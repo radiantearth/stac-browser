@@ -1,0 +1,23 @@
+{
+  "name": "stac-browser",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "vue": "^2.5.16"
+  },
+  "devDependencies": {
+    "@vue/component-compiler-utils": "^1.2.1",
+    "babel-preset-env": "^1.6.1",
+    "eslint": "^4.19.1",
+    "eslint-plugin-vue": "^4.5.0",
+    "parcel-bundler": "^1.8.1",
+    "parcel-plugin-eslint": "^1.0.4",
+    "parcel-plugin-vue": "^1.5.0"
+  }
+}
