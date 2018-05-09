@@ -16,8 +16,20 @@
     "babel-preset-env": "^1.6.1",
     "eslint": "^4.19.1",
     "eslint-plugin-vue": "^4.5.0",
+    "git-exec-and-restage": "^1.0.1",
+    "husky": "^0.14.3",
+    "lint-staged": "^7.1.0",
     "parcel-bundler": "^1.8.1",
     "parcel-plugin-eslint": "^1.0.4",
-    "parcel-plugin-vue": "^1.5.0"
+    "parcel-plugin-vue": "^1.5.0",
+    "prettier": "^1.12.1"
+  },
+  "lint-staged": {
+    "*.js": [
+      "git-exec-and-restage prettier --write --"
+    ],
+    "*.css": [
+      "git-exec-and-restage prettier --write --"
+    ]
   }
 }
