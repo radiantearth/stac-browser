@@ -100,12 +100,12 @@ export default {
       }
 
       // TODO global config
-      // return `https://wyn1lx9j71.execute-api.us-east-1.amazonaws.com/production/tiles/{z}/{x}/{y}@2x?url=${encodeURIComponent(
-      //   this.cog
-      // )}`;
-      return `http://localhost:8000/tiles/{z}/{x}/{y}@2x?url=${encodeURIComponent(
+      return `https://wyn1lx9j71.execute-api.us-east-1.amazonaws.com/production/tiles/{z}/{x}/{y}@2x?url=${encodeURIComponent(
         this.cog
       )}`;
+      // return `http://localhost:8000/tiles/{z}/{x}/{y}@2x?url=${encodeURIComponent(
+      //   this.cog
+      // )}`;
     },
     links() {
       return this.catalog != null ? this.catalog.links : null;
