@@ -1,13 +1,17 @@
 import AsyncComputed from "vue-async-computed";
+import BootstrapVue from "bootstrap-vue";
 import Vue from "vue";
 import VueRouter from "vue-router";
 
-require("../node_modules/leaflet/dist/leaflet.css");
+import "bootstrap/dist/css/bootstrap.css";
+import "bootstrap-vue/dist/bootstrap-vue.css";
+import "leaflet/dist/leaflet.css";
 
 import CatalogList from "./CatalogList.vue";
 import ItemDetail from "./ItemDetail.vue";
 
 Vue.use(AsyncComputed);
+Vue.use(BootstrapVue);
 Vue.use(VueRouter);
 
 const CATALOG_URL =

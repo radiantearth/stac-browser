@@ -1,0 +1,12 @@
+{
+  "license": "License",
+  "provider": "Provider",
+  "end": {
+    "label": "Acquisition End",
+    "type": "date"
+  },
+  "start": {
+    "label": "Acquisition Start",
+    "type": "date"
+  }
+}

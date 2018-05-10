@@ -1,55 +1,231 @@
+<style lang="css">
+body {
+  line-height: 24px;
+  color: #111;
+  font-family: Arial, sans-serif;
+}
+blockquote, body {
+  font-size: 16px;
+}
+table {
+  font-size: 80%;
+}
+h1, h2, h3, h4, h5, h6 {
+  padding: 0;
+  margin: 0;
+}
+h1, h2, h3, h4 {
+  font-family: Arial, sans-serif;
+  text-rendering: optimizeLegibility;
+  padding-bottom: 4px;
+}
+h1:last-child, h2:last-child, h3:last-child, h4:last-child {
+  padding-bottom: 0;
+}
+h1 {
+  font-weight: 400;
+  font-size: 28px;
+  line-height: 1.2;
+}
+h2 {
+  font-weight: 700;
+  font-size: 21px;
+  line-height: 1.3;
+}
+h3 {
+  font-weight: 700;
+}
+h3, h4 {
+  font-size: 17px;
+  line-height: 1.255;
+}
+h4 {
+  font-weight: 400;
+}
+h5 {
+  font-size: 13px;
+  line-height: 19px;
+}
+h5, h6 {
+  font-weight: 700;
+}
+h6 {
+  text-transform: uppercase;
+  font-size: 11px;
+  line-height: 1.465;
+  padding-bottom: 1px;
+}
+p {
+  padding: 0;
+  margin: 0 0 14px;
+}
+p:last-child {
+  margin-bottom: 0;
+}
+p + p {
+  margin-top: -4px;
+}
+b, strong {
+  font-weight: 700;
+}
+em, i {
+  font-style: italic;
+}
+blockquote {
+  margin: 13px;
+}
+small {
+  font-size: 12px;
+}
+a, a:active, a:link, a:visited {
+  color: #0066c0;
+}
+header {
+  padding: 1.5em 0 0.5em;
+}
+footer {
+  padding-bottom: 3em;
+}
+code {
+  white-space: nowrap;
+}
+</style>
+
+<style scoped lang="css">
+.vue2leaflet-map {
+  width: 100%;
+  height: 100%;
+  border: 1px solid #fff;
+  background-color: #090909;
+  z-index: 1;
+  position: relative;
+}
+
+#map-container {
+  height: 500px;
+}
+
+#thumbnail {
+  height: 500px;
+}
+
+#header_logo {
+  max-width: 100px;
+}
+
+ul.scene_files {
+  list-style-type: none;
+  padding: 0;
+}
+
+ul.scene_files {
+  margin: 0 0 1em;
+}
+
+ul.scene_files li {
+  margin: 0 0 0.2em;
+}
+</style>
+
 <template>
-  <div>
-    <h2>{{ name }}</h2>
+  <div class="container-fluid col-xs-12 col-md-8 col-md-offset-1">
+    <div class="row">
+      <header>
+        <!-- <a href="https://www.planet.com/disasterdata/">
+          <img
+            id="header_logo"
+            src="https://planet-pulse-assets-production.s3.amazonaws.com/uploads/2016/06/blog-logo.jpg"
+            alt="Powered by Planet Labs"
+            class="float-right">
+        </a> -->
+        <p>
+          <a href="/">Planet Disaster Data</a>
+          / <a href="/">Events</a>
+          / <a href="/">Hurricane Harvey</a>
+          / <a href="/">Aug 31</a>
+        </p>
+        <h1>{{ name }}</h1>
+        <p>Endpoint: <code>{{ url }}</code></p>
+      </header>
+    </div>
 
-    <l-map
-      ref="map"
-      style="height: 400px">
-      <l-tile-layer
-        :attribution="attribution"
-        :url="baseLayerSource"
-      />
-      <l-geo-json
-        ref="geojsonLayer"
-        :geojson="catalog"
-        :options="geojsonOptions"
-      />
-      <l-tile-layer
-        :url="tileSource"
-      />
-    </l-map>
+    <hr>
 
-    <p><code>{{ url }}</code></p>
-    <template v-if="properties">
-      <p>License: {{ properties.license }}</p>
-      <p>Provider: {{ properties.provider }}</p>
-      <p>Start: {{ properties.start }}</p>
-      <p>End: {{ properties.end }}</p>
-    </template>
+    <div class="row">
+      <div class="col-md-8">
+        <div
+          id="map-container">
+          <l-map ref="map">
+            <l-tile-layer
+              :attribution="attribution"
+              :url="baseLayerSource"
+            />
+            <l-geo-json
+              ref="geojsonLayer"
+              :geojson="catalog"
+              :options="geojsonOptions"
+            />
+            <l-tile-layer
+              :url="tileSource"
+            />
+            <l-tile-layer
+              :url="labelLayerSource"
+            />
+          </l-map>
+        </div>
 
-    <img
-      v-if="thumbnail"
-      :src="thumbnail"
-      width=400>
+        <!-- <h3>Preview</h3>
+        <a :href="thumbnail">
+          <img
+            v-if="thumbnail"
+            id="thumbnail"
+            :src="thumbnail">
+        </a> -->
+      </div>
 
-    <h3>Assets</h3>
-    <ul>
-      <li
-        v-for="asset in assets"
-        :key="asset.href">
-        <a
-          :href="asset.href"
-          v-html="asset.name" />
-        <template v-if="asset.format"> ({{ asset.format }})</template>
-        <template v-if="asset.product"> [<a :href="asset.product">product</a>]</template>
-      </li>
-    </ul>
+      <div class="col-md-4">
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Field</th>
+                <th>Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="prop in propertyList"
+                :key="prop.key">
+                <td>{{ prop.label }}</td>
+                <td>{{ prop.value }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Assets</h3>
+        <ul class="scene_files">
+          <li
+            v-for="asset in assets"
+            :key="asset.href">
+            <a
+              :href="asset.href"
+              v-html="asset.name" />
+            <template v-if="asset.format"> ({{ asset.format }})</template>
+            <template v-if="asset.product"> [<a :href="asset.product">product</a>]</template>
+          </li>
+        </ul>
+      </div>
+      <footer class="footer" />
+    </div>
   </div>
 </template>
 
 <script>
 import escape from "lodash.escape";
 import { LMap, LTileLayer, LGeoJson } from "vue2-leaflet";
+
+import dictionary from "./lib/stac/dictionary.json";
 
 export default {
   name: "ItemDetail",
@@ -77,11 +253,11 @@ export default {
           };
         }
       },
-      attribution: `Map data <a href="https://www.openstreetmap.org/copyright">&copy; OpenStreetMap contributors</a>`,
-      // this is not my Mapbox key
+      attribution: `Map data <a href="https://www.openstreetmap.org/copyright">&copy; OpenStreetMap contributors</a>, &copy; <a href="https://carto.com/attributions">CARTO</a>`,
       // TODO global config
       baseLayerSource:
-        "https://api.tiles.mapbox.com/v4/mapbox.light/{z}/{x}/{y}@2x.png?access_token=pk.eyJ1IjoibWJvdWNoYXVkIiwiYSI6ImNpdTA5bWw1azAyZDIyeXBqOWkxOGJ1dnkifQ.qha33VjEDTqcHQbibgHw3w"
+        "https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}@2x.png",
+      labelLayerSource: "https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}@2x.png"
     };
   },
   computed: {
@@ -100,7 +276,7 @@ export default {
       }
 
       // TODO global config
-      return `https://wyn1lx9j71.execute-api.us-east-1.amazonaws.com/production/tiles/{z}/{x}/{y}@2x?url=${encodeURIComponent(
+      return `https://tiles.rdnt.io/tiles/{z}/{x}/{y}@2x?url=${encodeURIComponent(
         this.cog
       )}`;
       // return `http://localhost:8000/tiles/{z}/{x}/{y}@2x?url=${encodeURIComponent(
@@ -163,6 +339,41 @@ export default {
         };
       });
     },
+    propertyList() {
+      if (this.catalog == null) {
+        return null;
+      }
+
+      const label = key => {
+        if (typeof dictionary[key] === "object") {
+          return dictionary[key].label;
+        }
+
+        return dictionary[key] || key;
+      }
+
+      const format = (key, value) => {
+        let suffix = "";
+
+        if (typeof dictionary[key] === "object") {
+          if (dictionary[key].suffix != null) {
+            suffix = dictionary[key].suffix;
+          }
+
+          if (dictionary[key].format === "date") {
+            return Date.parse(value) + suffix;
+          }
+        }
+
+        return value + suffix;
+      }
+
+      return Object.keys(this.catalog.properties).map(key => ({
+        key,
+        label: label(key),
+        value: format(key, this.catalog.properties[key])
+      }));
+    },
     properties() {
       if (this.catalog == null) {
         return null;
@@ -213,6 +424,3 @@ export default {
   }
 };
 </script>
-
-<style lang="css">
-</style>
