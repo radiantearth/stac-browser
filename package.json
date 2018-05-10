@@ -45,6 +45,9 @@
     ],
     "*.css": [
       "git-exec-and-restage prettier --write --"
+    ],
+    "*.vue": [
+      "git-exec-and-restage prettier --write --"
     ]
   },
   "alias": {
