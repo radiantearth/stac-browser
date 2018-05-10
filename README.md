@@ -2,7 +2,7 @@
 
 ```bash
 npm install
-npx parcel
+npx parcel --open
 ```
 
 ## Building
