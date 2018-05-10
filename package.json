@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "precommit": "lint-staged",
+    "start": "parcel"
   },
   "author": "",
   "license": "ISC",
@@ -16,7 +17,8 @@
     "vue": "^2.5.16",
     "vue-async-computed": "^3.3.1",
     "vue-router": "^3.0.1",
-    "vue2-leaflet": "^1.0.2"
+    "vue2-leaflet": "^1.0.2",
+    "vuex": "^3.0.1"
   },
   "devDependencies": {
     "@vue/component-compiler-utils": "^1.2.1",
