@@ -212,11 +212,9 @@ ul.scene_files li {
               :href="asset.href"
               v-html="asset.name" />
             <template v-if="asset.format"> ({{ asset.format }})</template>
-            <template v-if="asset.product"> [<a :href="asset.product">product</a>]</template>
           </li>
         </ul>
       </div>
-      <footer class="footer" />
     </div>
   </div>
 </template>
@@ -257,7 +255,8 @@ export default {
       // TODO global config
       baseLayerSource:
         "https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}@2x.png",
-      labelLayerSource: "https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}@2x.png"
+      labelLayerSource:
+        "https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}@2x.png"
     };
   },
   computed: {
@@ -291,8 +290,14 @@ export default {
         return null;
       }
 
+      // TODO does the key carry semantic meaning?
+      // for ISERV, it matches the name (except for `cog`)
       return (
-        this.catalog.assets
+        Object.keys(this.catalog.assets)
+          .map(key => ({
+            ...this.catalog.assets[key],
+            key
+          }))
           .map(x => ({
             ...x,
             name: escape(x.name) || `<code>${escape(x.href)}</code>`,
@@ -350,7 +355,7 @@ export default {
         }
 
         return dictionary[key] || key;
-      }
+      };
 
       const format = (key, value) => {
         let suffix = "";
@@ -366,7 +371,7 @@ export default {
         }
 
         return value + suffix;
-      }
+      };
 
       return Object.keys(this.catalog.properties).map(key => ({
         key,

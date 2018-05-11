@@ -2,11 +2,16 @@
   "license": "License",
   "provider": "Provider",
   "end": {
+    "TODO": "are these still used?",
     "label": "Acquisition End",
     "type": "date"
   },
   "start": {
     "label": "Acquisition Start",
+    "type": "date"
+  },
+  "datetime": {
+    "label": "Acquired",
     "type": "date"
   }
 }
