@@ -5,6 +5,7 @@ module.exports = {
     "plugin:prettier/recommended"
   ],
   globals: {
+    process: true,
     require: true
   },
   parser: "vue-eslint-parser",

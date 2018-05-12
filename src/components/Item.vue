@@ -155,17 +155,24 @@ ul.scene_files li {
       <div class="col-md-8">
         <div
           id="map-container">
-          <l-map ref="map">
+          <!-- TODO locator map -->
+          <!-- TODO include location + state in hash -->
+          <l-map
+            ref="map"
+            @update:zoom="onUpdateZoom"
+            @update:bounds="onUpdateBounds">
             <l-tile-layer
               :attribution="attribution"
               :url="baseLayerSource"
             />
             <l-geo-json
+              v-if="catalog"
               ref="geojsonLayer"
               :geojson="catalog"
               :options="geojsonOptions"
             />
             <l-tile-layer
+              v-if="tileSource"
               :url="tileSource"
             />
             <l-tile-layer
@@ -184,6 +191,7 @@ ul.scene_files li {
       </div>
 
       <div class="col-md-4">
+        <h3>Metadata</h3>
         <div class="table-responsive">
           <table class="table">
             <thead>
@@ -221,9 +229,11 @@ ul.scene_files li {
 
 <script>
 import escape from "lodash.escape";
+import isEqual from "lodash.isequal";
 import { LMap, LTileLayer, LGeoJson } from "vue2-leaflet";
+import { mapActions, mapGetters } from "vuex";
 
-import dictionary from "./lib/stac/dictionary.json";
+import dictionary from "../lib/stac/dictionary.json";
 
 export default {
   name: "ItemDetail",
@@ -233,14 +243,21 @@ export default {
     LGeoJson
   },
   props: {
-    url: {
-      type: String,
+    path: {
+      type: Array,
+      required: true
+    },
+    resolve: {
+      type: Function,
+      required: true
+    },
+    slugify: {
+      type: Function,
       required: true
     }
   },
   data() {
     return {
-      catalog: null,
       geojsonOptions: {
         style: function() {
           return {
@@ -260,6 +277,13 @@ export default {
     };
   },
   computed: {
+    ...mapGetters(["catalogForPath", "urlForPath"]),
+    url() {
+      return this.urlForPath(this.path);
+    },
+    catalog() {
+      return this.catalogForPath(this.path);
+    },
     cog() {
       if (this.assets != null) {
         const cog = this.assets.find(x => x.format === "cog");
@@ -396,7 +420,7 @@ export default {
 
       const self = this.links.find(x => x.type === "self");
 
-      return new URL(self.href, this.url).toString();
+      return this.resolve(self.href, this.url);
     },
     thumbnail() {
       if (this.links == null) {
@@ -405,26 +429,76 @@ export default {
 
       const thumbnail = this.links.find(x => x.type === "thumbnail");
 
-      return new URL(thumbnail.href, this.url).toString();
+      return this.resolve(thumbnail.href, this.url);
     }
   },
-  async created() {
-    if (this.url != null) {
-      this.catalog = await (await fetch(this.url)).json();
+  watch: {
+    catalog(from, to) {
+      if (!isEqual(from, to)) {
+        console.log("catalog changed");
+
+        const { map } = this.$refs;
+        const {
+          mapObject: { attributionControl }
+        } = map;
+
+        // TODO license + provider may not be present
+        attributionControl.addAttribution(
+          `Imagery ${this.properties.license} ${this.properties.provider}`
+        );
+
+        this.$nextTick(() => {
+          const { geojsonLayer } = this.$refs;
+          map.setBounds(geojsonLayer.getBounds());
+        });
+      }
+    },
+    path(from, to) {
+      // created() handles the initial load; this handles components that have been navigated to
+      if (!isEqual(from, to)) {
+        this.initialize();
+      }
+    }
+  },
+  created() {
+    this.initialize();
+  },
+  methods: {
+    ...mapActions(["loadPath"]),
+    async initialize() {
+      await this.loadPath({
+        path: this.path
+      });
 
       const { geojsonLayer, map } = this.$refs;
       const {
         mapObject: { attributionControl }
       } = map;
 
-      geojsonLayer.setGeojson(this.catalog);
       attributionControl.setPrefix("");
-      map.setBounds(geojsonLayer.getBounds());
 
-      // TODO license + provider may not be present
-      attributionControl.addAttribution(
-        `Imagery ${this.properties.license} ${this.properties.provider}`
-      );
+      if (geojsonLayer != null) {
+        geojsonLayer.setGeojson(this.catalog);
+        map.setBounds(geojsonLayer.getBounds());
+      }
+    },
+    onUpdateBounds() {
+      this.updateHash();
+    },
+    onUpdateZoom() {
+      this.updateHash();
+    },
+    updateHash() {
+      const {
+        map: { mapObject: map }
+      } = this.$refs;
+      const center = map.getCenter();
+      const zoom = map.getZoom();
+
+      this.$router.replace({
+        ...this.$route,
+        hash: `${zoom}/${center.lat.toFixed(6)}/${center.lng.toFixed(6)}`
+      });
     }
   }
 };

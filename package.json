@@ -12,8 +12,11 @@
   "dependencies": {
     "bootstrap-vue": "^2.0.0-rc.9",
     "css-loader": "^0.28.11",
+    "es6-promise": "^4.2.4",
     "jquery": "^3.3.1",
     "lodash.escape": "^4.0.1",
+    "lodash.isequal": "^4.5.0",
+    "sha.js": "^2.4.11",
     "vue": "^2.5.16",
     "vue-async-computed": "^3.3.1",
     "vue-router": "^3.0.1",
