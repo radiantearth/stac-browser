@@ -141,7 +141,7 @@ ul.scene_files li {
           </a> -->
           <b-breadcrumb :items="breadcrumbs" />
           <h1>{{ name }}</h1>
-          <p>Endpoint: <code>{{ url }}</code></p>
+          <p><small><code>{{ url }}</code></small></p>
         </header>
       </b-col>
     </b-row>

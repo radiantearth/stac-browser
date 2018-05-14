@@ -24,7 +24,7 @@ ul.links li, ul.items li {
           </a> -->
           <b-breadcrumb :items="breadcrumbs" />
           <h1>{{ name }}</h1>
-          <p>Endpoint: <code>{{ url }}</code></p>
+          <p><small><code>{{ url }}</code></small></p>
           <template v-if="meta">
             <p>
               Contact: {{ meta.contact }}<br>
@@ -57,13 +57,26 @@ ul.links li, ul.items li {
     <b-row v-if="items.length > 0">
       <b-col md="12">
         <h3>Items</h3>
-        <ul class="items">
-          <li
-            v-for="item in items"
-            :key="item.path">
-            <router-link :to="'/item/' + item.slug">{{ item.title }}</router-link>
-          </li>
-        </ul>
+        <b-pagination
+          :total-rows="items.length"
+          :per-page="perPage"
+          :hide-goto-end-buttons="true"
+          v-model="currentPage" />
+        <b-table
+          :items="items"
+          :fields="itemFields"
+          :per-page="perPage"
+          :current-page="currentPage"
+          :sort-compare="sortCompare"
+          responsive
+          small
+          striped>
+          <template
+            slot="link"
+            slot-scope="data">
+            <router-link :to="data.item.to">{{ data.item.title }}</router-link>
+          </template>
+        </b-table>
       </b-col>
     </b-row>
   </b-container>
@@ -88,6 +101,22 @@ export default {
       type: Function,
       required: true
     }
+  },
+  data() {
+    return {
+      itemFields: {
+        link: {
+          label: "Title",
+          sortable: true
+        },
+        dateAcquired: {
+          label: "Date Acquired",
+          sortable: true
+        }
+      },
+      currentPage: 1,
+      perPage: 25
+    };
   },
   computed: {
     ...mapGetters(["catalogForPath", "urlForPath"]),
@@ -152,11 +181,28 @@ export default {
         return [];
       }
 
-      return this.catalog.links.filter(x => x.rel === "item").map(item => ({
-        slug: [this.$route.params.path, this.slugify(item.href)].join("/"),
-        title: item.title || item.href,
-        url: this.resolve(item.href, this.url)
-      }));
+      return this.catalog.links.filter(x => x.rel === "item").map(item => {
+        const catalog = this.catalogForPath(
+          this.path.concat(this.slugify(item.href))
+        );
+
+        if (catalog != null) {
+          return {
+            to:
+              "/item/" +
+              [this.$route.params.path, this.slugify(item.href)].join("/"),
+            title: catalog.id || item.title || item.href,
+            dateAcquired: catalog.properties.datetime
+          };
+        }
+
+        return {
+          to:
+            "/item/" +
+            [this.$route.params.path, this.slugify(item.href)].join("/"),
+          title: item.title || item.href
+        };
+      });
     },
     license() {
       if (this.catalog == null) {
@@ -232,17 +278,26 @@ export default {
     }
   },
   watch: {
+    currentPage(to) {
+      const start = (to - 1) * this.perPage;
+      const count = to * this.perPage;
+
+      return this.catalog.links
+        .filter(x => x.rel === "item")
+        .slice(start, count)
+        .map(item =>
+          this.loadPath({
+            path: this.path.concat(this.slugify(item.href))
+          })
+        );
+    },
     path() {
       // created() handles the initial load; this handles components that have been navigated to
-      this.loadPath({
-        path: this.path
-      });
+      this.initialize();
     }
   },
   created() {
-    this.loadPath({
-      path: this.path
-    });
+    this.initialize();
   },
   mounted() {
     // console.log("mounted");
@@ -267,7 +322,41 @@ export default {
     return next();
   },
   methods: {
-    ...mapActions(["loadPath"])
+    ...mapActions(["loadPath"]),
+    async initialize() {
+      await this.loadPath({
+        path: this.path
+      });
+
+      const catalog = this.catalogForPath(this.path);
+
+      const start = (this.currentPage - 1) * this.perPage;
+      const count = this.currentPage * this.perPage;
+
+      return catalog.links
+        .filter(x => x.rel === "item")
+        .slice(start, count)
+        .map(item =>
+          this.loadPath({
+            path: this.path.concat(this.slugify(item.href))
+          })
+        );
+    },
+    sortCompare(a, b, key) {
+      if (key === "link") {
+        key = "title";
+      }
+
+      if (typeof a[key] === "number" && typeof b[key] === "number") {
+        // If both compared fields are native numbers
+        return a[key] < b[key] ? -1 : a[key] > b[key] ? 1 : 0;
+      } else {
+        // Stringify the field data and use String.localeCompare
+        return a[key].toString().localeCompare(b[key].toString(), undefined, {
+          numeric: true
+        });
+      }
+    }
   }
 };
 </script>
