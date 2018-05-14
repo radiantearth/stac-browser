@@ -95,6 +95,10 @@ export default {
       return this.urlForPath(this.path);
     },
     breadcrumbs() {
+      if (this.catalog == null) {
+        return [];
+      }
+
       const rootCatalog = this.catalogForPath([""]);
 
       return [
