@@ -177,6 +177,24 @@ ul.scene_files li {
             />
           </l-map>
           <h3>Assets</h3>
+          <!-- TODO display in a table to provide space for type, size -->
+          <!-- <div class="table-responsive">
+            <table class="table">
+              <tbody>
+                <tr
+                  v-for="asset in assets"
+                  :key="asset.href">
+                  <td>
+                    <a
+                      :href="asset.href"
+                      v-html="asset.name" />
+                    <template v-if="asset.format"> ({{ asset.format }})</template>
+                  </td>
+                  <td>{{ asset.size }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div> -->
           <ul class="scene_files">
             <li
               v-for="asset in assets"
