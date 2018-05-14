@@ -179,6 +179,17 @@ ul.scene_files li {
               :url="labelLayerSource"
             />
           </l-map>
+          <h3>Assets</h3>
+          <ul class="scene_files">
+            <li
+              v-for="asset in assets"
+              :key="asset.href">
+              <a
+                :href="asset.href"
+                v-html="asset.name" />
+              <template v-if="asset.format"> ({{ asset.format }})</template>
+            </li>
+          </ul>
         </div>
 
         <!-- <h3>Preview</h3>
@@ -194,12 +205,6 @@ ul.scene_files li {
         <h3>Metadata</h3>
         <div class="table-responsive">
           <table class="table">
-            <thead>
-              <tr>
-                <th>Field</th>
-                <th>Value</th>
-              </tr>
-            </thead>
             <tbody>
               <tr
                 v-for="prop in propertyList"
@@ -210,18 +215,6 @@ ul.scene_files li {
             </tbody>
           </table>
         </div>
-
-        <h3>Assets</h3>
-        <ul class="scene_files">
-          <li
-            v-for="asset in assets"
-            :key="asset.href">
-            <a
-              :href="asset.href"
-              v-html="asset.name" />
-            <template v-if="asset.format"> ({{ asset.format }})</template>
-          </li>
-        </ul>
       </div>
     </div>
   </div>
@@ -286,7 +279,11 @@ export default {
     },
     cog() {
       if (this.assets != null) {
-        const cog = this.assets.find(x => x.format === "cog");
+        console.log(this.assets);
+        const cog = this.assets.find(
+          // TODO x.name is a Planet-specific workaround
+          x => x.format === "cog" || x.name.includes("COG")
+        );
 
         if (cog != null) {
           return new URL(cog.href, this.url).toString();
@@ -443,6 +440,7 @@ export default {
         } = map;
 
         // TODO license + provider may not be present
+        // TODO license may be an object
         attributionControl.addAttribution(
           `Imagery ${this.properties.license} ${this.properties.provider}`
         );
@@ -478,6 +476,12 @@ export default {
       attributionControl.setPrefix("");
 
       if (geojsonLayer != null) {
+        // TODO license + provider may not be present
+        // TODO license may be an object
+        attributionControl.addAttribution(
+          `Imagery ${this.properties.license} ${this.properties.provider}`
+        );
+
         geojsonLayer.setGeojson(this.catalog);
         map.setBounds(geojsonLayer.getBounds());
       }

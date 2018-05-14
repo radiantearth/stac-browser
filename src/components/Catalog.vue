@@ -34,7 +34,7 @@ ul.links li, ul.items li {
             Contact: {{ meta.contact }}<br>
             Keywords: {{ meta.keywords }}<br>
             Formats: {{ meta.formats }}<br>
-            License: {{ meta.license }}
+            License: <span v-html="license" />
           </p>
         </template>
       </b-col>
@@ -73,6 +73,7 @@ ul.links li, ul.items li {
 </template>
 
 <script>
+import escape from "lodash.escape";
 import { mapActions, mapGetters } from "vuex";
 
 export default {
@@ -121,6 +122,33 @@ export default {
         title: item.title || item.href,
         url: this.resolve(item.href, this.url)
       }));
+    },
+    license() {
+      if (this.catalog == null) {
+        return null;
+      }
+
+      // TODO short_name in JSON -> not snake case
+      const {
+        copyright,
+        link,
+        name,
+        short_name: shortName
+      } = this.catalog.license;
+
+      if (
+        copyright != null &&
+        link != null &&
+        name != null &&
+        shortName != null
+      ) {
+        console.log(this.catalog.license);
+        return `Licensed under <a href="${link}" title=${escape(
+          shortName
+        )}>${name}</a> by ${escape(copyright)}`;
+      }
+
+      return this.catalog.license;
     },
     // TODO it doesn't appear to make any sense to group these here
     meta() {

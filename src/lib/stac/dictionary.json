@@ -3,15 +3,95 @@
   "provider": "Provider",
   "end": {
     "TODO": "are these still used?",
-    "label": "Acquisition End",
+    "label": "Acquisition end",
     "type": "date"
   },
   "start": {
-    "label": "Acquisition Start",
+    "label": "Acquisition start",
     "type": "date"
   },
   "datetime": {
     "label": "Acquired",
     "type": "date"
+  },
+  "eo:cloud_cover": {
+    "label": "Cloud cover"
+  },
+  "eo:gsd": {
+    "label": "Ground sample distance",
+    "suffix": "m"
+  },
+  "eo:azimuth": {
+    "label": "Sun azimuth",
+    "suffix": "º"
+  },
+  "eo:sun_azimuth": {
+    "label": "Sun azimuth",
+    "suffix": "º"
+  },
+  "eo:sun_elevation": {
+    "label": "Sun elevation",
+    "suffix": "º"
+  },
+  "eo:off_nadir": {
+    "label": "Off-nadir angle",
+    "suffix": "º"
+  },
+  "pl:anomalous_pixels": {
+    "label": "Anomalous pixels"
+  },
+  "pl:epsg_code": {
+    "label": "EPSG code"
+  },
+  "pl:ground_control": {
+    "label": "Ground control"
+  },
+  "pl:instrument": {
+    "label": "Instrument"
+  },
+  "pl:item_type": {
+    "label": "Source type"
+  },
+  "pl:origin_x": {
+    "label": "X origin"
+  },
+  "pl:origin_y": {
+    "label": "Y origin"
+  },
+  "pl:pixel_resolution": {
+    "label": "Pixel resolution"
+  },
+  "pl:provider": {
+    "label": "Provider"
+  },
+  "pl:published": {
+    "label": "Published",
+    "type": "date"
+  },
+  "pl:quality_category": {
+    "label": "Quality category"
+  },
+  "pl:columns": {
+    "label": "Columns"
+  },
+  "pl:rows": {
+    "label": "Rows"
+  },
+  "pl:satellite_id": {
+    "label": "Satellite ID"
+  },
+  "pl:strip_id": {
+    "label": "Strip ID"
+  },
+  "pl:updated": {
+    "label": "Updated",
+    "type": "date"
+  },
+  "pl:usable_data": {
+    "label": "Usable data"
+  },
+  "pl:view_angle": {
+    "label": "View angle",
+    "suffix": "º"
   }
 }

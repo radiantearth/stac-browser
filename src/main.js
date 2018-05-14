@@ -17,21 +17,21 @@ Vue.use(BootstrapVue);
 Vue.use(VueRouter);
 Vue.use(Vuex);
 
-const CATALOG_URL =
-  process.env.CATALOG_URL ||
-  "https://s3-us-west-2.amazonaws.com/radiant-nasa-iserv/iserv.json";
 // const CATALOG_URL =
-//   "https://storage.googleapis.com/pdd-stac/disasters/catalog.json";
+//   process.env.CATALOG_URL ||
+//   "https://s3-us-west-2.amazonaws.com/radiant-nasa-iserv/iserv.json";
+const CATALOG_URL =
+  "https://storage.googleapis.com/pdd-stac/disasters/catalog.json";
 import sha from "sha.js";
 
 // TODO allow this to be configured globally in case specific slugs can be inferred from the catalog structure (e.g. ISERV with dates)
-// const slugify = path =>
-//   sha("sha256")
-//     .update(path)
-//     .digest("hex")
-//     .slice(0, 16);
+const slugify = path =>
+  sha("sha256")
+    .update(path)
+    .digest("hex")
+    .slice(0, 16);
 
-const slugify = path => path.split("/")[0];
+// const slugify = path => path.split("/")[0];
 
 const resolve = (href, base = CATALOG_URL) => new URL(href, base).toString();
 
@@ -154,10 +154,7 @@ const main = async () => {
 
         commit("LOADED", { catalog, url });
       },
-      async loadPath(
-        { dispatch, getters, state },
-        { path, url = CATALOG_URL }
-      ) {
+      async loadPath({ dispatch, state }, { path, url = CATALOG_URL }) {
         if (path[0] === "") {
           path.shift();
         }
