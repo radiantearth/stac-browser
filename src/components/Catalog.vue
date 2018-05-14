@@ -95,29 +95,38 @@ export default {
       return this.urlForPath(this.path);
     },
     breadcrumbs() {
-      return this.path
-        .map((el, i) => {
-          const partialPath = this.path.slice(0, i + 1);
-          const catalog = this.catalogForPath(partialPath);
-          let slugPath = "/" + partialPath.join("/");
+      const rootCatalog = this.catalogForPath([""]);
 
-          if (catalog != null) {
-            // TODO should there always be an id field?
-            // a name field?
-            if (catalog.type === "Feature") {
-              // TODO how best to distinguish Catalogs from Items?
-              slugPath = `/item${slugPath}`;
+      return [
+        {
+          to: "/",
+          text: rootCatalog.name
+        }
+      ].concat(
+        this.path
+          .map((el, i) => {
+            const partialPath = this.path.slice(0, i + 1);
+            const catalog = this.catalogForPath(partialPath);
+            let slugPath = "/" + partialPath.join("/");
+
+            if (catalog != null) {
+              // TODO should there always be an id field?
+              // a name field?
+              if (catalog.type === "Feature") {
+                // TODO how best to distinguish Catalogs from Items?
+                slugPath = `/item${slugPath}`;
+              }
+
+              return {
+                to: slugPath,
+                text: catalog.name || catalog.id
+              };
             }
 
-            return {
-              to: slugPath,
-              text: catalog.name || catalog.id
-            };
-          }
-
-          return null;
-        })
-        .filter(x => x != null);
+            return null;
+          })
+          .filter(x => x != null)
+      );
     },
     catalog() {
       return this.catalogForPath(this.path);
