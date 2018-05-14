@@ -128,26 +128,23 @@ ul.scene_files li {
 </style>
 
 <template>
-  <div class="container-fluid col-xs-12 col-md-8 col-md-offset-1">
-    <div class="row">
-      <header>
-        <!-- <a href="https://www.planet.com/disasterdata/">
-          <img
-            id="header_logo"
-            src="https://planet-pulse-assets-production.s3.amazonaws.com/uploads/2016/06/blog-logo.jpg"
-            alt="Powered by Planet Labs"
-            class="float-right">
-        </a> -->
-        <p>
-          <a href="/">Planet Disaster Data</a>
-          / <a href="/">Events</a>
-          / <a href="/">Hurricane Harvey</a>
-          / <a href="/">Aug 31</a>
-        </p>
-        <h1>{{ name }}</h1>
-        <p>Endpoint: <code>{{ url }}</code></p>
-      </header>
-    </div>
+  <b-container>
+    <b-row>
+      <b-col md="12">
+        <header>
+          <!-- <a href="https://www.planet.com/disasterdata/">
+            <img
+              id="header_logo"
+              src="https://planet-pulse-assets-production.s3.amazonaws.com/uploads/2016/06/blog-logo.jpg"
+              alt="Powered by Planet Labs"
+              class="float-right">
+          </a> -->
+          <b-breadcrumb :items="breadcrumbs" />
+          <h1>{{ name }}</h1>
+          <p>Endpoint: <code>{{ url }}</code></p>
+        </header>
+      </b-col>
+    </b-row>
 
     <hr>
 
@@ -217,7 +214,7 @@ ul.scene_files li {
         </div>
       </div>
     </div>
-  </div>
+  </b-container>
 </template>
 
 <script>
@@ -274,12 +271,36 @@ export default {
     url() {
       return this.urlForPath(this.path);
     },
+    breadcrumbs() {
+      return this.path
+        .map((el, i) => {
+          const partialPath = this.path.slice(0, i + 1);
+          const catalog = this.catalogForPath(partialPath);
+          let slugPath = "/" + partialPath.join("/");
+
+          if (catalog != null) {
+            // TODO should there always be an id field?
+            // a name field?
+            if (catalog.type === "Feature") {
+              // TODO how best to distinguish Catalogs from Items?
+              slugPath = `/item${slugPath}`;
+            }
+
+            return {
+              to: slugPath,
+              text: catalog.name || catalog.id
+            };
+          }
+
+          return null;
+        })
+        .filter(x => x != null);
+    },
     catalog() {
       return this.catalogForPath(this.path);
     },
     cog() {
       if (this.assets != null) {
-        console.log(this.assets);
         const cog = this.assets.find(
           // TODO x.name is a Planet-specific workaround
           x => x.format === "cog" || x.name.includes("COG")
