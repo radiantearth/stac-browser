@@ -21,11 +21,11 @@ const CATALOG_URL =
   process.env.CATALOG_URL ||
   "https://s3-us-west-2.amazonaws.com/radiant-nasa-iserv/iserv.json";
 
-import sha from "sha.js";
+import sha256 from "hash.js/lib/hash/sha/256";
 
 // TODO allow this to be configured globally in case specific slugs can be inferred from the catalog structure (e.g. ISERV with dates)
 const slugify = path =>
-  sha("sha256")
+  sha256()
     .update(path)
     .digest("hex")
     .slice(0, 16);
