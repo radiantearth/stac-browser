@@ -275,10 +275,6 @@ export default {
     resolve: {
       type: Function,
       required: true
-    },
-    slugify: {
-      type: Function,
-      required: true
     }
   },
   data() {

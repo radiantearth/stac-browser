@@ -57,8 +57,7 @@ const main = async () => {
       component: Item,
       props: route => ({
         path: (route.params.path || "").split("/"),
-        resolve,
-        slugify
+        resolve
       })
     },
     {
@@ -104,7 +103,7 @@ const main = async () => {
         const link = catalog.links.find(link => {
           return (
             ["child", "item"].includes(link.rel) &&
-            slugify(link.href) === path[0]
+            (link.slug || slugify(link.href)) === path[0]
           );
         });
 
@@ -193,7 +192,7 @@ const main = async () => {
           const link = catalog.links.find(link => {
             return (
               ["child", "item"].includes(link.rel) &&
-              slugify(link.href) === slug
+              (link.slug || slugify(link.href)) === slug
             );
           });
 

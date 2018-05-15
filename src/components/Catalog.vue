@@ -226,7 +226,7 @@ export default {
 
       return this.catalog.links.filter(x => x.rel === "child").map(child => ({
         path: child.href,
-        slug: this.slugify(child.href),
+        slug: child.slug || this.slugify(child.href),
         title: child.title || child.href,
         url: this.resolve(child.href, this.url)
       }));
@@ -245,14 +245,17 @@ export default {
 
       return this.catalog.links.filter(x => x.rel === "item").map(item => {
         const catalog = this.catalogForPath(
-          this.path.concat(this.slugify(item.href))
+          this.path.concat(item.slug || this.slugify(item.href))
         );
 
         if (catalog != null) {
           return {
             to:
               "/item/" +
-              [this.$route.params.path, this.slugify(item.href)].join("/"),
+              [
+                this.$route.params.path,
+                item.slug || this.slugify(item.href)
+              ].join("/"),
             title: catalog.id || item.title || item.href,
             dateAcquired: catalog.properties.datetime
           };
@@ -261,7 +264,10 @@ export default {
         return {
           to:
             "/item/" +
-            [this.$route.params.path, this.slugify(item.href)].join("/"),
+            [
+              this.$route.params.path,
+              item.slug || this.slugify(item.href)
+            ].join("/"),
           title: item.title || item.href
         };
       });
@@ -361,7 +367,7 @@ export default {
         .slice(start, count)
         .map(item =>
           this.loadPath({
-            path: this.path.concat(this.slugify(item.href))
+            path: this.path.concat(item.slug || this.slugify(item.href))
           })
         );
     },
@@ -413,7 +419,7 @@ export default {
           .slice(start, count)
           .map(item =>
             this.loadPath({
-              path: this.path.concat(this.slugify(item.href))
+              path: this.path.concat(item.slug || this.slugify(item.href))
             })
           );
       }
