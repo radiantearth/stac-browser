@@ -38,7 +38,7 @@ ul.links li, ul.items li {
         </a> -->
         <h1><a :href="homepage">{{ name }}</a></h1>
         <p><small><code>{{ url }}</code></small></p>
-        <p><em>{{ description }}</em></p>
+        <p v-if="description"><em>{{ description }}</em></p>
         <p v-html="license" />
 
         <hr>
@@ -69,10 +69,10 @@ ul.links li, ul.items li {
                 <tr v-if="meta.contact">
                   <td class="title">Contact</td>
                   <td>
-                    {{ meta.contact.name }}<br>
-                    {{ meta.contact.organization }}<br>
-                    <a :href="meta.contact.emailUrl">{{ meta.contact.email }}</a><br>
-                    <a :href="meta.contact.url">{{ meta.contact.url }}</a>
+                    <template v-if="meta.contact.name">{{ meta.contact.name }}<br></template>
+                    <template v-if="meta.contact.organization">{{ meta.contact.organization }}<br></template>
+                    <template v-if="meta.contact.email"><a :href="meta.contact.emailUrl">{{ meta.contact.email }}</a><br></template>
+                    <template v-if="meta.contact.url"><a :href="meta.contact.url">{{ meta.contact.url }}</a></template>
                   </td>
                 </tr>
                 <tr v-if="meta.keywords">
@@ -336,9 +336,11 @@ export default {
         if (license.short_name != null) {
           // TODO short_name in JSON -> not snake case
           meta.shortLicense = license.short_name;
+        } else if (typeof license === "string") {
+          meta.shortLicense = license;
         }
 
-        if (license.link != null) {
+        if (typeof license === "object" && license.link != null) {
           meta.licenseUrl = license.link;
         }
       }
