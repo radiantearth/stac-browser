@@ -343,6 +343,13 @@ export default {
     catalog() {
       return this.catalogForPath(this.path);
     },
+    center() {
+      if (this.$route.hash === "") {
+        return null;
+      }
+
+      return this.$route.hash.slice(1).split("/");
+    },
     cog() {
       if (this.assets != null) {
         const cog = this.assets.find(
@@ -513,10 +520,12 @@ export default {
           `Imagery ${this.properties.license} ${this.properties.provider}`
         );
 
-        this.$nextTick(() => {
-          const { geojsonLayer } = this.$refs;
-          map.setBounds(geojsonLayer.getBounds());
-        });
+        if (this.center == null) {
+          this.$nextTick(() => {
+            const { geojsonLayer } = this.$refs;
+            map.setBounds(geojsonLayer.getBounds());
+          });
+        }
       }
     },
     fullscreen(to, from) {
@@ -550,8 +559,15 @@ export default {
     async initialize() {
       const { map } = this.$refs;
       const {
+        mapObject,
         mapObject: { attributionControl }
       } = map;
+
+      if (this.center != null) {
+        const [zoom, lat, lng] = this.center;
+
+        mapObject.setView([lat, lng], zoom);
+      }
 
       attributionControl.setPrefix("");
 
@@ -573,7 +589,9 @@ export default {
         );
 
         geojsonLayer.setGeojson(this.catalog);
-        map.setBounds(geojsonLayer.getBounds());
+        if (this.center == null) {
+          map.setBounds(geojsonLayer.getBounds());
+        }
       }
     },
     onFullscreenChange(_fullscreen) {
