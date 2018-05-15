@@ -268,13 +268,6 @@ export default {
     },
     name() {
       return this.catalog != null ? this.catalog.name : null;
-    },
-    self() {
-      if (this.catalog == null) {
-        return null;
-      }
-
-      return this.catalog.links.find(x => x.rel === "self");
     }
   },
   watch: {
