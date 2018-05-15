@@ -17,11 +17,10 @@ Vue.use(BootstrapVue);
 Vue.use(VueRouter);
 Vue.use(Vuex);
 
-// const CATALOG_URL =
-//   process.env.CATALOG_URL ||
-//   "https://s3-us-west-2.amazonaws.com/radiant-nasa-iserv/iserv.json";
 const CATALOG_URL =
-  "https://storage.googleapis.com/pdd-stac/disasters/catalog.json";
+  process.env.CATALOG_URL ||
+  "https://s3-us-west-2.amazonaws.com/radiant-nasa-iserv/iserv.json";
+
 import sha from "sha.js";
 
 // TODO allow this to be configured globally in case specific slugs can be inferred from the catalog structure (e.g. ISERV with dates)
