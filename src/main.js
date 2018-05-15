@@ -32,11 +32,21 @@ const CATALOG_URL =
 //     .digest("hex")
 //     .slice(0, 16);
 
-const slugify = pathname =>
-  path
+const slugify = pathname => {
+  const basename = path
+    .basename(pathname)
+    .split(".")
+    .shift();
+
+  if (basename !== "catalog") {
+    return basename;
+  }
+
+  return path
     .dirname(pathname)
     .split("/")
     .pop();
+};
 
 const resolve = (href, base = CATALOG_URL) => new URL(href, base).toString();
 
