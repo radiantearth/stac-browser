@@ -92,6 +92,15 @@ code {
 </style>
 
 <style scoped lang="css">
+.leaflet-pseudo-fullscreen {
+  position: fixed !important;
+  width: 100% !important;
+  height: 100% !important;
+  top: 0 !important;
+  left: 0 !important;
+  z-index: 99999;
+}
+
 .vue2leaflet-map {
   width: 100%;
   height: 100%;
@@ -111,6 +120,10 @@ code {
 
 #header_logo {
   max-width: 100px;
+}
+
+td.title {
+  font-weight: bold;
 }
 
 ul.scene_files {
@@ -153,11 +166,13 @@ ul.scene_files li {
         <div
           id="map-container">
           <!-- TODO locator map -->
-          <!-- TODO include location + state in hash -->
           <l-map
             ref="map"
             @update:zoom="onUpdateZoom"
             @update:bounds="onUpdateBounds">
+            <l-control-fullscreen
+              :fullscreen="fullscreen"
+              :on-change="onFullscreenChange" />
             <l-tile-layer
               :attribution="attribution"
               :url="baseLayerSource"
@@ -224,7 +239,7 @@ ul.scene_files li {
               <tr
                 v-for="prop in propertyList"
                 :key="prop.key">
-                <td>{{ prop.label }}</td>
+                <td class="title">{{ prop.label }}</td>
                 <td>{{ prop.value }}</td>
               </tr>
             </tbody>
@@ -241,11 +256,13 @@ import isEqual from "lodash.isequal";
 import { LMap, LTileLayer, LGeoJson } from "vue2-leaflet";
 import { mapActions, mapGetters } from "vuex";
 
+import LControlFullscreen from "./LControlFullscreen";
 import dictionary from "../lib/stac/dictionary.json";
 
 export default {
   name: "ItemDetail",
   components: {
+    LControlFullscreen,
     LMap,
     LTileLayer,
     LGeoJson
@@ -341,6 +358,9 @@ export default {
           return new URL(cog.href, this.url).toString();
         }
       }
+    },
+    fullscreen() {
+      return this.$route.query.fullscreen === "true";
     },
     tileSource() {
       if (this.cog == null) {
@@ -482,7 +502,7 @@ export default {
     }
   },
   watch: {
-    catalog(from, to) {
+    catalog(to, from) {
       if (!isEqual(from, to)) {
         console.log("catalog changed");
 
@@ -503,29 +523,51 @@ export default {
         });
       }
     },
-    path(from, to) {
+    fullscreen(to, from) {
+      if (to !== from) {
+        const {
+          map,
+          map: { mapObject }
+        } = this.$refs;
+
+        if (to) {
+          map.$el.classList.add("leaflet-pseudo-fullscreen");
+        } else {
+          map.$el.classList.remove("leaflet-pseudo-fullscreen");
+        }
+
+        mapObject.invalidateSize();
+      }
+    },
+    path(to, from) {
       // created() handles the initial load; this handles components that have been navigated to
       if (!isEqual(from, to)) {
         this.initialize();
       }
     }
   },
-  created() {
+  mounted() {
     this.initialize();
   },
   methods: {
     ...mapActions(["loadPath"]),
     async initialize() {
-      await this.loadPath({
-        path: this.path
-      });
-
-      const { geojsonLayer, map } = this.$refs;
+      const { map } = this.$refs;
       const {
         mapObject: { attributionControl }
       } = map;
 
       attributionControl.setPrefix("");
+
+      if (this.fullscreen) {
+        map.$el.classList.add("leaflet-pseudo-fullscreen");
+      }
+
+      await this.loadPath({
+        path: this.path
+      });
+
+      const { geojsonLayer } = this.$refs;
 
       if (geojsonLayer != null) {
         // TODO license + provider may not be present
@@ -537,6 +579,19 @@ export default {
         geojsonLayer.setGeojson(this.catalog);
         map.setBounds(geojsonLayer.getBounds());
       }
+    },
+    onFullscreenChange(_fullscreen) {
+      // strip fullscreen property
+      const { fullscreen, ...query } = this.$route.query;
+
+      if (_fullscreen) {
+        query.fullscreen = "true";
+      }
+
+      this.$router.replace({
+        ...this.$route,
+        query
+      });
     },
     onUpdateBounds() {
       this.updateHash();
