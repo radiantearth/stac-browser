@@ -208,7 +208,8 @@ const main = async () => {
   });
 
   const router = new VueRouter({
-    mode: "history",
+    base: process.env.PATH_PREFIX || "/",
+    // mode: "history",
     routes
   });
 
