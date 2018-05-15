@@ -68,6 +68,7 @@ ul.links li, ul.items li {
           :per-page="perPage"
           :current-page="currentPage"
           :sort-compare="sortCompare"
+          :outlined="true"
           responsive
           small
           striped>
@@ -76,6 +77,7 @@ ul.links li, ul.items li {
             slot-scope="data">
             <router-link :to="data.item.to">{{ data.item.title }}</router-link>
           </template>
+          <!-- TODO row-details w/ additional metadata + map -->
         </b-table>
       </b-col>
     </b-row>
@@ -323,17 +325,19 @@ export default {
 
       const catalog = this.catalogForPath(this.path);
 
-      const start = (this.currentPage - 1) * this.perPage;
-      const count = this.currentPage * this.perPage;
+      if (catalog != null) {
+        const start = (this.currentPage - 1) * this.perPage;
+        const count = this.currentPage * this.perPage;
 
-      return catalog.links
-        .filter(x => x.rel === "item")
-        .slice(start, count)
-        .map(item =>
-          this.loadPath({
-            path: this.path.concat(this.slugify(item.href))
-          })
-        );
+        return catalog.links
+          .filter(x => x.rel === "item")
+          .slice(start, count)
+          .map(item =>
+            this.loadPath({
+              path: this.path.concat(this.slugify(item.href))
+            })
+          );
+      }
     },
     sortCompare(a, b, key) {
       if (key === "link") {
