@@ -23,8 +23,9 @@ ul.links li, ul.items li {
               class="float-right">
           </a> -->
           <b-breadcrumb :items="breadcrumbs" />
-          <h1>{{ name }}</h1>
+          <h1><a :href="homepage">{{ name }}</a></h1>
           <p><small><code>{{ url }}</code></small></p>
+          <p><em>{{ description }}</em></p>
           <template v-if="meta">
             <p>
               Contact: {{ meta.contact }}<br>
@@ -33,6 +34,7 @@ ul.links li, ul.items li {
               License: <span v-html="license" />
             </p>
           </template>
+          <!-- TODO display provider info -->
         </header>
       </b-col>
     </b-row>
@@ -164,6 +166,7 @@ export default {
       );
     },
     catalog() {
+      console.log(JSON.stringify(this.catalogForPath(this.path), null, 2));
       return this.catalogForPath(this.path);
     },
     children() {
@@ -177,6 +180,13 @@ export default {
         title: child.title || child.href,
         url: this.resolve(child.href, this.url)
       }));
+    },
+    description() {
+      if (this.catalog == null) {
+        return null;
+      }
+
+      return this.catalog.description;
     },
     items() {
       if (this.catalog == null) {
@@ -205,6 +215,13 @@ export default {
           title: item.title || item.href
         };
       });
+    },
+    homepage() {
+      if (this.catalog == null) {
+        return null;
+      }
+
+      return this.catalog.homepage;
     },
     license() {
       if (this.catalog == null) {
