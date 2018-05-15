@@ -4,6 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "NODE_ENV=production parcel build --public-url . index.html",
+    "build-cbers": "PATH_PREFIX=/cbers/ CATALOG_URL=https://cbers-stac.s3.amazonaws.com/catalog.json npm run build",
+    "build-iserv": "PATH_PREFIX=/iserv/ CATALOG_URL=https://s3-us-west-2.amazonaws.com/radiant-nasa-iserv/iserv.json npm run build",
+    "build-planet": "PATH_PREFIX=/planet/ CATALOG_URL=https://storage.googleapis.com/pdd-stac/disasters/catalog.json npm run build",
+    "clean": "rm -rf dist/",
+    "deploy-cbers": "npm run clean && npm run build-cbers && aws s3 cp dist/ s3://stac-browser/cbers/ --recursive",
+    "deploy-iserv": "npm run clean && npm run build-iserv && aws s3 sync dist/ s3://stac-browser/iserv/ --delete",
+    "deploy-planet": "npm run clean && npm run build-planet && aws s3 sync dist/ s3://stac-browser/planet/ --delete",
     "precommit": "lint-staged",
     "start": "parcel"
   },
