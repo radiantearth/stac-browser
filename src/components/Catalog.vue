@@ -1,4 +1,12 @@
 <style scoped lang="css">
+h4 {
+  font-weight: bold;
+}
+
+td.title {
+  font-weight: bold;
+}
+
 ul.links, ul.items {
   margin: 0 0 1em;
   list-style-type: none;
@@ -15,44 +23,86 @@ ul.links li, ul.items li {
     <b-row>
       <b-col md="12">
         <header>
-          <!-- <a href="https://www.planet.com/disasterdata/">
-            <img
-              id="header_logo"
-              src="https://planet-pulse-assets-production.s3.amazonaws.com/uploads/2016/06/blog-logo.jpg"
-              alt="Powered by Planet Labs"
-              class="float-right">
-          </a> -->
           <b-breadcrumb :items="breadcrumbs" />
-          <h1><a :href="homepage">{{ name }}</a></h1>
-          <p><small><code>{{ url }}</code></small></p>
-          <p><em>{{ description }}</em></p>
-          <template v-if="meta">
-            <p>
-              Contact: {{ meta.contact }}<br>
-              Keywords: {{ meta.keywords }}<br>
-              Formats: {{ meta.formats }}<br>
-              License: <span v-html="license" />
-            </p>
-          </template>
-          <!-- TODO display provider info -->
         </header>
       </b-col>
     </b-row>
+    <b-row>
+      <b-col :md="meta ? 7 : 12">
+        <!-- <a href="https://www.planet.com/disasterdata/">
+          <img
+            id="header_logo"
+            src="https://planet-pulse-assets-production.s3.amazonaws.com/uploads/2016/06/blog-logo.jpg"
+            alt="Powered by Planet Labs"
+            class="float-right">
+        </a> -->
+        <h1><a :href="homepage">{{ name }}</a></h1>
+        <p><small><code>{{ url }}</code></small></p>
+        <p><em>{{ description }}</em></p>
+        <p v-html="license" />
 
-    <hr>
+        <hr>
 
-    <b-row v-if="children.length > 0">
-      <b-col md="12">
-        <h3>Catalogs</h3>
-        <ul class="links">
-          <li
-            v-for="child in children"
-            :key="child.path">
-            <router-link
-              :to="child.slug"
-              append>{{ child.title }}</router-link>
-          </li>
-        </ul>
+        <template v-if="children.length > 0">
+          <h3>Catalogs</h3>
+          <ul class="links">
+            <li
+              v-for="child in children"
+              :key="child.path">
+              <router-link
+                :to="child.slug"
+                append>{{ child.title }}</router-link>
+            </li>
+          </ul>
+        </template>
+      </b-col>
+      <b-col
+        v-if="meta"
+        md="5">
+        <b-card
+          title="Provider Information"
+          bg-variant="light"
+          class="float-right">
+          <div class="table-responsive">
+            <table class="table">
+              <tbody>
+                <tr v-if="meta.contact">
+                  <td class="title">Contact</td>
+                  <td>
+                    {{ meta.contact.name }}<br>
+                    {{ meta.contact.organization }}<br>
+                    <a :href="meta.contact.emailUrl">{{ meta.contact.email }}</a><br>
+                    <a :href="meta.contact.url">{{ meta.contact.url }}</a>
+                  </td>
+                </tr>
+                <tr v-if="meta.keywords">
+                  <td class="title">Keywords</td>
+                  <td>{{ meta.keywords }}</td>
+                </tr>
+                <tr v-if="meta.formats">
+                  <td class="title">Formats</td>
+                  <td>{{ meta.formats }}</td>
+                </tr>
+                <tr v-if="meta.shortLicense">
+                  <td class="title">License</td>
+                  <td><a :href="meta.licenseUrl">{{ meta.shortLicense }}</a></td>
+                </tr>
+                <tr v-if="meta.provider.scheme">
+                  <td class="title">Storage Provider</td>
+                  <td>{{ meta.provider.scheme }}</td>
+                </tr>
+                <tr v-if="meta.provider.region">
+                  <td class="title">Storage Region</td>
+                  <td>{{ meta.provider.region }}</td>
+                </tr>
+                <tr v-if="meta.provider.requesterPays">
+                  <td class="title">Requester Pays</td>
+                  <td>{{ meta.provider.requesterPays }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </b-card>
       </b-col>
     </b-row>
 
@@ -224,7 +274,7 @@ export default {
       return this.catalog.homepage;
     },
     license() {
-      if (this.catalog == null) {
+      if (this.catalog == null || this.catalog.license == null) {
         return null;
       }
 
@@ -250,20 +300,12 @@ export default {
 
       return this.catalog.license;
     },
-    // TODO it doesn't appear to make any sense to group these here
     meta() {
       if (this.catalog == null) {
         return null;
       }
 
-      const {
-        name,
-        provider,
-        contact,
-        keywords,
-        formats,
-        license
-      } = this.catalog;
+      const { provider, contact, keywords, formats, license } = this.catalog;
 
       if (
         provider == null &&
@@ -275,15 +317,33 @@ export default {
         return null;
       }
 
-      return {
-        name,
+      const meta = {
+        contact,
         provider,
-        // TODO safely construct this
-        contact: `${contact.name} <${contact.email}>`,
-        keywords: keywords.join(", "),
-        formats: formats.join(", "),
-        license
+        license,
+        keywords: (keywords || []).join(", "),
+        formats: (formats || []).join(", ")
       };
+
+      if (contact != null && contact.email != null) {
+        meta.contact = {
+          ...meta.contact,
+          emailUrl: `mailto:${contact.email}`
+        };
+      }
+
+      if (license != null) {
+        if (license.short_name != null) {
+          // TODO short_name in JSON -> not snake case
+          meta.shortLicense = license.short_name;
+        }
+
+        if (license.link != null) {
+          meta.licenseUrl = license.link;
+        }
+      }
+
+      return meta;
     },
     name() {
       return this.catalog != null ? this.catalog.name : null;
