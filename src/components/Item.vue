@@ -174,7 +174,7 @@ ul.scene_files li {
               :fullscreen="fullscreen"
               :on-change="onFullscreenChange" />
             <l-tile-layer
-              :attribution="attribution"
+              :attribution="baseAttribution"
               :url="baseLayerSource"
             />
             <l-geo-json
@@ -289,7 +289,7 @@ export default {
           };
         }
       },
-      attribution: `Map data <a href="https://www.openstreetmap.org/copyright">&copy; OpenStreetMap contributors</a>, &copy; <a href="https://carto.com/attributions">CARTO</a>`,
+      baseAttribution: `Map data <a href="https://www.openstreetmap.org/copyright">&copy; OpenStreetMap contributors</a>, &copy; <a href="https://carto.com/attributions">CARTO</a>`,
       // TODO global config
       baseLayerSource:
         "https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}@2x.png",
@@ -502,23 +502,28 @@ export default {
       const thumbnail = this.links.find(x => x.type === "thumbnail");
 
       return this.resolve(thumbnail.href, this.url);
+    },
+    attribution() {
+      if (this.cog) {
+        // TODO license + provider may not be present
+        // TODO license may be an object
+        return `Imagery ${this.properties.license || ""} ${
+          this.properties.provider
+        }`;
+      }
     }
   },
   watch: {
     catalog(to, from) {
       if (!isEqual(from, to)) {
-        console.log("catalog changed");
+        console.log(JSON.stringify(to, null, 2));
 
         const { map } = this.$refs;
         const {
           mapObject: { attributionControl }
         } = map;
 
-        // TODO license + provider may not be present
-        // TODO license may be an object
-        attributionControl.addAttribution(
-          `Imagery ${this.properties.license} ${this.properties.provider}`
-        );
+        attributionControl.addAttribution(this.attribution);
 
         if (this.center == null) {
           this.$nextTick(() => {
@@ -585,7 +590,7 @@ export default {
         // TODO license + provider may not be present
         // TODO license may be an object
         attributionControl.addAttribution(
-          `Imagery ${this.properties.license} ${this.properties.provider}`
+          `Imagery ${this.properties.license || ""} ${this.properties.provider}`
         );
 
         geojsonLayer.setGeojson(this.catalog);

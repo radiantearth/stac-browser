@@ -37,6 +37,8 @@
     "label": "Off-nadir angle",
     "suffix": "º"
   },
+  "eo:collection": "Collection",
+  "eo:epsg": "EPSG code",
   "pl:anomalous_pixels": {
     "label": "Anomalous pixels"
   },
@@ -93,5 +95,8 @@
   "pl:view_angle": {
     "label": "View angle",
     "suffix": "º"
-  }
+  },
+  "cbers:data_type": "Data type",
+  "cbers:path": "Path",
+  "cbers:row": "Row"
 }
