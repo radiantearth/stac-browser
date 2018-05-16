@@ -1,19 +1,34 @@
+# STAC Browser
+
+This is a [Spatio-Temporal Asset Catalog
+(STAC)](https://github.com/radiantearth/stac-spec) browser for static catalogs.
+It attempts to surface all included data in a user-centric way (an approach
+which can inform how data is represented in the evolving spec). It is
+implemented as a single page application (SPA) for ease of development and to
+limit the overall number of catalog reads necessary when browsing (as catalogs
+may be nested and do not necessarily contain references to their parents).
+
 ## Running
+
+By default, stac-browser will browse the ISERV catalog. To browse your own, set
+`CATALOG_URL` when building.
 
 ```bash
 npm install
-npm start -- --open
+CATALOG_URL=http://path/to/catalog.json npm start -- --open
 ```
 
 ## Building
 
 ```bash
-npx parcel build
+CATALOG_URL=http://path/to/catalog.json npx parcel build
 ```
 
 ## Contributing
 
-tk - something about how the catalog / sub-catalog / item templates are laid out
+tk - something about how the catalog (`src/components/Catalog.vue`) /
+sub-catalog (`src/components/Catalog.vue`) / item (`src/components/Item.vue`)
+templates are laid out
 
 ## Why Vue?
 
