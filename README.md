@@ -14,14 +14,14 @@ By default, stac-browser will browse the ISERV catalog. To browse your own, set
 `CATALOG_URL` when building.
 
 ```bash
-npm install
-CATALOG_URL=http://path/to/catalog.json npm start -- --open
+yarn
+CATALOG_URL=http://path/to/catalog.json yarn start -- --open
 ```
 
 ## Building
 
 ```bash
-CATALOG_URL=http://path/to/catalog.json npx parcel build
+CATALOG_URL=http://path/to/catalog.json yarn run build
 ```
 
 ## Contributing
