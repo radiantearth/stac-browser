@@ -1,3 +1,5 @@
 .cache/
 dist/
 .env
+package-lock.json
+npm-shrinkwrap.json
