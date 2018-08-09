@@ -1,3 +1,4 @@
 .cache/
 dist/
 .env
+node_modules/
