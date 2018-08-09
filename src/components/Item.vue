@@ -461,8 +461,8 @@ export default {
             suffix = dictionary[key].suffix;
           }
 
-          if (dictionary[key].format === "date") {
-            return Date.parse(value) + suffix;
+          if (dictionary[key].type === "date") {
+            return new Date(value).toUTCString() + suffix;
           }
         }
 

@@ -165,7 +165,10 @@ export default {
         },
         dateAcquired: {
           label: "Date Acquired",
-          sortable: true
+          sortable: true,
+          formatter: function(date) {
+            return new Date(date).toUTCString();
+          }
         }
       },
       currentPage: 1,
