@@ -1,6 +1,5 @@
 .cache/
 dist/
 .env
-package-lock.json
-npm-shrinkwrap.json
+yarn.lock
 node_modules/
