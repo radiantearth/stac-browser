@@ -165,7 +165,11 @@ export default {
         },
         dateAcquired: {
           label: "Date Acquired",
-          sortable: true
+          sortable: true,
+          formatter: function(isoDate) {
+            const date = new Date(isoDate);
+            return !isNaN(date.getTime()) ? date.toUTCString() : "";
+          }
         }
       },
       currentPage: 1,
@@ -429,7 +433,11 @@ export default {
         key = "title";
       }
 
-      if (typeof a[key] === "number" && typeof b[key] === "number") {
+      if (a[key] == null) {
+        return -1;
+      } else if (b[key] == null) {
+        return 1;
+      } else if (typeof a[key] === "number" && typeof b[key] === "number") {
         // If both compared fields are native numbers
         return a[key] < b[key] ? -1 : a[key] > b[key] ? 1 : 0;
       } else {

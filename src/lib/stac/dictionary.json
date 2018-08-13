@@ -15,7 +15,8 @@
     "type": "date"
   },
   "eo:cloud_cover": {
-    "label": "Cloud cover"
+    "label": "Cloud cover",
+    "suffix": "%"
   },
   "eo:gsd": {
     "label": "Ground sample distance",
