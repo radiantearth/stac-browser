@@ -13,7 +13,7 @@
     "deploy-iserv": "npm run clean && npm run build-iserv && netlify deploy -p dist/ -s iserv-stac",
     "deploy-planet": "npm run clean && npm run build-planet && netlify deploy -p dist/ -s planet-stac",
     "precommit": "lint-staged",
-    "start": "parcel"
+    "start": "parcel index.html"
   },
   "author": "",
   "license": "ISC",
@@ -28,6 +28,7 @@
     "lodash.isequal": "^4.5.0",
     "vue": "^2.5.16",
     "vue-async-computed": "^3.3.1",
+    "vue-hot-reload-api": "^2.3.0",
     "vue-router": "^3.0.1",
     "vue-template-compiler": "~2",
     "vue2-leaflet": "^1.0.2",
