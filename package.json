@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "NODE_ENV=production parcel build index.html",
+    "build": "NODE_ENV=production parcel build --target=browser index.html",
     "build-cbers": "CATALOG_URL=https://cbers-stac.s3.amazonaws.com/catalog.json npm run build",
     "build-iserv": "CATALOG_URL=https://s3-us-west-2.amazonaws.com/radiant-nasa-iserv/iserv.json npm run build",
     "build-planet": "CATALOG_URL=https://storage.googleapis.com/pdd-stac/disasters/catalog.json npm run build",
@@ -13,7 +13,7 @@
     "deploy-iserv": "npm run clean && npm run build-iserv && netlify deploy -p dist/ -s iserv-stac",
     "deploy-planet": "npm run clean && npm run build-planet && netlify deploy -p dist/ -s planet-stac",
     "precommit": "lint-staged",
-    "start": "parcel index.html"
+    "start": "parcel --target=browser index.html"
   },
   "author": "",
   "license": "ISC",
