@@ -38,9 +38,12 @@ ul.links li, ul.items li {
         </a> -->
         <h1><a :href="homepage">{{ name }}</a></h1>
         <p><small><code>{{ url }}</code></small></p>
-        <p v-if="description"><em>{{ description }}</em></p>
         <p v-html="license" />
 
+        <hr>
+        <div 
+          v-if="description" 
+          v-html="description" />
         <hr>
 
         <template v-if="children.length > 0">
@@ -137,6 +140,7 @@ ul.links li, ul.items li {
 </template>
 
 <script>
+import commonmark from "commonmark";
 import escape from "lodash.escape";
 import { mapActions, mapGetters } from "vuex";
 
@@ -236,11 +240,13 @@ export default {
       }));
     },
     description() {
-      if (this.catalog == null) {
+      if (typeof this.catalog.description !== "string") {
         return null;
       }
 
-      return this.catalog.description;
+      var reader = new commonmark.Parser();
+      var writer = new commonmark.HtmlRenderer();
+      return writer.render(reader.parse(this.catalog.description));
     },
     items() {
       if (this.catalog == null) {
