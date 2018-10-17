@@ -12,7 +12,6 @@
     "deploy-cbers": "npm run clean && npm run build-cbers && netlify deploy -p dist/ -s cbers-stac",
     "deploy-iserv": "npm run clean && npm run build-iserv && netlify deploy -p dist/ -s iserv-stac",
     "deploy-planet": "npm run clean && npm run build-planet && netlify deploy -p dist/ -s planet-stac",
-    "precommit": "lint-staged",
     "start": "parcel --target=browser index.html"
   },
   "author": "",
@@ -46,7 +45,7 @@
     "eslint-plugin-prettier": "^2.6.0",
     "eslint-plugin-vue": "^4.5.0",
     "git-exec-and-restage": "^1.1.1",
-    "husky": "^0.14.3",
+    "husky": "^1.1.2",
     "lint-staged": "^7.3.0",
     "parcel-bundler": "^1.8.1",
     "parcel-plugin-eslint": "^1.0.4",
@@ -65,5 +64,10 @@
   },
   "alias": {
     "vue": "./node_modules/vue/dist/vue.common.js"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
   }
 }
