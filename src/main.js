@@ -1,5 +1,6 @@
 import path from "path";
 
+import "@babel/polyfill";
 import "es6-promise/auto";
 import AsyncComputed from "vue-async-computed";
 import BootstrapVue from "bootstrap-vue";
