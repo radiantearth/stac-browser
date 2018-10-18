@@ -4,22 +4,34 @@ body {
   color: #111;
   font-family: Arial, sans-serif;
 }
-blockquote, body {
+blockquote,
+body {
   font-size: 16px;
 }
 table {
   font-size: 80%;
 }
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   padding: 0;
   margin: 0;
 }
-h1, h2, h3, h4 {
+h1,
+h2,
+h3,
+h4 {
   font-family: Arial, sans-serif;
   text-rendering: optimizeLegibility;
   padding-bottom: 4px;
 }
-h1:last-child, h2:last-child, h3:last-child, h4:last-child {
+h1:last-child,
+h2:last-child,
+h3:last-child,
+h4:last-child {
   padding-bottom: 0;
 }
 h1 {
@@ -35,7 +47,8 @@ h2 {
 h3 {
   font-weight: 700;
 }
-h3, h4 {
+h3,
+h4 {
   font-size: 17px;
   line-height: 1.255;
 }
@@ -46,7 +59,8 @@ h5 {
   font-size: 13px;
   line-height: 19px;
 }
-h5, h6 {
+h5,
+h6 {
   font-weight: 700;
 }
 h6 {
@@ -65,10 +79,12 @@ p:last-child {
 p + p {
   margin-top: -4px;
 }
-b, strong {
+b,
+strong {
   font-weight: 700;
 }
-em, i {
+em,
+i {
   font-style: italic;
 }
 blockquote {
@@ -77,7 +93,10 @@ blockquote {
 small {
   font-size: 12px;
 }
-a, a:active, a:link, a:visited {
+a,
+a:active,
+a:link,
+a:visited {
   color: #0066c0;
 }
 header {
@@ -152,8 +171,8 @@ ul.scene_files li {
               alt="Powered by Planet Labs"
               class="float-right">
           </a> -->
-          <b-breadcrumb :items="breadcrumbs" />
-          <h1>{{ name }}</h1>
+          <div><b-breadcrumb :items="breadcrumbs" /></div>
+          <h1>{{ title }}</h1>
           <p><small><code>{{ url }}</code></small></p>
         </header>
       </b-col>
@@ -164,32 +183,35 @@ ul.scene_files li {
     <div class="row">
       <div class="col-md-8">
         <div
-          id="map-container">
+          id="map-container"
+        >
           <!-- TODO locator map -->
           <l-map
             ref="map"
             @update:zoom="onUpdateZoom"
-            @update:bounds="onUpdateBounds">
-            <l-control-fullscreen
+            @update:bounds="onUpdateBounds"
+          >
+            <template><l-control-fullscreen
               :fullscreen="fullscreen"
-              :on-change="onFullscreenChange" />
-            <l-tile-layer
+              :on-change="onFullscreenChange"
+            /></template>
+            <template><l-tile-layer
               :attribution="baseAttribution"
               :url="baseLayerSource"
-            />
-            <l-geo-json
+            /></template>
+            <template><l-geo-json
               v-if="catalog"
               ref="geojsonLayer"
               :geojson="catalog"
               :options="geojsonOptions"
-            />
-            <l-tile-layer
+            /></template>
+            <template><l-tile-layer
               v-if="tileSource"
               :url="tileSource"
-            />
-            <l-tile-layer
+            /></template>
+            <template><l-tile-layer
               :url="labelLayerSource"
-            />
+            /></template>
           </l-map>
           <h3>Assets</h3>
           <!-- TODO display in a table to provide space for type, size -->
@@ -213,11 +235,11 @@ ul.scene_files li {
           <ul class="scene_files">
             <li
               v-for="asset in assets"
-              :key="asset.href">
-              <a
-                :href="asset.href"
-                v-html="asset.name" />
-              <template v-if="asset.format"> ({{ asset.format }})</template>
+              :key="asset.href"
+            >
+              <!-- eslint-disable-next-line vue/max-attributes-per-line vue/no-v-html -->
+              <span><a :href="asset.href" v-html="asset.title" /></span>
+              <template v-if="asset.type"> ("{{ asset.key }}", <code>{{ asset.type }}</code>)</template>
             </li>
           </ul>
         </div>
@@ -238,7 +260,8 @@ ul.scene_files li {
             <tbody>
               <tr
                 v-for="prop in propertyList"
-                :key="prop.key">
+                :key="prop.key"
+              >
                 <td class="title">{{ prop.label }}</td>
                 <td>{{ prop.value }}</td>
               </tr>
@@ -251,6 +274,8 @@ ul.scene_files li {
 </template>
 
 <script>
+import path from "path";
+
 import escape from "lodash.escape";
 import isEqual from "lodash.isequal";
 import { LMap, LTileLayer, LGeoJson } from "vue2-leaflet";
@@ -312,7 +337,7 @@ export default {
       return [
         {
           to: "/",
-          text: rootCatalog.name
+          text: rootCatalog.title
         }
       ].concat(
         this.path
@@ -322,16 +347,14 @@ export default {
             let slugPath = "/" + partialPath.join("/");
 
             if (catalog != null) {
-              // TODO should there always be an id field?
-              // a name field?
+              // Items are GeoJSON, so they'll have type: Feature
               if (catalog.type === "Feature") {
-                // TODO how best to distinguish Catalogs from Items?
                 slugPath = `/item${slugPath}`;
               }
 
               return {
                 to: slugPath,
-                text: catalog.name || catalog.id
+                text: catalog.title || catalog.id
               };
             }
 
@@ -353,8 +376,8 @@ export default {
     cog() {
       if (this.assets != null) {
         const cog = this.assets.find(
-          // TODO x.name is a Planet-specific workaround
-          x => x.format === "cog" || x.name.includes("COG")
+          // TODO "visual" is a hack
+          x => x.type === "image/x.cloud-optimized-geotiff" // && x.key === "visual"
         );
 
         if (cog != null) {
@@ -386,8 +409,6 @@ export default {
         return null;
       }
 
-      // TODO does the key carry semantic meaning?
-      // for ISERV, it matches the name (except for `cog`)
       return (
         Object.keys(this.catalog.assets)
           .map(key => ({
@@ -396,7 +417,9 @@ export default {
           }))
           .map(x => ({
             ...x,
-            name: escape(x.name) || `<code>${escape(x.href)}</code>`,
+            title:
+              escape(x.title) ||
+              `<code>${escape(path.basename(x.href))}</code>`,
             href: new URL(x.href, this.url).toString()
           }))
           // prioritize assets w/ a format set
@@ -482,7 +505,7 @@ export default {
 
       return this.catalog.properties;
     },
-    name() {
+    title() {
       return this.catalog != null ? this.catalog.id : null;
     },
     self() {
@@ -504,13 +527,11 @@ export default {
       return this.resolve(thumbnail.href, this.url);
     },
     attribution() {
-      if (this.cog) {
-        // TODO license + provider may not be present
-        // TODO license may be an object
-        return `Imagery ${this.properties.license || ""} ${
-          this.properties.provider
-        }`;
-      }
+      // TODO load attribution from rel=collection
+      return null;
+      // return `Imagery ${this.properties.license || ""} ${
+      //   this.properties.provider
+      // }`;
     }
   },
   watch: {
@@ -589,9 +610,9 @@ export default {
       if (geojsonLayer != null) {
         // TODO license + provider may not be present
         // TODO license may be an object
-        attributionControl.addAttribution(
-          `Imagery ${this.properties.license || ""} ${this.properties.provider}`
-        );
+        // attributionControl.addAttribution(
+        //   `Imagery ${this.properties.license || ""} ${this.properties.provider}`
+        // );
 
         geojsonLayer.setGeojson(this.catalog);
         if (this.center == null) {
@@ -601,6 +622,7 @@ export default {
     },
     onFullscreenChange(_fullscreen) {
       // strip fullscreen property
+      // eslint-disable-next-line no-unused-vars
       const { fullscreen, ...query } = this.$route.query;
 
       if (_fullscreen) {

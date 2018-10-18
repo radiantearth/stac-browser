@@ -28,7 +28,7 @@ ul.links li, ul.items li {
       </b-col>
     </b-row>
     <b-row>
-      <b-col :md="meta ? 7 : 12">
+      <b-col :md="keywords.length > 0 || license != null || propertyList.length > 0 ? 8 : 12">
         <!-- <a href="https://www.planet.com/disasterdata/">
           <img
             id="header_logo"
@@ -36,10 +36,24 @@ ul.links li, ul.items li {
             alt="Powered by Planet Labs"
             class="float-right">
         </a> -->
-        <h1><a :href="homepage">{{ name }}</a></h1>
+        <h1>{{ title }}</h1>
+        <p v-if="version"><small>Version {{ version }}</small></p>
         <p><small><code>{{ url }}</code></small></p>
-        <p v-if="description"><em>{{ description }}</em></p>
-        <p v-html="license" />
+        <!-- eslint-disable-next-line vue/no-v-html -->
+        <template><p v-html="description" /></template>
+        <template v-if="providers != null && providers.length > 0">
+          <h2>Provider<template v-if="providers.length > 1">s</template></h2>
+          <ul>
+            <li
+              v-for="provider in providers"
+              :key="provider.url"
+            >
+              <a
+                :href="provider.url"
+              >{{ provider.name }}</a> (<em>{{ provider.roles.join(", ") }}</em>)
+            </li>
+          </ul>
+        </template>
 
         <hr>
 
@@ -48,56 +62,52 @@ ul.links li, ul.items li {
           <ul class="links">
             <li
               v-for="child in children"
-              :key="child.path">
+              :key="child.path"
+            >
               <router-link
                 :to="child.slug"
-                append>{{ child.title }}</router-link>
+                append
+              >{{ child.title }}</router-link>
             </li>
           </ul>
         </template>
       </b-col>
-      <b-col
-        v-if="meta"
-        md="5">
+      <b-col 
+        v-if="keywords.length > 0 || license != null || propertyList.length > 0" 
+        md="4"
+      >
         <b-card
           title="Provider Information"
           bg-variant="light"
-          class="float-right">
+          class="float-right"
+        >
           <div class="table-responsive">
             <table class="table">
               <tbody>
-                <tr v-if="meta.contact">
-                  <td class="title">Contact</td>
-                  <td>
-                    <template v-if="meta.contact.name">{{ meta.contact.name }}<br></template>
-                    <template v-if="meta.contact.organization">{{ meta.contact.organization }}<br></template>
-                    <template v-if="meta.contact.email"><a :href="meta.contact.emailUrl">{{ meta.contact.email }}</a><br></template>
-                    <template v-if="meta.contact.url"><a :href="meta.contact.url">{{ meta.contact.url }}</a></template>
-                  </td>
-                </tr>
-                <tr v-if="meta.keywords">
+                <tr v-if="keywords">
                   <td class="title">Keywords</td>
-                  <td>{{ meta.keywords }}</td>
+                  <td>{{ keywords }}</td>
                 </tr>
-                <tr v-if="meta.formats">
-                  <td class="title">Formats</td>
-                  <td>{{ meta.formats }}</td>
-                </tr>
-                <tr v-if="meta.shortLicense">
+                <tr v-if="license">
                   <td class="title">License</td>
-                  <td><a :href="meta.licenseUrl">{{ meta.shortLicense }}</a></td>
+                  <!-- eslint-disable-next-line vue/no-v-html -->
+                  <td v-html="license" />
                 </tr>
-                <tr v-if="meta.provider.scheme">
-                  <td class="title">Storage Provider</td>
-                  <td>{{ meta.provider.scheme }}</td>
+                <tr v-if="spatialExtent">
+                  <!-- TODO display as a locator map -->
+                  <td class="title">Spatial Extent</td>
+                  <td>{{ spatialExtent }}</td>
                 </tr>
-                <tr v-if="meta.provider.region">
-                  <td class="title">Storage Region</td>
-                  <td>{{ meta.provider.region }}</td>
+                <tr v-if="temporalExtent">
+                  <td class="title">Temporal Extent</td>
+                  <td>{{ temporalExtent }}</td>
                 </tr>
-                <tr v-if="meta.provider.requesterPays">
-                  <td class="title">Requester Pays</td>
-                  <td>{{ meta.provider.requesterPays }}</td>
+                <tr
+                  v-for="prop in propertyList"
+                  :key="prop.key"
+                >
+                  <td class="title">{{ prop.label }}</td>
+                  <td>{{ prop.value }}</td>
                 </tr>
               </tbody>
             </table>
@@ -109,11 +119,14 @@ ul.links li, ul.items li {
     <b-row v-if="items.length > 0">
       <b-col md="12">
         <h3>Items</h3>
-        <b-pagination
-          :total-rows="items.length"
-          :per-page="perPage"
-          :hide-goto-end-buttons="true"
-          v-model="currentPage" />
+        <div>
+          <b-pagination
+            v-model="currentPage"
+            :total-rows="items.length"
+            :per-page="perPage"
+            :hide-goto-end-buttons="true"
+          />
+        </div>
         <b-table
           :items="items"
           :fields="itemFields"
@@ -123,10 +136,12 @@ ul.links li, ul.items li {
           :outlined="true"
           responsive
           small
-          striped>
+          striped
+        >
           <template
             slot="link"
-            slot-scope="data">
+            slot-scope="data"
+          >
             <router-link :to="data.item.to">{{ data.item.title }}</router-link>
           </template>
           <!-- TODO row-details w/ additional metadata + map -->
@@ -137,8 +152,11 @@ ul.links li, ul.items li {
 </template>
 
 <script>
-import escape from "lodash.escape";
+import { HtmlRenderer, Parser } from "commonmark";
+import spdxToHTML from "spdx-to-html";
 import { mapActions, mapGetters } from "vuex";
+
+import dictionary from "../lib/stac/dictionary.json";
 
 export default {
   name: "Catalog",
@@ -191,7 +209,7 @@ export default {
       return [
         {
           to: "/",
-          text: rootCatalog.name
+          text: rootCatalog.title || rootCatalog.id
         }
       ].concat(
         this.path
@@ -210,7 +228,7 @@ export default {
 
               return {
                 to: slugPath,
-                text: catalog.name || catalog.id
+                text: catalog.title || catalog.id
               };
             }
 
@@ -221,6 +239,7 @@ export default {
     },
     catalog() {
       console.log(JSON.stringify(this.catalogForPath(this.path), null, 2));
+
       return this.catalogForPath(this.path);
     },
     children() {
@@ -230,7 +249,7 @@ export default {
 
       return this.catalog.links.filter(x => x.rel === "child").map(child => ({
         path: child.href,
-        slug: child.slug || this.slugify(child.href),
+        slug: child.id || this.slugify(child.href),
         title: child.title || child.href,
         url: this.resolve(child.href, this.url)
       }));
@@ -240,16 +259,26 @@ export default {
         return null;
       }
 
-      return this.catalog.description;
+      const reader = new Parser({
+        smart: true
+      });
+      const writer = new HtmlRenderer({
+        safe: true,
+        softbreak: "<br />"
+      });
+
+      return writer.render(reader.parse(this.catalog.description));
     },
     items() {
       if (this.catalog == null) {
         return [];
       }
 
+      // TODO move to async computed and pull from rel=items if necessary
+
       return this.catalog.links.filter(x => x.rel === "item").map(item => {
         const catalog = this.catalogForPath(
-          this.path.concat(item.slug || this.slugify(item.href))
+          this.path.concat(item.id || this.slugify(item.href))
         );
 
         if (catalog != null) {
@@ -258,7 +287,7 @@ export default {
               "/item/" +
               [
                 this.$route.params.path,
-                item.slug || this.slugify(item.href)
+                item.id || this.slugify(item.href)
               ].join("/"),
             title: catalog.id || item.title || item.href,
             dateAcquired: catalog.properties.datetime
@@ -268,97 +297,105 @@ export default {
         return {
           to:
             "/item/" +
-            [
-              this.$route.params.path,
-              item.slug || this.slugify(item.href)
-            ].join("/"),
+            [this.$route.params.path, item.id || this.slugify(item.href)].join(
+              "/"
+            ),
           title: item.title || item.href
         };
       });
     },
-    homepage() {
-      if (this.catalog == null) {
-        return null;
-      }
-
-      return this.catalog.homepage;
-    },
     license() {
-      if (this.catalog == null || this.catalog.license == null) {
-        return null;
-      }
-
-      // TODO short_name in JSON -> not snake case
-      const {
-        copyright,
-        link,
-        name,
-        short_name: shortName
-      } = this.catalog.license;
-
-      if (
-        copyright != null &&
-        link != null &&
-        name != null &&
-        shortName != null
-      ) {
-        console.log(this.catalog.license);
-        return `Licensed under <a href="${link}" title=${escape(
-          shortName
-        )}>${name}</a> by ${escape(copyright)}`;
-      }
-
-      return this.catalog.license;
-    },
-    meta() {
       if (this.catalog == null) {
         return null;
       }
 
-      const { provider, contact, keywords, formats, license } = this.catalog;
+      // TODO look up license from root if it's not defined here
 
-      if (
-        provider == null &&
-        contact == null &&
-        keywords == null &&
-        formats == null &&
-        license == null
-      ) {
-        return null;
+      return spdxToHTML(this.catalog.license);
+    },
+    keywords() {
+      if (this.catalog == null) {
+        return [];
       }
 
-      const meta = {
-        contact,
-        provider,
-        license,
-        keywords: (keywords || []).join(", "),
-        formats: (formats || []).join(", ")
+      return [].concat(this.catalog.keywords || []).join(", ");
+    },
+    // TODO inherit from a common implementation w/ Item
+    propertyList() {
+      if (this.catalog == null) {
+        return [];
+      }
+
+      const label = key => {
+        if (typeof dictionary[key] === "object") {
+          return dictionary[key].label;
+        }
+
+        return dictionary[key] || key;
       };
 
-      if (contact != null && contact.email != null) {
-        meta.contact = {
-          ...meta.contact,
-          emailUrl: `mailto:${contact.email}`
-        };
-      }
+      const format = (key, value) => {
+        let suffix = "";
 
-      if (license != null) {
-        if (license.short_name != null) {
-          // TODO short_name in JSON -> not snake case
-          meta.shortLicense = license.short_name;
-        } else if (typeof license === "string") {
-          meta.shortLicense = license;
+        if (typeof value === "object") {
+          value = JSON.stringify(value, null, 2);
         }
 
-        if (typeof license === "object" && license.link != null) {
-          meta.licenseUrl = license.link;
-        }
-      }
+        if (typeof dictionary[key] === "object") {
+          if (dictionary[key].suffix != null) {
+            suffix = dictionary[key].suffix;
+          }
 
-      return meta;
+          if (dictionary[key].type === "date") {
+            return new Date(value).toUTCString() + suffix;
+          }
+        }
+
+        return value + suffix;
+      };
+
+      return Object.keys(this.properties).map(key => ({
+        key,
+        label: label(key),
+        value: format(key, this.properties[key])
+      }));
     },
-    name() {
-      return this.catalog != null ? this.catalog.name : null;
+    properties() {
+      if (this.catalog == null) {
+        return {};
+      }
+
+      return this.catalog.properties || {};
+    },
+    providers() {
+      return this.catalog != null ? this.catalog.providers : null;
+    },
+    spatialExtent() {
+      return this.catalog != null ? this.catalog.extent.spatial : null;
+    },
+    temporalExtent() {
+      if (this.catalog == null) {
+        return null;
+      }
+
+      const {
+        extent: { temporal }
+      } = this.catalog;
+
+      return [
+        temporal[0]
+          ? new Date(temporal[0]).toLocaleString()
+          : "beginning of time",
+        temporal[1] ? new Date(temporal[1]).toLocaleString() : "now"
+      ].join(" - ");
+    },
+    title() {
+      return this.catalog != null
+        ? this.catalog.title || this.catalog.id
+        : null;
+    },
+    version() {
+      return this.catalog != null ? this.catalog.version : null;
     }
   },
   watch: {
@@ -371,7 +408,7 @@ export default {
         .slice(start, count)
         .map(item =>
           this.loadPath({
-            path: this.path.concat(item.slug || this.slugify(item.href))
+            path: this.path.concat(item.id || this.slugify(item.href))
           })
         );
     },
@@ -382,28 +419,6 @@ export default {
   },
   created() {
     this.initialize();
-  },
-  mounted() {
-    // console.log("mounted");
-  },
-  beforeUpdate() {
-    // console.log("before update");
-  },
-  updated() {
-    // console.log("updated");
-  },
-  beforeRouteEnter(to, from, next) {
-    // console.log("beforeRouteEnter", to, from);
-
-    // console.log("$route:", this.$route);
-    // console.log(this);
-
-    return next();
-  },
-  beforeRouteUpdate(to, from, next) {
-    // console.log("beforeRouteUpdate", to, from);
-
-    return next();
   },
   methods: {
     ...mapActions(["loadPath"]),
@@ -418,14 +433,16 @@ export default {
         const start = (this.currentPage - 1) * this.perPage;
         const count = this.currentPage * this.perPage;
 
-        return catalog.links
-          .filter(x => x.rel === "item")
-          .slice(start, count)
-          .map(item =>
-            this.loadPath({
-              path: this.path.concat(item.slug || this.slugify(item.href))
-            })
-          );
+        await Promise.all(
+          catalog.links
+            .filter(x => x.rel === "item")
+            .slice(start, count)
+            .map(item =>
+              this.loadPath({
+                path: this.path.concat(item.id || this.slugify(item.href))
+              })
+            )
+        );
       }
     },
     sortCompare(a, b, key) {

@@ -77,7 +77,6 @@ const main = async () => {
       catalog: {
         url: CATALOG_URL
       },
-      initializing: true,
       loading: {}
     },
     getters: {
