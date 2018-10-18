@@ -8,10 +8,12 @@
     "build-cbers": "CATALOG_URL=https://cbers-stac.s3.amazonaws.com/catalog.json npm run build",
     "build-iserv": "CATALOG_URL=https://s3-us-west-2.amazonaws.com/radiant-nasa-iserv/iserv.json npm run build",
     "build-planet": "CATALOG_URL=https://storage.googleapis.com/pdd-stac/disasters/catalog.json npm run build",
+    "build-boundless": "CATALOG_URL=http://stac.boundlessgeo.io/stac npm run build",
     "clean": "rm -rf dist/*.{js,css,png,html,map}",
-    "deploy-cbers": "npm run clean && npm run build-cbers && netlify deploy -p dist/ -s cbers-stac",
-    "deploy-iserv": "npm run clean && npm run build-iserv && netlify deploy -p dist/ -s iserv-stac",
-    "deploy-planet": "npm run clean && npm run build-planet && netlify deploy -p dist/ -s planet-stac",
+    "deploy-cbers": "npm run clean && npm run build-cbers && netlify deploy --prod --dir dist/ --site d51680e6-45e1-49db-b1e4-eb6e236a431a",
+    "deploy-iserv": "npm run clean && npm run build-iserv && netlify deploy --prod --dir dist/ --site 7ad829b5-58b2-4a72-9e42-eb5749982070",
+    "deploy-planet": "npm run clean && npm run build-planet && netlify deploy --prod --dir dist/ --site 0208c719-dcdf-42dc-bddb-9ae5498424db",
+    "deploy-boundless": "npm run clean && npm run build-boundless && netlify deploy --prod --dir dist/ --site 95a54956-1c9b-4548-87bc-a7ce834f980b",
     "start": "parcel --target=browser index.html"
   },
   "author": "",
@@ -49,6 +51,7 @@
     "git-exec-and-restage": "^1.1.1",
     "husky": "^1.1.2",
     "lint-staged": "^7.3.0",
+    "netlify-cli": "^2.1.1",
     "parcel-bundler": "^1.10.3",
     "prettier": "^1.14.3"
   },
