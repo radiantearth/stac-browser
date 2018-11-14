@@ -50,7 +50,7 @@ ul.links li, ul.items li {
             >
               <a
                 :href="provider.url"
-              >{{ provider.name }}</a> (<em>{{ provider.roles.join(", ") }}</em>)
+              >{{ provider.name }}</a> (<em>{{ (provider.roles || []).join(", ") }}</em>)
             </li>
           </ul>
         </template>
@@ -371,10 +371,12 @@ export default {
       return this.catalog != null ? this.catalog.providers : null;
     },
     spatialExtent() {
-      return this.catalog != null ? this.catalog.extent.spatial : null;
+      return this.catalog != null && this.catalog.extent != null
+        ? this.catalog.extent.spatial
+        : null;
     },
     temporalExtent() {
-      if (this.catalog == null) {
+      if (this.catalog == null || this.catalog.extent == null) {
         return null;
       }
 
