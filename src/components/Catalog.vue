@@ -247,12 +247,14 @@ export default {
         return [];
       }
 
-      return this.catalog.links.filter(x => x.rel === "child").map(child => ({
-        path: child.href,
-        slug: child.id || this.slugify(child.href),
-        title: child.title || child.href,
-        url: this.resolve(child.href, this.url)
-      }));
+      return this.catalog.links
+        .filter(x => x.rel === "child")
+        .map(child => ({
+          path: child.href,
+          slug: child.id || this.slugify(this.resolve(child.href, this.url)),
+          title: child.title || child.href,
+          url: this.resolve(child.href, this.url)
+        }));
     },
     description() {
       if (this.catalog == null) {
