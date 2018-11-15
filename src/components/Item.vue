@@ -46,50 +46,39 @@
             </a>
           </b-tab>
         </b-tabs>
-        <h3>Assets</h3>
-        <!-- TODO display in a table to provide space for type, size -->
-        <!-- <div class="table-responsive">
+
+        <div class="table-responsive">
           <table class="table">
+            <thead>
+              <tr>
+                <th colspan="2"><h3>Assets</h3></th>
+              </tr>
+            </thead>
             <tbody>
               <tr
                 v-for="asset in assets"
-                :key="asset.href">
+                :key="asset.href"
+              >
                 <td>
-                  <a
-                    :href="asset.href"
-                    v-html="asset.name" />
-                  <template v-if="asset.format"> ({{ asset.format }})</template>
+                  <!-- eslint-disable-next-line vue/max-attributes-per-line vue/no-v-html -->
+                  <a :href="asset.href" :title="asset.key" v-html="asset.title" />
                 </td>
-                <td>{{ asset.size }}</td>
+                <td><code>{{ asset.type }}</code></td>
               </tr>
             </tbody>
           </table>
-        </div> -->
-        <!-- TODO locator map -->
-        <ul class="scene_files">
-          <li
-            v-for="asset in assets"
-            :key="asset.href"
-          >
-            <!-- eslint-disable-next-line vue/max-attributes-per-line vue/no-v-html -->
-            <span><a :href="asset.href" v-html="asset.title" /></span>
-            <template v-if="asset.type"> ("{{ asset.key }}", <code>{{ asset.type }}</code>)</template>
-          </li>
-        </ul>
-
-        <!-- <h3>Preview</h3>
-        <a :href="thumbnail">
-          <img
-            v-if="thumbnail"
-            id="thumbnail"
-            :src="thumbnail">
-        </a> -->
+        </div>
       </div>
 
       <div class="col-md-4">
-        <h3>Metadata</h3>
+        <!-- TODO locator map -->
         <div class="table-responsive">
           <table class="table">
+            <thead>
+              <tr>
+                <th colspan="2"><h3>Metadata</h3></th>
+              </tr>
+            </thead>
             <tbody>
               <tr
                 v-for="prop in propertyList"
@@ -564,20 +553,15 @@ code {
   max-width: 100px;
 }
 
+.table th {
+  border-top: none;
+}
+
+.table th, .table td {
+  padding: 0.5rem;
+}
+
 td.title {
   font-weight: bold;
-}
-
-ul.scene_files {
-  list-style-type: none;
-  padding: 0;
-}
-
-ul.scene_files {
-  margin: 0 0 1em;
-}
-
-ul.scene_files li {
-  margin: 0 0 0.2em;
 }
 </style>
