@@ -77,7 +77,7 @@
       </div>
 
       <div class="col-md-4">
-        <!-- TODO locator map -->
+        <div id="locator-map"></div>
         <div class="table-responsive">
           <table class="table">
             <thead>
@@ -145,19 +145,8 @@ export default {
   },
   data() {
     return {
+      locatorMap: null,
       map: null,
-      baseLayer: Leaflet.tileLayer(
-        "https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}@2x.png",
-        {
-          attribution: `Map data <a href="https://www.openstreetmap.org/copyright">&copy; OpenStreetMap contributors</a>, &copy; <a href="https://carto.com/attributions">CARTO</a>`
-        }
-      ),
-      labelLayer: Leaflet.tileLayer(
-        "https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}@2x.png",
-        {
-          zIndex: 1000
-        }
-      ),
       previewLayer: null,
       overlayLayer: null,
       geojsonOptions: {
@@ -343,6 +332,48 @@ export default {
   },
   methods: {
     initialize() {
+      this.initializePreviewMap();
+      this.initializeLocatorMap();
+    },
+    initializeLocatorMap() {
+      this.locatorMap = Leaflet.map("locator-map", {
+        attributionControl: false,
+        zoomControl: false,
+        boxZoom: false,
+        doubleClickZoom: false,
+        dragging: false,
+        scrollWheelZoom: false,
+        touchZoom: false
+      });
+
+      Leaflet.tileLayer(
+        "https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}@2x.png",
+        {
+          attribution: `Map data <a href="https://www.openstreetmap.org/copyright">&copy; OpenStreetMap contributors</a>, &copy; <a href="https://carto.com/attributions">CARTO</a>`
+        }
+      ).addTo(this.locatorMap);
+      Leaflet.tileLayer(
+        "https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}@2x.png",
+        {
+          zIndex: 1000
+        }
+      ).addTo(this.locatorMap);
+
+      const overlayLayer = Leaflet.geoJSON(this.item, {
+        pane: "tilePane",
+        style: {
+          weight: 1,
+          color: "#ffd65d",
+          opacity: 1,
+          fillOpacity: 1
+        }
+      }).addTo(this.locatorMap);
+
+      this.locatorMap.fitBounds(overlayLayer.getBounds(), {
+        padding: [95, 95]
+      });
+    },
+    initializePreviewMap() {
       this.map = Leaflet.map("map");
       this.map.on("moveend", this.updateHash);
       this.map.on("zoomend", this.updateHash);
@@ -361,8 +392,18 @@ export default {
         this.map.getContainer().classList.add("leaflet-pseudo-fullscreen");
       }
 
-      this.baseLayer.addTo(this.map);
-      this.labelLayer.addTo(this.map);
+      Leaflet.tileLayer(
+        "https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}@2x.png",
+        {
+          attribution: `Map data <a href="https://www.openstreetmap.org/copyright">&copy; OpenStreetMap contributors</a>, &copy; <a href="https://carto.com/attributions">CARTO</a>`
+        }
+      ).addTo(this.map);
+      Leaflet.tileLayer(
+        "https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}@2x.png",
+        {
+          zIndex: 1000
+        }
+      ).addTo(this.map);
 
       if (this.tileSource) {
         this.tileLayer = Leaflet.tileLayer(this.tileSource, {
@@ -370,9 +411,10 @@ export default {
         }).addTo(this.map);
       }
 
-      this.overlayLayer = Leaflet.geoJSON(this.item, this.geojsonOptions).addTo(
-        this.map
-      );
+      this.overlayLayer = Leaflet.geoJSON(this.item, {
+        ...this.geojsonOptions,
+        pane: "tilePane"
+      }).addTo(this.map);
 
       if (this.center != null) {
         const [zoom, lat, lng] = this.center;
@@ -532,13 +574,10 @@ code {
   z-index: 99999;
 }
 
-.vue2leaflet-map {
+#locator-map {
+  height: 200px;
   width: 100%;
-  height: 100%;
-  border: 1px solid #fff;
-  background-color: #090909;
-  z-index: 1;
-  position: relative;
+  margin-bottom: 10px;
 }
 
 #map-container {
