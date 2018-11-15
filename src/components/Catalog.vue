@@ -23,16 +23,19 @@
         <div v-if="description" v-html="description"></div>
         <template v-if="providers != null && providers.length > 0">
           <h2>Provider<template v-if="providers.length > 1">s</template></h2>
-          <ul>
-            <li
+          <dl>
+            <template
               v-for="provider in providers"
-              :key="provider.url"
             >
-              <a
-                :href="provider.url"
-              >{{ provider.name }}</a> (<em>{{ (provider.roles || []).join(", ") }}</em>)
-            </li>
-          </ul>
+              <dt :key="provider.url">
+                <a
+                  :href="provider.url"
+                >{{ provider.name }}</a> (<em>{{ (provider.roles || []).join(", ") }}</em>)
+              </dt>
+              <!-- eslint-disable-next-line vue/no-v-html vue/max-attributes-per-line -->
+              <dd :key="provider.name" v-html="provider.description"></dd>
+            </template>
+          </dl>
         </template>
 
         <hr>
@@ -129,6 +132,14 @@ import { HtmlRenderer, Parser } from "commonmark";
 import spdxToHTML from "spdx-to-html";
 import { mapActions, mapGetters } from "vuex";
 
+const MARKDOWN_READER = new Parser({
+  smart: true
+});
+const MARKDOWN_WRITER = new HtmlRenderer({
+  safe: true,
+  softbreak: "<br />"
+});
+
 export default {
   name: "Catalog",
   props: {
@@ -212,15 +223,9 @@ export default {
     },
     description() {
       // REQUIRED
-      const reader = new Parser({
-        smart: true
-      });
-      const writer = new HtmlRenderer({
-        safe: true,
-        softbreak: "<br />"
-      });
-
-      return writer.render(reader.parse(this.catalog.description));
+      return MARKDOWN_WRITER.render(
+        MARKDOWN_READER.parse(this.catalog.description)
+      );
     },
     id() {
       // REQUIRED
@@ -270,7 +275,12 @@ export default {
       return this.catalog.links;
     },
     providers() {
-      return this.catalog.providers || [];
+      return (this.catalog.providers || []).map(x => ({
+        ...x,
+        description: MARKDOWN_WRITER.render(
+          MARKDOWN_READER.parse(x.description || "")
+        )
+      }));
     },
     rootCatalog() {
       // TODO navigate up parents
