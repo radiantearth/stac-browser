@@ -198,10 +198,11 @@ export default {
     },
     cog() {
       // TODO find all relevant sources and surface in a dropdown
-      const cog = this.assets.find(
-        // TODO "visual" is a hack
-        x => x.type === "image/vnd.stac.geotiff; cloud-optimized=true" // && x.key === "visual"
-      );
+      const cog = this.assets
+        .filter(x => x.type === "image/vnd.stac.geotiff; cloud-optimized=true")
+        // prefer COGs with "visual" key
+        .sort((a, b) => a.key.indexOf("visual") - b.key.indexOf("visual"))
+        .pop();
 
       if (cog != null) {
         return this.resolve(cog.href, this.url);
