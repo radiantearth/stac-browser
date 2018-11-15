@@ -98,7 +98,7 @@
         <div>
           <b-pagination
             v-model="currentPage"
-            :total-rows="items.length"
+            :total-rows="itemCount"
             :per-page="perPage"
             :hide-goto-end-buttons="true"
           />
@@ -234,14 +234,23 @@ export default {
     extent() {
       return this.catalog.extent || this.rootCatalog.extent || {};
     },
+    itemCount() {
+      return this.links.filter(x => x.rel === "item").length;
+    },
     items() {
       // TODO move to async computed and pull from rel=items if necessary
 
-      return this.links.filter(x => x.rel === "item").map(itemLink => {
+      const start = (this.currentPage - 1) * this.perPage;
+      const end = this.currentPage * this.perPage;
+      return this.links.filter(x => x.rel === "item").map((itemLink, idx) => {
         const itemUrl = this.resolve(itemLink.href, this.url);
-        // dispatch a fetch
-        this.load(itemUrl);
-        // attempt the load the full item
+
+        if (idx >= start && idx < end) {
+          // dispatch a fetch if item is within the range of items being displayed
+          this.load(itemUrl);
+        }
+
+        // attempt to load the full item
         const item = this.getEntity(itemUrl);
 
         if (item != null) {
