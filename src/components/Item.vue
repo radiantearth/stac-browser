@@ -21,43 +21,61 @@
 
     <div class="row">
       <div class="col-md-8">
-        <div
-          id="map-container"
-        >
-          <!-- TODO locator map -->
-          <!-- TODO skip if no COG is available -->
-          <!-- TODO display thumbnail in place of COG if necessary -->
-          <div id="map"></div>
-          <h3>Assets</h3>
-          <!-- TODO display in a table to provide space for type, size -->
-          <!-- <div class="table-responsive">
-            <table class="table">
-              <tbody>
-                <tr
-                  v-for="asset in assets"
-                  :key="asset.href">
-                  <td>
-                    <a
-                      :href="asset.href"
-                      v-html="asset.name" />
-                    <template v-if="asset.format"> ({{ asset.format }})</template>
-                  </td>
-                  <td>{{ asset.size }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div> -->
-          <ul class="scene_files">
-            <li
-              v-for="asset in assets"
-              :key="asset.href"
+        <b-tabs>
+          <b-tab
+            v-if="cog"
+            title="Map"
+            active
+          >
+            <div
+              id="map-container"
             >
-              <!-- eslint-disable-next-line vue/max-attributes-per-line vue/no-v-html -->
-              <span><a :href="asset.href" v-html="asset.title" /></span>
-              <template v-if="asset.type"> ("{{ asset.key }}", <code>{{ asset.type }}</code>)</template>
-            </li>
-          </ul>
-        </div>
+              <div id="map"></div>
+            </div>
+          </b-tab>
+          <b-tab
+            v-if="thumbnail"
+            title="Preview"
+          >
+            <a :href="thumbnail">
+              <img
+                id="thumbnail"
+                align="center"
+                :src="thumbnail"
+              >
+            </a>
+          </b-tab>
+        </b-tabs>
+        <h3>Assets</h3>
+        <!-- TODO display in a table to provide space for type, size -->
+        <!-- <div class="table-responsive">
+          <table class="table">
+            <tbody>
+              <tr
+                v-for="asset in assets"
+                :key="asset.href">
+                <td>
+                  <a
+                    :href="asset.href"
+                    v-html="asset.name" />
+                  <template v-if="asset.format"> ({{ asset.format }})</template>
+                </td>
+                <td>{{ asset.size }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div> -->
+        <!-- TODO locator map -->
+        <ul class="scene_files">
+          <li
+            v-for="asset in assets"
+            :key="asset.href"
+          >
+            <!-- eslint-disable-next-line vue/max-attributes-per-line vue/no-v-html -->
+            <span><a :href="asset.href" v-html="asset.title" /></span>
+            <template v-if="asset.type"> ("{{ asset.key }}", <code>{{ asset.type }}</code>)</template>
+          </li>
+        </ul>
 
         <!-- <h3>Preview</h3>
         <a :href="thumbnail">
@@ -191,15 +209,20 @@ export default {
     },
     cog() {
       // TODO find all relevant sources and surface in a dropdown
-      if (this.assets != null) {
-        const cog = this.assets.find(
-          // TODO "visual" is a hack
-          x => x.type === "image/vnd.stac.geotiff; cloud-optimized=true" // && x.key === "visual"
-        );
+      const cog = this.assets.find(
+        // TODO "visual" is a hack
+        x => x.type === "image/vnd.stac.geotiff; cloud-optimized=true" // && x.key === "visual"
+      );
 
-        if (cog != null) {
-          return this.resolve(cog.href, this.url);
-        }
+      if (cog != null) {
+        return this.resolve(cog.href, this.url);
+      }
+    },
+    thumbnail() {
+      const thumbnail = this.assets.find(x => x.key === "thumbnail");
+
+      if (thumbnail != null) {
+        return this.resolve(thumbnail.href, this.url);
       }
     },
     tileSource() {
@@ -290,11 +313,6 @@ export default {
       const self = this.links.find(x => x.type === "self");
 
       return this.resolve(self.href, this.url);
-    },
-    thumbnail() {
-      const thumbnail = this.links.find(x => x.type === "thumbnail");
-
-      return this.resolve(thumbnail.href, this.url);
     },
     attribution() {
       // TODO load attribution from rel=collection
@@ -536,7 +554,10 @@ code {
 }
 
 #thumbnail {
-  height: 500px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  max-height: 500px;
 }
 
 #header_logo {
