@@ -511,6 +511,7 @@ footer {
   padding-bottom: 3em;
 }
 code {
+  color: #555;
   white-space: nowrap;
 }
 </style>
@@ -558,7 +559,8 @@ code {
   border-top: none;
 }
 
-.table th, .table td {
+.table th,
+.table td {
   padding: 0.5rem;
 }
 
