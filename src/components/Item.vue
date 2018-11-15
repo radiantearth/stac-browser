@@ -47,11 +47,17 @@
           </b-tab>
         </b-tabs>
 
+        <br>
+
         <div class="table-responsive">
           <table class="table">
             <thead>
               <tr>
                 <th colspan="2"><h3>Assets</h3></th>
+              </tr>
+              <tr>
+                <th>Name</th>
+                <th>Content-Type</th>
               </tr>
             </thead>
             <tbody>
@@ -555,13 +561,15 @@ code {
   max-width: 100px;
 }
 
-.table th {
-  border-top: none;
-}
-
 .table th,
 .table td {
-  padding: 0.5rem;
+  border: none;
+  padding: 0.25rem;
+}
+
+.table th {
+  border-top: none;
+  border-bottom: 1px solid #dee2e6;
 }
 
 td.title {
