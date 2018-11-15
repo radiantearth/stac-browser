@@ -1,23 +1,3 @@
-<style scoped lang="css">
-h4 {
-  font-weight: bold;
-}
-
-td.title {
-  font-weight: bold;
-}
-
-ul.links, ul.items {
-  margin: 0 0 1em;
-  list-style-type: none;
-  padding: 0;
-}
-
-ul.links li, ul.items li {
-  margin: 0 0 0.2em;
-}
-</style>
-
 <template>
   <b-container>
     <b-row>
@@ -39,8 +19,8 @@ ul.links li, ul.items li {
         <h1>{{ title }}</h1>
         <p v-if="version"><small>Version {{ version }}</small></p>
         <p><small><code>{{ url }}</code></small></p>
-        <!-- eslint-disable-next-line vue/no-v-html -->
-        <template><p v-html="description" /></template>
+        <!-- eslint-disable-next-line vue/no-v-html vue/max-attributes-per-line -->
+        <div v-if="description" v-html="description"></div>
         <template v-if="providers != null && providers.length > 0">
           <h2>Provider<template v-if="providers.length > 1">s</template></h2>
           <ul>
@@ -102,13 +82,6 @@ ul.links li, ul.items li {
                   <td class="title">Temporal Extent</td>
                   <td>{{ temporalExtent }}</td>
                 </tr>
-                <tr
-                  v-for="prop in propertyList"
-                  :key="prop.key"
-                >
-                  <td class="title">{{ prop.label }}</td>
-                  <td>{{ prop.value }}</td>
-                </tr>
               </tbody>
             </table>
           </div>
@@ -156,13 +129,15 @@ import { HtmlRenderer, Parser } from "commonmark";
 import spdxToHTML from "spdx-to-html";
 import { mapActions, mapGetters } from "vuex";
 
-import dictionary from "../lib/stac/dictionary.json";
-
 export default {
   name: "Catalog",
   props: {
-    path: {
+    ancestors: {
       type: Array,
+      required: true
+    },
+    path: {
+      type: String,
       required: true
     },
     resolve: {
@@ -171,6 +146,10 @@ export default {
     },
     slugify: {
       type: Function,
+      required: true
+    },
+    url: {
+      type: String,
       required: true
     }
   },
@@ -195,72 +174,44 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["catalogForPath", "urlForPath"]),
-    url() {
-      return this.urlForPath(this.path);
-    },
+    ...mapGetters(["getEntity"]),
     breadcrumbs() {
-      if (this.catalog == null) {
-        return [];
-      }
+      // create slugs for everything except the root
+      const slugs = this.ancestors.slice(1).map(this.slugify);
 
-      const rootCatalog = this.catalogForPath([""]);
+      return this.ancestors.map((uri, idx) => {
+        const entity = this.getEntity(uri);
 
-      return [
-        {
-          to: "/",
-          text: rootCatalog.title || rootCatalog.id
+        // use all previous slugs to construct a path to this entity
+        let to = "/" + slugs.slice(0, idx).join("/");
+
+        if (entity.type === "Feature") {
+          // TODO how best to distinguish Catalogs from Items?
+          to = "/items" + to;
         }
-      ].concat(
-        this.path
-          .map((el, i) => {
-            const partialPath = this.path.slice(0, i + 1);
-            const catalog = this.catalogForPath(partialPath);
-            let slugPath = "/" + partialPath.join("/");
 
-            if (catalog != null) {
-              // TODO should there always be an id field?
-              // a name field?
-              if (catalog.type === "Feature") {
-                // TODO how best to distinguish Catalogs from Items?
-                slugPath = `/item${slugPath}`;
-              }
-
-              return {
-                to: slugPath,
-                text: catalog.title || catalog.id
-              };
-            }
-
-            return null;
-          })
-          .filter(x => x != null)
-      );
+        return {
+          to,
+          text: entity.title || entity.id
+        };
+      });
     },
     catalog() {
-      console.log(JSON.stringify(this.catalogForPath(this.path), null, 2));
+      const catalog = this.getEntity(this.url);
 
-      return this.catalogForPath(this.path);
+      console.log(JSON.stringify(catalog, null, 2));
+
+      return catalog;
     },
     children() {
-      if (this.catalog == null) {
-        return [];
-      }
-
-      return this.catalog.links
-        .filter(x => x.rel === "child")
-        .map(child => ({
-          path: child.href,
-          slug: child.id || this.slugify(this.resolve(child.href, this.url)),
-          title: child.title || child.href,
-          url: this.resolve(child.href, this.url)
-        }));
+      return this.catalog.links.filter(x => x.rel === "child").map(child => ({
+        path: child.href,
+        slug: this.slugify(this.resolve(child.href, this.url)),
+        title: child.title || child.href
+      }));
     },
     description() {
-      if (this.catalog == null) {
-        return null;
-      }
-
+      // REQUIRED
       const reader = new Parser({
         smart: true
       });
@@ -271,120 +222,65 @@ export default {
 
       return writer.render(reader.parse(this.catalog.description));
     },
+    id() {
+      // REQUIRED
+      return this.catalog.id;
+    },
+    extent() {
+      return this.catalog.extent || this.rootCatalog.extent || {};
+    },
     items() {
-      if (this.catalog == null) {
-        return [];
-      }
-
       // TODO move to async computed and pull from rel=items if necessary
 
-      return this.catalog.links.filter(x => x.rel === "item").map(item => {
-        const catalog = this.catalogForPath(
-          this.path.concat(item.id || this.slugify(item.href))
-        );
+      return this.links.filter(x => x.rel === "item").map(itemLink => {
+        const itemUrl = this.resolve(itemLink.href, this.url);
+        // dispatch a fetch
+        this.load(itemUrl);
+        // attempt the load the full item
+        const item = this.getEntity(itemUrl);
 
-        if (catalog != null) {
+        if (item != null) {
           return {
-            to:
-              "/item/" +
-              [
-                this.$route.params.path,
-                item.id || this.slugify(item.href)
-              ].join("/"),
-            title: catalog.id || item.title || item.href,
-            dateAcquired: catalog.properties.datetime
+            to: `/item${this.path}/${this.slugify(itemUrl)}`,
+            title:
+              item.properties.title ||
+              item.id ||
+              itemLink.title ||
+              itemLink.href,
+            dateAcquired: item.properties.datetime
           };
         }
 
         return {
-          to:
-            "/item/" +
-            [this.$route.params.path, item.id || this.slugify(item.href)].join(
-              "/"
-            ),
-          title: item.title || item.href
+          to: `/item${this.path}/${this.slugify(itemUrl)}`,
+          title: itemLink.title || itemLink.href
         };
       });
     },
-    license() {
-      if (this.catalog == null) {
-        return null;
-      }
-
-      // TODO look up license from root if it's not defined here
-
-      return spdxToHTML(this.catalog.license);
-    },
     keywords() {
-      if (this.catalog == null) {
-        return [];
-      }
-
-      return [].concat(this.catalog.keywords || []).join(", ");
+      return []
+        .concat(this.catalog.keywords || this.rootCatalog.keywords || [])
+        .join(", ");
     },
-    // TODO inherit from a common implementation w/ Item
-    propertyList() {
-      if (this.catalog == null) {
-        return [];
-      }
-
-      const label = key => {
-        if (typeof dictionary[key] === "object") {
-          return dictionary[key].label;
-        }
-
-        return dictionary[key] || key;
-      };
-
-      const format = (key, value) => {
-        let suffix = "";
-
-        if (typeof value === "object") {
-          value = JSON.stringify(value, null, 2);
-        }
-
-        if (typeof dictionary[key] === "object") {
-          if (dictionary[key].suffix != null) {
-            suffix = dictionary[key].suffix;
-          }
-
-          if (dictionary[key].type === "date") {
-            return new Date(value).toUTCString() + suffix;
-          }
-        }
-
-        return value + suffix;
-      };
-
-      return Object.keys(this.properties).map(key => ({
-        key,
-        label: label(key),
-        value: format(key, this.properties[key])
-      }));
+    license() {
+      return spdxToHTML(this.catalog.license || this.rootCatalog.license);
     },
-    properties() {
-      if (this.catalog == null) {
-        return {};
-      }
-
-      return this.catalog.properties || {};
+    links() {
+      // REQUIRED
+      return this.catalog.links;
     },
     providers() {
-      return this.catalog != null ? this.catalog.providers : null;
+      return this.catalog.providers || [];
+    },
+    rootCatalog() {
+      // TODO navigate up parents
+      return this.getEntity(this.ancestors[0]);
     },
     spatialExtent() {
-      return this.catalog != null && this.catalog.extent != null
-        ? this.catalog.extent.spatial
-        : null;
+      return this.extent.spatial;
     },
     temporalExtent() {
-      if (this.catalog == null || this.catalog.extent == null) {
-        return null;
-      }
-
-      const {
-        extent: { temporal }
-      } = this.catalog;
+      const { temporal } = this.extent;
 
       return [
         temporal[0]
@@ -394,61 +290,18 @@ export default {
       ].join(" - ");
     },
     title() {
-      return this.catalog != null
-        ? this.catalog.title || this.catalog.id
-        : null;
+      if (this.catalog.title != null) {
+        return `${this.catalog.title} (${this.id})`;
+      }
+
+      return this.id;
     },
     version() {
-      return this.catalog != null ? this.catalog.version : null;
+      return this.catalog.version;
     }
-  },
-  watch: {
-    currentPage(to) {
-      const start = (to - 1) * this.perPage;
-      const count = to * this.perPage;
-
-      return this.catalog.links
-        .filter(x => x.rel === "item")
-        .slice(start, count)
-        .map(item =>
-          this.loadPath({
-            path: this.path.concat(item.id || this.slugify(item.href))
-          })
-        );
-    },
-    path() {
-      // created() handles the initial load; this handles components that have been navigated to
-      this.initialize();
-    }
-  },
-  created() {
-    this.initialize();
   },
   methods: {
-    ...mapActions(["loadPath"]),
-    async initialize() {
-      await this.loadPath({
-        path: this.path
-      });
-
-      const catalog = this.catalogForPath(this.path);
-
-      if (catalog != null) {
-        const start = (this.currentPage - 1) * this.perPage;
-        const count = this.currentPage * this.perPage;
-
-        await Promise.all(
-          catalog.links
-            .filter(x => x.rel === "item")
-            .slice(start, count)
-            .map(item =>
-              this.loadPath({
-                path: this.path.concat(item.id || this.slugify(item.href))
-              })
-            )
-        );
-      }
-    },
+    ...mapActions(["load"]),
     sortCompare(a, b, key) {
       if (key === "link") {
         key = "title";
@@ -471,3 +324,25 @@ export default {
   }
 };
 </script>
+
+<style scoped lang="css">
+h4 {
+  font-weight: bold;
+}
+
+td.title {
+  font-weight: bold;
+}
+
+ul.links,
+ul.items {
+  margin: 0 0 1em;
+  list-style-type: none;
+  padding: 0;
+}
+
+ul.links li,
+ul.items li {
+  margin: 0 0 0.2em;
+}
+</style>

@@ -1,3 +1,400 @@
+<template>
+  <b-container>
+    <b-row>
+      <b-col md="12">
+        <header>
+          <!-- <a href="https://www.planet.com/disasterdata/">
+            <img
+              id="header_logo"
+              src="https://planet-pulse-assets-production.s3.amazonaws.com/uploads/2016/06/blog-logo.jpg"
+              alt="Powered by Planet Labs"
+              class="float-right">
+          </a> -->
+          <div><b-breadcrumb :items="breadcrumbs" /></div>
+          <h1>{{ title }}</h1>
+          <p><small><code>{{ url }}</code></small></p>
+        </header>
+      </b-col>
+    </b-row>
+
+    <hr>
+
+    <div class="row">
+      <div class="col-md-8">
+        <div
+          id="map-container"
+        >
+          <!-- TODO locator map -->
+          <!-- TODO skip if no COG is available -->
+          <!-- TODO display thumbnail in place of COG if necessary -->
+          <div id="map"></div>
+          <h3>Assets</h3>
+          <!-- TODO display in a table to provide space for type, size -->
+          <!-- <div class="table-responsive">
+            <table class="table">
+              <tbody>
+                <tr
+                  v-for="asset in assets"
+                  :key="asset.href">
+                  <td>
+                    <a
+                      :href="asset.href"
+                      v-html="asset.name" />
+                    <template v-if="asset.format"> ({{ asset.format }})</template>
+                  </td>
+                  <td>{{ asset.size }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div> -->
+          <ul class="scene_files">
+            <li
+              v-for="asset in assets"
+              :key="asset.href"
+            >
+              <!-- eslint-disable-next-line vue/max-attributes-per-line vue/no-v-html -->
+              <span><a :href="asset.href" v-html="asset.title" /></span>
+              <template v-if="asset.type"> ("{{ asset.key }}", <code>{{ asset.type }}</code>)</template>
+            </li>
+          </ul>
+        </div>
+
+        <!-- <h3>Preview</h3>
+        <a :href="thumbnail">
+          <img
+            v-if="thumbnail"
+            id="thumbnail"
+            :src="thumbnail">
+        </a> -->
+      </div>
+
+      <div class="col-md-4">
+        <h3>Metadata</h3>
+        <div class="table-responsive">
+          <table class="table">
+            <tbody>
+              <tr
+                v-for="prop in propertyList"
+                :key="prop.key"
+              >
+                <td class="title">{{ prop.label }}</td>
+                <td>{{ prop.value }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </b-container>
+</template>
+
+<script>
+import path from "path";
+
+import escape from "lodash.escape";
+import Leaflet from "leaflet";
+import "leaflet-easybutton";
+import { mapGetters } from "vuex";
+
+import dictionary from "../lib/stac/dictionary.json";
+
+export default {
+  name: "ItemDetail",
+  props: {
+    ancestors: {
+      type: Array,
+      required: true
+    },
+    center: {
+      type: Array,
+      default: null
+    },
+    fullscreen: {
+      type: Boolean,
+      default: false
+    },
+    path: {
+      type: String,
+      required: true
+    },
+    resolve: {
+      type: Function,
+      required: true
+    },
+    slugify: {
+      type: Function,
+      required: true
+    },
+    url: {
+      type: String,
+      required: true
+    }
+  },
+  data() {
+    return {
+      map: null,
+      baseLayer: Leaflet.tileLayer(
+        "https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}@2x.png",
+        {
+          attribution: `Map data <a href="https://www.openstreetmap.org/copyright">&copy; OpenStreetMap contributors</a>, &copy; <a href="https://carto.com/attributions">CARTO</a>`
+        }
+      ),
+      labelLayer: Leaflet.tileLayer(
+        "https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}@2x.png",
+        {
+          zIndex: 1000
+        }
+      ),
+      previewLayer: null,
+      overlayLayer: null,
+      geojsonOptions: {
+        style: function() {
+          return {
+            weight: 2,
+            color: "#333",
+            opacity: 1,
+            fillOpacity: 0
+          };
+        }
+      }
+    };
+  },
+  computed: {
+    ...mapGetters(["getEntity"]),
+    breadcrumbs() {
+      // create slugs for everything except the root
+      const slugs = this.ancestors.slice(1).map(this.slugify);
+
+      return this.ancestors.map((uri, idx) => {
+        const entity = this.getEntity(uri);
+
+        // use all previous slugs to construct a path to this entity
+        let to = "/" + slugs.slice(0, idx).join("/");
+
+        if (entity.type === "Feature") {
+          // TODO how best to distinguish Catalogs from Items?
+          to = "/items" + to;
+        }
+
+        return {
+          to,
+          text: entity.title || entity.id
+        };
+      });
+    },
+    item() {
+      const entity = this.getEntity(this.url);
+
+      console.log(JSON.stringify(entity, null, 2));
+
+      return entity;
+    },
+    cog() {
+      // TODO find all relevant sources and surface in a dropdown
+      if (this.assets != null) {
+        const cog = this.assets.find(
+          // TODO "visual" is a hack
+          x => x.type === "image/vnd.stac.geotiff; cloud-optimized=true" // && x.key === "visual"
+        );
+
+        if (cog != null) {
+          return this.resolve(cog.href, this.url);
+        }
+      }
+    },
+    tileSource() {
+      if (this.cog == null) {
+        return "";
+      }
+
+      // TODO global config
+      return `https://tiles.rdnt.io/tiles/{z}/{x}/{y}@2x?url=${encodeURIComponent(
+        this.cog
+      )}`;
+      // return `http://localhost:8000/tiles/{z}/{x}/{y}@2x?url=${encodeURIComponent(
+      //   this.cog
+      // )}`;
+    },
+    links() {
+      return this.item.links || [];
+    },
+    assets() {
+      return (
+        Object.keys(this.item.assets)
+          .map(key => ({
+            ...this.item.assets[key],
+            key
+          }))
+          .map(x => ({
+            ...x,
+            title:
+              escape(x.title) ||
+              `<code>${escape(path.basename(x.href))}</code>`,
+            href: new URL(x.href, this.url).toString()
+          }))
+          // prioritize assets w/ a format set
+          .sort((a, b) => {
+            const formatA = a.format || "zzz";
+            const formatB = b.format || "zzz";
+
+            if (formatA < formatB) {
+              return -1;
+            }
+
+            if (formatA > formatB) {
+              return 1;
+            }
+
+            return 0;
+          })
+      );
+    },
+    propertyList() {
+      const label = key => {
+        if (typeof dictionary[key] === "object") {
+          return dictionary[key].label;
+        }
+
+        return dictionary[key] || key;
+      };
+
+      const format = (key, value) => {
+        let suffix = "";
+
+        if (typeof dictionary[key] === "object") {
+          if (dictionary[key].suffix != null) {
+            suffix = dictionary[key].suffix;
+          }
+
+          if (dictionary[key].type === "date") {
+            return new Date(value).toUTCString() + suffix;
+          }
+        }
+
+        return value + suffix;
+      };
+
+      return Object.keys(this.item.properties).map(key => ({
+        key,
+        label: label(key),
+        value: format(key, this.item.properties[key])
+      }));
+    },
+    properties() {
+      return this.item.properties || {};
+    },
+    title() {
+      return this.properties.title || this.item.id;
+    },
+    self() {
+      const self = this.links.find(x => x.type === "self");
+
+      return this.resolve(self.href, this.url);
+    },
+    thumbnail() {
+      const thumbnail = this.links.find(x => x.type === "thumbnail");
+
+      return this.resolve(thumbnail.href, this.url);
+    },
+    attribution() {
+      // TODO load attribution from rel=collection
+      return null;
+      // return `Imagery ${this.properties.license || ""} ${
+      //   this.properties.provider
+      // }`;
+
+      // TODO license + provider may not be present
+      // TODO license may be an object
+      // attributionControl.addAttribution(
+      //   `Imagery ${this.properties.license || ""} ${this.properties.provider}`
+      // );
+    }
+  },
+  watch: {
+    fullscreen(to, from) {
+      if (to !== from) {
+        console.log(this.map);
+        if (to) {
+          this.map.getContainer().classList.add("leaflet-pseudo-fullscreen");
+        } else {
+          this.map.getContainer().classList.remove("leaflet-pseudo-fullscreen");
+        }
+
+        this.map.invalidateSize();
+      }
+    }
+  },
+  mounted() {
+    this.initialize();
+  },
+  methods: {
+    initialize() {
+      this.map = Leaflet.map("map");
+      this.map.on("moveend", this.updateHash);
+      this.map.on("zoomend", this.updateHash);
+
+      this.map.attributionControl.setPrefix("");
+
+      this.button = Leaflet.easyButton(
+        "fas fa-expand fa-2x",
+        () => this.onFullscreenChange(!this.fullscreen),
+        {
+          position: "topright"
+        }
+      ).addTo(this.map);
+
+      if (this.fullscreen) {
+        this.map.getContainer().classList.add("leaflet-pseudo-fullscreen");
+      }
+
+      this.baseLayer.addTo(this.map);
+      this.labelLayer.addTo(this.map);
+
+      if (this.tileSource) {
+        this.tileLayer = Leaflet.tileLayer(this.tileSource, {
+          attribution: this.attribution
+        }).addTo(this.map);
+      }
+
+      this.overlayLayer = Leaflet.geoJSON(this.item, this.geojsonOptions).addTo(
+        this.map
+      );
+
+      if (this.center != null) {
+        const [zoom, lat, lng] = this.center;
+
+        this.map.setView([lat, lng], zoom);
+      } else {
+        this.map.fitBounds(this.overlayLayer.getBounds());
+      }
+    },
+    onFullscreenChange(_fullscreen) {
+      // strip fullscreen property
+      // eslint-disable-next-line no-unused-vars
+      const { fullscreen, ...query } = this.$route.query;
+
+      if (_fullscreen) {
+        query.fullscreen = "true";
+      }
+
+      this.$router.replace({
+        ...this.$route,
+        query
+      });
+    },
+    updateHash() {
+      const center = this.map.getCenter();
+      const zoom = this.map.getZoom();
+
+      this.$router.replace({
+        ...this.$route,
+        hash: `${zoom}/${center.lat.toFixed(6)}/${center.lng.toFixed(6)}`
+      });
+    }
+  }
+};
+</script>
+
 <style lang="css">
 body {
   line-height: 24px;
@@ -133,6 +530,11 @@ code {
   height: 500px;
 }
 
+#map {
+  height: 100%;
+  width: 100%;
+}
+
 #thumbnail {
   height: 500px;
 }
@@ -158,500 +560,3 @@ ul.scene_files li {
   margin: 0 0 0.2em;
 }
 </style>
-
-<template>
-  <b-container>
-    <b-row>
-      <b-col md="12">
-        <header>
-          <!-- <a href="https://www.planet.com/disasterdata/">
-            <img
-              id="header_logo"
-              src="https://planet-pulse-assets-production.s3.amazonaws.com/uploads/2016/06/blog-logo.jpg"
-              alt="Powered by Planet Labs"
-              class="float-right">
-          </a> -->
-          <div><b-breadcrumb :items="breadcrumbs" /></div>
-          <h1>{{ title }}</h1>
-          <p><small><code>{{ url }}</code></small></p>
-        </header>
-      </b-col>
-    </b-row>
-
-    <hr>
-
-    <div class="row">
-      <div class="col-md-8">
-        <div
-          id="map-container"
-        >
-          <!-- TODO locator map -->
-          <l-map
-            ref="map"
-            @update:zoom="onUpdateZoom"
-            @update:bounds="onUpdateBounds"
-          >
-            <template><l-control-fullscreen
-              :fullscreen="fullscreen"
-              :on-change="onFullscreenChange"
-            /></template>
-            <template><l-tile-layer
-              :attribution="baseAttribution"
-              :url="baseLayerSource"
-            /></template>
-            <template><l-geo-json
-              v-if="catalog"
-              ref="geojsonLayer"
-              :geojson="catalog"
-              :options="geojsonOptions"
-            /></template>
-            <template><l-tile-layer
-              v-if="tileSource"
-              :url="tileSource"
-            /></template>
-            <template><l-tile-layer
-              :url="labelLayerSource"
-            /></template>
-          </l-map>
-          <h3>Assets</h3>
-          <!-- TODO display in a table to provide space for type, size -->
-          <!-- <div class="table-responsive">
-            <table class="table">
-              <tbody>
-                <tr
-                  v-for="asset in assets"
-                  :key="asset.href">
-                  <td>
-                    <a
-                      :href="asset.href"
-                      v-html="asset.name" />
-                    <template v-if="asset.format"> ({{ asset.format }})</template>
-                  </td>
-                  <td>{{ asset.size }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div> -->
-          <ul class="scene_files">
-            <li
-              v-for="asset in assets"
-              :key="asset.href"
-            >
-              <!-- eslint-disable-next-line vue/max-attributes-per-line vue/no-v-html -->
-              <span><a :href="asset.href" v-html="asset.title" /></span>
-              <template v-if="asset.type"> ("{{ asset.key }}", <code>{{ asset.type }}</code>)</template>
-            </li>
-          </ul>
-        </div>
-
-        <!-- <h3>Preview</h3>
-        <a :href="thumbnail">
-          <img
-            v-if="thumbnail"
-            id="thumbnail"
-            :src="thumbnail">
-        </a> -->
-      </div>
-
-      <div class="col-md-4">
-        <h3>Metadata</h3>
-        <div class="table-responsive">
-          <table class="table">
-            <tbody>
-              <tr
-                v-for="prop in propertyList"
-                :key="prop.key"
-              >
-                <td class="title">{{ prop.label }}</td>
-                <td>{{ prop.value }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </b-container>
-</template>
-
-<script>
-import path from "path";
-
-import escape from "lodash.escape";
-import isEqual from "lodash.isequal";
-import { LMap, LTileLayer, LGeoJson } from "vue2-leaflet";
-import { mapActions, mapGetters } from "vuex";
-
-import LControlFullscreen from "./LControlFullscreen";
-import dictionary from "../lib/stac/dictionary.json";
-
-export default {
-  name: "ItemDetail",
-  components: {
-    LControlFullscreen,
-    LMap,
-    LTileLayer,
-    LGeoJson
-  },
-  props: {
-    path: {
-      type: Array,
-      required: true
-    },
-    resolve: {
-      type: Function,
-      required: true
-    }
-  },
-  data() {
-    return {
-      geojsonOptions: {
-        style: function() {
-          return {
-            weight: 2,
-            color: "#333",
-            opacity: 1,
-            fillOpacity: 0
-          };
-        }
-      },
-      baseAttribution: `Map data <a href="https://www.openstreetmap.org/copyright">&copy; OpenStreetMap contributors</a>, &copy; <a href="https://carto.com/attributions">CARTO</a>`,
-      // TODO global config
-      baseLayerSource:
-        "https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}@2x.png",
-      labelLayerSource:
-        "https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}@2x.png"
-    };
-  },
-  computed: {
-    ...mapGetters(["catalogForPath", "urlForPath"]),
-    url() {
-      return this.urlForPath(this.path);
-    },
-    breadcrumbs() {
-      if (this.catalog == null) {
-        return [];
-      }
-
-      const rootCatalog = this.catalogForPath([""]);
-
-      return [
-        {
-          to: "/",
-          text: rootCatalog.title
-        }
-      ].concat(
-        this.path
-          .map((el, i) => {
-            const partialPath = this.path.slice(0, i + 1);
-            const catalog = this.catalogForPath(partialPath);
-            let slugPath = "/" + partialPath.join("/");
-
-            if (catalog != null) {
-              // Items are GeoJSON, so they'll have type: Feature
-              if (catalog.type === "Feature") {
-                slugPath = `/item${slugPath}`;
-              }
-
-              return {
-                to: slugPath,
-                text: catalog.title || catalog.id
-              };
-            }
-
-            return null;
-          })
-          .filter(x => x != null)
-      );
-    },
-    catalog() {
-      return this.catalogForPath(this.path);
-    },
-    center() {
-      if (this.$route.hash === "") {
-        return null;
-      }
-
-      return this.$route.hash.slice(1).split("/");
-    },
-    cog() {
-      if (this.assets != null) {
-        const cog = this.assets.find(
-          // TODO "visual" is a hack
-          x => x.type === "image/x.cloud-optimized-geotiff" // && x.key === "visual"
-        );
-
-        if (cog != null) {
-          return new URL(cog.href, this.url).toString();
-        }
-      }
-    },
-    fullscreen() {
-      return this.$route.query.fullscreen === "true";
-    },
-    tileSource() {
-      if (this.cog == null) {
-        return "";
-      }
-
-      // TODO global config
-      return `https://tiles.rdnt.io/tiles/{z}/{x}/{y}@2x?url=${encodeURIComponent(
-        this.cog
-      )}`;
-      // return `http://localhost:8000/tiles/{z}/{x}/{y}@2x?url=${encodeURIComponent(
-      //   this.cog
-      // )}`;
-    },
-    links() {
-      return this.catalog != null ? this.catalog.links : null;
-    },
-    assets() {
-      if (this.catalog == null) {
-        return null;
-      }
-
-      return (
-        Object.keys(this.catalog.assets)
-          .map(key => ({
-            ...this.catalog.assets[key],
-            key
-          }))
-          .map(x => ({
-            ...x,
-            title:
-              escape(x.title) ||
-              `<code>${escape(path.basename(x.href))}</code>`,
-            href: new URL(x.href, this.url).toString()
-          }))
-          // prioritize assets w/ a format set
-          .sort((a, b) => {
-            const formatA = a.format || "zzz";
-            const formatB = b.format || "zzz";
-
-            if (formatA < formatB) {
-              return -1;
-            }
-
-            if (formatA > formatB) {
-              return 1;
-            }
-
-            return 0;
-          })
-      );
-    },
-    children() {
-      if (this.catalog == null) {
-        return null;
-      }
-
-      return this.catalog.links.filter(x => x.rel === "child").map(child => ({
-        path: child.href,
-        url: new URL(child.href, this.self.href).toString()
-      }));
-    },
-    items() {
-      if (this.catalog == null) {
-        return null;
-      }
-
-      return this.catalog.links.filter(x => x.rel === "item").map(item => {
-        const url = new URL(item.href, this.self.href);
-
-        return {
-          path: url.pathname,
-          url: url.toString()
-        };
-      });
-    },
-    propertyList() {
-      if (this.catalog == null) {
-        return null;
-      }
-
-      const label = key => {
-        if (typeof dictionary[key] === "object") {
-          return dictionary[key].label;
-        }
-
-        return dictionary[key] || key;
-      };
-
-      const format = (key, value) => {
-        let suffix = "";
-
-        if (typeof dictionary[key] === "object") {
-          if (dictionary[key].suffix != null) {
-            suffix = dictionary[key].suffix;
-          }
-
-          if (dictionary[key].type === "date") {
-            return new Date(value).toUTCString() + suffix;
-          }
-        }
-
-        return value + suffix;
-      };
-
-      return Object.keys(this.catalog.properties).map(key => ({
-        key,
-        label: label(key),
-        value: format(key, this.catalog.properties[key])
-      }));
-    },
-    properties() {
-      if (this.catalog == null) {
-        return null;
-      }
-
-      return this.catalog.properties;
-    },
-    title() {
-      return this.catalog != null ? this.catalog.id : null;
-    },
-    self() {
-      if (this.links == null) {
-        return null;
-      }
-
-      const self = this.links.find(x => x.type === "self");
-
-      return this.resolve(self.href, this.url);
-    },
-    thumbnail() {
-      if (this.links == null) {
-        return null;
-      }
-
-      const thumbnail = this.links.find(x => x.type === "thumbnail");
-
-      return this.resolve(thumbnail.href, this.url);
-    },
-    attribution() {
-      // TODO load attribution from rel=collection
-      return null;
-      // return `Imagery ${this.properties.license || ""} ${
-      //   this.properties.provider
-      // }`;
-    }
-  },
-  watch: {
-    catalog(to, from) {
-      if (!isEqual(from, to)) {
-        console.log(JSON.stringify(to, null, 2));
-
-        const { map } = this.$refs;
-        const {
-          mapObject: { attributionControl }
-        } = map;
-
-        attributionControl.addAttribution(this.attribution);
-
-        if (this.center == null) {
-          this.$nextTick(() => {
-            const { geojsonLayer } = this.$refs;
-            map.setBounds(geojsonLayer.getBounds());
-          });
-        }
-      }
-    },
-    fullscreen(to, from) {
-      if (to !== from) {
-        const {
-          map,
-          map: { mapObject }
-        } = this.$refs;
-
-        if (to) {
-          map.$el.classList.add("leaflet-pseudo-fullscreen");
-        } else {
-          map.$el.classList.remove("leaflet-pseudo-fullscreen");
-        }
-
-        mapObject.invalidateSize();
-      }
-    },
-    path(to, from) {
-      // created() handles the initial load; this handles components that have been navigated to
-      if (!isEqual(from, to)) {
-        this.initialize();
-      }
-    }
-  },
-  mounted() {
-    this.initialize();
-  },
-  methods: {
-    ...mapActions(["loadPath"]),
-    async initialize() {
-      const { map } = this.$refs;
-      const {
-        mapObject,
-        mapObject: { attributionControl }
-      } = map;
-
-      if (this.center != null) {
-        const [zoom, lat, lng] = this.center;
-
-        mapObject.setView([lat, lng], zoom);
-      }
-
-      attributionControl.setPrefix("");
-
-      if (this.fullscreen) {
-        map.$el.classList.add("leaflet-pseudo-fullscreen");
-      }
-
-      await this.loadPath({
-        path: this.path
-      });
-
-      const { geojsonLayer } = this.$refs;
-
-      if (geojsonLayer != null) {
-        // TODO license + provider may not be present
-        // TODO license may be an object
-        // attributionControl.addAttribution(
-        //   `Imagery ${this.properties.license || ""} ${this.properties.provider}`
-        // );
-
-        geojsonLayer.setGeojson(this.catalog);
-        if (this.center == null) {
-          map.setBounds(geojsonLayer.getBounds());
-        }
-      }
-    },
-    onFullscreenChange(_fullscreen) {
-      // strip fullscreen property
-      // eslint-disable-next-line no-unused-vars
-      const { fullscreen, ...query } = this.$route.query;
-
-      if (_fullscreen) {
-        query.fullscreen = "true";
-      }
-
-      this.$router.replace({
-        ...this.$route,
-        query
-      });
-    },
-    onUpdateBounds() {
-      this.updateHash();
-    },
-    onUpdateZoom() {
-      this.updateHash();
-    },
-    updateHash() {
-      const {
-        map: { mapObject: map }
-      } = this.$refs;
-      const center = map.getCenter();
-      const zoom = map.getZoom();
-
-      this.$router.replace({
-        ...this.$route,
-        hash: `${zoom}/${center.lat.toFixed(6)}/${center.lng.toFixed(6)}`
-      });
-    }
-  }
-};
-</script>

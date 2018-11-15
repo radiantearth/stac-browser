@@ -5,6 +5,7 @@ module.exports = {
     "plugin:prettier/recommended"
   ],
   globals: {
+    Buffer: true,
     process: true,
     require: true
   },
@@ -13,6 +14,7 @@ module.exports = {
     parser: "babel-eslint"
   },
   rules: {
-    "no-console": 0
+    "no-console": 0,
+    "vue/html-self-closing": 0
   }
 };
