@@ -45,40 +45,39 @@
               >
             </a>
           </b-tab>
+          <b-tab
+            v-if="assets.length > 0"
+            title="Assets"
+          >
+            <div class="table-responsive assets">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Content-Type</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="asset in assets"
+                    :key="asset.href"
+                  >
+                    <td>
+                      <!-- eslint-disable-next-line vue/max-attributes-per-line vue/no-v-html -->
+                      <a :href="asset.href" :title="asset.key" v-html="asset.title" />
+                    </td>
+                    <td><code>{{ asset.type }}</code></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </b-tab>
         </b-tabs>
-
-        <br>
-
-        <div class="table-responsive">
-          <table class="table">
-            <thead>
-              <tr>
-                <th colspan="2"><h3>Assets</h3></th>
-              </tr>
-              <tr>
-                <th>Name</th>
-                <th>Content-Type</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="asset in assets"
-                :key="asset.href"
-              >
-                <td>
-                  <!-- eslint-disable-next-line vue/max-attributes-per-line vue/no-v-html -->
-                  <a :href="asset.href" :title="asset.key" v-html="asset.title" />
-                </td>
-                <td><code>{{ asset.type }}</code></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
       </div>
 
       <div class="col-md-4">
         <div id="locator-map"></div>
-        <div class="table-responsive">
+        <div class="table-responsive metadata">
           <table class="table">
             <thead>
               <tr>
@@ -618,5 +617,15 @@ code {
 
 td.title {
   font-weight: bold;
+}
+
+.table-responsive.assets {
+  padding: 15px;
+}
+
+.table-responsibe.metadata {
+  background-color: #f9f9f9;
+  border: 1px solid #dee2e6;
+  padding: 10px;
 }
 </style>
