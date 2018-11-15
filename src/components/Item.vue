@@ -79,12 +79,22 @@
         <div id="locator-map"></div>
         <div class="table-responsive metadata">
           <table class="table">
-            <thead>
-              <tr>
-                <th colspan="2"><h3>Metadata</h3></th>
-              </tr>
-            </thead>
             <tbody>
+              <tr v-if="collection">
+                <td class="title">Collection</td>
+                <td><a :href="linkToCollection">{{ collection.title }}</a></td>
+              </tr>
+              <tr>
+                <td class="title">License</td>
+                <td>
+                  <!-- eslint-disable-next-line vue/no-v-html -->
+                  <span v-html="license"></span>
+                  <template v-if="licensor">
+                    <!-- eslint-disable-next-line vue/no-v-html -->
+                    by <span v-html="licensor"></span>
+                  </template>
+                </td>
+              </tr>
               <tr
                 v-for="prop in propertyList"
                 :key="prop.key"
@@ -106,7 +116,8 @@ import path from "path";
 import escape from "lodash.escape";
 import Leaflet from "leaflet";
 import "leaflet-easybutton";
-import { mapGetters } from "vuex";
+import spdxToHTML from "spdx-to-html";
+import { mapActions, mapGetters } from "vuex";
 
 import dictionary from "../lib/stac/dictionary.json";
 
@@ -286,11 +297,46 @@ export default {
         return value + suffix;
       };
 
-      return Object.keys(this.item.properties).map(key => ({
+      const collectionProps = this.collection && this.collection.properties;
+
+      const props = {
+        ...collectionProps,
+        ...this.item.properties
+      };
+
+      return Object.keys(props).map(key => ({
         key,
         label: label(key),
-        value: format(key, this.item.properties[key])
+        value: format(key, props[key])
       }));
+    },
+    license() {
+      return spdxToHTML(
+        this.properties["item:license"] ||
+          (this.collection && this.collection.license)
+      );
+    },
+    licensor() {
+      if (this.collection == null || this.collection.providers == null) {
+        return null;
+      }
+
+      return this.collection.providers
+        .filter(x => x.roles.includes("licensor"))
+        .map(x => {
+          if (x.url != null) {
+            return `<a href=${x.url}>${x.name}</a>`;
+          }
+
+          return x.name;
+        })
+        .pop();
+    },
+    providers() {
+      return (
+        this.properties["item:providers"] ||
+        (this.collection && this.collection.providers)
+      );
     },
     properties() {
       return this.item.properties || {};
@@ -298,10 +344,34 @@ export default {
     title() {
       return this.properties.title || this.item.id;
     },
-    self() {
-      const self = this.links.find(x => x.type === "self");
+    collection() {
+      const collection = this.links
+        .filter(x => x.rel === "collection")
+        .map(x => ({
+          ...x,
+          href: this.resolve(x.href, this.url)
+        }))
+        .pop();
 
-      return this.resolve(self.href, this.url);
+      if (collection != null) {
+        this.load(collection.href);
+
+        return this.getEntity(collection.href);
+      }
+    },
+    collectionLink() {
+      return this.links
+        .filter(x => x.rel === "collection")
+        .map(x => ({
+          ...x,
+          href: this.resolve(x.href, this.url)
+        }))
+        .pop();
+    },
+    linkToCollection() {
+      if (this.collectionLink.href != null) {
+        return `/collection/${this.slugify(this.collectionLink.href)}`;
+      }
     },
     attribution() {
       // TODO load attribution from rel=collection
@@ -335,6 +405,7 @@ export default {
     this.initialize();
   },
   methods: {
+    ...mapActions(["load"]),
     initialize() {
       this.initializePreviewMap();
       this.initializeLocatorMap();
@@ -615,8 +686,9 @@ code {
   border-bottom: 1px solid #dee2e6;
 }
 
-td.title {
+.metadata td.title {
   font-weight: bold;
+  width: 33%;
 }
 
 .table-responsive.assets {

@@ -82,6 +82,29 @@ const main = async () => {
       }
     },
     {
+      path: "/collection/:path*",
+      component: Catalog,
+      props: route => {
+        let urls = [CATALOG_URL];
+
+        if (route.params.path != null) {
+          urls = urls.concat(
+            route.params.path
+              .split("/")
+              .map(s => resolve(bs58.decode(s).toString()))
+          );
+        }
+
+        return {
+          ancestors: urls,
+          path: route.path,
+          resolve,
+          slugify,
+          url: urls.slice(-1).pop()
+        };
+      }
+    },
+    {
       path: "/:path*",
       component: Catalog,
       props: route => {
