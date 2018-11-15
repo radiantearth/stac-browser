@@ -24,7 +24,7 @@
         <b-tabs>
           <b-tab
             v-if="cog"
-            title="Map"
+            title="Preview"
             active
           >
             <div
@@ -35,7 +35,7 @@
           </b-tab>
           <b-tab
             v-if="thumbnail"
-            title="Preview"
+            title="Thumbnail"
           >
             <a :href="thumbnail">
               <img
