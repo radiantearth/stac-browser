@@ -275,7 +275,12 @@ export default {
           }
 
           if (dictionary[key].type === "date") {
-            return new Date(value).toUTCString() + suffix;
+            return (
+              new Date(value).toLocaleString([], {
+                timeZone: "UTC",
+                timeZoneName: "short"
+              }) + suffix
+            );
           }
         }
 
