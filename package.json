@@ -8,49 +8,52 @@
     "build-cbers": "CATALOG_URL=https://cbers-stac.s3.amazonaws.com/catalog.json npm run build",
     "build-iserv": "CATALOG_URL=https://s3-us-west-2.amazonaws.com/radiant-nasa-iserv/iserv.json npm run build",
     "build-planet": "CATALOG_URL=https://storage.googleapis.com/pdd-stac/disasters/catalog.json npm run build",
+    "build-boundless": "CATALOG_URL=http://stac.boundlessgeo.io/stac npm run build",
     "clean": "rm -rf dist/*.{js,css,png,html,map}",
-    "deploy-cbers": "npm run clean && npm run build-cbers && netlify deploy -p dist/ -s cbers-stac",
-    "deploy-iserv": "npm run clean && npm run build-iserv && netlify deploy -p dist/ -s iserv-stac",
-    "deploy-planet": "npm run clean && npm run build-planet && netlify deploy -p dist/ -s planet-stac",
-    "precommit": "lint-staged",
+    "deploy-cbers": "npm run clean && npm run build-cbers && netlify deploy --prod --dir dist/ --site d51680e6-45e1-49db-b1e4-eb6e236a431a",
+    "deploy-iserv": "npm run clean && npm run build-iserv && netlify deploy --prod --dir dist/ --site 7ad829b5-58b2-4a72-9e42-eb5749982070",
+    "deploy-planet": "npm run clean && npm run build-planet && netlify deploy --prod --dir dist/ --site 0208c719-dcdf-42dc-bddb-9ae5498424db",
+    "deploy-boundless": "npm run clean && npm run build-boundless && netlify deploy --prod --dir dist/ --site 95a54956-1c9b-4548-87bc-a7ce834f980b",
     "start": "parcel --target=browser index.html"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@babel/polyfill": "^7.0.0",
     "bootstrap-vue": "^2.0.0-rc.11",
-    "es6-promise": "^4.2.4",
+    "bs58": "^4.0.1",
+    "commonmark": "^0.28.1",
+    "es6-promise": "^4.2.5",
     "hash.js": "^1.1.3",
     "jquery": "^3.3.1",
-    "leaflet": "^1.3.1",
+    "leaflet": "^1.3.4",
     "leaflet-easybutton": "^2.3.0",
     "lodash.escape": "^4.0.1",
-    "lodash.isequal": "^4.5.0",
-    "vue": "^2.5.16",
-    "vue-async-computed": "^3.3.1",
-    "vue-hot-reload-api": "^2.3.0",
+    "p-map": "^2.0.0",
+    "spdx-to-html": "^0.3.2",
+    "vue": "^2.5.17",
+    "vue-async-computed": "^3.4.1",
+    "vue-hot-reload-api": "^2.3.1",
     "vue-router": "^3.0.1",
-    "vue-template-compiler": "~2",
-    "vue2-leaflet": "^1.0.2",
     "vuex": "^3.0.1"
   },
   "devDependencies": {
-    "@vue/component-compiler-utils": "^2.1.2",
-    "babel-eslint": "^8.2.3",
-    "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "babel-plugin-transform-runtime": "^6.23.0",
+    "@babel/core": "^7.1.2",
+    "@vue/component-compiler-utils": "^2.3.0",
+    "babel-eslint": "^10.0.1",
     "babel-preset-env": "^1.7.0",
     "babel-runtime": "^6.26.0",
-    "eslint": "^4.19.1",
-    "eslint-config-prettier": "^2.9.0",
-    "eslint-plugin-prettier": "^2.6.0",
-    "eslint-plugin-vue": "^4.5.0",
+    "eslint": "^5.7.0",
+    "eslint-config-prettier": "^3.1.0",
+    "eslint-plugin-prettier": "^3.0.0",
+    "eslint-plugin-vue": "^5.0.0-beta.3",
     "git-exec-and-restage": "^1.1.1",
-    "husky": "^0.14.3",
-    "lint-staged": "^7.1.2",
-    "parcel-bundler": "^1.8.1",
-    "parcel-plugin-eslint": "^1.0.4",
-    "prettier": "^1.13.0"
+    "husky": "^1.1.2",
+    "lint-staged": "^7.3.0",
+    "netlify-cli": "^2.1.1",
+    "parcel-bundler": "^1.10.3",
+    "prettier": "^1.14.3",
+    "vue-template-compiler": "^2.5.17"
   },
   "lint-staged": {
     "*.js": [
@@ -65,5 +68,10 @@
   },
   "alias": {
     "vue": "./node_modules/vue/dist/vue.common.js"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
   }
 }

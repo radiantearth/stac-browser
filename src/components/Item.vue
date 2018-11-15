@@ -1,145 +1,3 @@
-<style lang="css">
-body {
-  line-height: 24px;
-  color: #111;
-  font-family: Arial, sans-serif;
-}
-blockquote, body {
-  font-size: 16px;
-}
-table {
-  font-size: 80%;
-}
-h1, h2, h3, h4, h5, h6 {
-  padding: 0;
-  margin: 0;
-}
-h1, h2, h3, h4 {
-  font-family: Arial, sans-serif;
-  text-rendering: optimizeLegibility;
-  padding-bottom: 4px;
-}
-h1:last-child, h2:last-child, h3:last-child, h4:last-child {
-  padding-bottom: 0;
-}
-h1 {
-  font-weight: 400;
-  font-size: 28px;
-  line-height: 1.2;
-}
-h2 {
-  font-weight: 700;
-  font-size: 21px;
-  line-height: 1.3;
-}
-h3 {
-  font-weight: 700;
-}
-h3, h4 {
-  font-size: 17px;
-  line-height: 1.255;
-}
-h4 {
-  font-weight: 400;
-}
-h5 {
-  font-size: 13px;
-  line-height: 19px;
-}
-h5, h6 {
-  font-weight: 700;
-}
-h6 {
-  text-transform: uppercase;
-  font-size: 11px;
-  line-height: 1.465;
-  padding-bottom: 1px;
-}
-p {
-  padding: 0;
-  margin: 0 0 14px;
-}
-p:last-child {
-  margin-bottom: 0;
-}
-p + p {
-  margin-top: -4px;
-}
-b, strong {
-  font-weight: 700;
-}
-em, i {
-  font-style: italic;
-}
-blockquote {
-  margin: 13px;
-}
-small {
-  font-size: 12px;
-}
-a, a:active, a:link, a:visited {
-  color: #0066c0;
-}
-header {
-  padding: 1.5em 0 0.5em;
-}
-footer {
-  padding-bottom: 3em;
-}
-code {
-  white-space: nowrap;
-}
-</style>
-
-<style scoped lang="css">
-.leaflet-pseudo-fullscreen {
-  position: fixed !important;
-  width: 100% !important;
-  height: 100% !important;
-  top: 0 !important;
-  left: 0 !important;
-  z-index: 99999;
-}
-
-.vue2leaflet-map {
-  width: 100%;
-  height: 100%;
-  border: 1px solid #fff;
-  background-color: #090909;
-  z-index: 1;
-  position: relative;
-}
-
-#map-container {
-  height: 500px;
-}
-
-#thumbnail {
-  height: 500px;
-}
-
-#header_logo {
-  max-width: 100px;
-}
-
-td.title {
-  font-weight: bold;
-}
-
-ul.scene_files {
-  list-style-type: none;
-  padding: 0;
-}
-
-ul.scene_files {
-  margin: 0 0 1em;
-}
-
-ul.scene_files li {
-  margin: 0 0 0.2em;
-}
-</style>
-
 <template>
   <b-container>
     <b-row>
@@ -152,8 +10,8 @@ ul.scene_files li {
               alt="Powered by Planet Labs"
               class="float-right">
           </a> -->
-          <b-breadcrumb :items="breadcrumbs" />
-          <h1>{{ name }}</h1>
+          <div><b-breadcrumb :items="breadcrumbs" /></div>
+          <h1>{{ title }}</h1>
           <p><small><code>{{ url }}</code></small></p>
         </header>
       </b-col>
@@ -163,82 +21,84 @@ ul.scene_files li {
 
     <div class="row">
       <div class="col-md-8">
-        <div
-          id="map-container">
-          <!-- TODO locator map -->
-          <l-map
-            ref="map"
-            @update:zoom="onUpdateZoom"
-            @update:bounds="onUpdateBounds">
-            <l-control-fullscreen
-              :fullscreen="fullscreen"
-              :on-change="onFullscreenChange" />
-            <l-tile-layer
-              :attribution="baseAttribution"
-              :url="baseLayerSource"
-            />
-            <l-geo-json
-              v-if="catalog"
-              ref="geojsonLayer"
-              :geojson="catalog"
-              :options="geojsonOptions"
-            />
-            <l-tile-layer
-              v-if="tileSource"
-              :url="tileSource"
-            />
-            <l-tile-layer
-              :url="labelLayerSource"
-            />
-          </l-map>
-          <h3>Assets</h3>
-          <!-- TODO display in a table to provide space for type, size -->
-          <!-- <div class="table-responsive">
-            <table class="table">
-              <tbody>
-                <tr
-                  v-for="asset in assets"
-                  :key="asset.href">
-                  <td>
-                    <a
-                      :href="asset.href"
-                      v-html="asset.name" />
-                    <template v-if="asset.format"> ({{ asset.format }})</template>
-                  </td>
-                  <td>{{ asset.size }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div> -->
-          <ul class="scene_files">
-            <li
-              v-for="asset in assets"
-              :key="asset.href">
-              <a
-                :href="asset.href"
-                v-html="asset.name" />
-              <template v-if="asset.format"> ({{ asset.format }})</template>
-            </li>
-          </ul>
-        </div>
-
-        <!-- <h3>Preview</h3>
-        <a :href="thumbnail">
-          <img
+        <b-tabs>
+          <b-tab
+            v-if="cog"
+            title="Preview"
+            active
+          >
+            <div
+              id="map-container"
+            >
+              <div id="map"></div>
+            </div>
+          </b-tab>
+          <b-tab
             v-if="thumbnail"
-            id="thumbnail"
-            :src="thumbnail">
-        </a> -->
+            title="Thumbnail"
+          >
+            <a :href="thumbnail">
+              <img
+                id="thumbnail"
+                align="center"
+                :src="thumbnail"
+              >
+            </a>
+          </b-tab>
+          <b-tab
+            v-if="assets.length > 0"
+            title="Assets"
+          >
+            <div class="table-responsive assets">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Content-Type</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="asset in assets"
+                    :key="asset.key"
+                  >
+                    <td>
+                      <!-- eslint-disable-next-line vue/max-attributes-per-line vue/no-v-html -->
+                      <a :href="asset.href" :title="asset.key" v-html="asset.title" />
+                    </td>
+                    <td><code>{{ asset.type }}</code></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </b-tab>
+        </b-tabs>
       </div>
 
       <div class="col-md-4">
-        <h3>Metadata</h3>
-        <div class="table-responsive">
+        <div id="locator-map"></div>
+        <div class="table-responsive metadata">
           <table class="table">
             <tbody>
+              <tr v-if="collection">
+                <td class="title">Collection</td>
+                <td><a :href="linkToCollection">{{ collection.title }}</a></td>
+              </tr>
+              <tr>
+                <td class="title">License</td>
+                <td>
+                  <!-- eslint-disable-next-line vue/no-v-html -->
+                  <span v-html="license"></span>
+                  <template v-if="licensor">
+                    <!-- eslint-disable-next-line vue/no-v-html -->
+                    by <span v-html="licensor"></span>
+                  </template>
+                </td>
+              </tr>
               <tr
                 v-for="prop in propertyList"
-                :key="prop.key">
+                :key="prop.key"
+              >
                 <td class="title">{{ prop.label }}</td>
                 <td>{{ prop.value }}</td>
               </tr>
@@ -251,34 +111,54 @@ ul.scene_files li {
 </template>
 
 <script>
+import path from "path";
+
 import escape from "lodash.escape";
-import isEqual from "lodash.isequal";
-import { LMap, LTileLayer, LGeoJson } from "vue2-leaflet";
+import Leaflet from "leaflet";
+import "leaflet-easybutton";
+import spdxToHTML from "spdx-to-html";
 import { mapActions, mapGetters } from "vuex";
 
-import LControlFullscreen from "./LControlFullscreen";
 import dictionary from "../lib/stac/dictionary.json";
 
 export default {
   name: "ItemDetail",
-  components: {
-    LControlFullscreen,
-    LMap,
-    LTileLayer,
-    LGeoJson
-  },
   props: {
-    path: {
+    ancestors: {
       type: Array,
+      required: true
+    },
+    center: {
+      type: Array,
+      default: null
+    },
+    fullscreen: {
+      type: Boolean,
+      default: false
+    },
+    path: {
+      type: String,
       required: true
     },
     resolve: {
       type: Function,
       required: true
+    },
+    slugify: {
+      type: Function,
+      required: true
+    },
+    url: {
+      type: String,
+      required: true
     }
   },
   data() {
     return {
+      locatorMap: null,
+      map: null,
+      previewLayer: null,
+      overlayLayer: null,
       geojsonOptions: {
         style: function() {
           return {
@@ -288,82 +168,57 @@ export default {
             fillOpacity: 0
           };
         }
-      },
-      baseAttribution: `Map data <a href="https://www.openstreetmap.org/copyright">&copy; OpenStreetMap contributors</a>, &copy; <a href="https://carto.com/attributions">CARTO</a>`,
-      // TODO global config
-      baseLayerSource:
-        "https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}@2x.png",
-      labelLayerSource:
-        "https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}@2x.png"
+      }
     };
   },
   computed: {
-    ...mapGetters(["catalogForPath", "urlForPath"]),
-    url() {
-      return this.urlForPath(this.path);
-    },
+    ...mapGetters(["getEntity"]),
     breadcrumbs() {
-      if (this.catalog == null) {
-        return [];
-      }
+      // create slugs for everything except the root
+      const slugs = this.ancestors.slice(1).map(this.slugify);
 
-      const rootCatalog = this.catalogForPath([""]);
+      return this.ancestors.map((uri, idx) => {
+        const entity = this.getEntity(uri);
 
-      return [
-        {
-          to: "/",
-          text: rootCatalog.name
+        // use all previous slugs to construct a path to this entity
+        let to = "/" + slugs.slice(0, idx).join("/");
+
+        if (entity.type === "Feature") {
+          // TODO how best to distinguish Catalogs from Items?
+          to = "/items" + to;
         }
-      ].concat(
-        this.path
-          .map((el, i) => {
-            const partialPath = this.path.slice(0, i + 1);
-            const catalog = this.catalogForPath(partialPath);
-            let slugPath = "/" + partialPath.join("/");
 
-            if (catalog != null) {
-              // TODO should there always be an id field?
-              // a name field?
-              if (catalog.type === "Feature") {
-                // TODO how best to distinguish Catalogs from Items?
-                slugPath = `/item${slugPath}`;
-              }
-
-              return {
-                to: slugPath,
-                text: catalog.name || catalog.id
-              };
-            }
-
-            return null;
-          })
-          .filter(x => x != null)
-      );
+        return {
+          to,
+          text: entity.title || entity.id
+        };
+      });
     },
-    catalog() {
-      return this.catalogForPath(this.path);
-    },
-    center() {
-      if (this.$route.hash === "") {
-        return null;
-      }
+    item() {
+      const entity = this.getEntity(this.url);
 
-      return this.$route.hash.slice(1).split("/");
+      console.log(JSON.stringify(entity, null, 2));
+
+      return entity;
     },
     cog() {
-      if (this.assets != null) {
-        const cog = this.assets.find(
-          // TODO x.name is a Planet-specific workaround
-          x => x.format === "cog" || x.name.includes("COG")
-        );
+      // TODO find all relevant sources and surface in a dropdown
+      const cog = this.assets
+        .filter(x => x.type === "image/vnd.stac.geotiff; cloud-optimized=true")
+        // prefer COGs with "visual" key
+        .sort((a, b) => a.key.indexOf("visual") - b.key.indexOf("visual"))
+        .pop();
 
-        if (cog != null) {
-          return new URL(cog.href, this.url).toString();
-        }
+      if (cog != null) {
+        return this.resolve(cog.href, this.url);
       }
     },
-    fullscreen() {
-      return this.$route.query.fullscreen === "true";
+    thumbnail() {
+      const thumbnail = this.assets.find(x => x.key === "thumbnail");
+
+      if (thumbnail != null) {
+        return this.resolve(thumbnail.href, this.url);
+      }
     },
     tileSource() {
       if (this.cog == null) {
@@ -379,24 +234,20 @@ export default {
       // )}`;
     },
     links() {
-      return this.catalog != null ? this.catalog.links : null;
+      return this.item.links || [];
     },
     assets() {
-      if (this.catalog == null) {
-        return null;
-      }
-
-      // TODO does the key carry semantic meaning?
-      // for ISERV, it matches the name (except for `cog`)
       return (
-        Object.keys(this.catalog.assets)
+        Object.keys(this.item.assets)
           .map(key => ({
-            ...this.catalog.assets[key],
+            ...this.item.assets[key],
             key
           }))
           .map(x => ({
             ...x,
-            name: escape(x.name) || `<code>${escape(x.href)}</code>`,
+            title:
+              escape(x.title) ||
+              `<code>${escape(path.basename(x.href))}</code>`,
             href: new URL(x.href, this.url).toString()
           }))
           // prioritize assets w/ a format set
@@ -416,35 +267,7 @@ export default {
           })
       );
     },
-    children() {
-      if (this.catalog == null) {
-        return null;
-      }
-
-      return this.catalog.links.filter(x => x.rel === "child").map(child => ({
-        path: child.href,
-        url: new URL(child.href, this.self.href).toString()
-      }));
-    },
-    items() {
-      if (this.catalog == null) {
-        return null;
-      }
-
-      return this.catalog.links.filter(x => x.rel === "item").map(item => {
-        const url = new URL(item.href, this.self.href);
-
-        return {
-          path: url.pathname,
-          url: url.toString()
-        };
-      });
-    },
     propertyList() {
-      if (this.catalog == null) {
-        return null;
-      }
-
       const label = key => {
         if (typeof dictionary[key] === "object") {
           return dictionary[key].label;
@@ -462,97 +285,119 @@ export default {
           }
 
           if (dictionary[key].type === "date") {
-            return new Date(value).toUTCString() + suffix;
+            return (
+              new Date(value).toLocaleString([], {
+                timeZone: "UTC",
+                timeZoneName: "short"
+              }) + suffix
+            );
           }
         }
 
         return value + suffix;
       };
 
-      return Object.keys(this.catalog.properties).map(key => ({
+      const collectionProps = this.collection && this.collection.properties;
+
+      const props = {
+        ...collectionProps,
+        ...this.item.properties
+      };
+
+      return Object.keys(props).map(key => ({
         key,
         label: label(key),
-        value: format(key, this.catalog.properties[key])
+        value: format(key, props[key])
       }));
     },
+    license() {
+      return spdxToHTML(
+        this.properties["item:license"] ||
+          (this.collection && this.collection.license)
+      );
+    },
+    licensor() {
+      if (this.collection == null || this.collection.providers == null) {
+        return null;
+      }
+
+      return this.collection.providers
+        .filter(x => x.roles.includes("licensor"))
+        .map(x => {
+          if (x.url != null) {
+            return `<a href=${x.url}>${x.name}</a>`;
+          }
+
+          return x.name;
+        })
+        .pop();
+    },
+    providers() {
+      return (
+        this.properties["item:providers"] ||
+        (this.collection && this.collection.providers)
+      );
+    },
     properties() {
-      if (this.catalog == null) {
-        return null;
-      }
-
-      return this.catalog.properties;
+      return this.item.properties || {};
     },
-    name() {
-      return this.catalog != null ? this.catalog.id : null;
+    title() {
+      return this.properties.title || this.item.id;
     },
-    self() {
-      if (this.links == null) {
-        return null;
+    collection() {
+      const collection = this.links
+        .filter(x => x.rel === "collection")
+        .map(x => ({
+          ...x,
+          href: this.resolve(x.href, this.url)
+        }))
+        .pop();
+
+      if (collection != null) {
+        this.load(collection.href);
+
+        return this.getEntity(collection.href);
       }
-
-      const self = this.links.find(x => x.type === "self");
-
-      return this.resolve(self.href, this.url);
     },
-    thumbnail() {
-      if (this.links == null) {
-        return null;
+    collectionLink() {
+      return this.links
+        .filter(x => x.rel === "collection")
+        .map(x => ({
+          ...x,
+          href: this.resolve(x.href, this.url)
+        }))
+        .pop();
+    },
+    linkToCollection() {
+      if (this.collectionLink.href != null) {
+        return `/collection/${this.slugify(this.collectionLink.href)}`;
       }
-
-      const thumbnail = this.links.find(x => x.type === "thumbnail");
-
-      return this.resolve(thumbnail.href, this.url);
     },
     attribution() {
-      if (this.cog) {
-        // TODO license + provider may not be present
-        // TODO license may be an object
-        return `Imagery ${this.properties.license || ""} ${
-          this.properties.provider
-        }`;
-      }
+      // TODO load attribution from rel=collection
+      return null;
+      // return `Imagery ${this.properties.license || ""} ${
+      //   this.properties.provider
+      // }`;
+
+      // TODO license + provider may not be present
+      // TODO license may be an object
+      // attributionControl.addAttribution(
+      //   `Imagery ${this.properties.license || ""} ${this.properties.provider}`
+      // );
     }
   },
   watch: {
-    catalog(to, from) {
-      if (!isEqual(from, to)) {
-        console.log(JSON.stringify(to, null, 2));
-
-        const { map } = this.$refs;
-        const {
-          mapObject: { attributionControl }
-        } = map;
-
-        attributionControl.addAttribution(this.attribution);
-
-        if (this.center == null) {
-          this.$nextTick(() => {
-            const { geojsonLayer } = this.$refs;
-            map.setBounds(geojsonLayer.getBounds());
-          });
-        }
-      }
-    },
     fullscreen(to, from) {
       if (to !== from) {
-        const {
-          map,
-          map: { mapObject }
-        } = this.$refs;
-
+        console.log(this.map);
         if (to) {
-          map.$el.classList.add("leaflet-pseudo-fullscreen");
+          this.map.getContainer().classList.add("leaflet-pseudo-fullscreen");
         } else {
-          map.$el.classList.remove("leaflet-pseudo-fullscreen");
+          this.map.getContainer().classList.remove("leaflet-pseudo-fullscreen");
         }
 
-        mapObject.invalidateSize();
-      }
-    },
-    path(to, from) {
-      // created() handles the initial load; this handles components that have been navigated to
-      if (!isEqual(from, to)) {
-        this.initialize();
+        this.map.invalidateSize();
       }
     }
   },
@@ -560,47 +405,103 @@ export default {
     this.initialize();
   },
   methods: {
-    ...mapActions(["loadPath"]),
-    async initialize() {
-      const { map } = this.$refs;
-      const {
-        mapObject,
-        mapObject: { attributionControl }
-      } = map;
+    ...mapActions(["load"]),
+    initialize() {
+      this.initializePreviewMap();
+      this.initializeLocatorMap();
+    },
+    initializeLocatorMap() {
+      this.locatorMap = Leaflet.map("locator-map", {
+        attributionControl: false,
+        zoomControl: false,
+        boxZoom: false,
+        doubleClickZoom: false,
+        dragging: false,
+        scrollWheelZoom: false,
+        touchZoom: false
+      });
+
+      Leaflet.tileLayer(
+        "https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}@2x.png",
+        {
+          attribution: `Map data <a href="https://www.openstreetmap.org/copyright">&copy; OpenStreetMap contributors</a>, &copy; <a href="https://carto.com/attributions">CARTO</a>`
+        }
+      ).addTo(this.locatorMap);
+      Leaflet.tileLayer(
+        "https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}@2x.png",
+        {
+          zIndex: 1000
+        }
+      ).addTo(this.locatorMap);
+
+      const overlayLayer = Leaflet.geoJSON(this.item, {
+        pane: "tilePane",
+        style: {
+          weight: 1,
+          color: "#ffd65d",
+          opacity: 1,
+          fillOpacity: 1
+        }
+      }).addTo(this.locatorMap);
+
+      this.locatorMap.fitBounds(overlayLayer.getBounds(), {
+        padding: [95, 95]
+      });
+    },
+    initializePreviewMap() {
+      this.map = Leaflet.map("map");
+      this.map.on("moveend", this.updateHash);
+      this.map.on("zoomend", this.updateHash);
+
+      this.map.attributionControl.setPrefix("");
+
+      this.button = Leaflet.easyButton(
+        "fas fa-expand fa-2x",
+        () => this.onFullscreenChange(!this.fullscreen),
+        {
+          position: "topright"
+        }
+      ).addTo(this.map);
+
+      if (this.fullscreen) {
+        this.map.getContainer().classList.add("leaflet-pseudo-fullscreen");
+      }
+
+      Leaflet.tileLayer(
+        "https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}@2x.png",
+        {
+          attribution: `Map data <a href="https://www.openstreetmap.org/copyright">&copy; OpenStreetMap contributors</a>, &copy; <a href="https://carto.com/attributions">CARTO</a>`
+        }
+      ).addTo(this.map);
+      Leaflet.tileLayer(
+        "https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}@2x.png",
+        {
+          zIndex: 1000
+        }
+      ).addTo(this.map);
+
+      if (this.tileSource) {
+        this.tileLayer = Leaflet.tileLayer(this.tileSource, {
+          attribution: this.attribution
+        }).addTo(this.map);
+      }
+
+      this.overlayLayer = Leaflet.geoJSON(this.item, {
+        ...this.geojsonOptions,
+        pane: "tilePane"
+      }).addTo(this.map);
 
       if (this.center != null) {
         const [zoom, lat, lng] = this.center;
 
-        mapObject.setView([lat, lng], zoom);
-      }
-
-      attributionControl.setPrefix("");
-
-      if (this.fullscreen) {
-        map.$el.classList.add("leaflet-pseudo-fullscreen");
-      }
-
-      await this.loadPath({
-        path: this.path
-      });
-
-      const { geojsonLayer } = this.$refs;
-
-      if (geojsonLayer != null) {
-        // TODO license + provider may not be present
-        // TODO license may be an object
-        attributionControl.addAttribution(
-          `Imagery ${this.properties.license || ""} ${this.properties.provider}`
-        );
-
-        geojsonLayer.setGeojson(this.catalog);
-        if (this.center == null) {
-          map.setBounds(geojsonLayer.getBounds());
-        }
+        this.map.setView([lat, lng], zoom);
+      } else {
+        this.map.fitBounds(this.overlayLayer.getBounds());
       }
     },
     onFullscreenChange(_fullscreen) {
       // strip fullscreen property
+      // eslint-disable-next-line no-unused-vars
       const { fullscreen, ...query } = this.$route.query;
 
       if (_fullscreen) {
@@ -612,18 +513,9 @@ export default {
         query
       });
     },
-    onUpdateBounds() {
-      this.updateHash();
-    },
-    onUpdateZoom() {
-      this.updateHash();
-    },
     updateHash() {
-      const {
-        map: { mapObject: map }
-      } = this.$refs;
-      const center = map.getCenter();
-      const zoom = map.getZoom();
+      const center = this.map.getCenter();
+      const zoom = this.map.getZoom();
 
       this.$router.replace({
         ...this.$route,
@@ -633,3 +525,179 @@ export default {
   }
 };
 </script>
+
+<style lang="css">
+body {
+  line-height: 24px;
+  color: #111;
+  font-family: Arial, sans-serif;
+}
+blockquote,
+body {
+  font-size: 16px;
+}
+table {
+  font-size: 80%;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  padding: 0;
+  margin: 0;
+}
+h1,
+h2,
+h3,
+h4 {
+  font-family: Arial, sans-serif;
+  text-rendering: optimizeLegibility;
+  padding-bottom: 4px;
+}
+h1:last-child,
+h2:last-child,
+h3:last-child,
+h4:last-child {
+  padding-bottom: 0;
+}
+h1 {
+  font-weight: 400;
+  font-size: 28px;
+  line-height: 1.2;
+}
+h2 {
+  font-weight: 700;
+  font-size: 21px;
+  line-height: 1.3;
+}
+h3 {
+  font-weight: 700;
+}
+h3,
+h4 {
+  font-size: 17px;
+  line-height: 1.255;
+}
+h4 {
+  font-weight: 400;
+}
+h5 {
+  font-size: 13px;
+  line-height: 19px;
+}
+h5,
+h6 {
+  font-weight: 700;
+}
+h6 {
+  text-transform: uppercase;
+  font-size: 11px;
+  line-height: 1.465;
+  padding-bottom: 1px;
+}
+p {
+  padding: 0;
+  margin: 0 0 14px;
+}
+p:last-child {
+  margin-bottom: 0;
+}
+p + p {
+  margin-top: -4px;
+}
+b,
+strong {
+  font-weight: 700;
+}
+em,
+i {
+  font-style: italic;
+}
+blockquote {
+  margin: 13px;
+}
+small {
+  font-size: 12px;
+}
+a,
+a:active,
+a:link,
+a:visited {
+  color: #0066c0;
+}
+header {
+  padding: 1.5em 0 0.5em;
+}
+footer {
+  padding-bottom: 3em;
+}
+code {
+  color: #555;
+  white-space: nowrap;
+}
+</style>
+
+<style scoped lang="css">
+.leaflet-pseudo-fullscreen {
+  position: fixed !important;
+  width: 100% !important;
+  height: 100% !important;
+  top: 0 !important;
+  left: 0 !important;
+  z-index: 99999;
+}
+
+#locator-map {
+  height: 200px;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+#map-container {
+  height: 500px;
+}
+
+#map {
+  height: 100%;
+  width: 100%;
+}
+
+#thumbnail {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  max-height: 500px;
+}
+
+#header_logo {
+  max-width: 100px;
+}
+
+.table th,
+.table td {
+  border: none;
+  padding: 0.25rem;
+}
+
+.table th {
+  border-top: none;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.metadata td.title {
+  font-weight: bold;
+  width: 33%;
+}
+
+.table-responsive.assets {
+  padding: 15px;
+}
+
+.table-responsibe.metadata {
+  background-color: #f9f9f9;
+  border: 1px solid #dee2e6;
+  padding: 10px;
+}
+</style>

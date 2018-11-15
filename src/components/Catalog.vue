@@ -1,23 +1,3 @@
-<style scoped lang="css">
-h4 {
-  font-weight: bold;
-}
-
-td.title {
-  font-weight: bold;
-}
-
-ul.links, ul.items {
-  margin: 0 0 1em;
-  list-style-type: none;
-  padding: 0;
-}
-
-ul.links li, ul.items li {
-  margin: 0 0 0.2em;
-}
-</style>
-
 <template>
   <b-container>
     <b-row>
@@ -28,7 +8,7 @@ ul.links li, ul.items li {
       </b-col>
     </b-row>
     <b-row>
-      <b-col :md="meta ? 7 : 12">
+      <b-col :md="keywords.length > 0 || license != null ? 8 : 12">
         <!-- <a href="https://www.planet.com/disasterdata/">
           <img
             id="header_logo"
@@ -36,10 +16,27 @@ ul.links li, ul.items li {
             alt="Powered by Planet Labs"
             class="float-right">
         </a> -->
-        <h1><a :href="homepage">{{ name }}</a></h1>
+        <h1>{{ title }}</h1>
+        <p v-if="version"><small>Version {{ version }}</small></p>
         <p><small><code>{{ url }}</code></small></p>
-        <p v-if="description"><em>{{ description }}</em></p>
-        <p v-html="license" />
+        <!-- eslint-disable-next-line vue/no-v-html vue/max-attributes-per-line -->
+        <div v-if="description" v-html="description"></div>
+        <template v-if="providers != null && providers.length > 0">
+          <h2>Provider<template v-if="providers.length > 1">s</template></h2>
+          <dl>
+            <template
+              v-for="provider in providers"
+            >
+              <dt :key="provider.url">
+                <a
+                  :href="provider.url"
+                >{{ provider.name }}</a> (<em>{{ (provider.roles || []).join(", ") }}</em>)
+              </dt>
+              <!-- eslint-disable-next-line vue/no-v-html vue/max-attributes-per-line -->
+              <dd :key="provider.name" v-html="provider.description"></dd>
+            </template>
+          </dl>
+        </template>
 
         <hr>
 
@@ -48,56 +45,45 @@ ul.links li, ul.items li {
           <ul class="links">
             <li
               v-for="child in children"
-              :key="child.path">
+              :key="child.path"
+            >
               <router-link
                 :to="child.slug"
-                append>{{ child.title }}</router-link>
+                append
+              >{{ child.title }}</router-link>
             </li>
           </ul>
         </template>
       </b-col>
-      <b-col
-        v-if="meta"
-        md="5">
+      <b-col 
+        v-if="keywords.length > 0 || license != null"
+        md="4"
+      >
         <b-card
           title="Provider Information"
           bg-variant="light"
-          class="float-right">
+          class="float-right"
+        >
           <div class="table-responsive">
             <table class="table">
               <tbody>
-                <tr v-if="meta.contact">
-                  <td class="title">Contact</td>
-                  <td>
-                    <template v-if="meta.contact.name">{{ meta.contact.name }}<br></template>
-                    <template v-if="meta.contact.organization">{{ meta.contact.organization }}<br></template>
-                    <template v-if="meta.contact.email"><a :href="meta.contact.emailUrl">{{ meta.contact.email }}</a><br></template>
-                    <template v-if="meta.contact.url"><a :href="meta.contact.url">{{ meta.contact.url }}</a></template>
-                  </td>
-                </tr>
-                <tr v-if="meta.keywords">
+                <tr v-if="keywords">
                   <td class="title">Keywords</td>
-                  <td>{{ meta.keywords }}</td>
+                  <td>{{ keywords }}</td>
                 </tr>
-                <tr v-if="meta.formats">
-                  <td class="title">Formats</td>
-                  <td>{{ meta.formats }}</td>
-                </tr>
-                <tr v-if="meta.shortLicense">
+                <tr v-if="license">
                   <td class="title">License</td>
-                  <td><a :href="meta.licenseUrl">{{ meta.shortLicense }}</a></td>
+                  <!-- eslint-disable-next-line vue/no-v-html -->
+                  <td v-html="license" />
                 </tr>
-                <tr v-if="meta.provider.scheme">
-                  <td class="title">Storage Provider</td>
-                  <td>{{ meta.provider.scheme }}</td>
+                <tr v-if="spatialExtent">
+                  <!-- TODO display as a locator map -->
+                  <td class="title">Spatial Extent</td>
+                  <td>{{ spatialExtent }}</td>
                 </tr>
-                <tr v-if="meta.provider.region">
-                  <td class="title">Storage Region</td>
-                  <td>{{ meta.provider.region }}</td>
-                </tr>
-                <tr v-if="meta.provider.requesterPays">
-                  <td class="title">Requester Pays</td>
-                  <td>{{ meta.provider.requesterPays }}</td>
+                <tr v-if="temporalExtent">
+                  <td class="title">Temporal Extent</td>
+                  <td>{{ temporalExtent }}</td>
                 </tr>
               </tbody>
             </table>
@@ -109,11 +95,14 @@ ul.links li, ul.items li {
     <b-row v-if="items.length > 0">
       <b-col md="12">
         <h3>Items</h3>
-        <b-pagination
-          :total-rows="items.length"
-          :per-page="perPage"
-          :hide-goto-end-buttons="true"
-          v-model="currentPage" />
+        <div>
+          <b-pagination
+            v-model="currentPage"
+            :total-rows="itemCount"
+            :per-page="perPage"
+            :hide-goto-end-buttons="true"
+          />
+        </div>
         <b-table
           :items="items"
           :fields="itemFields"
@@ -123,10 +112,12 @@ ul.links li, ul.items li {
           :outlined="true"
           responsive
           small
-          striped>
+          striped
+        >
           <template
             slot="link"
-            slot-scope="data">
+            slot-scope="data"
+          >
             <router-link :to="data.item.to">{{ data.item.title }}</router-link>
           </template>
           <!-- TODO row-details w/ additional metadata + map -->
@@ -137,14 +128,27 @@ ul.links li, ul.items li {
 </template>
 
 <script>
-import escape from "lodash.escape";
+import { HtmlRenderer, Parser } from "commonmark";
+import spdxToHTML from "spdx-to-html";
 import { mapActions, mapGetters } from "vuex";
+
+const MARKDOWN_READER = new Parser({
+  smart: true
+});
+const MARKDOWN_WRITER = new HtmlRenderer({
+  safe: true,
+  softbreak: "<br />"
+});
 
 export default {
   name: "Catalog",
   props: {
-    path: {
+    ancestors: {
       type: Array,
+      required: true
+    },
+    path: {
+      type: String,
       required: true
     },
     resolve: {
@@ -153,6 +157,10 @@ export default {
     },
     slugify: {
       type: Function,
+      required: true
+    },
+    url: {
+      type: String,
       required: true
     }
   },
@@ -177,257 +185,142 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["catalogForPath", "urlForPath"]),
-    url() {
-      return this.urlForPath(this.path);
-    },
+    ...mapGetters(["getEntity"]),
     breadcrumbs() {
-      if (this.catalog == null) {
-        return [];
-      }
+      // create slugs for everything except the root
+      const slugs = this.ancestors.slice(1).map(this.slugify);
 
-      const rootCatalog = this.catalogForPath([""]);
+      return this.ancestors.map((uri, idx) => {
+        const entity = this.getEntity(uri);
 
-      return [
-        {
-          to: "/",
-          text: rootCatalog.name
+        // use all previous slugs to construct a path to this entity
+        let to = "/" + slugs.slice(0, idx).join("/");
+
+        if (entity.type === "Feature") {
+          // TODO how best to distinguish Catalogs from Items?
+          to = "/items" + to;
         }
-      ].concat(
-        this.path
-          .map((el, i) => {
-            const partialPath = this.path.slice(0, i + 1);
-            const catalog = this.catalogForPath(partialPath);
-            let slugPath = "/" + partialPath.join("/");
 
-            if (catalog != null) {
-              // TODO should there always be an id field?
-              // a name field?
-              if (catalog.type === "Feature") {
-                // TODO how best to distinguish Catalogs from Items?
-                slugPath = `/item${slugPath}`;
-              }
-
-              return {
-                to: slugPath,
-                text: catalog.name || catalog.id
-              };
-            }
-
-            return null;
-          })
-          .filter(x => x != null)
-      );
+        return {
+          to,
+          text: entity.title || entity.id
+        };
+      });
     },
     catalog() {
-      console.log(JSON.stringify(this.catalogForPath(this.path), null, 2));
-      return this.catalogForPath(this.path);
+      const catalog = this.getEntity(this.url);
+
+      console.log(JSON.stringify(catalog, null, 2));
+
+      return catalog;
     },
     children() {
-      if (this.catalog == null) {
-        return [];
-      }
-
       return this.catalog.links.filter(x => x.rel === "child").map(child => ({
         path: child.href,
-        slug: child.slug || this.slugify(child.href),
-        title: child.title || child.href,
-        url: this.resolve(child.href, this.url)
+        slug: this.slugify(this.resolve(child.href, this.url)),
+        title: child.title || child.href
       }));
     },
     description() {
-      if (this.catalog == null) {
-        return null;
-      }
-
-      return this.catalog.description;
+      // REQUIRED
+      return MARKDOWN_WRITER.render(
+        MARKDOWN_READER.parse(this.catalog.description)
+      );
+    },
+    id() {
+      // REQUIRED
+      return this.catalog.id;
+    },
+    extent() {
+      return this.catalog.extent || this.rootCatalog.extent || {};
+    },
+    itemCount() {
+      return this.links.filter(x => x.rel === "item").length;
     },
     items() {
-      if (this.catalog == null) {
-        return [];
-      }
+      // TODO move to async computed and pull from rel=items if necessary
 
-      return this.catalog.links.filter(x => x.rel === "item").map(item => {
-        const catalog = this.catalogForPath(
-          this.path.concat(item.slug || this.slugify(item.href))
-        );
+      const start = (this.currentPage - 1) * this.perPage;
+      const end = this.currentPage * this.perPage;
+      return this.links.filter(x => x.rel === "item").map((itemLink, idx) => {
+        const itemUrl = this.resolve(itemLink.href, this.url);
 
-        if (catalog != null) {
+        if (idx >= start && idx < end) {
+          // dispatch a fetch if item is within the range of items being displayed
+          this.load(itemUrl);
+        }
+
+        // attempt to load the full item
+        const item = this.getEntity(itemUrl);
+
+        if (item != null) {
           return {
-            to:
-              "/item/" +
-              [
-                this.$route.params.path,
-                item.slug || this.slugify(item.href)
-              ].join("/"),
-            title: catalog.id || item.title || item.href,
-            dateAcquired: catalog.properties.datetime
+            to: `/item${this.path}/${this.slugify(itemUrl)}`,
+            title:
+              item.properties.title ||
+              item.id ||
+              itemLink.title ||
+              itemLink.href,
+            dateAcquired: item.properties.datetime
           };
         }
 
         return {
-          to:
-            "/item/" +
-            [
-              this.$route.params.path,
-              item.slug || this.slugify(item.href)
-            ].join("/"),
-          title: item.title || item.href
+          to: `/item${this.path}/${this.slugify(itemUrl)}`,
+          title: itemLink.title || itemLink.href
         };
       });
     },
-    homepage() {
-      if (this.catalog == null) {
-        return null;
-      }
-
-      return this.catalog.homepage;
+    keywords() {
+      return []
+        .concat(this.catalog.keywords || this.rootCatalog.keywords || [])
+        .join(", ");
     },
     license() {
-      if (this.catalog == null || this.catalog.license == null) {
-        return null;
-      }
-
-      // TODO short_name in JSON -> not snake case
-      const {
-        copyright,
-        link,
-        name,
-        short_name: shortName
-      } = this.catalog.license;
-
-      if (
-        copyright != null &&
-        link != null &&
-        name != null &&
-        shortName != null
-      ) {
-        console.log(this.catalog.license);
-        return `Licensed under <a href="${link}" title=${escape(
-          shortName
-        )}>${name}</a> by ${escape(copyright)}`;
-      }
-
-      return this.catalog.license;
+      return spdxToHTML(this.catalog.license || this.rootCatalog.license);
     },
-    meta() {
-      if (this.catalog == null) {
-        return null;
-      }
-
-      const { provider, contact, keywords, formats, license } = this.catalog;
-
-      if (
-        provider == null &&
-        contact == null &&
-        keywords == null &&
-        formats == null &&
-        license == null
-      ) {
-        return null;
-      }
-
-      const meta = {
-        contact,
-        provider,
-        license,
-        keywords: (keywords || []).join(", "),
-        formats: (formats || []).join(", ")
-      };
-
-      if (contact != null && contact.email != null) {
-        meta.contact = {
-          ...meta.contact,
-          emailUrl: `mailto:${contact.email}`
-        };
-      }
-
-      if (license != null) {
-        if (license.short_name != null) {
-          // TODO short_name in JSON -> not snake case
-          meta.shortLicense = license.short_name;
-        } else if (typeof license === "string") {
-          meta.shortLicense = license;
-        }
-
-        if (typeof license === "object" && license.link != null) {
-          meta.licenseUrl = license.link;
-        }
-      }
-
-      return meta;
+    links() {
+      // REQUIRED
+      return this.catalog.links;
     },
-    name() {
-      return this.catalog != null ? this.catalog.name : null;
+    providers() {
+      return (this.catalog.providers || []).map(x => ({
+        ...x,
+        description: MARKDOWN_WRITER.render(
+          MARKDOWN_READER.parse(x.description || "")
+        )
+      }));
+    },
+    rootCatalog() {
+      // TODO navigate up parents
+      return this.getEntity(this.ancestors[0]);
+    },
+    spatialExtent() {
+      return this.extent.spatial;
+    },
+    temporalExtent() {
+      const { temporal } = this.extent;
+
+      return [
+        temporal[0]
+          ? new Date(temporal[0]).toLocaleString()
+          : "beginning of time",
+        temporal[1] ? new Date(temporal[1]).toLocaleString() : "now"
+      ].join(" - ");
+    },
+    title() {
+      if (this.catalog.title != null) {
+        return `${this.catalog.title} (${this.id})`;
+      }
+
+      return this.id;
+    },
+    version() {
+      return this.catalog.version;
     }
-  },
-  watch: {
-    currentPage(to) {
-      const start = (to - 1) * this.perPage;
-      const count = to * this.perPage;
-
-      return this.catalog.links
-        .filter(x => x.rel === "item")
-        .slice(start, count)
-        .map(item =>
-          this.loadPath({
-            path: this.path.concat(item.slug || this.slugify(item.href))
-          })
-        );
-    },
-    path() {
-      // created() handles the initial load; this handles components that have been navigated to
-      this.initialize();
-    }
-  },
-  created() {
-    this.initialize();
-  },
-  mounted() {
-    // console.log("mounted");
-  },
-  beforeUpdate() {
-    // console.log("before update");
-  },
-  updated() {
-    // console.log("updated");
-  },
-  beforeRouteEnter(to, from, next) {
-    // console.log("beforeRouteEnter", to, from);
-
-    // console.log("$route:", this.$route);
-    // console.log(this);
-
-    return next();
-  },
-  beforeRouteUpdate(to, from, next) {
-    // console.log("beforeRouteUpdate", to, from);
-
-    return next();
   },
   methods: {
-    ...mapActions(["loadPath"]),
-    async initialize() {
-      await this.loadPath({
-        path: this.path
-      });
-
-      const catalog = this.catalogForPath(this.path);
-
-      if (catalog != null) {
-        const start = (this.currentPage - 1) * this.perPage;
-        const count = this.currentPage * this.perPage;
-
-        return catalog.links
-          .filter(x => x.rel === "item")
-          .slice(start, count)
-          .map(item =>
-            this.loadPath({
-              path: this.path.concat(item.slug || this.slugify(item.href))
-            })
-          );
-      }
-    },
+    ...mapActions(["load"]),
     sortCompare(a, b, key) {
       if (key === "link") {
         key = "title";
@@ -450,3 +343,25 @@ export default {
   }
 };
 </script>
+
+<style scoped lang="css">
+h4 {
+  font-weight: bold;
+}
+
+td.title {
+  font-weight: bold;
+}
+
+ul.links,
+ul.items {
+  margin: 0 0 1em;
+  list-style-type: none;
+  padding: 0;
+}
+
+ul.links li,
+ul.items li {
+  margin: 0 0 0.2em;
+}
+</style>
