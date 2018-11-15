@@ -8,7 +8,7 @@
       </b-col>
     </b-row>
     <b-row>
-      <b-col :md="keywords.length > 0 || license != null || propertyList.length > 0 ? 8 : 12">
+      <b-col :md="keywords.length > 0 || license != null ? 8 : 12">
         <!-- <a href="https://www.planet.com/disasterdata/">
           <img
             id="header_logo"
@@ -53,7 +53,7 @@
         </template>
       </b-col>
       <b-col 
-        v-if="keywords.length > 0 || license != null || propertyList.length > 0" 
+        v-if="keywords.length > 0 || license != null"
         md="4"
       >
         <b-card
