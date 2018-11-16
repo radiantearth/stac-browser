@@ -18,6 +18,12 @@ npm install
 CATALOG_URL=http://path/to/catalog.json npm start -- --open
 ```
 
+STAC Browser defaults to using [HTML5 History
+Mode](https://router.vuejs.org/guide/essentials/history-mode.html), which can
+cause problems on certain web hosts. To use _hash mode_, set
+`HISTORY_MODE=hash` when running or building. This will be compatible with
+S3, etc.
+
 ## Building
 
 ```bash

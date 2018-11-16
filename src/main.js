@@ -175,7 +175,7 @@ const main = async () => {
 
   const router = new VueRouter({
     base: process.env.PATH_PREFIX || "/",
-    mode: "history",
+    mode: process.env.HISTORY_MODE || "history",
     routes
   });
 
