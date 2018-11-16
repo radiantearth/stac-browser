@@ -23,9 +23,9 @@
       <div class="col-md-8">
         <b-tabs>
           <b-tab
-            v-if="cog"
+            v-if="cog != null"
             title="Preview"
-            active
+            :active="cog != null"
           >
             <div
               id="map-container"
@@ -36,6 +36,7 @@
           <b-tab
             v-if="thumbnail"
             title="Thumbnail"
+            :active="cog == null && thumbnail != null"
           >
             <a :href="thumbnail">
               <img
@@ -48,6 +49,7 @@
           <b-tab
             v-if="assets.length > 0"
             title="Assets"
+            :active="cog == null && thumbnail == null"
           >
             <div class="table-responsive assets">
               <table class="table">
@@ -407,7 +409,9 @@ export default {
   methods: {
     ...mapActions(["load"]),
     initialize() {
-      this.initializePreviewMap();
+      if (this.cog != null) {
+        this.initializePreviewMap();
+      }
       this.initializeLocatorMap();
     },
     initializeLocatorMap() {
@@ -647,6 +651,10 @@ code {
   top: 0 !important;
   left: 0 !important;
   z-index: 99999;
+}
+
+.leaflet-container {
+  background-color: #262626;
 }
 
 #locator-map {
