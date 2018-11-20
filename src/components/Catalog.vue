@@ -38,9 +38,9 @@
           </dl>
         </template>
 
-        <hr>
-
         <template v-if="children.length > 0">
+          <hr>
+
           <h3>Catalogs</h3>
           <ul class="links">
             <li
@@ -60,7 +60,7 @@
         md="4"
       >
         <b-card
-          title="Provider Information"
+          title="Catalog Information"
           bg-variant="light"
           class="float-right"
         >
@@ -335,6 +335,9 @@ export default {
   mounted() {
     this.initialize();
   },
+  updated() {
+    this.initialize();
+  },
   methods: {
     ...mapActions(["load"]),
     initialize() {
@@ -343,6 +346,10 @@ export default {
       }
     },
     initializeLocatorMap() {
+      if (this.locatorMap != null) {
+        this.locatorMap.remove();
+      }
+
       this.locatorMap = Leaflet.map("locator-map", {
         attributionControl: false,
         zoomControl: false,
@@ -428,11 +435,6 @@ ul.items {
   margin: 0 0 1em;
   list-style-type: none;
   padding: 0;
-}
-
-ul.links li,
-ul.items li {
-  margin: 0 0 0.2em;
 }
 
 .leaflet-container {
