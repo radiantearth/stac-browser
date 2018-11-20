@@ -67,6 +67,10 @@
           <div class="table-responsive">
             <table class="table">
               <tbody>
+                <tr>
+                  <td class="title">STAC Version</td>
+                  <td>{{ stacVersion }}</td>
+                </tr>
                 <tr v-if="keywords">
                   <td class="title">Keywords</td>
                   <td>{{ keywords }}</td>
@@ -297,6 +301,10 @@ export default {
     },
     spatialExtent() {
       return this.extent.spatial;
+    },
+    stacVersion() {
+      // REQUIRED
+      return this.catalog.stac_version;
     },
     temporalExtent() {
       const { temporal } = this.extent;
