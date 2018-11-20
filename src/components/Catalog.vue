@@ -64,6 +64,9 @@
           bg-variant="light"
           class="float-right"
         >
+          <template v-if="spatialExtent">
+            <div id="locator-map"></div>
+          </template>
           <div class="table-responsive">
             <table class="table">
               <tbody>
@@ -133,6 +136,7 @@
 
 <script>
 import { HtmlRenderer, Parser } from "commonmark";
+import Leaflet from "leaflet";
 import spdxToHTML from "spdx-to-html";
 import { mapActions, mapGetters } from "vuex";
 
@@ -185,7 +189,8 @@ export default {
         }
       },
       currentPage: 1,
-      perPage: 25
+      perPage: 25,
+      locatorMap: null
     };
   },
   computed: {
@@ -327,8 +332,65 @@ export default {
       return this.catalog.version;
     }
   },
+  mounted() {
+    this.initialize();
+  },
   methods: {
     ...mapActions(["load"]),
+    initialize() {
+      if (this.spatialExtent != null) {
+        this.initializeLocatorMap();
+      }
+    },
+    initializeLocatorMap() {
+      this.locatorMap = Leaflet.map("locator-map", {
+        attributionControl: false,
+        zoomControl: false,
+        boxZoom: false,
+        doubleClickZoom: false,
+        dragging: false,
+        scrollWheelZoom: false,
+        touchZoom: false
+      });
+
+      Leaflet.tileLayer(
+        "https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}@2x.png",
+        {
+          attribution: `Map data <a href="https://www.openstreetmap.org/copyright">&copy; OpenStreetMap contributors</a>, &copy; <a href="https://carto.com/attributions">CARTO</a>`
+        }
+      ).addTo(this.locatorMap);
+      Leaflet.tileLayer(
+        "https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}@2x.png",
+        {
+          zIndex: 1000
+        }
+      ).addTo(this.locatorMap);
+
+      const [minX, minY, maxX, maxY] = this.spatialExtent;
+      const coordinates = [
+        [[minX, minY], [minX, maxY], [maxX, maxY], [maxX, minY], [minX, minY]]
+      ];
+
+      const overlayLayer = Leaflet.geoJSON(
+        {
+          type: "Polygon",
+          coordinates
+        },
+        {
+          pane: "tilePane",
+          style: {
+            weight: 3,
+            color: "#ffd65d",
+            opacity: 1,
+            fillOpacity: 0.15
+          }
+        }
+      ).addTo(this.locatorMap);
+
+      this.locatorMap.fitBounds(overlayLayer.getBounds(), {
+        padding: [95, 95]
+      });
+    },
     sortCompare(a, b, key) {
       if (key === "link") {
         key = "title";
@@ -371,5 +433,15 @@ ul.items {
 ul.links li,
 ul.items li {
   margin: 0 0 0.2em;
+}
+
+.leaflet-container {
+  background-color: #262626;
+}
+
+#locator-map {
+  height: 200px;
+  width: 100%;
+  margin-bottom: 10px;
 }
 </style>
