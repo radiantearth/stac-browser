@@ -101,7 +101,7 @@
                 v-for="prop in propertyList"
                 :key="prop.key"
               >
-                <td class="title">{{ prop.label }}</td>
+                <td class="title"><span :title="prop.key">{{ prop.label }}</span></td>
                 <td>{{ prop.value }}</td>
               </tr>
             </tbody>
