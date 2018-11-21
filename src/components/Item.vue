@@ -153,6 +153,10 @@ export default {
     url: {
       type: String,
       required: true
+    },
+    validate: {
+      type: Function,
+      required: true
     }
   },
   data() {
@@ -199,7 +203,10 @@ export default {
     item() {
       const entity = this.getEntity(this.url);
 
+      console.groupCollapsed("item definition");
       console.log(JSON.stringify(entity, null, 2));
+      console.groupEnd();
+      this.validate(entity);
 
       return entity;
     },

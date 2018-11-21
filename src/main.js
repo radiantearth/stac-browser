@@ -3,9 +3,12 @@ import url from "url";
 
 import "@babel/polyfill";
 import "es6-promise/auto";
+import Ajv from "ajv";
 import AsyncComputed from "vue-async-computed";
 import BootstrapVue from "bootstrap-vue";
 import bs58 from "bs58";
+import clone from "clone";
+import jsonQuery from "json-query";
 import pMap from "p-map";
 import Vue from "vue";
 import VueRouter from "vue-router";
@@ -17,6 +20,14 @@ import "leaflet/dist/leaflet.css";
 
 import Catalog from "./components/Catalog.vue";
 import Item from "./components/Item.vue";
+
+const CATALOG_SCHEMA = require("../schema/catalog.json");
+const COLLECTION_SCHEMA = require("../schema/collection.json");
+const ITEM_SCHEMA = require("../schema/item.json");
+
+const ajv = new Ajv({
+  loadSchema
+});
 
 Vue.use(AsyncComputed);
 Vue.use(BootstrapVue);
@@ -48,7 +59,86 @@ const slugify = uri => bs58.encode(Buffer.from(makeRelative(uri)));
 
 const resolve = (href, base = CATALOG_URL) => new URL(href, base).toString();
 
+async function loadSchema(uri) {
+  const rsp = await fetch(uri);
+
+  if (!rsp.ok) {
+    throw new Error(`Loading error: ${rsp.statusText}`);
+  }
+
+  return rsp.json();
+}
+
 const main = async () => {
+  const validateCatalog = await ajv.compileAsync(CATALOG_SCHEMA);
+  const validateCollection = await ajv.compileAsync(COLLECTION_SCHEMA);
+  const validateItem = await ajv.compileAsync(ITEM_SCHEMA);
+
+  const collectionValidator = data => {
+    if (!validateCollection(data)) {
+      console.warn("Failed to validate as a Collection");
+      validateCollection.errors.forEach(err => {
+        console.warn(`${err.message}:`);
+        const { value } = jsonQuery(err.dataPath, {
+          data
+        });
+        console.warn(clone(value));
+      });
+
+      return false;
+    }
+
+    return true;
+  };
+
+  const catalogValidator = data => {
+    // attempt to validate as a collection first
+    if (!validateCollection(data)) {
+      if (!validateCatalog(data)) {
+        console.warn("Failed to validate as a Catalog");
+        validateCatalog.errors.forEach(err => {
+          console.warn(`${err.message}:`);
+          const { value } = jsonQuery(err.dataPath, {
+            data
+          });
+          console.warn(clone(value));
+        });
+
+        return false;
+      }
+
+      console.warn("Failed to validate as a Collection");
+      validateCollection.errors.forEach(err => {
+        console.warn(`${err.dataPath} ${err.message}:`);
+        const { value } = jsonQuery(err.dataPath, {
+          data
+        });
+        console.warn(clone(value));
+      });
+
+      return false;
+    }
+
+    return true;
+  };
+
+  const itemValidator = data => {
+    if (!validateItem(data)) {
+      console.warn("Failed to validate as an Item");
+      validateItem.errors.forEach(err => {
+        console.warn(`${err.message}:`);
+        const { value } = jsonQuery(err.dataPath, {
+          data
+        });
+        console.warn(clone(value));
+      });
+
+      return false;
+    }
+
+    return true;
+  };
+
   const routes = [
     {
       path: "/item/:path*",
@@ -77,7 +167,8 @@ const main = async () => {
           path: route.path,
           resolve,
           slugify,
-          url: urls.slice(-1).pop()
+          url: urls.slice(-1).pop(),
+          validate: itemValidator
         };
       }
     },
@@ -100,7 +191,8 @@ const main = async () => {
           path: route.path,
           resolve,
           slugify,
-          url: urls.slice(-1).pop()
+          url: urls.slice(-1).pop(),
+          validate: collectionValidator
         };
       }
     },
@@ -123,7 +215,8 @@ const main = async () => {
           path: route.path,
           resolve,
           slugify,
-          url: urls.slice(-1).pop()
+          url: urls.slice(-1).pop(),
+          validate: catalogValidator
         };
       }
     }

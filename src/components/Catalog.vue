@@ -170,6 +170,10 @@ export default {
     url: {
       type: String,
       required: true
+    },
+    validate: {
+      type: Function,
+      required: true
     }
   },
   data() {
@@ -219,7 +223,10 @@ export default {
     catalog() {
       const catalog = this.getEntity(this.url);
 
+      console.groupCollapsed("entity definition");
       console.log(JSON.stringify(catalog, null, 2));
+      console.groupEnd();
+      this.validate(catalog);
 
       return catalog;
     },
