@@ -7,8 +7,6 @@ import Ajv from "ajv";
 import AsyncComputed from "vue-async-computed";
 import BootstrapVue from "bootstrap-vue";
 import bs58 from "bs58";
-import clone from "clone";
-import jsonQuery from "json-query";
 import pMap from "p-map";
 import Vue from "vue";
 import VueRouter from "vue-router";
@@ -76,67 +74,31 @@ const main = async () => {
 
   const collectionValidator = data => {
     if (!validateCollection(data)) {
-      console.warn("Failed to validate as a Collection");
-      validateCollection.errors.forEach(err => {
-        console.warn(`${err.message}:`);
-        const { value } = jsonQuery(err.dataPath, {
-          data
-        });
-        console.warn(clone(value));
-      });
-
-      return false;
+      return validateCollection.errors.slice();
     }
-
-    return true;
   };
 
   const catalogValidator = data => {
-    // attempt to validate as a collection first
-    if (!validateCollection(data)) {
-      if (!validateCatalog(data)) {
-        console.warn("Failed to validate as a Catalog");
-        validateCatalog.errors.forEach(err => {
-          console.warn(`${err.message}:`);
-          const { value } = jsonQuery(err.dataPath, {
-            data
-          });
-          console.warn(clone(value));
-        });
+    if (data.license != null || data.extent != null) {
+      // contains Collection properties
+      if (!validateCollection(data)) {
+        if (!validateCatalog(data)) {
+          return validateCatalog.errors.slice();
+        }
 
-        return false;
+        return validateCollection.errors.slice();
       }
-
-      console.warn("Failed to validate as a Collection");
-      validateCollection.errors.forEach(err => {
-        console.warn(`${err.dataPath} ${err.message}:`);
-        const { value } = jsonQuery(err.dataPath, {
-          data
-        });
-        console.warn(clone(value));
-      });
-
-      return false;
     }
 
-    return true;
+    if (!validateCatalog(data)) {
+      return validateCatalog.errors.slice();
+    }
   };
 
   const itemValidator = data => {
     if (!validateItem(data)) {
-      console.warn("Failed to validate as an Item");
-      validateItem.errors.forEach(err => {
-        console.warn(`${err.message}:`);
-        const { value } = jsonQuery(err.dataPath, {
-          data
-        });
-        console.warn(clone(value));
-      });
-
-      return false;
+      return validateItem.errors.slice();
     }
-
-    return true;
   };
 
   const routes = [

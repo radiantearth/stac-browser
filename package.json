@@ -32,6 +32,7 @@
     "leaflet": "^1.3.4",
     "leaflet-easybutton": "^2.3.0",
     "lodash.escape": "^4.0.1",
+    "lodash.isequal": "^4.5.0",
     "p-map": "^2.0.0",
     "spdx-to-html": "^0.3.2",
     "vue": "^2.5.17",

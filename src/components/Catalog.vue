@@ -18,7 +18,7 @@
         </a> -->
         <h1>{{ title }}</h1>
         <p v-if="version"><small>Version {{ version }}</small></p>
-        <p><small><code>{{ url }}</code></small></p>
+        <p><template v-if="validationErrors"><span title="Validation errors present; please check the JavaScript Console">⚠️</span></template><small><code>{{ url }}</code></small></p>
         <!-- eslint-disable-next-line vue/no-v-html vue/max-attributes-per-line -->
         <div v-if="description" v-html="description"></div>
         <template v-if="providers != null && providers.length > 0">
@@ -135,8 +135,11 @@
 </template>
 
 <script>
+import clone from "clone";
 import { HtmlRenderer, Parser } from "commonmark";
+import jsonQuery from "json-query";
 import Leaflet from "leaflet";
+import isEqual from "lodash.isequal";
 import spdxToHTML from "spdx-to-html";
 import { mapActions, mapGetters } from "vuex";
 
@@ -194,7 +197,8 @@ export default {
       },
       currentPage: 1,
       perPage: 25,
-      locatorMap: null
+      locatorMap: null,
+      validationErrors: null
     };
   },
   computed: {
@@ -221,14 +225,7 @@ export default {
       });
     },
     catalog() {
-      const catalog = this.getEntity(this.url);
-
-      console.groupCollapsed("entity definition");
-      console.log(JSON.stringify(catalog, null, 2));
-      console.groupEnd();
-      this.validate(catalog);
-
-      return catalog;
+      return this.getEntity(this.url);
     },
     children() {
       return this.catalog.links.filter(x => x.rel === "child").map(child => ({
@@ -339,8 +336,17 @@ export default {
       return this.catalog.version;
     }
   },
+  watch: {
+    catalog(to, from) {
+      if (!isEqual(to, from)) {
+        this._validate(to);
+      }
+    }
+  },
   mounted() {
     this.initialize();
+
+    this._validate(this.catalog);
   },
   updated() {
     this.initialize();
@@ -423,6 +429,23 @@ export default {
           numeric: true
         });
       }
+    },
+    _validate(data) {
+      const errors = this.validate(data);
+
+      if (errors != null) {
+        console.group("Validation errors");
+        errors.forEach(err => {
+          console.warn(`${err.dataPath} ${err.message}:`);
+          const { value } = jsonQuery(err.dataPath, {
+            data
+          });
+          console.warn(clone(value));
+        });
+        console.groupEnd();
+      }
+
+      this.validationErrors = errors;
     }
   }
 };

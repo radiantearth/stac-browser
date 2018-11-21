@@ -12,7 +12,7 @@
           </a> -->
           <div><b-breadcrumb :items="breadcrumbs" /></div>
           <h1>{{ title }}</h1>
-          <p><small><code>{{ url }}</code></small></p>
+          <p><template v-if="validationErrors"><span title="Validation errors present; please check the JavaScript Console">⚠️</span></template><small><code>{{ url }}</code></small></p>
         </header>
       </b-col>
     </b-row>
@@ -84,9 +84,9 @@
             <tbody>
               <tr v-if="collection">
                 <td class="title">Collection</td>
-                <td><a :href="linkToCollection">{{ collection.title }}</a></td>
+                <td><a :href="linkToCollection">{{ collection.title || "Untitled" }}</a></td>
               </tr>
-              <tr>
+              <tr v-if="license">
                 <td class="title">License</td>
                 <td>
                   <!-- eslint-disable-next-line vue/no-v-html -->
@@ -115,7 +115,10 @@
 <script>
 import path from "path";
 
+import clone from "clone";
+import jsonQuery from "json-query";
 import escape from "lodash.escape";
+import isEqual from "lodash.isequal";
 import Leaflet from "leaflet";
 import "leaflet-easybutton";
 import spdxToHTML from "spdx-to-html";
@@ -174,7 +177,8 @@ export default {
             fillOpacity: 0
           };
         }
-      }
+      },
+      validationErrors: null
     };
   },
   computed: {
@@ -201,14 +205,7 @@ export default {
       });
     },
     item() {
-      const entity = this.getEntity(this.url);
-
-      console.groupCollapsed("item definition");
-      console.log(JSON.stringify(entity, null, 2));
-      console.groupEnd();
-      this.validate(entity);
-
-      return entity;
+      return this.getEntity(this.url);
     },
     cog() {
       // TODO find all relevant sources and surface in a dropdown
@@ -243,6 +240,11 @@ export default {
       // )}`;
     },
     links() {
+      if (typeof this.item.links === "object") {
+        // previous STAC version specified links as an object
+        return Object.values(this.item.links);
+      }
+
       return this.item.links || [];
     },
     assets() {
@@ -399,7 +401,6 @@ export default {
   watch: {
     fullscreen(to, from) {
       if (to !== from) {
-        console.log(this.map);
         if (to) {
           this.map.getContainer().classList.add("leaflet-pseudo-fullscreen");
         } else {
@@ -408,10 +409,16 @@ export default {
 
         this.map.invalidateSize();
       }
+    },
+    item(to, from) {
+      if (!isEqual(to, from)) {
+        this._validate(to);
+      }
     }
   },
   mounted() {
     this.initialize();
+    this._validate(this.item);
   },
   methods: {
     ...mapActions(["load"]),
@@ -441,6 +448,7 @@ export default {
       Leaflet.tileLayer(
         "https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}@2x.png",
         {
+          opacity: 0.6,
           zIndex: 1000
         }
       ).addTo(this.locatorMap);
@@ -532,6 +540,23 @@ export default {
         ...this.$route,
         hash: `${zoom}/${center.lat.toFixed(6)}/${center.lng.toFixed(6)}`
       });
+    },
+    _validate(data) {
+      const errors = this.validate(data);
+
+      if (errors != null) {
+        console.group("Validation errors");
+        errors.forEach(err => {
+          console.warn(`${err.dataPath} ${err.message}:`);
+          const { value } = jsonQuery(err.dataPath, {
+            data
+          });
+          console.warn(clone(value));
+        });
+        console.groupEnd();
+      }
+
+      this.validationErrors = errors;
     }
   }
 };
