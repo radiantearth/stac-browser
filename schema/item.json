@@ -16,7 +16,7 @@
         {
           "oneOf": [
             {
-              "$ref": "http://geojson.org/schema/Feature.json"
+              "$ref": "https://raw.githubusercontent.com/geojson/schema/gh-pages/Feature.json"
             }
           ]
         },
