@@ -34,7 +34,7 @@ Vue.use(Vuex);
 
 const CATALOG_URL =
   process.env.CATALOG_URL ||
-  "https://s3-us-west-2.amazonaws.com/radiant-nasa-iserv/iserv.json";
+  "https://storage.googleapis.com/pdd-stac/disasters/catalog.json";
 
 const makeRelative = uri => {
   const rootURI = url.parse(CATALOG_URL);
