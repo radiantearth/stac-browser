@@ -20,7 +20,7 @@
         <p v-if="version"><small>Version {{ version }}</small></p>
         <p><template v-if="validationErrors"><span title="Validation errors present; please check the JavaScript Console">⚠️</span></template><small><code>{{ url }}</code></small></p>
         <!-- eslint-disable-next-line vue/no-v-html vue/max-attributes-per-line -->
-        <div v-if="description" v-html="description"></div>
+        <div v-if="description" v-html="description" />
         <template v-if="providers != null && providers.length > 0">
           <h2>Provider<template v-if="providers.length > 1">s</template></h2>
           <dl>
@@ -33,7 +33,7 @@
                 >{{ provider.name }}</a> (<em>{{ (provider.roles || []).join(", ") }}</em>)
               </dt>
               <!-- eslint-disable-next-line vue/no-v-html vue/max-attributes-per-line -->
-              <dd :key="provider.name" v-html="provider.description"></dd>
+              <dd :key="provider.name" v-html="provider.description" />
             </template>
           </dl>
         </template>
@@ -64,9 +64,10 @@
           bg-variant="light"
           class="float-right"
         >
-          <template v-if="spatialExtent">
-            <div id="locator-map"></div>
-          </template>
+          <div
+            v-if="spatialExtent"
+            id="locator-map"
+          />
           <div class="table-responsive">
             <table class="table">
               <tbody>
@@ -84,7 +85,6 @@
                   <td v-html="license" />
                 </tr>
                 <tr v-if="spatialExtent">
-                  <!-- TODO display as a locator map -->
                   <td class="title">Spatial Extent</td>
                   <td>{{ spatialExtent }}</td>
                 </tr>
@@ -102,14 +102,12 @@
     <b-row v-if="items.length > 0">
       <b-col md="12">
         <h3>Items</h3>
-        <div>
-          <b-pagination
-            v-model="currentPage"
-            :total-rows="itemCount"
-            :per-page="perPage"
-            :hide-goto-end-buttons="true"
-          />
-        </div>
+        <b-pagination
+          v-model="currentPage"
+          :total-rows="itemCount"
+          :per-page="perPage"
+          :hide-goto-end-buttons="true"
+        />
         <b-table
           :items="items"
           :fields="itemFields"
@@ -129,6 +127,12 @@
           </template>
           <!-- TODO row-details w/ additional metadata + map -->
         </b-table>
+        <b-pagination
+          v-model="currentPage"
+          :total-rows="itemCount"
+          :per-page="perPage"
+          :hide-goto-end-buttons="true"
+        />
       </b-col>
     </b-row>
   </b-container>
