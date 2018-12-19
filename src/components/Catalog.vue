@@ -322,6 +322,10 @@ export default {
     temporalExtent() {
       const { temporal } = this.extent;
 
+      if (temporal == null) {
+        return null;
+      }
+
       return [
         temporal[0]
           ? new Date(temporal[0]).toLocaleString()
