@@ -1,5 +1,6 @@
 <template>
   <b-container>
+    <div ref="renderedState" />
     <b-row>
       <b-col md="12">
         <header>
@@ -347,6 +348,7 @@ export default {
   watch: {
     catalog(to, from) {
       if (!isEqual(to, from)) {
+        this._updateState();
         this._validate(to);
       }
     }
@@ -365,6 +367,8 @@ export default {
       if (this.spatialExtent != null) {
         this.initializeLocatorMap();
       }
+
+      this._updateState();
     },
     initializeLocatorMap() {
       if (this.locatorMap != null) {
@@ -436,6 +440,26 @@ export default {
         return a[key].toString().localeCompare(b[key].toString(), undefined, {
           numeric: true
         });
+      }
+    },
+    _updateState() {
+      if (this.path == null) {
+        return;
+      }
+
+      const s = document.createElement("script");
+      s.setAttribute("type", "application/json");
+      s.setAttribute("class", "state");
+      s.text = JSON.stringify({
+        path: this.path
+      });
+
+      const { renderedState } = this.$refs;
+
+      if (renderedState.hasChildNodes()) {
+        renderedState.replaceChild(s, renderedState.firstChild);
+      } else {
+        renderedState.appendChild(s);
       }
     },
     _validate(data) {

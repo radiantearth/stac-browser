@@ -1,5 +1,6 @@
 <template>
   <b-container>
+    <div ref="renderedState" />
     <b-row>
       <b-col md="12">
         <header>
@@ -412,6 +413,7 @@ export default {
     },
     item(to, from) {
       if (!isEqual(to, from)) {
+        this._updateState();
         this._validate(to);
       }
     }
@@ -420,6 +422,9 @@ export default {
     this.initialize();
     this._validate(this.item);
   },
+  updated() {
+    this.initialize();
+  },
   methods: {
     ...mapActions(["load"]),
     initialize() {
@@ -427,17 +432,20 @@ export default {
         this.initializePreviewMap();
       }
       this.initializeLocatorMap();
+      this._updateState();
     },
     initializeLocatorMap() {
-      this.locatorMap = Leaflet.map("locator-map", {
-        attributionControl: false,
-        zoomControl: false,
-        boxZoom: false,
-        doubleClickZoom: false,
-        dragging: false,
-        scrollWheelZoom: false,
-        touchZoom: false
-      });
+      if (this.locatorMap == null) {
+        this.locatorMap = Leaflet.map("locator-map", {
+          attributionControl: false,
+          zoomControl: false,
+          boxZoom: false,
+          doubleClickZoom: false,
+          dragging: false,
+          scrollWheelZoom: false,
+          touchZoom: false
+        });
+      }
 
       Leaflet.tileLayer(
         "https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}@2x.png",
@@ -468,7 +476,10 @@ export default {
       });
     },
     initializePreviewMap() {
-      this.map = Leaflet.map("map");
+      if (this.map == null) {
+        this.map = Leaflet.map("map");
+      }
+
       this.map.on("moveend", this.updateHash);
       this.map.on("zoomend", this.updateHash);
 
@@ -540,6 +551,26 @@ export default {
         ...this.$route,
         hash: `${zoom}/${center.lat.toFixed(6)}/${center.lng.toFixed(6)}`
       });
+    },
+    _updateState() {
+      if (this.path == null) {
+        return;
+      }
+
+      const s = document.createElement("script");
+      s.setAttribute("type", "application/json");
+      s.setAttribute("class", "state");
+      s.text = JSON.stringify({
+        path: this.path
+      });
+
+      const { renderedState } = this.$refs;
+
+      if (renderedState.hasChildNodes()) {
+        renderedState.replaceChild(s, renderedState.firstChild);
+      } else {
+        renderedState.appendChild(s);
+      }
     },
     _validate(data) {
       const errors = this.validate(data);

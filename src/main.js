@@ -67,10 +67,45 @@ async function loadSchema(uri) {
   return rsp.json();
 }
 
+function decode(s) {
+  try {
+    return resolve(bs58.decode(s).toString());
+  } catch (err) {
+    console.warn(err);
+    return CATALOG_URL;
+  }
+}
+
 const main = async () => {
-  const validateCatalog = await ajv.compileAsync(CATALOG_SCHEMA);
-  const validateCollection = await ajv.compileAsync(COLLECTION_SCHEMA);
-  const validateItem = await ajv.compileAsync(ITEM_SCHEMA);
+  let persistedState = {};
+  const renderedState = document.querySelector(
+    "script.state[type='application/json']"
+  );
+
+  if (renderedState != null) {
+    try {
+      persistedState = JSON.parse(renderedState.text);
+    } catch (err) {
+      console.warn("Unable to parse rendered state:", err);
+    }
+  }
+
+  let validateCatalog;
+  let validateCollection;
+  let validateItem;
+
+  try {
+    validateCatalog = await ajv.compileAsync(CATALOG_SCHEMA);
+    validateCollection = await ajv.compileAsync(COLLECTION_SCHEMA);
+    validateItem = await ajv.compileAsync(ITEM_SCHEMA);
+  } catch (err) {
+    console.warn(err);
+
+    // create NOOP validators
+    validateCatalog = () => true;
+    validateCollection = () => true;
+    validateItem = () => true;
+  }
 
   const collectionValidator = data => {
     if (!validateCollection(data)) {
@@ -106,13 +141,11 @@ const main = async () => {
       path: "/item/:path*",
       component: Item,
       props: route => {
-        let urls = [CATALOG_URL];
+        let ancestors = [CATALOG_URL];
 
         if (route.params.path != null) {
-          urls = urls.concat(
-            route.params.path
-              .split("/")
-              .map(s => resolve(bs58.decode(s).toString()))
+          ancestors = ancestors.concat(
+            route.params.path.split("/").map(decode)
           );
         }
 
@@ -123,13 +156,13 @@ const main = async () => {
         }
 
         return {
-          ancestors: urls,
+          ancestors,
           center,
           fullscreen: route.query.fullscreen === "true",
           path: route.path,
           resolve,
           slugify,
-          url: urls.slice(-1).pop(),
+          url: ancestors.slice(-1).pop(),
           validate: itemValidator
         };
       }
@@ -138,22 +171,20 @@ const main = async () => {
       path: "/collection/:path*",
       component: Catalog,
       props: route => {
-        let urls = [CATALOG_URL];
+        let ancestors = [CATALOG_URL];
 
         if (route.params.path != null) {
-          urls = urls.concat(
-            route.params.path
-              .split("/")
-              .map(s => resolve(bs58.decode(s).toString()))
+          ancestors = ancestors.concat(
+            route.params.path.split("/").map(decode)
           );
         }
 
         return {
-          ancestors: urls,
+          ancestors,
           path: route.path,
           resolve,
           slugify,
-          url: urls.slice(-1).pop(),
+          url: ancestors.slice(-1).pop(),
           validate: collectionValidator
         };
       }
@@ -162,22 +193,20 @@ const main = async () => {
       path: "/:path*",
       component: Catalog,
       props: route => {
-        let urls = [CATALOG_URL];
+        let ancestors = [CATALOG_URL];
 
         if (route.params.path != null) {
-          urls = urls.concat(
-            route.params.path
-              .split("/")
-              .map(s => resolve(bs58.decode(s).toString()))
+          ancestors = ancestors.concat(
+            route.params.path.split("/").map(decode)
           );
         }
 
         return {
-          ancestors: urls,
+          ancestors,
           path: route.path,
           resolve,
           slugify,
-          url: urls.slice(-1).pop(),
+          url: ancestors.slice(-1).pop(),
           validate: catalogValidator
         };
       }
@@ -234,31 +263,50 @@ const main = async () => {
     routes
   });
 
+  await store.dispatch("load", CATALOG_URL);
+
   router.beforeEach(async (to, from, next) => {
-    // pre-load all known entities
+    if (from.path === to.path) {
+      return next();
+    }
+
+    if (
+      persistedState.path != null &&
+      persistedState.path !== to.path.replace(/\/$/, "") &&
+      persistedState.path.toLowerCase() ===
+        to.path.toLowerCase().replace(/\/$/, "")
+    ) {
+      return next(persistedState.path);
+    }
+
     if (to.params.path != null) {
-      const urls = [CATALOG_URL].concat(
-        to.params.path
-          .split("/")
-          .reverse()
-          .map(p => resolve(bs58.decode(p).toString()))
-      );
+      // pre-load all known entities
+      const urls = to.params.path
+        .split("/")
+        .reverse()
+        .map(decode);
 
       await pMap(urls, store.dispatch.bind(store, "load"), {
         concurrency: 10
       });
-    } else {
-      await store.dispatch("load", CATALOG_URL);
     }
 
     return next();
   });
 
+  // initial load
+  let el = document.getElementById("app");
+
+  // replace existing content
+  if (document.getElementById("rendered") != null) {
+    el = document.getElementById("rendered");
+  }
+
   new Vue({
-    el: "#app",
+    el,
     router,
     store,
-    template: `<router-view />`
+    template: `<router-view id="rendered" />`
   });
 };
 
