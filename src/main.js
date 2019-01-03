@@ -263,6 +263,8 @@ const main = async () => {
     routes
   });
 
+  window.router = router;
+
   await store.dispatch("load", CATALOG_URL);
 
   router.beforeEach(async (to, from, next) => {
