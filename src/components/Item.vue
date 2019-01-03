@@ -169,6 +169,7 @@ export default {
       map: null,
       previewLayer: null,
       overlayLayer: null,
+      locatorOverlayLayer: null,
       geojsonOptions: {
         style: function() {
           return {
@@ -445,23 +446,25 @@ export default {
           scrollWheelZoom: false,
           touchZoom: false
         });
+
+        Leaflet.tileLayer(
+          "https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}@2x.png",
+          {
+            attribution: `Map data <a href="https://www.openstreetmap.org/copyright">&copy; OpenStreetMap contributors</a>, &copy; <a href="https://carto.com/attributions">CARTO</a>`
+          }
+        ).addTo(this.locatorMap);
+        Leaflet.tileLayer(
+          "https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}@2x.png",
+          {
+            opacity: 0.6,
+            zIndex: 1000
+          }
+        ).addTo(this.locatorMap);
+      } else {
+        this.locatorOverlayLayer.removeFrom(this.locatorMap);
       }
 
-      Leaflet.tileLayer(
-        "https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}@2x.png",
-        {
-          attribution: `Map data <a href="https://www.openstreetmap.org/copyright">&copy; OpenStreetMap contributors</a>, &copy; <a href="https://carto.com/attributions">CARTO</a>`
-        }
-      ).addTo(this.locatorMap);
-      Leaflet.tileLayer(
-        "https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}@2x.png",
-        {
-          opacity: 0.6,
-          zIndex: 1000
-        }
-      ).addTo(this.locatorMap);
-
-      const overlayLayer = Leaflet.geoJSON(this.item, {
+      this.locatorOverlayLayer = Leaflet.geoJSON(this.item, {
         pane: "tilePane",
         style: {
           weight: 1,
@@ -471,44 +474,50 @@ export default {
         }
       }).addTo(this.locatorMap);
 
-      this.locatorMap.fitBounds(overlayLayer.getBounds(), {
+      this.locatorMap.fitBounds(this.locatorOverlayLayer.getBounds(), {
         padding: [95, 95]
       });
     },
     initializePreviewMap() {
       if (this.map == null) {
         this.map = Leaflet.map("map");
+
+        this.map.on("moveend", this.updateHash);
+        this.map.on("zoomend", this.updateHash);
+
+        this.map.attributionControl.setPrefix("");
+
+        this.button = Leaflet.easyButton(
+          "fas fa-expand fa-2x",
+          () => this.onFullscreenChange(!this.fullscreen),
+          {
+            position: "topright"
+          }
+        ).addTo(this.map);
+
+        if (this.fullscreen) {
+          this.map.getContainer().classList.add("leaflet-pseudo-fullscreen");
+        }
+
+        Leaflet.tileLayer(
+          "https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}@2x.png",
+          {
+            attribution: `Map data <a href="https://www.openstreetmap.org/copyright">&copy; OpenStreetMap contributors</a>, &copy; <a href="https://carto.com/attributions">CARTO</a>`
+          }
+        ).addTo(this.map);
+        Leaflet.tileLayer(
+          "https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}@2x.png",
+          {
+            zIndex: 1000
+          }
+        ).addTo(this.map);
+      } else {
+        if (this.tileLayer != null) {
+          this.tileLayer.removeFrom(this.map);
+        }
+
+        this.overlayLayer.removeFrom(this.map);
       }
-
-      this.map.on("moveend", this.updateHash);
-      this.map.on("zoomend", this.updateHash);
-
-      this.map.attributionControl.setPrefix("");
-
-      this.button = Leaflet.easyButton(
-        "fas fa-expand fa-2x",
-        () => this.onFullscreenChange(!this.fullscreen),
-        {
-          position: "topright"
-        }
-      ).addTo(this.map);
-
-      if (this.fullscreen) {
-        this.map.getContainer().classList.add("leaflet-pseudo-fullscreen");
-      }
-
-      Leaflet.tileLayer(
-        "https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}@2x.png",
-        {
-          attribution: `Map data <a href="https://www.openstreetmap.org/copyright">&copy; OpenStreetMap contributors</a>, &copy; <a href="https://carto.com/attributions">CARTO</a>`
-        }
-      ).addTo(this.map);
-      Leaflet.tileLayer(
-        "https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}@2x.png",
-        {
-          zIndex: 1000
-        }
-      ).addTo(this.map);
 
       if (this.tileSource) {
         this.tileLayer = Leaflet.tileLayer(this.tileSource, {
