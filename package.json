@@ -34,6 +34,7 @@
     "lodash.isequal": "^4.5.0",
     "node-fetch": "^2.3.0",
     "p-map": "^2.0.0",
+    "p-queue": "^3.0.0",
     "serve": "^10.1.1",
     "spdx-to-html": "^0.3.2",
     "vue": "^2.5.17",

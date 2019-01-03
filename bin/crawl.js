@@ -18,8 +18,8 @@ if (options.help || options.root == null) {
 
 async function main() {
   // eslint-disable-next-line no-unused-vars
-  for await (const [type, url, entity, ancestors] of crawl(options.root)) {
-    console.log(type, url);
+  for await (const [url, type, ancestors, entity] of crawl(options.root)) {
+    console.log("-->", type, url);
   }
 }
 
