@@ -1,6 +1,6 @@
 <template>
   <b-container>
-    <div ref="renderedState" />
+    <div ref="renderedState"/>
     <b-row>
       <b-col md="12">
         <header>
@@ -10,10 +10,20 @@
               src="https://planet-pulse-assets-production.s3.amazonaws.com/uploads/2016/06/blog-logo.jpg"
               alt="Powered by Planet Labs"
               class="float-right">
-          </a> -->
-          <div><b-breadcrumb :items="breadcrumbs" /></div>
+          </a>-->
+          <div>
+            <b-breadcrumb :items="breadcrumbs"/>
+          </div>
           <h1>{{ title }}</h1>
-          <p><template v-if="validationErrors"><span title="Validation errors present; please check the JavaScript Console">⚠️</span></template><small><code>{{ url }}</code></small></p>
+          <p>
+            <span
+              v-if="validationErrors"
+              title="Validation errors present; please check the JavaScript Console"
+            >⚠️</span>
+            <small>
+              <code>{{ url }}</code>
+            </small>
+          </p>
         </header>
       </b-col>
     </b-row>
@@ -23,35 +33,17 @@
     <div class="row">
       <div class="col-md-8">
         <b-tabs>
-          <b-tab
-            v-if="cog != null"
-            title="Preview"
-            :active="cog != null"
-          >
-            <div
-              id="map-container"
-            >
+          <b-tab v-if="cog != null" title="Preview" :active="cog != null">
+            <div id="map-container">
               <div id="map"></div>
             </div>
           </b-tab>
-          <b-tab
-            v-if="thumbnail"
-            title="Thumbnail"
-            :active="cog == null && thumbnail != null"
-          >
+          <b-tab v-if="thumbnail" title="Thumbnail" :active="cog == null && thumbnail != null">
             <a :href="thumbnail">
-              <img
-                id="thumbnail"
-                align="center"
-                :src="thumbnail"
-              >
+              <img id="thumbnail" align="center" :src="thumbnail">
             </a>
           </b-tab>
-          <b-tab
-            v-if="assets.length > 0"
-            title="Assets"
-            :active="cog == null && thumbnail == null"
-          >
+          <b-tab v-if="assets.length > 0" title="Assets" :active="cog == null && thumbnail == null">
             <div class="table-responsive assets">
               <table class="table">
                 <thead>
@@ -61,15 +53,14 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr
-                    v-for="asset in assets"
-                    :key="asset.key"
-                  >
+                  <tr v-for="asset in assets" :key="asset.key">
                     <td>
                       <!-- eslint-disable-next-line vue/max-attributes-per-line vue/no-v-html -->
-                      <a :href="asset.href" :title="asset.key" v-html="asset.title" />
+                      <a :href="asset.href" :title="asset.key" v-html="asset.title"/>
                     </td>
-                    <td><code>{{ asset.type }}</code></td>
+                    <td>
+                      <code>{{ asset.type }}</code>
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -85,24 +76,29 @@
             <tbody>
               <tr v-if="collection">
                 <td class="title">Collection</td>
-                <td><a :href="linkToCollection">{{ collection.title || "Untitled" }}</a></td>
+                <td>
+                  <a :href="linkToCollection">
+                    {{
+                    collection.title || "Untitled"
+                    }}
+                  </a>
+                </td>
               </tr>
               <tr v-if="license">
                 <td class="title">License</td>
                 <td>
                   <!-- eslint-disable-next-line vue/no-v-html -->
                   <span v-html="license"></span>
-                  <template v-if="licensor">
+                  <template v-if="licensor">by
                     <!-- eslint-disable-next-line vue/no-v-html -->
-                    by <span v-html="licensor"></span>
+                    <span v-html="licensor"></span>
                   </template>
                 </td>
               </tr>
-              <tr
-                v-for="prop in propertyList"
-                :key="prop.key"
-              >
-                <td class="title"><span :title="prop.key">{{ prop.label }}</span></td>
+              <tr v-for="prop in propertyList" :key="prop.key">
+                <td class="title">
+                  <span :title="prop.key">{{ prop.label }}</span>
+                </td>
                 <td>{{ prop.value }}</td>
               </tr>
             </tbody>

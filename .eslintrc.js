@@ -5,7 +5,8 @@ module.exports = {
   extends: [
     "eslint:recommended",
     "plugin:vue/recommended",
-    "plugin:prettier/recommended"
+    "plugin:prettier/recommended",
+    "prettier/vue"
   ],
   globals: {
     Buffer: true,

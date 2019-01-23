@@ -1,10 +1,10 @@
 <template>
   <b-container>
-    <div ref="renderedState" />
+    <div ref="renderedState"/>
     <b-row>
       <b-col md="12">
         <header>
-          <b-breadcrumb :items="breadcrumbs" />
+          <b-breadcrumb :items="breadcrumbs"/>
         </header>
       </b-col>
     </b-row>
@@ -16,25 +16,33 @@
             src="https://planet-pulse-assets-production.s3.amazonaws.com/uploads/2016/06/blog-logo.jpg"
             alt="Powered by Planet Labs"
             class="float-right">
-        </a> -->
+        </a>-->
         <h1>{{ title }}</h1>
-        <p v-if="version"><small>Version {{ version }}</small></p>
-        <p><template v-if="validationErrors"><span title="Validation errors present; please check the JavaScript Console">⚠️</span></template><small><code>{{ url }}</code></small></p>
+        <p v-if="version">
+          <small>Version {{ version }}</small>
+        </p>
+        <p>
+          <template v-if="validationErrors">
+            <span title="Validation errors present; please check the JavaScript Console">⚠️</span>
+          </template>
+          <small>
+            <code>{{ url }}</code>
+          </small>
+        </p>
         <!-- eslint-disable-next-line vue/no-v-html vue/max-attributes-per-line -->
-        <div v-if="description" v-html="description" />
+        <div v-if="description" v-html="description"/>
         <template v-if="providers != null && providers.length > 0">
-          <h2>Provider<template v-if="providers.length > 1">s</template></h2>
+          <h2>Provider
+            <template v-if="providers.length > 1">s</template>
+          </h2>
           <dl>
-            <template
-              v-for="provider in providers"
-            >
+            <template v-for="provider in providers">
               <dt :key="provider.url">
-                <a
-                  :href="provider.url"
-                >{{ provider.name }}</a> (<em>{{ (provider.roles || []).join(", ") }}</em>)
+                <a :href="provider.url">{{ provider.name }}</a> (
+                <em>{{ (provider.roles || []).join(", ") }}</em>)
               </dt>
               <!-- eslint-disable-next-line vue/no-v-html vue/max-attributes-per-line -->
-              <dd :key="provider.name" v-html="provider.description" />
+              <dd :key="provider.name" v-html="provider.description"/>
             </template>
           </dl>
         </template>
@@ -44,31 +52,15 @@
 
           <h3>Catalogs</h3>
           <ul class="links">
-            <li
-              v-for="child in children"
-              :key="child.path"
-            >
-              <router-link
-                :to="child.slug"
-                append
-              >{{ child.title }}</router-link>
+            <li v-for="child in children" :key="child.path">
+              <router-link :to="child.slug" append>{{ child.title }}</router-link>
             </li>
           </ul>
         </template>
       </b-col>
-      <b-col 
-        v-if="keywords.length > 0 || license != null"
-        md="4"
-      >
-        <b-card
-          title="Catalog Information"
-          bg-variant="light"
-          class="float-right"
-        >
-          <div
-            v-if="spatialExtent"
-            id="locator-map"
-          />
+      <b-col v-if="keywords.length > 0 || license != null" md="4">
+        <b-card title="Catalog Information" bg-variant="light" class="float-right">
+          <div v-if="spatialExtent" id="locator-map"/>
           <div class="table-responsive">
             <table class="table">
               <tbody>
@@ -83,7 +75,7 @@
                 <tr v-if="license">
                   <td class="title">License</td>
                   <!-- eslint-disable-next-line vue/no-v-html -->
-                  <td v-html="license" />
+                  <td v-html="license"/>
                 </tr>
                 <tr v-if="spatialExtent">
                   <td class="title">Spatial Extent</td>
@@ -120,10 +112,7 @@
           small
           striped
         >
-          <template
-            slot="link"
-            slot-scope="data"
-          >
+          <template slot="link" slot-scope="data">
             <router-link :to="data.item.to">{{ data.item.title }}</router-link>
           </template>
           <!-- TODO row-details w/ additional metadata + map -->
@@ -233,11 +222,13 @@ export default {
       return this.getEntity(this.url);
     },
     children() {
-      return this.catalog.links.filter(x => x.rel === "child").map(child => ({
-        path: child.href,
-        slug: this.slugify(this.resolve(child.href, this.url)),
-        title: child.title || child.href
-      }));
+      return this.catalog.links
+        .filter(x => x.rel === "child")
+        .map(child => ({
+          path: child.href,
+          slug: this.slugify(this.resolve(child.href, this.url)),
+          title: child.title || child.href
+        }));
     },
     description() {
       // REQUIRED
@@ -260,34 +251,36 @@ export default {
 
       const start = (this.currentPage - 1) * this.perPage;
       const end = this.currentPage * this.perPage;
-      return this.links.filter(x => x.rel === "item").map((itemLink, idx) => {
-        const itemUrl = this.resolve(itemLink.href, this.url);
+      return this.links
+        .filter(x => x.rel === "item")
+        .map((itemLink, idx) => {
+          const itemUrl = this.resolve(itemLink.href, this.url);
 
-        if (idx >= start && idx < end) {
-          // dispatch a fetch if item is within the range of items being displayed
-          this.load(itemUrl);
-        }
+          if (idx >= start && idx < end) {
+            // dispatch a fetch if item is within the range of items being displayed
+            this.load(itemUrl);
+          }
 
-        // attempt to load the full item
-        const item = this.getEntity(itemUrl);
+          // attempt to load the full item
+          const item = this.getEntity(itemUrl);
 
-        if (item != null) {
+          if (item != null) {
+            return {
+              to: `/item${this.path}/${this.slugify(itemUrl)}`,
+              title:
+                item.properties.title ||
+                item.id ||
+                itemLink.title ||
+                itemLink.href,
+              dateAcquired: item.properties.datetime
+            };
+          }
+
           return {
             to: `/item${this.path}/${this.slugify(itemUrl)}`,
-            title:
-              item.properties.title ||
-              item.id ||
-              itemLink.title ||
-              itemLink.href,
-            dateAcquired: item.properties.datetime
+            title: itemLink.title || itemLink.href
           };
-        }
-
-        return {
-          to: `/item${this.path}/${this.slugify(itemUrl)}`,
-          title: itemLink.title || itemLink.href
-        };
-      });
+        });
     },
     keywords() {
       return []
