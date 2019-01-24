@@ -1,6 +1,7 @@
 <template>
   <b-container>
     <div ref="renderedState"/>
+    <div ref="metadata"/>
     <b-row>
       <b-col md="12">
         <header>
@@ -237,6 +238,43 @@ export default {
       //   this.cog
       // )}`;
     },
+    jsonLD() {
+      const dataset = {
+        "@context": "https://schema.org/",
+        "@type": "Dataset",
+        // required
+        name: this.title,
+        description: this.properties.description,
+        // recommended
+        identifier: this.item.id,
+        keywords: this.keywords,
+        license: this._license,
+        isBasedOn: this.url,
+        url: this.url,
+        includedInDataCatalog: [this.collectionLink, this.parentLink].map(
+          l => ({
+            isBasedOn: l.href,
+            url: l.slug
+          })
+        ),
+        spatialCoverage: {
+          "@type": "Place",
+          geo: {
+            "@type": "GeoShape",
+            box: this.item.bbox.join(" ")
+          }
+        },
+        temporalCoverage: this.properties.datetime,
+        distribution: this.assets.map(a => ({
+          contentUrl: a.href,
+          fileFormat: a.type,
+          name: a.title
+        })),
+        image: this.thumbnail
+      };
+
+      return dataset;
+    },
     links() {
       if (typeof this.item.links === "object") {
         // previous STAC version specified links as an object
@@ -319,18 +357,26 @@ export default {
         value: format(key, props[key])
       }));
     },
-    license() {
-      return spdxToHTML(
-        this.properties["item:license"] ||
-          (this.collection && this.collection.license)
+    keywords() {
+      return (
+        (this.collection && this.collection.keywords) ||
+        this.rootCatalog.keywords ||
+        []
       );
     },
+    _license() {
+      return (
+        this.properties["item:license"] ||
+        (this.collection && this.collection.license) ||
+        this.rootCatalog.license ||
+        []
+      );
+    },
+    license() {
+      return spdxToHTML(this._license);
+    },
     licensor() {
-      if (this.collection == null || this.collection.providers == null) {
-        return null;
-      }
-
-      return this.collection.providers
+      return this.providers
         .filter(x => x.roles.includes("licensor"))
         .map(x => {
           if (x.url != null) {
@@ -344,28 +390,31 @@ export default {
     providers() {
       return (
         this.properties["item:providers"] ||
-        (this.collection && this.collection.providers)
+        (this.collection && this.collection.providers) ||
+        this.rootCatalog.providers ||
+        []
       );
     },
     properties() {
       return this.item.properties || {};
     },
+    rootCatalog() {
+      const rootLink = this.links.find(x => x.rel === "root");
+
+      if (rootLink != null) {
+        return this.getEntity(this.resolve(rootLink.href, this.url));
+      }
+
+      return this.getEntity(this.ancestors[0]);
+    },
     title() {
       return this.properties.title || this.item.id;
     },
     collection() {
-      const collection = this.links
-        .filter(x => x.rel === "collection")
-        .map(x => ({
-          ...x,
-          href: this.resolve(x.href, this.url)
-        }))
-        .pop();
+      if (this.collectionLink != null) {
+        this.load(this.collectionLink.href);
 
-      if (collection != null) {
-        this.load(collection.href);
-
-        return this.getEntity(collection.href);
+        return this.getEntity(this.collectionLink.href);
       }
     },
     collectionLink() {
@@ -373,7 +422,18 @@ export default {
         .filter(x => x.rel === "collection")
         .map(x => ({
           ...x,
-          href: this.resolve(x.href, this.url)
+          href: this.resolve(x.href, this.url),
+          slug: this.slugify(this.resolve(x.href, this.url))
+        }))
+        .pop();
+    },
+    parentLink() {
+      return this.links
+        .filter(x => x.rel === "parent")
+        .map(x => ({
+          ...x,
+          href: this.resolve(x.href, this.url),
+          slug: this.slugify(this.resolve(x.href, this.url))
         }))
         .pop();
     },
@@ -410,6 +470,7 @@ export default {
     },
     item(to, from) {
       if (!isEqual(to, from)) {
+        this._updateMetadata();
         this._updateState();
         this._validate(to);
       }
@@ -429,6 +490,7 @@ export default {
         this.initializePreviewMap();
       }
       this.initializeLocatorMap();
+      this._updateMetadata();
       this._updateState();
     },
     initializeLocatorMap() {
@@ -556,6 +618,20 @@ export default {
         ...this.$route,
         hash: `${zoom}/${center.lat.toFixed(6)}/${center.lng.toFixed(6)}`
       });
+    },
+    _updateMetadata() {
+      const s = document.createElement("script");
+      s.setAttribute("type", "application/ld+json");
+
+      s.text = JSON.stringify(this.jsonLD);
+
+      const { metadata } = this.$refs;
+
+      if (metadata.hasChildNodes()) {
+        metadata.replaceChild(s, metadata.firstChild);
+      } else {
+        metadata.appendChild(s);
+      }
     },
     _updateState() {
       if (this.path == null) {

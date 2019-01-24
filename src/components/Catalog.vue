@@ -1,6 +1,7 @@
 <template>
   <b-container>
     <div ref="renderedState"/>
+    <div ref="metadata"/>
     <b-row>
       <b-col md="12">
         <header>
@@ -214,7 +215,8 @@ export default {
 
         return {
           to,
-          text: entity.title || entity.id
+          text: entity.title || entity.id,
+          url: uri
         };
       });
     },
@@ -222,13 +224,12 @@ export default {
       return this.getEntity(this.url);
     },
     children() {
-      return this.catalog.links
-        .filter(x => x.rel === "child")
-        .map(child => ({
-          path: child.href,
-          slug: this.slugify(this.resolve(child.href, this.url)),
-          title: child.title || child.href
-        }));
+      return this.catalog.links.filter(x => x.rel === "child").map(child => ({
+        path: child.href,
+        slug: this.slugify(this.resolve(child.href, this.url)),
+        title: child.title || child.href,
+        url: this.resolve(child.href, this.url)
+      }));
     },
     description() {
       // REQUIRED
@@ -251,36 +252,141 @@ export default {
 
       const start = (this.currentPage - 1) * this.perPage;
       const end = this.currentPage * this.perPage;
-      return this.links
-        .filter(x => x.rel === "item")
-        .map((itemLink, idx) => {
-          const itemUrl = this.resolve(itemLink.href, this.url);
+      return this.links.filter(x => x.rel === "item").map((itemLink, idx) => {
+        const itemUrl = this.resolve(itemLink.href, this.url);
 
-          if (idx >= start && idx < end) {
-            // dispatch a fetch if item is within the range of items being displayed
-            this.load(itemUrl);
-          }
+        if (idx >= start && idx < end) {
+          // dispatch a fetch if item is within the range of items being displayed
+          this.load(itemUrl);
+        }
 
-          // attempt to load the full item
-          const item = this.getEntity(itemUrl);
+        // attempt to load the full item
+        const item = this.getEntity(itemUrl);
 
-          if (item != null) {
-            return {
-              to: `/item${this.path}/${this.slugify(itemUrl)}`,
-              title:
-                item.properties.title ||
-                item.id ||
-                itemLink.title ||
-                itemLink.href,
-              dateAcquired: item.properties.datetime
-            };
-          }
-
+        if (item != null) {
           return {
+            item,
             to: `/item${this.path}/${this.slugify(itemUrl)}`,
-            title: itemLink.title || itemLink.href
+            title:
+              item.properties.title ||
+              item.id ||
+              itemLink.title ||
+              itemLink.href,
+            dateAcquired: item.properties.datetime
           };
-        });
+        }
+
+        return {
+          to: `/item${this.path}/${this.slugify(itemUrl)}`,
+          title: itemLink.title || itemLink.href,
+          url: itemUrl
+        };
+      });
+    },
+    jsonLD() {
+      const dataCatalog = this.providers.reduce(
+        (dc, p) =>
+          p.roles.reduce((dc, role) => {
+            switch (role) {
+              case "licensor":
+                dc.copyrightHolder = dc.copyrightHolder || [];
+                dc.copyrightHolder.push({
+                  "@type": "Organization",
+                  description: p.description,
+                  name: p.name,
+                  url: p.url
+                });
+                break;
+
+              case "producer":
+                dc.producer = dc.producer || [];
+                dc.producer.push({
+                  "@type": "Organization",
+                  description: p.description,
+                  name: p.name,
+                  url: p.url
+                });
+                break;
+
+              case "processor":
+                dc.contributor = dc.contributor || [];
+                dc.contributor.push({
+                  "@type": "Organization",
+                  description: p.description,
+                  name: p.name,
+                  url: p.url
+                });
+                break;
+
+              case "host":
+                dc.provider = dc.provider || [];
+                dc.provider.push({
+                  "@type": "Organization",
+                  description: p.description,
+                  name: p.name,
+                  url: p.url
+                });
+                break;
+            }
+
+            return dc;
+          }, dc),
+        {
+          "@context": "https://schema.org/",
+          "@type": "DataCatalog",
+          // required
+          name: this.title,
+          description: this.description,
+          // recommended
+          identifier: this.catalog.id,
+          keywords: this.catalog.keywords || this.rootCatalog.keywords,
+          license: this.catalog.license || this.rootCatalog.license,
+          isBasedOn: this.url,
+          version: this.version,
+          url: this.url,
+          hasPart: this.children.map(({ title: name, slug, url }) => ({
+            "@type": "DataCatalog",
+            name,
+            isBasedOn: url,
+            url: slug
+          })),
+          dataset: this.items.map(({ item, title: name, to, url }) => ({
+            identifier: item ? item.id : undefined,
+            name,
+            isBasedOn: url,
+            url: to
+          }))
+        }
+      );
+
+      const parent = this.breadcrumbs[this.breadcrumbs.length - 1];
+
+      if (parent != null) {
+        dataCatalog.isPartOf = {
+          "@type": "DataCatalog",
+          name: parent.text,
+          isBasedOn: parent.url,
+          url: parent.to
+        };
+      }
+
+      const { spatial, temporal } = this.extent;
+
+      if (spatial != null) {
+        dataCatalog.spatialCoverage = {
+          "@type": "Place",
+          geo: {
+            "@type": "GeoShape",
+            box: spatial.join(" ")
+          }
+        };
+      }
+
+      if (temporal != null) {
+        dataCatalog.temporalCoverage = temporal.map(x => x || "..").join("/");
+      }
+
+      return dataCatalog;
     },
     keywords() {
       return []
@@ -295,15 +401,22 @@ export default {
       return this.catalog.links;
     },
     providers() {
-      return (this.catalog.providers || []).map(x => ({
-        ...x,
-        description: MARKDOWN_WRITER.render(
-          MARKDOWN_READER.parse(x.description || "")
-        )
-      }));
+      return (this.catalog.providers || this.rootCatalog.providers || []).map(
+        x => ({
+          ...x,
+          description: MARKDOWN_WRITER.render(
+            MARKDOWN_READER.parse(x.description || "")
+          )
+        })
+      );
     },
     rootCatalog() {
-      // TODO navigate up parents
+      const rootLink = this.links.find(x => x.rel === "root");
+
+      if (rootLink != null) {
+        return this.getEntity(this.resolve(rootLink.href, this.url));
+      }
+
       return this.getEntity(this.ancestors[0]);
     },
     spatialExtent() {
@@ -341,6 +454,7 @@ export default {
   watch: {
     catalog(to, from) {
       if (!isEqual(to, from)) {
+        this._updateMetadata();
         this._updateState();
         this._validate(to);
       }
@@ -361,6 +475,7 @@ export default {
         this.initializeLocatorMap();
       }
 
+      this._updateMetadata();
       this._updateState();
     },
     initializeLocatorMap() {
@@ -433,6 +548,20 @@ export default {
         return a[key].toString().localeCompare(b[key].toString(), undefined, {
           numeric: true
         });
+      }
+    },
+    _updateMetadata() {
+      const s = document.createElement("script");
+      s.setAttribute("type", "application/ld+json");
+
+      s.text = JSON.stringify(this.jsonLD);
+
+      const { metadata } = this.$refs;
+
+      if (metadata.hasChildNodes()) {
+        metadata.replaceChild(s, metadata.firstChild);
+      } else {
+        metadata.appendChild(s);
       }
     },
     _updateState() {
