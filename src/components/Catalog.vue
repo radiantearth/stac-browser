@@ -1,5 +1,5 @@
 <template>
-  <b-container>
+  <b-container :class="loaded && 'loaded'">
     <div ref="renderedState"/>
     <div ref="metadata"/>
     <b-row>
@@ -198,6 +198,9 @@ export default {
   },
   computed: {
     ...mapGetters(["getEntity"]),
+    loaded() {
+      return this.catalog != null;
+    },
     breadcrumbs() {
       // create slugs for everything except the root
       const slugs = this.ancestors.slice(1).map(this.slugify);
@@ -207,11 +210,6 @@ export default {
 
         // use all previous slugs to construct a path to this entity
         let to = "/" + slugs.slice(0, idx).join("/");
-
-        if (entity.type === "Feature") {
-          // TODO how best to distinguish Catalogs from Items?
-          to = "/items" + to;
-        }
 
         return {
           to,

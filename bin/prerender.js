@@ -64,6 +64,8 @@ class STACRenderer extends Renderer {
       route
     );
 
+    await page.waitForSelector(options.renderAfterElementExists);
+
     const result = {
       originalRoute: route,
       route: await page.evaluate("window.location.pathname"),
@@ -109,7 +111,7 @@ async function prerender(routes) {
 
   try {
     const renderer = new STACRenderer({
-      renderAfterElementExists: ".container",
+      renderAfterElementExists: ".loaded",
       // allow catalog requests
       skipThirdPartyRequests: req => !req.url().includes(uri.hostname)
     });
