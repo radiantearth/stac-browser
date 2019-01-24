@@ -1,7 +1,7 @@
 <template>
   <b-container :class="loaded && 'loaded'">
-    <div ref="renderedState"/>
-    <div ref="metadata"/>
+    <script ref="renderedState" type="application/json" class="state"/>
+    <script ref="metadata" type="application/ld+json"/>
     <b-row>
       <b-col md="12">
         <header>
@@ -549,38 +549,16 @@ export default {
       }
     },
     _updateMetadata() {
-      const s = document.createElement("script");
-      s.setAttribute("type", "application/ld+json");
-
-      s.text = JSON.stringify(this.jsonLD);
-
       const { metadata } = this.$refs;
 
-      if (metadata.hasChildNodes()) {
-        metadata.replaceChild(s, metadata.firstChild);
-      } else {
-        metadata.appendChild(s);
-      }
+      metadata.text = JSON.stringify(this.jsonLD);
     },
     _updateState() {
-      if (this.path == null) {
-        return;
-      }
-
-      const s = document.createElement("script");
-      s.setAttribute("type", "application/json");
-      s.setAttribute("class", "state");
-      s.text = JSON.stringify({
-        path: this.path
-      });
-
       const { renderedState } = this.$refs;
 
-      if (renderedState.hasChildNodes()) {
-        renderedState.replaceChild(s, renderedState.firstChild);
-      } else {
-        renderedState.appendChild(s);
-      }
+      renderedState.text = JSON.stringify({
+        path: this.path
+      });
     },
     _validate(data) {
       const errors = this.validate(data);
