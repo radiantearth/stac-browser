@@ -1,7 +1,5 @@
 <template>
   <b-container :class="loaded && 'loaded'">
-    <script ref="renderedState" type="application/json" class="state"/>
-    <script ref="metadata" type="application/ld+json"/>
     <b-row>
       <b-col md="12">
         <header>
@@ -148,6 +146,23 @@ const MARKDOWN_WRITER = new HtmlRenderer({
 
 export default {
   name: "Catalog",
+  metaInfo() {
+    return {
+      script: [
+        { innerHTML: JSON.stringify(this.jsonLD), type: "application/ld+json" },
+        {
+          innerHTML: JSON.stringify({
+            path: this.path
+          }),
+          class: "state",
+          type: "application/ld+json"
+        }
+      ],
+      __dangerouslyDisableSanitizers: ["script"],
+      title: this.title,
+      titleTemplate: "%s ⸬ STAC Browser"
+    };
+  },
   props: {
     ancestors: {
       type: Array,
@@ -452,8 +467,6 @@ export default {
   watch: {
     catalog(to, from) {
       if (!isEqual(to, from)) {
-        this._updateMetadata();
-        this._updateState();
         this._validate(to);
       }
     }
@@ -472,9 +485,6 @@ export default {
       if (this.spatialExtent != null) {
         this.initializeLocatorMap();
       }
-
-      this._updateMetadata();
-      this._updateState();
     },
     initializeLocatorMap() {
       if (this.locatorMap != null) {
@@ -547,18 +557,6 @@ export default {
           numeric: true
         });
       }
-    },
-    _updateMetadata() {
-      const { metadata } = this.$refs;
-
-      metadata.text = JSON.stringify(this.jsonLD);
-    },
-    _updateState() {
-      const { renderedState } = this.$refs;
-
-      renderedState.text = JSON.stringify({
-        path: this.path
-      });
     },
     _validate(data) {
       const errors = this.validate(data);

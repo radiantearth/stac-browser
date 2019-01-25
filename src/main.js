@@ -7,6 +7,7 @@ import Ajv from "ajv";
 import AsyncComputed from "vue-async-computed";
 import BootstrapVue from "bootstrap-vue";
 import bs58 from "bs58";
+import Meta from "vue-meta";
 import pMap from "p-map";
 import Vue from "vue";
 import VueRouter from "vue-router";
@@ -29,6 +30,7 @@ const ajv = new Ajv({
 
 Vue.use(AsyncComputed);
 Vue.use(BootstrapVue);
+Vue.use(Meta);
 Vue.use(VueRouter);
 Vue.use(Vuex);
 

@@ -1,7 +1,5 @@
 <template>
   <b-container :class="loaded && 'loaded'">
-    <script ref="renderedState" class="state" type="application/json"/>
-    <script ref="metadata" type="application/ld+json"/>
     <b-row>
       <b-col md="12">
         <header>
@@ -126,6 +124,23 @@ import dictionary from "../lib/stac/dictionary.json";
 
 export default {
   name: "ItemDetail",
+  metaInfo() {
+    return {
+      script: [
+        { innerHTML: JSON.stringify(this.jsonLD), type: "application/ld+json" },
+        {
+          innerHTML: JSON.stringify({
+            path: this.path
+          }),
+          class: "state",
+          type: "application/ld+json"
+        }
+      ],
+      __dangerouslyDisableSanitizers: ["script"],
+      title: this.title,
+      titleTemplate: "%s ⸬ STAC Browser"
+    };
+  },
   props: {
     ancestors: {
       type: Array,
@@ -474,8 +489,6 @@ export default {
     },
     item(to, from) {
       if (!isEqual(to, from)) {
-        this._updateMetadata();
-        this._updateState();
         this._validate(to);
       }
     }
@@ -494,8 +507,6 @@ export default {
         this.initializePreviewMap();
       }
       this.initializeLocatorMap();
-      this._updateMetadata();
-      this._updateState();
     },
     initializeLocatorMap() {
       if (this.locatorMap == null) {
@@ -621,18 +632,6 @@ export default {
       this.$router.replace({
         ...this.$route,
         hash: `${zoom}/${center.lat.toFixed(6)}/${center.lng.toFixed(6)}`
-      });
-    },
-    _updateMetadata() {
-      const { metadata } = this.$refs;
-
-      metadata.text = JSON.stringify(this.jsonLD);
-    },
-    _updateState() {
-      const { renderedState } = this.$refs;
-
-      renderedState.text = JSON.stringify({
-        path: this.path
       });
     },
     _validate(data) {
