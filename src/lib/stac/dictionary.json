@@ -114,6 +114,6 @@
     "suffix": "º"
   },
   "cbers:data_type": "Data type",
-  "cbers:path": "Path",
-  "cbers:row": "Row"
+  "cbers:path": "CBERS Path",
+  "cbers:row": "CBERS Row"
 }
