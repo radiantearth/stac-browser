@@ -1,26 +1,37 @@
 {
   "license": "License",
   "provider": "Provider",
-  "end": {
-    "TODO": "are these still used?",
-    "label": "Acquisition end",
-    "type": "date"
-  },
-  "start": {
-    "label": "Acquisition start",
-    "type": "date"
-  },
   "datetime": {
     "label": "Acquired",
     "type": "date"
   },
-  "eo:cloud_cover": {
-    "label": "Cloud cover",
-    "suffix": "%"
+  "dtr:end_datetime": {
+    "label": "End",
+    "type": "date"
+  },
+  "dtr:start_datetime": {
+    "label": "Start",
+    "type": "date"
   },
   "eo:gsd": {
     "label": "Ground sample distance",
     "suffix": "m"
+  },
+  "eo:platform": "Platform",
+  "eo:constellation": "Constellation",
+  "eo:instrument": "Instrument or sensor",
+  "eo:bands": {
+    "label": "Bands",
+    "type": "eo:bands"
+  },
+  "eo:epsg": "EPSG code",
+  "eo:cloud_cover": {
+    "label": "Cloud cover",
+    "suffix": "%"
+  },
+  "eo:off_nadir": {
+    "label": "Off-nadir angle",
+    "suffix": "º"
   },
   "eo:azimuth": {
     "label": "Sun azimuth",
@@ -34,12 +45,17 @@
     "label": "Sun elevation",
     "suffix": "º"
   },
-  "eo:off_nadir": {
-    "label": "Off-nadir angle",
-    "suffix": "º"
+  "sci:doi": "DOI",
+  "sci:citation": "Citation",
+  "sci:publications": {
+    "label": "Publications",
+    "type": "sci:publications"
   },
-  "eo:collection": "Collection",
-  "eo:epsg": "EPSG code",
+  "item:license": "License",
+  "item:providers": {
+    "label": "Providers",
+    "type": "providers"
+  },
   "pl:anomalous_pixels": {
     "label": "Anomalous pixels"
   },
