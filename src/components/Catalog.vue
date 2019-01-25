@@ -356,7 +356,7 @@ export default {
           license: this.catalog.license || this.rootCatalog.license,
           isBasedOn: this.url,
           version: this.version,
-          url: this.url,
+          url: this.path,
           hasPart: this.children.map(({ title: name, slug, url }) => ({
             "@type": "DataCatalog",
             name,

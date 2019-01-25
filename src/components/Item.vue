@@ -269,7 +269,7 @@ export default {
         keywords: this.keywords,
         license: this._license,
         isBasedOn: this.url,
-        url: this.url,
+        url: this.path,
         includedInDataCatalog: [this.collectionLink, this.parentLink].map(
           l => ({
             isBasedOn: l.href,
