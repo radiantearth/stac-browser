@@ -1,10 +1,9 @@
 <template>
-  <b-container>
-    <div ref="renderedState" />
+  <b-container :class="loaded && 'loaded'">
     <b-row>
       <b-col md="12">
         <header>
-          <b-breadcrumb :items="breadcrumbs" />
+          <b-breadcrumb :items="breadcrumbs"/>
         </header>
       </b-col>
     </b-row>
@@ -16,25 +15,33 @@
             src="https://planet-pulse-assets-production.s3.amazonaws.com/uploads/2016/06/blog-logo.jpg"
             alt="Powered by Planet Labs"
             class="float-right">
-        </a> -->
+        </a>-->
         <h1>{{ title }}</h1>
-        <p v-if="version"><small>Version {{ version }}</small></p>
-        <p><template v-if="validationErrors"><span title="Validation errors present; please check the JavaScript Console">⚠️</span></template><small><code>{{ url }}</code></small></p>
+        <p v-if="version">
+          <small>Version {{ version }}</small>
+        </p>
+        <p>
+          <template v-if="validationErrors">
+            <span title="Validation errors present; please check the JavaScript Console">⚠️</span>
+          </template>
+          <small>
+            <code>{{ url }}</code>
+          </small>
+        </p>
         <!-- eslint-disable-next-line vue/no-v-html vue/max-attributes-per-line -->
-        <div v-if="description" v-html="description" />
+        <div v-if="description" v-html="description"/>
         <template v-if="providers != null && providers.length > 0">
-          <h2>Provider<template v-if="providers.length > 1">s</template></h2>
+          <h2>Provider
+            <template v-if="providers.length > 1">s</template>
+          </h2>
           <dl>
-            <template
-              v-for="provider in providers"
-            >
+            <template v-for="provider in providers">
               <dt :key="provider.url">
-                <a
-                  :href="provider.url"
-                >{{ provider.name }}</a> (<em>{{ (provider.roles || []).join(", ") }}</em>)
+                <a :href="provider.url">{{ provider.name }}</a> (
+                <em>{{ (provider.roles || []).join(", ") }}</em>)
               </dt>
               <!-- eslint-disable-next-line vue/no-v-html vue/max-attributes-per-line -->
-              <dd :key="provider.name" v-html="provider.description" />
+              <dd :key="provider.name" v-html="provider.description"/>
             </template>
           </dl>
         </template>
@@ -44,31 +51,15 @@
 
           <h3>Catalogs</h3>
           <ul class="links">
-            <li
-              v-for="child in children"
-              :key="child.path"
-            >
-              <router-link
-                :to="child.slug"
-                append
-              >{{ child.title }}</router-link>
+            <li v-for="child in children" :key="child.path">
+              <router-link :to="child.slug" append>{{ child.title }}</router-link>
             </li>
           </ul>
         </template>
       </b-col>
-      <b-col 
-        v-if="keywords.length > 0 || license != null"
-        md="4"
-      >
-        <b-card
-          title="Catalog Information"
-          bg-variant="light"
-          class="float-right"
-        >
-          <div
-            v-if="spatialExtent"
-            id="locator-map"
-          />
+      <b-col v-if="keywords.length > 0 || license != null" md="4">
+        <b-card title="Catalog Information" bg-variant="light" class="float-right">
+          <div v-if="spatialExtent" id="locator-map"/>
           <div class="table-responsive">
             <table class="table">
               <tbody>
@@ -83,7 +74,7 @@
                 <tr v-if="license">
                   <td class="title">License</td>
                   <!-- eslint-disable-next-line vue/no-v-html -->
-                  <td v-html="license" />
+                  <td v-html="license"/>
                 </tr>
                 <tr v-if="spatialExtent">
                   <td class="title">Spatial Extent</td>
@@ -120,10 +111,7 @@
           small
           striped
         >
-          <template
-            slot="link"
-            slot-scope="data"
-          >
+          <template slot="link" slot-scope="data">
             <router-link :to="data.item.to">{{ data.item.title }}</router-link>
           </template>
           <!-- TODO row-details w/ additional metadata + map -->
@@ -158,6 +146,23 @@ const MARKDOWN_WRITER = new HtmlRenderer({
 
 export default {
   name: "Catalog",
+  metaInfo() {
+    return {
+      script: [
+        { innerHTML: JSON.stringify(this.jsonLD), type: "application/ld+json" },
+        {
+          innerHTML: JSON.stringify({
+            path: this.path
+          }),
+          class: "state",
+          type: "application/ld+json"
+        }
+      ],
+      __dangerouslyDisableSanitizers: ["script"],
+      title: this.title,
+      titleTemplate: "%s ⸬ STAC Browser"
+    };
+  },
   props: {
     ancestors: {
       type: Array,
@@ -208,6 +213,9 @@ export default {
   },
   computed: {
     ...mapGetters(["getEntity"]),
+    loaded() {
+      return this.catalog != null;
+    },
     breadcrumbs() {
       // create slugs for everything except the root
       const slugs = this.ancestors.slice(1).map(this.slugify);
@@ -218,14 +226,10 @@ export default {
         // use all previous slugs to construct a path to this entity
         let to = "/" + slugs.slice(0, idx).join("/");
 
-        if (entity.type === "Feature") {
-          // TODO how best to distinguish Catalogs from Items?
-          to = "/items" + to;
-        }
-
         return {
           to,
-          text: entity.title || entity.id
+          text: entity.title || entity.id,
+          url: uri
         };
       });
     },
@@ -236,7 +240,8 @@ export default {
       return this.catalog.links.filter(x => x.rel === "child").map(child => ({
         path: child.href,
         slug: this.slugify(this.resolve(child.href, this.url)),
-        title: child.title || child.href
+        title: child.title || child.href,
+        url: this.resolve(child.href, this.url)
       }));
     },
     description() {
@@ -273,6 +278,7 @@ export default {
 
         if (item != null) {
           return {
+            item,
             to: `/item${this.path}/${this.slugify(itemUrl)}`,
             title:
               item.properties.title ||
@@ -285,9 +291,115 @@ export default {
 
         return {
           to: `/item${this.path}/${this.slugify(itemUrl)}`,
-          title: itemLink.title || itemLink.href
+          title: itemLink.title || itemLink.href,
+          url: itemUrl
         };
       });
+    },
+    jsonLD() {
+      const dataCatalog = this.providers.reduce(
+        (dc, p) =>
+          p.roles.reduce((dc, role) => {
+            switch (role) {
+              case "licensor":
+                dc.copyrightHolder = dc.copyrightHolder || [];
+                dc.copyrightHolder.push({
+                  "@type": "Organization",
+                  description: p.description,
+                  name: p.name,
+                  url: p.url
+                });
+                break;
+
+              case "producer":
+                dc.producer = dc.producer || [];
+                dc.producer.push({
+                  "@type": "Organization",
+                  description: p.description,
+                  name: p.name,
+                  url: p.url
+                });
+                break;
+
+              case "processor":
+                dc.contributor = dc.contributor || [];
+                dc.contributor.push({
+                  "@type": "Organization",
+                  description: p.description,
+                  name: p.name,
+                  url: p.url
+                });
+                break;
+
+              case "host":
+                dc.provider = dc.provider || [];
+                dc.provider.push({
+                  "@type": "Organization",
+                  description: p.description,
+                  name: p.name,
+                  url: p.url
+                });
+                break;
+            }
+
+            return dc;
+          }, dc),
+        {
+          "@context": "https://schema.org/",
+          "@type": "DataCatalog",
+          // required
+          name: this.title,
+          description: this.description,
+          // recommended
+          identifier: this.catalog.id,
+          keywords: this.catalog.keywords || this.rootCatalog.keywords,
+          license: this.catalog.license || this.rootCatalog.license,
+          isBasedOn: this.url,
+          version: this.version,
+          url: this.url,
+          hasPart: this.children.map(({ title: name, slug, url }) => ({
+            "@type": "DataCatalog",
+            name,
+            isBasedOn: url,
+            url: slug
+          })),
+          dataset: this.items.map(({ item, title: name, to, url }) => ({
+            identifier: item ? item.id : undefined,
+            name,
+            isBasedOn: url,
+            url: to
+          }))
+        }
+      );
+
+      const parent = this.breadcrumbs[this.breadcrumbs.length - 1];
+
+      if (parent != null) {
+        dataCatalog.isPartOf = {
+          "@type": "DataCatalog",
+          name: parent.text,
+          isBasedOn: parent.url,
+          url: parent.to
+        };
+      }
+
+      const { spatial, temporal } = this.extent;
+
+      if (spatial != null) {
+        dataCatalog.spatialCoverage = {
+          "@type": "Place",
+          geo: {
+            "@type": "GeoShape",
+            box: spatial.join(" ")
+          }
+        };
+      }
+
+      if (temporal != null) {
+        dataCatalog.temporalCoverage = temporal.map(x => x || "..").join("/");
+      }
+
+      return dataCatalog;
     },
     keywords() {
       return []
@@ -302,15 +414,22 @@ export default {
       return this.catalog.links;
     },
     providers() {
-      return (this.catalog.providers || []).map(x => ({
-        ...x,
-        description: MARKDOWN_WRITER.render(
-          MARKDOWN_READER.parse(x.description || "")
-        )
-      }));
+      return (this.catalog.providers || this.rootCatalog.providers || []).map(
+        x => ({
+          ...x,
+          description: MARKDOWN_WRITER.render(
+            MARKDOWN_READER.parse(x.description || "")
+          )
+        })
+      );
     },
     rootCatalog() {
-      // TODO navigate up parents
+      const rootLink = this.links.find(x => x.rel === "root");
+
+      if (rootLink != null) {
+        return this.getEntity(this.resolve(rootLink.href, this.url));
+      }
+
       return this.getEntity(this.ancestors[0]);
     },
     spatialExtent() {
@@ -348,7 +467,6 @@ export default {
   watch: {
     catalog(to, from) {
       if (!isEqual(to, from)) {
-        this._updateState();
         this._validate(to);
       }
     }
@@ -367,8 +485,6 @@ export default {
       if (this.spatialExtent != null) {
         this.initializeLocatorMap();
       }
-
-      this._updateState();
     },
     initializeLocatorMap() {
       if (this.locatorMap != null) {
@@ -440,26 +556,6 @@ export default {
         return a[key].toString().localeCompare(b[key].toString(), undefined, {
           numeric: true
         });
-      }
-    },
-    _updateState() {
-      if (this.path == null) {
-        return;
-      }
-
-      const s = document.createElement("script");
-      s.setAttribute("type", "application/json");
-      s.setAttribute("class", "state");
-      s.text = JSON.stringify({
-        path: this.path
-      });
-
-      const { renderedState } = this.$refs;
-
-      if (renderedState.hasChildNodes()) {
-        renderedState.replaceChild(s, renderedState.firstChild);
-      } else {
-        renderedState.appendChild(s);
       }
     },
     _validate(data) {

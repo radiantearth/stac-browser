@@ -6,18 +6,18 @@
   "scripts": {
     "build": "NODE_ENV=production parcel build --target=browser index.html",
     "clean": "find dist -not -name _redirects -delete",
-    "prerender": "bin/prerender.js $CATALOG_URL",
-    "deploy-cbers": "CATALOG_URL=https://cbers-stac.s3.amazonaws.com/catalog.json npm run clean && npm run build && bin/prerender.js $CATALOG_URL && netlify deploy --prod --dir dist/ --site d51680e6-45e1-49db-b1e4-eb6e236a431a",
-    "deploy-iserv": "CATALOG_URL=https://s3-us-west-2.amazonaws.com/radiant-nasa-iserv/iserv.json npm run clean && npm run build && npm run prerender && netlify deploy --prod --dir dist/ --site 7ad829b5-58b2-4a72-9e42-eb5749982070",
-    "deploy-planet": "CATALOG_URL=https://storage.googleapis.com/pdd-stac/disasters/catalog.json npm run clean && npm run build && npm run prerender && netlify deploy --prod --dir dist/ --site 0208c719-dcdf-42dc-bddb-9ae5498424db",
-    "deploy-boundless": "CATALOG_URL=http://stac.boundlessgeo.io/stac npm run clean && npm run build && npm run prerender && netlify deploy --prod --dir dist/ --site 95a54956-1c9b-4548-87bc-a7ce834f980b",
+    "prerender": "bin/prerender.js -p $PUBLIC_URL $CATALOG_URL",
+    "deploy-cbers": "npm run clean && CATALOG_URL=https://cbers-stac-0-6.s3.amazonaws.com/catalog.json npm run build && bin/prerender.js -p https://cbers-stac.netlify.com https://cbers-stac.s3.amazonaws.com/catalog.json && netlify deploy --prod --dir dist/ --site d51680e6-45e1-49db-b1e4-eb6e236a431a",
+    "deploy-iserv": "npm run clean && CATALOG_URL=https://s3-us-west-2.amazonaws.com/radiant-nasa-iserv/iserv.json npm run build && bin/prerender.js -p https://iserv-stac.netlify.com https://s3-us-west-2.amazonaws.com/radiant-nasa-iserv/iserv.json && netlify deploy --prod --dir dist/ --site 7ad829b5-58b2-4a72-9e42-eb5749982070",
+    "deploy-planet": "npm run clean && CATALOG_URL=https://storage.googleapis.com/pdd-stac/disasters/catalog.json npm run build && bin/prerender.js -p https://planet-stac.netlify.com https://storage.googleapis.com/pdd-stac/disasters/catalog.json && netlify deploy --prod --dir dist/ --site 0208c719-dcdf-42dc-bddb-9ae5498424db",
+    "deploy-boundless": "npm run clean && CATALOG_URL=http://stac.boundlessgeo.io/stac npm run build && bin/prerender.js -p https://boundless-stac.netlify.com http://stac.boundlessgeo.io/stac && netlify deploy --prod --dir dist/ --site 95a54956-1c9b-4548-87bc-a7ce834f980b",
     "start": "npm run clean && parcel --target=browser index.html"
   },
   "author": "Seth Fitzsimmons <seth@mojodna.net>",
   "license": "ISC",
   "dependencies": {
-    "@babel/polyfill": "^7.0.0",
-    "ajv": "^6.5.5",
+    "@babel/polyfill": "^7.2.5",
+    "ajv": "^6.7.0",
     "bootstrap-vue": "^2.0.0-rc.11",
     "bs58": "^4.0.1",
     "clone": "^2.1.2",
@@ -25,11 +25,11 @@
     "commonmark": "^0.28.1",
     "es6-promise": "^4.2.5",
     "fs-extra": "^7.0.1",
-    "hash.js": "^1.1.3",
+    "hash.js": "^1.1.7",
     "jquery": "^3.3.1",
     "json-query": "^2.2.2",
-    "leaflet": "^1.3.4",
-    "leaflet-easybutton": "^2.3.0",
+    "leaflet": "^1.4.0",
+    "leaflet-easybutton": "^2.4.0",
     "lodash.escape": "^4.0.1",
     "lodash.isequal": "^4.5.0",
     "node-fetch": "^2.3.0",
@@ -37,49 +37,32 @@
     "p-queue": "^3.0.0",
     "serve": "^10.1.1",
     "spdx-to-html": "^0.3.2",
-    "vue": "^2.5.17",
-    "vue-async-computed": "^3.4.1",
+    "vue": "^2.5.22",
+    "vue-async-computed": "^3.5.1",
     "vue-hot-reload-api": "^2.3.1",
-    "vue-router": "^3.0.1",
-    "vuex": "^3.0.1"
+    "vue-meta": "^1.5.8",
+    "vue-router": "^3.0.2",
+    "vuex": "^3.1.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.1.2",
+    "@babel/core": "^7.2.2",
     "@prerenderer/prerenderer": "^0.7.2",
     "@prerenderer/renderer-puppeteer": "^0.2.0",
-    "@vue/component-compiler-utils": "^2.3.0",
+    "@vue/component-compiler-utils": "^2.5.0",
     "babel-eslint": "^10.0.1",
     "babel-preset-env": "^1.7.0",
     "babel-runtime": "^6.26.0",
-    "eslint": "^5.7.0",
-    "eslint-config-prettier": "^3.1.0",
-    "eslint-plugin-prettier": "^3.0.0",
-    "eslint-plugin-vue": "^5.0.0-beta.3",
+    "eslint": "^5.12.1",
+    "eslint-config-prettier": "^3.6.0",
+    "eslint-plugin-prettier": "^3.0.1",
+    "eslint-plugin-vue": "^5.1.0",
     "git-exec-and-restage": "^1.1.1",
-    "husky": "^1.1.2",
-    "lint-staged": "^7.3.0",
-    "netlify-cli": "^2.1.1",
-    "parcel-bundler": "^1.10.3",
-    "prettier": "^1.14.3",
-    "vue-template-compiler": "^2.5.17"
-  },
-  "lint-staged": {
-    "*.js": [
-      "git-exec-and-restage eslint --fix --"
-    ],
-    "*.css": [
-      "git-exec-and-restage prettier --write --"
-    ],
-    "*.vue": [
-      "git-exec-and-restage eslint --fix --"
-    ]
+    "netlify-cli": "^2.6.4",
+    "parcel-bundler": "^1.11.0",
+    "prettier": "^1.16.1",
+    "vue-template-compiler": "^2.5.22"
   },
   "alias": {
     "vue": "./node_modules/vue/dist/vue.common.js"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
   }
 }

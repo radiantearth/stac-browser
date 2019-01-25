@@ -1,6 +1,5 @@
 <template>
-  <b-container>
-    <div ref="renderedState" />
+  <b-container :class="loaded && 'loaded'">
     <b-row>
       <b-col md="12">
         <header>
@@ -10,10 +9,20 @@
               src="https://planet-pulse-assets-production.s3.amazonaws.com/uploads/2016/06/blog-logo.jpg"
               alt="Powered by Planet Labs"
               class="float-right">
-          </a> -->
-          <div><b-breadcrumb :items="breadcrumbs" /></div>
+          </a>-->
+          <div>
+            <b-breadcrumb :items="breadcrumbs"/>
+          </div>
           <h1>{{ title }}</h1>
-          <p><template v-if="validationErrors"><span title="Validation errors present; please check the JavaScript Console">⚠️</span></template><small><code>{{ url }}</code></small></p>
+          <p>
+            <span
+              v-if="validationErrors"
+              title="Validation errors present; please check the JavaScript Console"
+            >⚠️</span>
+            <small>
+              <code>{{ url }}</code>
+            </small>
+          </p>
         </header>
       </b-col>
     </b-row>
@@ -23,35 +32,17 @@
     <div class="row">
       <div class="col-md-8">
         <b-tabs>
-          <b-tab
-            v-if="cog != null"
-            title="Preview"
-            :active="cog != null"
-          >
-            <div
-              id="map-container"
-            >
+          <b-tab v-if="cog != null" title="Preview" :active="cog != null">
+            <div id="map-container">
               <div id="map"></div>
             </div>
           </b-tab>
-          <b-tab
-            v-if="thumbnail"
-            title="Thumbnail"
-            :active="cog == null && thumbnail != null"
-          >
+          <b-tab v-if="thumbnail" title="Thumbnail" :active="cog == null && thumbnail != null">
             <a :href="thumbnail">
-              <img
-                id="thumbnail"
-                align="center"
-                :src="thumbnail"
-              >
+              <img id="thumbnail" align="center" :src="thumbnail">
             </a>
           </b-tab>
-          <b-tab
-            v-if="assets.length > 0"
-            title="Assets"
-            :active="cog == null && thumbnail == null"
-          >
+          <b-tab v-if="assets.length > 0" title="Assets" :active="cog == null && thumbnail == null">
             <div class="table-responsive assets">
               <table class="table">
                 <thead>
@@ -61,15 +52,14 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr
-                    v-for="asset in assets"
-                    :key="asset.key"
-                  >
+                  <tr v-for="asset in assets" :key="asset.key">
                     <td>
                       <!-- eslint-disable-next-line vue/max-attributes-per-line vue/no-v-html -->
-                      <a :href="asset.href" :title="asset.key" v-html="asset.title" />
+                      <a :href="asset.href" :title="asset.key" v-html="asset.title"/>
                     </td>
-                    <td><code>{{ asset.type }}</code></td>
+                    <td>
+                      <code>{{ asset.type }}</code>
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -85,24 +75,29 @@
             <tbody>
               <tr v-if="collection">
                 <td class="title">Collection</td>
-                <td><a :href="linkToCollection">{{ collection.title || "Untitled" }}</a></td>
+                <td>
+                  <a :href="linkToCollection">
+                    {{
+                    collection.title || "Untitled"
+                    }}
+                  </a>
+                </td>
               </tr>
               <tr v-if="license">
                 <td class="title">License</td>
                 <td>
                   <!-- eslint-disable-next-line vue/no-v-html -->
                   <span v-html="license"></span>
-                  <template v-if="licensor">
+                  <template v-if="licensor">by
                     <!-- eslint-disable-next-line vue/no-v-html -->
-                    by <span v-html="licensor"></span>
+                    <span v-html="licensor"></span>
                   </template>
                 </td>
               </tr>
-              <tr
-                v-for="prop in propertyList"
-                :key="prop.key"
-              >
-                <td class="title"><span :title="prop.key">{{ prop.label }}</span></td>
+              <tr v-for="prop in propertyList" :key="prop.key">
+                <td class="title">
+                  <span :title="prop.key">{{ prop.label }}</span>
+                </td>
                 <td>{{ prop.value }}</td>
               </tr>
             </tbody>
@@ -129,6 +124,23 @@ import dictionary from "../lib/stac/dictionary.json";
 
 export default {
   name: "ItemDetail",
+  metaInfo() {
+    return {
+      script: [
+        { innerHTML: JSON.stringify(this.jsonLD), type: "application/ld+json" },
+        {
+          innerHTML: JSON.stringify({
+            path: this.path
+          }),
+          class: "state",
+          type: "application/ld+json"
+        }
+      ],
+      __dangerouslyDisableSanitizers: ["script"],
+      title: this.title,
+      titleTemplate: "%s ⸬ STAC Browser"
+    };
+  },
   props: {
     ancestors: {
       type: Array,
@@ -185,6 +197,9 @@ export default {
   },
   computed: {
     ...mapGetters(["getEntity"]),
+    loaded() {
+      return this.item != null;
+    },
     breadcrumbs() {
       // create slugs for everything except the root
       const slugs = this.ancestors.slice(1).map(this.slugify);
@@ -195,14 +210,15 @@ export default {
         // use all previous slugs to construct a path to this entity
         let to = "/" + slugs.slice(0, idx).join("/");
 
-        if (entity.type === "Feature") {
-          // TODO how best to distinguish Catalogs from Items?
-          to = "/items" + to;
+        if (entity != null) {
+          return {
+            to,
+            text: entity.title || entity.id
+          };
         }
 
         return {
-          to,
-          text: entity.title || entity.id
+          to
         };
       });
     },
@@ -240,6 +256,43 @@ export default {
       // return `http://localhost:8000/tiles/{z}/{x}/{y}@2x?url=${encodeURIComponent(
       //   this.cog
       // )}`;
+    },
+    jsonLD() {
+      const dataset = {
+        "@context": "https://schema.org/",
+        "@type": "Dataset",
+        // required
+        name: this.title,
+        description: this.properties.description,
+        // recommended
+        identifier: this.item.id,
+        keywords: this.keywords,
+        license: this._license,
+        isBasedOn: this.url,
+        url: this.url,
+        includedInDataCatalog: [this.collectionLink, this.parentLink].map(
+          l => ({
+            isBasedOn: l.href,
+            url: l.slug
+          })
+        ),
+        spatialCoverage: {
+          "@type": "Place",
+          geo: {
+            "@type": "GeoShape",
+            box: this.item.bbox.join(" ")
+          }
+        },
+        temporalCoverage: this.properties.datetime,
+        distribution: this.assets.map(a => ({
+          contentUrl: a.href,
+          fileFormat: a.type,
+          name: a.title
+        })),
+        image: this.thumbnail
+      };
+
+      return dataset;
     },
     links() {
       if (typeof this.item.links === "object") {
@@ -323,18 +376,26 @@ export default {
         value: format(key, props[key])
       }));
     },
-    license() {
-      return spdxToHTML(
-        this.properties["item:license"] ||
-          (this.collection && this.collection.license)
+    keywords() {
+      return (
+        (this.collection && this.collection.keywords) ||
+        this.rootCatalog.keywords ||
+        []
       );
     },
+    _license() {
+      return (
+        this.properties["item:license"] ||
+        (this.collection && this.collection.license) ||
+        this.rootCatalog.license ||
+        []
+      );
+    },
+    license() {
+      return spdxToHTML(this._license);
+    },
     licensor() {
-      if (this.collection == null || this.collection.providers == null) {
-        return null;
-      }
-
-      return this.collection.providers
+      return this.providers
         .filter(x => x.roles.includes("licensor"))
         .map(x => {
           if (x.url != null) {
@@ -348,28 +409,31 @@ export default {
     providers() {
       return (
         this.properties["item:providers"] ||
-        (this.collection && this.collection.providers)
+        (this.collection && this.collection.providers) ||
+        this.rootCatalog.providers ||
+        []
       );
     },
     properties() {
       return this.item.properties || {};
     },
+    rootCatalog() {
+      const rootLink = this.links.find(x => x.rel === "root");
+
+      if (rootLink != null) {
+        return this.getEntity(this.resolve(rootLink.href, this.url));
+      }
+
+      return this.getEntity(this.ancestors[0]);
+    },
     title() {
       return this.properties.title || this.item.id;
     },
     collection() {
-      const collection = this.links
-        .filter(x => x.rel === "collection")
-        .map(x => ({
-          ...x,
-          href: this.resolve(x.href, this.url)
-        }))
-        .pop();
+      if (this.collectionLink != null) {
+        this.load(this.collectionLink.href);
 
-      if (collection != null) {
-        this.load(collection.href);
-
-        return this.getEntity(collection.href);
+        return this.getEntity(this.collectionLink.href);
       }
     },
     collectionLink() {
@@ -377,7 +441,18 @@ export default {
         .filter(x => x.rel === "collection")
         .map(x => ({
           ...x,
-          href: this.resolve(x.href, this.url)
+          href: this.resolve(x.href, this.url),
+          slug: this.slugify(this.resolve(x.href, this.url))
+        }))
+        .pop();
+    },
+    parentLink() {
+      return this.links
+        .filter(x => x.rel === "parent")
+        .map(x => ({
+          ...x,
+          href: this.resolve(x.href, this.url),
+          slug: this.slugify(this.resolve(x.href, this.url))
         }))
         .pop();
     },
@@ -414,7 +489,6 @@ export default {
     },
     item(to, from) {
       if (!isEqual(to, from)) {
-        this._updateState();
         this._validate(to);
       }
     }
@@ -433,7 +507,6 @@ export default {
         this.initializePreviewMap();
       }
       this.initializeLocatorMap();
-      this._updateState();
     },
     initializeLocatorMap() {
       if (this.locatorMap == null) {
@@ -560,26 +633,6 @@ export default {
         ...this.$route,
         hash: `${zoom}/${center.lat.toFixed(6)}/${center.lng.toFixed(6)}`
       });
-    },
-    _updateState() {
-      if (this.path == null) {
-        return;
-      }
-
-      const s = document.createElement("script");
-      s.setAttribute("type", "application/json");
-      s.setAttribute("class", "state");
-      s.text = JSON.stringify({
-        path: this.path
-      });
-
-      const { renderedState } = this.$refs;
-
-      if (renderedState.hasChildNodes()) {
-        renderedState.replaceChild(s, renderedState.firstChild);
-      } else {
-        renderedState.appendChild(s);
-      }
     },
     _validate(data) {
       const errors = this.validate(data);

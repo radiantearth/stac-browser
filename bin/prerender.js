@@ -64,6 +64,8 @@ class STACRenderer extends Renderer {
       route
     );
 
+    await page.waitForSelector(options.renderAfterElementExists);
+
     const result = {
       originalRoute: route,
       route: await page.evaluate("window.location.pathname"),
@@ -76,14 +78,20 @@ class STACRenderer extends Renderer {
   }
 }
 
-const options = commandLineArgs([
-  { name: "verbose", alias: "v", type: Boolean },
-  { name: "help", alias: "h", type: Boolean },
-  { name: "root", type: String, defaultOption: true }
-]);
+const options = commandLineArgs(
+  [
+    { name: "verbose", alias: "v", type: Boolean },
+    { name: "help", alias: "h", type: Boolean },
+    { name: "public-url", alias: "p", type: String },
+    { name: "root", type: String, defaultOption: true }
+  ],
+  {
+    camelCase: true
+  }
+);
 
 if (options.help || options.root == null) {
-  console.warn("Usage: prerender [-v] [-h] <root catalog URL>");
+  console.warn("Usage: prerender [-v] [-h] [-p public URL] <root catalog URL>");
   process.exit(1);
 }
 
@@ -91,12 +99,19 @@ const slugify = _slugify.bind(null, options.root);
 
 async function prerender(routes) {
   let prerenderer;
+  let sitemap;
+
+  if (options.publicUrl) {
+    sitemap = fs.createWriteStream(
+      path.join(__dirname, "..", "dist", "sitemap.txt")
+    );
+  }
 
   const uri = url.parse(options.root);
 
   try {
     const renderer = new STACRenderer({
-      renderAfterElementExists: ".container",
+      renderAfterElementExists: ".loaded",
       // allow catalog requests
       skipThirdPartyRequests: req => !req.url().includes(uri.hostname)
     });
@@ -121,10 +136,23 @@ async function prerender(routes) {
       } catch (err) {
         console.warn(err.stack);
       }
+
+      if (sitemap != null) {
+        sitemap.write(`${options.publicUrl}${route}\n`);
+      }
     }
   } finally {
     if (prerenderer != null) {
       prerenderer.destroy();
+    }
+
+    if (sitemap != null) {
+      sitemap.end();
+
+      await fs.writeFile(
+        path.join(__dirname, "..", "dist", "robots.txt"),
+        `sitemap: ${options.publicUrl}/sitemap.txt\n`
+      );
     }
   }
 }
