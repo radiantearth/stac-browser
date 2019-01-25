@@ -267,7 +267,8 @@ export default {
         // recommended
         identifier: this.item.id,
         keywords: this.keywords,
-        license: this._license,
+        license:
+          this._license && `https://spdx.org/licenses/${this._license}.html`,
         isBasedOn: this.url,
         url: this.path,
         includedInDataCatalog: [this.collectionLink, this.parentLink].map(
@@ -387,8 +388,7 @@ export default {
       return (
         this.properties["item:license"] ||
         (this.collection && this.collection.license) ||
-        this.rootCatalog.license ||
-        []
+        this.rootCatalog.license
       );
     },
     license() {

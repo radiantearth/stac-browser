@@ -352,8 +352,9 @@ export default {
           description: this.description,
           // recommended
           identifier: this.catalog.id,
-          keywords: this.catalog.keywords || this.rootCatalog.keywords,
-          license: this.catalog.license || this.rootCatalog.license,
+          keywords: this._keywords,
+          license:
+            this._license && `https://spdx.org/licenses/${this._license}.html`,
           isBasedOn: this.url,
           version: this.version,
           url: this.path,
@@ -401,13 +402,17 @@ export default {
 
       return dataCatalog;
     },
+    _keywords() {
+      return this.catalog.keywords || this.rootCatalog.keywords;
+    },
     keywords() {
-      return []
-        .concat(this.catalog.keywords || this.rootCatalog.keywords || [])
-        .join(", ");
+      return (this._keywords || []).join(", ");
+    },
+    _license() {
+      return this.catalog.license || this.rootCatalog.license;
     },
     license() {
-      return spdxToHTML(this.catalog.license || this.rootCatalog.license);
+      return spdxToHTML(this._license);
     },
     links() {
       // REQUIRED
