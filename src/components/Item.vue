@@ -359,6 +359,10 @@ export default {
               }) + suffix
             );
           }
+
+          if (dictionary[key].type === "eo:bands") {
+            return value.map(band => band.common_name).join(", ");
+          }
         }
 
         return value + suffix;
