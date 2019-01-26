@@ -77,7 +77,7 @@
           <div class="table-responsive">
             <table class="table">
               <tbody>
-                <template v-if="providers != null && providers.length > 0">
+                <template v-if="providers">
                   <tr>
                     <th colspan="2">
                       <h3>
