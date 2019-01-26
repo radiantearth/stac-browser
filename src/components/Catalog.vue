@@ -39,6 +39,37 @@
             </li>
           </ul>
         </template>
+
+        <div v-if="items.length > 0" class="items">
+          <b-pagination
+            v-model="currentPage"
+            :total-rows="itemCount"
+            :per-page="perPage"
+            :hide-goto-end-buttons="true"
+          />
+          <b-table
+            :items="items"
+            :fields="itemFields"
+            :per-page="perPage"
+            :current-page="currentPage"
+            :sort-compare="sortCompare"
+            :outlined="true"
+            responsive
+            small
+            striped
+          >
+            <template slot="link" slot-scope="data">
+              <router-link :to="data.item.to">{{ data.item.title }}</router-link>
+            </template>
+            <!-- TODO row-details w/ additional metadata + map -->
+          </b-table>
+          <b-pagination
+            v-model="currentPage"
+            :total-rows="itemCount"
+            :per-page="perPage"
+            :hide-goto-end-buttons="true"
+          />
+        </div>
       </b-col>
       <b-col v-if="keywords.length > 0 || license != null" md="4">
         <b-card title="Catalog Information" bg-variant="light">
@@ -95,39 +126,6 @@
             </table>
           </div>
         </b-card>
-      </b-col>
-    </b-row>
-
-    <b-row v-if="items.length > 0" class="items">
-      <b-col md="12">
-        <b-pagination
-          v-model="currentPage"
-          :total-rows="itemCount"
-          :per-page="perPage"
-          :hide-goto-end-buttons="true"
-        />
-        <b-table
-          :items="items"
-          :fields="itemFields"
-          :per-page="perPage"
-          :current-page="currentPage"
-          :sort-compare="sortCompare"
-          :outlined="true"
-          responsive
-          small
-          striped
-        >
-          <template slot="link" slot-scope="data">
-            <router-link :to="data.item.to">{{ data.item.title }}</router-link>
-          </template>
-          <!-- TODO row-details w/ additional metadata + map -->
-        </b-table>
-        <b-pagination
-          v-model="currentPage"
-          :total-rows="itemCount"
-          :per-page="perPage"
-          :hide-goto-end-buttons="true"
-        />
       </b-col>
     </b-row>
   </b-container>
@@ -668,7 +666,7 @@ ul.items {
   background-color: #262626;
 }
 
-.row.items {
+div.items {
   margin-top: 25px;
 }
 
