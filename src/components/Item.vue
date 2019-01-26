@@ -367,8 +367,18 @@ export default {
           }
 
           if (dictionary[key].type === "eo:bands") {
-            return value.map(band => band.common_name).join(", ");
+            return value
+              .map(band => band.description || band.common_name)
+              .join(", ");
           }
+        }
+
+        if (Array.isArray(value)) {
+          return value.map(v => JSON.stringify(v));
+        }
+
+        if (typeof value === "object") {
+          return JSON.stringify(value);
         }
 
         return value + suffix;

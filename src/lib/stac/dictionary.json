@@ -119,8 +119,11 @@
   "dg:catalog_id": "DigitalGlobe ID",
   "dg:platform": "Platform",
   "dg:product_level": "Product level",
-  "landsat:product_id": "Landsat product ID",
-  "landsat:scene_id": "Landsat scene ID",
-  "landsat:processing_level": "Landsat processing level",
-  "landsat:tier": "Landsat tier"
+  "landsat:product_id": "Product ID",
+  "landsat:scene_id": "Scene ID",
+  "landsat:processing_level": "Processing level",
+  "landsat:tier": "Tier",
+  "gee:type": "Type",
+  "gee:cadence": "Cadence",
+  "gee:asset_schema": "Asset schema"
 }

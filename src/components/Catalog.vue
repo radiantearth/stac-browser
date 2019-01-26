@@ -122,6 +122,12 @@
                   <td class="title">Temporal Extent</td>
                   <td>{{ temporalExtent }}</td>
                 </tr>
+                <tr v-for="prop in propertyList" :key="prop.key">
+                  <td class="title">
+                    <span :title="prop.key">{{ prop.label }}</span>
+                  </td>
+                  <td>{{ prop.value }}</td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -139,6 +145,8 @@ import Leaflet from "leaflet";
 import isEqual from "lodash.isequal";
 import spdxToHTML from "spdx-to-html";
 import { mapActions, mapGetters } from "vuex";
+
+import dictionary from "../lib/stac/dictionary.json";
 
 const MARKDOWN_READER = new Parser({
   smart: true
@@ -415,6 +423,60 @@ export default {
       }
 
       return dataCatalog;
+    },
+    propertyList() {
+      const label = key => {
+        if (typeof dictionary[key] === "object") {
+          return dictionary[key].label;
+        }
+
+        return dictionary[key] || key;
+      };
+
+      const format = (key, value) => {
+        let suffix = "";
+
+        if (typeof dictionary[key] === "object") {
+          if (dictionary[key].suffix != null) {
+            suffix = dictionary[key].suffix;
+          }
+
+          if (dictionary[key].type === "date") {
+            return (
+              new Date(value).toLocaleString([], {
+                timeZone: "UTC",
+                timeZoneName: "short"
+              }) + suffix
+            );
+          }
+
+          if (dictionary[key].type === "eo:bands") {
+            return value
+              .map(band => band.description || band.common_name)
+              .join(", ");
+          }
+        }
+
+        if (Array.isArray(value)) {
+          return value.map(v => JSON.stringify(v));
+        }
+
+        if (typeof value === "object") {
+          return JSON.stringify(value);
+        }
+
+        return value + suffix;
+      };
+
+      const props = this.catalog.properties || {};
+
+      return Object.keys(props)
+        .filter(k => props[k] != null)
+        .map(key => ({
+          key,
+          label: label(key),
+          value: format(key, props[key])
+        }));
     },
     _keywords() {
       // [].concat() is a work-around for catalogs where keywords is a string (SpaceNet)
