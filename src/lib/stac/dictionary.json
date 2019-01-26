@@ -118,5 +118,9 @@
   "cbers:row": "CBERS Row",
   "dg:catalog_id": "DigitalGlobe ID",
   "dg:platform": "Platform",
-  "dg:product_level": "Product level"
+  "dg:product_level": "Product level",
+  "landsat:product_id": "Landsat product ID",
+  "landsat:scene_id": "Landsat scene ID",
+  "landsat:processing_level": "Landsat processing level",
+  "landsat:tier": "Landsat tier"
 }
