@@ -453,7 +453,7 @@ export default {
 
           if (dictionary[key].type === "eo:bands") {
             return value
-              .map(band => band.description || band.common_name)
+              .map(band => band.description || band.common_name || band.name)
               .join(", ");
           }
         }
