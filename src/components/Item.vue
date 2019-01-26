@@ -267,8 +267,7 @@ export default {
         // recommended
         identifier: this.item.id,
         keywords: this.keywords,
-        license:
-          this._license && `https://spdx.org/licenses/${this._license}.html`,
+        license: this.licenseUrl,
         isBasedOn: this.url,
         url: this.path,
         includedInDataCatalog: [this.collectionLink, this.parentLink].filter(x => !!x).map(
@@ -396,7 +395,30 @@ export default {
       );
     },
     license() {
+      if (this._license === "proprietary") {
+        if (this.licenseUrl != null) {
+          return `<a href="${this.licenseUrl}">${this._license}</a>`;
+        }
+
+        return this._license;
+      }
+
       return spdxToHTML(this._license);
+    },
+    licenseUrl() {
+      if (this._license === "proprietary") {
+        return this.links
+          .concat(
+            ((this.collection && this.collection.links) || []).concat(
+              (this.rootCatalog && this.rootCatalog.links) || []
+            )
+          )
+          .filter(x => x.rel === "license")
+          .map(x => x.href)
+          .pop();
+      }
+
+      return `https://spdx.org/licenses/${this._license}.html`;
     },
     licensor() {
       return this.providers

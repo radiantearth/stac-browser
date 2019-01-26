@@ -363,8 +363,7 @@ export default {
           // recommended
           identifier: this.catalog.id,
           keywords: this._keywords,
-          license:
-            this._license && `https://spdx.org/licenses/${this._license}.html`,
+          license: this.licenseUrl,
           isBasedOn: this.url,
           version: this.version,
           url: this.path,
@@ -429,7 +428,26 @@ export default {
       );
     },
     license() {
+      if (this._license === "proprietary") {
+        if (this.licenseUrl != null) {
+          return `<a href="${this.licenseUrl}">${this._license}</a>`;
+        }
+
+        return this._license;
+      }
+
       return spdxToHTML(this._license);
+    },
+    licenseUrl() {
+      if (this._license === "proprietary") {
+        return this.links
+          .concat((this.rootCatalog && this.rootCatalog.links) || [])
+          .filter(x => x.rel === "license")
+          .map(x => x.href)
+          .pop();
+      }
+
+      return `https://spdx.org/licenses/${this._license}.html`;
     },
     links() {
       // REQUIRED
