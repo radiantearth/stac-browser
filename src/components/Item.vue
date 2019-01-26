@@ -381,11 +381,13 @@ export default {
         ...this.item.properties
       };
 
-      return Object.keys(props).map(key => ({
-        key,
-        label: label(key),
-        value: format(key, props[key])
-      }));
+      return Object.keys(props)
+        .filter(k => props[k] != null)
+        .map(key => ({
+          key,
+          label: label(key),
+          value: format(key, props[key])
+        }));
     },
     keywords() {
       return (
