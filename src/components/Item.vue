@@ -271,7 +271,7 @@ export default {
           this._license && `https://spdx.org/licenses/${this._license}.html`,
         isBasedOn: this.url,
         url: this.path,
-        includedInDataCatalog: [this.collectionLink, this.parentLink].map(
+        includedInDataCatalog: [this.collectionLink, this.parentLink].filter(x => !!x).map(
           l => ({
             isBasedOn: l.href,
             url: l.slug
@@ -281,7 +281,7 @@ export default {
           "@type": "Place",
           geo: {
             "@type": "GeoShape",
-            box: this.item.bbox.join(" ")
+            box: (this.item.bbox || []).join(" ")
           }
         },
         temporalCoverage: this.properties.datetime,

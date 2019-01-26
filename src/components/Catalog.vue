@@ -30,25 +30,8 @@
         </p>
         <!-- eslint-disable-next-line vue/no-v-html vue/max-attributes-per-line -->
         <div v-if="description" v-html="description"/>
-        <template v-if="providers != null && providers.length > 0">
-          <h2>Provider
-            <template v-if="providers.length > 1">s</template>
-          </h2>
-          <dl>
-            <template v-for="provider in providers">
-              <dt :key="provider.url">
-                <a :href="provider.url">{{ provider.name }}</a> (
-                <em>{{ (provider.roles || []).join(", ") }}</em>)
-              </dt>
-              <!-- eslint-disable-next-line vue/no-v-html vue/max-attributes-per-line -->
-              <dd :key="provider.name" v-html="provider.description"/>
-            </template>
-          </dl>
-        </template>
 
         <template v-if="children.length > 0">
-          <hr>
-
           <h3>Catalogs</h3>
           <ul class="links">
             <li v-for="child in children" :key="child.path">
@@ -58,11 +41,35 @@
         </template>
       </b-col>
       <b-col v-if="keywords.length > 0 || license != null" md="4">
-        <b-card title="Catalog Information" bg-variant="light" class="float-right">
+        <b-card title="Catalog Information" bg-variant="light">
           <div v-if="spatialExtent" id="locator-map"/>
           <div class="table-responsive">
             <table class="table">
               <tbody>
+                <template v-if="providers != null && providers.length > 0">
+                  <tr>
+                    <th colspan="2">
+                      <h3>
+                        <template v-if="providers.length === 1">Provider</template>
+                        <template v-if="providers.length !== 1">Providers</template>
+                      </h3>
+                    </th>
+                  </tr>
+                  <template v-for="(provider, index) in providers">
+                    <tr :key="provider.url + index">
+                      <td colspan="2" class="provider">
+                        <a :href="provider.url">{{ provider.name }}</a>
+                        <em>({{ (provider.roles || []).join(", ") }})</em>
+                      </td>
+                    </tr>
+                    <!-- eslint-disable-next-line vue/no-v-html vue/max-attributes-per-line -->
+                    <tr
+                      v-if="provider.description"
+                      :key="provider.name + index"
+                      v-html="provider.description"
+                    />
+                  </template>
+                </template>
                 <tr>
                   <td class="title">STAC Version</td>
                   <td>{{ stacVersion }}</td>
@@ -78,7 +85,7 @@
                 </tr>
                 <tr v-if="spatialExtent">
                   <td class="title">Spatial Extent</td>
-                  <td>{{ spatialExtent }}</td>
+                  <td>{{ spatialExtent.join(", ") }}</td>
                 </tr>
                 <tr v-if="temporalExtent">
                   <td class="title">Temporal Extent</td>
@@ -91,9 +98,8 @@
       </b-col>
     </b-row>
 
-    <b-row v-if="items.length > 0">
+    <b-row v-if="items.length > 0" class="items">
       <b-col md="12">
-        <h3>Items</h3>
         <b-pagination
           v-model="currentPage"
           :total-rows="itemCount"
@@ -255,7 +261,11 @@ export default {
       return this.catalog.id;
     },
     extent() {
-      return this.catalog.extent || this.rootCatalog.extent || {};
+      return (
+        this.catalog.extent ||
+        (this.rootCatalog && this.rootCatalog.extent) ||
+        {}
+      );
     },
     itemCount() {
       return this.links.filter(x => x.rel === "item").length;
@@ -403,13 +413,20 @@ export default {
       return dataCatalog;
     },
     _keywords() {
-      return this.catalog.keywords || this.rootCatalog.keywords;
+      // [].concat() is a work-around for catalogs where keywords is a string (SpaceNet)
+      return [].concat(
+        this.catalog.keywords ||
+          (this.rootCatalog && this.rootCatalog.keywords) ||
+          []
+      );
     },
     keywords() {
       return (this._keywords || []).join(", ");
     },
     _license() {
-      return this.catalog.license || this.rootCatalog.license;
+      return (
+        this.catalog.license || (this.rootCatalog && this.rootCatalog.license)
+      );
     },
     license() {
       return spdxToHTML(this._license);
@@ -419,14 +436,16 @@ export default {
       return this.catalog.links;
     },
     providers() {
-      return (this.catalog.providers || this.rootCatalog.providers || []).map(
-        x => ({
-          ...x,
-          description: MARKDOWN_WRITER.render(
-            MARKDOWN_READER.parse(x.description || "")
-          )
-        })
-      );
+      return (
+        this.catalog.providers ||
+        (this.rootCatalog && this.rootCatalog.providers) ||
+        []
+      ).map(x => ({
+        ...x,
+        description: MARKDOWN_WRITER.render(
+          MARKDOWN_READER.parse(x.description || "")
+        )
+      }));
     },
     rootCatalog() {
       const rootLink = this.links.find(x => x.rel === "root");
@@ -589,8 +608,20 @@ h4 {
   font-weight: bold;
 }
 
+.table th {
+  border-top: none;
+  border-bottom: 1px solid #dee2e6;
+}
+
+td.provider {
+  border: none;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
 td.title {
   font-weight: bold;
+  width: 40%;
 }
 
 ul.links,
@@ -602,6 +633,10 @@ ul.items {
 
 .leaflet-container {
   background-color: #262626;
+}
+
+.row.items {
+  margin-top: 25px;
 }
 
 #locator-map {

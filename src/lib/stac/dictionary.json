@@ -115,5 +115,8 @@
   },
   "cbers:data_type": "Data type",
   "cbers:path": "CBERS Path",
-  "cbers:row": "CBERS Row"
+  "cbers:row": "CBERS Row",
+  "dg:catalog_id": "DigitalGlobe ID",
+  "dg:platform": "Platform",
+  "dg:product_level": "Product level"
 }
