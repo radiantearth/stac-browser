@@ -270,12 +270,12 @@ export default {
         license: this.licenseUrl,
         isBasedOn: this.url,
         url: this.path,
-        includedInDataCatalog: [this.collectionLink, this.parentLink].filter(x => !!x).map(
-          l => ({
+        includedInDataCatalog: [this.collectionLink, this.parentLink]
+          .filter(x => !!x)
+          .map(l => ({
             isBasedOn: l.href,
             url: l.slug
-          })
-        ),
+          })),
         spatialCoverage: {
           "@type": "Place",
           geo: {
