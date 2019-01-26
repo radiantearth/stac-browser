@@ -125,5 +125,10 @@
   "landsat:tier": "Tier",
   "gee:type": "Type",
   "gee:cadence": "Cadence",
-  "gee:asset_schema": "Asset schema"
+  "gee:asset_schema": "Asset schema",
+  "sentinel:utm_zone": "UTM zone",
+  "sentinel:latitude_band": "Latitude band",
+  "sentinel:grid_square": "Grid square",
+  "sentinel:sequence": "Sequence",
+  "sentinel:product_id": "Product ID"
 }
