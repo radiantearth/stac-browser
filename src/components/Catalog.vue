@@ -259,7 +259,8 @@ export default {
       return this.catalog.links.filter(x => x.rel === "child").map(child => ({
         path: child.href,
         slug: this.slugify(this.resolve(child.href, this.url)),
-        title: child.title || child.href,
+        // child.id is a workaround for https://earthengine-stac.storage.googleapis.com/catalog/catalog.json
+        title: child.title || child.id || child.href,
         url: this.resolve(child.href, this.url)
       }));
     },
