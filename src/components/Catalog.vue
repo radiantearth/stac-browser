@@ -622,6 +622,14 @@ export default {
 </script>
 
 <style scoped lang="css">
+h3 {
+  margin-top: 25px;
+}
+
+th h3 {
+  margin-top: 0;
+}
+
 h4 {
   font-weight: bold;
 }
