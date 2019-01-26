@@ -223,7 +223,14 @@ export default {
       });
     },
     item() {
-      return this.getEntity(this.url);
+      const item = this.getEntity(this.url);
+
+      if (item instanceof Error) {
+        this.$router.replace("/");
+        return;
+      }
+
+      return item;
     },
     cog() {
       // TODO find all relevant sources and surface in a dropdown

@@ -224,6 +224,17 @@ const main = async () => {
       getEntity: state => uri => state.entities[uri]
     },
     mutations: {
+      FAILED(state, { err, url }) {
+        state.entities = {
+          ...state.entities,
+          [url]: err
+        };
+
+        state.loading = {
+          ...state.loading,
+          [url]: false
+        };
+      },
       LOADING(state, url) {
         state.loading = {
           ...state.loading,
@@ -251,9 +262,15 @@ const main = async () => {
 
         commit("LOADING", url);
 
-        const entity = await (await fetch(url)).json();
+        try {
+          const entity = await (await fetch(url)).json();
 
-        commit("LOADED", { entity, url });
+          commit("LOADED", { entity, url });
+        } catch (err) {
+          console.warn(err);
+
+          commit("FAILED", { err, url });
+        }
       }
     },
     strict: process.env.NODE_ENV !== "production"

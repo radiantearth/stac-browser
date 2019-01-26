@@ -240,7 +240,14 @@ export default {
       });
     },
     catalog() {
-      return this.getEntity(this.url);
+      const catalog = this.getEntity(this.url);
+
+      if (catalog instanceof Error) {
+        this.$router.replace("/");
+        return;
+      }
+
+      return catalog;
     },
     children() {
       return this.catalog.links.filter(x => x.rel === "child").map(child => ({
