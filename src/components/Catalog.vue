@@ -31,27 +31,51 @@
         <!-- eslint-disable-next-line vue/no-v-html vue/max-attributes-per-line -->
         <div v-if="description" v-html="description"/>
 
-        <template v-if="children.length > 0">
+        <template v-if="childCount > 0">
           <h3>Catalogs</h3>
-          <ul class="links">
-            <li v-for="child in children" :key="child.path">
-              <router-link :to="child.slug" append>{{ child.title }}</router-link>
-            </li>
-          </ul>
+          <b-pagination
+            v-if="childCount > childrenPerPage"
+            v-model="currentChildPage"
+            :total-rows="childCount"
+            :per-page="childrenPerPage"
+            :hide-goto-end-buttons="true"
+          />
+          <b-table
+            :items="children"
+            :fields="childFields"
+            :per-page="childrenPerPage"
+            :current-page="currentChildPage"
+            :outlined="true"
+            responsive
+            small
+            striped
+          >
+            <template slot="link" slot-scope="data">
+              <router-link :to="data.item.slug">{{ data.item.title }}</router-link>
+            </template>
+          </b-table>
+          <b-pagination
+            v-if="childCount > childrenPerPage"
+            v-model="currentChildPage"
+            :total-rows="childCount"
+            :per-page="childrenPerPage"
+            :hide-goto-end-buttons="true"
+          />
         </template>
 
-        <div v-if="items.length > 0" class="items">
+        <div v-if="itemCount > 0" class="items">
           <b-pagination
-            v-model="currentPage"
+            v-if="itemCount > itemsPerPage"
+            v-model="currentItemPage"
             :total-rows="itemCount"
-            :per-page="perPage"
+            :per-page="itemsPerPage"
             :hide-goto-end-buttons="true"
           />
           <b-table
             :items="items"
             :fields="itemFields"
-            :per-page="perPage"
-            :current-page="currentPage"
+            :per-page="itemsPerPage"
+            :current-page="currentItemPage"
             :sort-compare="sortCompare"
             :outlined="true"
             responsive
@@ -64,9 +88,10 @@
             <!-- TODO row-details w/ additional metadata + map -->
           </b-table>
           <b-pagination
-            v-model="currentPage"
+            v-if="itemCount > itemsPerPage"
+            v-model="currentItemPage"
             :total-rows="itemCount"
-            :per-page="perPage"
+            :per-page="itemsPerPage"
             :hide-goto-end-buttons="true"
           />
         </div>
@@ -174,6 +199,14 @@ export default {
   },
   data() {
     return {
+      childFields: {
+        link: {
+          label: "Title",
+          sortable: true
+        }
+      },
+      currentChildPage: 1,
+      childrenPerPage: 25,
       itemFields: {
         link: {
           label: "Title",
@@ -188,8 +221,8 @@ export default {
           }
         }
       },
-      currentPage: 1,
-      perPage: 25,
+      currentItemPage: 1,
+      itemsPerPage: 25,
       locatorMap: null,
       validationErrors: null
     };
@@ -211,8 +244,11 @@ export default {
     catalog() {
       return this.entity;
     },
+    childCount() {
+      return this.links.filter(x => x.rel === "child").length;
+    },
     children() {
-      return this.catalog.links.filter(x => x.rel === "child").map(child => ({
+      return this.links.filter(x => x.rel === "child").map(child => ({
         path: child.href,
         slug: this.slugify(this.resolve(child.href, this.url)),
         // child.id is a workaround for https://earthengine-stac.storage.googleapis.com/catalog/catalog.json
@@ -488,6 +524,7 @@ export default {
 <style scoped lang="css">
 h3 {
   margin-top: 25px;
+  margin-bottom: 25px;
 }
 
 th h3 {
