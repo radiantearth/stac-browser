@@ -111,42 +111,16 @@
 <script>
 import path from "path";
 
-import clone from "clone";
-import jsonQuery from "json-query";
 import escape from "lodash.escape";
 import isEqual from "lodash.isequal";
 import Leaflet from "leaflet";
 import "leaflet-easybutton";
-import spdxToHTML from "spdx-to-html";
 import { mapActions, mapGetters } from "vuex";
 
-import dictionary from "../lib/stac/dictionary.json";
-
+import common from "./common";
 export default {
+  ...common,
   name: "ItemDetail",
-  metaInfo() {
-    return {
-      meta: [
-        {
-          name: "google-site-verification",
-          content: process.env.GOOGLE_SITE_VERIFICATION
-        }
-      ].filter(({ content }) => content != null),
-      script: [
-        { innerHTML: JSON.stringify(this.jsonLD), type: "application/ld+json" },
-        {
-          innerHTML: JSON.stringify({
-            path: this.path
-          }),
-          class: "state",
-          type: "application/json"
-        }
-      ],
-      __dangerouslyDisableSanitizers: ["script"],
-      title: this.title,
-      titleTemplate: "%s ⸬ STAC Browser"
-    };
-  },
   props: {
     ancestors: {
       type: Array,
@@ -202,135 +176,48 @@ export default {
     };
   },
   computed: {
+    ...common.computed,
     ...mapGetters(["getEntity"]),
-    loaded() {
-      return this.item != null;
+    _collectionLinks() {
+      return this.links.filter(x => x.rel === "collection");
     },
-    breadcrumbs() {
-      // create slugs for everything except the root
-      const slugs = this.ancestors.slice(1).map(this.slugify);
-
-      return this.ancestors.map((uri, idx) => {
-        const entity = this.getEntity(uri);
-
-        // use all previous slugs to construct a path to this entity
-        let to = "/" + slugs.slice(0, idx).join("/");
-
-        if (entity != null) {
-          return {
-            to,
-            text: entity.title || entity.id
-          };
-        }
-
-        return {
-          to
-        };
-      });
+    _description() {
+      return this._properties.description;
     },
-    item() {
-      const item = this.getEntity(this.url);
-
-      if (item instanceof Error) {
-        this.$router.replace("/");
-        return;
-      }
-
-      return item;
+    _keywords() {
+      return (
+        (this.collection && this.collection.keywords) ||
+        common.computed._keywords.apply(this)
+      );
     },
-    cog() {
-      // TODO find all relevant sources and surface in a dropdown
-      const cog = this.assets
-        .filter(x => x.type === "image/vnd.stac.geotiff; cloud-optimized=true")
-        // prefer COGs with "visual" key
-        .sort((a, b) => a.key.indexOf("visual") - b.key.indexOf("visual"))
-        .pop();
-
-      if (cog != null) {
-        return this.resolve(cog.href, this.url);
-      }
+    _license() {
+      return (
+        this._properties["item:license"] ||
+        (this.collection && this.collection.license) ||
+        (this.rootCatalog && this.rootCatalog.license)
+      );
     },
-    thumbnail() {
-      const thumbnail = this.assets.find(x => x.key === "thumbnail");
-
-      if (thumbnail != null) {
-        return this.resolve(thumbnail.href, this.url);
-      }
-    },
-    tileSource() {
-      if (this.cog == null) {
-        return "";
-      }
-
-      // TODO global config
-      return `https://tiles.rdnt.io/tiles/{z}/{x}/{y}@2x?url=${encodeURIComponent(
-        this.cog
-      )}`;
-      // return `http://localhost:8000/tiles/{z}/{x}/{y}@2x?url=${encodeURIComponent(
-      //   this.cog
-      // )}`;
+    _providers() {
+      return (
+        this._properties["item:providers"] ||
+        (this.collection && this.collection.providers) ||
+        common.computed._providers.apply(this)
+      );
     },
     _temporalCoverage() {
-      if (this.properties["dtr:start_datetime"] != null) {
+      if (this._properties["dtr:start_datetime"] != null) {
         return [
-          this.properties["dtr:start_datetime"],
-          this.properties["dtr:end_datetime"]
+          this._properties["dtr:start_datetime"],
+          this._properties["dtr:end_datetime"]
         ]
           .map(x => x || "..")
           .join("/");
       }
 
-      return this.properties.datetime;
+      return this._properties.datetime;
     },
-    jsonLD() {
-      const dataset = {
-        "@context": "https://schema.org/",
-        "@type": "Dataset",
-        // required
-        name: this.title,
-        description: this.properties.description,
-        // recommended
-        citation: this.properties["sci:citation"],
-        identifier: this.properties["sci:doi"] || this.item.id,
-        keywords: this.keywords,
-        license: this.licenseUrl,
-        isBasedOn: this.url,
-        url: this.path,
-        workExample: (this.properties["sci:publications"] || []).map(p => ({
-          identifier: p.doi,
-          citation: p.citation
-        })),
-        includedInDataCatalog: [this.collectionLink, this.parentLink]
-          .filter(x => !!x)
-          .map(l => ({
-            isBasedOn: l.href,
-            url: l.slug
-          })),
-        spatialCoverage: {
-          "@type": "Place",
-          geo: {
-            "@type": "GeoShape",
-            box: (this.item.bbox || []).join(" ")
-          }
-        },
-        temporalCoverage: this._temporalCoverage,
-        distribution: this.assets.map(a => ({
-          contentUrl: a.href,
-          fileFormat: a.type,
-          name: a.title
-        })),
-        image: this.thumbnail
-      };
-
-      return dataset;
-    },
-    links() {
-      if (typeof this.item.links === "object") {
-        // previous STAC version specified links as an object
-        return Object.values(this.item.links);
-      }
-
-      return this.item.links || [];
+    _title() {
+      return this._properties.title;
     },
     assets() {
       return (
@@ -363,104 +250,91 @@ export default {
           })
       );
     },
-    propertyList() {
-      const label = key => {
-        if (typeof dictionary[key] === "object") {
-          return dictionary[key].label;
-        }
+    attribution() {
+      // TODO load attribution from rel=collection
+      return null;
+      // return `Imagery ${this.properties.license || ""} ${
+      //   this.properties.provider
+      // }`;
 
-        return dictionary[key] || key;
-      };
-
-      const format = (key, value) => {
-        let suffix = "";
-
-        if (typeof dictionary[key] === "object") {
-          if (dictionary[key].suffix != null) {
-            suffix = dictionary[key].suffix;
-          }
-
-          if (dictionary[key].type === "date") {
-            return (
-              new Date(value).toLocaleString([], {
-                timeZone: "UTC",
-                timeZoneName: "short"
-              }) + suffix
-            );
-          }
-
-          if (dictionary[key].type === "eo:bands") {
-            return value
-              .map(band => band.description || band.common_name || band.name)
-              .join(", ");
-          }
-        }
-
-        if (Array.isArray(value)) {
-          return value.map(v => JSON.stringify(v));
-        }
-
-        if (typeof value === "object") {
-          return JSON.stringify(value);
-        }
-
-        return value + suffix;
-      };
-
-      const collectionProps = this.collection && this.collection.properties;
-
-      const props = {
-        ...collectionProps,
-        ...this.item.properties
-      };
-
-      return Object.keys(props)
-        .filter(k => props[k] != null)
-        .map(key => ({
-          key,
-          label: label(key),
-          value: format(key, props[key])
-        }));
+      // TODO license + provider may not be present
+      // TODO license may be an object
+      // attributionControl.addAttribution(
+      //   `Imagery ${this.properties.license || ""} ${this.properties.provider}`
+      // );
     },
-    keywords() {
-      return (
-        (this.collection && this.collection.keywords) ||
-        this.rootCatalog.keywords ||
-        []
-      );
-    },
-    _license() {
-      return (
-        this.properties["item:license"] ||
-        (this.collection && this.collection.license) ||
-        this.rootCatalog.license
-      );
-    },
-    license() {
-      if (this._license === "proprietary") {
-        if (this.licenseUrl != null) {
-          return `<a href="${this.licenseUrl}">${this._license}</a>`;
-        }
+    cog() {
+      // TODO find all relevant sources and surface in a dropdown
+      const cog = this.assets
+        .filter(x => x.type === "image/vnd.stac.geotiff; cloud-optimized=true")
+        // prefer COGs with "visual" key
+        .sort((a, b) => a.key.indexOf("visual") - b.key.indexOf("visual"))
+        .pop();
 
-        return this._license;
+      if (cog != null) {
+        return this.resolve(cog.href, this.url);
       }
-
-      return spdxToHTML(this._license);
     },
-    licenseUrl() {
-      if (this._license === "proprietary") {
-        return this.links
-          .concat(
-            ((this.collection && this.collection.links) || []).concat(
-              (this.rootCatalog && this.rootCatalog.links) || []
-            )
-          )
-          .filter(x => x.rel === "license")
-          .map(x => x.href)
-          .pop();
-      }
+    collection() {
+      if (this.collectionLink != null) {
+        this.load(this.collectionLink.href);
 
-      return `https://spdx.org/licenses/${this._license}.html`;
+        return this.getEntity(this.collectionLink.href);
+      }
+    },
+    collectionLink() {
+      return this._collectionLinks
+        .map(x => ({
+          ...x,
+          href: this.resolve(x.href, this.url),
+          slug: this.slugify(this.resolve(x.href, this.url))
+        }))
+        .pop();
+    },
+    item() {
+      return this.entity;
+    },
+    jsonLD() {
+      const dataset = {
+        "@context": "https://schema.org/",
+        "@type": "Dataset",
+        // required
+        name: this.title,
+        description: this.description,
+        // recommended
+        citation: this._properties["sci:citation"],
+        identifier: this._properties["sci:doi"] || this.item.id,
+        keywords: this._keywords,
+        license: this.licenseUrl,
+        isBasedOn: this.url,
+        url: this.path,
+        workExample: (this._properties["sci:publications"] || []).map(p => ({
+          identifier: p.doi,
+          citation: p.citation
+        })),
+        includedInDataCatalog: [this.collectionLink, this.parentLink]
+          .filter(x => !!x)
+          .map(l => ({
+            isBasedOn: l.href,
+            url: l.slug
+          })),
+        spatialCoverage: {
+          "@type": "Place",
+          geo: {
+            "@type": "GeoShape",
+            box: (this.item.bbox || []).join(" ")
+          }
+        },
+        temporalCoverage: this._temporalCoverage,
+        distribution: this.assets.map(a => ({
+          contentUrl: a.href,
+          fileFormat: a.type,
+          name: a.title
+        })),
+        image: this.thumbnail
+      };
+
+      return dataset;
     },
     licensor() {
       return this.providers
@@ -474,45 +348,10 @@ export default {
         })
         .pop();
     },
-    providers() {
-      return (
-        this.properties["item:providers"] ||
-        (this.collection && this.collection.providers) ||
-        this.rootCatalog.providers ||
-        []
-      );
-    },
-    properties() {
-      return this.item.properties || {};
-    },
-    rootCatalog() {
-      const rootLink = this.links.find(x => x.rel === "root");
-
-      if (rootLink != null) {
-        return this.getEntity(this.resolve(rootLink.href, this.url));
+    linkToCollection() {
+      if (this.collectionLink.href != null) {
+        return `/collection/${this.slugify(this.collectionLink.href)}`;
       }
-
-      return this.getEntity(this.ancestors[0]);
-    },
-    title() {
-      return this.properties.title || this.item.id;
-    },
-    collection() {
-      if (this.collectionLink != null) {
-        this.load(this.collectionLink.href);
-
-        return this.getEntity(this.collectionLink.href);
-      }
-    },
-    collectionLink() {
-      return this.links
-        .filter(x => x.rel === "collection")
-        .map(x => ({
-          ...x,
-          href: this.resolve(x.href, this.url),
-          slug: this.slugify(this.resolve(x.href, this.url))
-        }))
-        .pop();
     },
     parentLink() {
       return this.links
@@ -524,26 +363,29 @@ export default {
         }))
         .pop();
     },
-    linkToCollection() {
-      if (this.collectionLink.href != null) {
-        return `/collection/${this.slugify(this.collectionLink.href)}`;
+    thumbnail() {
+      const thumbnail = this.assets.find(x => x.key === "thumbnail");
+
+      if (thumbnail != null) {
+        return this.resolve(thumbnail.href, this.url);
       }
     },
-    attribution() {
-      // TODO load attribution from rel=collection
-      return null;
-      // return `Imagery ${this.properties.license || ""} ${
-      //   this.properties.provider
-      // }`;
+    tileSource() {
+      if (this.cog == null) {
+        return "";
+      }
 
-      // TODO license + provider may not be present
-      // TODO license may be an object
-      // attributionControl.addAttribution(
-      //   `Imagery ${this.properties.license || ""} ${this.properties.provider}`
-      // );
+      // TODO global config
+      return `https://tiles.rdnt.io/tiles/{z}/{x}/{y}@2x?url=${encodeURIComponent(
+        this.cog
+      )}`;
+      // return `http://localhost:8000/tiles/{z}/{x}/{y}@2x?url=${encodeURIComponent(
+      //   this.cog
+      // )}`;
     }
   },
   watch: {
+    ...common.watch,
     fullscreen(to, from) {
       if (to !== from) {
         if (to) {
@@ -554,21 +396,10 @@ export default {
 
         this.map.invalidateSize();
       }
-    },
-    item(to, from) {
-      if (!isEqual(to, from)) {
-        this._validate(to);
-      }
     }
   },
-  mounted() {
-    this.initialize();
-    this._validate(this.item);
-  },
-  updated() {
-    this.initialize();
-  },
   methods: {
+    ...common.methods,
     ...mapActions(["load"]),
     initialize() {
       if (this.cog != null) {
@@ -701,23 +532,6 @@ export default {
         ...this.$route,
         hash: `${zoom}/${center.lat.toFixed(6)}/${center.lng.toFixed(6)}`
       });
-    },
-    _validate(data) {
-      const errors = this.validate(data);
-
-      if (errors != null) {
-        console.group("Validation errors");
-        errors.forEach(err => {
-          console.warn(`${err.dataPath} ${err.message}:`);
-          const { value } = jsonQuery(err.dataPath, {
-            data
-          });
-          console.warn(clone(value));
-        });
-        console.groupEnd();
-      }
-
-      this.validationErrors = errors;
     }
   }
 };

@@ -138,49 +138,14 @@
 </template>
 
 <script>
-import clone from "clone";
-import { HtmlRenderer, Parser } from "commonmark";
-import jsonQuery from "json-query";
 import Leaflet from "leaflet";
-import isEqual from "lodash.isequal";
-import spdxToHTML from "spdx-to-html";
 import { mapActions, mapGetters } from "vuex";
 
-import dictionary from "../lib/stac/dictionary.json";
-
-const MARKDOWN_READER = new Parser({
-  smart: true
-});
-const MARKDOWN_WRITER = new HtmlRenderer({
-  safe: true,
-  softbreak: "<br />"
-});
+import common from "./common";
 
 export default {
+  ...common,
   name: "Catalog",
-  metaInfo() {
-    return {
-      meta: [
-        {
-          name: "google-site-verification",
-          content: process.env.GOOGLE_SITE_VERIFICATION
-        }
-      ].filter(({ content }) => content != null),
-      script: [
-        { innerHTML: JSON.stringify(this.jsonLD), type: "application/ld+json" },
-        {
-          innerHTML: JSON.stringify({
-            path: this.path
-          }),
-          class: "state",
-          type: "application/json"
-        }
-      ],
-      __dangerouslyDisableSanitizers: ["script"],
-      title: this.title,
-      titleTemplate: "%s ⸬ STAC Browser"
-    };
-  },
   props: {
     ancestors: {
       type: Array,
@@ -230,36 +195,21 @@ export default {
     };
   },
   computed: {
+    ...common.computed,
     ...mapGetters(["getEntity"]),
-    loaded() {
-      return this.catalog != null;
+    _description() {
+      return this.catalog.description;
     },
-    breadcrumbs() {
-      // create slugs for everything except the root
-      const slugs = this.ancestors.slice(1).map(this.slugify);
-
-      return this.ancestors.map((uri, idx) => {
-        const entity = this.getEntity(uri);
-
-        // use all previous slugs to construct a path to this entity
-        let to = "/" + slugs.slice(0, idx).join("/");
-
-        return {
-          to,
-          text: entity.title || entity.id,
-          url: uri
-        };
-      });
+    _license() {
+      return (
+        this.catalog.license || (this.rootCatalog && this.rootCatalog.license)
+      );
+    },
+    _title() {
+      return this.catalog.title;
     },
     catalog() {
-      const catalog = this.getEntity(this.url);
-
-      if (catalog instanceof Error) {
-        this.$router.replace("/");
-        return;
-      }
-
-      return catalog;
+      return this.entity;
     },
     children() {
       return this.catalog.links.filter(x => x.rel === "child").map(child => ({
@@ -269,16 +219,6 @@ export default {
         title: child.title || child.id || child.href,
         url: this.resolve(child.href, this.url)
       }));
-    },
-    description() {
-      // REQUIRED
-      return MARKDOWN_WRITER.render(
-        MARKDOWN_READER.parse(this.catalog.description)
-      );
-    },
-    id() {
-      // REQUIRED
-      return this.catalog.id;
     },
     extent() {
       return (
@@ -327,8 +267,6 @@ export default {
       });
     },
     jsonLD() {
-      const properties = this.properties || {};
-
       const dataCatalog = this.providers.reduce(
         (dc, p) =>
           p.roles.reduce((dc, role) => {
@@ -383,14 +321,14 @@ export default {
           name: this.title,
           description: this.description,
           // recommended
-          citation: properties["sci:citation"],
-          identifier: properties["sci:doi"] || this.catalog.id,
+          citation: this._properties["sci:citation"],
+          identifier: this._properties["sci:doi"] || this.catalog.id,
           keywords: this._keywords,
           license: this.licenseUrl,
           isBasedOn: this.url,
           version: this.version,
           url: this.path,
-          workExample: (properties["sci:publications"] || []).map(p => ({
+          workExample: (this._properties["sci:publications"] || []).map(p => ({
             identifier: p.doi,
             citation: p.citation
           })),
@@ -438,123 +376,6 @@ export default {
 
       return dataCatalog;
     },
-    propertyList() {
-      const label = key => {
-        if (typeof dictionary[key] === "object") {
-          return dictionary[key].label;
-        }
-
-        return dictionary[key] || key;
-      };
-
-      const format = (key, value) => {
-        let suffix = "";
-
-        if (typeof dictionary[key] === "object") {
-          if (dictionary[key].suffix != null) {
-            suffix = dictionary[key].suffix;
-          }
-
-          if (dictionary[key].type === "date") {
-            return (
-              new Date(value).toLocaleString([], {
-                timeZone: "UTC",
-                timeZoneName: "short"
-              }) + suffix
-            );
-          }
-
-          if (dictionary[key].type === "eo:bands") {
-            return value
-              .map(band => band.description || band.common_name || band.name)
-              .join(", ");
-          }
-        }
-
-        if (Array.isArray(value)) {
-          return value.map(v => JSON.stringify(v));
-        }
-
-        if (typeof value === "object") {
-          return JSON.stringify(value);
-        }
-
-        return value + suffix;
-      };
-
-      const props = this.catalog.properties || {};
-
-      return Object.keys(props)
-        .filter(k => props[k] != null)
-        .map(key => ({
-          key,
-          label: label(key),
-          value: format(key, props[key])
-        }));
-    },
-    _keywords() {
-      // [].concat() is a work-around for catalogs where keywords is a string (SpaceNet)
-      return [].concat(
-        this.catalog.keywords ||
-          (this.rootCatalog && this.rootCatalog.keywords) ||
-          []
-      );
-    },
-    keywords() {
-      return (this._keywords || []).join(", ");
-    },
-    _license() {
-      return (
-        this.catalog.license || (this.rootCatalog && this.rootCatalog.license)
-      );
-    },
-    license() {
-      if (this._license === "proprietary") {
-        if (this.licenseUrl != null) {
-          return `<a href="${this.licenseUrl}">${this._license}</a>`;
-        }
-
-        return this._license;
-      }
-
-      return spdxToHTML(this._license);
-    },
-    licenseUrl() {
-      if (this._license === "proprietary") {
-        return this.links
-          .concat((this.rootCatalog && this.rootCatalog.links) || [])
-          .filter(x => x.rel === "license")
-          .map(x => x.href)
-          .pop();
-      }
-
-      return `https://spdx.org/licenses/${this._license}.html`;
-    },
-    links() {
-      // REQUIRED
-      return this.catalog.links;
-    },
-    providers() {
-      return (
-        this.catalog.providers ||
-        (this.rootCatalog && this.rootCatalog.providers) ||
-        []
-      ).map(x => ({
-        ...x,
-        description: MARKDOWN_WRITER.render(
-          MARKDOWN_READER.parse(x.description || "")
-        )
-      }));
-    },
-    rootCatalog() {
-      const rootLink = this.links.find(x => x.rel === "root");
-
-      if (rootLink != null) {
-        return this.getEntity(this.resolve(rootLink.href, this.url));
-      }
-
-      return this.getEntity(this.ancestors[0]);
-    },
     spatialExtent() {
       return this.extent.spatial;
     },
@@ -576,33 +397,12 @@ export default {
         temporal[1] ? new Date(temporal[1]).toLocaleString() : "now"
       ].join(" - ");
     },
-    title() {
-      if (this.catalog.title != null) {
-        return `${this.catalog.title} (${this.id})`;
-      }
-
-      return this.id;
-    },
     version() {
       return this.catalog.version;
     }
   },
-  watch: {
-    catalog(to, from) {
-      if (!isEqual(to, from)) {
-        this._validate(to);
-      }
-    }
-  },
-  mounted() {
-    this.initialize();
-
-    this._validate(this.catalog);
-  },
-  updated() {
-    this.initialize();
-  },
   methods: {
+    ...common.methods,
     ...mapActions(["load"]),
     initialize() {
       if (this.spatialExtent != null) {
@@ -680,23 +480,6 @@ export default {
           numeric: true
         });
       }
-    },
-    _validate(data) {
-      const errors = this.validate(data);
-
-      if (errors != null) {
-        console.group("Validation errors");
-        errors.forEach(err => {
-          console.warn(`${err.dataPath} ${err.message}:`);
-          const { value } = jsonQuery(err.dataPath, {
-            data
-          });
-          console.warn(clone(value));
-        });
-        console.groupEnd();
-      }
-
-      this.validationErrors = errors;
     }
   }
 };
