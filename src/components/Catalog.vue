@@ -167,7 +167,7 @@ export default {
             path: this.path
           }),
           class: "state",
-          type: "application/ld+json"
+          type: "application/json"
         }
       ],
       __dangerouslyDisableSanitizers: ["script"],
