@@ -112,7 +112,6 @@
 import path from "path";
 
 import escape from "lodash.escape";
-import isEqual from "lodash.isequal";
 import Leaflet from "leaflet";
 import "leaflet-easybutton";
 import { mapActions, mapGetters } from "vuex";
