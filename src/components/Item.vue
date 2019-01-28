@@ -264,6 +264,18 @@ export default {
       //   this.cog
       // )}`;
     },
+    _temporalCoverage() {
+      if (this.properties["dtr:start_datetime"] != null) {
+        return [
+          this.properties["dtr:start_datetime"],
+          this.properties["dtr:end_datetime"]
+        ]
+          .map(x => x || "..")
+          .join("/");
+      }
+
+      return this.properties.datetime;
+    },
     jsonLD() {
       const dataset = {
         "@context": "https://schema.org/",
@@ -290,7 +302,7 @@ export default {
             box: (this.item.bbox || []).join(" ")
           }
         },
-        temporalCoverage: this.properties.datetime,
+        temporalCoverage: this._temporalCoverage,
         distribution: this.assets.map(a => ({
           contentUrl: a.href,
           fileFormat: a.type,
