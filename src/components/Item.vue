@@ -251,17 +251,9 @@ export default {
       );
     },
     attribution() {
-      // TODO load attribution from rel=collection
-      return null;
-      // return `Imagery ${this.properties.license || ""} ${
-      //   this.properties.provider
-      // }`;
-
-      // TODO license + provider may not be present
-      // TODO license may be an object
-      // attributionControl.addAttribution(
-      //   `Imagery ${this.properties.license || ""} ${this.properties.provider}`
-      // );
+      if (this.license != null || this.licensor != null) {
+        return `Imagery ${this.license || ""} ${this.licensor}`;
+      }
     },
     cog() {
       // TODO find all relevant sources and surface in a dropdown
