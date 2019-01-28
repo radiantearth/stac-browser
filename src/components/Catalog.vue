@@ -321,6 +321,8 @@ export default {
       });
     },
     jsonLD() {
+      const properties = this.properties || {};
+
       const dataCatalog = this.providers.reduce(
         (dc, p) =>
           p.roles.reduce((dc, role) => {
@@ -375,12 +377,17 @@ export default {
           name: this.title,
           description: this.description,
           // recommended
-          identifier: this.catalog.id,
+          citation: properties["sci:citation"],
+          identifier: properties["sci:doi"] || this.catalog.id,
           keywords: this._keywords,
           license: this.licenseUrl,
           isBasedOn: this.url,
           version: this.version,
           url: this.path,
+          workExample: (properties["sci:publications"] || []).map(p => ({
+            identifier: p.doi,
+            citation: p.citation
+          })),
           hasPart: this.children.map(({ title: name, slug, url }) => ({
             "@type": "DataCatalog",
             name,

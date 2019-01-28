@@ -284,11 +284,16 @@ export default {
         name: this.title,
         description: this.properties.description,
         // recommended
-        identifier: this.item.id,
+        citation: this.properties["sci:citation"],
+        identifier: this.properties["sci:doi"] || this.item.id,
         keywords: this.keywords,
         license: this.licenseUrl,
         isBasedOn: this.url,
         url: this.path,
+        workExample: (this.properties["sci:publications"] || []).map(p => ({
+          identifier: p.doi,
+          citation: p.citation
+        })),
         includedInDataCatalog: [this.collectionLink, this.parentLink]
           .filter(x => !!x)
           .map(l => ({
