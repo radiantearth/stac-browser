@@ -263,9 +263,15 @@ const main = async () => {
         commit("LOADING", url);
 
         try {
-          const entity = await (await fetch(url)).json();
+          const rsp = await fetch(url);
 
-          commit("LOADED", { entity, url });
+          if (rsp.ok) {
+            const entity = await rsp.json();
+
+            commit("LOADED", { entity, url });
+          } else {
+            commit("FAILED", { err: new Error(await rsp.text()), url });
+          }
         } catch (err) {
           console.warn(err);
 
