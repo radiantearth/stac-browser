@@ -160,6 +160,12 @@ export default {
   name: "Catalog",
   metaInfo() {
     return {
+      meta: [
+        {
+          name: "google-site-verification",
+          content: process.env.GOOGLE_SITE_VERIFICATION
+        }
+      ].filter(({ content }) => content != null),
       script: [
         { innerHTML: JSON.stringify(this.jsonLD), type: "application/ld+json" },
         {
