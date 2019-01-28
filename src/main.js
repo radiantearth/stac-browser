@@ -46,7 +46,7 @@ const makeRelative = uri => {
     return uri;
   }
 
-  return path.relative(path.dirname(rootURI.pathname), localURI.pathname);
+  return path.relative(path.dirname(rootURI.path), localURI.path);
 };
 
 /**
