@@ -61,7 +61,7 @@
                   <thead>
                     <tr>
                       <th>Name</th>
-                      <th v-if="_bands.length > 0">Band(s)</th>
+                      <th v-if="bands.length > 0">Band(s)</th>
                       <th>Content-Type</th>
                     </tr>
                   </thead>
@@ -71,7 +71,7 @@
                         <!-- eslint-disable-next-line vue/max-attributes-per-line vue/no-v-html -->
                         <a :href="asset.href" :title="asset.key" v-html="asset.label"/>
                       </td>
-                      <td v-if="_bands.length > 0">{{ asset.bandNames }}</td>
+                      <td v-if="bands.length > 0">{{ asset.bandNames }}</td>
                       <td>
                         <code>{{ asset.type }}</code>
                       </td>
@@ -80,36 +80,14 @@
                 </table>
               </div>
             </b-tab>
-            <b-tab v-if="_bands.length > 0" title="Bands">
-              <!-- TODO copy this to collection pages -->
-              <div class="table-responsive assets">
-                <table class="table table-striped">
-                  <thead>
-                    <tr>
-                      <th>Name</th>
-                      <th>Common Name</th>
-                      <th>GSD (m)</th>
-                      <th>Accuracy (m)</th>
-                      <th>Center Wavelength (μm)</th>
-                      <th>
-                        <abbr title="Full width at half maximum">FWHM</abbr> (μm)
-                      </th>
-                      <th>Description</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="band in _bands" :key="band.name">
-                      <td>{{ band.name }}</td>
-                      <td>{{ band.common_name }}</td>
-                      <td>{{ band.gsd }}</td>
-                      <td>{{ band.accuracy }}</td>
-                      <td>{{ band.center_wavelength }}</td>
-                      <td>{{ band.full_width_half_max }}</td>
-                      <td>{{ band.description }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+            <b-tab v-if="bands.length > 0" title="Bands">
+              <b-table
+                :items="bands"
+                :fields="bandFields"
+                responsive
+                small
+                striped
+              />
             </b-tab>
           </b-tabs>
         </b-col>
@@ -244,18 +222,6 @@ export default {
   computed: {
     ...common.computed,
     ...mapGetters(["getEntity"]),
-    _bands() {
-      return (
-        this._properties["eo:bands"] ||
-        (this.collection &&
-          this.collection.properties &&
-          this.collection.properties["eo:bands"]) ||
-        (this.rootCatalog &&
-          this.rootCatalog.properties &&
-          this.rootCatalog.properties["eo:bands"]) ||
-        []
-      );
-    },
     _collectionLinks() {
       return this.links.filter(x => x.rel === "collection");
     },
@@ -306,7 +272,7 @@ export default {
           }))
           .map(x => ({
             ...x,
-            bands: (x["eo:bands"] || []).map(idx => this._bands[idx]),
+            bands: (x["eo:bands"] || []).map(idx => this.bands[idx]),
             title: x.title || path.basename(x.href),
             label:
               escape(x.title) ||
@@ -346,6 +312,18 @@ export default {
       if (this.license != null || this.licensor != null) {
         return `Imagery ${this.license || ""} ${this.licensor || ""}`;
       }
+    },
+    bands() {
+      return (
+        this._properties["eo:bands"] ||
+        (this.collection &&
+          this.collection.properties &&
+          this.collection.properties["eo:bands"]) ||
+        (this.rootCatalog &&
+          this.rootCatalog.properties &&
+          this.rootCatalog.properties["eo:bands"]) ||
+        []
+      );
     },
     cog() {
       return (
@@ -780,6 +758,10 @@ code {
   border-radius: 4px;
   padding: 5px 10px;
   background-color: #f9f9f9;
+}
+
+.tabs {
+  margin-top: 25px;
 }
 </style>
 

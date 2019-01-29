@@ -35,70 +35,62 @@
           <!-- eslint-disable-next-line vue/no-v-html vue/max-attributes-per-line -->
           <div v-if="description" v-html="description"/>
 
-          <template v-if="childCount > 0">
-            <h3>Catalogs</h3>
-            <b-pagination
-              v-if="childCount > childrenPerPage"
-              v-model="currentChildPage"
-              :total-rows="childCount"
-              :per-page="childrenPerPage"
-              :hide-goto-end-buttons="true"
-            />
-            <b-table
-              :items="children"
-              :fields="childFields"
-              :per-page="childrenPerPage"
-              :current-page="currentChildPage"
-              :outlined="true"
-              responsive
-              small
-              striped
-            >
-              <template slot="link" slot-scope="data">
-                <router-link :to="data.item.slug">{{ data.item.title }}</router-link>
-              </template>
-            </b-table>
-            <b-pagination
-              v-if="childCount > childrenPerPage"
-              v-model="currentChildPage"
-              :total-rows="childCount"
-              :per-page="childrenPerPage"
-              :hide-goto-end-buttons="true"
-            />
-          </template>
+          <b-tabs v-model="tabIndex">
+            <b-tab v-if="childCount > 0" title="Catalogs">
+              <b-table
+                :items="children"
+                :fields="childFields"
+                :per-page="childrenPerPage"
+                :current-page="currentChildPage"
+                :outlined="true"
+                responsive
+                small
+                striped
+              >
+                <template slot="link" slot-scope="data">
+                  <router-link :to="data.item.slug">{{ data.item.title }}</router-link>
+                </template>
+              </b-table>
+              <b-pagination
+                v-if="childCount > childrenPerPage"
+                v-model="currentChildPage"
+                :limit="15"
+                :total-rows="childCount"
+                :per-page="childrenPerPage"
+                :hide-goto-end-buttons="true"
+              />
+            </b-tab>
 
-          <div v-if="itemCount > 0" class="items">
-            <b-pagination
-              v-if="itemCount > itemsPerPage"
-              v-model="currentItemPage"
-              :total-rows="itemCount"
-              :per-page="itemsPerPage"
-              :hide-goto-end-buttons="true"
-            />
-            <b-table
-              :items="items"
-              :fields="itemFields"
-              :per-page="itemsPerPage"
-              :current-page="currentItemPage"
-              :sort-compare="sortCompare"
-              :outlined="true"
-              responsive
-              small
-              striped
-            >
-              <template slot="link" slot-scope="data">
-                <router-link :to="data.item.to">{{ data.item.title }}</router-link>
-              </template>
-              <!-- TODO row-details w/ additional metadata + map -->
-            </b-table>
-            <b-pagination
-              v-if="itemCount > itemsPerPage"
-              v-model="currentItemPage"
-              :total-rows="itemCount"
-              :per-page="itemsPerPage"
-              :hide-goto-end-buttons="true"
-            />
-          </div>
+            <b-tab v-if="hasExternalItems || itemCount > 0" title="Items">
+              <b-table
+                :items="items"
+                :fields="itemFields"
+                :per-page="itemsPerPage"
+                :current-page="currentItemPage"
+                :sort-compare="sortCompare"
+                :outlined="true"
+                responsive
+                small
+                striped
+              >
+                <template slot="link" slot-scope="data">
+                  <router-link :to="data.item.to">{{ data.item.title }}</router-link>
+                </template>
+                <!-- TODO row-details w/ additional metadata + map -->
+              </b-table>
+              <b-pagination
+                v-if="itemCount > itemsPerPage"
+                v-model="currentItemPage"
+                :limit="15"
+                :total-rows="itemCount"
+                :per-page="itemsPerPage"
+                :hide-goto-end-buttons="true"
+              />
+            </b-tab>
+            <b-tab v-if="bands.length > 0" title="Bands">
+              <b-table :items="bands" :fields="bandFields" responsive small striped/>
+            </b-tab>
+          </b-tabs>
         </b-col>
         <b-col v-if="keywords.length > 0 || license != null" md="4">
           <b-card bg-variant="light">
@@ -154,10 +146,10 @@
                   <tr v-for="prop in propertyList" :key="prop.key">
                     <td class="title">
                       <!-- eslint-disable-next-line vue/no-v-html -->
-                      <span :title="prop.key" v-html="prop.label" />
+                      <span :title="prop.key" v-html="prop.label"/>
                     </td>
                     <!-- eslint-disable-next-line vue/no-v-html -->
-                    <td v-html="prop.value" />
+                    <td v-html="prop.value"/>
                   </tr>
                 </tbody>
               </table>
@@ -178,6 +170,8 @@
 </template>
 
 <script>
+import querystring from "querystring";
+
 import Leaflet from "leaflet";
 import { mapActions, mapGetters } from "vuex";
 
@@ -241,6 +235,7 @@ export default {
       },
       currentItemPage: 1,
       locatorMap: null,
+      selectedTab: null,
       validationErrors: null
     };
   },
@@ -301,6 +296,15 @@ export default {
     },
     _title() {
       return this.catalog.title;
+    },
+    bands() {
+      return (
+        this._properties["eo:bands"] ||
+        (this.rootCatalog &&
+          this.rootCatalog.properties &&
+          this.rootCatalog.properties["eo:bands"]) ||
+        []
+      );
     },
     catalog() {
       return this.entity;
@@ -497,6 +501,51 @@ export default {
       // REQUIRED
       return this.catalog.stac_version;
     },
+    tabIndex: {
+      get: function() {
+        switch (this.selectedTab) {
+          case "catalogs":
+            return 0;
+
+          case "items":
+            return Math.max(0, 1 - this.tabOffset);
+
+          case "bands":
+            return 2 - this.tabOffset;
+        }
+      },
+      set: function(tabIndex) {
+        // wait for the DOM to update
+        this.$nextTick(() => {
+          switch (tabIndex + this.tabOffset) {
+            case 0:
+              this.selectedTab = "catalogs";
+              break;
+
+            case 1:
+              this.selectedTab = "items";
+              break;
+
+            case 2:
+              this.selectedTab = "bands";
+              break;
+          }
+        });
+      }
+    },
+    tabOffset() {
+      let offset = 0;
+
+      if (this.childCount > 0) {
+        offset++;
+      }
+
+      if (this.hasExternalItems || this.itemCount > 0) {
+        offset++;
+      }
+
+      return offset;
+    },
     temporalExtent() {
       const { temporal } = this.extent;
 
@@ -515,6 +564,35 @@ export default {
       return this.catalog.version;
     }
   },
+  watch: {
+    ...common.watch,
+    $route(to, from) {
+      if (to.hash !== from.hash) {
+        this.syncWithHash(to.hash);
+      }
+    },
+    currentChildPage(to, from) {
+      if (to !== from) {
+        this.updateHash({
+          cp: to
+        });
+      }
+    },
+    currentItemPage(to, from) {
+      if (to !== from) {
+        this.updateHash({
+          ip: to
+        });
+      }
+    },
+    selectedTab(to, from) {
+      if (to !== from) {
+        this.updateHash({
+          t: to
+        });
+      }
+    }
+  },
   methods: {
     ...common.methods,
     ...mapActions(["load"]),
@@ -522,6 +600,8 @@ export default {
       if (this.spatialExtent != null) {
         this.$nextTick(() => this.initializeLocatorMap());
       }
+
+      this.syncWithHash(this.$route.hash);
     },
     initializeLocatorMap() {
       if (this.locatorMap != null) {
@@ -594,7 +674,25 @@ export default {
           numeric: true
         });
       }
-    }
+    },
+    syncWithHash(hash) {
+      const qs = querystring.parse(hash.slice(1));
+
+      this.selectedTab = qs.t;
+      this.currentChildPage = Number(qs.cp) || this.currentChildPage;
+      this.currentItemPage = Number(qs.ip) || this.currentItemPage;
+    },
+    updateHash(updated) {
+      const qs = querystring.parse(this.$route.hash.slice(1));
+
+      this.$router.replace({
+        ...this.$route,
+        hash: querystring.stringify({
+          ...qs,
+          ...updated
+        })
+      });
+    },
   }
 };
 </script>
@@ -626,19 +724,8 @@ td.title {
   width: 40%;
 }
 
-ul.links,
-ul.items {
-  margin: 0 0 1em;
-  list-style-type: none;
-  padding: 0;
-}
-
 .leaflet-container {
   background-color: #262626;
-}
-
-div.items {
-  margin-top: 25px;
 }
 
 #locator-map {

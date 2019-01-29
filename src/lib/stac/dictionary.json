@@ -22,7 +22,7 @@
   "eo:instrument": "Instrument",
   "eo:bands": {
     "label": "Bands",
-    "type": "eo:bands"
+    "skip": true
   },
   "eo:epsg": "EPSG code",
   "eo:cloud_cover": {

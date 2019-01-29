@@ -7,6 +7,18 @@ import spdxToHTML from "spdx-to-html";
 import { mapGetters } from "vuex";
 
 import dictionary from "../lib/stac/dictionary.json";
+import { SSL_OP_TLS_BLOCK_PADDING_BUG } from "constants";
+
+const BAND_LABELS = {
+  id: "ID",
+  name: "Name",
+  common_name: "Common Name",
+  gsd: `<abbr title="Ground Sample Distance">GSD</a> (m)`,
+  accuracy: "Accuracy (m)",
+  center_wavelength: "Center Wavelength (μm)",
+  full_width_half_max: `<abbr title="Full width at half maximum">FWHM</abbr> (μm)`,
+  description: "Description"
+};
 
 const MARKDOWN_READER = new Parser({
   smart: true
@@ -72,6 +84,19 @@ export default {
         (this.rootCatalog && this.rootCatalog.providers) ||
         []
       );
+    },
+    bandFields() {
+      const example = this.bands[0];
+
+      if (example != null) {
+        return Object.keys(example).map(k => ({
+          [k]: {
+            label: BAND_LABELS[k]
+          }
+        }));
+      }
+
+      return {};
     },
     breadcrumbs() {
       // create slugs for everything except the root
@@ -151,6 +176,8 @@ export default {
       return this.entity != null;
     },
     propertyList() {
+      const skip = key => dictionary[key] && dictionary[key].skip;
+
       const label = key => {
         if (typeof dictionary[key] === "object") {
           return dictionary[key].label;
@@ -173,14 +200,6 @@ export default {
                 timeZone: "UTC",
                 timeZoneName: "short"
               }) + suffix
-            );
-          }
-
-          if (dictionary[key].type === "eo:bands") {
-            return escape(
-              value
-                .map(band => band.description || band.common_name || band.name)
-                .join(", ")
             );
           }
         }
@@ -207,6 +226,7 @@ export default {
 
       return Object.keys(props)
         .filter(k => props[k] != null)
+        .filter(k => !skip(k))
         .map(key => ({
           key,
           label: label(key),
