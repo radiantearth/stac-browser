@@ -78,7 +78,8 @@
     "label": "Y origin"
   },
   "pl:pixel_resolution": {
-    "label": "Pixel resolution"
+    "label": "Pixel resolution",
+    "suffix": "m"
   },
   "pl:provider": {
     "label": "Provider"
