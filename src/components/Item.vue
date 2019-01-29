@@ -14,24 +14,24 @@
             <div>
               <b-breadcrumb :items="breadcrumbs"/>
             </div>
-            <h1>{{ title }}</h1>
-            <p>
-              <span
-                v-if="validationErrors"
-                title="Validation errors present; please check the JavaScript Console"
-              >⚠️</span>
-              <small>
-                <code>{{ url }}</code><b-button v-clipboard="url" variant="link" size="sm"><i class="far fa-copy" /></b-button>
-              </small>
-            </p>
           </header>
         </b-col>
       </b-row>
-
-      <hr>
-
-      <div class="row">
-        <div class="col-md-8">
+      <b-row>
+        <b-col md="8">
+          <h1>{{ title }}</h1>
+          <p>
+            <span
+              v-if="validationErrors"
+              title="Validation errors present; please check the JavaScript Console"
+            >⚠️</span>
+            <small>
+              <code>{{ url }}</code>
+              <b-button v-clipboard="url" variant="link" size="sm">
+                <i class="far fa-copy"/>
+              </b-button>
+            </small>
+          </p>
           <b-tabs>
             <b-tab v-if="cog != null" title="Preview" :active="cog != null">
               <div id="map-container">
@@ -78,9 +78,9 @@
               </div>
             </b-tab>
           </b-tabs>
-        </div>
+        </b-col>
 
-        <div class="col-md-4">
+        <b-col md="4">
           <b-card bg-variant="light">
             <div id="locator-map"></div>
             <div class="table-responsive metadata">
@@ -117,8 +117,8 @@
               </table>
             </div>
           </b-card>
-        </div>
-      </div>
+        </b-col>
+      </b-row>
     </b-container>
     <footer class="footer">
       <b-container>
