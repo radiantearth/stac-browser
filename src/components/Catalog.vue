@@ -1,165 +1,174 @@
 <template>
-  <b-container :class="loaded && 'loaded'">
-    <b-row>
-      <b-col md="12">
-        <header>
-          <b-breadcrumb :items="breadcrumbs"/>
-        </header>
-      </b-col>
-    </b-row>
-    <b-row>
-      <b-col :md="keywords.length > 0 || license != null ? 8 : 12">
-        <!-- <a href="https://www.planet.com/disasterdata/">
-          <img
-            id="header_logo"
-            src="https://planet-pulse-assets-production.s3.amazonaws.com/uploads/2016/06/blog-logo.jpg"
-            alt="Powered by Planet Labs"
-            class="float-right">
-        </a>-->
-        <h1>{{ title }}</h1>
-        <p v-if="version">
-          <small>Version {{ version }}</small>
-        </p>
-        <p>
-          <template v-if="validationErrors">
-            <span title="Validation errors present; please check the JavaScript Console">⚠️</span>
+  <div>
+    <b-container :class="loaded && 'loaded'">
+      <b-row>
+        <b-col md="12">
+          <header>
+            <b-breadcrumb :items="breadcrumbs"/>
+          </header>
+        </b-col>
+      </b-row>
+      <b-row>
+        <b-col :md="keywords.length > 0 || license != null ? 8 : 12">
+          <!-- <a href="https://www.planet.com/disasterdata/">
+            <img
+              id="header_logo"
+              src="https://planet-pulse-assets-production.s3.amazonaws.com/uploads/2016/06/blog-logo.jpg"
+              alt="Powered by Planet Labs"
+              class="float-right">
+          </a>-->
+          <h1>{{ title }}</h1>
+          <p v-if="version">
+            <small>Version {{ version }}</small>
+          </p>
+          <p>
+            <template v-if="validationErrors">
+              <span title="Validation errors present; please check the JavaScript Console">⚠️</span>
+            </template>
+            <small>
+              <code>{{ url }}</code>
+            </small>
+          </p>
+          <!-- eslint-disable-next-line vue/no-v-html vue/max-attributes-per-line -->
+          <div v-if="description" v-html="description"/>
+
+          <template v-if="childCount > 0">
+            <h3>Catalogs</h3>
+            <b-pagination
+              v-if="childCount > childrenPerPage"
+              v-model="currentChildPage"
+              :total-rows="childCount"
+              :per-page="childrenPerPage"
+              :hide-goto-end-buttons="true"
+            />
+            <b-table
+              :items="children"
+              :fields="childFields"
+              :per-page="childrenPerPage"
+              :current-page="currentChildPage"
+              :outlined="true"
+              responsive
+              small
+              striped
+            >
+              <template slot="link" slot-scope="data">
+                <router-link :to="data.item.slug">{{ data.item.title }}</router-link>
+              </template>
+            </b-table>
+            <b-pagination
+              v-if="childCount > childrenPerPage"
+              v-model="currentChildPage"
+              :total-rows="childCount"
+              :per-page="childrenPerPage"
+              :hide-goto-end-buttons="true"
+            />
           </template>
-          <small>
-            <code>{{ url }}</code>
-          </small>
-        </p>
-        <!-- eslint-disable-next-line vue/no-v-html vue/max-attributes-per-line -->
-        <div v-if="description" v-html="description"/>
 
-        <template v-if="childCount > 0">
-          <h3>Catalogs</h3>
-          <b-pagination
-            v-if="childCount > childrenPerPage"
-            v-model="currentChildPage"
-            :total-rows="childCount"
-            :per-page="childrenPerPage"
-            :hide-goto-end-buttons="true"
-          />
-          <b-table
-            :items="children"
-            :fields="childFields"
-            :per-page="childrenPerPage"
-            :current-page="currentChildPage"
-            :outlined="true"
-            responsive
-            small
-            striped
-          >
-            <template slot="link" slot-scope="data">
-              <router-link :to="data.item.slug">{{ data.item.title }}</router-link>
-            </template>
-          </b-table>
-          <b-pagination
-            v-if="childCount > childrenPerPage"
-            v-model="currentChildPage"
-            :total-rows="childCount"
-            :per-page="childrenPerPage"
-            :hide-goto-end-buttons="true"
-          />
-        </template>
-
-        <div v-if="itemCount > 0" class="items">
-          <b-pagination
-            v-if="itemCount > itemsPerPage"
-            v-model="currentItemPage"
-            :total-rows="itemCount"
-            :per-page="itemsPerPage"
-            :hide-goto-end-buttons="true"
-          />
-          <b-table
-            :items="items"
-            :fields="itemFields"
-            :per-page="itemsPerPage"
-            :current-page="currentItemPage"
-            :sort-compare="sortCompare"
-            :outlined="true"
-            responsive
-            small
-            striped
-          >
-            <template slot="link" slot-scope="data">
-              <router-link :to="data.item.to">{{ data.item.title }}</router-link>
-            </template>
-            <!-- TODO row-details w/ additional metadata + map -->
-          </b-table>
-          <b-pagination
-            v-if="itemCount > itemsPerPage"
-            v-model="currentItemPage"
-            :total-rows="itemCount"
-            :per-page="itemsPerPage"
-            :hide-goto-end-buttons="true"
-          />
-        </div>
-      </b-col>
-      <b-col v-if="keywords.length > 0 || license != null" md="4">
-        <b-card title="Catalog Information" bg-variant="light">
-          <div v-if="spatialExtent" id="locator-map"/>
-          <div class="table-responsive">
-            <table class="table">
-              <tbody>
-                <template v-if="providers">
-                  <tr>
-                    <th colspan="2">
-                      <h3>
-                        <template v-if="providers.length === 1">Provider</template>
-                        <template v-if="providers.length !== 1">Providers</template>
-                      </h3>
-                    </th>
-                  </tr>
-                  <template v-for="(provider, index) in providers">
-                    <tr :key="provider.url + index">
-                      <td colspan="2" class="provider">
-                        <a :href="provider.url">{{ provider.name }}</a>
-                        <em>({{ (provider.roles || []).join(", ") }})</em>
-                      </td>
-                    </tr>
-                    <!-- eslint-disable-next-line vue/no-v-html vue/max-attributes-per-line -->
-                    <tr
-                      v-if="provider.description"
-                      :key="provider.name + index"
-                      v-html="provider.description"
-                    />
-                  </template>
-                </template>
-                <tr>
-                  <td class="title">STAC Version</td>
-                  <td>{{ stacVersion }}</td>
-                </tr>
-                <tr v-if="keywords">
-                  <td class="title">Keywords</td>
-                  <td>{{ keywords }}</td>
-                </tr>
-                <tr v-if="license">
-                  <td class="title">License</td>
-                  <!-- eslint-disable-next-line vue/no-v-html -->
-                  <td v-html="license"/>
-                </tr>
-                <tr v-if="spatialExtent">
-                  <td class="title">Spatial Extent</td>
-                  <td>{{ spatialExtent.join(", ") }}</td>
-                </tr>
-                <tr v-if="temporalExtent">
-                  <td class="title">Temporal Extent</td>
-                  <td>{{ temporalExtent }}</td>
-                </tr>
-                <tr v-for="prop in propertyList" :key="prop.key">
-                  <td class="title">
-                    <span :title="prop.key">{{ prop.label }}</span>
-                  </td>
-                  <td>{{ prop.value }}</td>
-                </tr>
-              </tbody>
-            </table>
+          <div v-if="itemCount > 0" class="items">
+            <b-pagination
+              v-if="itemCount > itemsPerPage"
+              v-model="currentItemPage"
+              :total-rows="itemCount"
+              :per-page="itemsPerPage"
+              :hide-goto-end-buttons="true"
+            />
+            <b-table
+              :items="items"
+              :fields="itemFields"
+              :per-page="itemsPerPage"
+              :current-page="currentItemPage"
+              :sort-compare="sortCompare"
+              :outlined="true"
+              responsive
+              small
+              striped
+            >
+              <template slot="link" slot-scope="data">
+                <router-link :to="data.item.to">{{ data.item.title }}</router-link>
+              </template>
+              <!-- TODO row-details w/ additional metadata + map -->
+            </b-table>
+            <b-pagination
+              v-if="itemCount > itemsPerPage"
+              v-model="currentItemPage"
+              :total-rows="itemCount"
+              :per-page="itemsPerPage"
+              :hide-goto-end-buttons="true"
+            />
           </div>
-        </b-card>
-      </b-col>
-    </b-row>
-  </b-container>
+        </b-col>
+        <b-col v-if="keywords.length > 0 || license != null" md="4">
+          <b-card title="Catalog Information" bg-variant="light">
+            <div v-if="spatialExtent" id="locator-map"/>
+            <div class="table-responsive">
+              <table class="table">
+                <tbody>
+                  <template v-if="providers">
+                    <tr>
+                      <th colspan="2">
+                        <h3>
+                          <template v-if="providers.length === 1">Provider</template>
+                          <template v-if="providers.length !== 1">Providers</template>
+                        </h3>
+                      </th>
+                    </tr>
+                    <template v-for="(provider, index) in providers">
+                      <tr :key="provider.url + index">
+                        <td colspan="2" class="provider">
+                          <a :href="provider.url">{{ provider.name }}</a>
+                          <em>({{ (provider.roles || []).join(", ") }})</em>
+                        </td>
+                      </tr>
+                      <!-- eslint-disable-next-line vue/no-v-html vue/max-attributes-per-line -->
+                      <tr
+                        v-if="provider.description"
+                        :key="provider.name + index"
+                        v-html="provider.description"
+                      />
+                    </template>
+                  </template>
+                  <tr>
+                    <td class="title">STAC Version</td>
+                    <td>{{ stacVersion }}</td>
+                  </tr>
+                  <tr v-if="keywords">
+                    <td class="title">Keywords</td>
+                    <td>{{ keywords }}</td>
+                  </tr>
+                  <tr v-if="license">
+                    <td class="title">License</td>
+                    <!-- eslint-disable-next-line vue/no-v-html -->
+                    <td v-html="license"/>
+                  </tr>
+                  <tr v-if="spatialExtent">
+                    <td class="title">Spatial Extent</td>
+                    <td>{{ spatialExtent.join(", ") }}</td>
+                  </tr>
+                  <tr v-if="temporalExtent">
+                    <td class="title">Temporal Extent</td>
+                    <td>{{ temporalExtent }}</td>
+                  </tr>
+                  <tr v-for="prop in propertyList" :key="prop.key">
+                    <td class="title">
+                      <span :title="prop.key">{{ prop.label }}</span>
+                    </td>
+                    <td>{{ prop.value }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </b-card>
+        </b-col>
+      </b-row>
+    </b-container>
+    <footer class="footer">
+      <b-container>
+        <span class="poweredby text-muted">Powered by
+          <a href="https://github.com/radiantearth/stac-browser">STAC Browser</a>
+        </span>
+      </b-container>
+    </footer>
+  </div>
 </template>
 
 <script>

@@ -1,111 +1,120 @@
 <template>
-  <b-container :class="loaded && 'loaded'">
-    <b-row>
-      <b-col md="12">
-        <header>
-          <!-- <a href="https://www.planet.com/disasterdata/">
-            <img
-              id="header_logo"
-              src="https://planet-pulse-assets-production.s3.amazonaws.com/uploads/2016/06/blog-logo.jpg"
-              alt="Powered by Planet Labs"
-              class="float-right">
-          </a>-->
-          <div>
-            <b-breadcrumb :items="breadcrumbs"/>
-          </div>
-          <h1>{{ title }}</h1>
-          <p>
-            <span
-              v-if="validationErrors"
-              title="Validation errors present; please check the JavaScript Console"
-            >⚠️</span>
-            <small>
-              <code>{{ url }}</code>
-            </small>
-          </p>
-        </header>
-      </b-col>
-    </b-row>
-
-    <hr>
-
-    <div class="row">
-      <div class="col-md-8">
-        <b-tabs>
-          <b-tab v-if="cog != null" title="Preview" :active="cog != null">
-            <div id="map-container">
-              <div id="map"></div>
+  <div>
+    <b-container :class="loaded && 'loaded'">
+      <b-row>
+        <b-col md="12">
+          <header>
+            <!-- <a href="https://www.planet.com/disasterdata/">
+              <img
+                id="header_logo"
+                src="https://planet-pulse-assets-production.s3.amazonaws.com/uploads/2016/06/blog-logo.jpg"
+                alt="Powered by Planet Labs"
+                class="float-right">
+            </a>-->
+            <div>
+              <b-breadcrumb :items="breadcrumbs"/>
             </div>
-          </b-tab>
-          <b-tab v-if="thumbnail" title="Thumbnail" :active="cog == null && thumbnail != null">
-            <a :href="thumbnail">
-              <img id="thumbnail" align="center" :src="thumbnail">
-            </a>
-          </b-tab>
-          <b-tab v-if="assets.length > 0" title="Assets" :active="cog == null && thumbnail == null">
-            <div class="table-responsive assets">
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th>Name</th>
-                    <th>Content-Type</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="asset in assets" :key="asset.key">
-                    <td>
-                      <!-- eslint-disable-next-line vue/max-attributes-per-line vue/no-v-html -->
-                      <a :href="asset.href" :title="asset.key" v-html="asset.title"/>
-                    </td>
-                    <td>
-                      <code>{{ asset.type }}</code>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </b-tab>
-        </b-tabs>
-      </div>
+            <h1>{{ title }}</h1>
+            <p>
+              <span
+                v-if="validationErrors"
+                title="Validation errors present; please check the JavaScript Console"
+              >⚠️</span>
+              <small>
+                <code>{{ url }}</code>
+              </small>
+            </p>
+          </header>
+        </b-col>
+      </b-row>
 
-      <div class="col-md-4">
-        <div id="locator-map"></div>
-        <div class="table-responsive metadata">
-          <table class="table">
-            <tbody>
-              <tr v-if="collection">
-                <td class="title">Collection</td>
-                <td>
-                  <a :href="linkToCollection">
-                    {{
-                    collection.title || "Untitled"
-                    }}
-                  </a>
-                </td>
-              </tr>
-              <tr v-if="license">
-                <td class="title">License</td>
-                <td>
-                  <!-- eslint-disable-next-line vue/no-v-html -->
-                  <span v-html="license"></span>
-                  <template v-if="licensor">by
+      <hr>
+
+      <div class="row">
+        <div class="col-md-8">
+          <b-tabs>
+            <b-tab v-if="cog != null" title="Preview" :active="cog != null">
+              <div id="map-container">
+                <div id="map"></div>
+              </div>
+            </b-tab>
+            <b-tab v-if="thumbnail" title="Thumbnail" :active="cog == null && thumbnail != null">
+              <a :href="thumbnail">
+                <img id="thumbnail" align="center" :src="thumbnail">
+              </a>
+            </b-tab>
+            <b-tab v-if="assets.length > 0" title="Assets" :active="cog == null && thumbnail == null">
+              <div class="table-responsive assets">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Content-Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="asset in assets" :key="asset.key">
+                      <td>
+                        <!-- eslint-disable-next-line vue/max-attributes-per-line vue/no-v-html -->
+                        <a :href="asset.href" :title="asset.key" v-html="asset.title"/>
+                      </td>
+                      <td>
+                        <code>{{ asset.type }}</code>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </b-tab>
+          </b-tabs>
+        </div>
+
+        <div class="col-md-4">
+          <div id="locator-map"></div>
+          <div class="table-responsive metadata">
+            <table class="table">
+              <tbody>
+                <tr v-if="collection">
+                  <td class="title">Collection</td>
+                  <td>
+                    <a :href="linkToCollection">
+                      {{
+                      collection.title || "Untitled"
+                      }}
+                    </a>
+                  </td>
+                </tr>
+                <tr v-if="license">
+                  <td class="title">License</td>
+                  <td>
                     <!-- eslint-disable-next-line vue/no-v-html -->
-                    <span v-html="licensor"></span>
-                  </template>
-                </td>
-              </tr>
-              <tr v-for="prop in propertyList" :key="prop.key">
-                <td class="title">
-                  <span :title="prop.key">{{ prop.label }}</span>
-                </td>
-                <td>{{ prop.value }}</td>
-              </tr>
-            </tbody>
-          </table>
+                    <span v-html="license"></span>
+                    <template v-if="licensor">by
+                      <!-- eslint-disable-next-line vue/no-v-html -->
+                      <span v-html="licensor"></span>
+                    </template>
+                  </td>
+                </tr>
+                <tr v-for="prop in propertyList" :key="prop.key">
+                  <td class="title">
+                    <span :title="prop.key">{{ prop.label }}</span>
+                  </td>
+                  <td>{{ prop.value }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
-    </div>
-  </b-container>
+    </b-container>
+    <footer class="footer">
+      <b-container>
+        <span class="poweredby text-muted">Powered by
+          <a href="https://github.com/radiantearth/stac-browser">STAC Browser</a>
+        </span>
+      </b-container>
+    </footer>
+  </div>
 </template>
 
 <script>
@@ -529,11 +538,18 @@ export default {
 </script>
 
 <style lang="css">
+html {
+  position: relative;
+  min-height: 100%;
+}
+
 body {
   line-height: 24px;
   color: #111;
   font-family: Arial, sans-serif;
+  margin-bottom: 40px;
 }
+
 blockquote,
 body {
   font-size: 16px;
@@ -632,12 +648,26 @@ a:visited {
 header {
   padding: 1.5em 0 0.5em;
 }
-footer {
-  padding-bottom: 3em;
-}
 code {
   color: #555;
   white-space: nowrap;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 40px;
+  line-height: 40px;
+  text-align: right;
+  font-size: 0.75em;
+}
+
+.poweredby {
+  border: 1px dotted hotpink;
+  border-radius: 4px;
+  padding: 5px 10px;
+  background-color: #f9f9f9;
 }
 </style>
 
