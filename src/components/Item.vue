@@ -43,7 +43,11 @@
                 <img id="thumbnail" align="center" :src="thumbnail">
               </a>
             </b-tab>
-            <b-tab v-if="assets.length > 0" title="Assets" :active="cog == null && thumbnail == null">
+            <b-tab
+              v-if="assets.length > 0"
+              title="Assets"
+              :active="cog == null && thumbnail == null"
+            >
               <div class="table-responsive assets">
                 <table class="table">
                   <thead>
@@ -109,7 +113,8 @@
     </b-container>
     <footer class="footer">
       <b-container>
-        <span class="poweredby text-muted">Powered by
+        <span class="poweredby text-muted">
+          Powered by
           <a href="https://github.com/radiantearth/stac-browser">STAC Browser</a>
         </span>
       </b-container>

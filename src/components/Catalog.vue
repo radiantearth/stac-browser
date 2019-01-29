@@ -163,7 +163,8 @@
     </b-container>
     <footer class="footer">
       <b-container>
-        <span class="poweredby text-muted">Powered by
+        <span class="poweredby text-muted">
+          Powered by
           <a href="https://github.com/radiantearth/stac-browser">STAC Browser</a>
         </span>
       </b-container>
