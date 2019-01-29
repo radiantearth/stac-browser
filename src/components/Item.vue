@@ -26,9 +26,9 @@
               title="Validation errors present; please check the JavaScript Console"
             >⚠️</span>
             <small>
-              <code>{{ url }}</code>
-              <b-button v-clipboard="url" variant="link" size="sm">
-                <i class="far fa-copy"/>
+              <b-button v-clipboard="url" variant="link" size="sm" class="clipboard">
+                <i class="far fa-copy"/>&nbsp;
+                <code>{{ url }}</code>
               </b-button>
             </small>
           </p>
@@ -689,6 +689,14 @@ header {
 code {
   color: #555;
   white-space: nowrap;
+}
+
+.btn code {
+  font-size: 10.5px;
+}
+
+.btn.clipboard:hover {
+  text-decoration: none;
 }
 
 .footer {
