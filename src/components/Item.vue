@@ -123,11 +123,11 @@
                   <tr v-if="collection">
                     <td class="title">Collection</td>
                     <td>
-                      <a :href="linkToCollection">
+                      <router-link :to="linkToCollection">
                         {{
                         collection.title || "Untitled"
                         }}
-                      </a>
+                      </router-link>
                     </td>
                   </tr>
                   <tr v-if="license">
