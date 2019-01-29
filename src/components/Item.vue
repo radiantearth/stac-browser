@@ -663,7 +663,7 @@ export default {
       if (query.si != null) {
         this.selectedImage = this.cogs[query.si];
       } else {
-        this.selectedImage = null;
+        this.selectedImage = this.cog;
       }
 
       this.fullscreen = [true, "true"].includes(query.fullscreen);
