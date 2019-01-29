@@ -8,6 +8,7 @@ import AsyncComputed from "vue-async-computed";
 import BootstrapVue from "bootstrap-vue";
 import bs58 from "bs58";
 import Meta from "vue-meta";
+import Multiselect from "vue-multiselect";
 import pMap from "p-map";
 import Vue from "vue";
 import VueRouter from "vue-router";
@@ -16,6 +17,7 @@ import Vuex from "vuex";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
 import "leaflet/dist/leaflet.css";
+import "vue-multiselect/dist/vue-multiselect.min.css";
 
 import Catalog from "./components/Catalog.vue";
 import Item from "./components/Item.vue";
@@ -27,6 +29,8 @@ const ITEM_SCHEMA = require("../schema/item.json");
 const ajv = new Ajv({
   loadSchema
 });
+
+Vue.component("multiselect", Multiselect);
 
 Vue.use(AsyncComputed);
 Vue.use(BootstrapVue);
