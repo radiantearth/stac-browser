@@ -91,7 +91,9 @@
                       <th>GSD (m)</th>
                       <th>Accuracy (m)</th>
                       <th>Center Wavelength (μm)</th>
-                      <th><abbr title="Full width at half maximum">FWHM</abbr> (μm)</th>
+                      <th>
+                        <abbr title="Full width at half maximum">FWHM</abbr> (μm)
+                      </th>
                       <th>Description</th>
                     </tr>
                   </thead>
@@ -107,13 +109,14 @@
                     </tr>
                   </tbody>
                 </table>
+              </div>
             </b-tab>
           </b-tabs>
         </b-col>
 
         <b-col md="4">
           <b-card bg-variant="light">
-            <div id="locator-map"></div>
+            <div id="locator-map"/>
             <div class="table-responsive metadata">
               <table class="table">
                 <tbody>
@@ -143,7 +146,7 @@
                       <span :title="prop.key">{{ prop.label }}</span>
                     </td>
                     <!-- eslint-disable-next-line vue/no-v-html -->
-                    <td v-html="prop.value" />
+                    <td v-html="prop.value"/>
                   </tr>
                 </tbody>
               </table>
@@ -498,12 +501,14 @@ export default {
     ...common.methods,
     ...mapActions(["load"]),
     initialize() {
-      if (this.cog != null) {
-        this.selectedImage = this.selectedImage || this.cog;
+      this.$nextTick(() => {
+        if (this.cog != null) {
+          this.selectedImage = this.selectedImage || this.cog;
 
-        this.initializePreviewMap();
-      }
-      this.initializeLocatorMap();
+          this.initializePreviewMap();
+        }
+        this.initializeLocatorMap();
+      });
     },
     initializeLocatorMap() {
       if (this.locatorMap == null) {

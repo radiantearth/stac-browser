@@ -519,7 +519,7 @@ export default {
     ...mapActions(["load"]),
     initialize() {
       if (this.spatialExtent != null) {
-        this.initializeLocatorMap();
+        this.$nextTick(() => this.initializeLocatorMap());
       }
     },
     initializeLocatorMap() {
