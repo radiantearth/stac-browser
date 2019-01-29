@@ -21,7 +21,7 @@
                 title="Validation errors present; please check the JavaScript Console"
               >⚠️</span>
               <small>
-                <code>{{ url }}</code>
+                <code>{{ url }}</code><b-button v-clipboard="url" variant="link" size="sm"><i class="far fa-copy" /></b-button>
               </small>
             </p>
           </header>

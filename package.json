@@ -39,6 +39,7 @@
     "p-queue": "^3.0.0",
     "serve": "^10.1.1",
     "spdx-to-html": "^0.3.2",
+    "v-clipboard": "^2.2.1",
     "vue": "^2.5.22",
     "vue-async-computed": "^3.5.1",
     "vue-hot-reload-api": "^2.3.1",

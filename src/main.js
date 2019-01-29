@@ -7,6 +7,7 @@ import Ajv from "ajv";
 import AsyncComputed from "vue-async-computed";
 import BootstrapVue from "bootstrap-vue";
 import bs58 from "bs58";
+import Clipboard from "v-clipboard";
 import Meta from "vue-meta";
 import Multiselect from "vue-multiselect";
 import pMap from "p-map";
@@ -34,6 +35,7 @@ Vue.component("multiselect", Multiselect);
 
 Vue.use(AsyncComputed);
 Vue.use(BootstrapVue);
+Vue.use(Clipboard);
 Vue.use(Meta);
 Vue.use(VueRouter);
 Vue.use(Vuex);
