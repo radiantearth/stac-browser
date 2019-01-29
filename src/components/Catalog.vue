@@ -48,7 +48,7 @@
                 striped
               >
                 <template slot="link" slot-scope="data">
-                  <router-link :to="data.item.slug">{{ data.item.title }}</router-link>
+                  <router-link :to="data.item.slug" append>{{ data.item.title }}</router-link>
                 </template>
               </b-table>
               <b-pagination
