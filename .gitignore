@@ -3,3 +3,5 @@ dist/
 .env
 yarn.lock
 node_modules/
+.netlify
+.vscode/
