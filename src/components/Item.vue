@@ -49,7 +49,7 @@
               :active="cog == null && thumbnail == null"
             >
               <div class="table-responsive assets">
-                <table class="table">
+                <table class="table table-striped">
                   <thead>
                     <tr>
                       <th>Name</th>
@@ -74,40 +74,42 @@
         </div>
 
         <div class="col-md-4">
-          <div id="locator-map"></div>
-          <div class="table-responsive metadata">
-            <table class="table">
-              <tbody>
-                <tr v-if="collection">
-                  <td class="title">Collection</td>
-                  <td>
-                    <a :href="linkToCollection">
-                      {{
-                      collection.title || "Untitled"
-                      }}
-                    </a>
-                  </td>
-                </tr>
-                <tr v-if="license">
-                  <td class="title">License</td>
-                  <td>
-                    <!-- eslint-disable-next-line vue/no-v-html -->
-                    <span v-html="license"></span>
-                    <template v-if="licensor">by
+          <b-card bg-variant="light">
+            <div id="locator-map"></div>
+            <div class="table-responsive metadata">
+              <table class="table">
+                <tbody>
+                  <tr v-if="collection">
+                    <td class="title">Collection</td>
+                    <td>
+                      <a :href="linkToCollection">
+                        {{
+                        collection.title || "Untitled"
+                        }}
+                      </a>
+                    </td>
+                  </tr>
+                  <tr v-if="license">
+                    <td class="title">License</td>
+                    <td>
                       <!-- eslint-disable-next-line vue/no-v-html -->
-                      <span v-html="licensor"></span>
-                    </template>
-                  </td>
-                </tr>
-                <tr v-for="prop in propertyList" :key="prop.key">
-                  <td class="title">
-                    <span :title="prop.key">{{ prop.label }}</span>
-                  </td>
-                  <td>{{ prop.value }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+                      <span v-html="license"></span>
+                      <template v-if="licensor">by
+                        <!-- eslint-disable-next-line vue/no-v-html -->
+                        <span v-html="licensor"></span>
+                      </template>
+                    </td>
+                  </tr>
+                  <tr v-for="prop in propertyList" :key="prop.key">
+                    <td class="title">
+                      <span :title="prop.key">{{ prop.label }}</span>
+                    </td>
+                    <td>{{ prop.value }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </b-card>
         </div>
       </div>
     </b-container>

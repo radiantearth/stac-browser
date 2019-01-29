@@ -98,7 +98,7 @@
           </div>
         </b-col>
         <b-col v-if="keywords.length > 0 || license != null" md="4">
-          <b-card title="Catalog Information" bg-variant="light">
+          <b-card bg-variant="light">
             <div v-if="spatialExtent" id="locator-map"/>
             <div class="table-responsive">
               <table class="table">
@@ -602,10 +602,7 @@ h3 {
 
 th h3 {
   margin-top: 0;
-}
-
-h4 {
-  font-weight: bold;
+  margin-bottom: 0;
 }
 
 .table th {
