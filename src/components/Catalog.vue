@@ -495,7 +495,7 @@ export default {
         {
           pane: "tilePane",
           style: {
-            weight: 3,
+            weight: 2,
             color: "#ffd65d",
             opacity: 1,
             fillOpacity: 0.15
