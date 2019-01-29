@@ -112,14 +112,10 @@
                         <td colspan="2" class="provider">
                           <a :href="provider.url">{{ provider.name }}</a>
                           <em>({{ (provider.roles || []).join(", ") }})</em>
+                          <!-- eslint-disable-next-line vue/no-v-html vue/max-attributes-per-line -->
+                          <div v-if="provider.description" v-html="provider.description" class="description"/>
                         </td>
                       </tr>
-                      <!-- eslint-disable-next-line vue/no-v-html vue/max-attributes-per-line -->
-                      <tr
-                        v-if="provider.description"
-                        :key="provider.name + index"
-                        v-html="provider.description"
-                      />
                     </template>
                   </template>
                   <tr>
@@ -669,6 +665,11 @@ td.provider {
   border: none;
   padding-top: 0;
   padding-bottom: 0;
+}
+
+td.provider .description {
+  padding-left: 5px;
+  font-style: italic;
 }
 
 td.title {
