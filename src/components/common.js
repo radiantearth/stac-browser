@@ -242,6 +242,8 @@ export default {
     entity(to, from) {
       if (!isEqual(to, from)) {
         this._validate(to);
+
+        this.initialize();
       }
     }
   },
@@ -249,9 +251,6 @@ export default {
     this.initialize();
 
     this._validate(this.entity);
-  },
-  updated() {
-    this.initialize();
   },
   methods: {
     _validate(data) {
