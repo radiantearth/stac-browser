@@ -1,5 +1,6 @@
 import clone from "clone";
 import { HtmlRenderer, Parser } from "commonmark";
+import escape from "lodash.escape";
 import isEqual from "lodash.isequal";
 import jsonQuery from "json-query";
 import spdxToHTML from "spdx-to-html";
@@ -167,7 +168,7 @@ export default {
           }
 
           if (dictionary[key].type === "date") {
-            return (
+            return escape(
               new Date(value).toLocaleString([], {
                 timeZone: "UTC",
                 timeZoneName: "short"
@@ -176,21 +177,27 @@ export default {
           }
 
           if (dictionary[key].type === "eo:bands") {
-            return value
-              .map(band => band.description || band.common_name || band.name)
-              .join(", ");
+            return escape(
+              value
+                .map(band => band.description || band.common_name || band.name)
+                .join(", ")
+            );
           }
         }
 
+        if (key === "eo:epsg") {
+          return `<a href="http://epsg.io/${value}">${value}</a>`;
+        }
+
         if (Array.isArray(value)) {
-          return value.map(v => JSON.stringify(v));
+          return escape(value.map(v => JSON.stringify(v)));
         }
 
         if (typeof value === "object") {
-          return JSON.stringify(value);
+          return escape(JSON.stringify(value));
         }
 
-        return value + suffix;
+        return escape(value + suffix);
       };
 
       const props = {

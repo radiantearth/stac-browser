@@ -155,7 +155,8 @@
                     <td class="title">
                       <span :title="prop.key">{{ prop.label }}</span>
                     </td>
-                    <td>{{ prop.value }}</td>
+                    <!-- eslint-disable-next-line vue/no-v-html -->
+                    <td v-html="prop.value" />
                   </tr>
                 </tbody>
               </table>
