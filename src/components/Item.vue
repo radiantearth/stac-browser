@@ -38,6 +38,7 @@
                 <div id="map"></div>
               </div>
               <multiselect
+                v-if="cogs.length > 1"
                 v-model="selectedImage"
                 :options="cogs"
                 placeholder="Select an image"
