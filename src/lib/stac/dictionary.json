@@ -19,7 +19,7 @@
   },
   "eo:platform": "Platform",
   "eo:constellation": "Constellation",
-  "eo:instrument": "Instrument or sensor",
+  "eo:instrument": "Instrument",
   "eo:bands": {
     "label": "Bands",
     "type": "eo:bands"
