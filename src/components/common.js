@@ -1,4 +1,4 @@
-import querystring from "querystring";
+import url from "url";
 
 import clone from "clone";
 import { HtmlRenderer, Parser } from "commonmark";
@@ -104,7 +104,14 @@ export default {
       const slugs = this.ancestors.slice(1).map(this.slugify);
 
       return this.ancestors.map((uri, idx) => {
-        const entity = this.getEntity(uri);
+        let entity = this.getEntity(uri);
+
+        if (entity.type === "FeatureCollection") {
+          const { hash } = url.parse(uri);
+          const idx = hash.slice(1);
+
+          entity = entity.features[idx];
+        }
 
         // use all previous slugs to construct a path to this entity
         let to = "/" + slugs.slice(0, idx).join("/");
