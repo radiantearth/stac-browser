@@ -260,9 +260,12 @@ export default {
 
           this.externalItemCount = items.meta.found;
 
+          // strip /collection from the target path
+          let p = this.path.replace(/^\/collection/, "");
+
           return items.features.map((item, idx) => ({
             item,
-            to: `/item${this.path}/${this.slugify(
+            to: `/item${p}/${this.slugify(
               `${externalItemsLink.href}?page=${this.currentItemPage}#${idx}`
             )}`,
             title: item.properties.title || item.id,
@@ -688,7 +691,7 @@ export default {
           ...updated
         })
       });
-    },
+    }
   }
 };
 </script>
