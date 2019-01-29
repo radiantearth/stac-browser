@@ -60,6 +60,7 @@
                   <thead>
                     <tr>
                       <th>Name</th>
+                      <th v-if="_bands.length > 0">Band(s)</th>
                       <th>Content-Type</th>
                     </tr>
                   </thead>
@@ -69,6 +70,7 @@
                         <!-- eslint-disable-next-line vue/max-attributes-per-line vue/no-v-html -->
                         <a :href="asset.href" :title="asset.key" v-html="asset.label"/>
                       </td>
+                      <td v-if="_bands.length > 0">{{ asset.bandNames }}</td>
                       <td>
                         <code>{{ asset.type }}</code>
                       </td>
@@ -209,6 +211,18 @@ export default {
   computed: {
     ...common.computed,
     ...mapGetters(["getEntity"]),
+    _bands() {
+      return (
+        this._properties["eo:bands"] ||
+        (this.collection &&
+          this.collection.properties &&
+          this.collection.properties["eo:bands"]) ||
+        (this.rootCatalog &&
+          this.rootCatalog.properties &&
+          this.rootCatalog.properties["eo:bands"]) ||
+        []
+      );
+    },
     _collectionLinks() {
       return this.links.filter(x => x.rel === "collection");
     },
@@ -259,11 +273,24 @@ export default {
           }))
           .map(x => ({
             ...x,
+            bands: (x["eo:bands"] || []).map(idx => this._bands[idx]),
             title: x.title || path.basename(x.href),
             label:
               escape(x.title) ||
               `<code>${escape(path.basename(x.href))}</code>`,
-            href: new URL(x.href, this.url).toString()
+            href: this.resolve(x.href, this.url)
+          }))
+          .map(x => ({
+            ...x,
+            bandNames: x.bands
+              .map(
+                band =>
+                  band != null
+                    ? band.description || band.common_name || band.name
+                    : null
+              )
+              .filter(x => x != null)
+              .join(", ")
           }))
           // prioritize assets w/ a format set
           .sort((a, b) => {
@@ -299,7 +326,10 @@ export default {
     cogs() {
       return this.assets.filter(x => COG_TYPES.includes(x.type)).map(cog => ({
         ...cog,
-        href: this.resolve(cog.href, this.url)
+        title:
+          cog.bandNames.length > 0
+            ? `${cog.title} (${cog.bandNames})`
+            : cog.title
       }));
     },
     collection() {
