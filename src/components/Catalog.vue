@@ -135,10 +135,6 @@
                     <!-- eslint-disable-next-line vue/no-v-html -->
                     <td v-html="license"/>
                   </tr>
-                  <tr v-if="spatialExtent">
-                    <td class="title">Spatial Extent</td>
-                    <td>{{ spatialExtent.join(", ") }}</td>
-                  </tr>
                   <tr v-if="temporalExtent">
                     <td class="title">Temporal Extent</td>
                     <td>{{ temporalExtent }}</td>
