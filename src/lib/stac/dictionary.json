@@ -14,7 +14,7 @@
     "type": "date"
   },
   "eo:gsd": {
-    "label": "Ground sample distance",
+    "label": "<abbr title=\"Ground sample distance (eo:gsd)\">GSD</abbr>",
     "suffix": "m"
   },
   "eo:platform": "Platform",

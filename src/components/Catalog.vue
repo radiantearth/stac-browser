@@ -153,7 +153,8 @@
                   </tr>
                   <tr v-for="prop in propertyList" :key="prop.key">
                     <td class="title">
-                      <span :title="prop.key">{{ prop.label }}</span>
+                      <!-- eslint-disable-next-line vue/no-v-html -->
+                      <span :title="prop.key" v-html="prop.label" />
                     </td>
                     <!-- eslint-disable-next-line vue/no-v-html -->
                     <td v-html="prop.value" />
