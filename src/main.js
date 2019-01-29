@@ -169,7 +169,6 @@ const main = async () => {
         return {
           ancestors,
           center,
-          fullscreen: route.query.fullscreen === "true",
           path: route.path,
           resolve,
           slugify,

@@ -1,3 +1,5 @@
+import querystring from "querystring";
+
 import clone from "clone";
 import { HtmlRenderer, Parser } from "commonmark";
 import escape from "lodash.escape";
@@ -7,7 +9,6 @@ import spdxToHTML from "spdx-to-html";
 import { mapGetters } from "vuex";
 
 import dictionary from "../lib/stac/dictionary.json";
-import { SSL_OP_TLS_BLOCK_PADDING_BUG } from "constants";
 
 const BAND_LABELS = {
   id: "ID",
@@ -259,6 +260,11 @@ export default {
     }
   },
   watch: {
+    $route(to, from) {
+      if (!isEqual(to.query, from.query)) {
+        this.syncWithQueryState(to.query);
+      }
+    },
     entity(to, from) {
       if (!isEqual(to, from)) {
         this._validate(to);
@@ -289,6 +295,26 @@ export default {
       }
 
       this.validationErrors = errors;
+    },
+    updateState(updated) {
+      const qs = {
+        ...this.$route.query,
+        ...updated
+      };
+
+      // remove nulls and false values
+      const query = Object.keys(qs)
+        .filter(x => qs[x] != null && qs[x] !== false)
+        .reduce((acc, k) => {
+          acc[k] = qs[k];
+
+          return acc;
+        }, {});
+
+      this.$router.replace({
+        ...this.$route,
+        query
+      });
     }
   }
 };

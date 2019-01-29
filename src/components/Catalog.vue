@@ -36,7 +36,7 @@
           <div v-if="description" v-html="description"/>
 
           <b-tabs v-model="tabIndex">
-            <b-tab v-if="childCount > 0" title="Catalogs">
+            <b-tab v-if="visibleTabs.includes('catalogs')" title="Catalogs">
               <b-table
                 :items="children"
                 :fields="childFields"
@@ -61,7 +61,7 @@
               />
             </b-tab>
 
-            <b-tab v-if="hasExternalItems || itemCount > 0" title="Items">
+            <b-tab v-if="visibleTabs.includes('items')" title="Items">
               <b-table
                 :items="items"
                 :fields="itemFields"
@@ -87,7 +87,7 @@
                 :hide-goto-end-buttons="true"
               />
             </b-tab>
-            <b-tab v-if="bands.length > 0" title="Bands">
+            <b-tab v-if="visibleTabs.includes('bands')" title="Bands">
               <b-table :items="bands" :fields="bandFields" responsive small striped/>
             </b-tab>
           </b-tabs>
@@ -166,8 +166,6 @@
 </template>
 
 <script>
-import querystring from "querystring";
-
 import Leaflet from "leaflet";
 import { mapActions, mapGetters } from "vuex";
 
@@ -502,48 +500,14 @@ export default {
     },
     tabIndex: {
       get: function() {
-        switch (this.selectedTab) {
-          case "catalogs":
-            return 0;
-
-          case "items":
-            return Math.max(0, 1 - this.tabOffset);
-
-          case "bands":
-            return 2 - this.tabOffset;
-        }
+        return this.visibleTabs.indexOf(this.selectedTab);
       },
       set: function(tabIndex) {
         // wait for the DOM to update
         this.$nextTick(() => {
-          switch (tabIndex + this.tabOffset) {
-            case 0:
-              this.selectedTab = "catalogs";
-              break;
-
-            case 1:
-              this.selectedTab = "items";
-              break;
-
-            case 2:
-              this.selectedTab = "bands";
-              break;
-          }
+          this.selectedTab = this.visibleTabs[tabIndex];
         });
       }
-    },
-    tabOffset() {
-      let offset = 0;
-
-      if (this.childCount > 0) {
-        offset++;
-      }
-
-      if (this.hasExternalItems || this.itemCount > 0) {
-        offset++;
-      }
-
-      return offset;
     },
     temporalExtent() {
       const { temporal } = this.extent;
@@ -561,32 +525,34 @@ export default {
     },
     version() {
       return this.catalog.version;
+    },
+    visibleTabs() {
+      return [
+        this.childCount > 0 && "catalogs",
+        (this.hasExternalItems || this.itemCount > 0) && "items",
+        this.bands.length > 0 && "bands"
+      ].filter(x => x != null && x !== false);
     }
   },
   watch: {
     ...common.watch,
-    $route(to, from) {
-      if (to.hash !== from.hash) {
-        this.syncWithHash(to.hash);
-      }
-    },
     currentChildPage(to, from) {
       if (to !== from) {
-        this.updateHash({
+        this.updateState({
           cp: to
         });
       }
     },
     currentItemPage(to, from) {
       if (to !== from) {
-        this.updateHash({
+        this.updateState({
           ip: to
         });
       }
     },
     selectedTab(to, from) {
       if (to !== from) {
-        this.updateHash({
+        this.updateState({
           t: to
         });
       }
@@ -600,7 +566,7 @@ export default {
         this.$nextTick(() => this.initializeLocatorMap());
       }
 
-      this.syncWithHash(this.$route.hash);
+      this.syncWithQueryState(this.$route.query);
     },
     initializeLocatorMap() {
       if (this.locatorMap != null) {
@@ -674,23 +640,10 @@ export default {
         });
       }
     },
-    syncWithHash(hash) {
-      const qs = querystring.parse(hash.slice(1));
-
+    syncWithQueryState(qs) {
       this.selectedTab = qs.t;
       this.currentChildPage = Number(qs.cp) || this.currentChildPage;
       this.currentItemPage = Number(qs.ip) || this.currentItemPage;
-    },
-    updateHash(updated) {
-      const qs = querystring.parse(this.$route.hash.slice(1));
-
-      this.$router.replace({
-        ...this.$route,
-        hash: querystring.stringify({
-          ...qs,
-          ...updated
-        })
-      });
     }
   }
 };

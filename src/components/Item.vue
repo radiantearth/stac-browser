@@ -32,8 +32,8 @@
               </b-button>
             </small>
           </p>
-          <b-tabs>
-            <b-tab v-if="cog != null" title="Preview" :active="cog != null">
+          <b-tabs v-model="tabIndex">
+            <b-tab v-if="visibleTabs.includes('preview')" title="Preview" active>
               <div id="map-container">
                 <div id="map"></div>
               </div>
@@ -46,15 +46,19 @@
                 label="title"
               />
             </b-tab>
-            <b-tab v-if="thumbnail" title="Thumbnail" :active="cog == null && thumbnail != null">
+            <b-tab
+              v-if="visibleTabs.includes('thumbnail')"
+              title="Thumbnail"
+              :active="!visibleTabs.includes('preview')"
+            >
               <a :href="thumbnail">
                 <img id="thumbnail" align="center" :src="thumbnail">
               </a>
             </b-tab>
             <b-tab
-              v-if="assets.length > 0"
+              v-if="visibleTabs.includes('assets')"
               title="Assets"
-              :active="cog == null && thumbnail == null"
+              :active="!visibleTabs.includes('preview') && !visibleTags.includes('thumbnail')"
             >
               <div class="table-responsive assets">
                 <table class="table table-striped">
@@ -80,14 +84,12 @@
                 </table>
               </div>
             </b-tab>
-            <b-tab v-if="bands.length > 0" title="Bands">
-              <b-table
-                :items="bands"
-                :fields="bandFields"
-                responsive
-                small
-                striped
-              />
+            <b-tab
+              v-if="visibleTabs.includes('bands')"
+              title="Bands"
+              :active="!visibleTabs.includes('preview') && !visibleTabs.includes('thumbnail') && !visibleTabs.includes('assets')"
+            >
+              <b-table :items="bands" :fields="bandFields" responsive small striped/>
             </b-tab>
           </b-tabs>
         </b-col>
@@ -122,7 +124,7 @@
                   <tr v-for="prop in propertyList" :key="prop.key">
                     <td class="title">
                       <!-- eslint-disable-next-line vue/no-v-html -->
-                      <span :title="prop.key" v-html="prop.label" />
+                      <span :title="prop.key" v-html="prop.label"/>
                     </td>
                     <!-- eslint-disable-next-line vue/no-v-html -->
                     <td v-html="prop.value"/>
@@ -150,6 +152,7 @@ import path from "path";
 import url from "url";
 
 import escape from "lodash.escape";
+import isEqual from "lodash.isequal";
 import Leaflet from "leaflet";
 import "leaflet-easybutton";
 import { mapActions, mapGetters } from "vuex";
@@ -172,10 +175,6 @@ export default {
     center: {
       type: Array,
       default: null
-    },
-    fullscreen: {
-      type: Boolean,
-      default: false
     },
     path: {
       type: String,
@@ -200,6 +199,7 @@ export default {
   },
   data() {
     return {
+      fullscreen: false,
       locatorMap: null,
       map: null,
       previewLayer: null,
@@ -216,6 +216,7 @@ export default {
         }
       },
       selectedImage: null,
+      selectedTab: null,
       validationErrors: null
     };
   },
@@ -441,6 +442,17 @@ export default {
         }))
         .pop();
     },
+    tabIndex: {
+      get: function() {
+        return this.visibleTabs.indexOf(this.selectedTab);
+      },
+      set: function(tabIndex) {
+        // wait for the DOM to update
+        this.$nextTick(() => {
+          this.selectedTab = this.visibleTabs[tabIndex];
+        });
+      }
+    },
     thumbnail() {
       const thumbnail = this.assets.find(x => x.key === "thumbnail");
 
@@ -460,6 +472,14 @@ export default {
       // return `http://localhost:8000/tiles/{z}/{x}/{y}@2x?url=${encodeURIComponent(
       //   this.cog
       // )}`;
+    },
+    visibleTabs() {
+      return [
+        this.cogs.length > 0 && "preview",
+        this.thumbnail != null && "thumbnail",
+        this.assets.length > 0 && "assets",
+        this.bands.length > 0 && "bands"
+      ].filter(x => x != null && x !== false);
     }
   },
   watch: {
@@ -472,7 +492,50 @@ export default {
           this.map.getContainer().classList.remove("leaflet-pseudo-fullscreen");
         }
 
+        this.updateState({
+          fullscreen: to
+        });
+
         this.map.invalidateSize();
+      }
+    },
+    selectedImage(to, from) {
+      if (!isEqual(to, from)) {
+        const idx = this.cogs.indexOf(to);
+
+        if (idx >= 0) {
+          this.updateState({
+            si: idx
+          });
+        } else {
+          this.updateState({
+            si: null
+          });
+        }
+      }
+    },
+    selectedTab(to, from) {
+      if (to !== from) {
+        this.updateState({
+          t: to
+        });
+
+        if (to === "preview") {
+          this.map && this.map.invalidateSize();
+        }
+      }
+    },
+    tileSource(to, from) {
+      if (to !== from) {
+        if (this.map != null) {
+          if (this.tileLayer != null) {
+            this.tileLayer.removeFrom(this.map);
+          }
+
+          this.tileLayer = Leaflet.tileLayer(to, {
+            attribution: this.attribution
+          }).addTo(this.map);
+        }
       }
     }
   },
@@ -480,6 +543,8 @@ export default {
     ...common.methods,
     ...mapActions(["load"]),
     initialize() {
+      this.syncWithQueryState(this.$route.query);
+
       this.$nextTick(() => {
         if (this.cog != null) {
           this.selectedImage = this.selectedImage || this.cog;
@@ -543,7 +608,7 @@ export default {
 
         this.button = Leaflet.easyButton(
           "fas fa-expand fa-2x",
-          () => this.onFullscreenChange(!this.fullscreen),
+          () => (this.fullscreen = !this.fullscreen),
           {
             position: "topright"
           }
@@ -592,19 +657,16 @@ export default {
         this.map.fitBounds(this.overlayLayer.getBounds());
       }
     },
-    onFullscreenChange(_fullscreen) {
-      // strip fullscreen property
-      // eslint-disable-next-line no-unused-vars
-      const { fullscreen, ...query } = this.$route.query;
+    syncWithQueryState(query) {
+      this.selectedTab = query.t;
 
-      if (_fullscreen) {
-        query.fullscreen = "true";
+      if (query.si != null) {
+        this.selectedImage = this.cogs[query.si];
+      } else {
+        this.selectedImage = null;
       }
 
-      this.$router.replace({
-        ...this.$route,
-        query
-      });
+      this.fullscreen = [true, "true"].includes(query.fullscreen);
     },
     updateHash() {
       const center = this.map.getCenter();
