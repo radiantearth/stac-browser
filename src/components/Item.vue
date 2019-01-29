@@ -268,7 +268,7 @@ export default {
     },
     attribution() {
       if (this.license != null || this.licensor != null) {
-        return `Imagery ${this.license || ""} ${this.licensor}`;
+        return `Imagery ${this.license || ""} ${this.licensor || ""}`;
       }
     },
     cog() {
