@@ -44,6 +44,16 @@ export default {
     _collectionProperties() {
       return (this.collection && this.collection.properties) || {};
     },
+    _entity() {
+      const entity = this.getEntity(this.url);
+
+      if (entity instanceof Error) {
+        this.$router.replace("/");
+        return;
+      }
+
+      return entity;
+    },
     _keywords() {
       // [].concat() is a work-around for catalogs where keywords is a string (SpaceNet)
       return [].concat(
@@ -93,14 +103,7 @@ export default {
       );
     },
     entity() {
-      const entity = this.getEntity(this.url);
-
-      if (entity instanceof Error) {
-        this.$router.replace("/");
-        return;
-      }
-
-      return entity;
+      return this._entity;
     },
     id() {
       // REQUIRED

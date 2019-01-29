@@ -119,6 +119,7 @@
 
 <script>
 import path from "path";
+import url from "url";
 
 import escape from "lodash.escape";
 import Leaflet from "leaflet";
@@ -291,8 +292,18 @@ export default {
         }))
         .pop();
     },
+    entity() {
+      return this.item;
+    },
     item() {
-      return this.entity;
+      if (this._entity.type === "FeatureCollection") {
+        const { hash } = url.parse(this.url);
+        const idx = hash.slice(1);
+
+        return this._entity.features[idx];
+      }
+
+      return this._entity;
     },
     jsonLD() {
       const dataset = {

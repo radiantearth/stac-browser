@@ -177,6 +177,8 @@ import { mapActions, mapGetters } from "vuex";
 
 import common from "./common";
 
+const ITEMS_PER_PAGE = 25;
+
 export default {
   ...common,
   name: "Catalog",
@@ -208,6 +210,7 @@ export default {
   },
   data() {
     return {
+      externalItemCount: 0,
       childFields: {
         link: {
           label: "Title",
@@ -231,16 +234,59 @@ export default {
         }
       },
       currentItemPage: 1,
-      itemsPerPage: 25,
       locatorMap: null,
       validationErrors: null
     };
+  },
+  asyncComputed: {
+    externalItems: {
+      default: [],
+      lazy: true,
+      async get() {
+        const externalItemsLink = this.links.find(x => x.rel === "items");
+
+        if (externalItemsLink == null) {
+          return [];
+        }
+
+        try {
+          const rsp = await fetch(
+            `${externalItemsLink.href}?page=${this.currentItemPage}`
+          );
+
+          if (!rsp.ok) {
+            console.warn(await rsp.text());
+            return [];
+          }
+
+          const items = await rsp.json();
+
+          this.externalItemCount = items.meta.found;
+
+          return items.features.map((item, idx) => ({
+            item,
+            to: `/item${this.path}/${this.slugify(
+              `${externalItemsLink.href}?page=${this.currentItemPage}#${idx}`
+            )}`,
+            title: item.properties.title || item.id,
+            dateAcquired: item.properties.datetime
+          }));
+        } catch (err) {
+          console.warn(err);
+
+          return [];
+        }
+      }
+    }
   },
   computed: {
     ...common.computed,
     ...mapGetters(["getEntity"]),
     _description() {
       return this.catalog.description;
+    },
+    _items() {
+      return this.links.filter(x => x.rel === "item");
     },
     _license() {
       return (
@@ -272,44 +318,61 @@ export default {
         {}
       );
     },
+    hasExternalItems() {
+      return this.links.find(x => x.rel === "items") != null;
+    },
     itemCount() {
-      return this.links.filter(x => x.rel === "item").length;
+      if (!this.hasExternalItems) {
+        return this.links.filter(x => x.rel === "item").length;
+      }
+
+      return this.externalItemCount;
     },
     items() {
-      // TODO move to async computed and pull from rel=items if necessary
-
       const start = (this.currentPage - 1) * this.perPage;
       const end = this.currentPage * this.perPage;
-      return this.links.filter(x => x.rel === "item").map((itemLink, idx) => {
-        const itemUrl = this.resolve(itemLink.href, this.url);
 
-        if (idx >= start && idx < end) {
-          // dispatch a fetch if item is within the range of items being displayed
-          this.load(itemUrl);
-        }
+      if (!this.hasExternalItems) {
+        return this._items.map((itemLink, idx) => {
+          const itemUrl = this.resolve(itemLink.href, this.url);
 
-        // attempt to load the full item
-        const item = this.getEntity(itemUrl);
+          if (idx >= start && idx < end) {
+            // dispatch a fetch if item is within the range of items being displayed
+            this.load(itemUrl);
+          }
 
-        if (item != null) {
+          // attempt to load the full item
+          const item = this.getEntity(itemUrl);
+
+          if (item != null) {
+            return {
+              item,
+              to: `/item${this.path}/${this.slugify(itemUrl)}`,
+              title:
+                item.properties.title ||
+                item.id ||
+                itemLink.title ||
+                itemLink.href,
+              dateAcquired: item.properties.datetime
+            };
+          }
+
           return {
-            item,
             to: `/item${this.path}/${this.slugify(itemUrl)}`,
-            title:
-              item.properties.title ||
-              item.id ||
-              itemLink.title ||
-              itemLink.href,
-            dateAcquired: item.properties.datetime
+            title: itemLink.title || itemLink.href,
+            url: itemUrl
           };
-        }
+        });
+      }
 
-        return {
-          to: `/item${this.path}/${this.slugify(itemUrl)}`,
-          title: itemLink.title || itemLink.href,
-          url: itemUrl
-        };
-      });
+      return this.externalItems;
+    },
+    itemsPerPage() {
+      if (this.hasExternalItems) {
+        return 0;
+      }
+
+      return ITEMS_PER_PAGE;
     },
     jsonLD() {
       const dataCatalog = this.providers.reduce(
