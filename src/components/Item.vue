@@ -79,6 +79,34 @@
                 </table>
               </div>
             </b-tab>
+            <b-tab v-if="_bands.length > 0" title="Bands">
+              <!-- TODO copy this to collection pages -->
+              <div class="table-responsive assets">
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Common Name</th>
+                      <th>GSD (m)</th>
+                      <th>Accuracy (m)</th>
+                      <th>Center Wavelength (μm)</th>
+                      <th><abbr title="Full width at half maximum">FWHM</abbr> (μm)</th>
+                      <th>Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="band in _bands" :key="band.name">
+                      <td>{{ band.name }}</td>
+                      <td>{{ band.common_name }}</td>
+                      <td>{{ band.gsd }}</td>
+                      <td>{{ band.accuracy }}</td>
+                      <td>{{ band.center_wavelength }}</td>
+                      <td>{{ band.full_width_half_max }}</td>
+                      <td>{{ band.description }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+            </b-tab>
           </b-tabs>
         </b-col>
 
