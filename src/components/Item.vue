@@ -58,7 +58,7 @@
             <b-tab
               v-if="visibleTabs.includes('assets')"
               title="Assets"
-              :active="!visibleTabs.includes('preview') && !visibleTags.includes('thumbnail')"
+              :active="!visibleTabs.includes('preview') && !visibleTabs.includes('thumbnail')"
             >
               <div class="table-responsive assets">
                 <table class="table table-striped">
