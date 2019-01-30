@@ -6,11 +6,6 @@
   "scripts": {
     "build": "NODE_ENV=production parcel build --target=browser index.html",
     "clean": "find dist -not -name _redirects -delete",
-    "prerender": "bin/prerender.js -p $PUBLIC_URL $CATALOG_URL",
-    "deploy-cbers": "npm run clean && CATALOG_URL=https://cbers-stac-0-6.s3.amazonaws.com/catalog.json npm run build && bin/prerender.js -p https://cbers-stac.netlify.com https://cbers-stac.s3.amazonaws.com/catalog.json && netlify deploy --prod --dir dist/ --site d51680e6-45e1-49db-b1e4-eb6e236a431a",
-    "deploy-iserv": "npm run clean && CATALOG_URL=https://s3-us-west-2.amazonaws.com/radiant-nasa-iserv/iserv.json npm run build && bin/prerender.js -p https://iserv-stac.netlify.com https://s3-us-west-2.amazonaws.com/radiant-nasa-iserv/iserv.json && netlify deploy --prod --dir dist/ --site 7ad829b5-58b2-4a72-9e42-eb5749982070",
-    "deploy-planet": "npm run clean && CATALOG_URL=https://storage.googleapis.com/pdd-stac/disasters/catalog.json npm run build && bin/prerender.js -p https://planet.stac.cloud https://storage.googleapis.com/pdd-stac/disasters/catalog.json && netlify deploy --prod --dir dist/ --site 0208c719-dcdf-42dc-bddb-9ae5498424db && curl http://www.google.com/ping?sitemap=https://planet.stac.cloud/sitemap.txt",
-    "deploy-boundless": "npm run clean && CATALOG_URL=http://stac.boundlessgeo.io/stac npm run build && netlify deploy --prod --dir dist/ --site 95a54956-1c9b-4548-87bc-a7ce834f980b",
     "deploy-prerendered": "npm run clean && npm run build && bin/prerender.js -p $STAC_URL $CATALOG_URL && netlify deploy --prod --dir dist/ --site $NETLIFY_SITE_ID",
     "deploy": "npm run clean && npm run build && netlify deploy --prod --dir dist/ --site $NETLIFY_SITE_ID",
     "start": "npm run clean && parcel --target=browser index.html"
