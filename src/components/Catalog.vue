@@ -17,16 +17,14 @@
               alt="Powered by Planet Labs"
               class="float-right">
           </a>-->
-          <h1>{{ title }}</h1>
+          <h1 class="scroll">{{ title }}</h1>
           <p v-if="version">
             <small>Version {{ version }}</small>
           </p>
-          <p>
-            <template v-if="validationErrors">
-              <span title="Validation errors present; please check the JavaScript Console">⚠️</span>
-            </template>
+          <p class="scroll">
             <small>
               <b-button v-clipboard="url" variant="link" size="sm" class="clipboard">
+                <span v-if="validationErrors" title="Validation errors present; please check the JavaScript Console">⚠️</span>
                 <i class="far fa-copy"/>&nbsp;
                 <code>{{ url }}</code>
               </b-button>

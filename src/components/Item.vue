@@ -19,14 +19,14 @@
       </b-row>
       <b-row>
         <b-col md="8">
-          <h1>{{ title }}</h1>
-          <p>
-            <span
-              v-if="validationErrors"
-              title="Validation errors present; please check the JavaScript Console"
-            >⚠️</span>
+          <h1 class="scroll">{{ title }}</h1>
+          <p class="scroll">
             <small>
               <b-button v-clipboard="url" variant="link" size="sm" class="clipboard">
+                <span
+                  v-if="validationErrors"
+                  title="Validation errors present; please check the JavaScript Console"
+                >⚠️</span>
                 <i class="far fa-copy"/>&nbsp;
                 <code>{{ url }}</code>
               </b-button>
@@ -202,7 +202,7 @@ export default {
       fullscreen: false,
       locatorMap: null,
       map: null,
-      previewLayer: null,
+      tileLayer: null,
       overlayLayer: null,
       locatorOverlayLayer: null,
       geojsonOptions: {
@@ -599,7 +599,9 @@ export default {
     },
     initializePreviewMap() {
       if (this.map == null) {
-        this.map = Leaflet.map("map");
+        this.map = Leaflet.map("map", {
+          scrollWheelZoom: false
+        });
 
         this.map.on("moveend", this.updateHash);
         this.map.on("zoomend", this.updateHash);
@@ -795,6 +797,10 @@ header {
 code {
   color: #555;
   white-space: nowrap;
+}
+
+.scroll {
+  overflow-x: scroll;
 }
 
 .btn code {
