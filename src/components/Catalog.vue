@@ -4,7 +4,7 @@
       <b-row>
         <b-col md="12">
           <header>
-            <b-breadcrumb :items="breadcrumbs"/>
+            <b-breadcrumb :items="breadcrumbs" />
           </header>
         </b-col>
       </b-row>
@@ -23,18 +23,31 @@
           </p>
           <p class="scroll">
             <small>
-              <b-button v-clipboard="url" variant="link" size="sm" class="clipboard">
-                <span v-if="validationErrors" title="Validation errors present; please check the JavaScript Console">⚠️</span>
-                <i class="far fa-copy"/>&nbsp;
+              <b-button
+                v-clipboard="url"
+                variant="link"
+                size="sm"
+                class="clipboard"
+              >
+                <span
+                  v-if="validationErrors"
+                  title="Validation errors present; please check the JavaScript Console"
+                  >⚠️</span
+                >
+                <i class="far fa-copy" />&nbsp;
                 <code>{{ url }}</code>
               </b-button>
             </small>
           </p>
           <!-- eslint-disable-next-line vue/no-v-html vue/max-attributes-per-line -->
-          <div v-if="description" v-html="description"/>
+          <div v-if="description" v-html="description" />
 
           <b-tabs v-model="tabIndex">
-            <b-tab v-if="visibleTabs.includes('catalogs')" key="catalogs" title="Catalogs">
+            <b-tab
+              v-if="visibleTabs.includes('catalogs')"
+              key="catalogs"
+              title="Catalogs"
+            >
               <b-table
                 :items="children"
                 :fields="childFields"
@@ -46,7 +59,9 @@
                 striped
               >
                 <template slot="link" slot-scope="data">
-                  <router-link :to="data.item.slug" append>{{ data.item.title }}</router-link>
+                  <router-link :to="data.item.slug" append>{{
+                    data.item.title
+                  }}</router-link>
                 </template>
               </b-table>
               <b-pagination
@@ -59,7 +74,11 @@
               />
             </b-tab>
 
-            <b-tab v-if="visibleTabs.includes('items')" key="items" title="Items">
+            <b-tab
+              v-if="visibleTabs.includes('items')"
+              key="items"
+              title="Items"
+            >
               <b-table
                 :items="items"
                 :fields="itemFields"
@@ -72,7 +91,9 @@
                 striped
               >
                 <template slot="link" slot-scope="data">
-                  <router-link :to="data.item.to">{{ data.item.title }}</router-link>
+                  <router-link :to="data.item.to">{{
+                    data.item.title
+                  }}</router-link>
                 </template>
                 <!-- TODO row-details w/ additional metadata + map -->
               </b-table>
@@ -85,14 +106,24 @@
                 :hide-goto-end-buttons="true"
               />
             </b-tab>
-            <b-tab v-if="visibleTabs.includes('bands')" key="bands" title="Bands">
-              <b-table :items="bands" :fields="bandFields" responsive small striped/>
+            <b-tab
+              v-if="visibleTabs.includes('bands')"
+              key="bands"
+              title="Bands"
+            >
+              <b-table
+                :items="bands"
+                :fields="bandFields"
+                responsive
+                small
+                striped
+              />
             </b-tab>
           </b-tabs>
         </b-col>
         <b-col v-if="keywords.length > 0 || license != null" md="4">
           <b-card bg-variant="light">
-            <div v-if="spatialExtent" id="locator-map"/>
+            <div v-if="spatialExtent" id="locator-map" />
             <div class="table-responsive">
               <table class="table">
                 <tbody>
@@ -100,8 +131,12 @@
                     <tr>
                       <th colspan="2">
                         <h3>
-                          <template v-if="providers.length === 1">Provider</template>
-                          <template v-if="providers.length !== 1">Providers</template>
+                          <template v-if="providers.length === 1"
+                            >Provider</template
+                          >
+                          <template v-if="providers.length !== 1"
+                            >Providers</template
+                          >
                         </h3>
                       </th>
                     </tr>
@@ -131,7 +166,7 @@
                   <tr v-if="license">
                     <td class="title">License</td>
                     <!-- eslint-disable-next-line vue/no-v-html -->
-                    <td v-html="license"/>
+                    <td v-html="license" />
                   </tr>
                   <tr v-if="temporalExtent">
                     <td class="title">Temporal Extent</td>
@@ -140,10 +175,10 @@
                   <tr v-for="prop in propertyList" :key="prop.key">
                     <td class="title">
                       <!-- eslint-disable-next-line vue/no-v-html -->
-                      <span :title="prop.key" v-html="prop.label"/>
+                      <span :title="prop.key" v-html="prop.label" />
                     </td>
                     <!-- eslint-disable-next-line vue/no-v-html -->
-                    <td v-html="prop.value"/>
+                    <td v-html="prop.value" />
                   </tr>
                 </tbody>
               </table>
@@ -156,7 +191,9 @@
       <b-container>
         <span class="poweredby text-muted">
           Powered by
-          <a href="https://github.com/radiantearth/stac-browser">STAC Browser</a>
+          <a href="https://github.com/radiantearth/stac-browser"
+            >STAC Browser</a
+          >
         </span>
       </b-container>
     </footer>
@@ -308,13 +345,15 @@ export default {
       return this.links.filter(x => x.rel === "child").length;
     },
     children() {
-      return this.links.filter(x => x.rel === "child").map(child => ({
-        path: child.href,
-        slug: this.slugify(this.resolve(child.href, this.url)),
-        // child.id is a workaround for https://earthengine-stac.storage.googleapis.com/catalog/catalog.json
-        title: child.title || child.id || child.href,
-        url: this.resolve(child.href, this.url)
-      }));
+      return this.links
+        .filter(x => x.rel === "child")
+        .map(child => ({
+          path: child.href,
+          slug: this.slugify(this.resolve(child.href, this.url)),
+          // child.id is a workaround for https://earthengine-stac.storage.googleapis.com/catalog/catalog.json
+          title: child.title || child.id || child.href,
+          url: this.resolve(child.href, this.url)
+        }));
     },
     extent() {
       return (

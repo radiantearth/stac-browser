@@ -12,7 +12,7 @@
                 class="float-right">
             </a>-->
             <div>
-              <b-breadcrumb :items="breadcrumbs"/>
+              <b-breadcrumb :items="breadcrumbs" />
             </div>
           </header>
         </b-col>
@@ -22,18 +22,28 @@
           <h1 class="scroll">{{ title }}</h1>
           <p class="scroll">
             <small>
-              <b-button v-clipboard="url" variant="link" size="sm" class="clipboard">
+              <b-button
+                v-clipboard="url"
+                variant="link"
+                size="sm"
+                class="clipboard"
+              >
                 <span
                   v-if="validationErrors"
                   title="Validation errors present; please check the JavaScript Console"
-                >⚠️</span>
-                <i class="far fa-copy"/>&nbsp;
+                  >⚠️</span
+                >
+                <i class="far fa-copy" />&nbsp;
                 <code>{{ url }}</code>
               </b-button>
             </small>
           </p>
           <b-tabs v-model="tabIndex">
-            <b-tab v-if="visibleTabs.includes('preview')" title="Preview" active>
+            <b-tab
+              v-if="visibleTabs.includes('preview')"
+              title="Preview"
+              active
+            >
               <div id="map-container">
                 <div id="map"></div>
               </div>
@@ -52,13 +62,16 @@
               :active="!visibleTabs.includes('preview')"
             >
               <a :href="thumbnail">
-                <img id="thumbnail" align="center" :src="thumbnail">
+                <img id="thumbnail" align="center" :src="thumbnail" />
               </a>
             </b-tab>
             <b-tab
               v-if="visibleTabs.includes('assets')"
               title="Assets"
-              :active="!visibleTabs.includes('preview') && !visibleTabs.includes('thumbnail')"
+              :active="
+                !visibleTabs.includes('preview') &&
+                  !visibleTabs.includes('thumbnail')
+              "
             >
               <div class="table-responsive assets">
                 <table class="table table-striped">
@@ -73,7 +86,11 @@
                     <tr v-for="asset in assets" :key="asset.key">
                       <td>
                         <!-- eslint-disable-next-line vue/max-attributes-per-line vue/no-v-html -->
-                        <a :href="asset.href" :title="asset.key" v-html="asset.label"/>
+                        <a
+                          :href="asset.href"
+                          :title="asset.key"
+                          v-html="asset.label"
+                        />
                       </td>
                       <td v-if="bands.length > 0">{{ asset.bandNames }}</td>
                       <td>
@@ -87,16 +104,26 @@
             <b-tab
               v-if="visibleTabs.includes('bands')"
               title="Bands"
-              :active="!visibleTabs.includes('preview') && !visibleTabs.includes('thumbnail') && !visibleTabs.includes('assets')"
+              :active="
+                !visibleTabs.includes('preview') &&
+                  !visibleTabs.includes('thumbnail') &&
+                  !visibleTabs.includes('assets')
+              "
             >
-              <b-table :items="bands" :fields="bandFields" responsive small striped/>
+              <b-table
+                :items="bands"
+                :fields="bandFields"
+                responsive
+                small
+                striped
+              />
             </b-tab>
           </b-tabs>
         </b-col>
 
         <b-col md="4">
           <b-card bg-variant="light">
-            <div id="locator-map"/>
+            <div id="locator-map" />
             <div class="table-responsive metadata">
               <table class="table">
                 <tbody>
@@ -104,9 +131,7 @@
                     <td class="title">Collection</td>
                     <td>
                       <router-link :to="linkToCollection">
-                        {{
-                        collection.title || "Untitled"
-                        }}
+                        {{ collection.title || "Untitled" }}
                       </router-link>
                     </td>
                   </tr>
@@ -115,7 +140,8 @@
                     <td>
                       <!-- eslint-disable-next-line vue/no-v-html -->
                       <span v-html="license"></span>
-                      <template v-if="licensor">by
+                      <template v-if="licensor"
+                        >by
                         <!-- eslint-disable-next-line vue/no-v-html -->
                         <span v-html="licensor"></span>
                       </template>
@@ -124,10 +150,10 @@
                   <tr v-for="prop in propertyList" :key="prop.key">
                     <td class="title">
                       <!-- eslint-disable-next-line vue/no-v-html -->
-                      <span :title="prop.key" v-html="prop.label"/>
+                      <span :title="prop.key" v-html="prop.label" />
                     </td>
                     <!-- eslint-disable-next-line vue/no-v-html -->
-                    <td v-html="prop.value"/>
+                    <td v-html="prop.value" />
                   </tr>
                 </tbody>
               </table>
@@ -140,7 +166,9 @@
       <b-container>
         <span class="poweredby text-muted">
           Powered by
-          <a href="https://github.com/radiantearth/stac-browser">STAC Browser</a>
+          <a href="https://github.com/radiantearth/stac-browser"
+            >STAC Browser</a
+          >
         </span>
       </b-container>
     </footer>
@@ -283,11 +311,10 @@ export default {
           .map(x => ({
             ...x,
             bandNames: x.bands
-              .map(
-                band =>
-                  band != null
-                    ? band.description || band.common_name || band.name
-                    : null
+              .map(band =>
+                band != null
+                  ? band.description || band.common_name || band.name
+                  : null
               )
               .filter(x => x != null)
               .join(", ")
@@ -313,6 +340,8 @@ export default {
       if (this.license != null || this.licensor != null) {
         return `Imagery ${this.license || ""} ${this.licensor || ""}`;
       }
+
+      return null;
     },
     bands() {
       return (
@@ -336,13 +365,15 @@ export default {
       );
     },
     cogs() {
-      return this.assets.filter(x => COG_TYPES.includes(x.type)).map(cog => ({
-        ...cog,
-        title:
-          cog.bandNames.length > 0
-            ? `${cog.title} (${cog.bandNames})`
-            : cog.title
-      }));
+      return this.assets
+        .filter(x => COG_TYPES.includes(x.type))
+        .map(cog => ({
+          ...cog,
+          title:
+            cog.bandNames.length > 0
+              ? `${cog.title} (${cog.bandNames})`
+              : cog.title
+        }));
     },
     collection() {
       if (this.collectionLink != null) {
@@ -350,6 +381,8 @@ export default {
 
         return this.getEntity(this.collectionLink.href);
       }
+
+      return null;
     },
     collectionLink() {
       return this._collectionLinks
@@ -431,6 +464,8 @@ export default {
       if (this.collectionLink.href != null) {
         return `/collection/${this.slugify(this.collectionLink.href)}`;
       }
+
+      return null;
     },
     parentLink() {
       return this.links
@@ -459,6 +494,8 @@ export default {
       if (thumbnail != null) {
         return this.resolve(thumbnail.href, this.url);
       }
+
+      return null;
     },
     tileSource() {
       if (this.selectedImage == null) {

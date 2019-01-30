@@ -13,7 +13,6 @@ module.exports = {
     process: true,
     require: true
   },
-  parser: "vue-eslint-parser",
   parserOptions: {
     parser: "babel-eslint"
   },
