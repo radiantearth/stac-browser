@@ -36,7 +36,7 @@
           <div v-if="description" v-html="description"/>
 
           <b-tabs v-model="tabIndex">
-            <b-tab v-if="visibleTabs.includes('catalogs')" title="Catalogs">
+            <b-tab v-if="visibleTabs.includes('catalogs')" key="catalogs" title="Catalogs">
               <b-table
                 :items="children"
                 :fields="childFields"
@@ -61,7 +61,7 @@
               />
             </b-tab>
 
-            <b-tab v-if="visibleTabs.includes('items')" title="Items">
+            <b-tab v-if="visibleTabs.includes('items')" key="items" title="Items">
               <b-table
                 :items="items"
                 :fields="itemFields"
@@ -87,7 +87,7 @@
                 :hide-goto-end-buttons="true"
               />
             </b-tab>
-            <b-tab v-if="visibleTabs.includes('bands')" title="Bands">
+            <b-tab v-if="visibleTabs.includes('bands')" key="bands" title="Bands">
               <b-table :items="bands" :fields="bandFields" responsive small striped/>
             </b-tab>
           </b-tabs>
@@ -113,7 +113,11 @@
                           <a :href="provider.url">{{ provider.name }}</a>
                           <em>({{ (provider.roles || []).join(", ") }})</em>
                           <!-- eslint-disable-next-line vue/no-v-html vue/max-attributes-per-line -->
-                          <div v-if="provider.description" v-html="provider.description" class="description"/>
+                          <div
+                            v-if="provider.description"
+                            class="description"
+                            v-html="provider.description"
+                          />
                         </td>
                       </tr>
                     </template>
