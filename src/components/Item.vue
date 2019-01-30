@@ -803,6 +803,10 @@ code {
   overflow-x: scroll;
 }
 
+.scroll::-webkit-scrollbar {
+  display: none;
+}
+
 .btn code {
   font-size: 10.5px;
 }
