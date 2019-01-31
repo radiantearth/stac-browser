@@ -98,7 +98,7 @@
                 <!-- TODO row-details w/ additional metadata + map -->
               </b-table>
               <b-pagination
-                v-if="itemCount > itemsPerPage"
+                v-if="itemCount > items.length"
                 v-model="currentItemPage"
                 :limit="15"
                 :total-rows="itemCount"
@@ -144,7 +144,9 @@
                       <tr :key="provider.url + index">
                         <td colspan="2" class="provider">
                           <a :href="provider.url">{{ provider.name }}</a>
-                          <em>({{ (provider.roles || []).join(", ") }})</em>
+                          <em v-if="provider.roles"
+                            >({{ provider.roles.join(", ") }})</em
+                          >
                           <!-- eslint-disable-next-line vue/no-v-html vue/max-attributes-per-line -->
                           <div
                             v-if="provider.description"
@@ -240,6 +242,7 @@ export default {
   data() {
     return {
       externalItemCount: 0,
+      externalItemsPerPage: 0,
       childFields: {
         link: {
           label: "Title",
@@ -291,7 +294,13 @@ export default {
 
           const items = await rsp.json();
 
-          this.externalItemCount = items.meta.found;
+          if (items.meta != null) {
+            // sat-api
+            this.externalItemCount = items.meta.found;
+            this.externalItemsPerPage = items.meta.limit;
+          } else {
+            this.externalItemCount = items.features.length;
+          }
 
           // strip /collection from the target path
           let p = this.path.replace(/^\/collection/, "");
@@ -413,7 +422,7 @@ export default {
     },
     itemsPerPage() {
       if (this.hasExternalItems) {
-        return 0;
+        return this.externalItemsPerPage;
       }
 
       return ITEMS_PER_PAGE;
@@ -421,7 +430,7 @@ export default {
     jsonLD() {
       const dataCatalog = this.providers.reduce(
         (dc, p) =>
-          p.roles.reduce((dc, role) => {
+          (p.roles || []).reduce((dc, role) => {
             switch (role) {
               case "licensor":
                 dc.copyrightHolder = dc.copyrightHolder || [];

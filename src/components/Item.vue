@@ -450,7 +450,7 @@ export default {
     },
     licensor() {
       return this.providers
-        .filter(x => x.roles.includes("licensor"))
+        .filter(x => (x.roles || []).includes("licensor"))
         .map(x => {
           if (x.url != null) {
             return `<a href=${x.url}>${x.name}</a>`;
