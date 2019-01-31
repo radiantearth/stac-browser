@@ -52,10 +52,12 @@ const makeRelative = uri => {
     return uri;
   }
 
-  return path.relative(
-    path.dirname(rootURI.path),
-    `${localURI.path}${localURI.hash || ""}`
-  );
+  const rootPath = rootURI.path
+    .split("/")
+    .slice(0, -1)
+    .join("/");
+
+  return path.relative(rootPath, `${localURI.path}${localURI.hash || ""}`);
 };
 
 /**
