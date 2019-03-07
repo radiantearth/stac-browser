@@ -412,7 +412,7 @@ export default {
         "@type": "Dataset",
         // required
         name: this.title,
-        description: this.description,
+        description: this.description || `${this.title} STAC Item`,
         // recommended
         citation: this._properties["sci:citation"],
         identifier: this._properties["sci:doi"] || this.item.id,
