@@ -15,6 +15,8 @@ may be nested and do not necessarily contain references to their parents).
 * [Google Earth Engine](https://gee.stac.cloud)
 * [sat-api.stac.cloud](https://sat-api.stac.cloud) ([sat-api on GitHub](https://github.com/sat-utils/sat-api))
 
+For a longer list of examples, checkout out [stac.cloud](http://stac.cloud).
+
 ## Running
 
 By default, stac-browser will browse the [testbed Planet
