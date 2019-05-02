@@ -260,8 +260,12 @@ export default {
           label: "Date Acquired",
           sortable: true,
           formatter: function(isoDate) {
-            const date = new Date(isoDate);
-            return !isNaN(date.getTime()) ? date.toUTCString() : "";
+            if (isoDate != null) {
+              const date = new Date(isoDate);
+              return !isNaN(date.getTime()) ? date.toUTCString() : "";
+            }
+
+            return "";
           }
         }
       },
