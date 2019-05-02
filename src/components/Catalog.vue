@@ -131,12 +131,12 @@
                     <tr>
                       <th colspan="2">
                         <h3>
-                          <template v-if="providers.length === 1"
-                            >Provider</template
-                          >
-                          <template v-if="providers.length !== 1"
-                            >Providers</template
-                          >
+                          <template v-if="providers.length === 1">
+                            Provider
+                          </template>
+                          <template v-if="providers.length !== 1">
+                            Providers
+                          </template>
                         </h3>
                       </th>
                     </tr>
