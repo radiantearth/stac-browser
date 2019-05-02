@@ -851,6 +851,10 @@ code {
   font-size: 10.5px;
 }
 
+.btn.clipboard {
+  white-space: nowrap;
+}
+
 .btn.clipboard:hover {
   text-decoration: none;
 }
