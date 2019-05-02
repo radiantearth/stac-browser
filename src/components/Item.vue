@@ -838,6 +838,9 @@ code {
 
 .scroll {
   overflow-x: scroll;
+  -ms-overflow-style: none;
+  overflow: -moz-scrollbars-none;
+  scrollbar-width: none;
 }
 
 .scroll::-webkit-scrollbar {
