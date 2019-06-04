@@ -98,7 +98,7 @@
                 <!-- TODO row-details w/ additional metadata + map -->
               </b-table>
               <b-pagination
-                v-if="itemCount > items.length"
+                v-if="itemCount > itemsPerPage"
                 v-model="currentItemPage"
                 :limit="15"
                 :total-rows="itemCount"
