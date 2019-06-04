@@ -16,7 +16,7 @@
         {
           "oneOf": [
             {
-              "$ref": "https://raw.githubusercontent.com/geojson/schema/gh-pages/Feature.json"
+              "$ref": "https://geojson.org/schema/Feature.json"
             }
           ]
         },
@@ -69,6 +69,11 @@
                   "format": "date-time"
                 }
               }
+            },
+            "collection": {
+              "title": "Collection ID",
+              "description": "The ID of the STAC Collection this Item references to.",
+              "type": "string"
             }
           }
         }
