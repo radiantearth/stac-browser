@@ -51,11 +51,6 @@
     "label": "Publications",
     "type": "sci:publications"
   },
-  "item:license": "License",
-  "item:providers": {
-    "label": "Providers",
-    "type": "providers"
-  },
   "pl:anomalous_pixels": {
     "label": "Anomalous pixels"
   },
