@@ -50,7 +50,7 @@ export default {
       ],
       __dangerouslyDisableSanitizers: ["script"],
       title: this.title,
-      titleTemplate: "%s ⸬ STAC Browser"
+      titleTemplate: "%s :: STAC Browser"
     };
   },
   computed: {
