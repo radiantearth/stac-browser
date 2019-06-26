@@ -1,12 +1,10 @@
 import path from "path";
-import url from "url";
 
 import "@babel/polyfill";
 import "es6-promise/auto";
 import Ajv from "ajv";
 import AsyncComputed from "vue-async-computed";
 import BootstrapVue from "bootstrap-vue";
-import bs58 from "bs58";
 import Clipboard from "v-clipboard";
 import Meta from "vue-meta";
 import Multiselect from "vue-multiselect";
@@ -44,29 +42,66 @@ const CATALOG_URL =
   process.env.CATALOG_URL ||
   "https://storage.googleapis.com/pdd-stac/disasters/catalog.json";
 
-const makeRelative = uri => {
-  const rootURI = url.parse(CATALOG_URL);
-  const localURI = url.parse(uri);
-
-  if (rootURI.hostname !== localURI.hostname) {
-    return uri;
-  }
-
-  const rootPath = rootURI.path
-    .split("/")
-    .slice(0, -1)
-    .join("/");
-
-  return path.relative(rootPath, `${localURI.path}${localURI.hash || ""}`);
-};
-
 /**
  * Generate a slug (short, URL-encodable string) for a URI.
  *
  * @param {String} uri URI to generate a slug for.
- * @returns Base58-encoded relative path to the root catalog.
+ * @returns Relative path to the root catalog.
  */
-const slugify = uri => bs58.encode(Buffer.from(makeRelative(uri)));
+const slugify = uri => {
+  const basename = path.basename(uri, path.extname(uri));
+
+  if (["catalog", "collection"].includes(basename)) {
+    return path
+      .dirname(uri)
+      .split("/")
+      .pop();
+  } else {
+    return basename;
+  }
+};
+
+/**
+ * Convert a route containing multiple slug components into a set of STAC entity URIs.
+ *
+ * @param {String} route Relative path.
+ * @param {String} type Type of entity.
+ */
+const unslugify = (route, type) => {
+  let suffix;
+
+  switch (type) {
+    case "catalog":
+      // assumption: all catalogs (rel=root, rel=parent, rel=child) are named catalog.json; these
+      // are mapped by STAC browser to /<path>
+      suffix = "/catalog.json";
+      break;
+
+    case "collection":
+      // assumption: all collections (rel=collection) are named collection.json; these are mapped by
+      // STAC browser to /collection/<path>
+      suffix = "/collection.json";
+      break;
+
+    default:
+      // assumption: all items (rel=item) are named <id>.json; these are mapped by STAC browser to
+      // /item/<path>
+      suffix = `.json`;
+  }
+
+  const parts = route.split("/").filter(x => x !== "");
+
+  return parts.reduce(
+    (acc, el, i) => [
+      ...acc,
+      [
+        path.dirname(acc[acc.length - 1]),
+        el + (i === parts.length - 1 ? suffix : "/catalog.json")
+      ].join("/")
+    ],
+    [CATALOG_URL]
+  );
+};
 
 const resolve = (href, base = CATALOG_URL) => new URL(href, base).toString();
 
@@ -78,15 +113,6 @@ async function loadSchema(uri) {
   }
 
   return rsp.json();
-}
-
-function decode(s) {
-  try {
-    return resolve(bs58.decode(s).toString());
-  } catch (err) {
-    console.warn(err);
-    return CATALOG_URL;
-  }
 }
 
 const main = async () => {
@@ -155,13 +181,7 @@ const main = async () => {
       path: "/item/:path*",
       component: Item,
       props: route => {
-        let ancestors = [CATALOG_URL];
-
-        if (route.params.path != null) {
-          ancestors = ancestors.concat(
-            route.params.path.split("/").map(decode)
-          );
-        }
+        let ancestors = unslugify(route.params.path, "item");
 
         let center = null;
 
@@ -184,13 +204,7 @@ const main = async () => {
       path: "/collection/:path*",
       component: Catalog,
       props: route => {
-        let ancestors = [CATALOG_URL];
-
-        if (route.params.path != null) {
-          ancestors = ancestors.concat(
-            route.params.path.split("/").map(decode)
-          );
-        }
+        let ancestors = unslugify(route.params.path, "collection");
 
         return {
           ancestors,
@@ -206,13 +220,7 @@ const main = async () => {
       path: "/:path*",
       component: Catalog,
       props: route => {
-        let ancestors = [CATALOG_URL];
-
-        if (route.params.path != null) {
-          ancestors = ancestors.concat(
-            route.params.path.split("/").map(decode)
-          );
-        }
+        let ancestors = unslugify(route.params.path || "", "catalog");
 
         return {
           ancestors,
@@ -318,11 +326,16 @@ const main = async () => {
     }
 
     if (to.params.path != null) {
-      // pre-load all known entities
-      const urls = to.params.path
-        .split("/")
-        .reverse()
-        .map(decode);
+      // assume everything under / is a catalog
+      let type = "catalog";
+
+      if (to.path.startsWith("/item/")) {
+        type = "item";
+      } else if (to.path.startsWith("/collection/")) {
+        type = "collection";
+      }
+
+      const urls = unslugify(to.params.path, type);
 
       await pMap(urls, store.dispatch.bind(store, "load"), {
         concurrency: 10

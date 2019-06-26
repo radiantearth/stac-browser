@@ -368,7 +368,8 @@ export default {
       }
     },
     entity(to, from) {
-      if (!isEqual(to, from)) {
+      console.log("entity:", from, to);
+      if (!isEqual(to, from) && to != null) {
         this._validate(to);
 
         this.initialize();
