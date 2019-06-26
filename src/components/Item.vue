@@ -4,13 +4,6 @@
       <b-row>
         <b-col md="12">
           <header>
-            <!-- <a href="https://www.planet.com/disasterdata/">
-              <img
-                id="header_logo"
-                src="https://planet-pulse-assets-production.s3.amazonaws.com/uploads/2016/06/blog-logo.jpg"
-                alt="Powered by Planet Labs"
-                class="float-right">
-            </a>-->
             <div>
               <b-breadcrumb :items="breadcrumbs" />
             </div>
@@ -127,6 +120,11 @@
             <div class="table-responsive metadata">
               <table class="table">
                 <tbody>
+                  <tr>
+                    <td class="group" colspan="2">
+                      <h4>Metadata</h4>
+                    </td>
+                  </tr>
                   <tr v-if="collection">
                     <td class="title">Collection</td>
                     <td>
@@ -147,14 +145,21 @@
                       </template>
                     </td>
                   </tr>
-                  <tr v-for="prop in propertyList" :key="prop.key">
-                    <td class="title">
+                  <template v-for="(props, ext) in propertyList">
+                    <tr v-if="ext" :key="ext">
+                      <td class="group" colspan="2">
+                        <h4>{{ ext }}</h4>
+                      </td>
+                    </tr>
+                    <tr v-for="prop in props" :key="prop.key">
+                      <td class="title">
+                        <!-- eslint-disable-next-line vue/no-v-html -->
+                        <span :title="prop.key" v-html="prop.label" />
+                      </td>
                       <!-- eslint-disable-next-line vue/no-v-html -->
-                      <span :title="prop.key" v-html="prop.label" />
-                    </td>
-                    <!-- eslint-disable-next-line vue/no-v-html -->
-                    <td v-html="prop.value" />
-                  </tr>
+                      <td v-html="prop.value" />
+                    </tr>
+                  </template>
                 </tbody>
               </table>
             </div>
@@ -879,6 +884,40 @@ code {
 .tabs {
   margin-top: 25px;
 }
+
+.table th,
+.table td {
+  border: none;
+  padding: 0.25rem;
+}
+
+.table td.title {
+  border-right: 1px solid #ddd;
+}
+
+.table td.group {
+  border-radius: 5px;
+  background-color: #ddd;
+  padding-left: 7px;
+}
+
+.table td.group h4 {
+  font-size: 14px;
+  font-weight: normal;
+  color: #555;
+  text-transform: uppercase;
+}
+
+.table th {
+  border-top: none;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.metadata td.title {
+  font-weight: bold;
+  width: 33%;
+  text-align: right;
+}
 </style>
 
 <style scoped lang="css">
@@ -921,30 +960,8 @@ code {
   max-width: 100px;
 }
 
-.table th,
-.table td {
-  border: none;
-  padding: 0.25rem;
-}
-
-.table th {
-  border-top: none;
-  border-bottom: 1px solid #dee2e6;
-}
-
-.metadata td.title {
-  font-weight: bold;
-  width: 33%;
-}
-
 .table-responsive.assets {
   padding: 15px;
-}
-
-.table-responsibe.metadata {
-  background-color: #f9f9f9;
-  border: 1px solid #dee2e6;
-  padding: 10px;
 }
 
 .multiselect {

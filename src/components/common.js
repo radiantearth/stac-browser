@@ -4,6 +4,7 @@ import clone from "clone";
 import { HtmlRenderer, Parser } from "commonmark";
 import escape from "lodash.escape";
 import isEqual from "lodash.isequal";
+import isEmpty from "lodash.isempty";
 import jsonQuery from "json-query";
 import spdxToHTML from "spdx-to-html";
 import { mapGetters } from "vuex";
@@ -210,6 +211,88 @@ export default {
               }) + suffix
             );
           }
+
+          if (dictionary[key].type === "label:property") {
+            if (value == null) {
+              return;
+            }
+
+            return value.map(x => `<code>${x}</code>`).join(", ");
+          }
+
+          if (dictionary[key].type === "label:classes") {
+            if (Array.isArray(value)) {
+              return value
+                .map(o =>
+                  Object.entries(o)
+                    .map(([k, v]) => {
+                      if (k === "name") {
+                        if (v === "raster") {
+                          return;
+                        }
+
+                        return `<code><b>${v}</b></code>:`;
+                      }
+
+                      if (Array.isArray(v)) {
+                        return v.map(x => `<code>${x}</code>`).join(", ");
+                      }
+
+                      return v;
+                    })
+                    .join(" ")
+                )
+                .join("<br>\n");
+            }
+
+            return Object.entries(value)
+              .map(([k, v]) => {
+                if (k === "name") {
+                  if (v === "raster") {
+                    return;
+                  }
+
+                  return `<code><b>${v}</b></code>:`;
+                }
+
+                if (Array.isArray(v)) {
+                  return v.map(x => `<code>${x}</code>`).join(", ");
+                }
+
+                return v;
+              })
+              .join(" ");
+          }
+
+          if (dictionary[key].type === "label:overview") {
+            return Object.entries(value)
+              .map(([k, v]) => {
+                if (k === "property_key") {
+                  if (Array.isArray(v)) {
+                    return `<b>keys</b>: ${v
+                      .map(x => `<code>${x}</code>`)
+                      .join(", ")}`;
+                  }
+
+                  return `key: <code>${v}`;
+                }
+
+                if (k === "counts") {
+                  return v.map(
+                    c => `<code><b>${c.name}</b></code>: ${c.count}`
+                  );
+                }
+
+                if (k === "statistics") {
+                  return v.map(
+                    c => `<code><b>${c.name}</b></code>: ${c.value}`
+                  );
+                }
+
+                return `${k}: ${JSON.stringify(v)}`;
+              })
+              .join("<br>\n");
+          }
         }
 
         if (key === "eo:epsg") {
@@ -232,14 +315,27 @@ export default {
         ...this._properties
       };
 
-      return Object.keys(props)
-        .filter(k => props[k] != null)
-        .filter(k => !skip(k))
-        .map(key => ({
+      return Object.entries(props)
+        .filter(([, v]) => !isEmpty(v))
+        .filter(([k]) => !skip(k))
+        .sort(([a], [b]) => a - b)
+        .map(([key, value]) => ({
           key,
           label: label(key),
-          value: format(key, props[key])
-        }));
+          value: format(key, value)
+        }))
+        .reduce((acc, prop) => {
+          let ext = "";
+          if (prop.key.includes(":")) {
+            const prefix = prop.key.split(":")[0];
+            ext = dictionary[`${prefix}:`] || prefix;
+          }
+
+          acc[ext] = acc[ext] || [];
+          acc[ext].push(prop);
+
+          return acc;
+        }, {});
     },
     providers() {
       return this._providers.map(x => ({

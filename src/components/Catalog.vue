@@ -10,13 +10,6 @@
       </b-row>
       <b-row>
         <b-col :md="keywords.length > 0 || license != null ? 8 : 12">
-          <!-- <a href="https://www.planet.com/disasterdata/">
-            <img
-              id="header_logo"
-              src="https://planet-pulse-assets-production.s3.amazonaws.com/uploads/2016/06/blog-logo.jpg"
-              alt="Powered by Planet Labs"
-              class="float-right">
-          </a>-->
           <h1 class="scroll">{{ title }}</h1>
           <p v-if="version">
             <small>Version {{ version }}</small>
@@ -124,21 +117,58 @@
         <b-col v-if="keywords.length > 0 || license != null" md="4">
           <b-card bg-variant="light">
             <div v-if="spatialExtent" id="locator-map" />
-            <div class="table-responsive">
+            <div class="table-responsive metadata">
               <table class="table">
                 <tbody>
+                  <tr>
+                    <td class="group" colspan="2">
+                      <h4>Metadata</h4>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="title">STAC Version</td>
+                    <td>{{ stacVersion }}</td>
+                  </tr>
+                  <tr v-if="keywords">
+                    <td class="title">Keywords</td>
+                    <td>{{ keywords }}</td>
+                  </tr>
+                  <tr v-if="license">
+                    <td class="title">License</td>
+                    <!-- eslint-disable-next-line vue/no-v-html -->
+                    <td v-html="license" />
+                  </tr>
+                  <tr v-if="temporalExtent">
+                    <td class="title">Temporal Extent</td>
+                    <td>{{ temporalExtent }}</td>
+                  </tr>
+                  <template v-for="(props, ext) in propertyList">
+                    <tr v-if="ext" :key="ext">
+                      <td class="group" colspan="2">
+                        <h4>{{ ext }}</h4>
+                      </td>
+                    </tr>
+                    <tr v-for="prop in props" :key="prop.key">
+                      <td class="title">
+                        <!-- eslint-disable-next-line vue/no-v-html -->
+                        <span :title="prop.key" v-html="prop.label" />
+                      </td>
+                      <!-- eslint-disable-next-line vue/no-v-html -->
+                      <td v-html="prop.value" />
+                    </tr>
+                  </template>
                   <template v-if="providers">
                     <tr>
-                      <th colspan="2">
-                        <h3>
+                      <td colspan="2" class="group">
+                        <h4>
                           <template v-if="providers.length === 1">
                             Provider
                           </template>
                           <template v-if="providers.length !== 1">
                             Providers
                           </template>
-                        </h3>
-                      </th>
+                        </h4>
+                      </td>
                     </tr>
                     <template v-for="(provider, index) in providers">
                       <tr :key="provider.url + index">
@@ -157,31 +187,6 @@
                       </tr>
                     </template>
                   </template>
-                  <tr>
-                    <td class="title">STAC Version</td>
-                    <td>{{ stacVersion }}</td>
-                  </tr>
-                  <tr v-if="keywords">
-                    <td class="title">Keywords</td>
-                    <td>{{ keywords }}</td>
-                  </tr>
-                  <tr v-if="license">
-                    <td class="title">License</td>
-                    <!-- eslint-disable-next-line vue/no-v-html -->
-                    <td v-html="license" />
-                  </tr>
-                  <tr v-if="temporalExtent">
-                    <td class="title">Temporal Extent</td>
-                    <td>{{ temporalExtent }}</td>
-                  </tr>
-                  <tr v-for="prop in propertyList" :key="prop.key">
-                    <td class="title">
-                      <!-- eslint-disable-next-line vue/no-v-html -->
-                      <span :title="prop.key" v-html="prop.label" />
-                    </td>
-                    <!-- eslint-disable-next-line vue/no-v-html -->
-                    <td v-html="prop.value" />
-                  </tr>
                 </tbody>
               </table>
             </div>
@@ -708,6 +713,10 @@ h3 {
 th h3 {
   margin-top: 0;
   margin-bottom: 0;
+  font-size: 16px;
+  text-transform: uppercase;
+  color: #555;
+  font-weight: normal;
 }
 
 .table th {
@@ -717,18 +726,12 @@ th h3 {
 
 td.provider {
   border: none;
-  padding-top: 0;
-  padding-bottom: 0;
+  padding: 0 15px;
 }
 
 td.provider .description {
   padding-left: 5px;
   font-style: italic;
-}
-
-td.title {
-  font-weight: bold;
-  width: 40%;
 }
 
 .leaflet-container {

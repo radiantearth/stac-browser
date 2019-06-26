@@ -108,6 +108,7 @@ const main = async () => {
   let validateItem;
 
   try {
+    // eslint-disable-next-line require-atomic-updates
     validateCatalog = await ajv.compileAsync(CATALOG_SCHEMA);
     validateCollection = await ajv.compileAsync(COLLECTION_SCHEMA);
     validateItem = await ajv.compileAsync(ITEM_SCHEMA);

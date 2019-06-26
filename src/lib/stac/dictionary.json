@@ -13,6 +13,7 @@
     "label": "Start",
     "type": "date"
   },
+  "eo:": "Electro-Optical",
   "eo:gsd": {
     "label": "<abbr title=\"Ground sample distance (eo:gsd)\">GSD</abbr>",
     "suffix": "m"
@@ -51,6 +52,24 @@
     "label": "Publications",
     "type": "sci:publications"
   },
+  "label:": "Labels",
+  "label:property": {
+    "label": "Properties",
+    "type": "label:property"
+  },
+  "label:classes": {
+    "label": "Classes",
+    "type": "label:classes"
+  },
+  "label:description": "Description",
+  "label:type": "Type",
+  "label:task": "Task",
+  "label:method": "Method",
+  "label:overview": {
+    "label": "Overview",
+    "type": "label:overview"
+  },
+  "pl:": "Planet",
   "pl:anomalous_pixels": {
     "label": "Anomalous pixels"
   },
@@ -109,19 +128,24 @@
     "label": "View angle",
     "suffix": "º"
   },
+  "cbers:": "CBERS",
   "cbers:data_type": "Data type",
   "cbers:path": "CBERS Path",
   "cbers:row": "CBERS Row",
+  "dg:": "Digital Globe",
   "dg:catalog_id": "DigitalGlobe ID",
   "dg:platform": "Platform",
   "dg:product_level": "Product level",
+  "landsat:": "Landsat",
   "landsat:product_id": "Product ID",
   "landsat:scene_id": "Scene ID",
   "landsat:processing_level": "Processing level",
   "landsat:tier": "Tier",
+  "gee:": "Google Earth Engine",
   "gee:type": "Type",
   "gee:cadence": "Cadence",
   "gee:asset_schema": "Asset schema",
+  "sentinel:": "Sentinel",
   "sentinel:utm_zone": "UTM zone",
   "sentinel:latitude_band": "Latitude band",
   "sentinel:grid_square": "Grid square",
