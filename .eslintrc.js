@@ -13,11 +13,7 @@ module.exports = {
     process: true,
     require: true
   },
-  parserOptions: {
-    parser: "babel-eslint"
-  },
   rules: {
-    "no-console": 0,
     "vue/html-self-closing": 0
   }
 };
