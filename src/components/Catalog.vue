@@ -391,8 +391,8 @@ export default {
       return this.externalItemCount;
     },
     items() {
-      const start = (this.currentPage - 1) * this.perPage;
-      const end = this.currentPage * this.perPage;
+      const start = (this.currentItemPage - 1) * this.itemsPerPage;
+      const end = this.currentItemPage * this.itemsPerPage;
 
       if (!this.hasExternalItems) {
         return this._items.map((itemLink, idx) => {
