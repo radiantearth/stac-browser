@@ -628,6 +628,11 @@ export default {
         this.locatorMap.remove();
       }
 
+      if (this.spatialExtent == null) {
+        // no spatial extent; skip
+        return;
+      }
+
       this.locatorMap = Leaflet.map("locator-map", {
         attributionControl: false,
         zoomControl: false,
