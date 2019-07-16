@@ -58,7 +58,7 @@
                 striped
               >
                 <template slot="link" slot-scope="data">
-                  <router-link :to="data.item.slug" append>{{
+                  <router-link :to="data.item.to">{{
                     data.item.title
                   }}</router-link>
                 </template>
@@ -374,13 +374,25 @@ export default {
     children() {
       return this.links
         .filter(x => x.rel === "child")
-        .map(child => ({
-          path: child.href,
-          slug: this.slugify(this.resolve(child.href, this.url)),
-          // child.id is a workaround for https://earthengine-stac.storage.googleapis.com/catalog/catalog.json
-          title: child.title || child.id || child.href,
-          url: this.resolve(child.href, this.url)
-        }));
+        .map(child => {
+          // strip /collection from the target path
+          let p = this.path.replace(/^\/collection/, "");
+
+          if (!p.endsWith("/")) {
+            p += "/";
+          }
+
+          const slug = this.slugify(this.resolve(child.href, this.url));
+          const to = [p, slug].join("");
+
+          return {
+            path: child.href,
+            to,
+            // child.id is a workaround for https://earthengine-stac.storage.googleapis.com/catalog/catalog.json
+            title: child.title || child.id || child.href,
+            url: this.resolve(child.href, this.url)
+          };
+        });
     },
     extent() {
       return (
@@ -511,11 +523,11 @@ export default {
             identifier: p.doi,
             citation: p.citation
           })),
-          hasPart: this.children.map(({ title: name, slug, url }) => ({
+          hasPart: this.children.map(({ title: name, to, url }) => ({
             "@type": "DataCatalog",
             name,
             isBasedOn: url,
-            url: slug
+            url: to
           })),
           dataset: this.items.map(({ item, title: name, to, url }) => ({
             identifier: item ? item.id : undefined,
