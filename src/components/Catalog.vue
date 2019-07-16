@@ -9,7 +9,13 @@
         </b-col>
       </b-row>
       <b-row>
-        <b-col :md="keywords.length > 0 || license != null ? 8 : 12">
+        <b-col
+          :md="
+            keywords.length > 0 || license != null || spatialExtent != null
+              ? 8
+              : 12
+          "
+        >
           <h1 class="scroll">{{ title }}</h1>
           <p v-if="version">
             <small>Version {{ version }}</small>
@@ -114,7 +120,10 @@
             </b-tab>
           </b-tabs>
         </b-col>
-        <b-col v-if="keywords.length > 0 || license != null" md="4">
+        <b-col
+          v-if="keywords.length > 0 || license != null || spatialExtent != null"
+          md="4"
+        >
           <b-card bg-variant="light">
             <div v-if="spatialExtent" id="locator-map" />
             <div class="table-responsive metadata">
