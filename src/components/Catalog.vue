@@ -22,20 +22,20 @@
           </p>
           <p class="scroll">
             <small>
-              <b-button
+              <!-- <b-button
                 v-clipboard="url"
                 variant="link"
                 size="sm"
                 class="clipboard"
+              > -->
+              <span
+                v-if="validationErrors"
+                title="Validation errors present; please check the JavaScript Console"
+                >⚠️</span
               >
-                <span
-                  v-if="validationErrors"
-                  title="Validation errors present; please check the JavaScript Console"
-                  >⚠️</span
-                >
-                <i class="far fa-copy" />&nbsp;
-                <code>{{ url }}</code>
-              </b-button>
+              <!-- <i class="far fa-copy" />&nbsp; -->
+              <code>{{ url }}</code>
+              <!-- </b-button> -->
             </small>
           </p>
           <!-- eslint-disable-next-line vue/no-v-html vue/max-attributes-per-line -->
