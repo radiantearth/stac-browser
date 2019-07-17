@@ -6,7 +6,7 @@
   "main": "lib/index.js",
   "scripts": {
     "build": "NODE_ENV=production parcel build --target=browser index.html",
-    "clean": "find dist -not -name _redirects -delete",
+    "clean": "find dist ! -name _redirects -delete",
     "deploy-prerendered": "npm run clean && npm run build && bin/prerender.js -p $STAC_URL $CATALOG_URL && netlify deploy --prod --dir dist/ --site $NETLIFY_SITE_ID",
     "deploy": "npm run clean && npm run build && netlify deploy --prod --dir dist/ --site $NETLIFY_SITE_ID",
     "start": "npm run clean && parcel --target=browser index.html"
