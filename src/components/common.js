@@ -156,7 +156,7 @@ export default {
         return this._license;
       }
 
-      return spdxToHTML(this._license);
+      return spdxToHTML(this._license) || this._license;
     },
     licenseUrl() {
       if (this._license === "proprietary") {
