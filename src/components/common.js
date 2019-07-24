@@ -316,7 +316,7 @@ export default {
       };
 
       return Object.entries(props)
-        .filter(([, v]) => !isEmpty(v))
+        .filter(([, v]) => Number.isFinite(v) || !isEmpty(v))
         .filter(([k]) => !skip(k))
         .sort(([a], [b]) => a - b)
         .map(([key, value]) => ({
