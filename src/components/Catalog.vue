@@ -57,7 +57,7 @@
                 small
                 striped
               >
-                <template slot="link" slot-scope="data">
+                <template slot="cell(link)" slot-scope="data">
                   <router-link :to="data.item.to">{{
                     data.item.title
                   }}</router-link>
@@ -89,7 +89,7 @@
                 small
                 striped
               >
-                <template slot="link" slot-scope="data">
+                <template slot="cell(link)" slot-scope="data">
                   <router-link :to="data.item.to">{{
                     data.item.title
                   }}</router-link>
@@ -257,20 +257,23 @@ export default {
     return {
       externalItemCount: 0,
       externalItemsPerPage: 0,
-      childFields: {
-        link: {
+      childFields: [
+        {
+          key: "link",
           label: "Title",
           sortable: true
         }
-      },
+      ],
       currentChildPage: 1,
       childrenPerPage: 25,
-      itemFields: {
-        link: {
+      itemFields: [
+        {
+          key: "link",
           label: "Title",
           sortable: true
         },
-        dateAcquired: {
+        {
+          key: "dateAcquired",
           label: "Date Acquired",
           sortable: true,
           formatter: function(isoDate) {
@@ -282,7 +285,7 @@ export default {
             return "";
           }
         }
-      },
+      ],
       currentItemPage: 1,
       locatorMap: null,
       selectedTab: null,

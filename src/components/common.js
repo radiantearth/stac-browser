@@ -92,13 +92,12 @@ export default {
 
       if (example != null) {
         return Object.keys(example).map(k => ({
-          [k]: {
-            label: BAND_LABELS[k]
-          }
+          key: k,
+          label: BAND_LABELS[k]
         }));
       }
 
-      return {};
+      return [];
     },
     breadcrumbs() {
       // create slugs for everything except the root
@@ -399,7 +398,7 @@ export default {
 
       this.validationErrors = errors;
     },
-    updateState(updated) {
+    async updateState(updated) {
       const qs = {
         ...this.$route.query,
         ...updated
@@ -414,10 +413,19 @@ export default {
           return acc;
         }, {});
 
-      this.$router.replace({
-        ...this.$route,
-        query
-      });
+      if (isEqual(this.$route.query, query)) {
+        // nothing to change
+        return;
+      }
+
+      try {
+        await this.$router.replace({
+          ...this.$route,
+          query
+        });
+      } catch (err) {
+        console.warn(err);
+      }
     }
   }
 };
