@@ -712,14 +712,23 @@ export default {
 
       this.fullscreen = [true, "true"].includes(query.fullscreen);
     },
-    updateHash() {
+    async updateHash() {
       const center = this.map.getCenter();
       const zoom = this.map.getZoom();
+      const hash = `${zoom}/${center.lat.toFixed(6)}/${center.lng.toFixed(6)}`;
 
-      this.$router.replace({
-        ...this.$route,
-        hash: `${zoom}/${center.lat.toFixed(6)}/${center.lng.toFixed(6)}`
-      });
+      if (isEqual(this.$route.hash, `#${hash}`)) {
+        return;
+      }
+
+      try {
+        await this.$router.replace({
+          ...this.$route,
+          hash
+        });
+      } catch (err) {
+        console.warn(err);
+      }
     }
   }
 };
