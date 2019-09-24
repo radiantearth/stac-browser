@@ -34,6 +34,7 @@
     "node-fetch": "^2.6.0",
     "p-map": "^3.0.0",
     "p-queue": "^6.1.1",
+    "spdx-license-ids": "^3.0.5",
     "spdx-to-html": "^0.3.2",
     "v-clipboard": "^2.2.2",
     "vue": "^2.6.10",

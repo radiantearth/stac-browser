@@ -7,6 +7,7 @@ import isEqual from "lodash.isequal";
 import isEmpty from "lodash.isempty";
 import jsonQuery from "json-query";
 import spdxToHTML from "spdx-to-html";
+import spdxLicenseIds from "spdx-license-ids";
 import { mapGetters } from "vuex";
 
 import dictionary from "../lib/stac/dictionary.json";
@@ -147,7 +148,7 @@ export default {
       return this._keywords.join(", ");
     },
     license() {
-      if (this._license === "proprietary") {
+      if (this._license != null && !spdxLicenseIds.includes(this._license)) {
         if (this.licenseUrl != null) {
           return `<a href="${this.licenseUrl}">${this._license}</a>`;
         }
@@ -158,7 +159,7 @@ export default {
       return spdxToHTML(this._license) || this._license;
     },
     licenseUrl() {
-      if (this._license === "proprietary") {
+      if (!spdxLicenseIds.includes(this._license)) {
         return this.links
           .concat(
             ((this.collection && this.collection.links) || []).concat(
