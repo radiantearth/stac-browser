@@ -390,6 +390,10 @@ export default {
             cog.bandNames.length > 0
               ? `${cog.title} (${cog.bandNames})`
               : cog.title
+        }))
+        .map(cog => ({
+          ...cog,
+          title: `Image: ${cog.title}`
         }));
     },
     collection() {
