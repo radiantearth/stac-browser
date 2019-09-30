@@ -409,7 +409,7 @@ export default {
       const query = Object.keys(qs)
         .filter(x => qs[x] != null && qs[x] !== false)
         .reduce((acc, k) => {
-          acc[k] = qs[k];
+          acc[k] = qs[k].toString();
 
           return acc;
         }, {});
