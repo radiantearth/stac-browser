@@ -656,11 +656,15 @@ export default {
 
       this.featuresLayer = Leaflet.geoJSON(null, {
         onEachFeature: (feature, layer) =>
-          // layer.bindPopup(JSON.stringify(feature.properties))
           layer.bindPopup(() => {
             const el = document.createElement("table");
 
+            const labelProperties = this._properties["label:property"] || [];
+
             el.innerHTML = Object.entries(feature.properties)
+              .filter(([k]) =>
+                labelProperties.length > 0 ? labelProperties.includes(k) : true
+              )
               .map(
                 ([k, v]) =>
                   `<tr><td><strong>${k}</strong></td><td><code>${v}</code></td></tr>`
