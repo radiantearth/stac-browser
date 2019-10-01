@@ -800,7 +800,8 @@ export default {
 
       if (this.tileSource) {
         this.tileLayer = Leaflet.tileLayer(this.tileSource, {
-          attribution: this.attribution
+          attribution: this.attribution,
+          maxZoom: 22
         }).addTo(this.map);
       }
 
