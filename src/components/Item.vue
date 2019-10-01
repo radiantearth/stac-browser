@@ -585,11 +585,11 @@ export default {
 
         if (idx >= 0) {
           this.updateState({
-            sl: idx
+            sf: idx
           });
         } else {
           this.updateState({
-            sl: null
+            sf: null
           });
         }
       }
