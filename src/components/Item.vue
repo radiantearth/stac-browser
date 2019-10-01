@@ -567,17 +567,23 @@ export default {
     },
     fullscreen(to, from) {
       if (to !== from) {
-        if (to) {
-          this.map.getContainer().classList.add("leaflet-pseudo-fullscreen");
-        } else {
-          this.map.getContainer().classList.remove("leaflet-pseudo-fullscreen");
+        if (this.map != null) {
+          if (to) {
+            this.map.getContainer().classList.add("leaflet-pseudo-fullscreen");
+          } else {
+            this.map
+              .getContainer()
+              .classList.remove("leaflet-pseudo-fullscreen");
+          }
         }
 
         this.updateState({
           fullscreen: to
         });
 
-        this.map.invalidateSize();
+        if (this.map != null) {
+          this.map.invalidateSize();
+        }
       }
     },
     selectedFeatures(to, from) {
