@@ -192,6 +192,7 @@
 import path from "path";
 import url from "url";
 
+import * as d3 from "d3-scale-chromatic";
 import escape from "lodash.escape";
 import isEqual from "lodash.isequal";
 import Leaflet from "leaflet";
@@ -672,7 +673,29 @@ export default {
               .join("");
 
             return el;
-          })
+          }),
+        style: feature => {
+          const labelClasses = this._properties["label:classes"];
+          const classes = (labelClasses || [])
+            .map(x => x.classes.map(c => `${x.name}-${c}`))
+            .flat();
+          const classification = (
+            labelClasses
+              .map(x => [x.name, feature.properties[x.name]])
+              .find(x => x[1] != null) || []
+          ).join("-");
+          const color =
+            d3.schemeTableau10[
+              classes.indexOf(classification) % d3.schemeTableau10.length
+            ] || "#fc0";
+
+          return {
+            color,
+            weight: 1,
+            opacity: 1,
+            fillOpacity: 0.25
+          };
+        }
       }).addTo(this.map);
 
       this.$nextTick(async () => {
