@@ -41,11 +41,11 @@ export default {
         }
       ].filter(({ content }) => content != null),
       script: [
-        { innerHTML: JSON.stringify(this.jsonLD), type: "application/ld+json" },
+        { json: this.jsonLD, type: "application/ld+json" },
         {
-          innerHTML: JSON.stringify({
+          json: {
             path: this.path
-          }),
+          },
           class: "state",
           type: "application/json"
         }
