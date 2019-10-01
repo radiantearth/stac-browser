@@ -265,31 +265,21 @@ export default {
           }
 
           if (dictionary[key].type === "label:overview") {
-            return Object.entries(value)
-              .map(([k, v]) => {
-                if (k === "property_key") {
-                  if (Array.isArray(v)) {
-                    return `<b>keys</b>: ${v
-                      .map(x => `<code>${x}</code>`)
-                      .join(", ")}`;
-                  }
+            return value
+              .map(v => {
+                const prop = v.property_key;
 
-                  return `key: <code>${v}`;
+                if (v.counts != null) {
+                  return `<code><b>${prop}</b></code>: ${v.counts
+                    .map(c => `<code>${c.name}</code> (${c.count})`)
+                    .join(", ")}`;
                 }
 
-                if (k === "counts") {
-                  return v.map(
-                    c => `<code><b>${c.name}</b></code>: ${c.count}`
-                  );
+                if (v.statistics != null) {
+                  return `<code><b>${prop}</b></code>: ${v.statistics
+                    .map(c => `<code>${c.name}</code> (${c.count})`)
+                    .join(", ")}`;
                 }
-
-                if (k === "statistics") {
-                  return v.map(
-                    c => `<code><b>${c.name}</b></code>: ${c.value}`
-                  );
-                }
-
-                return `${k}: ${JSON.stringify(v)}`;
               })
               .join("<br>\n");
           }
