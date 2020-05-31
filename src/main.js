@@ -20,6 +20,7 @@ import "bootstrap-vue/dist/bootstrap-vue.css";
 import "leaflet/dist/leaflet.css";
 import "vue-multiselect/dist/vue-multiselect.min.css";
 
+import { fetchUri } from "./util";
 import Catalog from "./components/Catalog.vue";
 import Item from "./components/Item.vue";
 
@@ -274,7 +275,7 @@ const main = async () => {
         commit("LOADING", url);
 
         try {
-          const rsp = await fetch(url);
+          const rsp = await fetchUri(url);
 
           if (rsp.ok) {
             const entity = await rsp.json();
