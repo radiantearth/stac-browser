@@ -82,7 +82,7 @@
                 :items="items"
                 :fields="itemFields"
                 :per-page="itemsPerPage"
-                :current-page="currentItemPage"
+                :current-page="currentItemListPage"
                 :sort-compare="sortCompare"
                 :outlined="true"
                 responsive
@@ -257,6 +257,7 @@ export default {
     return {
       externalItemCount: 0,
       externalItemsPerPage: 0,
+      externalItemPaging: false,
       childFields: [
         {
           key: "link",
@@ -287,6 +288,7 @@ export default {
         }
       ],
       currentItemPage: 1,
+      currentItemListPage: 1,
       locatorMap: null,
       selectedTab: null,
       validationErrors: null
@@ -324,6 +326,7 @@ export default {
           if (context != null) {
             this.externalItemCount = context.matched;
             this.externalItemsPerPage = context.limit;
+            this.externalItemPaging = true;
           } else {
             this.externalItemCount = items.features.length;
           }
@@ -459,7 +462,7 @@ export default {
       return this.externalItems;
     },
     itemsPerPage() {
-      if (this.hasExternalItems) {
+      if (this.externalItemPaging) {
         return this.externalItemsPerPage;
       }
 
@@ -733,6 +736,10 @@ export default {
       this.selectedTab = qs.t;
       this.currentChildPage = Number(qs.cp) || this.currentChildPage;
       this.currentItemPage = Number(qs.ip) || this.currentItemPage;
+
+      // If we have external items, the b-table needs to "stay" on page 1 as
+      // the items list only contains the number of items we want to show.
+      this.currentItemListPage = this.hasExternalItems ? 1 : this.currentItemPage;
     }
   }
 };
