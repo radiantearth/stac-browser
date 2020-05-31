@@ -563,23 +563,44 @@ export default {
       const { spatial, temporal } = this.extent;
 
       if (spatial != null) {
+        let bbox = !!spatial.bbox ? (
+          Array.isArray(spatial.bbox[0]) ? spatial.bbox[0] : spatial.bbox // Account for misformat.
+        ) : spatial;
+
         dataCatalog.spatialCoverage = {
           "@type": "Place",
           geo: {
             "@type": "GeoShape",
-            box: spatial.join(" ")
+            box: bbox.join(" ")
           }
         };
       }
 
       if (temporal != null) {
-        dataCatalog.temporalCoverage = temporal.map(x => x || "..").join("/");
+        let interval = !!temporal.interval ? (
+            temporal.interval[0]
+        ) : temporal;
+
+        dataCatalog.temporalCoverage = interval.map(x => x || "..").join("/");
       }
 
       return dataCatalog;
     },
     spatialExtent() {
-      return this.extent.spatial;
+      const { spatial } = this.extent;
+
+      if (spatial == null) {
+          return null;
+      }
+
+      // In STAC 0.8, spatial was changed from the direct array to an
+      // object with the property 'bbox' containing an array of arrays.
+      // As a workaround, use the first element of that array.
+      let bbox = !!spatial.bbox ? (
+          Array.isArray(spatial.bbox[0]) ? spatial.bbox[0] : spatial.bbox // Account for misformat.
+      ) : spatial;
+
+      return bbox;
     },
     stacVersion() {
       // REQUIRED
@@ -603,11 +624,18 @@ export default {
         return null;
       }
 
+      // In STAC 0.8, temporal was changed from the direct array to an
+      // object with the property 'interval' containing an array of arrays.
+      // As a worrkaround, use the first element of that array.
+      let interval = !!temporal.interval ? (
+        temporal.interval[0]
+      ) : temporal;
+
       return [
-        temporal[0]
-          ? new Date(temporal[0]).toLocaleString()
+        interval[0]
+          ? new Date(interval[0]).toLocaleString()
           : "beginning of time",
-        temporal[1] ? new Date(temporal[1]).toLocaleString() : "now"
+        interval[1] ? new Date(interval[1]).toLocaleString() : "now"
       ].join(" - ");
     },
     version() {
