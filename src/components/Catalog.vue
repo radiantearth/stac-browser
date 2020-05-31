@@ -315,10 +315,15 @@ export default {
 
           const items = await rsp.json();
 
-          if (items.meta != null) {
-            // sat-api
-            this.externalItemCount = items.meta.found;
-            this.externalItemsPerPage = items.meta.limit;
+          // STAC-API Context extension.
+          // Account for the old search:metadata extension.
+          const context = !!items.context ? (
+              items.context
+          ) : items["search:metadata"];
+
+          if (context != null) {
+            this.externalItemCount = context.matched;
+            this.externalItemsPerPage = context.limit;
           } else {
             this.externalItemCount = items.features.length;
           }
