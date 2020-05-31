@@ -184,7 +184,7 @@
                         <td colspan="2" class="provider">
                           <a :href="provider.url">{{ provider.name }}</a>
                           <em v-if="provider.roles"
-                            >({{ provider.roles.join(", ") }})</em
+                          >({{(Array.isArray(provider.roles) ? provider.roles : []).join(", ") }})</em
                           >
                           <!-- eslint-disable-next-line vue/no-v-html vue/max-attributes-per-line -->
                           <div
@@ -470,8 +470,10 @@ export default {
     },
     jsonLD() {
       const dataCatalog = this.providers.reduce(
-        (dc, p) =>
-          (p.roles || []).reduce((dc, role) => {
+        (dc, p) => {
+          let roles = Array.isArray(p.roles) ? p.roles : [];
+
+          return roles.reduce((dc, role) => {
             switch (role) {
               case "licensor":
                 dc.copyrightHolder = dc.copyrightHolder || [];
@@ -515,7 +517,8 @@ export default {
             }
 
             return dc;
-          }, dc),
+            }, dc)
+            },
         {
           "@context": "https://schema.org/",
           "@type": "DataCatalog",
