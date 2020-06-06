@@ -1030,6 +1030,7 @@ code {
 .table td {
   border: none;
   padding: 0.25rem;
+  vertical-align: middle
 }
 
 .table td.title {
