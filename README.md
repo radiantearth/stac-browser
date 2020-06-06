@@ -114,7 +114,7 @@ Catalogs and collections are rendered using the
 [`Item`](src/components/Item.vue) component. Common functionality across both
 components exists in [`src/components/common.js`](src/components/common.js).
 Mappings between property keys (e.g. `eo:platform`) are defined in
-[`src/lib/stac/dictionary.json`](src/lib/stac/dictionary.json).
+[`src/properties.js`](src/properties.js).
 
 ## Alternate Implementations
 
