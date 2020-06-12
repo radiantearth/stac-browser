@@ -10,7 +10,11 @@ import spdxToHTML from "spdx-to-html";
 import spdxLicenseIds from "spdx-license-ids";
 import { mapGetters } from "vuex";
 
-import dictionary from "../lib/stac/dictionary.json";
+import getPropertyDefinitions from "../properties.js";
+
+const propertyDefinitions = getPropertyDefinitions(),
+      propertyMap = propertyDefinitions.properties,
+      groupMap = propertyDefinitions.groups;
 
 const BAND_LABELS = {
   id: "ID",
@@ -185,25 +189,25 @@ export default {
       return this.entity != null;
     },
     propertyList() {
-      const skip = key => dictionary[key] && dictionary[key].skip;
+      const skip = key => propertyMap[key] && propertyMap[key].skip;
 
       const label = key => {
-        if (typeof dictionary[key] === "object") {
-          return dictionary[key].label;
+        if (typeof propertyMap[key] === "object") {
+          return propertyMap[key].label;
         }
 
-        return dictionary[key] || key;
+        return propertyMap[key] || key;
       };
 
       const format = (key, value) => {
         let suffix = "";
 
-        if (typeof dictionary[key] === "object") {
-          if (dictionary[key].suffix != null) {
-            suffix = dictionary[key].suffix;
+        if (typeof propertyMap[key] === "object") {
+          if (propertyMap[key].suffix != null) {
+            suffix = propertyMap[key].suffix;
           }
 
-          if (dictionary[key].type === "date") {
+          if (propertyMap[key].type === "date") {
             return escape(
               new Date(value).toLocaleString([], {
                 timeZone: "UTC",
@@ -212,15 +216,15 @@ export default {
             );
           }
 
-          if (dictionary[key].type === "label:property") {
+          if (propertyMap[key].type === "label:property") {
             if (value == null) {
-              return;
+              return undefined;
             }
 
             return value.map(x => `<code>${x}</code>`).join(", ");
           }
 
-          if (dictionary[key].type === "label:classes") {
+          if (propertyMap[key].type === "label:classes") {
             if (Array.isArray(value)) {
               return value
                 .map(o =>
@@ -228,7 +232,7 @@ export default {
                     .map(([k, v]) => {
                       if (k === "name") {
                         if (v === "raster") {
-                          return;
+                          return undefined;
                         }
 
                         return `<code><b>${v}</b></code>:`;
@@ -249,7 +253,7 @@ export default {
               .map(([k, v]) => {
                 if (k === "name") {
                   if (v === "raster") {
-                    return;
+                    return undefined;
                   }
 
                   return `<code><b>${v}</b></code>:`;
@@ -264,7 +268,7 @@ export default {
               .join(" ");
           }
 
-          if (dictionary[key].type === "label:overview") {
+          if (propertyMap[key].type === "label:overviews") {
             return value
               .map(v => {
                 const prop = v.property_key;
@@ -280,6 +284,8 @@ export default {
                     .map(c => `<code>${c.name}</code> (${c.count})`)
                     .join(", ")}`;
                 }
+
+                return "";
               })
               .join("<br>\n");
           }
@@ -290,7 +296,12 @@ export default {
         }
 
         if (Array.isArray(value)) {
-          return escape(value.map(v => JSON.stringify(v)));
+          return escape(value.map(v => {
+            if(typeof(v) === "object") {
+              return JSON.stringify(v);
+            }
+            return v;
+          }));
         }
 
         if (typeof value === "object") {
@@ -318,7 +329,7 @@ export default {
           let ext = "";
           if (prop.key.includes(":")) {
             const prefix = prop.key.split(":")[0];
-            ext = dictionary[`${prefix}:`] || prefix;
+            ext = groupMap[prefix] || prefix;
           }
 
           acc[ext] = acc[ext] || [];
@@ -373,21 +384,22 @@ export default {
   },
   methods: {
     _validate(data) {
-      const errors = this.validate(data);
-
-      if (errors != null) {
-        console.group("Validation errors");
-        errors.forEach(err => {
-          console.warn(`${err.dataPath} ${err.message}:`);
-          const { value } = jsonQuery(err.dataPath, {
-            data
+      this.validate(data).then(errors => {
+        if (errors != null) {
+          console.log(errors);
+          console.group("Validation errors");
+          errors.forEach(err => {
+            console.warn(`${err.dataPath} ${err.message}:`);
+            const { value } = jsonQuery(err.dataPath, {
+              data
+            });
+            console.warn(clone(value));
           });
-          console.warn(clone(value));
-        });
-        console.groupEnd();
-      }
+          console.groupEnd();
+        }
 
-      this.validationErrors = errors;
+        this.validationErrors = errors;
+      });
     },
     async updateState(updated) {
       const qs = {

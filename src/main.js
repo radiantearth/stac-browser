@@ -3,7 +3,6 @@ import url from "url";
 
 import "@babel/polyfill";
 import "es6-promise/auto";
-import Ajv from "ajv";
 import AsyncComputed from "vue-async-computed";
 import BootstrapVue from "bootstrap-vue";
 import bs58 from "bs58";
@@ -20,16 +19,9 @@ import "bootstrap-vue/dist/bootstrap-vue.css";
 import "leaflet/dist/leaflet.css";
 import "vue-multiselect/dist/vue-multiselect.min.css";
 
+import { fetchUri, fetchSchemaValidator } from "./util";
 import Catalog from "./components/Catalog.vue";
 import Item from "./components/Item.vue";
-
-const CATALOG_SCHEMA = require("../schema/catalog.json");
-const COLLECTION_SCHEMA = require("../schema/collection.json");
-const ITEM_SCHEMA = require("../schema/item.json");
-
-const ajv = new Ajv({
-  loadSchema
-});
 
 Vue.component("multiselect", Multiselect);
 
@@ -42,7 +34,11 @@ Vue.use(Vuex);
 
 const CATALOG_URL =
   process.env.CATALOG_URL ||
-  "https://storage.googleapis.com/pdd-stac/disasters/catalog.json";
+      "https://raw.githubusercontent.com/cholmes/sample-stac/master/stac/catalog.json";
+
+const STAC_VERSION =
+  process.env.STAC_VERSION ||
+      "0.9.0";
 
 const makeRelative = uri => {
   const rootURI = url.parse(CATALOG_URL);
@@ -70,16 +66,6 @@ const slugify = uri => bs58.encode(Buffer.from(makeRelative(uri)));
 
 const resolve = (href, base = CATALOG_URL) => new URL(href, base).toString();
 
-async function loadSchema(uri) {
-  const rsp = await fetch(uri);
-
-  if (!rsp.ok) {
-    throw new Error(`Loading error: ${rsp.statusText}`);
-  }
-
-  return rsp.json();
-}
-
 function decode(s) {
   try {
     return resolve(bs58.decode(s).toString());
@@ -103,51 +89,41 @@ const main = async () => {
     }
   }
 
-  let validateCatalog;
-  let validateCollection;
-  let validateItem;
+  const collectionValidator = async (data) => {
+    const stacVersion = data.stac_version || STAC_VERSION;
 
-  try {
-    // eslint-disable-next-line require-atomic-updates
-    validateCatalog = await ajv.compileAsync(CATALOG_SCHEMA);
-    validateCollection = await ajv.compileAsync(COLLECTION_SCHEMA);
-    validateItem = await ajv.compileAsync(ITEM_SCHEMA);
-  } catch (err) {
-    console.warn(err);
-
-    // create NOOP validators
-    validateCatalog = () => true;
-    validateCollection = () => true;
-    validateItem = () => true;
-  }
-
-  const collectionValidator = data => {
+    let validateCollection = await fetchSchemaValidator("collection", stacVersion);
     if (!validateCollection(data)) {
       return validateCollection.errors.slice();
     }
+    return null;
   };
 
-  const catalogValidator = data => {
+  const catalogValidator = async (data) => {
     if (data.license != null || data.extent != null) {
       // contains Collection properties
-      if (!validateCollection(data)) {
-        if (!validateCatalog(data)) {
-          return validateCatalog.errors.slice();
-        }
-
-        return validateCollection.errors.slice();
-      }
+      return collectionValidator(data);
     }
+
+    const stacVersion = data.stac_version || STAC_VERSION;
+
+    let validateCatalog = await fetchSchemaValidator("catalog", stacVersion);
 
     if (!validateCatalog(data)) {
       return validateCatalog.errors.slice();
     }
+
+    return null;
   };
 
-  const itemValidator = data => {
+  const itemValidator = async (data) => {
+    const stacVersion = data.stac_version || STAC_VERSION;
+
+    let validateItem = await fetchSchemaValidator("item", stacVersion);
     if (!validateItem(data)) {
       return validateItem.errors.slice();
     }
+    return null;
   };
 
   const routes = [
@@ -274,7 +250,7 @@ const main = async () => {
         commit("LOADING", url);
 
         try {
-          const rsp = await fetch(url);
+          const rsp = await fetchUri(url);
 
           if (rsp.ok) {
             const entity = await rsp.json();

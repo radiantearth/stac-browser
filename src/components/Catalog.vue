@@ -82,7 +82,7 @@
                 :items="items"
                 :fields="itemFields"
                 :per-page="itemsPerPage"
-                :current-page="currentItemPage"
+                :current-page="currentItemListPage"
                 :sort-compare="sortCompare"
                 :outlined="true"
                 responsive
@@ -184,7 +184,7 @@
                         <td colspan="2" class="provider">
                           <a :href="provider.url">{{ provider.name }}</a>
                           <em v-if="provider.roles"
-                            >({{ provider.roles.join(", ") }})</em
+                          >({{(Array.isArray(provider.roles) ? provider.roles : []).join(", ") }})</em
                           >
                           <!-- eslint-disable-next-line vue/no-v-html vue/max-attributes-per-line -->
                           <div
@@ -257,6 +257,7 @@ export default {
     return {
       externalItemCount: 0,
       externalItemsPerPage: 0,
+      externalItemPaging: false,
       childFields: [
         {
           key: "link",
@@ -287,6 +288,7 @@ export default {
         }
       ],
       currentItemPage: 1,
+      currentItemListPage: 1,
       locatorMap: null,
       selectedTab: null,
       validationErrors: null
@@ -315,10 +317,16 @@ export default {
 
           const items = await rsp.json();
 
-          if (items.meta != null) {
-            // sat-api
-            this.externalItemCount = items.meta.found;
-            this.externalItemsPerPage = items.meta.limit;
+          // STAC-API Context extension.
+          // Account for the old search:metadata extension.
+          const context = !!items.context ? (
+              items.context
+          ) : items["search:metadata"];
+
+          if (context != null) {
+            this.externalItemCount = context.matched;
+            this.externalItemsPerPage = context.limit;
+            this.externalItemPaging = true;
           } else {
             this.externalItemCount = items.features.length;
           }
@@ -454,7 +462,7 @@ export default {
       return this.externalItems;
     },
     itemsPerPage() {
-      if (this.hasExternalItems) {
+      if (this.externalItemPaging) {
         return this.externalItemsPerPage;
       }
 
@@ -462,8 +470,10 @@ export default {
     },
     jsonLD() {
       const dataCatalog = this.providers.reduce(
-        (dc, p) =>
-          (p.roles || []).reduce((dc, role) => {
+        (dc, p) => {
+          let roles = Array.isArray(p.roles) ? p.roles : [];
+
+          return roles.reduce((dc, role) => {
             switch (role) {
               case "licensor":
                 dc.copyrightHolder = dc.copyrightHolder || [];
@@ -507,7 +517,8 @@ export default {
             }
 
             return dc;
-          }, dc),
+            }, dc)
+            },
         {
           "@context": "https://schema.org/",
           "@type": "DataCatalog",
@@ -555,23 +566,44 @@ export default {
       const { spatial, temporal } = this.extent;
 
       if (spatial != null) {
+        let bbox = !!spatial.bbox ? (
+          Array.isArray(spatial.bbox[0]) ? spatial.bbox[0] : spatial.bbox // Account for misformat.
+        ) : spatial;
+
         dataCatalog.spatialCoverage = {
           "@type": "Place",
           geo: {
             "@type": "GeoShape",
-            box: spatial.join(" ")
+            box: bbox.join(" ")
           }
         };
       }
 
       if (temporal != null) {
-        dataCatalog.temporalCoverage = temporal.map(x => x || "..").join("/");
+        let interval = !!temporal.interval ? (
+            temporal.interval[0]
+        ) : temporal;
+
+        dataCatalog.temporalCoverage = interval.map(x => x || "..").join("/");
       }
 
       return dataCatalog;
     },
     spatialExtent() {
-      return this.extent.spatial;
+      const { spatial } = this.extent;
+
+      if (spatial == null) {
+          return null;
+      }
+
+      // In STAC 0.8, spatial was changed from the direct array to an
+      // object with the property 'bbox' containing an array of arrays.
+      // As a workaround, use the first element of that array.
+      let bbox = !!spatial.bbox ? (
+          Array.isArray(spatial.bbox[0]) ? spatial.bbox[0] : spatial.bbox // Account for misformat.
+      ) : spatial;
+
+      return bbox;
     },
     stacVersion() {
       // REQUIRED
@@ -595,11 +627,18 @@ export default {
         return null;
       }
 
+      // In STAC 0.8, temporal was changed from the direct array to an
+      // object with the property 'interval' containing an array of arrays.
+      // As a worrkaround, use the first element of that array.
+      let interval = !!temporal.interval ? (
+        temporal.interval[0]
+      ) : temporal;
+
       return [
-        temporal[0]
-          ? new Date(temporal[0]).toLocaleString()
+        interval[0]
+          ? new Date(interval[0]).toLocaleString()
           : "beginning of time",
-        temporal[1] ? new Date(temporal[1]).toLocaleString() : "now"
+        interval[1] ? new Date(interval[1]).toLocaleString() : "now"
       ].join(" - ");
     },
     version() {
@@ -728,6 +767,10 @@ export default {
       this.selectedTab = qs.t;
       this.currentChildPage = Number(qs.cp) || this.currentChildPage;
       this.currentItemPage = Number(qs.ip) || this.currentItemPage;
+
+      // If we have external items, the b-table needs to "stay" on page 1 as
+      // the items list only contains the number of items we want to show.
+      this.currentItemListPage = this.hasExternalItems ? 1 : this.currentItemPage;
     }
   }
 };

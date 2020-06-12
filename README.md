@@ -24,13 +24,22 @@ For a longer list of examples, checkout out [stac.cloud](http://stac.cloud).
 ## Running
 
 By default, stac-browser will browse the [testbed Planet
-catalog](https://storage.googleapis.com/pdd-stac/disasters/catalog.json)
-([GitHub](https://github.com/cholmes/pdd-stac/)). To browse your own, set
+catalog](https://raw.githubusercontent.com/cholmes/sample-stac/master/stac/catalog.json)
+([GitHub](https://github.com/cholmes/sample-stac/)). To browse your own, set
 `CATALOG_URL` when building.
 
 ```bash
 npm install
 CATALOG_URL=http://path/to/catalog.json npm start -- --open
+```
+
+Validation will happen againt the version of stac defined in the Catalog, Collection or Item
+`stac_version` property. If you are running against an older STAC version where the objects
+do not conatin a `stac_version` property, you'll need to set the `STAC_VERSION` environment
+variable e.g.:
+
+```
+STAC_VERSION=0.6.0 CATALOG_URL=http://path/to/catalog.json npm start -- --open
 ```
 
 STAC Browser defaults to using [HTML5 History
@@ -114,7 +123,7 @@ Catalogs and collections are rendered using the
 [`Item`](src/components/Item.vue) component. Common functionality across both
 components exists in [`src/components/common.js`](src/components/common.js).
 Mappings between property keys (e.g. `eo:platform`) are defined in
-[`src/lib/stac/dictionary.json`](src/lib/stac/dictionary.json).
+[`src/properties.js`](src/properties.js).
 
 ## Alternate Implementations
 
