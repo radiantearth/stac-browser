@@ -444,8 +444,8 @@ export default {
               to: `/item${this.path}/${this.slugify(itemUrl)}`,
               title:
                 item.properties.title ||
-                item.id ||
                 itemLink.title ||
+                item.id ||
                 itemLink.href,
               dateAcquired: item.properties.datetime
             };
