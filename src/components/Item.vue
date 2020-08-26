@@ -1,6 +1,8 @@
 <template>
   <div>
-    <b-container :class="loaded && 'loaded'">
+    <b-alert v-if="errored" variant="danger" show>{{ _entity.message }}</b-alert>
+    <b-spinner v-else-if="!loaded" label="Loading..."></b-spinner>
+    <b-container v-else :class="loaded && 'loaded'">
       <b-row>
         <b-col md="12">
           <header>
