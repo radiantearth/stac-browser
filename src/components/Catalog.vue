@@ -1,6 +1,12 @@
 <template>
   <div>
-    <b-container :class="loaded && 'loaded'">
+    <b-alert v-if="errored" variant="danger" show>
+      <p>{{ _entity.message }}</p>
+      <p>Please note that some servers don't allow external access via web browsers (e.g., when CORS headers are not present).</p>
+      <p><a href="#" @click="$router.go(-1)">Go back</a></p>
+    </b-alert>
+    <b-spinner v-else-if="!loaded" label="Loading..."></b-spinner>
+    <b-container v-else :class="loaded && 'loaded'">
       <b-row>
         <b-col md="12">
           <header>
