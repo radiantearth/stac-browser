@@ -148,8 +148,7 @@
                     <td>
                       <!-- eslint-disable-next-line vue/no-v-html -->
                       <span v-html="license"></span>
-                      <template v-if="licensor"
-                        >by
+                      <template v-if="licensor"> by
                         <!-- eslint-disable-next-line vue/no-v-html -->
                         <span v-html="licensor"></span>
                       </template>
