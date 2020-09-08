@@ -10,6 +10,12 @@ export default function getPropertyDefinitions() {
   // Required and Common Metadata properties
   // that are shown in the property list.
   const coreProperties = {
+    "title": {
+      "label": "Title"
+    },
+    "description": {
+      "label": "Description"
+    },
     "datetime": {
       "label": "Acquired",
       "type": "date"
@@ -37,6 +43,9 @@ export default function getPropertyDefinitions() {
     "mission": "Mission",
     "gsd": "Ground Sample Distance",
 
+    "providers": {
+      "skip": true
+    },
     // Backwards compatibility
     "provider": "Provider",
   };

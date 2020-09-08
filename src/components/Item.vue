@@ -169,6 +169,36 @@
                       <td v-html="prop.value" />
                     </tr>
                   </template>
+                  <template v-if="providers">
+                    <tr>
+                      <td colspan="2" class="group">
+                        <h4>
+                          <template v-if="providers.length === 1">
+                            Provider
+                          </template>
+                          <template v-if="providers.length !== 1">
+                            Providers
+                          </template>
+                        </h4>
+                      </td>
+                    </tr>
+                    <template v-for="(provider, index) in providers">
+                      <tr :key="provider.url + index">
+                        <td colspan="2" class="provider">
+                          <a :href="provider.url">{{ provider.name }}</a>
+                          <em v-if="provider.roles"
+                          >({{(Array.isArray(provider.roles) ? provider.roles : []).join(", ") }})</em
+                          >
+                          <!-- eslint-disable-next-line vue/no-v-html vue/max-attributes-per-line -->
+                          <div
+                            v-if="provider.description"
+                            class="description"
+                            v-html="provider.description"
+                          />
+                        </td>
+                      </tr>
+                    </template>
+                  </template>
                 </tbody>
               </table>
             </div>
@@ -286,6 +316,7 @@ export default {
     _license() {
       return (
         this._properties["item:license"] ||
+        this._properties["license"] ||
         (this.collection && this.collection.license) ||
         (this.rootCatalog && this.rootCatalog.license)
       );
@@ -293,6 +324,7 @@ export default {
     _providers() {
       return (
         this._properties["item:providers"] ||
+        this._properties["providers"] ||
         (this.collection && this.collection.providers) ||
         common.computed._providers.apply(this)
       );
