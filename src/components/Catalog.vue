@@ -131,6 +131,10 @@
               :hasBands="hasBands"
               :active="false"
             ></AssetTab>
+            <SummariesTab
+              v-if="visibleTabs.includes('summaries')"
+              :summaries="summaries"
+            ></SummariesTab>
           </b-tabs>
         </b-col>
         <b-col
@@ -235,6 +239,7 @@ import { mapActions, mapGetters } from "vuex";
 
 import common from "./common";
 import AssetTab from './AssetTab.vue'
+import SummariesTab from './SummariesTab.vue'
 
 const ITEMS_PER_PAGE = 25;
 
@@ -267,7 +272,7 @@ export default {
       required: true
     }
   },
-  components: { AssetTab },
+  components: { AssetTab, SummariesTab },
   data() {
     return {
       externalItemCount: 0,
@@ -667,6 +672,7 @@ export default {
         this.childCount > 0 && "catalogs",
         (this.hasExternalItems || this.itemCount > 0) && "items",
         this.bands.length > 0 && "bands",
+        this.summaries && "summaries",
         this.assets && this.assets.length > 0 && "assets"
       ].filter(x => x != null && x !== false);
     }
