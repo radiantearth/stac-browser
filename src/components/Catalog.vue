@@ -791,8 +791,8 @@ export default {
     },
     syncWithQueryState(qs) {
       this.selectedTab = qs.t;
-      this.currentChildPage = Number(qs.cp) || this.currentChildPage;
-      this.currentItemPage = Number(qs.ip) || this.currentItemPage;
+      this.currentChildPage = Number(qs.cp) || 1;
+      this.currentItemPage = Number(qs.ip) || 1;
 
       // If we have external items, the b-table needs to "stay" on page 1 as
       // the items list only contains the number of items we want to show.
