@@ -124,6 +124,13 @@
                 striped
               />
             </b-tab>
+            <AssetTab
+              v-if="visibleTabs.includes('assets')"
+              :assets="assets"
+              :bands="bands"
+              :hasBands="hasBands"
+              :active="false"
+            ></AssetTab>
           </b-tabs>
         </b-col>
         <b-col
@@ -227,6 +234,7 @@ import Leaflet from "leaflet";
 import { mapActions, mapGetters } from "vuex";
 
 import common from "./common";
+import AssetTab from './AssetTab.vue'
 
 const ITEMS_PER_PAGE = 25;
 
@@ -259,6 +267,7 @@ export default {
       required: true
     }
   },
+  components: { AssetTab },
   data() {
     return {
       externalItemCount: 0,
@@ -615,6 +624,9 @@ export default {
       // REQUIRED
       return this.catalog.stac_version;
     },
+    summaries() {
+      return this.catalog.summaries;
+    },
     tabIndex: {
       get: function() {
         return this.visibleTabs.indexOf(this.selectedTab);
@@ -654,7 +666,8 @@ export default {
       return [
         this.childCount > 0 && "catalogs",
         (this.hasExternalItems || this.itemCount > 0) && "items",
-        this.bands.length > 0 && "bands"
+        this.bands.length > 0 && "bands",
+        this.assets && this.assets.length > 0 && "assets"
       ].filter(x => x != null && x !== false);
     }
   },

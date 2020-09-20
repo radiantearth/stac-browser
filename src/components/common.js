@@ -1,3 +1,4 @@
+import path from "path";
 import url from "url";
 
 import clone from "clone";
@@ -85,7 +86,77 @@ export default {
         []
       );
     },
+    assets() {
+      if(!this.entity.assets) return [];
+      return (
+        Object.keys(this.entity.assets)
+          .map(key => ({
+            ...this.entity.assets[key],
+            key
+          }))
+          .map(x => {
+            let bands = x["eo:bands"] || [];
+            if(bands.length > 0) {
+              // If these are numbers, they are indexes into top
+              // level bands (pre-1.0.0). If they are objects, they
+              // are band definitions themselves.
+              if(Number.isInteger(bands[0])) {
+                bands = bands
+                  .filter(idx => idx > 0 && idx < this.bands.length)
+                  .map(idx => this.bands[idx]);
+              }
+            }
+            return {
+              ...x,
+              bands: bands,
+              title: x.title || path.basename(x.href),
+              label:
+                escape(x.title) ||
+                `<code>${escape(path.basename(x.href))}</code>`,
+              href: this.resolve(x.href, this.url)
+            };
+          })
+          .map(x => {
+            return ({
+              ...x,
+              roleNames: x.roles.filter(x => x != null).join(", "),
+              bandNames: x.bands
+                .map(band =>
+                  band != null
+                    ? band.description || band.common_name || band.name
+                    : null
+                )
+                .filter(x => x != null)
+                .join(", ")
+            })
+          })
+          // prioritize assets w/ a format set
+          .sort((a, b) => {
+            const formatA = a.format || "zzz";
+            const formatB = b.format || "zzz";
+
+            if (formatA < formatB) {
+              return -1;
+            }
+
+            if (formatA > formatB) {
+              return 1;
+            }
+
+            return 0;
+          })
+      );
+    },
+    bands() {
+      return [];  // Overwritten in Item.
+    },
+    hasBands() {
+      return this.bands.length > 0 ||
+        this.assets.some(asset => asset.bands.length > 0);
+    },
     bandFields() {
+      if(!this.bands) return [];
+
       const example = this.bands[0];
 
       if (example != null) {
