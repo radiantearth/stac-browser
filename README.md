@@ -33,9 +33,9 @@ npm install
 CATALOG_URL=http://path/to/catalog.json npm start -- --open
 ```
 
-Validation will happen againt the version of stac defined in the Catalog, Collection or Item
+Validation will happen against the version of stac defined in the Catalog, Collection or Item
 `stac_version` property. If you are running against an older STAC version where the objects
-do not conatin a `stac_version` property, you'll need to set the `STAC_VERSION` environment
+do not contain a `stac_version` property, you'll need to set the `STAC_VERSION` environment
 variable e.g.:
 
 ```

@@ -76,7 +76,7 @@ export default function getPropertyDefinitions() {
           "suffix": "%"
         },
 
-        // Backwards compatability
+        // Backwards compatibility
         "eo:platform": "Platform",
         "eo:constellation": "Constellation",
         "eo:instrument": "Instrument",
@@ -123,7 +123,7 @@ export default function getPropertyDefinitions() {
           "type": "label:overviews"
         },
 
-        // Backwards Compatability
+        // Backwards compatibility
         "label:task": "Task",
         "label:method": "Method",
         "label:overview": {
@@ -143,7 +143,7 @@ export default function getPropertyDefinitions() {
           skip: true // Value is a complex object that would require specific display logic TODO
         },
         "pc:density": "Density",
-        "pc:statitics": {
+        "pc:statistics": {
           label: "Statistics",
           skip: true // Value is a complex object that would require specific display logic TODO
         }
