@@ -38,7 +38,7 @@
     "spdx-license-ids": "^3.0.5",
     "spdx-to-html": "^0.3.2",
     "v-clipboard": "^2.2.2",
-    "vue": "^2.6.10",
+    "vue": "^2.6.12",
     "vue-async-computed": "^3.7.0",
     "vue-hot-reload-api": "^2.3.4",
     "vue-meta": "^2.2.2",
@@ -60,7 +60,7 @@
     "git-exec-and-restage": "^1.1.1",
     "husky": "^3.0.5",
     "lint-staged": "^9.3.0",
-    "netlify-cli": "^2.15.0",
+    "netlify-cli": "^2.53.0",
     "parcel-bundler": "^1.12.3",
     "prettier": "^1.18.2",
     "vue-template-compiler": "^2.6.10"
