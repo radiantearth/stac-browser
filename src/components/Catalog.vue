@@ -132,10 +132,6 @@
               :hasBands="hasBands"
               :active="false"
             ></AssetTab>
-            <SummariesTab
-              v-if="visibleTabs.includes('summaries')"
-              :summaries="summaries"
-            ></SummariesTab>
           </b-tabs>
         </b-col>
         <b-col
@@ -144,79 +140,15 @@
         >
           <b-card bg-variant="light">
             <div v-if="spatialExtent" id="locator-map" />
-            <div class="table-responsive metadata">
-              <table class="table">
-                <tbody>
-                  <tr>
-                    <td class="group" colspan="2">
-                      <h4>Metadata</h4>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="title">STAC Version</td>
-                    <td>{{ stacVersion }}</td>
-                  </tr>
-                  <tr v-if="keywords">
-                    <td class="title">Keywords</td>
-                    <td>{{ keywords }}</td>
-                  </tr>
-                  <tr v-if="license">
-                    <td class="title">License</td>
-                    <!-- eslint-disable-next-line vue/no-v-html -->
-                    <td v-html="license" />
-                  </tr>
-                  <tr v-if="temporalExtent">
-                    <td class="title">Temporal Extent</td>
-                    <td>{{ temporalExtent }}</td>
-                  </tr>
-                  <template v-for="(props, ext) in propertyList">
-                    <tr v-if="ext" :key="ext">
-                      <td class="group" colspan="2">
-                        <h4>{{ ext }}</h4>
-                      </td>
-                    </tr>
-                    <tr v-for="prop in props" :key="prop.key">
-                      <td class="title">
-                        <!-- eslint-disable-next-line vue/no-v-html -->
-                        <span :title="prop.key" v-html="prop.label" />
-                      </td>
-                      <!-- eslint-disable-next-line vue/no-v-html -->
-                      <td v-html="prop.value" />
-                    </tr>
-                  </template>
-                  <template v-if="providers">
-                    <tr>
-                      <td colspan="2" class="group">
-                        <h4>
-                          <template v-if="providers.length === 1">
-                            Provider
-                          </template>
-                          <template v-if="providers.length !== 1">
-                            Providers
-                          </template>
-                        </h4>
-                      </td>
-                    </tr>
-                    <template v-for="(provider, index) in providers">
-                      <tr :key="provider.url + index">
-                        <td colspan="2" class="provider">
-                          <a :href="provider.url">{{ provider.name }}</a>
-                          <em v-if="provider.roles"
-                          >({{(Array.isArray(provider.roles) ? provider.roles : []).join(", ") }})</em
-                          >
-                          <!-- eslint-disable-next-line vue/no-v-html vue/max-attributes-per-line -->
-                          <div
-                            v-if="provider.description"
-                            class="description"
-                            v-html="provider.description"
-                          />
-                        </td>
-                      </tr>
-                    </template>
-                  </template>
-                </tbody>
-              </table>
-            </div>
+            <MetadataSidebar
+              :properties="properties"
+              :summaries="summaries"
+              :stacVersion="stacVersion"
+              :keywords="keywords"
+              :license="license"
+              :temporalExtent="temporalExtent"
+              :providers="providers"
+            />
           </b-card>
         </b-col>
       </b-row>
@@ -240,7 +172,7 @@ import { mapActions, mapGetters } from "vuex";
 
 import common from "./common";
 import AssetTab from './AssetTab.vue'
-import SummariesTab from './SummariesTab.vue'
+import MetadataSidebar from './MetadataSidebar.vue'
 
 import { transformCatalog } from "../migrate"
 
@@ -275,7 +207,7 @@ export default {
       required: true
     }
   },
-  components: { AssetTab, SummariesTab },
+  components: { AssetTab, MetadataSidebar },
   data() {
     return {
       externalItemCount: 0,
@@ -615,6 +547,9 @@ export default {
 
       return dataCatalog;
     },
+    properties() {
+      return this._properties;
+    },
     spatialExtent() {
       const { spatial } = this.extent;
 
@@ -630,10 +565,6 @@ export default {
       ) : spatial;
 
       return bbox;
-    },
-    stacVersion() {
-      // REQUIRED
-      return this.catalog.stac_version;
     },
     summaries() {
       return this.catalog.summaries;

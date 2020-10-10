@@ -101,81 +101,14 @@
         <b-col md="4">
           <b-card bg-variant="light">
             <div id="locator-map" />
-            <div class="table-responsive metadata">
-              <table class="table">
-                <tbody>
-                  <tr>
-                    <td class="group" colspan="2">
-                      <h4>Metadata</h4>
-                    </td>
-                  </tr>
-                  <tr v-if="collection">
-                    <td class="title">Collection</td>
-                    <td>
-                      <router-link :to="linkToCollection">
-                        {{ collection.title || "Untitled" }}
-                      </router-link>
-                    </td>
-                  </tr>
-                  <tr v-if="license">
-                    <td class="title">License</td>
-                    <td>
-                      <!-- eslint-disable-next-line vue/no-v-html -->
-                      <span v-html="license"></span>
-                      <template v-if="licensor"> by
-                        <!-- eslint-disable-next-line vue/no-v-html -->
-                        <span v-html="licensor"></span>
-                      </template>
-                    </td>
-                  </tr>
-                  <template v-for="(props, ext) in propertyList">
-                    <tr v-if="ext" :key="ext">
-                      <td class="group" colspan="2">
-                        <h4>{{ ext }}</h4>
-                      </td>
-                    </tr>
-                    <tr v-for="prop in props" :key="prop.key">
-                      <td class="title">
-                        <!-- eslint-disable-next-line vue/no-v-html -->
-                        <span :title="prop.key" v-html="prop.label" />
-                      </td>
-                      <!-- eslint-disable-next-line vue/no-v-html -->
-                      <td v-html="prop.value" />
-                    </tr>
-                  </template>
-                  <template v-if="providers">
-                    <tr>
-                      <td colspan="2" class="group">
-                        <h4>
-                          <template v-if="providers.length === 1">
-                            Provider
-                          </template>
-                          <template v-if="providers.length !== 1">
-                            Providers
-                          </template>
-                        </h4>
-                      </td>
-                    </tr>
-                    <template v-for="(provider, index) in providers">
-                      <tr :key="provider.url + index">
-                        <td colspan="2" class="provider">
-                          <a :href="provider.url">{{ provider.name }}</a>
-                          <em v-if="provider.roles"
-                          >({{(Array.isArray(provider.roles) ? provider.roles : []).join(", ") }})</em
-                          >
-                          <!-- eslint-disable-next-line vue/no-v-html vue/max-attributes-per-line -->
-                          <div
-                            v-if="provider.description"
-                            class="description"
-                            v-html="provider.description"
-                          />
-                        </td>
-                      </tr>
-                    </template>
-                  </template>
-                </tbody>
-              </table>
-            </div>
+            <MetadataSidebar
+              :properties="properties"
+              :keywords="keywords"
+              :collection="collection"
+              :collectionLink="collectionLink"
+              :providers="providers"
+              :slugify="slugify"
+            />
           </b-card>
         </b-col>
       </b-row>
@@ -208,6 +141,7 @@ import common from "./common";
 import { transformItem } from "../migrate"
 
 import AssetTab from './AssetTab.vue'
+import MetadataSidebar from './MetadataSidebar.vue'
 
 const COG_TYPES = [
   "image/vnd.stac.geotiff; cloud-optimized=true",
@@ -251,7 +185,8 @@ export default {
     }
   },
   components: {
-    AssetTab
+    AssetTab,
+    MetadataSidebar
   },
   data() {
     return {
@@ -470,13 +405,6 @@ export default {
         })
         .pop();
     },
-    linkToCollection() {
-      if (this.collectionLink.href != null) {
-        return `/collection/${this.slugify(this.collectionLink.href)}`;
-      }
-
-      return null;
-    },
     parentLink() {
       return this.links
         .filter(x => x.rel === "parent")
@@ -486,6 +414,12 @@ export default {
           slug: this.slugify(this.resolve(x.href, this.url))
         }))
         .pop();
+    },
+    properties() {
+      return {
+        ...this._collectionProperties,
+        ...this._properties
+      };
     },
     tabIndex: {
       get: function() {

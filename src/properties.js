@@ -1,3 +1,129 @@
+// This method enriches the property definition object with methods
+// for formatting property labels and values.
+const enrichPropertyDefinitions = (propertyDefinitions) => {
+  const propertyMap = propertyDefinitions.properties;
+
+  return {
+    ...propertyDefinitions,
+    formatPropertyLabel: key => {
+      if (typeof propertyMap[key] === "object") {
+        return propertyMap[key].label;
+      }
+
+      return propertyMap[key] || key;
+    },
+    formatPropertyValue: (key, value) => {
+      let suffix = "";
+
+      if (typeof propertyMap[key] === "object") {
+        if (propertyMap[key].suffix != null) {
+          suffix = propertyMap[key].suffix;
+        }
+
+        if (propertyMap[key].type === "date") {
+          return new Date(value).toLocaleString([], {
+              timeZone: "UTC",
+              timeZoneName: "short"
+            }) + suffix;
+        }
+
+        if (propertyMap[key].type === "label:property") {
+          if (value == null) {
+            return undefined;
+          }
+
+          return value.map(x => `<code>${x}</code>`).join(", ");
+        }
+
+        if (propertyMap[key].type === "label:classes") {
+          if (Array.isArray(value)) {
+            return value
+              .map(o =>
+                Object.entries(o)
+                  .map(([k, v]) => {
+                    if (k === "name") {
+                      if (v === "raster") {
+                        return undefined;
+                      }
+
+                      return `<code><b>${v}</b></code>:`;
+                    }
+
+                    if (Array.isArray(v)) {
+                      return v.map(x => `<code>${x}</code>`).join(", ");
+                    }
+
+                    return v;
+                  })
+                  .join(" ")
+              )
+              .join("<br>\n");
+          }
+
+          return Object.entries(value)
+            .map(([k, v]) => {
+              if (k === "name") {
+                if (v === "raster") {
+                  return undefined;
+                }
+
+                return `<code><b>${v}</b></code>:`;
+              }
+
+              if (Array.isArray(v)) {
+                return v.map(x => `<code>${x}</code>`).join(", ");
+              }
+
+              return v;
+            })
+            .join(" ");
+        }
+
+        if (propertyMap[key].type === "label:overviews") {
+          return value
+            .map(v => {
+              const prop = v.property_key;
+
+              if (v.counts != null) {
+                return `<code><b>${prop}</b></code>: ${v.counts
+                  .map(c => `<code>${c.name}</code> (${c.count})`)
+                  .join(", ")}`;
+              }
+
+              if (v.statistics != null) {
+                return `<code><b>${prop}</b></code>: ${v.statistics
+                  .map(c => `<code>${c.name}</code> (${c.count})`)
+                  .join(", ")}`;
+              }
+
+              return "";
+            })
+            .join("<br>\n");
+        }
+      }
+
+      if (key === "eo:epsg") {
+        return `<a href="http://epsg.io/${value}">${value}</a>`;
+      }
+
+      if (Array.isArray(value)) {
+        return value.map(v => {
+          if (typeof (v) === "object") {
+            return JSON.stringify(v);
+          }
+          return v;
+        });
+      }
+
+      if (typeof value === "object") {
+        return JSON.stringify(value);
+      }
+
+      return value + suffix;
+    }
+  };
+}
+
 /**
  * getPropertyDefinitions constructs the object that's used to display
  * properties in the sidebar for an Item or Collection. This method returns an object with
@@ -6,7 +132,7 @@
  * properties found in STAC "properties" fields to either a display label, or an
  * object that describes the display characteristics of the field.
  */
-export default function getPropertyDefinitions() {
+export const getPropertyDefinitions = () => {
   // Required and Common Metadata properties
   // that are shown in the property list.
   const coreProperties = {
@@ -178,7 +304,7 @@ export default function getPropertyDefinitions() {
         "sar:pixel_spacing_range": "Range Pixel Spacing",
         "sar:pixel_spacing_azimuth": "Aziumth Pixel Spacing",
         "sar:looks_range": "Range Looks",
-	"sar:looks_azimuth": "Azimuth Looks",
+        "sar:looks_azimuth": "Azimuth Looks",
         "sar:looks_equivalent_number": "Equivalent Number of Looks",
         "sar:observation_direction": "Observation Direction"
       }
@@ -230,21 +356,21 @@ export default function getPropertyDefinitions() {
           "suffix": "º"
         },
         "view:incidence_angle": {
-	  label: "Incidence angle",
-	  suffix: "º"
-	},
+          label: "Incidence angle",
+          suffix: "º"
+        },
         "view:azimuth": {
-	  label: "Viewing azimuth",
-	  suffix: "º"
-	},
+          label: "Viewing azimuth",
+          suffix: "º"
+        },
         "view:sun_azimuth": {
-	  label: "Sun azimuth",
-	  suffix: "º"
-	},
+          label: "Sun azimuth",
+          suffix: "º"
+        },
         "view:sun_elevation": {
-	  label: "Sun elevation",
-	  suffix: "º"
-	}
+          label: "Sun elevation",
+          suffix: "º"
+        }
       }
     },
 
@@ -381,23 +507,23 @@ export default function getPropertyDefinitions() {
     properties: {}
   };
 
-  for(var coreProp in coreProperties) {
+  for (var coreProp in coreProperties) {
     propertyDefinitions.properties[coreProp] = coreProperties[coreProp];
   }
 
-  for(var seGroup in stacExtensions) {
+  for (var seGroup in stacExtensions) {
     propertyDefinitions.groups[seGroup] = stacExtensions[seGroup].title;
-    for(var seProp in stacExtensions[seGroup].props) {
+    for (var seProp in stacExtensions[seGroup].props) {
       propertyDefinitions.properties[seProp] = stacExtensions[seGroup].props[seProp];
     }
   }
 
-  for(var exGroup in externalProviderGroups) {
+  for (var exGroup in externalProviderGroups) {
     propertyDefinitions.groups[exGroup] = externalProviderGroups[exGroup].title;
-    for(var exProp in externalProviderGroups[exGroup].props) {
+    for (var exProp in externalProviderGroups[exGroup].props) {
       propertyDefinitions.properties[exProp] = externalProviderGroups[exGroup].props[exProp];
     }
   }
 
-  return propertyDefinitions;
+  return enrichPropertyDefinitions(propertyDefinitions);
 };

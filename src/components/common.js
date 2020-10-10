@@ -11,12 +11,6 @@ import spdxToHTML from "spdx-to-html";
 import spdxLicenseIds from "spdx-license-ids";
 import { mapGetters } from "vuex";
 
-import getPropertyDefinitions from "../properties.js";
-
-const propertyDefinitions = getPropertyDefinitions(),
-      propertyMap = propertyDefinitions.properties,
-      groupMap = propertyDefinitions.groups;
-
 const BAND_LABELS = {
   id: "ID",
   name: "Name",
@@ -69,8 +63,8 @@ export default {
       // [].concat() is a work-around for catalogs where keywords is a string (SpaceNet)
       return [].concat(
         this.entity.keywords ||
-          (this.rootCatalog && this.rootCatalog.keywords) ||
-          []
+        (this.rootCatalog && this.rootCatalog.keywords) ||
+        []
       );
     },
     _properties() {
@@ -84,7 +78,7 @@ export default {
       );
     },
     assets() {
-      if(!this.entity.assets) return [];
+      if (!this.entity.assets) return [];
       return (
         Object.keys(this.entity.assets)
           .map(key => ({
@@ -93,11 +87,11 @@ export default {
           }))
           .map(x => {
             let bands = x["eo:bands"] || [];
-            if(bands.length > 0) {
+            if (bands.length > 0) {
               // If these are numbers, they are indexes into top
               // level bands (pre-1.0.0). If they are objects, they
               // are band definitions themselves.
-              if(Number.isInteger(bands[0])) {
+              if (Number.isInteger(bands[0])) {
                 bands = bands
                   .filter(idx => idx > 0 && idx < this.bands.length)
                   .map(idx => this.bands[idx]);
@@ -110,14 +104,14 @@ export default {
               label:
                 escape(x.title) ||
                 `<code>${escape(path.basename(x.href))}</code>`,
-              href: this.resolve(x.href, this.url)
+              href: x.href ? this.resolve(x.href, this.url) : null
             };
           })
           .map(x => {
             return ({
               ...x,
-              roleNames: x.roles.filter(x => x != null).join(", "),
-              bandNames: x.bands
+              roleNames: x.roles ? x.roles.filter(x => x != null).join(", ") : null,
+              bandNames: (x.bands ? x.bands : [])
                 .map(band =>
                   band != null
                     ? band.description || band.common_name || band.name
@@ -152,7 +146,7 @@ export default {
         this.assets.some(asset => asset.bands.length > 0);
     },
     bandFields() {
-      if(!this.bands) return [];
+      if (!this.bands) return [];
 
       const example = this.bands[0];
 
@@ -255,156 +249,6 @@ export default {
     loaded() {
       return Object.keys(this.entity).length > 0;
     },
-    propertyList() {
-      const skip = key => propertyMap[key] && propertyMap[key].skip;
-
-      const label = key => {
-        if (typeof propertyMap[key] === "object") {
-          return propertyMap[key].label;
-        }
-
-        return propertyMap[key] || key;
-      };
-
-      const format = (key, value) => {
-        let suffix = "";
-
-        if (typeof propertyMap[key] === "object") {
-          if (propertyMap[key].suffix != null) {
-            suffix = propertyMap[key].suffix;
-          }
-
-          if (propertyMap[key].type === "date") {
-            return escape(
-              new Date(value).toLocaleString([], {
-                timeZone: "UTC",
-                timeZoneName: "short"
-              }) + suffix
-            );
-          }
-
-          if (propertyMap[key].type === "label:property") {
-            if (value == null) {
-              return undefined;
-            }
-
-            return value.map(x => `<code>${x}</code>`).join(", ");
-          }
-
-          if (propertyMap[key].type === "label:classes") {
-            if (Array.isArray(value)) {
-              return value
-                .map(o =>
-                  Object.entries(o)
-                    .map(([k, v]) => {
-                      if (k === "name") {
-                        if (v === "raster") {
-                          return undefined;
-                        }
-
-                        return `<code><b>${v}</b></code>:`;
-                      }
-
-                      if (Array.isArray(v)) {
-                        return v.map(x => `<code>${x}</code>`).join(", ");
-                      }
-
-                      return v;
-                    })
-                    .join(" ")
-                )
-                .join("<br>\n");
-            }
-
-            return Object.entries(value)
-              .map(([k, v]) => {
-                if (k === "name") {
-                  if (v === "raster") {
-                    return undefined;
-                  }
-
-                  return `<code><b>${v}</b></code>:`;
-                }
-
-                if (Array.isArray(v)) {
-                  return v.map(x => `<code>${x}</code>`).join(", ");
-                }
-
-                return v;
-              })
-              .join(" ");
-          }
-
-          if (propertyMap[key].type === "label:overviews") {
-            return value
-              .map(v => {
-                const prop = v.property_key;
-
-                if (v.counts != null) {
-                  return `<code><b>${prop}</b></code>: ${v.counts
-                    .map(c => `<code>${c.name}</code> (${c.count})`)
-                    .join(", ")}`;
-                }
-
-                if (v.statistics != null) {
-                  return `<code><b>${prop}</b></code>: ${v.statistics
-                    .map(c => `<code>${c.name}</code> (${c.count})`)
-                    .join(", ")}`;
-                }
-
-                return "";
-              })
-              .join("<br>\n");
-          }
-        }
-
-        if (key === "eo:epsg") {
-          return `<a href="http://epsg.io/${value}">${value}</a>`;
-        }
-
-        if (Array.isArray(value)) {
-          return escape(value.map(v => {
-            if(typeof(v) === "object") {
-              return JSON.stringify(v);
-            }
-            return v;
-          }));
-        }
-
-        if (typeof value === "object") {
-          return escape(JSON.stringify(value));
-        }
-
-        return escape(value + suffix);
-      };
-
-      const props = {
-        ...this._collectionProperties,
-        ...this._properties
-      };
-
-      return Object.entries(props)
-        .filter(([, v]) => Number.isFinite(v) || !isEmpty(v))
-        .filter(([k]) => !skip(k))
-        .sort(([a], [b]) => a - b)
-        .map(([key, value]) => ({
-          key,
-          label: label(key),
-          value: format(key, value)
-        }))
-        .reduce((acc, prop) => {
-          let ext = "";
-          if (prop.key.includes(":")) {
-            const prefix = prop.key.split(":")[0];
-            ext = groupMap[prefix] || prefix;
-          }
-
-          acc[ext] = acc[ext] || [];
-          acc[ext].push(prop);
-
-          return acc;
-        }, {});
-    },
     providers() {
       return this._providers.map(x => ({
         ...x,
@@ -421,6 +265,9 @@ export default {
       }
 
       return this.getEntity(this.ancestors[0]);
+    },
+    stacVersion() {
+      return this.entity.stac_version;
     },
     title() {
       if (this._title != null) {
@@ -453,8 +300,8 @@ export default {
     _validate(data) {
       this.validate(data).then(errors => {
         if (errors != null) {
-          console.log(errors);
           console.group("Validation errors");
+          console.log(errors);
           errors.forEach(err => {
             console.warn(`${err.dataPath} ${err.message}:`);
             const { value } = jsonQuery(err.dataPath, {

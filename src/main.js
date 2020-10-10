@@ -19,6 +19,7 @@ import "bootstrap-vue/dist/bootstrap-vue.css";
 import "leaflet/dist/leaflet.css";
 import "vue-multiselect/dist/vue-multiselect.min.css";
 
+import {CATALOG_URL, STAC_VERSION } from './config';
 import { fetchUri, fetchSchemaValidator } from "./util";
 import Catalog from "./components/Catalog.vue";
 import Item from "./components/Item.vue";
@@ -31,14 +32,6 @@ Vue.use(Clipboard);
 Vue.use(Meta);
 Vue.use(VueRouter);
 Vue.use(Vuex);
-
-const CATALOG_URL =
-  process.env.CATALOG_URL ||
-      "https://raw.githubusercontent.com/cholmes/sample-stac/master/stac/catalog.json";
-
-const STAC_VERSION =
-  process.env.STAC_VERSION ||
-      "0.9.0";
 
 const makeRelative = uri => {
   const rootURI = url.parse(CATALOG_URL);
