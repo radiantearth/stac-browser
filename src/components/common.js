@@ -65,9 +65,6 @@ export default {
     _collectionProperties() {
       return (this.collection && this.collection.properties) || {};
     },
-    _entity() {
-      return this.getEntity(this.url);
-    },
     _keywords() {
       // [].concat() is a work-around for catalogs where keywords is a string (SpaceNet)
       return [].concat(

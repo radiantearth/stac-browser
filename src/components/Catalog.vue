@@ -242,6 +242,8 @@ import common from "./common";
 import AssetTab from './AssetTab.vue'
 import SummariesTab from './SummariesTab.vue'
 
+import { transformCatalog } from "../migrate"
+
 const ITEMS_PER_PAGE = 25;
 
 export default {
@@ -374,6 +376,9 @@ export default {
   computed: {
     ...common.computed,
     ...mapGetters(["getEntity"]),
+    _entity() {
+      return transformCatalog(this.getEntity(this.url));
+    },
     _description() {
       return this.catalog.description;
     },

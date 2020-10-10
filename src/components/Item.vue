@@ -205,6 +205,7 @@ import "leaflet-easybutton";
 import { mapActions, mapGetters } from "vuex";
 
 import common from "./common";
+import { transformItem } from "../migrate"
 
 import AssetTab from './AssetTab.vue'
 
@@ -280,6 +281,9 @@ export default {
   computed: {
     ...common.computed,
     ...mapGetters(["getEntity"]),
+    _entity() {
+      return transformItem(this.getEntity(this.url));
+    },
     _collectionLinks() {
       return this.links.filter(x => x.rel === "collection");
     },
