@@ -68,42 +68,16 @@
                 <img id="thumbnail" align="center" :src="thumbnail" />
               </a>
             </b-tab>
-            <b-tab
+            <AssetTab
               v-if="visibleTabs.includes('assets')"
-              title="Assets"
+              :assets="assets"
+              :bands="bands"
+              :hasBands="hasBands"
               :active="
                 !visibleTabs.includes('preview') &&
                   !visibleTabs.includes('thumbnail')
               "
-            >
-              <div class="table-responsive assets">
-                <table class="table table-striped">
-                  <thead>
-                    <tr>
-                      <th>Name</th>
-                      <th v-if="bands.length > 0">Band(s)</th>
-                      <th>Content-Type</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="asset in assets" :key="asset.key">
-                      <td>
-                        <!-- eslint-disable-next-line vue/max-attributes-per-line vue/no-v-html -->
-                        <a
-                          :href="asset.href"
-                          :title="asset.key"
-                          v-html="asset.label"
-                        />
-                      </td>
-                      <td v-if="bands.length > 0">{{ asset.bandNames }}</td>
-                      <td>
-                        <code>{{ asset.type }}</code>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </b-tab>
+            ></AssetTab>
             <b-tab
               v-if="visibleTabs.includes('bands')"
               title="Bands"
@@ -127,81 +101,14 @@
         <b-col md="4">
           <b-card bg-variant="light">
             <div id="locator-map" />
-            <div class="table-responsive metadata">
-              <table class="table">
-                <tbody>
-                  <tr>
-                    <td class="group" colspan="2">
-                      <h4>Metadata</h4>
-                    </td>
-                  </tr>
-                  <tr v-if="collection">
-                    <td class="title">Collection</td>
-                    <td>
-                      <router-link :to="linkToCollection">
-                        {{ collection.title || "Untitled" }}
-                      </router-link>
-                    </td>
-                  </tr>
-                  <tr v-if="license">
-                    <td class="title">License</td>
-                    <td>
-                      <!-- eslint-disable-next-line vue/no-v-html -->
-                      <span v-html="license"></span>
-                      <template v-if="licensor"> by
-                        <!-- eslint-disable-next-line vue/no-v-html -->
-                        <span v-html="licensor"></span>
-                      </template>
-                    </td>
-                  </tr>
-                  <template v-for="(props, ext) in propertyList">
-                    <tr v-if="ext" :key="ext">
-                      <td class="group" colspan="2">
-                        <h4>{{ ext }}</h4>
-                      </td>
-                    </tr>
-                    <tr v-for="prop in props" :key="prop.key">
-                      <td class="title">
-                        <!-- eslint-disable-next-line vue/no-v-html -->
-                        <span :title="prop.key" v-html="prop.label" />
-                      </td>
-                      <!-- eslint-disable-next-line vue/no-v-html -->
-                      <td v-html="prop.value" />
-                    </tr>
-                  </template>
-                  <template v-if="providers">
-                    <tr>
-                      <td colspan="2" class="group">
-                        <h4>
-                          <template v-if="providers.length === 1">
-                            Provider
-                          </template>
-                          <template v-if="providers.length !== 1">
-                            Providers
-                          </template>
-                        </h4>
-                      </td>
-                    </tr>
-                    <template v-for="(provider, index) in providers">
-                      <tr :key="provider.url + index">
-                        <td colspan="2" class="provider">
-                          <a :href="provider.url">{{ provider.name }}</a>
-                          <em v-if="provider.roles"
-                          >({{(Array.isArray(provider.roles) ? provider.roles : []).join(", ") }})</em
-                          >
-                          <!-- eslint-disable-next-line vue/no-v-html vue/max-attributes-per-line -->
-                          <div
-                            v-if="provider.description"
-                            class="description"
-                            v-html="provider.description"
-                          />
-                        </td>
-                      </tr>
-                    </template>
-                  </template>
-                </tbody>
-              </table>
-            </div>
+            <MetadataSidebar
+              :properties="properties"
+              :keywords="keywords"
+              :collection="collection"
+              :collectionLink="collectionLink"
+              :providers="providers"
+              :slugify="slugify"
+            />
           </b-card>
         </b-col>
       </b-row>
@@ -231,6 +138,10 @@ import "leaflet-easybutton";
 import { mapActions, mapGetters } from "vuex";
 
 import common from "./common";
+import { transformItem } from "../migrate"
+
+import AssetTab from './AssetTab.vue'
+import MetadataSidebar from './MetadataSidebar.vue'
 
 const COG_TYPES = [
   "image/vnd.stac.geotiff; cloud-optimized=true",
@@ -273,6 +184,10 @@ export default {
       required: true
     }
   },
+  components: {
+    AssetTab,
+    MetadataSidebar
+  },
   data() {
     return {
       fullscreen: false,
@@ -301,6 +216,9 @@ export default {
   computed: {
     ...common.computed,
     ...mapGetters(["getEntity"]),
+    _entity() {
+      return transformItem(this.getEntity(this.url));
+    },
     _collectionLinks() {
       return this.links.filter(x => x.rel === "collection");
     },
@@ -343,50 +261,6 @@ export default {
     },
     _title() {
       return this._properties.title;
-    },
-    assets() {
-      return (
-        Object.keys(this.item.assets)
-          .map(key => ({
-            ...this.item.assets[key],
-            key
-          }))
-          .map(x => ({
-            ...x,
-            bands: (x["eo:bands"] || []).map(idx => this.bands[idx]),
-            title: x.title || path.basename(x.href),
-            label:
-              escape(x.title) ||
-              `<code>${escape(path.basename(x.href))}</code>`,
-            href: this.resolve(x.href, this.url)
-          }))
-          .map(x => ({
-            ...x,
-            bandNames: x.bands
-              .map(band =>
-                band != null
-                  ? band.description || band.common_name || band.name
-                  : null
-              )
-              .filter(x => x != null)
-              .join(", ")
-          }))
-          // prioritize assets w/ a format set
-          .sort((a, b) => {
-            const formatA = a.format || "zzz";
-            const formatB = b.format || "zzz";
-
-            if (formatA < formatB) {
-              return -1;
-            }
-
-            if (formatA > formatB) {
-              return 1;
-            }
-
-            return 0;
-          })
-      );
     },
     attribution() {
       if (this.license != null || this.licensor != null) {
@@ -531,13 +405,6 @@ export default {
         })
         .pop();
     },
-    linkToCollection() {
-      if (this.collectionLink.href != null) {
-        return `/collection/${this.slugify(this.collectionLink.href)}`;
-      }
-
-      return null;
-    },
     parentLink() {
       return this.links
         .filter(x => x.rel === "parent")
@@ -547,6 +414,12 @@ export default {
           slug: this.slugify(this.resolve(x.href, this.url))
         }))
         .pop();
+    },
+    properties() {
+      return {
+        ...this._collectionProperties,
+        ...this._properties
+      };
     },
     tabIndex: {
       get: function() {

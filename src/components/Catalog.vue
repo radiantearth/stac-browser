@@ -3,6 +3,7 @@
     <b-alert v-if="errored" variant="danger" show>
       <p>{{ _entity.message }}</p>
       <p>Please note that some servers don't allow external access via web browsers (e.g., when CORS headers are not present).</p>
+      <p>Errored URL: {{ url }}</p>
       <p><a href="#" @click="$router.go(-1)">Go back</a></p>
     </b-alert>
     <b-spinner v-else-if="!loaded" label="Loading..."></b-spinner>
@@ -124,6 +125,13 @@
                 striped
               />
             </b-tab>
+            <AssetTab
+              v-if="visibleTabs.includes('assets')"
+              :assets="assets"
+              :bands="bands"
+              :hasBands="hasBands"
+              :active="false"
+            ></AssetTab>
           </b-tabs>
         </b-col>
         <b-col
@@ -132,79 +140,15 @@
         >
           <b-card bg-variant="light">
             <div v-if="spatialExtent" id="locator-map" />
-            <div class="table-responsive metadata">
-              <table class="table">
-                <tbody>
-                  <tr>
-                    <td class="group" colspan="2">
-                      <h4>Metadata</h4>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="title">STAC Version</td>
-                    <td>{{ stacVersion }}</td>
-                  </tr>
-                  <tr v-if="keywords">
-                    <td class="title">Keywords</td>
-                    <td>{{ keywords }}</td>
-                  </tr>
-                  <tr v-if="license">
-                    <td class="title">License</td>
-                    <!-- eslint-disable-next-line vue/no-v-html -->
-                    <td v-html="license" />
-                  </tr>
-                  <tr v-if="temporalExtent">
-                    <td class="title">Temporal Extent</td>
-                    <td>{{ temporalExtent }}</td>
-                  </tr>
-                  <template v-for="(props, ext) in propertyList">
-                    <tr v-if="ext" :key="ext">
-                      <td class="group" colspan="2">
-                        <h4>{{ ext }}</h4>
-                      </td>
-                    </tr>
-                    <tr v-for="prop in props" :key="prop.key">
-                      <td class="title">
-                        <!-- eslint-disable-next-line vue/no-v-html -->
-                        <span :title="prop.key" v-html="prop.label" />
-                      </td>
-                      <!-- eslint-disable-next-line vue/no-v-html -->
-                      <td v-html="prop.value" />
-                    </tr>
-                  </template>
-                  <template v-if="providers">
-                    <tr>
-                      <td colspan="2" class="group">
-                        <h4>
-                          <template v-if="providers.length === 1">
-                            Provider
-                          </template>
-                          <template v-if="providers.length !== 1">
-                            Providers
-                          </template>
-                        </h4>
-                      </td>
-                    </tr>
-                    <template v-for="(provider, index) in providers">
-                      <tr :key="provider.url + index">
-                        <td colspan="2" class="provider">
-                          <a :href="provider.url">{{ provider.name }}</a>
-                          <em v-if="provider.roles"
-                          >({{(Array.isArray(provider.roles) ? provider.roles : []).join(", ") }})</em
-                          >
-                          <!-- eslint-disable-next-line vue/no-v-html vue/max-attributes-per-line -->
-                          <div
-                            v-if="provider.description"
-                            class="description"
-                            v-html="provider.description"
-                          />
-                        </td>
-                      </tr>
-                    </template>
-                  </template>
-                </tbody>
-              </table>
-            </div>
+            <MetadataSidebar
+              :properties="properties"
+              :summaries="summaries"
+              :stacVersion="stacVersion"
+              :keywords="keywords"
+              :license="license"
+              :temporalExtent="temporalExtent"
+              :providers="providers"
+            />
           </b-card>
         </b-col>
       </b-row>
@@ -227,6 +171,10 @@ import Leaflet from "leaflet";
 import { mapActions, mapGetters } from "vuex";
 
 import common from "./common";
+import AssetTab from './AssetTab.vue'
+import MetadataSidebar from './MetadataSidebar.vue'
+
+import { transformCatalog } from "../migrate"
 
 const ITEMS_PER_PAGE = 25;
 
@@ -259,6 +207,7 @@ export default {
       required: true
     }
   },
+  components: { AssetTab, MetadataSidebar },
   data() {
     return {
       externalItemCount: 0,
@@ -359,6 +308,9 @@ export default {
   computed: {
     ...common.computed,
     ...mapGetters(["getEntity"]),
+    _entity() {
+      return transformCatalog(this.getEntity(this.url));
+    },
     _description() {
       return this.catalog.description;
     },
@@ -595,6 +547,9 @@ export default {
 
       return dataCatalog;
     },
+    properties() {
+      return this._properties;
+    },
     spatialExtent() {
       const { spatial } = this.extent;
 
@@ -611,9 +566,8 @@ export default {
 
       return bbox;
     },
-    stacVersion() {
-      // REQUIRED
-      return this.catalog.stac_version;
+    summaries() {
+      return this.catalog.summaries;
     },
     tabIndex: {
       get: function() {
@@ -654,7 +608,9 @@ export default {
       return [
         this.childCount > 0 && "catalogs",
         (this.hasExternalItems || this.itemCount > 0) && "items",
-        this.bands.length > 0 && "bands"
+        this.bands.length > 0 && "bands",
+        this.summaries && "summaries",
+        this.assets && this.assets.length > 0 && "assets"
       ].filter(x => x != null && x !== false);
     }
   },
@@ -771,8 +727,8 @@ export default {
     },
     syncWithQueryState(qs) {
       this.selectedTab = qs.t;
-      this.currentChildPage = Number(qs.cp) || this.currentChildPage;
-      this.currentItemPage = Number(qs.ip) || this.currentItemPage;
+      this.currentChildPage = Number(qs.cp) || 1;
+      this.currentItemPage = Number(qs.ip) || 1;
 
       // If we have external items, the b-table needs to "stay" on page 1 as
       // the items list only contains the number of items we want to show.
