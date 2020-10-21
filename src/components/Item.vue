@@ -138,10 +138,11 @@ import "leaflet-easybutton";
 import { mapActions, mapGetters } from "vuex";
 
 import common from "./common";
-import { transformItem } from "../migrate"
+import { getTileSource } from "../util";
+import { transformItem } from "../migrate";
 
-import AssetTab from './AssetTab.vue'
-import MetadataSidebar from './MetadataSidebar.vue'
+import AssetTab from './AssetTab.vue';
+import MetadataSidebar from './MetadataSidebar.vue';
 
 const COG_TYPES = [
   "image/vnd.stac.geotiff; cloud-optimized=true",
@@ -446,13 +447,7 @@ export default {
         return "";
       }
 
-      // TODO global config
-      return `https://tiles.rdnt.io/tiles/{z}/{x}/{y}@2x?url=${encodeURIComponent(
-        this.selectedImage.href
-      )}`;
-      // return `http://localhost:8000/tiles/{z}/{x}/{y}@2x?url=${encodeURIComponent(
-      //   this.cog
-      // )}`;
+      return getTileSource(this.selectedImage.href);
     },
     visibleTabs() {
       return [
