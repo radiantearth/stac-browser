@@ -63,7 +63,7 @@
     "netlify-cli": "^2.53.0",
     "parcel-bundler": "^1.12.3",
     "prettier": "^1.18.2",
-    "vue-template-compiler": "^2.6.10"
+    "vue-template-compiler": "^2.6.12"
   },
   "lint-staged": {
     "*.js": [
