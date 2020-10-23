@@ -1,6 +1,11 @@
 <template>
   <b-tab key="zarr-metadata" title="Zarr Metadata" :active="active">
-    <div class="mt-2 zarr-arrays">
+    <div v-if="loading" class="mt-2"></div>
+    <div v-else-if="errored" class="mt-2">
+      <p>An error has occurred while loading while loading Zarr metadata.</p>
+      <p>Check the console.</p>
+    </div>
+    <div v-else class="mt-2 zarr-arrays">
       <b-list-group>
         <b-list-group-item v-for="array in group.arrays" :key="array.name">
           <div class="d-flex justify-content-between array-name">
@@ -63,25 +68,25 @@
           </div>
         </b-list-group-item>
       </b-list-group>
-    </div>
-    <div class="mt-2 zarr-attrs">
-      <b-card no-body class="mb-1">
-        <b-card-header header-tag="header" class="p-1">
-          <b-button v-b-toggle.zarr-attrs block variant="light">
-            <b>Group Attributes</b>
-          </b-button>
-        </b-card-header>
-        <b-collapse id="zarr-attrs">
-          <b-card-body>
-            <dl>
-              <template v-for="(value, key, i) in group.attrs">
-                <dt :key="'group-key-' + i">{{ key }}</dt>
-                <dd :key="'group-value-' + i">{{ value }}</dd>
-              </template>
-            </dl>
-          </b-card-body>
-        </b-collapse>
-      </b-card>
+      <div class="mt-2 zarr-attrs">
+        <b-card no-body class="mb-1">
+          <b-card-header header-tag="header" class="p-1">
+            <b-button v-b-toggle.zarr-attrs block variant="light">
+              <b>Group Attributes</b>
+            </b-button>
+          </b-card-header>
+          <b-collapse id="zarr-attrs">
+            <b-card-body>
+              <dl>
+                <template v-for="(value, key, i) in group.attrs">
+                  <dt :key="'group-key-' + i">{{ key }}</dt>
+                  <dd :key="'group-value-' + i">{{ value }}</dd>
+                </template>
+              </dl>
+            </b-card-body>
+          </b-collapse>
+        </b-card>
+      </div>
     </div>
   </b-tab>
 </template>
@@ -127,6 +132,7 @@ export default {
     return {
       loading: true,
       errored: false,
+      error: null,
       group: {}
     };
   },
@@ -134,8 +140,8 @@ export default {
     axios
       .get(this.zarrMetadataUrl)
       .then(response => (this.group = parseMeta(response.data.metadata)))
-      .catch(error => {
-        console.log(error);
+      .catch(err => {
+        console.error(err);
         this.errored = true;
       })
       .finally(() => (this.loading = false));
