@@ -125,6 +125,11 @@
                 striped
               />
             </b-tab>
+            <ZarrMetadataTab
+              v-if="visibleTabs.includes('zarrMetadata')"
+              :active="true"
+              :zarr-metadata-url="zarrMetadataUrl"
+            ></ZarrMetadataTab>
             <AssetTab
               v-if="visibleTabs.includes('assets')"
               :assets="assets"
@@ -132,11 +137,6 @@
               :hasBands="hasBands"
               :active="false"
             ></AssetTab>
-            <ZarrMetadataTab
-              v-if="visibleTabs.includes('zarrMetadata')"
-              :active="false"
-              :zarr-metadata-url="zarrMetadataUrl"
-            ></ZarrMetadataTab>
           </b-tabs>
         </b-col>
         <b-col
