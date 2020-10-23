@@ -275,6 +275,12 @@ export default {
       }
 
       return this.id;
+    },
+    zarrMetadataUrl() {
+      return (
+        this.assets.find(x => x.roles.includes("zarr-consolidated-metadata"))
+          .href || null
+      );
     }
   },
   watch: {
