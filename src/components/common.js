@@ -277,10 +277,14 @@ export default {
       return this.id;
     },
     zarrMetadataUrl() {
-      return (
-        this.assets.find(x => x.roles.includes("zarr-consolidated-metadata"))
-          .href || null
+      const zarrMetadata = this.assets.find(x =>
+        x.roles.includes("zarr-consolidated-metadata")
       );
+
+      if (zarrMetadata != null) {
+        return zarrMetadata.href;
+      }
+      return null;
     }
   },
   watch: {
