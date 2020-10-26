@@ -177,7 +177,6 @@ import { mapActions, mapGetters } from "vuex";
 
 import common from "./common";
 import AssetTab from './AssetTab.vue'
-import ZarrMetadataTab from "./ZarrMetadataTab.vue";
 import MetadataSidebar from './MetadataSidebar.vue'
 
 import { transformCatalog } from "../migrate"
