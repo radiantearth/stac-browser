@@ -213,7 +213,11 @@ export default {
       required: true
     }
   },
-  components: { AssetTab, ZarrMetadataTab, MetadataSidebar },
+  components: {
+    AssetTab,
+    ZarrMetadataTab: () => import('./ZarrMetadataTab.vue'),
+    MetadataSidebar
+  },
   data() {
     return {
       externalItemCount: 0,
