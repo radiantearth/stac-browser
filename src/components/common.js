@@ -281,7 +281,7 @@ export default {
         x.roles.includes("zarr-consolidated-metadata")
       );
 
-      if (zarrMetadata != null) {
+      if (typeof zarrMetadata !== 'undefined') {
         return zarrMetadata.href;
       }
       return null;
