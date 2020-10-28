@@ -127,7 +127,7 @@
             </b-tab>
             <ZarrMetadataTab
               v-if="visibleTabs.includes('zarrMetadata')"
-              :active="true"
+              :active="false"
               :zarr-metadata-url="zarrMetadataUrl"
             ></ZarrMetadataTab>
             <AssetTab
