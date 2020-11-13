@@ -444,10 +444,12 @@ export default {
       return this.children.length;
     },
     children() {
-      return this.links.filter(x => x.rel === "child")
+      return this.links
+        .filter(x => x.rel === "child")
         .map(child => {
           // strip /collection from the target path
           let p = this.path.replace(/^\/collection/, "");
+
           if (!p.endsWith("/")) {
             p += "/";
           }
