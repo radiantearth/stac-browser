@@ -79,8 +79,8 @@
             </template>
             <template v-if="summaries">
                 <tr>
-                <td colspan="2" class="group">
-                    <h4>Summaries</h4>
+                <td colspan="2" class="group summary">
+                    <h4>Item Summary</h4>
                 </td>
                 </tr>
                 <template v-for="(props, ext) in summariesList">
@@ -90,7 +90,7 @@
                     </td>
                 </tr>
                 <tr v-for="prop in props" :key="prop.key">
-                    <td class="summary-title" >
+                    <td class="title summary-title" >
                         <!-- eslint-disable-next-line vue/no-v-html -->
                         <span :title="prop.key" v-html="prop.label" />
                     </td>
@@ -113,15 +113,15 @@ const propertyDefinitions = getPropertyDefinitions(),
   propertyMap = propertyDefinitions.properties,
   groupMap = propertyDefinitions.groups;
 
-const constructPropList = (props, skip = () => false) => {
+const constructPropList = (props, summaries = false, skip = () => false) => {
     return Object.entries(props || [])
-                .filter(([, v]) => Number.isFinite(v) || !isEmpty(v))
+                .filter(([, v]) => Number.isFinite(v) || !isEmpty(v) || (summaries && Array.isArray(v) && v.length == 0)) // last part: Skip empty summaries
                 .filter(([k]) => !skip(k))
                 .sort(([a], [b]) => a - b)
                 .map(([key, value]) => ({
                     key,
                     label: propertyDefinitions.formatPropertyLabel(key),
-                    value: propertyDefinitions.formatPropertyValue(key, value)
+                    value: summaries ? propertyDefinitions.formatSummaryValues(key, value) : propertyDefinitions.formatPropertyValue(key, value)
                 }))
                 .reduce((acc, prop) => {
                     let ext = "";
@@ -160,12 +160,12 @@ export default {
             return null;
         },
         summariesList() {
-            return constructPropList(this.summaries);
+            const skip = key => propertyMap[key] && propertyMap[key].skip;
+            return constructPropList(this.summaries, true, skip);
         },
         propertyList() {
             const skip = key => propertyMap[key] && propertyMap[key].skip;
-
-            return constructPropList(this.properties, skip);
+            return constructPropList(this.properties, false, skip);
         },
     }
 };
@@ -176,5 +176,15 @@ export default {
 .summary-title {
     font-weight: bold;
     width: 40%;
+}
+</style>
+<style>
+#stac-browser .table td.group.summary {
+  background-color: #555;
+}
+
+#stac-browser .table td.group.summary h4 {
+  font-weight: bold;
+  color: #ddd;
 }
 </style>
