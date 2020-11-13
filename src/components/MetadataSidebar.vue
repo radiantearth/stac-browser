@@ -47,7 +47,7 @@
                 <td v-html="prop.value" />
                 </tr>
             </template>
-            <template v-if="providers">
+            <template v-if="Array.isArray(providers) && providers.length > 0">
                 <tr>
                 <td colspan="2" class="group">
                     <h4>
