@@ -1,6 +1,6 @@
 /* Methods that transform STAC object JSON from older versions to
 allow for a more consistent usage in other parts of the codebase */
-import { STAC_VERISON } from './config';
+import { STAC_VERSION } from './config';
 
 export const transformCatalog = (entity) => {
     if(!entity) { return entity; }

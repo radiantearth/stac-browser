@@ -99,7 +99,13 @@ const main = async () => {
   };
 
   const catalogValidator = async (data) => {
-    if (data.license != null || data.extent != null) {
+    if (Array.isArray(data.collections) && Array.isArray(data.links)) {
+      // TODO: Validate the Collections API (/collections)
+      // Skip Collections API validation for now
+      return null;
+    }
+
+    if (data.license || data.extent) {
       // contains Collection properties
       return collectionValidator(data);
     }

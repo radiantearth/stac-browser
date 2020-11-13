@@ -50,6 +50,37 @@
 
           <b-tabs v-model="tabIndex">
             <b-tab
+              v-if="visibleTabs.includes('collections')"
+              key="collections"
+              title="Collections (API)"
+            >
+              <b-table
+                :items="collections"
+                :fields="collectionFields"
+                :per-page="childrenPerPage"
+                :current-page="currentCollectionPage"
+                :outlined="true"
+                responsive
+                small
+                striped
+              >
+                <template slot="cell(link)" slot-scope="data">
+                  <router-link :to="data.item.to">{{
+                    data.item.id
+                  }}</router-link>
+                </template>
+              </b-table>
+              <b-pagination
+                v-if="collectionCount > childrenPerPage"
+                v-model="currentCollectionPage"
+                :limit="15"
+                :total-rows="collectionCount"
+                :per-page="childrenPerPage"
+                :hide-goto-end-buttons="true"
+              />
+            </b-tab>
+
+            <b-tab
               v-if="visibleTabs.includes('catalogs')"
               key="catalogs"
               title="Catalogs"
@@ -220,13 +251,26 @@ export default {
           sortable: true
         }
       ],
+      collectionFields: [
+        {
+          key: "link",
+          label: "Identifier",
+          sortable: false // Sorting doesn't work for links
+        },
+        {
+          key: "title",
+          label: "Title",
+          sortable: true
+        }
+      ],
       currentChildPage: 1,
-      childrenPerPage: 25,
+      currentCollectionPage: 1,
+      childrenPerPage: 25, // also applies to collections
       itemFields: [
         {
           key: "link",
           label: "Title",
-          sortable: true
+          sortable: false // Sorting doesn't work for links
         },
         {
           key: "dateAcquired",
@@ -250,13 +294,69 @@ export default {
     };
   },
   asyncComputed: {
+    collections: {
+      default: [],
+      lazy: true,
+      async get() {
+        const externalCollections = this.links.find(x => x.rel === "data");
+        if (externalCollections === undefined) {
+          return [];
+        }
+
+        try {
+          const rsp = await fetch(externalCollections.href);
+          if (!rsp.ok) {
+            console.warn(await rsp.text());
+            return [];
+          }
+
+          const data = await rsp.json();
+          if (!data || !Array.isArray(data.collections)) {
+            console.warn(await rsp.text());
+            return [];
+          }
+
+          return data.collections
+            .map(collection => {
+              // strip /collection from the target path
+              let p = this.path.replace(/^\/collection/, "");
+              if (!p.endsWith("/")) {
+                p += "/";
+              }
+
+              // Try to get the location of the collection
+              let href = externalCollections.href + '/collections/' + collection.id;
+              if (Array.isArray(collection.links)) {
+                let selfLink = collection.links.find(l => l.rel == 'self');
+                if (selfLink && selfLink.href) {
+                  href = selfLink.href;
+                }
+              }
+
+              const slug = this.slugify(this.resolve(href, this.url));
+              const to = [p, slug].join("");
+
+              return Object.assign(collection, {
+                path: href,
+                to,
+                title: collection.title || collection.id || href,
+                url: this.resolve(href, this.url)
+              });
+            });
+        } catch (err) {
+          console.warn(err);
+
+          return [];
+        }
+      }
+    },
     externalItems: {
       default: [],
       lazy: true,
       async get() {
         const externalItemsLink = this.links.find(x => x.rel === "items");
 
-        if (externalItemsLink == null) {
+        if (externalItemsLink === undefined) {
           return [];
         }
 
@@ -337,16 +437,17 @@ export default {
     catalog() {
       return this.entity;
     },
+    collectionCount() {
+      return this.collections.length;
+    },
     childCount() {
-      return this.links.filter(x => x.rel === "child").length;
+      return this.children.length;
     },
     children() {
-      return this.links
-        .filter(x => x.rel === "child")
+      return this.links.filter(x => x.rel === "child")
         .map(child => {
           // strip /collection from the target path
           let p = this.path.replace(/^\/collection/, "");
-
           if (!p.endsWith("/")) {
             p += "/";
           }
@@ -606,6 +707,7 @@ export default {
     },
     visibleTabs() {
       return [
+        this.collectionCount > 0 && "collections",
         this.childCount > 0 && "catalogs",
         (this.hasExternalItems || this.itemCount > 0) && "items",
         this.bands.length > 0 && "bands",
