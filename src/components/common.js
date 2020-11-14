@@ -275,6 +275,16 @@ export default {
       }
 
       return this.id;
+    },
+    zarrMetadataUrl() {
+      const zarrMetadata = this.assets.find(x =>
+        x.roles.includes("zarr-consolidated-metadata")
+      );
+
+      if (typeof zarrMetadata !== 'undefined') {
+        return zarrMetadata.href;
+      }
+      return null;
     }
   },
   watch: {
