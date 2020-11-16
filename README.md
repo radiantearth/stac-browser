@@ -48,6 +48,46 @@ cause problems on certain web hosts. To use _hash mode_, set
 `HISTORY_MODE=hash` when running or building. This will be compatible with
 S3, stock Apache, etc.
 
+## Other options
+
+### STAC_PROXY_URL
+
+Setting the `STAC_PROXY_URL` allows users to modify the URLs contained in the catalog to point to another location.
+For instance, if you are serving a catalog on the local file system at `/home/user/catalog.json`, but want to serve
+the data out from a server located at `http://localhost:8888/`, you can use:
+
+```
+CATALOG_URL=http://localhost:8888/catalog.json STAC_PROXY_URL="/home/user|http://localhost:8888" npm start -- --open
+```
+
+Notice the format of the value: it is the original location and the proxy location separated by the `|` character, i.e. `{original}|{proxy}`.
+
+In this example, any href contained in the STAC (including link or asset hrefs) will replace any occurrence of `/home/user/` with `http://localhost:8888`.
+
+This can also be helpful when proxying a STAC that does not have cors enabled; by using STAC_PROXY_URL you can proxy the original STAC server with one that enables cors
+and be able to browse that catalog.
+
+### TILE_SOURCE_TEMPLATE
+
+The `TILE_SOURCE_TEMPLATE` environment variable controls the tile layer that is used to render COGs. If not set, the default value is:
+
+```
+https://tiles.rdnt.io/tiles/{z}/{x}/{y}@2x?url={ASSET_HREF}
+```
+
+which uses the [tiles.rdnt.io](https://github.com/radiantearth/tiles.rdnt.io) project to serve publicly accessible COGs as tile layers.
+
+The format of this value is a tile layer template with an optional `{ASSET_HREF}` that will be replaced with the COG asset href. For example,
+using a local version of [titiler](https://github.com/developmentseed/titiler) to serve local COG files would look something like:
+
+```
+TILE_SOURCE_TEMPLATE=http://localhost:8000/cog/tiles/{z}/{x}/{y}?url={ASSET_HREF} npm start -- --open
+```
+
+### TILE_PROXY_URL
+
+`TILE_PROXY_URL` is very similar to STAC_PROXY_URL, but is only used for asset hrefs passed into the TILE_SOURCE_TEMPLATE. This enables deployment scenarios where the tiler needs to reference a proxy server by a different name, e.g. in a docker-compose setup with linked containers.
+
 ## Building
 
 ```bash

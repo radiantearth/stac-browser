@@ -19,8 +19,8 @@ import "bootstrap-vue/dist/bootstrap-vue.css";
 import "leaflet/dist/leaflet.css";
 import "vue-multiselect/dist/vue-multiselect.min.css";
 
-import {CATALOG_URL, STAC_VERSION } from './config';
-import { fetchUri, fetchSchemaValidator } from "./util";
+import { CATALOG_URL, STAC_VERSION } from './config';
+import { fetchUri, fetchSchemaValidator, getProxiedUri } from "./util";
 import Catalog from "./components/Catalog.vue";
 import Item from "./components/Item.vue";
 
@@ -59,9 +59,10 @@ const slugify = uri => bs58.encode(Buffer.from(makeRelative(uri)));
 
 const resolve = (href, base = CATALOG_URL) => {
   // Encode colons from all but schema, as they create errors in URL resolving.
+  const proxiedUri = getProxiedUri(href);
   const hrefEncoded =
-        href.replace(':', encodeURIComponent(':'))
-            .replace(encodeURIComponent(':') + '//', '://');
+    proxiedUri.replace(':', encodeURIComponent(':'))
+      .replace(encodeURIComponent(':') + '//', '://');
   return new URL(hrefEncoded, base).toString();
 };
 
@@ -287,7 +288,7 @@ const main = async () => {
       persistedState.path != null &&
       persistedState.path !== to.path.replace(/\/$/, "") &&
       persistedState.path.toLowerCase() ===
-        to.path.toLowerCase().replace(/\/$/, "")
+      to.path.toLowerCase().replace(/\/$/, "")
     ) {
       return next(persistedState.path);
     }
