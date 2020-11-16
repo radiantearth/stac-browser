@@ -77,7 +77,7 @@
                 </tr>
                 </template>
             </template>
-            <template v-if="summaries">
+            <template v-if="hasSummary">
                 <tr>
                 <td colspan="2" class="group summary">
                     <h4>Item Summary</h4>
@@ -158,6 +158,9 @@ export default {
             }
 
             return null;
+        },
+        hasSummary() {
+            return Object.keys(this.summaries).length > 0;
         },
         summariesList() {
             const skip = key => propertyMap[key] && propertyMap[key].skip;
