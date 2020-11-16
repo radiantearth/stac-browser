@@ -10,7 +10,7 @@ const enrichPropertyDefinitions = (propertyDefinitions) => {
     }
     list = list.map(v => formatValue(key, v));
     if (list.length > 1) {
-      return "<ul><li>" + list.join("</li><li>") + "</li></ul>";
+      return `<ul><li>${list.join("</li><li>")}</li></ul>`;
     }
     else {
       return list[0];
@@ -24,7 +24,7 @@ const enrichPropertyDefinitions = (propertyDefinitions) => {
       let formatted = formatValue(key, obj[type]);
       props.push(`<strong>${label}</strong>: ${formatted}`);
     }
-    return props.join("<br />");
+    return `<div class="metadata-object">${props.join("<br />")}</div>`;
   }
   
 

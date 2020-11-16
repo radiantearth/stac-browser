@@ -187,4 +187,7 @@ export default {
   font-weight: bold;
   color: #ddd;
 }
+#stac-browser .metadata-object .metadata-object {
+    margin-left: 1em;
+}
 </style>
