@@ -3,6 +3,136 @@
 const enrichPropertyDefinitions = (propertyDefinitions) => {
   const propertyMap = propertyDefinitions.properties;
 
+  const formatArray = (key, values, sort = false) => {
+    let list = values;
+    if (sort) {
+      list = list.slice(0).sort();
+    }
+    list = list.map(v => formatValue(key, v));
+    if (list.length > 1) {
+      return `<ul><li>${list.join("</li><li>")}</li></ul>`;
+    }
+    else {
+      return list[0];
+    }
+  }
+  
+  const formatObject = (key, obj) => {
+    let props = [];
+    for(let type in obj) {
+      let label = type.split(":").map(part => part.substr(0, 1).toUpperCase() + part.substr(1));
+      let formatted = formatValue(key, obj[type]);
+      props.push(`<strong>${label}</strong>: ${formatted}`);
+    }
+    return `<div class="metadata-object">${props.join("<br />")}</div>`;
+  }
+  
+
+  const formatValue = (key, value) => {
+    let suffix = "";
+  
+    if (typeof propertyMap[key] === "object") {
+      if (propertyMap[key].suffix != null) {
+        suffix = propertyMap[key].suffix;
+      }
+  
+      if (propertyMap[key].type === "date") {
+        return new Date(value).toLocaleString([], {
+            timeZone: "UTC",
+            timeZoneName: "short"
+          }) + suffix;
+      }
+  
+      if (propertyMap[key].type === "label:property") {
+        if (value == null) {
+          return undefined;
+        }
+  
+        return value.map(x => `<code>${x}</code>`).join(", ");
+      }
+  
+      if (propertyMap[key].type === "label:classes") {
+        if (Array.isArray(value)) {
+          return value
+            .map(o =>
+              Object.entries(o)
+                .map(([k, v]) => {
+                  if (k === "name") {
+                    if (v === "raster") {
+                      return undefined;
+                    }
+  
+                    return `<code><b>${v}</b></code>:`;
+                  }
+  
+                  if (Array.isArray(v)) {
+                    return v.map(x => `<code>${x}</code>`).join(", ");
+                  }
+  
+                  return v;
+                })
+                .join(" ")
+            )
+            .join("<br>\n");
+        }
+  
+        return Object.entries(value)
+          .map(([k, v]) => {
+            if (k === "name") {
+              if (v === "raster") {
+                return undefined;
+              }
+  
+              return `<code><b>${v}</b></code>:`;
+            }
+  
+            if (Array.isArray(v)) {
+              return v.map(x => `<code>${x}</code>`).join(", ");
+            }
+  
+            return v;
+          })
+          .join(" ");
+      }
+  
+      if (propertyMap[key].type === "label:overviews") {
+        return value
+          .map(v => {
+            const prop = v.property_key;
+  
+            if (v.counts != null) {
+              return `<code><b>${prop}</b></code>: ${v.counts
+                .map(c => `<code>${c.name}</code> (${c.count})`)
+                .join(", ")}`;
+            }
+  
+            if (v.statistics != null) {
+              return `<code><b>${prop}</b></code>: ${v.statistics
+                .map(c => `<code>${c.name}</code> (${c.count})`)
+                .join(", ")}`;
+            }
+  
+            return "";
+          })
+          .join("<br>\n");
+      }
+    }
+  
+    if (key === "eo:epsg") {
+      return `<a href="http://epsg.io/${value}">${value}</a>`;
+    }
+  
+    if (Array.isArray(value)) {
+      return formatArray(key, value);
+    }
+  
+    if (typeof value === "object") {
+      return formatObject(key, value);
+    }
+  
+    return value + suffix;
+  };
+
   return {
     ...propertyDefinitions,
     formatPropertyLabel: key => {
@@ -12,115 +142,17 @@ const enrichPropertyDefinitions = (propertyDefinitions) => {
 
       return propertyMap[key] || key;
     },
-    formatPropertyValue: (key, value) => {
-      let suffix = "";
-
-      if (typeof propertyMap[key] === "object") {
-        if (propertyMap[key].suffix != null) {
-          suffix = propertyMap[key].suffix;
-        }
-
-        if (propertyMap[key].type === "date") {
-          return new Date(value).toLocaleString([], {
-              timeZone: "UTC",
-              timeZoneName: "short"
-            }) + suffix;
-        }
-
-        if (propertyMap[key].type === "label:property") {
-          if (value == null) {
-            return undefined;
-          }
-
-          return value.map(x => `<code>${x}</code>`).join(", ");
-        }
-
-        if (propertyMap[key].type === "label:classes") {
-          if (Array.isArray(value)) {
-            return value
-              .map(o =>
-                Object.entries(o)
-                  .map(([k, v]) => {
-                    if (k === "name") {
-                      if (v === "raster") {
-                        return undefined;
-                      }
-
-                      return `<code><b>${v}</b></code>:`;
-                    }
-
-                    if (Array.isArray(v)) {
-                      return v.map(x => `<code>${x}</code>`).join(", ");
-                    }
-
-                    return v;
-                  })
-                  .join(" ")
-              )
-              .join("<br>\n");
-          }
-
-          return Object.entries(value)
-            .map(([k, v]) => {
-              if (k === "name") {
-                if (v === "raster") {
-                  return undefined;
-                }
-
-                return `<code><b>${v}</b></code>:`;
-              }
-
-              if (Array.isArray(v)) {
-                return v.map(x => `<code>${x}</code>`).join(", ");
-              }
-
-              return v;
-            })
-            .join(" ");
-        }
-
-        if (propertyMap[key].type === "label:overviews") {
-          return value
-            .map(v => {
-              const prop = v.property_key;
-
-              if (v.counts != null) {
-                return `<code><b>${prop}</b></code>: ${v.counts
-                  .map(c => `<code>${c.name}</code> (${c.count})`)
-                  .join(", ")}`;
-              }
-
-              if (v.statistics != null) {
-                return `<code><b>${prop}</b></code>: ${v.statistics
-                  .map(c => `<code>${c.name}</code> (${c.count})`)
-                  .join(", ")}`;
-              }
-
-              return "";
-            })
-            .join("<br>\n");
-        }
+    formatSummaryValues: (key, values) => {
+      if (Array.isArray(values)) {
+        return formatArray(key, values, true);
       }
-
-      if (key === "eo:epsg") {
-        return `<a href="http://epsg.io/${value}">${value}</a>`;
+      else if (values && typeof values === 'object') {
+        return formatObject(key, values);
       }
-
-      if (Array.isArray(value)) {
-        return value.map(v => {
-          if (typeof (v) === "object") {
-            return JSON.stringify(v);
-          }
-          return v;
-        });
-      }
-
-      if (typeof value === "object") {
-        return JSON.stringify(value);
-      }
-
-      return value + suffix;
-    }
+      
+      return formatValue(key, values);
+    },
+    formatPropertyValue: formatValue
   };
 }
 
