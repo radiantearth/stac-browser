@@ -5,7 +5,6 @@ import clone from "clone";
 import { HtmlRenderer, Parser } from "commonmark";
 import escape from "lodash.escape";
 import isEqual from "lodash.isequal";
-import isEmpty from "lodash.isempty";
 import jsonQuery from "json-query";
 import spdxToHTML from "spdx-to-html";
 import spdxLicenseIds from "spdx-license-ids";

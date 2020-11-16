@@ -99,7 +99,7 @@ const main = async () => {
   };
 
   const catalogValidator = async (data) => {
-    if (data.license != null || data.extent != null) {
+    if (data.license || data.extent) {
       // contains Collection properties
       return collectionValidator(data);
     }
