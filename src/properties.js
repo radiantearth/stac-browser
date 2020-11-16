@@ -3,6 +3,31 @@
 const enrichPropertyDefinitions = (propertyDefinitions) => {
   const propertyMap = propertyDefinitions.properties;
 
+  const formatArray = (key, values, sort = false) => {
+    let list = values;
+    if (sort) {
+      list = list.slice(0).sort();
+    }
+    list = list.map(v => formatValue(key, v));
+    if (list.length > 1) {
+      return "<ul><li>" + list.join("</li><li>") + "</li></ul>";
+    }
+    else {
+      return list[0];
+    }
+  }
+  
+  const formatObject = (key, obj) => {
+    let props = [];
+    for(let type in obj) {
+      let label = type.split(":").map(part => part.substr(0, 1).toUpperCase() + part.substr(1));
+      let formatted = formatValue(key, obj[type]);
+      props.push(`<strong>${label}</strong>: ${formatted}`);
+    }
+    return props.join("<br />");
+  }
+  
+
   const formatValue = (key, value) => {
     let suffix = "";
   
@@ -98,16 +123,11 @@ const enrichPropertyDefinitions = (propertyDefinitions) => {
     }
   
     if (Array.isArray(value)) {
-      return value.map(v => {
-        if (typeof (v) === "object") {
-          return JSON.stringify(v);
-        }
-        return v;
-      });
+      return formatArray(key, value);
     }
   
     if (typeof value === "object") {
-      return JSON.stringify(value);
+      return formatObject(key, value);
     }
   
     return value + suffix;
@@ -124,23 +144,10 @@ const enrichPropertyDefinitions = (propertyDefinitions) => {
     },
     formatSummaryValues: (key, values) => {
       if (Array.isArray(values)) {
-        let list = values.sort().map(v => formatValue(key, v))
-        if (list.length > 1) {
-          return "<ul><li>" + list.join("</li><li>") + "</li></ul>";
-        }
-        else {
-          return list[0];
-        }
+        return formatArray(key, values, true);
       }
       else if (values && typeof values === 'object') {
-        let lines = [];
-        for(let type in values) {
-          let c1 = type.substr(0, 1).toUpperCase();
-          let rest = type.substr(1);
-          let tval = formatValue(key, values[type]);
-          lines.push(`<strong>${c1}${rest}</strong>: ${tval}`);
-        }
-        return lines.join("<br />");
+        return formatObject(key, values);
       }
       
       return formatValue(key, values);
