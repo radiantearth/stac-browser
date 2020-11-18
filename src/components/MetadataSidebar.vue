@@ -160,7 +160,7 @@ export default {
             return null;
         },
         hasSummary() {
-            return Object.keys(this.summaries).length > 0;
+            return this.summaries && typeof this.summaries === 'object' && Object.keys(this.summaries).length > 0;
         },
         summariesList() {
             const skip = key => propertyMap[key] && propertyMap[key].skip;
