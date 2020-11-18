@@ -276,10 +276,7 @@ export default {
       return this.id;
     },
     zarrMetadataUrl() {
-      const zarrMetadata = this.assets.find(x =>
-        x.roles.includes("zarr-consolidated-metadata")
-      );
-
+      const zarrMetadata = this.assets.find(x => Array.isArray(x.roles) && x.roles.includes("zarr-consolidated-metadata"));
       if (typeof zarrMetadata !== 'undefined') {
         return zarrMetadata.href;
       }
