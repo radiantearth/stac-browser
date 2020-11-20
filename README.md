@@ -1,25 +1,20 @@
+[![Netlify Status](https://api.netlify.com/api/v1/badges/326929da-fcf9-44a2-99d8-4b2f424e4a29/deploy-status)](https://app.netlify.com/sites/stac-cog-browser/deploys)
+
 # STAC Browser
 
 This is a [Spatio-Temporal Asset Catalog
-(STAC)](https://github.com/radiantearth/stac-spec) browser for static catalogs.
+(STAC)](https://github.com/radiantearth/stac-spec) browser for Element 84 Earth Search STAC Catalogs.
 It attempts to surface all included data in a user-centric way (an approach
 which can inform how data is represented in the evolving spec). It is
 implemented as a single page application (SPA) for ease of development and to
 limit the overall number of catalog reads necessary when browsing (as catalogs
 may be nested and do not necessarily contain references to their parents).
 
-<a href="https://www.netlify.com">
-  <img src="https://www.netlify.com/img/global/badges/netlify-light.svg"/>
-</a>
 
-## Examples
+## Element 84 Earth Search
 
-* [planet.stac.cloud](https://planet.stac.cloud) ([catalog on GitHub](https://github.com/cholmes/pdd-stac/))
-* [CBERS](https://cbers.stac.cloud) ([catalog tools on GitHub](https://github.com/fredliporace/cbers-2-stac))
-* [Google Earth Engine](https://gee.stac.cloud)
-* [sat-api.stac.cloud](https://sat-api.stac.cloud) ([sat-api on GitHub](https://github.com/sat-utils/sat-api))
-
-For a longer list of examples, checkout out [stac.cloud](http://stac.cloud).
+* [Earth Search Catalog](https://www.element84.com/earth-search/)
+* [Earth Search API Endpoint](https://earth-search.aws.element84.com/v0/)
 
 ## Running
 

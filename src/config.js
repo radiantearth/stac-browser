@@ -1,6 +1,5 @@
 export const CATALOG_URL =
-  process.env.CATALOG_URL ||
-  "https://earth-search.aws.element84.com/v0/collections/sentinel-s2-l2a-cogs";
+  process.env.CATALOG_URL || "https://earth-search.aws.element84.com/v0";
 
 export const STAC_VERSION = process.env.STAC_VERSION || "1.0.0-beta.2";
 

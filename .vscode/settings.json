@@ -18,5 +18,6 @@
   "vetur.format.defaultFormatter.stylus": "none",
   "vetur.format.defaultFormatter.js": "none",
   "vetur.format.defaultFormatter.ts": "none",
-  "vetur.validation.template": false
+  "vetur.validation.template": false,
+  "cSpell.enabled": true
 }
