@@ -1,6 +1,6 @@
 [![Netlify Status](https://api.netlify.com/api/v1/badges/326929da-fcf9-44a2-99d8-4b2f424e4a29/deploy-status)](https://app.netlify.com/sites/stac-cog-browser/deploys)
 
-# STAC Browser 
+# STAC Browser
 
 This is a [Spatio-Temporal Asset Catalog
 (STAC)](https://github.com/radiantearth/stac-spec) browser for Element 84 Earth Search STAC Catalogs.
@@ -168,4 +168,4 @@ JS frameworks, check out:
 * [GravityLabGeo/stacjs](https://github.com/GravityLabGeo/stacjs) - a
   jQuery-based viewer
 * [alkamin/stac-gdalsj-browser](https://github.com/alkamin/stac-gdaljs-browser) -
-  an Ember-based viewer 
+  an Ember-based viewer
