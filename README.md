@@ -168,4 +168,4 @@ JS frameworks, check out:
 * [GravityLabGeo/stacjs](https://github.com/GravityLabGeo/stacjs) - a
   jQuery-based viewer
 * [alkamin/stac-gdalsj-browser](https://github.com/alkamin/stac-gdaljs-browser) -
-  an Ember-based viewer
+  an Ember-based viewer 
