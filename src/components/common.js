@@ -14,10 +14,10 @@ const BAND_LABELS = {
   id: "ID",
   name: "Name",
   common_name: "Common Name",
-  gsd: `<abbr title="Ground Sample Distance">GSD</a> (m)`,
+  gsd: `GSD (m)`,
   accuracy: "Accuracy (m)",
   center_wavelength: "Center Wavelength (μm)",
-  full_width_half_max: `<abbr title="Full width at half maximum">FWHM</abbr> (μm)`,
+  full_width_half_max: `FWHM (μm)`,
   description: "Description"
 };
 
