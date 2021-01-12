@@ -1,8 +1,7 @@
 {
-  "name": "stac-browser",
-  "version": "0.6.2",
-  "private": true,
-  "description": "",
+  "name": "@radiantearth/stac-browser",
+  "version": "0.9.0",
+  "description": "A Vue-based STAC browser intended for static + dynamic deployment",
   "main": "lib/index.js",
   "scripts": {
     "build": "NODE_ENV=production parcel build --target=browser index.html",
@@ -11,7 +10,19 @@
     "deploy": "npm run clean && npm run build && netlify deploy --prod --dir dist/ --site $NETLIFY_SITE_ID",
     "start": "npm run clean && parcel --target=browser index.html"
   },
-  "author": "Seth Fitzsimmons <seth@mojodna.net>",
+  "author": "Radiant Earth Foundation <hello@radiant.earth>",
+  "contributors": [
+    {
+      "name": "Seth Fitzsimmons",
+      "email": "seth@mojodna.net"
+    },
+    {
+      "name": "Rob Emanuele"
+    },
+    {
+      "name": "Matthias Mohr"
+    }
+  ],
   "license": "ISC",
   "dependencies": {
     "@babel/polyfill": "^7.6.0",
