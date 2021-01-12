@@ -164,13 +164,3 @@ Catalogs and collections are rendered using the
 components exists in [`src/components/common.js`](src/components/common.js).
 Mappings between property keys (e.g. `eo:platform`) are defined in
 [`src/properties.js`](src/properties.js).
-
-## Alternate Implementations
-
-If you're interested in experimenting with a STAC browser built with different
-JS frameworks, check out:
-
-* [GravityLabGeo/stacjs](https://github.com/GravityLabGeo/stacjs) - a
-  jQuery-based viewer
-* [alkamin/stac-gdalsj-browser](https://github.com/alkamin/stac-gdaljs-browser) -
-  an Ember-based viewer
