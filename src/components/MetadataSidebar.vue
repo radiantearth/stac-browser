@@ -28,9 +28,9 @@
                 <!-- eslint-disable-next-line vue/no-v-html -->
                 <td v-html="license" />
             </tr>
-            <tr v-if="temporalExtent">
+            <tr v-if="temporalExtentReadable.length > 0">
                 <td class="title">Temporal Extent</td>
-                <td>{{ temporalExtent }}</td>
+                <td>{{ temporalExtentReadable }}</td>
             </tr>
             <template v-for="(props, ext) in propertyList">
                 <tr v-if="ext" :key="ext">
@@ -170,6 +170,15 @@ export default {
             const skip = key => propertyMap[key] && propertyMap[key].skip;
             return constructPropList(this.properties, false, skip);
         },
+        temporalExtentReadable() {
+            return this.temporalExtent
+                .map(interval => {
+                    return [
+                        interval[0] ? new Date(interval[0]).toLocaleString() : "beginning of time",
+                        interval[1] ? new Date(interval[1]).toLocaleString() : "now"
+                    ].join(" - ")
+                }).join(', ');
+        }
     }
 };
 

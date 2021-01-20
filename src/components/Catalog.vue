@@ -18,7 +18,7 @@
       <b-row>
         <b-col
           :md="
-            keywords.length > 0 || license != null || spatialExtent != null
+            keywords.length > 0 || license != null || spatialExtent.length > 0
               ? 8
               : 12
           "
@@ -171,11 +171,11 @@
           </b-tabs>
         </b-col>
         <b-col
-          v-if="keywords.length > 0 || license != null || spatialExtent != null"
+          v-if="keywords.length > 0 || license != null || spatialExtent.length > 0"
           md="4"
         >
           <b-card bg-variant="light">
-            <div v-if="spatialExtent" id="locator-map" />
+            <div v-if="spatialExtent.length > 0" id="locator-map" />
             <MetadataSidebar
               :properties="properties"
               :summaries="summaries"
@@ -638,28 +638,20 @@ export default {
         };
       }
 
-      const { spatial, temporal } = this.extent;
-
-      if (spatial != null) {
-        let bbox = !!spatial.bbox ? (
-          Array.isArray(spatial.bbox[0]) ? spatial.bbox[0] : spatial.bbox // Account for misformat.
-        ) : spatial;
-
+      if (this.spatialExtent.length > 0) {
         dataCatalog.spatialCoverage = {
           "@type": "Place",
           geo: {
             "@type": "GeoShape",
-            box: bbox.join(" ")
+            // ToDo: compute min and max values from multiple extents
+            box: this.spatialExtent[0].join(" ")
           }
         };
       }
 
-      if (temporal != null) {
-        let interval = !!temporal.interval ? (
-            temporal.interval[0]
-        ) : temporal;
-
-        dataCatalog.temporalCoverage = interval.map(x => x || "..").join("/");
+      if (this.temporalExtent.length > 0) {
+        // ToDo: compute min and max values from multiple extents
+        dataCatalog.temporalCoverage = this.temporalExtent[0].map(x => x || "..").join("/");
       }
 
       return dataCatalog;
@@ -669,19 +661,21 @@ export default {
     },
     spatialExtent() {
       const { spatial } = this.extent;
-
-      if (spatial == null) {
-          return null;
+      if (!spatial || typeof spatial !== 'object') {
+          return [];
       }
 
+      let bbox = [];
       // In STAC 0.8, spatial was changed from the direct array to an
       // object with the property 'bbox' containing an array of arrays.
-      // As a workaround, use the first element of that array.
-      let bbox = !!spatial.bbox ? (
-          Array.isArray(spatial.bbox[0]) ? spatial.bbox[0] : spatial.bbox // Account for misformat.
-      ) : spatial;
+      if (Array.isArray(spatial)) {
+        bbox = [spatial];
+      }
+      else if (Array.isArray(spatial.bbox)) {
+        bbox = spatial.bbox;
+      }
 
-      return bbox;
+      return bbox.filter(box => Array.isArray(box) && box.length >= 4);
     },
     summaries() {
       return this.catalog.summaries || {};
@@ -699,24 +693,24 @@ export default {
     },
     temporalExtent() {
       const { temporal } = this.extent;
-
-      if (temporal == null) {
-        return null;
+      if (!temporal || typeof temporal !== 'object') {
+        return [];
       }
 
       // In STAC 0.8, temporal was changed from the direct array to an
       // object with the property 'interval' containing an array of arrays.
-      // As a worrkaround, use the first element of that array.
-      let interval = !!temporal.interval ? (
-        temporal.interval[0]
-      ) : temporal;
 
-      return [
-        interval[0]
-          ? new Date(interval[0]).toLocaleString()
-          : "beginning of time",
-        interval[1] ? new Date(interval[1]).toLocaleString() : "now"
-      ].join(" - ");
+      let intervals = [];
+      // In STAC 0.8, spatial was changed from the direct array to an
+      // object with the property 'bbox' containing an array of arrays.
+      if (Array.isArray(temporal)) {
+        intervals = [temporal];
+      }
+      else if (Array.isArray(temporal.interval)) {
+        intervals = temporal.interval;
+      }
+
+      return intervals.filter(box => Array.isArray(box) && box.length === 2);
     },
     version() {
       return this.catalog.version;
@@ -761,7 +755,7 @@ export default {
     ...common.methods,
     ...mapActions(["load"]),
     initialize() {
-      if (this.spatialExtent != null) {
+      if (this.spatialExtent.length > 0) {
         this.$nextTick(() => this.initializeLocatorMap());
       }
 
@@ -772,7 +766,7 @@ export default {
         this.locatorMap.remove();
       }
 
-      if (this.spatialExtent == null) {
+      if (this.spatialExtent.length === 0) {
         // no spatial extent; skip
         return;
       }
@@ -800,14 +794,14 @@ export default {
         }
       ).addTo(this.locatorMap);
 
-      const [minX, minY, maxX, maxY] = this.spatialExtent;
-      const coordinates = [
-        [[minX, minY], [minX, maxY], [maxX, maxY], [maxX, minY], [minX, minY]]
-      ];
+      const coordinates = [this.spatialExtent.map(extent => {
+        const [minX, minY, maxX, maxY] = extent;
+        return [[minX, minY], [minX, maxY], [maxX, maxY], [maxX, minY], [minX, minY]];
+      })];
 
       const overlayLayer = Leaflet.geoJSON(
         {
-          type: "Polygon",
+          type: "MultiPolygon",
           coordinates
         },
         {
