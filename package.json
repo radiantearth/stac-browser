@@ -37,8 +37,6 @@
     "commonmark": "^0.29.3",
     "core-js": "^3.6.5",
     "d3-scale-chromatic": "^1.5.0",
-    "es6-promise": "^4.2.8",
-    "hash.js": "^1.1.7",
     "json-query": "^2.2.2",
     "leaflet": "^1.7.1",
     "leaflet-easybutton": "^2.4.0",
