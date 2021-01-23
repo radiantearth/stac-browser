@@ -165,6 +165,9 @@ export default {
             return constructPropList(this.properties, false, skip);
         },
         temporalExtentReadable() {
+            if (!Array.isArray(this.temporalExtent)) {
+                return '';
+            }
             return this.temporalExtent
                 .map(interval => {
                     return [
