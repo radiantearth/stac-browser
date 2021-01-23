@@ -1,12 +1,9 @@
 import path from "path";
 import url from "url";
 
-import "@babel/polyfill";
-import "es6-promise/auto";
 import AsyncComputed from "vue-async-computed";
 import BootstrapVue from "bootstrap-vue";
 import bs58 from "bs58";
-import Clipboard from "v-clipboard";
 import Meta from "vue-meta";
 import Multiselect from "vue-multiselect";
 import pMap from "p-map";
@@ -19,7 +16,7 @@ import "bootstrap-vue/dist/bootstrap-vue.css";
 import "leaflet/dist/leaflet.css";
 import "vue-multiselect/dist/vue-multiselect.min.css";
 
-import { CATALOG_URL, STAC_VERSION } from './config';
+import { CATALOG_URL, STAC_VERSION } from "./config";
 import { fetchUri, fetchSchemaValidator, getProxiedUri } from "./util";
 import Catalog from "./components/Catalog.vue";
 import Item from "./components/Item.vue";
@@ -28,7 +25,6 @@ Vue.component("multiselect", Multiselect);
 
 Vue.use(AsyncComputed);
 Vue.use(BootstrapVue);
-Vue.use(Clipboard);
 Vue.use(Meta);
 Vue.use(VueRouter);
 Vue.use(Vuex);
@@ -60,9 +56,9 @@ const slugify = uri => bs58.encode(Buffer.from(makeRelative(uri)));
 const resolve = (href, base = CATALOG_URL) => {
   // Encode colons from all but schema, as they create errors in URL resolving.
   const proxiedUri = getProxiedUri(href);
-  const hrefEncoded =
-    proxiedUri.replace(':', encodeURIComponent(':'))
-      .replace(encodeURIComponent(':') + '//', '://');
+  const hrefEncoded = proxiedUri
+    .replace(":", encodeURIComponent(":"))
+    .replace(encodeURIComponent(":") + "//", "://");
   return new URL(hrefEncoded, base).toString();
 };
 
@@ -89,17 +85,20 @@ const main = async () => {
     }
   }
 
-  const collectionValidator = async (data) => {
+  const collectionValidator = async data => {
     const stacVersion = data.stac_version || STAC_VERSION;
 
-    let validateCollection = await fetchSchemaValidator("collection", stacVersion);
+    let validateCollection = await fetchSchemaValidator(
+      "collection",
+      stacVersion
+    );
     if (!validateCollection(data)) {
       return validateCollection.errors.slice();
     }
     return null;
   };
 
-  const catalogValidator = async (data) => {
+  const catalogValidator = async data => {
     if (data.license || data.extent) {
       // contains Collection properties
       return collectionValidator(data);
@@ -116,7 +115,7 @@ const main = async () => {
     return null;
   };
 
-  const itemValidator = async (data) => {
+  const itemValidator = async data => {
     const stacVersion = data.stac_version || STAC_VERSION;
 
     let validateItem = await fetchSchemaValidator("item", stacVersion);
@@ -288,7 +287,7 @@ const main = async () => {
       persistedState.path != null &&
       persistedState.path !== to.path.replace(/\/$/, "") &&
       persistedState.path.toLowerCase() ===
-      to.path.toLowerCase().replace(/\/$/, "")
+        to.path.toLowerCase().replace(/\/$/, "")
     ) {
       return next(persistedState.path);
     }

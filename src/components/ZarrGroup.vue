@@ -90,7 +90,7 @@
 </template>
 
 <script>
-import { isEmpty } from "lodash";
+import isEmpty from "lodash.isempty";
 
 export default {
   name: "ZarrGroup",

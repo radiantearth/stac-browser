@@ -17,7 +17,6 @@
       <tbody>
         <tr v-for="asset in assets" :key="asset.key">
           <td>
-            <!-- eslint-disable-next-line vue/max-attributes-per-line vue/no-v-html -->
             <a
                 :href="asset.href"
                 :title="asset.key"

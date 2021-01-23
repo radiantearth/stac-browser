@@ -1,6 +1,8 @@
 <template>
   <div>
-    <b-alert v-if="errored" variant="danger" show>{{ _entity.message }}</b-alert>
+    <b-alert v-if="errored" variant="danger" show>{{
+      _entity.message
+    }}</b-alert>
     <b-spinner v-else-if="!loaded" label="Loading..."></b-spinner>
     <b-container v-else :class="loaded && 'loaded'">
       <b-row>
@@ -17,20 +19,12 @@
           <h1 class="scroll">{{ title }}</h1>
           <p class="scroll">
             <small>
-              <!-- <b-button
-                v-clipboard="url"
-                variant="link"
-                size="sm"
-                class="clipboard"
-              > -->
               <span
                 v-if="validationErrors"
                 title="Validation errors present; please check the JavaScript Console"
                 >⚠️</span
               >
-              <!-- <i class="far fa-copy" />&nbsp; -->
               <code>{{ url }}</code>
-              <!-- </b-button> -->
             </small>
           </p>
           <b-tabs v-model="tabIndex">
@@ -72,7 +66,7 @@
               v-if="visibleTabs.includes('assets')"
               :assets="assets"
               :bands="bands"
-              :hasBands="hasBands"
+              :has-bands="hasBands"
               :active="
                 !visibleTabs.includes('preview') &&
                   !visibleTabs.includes('thumbnail')
@@ -105,7 +99,7 @@
               :properties="properties"
               :keywords="keywords"
               :collection="collection"
-              :collectionLink="collectionLink"
+              :collection-link="collectionLink"
               :providers="providers"
               :slugify="slugify"
             />
@@ -127,11 +121,9 @@
 </template>
 
 <script>
-import path from "path";
 import url from "url";
 
 import * as d3 from "d3-scale-chromatic";
-import escape from "lodash.escape";
 import isEqual from "lodash.isequal";
 import Leaflet from "leaflet";
 import "leaflet-easybutton";
@@ -141,8 +133,8 @@ import common from "./common";
 import { getTileSource } from "../util";
 import { transformItem } from "../migrate";
 
-import AssetTab from './AssetTab.vue';
-import MetadataSidebar from './MetadataSidebar.vue';
+import AssetTab from "./AssetTab.vue";
+import MetadataSidebar from "./MetadataSidebar.vue";
 
 const COG_TYPES = [
   "image/vnd.stac.geotiff; cloud-optimized=true",
@@ -155,6 +147,10 @@ const FEATURES_TYPES = ["application/geo+json"];
 export default {
   ...common,
   name: "ItemDetail",
+  components: {
+    AssetTab,
+    MetadataSidebar
+  },
   props: {
     ancestors: {
       type: Array,
@@ -184,10 +180,6 @@ export default {
       type: Function,
       required: true
     }
-  },
-  components: {
-    AssetTab,
-    MetadataSidebar
   },
   data() {
     return {
@@ -898,14 +890,6 @@ code {
   font-size: 10.5px;
 }
 
-.btn.clipboard {
-  white-space: nowrap;
-}
-
-.btn.clipboard:hover {
-  text-decoration: none;
-}
-
 .footer {
   position: absolute;
   bottom: 0;
@@ -931,7 +915,7 @@ code {
 .table td {
   border: none;
   padding: 0.25rem;
-  vertical-align: middle
+  vertical-align: middle;
 }
 
 .table td.title {

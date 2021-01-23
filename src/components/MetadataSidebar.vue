@@ -25,7 +25,6 @@
             </tr>
             <tr v-if="license">
                 <td class="title">License</td>
-                <!-- eslint-disable-next-line vue/no-v-html -->
                 <td v-html="license" />
             </tr>
             <tr v-if="temporalExtentReadable.length > 0">
@@ -40,10 +39,8 @@
                 </tr>
                 <tr v-for="prop in props" :key="prop.key">
                 <td class="title">
-                    <!-- eslint-disable-next-line vue/no-v-html -->
                     <span :title="prop.key" v-html="prop.label" />
                 </td>
-                <!-- eslint-disable-next-line vue/no-v-html -->
                 <td v-html="prop.value" />
                 </tr>
             </template>
@@ -67,7 +64,6 @@
                     <em v-if="provider.roles"
                     >({{(Array.isArray(provider.roles) ? provider.roles : []).join(", ") }})</em
                     >
-                    <!-- eslint-disable-next-line vue/no-v-html vue/max-attributes-per-line -->
                     <div
                         v-if="provider.description"
                         class="description"
@@ -91,10 +87,8 @@
                 </tr>
                 <tr v-for="prop in props" :key="prop.key">
                     <td class="title summary-title" >
-                        <!-- eslint-disable-next-line vue/no-v-html -->
                         <span :title="prop.key" v-html="prop.label" />
                     </td>
-                    <!-- eslint-disable-next-line vue/no-v-html -->
                     <td v-html="prop.value" />
                 </tr>
                 </template>
