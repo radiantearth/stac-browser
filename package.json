@@ -33,7 +33,6 @@
     "ajv": "^6.12.6",
     "bootstrap-vue": "^2.21.2",
     "bs58": "^4.0.1",
-    "clone": "^2.1.2",
     "commonmark": "^0.29.3",
     "core-js": "^3.6.5",
     "d3-scale-chromatic": "^1.5.0",
