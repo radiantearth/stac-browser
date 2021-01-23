@@ -4,7 +4,7 @@
   "description": "A Vue-based STAC browser intended for static + dynamic deployment",
   "main": "src/main.js",
   "scripts": {
-    "serve": "vue-cli-service serve",
+    "start": "vue-cli-service serve",
     "build": "vue-cli-service build"
   },
   "bugs": {
