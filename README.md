@@ -48,6 +48,8 @@ cause problems on certain web hosts. To use _hash mode_, set
 `HISTORY_MODE=hash` when running or building. This will be compatible with
 S3, stock Apache, etc.
 
+This package has also been published to npm as [`@radiantearth/stac-browser`](https://www.npmjs.com/package/@radiantearth/stac-browser).
+
 ## Other options
 
 ### STAC_PROXY_URL
