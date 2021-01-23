@@ -188,15 +188,15 @@ export default {
 }
 </style>
 <style>
-.table td.group.summary {
+#stac-browser .table td.group.summary {
   background-color: #555;
 }
 
-.table td.group.summary h4 {
+#stac-browser .table td.group.summary h4 {
   font-weight: bold;
   color: #ddd;
 }
-.metadata-object .metadata-object {
+#stac-browser .metadata-object .metadata-object {
     margin-left: 1em;
 }
 </style>

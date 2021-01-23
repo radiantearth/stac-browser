@@ -38,6 +38,11 @@
             </small>
           </p>
           <div v-if="description" v-html="description" />
+          
+          <p v-if="openEO">
+            <br />
+            <b-button variant="outline-dark" :href="openEO" target="_blank">Discover in openEO Web Editor</b-button>
+          </p>
 
           <b-tabs v-model="tabIndex">
             <b-tab
@@ -437,6 +442,12 @@ export default {
           this.rootCatalog.properties["eo:bands"]) ||
         []
       );
+    },
+    openEO() {
+      if (typeof this.entity.api_version === 'string' && Array.isArray(this.entity.endpoints)) {
+        return `https://editor.openeo.org/?server=${this.url}&discover=1`;
+      }
+      return null;
     },
     catalog() {
       return this.entity;

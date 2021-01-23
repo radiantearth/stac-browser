@@ -1,7 +1,6 @@
 import path from "path";
 import url from "url";
 
-import clone from "clone";
 import { HtmlRenderer, Parser } from "commonmark";
 import escape from "lodash.escape";
 import isEqual from "lodash.isequal";
@@ -50,7 +49,7 @@ export default {
       ],
       __dangerouslyDisableSanitizers: ["script"],
       title: this.title,
-      titleTemplate: "%s :: STAC Browser"
+      titleTemplate: "%s - STAC Index"
     };
   },
   computed: {
@@ -313,7 +312,7 @@ export default {
             const { value } = jsonQuery(err.dataPath, {
               data
             });
-            console.warn(clone(value));
+            console.warn(value);
           });
           console.groupEnd();
         }
