@@ -1,6 +1,6 @@
 {
   "name": "@radiantearth/stac-browser",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A Vue-based STAC browser intended for static + dynamic deployment",
   "main": "lib/index.js",
   "scripts": {
