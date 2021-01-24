@@ -198,8 +198,6 @@ import Leaflet from "leaflet";
 import { mapActions, mapGetters } from "vuex";
 
 import common from "./common";
-import AssetTab from './AssetTab.vue'
-import MetadataSidebar from './MetadataSidebar.vue'
 
 import { transformCatalog } from "../migrate"
 
@@ -237,9 +235,9 @@ export default {
     }
   },
   components: {
-    AssetTab,
-    ZarrMetadataTab: () => import('./ZarrMetadataTab.vue'),
-    MetadataSidebar
+    AssetTab: () => import(/* webpackChunkName: "asset-tab" */ "./AssetTab.vue"),
+    MetadataSidebar: () => import(/* webpackChunkName: "metadata-sidebar" */ "./MetadataSidebar.vue"),
+    ZarrMetadataTab: () => import(/* webpackChunkName: "zarr-metadata-tab" */ './ZarrMetadataTab.vue')
   },
   data() {
     return {
@@ -841,6 +839,8 @@ export default {
   }
 };
 </script>
+
+<style src="./base.css"></style>
 
 <style scoped lang="css">
 h3 {

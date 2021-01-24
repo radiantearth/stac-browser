@@ -1,0 +1,185 @@
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  line-height: 24px;
+  color: #111;
+  font-family: Arial, sans-serif;
+  margin-bottom: 40px;
+}
+
+blockquote,
+body {
+  font-size: 16px;
+}
+table {
+  font-size: 80%;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  padding: 0;
+  margin: 0;
+}
+h1,
+h2,
+h3,
+h4 {
+  font-family: Arial, sans-serif;
+  text-rendering: optimizeLegibility;
+  padding-bottom: 4px;
+}
+h1:last-child,
+h2:last-child,
+h3:last-child,
+h4:last-child {
+  padding-bottom: 0;
+}
+h1 {
+  font-weight: 400;
+  font-size: 28px;
+  line-height: 1.2;
+}
+h2 {
+  font-weight: 700;
+  font-size: 21px;
+  line-height: 1.3;
+}
+h3 {
+  font-weight: 700;
+}
+h3,
+h4 {
+  font-size: 17px;
+  line-height: 1.255;
+}
+h4 {
+  font-weight: 400;
+}
+h5 {
+  font-size: 13px;
+  line-height: 19px;
+}
+h5,
+h6 {
+  font-weight: 700;
+}
+h6 {
+  text-transform: uppercase;
+  font-size: 11px;
+  line-height: 1.465;
+  padding-bottom: 1px;
+}
+p {
+  padding: 0;
+  margin: 0 0 14px;
+}
+p:last-child {
+  margin-bottom: 0;
+}
+p + p {
+  margin-top: -4px;
+}
+b,
+strong {
+  font-weight: 700;
+}
+em,
+i {
+  font-style: italic;
+}
+blockquote {
+  margin: 13px;
+}
+small {
+  font-size: 12px;
+}
+a,
+a:active,
+a:link,
+a:visited {
+  color: #0066c0;
+}
+header {
+  padding: 1.5em 0 0.5em;
+}
+code {
+  color: #555;
+  white-space: nowrap;
+}
+
+.scroll {
+  overflow-x: scroll;
+  -ms-overflow-style: none;
+  overflow: -moz-scrollbars-none;
+  scrollbar-width: none;
+}
+
+.scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.btn code {
+  font-size: 10.5px;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 40px;
+  line-height: 40px;
+  text-align: right;
+  font-size: 0.75em;
+}
+
+.poweredby {
+  border: 1px dotted hotpink;
+  border-radius: 4px;
+  padding: 5px 10px;
+  background-color: #f9f9f9;
+}
+
+.tabs {
+  margin-top: 25px;
+}
+
+.table th,
+.table td {
+  border: none;
+  padding: 0.25rem;
+  vertical-align: middle;
+}
+
+.table td.title {
+  border-right: 1px solid #ddd;
+}
+
+.table td.group {
+  border-radius: 5px;
+  background-color: #ddd;
+  padding-left: 7px;
+}
+
+.table td.group h4 {
+  font-size: 14px;
+  font-weight: normal;
+  color: #555;
+  text-transform: uppercase;
+}
+
+.table th {
+  border-top: none;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.metadata td.title {
+  font-weight: bold;
+  width: 33%;
+  text-align: right;
+}

@@ -2,10 +2,12 @@ import path from "path";
 import url from "url";
 
 import AsyncComputed from "vue-async-computed";
-import BootstrapVue from "bootstrap-vue";
+import {
+  AlertPlugin, BreadcrumbPlugin, ButtonPlugin,
+  CardPlugin,  LayoutPlugin,PaginationPlugin,
+  SpinnerPlugin, TablePlugin, TabsPlugin } from "bootstrap-vue";
 import bs58 from "bs58";
 import Meta from "vue-meta";
-import Multiselect from "vue-multiselect";
 import pMap from "p-map";
 import Vue from "vue";
 import VueRouter from "vue-router";
@@ -14,17 +16,23 @@ import Vuex from "vuex";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
 import "leaflet/dist/leaflet.css";
-import "vue-multiselect/dist/vue-multiselect.min.css";
 
 import { CATALOG_URL, STAC_VERSION } from "./config";
 import { fetchUri, fetchSchemaValidator, getProxiedUri } from "./util";
-import Catalog from "./components/Catalog.vue";
-import Item from "./components/Item.vue";
 
-Vue.component("multiselect", Multiselect);
+const Catalog = () => import(/* webpackChunkName: "catalog" */ "./components/Catalog.vue");
+const Item = () => import(/* webpackChunkName: "item" */ "./components/Item.vue");
 
 Vue.use(AsyncComputed);
-Vue.use(BootstrapVue);
+Vue.use(AlertPlugin);
+Vue.use(BreadcrumbPlugin);
+Vue.use(ButtonPlugin);
+Vue.use(CardPlugin);
+Vue.use(LayoutPlugin);
+Vue.use(PaginationPlugin);
+Vue.use(SpinnerPlugin);
+Vue.use(TablePlugin);
+Vue.use(TabsPlugin);
 Vue.use(Meta);
 Vue.use(VueRouter);
 Vue.use(Vuex);
