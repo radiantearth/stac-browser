@@ -43,6 +43,7 @@
                 placeholder="Select an image"
                 track-by="href"
                 label="title"
+                open-direction="bottom"
               />
               <multiselect
                 v-if="features.length > 0"
@@ -51,6 +52,7 @@
                 placeholder="Select a set of features"
                 track-by="href"
                 label="title"
+                open-direction="bottom"
               />
             </b-tab>
             <b-tab
