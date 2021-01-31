@@ -8,11 +8,11 @@
     "build": "vue-cli-service build"
   },
   "bugs": {
-    "url": "https://github.com/radiantearth/stac-browser//issues"
+    "url": "https://github.com/radiantearth/stac-browser/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/radiantearth/stac-browser/.git"
+    "url": "https://github.com/radiantearth/stac-browser.git"
   },
   "author": "Radiant Earth Foundation <hello@radiant.earth>",
   "contributors": [
@@ -30,6 +30,7 @@
   "license": "ISC",
   "dependencies": {
     "@babel/core": "^7.12.10",
+    "@radiantearth/stac-fields": "github:stac-utils/stac-fields#main",
     "ajv": "^6.12.6",
     "bootstrap-vue": "^2.21.2",
     "bs58": "^4.0.1",
@@ -45,8 +46,6 @@
     "node-fetch": "^2.6.1",
     "p-map": "^3.0.0",
     "regenerator-runtime": "^0.13.7",
-    "spdx-license-ids": "^3.0.7",
-    "spdx-to-html": "^0.3.2",
     "vue": "^2.6.12",
     "vue-async-computed": "^3.9.0",
     "vue-meta": "^2.4.0",

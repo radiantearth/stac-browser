@@ -5,8 +5,6 @@ import { HtmlRenderer, Parser } from "commonmark";
 import escape from "lodash.escape";
 import isEqual from "lodash.isequal";
 import jsonQuery from "json-query";
-import spdxToHTML from "spdx-to-html";
-import spdxLicenseIds from "spdx-license-ids";
 import { mapGetters } from "vuex";
 
 const BAND_LABELS = {
@@ -211,30 +209,26 @@ export default {
       return this._keywords.join(", ");
     },
     license() {
-      if (this._license != null && !spdxLicenseIds.includes(this._license)) {
-        if (this.licenseUrl != null) {
-          return `<a href="${this.licenseUrl}">${this._license}</a>`;
-        }
-
-        return this._license;
+      if (this.licenseUrl) {
+        return `<a href="${this.licenseUrl}" target="_blank">${this._license}</a>`;
       }
 
-      return spdxToHTML(this._license) || this._license;
+      return this._license;
     },
     licenseUrl() {
-      if (!spdxLicenseIds.includes(this._license)) {
-        return this.links
-          .concat(
-            ((this.collection && this.collection.links) || []).concat(
-              (this.rootCatalog && this.rootCatalog.links) || []
-            )
-          )
-          .filter(x => x.rel === "license")
-          .map(x => x.href)
-          .pop();
+      if (typeof this._license === 'string' && this._license !== 'proprietary' && this._license !== 'various' && this._license.match(/^[\w\.\-]+$/i)) {
+        return `https://spdx.org/licenses/${this._license}.html`;
       }
 
-      return `https://spdx.org/licenses/${this._license}.html`;
+      return this.links
+        .concat(
+          ((this.collection && this.collection.links) || []).concat(
+            (this.rootCatalog && this.rootCatalog.links) || []
+          )
+        )
+        .filter(x => x.rel === "license")
+        .map(x => x.href)
+        .pop();
     },
     links() {
       if (typeof this.entity.links === "object") {

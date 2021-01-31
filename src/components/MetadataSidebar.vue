@@ -31,17 +31,15 @@
                 <td class="title">Temporal Extent</td>
                 <td>{{ temporalExtentReadable }}</td>
             </tr>
-            <template v-for="(props, ext) in propertyList">
-                <tr v-if="ext" :key="ext">
-                <td class="group" colspan="2">
-                    <h4>{{ ext }}</h4>
-                </td>
+            <template v-for="group in propertyList">
+                <tr v-if="group.extension" :key="group.extension">
+                    <td class="group" colspan="2">
+                        <h4 v-html="group.label" />
+                    </td>
                 </tr>
-                <tr v-for="prop in props" :key="prop.key">
-                <td class="title">
-                    <span :title="prop.key" v-html="prop.label" />
-                </td>
-                <td v-html="prop.value" />
+                <tr v-for="(prop, key) in group.properties" :key="key">
+                    <td class="title" :title="key" v-html="prop.label" />
+                    <td v-html="prop.formatted" />
                 </tr>
             </template>
             <template v-if="Array.isArray(providers) && providers.length > 0">
@@ -79,18 +77,16 @@
                     <h4>Item Summary</h4>
                 </td>
                 </tr>
-                <template v-for="(props, ext) in summariesList">
-                <tr v-if="ext" :key="ext">
-                    <td class="group" colspan="2">
-                    <h4>{{ ext }}</h4>
-                    </td>
-                </tr>
-                <tr v-for="prop in props" :key="prop.key">
-                    <td class="title summary-title" >
-                        <span :title="prop.key" v-html="prop.label" />
-                    </td>
-                    <td v-html="prop.value" />
-                </tr>
+                <template v-for="group in summariesList">
+                    <tr v-if="group.extension" :key="group.extension">
+                        <td class="group" colspan="2">
+                            <h4 v-html="group.label" />
+                        </td>
+                    </tr>
+                    <tr v-for="(prop, key) in group.properties" :key="key">
+                        <td class="title summary-title" :title="key" v-html="prop.label" />
+                        <td v-html="prop.formatted" />
+                    </tr>
                 </template>
             </template>
         </tbody>
@@ -99,37 +95,7 @@
 </template>
 
 <script>
-import isEmpty from "lodash.isempty";
-
-import { getPropertyDefinitions } from "../properties.js";
-
-const propertyDefinitions = getPropertyDefinitions(),
-  propertyMap = propertyDefinitions.properties,
-  groupMap = propertyDefinitions.groups;
-
-const constructPropList = (props, summaries = false, skip = () => false) => {
-    return Object.entries(props || [])
-                .filter(([, v]) => Number.isFinite(v) || !isEmpty(v) || (summaries && Array.isArray(v) && v.length == 0)) // last part: Skip empty summaries
-                .filter(([k]) => !skip(k))
-                .sort(([a], [b]) => a - b)
-                .map(([key, value]) => ({
-                    key,
-                    label: propertyDefinitions.formatPropertyLabel(key),
-                    value: summaries ? propertyDefinitions.formatSummaryValues(key, value) : propertyDefinitions.formatPropertyValue(key, value)
-                }))
-                .reduce((acc, prop) => {
-                    let ext = "";
-                    if (prop.key.includes(":")) {
-                        const prefix = prop.key.split(":")[0];
-                        ext = groupMap[prefix] || prefix;
-                    }
-
-                    acc[ext] = acc[ext] || [];
-                    acc[ext].push(prop);
-
-                    return acc;
-                }, {});
-};
+import StacFields from "@radiantearth/stac-fields";
 
 export default {
     name: "MetadataSidebar",
@@ -157,12 +123,10 @@ export default {
             return this.summaries && typeof this.summaries === 'object' && Object.keys(this.summaries).length > 0;
         },
         summariesList() {
-            const skip = key => propertyMap[key] && propertyMap[key].skip;
-            return constructPropList(this.summaries, true, skip);
+            return StacFields.formatSummaries({summaries: this.summaries}, this.ignore, "");
         },
         propertyList() {
-            const skip = key => propertyMap[key] && propertyMap[key].skip;
-            return constructPropList(this.properties, false, skip);
+            return StacFields.formatItemProperties({properties: this.properties}, this.ignore, "");
         },
         temporalExtentReadable() {
             if (!Array.isArray(this.temporalExtent)) {
@@ -175,6 +139,14 @@ export default {
                         interval[1] ? new Date(interval[1]).toLocaleString() : "now"
                     ].join(" - ")
                 }).join(', ');
+        }
+    },
+    methods: {
+        ignore(key) {
+            if (key === 'eo:bands') {
+                return false;
+            }
+            return true;
         }
     }
 };
@@ -198,5 +170,27 @@ export default {
 }
 .metadata-object .metadata-object {
     margin-left: 1em;
+}
+.metadata dl {
+    margin: 0;
+    margin-left: 1em;
+}
+.metadata dt {
+    display: inline;
+}
+.metadata dt:after {
+    content: ': ';
+}
+.metadata dd {
+    display: inline;
+}
+.metadata dd:after {
+    content: "\A";
+    white-space: pre;
+    line-height: 1px;
+}
+.metadata dd:last-of-type:after {
+    content: "";
+    white-space: normal;
 }
 </style>
