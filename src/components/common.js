@@ -216,7 +216,7 @@ export default {
       return this._license;
     },
     licenseUrl() {
-      if (typeof this._license === 'string' && this._license !== 'proprietary' && this._license !== 'various' && this._license.match(/^[\w\.\-]+$/i)) {
+      if (typeof this._license === 'string' && this._license !== 'proprietary' && this._license !== 'various' && this._license.match(/^[\w\-\.\+]+$/i)) { // regexp from STAC json schemas
         return `https://spdx.org/licenses/${this._license}.html`;
       }
 
