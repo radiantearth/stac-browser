@@ -177,9 +177,3 @@ code {
   border-top: none;
   border-bottom: 1px solid #dee2e6;
 }
-
-.metadata td.title {
-  font-weight: bold;
-  width: 33%;
-  text-align: right;
-}

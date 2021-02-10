@@ -59,9 +59,9 @@
                 <tr :key="provider.url + index">
                     <td colspan="2" class="provider">
                     <a :href="provider.url">{{ provider.name }}</a>
-                    <em v-if="provider.roles"
-                    >({{(Array.isArray(provider.roles) ? provider.roles : []).join(", ") }})</em
-                    >
+                    <em v-if="provider.roles">
+                        ({{(Array.isArray(provider.roles) ? provider.roles : []).join(", ") }})
+                    </em>
                     <div
                         v-if="provider.description"
                         class="description"
@@ -123,9 +123,11 @@ export default {
             return this.summaries && typeof this.summaries === 'object' && Object.keys(this.summaries).length > 0;
         },
         summariesList() {
+            // ToDo: Pass full collection json
             return StacFields.formatSummaries({summaries: this.summaries}, this.ignore, "");
         },
         propertyList() {
+            // ToDo: Pass full item json
             return StacFields.formatItemProperties({properties: this.properties}, this.ignore, "");
         },
         temporalExtentReadable() {
@@ -143,10 +145,13 @@ export default {
     },
     methods: {
         ignore(key) {
-            if (key === 'eo:bands') {
-                return false;
+            switch(key) {
+                case 'eo:bands':
+                case 'providers':
+                    return false;
+                default:
+                    return true;
             }
-            return true;
         }
     }
 };
@@ -160,13 +165,22 @@ export default {
 }
 </style>
 <style>
-.table td.group.summary {
+.metadata td.group.summary {
   background-color: #555;
 }
 
-.table td.group.summary h4 {
+.metadata  td.group.summary h4 {
   font-weight: bold;
   color: #ddd;
+}
+.metadata td.title {
+  font-weight: bold;
+  width: 33%;
+  text-align: right;
+  vertical-align: top;
+}
+.metadata ul, .metadata ol {
+    padding-left: 2em;
 }
 .metadata-object .metadata-object {
     margin-left: 1em;
@@ -174,6 +188,9 @@ export default {
 .metadata dl {
     margin: 0;
     margin-left: 1em;
+}
+.metadata ul > li > dl, .metadata ol > li > dl {
+    margin-left: 0;
 }
 .metadata dt {
     display: inline;
