@@ -55,21 +55,9 @@
                     </h4>
                 </td>
                 </tr>
-                <template v-for="(provider, index) in providers">
-                <tr :key="provider.url + index">
-                    <td colspan="2" class="provider">
-                    <a :href="provider.url">{{ provider.name }}</a>
-                    <em v-if="provider.roles">
-                        ({{(Array.isArray(provider.roles) ? provider.roles : []).join(", ") }})
-                    </em>
-                    <div
-                        v-if="provider.description"
-                        class="description"
-                        v-html="provider.description"
-                    />
-                    </td>
+                <tr>
+                    <td colspan="2" class="provider" v-html="providerHtml" />
                 </tr>
-                </template>
             </template>
             <template v-if="hasSummary">
                 <tr>
@@ -121,6 +109,9 @@ export default {
         },
         hasSummary() {
             return this.summaries && typeof this.summaries === 'object' && Object.keys(this.summaries).length > 0;
+        },
+        providerHtml() {
+            return StacFields.Formatters.formatProviders(this.providers);
         },
         summariesList() {
             // ToDo: Pass full collection json
@@ -209,5 +200,10 @@ export default {
 .metadata dd:last-of-type:after {
     content: "";
     white-space: normal;
+}
+.metadata .provider .description {
+    font-size: 0.9em;
+    line-height: 1.5em;
+    margin-bottom: 0.5em;
 }
 </style>

@@ -66,13 +66,6 @@ export default {
     _properties() {
       return this.entity.properties || {};
     },
-    _providers() {
-      return (
-        this.entity.providers ||
-        (this.rootCatalog && this.rootCatalog.providers) ||
-        []
-      );
-    },
     assets() {
       if (!this.entity.assets) return [];
       return (
@@ -242,12 +235,11 @@ export default {
       return Object.keys(this.entity).length > 0;
     },
     providers() {
-      return this._providers.map(x => ({
-        ...x,
-        description: MARKDOWN_WRITER.render(
-          MARKDOWN_READER.parse(x.description || "")
-        )
-      }));
+      return (
+        this.entity.providers ||
+        (this.rootCatalog && this.rootCatalog.providers) ||
+        []
+      );
     },
     rootCatalog() {
       const rootLink = this.links.find(x => x.rel === "root");

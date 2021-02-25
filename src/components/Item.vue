@@ -232,12 +232,12 @@ export default {
         (this.rootCatalog && this.rootCatalog.license)
       );
     },
-    _providers() {
+    providers() {
       return (
         this._properties["item:providers"] ||
         this._properties["providers"] ||
         (this.collection && this.collection.providers) ||
-        common.computed._providers.apply(this)
+        common.computed.providers.apply(this)
       );
     },
     _temporalCoverage() {
