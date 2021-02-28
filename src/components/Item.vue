@@ -133,7 +133,7 @@ import { mapActions, mapGetters } from "vuex";
 
 import common from "./common";
 import { getTileSource } from "../util";
-import { transformItem } from "../migrate";
+import Migrate from '@radiantearth/stac-migrate';
 
 const COG_TYPES = [
   "image/vnd.stac.geotiff; cloud-optimized=true",
@@ -183,6 +183,7 @@ export default {
   },
   data() {
     return {
+      stacVersion: null,
       fullscreen: false,
       locatorMap: null,
       map: null,
@@ -210,7 +211,10 @@ export default {
     ...common.computed,
     ...mapGetters(["getEntity"]),
     _entity() {
-      return transformItem(this.getEntity(this.url));
+      let item = this.getEntity(this.url);
+      this.stacVersion = item.stac_version; // Store the original stac_version as it gets replaced by the migration
+      let cloned = JSON.parse(JSON.stringify(item)); // Clone to avoid changing the vuex store, remove once migration is done directly in vuex
+      return Migrate.item(cloned);
     },
     _collectionLinks() {
       return this.links.filter(x => x.rel === "collection");
@@ -226,7 +230,6 @@ export default {
     },
     _license() {
       return (
-        this._properties["item:license"] ||
         this._properties["license"] ||
         (this.collection && this.collection.license) ||
         (this.rootCatalog && this.rootCatalog.license)
@@ -234,17 +237,16 @@ export default {
     },
     providers() {
       return (
-        this._properties["item:providers"] ||
         this._properties["providers"] ||
         (this.collection && this.collection.providers) ||
         common.computed.providers.apply(this)
       );
     },
     _temporalCoverage() {
-      if (this._properties["dtr:start_datetime"] != null) {
+      if (this._properties["start_datetime"] != null) {
         return [
-          this._properties["dtr:start_datetime"],
-          this._properties["dtr:end_datetime"]
+          this._properties["start_datetime"],
+          this._properties["end_datetime"]
         ]
           .map(x => x || "..")
           .join("/");
@@ -560,7 +562,7 @@ export default {
           layer.bindPopup(() => {
             const el = document.createElement("table");
 
-            const labelProperties = this._properties["label:property"] || [];
+            const labelProperties = this._properties["label:properties"] || [];
 
             el.innerHTML = Object.entries(feature.properties)
               .filter(([k]) =>

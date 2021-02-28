@@ -250,9 +250,6 @@ export default {
 
       return this.getEntity(this.ancestors[0]);
     },
-    stacVersion() {
-      return this.entity.stac_version;
-    },
     title() {
       if (this._title != null) {
         return `${this._title} (${this.id})`;

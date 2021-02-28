@@ -199,7 +199,7 @@ import { mapActions, mapGetters } from "vuex";
 
 import common from "./common";
 
-import { transformCatalog } from "../migrate"
+import Migrate from '@radiantearth/stac-migrate';
 
 import { fetchUri } from "../util";
 
@@ -241,6 +241,7 @@ export default {
   },
   data() {
     return {
+      stacVersion: null,
       externalItemCount: 0,
       externalItemsPerPage: 0,
       externalItemPaging: false,
@@ -410,7 +411,10 @@ export default {
     ...common.computed,
     ...mapGetters(["getEntity"]),
     _entity() {
-      return transformCatalog(this.getEntity(this.url));
+      let object = this.getEntity(this.url);
+      this.stacVersion = object.stac_version; // Store the original stac_version as it gets replaced by the migration
+      let cloned = JSON.parse(JSON.stringify(object)); // Clone to avoid changing the vuex store, remove once migration is done directly in vuex
+      return Migrate.stac(cloned);
     },
     _description() {
       return this.catalog.description;
@@ -427,6 +431,7 @@ export default {
       return this.catalog.title;
     },
     bands() {
+      // ToDo: Merge all bands from assets
       return (
         this._properties["eo:bands"] ||
         this.summaries['eo:bands'] ||
@@ -650,21 +655,11 @@ export default {
     },
     spatialExtent() {
       const { spatial } = this.extent;
-      if (!spatial || typeof spatial !== 'object') {
+      if (!spatial || typeof spatial !== 'object' || !Array.isArray(spatial.bbox)) {
           return [];
       }
 
-      let bbox = [];
-      // In STAC 0.8, spatial was changed from the direct array to an
-      // object with the property 'bbox' containing an array of arrays.
-      if (Array.isArray(spatial)) {
-        bbox = [spatial];
-      }
-      else if (Array.isArray(spatial.bbox)) {
-        bbox = spatial.bbox;
-      }
-
-      return bbox.filter(box => Array.isArray(box) && box.length >= 4);
+      return spatial.bbox.filter(box => Array.isArray(box) && box.length >= 4);
     },
     summaries() {
       return this.catalog.summaries || {};
@@ -682,24 +677,11 @@ export default {
     },
     temporalExtent() {
       const { temporal } = this.extent;
-      if (!temporal || typeof temporal !== 'object') {
-        return [];
+      if (!temporal || typeof temporal !== 'object' || !Array.isArray(temporal.interval)) {
+          return [];
       }
 
-      // In STAC 0.8, temporal was changed from the direct array to an
-      // object with the property 'interval' containing an array of arrays.
-
-      let intervals = [];
-      // In STAC 0.8, spatial was changed from the direct array to an
-      // object with the property 'bbox' containing an array of arrays.
-      if (Array.isArray(temporal)) {
-        intervals = [temporal];
-      }
-      else if (Array.isArray(temporal.interval)) {
-        intervals = temporal.interval;
-      }
-
-      return intervals.filter(box => Array.isArray(box) && box.length === 2);
+      return temporal.interval.filter(box => Array.isArray(box) && box.length === 2);
     },
     version() {
       return this.catalog.version;
