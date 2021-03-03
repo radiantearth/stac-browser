@@ -1,0 +1,152 @@
+#stac-browser h1,
+#stac-browser h2,
+#stac-browser h3,
+#stac-browser h4,
+#stac-browser h5,
+#stac-browser h6 {
+  padding: 0;
+  margin: 0;
+}
+#stac-browser h1,
+#stac-browser h2,
+#stac-browser h3,
+#stac-browser h4 {
+  font-family: Arial, sans-serif;
+  text-rendering: optimizeLegibility;
+  padding-bottom: 4px;
+}
+#stac-browser h1:last-child,
+#stac-browser h2:last-child,
+#stac-browser h3:last-child,
+#stac-browser h4:last-child {
+  padding-bottom: 0;
+}
+#stac-browser h1 {
+  font-weight: 400;
+  font-size: 28px;
+  line-height: 1.2;
+}
+#stac-browser h2 {
+  font-weight: 700;
+  font-size: 21px;
+  line-height: 1.3;
+}
+#stac-browser h3 {
+  font-weight: 700;
+}
+#stac-browser h3,
+#stac-browser h4 {
+  font-size: 17px;
+  line-height: 1.255;
+}
+#stac-browser h4 {
+  font-weight: 400;
+}
+#stac-browser h5 {
+  font-size: 13px;
+  line-height: 19px;
+}
+#stac-browser h5,
+#stac-browser h6 {
+  font-weight: 700;
+}
+#stac-browser h6 {
+  text-transform: uppercase;
+  font-size: 11px;
+  line-height: 1.465;
+  padding-bottom: 1px;
+}
+#stac-browser p {
+  padding: 0;
+  margin: 0 0 14px;
+}
+#stac-browser p:last-child {
+  margin-bottom: 0;
+}
+#stac-browser p + #stac-browser p {
+  margin-top: -4px;
+}
+#stac-browser b,
+#stac-browser strong {
+  font-weight: 700;
+}
+#stac-browser em,
+#stac-browser i {
+  font-style: italic;
+}
+#stac-browser blockquote {
+  margin: 13px;
+}
+#stac-browser header {
+  padding: 0 0 0.5em;
+}
+#stac-browser code {
+  color: #555;
+  white-space: nowrap;
+}
+
+#stac-browser .scroll {
+  overflow-x: scroll;
+  -ms-overflow-style: none;
+  overflow: -moz-scrollbars-none;
+  scrollbar-width: none;
+}
+
+#stac-browser .scroll::-webkit-scrollbar {
+  display: none;
+}
+
+#stac-browser .btn code {
+  font-size: 10.5px;
+}
+
+#stac-browser .footer {
+  height: 40px;
+  line-height: 40px;
+  text-align: right;
+  font-size: 0.75em;
+}
+
+#stac-browser .poweredby {
+  padding: 5px 10px;
+}
+
+#stac-browser .tabs {
+  margin-top: 25px;
+  height: auto;
+}
+
+#stac-browser .table th,
+#stac-browser .table td {
+  border: none;
+  padding: 0.25rem;
+  vertical-align: middle;
+}
+
+#stac-browser .table td.title {
+  border-right: 1px solid #ddd;
+}
+
+#stac-browser .table td.group {
+  border-radius: 5px;
+  background-color: #ddd;
+  padding-left: 7px;
+}
+
+#stac-browser .table td.group h4 {
+  font-size: 14px;
+  font-weight: normal;
+  color: #555;
+  text-transform: uppercase;
+}
+
+#stac-browser .table th {
+  border-top: none;
+  border-bottom: 1px solid #dee2e6;
+}
+
+#stac-browser .metadata td.title {
+  font-weight: bold;
+  width: 33%;
+  text-align: right;
+}

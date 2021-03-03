@@ -164,6 +164,11 @@
               :hasBands="hasBands"
               :active="false"
             ></AssetTab>
+            <LinkTab
+              v-if="visibleTabs.includes('links')"
+              :links="shownLinks"
+              :active="false"
+            ></LinkTab>
           </b-tabs>
         </b-col>
         <b-col
@@ -203,10 +208,8 @@ import Leaflet from "leaflet";
 import { mapActions, mapGetters } from "vuex";
 
 import common from "./common";
-import AssetTab from './AssetTab.vue'
-import MetadataSidebar from './MetadataSidebar.vue'
 
-import { transformCatalog } from "../migrate"
+import Migrate from '@radiantearth/stac-migrate';
 
 import { fetchUri } from "../util";
 
@@ -242,12 +245,14 @@ export default {
     }
   },
   components: {
-    AssetTab,
-    ZarrMetadataTab: () => import('./ZarrMetadataTab.vue'),
-    MetadataSidebar
+    LinkTab: () => import(/* webpackChunkName: "link-tab" */ "./LinkTab.vue"),
+    AssetTab: () => import(/* webpackChunkName: "asset-tab" */ "./AssetTab.vue"),
+    MetadataSidebar: () => import(/* webpackChunkName: "metadata-sidebar" */ "./MetadataSidebar.vue"),
+    ZarrMetadataTab: () => import(/* webpackChunkName: "zarr-metadata-tab" */ './ZarrMetadataTab.vue')
   },
   data() {
     return {
+      stacVersion: null,
       externalItemCount: 0,
       externalItemsPerPage: 0,
       externalItemPaging: false,
@@ -417,7 +422,10 @@ export default {
     ...common.computed,
     ...mapGetters(["getEntity"]),
     _entity() {
-      return transformCatalog(this.getEntity(this.url));
+      let object = this.getEntity(this.url);
+      this.stacVersion = object.stac_version; // Store the original stac_version as it gets replaced by the migration
+      let cloned = JSON.parse(JSON.stringify(object)); // Clone to avoid changing the vuex store, remove once migration is done directly in vuex
+      return Migrate.stac(cloned);
     },
     _description() {
       return this.catalog.description;
@@ -434,6 +442,7 @@ export default {
       return this.catalog.title;
     },
     bands() {
+      // ToDo: Merge all bands from assets
       return (
         this._properties["eo:bands"] ||
         this.summaries['eo:bands'] ||
@@ -663,21 +672,11 @@ export default {
     },
     spatialExtent() {
       const { spatial } = this.extent;
-      if (!spatial || typeof spatial !== 'object') {
+      if (!spatial || typeof spatial !== 'object' || !Array.isArray(spatial.bbox)) {
           return [];
       }
 
-      let bbox = [];
-      // In STAC 0.8, spatial was changed from the direct array to an
-      // object with the property 'bbox' containing an array of arrays.
-      if (Array.isArray(spatial)) {
-        bbox = [spatial];
-      }
-      else if (Array.isArray(spatial.bbox)) {
-        bbox = spatial.bbox;
-      }
-
-      return bbox.filter(box => Array.isArray(box) && box.length >= 4);
+      return spatial.bbox.filter(box => Array.isArray(box) && box.length >= 4);
     },
     summaries() {
       return this.catalog.summaries || {};
@@ -695,24 +694,11 @@ export default {
     },
     temporalExtent() {
       const { temporal } = this.extent;
-      if (!temporal || typeof temporal !== 'object') {
-        return [];
+      if (!temporal || typeof temporal !== 'object' || !Array.isArray(temporal.interval)) {
+          return [];
       }
 
-      // In STAC 0.8, temporal was changed from the direct array to an
-      // object with the property 'interval' containing an array of arrays.
-
-      let intervals = [];
-      // In STAC 0.8, spatial was changed from the direct array to an
-      // object with the property 'bbox' containing an array of arrays.
-      if (Array.isArray(temporal)) {
-        intervals = [temporal];
-      }
-      else if (Array.isArray(temporal.interval)) {
-        intervals = temporal.interval;
-      }
-
-      return intervals.filter(box => Array.isArray(box) && box.length === 2);
+      return temporal.interval.filter(box => Array.isArray(box) && box.length === 2);
     },
     version() {
       return this.catalog.version;
@@ -723,10 +709,11 @@ export default {
         this.childCount > 0 && "catalogs",
         (this.hasExternalItems || this.itemCount > 0) && "items",
         this.bands.length > 0 && "bands",
-        this.summaries && "summaries",
-        this.assets && this.assets.length > 0 && "assets",
+        Object.keys(this.summaries).length && "summaries",
+        this.assets.length > 0 && "assets",
+        this.shownLinks.length > 0 && "links",
         this.zarrMetadataUrl && "zarrMetadata"
-      ].filter(x => x != null && x !== false);
+      ].filter(x => !!x);
     }
   },
   watch: {
@@ -852,6 +839,8 @@ export default {
   }
 };
 </script>
+
+<style src="./base.css"></style>
 
 <style scoped lang="css">
 h3 {

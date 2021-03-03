@@ -5,8 +5,6 @@ import { HtmlRenderer, Parser } from "commonmark";
 import escape from "lodash.escape";
 import isEqual from "lodash.isequal";
 import jsonQuery from "json-query";
-import spdxToHTML from "spdx-to-html";
-import spdxLicenseIds from "spdx-license-ids";
 import { mapGetters } from "vuex";
 
 const BAND_LABELS = {
@@ -67,13 +65,6 @@ export default {
     },
     _properties() {
       return this.entity.properties || {};
-    },
-    _providers() {
-      return (
-        this.entity.providers ||
-        (this.rootCatalog && this.rootCatalog.providers) ||
-        []
-      );
     },
     assets() {
       if (!this.entity.assets) return [];
@@ -211,49 +202,43 @@ export default {
       return this._keywords.join(", ");
     },
     license() {
-      if (this._license != null && !spdxLicenseIds.includes(this._license)) {
-        if (this.licenseUrl != null) {
-          return `<a href="${this.licenseUrl}">${this._license}</a>`;
-        }
-
-        return this._license;
+      if (this.licenseUrl) {
+        return `<a href="${this.licenseUrl}" target="_blank">${this._license}</a>`;
       }
 
-      return spdxToHTML(this._license) || this._license;
+      return this._license;
     },
     licenseUrl() {
-      if (!spdxLicenseIds.includes(this._license)) {
-        return this.links
-          .concat(
-            ((this.collection && this.collection.links) || []).concat(
-              (this.rootCatalog && this.rootCatalog.links) || []
-            )
-          )
-          .filter(x => x.rel === "license")
-          .map(x => x.href)
-          .pop();
+      if (typeof this._license === 'string' && this._license !== 'proprietary' && this._license !== 'various' && this._license.match(/^[\w\-\.\+]+$/i)) { // regexp from STAC json schemas
+        return `https://spdx.org/licenses/${this._license}.html`;
       }
 
-      return `https://spdx.org/licenses/${this._license}.html`;
+      return this.links
+        .concat(
+          ((this.collection && this.collection.links) || []).concat(
+            (this.rootCatalog && this.rootCatalog.links) || []
+          )
+        )
+        .filter(x => x.rel === "license")
+        .map(x => x.href)
+        .pop();
     },
     links() {
-      if (typeof this.entity.links === "object") {
-        // previous STAC version specified links as an object (SpaceNet MVS Dataset)
-        return Object.values(this.entity.links);
-      }
-
       return this.entity.links || [];
+    },
+    shownLinks() {
+      const ignoreRels = ['self', 'parent', 'child', 'item', 'collection', 'root', 'data', 'items'];
+      return this.links.filter(link => !ignoreRels.includes(link.rel));
     },
     loaded() {
       return Object.keys(this.entity).length > 0;
     },
     providers() {
-      return this._providers.map(x => ({
-        ...x,
-        description: MARKDOWN_WRITER.render(
-          MARKDOWN_READER.parse(x.description || "")
-        )
-      }));
+      return (
+        this.entity.providers ||
+        (this.rootCatalog && this.rootCatalog.providers) ||
+        []
+      );
     },
     rootCatalog() {
       const rootLink = this.links.find(x => x.rel === "root");
@@ -263,9 +248,6 @@ export default {
       }
 
       return this.getEntity(this.ancestors[0]);
-    },
-    stacVersion() {
-      return this.entity.stac_version;
     },
     title() {
       if (this._title != null) {

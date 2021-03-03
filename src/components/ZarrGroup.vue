@@ -91,9 +91,14 @@
 
 <script>
 import isEmpty from "lodash.isempty";
+import { BCollapse, BListGroup } from 'bootstrap-vue'
 
 export default {
   name: "ZarrGroup",
+  components: {
+    'b-collapse': BCollapse,
+    'b-list-group': BListGroup
+  },
   props: ["group", "groupName"],
   methods: {
     hasItems: function(obj) {

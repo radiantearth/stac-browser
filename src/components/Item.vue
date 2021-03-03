@@ -36,21 +36,23 @@
               <div id="map-container">
                 <div id="map"></div>
               </div>
-              <multiselect
+              <MultiSelect
                 v-if="cogs.length > 1"
                 v-model="selectedImage"
                 :options="cogs"
                 placeholder="Select an image"
                 track-by="href"
                 label="title"
+                open-direction="bottom"
               />
-              <multiselect
+              <MultiSelect
                 v-if="features.length > 0"
                 v-model="selectedFeatures"
                 :options="features"
                 placeholder="Select a set of features"
                 track-by="href"
                 label="title"
+                open-direction="bottom"
               />
             </b-tab>
             <b-tab
@@ -72,14 +74,15 @@
                   !visibleTabs.includes('thumbnail')
               "
             ></AssetTab>
+            <LinkTab
+              v-if="visibleTabs.includes('links')"
+              :links="shownLinks"
+              :active="false"
+            ></LinkTab>
             <b-tab
               v-if="visibleTabs.includes('bands')"
               title="Bands"
-              :active="
-                !visibleTabs.includes('preview') &&
-                  !visibleTabs.includes('thumbnail') &&
-                  !visibleTabs.includes('assets')
-              "
+              :active="false"
             >
               <b-table
                 :items="bands"
@@ -131,10 +134,7 @@ import { mapActions, mapGetters } from "vuex";
 
 import common from "./common";
 import { getTileSource } from "../util";
-import { transformItem } from "../migrate";
-
-import AssetTab from "./AssetTab.vue";
-import MetadataSidebar from "./MetadataSidebar.vue";
+import Migrate from '@radiantearth/stac-migrate';
 
 const COG_TYPES = [
   "image/vnd.stac.geotiff; cloud-optimized=true",
@@ -148,8 +148,10 @@ export default {
   ...common,
   name: "ItemDetail",
   components: {
-    AssetTab,
-    MetadataSidebar
+    LinkTab: () => import(/* webpackChunkName: "link-tab" */ "./LinkTab.vue"),
+    AssetTab: () => import(/* webpackChunkName: "asset-tab" */ "./AssetTab.vue"),
+    MetadataSidebar: () => import(/* webpackChunkName: "metadata-sidebar" */ "./MetadataSidebar.vue"),
+    MultiSelect: () => import(/* webpackChunkName: "multiselect" */ 'vue-multiselect')
   },
   props: {
     ancestors: {
@@ -183,6 +185,7 @@ export default {
   },
   data() {
     return {
+      stacVersion: null,
       fullscreen: false,
       locatorMap: null,
       map: null,
@@ -210,7 +213,15 @@ export default {
     ...common.computed,
     ...mapGetters(["getEntity"]),
     _entity() {
-      return transformItem(this.getEntity(this.url));
+      let object = this.getEntity(this.url);
+      if (object.type === "FeatureCollection") {
+        const { hash } = url.parse(this.url);
+        const idx = hash.slice(1);
+        object = object.features[idx];
+      }
+      this.stacVersion = object.stac_version; // Store the original stac_version as it gets replaced by the migration
+      let cloned = JSON.parse(JSON.stringify(object)); // Clone to avoid changing the vuex store, remove once migration is done directly in vuex
+      return Migrate.item(cloned);
     },
     _collectionLinks() {
       return this.links.filter(x => x.rel === "collection");
@@ -226,25 +237,23 @@ export default {
     },
     _license() {
       return (
-        this._properties["item:license"] ||
         this._properties["license"] ||
         (this.collection && this.collection.license) ||
         (this.rootCatalog && this.rootCatalog.license)
       );
     },
-    _providers() {
+    providers() {
       return (
-        this._properties["item:providers"] ||
         this._properties["providers"] ||
         (this.collection && this.collection.providers) ||
-        common.computed._providers.apply(this)
+        common.computed.providers.apply(this)
       );
     },
     _temporalCoverage() {
-      if (this._properties["dtr:start_datetime"] != null) {
+      if (this._properties["start_datetime"] != null) {
         return [
-          this._properties["dtr:start_datetime"],
-          this._properties["dtr:end_datetime"]
+          this._properties["start_datetime"],
+          this._properties["end_datetime"]
         ]
           .map(x => x || "..")
           .join("/");
@@ -335,13 +344,6 @@ export default {
       return this.selectedFeatures.href;
     },
     item() {
-      if (this._entity.type === "FeatureCollection") {
-        const { hash } = url.parse(this.url);
-        const idx = hash.slice(1);
-
-        return this._entity.features[idx];
-      }
-
       return this._entity;
     },
     jsonLD() {
@@ -446,8 +448,9 @@ export default {
         this.cogs.length > 0 && "preview",
         this.thumbnail != null && "thumbnail",
         this.assets.length > 0 && "assets",
+        this.shownLinks.length > 0 && "links",
         this.bands.length > 0 && "bands"
-      ].filter(x => x != null && x !== false);
+      ].filter(x => !!x);
     }
   },
   watch: {
@@ -560,7 +563,7 @@ export default {
           layer.bindPopup(() => {
             const el = document.createElement("table");
 
-            const labelProperties = this._properties["label:property"] || [];
+            const labelProperties = this._properties["label:properties"] || [];
 
             el.innerHTML = Object.entries(feature.properties)
               .filter(([k]) =>
@@ -759,160 +762,8 @@ export default {
 };
 </script>
 
-<style>
-#stac-browser h1,
-#stac-browser h2,
-#stac-browser h3,
-#stac-browser h4,
-#stac-browser h5,
-#stac-browser h6 {
-  padding: 0;
-  margin: 0;
-}
-#stac-browser h1,
-#stac-browser h2,
-#stac-browser h3,
-#stac-browser h4 {
-  font-family: Arial, sans-serif;
-  text-rendering: optimizeLegibility;
-  padding-bottom: 4px;
-}
-#stac-browser h1:last-child,
-#stac-browser h2:last-child,
-#stac-browser h3:last-child,
-#stac-browser h4:last-child {
-  padding-bottom: 0;
-}
-#stac-browser h1 {
-  font-weight: 400;
-  font-size: 28px;
-  line-height: 1.2;
-}
-#stac-browser h2 {
-  font-weight: 700;
-  font-size: 21px;
-  line-height: 1.3;
-}
-#stac-browser h3 {
-  font-weight: 700;
-}
-#stac-browser h3,
-#stac-browser h4 {
-  font-size: 17px;
-  line-height: 1.255;
-}
-#stac-browser h4 {
-  font-weight: 400;
-}
-#stac-browser h5 {
-  font-size: 13px;
-  line-height: 19px;
-}
-#stac-browser h5,
-#stac-browser h6 {
-  font-weight: 700;
-}
-#stac-browser h6 {
-  text-transform: uppercase;
-  font-size: 11px;
-  line-height: 1.465;
-  padding-bottom: 1px;
-}
-#stac-browser p {
-  padding: 0;
-  margin: 0 0 14px;
-}
-#stac-browser p:last-child {
-  margin-bottom: 0;
-}
-#stac-browser p + #stac-browser p {
-  margin-top: -4px;
-}
-#stac-browser b,
-#stac-browser strong {
-  font-weight: 700;
-}
-#stac-browser em,
-#stac-browser i {
-  font-style: italic;
-}
-#stac-browser blockquote {
-  margin: 13px;
-}
-#stac-browser header {
-  padding: 0 0 0.5em;
-}
-#stac-browser code {
-  color: #555;
-  white-space: nowrap;
-}
-
-#stac-browser .scroll {
-  overflow-x: scroll;
-  -ms-overflow-style: none;
-  overflow: -moz-scrollbars-none;
-  scrollbar-width: none;
-}
-
-#stac-browser .scroll::-webkit-scrollbar {
-  display: none;
-}
-
-#stac-browser .btn code {
-  font-size: 10.5px;
-}
-
-#stac-browser .footer {
-  height: 40px;
-  line-height: 40px;
-  text-align: right;
-  font-size: 0.75em;
-}
-
-#stac-browser .poweredby {
-  padding: 5px 10px;
-}
-
-#stac-browser .tabs {
-  margin-top: 25px;
-  height: auto;
-}
-
-#stac-browser .table th,
-#stac-browser .table td {
-  border: none;
-  padding: 0.25rem;
-  vertical-align: middle;
-}
-
-#stac-browser .table td.title {
-  border-right: 1px solid #ddd;
-}
-
-#stac-browser .table td.group {
-  border-radius: 5px;
-  background-color: #ddd;
-  padding-left: 7px;
-}
-
-#stac-browser .table td.group h4 {
-  font-size: 14px;
-  font-weight: normal;
-  color: #555;
-  text-transform: uppercase;
-}
-
-#stac-browser .table th {
-  border-top: none;
-  border-bottom: 1px solid #dee2e6;
-}
-
-#stac-browser .metadata td.title {
-  font-weight: bold;
-  width: 33%;
-  text-align: right;
-}
-</style>
+<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
+<style src="./base.css"></style>
 
 <style scoped lang="css">
 .leaflet-pseudo-fullscreen {
