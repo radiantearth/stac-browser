@@ -211,9 +211,14 @@ export default {
     ...common.computed,
     ...mapGetters(["getEntity"]),
     _entity() {
-      let item = this.getEntity(this.url);
-      this.stacVersion = item.stac_version; // Store the original stac_version as it gets replaced by the migration
-      let cloned = JSON.parse(JSON.stringify(item)); // Clone to avoid changing the vuex store, remove once migration is done directly in vuex
+      let object = this.getEntity(this.url);
+      if (object.type === "FeatureCollection") {
+        const { hash } = url.parse(this.url);
+        const idx = hash.slice(1);
+        object = object.features[idx];
+      }
+      this.stacVersion = object.stac_version; // Store the original stac_version as it gets replaced by the migration
+      let cloned = JSON.parse(JSON.stringify(object)); // Clone to avoid changing the vuex store, remove once migration is done directly in vuex
       return Migrate.item(cloned);
     },
     _collectionLinks() {
@@ -337,13 +342,6 @@ export default {
       return this.selectedFeatures.href;
     },
     item() {
-      if (this._entity.type === "FeatureCollection") {
-        const { hash } = url.parse(this.url);
-        const idx = hash.slice(1);
-
-        return this._entity.features[idx];
-      }
-
       return this._entity;
     },
     jsonLD() {
