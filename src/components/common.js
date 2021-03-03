@@ -224,12 +224,11 @@ export default {
         .pop();
     },
     links() {
-      if (typeof this.entity.links === "object") {
-        // previous STAC version specified links as an object (SpaceNet MVS Dataset)
-        return Object.values(this.entity.links);
-      }
-
       return this.entity.links || [];
+    },
+    shownLinks() {
+      const ignoreRels = ['self', 'parent', 'child', 'item', 'collection', 'root', 'data', 'items'];
+      return this.links.filter(link => !ignoreRels.includes(link.rel));
     },
     loaded() {
       return Object.keys(this.entity).length > 0;

@@ -74,14 +74,15 @@
                   !visibleTabs.includes('thumbnail')
               "
             ></AssetTab>
+            <LinkTab
+              v-if="visibleTabs.includes('links')"
+              :links="shownLinks"
+              :active="false"
+            ></LinkTab>
             <b-tab
               v-if="visibleTabs.includes('bands')"
               title="Bands"
-              :active="
-                !visibleTabs.includes('preview') &&
-                  !visibleTabs.includes('thumbnail') &&
-                  !visibleTabs.includes('assets')
-              "
+              :active="false"
             >
               <b-table
                 :items="bands"
@@ -147,6 +148,7 @@ export default {
   ...common,
   name: "ItemDetail",
   components: {
+    LinkTab: () => import(/* webpackChunkName: "link-tab" */ "./LinkTab.vue"),
     AssetTab: () => import(/* webpackChunkName: "asset-tab" */ "./AssetTab.vue"),
     MetadataSidebar: () => import(/* webpackChunkName: "metadata-sidebar" */ "./MetadataSidebar.vue"),
     MultiSelect: () => import(/* webpackChunkName: "multiselect" */ 'vue-multiselect')
@@ -446,8 +448,9 @@ export default {
         this.cogs.length > 0 && "preview",
         this.thumbnail != null && "thumbnail",
         this.assets.length > 0 && "assets",
+        this.shownLinks.length > 0 && "links",
         this.bands.length > 0 && "bands"
-      ].filter(x => x != null && x !== false);
+      ].filter(x => !!x);
     }
   },
   watch: {

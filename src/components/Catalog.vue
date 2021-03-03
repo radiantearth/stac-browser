@@ -159,6 +159,11 @@
               :hasBands="hasBands"
               :active="false"
             ></AssetTab>
+            <LinkTab
+              v-if="visibleTabs.includes('links')"
+              :links="shownLinks"
+              :active="false"
+            ></LinkTab>
           </b-tabs>
         </b-col>
         <b-col
@@ -235,6 +240,7 @@ export default {
     }
   },
   components: {
+    LinkTab: () => import(/* webpackChunkName: "link-tab" */ "./LinkTab.vue"),
     AssetTab: () => import(/* webpackChunkName: "asset-tab" */ "./AssetTab.vue"),
     MetadataSidebar: () => import(/* webpackChunkName: "metadata-sidebar" */ "./MetadataSidebar.vue"),
     ZarrMetadataTab: () => import(/* webpackChunkName: "zarr-metadata-tab" */ './ZarrMetadataTab.vue')
@@ -692,10 +698,11 @@ export default {
         this.childCount > 0 && "catalogs",
         (this.hasExternalItems || this.itemCount > 0) && "items",
         this.bands.length > 0 && "bands",
-        this.summaries && "summaries",
-        this.assets && this.assets.length > 0 && "assets",
+        Object.keys(this.summaries).length && "summaries",
+        this.assets.length > 0 && "assets",
+        this.shownLinks.length > 0 && "links",
         this.zarrMetadataUrl && "zarrMetadata"
-      ].filter(x => x != null && x !== false);
+      ].filter(x => !!x);
     }
   },
   watch: {
