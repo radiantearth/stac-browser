@@ -27,11 +27,10 @@
               <code>{{ url }}</code>
             </small>
           </p>
-          <b-tabs v-model="tabIndex">
+          <b-tabs :value="tabIndex" @input="selectTab" @activate-tab="activateTab">
             <b-tab
               v-if="visibleTabs.includes('preview')"
               title="Preview"
-              active
             >
               <div id="map-container">
                 <div id="map"></div>
@@ -58,7 +57,6 @@
             <b-tab
               v-if="visibleTabs.includes('thumbnail')"
               title="Thumbnail"
-              :active="!visibleTabs.includes('preview')"
             >
               <a :href="thumbnail">
                 <img id="thumbnail" align="center" :src="thumbnail" />
@@ -69,20 +67,16 @@
               :assets="assets"
               :bands="bands"
               :has-bands="hasBands"
-              :active="
-                !visibleTabs.includes('preview') &&
-                  !visibleTabs.includes('thumbnail')
-              "
+              :active="selectedTab == 'assets'"
             ></AssetTab>
             <LinkTab
               v-if="visibleTabs.includes('links')"
               :links="shownLinks"
-              :active="false"
+              :active="selectedTab == 'links'"
             ></LinkTab>
             <b-tab
               v-if="visibleTabs.includes('bands')"
               title="Bands"
-              :active="false"
             >
               <b-table
                 :items="bands"
@@ -206,6 +200,7 @@ export default {
       selectedFeatures: null,
       selectedImage: null,
       selectedTab: null,
+      tabsLoaded: false,
       validationErrors: null
     };
   },
@@ -416,16 +411,8 @@ export default {
         ...this._properties
       };
     },
-    tabIndex: {
-      get: function() {
-        return this.visibleTabs.indexOf(this.selectedTab);
-      },
-      set: function(tabIndex) {
-        // wait for the DOM to update
-        this.$nextTick(() => {
-          this.selectedTab = this.visibleTabs[tabIndex];
-        });
-      }
+    tabIndex() {
+      return this.visibleTabs.indexOf(this.selectedTab);
     },
     thumbnail() {
       const thumbnail = this.assets.find(x => x.key === "thumbnail");
@@ -724,6 +711,14 @@ export default {
       } else {
         this.map.fitBounds(this.overlayLayer.getBounds());
       }
+    },
+    selectTab(tabIndex) {
+      if (this.tabsLoaded) {
+        this.selectedTab = this.visibleTabs[tabIndex];
+      }
+    },
+    activateTab() {
+      this.tabsLoaded = true;
     },
     syncWithQueryState(query) {
       this.selectedTab = query.t;
