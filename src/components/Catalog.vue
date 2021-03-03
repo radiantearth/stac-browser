@@ -44,7 +44,7 @@
             <b-button variant="outline-dark" :href="openEO" target="_blank">Discover in openEO Web Editor</b-button>
           </p>
 
-          <b-tabs v-model="tabIndex">
+          <b-tabs :value="tabIndex" @input="selectTab" @activate-tab="activateTab">
             <b-tab
               v-if="visibleTabs.includes('collections')"
               key="collections"
@@ -154,20 +154,20 @@
             </b-tab>
             <ZarrMetadataTab
               v-if="visibleTabs.includes('zarrMetadata')"
-              :active="false"
               :zarr-metadata-url="zarrMetadataUrl"
+              :active="selectedTab == 'zarrMetadata'"
             ></ZarrMetadataTab>
             <AssetTab
               v-if="visibleTabs.includes('assets')"
               :assets="assets"
               :bands="bands"
               :hasBands="hasBands"
-              :active="false"
+              :active="selectedTab == 'assets'"
             ></AssetTab>
             <LinkTab
               v-if="visibleTabs.includes('links')"
               :links="shownLinks"
-              :active="false"
+              :active="selectedTab == 'links'"
             ></LinkTab>
           </b-tabs>
         </b-col>
@@ -302,6 +302,7 @@ export default {
       currentItemListPage: 1,
       locatorMap: null,
       selectedTab: null,
+      tabsLoaded: false,
       validationErrors: null
     };
   },
@@ -681,16 +682,8 @@ export default {
     summaries() {
       return this.catalog.summaries || {};
     },
-    tabIndex: {
-      get: function() {
-        return this.visibleTabs.indexOf(this.selectedTab);
-      },
-      set: function(tabIndex) {
-        // wait for the DOM to update
-        this.$nextTick(() => {
-          this.selectedTab = this.visibleTabs[tabIndex];
-        });
-      }
+    tabIndex() {
+      return this.visibleTabs.indexOf(this.selectedTab);
     },
     temporalExtent() {
       const { temporal } = this.extent;
@@ -709,7 +702,6 @@ export default {
         this.childCount > 0 && "catalogs",
         (this.hasExternalItems || this.itemCount > 0) && "items",
         this.bands.length > 0 && "bands",
-        Object.keys(this.summaries).length && "summaries",
         this.assets.length > 0 && "assets",
         this.shownLinks.length > 0 && "links",
         this.zarrMetadataUrl && "zarrMetadata"
@@ -807,6 +799,14 @@ export default {
       this.locatorMap.fitBounds(overlayLayer.getBounds(), {
         padding: [95, 95]
       });
+    },
+    selectTab(tabIndex) {
+      if (this.tabsLoaded) {
+        this.selectedTab = this.visibleTabs[tabIndex];
+      }
+    },
+    activateTab() {
+      this.tabsLoaded = true;
     },
     sortCompare(a, b, key) {
       if (key === "link") {
