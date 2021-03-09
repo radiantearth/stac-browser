@@ -135,15 +135,14 @@
                 <!-- TODO row-details w/ additional metadata + map -->
               </b-table>
               <b-pagination
-                v-if="!hasExternalPagination"
-                v-show="itemCount > itemsPerPage"
+                v-if="!hasExternalPagination && itemCount > itemsPerPage"
                 v-model="currentItemPage"
                 :limit="15"
                 :total-rows="itemCount"
                 :per-page="itemsPerPage"
                 :hide-goto-end-buttons="true"
               />
-              <ul v-else class="pagination">
+              <ul v-else-if="hasExternalPagination" class="pagination">
                 <li class="page-item" :class="{ 'disabled': !previousItemsLink}">
                     <a class="page-link" @click="goToPreviousItems">Previous</a>
                 </li>
@@ -504,11 +503,11 @@ export default {
       if (!externalItemsLink) {
         return null;
       }
-      let externalItemsURL = `${externalItemsLink.href}?limit=${ITEMS_PER_PAGE}`
+      let externalItemsURL = `${externalItemsLink.href}?limit=${ITEMS_PER_PAGE}`;
       if (!this.hasExternalPagination) {
-        externalItemsURL += `&page=${this.currentItemPage}`
+        externalItemsURL += `&page=${this.currentItemPage}`;
       }
-      return externalItemsURL
+      return externalItemsURL;
     },
     itemCount() {
       if (!this.hasExternalItems) {
@@ -747,7 +746,7 @@ export default {
       ].filter(x => x != null && x !== false);
     },
     hasExternalPagination() {
-      return this.previousItemsLink || this.nextItemsLink
+      return this.previousItemsLink || this.nextItemsLink;
     },
   },
   watch: {
@@ -872,16 +871,16 @@ export default {
       this.selectedTab = qs.t;
       this.currentChildPage = Number(qs.cp) || 1;
       this.currentItemPage = Number(qs.ip) || 1;
-      this.currentExternalItemsURL = qs.eiu ? String(qs.eiu) : this.externalItemsURL
+      this.currentExternalItemsURL = qs.eiu ? String(qs.eiu) : this.externalItemsURL;
       // If we have external items, the b-table needs to "stay" on page 1 as
       // the items list only contains the number of items we want to show.
       this.currentItemListPage = this.hasExternalItems ? 1 : this.currentItemPage;
     },
     goToNextItems() {
-      this.currentExternalItemsURL = this.nextItemsLink
+      this.currentExternalItemsURL = this.nextItemsLink;
     },
     goToPreviousItems() {
-      this.currentExternalItemsURL = this.previousItemsLink
+      this.currentExternalItemsURL = this.previousItemsLink;
     }
   }
 };
