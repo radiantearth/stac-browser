@@ -135,13 +135,22 @@
                 <!-- TODO row-details w/ additional metadata + map -->
               </b-table>
               <b-pagination
-                v-if="itemCount > itemsPerPage"
+                v-if="!hasExternalPagination"
+                v-show="itemCount > itemsPerPage"
                 v-model="currentItemPage"
                 :limit="15"
                 :total-rows="itemCount"
                 :per-page="itemsPerPage"
                 :hide-goto-end-buttons="true"
               />
+              <ul v-else class="pagination">
+                <li class="page-item" :class="{ 'disabled': !previousItemsLink}">
+                    <a class="page-link" @click="goToPreviousItems">Previous</a>
+                </li>
+                <li class="page-item" :class="{ 'disabled': !nextItemsLink }">
+                    <a class="page-link" @click="goToNextItems">Next</a>
+                </li>
+              </ul>
             </b-tab>
             <b-tab
               v-if="visibleTabs.includes('bands')"
@@ -301,7 +310,10 @@ export default {
       currentItemListPage: 1,
       locatorMap: null,
       selectedTab: null,
-      validationErrors: null
+      validationErrors: null,
+      previousItemsLink: null,
+      nextItemsLink: null,
+      currentExternalItemsURL: null
     };
   },
   asyncComputed: {
@@ -366,16 +378,11 @@ export default {
       default: [],
       lazy: true,
       async get() {
-        const externalItemsLink = this.links.find(x => x.rel === "items");
-
-        if (externalItemsLink === undefined) {
+        if (!this.currentExternalItemsURL) {
           return [];
         }
-
         try {
-          const rsp = await fetchUri(
-            `${externalItemsLink.href}?page=${this.currentItemPage}`
-          );
+          const rsp = await fetchUri(this.currentExternalItemsURL);
 
           if (!rsp.ok) {
             console.warn(await rsp.text());
@@ -397,15 +404,17 @@ export default {
           } else {
             this.externalItemCount = items.features.length;
           }
+          const previousLink = items.links.find(link => link.rel === 'previous')
+          this.previousItemsLink = previousLink ? previousLink.href : null
+          const nextLink = items.links.find(link => link.rel === 'next')
+          this.nextItemsLink = nextLink ? nextLink.href : null
 
           // strip /collection from the target path
           let p = this.path.replace(/^\/collection/, "");
 
           return items.features.map((item, idx) => ({
             item,
-            to: `/item${p}/${this.slugify(
-              `${externalItemsLink.href}?page=${this.currentItemPage}#${idx}`
-            )}`,
+            to: `/item${p}/${this.slugify(`${this.externalItemsURL}#${idx}`)}`,
             title: item.properties.title || item.id,
             dateAcquired: item.properties.datetime
           }));
@@ -489,6 +498,17 @@ export default {
     },
     hasExternalItems() {
       return this.links.find(x => x.rel === "items") != null;
+    },
+    externalItemsURL() {
+      const externalItemsLink = this.links.find(x => x.rel === "items");
+      if (!externalItemsLink) {
+        return null;
+      }
+      let externalItemsURL = `${externalItemsLink.href}?limit=${ITEMS_PER_PAGE}`
+      if (!this.hasExternalPagination) {
+        externalItemsURL += `&page=${this.currentItemPage}`
+      }
+      return externalItemsURL
     },
     itemCount() {
       if (!this.hasExternalItems) {
@@ -725,7 +745,10 @@ export default {
         this.assets && this.assets.length > 0 && "assets",
         this.zarrMetadataUrl && "zarrMetadata"
       ].filter(x => x != null && x !== false);
-    }
+    },
+    hasExternalPagination() {
+      return this.previousItemsLink || this.nextItemsLink
+    },
   },
   watch: {
     ...common.watch,
@@ -747,6 +770,13 @@ export default {
       if (to !== from) {
         this.updateState({
           t: to
+        });
+      }
+    },
+    currentExternalItemsURL(to, from) {
+      if (to !== from) {
+        this.updateState({
+          eiu: to
         });
       }
     }
@@ -842,10 +872,16 @@ export default {
       this.selectedTab = qs.t;
       this.currentChildPage = Number(qs.cp) || 1;
       this.currentItemPage = Number(qs.ip) || 1;
-
+      this.currentExternalItemsURL = qs.eiu ? String(qs.eiu) : this.externalItemsURL
       // If we have external items, the b-table needs to "stay" on page 1 as
       // the items list only contains the number of items we want to show.
       this.currentItemListPage = this.hasExternalItems ? 1 : this.currentItemPage;
+    },
+    goToNextItems() {
+      this.currentExternalItemsURL = this.nextItemsLink
+    },
+    goToPreviousItems() {
+      this.currentExternalItemsURL = this.previousItemsLink
     }
   }
 };
