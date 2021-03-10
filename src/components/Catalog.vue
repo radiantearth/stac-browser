@@ -142,12 +142,9 @@
                 :per-page="itemsPerPage"
                 :hide-goto-end-buttons="true"
               />
-              <ul v-else-if="hasExternalPagination" class="pagination">
-                <li class="page-item" :class="{ 'disabled': !previousItemsLink}">
-                    <a class="page-link" @click="goToPreviousItems">Previous</a>
-                </li>
-                <li class="page-item" :class="{ 'disabled': !nextItemsLink }">
-                    <a class="page-link" @click="goToNextItems">Next</a>
+              <ul v-else-if="hasExternalPagination" class="pagination external-pagination">
+                <li class="page-item" :class="{ 'disabled': !link}" v-for="(link, linkRelation) in externalPaginationLinks" :key="linkRelation">
+                    <a class="page-link" @click="goToExternalPaginationLink(linkRelation)">{{ linkRelation }}</a>
                 </li>
               </ul>
             </b-tab>
@@ -263,6 +260,12 @@ export default {
       externalItemCount: 0,
       externalItemsPerPage: 0,
       externalItemPaging: false,
+      externalPaginationLinks: {
+        first: null,
+        previous: null,
+        next: null,
+        last: null
+      },
       childFields: [
         {
           key: "link",
@@ -310,8 +313,6 @@ export default {
       locatorMap: null,
       selectedTab: null,
       validationErrors: null,
-      previousItemsLink: null,
-      nextItemsLink: null,
       currentExternalItemsURL: null
     };
   },
@@ -403,10 +404,10 @@ export default {
           } else {
             this.externalItemCount = items.features.length;
           }
-          const previousLink = items.links.find(link => link.rel === 'previous')
-          this.previousItemsLink = previousLink ? previousLink.href : null
-          const nextLink = items.links.find(link => link.rel === 'next')
-          this.nextItemsLink = nextLink ? nextLink.href : null
+          ['first', 'previous', 'next', 'last'].forEach(linkRelation => {
+            const link = items.links.find(link => link.rel === linkRelation);
+            this.externalPaginationLinks[linkRelation] = link ? link.href : null;
+          });
 
           // strip /collection from the target path
           let p = this.path.replace(/^\/collection/, "");
@@ -746,7 +747,11 @@ export default {
       ].filter(x => x != null && x !== false);
     },
     hasExternalPagination() {
-      return this.previousItemsLink || this.nextItemsLink;
+      let hasOneExternalLinkDefined = false;
+      Object.values(this.externalPaginationLinks).forEach(link => {
+        hasOneExternalLinkDefined ||= link !== null;
+      })
+      return hasOneExternalLinkDefined;
     },
   },
   watch: {
@@ -876,11 +881,10 @@ export default {
       // the items list only contains the number of items we want to show.
       this.currentItemListPage = this.hasExternalItems ? 1 : this.currentItemPage;
     },
-    goToNextItems() {
-      this.currentExternalItemsURL = this.nextItemsLink;
-    },
-    goToPreviousItems() {
-      this.currentExternalItemsURL = this.previousItemsLink;
+    goToExternalPaginationLink(linkRelation) {
+      if (linkRelation in this.externalPaginationLinks) {
+        this.currentExternalItemsURL = this.externalPaginationLinks[linkRelation];
+      }
     }
   }
 };
@@ -924,5 +928,10 @@ td.provider .description {
   height: 200px;
   width: 100%;
   margin-bottom: 10px;
+}
+
+.external-pagination .page-link {
+  text-transform: capitalize;
+  cursor: pointer;
 }
 </style>
