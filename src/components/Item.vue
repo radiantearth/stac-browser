@@ -28,10 +28,7 @@
             </small>
           </p>
           <b-tabs :value="tabIndex" @input="selectTab" @activate-tab="activateTab">
-            <b-tab
-              v-if="visibleTabs.includes('preview')"
-              title="Preview"
-            >
+            <b-tab :disabled="!this.cogs.length" title="Preview">
               <div id="map-container">
                 <div id="map"></div>
               </div>
@@ -54,37 +51,19 @@
                 open-direction="bottom"
               />
             </b-tab>
-            <b-tab
-              v-if="visibleTabs.includes('thumbnail')"
-              title="Thumbnail"
-            >
+            <b-tab v-if="this.thumbnail" title="Thumbnail">
               <a :href="thumbnail">
                 <img id="thumbnail" align="center" :src="thumbnail" />
               </a>
             </b-tab>
-            <AssetTab
-              v-if="visibleTabs.includes('assets')"
-              :assets="assets"
-              :bands="bands"
-              :has-bands="hasBands"
-              :active="selectedTab == 'assets'"
-            ></AssetTab>
-            <LinkTab
-              v-if="visibleTabs.includes('links')"
-              :links="shownLinks"
-              :active="selectedTab == 'links'"
-            ></LinkTab>
-            <b-tab
-              v-if="visibleTabs.includes('bands')"
-              title="Bands"
-            >
-              <b-table
-                :items="bands"
-                :fields="bandFields"
-                responsive
-                small
-                striped
-              />
+            <b-tab :disabled="!this.assets.length" title="Assets" key="assets">
+              <AssetTab :assets="assets" :bands="bands" :has-bands="hasBands" />
+            </b-tab>
+            <b-tab :disabled="!this.shownLinks.length" title="Links" key="links">
+              <LinkTab :links="shownLinks" />
+            </b-tab>
+            <b-tab v-if="this.bands.length > 0" title="Bands">
+              <b-table :items="bands" :fields="bandFields" responsive small striped />
             </b-tab>
           </b-tabs>
         </b-col>
@@ -199,8 +178,8 @@ export default {
       },
       selectedFeatures: null,
       selectedImage: null,
-      selectedTab: null,
-      tabsLoaded: false,
+      tabIndex: 0,
+      tabsChanged: false,
       validationErrors: null
     };
   },
@@ -413,9 +392,6 @@ export default {
         ...this._properties
       };
     },
-    tabIndex() {
-      return this.visibleTabs.indexOf(this.selectedTab);
-    },
     thumbnail() {
       const thumbnail = this.assets.find(x => x.key === "thumbnail");
 
@@ -431,15 +407,6 @@ export default {
       }
 
       return getTileSource(this.selectedImage.href);
-    },
-    visibleTabs() {
-      return [
-        this.cogs.length > 0 && "preview",
-        this.thumbnail != null && "thumbnail",
-        this.assets.length > 0 && "assets",
-        this.shownLinks.length > 0 && "links",
-        this.bands.length > 0 && "bands"
-      ].filter(x => !!x);
     }
   },
   watch: {
@@ -502,17 +469,6 @@ export default {
         }
       }
     },
-    selectedTab(to, from) {
-      if (to !== from) {
-        this.updateState({
-          t: to
-        });
-
-        if (to === "preview") {
-          this.map && this.map.invalidateSize();
-        }
-      }
-    },
     tileSource(to, from) {
       if (to !== from) {
         if (this.map != null) {
@@ -531,7 +487,7 @@ export default {
     ...common.methods,
     ...mapActions(["load"]),
     initialize() {
-      this.syncWithQueryState(this.$route.query);
+      this.syncWithQueryState();
 
       this.$nextTick(() => {
         if (this.cog != null) {
@@ -715,27 +671,41 @@ export default {
       }
     },
     selectTab(tabIndex) {
-      if (this.tabsLoaded) {
-        this.selectedTab = this.visibleTabs[tabIndex];
+      if (typeof tabIndex !== 'number') {
+        tabIndex = parseInt(tabIndex, 10);
+        if (isNaN(tabIndex)) {
+          return;
+        }
       }
+      if (this.tabsChanged && this.tabIndex !== tabIndex) {
+        this.updateState({
+          t: tabIndex
+        });
+        if (tabIndex === 0) {
+          this.map && this.map.invalidateSize();
+        }
+      }
+      this.$nextTick(() => {
+        this.tabIndex = tabIndex;
+      });
     },
     activateTab() {
-      this.tabsLoaded = true;
+      this.tabsChanged = true;
     },
-    syncWithQueryState(query) {
-      this.selectedTab = query.t;
+    syncWithQueryState() {
+      this.selectTab(this.$route.query.t);
 
-      if (query.si != null) {
-        this.selectedImage = this.cogs[query.si];
+      if (this.$route.query.si != null) {
+        this.selectedImage = this.cogs[this.$route.query.si];
       } else {
         this.selectedImage = this.cog;
       }
 
-      if (query.sf != null) {
-        this.selectedFeatures = this.features[query.sf];
+      if (this.$route.query.sf != null) {
+        this.selectedFeatures = this.features[this.$route.query.sf];
       }
 
-      this.fullscreen = [true, "true"].includes(query.fullscreen);
+      this.fullscreen = [true, "true"].includes(this.$route.query.fullscreen);
     },
     async updateHash() {
       const center = this.map.getCenter();

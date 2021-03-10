@@ -1,9 +1,4 @@
 <template>
-<b-tab
-    title="Assets"
-    :active="active"
-    key="assets"
->
   <div class="table-responsive assets">
     <table class="table table-striped">
       <thead>
@@ -34,14 +29,13 @@
       </tbody>
     </table>
   </div>
-</b-tab>
 </template>
 
 <script>
 
 export default {
   name: "AssetTab",
-  props: ["assets", "bands", "active", "hasBands"]
+  props: ["assets", "bands", "hasBands"]
 };
 
 </script>

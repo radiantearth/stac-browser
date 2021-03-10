@@ -1,9 +1,4 @@
 <template>
-<b-tab
-    title="Links"
-    :active="active"
-    key="links"
->
   <div class="table-responsive links">
     <table class="table table-striped">
       <thead>
@@ -30,14 +25,13 @@
       </tbody>
     </table>
   </div>
-</b-tab>
 </template>
 
 <script>
 
 export default {
   name: "LinkTab",
-  props: ["links","active"],
+  props: ["links"],
   methods: {
     title(link) {
       if (typeof link.title === 'string' && link.title.length > 0) {

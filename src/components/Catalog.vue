@@ -40,11 +40,7 @@
           <div v-if="description" v-html="description" />
 
           <b-tabs :value="tabIndex" @input="selectTab" @activate-tab="activateTab">
-            <b-tab
-              v-if="visibleTabs.includes('collections')"
-              key="collections"
-              title="Collections (API)"
-            >
+            <b-tab :disabled="!this.collectionCount" key="collections" title="Collections">
               <b-table
                 :items="collections"
                 :fields="collectionFields"
@@ -70,12 +66,7 @@
                 :hide-goto-end-buttons="true"
               />
             </b-tab>
-
-            <b-tab
-              v-if="visibleTabs.includes('catalogs')"
-              key="catalogs"
-              title="Catalogs"
-            >
+            <b-tab :disabled="!this.childCount" key="catalogs" title="Catalogs">
               <b-table
                 :items="children"
                 :fields="childFields"
@@ -101,12 +92,7 @@
                 :hide-goto-end-buttons="true"
               />
             </b-tab>
-
-            <b-tab
-              v-if="visibleTabs.includes('items')"
-              key="items"
-              title="Items"
-            >
+            <b-tab :disabled="!this.hasExternalItems || !this.itemCount" key="items" title="Items">
               <b-table
                 :items="items"
                 :fields="itemFields"
@@ -134,36 +120,18 @@
                 :hide-goto-end-buttons="true"
               />
             </b-tab>
-            <b-tab
-              v-if="visibleTabs.includes('bands')"
-              key="bands"
-              title="Bands"
-            >
-              <b-table
-                :items="bands"
-                :fields="bandFields"
-                responsive
-                small
-                striped
-              />
+            <b-tab v-if="this.bands.length > 0" key="bands" title="Bands">
+              <b-table :items="bands" :fields="bandFields" responsive small striped />
             </b-tab>
-            <ZarrMetadataTab
-              v-if="visibleTabs.includes('zarrMetadata')"
-              :zarr-metadata-url="zarrMetadataUrl"
-              :active="selectedTab == 'zarrMetadata'"
-            ></ZarrMetadataTab>
-            <AssetTab
-              v-if="visibleTabs.includes('assets')"
-              :assets="assets"
-              :bands="bands"
-              :hasBands="hasBands"
-              :active="selectedTab == 'assets'"
-            ></AssetTab>
-            <LinkTab
-              v-if="visibleTabs.includes('links')"
-              :links="shownLinks"
-              :active="selectedTab == 'links'"
-            ></LinkTab>
+            <b-tab v-if="this.zarrMetadataUrl" key="zarr-metadata" title="Zarr Metadata">
+              <ZarrMetadataTab :zarr-metadata-url="zarrMetadataUrl" />
+            </b-tab>
+            <b-tab :disabled="!this.assets.length" title="Assets" key="assets">
+              <AssetTab :assets="assets" :bands="bands" :hasBands="hasBands" />
+            </b-tab>
+            <b-tab :disabled="!this.shownLinks.length" title="Links" key="links">
+              <LinkTab :links="shownLinks" />
+            </b-tab>
           </b-tabs>
         </b-col>
         <b-col
@@ -296,8 +264,8 @@ export default {
       currentItemPage: 1,
       currentItemListPage: 1,
       locatorMap: null,
-      selectedTab: null,
-      tabsLoaded: false,
+      tabIndex: 0,
+      tabsChanged: false,
       validationErrors: null
     };
   },
@@ -324,7 +292,7 @@ export default {
             return [];
           }
 
-          return data.collections
+          let collections = data.collections
             .map(collection => {
               // strip /collection from the target path
               let p = this.path.replace(/^\/collection/, "");
@@ -352,6 +320,16 @@ export default {
                 url: resolved
               });
             });
+
+            // Set to collection tab manually if tab has not been changed by user
+            // Otherwise due to async nature non-async tab is selected by default
+            window.setTimeout(() => {
+              if (!this.tabsChanged && (!this.$route.query.t || this.$route.query.t === "0")) {
+                this.selectTab(0);
+              }
+            }, 250);
+
+            return collections;
         } catch (err) {
           console.warn(err);
 
@@ -398,7 +376,7 @@ export default {
           // strip /collection from the target path
           let p = this.path.replace(/^\/collection/, "");
 
-          return items.features.map((item, idx) => ({
+          let features = items.features.map((item, idx) => ({
             item,
             to: `/item${p}/${this.slugify(
               `${externalItemsLink.href}?page=${this.currentItemPage}#${idx}`
@@ -406,6 +384,16 @@ export default {
             title: item.properties.title || item.id,
             dateAcquired: item.properties.datetime
           }));
+
+          // Set to items tab manually if tab has not been changed by user
+          // Otherwise due to async nature non-async tab is selected by default
+          window.setTimeout(() => {
+            if (!this.tabsChanged && (!this.$route.query.t || this.$route.query.t === "2")) {
+              this.selectTab(2);
+            }
+          }, 250);
+
+          return features;
         } catch (err) {
           console.warn(err);
 
@@ -671,9 +659,6 @@ export default {
     summaries() {
       return this.catalog.summaries || {};
     },
-    tabIndex() {
-      return this.visibleTabs.indexOf(this.selectedTab);
-    },
     temporalExtent() {
       const { temporal } = this.extent;
       if (!temporal || typeof temporal !== 'object' || !Array.isArray(temporal.interval)) {
@@ -684,17 +669,6 @@ export default {
     },
     version() {
       return this.catalog.version;
-    },
-    visibleTabs() {
-      return [
-        this.collectionCount > 0 && "collections",
-        this.childCount > 0 && "catalogs",
-        (this.hasExternalItems || this.itemCount > 0) && "items",
-        this.bands.length > 0 && "bands",
-        this.assets.length > 0 && "assets",
-        this.shownLinks.length > 0 && "links",
-        this.zarrMetadataUrl && "zarrMetadata"
-      ].filter(x => !!x);
     }
   },
   watch: {
@@ -712,13 +686,6 @@ export default {
           ip: to
         });
       }
-    },
-    selectedTab(to, from) {
-      if (to !== from) {
-        this.updateState({
-          t: to
-        });
-      }
     }
   },
   methods: {
@@ -729,7 +696,7 @@ export default {
         this.$nextTick(() => this.initializeLocatorMap());
       }
 
-      this.syncWithQueryState(this.$route.query);
+      this.syncWithQueryState();
     },
     initializeLocatorMap() {
       if (this.locatorMap != null) {
@@ -790,12 +757,23 @@ export default {
       });
     },
     selectTab(tabIndex) {
-      if (this.tabsLoaded) {
-        this.selectedTab = this.visibleTabs[tabIndex];
+      if (typeof tabIndex !== 'number') {
+        tabIndex = parseInt(tabIndex, 10);
+        if (isNaN(tabIndex)) {
+          return;
+        }
       }
+      if (this.tabsChanged && this.tabIndex !== tabIndex) {
+        this.updateState({
+          t: tabIndex
+        });
+      }
+      this.$nextTick(() => {
+        this.tabIndex = tabIndex;
+      });
     },
     activateTab() {
-      this.tabsLoaded = true;
+      this.tabsChanged = true;
     },
     sortCompare(a, b, key) {
       if (key === "link") {
@@ -816,10 +794,10 @@ export default {
         });
       }
     },
-    syncWithQueryState(qs) {
-      this.selectedTab = qs.t;
-      this.currentChildPage = Number(qs.cp) || 1;
-      this.currentItemPage = Number(qs.ip) || 1;
+    syncWithQueryState() {
+      this.selectTab(this.$route.query.t);
+      this.currentChildPage = Number(this.$route.query.cp) || 1;
+      this.currentItemPage = Number(this.$route.query.ip) || 1;
 
       // If we have external items, the b-table needs to "stay" on page 1 as
       // the items list only contains the number of items we want to show.
