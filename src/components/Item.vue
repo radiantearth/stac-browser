@@ -224,11 +224,13 @@ export default {
     _description() {
       return this._properties.description;
     },
-    _keywords() {
-      return (
-        (this.collection && this.collection.keywords) ||
-        common.computed._keywords.apply(this)
-      );
+    keywords() {
+      if (this.collection && Array.isArray(this.collection.keywords)) {
+        return this.collection.keywords;
+      }
+      else {
+        return common.computed.keywords.apply(this)
+      }
     },
     _license() {
       return (
@@ -351,7 +353,7 @@ export default {
         // recommended
         citation: this._properties["sci:citation"],
         identifier: this._properties["sci:doi"] || this.item.id,
-        keywords: this._keywords,
+        keywords: this.keywords,
         license: this.licenseUrl,
         isBasedOn: this.url,
         url: this.path,

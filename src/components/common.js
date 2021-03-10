@@ -55,14 +55,6 @@ export default {
     _collectionProperties() {
       return (this.collection && this.collection.properties) || {};
     },
-    _keywords() {
-      // [].concat() is a work-around for catalogs where keywords is a string (SpaceNet)
-      return [].concat(
-        this.entity.keywords ||
-        (this.rootCatalog && this.rootCatalog.keywords) ||
-        []
-      );
-    },
     _properties() {
       return this.entity.properties || {};
     },
@@ -199,7 +191,13 @@ export default {
       return this.entity.id;
     },
     keywords() {
-      return this._keywords.join(", ");
+      if (Array.isArray(this.entity.keywords)) {
+        return this.entity.keywords;
+      }
+      else if (this.rootCatalog && Array.isArray(this.rootCatalog.keywords)) {
+        return this.rootCatalog.keywords;
+      }
+      return [];
     },
     license() {
       if (this.licenseUrl) {

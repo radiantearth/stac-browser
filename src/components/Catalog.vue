@@ -604,7 +604,7 @@ export default {
           // recommended
           citation: this._properties["sci:citation"],
           identifier: this._properties["sci:doi"] || this.catalog.id,
-          keywords: this._keywords,
+          keywords: this.keywords,
           license: this.licenseUrl,
           isBasedOn: this.url,
           version: this.version,

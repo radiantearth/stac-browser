@@ -11,9 +11,9 @@
                 <td class="title">STAC Version</td>
                 <td>{{ stacVersion }}</td>
             </tr>
-            <tr v-if="keywords">
+            <tr v-if="keywords.length > 0">
                 <td class="title">Keywords</td>
-                <td>{{ keywords }}</td>
+                <td>{{ keywords.join(', ') }}</td>
             </tr>
             <tr v-if="collectionLink">
             <td class="title">Collection</td>
