@@ -404,8 +404,8 @@ export default {
           } else {
             this.externalItemCount = items.features.length;
           }
-          ['first', 'previous', 'next', 'last'].forEach(linkRelation => {
-            const link = items.links.find(link => link.rel === linkRelation);
+          Object.keys(this.externalPaginationLinks).forEach(linkRelation => {
+            const link = items.links.find(link => link && link.rel === linkRelation && typeof link.href === 'string');
             this.externalPaginationLinks[linkRelation] = link ? link.href : null;
           });
 
@@ -747,11 +747,7 @@ export default {
       ].filter(x => x != null && x !== false);
     },
     hasExternalPagination() {
-      let hasOneExternalLinkDefined = false;
-      Object.values(this.externalPaginationLinks).forEach(link => {
-        hasOneExternalLinkDefined ||= link !== null;
-      })
-      return hasOneExternalLinkDefined;
+      return Object.values(this.externalPaginationLinks).filter(link => link !== null).length > 0
     },
   },
   watch: {
