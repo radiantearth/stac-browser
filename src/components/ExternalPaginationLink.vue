@@ -20,3 +20,9 @@ export default {
   }
 };
 </script>
+<style scoped>
+.page-link {
+  text-transform: capitalize;
+  cursor: pointer;
+}
+</style>

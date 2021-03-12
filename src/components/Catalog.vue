@@ -142,9 +142,9 @@
                 :per-page="itemsPerPage"
                 :hide-goto-end-buttons="true"
               />
-              <ul v-else-if="hasExternalPagination" class="pagination external-pagination">
+              <ul v-else-if="hasExternalPagination" class="pagination">
                 <ExternalPaginationLink v-if="showFirstAndLastExternalPaginationLink" :to="externalPaginationLinks.first" name="First" />
-                <ExternalPaginationLink :to="externalPaginationLinks.previous" name="Previous" />
+                <ExternalPaginationLink :to="externalPaginationLinks.previous || externalPaginationLinks.prev" name="Previous" />
                 <ExternalPaginationLink :to="externalPaginationLinks.next" name="Next" />
                 <ExternalPaginationLink v-if="showFirstAndLastExternalPaginationLink" :to="externalPaginationLinks.last" name="Last" />
               </ul>
@@ -263,9 +263,10 @@ export default {
       externalItemCount: 0,
       externalItemsPerPage: 0,
       externalItemPaging: false,
-      externalPaginationRelations: ['first', 'previous', 'next', 'last'],
+      externalPaginationRelations: ['first', 'prev', 'previous', 'next', 'last'],
       externalPaginationLinks: {
         first: null,
+        prev: null,
         previous: null,
         next: null,
         last: null
@@ -926,10 +927,5 @@ td.provider .description {
   height: 200px;
   width: 100%;
   margin-bottom: 10px;
-}
-
-.external-pagination .page-link {
-  text-transform: capitalize;
-  cursor: pointer;
 }
 </style>
