@@ -270,36 +270,14 @@ export default {
     },
     entity(to, from) {
       if (!isEqual(to, from)) {
-        this._validate(to);
-
         this.initialize();
       }
     }
   },
   mounted() {
     this.initialize();
-
-    this._validate(this.entity);
   },
   methods: {
-    _validate(data) {
-      this.validate(data).then(errors => {
-        if (errors != null) {
-          console.group("Validation errors");
-          console.log(errors);
-          errors.forEach(err => {
-            console.warn(`${err.dataPath} ${err.message}:`);
-            const { value } = jsonQuery(err.dataPath, {
-              data
-            });
-            console.warn(value);
-          });
-          console.groupEnd();
-        }
-
-        this.validationErrors = errors;
-      });
-    },
     async updateState(updated) {
       const qs = {
         ...this.$route.query,

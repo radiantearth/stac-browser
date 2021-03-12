@@ -19,11 +19,6 @@
           <h1 class="scroll">{{ title }}</h1>
           <p class="scroll">
             <small>
-              <span
-                v-if="validationErrors"
-                title="Validation errors present; please check the JavaScript Console"
-                >⚠️</span
-              >
               <code>{{ url }}</code>
             </small>
           </p>
@@ -150,10 +145,6 @@ export default {
     url: {
       type: String,
       required: true
-    },
-    validate: {
-      type: Function,
-      required: true
     }
   },
   data() {
@@ -179,8 +170,7 @@ export default {
       selectedFeatures: null,
       selectedImage: null,
       tabIndex: 0,
-      tabsChanged: false,
-      validationErrors: null
+      tabsChanged: false
     };
   },
   computed: {

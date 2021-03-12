@@ -17,8 +17,8 @@ import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
 import "leaflet/dist/leaflet.css";
 
-import { CATALOG_URL, STAC_VERSION } from "./config";
-import { fetchUri, fetchSchemaValidator, getProxiedUri } from "./util";
+import { CATALOG_URL } from "./config";
+import { fetchUri, getProxiedUri } from "./util";
 
 const Catalog = () => import(/* webpackChunkName: "catalog" */ "./components/Catalog.vue");
 const Item = () => import(/* webpackChunkName: "item" */ "./components/Item.vue");
@@ -93,46 +93,6 @@ const main = async () => {
     }
   }
 
-  const collectionValidator = async data => {
-    const stacVersion = data.stac_version || STAC_VERSION;
-
-    let validateCollection = await fetchSchemaValidator(
-      "collection",
-      stacVersion
-    );
-    if (!validateCollection(data)) {
-      return validateCollection.errors.slice();
-    }
-    return null;
-  };
-
-  const catalogValidator = async data => {
-    if (data.license || data.extent) {
-      // contains Collection properties
-      return collectionValidator(data);
-    }
-
-    const stacVersion = data.stac_version || STAC_VERSION;
-
-    let validateCatalog = await fetchSchemaValidator("catalog", stacVersion);
-
-    if (!validateCatalog(data)) {
-      return validateCatalog.errors.slice();
-    }
-
-    return null;
-  };
-
-  const itemValidator = async data => {
-    const stacVersion = data.stac_version || STAC_VERSION;
-
-    let validateItem = await fetchSchemaValidator("item", stacVersion);
-    if (!validateItem(data)) {
-      return validateItem.errors.slice();
-    }
-    return null;
-  };
-
   const routes = [
     {
       path: "/item/(.*)",
@@ -158,8 +118,7 @@ const main = async () => {
           path: route.path,
           resolve,
           slugify,
-          url: ancestors.slice(-1).pop(),
-          validate: itemValidator
+          url: ancestors.slice(-1).pop()
         };
       }
     },
@@ -180,8 +139,7 @@ const main = async () => {
           path: route.path,
           resolve,
           slugify,
-          url: ancestors.slice(-1).pop(),
-          validate: collectionValidator
+          url: ancestors.slice(-1).pop()
         };
       }
     },
@@ -202,8 +160,7 @@ const main = async () => {
           path: route.path,
           resolve,
           slugify,
-          url: ancestors.slice(-1).pop(),
-          validate: catalogValidator
+          url: ancestors.slice(-1).pop()
         };
       }
     }
