@@ -144,7 +144,10 @@
               />
               <ul v-else-if="hasExternalPagination" class="pagination external-pagination">
                 <li class="page-item" :class="{ 'disabled': !link}" v-for="(link, linkRelation) in externalPaginationLinks" :key="linkRelation">
-                    <a class="page-link" @click="goToExternalPaginationLink(linkRelation)">{{ linkRelation }}</a>
+                  <router-link :to="link" v-if="link" class="page-link">
+                    {{ linkRelation }}
+                  </router-link>
+                  <a class="page-link" v-else>{{ linkRelation }}</a>
                 </li>
               </ul>
             </b-tab>
@@ -312,8 +315,7 @@ export default {
       currentItemListPage: 1,
       locatorMap: null,
       selectedTab: null,
-      validationErrors: null,
-      currentExternalItemsURL: null
+      validationErrors: null
     };
   },
   asyncComputed: {
@@ -378,11 +380,11 @@ export default {
       default: [],
       lazy: true,
       async get() {
-        if (!this.currentExternalItemsURL) {
+        if (!this.externalItemsURL) {
           return [];
         }
         try {
-          const rsp = await fetchUri(this.currentExternalItemsURL);
+          const rsp = await fetchUri(this.externalItemsURL);
 
           if (!rsp.ok) {
             console.warn(await rsp.text());
@@ -406,8 +408,17 @@ export default {
           }
           Object.keys(this.externalPaginationLinks).forEach(linkRelation => {
             const link = items.links.find(link => link && link.rel === linkRelation && typeof link.href === 'string');
-            this.externalPaginationLinks[linkRelation] = link ? link.href : null;
+            if (link && typeof link.href === 'string') {
+              this.externalPaginationLinks[linkRelation] = `${this.slugify(link.href.replace(this.ancestors[0], '').replace('/items', ''))}`;
+            } else {
+              this.externalPaginationLinks[linkRelation] = null;
+            }
           });
+          // if external pagination doesn't include first or last link, we remove those two entries so that links are not rendered on the UI for them
+          if (this.externalPaginationLinks.first === null && this.externalPaginationLinks.last === null) {
+            delete this.externalPaginationLinks.first;
+            delete this.externalPaginationLinks.last;
+          }
 
           // strip /collection from the target path
           let p = this.path.replace(/^\/collection/, "");
@@ -504,11 +515,16 @@ export default {
       if (!externalItemsLink) {
         return null;
       }
-      let externalItemsURL = `${externalItemsLink.href}?limit=${ITEMS_PER_PAGE}`;
+      const externalItemsURL = new URL(externalItemsLink.href);
+      externalItemsURL.searchParams.set('limit', this.itemsPerPage);
       if (!this.hasExternalPagination) {
-        externalItemsURL += `&page=${this.currentItemPage}`;
+        externalItemsURL.searchParams.set('page', this.currentItemPage);
       }
-      return externalItemsURL;
+      if (this.url.indexOf('?') !== -1) {
+        // merging main URL params to the external items URL (so that external pagination param can be passed on)
+        new URL(this.url).searchParams.forEach((value, key) => externalItemsURL.searchParams.set(key, value));
+      }
+      return externalItemsURL.toString();
     },
     itemCount() {
       if (!this.hasExternalItems) {
@@ -772,13 +788,6 @@ export default {
           t: to
         });
       }
-    },
-    currentExternalItemsURL(to, from) {
-      if (to !== from) {
-        this.updateState({
-          eiu: to
-        });
-      }
     }
   },
   methods: {
@@ -872,15 +881,9 @@ export default {
       this.selectedTab = qs.t;
       this.currentChildPage = Number(qs.cp) || 1;
       this.currentItemPage = Number(qs.ip) || 1;
-      this.currentExternalItemsURL = qs.eiu ? String(qs.eiu) : this.externalItemsURL;
       // If we have external items, the b-table needs to "stay" on page 1 as
       // the items list only contains the number of items we want to show.
       this.currentItemListPage = this.hasExternalItems ? 1 : this.currentItemPage;
-    },
-    goToExternalPaginationLink(linkRelation) {
-      if (linkRelation in this.externalPaginationLinks) {
-        this.currentExternalItemsURL = this.externalPaginationLinks[linkRelation];
-      }
     }
   }
 };
