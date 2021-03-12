@@ -143,12 +143,10 @@
                 :hide-goto-end-buttons="true"
               />
               <ul v-else-if="hasExternalPagination" class="pagination external-pagination">
-                <li class="page-item" :class="{ 'disabled': !link}" v-for="(link, linkRelation) in externalPaginationLinks" :key="linkRelation">
-                  <router-link :to="link" v-if="link" class="page-link">
-                    {{ linkRelation }}
-                  </router-link>
-                  <a class="page-link" v-else>{{ linkRelation }}</a>
-                </li>
+                <ExternalPaginationLink v-if="showFirstAndLastExternalPaginationLink" :to="externalPaginationLinks.first" name="First" />
+                <ExternalPaginationLink :to="externalPaginationLinks.previous" name="Previous" />
+                <ExternalPaginationLink :to="externalPaginationLinks.next" name="Next" />
+                <ExternalPaginationLink v-if="showFirstAndLastExternalPaginationLink" :to="externalPaginationLinks.last" name="Last" />
               </ul>
             </b-tab>
             <b-tab
@@ -217,6 +215,7 @@ import { mapActions, mapGetters } from "vuex";
 import common from "./common";
 import AssetTab from './AssetTab.vue'
 import MetadataSidebar from './MetadataSidebar.vue'
+import ExternalPaginationLink from "./ExternalPaginationLink.vue";
 
 import { transformCatalog } from "../migrate"
 
@@ -254,6 +253,7 @@ export default {
     }
   },
   components: {
+    ExternalPaginationLink,
     AssetTab,
     ZarrMetadataTab: () => import('./ZarrMetadataTab.vue'),
     MetadataSidebar
@@ -263,6 +263,7 @@ export default {
       externalItemCount: 0,
       externalItemsPerPage: 0,
       externalItemPaging: false,
+      externalPaginationRelations: ['first', 'previous', 'next', 'last'],
       externalPaginationLinks: {
         first: null,
         previous: null,
@@ -414,11 +415,6 @@ export default {
               this.externalPaginationLinks[linkRelation] = null;
             }
           });
-          // if external pagination doesn't include first or last link, we remove those two entries so that links are not rendered on the UI for them
-          if (this.externalPaginationLinks.first === null && this.externalPaginationLinks.last === null) {
-            delete this.externalPaginationLinks.first;
-            delete this.externalPaginationLinks.last;
-          }
 
           // strip /collection from the target path
           let p = this.path.replace(/^\/collection/, "");
@@ -765,6 +761,9 @@ export default {
     hasExternalPagination() {
       return Object.values(this.externalPaginationLinks).filter(link => link !== null).length > 0
     },
+    showFirstAndLastExternalPaginationLink() {
+      return this.externalPaginationLinks.first !== null || this.externalPaginationLinks.last !== null
+    }
   },
   watch: {
     ...common.watch,
