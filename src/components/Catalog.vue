@@ -881,6 +881,7 @@ export default {
       this.selectedTab = qs.t;
       this.currentChildPage = Number(qs.cp) || 1;
       this.currentItemPage = Number(qs.ip) || 1;
+
       // If we have external items, the b-table needs to "stay" on page 1 as
       // the items list only contains the number of items we want to show.
       this.currentItemListPage = this.hasExternalItems ? 1 : this.currentItemPage;
