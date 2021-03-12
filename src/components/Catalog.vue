@@ -87,7 +87,7 @@
                 :hide-goto-end-buttons="true"
               />
             </b-tab>
-            <b-tab :disabled="!this.hasExternalItems || !this.itemCount" key="items" title="Items">
+            <b-tab :disabled="!this.hasExternalItems && !this.itemCount" key="items" title="Items">
               <b-table
                 :items="items"
                 :fields="itemFields"
