@@ -263,7 +263,6 @@ export default {
       externalItemCount: 0,
       externalItemsPerPage: 0,
       externalItemPaging: false,
-      externalPaginationRelations: ['first', 'prev', 'previous', 'next', 'last'],
       externalPaginationLinks: {
         first: null,
         prev: null,
