@@ -410,7 +410,9 @@ export default {
           Object.keys(this.externalPaginationLinks).forEach(linkRelation => {
             const link = items.links.find(link => link && link.rel === linkRelation && typeof link.href === 'string');
             if (link && typeof link.href === 'string') {
-              this.externalPaginationLinks[linkRelation] = `${this.slugify(link.href.replace(this.ancestors[0], '').replace('/items', ''))}`;
+              const externalPaginationUrl = new URL(this.url)
+              new URL(link.href).searchParams.forEach((value, key) => externalPaginationUrl.searchParams.set(key, value));
+              this.externalPaginationLinks[linkRelation] = this.slugify(externalPaginationUrl.toString());
             } else {
               this.externalPaginationLinks[linkRelation] = null;
             }
