@@ -410,8 +410,18 @@ export default {
           Object.keys(this.externalPaginationLinks).forEach(linkRelation => {
             const link = items.links.find(link => link && link.rel === linkRelation && typeof link.href === 'string');
             if (link && typeof link.href === 'string') {
-              const externalPaginationUrl = new URL(this.url)
-              new URL(link.href).searchParams.forEach((value, key) => externalPaginationUrl.searchParams.set(key, value));
+              const externalPaginationUrl = new URL(this.url);
+              const searchParams = new URL(link.href).searchParams;
+              // removing any non present URL params in the pagination link from the current URL
+              // so that "First" link is not tainted by URL param from the current page
+              externalPaginationUrl.searchParams.forEach((value, key) => {
+                if (!searchParams.has(key)) {
+                  externalPaginationUrl.searchParams.delete(key);
+                }
+              })
+              // passing any pagination URL param to the link
+              searchParams.forEach((value, key) => externalPaginationUrl.searchParams.set(key, value));
+
               this.externalPaginationLinks[linkRelation] = this.slugify(externalPaginationUrl.toString());
             } else {
               this.externalPaginationLinks[linkRelation] = null;
