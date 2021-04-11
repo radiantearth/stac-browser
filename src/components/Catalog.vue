@@ -373,7 +373,7 @@ export default {
         }
 
         try {
-          let sep = `${externalItemsLink.href}`.match(/\?/) ? '&' : '?';
+          let sep = externalItemsLink.href.includes('?') ? '&' : '?';
           const rsp = await fetchUri(
             `${externalItemsLink.href}${sep}page=${this.currentItemPage}`
           );
