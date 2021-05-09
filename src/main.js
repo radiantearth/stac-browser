@@ -1,14 +1,13 @@
 import path from "path";
 import url from "url";
 
-import "@babel/polyfill";
-import "es6-promise/auto";
 import AsyncComputed from "vue-async-computed";
-import BootstrapVue from "bootstrap-vue";
+import {
+  AlertPlugin, BreadcrumbPlugin, ButtonPlugin,
+  CardPlugin,  LayoutPlugin,PaginationPlugin,
+  SpinnerPlugin, TablePlugin, TabsPlugin } from "bootstrap-vue";
 import bs58 from "bs58";
-import Clipboard from "v-clipboard";
 import Meta from "vue-meta";
-import Multiselect from "vue-multiselect";
 import pMap from "p-map";
 import Vue from "vue";
 import VueRouter from "vue-router";
@@ -17,18 +16,23 @@ import Vuex from "vuex";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
 import "leaflet/dist/leaflet.css";
-import "vue-multiselect/dist/vue-multiselect.min.css";
 
-import { CATALOG_URL, STAC_VERSION } from './config';
-import { fetchUri, fetchSchemaValidator, getProxiedUri } from "./util";
-import Catalog from "./components/Catalog.vue";
-import Item from "./components/Item.vue";
+import { CATALOG_URL } from "./config";
+import { fetchUri, getProxiedUri } from "./util";
 
-Vue.component("multiselect", Multiselect);
+const Catalog = () => import(/* webpackChunkName: "catalog" */ "./components/Catalog.vue");
+const Item = () => import(/* webpackChunkName: "item" */ "./components/Item.vue");
 
 Vue.use(AsyncComputed);
-Vue.use(BootstrapVue);
-Vue.use(Clipboard);
+Vue.use(AlertPlugin);
+Vue.use(BreadcrumbPlugin);
+Vue.use(ButtonPlugin);
+Vue.use(CardPlugin);
+Vue.use(LayoutPlugin);
+Vue.use(PaginationPlugin);
+Vue.use(SpinnerPlugin);
+Vue.use(TablePlugin);
+Vue.use(TabsPlugin);
 Vue.use(Meta);
 Vue.use(VueRouter);
 Vue.use(Vuex);
@@ -60,9 +64,9 @@ const slugify = uri => bs58.encode(Buffer.from(makeRelative(uri)));
 const resolve = (href, base = CATALOG_URL) => {
   // Encode colons from all but schema, as they create errors in URL resolving.
   const proxiedUri = getProxiedUri(href);
-  const hrefEncoded =
-    proxiedUri.replace(':', encodeURIComponent(':'))
-      .replace(encodeURIComponent(':') + '//', '://');
+  const hrefEncoded = proxiedUri
+    .replace(":", encodeURIComponent(":"))
+    .replace(encodeURIComponent(":") + "//", "://");
   return new URL(hrefEncoded, base).toString();
 };
 
@@ -89,43 +93,6 @@ const main = async () => {
     }
   }
 
-  const collectionValidator = async (data) => {
-    const stacVersion = data.stac_version || STAC_VERSION;
-
-    let validateCollection = await fetchSchemaValidator("collection", stacVersion);
-    if (!validateCollection(data)) {
-      return validateCollection.errors.slice();
-    }
-    return null;
-  };
-
-  const catalogValidator = async (data) => {
-    if (data.license || data.extent) {
-      // contains Collection properties
-      return collectionValidator(data);
-    }
-
-    const stacVersion = data.stac_version || STAC_VERSION;
-
-    let validateCatalog = await fetchSchemaValidator("catalog", stacVersion);
-
-    if (!validateCatalog(data)) {
-      return validateCatalog.errors.slice();
-    }
-
-    return null;
-  };
-
-  const itemValidator = async (data) => {
-    const stacVersion = data.stac_version || STAC_VERSION;
-
-    let validateItem = await fetchSchemaValidator("item", stacVersion);
-    if (!validateItem(data)) {
-      return validateItem.errors.slice();
-    }
-    return null;
-  };
-
   const routes = [
     {
       path: "/item/(.*)",
@@ -151,8 +118,7 @@ const main = async () => {
           path: route.path,
           resolve,
           slugify,
-          url: ancestors.slice(-1).pop(),
-          validate: itemValidator
+          url: ancestors.slice(-1).pop()
         };
       }
     },
@@ -173,8 +139,7 @@ const main = async () => {
           path: route.path,
           resolve,
           slugify,
-          url: ancestors.slice(-1).pop(),
-          validate: collectionValidator
+          url: ancestors.slice(-1).pop()
         };
       }
     },
@@ -195,8 +160,7 @@ const main = async () => {
           path: route.path,
           resolve,
           slugify,
-          url: ancestors.slice(-1).pop(),
-          validate: catalogValidator
+          url: ancestors.slice(-1).pop()
         };
       }
     }
@@ -288,7 +252,7 @@ const main = async () => {
       persistedState.path != null &&
       persistedState.path !== to.path.replace(/\/$/, "") &&
       persistedState.path.toLowerCase() ===
-      to.path.toLowerCase().replace(/\/$/, "")
+        to.path.toLowerCase().replace(/\/$/, "")
     ) {
       return next(persistedState.path);
     }

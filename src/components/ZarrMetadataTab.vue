@@ -1,12 +1,12 @@
 <template>
-  <b-tab key="zarr-metadata" title="Zarr Metadata" :active="active">
+  <div>
     <div v-if="loading" class="mt-2"></div>
     <div v-else-if="errored" class="mt-2">
       <p>An error has occurred while loading while loading Zarr metadata.</p>
       <p>Check the console.</p>
     </div>
     <ZarrGroup v-else :group="group" :group-name="root"></ZarrGroup>
-  </b-tab>
+  </div>
 </template>
 
 <script>
@@ -16,7 +16,7 @@ import fetch from "node-fetch";
 export default {
   name: "ZarrMetadataTab",
   components: { ZarrGroup },
-  props: ["active", "zarrMetadataUrl"],
+  props: ["zarrMetadataUrl"],
   data() {
     return {
       loading: true,

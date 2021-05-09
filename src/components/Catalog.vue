@@ -29,31 +29,13 @@
           </p>
           <p class="scroll">
             <small>
-              <!-- <b-button
-                v-clipboard="url"
-                variant="link"
-                size="sm"
-                class="clipboard"
-              > -->
-              <span
-                v-if="validationErrors"
-                title="Validation errors present; please check the JavaScript Console"
-                >⚠️</span
-              >
-              <!-- <i class="far fa-copy" />&nbsp; -->
-              <code>{{ url }}</code>
-              <!-- </b-button> -->
+              <a :href="url" target="_blank"><code>{{ url }}</code></a>
             </small>
           </p>
-          <!-- eslint-disable-next-line vue/no-v-html vue/max-attributes-per-line -->
           <div v-if="description" v-html="description" />
 
-          <b-tabs v-model="tabIndex">
-            <b-tab
-              v-if="visibleTabs.includes('collections')"
-              key="collections"
-              title="Collections (API)"
-            >
+          <b-tabs :value="tabIndex" @input="selectTab" @activate-tab="activateTab">
+            <b-tab :disabled="!this.collectionCount" key="collections" title="Collections">
               <b-table
                 :items="collections"
                 :fields="collectionFields"
@@ -79,12 +61,7 @@
                 :hide-goto-end-buttons="true"
               />
             </b-tab>
-
-            <b-tab
-              v-if="visibleTabs.includes('catalogs')"
-              key="catalogs"
-              title="Catalogs"
-            >
+            <b-tab :disabled="!this.childCount" key="catalogs" title="Catalogs">
               <b-table
                 :items="children"
                 :fields="childFields"
@@ -110,12 +87,7 @@
                 :hide-goto-end-buttons="true"
               />
             </b-tab>
-
-            <b-tab
-              v-if="visibleTabs.includes('items')"
-              key="items"
-              title="Items"
-            >
+            <b-tab :disabled="!this.hasExternalItems && !this.itemCount" key="items" title="Items">
               <b-table
                 :items="items"
                 :fields="itemFields"
@@ -143,31 +115,23 @@
                 :hide-goto-end-buttons="true"
               />
             </b-tab>
-            <b-tab
-              v-if="visibleTabs.includes('bands')"
-              key="bands"
-              title="Bands"
-            >
-              <b-table
-                :items="bands"
-                :fields="bandFields"
-                responsive
-                small
-                striped
-              />
+            <b-tab v-if="this.bands.length > 0" key="bands" title="Bands">
+              <b-table :items="bands" :fields="bandFields" responsive small striped />
             </b-tab>
-            <ZarrMetadataTab
-              v-if="visibleTabs.includes('zarrMetadata')"
-              :active="false"
-              :zarr-metadata-url="zarrMetadataUrl"
-            ></ZarrMetadataTab>
-            <AssetTab
-              v-if="visibleTabs.includes('assets')"
-              :assets="assets"
-              :bands="bands"
-              :hasBands="hasBands"
-              :active="false"
-            ></AssetTab>
+            <b-tab v-if="this.thumbnail" title="Thumbnail">
+              <a :href="thumbnail">
+                <img id="thumbnail" align="center" :src="thumbnail" />
+              </a>
+            </b-tab>
+            <b-tab v-if="this.assets.length" title="Assets" key="assets">
+              <AssetTab :assets="assets" :bands="bands" :hasBands="hasBands" />
+            </b-tab>
+            <b-tab v-if="this.shownLinks.length" title="Links" key="links">
+              <LinkTab :links="shownLinks" />
+            </b-tab>
+            <b-tab v-if="this.zarrMetadataUrl" key="zarr-metadata" title="Zarr Metadata">
+              <ZarrMetadataTab :zarr-metadata-url="zarrMetadataUrl" />
+            </b-tab>
           </b-tabs>
         </b-col>
         <b-col
@@ -207,12 +171,14 @@ import Leaflet from "leaflet";
 import { mapActions, mapGetters } from "vuex";
 
 import common from "./common";
-import AssetTab from './AssetTab.vue'
-import MetadataSidebar from './MetadataSidebar.vue'
 
-import { transformCatalog } from "../migrate"
+import Migrate from '@radiantearth/stac-migrate';
 
 import { fetchUri } from "../util";
+
+// ToDo 3.0: Import tabs lazily
+import LinkTab from "./LinkTab.vue";
+import AssetTab from "./AssetTab.vue";
 
 const ITEMS_PER_PAGE = 25;
 
@@ -239,19 +205,17 @@ export default {
     url: {
       type: String,
       required: true
-    },
-    validate: {
-      type: Function,
-      required: true
     }
   },
   components: {
+    LinkTab,
     AssetTab,
-    ZarrMetadataTab: () => import('./ZarrMetadataTab.vue'),
-    MetadataSidebar
+    MetadataSidebar: () => import(/* webpackChunkName: "metadata-sidebar" */ "./MetadataSidebar.vue"),
+    ZarrMetadataTab: () => import(/* webpackChunkName: "zarr-metadata-tab" */ './ZarrMetadataTab.vue')
   },
   data() {
     return {
+      stacVersion: null,
       externalItemCount: 0,
       externalItemsPerPage: 0,
       externalItemPaging: false,
@@ -300,8 +264,8 @@ export default {
       currentItemPage: 1,
       currentItemListPage: 1,
       locatorMap: null,
-      selectedTab: null,
-      validationErrors: null
+      tabIndex: 0,
+      tabsChanged: false
     };
   },
   asyncComputed: {
@@ -327,7 +291,7 @@ export default {
             return [];
           }
 
-          return data.collections
+          let collections = data.collections
             .map(collection => {
               // strip /collection from the target path
               let p = this.path.replace(/^\/collection/, "");
@@ -355,6 +319,16 @@ export default {
                 url: resolved
               });
             });
+
+            // Set to collection tab manually if tab has not been changed by user
+            // Otherwise due to async nature non-async tab is selected by default
+            window.setTimeout(() => {
+              if (!this.tabsChanged && (!this.$route.query.t || this.$route.query.t === "0")) {
+                this.selectTab(0);
+              }
+            }, 250);
+
+            return collections;
         } catch (err) {
           console.warn(err);
 
@@ -385,15 +359,9 @@ export default {
 
           const items = await rsp.json();
 
-          // STAC-API Context extension.
-          // Account for the old search:metadata extension.
-          const context = !!items.context ? (
-              items.context
-          ) : items["search:metadata"];
-
-          if (context != null) {
-            this.externalItemCount = context.matched;
-            this.externalItemsPerPage = context.limit;
+          if (items.context != null) {
+            this.externalItemCount = items.context.matched;
+            this.externalItemsPerPage = items.context.limit;
             this.externalItemPaging = true;
           } else {
             this.externalItemCount = items.features.length;
@@ -402,7 +370,7 @@ export default {
           // strip /collection from the target path
           let p = this.path.replace(/^\/collection/, "");
 
-          return items.features.map((item, idx) => ({
+          let features = items.features.map((item, idx) => ({
             item,
             to: `/item${p}/${this.slugify(
               `${externalItemsLink.href}${sep}page=${this.currentItemPage}#${idx}`
@@ -410,6 +378,16 @@ export default {
             title: item.properties.title || item.id,
             dateAcquired: item.properties.datetime
           }));
+
+          // Set to items tab manually if tab has not been changed by user
+          // Otherwise due to async nature non-async tab is selected by default
+          window.setTimeout(() => {
+            if (!this.tabsChanged && (!this.$route.query.t || this.$route.query.t === "2")) {
+              this.selectTab(2);
+            }
+          }, 250);
+
+          return features;
         } catch (err) {
           console.warn(err);
 
@@ -422,7 +400,10 @@ export default {
     ...common.computed,
     ...mapGetters(["getEntity"]),
     _entity() {
-      return transformCatalog(this.getEntity(this.url));
+      let object = this.getEntity(this.url);
+      this.stacVersion = object.stac_version; // Store the original stac_version as it gets replaced by the migration
+      let cloned = JSON.parse(JSON.stringify(object)); // Clone to avoid changing the vuex store, remove once migration is done directly in vuex
+      return Migrate.stac(cloned);
     },
     _description() {
       return this.catalog.description;
@@ -439,6 +420,7 @@ export default {
       return this.catalog.title;
     },
     bands() {
+      // ToDo: Merge all bands from assets
       return (
         this._properties["eo:bands"] ||
         this.summaries['eo:bands'] ||
@@ -604,7 +586,7 @@ export default {
           // recommended
           citation: this._properties["sci:citation"],
           identifier: this._properties["sci:doi"] || this.catalog.id,
-          keywords: this._keywords,
+          keywords: this.keywords,
           license: this.licenseUrl,
           isBasedOn: this.url,
           version: this.version,
@@ -662,70 +644,25 @@ export default {
     },
     spatialExtent() {
       const { spatial } = this.extent;
-      if (!spatial || typeof spatial !== 'object') {
+      if (!spatial || typeof spatial !== 'object' || !Array.isArray(spatial.bbox)) {
           return [];
       }
 
-      let bbox = [];
-      // In STAC 0.8, spatial was changed from the direct array to an
-      // object with the property 'bbox' containing an array of arrays.
-      if (Array.isArray(spatial)) {
-        bbox = [spatial];
-      }
-      else if (Array.isArray(spatial.bbox)) {
-        bbox = spatial.bbox;
-      }
-
-      return bbox.filter(box => Array.isArray(box) && box.length >= 4);
+      return spatial.bbox.filter(box => Array.isArray(box) && box.length >= 4);
     },
     summaries() {
       return this.catalog.summaries || {};
     },
-    tabIndex: {
-      get: function() {
-        return this.visibleTabs.indexOf(this.selectedTab);
-      },
-      set: function(tabIndex) {
-        // wait for the DOM to update
-        this.$nextTick(() => {
-          this.selectedTab = this.visibleTabs[tabIndex];
-        });
-      }
-    },
     temporalExtent() {
       const { temporal } = this.extent;
-      if (!temporal || typeof temporal !== 'object') {
-        return [];
+      if (!temporal || typeof temporal !== 'object' || !Array.isArray(temporal.interval)) {
+          return [];
       }
 
-      // In STAC 0.8, temporal was changed from the direct array to an
-      // object with the property 'interval' containing an array of arrays.
-
-      let intervals = [];
-      // In STAC 0.8, spatial was changed from the direct array to an
-      // object with the property 'bbox' containing an array of arrays.
-      if (Array.isArray(temporal)) {
-        intervals = [temporal];
-      }
-      else if (Array.isArray(temporal.interval)) {
-        intervals = temporal.interval;
-      }
-
-      return intervals.filter(box => Array.isArray(box) && box.length === 2);
+      return temporal.interval.filter(box => Array.isArray(box) && box.length === 2);
     },
     version() {
       return this.catalog.version;
-    },
-    visibleTabs() {
-      return [
-        this.collectionCount > 0 && "collections",
-        this.childCount > 0 && "catalogs",
-        (this.hasExternalItems || this.itemCount > 0) && "items",
-        this.bands.length > 0 && "bands",
-        this.summaries && "summaries",
-        this.assets && this.assets.length > 0 && "assets",
-        this.zarrMetadataUrl && "zarrMetadata"
-      ].filter(x => x != null && x !== false);
     }
   },
   watch: {
@@ -743,13 +680,6 @@ export default {
           ip: to
         });
       }
-    },
-    selectedTab(to, from) {
-      if (to !== from) {
-        this.updateState({
-          t: to
-        });
-      }
     }
   },
   methods: {
@@ -760,7 +690,7 @@ export default {
         this.$nextTick(() => this.initializeLocatorMap());
       }
 
-      this.syncWithQueryState(this.$route.query);
+      this.syncWithQueryState();
     },
     initializeLocatorMap() {
       if (this.locatorMap != null) {
@@ -820,6 +750,25 @@ export default {
         padding: [95, 95]
       });
     },
+    selectTab(tabIndex) {
+      if (typeof tabIndex !== 'number') {
+        tabIndex = parseInt(tabIndex, 10);
+        if (isNaN(tabIndex)) {
+          return;
+        }
+      }
+      if (this.tabsChanged && this.tabIndex !== tabIndex) {
+        this.updateState({
+          t: tabIndex
+        });
+      }
+      this.$nextTick(() => {
+        this.tabIndex = tabIndex;
+      });
+    },
+    activateTab() {
+      this.tabsChanged = true;
+    },
     sortCompare(a, b, key) {
       if (key === "link") {
         key = "title";
@@ -839,10 +788,10 @@ export default {
         });
       }
     },
-    syncWithQueryState(qs) {
-      this.selectedTab = qs.t;
-      this.currentChildPage = Number(qs.cp) || 1;
-      this.currentItemPage = Number(qs.ip) || 1;
+    syncWithQueryState() {
+      this.selectTab(this.$route.query.t);
+      this.currentChildPage = Number(this.$route.query.cp) || 1;
+      this.currentItemPage = Number(this.$route.query.ip) || 1;
 
       // If we have external items, the b-table needs to "stay" on page 1 as
       // the items list only contains the number of items we want to show.
@@ -851,6 +800,8 @@ export default {
   }
 };
 </script>
+
+<style src="./base.css"></style>
 
 <style scoped lang="css">
 h3 {

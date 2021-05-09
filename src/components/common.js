@@ -1,13 +1,10 @@
 import path from "path";
 import url from "url";
 
-import clone from "clone";
 import { HtmlRenderer, Parser } from "commonmark";
 import escape from "lodash.escape";
 import isEqual from "lodash.isequal";
 import jsonQuery from "json-query";
-import spdxToHTML from "spdx-to-html";
-import spdxLicenseIds from "spdx-license-ids";
 import { mapGetters } from "vuex";
 
 const BAND_LABELS = {
@@ -58,23 +55,8 @@ export default {
     _collectionProperties() {
       return (this.collection && this.collection.properties) || {};
     },
-    _keywords() {
-      // [].concat() is a work-around for catalogs where keywords is a string (SpaceNet)
-      return [].concat(
-        this.entity.keywords ||
-        (this.rootCatalog && this.rootCatalog.keywords) ||
-        []
-      );
-    },
     _properties() {
       return this.entity.properties || {};
-    },
-    _providers() {
-      return (
-        this.entity.providers ||
-        (this.rootCatalog && this.rootCatalog.providers) ||
-        []
-      );
     },
     assets() {
       if (!this.entity.assets) return [];
@@ -209,52 +191,52 @@ export default {
       return this.entity.id;
     },
     keywords() {
-      return this._keywords.join(", ");
+      if (Array.isArray(this.entity.keywords)) {
+        return this.entity.keywords;
+      }
+      else if (this.rootCatalog && Array.isArray(this.rootCatalog.keywords)) {
+        return this.rootCatalog.keywords;
+      }
+      return [];
     },
     license() {
-      if (this._license != null && !spdxLicenseIds.includes(this._license)) {
-        if (this.licenseUrl != null) {
-          return `<a href="${this.licenseUrl}">${this._license}</a>`;
-        }
-
-        return this._license;
+      if (this.licenseUrl) {
+        return `<a href="${this.licenseUrl}" target="_blank">${this._license}</a>`;
       }
 
-      return spdxToHTML(this._license) || this._license;
+      return this._license;
     },
     licenseUrl() {
-      if (!spdxLicenseIds.includes(this._license)) {
-        return this.links
-          .concat(
-            ((this.collection && this.collection.links) || []).concat(
-              (this.rootCatalog && this.rootCatalog.links) || []
-            )
-          )
-          .filter(x => x.rel === "license")
-          .map(x => x.href)
-          .pop();
+      if (typeof this._license === 'string' && this._license !== 'proprietary' && this._license !== 'various' && this._license.match(/^[\w\-\.\+]+$/i)) { // regexp from STAC json schemas
+        return `https://spdx.org/licenses/${this._license}.html`;
       }
 
-      return `https://spdx.org/licenses/${this._license}.html`;
+      return this.links
+        .concat(
+          ((this.collection && this.collection.links) || []).concat(
+            (this.rootCatalog && this.rootCatalog.links) || []
+          )
+        )
+        .filter(x => x.rel === "license")
+        .map(x => x.href)
+        .pop();
     },
     links() {
-      if (typeof this.entity.links === "object") {
-        // previous STAC version specified links as an object (SpaceNet MVS Dataset)
-        return Object.values(this.entity.links);
-      }
-
       return this.entity.links || [];
+    },
+    shownLinks() {
+      const ignoreRels = ['self', 'parent', 'child', 'item', 'collection', 'root', 'data', 'items'];
+      return this.links.filter(link => !ignoreRels.includes(link.rel));
     },
     loaded() {
       return Object.keys(this.entity).length > 0;
     },
     providers() {
-      return this._providers.map(x => ({
-        ...x,
-        description: MARKDOWN_WRITER.render(
-          MARKDOWN_READER.parse(x.description || "")
-        )
-      }));
+      return (
+        this.entity.providers ||
+        (this.rootCatalog && this.rootCatalog.providers) ||
+        []
+      );
     },
     rootCatalog() {
       const rootLink = this.links.find(x => x.rel === "root");
@@ -265,8 +247,17 @@ export default {
 
       return this.getEntity(this.ancestors[0]);
     },
-    stacVersion() {
-      return this.entity.stac_version;
+    thumbnail() {
+      let thumbnail = this.assets.find(x => x.key === "thumbnail");
+      if (!thumbnail) {
+        thumbnail = this.links.find(x => x.rel === "preview");
+      }
+
+      if (thumbnail) {
+        return this.resolve(thumbnail.href, this.url);
+      }
+
+      return null;
     },
     title() {
       if (this._title != null) {
@@ -291,36 +282,14 @@ export default {
     },
     entity(to, from) {
       if (!isEqual(to, from)) {
-        this._validate(to);
-
         this.initialize();
       }
     }
   },
   mounted() {
     this.initialize();
-
-    this._validate(this.entity);
   },
   methods: {
-    _validate(data) {
-      this.validate(data).then(errors => {
-        if (errors != null) {
-          console.group("Validation errors");
-          console.log(errors);
-          errors.forEach(err => {
-            console.warn(`${err.dataPath} ${err.message}:`);
-            const { value } = jsonQuery(err.dataPath, {
-              data
-            });
-            console.warn(clone(value));
-          });
-          console.groupEnd();
-        }
-
-        this.validationErrors = errors;
-      });
-    },
     async updateState(updated) {
       const qs = {
         ...this.$route.query,
