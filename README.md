@@ -33,15 +33,6 @@ npm install
 CATALOG_URL=http://path/to/catalog.json npm start -- --open
 ```
 
-Validation will happen against the version of stac defined in the Catalog, Collection or Item
-`stac_version` property. If you are running against an older STAC version where the objects
-do not contain a `stac_version` property, you'll need to set the `STAC_VERSION` environment
-variable e.g.:
-
-```
-STAC_VERSION=0.6.0 CATALOG_URL=http://path/to/catalog.json npm start -- --open
-```
-
 STAC Browser defaults to using [HTML5 History
 Mode](https://router.vuejs.org/guide/essentials/history-mode.html), which can
 cause problems on certain web hosts. To use _hash mode_, set
