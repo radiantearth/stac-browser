@@ -247,6 +247,18 @@ export default {
 
       return this.getEntity(this.ancestors[0]);
     },
+    thumbnail() {
+      let thumbnail = this.assets.find(x => x.key === "thumbnail");
+      if (!thumbnail) {
+        thumbnail = this.links.find(x => x.rel === "preview");
+      }
+
+      if (thumbnail) {
+        return this.resolve(thumbnail.href, this.url);
+      }
+
+      return null;
+    },
     title() {
       if (this._title != null) {
         return `${this._title} (${this.id})`;

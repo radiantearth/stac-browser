@@ -118,14 +118,19 @@
             <b-tab v-if="this.bands.length > 0" key="bands" title="Bands">
               <b-table :items="bands" :fields="bandFields" responsive small striped />
             </b-tab>
-            <b-tab v-if="this.zarrMetadataUrl" key="zarr-metadata" title="Zarr Metadata">
-              <ZarrMetadataTab :zarr-metadata-url="zarrMetadataUrl" />
+            <b-tab v-if="this.thumbnail" title="Thumbnail">
+              <a :href="thumbnail">
+                <img id="thumbnail" align="center" :src="thumbnail" />
+              </a>
             </b-tab>
             <b-tab v-if="this.assets.length" title="Assets" key="assets">
               <AssetTab :assets="assets" :bands="bands" :hasBands="hasBands" />
             </b-tab>
             <b-tab v-if="this.shownLinks.length" title="Links" key="links">
               <LinkTab :links="shownLinks" />
+            </b-tab>
+            <b-tab v-if="this.zarrMetadataUrl" key="zarr-metadata" title="Zarr Metadata">
+              <ZarrMetadataTab :zarr-metadata-url="zarrMetadataUrl" />
             </b-tab>
           </b-tabs>
         </b-col>

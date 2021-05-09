@@ -386,15 +386,6 @@ export default {
         ...this._properties
       };
     },
-    thumbnail() {
-      const thumbnail = this.assets.find(x => x.key === "thumbnail");
-
-      if (thumbnail != null) {
-        return this.resolve(thumbnail.href, this.url);
-      }
-
-      return null;
-    },
     tileSource() {
       if (this.selectedImage == null) {
         return "";
@@ -753,13 +744,6 @@ export default {
 #map {
   height: 100%;
   width: 100%;
-}
-
-#thumbnail {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  max-height: 500px;
 }
 
 #header_logo {
