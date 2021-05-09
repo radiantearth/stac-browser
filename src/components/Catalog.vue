@@ -29,7 +29,7 @@
           </p>
           <p class="scroll">
             <small>
-              <code>{{ url }}</code>
+              <a :href="url" target="_blank"><code>{{ url }}</code></a>
             </small>
           </p>
           <div v-if="description" v-html="description" />
@@ -121,10 +121,10 @@
             <b-tab v-if="this.zarrMetadataUrl" key="zarr-metadata" title="Zarr Metadata">
               <ZarrMetadataTab :zarr-metadata-url="zarrMetadataUrl" />
             </b-tab>
-            <b-tab :disabled="!this.assets.length" title="Assets" key="assets">
+            <b-tab v-if="this.assets.length" title="Assets" key="assets">
               <AssetTab :assets="assets" :bands="bands" :hasBands="hasBands" />
             </b-tab>
-            <b-tab :disabled="!this.shownLinks.length" title="Links" key="links">
+            <b-tab v-if="this.shownLinks.length" title="Links" key="links">
               <LinkTab :links="shownLinks" />
             </b-tab>
           </b-tabs>
@@ -171,6 +171,10 @@ import Migrate from '@radiantearth/stac-migrate';
 
 import { fetchUri } from "../util";
 
+// ToDo 3.0: Import tabs lazily
+import LinkTab from "./LinkTab.vue";
+import AssetTab from "./AssetTab.vue";
+
 const ITEMS_PER_PAGE = 25;
 
 export default {
@@ -199,8 +203,8 @@ export default {
     }
   },
   components: {
-    LinkTab: () => import(/* webpackChunkName: "link-tab" */ "./LinkTab.vue"),
-    AssetTab: () => import(/* webpackChunkName: "asset-tab" */ "./AssetTab.vue"),
+    LinkTab,
+    AssetTab,
     MetadataSidebar: () => import(/* webpackChunkName: "metadata-sidebar" */ "./MetadataSidebar.vue"),
     ZarrMetadataTab: () => import(/* webpackChunkName: "zarr-metadata-tab" */ './ZarrMetadataTab.vue')
   },
@@ -349,15 +353,9 @@ export default {
 
           const items = await rsp.json();
 
-          // STAC-API Context extension.
-          // Account for the old search:metadata extension.
-          const context = !!items.context ? (
-              items.context
-          ) : items["search:metadata"];
-
-          if (context != null) {
-            this.externalItemCount = context.matched;
-            this.externalItemsPerPage = context.limit;
+          if (items.context != null) {
+            this.externalItemCount = items.context.matched;
+            this.externalItemsPerPage = items.context.limit;
             this.externalItemPaging = true;
           } else {
             this.externalItemCount = items.features.length;
