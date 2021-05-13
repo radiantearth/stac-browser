@@ -323,7 +323,7 @@ export default {
               if (!this.tabsChanged && (!this.$route.query.t || this.$route.query.t === "0")) {
                 this.selectTab(0);
               }
-            }, 250);
+            }, 1000);
 
             return collections;
         } catch (err) {
@@ -381,7 +381,7 @@ export default {
             if (!this.tabsChanged && (!this.$route.query.t || this.$route.query.t === "2")) {
               this.selectTab(2);
             }
-          }, 250);
+          }, 1000);
 
           return features;
         } catch (err) {
