@@ -179,7 +179,10 @@ export default {
     ...mapGetters(["getEntity"]),
     _entity() {
       let object = this.getEntity(this.url);
-      if (object.type === "FeatureCollection") {
+      if (object instanceof Error) {
+        return object;
+      }
+      else if (object.type === "FeatureCollection") {
         const { hash } = url.parse(this.url);
         const idx = hash.slice(1);
         object = object.features[idx];

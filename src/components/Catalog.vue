@@ -380,6 +380,9 @@ export default {
     ...mapGetters(["getEntity"]),
     _entity() {
       let object = this.getEntity(this.url);
+      if (object instanceof Error) {
+        return object;
+      }
       this.stacVersion = object.stac_version; // Store the original stac_version as it gets replaced by the migration
       let cloned = JSON.parse(JSON.stringify(object)); // Clone to avoid changing the vuex store, remove once migration is done directly in vuex
       return Migrate.stac(cloned);
