@@ -19,7 +19,7 @@
             <td class="title">Collection</td>
                 <td>
                     <router-link :to="linkToCollection">
-                    {{ collection.title || "Untitled" }}
+                    {{ collectionTitle }}
                     </router-link>
                 </td>
             </tr>
@@ -87,18 +87,32 @@ import StacFields from "@radiantearth/stac-fields";
 
 export default {
     name: "MetadataSidebar",
-    props: [
-        "properties",
-        "summaries",
-        "stacVersion",
-        "keywords",
-        "collection", // Item-specific
-        "collectionLink", // Item-specific
-        "license",
-        "temporalExtent", // Collection-specific
-        "providers",
-        "slugify",
-    ],
+    props: {
+        properties: {
+            type: Object,
+            default: () => ({})
+        },
+        summaries: {
+            type: Object,
+            default: () => ({})
+        },
+        stacVersion: {
+            type: String
+        },
+        keywords: {
+            type: Array,
+            default: () => ([])
+        },
+        collection: { // Item-specific
+            type: Object,
+            default: () => ({})
+        },
+        collectionLink: {}, // Item-specific
+        license: {},
+        temporalExtent: {}, // Collection-specific
+        providers: {},
+        slugify: {}
+    },
     computed: {
         linkToCollection() {
             if (this.collectionLink.href != null) {
@@ -106,6 +120,12 @@ export default {
             }
 
             return null;
+        },
+        collectionTitle() {
+            if (this.collection && this.collection.title) {
+                return this.collection.title;
+            }
+            return "Untitled";
         },
         hasSummary() {
             return this.summaries && typeof this.summaries === 'object' && Object.keys(this.summaries).length > 0;
