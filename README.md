@@ -8,18 +8,14 @@ implemented as a single page application (SPA) for ease of development and to
 limit the overall number of catalog reads necessary when browsing (as catalogs
 may be nested and do not necessarily contain references to their parents).
 
-<a href="https://www.netlify.com">
-  <img src="https://www.netlify.com/img/global/badges/netlify-light.svg"/>
-</a>
+Version: 2.0.0-rc.2 (supports all STAC versions between 0.6.0 and 1.0.0-rc.4)
 
 ## Examples
 
-* [planet.stac.cloud](https://planet.stac.cloud) ([catalog on GitHub](https://github.com/cholmes/pdd-stac/))
-* [CBERS](https://cbers.stac.cloud) ([catalog tools on GitHub](https://github.com/fredliporace/cbers-2-stac))
-* [Google Earth Engine](https://gee.stac.cloud)
-* [sat-api.stac.cloud](https://sat-api.stac.cloud) ([sat-api on GitHub](https://github.com/sat-utils/sat-api))
+* [FedEO Clearinghouse](https://geo.spacebel.be/)
+* [radarsat-1](https://www.radarstac.com/)
 
-For a longer list of examples, checkout out [stac.cloud](http://stac.cloud).
+For a longer list of examples, checkout out [STAC Index](https://stac-index.org).
 
 ## Running
 

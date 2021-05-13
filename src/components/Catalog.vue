@@ -141,7 +141,6 @@
           <b-card bg-variant="light">
             <div v-if="spatialExtent.length > 0" id="locator-map" />
             <MetadataSidebar
-              :properties="properties"
               :summaries="summaries"
               :stacVersion="stacVersion"
               :keywords="keywords"
@@ -156,10 +155,7 @@
     <footer class="footer">
       <b-container>
         <span class="poweredby text-muted">
-          Powered by
-          <a href="https://github.com/radiantearth/stac-browser"
-            >STAC Browser</a
-          >
+          Powered by <a href="https://github.com/radiantearth/stac-browser">STAC Browser</a> v{{ browserVersion }}
         </span>
       </b-container>
     </footer>
@@ -320,14 +316,6 @@ export default {
               });
             });
 
-            // Set to collection tab manually if tab has not been changed by user
-            // Otherwise due to async nature non-async tab is selected by default
-            window.setTimeout(() => {
-              if (!this.tabsChanged && (!this.$route.query.t || this.$route.query.t === "0")) {
-                this.selectTab(0);
-              }
-            }, 250);
-
             return collections;
         } catch (err) {
           console.warn(err);
@@ -379,14 +367,6 @@ export default {
             dateAcquired: item.properties.datetime
           }));
 
-          // Set to items tab manually if tab has not been changed by user
-          // Otherwise due to async nature non-async tab is selected by default
-          window.setTimeout(() => {
-            if (!this.tabsChanged && (!this.$route.query.t || this.$route.query.t === "2")) {
-              this.selectTab(2);
-            }
-          }, 250);
-
           return features;
         } catch (err) {
           console.warn(err);
@@ -401,6 +381,9 @@ export default {
     ...mapGetters(["getEntity"]),
     _entity() {
       let object = this.getEntity(this.url);
+      if (object instanceof Error) {
+        return object;
+      }
       this.stacVersion = object.stac_version; // Store the original stac_version as it gets replaced by the migration
       let cloned = JSON.parse(JSON.stringify(object)); // Clone to avoid changing the vuex store, remove once migration is done directly in vuex
       return Migrate.stac(cloned);
@@ -421,14 +404,7 @@ export default {
     },
     bands() {
       // ToDo: Merge all bands from assets
-      return (
-        this._properties["eo:bands"] ||
-        this.summaries['eo:bands'] ||
-        (this.rootCatalog &&
-          this.rootCatalog.properties &&
-          this.rootCatalog.properties["eo:bands"]) ||
-        []
-      );
+      return Array.isArray(this.summaries['eo:bands']) ? this.summaries['eo:bands'] : [];
     },
     catalog() {
       return this.entity;
@@ -584,14 +560,14 @@ export default {
           name: this.title,
           description: this.description,
           // recommended
-          citation: this._properties["sci:citation"],
-          identifier: this._properties["sci:doi"] || this.catalog.id,
+          citation: this.catalog["sci:citation"],
+          identifier: this.catalog["sci:doi"] || this.catalog.id,
           keywords: this.keywords,
           license: this.licenseUrl,
           isBasedOn: this.url,
           version: this.version,
           url: this.path,
-          workExample: (this._properties["sci:publications"] || []).map(p => ({
+          workExample: (this.catalog["sci:publications"] || []).map(p => ({
             identifier: p.doi,
             citation: p.citation
           })),
@@ -626,21 +602,16 @@ export default {
           "@type": "Place",
           geo: {
             "@type": "GeoShape",
-            // ToDo: compute min and max values from multiple extents
             box: this.spatialExtent[0].join(" ")
           }
         };
       }
 
-      if (this.temporalExtent.length > 0) {
-        // ToDo: compute min and max values from multiple extents
+      if (!this.isTemporalExtentUnbounded) {
         dataCatalog.temporalCoverage = this.temporalExtent[0].map(x => x || "..").join("/");
       }
 
       return dataCatalog;
-    },
-    properties() {
-      return this._properties;
     },
     spatialExtent() {
       const { spatial } = this.extent;
@@ -659,7 +630,13 @@ export default {
           return [];
       }
 
-      return temporal.interval.filter(box => Array.isArray(box) && box.length === 2);
+      return temporal.interval.filter(interval => Array.isArray(interval) && interval.length === 2);
+    },
+    isTemporalExtentUnbounded() {
+      if (this.temporalExtent.length > 0) {
+        return this.temporalExtent[0].findIndex(interval => (typeof interval === 'string')) >= 0;
+      }
+      return true;
     },
     version() {
       return this.catalog.version;
@@ -679,6 +656,16 @@ export default {
         this.updateState({
           ip: to
         });
+      }
+    },
+    collections() {
+      if (!this.tabsChanged && (!this.$route.query.t || this.$route.query.t === "0") && this.collections.length > 0) {
+        this.selectTab(0);
+      }
+    },
+    externalItems() {
+      if (!this.tabsChanged && (!this.$route.query.t || this.$route.query.t === "2") && this.externalItems.length > 0) {
+        this.selectTab(2);
       }
     }
   },
@@ -725,7 +712,16 @@ export default {
         }
       ).addTo(this.locatorMap);
 
-      const coordinates = [this.spatialExtent.map(extent => {
+      let spatialExtent;
+      if (this.spatialExtent.length > 1) {
+        // Remove union bbox in favor of more concrete bboxes
+        spatialExtent = this.spatialExtent.slice(1);
+      }
+      else {
+        spatialExtent = this.spatialExtent;
+      }
+
+      const coordinates = [spatialExtent.map(extent => {
         const [minX, minY, maxX, maxY] = extent;
         return [[minX, minY], [minX, maxY], [maxX, maxY], [maxX, minY], [minX, minY]];
       })];

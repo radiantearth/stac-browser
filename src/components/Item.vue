@@ -81,10 +81,7 @@
     <footer class="footer">
       <b-container>
         <span class="poweredby text-muted">
-          Powered by
-          <a href="https://github.com/radiantearth/stac-browser"
-            >STAC Browser</a
-          >
+          Powered by <a href="https://github.com/radiantearth/stac-browser">STAC Browser</a> v{{ browserVersion }}
         </span>
       </b-container>
     </footer>
@@ -182,7 +179,10 @@ export default {
     ...mapGetters(["getEntity"]),
     _entity() {
       let object = this.getEntity(this.url);
-      if (object.type === "FeatureCollection") {
+      if (object instanceof Error) {
+        return object;
+      }
+      else if (object.type === "FeatureCollection") {
         const { hash } = url.parse(this.url);
         const idx = hash.slice(1);
         object = object.features[idx];
@@ -195,7 +195,7 @@ export default {
       return this.links.filter(x => x.rel === "collection");
     },
     _description() {
-      return this._properties.description;
+      return this.properties.description;
     },
     keywords() {
       if (this.collection && Array.isArray(this.collection.keywords)) {
@@ -207,32 +207,32 @@ export default {
     },
     _license() {
       return (
-        this._properties["license"] ||
+        this.properties.license ||
         (this.collection && this.collection.license) ||
         (this.rootCatalog && this.rootCatalog.license)
       );
     },
     providers() {
       return (
-        this._properties["providers"] ||
+        this.properties.providers ||
         (this.collection && this.collection.providers) ||
         common.computed.providers.apply(this)
       );
     },
     _temporalCoverage() {
-      if (this._properties["start_datetime"] != null) {
+      if (this.properties.start_datetime != null) {
         return [
-          this._properties["start_datetime"],
-          this._properties["end_datetime"]
+          this.properties.start_datetime,
+          this.properties.end_datetime
         ]
           .map(x => x || "..")
           .join("/");
       }
 
-      return this._properties.datetime;
+      return this.properties.datetime;
     },
     _title() {
-      return this._properties.title;
+      return this.properties.title;
     },
     attribution() {
       if (this.license != null || this.licensor != null) {
@@ -242,14 +242,12 @@ export default {
       return null;
     },
     bands() {
+      // ToDo: Merge all bands from assets
       return (
-        this._properties["eo:bands"] ||
+        this.properties["eo:bands"] ||
         (this.collection &&
           this.collection.properties &&
           this.collection.properties["eo:bands"]) ||
-        (this.rootCatalog &&
-          this.rootCatalog.properties &&
-          this.rootCatalog.properties["eo:bands"]) ||
         []
       );
     },
@@ -324,13 +322,13 @@ export default {
         name: this.title,
         description: this.description || `${this.title} STAC Item`,
         // recommended
-        citation: this._properties["sci:citation"],
-        identifier: this._properties["sci:doi"] || this.item.id,
+        citation: this.properties["sci:citation"],
+        identifier: this.properties["sci:doi"] || this.item.id,
         keywords: this.keywords,
         license: this.licenseUrl,
         isBasedOn: this.url,
         url: this.path,
-        workExample: (this._properties["sci:publications"] || []).map(p => ({
+        workExample: (this.properties["sci:publications"] || []).map(p => ({
           identifier: p.doi,
           citation: p.citation
         })),
@@ -381,10 +379,7 @@ export default {
         .pop();
     },
     properties() {
-      return {
-        ...this._collectionProperties,
-        ...this._properties
-      };
+      return this.entity.properties || {};
     },
     tileSource() {
       if (this.selectedImage == null) {
@@ -493,7 +488,7 @@ export default {
           layer.bindPopup(() => {
             const el = document.createElement("table");
 
-            const labelProperties = this._properties["label:properties"] || [];
+            const labelProperties = this.properties["label:properties"] || [];
 
             el.innerHTML = Object.entries(feature.properties)
               .filter(([k]) =>
@@ -508,7 +503,7 @@ export default {
             return el;
           }),
         style: feature => {
-          const labelClasses = this._properties["label:classes"];
+          const labelClasses = this.properties["label:classes"];
           const classes = (labelClasses || [])
             .map(x => x.classes.map(c => `${x.name}-${c}`))
             .flat();

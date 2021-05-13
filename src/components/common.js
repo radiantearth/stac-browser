@@ -4,8 +4,9 @@ import url from "url";
 import { HtmlRenderer, Parser } from "commonmark";
 import escape from "lodash.escape";
 import isEqual from "lodash.isequal";
-import jsonQuery from "json-query";
 import { mapGetters } from "vuex";
+
+import { version } from "../../package.json";
 
 const BAND_LABELS = {
   id: "ID",
@@ -52,11 +53,8 @@ export default {
   },
   computed: {
     ...mapGetters(["getEntity"]),
-    _collectionProperties() {
-      return (this.collection && this.collection.properties) || {};
-    },
-    _properties() {
-      return this.entity.properties || {};
+    browserVersion() {
+      return version;
     },
     assets() {
       if (!this.entity.assets) return [];
