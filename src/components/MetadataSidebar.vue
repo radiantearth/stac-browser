@@ -19,7 +19,7 @@
             <td class="title">Collection</td>
                 <td>
                     <router-link :to="linkToCollection">
-                    {{ collection.title || "Untitled" }}
+                    {{ collectionTitle }}
                     </router-link>
                 </td>
             </tr>
@@ -106,6 +106,12 @@ export default {
             }
 
             return null;
+        },
+        collectionTitle() {
+            if (this.collection && this.collection.title) {
+                return this.collection.title;
+            }
+            return "Untitled";
         },
         hasSummary() {
             return this.summaries && typeof this.summaries === 'object' && Object.keys(this.summaries).length > 0;
