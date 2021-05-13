@@ -56,12 +56,6 @@ export default {
     browserVersion() {
       return version;
     },
-    _collectionProperties() {
-      return (this.collection && this.collection.properties) || {};
-    },
-    _properties() {
-      return this.entity.properties || {};
-    },
     assets() {
       if (!this.entity.assets) return [];
       return (

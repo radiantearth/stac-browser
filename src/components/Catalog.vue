@@ -141,7 +141,6 @@
           <b-card bg-variant="light">
             <div v-if="spatialExtent.length > 0" id="locator-map" />
             <MetadataSidebar
-              :properties="properties"
               :summaries="summaries"
               :stacVersion="stacVersion"
               :keywords="keywords"
@@ -317,14 +316,6 @@ export default {
               });
             });
 
-            // Set to collection tab manually if tab has not been changed by user
-            // Otherwise due to async nature non-async tab is selected by default
-            window.setTimeout(() => {
-              if (!this.tabsChanged && (!this.$route.query.t || this.$route.query.t === "0")) {
-                this.selectTab(0);
-              }
-            }, 1000);
-
             return collections;
         } catch (err) {
           console.warn(err);
@@ -375,14 +366,6 @@ export default {
             dateAcquired: item.properties.datetime
           }));
 
-          // Set to items tab manually if tab has not been changed by user
-          // Otherwise due to async nature non-async tab is selected by default
-          window.setTimeout(() => {
-            if (!this.tabsChanged && (!this.$route.query.t || this.$route.query.t === "2")) {
-              this.selectTab(2);
-            }
-          }, 1000);
-
           return features;
         } catch (err) {
           console.warn(err);
@@ -417,14 +400,7 @@ export default {
     },
     bands() {
       // ToDo: Merge all bands from assets
-      return (
-        this._properties["eo:bands"] ||
-        this.summaries['eo:bands'] ||
-        (this.rootCatalog &&
-          this.rootCatalog.properties &&
-          this.rootCatalog.properties["eo:bands"]) ||
-        []
-      );
+      return Array.isArray(this.summaries['eo:bands']) ? this.summaries['eo:bands'] : [];
     },
     catalog() {
       return this.entity;
@@ -580,14 +556,14 @@ export default {
           name: this.title,
           description: this.description,
           // recommended
-          citation: this._properties["sci:citation"],
-          identifier: this._properties["sci:doi"] || this.catalog.id,
+          citation: this.catalog["sci:citation"],
+          identifier: this.catalog["sci:doi"] || this.catalog.id,
           keywords: this.keywords,
           license: this.licenseUrl,
           isBasedOn: this.url,
           version: this.version,
           url: this.path,
-          workExample: (this._properties["sci:publications"] || []).map(p => ({
+          workExample: (this.catalog["sci:publications"] || []).map(p => ({
             identifier: p.doi,
             citation: p.citation
           })),
@@ -633,9 +609,6 @@ export default {
 
       return dataCatalog;
     },
-    properties() {
-      return this._properties;
-    },
     spatialExtent() {
       const { spatial } = this.extent;
       if (!spatial || typeof spatial !== 'object' || !Array.isArray(spatial.bbox)) {
@@ -679,6 +652,16 @@ export default {
         this.updateState({
           ip: to
         });
+      }
+    },
+    collections() {
+      if (!this.tabsChanged && (!this.$route.query.t || this.$route.query.t === "0") && this.collections.length > 0) {
+        this.selectTab(0);
+      }
+    },
+    externalItems() {
+      if (!this.tabsChanged && (!this.$route.query.t || this.$route.query.t === "2") && this.externalItems.length > 0) {
+        this.selectTab(2);
       }
     }
   },
