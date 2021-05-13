@@ -125,16 +125,25 @@ export default {
             if (!Array.isArray(this.temporalExtent)) {
                 return '';
             }
-            return this.temporalExtent
-                .map(interval => {
-                    return [
-                        interval[0] ? new Date(interval[0]).toLocaleString() : "beginning of time",
-                        interval[1] ? new Date(interval[1]).toLocaleString() : "now"
-                    ].join(" - ")
-                }).join(', ');
+
+            let temporalExtent;
+            if (this.temporalExtent.length > 1) {
+                // Remove union temporal extent in favor of more concrete extents
+                temporalExtent = this.temporalExtent.slice(1);
+            }
+            else {
+                temporalExtent = this.temporalExtent;
+            }
+            return temporalExtent.map(this.formatTemporalInterval).join(', ');
         }
     },
     methods: {
+        formatTemporalInterval(interval) {
+            return [
+                interval[0] ? new Date(interval[0]).toLocaleString() : "beginning of time",
+                interval[1] ? new Date(interval[1]).toLocaleString() : "now"
+            ].join(" - ");
+        },
         ignore(key) {
             switch(key) {
                 case 'eo:bands':

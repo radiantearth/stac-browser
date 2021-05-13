@@ -625,14 +625,12 @@ export default {
           "@type": "Place",
           geo: {
             "@type": "GeoShape",
-            // ToDo: compute min and max values from multiple extents
             box: this.spatialExtent[0].join(" ")
           }
         };
       }
 
-      if (this.temporalExtent.length > 0) {
-        // ToDo: compute min and max values from multiple extents
+      if (!this.isTemporalExtentUnbounded) {
         dataCatalog.temporalCoverage = this.temporalExtent[0].map(x => x || "..").join("/");
       }
 
@@ -658,7 +656,13 @@ export default {
           return [];
       }
 
-      return temporal.interval.filter(box => Array.isArray(box) && box.length === 2);
+      return temporal.interval.filter(interval => Array.isArray(interval) && interval.length === 2);
+    },
+    isTemporalExtentUnbounded() {
+      if (this.temporalExtent.length > 0) {
+        return this.temporalExtent[0].findIndex(interval => (typeof interval === 'string')) >= 0;
+      }
+      return true;
     },
     version() {
       return this.catalog.version;
@@ -724,7 +728,16 @@ export default {
         }
       ).addTo(this.locatorMap);
 
-      const coordinates = [this.spatialExtent.map(extent => {
+      let spatialExtent;
+      if (this.spatialExtent.length > 1) {
+        // Remove union bbox in favor of more concrete bboxes
+        spatialExtent = this.spatialExtent.slice(1);
+      }
+      else {
+        spatialExtent = this.spatialExtent;
+      }
+
+      const coordinates = [spatialExtent.map(extent => {
         const [minX, minY, maxX, maxY] = extent;
         return [[minX, minY], [minX, maxY], [maxX, maxY], [maxX, minY], [minX, minY]];
       })];
