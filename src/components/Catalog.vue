@@ -335,8 +335,9 @@ export default {
         }
 
         try {
+          let sep = externalItemsLink.href.includes('?') ? '&' : '?';
           const rsp = await fetchUri(
-            `${externalItemsLink.href}?page=${this.currentItemPage}`
+            `${externalItemsLink.href}${sep}page=${this.currentItemPage}`
           );
 
           if (!rsp.ok) {
@@ -360,7 +361,7 @@ export default {
           let features = items.features.map((item, idx) => ({
             item,
             to: `/item${p}/${this.slugify(
-              `${externalItemsLink.href}?page=${this.currentItemPage}#${idx}`
+              `${externalItemsLink.href}${sep}page=${this.currentItemPage}#${idx}`
             )}`,
             title: item.properties.title || item.id,
             dateAcquired: item.properties.datetime
