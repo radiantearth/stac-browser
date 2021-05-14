@@ -99,11 +99,11 @@ npm start -- --open --TILE_SOURCE_TEMPLATE="http://localhost:8000/cog/tiles/{z}/
 ## Building
 
 ```bash
-CATALOG_URL=http://path/to/catalog.json npm run build
+npm run build -- --CATALOG_URL="http://path/to/catalog.json"
 ```
 
 If you'd like to publish the STAC Browser instance not on the root path of your domain, 
-you can set the option [`publicPath`](https://cli.vuejs.org/config/#publicpath) in the file vue.config.js.
+you can use the `PATH_PREFIX` option (see above).
 
 ## Publishing
 
