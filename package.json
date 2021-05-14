@@ -1,6 +1,6 @@
 {
   "name": "@radiantearth/stac-browser",
-  "version": "2.0.0-rc.2",
+  "version": "2.0.0-rc.3",
   "description": "A Vue-based STAC browser intended for static + dynamic deployment",
   "main": "src/main.js",
   "scripts": {
@@ -50,7 +50,8 @@
     "vue-meta": "^2.4.0",
     "vue-multiselect": "^2.1.6",
     "vue-router": "^3.2.0",
-    "vuex": "^3.4.0"
+    "vuex": "^3.4.0",
+    "yargs": "^17.0.1"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",

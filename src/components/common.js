@@ -30,12 +30,6 @@ const MARKDOWN_WRITER = new HtmlRenderer({
 export default {
   metaInfo() {
     return {
-      meta: [
-        {
-          name: "google-site-verification",
-          content: process.env.GOOGLE_SITE_VERIFICATION
-        }
-      ].filter(({ content }) => content != null),
       script: [
         { json: this.jsonLD, type: "application/ld+json" },
         {

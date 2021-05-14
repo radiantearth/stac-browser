@@ -17,7 +17,7 @@ import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
 import "leaflet/dist/leaflet.css";
 
-import { CATALOG_URL } from "./config";
+import { CATALOG_URL, PATH_PREFIX, HISTORY_MODE } from "./config";
 import { fetchUri, getProxiedUri } from "./util";
 
 const Catalog = () => import(/* webpackChunkName: "catalog" */ "./components/Catalog.vue");
@@ -234,8 +234,8 @@ const main = async () => {
   });
 
   const router = new VueRouter({
-    base: process.env.PATH_PREFIX || "/",
-    mode: process.env.HISTORY_MODE || "history",
+    base: PATH_PREFIX,
+    mode: HISTORY_MODE,
     routes
   });
 
