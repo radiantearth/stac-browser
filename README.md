@@ -44,13 +44,13 @@ npm start -- --open --CATALOG_URL="http://path/to/catalog.json"
 
 All the following options can be used as explained in the chapter "Running", either as CLI Parameter or as environment variable (deprecated).
 
-### HISTORY_MODE
+### HISTORY_MODE (build-only option)
 
 STAC Browser defaults to using [HTML5 History Mode](https://router.vuejs.org/guide/essentials/history-mode.html),
 which can cause problems on certain web hosts. To use _hash mode_, set `--HISTORY_MODE=hash` when running or building.
 This will be compatible with S3, stock Apache, etc.
 
-### PATH_PREFIX
+### PATH_PREFIX (build-only option)
 
 If you don't deploy the STAC Browser instance at the root path of your (sub) domain, then you need to set the path prefix
 when building (or running) STAC Browser.
@@ -96,6 +96,18 @@ npm start -- --open --TILE_SOURCE_TEMPLATE="http://localhost:8000/cog/tiles/{z}/
 
 `TILE_PROXY_URL` is very similar to STAC_PROXY_URL, but is only used for asset hrefs passed into the TILE_SOURCE_TEMPLATE. This enables deployment scenarios where the tiler needs to reference a proxy server by a different name, e.g. in a docker-compose setup with linked containers.
 
+## Theming
+
+You can customize STAC Browser in the `src/theme` folder. It contains Sass files (a CSS preprocessor), which you can change to suit your needs.
+
+The easiest solution is to start with the `variables.scss` file and customize the options given there.
+For simplicity we just provide some common options as default, but you can also add and customize any Bootstrap variable,
+see <https://getbootstrap.com/docs/4.0/getting-started/theming/> for details.
+
+The file `page.scss` contains some Sass declarations for the main sections of STAC Browser and you can adopt those to suit your needs.
+
+If you need even more flexibility (which I doubt), you need to dig into the Vue files and their dependencies though.
+
 ## Building
 
 ```bash
@@ -119,3 +131,5 @@ Catalogs and collections are rendered using the
 [`src/components/`](src/components/). Items are rendered using the
 [`Item`](src/components/Item.vue) component. Common functionality across both
 components exists in [`src/components/common.js`](src/components/common.js).
+
+To lint the source code, run `npm run lint`

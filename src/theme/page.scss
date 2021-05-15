@@ -1,0 +1,38 @@
+@import '~bootstrap/scss/bootstrap.scss';
+@import '~bootstrap-vue/src/index.scss';
+
+#stac-browser {
+    header {
+        margin: $block-margin auto;
+    }
+    .logo {
+        @if $logo == 'image' {
+            // Hide text
+            color: transparent;
+            font-size: 0;
+            // Show image
+            background-image: url($logo-image);
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: contain;
+            height: $logo-image-height;
+        } @else if $logo == 'none' {
+            display: none;
+        }
+        margin-bottom: $block-margin;
+    }
+    nav {
+        margin: $block-margin auto;
+    }
+    main {
+        margin: $block-margin auto;
+    }
+    footer {
+        margin: $block-margin auto;
+        text-align: center;
+    }
+}
+
+.twitter {
+    @include button-variant(#1DA1F2, #1DA1F2);
+}
