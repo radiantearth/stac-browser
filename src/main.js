@@ -273,12 +273,12 @@ async function main(CATALOG_URL, INDEX_PATH) {
     return next();
   });
 
-  let el = document.getElementById("stac-browser");
+  let el = document.getElementById("app");
   return new Vue({
     el,
     router,
     store,
-    template: `<router-view id="stac-browser" />`
+    template: `<router-view id="app" />`
   });
 };
 
