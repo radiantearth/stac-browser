@@ -17,7 +17,6 @@ import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
 import "leaflet/dist/leaflet.css";
 
-import { CATALOG_URL, PATH_PREFIX, HISTORY_MODE } from "./config";
 import { fetchUri, getProxiedUri } from "./util";
 
 const Catalog = () => import(/* webpackChunkName: "catalog" */ "./components/Catalog.vue");
@@ -284,7 +283,3 @@ async function main(CATALOG_URL, INDEX_PATH) {
 };
 
 export default main;
-
-if (CATALOG_URL) {
-  main(CATALOG_URL, '/');
-}
