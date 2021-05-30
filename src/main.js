@@ -37,49 +37,49 @@ Vue.use(Meta);
 Vue.use(VueRouter);
 Vue.use(Vuex);
 
-const makeRelative = uri => {
-  const rootURI = url.parse(CATALOG_URL);
-  const localURI = url.parse(uri);
-
-  if (rootURI.hostname !== localURI.hostname) {
-    return uri;
+async function main(CATALOG_URL, INDEX_PATH) {
+  const makeRelative = uri => {
+    const rootURI = url.parse(CATALOG_URL);
+    const localURI = url.parse(uri);
+  
+    if (rootURI.hostname !== localURI.hostname) {
+      return uri;
+    }
+  
+    const rootPath = rootURI.path
+      .split("/")
+      .slice(0, -1)
+      .join("/");
+  
+    return path.relative(rootPath, `${localURI.path}${localURI.hash || ""}`);
+  };
+  
+  /**
+   * Generate a slug (short, URL-encodable string) for a URI.
+   *
+   * @param {String} uri URI to generate a slug for.
+   * @returns Base58-encoded relative path to the root catalog.
+   */
+  const slugify = uri => bs58.encode(Buffer.from(makeRelative(uri)));
+  
+  const resolve = (href, base = CATALOG_URL) => {
+    // Encode colons from all but schema, as they create errors in URL resolving.
+    const proxiedUri = getProxiedUri(href);
+    const hrefEncoded =
+        proxiedUri.replace(':', encodeURIComponent(':'))
+          .replace(encodeURIComponent(':') + '//', '://');
+    return new URL(hrefEncoded, base).toString();
+  };
+  
+  function decode(s) {
+    try {
+      return resolve(bs58.decode(s).toString());
+    } catch (err) {
+      console.warn(err);
+      return CATALOG_URL;
+    }
   }
 
-  const rootPath = rootURI.path
-    .split("/")
-    .slice(0, -1)
-    .join("/");
-
-  return path.relative(rootPath, `${localURI.path}${localURI.hash || ""}`);
-};
-
-/**
- * Generate a slug (short, URL-encodable string) for a URI.
- *
- * @param {String} uri URI to generate a slug for.
- * @returns Base58-encoded relative path to the root catalog.
- */
-const slugify = uri => bs58.encode(Buffer.from(makeRelative(uri)));
-
-const resolve = (href, base = CATALOG_URL) => {
-  // Encode colons from all but schema, as they create errors in URL resolving.
-  const proxiedUri = getProxiedUri(href);
-  const hrefEncoded = proxiedUri
-    .replace(":", encodeURIComponent(":"))
-    .replace(encodeURIComponent(":") + "//", "://");
-  return new URL(hrefEncoded, base).toString();
-};
-
-function decode(s) {
-  try {
-    return resolve(bs58.decode(s).toString());
-  } catch (err) {
-    console.warn(err);
-    return CATALOG_URL;
-  }
-}
-
-const main = async () => {
   let persistedState = {};
   const renderedState = document.querySelector(
     "script.state[type='application/json']"
@@ -218,8 +218,12 @@ const main = async () => {
 
           if (rsp.ok) {
             const entity = await rsp.json();
-
-            commit("LOADED", { entity, url });
+            if (!entity) {
+              commit("FAILED", { err: new Error("Can't load data. Likely a CORS issue."), url });
+            }
+            else {
+              commit("LOADED", { entity, url });
+            }
           } else {
             commit("FAILED", { err: new Error(await rsp.text()), url });
           }
@@ -234,12 +238,10 @@ const main = async () => {
   });
 
   const router = new VueRouter({
-    base: PATH_PREFIX,
-    mode: HISTORY_MODE,
+    base: INDEX_PATH,
+    mode: "hash",
     routes
   });
-
-  window.router = router;
 
   await store.dispatch("load", CATALOG_URL);
 
@@ -272,20 +274,17 @@ const main = async () => {
     return next();
   });
 
-  // initial load
-  let el = document.getElementById("app");
-
-  // replace existing content
-  if (document.getElementById("rendered") != null) {
-    el = document.getElementById("rendered");
-  }
-
-  new Vue({
+  let el = document.getElementById("stac-browser");
+  return new Vue({
     el,
     router,
     store,
-    template: `<router-view id="rendered" />`
+    template: `<router-view id="stac-browser" />`
   });
 };
 
-main();
+export default main;
+
+if (CATALOG_URL) {
+  main(CATALOG_URL, '/');
+}

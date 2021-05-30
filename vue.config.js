@@ -1,6 +1,6 @@
 const { argv } = require("yargs");
 
-const DEFAULT_PATH_PREFIX = '/';
+const DEFAULT_PATH_PREFIX = '/browse/';
 
 function getVar(name, defaultValue) {
 	let value;
