@@ -1,10 +1,19 @@
 <template>
     <div class="share mt-1">
         <b-button-group>
-            <b-button size="sm" variant="primary" id="popover-link"><b-icon-link /></b-button>
-            <b-button size="sm" variant="primary" id="popover-share"><b-icon-share /></b-button>
+            <b-button size="sm" variant="light" id="popover-link"><b-icon-link /></b-button>
+            <b-button size="sm" variant="light" id="popover-share"><b-icon-share /></b-button>
         </b-button-group>
-        <b-popover target="popover-link" triggers="hover" placement="bottom" container="body" title="URL to Source Data">
+        <b-popover target="popover-link" triggers="hover" placement="bottom" container="body" title="Source Data">
+            <b-row>
+                <b-col cols="2">STAC Version:</b-col>
+                <b-col>{{ stacVersion }}</b-col>
+            </b-row>
+            <b-row v-if="validate">
+                <b-col cols="2">Valid:</b-col>
+                <b-col><Valid :stacUrl="stacUrl" /></b-col>
+            </b-row>
+            <hr />
             <Url id="stacUrl" :url="stacUrl" label="The STAC metdata file is located at:" />
         </b-popover>
         <b-popover target="popover-share" triggers="hover" placement="bottom" container="body" title="Share">
@@ -23,6 +32,7 @@ import {
     BPopover } from 'bootstrap-vue';
 
 import Url from './Url.vue';
+import Valid from './Valid.vue';
 
 export default {
     name: "Share",
@@ -34,7 +44,8 @@ export default {
         BIconShare,
         BIconTwitter,
         BPopover,
-        Url
+        Url,
+        Valid
     },
     props: {
         title: {
@@ -44,9 +55,15 @@ export default {
         stacUrl: {
             type: String,
             required: true
+        },
+        stacVersion: {
+            type: String
         }
     },
     computed: {
+        validate() {
+            return STAC_LINT;
+        },
         message() {
             return `${this.title} is available at ${this.browserUrl()}`;
         },

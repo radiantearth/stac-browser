@@ -68,7 +68,8 @@
       "TILE_PROXY_URL": "readonly",
       "PATH_PREFIX": "readonly",
       "HISTORY_MODE": "readonly",
-      "STAC_BROWSER_VERSION": "readonly"
+      "STAC_BROWSER_VERSION": "readonly",
+      "STAC_LINT": "readonly"
     },
     "extends": [
       "plugin:vue/essential",

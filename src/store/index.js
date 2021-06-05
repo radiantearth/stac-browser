@@ -21,7 +21,19 @@ export default new Vuex.Store({
     data: {},
     loading: true,
     error: null,
-    database: {}
+    valid: null,
+    database: {},
+    supportedRelTypes: [ // These will be handled in a special way and will not be shown in the link lists
+      'child',
+      'data',
+      'item',
+      'items',
+      'license',
+      'parent',
+      'preview',
+      'root',
+      'self',
+    ]
   },
   getters: {
     parents: state => {
@@ -35,6 +47,24 @@ export default new Vuex.Store({
     },
     isItem: state => {
       return state.data.type === 'Feature';
+    },
+    items: state => {
+      return state.data.type === 'Feature';
+    },
+    children: state => {
+      return state.data.type === 'Feature';
+    },
+    additionalLinks: state => {
+      return Array.isArray(state.data.links) && state.data.links.filter(link => Utils.isObject(link) && !state.supportedRelTypes.includes(link.rel));
+    },
+    thumbnails: state => {
+      let thumbnails = [];
+      // Get from links
+      thumbnails.concat(Array.isArray(state.data.links) && state.data.links.filter(link => Utils.isObject(link) && link.rel === 'preview'));
+      // ToDo: Get from assets
+
+      // Return unique values
+      return thumbnails;
     },
     getTileSource: (state, getters) => assetHref => {
       const proxiedUri = getters.getTileProxiedUrl(assetHref);
@@ -87,6 +117,7 @@ export default new Vuex.Store({
     },
     loading(state, url) {
       state.url = url;
+      state.valid = null;
       state.data = {};
       state.error = null;
       state.loading = true;
@@ -100,6 +131,9 @@ export default new Vuex.Store({
       state.data = {};
 			state.error = error;
       state.loading = false;
+		},
+		valid(state, valid) {
+      state.valid = valid;
 		},
     add(state, path, data) {
       Vue.set(state.database, path, data);
@@ -127,6 +161,23 @@ export default new Vuex.Store({
         }
       } catch (error) {
         cx.commit('errored', error.message);
+      }
+    },
+    async validate(cx, url) {
+      if (typeof cx.state.valid === 'boolean') {
+        return;
+      }
+      try {
+        let proxiedUrl = cx.getters.getProxiedUrl(`https://api.staclint.com/url?stac_url=${url}`);
+        await axios.get(proxiedUrl);
+        cx.commit('valid', true);
+      } catch (error) {
+        if (error.response && error.response.status === 422) {
+          cx.commit('valid', false);
+        }
+        else {
+          cx.commit('valid', error);
+        }
       }
     },
     async fetch() {

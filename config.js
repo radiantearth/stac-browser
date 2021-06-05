@@ -5,5 +5,6 @@ module.exports = {
     STAC_PROXY_URL: null,
     TILE_PROXY_URL: null,
     PATH_PREFIX: "/",
-    HISTORY_MODE: "history"
+    HISTORY_MODE: "history",
+    STAC_LINT: true
 };

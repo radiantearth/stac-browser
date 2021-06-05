@@ -5,7 +5,7 @@
         <h1>{{ title }}</h1>
       </b-col>
       <b-col :md="1">
-        <Share :title="title" :stacUrl="url" />
+        <Share :title="title" :stacUrl="url" :stacVersion="data.stac_version" />
       </b-col>
     </b-row>
     <b-row>
