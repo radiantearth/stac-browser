@@ -13,6 +13,7 @@ module.exports = {
 			args[0].TILE_PROXY_URL = getVar('TILE_PROXY_URL');
 			args[0].PATH_PREFIX = getVar('PATH_PREFIX');
 			args[0].HISTORY_MODE = getVar('HISTORY_MODE');
+			args[0].STAC_LINT = getVar('STAC_LINT');
 			return args;
 		});
         config.plugin('html').tap(args => {

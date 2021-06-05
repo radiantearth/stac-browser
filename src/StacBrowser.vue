@@ -22,7 +22,7 @@ import Vue from "vue";
 
 import Breadcrumb from './components/Breadcrumb.vue';
 
-import { AlertPlugin, BadgePlugin, BreadcrumbPlugin, ButtonGroupPlugin, ButtonPlugin, LayoutPlugin, SpinnerPlugin } from "bootstrap-vue";
+import { AlertPlugin, BadgePlugin, BreadcrumbPlugin, ButtonGroupPlugin, ButtonPlugin, CardPlugin, LayoutPlugin, SpinnerPlugin, TablePlugin, TabsPlugin } from "bootstrap-vue";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
 
@@ -30,16 +30,24 @@ import Clipboard from 'v-clipboard'
 
 import router from "./router";
 import store from "./store";
+import { mapGetters } from 'vuex';
+
+import StacFields from '@radiantearth/stac-fields';
 
 Vue.use(AlertPlugin);
 Vue.use(ButtonGroupPlugin);
 Vue.use(ButtonPlugin);
 Vue.use(BadgePlugin);
 Vue.use(BreadcrumbPlugin);
+Vue.use(CardPlugin);
 Vue.use(LayoutPlugin);
 Vue.use(SpinnerPlugin);
+Vue.use(TablePlugin);
+Vue.use(TabsPlugin);
 
-Vue.use(Clipboard)
+Vue.use(Clipboard);
+
+Vue.prototype.fields = StacFields;
 
 export default {
   name: 'StacBrowser',
@@ -53,7 +61,7 @@ export default {
       type: String,
       default: CATALOG_URL
     },
-    title: {
+    defaultTitle: {
       type: String,
       default: CATALOG_TITLE
     },
@@ -71,16 +79,20 @@ export default {
     }
   },
   watch: {
+    title(title) {
+      document.title = title;
+    },
     url: {
       immediate: true,
       handler(url) {
         this.$store.commit('baseUrl', url);
       }
     },
-    title: {
+    defaultTitle: {
       immediate: true,
       handler(title) {
-        this.$store.commit('title', title);
+        this.$store.commit('defaultTitle', title);
+        document.title = title;
       }
     },
     tileSourceTemplate: {
@@ -103,6 +115,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(['title']),
     browserVersion() {
       return STAC_BROWSER_VERSION;
     }

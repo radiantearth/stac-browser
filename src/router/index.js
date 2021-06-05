@@ -5,44 +5,31 @@ Vue.use(VueRouter);
 
 const routes = [
   {
-    path: "/",
-    name: "Root Catalog",
-    component: () => import(/* webpackChunkName: "catalog" */ "../views/Catalog.vue")
-  },
-  {
     path: "/collection/:collection",
-    name: "OGC API Collection",
+    name: "api-collection",
     component: () => import(/* webpackChunkName: "catalog" */ "../views/Catalog.vue"),
     props: route => {
-      console.log(route);
+      console.log(route); // ToDo
       return {};
     }
   },
   {
     path: "/collection/:collection/:item",
-    name: "OGC API Item",
+    name: "api-item",
     component: () => import(/* webpackChunkName: "item" */ "../views/Item.vue"),
     props: route => {
-      console.log(route);
+      console.log(route); // ToDo
       return {};
     }
   },
   {
-    path: "/item/(.*)",
-    name: "Static Item",
-    component: () => import(/* webpackChunkName: "item" */ "../views/Item.vue"),
+    path: "(.*)",
+    name: "browse",
+    component: () => import(/* webpackChunkName: "browse" */ "../views/Browse.vue"),
     props: route => {
-      console.log(route);
-      return {};
-    }
-  },
-  {
-    path: "/catalog/(.*)",
-    name: "Static Catalog / Collection",
-    component: () => import(/* webpackChunkName: "catalog" */ "../views/Catalog.vue"),
-    props: route => {
-      console.log(route);
-      return {};
+      return {
+        path: route.params.pathMatch
+      };
     }
   }
 ];

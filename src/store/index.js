@@ -1,8 +1,8 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import axios from "axios";
-import Migrate from '@radiantearth/stac-migrate';
 import Utils from '../utils'
+import STAC from '../stac';
 
 Vue.use(Vuex);
 
@@ -12,23 +12,28 @@ export default new Vuex.Store({
 
   },
   state: {
+    // Local settings (i.e. for currently loaded STAC entity)
+    url: '',
+    data: null,
+    valid: null,
+    // Global settings
     baseUrl: null,
-    url: null,
-    title: 'STAC Browser',
+    defaultTitle: '',
     tileSourceTemplate: null,
     stacProxyUrl: null,
     tileProxyUrl: null,
-    data: {},
-    loading: true,
-    error: null,
-    valid: null,
     database: {},
     supportedRelTypes: [ // These will be handled in a special way and will not be shown in the link lists
       'child',
+      'collection',
       'data',
+      'first',
       'item',
       'items',
+      'last',
       'license',
+      'next',
+      'prev',
       'parent',
       'preview',
       'root',
@@ -36,46 +41,50 @@ export default new Vuex.Store({
     ]
   },
   getters: {
-    parents: state => {
-      return state; // TODO
-    },
-    isCollection: state => {
-      return  state.data.type === 'Collection';
-    },
-    isCatalog: state => {
-      return state.data.type === 'Catalog';
-    },
-    isItem: state => {
-      return state.data.type === 'Feature';
-    },
+    loading: state => !state.database[state.url],
+    error: state => state.database[state.url] instanceof Error ? state.database[state.url] : null,
+    getStac: state => url => state.database[url] ? state.database[url] : null,
+    isCollection: state => state.data ? state.data.isCollection() : false,
+    isCatalog: state => state.data ? state.data.isCatalog() : false,
+    isCatalogLike: state => state.data ? state.data.isCatalogLike() : false,
+    isItem: state => state.data ? state.data.isItem() : false,
+    title: state => state.data ? state.data.getDisplayTitle() : STAC.DEFAULT_TITLE,
     items: state => {
-      return state.data.type === 'Feature';
+      // ToDo: API & Pagination support(?)
+      return state.data ? state.data.getLinksWithRels(['item']) : [];
     },
-    children: state => {
-      return state.data.type === 'Feature';
+    catalogs: state => {
+      // ToDo: API & Pagination support(?)
+      return state.data ? state.data.getLinksWithRels(['child']) : [];
     },
-    additionalLinks: state => {
-      return Array.isArray(state.data.links) && state.data.links.filter(link => Utils.isObject(link) && !state.supportedRelTypes.includes(link.rel));
+    additionalLinks: state => state.data ? state.data.getLinksWithOtherRels(state.supportedRelTypes) : [],
+    thumbnails: state => state.data ? state.data.getThumbnails() :  [],
+    toBrowserPath: state => (url, baseUrl = null) => {
+      // ToDo: proxy support
+      if (!Utils.hasText(url)) {
+        url = '/';
+      }
+      if (baseUrl === null) {
+        baseUrl = state.url;
+      }
+      return '/' + Utils.toAbsolute(url, state.url, false).relativeTo(state.baseUrl).toString();
     },
-    thumbnails: state => {
-      let thumbnails = [];
-      // Get from links
-      thumbnails.concat(Array.isArray(state.data.links) && state.data.links.filter(link => Utils.isObject(link) && link.rel === 'preview'));
-      // ToDo: Get from assets
-
-      // Return unique values
-      return thumbnails;
+    fromBrowserPath: (state, getters) => url => {
+      if (!Utils.hasText(url) || url === '/') {
+        url = state.baseUrl;
+      }
+      return getters.getProxiedUrl(Utils.toAbsolute(url, state.baseUrl));
     },
-    getTileSource: (state, getters) => assetHref => {
-      const proxiedUri = getters.getTileProxiedUrl(assetHref);
-      return state.tileSourceTemplate.replace("{ASSET_HREF}", proxiedUri);
-    },
-    getProxiedUrl: state => url => {
+    getProxiedUrl: state => absoluteUrl => {
       // If we are proxying a STAC Catalog, replace any URI with the proxied address.
       if (Array.isArray(state.stacProxyUrl)) {
-        return url.replace(state.stacProxyUrl[0], state.stacProxyUrl[1]);
+        return absoluteUrl.replace(state.stacProxyUrl[0], state.stacProxyUrl[1]);
       }
-      return url;
+      return absoluteUrl;
+    },
+/*  getTileSource: (state, getters) => assetHref => {
+      const proxiedUri = getters.getTileProxiedUrl(assetHref);
+      return state.tileSourceTemplate.replace("{ASSET_HREF}", proxiedUri);
     },
     getTileProxiedUrl: state => url => {
       // Tile sources can be proxied differently than other assets, replace any asset HREF with the proxied address.
@@ -84,15 +93,14 @@ export default new Vuex.Store({
         return url.replace(state.tileProxyUrl[0], state.tileProxyUrl[1]);
       }
       return url;
-    }
+    } */
   },
   mutations: {
     baseUrl(state, url) {
       state.baseUrl = url;
     },
-    title(state, title) {
-      state.title = title;
-      document.title = title;
+    defaultTitle(state, title) {
+      state.defaultTitle = title;
     },
     tileSourceTemplate(state, tileSourceTemplate) {
       state.tileSourceTemplate = tileSourceTemplate;
@@ -116,51 +124,45 @@ export default new Vuex.Store({
       }
     },
     loading(state, url) {
+      Vue.set(state.database, url, null);
+    },
+    loaded(state, {url, data}) {
+      Vue.set(state.database, url, data);
+    },
+    show(state, url) {
       state.url = url;
+      state.data = state.database[url];
       state.valid = null;
-      state.data = {};
-      state.error = null;
-      state.loading = true;
     },
-    loaded(state, data) {
-      state.data = data;
-			state.error = null;
-      state.loading = false;
-    },
-		errored(state, error) {
-      state.data = {};
-			state.error = error;
-      state.loading = false;
+		errored(state, {url, error}) {
+      if (!(error instanceof Error)) {
+        error = new Error(error);
+      }
+      Vue.set(state.database, url, error);
 		},
 		valid(state, valid) {
       state.valid = valid;
-		},
-    add(state, path, data) {
-      Vue.set(state.database, path, data);
-    }
+		}
   },
   actions: {
-    async load(cx, path = null) {
-      let url = cx.state.baseUrl;
-      if (typeof path === 'string') {
-        url = Utils.resolveUrl(url, path);
-      }
+    async load(cx, {path, show}) {
+      path = Utils.hasText(path) ? path : '/';
+      let url = cx.getters.fromBrowserPath(path);
       cx.commit('loading', url);
-      try {
-        if (typeof cx.state.database[url] === 'undefined') {
-            let proxiedUrl = cx.getters.getProxiedUrl(url);
-            let response = await axios.get(proxiedUrl);
-            if (Utils.isObject(response.data)) {
-                let data = Migrate.stac(response.data);
-                cx.commit('loaded', data);
-                cx.commit('add', path, data);
-            }
-            else {
-              cx.commit('errored', 'The response is not valid STAC');
-            }
+      if (!cx.state.database[url]) {
+        try {
+          let response = await axios.get(url);
+          if (!Utils.isObject(response.data)) {
+            throw new Error('The response is not a valid STAC entity');
+          }
+          let data = new STAC(response.data, url, path);
+          cx.commit('loaded', {url, data});
+        } catch (error) {
+          cx.commit('errored', {url, error});
         }
-      } catch (error) {
-        cx.commit('errored', error.message);
+        if (show) {
+          cx.commit('show', url);
+        }
       }
     },
     async validate(cx, url) {
@@ -168,8 +170,7 @@ export default new Vuex.Store({
         return;
       }
       try {
-        let proxiedUrl = cx.getters.getProxiedUrl(`https://api.staclint.com/url?stac_url=${url}`);
-        await axios.get(proxiedUrl);
+        await axios.get(`https://api.staclint.com/url?stac_url=${url}`);
         cx.commit('valid', true);
       } catch (error) {
         if (error.response && error.response.status === 422) {

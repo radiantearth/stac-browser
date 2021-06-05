@@ -1,3 +1,5 @@
+import URI from 'urijs';
+
 /**
  * General utilities
  * 
@@ -18,20 +20,13 @@ export default class Utils {
 		return (typeof obj === 'object' && obj === Object(obj) && !Array.isArray(obj));
 	}
 
-    static getLinksWithRel(links, rel) {
-        if (Array.isArray(links)) {
-            return links.filter(link => Utils.isObject(link) && typeof link.href === 'string' && link.rel === rel);
-        }
-        return [];
-    }
-
-	static resolveUrl(base, path) {
-		let url = new URL(path, base);
-		return url.toString();
+	static hasText(str) {
+		return (typeof str === 'string' && str.length > 0);
 	}
 
-	static buildUrl() {
-
+	static toAbsolute(href, baseUrl, stringify = true) {
+		let uri = URI(href).absoluteTo(baseUrl);
+		return stringify ? uri.toString() : uri;
 	}
 
 }
