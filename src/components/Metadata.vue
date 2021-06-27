@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <section class="metadata">
         <template v-for="group in metadata">
             <h4 v-if="group.extension" v-html="group.label" :key="group.extension" />
             <table class="table-responsive" :key="group.extension">
@@ -11,7 +11,7 @@
                 </tbody>
             </table>
         </template>
-    </div>
+    </section>
 </template>
 
 <script>
@@ -31,47 +31,49 @@ export default {
 
 </script>
 
-<style>
-.metadata td.title {
-  font-weight: bold;
-  width: 33%;
-  text-align: right;
-  vertical-align: top;
-}
-.metadata ul, .metadata ol {
-    padding-left: 2em;
-}
-.metadata-object .metadata-object {
-    margin-left: 1em;
-}
-.metadata dl {
-    margin: 0;
-    margin-left: 1em;
-}
-.metadata ul > li > dl, .metadata ol > li > dl {
-    margin-left: 0;
-}
-.metadata dt {
-    display: inline;
-}
-.metadata dt:after {
-    content: ': ';
-}
-.metadata dd {
-    display: inline;
-}
-.metadata dd:after {
-    content: "\A";
-    white-space: pre;
-    line-height: 1px;
-}
-.metadata dd:last-of-type:after {
-    content: "";
-    white-space: normal;
-}
-.metadata .provider .description {
-    font-size: 0.9em;
-    line-height: 1.5em;
-    margin-bottom: 0.5em;
+<style lang="scss">
+.metadata {
+    td.title {
+        font-weight: bold;
+        width: 33%;
+        text-align: right;
+        vertical-align: top;
+    }
+    ul, ol {
+        padding-left: 2em;
+    }
+    .metadata-object .metadata-object {
+        margin-left: 1em;
+    }
+    dl {
+        margin: 0;
+        margin-left: 1em;
+    }
+    ul > li > dl, ol > li > dl {
+        margin-left: 0;
+    }
+    dt {
+        display: inline;
+    }
+    dt:after {
+        content: ': ';
+    }
+    dd {
+        display: inline;
+    }
+    dd:after {
+        content: "\A";
+        white-space: pre;
+        line-height: 1px;
+    }
+    dd:last-of-type:after {
+        content: "";
+        white-space: normal;
+    }
+    .provider .description {
+        font-size: 0.9em;
+        line-height: 1.5em;
+        margin-bottom: 0.5em;
+    }
 }
 </style>

@@ -2,8 +2,14 @@
 @import '~bootstrap-vue/src/index.scss';
 
 #stac-browser {
+    max-width: 1600px;
+
     header {
         margin: $block-margin auto;
+        
+        .lead {
+            color: $secondary;
+        }
     }
     .logo {
         @if $logo == 'image' {
@@ -20,9 +26,6 @@
             display: none;
         }
         margin-bottom: $block-margin;
-    }
-    nav {
-        margin: $block-margin auto;
     }
     main {
         margin: $block-margin auto;
@@ -44,6 +47,13 @@
             color: $dark;
             text-transform: uppercase;
         }
+    }
+
+    .map.main {
+        height: 400px;
+        background-color: transparent;
+        border: $border-width solid $border-color;
+        @include border-radius($border-radius);
     }
 }
 

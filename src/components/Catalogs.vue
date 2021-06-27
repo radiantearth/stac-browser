@@ -1,23 +1,24 @@
 <template>
-  <ul>
-    <li v-for="catalog in catalogs" :key="catalog.href">
-      <StacLink :link="catalog" />
-    </li>
-  </ul>
+  <section>
+    <h2>Catalogs</h2>
+    <b-card-group columns>
+      <Catalog v-for="catalog in catalogs" :catalog="catalog" :key="catalog.href" />
+    </b-card-group>
+  </section>
 </template>
 
 <script>
-import StacLink from './StacLink.vue';
+import Catalog from './Catalog.vue';
 
 export default {
   name: "Catalogs",
   components: {
-    StacLink
+    Catalog
   },
   props: {
     catalogs: {
       type: Array,
-      default: () => ([])
+      required: true
     }
   }
 };

@@ -42,20 +42,20 @@ class STAC {
         return null;
     }
 
-	getDisplayTitle(defaultTitle = STAC.DEFAULT_TITLE) {
-		if (this.isItem() && Utils.hasText(this.properties.title)) {
-			return this.properties.title;
-		}
-		else if (Utils.hasText(this.title)) {
-			return this.title;
-		}
-		else if (Utils.hasText(this.id)) {
-			return this.id;
-		}
-		else {
-			return defaultTitle;
-		}
-	}
+    getDisplayTitle(defaultTitle = STAC.DEFAULT_TITLE) {
+        if (this.isItem() && Utils.hasText(this.properties.title)) {
+            return this.properties.title;
+        }
+        else if (Utils.hasText(this.title)) {
+            return this.title;
+        }
+        else if (Utils.hasText(this.id)) {
+            return this.id;
+        }
+        else {
+            return defaultTitle;
+        }
+    }
 
     getBrowserPath() {
         return this.path;
@@ -65,28 +65,28 @@ class STAC {
         return this.url;
     }
 
-	getLinkWithRel(rel) {
-		return this.links.find(link => Utils.isObject(link) && typeof link.href === 'string' && link.rel === rel);
-	}
+    getLinkWithRel(rel) {
+        return this.links.find(link => Utils.isObject(link) && typeof link.href === 'string' && link.rel === rel);
+    }
 
-	getLinksWithRels(rels) {
-		return this.links.filter(link => Utils.isObject(link) && typeof link.href === 'string' && rels.includes(link.rel));
-	}
+    getLinksWithRels(rels) {
+        return this.links.filter(link => Utils.isObject(link) && typeof link.href === 'string' && rels.includes(link.rel));
+    }
 
-	getLinksWithOtherRels(rels) {
-		return this.links.filter(link => Utils.isObject(link) && typeof link.href === 'string' && !rels.includes(link.rel));
-	}
+    getLinksWithOtherRels(rels) {
+        return this.links.filter(link => Utils.isObject(link) && typeof link.href === 'string' && !rels.includes(link.rel));
+    }
 
-	getAssetsWithRoles(roles) {
-		let matches = [];
+    getAssetsWithRoles(roles) {
+        let matches = [];
         for(let key in this.assets) {
             let asset = this.assets[key];
             if (Utils.isObject(asset) && typeof asset.href === 'string' && Array.isArray(asset.roles) && roles.find(role => asset.roles.includes(role))) {
                 matches.push(asset);
             }
         }
-		return matches;
-	}
+        return matches;
+    }
 
     getThumbnails() {
       // Get from assets

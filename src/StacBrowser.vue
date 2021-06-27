@@ -1,9 +1,12 @@
 <template>
   <b-container id="stac-browser">
+    <b-sidebar id="sidebar" title="Browse" shadow lazy>
+      <Sidebar />
+    </b-sidebar>
     <!-- Header -->
     <header>
-      <div class="logo">{{ title }}</div>
-      <Breadcrumb />
+      <div class="logo">{{ rootTitle }}</div>
+      <StacHeader />
     </header>
     <!-- Content (Item / Catalog) -->
     <main>
@@ -19,10 +22,9 @@
 
 <script>
 import Vue from "vue";
-
-import Breadcrumb from './components/Breadcrumb.vue';
-
-import { AlertPlugin, BadgePlugin, BreadcrumbPlugin, ButtonGroupPlugin, ButtonPlugin, CardPlugin, LayoutPlugin, SpinnerPlugin, TablePlugin, TabsPlugin } from "bootstrap-vue";
+import {
+  AlertPlugin, BadgePlugin, BreadcrumbPlugin, ButtonGroupPlugin, ButtonPlugin,
+  CardPlugin, LayoutPlugin, SidebarPlugin, SpinnerPlugin, TablePlugin, VBToggle } from "bootstrap-vue";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
 
@@ -30,9 +32,12 @@ import Clipboard from 'v-clipboard'
 
 import router from "./router";
 import store from "./store";
-import { mapGetters } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 
 import StacFields from '@radiantearth/stac-fields';
+
+import Sidebar from './components/Sidebar.vue';
+import StacHeader from './components/StacHeader.vue';
 
 Vue.use(AlertPlugin);
 Vue.use(ButtonGroupPlugin);
@@ -41,9 +46,11 @@ Vue.use(BadgePlugin);
 Vue.use(BreadcrumbPlugin);
 Vue.use(CardPlugin);
 Vue.use(LayoutPlugin);
+Vue.use(SidebarPlugin);
 Vue.use(SpinnerPlugin);
 Vue.use(TablePlugin);
-Vue.use(TabsPlugin);
+
+Vue.directive('b-toggle', VBToggle);
 
 Vue.use(Clipboard);
 
@@ -54,7 +61,8 @@ export default {
   router,
   store,
   components: {
-    Breadcrumb
+    Sidebar,
+    StacHeader
   },
   props: {
     url: {
@@ -88,6 +96,14 @@ export default {
         this.$store.commit('baseUrl', url);
       }
     },
+    baseUrl: {
+      immediate: true,
+      handler(path, oldPath) {
+        if (path !== oldPath) {
+          this.$store.dispatch("load", { path });
+        }
+      },
+    },
     defaultTitle: {
       immediate: true,
       handler(title) {
@@ -115,7 +131,8 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['title']),
+    ...mapState(['baseUrl']),
+    ...mapGetters(['rootTitle']),
     browserVersion() {
       return STAC_BROWSER_VERSION;
     }
@@ -124,6 +141,6 @@ export default {
 </script>
 
 <style lang="scss">
-  @import "./theme/variables.scss";
-  @import "./theme/page.scss";
+@import "./theme/variables.scss";
+@import "./theme/page.scss";
 </style>

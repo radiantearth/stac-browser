@@ -1,45 +1,26 @@
 <template>
   <b-row>
-    <b-col md="8">
-      <b-row>
-        <b-col md="10">
-          <h1>{{ title }}</h1>
-        </b-col>
-        <b-col md="2" class="text-sm-right">
-          <Share :title="title" :stacUrl="url" :stacVersion="data.stac_version" />
-        </b-col>
-      </b-row>
+    <b-col>
       <Description v-if="data.properties.description" :description="data.properties.description" />
-
-      <b-tabs v-model="tabIndex">
-        <b-tab v-if="thumbnails.length > 0" title="Previews">
-          <a v-for="thumbnail in thumbnails" :key="thumbnail.href" :href="thumbnail.href">
-            <img align="center" :src="thumbnail.href" /><!-- ToDo: Show on Leaflet map instead -->
-          </a>
-        </b-tab>
-        <b-tab v-if="additionalLinks.length > 0" title="Links" key="links">
-          <Links :links="additionalLinks" />
-        </b-tab>
-      </b-tabs>
+      <Keywords v-if="Array.isArray(data.properties.keywords) && data.properties.keywords.length > 0" :keywords="data.properties.keywords" />
+      <!-- ToDo: Show on Leaflet map instead -->
+      <!-- <h2 v-if="thumbnails.length > 0">Preview</h2>
+      <a v-for="thumbnail in thumbnails" :key="thumbnail.href" :href="thumbnail.href">
+        <img align="center" :src="thumbnail.href" />
+      </a> -->
+      <Assets v-if="assets.length > 0" :assets="assets" />
     </b-col>
-    <b-col md="4">
-      <div class="metadata">
-        <b-card header="Metadata">
-          <table class="table">
-            <tr v-if="data.license">
-              <td>License</td>
-              <td>Apache</td>
-            </tr>
-          </table>
-        </b-card>
-        <Metadata :metadata="data" />
-      </div>
+    <b-col>
+      <Map :stac="data" />
+      <Metadata :metadata="data" />
+      <Links v-if="additionalLinks.length > 0" title="Additional resources" :links="additionalLinks" />
     </b-col>
   </b-row>
 </template>
 
 <script>
 import { mapState, mapGetters } from 'vuex';
+import Assets from '../components/Assets.vue';
 import Description from '../components/Description.vue';
 import Links from '../components/Links.vue';
 import Metadata from '../components/Metadata.vue';
@@ -47,19 +28,15 @@ import Metadata from '../components/Metadata.vue';
 export default {
   name: "Item",
   components: {
+    Assets,
     Description,
     Links,
-    Share: () => import('../components/Share.vue'),
+    Map: () => import('../components/Map.vue'),
     Metadata
-  },
-  data() {
-    return {
-      tabIndex: 0
-    };
   },
   computed: {
     ...mapState(['data', 'url']),
-    ...mapGetters(['additionalLinks', 'thumbnails', 'title'])
+    ...mapGetters(['additionalLinks', 'thumbnails', 'assets'])
   }
 };
 </script>

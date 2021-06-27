@@ -48,6 +48,6 @@ export default {
         }
       },
     },
-  },
+  }
 };
 </script>

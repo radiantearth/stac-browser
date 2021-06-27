@@ -70,7 +70,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .popover {
     width: 100%;
     max-width: 800px;

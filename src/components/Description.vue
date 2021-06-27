@@ -1,5 +1,5 @@
 <template>
-	<div class="vue-component styled-description" :class="{compact: compact}" v-html="markup(description)"></div>
+	<div class="styled-description" :class="{compact: compact}" v-html="markup(description)"></div>
 </template>
 
 <script>
@@ -37,39 +37,42 @@ export default {
 }
 </script>
 
-<style>
-.vue-component.styled-description {
+<style lang="scss">
+.styled-description.compact {
+	p {
+		margin: 0.5em 0;
+	}
+	p:first-child {
+		margin-top: 0;
+	}
+	p:last-child {
+		margin-bottom: 0;
+	}
+	pre {
+		max-height: 7em;
+		width: auto;
+		max-width: 100%;
+	}
+}
+.styled-description {
 	line-height: 1.25em;
-}
-.vue-component.styled-description.compact p {
-	margin: 0.5em 0;
-}
-.vue-component.styled-description.compact p:first-child {
-	margin-top: 0;
-}
-.vue-component.styled-description.compact p:last-child {
-	margin-bottom: 0;
-}
-.vue-component.styled-description pre {
-	background-color: #eee;
-	width: 100%;
-	border: 1px solid #ccc;
-	max-height: 15em;
-	overflow-y: auto;
-}
-.vue-component.styled-description.compact pre {
-	max-height: 7em;
-	width: auto;
-	max-width: 100%;
-}
-.vue-component.styled-description pre code {
-	background-color: transparent; 
-	display: block;
-	margin: 0.5em;
-}
-.vue-component.styled-description code {
-	color: maroon;
-	display: inline-block;
-	padding: 0 0.1em;
+
+	pre {
+		background-color: #eee;
+		width: 100%;
+		border: 1px solid #ccc;
+		max-height: 15em;
+		overflow-y: auto;
+	}
+	pre code {
+		background-color: transparent; 
+		display: block;
+		margin: 0.5em;
+	}
+	code {
+		color: maroon;
+		display: inline-block;
+		padding: 0 0.1em;
+	}
 }
 </style>

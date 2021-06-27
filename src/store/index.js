@@ -12,10 +12,11 @@ export default new Vuex.Store({
 
   },
   state: {
-    // Local settings (i.e. for currently loaded STAC entity)
+    // Local settings (e.g. for currently loaded STAC entity)
     url: '',
     data: null,
     valid: null,
+    title: CATALOG_TITLE,
     // Global settings
     baseUrl: null,
     defaultTitle: '',
@@ -37,6 +38,7 @@ export default new Vuex.Store({
       'parent',
       'preview',
       'root',
+      'search',
       'self',
     ]
   },
@@ -48,7 +50,9 @@ export default new Vuex.Store({
     isCatalog: state => state.data ? state.data.isCatalog() : false,
     isCatalogLike: state => state.data ? state.data.isCatalogLike() : false,
     isItem: state => state.data ? state.data.isItem() : false,
-    title: state => state.data ? state.data.getDisplayTitle() : STAC.DEFAULT_TITLE,
+    stacVersion: state => state.data && state.data.stac_version ? state.data.stac_version : null,
+    root: (state, getters) => getters.getStac(state.baseUrl),
+    rootTitle: (state, getters) => getters.root ? getters.root.getDisplayTitle(CATALOG_TITLE) : CATALOG_TITLE,
     items: state => {
       // ToDo: API & Pagination support(?)
       return state.data ? state.data.getLinksWithRels(['item']) : [];
@@ -58,7 +62,9 @@ export default new Vuex.Store({
       return state.data ? state.data.getLinksWithRels(['child']) : [];
     },
     additionalLinks: state => state.data ? state.data.getLinksWithOtherRels(state.supportedRelTypes) : [],
-    thumbnails: state => state.data ? state.data.getThumbnails() :  [],
+    assets: state => state.data && Utils.isObject(state.data.assets) ? Object.values(state.data.assets) : [],
+    thumbnails: state => state.data ? state.data.getThumbnails() : [],
+    supportsSearch: () => false, // ToDo
     toBrowserPath: state => (url, baseUrl = null) => {
       // ToDo: proxy support
       if (!Utils.hasText(url)) {
@@ -129,10 +135,20 @@ export default new Vuex.Store({
     loaded(state, {url, data}) {
       Vue.set(state.database, url, data);
     },
-    show(state, url) {
-      state.url = url;
-      state.data = state.database[url];
+    show(state, { url, title }) {
+      let stac = state.database[url] || null;
+      state.url = url || null;
+      state.data = stac;
       state.valid = null;
+      if (title) {
+        state.title = title;
+      }
+      else if (stac) {
+        state.title = stac.getDisplayTitle(STAC.DEFAULT_TITLE);
+      }
+      else {
+        state.title = CATALOG_TITLE;
+      }
     },
 		errored(state, {url, error}) {
       if (!(error instanceof Error)) {
@@ -161,7 +177,7 @@ export default new Vuex.Store({
           cx.commit('errored', {url, error});
         }
         if (show) {
-          cx.commit('show', url);
+          cx.commit('show', {url});
         }
       }
     },
