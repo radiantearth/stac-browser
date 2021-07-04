@@ -181,8 +181,8 @@ export default new Vuex.Store({
         url = Utils.toAbsolute(url, cx.state.url);
         path = cx.getters.toBrowserPath(url);
       }
-      cx.commit('loading', url);
       if (!cx.state.database[url]) {
+        cx.commit('loading', url);
         try {
           let response = await axios.get(url);
           if (!Utils.isObject(response.data)) {
@@ -193,9 +193,9 @@ export default new Vuex.Store({
         } catch (error) {
           cx.commit('errored', {url, error});
         }
-        if (show) {
-          cx.commit('show', {url});
-        }
+      }
+      if (show) {
+        cx.commit('show', {url});
       }
     },
     async validate(cx, url) {

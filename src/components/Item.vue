@@ -8,6 +8,9 @@
       <template v-else-if="data && data.properties.datetime">{{ data.properties.datetime | Timestamp }}</template>
       <template v-else>No time given</template>
     </small></b-card-text>
+    <b-card-text v-if="fileFormats.length > 0">
+      <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="mr-1 mt-1">{{ format | MediaType }}</b-badge>
+    </b-card-text>
   </b-card>
 </template>
 
@@ -54,6 +57,15 @@ export default {
         return [this.data.properties.start_datetime, this.data.properties.end_datetime];
       }
       return null;
+    },
+    fileFormats() {
+      if (!this.data) {
+        return [];
+      }
+      return Object.values(this.data.assets)
+        .filter(asset => Array.isArray(asset.roles) && asset.roles.includes('data') && typeof asset.type === 'string') // Look for data files
+        .map(asset => asset.type) // Array shall only contain media types
+        .filter((v, i, a) => a.indexOf(v) === i); // Unique values
     }
   },
   methods: {
