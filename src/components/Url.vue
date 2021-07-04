@@ -11,8 +11,7 @@
 </template>
 
 <script>
-import { 
-    BButton,
+import {
     BFormInput, BFormGroup,
     BIconClipboard, BIconClipboardCheck, BIconArrowUpRightSquare,
     BInputGroup, BInputGroupAppend } from 'bootstrap-vue';
@@ -20,7 +19,6 @@ import {
 export default {
     name: "Share",
     components: {
-        BButton,
         BFormGroup,
         BFormInput,
         BIconClipboard,

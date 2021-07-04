@@ -23,8 +23,9 @@
 <script>
 import Vue from "vue";
 import {
-  AlertPlugin, BadgePlugin, BreadcrumbPlugin, ButtonGroupPlugin, ButtonPlugin,
-  CardPlugin, LayoutPlugin, SidebarPlugin, SpinnerPlugin, TablePlugin, VBToggle } from "bootstrap-vue";
+  AlertPlugin, BadgePlugin, ButtonGroupPlugin, ButtonPlugin,
+  CardPlugin, LayoutPlugin, SidebarPlugin, SpinnerPlugin, TablePlugin,
+  VBToggle, VBVisible } from "bootstrap-vue";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
 
@@ -43,14 +44,22 @@ Vue.use(AlertPlugin);
 Vue.use(ButtonGroupPlugin);
 Vue.use(ButtonPlugin);
 Vue.use(BadgePlugin);
-Vue.use(BreadcrumbPlugin);
 Vue.use(CardPlugin);
 Vue.use(LayoutPlugin);
 Vue.use(SidebarPlugin);
 Vue.use(SpinnerPlugin);
 Vue.use(TablePlugin);
 
+// For collapsibles / accordions
 Vue.directive('b-toggle', VBToggle);
+// Used to detect when a catalog/item becomes visible so that further data can be loaded
+Vue.directive('b-visible', VBVisible);
+
+for(let name in StacFields.Formatters) {
+  if (name.startsWith('format')) {
+    Vue.filter(name.replace(/^format/, ''), StacFields.Formatters[name]);
+  }
+}
 
 Vue.use(Clipboard);
 
@@ -98,9 +107,9 @@ export default {
     },
     baseUrl: {
       immediate: true,
-      handler(path, oldPath) {
-        if (path !== oldPath) {
-          this.$store.dispatch("load", { path });
+      handler(url, oldUrl) {
+        if (url !== oldUrl) {
+          this.$store.dispatch("load", { url });
         }
       },
     },

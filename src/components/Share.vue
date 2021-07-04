@@ -1,8 +1,8 @@
 <template>
     <div class="share mt-1">
         <b-button-group>
-            <b-button v-show="stacUrl" size="sm" variant="light" id="popover-link"><b-icon-link /></b-button>
-            <b-button size="sm" variant="light" id="popover-share"><b-icon-share /></b-button>
+            <b-button v-show="stacUrl" size="sm" variant="outline-primary" id="popover-link"><b-icon-link /></b-button>
+            <b-button size="sm" variant="outline-primary" id="popover-share"><b-icon-share /></b-button>
         </b-button-group>
         <b-popover v-show="stacUrl" target="popover-link" triggers="hover" placement="bottom" container="body" title="Source Data">
             <b-row v-if="stacVersion">

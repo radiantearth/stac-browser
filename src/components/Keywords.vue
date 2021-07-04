@@ -1,6 +1,6 @@
 <template>
-    <p class="keywords">
-        <b-badge v-for="keyword in keywords" :key="keyword" variant="secondary" class="mr-1 mb-1">{{ keyword }}</b-badge>&nbsp;
+    <p class="keywords d-flex">
+        <b-badge v-for="keyword in keywords" :key="keyword" variant="secondary" class="mr-1 mb-1">{{ keyword }}</b-badge>
     </p>
 </template>
 

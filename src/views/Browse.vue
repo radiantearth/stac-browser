@@ -44,7 +44,7 @@ export default {
       immediate: true,
       handler(path, oldPath) {
         if (path !== oldPath) {
-          this.$store.dispatch("load", { path, show: true });
+          this.$store.dispatch("load", { url: path || '/', fromBrowser: true, show: true });
         }
       },
     },

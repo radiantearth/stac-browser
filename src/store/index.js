@@ -45,7 +45,16 @@ export default new Vuex.Store({
   getters: {
     loading: state => !state.database[state.url],
     error: state => state.database[state.url] instanceof Error ? state.database[state.url] : null,
-    getStac: state => url => state.database[url] ? state.database[url] : null,
+    getStac: state => (url, returnErrorObject = false) => {
+      let absoluteUrl = Utils.toAbsolute(url, state.url);
+      let data = state.database[absoluteUrl];
+      if (!returnErrorObject && data instanceof Error) {
+        return null;
+      }
+      else {
+        return data;
+      }
+    },
     isCollection: state => state.data ? state.data.isCollection() : false,
     isCatalog: state => state.data ? state.data.isCatalog() : false,
     isCatalogLike: state => state.data ? state.data.isCatalogLike() : false,
@@ -62,7 +71,8 @@ export default new Vuex.Store({
       return state.data ? state.data.getLinksWithRels(['child']) : [];
     },
     additionalLinks: state => state.data ? state.data.getLinksWithOtherRels(state.supportedRelTypes) : [],
-    assets: state => state.data && Utils.isObject(state.data.assets) ? Object.values(state.data.assets) : [],
+    hasAssets: state => Boolean(state.data && Utils.size(state.data.assets) > 0),
+    assets: state => state.data && Utils.isObject(state.data.assets) ? state.data.assets : [],
     thumbnails: state => state.data ? state.data.getThumbnails() : [],
     supportsSearch: () => false, // ToDo
     toBrowserPath: state => (url, baseUrl = null) => {
@@ -103,7 +113,7 @@ export default new Vuex.Store({
   },
   mutations: {
     baseUrl(state, url) {
-      state.baseUrl = url;
+      state.baseUrl = Utils.toAbsolute(url, url); // This call is made to normalize the URL, e.g. append a missing /
     },
     defaultTitle(state, title) {
       state.defaultTitle = title;
@@ -143,7 +153,7 @@ export default new Vuex.Store({
       if (title) {
         state.title = title;
       }
-      else if (stac) {
+      else if (stac instanceof STAC) {
         state.title = stac.getDisplayTitle(STAC.DEFAULT_TITLE);
       }
       else {
@@ -161,9 +171,16 @@ export default new Vuex.Store({
 		}
   },
   actions: {
-    async load(cx, {path, show}) {
-      path = Utils.hasText(path) ? path : '/';
-      let url = cx.getters.fromBrowserPath(path);
+    async load(cx, {url, fromBrowser, show}) {
+      let path;
+      if (fromBrowser) {
+        path = url;
+        url = cx.getters.fromBrowserPath(url);
+      }
+      else {
+        url = Utils.toAbsolute(url, cx.state.url);
+        path = cx.getters.toBrowserPath(url);
+      }
       cx.commit('loading', url);
       if (!cx.state.database[url]) {
         try {
@@ -198,15 +215,6 @@ export default new Vuex.Store({
       }
     },
     async fetch() {
-
-    },
-    async loadRoot() {
-
-    },
-    async loadParents() {
-
-    },
-    async loadItems() {
 
     }
   },

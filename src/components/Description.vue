@@ -39,6 +39,11 @@ export default {
 
 <style lang="scss">
 .styled-description.compact {
+	h1, h2, h3, h4, h5, h6 {
+		font-weight: bold;
+		font-size: 1.1em;
+		margin: 0.5em 0;
+	}
 	p {
 		margin: 0.5em 0;
 	}
@@ -57,6 +62,24 @@ export default {
 .styled-description {
 	line-height: 1.25em;
 
+	h1 {
+		font-size: 1.75rem;
+	}
+	h2 {
+		font-size: 1.5em;
+	}
+	h3 {
+		font-size: 1.35em;
+	}
+	h4 {
+		font-size: 1.2em;
+	}
+	h5 {
+		font-size: 1.1em;
+	}
+	h6 {
+		font-size: 1.0em;
+	}
 	pre {
 		background-color: #eee;
 		width: 100%;

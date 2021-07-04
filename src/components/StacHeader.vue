@@ -4,7 +4,7 @@
       <h1>{{ title }}</h1>
       <p class="lead">
         <span class="in" v-if="rootLink">in <StacLink :link="rootLink" /></span>
-        <b-button variant="primary" size="sm" v-b-toggle.sidebar><b-icon-search /> Browse</b-button>
+        <b-button variant="outline-primary" size="sm" v-b-toggle.sidebar><b-icon-search /> Browse</b-button>
       </p>
     </b-col>
     <b-col md="2" class="text-sm-right">

@@ -1,9 +1,9 @@
 <template>
   <section class="assets">
     <h2>Assets</h2>
-    <b-card-group columns>
-      <Asset v-for="asset in assets" :asset="asset" :key="asset.href" />
-    </b-card-group>
+    <div class="accordion" role="tablist">
+      <Asset v-for="(asset, key) in assets" :asset="asset" :id="key" :key="key" />
+    </div>
   </section>
 </template>
 
@@ -17,7 +17,7 @@ export default {
   },
   props: {
     assets: {
-      type: Array,
+      type: Object,
       required: true
     }
   }

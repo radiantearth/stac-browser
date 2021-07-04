@@ -3,8 +3,8 @@
     <l-control-fullscreen />
     <l-tile-layer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
     <!-- ToDo: Replace with STAC Leaflet plugin; use minimap plugin? -->
-    <l-geo-json v-if="isGeoJSON" :geojson="stac" />
-    <l-rectangle v-else-if="bbox" :bounds="bbox" />
+    <l-geo-json v-if="isGeoJSON" ref="bounds" @ready="fitBounds" :geojson="stac" />
+    <l-rectangle v-else-if="bbox" ref="bounds" @ready="fitBounds" :bounds="bbox" />
   </l-map>
 </template>
 
@@ -25,7 +25,8 @@ export default {
   },
   data() {
     return {
-      map: null
+      map: null,
+      boundsLayer: null
     };
   },
   props: {
@@ -39,7 +40,7 @@ export default {
       return this.stac.isItem();
     },
     bbox() {
-      if (this.stac.isCollection()) {
+      if (this.stac.isCollection() && this.stac.extent.spatial.bbox.length > 0) {
         let bbox = this.stac.extent.spatial.bbox[0];
         return [[bbox[1], bbox[2]], [bbox[3], bbox[0]]];
       }
@@ -48,7 +49,11 @@ export default {
   },
   methods: {
     init() {
-        this.map = this.$refs.leaflet.mapObject;
+      this.map = this.$refs.leaflet.mapObject;
+    },
+    fitBounds() {
+      this.boundsLayer = this.$refs.bounds.mapObject;
+      this.map.fitBounds(this.boundsLayer.getBounds(), { padding: [90, 90] });
     }
   }
 }

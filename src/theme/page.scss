@@ -4,7 +4,7 @@
 #stac-browser {
     max-width: 1600px;
 
-    header {
+    > header {
         margin: $block-margin auto;
         
         .lead {
@@ -27,10 +27,10 @@
         }
         margin-bottom: $block-margin;
     }
-    main {
+    > main {
         margin: $block-margin auto;
     }
-    footer {
+    > footer {
         margin: $block-margin auto;
         text-align: center;
     }
@@ -55,8 +55,12 @@
         border: $border-width solid $border-color;
         @include border-radius($border-radius);
     }
-}
 
-.twitter {
-    @include button-variant(#1DA1F2, #1DA1F2);
+    .styled-description {
+        text-align: justify;
+    }
+
+    .twitter {
+        @include button-variant(#1DA1F2, #1DA1F2);
+    }
 }
