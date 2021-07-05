@@ -1,5 +1,5 @@
 <template>
-  <section>
+  <section class="items">
     <h2>Items</h2>
     <b-card-group columns>
       <Item v-for="item in items" :item="item" :key="item.href" />

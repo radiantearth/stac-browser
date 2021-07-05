@@ -1,13 +1,13 @@
 <template>
-    <section class="metadata">
-        <h2>Metadata</h2>
-        <b-card-group columns>
+    <section v-show="formattedData.length > 0" class="metadata">
+        <h2 v-if="formattedData.length > 0 && title">{{ title }}</h2>
+        <b-card-group v-if="formattedData.length > 0" columns>
             <b-card v-for="group in formattedData" :key="group.extension" class="metadata-card">
-                <template #header>
+                <b-card-title>
                     <div v-if="group.extension" v-html="group.label" />
-                    <template v-else>General</template>
-                </template>
-                <b-row v-for="(prop, key) in group.properties" v-show="!ignoreFields.includes(key)" :key="key">
+                    <template v-else>{{ commmonMetadataTitle }}</template>
+                </b-card-title>
+                <b-row v-for="(prop, key) in group.properties" :key="key">
                     <b-col md="5" class="label" :title="key" v-html="prop.label" />
                     <b-col md="7" class="value" v-html="prop.formatted" />
                 </b-row>
@@ -26,25 +26,45 @@ export default {
             type: Object,
             required: true
         },
+        type: {
+            type: String,
+            required: true
+        },
+        context: {
+            type: Object,
+            default: null
+        },
         ignoreFields: {
             type: Array,
             default: () => ([])
         },
-        columns: {
-            type: Number,
-            default: 3
+        title: {
+            type: String,
+            default: 'Metadata'
+        },
+        commmonMetadataTitle: {
+            type: String,
+            default: 'General'
         }
     },
     computed: {
         formattedData() {
-            if (this.data.isItem()) {
-                return StacFields.formatItemProperties(this.data);
-            }
-            else if (this.data.isCollection()) {
-                return StacFields.formatSummaries(this.data);
-            }
-            else {
-                return [];
+            // Filter all fields as given in ignoreFields and also 
+            // ignore fields starting with an underscore which is likely originating from the STAC class
+            let filter = key => !key.startsWith('_') && !this.ignoreFields.includes(key);
+            switch(this.type) {
+                case 'Asset':
+                    return StacFields.formatAsset(this.data, this.context, filter);
+                case 'Link':
+                    return StacFields.formatLink(this.data, this.context, filter);
+                case 'Item':
+                    return StacFields.formatItemProperties(this.data, filter);
+                case 'Collection':
+                    return StacFields.formatCollection(this.data, filter);
+                case 'Summaries':
+                    return StacFields.formatSummaries(this.data, filter);
+                default:
+                    return [];
             }
         }
     }
@@ -55,11 +75,14 @@ export default {
 <style lang="scss">
 .metadata {
     .label {
-        font-weight: bold;
+        font-weight: 600;
         vertical-align: top;
     }
     ul, ol {
-        padding-left: 2em;
+        padding-left: 1.2em;
+    }
+    ul li {
+        list-style-type: '- ';
     }
     dl {
         margin: 0;

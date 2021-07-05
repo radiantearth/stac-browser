@@ -5,8 +5,8 @@ import Migrate from '@radiantearth/stac-migrate';
 class STAC {
 
     constructor(data, url, path) {
-        this.url = url;
-        this.path = path;
+        this._url = url;
+        this._path = path;
 
         let migrated = Migrate.stac(data);
         for(let key in migrated) {
@@ -58,11 +58,11 @@ class STAC {
     }
 
     getBrowserPath() {
-        return this.path;
+        return this._path;
     }
 
     getAbsoluteUrl() {
-        return this.url;
+        return this._url;
     }
 
     getLinkWithRel(rel) {

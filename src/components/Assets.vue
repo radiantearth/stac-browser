@@ -1,8 +1,8 @@
 <template>
-  <section class="assets">
+  <section class="assets mb-4">
     <h2>Assets</h2>
     <div class="accordion" role="tablist">
-      <Asset v-for="(asset, key) in assets" :asset="asset" :id="key" :key="key" />
+      <Asset v-for="(asset, key) in assets" :asset="asset" :context="context" :id="key" :key="key" />
     </div>
   </section>
 </template>
@@ -19,6 +19,10 @@ export default {
     assets: {
       type: Object,
       required: true
+    },
+    context: {
+        type: Object,
+        default: null
     }
   }
 }

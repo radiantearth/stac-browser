@@ -35,20 +35,6 @@
         text-align: center;
     }
 
-    .metadata {
-        h4 {
-            border: none;
-            border-radius: 5px;
-            background-color: $gray-200;
-            margin: 0;
-            padding: 0.5rem;
-            font-size: 1rem;
-            font-weight: normal;
-            color: $dark;
-            text-transform: uppercase;
-        }
-    }
-
     .map {
         height: 400px;
         background-color: transparent;

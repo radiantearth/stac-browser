@@ -29,8 +29,8 @@
   ],
   "license": "ISC",
   "dependencies": {
-    "@radiantearth/stac-fields": "1.0.0-beta.7",
-    "@radiantearth/stac-migrate": "1.0.2",
+    "@radiantearth/stac-fields": "stac-utils/stac-migrate#main",
+    "@radiantearth/stac-migrate": "~1.0.2",
     "axios": "^0.21.1",
     "bootstrap-vue": "^2.21.2",
     "commonmark": "^0.29.3",

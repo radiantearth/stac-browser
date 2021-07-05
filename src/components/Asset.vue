@@ -1,5 +1,5 @@
 <template>
-  <b-card no-body>
+  <b-card class="asset" no-body>
     <b-card-header header-tag="header" role="tab" class="p-0">
       <b-button block v-b-toggle="id" variant="asset" squared class="p-2 d-flex">
         {{ asset.title || id }}
@@ -14,16 +14,14 @@
     </b-card-header>
     <b-collapse :id="id" v-model="expanded" role="tabpanel">
       <b-card-body>
-        <b-card-text v-if="asset.description">
-          <Description v-if="data.description" :description="data.description" :compact="true" />
-        </b-card-text>
-        <b-card-text>
-          ToDo: More metadata like bands etc.
-        </b-card-text>
         <b-button-group>
           <b-button :href="asset.href" target="_blank" variant="outline-primary">{{ downloadLabel }}</b-button>
           <b-button v-if="canShowOnMap" @click="showOnMap" target="_blank" variant="outline-primary">Show on Map</b-button>
         </b-button-group>
+        <b-card-text class="mt-4" v-if="asset.description">
+          <Description v-if="asset.description" :description="asset.description" :compact="true" />
+        </b-card-text>
+        <Metadata class="mt-4" :data="asset" :context="context" :ignoreFields="ignore" title="" type="Asset" />
       </b-card-body>
     </b-collapse>
   </b-card>
@@ -32,6 +30,8 @@
 <script>
 import { BCollapse, BIconChevronUp, BIconChevronDown } from 'bootstrap-vue';
 import { Formatters } from '@radiantearth/stac-fields';
+import Description from './Description.vue';
+import Metadata from './Metadata.vue';
 import Utils from '../utils';
 
 export default {
@@ -39,7 +39,9 @@ export default {
   components: {
     BCollapse,
     BIconChevronDown,
-    BIconChevronUp
+    BIconChevronUp,
+    Description,
+    Metadata
   },
   props: {
     asset: {
@@ -49,11 +51,16 @@ export default {
     id: {
       type: String,
       required: true
+    },
+    context: {
+        type: Object,
+        default: null
     }
   },
   data() {
     return {
-      expanded: false
+      expanded: false,
+      ignore: ['href', 'title', 'description', 'type', 'roles']
     };
   },
   created() {
@@ -76,17 +83,34 @@ export default {
   },
   methods: {
     showOnMap() {
-      alert('Not implemented yet')
+      alert('Not implemented yet');
     }
   }
 }
 </script>
 
-<style>
-.btn-asset {
-  text-align: left;
-}
-.btn-asset .badge {
-  text-transform: uppercase;
+<style lang="scss">
+.asset {
+  .btn-asset {
+    text-align: left;
+
+    .badge {
+      text-transform: uppercase;
+    }
+  }
+  .metadata {
+    h4 {
+      font-size: 1.2rem;
+    }
+    .card-columns {
+      column-count: 1;
+    }
+    .card {
+      border: 0;
+    }
+    .card-body {
+      padding: 0;
+    }
+  }
 }
 </style>

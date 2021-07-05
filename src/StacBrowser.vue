@@ -35,7 +35,7 @@ import router from "./router";
 import store from "./store";
 import { mapGetters, mapState } from 'vuex';
 
-import StacFields from '@radiantearth/stac-fields';
+import { Formatters } from '@radiantearth/stac-fields';
 
 import Sidebar from './components/Sidebar.vue';
 import StacHeader from './components/StacHeader.vue';
@@ -55,15 +55,13 @@ Vue.directive('b-toggle', VBToggle);
 // Used to detect when a catalog/item becomes visible so that further data can be loaded
 Vue.directive('b-visible', VBVisible);
 
-for(let name in StacFields.Formatters) {
+for(let name in Formatters) {
   if (name.startsWith('format')) {
-    Vue.filter(name.replace(/^format/, ''), StacFields.Formatters[name]);
+    Vue.filter(name.replace(/^format/, ''), Formatters[name]);
   }
 }
 
 Vue.use(Clipboard);
-
-Vue.prototype.fields = StacFields;
 
 export default {
   name: 'StacBrowser',

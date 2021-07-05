@@ -2,7 +2,7 @@
   <section class="mb-4">
     <l-map class="map" :class="stac.type" ref="leaflet" @ready="init()">
       <l-control-fullscreen />
-      <l-tile-layer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+      <l-tile-layer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" :options="mapOptions" />
       <!-- ToDo: Replace with STAC Leaflet plugin; use minimap plugin? -->
       <l-geo-json v-if="isGeoJSON" ref="bounds" @ready="fitBounds" :geojson="stac" />
       <l-rectangle v-else-if="bbox" ref="bounds" @ready="fitBounds" :bounds="bbox" />
@@ -19,16 +19,19 @@ import 'leaflet/dist/leaflet.css';
 export default {
   name: 'Map',
   components: {
-    LMap,
+    LControlFullscreen,
     LGeoJson,
+    LMap,
     LRectangle,
-    LTileLayer,
-    LControlFullscreen
+    LTileLayer
   },
   data() {
     return {
       map: null,
-      boundsLayer: null
+      boundsLayer: null,
+      mapOptions: {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors.'
+      }
     };
   },
   props: {

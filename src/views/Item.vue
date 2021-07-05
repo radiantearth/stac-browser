@@ -1,11 +1,12 @@
 <template>
-  <div>
+  <div class="item">
+    <!-- ToDo: Link to Collection - add to StacHeader? -->
     <b-row>
       <b-col>
         <Description v-if="data.properties.description" :description="data.properties.description" />
         <Keywords v-if="Array.isArray(data.properties.keywords) && data.properties.keywords.length > 0" :keywords="data.properties.keywords" />
+        <Assets v-if="hasAssets" :assets="assets" :context="data" />
         <Links v-if="additionalLinks.length > 0" title="Additional resources" :links="additionalLinks" />
-        <Assets v-if="hasAssets" :assets="assets" />
       </b-col>
       <b-col>
         <Map :stac="data" />
@@ -17,8 +18,8 @@
       </b-col>
     </b-row>
     <b-row>
-      <b-col>
-        <Metadata :data="data" />
+      <b-col class="properties">
+        <Metadata :data="data" type="Item" />
       </b-col>
     </b-row>
   </div>
@@ -46,3 +47,28 @@ export default {
   }
 };
 </script>
+
+<style lang="scss">
+@import '~bootstrap/scss/bootstrap.scss';
+
+.item {
+  .properties {
+    .metadata {
+      .card-columns {
+        @include media-breakpoint-only(xl) {
+          column-count: 3;
+        }
+        @include media-breakpoint-only(lg) {
+          column-count: 3;
+        }
+        @include media-breakpoint-only(md) {
+          column-count: 2;
+        }
+        @include media-breakpoint-only(sm) {
+          column-count: 1;
+        }
+      }
+    }
+  }
+}
+</style>
