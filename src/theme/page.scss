@@ -49,11 +49,16 @@
         }
     }
 
-    .map.main {
+    .map {
         height: 400px;
         background-color: transparent;
         border: $border-width solid $border-color;
         @include border-radius($border-radius);
+    }
+    .catalog {
+        .map {
+            height: 300px;
+        }
     }
 
     .styled-description {

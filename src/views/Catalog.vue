@@ -1,21 +1,22 @@
 <template>
-  <b-row>
+  <b-row class="catalog">
     <b-col>
+      <h2>Introduction</h2>
       <Description v-if="data.description" :description="data.description" />
       <Keywords v-if="Array.isArray(data.keywords) && data.keywords.length > 0" :keywords="data.keywords" />
       <Links v-if="additionalLinks.length > 0" title="Additional resources" :links="additionalLinks" />
-      <Catalogs v-if="catalogs.length > 0" :catalogs="catalogs" />
-      <Items v-if="items.length > 0" :items="items" />
-      <Assets v-if="hasAssets" :assets="assets" />
-    </b-col>
-    <b-col v-if="data.isCollection()">
-      <Map :stac="data" />
+      <Map v-if="data.isCollection()" :stac="data" />
       <!-- ToDo: Show on Leaflet map instead -->
       <!-- <h2 v-if="thumbnails.length > 0">Preview</h2>
       <a v-for="thumbnail in thumbnails" :key="thumbnail.href" :href="thumbnail.href">
         <img align="center" :src="thumbnail.href" />
       </a> -->
-      <Metadata :metadata="data" />
+      <Metadata v-if="data.isCollection()" :data="data" />
+    </b-col>
+    <b-col>
+      <Catalogs v-if="catalogs.length > 0" :catalogs="catalogs" />
+      <Items v-if="items.length > 0" :items="items" />
+      <Assets v-if="hasAssets" :assets="assets" />
     </b-col>
   </b-row>
 </template>
@@ -51,3 +52,13 @@ export default {
   }
 };
 </script>
+
+<style lang="scss">
+.catalog {
+  .metadata {
+    .card-columns {
+      column-count: 2; // ToDo: responsive columns
+    }
+  }
+}
+</style>

@@ -1,11 +1,13 @@
 <template>
-  <l-map class="map main" ref="leaflet" @ready="init()">
-    <l-control-fullscreen />
-    <l-tile-layer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-    <!-- ToDo: Replace with STAC Leaflet plugin; use minimap plugin? -->
-    <l-geo-json v-if="isGeoJSON" ref="bounds" @ready="fitBounds" :geojson="stac" />
-    <l-rectangle v-else-if="bbox" ref="bounds" @ready="fitBounds" :bounds="bbox" />
-  </l-map>
+  <section class="mb-4">
+    <l-map class="map" :class="stac.type" ref="leaflet" @ready="init()">
+      <l-control-fullscreen />
+      <l-tile-layer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+      <!-- ToDo: Replace with STAC Leaflet plugin; use minimap plugin? -->
+      <l-geo-json v-if="isGeoJSON" ref="bounds" @ready="fitBounds" :geojson="stac" />
+      <l-rectangle v-else-if="bbox" ref="bounds" @ready="fitBounds" :bounds="bbox" />
+    </l-map>
+  </section>
 </template>
 
 <script>
