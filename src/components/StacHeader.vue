@@ -5,6 +5,8 @@
       <p class="lead">
         <span class="in" v-if="rootLink">in <StacLink :link="rootLink" /></span>
         <b-button-group>
+          <!-- Up -->
+          <!-- Collection (for items) -->
           <b-button variant="outline-primary" size="sm" v-b-toggle.sidebar><b-icon-book /> Browse</b-button>
           <b-button v-if="supportsSearch" variant="outline-primary" size="sm" to="/search"><b-icon-search /> Search</b-button>
         </b-button-group>
@@ -30,10 +32,10 @@ export default {
     Share: () => import('../components/Share.vue')
   },
   computed: {
-    ...mapState(['baseUrl', 'data', 'url', 'title']),
+    ...mapState(['catalogUrl', 'data', 'url', 'title']),
     ...mapGetters(['rootTitle', 'stacVersion', 'supportsSearch']),
     rootLink() {
-      if (this.url === this.baseUrl) {
+      if (this.url === this.catalogUrl) {
         return null;
       }
       return {

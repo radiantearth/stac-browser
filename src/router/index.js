@@ -1,9 +1,4 @@
-import Vue from "vue";
-import VueRouter from "vue-router";
-
-Vue.use(VueRouter);
-
-const routes = [
+export default [
   {
     path: "/collection/:collection",
     name: "api-collection",
@@ -38,11 +33,3 @@ const routes = [
     }
   }
 ];
-
-const router = new VueRouter({
-  mode: HISTORY_MODE,
-  base: PATH_PREFIX,
-  routes,
-});
-
-export default router;

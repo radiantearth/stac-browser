@@ -9,7 +9,7 @@
                 <b-col cols="2">STAC Version:</b-col>
                 <b-col>{{ stacVersion }}</b-col>
             </b-row>
-            <b-row v-if="validate">
+            <b-row v-if="stacLint">
                 <b-col cols="2">Valid:</b-col>
                 <b-col><Valid :stacUrl="stacUrl" /></b-col>
             </b-row>
@@ -27,6 +27,7 @@
 
 <script>
 import { BIconEnvelope, BIconLink, BIconShare, BIconTwitter, BPopover } from 'bootstrap-vue';
+import { mapState } from 'vuex';
 
 import Url from './Url.vue';
 import Valid from './Valid.vue';
@@ -57,9 +58,7 @@ export default {
         }
     },
     computed: {
-        validate() {
-            return STAC_LINT;
-        },
+        ...mapState(['stacLint']),
         message() {
             return `${this.title} is available at ${this.browserUrl()}`;
         },

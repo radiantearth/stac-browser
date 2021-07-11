@@ -8,21 +8,13 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   strict: true,
-  modules: {
-
-  },
-  state: {
+  state: Object.assign(CONFIG, {
     // Local settings (e.g. for currently loaded STAC entity)
     url: '',
+    title: '',
     data: null,
     valid: null,
-    title: CATALOG_TITLE,
     // Global settings
-    baseUrl: null,
-    defaultTitle: '',
-    tileSourceTemplate: null,
-    stacProxyUrl: null,
-    tileProxyUrl: null,
     database: {},
     supportedRelTypes: [ // These will be handled in a special way and will not be shown in the link lists
       'child',
@@ -41,7 +33,7 @@ export default new Vuex.Store({
       'search',
       'self',
     ]
-  },
+  }),
   getters: {
     loading: state => !state.database[state.url],
     error: state => state.database[state.url] instanceof Error ? state.database[state.url] : null,
@@ -60,8 +52,8 @@ export default new Vuex.Store({
     isCatalogLike: state => state.data ? state.data.isCatalogLike() : false,
     isItem: state => state.data ? state.data.isItem() : false,
     stacVersion: state => state.data && state.data.stac_version ? state.data.stac_version : null,
-    root: (state, getters) => getters.getStac(state.baseUrl),
-    rootTitle: (state, getters) => getters.root ? getters.root.getDisplayTitle(CATALOG_TITLE) : CATALOG_TITLE,
+    root: (state, getters) => getters.getStac(state.catalogUrl),
+    rootTitle: (state, getters) => getters.root ? getters.root.getDisplayTitle(state.catalogTitle) : state.catalogTitle,
     items: state => {
       // ToDo: API & Pagination support(?)
       return state.data ? state.data.getLinksWithRels(['item']) : [];
@@ -83,13 +75,13 @@ export default new Vuex.Store({
       if (baseUrl === null) {
         baseUrl = state.url;
       }
-      return '/' + Utils.toAbsolute(url, state.url, false).relativeTo(state.baseUrl).toString();
+      return '/' + Utils.toAbsolute(url, state.url, false).relativeTo(state.catalogUrl).toString();
     },
     fromBrowserPath: (state, getters) => url => {
       if (!Utils.hasText(url) || url === '/') {
-        url = state.baseUrl;
+        url = state.catalogUrl;
       }
-      return getters.getProxiedUrl(Utils.toAbsolute(url, state.baseUrl));
+      return getters.getProxiedUrl(Utils.toAbsolute(url, state.catalogUrl));
     },
     getProxiedUrl: state => absoluteUrl => {
       // If we are proxying a STAC Catalog, replace any URI with the proxied address.
@@ -98,7 +90,7 @@ export default new Vuex.Store({
       }
       return absoluteUrl;
     },
-/*  getTileSource: (state, getters) => assetHref => {
+  getTileSource: (state, getters) => assetHref => {
       const proxiedUri = getters.getTileProxiedUrl(assetHref);
       return state.tileSourceTemplate.replace("{ASSET_HREF}", proxiedUri);
     },
@@ -109,35 +101,36 @@ export default new Vuex.Store({
         return url.replace(state.tileProxyUrl[0], state.tileProxyUrl[1]);
       }
       return url;
-    } */
+    }
   },
   mutations: {
-    baseUrl(state, url) {
-      state.baseUrl = Utils.toAbsolute(url, url); // This call is made to normalize the URL, e.g. append a missing /
-    },
-    defaultTitle(state, title) {
-      state.defaultTitle = title;
+    config(state, config) {
+      for(let key in config) {
+        let value = config[key];
+        switch(key) {
+          case 'catalogTitle':
+            state.catalogTitle = value;
+            break;
+          case 'catalogUrl':
+            state.catalogUrl = Utils.toAbsolute(value, value); // This call is made to normalize the URL, e.g. append a missing /
+            break;
+          case 'stacProxyUrl':
+          case 'tileProxyUrl':
+            // Proxy URLs coming from CLI have the form https://thingtoproxy.com|http://proxy:111
+            if (typeof value === 'string' && value.includes('|')) {
+              state[key] = value.split('|');
+            }
+            else {
+              state[key] = value;
+            }
+            break;
+          default:
+            state[key] = value;
+        }
+      }
     },
     tileSourceTemplate(state, tileSourceTemplate) {
       state.tileSourceTemplate = tileSourceTemplate;
-    },
-    stacProxyUrl(state, stacProxyUrl) {
-      // stacProxyUrl has the form https://thingtoproxy.com|http://proxy:111
-      if (typeof stacProxyUrl === 'string' && stacProxyUrl.includes('|')) {
-        state.stacProxyUrl = stacProxyUrl.split('|');
-      }
-      else {
-        state.stacProxyUrl = null;
-      }
-    },
-    tileProxyUrl(state, tileProxyUrl) {
-      // tileProxyUrl has the form https://thingtoproxy.com|http://proxy:111
-      if (typeof tileProxyUrl === 'string' && tileProxyUrl.includes('|')) {
-        state.tileProxyUrl = tileProxyUrl.split('|');
-      }
-      else {
-        state.tileProxyUrl = null;
-      }
     },
     loading(state, url) {
       Vue.set(state.database, url, null);
@@ -157,7 +150,7 @@ export default new Vuex.Store({
         state.title = stac.getDisplayTitle(STAC.DEFAULT_TITLE);
       }
       else {
-        state.title = CATALOG_TITLE;
+        state.title = state.catalogTitle;
       }
     },
 		errored(state, {url, error}) {

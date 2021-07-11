@@ -22,6 +22,13 @@
 
 <script>
 import Vue from "vue";
+
+import VueRouter from "vue-router";
+
+import routes from "./router";
+import { mapGetters } from 'vuex';
+import store from "./store";
+
 import {
   AlertPlugin, BadgePlugin, ButtonGroupPlugin, ButtonPlugin,
   CardPlugin, LayoutPlugin, SidebarPlugin, SpinnerPlugin, TablePlugin,
@@ -31,14 +38,12 @@ import "bootstrap-vue/dist/bootstrap-vue.css";
 
 import Clipboard from 'v-clipboard'
 
-import router from "./router";
-import store from "./store";
-import { mapGetters, mapState } from 'vuex';
-
 import { Formatters } from '@radiantearth/stac-fields';
 
 import Sidebar from './components/Sidebar.vue';
 import StacHeader from './components/StacHeader.vue';
+
+Vue.use(Clipboard);
 
 Vue.use(AlertPlugin);
 Vue.use(ButtonGroupPlugin);
@@ -55,13 +60,34 @@ Vue.directive('b-toggle', VBToggle);
 // Used to detect when a catalog/item becomes visible so that further data can be loaded
 Vue.directive('b-visible', VBVisible);
 
+// Add StacField formatters as filters
 for(let name in Formatters) {
   if (name.startsWith('format')) {
     Vue.filter(name.replace(/^format/, ''), Formatters[name]);
   }
 }
 
-Vue.use(Clipboard);
+// Setup router
+Vue.use(VueRouter);
+const router = new VueRouter({
+  mode: CONFIG.historyMode,
+  base: CONFIG.pathPrefix,
+  routes,
+});
+
+// Pass Config through from props to vuex
+let Props = {};
+let Watchers = {};
+for(let key in CONFIG) {
+  Props[key] = {
+    default: CONFIG[key]
+  }
+  Watchers[key] = function(newValue) {
+    this.$store.commit('config', {
+      key: newValue
+    });
+  };
+}
 
 export default {
   name: 'StacBrowser',
@@ -72,73 +98,15 @@ export default {
     StacHeader
   },
   props: {
-    url: {
-      type: String,
-      default: CATALOG_URL
-    },
-    defaultTitle: {
-      type: String,
-      default: CATALOG_TITLE
-    },
-    tileSourceTemplate: {
-      type: String,
-      default: TILE_SOURCE_TEMPLATE
-    },
-    stacProxyUrl: {
-      type: String,
-      default: STAC_PROXY_URL
-    },
-    tileProxyUrl: {
-      type: String,
-      default: TILE_PROXY_URL
-    }
+    ...Props
   },
   watch: {
+    ...Watchers,
     title(title) {
       document.title = title;
-    },
-    url: {
-      immediate: true,
-      handler(url) {
-        this.$store.commit('baseUrl', url);
-      }
-    },
-    baseUrl: {
-      immediate: true,
-      handler(url, oldUrl) {
-        if (url !== oldUrl) {
-          this.$store.dispatch("load", { url });
-        }
-      },
-    },
-    defaultTitle: {
-      immediate: true,
-      handler(title) {
-        this.$store.commit('defaultTitle', title);
-        document.title = title;
-      }
-    },
-    tileSourceTemplate: {
-      immediate: true,
-      handler(tileSourceTemplate) {
-        this.$store.commit('tileSourceTemplate', tileSourceTemplate);
-      }
-    },
-    stacProxyUrl: {
-      immediate: true,
-      handler(stacProxyUrl) {
-        this.$store.commit('stacProxyUrl', stacProxyUrl);
-      }
-    },
-    tileProxyUrl: {
-      immediate: true,
-      handler(tileProxyUrl) {
-        this.$store.commit('tileProxyUrl', tileProxyUrl);
-      }
     }
-  },
+  },Watchers,
   computed: {
-    ...mapState(['baseUrl']),
     ...mapGetters(['rootTitle']),
     browserVersion() {
       return STAC_BROWSER_VERSION;

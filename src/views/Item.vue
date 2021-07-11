@@ -9,6 +9,7 @@
         <Links v-if="additionalLinks.length > 0" title="Additional resources" :links="additionalLinks" />
       </b-col>
       <b-col>
+        <h2>Preview</h2>
         <Map :stac="data" />
         <!-- ToDo: Show on Leaflet map instead -->
         <!-- <h2 v-if="thumbnails.length > 0">Preview</h2>

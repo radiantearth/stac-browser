@@ -65,15 +65,8 @@
       "node": true
     },
     "globals": {
-      "CATALOG_URL": "readonly",
-      "CATALOG_TITLE": "readonly",
-      "TILE_SOURCE_TEMPLATE": "readonly",
-      "STAC_PROXY_URL": "readonly",
-      "TILE_PROXY_URL": "readonly",
-      "PATH_PREFIX": "readonly",
-      "HISTORY_MODE": "readonly",
       "STAC_BROWSER_VERSION": "readonly",
-      "STAC_LINT": "readonly"
+      "CONFIG": "readonly"
     },
     "extends": [
       "plugin:vue/essential",
