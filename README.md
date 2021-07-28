@@ -17,7 +17,7 @@ This package has also been published to npm as [`@radiantearth/stac-browser`](ht
 * [FedEO Clearinghouse](https://geo.spacebel.be/)
 * [radarsat-1](https://www.radarstac.com/)
 
-For a longer list of examples, checkout out [STAC Index](https://stac-index.org).
+For a longer list of examples, checkout out [STAC Index](https://stacindex.org).
 
 ## Running
 
