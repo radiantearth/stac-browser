@@ -5,8 +5,8 @@
       <p class="lead">
         <span class="in" v-if="rootLink">in <StacLink :link="rootLink" /></span>
         <b-button-group>
-          <!-- Up -->
-          <!-- Collection (for items) -->
+          <b-button v-if="parentLink" variant="outline-primary" size="sm"><b-icon-arrow-90deg-up /> Go to Parent</b-button>
+          <b-button v-if="collectionLink" variant="outline-primary" size="sm"><b-icon-folder-symlink /> Go to Collection</b-button>
           <b-button variant="outline-primary" size="sm" v-b-toggle.sidebar><b-icon-book /> Browse</b-button>
           <b-button v-if="supportsSearch" variant="outline-primary" size="sm" to="/search"><b-icon-search /> Search</b-button>
         </b-button-group>
@@ -21,12 +21,14 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
 import StacLink from './StacLink.vue';
-import { BIconBook, BIconSearch } from "bootstrap-vue";
+import { BIconArrow90degUp, BIconBook, BIconFolderSymlink, BIconSearch } from "bootstrap-vue";
 
 export default {
   name: 'StacHeader',
   components: {
+    BIconArrow90degUp,
     BIconBook,
+    BIconFolderSymlink,
     BIconSearch,
     StacLink,
     Share: () => import('../components/Share.vue')
@@ -34,6 +36,12 @@ export default {
   computed: {
     ...mapState(['catalogUrl', 'data', 'url', 'title']),
     ...mapGetters(['rootTitle', 'stacVersion', 'supportsSearch']),
+    parentLink() {
+      return null; // ToDo
+    },
+    collectionLink() {
+      return null; // ToDo
+    },
     rootLink() {
       if (this.url === this.catalogUrl) {
         return null;

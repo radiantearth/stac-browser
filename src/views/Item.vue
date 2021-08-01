@@ -10,12 +10,16 @@
       </b-col>
       <b-col>
         <h2>Preview</h2>
-        <Map :stac="data" />
-        <!-- ToDo: Show on Leaflet map instead -->
-        <!-- <h2 v-if="thumbnails.length > 0">Preview</h2>
-        <a v-for="thumbnail in thumbnails" :key="thumbnail.href" :href="thumbnail.href">
-          <img align="center" :src="thumbnail.href" />
-        </a> -->
+        <b-tabs>
+          <b-tab title="Map">
+            <Map :stac="data" />
+          </b-tab>
+          <b-tab v-if="thumbnails.length > 0" title="Preview" class="previews">
+            <a v-for="thumbnail in thumbnails" :key="thumbnail.href" :href="thumbnail.href">
+              <img class="thumbnail" :src="thumbnail.href" />
+            </a>
+          </b-tab>
+        </b-tabs>
       </b-col>
     </b-row>
     <b-row>
@@ -32,11 +36,14 @@ import Assets from '../components/Assets.vue';
 import Description from '../components/Description.vue';
 import Links from '../components/Links.vue';
 import Metadata from '../components/Metadata.vue';
+import { BTabs, BTab } from 'bootstrap-vue';
 
 export default {
   name: "Item",
   components: {
     Assets,
+    BTabs,
+    BTab,
     Description,
     Links,
     Map: () => import('../components/Map.vue'),
@@ -71,5 +78,14 @@ export default {
       }
     }
   }
+}
+
+.previews {
+  text-align: center;
+}
+
+.thumbnail {
+  max-width: 100%;
+  max-height: 400px;
 }
 </style>

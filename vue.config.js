@@ -1,6 +1,9 @@
-const yargs = require('yargs/yargs')
-const { hideBin } = require('yargs/helpers')
-const argv = yargs(hideBin(process.argv)).argv
+const yargs = require('yargs/yargs');
+const { hideBin } = require('yargs/helpers');
+const argv = yargs(hideBin(process.argv)).argv;
+// Clean-up arguments
+delete argv._;
+delete argv.$0;
 
 const pkgFile = require('./package.json');
 

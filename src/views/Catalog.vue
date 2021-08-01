@@ -5,24 +5,28 @@
       <Description v-if="data.description" :description="data.description" />
       <Keywords v-if="Array.isArray(data.keywords) && data.keywords.length > 0" :keywords="data.keywords" />
       <section v-if="isCollection" class="metadata mb-4">
-        <b-row v-if="temporalExtents">
-          <b-col md="4" class="label">Temporal Extents</b-col>
-          <b-col md="8" class="value" v-html="temporalExtents" />
-        </b-row>
         <b-row v-if="licenses">
           <b-col md="4" class="label">Licenses</b-col>
           <b-col md="8" class="value" v-html="licenses" />
         </b-row>
+        <b-row v-if="temporalExtents">
+          <b-col md="4" class="label">Temporal Extents</b-col>
+          <b-col md="8" class="value" v-html="temporalExtents" />
+        </b-row>
       </section>
-      <Map v-if="isCollection" :stac="data" />
-      <!-- ToDo: Show on Leaflet map instead -->
-      <!-- <h2 v-if="thumbnails.length > 0">Preview</h2>
-      <a v-for="thumbnail in thumbnails" :key="thumbnail.href" :href="thumbnail.href">
-        <img align="center" :src="thumbnail.href" />
-      </a> -->
+      <b-tabs v-if="isCollection || thumbnails.length > 0" end>
+        <b-tab v-if="isCollection" title="Map">
+          <Map :stac="data" />
+        </b-tab>
+        <b-tab v-if="thumbnails.length > 0" title="Preview" class="previews">
+          <a v-for="thumbnail in thumbnails" :key="thumbnail.href" :href="thumbnail.href">
+            <img class="thumbnail" :src="thumbnail.href" />
+          </a>
+        </b-tab>
+      </b-tabs>
       <!-- ToDo: Merge Metadata with summaries? -->
       <Metadata title="Metadata" type="Collection" :data="data" :ignoreFields="collectionCoreFields" />
-      <Metadata v-if="isCollection" title="Collection Summary" type="Summaries" :data="data" />
+      <Metadata v-if="isCollection" title="Metadata Summary" type="Summaries" :data="data" />
     </b-col>
     <b-col class="right">
       <section v-if="providers">
@@ -47,11 +51,14 @@ import Keywords from '../components/Keywords.vue';
 import Links from '../components/Links.vue';
 import Metadata from '../components/Metadata.vue';
 import { Formatters } from '@radiantearth/stac-fields';
+import { BTabs, BTab } from 'bootstrap-vue';
 
 export default {
   name: "Catalog",
   components: {
     Assets,
+    BTabs,
+    BTab,
     Catalogs,
     Description,
     Items,
