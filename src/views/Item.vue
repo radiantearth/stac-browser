@@ -10,16 +10,15 @@
       </b-col>
       <b-col>
         <h2>Preview</h2>
-        <b-tabs>
+        <b-tabs v-if="thumbnails.length > 0">
           <b-tab title="Map">
             <Map :stac="data" />
           </b-tab>
-          <b-tab v-if="thumbnails.length > 0" title="Preview" class="previews">
-            <a v-for="thumbnail in thumbnails" :key="thumbnail.href" :href="thumbnail.href">
-              <img class="thumbnail" :src="thumbnail.href" />
-            </a>
+          <b-tab title="Preview">
+            <Thumbnails :thumbnails="thumbnails" />
           </b-tab>
         </b-tabs>
+        <Map v-else :stac="data" />
       </b-col>
     </b-row>
     <b-row>
@@ -36,6 +35,7 @@ import Assets from '../components/Assets.vue';
 import Description from '../components/Description.vue';
 import Links from '../components/Links.vue';
 import Metadata from '../components/Metadata.vue';
+import Thumbnails from '../components/Thumbnails.vue';
 import { BTabs, BTab } from 'bootstrap-vue';
 
 export default {
@@ -47,7 +47,8 @@ export default {
     Description,
     Links,
     Map: () => import('../components/Map.vue'),
-    Metadata
+    Metadata,
+    Thumbnails
   },
   computed: {
     ...mapState(['data', 'url']),
@@ -78,14 +79,5 @@ export default {
       }
     }
   }
-}
-
-.previews {
-  text-align: center;
-}
-
-.thumbnail {
-  max-width: 100%;
-  max-height: 400px;
 }
 </style>

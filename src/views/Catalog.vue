@@ -14,16 +14,18 @@
           <b-col md="8" class="value" v-html="temporalExtents" />
         </b-row>
       </section>
-      <b-tabs v-if="isCollection || thumbnails.length > 0" end>
-        <b-tab v-if="isCollection" title="Map">
-          <Map :stac="data" />
-        </b-tab>
-        <b-tab v-if="thumbnails.length > 0" title="Preview" class="previews">
-          <a v-for="thumbnail in thumbnails" :key="thumbnail.href" :href="thumbnail.href">
-            <img class="thumbnail" :src="thumbnail.href" />
-          </a>
-        </b-tab>
-      </b-tabs>
+      <template>
+        <b-tabs v-if="isCollection && thumbnails.length > 0">
+          <b-tab title="Map">
+            <Map :stac="data" />
+          </b-tab>
+          <b-tab title="Preview">
+            <Thumbnails :thumbnails="thumbnails" />
+          </b-tab>
+        </b-tabs>
+        <Map v-else-if="isCollection" :stac="data" />
+        <Thumbnails v-else-if="thumbnails.length > 0" :thumbnails="thumbnails" />
+      </template>
       <!-- ToDo: Merge Metadata with summaries? -->
       <Metadata title="Metadata" type="Collection" :data="data" :ignoreFields="collectionCoreFields" />
       <Metadata v-if="isCollection" title="Metadata Summary" type="Summaries" :data="data" />
@@ -50,6 +52,7 @@ import Items from '../components/Items.vue';
 import Keywords from '../components/Keywords.vue';
 import Links from '../components/Links.vue';
 import Metadata from '../components/Metadata.vue';
+import Thumbnails from '../components/Thumbnails.vue';
 import { Formatters } from '@radiantearth/stac-fields';
 import { BTabs, BTab } from 'bootstrap-vue';
 
@@ -65,7 +68,8 @@ export default {
     Keywords,
     Links,
     Map: () => import('../components/Map.vue'),
-    Metadata
+    Metadata,
+    Thumbnails
   },
   data() {
     return {
