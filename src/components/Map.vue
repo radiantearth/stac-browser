@@ -47,10 +47,10 @@ export default {
         };
         this.stacLayer = await stacLayer(this.stac, options);
         if (this.stacLayer) {
+          // Fit bounds before adding the layer to the map to avoid a race condition(?) between Tiff loading and fitBounds
+          this.map.fitBounds(this.stacLayer.getBounds(), { padding: [90, 90] });
           this.stacLayer.addTo(this.map);
         }
-        
-        this.map.fitBounds(this.stacLayer.getBounds(), { padding: [90, 90] });
       } catch (error) {
         console.log(error);
       }
