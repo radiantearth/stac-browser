@@ -50,8 +50,16 @@ export default class Utils {
 		return (typeof string === 'string' && string.length > 0);
 	}
 
+	static urlType(url, type) {
+		let uri = URI(url);
+		return uri.is(type);
+	}
+
 	static toAbsolute(href, baseUrl, stringify = true) {
-		let uri = URI(href).absoluteTo(baseUrl);
+		let uri = URI(href);
+		if (uri.is("relative")) {
+			uri = uri.absoluteTo(baseUrl);
+		}
 		return stringify ? uri.toString() : uri;
 	}
 

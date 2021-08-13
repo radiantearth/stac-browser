@@ -1,5 +1,8 @@
 <template>
   <section>
+    <b-alert v-if="!allowExternalAccess && this.isExternal">
+      <p>Accessing external catalogs is not allowed!</p>
+    </b-alert>
     <div v-if="loading" class="loading text-center">
       <b-spinner label="Loading..."></b-spinner>
     </div>
@@ -19,12 +22,13 @@
 
 <script>
 import { mapGetters, mapState } from "vuex";
+import Utils from '../utils';
 
 export default {
   name: "Browse",
   components: {
       Item: () => import(/* webpackChunkName: "item" */ "./Item.vue"),
-      Catalog: () => import(/* webpackChunkName: "catalog" */ "./Catalog.vue"),
+      Catalog: () => import(/* webpackChunkName: "catalog" */ "./Catalog.vue")
   },
   props: {
     path: {
@@ -33,10 +37,13 @@ export default {
     }
   },
   computed: {
-    ...mapState(["url"]),
+    ...mapState(["allowExternalAccess", "url"]),
     ...mapGetters(["isCatalogLike", "loading", "error"]),
     component() {
         return this.isCatalogLike ? 'Catalog' : 'Item'; 
+    },
+    isExternal() {
+      return Utils.urlType(this.path, "absolute");
     }
   },
   watch: {
@@ -46,7 +53,7 @@ export default {
         if (path !== oldPath) {
           this.$store.dispatch("load", { url: path || '/', fromBrowser: true, show: true });
         }
-      },
+      }
     },
   }
 };

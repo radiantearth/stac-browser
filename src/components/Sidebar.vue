@@ -1,5 +1,5 @@
 <template>
-  <ul>
+  <ul class="tree">
     <li>STAC Browser
       <ul>
         <li><b-icon-folder-minus /> Catalog 1
@@ -11,22 +11,30 @@
         <li><b-icon-folder-plus /> Catalog 3</li>
       </ul>
     </li>
+    <li v-if="allowSelectCatalog"><router-link to="/"><b-icon-arrow-left-right /> Switch Catalog</router-link></li>
   </ul>
 </template>
 
 <script>
-import { BIconFileEarmarkRichtext, BIconFolderMinus, BIconFolderPlus } from "bootstrap-vue";
-import { mapGetters } from 'vuex';
+import { BIconArrowLeftRight, BIconFileEarmarkRichtext, BIconFolderMinus, BIconFolderPlus } from "bootstrap-vue";
+import { mapState } from 'vuex';
 
 export default {
   name: 'Sidebar',
   components: {
+    BIconArrowLeftRight,
     BIconFileEarmarkRichtext,
     BIconFolderMinus,
     BIconFolderPlus
   },
   computed: {
-    ...mapGetters(['supportsSearch'])
+    ...mapState(['allowSelectCatalog'])
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.tree > li {
+  margin-bottom: 1em;
+}
+</style>

@@ -16,7 +16,6 @@
       <b-card-body>
         <b-button-group>
           <b-button :href="asset.href" target="_blank" variant="outline-primary">{{ downloadLabel }}</b-button>
-          <b-button v-if="canShowOnMap" @click="showOnMap" target="_blank" variant="outline-primary">Show on Map</b-button>
         </b-button-group>
         <b-card-text class="mt-4" v-if="asset.description">
           <Description v-if="asset.description" :description="asset.description" :compact="true" />
@@ -32,7 +31,6 @@ import { BCollapse, BIconChevronUp, BIconChevronDown } from 'bootstrap-vue';
 import { Formatters } from '@radiantearth/stac-fields';
 import Description from './Description.vue';
 import Metadata from './Metadata.vue';
-import Utils from '../utils';
 
 export default {
   name: 'Asset',
@@ -53,8 +51,12 @@ export default {
       required: true
     },
     context: {
-        type: Object,
-        default: null
+      type: Object,
+      default: null
+    },
+    expand: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -65,7 +67,7 @@ export default {
   },
   created() {
     // Expand all assets with role data by default
-    this.expanded = Array.isArray(this.asset.roles) && this.asset.roles.includes('data');
+    this.expanded = this.expand || (Array.isArray(this.asset.roles) && this.asset.roles.includes('data'));
   },
   computed: {
     downloadLabel() {
@@ -76,9 +78,6 @@ export default {
       else {
         return 'Download';
       }
-    },
-    canShowOnMap() {
-      return (this.asset.type && (Utils.canBrowserDisplayImage(this.asset.type) || this.asset.type.startsWith('image/tif')));
     }
   },
   methods: {

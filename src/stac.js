@@ -42,7 +42,7 @@ class STAC {
         return null;
     }
 
-    getDisplayTitle(defaultTitle = STAC.DEFAULT_TITLE) {
+    getDisplayTitle(defaultTitle = null) {
         if (this.isItem() && Utils.hasText(this.properties.title)) {
             return this.properties.title;
         }
