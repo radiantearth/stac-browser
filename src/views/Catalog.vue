@@ -17,13 +17,13 @@
       <template>
         <b-tabs v-if="isCollection && thumbnails.length > 0">
           <b-tab title="Map">
-            <Map :stac="data" />
+            <Map :stac="data" @mapClicked="mapClicked" />
           </b-tab>
           <b-tab title="Preview">
             <Thumbnails :thumbnails="thumbnails" />
           </b-tab>
         </b-tabs>
-        <Map v-else-if="isCollection" :stac="data" />
+        <Map v-else-if="isCollection" :stac="data" @mapClicked="mapClicked" />
         <Thumbnails v-else-if="thumbnails.length > 0" :thumbnails="thumbnails" />
       </template>
       <!-- ToDo: Merge Metadata with summaries? -->
@@ -115,6 +115,11 @@ export default {
         return Formatters.formatTemporalExtents(extents);
       }
       return null;
+    }
+  },
+  methods: {
+    mapClicked(stac) {
+      console.log(stac);
     }
   }
 };

@@ -1,10 +1,12 @@
 module.exports = {
     catalogUrl: "https://raw.githubusercontent.com/cholmes/pdd-stac/beta2/disasters/collection.json",
     catalogTitle: "STAC Browser",
-    tileSourceTemplate: "https://tiles.rdnt.io/tiles/{z}/{x}/{y}@2x?url={ASSET_HREF}",
+    tileSourceTemplate: "https://tiles.rdnt.io/tiles/{z}/{x}/{y}@2x?url={url}",
+    buildTileUrlTemplate: null,
     stacProxyUrl: null,
     tileProxyUrl: null,
     pathPrefix: "/",
     historyMode: "history",
-    stacLint: true
+    stacLint: true,
+    geoTiffResolution: 123
 };

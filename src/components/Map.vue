@@ -13,6 +13,7 @@ import { LMap, LTileLayer } from 'vue2-leaflet';
 import LControlFullscreen from 'vue2-leaflet-fullscreen';
 import 'leaflet/dist/leaflet.css';
 import stacLayer from 'stac-layer';
+import { mapState } from 'vuex';
 
 export default {
   name: 'Map',
@@ -37,16 +38,22 @@ export default {
       required: true
     }
   },
+  computed: {
+    ...mapState(['geoTiffResolution', 'tileSourceTemplate', 'buildTileUrlTemplate'])
+  },
   methods: {
     async init() {
       this.map = this.$refs.leaflet.mapObject;
 
       try {
         let options = {
-          resolution: 256
+          resolution: this.geoTiffResolution,
+//        tileUrlTemplate: this.tileSourceTemplate,
+//        buildTileUrlTemplate: this.buildTileUrlTemplate
         };
         this.stacLayer = await stacLayer(this.stac, options);
         if (this.stacLayer) {
+          this.stacLayer.on('click', event => this.$emit('mapClicked', event.stac));
           // Fit bounds before adding the layer to the map to avoid a race condition(?) between Tiff loading and fitBounds
           this.map.fitBounds(this.stacLayer.getBounds(), { padding: [90, 90] });
           this.stacLayer.addTo(this.map);
