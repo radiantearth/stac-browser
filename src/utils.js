@@ -1,5 +1,7 @@
 import URI from 'urijs';
 
+const commonFileNames = ['catalog', 'collection', 'item'];
+
 /**
  * General utilities
  * 
@@ -61,6 +63,32 @@ export default class Utils {
 			uri = uri.absoluteTo(baseUrl);
 		}
 		return stringify ? uri.toString() : uri;
+	}
+
+	static equalUrl(a, b) {
+		return URI(a).equals(b);
+	}
+
+	static titleForHref(href) {
+		let uri = URI(href);
+		let auth = uri.authority();
+		let file = uri.filename().replace(/^(.{1,})\.\w+$/, '$1');
+		let dir = uri.directory().replace(/^\//, '');
+		if (auth && file) {
+			return `${file} at ${auth}`;
+		}
+		else if (auth) {
+			return auth;
+		}
+		else if (file && !commonFileNames.includes(file)) {
+			return file;
+		}
+		else if (dir) {
+			return dir;
+		}
+		else {
+			return href;
+		}
 	}
 
 	static canBrowserDisplayImage(mediaType) {

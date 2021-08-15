@@ -76,7 +76,6 @@ export default new Vuex.Store({
       if (link) {
         link = Object.assign({}, link);
         link.title = stac?.getDisplayTitle() || link.title;
-        link.href = getters.toBrowserPath(link.href);
       }
       return link;
     },
@@ -106,8 +105,8 @@ export default new Vuex.Store({
     },
 
     // hasAsset also checks whether the assets have a href and thus are not item asset definitions
-    hasAssets: (state, getters) => getters.assets.find(asset => Utils.isObject(asset) && typeof asset.href === 'string'),
-    assets: state => Utils.isObject(state.data?.assets) ? Object.values(state.data.assets) : [],
+    hasAssets: (state, getters) => Object.values(getters.assets).find(asset => Utils.isObject(asset) && typeof asset.href === 'string'),
+    assets: state => Utils.isObject(state.data?.assets) ? state.data.assets : {},
     thumbnails: state => state.data ? state.data.getThumbnails() : [],
     additionalLinks: state => state.data ? state.data.getLinksWithOtherRels(state.supportedRelTypes) : [],
 

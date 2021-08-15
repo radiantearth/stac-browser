@@ -14,7 +14,7 @@
           <b-col md="8" class="value" v-html="temporalExtents" />
         </b-row>
       </section>
-      <template>
+      <section class="mb-4">
         <b-tabs v-if="isCollection && thumbnails.length > 0">
           <b-tab title="Map">
             <Map :stac="data" />
@@ -25,10 +25,8 @@
         </b-tabs>
         <Map v-else-if="isCollection" :stac="data" />
         <Thumbnails v-else-if="thumbnails.length > 0" :thumbnails="thumbnails" />
-      </template>
-      <!-- ToDo: Merge Metadata with summaries? -->
+      </section>
       <Metadata title="Metadata" :type="data.type" :data="data" :ignoreFields="ignoredMetadataFields" />
-      <Metadata v-if="isCollection" title="Metadata Summary" type="Summaries" :data="data" />
     </b-col>
     <b-col class="right">
       <Providers v-if="hasProviders" :providers="data.providers" />

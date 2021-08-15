@@ -2,7 +2,7 @@
   <section class="assets mb-4">
     <h2>{{ title }}</h2>
     <div class="accordion" role="tablist">
-      <Asset v-for="(asset, key) in assets" :asset="asset" :expand="expand" :context="context" :id="key" :key="key" />
+      <Asset v-for="(asset, key) in assets" :asset="asset" :expand="expand" :context="context" :id="String(key)" :key="key" />
     </div>
   </section>
 </template>

@@ -55,8 +55,11 @@ export default {
       return null;
     },
     temporalExtent() {
-      if (this.data && this.data.isCollection() && this.data.extent.temporal.interval.length > 0) {
-        return this.data.extent.temporal.interval[0];
+      if (this.data?.isCollection() && this.data.extent?.temporal?.interval.length > 0) {
+        let extent = this.data.extent.temporal.interval[0]; 
+        if (extent[0] && extent[1]) {
+          return this.data.extent.temporal.interval[0];
+        }
       }
       return null;
     }

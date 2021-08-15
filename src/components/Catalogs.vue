@@ -1,5 +1,5 @@
 <template>
-  <section>
+  <section class="catalogs mb-4">
     <h2>Catalogs</h2>
     <b-card-group columns>
       <Catalog v-for="catalog in catalogs" :catalog="catalog" :key="catalog.href" />
