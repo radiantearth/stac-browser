@@ -1,7 +1,7 @@
 <template>
   <section>
     <h2>Catalogs</h2>
-    <b-card-group deck>
+    <b-card-group columns>
       <Catalog v-for="catalog in catalogs" :catalog="catalog" :key="catalog.href" />
     </b-card-group>
   </section>

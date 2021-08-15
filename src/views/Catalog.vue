@@ -27,17 +27,15 @@
         <Thumbnails v-else-if="thumbnails.length > 0" :thumbnails="thumbnails" />
       </template>
       <!-- ToDo: Merge Metadata with summaries? -->
-      <Metadata title="Metadata" type="Collection" :data="data" :ignoreFields="collectionCoreFields" />
+      <Metadata title="Metadata" :type="data.type" :data="data" :ignoreFields="ignoredMetadataFields" />
       <Metadata v-if="isCollection" title="Metadata Summary" type="Summaries" :data="data" />
     </b-col>
     <b-col class="right">
-      <section v-if="providers">
-        <h2>Providers</h2>
-        <div v-html="providers" />
-      </section>
+      <Providers v-if="hasProviders" :providers="data.providers" />
       <Catalogs v-if="catalogs.length > 0" :catalogs="catalogs" />
       <Items v-if="items.length > 0" :items="items" />
       <Assets v-if="hasAssets" :assets="assets" />
+      <Assets v-if="hasItemAssets" :assets="data.item_assets" :definition="true" />
       <Links v-if="additionalLinks.length > 0" title="Additional resources" :links="additionalLinks" />
     </b-col>
   </b-row>
@@ -52,9 +50,11 @@ import Items from '../components/Items.vue';
 import Keywords from '../components/Keywords.vue';
 import Links from '../components/Links.vue';
 import Metadata from '../components/Metadata.vue';
+import Providers from '../components/Providers.vue';
 import Thumbnails from '../components/Thumbnails.vue';
 import { Formatters } from '@radiantearth/stac-fields';
 import { BTabs, BTab } from 'bootstrap-vue';
+import Utils from '../utils';
 
 export default {
   name: "Catalog",
@@ -69,11 +69,13 @@ export default {
     Links,
     Map: () => import('../components/Map.vue'),
     Metadata,
+    Providers,
     Thumbnails
   },
   data() {
     return {
-      collectionCoreFields: [
+      ignoredMetadataFields: [
+        // Catalog and Collection fields that are handled directly
         'stac_version',
         'stac_extensions',
         'id',
@@ -86,7 +88,10 @@ export default {
         'extent',
         'summaries',
         'links',
-        'assets'
+        'assets',
+        'item_assets',
+        // API landing page, not very useful to display
+        'conformsTo'
       ]
     };
   },
@@ -99,11 +104,8 @@ export default {
       }
       return null;
     },
-    providers() {
-      if (this.isCollection && Array.isArray(this.data.providers) && this.data.providers.length > 0) {
-        return Formatters.formatProviders(this.data.providers);
-      }
-      return null;
+    hasProviders() {
+      return (this.isCollection && Array.isArray(this.data.providers) && this.data.providers.length > 0);
     },
     temporalExtents() {
       if (this.data && this.data.isCollection() && this.data.extent.temporal.interval.length > 0) {
@@ -115,6 +117,9 @@ export default {
         return Formatters.formatTemporalExtents(extents);
       }
       return null;
+    },
+    hasItemAssets() {
+      return Utils.size(this.data?.item_assets) > 0;
     }
   }
 };
@@ -129,17 +134,11 @@ export default {
   }
   .metadata {
     .card-columns {
+      column-count: 1;
+    }
+    .card-columns:not(.count-1) {
       @include media-breakpoint-only(xl) {
         column-count: 2;
-      }
-      @include media-breakpoint-only(lg) {
-        column-count: 1;
-      }
-      @include media-breakpoint-only(md) {
-        column-count: 1;
-      }
-      @include media-breakpoint-only(sm) {
-        column-count: 1;
       }
     }
   }

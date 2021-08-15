@@ -3,7 +3,7 @@
     <b-card-header header-tag="header" role="tab" class="p-0">
       <b-button block v-b-toggle="id" variant="asset" squared class="p-2 d-flex">
         {{ asset.title || id }}
-        <div class="roles ml-1" v-if="Array.isArray(asset.roles)">
+        <div class="roles ml-1 mr-2" v-if="Array.isArray(asset.roles)">
           <b-badge v-for="role in asset.roles" :key="role" :variant="role === 'data' ? 'primary' : 'secondary'" class="ml-1 mb-1">{{ role }}</b-badge>
         </div>
         <span class="ml-auto" aria-hidden="true">
@@ -14,11 +14,14 @@
     </b-card-header>
     <b-collapse :id="id" v-model="expanded" role="tabpanel">
       <b-card-body>
-        <b-button-group>
-          <b-button :href="asset.href" target="_blank" variant="outline-primary">{{ downloadLabel }}</b-button>
+        <b-button-group v-if="asset.href">
+          <b-button :href="asset.href" target="_blank" variant="outline-primary">
+            Download {{ fileFormat }}
+          </b-button>
         </b-button-group>
+        <b-card-title v-else>{{ fileFormat }}</b-card-title>
         <b-card-text class="mt-4" v-if="asset.description">
-          <Description v-if="asset.description" :description="asset.description" :compact="true" />
+          <Description :description="asset.description" :compact="true" />
         </b-card-text>
         <Metadata class="mt-4" :data="asset" :context="context" :ignoreFields="ignore" title="" type="Asset" />
       </b-card-body>
@@ -56,7 +59,7 @@ export default {
     },
     expand: {
       type: Boolean,
-      default: false
+      default: null
     }
   },
   data() {
@@ -66,23 +69,20 @@ export default {
     };
   },
   created() {
-    // Expand all assets with role data by default
-    this.expanded = this.expand || (Array.isArray(this.asset.roles) && this.asset.roles.includes('data'));
-  },
-  computed: {
-    downloadLabel() {
-      if (this.asset.type) {
-        let format = Formatters.formatMediaType(this.asset.type);
-        return `Download ${format}`;
-      }
-      else {
-        return 'Download';
-      }
+    if (typeof this.expand === 'boolean') {
+      this.expanded = this.expand;
+    }
+    else {
+      // Expand all assets with role data by default
+      this.expanded = Array.isArray(this.asset.roles) && this.asset.roles.includes('data');
     }
   },
-  methods: {
-    showOnMap() {
-      alert('Not implemented yet');
+  computed: {
+    fileFormat() {
+      if (this.asset.type) {
+        return Formatters.formatMediaType(this.asset.type);
+      }
+      return null;
     }
   }
 }

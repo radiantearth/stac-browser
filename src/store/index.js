@@ -105,10 +105,11 @@ export default new Vuex.Store({
       return state.data ? state.data.getLinksWithRels(['child']) : [];
     },
 
-    additionalLinks: state => state.data ? state.data.getLinksWithOtherRels(state.supportedRelTypes) : [],
-    hasAssets: state => Boolean(state.data && Utils.size(state.data.assets) > 0),
-    assets: state => state.data && Utils.isObject(state.data.assets) ? state.data.assets : [],
+    // hasAsset also checks whether the assets have a href and thus are not item asset definitions
+    hasAssets: (state, getters) => getters.assets.find(asset => Utils.isObject(asset) && typeof asset.href === 'string'),
+    assets: state => Utils.isObject(state.data?.assets) ? Object.values(state.data.assets) : [],
     thumbnails: state => state.data ? state.data.getThumbnails() : [],
+    additionalLinks: state => state.data ? state.data.getLinksWithOtherRels(state.supportedRelTypes) : [],
 
     supportsSearch: () => false, // ToDo
 
@@ -125,7 +126,7 @@ export default new Vuex.Store({
       }
 
       if (!relative || relative === absolute) { // This is an external URL
-        if (state.allowExternalAccess) {
+        if (!state.allowExternalAccess) {
           return absolute.toString();
         }
         let parts = ['/external'];

@@ -73,14 +73,13 @@ export default {
 
 <style lang="scss">
 .catalog-card {
-  max-height: 12em;
   min-width: 50%;
   box-sizing: border-box;
   margin-top: 1em;
 
   .intro {
     display: -webkit-box;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
