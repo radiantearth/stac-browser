@@ -37,6 +37,7 @@ import Links from '../components/Links.vue';
 import Metadata from '../components/Metadata.vue';
 import Thumbnails from '../components/Thumbnails.vue';
 import { BTabs, BTab } from 'bootstrap-vue';
+import Utils from '../utils';
 
 export default {
   name: "Item",
@@ -52,7 +53,17 @@ export default {
   },
   computed: {
     ...mapState(['data', 'url']),
-    ...mapGetters(['additionalLinks', 'thumbnails', 'hasAssets', 'assets'])
+    ...mapGetters(['additionalLinks', 'collectionLink', 'thumbnails', 'hasAssets', 'assets'])
+  },
+  watch: {
+    collectionLink: {
+      immediate: true,
+      handler(newLink) {
+        if (Utils.isObject(newLink)) {
+          this.$store.dispatch("load", { url: newLink.href });
+        }
+      }
+    }
   },
   methods: {
     mapClicked(stac) {

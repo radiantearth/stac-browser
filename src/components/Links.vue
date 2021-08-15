@@ -1,17 +1,22 @@
 <template>
-  <section class="links">
+  <section class="links mb-4">
     <h2 v-if="title">{{ title }}</h2>
     <ul>
       <li v-for="link in links" :key="link.href">
-        <a :href="link.href" target="_blank">{{ link.title || link.rel || link.href }}</a>
+        <StacLink :link="link" />
       </li>
     </ul>
   </section>
 </template>
 
 <script>
+import StacLink from './StacLink.vue';
+
 export default {
   name: "Links",
+  components: {
+    StacLink
+  },
   props: {
     title: {
       type: String,

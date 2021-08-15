@@ -2,17 +2,17 @@
   <b-row>
     <b-col md="10">
       <h1>{{ title }}</h1>
-      <p class="lead">
-        <span class="in" v-if="rootLink">in <StacLink :link="rootLink" /></span>
+      <p class="lead" v-if="url">
+        <span class="in" v-if="containerLink">in <StacLink :link="containerLink" /></span>
         <b-button-group>
-          <b-button v-if="parentLink" variant="outline-primary" size="sm"><b-icon-arrow-90deg-up /> Go to Parent</b-button>
-          <b-button v-if="collectionLink" variant="outline-primary" size="sm"><b-icon-folder-symlink /> Go to Collection</b-button>
+          <b-button v-if="parentLink" :to="toBrowserPath(parentLink.href)" :title="parentLink.title" variant="outline-primary" size="sm"><b-icon-arrow-90deg-up /> Go to Parent</b-button>
+          <b-button v-if="collectionLink" :to="toBrowserPath(collectionLink.href)" :title="collectionLink.title" variant="outline-primary" size="sm"><b-icon-folder-symlink /> Go to Collection</b-button>
           <b-button variant="outline-primary" size="sm" v-b-toggle.sidebar><b-icon-book /> Browse</b-button>
           <b-button v-if="supportsSearch" variant="outline-primary" size="sm" to="/search"><b-icon-search /> Search</b-button>
         </b-button-group>
       </p>
     </b-col>
-    <b-col md="2" class="text-sm-right">
+    <b-col v-if="url" md="2" class="text-sm-right">
       <Share :title="title" :stacUrl="url" :stacVersion="stacVersion" />
     </b-col>
   </b-row>
@@ -22,6 +22,7 @@
 import { mapState, mapGetters } from 'vuex';
 import StacLink from './StacLink.vue';
 import { BIconArrow90degUp, BIconBook, BIconFolderSymlink, BIconSearch } from "bootstrap-vue";
+import Utils from '../utils';
 
 export default {
   name: 'StacHeader',
@@ -35,21 +36,16 @@ export default {
   },
   computed: {
     ...mapState(['catalogUrl', 'data', 'url', 'title']),
-    ...mapGetters(['rootTitle', 'stacVersion', 'supportsSearch']),
-    parentLink() {
-      return null; // ToDo
-    },
-    collectionLink() {
-      return null; // ToDo
-    },
-    rootLink() {
-      if (this.url === this.catalogUrl) {
+    ...mapGetters(['rootLink', 'parentLink', 'collectionLink', 'stacVersion', 'supportsSearch', 'fromBrowserPath', 'toBrowserPath']),
+    containerLink() {
+      // Check two cases where this page is the root...
+      if (this.catalogUrl && this.url === this.catalogUrl) {
         return null;
       }
-      return {
-        href: '/',
-        title: this.rootTitle
-      };
+      if (this.rootLink && Utils.equalUrl(this.fromBrowserPath(this.rootLink.href), this.url)) {
+        return null;
+      }
+      return this.rootLink || this.collectionLink || this.parentLink;
     }
   }
 }

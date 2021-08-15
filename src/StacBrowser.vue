@@ -5,7 +5,7 @@
     </b-sidebar>
     <!-- Header -->
     <header>
-      <div class="logo">{{ rootTitle }}</div>
+      <div class="logo">{{ catalogTitle }}</div>
       <StacHeader />
     </header>
     <!-- Content (Item / Catalog) -->
@@ -105,9 +105,9 @@ export default {
     title(title) {
       document.title = title;
     }
-  },Watchers,
+  },
   computed: {
-    ...mapGetters(['rootTitle']),
+    ...mapGetters(['displayCatalogTitle']),
     browserVersion() {
       return STAC_BROWSER_VERSION;
     }

@@ -108,6 +108,12 @@ The file `page.scss` contains some Sass declarations for the main sections of ST
 
 If you need even more flexibility (which I doubt), you need to dig into the Vue files and their dependencies though.
 
+## Custom fields
+
+STAC Browser supports some non-standardized fields that you can use to improve the user-experience.
+
+1. To the [Provider Object](https://github.com/radiantearth/stac-spec/blob/master/collection-spec/collection-spec.md#provider-object) you can add an `email` (or `mail`) field with an e-mail address and the mail will be shown in the Browser, too.
+
 ## Building
 
 ```bash

@@ -11,10 +11,12 @@ export default new Vuex.Store({
   state: Object.assign(CONFIG, {
     // Local settings (e.g. for currently loaded STAC entity)
     url: '',
-    title: '',
+    title: CONFIG.catalogTitle,
     data: null,
     valid: null,
     // Global settings
+    allowSelectCatalog: !CONFIG.catalogUrl,
+    stacIndex: [],
     database: {},
     supportedRelTypes: [ // These will be handled in a special way and will not be shown in the link lists
       'child',
@@ -38,6 +40,9 @@ export default new Vuex.Store({
     loading: state => !state.database[state.url],
     error: state => state.database[state.url] instanceof Error ? state.database[state.url] : null,
     getStac: state => (url, returnErrorObject = false) => {
+      if (!url) {
+        return null;
+      }
       let absoluteUrl = Utils.toAbsolute(url, state.url);
       let data = state.database[absoluteUrl];
       if (!returnErrorObject && data instanceof Error) {
@@ -47,13 +52,49 @@ export default new Vuex.Store({
         return data;
       }
     },
-    isCollection: state => state.data ? state.data.isCollection() : false,
-    isCatalog: state => state.data ? state.data.isCatalog() : false,
-    isCatalogLike: state => state.data ? state.data.isCatalogLike() : false,
-    isItem: state => state.data ? state.data.isItem() : false,
-    stacVersion: state => state.data && state.data.stac_version ? state.data.stac_version : null,
-    root: (state, getters) => getters.getStac(state.catalogUrl),
-    rootTitle: (state, getters) => getters.root ? getters.root.getDisplayTitle(state.catalogTitle) : state.catalogTitle,
+    getStacFromLink: (state, getters) => (rel, fallback = null) => {
+      let link = state.data?.getLinkWithRel(rel) || {href: fallback};
+      return getters.getStac(link.href);
+    },
+
+    displayCatalogTitle: (state, getters) => getters.root?.getDisplayTitle() || state.catalogTitle,
+
+    isCollection: state => state.data?.isCollection() || false,
+    isCatalog: state => state.data?.isCatalog() || false,
+    isCatalogLike: state => state.data?.isCatalogLike() || false,
+    isItem: state => state.data?.isItem() || false,
+
+    stacVersion: state => state.data?.stac_version,
+
+    root: (state, getters) => getters.getStacFromLink('root', state.catalogUrl),
+    parent: (state, getters) => getters.getStacFromLink('parent'),
+    collection: (state, getters) => getters.getStacFromLink('collection'),
+
+    getLink: (state, getters) => rel => {
+      let link = state.data?.getLinkWithRel(rel);
+      let stac = getters[rel];
+      if (link) {
+        link = Object.assign({}, link);
+        link.title = stac?.getDisplayTitle() || link.title;
+      }
+      return link;
+    },
+    rootLink: (state, getters) => {
+      let link = getters.getLink('root');
+      if (link) {
+        link.title = link.title || state.catalogTitle;
+      }
+      else if (!link && state.catalogUrl) {
+        link = {
+          href: '/',
+          title: state.catalogTitle
+        };
+      }
+      return link;
+    },
+    parentLink: (state, getters) => getters.getLink('parent'),
+    collectionLink: (state, getters) => getters.getLink('collection'),
+
     items: state => {
       // ToDo: API & Pagination support(?)
       return state.data ? state.data.getLinksWithRels(['item']) : [];
@@ -62,27 +103,66 @@ export default new Vuex.Store({
       // ToDo: API & Pagination support(?)
       return state.data ? state.data.getLinksWithRels(['child']) : [];
     },
-    additionalLinks: state => state.data ? state.data.getLinksWithOtherRels(state.supportedRelTypes) : [],
-    hasAssets: state => Boolean(state.data && Utils.size(state.data.assets) > 0),
-    assets: state => state.data && Utils.isObject(state.data.assets) ? state.data.assets : [],
+
+    // hasAsset also checks whether the assets have a href and thus are not item asset definitions
+    hasAssets: (state, getters) => Object.values(getters.assets).find(asset => Utils.isObject(asset) && typeof asset.href === 'string'),
+    assets: state => Utils.isObject(state.data?.assets) ? state.data.assets : {},
     thumbnails: state => state.data ? state.data.getThumbnails() : [],
+    additionalLinks: state => state.data ? state.data.getLinksWithOtherRels(state.supportedRelTypes) : [],
+
     supportsSearch: () => false, // ToDo
-    toBrowserPath: state => (url, baseUrl = null) => {
+
+    toBrowserPath: state => url => {
       // ToDo: proxy support
       if (!Utils.hasText(url)) {
         url = '/';
       }
-      if (baseUrl === null) {
-        baseUrl = state.url;
+
+      let absolute = Utils.toAbsolute(url, state.url, false);
+      let relative;
+      if (state.catalogUrl) {
+        relative = absolute.relativeTo(state.catalogUrl);
       }
-      return '/' + Utils.toAbsolute(url, state.url, false).relativeTo(state.catalogUrl).toString();
+
+      if (!relative || relative === absolute) { // This is an external URL
+        if (!state.allowExternalAccess) {
+          return absolute.toString();
+        }
+        let parts = ['/external'];
+        let protocol = absolute.protocol();
+        if (protocol !== 'https') {
+          parts.push(protocol + ':');
+        }
+        parts.push(absolute.authority());
+        parts.push(absolute.path().replace(/^\//, ''));
+        return parts.join('/');
+      }
+      else {
+        return '/' + relative.toString();
+      }
     },
     fromBrowserPath: (state, getters) => url => {
       if (!Utils.hasText(url) || url === '/') {
         url = state.catalogUrl;
       }
-      return getters.getProxiedUrl(Utils.toAbsolute(url, state.catalogUrl));
+      else if (url.startsWith('/external/')) {
+        let parts = url.replace(/^\/external\//, '').split('/');
+        let protocol;
+        if (!parts[0].endsWith(':')) {
+          protocol = 'https';
+        }
+        else {
+          protocol = parts.shift();
+          parts = parts.slice(1);
+        }
+        url = `${protocol}://${parts.join('/')}`;
+      }
+      else if (state.catalogUrl) {
+        url = Utils.toAbsolute(url, state.catalogUrl);
+      }
+      return getters.getProxiedUrl(url);
     },
+
     getProxiedUrl: state => absoluteUrl => {
       // If we are proxying a STAC Catalog, replace any URI with the proxied address.
       if (Array.isArray(state.stacProxyUrl)) {
@@ -125,6 +205,9 @@ export default new Vuex.Store({
         }
       }
     },
+    stacIndex(state, index) {
+      state.stacIndex = index;
+    },
     tileSourceTemplate(state, tileSourceTemplate) {
       state.tileSourceTemplate = tileSourceTemplate;
     },
@@ -160,6 +243,16 @@ export default new Vuex.Store({
 		}
   },
   actions: {
+    async loadStacIndex(cx) {
+      try {
+        let response = await axios.get('https://stacindex.org/api/catalogs');
+        if (Array.isArray(response.data)) {
+          cx.commit('stacIndex', response.data);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
     async load(cx, {url, fromBrowser, show}) {
       let path;
       if (fromBrowser) {

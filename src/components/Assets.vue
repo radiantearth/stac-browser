@@ -1,14 +1,15 @@
 <template>
   <section class="assets mb-4">
-    <h2>Assets</h2>
+    <h2>{{ title }}</h2>
     <div class="accordion" role="tablist">
-      <Asset v-for="(asset, key) in assets" :asset="asset" :context="context" :id="key" :key="key" />
+      <Asset v-for="(asset, key) in assets" :asset="asset" :expand="expand" :context="context" :id="String(key)" :key="key" />
     </div>
   </section>
 </template>
 
 <script>
 import Asset from './Asset.vue';
+import Utils from '../utils';
 
 export default {
   name: 'Assets',
@@ -21,8 +22,26 @@ export default {
       required: true
     },
     context: {
-        type: Object,
-        default: null
+      type: Object,
+      default: null
+    },
+    definition: {
+      type: Boolean,
+      default: false
+    }
+  },
+  computed: {
+    title() {
+      return this.definition ? 'Assets in Items' : 'Assets';
+    },
+    expand() {
+      if (this.definition) {
+        return false; // Don't expand assets for Item Asset Definitions
+      }
+      else if (Utils.size(this.assets) === 1) {
+        return true; // Expand asset if it's the only asset available
+      }
+      return null; // Let asset decide (e.g. depending on roles)
     }
   }
 }
