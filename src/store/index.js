@@ -224,7 +224,7 @@ export default new Vuex.Store({
     show(state, { url, title }) {
       let stac = state.database[url] || null;
       state.url = url || null;
-      state.data = stac;
+      state.data = stac instanceof STAC ? stac : null;
       state.valid = null;
       if (title) {
         state.title = title;
