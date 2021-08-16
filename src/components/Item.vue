@@ -17,6 +17,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import StacLink from './StacLink.vue';
+import STAC from '../stac';
 
 export default {
   name: 'Item',
@@ -32,7 +33,12 @@ export default {
   computed: {
     ...mapGetters(['getStac']),
     data() {
-      return this.getStac(this.item.href);
+      if (this.item instanceof STAC) {
+        return this.item;
+      }
+      else {
+        return this.getStac(this.item.href);
+      }
     },
     thumbnail() {
       if (this.data) {
@@ -70,6 +76,9 @@ export default {
   },
   methods: {
     load(visible) {
+      if (this.item instanceof STAC) {
+        return;
+      }
       this.$store.commit(visible ? 'queue' : 'unqueue', this.item.href);
     }
   }

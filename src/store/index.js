@@ -17,7 +17,8 @@ export default new Vuex.Store({
     apiCollections: [],
     nextCollectionsLink: null,
     apiItems: [],
-    apiItemsPage: 1,
+    apiItemsLink: null,
+    apiItemsPagination: {},
     // Global settings
     allowSelectCatalog: !CONFIG.catalogUrl,
     stacIndex: [],
@@ -101,8 +102,13 @@ export default new Vuex.Store({
     collectionLink: (state, getters) => getters.getLink('collection'),
 
     items: state => {
-      // ToDo: API & Pagination support(?)
-      return state.data ? state.data.getLinksWithRels(['item']) : [];
+      if (state.apiItems.length > 0) {
+        return state.apiItems;
+      }
+      else if (state.data) {
+        return state.data.getLinksWithRels(['item']);
+      }
+      return [];
     },
     catalogs: state => {
       let catalogs = [];
@@ -122,7 +128,7 @@ export default new Vuex.Store({
     thumbnails: state => state.data ? state.data.getThumbnails() : [],
     additionalLinks: state => state.data ? state.data.getLinksWithOtherRels(state.supportedRelTypes) : [],
 
-    supportsSearch: () => false, // ToDo
+    supportsSearch: (state, getters) => Boolean(getters.root?.getLinkWithRel('search') || state.data?.getLinkWithRel('search')),
 
     toBrowserPath: state => url => {
       // ToDo: proxy support
@@ -229,6 +235,8 @@ export default new Vuex.Store({
     },
     loading(state, url) {
       state.apiCollections = [];
+      state.apiItems = [];
+      state.apiItemsPagination = {};
       Vue.set(state.database, url, null);
     },
     loaded(state, {url, data}) {
@@ -239,7 +247,6 @@ export default new Vuex.Store({
       state.url = url || null;
       state.data = stac instanceof STAC ? stac : null;
       state.valid = null;
-      // state.apiItems = [];
       if (title) {
         state.title = title;
       }
@@ -270,6 +277,21 @@ export default new Vuex.Store({
     },
     removeFromQueue(state, num) {
       state.queue.splice(0, num);
+    },
+    addApiItems(state, {data, link}) {
+      if (Array.isArray(data.features)) {
+        state.apiItems = data.features;
+        state.apiItemsLink = link;
+
+        // Handle pagination links
+        let pageLinks = Utils.getLinksWithRels(data.links, ['first', 'prev', 'previous', 'next', 'last']);
+        let pages = {};
+        for(let pageLink of pageLinks) {
+          let rel = pageLink.rel === 'previous' ? 'prev' : pageLink.rel;
+          pages[rel] = pageLink;
+        }
+        state.apiItemsPagination = pages;
+      }
     },
     addApiCollections(state, data) {
       if (Array.isArray(data.collections)) {
@@ -329,10 +351,30 @@ export default new Vuex.Store({
       if (data) {
         // Load API Collections
         await cx.dispatch('loadNextApiCollections', data.getLinkWithRel('data'));
+        // Load API Items
+        await cx.dispatch('loadApiItems', data.getLinkWithRel('items'));
       }
 
       if (show) {
         cx.commit('show', {url});
+      }
+    },
+    async loadApiItems(cx, link) {
+      if (!link) {
+        return;
+      }
+      // ToDo: Caching
+      let response = await axios(Utils.stacLinkToAxiosRequest(link));
+      if (!Utils.isObject(response.data) || !Array.isArray(response.data.features)) {
+        throw new Error('The API response is not a valid list of STAC Items');
+      }
+      else {
+        response.data.features = response.data.features.map(item => {
+          let selfLink = Utils.getLinkWithRel(item.links, 'self');
+          let url = Utils.toAbsolute(selfLink?.href || `./collections/${cx.state.data.id}/items/${item.id}`, cx.state.url);
+          return new STAC(item, url, cx.getters.toBrowserPath(url));
+        });
+        cx.commit('addApiItems', {data: response.data, link});
       }
     },
     async loadNextApiCollections(cx, link = null) {
@@ -345,10 +387,10 @@ export default new Vuex.Store({
         throw new Error('The API response is not a valid list of STAC Collections');
       }
       else {
-        response.data.collections = response.data.collections.map(data => {
-          let selfLink = Utils.getLinkWithRel(data.links, 'self');
-          let url = Utils.toAbsolute(selfLink?.href || `./collections/${data.id}`, cx.state.url);
-          return new STAC(data, url, cx.getters.toBrowserPath(url));
+        response.data.collections = response.data.collections.map(collection => {
+          let selfLink = Utils.getLinkWithRel(collection.links, 'self');
+          let url = Utils.toAbsolute(selfLink?.href || `./collections/${collection.id}`, cx.state.url);
+          return new STAC(collection, url, cx.getters.toBrowserPath(url));
         });
         cx.commit('addApiCollections', response.data);
       }

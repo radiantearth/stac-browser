@@ -1,6 +1,5 @@
 <template>
   <div class="item">
-    <!-- ToDo: Link to Collection - add to StacHeader? -->
     <b-row>
       <b-col>
         <Description v-if="data.properties.description" :description="data.properties.description" />
