@@ -73,7 +73,4 @@ export default {
     width: 100%;
     max-width: 800px;
 }
-.twitter {
-    background-color: #1DA1F2;
-}
 </style>

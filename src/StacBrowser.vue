@@ -5,7 +5,7 @@
     </b-sidebar>
     <!-- Header -->
     <header>
-      <div class="logo">{{ rootTitle }}</div>
+      <div class="logo">{{ catalogTitle }}</div>
       <StacHeader />
     </header>
     <!-- Content (Item / Catalog) -->
@@ -26,7 +26,7 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 
 import routes from "./router";
-import { mapGetters } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 import store from "./store";
 
 import {
@@ -105,9 +105,13 @@ export default {
     title(title) {
       document.title = title;
     }
-  },Watchers,
+  },
+  mounted() {
+    setInterval(() => this.$store.dispatch('loadBackground', 5), 250);
+  },
   computed: {
-    ...mapGetters(['rootTitle']),
+    ...mapState(['title']),
+    ...mapGetters(['displayCatalogTitle']),
     browserVersion() {
       return STAC_BROWSER_VERSION;
     }

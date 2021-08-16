@@ -11,11 +11,19 @@ export default new Vuex.Store({
   state: Object.assign(CONFIG, {
     // Local settings (e.g. for currently loaded STAC entity)
     url: '',
-    title: '',
+    title: CONFIG.catalogTitle,
     data: null,
     valid: null,
+    apiCollections: [],
+    nextCollectionsLink: null,
+    apiItems: [],
+    apiItemsLink: null,
+    apiItemsPagination: {},
     // Global settings
+    allowSelectCatalog: !CONFIG.catalogUrl,
+    stacIndex: [],
     database: {},
+    queue: [],
     supportedRelTypes: [ // These will be handled in a special way and will not be shown in the link lists
       'child',
       'collection',
@@ -38,6 +46,9 @@ export default new Vuex.Store({
     loading: state => !state.database[state.url],
     error: state => state.database[state.url] instanceof Error ? state.database[state.url] : null,
     getStac: state => (url, returnErrorObject = false) => {
+      if (!url) {
+        return null;
+      }
       let absoluteUrl = Utils.toAbsolute(url, state.url);
       let data = state.database[absoluteUrl];
       if (!returnErrorObject && data instanceof Error) {
@@ -47,42 +58,129 @@ export default new Vuex.Store({
         return data;
       }
     },
-    isCollection: state => state.data ? state.data.isCollection() : false,
-    isCatalog: state => state.data ? state.data.isCatalog() : false,
-    isCatalogLike: state => state.data ? state.data.isCatalogLike() : false,
-    isItem: state => state.data ? state.data.isItem() : false,
-    stacVersion: state => state.data && state.data.stac_version ? state.data.stac_version : null,
-    root: (state, getters) => getters.getStac(state.catalogUrl),
-    rootTitle: (state, getters) => getters.root ? getters.root.getDisplayTitle(state.catalogTitle) : state.catalogTitle,
+    getStacFromLink: (state, getters) => (rel, fallback = null) => {
+      let link = state.data?.getLinkWithRel(rel) || {href: fallback};
+      return getters.getStac(link.href);
+    },
+
+    displayCatalogTitle: (state, getters) => getters.root?.getDisplayTitle() || state.catalogTitle,
+
+    isCollection: state => state.data?.isCollection() || false,
+    isCatalog: state => state.data?.isCatalog() || false,
+    isCatalogLike: state => state.data?.isCatalogLike() || false,
+    isItem: state => state.data?.isItem() || false,
+
+    stacVersion: state => state.data?.stac_version,
+
+    root: (state, getters) => getters.getStacFromLink('root', state.catalogUrl),
+    parent: (state, getters) => getters.getStacFromLink('parent'),
+    collection: (state, getters) => getters.getStacFromLink('collection'),
+
+    getLink: (state, getters) => rel => {
+      let link = state.data?.getLinkWithRel(rel);
+      let stac = getters[rel];
+      if (link) {
+        link = Object.assign({}, link);
+        link.title = stac?.getDisplayTitle() || link.title;
+      }
+      return link;
+    },
+    rootLink: (state, getters) => {
+      let link = getters.getLink('root');
+      if (link) {
+        link.title = link.title || state.catalogTitle;
+      }
+      else if (!link && state.catalogUrl) {
+        link = {
+          href: '/',
+          title: state.catalogTitle
+        };
+      }
+      return link;
+    },
+    parentLink: (state, getters) => getters.getLink('parent'),
+    collectionLink: (state, getters) => getters.getLink('collection'),
+
     items: state => {
-      // ToDo: API & Pagination support(?)
-      return state.data ? state.data.getLinksWithRels(['item']) : [];
+      if (state.apiItems.length > 0) {
+        return state.apiItems;
+      }
+      else if (state.data) {
+        return state.data.getLinksWithRels(['item']);
+      }
+      return [];
     },
     catalogs: state => {
-      // ToDo: API & Pagination support(?)
-      return state.data ? state.data.getLinksWithRels(['child']) : [];
+      let catalogs = [];
+      if (state.data) {
+        catalogs = catalogs.concat(state.data.getLinksWithRels(['child']));
+      }
+      if (state.apiCollections.length > 0) {
+        catalogs = catalogs.concat(state.apiCollections);
+      }
+      return catalogs;
     },
-    additionalLinks: state => state.data ? state.data.getLinksWithOtherRels(state.supportedRelTypes) : [],
-    hasAssets: state => Boolean(state.data && Utils.size(state.data.assets) > 0),
-    assets: state => state.data && Utils.isObject(state.data.assets) ? state.data.assets : [],
+    hasMoreCollections: state => Boolean(state.nextCollectionsLink),
+
+    // hasAsset also checks whether the assets have a href and thus are not item asset definitions
+    hasAssets: (state, getters) => Object.values(getters.assets).find(asset => Utils.isObject(asset) && typeof asset.href === 'string'),
+    assets: state => Utils.isObject(state.data?.assets) ? state.data.assets : {},
     thumbnails: state => state.data ? state.data.getThumbnails() : [],
-    supportsSearch: () => false, // ToDo
-    toBrowserPath: state => (url, baseUrl = null) => {
+    additionalLinks: state => state.data ? state.data.getLinksWithOtherRels(state.supportedRelTypes) : [],
+
+    supportsSearch: (state, getters) => Boolean(getters.root?.getLinkWithRel('search') || state.data?.getLinkWithRel('search')),
+
+    toBrowserPath: state => url => {
       // ToDo: proxy support
       if (!Utils.hasText(url)) {
         url = '/';
       }
-      if (baseUrl === null) {
-        baseUrl = state.url;
+
+      let absolute = Utils.toAbsolute(url, state.url, false);
+      let relative;
+      if (state.catalogUrl) {
+        relative = absolute.relativeTo(state.catalogUrl);
       }
-      return '/' + Utils.toAbsolute(url, state.url, false).relativeTo(state.catalogUrl).toString();
+
+      if (!relative || relative === absolute) { // This is an external URL
+        if (!state.allowExternalAccess) {
+          return absolute.toString();
+        }
+        let parts = ['/external'];
+        let protocol = absolute.protocol();
+        if (protocol !== 'https') {
+          parts.push(protocol + ':');
+        }
+        parts.push(absolute.authority());
+        parts.push(absolute.path().replace(/^\//, ''));
+        return parts.join('/');
+      }
+      else {
+        return '/' + relative.toString();
+      }
     },
     fromBrowserPath: (state, getters) => url => {
       if (!Utils.hasText(url) || url === '/') {
         url = state.catalogUrl;
       }
-      return getters.getProxiedUrl(Utils.toAbsolute(url, state.catalogUrl));
+      else if (url.startsWith('/external/')) {
+        let parts = url.replace(/^\/external\//, '').split('/');
+        let protocol;
+        if (!parts[0].endsWith(':')) {
+          protocol = 'https';
+        }
+        else {
+          protocol = parts.shift();
+          parts = parts.slice(1);
+        }
+        url = `${protocol}://${parts.join('/')}`;
+      }
+      else if (state.catalogUrl) {
+        url = Utils.toAbsolute(url, state.catalogUrl);
+      }
+      return getters.getProxiedUrl(url);
     },
+
     getProxiedUrl: state => absoluteUrl => {
       // If we are proxying a STAC Catalog, replace any URI with the proxied address.
       if (Array.isArray(state.stacProxyUrl)) {
@@ -90,7 +188,7 @@ export default new Vuex.Store({
       }
       return absoluteUrl;
     },
-  getTileSource: (state, getters) => assetHref => {
+    getTileSource: (state, getters) => assetHref => {
       const proxiedUri = getters.getTileProxiedUrl(assetHref);
       return state.tileSourceTemplate.replace("{ASSET_HREF}", proxiedUri);
     },
@@ -129,10 +227,16 @@ export default new Vuex.Store({
         }
       }
     },
+    stacIndex(state, index) {
+      state.stacIndex = index;
+    },
     tileSourceTemplate(state, tileSourceTemplate) {
       state.tileSourceTemplate = tileSourceTemplate;
     },
     loading(state, url) {
+      state.apiCollections = [];
+      state.apiItems = [];
+      state.apiItemsPagination = {};
       Vue.set(state.database, url, null);
     },
     loaded(state, {url, data}) {
@@ -141,7 +245,7 @@ export default new Vuex.Store({
     show(state, { url, title }) {
       let stac = state.database[url] || null;
       state.url = url || null;
-      state.data = stac;
+      state.data = stac instanceof STAC ? stac : null;
       state.valid = null;
       if (title) {
         state.title = title;
@@ -161,9 +265,63 @@ export default new Vuex.Store({
 		},
 		valid(state, valid) {
       state.valid = valid;
-		}
+		},
+    queue(state, url) {
+      state.queue.push(url);
+    },
+    unqueue(state, url) {
+      let i = state.queue.indexOf(url);
+      if (i !== -1) {
+        state.queue.splice(i, 1);
+      }
+    },
+    removeFromQueue(state, num) {
+      state.queue.splice(0, num);
+    },
+    addApiItems(state, {data, link}) {
+      if (Array.isArray(data.features)) {
+        state.apiItems = data.features;
+        state.apiItemsLink = link;
+
+        // Handle pagination links
+        let pageLinks = Utils.getLinksWithRels(data.links, ['first', 'prev', 'previous', 'next', 'last']);
+        let pages = {};
+        for(let pageLink of pageLinks) {
+          let rel = pageLink.rel === 'previous' ? 'prev' : pageLink.rel;
+          pages[rel] = pageLink;
+        }
+        state.apiItemsPagination = pages;
+      }
+    },
+    addApiCollections(state, data) {
+      if (Array.isArray(data.collections)) {
+          state.nextCollectionsLink = Utils.getLinkWithRel(data.links, 'next');
+          state.apiCollections = state.apiCollections.concat(data.collections);
+      }
+    }
   },
   actions: {
+    async loadBackground(cx, count) {
+      let urls = cx.state.queue.slice(0, count);
+      if (urls.length > 0) {
+        let promises = [];
+        for(let url of urls) {
+          promises.push(cx.dispatch('load', { url }));
+        }
+        cx.commit('removeFromQueue', count);
+        return await Promise.all(promises);
+      }
+    },
+    async loadStacIndex(cx) {
+      try {
+        let response = await axios.get('https://stacindex.org/api/catalogs');
+        if (Array.isArray(response.data)) {
+          cx.commit('stacIndex', response.data);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
     async load(cx, {url, fromBrowser, show}) {
       let path;
       if (fromBrowser) {
@@ -174,21 +332,67 @@ export default new Vuex.Store({
         url = Utils.toAbsolute(url, cx.state.url);
         path = cx.getters.toBrowserPath(url);
       }
-      if (!cx.state.database[url]) {
+
+      let data = cx.state.database[url];
+      if (!data) {
         cx.commit('loading', url);
         try {
           let response = await axios.get(url);
           if (!Utils.isObject(response.data)) {
             throw new Error('The response is not a valid STAC entity');
           }
-          let data = new STAC(response.data, url, path);
+          data = new STAC(response.data, url, path);
           cx.commit('loaded', {url, data});
         } catch (error) {
           cx.commit('errored', {url, error});
         }
       }
+
+      if (data) {
+        // Load API Collections
+        await cx.dispatch('loadNextApiCollections', data.getLinkWithRel('data'));
+        // Load API Items
+        await cx.dispatch('loadApiItems', data.getLinkWithRel('items'));
+      }
+
       if (show) {
         cx.commit('show', {url});
+      }
+    },
+    async loadApiItems(cx, link) {
+      if (!link) {
+        return;
+      }
+      // ToDo: Caching
+      let response = await axios(Utils.stacLinkToAxiosRequest(link));
+      if (!Utils.isObject(response.data) || !Array.isArray(response.data.features)) {
+        throw new Error('The API response is not a valid list of STAC Items');
+      }
+      else {
+        response.data.features = response.data.features.map(item => {
+          let selfLink = Utils.getLinkWithRel(item.links, 'self');
+          let url = Utils.toAbsolute(selfLink?.href || `./collections/${cx.state.data.id}/items/${item.id}`, cx.state.url);
+          return new STAC(item, url, cx.getters.toBrowserPath(url));
+        });
+        cx.commit('addApiItems', {data: response.data, link});
+      }
+    },
+    async loadNextApiCollections(cx, link = null) {
+      link = link || cx.state.nextCollectionsLink;
+      if (!link) {
+        return;
+      }
+      let response = await axios(Utils.stacLinkToAxiosRequest(link));
+      if (!Utils.isObject(response.data) || !Array.isArray(response.data.collections)) {
+        throw new Error('The API response is not a valid list of STAC Collections');
+      }
+      else {
+        response.data.collections = response.data.collections.map(collection => {
+          let selfLink = Utils.getLinkWithRel(collection.links, 'self');
+          let url = Utils.toAbsolute(selfLink?.href || `./collections/${collection.id}`, cx.state.url);
+          return new STAC(collection, url, cx.getters.toBrowserPath(url));
+        });
+        cx.commit('addApiCollections', response.data);
       }
     },
     async validate(cx, url) {
@@ -206,9 +410,6 @@ export default new Vuex.Store({
           cx.commit('valid', error);
         }
       }
-    },
-    async fetch() {
-
     }
   },
 });

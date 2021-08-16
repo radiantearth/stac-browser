@@ -4,7 +4,7 @@
             <b-button v-show="stacUrl" size="sm" variant="outline-primary" id="popover-link"><b-icon-link /></b-button>
             <b-button size="sm" variant="outline-primary" id="popover-share"><b-icon-share /></b-button>
         </b-button-group>
-        <b-popover v-show="stacUrl" target="popover-link" triggers="hover" placement="bottom" container="body" title="Source Data">
+        <b-popover v-show="stacUrl" target="popover-link" triggers="click blur" placement="bottom" container="stac-browser" title="Source Data">
             <b-row v-if="stacVersion">
                 <b-col cols="2">STAC Version:</b-col>
                 <b-col>{{ stacVersion }}</b-col>
@@ -16,7 +16,7 @@
             <hr />
             <Url id="stacUrl" :url="stacUrl" label="The STAC metdata file is located at:" />
         </b-popover>
-        <b-popover target="popover-share" triggers="hover" placement="bottom" container="body" title="Share">
+        <b-popover target="popover-share" triggers="click blur" placement="bottom" container="stac-browser" title="Share">
             <Url id="browserUrl" :url="browserUrl()" label="Share the URL of this page anywhere you like:" :open="false" />
             <hr />
             <b-button class="twitter mr-1" :href="twitterUrl"><b-icon-twitter /> Twitter</b-button>
