@@ -63,7 +63,15 @@ export default {
       }
     },
     displayTitle() {
-      return this.title || this.link.title || this.link.id || Utils.titleForHref(this.link.href);
+      if (this.title) {
+        return this.title;
+      }
+      else if (this.link instanceof STAC) {
+        return this.link.getDisplayTitle(STAC.DEFAULT_TITLE);
+      }
+      else {
+        return this.link.title || Utils.titleForHref(this.link.href);
+      }
     }
   }
 };

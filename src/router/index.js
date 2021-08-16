@@ -1,3 +1,5 @@
+import Browse from '../views/Browse.vue';
+
 let routes = [
   {
     path: "/search",
@@ -10,7 +12,7 @@ if (CONFIG.allowExternalAccess) {
   routes.push({
     path: "/external/(.*)",
     name: "browseExternal",
-    component: () => import("../views/Browse.vue"),
+    component: Browse,
     props: route => {
       return {
         path: `/external/${route.params.pathMatch}`
@@ -30,7 +32,7 @@ if (!CONFIG.catalogUrl) {
 routes.push({
   path: "/(.*)",
   name: "browse",
-  component: () => import("../views/Browse.vue"),
+  component: Browse,
   props: route => {
     return {
       path: route.params.pathMatch
