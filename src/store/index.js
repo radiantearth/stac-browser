@@ -18,6 +18,7 @@ export default new Vuex.Store({
     allowSelectCatalog: !CONFIG.catalogUrl,
     stacIndex: [],
     database: {},
+    queue: [],
     supportedRelTypes: [ // These will be handled in a special way and will not be shown in the link lists
       'child',
       'collection',
@@ -244,9 +245,30 @@ export default new Vuex.Store({
 		},
 		valid(state, valid) {
       state.valid = valid;
-		}
+		},
+    queue(state, url) {
+      state.queue.push(url);
+    },
+    unqueue(state, url) {
+      let i = state.queue.indexOf(url);
+      if (i !== -1) {
+        state.queue.splice(i, 1);
+      }
+    },
+    removeFromQueue(state, num) {
+      state.queue.splice(0, num);
+    }
   },
   actions: {
+    async loadBackground(cx, count) {
+      let urls = cx.state.queue.slice(0, count);
+      let promises = [];
+      for(let url of urls) {
+        promises.push(cx.dispatch('load', { url }));
+      }
+      cx.commit('removeFromQueue', count);
+      return await Promise.all(promises);
+    },
     async loadStacIndex(cx) {
       try {
         let response = await axios.get('https://stacindex.org/api/catalogs');

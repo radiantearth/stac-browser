@@ -1,5 +1,5 @@
 <template>
-  <b-card no-body class="catalog-card" v-b-visible.once.200="load">
+  <b-card no-body class="catalog-card" :class="{queued: !this.data}" v-b-visible.200="load">
     <b-row no-gutters>
       <b-col :md="thumbnail ? 8 : 12">
         <b-card-body>
@@ -66,9 +66,7 @@ export default {
   },
   methods: {
     load(visible) {
-      if (visible) {
-        this.$store.dispatch("load", { url: this.catalog.href });
-      }
+      this.$store.commit(visible ? 'queue' : 'unqueue', this.catalog.href);
     }
   }
 }
@@ -79,6 +77,10 @@ export default {
   min-width: 50%;
   box-sizing: border-box;
   margin-top: 1em;
+
+  &.queued {
+    min-height: 10rem;
+  }
 
   .intro {
     display: -webkit-box;

@@ -106,6 +106,9 @@ export default {
       document.title = title;
     }
   },
+  mounted() {
+    setInterval(() => this.$store.dispatch('loadBackground', 5), 250);
+  },
   computed: {
     ...mapGetters(['displayCatalogTitle']),
     browserVersion() {
