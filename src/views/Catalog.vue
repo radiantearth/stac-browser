@@ -134,9 +134,7 @@ export default {
     },
     paginateItems(link) {
       this.$store.dispatch('loadApiItems', link);
-    }
-  },
-  methods: {
+    },
     mapClicked(stac) {
       console.log(stac);
     }

@@ -167,7 +167,7 @@ export default new Vuex.Store({
         let parts = url.replace(/^\/external\//, '').split('/');
         let protocol;
         if (!parts[0].endsWith(':')) {
-          protocol = 'https';
+          protocol = 'https:';
         }
         else {
           protocol = parts.shift();
@@ -223,7 +223,7 @@ export default new Vuex.Store({
       }
     },
     stacIndex(state, index) {
-      state.stacIndex = index;
+      state.stacIndex = Object.freeze(index);
     },
     tileSourceTemplate(state, tileSourceTemplate) {
       state.tileSourceTemplate = tileSourceTemplate;
@@ -235,7 +235,7 @@ export default new Vuex.Store({
       Vue.set(state.database, url, null);
     },
     loaded(state, {url, data}) {
-      Vue.set(state.database, url, data);
+      Vue.set(state.database, url, Object.freeze(data));
     },
     show(state, { url, title }) {
       let stac = state.database[url] || null;
@@ -275,7 +275,7 @@ export default new Vuex.Store({
     },
     addApiItems(state, {data, link}) {
       if (Array.isArray(data.features)) {
-        state.apiItems = data.features;
+        state.apiItems = data.features.map(feature => Object.freeze(feature));
         state.apiItemsLink = link;
 
         // Handle pagination links
@@ -291,7 +291,7 @@ export default new Vuex.Store({
     addApiCollections(state, data) {
       if (Array.isArray(data.collections)) {
           state.nextCollectionsLink = Utils.getLinkWithRel(data.links, 'next');
-          state.apiCollections = state.apiCollections.concat(data.collections);
+          state.apiCollections = state.apiCollections.concat(data.collections.map(collection => Object.freeze(collection)));
       }
     }
   },

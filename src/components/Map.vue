@@ -1,18 +1,22 @@
 <template>
   <section class="mb-4">
     <l-map class="map" :class="stac.type" ref="leaflet" @ready="init()">
-      <l-control-fullscreen />
-      <l-tile-layer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" :options="mapOptions" />
+      <LControlFullscreen />
+      <template v-if="baseMaps.length > 0">
+        <component :is="baseMap.component" v-for="baseMap in baseMaps" :key="baseMap.name" v-bind="baseMap" :layers="baseMap.name" layer-type="base" />
+      </template>
+      <LTileLayer v-else url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" :options="mapOptions" />
     </l-map>
   </section>
 </template>
 
 <script>
-// import L from 'leaflet';
-import { LMap, LTileLayer } from 'vue2-leaflet';
+import { CRS } from "leaflet";
+import { LMap, LTileLayer, LWMSTileLayer } from 'vue2-leaflet';
 import LControlFullscreen from 'vue2-leaflet-fullscreen';
 import 'leaflet/dist/leaflet.css';
 import stacLayer from 'stac-layer';
+import Utils from '../utils';
 import { mapState } from 'vuex';
 
 export default {
@@ -20,7 +24,8 @@ export default {
   components: {
     LControlFullscreen,
     LMap,
-    LTileLayer
+    LTileLayer,
+    LWMSTileLayer
   },
   data() {
     return {
@@ -39,7 +44,46 @@ export default {
     }
   },
   computed: {
-    ...mapState(['geoTiffResolution', 'tileSourceTemplate', 'buildTileUrlTemplate'])
+    ...mapState(['geoTiffResolution', 'tileSourceTemplate', 'buildTileUrlTemplate']),
+    baseMaps() {
+      let targets = [];
+      if (this.stac.isCollection() && Utils.isObject(this.stac.summaries) && Array.isArray(this.stac.summaries['ssys:targets'])) {
+        targets = this.stac.summaries['ssys:targets'];
+      }
+      else if (this.stac.isCollection() && Array.isArray(this.stac['ssys:targets'])) {
+        targets = this.stac['ssys:targets'];
+      }
+      else if (this.stac.isItem() && Array.isArray(this.stac.properties['ssys:targets'])) {
+        targets = this.stac.properties['ssys:targets'];
+      }
+
+      const baseMaps = {
+        europa: {
+          baseUrl: "https://planetarymaps.usgs.gov/cgi-bin/mapserv?map=/maps/jupiter/europa_simp_cyl.map",
+          name: "GALILEO_VOYAGER"
+        },
+        mars: {
+          baseUrl: "https://planetarymaps.usgs.gov/cgi-bin/mapserv?map=/maps/mars/mars_simp_cyl.map",
+          name: "MDIM21"
+        },
+        moon: {
+          baseUrl: "https://planetarymaps.usgs.gov/cgi-bin/mapserv?map=/maps/earth/moon_simp_cyl.map",
+          name: "LROC_WAC"
+        }
+      };
+
+      return targets.map(target => {
+        target = target.toLowerCase();
+        if (baseMaps[target]) {
+          return Object.assign({
+              component: "LWMSTileLayer",
+              crs: CRS.EPSG4326,
+              attribution: "USGS Astrogeology",
+              format: "image/png"
+            }, baseMaps[target]);
+        }
+      });
+    }
   },
   methods: {
     async init() {

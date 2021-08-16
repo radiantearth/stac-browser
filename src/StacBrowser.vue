@@ -107,7 +107,7 @@ export default {
     }
   },
   mounted() {
-    setInterval(() => this.$store.dispatch('loadBackground', 5), 250);
+    setInterval(() => this.$store.dispatch('loadBackground', 3), 200);
   },
   computed: {
     ...mapState(['title']),

@@ -1,6 +1,6 @@
 <template>
   <section class="catalogs mb-4">
-    <h2>Catalogs</h2>
+    <h2>Catalogs ({{ catalogs.length }})</h2>
     <b-card-group columns>
       <Catalog v-for="catalog in catalogs" :catalog="catalog" :key="catalog.href" />
     </b-card-group>
