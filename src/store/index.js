@@ -167,7 +167,7 @@ export default new Vuex.Store({
         let parts = url.replace(/^\/external\//, '').split('/');
         let protocol;
         if (!parts[0].endsWith(':')) {
-          protocol = 'https';
+          protocol = 'https:';
         }
         else {
           protocol = parts.shift();
