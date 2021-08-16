@@ -52,6 +52,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+h1 {
+  word-break: break-word;
+}
 .lead .in {
   margin-right: 0.5em;
 }
