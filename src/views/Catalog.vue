@@ -30,7 +30,7 @@
     </b-col>
     <b-col class="right">
       <Providers v-if="hasProviders" :providers="data.providers" />
-      <Catalogs v-if="catalogs.length > 0" :catalogs="catalogs" />
+      <Catalogs v-if="catalogs.length > 0" :catalogs="catalogs" :hasMore="hasMoreCollections" @loadMore="loadMoreCollections" />
       <Items v-if="items.length > 0" :items="items" />
       <Assets v-if="hasAssets" :assets="assets" />
       <Assets v-if="hasItemAssets" :assets="data.item_assets" :definition="true" />
@@ -95,7 +95,7 @@ export default {
   },
   computed: {
     ...mapState(['data', 'url']),
-    ...mapGetters(['additionalLinks', 'catalogs', 'isCollection', 'items', 'thumbnails', 'hasAssets', 'assets']),
+    ...mapGetters(['additionalLinks', 'catalogs', 'isCollection', 'items', 'thumbnails', 'hasMoreCollections', 'hasAssets', 'assets']),
     licenses() {
       if (this.isCollection && this.data.license) {
         return Formatters.formatLicense(this.data.license, null, null, this.data);
@@ -118,6 +118,11 @@ export default {
     },
     hasItemAssets() {
       return Utils.size(this.data?.item_assets) > 0;
+    }
+  },
+  methods: {
+    loadMoreCollections() {
+      this.$store.dispatch('loadNextApiCollections');
     }
   }
 };

@@ -26,7 +26,7 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 
 import routes from "./router";
-import { mapGetters } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 import store from "./store";
 
 import {
@@ -110,6 +110,7 @@ export default {
     setInterval(() => this.$store.dispatch('loadBackground', 5), 250);
   },
   computed: {
+    ...mapState(['title']),
     ...mapGetters(['displayCatalogTitle']),
     browserVersion() {
       return STAC_BROWSER_VERSION;

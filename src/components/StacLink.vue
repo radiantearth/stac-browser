@@ -5,6 +5,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import Utils from '../utils';
+import STAC from '../stac';
 
 export default {
   name: "StacLink",
@@ -21,6 +22,9 @@ export default {
   computed: {
     ...mapGetters(['toBrowserPath']),
     isStacBrowserLink() {
+      if (this.link instanceof STAC) {
+        return true;
+      }
       switch(this.link.rel) {
         case 'root': // STAC hierarchical links v
         case 'child':
@@ -48,7 +52,10 @@ export default {
       }
     },
     href() {
-      if (this.isStacBrowserLink) {
+      if (this.link instanceof STAC) {
+        return this.link.getBrowserPath();
+      }
+      else if (this.isStacBrowserLink) {
           return this.toBrowserPath(this.link.href);
       }
       else {
@@ -56,7 +63,7 @@ export default {
       }
     },
     displayTitle() {
-      return this.title || this.link.title || Utils.titleForHref(this.link.href);
+      return this.title || this.link.title || this.link.id || Utils.titleForHref(this.link.href);
     }
   }
 };

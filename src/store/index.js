@@ -14,6 +14,10 @@ export default new Vuex.Store({
     title: CONFIG.catalogTitle,
     data: null,
     valid: null,
+    apiCollections: [],
+    nextCollectionsLink: null,
+    apiItems: [],
+    apiItemsPage: 1,
     // Global settings
     allowSelectCatalog: !CONFIG.catalogUrl,
     stacIndex: [],
@@ -101,9 +105,16 @@ export default new Vuex.Store({
       return state.data ? state.data.getLinksWithRels(['item']) : [];
     },
     catalogs: state => {
-      // ToDo: API & Pagination support(?)
-      return state.data ? state.data.getLinksWithRels(['child']) : [];
+      let catalogs = [];
+      if (state.data) {
+        catalogs = catalogs.concat(state.data.getLinksWithRels(['child']));
+      }
+      if (state.apiCollections.length > 0) {
+        catalogs = catalogs.concat(state.apiCollections);
+      }
+      return catalogs;
     },
+    hasMoreCollections: state => Boolean(state.nextCollectionsLink),
 
     // hasAsset also checks whether the assets have a href and thus are not item asset definitions
     hasAssets: (state, getters) => Object.values(getters.assets).find(asset => Utils.isObject(asset) && typeof asset.href === 'string'),
@@ -217,6 +228,7 @@ export default new Vuex.Store({
       state.tileSourceTemplate = tileSourceTemplate;
     },
     loading(state, url) {
+      state.apiCollections = [];
       Vue.set(state.database, url, null);
     },
     loaded(state, {url, data}) {
@@ -227,6 +239,7 @@ export default new Vuex.Store({
       state.url = url || null;
       state.data = stac instanceof STAC ? stac : null;
       state.valid = null;
+      // state.apiItems = [];
       if (title) {
         state.title = title;
       }
@@ -257,17 +270,25 @@ export default new Vuex.Store({
     },
     removeFromQueue(state, num) {
       state.queue.splice(0, num);
+    },
+    addApiCollections(state, data) {
+      if (Array.isArray(data.collections)) {
+          state.nextCollectionsLink = Utils.getLinkWithRel(data.links, 'next');
+          state.apiCollections = state.apiCollections.concat(data.collections);
+      }
     }
   },
   actions: {
     async loadBackground(cx, count) {
       let urls = cx.state.queue.slice(0, count);
-      let promises = [];
-      for(let url of urls) {
-        promises.push(cx.dispatch('load', { url }));
+      if (urls.length > 0) {
+        let promises = [];
+        for(let url of urls) {
+          promises.push(cx.dispatch('load', { url }));
+        }
+        cx.commit('removeFromQueue', count);
+        return await Promise.all(promises);
       }
-      cx.commit('removeFromQueue', count);
-      return await Promise.all(promises);
     },
     async loadStacIndex(cx) {
       try {
@@ -289,21 +310,47 @@ export default new Vuex.Store({
         url = Utils.toAbsolute(url, cx.state.url);
         path = cx.getters.toBrowserPath(url);
       }
-      if (!cx.state.database[url]) {
+
+      let data = cx.state.database[url];
+      if (!data) {
         cx.commit('loading', url);
         try {
           let response = await axios.get(url);
           if (!Utils.isObject(response.data)) {
             throw new Error('The response is not a valid STAC entity');
           }
-          let data = new STAC(response.data, url, path);
+          data = new STAC(response.data, url, path);
           cx.commit('loaded', {url, data});
         } catch (error) {
           cx.commit('errored', {url, error});
         }
       }
+
+      if (data) {
+        // Load API Collections
+        await cx.dispatch('loadNextApiCollections', data.getLinkWithRel('data'));
+      }
+
       if (show) {
         cx.commit('show', {url});
+      }
+    },
+    async loadNextApiCollections(cx, link = null) {
+      link = link || cx.state.nextCollectionsLink;
+      if (!link) {
+        return;
+      }
+      let response = await axios(Utils.stacLinkToAxiosRequest(link));
+      if (!Utils.isObject(response.data) || !Array.isArray(response.data.collections)) {
+        throw new Error('The API response is not a valid list of STAC Collections');
+      }
+      else {
+        response.data.collections = response.data.collections.map(data => {
+          let selfLink = Utils.getLinkWithRel(data.links, 'self');
+          let url = Utils.toAbsolute(selfLink?.href || `./collections/${data.id}`, cx.state.url);
+          return new STAC(data, url, cx.getters.toBrowserPath(url));
+        });
+        cx.commit('addApiCollections', response.data);
       }
     },
     async validate(cx, url) {
@@ -321,9 +368,6 @@ export default new Vuex.Store({
           cx.commit('valid', error);
         }
       }
-    },
-    async fetch() {
-
     }
   },
 });

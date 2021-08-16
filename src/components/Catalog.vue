@@ -22,6 +22,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import StacLink from './StacLink.vue';
+import STAC from '../stac';
 
 export default {
   name: 'Catalog',
@@ -37,7 +38,12 @@ export default {
   computed: {
     ...mapGetters(['getStac']),
     data() {
-      return this.getStac(this.catalog.href);
+      if (this.catalog instanceof STAC) {
+        return this.catalog;
+      }
+      else {
+        return this.getStac(this.catalog.href);
+      }
     },
     thumbnail() {
       if (this.data) {
@@ -66,6 +72,9 @@ export default {
   },
   methods: {
     load(visible) {
+      if (this.catalog instanceof STAC) {
+        return;
+      }
       this.$store.commit(visible ? 'queue' : 'unqueue', this.catalog.href);
     }
   }
