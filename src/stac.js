@@ -4,14 +4,16 @@ import Migrate from '@radiantearth/stac-migrate';
 // STAC Entity
 class STAC {
 
-    constructor(data, url, path) {
+    constructor(data, url, path, migrate = true) {
         this._url = url;
         this._path = path;
 
-        let migrated = Migrate.stac(data);
-        for(let key in migrated) {
+        if (migrate) {
+            data = Migrate.stac(data);
+        }
+        for(let key in data) {
             if (typeof this[key] === 'undefined') {
-                this[key] = migrated[key];
+                this[key] = data[key];
             }
         }
     }
@@ -30,6 +32,14 @@ class STAC {
 
     isCollection() {
         return this.type === 'Collection';
+    }
+
+    getApiCollectionsLink() {
+        return this.getLinkWithRel('data');
+    }
+
+    getApiItemsLink() {
+        return this.getLinkWithRel('items');
     }
 
     getMetadata(field) {
@@ -66,15 +76,15 @@ class STAC {
     }
 
     getLinkWithRel(rel) {
-        return this.links.find(link => Utils.isObject(link) && typeof link.href === 'string' && link.rel === rel);
+        return Utils.getLinkWithRel(this.links, rel);
     }
 
     getLinksWithRels(rels) {
-        return this.links.filter(link => Utils.isObject(link) && typeof link.href === 'string' && rels.includes(link.rel));
+        return Utils.getLinksWithRels(this.links, rels);
     }
 
     getLinksWithOtherRels(rels) {
-        return this.links.filter(link => Utils.isObject(link) && typeof link.href === 'string' && !rels.includes(link.rel));
+        return Utils.getLinksWithOtherRels(this.links, rels);
     }
 
     getAssetsWithRoles(roles) {

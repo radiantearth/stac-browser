@@ -30,8 +30,8 @@
     </b-col>
     <b-col class="right">
       <Providers v-if="hasProviders" :providers="data.providers" />
-      <Catalogs v-if="catalogs.length > 0" :catalogs="catalogs" />
-      <Items v-if="items.length > 0" :items="items" />
+      <Catalogs v-if="catalogs.length > 0" :catalogs="catalogs" :hasMore="hasMoreCollections" @loadMore="loadMoreCollections" />
+      <Items v-if="items.length > 0" :items="items" :api="apiItems.length > 0" :pagination="itemPages" @paginate="paginateItems" />
       <Assets v-if="hasAssets" :assets="assets" />
       <Assets v-if="hasItemAssets" :assets="data.item_assets" :definition="true" />
       <Links v-if="additionalLinks.length > 0" title="Additional resources" :links="additionalLinks" />
@@ -94,8 +94,8 @@ export default {
     };
   },
   computed: {
-    ...mapState(['data', 'url']),
-    ...mapGetters(['additionalLinks', 'catalogs', 'isCollection', 'items', 'thumbnails', 'hasAssets', 'assets']),
+    ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination']),
+    ...mapGetters(['additionalLinks', 'catalogs', 'isCollection', 'items', 'thumbnails', 'hasMoreCollections', 'hasAssets', 'assets']),
     licenses() {
       if (this.isCollection && this.data.license) {
         return Formatters.formatLicense(this.data.license, null, null, this.data);
@@ -118,6 +118,22 @@ export default {
     },
     hasItemAssets() {
       return Utils.size(this.data?.item_assets) > 0;
+    },
+    itemPages() {
+      let pages = Object.assign({}, this.apiItemsPagination);
+      // If first link is not available, add the items link as first link
+      if (!pages.first && this.data && this.apiItemsLink && this.apiItemsLink.rel !== 'items') {
+        pages.first = this.data.getLinkWithRel('items');
+      }
+      return pages;
+    }
+  },
+  methods: {
+    loadMoreCollections() {
+      this.$store.dispatch('loadNextApiCollections');
+    },
+    paginateItems(link) {
+      this.$store.dispatch('loadApiItems', link);
     }
   },
   methods: {

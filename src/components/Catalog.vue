@@ -1,5 +1,5 @@
 <template>
-  <b-card no-body class="catalog-card" v-b-visible.once.200="load">
+  <b-card no-body class="catalog-card" :class="{queued: !this.data}" v-b-visible.200="load">
     <b-row no-gutters>
       <b-col :md="thumbnail ? 8 : 12">
         <b-card-body>
@@ -22,6 +22,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import StacLink from './StacLink.vue';
+import STAC from '../stac';
 
 export default {
   name: 'Catalog',
@@ -37,7 +38,12 @@ export default {
   computed: {
     ...mapGetters(['getStac']),
     data() {
-      return this.getStac(this.catalog.href);
+      if (this.catalog instanceof STAC) {
+        return this.catalog;
+      }
+      else {
+        return this.getStac(this.catalog.href);
+      }
     },
     thumbnail() {
       if (this.data) {
@@ -66,9 +72,10 @@ export default {
   },
   methods: {
     load(visible) {
-      if (visible) {
-        this.$store.dispatch("load", { url: this.catalog.href });
+      if (this.catalog instanceof STAC) {
+        return;
       }
+      this.$store.commit(visible ? 'queue' : 'unqueue', this.catalog.href);
     }
   }
 }
@@ -79,6 +86,10 @@ export default {
   min-width: 50%;
   box-sizing: border-box;
   margin-top: 1em;
+
+  &.queued {
+    min-height: 10rem;
+  }
 
   .intro {
     display: -webkit-box;

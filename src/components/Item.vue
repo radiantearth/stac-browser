@@ -1,5 +1,5 @@
 <template>
-  <b-card class="item-card" :img-src="thumbnail.href" :img-alt="thumbnail.title" img-top v-b-visible.once.200="load">
+  <b-card class="item-card" :class="{queued: !this.data}" :img-src="thumbnail.href" :img-alt="thumbnail.title" img-top v-b-visible.200="load">
     <b-card-title>
       <StacLink :link="item" :title="title" class="stretched-link" />
     </b-card-title>
@@ -17,6 +17,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import StacLink from './StacLink.vue';
+import STAC from '../stac';
 
 export default {
   name: 'Item',
@@ -32,7 +33,12 @@ export default {
   computed: {
     ...mapGetters(['getStac']),
     data() {
-      return this.getStac(this.item.href);
+      if (this.item instanceof STAC) {
+        return this.item;
+      }
+      else {
+        return this.getStac(this.item.href);
+      }
     },
     thumbnail() {
       if (this.data) {
@@ -70,21 +76,27 @@ export default {
   },
   methods: {
     load(visible) {
-      if (visible) {
-        this.$store.dispatch("load", { url: this.item.href });
+      if (this.item instanceof STAC) {
+        return;
       }
+      this.$store.commit(visible ? 'queue' : 'unqueue', this.item.href);
     }
   }
 }
 </script>
 
-<style>
+<style lang="scss">
 .item-card {
   text-align: center;
-}
-.item-card .card-img-top {
-  width: auto;
-  max-width: 100%;
-  max-height: 200px;
+
+  &.queued {
+    min-height: 200px;
+  }
+
+  .card-img-top {
+    width: auto;
+    max-width: 100%;
+    max-height: 200px;
+  }
 }
 </style>
