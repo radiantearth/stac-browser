@@ -171,9 +171,8 @@ export default new Vuex.Store({
         }
         else {
           protocol = parts.shift();
-          parts = parts.slice(1);
         }
-        url = `${protocol}://${parts.join('/')}`;
+        url = `${protocol}//${parts.join('/')}`;
       }
       else if (state.catalogUrl) {
         url = Utils.toAbsolute(url, state.catalogUrl);
