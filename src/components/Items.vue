@@ -1,26 +1,27 @@
 <template>
   <section class="items mb-4">
-    <h2>Items ({{ items.length }})</h2>
+    <h2>
+      Items
+      <template v-if="!api">({{ items.length }})</template>
+    </h2>
+    <Pagination ref="topPagination" v-if="api" :pagination="pagination" placement="top" @paginate="paginate" />
     <b-card-group columns>
       <Item v-for="item in chunkedItems" :item="item" :key="item.href" />
     </b-card-group>
-    <b-button-group v-if="api">
-      <b-button @click="paginate(pagination.first)" :disabled="!pagination.first" variant="primary">« First</b-button>
-      <b-button @click="paginate(pagination.prev)" :disabled="!pagination.prev" variant="primary">‹ Previous</b-button>
-      <b-button @click="paginate(pagination.next)" :disabled="!pagination.next" variant="primary">Next ›</b-button>
-      <b-button v-if="pagination.last" @click="paginate(pagination.last)" variant="primary">Last »</b-button>
-    </b-button-group>
+    <Pagination v-if="api" :pagination="pagination" placement="bottom" @paginate="paginate" />
     <b-button v-else-if="hasMore" @click="showMore" variant="primary" v-b-visible.200="showMore">Show more...</b-button>
   </section>
 </template>
 
 <script>
 import Item from './Item.vue';
+import Pagination from './Pagination.vue';
 
 export default {
   name: "Items",
   components: {
-    Item
+    Item,
+    Pagination
   },
   props: {
     items: {
@@ -63,7 +64,13 @@ export default {
     showMore() {
       this.shownItems += this.chunkSize;
     },
-    paginate(link) {
+    paginate(link, placement) {
+      if (placement === 'bottom' && this.$refs.topPagination) {
+        this.$refs.topPagination.$el.scrollIntoView({
+          behavior: "smooth",
+          block: "start"
+      });
+      }
       this.$emit('paginate', link);
     }
   }
