@@ -1,6 +1,7 @@
 <template>
   <b-row>
-    <b-col md="10">
+    <b-col md="12">
+      <Share class="float-right" :title="title" :stacUrl="url" :stacVersion="stacVersion" />
       <h1>{{ title }}</h1>
       <p class="lead" v-if="url">
         <span class="in mr-3" v-if="containerLink">in <StacLink :link="containerLink" /></span>
@@ -11,9 +12,6 @@
           <b-button v-if="supportsSearch" variant="outline-primary" size="sm" to="/search"><b-icon-search /> Search</b-button>
         </b-button-group>
       </p>
-    </b-col>
-    <b-col v-if="url" md="2" class="text-sm-right">
-      <Share :title="title" :stacUrl="url" :stacVersion="stacVersion" />
     </b-col>
   </b-row>
 </template>

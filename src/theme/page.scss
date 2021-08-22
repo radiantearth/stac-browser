@@ -1,8 +1,8 @@
-@import '~bootstrap/scss/bootstrap.scss';
-@import '~bootstrap-vue/src/index.scss';
-
 #stac-browser {
-    max-width: 1600px;
+    max-width: 100%;
+    @include media-breakpoint-only(xxxl) {
+      max-width: 75vw;
+    }
 
     > header {
         margin: $block-margin auto;

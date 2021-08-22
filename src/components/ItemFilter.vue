@@ -118,14 +118,14 @@ export default {
 </script>
 
 <style lang="scss">
-  @import "../theme/variables.scss";
-  
-  $default-color: #6c757d;
-  $primary-color: #17a2b8;
+@import '../theme/variables.scss';
 
-  @import '~vue2-datepicker/scss/index.scss';
+$default-color: $secondary;
+$primary-color: $primary;
 
-  .mx-datepicker {
-    width: 100%;
-  }
+@import '~vue2-datepicker/scss/index.scss';
+
+.mx-datepicker {
+  width: 100%;
+}
 </style>

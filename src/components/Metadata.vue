@@ -104,6 +104,9 @@ export default {
         &:only-child {
             margin-left: 0;
         }
+        dl:only-child {
+            margin-left: 1em;
+        }
     }
     ul > li > dl, ol > li > dl {
         margin-left: 0;

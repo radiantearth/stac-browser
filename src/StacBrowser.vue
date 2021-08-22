@@ -120,6 +120,8 @@ export default {
 </script>
 
 <style lang="scss">
+@import '~bootstrap/scss/bootstrap.scss';
+@import '~bootstrap-vue/src/index.scss';
 @import "./theme/variables.scss";
 @import "./theme/page.scss";
 </style>

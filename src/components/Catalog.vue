@@ -12,7 +12,7 @@
           <b-card-text v-if="temporalExtent"><small class="text-muted">{{ temporalExtent | TemporalExtent }}</small></b-card-text>
         </b-card-body>
       </b-col>
-      <b-col md="4" v-if="thumbnail" class="thumbnail">
+      <b-col md="4" v-if="thumbnail && showThumbnail" class="thumbnail">
         <b-card-img :src="thumbnail.href" :alt="thumbnail.title" fluid></b-card-img>
       </b-col>
     </b-row>
@@ -33,6 +33,11 @@ export default {
     catalog: {
       type: Object,
       required: true
+    }
+  },
+  data() {
+    return {
+      showThumbnail: false // Lazy load thumbnails and not all at once for API Collections
     }
   },
   computed: {
@@ -72,6 +77,9 @@ export default {
   },
   methods: {
     load(visible) {
+      if (visible) {
+        this.showThumbnail = true;
+      }
       if (this.catalog instanceof STAC) {
         return;
       }
@@ -83,9 +91,9 @@ export default {
 
 <style lang="scss">
 .catalog-card {
-  min-width: 50%;
   box-sizing: border-box;
-  margin-top: 1em;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
 
   &.queued {
     min-height: 10rem;

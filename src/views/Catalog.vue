@@ -150,35 +150,48 @@ export default {
 </script>
 
 <style lang="scss">
-@import '~bootstrap/scss/bootstrap.scss';
+@import '~bootstrap/scss/mixins';
+@import "../theme/variables.scss";
 
 .catalog {
   .left {
-    min-width: 400px;
+    min-width: 300px;
+  }
+  .right {
+    min-width: 250px;
   }
   .metadata {
     .card-columns {
       column-count: 1;
     }
     .card-columns:not(.count-1) {
-      @include media-breakpoint-only(xl) {
+      @include media-breakpoint-up(xl) {
         column-count: 2;
+      }
+      @include media-breakpoint-up(xxxl) {
+        column-count: 3;
       }
     }
   }
-  .items {
+  .items, .catalogs {
     .card-columns {
-      @include media-breakpoint-only(xl) {
-        column-count: 3;
+      @include media-breakpoint-only(sm) {
+        column-count: 1;
+      }
+      @include media-breakpoint-only(md) {
+        column-count: 1;
       }
       @include media-breakpoint-only(lg) {
         column-count: 2;
       }
-      @include media-breakpoint-only(md) {
+      @include media-breakpoint-only(xl) {
         column-count: 2;
       }
-      @include media-breakpoint-only(sm) {
-        column-count: 1;
+      @include media-breakpoint-only(xxl) {
+        column-count: 3;
+      }
+      @include media-breakpoint-up(xxxl) {
+        column-count: 4;
       }
     }
   }

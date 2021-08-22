@@ -1,5 +1,5 @@
 <template>
-  <b-card class="item-card" :class="{queued: !this.data}" :img-src="thumbnail.href" :img-alt="thumbnail.title" img-top v-b-visible.200="load">
+  <b-card class="item-card" :class="{queued: !this.data}" v-bind="cardProps" img-top v-b-visible.200="load">
     <b-card-title>
       <StacLink :link="item" :title="title" class="stretched-link" />
     </b-card-title>
@@ -30,8 +30,23 @@ export default {
       required: true
     }
   },
+  data() {
+    return {
+      showThumbnail: false
+    }
+  },
   computed: {
     ...mapGetters(['getStac']),
+    cardProps() {
+      // Lazy load thumbnails and not all at once for API Collections
+      if (this.showThumbnail && this.thumbnail) {
+        return {
+          "img-src": this.thumbnail.href,
+          "img-alt": this.thumbnail.title
+        };
+      }
+      return {};
+    },
     data() {
       if (this.item instanceof STAC) {
         return this.item;
@@ -76,6 +91,9 @@ export default {
   },
   methods: {
     load(visible) {
+      if (visible) {
+        this.showThumbnail = true;
+      }
       if (this.item instanceof STAC) {
         return;
       }
