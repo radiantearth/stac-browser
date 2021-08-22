@@ -11,11 +11,11 @@
 </template>
 
 <script>
+import stacLayer from 'stac-layer';
 import { CRS } from "leaflet";
 import { LMap, LTileLayer, LWMSTileLayer } from 'vue2-leaflet';
 import LControlFullscreen from 'vue2-leaflet-fullscreen';
 import 'leaflet/dist/leaflet.css';
-import stacLayer from 'stac-layer';
 import Utils from '../utils';
 import { mapState } from 'vuex';
 
