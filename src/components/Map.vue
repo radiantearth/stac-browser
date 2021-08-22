@@ -1,11 +1,11 @@
 <template>
   <section class="mb-4">
-    <l-map class="map" :class="stac.type" ref="leaflet" @ready="init()">
+    <l-map class="map" :class="stac.type" ref="leaflet" @ready="init()" :options="mapOptions">
       <LControlFullscreen />
       <template v-if="baseMaps.length > 0">
         <component :is="baseMap.component" v-for="baseMap in baseMaps" :key="baseMap.name" v-bind="baseMap" :layers="baseMap.name" layer-type="base" />
       </template>
-      <LTileLayer v-else url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" :options="mapOptions" />
+      <LTileLayer v-else url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" :options="osmOptions" />
       <!-- ToDo: Replace with STAC Leaflet plugin; use minimap plugin? -->
       <LGeoJson v-if="isGeoJSON" ref="bounds" @ready="fitBounds" :geojson="stac" />
       <LRectangle v-else-if="bbox" ref="bounds" @ready="fitBounds" :bounds="bbox" />
@@ -19,6 +19,7 @@ import { LMap, LGeoJson, LRectangle, LTileLayer, LWMSTileLayer } from 'vue2-leaf
 import LControlFullscreen from 'vue2-leaflet-fullscreen';
 import 'leaflet/dist/leaflet.css';
 import Utils from '../utils';
+import '@lweller/leaflet-areaselect';
 
 export default {
   name: 'Map',
@@ -34,7 +35,11 @@ export default {
     return {
       map: null,
       boundsLayer: null,
+      areaSelect: null,
       mapOptions: {
+        scrollWheelZoom: !this.selectBounds
+      },
+      osmOptions: {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors.'
       }
     };
@@ -43,6 +48,10 @@ export default {
     stac: {
       type: Object,
       required: true
+    },
+    selectBounds: {
+      type: Boolean,
+      required: false
     }
   },
   computed: {
@@ -102,8 +111,30 @@ export default {
     },
     fitBounds() {
       this.boundsLayer = this.$refs.bounds.mapObject;
-      this.map.fitBounds(this.boundsLayer.getBounds(), { padding: [90, 90] });
+      let fitOptions = this.selectBounds ? {} : { padding: [90, 90] };
+      this.map.fitBounds(this.boundsLayer.getBounds(), fitOptions);
+
+      if (this.selectBounds) {
+        this.areaSelect = L.areaSelect({ // eslint-disable-line 
+          width: 300,
+          height: 200,
+          minWidth: 20,
+          minHeight: 20,
+          minHorizontalSpacing: 20,
+          minVerticalSpacing: 20
+        });
+        this.areaSelect.addTo(this.map);
+        this.areaSelect.on("change", () => this.emitBounds());
+        this.emitBounds();
+      }
+    },
+    emitBounds() {
+      this.$emit('bounds', this.areaSelect.getBounds());
     }
   }
 }
 </script>
+
+<style lang="scss">
+  @import '~@lweller/leaflet-areaselect/src/leaflet-areaselect.css'
+</style>

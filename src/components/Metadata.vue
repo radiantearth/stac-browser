@@ -61,7 +61,6 @@ export default {
                     return StacFields.formatItemProperties(this.data, filter);
                 case 'Collection':
                 case 'Catalog': {
-                    //debugger; // eslint-disable-line
                     let core = StacFields.formatCollection(this.data, filter);
                     let summaries = StacFields.formatSummaries(this.data, filter);
                     // Merge summaries into collection metadata

@@ -1,6 +1,6 @@
 {
   "name": "@radiantearth/stac-browser",
-  "version": "3.0.0-alpha.1",
+  "version": "3.0.0-alpha.2",
   "description": "A Vue-based STAC browser intended for static + dynamic deployment",
   "main": "src/main.js",
   "scripts": {
@@ -29,6 +29,7 @@
   ],
   "license": "ISC",
   "dependencies": {
+    "@lweller/leaflet-areaselect": "^1.3.0",
     "@radiantearth/stac-fields": "stac-utils/stac-fields#main",
     "@radiantearth/stac-migrate": "~1.0.2",
     "axios": "^0.21.1",
@@ -41,6 +42,7 @@
     "vue": "^2.6.12",
     "vue-clipboard2": "^0.3.1",
     "vue-router": "^3.2.0",
+    "vue2-datepicker": "^3.9.2",
     "vue2-leaflet": "^2.7.0",
     "vue2-leaflet-fullscreen": "^1.0.1",
     "vuex": "^3.4.0",

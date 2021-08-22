@@ -10,7 +10,7 @@
 export default {
   name: "Search",
   created() {
-    this.$store.commit('show', {title: 'Search'});
+    this.$store.commit('showPage', {title: 'Search'});
   }
 };
 </script>

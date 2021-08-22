@@ -5,9 +5,16 @@
       <template v-if="!api">({{ items.length }})</template>
     </h2>
     <Pagination ref="topPagination" v-if="api" :pagination="pagination" placement="top" @paginate="paginate" />
-    <b-card-group columns>
+    <b-button v-if="api" v-b-toggle.itemFilter class="mb-4 mt-2 ml-3" variant="outline-primary">
+      <b-icon-search /> Filter
+    </b-button>
+    <b-collapse id="itemFilter">
+      <ItemFilter :stac="stac" v-model="filters" />
+    </b-collapse>
+    <b-card-group v-if="chunkedItems.length > 0" columns>
       <Item v-for="item in chunkedItems" :item="item" :key="item.href" />
     </b-card-group>
+    <p v-else>Sorry, no items found.</p>
     <Pagination v-if="api" :pagination="pagination" placement="bottom" @paginate="paginate" />
     <b-button v-else-if="hasMore" @click="showMore" variant="primary" v-b-visible.200="showMore">Show more...</b-button>
   </section>
@@ -16,11 +23,15 @@
 <script>
 import Item from './Item.vue';
 import Pagination from './Pagination.vue';
+import { BCollapse, BIconSearch } from "bootstrap-vue";
 
 export default {
   name: "Items",
   components: {
+    BCollapse,
+    BIconSearch,
     Item,
+    ItemFilter: () => import('./ItemFilter.vue'),
     Pagination
   },
   props: {
@@ -28,9 +39,17 @@ export default {
       type: Array,
       required: true
     },
+    stac: {
+      type: Object,
+      required: true
+    },
     api: {
       type: Boolean,
       default: false
+    },
+    apiFilters: {
+      type: Object,
+      default: () => ({})
     },
     pagination: {
       type: Object,
@@ -43,7 +62,8 @@ export default {
   },
   data() {
     return {
-      shownItems: this.chunkSize
+      shownItems: this.chunkSize,
+      filters: this.apiFilters
     };
   },
   computed: {
@@ -51,12 +71,19 @@ export default {
       return this.items.length > this.shownItems;
     },
     chunkedItems() {
-      console.log(!this.api, this.items.length, this.chunkSize);
       if (!this.api && this.items.length > this.chunkSize) {
         return this.items.slice(0, this.shownItems);
       }
       else {
         return this.items;
+      }
+    }
+  },
+  watch: {
+    filters: {
+      deep: true,
+      handler(value) {
+        this.$emit('filterItems', value);
       }
     }
   },

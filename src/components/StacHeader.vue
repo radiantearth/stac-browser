@@ -3,7 +3,7 @@
     <b-col md="10">
       <h1>{{ title }}</h1>
       <p class="lead" v-if="url">
-        <span class="in" v-if="containerLink">in <StacLink :link="containerLink" /></span>
+        <span class="in mr-3" v-if="containerLink">in <StacLink :link="containerLink" /></span>
         <b-button-group>
           <b-button v-if="parentLink" :to="toBrowserPath(parentLink.href)" :title="parentLink.title" variant="outline-primary" size="sm"><b-icon-arrow-90deg-up /> Go to Parent</b-button>
           <b-button v-if="collectionLink" :to="toBrowserPath(collectionLink.href)" :title="collectionLink.title" variant="outline-primary" size="sm"><b-icon-folder-symlink /> Go to Collection</b-button>
@@ -54,8 +54,5 @@ export default {
 <style lang="scss" scoped>
 h1 {
   word-break: break-word;
-}
-.lead .in {
-  margin-right: 0.5em;
 }
 </style>

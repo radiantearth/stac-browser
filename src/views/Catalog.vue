@@ -31,7 +31,8 @@
     <b-col class="right">
       <Providers v-if="hasProviders" :providers="data.providers" />
       <Catalogs v-if="catalogs.length > 0" :catalogs="catalogs" :hasMore="hasMoreCollections" @loadMore="loadMoreCollections" />
-      <Items v-if="items.length > 0" :items="items" :api="apiItems.length > 0" :pagination="itemPages" @paginate="paginateItems" />
+      <Items v-if="hasItems" :stac="data" :items="items" :api="isApi" :apiFilters="apiItemsFilter" :pagination="itemPages"
+        @paginate="paginateItems" @filterItems="filterItems" />
       <Assets v-if="hasAssets" :assets="assets" />
       <Assets v-if="hasItemAssets" :assets="data.item_assets" :definition="true" />
       <Links v-if="additionalLinks.length > 0" title="Additional resources" :links="additionalLinks" />
@@ -94,7 +95,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination']),
+    ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination', 'apiItemsFilter']),
     ...mapGetters(['additionalLinks', 'catalogs', 'isCollection', 'items', 'thumbnails', 'hasMoreCollections', 'hasAssets', 'assets']),
     licenses() {
       if (this.isCollection && this.data.license) {
@@ -123,9 +124,15 @@ export default {
       let pages = Object.assign({}, this.apiItemsPagination);
       // If first link is not available, add the items link as first link
       if (!pages.first && this.data && this.apiItemsLink && this.apiItemsLink.rel !== 'items') {
-        pages.first = this.data.getLinkWithRel('items');
+        pages.first = Utils.addFiltersToLink(this.data.getLinkWithRel('items'), this.apiItemsFilter);
       }
       return pages;
+    },
+    isApi() {
+      return Boolean(this.apiItemsLink);
+    },
+    hasItems() {
+      return this.items.length > 0 || this.isApi;
     }
   },
   methods: {
@@ -134,6 +141,9 @@ export default {
     },
     paginateItems(link) {
       this.$store.dispatch('loadApiItems', link);
+    },
+    filterItems(filters) {
+      this.$store.dispatch('filterApiItems', filters);
     }
   }
 };

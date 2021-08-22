@@ -97,6 +97,44 @@ export default class Utils {
 		return uri1.equals(uri2);
 	}
 
+	static addFiltersToLink(link, filters = {}) {
+		// Construct new link with search params
+		let newLink = Object.assign({}, link);
+		let url = new URL(newLink.href);
+		for(let key in filters) {
+			let value = filters[key];
+			if (value) {
+				if (key === 'datetime') {
+					value = value.map(dt => {
+						if (dt instanceof Date) {
+							return dt.toISOString();
+						}
+						else if (dt) {
+							return dt;
+						}
+						else {
+							return '..';
+						}
+					}).join('/');
+				}
+				else if (key === 'bbox') {
+					if (typeof value.toBBoxString === 'function') {
+						value = value.toBBoxString();
+					}
+					else {
+						value = value.join(',');
+					}
+				}
+				url.searchParams.set(key, value);
+			}
+			else {
+				url.searchParams.delete(key);
+			}
+		}
+		newLink.href = url.toString();
+		return newLink;
+	}
+
 	static titleForHref(href) {
 		let uri = URI(href);
 		let auth = uri.authority();

@@ -6,19 +6,23 @@ import STAC from '../stac';
 
 Vue.use(Vuex);
 
+// Local settings (e.g. for currently loaded STAC entity)
+const localDefaults = {
+  url: '',
+  title: CONFIG.catalogTitle,
+  data: null,
+  valid: null,
+  apiCollections: [],
+  nextCollectionsLink: null,
+  apiItems: [],
+  apiItemsLink: null,
+  apiItemsFilter: {},
+  apiItemsPagination: {}
+};
+
 export default new Vuex.Store({
   strict: true,
-  state: Object.assign(CONFIG, {
-    // Local settings (e.g. for currently loaded STAC entity)
-    url: '',
-    title: CONFIG.catalogTitle,
-    data: null,
-    valid: null,
-    apiCollections: [],
-    nextCollectionsLink: null,
-    apiItems: [],
-    apiItemsLink: null,
-    apiItemsPagination: {},
+  state: Object.assign(CONFIG, localDefaults, {
     // Global settings
     allowSelectCatalog: !CONFIG.catalogUrl,
     stacIndex: [],
@@ -233,15 +237,15 @@ export default new Vuex.Store({
       state.tileSourceTemplate = tileSourceTemplate;
     },
     loading(state, url) {
-      state.apiCollections = [];
-      state.apiItems = [];
-      state.apiItemsPagination = {};
       Vue.set(state.database, url, null);
     },
     loaded(state, {url, data}) {
       Vue.set(state.database, url, Object.freeze(data));
     },
-    show(state, { url, title }) {
+    resetPage(state) {
+      Object.assign(state, localDefaults);
+    },
+    showPage(state, { url, title }) {
       let stac = state.database[url] || null;
       state.url = url || null;
       state.data = stac instanceof STAC ? stac : null;
@@ -297,6 +301,9 @@ export default new Vuex.Store({
           state.nextCollectionsLink = Utils.getLinkWithRel(data.links, 'next');
           state.apiCollections = state.apiCollections.concat(data.collections.map(collection => Object.freeze(collection)));
       }
+    },
+    setApiItemsFilter(state, filter) {
+      state.apiItemsFilter = filter;
     }
   },
   actions: {
@@ -332,6 +339,10 @@ export default new Vuex.Store({
         path = cx.getters.toBrowserPath(url);
       }
 
+      if (show) {
+        cx.commit('resetPage');
+      }
+
       let data = cx.state.database[url];
       if (!data) {
         cx.commit('loading', url);
@@ -355,7 +366,7 @@ export default new Vuex.Store({
       }
 
       if (show) {
-        cx.commit('show', {url});
+        cx.commit('showPage', {url});
       }
     },
     async loadApiItems(cx, link) {
@@ -375,6 +386,14 @@ export default new Vuex.Store({
         });
         cx.commit('addApiItems', {data: response.data, link});
       }
+    },
+    async filterApiItems(cx, filters = {}) {
+      if (!cx.state.apiItemsLink) {
+        return;
+      }
+      cx.commit('setApiItemsFilter', filters);
+      // load API Items with search params
+      await cx.dispatch('loadApiItems', Utils.addFiltersToLink(cx.state.apiItemsLink, filters));
     },
     async loadNextApiCollections(cx, link = null) {
       link = link || cx.state.nextCollectionsLink;

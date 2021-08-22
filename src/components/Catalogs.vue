@@ -1,6 +1,9 @@
 <template>
   <section class="catalogs mb-4">
-    <h2>Catalogs ({{ catalogs.length }})</h2>
+    <h2>
+      Catalogs
+      <template v-if="!hasMore">({{ catalogs.length }})</template>
+    </h2>
     <b-card-group columns>
       <Catalog v-for="catalog in catalogs" :catalog="catalog" :key="catalog.href" />
     </b-card-group>

@@ -75,7 +75,7 @@ export default {
   },
   created() {
     this.$store.dispatch('loadStacIndex');
-    this.$store.commit('show', {}); // Reset loaded STAC entity
+    this.$store.commit('resetPage'); // Reset loaded STAC entity
   },
   methods: {
     onSubmit() {
