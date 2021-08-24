@@ -37,7 +37,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["allowExternalAccess", "url"]),
+    ...mapState(["allowExternalAccess", "url", "redirectUrl"]),
     ...mapGetters(["isCatalogLike", "loading", "error"]),
     component() {
         return this.isCatalogLike ? 'Catalog' : 'Item'; 
@@ -50,11 +50,24 @@ export default {
     path: {
       immediate: true,
       handler(path, oldPath) {
-        if (path !== oldPath) {
-          this.$store.dispatch("load", { url: path || '/', fromBrowser: true, show: true });
+        if (path === oldPath) {
+          return;
         }
+
+        this.$store.dispatch("load", { url: path || '/', fromBrowser: true, show: true });
       }
     },
+    redirectUrl: {
+      immediate: true,
+      handler(path) {
+        console.log(path);
+        if (!path) {
+          return;
+        }
+
+        this.$router.replace({ path });
+      }
+    }
   }
 };
 </script>
