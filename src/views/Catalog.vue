@@ -17,13 +17,13 @@
       <section class="mb-4">
         <b-tabs v-if="isCollection && thumbnails.length > 0">
           <b-tab title="Map">
-            <Map :stac="data" />
+            <Map :stac="data" @mapClicked="mapClicked" />
           </b-tab>
           <b-tab title="Preview">
             <Thumbnails :thumbnails="thumbnails" />
           </b-tab>
         </b-tabs>
-        <Map v-else-if="isCollection" :stac="data" />
+        <Map v-else-if="isCollection" :stac="data" @mapClicked="mapClicked" />
         <Thumbnails v-else-if="thumbnails.length > 0" :thumbnails="thumbnails" />
       </section>
       <Metadata title="Metadata" :type="data.type" :data="data" :ignoreFields="ignoredMetadataFields" />
@@ -144,6 +144,9 @@ export default {
     },
     filterItems(filters) {
       this.$store.dispatch('filterApiItems', filters);
+    },
+    mapClicked(stac) {
+      console.log(stac); // todo
     }
   }
 };

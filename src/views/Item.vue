@@ -11,7 +11,7 @@
         <h2>Preview</h2>
         <b-tabs v-if="thumbnails.length > 0">
           <b-tab title="Map">
-            <Map :stac="data" />
+            <Map :stac="data" @mapClicked="mapClicked" />
           </b-tab>
           <b-tab title="Preview">
             <Thumbnails :thumbnails="thumbnails" />
@@ -62,6 +62,11 @@ export default {
           this.$store.dispatch("load", { url: newLink.href });
         }
       }
+    }
+  },
+  methods: {
+    mapClicked(stac) {
+      console.log(stac); // todo
     }
   }
 };

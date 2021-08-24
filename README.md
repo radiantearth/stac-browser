@@ -82,14 +82,14 @@ and be able to browse that catalog.
 ### TILE_SOURCE_TEMPLATE
 
 The `TILE_SOURCE_TEMPLATE` environment variable controls the tile layer that is used to render COGs. If not set, the default value is:
-`https://tiles.rdnt.io/tiles/{z}/{x}/{y}@2x?url={ASSET_HREF}`,
+`https://tiles.rdnt.io/tiles/{z}/{x}/{y}@2x?url={url}`,
 which uses the [tiles.rdnt.io](https://github.com/radiantearth/tiles.rdnt.io) project to serve publicly accessible COGs as tile layers.
 
-The format of this value is a tile layer template with an optional `{ASSET_HREF}` that will be replaced with the COG asset href. For example,
+The format of this value is a tile layer template with an optional `{url}` that will be replaced with the COG asset href. For example,
 using a local version of [titiler](https://github.com/developmentseed/titiler) to serve local COG files would look something like:
 
 ```bash
-npm start -- --open --TILE_SOURCE_TEMPLATE="http://localhost:8000/cog/tiles/{z}/{x}/{y}?url={ASSET_HREF}"
+npm start -- --open --TILE_SOURCE_TEMPLATE="http://localhost:8000/cog/tiles/{z}/{x}/{y}?url={url}"
 ```
 
 ### TILE_PROXY_URL

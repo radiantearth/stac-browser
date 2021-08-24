@@ -5,37 +5,34 @@
       <template v-if="baseMaps.length > 0">
         <component :is="baseMap.component" v-for="baseMap in baseMaps" :key="baseMap.name" v-bind="baseMap" :layers="baseMap.name" layer-type="base" />
       </template>
-      <LTileLayer v-else url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" :options="osmOptions" />
-      <!-- ToDo: Replace with STAC Leaflet plugin; use minimap plugin? -->
-      <LGeoJson v-if="isGeoJSON" ref="bounds" @ready="fitBounds" :geojson="stac" />
-      <LRectangle v-else-if="bbox" ref="bounds" @ready="fitBounds" :bounds="bbox" />
+      <LTileLayer v-else url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" :options="mapOptions" />
     </l-map>
   </section>
 </template>
 
 <script>
+import stacLayer from 'stac-layer/src/index'; // todo: remove /src/index
 import { CRS } from "leaflet";
-import { LMap, LGeoJson, LRectangle, LTileLayer, LWMSTileLayer } from 'vue2-leaflet';
+import { LMap, LTileLayer, LWMSTileLayer } from 'vue2-leaflet';
 import LControlFullscreen from 'vue2-leaflet-fullscreen';
 import 'leaflet/dist/leaflet.css';
 import Utils from '../utils';
 import '@lweller/leaflet-areaselect';
+import { mapState } from 'vuex';
 
 export default {
   name: 'Map',
   components: {
     LControlFullscreen,
-    LGeoJson,
     LMap,
-    LRectangle,
     LTileLayer,
     LWMSTileLayer
   },
   data() {
     return {
       map: null,
-      boundsLayer: null,
       areaSelect: null,
+      stacLayer: null,
       mapOptions: {
         scrollWheelZoom: !this.selectBounds
       },
@@ -55,16 +52,7 @@ export default {
     }
   },
   computed: {
-    isGeoJSON() {
-      return this.stac.isItem();
-    },
-    bbox() {
-      if (this.stac.isCollection() && this.stac.extent.spatial.bbox.length > 0) {
-        let bbox = this.stac.extent.spatial.bbox[0];
-        return [[bbox[1], bbox[2]], [bbox[3], bbox[0]]];
-      }
-      return null;
-    },
+    ...mapState(['geoTiffResolution', 'tileSourceTemplate', 'buildTileUrlTemplate']),
     baseMaps() {
       let targets = [];
       if (this.stac.isCollection() && Utils.isObject(this.stac.summaries) && Array.isArray(this.stac.summaries['ssys:targets'])) {
@@ -103,16 +91,34 @@ export default {
             }, baseMaps[target]);
         }
       });
-    }        
+    }
   },
   methods: {
-    init() {
+    async init() {
       this.map = this.$refs.leaflet.mapObject;
+
+      try {
+        let options = {
+          resolution: this.geoTiffResolution,
+// todo: uncomment once useTileLayerAsFallback is available
+//        useTileLayerAsFallback: true,
+//        tileUrlTemplate: this.tileSourceTemplate,
+//        buildTileUrlTemplate: this.buildTileUrlTemplate
+        };
+        this.stacLayer = await stacLayer(this.stac, options);
+        if (this.stacLayer) {
+          this.stacLayer.on('click', event => this.$emit('mapClicked', event.stac));
+          // Fit bounds before adding the layer to the map to avoid a race condition(?) between Tiff loading and fitBounds
+          this.fitBounds();
+          this.stacLayer.addTo(this.map);
+        }
+      } catch (error) {
+        console.log(error);
+      }
     },
     fitBounds() {
-      this.boundsLayer = this.$refs.bounds.mapObject;
       let fitOptions = this.selectBounds ? {} : { padding: [90, 90] };
-      this.map.fitBounds(this.boundsLayer.getBounds(), fitOptions);
+      this.map.fitBounds(this.stacLayer.getBounds(), fitOptions);
 
       if (this.selectBounds) {
         this.areaSelect = L.areaSelect({ // eslint-disable-line 

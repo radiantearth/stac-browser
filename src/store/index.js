@@ -191,10 +191,6 @@ export default new Vuex.Store({
       }
       return absoluteUrl;
     },
-    getTileSource: (state, getters) => assetHref => {
-      const proxiedUri = getters.getTileProxiedUrl(assetHref);
-      return state.tileSourceTemplate.replace("{ASSET_HREF}", proxiedUri);
-    },
     getTileProxiedUrl: state => url => {
       // Tile sources can be proxied differently than other assets, replace any asset HREF with the proxied address.
       // Note: This will occur after the STAC_PROXY_URL is used.
