@@ -26,7 +26,7 @@
         <Map v-else-if="isCollection" :stac="data" @mapClicked="mapClicked" />
         <Thumbnails v-else-if="thumbnails.length > 0" :thumbnails="thumbnails" />
       </section>
-      <Metadata title="Metadata" :type="data.type" :data="data" :ignoreFields="ignoredMetadataFields" />
+      <Metadata title="Metadata" class="mb-4" :type="data.type" :data="data" :ignoreFields="ignoredMetadataFields" />
     </b-col>
     <b-col class="right">
       <Providers v-if="hasProviders" :providers="data.providers" />

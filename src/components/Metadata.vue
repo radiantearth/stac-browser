@@ -1,5 +1,5 @@
 <template>
-    <section v-show="formattedData.length > 0" class="metadata mb-4">
+    <section v-show="formattedData.length > 0" class="metadata">
         <h2 v-if="formattedData.length > 0 && title">{{ title }}</h2>
         <b-card-group v-if="formattedData.length > 0" columns :class="`count-${formattedData.length}`">
             <b-card v-for="group in formattedData" :key="group.extension" class="metadata-card">
