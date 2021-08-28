@@ -106,6 +106,12 @@ export default {
       document.title = title;
     }
   },
+  created() {
+    // Load the root catalog data if not available (e.g. after page refresh or external access)
+    if (this.catalogUrl) {
+      this.$store.dispatch("load", { url: this.catalogUrl });
+    }
+  },
   mounted() {
     setInterval(() => this.$store.dispatch('loadBackground', 3), 200);
   },

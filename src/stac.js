@@ -116,7 +116,7 @@ class STAC {
       }
       if (browserOnly) {
           // Remove all images that can't be displayed in a browser
-          return thumbnails.filter(img => Utils.canBrowserDisplayImage(img.type));
+          return thumbnails.filter(img => Utils.canBrowserDisplayImage(img));
       }
       else {
         return thumbnails;
