@@ -73,7 +73,7 @@ export default {
       this.expanded = this.expand;
     }
     else {
-      // Expand all assets with role data by default
+      // Expand assets with role data by default
       this.expanded = Array.isArray(this.asset.roles) && this.asset.roles.includes('data');
     }
   },

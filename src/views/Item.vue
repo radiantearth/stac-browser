@@ -22,7 +22,7 @@
     </b-row>
     <b-row>
       <b-col class="properties">
-        <Metadata :data="data" type="Item" />
+        <Metadata :data="data" type="Item" :ignoreFields="ignoredMetadataFields" />
       </b-col>
     </b-row>
   </div>
@@ -49,6 +49,13 @@ export default {
     Map: () => import('../components/Map.vue'),
     Metadata,
     Thumbnails
+  },
+  data() {
+    return {
+      ignoredMetadataFields: [
+        'title'
+      ]
+    };
   },
   computed: {
     ...mapState(['data', 'url']),

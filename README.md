@@ -104,7 +104,7 @@ see <https://getbootstrap.com/docs/4.0/getting-started/theming/> for details.
 
 The file `page.scss` contains some Sass declarations for the main sections of STAC Browser and you can adopt those to suit your needs.
 
-If you need even more flexibility (which I doubt), you need to dig into the Vue files and their dependencies though.
+If you need even more flexibility, you need to dig into the Vue files and their dependencies though.
 
 ## Custom fields
 

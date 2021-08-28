@@ -1,11 +1,17 @@
 <template>
-  <router-link :to="href" :rel="link.rel" :target="target">{{ displayTitle }}</router-link>
+  <component :is="component" v-bind="attributes">{{ displayTitle }}</component>
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
 import Utils from '../utils';
 import STAC from '../stac';
+
+const STAC_MEDIA_TYPES = [
+  'application/json',
+  'application/geo+json',
+  'text/json'
+];
 
 export default {
   name: "StacLink",
@@ -25,6 +31,9 @@ export default {
       if (this.link instanceof STAC) {
         return true;
       }
+      if (this.link.type && !STAC_MEDIA_TYPES.includes(this.link.type)) {
+        return false;
+      }
       switch(this.link.rel) {
         case 'root': // STAC hierarchical links v
         case 'child':
@@ -43,13 +52,23 @@ export default {
           return false;
       }
     },
-    target() {
+    attributes() {
       if (this.isStacBrowserLink) {
-        return null;
+        return {
+          to: this.href,
+          rel: this.rel
+        };
       }
       else {
-        return '_blank';
+        return {
+          href: this.href,
+          target: '_blank',
+          rel: this.rel
+        };
       }
+    },
+    component() {
+      return this.isStacBrowserLink ? 'router-link' : 'a';
     },
     href() {
       if (this.link instanceof STAC) {
