@@ -166,13 +166,14 @@ export default {
   .metadata {
     .card-columns {
       column-count: 1;
-    }
-    .card-columns:not(.count-1) {
-      @include media-breakpoint-up(xl) {
-        column-count: 2;
-      }
-      @include media-breakpoint-up(xxxl) {
-        column-count: 3;
+
+      &:not(.count-1) {
+        @include media-breakpoint-up(xl) {
+          column-count: 2;
+        }
+        @include media-breakpoint-up(xxxl) {
+          column-count: 3;
+        }
       }
     }
   }

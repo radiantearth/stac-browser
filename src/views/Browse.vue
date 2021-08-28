@@ -60,7 +60,6 @@ export default {
     redirectUrl: {
       immediate: true,
       handler(path) {
-        console.log(path);
         if (!path) {
           return;
         }

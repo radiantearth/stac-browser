@@ -86,6 +86,12 @@ export default {
     .card-body {
       padding: 0;
     }
+    &:only-child:empty {
+      display: inline !important;
+      &:before {
+        content: 'No additional information available.';
+      }
+    }
   }
 }
 </style>

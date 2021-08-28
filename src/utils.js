@@ -157,11 +157,14 @@ export default class Utils {
 		}
 	}
 
-	static canBrowserDisplayImage(mediaType) {
-		if (typeof mediaType !== 'string') {
+	static canBrowserDisplayImage(img) {
+		if (typeof img.type !== 'string' || typeof img.href !== 'string') {
 			return false;
 		}
-		switch(mediaType.toLowerCase()) {
+		if (!img.href.match(/https?:\/\//i)) {
+			return false;
+		}
+		switch(img.type.toLowerCase()) {
 			case 'image/png':
 			case 'image/jpg':
 			case 'image/jpeg':
