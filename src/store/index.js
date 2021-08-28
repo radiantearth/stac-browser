@@ -13,6 +13,7 @@ const localDefaults = {
   title: CONFIG.catalogTitle,
   data: null,
   valid: null,
+  parents: null,
   apiCollections: [],
   nextCollectionsLink: null,
   apiItems: [],
@@ -88,6 +89,13 @@ export default new Vuex.Store({
       if (link) {
         link = Object.assign({}, link);
         link.title = stac?.getDisplayTitle() || link.title;
+      }
+      else if (stac) {
+        link = {
+          rel,
+          href: stac.getAbsoluteUrl(),
+          title: stac.getDisplayTitle()
+        };
       }
       return link;
     },
@@ -314,6 +322,9 @@ export default new Vuex.Store({
           state.redirectUrl = '/' + newPath;
         }
       }
+    },
+    parents(state, parents) {
+      state.parents = parents;
     }
   },
   actions: {
@@ -337,6 +348,33 @@ export default new Vuex.Store({
       } catch (error) {
         console.log(error);
       }
+    },
+    async loadParents(cx) {
+      if (!(cx.state.data instanceof STAC)) {
+        return;
+      }
+
+      let parents = [];
+      let stac = cx.state.data;
+      while(stac) {
+        let parentLink = stac.getLinkWithRel('parent') || stac.getLinkWithRel('root');
+        if (!parentLink) {
+          break;
+        }
+        let url = Utils.toAbsolute(parentLink.href, stac.getAbsoluteUrl());
+        await cx.dispatch('load', { url });
+        let parentStac = cx.getters.getStac(url, true);
+        if (parentStac instanceof Error) {
+          cx.commit('parents', parentStac);
+          return;
+        }
+        if (parentStac === stac) {
+          break;
+        }
+        parents.push(parentStac);
+        stac = parentStac;
+      }
+      cx.commit('parents', parents);
     },
     async load(cx, {url, fromBrowser, show}) {
       let path;

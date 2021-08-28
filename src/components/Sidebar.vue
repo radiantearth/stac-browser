@@ -1,40 +1,46 @@
 <template>
-  <ul class="tree">
-    <li>STAC Browser
-      <ul>
-        <li><b-icon-folder-minus /> Catalog 1
-          <ul>
-            <li><b-icon-file-earmark-richtext /> Item 1</li>
-          </ul>
-        </li>
-        <li><b-icon-folder-plus /> Catalog 2</li>
-        <li><b-icon-folder-plus /> Catalog 3</li>
-      </ul>
-    </li>
-    <li v-if="allowSelectCatalog"><router-link to="/"><b-icon-arrow-left-right /> Switch Catalog</router-link></li>
-  </ul>
+  <div class="sidebar">
+    <div v-if="!parents" class="loading text-center">
+      <b-spinner label="Loading..."></b-spinner>
+    </div>
+    <Tree v-else-if="root" :item="root" :path="parents" />
+
+    <b-button v-if="allowSelectCatalog" class="mt-4" variant="light"><router-link to="/"><b-icon-arrow-left-right /> Switch Catalog</router-link></b-button>
+  </div>
 </template>
 
 <script>
-import { BIconArrowLeftRight, BIconFileEarmarkRichtext, BIconFolderMinus, BIconFolderPlus } from "bootstrap-vue";
-import { mapState } from 'vuex';
+import { BIconArrowLeftRight } from "bootstrap-vue";
+import { mapGetters, mapState } from 'vuex';
+import Tree from './Tree.vue';
 
 export default {
   name: 'Sidebar',
   components: {
     BIconArrowLeftRight,
-    BIconFileEarmarkRichtext,
-    BIconFolderMinus,
-    BIconFolderPlus
+    Tree
   },
   computed: {
-    ...mapState(['allowSelectCatalog'])
+    ...mapState(['allowSelectCatalog', 'parents']),
+    ...mapGetters(['root'])
+  },
+  async created() {
+    await this.$store.dispatch('loadParents');
   }
 }
 </script>
 
 <style lang="scss" scoped>
-.tree > li {
-  margin-bottom: 1em;
+.sidebar {
+  padding: 0.5rem 1rem;
+
+  .tree.root {
+    margin: 0;
+    padding: 0;
+  }
+
+  > button {
+    width: 100%;
+  }
 }
 </style>
