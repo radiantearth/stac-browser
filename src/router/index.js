@@ -1,12 +1,6 @@
 import Browse from '../views/Browse.vue';
 
-let routes = [
-  {
-    path: "/search",
-    name: "search",
-    component: () => import("../views/Search.vue")
-  }
-];
+let routes = [];
 
 if (CONFIG.allowExternalAccess) {
   routes.push({
@@ -26,6 +20,23 @@ if (!CONFIG.catalogUrl) {
     path: "/",
     name: "select",
     component: () => import("../views/SelectDataSource.vue")
+  });
+  routes.push(  {
+    path: "/search/external/(.*)",
+    name: "search",
+    component: () => import("../views/Search.vue"),
+    props: route => {
+      return {
+        loadRoot: `/external/${route.params.pathMatch}`
+      };
+    }
+  });
+}
+else {
+  routes.push(  {
+    path: "/search",
+    name: "search",
+    component: () => import("../views/Search.vue")
   });
 }
 

@@ -46,6 +46,10 @@ export default {
       type: Object,
       required: true
     },
+    stacLayerData: {
+      type: Object,
+      default: null
+    },
     selectBounds: {
       type: Boolean,
       required: false
@@ -97,42 +101,48 @@ export default {
     async init() {
       this.map = this.$refs.leaflet.mapObject;
 
-      try {
-        let options = {
-          resolution: this.geoTiffResolution,
-// todo: uncomment once useTileLayerAsFallback is available
-//        useTileLayerAsFallback: true,
-//        tileUrlTemplate: this.tileSourceTemplate,
-//        buildTileUrlTemplate: this.buildTileUrlTemplate
-        };
-        this.stacLayer = await stacLayer(this.stac, options);
-        if (this.stacLayer) {
-          this.stacLayer.on('click', event => this.$emit('mapClicked', event.stac));
-          // Fit bounds before adding the layer to the map to avoid a race condition(?) between Tiff loading and fitBounds
-          this.fitBounds();
-          this.stacLayer.addTo(this.map);
+      let data = this.stacLayerData || this.stac;
+      if (data.type !== 'Catalog') {
+        try {
+          let options = {
+            resolution: this.geoTiffResolution,
+  // todo: uncomment once useTileLayerAsFallback is available
+  //        useTileLayerAsFallback: true,
+  //        tileUrlTemplate: this.tileSourceTemplate,
+  //        buildTileUrlTemplate: this.buildTileUrlTemplate
+          };
+          this.stacLayer = await stacLayer(data, options);
+          if (this.stacLayer) {
+            this.stacLayer.on('click', event => this.$emit('mapClicked', event.stac));
+            // Fit bounds before adding the layer to the map to avoid a race condition(?) between Tiff loading and fitBounds
+            this.fitBounds();
+            this.stacLayer.addTo(this.map);
+          }
+        } catch (error) {
+          this.$root.$emit('error', error, 'Sorry, loading the map failed.');
         }
-      } catch (error) {
-        console.log(error);
+      }
+
+      if (this.selectBounds) {
+        this.addBoundsSelector();
       }
     },
     fitBounds() {
       let fitOptions = this.selectBounds ? {} : { padding: [90, 90] };
       this.map.fitBounds(this.stacLayer.getBounds(), fitOptions);
-
-      if (this.selectBounds) {
-        this.areaSelect = L.areaSelect({ // eslint-disable-line 
-          width: 300,
-          height: 200,
-          minWidth: 20,
-          minHeight: 20,
-          minHorizontalSpacing: 20,
-          minVerticalSpacing: 20
-        });
-        this.areaSelect.addTo(this.map);
-        this.areaSelect.on("change", () => this.emitBounds());
-        this.emitBounds();
-      }
+    },
+    addBoundsSelector() {
+      this.areaSelect = L.areaSelect({ // eslint-disable-line 
+        width: 300,
+        height: 200,
+        minWidth: 20,
+        minHeight: 20,
+        minHorizontalSpacing: 20,
+        minVerticalSpacing: 20
+      });
+      this.areaSelect.addTo(this.map);
+      this.areaSelect.on("change", () => this.emitBounds());
+      this.emitBounds();
     },
     emitBounds() {
       this.$emit('bounds', this.areaSelect.getBounds());

@@ -10,6 +10,7 @@
     </header>
     <!-- Content (Item / Catalog) -->
     <main>
+      <ErrorAlert class="global-error" v-if="error" v-bind="error" @close="error = null" />
       <router-view />
     </main>
     <footer>
@@ -40,6 +41,7 @@ import Clipboard from 'v-clipboard'
 
 import { Formatters } from '@radiantearth/stac-fields';
 
+import ErrorAlert from './components/ErrorAlert.vue';
 import Sidebar from './components/Sidebar.vue';
 import StacHeader from './components/StacHeader.vue';
 
@@ -86,6 +88,10 @@ for(let key in CONFIG) {
     this.$store.commit('config', {
       key: newValue
     });
+    if (key === 'catalogUrl' && newValue) {
+      // Load the root catalog data if not available (e.g. after page refresh or external access)
+      this.$store.dispatch("load", { url: newValue });
+    }
   };
 }
 
@@ -94,32 +100,48 @@ export default {
   router,
   store,
   components: {
+    ErrorAlert,
     Sidebar,
     StacHeader
   },
   props: {
     ...Props
   },
+  data() {
+    return {
+      error: null
+    };
+  },
   watch: {
     ...Watchers,
     title(title) {
       document.title = title;
-    }
-  },
-  created() {
-    // Load the root catalog data if not available (e.g. after page refresh or external access)
-    if (this.catalogUrl) {
-      this.$store.dispatch("load", { url: this.catalogUrl });
+    },
+    catalogUrlFromVueX(url) {
+      if (url) {
+        // Load the root catalog data if not available (e.g. after page refresh or external access)
+        this.$store.dispatch("load", { url });
+      }
     }
   },
   mounted() {
+    this.$root.$on('error', this.showError);
     setInterval(() => this.$store.dispatch('loadBackground', 3), 200);
   },
   computed: {
     ...mapState(['title']),
+    ...mapState({catalogUrlFromVueX: 'catalogUrl'}),
     ...mapGetters(['displayCatalogTitle']),
     browserVersion() {
       return STAC_BROWSER_VERSION;
+    }
+  },
+  methods: {
+    showError(error, message) {
+      this.error = {
+        error,
+        message
+      };
     }
   }
 }

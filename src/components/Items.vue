@@ -5,14 +5,16 @@
       <template v-if="!api">({{ items.length }})</template>
     </h2>
     <Pagination ref="topPagination" v-if="api" :pagination="pagination" placement="top" @paginate="paginate" />
-    <b-button v-if="api" v-b-toggle.itemFilter class="mb-4 mt-2 ml-3" variant="outline-primary">
-      <b-icon-search /> Filter
-    </b-button>
-    <b-collapse id="itemFilter">
-      <ItemFilter :stac="stac" v-model="filters" />
-    </b-collapse>
+    <template v-if="allowFilter">
+      <b-button v-if="api" v-b-toggle.itemFilter class="mb-4 mt-2 ml-3" variant="outline-primary">
+        <b-icon-search /> Filter
+      </b-button>
+      <b-collapse id="itemFilter">
+        <ItemFilter :stac="stac" v-model="filters" :collectionOnly="true" />
+      </b-collapse>
+    </template>
     <b-card-group v-if="chunkedItems.length > 0" columns>
-      <Item v-for="item in chunkedItems" :item="item" :key="item.href" />
+      <Item v-for="item in chunkedItems" :item="item" :key="item.href" :selected="selected" />
     </b-card-group>
     <p v-else>Sorry, no items found.</p>
     <Pagination v-if="api" :pagination="pagination" placement="bottom" @paginate="paginate" />
@@ -47,6 +49,10 @@ export default {
       type: Boolean,
       default: false
     },
+    allowFilter: {
+      type: Boolean,
+      default: true
+    },
     apiFilters: {
       type: Object,
       default: () => ({})
@@ -58,6 +64,10 @@ export default {
     chunkSize: {
       type: Number,
       default: 90
+    },
+    selected: {
+      type: Array,
+      default: () => ([])
     }
   },
   data() {
@@ -96,7 +106,7 @@ export default {
         this.$refs.topPagination.$el.scrollIntoView({
           behavior: "smooth",
           block: "start"
-      });
+        });
       }
       this.$emit('paginate', link);
     }
