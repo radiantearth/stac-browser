@@ -7,12 +7,6 @@ import { mapGetters } from 'vuex';
 import Utils from '../utils';
 import STAC from '../stac';
 
-const STAC_MEDIA_TYPES = [
-  'application/json',
-  'application/geo+json',
-  'text/json'
-];
-
 export default {
   name: "StacLink",
   props: {
@@ -31,7 +25,7 @@ export default {
       if (this.link instanceof STAC) {
         return true;
       }
-      if (this.link.type && !STAC_MEDIA_TYPES.includes(this.link.type)) {
+      if (this.link.type && !Utils.isStacMediaType(this.link.type)) {
         return false;
       }
       switch(this.link.rel) {

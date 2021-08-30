@@ -9,7 +9,12 @@ class STAC {
         this._path = path;
 
         if (migrate) {
-            data = Migrate.stac(data);
+            if (data.type === 'FeatureCollection') {
+                data.features = data.features.map(item => Migrate.item(item));
+            }
+            else {
+                data = Migrate.stac(data);
+            }
         }
         for(let key in data) {
             if (typeof this[key] === 'undefined') {
@@ -32,6 +37,10 @@ class STAC {
 
     isCollection() {
         return this.type === 'Collection';
+    }
+
+    isItemCollection() {
+        return this.type === 'FeatureCollection';
     }
 
     getApiCollectionsLink() {
@@ -121,6 +130,19 @@ class STAC {
       else {
         return thumbnails;
       }
+    }
+
+    equals(other) {
+        if (!Utils.isObject(other)) {
+            return false;
+        }
+        if (this === other) {
+            return true;
+        }
+        if (this.id === other.id && this.type == other.type) {
+            return true;
+        }
+        return false;
     }
 
 }

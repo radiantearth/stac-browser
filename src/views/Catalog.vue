@@ -139,11 +139,19 @@ export default {
     loadMoreCollections() {
       this.$store.dispatch('loadNextApiCollections');
     },
-    paginateItems(link) {
-      this.$store.dispatch('loadApiItems', link);
+    async paginateItems(link) {
+      try {
+        await this.$store.dispatch('loadApiItems', link);
+      } catch (error) {
+        this.$root.$emit('error', error, 'Sorry, loading the list of STAC Items failed.');
+      }
     },
-    filterItems(filters) {
-      this.$store.dispatch('filterApiItems', filters);
+    async filterItems(filters) {
+      try {
+        await this.$store.dispatch('filterApiItems', {link: this.apiItemsLink, filters});
+      } catch (error) {
+        this.$root.$emit('error', error, 'Sorry, loading a filtered list of STAC Items failed.');
+      }
     },
     mapClicked(stac) {
       console.log(stac); // todo
@@ -166,13 +174,14 @@ export default {
   .metadata {
     .card-columns {
       column-count: 1;
-    }
-    .card-columns:not(.count-1) {
-      @include media-breakpoint-up(xl) {
-        column-count: 2;
-      }
-      @include media-breakpoint-up(xxxl) {
-        column-count: 3;
+
+      &:not(.count-1) {
+        @include media-breakpoint-up(xl) {
+          column-count: 2;
+        }
+        @include media-breakpoint-up(xxxl) {
+          column-count: 3;
+        }
       }
     }
   }

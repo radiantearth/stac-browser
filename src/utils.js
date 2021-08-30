@@ -2,6 +2,12 @@ import URI from 'urijs';
 
 const commonFileNames = ['catalog', 'collection', 'item'];
 
+const stacMediaTypes = [
+	'application/json',
+	'application/geo+json',
+	'text/json'
+];
+
 /**
  * General utilities
  * 
@@ -40,6 +46,18 @@ export default class Utils {
 			}
 		}
 		return 0;
+	}
+
+	static isStacMediaType(type, allowEmpty = false) {
+		if (allowEmpty && !type) {
+			return true;
+		}
+		else if (typeof type !== 'string') {
+			return false;
+		}
+		else {
+			return stacMediaTypes.includes(type.toLowerCase());
+		}
 	}
 
 	/**
@@ -89,12 +107,16 @@ export default class Utils {
 	}
 
 	static equalUrl(a, b) {
-		let uri1 = URI(a);
-		let uri2 = URI(b);
-		// Ignore trailing slash in URL paths
-		uri1.path(uri1.path().replace(/\/$/, ''));
-		uri2.path(uri2.path().replace(/\/$/, ''));
-		return uri1.equals(uri2);
+		try {
+			let uri1 = URI(a);
+			let uri2 = URI(b);
+			// Ignore trailing slash in URL paths
+			uri1.path(uri1.path().replace(/\/$/, ''));
+			uri2.path(uri2.path().replace(/\/$/, ''));
+			return uri1.equals(uri2);
+		} catch(error) {
+			return false;
+		}
 	}
 
 	static addFiltersToLink(link, filters = {}) {
@@ -123,6 +145,14 @@ export default class Utils {
 					}
 					else {
 						value = value.join(',');
+					}
+				}
+				else if (key === 'collections' || key === 'ids') {
+					if (Array.isArray(value) && value.length > 0) {
+						value = value.join(',');
+					}
+					else {
+						continue;
 					}
 				}
 				url.searchParams.set(key, value);

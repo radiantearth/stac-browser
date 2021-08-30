@@ -1,6 +1,6 @@
 <template>
   <section class="filter mb-4">
-    <h4>Filter</h4>
+    <h4 v-if="title">{{ title }}</h4>
     <b-form @submit.stop.prevent="onSubmit" @reset="onReset">
       <b-form-group label="Temporal Extent" label-for="datetime">
         <date-picker id="datetime" :value="filters.datetime" @input="setDateTime" range input-class="form-control mx-input"></date-picker>
@@ -9,6 +9,14 @@
       <b-form-group label="Spatial Extent" label-for="provideBBox">
         <b-form-checkbox id="provideBBox" v-model="provideBBox" value="1" @change="setBBox">Filter by spatial extent</b-form-checkbox>
         <Map v-if="provideBBox" :stac="stac" :selectBounds="true" @bounds="setBBox" />
+      </b-form-group>
+
+      <b-form-group v-if="!collectionOnly" label="Collections" label-for="collections">
+        <b-form-tags input-id="collections" :value="filters.collections" @input="setCollections" separator=" ,;" remove-on-delete add-on-change placeholder="List one or multiple collections..."></b-form-tags>
+      </b-form-group>
+
+      <b-form-group v-if="!collectionOnly" label="Item IDs" label-for="ids">
+        <b-form-tags input-id="ids" :value="filters.ids" @input="setIds" separator=" ,;" remove-on-delete add-on-change placeholder="List one or multiple Item IDs..."></b-form-tags>
       </b-form-group>
 
       <b-form-group label="Limit" label-for="limit" description="Number of items requested per page">
@@ -22,10 +30,10 @@
 </template>
 
 <script>
-import { BForm, BFormGroup, BFormInput, BFormCheckbox } from 'bootstrap-vue';
+import { BForm, BFormGroup, BFormInput, BFormCheckbox, BFormTags } from 'bootstrap-vue';
 import DatePicker from 'vue2-datepicker';
 
-const defaultValues = {datetime: null, bbox: null, limit: null};
+const defaultValues = {datetime: null, bbox: null, limit: null, ids: [], collections: []};
 
 export default {
   name: 'ItemFilter',
@@ -34,6 +42,7 @@ export default {
     BFormGroup,
     BFormInput,
     BFormCheckbox,
+    BFormTags,
     DatePicker,
     Map: () => import('./Map.vue')
   },
@@ -45,6 +54,14 @@ export default {
     value: {
       type: Object,
       default: () => ({})
+    },
+    title: {
+      type: String,
+      default: 'Filter'
+    },
+    collectionOnly: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -76,10 +93,10 @@ export default {
   },
   methods: {
     onSubmit() {
-      this.$emit('input', this.filters);
+      this.$emit('input', this.filters, false);
     },
     onReset() {
-      this.$emit('input', defaultValues);
+      this.$emit('input', defaultValues, true);
     },
     setLimit(limit) {
       if (limit > 0 && limit < 1000) {
@@ -112,6 +129,12 @@ export default {
       else {
         this.filters.datetime = null;
       }
+    },
+    setCollections(collections) {
+      this.filters.collections = collections;
+    },
+    setIds(ids) {
+      this.filters.ids = ids;
     }
   }
 }

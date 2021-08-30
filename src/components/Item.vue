@@ -28,6 +28,10 @@ export default {
     item: {
       type: Object,
       required: true
+    },
+    selected: {
+      type: Array,
+      default: () => ([])
     }
   },
   data() {
@@ -38,14 +42,16 @@ export default {
   computed: {
     ...mapGetters(['getStac']),
     cardProps() {
+      let props = {};
       // Lazy load thumbnails and not all at once for API Collections
       if (this.showThumbnail && this.thumbnail) {
-        return {
-          "img-src": this.thumbnail.href,
-          "img-alt": this.thumbnail.title
-        };
+        props['img-src'] = this.thumbnail.href;
+        props['img-alt'] = this.thumbnail.title;
       }
-      return {};
+      if (Array.isArray(this.selected) && this.selected.find(obj => this.data.equals(obj))) {
+        props['border-variant'] = 'danger';
+      }
+      return props;
     },
     data() {
       if (this.item instanceof STAC) {

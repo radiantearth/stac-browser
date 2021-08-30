@@ -58,4 +58,12 @@
     .twitter {
         @include button-variant(#1DA1F2, #1DA1F2);
     }
+
+    .global-error {
+        position: fixed;
+        top: 2vh;
+        left: 20vw;
+        width: 60vw;
+        z-index: 9999;
+    }
 }
