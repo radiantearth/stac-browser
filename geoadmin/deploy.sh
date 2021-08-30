@@ -2,8 +2,6 @@
 set -e
 set -u
 
-STAC_VERSION=0.9.0
-
 # Colors
 RESET=$(tput sgr0)
 RED=$(tput setaf 1)
@@ -39,7 +37,7 @@ while [[ $# -gt 0 ]]; do
       shift # past argument
       shift # past value
       ;;
-    --max-age)
+    -m|--max-age)
       MAX_AGE="$2"
       shift # past argument
       shift # past value
@@ -60,9 +58,9 @@ fi
 
 
 # Setting catalog URL
-CATALOG_URL=https://data.geo.admin.ch/api/stac/v0.9/collections
-if [[ " dev int " =~ \\b${STAGING:-}\\b ]]; then
-    CATALOG_URL=https://service-stac.${STAGING}.bgdi.ch/api/stac/v0.9/collections
+CATALOG_URL=https://data.geo.admin.ch/api/stac/v0.9/
+if [[ "${STAGING:-}" == "dev" ]] || [[ "${STAGING:-}" == "int" ]]; then
+    CATALOG_URL=https://service-stac.${STAGING}.bgdi.ch/api/stac/v0.9/
 fi
 
 # Setting default cache control max-age
@@ -87,8 +85,14 @@ else
 fi
 
 
+echo "${YELLOW}NPM install...${RESET}"
+npm install
+
+echo "${YELLOW}Cleaning previous build...${RESET}"
+npm run clean
+
 echo "${YELLOW}Building with catalog ${CATALOG_URL}...${RESET}"
-STAC_VERSION=${STAC_VERSION} CATALOG_URL=${CATALOG_URL} npm run build
+HISTORY_MODE=hash CATALOG_URL=${CATALOG_URL} npm run build -- --public-url ./
 
 echo "${YELLOW}Uploading to ${S3_BUCKET_NAME}...${RESET}"
 aws --profile ${AWS_PROFILE} \
@@ -96,6 +100,6 @@ aws --profile ${AWS_PROFILE} \
     s3 sync \
         --delete \
         --cache-control "public, max-age=${MAX_AGE}" \
-        dist/  s3://${S3_BUCKET_NAME}/
+        dist/  s3://${S3_BUCKET_NAME}/browser/
 
 echo "${GREEN}Deployment successful${RESET}"
