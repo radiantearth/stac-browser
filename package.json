@@ -42,7 +42,6 @@
     "urijs": "^1.19.6",
     "v-clipboard": "^2.2.3",
     "vue": "^2.6.12",
-    "vue-clipboard2": "^0.3.1",
     "vue-router": "^3.2.0",
     "vue2-datepicker": "^3.9.2",
     "vue2-leaflet": "^2.7.0",
