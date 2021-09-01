@@ -298,7 +298,7 @@ export default new Vuex.Store({
     setApiItemsLink(state, link) {
       state.apiItemsLink = link;
     },
-    addApiItems(state, data) {
+    setApiItems(state, { data, stac }) {
       if (Utils.isObject(data) && Array.isArray(data.features)) {
         state.apiItems = data.features.map(feature => Object.freeze(feature));
 
@@ -310,12 +310,22 @@ export default new Vuex.Store({
           pages[rel] = pageLink;
         }
         state.apiItemsPagination = pages;
+
+        if (stac instanceof STAC) {
+          stac._apiChildren.prev = pages.prev; // ToDo: Only required when state.apiItems is not cached(?) -> cache apiItems?
+          stac._apiChildren.next = state.next;
+          stac._apiChildren.list = state.apiItems;
+        }
       }
     },
-    addApiCollections(state, data) {
+    addApiCollections(state, { data, stac }) {
       if (Array.isArray(data.collections)) {
           state.nextCollectionsLink = Utils.getLinkWithRel(data.links, 'next');
           state.apiCollections = state.apiCollections.concat(data.collections.map(collection => Object.freeze(collection)));
+          if (stac instanceof STAC) {
+            stac._apiChildren.next = state.nextCollectionsLink;
+            stac._apiChildren.list = state.apiCollections;
+          }
       }
     },
     setApiItemsFilter(state, filter) {
@@ -434,16 +444,17 @@ export default new Vuex.Store({
 
       if (data) {
         // Load API Collections
-        await cx.dispatch('loadNextApiCollections', data.getLinkWithRel('data'));
+        await cx.dispatch('loadNextApiCollections', data);
         // Load API Items
-        await cx.dispatch('loadApiItems', data.getLinkWithRel('items'));
+        await cx.dispatch('loadApiItems', data);
       }
 
       if (show) {
         cx.commit('showPage', {url});
       }
     },
-    async loadApiItems(cx, link) {
+    async loadApiItems(cx, stac) {
+      let link = stac.getLinkWithRel('items');
       if (!link) {
         return;
       }
@@ -459,7 +470,7 @@ export default new Vuex.Store({
           return new STAC(item, url, cx.getters.toBrowserPath(url));
         });
         cx.commit('setApiItemsLink', link);
-        cx.commit('addApiItems', response.data);
+        cx.commit('setApiItems', { data: response.data, stac });
         return response;
       }
     },
@@ -474,8 +485,17 @@ export default new Vuex.Store({
       // load API Items with search params
       return await cx.dispatch('loadApiItems', Utils.addFiltersToLink(link, filters));
     },
-    async loadNextApiCollections(cx, link = null) {
-      link = link || cx.state.nextCollectionsLink;
+    async loadNextApiCollections(cx, stac = null) {
+      let link;
+      if (stac) {
+        // First page
+        link = stac.getLinkWithRel('data');
+      }
+      else {
+        // Second page and after
+        stac = cx.state.data;
+        link = cx.state.nextCollectionsLink;
+      }
       if (!link) {
         return;
       }
@@ -489,7 +509,7 @@ export default new Vuex.Store({
           let url = Utils.toAbsolute(selfLink?.href || `./collections/${collection.id}`, cx.state.url);
           return new STAC(collection, url, cx.getters.toBrowserPath(url));
         });
-        cx.commit('addApiCollections', response.data);
+        cx.commit('addApiCollections', { data: response.data, stac });
       }
     },
     async validate(cx, url) {

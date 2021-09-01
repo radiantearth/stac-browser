@@ -87,7 +87,7 @@ export default {
     },
     mayHaveChildren() {
       if (this.item instanceof STAC) {
-        return this.childs.length > 0;
+        return this.item.isCatalogLike();
       }
       else if (this.link) {
         return this.item.rel !== 'item';
@@ -112,23 +112,11 @@ export default {
       }
       return STAC.DEFAULT_TITLE;
     },
-    apiItems() {
-      if (!this.stac) {
-        return null;
-      }
-      return this.stac.getLinksWithRels(['items']);
-    },
-    collections() {
-      if (!this.stac) {
-        return null;
-      }
-      return this.stac.getLinkWithRel(['data']);
-    },
     childs() {
       if (!this.stac) {
         return [];
       }
-      return this.stac.getLinksWithRels(['child', 'item']);
+      return this.stac.getChildren();
     },
     onPath() {
       if (!Array.isArray(this.path) || !this.stac) {

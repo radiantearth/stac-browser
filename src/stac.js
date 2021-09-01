@@ -7,6 +7,10 @@ class STAC {
     constructor(data, url, path, migrate = true) {
         this._url = url;
         this._path = path;
+        this._apiChildren = {
+            list: [],
+            next: false
+        };
 
         if (migrate) {
             if (data.type === 'FeatureCollection') {
@@ -41,6 +45,25 @@ class STAC {
 
     isItemCollection() {
         return this.type === 'FeatureCollection';
+    }
+
+    getChildren() {
+        if (!this.isCatalogLike()) {
+            return [];
+        }
+
+        let children = [];
+        if (this._apiChildren.prev) {
+            children.push(this._apiChildren.prev);
+        }
+        children = children.concat(this.getLinksWithRels(['child', 'item']));
+        if (this._apiChildren.list.length > 0) {
+            children = children.concat(this._apiChildren.list);
+        }
+        if (this._apiChildren.next) {
+            children.push(this._apiChildren.next);
+        }
+        return children;
     }
 
     getApiCollectionsLink() {
