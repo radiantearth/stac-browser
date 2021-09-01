@@ -66,4 +66,9 @@
         width: 60vw;
         z-index: 9999;
     }
+
+    abbr[title], abbr[data-original-title] {
+        text-decoration: none;
+        border-bottom: 1px dotted $body-color;
+    }
 }
