@@ -81,7 +81,6 @@ export default {
         }
     }
 };
-
 </script>
 
 <style lang="scss">
@@ -138,6 +137,9 @@ export default {
         font-size: 0.9em;
         line-height: 1.5em;
         margin-bottom: 0.5em;
+    }
+    .checksum-input {
+        width: 100%;
     }
 }
 </style>
