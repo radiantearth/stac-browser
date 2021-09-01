@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import stacLayer from 'stac-layer';
+import stacLayer from 'stac-layer/src/index'; // todo: remove /src/index
 import { CRS } from "leaflet";
 import { LMap, LTileLayer, LWMSTileLayer } from 'vue2-leaflet';
 import LControlFullscreen from 'vue2-leaflet-fullscreen';
