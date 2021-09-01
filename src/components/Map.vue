@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import stacLayer from 'stac-layer/src/index'; // todo: remove /src/index
+import stacLayer from 'stac-layer';
 import { CRS } from "leaflet";
 import { LMap, LTileLayer, LWMSTileLayer } from 'vue2-leaflet';
 import LControlFullscreen from 'vue2-leaflet-fullscreen';
@@ -106,10 +106,9 @@ export default {
         try {
           let options = {
             resolution: this.geoTiffResolution,
-  // todo: uncomment once useTileLayerAsFallback is available
-  //        useTileLayerAsFallback: true,
-  //        tileUrlTemplate: this.tileSourceTemplate,
-  //        buildTileUrlTemplate: this.buildTileUrlTemplate
+            useTileLayerAsFallback: true,
+            tileUrlTemplate: this.tileSourceTemplate,
+            buildTileUrlTemplate: this.buildTileUrlTemplate
           };
           this.stacLayer = await stacLayer(data, options);
           if (this.stacLayer) {
