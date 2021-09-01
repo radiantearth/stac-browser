@@ -106,10 +106,9 @@ export default {
         try {
           let options = {
             resolution: this.geoTiffResolution,
-  // todo: uncomment once useTileLayerAsFallback is available
-  //        useTileLayerAsFallback: true,
-  //        tileUrlTemplate: this.tileSourceTemplate,
-  //        buildTileUrlTemplate: this.buildTileUrlTemplate
+            useTileLayerAsFallback: true,
+            tileUrlTemplate: this.tileSourceTemplate,
+            buildTileUrlTemplate: this.buildTileUrlTemplate
           };
           this.stacLayer = await stacLayer(data, options);
           if (this.stacLayer) {
