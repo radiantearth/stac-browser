@@ -56,7 +56,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(['geoTiffResolution', 'tileSourceTemplate', 'buildTileUrlTemplate']),
+    ...mapState(['geoTiffResolution', 'tileSourceTemplate', 'buildTileUrlTemplate', 'useTileLayerAsFallback']),
     baseMaps() {
       let targets = [];
       if (this.stac.isCollection() && Utils.isObject(this.stac.summaries) && Array.isArray(this.stac.summaries['ssys:targets'])) {
@@ -106,7 +106,7 @@ export default {
         try {
           let options = {
             resolution: this.geoTiffResolution,
-            useTileLayerAsFallback: true,
+            useTileLayerAsFallback: this.useTileLayerAsFallback,
             tileUrlTemplate: this.tileSourceTemplate,
             buildTileUrlTemplate: this.buildTileUrlTemplate
           };
