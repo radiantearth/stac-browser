@@ -4,20 +4,20 @@
       <b-col>
         <Description v-if="data.properties.description" :description="data.properties.description" />
         <Keywords v-if="Array.isArray(data.properties.keywords) && data.properties.keywords.length > 0" :keywords="data.properties.keywords" />
-        <Assets v-if="hasAssets" :assets="assets" :context="data" />
+        <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="shownAssets" @showAsset="showAsset" />
         <Links v-if="additionalLinks.length > 0" title="Additional resources" :links="additionalLinks" />
       </b-col>
       <b-col>
         <h2>Preview</h2>
-        <b-tabs v-if="thumbnails.length > 0">
+        <b-tabs v-if="thumbnails.length > 0" v-model="tab" ref="tabs">
           <b-tab title="Map">
-            <Map :stac="data" @mapClicked="mapClicked" />
+            <Map :stac="data" :stacLayerData="selectedAsset" @mapClicked="mapClicked" @mapChanged="mapChanged" />
           </b-tab>
-          <b-tab title="Preview">
+          <b-tab title="Thumbnails">
             <Thumbnails :thumbnails="thumbnails" />
           </b-tab>
         </b-tabs>
-        <Map v-else :stac="data" />
+        <Map v-else :stac="data" :stacLayerData="selectedAsset" @mapClicked="mapClicked" @mapChanged="mapChanged" />
       </b-col>
     </b-row>
     <b-row>
@@ -35,11 +35,13 @@ import Description from '../components/Description.vue';
 import Links from '../components/Links.vue';
 import Metadata from '../components/Metadata.vue';
 import Thumbnails from '../components/Thumbnails.vue';
+import ShowAssetMixin from '../components/ShowAssetMixin';
 import { BTabs, BTab } from 'bootstrap-vue';
 import Utils from '../utils';
 
 export default {
   name: "Item",
+  mixins: [ShowAssetMixin],
   components: {
     Assets,
     BTabs,
@@ -59,7 +61,7 @@ export default {
   },
   computed: {
     ...mapState(['data', 'url']),
-    ...mapGetters(['additionalLinks', 'collectionLink', 'thumbnails', 'hasAssets', 'assets'])
+    ...mapGetters(['additionalLinks', 'collectionLink'])
   },
   watch: {
     collectionLink: {

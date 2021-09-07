@@ -10,6 +10,6 @@ module.exports = {
     pathPrefix: "/",
     historyMode: "history",
     stacLint: true,
-    geoTiffResolution: 128,
+    geoTiffResolution: 256,
     redirectLegacyUrls: false
 };

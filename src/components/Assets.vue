@@ -2,7 +2,7 @@
   <section class="assets mb-4">
     <h2>{{ title }}</h2>
     <div class="accordion" role="tablist">
-      <Asset v-for="(asset, key) in assets" :asset="asset" :expand="expand" :context="context" :id="String(key)" :key="key" />
+      <Asset v-for="(asset, key) in assets" :asset="asset" :expand="expand" :context="context" :shown="shown.includes(key)" :id="String(key)" :key="key" @show="show" />
     </div>
   </section>
 </template>
@@ -20,6 +20,10 @@ export default {
     assets: {
       type: Object,
       required: true
+    },
+    shown: {
+      type: Array,
+      default: () => ([])
     },
     context: {
       type: Object,
@@ -45,6 +49,11 @@ export default {
         return false; // Expand assets with role asset only if there are 3 of them max
       }
       return null; // Let asset decide (e.g. depending on roles)
+    }
+  },
+  methods: {
+    show(asset, id, isThumbnail) {
+      this.$emit('showAsset', asset, id, isThumbnail);
     }
   }
 }

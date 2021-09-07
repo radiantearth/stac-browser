@@ -97,10 +97,25 @@ export default {
       });
     }
   },
+  watch: {
+    async stacLayerData() {
+      await this.showStacLayer();
+    }
+  },
   methods: {
     async init() {
       this.map = this.$refs.leaflet.mapObject;
 
+      await this.showStacLayer();
+
+      if (this.selectBounds) {
+        this.addBoundsSelector();
+      }
+    },
+    async showStacLayer() {
+      if (this.stacLayer) {
+        this.map.removeLayer(this.stacLayer);
+      }
       let data = this.stacLayerData || this.stac;
       if (data.type !== 'Catalog') {
         try {
@@ -110,9 +125,19 @@ export default {
             tileUrlTemplate: this.tileSourceTemplate,
             buildTileUrlTemplate: this.buildTileUrlTemplate
           };
+          if ('href' in data) {
+            if (data.type === 'Feature') {
+              options.bbox = this.stac?.bbox;
+            }
+            else if (data.type === 'Collection') {
+              options.bbox = this.stac?.extent?.spatial?.bbox[0];
+            }
+          }
           this.stacLayer = await stacLayer(data, options);
           if (this.stacLayer) {
+            this.$emit('mapChanged', this.stacLayer.stac);
             this.stacLayer.on('click', event => this.$emit('mapClicked', event.stac));
+            this.stacLayer.on("fallback", event => this.$emit('mapChanged', event.stac));
             // Fit bounds before adding the layer to the map to avoid a race condition(?) between Tiff loading and fitBounds
             this.fitBounds();
             this.stacLayer.addTo(this.map);
@@ -120,10 +145,6 @@ export default {
         } catch (error) {
           this.$root.$emit('error', error, 'Sorry, loading the map failed.');
         }
-      }
-
-      if (this.selectBounds) {
-        this.addBoundsSelector();
       }
     },
     fitBounds() {

@@ -15,15 +15,15 @@
         </b-row>
       </section>
       <section class="mb-4">
-        <b-tabs v-if="isCollection && thumbnails.length > 0">
+        <b-tabs v-if="isCollection && thumbnails.length > 0" v-model="tab" ref="tabs">
           <b-tab title="Map">
-            <Map :stac="data" @mapClicked="mapClicked" />
+            <Map :stac="data" :stacLayerData="selectedAsset" @mapClicked="mapClicked" @mapChanged="mapChanged" />
           </b-tab>
           <b-tab title="Preview">
             <Thumbnails :thumbnails="thumbnails" />
           </b-tab>
         </b-tabs>
-        <Map v-else-if="isCollection" :stac="data" @mapClicked="mapClicked" />
+        <Map v-else-if="isCollection" :stac="data" :stacLayerData="selectedAsset" @mapClicked="mapClicked" @mapChanged="mapChanged" />
         <Thumbnails v-else-if="thumbnails.length > 0" :thumbnails="thumbnails" />
       </section>
       <Metadata title="Metadata" class="mb-4" :type="data.type" :data="data" :ignoreFields="ignoredMetadataFields" />
@@ -33,7 +33,7 @@
       <Catalogs v-if="catalogs.length > 0" :catalogs="catalogs" :hasMore="hasMoreCollections" @loadMore="loadMoreCollections" />
       <Items v-if="hasItems" :stac="data" :items="items" :api="isApi" :apiFilters="apiItemsFilter" :pagination="itemPages"
         @paginate="paginateItems" @filterItems="filterItems" />
-      <Assets v-if="hasAssets" :assets="assets" />
+      <Assets v-if="hasAssets" :assets="assets" :shown="shownAssets" @showAsset="showAsset" />
       <Assets v-if="hasItemAssets" :assets="data.item_assets" :definition="true" />
       <Links v-if="additionalLinks.length > 0" title="Additional resources" :links="additionalLinks" />
     </b-col>
@@ -51,12 +51,14 @@ import Links from '../components/Links.vue';
 import Metadata from '../components/Metadata.vue';
 import Providers from '../components/Providers.vue';
 import Thumbnails from '../components/Thumbnails.vue';
+import ShowAssetMixin from '../components/ShowAssetMixin';
 import { Formatters } from '@radiantearth/stac-fields';
 import { BTabs, BTab } from 'bootstrap-vue';
 import Utils from '../utils';
 
 export default {
   name: "Catalog",
+  mixins: [ShowAssetMixin],
   components: {
     Assets,
     BTabs,
@@ -96,7 +98,7 @@ export default {
   },
   computed: {
     ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination', 'apiItemsFilter']),
-    ...mapGetters(['additionalLinks', 'catalogs', 'isCollection', 'items', 'thumbnails', 'hasMoreCollections', 'hasAssets', 'assets']),
+    ...mapGetters(['additionalLinks', 'catalogs', 'isCollection', 'items', 'hasMoreCollections']),
     licenses() {
       if (this.isCollection && this.data.license) {
         return Formatters.formatLicense(this.data.license, null, null, this.data);
