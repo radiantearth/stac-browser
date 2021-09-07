@@ -38,7 +38,7 @@
     "commonmark": "^0.29.3",
     "core-js": "^3.6.5",
     "leaflet": "^1.7.1",
-    "stac-layer": "^0.2.0",
+    "stac-layer": "^0.4.2",
     "urijs": "^1.19.6",
     "v-clipboard": "^2.2.3",
     "vue": "^2.6.12",
