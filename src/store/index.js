@@ -8,7 +8,8 @@ import bs58 from 'bs58';
 Vue.use(Vuex);
 
 // Local settings (e.g. for currently loaded STAC entity)
-const localDefaults = {
+const localDefaults = () => ({
+  loading: false,
   url: '',
   title: CONFIG.catalogTitle,
   data: null,
@@ -19,17 +20,20 @@ const localDefaults = {
   apiItemsLink: null,
   apiItemsFilter: {},
   apiItemsPagination: {}
-};
+});
+
+const catalogDefaults = () => ({
+  database: {},
+  queue: [],
+  redirectUrl: null
+});
 
 export default new Vuex.Store({
   strict: true,
-  state: Object.assign(CONFIG, localDefaults, {
+  state: Object.assign(CONFIG, localDefaults(), catalogDefaults(), {
     // Global settings
     allowSelectCatalog: !CONFIG.catalogUrl,
-    redirectUrl: null,
     stacIndex: [],
-    database: {},
-    queue: [],
     supportedRelTypes: [ // These will be handled in a special way and will not be shown in the link lists
       'child',
       'collection',
@@ -49,7 +53,6 @@ export default new Vuex.Store({
     ]
   }),
   getters: {
-    loading: state => !state.database[state.url],
     error: state => state.database[state.url] instanceof Error ? state.database[state.url] : null,
     getStac: state => (url, returnErrorObject = false) => {
       if (!url) {
@@ -247,14 +250,20 @@ export default new Vuex.Store({
     tileSourceTemplate(state, tileSourceTemplate) {
       state.tileSourceTemplate = tileSourceTemplate;
     },
-    loading(state, url) {
+    loading(state, {url, show}) {
       Vue.set(state.database, url, null);
+      if (show) {
+        state.loading = true;
+      }
     },
     loaded(state, {url, data}) {
       Vue.set(state.database, url, Object.freeze(data));
     },
+    resetCatalog(state) {
+      Object.assign(state, catalogDefaults());
+    },
     resetPage(state) {
-      Object.assign(state, localDefaults);
+      Object.assign(state, localDefaults());
     },
     showPage(state, { url, title, stac }) {
       if (!stac) {
@@ -370,13 +379,9 @@ export default new Vuex.Store({
         path = cx.getters.toBrowserPath(url);
       }
 
-      if (show) {
-        cx.commit('resetPage');
-      }
-
       let data = cx.state.database[url];
       if (!data) {
-        cx.commit('loading', url);
+        cx.commit('loading', {url, show});
         try {
           let response = await axios.get(url);
           if (!Utils.isObject(response.data)) {
@@ -409,6 +414,7 @@ export default new Vuex.Store({
       }
 
       if (show) {
+        cx.commit('resetPage');
         cx.commit('showPage', {url});
       }
     },
