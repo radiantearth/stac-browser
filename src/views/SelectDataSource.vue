@@ -6,10 +6,11 @@
           :invalid-feedback="error" :state="valid">
           <b-form-input id="url" type="url" v-model="url" placeholder="https://..."></b-form-input>
         </b-form-group>
+        <hr />
         <b-form-group v-if="stacIndex.length > 0" id="stacIndex" label="... or select one from STAC Index">
           <b-list-group class="stacIndex">
             <template v-for="catalog in stacIndex">
-              <b-list-group-item button v-if="catalog.access !== 'private'" :key="catalog.id" class="flex-column align-items-start"
+              <b-list-group-item button v-if="catalog.access !== 'private'" v-show="show(catalog)" :key="catalog.id" class="flex-column align-items-start"
                 :active="url === catalog.url" @click="url = catalog.url">
                 <div class="d-flex w-100 justify-content-between">
                   <strong class="mb-1">{{ catalog.title }}</strong>
@@ -78,6 +79,20 @@ export default {
     this.$store.commit('resetPage'); // Reset loaded STAC entity
   },
   methods: {
+    show(catalog) {
+      if(!this.url) {
+        return true;
+      }
+
+      let searchTerm = this.url.toLowerCase();
+      if (typeof catalog.title === 'string' && catalog.title.toLowerCase().includes(searchTerm)) {
+        return true;
+      }
+      if (typeof catalog.url === 'string' && catalog.url.toLowerCase().includes(searchTerm)) {
+        return true;
+      }
+      return false;
+    },
     onSubmit() {
     this.$store.commit('resetCatalog'); // Reset loaded STAC catalog
       this.$router.push({
