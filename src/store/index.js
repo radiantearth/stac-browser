@@ -401,7 +401,7 @@ export default new Vuex.Store({
         }
       }
 
-      if (data) {
+      if (data && show) {
         // Load API Collections
         await cx.dispatch('loadNextApiCollections', data.getLinkWithRel('data'));
         // Load API Items
