@@ -1,6 +1,6 @@
 <template>
   <section class="mb-4">
-    <l-map class="map" :class="stac.type" @ready="init" :options="mapOptions">
+    <l-map class="map" v-if="show" :class="stac.type" @ready="init" :options="mapOptions">
       <LControlFullscreen />
       <template v-if="baseMaps.length > 0">
         <component :is="baseMap.component" v-for="baseMap in baseMaps" :key="baseMap.name" v-bind="baseMap" :layers="baseMap.name" layer-type="base" />
@@ -29,6 +29,7 @@ export default {
   },
   data() {
     return {
+      show: false,
       map: null,
       areaSelect: null,
       stacLayer: null,
@@ -53,6 +54,11 @@ export default {
       type: Boolean,
       required: false
     }
+  },
+  mounted() {
+    // Workaround for https://github.com/radiantearth/stac-browser/issues/95
+    // I have absolutely no clue yet why this is required, needs further investigation!
+    setTimeout(() => this.show = true, 100);
   },
   computed: {
     ...mapState(['geoTiffResolution', 'tileSourceTemplate', 'buildTileUrlTemplate', 'useTileLayerAsFallback']),
