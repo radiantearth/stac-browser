@@ -3,8 +3,9 @@
     <b-card-header header-tag="header" role="tab" class="p-0">
       <b-button block v-b-toggle="id" variant="asset" squared class="p-2 d-flex">
         {{ asset.title || id }}
-        <div class="roles ml-1 mr-2" v-if="Array.isArray(asset.roles)">
-          <b-badge v-for="role in asset.roles" :key="role" :variant="role === 'data' ? 'primary' : 'secondary'" class="ml-1 mb-1">{{ role }}</b-badge>
+        <div class="badges ml-1 mr-2" v-if="Array.isArray(asset.roles)">
+          <b-badge v-for="role in asset.roles" :key="role" :variant="role === 'data' ? 'primary' : 'secondary'" class="role ml-1 mb-1">{{ role }}</b-badge>
+          <b-badge v-if="shown" variant="success" class="shown ml-1 mb-1" title="Asset visualized on map"><b-icon-eye /></b-badge>
         </div>
         <span class="ml-auto" aria-hidden="true">
           <b-icon-chevron-down v-if="expanded" />
@@ -14,9 +15,15 @@
     </b-card-header>
     <b-collapse :id="id" v-model="expanded" role="tabpanel">
       <b-card-body>
-        <b-button-group v-if="asset.href">
+        <b-button-group class="actions" v-if="asset.href">
           <b-button :href="asset.href" target="_blank" variant="outline-primary">
             Download {{ fileFormat }}
+          </b-button>
+          <b-button v-if="canShow && shown" :pressed="true" variant="outline-primary" class="inactive">
+            <b-icon-check /> Shown
+          </b-button>
+          <b-button v-else-if="canShow" @click="show" variant="outline-primary">
+            <b-icon-eye /> Show
           </b-button>
         </b-button-group>
         <b-card-title v-else>{{ fileFormat }}</b-card-title>
@@ -30,8 +37,9 @@
 </template>
 
 <script>
-import { BCollapse, BIconChevronUp, BIconChevronDown } from 'bootstrap-vue';
+import { BCollapse, BIconCheck, BIconChevronUp, BIconChevronDown, BIconEye } from 'bootstrap-vue';
 import { Formatters } from '@radiantearth/stac-fields';
+import { MIME_TYPES } from 'stac-layer/src/data';
 import Description from './Description.vue';
 import Metadata from './Metadata.vue';
 
@@ -39,8 +47,10 @@ export default {
   name: 'Asset',
   components: {
     BCollapse,
+    BIconCheck,
     BIconChevronDown,
     BIconChevronUp,
+    BIconEye,
     Description,
     Metadata
   },
@@ -60,6 +70,10 @@ export default {
     expand: {
       type: Boolean,
       default: null
+    },
+    shown: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -77,12 +91,38 @@ export default {
       this.expanded = Array.isArray(this.asset.roles) && this.asset.roles.includes('data');
     }
   },
+  watch: {
+    shown(show, wasShown) {
+      if (show && !wasShown) {
+        this.expanded = true;
+      }
+    }
+  },
   computed: {
+    isThumbnail() {
+      return Array.isArray(this.asset.roles) && this.asset.roles.includes('thumbnail');
+    },
+    canShow() {
+      if (typeof this.asset.type !== 'string') {
+        return false;
+      }
+      for(let type in MIME_TYPES) {
+        if (MIME_TYPES[type].includes(this.asset.type)) {
+          return true;
+        }
+      }
+      return false;
+    },
     fileFormat() {
       if (this.asset.type) {
         return Formatters.formatMediaType(this.asset.type);
       }
       return null;
+    }
+  },
+  methods: {
+    show() {
+      this.$emit('show', this.asset, this.id, this.isThumbnail);
     }
   }
 }
@@ -93,8 +133,15 @@ export default {
   .btn-asset {
     text-align: left;
 
-    .badge {
-      text-transform: uppercase;
+    .badges {
+      .badge {
+        line-height: 1.2em;
+        height: 1.7em;
+      }
+
+      .role {
+        text-transform: uppercase;
+      }
     }
   }
   .metadata {

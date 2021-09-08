@@ -133,10 +133,7 @@ export default {
 /* Doesn't work right now, scrolls to incorrect blocks?!
       let selected = document.querySelectorAll('.item-card.border-danger');
       if (selected.length === 1) {
-        selected[0].scrollIntoView({
-          behavior: "smooth",
-          block: "start"
-        });
+        Utils.scrollTo(selected[0]);
       } */
     }
   }

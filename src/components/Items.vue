@@ -26,6 +26,7 @@
 import Item from './Item.vue';
 import Pagination from './Pagination.vue';
 import { BCollapse, BIconSearch } from "bootstrap-vue";
+import Utils from '../utils';
 
 export default {
   name: "Items",
@@ -103,10 +104,7 @@ export default {
     },
     paginate(link, placement) {
       if (placement === 'bottom' && this.$refs.topPagination) {
-        this.$refs.topPagination.$el.scrollIntoView({
-          behavior: "smooth",
-          block: "start"
-        });
+        Utils.scrollTo(this.$refs.topPagination.$el);
       }
       this.$emit('paginate', link);
     }

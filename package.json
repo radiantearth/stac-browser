@@ -38,7 +38,7 @@
     "commonmark": "^0.29.3",
     "core-js": "^3.6.5",
     "leaflet": "^1.7.1",
-    "stac-layer": "^0.2.0",
+    "stac-layer": "^0.5.1",
     "urijs": "^1.19.6",
     "v-clipboard": "^2.2.3",
     "vue": "^2.6.12",
@@ -50,7 +50,6 @@
     "yargs": "^17.0.1"
   },
   "devDependencies": {
-    "@babel/plugin-proposal-optional-chaining": "^7.14.5",
     "@vue/cli-plugin-babel": "^4.5.0",
     "@vue/cli-plugin-eslint": "^4.5.0",
     "@vue/cli-plugin-router": "^4.5.0",

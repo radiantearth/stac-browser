@@ -442,7 +442,7 @@ export default new Vuex.Store({
         }
       }
 
-      if (data) {
+      if (data && show) {
         // Load API Collections
         await cx.dispatch('loadNextApiCollections', data);
         // Load API Items

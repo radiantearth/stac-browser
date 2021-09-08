@@ -119,6 +119,20 @@ export default class Utils {
 		}
 	}
 
+	static scrollTo(el) {
+		if (!el) {
+			return;
+		}
+		var rect = el.getBoundingClientRect();
+		var isVisible = rect.top < window.innerHeight && rect.bottom >= 0;
+		if (!isVisible) {
+			el.scrollIntoView({
+				behavior: "smooth",
+				block: "start"
+			});
+		}
+	}
+
 	static addFiltersToLink(link, filters = {}) {
 		// Construct new link with search params
 		let newLink = Object.assign({}, link);
