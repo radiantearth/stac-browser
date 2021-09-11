@@ -1,6 +1,8 @@
 <template>
   <div>
-    <b-alert v-if="errored" variant="danger" show>{{ _entity.message }}</b-alert>
+    <b-alert v-if="errored" variant="danger" show>{{
+      _entity.message
+    }}</b-alert>
     <b-spinner v-else-if="!loaded" label="Loading..."></b-spinner>
     <b-container v-else :class="loaded && 'loaded'">
       <b-row>
@@ -17,83 +19,46 @@
           <h1 class="scroll">{{ title }}</h1>
           <p class="scroll">
             <small>
-              <!-- <b-button
-                v-clipboard="url"
-                variant="link"
-                size="sm"
-                class="clipboard"
-              > -->
-              <span
-                v-if="validationErrors"
-                title="Validation errors present; please check the JavaScript Console"
-                >⚠️</span
-              >
-              <!-- <i class="far fa-copy" />&nbsp; -->
-              <code>{{ url }}</code>
-              <!-- </b-button> -->
+              <a :href="url" target="_blank"><code>{{ url }}</code></a>
             </small>
           </p>
-          <b-tabs v-model="tabIndex">
-            <b-tab
-              v-if="visibleTabs.includes('preview')"
-              title="Preview"
-              active
-            >
+          <b-tabs :value="tabIndex" @input="selectTab" @activate-tab="activateTab">
+            <b-tab v-if="this.cogs.length" title="Preview">
               <div id="map-container">
                 <div id="map"></div>
               </div>
-              <multiselect
+              <MultiSelect
                 v-if="cogs.length > 1"
                 v-model="selectedImage"
                 :options="cogs"
                 placeholder="Select an image"
                 track-by="href"
                 label="title"
+                open-direction="bottom"
               />
-              <multiselect
+              <MultiSelect
                 v-if="features.length > 0"
                 v-model="selectedFeatures"
                 :options="features"
                 placeholder="Select a set of features"
                 track-by="href"
                 label="title"
+                open-direction="bottom"
               />
             </b-tab>
-            <b-tab
-              v-if="visibleTabs.includes('thumbnail')"
-              title="Thumbnail"
-              :active="!visibleTabs.includes('preview')"
-            >
+            <b-tab v-if="this.thumbnail" title="Thumbnail">
               <a :href="thumbnail">
                 <img id="thumbnail" align="center" :src="thumbnail" />
               </a>
             </b-tab>
-            <AssetTab
-              v-if="visibleTabs.includes('assets')"
-              :assets="assets"
-              :bands="bands"
-              :hasBands="hasBands"
-              :active="
-                !visibleTabs.includes('preview') &&
-                  !visibleTabs.includes('thumbnail')
-              "
-            ></AssetTab>
-            <b-tab
-              v-if="visibleTabs.includes('bands')"
-              title="Bands"
-              :active="
-                !visibleTabs.includes('preview') &&
-                  !visibleTabs.includes('thumbnail') &&
-                  !visibleTabs.includes('assets')
-              "
-            >
-              <b-table
-                :items="bands"
-                :fields="bandFields"
-                responsive
-                small
-                striped
-              />
+            <b-tab v-if="this.assets.length" title="Assets" key="assets">
+              <AssetTab :assets="assets" :bands="bands" :has-bands="hasBands" />
+            </b-tab>
+            <b-tab v-if="this.shownLinks.length" title="Links" key="links">
+              <LinkTab :links="shownLinks" />
+            </b-tab>
+            <b-tab v-if="this.bands.length > 0" title="Bands">
+              <b-table :items="bands" :fields="bandFields" responsive small striped />
             </b-tab>
           </b-tabs>
         </b-col>
@@ -105,7 +70,7 @@
               :properties="properties"
               :keywords="keywords"
               :collection="collection"
-              :collectionLink="collectionLink"
+              :collection-link="collectionLink"
               :providers="providers"
               :slugify="slugify"
             />
@@ -116,10 +81,7 @@
     <footer class="footer">
       <b-container>
         <span class="poweredby text-muted">
-          Powered by
-          <a href="https://github.com/radiantearth/stac-browser"
-            >STAC Browser</a
-          >
+          Powered by <a href="https://github.com/radiantearth/stac-browser">STAC Browser</a> v{{ browserVersion }}
         </span>
       </b-container>
     </footer>
@@ -127,11 +89,9 @@
 </template>
 
 <script>
-import path from "path";
 import url from "url";
 
 import * as d3 from "d3-scale-chromatic";
-import escape from "lodash.escape";
 import isEqual from "lodash.isequal";
 import Leaflet from "leaflet";
 import "leaflet-easybutton";
@@ -139,10 +99,11 @@ import { mapActions, mapGetters } from "vuex";
 
 import common from "./common";
 import { getTileSource } from "../util";
-import { transformItem } from "../migrate";
+import Migrate from '@radiantearth/stac-migrate';
 
-import AssetTab from './AssetTab.vue';
-import MetadataSidebar from './MetadataSidebar.vue';
+// ToDo 3.0: Import tabs lazily
+import LinkTab from "./LinkTab.vue";
+import AssetTab from "./AssetTab.vue";
 
 const COG_TYPES = [
   "image/vnd.stac.geotiff; cloud-optimized=true",
@@ -155,6 +116,12 @@ const FEATURES_TYPES = ["application/geo+json"];
 export default {
   ...common,
   name: "ItemDetail",
+  components: {
+    LinkTab,
+    AssetTab,
+    MetadataSidebar: () => import(/* webpackChunkName: "metadata-sidebar" */ "./MetadataSidebar.vue"),
+    MultiSelect: () => import(/* webpackChunkName: "multiselect" */ 'vue-multiselect')
+  },
   props: {
     ancestors: {
       type: Array,
@@ -179,18 +146,11 @@ export default {
     url: {
       type: String,
       required: true
-    },
-    validate: {
-      type: Function,
-      required: true
     }
-  },
-  components: {
-    AssetTab,
-    MetadataSidebar
   },
   data() {
     return {
+      stacVersion: null,
       fullscreen: false,
       locatorMap: null,
       map: null,
@@ -210,58 +170,69 @@ export default {
       },
       selectedFeatures: null,
       selectedImage: null,
-      selectedTab: null,
-      validationErrors: null
+      tabIndex: 0,
+      tabsChanged: false
     };
   },
   computed: {
     ...common.computed,
     ...mapGetters(["getEntity"]),
     _entity() {
-      return transformItem(this.getEntity(this.url));
+      let object = this.getEntity(this.url);
+      if (object instanceof Error) {
+        return object;
+      }
+      else if (object.type === "FeatureCollection") {
+        const { hash } = url.parse(this.url);
+        const idx = hash.slice(1);
+        object = object.features[idx];
+      }
+      this.stacVersion = object.stac_version; // Store the original stac_version as it gets replaced by the migration
+      let cloned = JSON.parse(JSON.stringify(object)); // Clone to avoid changing the vuex store, remove once migration is done directly in vuex
+      return Migrate.item(cloned);
     },
     _collectionLinks() {
       return this.links.filter(x => x.rel === "collection");
     },
     _description() {
-      return this._properties.description;
+      return this.properties.description;
     },
-    _keywords() {
-      return (
-        (this.collection && this.collection.keywords) ||
-        common.computed._keywords.apply(this)
-      );
+    keywords() {
+      if (this.collection && Array.isArray(this.collection.keywords)) {
+        return this.collection.keywords;
+      }
+      else {
+        return common.computed.keywords.apply(this)
+      }
     },
     _license() {
       return (
-        this._properties["item:license"] ||
-        this._properties["license"] ||
+        this.properties.license ||
         (this.collection && this.collection.license) ||
         (this.rootCatalog && this.rootCatalog.license)
       );
     },
-    _providers() {
+    providers() {
       return (
-        this._properties["item:providers"] ||
-        this._properties["providers"] ||
+        this.properties.providers ||
         (this.collection && this.collection.providers) ||
-        common.computed._providers.apply(this)
+        common.computed.providers.apply(this)
       );
     },
     _temporalCoverage() {
-      if (this._properties["dtr:start_datetime"] != null) {
+      if (this.properties.start_datetime != null) {
         return [
-          this._properties["dtr:start_datetime"],
-          this._properties["dtr:end_datetime"]
+          this.properties.start_datetime,
+          this.properties.end_datetime
         ]
           .map(x => x || "..")
           .join("/");
       }
 
-      return this._properties.datetime;
+      return this.properties.datetime;
     },
     _title() {
-      return this._properties.title;
+      return this.properties.title;
     },
     attribution() {
       if (this.license != null || this.licensor != null) {
@@ -271,14 +242,12 @@ export default {
       return null;
     },
     bands() {
+      // ToDo: Merge all bands from assets
       return (
-        this._properties["eo:bands"] ||
+        this.properties["eo:bands"] ||
         (this.collection &&
           this.collection.properties &&
           this.collection.properties["eo:bands"]) ||
-        (this.rootCatalog &&
-          this.rootCatalog.properties &&
-          this.rootCatalog.properties["eo:bands"]) ||
         []
       );
     },
@@ -343,13 +312,6 @@ export default {
       return this.selectedFeatures.href;
     },
     item() {
-      if (this._entity.type === "FeatureCollection") {
-        const { hash } = url.parse(this.url);
-        const idx = hash.slice(1);
-
-        return this._entity.features[idx];
-      }
-
       return this._entity;
     },
     jsonLD() {
@@ -360,13 +322,13 @@ export default {
         name: this.title,
         description: this.description || `${this.title} STAC Item`,
         // recommended
-        citation: this._properties["sci:citation"],
-        identifier: this._properties["sci:doi"] || this.item.id,
-        keywords: this._keywords,
+        citation: this.properties["sci:citation"],
+        identifier: this.properties["sci:doi"] || this.item.id,
+        keywords: this.keywords,
         license: this.licenseUrl,
         isBasedOn: this.url,
         url: this.path,
-        workExample: (this._properties["sci:publications"] || []).map(p => ({
+        workExample: (this.properties["sci:publications"] || []).map(p => ({
           identifier: p.doi,
           citation: p.citation
         })),
@@ -417,30 +379,7 @@ export default {
         .pop();
     },
     properties() {
-      return {
-        ...this._collectionProperties,
-        ...this._properties
-      };
-    },
-    tabIndex: {
-      get: function() {
-        return this.visibleTabs.indexOf(this.selectedTab);
-      },
-      set: function(tabIndex) {
-        // wait for the DOM to update
-        this.$nextTick(() => {
-          this.selectedTab = this.visibleTabs[tabIndex];
-        });
-      }
-    },
-    thumbnail() {
-      const thumbnail = this.assets.find(x => x.key === "thumbnail");
-
-      if (thumbnail != null) {
-        return this.resolve(thumbnail.href, this.url);
-      }
-
-      return null;
+      return this.entity.properties || {};
     },
     tileSource() {
       if (this.selectedImage == null) {
@@ -448,14 +387,6 @@ export default {
       }
 
       return getTileSource(this.selectedImage.href);
-    },
-    visibleTabs() {
-      return [
-        this.cogs.length > 0 && "preview",
-        this.thumbnail != null && "thumbnail",
-        this.assets.length > 0 && "assets",
-        this.bands.length > 0 && "bands"
-      ].filter(x => x != null && x !== false);
     }
   },
   watch: {
@@ -518,17 +449,6 @@ export default {
         }
       }
     },
-    selectedTab(to, from) {
-      if (to !== from) {
-        this.updateState({
-          t: to
-        });
-
-        if (to === "preview") {
-          this.map && this.map.invalidateSize();
-        }
-      }
-    },
     tileSource(to, from) {
       if (to !== from) {
         if (this.map != null) {
@@ -547,7 +467,7 @@ export default {
     ...common.methods,
     ...mapActions(["load"]),
     initialize() {
-      this.syncWithQueryState(this.$route.query);
+      this.syncWithQueryState();
 
       this.$nextTick(() => {
         if (this.cog != null) {
@@ -568,7 +488,7 @@ export default {
           layer.bindPopup(() => {
             const el = document.createElement("table");
 
-            const labelProperties = this._properties["label:property"] || [];
+            const labelProperties = this.properties["label:properties"] || [];
 
             el.innerHTML = Object.entries(feature.properties)
               .filter(([k]) =>
@@ -583,7 +503,7 @@ export default {
             return el;
           }),
         style: feature => {
-          const labelClasses = this._properties["label:classes"];
+          const labelClasses = this.properties["label:classes"];
           const classes = (labelClasses || [])
             .map(x => x.classes.map(c => `${x.name}-${c}`))
             .flat();
@@ -730,20 +650,42 @@ export default {
         this.map.fitBounds(this.overlayLayer.getBounds());
       }
     },
-    syncWithQueryState(query) {
-      this.selectedTab = query.t;
+    selectTab(tabIndex) {
+      if (typeof tabIndex !== 'number') {
+        tabIndex = parseInt(tabIndex, 10);
+        if (isNaN(tabIndex)) {
+          return;
+        }
+      }
+      if (this.tabsChanged && this.tabIndex !== tabIndex) {
+        this.updateState({
+          t: tabIndex
+        });
+        if (tabIndex === 0) {
+          this.map && this.map.invalidateSize();
+        }
+      }
+      this.$nextTick(() => {
+        this.tabIndex = tabIndex;
+      });
+    },
+    activateTab() {
+      this.tabsChanged = true;
+    },
+    syncWithQueryState() {
+      this.selectTab(this.$route.query.t);
 
-      if (query.si != null) {
-        this.selectedImage = this.cogs[query.si];
+      if (this.$route.query.si != null) {
+        this.selectedImage = this.cogs[this.$route.query.si];
       } else {
         this.selectedImage = this.cog;
       }
 
-      if (query.sf != null) {
-        this.selectedFeatures = this.features[query.sf];
+      if (this.$route.query.sf != null) {
+        this.selectedFeatures = this.features[this.$route.query.sf];
       }
 
-      this.fullscreen = [true, "true"].includes(query.fullscreen);
+      this.fullscreen = [true, "true"].includes(this.$route.query.fullscreen);
     },
     async updateHash() {
       const center = this.map.getCenter();
@@ -767,201 +709,8 @@ export default {
 };
 </script>
 
-<style lang="css">
-html {
-  position: relative;
-  min-height: 100%;
-}
-
-body {
-  line-height: 24px;
-  color: #111;
-  font-family: Arial, sans-serif;
-  margin-bottom: 40px;
-}
-
-blockquote,
-body {
-  font-size: 16px;
-}
-table {
-  font-size: 80%;
-}
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  padding: 0;
-  margin: 0;
-}
-h1,
-h2,
-h3,
-h4 {
-  font-family: Arial, sans-serif;
-  text-rendering: optimizeLegibility;
-  padding-bottom: 4px;
-}
-h1:last-child,
-h2:last-child,
-h3:last-child,
-h4:last-child {
-  padding-bottom: 0;
-}
-h1 {
-  font-weight: 400;
-  font-size: 28px;
-  line-height: 1.2;
-}
-h2 {
-  font-weight: 700;
-  font-size: 21px;
-  line-height: 1.3;
-}
-h3 {
-  font-weight: 700;
-}
-h3,
-h4 {
-  font-size: 17px;
-  line-height: 1.255;
-}
-h4 {
-  font-weight: 400;
-}
-h5 {
-  font-size: 13px;
-  line-height: 19px;
-}
-h5,
-h6 {
-  font-weight: 700;
-}
-h6 {
-  text-transform: uppercase;
-  font-size: 11px;
-  line-height: 1.465;
-  padding-bottom: 1px;
-}
-p {
-  padding: 0;
-  margin: 0 0 14px;
-}
-p:last-child {
-  margin-bottom: 0;
-}
-p + p {
-  margin-top: -4px;
-}
-b,
-strong {
-  font-weight: 700;
-}
-em,
-i {
-  font-style: italic;
-}
-blockquote {
-  margin: 13px;
-}
-small {
-  font-size: 12px;
-}
-a,
-a:active,
-a:link,
-a:visited {
-  color: #0066c0;
-}
-header {
-  padding: 1.5em 0 0.5em;
-}
-code {
-  color: #555;
-  white-space: nowrap;
-}
-
-.scroll {
-  overflow-x: scroll;
-  -ms-overflow-style: none;
-  overflow: -moz-scrollbars-none;
-  scrollbar-width: none;
-}
-
-.scroll::-webkit-scrollbar {
-  display: none;
-}
-
-.btn code {
-  font-size: 10.5px;
-}
-
-.btn.clipboard {
-  white-space: nowrap;
-}
-
-.btn.clipboard:hover {
-  text-decoration: none;
-}
-
-.footer {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  height: 40px;
-  line-height: 40px;
-  text-align: right;
-  font-size: 0.75em;
-}
-
-.poweredby {
-  border: 1px dotted hotpink;
-  border-radius: 4px;
-  padding: 5px 10px;
-  background-color: #f9f9f9;
-}
-
-.tabs {
-  margin-top: 25px;
-}
-
-.table th,
-.table td {
-  border: none;
-  padding: 0.25rem;
-  vertical-align: middle
-}
-
-.table td.title {
-  border-right: 1px solid #ddd;
-}
-
-.table td.group {
-  border-radius: 5px;
-  background-color: #ddd;
-  padding-left: 7px;
-}
-
-.table td.group h4 {
-  font-size: 14px;
-  font-weight: normal;
-  color: #555;
-  text-transform: uppercase;
-}
-
-.table th {
-  border-top: none;
-  border-bottom: 1px solid #dee2e6;
-}
-
-.metadata td.title {
-  font-weight: bold;
-  width: 33%;
-  text-align: right;
-}
-</style>
+<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
+<style src="./base.css"></style>
 
 <style scoped lang="css">
 .leaflet-pseudo-fullscreen {
@@ -990,13 +739,6 @@ code {
 #map {
   height: 100%;
   width: 100%;
-}
-
-#thumbnail {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  max-height: 500px;
 }
 
 #header_logo {

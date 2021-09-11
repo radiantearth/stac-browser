@@ -11,40 +11,35 @@
                 <td class="title">STAC Version</td>
                 <td>{{ stacVersion }}</td>
             </tr>
-            <tr v-if="keywords">
+            <tr v-if="keywords.length > 0">
                 <td class="title">Keywords</td>
-                <td>{{ keywords }}</td>
+                <td>{{ keywords.join(', ') }}</td>
             </tr>
             <tr v-if="collectionLink">
             <td class="title">Collection</td>
                 <td>
                     <router-link :to="linkToCollection">
-                    {{ collection.title || "Untitled" }}
+                    {{ collectionTitle }}
                     </router-link>
                 </td>
             </tr>
             <tr v-if="license">
                 <td class="title">License</td>
-                <!-- eslint-disable-next-line vue/no-v-html -->
                 <td v-html="license" />
             </tr>
-            <tr v-if="temporalExtent">
+            <tr v-if="temporalExtentReadable.length > 0">
                 <td class="title">Temporal Extent</td>
-                <td>{{ temporalExtent }}</td>
+                <td>{{ temporalExtentReadable }}</td>
             </tr>
-            <template v-for="(props, ext) in propertyList">
-                <tr v-if="ext" :key="ext">
-                <td class="group" colspan="2">
-                    <h4>{{ ext }}</h4>
-                </td>
+            <template v-for="group in propertyList">
+                <tr v-if="group.extension" :key="group.extension">
+                    <td class="group" colspan="2">
+                        <h4 v-html="group.label" />
+                    </td>
                 </tr>
-                <tr v-for="prop in props" :key="prop.key">
-                <td class="title">
-                    <!-- eslint-disable-next-line vue/no-v-html -->
-                    <span :title="prop.key" v-html="prop.label" />
-                </td>
-                <!-- eslint-disable-next-line vue/no-v-html -->
-                <td v-html="prop.value" />
+                <tr v-for="(prop, key) in group.properties" :key="key">
+                    <td class="title" :title="key" v-html="prop.label" />
+                    <td v-html="prop.formatted" />
                 </tr>
             </template>
             <template v-if="Array.isArray(providers) && providers.length > 0">
@@ -60,22 +55,9 @@
                     </h4>
                 </td>
                 </tr>
-                <template v-for="(provider, index) in providers">
-                <tr :key="provider.url + index">
-                    <td colspan="2" class="provider">
-                    <a :href="provider.url">{{ provider.name }}</a>
-                    <em v-if="provider.roles"
-                    >({{(Array.isArray(provider.roles) ? provider.roles : []).join(", ") }})</em
-                    >
-                    <!-- eslint-disable-next-line vue/no-v-html vue/max-attributes-per-line -->
-                    <div
-                        v-if="provider.description"
-                        class="description"
-                        v-html="provider.description"
-                    />
-                    </td>
+                <tr>
+                    <td colspan="2" class="provider" v-html="providerHtml" />
                 </tr>
-                </template>
             </template>
             <template v-if="hasSummary">
                 <tr>
@@ -83,20 +65,16 @@
                     <h4>Item Summary</h4>
                 </td>
                 </tr>
-                <template v-for="(props, ext) in summariesList">
-                <tr v-if="ext" :key="ext">
-                    <td class="group" colspan="2">
-                    <h4>{{ ext }}</h4>
-                    </td>
-                </tr>
-                <tr v-for="prop in props" :key="prop.key">
-                    <td class="title summary-title" >
-                        <!-- eslint-disable-next-line vue/no-v-html -->
-                        <span :title="prop.key" v-html="prop.label" />
-                    </td>
-                    <!-- eslint-disable-next-line vue/no-v-html -->
-                    <td v-html="prop.value" />
-                </tr>
+                <template v-for="group in summariesList">
+                    <tr v-if="group.extension" :key="group.extension">
+                        <td class="group" colspan="2">
+                            <h4 v-html="group.label" />
+                        </td>
+                    </tr>
+                    <tr v-for="(prop, key) in group.properties" :key="key">
+                        <td class="title summary-title" :title="key" v-html="prop.label" />
+                        <td v-html="prop.formatted" />
+                    </tr>
                 </template>
             </template>
         </tbody>
@@ -105,52 +83,36 @@
 </template>
 
 <script>
-import isEmpty from "lodash.isempty";
-
-import { getPropertyDefinitions } from "../properties.js";
-
-const propertyDefinitions = getPropertyDefinitions(),
-  propertyMap = propertyDefinitions.properties,
-  groupMap = propertyDefinitions.groups;
-
-const constructPropList = (props, summaries = false, skip = () => false) => {
-    return Object.entries(props || [])
-                .filter(([, v]) => Number.isFinite(v) || !isEmpty(v) || (summaries && Array.isArray(v) && v.length == 0)) // last part: Skip empty summaries
-                .filter(([k]) => !skip(k))
-                .sort(([a], [b]) => a - b)
-                .map(([key, value]) => ({
-                    key,
-                    label: propertyDefinitions.formatPropertyLabel(key),
-                    value: summaries ? propertyDefinitions.formatSummaryValues(key, value) : propertyDefinitions.formatPropertyValue(key, value)
-                }))
-                .reduce((acc, prop) => {
-                    let ext = "";
-                    if (prop.key.includes(":")) {
-                        const prefix = prop.key.split(":")[0];
-                        ext = groupMap[prefix] || prefix;
-                    }
-
-                    acc[ext] = acc[ext] || [];
-                    acc[ext].push(prop);
-
-                    return acc;
-                }, {});
-};
+import StacFields from "@radiantearth/stac-fields";
 
 export default {
     name: "MetadataSidebar",
-    props: [
-        "properties",
-        "summaries",
-        "stacVersion",
-        "keywords",
-        "collection", // Item-specific
-        "collectionLink", // Item-specific
-        "license",
-        "temporalExtent", // Collection-specific
-        "providers",
-        "slugify",
-    ],
+    props: {
+        properties: {
+            type: Object,
+            default: () => ({})
+        },
+        summaries: {
+            type: Object,
+            default: () => ({})
+        },
+        stacVersion: {
+            type: String
+        },
+        keywords: {
+            type: Array,
+            default: () => ([])
+        },
+        collection: { // Item-specific
+            type: Object,
+            default: () => ({})
+        },
+        collectionLink: {}, // Item-specific
+        license: {},
+        temporalExtent: {}, // Collection-specific
+        providers: {},
+        slugify: {}
+    },
     computed: {
         linkToCollection() {
             if (this.collectionLink.href != null) {
@@ -159,17 +121,58 @@ export default {
 
             return null;
         },
+        collectionTitle() {
+            if (this.collection && this.collection.title) {
+                return this.collection.title;
+            }
+            return "Untitled";
+        },
         hasSummary() {
             return this.summaries && typeof this.summaries === 'object' && Object.keys(this.summaries).length > 0;
         },
+        providerHtml() {
+            return StacFields.Formatters.formatProviders(this.providers);
+        },
         summariesList() {
-            const skip = key => propertyMap[key] && propertyMap[key].skip;
-            return constructPropList(this.summaries, true, skip);
+            // ToDo: Pass full collection json
+            return StacFields.formatSummaries({summaries: this.summaries}, this.ignore, "");
         },
         propertyList() {
-            const skip = key => propertyMap[key] && propertyMap[key].skip;
-            return constructPropList(this.properties, false, skip);
+            // ToDo: Pass full item json
+            return StacFields.formatItemProperties({properties: this.properties}, this.ignore, "");
         },
+        temporalExtentReadable() {
+            if (!Array.isArray(this.temporalExtent)) {
+                return '';
+            }
+
+            let temporalExtent;
+            if (this.temporalExtent.length > 1) {
+                // Remove union temporal extent in favor of more concrete extents
+                temporalExtent = this.temporalExtent.slice(1);
+            }
+            else {
+                temporalExtent = this.temporalExtent;
+            }
+            return temporalExtent.map(this.formatTemporalInterval).join(', ');
+        }
+    },
+    methods: {
+        formatTemporalInterval(interval) {
+            return [
+                interval[0] ? new Date(interval[0]).toLocaleString() : "beginning of time",
+                interval[1] ? new Date(interval[1]).toLocaleString() : "now"
+            ].join(" - ");
+        },
+        ignore(key) {
+            switch(key) {
+                case 'eo:bands':
+                case 'providers':
+                    return false;
+                default:
+                    return true;
+            }
+        }
     }
 };
 
@@ -182,15 +185,54 @@ export default {
 }
 </style>
 <style>
-.table td.group.summary {
+.metadata td.group.summary {
   background-color: #555;
 }
 
-.table td.group.summary h4 {
+.metadata  td.group.summary h4 {
   font-weight: bold;
   color: #ddd;
 }
+.metadata td.title {
+  font-weight: bold;
+  width: 33%;
+  text-align: right;
+  vertical-align: top;
+}
+.metadata ul, .metadata ol {
+    padding-left: 2em;
+}
 .metadata-object .metadata-object {
     margin-left: 1em;
+}
+.metadata dl {
+    margin: 0;
+    margin-left: 1em;
+}
+.metadata ul > li > dl, .metadata ol > li > dl {
+    margin-left: 0;
+}
+.metadata dt {
+    display: inline;
+}
+.metadata dt:after {
+    content: ': ';
+}
+.metadata dd {
+    display: inline;
+}
+.metadata dd:after {
+    content: "\A";
+    white-space: pre;
+    line-height: 1px;
+}
+.metadata dd:last-of-type:after {
+    content: "";
+    white-space: normal;
+}
+.metadata .provider .description {
+    font-size: 0.9em;
+    line-height: 1.5em;
+    margin-bottom: 0.5em;
 }
 </style>

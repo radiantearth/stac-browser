@@ -1,9 +1,4 @@
 <template>
-<b-tab
-    title="Assets"
-    :active="active"
-    key="assets"
->
   <div class="table-responsive assets">
     <table class="table table-striped">
       <thead>
@@ -17,7 +12,6 @@
       <tbody>
         <tr v-for="asset in assets" :key="asset.key">
           <td>
-            <!-- eslint-disable-next-line vue/max-attributes-per-line vue/no-v-html -->
             <a
                 :href="asset.href"
                 :title="asset.key"
@@ -35,14 +29,13 @@
       </tbody>
     </table>
   </div>
-</b-tab>
 </template>
 
 <script>
 
 export default {
   name: "AssetTab",
-  props: ["assets", "bands", "active", "hasBands"]
+  props: ["assets", "bands", "hasBands"]
 };
 
 </script>

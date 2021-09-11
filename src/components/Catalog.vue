@@ -18,7 +18,7 @@
       <b-row>
         <b-col
           :md="
-            keywords.length > 0 || license != null || spatialExtent != null
+            keywords.length > 0 || license != null || spatialExtent.length > 0
               ? 8
               : 12
           "
@@ -29,31 +29,13 @@
           </p>
           <p class="scroll">
             <small>
-              <!-- <b-button
-                v-clipboard="url"
-                variant="link"
-                size="sm"
-                class="clipboard"
-              > -->
-              <span
-                v-if="validationErrors"
-                title="Validation errors present; please check the JavaScript Console"
-                >⚠️</span
-              >
-              <!-- <i class="far fa-copy" />&nbsp; -->
-              <code>{{ url }}</code>
-              <!-- </b-button> -->
+              <a :href="url" target="_blank"><code>{{ url }}</code></a>
             </small>
           </p>
-          <!-- eslint-disable-next-line vue/no-v-html vue/max-attributes-per-line -->
           <div v-if="description" v-html="description" />
 
-          <b-tabs v-model="tabIndex">
-            <b-tab
-              v-if="visibleTabs.includes('collections')"
-              key="collections"
-              title="Collections (API)"
-            >
+          <b-tabs :value="tabIndex" @input="selectTab" @activate-tab="activateTab">
+            <b-tab :disabled="!this.collectionCount" key="collections" title="Collections">
               <b-table
                 :items="collections"
                 :fields="collectionFields"
@@ -79,12 +61,7 @@
                 :hide-goto-end-buttons="true"
               />
             </b-tab>
-
-            <b-tab
-              v-if="visibleTabs.includes('catalogs')"
-              key="catalogs"
-              title="Catalogs"
-            >
+            <b-tab :disabled="!this.childCount" key="catalogs" title="Catalogs">
               <b-table
                 :items="children"
                 :fields="childFields"
@@ -110,12 +87,7 @@
                 :hide-goto-end-buttons="true"
               />
             </b-tab>
-
-            <b-tab
-              v-if="visibleTabs.includes('items')"
-              key="items"
-              title="Items"
-            >
+            <b-tab :disabled="!this.hasExternalItems && !this.itemCount" key="items" title="Items">
               <b-table
                 :items="items"
                 :fields="itemFields"
@@ -143,41 +115,32 @@
                 :hide-goto-end-buttons="true"
               />
             </b-tab>
-            <b-tab
-              v-if="visibleTabs.includes('bands')"
-              key="bands"
-              title="Bands"
-            >
-              <b-table
-                :items="bands"
-                :fields="bandFields"
-                responsive
-                small
-                striped
-              />
+            <b-tab v-if="this.bands.length > 0" key="bands" title="Bands">
+              <b-table :items="bands" :fields="bandFields" responsive small striped />
             </b-tab>
-            <ZarrMetadataTab
-              v-if="visibleTabs.includes('zarrMetadata')"
-              :active="false"
-              :zarr-metadata-url="zarrMetadataUrl"
-            ></ZarrMetadataTab>
-            <AssetTab
-              v-if="visibleTabs.includes('assets')"
-              :assets="assets"
-              :bands="bands"
-              :hasBands="hasBands"
-              :active="false"
-            ></AssetTab>
+            <b-tab v-if="this.thumbnail" title="Thumbnail">
+              <a :href="thumbnail">
+                <img id="thumbnail" align="center" :src="thumbnail" />
+              </a>
+            </b-tab>
+            <b-tab v-if="this.assets.length" title="Assets" key="assets">
+              <AssetTab :assets="assets" :bands="bands" :hasBands="hasBands" />
+            </b-tab>
+            <b-tab v-if="this.shownLinks.length" title="Links" key="links">
+              <LinkTab :links="shownLinks" />
+            </b-tab>
+            <b-tab v-if="this.zarrMetadataUrl" key="zarr-metadata" title="Zarr Metadata">
+              <ZarrMetadataTab :zarr-metadata-url="zarrMetadataUrl" />
+            </b-tab>
           </b-tabs>
         </b-col>
         <b-col
-          v-if="keywords.length > 0 || license != null || spatialExtent != null"
+          v-if="keywords.length > 0 || license != null || spatialExtent.length > 0"
           md="4"
         >
           <b-card bg-variant="light">
-            <div v-if="spatialExtent" id="locator-map" />
+            <div v-if="spatialExtent.length > 0" id="locator-map" />
             <MetadataSidebar
-              :properties="properties"
               :summaries="summaries"
               :stacVersion="stacVersion"
               :keywords="keywords"
@@ -192,10 +155,7 @@
     <footer class="footer">
       <b-container>
         <span class="poweredby text-muted">
-          Powered by
-          <a href="https://github.com/radiantearth/stac-browser"
-            >STAC Browser</a
-          >
+          Powered by <a href="https://github.com/radiantearth/stac-browser">STAC Browser</a> v{{ browserVersion }}
         </span>
       </b-container>
     </footer>
@@ -207,12 +167,14 @@ import Leaflet from "leaflet";
 import { mapActions, mapGetters } from "vuex";
 
 import common from "./common";
-import AssetTab from './AssetTab.vue'
-import MetadataSidebar from './MetadataSidebar.vue'
 
-import { transformCatalog } from "../migrate"
+import Migrate from '@radiantearth/stac-migrate';
 
 import { fetchUri } from "../util";
+
+// ToDo 3.0: Import tabs lazily
+import LinkTab from "./LinkTab.vue";
+import AssetTab from "./AssetTab.vue";
 
 const ITEMS_PER_PAGE = 25;
 
@@ -239,19 +201,17 @@ export default {
     url: {
       type: String,
       required: true
-    },
-    validate: {
-      type: Function,
-      required: true
     }
   },
   components: {
+    LinkTab,
     AssetTab,
-    ZarrMetadataTab: () => import('./ZarrMetadataTab.vue'),
-    MetadataSidebar
+    MetadataSidebar: () => import(/* webpackChunkName: "metadata-sidebar" */ "./MetadataSidebar.vue"),
+    ZarrMetadataTab: () => import(/* webpackChunkName: "zarr-metadata-tab" */ './ZarrMetadataTab.vue')
   },
   data() {
     return {
+      stacVersion: null,
       externalItemCount: 0,
       externalItemsPerPage: 0,
       externalItemPaging: false,
@@ -300,8 +260,8 @@ export default {
       currentItemPage: 1,
       currentItemListPage: 1,
       locatorMap: null,
-      selectedTab: null,
-      validationErrors: null
+      tabIndex: 0,
+      tabsChanged: false
     };
   },
   asyncComputed: {
@@ -327,7 +287,7 @@ export default {
             return [];
           }
 
-          return data.collections
+          let collections = data.collections
             .map(collection => {
               // strip /collection from the target path
               let p = this.path.replace(/^\/collection/, "");
@@ -355,6 +315,8 @@ export default {
                 url: resolved
               });
             });
+
+            return collections;
         } catch (err) {
           console.warn(err);
 
@@ -373,8 +335,9 @@ export default {
         }
 
         try {
+          let sep = externalItemsLink.href.includes('?') ? '&' : '?';
           const rsp = await fetchUri(
-            `${externalItemsLink.href}?page=${this.currentItemPage}`
+            `${externalItemsLink.href}${sep}page=${this.currentItemPage}`
           );
 
           if (!rsp.ok) {
@@ -384,15 +347,9 @@ export default {
 
           const items = await rsp.json();
 
-          // STAC-API Context extension.
-          // Account for the old search:metadata extension.
-          const context = !!items.context ? (
-              items.context
-          ) : items["search:metadata"];
-
-          if (context != null) {
-            this.externalItemCount = context.matched;
-            this.externalItemsPerPage = context.limit;
+          if (items.context != null) {
+            this.externalItemCount = items.context.matched;
+            this.externalItemsPerPage = items.context.limit;
             this.externalItemPaging = true;
           } else {
             this.externalItemCount = items.features.length;
@@ -401,14 +358,16 @@ export default {
           // strip /collection from the target path
           let p = this.path.replace(/^\/collection/, "");
 
-          return items.features.map((item, idx) => ({
+          let features = items.features.map((item, idx) => ({
             item,
             to: `/item${p}/${this.slugify(
-              `${externalItemsLink.href}?page=${this.currentItemPage}#${idx}`
+              `${externalItemsLink.href}${sep}page=${this.currentItemPage}#${idx}`
             )}`,
             title: item.properties.title || item.id,
             dateAcquired: item.properties.datetime
           }));
+
+          return features;
         } catch (err) {
           console.warn(err);
 
@@ -421,7 +380,13 @@ export default {
     ...common.computed,
     ...mapGetters(["getEntity"]),
     _entity() {
-      return transformCatalog(this.getEntity(this.url));
+      let object = this.getEntity(this.url);
+      if (object instanceof Error) {
+        return object;
+      }
+      this.stacVersion = object.stac_version; // Store the original stac_version as it gets replaced by the migration
+      let cloned = JSON.parse(JSON.stringify(object)); // Clone to avoid changing the vuex store, remove once migration is done directly in vuex
+      return Migrate.stac(cloned);
     },
     _description() {
       return this.catalog.description;
@@ -438,14 +403,8 @@ export default {
       return this.catalog.title;
     },
     bands() {
-      return (
-        this._properties["eo:bands"] ||
-        this.summaries['eo:bands'] ||
-        (this.rootCatalog &&
-          this.rootCatalog.properties &&
-          this.rootCatalog.properties["eo:bands"]) ||
-        []
-      );
+      // ToDo: Merge all bands from assets
+      return Array.isArray(this.summaries['eo:bands']) ? this.summaries['eo:bands'] : [];
     },
     catalog() {
       return this.entity;
@@ -601,14 +560,14 @@ export default {
           name: this.title,
           description: this.description,
           // recommended
-          citation: this._properties["sci:citation"],
-          identifier: this._properties["sci:doi"] || this.catalog.id,
-          keywords: this._keywords,
+          citation: this.catalog["sci:citation"],
+          identifier: this.catalog["sci:doi"] || this.catalog.id,
+          keywords: this.keywords,
           license: this.licenseUrl,
           isBasedOn: this.url,
           version: this.version,
           url: this.path,
-          workExample: (this._properties["sci:publications"] || []).map(p => ({
+          workExample: (this.catalog["sci:publications"] || []).map(p => ({
             identifier: p.doi,
             citation: p.citation
           })),
@@ -638,99 +597,49 @@ export default {
         };
       }
 
-      const { spatial, temporal } = this.extent;
-
-      if (spatial != null) {
-        let bbox = !!spatial.bbox ? (
-          Array.isArray(spatial.bbox[0]) ? spatial.bbox[0] : spatial.bbox // Account for misformat.
-        ) : spatial;
-
+      if (this.spatialExtent.length > 0) {
         dataCatalog.spatialCoverage = {
           "@type": "Place",
           geo: {
             "@type": "GeoShape",
-            box: bbox.join(" ")
+            box: this.spatialExtent[0].join(" ")
           }
         };
       }
 
-      if (temporal != null) {
-        let interval = !!temporal.interval ? (
-            temporal.interval[0]
-        ) : temporal;
-
-        dataCatalog.temporalCoverage = interval.map(x => x || "..").join("/");
+      if (!this.isTemporalExtentUnbounded) {
+        dataCatalog.temporalCoverage = this.temporalExtent[0].map(x => x || "..").join("/");
       }
 
       return dataCatalog;
     },
-    properties() {
-      return this._properties;
-    },
     spatialExtent() {
       const { spatial } = this.extent;
-
-      if (spatial == null) {
-          return null;
+      if (!spatial || typeof spatial !== 'object' || !Array.isArray(spatial.bbox)) {
+          return [];
       }
 
-      // In STAC 0.8, spatial was changed from the direct array to an
-      // object with the property 'bbox' containing an array of arrays.
-      // As a workaround, use the first element of that array.
-      let bbox = !!spatial.bbox ? (
-          Array.isArray(spatial.bbox[0]) ? spatial.bbox[0] : spatial.bbox // Account for misformat.
-      ) : spatial;
-
-      return bbox;
+      return spatial.bbox.filter(box => Array.isArray(box) && box.length >= 4);
     },
     summaries() {
       return this.catalog.summaries || {};
     },
-    tabIndex: {
-      get: function() {
-        return this.visibleTabs.indexOf(this.selectedTab);
-      },
-      set: function(tabIndex) {
-        // wait for the DOM to update
-        this.$nextTick(() => {
-          this.selectedTab = this.visibleTabs[tabIndex];
-        });
-      }
-    },
     temporalExtent() {
       const { temporal } = this.extent;
-
-      if (temporal == null) {
-        return null;
+      if (!temporal || typeof temporal !== 'object' || !Array.isArray(temporal.interval)) {
+          return [];
       }
 
-      // In STAC 0.8, temporal was changed from the direct array to an
-      // object with the property 'interval' containing an array of arrays.
-      // As a worrkaround, use the first element of that array.
-      let interval = !!temporal.interval ? (
-        temporal.interval[0]
-      ) : temporal;
-
-      return [
-        interval[0]
-          ? new Date(interval[0]).toLocaleString()
-          : "beginning of time",
-        interval[1] ? new Date(interval[1]).toLocaleString() : "now"
-      ].join(" - ");
+      return temporal.interval.filter(interval => Array.isArray(interval) && interval.length === 2);
+    },
+    isTemporalExtentUnbounded() {
+      if (this.temporalExtent.length > 0) {
+        return this.temporalExtent[0].findIndex(interval => (typeof interval === 'string')) >= 0;
+      }
+      return true;
     },
     version() {
       return this.catalog.version;
-    },
-    visibleTabs() {
-      return [
-        this.collectionCount > 0 && "collections",
-        this.childCount > 0 && "catalogs",
-        (this.hasExternalItems || this.itemCount > 0) && "items",
-        this.bands.length > 0 && "bands",
-        this.summaries && "summaries",
-        this.assets && this.assets.length > 0 && "assets",
-        this.zarrMetadataUrl && "zarrMetadata"
-      ].filter(x => x != null && x !== false);
     }
   },
   watch: {
@@ -749,11 +658,14 @@ export default {
         });
       }
     },
-    selectedTab(to, from) {
-      if (to !== from) {
-        this.updateState({
-          t: to
-        });
+    collections() {
+      if (!this.tabsChanged && (!this.$route.query.t || this.$route.query.t === "0") && this.collections.length > 0) {
+        this.selectTab(0);
+      }
+    },
+    externalItems() {
+      if (!this.tabsChanged && (!this.$route.query.t || this.$route.query.t === "2") && this.externalItems.length > 0) {
+        this.selectTab(2);
       }
     }
   },
@@ -761,18 +673,18 @@ export default {
     ...common.methods,
     ...mapActions(["load"]),
     initialize() {
-      if (this.spatialExtent != null) {
+      if (this.spatialExtent.length > 0) {
         this.$nextTick(() => this.initializeLocatorMap());
       }
 
-      this.syncWithQueryState(this.$route.query);
+      this.syncWithQueryState();
     },
     initializeLocatorMap() {
       if (this.locatorMap != null) {
         this.locatorMap.remove();
       }
 
-      if (this.spatialExtent == null) {
+      if (this.spatialExtent.length === 0) {
         // no spatial extent; skip
         return;
       }
@@ -800,14 +712,23 @@ export default {
         }
       ).addTo(this.locatorMap);
 
-      const [minX, minY, maxX, maxY] = this.spatialExtent;
-      const coordinates = [
-        [[minX, minY], [minX, maxY], [maxX, maxY], [maxX, minY], [minX, minY]]
-      ];
+      let spatialExtent;
+      if (this.spatialExtent.length > 1) {
+        // Remove union bbox in favor of more concrete bboxes
+        spatialExtent = this.spatialExtent.slice(1);
+      }
+      else {
+        spatialExtent = this.spatialExtent;
+      }
+
+      const coordinates = [spatialExtent.map(extent => {
+        const [minX, minY, maxX, maxY] = extent;
+        return [[minX, minY], [minX, maxY], [maxX, maxY], [maxX, minY], [minX, minY]];
+      })];
 
       const overlayLayer = Leaflet.geoJSON(
         {
-          type: "Polygon",
+          type: "MultiPolygon",
           coordinates
         },
         {
@@ -824,6 +745,25 @@ export default {
       this.locatorMap.fitBounds(overlayLayer.getBounds(), {
         padding: [95, 95]
       });
+    },
+    selectTab(tabIndex) {
+      if (typeof tabIndex !== 'number') {
+        tabIndex = parseInt(tabIndex, 10);
+        if (isNaN(tabIndex)) {
+          return;
+        }
+      }
+      if (this.tabsChanged && this.tabIndex !== tabIndex) {
+        this.updateState({
+          t: tabIndex
+        });
+      }
+      this.$nextTick(() => {
+        this.tabIndex = tabIndex;
+      });
+    },
+    activateTab() {
+      this.tabsChanged = true;
     },
     sortCompare(a, b, key) {
       if (key === "link") {
@@ -844,10 +784,10 @@ export default {
         });
       }
     },
-    syncWithQueryState(qs) {
-      this.selectedTab = qs.t;
-      this.currentChildPage = Number(qs.cp) || 1;
-      this.currentItemPage = Number(qs.ip) || 1;
+    syncWithQueryState() {
+      this.selectTab(this.$route.query.t);
+      this.currentChildPage = Number(this.$route.query.cp) || 1;
+      this.currentItemPage = Number(this.$route.query.ip) || 1;
 
       // If we have external items, the b-table needs to "stay" on page 1 as
       // the items list only contains the number of items we want to show.
@@ -856,6 +796,8 @@ export default {
   }
 };
 </script>
+
+<style src="./base.css"></style>
 
 <style scoped lang="css">
 h3 {
