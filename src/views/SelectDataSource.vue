@@ -102,7 +102,7 @@ export default {
       this.filter = filter;
     },
     onSubmit() {
-    this.$store.commit('resetCatalog'); // Reset loaded STAC catalog
+      this.$store.commit('resetCatalog'); // Reset loaded STAC catalog
       this.$router.push({
         path: this.toBrowserPath(this.url)
       });

@@ -14,18 +14,20 @@ const localDefaults = () => ({
   title: CONFIG.catalogTitle,
   data: null,
   valid: null,
-  apiCollections: [],
-  nextCollectionsLink: null,
+
   apiItems: [],
   apiItemsLink: null,
   apiItemsFilter: {},
-  apiItemsPagination: {}
+  apiItemsPagination: {},
 });
 
 const catalogDefaults = () => ({
   database: {},
   queue: [],
-  redirectUrl: null
+  redirectUrl: null,
+
+  apiCollections: [],
+  nextCollectionsLink: null
 });
 
 export default new Vuex.Store({
@@ -139,7 +141,7 @@ export default new Vuex.Store({
       if (state.data) {
         catalogs = catalogs.concat(state.data.getLinksWithRels(['child']));
       }
-      if (state.apiCollections.length > 0) {
+      if (state.data.getApiCollectionsLink() && state.apiCollections.length > 0) {
         catalogs = catalogs.concat(state.apiCollections);
       }
       return catalogs;
@@ -269,6 +271,7 @@ export default new Vuex.Store({
       if (!stac) {
         stac = state.database[url] || null;
       }
+      state.loading = false;
       state.url = url || null;
       state.data = stac instanceof STAC ? stac : null;
       state.valid = null;
@@ -379,6 +382,10 @@ export default new Vuex.Store({
         path = cx.getters.toBrowserPath(url);
       }
 
+      if (show) {
+        cx.commit('resetPage');
+      }
+
       let data = cx.state.database[url];
       if (!data) {
         cx.commit('loading', {url, show});
@@ -408,13 +415,18 @@ export default new Vuex.Store({
 
       if (data && show) {
         // Load API Collections
-        await cx.dispatch('loadNextApiCollections', data.getLinkWithRel('data'));
+        let collectionsLink = data.getApiCollectionsLink();
+        if (collectionsLink) {
+          await cx.dispatch('loadNextApiCollections', collectionsLink);
+        }
         // Load API Items
-        await cx.dispatch('loadApiItems', data.getLinkWithRel('items'));
+        let itemsLink = data.getApiItemsLink();
+        if (itemsLink) {
+          await cx.dispatch('loadApiItems', itemsLink);
+        }
       }
 
       if (show) {
-        cx.commit('resetPage');
         cx.commit('showPage', {url});
       }
     },
@@ -450,7 +462,13 @@ export default new Vuex.Store({
       return await cx.dispatch('loadApiItems', Utils.addFiltersToLink(link, filters));
     },
     async loadNextApiCollections(cx, link = null) {
-      link = link || cx.state.nextCollectionsLink;
+      // If we have already loaded collections, skip loading the first page
+      if (link && cx.state.apiCollections.length > 0) {
+        return;
+      }
+      if (cx.state.nextCollectionsLink) {
+        link = cx.state.nextCollectionsLink;
+      }
       if (!link) {
         return;
       }
