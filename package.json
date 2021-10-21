@@ -5,7 +5,10 @@
   "main": "src/main.js",
   "scripts": {
     "start": "vue-cli-service serve",
-    "build": "vue-cli-service build"
+    "build": "vue-cli-service build",
+    "deploy:sit": "aws s3 sync ./dist s3://sit-stac.geoplatform.info --profile sit",
+    "deploy:stg": "aws s3 sync ./dist s3://stg-stac.geoplatform.gov --profile stg",
+    "deploy:prd": "echo 'Run Manually'"
   },
   "bugs": {
     "url": "https://github.com/radiantearth/stac-browser/issues"

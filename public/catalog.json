@@ -1,7 +1,9 @@
 {
     "id": "geoplatform-stac",
-    "stac_version": "0.6.0",
-    "description": "GeoPlatform STAC Catalog",
+    "stac_version": "1.0.0",
+    "title": "GeoPlatform STAC Catalog",
+    "description": "GeoPlatform.gov provides offical list of National STAC Sources.",
+    "type": "Catalog",
     "links": [
         {
             "rel": "self",
