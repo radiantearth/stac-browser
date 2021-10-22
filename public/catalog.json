@@ -20,13 +20,13 @@
         },
         {
             "rel": "child",
-            "href": "https://sentinel-stac.s3.amazonaws.com/catalog.json",
-            "title": "Sentinel STAC Data"
+            "href": "https://cmr.earthdata.nasa.gov/stac",
+            "title": "NASA STAC Data"
         },
         {
             "rel": "child",
-            "href": "https://cmr.earthdata.nasa.gov/stac",
-            "title": "NASA STAC Data"
+            "href": "https://sentinel-stac.s3.amazonaws.com/catalog.json",
+            "title": "Sentinel STAC Data"
         }
     ]
 }
