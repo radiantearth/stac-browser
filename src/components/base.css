@@ -105,9 +105,6 @@ a:link,
 a:visited {
   color: #0066c0;
 }
-header {
-  padding: 1.5em 0 0.5em;
-}
 code {
   color: #555;
   white-space: nowrap;
@@ -184,7 +181,10 @@ code {
 }
 
 /*  Breadcrumb Nav */
-
+ol.breadcrumb {
+  background-color: inherit;
+  padding: 0px;
+}
 .breadcrumb {
   list-style: none;
   display: inline-block;
