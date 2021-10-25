@@ -234,9 +234,9 @@ code {
 .breadcrumb li:nth-child(even) a {
   background-color: #094E93 ;
 }
-/* .breadcrumb li:nth-child(even) span {
-  background-color: #2980b9;
-} */
+.breadcrumb li:first-child span:before {
+  border:none;
+}
 
 .breadcrumb li:nth-child(even) a:before {
   border-color: #094E93 ;
