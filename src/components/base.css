@@ -182,3 +182,138 @@ code {
   border-top: none;
   border-bottom: 1px solid #dee2e6;
 }
+
+/*  Breadcrumb Nav */
+
+.breadcrumb {
+  list-style: none;
+  display: inline-block;
+}
+.breadcrumb .icon {
+  font-size: 14px;
+}
+.breadcrumb li {
+  float: left;
+}
+.breadcrumb li a {
+  color: #EFEFEF ;
+  display: block;
+  background: #094E93 ;
+  text-decoration: none;
+  position: relative;
+  height: 40px;
+  line-height: 40px;
+  padding: 0 10px 0 5px;
+  text-align: center;
+  margin-right: 23px;
+  font-size: small;
+}
+.breadcrumb li span {
+  color: #EFEFEF ;
+  display: block;
+  background: #094E93 ;
+  text-decoration: none;
+  position: relative;
+  height: 40px;
+  line-height: 40px;
+  padding: 0 10px 0 5px;
+  text-align: center;
+  margin-right: 23px;
+  font-size: small;
+  width:100%
+}
+
+.breadcrumb li:nth-child(even) a {
+  background-color: #094E93 ;
+}
+/* .breadcrumb li:nth-child(even) span {
+  background-color: #2980b9;
+} */
+
+.breadcrumb li:nth-child(even) a:before {
+  border-color: #094E93 ;
+  border-left-color: transparent;
+}
+
+.breadcrumb li  span:before {
+  border-color: #094E93 ;
+  border-left-color: transparent;
+}
+
+.breadcrumb li:nth-child(even) a:after {
+  border-left-color: #094E93 ;
+}
+
+.breadcrumb li span:after {
+  border-left-color: #094E93 ;
+}
+
+.breadcrumb li:first-child a {
+  padding-left: 15px;
+}
+.breadcrumb li:first-child a:before {
+  border: none;
+}
+.breadcrumb li  span{
+  padding-right: 15px;
+}
+.breadcrumb li span:after {
+  border: none;
+}
+.breadcrumb li a:before, .breadcrumb li a:after {
+  content: "";
+  position: absolute;
+  top: 0;
+  border: 0 solid #094E93 ;
+  border-width: 20px 10px;
+  width: 0;
+  height: 0;
+}
+.breadcrumb li span:before, .breadcrumb li span:after {
+  content: "";
+  position: absolute;
+  top: 0;
+  border: 0 solid #094E93 ;
+  border-width: 20px 10px;
+  width: 0;
+  height: 0;
+}
+
+.breadcrumb li a:before {
+  left: -20px;
+  border-left-color: transparent;
+}
+.breadcrumb li span:before {
+  left: -20px;
+  border-left-color: transparent;
+}
+.breadcrumb li a:after {
+  left: 100%;
+  border-color: transparent;
+  border-left-color: #094E93 ;
+}
+.breadcrumb li span:after {
+  left: 100%;
+  border-color: transparent;
+  border-left-color: #094E93 ;
+}
+.breadcrumb li a:hover {
+  background-color: #0E70D3 ;
+}
+.breadcrumb li a:hover:before {
+  border-color: #0E70D3 ;
+  border-left-color: transparent;
+}
+.breadcrumb li a:hover:after {
+  border-left-color: #0E70D3 ;
+}
+.breadcrumb li span {
+  background-color: #3E8CDB  ;
+}
+.breadcrumb li span:before {
+  border-color: #3E8CDB  ;
+  border-left-color: transparent;
+}
+.breadcrumb li span:after {
+  border-left-color: #3E8CDB  ;
+}
