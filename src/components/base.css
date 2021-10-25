@@ -195,6 +195,9 @@ code {
 .breadcrumb li {
   float: left;
 }
+.breadcrumb-item{
+  margin-top: 10px;
+}
 .breadcrumb li a {
   color: #EFEFEF ;
   display: block;
@@ -203,10 +206,13 @@ code {
   position: relative;
   height: 40px;
   line-height: 40px;
-  padding: 0 10px 0 5px;
+  padding: 0 10px 0 15px;
   text-align: center;
   margin-right: 23px;
   font-size: small;
+  max-width:200px;
+  text-overflow: ellipsis;
+  /* white-space: nowrap; */
 }
 .breadcrumb li span {
   color: #EFEFEF ;
@@ -216,11 +222,13 @@ code {
   position: relative;
   height: 40px;
   line-height: 40px;
-  padding: 0 10px 0 5px;
+  padding: 0 10px 0 15px;
   text-align: center;
   margin-right: 23px;
   font-size: small;
-  width:100%
+  max-width:200px;
+  text-overflow: ellipsis;
+  /* white-space: nowrap; */
 }
 
 .breadcrumb li:nth-child(even) a {
