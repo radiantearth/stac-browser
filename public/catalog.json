@@ -20,13 +20,63 @@
         },
         {
             "rel": "child",
+            "href": "https://franklin.nasa-hsi.azavea.com/",
+            "title": "NASA AVIRIS catalog"
+        },
+        {
+            "rel": "child",
+            "href": "https://cmr.earthdata.nasa.gov/cmr-stac",
+            "title": "NASA CMR STAC"
+        },
+        {
+            "rel": "child",
+            "href": "https://nasa-iserv.s3-us-west-2.amazonaws.com/catalog/catalog.json",
+            "title": "NASA ISERV"
+        },
+        {
+            "rel": "child",
             "href": "https://cmr.earthdata.nasa.gov/stac",
             "title": "NASA STAC Data"
         },
         {
             "rel": "child",
+            "href": "https://raw.githubusercontent.com/scottyhq/sentinel1-rtc-stac/main/collection.json",
+            "title": "Sentinel-1 Analysis Ready Backscatter Imagery"
+        },
+        {
+            "rel": "child",
+            "href": "https://tamn.snapplanet.io",
+            "title": "Sentinel-2 and Landsat-8 catalog"
+        },
+        {
+            "rel": "child",
+            "href": "https://earth-search.aws.element84.com/v0/collections/sentinel-s2-l2a",
+            "title": "Sentinel 2 L2A"
+        },
+        {
+            "rel": "child",
+            "href": "https://stacindex.org/api/proxy?https%3A%2F%2Fmeeo-s5p.s3.amazonaws.com%2Fcatalog.json",
+            "title": "Sentinel 5P Level 2 and Level 3"
+        },
+        {
+            "rel": "child",
             "href": "https://sentinel-stac.s3.amazonaws.com/catalog.json",
             "title": "Sentinel STAC Data"
+        },
+        {
+            "rel": "child",
+            "href": "https://usgs-lidar-stac.s3-us-west-2.amazonaws.com/ept/catalog.json",
+            "title": "USGS 3DEP LiDAR Point Clouds"
+        },
+        {
+            "rel": "child",
+            "href": "https://asc-stacbrowser.s3.us-west-2.amazonaws.com/catalog.json",
+            "title": "USGS Astrogeology Provided Analysis Ready Data"
+        },
+        {
+            "rel": "child",
+            "href": "https://landsatlook.usgs.gov/sat-api/stac",
+            "title": "USGS Landsat"
         }
     ]
 }
