@@ -5,9 +5,9 @@
   "main": "src/main.js",
   "scripts": {
     "start": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "deploy:sit": "aws s3 sync ./dist s3://sit-stac.geoplatform.info --profile sit",
-    "deploy:stg": "aws s3 sync ./dist s3://stg-stac.geoplatform.gov --profile stg",
+    "build": "vue-cli-service build --HISTORY_MODE=hash",
+    "deploy:sit": "aws s3 sync ./dist s3://gp-sit-us-east-1-stac --acl public-read --profile sit",
+    "deploy:stg": "aws s3 sync ./dist s3://stg-stac.geoplatform.gov --acl public-read --profile stg",
     "deploy:prd": "echo 'Run Manually'"
   },
   "bugs": {
@@ -60,6 +60,8 @@
     "@vue/cli-plugin-router": "~4.5.0",
     "@vue/cli-plugin-vuex": "~4.5.0",
     "@vue/cli-service": "~4.5.0",
+    "serverless": "^2.64.1",
+    "serverless-s3-sync": "^1.17.2",
     "vue-template-compiler": "^2.6.12"
   },
   "browserslist": [
