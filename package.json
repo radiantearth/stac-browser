@@ -30,7 +30,7 @@
   "license": "ISC",
   "dependencies": {
     "@lweller/leaflet-areaselect": "^1.3.0",
-    "@radiantearth/stac-fields": "1.0.0-beta.8",
+    "@radiantearth/stac-fields": "1.0.0-beta.9",
     "@radiantearth/stac-migrate": "~1.0.2",
     "axios": "^0.21.4",
     "bootstrap-vue": "^2.21.2",
@@ -38,7 +38,7 @@
     "commonmark": "^0.29.3",
     "core-js": "^3.6.5",
     "leaflet": "^1.7.1",
-    "stac-layer": "^0.5.1",
+    "stac-layer": "^0.6.0",
     "urijs": "^1.19.6",
     "v-clipboard": "^2.2.3",
     "vue": "^2.6.12",
