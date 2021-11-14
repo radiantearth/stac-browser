@@ -126,7 +126,7 @@ export default {
       let pages = Object.assign({}, this.apiItemsPagination);
       // If first link is not available, add the items link as first link
       if (!pages.first && this.data && this.apiItemsLink && this.apiItemsLink.rel !== 'items') {
-        pages.first = Utils.addFiltersToLink(this.data.getLinkWithRel('items'), this.apiItemsFilter);
+        pages.first = Utils.addFiltersToLink(this.data.getApiItemsLink(), this.apiItemsFilter);
       }
       return pages;
     },

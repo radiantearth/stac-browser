@@ -4,13 +4,14 @@
       <b-form @submit="onSubmit">
         <b-form-group id="select" label="Please specify a STAC Catalog or API..." label-for="url"
           :invalid-feedback="error" :state="valid">
-          <b-form-input id="url" type="url" v-model="url" placeholder="https://..."></b-form-input>
+          <b-form-input id="url" type="url" :value="url" @input="setUrl" placeholder="https://..."></b-form-input>
         </b-form-group>
+        <hr />
         <b-form-group v-if="stacIndex.length > 0" id="stacIndex" label="... or select one from STAC Index">
           <b-list-group class="stacIndex">
             <template v-for="catalog in stacIndex">
-              <b-list-group-item button v-if="catalog.access !== 'private'" :key="catalog.id" class="flex-column align-items-start"
-                :active="url === catalog.url" @click="url = catalog.url">
+              <b-list-group-item button v-if="show(catalog)" :key="catalog.id" class="flex-column align-items-start"
+                :active="url === catalog.url" @click="setUrl(catalog.url, false)">
                 <div class="d-flex w-100 justify-content-between">
                   <strong class="mb-1">{{ catalog.title }}</strong>
                   <small>
@@ -46,7 +47,8 @@ export default {
   },
   data() {
     return {
-      url: ''
+      url: '',
+      filter: false
     };
   },
   computed: {
@@ -78,7 +80,29 @@ export default {
     this.$store.commit('resetPage'); // Reset loaded STAC entity
   },
   methods: {
+    show(catalog) {
+      if (catalog.access === 'private') {
+        return false;
+      }
+      else if(!this.url || !this.filter) {
+        return true;
+      }
+
+      let searchTerm = this.url.toLowerCase();
+      if (typeof catalog.title === 'string' && catalog.title.toLowerCase().includes(searchTerm)) {
+        return true;
+      }
+      if (typeof catalog.url === 'string' && catalog.url.toLowerCase().includes(searchTerm)) {
+        return true;
+      }
+      return false;
+    },
+    setUrl(url, filter = true) {
+      this.url = url;
+      this.filter = filter;
+    },
     onSubmit() {
+      this.$store.commit('resetCatalog'); // Reset loaded STAC catalog
       this.$router.push({
         path: this.toBrowserPath(this.url)
       });

@@ -8,29 +8,35 @@ import bs58 from 'bs58';
 Vue.use(Vuex);
 
 // Local settings (e.g. for currently loaded STAC entity)
-const localDefaults = {
+const localDefaults = () => ({
+  loading: false,
   url: '',
   title: CONFIG.catalogTitle,
   data: null,
   valid: null,
   parents: null,
-  apiCollections: [],
-  nextCollectionsLink: null,
+
   apiItems: [],
   apiItemsLink: null,
   apiItemsFilter: {},
-  apiItemsPagination: {}
-};
+  apiItemsPagination: {},
+});
+
+const catalogDefaults = () => ({
+  database: {},
+  queue: [],
+  redirectUrl: null,
+
+  apiCollections: [],
+  nextCollectionsLink: null
+});
 
 export default new Vuex.Store({
   strict: true,
-  state: Object.assign(CONFIG, localDefaults, {
+  state: Object.assign(CONFIG, localDefaults(), catalogDefaults(), {
     // Global settings
     allowSelectCatalog: !CONFIG.catalogUrl,
-    redirectUrl: null,
     stacIndex: [],
-    database: {},
-    queue: [],
     supportedRelTypes: [ // These will be handled in a special way and will not be shown in the link lists
       'child',
       'collection',
@@ -50,7 +56,6 @@ export default new Vuex.Store({
     ]
   }),
   getters: {
-    loading: state => !state.database[state.url],
     error: state => state.database[state.url] instanceof Error ? state.database[state.url] : null,
     getStac: state => (url, returnErrorObject = false) => {
       if (!url) {
@@ -137,7 +142,7 @@ export default new Vuex.Store({
       if (state.data) {
         catalogs = catalogs.concat(state.data.getLinksWithRels(['child']));
       }
-      if (state.apiCollections.length > 0) {
+      if (state.data.getApiCollectionsLink() && state.apiCollections.length > 0) {
         catalogs = catalogs.concat(state.apiCollections);
       }
       return catalogs;
@@ -248,19 +253,26 @@ export default new Vuex.Store({
     tileSourceTemplate(state, tileSourceTemplate) {
       state.tileSourceTemplate = tileSourceTemplate;
     },
-    loading(state, url) {
+    loading(state, {url, show}) {
       Vue.set(state.database, url, null);
+      if (show) {
+        state.loading = true;
+      }
     },
     loaded(state, {url, data}) {
       Vue.set(state.database, url, Object.freeze(data));
     },
+    resetCatalog(state) {
+      Object.assign(state, catalogDefaults());
+    },
     resetPage(state) {
-      Object.assign(state, localDefaults);
+      Object.assign(state, localDefaults());
     },
     showPage(state, { url, title, stac }) {
       if (!stac) {
         stac = state.database[url] || null;
       }
+      state.loading = false;
       state.url = url || null;
       state.data = stac instanceof STAC ? stac : null;
       state.valid = null;
@@ -417,7 +429,7 @@ export default new Vuex.Store({
 
       let data = cx.state.database[url];
       if (!data) {
-        cx.commit('loading', url);
+        cx.commit('loading', {url, show});
         try {
           let response = await axios.get(url);
           if (!Utils.isObject(response.data)) {
@@ -444,9 +456,13 @@ export default new Vuex.Store({
 
       if (data && show) {
         // Load API Collections
-        await cx.dispatch('loadNextApiCollections', data);
+        if (data.getApiCollectionsLink()) {
+          await cx.dispatch('loadNextApiCollections', data);
+        }
         // Load API Items
-        await cx.dispatch('loadApiItems', data);
+        if (data.getApiItemsLink()) {
+          await cx.dispatch('loadApiItems', data);
+        }
       }
 
       if (show) {
@@ -489,6 +505,10 @@ export default new Vuex.Store({
       let link;
       if (stac) {
         // First page
+        if (cx.state.apiCollections.length > 0) {
+          // If we have already loaded collections, skip loading the first page
+          return;
+        }
         link = stac.getLinkWithRel('data');
       }
       else {

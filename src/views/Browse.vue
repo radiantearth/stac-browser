@@ -31,8 +31,8 @@ export default {
     }
   },
   computed: {
-    ...mapState(["allowExternalAccess", "url", "redirectUrl"]),
-    ...mapGetters(["isCatalogLike", "loading", "error"]),
+    ...mapState(["allowExternalAccess", "url", "redirectUrl", "loading"]),
+    ...mapGetters(["isCatalogLike", "error"]),
     component() {
         return this.isCatalogLike ? 'Catalog' : 'Item'; 
     },

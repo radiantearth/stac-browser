@@ -1,11 +1,11 @@
 <template>
   <section class="mb-4">
-    <l-map class="map" :class="stac.type" ref="leaflet" @ready="init()" :options="mapOptions">
+    <l-map class="map" v-if="show" :class="stac.type" @ready="init" :options="mapOptions">
       <LControlFullscreen />
       <template v-if="baseMaps.length > 0">
         <component :is="baseMap.component" v-for="baseMap in baseMaps" :key="baseMap.name" v-bind="baseMap" :layers="baseMap.name" layer-type="base" />
       </template>
-      <LTileLayer v-else url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" :options="mapOptions" />
+      <LTileLayer v-else url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" :options="osmOptions" />
     </l-map>
   </section>
 </template>
@@ -15,7 +15,6 @@ import stacLayer from 'stac-layer';
 import { CRS } from "leaflet";
 import { LMap, LTileLayer, LWMSTileLayer } from 'vue2-leaflet';
 import LControlFullscreen from 'vue2-leaflet-fullscreen';
-import 'leaflet/dist/leaflet.css';
 import Utils from '../utils';
 import '@lweller/leaflet-areaselect';
 import { mapState } from 'vuex';
@@ -30,6 +29,7 @@ export default {
   },
   data() {
     return {
+      show: false,
       map: null,
       areaSelect: null,
       stacLayer: null,
@@ -54,6 +54,11 @@ export default {
       type: Boolean,
       required: false
     }
+  },
+  mounted() {
+    // Workaround for https://github.com/radiantearth/stac-browser/issues/95
+    // I have absolutely no clue yet why this is required, needs further investigation!
+    setTimeout(() => this.show = true, 100);
   },
   computed: {
     ...mapState(['geoTiffResolution', 'tileSourceTemplate', 'buildTileUrlTemplate', 'useTileLayerAsFallback']),
@@ -103,8 +108,8 @@ export default {
     }
   },
   methods: {
-    async init() {
-      this.map = this.$refs.leaflet.mapObject;
+    async init(map) {
+      this.map = map;
 
       await this.showStacLayer();
 
@@ -172,5 +177,6 @@ export default {
 </script>
 
 <style lang="scss">
-  @import '~@lweller/leaflet-areaselect/src/leaflet-areaselect.css'
+  @import '~leaflet/dist/leaflet.css';
+  @import '~@lweller/leaflet-areaselect/src/leaflet-areaselect.css';
 </style>

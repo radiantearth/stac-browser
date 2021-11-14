@@ -5,7 +5,7 @@
         {{ asset.title || id }}
         <div class="badges ml-1 mr-2" v-if="Array.isArray(asset.roles)">
           <b-badge v-for="role in asset.roles" :key="role" :variant="role === 'data' ? 'primary' : 'secondary'" class="role ml-1 mb-1">{{ role }}</b-badge>
-          <b-badge v-if="shown" variant="success" class="shown ml-1 mb-1" title="Asset visualized on map"><b-icon-eye /></b-badge>
+          <b-badge v-if="shown" variant="success" class="shown ml-1 mb-1" title="This is the asset currently shown"><b-icon-eye /></b-badge>
         </div>
         <span class="ml-auto" aria-hidden="true">
           <b-icon-chevron-down v-if="expanded" />
@@ -20,7 +20,7 @@
             Download {{ fileFormat }}
           </b-button>
           <b-button v-if="canShow && shown" :pressed="true" variant="outline-primary" class="inactive">
-            <b-icon-check /> Shown
+            <b-icon-check /> Currently shown
           </b-button>
           <b-button v-else-if="canShow" @click="show" variant="outline-primary">
             <b-icon-eye /> Show
