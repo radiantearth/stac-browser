@@ -18,6 +18,9 @@
         <b-button-group class="actions" v-if="asset.href">
           <b-button :href="asset.href" target="_blank" variant="outline-primary">
             Download {{ fileFormat }}
+            <template v-if="from && !isBrowsable">
+              from {{ from }}
+            </template>
           </b-button>
           <b-button v-if="canShow && shown" :pressed="true" variant="outline-primary" class="inactive">
             <b-icon-check /> Currently shown
@@ -42,6 +45,7 @@ import { Formatters } from '@radiantearth/stac-fields';
 import { MIME_TYPES } from 'stac-layer/src/data';
 import Description from './Description.vue';
 import Metadata from './Metadata.vue';
+import STAC from '../stac';
 
 export default {
   name: 'Asset',
@@ -106,6 +110,10 @@ export default {
       if (typeof this.asset.type !== 'string') {
         return false;
       }
+      // Only http(s) links and relative links are supported
+      if (!this.isBrowsable) {
+        return false;
+      }
       for(let type in MIME_TYPES) {
         if (MIME_TYPES[type].includes(this.asset.type)) {
           return true;
@@ -118,6 +126,36 @@ export default {
         return Formatters.formatMediaType(this.asset.type);
       }
       return null;
+    },
+    protocol() {
+      if (typeof this.asset.href === 'string') {
+        let url = this.asset.href;
+        if (this.context instanceof STAC && !this.asset.href.includes('://')) {
+          url = this.context.getAbsoluteUrl();
+        }
+        if (url) {
+          let match = url.match(/^(\w+):\/\//);
+          if (match) {
+            return match[1].toLowerCase();
+          }
+        }
+      }
+      return null;
+    },
+    isBrowsable() {
+      return (this.protocol === 'http' || this.protocol === 'https');
+    },
+    from() {
+      switch(this.protocol) {
+        case 's3':
+          return 'Amazon S3';
+        case 'gcs':
+          return 'Google Cloud';
+        case 'ftp':
+          return 'FTP server';
+        default:
+          return '';
+      }
     }
   },
   methods: {
