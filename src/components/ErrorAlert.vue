@@ -29,7 +29,10 @@ export default {
       default: ''
     },
     error: {
-      type: Object
+      type: [
+        Object,
+        Error
+      ]
     },
     url: {
       type: String,
