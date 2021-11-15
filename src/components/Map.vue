@@ -18,6 +18,7 @@ import LControlFullscreen from 'vue2-leaflet-fullscreen';
 import Utils from '../utils';
 import '@lweller/leaflet-areaselect';
 import { mapState } from 'vuex';
+import STAC from '../stac';
 
 export default {
   name: 'Map',
@@ -130,11 +131,14 @@ export default {
             tileUrlTemplate: this.tileSourceTemplate,
             buildTileUrlTemplate: this.buildTileUrlTemplate
           };
+          if (this.stac instanceof STAC) {
+            options.baseUrl = this.stac.getAbsoluteUrl();
+          }
           if ('href' in data) {
-            if (data.type === 'Feature') {
+            if (this.stac.type === 'Feature') {
               options.bbox = this.stac?.bbox;
             }
-            else if (data.type === 'Collection') {
+            else if (this.stac.type === 'Collection') {
               options.bbox = this.stac?.extent?.spatial?.bbox[0];
             }
           }

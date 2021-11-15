@@ -10,7 +10,7 @@
     </header>
     <!-- Content (Item / Catalog) -->
     <main>
-      <ErrorAlert class="global-error" v-if="error" v-bind="error" @close="error = null" />
+      <ErrorAlert class="global-error" v-if="globalError" v-bind="globalError" @close="hideError" />
       <router-view />
     </main>
     <footer>
@@ -135,7 +135,7 @@ export default {
     setInterval(() => this.$store.dispatch('loadBackground', 3), 200);
   },
   computed: {
-    ...mapState(['title']),
+    ...mapState(['title', 'globalError']),
     ...mapState({catalogUrlFromVueX: 'catalogUrl'}),
     ...mapGetters(['displayCatalogTitle']),
     browserVersion() {
@@ -144,10 +144,13 @@ export default {
   },
   methods: {
     showError(error, message) {
-      this.error = {
-        error,
+      this.$store.commit('showGlobalError', {
+        error, 
         message
-      };
+      });
+    },
+    hideError() {
+      this.$store.commit('showGlobalError', null);
     }
   }
 }

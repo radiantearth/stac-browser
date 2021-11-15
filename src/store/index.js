@@ -15,6 +15,7 @@ const localDefaults = () => ({
   data: null,
   valid: null,
   parents: null,
+  globalError: null,
 
   apiItems: [],
   apiItemsLink: null,
@@ -361,6 +362,9 @@ export default new Vuex.Store({
     },
     parents(state, parents) {
       state.parents = parents;
+    },
+    showGlobalError(state, error) {
+      state.globalError = error;
     }
   },
   actions: {
