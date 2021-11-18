@@ -20,6 +20,16 @@ import "leaflet/dist/leaflet.css";
 import { CATALOG_URL, PATH_PREFIX, HISTORY_MODE } from "./config";
 import { fetchUri, getProxiedUri } from "./util";
 
+// configure the catalog and title from URL params
+const urlParams = new URLSearchParams(window.location.search)
+const titleParam = urlParams.get('title');
+const catalogParam = urlParams.get('catalog');
+let CATALOG_URL = catalogParam ? catalogParam : BASE_CATALOG_URL;
+
+// this element is located in the public index.html, part of the GP header. 
+let orangeText = document.getElementById('orange-text').firstChild;
+titleParam ? orangeText.nodeValue = titleParam : orangeText.nodeValue = 'STAC'
+
 const Catalog = () => import(/* webpackChunkName: "catalog" */ "./components/Catalog.vue");
 const Item = () => import(/* webpackChunkName: "item" */ "./components/Item.vue");
 
