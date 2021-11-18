@@ -25,8 +25,13 @@
         },
         {
             "rel": "child",
-            "href": "https://cmr.earthdata.nasa.gov/cmr-stac",
-            "title": "NASA CMR STAC"
+            "href": "https://cmr.earthdata.nasa.gov/stac",
+            "title": "NASA CMR"
+        },
+        {
+            "rel": "child",
+            "href": "https://cmr.earthdata.nasa.gov/cloudstac",
+            "title": "NASA CMR Cloud"
         },
         {
             "rel": "child",
