@@ -6,9 +6,9 @@
   "scripts": {
     "start": "vue-cli-service serve",
     "build": "vue-cli-service build --HISTORY_MODE=hash",
-    "deploy:sit": "aws s3 sync ./dist s3://gp-sit-us-east-1-stac --acl public-read --profile sit",
+    "deploy:sit": "aws s3 sync ./dist s3://sit-stac.geoplatform.info --acl public-read --profile sit",
     "deploy:stg": "aws s3 sync ./dist s3://stg-stac.geoplatform.gov --acl public-read --profile stg",
-    "deploy:prd": "echo 'Run Manually'"
+    "deploy:prd": "echo aws s3 sync ./dist s3://stac.geoplatform.gov --acl public-read --profile prd"
   },
   "bugs": {
     "url": "https://github.com/radiantearth/stac-browser/issues"
