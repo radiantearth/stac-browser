@@ -17,7 +17,7 @@ import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
 import "leaflet/dist/leaflet.css";
 
-import { CATALOG_URL, PATH_PREFIX, HISTORY_MODE } from "./config";
+import { BASE_CATALOG_URL, PATH_PREFIX, HISTORY_MODE } from "./config";
 import { fetchUri, getProxiedUri } from "./util";
 
 // configure the catalog and title from URL params
