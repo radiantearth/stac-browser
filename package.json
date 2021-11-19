@@ -5,10 +5,12 @@
   "main": "src/main.js",
   "scripts": {
     "start": "vue-cli-service serve",
-    "build": "vue-cli-service build --HISTORY_MODE=hash",
-    "deploy:sit": "aws s3 sync ./dist s3://sit-stac.geoplatform.info --acl public-read --profile sit",
-    "deploy:stg": "aws s3 sync ./dist s3://stg-stac.geoplatform.gov --acl public-read --profile stg",
-    "deploy:prd": "echo aws s3 sync ./dist s3://stac.geoplatform.gov --acl public-read --profile prd"
+    "build:sit": "vue-cli-service build --CATALOG_URL=https://sit-stac.geoplatform.info/catalog.json --HISTORY_MODE=hash",
+    "build:stg": "vue-cli-service build --CATALOG_URL=https://stg-stac.geoplatform.gov/catalog.json --HISTORY_MODE=hash",
+    "build:prd": "vue-cli-service build --CATALOG_URL=https://stac.geoplatform.gov/catalog.json --HISTORY_MODE=hash",
+    "deploy:sit": "aws s3 sync ./dist s3://gp-sit-us-east-1-stac --acl public-read --profile sit",
+    "deploy:stg": "aws s3 sync ./dist s3://gp-stg-us-east-1-stac --acl public-read --profile stg",
+    "deploy:prd": "echo aws s3 sync ./dist s3://gp-stg-us-east-1-stac --acl public-read --profile prd"
   },
   "bugs": {
     "url": "https://github.com/radiantearth/stac-browser/issues"
@@ -31,13 +33,13 @@
   ],
   "license": "ISC",
   "dependencies": {
-    "@babel/core": "^7.12.10",
-    "@radiantearth/stac-fields": "1.0.0-beta.7",
-    "@radiantearth/stac-migrate": "1.0.0",
+    "@babel/core": "^7.16.0",
+    "@radiantearth/stac-fields": "1.0.0-beta.10",
+    "@radiantearth/stac-migrate": "1.0.2",
     "bootstrap-vue": "^2.21.2",
     "bs58": "^4.0.1",
-    "commonmark": "^0.29.3",
-    "core-js": "^3.6.5",
+    "commonmark": "^0.30.0",
+    "core-js": "^3.19.1",
     "d3-scale-chromatic": "^1.5.0",
     "leaflet": "^1.7.1",
     "leaflet-easybutton": "^2.4.0",
@@ -51,17 +53,15 @@
     "vue-async-computed": "^3.9.0",
     "vue-meta": "^2.4.0",
     "vue-multiselect": "^2.1.6",
-    "vue-router": "^3.2.0",
+    "vue-router": "^3.5.3",
     "vuex": "^3.4.0",
     "yargs": "^17.0.1"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "~4.5.0",
-    "@vue/cli-plugin-router": "~4.5.0",
-    "@vue/cli-plugin-vuex": "~4.5.0",
-    "@vue/cli-service": "~4.5.0",
-    "serverless": "^2.64.1",
-    "serverless-s3-sync": "^1.17.2",
+    "@vue/cli-plugin-babel": "~4.5.15",
+    "@vue/cli-plugin-router": "~4.5.15",
+    "@vue/cli-plugin-vuex": "~4.5.15",
+    "@vue/cli-service": "~4.5.15",
     "vue-template-compiler": "^2.6.12"
   },
   "browserslist": [
