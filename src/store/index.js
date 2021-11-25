@@ -140,11 +140,17 @@ export default new Vuex.Store({
     },
     catalogs: state => {
       let catalogs = [];
-      if (state.data) {
-        catalogs = catalogs.concat(state.data.getLinksWithRels(['child']));
-      }
       if (state.data.getApiCollectionsLink() && state.apiCollections.length > 0) {
         catalogs = catalogs.concat(state.apiCollections);
+      }
+      if (state.data) {
+        // Don't add links that are already in collections: https://github.com/radiantearth/stac-browser/issues/103
+        // ToDo: The runtime of this can probably be improved
+        let links = state.data.getLinksWithRels(['child']).filter(link => {
+          let absoluteUrl = Utils.toAbsolute(link.href, state.url);
+          return !state.apiCollections.find(collection => collection.getAbsoluteUrl() === absoluteUrl);
+        });
+        catalogs = catalogs.concat(links);
       }
       return catalogs;
     },
