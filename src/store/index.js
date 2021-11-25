@@ -391,6 +391,7 @@ export default new Vuex.Store({
     },
     async loadParents(cx) {
       if (!(cx.state.data instanceof STAC)) {
+        cx.commit('parents', []);
         return;
       }
 
