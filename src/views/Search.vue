@@ -120,7 +120,9 @@ export default {
       }
     },
     handleResponse(response) {
-      this.$store.commit('showPage', {title: pageTitle, url: response.config.url});
+      if (response) {
+        this.$store.commit('showPage', {title: pageTitle, url: response.config.url});
+      }
     },
     mapClicked(event) {
       if (event.type !== 'Feature') {

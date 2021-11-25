@@ -9,7 +9,7 @@ Vue.use(Vuex);
 
 // Local settings (e.g. for currently loaded STAC entity)
 const localDefaults = () => ({
-  loading: false,
+  loading: true,
   url: '',
   title: CONFIG.catalogTitle,
   data: null,
@@ -473,10 +473,11 @@ export default new Vuex.Store({
         cx.commit('showPage', {url});
       }
     },
-    async loadApiItems(cx, stac) {
-      let link = stac.getLinkWithRel('items');
-      if (!link) {
-        return;
+    async loadApiItems(cx, link) {
+      let stac = null;
+      if (link instanceof STAC) {
+        stac = link;
+        link = stac.getApiItemsLink();
       }
       let request = Utils.stacLinkToAxiosRequest(link);
       let response = await axios(request);
