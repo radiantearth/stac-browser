@@ -79,6 +79,11 @@
       "parser": "babel-eslint"
     }
   },
+  "eslintIgnore": [
+    "**/stac-fields",
+    "**/stac-migrate",
+    "**/stac-layer"
+  ],
   "browserslist": [
     "> 1%",
     "last 2 versions",
