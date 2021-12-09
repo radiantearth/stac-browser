@@ -2,6 +2,7 @@
   <b-row class="catalog">
     <b-col class="left">
       <h2>Introduction</h2>
+      <DeprecationNotice v-if="data.deprecated" :type="data.type" />
       <Description v-if="data.description" :description="data.description" />
       <Keywords v-if="Array.isArray(data.keywords) && data.keywords.length > 0" :keywords="data.keywords" />
       <section v-if="isCollection" class="metadata mb-4">
@@ -64,6 +65,7 @@ export default {
     BTabs,
     BTab,
     Catalogs,
+    DeprecationNotice: () => import('../components/DeprecationNotice.vue'),
     Description,
     Items,
     Keywords,
@@ -92,7 +94,9 @@ export default {
         'assets',
         'item_assets',
         // API landing page, not very useful to display
-        'conformsTo'
+        'conformsTo',
+        // Will be rendered with a custom rendered
+        'deprecated'
       ]
     };
   },

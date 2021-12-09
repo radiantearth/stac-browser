@@ -2,6 +2,7 @@
   <div class="item">
     <b-row>
       <b-col>
+        <DeprecationNotice v-if="data.properties.deprecated" :type="data.type" />
         <Description v-if="data.properties.description" :description="data.properties.description" />
         <Keywords v-if="Array.isArray(data.properties.keywords) && data.properties.keywords.length > 0" :keywords="data.properties.keywords" />
         <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="shownAssets" @showAsset="showAsset" />
@@ -47,6 +48,7 @@ export default {
     BTabs,
     BTab,
     Description,
+    DeprecationNotice: () => import('../components/DeprecationNotice.vue'),
     Links,
     Map: () => import('../components/Map.vue'),
     Metadata,
@@ -55,7 +57,9 @@ export default {
   data() {
     return {
       ignoredMetadataFields: [
-        'title'
+        'title',
+        // Will be rendered with a custom rendered
+        'deprecated'
       ]
     };
   },
