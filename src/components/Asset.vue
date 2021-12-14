@@ -15,8 +15,8 @@
     </b-card-header>
     <b-collapse :id="id" v-model="expanded" role="tabpanel">
       <b-card-body>
-        <b-button-group class="actions" v-if="asset.href">
-          <b-button :href="asset.href" target="_blank" variant="outline-primary">
+        <b-button-group class="actions" v-if="href">
+          <b-button :href="href" target="_blank" variant="outline-primary">
             Download {{ fileFormat }}
             <template v-if="from && !isBrowsable">
               from {{ from }}
@@ -43,9 +43,11 @@
 import { BCollapse, BIconCheck, BIconChevronUp, BIconChevronDown, BIconEye } from 'bootstrap-vue';
 import { Formatters } from '@radiantearth/stac-fields';
 import { MIME_TYPES } from 'stac-layer/src/data';
+import { mapState } from 'vuex';
 import Description from './Description.vue';
 import Metadata from './Metadata.vue';
 import STAC from '../stac';
+import Utils from '../utils';
 
 export default {
   name: 'Asset',
@@ -103,6 +105,7 @@ export default {
     }
   },
   computed: {
+    ...mapState(['url']),
     isThumbnail() {
       return Array.isArray(this.asset.roles) && this.asset.roles.includes('thumbnail');
     },
@@ -128,13 +131,9 @@ export default {
       return null;
     },
     protocol() {
-      if (typeof this.asset.href === 'string') {
-        let url = this.asset.href;
-        if (this.context instanceof STAC && !this.asset.href.includes('://')) {
-          url = this.context.getAbsoluteUrl();
-        }
-        if (url) {
-          let match = url.match(/^(\w+):\/\//);
+      if (typeof this.href === 'string') {
+        if (this.href) {
+          let match = this.href.match(/^(\w+):\/\//);
           if (match) {
             return match[1].toLowerCase();
           }
@@ -144,6 +143,16 @@ export default {
     },
     isBrowsable() {
       return (this.protocol === 'http' || this.protocol === 'https');
+    },
+    href() {
+      let baseUrl;
+      if (this.context instanceof STAC) {
+        baseUrl = this.context.getAbsoluteUrl();
+      }
+      else {
+        baseUrl = this.url;
+      }
+      return Utils.toAbsolute(this.asset.href, baseUrl);
     },
     from() {
       switch(this.protocol) {
