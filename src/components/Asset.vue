@@ -169,7 +169,8 @@ export default {
   },
   methods: {
     show() {
-      this.$emit('show', this.asset, this.id, this.isThumbnail);
+      let absoluteAsset =  Object.assign({}, this.asset, {href: this.href});
+      this.$emit('show', absoluteAsset, this.id, this.isThumbnail);
     }
   }
 }
