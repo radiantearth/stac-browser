@@ -18,8 +18,8 @@ export default {
             required: true
         }
     },
-    created() {
-        this.$store.dispatch('validate', this.stacUrl);
+    async created() {
+        await this.$store.dispatch('validate', this.stacUrl);
     },
     computed: {
         ...mapState(['valid']),

@@ -120,14 +120,14 @@ export default {
     catalogUrlFromVueX(url) {
       if (url) {
         // Load the root catalog data if not available (e.g. after page refresh or external access)
-        this.$store.dispatch("load", { url });
+        this.$store.dispatch("load", { url, loadApi: true });
       }
     }
   },
   created() {
     // Load the root catalog data if not available (e.g. after page refresh or external access)
     if (this.catalogUrl) {
-      this.$store.dispatch("load", { url: this.catalogUrl });
+      this.$store.dispatch("load", { url: this.catalogUrl, loadApi: true });
     }
   },
   mounted() {

@@ -143,11 +143,11 @@ export default {
   },
   methods: {
     loadMoreCollections() {
-      this.$store.dispatch('loadNextApiCollections');
+      this.$store.dispatch('loadNextApiCollections', {show: true});
     },
     async paginateItems(link) {
       try {
-        await this.$store.dispatch('loadApiItems', link);
+        await this.$store.dispatch('loadApiItems', {link, show: true});
       } catch (error) {
         this.$root.$emit('error', error, 'Sorry, loading the list of STAC Items failed.');
       }

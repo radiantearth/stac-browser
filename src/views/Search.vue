@@ -102,7 +102,7 @@ export default {
     },
     async paginateItems(link) {
       try {
-        let response = await this.$store.dispatch('loadApiItems', link);
+        let response = await this.$store.dispatch('loadApiItems', {link, show: true});
         this.handleResponse(response);
       } catch (error) {
         this.$root.$emit('error', error, 'Sorry, loading the list of STAC Items failed.');

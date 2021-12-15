@@ -1,14 +1,18 @@
 import Utils from "./utils";
 import Migrate from '@radiantearth/stac-migrate';
 
+let stacObjCounter = 0;
+
 // STAC Entity
 class STAC {
 
     constructor(data, url, path, migrate = true) {
+        this._id = stacObjCounter++;
         this._url = url;
         this._path = path;
         this._apiChildren = {
             list: [],
+            prev: false,
             next: false
         };
 
@@ -47,6 +51,10 @@ class STAC {
         return this.type === 'FeatureCollection';
     }
 
+    hasApiData() {
+        return this._apiChildren.list.length > 0;
+    }
+
     getChildren() {
         if (!this.isCatalogLike()) {
             return [];
@@ -58,6 +66,7 @@ class STAC {
         }
         children = children.concat(this.getLinksWithRels(['child', 'item']));
         if (this._apiChildren.list.length > 0) {
+            // ToDo: Don't add collections that are already present in children, see index.js, catalogs() getter
             children = children.concat(this._apiChildren.list);
         }
         if (this._apiChildren.next) {

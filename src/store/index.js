@@ -7,9 +7,17 @@ import bs58 from 'bs58';
 
 Vue.use(Vuex);
 
+class Loading {
+  
+  constructor(show = false, loadApi = false) {
+    this.show = Boolean(show);
+    this.loadApi = Boolean(loadApi);
+  }
+
+}
+
 // Local settings (e.g. for currently loaded STAC entity)
 const localDefaults = () => ({
-  loading: true,
   url: '',
   title: CONFIG.catalogTitle,
   data: null,
@@ -24,7 +32,7 @@ const localDefaults = () => ({
 });
 
 const catalogDefaults = () => ({
-  database: {},
+  database: {}, // STAC object, Error object or Loading object or Promise (when loading)
   queue: [],
   redirectUrl: null,
 
@@ -57,6 +65,7 @@ export default new Vuex.Store({
     ]
   }),
   getters: {
+    loading: state => !state.url || !state.data || state.database[state.url] instanceof Loading,
     error: state => state.database[state.url] instanceof Error ? state.database[state.url] : null,
     getStac: state => (url, returnErrorObject = false) => {
       if (!url) {
@@ -64,11 +73,11 @@ export default new Vuex.Store({
       }
       let absoluteUrl = Utils.toAbsolute(url, state.url);
       let data = state.database[absoluteUrl];
-      if (!returnErrorObject && data instanceof Error) {
-        return null;
+      if (data instanceof STAC || (returnErrorObject && data instanceof Error)) {
+        return data;
       }
       else {
-        return data;
+        return null;
       }
     },
     getStacFromLink: (state, getters) => (rel, fallback = null) => {
@@ -260,10 +269,10 @@ export default new Vuex.Store({
     tileSourceTemplate(state, tileSourceTemplate) {
       state.tileSourceTemplate = tileSourceTemplate;
     },
-    loading(state, {url, show}) {
-      Vue.set(state.database, url, null);
-      if (show) {
-        state.loading = true;
+    loading(state, {url, loading}) {
+      Vue.set(state.database, url, loading);
+      if (loading.show) {
+        state.url = url;
       }
     },
     loaded(state, {url, data}) {
@@ -279,7 +288,6 @@ export default new Vuex.Store({
       if (!stac) {
         stac = state.database[url] || null;
       }
-      state.loading = false;
       state.url = url || null;
       state.data = stac instanceof STAC ? stac : null;
       state.valid = null;
@@ -317,34 +325,48 @@ export default new Vuex.Store({
     setApiItemsLink(state, link) {
       state.apiItemsLink = link;
     },
-    setApiItems(state, { data, stac }) {
-      if (Utils.isObject(data) && Array.isArray(data.features)) {
-        state.apiItems = data.features.map(feature => Object.freeze(feature));
+    setApiItems(state, { data, stac, show }) {
+      if (!Utils.isObject(data) || !Array.isArray(data.features)) {
+        return;
+      }
+      let apiItems = data.features.map(feature => Object.freeze(feature));
 
-        // Handle pagination links
-        let pageLinks = Utils.getLinksWithRels(data.links, ['first', 'prev', 'previous', 'next', 'last']);
-        let pages = {};
-        for(let pageLink of pageLinks) {
-          let rel = pageLink.rel === 'previous' ? 'prev' : pageLink.rel;
-          pages[rel] = pageLink;
-        }
+      if (show) {
+        state.apiItems = apiItems;
+      }
+
+      // Handle pagination links
+      let pageLinks = Utils.getLinksWithRels(data.links, ['first', 'prev', 'previous', 'next', 'last']);
+      let pages = {};
+      for(let pageLink of pageLinks) {
+        let rel = pageLink.rel === 'previous' ? 'prev' : pageLink.rel;
+        pages[rel] = pageLink;
+      }
+
+      if (show) {
         state.apiItemsPagination = pages;
+      }
 
-        if (stac instanceof STAC) {
-          stac._apiChildren.prev = pages.prev; // ToDo: Only required when state.apiItems is not cached(?) -> cache apiItems?
-          stac._apiChildren.next = state.next;
-          stac._apiChildren.list = state.apiItems;
-        }
+      if (stac instanceof STAC) {
+        stac._apiChildren.prev = pages.prev; // ToDo: Only required when state.apiItems is not cached(?) -> cache apiItems?
+        stac._apiChildren.next = pages.next;
+        stac._apiChildren.list = apiItems;
       }
     },
-    addApiCollections(state, { data, stac }) {
-      if (Array.isArray(data.collections)) {
-          state.nextCollectionsLink = Utils.getLinkWithRel(data.links, 'next');
-          state.apiCollections = state.apiCollections.concat(data.collections.map(collection => Object.freeze(collection)));
-          if (stac instanceof STAC) {
-            stac._apiChildren.next = state.nextCollectionsLink;
-            stac._apiChildren.list = state.apiCollections;
-          }
+    addApiCollections(state, { data, stac, show }) {
+      if (!Utils.isObject(data) || !Array.isArray(data.collections)) {
+        return;
+      }
+
+      let collections = data.collections.map(collection => Object.freeze(collection));
+      let nextLink = Utils.getLinkWithRel(data.links, 'next');
+      if (show) {
+        state.nextCollectionsLink = nextLink;
+        state.apiCollections = state.apiCollections.concat(collections);
+      }
+      if (stac instanceof STAC) {
+        stac._apiChildren.next = nextLink;
+        stac._apiChildren.list = collections;
       }
     },
     setApiItemsFilter(state, filter) {
@@ -370,6 +392,7 @@ export default new Vuex.Store({
       state.parents = parents;
     },
     showGlobalError(state, error) {
+      console.log(error);
       state.globalError = error;
     }
   },
@@ -392,7 +415,7 @@ export default new Vuex.Store({
           cx.commit('stacIndex', response.data);
         }
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     },
     async loadParents(cx) {
@@ -409,7 +432,7 @@ export default new Vuex.Store({
           break;
         }
         let url = Utils.toAbsolute(parentLink.href, stac.getAbsoluteUrl());
-        await cx.dispatch('load', { url });
+        await cx.dispatch('load', { url, loadApi: true });
         let parentStac = cx.getters.getStac(url, true);
         if (parentStac instanceof Error) {
           cx.commit('parents', parentStac);
@@ -423,7 +446,7 @@ export default new Vuex.Store({
       }
       cx.commit('parents', parents);
     },
-    async load(cx, {url, fromBrowser, show}) {
+    async load(cx, {url, fromBrowser, show, loadApi}) {
       let path;
       if (fromBrowser) {
         path = url;
@@ -438,9 +461,15 @@ export default new Vuex.Store({
         cx.commit('resetPage');
       }
 
+      let loading = new Loading(show, loadApi);
       let data = cx.state.database[url];
-      if (!data) {
-        cx.commit('loading', {url, show});
+      if (data instanceof Loading) {
+        data.show = show || data.show;
+        data.loadApi = loadApi || data.loadApi;
+        return;
+      }
+      else if (!data) {
+        cx.commit('loading', {url, loading});
         try {
           let response = await axios.get(url);
           if (!Utils.isObject(response.data)) {
@@ -465,25 +494,37 @@ export default new Vuex.Store({
         }
       }
 
-      if (data && show) {
+      if (loading.loadApi && data instanceof STAC) {
         // Load API Collections
         if (data.getApiCollectionsLink()) {
-          await cx.dispatch('loadNextApiCollections', data);
+          try {
+            await cx.dispatch('loadNextApiCollections', {stac: data, show: loading.show});
+          } catch (error) {
+            cx.commit('showGlobalError', {
+              message: 'Sorry, the API Collections could not be loaded.',
+              error
+            });
+          }
         }
         // Load API Items
         if (data.getApiItemsLink()) {
-          await cx.dispatch('loadApiItems', data);
+          try {
+            await cx.dispatch('loadApiItems', {stac: data, show: loading.show});
+          } catch (error) {
+            cx.commit('showGlobalError', {
+              message: 'Sorry, the API Items could not be loaded.',
+              error
+            });
+          }
         }
       }
 
-      if (show) {
+      if (loading.show) {
         cx.commit('showPage', {url});
       }
     },
-    async loadApiItems(cx, link) {
-      let stac = null;
-      if (link instanceof STAC) {
-        stac = link;
+    async loadApiItems(cx, {link, stac, show}) {
+      if (stac instanceof STAC) {
         link = stac.getApiItemsLink();
       }
       let request = Utils.stacLinkToAxiosRequest(link);
@@ -497,8 +538,10 @@ export default new Vuex.Store({
           let url = Utils.toAbsolute(selfLink?.href || `./collections/${cx.state.data.id}/items/${item.id}`, cx.state.url);
           return new STAC(item, url, cx.getters.toBrowserPath(url));
         });
-        cx.commit('setApiItemsLink', link);
-        cx.commit('setApiItems', { data: response.data, stac });
+        if (show) {
+          cx.commit('setApiItemsLink', link);
+        }
+        cx.commit('setApiItems', { data: response.data, stac, show });
         return response;
       }
     },
@@ -511,9 +554,9 @@ export default new Vuex.Store({
       }
       cx.commit('setApiItemsFilter', filters);
       // load API Items with search params
-      return await cx.dispatch('loadApiItems', Utils.addFiltersToLink(link, filters));
+      return await cx.dispatch('loadApiItems', {link: Utils.addFiltersToLink(link, filters), show: true});
     },
-    async loadNextApiCollections(cx, stac = null) {
+    async loadNextApiCollections(cx, {stac, show}) {
       let link;
       if (stac) {
         // First page
@@ -541,7 +584,7 @@ export default new Vuex.Store({
           let url = Utils.toAbsolute(selfLink?.href || `./collections/${collection.id}`, cx.state.url);
           return new STAC(collection, url, cx.getters.toBrowserPath(url));
         });
-        cx.commit('addApiCollections', { data: response.data, stac });
+        cx.commit('addApiCollections', { data: response.data, stac, show });
       }
     },
     async validate(cx, url) {

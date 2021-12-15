@@ -8,8 +8,6 @@
     <div v-else-if="loading" class="loading text-center">
       <b-spinner label="Loading..."></b-spinner>
     </div>
-    <ErrorAlert v-else-if="!data" :dismissible="false" :url="url"
-      description="Sorry, No data available." />
     <component v-else :is="component" />
   </section>
 </template>
@@ -33,8 +31,8 @@ export default {
     }
   },
   computed: {
-    ...mapState(["allowExternalAccess", "url", "redirectUrl", "loading", "data"]),
-    ...mapGetters(["isItem", "error"]),
+    ...mapState(["allowExternalAccess", "url", "redirectUrl", "data"]),
+    ...mapGetters(["isItem", "error", "loading"]),
     component() {
       if (this.isItem) {
         return 'Item';
@@ -55,7 +53,7 @@ export default {
           return;
         }
 
-        this.$store.dispatch("load", { url: path || '/', fromBrowser: true, show: true });
+        this.$store.dispatch("load", { url: path || '/', fromBrowser: true, show: true, loadApi: true });
       }
     },
     redirectUrl: {
