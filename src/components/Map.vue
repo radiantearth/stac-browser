@@ -132,7 +132,10 @@ export default {
             buildTileUrlTemplate: this.buildTileUrlTemplate
           };
           if (this.stac instanceof STAC) {
-            options.baseUrl = this.stac.getAbsoluteUrl();
+            // gets the absolute path to the current stac item
+            // and then basically remove the filename from it
+            // so you essentially have the "parent directory"
+            options.baseUrl = this.stac.getAbsoluteUrl().replace(/\/[^/]+$/,'');
           }
           if ('href' in data) {
             if (this.stac.type === 'Feature') {
