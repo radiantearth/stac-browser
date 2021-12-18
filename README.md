@@ -86,6 +86,11 @@ using a local version of [titiler](https://github.com/developmentseed/titiler) t
 npm start -- --open --tileSourceTemplate="http://localhost:8000/cog/tiles/{z}/{x}/{y}?url={url}"
 ```
 
+### useTileLayerAsFallback
+
+If either `tileSourceTemplate` or `buildTileUrlTemplate` are given server-side rendering of COGs is enabled. 
+If server-side rendering should only be used as a fallback for client-side rendering, enable the boolean `useTileLayerAsFallback` option.
+
 ### tileProxyUrl
 
 `tileProxyUrl` is very similar to STAC_PROXY_URL, but is only used for asset hrefs passed into the tileSourceTemplate. This enables deployment scenarios where the tiler needs to reference a proxy server by a different name, e.g. in a docker-compose setup with linked containers.
