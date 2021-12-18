@@ -7,7 +7,7 @@
             <StacLink :link="catalog" :title="title" class="stretched-link" />
           </b-card-title>
           <b-card-text v-if="data && data.description" class="intro">
-            {{ data.description }}
+            {{ data.description | stripCommonmark }}
           </b-card-text>
           <b-card-text v-if="temporalExtent"><small class="text-muted">{{ temporalExtent | TemporalExtent }}</small></b-card-text>
         </b-card-body>
@@ -23,6 +23,7 @@
 import { mapGetters } from 'vuex';
 import StacLink from './StacLink.vue';
 import STAC from '../stac';
+import removeMd from 'remove-markdown';
 
 export default {
   name: 'Catalog',
@@ -38,6 +39,13 @@ export default {
   data() {
     return {
       showThumbnail: false // Lazy load thumbnails and not all at once for API Collections
+    }
+  },
+  filters: {
+    stripCommonmark(text) {
+      // Best-effort approach to remove some CommonMark (Markdown).
+      // Likely not perfect, but seems good enough for most cases.
+      return removeMd(text);
     }
   },
   computed: {
