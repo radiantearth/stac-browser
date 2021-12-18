@@ -107,6 +107,9 @@ export default {
             margin-left: 1em;
         }
     }
+    dd:not(:last-of-type) > dl:only-child {
+         margin-bottom: -1em;
+    }
     ul > li > dl, ol > li > dl {
         margin-left: 0;
     }
