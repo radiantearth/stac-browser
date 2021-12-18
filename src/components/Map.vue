@@ -39,7 +39,8 @@ export default {
       },
       osmOptions: {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors.'
-      }
+      },
+      dblClickState: null
     };
   },
   props: {
@@ -145,7 +146,20 @@ export default {
           this.stacLayer = await stacLayer(data, options);
           if (this.stacLayer) {
             this.$emit('mapChanged', this.stacLayer.stac);
-            this.stacLayer.on('click', event => this.$emit('mapClicked', event.stac));
+            this.stacLayer.on('click', event => {
+              // Debounce click event, otherwise a dblclick is fired (and fired twice)
+              let clicks = event.originalEvent.detail || 1;
+              if (clicks === 1) {
+                this.dblClickState = window.setTimeout(() => {
+                  this.dblClickState = null;
+                  this.$emit('mapClicked', event.stac);
+                }, 500);
+              }
+              else if (clicks > 1 && this.dblClickState) {
+                window.clearTimeout(this.dblClickState);
+                this.dblClickState = null;
+              }
+            });
             this.stacLayer.on("fallback", event => this.$emit('mapChanged', event.stac));
             // Fit bounds before adding the layer to the map to avoid a race condition(?) between Tiff loading and fitBounds
             this.fitBounds();
