@@ -3,6 +3,7 @@
     <b-row>
       <b-col>
         <DeprecationNotice v-if="data.properties.deprecated" :type="data.type" />
+        <AnonymizedNotice v-if="data.properties['anon:warning']" :warning="data.properties['anon:warning']" />
         <Description v-if="data.properties.description" :description="data.properties.description" />
         <Keywords v-if="Array.isArray(data.properties.keywords) && data.properties.keywords.length > 0" :keywords="data.properties.keywords" />
         <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="shownAssets" @showAsset="showAsset" />
@@ -44,6 +45,7 @@ export default {
   name: "Item",
   mixins: [ShowAssetMixin],
   components: {
+    AnonymizedNotice: () => import('../components/AnonymizedNotice.vue'),
     Assets,
     BTabs,
     BTab,
@@ -59,7 +61,9 @@ export default {
       ignoredMetadataFields: [
         'title',
         // Will be rendered with a custom rendered
-        'deprecated'
+        'deprecated',
+        // Special handling for the warning of the anonymized-location extension
+        'anon:warning'
       ]
     };
   },

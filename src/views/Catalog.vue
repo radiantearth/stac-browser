@@ -3,6 +3,7 @@
     <b-col class="left">
       <h2>Introduction</h2>
       <DeprecationNotice v-if="data.deprecated" :type="data.type" />
+      <AnonymizedNotice v-if="data['anon:warning']" :warning="data['anon:warning']" />
       <Description v-if="data.description" :description="data.description" />
       <Keywords v-if="Array.isArray(data.keywords) && data.keywords.length > 0" :keywords="data.keywords" />
       <section v-if="isCollection" class="metadata mb-4">
@@ -61,6 +62,7 @@ export default {
   name: "Catalog",
   mixins: [ShowAssetMixin],
   components: {
+    AnonymizedNotice: () => import('../components/AnonymizedNotice.vue'),
     Assets,
     BTabs,
     BTab,
@@ -96,7 +98,9 @@ export default {
         // API landing page, not very useful to display
         'conformsTo',
         // Will be rendered with a custom rendered
-        'deprecated'
+        'deprecated',
+        // Special handling for the warning of the anonymized-location extension
+        'anon:warning'
       ]
     };
   },

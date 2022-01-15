@@ -9,7 +9,10 @@
 export default {
 	name: 'DeprecationNotice',
 	props: {
-		type: String
+		type: {
+			type: String,
+			default: ""
+		}
 	}
 }
 </script>
