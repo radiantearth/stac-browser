@@ -85,7 +85,10 @@ export default {
   data() {
     return {
       expanded: false,
-      ignore: ['href', 'title', 'description', 'type', 'roles']
+      ignore: [
+        'href', 'title', 'description', 'type', 'roles',
+        'table:storage_options', 'xarray:open_kwargs', 'xarray:storage_options'
+      ]
     };
   },
   created() {

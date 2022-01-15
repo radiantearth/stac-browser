@@ -34,9 +34,7 @@ export default {
       map: null,
       areaSelect: null,
       stacLayer: null,
-      mapOptions: {
-        scrollWheelZoom: !this.selectBounds
-      },
+      mapOptions: {},
       osmOptions: {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors.'
       },
@@ -56,6 +54,9 @@ export default {
       type: Boolean,
       required: false
     }
+  },
+  created() {
+    this.mapOptions.scrollWheelZoom = this.selectBounds || this.stac?.isItem();
   },
   mounted() {
     // Solves https://github.com/radiantearth/stac-browser/issues/95 by showing the map

@@ -30,6 +30,7 @@
         <Map v-else-if="isCollection" :stac="data" :stacLayerData="selectedAsset" @mapClicked="mapClicked" @mapChanged="mapChanged" />
         <Thumbnails v-else-if="thumbnails.length > 0" :thumbnails="thumbnails" />
       </section>
+      <Links v-if="additionalLinks.length > 0" title="Additional resources" :links="additionalLinks" />
       <Metadata title="Metadata" class="mb-4" :type="data.type" :data="data" :ignoreFields="ignoredMetadataFields" />
     </b-col>
     <b-col class="right">
@@ -39,7 +40,6 @@
         @paginate="paginateItems" @filterItems="filterItems" />
       <Assets v-if="hasAssets" :assets="assets" :shown="shownAssets" @showAsset="showAsset" />
       <Assets v-if="hasItemAssets" :assets="data.item_assets" :definition="true" />
-      <Links v-if="additionalLinks.length > 0" title="Additional resources" :links="additionalLinks" />
     </b-col>
   </b-row>
 </template>
