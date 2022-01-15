@@ -4,7 +4,9 @@
       <b-col>
         <DeprecationNotice v-if="data.properties.deprecated" :type="data.type" />
         <AnonymizedNotice v-if="data.properties['anon:warning']" :warning="data.properties['anon:warning']" />
-        <Description v-if="data.properties.description" :description="data.properties.description" />
+        <ReadMore v-if="data.properties.description" :lines="10">
+          <Description :description="data.properties.description" />
+        </ReadMore>
         <Keywords v-if="Array.isArray(data.properties.keywords) && data.properties.keywords.length > 0" :keywords="data.properties.keywords" />
         <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="shownAssets" @showAsset="showAsset" />
         <Links v-if="additionalLinks.length > 0" title="Additional resources" :links="additionalLinks" />
@@ -36,6 +38,7 @@ import Assets from '../components/Assets.vue';
 import Description from '../components/Description.vue';
 import Links from '../components/Links.vue';
 import Metadata from '../components/Metadata.vue';
+import ReadMore from "vue-read-more-smooth";
 import Thumbnails from '../components/Thumbnails.vue';
 import ShowAssetMixin from '../components/ShowAssetMixin';
 import { BTabs, BTab } from 'bootstrap-vue';
@@ -54,6 +57,7 @@ export default {
     Links,
     Map: () => import('../components/Map.vue'),
     Metadata,
+    ReadMore,
     Thumbnails
   },
   data() {

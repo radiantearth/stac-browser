@@ -30,7 +30,7 @@
   "license": "ISC",
   "dependencies": {
     "@lweller/leaflet-areaselect": "^1.3.0",
-    "@radiantearth/stac-fields": "1.0.0-beta.10",
+    "@radiantearth/stac-fields": "1.0.0-beta.11",
     "@radiantearth/stac-migrate": "~1.0.2",
     "axios": "^0.21.4",
     "bootstrap-vue": "^2.21.2",
@@ -43,6 +43,7 @@
     "urijs": "^1.19.6",
     "v-clipboard": "^2.2.3",
     "vue": "^2.6.12",
+    "vue-read-more-smooth": "^0.1.8",
     "vue-router": "^3.2.0",
     "vue2-datepicker": "^3.9.2",
     "vue2-leaflet": "^2.7.0",

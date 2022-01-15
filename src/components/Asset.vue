@@ -145,6 +145,9 @@ export default {
       return (this.protocol === 'http' || this.protocol === 'https');
     },
     href() {
+      if (typeof this.asset.href !== 'string') {
+        return null;
+      }
       let baseUrl;
       if (this.context instanceof STAC) {
         baseUrl = this.context.getAbsoluteUrl();
@@ -158,6 +161,9 @@ export default {
       switch(this.protocol) {
         case 's3':
           return 'Amazon S3';
+        case 'abfs':
+        case 'abfss':
+          return 'Microsoft Azure';
         case 'gcs':
           return 'Google Cloud';
         case 'ftp':
@@ -178,6 +184,9 @@ export default {
 
 <style lang="scss">
 .asset {
+  .card-title {
+    font-size: 1.3em;
+  }
   .btn-asset {
     text-align: left;
 

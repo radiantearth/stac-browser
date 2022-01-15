@@ -4,7 +4,9 @@
       <h2>Introduction</h2>
       <DeprecationNotice v-if="data.deprecated" :type="data.type" />
       <AnonymizedNotice v-if="data['anon:warning']" :warning="data['anon:warning']" />
-      <Description v-if="data.description" :description="data.description" />
+      <ReadMore v-if="data.description" :lines="10">
+        <Description :description="data.description" />
+      </ReadMore>
       <Keywords v-if="Array.isArray(data.keywords) && data.keywords.length > 0" :keywords="data.keywords" />
       <section v-if="isCollection" class="metadata mb-4">
         <b-row v-if="licenses">
@@ -52,6 +54,7 @@ import Keywords from '../components/Keywords.vue';
 import Links from '../components/Links.vue';
 import Metadata from '../components/Metadata.vue';
 import Providers from '../components/Providers.vue';
+import ReadMore from "vue-read-more-smooth";
 import Thumbnails from '../components/Thumbnails.vue';
 import ShowAssetMixin from '../components/ShowAssetMixin';
 import { Formatters } from '@radiantearth/stac-fields';
@@ -75,6 +78,7 @@ export default {
     Map: () => import('../components/Map.vue'),
     Metadata,
     Providers,
+    ReadMore,
     Thumbnails
   },
   data() {
