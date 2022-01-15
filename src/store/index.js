@@ -523,10 +523,20 @@ export default new Vuex.Store({
         cx.commit('showPage', {url});
       }
     },
-    async loadApiItems(cx, {link, stac, show}) {
+    async loadApiItems(cx, {link, stac, show, filters}) {
       if (stac instanceof STAC) {
         link = stac.getApiItemsLink();
       }
+
+      if (!Utils.isObject(filters)) {
+        filters = {};
+      }
+      if (typeof filters.limit !== 'number') {
+        filters.limit = cx.state.itemsPerPage;
+      }
+      cx.commit('setApiItemsFilter', filters);
+      link = Utils.addFiltersToLink(link, filters);
+
       let request = Utils.stacLinkToAxiosRequest(link);
       let response = await axios(request);
       if (!Utils.isObject(response.data) || !Array.isArray(response.data.features)) {
@@ -544,17 +554,6 @@ export default new Vuex.Store({
         cx.commit('setApiItems', { data: response.data, stac, show });
         return response;
       }
-    },
-    async filterApiItems(cx, {link, filters}) {
-      if (!link) {
-        return;
-      }
-      if (!Utils.isObject(filters)) {
-        filters = {};
-      }
-      cx.commit('setApiItemsFilter', filters);
-      // load API Items with search params
-      return await cx.dispatch('loadApiItems', {link: Utils.addFiltersToLink(link, filters), show: true});
     },
     async loadNextApiCollections(cx, {stac, show}) {
       let link;

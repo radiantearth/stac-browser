@@ -99,6 +99,10 @@ If server-side rendering should only be used as a fallback for client-side rende
 
 If you are updating from on old version of STAC Browser, you can set this option to `true` to redirect users from the old "unreadable" URLs to the new human-readable URLs.
 
+### itemsPerPage
+
+The number of items requested and shown per page by default. Only applies to APIs that support the `limit` query parameter.
+
 ## Theming
 
 You can customize STAC Browser in the `src/theme` folder. It contains Sass files (a CSS preprocessor), which you can change to suit your needs.

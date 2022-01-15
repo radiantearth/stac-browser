@@ -11,5 +11,6 @@ module.exports = {
     historyMode: "history",
     stacLint: true,
     geoTiffResolution: 128,
-    redirectLegacyUrls: false
+    redirectLegacyUrls: false,
+    itemsPerPage: 12
 };

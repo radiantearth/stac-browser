@@ -6,10 +6,10 @@
     </h2>
     <Pagination ref="topPagination" v-if="api" :pagination="pagination" placement="top" @paginate="paginate" />
     <template v-if="allowFilter">
-      <b-button v-if="api" v-b-toggle.itemFilter class="mb-4 mt-2 ml-3" variant="outline-primary">
+      <b-button v-if="api" v-b-toggle.itemFilter class="mb-4 mt-2 ml-3" :pressed="filtersOpen" variant="outline-primary">
         <b-icon-search /> Filter
       </b-button>
-      <b-collapse id="itemFilter">
+      <b-collapse id="itemFilter" v-model="filtersOpen">
         <ItemFilter :stac="stac" v-model="filters" :collectionOnly="true" />
       </b-collapse>
     </template>
@@ -74,7 +74,8 @@ export default {
   data() {
     return {
       shownItems: this.chunkSize,
-      filters: this.apiFilters
+      filters: this.apiFilters,
+      filtersOpen: false
     };
   },
   computed: {

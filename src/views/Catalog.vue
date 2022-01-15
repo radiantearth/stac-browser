@@ -162,7 +162,7 @@ export default {
     },
     async filterItems(filters) {
       try {
-        await this.$store.dispatch('filterApiItems', {link: this.apiItemsLink, filters});
+        await this.$store.dispatch('loadApiItems', {link: this.apiItemsLink, show: true, filters});
       } catch (error) {
         this.$root.$emit('error', error, 'Sorry, loading a filtered list of STAC Items failed.');
       }
