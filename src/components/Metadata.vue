@@ -89,6 +89,12 @@ export default {
         font-weight: 600;
         vertical-align: top;
     }
+    .value {
+        > ul, > ol {
+            max-height: 15em;
+            overflow: auto;
+        }
+    }
     ul, ol {
         padding-left: 1.2em;
     }
@@ -122,6 +128,15 @@ export default {
         &:not(:last-of-type) > dl:only-child {
             margin-bottom: -1em;
         }
+        &:after {
+            content: "\A";
+            white-space: pre;
+            line-height: 1px;
+        }
+        &:last-of-type:after {
+            content: "";
+            white-space: normal;
+        }
         .description {
             display: inline-block;
             
@@ -130,18 +145,9 @@ export default {
             }
         }
         > ul, > ol {
-            max-height: 10em;
+            max-height: 15em;
             overflow: auto;
         }
-    }
-    dd:after {
-        content: "\A";
-        white-space: pre;
-        line-height: 1px;
-    }
-    dd:last-of-type:after {
-        content: "";
-        white-space: normal;
     }
     .provider .description {
         font-size: 0.9em;

@@ -1,16 +1,19 @@
 <template>
-  <b-card class="item-card" :class="{queued: !this.data}" v-bind="cardProps" img-top v-b-visible.200="load">
-    <b-card-title>
-      <StacLink :link="item" :title="title" class="stretched-link" />
-    </b-card-title>
-    <b-card-text><small class="text-muted">
-      <template v-if="extent">{{ extent | TemporalExtent }}</template>
-      <template v-else-if="data && data.properties.datetime">{{ data.properties.datetime | Timestamp }}</template>
-      <template v-else>No time given</template>
-    </small></b-card-text>
-    <b-card-text v-if="fileFormats.length > 0">
-      <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="mr-1 mt-1">{{ format | MediaType }}</b-badge>
-    </b-card-text>
+  <b-card no-body class="item-card" :class="{queued: !this.data}" v-bind="cardProps" v-b-visible.200="load">
+    <b-card-img v-if="thumbnail && showThumbnail" class="thumbnail" :src="thumbnail.href" :alt="thumbnail.title" fluid></b-card-img>
+    <b-card-body>
+      <b-card-title>
+        <StacLink :link="item" :title="title" class="stretched-link" />
+      </b-card-title>
+      <b-card-text><small class="text-muted">
+        <template v-if="extent">{{ extent | TemporalExtent }}</template>
+        <template v-else-if="data && data.properties.datetime">{{ data.properties.datetime | Timestamp }}</template>
+        <template v-else>No time given</template>
+      </small></b-card-text>
+      <b-card-text v-if="fileFormats.length > 0">
+        <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="mr-1 mt-1 fileformat">{{ format | MediaType }}</b-badge>
+      </b-card-text>
+    </b-card-body>
   </b-card>
 </template>
 
@@ -43,11 +46,6 @@ export default {
     ...mapGetters(['getStac']),
     cardProps() {
       let props = {};
-      // Lazy load thumbnails and not all at once for API Collections
-      if (this.showThumbnail && this.thumbnail) {
-        props['img-src'] = this.thumbnail.href;
-        props['img-alt'] = this.thumbnail.title;
-      }
       if (Array.isArray(this.selected) && this.selected.find(obj => this.data.equals(obj))) {
         props['border-variant'] = 'danger';
       }
@@ -117,8 +115,15 @@ export default {
     min-height: 200px;
   }
 
-  .card-img-top {
+  .fileformat {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+
+  .card-img {
     width: auto;
+    height: auto;
     max-width: 100%;
     max-height: 200px;
   }

@@ -1,21 +1,15 @@
 <template>
   <b-card no-body class="catalog-card" :class="{queued: !this.data}" v-b-visible.200="load">
-    <b-row no-gutters>
-      <b-col :md="thumbnail ? 8 : 12">
-        <b-card-body>
-          <b-card-title>
-            <StacLink :link="catalog" :title="title" class="stretched-link" />
-          </b-card-title>
-          <b-card-text v-if="data && data.description" class="intro">
-            {{ data.description | stripCommonmark }}
-          </b-card-text>
-          <b-card-text v-if="temporalExtent"><small class="text-muted">{{ temporalExtent | TemporalExtent }}</small></b-card-text>
-        </b-card-body>
-      </b-col>
-      <b-col md="4" v-if="thumbnail && showThumbnail" class="thumbnail">
-        <b-card-img :src="thumbnail.href" :alt="thumbnail.title" fluid></b-card-img>
-      </b-col>
-    </b-row>
+    <b-card-img v-if="thumbnail && showThumbnail" class="thumbnail" :src="thumbnail.href" :alt="thumbnail.title" fluid></b-card-img>
+    <b-card-body>
+      <b-card-title>
+        <StacLink :link="catalog" :title="title" class="stretched-link" />
+      </b-card-title>
+      <b-card-text v-if="data && data.description" class="intro">
+        {{ data.description | stripCommonmark }}
+      </b-card-text>
+      <b-card-text v-if="temporalExtent"><small class="text-muted">{{ temporalExtent | shortTemporalExtent }}</small></b-card-text>
+    </b-card-body>
   </b-card>
 </template>
 
@@ -24,6 +18,7 @@ import { mapGetters } from 'vuex';
 import StacLink from './StacLink.vue';
 import STAC from '../stac';
 import removeMd from 'remove-markdown';
+import { Formatters } from '@radiantearth/stac-fields';
 
 export default {
   name: 'Catalog',
@@ -46,6 +41,9 @@ export default {
       // Best-effort approach to remove some CommonMark (Markdown).
       // Likely not perfect, but seems good enough for most cases.
       return removeMd(text);
+    },
+    shortTemporalExtent(value) {
+      return Formatters.formatTemporalExtent(value, true);
     }
   },
   computed: {
@@ -75,8 +73,8 @@ export default {
     },
     temporalExtent() {
       if (this.data?.isCollection() && this.data.extent?.temporal?.interval.length > 0) {
-        let extent = this.data.extent.temporal.interval[0]; 
-        if (extent[0] && extent[1]) {
+        let extent = this.data.extent.temporal.interval[0];
+        if (extent[0] || extent[1]) {
           return this.data.extent.temporal.interval[0];
         }
       }
@@ -113,18 +111,11 @@ export default {
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
-  .row {
-    height: 100%;
-  }
-  .thumbnail {
-    text-align: center;
-    height: 100%;
-  }
   .card-img {
     width: auto;
     height: auto;
     max-width: 100%;
-    max-height: 100%;
+    max-height: 200px;
   }
 }
 </style>
