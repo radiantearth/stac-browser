@@ -2,7 +2,7 @@
     <section v-show="formattedData.length > 0" class="metadata">
         <h2 v-if="formattedData.length > 0 && title">{{ title }}</h2>
         <b-card-group v-if="formattedData.length > 0" columns :class="`count-${formattedData.length}`">
-            <b-card v-for="group in formattedData" :key="group.extension" class="metadata-card">
+            <b-card no-body v-for="group in formattedData" :key="group.extension" class="metadata-card">
                 <b-card-title>
                     <div v-if="group.extension" v-html="group.label" />
                     <template v-else>{{ commmonMetadataTitle }}</template>
@@ -84,7 +84,18 @@ export default {
 </script>
 
 <style lang="scss">
+@import "../theme/variables.scss";
+
 .metadata {
+    .card {
+        border: 0;
+        margin-top: $block-margin;
+        margin-bottom: $block-margin;
+
+        .row {
+            margin-bottom: 0.33em;
+        }
+    }
     .label {
         font-weight: 600;
         vertical-align: top;
@@ -97,6 +108,7 @@ export default {
     }
     ul, ol {
         padding-left: 1.2em;
+        margin-bottom: 0;
     }
     ul li {
         list-style-type: '- ';

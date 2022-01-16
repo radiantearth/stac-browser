@@ -103,6 +103,22 @@ export default {
       .card-columns {
         column-count: 1;
 
+        &.count-2 {
+          @include media-breakpoint-up(md) {
+            column-count: 2 !important;
+          }
+        }
+        &.count-3 {
+          @include media-breakpoint-up(lg) {
+            column-count: 3 !important;
+          }
+        }
+        &.count-4 {
+          @include media-breakpoint-up(xxl) {
+            column-count: 4 !important;
+          }
+        }
+
         &:not(.count-1) {
           @include media-breakpoint-up(md) {
             column-count: 2;
