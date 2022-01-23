@@ -75,9 +75,18 @@ export default class Utils {
 		return uri.is(type);
 	}
 
+	static isGdalVfsUri(url) {
+		return typeof url === 'string' && url.startsWith('/vsi') && !url.startsWith('/vsicurl/');
+	}
+
 	static toAbsolute(href, baseUrl, stringify = true) {
+		// Convert vsicurl URLs to normal URLs
+		if (typeof href === 'string' && href.startsWith('/vsicurl/')) {
+			href = href.replace(/^\/vsicurl\//, '');
+		}
+		// Parse URL and make absolute, if required
 		let uri = URI(href);
-		if (uri.is("relative")) {
+		if (uri.is("relative") && !Utils.isGdalVfsUri(href)) { // Don't convert GDAL VFS URIs: https://github.com/radiantearth/stac-browser/issues/116
 			uri = uri.absoluteTo(baseUrl);
 		}
 		return stringify ? uri.toString() : uri;

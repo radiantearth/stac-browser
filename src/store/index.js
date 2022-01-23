@@ -138,6 +138,15 @@ export default new Vuex.Store({
     },
     supportsSearch: (state, getters) => Boolean(getters.searchLink),
 
+    tileRendererType: state => {
+      if ((state.tileSourceTemplate || state.buildTileUrlTemplate) && !state.useTileLayerAsFallback) {
+        return 'server';
+      }
+      else {
+        return 'client';
+      }
+    },
+
     items: state => {
       if (state.apiItems.length > 0) {
         return state.apiItems;
