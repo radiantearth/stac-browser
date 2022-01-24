@@ -19,8 +19,8 @@
         <b-form-tags input-id="ids" :value="filters.ids" @input="setIds" separator=" ,;" remove-on-delete add-on-change placeholder="List one or multiple Item IDs..."></b-form-tags>
       </b-form-group>
 
-      <b-form-group label="Limit" label-for="limit" description="Number of items requested per page">
-        <b-form-input id="limit" :value="filters.limit" @change="setLimit" min="1" max="1000" type="number" :placeholder="`Default (${itemsPerPage})`"></b-form-input>
+      <b-form-group label="Limit" label-for="limit" :description="`Number of items requested per page, max ${maxItems} items.`">
+        <b-form-input id="limit" :value="filters.limit" @change="setLimit" min="1" :max="maxItems" type="number" :placeholder="`Default (${itemsPerPage})`"></b-form-input>
       </b-form-group>
 
       <b-button type="submit" variant="primary">Filter</b-button>
@@ -65,6 +65,7 @@ export default {
   },
   data() {
     return {
+      maxItems: 10000,
       provideBBox: false,
       filters: this.getDefaultValues()
     };
@@ -111,8 +112,12 @@ export default {
       this.$emit('input', this.filters, true);
     },
     setLimit(limit) {
-      if (limit > 0 && limit < 1000) {
-        this.filters.limit = Number.parseInt(limit, 10);
+      limit = Number.parseInt(limit, 10);
+      if (limit > this.maxItems) {
+        this.filters.limit = this.maxItems;
+      }
+      else if (limit > 0) {
+        this.filters.limit = limit;
       }
       else {
         this.filters.limit = null;
