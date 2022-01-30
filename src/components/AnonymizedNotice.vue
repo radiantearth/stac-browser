@@ -7,7 +7,7 @@
 
 <script>
 export default {
-	name: 'DeprecationNotice',
+	name: 'AnonymizedNotice',
 	props: {
 		warning: {
 			type: String,

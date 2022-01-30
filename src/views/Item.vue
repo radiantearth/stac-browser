@@ -2,7 +2,7 @@
   <div class="item">
     <b-row>
       <b-col>
-        <DeprecationNotice v-if="data.properties.deprecated" :type="data.type" />
+        <DeprecationNotice v-if="data.properties.deprecated" :data="data" />
         <AnonymizedNotice v-if="data.properties['anon:warning']" :warning="data.properties['anon:warning']" />
         <ReadMore v-if="data.properties.description" :lines="10">
           <Description :description="data.properties.description" />

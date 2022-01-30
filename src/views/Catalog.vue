@@ -2,7 +2,7 @@
   <b-row class="catalog">
     <b-col class="left">
       <h2>Introduction</h2>
-      <DeprecationNotice v-if="data.deprecated" :type="data.type" />
+      <DeprecationNotice v-if="data.deprecated" :data="data" />
       <AnonymizedNotice v-if="data['anon:warning']" :warning="data['anon:warning']" />
       <ReadMore v-if="data.description" :lines="10">
         <Description :description="data.description" />
