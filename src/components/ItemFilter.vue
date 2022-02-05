@@ -160,8 +160,8 @@ export default {
 <style lang="scss">
 @import '../theme/variables.scss';
 
-$default-color: $secondary;
-$primary-color: $primary;
+$default-color: map-get($theme-colors, "secondary");
+$primary-color: map-get($theme-colors, "primary");
 
 @import '~vue2-datepicker/scss/index.scss';
 

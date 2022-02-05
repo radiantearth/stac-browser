@@ -18,12 +18,28 @@ export default {
 </script>
 
 <style lang="scss">
+@import '../theme/variables.scss';
+
 .previews {
   text-align: center;
+
+  a {
+    display: inline-block;
+    padding: 1px;
+    border: 1px solid $body-bg;
+    margin: 0.25rem;
+    border-radius: $border-radius;
+
+    &:hover {
+      border-color: map-get($theme-colors, "primary");
+    }
+  }
+
+  .thumbnail {
+    max-width: 100%;
+    max-height: 400px;
+    border-radius: $border-radius;
+  }
 }
 
-.thumbnail {
-  max-width: 100%;
-  max-height: 400px;
-}
 </style>
