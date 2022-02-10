@@ -1,7 +1,7 @@
 <template>
   <div class="previews">
     <a v-for="thumbnail in thumbnails" :key="thumbnail.href" :href="thumbnail.href">
-      <img class="thumbnail" :src="thumbnail.href" />
+      <img class="thumbnail" :src="thumbnail.href" crossorigin="anonymous" />
     </a>
   </div>
 </template>

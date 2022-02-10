@@ -39,7 +39,7 @@
     "core-js": "^3.6.5",
     "leaflet": "^1.7.1",
     "remove-markdown": "^0.3.0",
-    "stac-layer": "^0.7.1",
+    "stac-layer": "^0.8.0",
     "urijs": "^1.19.6",
     "v-clipboard": "^2.2.3",
     "vue": "^2.6.12",
