@@ -3,10 +3,9 @@ module.exports = {
     catalogTitle: "STAC Browser",
     allowExternalAccess: true, // Must be true if catalogUrl is not given
     useTileLayerAsFallback: true,
-    tileSourceTemplate: "https://tiles.rdnt.io/tiles/{z}/{x}/{y}@2x?url={url}",
-    buildTileUrlTemplate: null,
+    tileSourceTemplate: null,
+    buildTileUrlTemplate: ({href, asset}) => 'https://tiles.rdnt.io/tiles/{z}/{x}/{y}@2x?url=' + encodeURIComponent(asset.href.startsWith('/vsi') ? asset.href : href),
     stacProxyUrl: null,
-    tileProxyUrl: null,
     pathPrefix: "/",
     historyMode: "history",
     stacLint: true,

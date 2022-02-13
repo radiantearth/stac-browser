@@ -23,12 +23,10 @@
 
 <script>
 import Vue from "vue";
-
 import VueRouter from "vue-router";
-
-import routes from "./router";
 import { mapGetters, mapState } from 'vuex';
-import store from "./store";
+import getRoutes from "./router";
+import getStore from "./store";
 
 import {
   AlertPlugin, BadgePlugin, ButtonGroupPlugin, ButtonPlugin,
@@ -44,6 +42,8 @@ import { Formatters } from '@radiantearth/stac-fields';
 import ErrorAlert from './components/ErrorAlert.vue';
 import Sidebar from './components/Sidebar.vue';
 import StacHeader from './components/StacHeader.vue';
+
+const CONFIG_FILE = require(CONFIG_PATH);
 
 Vue.use(Clipboard);
 
@@ -69,12 +69,14 @@ for(let name in Formatters) {
   }
 }
 
+const CONFIG = Object.assign(CONFIG_FILE, CONFIG_CLI);
+
 // Setup router
 Vue.use(VueRouter);
 const router = new VueRouter({
   mode: CONFIG.historyMode,
   base: CONFIG.pathPrefix,
-  routes,
+  routes: getRoutes(CONFIG)
 });
 
 // Pass Config through from props to vuex
@@ -82,7 +84,7 @@ let Props = {};
 let Watchers = {};
 for(let key in CONFIG) {
   Props[key] = {
-    default: CONFIG[key]
+    default: ['object', 'function'].includes(typeof CONFIG[key]) ? () => CONFIG[key] : CONFIG[key]
   }
   Watchers[key] = function(newValue) {
     this.$store.commit('config', {
@@ -98,7 +100,7 @@ for(let key in CONFIG) {
 export default {
   name: 'StacBrowser',
   router,
-  store,
+  store: getStore(CONFIG),
   components: {
     ErrorAlert,
     Sidebar,

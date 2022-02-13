@@ -75,9 +75,7 @@ and be able to browse that catalog.
 
 ### tileSourceTemplate
 
-The `tileSourceTemplate` environment variable controls the tile layer that is used to render COGs. If not set, the default value is:
-`https://tiles.rdnt.io/tiles/{z}/{x}/{y}@2x?url={url}`,
-which uses the [tiles.rdnt.io](https://github.com/radiantearth/tiles.rdnt.io) project to serve publicly accessible COGs as tile layers.
+The `tileSourceTemplate` variable controls the tile layer that is used to render COGs.
 
 The format of this value is a tile layer template with an optional `{url}` that will be replaced with the COG asset href. For example,
 using a local version of [titiler](https://github.com/developmentseed/titiler) to serve local COG files would look something like:
@@ -86,14 +84,20 @@ using a local version of [titiler](https://github.com/developmentseed/titiler) t
 npm start -- --open --tileSourceTemplate="http://localhost:8000/cog/tiles/{z}/{x}/{y}?url={url}"
 ```
 
+### buildTileUrlTemplate
+
+A more flexible option than `tileSourceTemplate` is passing a function to `buildTileUrlTemplate`.
+See the [documentation for the corresponding stac-layer option](https://github.com/stac-utils/stac-layer#buildtileurltemplate) for details.
+Please note that this option can only be provided through a config file and is not available via CLI.
+
+This option also replaces the v2 option `tileProxyUrl`.
+
 ### useTileLayerAsFallback
 
 If either `tileSourceTemplate` or `buildTileUrlTemplate` are given server-side rendering of COGs is enabled. 
 If server-side rendering should only be used as a fallback for client-side rendering, enable the boolean `useTileLayerAsFallback` option.
 
-### tileProxyUrl
-
-`tileProxyUrl` is very similar to STAC_PROXY_URL, but is only used for asset hrefs passed into the tileSourceTemplate. This enables deployment scenarios where the tiler needs to reference a proxy server by a different name, e.g. in a docker-compose setup with linked containers.
+By default, client-side COG rendering is enabled. A server-side fallback is provided via the [tiles.rdnt.io](https://github.com/radiantearth/tiles.rdnt.io) project, which serves publicly accessible COGs as tile layers.
 
 ### redirectLegacyUrls
 
