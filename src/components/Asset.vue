@@ -2,15 +2,15 @@
   <b-card class="asset" no-body>
     <b-card-header header-tag="header" role="tab" class="p-0">
       <b-button block v-b-toggle="id" variant="asset" squared class="p-2 d-flex">
+        <span class="mr-1" aria-hidden="true">
+          <b-icon-chevron-down v-if="expanded" />
+          <b-icon-chevron-right v-else />
+        </span>
         {{ asset.title || id }}
-        <div class="badges ml-1 mr-2" v-if="Array.isArray(asset.roles)">
+        <div class="badges ml-1" v-if="Array.isArray(asset.roles)">
           <b-badge v-for="role in asset.roles" :key="role" :variant="role === 'data' ? 'primary' : 'secondary'" class="role ml-1 mb-1">{{ role }}</b-badge>
           <b-badge v-if="shown" variant="success" class="shown ml-1 mb-1" title="This is the asset currently shown"><b-icon-eye /></b-badge>
         </div>
-        <span class="ml-auto" aria-hidden="true">
-          <b-icon-chevron-down v-if="expanded" />
-          <b-icon-chevron-up v-else />
-        </span>
       </b-button>
     </b-card-header>
     <b-collapse :id="id" v-model="expanded" role="tabpanel">
@@ -40,7 +40,7 @@
 </template>
 
 <script>
-import { BCollapse, BIconCheck, BIconChevronUp, BIconChevronDown, BIconEye } from 'bootstrap-vue';
+import { BCollapse, BIconCheck, BIconChevronRight, BIconChevronDown, BIconEye } from 'bootstrap-vue';
 import { Formatters } from '@radiantearth/stac-fields';
 import { MIME_TYPES } from 'stac-layer/src/data';
 import { mapGetters, mapState } from 'vuex';
@@ -55,7 +55,7 @@ export default {
     BCollapse,
     BIconCheck,
     BIconChevronDown,
-    BIconChevronUp,
+    BIconChevronRight,
     BIconEye,
     CopyButton: () => import('./CopyButton.vue'),
     Description,
@@ -97,15 +97,7 @@ export default {
       this.expanded = this.expand;
     }
     else {
-      // Expand assets with role data by default
-      this.expanded = Array.isArray(this.asset.roles) && this.asset.roles.includes('data');
-    }
-  },
-  watch: {
-    shown(show, wasShown) {
-      if (show && !wasShown) {
-        this.expanded = true;
-      }
+      this.expanded = false;
     }
   },
   computed: {

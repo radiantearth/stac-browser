@@ -100,6 +100,7 @@ export default {
   box-sizing: border-box;
   margin-top: 0.5em;
   margin-bottom: 0.5em;
+  text-align: center;
 
   &.queued {
     min-height: 10rem;
@@ -110,12 +111,16 @@ export default {
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    text-align: left;
   }
   .card-img {
     width: auto;
     height: auto;
     max-width: 100%;
-    max-height: 200px;
+    max-height: 300px;
+  }
+  .card-body, .card-title {
+    text-align: center;
   }
 }
 </style>

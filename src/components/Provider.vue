@@ -2,14 +2,14 @@
   <b-card class="provider" no-body>
     <b-card-header header-tag="header" role="tab" class="p-0">
       <b-button block v-b-toggle="id" variant="provider" squared class="p-2 d-flex">
+        <span class="roles mr-1" aria-hidden="true">
+          <b-icon-chevron-down v-if="expanded" />
+          <b-icon-chevron-right v-else />
+        </span>
         {{ provider.name }}
-        <div class="roles ml-1 mr-2" v-if="Array.isArray(provider.roles)">
+        <div class="roles ml-1" v-if="Array.isArray(provider.roles)">
           <b-badge v-for="role in provider.roles" :key="role" variant="secondary" class="ml-1 mb-1">{{ role }}</b-badge>
         </div>
-        <span class="ml-auto" aria-hidden="true">
-          <b-icon-chevron-down v-if="expanded" />
-          <b-icon-chevron-up v-else />
-        </span>
       </b-button>
     </b-card-header>
     <b-collapse :id="id" v-model="expanded" accordion="providers" role="tabpanel">
@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import { BCollapse, BIconChevronUp, BIconChevronDown } from 'bootstrap-vue';
+import { BCollapse, BIconChevronRight, BIconChevronDown } from 'bootstrap-vue';
 import Description from './Description.vue';
 import Metadata from './Metadata.vue';
 
@@ -41,7 +41,7 @@ export default {
   components: {
     BCollapse,
     BIconChevronDown,
-    BIconChevronUp,
+    BIconChevronRight,
     Description,
     Metadata
   },

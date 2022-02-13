@@ -1,47 +1,61 @@
 <template>
-  <b-row class="catalog">
-    <b-col class="left">
-      <h2>Introduction</h2>
-      <DeprecationNotice v-if="data.deprecated" :data="data" />
-      <AnonymizedNotice v-if="data['anon:warning']" :warning="data['anon:warning']" />
-      <ReadMore v-if="data.description" :lines="10">
-        <Description :description="data.description" />
-      </ReadMore>
-      <Keywords v-if="Array.isArray(data.keywords) && data.keywords.length > 0" :keywords="data.keywords" />
-      <section v-if="isCollection" class="metadata mb-4">
-        <b-row v-if="licenses">
-          <b-col md="4" class="label">Licenses</b-col>
-          <b-col md="8" class="value" v-html="licenses" />
-        </b-row>
-        <b-row v-if="temporalExtents">
-          <b-col md="4" class="label">Temporal Extents</b-col>
-          <b-col md="8" class="value" v-html="temporalExtents" />
-        </b-row>
-      </section>
-      <section class="mb-4">
-        <b-tabs v-if="isCollection && thumbnails.length > 0" v-model="tab" ref="tabs">
-          <b-tab title="Map">
-            <Map :stac="data" :stacLayerData="selectedAsset" @mapClicked="mapClicked" @mapChanged="mapChanged" />
-          </b-tab>
-          <b-tab title="Preview">
-            <Thumbnails :thumbnails="thumbnails" />
-          </b-tab>
-        </b-tabs>
-        <Map v-else-if="isCollection" :stac="data" :stacLayerData="selectedAsset" @mapClicked="mapClicked" @mapChanged="mapChanged" />
-        <Thumbnails v-else-if="thumbnails.length > 0" :thumbnails="thumbnails" />
-      </section>
-      <Links v-if="additionalLinks.length > 0" title="Additional resources" :links="additionalLinks" />
-      <Metadata title="Metadata" class="mb-4" :type="data.type" :data="data" :ignoreFields="ignoredMetadataFields" />
-    </b-col>
-    <b-col class="right">
-      <Providers v-if="hasProviders" :providers="data.providers" />
-      <Catalogs v-if="catalogs.length > 0" :catalogs="catalogs" :hasMore="hasMoreCollections" @loadMore="loadMoreCollections" />
-      <Items v-if="hasItems" :stac="data" :items="items" :api="isApi" :apiFilters="apiItemsFilter" :pagination="itemPages"
-        @paginate="paginateItems" @filterItems="filterItems" />
-      <Assets v-if="hasAssets" :assets="assets" :shown="shownAssets" @showAsset="showAsset" />
-      <Assets v-if="hasItemAssets" :assets="data.item_assets" :definition="true" />
-    </b-col>
-  </b-row>
+  <div class="catalog">
+    <b-row>
+      <b-col class="left">
+        <DeprecationNotice v-if="data.deprecated" :data="data" />
+        <AnonymizedNotice v-if="data['anon:warning']" :warning="data['anon:warning']" />
+        <ReadMore v-if="data.description" :lines="10">
+          <Description :description="data.description" />
+        </ReadMore>
+        <Keywords v-if="Array.isArray(data.keywords) && data.keywords.length > 0" :keywords="data.keywords" />
+        <section v-if="isCollection" class="metadata mb-4">
+          <b-row v-if="licenses">
+            <b-col md="4" class="label">Licenses</b-col>
+            <b-col md="8" class="value" v-html="licenses" />
+          </b-row>
+          <b-row v-if="temporalExtents">
+            <b-col md="4" class="label">Temporal Extents</b-col>
+            <b-col md="8" class="value" v-html="temporalExtents" />
+          </b-row>
+        </section>
+        <Links v-if="isCollection && additionalLinks.length > 0" title="Additional resources" :links="additionalLinks" />
+      </b-col>
+      <b-col class="middle">
+        <section v-if="isCollection || thumbnails.length > 0" class="mb-4">
+          <b-tabs v-if="isCollection && thumbnails.length > 0" v-model="tab" ref="tabs">
+            <b-tab title="Map">
+              <Map :stac="data" :stacLayerData="selectedAsset" @mapClicked="mapClicked" @mapChanged="mapChanged" />
+            </b-tab>
+            <b-tab title="Preview">
+              <Thumbnails :thumbnails="thumbnails" />
+            </b-tab>
+          </b-tabs>
+          <Map v-else-if="isCollection" :stac="data" :stacLayerData="selectedAsset" @mapClicked="mapClicked" @mapChanged="mapChanged" />
+          <Thumbnails v-else-if="thumbnails.length > 0" :thumbnails="thumbnails" />
+        </section>
+        <Links v-if="!isCollection && additionalLinks.length > 0" title="Additional resources" :links="additionalLinks" />
+      </b-col>
+      <b-col class="right">
+        <Providers v-if="hasProviders" :providers="data.providers" />
+        <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="shownAssets" @showAsset="showAsset" />
+      </b-col>
+    </b-row>
+    <b-row>
+      <b-col>
+        <Metadata title="Metadata" class="mb-4" :type="data.type" :data="data" :ignoreFields="ignoredMetadataFields" />
+      </b-col>
+    </b-row>
+    <b-row>
+      <b-col v-if="catalogs.length > 0" class="left">
+        <Catalogs :catalogs="catalogs" :hasMore="hasMoreCollections" @loadMore="loadMoreCollections" />
+      </b-col>
+      <b-col v-if="hasItems || hasItemAssets" class="right">
+        <Items v-if="hasItems" :stac="data" :items="items" :api="isApi" :apiFilters="apiItemsFilter" :pagination="itemPages"
+          @paginate="paginateItems" @filterItems="filterItems" />
+        <Assets v-if="hasItemAssets" :assets="data.item_assets" :definition="true" />
+      </b-col>
+    </b-row>
+  </div>
 </template>
 
 <script>
@@ -179,45 +193,29 @@ export default {
 @import "../theme/variables.scss";
 
 .catalog {
-  .left {
-    min-width: 300px;
+  .middle:empty, .right:empty {
+    display: none;
   }
-  .right {
-    min-width: 250px;
-  }
-  .metadata {
-    .card-columns {
-      column-count: 1;
 
-      &:not(.count-1) {
-        @include media-breakpoint-up(xxl) {
-          column-count: 2;
-        }
-        @include media-breakpoint-up(xxxl) {
-          column-count: 3;
-        }
-      }
-    }
-  }
   .items, .catalogs {
     .card-columns {
       @include media-breakpoint-only(sm) {
         column-count: 1;
       }
       @include media-breakpoint-only(md) {
-        column-count: 1;
+        column-count: 2;
       }
       @include media-breakpoint-only(lg) {
-        column-count: 2;
-      }
-      @include media-breakpoint-only(xl) {
-        column-count: 2;
-      }
-      @include media-breakpoint-only(xxl) {
         column-count: 3;
       }
-      @include media-breakpoint-up(xxxl) {
+      @include media-breakpoint-only(xl) {
+        column-count: 3;
+      }
+      @include media-breakpoint-only(xxl) {
         column-count: 4;
+      }
+      @include media-breakpoint-up(xxxl) {
+        column-count: 5;
       }
     }
   }

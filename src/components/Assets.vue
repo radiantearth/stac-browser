@@ -42,11 +42,8 @@ export default {
       if (this.definition) {
         return false; // Don't expand assets for Item Asset Definitions
       }
-      else if (Utils.size(this.assets) === 1) {
-        return true; // Expand asset if it's the only asset available
-      }
-      else if (Object.values(this.assets).filter(asset => Array.isArray(asset.roles) && asset.roles.includes('data')).length > 1) {
-        return false; // Expand assets with role "data" only if there is one of it
+      else if (Utils.size(this.assets) === 1 && this.stac && this.stac.isItem()) {
+        return true; // Expand asset if it's the only asset available and it is in an Item
       }
       return null; // Let asset decide (e.g. depending on roles)
     }
