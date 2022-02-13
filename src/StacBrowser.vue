@@ -86,13 +86,16 @@ for(let key in CONFIG) {
   Props[key] = {
     default: ['object', 'function'].includes(typeof CONFIG[key]) ? () => CONFIG[key] : CONFIG[key]
   }
-  Watchers[key] = function(newValue) {
-    this.$store.commit('config', {
-      key: newValue
-    });
-    if (key === 'catalogUrl' && newValue) {
-      // Load the root catalog data if not available (e.g. after page refresh or external access)
-      this.$store.dispatch("load", { url: newValue });
+  Watchers[key] = {
+    immediate: true,
+    handler: function(newValue) {
+      this.$store.commit('config', {
+        [key]: newValue
+      });
+      if (key === 'catalogUrl' && newValue) {
+        // Load the root catalog data if not available (e.g. after page refresh or external access)
+        this.$store.dispatch("load", { url: newValue });
+      }
     }
   };
 }

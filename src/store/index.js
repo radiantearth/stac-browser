@@ -251,9 +251,9 @@ function getStore(config) {
               state.catalogUrl = Utils.toAbsolute(value, value); // This call is made to normalize the URL, e.g. append a missing /
               break;
             case 'stacProxyUrl':
-              // Proxy URLs coming from CLI have the form https://thingtoproxy.com|http://proxy:111
-              if (typeof value === 'string' && value.includes('|')) {
-                state[key] = value.split('|');
+              // Proxy URLs coming from CLI have the form https://thingtoproxy.com;http://proxy:111
+              if (typeof value === 'string' && value.includes(';')) {
+                state[key] = value.split(';');
               }
               else {
                 state[key] = value;
