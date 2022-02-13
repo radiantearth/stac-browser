@@ -1,6 +1,6 @@
 <template>
   <b-card no-body class="item-card" :class="{queued: !this.data}" v-bind="cardProps" v-b-visible.200="load">
-    <b-card-img v-if="thumbnail && showThumbnail" class="thumbnail" :src="thumbnail.href" :alt="thumbnail.title" fluid></b-card-img>
+    <b-card-img v-if="thumbnail && showThumbnail" class="thumbnail" :src="thumbnail.href" :alt="thumbnail.title" crossorigin="anonymous" fluid></b-card-img>
     <b-card-body>
       <b-card-title>
         <StacLink :link="item" :title="title" class="stretched-link" />
