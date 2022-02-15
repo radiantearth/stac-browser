@@ -45,7 +45,7 @@
         <Metadata title="Metadata" class="mb-4" :type="data.type" :data="data" :ignoreFields="ignoredMetadataFields" />
       </b-col>
     </b-row>
-    <b-row>
+    <b-row class="flex-wrap-reverse" :class="{split: catalogs.length > 0 && (hasItems || hasItemAssets)}">
       <b-col v-if="catalogs.length > 0" class="left">
         <Catalogs :catalogs="catalogs" :hasMore="hasMoreCollections" @loadMore="loadMoreCollections" />
       </b-col>
@@ -216,6 +216,28 @@ export default {
       }
       @include media-breakpoint-up(xxxl) {
         column-count: 5;
+      }
+    }
+  }
+
+  .split {
+    .items, .catalogs {
+      .card-columns {
+        @include media-breakpoint-only(md) {
+          column-count: 1;
+        }
+        @include media-breakpoint-only(lg) {
+          column-count: 1;
+        }
+        @include media-breakpoint-only(xl) {
+          column-count: 2;
+        }
+        @include media-breakpoint-only(xxl) {
+          column-count: 2;
+        }
+        @include media-breakpoint-up(xxxl) {
+          column-count: 3;
+        }
       }
     }
   }
