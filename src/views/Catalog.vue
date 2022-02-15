@@ -1,6 +1,6 @@
 <template>
   <div class="catalog">
-    <b-row>
+    <b-row class="three-cols">
       <b-col class="left">
         <DeprecationNotice v-if="data.deprecated" :data="data" />
         <AnonymizedNotice v-if="data['anon:warning']" :warning="data['anon:warning']" />
@@ -193,15 +193,31 @@ export default {
 @import "../theme/variables.scss";
 
 .catalog {
+  @include media-breakpoint-down(md) {
+    .three-cols {
+      .left, .middle, .right {
+        min-width: 100%;
+      }
+    }
+  }
+  @include media-breakpoint-only(xs) {
+    .split {
+      .left, .middle, .right {
+        min-width: 100%;
+      }
+    }
+  }
+
   .middle:empty, .right:empty {
     display: none;
   }
 
   .items, .catalogs {
+    .card {
+      display: block;
+    }
     .card-columns {
-      @include media-breakpoint-only(sm) {
-        column-count: 1;
-      }
+      column-count: 1;
       @include media-breakpoint-only(md) {
         column-count: 2;
       }
@@ -223,9 +239,7 @@ export default {
   .split {
     .items, .catalogs {
       .card-columns {
-        @include media-breakpoint-only(md) {
-          column-count: 1;
-        }
+        column-count: 1;
         @include media-breakpoint-only(lg) {
           column-count: 1;
         }
