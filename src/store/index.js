@@ -86,7 +86,7 @@ function getStore(config) {
         return getters.getStac(link.href);
       },
 
-      displayCatalogTitle: (state, getters) => getters.root?.getDisplayTitle() || state.catalogTitle,
+      displayCatalogTitle: (state, getters) => STAC.getDisplayTitle(getters.root, state.catalogTitle),
 
       isCollection: state => state.data?.isCollection() || false,
       isCatalog: state => state.data?.isCatalog() || false,
@@ -111,14 +111,15 @@ function getStore(config) {
       getLink: (state, getters) => rel => {
         let link = state.data?.getLinkWithRel(rel);
         let stac = getters[rel];
+        let title = STAC.getDisplayTitle([stac, link]);
         if (link) {
           link = Object.assign({}, link);
-          link.title = stac?.getDisplayTitle() || link.title;
+          link.title = title;
         }
         else if (stac instanceof STAC) {
           return {
             href: stac.getAbsoluteUrl(),
-            title: stac.getDisplayTitle(),
+            title,
             rel
           };
         }
@@ -248,7 +249,9 @@ function getStore(config) {
               state.catalogTitle = value;
               break;
             case 'catalogUrl':
-              state.catalogUrl = Utils.toAbsolute(value, value); // This call is made to normalize the URL, e.g. append a missing /
+              if (typeof value === 'string') {
+                state.catalogUrl = Utils.toAbsolute(value, value); // This call is made to normalize the URL, e.g. append a missing /
+              }
               break;
             case 'stacProxyUrl':
               // Proxy URLs coming from CLI have the form https://thingtoproxy.com;http://proxy:111
@@ -300,11 +303,8 @@ function getStore(config) {
         if (title) {
           state.title = title;
         }
-        else if (stac instanceof STAC) {
-          state.title = stac.getDisplayTitle(STAC.DEFAULT_TITLE);
-        }
         else {
-          state.title = state.catalogTitle;
+          state.title = STAC.getDisplayTitle(stac, state.catalogTitle);
         }
       },
       errored(state, {url, error}) {
