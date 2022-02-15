@@ -1,6 +1,6 @@
 <template>
   <b-card no-body class="item-card" :class="{queued: !this.data}" v-bind="cardProps" v-b-visible.200="load">
-    <b-card-img v-if="thumbnail && showThumbnail" class="thumbnail" :src="thumbnail.href" :alt="thumbnail.title" crossorigin="anonymous" fluid></b-card-img>
+    <b-card-img v-if="thumbnail && showThumbnail" class="thumbnail" :src="thumbnail.href" :alt="thumbnail.title" :crossorigin="crossOriginMedia" fluid></b-card-img>
     <b-card-body>
       <b-card-title>
         <StacLink :link="[data, item]" class="stretched-link" />
@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 import StacLink from './StacLink.vue';
 import STAC from '../stac';
 
@@ -43,6 +43,7 @@ export default {
     }
   },
   computed: {
+    ...mapState(['crossOriginMedia']),
     ...mapGetters(['getStac']),
     cardProps() {
       let props = {};

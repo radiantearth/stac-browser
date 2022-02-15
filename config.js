@@ -11,5 +11,6 @@ module.exports = {
     stacLint: true,
     geoTiffResolution: 128,
     redirectLegacyUrls: false,
-    itemsPerPage: 12
+    itemsPerPage: 12,
+    crossOriginMedia: null
 };

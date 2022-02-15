@@ -1,18 +1,23 @@
 <template>
   <div class="previews">
     <a v-for="thumbnail in thumbnails" :key="thumbnail.href" :href="thumbnail.href">
-      <img class="thumbnail" :src="thumbnail.href" crossorigin="anonymous" />
+      <img class="thumbnail" :src="thumbnail.href" :crossorigin="crossOriginMedia" />
     </a>
   </div>
 </template>
 
 <script>
+import { mapState } from 'vuex';
+
 export default {
   name: 'Thumbnails',
   props: {
     thumbnails: {
       type: Array
     }
+  },
+  computed: {
+    ...mapState(['crossOriginMedia'])
   }
 }
 </script>
