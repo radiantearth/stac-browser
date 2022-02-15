@@ -4,7 +4,7 @@
       <Share class="float-right" :title="title" :stacUrl="url" :stacVersion="stacVersion" />
       <h1>{{ title }}</h1>
       <p class="lead" v-if="url || isSearchPage()">
-        <span class="in mr-3" v-if="containerLink">in <StacLink :link="containerLink" /></span>
+        <span class="in mr-3" v-if="containerLink">in <StacLink :data="containerLink" /></span>
         <b-button-group>
           <b-button v-if="parentLink" :to="toBrowserPath(parentLink.href)" :title="parentLink.title" variant="outline-primary" size="sm"><b-icon-arrow-90deg-up /> Go to Parent</b-button>
           <b-button v-if="collectionLink" :to="toBrowserPath(collectionLink.href)" :title="collectionLink.title" variant="outline-primary" size="sm"><b-icon-folder-symlink /> Go to Collection</b-button>
@@ -20,6 +20,7 @@
 import { mapState, mapGetters } from 'vuex';
 import StacLink from './StacLink.vue';
 import { BIconArrow90degUp, BIconBook, BIconFolderSymlink, BIconSearch } from "bootstrap-vue";
+import STAC from '../stac';
 import Utils from '../utils';
 
 export default {
@@ -62,7 +63,7 @@ export default {
           return {
             href: this.root.getAbsoluteUrl(),
             rel: 'root',
-            title: this.root.getDisplayTitle()
+            title: STAC.getDisplayTitle(this.root)
           };
         }
       }

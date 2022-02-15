@@ -1,9 +1,9 @@
 <template>
   <b-card no-body class="item-card" :class="{queued: !this.data}" v-bind="cardProps" v-b-visible.200="load">
-    <b-card-img v-if="thumbnail && showThumbnail" class="thumbnail" :src="thumbnail.href" :alt="thumbnail.title" crossorigin="anonymous" fluid></b-card-img>
+    <b-card-img v-if="thumbnail && showThumbnail" class="thumbnail" :src="thumbnail.href" :alt="thumbnail.title" :crossorigin="crossOriginMedia" fluid></b-card-img>
     <b-card-body>
       <b-card-title>
-        <StacLink :link="item" :title="title" class="stretched-link" />
+        <StacLink :data="[data, item]" class="stretched-link" />
       </b-card-title>
       <b-card-text><small class="text-muted">
         <template v-if="extent">{{ extent | TemporalExtent }}</template>
@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 import StacLink from './StacLink.vue';
 import STAC from '../stac';
 
@@ -43,6 +43,7 @@ export default {
     }
   },
   computed: {
+    ...mapState(['crossOriginMedia']),
     ...mapGetters(['getStac']),
     cardProps() {
       let props = {};
@@ -70,12 +71,6 @@ export default {
         href: null,
         title: ''
       };
-    },
-    title() {
-      if (this.data) {
-        return this.data.properties.title || this.data.id;
-      }
-      return null;
     },
     extent() {
       if (this.data && (this.data.properties.start_datetime || this.data.properties.end_datetime)) {

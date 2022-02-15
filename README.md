@@ -109,6 +109,10 @@ If you are updating from on old version of STAC Browser, you can set this option
 
 The number of items requested and shown per page by default. Only applies to APIs that support the `limit` query parameter.
 
+### crossOriginMedia
+
+The value for the [`crossorigin` attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/crossorigin) that is sent when loading images through the browser. Default to `null`. If you encounter issues with loading images, you may want to try setting this to `anonymous`.
+
 ## Theming
 
 You can customize STAC Browser in the `src/theme` folder. It contains Sass files (a CSS preprocessor), which you can change to suit your needs.

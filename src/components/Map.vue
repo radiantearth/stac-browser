@@ -70,7 +70,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(['geoTiffResolution', 'tileSourceTemplate', 'buildTileUrlTemplate', 'useTileLayerAsFallback']),
+    ...mapState(['buildTileUrlTemplate', 'crossOriginMedia', 'geoTiffResolution', 'tileSourceTemplate', 'useTileLayerAsFallback']),
     baseMaps() {
       let targets = [];
       if (this.stac.isCollection() && Utils.isObject(this.stac.summaries) && Array.isArray(this.stac.summaries['ssys:targets'])) {
@@ -137,7 +137,8 @@ export default {
           resolution: this.geoTiffResolution,
           useTileLayerAsFallback: this.useTileLayerAsFallback,
           tileUrlTemplate: this.tileSourceTemplate,
-          buildTileUrlTemplate: this.buildTileUrlTemplate
+          buildTileUrlTemplate: this.buildTileUrlTemplate,
+          crossOrigin: this.crossOriginMedia
         };
         if (this.stac instanceof STAC) {
           options.baseUrl = this.stac.getAbsoluteUrl();

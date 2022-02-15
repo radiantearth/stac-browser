@@ -137,16 +137,7 @@ export default {
       if (this.pagination) {
         return 'more pages available for Collection';
       }
-      else if (this.stac instanceof STAC) {
-        let title = this.stac.getDisplayTitle();
-        if (title) {
-          return title;
-        }
-      }
-      if (this.link) {
-        return this.item.title || Utils.titleForHref(this.item.href);
-      }
-      return STAC.DEFAULT_TITLE;
+      return STAC.getDisplayTitle([this.item, this.stac]);
     },
     childs() {
       if (!this.stac) {
