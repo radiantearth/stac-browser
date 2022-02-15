@@ -93,21 +93,6 @@ class STAC {
         return null;
     }
 
-    getDisplayTitle(defaultTitle = null) {
-        if (this.isItem() && Utils.hasText(this.properties.title)) {
-            return this.properties.title;
-        }
-        else if (Utils.hasText(this.title)) {
-            return this.title;
-        }
-        else if (Utils.hasText(this.id)) {
-            return this.id;
-        }
-        else {
-            return defaultTitle;
-        }
-    }
-
     getBrowserPath() {
         return this._path;
     }
@@ -137,6 +122,51 @@ class STAC {
             }
         }
         return matches;
+    }
+
+	static getDisplayTitle(sources, fallbackTitle = null) {
+        if (!Array.isArray(sources)) {
+            sources = [sources];
+        }
+		let stac = sources.find(o => o instanceof STAC);
+        let link = sources.find(o => Utils.isObject(o) && !(o instanceof STAC));
+		// Get title from STAC item/catalog/collection
+		if (stac && Utils.hasText(stac.getTitle())) {
+			return stac.getTitle();
+		}
+		// Get title from link
+		else if (link && Utils.hasText(link.title)) {
+			return link.title;
+		}
+		// Use id from STAC item/catalog/collection instead of titles
+		else if (stac && Utils.hasText(stac.id)) {
+			return stac.id;
+		}
+		// Use fallback title
+		else if (Utils.hasText(fallbackTitle)) {
+			return fallbackTitle;
+		}
+		// Use file or directory name from STAC as title
+		else if (stac) {
+			return Utils.titleForHref(stac.getAbsoluteUrl(), true);
+		}
+		// Use file or directory name from link as title
+		else if (link && Utils.hasText(link.href)) {
+			return Utils.titleForHref(link.href, true);
+		}
+		// Nothing available, return "untitled"
+		else {
+			return "Untitled";
+		}
+	}
+
+    getTitle() {
+        if (this.isItem()) {
+			return this.properties.title;
+		}
+		else {
+			return this.title;
+		}
     }
 
     /**
@@ -178,7 +208,5 @@ class STAC {
     }
 
 }
-
-STAC.DEFAULT_TITLE = 'Untitled';
 
 export default STAC;

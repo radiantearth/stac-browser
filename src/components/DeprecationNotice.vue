@@ -3,8 +3,8 @@
 		<strong>Deprecated</strong>&nbsp;
 		<small>Please note that this {{ type }} is deprecated with the potential to be removed in any of the next versions. It should be transitioned out of usage as soon as possible. Refrain from using it in new projects.</small>
 		<ul v-if="latestLink || successorLink">
-			<li v-if="latestLink"><small><StacLink :link="latestLink" fallbackTitle="Go to latest version" /></small></li>
-			<li v-if="successorLink"><small><StacLink :link="successorLink" fallbackTitle="Go to successor version" /></small></li>
+			<li v-if="latestLink"><small><StacLink :data="latestLink" fallbackTitle="Go to latest version" /></small></li>
+			<li v-if="successorLink"><small><StacLink :data="successorLink" fallbackTitle="Go to successor version" /></small></li>
 		</ul>
 	</b-alert>
 </template>

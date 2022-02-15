@@ -188,19 +188,19 @@ export default class Utils {
 		return newLink;
 	}
 
-	static titleForHref(href) {
+	static titleForHref(href, preferFileName = false) {
 		let uri = URI(href);
 		let auth = uri.authority();
 		let file = uri.filename().replace(/^(.{1,})\.\w+$/, '$1');
 		let dir = uri.directory().replace(/^\//, '');
-		if (auth && file) {
+		if (auth && file && !preferFileName) {
 			return `${file} at ${auth}`;
-		}
-		else if (auth) {
-			return auth;
 		}
 		else if (file && !commonFileNames.includes(file)) {
 			return file;
+		}
+		else if (auth) {
+			return auth;
 		}
 		else if (dir) {
 			return dir;

@@ -3,7 +3,7 @@
     <b-card-img v-if="thumbnail && showThumbnail" class="thumbnail" :src="thumbnail.href" :alt="thumbnail.title" :crossorigin="crossOriginMedia" fluid></b-card-img>
     <b-card-body>
       <b-card-title>
-        <StacLink :link="item" :title="title" class="stretched-link" />
+        <StacLink :link="[data, item]" class="stretched-link" />
       </b-card-title>
       <b-card-text><small class="text-muted">
         <template v-if="extent">{{ extent | TemporalExtent }}</template>
@@ -71,12 +71,6 @@ export default {
         href: null,
         title: ''
       };
-    },
-    title() {
-      if (this.data) {
-        return this.data.properties.title || this.data.id;
-      }
-      return null;
     },
     extent() {
       if (this.data && (this.data.properties.start_datetime || this.data.properties.end_datetime)) {
