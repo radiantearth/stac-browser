@@ -1,6 +1,6 @@
 <template>
   <b-card no-body class="catalog-card" :class="{queued: !this.data}" v-b-visible.200="load">
-    <b-card-img v-if="thumbnail && showThumbnail" class="thumbnail" :src="thumbnail.href" :alt="thumbnail.title" crossorigin="anonymous" fluid></b-card-img>
+    <b-card-img v-if="thumbnail && showThumbnail" class="thumbnail" :src="thumbnail.href" :alt="thumbnail.title" :crossorigin="crossOriginMedia" fluid></b-card-img>
     <b-card-body>
       <b-card-title>
         <StacLink :link="catalog" :title="title" class="stretched-link" />
@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 import StacLink from './StacLink.vue';
 import STAC from '../stac';
 import removeMd from 'remove-markdown';
@@ -47,6 +47,7 @@ export default {
     }
   },
   computed: {
+    ...mapState(['crossOriginMedia']),
     ...mapGetters(['getStac']),
     data() {
       if (this.catalog instanceof STAC) {
