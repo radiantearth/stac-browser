@@ -3,7 +3,7 @@
     <b-card-img v-if="thumbnail && showThumbnail" class="thumbnail" :src="thumbnail.href" :alt="thumbnail.title" :crossorigin="crossOriginMedia" fluid></b-card-img>
     <b-card-body>
       <b-card-title>
-        <StacLink :link="[data, item]" class="stretched-link" />
+        <StacLink :data="[data, item]" class="stretched-link" />
       </b-card-title>
       <b-card-text><small class="text-muted">
         <template v-if="extent">{{ extent | TemporalExtent }}</template>
