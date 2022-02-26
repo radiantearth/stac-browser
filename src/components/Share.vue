@@ -4,15 +4,20 @@
             <b-button :disabled="!stacUrl" size="sm" variant="outline-primary" id="popover-link"><b-icon-link /></b-button>
             <b-button size="sm" variant="outline-primary" id="popover-share"><b-icon-share /></b-button>
         </b-button-group>
-        <b-popover v-show="stacUrl" target="popover-link" triggers="click blur" placement="bottom" container="stac-browser" title="Source Data">
+        <b-popover v-show="stacUrl" target="popover-link" triggers="click blur" placement="bottom" container="stac-browser" title="Source Data" @show="validate">
             <template v-if="stacVersion">
                 <b-row>
                     <b-col cols="2">STAC Version:</b-col>
                     <b-col>{{ stacVersion }}</b-col>
                 </b-row>
-                <b-row v-if="stacLint">
+                <b-row v-if="canValidate">
                     <b-col cols="2">Valid:</b-col>
-                    <b-col><Valid :stacUrl="stacUrl" /></b-col>
+                    <b-col>
+                        <b-spinner v-if="valid === null" label="Validating..." small></b-spinner>
+                        <template v-else-if="valid === true">✔️</template>
+                        <template v-else-if="valid === false">❌</template><!-- ToDo: Link to staclint -->
+                        <template v-else>n/a</template>
+                    </b-col>
                 </b-row>
                 <hr />
             </template>
@@ -32,7 +37,9 @@ import { BIconEnvelope, BIconLink, BIconShare, BIconTwitter, BPopover } from 'bo
 import { mapState } from 'vuex';
 
 import Url from './Url.vue';
-import Valid from './Valid.vue';
+
+import URI from 'urijs';
+import Utils from '../utils';
 
 export default {
     name: "Share",
@@ -42,8 +49,7 @@ export default {
         BIconShare,
         BIconTwitter,
         BPopover,
-        Url,
-        Valid
+        Url
     },
     props: {
         title: {
@@ -60,7 +66,27 @@ export default {
         }
     },
     computed: {
-        ...mapState(['stacLint']),
+        ...mapState(['privateQueryParameters', 'stacLint', 'stacProxyUrl', 'valid']),
+        canValidate() {
+            if (!this.stacLint || typeof this.stacUrl !== 'string') {
+                return false;
+            }
+            else if (Utils.size(this.privateQueryParameters) > 0) {
+                // Don't expose private query parameters to externals
+                return false;
+            }
+            else if (Array.isArray(this.stacProxyUrl)) {
+                // Don't validate if a proxy has been set
+                return false;
+            }
+            let uri = new URI(this.stacUrl);
+            let host = uri.hostname().toLowerCase();
+            if (host === 'localhost' || host.startsWith('127.') || host === '::1') {
+                // Can't validate localhost
+                return false;
+            }
+            return true;
+        },
         message() {
             return `${this.title} is available at ${this.browserUrl()}`;
         },
@@ -75,6 +101,9 @@ export default {
         }
     },
     methods: {
+        async validate() {
+            await this.$store.dispatch('validate', this.stacUrl);
+        },
         browserUrl() {
             return window.location.toString();
         }

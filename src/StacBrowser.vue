@@ -43,6 +43,8 @@ import ErrorAlert from './components/ErrorAlert.vue';
 import Sidebar from './components/Sidebar.vue';
 import StacHeader from './components/StacHeader.vue';
 
+import Utils from './utils';
+
 const CONFIG_FILE = require(CONFIG_PATH);
 
 Vue.use(Clipboard);
@@ -92,10 +94,6 @@ for(let key in CONFIG) {
       this.$store.commit('config', {
         [key]: newValue
       });
-      if (key === 'catalogUrl' && newValue) {
-        // Load the root catalog data if not available (e.g. after page refresh or external access)
-        this.$store.dispatch("load", { url: newValue });
-      }
     }
   };
 }
@@ -130,6 +128,25 @@ export default {
     }
   },
   created() {
+    this.$router.onReady(() => {
+      // Get and store all private query parameters and replace them in the shown URI
+      let query = Object.assign({}, this.$route.query);
+      let privateParams = {};
+      for(let key in query) {
+        if (key.startsWith('~')) {
+          privateParams[key.substr(1)] = query[key];
+          delete query[key];
+        }
+      }
+      if (Utils.size(privateParams) > 0) {
+        this.$store.commit("privateQueryParameters", privateParams);
+        this.$router.replace({
+          ...this.$route,
+          query
+        });
+      }
+    });
+
     // Load the root catalog data if not available (e.g. after page refresh or external access)
     if (this.catalogUrl) {
       this.$store.dispatch("load", { url: this.catalogUrl, loadApi: true });

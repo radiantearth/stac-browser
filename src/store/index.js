@@ -4,17 +4,10 @@ import axios from "axios";
 import Utils from '../utils'
 import STAC from '../stac';
 import bs58 from 'bs58';
+import { Loading, stacRequest } from './utils';
+import URI from "urijs";
 
 Vue.use(Vuex);
-
-class Loading {
-  
-  constructor(show = false, loadApi = false) {
-    this.show = Boolean(show);
-    this.loadApi = Boolean(loadApi);
-  }
-
-}
 
 function getStore(config) {
   // Local settings (e.g. for currently loaded STAC entity)
@@ -46,6 +39,7 @@ function getStore(config) {
     state: Object.assign({}, config, localDefaults(), catalogDefaults(), {
       // Global settings
       allowSelectCatalog: !config.catalogUrl,
+      privateQueryParameters: {},
       stacIndex: [],
       supportedRelTypes: [ // These will be handled in a special way and will not be shown in the link lists
         'child',
@@ -182,19 +176,19 @@ function getStore(config) {
       thumbnails: state => state.data ? state.data.getThumbnails() : [],
       additionalLinks: state => state.data ? state.data.getLinksWithOtherRels(state.supportedRelTypes) : [],
 
-      toBrowserPath: state => url => {
+      toBrowserPath: (state, getters) => url => {
         // ToDo: proxy support
         if (!Utils.hasText(url)) {
           url = '/';
         }
 
-        let absolute = Utils.toAbsolute(url, state.url, false);
+        let absolute = Utils.toAbsolute(getters.unproxyUrl(url), state.url, false);
         let relative;
         if (!state.allowSelectCatalog && state.catalogUrl) {
           relative = absolute.relativeTo(state.catalogUrl);
         }
 
-        if (!relative || relative === absolute) { // This is an external URL
+        if (typeof relative === 'undefined' || getters.isExternalUrl(absolute)) {
           if (!state.allowExternalAccess) {
             return absolute.toString();
           }
@@ -208,7 +202,7 @@ function getStore(config) {
           return parts.join('/');
         }
         else {
-          return '/' + relative.toString();
+          return '/' + relative;
         }
       },
       fromBrowserPath: (state, getters) => url => {
@@ -227,17 +221,40 @@ function getStore(config) {
           url = `${protocol}//${parts.join('/')}`;
         }
         else if (!state.allowSelectCatalog && state.catalogUrl) {
-          url = Utils.toAbsolute(url, state.catalogUrl);
+          url = Utils.toAbsolute(url, state.catalogUrl, false);
         }
-        return getters.getProxiedUrl(url);
+        return getters.getRequestUrl(url);
       },
-
-      getProxiedUrl: state => absoluteUrl => {
-        // If we are proxying a STAC Catalog, replace any URI with the proxied address.
-        if (Array.isArray(state.stacProxyUrl)) {
+      unproxyUrl: state => absoluteUrl => {
+        if (absoluteUrl instanceof URI) {
+          absoluteUrl = absoluteUrl.toString();
+        }
+        if (typeof absoluteUrl === 'string' && Array.isArray(state.stacProxyUrl)) {
+          return absoluteUrl.replace(state.stacProxyUrl[1], state.stacProxyUrl[0]);
+        }
+        return absoluteUrl;
+      },
+      proxyUrl: state => absoluteUrl => {
+        if (absoluteUrl instanceof URI) {
+          absoluteUrl = absoluteUrl.toString();
+        }
+        if (typeof absoluteUrl === 'string' && Array.isArray(state.stacProxyUrl)) {
           return absoluteUrl.replace(state.stacProxyUrl[0], state.stacProxyUrl[1]);
         }
         return absoluteUrl;
+      },
+      isExternalUrl: (state) => absoluteUrl => {
+        return absoluteUrl.relativeTo(state.catalogUrl) === absoluteUrl;
+      },
+      getRequestUrl: (state, getters) => (url, baseUrl = null) => {
+        let absoluteUrl = Utils.toAbsolute(getters.proxyUrl(url), baseUrl ? baseUrl : state.url, false);
+        // Add private query parameters to the URL
+        // Check whether private params are present and add them if the URL is part of the catalog
+        if (Utils.size(state.privateQueryParameters) > 0 && !getters.isExternalUrl(absoluteUrl)) {
+          absoluteUrl.addSearch(state.privateQueryParameters);
+        }
+        // If we are proxying a STAC Catalog, replace any URI with the proxied address.
+        return absoluteUrl.toString();
       }
     },
     mutations: {
@@ -266,6 +283,9 @@ function getStore(config) {
               state[key] = value;
           }
         }
+      },
+      privateQueryParameters(state, params) {
+        state.privateQueryParameters = params;
       },
       stacIndex(state, index) {
         state.stacIndex = Object.freeze(index);
@@ -476,7 +496,7 @@ function getStore(config) {
         else if (!data) {
           cx.commit('loading', {url, loading});
           try {
-            let response = await axios.get(url);
+            let response = await stacRequest(cx, url);
             if (!Utils.isObject(response.data)) {
               throw new Error('The response is not a valid STAC entity');
             }
@@ -542,8 +562,7 @@ function getStore(config) {
         cx.commit('setApiItemsFilter', filters);
         link = Utils.addFiltersToLink(link, filters);
 
-        let request = Utils.stacLinkToAxiosRequest(link);
-        let response = await axios(request);
+        let response = await stacRequest(cx, link);
         if (!Utils.isObject(response.data) || !Array.isArray(response.data.features)) {
           throw new Error('The API response is not a valid list of STAC Items');
         }
@@ -578,7 +597,7 @@ function getStore(config) {
         if (!link) {
           return;
         }
-        let response = await axios(Utils.stacLinkToAxiosRequest(link));
+        let response = await stacRequest(cx, link);
         if (!Utils.isObject(response.data) || !Array.isArray(response.data.collections)) {
           throw new Error('The API response is not a valid list of STAC Collections');
         }
@@ -596,7 +615,9 @@ function getStore(config) {
           return;
         }
         try {
-          let response = await axios.get(`https://api.staclint.com/url?stac_url=${url}`);
+          let uri = new URI('https://api.staclint.com/url');
+          uri.addSearch('stac_url', url);
+          let response = await axios.get(uri.toString());
           cx.commit('valid', Boolean(response.data?.body?.valid_stac));
         } catch (error) {
           cx.commit('valid', error);
