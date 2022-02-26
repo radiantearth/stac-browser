@@ -72,6 +72,7 @@ export default {
         case 'latest-version': // version extension v
         case 'predecessor-version':
         case 'successor-version':
+        case 'source': // label extension
         case 'first': // Pagination v
         case 'prev':
         case 'previous':
