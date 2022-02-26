@@ -128,24 +128,8 @@ export default {
     }
   },
   created() {
-    this.$router.onReady(() => {
-      // Get and store all private query parameters and replace them in the shown URI
-      let query = Object.assign({}, this.$route.query);
-      let privateParams = {};
-      for(let key in query) {
-        if (key.startsWith('~')) {
-          privateParams[key.substr(1)] = query[key];
-          delete query[key];
-        }
-      }
-      if (Utils.size(privateParams) > 0) {
-        this.$store.commit("privateQueryParameters", privateParams);
-        this.$router.replace({
-          ...this.$route,
-          query
-        });
-      }
-    });
+    this.$router.onReady(() => this.parseQuery(this.$route, true));
+    this.$router.afterEach(to => this.parseQuery(to));
 
     // Load the root catalog data if not available (e.g. after page refresh or external access)
     if (this.catalogUrl) {
@@ -165,6 +149,37 @@ export default {
     }
   },
   methods: {
+    parseQuery(route, parsePrivate = false) {
+      let query = Object.assign({}, route.query);
+      let params = {};
+      for(let key in query) {
+        // Store all private query parameters (start with ~) and replace them in the shown URI
+        if (parsePrivate && key.startsWith('~')) {
+          params.private = Utils.isObject(params.private) ? params.private : {};
+          params.private[key.substr(1)] = query[key];
+          delete query[key];
+        }
+        // Store all state related parameters (start with .)
+        else if (key.startsWith('.')) {
+          params.state = Utils.isObject(params.state) ? params.state : {};
+          params.state[key.substr(1)] = query[key];
+        }
+        // All other parameters should be appended to the catalog requests
+        else {
+          params.catalog = Utils.isObject(params.catalog) ? params.catalog : {};
+          params.catalog[key] = query[key];
+        }
+      }
+      if (Utils.size(params) > 0) {
+        this.$store.commit("queryParameters", params);
+      }
+      if (Utils.size(params.private) > 0) {
+        this.$router.replace({
+          ...route,
+          query
+        });
+      }
+    },
     showError(error, message) {
       this.$store.commit('showGlobalError', {
         error, 

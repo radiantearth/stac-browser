@@ -40,6 +40,8 @@ function getStore(config) {
       // Global settings
       allowSelectCatalog: !config.catalogUrl,
       privateQueryParameters: {},
+      stateQueryParameters: {},
+      catalogQueryParameters: {},
       stacIndex: [],
       supportedRelTypes: [ // These will be handled in a special way and will not be shown in the link lists
         'child',
@@ -148,7 +150,9 @@ function getStore(config) {
           return state.apiItems;
         }
         else if (state.data) {
-          return state.data.getLinksWithRels(['item']);
+          let allowedMediaTypes = ['application/json', 'text/json', 'application/geo+json'];
+          return state.data.getLinksWithRels(['item'])
+            .filter(link => typeof link.type !== 'string' || allowedMediaTypes.includes(link.type.toLowerCase())); // Don't add non-JSON links
         }
         return [];
       },
@@ -158,9 +162,14 @@ function getStore(config) {
           catalogs = catalogs.concat(state.apiCollections);
         }
         if (state.data) {
-          // Don't add links that are already in collections: https://github.com/radiantearth/stac-browser/issues/103
-          // ToDo: The runtime of this can probably be improved
+          let allowedMediaTypes = ['application/json', 'text/json'];
           let links = state.data.getLinksWithRels(['child']).filter(link => {
+            // Don't add non-JSON links
+            if (typeof link.type === 'string' && !allowedMediaTypes.includes(link.type.toLowerCase())) {
+              return false;
+            }
+            // Don't add links that are already in collections: https://github.com/radiantearth/stac-browser/issues/103
+            // ToDo: The runtime of this can probably be improved
             let absoluteUrl = Utils.toAbsolute(link.href, state.url);
             return !state.apiCollections.find(collection => collection.getAbsoluteUrl() === absoluteUrl);
           });
@@ -223,7 +232,7 @@ function getStore(config) {
         else if (!state.allowSelectCatalog && state.catalogUrl) {
           url = Utils.toAbsolute(url, state.catalogUrl, false);
         }
-        return getters.getRequestUrl(url);
+        return getters.getRequestUrl(url, null, true);
       },
       unproxyUrl: state => absoluteUrl => {
         if (absoluteUrl instanceof URI) {
@@ -243,15 +252,23 @@ function getStore(config) {
         }
         return absoluteUrl;
       },
-      isExternalUrl: (state) => absoluteUrl => {
+      isExternalUrl: state => absoluteUrl => {
+        if (!state.catalogUrl) {
+          return false;
+        }
         return absoluteUrl.relativeTo(state.catalogUrl) === absoluteUrl;
       },
-      getRequestUrl: (state, getters) => (url, baseUrl = null) => {
+      getRequestUrl: (state, getters) => (url, baseUrl = null, addCatalogParams = false) => {
         let absoluteUrl = Utils.toAbsolute(getters.proxyUrl(url), baseUrl ? baseUrl : state.url, false);
-        // Add private query parameters to the URL
-        // Check whether private params are present and add them if the URL is part of the catalog
-        if (Utils.size(state.privateQueryParameters) > 0 && !getters.isExternalUrl(absoluteUrl)) {
-          absoluteUrl.addSearch(state.privateQueryParameters);
+        if (!getters.isExternalUrl(absoluteUrl)) {
+          // Check whether private params are present and add them if the URL is part of the catalog
+          if (Utils.size(state.privateQueryParameters) > 0) {
+            absoluteUrl.addSearch(state.privateQueryParameters);
+          }
+          // Check if we need to add catalog params
+          if (addCatalogParams && Utils.size(state.catalogQueryParameters) > 0) {
+            absoluteUrl.addSearch(state.catalogQueryParameters);
+          }
         }
         // If we are proxying a STAC Catalog, replace any URI with the proxied address.
         return absoluteUrl.toString();
@@ -284,8 +301,10 @@ function getStore(config) {
           }
         }
       },
-      privateQueryParameters(state, params) {
-        state.privateQueryParameters = params;
+      queryParameters(state, params) {
+        for(let key in params) {
+          state[`${key}QueryParameters`] = params[key];
+        }
       },
       stacIndex(state, index) {
         state.stacIndex = Object.freeze(index);
@@ -418,7 +437,7 @@ function getStore(config) {
         state.parents = parents;
       },
       showGlobalError(state, error) {
-        console.log(error);
+        console.error(error);
         state.globalError = error;
       }
     },
@@ -498,7 +517,7 @@ function getStore(config) {
           try {
             let response = await stacRequest(cx, url);
             if (!Utils.isObject(response.data)) {
-              throw new Error('The response is not a valid STAC entity');
+              throw new Error('The response is not a valid STAC JSON');
             }
             data = new STAC(response.data, url, path);
             cx.commit('loaded', {url, data});
@@ -510,6 +529,7 @@ function getStore(config) {
               }
             }
           } catch (error) {
+            console.error(error);
             cx.commit('errored', {url, error});
 
             // Redirect legacy URLs
