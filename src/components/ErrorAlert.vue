@@ -9,6 +9,10 @@
       <dt>Reasoning:</dt>
       <dd>{{ description }}</dd>
     </dl>
+    <dl class="id" v-if="id">
+      <dt>Error code:</dt>
+      <dd><code>{{ id }}</code></dd>
+    </dl>
     <dl class="url" v-if="url">
       <dt>Requested URL:</dt>
       <dd><code>{{ url }}</code></dd>
@@ -33,6 +37,13 @@ export default {
         Object,
         Error
       ]
+    },
+    id: {
+      type: [
+        String,
+        Number
+      ],
+      default: null
     },
     url: {
       type: String,
