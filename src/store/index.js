@@ -525,7 +525,7 @@ function getStore(config) {
             if (!cx.getters.root) {
               let root = data.getLinkWithRel('root');
               if (root) {
-                cx.commit('config', { catalogUrl: root.href });
+                cx.commit('config', { catalogUrl: Utils.toAbsolute(root.href, url) });
               }
             }
           } catch (error) {
