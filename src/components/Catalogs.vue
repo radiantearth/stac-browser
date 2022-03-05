@@ -3,7 +3,7 @@
     <h2>
       Catalogs
       <template v-if="!hasMore">({{ catalogs.length }})</template>
-      <SortButtons class="ml-4" v-model="sort" />
+      <SortButtons v-if="!hasMore" class="ml-4" v-model="sort" />
     </h2>
     <b-card-group columns>
       <Catalog v-for="catalog in sortedCatalogs" :catalog="catalog" :key="catalog.href" />
@@ -14,6 +14,7 @@
 
 <script>
 import Catalog from './Catalog.vue';
+import STAC from '../stac';
 
 export default {
   name: "Catalogs",
@@ -39,9 +40,9 @@ export default {
   computed: {
     sortedCatalogs() {
       let catalogs = this.catalogs;
-      if (this.sort !== 0) {
+      if (!this.hasMore && this.sort !== 0) {
         catalogs = catalogs.slice(0).sort((a,b) => {
-          return (a.title || a.id || "").localeCompare((b.title || b.id || ""));
+          return STAC.getDisplayTitle(a).localeCompare(STAC.getDisplayTitle(b));
         });
         if (this.sort === -1) {
           catalogs = catalogs.reverse();
