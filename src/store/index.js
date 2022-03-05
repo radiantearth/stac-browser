@@ -4,17 +4,10 @@ import axios from "axios";
 import Utils from '../utils'
 import STAC from '../stac';
 import bs58 from 'bs58';
+import { Loading, stacRequest } from './utils';
+import URI from "urijs";
 
 Vue.use(Vuex);
-
-class Loading {
-  
-  constructor(show = false, loadApi = false) {
-    this.show = Boolean(show);
-    this.loadApi = Boolean(loadApi);
-  }
-
-}
 
 function getStore(config) {
   // Local settings (e.g. for currently loaded STAC entity)
@@ -25,6 +18,7 @@ function getStore(config) {
     valid: null,
     parents: null,
     globalError: null,
+    stateQueryParameters: {},
 
     apiItems: [],
     apiItemsLink: null,
@@ -36,6 +30,8 @@ function getStore(config) {
     database: {}, // STAC object, Error object or Loading object or Promise (when loading)
     queue: [],
     redirectUrl: null,
+    catalogQueryParameters: {},
+    privateQueryParameters: {},
 
     apiCollections: [],
     nextCollectionsLink: null
@@ -139,6 +135,17 @@ function getStore(config) {
         return links.find(link => Utils.isStacMediaType(link.type, true) && link.method !== 'POST');
       },
       supportsSearch: (state, getters) => Boolean(getters.searchLink),
+      supportsConformance: (state, getters) => conformanceClass => {
+        let conformance = [];
+        if (getters.root && Array.isArray(getters.root.conformsTo)) {
+          conformance = getters.root.conformsTo;
+        }
+        else if (state.data instanceof STAC && Array.isArray(state.data.conformsTo)) {
+          conformance = state.data.conformsTo;
+        }
+        let regexp = new RegExp(conformanceClass.replace('*', '[^/]+').replace(/\/?#/, '/?#'));
+        return !!conformance.find(uri => uri.match(regexp));
+      },
 
       tileRendererType: state => {
         if ((state.tileSourceTemplate || state.buildTileUrlTemplate) && !state.useTileLayerAsFallback) {
@@ -154,7 +161,9 @@ function getStore(config) {
           return state.apiItems;
         }
         else if (state.data) {
-          return state.data.getLinksWithRels(['item']);
+          let allowedMediaTypes = ['application/json', 'text/json', 'application/geo+json'];
+          return state.data.getLinksWithRels(['item'])
+            .filter(link => typeof link.type !== 'string' || allowedMediaTypes.includes(link.type.toLowerCase())); // Don't add non-JSON links
         }
         return [];
       },
@@ -164,9 +173,14 @@ function getStore(config) {
           catalogs = catalogs.concat(state.apiCollections);
         }
         if (state.data) {
-          // Don't add links that are already in collections: https://github.com/radiantearth/stac-browser/issues/103
-          // ToDo: The runtime of this can probably be improved
+          let allowedMediaTypes = ['application/json', 'text/json'];
           let links = state.data.getLinksWithRels(['child']).filter(link => {
+            // Don't add non-JSON links
+            if (typeof link.type === 'string' && !allowedMediaTypes.includes(link.type.toLowerCase())) {
+              return false;
+            }
+            // Don't add links that are already in collections: https://github.com/radiantearth/stac-browser/issues/103
+            // ToDo: The runtime of this can probably be improved
             let absoluteUrl = Utils.toAbsolute(link.href, state.url);
             return !state.apiCollections.find(collection => collection.getAbsoluteUrl() === absoluteUrl);
           });
@@ -182,19 +196,19 @@ function getStore(config) {
       thumbnails: state => state.data ? state.data.getThumbnails() : [],
       additionalLinks: state => state.data ? state.data.getLinksWithOtherRels(state.supportedRelTypes) : [],
 
-      toBrowserPath: state => url => {
+      toBrowserPath: (state, getters) => url => {
         // ToDo: proxy support
         if (!Utils.hasText(url)) {
           url = '/';
         }
 
-        let absolute = Utils.toAbsolute(url, state.url, false);
+        let absolute = Utils.toAbsolute(getters.unproxyUrl(url), state.url, false);
         let relative;
         if (!state.allowSelectCatalog && state.catalogUrl) {
           relative = absolute.relativeTo(state.catalogUrl);
         }
 
-        if (!relative || relative === absolute) { // This is an external URL
+        if (typeof relative === 'undefined' || getters.isExternalUrl(absolute)) {
           if (!state.allowExternalAccess) {
             return absolute.toString();
           }
@@ -205,10 +219,15 @@ function getStore(config) {
           }
           parts.push(absolute.authority());
           parts.push(absolute.path().replace(/^\//, ''));
-          return parts.join('/');
+          let path = parts.join('/');
+          let q = absolute.query();
+          if (q) {
+            path += `?${q}`;
+          }
+          return path;
         }
         else {
-          return '/' + relative.toString();
+          return '/' + relative;
         }
       },
       fromBrowserPath: (state, getters) => url => {
@@ -227,17 +246,48 @@ function getStore(config) {
           url = `${protocol}//${parts.join('/')}`;
         }
         else if (!state.allowSelectCatalog && state.catalogUrl) {
-          url = Utils.toAbsolute(url, state.catalogUrl);
+          url = Utils.toAbsolute(url, state.catalogUrl, false);
         }
-        return getters.getProxiedUrl(url);
+        return getters.getRequestUrl(url);
       },
-
-      getProxiedUrl: state => absoluteUrl => {
-        // If we are proxying a STAC Catalog, replace any URI with the proxied address.
-        if (Array.isArray(state.stacProxyUrl)) {
+      unproxyUrl: state => absoluteUrl => {
+        if (absoluteUrl instanceof URI) {
+          absoluteUrl = absoluteUrl.toString();
+        }
+        if (typeof absoluteUrl === 'string' && Array.isArray(state.stacProxyUrl)) {
+          return absoluteUrl.replace(state.stacProxyUrl[1], state.stacProxyUrl[0]);
+        }
+        return absoluteUrl;
+      },
+      proxyUrl: state => absoluteUrl => {
+        if (absoluteUrl instanceof URI) {
+          absoluteUrl = absoluteUrl.toString();
+        }
+        if (typeof absoluteUrl === 'string' && Array.isArray(state.stacProxyUrl)) {
           return absoluteUrl.replace(state.stacProxyUrl[0], state.stacProxyUrl[1]);
         }
         return absoluteUrl;
+      },
+      isExternalUrl: state => absoluteUrl => {
+        if (!state.catalogUrl) {
+          return false;
+        }
+        return absoluteUrl.relativeTo(state.catalogUrl) === absoluteUrl;
+      },
+      getRequestUrl: (state, getters) => (url, baseUrl = null, addCatalogParams = true) => {
+        let absoluteUrl = Utils.toAbsolute(getters.proxyUrl(url), baseUrl ? baseUrl : state.url, false);
+        if (!getters.isExternalUrl(absoluteUrl)) {
+          // Check whether private params are present and add them if the URL is part of the catalog
+          if (Utils.size(state.privateQueryParameters) > 0) {
+            absoluteUrl.addQuery(state.privateQueryParameters);
+          }
+          // Check if we need to add catalog params
+          if (addCatalogParams && Utils.size(state.catalogQueryParameters) > 0) {
+            absoluteUrl.addQuery(state.catalogQueryParameters);
+          }
+        }
+        // If we are proxying a STAC Catalog, replace any URI with the proxied address.
+        return absoluteUrl.toString();
       }
     },
     mutations: {
@@ -250,7 +300,10 @@ function getStore(config) {
               break;
             case 'catalogUrl':
               if (typeof value === 'string') {
-                state.catalogUrl = Utils.toAbsolute(value, value); // This call is made to normalize the URL, e.g. append a missing /
+                let url = new URI(value);
+                state.catalogQueryParameters = Object.assign({}, state.catalogQueryParameters, url.query(true));
+                url.query("");
+                state.catalogUrl = url.toString();
               }
               break;
             case 'stacProxyUrl':
@@ -265,6 +318,11 @@ function getStore(config) {
             default:
               state[key] = value;
           }
+        }
+      },
+      queryParameters(state, params) {
+        for(let key in params) {
+          state[`${key}QueryParameters`] = params[key];
         }
       },
       stacIndex(state, index) {
@@ -398,7 +456,7 @@ function getStore(config) {
         state.parents = parents;
       },
       showGlobalError(state, error) {
-        console.log(error);
+        console.error(error);
         state.globalError = error;
       }
     },
@@ -476,9 +534,9 @@ function getStore(config) {
         else if (!data) {
           cx.commit('loading', {url, loading});
           try {
-            let response = await axios.get(url);
+            let response = await stacRequest(cx, url);
             if (!Utils.isObject(response.data)) {
-              throw new Error('The response is not a valid STAC entity');
+              throw new Error('The response is not a valid STAC JSON');
             }
             data = new STAC(response.data, url, path);
             cx.commit('loaded', {url, data});
@@ -486,10 +544,11 @@ function getStore(config) {
             if (!cx.getters.root) {
               let root = data.getLinkWithRel('root');
               if (root) {
-                cx.commit('config', { catalogUrl: root.href });
+                cx.commit('config', { catalogUrl: Utils.toAbsolute(root.href, url) });
               }
             }
           } catch (error) {
+            console.error(error);
             cx.commit('errored', {url, error});
 
             // Redirect legacy URLs
@@ -542,8 +601,7 @@ function getStore(config) {
         cx.commit('setApiItemsFilter', filters);
         link = Utils.addFiltersToLink(link, filters);
 
-        let request = Utils.stacLinkToAxiosRequest(link);
-        let response = await axios(request);
+        let response = await stacRequest(cx, link);
         if (!Utils.isObject(response.data) || !Array.isArray(response.data.features)) {
           throw new Error('The API response is not a valid list of STAC Items');
         }
@@ -578,7 +636,7 @@ function getStore(config) {
         if (!link) {
           return;
         }
-        let response = await axios(Utils.stacLinkToAxiosRequest(link));
+        let response = await stacRequest(cx, link);
         if (!Utils.isObject(response.data) || !Array.isArray(response.data.collections)) {
           throw new Error('The API response is not a valid list of STAC Collections');
         }
@@ -596,7 +654,9 @@ function getStore(config) {
           return;
         }
         try {
-          let response = await axios.get(`https://api.staclint.com/url?stac_url=${url}`);
+          let uri = new URI('https://api.staclint.com/url');
+          uri.addSearch('stac_url', url);
+          let response = await axios.get(uri.toString());
           cx.commit('valid', Boolean(response.data?.body?.valid_stac));
         } catch (error) {
           cx.commit('valid', error);

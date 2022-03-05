@@ -6,7 +6,7 @@
     <b-alert v-else-if="!supportsSearch" variant="danger" show>Item Search (with 'GET') is not supported by the API.</b-alert>
     <b-row v-else>
       <b-col class="left">
-        <ItemFilter :stac="root" title="" :value="filters" @input="setFilters" />
+        <ItemFilter :stac="root" title="" :value="filters" :sort="canSort" @input="setFilters" />
       </b-col>
       <b-col class="right">
         <b-alert v-if="loading === null" variant="light" show>Please modify the search criteria.</b-alert>
@@ -35,7 +35,7 @@ export default {
   components: {
     ItemFilter: () => import('../components/ItemFilter.vue'),
     Items,
-    Map: () => import('../components/Map.vue'),
+    Map: () => import('../components/Map.vue')
   },
   data() {
     return {
@@ -58,7 +58,7 @@ export default {
   },
   computed: {
     ...mapState(['apiItems', 'apiItemsLink', 'apiItemsPagination', 'apiItemsFilter']),
-    ...mapGetters(["root", "searchLink", 'supportsSearch', 'fromBrowserPath']),
+    ...mapGetters(["root", "searchLink", 'supportsSearch', 'supportsConformance', 'fromBrowserPath']),
     itemCollection() {
       return {
         type: 'FeatureCollection',
@@ -73,6 +73,9 @@ export default {
         pages.first = Utils.addFiltersToLink(this.apiItemsLink, this.apiItemsFilter);
       }
       return pages;
+    },
+    canSort() {
+      return this.supportsConformance('https://api.stacspec.org/*/item-search#sort');
     }
   },
   watch:{

@@ -8,7 +8,7 @@ implemented as a single page application (SPA) for ease of development and to
 limit the overall number of catalog reads necessary when browsing (as catalogs
 may be nested and do not necessarily contain references to their parents).
 
-Version: **3.0.0-alpha.6** (supports all STAC versions between 0.6.0 and 1.0.0)
+Version: **3.0.0-alpha.7** (supports all STAC versions between 0.6.0 and 1.0.0)
 
 This package has also been published to npm as [`@radiantearth/stac-browser`](https://www.npmjs.com/package/@radiantearth/stac-browser).
 
@@ -34,9 +34,34 @@ To browse your own, set the `catalogUrl` CLI parameter when running the dev serv
 npm start -- --open --catalogUrl="http://path/to/catalog.json"
 ```
 
-## Other options
+## Options
 
 All the following options can be used as explained in the chapter "Running", either as CLI Parameter or as environment variable (deprecated).
+
+### catalogUrl
+
+The URL of the catalog to show by default. If you don't point to a specific file make sure to append a `/` at the end of the URL!
+If `catalogUrl` is empty or set to `null` STAC Browser switches to a mode where it defaults to a screen where you can either insert a catalog URL or select a catalog from [stacindex.org](https://stacindex.org).
+
+### catalogTitle
+
+The default title shown if no title can be read from the root STAC catalog.
+
+### allowExternalAccess
+
+This allows or disallows loading and browsing external STAC data.
+External STAC data is any data that is not a children of the given `catalogUrl`.
+Must be set to `true` if a `catalogUrl` is not given as otherwise you won't be able to browse anything.
+
+### stacLint (experimental)
+
+Enables or disables a feature that validates the STAC catalog when opening the "Source Data" popup.
+Validation uses the external service [staclint.com](https://staclint.com).
+
+Validation is automatically disabled in the following cases:
+- the host of a catalog is `localhost`, `127.0.0.1` and `::1`
+- [private query parameters](#private-query-parameters) have been set
+- `stacProxyUrl` is set
 
 ### historyMode (build-only option)
 
@@ -56,7 +81,7 @@ npm run build -- --pathPrefix="/browser/"
 This will build STAC Browser in a way that it can be hosted at `https://example.com/browser` for example.
 Using this parameter for the dev server will make STAC Browser available at `http://localhost:8080/browser`.
 
-### stacProxyUrl
+### stacProxyUrl (experimental)
 
 Setting the `stacProxyUrl` allows users to modify the URLs contained in the catalog to point to another location.
 For instance, if you are serving a catalog on the local file system at `/home/user/catalog.json`, but want to serve
@@ -68,12 +93,12 @@ npm start -- --open --stacProxyUrl="/home/user;http://localhost:8888"
 
 Notice the format of the value:
 * In CLI it is the original location and the proxy location separated by the `;` character, i.e. `{original};{proxy}`.
-* In the config file it is a two-element array with the original location as first element and the proxy location as the second element.
+* In the config file it is a two-element array with the original location as first element and the proxy location as the second element. Set to `null` to disable (default).
 
 In this example, any href contained in the STAC (including link or asset hrefs) will replace any occurrence of `/home/user/` with `http://localhost:8888`.
 
-This can also be helpful when proxying a STAC that does not have cors enabled; by using stacProxyUrl you can proxy the original STAC server with one that enables cors
-and be able to browse that catalog.
+This can also be helpful when proxying a STAC that does not have cors enabled;
+by using stacProxyUrl you can proxy the original STAC server with one that enables cors and be able to browse that catalog.
 
 ### tileSourceTemplate
 
@@ -101,7 +126,7 @@ If server-side rendering should only be used as a fallback for client-side rende
 
 By default, client-side COG rendering is enabled. A server-side fallback is provided via the [tiles.rdnt.io](https://github.com/radiantearth/tiles.rdnt.io) project, which serves publicly accessible COGs as tile layers.
 
-### redirectLegacyUrls
+### redirectLegacyUrls (experimental)
 
 If you are updating from on old version of STAC Browser, you can set this option to `true` to redirect users from the old "unreadable" URLs to the new human-readable URLs.
 
@@ -130,6 +155,16 @@ If you need even more flexibility, you need to dig into the Vue files and their 
 STAC Browser supports some non-standardized fields that you can use to improve the user-experience.
 
 1. To the [Provider Object](https://github.com/radiantearth/stac-spec/blob/master/collection-spec/collection-spec.md#provider-object) you can add an `email` (or `mail`) field with an e-mail address and the mail will be shown in the Browser, too.
+
+## Private query parameters (experimental)
+
+STAC Browser supports "private query parameters", e.g. for passing an API key through. Any query parameter that is starting with a `~` will be stored internally, removed from the URL and be appended to STAC requests. This is useful for token-based authentication via query parameters.
+
+So for example if your API requires to pass a token via the `API_KEY` query parameter, you can request STAC Browser as such:
+`https://examples.com/stac-browser/?~API_KEY=123` which will change the URL to `https://examples.com/stac-browser/` and store the token `123` internally. The request then will have the query parameter attached and the Browser will request e.g. `https://examples.com/stac-api/?API_KEY=123`.
+
+Please note: If the server hosting STAC Browser should not get aware of private query parameters and you are having `historyMode` set to `history`, you can also append the private query parameters to the hash so that it doesn't get transmitted to the server hosting STAC Browser. 
+In this case use for example `https://examples.com/stac-browser/#?~API_KEY=123` instead of `https://examples.com/stac-browser/?~API_KEY=123`.
 
 ## Building
 

@@ -2,7 +2,7 @@
   <section class="links mb-4">
     <h2 v-if="title">{{ title }}</h2>
     <ul>
-      <li v-for="(link, i) in links" :key="i">
+      <li v-for="link in links" :key="link.href">
         <StacLink :data="link" :fallbackTitle="() => fallbackTitle(link)" />
       </li>
     </ul>

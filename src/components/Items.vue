@@ -3,6 +3,7 @@
     <h2>
       Items
       <template v-if="!api">({{ items.length }})</template>
+      <SortButtons v-if="!api" class="ml-4" v-model="sort" />
     </h2>
     <Pagination ref="topPagination" v-if="api" :pagination="pagination" placement="top" @paginate="paginate" />
     <template v-if="allowFilter">
@@ -10,7 +11,7 @@
         <b-icon-search /> Filter
       </b-button>
       <b-collapse id="itemFilter" v-model="filtersOpen">
-        <ItemFilter :stac="stac" v-model="filters" :collectionOnly="true" />
+        <ItemFilter :stac="stac" v-model="filters" :sort="canSort" :collectionOnly="true" />
       </b-collapse>
     </template>
     <b-card-group v-if="chunkedItems.length > 0" columns>
@@ -27,6 +28,8 @@ import Item from './Item.vue';
 import Pagination from './Pagination.vue';
 import { BCollapse, BIconSearch } from "bootstrap-vue";
 import Utils from '../utils';
+import STAC from '../stac';
+import { mapGetters } from "vuex";
 
 export default {
   name: "Items",
@@ -35,7 +38,8 @@ export default {
     BIconSearch,
     Item,
     ItemFilter: () => import('./ItemFilter.vue'),
-    Pagination
+    Pagination,
+    SortButtons: () => import('./SortButtons.vue')
   },
   props: {
     items: {
@@ -75,20 +79,32 @@ export default {
     return {
       shownItems: this.chunkSize,
       filters: this.apiFilters,
-      filtersOpen: false
+      filtersOpen: false,
+      sort: 0
     };
   },
   computed: {
+    ...mapGetters(['supportsConformance']),
     hasMore() {
       return this.items.length > this.shownItems;
     },
     chunkedItems() {
+      let items = this.items;
+      if (this.sort !== 0) {
+        items = items.slice(0).sort((a,b) => STAC.getDisplayTitle(a).localeCompare(STAC.getDisplayTitle(b)));
+        if (this.sort === -1) {
+          items = items.reverse();
+        }
+      }
       if (!this.api && this.items.length > this.chunkSize) {
-        return this.items.slice(0, this.shownItems);
+        return items.slice(0, this.shownItems);
       }
       else {
-        return this.items;
+        return items;
       }
+    },
+    canSort() {
+      return this.supportsConformance('https://api.stacspec.org/*/ogcapi-features#sort');
     }
   },
   watch: {

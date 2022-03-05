@@ -92,17 +92,6 @@ export default class Utils {
 		return stringify ? uri.toString() : uri;
 	}
 
-	static stacLinkToAxiosRequest(link) {
-		let method = typeof link.method === 'string' ? link.method.toLowerCase() : 'get'
-		return {
-			method,
-			url: link.href,
-			headers: link.headers,
-			data: link.body
-			// ToDo: Support for merge property from STAC API
-		};
-	}
-
 	static getLinkWithRel(links, rel) {
 		return Array.isArray(links) ? links.find(link => Utils.isObject(link) && typeof link.href === 'string' && link.rel === rel) : null;
 	}
@@ -145,7 +134,7 @@ export default class Utils {
 	static addFiltersToLink(link, filters = {}) {
 		// Construct new link with search params
 		let newLink = Object.assign({}, link);
-		let url = new URL(newLink.href);
+		let url = new URI(newLink.href);
 		for(let key in filters) {
 			let value = filters[key];
 			if (value) {
@@ -178,10 +167,10 @@ export default class Utils {
 						continue;
 					}
 				}
-				url.searchParams.set(key, value);
+				url.setQuery(key, value);
 			}
 			else {
-				url.searchParams.delete(key);
+				url.removeQuery(key);
 			}
 		}
 		newLink.href = url.toString();

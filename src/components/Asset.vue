@@ -102,7 +102,7 @@ export default {
   },
   computed: {
     ...mapState(['url']),
-    ...mapGetters(['tileRendererType']),
+    ...mapGetters(['tileRendererType', 'getRequestUrl']),
     isThumbnail() {
       return Array.isArray(this.asset.roles) && this.asset.roles.includes('thumbnail');
     },
@@ -157,14 +157,11 @@ export default {
       if (typeof this.asset.href !== 'string') {
         return null;
       }
-      let baseUrl;
+      let baseUrl = null;
       if (this.context instanceof STAC) {
         baseUrl = this.context.getAbsoluteUrl();
       }
-      else {
-        baseUrl = this.url;
-      }
-      return Utils.toAbsolute(this.asset.href, baseUrl);
+      return this.getRequestUrl(this.asset.href, baseUrl);
     },
     from() {
       const s3 = 'Amazon S3';

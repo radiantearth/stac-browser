@@ -43,6 +43,9 @@ import ErrorAlert from './components/ErrorAlert.vue';
 import Sidebar from './components/Sidebar.vue';
 import StacHeader from './components/StacHeader.vue';
 
+import Utils from './utils';
+import URI from 'urijs';
+
 const CONFIG_FILE = require(CONFIG_PATH);
 
 Vue.use(Clipboard);
@@ -92,10 +95,6 @@ for(let key in CONFIG) {
       this.$store.commit('config', {
         [key]: newValue
       });
-      if (key === 'catalogUrl' && newValue) {
-        // Load the root catalog data if not available (e.g. after page refresh or external access)
-        this.$store.dispatch("load", { url: newValue });
-      }
     }
   };
 }
@@ -130,6 +129,9 @@ export default {
     }
   },
   created() {
+    this.$router.onReady(() => this.parseQuery(this.$route));
+    this.$router.afterEach(to => this.parseQuery(to));
+
     // Load the root catalog data if not available (e.g. after page refresh or external access)
     if (this.catalogUrl) {
       this.$store.dispatch("load", { url: this.catalogUrl, loadApi: true });
@@ -148,6 +150,42 @@ export default {
     }
   },
   methods: {
+    parseQuery(route) {
+      let privateFromHash = {};
+      if (this.historyMode === 'history') {
+        let uri = new URI(route.hash.replace(/^#/, ''));
+        privateFromHash = uri.query(true);
+      }
+      let query = Object.assign({}, route.query, privateFromHash);
+      let params = {};
+      for(let key in query) {
+        // Store all private query parameters (start with ~) and replace them in the shown URI
+        if (key.startsWith('~')) {
+          params.private = Utils.isObject(params.private) ? params.private : {};
+          params.private[key.substr(1)] = query[key];
+          delete query[key];
+        }
+        // Store all state related parameters (start with .)
+        else if (key.startsWith('.')) {
+          params.state = Utils.isObject(params.state) ? params.state : {};
+          params.state[key.substr(1)] = query[key];
+        }
+        // All other parameters should be appended to the catalog requests
+        else {
+          params.catalog = Utils.isObject(params.catalog) ? params.catalog : {};
+          params.catalog[key] = query[key];
+        }
+      }
+      if (Utils.size(params) > 0) {
+        this.$store.commit("queryParameters", params);
+      }
+      if (Utils.size(params.private) > 0) {
+        this.$router.replace({
+          ...route,
+          query
+        });
+      }
+    },
     showError(error, message) {
       this.$store.commit('showGlobalError', {
         error, 

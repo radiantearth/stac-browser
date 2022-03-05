@@ -1,7 +1,7 @@
 <template>
   <component :is="component" v-bind="attributes">
-    {{ displayTitle }}
-    <b-icon-box-arrow-up-right v-if="!isStacBrowserLink" />
+    {{ displayTitle }}<!-- avoid space
+    --><small v-if="!isStacBrowserLink"><b-icon-box-arrow-up-right class="ml-1 align-baseline" /></small>
   </component> 
 </template>
 
@@ -31,7 +31,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['toBrowserPath']),
+    ...mapGetters(['toBrowserPath', 'getRequestUrl']),
     stac() {
       if (this.data instanceof STAC) {
         return this.data;
@@ -72,6 +72,7 @@ export default {
         case 'latest-version': // version extension v
         case 'predecessor-version':
         case 'successor-version':
+        case 'source': // label extension
         case 'first': // Pagination v
         case 'prev':
         case 'previous':
@@ -105,10 +106,10 @@ export default {
         return this.stac.getBrowserPath();
       }
       else if (this.isStacBrowserLink) {
-          return this.toBrowserPath(this.link.href);
+        return this.toBrowserPath(this.link.href);
       }
       else {
-          return this.link.href;
+        return this.getRequestUrl(this.link.href);
       }
     },
     displayTitle() {
