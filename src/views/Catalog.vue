@@ -213,9 +213,6 @@ export default {
   }
 
   .items, .catalogs {
-    .card {
-      display: block;
-    }
     .card-columns {
       column-count: 1;
       @include media-breakpoint-only(md) {
