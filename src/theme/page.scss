@@ -8,7 +8,7 @@
         margin: $block-margin auto;
         
         .lead {
-            color: $secondary;
+            color: theme-color("secondary");
         }
     }
     .logo {

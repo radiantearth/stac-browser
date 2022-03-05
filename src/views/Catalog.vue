@@ -2,8 +2,11 @@
   <b-row class="catalog">
     <b-col class="left">
       <h2>Introduction</h2>
-      <DeprecationNotice v-if="data.deprecated" :type="data.type" />
-      <Description v-if="data.description" :description="data.description" />
+      <DeprecationNotice v-if="data.deprecated" :data="data" />
+      <AnonymizedNotice v-if="data['anon:warning']" :warning="data['anon:warning']" />
+      <ReadMore v-if="data.description" :lines="10">
+        <Description :description="data.description" />
+      </ReadMore>
       <Keywords v-if="Array.isArray(data.keywords) && data.keywords.length > 0" :keywords="data.keywords" />
       <section v-if="isCollection" class="metadata mb-4">
         <b-row v-if="licenses">
@@ -27,6 +30,7 @@
         <Map v-else-if="isCollection" :stac="data" :stacLayerData="selectedAsset" @mapClicked="mapClicked" @mapChanged="mapChanged" />
         <Thumbnails v-else-if="thumbnails.length > 0" :thumbnails="thumbnails" />
       </section>
+      <Links v-if="additionalLinks.length > 0" title="Additional resources" :links="additionalLinks" />
       <Metadata title="Metadata" class="mb-4" :type="data.type" :data="data" :ignoreFields="ignoredMetadataFields" />
     </b-col>
     <b-col class="right">
@@ -36,7 +40,6 @@
         @paginate="paginateItems" @filterItems="filterItems" />
       <Assets v-if="hasAssets" :assets="assets" :shown="shownAssets" @showAsset="showAsset" />
       <Assets v-if="hasItemAssets" :assets="data.item_assets" :definition="true" />
-      <Links v-if="additionalLinks.length > 0" title="Additional resources" :links="additionalLinks" />
     </b-col>
   </b-row>
 </template>
@@ -51,6 +54,7 @@ import Keywords from '../components/Keywords.vue';
 import Links from '../components/Links.vue';
 import Metadata from '../components/Metadata.vue';
 import Providers from '../components/Providers.vue';
+import ReadMore from "vue-read-more-smooth";
 import Thumbnails from '../components/Thumbnails.vue';
 import ShowAssetMixin from '../components/ShowAssetMixin';
 import { Formatters } from '@radiantearth/stac-fields';
@@ -61,6 +65,7 @@ export default {
   name: "Catalog",
   mixins: [ShowAssetMixin],
   components: {
+    AnonymizedNotice: () => import('../components/AnonymizedNotice.vue'),
     Assets,
     BTabs,
     BTab,
@@ -73,6 +78,7 @@ export default {
     Map: () => import('../components/Map.vue'),
     Metadata,
     Providers,
+    ReadMore,
     Thumbnails
   },
   data() {
@@ -96,7 +102,9 @@ export default {
         // API landing page, not very useful to display
         'conformsTo',
         // Will be rendered with a custom rendered
-        'deprecated'
+        'deprecated',
+        // Special handling for the warning of the anonymized-location extension
+        'anon:warning'
       ]
     };
   },
@@ -154,7 +162,7 @@ export default {
     },
     async filterItems(filters) {
       try {
-        await this.$store.dispatch('filterApiItems', {link: this.apiItemsLink, filters});
+        await this.$store.dispatch('loadApiItems', {link: this.apiItemsLink, show: true, filters});
       } catch (error) {
         this.$root.$emit('error', error, 'Sorry, loading a filtered list of STAC Items failed.');
       }
@@ -182,7 +190,7 @@ export default {
       column-count: 1;
 
       &:not(.count-1) {
-        @include media-breakpoint-up(xl) {
+        @include media-breakpoint-up(xxl) {
           column-count: 2;
         }
         @include media-breakpoint-up(xxxl) {

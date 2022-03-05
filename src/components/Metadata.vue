@@ -2,7 +2,7 @@
     <section v-show="formattedData.length > 0" class="metadata">
         <h2 v-if="formattedData.length > 0 && title">{{ title }}</h2>
         <b-card-group v-if="formattedData.length > 0" columns :class="`count-${formattedData.length}`">
-            <b-card v-for="group in formattedData" :key="group.extension" class="metadata-card">
+            <b-card no-body v-for="group in formattedData" :key="group.extension" class="metadata-card">
                 <b-card-title>
                     <div v-if="group.extension" v-html="group.label" />
                     <template v-else>{{ commmonMetadataTitle }}</template>
@@ -84,13 +84,31 @@ export default {
 </script>
 
 <style lang="scss">
+@import "../theme/variables.scss";
+
 .metadata {
+    .card {
+        border: 0;
+        margin-top: $block-margin;
+        margin-bottom: $block-margin;
+
+        .row {
+            margin-bottom: 0.33em;
+        }
+    }
     .label {
         font-weight: 600;
         vertical-align: top;
     }
+    .value {
+        > ul, > ol {
+            max-height: 15em;
+            overflow: auto;
+        }
+    }
     ul, ol {
         padding-left: 1.2em;
+        margin-bottom: 0;
     }
     ul li {
         list-style-type: '- ';
@@ -107,9 +125,6 @@ export default {
             margin-left: 1em;
         }
     }
-    dd:not(:last-of-type) > dl:only-child {
-         margin-bottom: -1em;
-    }
     ul > li > dl, ol > li > dl {
         margin-left: 0;
     }
@@ -122,19 +137,29 @@ export default {
     dd {
         display: inline;
 
+        &:not(:last-of-type) > dl:only-child {
+            margin-bottom: -1em;
+        }
+        &:after {
+            content: "\A";
+            white-space: pre;
+            line-height: 1px;
+        }
+        &:last-of-type:after {
+            content: "";
+            white-space: normal;
+        }
+        .description {
+            display: inline-block;
+            
+            > p:only-child {
+                display: inline;
+            }
+        }
         > ul, > ol {
-            max-height: 10em;
+            max-height: 15em;
             overflow: auto;
         }
-    }
-    dd:after {
-        content: "\A";
-        white-space: pre;
-        line-height: 1px;
-    }
-    dd:last-of-type:after {
-        content: "";
-        white-space: normal;
     }
     .provider .description {
         font-size: 0.9em;

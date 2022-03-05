@@ -23,12 +23,10 @@
 
 <script>
 import Vue from "vue";
-
 import VueRouter from "vue-router";
-
-import routes from "./router";
 import { mapGetters, mapState } from 'vuex';
-import store from "./store";
+import getRoutes from "./router";
+import getStore from "./store";
 
 import {
   AlertPlugin, BadgePlugin, ButtonGroupPlugin, ButtonPlugin,
@@ -44,6 +42,11 @@ import { Formatters } from '@radiantearth/stac-fields';
 import ErrorAlert from './components/ErrorAlert.vue';
 import Sidebar from './components/Sidebar.vue';
 import StacHeader from './components/StacHeader.vue';
+
+import Utils from './utils';
+import URI from 'urijs';
+
+const CONFIG_FILE = require(CONFIG_PATH);
 
 Vue.use(Clipboard);
 
@@ -69,12 +72,14 @@ for(let name in Formatters) {
   }
 }
 
+const CONFIG = Object.assign(CONFIG_FILE, CONFIG_CLI);
+
 // Setup router
 Vue.use(VueRouter);
 const router = new VueRouter({
   mode: CONFIG.historyMode,
   base: CONFIG.pathPrefix,
-  routes,
+  routes: getRoutes(CONFIG)
 });
 
 // Pass Config through from props to vuex
@@ -82,15 +87,14 @@ let Props = {};
 let Watchers = {};
 for(let key in CONFIG) {
   Props[key] = {
-    default: CONFIG[key]
+    default: ['object', 'function'].includes(typeof CONFIG[key]) ? () => CONFIG[key] : CONFIG[key]
   }
-  Watchers[key] = function(newValue) {
-    this.$store.commit('config', {
-      key: newValue
-    });
-    if (key === 'catalogUrl' && newValue) {
-      // Load the root catalog data if not available (e.g. after page refresh or external access)
-      this.$store.dispatch("load", { url: newValue });
+  Watchers[key] = {
+    immediate: true,
+    handler: function(newValue) {
+      this.$store.commit('config', {
+        [key]: newValue
+      });
     }
   };
 }
@@ -98,7 +102,7 @@ for(let key in CONFIG) {
 export default {
   name: 'StacBrowser',
   router,
-  store,
+  store: getStore(CONFIG),
   components: {
     ErrorAlert,
     Sidebar,
@@ -125,6 +129,9 @@ export default {
     }
   },
   created() {
+    this.$router.onReady(() => this.parseQuery(this.$route));
+    this.$router.afterEach(to => this.parseQuery(to));
+
     // Load the root catalog data if not available (e.g. after page refresh or external access)
     if (this.catalogUrl) {
       this.$store.dispatch("load", { url: this.catalogUrl, loadApi: true });
@@ -143,6 +150,42 @@ export default {
     }
   },
   methods: {
+    parseQuery(route) {
+      let privateFromHash = {};
+      if (this.historyMode === 'history') {
+        let uri = new URI(route.hash.replace(/^#/, ''));
+        privateFromHash = uri.query(true);
+      }
+      let query = Object.assign({}, route.query, privateFromHash);
+      let params = {};
+      for(let key in query) {
+        // Store all private query parameters (start with ~) and replace them in the shown URI
+        if (key.startsWith('~')) {
+          params.private = Utils.isObject(params.private) ? params.private : {};
+          params.private[key.substr(1)] = query[key];
+          delete query[key];
+        }
+        // Store all state related parameters (start with .)
+        else if (key.startsWith('.')) {
+          params.state = Utils.isObject(params.state) ? params.state : {};
+          params.state[key.substr(1)] = query[key];
+        }
+        // All other parameters should be appended to the catalog requests
+        else {
+          params.catalog = Utils.isObject(params.catalog) ? params.catalog : {};
+          params.catalog[key] = query[key];
+        }
+      }
+      if (Utils.size(params) > 0) {
+        this.$store.commit("queryParameters", params);
+      }
+      if (Utils.size(params.private) > 0) {
+        this.$router.replace({
+          ...route,
+          query
+        });
+      }
+    },
     showError(error, message) {
       this.$store.commit('showGlobalError', {
         error, 
@@ -157,8 +200,8 @@ export default {
 </script>
 
 <style lang="scss">
+@import "./theme/variables.scss";
 @import '~bootstrap/scss/bootstrap.scss';
 @import '~bootstrap-vue/src/index.scss';
-@import "./theme/variables.scss";
 @import "./theme/page.scss";
 </style>

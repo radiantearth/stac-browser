@@ -34,9 +34,7 @@ export default {
       map: null,
       areaSelect: null,
       stacLayer: null,
-      mapOptions: {
-        scrollWheelZoom: !this.selectBounds
-      },
+      mapOptions: {},
       osmOptions: {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors.'
       },
@@ -57,13 +55,22 @@ export default {
       required: false
     }
   },
+  created() {
+    this.mapOptions.scrollWheelZoom = this.selectBounds || this.stac?.isItem();
+  },
   mounted() {
-    // Workaround for https://github.com/radiantearth/stac-browser/issues/95
-    // I have absolutely no clue yet why this is required, needs further investigation!
-    setTimeout(() => this.show = true, 100);
+    // Solves https://github.com/radiantearth/stac-browser/issues/95 by showing the map
+    // only after the next tick so that the page was fully rendered once before we start adding the map
+    this.$nextTick(() => this.show = true);
+  },
+  beforeDestroy() {
+    this.show = false;
+    if (this.dblClickState) {
+      window.clearTimeout(this.dblClickState);
+    }
   },
   computed: {
-    ...mapState(['geoTiffResolution', 'tileSourceTemplate', 'buildTileUrlTemplate', 'useTileLayerAsFallback']),
+    ...mapState(['buildTileUrlTemplate', 'crossOriginMedia', 'geoTiffResolution', 'tileSourceTemplate', 'useTileLayerAsFallback']),
     baseMaps() {
       let targets = [];
       if (this.stac.isCollection() && Utils.isObject(this.stac.summaries) && Array.isArray(this.stac.summaries['ssys:targets'])) {
@@ -122,56 +129,66 @@ export default {
     async showStacLayer() {
       if (this.stacLayer) {
         this.map.removeLayer(this.stacLayer);
+        this.stacLayer = null;
       }
       let data = this.stacLayerData || this.stac;
       if (data.type !== 'Catalog') {
-        try {
-          let options = {
-            resolution: this.geoTiffResolution,
-            useTileLayerAsFallback: this.useTileLayerAsFallback,
-            tileUrlTemplate: this.tileSourceTemplate,
-            buildTileUrlTemplate: this.buildTileUrlTemplate
-          };
-          if (this.stac instanceof STAC) {
-            options.baseUrl = this.stac.getAbsoluteUrl();
-          }
-          if ('href' in data) {
-            if (this.stac.type === 'Feature') {
-              options.bbox = this.stac?.bbox;
-            }
-            else if (this.stac.type === 'Collection') {
-              options.bbox = this.stac?.extent?.spatial?.bbox[0];
-            }
-          }
-          this.stacLayer = await stacLayer(data, options);
-          if (this.stacLayer) {
-            this.$emit('mapChanged', this.stacLayer.stac);
-            this.stacLayer.on('click', event => {
-              // Debounce click event, otherwise a dblclick is fired (and fired twice)
-              let clicks = event.originalEvent.detail || 1;
-              if (clicks === 1) {
-                this.dblClickState = window.setTimeout(() => {
-                  this.dblClickState = null;
-                  this.$emit('mapClicked', event.stac);
-                }, 500);
-              }
-              else if (clicks > 1 && this.dblClickState) {
-                window.clearTimeout(this.dblClickState);
-                this.dblClickState = null;
-              }
-            });
-            this.stacLayer.on("fallback", event => this.$emit('mapChanged', event.stac));
-            // Fit bounds before adding the layer to the map to avoid a race condition(?) between Tiff loading and fitBounds
-            this.fitBounds();
-            this.stacLayer.addTo(this.map);
-          }
-        } catch (error) {
-          this.$root.$emit('error', error, 'Sorry, loading the map failed.');
+        let options = {
+          resolution: this.geoTiffResolution,
+          useTileLayerAsFallback: this.useTileLayerAsFallback,
+          tileUrlTemplate: this.tileSourceTemplate,
+          buildTileUrlTemplate: this.buildTileUrlTemplate,
+          crossOrigin: this.crossOriginMedia
+        };
+        if (this.stac instanceof STAC) {
+          options.baseUrl = this.stac.getAbsoluteUrl();
         }
+        if ('href' in data) {
+          if (this.stac.type === 'Feature') {
+            options.bbox = this.stac?.bbox;
+          }
+          else if (this.stac.type === 'Collection') {
+            options.bbox = this.stac?.extent?.spatial?.bbox[0];
+          }
+        }
+        try {
+          this.stacLayer = await stacLayer(data, options);
+        } catch (error) {
+          this.$root.$emit('error', error, 'Sorry, adding the data to the map failed.');
+        }
+
+        // If the map isn't shown any more after loading the STAC data, don't try to add it to the map.
+        // Fixes https://github.com/radiantearth/stac-browser/issues/109
+        if (!this.show || !this.stacLayer) {
+          return;
+        }
+
+        this.$emit('mapChanged', this.stacLayer.stac);
+        this.stacLayer.on('click', event => {
+          // Debounce click event, otherwise a dblclick is fired (and fired twice)
+          let clicks = event.originalEvent.detail || 1;
+          if (clicks === 1) {
+            this.dblClickState = window.setTimeout(() => {
+              this.dblClickState = null;
+              this.$emit('mapClicked', event.stac);
+            }, 500);
+          }
+          else if (clicks > 1 && this.dblClickState) {
+            window.clearTimeout(this.dblClickState);
+            this.dblClickState = null;
+          }
+        });
+        this.stacLayer.on("fallback", event => this.$emit('mapChanged', event.stac));
+        this.stacLayer.addTo(this.map);
+        this.fitBounds();
       }
     },
     fitBounds() {
-      let fitOptions = this.selectBounds ? {} : { padding: [90, 90] };
+      let fitOptions = {
+        padding: this.selectBounds ? [0,0] : [90,90],
+        animate: false,
+        duration: 0
+      };
       this.map.fitBounds(this.stacLayer.getBounds(), fitOptions);
     },
     addBoundsSelector() {

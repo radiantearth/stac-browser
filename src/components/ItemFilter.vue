@@ -19,8 +19,8 @@
         <b-form-tags input-id="ids" :value="filters.ids" @input="setIds" separator=" ,;" remove-on-delete add-on-change placeholder="List one or multiple Item IDs..."></b-form-tags>
       </b-form-group>
 
-      <b-form-group label="Limit" label-for="limit" description="Number of items requested per page">
-        <b-form-input id="limit" :input="filters.limit" @change="setLimit" min="1" max="1000" type="number" placeholder="Default"></b-form-input>
+      <b-form-group label="Limit" label-for="limit" :description="`Number of items requested per page, max ${maxItems} items.`">
+        <b-form-input id="limit" :value="filters.limit" @change="setLimit" min="1" :max="maxItems" type="number" :placeholder="`Default (${itemsPerPage})`"></b-form-input>
       </b-form-group>
 
       <b-button type="submit" variant="primary">Filter</b-button>
@@ -32,8 +32,7 @@
 <script>
 import { BForm, BFormGroup, BFormInput, BFormCheckbox, BFormTags } from 'bootstrap-vue';
 import DatePicker from 'vue2-datepicker';
-
-const defaultValues = {datetime: null, bbox: null, limit: null, ids: [], collections: []};
+import { mapState } from "vuex";
 
 export default {
   name: 'ItemFilter',
@@ -66,15 +65,19 @@ export default {
   },
   data() {
     return {
+      maxItems: 10000,
       provideBBox: false,
-      filters: {}
+      filters: this.getDefaultValues()
     };
+  },
+  computed: {
+    ...mapState(['itemsPerPage']),
   },
   watch: {
     value: {
       immediate: true,
       handler(value) {
-        let filters = Object.assign({}, defaultValues, value);
+        let filters = Object.assign({}, this.getDefaultValues(), value);
         // Convert from UTC to locale time (needed for vue2-datetimepicker)
         // see https://github.com/mengxiong10/vue2-datepicker/issues/388
         if (Array.isArray(filters.datetime)) {
@@ -92,15 +95,29 @@ export default {
     }
   },
   methods: {
+    getDefaultValues() {
+      return {
+        datetime: null,
+        bbox: null,
+        limit: null,
+        ids: [],
+        collections: []
+      };
+    },
     onSubmit() {
       this.$emit('input', this.filters, false);
     },
     onReset() {
-      this.$emit('input', defaultValues, true);
+      this.filters = this.getDefaultValues();
+      this.$emit('input', this.filters, true);
     },
     setLimit(limit) {
-      if (limit > 0 && limit < 1000) {
-        this.filters.limit = Number.parseInt(limit, 10);
+      limit = Number.parseInt(limit, 10);
+      if (limit > this.maxItems) {
+        this.filters.limit = this.maxItems;
+      }
+      else if (limit > 0) {
+        this.filters.limit = limit;
       }
       else {
         this.filters.limit = null;
@@ -143,8 +160,8 @@ export default {
 <style lang="scss">
 @import '../theme/variables.scss';
 
-$default-color: $secondary;
-$primary-color: $primary;
+$default-color: map-get($theme-colors, "secondary");
+$primary-color: map-get($theme-colors, "primary");
 
 @import '~vue2-datepicker/scss/index.scss';
 

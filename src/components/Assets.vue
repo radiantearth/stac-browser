@@ -45,8 +45,8 @@ export default {
       else if (Utils.size(this.assets) === 1) {
         return true; // Expand asset if it's the only asset available
       }
-      else if (Object.values(this.assets).filter(asset => Array.isArray(asset.roles) && asset.roles.includes('data')).length > 3) {
-        return false; // Expand assets with role asset only if there are 3 of them max
+      else if (Object.values(this.assets).filter(asset => Array.isArray(asset.roles) && asset.roles.includes('data')).length > 1) {
+        return false; // Expand assets with role "data" only if there is one of it
       }
       return null; // Let asset decide (e.g. depending on roles)
     }

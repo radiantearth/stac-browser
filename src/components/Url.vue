@@ -3,7 +3,7 @@
         <b-input-group size="sm">
             <b-form-input :id="id" ref="input" v-model="url" readonly></b-form-input>
             <b-input-group-append>
-                <b-button @click="copyUrl" :variant="copyColor"><component :is="copyIcon" /></b-button>
+                <CopyButton :copyText="url" variant="primary" />
                 <b-button v-if="open" :href="url" target="_blank" variant="primary"><b-icon-arrow-up-right-square /></b-button>
             </b-input-group-append>
         </b-input-group>
@@ -13,7 +13,7 @@
 <script>
 import {
     BFormInput, BFormGroup,
-    BIconClipboard, BIconClipboardCheck, BIconArrowUpRightSquare,
+    BIconArrowUpRightSquare,
     BInputGroup, BInputGroupAppend } from 'bootstrap-vue';
 
 export default {
@@ -21,11 +21,10 @@ export default {
     components: {
         BFormGroup,
         BFormInput,
-        BIconClipboard,
-        BIconClipboardCheck,
         BIconArrowUpRightSquare,
         BInputGroup,
-        BInputGroupAppend
+        BInputGroupAppend,
+        CopyButton: () => import('./CopyButton.vue')
     },
     props: {
         id: {
@@ -43,26 +42,6 @@ export default {
         open: {
             type: Boolean,
             default: true
-        }
-    },
-    data() {
-        return {
-            copyConfirm: false
-        };
-    },
-    computed: {
-        copyColor() {
-            return this.copyConfirm ? 'success' : 'primary';
-        },
-        copyIcon() {
-            return this.copyConfirm ? 'b-icon-clipboard-check' : 'b-icon-clipboard';
-        }
-    },
-    methods: {
-        copyUrl() {
-            this.copyConfirm = true;
-            this.$clipboard(this.url);
-            setTimeout(() => this.copyConfirm = false, 2500);
         }
     }
 }

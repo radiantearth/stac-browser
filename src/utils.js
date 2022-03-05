@@ -75,23 +75,21 @@ export default class Utils {
 		return uri.is(type);
 	}
 
+	static isGdalVfsUri(url) {
+		return typeof url === 'string' && url.startsWith('/vsi') && !url.startsWith('/vsicurl/');
+	}
+
 	static toAbsolute(href, baseUrl, stringify = true) {
+		// Convert vsicurl URLs to normal URLs
+		if (typeof href === 'string' && href.startsWith('/vsicurl/')) {
+			href = href.replace(/^\/vsicurl\//, '');
+		}
+		// Parse URL and make absolute, if required
 		let uri = URI(href);
-		if (uri.is("relative")) {
+		if (uri.is("relative") && !Utils.isGdalVfsUri(href)) { // Don't convert GDAL VFS URIs: https://github.com/radiantearth/stac-browser/issues/116
 			uri = uri.absoluteTo(baseUrl);
 		}
 		return stringify ? uri.toString() : uri;
-	}
-
-	static stacLinkToAxiosRequest(link) {
-		let method = typeof link.method === 'string' ? link.method.toLowerCase() : 'get'
-		return {
-			method,
-			url: link.href,
-			headers: link.headers,
-			data: link.body
-			// ToDo: Support for merge property from STAC API
-		};
 	}
 
 	static getLinkWithRel(links, rel) {
@@ -136,7 +134,7 @@ export default class Utils {
 	static addFiltersToLink(link, filters = {}) {
 		// Construct new link with search params
 		let newLink = Object.assign({}, link);
-		let url = new URL(newLink.href);
+		let url = new URI(newLink.href);
 		for(let key in filters) {
 			let value = filters[key];
 			if (value) {
@@ -169,29 +167,29 @@ export default class Utils {
 						continue;
 					}
 				}
-				url.searchParams.set(key, value);
+				url.addQuery(key, value);
 			}
 			else {
-				url.searchParams.delete(key);
+				url.removeQuery(key);
 			}
 		}
 		newLink.href = url.toString();
 		return newLink;
 	}
 
-	static titleForHref(href) {
+	static titleForHref(href, preferFileName = false) {
 		let uri = URI(href);
 		let auth = uri.authority();
 		let file = uri.filename().replace(/^(.{1,})\.\w+$/, '$1');
 		let dir = uri.directory().replace(/^\//, '');
-		if (auth && file) {
+		if (auth && file && !preferFileName) {
 			return `${file} at ${auth}`;
-		}
-		else if (auth) {
-			return auth;
 		}
 		else if (file && !commonFileNames.includes(file)) {
 			return file;
+		}
+		else if (auth) {
+			return auth;
 		}
 		else if (dir) {
 			return dir;

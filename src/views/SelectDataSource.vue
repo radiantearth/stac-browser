@@ -103,9 +103,7 @@ export default {
     },
     onSubmit() {
       this.$store.commit('resetCatalog'); // Reset loaded STAC catalog
-      this.$router.push({
-        path: this.toBrowserPath(this.url)
-      });
+      this.$router.push(this.toBrowserPath(this.url));
     }
   }
 };

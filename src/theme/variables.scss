@@ -14,14 +14,16 @@ $body-bg: white;
 $body-color: black;
 
 // Colors
-$primary:       #17a2b8;
-$secondary:     #6c757d;
-$success:       #28a745;
-$info:          #17a2b8;
-$warning:       #ffc107;
-$danger:        #dc3545;
-$light:         #f8f9fa;
-$dark:          #343a40;
+$theme-colors: (
+  "primary":       #17a2b8,
+  "secondary":     #6c757d,
+  "success":       #28a745,
+  "info":          #17a2b8,
+  "warning":       #ffc107,
+  "danger":        #dc3545,
+  "light":         #f8f9fa,
+  "dark":          #343a40
+);
 
 // Breakpoints for responsive design
 $grid-breakpoints: (
@@ -43,3 +45,6 @@ $font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mon
 
 // Margin between the main sections of the page (header, content, footer)
 $block-margin: 1rem;
+
+// Border radius
+$border-radius: 0.25rem;

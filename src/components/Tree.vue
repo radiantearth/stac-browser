@@ -22,6 +22,13 @@
         <ul v-if="loading" class="tree">
           <li><b-spinner label="Loading..." small></b-spinner></li>
         </ul>
+        <ul v-else-if="childs.length === 0" class="tree">
+          <li>
+            <b-button size="sm" variant="light" disabled>
+              No children available.
+            </b-button>
+          </li>
+        </ul>
         <Tree v-else v-for="(child, i) in childs" :key="i" :item="child" :parent="stac" :path="path" />
       </template>
     </li>
@@ -137,16 +144,7 @@ export default {
       if (this.pagination) {
         return 'more pages available for Collection';
       }
-      else if (this.stac instanceof STAC) {
-        let title = this.stac.getDisplayTitle();
-        if (title) {
-          return title;
-        }
-      }
-      if (this.link) {
-        return this.item.title || Utils.titleForHref(this.item.href);
-      }
-      return STAC.DEFAULT_TITLE;
+      return STAC.getDisplayTitle([this.item, this.stac]);
     },
     childs() {
       if (!this.stac) {
@@ -175,9 +173,10 @@ export default {
     },
     async toggle() {
       this.expanded = !this.expanded;
-      if (this.expanded && !this.pagination && this.item instanceof STAC) {
+      if (this.expanded && !this.pagination) {
         this.loading = true;
-        await this.$store.dispatch("load", { url: this.item.getAbsoluteUrl(), loadApi: true });
+        let url = this.item instanceof STAC ? this.item.getAbsoluteUrl() : this.item.href;
+        await this.$store.dispatch("load", { url, loadApi: true });
         this.loading = false;
       }
     }

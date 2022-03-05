@@ -2,8 +2,11 @@
   <div class="item">
     <b-row>
       <b-col>
-        <DeprecationNotice v-if="data.properties.deprecated" :type="data.type" />
-        <Description v-if="data.properties.description" :description="data.properties.description" />
+        <DeprecationNotice v-if="data.properties.deprecated" :data="data" />
+        <AnonymizedNotice v-if="data.properties['anon:warning']" :warning="data.properties['anon:warning']" />
+        <ReadMore v-if="data.properties.description" :lines="10">
+          <Description :description="data.properties.description" />
+        </ReadMore>
         <Keywords v-if="Array.isArray(data.properties.keywords) && data.properties.keywords.length > 0" :keywords="data.properties.keywords" />
         <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="shownAssets" @showAsset="showAsset" />
         <Links v-if="additionalLinks.length > 0" title="Additional resources" :links="additionalLinks" />
@@ -35,6 +38,7 @@ import Assets from '../components/Assets.vue';
 import Description from '../components/Description.vue';
 import Links from '../components/Links.vue';
 import Metadata from '../components/Metadata.vue';
+import ReadMore from "vue-read-more-smooth";
 import Thumbnails from '../components/Thumbnails.vue';
 import ShowAssetMixin from '../components/ShowAssetMixin';
 import { BTabs, BTab } from 'bootstrap-vue';
@@ -44,6 +48,7 @@ export default {
   name: "Item",
   mixins: [ShowAssetMixin],
   components: {
+    AnonymizedNotice: () => import('../components/AnonymizedNotice.vue'),
     Assets,
     BTabs,
     BTab,
@@ -52,6 +57,7 @@ export default {
     Links,
     Map: () => import('../components/Map.vue'),
     Metadata,
+    ReadMore,
     Thumbnails
   },
   data() {
@@ -59,7 +65,9 @@ export default {
       ignoredMetadataFields: [
         'title',
         // Will be rendered with a custom rendered
-        'deprecated'
+        'deprecated',
+        // Special handling for the warning of the anonymized-location extension
+        'anon:warning'
       ]
     };
   },
@@ -94,6 +102,22 @@ export default {
     .metadata {
       .card-columns {
         column-count: 1;
+
+        &.count-2 {
+          @include media-breakpoint-up(md) {
+            column-count: 2 !important;
+          }
+        }
+        &.count-3 {
+          @include media-breakpoint-up(lg) {
+            column-count: 3 !important;
+          }
+        }
+        &.count-4 {
+          @include media-breakpoint-up(xxl) {
+            column-count: 4 !important;
+          }
+        }
 
         &:not(.count-1) {
           @include media-breakpoint-up(md) {

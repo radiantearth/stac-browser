@@ -15,12 +15,13 @@
     </b-card-header>
     <b-collapse :id="id" v-model="expanded" role="tabpanel">
       <b-card-body>
+        <b-card-title>{{ fileFormat }}</b-card-title>
         <b-button-group class="actions" v-if="href">
-          <b-button :href="href" target="_blank" variant="outline-primary">
-            Download {{ fileFormat }}
-            <template v-if="from && !isBrowsable">
-              from {{ from }}
-            </template>
+          <CopyButton v-if="isGdalVfs" variant="outline-primary" :copyText="href">
+            {{ buttonText }}
+          </CopyButton>
+          <b-button v-else :href="href" target="_blank" variant="outline-primary">
+            {{ buttonText }}
           </b-button>
           <b-button v-if="canShow && shown" :pressed="true" variant="outline-primary" class="inactive">
             <b-icon-check /> Currently shown
@@ -29,7 +30,6 @@
             <b-icon-eye /> Show
           </b-button>
         </b-button-group>
-        <b-card-title v-else>{{ fileFormat }}</b-card-title>
         <b-card-text class="mt-4" v-if="asset.description">
           <Description :description="asset.description" :compact="true" />
         </b-card-text>
@@ -43,7 +43,7 @@
 import { BCollapse, BIconCheck, BIconChevronUp, BIconChevronDown, BIconEye } from 'bootstrap-vue';
 import { Formatters } from '@radiantearth/stac-fields';
 import { MIME_TYPES } from 'stac-layer/src/data';
-import { mapState } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 import Description from './Description.vue';
 import Metadata from './Metadata.vue';
 import STAC from '../stac';
@@ -57,6 +57,7 @@ export default {
     BIconChevronDown,
     BIconChevronUp,
     BIconEye,
+    CopyButton: () => import('./CopyButton.vue'),
     Description,
     Metadata
   },
@@ -85,7 +86,10 @@ export default {
   data() {
     return {
       expanded: false,
-      ignore: ['href', 'title', 'description', 'type', 'roles']
+      ignore: [
+        'href', 'title', 'description', 'type', 'roles',
+        'table:storage_options', 'xarray:open_kwargs', 'xarray:storage_options'
+      ]
     };
   },
   created() {
@@ -106,15 +110,25 @@ export default {
   },
   computed: {
     ...mapState(['url']),
+    ...mapGetters(['tileRendererType', 'getRequestUrl']),
     isThumbnail() {
       return Array.isArray(this.asset.roles) && this.asset.roles.includes('thumbnail');
     },
     canShow() {
+      // We need to know the type, otherwise we don't even try to show it
       if (typeof this.asset.type !== 'string') {
         return false;
       }
-      // Only http(s) links and relative links are supported
-      if (!this.isBrowsable) {
+      // If the tile renderer is a tile server, we can't really know what it supports so we pass all images
+      else if (this.tileRendererType === 'server' && this.asset.type.toLowerCase().startsWith('image/')) {
+        return true;
+      }
+      // Don't pass GDAL VFS URIs to client-side tile renderer: https://github.com/radiantearth/stac-browser/issues/116
+      else if (this.isGdalVfs && this.tileRendererType === 'client') {
+        return false;
+      }
+      // Otherwise, only http(s) links and relative links are supported
+      else if (!this.isBrowsable) {
         return false;
       }
       for(let type in MIME_TYPES) {
@@ -144,33 +158,71 @@ export default {
     isBrowsable() {
       return (this.protocol === 'http' || this.protocol === 'https');
     },
+    isGdalVfs() {
+      return Utils.isGdalVfsUri(this.asset.href);
+    },
     href() {
-      let baseUrl;
+      if (typeof this.asset.href !== 'string') {
+        return null;
+      }
+      let baseUrl = null;
       if (this.context instanceof STAC) {
         baseUrl = this.context.getAbsoluteUrl();
       }
-      else {
-        baseUrl = this.url;
-      }
-      return Utils.toAbsolute(this.asset.href, baseUrl);
+      return this.getRequestUrl(this.asset.href, baseUrl);
     },
     from() {
+      const s3 = 'Amazon S3';
+      const azure = 'Microsoft Azure';
+      const gc = 'Google Cloud';
+      const ftp = 'FTP';
+      const ali = 'Alibaba Cloud';
       switch(this.protocol) {
         case 's3':
-          return 'Amazon S3';
+          return s3;
+        case 'abfs':
+        case 'abfss':
+          return azure;
         case 'gcs':
-          return 'Google Cloud';
+          return gc;
         case 'ftp':
-          return 'FTP server';
-        default:
-          return '';
+          return ftp;
       }
+      if (this.isGdalVfs) {
+        let type = this.asset.href.match(/^\/vsi([a-z\d]+)(_streaming)?\//);
+        if (type) {
+          switch(type[1]) {
+            case 's3':
+              return s3;
+            case 'az':
+            case 'adls':
+              return azure;
+            case 'gs':
+              return gc;
+            case 'oss':
+              return ali;
+          }
+        }
+      }
+      return '';
+    },
+    buttonText() {
+      let text = [this.isGdalVfs ? 'Copy GDAL VFS URL' : 'Download'];
+      if (this.from && !this.isBrowsable) {
+        text.push(this.isGdalVfs ? 'for' : 'from');
+        text.push(this.from);
+      }
+      return text.join(' ');
     }
   },
   methods: {
     show() {
-      let absoluteAsset =  Object.assign({}, this.asset, {href: this.href});
-      this.$emit('show', absoluteAsset, this.id, this.isThumbnail);
+      let asset = Object.assign({}, this.asset);
+      // Override asset href with absolute URL if not a GDAL VFS
+      if (!this.isGdalVfs) {
+        asset.href = this.href;
+      }
+      this.$emit('show', asset, this.id, this.isThumbnail);
     }
   }
 }
@@ -178,6 +230,9 @@ export default {
 
 <style lang="scss">
 .asset {
+  .card-title {
+    font-size: 1.3em;
+  }
   .btn-asset {
     text-align: left;
 
