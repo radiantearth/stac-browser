@@ -3,6 +3,7 @@
     <h2>
       Items
       <template v-if="!api">({{ items.length }})</template>
+      <SortButtons class="ml-4" v-model="sort" />
     </h2>
     <Pagination ref="topPagination" v-if="api" :pagination="pagination" placement="top" @paginate="paginate" />
     <template v-if="allowFilter">
@@ -35,7 +36,8 @@ export default {
     BIconSearch,
     Item,
     ItemFilter: () => import('./ItemFilter.vue'),
-    Pagination
+    Pagination,
+    SortButtons: () => import('./SortButtons.vue')
   },
   props: {
     items: {
@@ -75,7 +77,8 @@ export default {
     return {
       shownItems: this.chunkSize,
       filters: this.apiFilters,
-      filtersOpen: false
+      filtersOpen: false,
+      sort: 0
     };
   },
   computed: {
@@ -83,11 +86,20 @@ export default {
       return this.items.length > this.shownItems;
     },
     chunkedItems() {
+      let items = this.items;
+      if (this.sort !== 0) {
+        items = items.slice(0).sort((a,b) => {
+          return (a.title || a.properties?.title || a.id || "").localeCompare((b.title || b.properties?.title || b.id || ""));
+        });
+        if (this.sort === -1) {
+          items = items.reverse();
+        }
+      }
       if (!this.api && this.items.length > this.chunkSize) {
-        return this.items.slice(0, this.shownItems);
+        return items.slice(0, this.shownItems);
       }
       else {
-        return this.items;
+        return items;
       }
     }
   },
