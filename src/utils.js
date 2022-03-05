@@ -167,10 +167,10 @@ export default class Utils {
 						continue;
 					}
 				}
-				url.addSearch(key, value);
+				url.addQuery(key, value);
 			}
 			else {
-				url.removeSearch(key);
+				url.removeQuery(key);
 			}
 		}
 		newLink.href = url.toString();

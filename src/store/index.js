@@ -18,6 +18,7 @@ function getStore(config) {
     valid: null,
     parents: null,
     globalError: null,
+    stateQueryParameters: {},
 
     apiItems: [],
     apiItemsLink: null,
@@ -29,6 +30,8 @@ function getStore(config) {
     database: {}, // STAC object, Error object or Loading object or Promise (when loading)
     queue: [],
     redirectUrl: null,
+    catalogQueryParameters: {},
+    privateQueryParameters: {},
 
     apiCollections: [],
     nextCollectionsLink: null
@@ -39,9 +42,6 @@ function getStore(config) {
     state: Object.assign({}, config, localDefaults(), catalogDefaults(), {
       // Global settings
       allowSelectCatalog: !config.catalogUrl,
-      privateQueryParameters: {},
-      stateQueryParameters: {},
-      catalogQueryParameters: {},
       stacIndex: [],
       supportedRelTypes: [ // These will be handled in a special way and will not be shown in the link lists
         'child',
@@ -208,7 +208,12 @@ function getStore(config) {
           }
           parts.push(absolute.authority());
           parts.push(absolute.path().replace(/^\//, ''));
-          return parts.join('/');
+          let path = parts.join('/');
+          let q = absolute.query();
+          if (q) {
+            path += `?${q}`;
+          }
+          return path;
         }
         else {
           return '/' + relative;
@@ -232,7 +237,7 @@ function getStore(config) {
         else if (!state.allowSelectCatalog && state.catalogUrl) {
           url = Utils.toAbsolute(url, state.catalogUrl, false);
         }
-        return getters.getRequestUrl(url, null, true);
+        return getters.getRequestUrl(url);
       },
       unproxyUrl: state => absoluteUrl => {
         if (absoluteUrl instanceof URI) {
@@ -258,16 +263,16 @@ function getStore(config) {
         }
         return absoluteUrl.relativeTo(state.catalogUrl) === absoluteUrl;
       },
-      getRequestUrl: (state, getters) => (url, baseUrl = null, addCatalogParams = false) => {
+      getRequestUrl: (state, getters) => (url, baseUrl = null, addCatalogParams = true) => {
         let absoluteUrl = Utils.toAbsolute(getters.proxyUrl(url), baseUrl ? baseUrl : state.url, false);
         if (!getters.isExternalUrl(absoluteUrl)) {
           // Check whether private params are present and add them if the URL is part of the catalog
           if (Utils.size(state.privateQueryParameters) > 0) {
-            absoluteUrl.addSearch(state.privateQueryParameters);
+            absoluteUrl.addQuery(state.privateQueryParameters);
           }
           // Check if we need to add catalog params
           if (addCatalogParams && Utils.size(state.catalogQueryParameters) > 0) {
-            absoluteUrl.addSearch(state.catalogQueryParameters);
+            absoluteUrl.addQuery(state.catalogQueryParameters);
           }
         }
         // If we are proxying a STAC Catalog, replace any URI with the proxied address.
@@ -284,7 +289,10 @@ function getStore(config) {
               break;
             case 'catalogUrl':
               if (typeof value === 'string') {
-                state.catalogUrl = Utils.toAbsolute(value, value); // This call is made to normalize the URL, e.g. append a missing /
+                let url = new URI(value);
+                state.catalogQueryParameters = Object.assign({}, state.catalogQueryParameters, url.query(true));
+                url.query("");
+                state.catalogUrl = url.toString();
               }
               break;
             case 'stacProxyUrl':

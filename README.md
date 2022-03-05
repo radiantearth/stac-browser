@@ -163,6 +163,9 @@ STAC Browser supports "private query parameters", e.g. for passing an API key th
 So for example if your API requires to pass a token via the `API_KEY` query parameter, you can request STAC Browser as such:
 `https://examples.com/stac-browser/?~API_KEY=123` which will change the URL to `https://examples.com/stac-browser/` and store the token `123` internally. The request then will have the query parameter attached and the Browser will request e.g. `https://examples.com/stac-api/?API_KEY=123`.
 
+Please note: If the server hosting STAC Browser should not get aware of private query parameters and you are having `historyMode` set to `history`, you can also append the private query parameters to the hash so that it doesn't get transmitted to the server hosting STAC Browser. 
+In this case use for example `https://examples.com/stac-browser/#?~API_KEY=123` instead of `https://examples.com/stac-browser/?~API_KEY=123`.
+
 ## Building
 
 ```bash

@@ -44,6 +44,7 @@ import Sidebar from './components/Sidebar.vue';
 import StacHeader from './components/StacHeader.vue';
 
 import Utils from './utils';
+import URI from 'urijs';
 
 const CONFIG_FILE = require(CONFIG_PATH);
 
@@ -128,7 +129,7 @@ export default {
     }
   },
   created() {
-    this.$router.onReady(() => this.parseQuery(this.$route, true));
+    this.$router.onReady(() => this.parseQuery(this.$route));
     this.$router.afterEach(to => this.parseQuery(to));
 
     // Load the root catalog data if not available (e.g. after page refresh or external access)
@@ -149,12 +150,17 @@ export default {
     }
   },
   methods: {
-    parseQuery(route, parsePrivate = false) {
-      let query = Object.assign({}, route.query);
+    parseQuery(route) {
+      let privateFromHash = {};
+      if (this.historyMode === 'history') {
+        let uri = new URI(route.hash.replace(/^#/, ''));
+        privateFromHash = uri.query(true);
+      }
+      let query = Object.assign({}, route.query, privateFromHash);
       let params = {};
       for(let key in query) {
         // Store all private query parameters (start with ~) and replace them in the shown URI
-        if (parsePrivate && key.startsWith('~')) {
+        if (key.startsWith('~')) {
           params.private = Utils.isObject(params.private) ? params.private : {};
           params.private[key.substr(1)] = query[key];
           delete query[key];
