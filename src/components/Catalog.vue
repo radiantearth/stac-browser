@@ -1,6 +1,6 @@
 <template>
-  <b-card no-body class="catalog-card" :class="{queued: !this.data}" v-b-visible.200="load">
-    <b-card-img v-if="thumbnail && showThumbnail" class="thumbnail" :src="thumbnail.href" :alt="thumbnail.title" :crossorigin="crossOriginMedia"></b-card-img>
+  <b-card no-body class="catalog-card" :class="{queued: !this.data}" v-b-visible.200="load" :img-right="isList">
+    <b-card-img v-if="thumbnail && showThumbnail" class="thumbnail" :src="thumbnail.href" :alt="thumbnail.title" :crossorigin="crossOriginMedia" :right="isList"></b-card-img>
     <b-card-body>
       <b-card-title>
         <StacLink :data="[data, catalog]" class="stretched-link" />
@@ -8,7 +8,7 @@
       <b-card-text v-if="data && data.description" class="intro">
         {{ data.description | stripCommonmark }}
       </b-card-text>
-      <b-card-text v-if="temporalExtent"><small class="text-muted">{{ temporalExtent | shortTemporalExtent }}</small></b-card-text>
+      <b-card-text v-if="temporalExtent" class="datetime">{{ temporalExtent | shortTemporalExtent }}</b-card-text>
     </b-card-body>
   </b-card>
 </template>
@@ -47,8 +47,11 @@ export default {
     }
   },
   computed: {
-    ...mapState(['crossOriginMedia']),
+    ...mapState(['crossOriginMedia', 'cardViewMode']),
     ...mapGetters(['getStac']),
+    isList() {
+      return this.cardViewMode === 'list';
+    },
     data() {
       if (this.catalog instanceof STAC) {
         return this.catalog;
@@ -91,31 +94,79 @@ export default {
 </script>
 
 <style lang="scss">
-.catalog-card {
-  box-sizing: border-box;
-  margin-top: 0.5em;
-  margin-bottom: 0.5em;
-  text-align: center;
+@import '../theme/variables.scss';
 
-  &.queued {
-    min-height: 10rem;
+.catalogs {
+  .catalog-card {
+    .intro {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-align: left;
+    }
   }
+  .card-list {
+    flex-direction: row;
+    .catalog-card {
+      box-sizing: border-box;
+      margin-top: 0.5em;
+      margin-bottom: 0.5em;
 
-  .intro {
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-align: left;
+      .card-img-right {
+        min-height: 100px;
+        height: 100%;
+        max-height: 8.5rem;
+        max-width: 33%;
+      }
+
+      .intro {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-align: left;
+        margin-bottom: 0;
+      }
+      .datetime {
+        display: inline-block;
+        padding: $border-radius;
+        border: 0;
+        background-color: rgba(0,0,0,0.6);
+        color: map-get($theme-colors, "light");
+        border-radius: 0 0 0 $border-radius;
+        position: absolute;
+        top: 0;
+        right: 0;
+        font-size: 80%;
+      }
+    }
   }
-  .card-img {
-    width: auto;
-    height: auto;
-    max-width: 100%;
-    max-height: 300px;
-  }
-  .card-body, .card-title {
-    text-align: center;
+  .card-columns {
+    .catalog-card {
+      box-sizing: border-box;
+      margin-top: 0.5em;
+      margin-bottom: 0.5em;
+      text-align: center;
+
+      &.queued {
+        min-height: 10rem;
+      }
+
+      .card-img {
+        width: auto;
+        height: auto;
+        max-width: 100%;
+        max-height: 300px;
+      }
+      .card-body, .card-title {
+        text-align: center;
+      }
+      .datetime {
+        color: map-get($theme-colors, "secondary");
+        font-size: 85%;
+      }
+    }
   }
 }
 </style>

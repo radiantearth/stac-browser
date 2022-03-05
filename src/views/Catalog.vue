@@ -213,6 +213,9 @@ export default {
   }
 
   .items, .catalogs {
+    .card-list {
+      flex-flow: column wrap;
+    }
     .card-columns {
       column-count: 1;
       @include media-breakpoint-only(md) {
@@ -236,7 +239,6 @@ export default {
   .split {
     .items, .catalogs {
       .card-columns {
-        column-count: 1;
         @include media-breakpoint-only(lg) {
           column-count: 1;
         }

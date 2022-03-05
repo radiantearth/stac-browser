@@ -3,11 +3,12 @@
     <h2>
       Catalogs
       <template v-if="!hasMore">({{ catalogs.length }})</template>
-      <SortButtons v-if="!hasMore" class="ml-4" v-model="sort" />
+      <ViewButtons class="ml-4" v-model="view" />
+      <SortButtons v-if="!hasMore" class="ml-2" v-model="sort" />
     </h2>
-    <b-card-group columns>
+    <component :is="cardsComponent" v-bind="cardsComponentProps">
       <Catalog v-for="catalog in sortedCatalogs" :catalog="catalog" :key="catalog.href" />
-    </b-card-group>
+    </component>
     <b-button v-if="hasMore" @click="loadMore" variant="primary" v-b-visible.200="loadMore">Load more...</b-button>
   </section>
 </template>
@@ -15,9 +16,13 @@
 <script>
 import Catalog from './Catalog.vue';
 import STAC from '../stac';
+import ViewMixin from './ViewMixin';
 
 export default {
   name: "Catalogs",
+  mixins: [
+    ViewMixin
+  ],
   components: {
     Catalog,
     SortButtons: () => import('./SortButtons.vue')

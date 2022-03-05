@@ -8,6 +8,7 @@ module.exports = {
     stacProxyUrl: null,
     pathPrefix: "/",
     historyMode: "history",
+    cardViewMode: 'cards',
     stacLint: true,
     geoTiffResolution: 128,
     redirectLegacyUrls: false,

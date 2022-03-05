@@ -1,7 +1,11 @@
 <template>
   <b-button-group title="Sort" size="sm">
-    <b-button @click="toggle(1)" variant="outline-primary" :pressed="value === 1 || (enforce && value !== -1)"><b-icon-sort-alpha-down /></b-button>
-    <b-button @click="toggle(-1)" variant="outline-primary" :pressed="value === -1"><b-icon-sort-alpha-up /></b-button>
+    <b-button @click="toggle(1)" variant="outline-primary" title="Sort in acending order (A-Z)" :pressed="value === 1 || (enforce && value !== -1)">
+      <b-icon-sort-alpha-down />
+    </b-button>
+    <b-button @click="toggle(-1)" variant="outline-primary" title="Sort in descending order (Z-A)" :pressed="value === -1">
+      <b-icon-sort-alpha-up />
+    </b-button>
   </b-button-group>
 </template>
 
