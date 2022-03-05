@@ -167,7 +167,7 @@ export default class Utils {
 						continue;
 					}
 				}
-				url.addQuery(key, value);
+				url.setQuery(key, value);
 			}
 			else {
 				url.removeQuery(key);

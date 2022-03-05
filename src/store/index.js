@@ -135,6 +135,17 @@ function getStore(config) {
         return links.find(link => Utils.isStacMediaType(link.type, true) && link.method !== 'POST');
       },
       supportsSearch: (state, getters) => Boolean(getters.searchLink),
+      supportsConformance: (state, getters) => conformanceClass => {
+        let conformance = [];
+        if (getters.root && Array.isArray(getters.root.conformsTo)) {
+          conformance = getters.root.conformsTo;
+        }
+        else if (state.data instanceof STAC && Array.isArray(state.data.conformsTo)) {
+          conformance = state.data.conformsTo;
+        }
+        let regexp = new RegExp(conformanceClass.replace('*', '[^/]+').replace(/\/?#/, '/?#'));
+        return !!conformance.find(uri => uri.match(regexp));
+      },
 
       tileRendererType: state => {
         if ((state.tileSourceTemplate || state.buildTileUrlTemplate) && !state.useTileLayerAsFallback) {

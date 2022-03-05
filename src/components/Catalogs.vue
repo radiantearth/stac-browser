@@ -41,9 +41,7 @@ export default {
     sortedCatalogs() {
       let catalogs = this.catalogs;
       if (!this.hasMore && this.sort !== 0) {
-        catalogs = catalogs.slice(0).sort((a,b) => {
-          return STAC.getDisplayTitle(a).localeCompare(STAC.getDisplayTitle(b));
-        });
+        catalogs = catalogs.slice(0).sort((a,b) => STAC.getDisplayTitle(a).localeCompare(STAC.getDisplayTitle(b)));
         if (this.sort === -1) {
           catalogs = catalogs.reverse();
         }
