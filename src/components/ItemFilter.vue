@@ -8,7 +8,7 @@
 
       <b-form-group label="Spatial Extent" label-for="provideBBox">
         <b-form-checkbox id="provideBBox" v-model="provideBBox" value="1" @change="setBBox">Filter by spatial extent</b-form-checkbox>
-        <Map v-if="provideBBox" :stac="stac" :selectBounds="true" @bounds="setBBox" />
+        <Map class="mb-4" v-if="provideBBox" :stac="stac" :selectBounds="true" @bounds="setBBox" />
       </b-form-group>
 
       <b-form-group v-if="!collectionOnly" label="Collections" label-for="collections">

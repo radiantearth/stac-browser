@@ -1,8 +1,13 @@
 <template>
-  <div class="previews">
-    <a v-for="thumbnail in thumbnails" :key="thumbnail.href" :href="thumbnail.href">
-      <img class="thumbnail" :src="thumbnail.href" :crossorigin="crossOriginMedia" />
-    </a>
+  <div class="previews" ref="previews">
+    <div class="overlay">
+      <FullscreenButton :element="() => $refs.previews" />
+    </div>
+    <div class="content">
+      <a v-for="thumbnail in thumbnails" :key="thumbnail.href" :href="thumbnail.href" target="_blank" download>
+        <img class="thumbnail" :src="thumbnail.href" :crossorigin="crossOriginMedia" />
+      </a>
+    </div>
   </div>
 </template>
 
@@ -11,6 +16,9 @@ import { mapState } from 'vuex';
 
 export default {
   name: 'Thumbnails',
+  components: {
+    FullscreenButton: () => import('./FullscreenButton.vue')
+  },
   props: {
     thumbnails: {
       type: Array
@@ -26,13 +34,15 @@ export default {
 @import '../theme/variables.scss';
 
 .previews {
-  text-align: center;
+  height: 400px;
+  box-sizing: border-box;
+  overflow: auto;
 
   a {
     display: inline-block;
     padding: 1px;
     border: 1px solid $body-bg;
-    margin: 0.25rem;
+    margin: 5px;
     border-radius: $border-radius;
 
     &:hover {
@@ -40,10 +50,36 @@ export default {
     }
   }
 
-  .thumbnail {
-    max-width: 100%;
-    max-height: 400px;
-    border-radius: $border-radius;
+  .content {
+    text-align: center;
+
+    .thumbnail {
+      max-width: 100%;
+      max-height: 390px;
+      border-radius: $border-radius;
+    }
+  }
+
+  .overlay {
+    text-align: right;
+    position: sticky;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: 0;
+    width: 100%;
+    z-index: 1;
+
+    .fullscreen-button {
+      margin: 10px;
+    }
+  }
+
+  &.fullscreen {
+    .thumbnail {
+      max-height: none;
+      border-radius: 0;
+    }
   }
 }
 

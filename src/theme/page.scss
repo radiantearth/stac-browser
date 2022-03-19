@@ -22,10 +22,10 @@
             background-repeat: no-repeat;
             background-size: contain;
             height: $logo-image-height;
+            margin-bottom: $block-margin;
         } @else if $logo == 'none' {
             display: none;
         }
-        margin-bottom: $block-margin;
     }
     > main {
         margin: $block-margin auto;
@@ -64,12 +64,16 @@
         top: 2vh;
         left: 20vw;
         width: 60vw;
-        z-index: 9999;
+        z-index: 5000;
     }
 
     abbr[title], abbr[data-original-title] {
         text-decoration: none;
         border-bottom: 1px dotted $body-color;
+    }
+
+    [class*='col'] {
+        position: static;
     }
 
     .accordion {

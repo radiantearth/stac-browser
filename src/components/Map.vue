@@ -1,5 +1,5 @@
 <template>
-  <section class="mb-4">
+  <section>
     <l-map class="map" v-if="show" :class="stac.type" @ready="init" :options="mapOptions">
       <LControlFullscreen />
       <template v-if="baseMaps.length > 0">

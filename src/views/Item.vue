@@ -12,16 +12,18 @@
         <Links v-if="additionalLinks.length > 0" title="Additional resources" :links="additionalLinks" />
       </b-col>
       <b-col>
-        <h2>Preview</h2>
-        <b-tabs v-if="thumbnails.length > 0" v-model="tab" ref="tabs">
-          <b-tab title="Map">
-            <Map :stac="data" :stacLayerData="selectedAsset" @mapClicked="mapClicked" @mapChanged="mapChanged" />
-          </b-tab>
-          <b-tab title="Thumbnails">
-            <Thumbnails :thumbnails="thumbnails" />
-          </b-tab>
-        </b-tabs>
-        <Map v-else :stac="data" :stacLayerData="selectedAsset" @mapClicked="mapClicked" @mapChanged="mapChanged" />
+        <section class="mb-4">
+          <h2>Preview</h2>
+          <b-tabs v-if="thumbnails.length > 0" v-model="tab" ref="tabs">
+            <b-tab title="Map">
+              <Map :stac="data" :stacLayerData="selectedAsset" @mapClicked="mapClicked" @mapChanged="mapChanged" />
+            </b-tab>
+            <b-tab title="Thumbnails">
+              <Thumbnails :thumbnails="thumbnails" />
+            </b-tab>
+          </b-tabs>
+          <Map v-else :stac="data" :stacLayerData="selectedAsset" @mapClicked="mapClicked" @mapChanged="mapChanged" />
+        </section>
       </b-col>
     </b-row>
     <b-row>

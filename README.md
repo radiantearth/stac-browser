@@ -138,6 +138,10 @@ The number of items requested and shown per page by default. Only applies to API
 
 The default view mode for lists of catalogs/collections. Either `list` or `cards` (default). 
 
+### showThumbnailsAsAssets
+
+Defines whether thumbnails are shown in the lists of assets (`true`, default) or not.
+
 ### crossOriginMedia
 
 The value for the [`crossorigin` attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/crossorigin) that is sent when loading images through the browser. Default to `null`. If you encounter issues with loading images, you may want to try setting this to `anonymous`.

@@ -192,8 +192,26 @@ function getStore(config) {
 
       // hasAsset also checks whether the assets have a href and thus are not item asset definitions
       hasAssets: (state, getters) => Object.values(getters.assets).find(asset => Utils.isObject(asset) && typeof asset.href === 'string'),
-      assets: state => Utils.isObject(state.data?.assets) ? state.data.assets : {},
-      thumbnails: state => state.data ? state.data.getThumbnails() : [],
+      assets: (state, getters) => {
+        if (!Utils.isObject(state.data?.assets)) {
+          return {};
+        }
+        else if (state.showThumbnailsAsAssets) {
+          return state.data.assets;
+        }
+        else {
+          let assets = {};
+          let thumbnails = getters.thumbnails;
+          for(let key in state.data.assets) {
+            let asset = state.data.assets[key];
+            if (!thumbnails.includes(asset)) {
+              assets[key] = asset;
+            }
+          }
+          return assets;
+        }
+      },
+      thumbnails: state => state.data ? state.data.getThumbnails(true) : [],
       additionalLinks: state => state.data ? state.data.getLinksWithOtherRels(state.supportedRelTypes) : [],
 
       toBrowserPath: (state, getters) => url => {

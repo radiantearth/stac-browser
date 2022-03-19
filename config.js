@@ -9,6 +9,7 @@ module.exports = {
     pathPrefix: "/",
     historyMode: "history",
     cardViewMode: 'cards',
+    showThumbnailsAsAssets: false,
     stacLint: true,
     geoTiffResolution: 128,
     redirectLegacyUrls: false,
