@@ -55,7 +55,7 @@ export default {
 
     .thumbnail {
       max-width: 100%;
-      max-height: 390px;
+      max-height: 385px;
       border-radius: $border-radius;
     }
   }
