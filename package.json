@@ -1,6 +1,6 @@
 {
   "name": "@radiantearth/stac-browser",
-  "version": "3.0.0-alpha.7",
+  "version": "3.0.0-alpha.8",
   "description": "A Vue-based STAC browser intended for static + dynamic deployment",
   "main": "src/main.js",
   "scripts": {
