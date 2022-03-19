@@ -18,10 +18,10 @@ class STAC {
 
         if (migrate) {
             if (data.type === 'FeatureCollection') {
-                data.features = data.features.map(item => Migrate.item(item));
+                data.features = data.features.map(item => Migrate.item(item, false));
             }
             else {
-                data = Migrate.stac(data);
+                data = Migrate.stac(data, false);
             }
         }
         for(let key in data) {
