@@ -21,6 +21,10 @@
         <Links v-if="isCollection && additionalLinks.length > 0" title="Additional resources" :links="additionalLinks" />
       </b-col>
       <b-col class="middle">
+        <Providers v-if="hasProviders" :providers="data.providers" />
+        <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="shownAssets" @showAsset="showAsset" />
+      </b-col>
+      <b-col class="right">
         <section v-if="isCollection || thumbnails.length > 0" class="mb-4">
           <b-tabs v-if="isCollection && thumbnails.length > 0" v-model="tab" ref="tabs">
             <b-tab title="Map">
@@ -34,10 +38,6 @@
           <Thumbnails v-else-if="thumbnails.length > 0" :thumbnails="thumbnails" />
         </section>
         <Links v-if="!isCollection && additionalLinks.length > 0" title="Additional resources" :links="additionalLinks" />
-      </b-col>
-      <b-col class="right">
-        <Providers v-if="hasProviders" :providers="data.providers" />
-        <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="shownAssets" @showAsset="showAsset" />
       </b-col>
     </b-row>
     <b-row>
