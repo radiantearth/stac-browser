@@ -15,7 +15,7 @@
                     <b-col>
                         <b-spinner v-if="valid === null" label="Validating..." small></b-spinner>
                         <template v-else-if="valid === true">✔️</template>
-                        <template v-else-if="valid === false">❌</template><!-- ToDo: Link to staclint -->
+                        <template v-else-if="valid === false">❌</template>
                         <template v-else>n/a</template>
                     </b-col>
                 </b-row>
