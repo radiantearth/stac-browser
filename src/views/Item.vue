@@ -66,6 +66,7 @@ export default {
     return {
       ignoredMetadataFields: [
         'title',
+        'description',
         // Will be rendered with a custom rendered
         'deprecated',
         // Special handling for the warning of the anonymized-location extension
@@ -99,9 +100,11 @@ export default {
 @import '~bootstrap/scss/mixins';
 @import "../theme/variables.scss";
 
-@include media-breakpoint-down(sm) {
-  .item {
-    .left, .right {
+.item {
+  .left, .right {
+    max-width: 50%;
+    @include media-breakpoint-down(sm) {
+      max-width: 100%;
       min-width: 100%;
     }
   }

@@ -183,7 +183,13 @@ export default class Utils {
 		let file = uri.filename().replace(/^(.{1,})\.\w+$/, '$1');
 		let dir = uri.directory().replace(/^\//, '');
 		if (auth && file && !preferFileName) {
-			return `${file} at ${auth}`;
+			let path = uri.path().replace(/^\//, '');
+			if (auth === 'doi.org' && path.startsWith('10.')) {
+				return `DOI ${path}`;
+			}
+			else {
+				return `${file} at ${auth}`;
+			}
 		}
 		else if (file && !commonFileNames.includes(file)) {
 			return file;

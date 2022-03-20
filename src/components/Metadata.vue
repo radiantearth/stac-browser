@@ -102,7 +102,7 @@ export default {
         vertical-align: top;
     }
     .value {
-        > ul, > ol {
+        > ul, > ol, > pre {
             max-height: 15em;
             overflow: auto;
         }
