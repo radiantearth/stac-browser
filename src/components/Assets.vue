@@ -2,7 +2,7 @@
   <section class="assets mb-4">
     <h2>{{ title }}</h2>
     <div class="accordion" role="tablist">
-      <Asset v-for="(asset, key) in assets" :asset="asset" :expand="expand" :context="context" :shown="shown.includes(key)" :id="String(key)" :key="key" @show="show" />
+      <Asset v-for="(asset, key) in assets" :asset="asset" :expand="expand" :context="context" :shown="shown.includes(key)" :id="getId(key)" :key="getId(key)" @show="show" />
     </div>
   </section>
 </template>
@@ -49,6 +49,9 @@ export default {
     }
   },
   methods: {
+    getId(key) {
+      return (this.definition ? 'item-def-' : 'asset-') + String(key);
+    },
     show(asset, id, isThumbnail) {
       this.$emit('showAsset', asset, id, isThumbnail);
     }
