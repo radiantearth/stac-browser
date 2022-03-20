@@ -30,6 +30,7 @@ import { BCollapse, BIconSearch } from "bootstrap-vue";
 import Utils from '../utils';
 import STAC from '../stac';
 import { mapGetters } from "vuex";
+import { ITEMSEARCH_SORT } from '../api';
 
 export default {
   name: "Items",
@@ -104,7 +105,7 @@ export default {
       }
     },
     canSort() {
-      return this.supportsConformance('https://api.stacspec.org/*/ogcapi-features#sort');
+      return this.supportsConformance(ITEMSEARCH_SORT);
     }
   },
   watch: {

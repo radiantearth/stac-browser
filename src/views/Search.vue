@@ -27,6 +27,7 @@
 import Items from '../components/Items.vue';
 import { mapGetters, mapState } from "vuex";
 import Utils from '../utils';
+import { ITEMSEARCH_SORT } from '../api';
 
 const pageTitle = 'Search';
 
@@ -75,7 +76,7 @@ export default {
       return pages;
     },
     canSort() {
-      return this.supportsConformance('https://api.stacspec.org/*/item-search#sort');
+      return this.supportsConformance(ITEMSEARCH_SORT);
     }
   },
   watch:{

@@ -143,7 +143,7 @@ function getStore(config) {
         else if (state.data instanceof STAC && Array.isArray(state.data.conformsTo)) {
           conformance = state.data.conformsTo;
         }
-        let regexp = new RegExp(conformanceClass.replace('*', '[^/]+').replace(/\/?#/, '/?#'));
+        let regexp = new RegExp('^' + conformanceClass.replace('*', '[^/]+').replace(/\/?#/, '/?#') + '$');
         return !!conformance.find(uri => uri.match(regexp));
       },
 
