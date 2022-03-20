@@ -4,7 +4,7 @@
             <b-form-input :id="id" ref="input" v-model="url" readonly></b-form-input>
             <b-input-group-append>
                 <CopyButton :copyText="url" variant="primary" />
-                <b-button v-if="open" :href="url" target="_blank" variant="primary"><b-icon-arrow-up-right-square /></b-button>
+                <b-button v-if="open" :href="url" target="_blank" variant="primary" title="Open"><b-icon-arrow-up-right-square /></b-button>
             </b-input-group-append>
         </b-input-group>
     </b-form-group>

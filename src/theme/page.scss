@@ -76,6 +76,20 @@
         position: static;
     }
 
+    .button-label {
+        display: none;
+    }
+    @include media-breakpoint-up(sm) {
+        .button-label.prio {
+            display: inline;
+        }
+    }
+    @include media-breakpoint-up(md) {
+        .button-label {
+            display: inline;
+        }
+    }
+
     .accordion {
         > .card  {
             border: 0;

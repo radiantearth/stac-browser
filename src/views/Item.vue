@@ -1,7 +1,7 @@
 <template>
   <div class="item">
     <b-row>
-      <b-col>
+      <b-col class="left">
         <DeprecationNotice v-if="data.properties.deprecated" :data="data" />
         <AnonymizedNotice v-if="data.properties['anon:warning']" :warning="data.properties['anon:warning']" />
         <ReadMore v-if="data.properties.description" :lines="10">
@@ -11,7 +11,7 @@
         <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="shownAssets" @showAsset="showAsset" />
         <Links v-if="additionalLinks.length > 0" title="Additional resources" :links="additionalLinks" />
       </b-col>
-      <b-col>
+      <b-col class="right">
         <section class="mb-4">
           <h2>Preview</h2>
           <b-tabs v-if="thumbnails.length > 0" v-model="tab" ref="tabs">
@@ -98,6 +98,14 @@ export default {
 <style lang="scss">
 @import '~bootstrap/scss/mixins';
 @import "../theme/variables.scss";
+
+@include media-breakpoint-down(sm) {
+  .item {
+    .left, .right {
+      min-width: 100%;
+    }
+  }
+}
 
 .item .properties, .catalog {
   .metadata {

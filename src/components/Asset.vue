@@ -21,7 +21,7 @@
             {{ buttonText }}
           </CopyButton>
           <b-button v-else :href="href" target="_blank" variant="outline-primary">
-            {{ buttonText }}
+            <b-icon-download /> {{ buttonText }}
           </b-button>
           <b-button v-if="canShow && shown" :pressed="true" variant="outline-primary" class="inactive">
             <b-icon-check /> Currently shown
@@ -40,7 +40,7 @@
 </template>
 
 <script>
-import { BCollapse, BIconCheck, BIconChevronRight, BIconChevronDown, BIconEye } from 'bootstrap-vue';
+import { BCollapse, BIconCheck, BIconChevronRight, BIconChevronDown, BIconDownload, BIconEye } from 'bootstrap-vue';
 import { Formatters } from '@radiantearth/stac-fields';
 import { MIME_TYPES } from 'stac-layer/src/data';
 import { mapGetters, mapState } from 'vuex';
@@ -56,6 +56,7 @@ export default {
     BIconCheck,
     BIconChevronDown,
     BIconChevronRight,
+    BIconDownload,
     BIconEye,
     CopyButton: () => import('./CopyButton.vue'),
     Description,

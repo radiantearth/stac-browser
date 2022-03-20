@@ -1,10 +1,10 @@
 <template>
     <div class="share mt-1">
         <b-button-group>
-            <b-button :disabled="!stacUrl" size="sm" variant="outline-primary" id="popover-link"><b-icon-link /></b-button>
-            <b-button size="sm" variant="outline-primary" id="popover-share"><b-icon-share /></b-button>
+            <b-button v-if="stacUrl" size="sm" variant="outline-primary" id="popover-link" title="Details about the STAC source"><b-icon-link /> <span class="button-label">Source</span></b-button>
+            <b-button size="sm" variant="outline-primary" id="popover-share" title="Share this page with others"><b-icon-share /> <span class="button-label">Share</span></b-button>
         </b-button-group>
-        <b-popover v-show="stacUrl" target="popover-link" triggers="click blur" placement="bottom" container="stac-browser" title="Source Data" @show="validate">
+        <b-popover v-if="stacUrl" target="popover-link" triggers="click blur" placement="bottom" container="stac-browser" title="Source Data" @show="validate">
             <template v-if="stacVersion">
                 <b-row>
                     <b-col cols="2">STAC Version:</b-col>
