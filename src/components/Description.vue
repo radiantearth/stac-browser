@@ -60,7 +60,7 @@ export default {
 	}
 }
 .styled-description {
-	line-height: 1.25em;
+	line-height: 1.4em;
 
 	h1 {
 		font-size: 1.75rem;
