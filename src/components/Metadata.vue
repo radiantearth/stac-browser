@@ -8,8 +8,8 @@
                     <template v-else>{{ commmonMetadataTitle }}</template>
                 </b-card-title>
                 <b-row v-for="(prop, key) in group.properties" :key="key">
-                    <b-col md="5" class="label" :title="key" v-html="prop.label" />
-                    <b-col md="7" class="value" v-html="prop.formatted" />
+                    <b-col md="4" class="label" :title="key" v-html="prop.label" />
+                    <b-col md="8" class="value" v-html="prop.formatted" />
                 </b-row>
             </b-card>
         </b-card-group>
@@ -93,8 +93,18 @@ export default {
         margin-bottom: $block-margin;
         text-align: left;
 
+        h4 {
+            font-size: 1.2em;
+        }
+
         .row {
-            margin-bottom: 0.33em;
+            padding: 0.4em;
+            border-top: 1px solid rgba(0,0,0,0.125);
+
+        }
+
+        .row:nth-child(even) {
+            background: rgba(0,0,0,0.03);
         }
     }
     .label {
@@ -108,7 +118,7 @@ export default {
         }
     }
     ul, ol {
-        padding-left: 1.2em;
+        padding-left: 1.4em;
         margin-bottom: 0;
     }
     ul li {

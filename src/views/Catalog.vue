@@ -2,6 +2,7 @@
   <div class="catalog">
     <b-row class="three-cols">
       <b-col class="left">
+        <h2>Description</h2>
         <DeprecationNotice v-if="data.deprecated" :data="data" />
         <AnonymizedNotice v-if="data['anon:warning']" :warning="data['anon:warning']" />
         <ReadMore v-if="data.description" :lines="10">
@@ -21,23 +22,25 @@
         <Links v-if="isCollection && additionalLinks.length > 0" title="Additional resources" :links="additionalLinks" />
       </b-col>
       <b-col class="middle">
+        <Links v-if="!isCollection && additionalLinks.length > 0" title="Additional resources" :links="additionalLinks" />
+        <Providers v-if="hasProviders" :providers="data.providers" />
+        <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="shownAssets" @showAsset="showAsset" />
+      </b-col>
+      <b-col class="right">
         <section v-if="isCollection || thumbnails.length > 0" class="mb-4">
-          <b-tabs v-if="isCollection && thumbnails.length > 0" v-model="tab" ref="tabs">
-            <b-tab title="Map">
+          <b-card no-body>
+          <b-tabs v-if="isCollection && thumbnails.length > 0" v-model="tab" ref="tabs" pills card>
+            <b-tab title="Map" no-body>
               <Map :stac="data" :stacLayerData="selectedAsset" @mapClicked="mapClicked" @mapChanged="mapChanged" />
             </b-tab>
-            <b-tab title="Preview">
+            <b-tab title="Preview" no-body>
               <Thumbnails :thumbnails="thumbnails" />
             </b-tab>
           </b-tabs>
           <Map v-else-if="isCollection" :stac="data" :stacLayerData="selectedAsset" @mapClicked="mapClicked" @mapChanged="mapChanged" />
           <Thumbnails v-else-if="thumbnails.length > 0" :thumbnails="thumbnails" />
+          </b-card>
         </section>
-        <Links v-if="!isCollection && additionalLinks.length > 0" title="Additional resources" :links="additionalLinks" />
-      </b-col>
-      <b-col class="right">
-        <Providers v-if="hasProviders" :providers="data.providers" />
-        <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="shownAssets" @showAsset="showAsset" />
       </b-col>
     </b-row>
     <b-row>
