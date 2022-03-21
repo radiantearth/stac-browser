@@ -103,27 +103,29 @@ export default {
 </script>
 
 <style lang="scss">
-.item-card {
-  text-align: center;
-
-  &.queued {
-    min-height: 200px;
-  }
-
-  .fileformat {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100%;
-  }
-
-  .card-img {
-    width: auto;
-    height: auto;
-    max-width: 100%;
-    max-height: 200px;
-  }
-  .card-body {
+#stac-browser {
+  .item-card {
     text-align: center;
+
+    &.queued {
+      min-height: 200px;
+    }
+
+    .fileformat {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+
+    .card-img {
+      width: auto;
+      height: auto;
+      max-width: 100%;
+      max-height: 200px;
+    }
+    .card-body {
+      text-align: center;
+    }
   }
 }
 </style>

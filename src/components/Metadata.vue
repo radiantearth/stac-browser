@@ -86,99 +86,100 @@ export default {
 <style lang="scss">
 @import "../theme/variables.scss";
 
-.metadata {
-    .card {
-        border: 0;
-        margin-top: $block-margin;
-        margin-bottom: $block-margin;
-        text-align: left;
+#stac-browser {
+    .metadata {
+        .card {
+            border: 0;
+            margin-top: $block-margin;
+            margin-bottom: $block-margin;
+            text-align: left;
 
-        h4 {
-            font-size: 1.2em;
-        }
+            .row {
+                padding: 0.4em;
+                border-top: 1px solid rgba(0,0,0,0.125);
+                margin: 0;
+            }
 
-        .row {
-            padding: 0.4em;
-            border-top: 1px solid rgba(0,0,0,0.125);
-
-        }
-
-        .row:nth-child(even) {
-            background: rgba(0,0,0,0.03);
-        }
-    }
-    .label {
-        font-weight: 600;
-        vertical-align: top;
-    }
-    .value {
-        > ul, > ol, > pre {
-            max-height: 15em;
-            overflow: auto;
-        }
-    }
-    ul, ol {
-        padding-left: 1.4em;
-        margin-bottom: 0;
-    }
-    ul li {
-        list-style-type: '- ';
-    }
-    dl {
-        margin: 0;
-        margin-left: 1em;
-        margin-bottom: 0.5em;
-
-        &:only-child {
-            margin-left: 0;
-        }
-        dl:only-child {
-            margin-left: 1em;
-        }
-    }
-    ul > li > dl, ol > li > dl {
-        margin-left: 0;
-    }
-    dt {
-        display: inline;
-    }
-    dt:after {
-        content: ': ';
-    }
-    dd {
-        display: inline;
-
-        &:not(:last-of-type) > dl:only-child {
-            margin-bottom: -1em;
-        }
-        &:after {
-            content: "\A";
-            white-space: pre;
-            line-height: 1px;
-        }
-        &:last-of-type:after {
-            content: "";
-            white-space: normal;
-        }
-        .description {
-            display: inline-block;
-            
-            > p:only-child {
-                display: inline;
+            .row:nth-child(even) {
+                background: rgba(0,0,0,0.03);
             }
         }
-        > ul, > ol {
-            max-height: 15em;
-            overflow: auto;
+        .label {
+            font-weight: 600;
+            vertical-align: top;
+            padding-left: 0.4em;
         }
-    }
-    .provider .description {
-        font-size: 0.9em;
-        line-height: 1.5em;
-        margin-bottom: 0.5em;
-    }
-    .checksum-input {
-        width: 100%;
+        .value {
+            padding-right: 0.4em;
+
+            > ul, > ol, > pre {
+                max-height: 15em;
+                overflow: auto;
+            }
+        }
+        ul, ol {
+            padding-left: 1.4em;
+            margin-bottom: 0;
+        }
+        ul li {
+            list-style-type: '- ';
+        }
+        dl {
+            margin: 0;
+            margin-left: 1em;
+            margin-bottom: 0.5em;
+
+            &:only-child {
+                margin-left: 0;
+            }
+            dl:only-child {
+                margin-left: 1em;
+            }
+        }
+        ul > li > dl, ol > li > dl {
+            margin-left: 0;
+        }
+        dt {
+            display: inline;
+        }
+        dt:after {
+            content: ': ';
+        }
+        dd {
+            display: inline;
+
+            &:not(:last-of-type) > dl:only-child {
+                margin-bottom: -1em;
+            }
+            &:after {
+                content: "\A";
+                white-space: pre;
+                line-height: 1px;
+            }
+            &:last-of-type:after {
+                content: "";
+                white-space: normal;
+            }
+            .description {
+                display: inline-block;
+                
+                > p:only-child {
+                    display: inline;
+                }
+            }
+            > ul, > ol {
+                max-height: 15em;
+                overflow: auto;
+            }
+        }
+        .provider .description {
+            font-size: 0.9em;
+            line-height: 1.5em;
+            margin-bottom: 0.5em;
+        }
+        .checksum-input {
+            width: 100%;
+        }
     }
 }
 </style>

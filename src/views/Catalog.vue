@@ -28,18 +28,18 @@
       </b-col>
       <b-col class="right">
         <section v-if="isCollection || thumbnails.length > 0" class="mb-4">
-          <b-card no-body>
-          <b-tabs v-if="isCollection && thumbnails.length > 0" v-model="tab" ref="tabs" pills card>
-            <b-tab title="Map" no-body>
-              <Map :stac="data" :stacLayerData="selectedAsset" @mapClicked="mapClicked" @mapChanged="mapChanged" />
-            </b-tab>
-            <b-tab title="Preview" no-body>
-              <Thumbnails :thumbnails="thumbnails" />
-            </b-tab>
-          </b-tabs>
+          <b-card v-if="isCollection && thumbnails.length > 0" no-body class="maps-preview">
+            <b-tabs v-model="tab" ref="tabs" pills card justified>
+              <b-tab title="Map" no-body>
+                <Map :stac="data" :stacLayerData="selectedAsset" @mapClicked="mapClicked" @mapChanged="mapChanged" />
+              </b-tab>
+              <b-tab title="Preview" no-body>
+                <Thumbnails :thumbnails="thumbnails" />
+              </b-tab>
+            </b-tabs>
+          </b-card>
           <Map v-else-if="isCollection" :stac="data" :stacLayerData="selectedAsset" @mapClicked="mapClicked" @mapChanged="mapChanged" />
           <Thumbnails v-else-if="thumbnails.length > 0" :thumbnails="thumbnails" />
-          </b-card>
         </section>
       </b-col>
     </b-row>
@@ -195,64 +195,66 @@ export default {
 @import '~bootstrap/scss/mixins';
 @import "../theme/variables.scss";
 
-.catalog {
-  @include media-breakpoint-down(md) {
-    .three-cols {
-      .left, .middle, .right {
-        min-width: 100%;
+#stac-browser {
+  .catalog {
+    @include media-breakpoint-down(md) {
+      .three-cols {
+        .left, .middle, .right {
+          min-width: 100%;
+        }
       }
     }
-  }
-  @include media-breakpoint-only(xs) {
-    .split {
-      .left, .middle, .right {
-        min-width: 100%;
+    @include media-breakpoint-only(xs) {
+      .split {
+        .left, .middle, .right {
+          min-width: 100%;
+        }
       }
     }
-  }
 
-  .middle:empty, .right:empty {
-    display: none;
-  }
-
-  .items, .catalogs {
-    .card-list {
-      flex-flow: column wrap;
+    .middle:empty, .right:empty {
+      display: none;
     }
-    .card-columns {
-      column-count: 1;
-      @include media-breakpoint-only(md) {
-        column-count: 2;
-      }
-      @include media-breakpoint-only(lg) {
-        column-count: 3;
-      }
-      @include media-breakpoint-only(xl) {
-        column-count: 3;
-      }
-      @include media-breakpoint-only(xxl) {
-        column-count: 4;
-      }
-      @include media-breakpoint-up(xxxl) {
-        column-count: 5;
-      }
-    }
-  }
 
-  .split {
     .items, .catalogs {
+      .card-list {
+        flex-flow: column wrap;
+      }
       .card-columns {
+        column-count: 1;
+        @include media-breakpoint-only(md) {
+          column-count: 2;
+        }
         @include media-breakpoint-only(lg) {
-          column-count: 1;
+          column-count: 3;
         }
         @include media-breakpoint-only(xl) {
-          column-count: 2;
+          column-count: 3;
         }
         @include media-breakpoint-only(xxl) {
-          column-count: 2;
+          column-count: 4;
         }
         @include media-breakpoint-up(xxxl) {
-          column-count: 3;
+          column-count: 5;
+        }
+      }
+    }
+
+    .split {
+      .items, .catalogs {
+        .card-columns {
+          @include media-breakpoint-only(lg) {
+            column-count: 1;
+          }
+          @include media-breakpoint-only(xl) {
+            column-count: 2;
+          }
+          @include media-breakpoint-only(xxl) {
+            column-count: 2;
+          }
+          @include media-breakpoint-up(xxxl) {
+            column-count: 3;
+          }
         }
       }
     }

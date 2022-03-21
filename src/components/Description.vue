@@ -38,64 +38,74 @@ export default {
 </script>
 
 <style lang="scss">
-.styled-description.compact {
-	h1, h2, h3, h4, h5, h6 {
-		font-weight: bold;
-		font-size: 1.1em;
-		margin: 0.5em 0;
-	}
-	p {
-		margin: 0.5em 0;
-	}
-	p:first-child {
-		margin-top: 0;
-	}
-	p:last-child {
-		margin-bottom: 0;
-	}
-	pre {
-		max-height: 7em;
-		width: auto;
-		max-width: 100%;
-	}
-}
-.styled-description {
-	line-height: 1.4em;
+@import '../theme/variables.scss';
 
-	h1 {
-		font-size: 1.75rem;
-	}
-	h2 {
-		font-size: 1.5em;
-	}
-	h3 {
-		font-size: 1.35em;
-	}
-	h4 {
-		font-size: 1.2em;
-	}
-	h5 {
-		font-size: 1.1em;
-	}
-	h6 {
-		font-size: 1.0em;
-	}
-	pre {
-		background-color: #eee;
-		width: 100%;
-		border: 1px solid #ccc;
-		max-height: 15em;
-		overflow-y: auto;
-	}
-	pre code {
-		background-color: transparent; 
-		display: block;
-		margin: 0.5em;
-	}
-	code {
-		color: maroon;
-		display: inline-block;
-		padding: 0 0.1em;
+#stac-browser {
+	.styled-description {
+		line-height: 1.4em;
+		text-align: justify;
+
+		h1, h2, h3, h4, h5, h6 {
+			color: map-get($theme-colors, "secondary");
+			font-weight: 600;
+		}
+		h1 {
+			font-size: 1.5rem;
+		}
+		h2 {
+			font-size: 1.4rem;
+		}
+		h3 {
+			font-size: 1.3rem;
+		}
+		h4 {
+			font-size: 1.2rem;
+		}
+		h5 {
+			font-size: 1.1rem;
+		}
+		h6 {
+			font-size: 1.0rem;
+		}
+		pre {
+			background-color: #eee;
+			width: 100%;
+			border: 1px solid #ccc;
+			max-height: 15em;
+			overflow-y: auto;
+		}
+		pre code {
+			background-color: transparent; 
+			display: block;
+			margin: 0.5em;
+		}
+		code {
+			color: maroon;
+			display: inline-block;
+			padding: 0 0.1em;
+		}
+
+		&.compact {
+			h1, h2, h3, h4, h5, h6 {
+				font-weight: bold;
+				font-size: 1.1em;
+				margin: 0.5em 0;
+			}
+			p {
+				margin: 0.5em 0;
+			}
+			p:first-child {
+				margin-top: 0;
+			}
+			p:last-child {
+				margin-bottom: 0;
+			}
+			pre {
+				max-height: 7em;
+				width: auto;
+				max-width: 100%;
+			}
+		}
 	}
 }
 </style>

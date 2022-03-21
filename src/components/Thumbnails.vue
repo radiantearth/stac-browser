@@ -33,54 +33,55 @@ export default {
 <style lang="scss">
 @import '../theme/variables.scss';
 
-.previews {
-  height: 400px;
-  box-sizing: border-box;
-  overflow: auto;
+#stac-browser {
+  .previews {
+    height: 350px;
+    box-sizing: border-box;
+    overflow: auto;
 
-  a {
-    display: inline-block;
-    padding: 1px;
-    border: 1px solid $body-bg;
-    margin: 5px;
-    border-radius: $border-radius;
-
-    &:hover {
-      border-color: map-get($theme-colors, "primary");
-    }
-  }
-
-  .content {
-    text-align: center;
-
-    .thumbnail {
-      max-width: 100%;
-      max-height: 385px;
+    a {
+      display: inline-block;
+      padding: 1px;
+      border: 1px solid $body-bg;
+      margin: 5px;
       border-radius: $border-radius;
+
+      &:hover {
+        border-color: map-get($theme-colors, "primary");
+      }
     }
-  }
 
-  .overlay {
-    text-align: right;
-    position: sticky;
-    top: 0;
-    right: 0;
-    left: 0;
-    height: 0;
-    width: 100%;
-    z-index: 1;
+    .content {
+      text-align: center;
 
-    .fullscreen-button {
-      margin: 10px;
+      .thumbnail {
+        max-width: 100%;
+        max-height: 335px;
+        border-radius: $border-radius;
+      }
     }
-  }
 
-  &.fullscreen {
-    .thumbnail {
-      max-height: none;
-      border-radius: 0;
+    .overlay {
+      text-align: right;
+      position: sticky;
+      top: 0;
+      right: 0;
+      left: 0;
+      height: 0;
+      width: 100%;
+      z-index: 1;
+
+      .fullscreen-button {
+        margin: 10px;
+      }
+    }
+
+    &.fullscreen {
+      .thumbnail {
+        max-height: none;
+        border-radius: 0;
+      }
     }
   }
 }
-
 </style>

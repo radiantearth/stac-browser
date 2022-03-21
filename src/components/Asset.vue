@@ -222,36 +222,32 @@ export default {
 </script>
 
 <style lang="scss">
-.asset {
-  .card-title {
-    font-size: 1.3em;
-  }
-  .btn-asset {
-    text-align: left;
+#stac-browser {
+  .asset {
+    .btn-asset {
+      text-align: left;
 
-    .badges {
-      .badge {
-        line-height: 1.2em;
-        height: 1.7em;
-      }
+      .badges {
+        .badge {
+          line-height: 1.2em;
+          height: 1.7em;
+        }
 
-      .role {
-        text-transform: uppercase;
+        .role {
+          text-transform: uppercase;
+        }
       }
     }
-  }
-  .metadata {
-    h4 {
-      font-size: 1.2rem;
-    }
-    .card-columns {
-      column-count: 1;
-    }
-    .card {
-      border: 0;
-    }
-    .card-body {
-      padding: 0;
+    .metadata {
+      .card-columns {
+        column-count: 1;
+      }
+      .card {
+        border: 0;
+      }
+      .card-body {
+        padding: 0;
+      }
     }
   }
 }

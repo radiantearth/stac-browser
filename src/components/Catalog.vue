@@ -96,75 +96,77 @@ export default {
 <style lang="scss">
 @import '../theme/variables.scss';
 
-.catalogs {
-  .catalog-card {
-    .intro {
-      display: -webkit-box;
-      -webkit-line-clamp: 3;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      text-align: left;
-    }
-  }
-  .card-list {
-    flex-direction: row;
+#stac-browser {
+  .catalogs {
     .catalog-card {
-      box-sizing: border-box;
-      margin-top: 0.5em;
-      margin-bottom: 0.5em;
-
-      .card-img-right {
-        min-height: 100px;
-        height: 100%;
-        max-height: 8.5rem;
-        max-width: 33%;
-      }
-
       .intro {
         display: -webkit-box;
-        -webkit-line-clamp: 2;
+        -webkit-line-clamp: 3;
         -webkit-box-orient: vertical;
         overflow: hidden;
         text-align: left;
-        margin-bottom: 0;
-      }
-      .datetime {
-        display: inline-block;
-        padding: $border-radius;
-        border: 0;
-        background-color: rgba(0,0,0,0.6);
-        color: map-get($theme-colors, "light");
-        border-radius: 0 0 0 $border-radius;
-        position: absolute;
-        top: 0;
-        right: 0;
-        font-size: 80%;
       }
     }
-  }
-  .card-columns {
-    .catalog-card {
-      box-sizing: border-box;
-      margin-top: 0.5em;
-      margin-bottom: 0.5em;
-      text-align: center;
+    .card-list {
+      flex-direction: row;
+      .catalog-card {
+        box-sizing: border-box;
+        margin-top: 0.5em;
+        margin-bottom: 0.5em;
 
-      &.queued {
-        min-height: 10rem;
-      }
+        .card-img-right {
+          min-height: 100px;
+          height: 100%;
+          max-height: 8.5rem;
+          max-width: 33%;
+        }
 
-      .card-img {
-        width: auto;
-        height: auto;
-        max-width: 100%;
-        max-height: 300px;
+        .intro {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          text-align: left;
+          margin-bottom: 0;
+        }
+        .datetime {
+          display: inline-block;
+          padding: $border-radius;
+          border: 0;
+          background-color: rgba(0,0,0,0.6);
+          color: map-get($theme-colors, "light");
+          border-radius: 0 0 0 $border-radius;
+          position: absolute;
+          top: 0;
+          right: 0;
+          font-size: 80%;
+        }
       }
-      .card-body, .card-title {
+    }
+    .card-columns {
+      .catalog-card {
+        box-sizing: border-box;
+        margin-top: 0.5em;
+        margin-bottom: 0.5em;
         text-align: center;
-      }
-      .datetime {
-        color: map-get($theme-colors, "secondary");
-        font-size: 85%;
+
+        &.queued {
+          min-height: 10rem;
+        }
+
+        .card-img {
+          width: auto;
+          height: auto;
+          max-width: 100%;
+          max-height: 300px;
+        }
+        .card-body, .card-title {
+          text-align: center;
+        }
+        .datetime {
+          color: map-get($theme-colors, "secondary");
+          font-size: 85%;
+        }
       }
     }
   }

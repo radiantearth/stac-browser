@@ -110,12 +110,14 @@ export default {
 </script>
 
 <style lang="scss">
-.stacIndex {
-  max-height: 50vh;
-  overflow: auto;
+#stac-browser {
+  .stacIndex {
+    max-height: 50vh;
+    overflow: auto;
 
-  .active .styled-description a {
-    color: white;
+    .active .styled-description a {
+      color: white;
+    }
   }
 }
 </style>

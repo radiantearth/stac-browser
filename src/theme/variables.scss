@@ -15,7 +15,7 @@ $body-color: black;
 
 // Colors
 $theme-colors: (
-  "primary":       #0061C8,
+  "primary":       #17a2b8,
   "secondary":     #6c757d,
   "success":       #28a745,
   "info":          #17a2b8,
@@ -43,7 +43,10 @@ $font-family-sans-serif: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, 
 // Fonts for code
 $font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
-$h2-font-size: 1.5rem;
+$h1-font-size: 2.2rem;
+$h2-font-size: 1.6rem;
+$h3-font-size: 1.4rem;
+$h4-font-size: 1.2rem;
 
 // Margin between the main sections of the page (header, content, footer)
 $block-margin: 1rem;

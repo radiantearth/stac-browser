@@ -96,13 +96,15 @@ export default {
 </script>
 
 <style lang="scss">
-.fullscreen {
-  position: absolute !important;
-  top: 0 !important;
-  left: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  background-color: white;
-  overflow: auto;
+#stac-browser {
+  .fullscreen {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background-color: white;
+    overflow: auto;
+  }
 }
 </style>

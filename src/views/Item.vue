@@ -13,22 +13,23 @@
       </b-col>
       <b-col class="right">
         <section class="mb-4">
-          <h2>Preview</h2>
-          <b-tabs v-if="thumbnails.length > 0" v-model="tab" ref="tabs">
-            <b-tab title="Map">
-              <Map :stac="data" :stacLayerData="selectedAsset" @mapClicked="mapClicked" @mapChanged="mapChanged" />
-            </b-tab>
-            <b-tab title="Thumbnails">
-              <Thumbnails :thumbnails="thumbnails" />
-            </b-tab>
-          </b-tabs>
+          <b-card v-if="thumbnails.length > 0" no-body class="maps-preview">
+            <b-tabs v-model="tab" ref="tabs" card pills justified>
+              <b-tab title="Map" no-body>
+                <Map :stac="data" :stacLayerData="selectedAsset" @mapClicked="mapClicked" @mapChanged="mapChanged" />
+              </b-tab>
+              <b-tab title="Thumbnails" no-body>
+                <Thumbnails :thumbnails="thumbnails" />
+              </b-tab>
+            </b-tabs>
+          </b-card>
           <Map v-else :stac="data" :stacLayerData="selectedAsset" @mapClicked="mapClicked" @mapChanged="mapChanged" />
         </section>
       </b-col>
     </b-row>
     <b-row>
       <b-col class="properties">
-        <Metadata :data="data" type="Item" :ignoreFields="ignoredMetadataFields" />
+        <Metadata :data="data" type="Item" title="" commmonMetadataTitle="General Metadata" :ignoreFields="ignoredMetadataFields" />
       </b-col>
     </b-row>
   </div>
@@ -100,52 +101,60 @@ export default {
 @import '~bootstrap/scss/mixins';
 @import "../theme/variables.scss";
 
-.item {
-  .left, .right {
-    max-width: 50%;
-    @include media-breakpoint-down(sm) {
-      max-width: 100%;
-      min-width: 100%;
+#stac-browser {
+  .item {
+    .left, .right {
+      max-width: 50%;
+      @include media-breakpoint-down(sm) {
+        max-width: 100%;
+        min-width: 100%;
+      }
+    }
+    
+    .left > .assets:first-child {
+      > h2 {
+        display: none;
+      }
     }
   }
-}
 
-.item .properties, .catalog {
-  .metadata {
-    .card-columns {
-      column-count: 1;
+  .item .properties, .catalog {
+    .metadata {
+      .card-columns {
+        column-count: 1;
 
-      &.count-2 {
-        @include media-breakpoint-up(md) {
-          column-count: 2 !important;
+        &.count-2 {
+          @include media-breakpoint-up(md) {
+            column-count: 2 !important;
+          }
         }
-      }
-      &.count-3 {
-        @include media-breakpoint-up(lg) {
-          column-count: 3 !important;
+        &.count-3 {
+          @include media-breakpoint-up(lg) {
+            column-count: 3 !important;
+          }
         }
-      }
-      &.count-4 {
-        @include media-breakpoint-up(xxl) {
-          column-count: 4 !important;
+        &.count-4 {
+          @include media-breakpoint-up(xxl) {
+            column-count: 4 !important;
+          }
         }
-      }
 
-      &:not(.count-1) {
-        @include media-breakpoint-up(md) {
-          column-count: 2;
-        }
-        @include media-breakpoint-up(lg) {
-          column-count: 3;
-        }
-        @include media-breakpoint-up(xl) {
-          column-count: 3;
-        }
-        @include media-breakpoint-up(xxl) {
-          column-count: 4;
-        }
-        @include media-breakpoint-up(xxxl) {
-          column-count: 5;
+        &:not(.count-1) {
+          @include media-breakpoint-up(md) {
+            column-count: 2;
+          }
+          @include media-breakpoint-up(lg) {
+            column-count: 3;
+          }
+          @include media-breakpoint-up(xl) {
+            column-count: 3;
+          }
+          @include media-breakpoint-up(xxl) {
+            column-count: 4;
+          }
+          @include media-breakpoint-up(xxxl) {
+            column-count: 5;
+          }
         }
       }
     }

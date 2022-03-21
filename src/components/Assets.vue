@@ -1,6 +1,6 @@
 <template>
   <section class="assets mb-4">
-    <h2>{{ title }}</h2>
+    <h2 v-if="displayTitle">{{ displayTitle }}</h2>
     <div class="accordion" role="tablist">
       <Asset v-for="(asset, key) in assets" :asset="asset" :expand="expand" :context="context" :shown="shown.includes(key)" :id="getId(key)" :key="getId(key)" @show="show" />
     </div>
@@ -32,11 +32,20 @@ export default {
     definition: {
       type: Boolean,
       default: false
+    },
+    title: {
+      type: String,
+      default: null
     }
   },
   computed: {
-    title() {
-      return this.definition ? 'Assets in Items' : 'Assets';
+    displayTitle() {
+      if (this.title === null) {
+        return this.definition ? 'Assets in Items' : 'Assets';
+      }
+      else {
+        return this.title;
+      }
     },
     expand() {
       if (this.definition) {

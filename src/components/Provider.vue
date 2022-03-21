@@ -65,28 +65,27 @@ export default {
 </script>
 
 <style lang="scss">
-.provider {
-  .btn-provider {
-    text-align: left;
+#stac-browser {
+  .provider {
+    .btn-provider {
+      text-align: left;
 
-    .badge {
-      text-transform: uppercase;
+      .badge {
+        text-transform: uppercase;
+      }
     }
-  }
-  .metadata {
-    h4 {
-      font-size: 1.2rem;
-    }
-    .card-columns {
-      column-count: 1;
-    }
-    .card-body {
-      padding: 0;
-    }
-    &:only-child:empty {
-      display: inline !important;
-      &:before {
-        content: 'No additional information available.';
+    .metadata {
+      .card-columns {
+        column-count: 1;
+      }
+      .card-body {
+        padding: 0;
+      }
+      &:only-child:empty {
+        display: inline !important;
+        &:before {
+          content: 'No additional information available.';
+        }
       }
     }
   }
