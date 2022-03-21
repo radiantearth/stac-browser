@@ -22,9 +22,9 @@
         <Links v-if="isCollection && additionalLinks.length > 0" title="Additional resources" :links="additionalLinks" />
       </b-col>
       <b-col class="middle">
-        <Links v-if="!isCollection && additionalLinks.length > 0" title="Additional resources" :links="additionalLinks" />
         <Providers v-if="hasProviders" :providers="data.providers" />
         <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="shownAssets" @showAsset="showAsset" />
+        <Links v-if="!isCollection && additionalLinks.length > 0" title="Additional resources" :links="additionalLinks" />
       </b-col>
       <b-col class="right">
         <section v-if="isCollection || thumbnails.length > 0" class="mb-4">
@@ -63,16 +63,12 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
-import Assets from '../components/Assets.vue';
 import Catalogs from '../components/Catalogs.vue';
 import Description from '../components/Description.vue';
 import Items from '../components/Items.vue';
-import Keywords from '../components/Keywords.vue';
 import Links from '../components/Links.vue';
 import Metadata from '../components/Metadata.vue';
-import Providers from '../components/Providers.vue';
 import ReadMore from "vue-read-more-smooth";
-import Thumbnails from '../components/Thumbnails.vue';
 import ShowAssetMixin from '../components/ShowAssetMixin';
 import { Formatters } from '@radiantearth/stac-fields';
 import { BTabs, BTab } from 'bootstrap-vue';
@@ -83,20 +79,20 @@ export default {
   mixins: [ShowAssetMixin],
   components: {
     AnonymizedNotice: () => import('../components/AnonymizedNotice.vue'),
-    Assets,
+    Assets: () => import('../components/Assets.vue'),
     BTabs,
     BTab,
     Catalogs,
     DeprecationNotice: () => import('../components/DeprecationNotice.vue'),
     Description,
     Items,
-    Keywords,
+    Keywords: () => import('../components/Keywords.vue'),
     Links,
     Map: () => import('../components/Map.vue'),
     Metadata,
-    Providers,
+    Providers: () => import('../components/Providers.vue'),
     ReadMore,
-    Thumbnails
+    Thumbnails: () => import('../components/Thumbnails.vue')
   },
   data() {
     return {
