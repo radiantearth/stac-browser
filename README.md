@@ -34,6 +34,8 @@ To browse your own, set the `CATALOG_URL` CLI parameter when running the dev ser
 npm start -- --open --CATALOG_URL="http://path/to/catalog.json"
 ```
 
+To open a local file on your system, see [Using Local Files] below.
+
 **Deprecated:** You can also set the environment variable `CATALOG_URL` instead of using the CLI parameter:
 
 * Linux/Unix/MacOS: `CATALOG_URL=http://path/to/catalog.json`
@@ -119,3 +121,54 @@ Catalogs and collections are rendered using the
 [`src/components/`](src/components/). Items are rendered using the
 [`Item`](src/components/Item.vue) component. Common functionality across both
 components exists in [`src/components/common.js`](src/components/common.js).
+
+## Using Local Files
+
+Web browser security settings prevent web pages from accessing local files using the normal request model. The solution is to serve the files from a local webserver.
+
+### Stactools
+
+The [stactools-browse](https://github.com/stactools-packages/browse) package for [stactools](https://github.com/stac-utils/stactools) adds the ability to run a Stac Browser instance locally. It uses Docker to run Stac Browser, a local webserver to access your files, and even a local tile server that can serve web map tiles of images. 
+
+Installation using pip:
+
+`pip install stactools stactools-browse`
+
+Then run:
+
+`stac browse <path to file>`
+
+### Local Webserver
+
+If your are running STAC Browser using `npm` commands and only need to browse files, you can run a lightweight webserver locally, but the server must be able to accept CORS headers. 
+
+Node users can accomplish this using the [`http-server`](https://www.npmjs.com/package/http-server) package:
+
+```js
+npm install http-server -g
+```
+
+You can then run the server from the directory that contains the STAC files.
+
+```js
+http-server -p 8000 --cors
+```
+
+This short script does the same in Python:
+
+```python
+#!/usr/bin/env python3
+from http.server import HTTPServer, SimpleHTTPRequestHandler, test
+import sys
+
+class CORSRequestHandler (SimpleHTTPRequestHandler):
+    def end_headers (self):
+        self.send_header('Access-Control-Allow-Origin', '*')
+        SimpleHTTPRequestHandler.end_headers(self)
+
+if __name__ == '__main__':
+    test(CORSRequestHandler, HTTPServer, port=int(sys.argv[1]) if len(sys.argv) > 1 else 8000)
+```
+
+You can then use `http://localhost:8000/<file name>` as the URL to your STAC file.
+
