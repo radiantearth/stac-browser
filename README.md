@@ -34,7 +34,7 @@ To browse your own, set the `CATALOG_URL` CLI parameter when running the dev ser
 npm start -- --open --CATALOG_URL="http://path/to/catalog.json"
 ```
 
-To open a local file on your system, see [Using Local Files] below.
+To open a local file on your system, see [Using Local Files]( #using-local-files) below.
 
 **Deprecated:** You can also set the environment variable `CATALOG_URL` instead of using the CLI parameter:
 
