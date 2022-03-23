@@ -352,7 +352,7 @@ function getStore(config) {
       updateLoading(state, {url, show, loadApi}) {
         let data = state.database[url];
         Vue.set(data, 'show', show || data.show);
-        Vue.set(data, 'show', loadApi || data.loadApi);
+        Vue.set(data, 'loadApi', loadApi || data.loadApi);
       },
       loading(state, {url, loading}) {
         Vue.set(state.database, url, loading);
