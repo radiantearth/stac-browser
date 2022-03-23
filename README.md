@@ -14,10 +14,7 @@ This package has also been published to npm as [`@radiantearth/stac-browser`](ht
 
 ## Examples
 
-* [FedEO Clearinghouse](https://geo.spacebel.be/)
-* [radarsat-1](https://www.radarstac.com/)
-
-For a longer list of examples, checkout out [STAC Index](https://stacindex.org).
+For a list of examples, check out [STAC Index](https://stacindex.org).
 
 ## Running
 
@@ -25,9 +22,6 @@ First, you need to install all dependencies:
 ```bash
 npm install
 ```
-
-By default, stac-browser will browse the
-[testbed Planet catalog](https://raw.githubusercontent.com/cholmes/sample-stac/master/stac/catalog.json).
 
 To browse your own, set the `catalogUrl` CLI parameter when running the dev server:
 ```bash
@@ -54,7 +48,9 @@ This allows or disallows loading and browsing external STAC data.
 External STAC data is any data that is not a children of the given `catalogUrl`.
 Must be set to `true` if a `catalogUrl` is not given as otherwise you won't be able to browse anything.
 
-### stacLint (experimental)
+### stacLint
+
+***experimental***
 
 Enables or disables a feature that validates the STAC catalog when opening the "Source Data" popup.
 Validation uses the external service [staclint.com](https://staclint.com).
@@ -64,13 +60,17 @@ Validation is automatically disabled in the following cases:
 - [private query parameters](#private-query-parameters) have been set
 - `stacProxyUrl` is set
 
-### historyMode (build-only option)
+### historyMode
+
+***build-only option***
 
 STAC Browser defaults to using [HTML5 History Mode](https://router.vuejs.org/guide/essentials/history-mode.html),
 which can cause problems on certain web hosts. To use _hash mode_, set `--historyMode=hash` when running or building.
 This will be compatible with S3, stock Apache, etc.
 
-### pathPrefix (build-only option)
+### pathPrefix
+
+***build-only option***
 
 If you don't deploy the STAC Browser instance at the root path of your (sub) domain, then you need to set the path prefix
 when building (or running) STAC Browser.
@@ -82,7 +82,9 @@ npm run build -- --pathPrefix="/browser/"
 This will build STAC Browser in a way that it can be hosted at `https://example.com/browser` for example.
 Using this parameter for the dev server will make STAC Browser available at `http://localhost:8080/browser`.
 
-### stacProxyUrl (experimental)
+### stacProxyUrl
+
+***experimental***
 
 Setting the `stacProxyUrl` allows users to modify the URLs contained in the catalog to point to another location.
 For instance, if you are serving a catalog on the local file system at `/home/user/catalog.json`, but want to serve
@@ -127,7 +129,9 @@ If server-side rendering should only be used as a fallback for client-side rende
 
 By default, client-side COG rendering is enabled. A server-side fallback is provided via the [tiles.rdnt.io](https://github.com/radiantearth/tiles.rdnt.io) project, which serves publicly accessible COGs as tile layers.
 
-### redirectLegacyUrls (experimental)
+### redirectLegacyUrls
+
+***experimental***
 
 If you are updating from on old version of STAC Browser, you can set this option to `true` to redirect users from the old "unreadable" URLs to the new human-readable URLs.
 
@@ -165,7 +169,9 @@ STAC Browser supports some non-standardized fields that you can use to improve t
 
 1. To the [Provider Object](https://github.com/radiantearth/stac-spec/blob/master/collection-spec/collection-spec.md#provider-object) you can add an `email` (or `mail`) field with an e-mail address and the mail will be shown in the Browser, too.
 
-## Private query parameters (experimental)
+## Private query parameters
+
+***experimental***
 
 STAC Browser supports "private query parameters", e.g. for passing an API key through. Any query parameter that is starting with a `~` will be stored internally, removed from the URL and be appended to STAC requests. This is useful for token-based authentication via query parameters.
 
