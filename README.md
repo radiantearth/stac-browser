@@ -17,7 +17,7 @@ This package has also been published to npm as [`@radiantearth/stac-browser`](ht
 * [FedEO Clearinghouse](https://geo.spacebel.be/)
 * [radarsat-1](https://www.radarstac.com/)
 
-For a longer list of examples, checkout out [STAC Index](https://stac-index.org).
+For a longer list of examples, checkout out [STAC Index](https://stacindex.org).
 
 ## Running
 
@@ -33,6 +33,7 @@ To browse your own, set the `catalogUrl` CLI parameter when running the dev serv
 ```bash
 npm start -- --open --catalogUrl="http://path/to/catalog.json"
 ```
+To open a local file on your system, see the chapter [Using Local Files](local_files.md).
 
 ## Options
 
