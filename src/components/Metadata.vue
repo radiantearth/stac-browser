@@ -97,20 +97,32 @@ export default {
             .row {
                 padding: 0.4em;
                 border-top: 1px solid rgba(0,0,0,0.125);
-                margin: 0;
             }
 
             .row:nth-child(even) {
                 background: rgba(0,0,0,0.03);
             }
+
+            .label {
+                padding-left: 0.4em;
+            }
+            .value {
+                padding-right: 0.4em;
+            }
+        }
+        .row {
+            margin: 0;
+            padding: 0;
         }
         .label {
+            margin: 0;
+            padding-left: 0;
             font-weight: 600;
             vertical-align: top;
-            padding-left: 0.4em;
         }
         .value {
-            padding-right: 0.4em;
+            margin: 0;
+            padding-right: 0;
 
             > ul, > ol, > pre {
                 max-height: 15em;
