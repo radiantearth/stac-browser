@@ -24,7 +24,7 @@ If your catalog uses absolute file locations, you can use the `STAC_PROXY_URL` o
 
 ## Using Stac Browser somewhere else
 
-If you are using a hosted version of Stac Browser, such as the [Radiant Demo](https://radiantearth.github.io/stac-browser/#/), you can run a local webserver *if your STAC files use relative URIs*. One possibility is to use the Node package described above. Another is to use this Python 3 script:
+If you are using a hosted version of STAC Browser, such as the [STAC Browser Demo by Radiant Earth](https://radiantearth.github.io/stac-browser/), you can run a local webserver *if your STAC files use relative URIs*. One possibility is to use the Node package described above. Another is to use this Python 3 script:
 
 ```python
 #!/usr/bin/env python3
