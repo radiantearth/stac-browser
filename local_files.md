@@ -22,7 +22,7 @@ You can then use the option `--CATALOG_URL="http://localhost:8000/catalog.json"`
 
 If your catalog uses absolute file locations, you can use the `STAC_PROXY_URL` option to convert local file locations to local web browser URLs. For instance, if you are serving a catalog on the local file system at /home/user/catalog.json, but want to serve the data out from a server located at http://localhost:8000/, you can use `--STAC_PROXY_URL="/home/user|http://localhost:8000"`.
 
-## Using Stac Browser somewhere else
+## Using STAC Browser somewhere else
 
 If you are using a hosted version of STAC Browser, such as the [STAC Browser Demo by Radiant Earth](https://radiantearth.github.io/stac-browser/), you can run a local webserver *if your STAC files use relative URIs*. One possibility is to use the Node package described above. Another is to use this Python 3 script:
 
