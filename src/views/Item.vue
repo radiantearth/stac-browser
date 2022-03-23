@@ -8,6 +8,10 @@
           <Description :description="data.properties.description" />
         </ReadMore>
         <Keywords v-if="Array.isArray(data.properties.keywords) && data.properties.keywords.length > 0" :keywords="data.properties.keywords" />
+        <section class="item-collection card-list mb-4" v-if="collection">
+          <h2>Collection</h2>
+          <Catalog :catalog="collection" />
+        </section>
         <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="shownAssets" @showAsset="showAsset" />
         <Providers v-if="data.properties.providers" :providers="data.properties.providers" />
         <Links v-if="additionalLinks.length > 0" title="Additional resources" :links="additionalLinks" />
@@ -55,6 +59,7 @@ export default {
     Assets,
     BTabs,
     BTab,
+    Catalog: () => import('../components/Catalog.vue'),
     Description,
     DeprecationNotice: () => import('../components/DeprecationNotice.vue'),
     Links,
@@ -79,7 +84,7 @@ export default {
   },
   computed: {
     ...mapState(['data', 'url']),
-    ...mapGetters(['additionalLinks', 'collectionLink'])
+    ...mapGetters(['additionalLinks', 'collection', 'collectionLink'])
   },
   watch: {
     collectionLink: {
@@ -110,12 +115,6 @@ export default {
       @include media-breakpoint-down(sm) {
         max-width: 100%;
         min-width: 100%;
-      }
-    }
-    
-    .left > .assets:first-child {
-      > h2 {
-        display: none;
       }
     }
   }
