@@ -23,15 +23,32 @@ First, you need to install all dependencies:
 npm install
 ```
 
-To browse your own, set the `catalogUrl` CLI parameter when running the dev server:
+By default, STAC Browser will let you browse all catalogs on STAC Index.
+
+To browse only your own static STAC catalog or STAC API, set the `catalogUrl` CLI parameter when running the dev server:
+
 ```bash
 npm start -- --open --catalogUrl="http://path/to/catalog.json"
 ```
 To open a local file on your system, see the chapter [Using Local Files](local_files.md).
 
+If you'd like to publish the STAC Browser instance use the following command:
+
+```bash
+npm run build -- --catalogUrl="http://path/to/catalog.json"
+```
+
+This will only work on the root path of your domain though. If you'd like to publish in a sub-folder, 
+you can use the [`pathPrefix`](#pathprefix) option.
+
+After building, `dist/` will contain all assets necessary to
+host the browser. These can be manually copied to your web host of choice.
+
+You can customize STAC Browser, too. See the options and theming details below. If not stated otherwise, all options can either be specified via CLI or in the [config file](config.js).
+
 ## Options
 
-All the following options can be used as explained in the chapter "Running", either as CLI Parameter or as environment variable (deprecated).
+All the following options can be used as explained in the chapter "Running", either through the [config file](config.js), as CLI Parameter or as environment variable (deprecated).
 
 ### catalogUrl
 
@@ -180,20 +197,6 @@ So for example if your API requires to pass a token via the `API_KEY` query para
 
 Please note: If the server hosting STAC Browser should not get aware of private query parameters and you are having `historyMode` set to `history`, you can also append the private query parameters to the hash so that it doesn't get transmitted to the server hosting STAC Browser. 
 In this case use for example `https://examples.com/stac-browser/#?~API_KEY=123` instead of `https://examples.com/stac-browser/?~API_KEY=123`.
-
-## Building
-
-```bash
-npm run build -- --catalogUrl="http://path/to/catalog.json"
-```
-
-If you'd like to publish the STAC Browser instance not on the root path of your domain, 
-you can use the `pathPrefix` option (see above).
-
-## Publishing
-
-After building, `dist/` will contain all assets necessary to
-host the browser. These can be manually copied to your web host of choice.
 
 ## Contributing
 
