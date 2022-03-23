@@ -2,7 +2,7 @@
 
 Web browser security settings prevent web pages from accessing local files using the normal request model. The solution is to serve the files from a local webserver. The following examples show `catalog.json` as the name of the local catalog you wish to browse - substitute the name of your catalog file if it is different.
 
-## Using Stac Browser from source
+## Using STAC Browser from source
 
 If you are accessing Stac-Browser by running the `npm start` command, you can run a local webserver using the [`http-server`](https://www.npmjs.com/package/http-server) package.
 
