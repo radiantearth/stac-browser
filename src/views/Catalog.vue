@@ -19,17 +19,9 @@
             <b-col md="8" class="value" v-html="temporalExtents" />
           </b-row>
         </section>
-        <Links v-if="isCollection && additionalLinks.length > 0" title="Additional resources" :links="additionalLinks" />
-      </b-col>
-      <b-col class="middle">
-        <Providers v-if="hasProviders" :providers="data.providers" />
-        <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="shownAssets" @showAsset="showAsset" />
-        <Links v-if="!isCollection && additionalLinks.length > 0" title="Additional resources" :links="additionalLinks" />
-      </b-col>
-      <b-col class="right">
         <section v-if="isCollection || thumbnails.length > 0" class="mb-4">
           <b-card v-if="isCollection && thumbnails.length > 0" no-body class="maps-preview">
-            <b-tabs v-model="tab" ref="tabs" pills card justified>
+            <b-tabs v-model="tab" ref="tabs" pills card justified end>
               <b-tab title="Map" no-body>
                 <Map :stac="data" :stacLayerData="selectedAsset" @mapClicked="mapClicked" @mapChanged="mapChanged" />
               </b-tab>
@@ -41,21 +33,19 @@
           <Map v-else-if="isCollection" :stac="data" :stacLayerData="selectedAsset" @mapClicked="mapClicked" @mapChanged="mapChanged" />
           <Thumbnails v-else-if="thumbnails.length > 0" :thumbnails="thumbnails" />
         </section>
-      </b-col>
-    </b-row>
-    <b-row>
-      <b-col>
+        <Providers v-if="hasProviders" :providers="data.providers" />
+        <Links v-if="isCollection && additionalLinks.length > 0" title="Additional resources" :links="additionalLinks" />
         <Metadata title="Metadata" class="mb-4" :type="data.type" :data="data" :ignoreFields="ignoredMetadataFields" />
       </b-col>
-    </b-row>
-    <b-row class="flex-wrap-reverse" :class="{split: catalogs.length > 0 && (hasItems || hasItemAssets)}">
-      <b-col v-if="catalogs.length > 0" class="left">
-        <Catalogs :catalogs="catalogs" :hasMore="hasMoreCollections" @loadMore="loadMoreCollections" />
+      <b-col class="middle">
+        <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="shownAssets" @showAsset="showAsset" />
+        <Links v-if="!isCollection && additionalLinks.length > 0" title="Additional resources" :links="additionalLinks" />
+        <Catalogs v-if="catalogs.length > 0" :catalogs="catalogs" :hasMore="hasMoreCollections" @loadMore="loadMoreCollections" />
       </b-col>
-      <b-col v-if="hasItems || hasItemAssets" class="right">
+      <b-col class="right">
+        <Assets v-if="hasItemAssets" :assets="data.item_assets" :definition="true" />
         <Items v-if="hasItems" :stac="data" :items="items" :api="isApi" :apiFilters="apiItemsFilter" :pagination="itemPages"
           @paginate="paginateItems" @filterItems="filterItems" />
-        <Assets v-if="hasItemAssets" :assets="data.item_assets" :definition="true" />
       </b-col>
     </b-row>
   </div>
@@ -191,67 +181,45 @@ export default {
 @import '~bootstrap/scss/mixins';
 @import "../theme/variables.scss";
 
-#stac-browser {
-  .catalog {
-    @include media-breakpoint-down(md) {
-      .three-cols {
-        .left, .middle, .right {
-          min-width: 100%;
-        }
+#stac-browser .catalog {
+  @include media-breakpoint-down(md) {
+    .three-cols {
+      .left, .middle, .right {
+        min-width: 100%;
       }
     }
-    @include media-breakpoint-only(xs) {
-      .split {
-        .left, .middle, .right {
-          min-width: 100%;
-        }
-      }
-    }
+  }
+  .middle:empty, .right:empty {
+    display: none;
+  }
 
-    .middle:empty, .right:empty {
-      display: none;
-    }
+  .metadata .card-columns {
+    column-count: 1;
 
-    .items, .catalogs {
-      .card-list {
-        flex-flow: column wrap;
-      }
-      .card-columns {
-        column-count: 1;
-        @include media-breakpoint-only(md) {
-          column-count: 2;
-        }
-        @include media-breakpoint-only(lg) {
-          column-count: 3;
-        }
-        @include media-breakpoint-only(xl) {
-          column-count: 3;
-        }
-        @include media-breakpoint-only(xxl) {
-          column-count: 4;
-        }
-        @include media-breakpoint-up(xxxl) {
-          column-count: 5;
-        }
+    &:not(.count-1) {
+      @include media-breakpoint-up(xxl) {
+        column-count: 2;
       }
     }
+  }
 
-    .split {
-      .items, .catalogs {
-        .card-columns {
-          @include media-breakpoint-only(lg) {
-            column-count: 1;
-          }
-          @include media-breakpoint-only(xl) {
-            column-count: 2;
-          }
-          @include media-breakpoint-only(xxl) {
-            column-count: 2;
-          }
-          @include media-breakpoint-up(xxxl) {
-            column-count: 3;
-          }
-        }
+  .items, .catalogs {
+    .card-list {
+      flex-flow: column wrap;
+    }
+    .card-columns {
+      column-count: 1;
+      @include media-breakpoint-only(lg) {
+        column-count: 2;
+      }
+      @include media-breakpoint-only(xl) {
+        column-count: 2;
+      }
+      @include media-breakpoint-only(xxl) {
+        column-count: 2;
+      }
+      @include media-breakpoint-up(xxxl) {
+        column-count: 4;
       }
     }
   }

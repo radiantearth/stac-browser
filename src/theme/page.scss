@@ -56,20 +56,6 @@
 
     .maps-preview {
         position: static;
-        border: 0;
-
-        > .tabs {
-            > .card-header {
-                padding: 0;
-                margin-bottom: 0.5rem;
-                background-color: transparent;
-                border-bottom: 0;
-
-                > .card-header-pills {
-                    margin: 0;
-                }
-            }
-        }
     }
 
     .twitter {

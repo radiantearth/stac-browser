@@ -8,8 +8,8 @@
                     <template v-else>{{ commmonMetadataTitle }}</template>
                 </b-card-title>
                 <b-row v-for="(prop, key) in group.properties" :key="key">
-                    <b-col md="4" class="label" :title="key" v-html="prop.label" />
-                    <b-col md="8" class="value" v-html="prop.formatted" />
+                    <b-col md="3" class="label" :title="key" v-html="prop.label" />
+                    <b-col md="9" class="value" v-html="prop.formatted" />
                 </b-row>
             </b-card>
         </b-card-group>

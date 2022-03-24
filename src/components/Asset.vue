@@ -13,7 +13,7 @@
         </div>
       </b-button>
     </b-card-header>
-    <b-collapse :id="id" v-model="expanded" role="tabpanel">
+    <b-collapse :id="id" v-model="expanded" accordion="assets" role="tabpanel">
       <b-card-body>
         <b-card-title>{{ fileFormat }}</b-card-title>
         <b-button-group class="actions" v-if="href">
