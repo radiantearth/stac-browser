@@ -4,7 +4,7 @@ Web browser security settings prevent web pages from accessing local files using
 
 ## Using STAC Browser from source
 
-If you are accessing Stac-Browser by running the `npm start` command, you can run a local webserver using the [`http-server`](https://www.npmjs.com/package/http-server) package.
+If you are accessing STAC Browser by running the `npm start` command, you can run a local webserver using the [`http-server`](https://www.npmjs.com/package/http-server) package.
 
 Install `http-server`:
 
@@ -40,15 +40,15 @@ if __name__ == '__main__':
     test(CORSRequestHandler, HTTPServer, port=int(sys.argv[1]) if len(sys.argv) > 1 else 8000)
 ```
 
-Save this script and run it from the directory that has your STAC Catalog/ You can then use `http://localhost:8000/catalog.json` as the URL to your STAC file.
+Save this script and run it from the directory that has your STAC Catalog. You can then use `http://localhost:8000/catalog.json` as the URL to your STAC file.
 
 ## Stactools
 
 If the above options don't work for you, you can run a fully-featured implementation of STAC Browser locally using the [stactools-browse](https://github.com/stactools-packages/browse) package for [stactools](https://github.com/stac-utils/stactools). One short command gives you:
 
-- Stac Browser running locally.
+- STAC Browser running locally.
 - a local webserver that serves your files to STAC Browser.
-- a local tile server that can serve web map tiles of images. 
+- a local tile server that can serve web map tiles of images in your item assets. 
 
 `stactools-browse` require Docker to run.
 
