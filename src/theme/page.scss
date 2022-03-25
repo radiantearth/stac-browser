@@ -56,6 +56,24 @@
 
     .maps-preview {
         position: static;
+
+        .nav-pills {
+            margin: 0;
+            padding: 0;
+            
+            > li {
+                margin: 0 0.5rem;
+                &:only-child {
+                    display: none;
+                }
+                &:first-of-type {
+                    margin-top: 0.5rem;
+                }
+                &:last-of-type {
+                    margin-bottom: 0.5rem;
+                }
+            }
+        }
     }
 
     .twitter {

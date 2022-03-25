@@ -3,17 +3,16 @@
     <b-row>
       <b-col class="left">
         <section class="mb-4">
-          <b-card v-if="thumbnails.length > 0" no-body class="maps-preview">
-            <b-tabs v-model="tab" ref="tabs" card pills justified vertical end>
+          <b-card no-body class="maps-preview">
+            <b-tabs v-model="tab" ref="tabs" card pills vertical end>
               <b-tab title="Map" no-body>
                 <Map :stac="data" :stacLayerData="selectedAsset" @mapClicked="mapClicked" @mapChanged="mapChanged" />
               </b-tab>
-              <b-tab title="Thumbnails" no-body>
+              <b-tab v-if="thumbnails.length > 0" title="Thumbnails" no-body>
                 <Thumbnails :thumbnails="thumbnails" />
               </b-tab>
             </b-tabs>
           </b-card>
-          <Map v-else :stac="data" :stacLayerData="selectedAsset" @mapClicked="mapClicked" @mapChanged="mapChanged" />
         </section>
         <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="shownAssets" @showAsset="showAsset" />
         <Links v-if="additionalLinks.length > 0" title="Additional resources" :links="additionalLinks" />
@@ -111,6 +110,10 @@ export default {
       max-width: 100%;
       min-width: 100%;
     }
+  }
+
+  .card-columns .thumbnail {
+    align-self: center;
   }
 
   .metadata .card-columns {

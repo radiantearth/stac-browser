@@ -1,7 +1,7 @@
 <template>
-  <div class="catalog">
-    <b-row class="three-cols">
-      <b-col class="left">
+  <div :class="{cc: true, [data.type.toLowerCase()]: true, mixed: hasCatalogs && hasItems}">
+    <b-row>
+      <b-col class="meta">
         <h2>Description</h2>
         <DeprecationNotice v-if="data.deprecated" :data="data" />
         <AnonymizedNotice v-if="data['anon:warning']" :warning="data['anon:warning']" />
@@ -20,32 +20,30 @@
           </b-row>
         </section>
         <section v-if="isCollection || thumbnails.length > 0" class="mb-4">
-          <b-card v-if="isCollection && thumbnails.length > 0" no-body class="maps-preview">
-            <b-tabs v-model="tab" ref="tabs" pills card justified end>
-              <b-tab title="Map" no-body>
+          <b-card no-body class="maps-preview">
+            <b-tabs v-model="tab" ref="tabs" pills card vertical end>
+              <b-tab v-if="isCollection" title="Map" no-body>
                 <Map :stac="data" :stacLayerData="selectedAsset" @mapClicked="mapClicked" @mapChanged="mapChanged" />
               </b-tab>
-              <b-tab title="Preview" no-body>
+              <b-tab v-if="thumbnails.length > 0" title="Preview" no-body>
                 <Thumbnails :thumbnails="thumbnails" />
               </b-tab>
             </b-tabs>
           </b-card>
-          <Map v-else-if="isCollection" :stac="data" :stacLayerData="selectedAsset" @mapClicked="mapClicked" @mapChanged="mapChanged" />
-          <Thumbnails v-else-if="thumbnails.length > 0" :thumbnails="thumbnails" />
         </section>
-        <Providers v-if="hasProviders" :providers="data.providers" />
-        <Links v-if="isCollection && additionalLinks.length > 0" title="Additional resources" :links="additionalLinks" />
-        <Metadata title="Metadata" class="mb-4" :type="data.type" :data="data" :ignoreFields="ignoredMetadataFields" />
-      </b-col>
-      <b-col class="middle">
         <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="shownAssets" @showAsset="showAsset" />
-        <Links v-if="!isCollection && additionalLinks.length > 0" title="Additional resources" :links="additionalLinks" />
-        <Catalogs v-if="catalogs.length > 0" :catalogs="catalogs" :hasMore="hasMoreCollections" @loadMore="loadMoreCollections" />
+        <Assets v-if="hasItemAssets && !hasItems" :assets="data.item_assets" :definition="true" />
+        <Providers v-if="hasProviders" :providers="data.providers" />
+        <Metadata title="Metadata" class="mb-4" :type="data.type" :data="data" :ignoreFields="ignoredMetadataFields" />
+        <Links v-if="additionalLinks.length > 0" title="Additional resources" :links="additionalLinks" />
       </b-col>
-      <b-col class="right">
-        <Assets v-if="hasItemAssets" :assets="data.item_assets" :definition="true" />
-        <Items v-if="hasItems" :stac="data" :items="items" :api="isApi" :apiFilters="apiItemsFilter" :pagination="itemPages"
+      <b-col class="catalogs-container" v-if="hasCatalogs">
+        <Catalogs :catalogs="catalogs" :hasMore="hasMoreCollections" @loadMore="loadMoreCollections" />
+      </b-col>
+      <b-col class="items-container" v-if="hasItems">
+        <Items :stac="data" :items="items" :api="isApi" :apiFilters="apiItemsFilter" :pagination="itemPages"
           @paginate="paginateItems" @filterItems="filterItems" />
+        <Assets v-if="hasItemAssets" :assets="data.item_assets" :definition="true" />
       </b-col>
     </b-row>
   </div>
@@ -150,6 +148,9 @@ export default {
     },
     hasItems() {
       return this.items.length > 0 || this.isApi;
+    },
+    hasCatalogs() {
+      return this.catalogs.length > 0;
     }
   },
   methods: {
@@ -181,45 +182,132 @@ export default {
 @import '~bootstrap/scss/mixins';
 @import "../theme/variables.scss";
 
-#stac-browser .catalog {
-  @include media-breakpoint-down(md) {
-    .three-cols {
-      .left, .middle, .right {
-        min-width: 100%;
+#stac-browser .cc {
+  .items-container, .catalogs-container {
+    max-width: 50%;
+
+    .card-list {
+      flex-flow: column wrap;
+    }
+
+    .card-columns {
+      column-count: 1;
+
+      .thumbnail {
+        align-self: center;
       }
     }
   }
-  .middle:empty, .right:empty {
-    display: none;
+
+  &.catalog { // Catalog has items or catalogs
+    .items-container, .catalogs-container {
+      max-width: 100%;
+      .card-columns {
+        @include media-breakpoint-up(sm) {
+          column-count: 2;
+        }
+        @include media-breakpoint-up(lg) {
+          column-count: 3;
+        }
+        @include media-breakpoint-up(xxl) {
+          column-count: 4;
+        }
+        @include media-breakpoint-up(xxxl) {
+          column-count: 6;
+        }
+      }
+    }
+  }
+
+  &.collection { // Collection has items or catalogs
+    .items-container, .catalogs-container {
+      .card-columns {
+        @include media-breakpoint-only(md) {
+          column-count: 2;
+        }
+        @include media-breakpoint-up(lg) {
+          column-count: 1;
+        }
+        @include media-breakpoint-up(xxl) {
+          column-count: 2;
+        }
+        @include media-breakpoint-up(xxxl) {
+          column-count: 3;
+        }
+      }
+    }
+  }
+
+  &.catalog.mixed { // Catalog has items and catalogs
+    .items-container, .catalogs-container {
+      .card-columns {
+        @include media-breakpoint-up(lg) {
+          column-count: 1;
+        }
+        @include media-breakpoint-up(xl) {
+          column-count: 2;
+        }
+        @include media-breakpoint-up(xxl) {
+          column-count: 3;
+        }
+      }
+    }
+  }
+
+  &.collection.mixed { // Collection has items and catalogs
+    .items-container, .catalogs-container {
+      max-width: 33%;
+
+      .card-columns {
+        @include media-breakpoint-up(lg) {
+          column-count: 1;
+        }
+        @include media-breakpoint-up(xxl) {
+          column-count: 2;
+        }
+        @include media-breakpoint-up(xxxl) {
+          column-count: 3;
+        }
+      }
+    }
+  }
+
+  .meta {
+    min-width: 100%;
+    margin-bottom: $block-margin;
+  }
+  &.collection .meta {
+    min-width: 33%;
+    margin-bottom: 0;
+  }
+
+  @include media-breakpoint-down(md) {
+    > .row {
+      > .meta,
+      > .items-container,
+      > .catalogs-container {
+        min-width: 100%;
+      }
+
+      > .meta {
+        order: 1;
+        margin-bottom: $block-margin;
+      }
+      > .items-container {
+        order: 2;
+      }
+      > .catalogs-container {
+        order: 3;
+      }
+    }
   }
 
   .metadata .card-columns {
     column-count: 1;
 
     &:not(.count-1) {
-      @include media-breakpoint-up(xxl) {
-        column-count: 2;
-      }
-    }
-  }
-
-  .items, .catalogs {
-    .card-list {
-      flex-flow: column wrap;
-    }
-    .card-columns {
-      column-count: 1;
-      @include media-breakpoint-only(lg) {
-        column-count: 2;
-      }
-      @include media-breakpoint-only(xl) {
-        column-count: 2;
-      }
-      @include media-breakpoint-only(xxl) {
-        column-count: 2;
-      }
       @include media-breakpoint-up(xxxl) {
-        column-count: 4;
+        column-count: 2;
       }
     }
   }
