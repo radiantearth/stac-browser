@@ -64,15 +64,28 @@ class STAC {
         if (this._apiChildren.prev) {
             children.push(this._apiChildren.prev);
         }
-        children = children.concat(this.getLinksWithRels(['child', 'item']));
         if (this._apiChildren.list.length > 0) {
-            // ToDo: Don't add collections that are already present in children, see index.js, catalogs() getter
-            children = children.concat(this._apiChildren.list);
+            children = this._apiChildren.list;
         }
+        children = STAC.addMissingChildren(children, this).concat(this.getLinksWithRels(['item']));
         if (this._apiChildren.next) {
             children.push(this._apiChildren.next);
         }
         return children;
+    }
+
+    static addMissingChildren(catalogs, stac) {
+        let links = stac.getLinksWithRels(['child']).filter(link => {
+          // Don't add non-JSON links
+          if (!Utils.isStacMediaType(link.type, true)) {
+            return false;
+          }
+          // Don't add links that are already in collections: https://github.com/radiantearth/stac-browser/issues/103
+          // ToDo: The runtime of this can probably be improved
+          let absoluteUrl = Utils.toAbsolute(link.href, stac.getAbsoluteUrl());
+          return !catalogs.find(collection => collection.getAbsoluteUrl() === absoluteUrl);
+        });
+        return catalogs.concat(links);
     }
 
     getApiCollectionsLink() {

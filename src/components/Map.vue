@@ -20,6 +20,16 @@ import '@lweller/leaflet-areaselect';
 import { mapState } from 'vuex';
 import STAC from '../stac';
 
+// Fix missing icons: https://vue2-leaflet.netlify.app/quickstart/#marker-icons-are-missing
+import { Icon } from 'leaflet';
+delete Icon.Default.prototype._getIconUrl;
+Icon.Default.mergeOptions({
+  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
+  iconUrl: require('leaflet/dist/images/marker-icon.png'),
+  shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
+});
+
+
 export default {
   name: 'Map',
   components: {

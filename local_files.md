@@ -42,7 +42,7 @@ If the above options don't work for you, you can run a fully-featured implementa
 
 - STAC Browser running locally,
 - a local webserver that serves your files to STAC Browser, and
-- a local tile server that can serve web map tiles of images. 
+- a local tile server that can serve web map tiles of images in your item assets. 
 
 `stactools-browse` requires Docker to run.
 

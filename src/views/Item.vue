@@ -72,6 +72,9 @@ export default {
         'providers',
         // Will be rendered with a custom rendered
         'deprecated',
+        // Don't show these complex lists of coordinates: https://github.com/radiantearth/stac-browser/issues/141
+        'proj:bbox',
+        'proj:geometry',
         // Special handling for the warning of the anonymized-location extension
         'anon:warning'
       ]
