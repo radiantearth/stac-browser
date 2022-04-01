@@ -24,7 +24,7 @@
         <SortButtons class="mt-1" v-model="sortOrder" enforce />
       </b-form-group>
 
-      <b-form-group label="Limit" label-for="limit" :description="`Number of items requested per page, max ${maxItems} items.`">
+      <b-form-group label="Page Size" label-for="limit" :description="`Number of items requested per page, max. ${maxItems} items.`">
         <b-form-input id="limit" :value="filters.limit" @change="setLimit" min="1" :max="maxItems" type="number" :placeholder="`Default (${itemsPerPage})`"></b-form-input>
       </b-form-group>
 
