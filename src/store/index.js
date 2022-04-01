@@ -161,9 +161,7 @@ function getStore(config) {
           return state.apiItems;
         }
         else if (state.data) {
-          let allowedMediaTypes = ['application/json', 'text/json', 'application/geo+json'];
-          return state.data.getLinksWithRels(['item'])
-            .filter(link => typeof link.type !== 'string' || allowedMediaTypes.includes(link.type.toLowerCase())); // Don't add non-JSON links
+          return state.data.getLinksWithRels(['item']).filter(link => Utils.isStacMediaType(link.type, true));
         }
         return [];
       },
@@ -173,18 +171,7 @@ function getStore(config) {
           catalogs = catalogs.concat(state.apiCollections);
         }
         if (state.data) {
-          let allowedMediaTypes = ['application/json', 'text/json'];
-          let links = state.data.getLinksWithRels(['child']).filter(link => {
-            // Don't add non-JSON links
-            if (typeof link.type === 'string' && !allowedMediaTypes.includes(link.type.toLowerCase())) {
-              return false;
-            }
-            // Don't add links that are already in collections: https://github.com/radiantearth/stac-browser/issues/103
-            // ToDo: The runtime of this can probably be improved
-            let absoluteUrl = Utils.toAbsolute(link.href, state.url);
-            return !state.apiCollections.find(collection => collection.getAbsoluteUrl() === absoluteUrl);
-          });
-          catalogs = catalogs.concat(links);
+          catalogs = STAC.addMissingChildren(catalogs, state.data);
         }
         return catalogs;
       },
