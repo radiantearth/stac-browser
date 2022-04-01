@@ -112,6 +112,9 @@ export default {
         'links',
         'assets',
         'item_assets',
+        // Don't show these complex lists of coordinates: https://github.com/radiantearth/stac-browser/issues/141
+        'proj:bbox',
+        'proj:geometry',
         // API landing page, not very useful to display
         'conformsTo',
         // Will be rendered with a custom rendered
