@@ -1,7 +1,7 @@
 <template>
   <b-card class="asset" no-body>
     <b-card-header header-tag="header" role="tab" class="p-0">
-      <b-button block v-b-toggle="id" variant="asset" squared class="p-2 d-flex">
+      <b-button block v-b-toggle="uid" variant="asset" squared class="p-2 d-flex">
         <span class="mr-1" aria-hidden="true">
           <b-icon-chevron-down v-if="expanded" />
           <b-icon-chevron-right v-else />
@@ -13,7 +13,7 @@
         </div>
       </b-button>
     </b-card-header>
-    <b-collapse :id="id" v-model="expanded" accordion="assets" role="tabpanel">
+    <b-collapse :id="uid" v-model="expanded" accordion="assets" role="tabpanel">
       <b-card-body>
         <b-card-title>{{ fileFormat }}</b-card-title>
         <b-button-group class="actions" v-if="href">
@@ -75,6 +75,10 @@ export default {
       type: Object,
       default: null
     },
+    definition: {
+      type: Boolean,
+      default: false
+    },
     expand: {
       type: Boolean,
       default: null
@@ -104,6 +108,9 @@ export default {
   computed: {
     ...mapState(['url']),
     ...mapGetters(['tileRendererType', 'getRequestUrl']),
+    uid() {
+      return (this.definition ? 'item-def-' : 'asset-') + String(this.id);
+    },
     isThumbnail() {
       return Array.isArray(this.asset.roles) && this.asset.roles.includes('thumbnail');
     },
