@@ -1,13 +1,11 @@
 <template>
-  <section>
-    <l-map class="map" v-if="show" :class="stac.type" @ready="init" :options="mapOptions">
-      <LControlFullscreen />
-      <template v-if="baseMaps.length > 0">
-        <component :is="baseMap.component" v-for="baseMap in baseMaps" :key="baseMap.name" v-bind="baseMap" :layers="baseMap.name" layer-type="base" />
-      </template>
-      <LTileLayer v-else url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" :options="osmOptions" />
-    </l-map>
-  </section>
+  <l-map class="map" v-if="show" :class="stac.type" @ready="init" :options="mapOptions">
+    <LControlFullscreen />
+    <template v-if="baseMaps.length > 0">
+      <component :is="baseMap.component" v-for="baseMap in baseMaps" :key="baseMap.name" v-bind="baseMap" :layers="baseMap.name" layer-type="base" />
+    </template>
+    <LTileLayer v-else url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" :options="osmOptions" />
+  </l-map>
 </template>
 
 <script>
