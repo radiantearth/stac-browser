@@ -2,22 +2,24 @@
   <div :class="{cc: true, [data.type.toLowerCase()]: true, mixed: hasCatalogs && hasItems}">
     <b-row>
       <b-col class="meta">
-        <h2>Description</h2>
-        <DeprecationNotice v-if="data.deprecated" :data="data" />
-        <AnonymizedNotice v-if="data['anon:warning']" :warning="data['anon:warning']" />
-        <ReadMore v-if="data.description" :lines="10">
-          <Description :description="data.description" />
-        </ReadMore>
-        <Keywords v-if="Array.isArray(data.keywords) && data.keywords.length > 0" :keywords="data.keywords" />
-        <section v-if="isCollection" class="metadata mb-4">
-          <b-row v-if="licenses">
-            <b-col md="4" class="label">License</b-col>
-            <b-col md="8" class="value" v-html="licenses" />
-          </b-row>
-          <b-row v-if="temporalExtents">
-            <b-col md="4" class="label">Temporal Extents</b-col>
-            <b-col md="8" class="value" v-html="temporalExtents" />
-          </b-row>
+        <section class="intro">
+          <h2>Description</h2>
+          <DeprecationNotice v-if="data.deprecated" :data="data" />
+          <AnonymizedNotice v-if="data['anon:warning']" :warning="data['anon:warning']" />
+          <ReadMore v-if="data.description" :lines="10">
+            <Description :description="data.description" />
+          </ReadMore>
+          <Keywords v-if="Array.isArray(data.keywords) && data.keywords.length > 0" :keywords="data.keywords" />
+          <section v-if="isCollection" class="metadata mb-4">
+            <b-row v-if="licenses">
+              <b-col md="4" class="label">License</b-col>
+              <b-col md="8" class="value" v-html="licenses" />
+            </b-row>
+            <b-row v-if="temporalExtents">
+              <b-col md="4" class="label">Temporal Extents</b-col>
+              <b-col md="8" class="value" v-html="temporalExtents" />
+            </b-row>
+          </section>
         </section>
         <section v-if="isCollection || thumbnails.length > 0" class="mb-4">
           <b-card no-body class="maps-preview">
@@ -282,6 +284,21 @@ export default {
   &.collection .meta {
     min-width: 33%;
     margin-bottom: 0;
+  }
+  @include media-breakpoint-up(xl) {
+    &.catalog .meta {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 30px;
+
+      > section {
+        flex-basis: 0;
+        flex-grow: 1;
+        max-width: 100%;
+        min-width: 40%;
+      }
+    }
   }
 
   @include media-breakpoint-down(md) {
