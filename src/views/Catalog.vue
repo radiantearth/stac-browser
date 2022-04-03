@@ -1,5 +1,5 @@
 <template>
-  <div :class="{cc: true, [data.type.toLowerCase()]: true, mixed: hasCatalogs && hasItems}">
+  <div :class="{cc: true, [data.type.toLowerCase()]: true, mixed: hasCatalogs && hasItems, empty: !hasCatalogs && !hasItems}">
     <b-row>
       <b-col class="meta">
         <section class="intro">
@@ -285,6 +285,17 @@ export default {
     min-width: 33%;
     margin-bottom: 0;
   }
+
+  @include media-breakpoint-up(lg) {
+    &.collection.empty .meta {
+      column-count: 2;
+
+      > section {
+        break-inside: avoid;
+      }
+    }
+  }
+
   @include media-breakpoint-up(xl) {
     &.catalog .meta {
       display: flex;
