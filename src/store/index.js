@@ -30,7 +30,6 @@ function getStore(config) {
     database: {}, // STAC object, Error object or Loading object or Promise (when loading)
     queue: [],
     redirectUrl: null,
-    catalogQueryParameters: {},
     privateQueryParameters: {},
 
     apiCollections: [],
@@ -287,11 +286,7 @@ function getStore(config) {
             absoluteUrl.addQuery(state.privateQueryParameters);
           }
           // Check if we need to add catalog params
-          if (addCatalogParams && Utils.size(state.catalogQueryParameters) > 0) {
-            absoluteUrl.addQuery(state.catalogQueryParameters);
-          }
-          // Add global request parameters
-          if (Utils.size(state.requestQueryParameters) > 0) {
+          if (addCatalogParams && Utils.size(state.requestQueryParameters) > 0) {
             absoluteUrl.addQuery(state.requestQueryParameters);
           }
         }
@@ -310,7 +305,7 @@ function getStore(config) {
             case 'catalogUrl':
               if (typeof value === 'string') {
                 let url = new URI(value);
-                state.catalogQueryParameters = Object.assign({}, state.catalogQueryParameters, url.query(true));
+                state.requestQueryParameters = Object.assign({}, state.requestQueryParameters, url.query(true));
                 url.query("");
                 state.catalogUrl = url.toString();
               }
