@@ -168,6 +168,22 @@ Defines whether thumbnails are shown in the lists of assets (`true`, default) or
 
 The value for the [`crossorigin` attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/crossorigin) that is sent when loading images through the browser. Default to `null`. If you encounter issues with loading images, you may want to try setting this to `anonymous`.
 
+### requestHeaders
+
+***experimental***
+
+The headers given in this option are added to all requests that are sent to the selected STAC catalog or API.
+
+Example: `{'Bearer': '134567984623223'}` adds a Bearer token to the HTTP headers.
+
+### requestQueryParameters
+
+***experimental***
+
+The query parameters given in this option are added to all requests that are sent to the selected STAC catalog or API.
+
+Example: `{'f': 'json'}` adds a `f` query parameter to the HTTP URL, e.g. `https://example.com?f=json`.
+
 ## Theming
 
 You can customize STAC Browser in the `src/theme` folder. It contains Sass files (a CSS preprocessor), which you can change to suit your needs.

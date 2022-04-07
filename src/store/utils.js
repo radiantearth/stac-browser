@@ -17,7 +17,7 @@ export async function stacRequest(cx, link) {
     opts = {
       method,
       url: cx.getters.getRequestUrl(link.href),
-      headers: link.headers,
+      headers: Object.assign({}, cx.state.requestHeaders, link.headers),
       data: link.body
       // ToDo: Support for merge property from STAC API
     };
@@ -26,7 +26,7 @@ export async function stacRequest(cx, link) {
     opts = {
       method: 'get',
       url: cx.getters.getRequestUrl(link),
-      headers: {}
+      headers: cx.state.requestHeaders
     };
   }
   else {

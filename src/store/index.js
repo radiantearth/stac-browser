@@ -290,6 +290,10 @@ function getStore(config) {
           if (addCatalogParams && Utils.size(state.catalogQueryParameters) > 0) {
             absoluteUrl.addQuery(state.catalogQueryParameters);
           }
+          // Add global request parameters
+          if (Utils.size(state.requestQueryParameters) > 0) {
+            absoluteUrl.addQuery(state.requestQueryParameters);
+          }
         }
         // If we are proxying a STAC Catalog, replace any URI with the proxied address.
         return absoluteUrl.toString();
