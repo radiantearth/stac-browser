@@ -66,6 +66,7 @@ export default {
         case 'child':
         case 'parent':
         case 'item':
+        case 'collection':
         case 'related': // Links to other catalogs or items v
         case 'derived_from':
         case 'canonical':
