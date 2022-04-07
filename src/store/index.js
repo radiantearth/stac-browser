@@ -518,7 +518,7 @@ function getStore(config) {
       async load(cx, {url, fromBrowser, show, loadApi}) {
         let path;
         if (fromBrowser) {
-          path = url;
+          path = url.startsWith('/') ? url : '/' + url;
           url = cx.getters.fromBrowserPath(url);
         }
         else {
