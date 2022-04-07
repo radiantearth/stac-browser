@@ -6,10 +6,11 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import Utils from '../utils';
 import STAC from '../stac';
 import { BIconBoxArrowUpRight } from 'bootstrap-vue';
+import URI from 'urijs';
 
 export default {
   name: "StacLink",
@@ -31,6 +32,7 @@ export default {
     }
   },
   computed: {
+    ...mapState(['privateQueryParameters']),
     ...mapGetters(['toBrowserPath', 'getRequestUrl']),
     stac() {
       if (this.data instanceof STAC) {
@@ -103,15 +105,27 @@ export default {
       return this.isStacBrowserLink ? 'router-link' : 'a';
     },
     href() {
+      let href;
       if (this.stac) {
-        return this.stac.getBrowserPath();
+        href = this.stac.getBrowserPath();
       }
       else if (this.isStacBrowserLink) {
-        return this.toBrowserPath(this.link.href);
+        href = this.toBrowserPath(this.link.href);
       }
       else {
-        return this.getRequestUrl(this.link.href);
+        href = this.getRequestUrl(this.link.href);
       }
+
+      // Add private query parameters to links: https://github.com/radiantearth/stac-browser/issues/142
+      if (Utils.size(this.privateQueryParameters) > 0) {
+        let uri = new URI(href);
+        for(let key in this.privateQueryParameters) {
+          uri.addQuery(`~${key}`, this.privateQueryParameters[key]);
+        }
+        href = uri.toString();
+      }
+
+      return href;
     },
     displayTitle() {
       if (this.title) {
