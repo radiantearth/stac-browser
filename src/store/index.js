@@ -613,7 +613,13 @@ function getStore(config) {
         else {
           response.data.features = response.data.features.map(item => {
             let selfLink = Utils.getLinkWithRel(item.links, 'self');
-            let url = Utils.toAbsolute(selfLink?.href || `./collections/${cx.state.data.id}/items/${item.id}`, cx.state.url);
+            let url;
+            if (selfLink?.href) {
+              url = Utils.toAbsolute(selfLink.href, cx.state.url);
+            }
+            else {
+              url = Utils.toAbsolute(`./collections/${cx.state.data.id}/items/${item.id}`, cx.state.baseUrl);
+            }
             return new STAC(item, url, cx.getters.toBrowserPath(url));
           });
           if (show) {
@@ -648,7 +654,13 @@ function getStore(config) {
         else {
           response.data.collections = response.data.collections.map(collection => {
             let selfLink = Utils.getLinkWithRel(collection.links, 'self');
-            let url = Utils.toAbsolute(selfLink?.href || `./collections/${collection.id}`, cx.state.url);
+            let url;
+            if (selfLink?.href) {
+              url = Utils.toAbsolute(selfLink.href, cx.state.url);
+            }
+            else {
+              url = Utils.toAbsolute(`./collections/${collection.id}`, cx.state.baseUrl);
+            }
             return new STAC(collection, url, cx.getters.toBrowserPath(url));
           });
           cx.commit('addApiCollections', { data: response.data, stac, show });
