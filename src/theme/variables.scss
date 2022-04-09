@@ -48,6 +48,12 @@ $h2-font-size: 1.6rem;
 $h3-font-size: 1.4rem;
 $h4-font-size: 1.2rem;
 
+// Links
+$link-color: map-get($theme-colors, "primary");
+$link-decoration: none;
+$link-hover-color: darken($link-color, 15%);
+$link-hover-decoration: underline;
+
 // Margin between the main sections of the page (header, content, footer)
 $block-margin: 1rem;
 

@@ -8,7 +8,7 @@
         margin: $block-margin auto;
         
         .lead {
-            color: theme-color("secondary");
+            color: map-get($theme-colors, "secondary");;
         }
     }
     .logo {
@@ -98,6 +98,16 @@
     }
     .card {
         background: transparent;
+    }
+
+    a.list-group-item {
+        color: $link-color;
+        text-decoration: $link-decoration;
+
+        &:hover {
+            color: $link-hover-color;
+            text-decoration: $link-hover-decoration;
+        }
     }
 
     .button-label {
