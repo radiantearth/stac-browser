@@ -1,0 +1,1 @@
+#stac-browser .providers .btn-provider,#stac-browser .providers .list-group-item-provider{display:flex;justify-content:space-between;align-items:center;padding:.5rem .8rem;background-color:rgba(0,0,0,.03)}#stac-browser .providers .btn-provider .badge,#stac-browser .providers .list-group-item-provider .badge{text-transform:uppercase}
