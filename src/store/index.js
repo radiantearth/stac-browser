@@ -47,6 +47,7 @@ function getStore(config) {
         'collection',
         'data',
         'first',
+        'icon',
         'item',
         'items',
         'last',

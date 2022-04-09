@@ -201,6 +201,7 @@ If you need even more flexibility, you need to dig into the Vue files and their 
 STAC Browser supports some non-standardized fields that you can use to improve the user-experience.
 
 1. To the [Provider Object](https://github.com/radiantearth/stac-spec/blob/master/collection-spec/collection-spec.md#provider-object) you can add an `email` (or `mail`) field with an e-mail address and the mail will be shown in the Browser, too.
+2. A link with relation type `icon` and a Browser-supported media type in any STAC entity will show an icon in the header and the lists.
 
 ## Private query parameters
 

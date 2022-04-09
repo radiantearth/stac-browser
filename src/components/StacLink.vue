@@ -1,8 +1,13 @@
 <template>
-  <component :is="component" v-bind="attributes">
-    {{ displayTitle }}<!-- avoid space
-    --><small v-if="!isStacBrowserLink"><b-icon-box-arrow-up-right class="ml-1 align-baseline" /></small>
-  </component> 
+  <component :is="component" class="stac-link" v-bind="attributes">
+    <template v-if="icon">
+      <img :src="icon.href" :alt="icon.title" :title="icon.title" class="icon mr-2" />
+    </template>
+    <span class="title">{{ displayTitle }}</span>
+    <template v-if="!isStacBrowserLink">
+      <small><b-icon-box-arrow-up-right class="ml-1 align-baseline" /></small>
+    </template>
+  </component>
 </template>
 
 <script>
@@ -34,6 +39,15 @@ export default {
   computed: {
     ...mapState(['privateQueryParameters']),
     ...mapGetters(['toBrowserPath', 'getRequestUrl']),
+    icon() {
+      if (this.stac) {
+        let icons = this.stac.getIcons();
+        if (icons.length > 0) {
+          return icons[0];
+        }
+      }
+      return null;
+    },
     stac() {
       if (this.data instanceof STAC) {
         return this.data;

@@ -8,7 +8,7 @@
         margin: $block-margin auto;
         
         .lead {
-            color: map-get($theme-colors, "secondary");;
+            color: map-get($theme-colors, "secondary");
         }
     }
     .logo {
@@ -47,6 +47,8 @@
 
     h1 {
         font-weight: 700;
+        display: flex;
+        align-items: center;
     }
 
     h2 {
@@ -78,6 +80,15 @@
 
     .twitter {
         @include button-variant(#1DA1F2, #1DA1F2);
+    }
+
+    .icon {
+        max-width: $max-icon-size;
+        max-height: $max-icon-size;
+    }
+    h1 > .icon {
+        max-width: 1.2em;
+        max-height: 1.2em;
     }
 
     .global-error {

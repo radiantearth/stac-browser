@@ -163,7 +163,8 @@ export default {
         max-width: 100%;
         max-height: 300px;
       }
-      .card-body, .card-title {
+      .card-body,
+      .card-title {
         text-align: center;
       }
       .datetime {

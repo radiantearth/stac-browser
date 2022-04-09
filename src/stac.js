@@ -182,6 +182,10 @@ class STAC {
 		}
     }
 
+    getIcons() {
+        return this.getLinksWithRels(['icon']).filter(img => Utils.canBrowserDisplayImage(img));
+    }
+
     /**
      * Get the thumbnails from the assets and links in a STAC entity.
      * 
