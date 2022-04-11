@@ -105,7 +105,7 @@ export default {
         // Don't show these complex lists of coordinates: https://github.com/radiantearth/stac-browser/issues/141
         'proj:bbox',
         'proj:geometry',
-        // API landing page, not very useful to display
+        // API landing page, not very useful to display, but https://github.com/radiantearth/stac-browser/issues/136
         'conformsTo',
         // Will be rendered with a custom rendered
         'deprecated',
