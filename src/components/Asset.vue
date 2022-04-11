@@ -21,7 +21,9 @@
             {{ buttonText }}
           </CopyButton>
           <b-button v-else :href="href" target="_blank" variant="outline-primary">
-            <b-icon-download /> {{ buttonText }}
+            <b-icon-box-arrow-up-right v-if="browserCanOpen" /> 
+            <b-icon-download v-else />
+            {{ buttonText }}
           </b-button>
           <b-button v-if="canShow && shown" :pressed="true" variant="outline-primary" class="inactive">
             <b-icon-check /> Currently shown
@@ -40,7 +42,7 @@
 </template>
 
 <script>
-import { BCollapse, BIconCheck, BIconChevronRight, BIconChevronDown, BIconDownload, BIconEye } from 'bootstrap-vue';
+import { BCollapse, BIconBoxArrowUpRight, BIconCheck, BIconChevronRight, BIconChevronDown, BIconDownload, BIconEye } from 'bootstrap-vue';
 import { Formatters } from '@radiantearth/stac-fields';
 import { MIME_TYPES } from 'stac-layer/src/data';
 import { mapGetters, mapState } from 'vuex';
@@ -53,6 +55,7 @@ export default {
   name: 'Asset',
   components: {
     BCollapse,
+    BIconBoxArrowUpRight,
     BIconCheck,
     BIconChevronDown,
     BIconChevronRight,
@@ -206,7 +209,25 @@ export default {
       }
       return '';
     },
+    browserCanOpen() {
+      if (Utils.canBrowserDisplayImage(this.asset)) {
+        return true;
+      }
+      else if (typeof this.asset.type === 'string') {
+        switch(this.asset.type.toLowerCase()) {
+          case 'text/html':
+          case 'application/xhtml+xml':
+          case 'text/plain':
+          case 'application/pdf':
+            return true;
+        }
+      }
+      return false;
+    },
     buttonText() {
+      if (this.browserCanOpen) {
+        return 'Open';
+      }
       let text = [this.isGdalVfs ? 'Copy GDAL VFS URL' : 'Download'];
       if (this.from && !this.isBrowsable) {
         text.push(this.isGdalVfs ? 'for' : 'from');
