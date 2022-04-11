@@ -8,7 +8,7 @@
       <b-card-text v-if="data && data.description" class="intro">
         {{ data.description | stripCommonmark }}
       </b-card-text>
-      <b-card-text v-if="temporalExtent" class="datetime">{{ temporalExtent | shortTemporalExtent }}</b-card-text>
+      <b-card-text v-if="temporalExtent" class="datetime"><span v-html="temporalExtent" /></b-card-text>
     </b-card-body>
   </b-card>
 </template>
@@ -45,9 +45,6 @@ export default {
       // Best-effort approach to remove some CommonMark (Markdown).
       // Likely not perfect, but seems good enough for most cases.
       return removeMd(text);
-    },
-    shortTemporalExtent(value) {
-      return Formatters.formatTemporalExtent(value, true);
     }
   },
   computed: {
@@ -76,8 +73,8 @@ export default {
     temporalExtent() {
       if (this.data?.isCollection() && this.data.extent?.temporal?.interval.length > 0) {
         let extent = this.data.extent.temporal.interval[0];
-        if (extent[0] || extent[1]) {
-          return this.data.extent.temporal.interval[0];
+        if (Array.isArray(extent) && (typeof extent[0] === 'string' || typeof extent[1] === 'string')) {
+          return Formatters.formatTemporalExtent(this.data.extent.temporal.interval[0], true);
         }
       }
       return null;
