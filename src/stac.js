@@ -184,8 +184,14 @@ class STAC {
 		}
     }
 
+    _linkToAbsolute(link) {
+        return Object.assign({}, link, {href: Utils.toAbsolute(link.href, this.getAbsoluteUrl())});
+    }
+
     getIcons() {
-        return this.getLinksWithRels(['icon']).filter(img => Utils.canBrowserDisplayImage(img));
+        return this.getLinksWithRels(['icon'])
+            .filter(img => Utils.canBrowserDisplayImage(img))
+            .map(img => this._linkToAbsolute(img));
     }
 
     /**
@@ -210,11 +216,9 @@ class STAC {
         }
         if (browserOnly) {
             // Remove all images that can't be displayed in a browser
-            return thumbnails.filter(img => Utils.canBrowserDisplayImage(img));
+            thumbnails = thumbnails.filter(img => Utils.canBrowserDisplayImage(img));
         }
-        else {
-        return thumbnails;
-        }
+        return thumbnails.map(img => this._linkToAbsolute(img));
     }
 
     equals(other) {
