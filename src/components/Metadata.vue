@@ -86,7 +86,7 @@ export default {
             text-align: left;
 
             .row {
-                padding: 0.4em;
+                padding: 0.4rem;
                 border-top: 1px solid rgba(0,0,0,0.125);
             }
 
@@ -95,10 +95,10 @@ export default {
             }
 
             .label {
-                padding-left: 0.4em;
+                padding-left: 0.4rem;
             }
             .value {
-                padding-right: 0.4em;
+                padding-right: 0.4rem;
             }
         }
         .row {

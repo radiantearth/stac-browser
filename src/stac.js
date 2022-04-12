@@ -128,10 +128,12 @@ class STAC {
 
     getAssetsWithRoles(roles) {
         let matches = [];
-        for(let key in this.assets) {
-            let asset = this.assets[key];
-            if (Utils.isObject(asset) && typeof asset.href === 'string' && Array.isArray(asset.roles) && asset.roles.find(role => roles.includes(role))) {
-                matches.push(asset);
+        if (Utils.isObject(this.assets)) {
+            for(let key in this.assets) {
+                let asset = this.assets[key];
+                if (Utils.isObject(asset) && typeof asset.href === 'string' && Array.isArray(asset.roles) && asset.roles.find(role => roles.includes(role))) {
+                    matches.push(asset);
+                }
             }
         }
         return matches;
@@ -182,6 +184,16 @@ class STAC {
 		}
     }
 
+    _linkToAbsolute(link) {
+        return Object.assign({}, link, {href: Utils.toAbsolute(link.href, this.getAbsoluteUrl())});
+    }
+
+    getIcons() {
+        return this.getLinksWithRels(['icon'])
+            .filter(img => Utils.canBrowserDisplayImage(img))
+            .map(img => this._linkToAbsolute(img));
+    }
+
     /**
      * Get the thumbnails from the assets and links in a STAC entity.
      * 
@@ -190,21 +202,23 @@ class STAC {
      * @returns 
      */
     getThumbnails(browserOnly = false, prefer = null) { // prefer can be either 
-      let thumbnails = this.getAssetsWithRoles(['thumbnail', 'overview']);
-      if (prefer && thumbnails.length > 1) {
-          thumbnails.sort(a => a.roles.includes(prefer) ? -1 : 1);
-      }
-      // Get from links only if no assets are available as they should usually be the same as in assets
-      if (thumbnails.length === 0) {
-        thumbnails = this.getLinksWithRels(['preview']);
-      }
-      if (browserOnly) {
-          // Remove all images that can't be displayed in a browser
-          return thumbnails.filter(img => Utils.canBrowserDisplayImage(img));
-      }
-      else {
-        return thumbnails;
-      }
+        let thumbnails = this.getAssetsWithRoles(['thumbnail', 'overview']);
+        if (prefer && thumbnails.length > 1) {
+            thumbnails.sort(a => a.roles.includes(prefer) ? -1 : 1);
+        }
+        // Get from links only if no assets are available as they should usually be the same as in assets
+        if (thumbnails.length === 0) {
+            thumbnails = this.getLinksWithRels(['preview']);
+        }
+        // Some old catalogs use just a asset key
+        if (thumbnails.length === 0 && Utils.isObject(this.assets) && Utils.isObject(this.assets.thumbnail)) {
+            thumbnails = [this.assets.thumbnail];
+        }
+        if (browserOnly) {
+            // Remove all images that can't be displayed in a browser
+            thumbnails = thumbnails.filter(img => Utils.canBrowserDisplayImage(img));
+        }
+        return thumbnails.map(img => this._linkToAbsolute(img));
     }
 
     equals(other) {

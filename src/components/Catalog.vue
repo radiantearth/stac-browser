@@ -5,10 +5,11 @@
       <b-card-title>
         <StacLink :data="[data, catalog]" class="stretched-link" />
       </b-card-title>
-      <b-card-text v-if="data && data.description" class="intro">
+      <b-card-text v-if="data && (data.description || data.deprecated)" class="intro">
+        <b-badge v-if="data.deprecated" variant="warning" class="deprecated">Deprecated</b-badge>
         {{ data.description | stripCommonmark }}
       </b-card-text>
-      <b-card-text v-if="temporalExtent" class="datetime">{{ temporalExtent | shortTemporalExtent }}</b-card-text>
+      <b-card-text v-if="temporalExtent" class="datetime"><span v-html="temporalExtent" /></b-card-text>
     </b-card-body>
   </b-card>
 </template>
@@ -45,9 +46,6 @@ export default {
       // Best-effort approach to remove some CommonMark (Markdown).
       // Likely not perfect, but seems good enough for most cases.
       return removeMd(text);
-    },
-    shortTemporalExtent(value) {
-      return Formatters.formatTemporalExtent(value, true);
     }
   },
   computed: {
@@ -76,8 +74,8 @@ export default {
     temporalExtent() {
       if (this.data?.isCollection() && this.data.extent?.temporal?.interval.length > 0) {
         let extent = this.data.extent.temporal.interval[0];
-        if (extent[0] || extent[1]) {
-          return this.data.extent.temporal.interval[0];
+        if (Array.isArray(extent) && (typeof extent[0] === 'string' || typeof extent[1] === 'string')) {
+          return Formatters.formatTemporalExtent(this.data.extent.temporal.interval[0], true);
         }
       }
       return null;
@@ -108,6 +106,10 @@ export default {
       -webkit-box-orient: vertical;
       overflow: hidden;
       text-align: left;
+    }
+      
+    .badge {
+      text-transform: uppercase;
     }
   }
   .card-list {
@@ -163,7 +165,7 @@ export default {
         max-width: 100%;
         max-height: 300px;
       }
-      .card-body, .card-title {
+      .card-title {
         text-align: center;
       }
       .datetime {

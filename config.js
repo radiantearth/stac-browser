@@ -14,5 +14,7 @@ module.exports = {
     geoTiffResolution: 128,
     redirectLegacyUrls: false,
     itemsPerPage: 12,
-    crossOriginMedia: null
+    crossOriginMedia: null,
+    requestHeaders: {},
+    requestQueryParameters: {}
 };

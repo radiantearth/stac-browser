@@ -2,7 +2,12 @@
   <b-row>
     <b-col md="12">
       <Share class="float-right" :title="title" :stacUrl="url" :stacVersion="stacVersion" />
-      <h1>{{ title }}</h1>
+      <h1>
+        <template v-if="icon">
+          <img :src="icon.href" :alt="icon.title" :title="icon.title" class="icon mr-2" />
+        </template>
+        <span class="title">{{ title }}</span>
+      </h1>
       <p class="lead" v-if="url || isSearchPage()">
         <span class="in mr-3" v-if="containerLink">in <StacLink :data="containerLink" /></span>
         <b-button-group>
@@ -42,8 +47,17 @@ export default {
     Share: () => import('../components/Share.vue')
   },
   computed: {
-    ...mapState(['allowSelectCatalog', 'catalogUrl', 'url', 'title']),
+    ...mapState(['allowSelectCatalog', 'catalogUrl', 'data', 'url', 'title']),
     ...mapGetters(['root', 'parentLink', 'collectionLink', 'stacVersion', 'supportsSearch', 'toBrowserPath']),
+    icon() {
+      if (this.data instanceof STAC) {
+        let icons = this.data.getIcons();
+        if (icons.length > 0) {
+          return icons[0];
+        }
+      }
+      return null;
+    },
     searchBrowserLink() {
       if (!this.allowSelectCatalog) {
         return '/search';

@@ -8,7 +8,7 @@
         margin: $block-margin auto;
         
         .lead {
-            color: theme-color("secondary");
+            color: map-get($theme-colors, "secondary");
         }
     }
     .logo {
@@ -47,6 +47,8 @@
 
     h1 {
         font-weight: 700;
+        display: flex;
+        align-items: center;
     }
 
     h2 {
@@ -80,6 +82,15 @@
         @include button-variant(#1DA1F2, #1DA1F2);
     }
 
+    .icon {
+        max-width: $max-icon-size;
+        max-height: $max-icon-size;
+    }
+    h1 > .icon {
+        max-width: 1.2em;
+        max-height: 1.2em;
+    }
+
     .global-error {
         position: fixed;
         top: 2vh;
@@ -98,6 +109,16 @@
     }
     .card {
         background: transparent;
+    }
+
+    a.list-group-item {
+        color: $link-color;
+        text-decoration: $link-decoration;
+
+        &:hover {
+            color: $link-hover-color;
+            text-decoration: $link-hover-decoration;
+        }
     }
 
     .button-label {

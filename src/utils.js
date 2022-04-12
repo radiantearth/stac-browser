@@ -8,6 +8,21 @@ const stacMediaTypes = [
 	'text/json'
 ];
 
+const browserImageTypes = [
+	'gif',
+	'jpg',
+	'jpeg',
+	'png',
+	'webp'
+];
+
+const browserMediaTypeRegexp = new RegExp(`^image/(${browserImageTypes.join('|')})`, 'i');
+
+const browserProtocols = [
+	'http',
+	'https'
+];
+
 /**
  * General utilities
  * 
@@ -87,6 +102,10 @@ export default class Utils {
 		// Parse URL and make absolute, if required
 		let uri = URI(href);
 		if (uri.is("relative") && !Utils.isGdalVfsUri(href)) { // Don't convert GDAL VFS URIs: https://github.com/radiantearth/stac-browser/issues/116
+			// Avoid that baseUrls that have a . in the last parth part will be removed (e.g. https://example.com/api/v1.0 )
+			if (!baseUrl.endsWith('/') && !baseUrl.endsWith('.json')) {
+				baseUrl += '/';
+			}
 			uri = uri.absoluteTo(baseUrl);
 		}
 		return stringify ? uri.toString() : uri;
@@ -206,21 +225,25 @@ export default class Utils {
 	}
 
 	static canBrowserDisplayImage(img) {
-		if (typeof img.type !== 'string' || typeof img.href !== 'string') {
+		if (typeof img.href !== 'string') {
 			return false;
 		}
-		if (!img.href.match(/https?:\/\//i)) {
+		let uri = new URI(img.href);
+		let protocol = uri.protocol().toLowerCase();
+		if (protocol && !browserProtocols.includes(protocol)) {
 			return false;
 		}
-		switch(img.type.toLowerCase()) {
-			case 'image/png':
-			case 'image/jpg':
-			case 'image/jpeg':
-			case 'image/webp':
-			case 'image/gif':
-				return true;
-			default:
-				return false;
+		else if (browserMediaTypeRegexp.test(img.type)) {
+			return true;
+		}
+		else if (browserImageTypes.includes(uri.suffix().toLowerCase())) {
+			return true;
+		}
+		else if (img.type) {
+			return false;
+		}
+		else {
+			return true; // If no img.type is given, try to load it anyway: https://github.com/radiantearth/stac-browser/issues/147
 		}
 	}
 

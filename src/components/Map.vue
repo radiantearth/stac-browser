@@ -2,7 +2,7 @@
   <l-map class="map" v-if="show" :class="stac.type" @ready="init" :options="mapOptions">
     <LControlFullscreen />
     <template v-if="baseMaps.length > 0">
-      <component :is="baseMap.component" v-for="baseMap in baseMaps" :key="baseMap.name" v-bind="baseMap" :layers="baseMap.name" layer-type="base" />
+      <component v-for="baseMap in baseMaps" :key="baseMap.name" :is="baseMap.component" v-bind="baseMap" :layers="baseMap.name" layer-type="base" />
     </template>
     <LTileLayer v-else url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" :options="osmOptions" />
   </l-map>
@@ -116,7 +116,7 @@ export default {
               format: "image/png"
             }, baseMaps[target]);
         }
-      });
+      }).filter(map => !!map);
     }
   },
   watch: {

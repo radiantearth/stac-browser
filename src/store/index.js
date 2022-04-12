@@ -30,7 +30,6 @@ function getStore(config) {
     database: {}, // STAC object, Error object or Loading object or Promise (when loading)
     queue: [],
     redirectUrl: null,
-    catalogQueryParameters: {},
     privateQueryParameters: {},
 
     apiCollections: [],
@@ -48,6 +47,7 @@ function getStore(config) {
         'collection',
         'data',
         'first',
+        'icon',
         'item',
         'items',
         'last',
@@ -287,8 +287,8 @@ function getStore(config) {
             absoluteUrl.addQuery(state.privateQueryParameters);
           }
           // Check if we need to add catalog params
-          if (addCatalogParams && Utils.size(state.catalogQueryParameters) > 0) {
-            absoluteUrl.addQuery(state.catalogQueryParameters);
+          if (addCatalogParams && Utils.size(state.requestQueryParameters) > 0) {
+            absoluteUrl.addQuery(state.requestQueryParameters);
           }
         }
         // If we are proxying a STAC Catalog, replace any URI with the proxied address.
@@ -306,7 +306,7 @@ function getStore(config) {
             case 'catalogUrl':
               if (typeof value === 'string') {
                 let url = new URI(value);
-                state.catalogQueryParameters = Object.assign({}, state.catalogQueryParameters, url.query(true));
+                state.requestQueryParameters = Object.assign({}, state.requestQueryParameters, url.query(true));
                 url.query("");
                 state.catalogUrl = url.toString();
               }
@@ -518,7 +518,7 @@ function getStore(config) {
       async load(cx, {url, fromBrowser, show, loadApi}) {
         let path;
         if (fromBrowser) {
-          path = url;
+          path = url.startsWith('/') ? url : '/' + url;
           url = cx.getters.fromBrowserPath(url);
         }
         else {
@@ -613,7 +613,13 @@ function getStore(config) {
         else {
           response.data.features = response.data.features.map(item => {
             let selfLink = Utils.getLinkWithRel(item.links, 'self');
-            let url = Utils.toAbsolute(selfLink?.href || `./collections/${cx.state.data.id}/items/${item.id}`, cx.state.url);
+            let url;
+            if (selfLink?.href) {
+              url = Utils.toAbsolute(selfLink.href, cx.state.url || stac.getAbsoluteUrl());
+            }
+            else {
+              url = Utils.toAbsolute(`./collections/${cx.state.data.id}/items/${item.id}`, cx.state.catalogUrl || stac.getAbsoluteUrl());
+            }
             return new STAC(item, url, cx.getters.toBrowserPath(url));
           });
           if (show) {
@@ -648,7 +654,13 @@ function getStore(config) {
         else {
           response.data.collections = response.data.collections.map(collection => {
             let selfLink = Utils.getLinkWithRel(collection.links, 'self');
-            let url = Utils.toAbsolute(selfLink?.href || `./collections/${collection.id}`, cx.state.url);
+            let url;
+            if (selfLink?.href) {
+              url = Utils.toAbsolute(selfLink.href, cx.state.url || stac.getAbsoluteUrl());
+            }
+            else {
+              url = Utils.toAbsolute(`collections/${collection.id}`, cx.state.catalogUrl || stac.getAbsoluteUrl());
+            }
             return new STAC(collection, url, cx.getters.toBrowserPath(url));
           });
           cx.commit('addApiCollections', { data: response.data, stac, show });
