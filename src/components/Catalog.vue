@@ -5,7 +5,8 @@
       <b-card-title>
         <StacLink :data="[data, catalog]" class="stretched-link" />
       </b-card-title>
-      <b-card-text v-if="data && data.description" class="intro">
+      <b-card-text v-if="data && (data.description || data.deprecated)" class="intro">
+        <b-badge v-if="data.deprecated" variant="warning" class="deprecated">Deprecated</b-badge>
         {{ data.description | stripCommonmark }}
       </b-card-text>
       <b-card-text v-if="temporalExtent" class="datetime"><span v-html="temporalExtent" /></b-card-text>
@@ -106,6 +107,10 @@ export default {
       overflow: hidden;
       text-align: left;
     }
+      
+    .badge {
+      text-transform: uppercase;
+    }
   }
   .card-list {
     flex-direction: row;
@@ -160,7 +165,6 @@ export default {
         max-width: 100%;
         max-height: 300px;
       }
-      .card-body,
       .card-title {
         text-align: center;
       }

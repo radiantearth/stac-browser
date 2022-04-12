@@ -10,8 +10,9 @@
         <template v-else-if="data && data.properties.datetime">{{ data.properties.datetime | Timestamp }}</template>
         <template v-else>No time given</template>
       </small></b-card-text>
-      <b-card-text v-if="fileFormats.length > 0">
+      <b-card-text v-if="fileFormats.length > 0 || (data && data.deprecated)">
         <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="mr-1 mt-1 fileformat">{{ format | MediaType }}</b-badge>
+        <b-badge v-if="data && data.deprecated" variant="warning" class="mr-1 mt-1 deprecated">Deprecated</b-badge>
       </b-card-text>
     </b-card-body>
   </b-card>
@@ -111,10 +112,14 @@ export default {
       min-height: 200px;
     }
 
-    .fileformat {
+    .badge {
       overflow: hidden;
       text-overflow: ellipsis;
       max-width: 100%;
+    }
+
+    .deprecated {
+      text-transform: uppercase;
     }
 
     .card-img {

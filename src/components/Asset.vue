@@ -9,6 +9,7 @@
         {{ asset.title || id }}
         <div class="badges ml-1" v-if="Array.isArray(asset.roles)">
           <b-badge v-for="role in asset.roles" :key="role" :variant="role === 'data' ? 'primary' : 'secondary'" class="role ml-1 mb-1">{{ role }}</b-badge>
+          <b-badge v-if="asset.deprecated" variant="warning" class="deprecated ml-1 mb-1">Deprecated</b-badge>
           <b-badge v-if="shown" variant="success" class="shown ml-1 mb-1" title="This is the asset currently shown"><b-icon-eye /></b-badge>
         </div>
       </b-button>
@@ -259,9 +260,6 @@ export default {
         .badge {
           line-height: 1.2em;
           height: 1.7em;
-        }
-
-        .role {
           text-transform: uppercase;
         }
       }
