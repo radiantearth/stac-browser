@@ -140,56 +140,55 @@ export default {
         this.stacLayer = null;
       }
       let data = this.stacLayerData || this.stac;
-      if (data.type !== 'Catalog') {
-        let options = {
-          resolution: this.geoTiffResolution,
-          useTileLayerAsFallback: this.useTileLayerAsFallback,
-          tileUrlTemplate: this.tileSourceTemplate,
-          buildTileUrlTemplate: this.buildTileUrlTemplate,
-          crossOrigin: this.crossOriginMedia
-        };
-        if (this.stac instanceof STAC) {
-          options.baseUrl = this.stac.getAbsoluteUrl();
-        }
-        if ('href' in data) {
-          if (this.stac.type === 'Feature') {
-            options.bbox = this.stac?.bbox;
-          }
-          else if (this.stac.type === 'Collection') {
-            options.bbox = this.stac?.extent?.spatial?.bbox[0];
-          }
-        }
-        try {
-          this.stacLayer = await stacLayer(data, options);
-        } catch (error) {
-          this.$root.$emit('error', error, 'Sorry, adding the data to the map failed.');
-        }
 
-        // If the map isn't shown any more after loading the STAC data, don't try to add it to the map.
-        // Fixes https://github.com/radiantearth/stac-browser/issues/109
-        if (!this.show || !this.stacLayer) {
-          return;
-        }
-
-        this.$emit('mapChanged', this.stacLayer.stac);
-        this.stacLayer.on('click', event => {
-          // Debounce click event, otherwise a dblclick is fired (and fired twice)
-          let clicks = event.originalEvent.detail || 1;
-          if (clicks === 1) {
-            this.dblClickState = window.setTimeout(() => {
-              this.dblClickState = null;
-              this.$emit('mapClicked', event.stac);
-            }, 500);
-          }
-          else if (clicks > 1 && this.dblClickState) {
-            window.clearTimeout(this.dblClickState);
-            this.dblClickState = null;
-          }
-        });
-        this.stacLayer.on("fallback", event => this.$emit('mapChanged', event.stac));
-        this.stacLayer.addTo(this.map);
-        this.fitBounds();
+      let options = {
+        resolution: this.geoTiffResolution,
+        useTileLayerAsFallback: this.useTileLayerAsFallback,
+        tileUrlTemplate: this.tileSourceTemplate,
+        buildTileUrlTemplate: this.buildTileUrlTemplate,
+        crossOrigin: this.crossOriginMedia
+      };
+      if (this.stac instanceof STAC) {
+        options.baseUrl = this.stac.getAbsoluteUrl();
       }
+      if ('href' in data) {
+        if (this.stac.type === 'Feature') {
+          options.bbox = this.stac?.bbox;
+        }
+        else if (this.stac.type === 'Collection') {
+          options.bbox = this.stac?.extent?.spatial?.bbox[0];
+        }
+      }
+      try {
+        this.stacLayer = await stacLayer(data, options);
+      } catch (error) {
+        this.$root.$emit('error', error, 'Sorry, adding the data to the map failed.');
+      }
+
+      // If the map isn't shown any more after loading the STAC data, don't try to add it to the map.
+      // Fixes https://github.com/radiantearth/stac-browser/issues/109
+      if (!this.show || !this.stacLayer) {
+        return;
+      }
+
+      this.$emit('mapChanged', this.stacLayer.stac);
+      this.stacLayer.on('click', event => {
+        // Debounce click event, otherwise a dblclick is fired (and fired twice)
+        let clicks = event.originalEvent.detail || 1;
+        if (clicks === 1) {
+          this.dblClickState = window.setTimeout(() => {
+            this.dblClickState = null;
+            this.$emit('mapClicked', event.stac);
+          }, 500);
+        }
+        else if (clicks > 1 && this.dblClickState) {
+          window.clearTimeout(this.dblClickState);
+          this.dblClickState = null;
+        }
+      });
+      this.stacLayer.on("fallback", event => this.$emit('mapChanged', event.stac));
+      this.stacLayer.addTo(this.map);
+      this.fitBounds();
     },
     fitBounds() {
       let fitOptions = {
