@@ -19,7 +19,7 @@ import { mapState } from 'vuex';
 import STAC from '../stac';
 
 // Fix missing icons: https://vue2-leaflet.netlify.app/quickstart/#marker-icons-are-missing
-import { Icon } from 'leaflet';
+import { Icon, rectangle } from 'leaflet';
 delete Icon.Default.prototype._getIconUrl;
 Icon.Default.mergeOptions({
   iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
@@ -42,6 +42,7 @@ export default {
       map: null,
       areaSelect: null,
       stacLayer: null,
+      boundsLayer: null,
       mapOptions: {},
       osmOptions: {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors.'
@@ -138,6 +139,10 @@ export default {
       if (this.stacLayer) {
         this.map.removeLayer(this.stacLayer);
         this.stacLayer = null;
+      } 
+      if (this.boundsLayer) {
+        this.map.removeLayer(this.boundsLayer)
+        this.boundsLayer = null;
       }
       let data = this.stacLayerData || this.stac;
 
@@ -159,6 +164,14 @@ export default {
           options.bbox = this.stac?.extent?.spatial?.bbox[0];
         }
       }
+      if (this.stac.type === 'Collection' && Array.isArray(this.stac?.extent?.spatial?.bbox[0])) {
+        const bounds = this.stac.extent.spatial.bbox[0]
+        this.boundsLayer = rectangle([[bounds[1], bounds[0]], [bounds[3], bounds[2]]], {
+          fillOpacity: 0.1,
+          weight: 1
+        }).addTo(this.map)
+      }
+
       try {
         this.stacLayer = await stacLayer(data, options);
       } catch (error) {

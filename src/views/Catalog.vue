@@ -160,7 +160,6 @@ export default {
     catalogAsFc () {
       return {
         type: 'FeatureCollection',
-        bbox: this.data.extent.spatial.bbox[0],
         features: this.items
       }
     }
