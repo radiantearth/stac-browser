@@ -137,7 +137,11 @@ export default {
     },
     async showStacLayer() {
       if (this.stacLayer) {
-        this.map.removeLayer(this.stacLayer);
+        try {
+          this.map.removeLayer(this.stacLayer)
+        } catch (e) {
+          console.log(e)
+        }
         this.stacLayer = null;
       } 
       if (this.boundsLayer) {
@@ -170,6 +174,7 @@ export default {
           fillOpacity: 0.1,
           weight: 1
         }).addTo(this.map)
+        options.displayPreview = true
       }
 
       try {

@@ -160,7 +160,7 @@ export default {
     catalogAsFc () {
       return {
         type: 'FeatureCollection',
-        features: this.items
+        features: this.items.map(i => i._rawJson)
       }
     }
   },
