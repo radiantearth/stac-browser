@@ -593,8 +593,10 @@ function getStore(config) {
         }
       },
       async loadApiItems(cx, {link, stac, show, filters}) {
+        let baseUrl = cx.state.url;
         if (stac instanceof STAC) {
           link = stac.getApiItemsLink();
+          baseUrl = stac.getAbsoluteUrl();
         }
 
         if (!Utils.isObject(filters)) {
@@ -615,10 +617,10 @@ function getStore(config) {
             let selfLink = Utils.getLinkWithRel(item.links, 'self');
             let url;
             if (selfLink?.href) {
-              url = Utils.toAbsolute(selfLink.href, cx.state.url || stac.getAbsoluteUrl());
+              url = Utils.toAbsolute(selfLink.href, baseUrl);
             }
             else {
-              url = Utils.toAbsolute(`./collections/${cx.state.data.id}/items/${item.id}`, cx.state.catalogUrl || stac.getAbsoluteUrl());
+              url = Utils.toAbsolute(`./collections/${cx.state.data.id}/items/${item.id}`, cx.state.catalogUrl || baseUrl);
             }
             return new STAC(item, url, cx.getters.toBrowserPath(url));
           });
