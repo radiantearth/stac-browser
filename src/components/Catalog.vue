@@ -1,5 +1,5 @@
 <template>
-  <b-card no-body class="catalog-card" :class="{queued: !this.data, deprecated: data.deprecated}" v-b-visible.200="load" :img-right="isList">
+  <b-card no-body class="catalog-card" :class="{queued: !data, deprecated: data && data.deprecated}" v-b-visible.200="load" :img-right="isList">
     <b-card-img v-if="showThumbnail && thumbnail && thumbnailVisible" class="thumbnail" :src="thumbnail.href" :alt="thumbnail.title" :crossorigin="crossOriginMedia" :right="isList"></b-card-img>
     <b-card-body>
       <b-card-title>
@@ -102,7 +102,7 @@ export default {
   .catalog-card {
 
     &.deprecated {
-      opacity: 0.7;
+      opacity: 0.5;
 
       &:hover {
         opacity: 1;
