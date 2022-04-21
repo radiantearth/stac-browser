@@ -1,5 +1,5 @@
 <template>
-  <b-card no-body class="item-card" :class="{queued: !this.data}" v-bind="cardProps" v-b-visible.200="load">
+  <b-card no-body class="item-card" :class="{queued: !this.data, deprecated: isDeprecated}" v-bind="cardProps" v-b-visible.200="load">
     <b-card-img v-if="thumbnail && showThumbnail" class="thumbnail" :src="thumbnail.href" :alt="thumbnail.title" :crossorigin="crossOriginMedia"></b-card-img>
     <b-card-body>
       <b-card-title>
@@ -10,9 +10,9 @@
         <template v-else-if="data && data.properties.datetime">{{ data.properties.datetime | Timestamp }}</template>
         <template v-else>No time given</template>
       </small></b-card-text>
-      <b-card-text v-if="fileFormats.length > 0 || (data && data.deprecated)">
+      <b-card-text v-if="fileFormats.length > 0 || isDeprecated">
         <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="mr-1 mt-1 fileformat">{{ format | MediaType }}</b-badge>
-        <b-badge v-if="data && data.deprecated" variant="warning" class="mr-1 mt-1 deprecated">Deprecated</b-badge>
+        <b-badge v-if="isDeprecated" variant="warning" class="mr-1 mt-1 deprecated">Deprecated</b-badge>
       </b-card-text>
     </b-card-body>
   </b-card>
@@ -87,6 +87,9 @@ export default {
         .filter(asset => Array.isArray(asset.roles) && asset.roles.includes('data') && typeof asset.type === 'string') // Look for data files
         .map(asset => asset.type) // Array shall only contain media types
         .filter((v, i, a) => a.indexOf(v) === i); // Unique values
+    },
+    isDeprecated() {
+      return this.data instanceof STAC && Boolean(this.data.properties.deprecated);
     }
   },
   methods: {
@@ -108,6 +111,14 @@ export default {
   .item-card {
     text-align: center;
 
+    &.deprecated {
+      opacity: 0.7;
+
+      &:hover {
+        opacity: 1;
+      }
+    }
+
     &.queued {
       min-height: 200px;
     }
@@ -116,10 +127,10 @@ export default {
       overflow: hidden;
       text-overflow: ellipsis;
       max-width: 100%;
-    }
 
-    .deprecated {
-      text-transform: uppercase;
+      &.deprecated {
+        text-transform: uppercase;
+      }
     }
 
     .card-img {

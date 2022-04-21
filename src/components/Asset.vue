@@ -2,15 +2,17 @@
   <b-card class="asset" no-body>
     <b-card-header header-tag="header" role="tab" class="p-0">
       <b-button block v-b-toggle="uid" variant="asset" squared class="p-2 d-flex">
-        <span class="mr-1" aria-hidden="true">
-          <b-icon-chevron-down v-if="expanded" />
-          <b-icon-chevron-right v-else />
+        <span class="title">
+          <span class="mr-1" aria-hidden="true">
+            <b-icon-chevron-down v-if="expanded" />
+            <b-icon-chevron-right v-else />
+          </span>
+          {{ asset.title || id }}
         </span>
-        {{ asset.title || id }}
         <div class="badges ml-1" v-if="Array.isArray(asset.roles)">
-          <b-badge v-for="role in asset.roles" :key="role" :variant="role === 'data' ? 'primary' : 'secondary'" class="role ml-1 mb-1">{{ role }}</b-badge>
-          <b-badge v-if="asset.deprecated" variant="warning" class="deprecated ml-1 mb-1">Deprecated</b-badge>
           <b-badge v-if="shown" variant="success" class="shown ml-1 mb-1" title="This is the asset currently shown"><b-icon-eye /></b-badge>
+          <b-badge v-if="asset.deprecated" variant="warning" class="deprecated ml-1 mb-1">Deprecated</b-badge>
+          <b-badge v-for="role in asset.roles" :key="role" :variant="role === 'data' ? 'primary' : 'secondary'" class="role ml-1 mb-1">{{ role }}</b-badge>
         </div>
       </b-button>
     </b-card-header>
@@ -251,29 +253,31 @@ export default {
 </script>
 
 <style lang="scss">
-#stac-browser {
-  .asset {
-    .btn-asset {
-      text-align: left;
+#stac-browser .asset {
+  .btn-asset {
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0.8rem;
 
-      .badges {
-        .badge {
-          line-height: 1.2em;
-          height: 1.7em;
-          text-transform: uppercase;
-        }
+    .badges {
+      .badge {
+        line-height: 1.2em;
+        height: 1.7em;
+        text-transform: uppercase;
       }
     }
-    .metadata {
-      .card-columns {
-        column-count: 1;
-      }
-      .card {
-        border: 0;
-      }
-      .card-body {
-        padding: 0;
-      }
+  }
+  .metadata {
+    .card-columns {
+      column-count: 1;
+    }
+    .card {
+      border: 0;
+    }
+    .card-body {
+      padding: 0;
     }
   }
 }

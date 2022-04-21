@@ -1,5 +1,5 @@
 <template>
-  <b-card no-body class="catalog-card" :class="{queued: !this.data}" v-b-visible.200="load" :img-right="isList">
+  <b-card no-body class="catalog-card" :class="{queued: !this.data, deprecated: data.deprecated}" v-b-visible.200="load" :img-right="isList">
     <b-card-img v-if="showThumbnail && thumbnail && thumbnailVisible" class="thumbnail" :src="thumbnail.href" :alt="thumbnail.title" :crossorigin="crossOriginMedia" :right="isList"></b-card-img>
     <b-card-body>
       <b-card-title>
@@ -100,6 +100,15 @@ export default {
 
 #stac-browser {
   .catalog-card {
+
+    &.deprecated {
+      opacity: 0.7;
+
+      &:hover {
+        opacity: 1;
+      }
+    }
+
     .intro {
       display: -webkit-box;
       -webkit-line-clamp: 3;
@@ -108,12 +117,13 @@ export default {
       text-align: left;
     }
       
-    .badge {
+    .badge.deprecated {
       text-transform: uppercase;
     }
   }
   .card-list {
     flex-direction: row;
+
     .catalog-card {
       box-sizing: border-box;
       margin-top: 0.5em;
