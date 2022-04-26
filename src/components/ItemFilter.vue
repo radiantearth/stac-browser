@@ -28,6 +28,39 @@
         <b-form-input id="limit" :value="filters.limit" @change="setLimit" min="1" :max="maxItems" type="number" :placeholder="`Default (${itemsPerPage})`"></b-form-input>
       </b-form-group>
 
+      <div class="additionalFilters">
+        <b-form-group label="Select additional field filters" label-for="availableFields" description="Fields advertised by the queryables endpoint">
+          <b-form-select id="availableFields" :value="selectedQueryable" size="sm" @input="additionalFieldSelected" :options="fieldFilterOptions">
+            <template #first>
+              <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
+            </template>
+          </b-form-select>
+        </b-form-group>
+
+        <b-row 
+          v-for="(item) in userDefinedFilters"
+          :key="item.queryable.id"
+        >
+          <b-col cols="4">
+            {{item.queryable.usableDefinition.title}}
+          </b-col>
+          <b-col v-if="item.operator !== null" cols="2">
+            <b-form-select v-model="item.operator" size="sm" @input="queryableSet(item, $event)" :options="item.queryable.operatorOptions">
+            </b-form-select>     
+          </b-col>
+          <b-col :cols="item.operator !== null ? 5 : 7">
+            <component :is="item.component" v-bind="item.props" @input="queryableSet(item, $event)"/>
+          </b-col>
+          <b-col cols="1">
+            <b-button size="sm" class="mb-2" variant="danger" style="float: right;">
+              <b-icon icon="x-circle-fill" aria-hidden="true" @click="removeUserFilterField(item)"></b-icon>
+            </b-button>
+          </b-col>
+        </b-row>
+
+
+      </div>
+
       <b-button type="submit" variant="primary">Filter</b-button>
       <b-button type="reset" variant="danger" class="ml-3">Reset</b-button>
     </b-form>
@@ -35,9 +68,11 @@
 </template>
 
 <script>
-import { BForm, BFormGroup, BFormInput, BFormCheckbox, BFormSelect, BFormTags } from 'bootstrap-vue';
+import { BForm, BFormGroup, BFormInput, BFormCheckbox, BFormSelect, BFormSelectOption, BFormTags, BButton, BIcon, BIconXCircleFill } from 'bootstrap-vue';
+
 import DatePicker from 'vue2-datepicker';
 import { mapState } from "vuex";
+import Queryable from '../models/Queryable'
 
 export default {
   name: 'ItemFilter',
@@ -47,7 +82,11 @@ export default {
     BFormInput,
     BFormCheckbox,
     BFormSelect,
+    BFormSelectOption,
     BFormTags,
+    BButton,
+    BIcon,
+    BIconXCircleFill,
     DatePicker,
     Map: () => import('./Map.vue'),
     SortButtons: () => import('./SortButtons.vue')
@@ -76,6 +115,9 @@ export default {
   },
   data() {
     return {
+      selectedQueryable: null,
+      queryables: [],
+      userDefinedFilters: [],
       sortOrder: 1,
       sortTerm: null,
       sortOptions: [
@@ -91,6 +133,11 @@ export default {
   },
   computed: {
     ...mapState(['itemsPerPage']),
+    fieldFilterOptions () {
+      return this.queryables.map(q => {
+          return { value: q.field, text: q.usableDefinition.title }
+      })
+    }
   },
   watch: {
     value: {
@@ -118,6 +165,62 @@ export default {
     }
   },
   methods: {
+    queryableSet (item, event) {
+      item.props.value = event
+      // console.log('something changed', item, event)
+    },
+    removeUserFilterField (item) {
+      this.userDefinedFilters.splice(this.userDefinedFilters.findIndex(i => i.id === item.id), 1)
+    },
+    getComponentForQueryable (queryable) {
+      if (queryable.uiType === 'selectField') return BFormSelect
+     return BFormInput
+    },
+    getComponentPropsForQueryable (queryable)  {
+      if (queryable.uiType === 'textField') {
+        return {
+          value: '',
+          size: 'sm'
+        }
+      }
+      if (queryable.uiType === 'selectField') {
+        return {
+          value: queryable.usableDefinition.enum[0],
+          options: queryable.usableDefinition.enum,
+          size: 'sm'
+        }
+      } else if (queryable.uiType === 'numberField') {
+        const d = {
+          value: 0,
+          type: 'number',
+          size: 'sm'
+        }
+        if (queryable.usableDefinition.minimum) {
+          d.value = queryable.usableDefinition.minimum
+          d.min = queryable.usableDefinition.minimum
+        }
+        if (queryable.usableDefinition.maximum) d.max = queryable.usableDefinition.maximum
+        return d
+      } else if (queryable.uiType === 'rangeField') {
+        return {
+          value: 0,
+          type: 'range',
+          min: queryable.usableDefinition.minimum,
+          max: queryable.usableDefinition.maximum
+        }
+      }
+    },
+    additionalFieldSelected (value) {
+      const queryable = this.queryables.find(q => q.id === value)
+      this.userDefinedFilters.push({
+        queryable,
+        component: this.getComponentForQueryable(queryable),
+        props: this.getComponentPropsForQueryable(queryable),
+        operator: queryable.operatorOptions !== null ? queryable.operatorOptions[0] : null
+      })
+      // Note this doesn't seem to clear the UI component, think it's a bug in vue-bootstrap
+      this.selectedQueryable = null
+    },
     getDefaultValues() {
       return {
         datetime: null,
@@ -132,6 +235,12 @@ export default {
       if (this.sort) {
         this.filters.sortby = this.formatSort();
       }
+
+      if (this.userDefinedFilters.length > 0) {
+        const otherFilters = this.userDefinedFilters.map(f => f.queryable.getAsCql2Json(f.operator, f.props.value))
+        console.log(otherFilters)
+      }
+      console.log(this.filters)
       this.$emit('input', this.filters, false);
     },
     onReset() {
@@ -189,6 +298,19 @@ export default {
         return null;
       }
     }
+  },
+  async mounted () {
+    if (this.stac.type === 'Collection') {
+      const rawQueryables = await this.stac.getQueryables()
+      const keys = Object.keys(rawQueryables)
+      for (let index = 0; index < keys.length; index++) {
+        const key = keys[index]
+        const q = new Queryable(key, rawQueryables[key])
+        await q.init()
+        this.queryables.push(q)
+      }
+      console.log(this.queryables)
+    }
   }
 }
 </script>
@@ -203,5 +325,13 @@ $primary-color: map-get($theme-colors, "primary");
 
 .mx-datepicker {
   width: 100%;
+}
+
+.additionalFilters {
+  background: #f0f0f0;
+  border: 1px solid #cccccc;
+  border-radius: 0.25rem;
+  padding: 20px;
+  margin-bottom: 20px;;
 }
 </style>

@@ -234,6 +234,13 @@ class STAC {
         return false;
     }
 
+    async getQueryables () {
+        const response = await fetch(`${this._url}/queryables`)
+        if (!response.ok) return
+        const queryables = await response.json()
+        return queryables.properties
+    }
+
 }
 
 export default STAC;
