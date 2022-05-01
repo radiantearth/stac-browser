@@ -55,7 +55,6 @@ function getStore(config) {
         'next',
         'prev',
         'parent',
-        'preview',
         'root',
         'search',
         'self',
@@ -199,7 +198,7 @@ function getStore(config) {
         }
       },
       thumbnails: state => state.data ? state.data.getThumbnails(true) : [],
-      additionalLinks: state => state.data ? state.data.getLinksWithOtherRels(state.supportedRelTypes) : [],
+      additionalLinks: state => state.data ? state.data.getLinksWithOtherRels(state.supportedRelTypes).filter(link => link.rel !== 'preview' || !Utils.canBrowserDisplayImage(link)) : [],
 
       toBrowserPath: (state, getters) => url => {
         // ToDo: proxy support
