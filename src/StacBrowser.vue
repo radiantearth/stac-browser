@@ -204,4 +204,5 @@ export default {
 @import '~bootstrap/scss/bootstrap.scss';
 @import '~bootstrap-vue/src/index.scss';
 @import "./theme/page.scss";
+@import "./theme/custom.scss";
 </style>
