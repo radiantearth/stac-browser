@@ -20,8 +20,8 @@
       </b-form-group>
 
       <b-form-group v-if="sort" label="Sort" label-for="sort" description="Some APIs may not support all of the options.">
-        <b-form-select id="sort" v-model="sortTerm" :options="sortOptions" placeholder="Default"></b-form-select>
-        <SortButtons class="mt-1" v-model="sortOrder" enforce />
+        <b-form-select id="sort" :options="sortOptions" placeholder="Default" @input="sortFieldSet"></b-form-select>
+        <SortButtons class="mt-1" :value="sortOrder" enforce @input="sortDirectionSet"/>
       </b-form-group>
 
       <b-form-group label="Items per page" label-for="limit" :description="`Number of items requested per page, max. ${maxItems} items.`">
@@ -29,7 +29,7 @@
       </b-form-group>
 
       <div class="additionalFilters">
-        <b-form-group label="Select additional field filters" label-for="availableFields" description="Fields advertised by the queryables endpoint">
+        <b-form-group label="Select additional field filters" label-for="availableFields" description="Fields advertised by the /queryables endpoint">
           <b-form-select id="availableFields" :value="selectedQueryable" size="sm" @input="additionalFieldSelected" :options="fieldFilterOptions">
             <template #first>
               <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
@@ -72,7 +72,7 @@ import { BForm, BFormGroup, BFormInput, BFormCheckbox, BFormSelect, BFormSelectO
 
 import DatePicker from 'vue2-datepicker';
 import { mapState } from "vuex";
-import Queryable from '../models/Queryable'
+import ItemSearch from '../models/ItemSearch';
 
 export default {
   name: 'ItemFilter',
@@ -116,9 +116,8 @@ export default {
   data() {
     return {
       selectedQueryable: null,
-      queryables: [],
-      userDefinedFilters: [],
-      sortOrder: 1,
+      itemSearch: null,
+      sortOrder: 'asc',
       sortTerm: null,
       sortOptions: [
         { value: null, text: 'Default' },
@@ -134,10 +133,16 @@ export default {
   computed: {
     ...mapState(['itemsPerPage']),
     fieldFilterOptions () {
-      return this.queryables.map(q => {
-          return { value: q.field, text: q.usableDefinition.title }
+      if (this.itemSearch === null) return []
+      return this.itemSearch.filterFragment.queryables.map(q => {
+          return { value: q.queryable.field, text: q.queryable.usableDefinition.title }
       })
+    },
+    userDefinedFilters () {
+      if (this.itemSearch === null) return []
+      return this.itemSearch.filterFragment.queryables.filter(q => q.isUsed)
     }
+
   },
   watch: {
     value: {
@@ -156,69 +161,29 @@ export default {
             return dt;
           });
         }
-        if (this.sort && typeof filters.sortby === 'string') {
-          this.sortOrder = filters.sortby.startsWith('-') ? -1 : 1;
-          this.sortTerm = filters.sortby.replace(/^(\+|-)/, '');
-        }
         this.filters = filters;
       }
     }
   },
   methods: {
+    sortFieldSet (value) {
+      this.sortTerm = value
+      this.queryableSet(this.itemSearch.sortFragment.queryable, value)
+    },
+    sortDirectionSet (value) {
+      this.sortOrder = value
+      this.itemSearch.sortFragment.direction = value
+    },
     queryableSet (item, event) {
       item.props.value = event
-      // console.log('something changed', item, event)
     },
     removeUserFilterField (item) {
       this.userDefinedFilters.splice(this.userDefinedFilters.findIndex(i => i.id === item.id), 1)
     },
-    getComponentForQueryable (queryable) {
-      if (queryable.uiType === 'selectField') return BFormSelect
-     return BFormInput
-    },
-    getComponentPropsForQueryable (queryable)  {
-      if (queryable.uiType === 'textField') {
-        return {
-          value: '',
-          size: 'sm'
-        }
-      }
-      if (queryable.uiType === 'selectField') {
-        return {
-          value: queryable.usableDefinition.enum[0],
-          options: queryable.usableDefinition.enum,
-          size: 'sm'
-        }
-      } else if (queryable.uiType === 'numberField') {
-        const d = {
-          value: 0,
-          type: 'number',
-          size: 'sm'
-        }
-        if (queryable.usableDefinition.minimum) {
-          d.value = queryable.usableDefinition.minimum
-          d.min = queryable.usableDefinition.minimum
-        }
-        if (queryable.usableDefinition.maximum) d.max = queryable.usableDefinition.maximum
-        return d
-      } else if (queryable.uiType === 'rangeField') {
-        return {
-          value: 0,
-          type: 'range',
-          min: queryable.usableDefinition.minimum,
-          max: queryable.usableDefinition.maximum
-        }
-      }
-    },
     additionalFieldSelected (value) {
-      const queryable = this.queryables.find(q => q.id === value)
-      this.userDefinedFilters.push({
-        queryable,
-        component: this.getComponentForQueryable(queryable),
-        props: this.getComponentPropsForQueryable(queryable),
-        operator: queryable.operatorOptions !== null ? queryable.operatorOptions[0] : null
-      })
-      // Note this doesn't seem to clear the UI component, think it's a bug in vue-bootstrap
+      const queryable = this.itemSearch.filterFragment.queryables.find(q => q.queryable.id === value)
+      queryable.setIsUsed(true)
+      // Note this does n't seem to clear the UI component, think it's a bug in vue-bootstrap
       this.selectedQueryable = null
     },
     getDefaultValues() {
@@ -228,19 +193,15 @@ export default {
         limit: null,
         ids: [],
         collections: [],
-        sortby: null
+        sortby: null,
+        advancedFilters: null
       };
     },
     onSubmit() {
       if (this.sort) {
         this.filters.sortby = this.formatSort();
       }
-
-      if (this.userDefinedFilters.length > 0) {
-        const otherFilters = this.userDefinedFilters.map(f => f.queryable.getAsCql2Json(f.operator, f.props.value))
-        console.log(otherFilters)
-      }
-      console.log(this.filters)
+      this.filters.advancedFilters = this.itemSearch.getAsCql2Json()
       this.$emit('input', this.filters, false);
     },
     onReset() {
@@ -262,6 +223,7 @@ export default {
     setBBox(bounds) {
       if (this.provideBBox) {
         this.filters.bbox = bounds;
+        this.queryableSet(this.itemSearch.coreSearchFields.bboxQueryableInput, bounds.toBBoxString().split(','))
       }
       else {
         this.filters.bbox = null;
@@ -278,6 +240,9 @@ export default {
           return dt;
         });
         this.filters.datetime = datetime;
+
+        this.queryableSet(this.itemSearch.coreSearchFields.datetimeQueryableInput, `${datetime[0].toISOString()}/${datetime[1].toISOString()}`)
+
       }
       else {
         this.filters.datetime = null;
@@ -291,8 +256,7 @@ export default {
     },
     formatSort() {
       if (this.sort && this.sortTerm) {
-        let order = this.sortOrder < 0 ? '-' : '';
-        return `${order}${this.sortTerm}`;
+        return `${this.sortOrder}${this.sortTerm}`;
       }
       else {
         return null;
@@ -301,15 +265,10 @@ export default {
   },
   async mounted () {
     if (this.stac.type === 'Collection') {
-      const rawQueryables = await this.stac.getQueryables()
-      const keys = Object.keys(rawQueryables)
-      for (let index = 0; index < keys.length; index++) {
-        const key = keys[index]
-        const q = new Queryable(key, rawQueryables[key])
-        await q.init()
-        this.queryables.push(q)
-      }
-      console.log(this.queryables)
+      const itemSearch = new ItemSearch()
+      await itemSearch.init(this.stac)
+      this.queryableSet(itemSearch.coreSearchFields.collectionsQueryableInput, [this.stac.id])
+      this.itemSearch = itemSearch
     }
   }
 }

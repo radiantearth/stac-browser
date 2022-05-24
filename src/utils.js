@@ -196,6 +196,14 @@ export default class Utils {
 		return newLink;
 	}
 
+	static addAdvancedFiltersToLink(link, filters = {}, searchLink = {}) {
+		let newLink = Object.assign({}, link);
+		newLink.href = searchLink.href
+		newLink.method = 'post'
+		newLink.body = filters.advancedFilters
+		return newLink
+	}
+
 	static titleForHref(href, preferFileName = false) {
 		let uri = URI(href);
 		let auth = uri.authority();
