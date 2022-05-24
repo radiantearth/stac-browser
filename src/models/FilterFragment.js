@@ -25,7 +25,6 @@ export default class FilterFragment {
   getAsCql2Json (combineOperator) {
     const filters = this.queryables.filter(q => q.isUsed)
     if (filters.length === 0) return {}
-    console.log(filters)
     return {
       "filter-lang": "cql2-json",
       "filter": {
