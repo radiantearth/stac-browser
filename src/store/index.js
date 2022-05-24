@@ -55,7 +55,6 @@ function getStore(config) {
         'next',
         'prev',
         'parent',
-        'preview',
         'root',
         'search',
         'self',
@@ -199,7 +198,7 @@ function getStore(config) {
         }
       },
       thumbnails: state => state.data ? state.data.getThumbnails(true) : [],
-      additionalLinks: state => state.data ? state.data.getLinksWithOtherRels(state.supportedRelTypes) : [],
+      additionalLinks: state => state.data ? state.data.getLinksWithOtherRels(state.supportedRelTypes).filter(link => link.rel !== 'preview' || !Utils.canBrowserDisplayImage(link)) : [],
 
       toBrowserPath: (state, getters) => url => {
         // ToDo: proxy support
@@ -593,8 +592,10 @@ function getStore(config) {
         }
       },
       async loadApiItems(cx, {link, stac, show, filters}) {
+        let baseUrl = cx.state.url;
         if (stac instanceof STAC) {
           link = stac.getApiItemsLink();
+          baseUrl = stac.getAbsoluteUrl();
         }
 
         if (!Utils.isObject(filters)) {
@@ -619,10 +620,10 @@ function getStore(config) {
             let selfLink = Utils.getLinkWithRel(item.links, 'self');
             let url;
             if (selfLink?.href) {
-              url = Utils.toAbsolute(selfLink.href, cx.state.url || stac.getAbsoluteUrl());
+              url = Utils.toAbsolute(selfLink.href, baseUrl);
             }
             else {
-              url = Utils.toAbsolute(`./collections/${cx.state.data.id}/items/${item.id}`, cx.state.catalogUrl || stac.getAbsoluteUrl());
+              url = Utils.toAbsolute(`./collections/${cx.state.data.id}/items/${item.id}`, cx.state.catalogUrl || baseUrl);
             }
             return new STAC(item, url, cx.getters.toBrowserPath(url));
           });

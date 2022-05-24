@@ -41,3 +41,17 @@ export default {
   }
 };
 </script>
+
+<style lang="scss">
+#stac-browser .links {
+  > ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+
+    > li {
+      margin-bottom: 0.2em;
+    }
+  }
+}
+</style>
