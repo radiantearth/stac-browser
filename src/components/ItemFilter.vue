@@ -204,8 +204,9 @@ export default {
       this.filters.advancedFilters = this.itemSearch.getAsCql2Json()
       this.$emit('input', this.filters, false);
     },
-    onReset() {
+    async onReset() {
       this.filters = this.getDefaultValues();
+      await this.createBlankSearchFilter()
       this.$emit('input', this.filters, true);
     },
     setLimit(limit) {
@@ -261,15 +262,18 @@ export default {
       else {
         return null;
       }
+    },
+    async createBlankSearchFilter() {
+      if (this.stac.type === 'Collection') {
+        const itemSearch = new ItemSearch()
+        await itemSearch.init(this.stac)
+        this.queryableSet(itemSearch.coreSearchFields.collectionsQueryableInput, [this.stac.id])
+        this.itemSearch = itemSearch
+      }      
     }
   },
-  async mounted () {
-    if (this.stac.type === 'Collection') {
-      const itemSearch = new ItemSearch()
-      await itemSearch.init(this.stac)
-      this.queryableSet(itemSearch.coreSearchFields.collectionsQueryableInput, [this.stac.id])
-      this.itemSearch = itemSearch
-    }
+   mounted () {
+    this.createBlankSearchFilter()
   }
 }
 </script>
