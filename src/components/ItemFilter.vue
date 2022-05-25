@@ -178,12 +178,12 @@ export default {
       item.props.value = event
     },
     removeUserFilterField (item) {
-      this.userDefinedFilters.splice(this.userDefinedFilters.findIndex(i => i.id === item.id), 1)
+      item.setIsUsed(false)
     },
     additionalFieldSelected (value) {
       const queryable = this.itemSearch.filterFragment.queryables.find(q => q.queryable.id === value)
       queryable.setIsUsed(true)
-      // Note this does n't seem to clear the UI component, think it's a bug in vue-bootstrap
+      // Note this doesn't seem to clear the UI component, think it's a bug in vue-bootstrap
       this.selectedQueryable = null
     },
     getDefaultValues() {

@@ -23,7 +23,7 @@ export default class Queryable {
     if (this.usableDefinition.enum) return 'selectField'
     if (this.usableDefinition.type === 'string') return 'textField'
     if (this.usableDefinition.type === 'number' || this.usableDefinition.type === 'integer') {
-      if ('minimum' in this.usableDefinition && 'maximum' in this.usableDefinition) return 'rangeField'
+      // if ('minimum' in this.usableDefinition && 'maximum' in this.usableDefinition) return 'rangeField'
       return 'numberField'
     }
     return null
