@@ -4,6 +4,7 @@ import QueryableInput from "./QueryableInput"
 export default class ItemSearchCore {
   constructor () {
     this.queryables = []
+    this.queryableInputs = []
   }
 
   init () {
@@ -50,32 +51,32 @@ export default class ItemSearchCore {
     coreFields.forEach(async (field) => {
       const q = new Queryable(field.id, field.options)
       await q.init()
+      this.queryables.push(q)
       const qui = new QueryableInput(q)
       if (q.id === 'limit') qui.setDefaultValue(12)
-      this.queryables.push(qui)
-      qui.setIsUsed(true)
+      this.queryableInputs.push(qui)
     })
   }
 
   get limitQueryableInput () {
-    return this.queryables.find(q => q.queryable.id === 'limit')
+    return this.queryableInputs.find(q => q.queryable.id === 'limit')
   }
 
   get datetimeQueryableInput () {
-    return this.queryables.find(q => q.queryable.id === 'datetime')
+    return this.queryableInputs.find(q => q.queryable.id === 'datetime')
   }
 
   get collectionsQueryableInput () {
-    return this.queryables.find(q => q.queryable.id === 'collections')
+    return this.queryableInputs.find(q => q.queryable.id === 'collections')
   }
 
   get bboxQueryableInput () {
-    return this.queryables.find(q => q.queryable.id === 'bbox')
+    return this.queryableInputs.find(q => q.queryable.id === 'bbox')
   }
 
   getAsCql2Json () {
     let out = {}
-    this.queryables.forEach(q => {
+    this.queryableInputs.forEach(q => {
       if (q.props.value !== '') out[q.queryable.field] = q.props.value 
     })
     return out

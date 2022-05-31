@@ -3,6 +3,7 @@ import QueryableInput from "./QueryableInput"
 
 export default class FilterFragment {
   constructor () {
+    this.queryableInputs = []
     this.queryables = []
   }
 
@@ -13,9 +14,17 @@ export default class FilterFragment {
       const key = keys[index]
       const q = new Queryable(key, rawQueryables[key])
       await q.init()
-      const qui = new QueryableInput(q)
-      this.queryables.push(qui)
+      this.queryables.push(q)
     }
+  }
+
+  createQueryableInput (q) {
+    this.queryableInputs.push(new QueryableInput(q))
+  }
+
+  removeQueryableInput (input) {
+    const index = this.queryableInputs.findIndex(i => i.uniqueId === input.uniqueId)
+    this.queryableInputs.splice(index, 1)
   }
 
   get isSet () {
@@ -23,7 +32,7 @@ export default class FilterFragment {
   }
 
   getAsCql2Json (combineOperator) {
-    const filters = this.queryables.filter(q => q.isUsed)
+    const filters = this.queryableInputs
     if (filters.length === 0) return {}
     return {
       "filter-lang": "cql2-json",
@@ -36,6 +45,6 @@ export default class FilterFragment {
 
   getAsCql2Text (combineOperator) {
     const operatorText = ` ${combineOperator} `
-    return `${this.queryables.map(q => q.getAsCql2Text()).join(operatorText)}`
+    return `${this.queryableInputs.map(q => q.getAsCql2Text()).join(operatorText)}`
   }
 }

@@ -30,16 +30,14 @@
 
       <div class="additionalFilters">
         <b-form-group label="Select additional field filters" label-for="availableFields" description="Fields advertised by the /queryables endpoint">
-          <b-form-select id="availableFields" :value="selectedQueryable" size="sm" @input="additionalFieldSelected" :options="fieldFilterOptions">
-            <template #first>
-              <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
-            </template>
-          </b-form-select>
+          <b-dropdown size="sm" text="Add field filter" block variant="primary" class="m-2" menu-class="w-100">
+            <b-dropdown-item v-for="option in fieldFilterOptions" :key="option.text" @click="additionalFieldSelected(option)">{{option.text}}</b-dropdown-item>
+          </b-dropdown>
         </b-form-group>
 
         <b-row 
           v-for="(item) in userDefinedFilters"
-          :key="item.queryable.id"
+          :key="item.queryable.uniqueId"
         >
           <b-col cols="4">
             {{item.queryable.usableDefinition.title}}
@@ -68,7 +66,7 @@
 </template>
 
 <script>
-import { BForm, BFormGroup, BFormInput, BFormCheckbox, BFormSelect, BFormSelectOption, BFormTags, BButton, BIcon, BIconXCircleFill } from 'bootstrap-vue';
+import { BDropdown, BDropdownItem, BForm, BFormGroup, BFormInput, BFormCheckbox, BFormSelect, BFormSelectOption, BFormTags, BButton, BIcon, BIconXCircleFill } from 'bootstrap-vue';
 
 import DatePicker from 'vue2-datepicker';
 import { mapState } from "vuex";
@@ -77,6 +75,8 @@ import ItemSearch from '../models/ItemSearch';
 export default {
   name: 'ItemFilter',
   components: {
+    BDropdown,
+    BDropdownItem,
     BForm,
     BFormGroup,
     BFormInput,
@@ -115,7 +115,6 @@ export default {
   },
   data() {
     return {
-      selectedQueryable: null,
       itemSearch: null,
       sortOrder: 'asc',
       sortTerm: null,
@@ -135,14 +134,13 @@ export default {
     fieldFilterOptions () {
       if (this.itemSearch === null) return []
       return this.itemSearch.filterFragment.queryables.map(q => {
-          return { value: q.queryable.field, text: q.queryable.usableDefinition.title }
+          return { value: q.id, text: q.usableDefinition.title }
       })
     },
     userDefinedFilters () {
       if (this.itemSearch === null) return []
-      return this.itemSearch.filterFragment.queryables.filter(q => q.isUsed)
+      return this.itemSearch.filterFragment.queryableInputs
     }
-
   },
   watch: {
     value: {
@@ -178,13 +176,11 @@ export default {
       item.props.value = event
     },
     removeUserFilterField (item) {
-      item.setIsUsed(false)
+      this.itemSearch.filterFragment.removeQueryableInput(item)
     },
-    additionalFieldSelected (value) {
-      const queryable = this.itemSearch.filterFragment.queryables.find(q => q.queryable.id === value)
-      queryable.setIsUsed(true)
-      // Note this doesn't seem to clear the UI component, think it's a bug in vue-bootstrap
-      this.selectedQueryable = null
+    additionalFieldSelected (selected) {
+      const queryable = this.itemSearch.filterFragment.queryables.find(q => q.id === selected.value)
+      this.itemSearch.filterFragment.createQueryableInput(queryable)
     },
     getDefaultValues() {
       return {

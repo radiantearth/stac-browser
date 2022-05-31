@@ -2,15 +2,11 @@ import { BFormInput, BFormSelect } from 'bootstrap-vue';
 
 export default class QueryableInput {
   constructor (queryable) {
+    this.uniqueId = `id_${(new Date()).getTime()}`
     this.queryable = queryable
     this.component = this._getComponentForQueryable()
     this.props = this._getComponentPropsForQueryable()
     this.operator = this.queryable.operatorOptions !== null ? this.queryable.operatorOptions[0] : null
-    this.isUsed = false
-  }
-
-  setIsUsed (bool) {
-    this.isUsed = bool
   }
 
   setDefaultValue (value) {
@@ -41,7 +37,9 @@ export default class QueryableInput {
         d.value = this.queryable.usableDefinition.minimum
         d.min = this.queryable.usableDefinition.minimum
       }
-      if (this.queryable.usableDefinition.maximum) d.max = this.queryable.usableDefinition.maximum
+      if (this.queryable.usableDefinition.maximum) {
+        d.max = this.queryable.usableDefinition.maximum
+      }
       return d
     } else if (this.queryable.uiType === 'rangeField') {
       return {
