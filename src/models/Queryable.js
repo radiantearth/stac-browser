@@ -65,18 +65,4 @@ export default class Queryable {
     const hashComponents = hash.replace('#/', '').split('/').join('.')
     return Object.assign(this._rawJson, _get(data, hashComponents))
   }
-
-  getAsCql2Json (operator, value) {
-    return {
-      "op": operator,
-      "args": [ { "property": this.id }, value ]
-    }
-  }
-
-  getAsCql2Text (operator, value) {
-    // if (Array.isArray(value) && value.length > 0) {
-    //   value = value.join(',');
-    // }
-    return `${this.id}${operator}${value}`
-  }
 }

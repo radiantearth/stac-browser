@@ -220,10 +220,10 @@ export default {
     setBBox(bounds) {
       if (this.provideBBox) {
         this.filters.bbox = bounds;
-        this.queryableSet(this.itemSearch.coreSearchFields.bboxQueryableInput, bounds.toBBoxString().split(','))
-      }
-      else {
+        this.itemSearch.coreSearchFields.bboxQueryableInput.setValueFromLeafletBounds(bounds);
+      } else {
         this.filters.bbox = null;
+        this.itemSearch.coreSearchFields.bboxQueryableInput.clearValue();
       }
     },
     setDateTime(datetime) {

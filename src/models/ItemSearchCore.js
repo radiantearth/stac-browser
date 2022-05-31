@@ -1,10 +1,12 @@
 import Queryable from "./Queryable"
+import QueryableBbox from "./QueryableBbox"
 import QueryableInput from "./QueryableInput"
 
 export default class ItemSearchCore {
   constructor () {
     this.queryables = []
     this.queryableInputs = []
+    this.bboxQueryable = null
   }
 
   init () {
@@ -40,13 +42,6 @@ export default class ItemSearchCore {
           "maximum": 1000
         }
       },
-      {
-        id: 'bbox',
-        options: {
-          "title": "Bounding Box",
-          "type": "number"
-        }
-      }
     ]
     coreFields.forEach(async (field) => {
       const q = new Queryable(field.id, field.options)
@@ -56,6 +51,8 @@ export default class ItemSearchCore {
       if (q.id === 'limit') qui.setDefaultValue(12)
       this.queryableInputs.push(qui)
     })
+
+    this.bboxQueryable = new QueryableBbox('bbox')
   }
 
   get limitQueryableInput () {
@@ -71,7 +68,7 @@ export default class ItemSearchCore {
   }
 
   get bboxQueryableInput () {
-    return this.queryableInputs.find(q => q.queryable.id === 'bbox')
+    return this.bboxQueryable
   }
 
   getAsCql2Json () {
@@ -79,11 +76,17 @@ export default class ItemSearchCore {
     this.queryableInputs.forEach(q => {
       if (q.props.value !== '') out[q.queryable.field] = q.props.value 
     })
+    if (this.bboxQueryable.value !== null) out.bbox = this.bboxQueryable.getAsCql2Json()
     return out
   }
 
   getAsCql2Text () {
-    return ''
+    let out = ''
+    this.queryableInputs.forEach(q => {
+      if (q.props.value !== '') out = out.concat(`${out[q.queryable.field]}=${q.props.value}`)
+    })
+    if (this.bboxQueryable.value !== null) out = out.concat(this.bboxQueryable.getAsCql2Text())
+    return out
   }
 
 }

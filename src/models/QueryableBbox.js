@@ -1,35 +1,25 @@
-import Queryable from './Queryable';
-import bboxPolygon from '@turf/bbox-polygon'
-
-export default class QueryableBBox extends Queryable {
-  constructor (id, json) {
-    super(id, json)
+export default class QueryableBBox {
+  constructor (id) {
+    this.id = id;
+    this.value = null;
   }
 
-  get field () {
-    return this.id
+  clearValue () {
+    this.value = null;
   }
 
-  get _hasDetails () {
-    return true
+  setValueFromLeafletBounds (bounds) {
+    if (bounds === null || typeof bounds.toBBoxString !== 'function') return;
+    this.value = bounds.toBBoxString().split(',').map(str => parseFloat(str));
   }
 
-  get uiType () {
-    return 'bboxMap'
+  getAsCql2Json () {
+    if (this.value === null) return;
+    return this.value;
   }
 
-  get operatorOptions () {
-    return null
-  }
-
-  getAsCql2Json (operator, bboxArray) {
-    return {
-      "op": 's_intersects',
-      "args": [ { "property": "geometry" }, bboxPolygon(bboxArray) ]
-    }
-  }
-
-  getAsCql2Text (operator, bboxArray) {
-    return `bbox=${bboxArray.toString(',')}`
+  getAsCql2Text () {
+    if (this.value === null) return;
+    return `bbox=${this.value.toString(',')}`;
   }
 }

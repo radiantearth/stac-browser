@@ -2,7 +2,7 @@ import { BFormInput, BFormSelect } from 'bootstrap-vue';
 
 export default class QueryableInput {
   constructor (queryable) {
-    this.uniqueId = `id_${(new Date()).getTime()}`
+    this.uniqueId = "id" + Math.random().toString(16).slice(2)
     this.queryable = queryable
     this.component = this._getComponentForQueryable()
     this.props = this._getComponentPropsForQueryable()
