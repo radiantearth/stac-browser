@@ -51,7 +51,6 @@ import Utils from '../utils';
 
 export default {
   name: "Item",
-  mixins: [ShowAssetMixin],
   components: {
     AnonymizedNotice: () => import('../components/AnonymizedNotice.vue'),
     Assets,
@@ -67,6 +66,7 @@ export default {
     ReadMore,
     Thumbnails: () => import('../components/Thumbnails.vue')
   },
+  mixins: [ShowAssetMixin],
   data() {
     return {
       ignoredMetadataFields: [

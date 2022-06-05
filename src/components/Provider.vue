@@ -63,7 +63,7 @@ export default {
       ignore: ['url', 'name', 'description', 'roles']
     };
   }
-}
+};
 </script>
 
 <style lang="scss">

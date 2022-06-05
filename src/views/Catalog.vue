@@ -43,8 +43,11 @@
         <Catalogs :catalogs="catalogs" :hasMore="hasMoreCollections" @loadMore="loadMoreCollections" />
       </b-col>
       <b-col class="items-container" v-if="hasItems">
-        <Items :stac="data" :items="items" :api="isApi" :apiFilters="apiItemsFilter" :pagination="itemPages"
-          @paginate="paginateItems" @filterItems="filterItems" />
+        <Items
+          :stac="data" :items="items" :api="isApi" :apiFilters="apiItemsFilter"
+          :pagination="itemPages"
+          @paginate="paginateItems" @filterItems="filterItems"
+        />
         <Assets v-if="hasItemAssets" :assets="data.item_assets" :definition="true" />
       </b-col>
     </b-row>
@@ -66,7 +69,6 @@ import Utils from '../utils';
 
 export default {
   name: "Catalog",
-  mixins: [ShowAssetMixin],
   components: {
     AnonymizedNotice: () => import('../components/AnonymizedNotice.vue'),
     Assets: () => import('../components/Assets.vue'),
@@ -84,6 +86,7 @@ export default {
     ReadMore,
     Thumbnails: () => import('../components/Thumbnails.vue')
   },
+  mixins: [ShowAssetMixin],
   data() {
     return {
       ignoredMetadataFields: [

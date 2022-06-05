@@ -103,14 +103,6 @@ export default {
       ]
     };
   },
-  created() {
-    if (typeof this.expand === 'boolean') {
-      this.expanded = this.expand;
-    }
-    else {
-      this.expanded = false;
-    }
-  },
   computed: {
     ...mapState(['url']),
     ...mapGetters(['tileRendererType', 'getRequestUrl']),
@@ -239,6 +231,14 @@ export default {
       return text.join(' ');
     }
   },
+  created() {
+    if (typeof this.expand === 'boolean') {
+      this.expanded = this.expand;
+    }
+    else {
+      this.expanded = false;
+    }
+  },
   methods: {
     show() {
       let asset = Object.assign({}, this.asset);
@@ -249,7 +249,7 @@ export default {
       this.$emit('show', asset, this.id, this.isThumbnail);
     }
   }
-}
+};
 </script>
 
 <style lang="scss">

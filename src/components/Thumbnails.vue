@@ -5,7 +5,7 @@
     </div>
     <div class="content">
       <a v-for="thumbnail in thumbnails" :key="thumbnail.href" :href="thumbnail.href" target="_blank" download>
-        <img class="thumbnail" :src="thumbnail.href" :crossorigin="crossOriginMedia" />
+        <img class="thumbnail" :src="thumbnail.href" :crossorigin="crossOriginMedia">
       </a>
     </div>
   </div>
@@ -21,13 +21,14 @@ export default {
   },
   props: {
     thumbnails: {
-      type: Array
+      type: Array,
+      required: true
     }
   },
   computed: {
     ...mapState(['crossOriginMedia'])
   }
-}
+};
 </script>
 
 <style lang="scss">

@@ -15,13 +15,14 @@ export default {
       type: Object,
       default: () => ({})
     },
-    placement: {
-      type: String
+    placement: { // top or bottom
+      type: String,
+      default: "bottom"
     }
   },
   computed: {
     classes() {
-      return this.placement === 'top' ? 'mb-4 mt-2' : 'mb-2 mt-2'
+      return this.placement === 'top' ? 'mb-4 mt-2' : 'mb-2 mt-2';
     }
   },
   methods: {

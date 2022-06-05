@@ -3,7 +3,7 @@
     <h4 v-if="title">{{ title }}</h4>
     <b-form @submit.stop.prevent="onSubmit" @reset="onReset">
       <b-form-group label="Temporal Extent" label-for="datetime">
-        <date-picker id="datetime" :value="filters.datetime" @input="setDateTime" range input-class="form-control mx-input"></date-picker>
+        <date-picker id="datetime" :value="filters.datetime" @input="setDateTime" range input-class="form-control mx-input" />
       </b-form-group>
 
       <b-form-group label="Spatial Extent" label-for="provideBBox">
@@ -12,20 +12,32 @@
       </b-form-group>
 
       <b-form-group v-if="!collectionOnly" label="Collections" label-for="collections">
-        <b-form-tags input-id="collections" :value="filters.collections" @input="setCollections" separator=" ,;" remove-on-delete add-on-change placeholder="List one or multiple collections..."></b-form-tags>
+        <b-form-tags
+          input-id="collections" :value="filters.collections" @input="setCollections" separator=" ,;"
+          remove-on-delete add-on-change
+          placeholder="List one or multiple collections..."
+        />
       </b-form-group>
 
       <b-form-group v-if="!collectionOnly" label="Item IDs" label-for="ids">
-        <b-form-tags input-id="ids" :value="filters.ids" @input="setIds" separator=" ,;" remove-on-delete add-on-change placeholder="List one or multiple Item IDs..."></b-form-tags>
+        <b-form-tags
+          input-id="ids" :value="filters.ids" @input="setIds" separator=" ,;"
+          remove-on-delete add-on-change
+          placeholder="List one or multiple Item IDs..."
+        />
       </b-form-group>
 
       <b-form-group v-if="sort" label="Sort" label-for="sort" description="Some APIs may not support all of the options.">
-        <b-form-select id="sort" :options="sortOptions" placeholder="Default" @input="sortFieldSet"></b-form-select>
-        <SortButtons class="mt-1" :value="sortOrder" enforce @input="sortDirectionSet"/>
+        <b-form-select id="sort" :options="sortOptions" placeholder="Default" @input="sortFieldSet" />
+        <SortButtons class="mt-1" :value="sortOrder" enforce @input="sortDirectionSet" />
       </b-form-group>
 
       <b-form-group label="Items per page" label-for="limit" :description="`Number of items requested per page, max. ${maxItems} items.`">
-        <b-form-input id="limit" :value="filters.limit" @change="setLimit" min="1" :max="maxItems" type="number" :placeholder="`Default (${itemsPerPage})`"></b-form-input>
+        <b-form-input
+          id="limit" :value="filters.limit" @change="setLimit" min="1"
+          :max="maxItems" type="number"
+          :placeholder="`Default (${itemsPerPage})`"
+        />
       </b-form-group>
 
       <div class="additionalFilters">
@@ -271,7 +283,7 @@ export default {
    mounted () {
     this.createBlankSearchFilter()
   }
-}
+};
 </script>
 
 <style lang="scss">

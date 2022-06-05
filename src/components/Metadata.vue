@@ -1,21 +1,21 @@
 <template>
-    <section v-if="formattedData.length > 0" class="metadata">
-        <h2 v-if="title">{{ title }}</h2>
-        <b-card-group v-if="formattedData.length > 0" columns :class="`count-${formattedData.length}`">
-            <b-card no-body v-for="group in formattedData" :key="group.extension" class="metadata-card">
-                    <b-card-title>
-                        <div v-if="group.extension" v-html="group.label" />
-                        <template v-else>{{ commmonMetadataTitle }}</template>
-                    </b-card-title>
-                    <section class="border metadata-rows">
-                        <b-row v-for="(prop, key) in group.properties" :key="key">
-                            <b-col md="3" class="label" :title="key" v-html="prop.label" />
-                            <b-col md="9" class="value" v-html="prop.formatted" />
-                        </b-row>
-                    </section>
-            </b-card>
-        </b-card-group>
-    </section>
+  <section v-if="formattedData.length > 0" class="metadata">
+    <h2 v-if="title">{{ title }}</h2>
+    <b-card-group v-if="formattedData.length > 0" columns :class="`count-${formattedData.length}`">
+      <b-card no-body v-for="group in formattedData" :key="group.extension" class="metadata-card">
+        <b-card-title>
+          <div v-if="group.extension" v-html="group.label" />
+          <template v-else>{{ commmonMetadataTitle }}</template>
+        </b-card-title>
+        <section class="border metadata-rows">
+          <b-row v-for="(prop, key) in group.properties" :key="key">
+            <b-col md="3" class="label" :title="key" v-html="prop.label" />
+            <b-col md="9" class="value" v-html="prop.formatted" />
+          </b-row>
+        </section>
+      </b-card>
+    </b-card-group>
+  </section>
 </template>
 
 <script>

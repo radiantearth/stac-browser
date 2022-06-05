@@ -13,7 +13,7 @@ export class Loading {
 export async function stacRequest(cx, link) {
   let opts;
   if (Utils.isObject(link)) {
-    let method = typeof link.method === 'string' ? link.method.toLowerCase() : 'get'
+    let method = typeof link.method === 'string' ? link.method.toLowerCase() : 'get';
     opts = {
       method,
       url: cx.getters.getRequestUrl(link.href),

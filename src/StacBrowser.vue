@@ -35,7 +35,7 @@ import {
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
 
-import Clipboard from 'v-clipboard'
+import Clipboard from 'v-clipboard';
 
 import { Formatters } from '@radiantearth/stac-fields';
 
@@ -88,7 +88,7 @@ let Watchers = {};
 for(let key in CONFIG) {
   Props[key] = {
     default: ['object', 'function'].includes(typeof CONFIG[key]) ? () => CONFIG[key] : CONFIG[key]
-  }
+  };
   Watchers[key] = {
     immediate: true,
     handler: function(newValue) {
@@ -116,6 +116,14 @@ export default {
       error: null
     };
   },
+  computed: {
+    ...mapState(['title', 'globalError']),
+    ...mapState({catalogUrlFromVueX: 'catalogUrl'}),
+    ...mapGetters(['displayCatalogTitle']),
+    browserVersion() {
+      return STAC_BROWSER_VERSION;
+    }
+  },
   watch: {
     ...Watchers,
     title(title) {
@@ -140,14 +148,6 @@ export default {
   mounted() {
     this.$root.$on('error', this.showError);
     setInterval(() => this.$store.dispatch('loadBackground', 3), 200);
-  },
-  computed: {
-    ...mapState(['title', 'globalError']),
-    ...mapState({catalogUrlFromVueX: 'catalogUrl'}),
-    ...mapGetters(['displayCatalogTitle']),
-    browserVersion() {
-      return STAC_BROWSER_VERSION;
-    }
   },
   methods: {
     parseQuery(route) {
@@ -196,7 +196,7 @@ export default {
       this.$store.commit('showGlobalError', null);
     }
   }
-}
+};
 </script>
 
 <style lang="scss">

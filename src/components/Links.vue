@@ -36,7 +36,7 @@ export default {
         rel = links.rel.mapping[rel];
       }
       let title = Utils.titleForHref(link.href);
-      return `${rel} (${title})`
+      return `${rel} (${title})`;
     }
   }
 };

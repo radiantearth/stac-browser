@@ -1,6 +1,6 @@
 <template>
   <b-card no-body class="catalog-card" :class="{queued: !data, deprecated: data && data.deprecated}" v-b-visible.200="load" :img-right="isList">
-    <b-card-img v-if="showThumbnail && thumbnail && thumbnailVisible" class="thumbnail" :src="thumbnail.href" :alt="thumbnail.title" :crossorigin="crossOriginMedia" :right="isList"></b-card-img>
+    <b-card-img v-if="showThumbnail && thumbnail && thumbnailVisible" class="thumbnail" :src="thumbnail.href" :alt="thumbnail.title" :crossorigin="crossOriginMedia" :right="isList" />
     <b-card-body>
       <b-card-title>
         <StacLink :data="[data, catalog]" class="stretched-link" />
@@ -26,6 +26,13 @@ export default {
   components: {
     StacLink
   },
+  filters: {
+    stripCommonmark(text) {
+      // Best-effort approach to remove some CommonMark (Markdown).
+      // Likely not perfect, but seems good enough for most cases.
+      return removeMd(text);
+    }
+  },
   props: {
     catalog: {
       type: Object,
@@ -39,14 +46,7 @@ export default {
   data() {
     return {
       thumbnailVisible: false // Lazy load thumbnails and not all at once for API Collections
-    }
-  },
-  filters: {
-    stripCommonmark(text) {
-      // Best-effort approach to remove some CommonMark (Markdown).
-      // Likely not perfect, but seems good enough for most cases.
-      return removeMd(text);
-    }
+    };
   },
   computed: {
     ...mapState(['crossOriginMedia', 'cardViewMode']),
@@ -92,7 +92,7 @@ export default {
       this.$store.commit(visible ? 'queue' : 'unqueue', this.catalog.href);
     }
   }
-}
+};
 </script>
 
 <style lang="scss">
