@@ -1,8 +1,8 @@
 <template>
-    <b-button @click="copy" :variant="copyColor" v-bind="buttonProps" title="Copy">
-        <component :is="copyIcon" />
-        <slot></slot>    
-    </b-button>
+  <b-button @click="copy" :variant="copyColor" v-bind="buttonProps" title="Copy">
+    <component :is="copyIcon" />
+    <slot />    
+  </b-button>
 </template>
 
 <script>
@@ -58,5 +58,5 @@ export default {
             setTimeout(() => this.copyConfirm = false, 2500);
         }
     }
-}
+};
 </script>

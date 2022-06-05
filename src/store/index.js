@@ -1,7 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import axios from "axios";
-import Utils from '../utils'
+import Utils from '../utils';
 import STAC from '../stac';
 import bs58 from 'bs58';
 import { Loading, stacRequest } from './utils';

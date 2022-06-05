@@ -1,7 +1,7 @@
 <template>
   <div class="sidebar">
     <div v-if="!parents" class="loading text-center">
-      <b-spinner label="Loading..."></b-spinner>
+      <b-spinner label="Loading..." />
     </div>
     <Tree v-else-if="root" :item="root" :path="parents" />
 
@@ -27,7 +27,7 @@ export default {
   async created() {
     await this.$store.dispatch('loadParents');
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>

@@ -36,7 +36,8 @@ export default {
       type: [
         Object,
         Error
-      ]
+      ],
+      required: true
     },
     id: {
       type: [
@@ -54,7 +55,7 @@ export default {
       default: true
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>

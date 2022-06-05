@@ -18,7 +18,7 @@
       <Item v-for="item in chunkedItems" :item="item" :key="item.href" :selected="selected" />
     </b-card-group>
     <p v-else>Sorry, no items found.</p>
-    <Pagination v-if="api" :pagination="pagination" placement="bottom" @paginate="paginate" />
+    <Pagination v-if="api" :pagination="pagination" @paginate="paginate" />
     <b-button v-else-if="hasMore" @click="showMore" variant="primary" v-b-visible.200="showMore">Show more...</b-button>
   </section>
 </template>

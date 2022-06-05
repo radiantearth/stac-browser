@@ -2,16 +2,20 @@
   <b-row>
     <b-col>
       <b-form @submit="onSubmit">
-        <b-form-group id="select" label="Please specify a STAC Catalog or API..." label-for="url"
-          :invalid-feedback="error" :state="valid">
-          <b-form-input id="url" type="url" :value="url" @input="setUrl" placeholder="https://..."></b-form-input>
+        <b-form-group
+          id="select" label="Please specify a STAC Catalog or API..." label-for="url"
+          :invalid-feedback="error" :state="valid"
+        >
+          <b-form-input id="url" type="url" :value="url" @input="setUrl" placeholder="https://..." />
         </b-form-group>
-        <hr />
+        <hr>
         <b-form-group v-if="stacIndex.length > 0" id="stacIndex" label="... or select one from STAC Index">
           <b-list-group class="stacIndex">
             <template v-for="catalog in stacIndex">
-              <b-list-group-item button v-if="show(catalog)" :key="catalog.id" class="flex-column align-items-start"
-                :active="url === catalog.url" @click="setUrl(catalog.url, false)">
+              <b-list-group-item
+                button v-if="show(catalog)" :key="catalog.id" class="flex-column align-items-start"
+                :active="url === catalog.url" @click="setUrl(catalog.url, false)"
+              >
                 <div class="d-flex w-100 justify-content-between">
                   <strong class="mb-1">{{ catalog.title }}</strong>
                   <small>

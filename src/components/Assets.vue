@@ -2,7 +2,11 @@
   <section class="assets mb-4">
     <h2 v-if="displayTitle">{{ displayTitle }}</h2>
     <div class="accordion" role="tablist">
-      <Asset v-for="(asset, key) in assets" :asset="asset" :expand="expand" :context="context" :definition="definition" :shown="shown.includes(key)" :id="key" :key="getId(key)" @show="show" />
+      <Asset
+        v-for="(asset, key) in assets" :asset="asset" :expand="expand" :context="context"
+        :definition="definition" :shown="shown.includes(key)"
+        :id="key" :key="getId(key)" @show="show"
+      />
     </div>
   </section>
 </template>
@@ -65,5 +69,5 @@ export default {
       this.$emit('showAsset', asset, id, isThumbnail);
     }
   }
-}
+};
 </script>
