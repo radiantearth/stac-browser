@@ -1,12 +1,12 @@
-import Queryable from "./Queryable"
-import QueryableBbox from "./QueryableBbox"
-import QueryableInput from "./QueryableInput"
+import Queryable from "./Queryable";
+import QueryableBbox from "./QueryableBbox";
+import QueryableInput from "./QueryableInput";
 
 export default class ItemSearchCore {
   constructor () {
-    this.queryables = []
-    this.queryableInputs = []
-    this.bboxQueryable = null
+    this.queryables = [];
+    this.queryableInputs = [];
+    this.bboxQueryable = null;
   }
 
   init () {
@@ -42,51 +42,51 @@ export default class ItemSearchCore {
           "maximum": 1000
         }
       },
-    ]
+    ];
     coreFields.forEach(async (field) => {
-      const q = new Queryable(field.id, field.options)
-      await q.init()
-      this.queryables.push(q)
-      const qui = new QueryableInput(q)
-      if (q.id === 'limit') qui.setDefaultValue(12)
-      this.queryableInputs.push(qui)
-    })
+      const q = new Queryable(field.id, field.options);
+      await q.init();
+      this.queryables.push(q);
+      const qui = new QueryableInput(q);
+      if (q.id === 'limit') qui.setDefaultValue(12);
+      this.queryableInputs.push(qui);
+    });
 
-    this.bboxQueryable = new QueryableBbox('bbox')
+    this.bboxQueryable = new QueryableBbox('bbox');
   }
 
   get limitQueryableInput () {
-    return this.queryableInputs.find(q => q.queryable.id === 'limit')
+    return this.queryableInputs.find(q => q.queryable.id === 'limit');
   }
 
   get datetimeQueryableInput () {
-    return this.queryableInputs.find(q => q.queryable.id === 'datetime')
+    return this.queryableInputs.find(q => q.queryable.id === 'datetime');
   }
 
   get collectionsQueryableInput () {
-    return this.queryableInputs.find(q => q.queryable.id === 'collections')
+    return this.queryableInputs.find(q => q.queryable.id === 'collections');
   }
 
   get bboxQueryableInput () {
-    return this.bboxQueryable
+    return this.bboxQueryable;
   }
 
   getAsCql2Json () {
-    let out = {}
+    let out = {};
     this.queryableInputs.forEach(q => {
-      if (q.props.value !== '') out[q.queryable.field] = q.props.value 
-    })
-    if (this.bboxQueryable.value !== null) out.bbox = this.bboxQueryable.getAsCql2Json()
-    return out
+      if (q.props.value !== '') out[q.queryable.field] = q.props.value; 
+    });
+    if (this.bboxQueryable.value !== null) out.bbox = this.bboxQueryable.getAsCql2Json();
+    return out;
   }
 
   getAsCql2Text () {
-    let out = ''
+    let out = '';
     this.queryableInputs.forEach(q => {
-      if (q.props.value !== '') out = out.concat(`${out[q.queryable.field]}=${q.props.value}`)
-    })
-    if (this.bboxQueryable.value !== null) out = out.concat(this.bboxQueryable.getAsCql2Text())
-    return out
+      if (q.props.value !== '') out = out.concat(`${out[q.queryable.field]}=${q.props.value}`);
+    });
+    if (this.bboxQueryable.value !== null) out = out.concat(this.bboxQueryable.getAsCql2Text());
+    return out;
   }
 
 }

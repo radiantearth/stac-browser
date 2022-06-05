@@ -1,11 +1,11 @@
-import Queryable from "./Queryable"
-import QueryableInput from "./QueryableInput"
+import Queryable from "./Queryable";
+import QueryableInput from "./QueryableInput";
 
 export default class SortFragment {
   constructor () {
-    this.queryable = null
-    this.direction = ''
-    this.field = ''
+    this.queryable = null;
+    this.direction = '';
+    this.field = '';
   }
 
   async init () {
@@ -17,21 +17,21 @@ export default class SortFragment {
         { value: 'id', text: 'ID' },
         { value: 'properties.title', text: 'Title' }
       ]
-    })
-    await q.init()
-    const qui = new QueryableInput(q)
-    this.queryable = qui
-    if (q.id === 'limit') qui.setDefaultValue(12)
+    });
+    await q.init();
+    const qui = new QueryableInput(q);
+    this.queryable = qui;
+    if (q.id === 'limit') qui.setDefaultValue(12);
   }
 
   get _directionAsSymbol () {
     // if (this.direction === 'asc') return '+'
     // if (this.direction === 'desc') return '-'
-    return this.direction
+    return this.direction;
   }
 
   getAsCql2Json () {
-    if (this.queryable.props.value === '' && this._directionAsSymbol === '') return 
+    if (this.queryable.props.value === '' && this._directionAsSymbol === '') return; 
     return {
       sortby: [
         {
@@ -39,11 +39,11 @@ export default class SortFragment {
           "direction": this._directionAsSymbol
         }
       ]
-    }
+    };
   }
   
   getAsCql2Text () {
-    return `sortby=${this._directionAsSymbol}${this.field}`
+    return `sortby=${this._directionAsSymbol}${this.field}`;
   }
 
 }

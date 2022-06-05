@@ -235,10 +235,10 @@ class STAC {
     }
 
     async getQueryables () {
-        const response = await fetch(`${this._url}/queryables`)
-        if (!response.ok) return
-        const queryables = await response.json()
-        return queryables.properties
+        const response = await fetch(`${this._url}/queryables`);
+        if (!response.ok) return;
+        const queryables = await response.json();
+        return queryables.properties;
     }
 
 }

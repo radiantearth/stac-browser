@@ -198,10 +198,10 @@ export default class Utils {
 
 	static addAdvancedFiltersToLink(link, filters = {}, searchLink = {}) {
 		let newLink = Object.assign({}, link);
-		newLink.href = searchLink.href
-		newLink.method = 'post'
-		newLink.body = filters.advancedFilters
-		return newLink
+		newLink.href = searchLink.href;
+		newLink.method = 'post';
+		newLink.body = filters.advancedFilters;
+		return newLink;
 	}
 
 	static titleForHref(href, preferFileName = false) {

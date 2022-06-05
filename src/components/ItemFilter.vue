@@ -43,7 +43,7 @@
       <div class="additionalFilters">
         <b-form-group label="Select additional field filters" label-for="availableFields" description="Fields advertised by the /queryables endpoint">
           <b-dropdown size="sm" text="Add field filter" block variant="primary" class="m-2" menu-class="w-100">
-            <b-dropdown-item v-for="option in fieldFilterOptions" :key="option.text" @click="additionalFieldSelected(option)">{{option.text}}</b-dropdown-item>
+            <b-dropdown-item v-for="option in fieldFilterOptions" :key="option.text" @click="additionalFieldSelected(option)">{{ option.text }}</b-dropdown-item>
           </b-dropdown>
         </b-form-group>
 
@@ -52,23 +52,20 @@
           :key="item.queryable.uniqueId"
         >
           <b-col cols="4">
-            {{item.queryable.usableDefinition.title}}
+            {{ item.queryable.usableDefinition.title }}
           </b-col>
           <b-col v-if="item.operator !== null" cols="2">
-            <b-form-select v-model="item.operator" size="sm" @input="queryableSet(item, $event)" :options="item.queryable.operatorOptions">
-            </b-form-select>     
+            <b-form-select v-model="item.operator" size="sm" @input="queryableSet(item, $event)" :options="item.queryable.operatorOptions" />     
           </b-col>
           <b-col :cols="item.operator !== null ? 5 : 7">
-            <component :is="item.component" v-bind="item.props" @input="queryableSet(item, $event)"/>
+            <component :is="item.component" v-bind="item.props" @input="queryableSet(item, $event)" />
           </b-col>
           <b-col cols="1">
             <b-button size="sm" class="mb-2" variant="danger" style="float: right;">
-              <b-icon icon="x-circle-fill" aria-hidden="true" @click="removeUserFilterField(item)"></b-icon>
+              <b-icon icon="x-circle-fill" aria-hidden="true" @click="removeUserFilterField(item)" />
             </b-button>
           </b-col>
         </b-row>
-
-
       </div>
 
       <b-button type="submit" variant="primary">Filter</b-button>
@@ -144,14 +141,14 @@ export default {
   computed: {
     ...mapState(['itemsPerPage']),
     fieldFilterOptions () {
-      if (this.itemSearch === null) return []
+      if (this.itemSearch === null) return [];
       return this.itemSearch.filterFragment.queryables.map(q => {
-          return { value: q.id, text: q.usableDefinition.title }
-      })
+          return { value: q.id, text: q.usableDefinition.title };
+      });
     },
     userDefinedFilters () {
-      if (this.itemSearch === null) return []
-      return this.itemSearch.filterFragment.queryableInputs
+      if (this.itemSearch === null) return [];
+      return this.itemSearch.filterFragment.queryableInputs;
     }
   },
   watch: {
@@ -175,24 +172,27 @@ export default {
       }
     }
   },
+   mounted () {
+    this.createBlankSearchFilter();
+  },
   methods: {
     sortFieldSet (value) {
-      this.sortTerm = value
-      this.queryableSet(this.itemSearch.sortFragment.queryable, value)
+      this.sortTerm = value;
+      this.queryableSet(this.itemSearch.sortFragment.queryable, value);
     },
     sortDirectionSet (value) {
-      this.sortOrder = value
-      this.itemSearch.sortFragment.direction = value
+      this.sortOrder = value;
+      this.itemSearch.sortFragment.direction = value;
     },
     queryableSet (item, event) {
-      item.props.value = event
+      item.props.value = event;
     },
     removeUserFilterField (item) {
-      this.itemSearch.filterFragment.removeQueryableInput(item)
+      this.itemSearch.filterFragment.removeQueryableInput(item);
     },
     additionalFieldSelected (selected) {
-      const queryable = this.itemSearch.filterFragment.queryables.find(q => q.id === selected.value)
-      this.itemSearch.filterFragment.createQueryableInput(queryable)
+      const queryable = this.itemSearch.filterFragment.queryables.find(q => q.id === selected.value);
+      this.itemSearch.filterFragment.createQueryableInput(queryable);
     },
     getDefaultValues() {
       return {
@@ -209,12 +209,12 @@ export default {
       if (this.sort) {
         this.filters.sortby = this.formatSort();
       }
-      this.filters.advancedFilters = this.itemSearch.getAsCql2Json()
+      this.filters.advancedFilters = this.itemSearch.getAsCql2Json();
       this.$emit('input', this.filters, false);
     },
     async onReset() {
       this.filters = this.getDefaultValues();
-      await this.createBlankSearchFilter()
+      await this.createBlankSearchFilter();
       this.$emit('input', this.filters, true);
     },
     setLimit(limit) {
@@ -250,7 +250,7 @@ export default {
         });
         this.filters.datetime = datetime;
 
-        this.queryableSet(this.itemSearch.coreSearchFields.datetimeQueryableInput, `${datetime[0].toISOString()}/${datetime[1].toISOString()}`)
+        this.queryableSet(this.itemSearch.coreSearchFields.datetimeQueryableInput, `${datetime[0].toISOString()}/${datetime[1].toISOString()}`);
 
       }
       else {
@@ -273,15 +273,12 @@ export default {
     },
     async createBlankSearchFilter() {
       if (this.stac.type === 'Collection') {
-        const itemSearch = new ItemSearch()
-        await itemSearch.init(this.stac)
-        this.queryableSet(itemSearch.coreSearchFields.collectionsQueryableInput, [this.stac.id])
-        this.itemSearch = itemSearch
+        const itemSearch = new ItemSearch();
+        await itemSearch.init(this.stac);
+        this.queryableSet(itemSearch.coreSearchFields.collectionsQueryableInput, [this.stac.id]);
+        this.itemSearch = itemSearch;
       }      
     }
-  },
-   mounted () {
-    this.createBlankSearchFilter()
   }
 };
 </script>

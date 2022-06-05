@@ -605,10 +605,10 @@ function getStore(config) {
           filters.limit = cx.state.itemsPerPage;
         }
         cx.commit('setApiItemsFilter', filters);
-        let showingFilteredItems = false
+        let showingFilteredItems = false;
         if (filters.advancedFilters && cx.getters.root && Object.keys(filters.advancedFilters).length > 0) {
-          link = Utils.addAdvancedFiltersToLink(link, filters, cx.getters.searchLink)
-          showingFilteredItems = true
+          link = Utils.addAdvancedFiltersToLink(link, filters, cx.getters.searchLink);
+          showingFilteredItems = true;
         } else link = Utils.addFiltersToLink(link, filters);
 
         let response = await stacRequest(cx, link);

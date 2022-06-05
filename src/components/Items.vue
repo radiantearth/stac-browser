@@ -11,7 +11,7 @@
         <b-icon-search /> Filter
       </b-button>
       <b-collapse id="itemFilter" v-model="filtersOpen">
-        <ItemFilter :stac="stac" v-model="filters" :sort="canSort" :collectionOnly="true"/>
+        <ItemFilter :stac="stac" v-model="filters" :sort="canSort" :collectionOnly="true" />
       </b-collapse>
     </template>
     <b-card-group v-if="chunkedItems.length > 0" columns>

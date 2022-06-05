@@ -1,68 +1,68 @@
 import URI from 'urijs';
-import _get from 'lodash.get'
+import _get from 'lodash.get';
 
 export default class Queryable {
   constructor (id, json) {
-    this.id = id
-    this._rawJson = json
-    this.usableDefinition = null
+    this.id = id;
+    this._rawJson = json;
+    this.usableDefinition = null;
   }
 
   get field () {
-    return this.id
+    return this.id;
   }
 
   get _hasDetails () {
-    if ('type' in this._rawJson) return true
-    if ('$ref' in this._rawJson) return false
-    return true
+    if ('type' in this._rawJson) return true;
+    if ('$ref' in this._rawJson) return false;
+    return true;
   }
 
   get uiType () {
-    if (this.usableDefinition === null) return null
-    if (this.usableDefinition.enum) return 'selectField'
-    if (this.usableDefinition.type === 'string') return 'textField'
+    if (this.usableDefinition === null) return null;
+    if (this.usableDefinition.enum) return 'selectField';
+    if (this.usableDefinition.type === 'string') return 'textField';
     if (this.usableDefinition.type === 'number' || this.usableDefinition.type === 'integer') {
       // if ('minimum' in this.usableDefinition && 'maximum' in this.usableDefinition) return 'rangeField'
-      return 'numberField'
+      return 'numberField';
     }
-    return null
+    return null;
   }
 
   get operatorOptions () {
-    if (this.uiType === null) return null
+    if (this.uiType === null) return null;
     if (this.uiType === 'selectField') {
-      return ["=", "<>"]
+      return ["=", "<>"];
     }
     if (this.uiType === 'textField') {
-      return ["=", "<>", 'LIKE']
+      return ["=", "<>", 'LIKE'];
     }
     if (this.uiType === 'rangeField') {
-      return ['>', ">=", "<", "<="]
+      return ['>', ">=", "<", "<="];
 
     }
     if (this.uiType === 'numberField') {
-      return ['>', ">=", "<", "<="]
+      return ['>', ">=", "<", "<="];
     }
-    return null
+    return null;
   }
 
   async init () {
     if (!this._hasDetails) {
-      this.usableDefinition = await this.getDefinitionFromReference()
+      this.usableDefinition = await this.getDefinitionFromReference();
     } else {
-      this.usableDefinition = this._rawJson
+      this.usableDefinition = this._rawJson;
     }
   }
 
   async getDefinitionFromReference () {
-    const response = await fetch(this._rawJson.$ref)
-    if (!response.ok) return
-    const data = await response.json()
+    const response = await fetch(this._rawJson.$ref);
+    if (!response.ok) return;
+    const data = await response.json();
     
-    const uri = new URI(this._rawJson.$ref)
-    const hash = uri.hash()
-    const hashComponents = hash.replace('#/', '').split('/').join('.')
-    return Object.assign(this._rawJson, _get(data, hashComponents))
+    const uri = new URI(this._rawJson.$ref);
+    const hash = uri.hash();
+    const hashComponents = hash.replace('#/', '').split('/').join('.');
+    return Object.assign(this._rawJson, _get(data, hashComponents));
   }
 }
