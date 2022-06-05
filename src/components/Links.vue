@@ -36,8 +36,22 @@ export default {
         rel = links.rel.mapping[rel];
       }
       let title = Utils.titleForHref(link.href);
-      return `${rel} (${title})`
+      return `${rel} (${title})`;
     }
   }
 };
 </script>
+
+<style lang="scss">
+#stac-browser .links {
+  > ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+
+    > li {
+      margin-bottom: 0.2em;
+    }
+  }
+}
+</style>

@@ -20,13 +20,13 @@ import ViewMixin from './ViewMixin';
 
 export default {
   name: "Catalogs",
-  mixins: [
-    ViewMixin
-  ],
   components: {
     Catalog,
     SortButtons: () => import('./SortButtons.vue')
   },
+  mixins: [
+    ViewMixin
+  ],
   props: {
     catalogs: {
       type: Array,

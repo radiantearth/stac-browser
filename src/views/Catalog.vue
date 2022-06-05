@@ -43,8 +43,11 @@
         <Catalogs :catalogs="catalogs" :hasMore="hasMoreCollections" @loadMore="loadMoreCollections" />
       </b-col>
       <b-col class="items-container" v-if="hasItems">
-        <Items :stac="data" :items="items" :api="isApi" :apiFilters="apiItemsFilter" :pagination="itemPages"
-          @paginate="paginateItems" @filterItems="filterItems" />
+        <Items
+          :stac="data" :items="items" :api="isApi" :apiFilters="apiItemsFilter"
+          :pagination="itemPages"
+          @paginate="paginateItems" @filterItems="filterItems"
+        />
         <Assets v-if="hasItemAssets" :assets="data.item_assets" :definition="true" />
       </b-col>
     </b-row>
@@ -66,7 +69,6 @@ import Utils from '../utils';
 
 export default {
   name: "Catalog",
-  mixins: [ShowAssetMixin],
   components: {
     AnonymizedNotice: () => import('../components/AnonymizedNotice.vue'),
     Assets: () => import('../components/Assets.vue'),
@@ -84,6 +86,7 @@ export default {
     ReadMore,
     Thumbnails: () => import('../components/Thumbnails.vue')
   },
+  mixins: [ShowAssetMixin],
   data() {
     return {
       ignoredMetadataFields: [
@@ -201,11 +204,13 @@ export default {
       flex-flow: column wrap;
     }
 
-    .card-columns {
-      column-count: 1;
+    .items, .catalogs {
+      .card-columns {
+        column-count: 1;
 
-      .thumbnail {
-        align-self: center;
+        .thumbnail {
+          align-self: center;
+        }
       }
     }
   }
@@ -213,18 +218,21 @@ export default {
   &.catalog { // Catalog has items or catalogs
     .items-container, .catalogs-container {
       max-width: 100%;
-      .card-columns {
-        @include media-breakpoint-up(sm) {
-          column-count: 2;
-        }
-        @include media-breakpoint-up(lg) {
-          column-count: 3;
-        }
-        @include media-breakpoint-up(xxl) {
-          column-count: 4;
-        }
-        @include media-breakpoint-up(xxxl) {
-          column-count: 6;
+      
+      .items, .catalogs {
+        .card-columns {
+          @include media-breakpoint-up(sm) {
+            column-count: 2;
+          }
+          @include media-breakpoint-up(lg) {
+            column-count: 3;
+          }
+          @include media-breakpoint-up(xxl) {
+            column-count: 4;
+          }
+          @include media-breakpoint-up(xxxl) {
+            column-count: 6;
+          }
         }
       }
     }
@@ -232,18 +240,20 @@ export default {
 
   &.collection { // Collection has items or catalogs
     .items-container, .catalogs-container {
-      .card-columns {
-        @include media-breakpoint-only(md) {
-          column-count: 2;
-        }
-        @include media-breakpoint-up(lg) {
-          column-count: 1;
-        }
-        @include media-breakpoint-up(xxl) {
-          column-count: 2;
-        }
-        @include media-breakpoint-up(xxxl) {
-          column-count: 3;
+      .items, .catalogs {
+        .card-columns {
+          @include media-breakpoint-only(md) {
+            column-count: 2;
+          }
+          @include media-breakpoint-up(lg) {
+            column-count: 1;
+          }
+          @include media-breakpoint-up(xxl) {
+            column-count: 2;
+          }
+          @include media-breakpoint-up(xxxl) {
+            column-count: 3;
+          }
         }
       }
     }
@@ -251,15 +261,17 @@ export default {
 
   &.catalog.mixed { // Catalog has items and catalogs
     .items-container, .catalogs-container {
-      .card-columns {
-        @include media-breakpoint-up(lg) {
-          column-count: 1;
-        }
-        @include media-breakpoint-up(xl) {
-          column-count: 2;
-        }
-        @include media-breakpoint-up(xxl) {
-          column-count: 3;
+      .items, .catalogs {
+        .card-columns {
+          @include media-breakpoint-up(lg) {
+            column-count: 1;
+          }
+          @include media-breakpoint-up(xl) {
+            column-count: 2;
+          }
+          @include media-breakpoint-up(xxl) {
+            column-count: 3;
+          }
         }
       }
     }
@@ -269,15 +281,18 @@ export default {
     .items-container, .catalogs-container {
       max-width: 33%;
 
-      .card-columns {
-        @include media-breakpoint-up(lg) {
-          column-count: 1;
-        }
-        @include media-breakpoint-up(xxl) {
-          column-count: 2;
-        }
-        @include media-breakpoint-up(xxxl) {
-          column-count: 3;
+      
+      .items, .catalogs {
+        .card-columns {
+          @include media-breakpoint-up(lg) {
+            column-count: 1;
+          }
+          @include media-breakpoint-up(xxl) {
+            column-count: 2;
+          }
+          @include media-breakpoint-up(xxxl) {
+            column-count: 3;
+          }
         }
       }
     }

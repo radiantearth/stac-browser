@@ -36,20 +36,6 @@ export default {
     LTileLayer,
     LWMSTileLayer
   },
-  data() {
-    return {
-      show: false,
-      map: null,
-      areaSelect: null,
-      stacLayer: null,
-      boundsLayer: null,
-      mapOptions: {},
-      osmOptions: {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors.'
-      },
-      dblClickState: null
-    };
-  },
   props: {
     stac: {
       type: Object,
@@ -64,19 +50,19 @@ export default {
       required: false
     }
   },
-  created() {
-    this.mapOptions.scrollWheelZoom = this.selectBounds || this.stac?.isItem();
-  },
-  mounted() {
-    // Solves https://github.com/radiantearth/stac-browser/issues/95 by showing the map
-    // only after the next tick so that the page was fully rendered once before we start adding the map
-    this.$nextTick(() => this.show = true);
-  },
-  beforeDestroy() {
-    this.show = false;
-    if (this.dblClickState) {
-      window.clearTimeout(this.dblClickState);
-    }
+  data() {
+    return {
+      show: false,
+      map: null,
+      areaSelect: null,
+      stacLayer: null,
+      boundsLayer: null,
+      mapOptions: {},
+      osmOptions: {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors.'
+      },
+      dblClickState: null
+    };
   },
   computed: {
     ...mapState(['buildTileUrlTemplate', 'crossOriginMedia', 'geoTiffResolution', 'tileSourceTemplate', 'useTileLayerAsFallback']),
@@ -123,6 +109,20 @@ export default {
   watch: {
     async stacLayerData() {
       await this.showStacLayer();
+    }
+  },
+  created() {
+    this.mapOptions.scrollWheelZoom = this.selectBounds || this.stac?.isItem();
+  },
+  mounted() {
+    // Solves https://github.com/radiantearth/stac-browser/issues/95 by showing the map
+    // only after the next tick so that the page was fully rendered once before we start adding the map
+    this.$nextTick(() => this.show = true);
+  },
+  beforeDestroy() {
+    this.show = false;
+    if (this.dblClickState) {
+      window.clearTimeout(this.dblClickState);
     }
   },
   methods: {
@@ -233,7 +233,7 @@ export default {
       this.$emit('bounds', this.areaSelect.getBounds());
     }
   }
-}
+};
 </script>
 
 <style lang="scss">
