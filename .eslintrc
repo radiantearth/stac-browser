@@ -1,12 +1,17 @@
-module.exports = {
-  parserOptions: {
-    ecmaVersion: 2020,
-    sourceType: "module"
+{
+  "parserOptions": {
+    "ecmaVersion": 2020,
+    "sourceType": "module"
   },
-  extends: [
-    'plugin:vue/strongly-recommended'
+  "globals": {
+    "STAC_BROWSER_VERSION": "readonly",
+    "CONFIG_PATH": "readonly",
+    "CONFIG_CLI": "readonly"
+  },
+  "extends": [
+    "plugin:vue/strongly-recommended"  
   ],
-  rules: {
+  "rules": {
     "semi": [1, "always"],
     "vue/singleline-html-element-content-newline": "off",
     "vue/attribute-hyphenation": "off",
