@@ -28,8 +28,8 @@
       </b-form-group>
 
       <b-form-group v-if="sort" label="Sort" label-for="sort" description="Some APIs may not support all of the options.">
-        <b-form-select id="sort" v-model="sortTerm" :options="sortOptions" placeholder="Default" />
-        <SortButtons class="mt-1" v-model="sortOrder" enforce />
+        <b-form-select id="sort" :options="sortOptions" placeholder="Default" @input="sortFieldSet" />
+        <SortButtons class="mt-1" :value="sortOrder" enforce @input="sortDirectionSet" />
       </b-form-group>
 
       <b-form-group label="Items per page" label-for="limit" :description="`Number of items requested per page, max. ${maxItems} items.`">
@@ -40,6 +40,34 @@
         />
       </b-form-group>
 
+      <div class="additionalFilters" v-if="itemSearch && itemSearch.filterFragment.hasQueryableFields">
+        <b-form-group label="Additional filters" label-for="availableFields">
+          <b-dropdown size="sm" text="Add filter" block variant="primary" class="m-2" menu-class="w-100">
+            <b-dropdown-item v-for="option in fieldFilterOptions" :key="option.text" @click="additionalFieldSelected(option)">{{ option.text }}</b-dropdown-item>
+          </b-dropdown>
+        </b-form-group>
+
+        <b-row 
+          v-for="(item) in userDefinedFilters"
+          :key="item.queryable.uniqueId"
+        >
+          <b-col cols="4">
+            {{ item.queryable.usableDefinition.title }}
+          </b-col>
+          <b-col v-if="item.operator !== null" cols="2">
+            <b-form-select v-model="item.operator" size="sm" @input="queryableSet(item, $event)" :options="item.queryable.operatorOptions" />     
+          </b-col>
+          <b-col :cols="item.operator !== null ? 5 : 7">
+            <component :is="item.component" v-bind="item.props" @input="queryableSet(item, $event)" />
+          </b-col>
+          <b-col cols="1">
+            <b-button size="sm" class="mb-2" variant="danger" style="float: right;">
+              <b-icon icon="x-circle-fill" aria-hidden="true" @click="removeUserFilterField(item)" />
+            </b-button>
+          </b-col>
+        </b-row>
+      </div>
+
       <b-button type="submit" variant="primary">Filter</b-button>
       <b-button type="reset" variant="danger" class="ml-3">Reset</b-button>
     </b-form>
@@ -47,19 +75,27 @@
 </template>
 
 <script>
-import { BForm, BFormGroup, BFormInput, BFormCheckbox, BFormSelect, BFormTags } from 'bootstrap-vue';
+import { BDropdown, BDropdownItem, BForm, BFormGroup, BFormInput, BFormCheckbox, BFormSelect, BFormSelectOption, BFormTags, BButton, BIcon, BIconXCircleFill } from 'bootstrap-vue';
+
 import DatePicker from 'vue2-datepicker';
 import { mapState } from "vuex";
+import ItemSearch from '../models/ItemSearch';
 
 export default {
   name: 'ItemFilter',
   components: {
+    BDropdown,
+    BDropdownItem,
     BForm,
     BFormGroup,
     BFormInput,
     BFormCheckbox,
     BFormSelect,
+    BFormSelectOption,
     BFormTags,
+    BButton,
+    BIcon,
+    BIconXCircleFill,
     DatePicker,
     Map: () => import('./Map.vue'),
     SortButtons: () => import('./SortButtons.vue')
@@ -88,6 +124,7 @@ export default {
   },
   data() {
     return {
+      itemSearch: null,
       sortOrder: 1,
       sortTerm: null,
       sortOptions: [
@@ -103,6 +140,16 @@ export default {
   },
   computed: {
     ...mapState(['itemsPerPage']),
+    fieldFilterOptions () {
+      if (this.itemSearch === null) return [];
+      return this.itemSearch.filterFragment.queryables.map(q => {
+          return { value: q.id, text: q.usableDefinition.title };
+      });
+    },
+    userDefinedFilters () {
+      if (this.itemSearch === null) return [];
+      return this.itemSearch.filterFragment.queryableInputs;
+    }
   },
   watch: {
     value: {
@@ -121,15 +168,32 @@ export default {
             return dt;
           });
         }
-        if (this.sort && typeof filters.sortby === 'string') {
-          this.sortOrder = filters.sortby.startsWith('-') ? -1 : 1;
-          this.sortTerm = filters.sortby.replace(/^(\+|-)/, '');
-        }
         this.filters = filters;
       }
     }
   },
+   mounted () {
+    this.createBlankSearchFilter();
+  },
   methods: {
+    sortFieldSet (value) {
+      this.sortTerm = value;
+      this.queryableSet(this.itemSearch.sortFragment.queryable, value);
+    },
+    sortDirectionSet (value) {
+      this.sortOrder = value;
+      this.itemSearch.sortFragment.direction = this.sortOrder < 0 ? '-' : '';
+    },
+    queryableSet (item, event) {
+      item.props.value = event;
+    },
+    removeUserFilterField (item) {
+      this.itemSearch.filterFragment.removeQueryableInput(item);
+    },
+    additionalFieldSelected (selected) {
+      const queryable = this.itemSearch.filterFragment.queryables.find(q => q.id === selected.value);
+      this.itemSearch.filterFragment.createQueryableInput(queryable);
+    },
     getDefaultValues() {
       return {
         datetime: null,
@@ -137,17 +201,20 @@ export default {
         limit: null,
         ids: [],
         collections: [],
-        sortby: null
+        sortby: null,
+        advancedFilters: null
       };
     },
     onSubmit() {
       if (this.sort) {
         this.filters.sortby = this.formatSort();
       }
+      this.filters.advancedFilters = this.itemSearch.getAsCql2Json();
       this.$emit('input', this.filters, false);
     },
-    onReset() {
+    async onReset() {
       this.filters = this.getDefaultValues();
+      await this.createBlankSearchFilter();
       this.$emit('input', this.filters, true);
     },
     setLimit(limit) {
@@ -165,9 +232,10 @@ export default {
     setBBox(bounds) {
       if (this.provideBBox) {
         this.filters.bbox = bounds;
-      }
-      else {
+        this.itemSearch.coreSearchFields.bboxQueryableInput.setValueFromLeafletBounds(bounds);
+      } else {
         this.filters.bbox = null;
+        this.itemSearch.coreSearchFields.bboxQueryableInput.clearValue();
       }
     },
     setDateTime(datetime) {
@@ -181,6 +249,9 @@ export default {
           return dt;
         });
         this.filters.datetime = datetime;
+
+        this.queryableSet(this.itemSearch.coreSearchFields.datetimeQueryableInput, `${datetime[0].toISOString()}/${datetime[1].toISOString()}`);
+
       }
       else {
         this.filters.datetime = null;
@@ -188,6 +259,7 @@ export default {
     },
     setCollections(collections) {
       this.filters.collections = collections;
+      this.queryableSet(this.itemSearch.coreSearchFields.collectionsQueryableInput, collections);
     },
     setIds(ids) {
       this.filters.ids = ids;
@@ -200,6 +272,14 @@ export default {
       else {
         return null;
       }
+    },
+    async createBlankSearchFilter() {
+      const itemSearch = new ItemSearch();
+      await itemSearch.init(this.stac);
+      if (this.stac.type === 'Collection') {
+        this.queryableSet(itemSearch.coreSearchFields.collectionsQueryableInput, [this.stac.id]);
+      }
+      this.itemSearch = itemSearch;
     }
   }
 };
@@ -215,5 +295,13 @@ $primary-color: map-get($theme-colors, "primary");
 
 .mx-datepicker {
   width: 100%;
+}
+
+.additionalFilters {
+  background: #f0f0f0;
+  border: 1px solid #cccccc;
+  border-radius: 0.25rem;
+  padding: 20px;
+  margin-bottom: 20px;;
 }
 </style>

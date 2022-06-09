@@ -196,6 +196,14 @@ export default class Utils {
 		return newLink;
 	}
 
+	static addAdvancedFiltersToLink(link, filters = {}, searchLink = {}) {
+		let newLink = Object.assign({}, link);
+		newLink.href = searchLink.href;
+		newLink.method = 'post';
+		newLink.body = filters.advancedFilters;
+		return newLink;
+	}
+
 	static titleForHref(href, preferFileName = false) {
 		let uri = URI(href);
 		let auth = uri.authority();
@@ -245,6 +253,19 @@ export default class Utils {
 		else {
 			return true; // If no img.type is given, try to load it anyway: https://github.com/radiantearth/stac-browser/issues/147
 		}
+	}
+
+	// Gets the value at path of object.
+	// Drop in replacement for lodash.get
+	static getValueFromObjectUsingPath (object, path) {
+		if (object === null || typeof object !== 'object') {
+			return;
+		}
+		object = object[path[0]];
+		if (typeof object !== 'undefined' && path.length > 1) {
+			return this.getValueFromObjectUsingPath(object, path.slice(1));
+		}
+		return object;
 	}
 
 }
