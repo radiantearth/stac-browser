@@ -1,24 +1,31 @@
 import URI from 'urijs';
 
-const commonFileNames = ['catalog', 'collection', 'item'];
+export const commonFileNames = ['catalog', 'collection', 'item'];
 
-const stacMediaTypes = [
+export const stacMediaTypes = [
 	'application/json',
 	'application/geo+json',
 	'text/json'
 ];
 
-const browserImageTypes = [
-	'gif',
-	'jpg',
-	'jpeg',
-	'png',
-	'webp'
+export const browserImageTypes = [
+	'image/gif',
+	'image/jpg',
+	'image/jpeg',
+	'image/apng',
+	'image/png',
+	'image/webp'
 ];
 
-const browserMediaTypeRegexp = new RegExp(`^image/(${browserImageTypes.join('|')})`, 'i');
+export const geotiffMediaTypes = [
+  "application/geotiff",
+  "image/tiff; application=geotiff",
+  "image/tiff; application=geotiff; profile=cloud-optimized",
+  "image/vnd.stac.geotiff",
+  "image/vnd.stac.geotiff; cloud-optimized=true"
+];
 
-const browserProtocols = [
+export const browserProtocols = [
 	'http',
 	'https'
 ];
@@ -241,10 +248,10 @@ export default class Utils {
 		if (protocol && !browserProtocols.includes(protocol)) {
 			return false;
 		}
-		else if (browserMediaTypeRegexp.test(img.type)) {
+		else if (browserImageTypes.includes(img.type)) {
 			return true;
 		}
-		else if (browserImageTypes.includes(uri.suffix().toLowerCase())) {
+		else if (browserImageTypes.includes('image/' + uri.suffix().toLowerCase())) {
 			return true;
 		}
 		else if (img.type) {

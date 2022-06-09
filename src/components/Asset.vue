@@ -20,11 +20,11 @@
       <b-card-body>
         <b-card-title>{{ fileFormat }}</b-card-title>
         <b-button-group class="actions" v-if="href">
-          <CopyButton v-if="isGdalVfs" variant="outline-primary" :copyText="href">
+          <CopyButton v-if="shouldCopy" variant="outline-primary" :copyText="href">
             {{ buttonText }}
           </CopyButton>
           <b-button v-else :href="href" target="_blank" variant="outline-primary">
-            <b-icon-box-arrow-up-right v-if="browserCanOpen" /> 
+            <b-icon-box-arrow-up-right v-if="browserCanOpenFile" /> 
             <b-icon-download v-else />
             {{ buttonText }}
           </b-button>
@@ -51,25 +51,9 @@ import { mapGetters, mapState } from 'vuex';
 import Description from './Description.vue';
 import Metadata from './Metadata.vue';
 import STAC from '../stac';
-import Utils from '../utils';
+import Utils, { browserImageTypes, browserProtocols, geotiffMediaTypes } from '../utils';
 
-export const MIME_TYPES = [
-  // JPEG
-  "image/jpeg",
-  "image/jpg",
-  // PNG
-  "image/apng",
-  "image/png",
-  // GIF & WebP
-  "image/gif",
-  "image/webp",
-  // GeoTiff & COG
-  "application/geotiff",
-  "image/tiff; application=geotiff",
-  "image/tiff; application=geotiff; profile=cloud-optimized",
-  "image/vnd.stac.geotiff",
-  "image/vnd.stac.geotiff; cloud-optimized=true"
-];
+export const MIME_TYPES = browserImageTypes.concat(geotiffMediaTypes);
 
 export default {
   name: 'Asset',
@@ -143,7 +127,7 @@ export default {
         return false;
       }
       // Only http(s) links and relative links are supported
-      else if (!this.isBrowsable) {
+      else if (!this.isBrowserProtocol) {
         return false;
       }
       // Otherwise, all images that a browser can read are supported
@@ -151,6 +135,13 @@ export default {
         return true;
       }
       return false;
+    },
+    shouldCopy() {
+      if (this.isGdalVfs) {
+        return true;
+      }
+
+      return !this.isBrowserProtocol;
     },
     fileFormat() {
       if (this.asset.type) {
@@ -169,8 +160,8 @@ export default {
       }
       return null;
     },
-    isBrowsable() {
-      return (this.protocol === 'http' || this.protocol === 'https');
+    isBrowserProtocol() {
+      return !this.protocol || browserProtocols.includes(this.protocol);
     },
     isGdalVfs() {
       return Utils.isGdalVfsUri(this.asset.href);
@@ -186,41 +177,15 @@ export default {
       return this.getRequestUrl(this.asset.href, baseUrl);
     },
     from() {
-      const s3 = 'Amazon S3';
-      const azure = 'Microsoft Azure';
-      const gc = 'Google Cloud';
-      const ftp = 'FTP';
-      const ali = 'Alibaba Cloud';
-      switch(this.protocol) {
-        case 's3':
-          return s3;
-        case 'abfs':
-        case 'abfss':
-          return azure;
-        case 'gcs':
-          return gc;
-        case 'ftp':
-          return ftp;
-      }
       if (this.isGdalVfs) {
         let type = this.asset.href.match(/^\/vsi([a-z\d]+)(_streaming)?\//);
-        if (type) {
-          switch(type[1]) {
-            case 's3':
-              return s3;
-            case 'az':
-            case 'adls':
-              return azure;
-            case 'gs':
-              return gc;
-            case 'oss':
-              return ali;
-          }
-        }
+        return this.protocolName(type);
       }
-      return '';
+      else {
+        return this.protocolName(this.protocol);
+      }
     },
-    browserCanOpen() {
+    browserCanOpenFile() {
       if (Utils.canBrowserDisplayImage(this.asset)) {
         return true;
       }
@@ -236,12 +201,23 @@ export default {
       return false;
     },
     buttonText() {
-      if (this.browserCanOpen) {
+      if (this.browserCanOpenFile && this.isBrowserProtocol) {
         return 'Open';
       }
-      let text = [this.isGdalVfs ? 'Copy GDAL VFS URL' : 'Download'];
-      if (this.from && !this.isBrowsable) {
-        text.push(this.isGdalVfs ? 'for' : 'from');
+      let text = [];
+      let preposition = 'for';
+      if (this.isGdalVfs) {
+        text.push('Copy GDAL VFS URL');
+      }
+      else if (this.shouldCopy) {
+        text.push('Copy URL');
+      }
+      else {
+        text.push('Download');
+        preposition = 'from';
+      }
+      if (!this.isBrowserProtocol && this.from) {
+        text.push(preposition);
         text.push(this.from);
       }
       return text.join(' ');
@@ -263,6 +239,27 @@ export default {
         asset.href = this.href;
       }
       this.$emit('show', asset, this.id, this.isThumbnail);
+    },
+    protocolName(protocol) {
+      if (typeof protocol !== 'string') {
+        return '';
+      }
+      switch(protocol.toLowerCase()) {
+        case 's3':
+          return 'Amazon S3';
+        case 'abfs':
+        case 'abfss':
+          return 'Microsoft Azure';
+        case 'gcs':
+          return 'Google Cloud';
+        case 'ftp':
+          return 'FTP';
+        case 'oss':
+          return 'Alibaba Cloud';
+        case 'file':
+          return 'local file system';
+      }
+      return '';
     }
   }
 };
