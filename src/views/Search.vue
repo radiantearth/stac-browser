@@ -13,7 +13,7 @@
         <div v-else-if="loading === true" class="loading text-center">
           <b-spinner label="Loading..." />
         </div>
-        <b-alert v-else-if="apiItems.length === 0" variant="info" show>Sorry, no items match the given criteria.</b-alert>
+        <b-alert v-else-if="apiItems.length === 0" variant="warning" show>No items found for the given filters.</b-alert>
         <template v-else>
           <Map :stac="root" :stacLayerData="itemCollection" @mapClicked="mapClicked" />
           <Items

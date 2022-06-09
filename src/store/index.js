@@ -609,7 +609,10 @@ function getStore(config) {
         if (filters.advancedFilters && cx.getters.root && Object.keys(filters.advancedFilters).length > 0) {
           link = Utils.addAdvancedFiltersToLink(link, filters, cx.getters.searchLink);
           showingFilteredItems = true;
-        } else link = Utils.addFiltersToLink(link, filters);
+        }
+        else {
+          link = Utils.addFiltersToLink(link, filters);
+        }
 
         let response = await stacRequest(cx, link);
         if (!Utils.isObject(response.data) || !Array.isArray(response.data.features)) {
@@ -628,7 +631,9 @@ function getStore(config) {
             return new STAC(item, url, cx.getters.toBrowserPath(url));
           });
           if (show) {
-            if (!showingFilteredItems) cx.commit('setApiItemsLink', link);
+            if (!showingFilteredItems) {
+              cx.commit('setApiItemsLink', link);
+            }
           }
           cx.commit('setApiItems', { data: response.data, stac, show });
           return response;
