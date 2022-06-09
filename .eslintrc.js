@@ -8,6 +8,7 @@ module.exports = {
   ],
   rules: {
     "semi": [1, "always"],
+    "vue/multi-word-component-names": "off",
     "vue/singleline-html-element-content-newline": "off",
     "vue/attribute-hyphenation": "off",
     "vue/max-attributes-per-line": ["error", {
@@ -25,4 +26,4 @@ module.exports = {
     "vue/this-in-template": "error",
     "vue/match-component-file-name": "error"
   }
-}
+};
