@@ -6,10 +6,19 @@
   "globals": {
     "STAC_BROWSER_VERSION": "readonly",
     "CONFIG_PATH": "readonly",
-    "CONFIG_CLI": "readonly"
+    "CONFIG_CLI": "readonly",
+    "require": "readonly"
   },
   "extends": [
-    "plugin:vue/strongly-recommended"  
+    "plugin:vue/strongly-recommended",
+    "eslint:recommended"
+  ],
+  "ignorePatterns": [
+    "**/stac-fields",
+    "**/stac-migrate",
+    "**/stac-layer",
+    "config.js",
+    "*.config.js"
   ],
   "rules": {
     "semi": [1, "always"],
@@ -31,4 +40,4 @@
     "vue/this-in-template": "error",
     "vue/match-component-file-name": "error"
   }
-};
+}
