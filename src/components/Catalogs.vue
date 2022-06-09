@@ -1,8 +1,8 @@
 <template>
   <section class="catalogs mb-4">
     <h2>
-      Catalogs
-      <template v-if="!hasMore">({{ catalogs.length }})</template>
+      <span class="title">Catalogs</span>
+      <b-badge v-if="!hasMore" pill variant="secondary ml-2">{{ catalogs.length }}</b-badge>
       <ViewButtons class="ml-4" v-model="view" />
       <SortButtons v-if="!hasMore" class="ml-2" v-model="sort" />
     </h2>
@@ -63,3 +63,11 @@ export default {
   }
 };
 </script>
+
+<style lang="scss" scoped>
+.catalogs > h2 {
+  .title, .badge {
+    vertical-align: middle;
+  }
+}
+</style>

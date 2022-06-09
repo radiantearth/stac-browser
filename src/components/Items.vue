@@ -1,8 +1,8 @@
 <template>
   <section class="items mb-4">
     <h2>
-      Items
-      <template v-if="!api">({{ items.length }})</template>
+      <span class="title">Items</span>
+      <b-badge v-if="!api" pill variant="secondary ml-2">{{ items.length }}</b-badge>
       <SortButtons v-if="!api" class="ml-4" v-model="sort" />
     </h2>
     <Pagination ref="topPagination" v-if="api" :pagination="pagination" placement="top" @paginate="paginate" />
@@ -129,3 +129,11 @@ export default {
   }
 };
 </script>
+
+<style lang="scss" scoped>
+.items > h2 {
+  .title, .badge {
+    vertical-align: middle;
+  }
+}
+</style>
