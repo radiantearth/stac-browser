@@ -138,14 +138,14 @@ export default {
     async showStacLayer() {
       if (this.stacLayer) {
         try {
-          this.map.removeLayer(this.stacLayer)
+          this.map.removeLayer(this.stacLayer);
         } catch (e) {
-          console.log(e)
+          console.log(e);
         }
         this.stacLayer = null;
       } 
       if (this.boundsLayer) {
-        this.map.removeLayer(this.boundsLayer)
+        this.map.removeLayer(this.boundsLayer);
         this.boundsLayer = null;
       }
       let data = this.stacLayerData || this.stac;
@@ -169,12 +169,12 @@ export default {
         }
       }
       if (this.stac.type === 'Collection' && Array.isArray(this.stac?.extent?.spatial?.bbox[0])) {
-        const bounds = this.stac.extent.spatial.bbox[0]
+        const bounds = this.stac.extent.spatial.bbox[0];
         this.boundsLayer = rectangle([[bounds[1], bounds[0]], [bounds[3], bounds[2]]], {
           fillOpacity: 0.1,
           weight: 1
-        }).addTo(this.map)
-        options.displayPreview = true
+        }).addTo(this.map);
+        options.displayPreview = true;
       }
 
       try {

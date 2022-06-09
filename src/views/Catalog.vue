@@ -163,8 +163,8 @@ export default {
     catalogAsFc () {
       return {
         type: 'FeatureCollection',
-        features: this.items.map(i => i._rawJson)
-      }
+        features: this.items
+      };
     }
   },
   methods: {

@@ -8,7 +8,6 @@ class STAC {
 
     constructor(data, url, path, migrate = true) {
         this._id = stacObjCounter++;
-        this._rawJson = data
         this._url = url;
         this._path = path;
         this._apiChildren = {
