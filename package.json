@@ -64,29 +64,6 @@
     "sass-loader": "^8.0.2",
     "vue-template-compiler": "^2.6.12"
   },
-  "eslintConfig": {
-    "root": true,
-    "env": {
-      "node": true
-    },
-    "globals": {
-      "STAC_BROWSER_VERSION": "readonly",
-      "CONFIG_PATH": "readonly",
-      "CONFIG_CLI": "readonly"
-    },
-    "extends": [
-      "plugin:vue/essential",
-      "eslint:recommended"
-    ],
-    "parserOptions": {
-      "parser": "babel-eslint"
-    }
-  },
-  "eslintIgnore": [
-    "**/stac-fields",
-    "**/stac-migrate",
-    "**/stac-layer"
-  ],
   "browserslist": [
     "> 1%",
     "last 2 versions",
