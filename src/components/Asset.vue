@@ -47,12 +47,29 @@
 <script>
 import { BCollapse, BIconBoxArrowUpRight, BIconCheck, BIconChevronRight, BIconChevronDown, BIconDownload, BIconEye } from 'bootstrap-vue';
 import { Formatters } from '@radiantearth/stac-fields';
-import { MIME_TYPES } from 'stac-layer/src/data';
 import { mapGetters, mapState } from 'vuex';
 import Description from './Description.vue';
 import Metadata from './Metadata.vue';
 import STAC from '../stac';
 import Utils from '../utils';
+
+export const MIME_TYPES = [
+  // JPEG
+  "image/jpeg",
+  "image/jpg",
+  // PNG
+  "image/apng",
+  "image/png",
+  // GIF & WebP
+  "image/gif",
+  "image/webp",
+  // GeoTiff & COG
+  "application/geotiff",
+  "image/tiff; application=geotiff",
+  "image/tiff; application=geotiff; profile=cloud-optimized",
+  "image/vnd.stac.geotiff",
+  "image/vnd.stac.geotiff; cloud-optimized=true"
+];
 
 export default {
   name: 'Asset',
@@ -118,21 +135,20 @@ export default {
         return false;
       }
       // If the tile renderer is a tile server, we can't really know what it supports so we pass all images
-      else if (this.tileRendererType === 'server' && this.asset.type.toLowerCase().startsWith('image/')) {
+      else if (this.tileRendererType === 'server' && MIME_TYPES.includes(this.asset.type)) {
         return true;
       }
       // Don't pass GDAL VFS URIs to client-side tile renderer: https://github.com/radiantearth/stac-browser/issues/116
       else if (this.isGdalVfs && this.tileRendererType === 'client') {
         return false;
       }
-      // Otherwise, only http(s) links and relative links are supported
+      // Only http(s) links and relative links are supported
       else if (!this.isBrowsable) {
         return false;
       }
-      for(let type in MIME_TYPES) {
-        if (MIME_TYPES[type].includes(this.asset.type)) {
-          return true;
-        }
+      // Otherwise, all images that a browser can read are supported
+      else if (MIME_TYPES.includes(this.asset.type)) {
+        return true;
       }
       return false;
     },
