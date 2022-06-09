@@ -48,7 +48,9 @@ export default class ItemSearchCore {
       await q.init();
       this.queryables.push(q);
       const qui = new QueryableInput(q);
-      if (q.id === 'limit') qui.setDefaultValue(12);
+      if (q.id === 'limit') {
+        qui.setDefaultValue(12);
+      }
       this.queryableInputs.push(qui);
     });
 
@@ -74,16 +76,22 @@ export default class ItemSearchCore {
   getAsCql2Json () {
     let out = {};
     this.queryableInputs.forEach(q => {
-      if (q.props.value !== '') out[q.queryable.field] = q.props.value; 
+      if (q.props.value !== '') {
+        out[q.queryable.field] = q.props.value; 
+      }
     });
-    if (this.bboxQueryable.value !== null) out.bbox = this.bboxQueryable.getAsCql2Json();
+    if (this.bboxQueryable.value !== null) {
+      out.bbox = this.bboxQueryable.getAsCql2Json();
+    }
     return out;
   }
 
   getAsCql2Text () {
     let out = '';
     this.queryableInputs.forEach(q => {
-      if (q.props.value !== '') out = out.concat(`${out[q.queryable.field]}=${q.props.value}`);
+      if (q.props.value !== '') {
+        out = out.concat(`${out[q.queryable.field]}=${q.props.value}`);
+      }
     });
     if (this.bboxQueryable.value !== null) out = out.concat(this.bboxQueryable.getAsCql2Text());
     return out;

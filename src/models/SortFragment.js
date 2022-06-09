@@ -21,17 +21,23 @@ export default class SortFragment {
     await q.init();
     const qui = new QueryableInput(q);
     this.queryable = qui;
-    if (q.id === 'limit') qui.setDefaultValue(12);
+    if (q.id === 'limit') {
+      qui.setDefaultValue(12);
+    }
   }
 
   get directionAsSymbol () {
-    if (this.direction === '' || this.direction === '+') return 'asc';
+    if (this.direction === '' || this.direction === '+') {
+      return 'asc';
+    }
     return 'desc';
   }
 
 
   getAsCql2Json () {
-    if (this.queryable.props.value === '') return; 
+    if (!this.queryable.props.value) {
+      return; 
+    }
     return {
       sortby: [
         {

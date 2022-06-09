@@ -18,9 +18,15 @@ export default class ItemSearch {
 
   getAsCql2Text () {
     const out = [];
-    if (this.coreSearchFields.isSet) out.push(this.coreSearchFields.asCql2Text);
-    if (this.sortFragment.isSet) out.push(this.sortFragment.asCql2Text);
-    if (this.filterFragment.isSet) out.push(this.filterFragment.asCql2Text);
+    if (this.coreSearchFields.isSet) {
+      out.push(this.coreSearchFields.asCql2Text);
+    }
+    if (this.sortFragment.isSet) {
+      out.push(this.sortFragment.asCql2Text);
+    }
+    if (this.filterFragment.isSet) {
+      out.push(this.filterFragment.asCql2Text);
+    }
     return out.join('&');
   }
 

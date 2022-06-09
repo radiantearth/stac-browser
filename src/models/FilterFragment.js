@@ -22,10 +22,9 @@ export default class FilterFragment {
     for (let index = 0; index < keys.length; index++) {
       const key = keys[index];
       
-      // Seems to be a bug with MS Planetary Computer global search
-      // The ItemId is listed as a queryable but the schema $ref points
-      // to Provider ID definition
-      // if (key === 'id') continue;
+      if (key === 'id') {
+        continue;
+      }
 
       const q = new Queryable(key, rawQueryables[key]);
       await q.init();

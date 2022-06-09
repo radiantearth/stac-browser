@@ -52,8 +52,10 @@ export default class QueryableInput {
   }
 
   _getComponentForQueryable () {
-    if (this.queryable.uiType === 'selectField') return BFormSelect;
-   return BFormInput;
+    if (this.queryable.uiType === 'selectField') {
+      return BFormSelect;
+    }
+    return BFormInput;
   }
 
   getAsCql2Json () {

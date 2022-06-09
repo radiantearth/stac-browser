@@ -28,8 +28,8 @@
       </b-form-group>
 
       <b-form-group v-if="sort" label="Sort" label-for="sort" description="Some APIs may not support all of the options.">
-        <b-form-select id="sort" :options="sortOptions" placeholder="Default" @input="sortFieldSet" />
-        <SortButtons class="mt-1" :value="sortOrder" enforce @input="sortDirectionSet" />
+        <b-form-select id="sort" :value="sortTerm" :options="sortOptions" placeholder="Default" @input="sortFieldSet" />
+        <SortButtons v-if="sortTerm" class="mt-1" :value="sortOrder" enforce @input="sortDirectionSet" />
       </b-form-group>
 
       <b-form-group label="Items per page" label-for="limit" :description="`Number of items requested per page, max. ${maxItems} items.`">
@@ -42,34 +42,27 @@
 
       <div class="additionalFilters" v-if="itemSearch && itemSearch.filterFragment.hasQueryableFields">
         <b-form-group label="Additional filters" label-for="availableFields">
-          <b-dropdown size="sm" text="Add filter" block variant="primary" class="m-2" menu-class="w-100">
+          <b-dropdown size="sm" text="Add filter" block variant="primary" class="mt-2 mb-3" menu-class="w-100">
             <b-dropdown-item v-for="option in fieldFilterOptions" :key="option.text" @click="additionalFieldSelected(option)">{{ option.text }}</b-dropdown-item>
           </b-dropdown>
-        </b-form-group>
 
-        <b-row 
-          v-for="(item) in userDefinedFilters"
-          :key="item.queryable.uniqueId"
-        >
-          <b-col cols="4">
-            {{ item.queryable.usableDefinition.title }}
-          </b-col>
-          <b-col v-if="item.operator !== null" cols="2">
-            <b-form-select v-model="item.operator" size="sm" @input="queryableSet(item, $event)" :options="item.queryable.operatorOptions" />     
-          </b-col>
-          <b-col :cols="item.operator !== null ? 5 : 7">
-            <component :is="item.component" v-bind="item.props" @input="queryableSet(item, $event)" />
-          </b-col>
-          <b-col cols="1">
-            <b-button size="sm" class="mb-2" variant="danger" style="float: right;">
-              <b-icon icon="x-circle-fill" aria-hidden="true" @click="removeUserFilterField(item)" />
+          <b-row v-for="item in userDefinedFilters" :key="item.queryable.uniqueId" class="mb-2">
+            <span class="title">
+              {{ item.queryable.usableDefinition.title }}
+            </span>
+            <b-form-select v-if="item.operator !== null" class="op" v-model="item.operator" size="sm" :options="item.queryable.operatorOptions" />     
+            <component class="value" :is="item.component" v-bind="item.props" @input="queryableSet(item, $event)" />
+            <b-button class="delete" size="sm" variant="danger" @click="removeUserFilterField(item)">
+              <b-icon icon="x-circle-fill" aria-hidden="true" />
             </b-button>
-          </b-col>
-        </b-row>
+          </b-row>
+        </b-form-group>
       </div>
 
-      <b-button type="submit" variant="primary">Filter</b-button>
-      <b-button type="reset" variant="danger" class="ml-3">Reset</b-button>
+      <div class="mt-3">
+        <b-button type="submit" variant="primary">Filter</b-button>
+        <b-button type="reset" variant="danger" class="ml-3">Reset</b-button>
+      </div>
     </b-form>
   </section>
 </template>
@@ -293,15 +286,40 @@ $primary-color: map-get($theme-colors, "primary");
 
 @import '~vue2-datepicker/scss/index.scss';
 
-.mx-datepicker {
-  width: 100%;
-}
+.filter {
+  .mx-datepicker {
+    width: 100%;
+  }
 
-.additionalFilters {
-  background: #f0f0f0;
-  border: 1px solid #cccccc;
-  border-radius: 0.25rem;
-  padding: 20px;
-  margin-bottom: 20px;;
+  .form-group {
+    > div {
+      margin-left: 1em;
+    }
+
+    > label {
+      font-weight: 600;
+    }
+  }
+
+  .additionalFilters {
+    .row {
+      margin: 0;
+      gap: 0.5em;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      align-content: center;
+    }
+
+    .op {
+      width: 5rem;
+    }
+    .delete {
+      width: auto;
+    }
+    .title, .value {
+      flex-grow: 5;
+      width: auto;
+    }
+  }
 }
 </style>

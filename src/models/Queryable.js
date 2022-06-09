@@ -13,16 +13,26 @@ export default class Queryable {
   }
 
   get _hasDetails () {
-    if ('type' in this._rawJson) return true;
-    if ('$ref' in this._rawJson) return false;
+    if ('type' in this._rawJson) {
+      return true;
+    }
+    else if ('$ref' in this._rawJson) {
+      return false;
+    }
     return true;
   }
 
   get uiType () {
-    if (this.usableDefinition === null) return null;
-    if (this.usableDefinition.enum) return 'selectField';
-    if (this.usableDefinition.type === 'string') return 'textField';
-    if (this.usableDefinition.type === 'number' || this.usableDefinition.type === 'integer') {
+    if (this.usableDefinition === null) {
+      return null;
+    }
+    else if (this.usableDefinition.enum) {
+      return 'selectField';
+    }
+    else if (this.usableDefinition.type === 'string') {
+      return 'textField';
+    }
+    else if (this.usableDefinition.type === 'number' || this.usableDefinition.type === 'integer') {
       // if ('minimum' in this.usableDefinition && 'maximum' in this.usableDefinition) return 'rangeField'
       return 'numberField';
     }
@@ -30,27 +40,24 @@ export default class Queryable {
   }
 
   get operatorOptions () {
-    if (this.uiType === null) return null;
-    if (this.uiType === 'selectField') {
-      return ["=", "<>"];
+    switch(this.uiType) {
+      case 'selectField':
+        return ["=", "<>"];
+      case 'textField':
+        return ["=", "<>", 'LIKE'];
+      case 'rangeField':
+      case 'numberField':
+        return ['>', ">=", "<", "<="];
+      default:
+        return null;
     }
-    if (this.uiType === 'textField') {
-      return ["=", "<>", 'LIKE'];
-    }
-    if (this.uiType === 'rangeField') {
-      return ['>', ">=", "<", "<="];
-
-    }
-    if (this.uiType === 'numberField') {
-      return ['>', ">=", "<", "<="];
-    }
-    return null;
   }
 
   async init () {
     if (!this._hasDetails) {
       this.usableDefinition = await this.getDefinitionFromReference();
-    } else {
+    }
+    else {
       this.usableDefinition = this._rawJson;
     }
   }
@@ -64,7 +71,9 @@ export default class Queryable {
     const hash = uri.hash();
     const hashComponents = hash.replace('#/', '').split('/');
     const obj = Utils.getValueFromObjectUsingPath(data, hashComponents);
-    if (obj) return Object.assign(this._rawJson, obj);
+    if (obj) {
+      return Object.assign(this._rawJson, obj);
+    }
     return this._rawJson;
   }
 }

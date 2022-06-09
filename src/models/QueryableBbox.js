@@ -9,17 +9,23 @@ export default class QueryableBBox {
   }
 
   setValueFromLeafletBounds (bounds) {
-    if (bounds === null || typeof bounds.toBBoxString !== 'function') return;
+    if (bounds === null || typeof bounds.toBBoxString !== 'function') {
+      return;
+    }
     this.value = bounds.toBBoxString().split(',').map(str => parseFloat(str));
   }
 
   getAsCql2Json () {
-    if (this.value === null) return;
+    if (this.value === null) {
+      return;
+    }
     return this.value;
   }
 
   getAsCql2Text () {
-    if (this.value === null) return;
+    if (this.value === null) {
+      return;
+    }
     return `bbox=${this.value.toString(',')}`;
   }
 }
