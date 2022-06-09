@@ -1,5 +1,5 @@
 import URI from 'urijs';
-import _get from 'lodash.get';
+import Utils from '../utils';
 
 export default class Queryable {
   constructor (id, json) {
@@ -57,12 +57,14 @@ export default class Queryable {
 
   async getDefinitionFromReference () {
     const response = await fetch(this._rawJson.$ref);
-    if (!response.ok) return;
+    if (!response.ok) return this._rawJson;
     const data = await response.json();
     
     const uri = new URI(this._rawJson.$ref);
     const hash = uri.hash();
-    const hashComponents = hash.replace('#/', '').split('/').join('.');
-    return Object.assign(this._rawJson, _get(data, hashComponents));
+    const hashComponents = hash.replace('#/', '').split('/');
+    const obj = Utils.getValueFromObjectUsingPath(data, hashComponents);
+    if (obj) return Object.assign(this._rawJson, obj);
+    return this._rawJson;
   }
 }

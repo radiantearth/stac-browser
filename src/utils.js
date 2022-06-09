@@ -255,4 +255,17 @@ export default class Utils {
 		}
 	}
 
+	// Gets the value at path of object.
+	// Drop in replacement for lodash.get
+	static getValueFromObjectUsingPath (object, path) {
+		if (object === null || typeof object !== 'object') {
+			return;
+		}
+		object = object[path[0]];
+		if (typeof object !== 'undefined' && path.length > 1) {
+			return this.getValueFromObjectUsingPath(object, path.slice(1));
+		}
+		return object;
+	}
+
 }
