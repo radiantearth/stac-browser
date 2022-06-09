@@ -1,7 +1,7 @@
 <template>
   <b-form-group :label="label" :label-for="id">
     <b-input-group size="sm">
-      <b-form-input :id="id" ref="input" v-model="url" readonly />
+      <b-form-input :id="id" ref="input" :value="url" readonly />
       <b-input-group-append>
         <CopyButton :copyText="url" variant="primary" />
         <b-button v-if="open" :href="url" target="_blank" variant="primary" title="Open"><b-icon-arrow-up-right-square /></b-button>
