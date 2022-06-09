@@ -11,7 +11,7 @@
 
 <script>
 import StacLink from './StacLink.vue';
-import { links } from '@radiantearth/stac-fields/fields.json';
+import Fields from '@radiantearth/stac-fields/fields.json';
 import Utils from '../utils';
 
 export default {
@@ -32,8 +32,8 @@ export default {
   methods: {
     fallbackTitle(link) {
       let rel = link.rel;
-      if (rel in links.rel.mapping) {
-        rel = links.rel.mapping[rel];
+      if (rel in Fields.links.rel.mapping) {
+        rel = Fields.links.rel.mapping[rel];
       }
       let title = Utils.titleForHref(link.href);
       return `${rel} (${title})`;
