@@ -41,7 +41,7 @@
       </b-form-group>
 
       <div class="additionalFilters">
-        <b-form-group label="Select additional field filters" label-for="availableFields" description="Fields advertised by the /queryables endpoint">
+        <b-form-group label="Additional filters" label-for="availableFields">
           <b-dropdown size="sm" text="Add field filter" block variant="primary" class="m-2" menu-class="w-100">
             <b-dropdown-item v-for="option in fieldFilterOptions" :key="option.text" @click="additionalFieldSelected(option)">{{ option.text }}</b-dropdown-item>
           </b-dropdown>
