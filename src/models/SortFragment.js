@@ -24,26 +24,26 @@ export default class SortFragment {
     if (q.id === 'limit') qui.setDefaultValue(12);
   }
 
-  get _directionAsSymbol () {
-    // if (this.direction === 'asc') return '+'
-    // if (this.direction === 'desc') return '-'
-    return this.direction;
+  get directionAsSymbol () {
+    if (this.direction === '' || this.direction === '+') return 'asc';
+    return 'desc';
   }
 
+
   getAsCql2Json () {
-    if (this.queryable.props.value === '' && this._directionAsSymbol === '') return; 
+    if (this.queryable.props.value === '') return; 
     return {
       sortby: [
         {
           "field": this.queryable.props.value,
-          "direction": this._directionAsSymbol
+          "direction": this.directionAsSymbol
         }
       ]
     };
   }
   
   getAsCql2Text () {
-    return `sortby=${this._directionAsSymbol}${this.field}`;
+    return `sortby=${this.direction}${this.field}`;
   }
 
 }

@@ -125,7 +125,7 @@ export default {
   data() {
     return {
       itemSearch: null,
-      sortOrder: 'asc',
+      sortOrder: 1,
       sortTerm: null,
       sortOptions: [
         { value: null, text: 'Default' },
@@ -182,7 +182,7 @@ export default {
     },
     sortDirectionSet (value) {
       this.sortOrder = value;
-      this.itemSearch.sortFragment.direction = value;
+      this.itemSearch.sortFragment.direction = this.sortOrder < 0 ? '-' : '';
     },
     queryableSet (item, event) {
       item.props.value = event;
@@ -265,7 +265,8 @@ export default {
     },
     formatSort() {
       if (this.sort && this.sortTerm) {
-        return `${this.sortOrder}${this.sortTerm}`;
+        let order = this.sortOrder < 0 ? '-' : '';
+        return `${order}${this.sortTerm}`;
       }
       else {
         return null;

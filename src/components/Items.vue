@@ -81,7 +81,7 @@ export default {
       shownItems: this.chunkSize,
       filters: this.apiFilters,
       filtersOpen: false,
-      sort: 'asc'
+      sort: 0
     };
   },
   computed: {
