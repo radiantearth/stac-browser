@@ -37,7 +37,7 @@ export default {
         Object,
         Error
       ],
-      required: true
+      default: null
     },
     id: {
       type: [
