@@ -7,11 +7,26 @@ export default class FilterFragment {
     this.queryables = [];
   }
 
+  get hasQueryableFields () {
+    return this.queryables.length > 0;
+  }
+
   async init (stac) {
+    // Ideally the stac object would tell us if the queryables existed,
+    // according to the spec it should, but right now that aren't any
+    // implementations that do...
     const rawQueryables = await stac.getQueryables();
+    if (rawQueryables === null) return;
+
     const keys = Object.keys(rawQueryables);
     for (let index = 0; index < keys.length; index++) {
       const key = keys[index];
+      
+      // Seems to be a bug with MS Planetary Computer global search
+      // The ItemId is listed as a queryable but the schema $ref points
+      // to Provider ID definition
+      // if (key === 'id') continue;
+
       const q = new Queryable(key, rawQueryables[key]);
       await q.init();
       this.queryables.push(q);

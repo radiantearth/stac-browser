@@ -236,7 +236,7 @@ class STAC {
 
     async getQueryables () {
         const response = await fetch(`${this._url}/queryables`);
-        if (!response.ok) return;
+        if (!response.ok) return null;
         const queryables = await response.json();
         return queryables.properties;
     }

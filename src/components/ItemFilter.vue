@@ -40,7 +40,7 @@
         />
       </b-form-group>
 
-      <div class="additionalFilters">
+      <div class="additionalFilters" v-if="itemSearch && itemSearch.filterFragment.hasQueryableFields">
         <b-form-group label="Additional filters" label-for="availableFields">
           <b-dropdown size="sm" text="Add filter" block variant="primary" class="m-2" menu-class="w-100">
             <b-dropdown-item v-for="option in fieldFilterOptions" :key="option.text" @click="additionalFieldSelected(option)">{{ option.text }}</b-dropdown-item>
@@ -259,6 +259,7 @@ export default {
     },
     setCollections(collections) {
       this.filters.collections = collections;
+      this.queryableSet(this.itemSearch.coreSearchFields.collectionsQueryableInput, collections);
     },
     setIds(ids) {
       this.filters.ids = ids;
@@ -273,12 +274,12 @@ export default {
       }
     },
     async createBlankSearchFilter() {
+      const itemSearch = new ItemSearch();
+      await itemSearch.init(this.stac);
       if (this.stac.type === 'Collection') {
-        const itemSearch = new ItemSearch();
-        await itemSearch.init(this.stac);
         this.queryableSet(itemSearch.coreSearchFields.collectionsQueryableInput, [this.stac.id]);
-        this.itemSearch = itemSearch;
-      }      
+      }
+      this.itemSearch = itemSearch;
     }
   }
 };
