@@ -242,11 +242,10 @@ export default {
           return dt;
         });
         this.filters.datetime = datetime;
-
         this.queryableSet(this.itemSearch.coreSearchFields.datetimeQueryableInput, `${datetime[0].toISOString()}/${datetime[1].toISOString()}`);
-
       }
       else {
+        this.queryableSet(this.itemSearch.coreSearchFields.datetimeQueryableInput, '');
         this.filters.datetime = null;
       }
     },
