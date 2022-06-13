@@ -15,7 +15,7 @@ export default class ItemSearchCore {
         id: 'ids',
         options: {
           "title": "Item IDs",
-          "type": "string"          
+          "type": "string"
         }
       },
       {
@@ -55,6 +55,10 @@ export default class ItemSearchCore {
     });
 
     this.bboxQueryable = new QueryableBbox('bbox');
+  }
+
+  get idsQueryableInput () {
+    return this.queryableInputs.find(q => q.queryable.id === 'ids');
   }
 
   get limitQueryableInput () {

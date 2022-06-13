@@ -255,6 +255,7 @@ export default {
     },
     setIds(ids) {
       this.filters.ids = ids;
+      this.queryableSet(this.itemSearch.coreSearchFields.idsQueryableInput, ids);
     },
     formatSort() {
       if (this.sort && this.sortTerm) {
