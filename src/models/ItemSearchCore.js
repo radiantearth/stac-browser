@@ -80,7 +80,7 @@ export default class ItemSearchCore {
   getAsCql2Json () {
     let out = {};
     this.queryableInputs.forEach(q => {
-      if (q.props.value !== '' || q.props.value.length !== 0) {
+      if ((typeof q.props.value === 'string' && q.props.value !== '') || (Array.isArray(q.props.value) && q.props.value.length !== 0)) {
         out[q.queryable.field] = q.props.value; 
       }
     });

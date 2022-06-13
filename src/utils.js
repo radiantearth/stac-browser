@@ -162,6 +162,7 @@ export default class Utils {
 		let newLink = Object.assign({}, link);
 		let url = new URI(newLink.href);
 		for(let key in filters) {
+			if (key === 'advancedFilters') continue;
 			let value = filters[key];
 			if (value) {
 				if (key === 'datetime') {
