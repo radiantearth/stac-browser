@@ -1,6 +1,6 @@
 <template>
-  <div class="search">
-    <div v-if="!root" class="loading text-center">
+  <div class="search d-flex flex-column">
+    <div v-if="!root" class="loading text-center d-flex align-items-center justify-content-center flex-grow-1">
       <b-spinner label="Loading..."></b-spinner>
     </div>
     <b-alert v-else-if="!supportsSearch" variant="danger" show>Item Search (with 'GET') is not supported by the API.</b-alert>
@@ -151,6 +151,8 @@ export default {
 @import "../theme/variables.scss";
 
 .search {
+  min-height: 100%;
+
   .left {
     min-width: 200px;
     flex-basis: 40%;

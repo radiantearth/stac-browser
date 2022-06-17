@@ -1,11 +1,27 @@
+html {
+    height: 100vh;
+    width: 100vw;
+}
+
+body {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+}
+
 #stac-browser {
+    display: flex;
+    flex-direction: column;
     max-width: 100%;
+    overflow: auto;
+
     @include media-breakpoint-only(xxxl) {
       max-width: 75vw;
     }
 
     > header {
-        margin: $block-margin auto;
+        flex-grow: 0;
+        margin: $block-margin 0;
         
         .lead {
             color: map-get($theme-colors, "secondary");
@@ -28,10 +44,12 @@
         }
     }
     > main {
-        margin: $block-margin auto;
+        flex-grow: 1;
+        margin: $block-margin 0;
     }
     > footer {
-        margin: $block-margin auto;
+        flex-grow: 0;
+        margin: $block-margin 0;
         text-align: center;
     }
 
