@@ -157,58 +157,101 @@ export default class Utils {
 		}
 	}
 
-	static addFiltersToLink(link, filters = {}) {
+
+	static addFiltersToLink(link, filters = {}, searchLink = {}) {
 		// Construct new link with search params
 		let newLink = Object.assign({}, link);
 		let url = new URI(newLink.href);
-		for(let key in filters) {
-			if (key === 'advancedFilters') continue;
+		let postRequired = 'filters' in filters && filters.filters.length > 0;
+		let body = {};
+
+		function formatDatetime (value) {
+			return value.map(dt => {
+				if (dt instanceof Date) {
+					return dt.toISOString();
+				}
+				else if (dt) {
+					return dt;
+				}
+				else {
+					return '..';
+				}
+			}).join('/');
+		}
+
+		function formatBbox (value) {
+			let out = null;
+			if (typeof value.toBBoxString === 'function') {
+				out = value.toBBoxString();
+			}
+			else {
+				out = value.join(',');
+			}
+			if (postRequired) {
+				out = out.split(',').map(val => parseFloat(val));
+			}
+			return out;
+		}
+
+		function formatArraysToString (value) {
+			if (Array.isArray(value) && value.length > 0) {
+				return value.join(',');
+			}
+			return value;
+		}
+
+		function formatQueryables (queryables) {
+      return {
+        "filter-lang": "cql2-json",
+        "filter": {
+          "op": 'and',
+          "args": queryables.map(q => {
+            return {
+              op: q.operator,
+              args: [{"property": q.queryable.id }, q.value ]
+            };
+          })
+        }
+      };
+		}
+
+		for (let key in filters) {
+
 			let value = filters[key];
 			if (value) {
 				if (key === 'datetime') {
-					value = value.map(dt => {
-						if (dt instanceof Date) {
-							return dt.toISOString();
-						}
-						else if (dt) {
-							return dt;
-						}
-						else {
-							return '..';
-						}
-					}).join('/');
+					value = formatDatetime(value);
 				}
 				else if (key === 'bbox') {
-					if (typeof value.toBBoxString === 'function') {
-						value = value.toBBoxString();
-					}
-					else {
-						value = value.join(',');
-					}
+					value = formatBbox(value);
 				}
 				else if (key === 'collections' || key === 'ids') {
-					if (Array.isArray(value) && value.length > 0) {
-						value = value.join(',');
-					}
-					else {
-						continue;
-					}
+					value = formatArraysToString(value);
 				}
-				url.setQuery(key, value);
+				else if (key === 'filters') {
+					value = formatQueryables(value);
+					Object.assign(body, value);
+				}
+
+				if (key !== 'filters') {
+					url.setQuery(key, value);
+					if (value !== null && (Array.isArray(value) && value.length > 0)) {
+						body[key] = value;
+					}
+				}	
 			}
 			else {
 				url.removeQuery(key);
 			}
 		}
-		newLink.href = url.toString();
-		return newLink;
-	}
 
-	static addAdvancedFiltersToLink(link, filters = {}, searchLink = {}) {
-		let newLink = Object.assign({}, link);
-		newLink.href = searchLink.href;
-		newLink.method = 'post';
-		newLink.body = filters.advancedFilters;
+		newLink.href = url.toString();
+
+		if (postRequired) {
+			newLink.href = searchLink.href;
+			newLink.method = 'post';
+			newLink.body = body;
+		}
 		return newLink;
 	}
 

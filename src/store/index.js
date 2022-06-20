@@ -7,6 +7,8 @@ import bs58 from 'bs58';
 import { Loading, stacRequest } from './utils';
 import URI from "urijs";
 
+import Queryable from '../models/Queryable';
+
 Vue.use(Vuex);
 
 function getStore(config) {
@@ -24,6 +26,8 @@ function getStore(config) {
     apiItemsLink: null,
     apiItemsFilter: {},
     apiItemsPagination: {},
+
+    queryables: []
   });
 
   const catalogDefaults = () => ({
@@ -462,6 +466,12 @@ function getStore(config) {
       showGlobalError(state, error) {
         console.error(error);
         state.globalError = error;
+      },
+      addQueryable (state, queryable) {
+        state.queryables.push(queryable);
+      },
+      removeQueryableByIndex (state, queryableIndex) {
+        state.queryables.splice(queryableIndex, 1);
       }
     },
     actions: {
@@ -585,6 +595,14 @@ function getStore(config) {
               });
             }
           }
+
+          if (data.isCollection() || cx.getters.supportsSearch) {
+            try {
+              await cx.dispatch('loadQueryables', {stac: data});
+            } catch {
+              console.log('Queryables failed to load');
+            }
+          }
         }
 
         if (loading.show) {
@@ -606,13 +624,8 @@ function getStore(config) {
         }
         cx.commit('setApiItemsFilter', filters);
         let showingFilteredItems = false;
-        if (filters.advancedFilters && cx.getters.root && Object.keys(filters.advancedFilters).length > 0) {
-          link = Utils.addAdvancedFiltersToLink(link, filters, cx.getters.searchLink);
-          showingFilteredItems = true;
-        }
-        else {
-          link = Utils.addFiltersToLink(link, filters);
-        }
+
+        link = Utils.addFiltersToLink(link, filters, cx.getters.searchLink);
 
         let response = await stacRequest(cx, link);
         if (!Utils.isObject(response.data) || !Array.isArray(response.data.features)) {
@@ -674,6 +687,31 @@ function getStore(config) {
             return new STAC(collection, url, cx.getters.toBrowserPath(url));
           });
           cx.commit('addApiCollections', { data: response.data, stac, show });
+        }
+      },
+      async loadQueryables(cx, {stac}) {
+        const queryablesUrl = `${stac._url}/queryables`;
+        let response = await stacRequest(cx, queryablesUrl);
+        const rawQueryables = response.data.properties;
+
+        const keys = Object.keys(rawQueryables);
+
+        for (let index = 0; index < keys.length; index++) {
+          const key = keys[index];
+          
+          // MS planetary computer has this incorrectly on the global search
+          if (key === 'id') {
+            continue;
+          }
+
+          const q = new Queryable(key, rawQueryables[key]);
+          if (q._requiresReferenceJson) {
+            const referenceUrl = q._rawJson.$ref;
+            let response = await stacRequest(cx, referenceUrl);
+            q.setDefinitionFromReference(referenceUrl, response.data);
+          }
+
+          cx.commit('addQueryable', q);
         }
       },
       async validate(cx, url) {

@@ -27,22 +27,19 @@
           />
         </b-form-group>
 
-        <div class="additionalFilters" v-if="itemSearch && itemSearch.filterFragment.hasQueryableFields">
+        <div class="additionalFilters" v-if="queryables.length > 0">
           <b-form-group label="Additional filters" label-for="availableFields">
             <b-dropdown size="sm" text="Add filter" block variant="primary" class="mt-2 mb-3" menu-class="w-100">
-              <b-dropdown-item v-for="option in fieldFilterOptions" :key="option.text" @click="additionalFieldSelected(option)">{{ option.text }}</b-dropdown-item>
+              <b-dropdown-item v-for="(queryable, index) in queryables" :key="index" @click="additionalFieldSelected(queryable)">{{ queryable.titleOrId }}</b-dropdown-item>
             </b-dropdown>
 
-            <b-row v-for="item in userDefinedFilters" :key="item.queryable.uniqueId" class="mb-2">
-              <span class="title">
-                {{ item.queryable.usableDefinition.title }}
-              </span>
-              <b-form-select v-if="item.operator !== null" class="op" v-model="item.operator" size="sm" :options="item.queryable.operatorOptions" />     
-              <component class="value" :is="item.component" v-bind="item.props" @input="queryableSet(item, $event)" />
-              <b-button class="delete" size="sm" variant="danger" @click="removeUserFilterField(item)">
-                <b-icon icon="x-circle-fill" aria-hidden="true" />
-              </b-button>
-            </b-row>
+            <div v-for="(queryable, index) in filters.filters" :key="index">
+              <queryable-input
+                :queryable="queryable"
+                :queryable-index="index"
+                @remove-queryable="removeQueryable"
+              />
+            </div> 
           </b-form-group>
         </div>
 
@@ -68,11 +65,11 @@
 </template>
 
 <script>
-import { BDropdown, BDropdownItem, BForm, BFormGroup, BFormInput, BFormCheckbox, BFormSelect, BFormSelectOption, BFormTags, BButton, BIcon, BIconXCircleFill } from 'bootstrap-vue';
+import { BDropdown, BDropdownItem, BForm, BFormGroup, BFormInput, BFormCheckbox, BFormSelect, BFormTags, BButton } from 'bootstrap-vue';
 
 import DatePicker from 'vue2-datepicker';
 import { mapState } from "vuex";
-import ItemSearch from '../models/ItemSearch';
+import QueryableInput from './QueryableInput.vue';
 
 export default {
   name: 'ItemFilter',
@@ -84,11 +81,9 @@ export default {
     BFormInput,
     BFormCheckbox,
     BFormSelect,
-    BFormSelectOption,
     BFormTags,
     BButton,
-    BIcon,
-    BIconXCircleFill,
+    QueryableInput,
     DatePicker,
     Map: () => import('./Map.vue'),
     SortButtons: () => import('./SortButtons.vue')
@@ -132,17 +127,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['itemsPerPage']),
-    fieldFilterOptions () {
-      if (this.itemSearch === null) return [];
-      return this.itemSearch.filterFragment.queryables.map(q => {
-          return { value: q.id, text: q.usableDefinition.title };
-      });
-    },
-    userDefinedFilters () {
-      if (this.itemSearch === null) return [];
-      return this.itemSearch.filterFragment.queryableInputs;
-    }
+    ...mapState(['itemsPerPage', 'queryables'])
   },
   watch: {
     value: {
@@ -160,32 +145,30 @@ export default {
             }
             return dt;
           });
+        } else if (filters.filters.length > 0) {
+          filters.filters = filters.filters.map(f => Object.assign({}, f));
         }
         this.filters = filters;
       }
     }
   },
-   mounted () {
-    this.createBlankSearchFilter();
-  },
   methods: {
     sortFieldSet (value) {
       this.sortTerm = value;
-      this.queryableSet(this.itemSearch.sortFragment.queryable, value);
     },
     sortDirectionSet (value) {
       this.sortOrder = value;
       this.itemSearch.sortFragment.direction = this.sortOrder < 0 ? '-' : '';
     },
-    queryableSet (item, event) {
-      item.props.value = event;
+    removeQueryable (queryableIndex) {
+      this.filters.filters.splice(queryableIndex, 1);
     },
-    removeUserFilterField (item) {
-      this.itemSearch.filterFragment.removeQueryableInput(item);
-    },
-    additionalFieldSelected (selected) {
-      const queryable = this.itemSearch.filterFragment.queryables.find(q => q.id === selected.value);
-      this.itemSearch.filterFragment.createQueryableInput(queryable);
+    additionalFieldSelected (queryable) {
+      this.filters.filters.push({
+        value: null,
+        operator: null,
+        queryable
+      });
     },
     getDefaultValues() {
       return {
@@ -195,19 +178,17 @@ export default {
         ids: [],
         collections: [],
         sortby: null,
-        advancedFilters: null
+        filters: []
       };
     },
     onSubmit() {
       if (this.sort) {
         this.filters.sortby = this.formatSort();
       }
-      this.filters.advancedFilters = this.itemSearch.getAsCql2Json();
       this.$emit('input', this.filters, false);
     },
     async onReset() {
       this.filters = this.getDefaultValues();
-      await this.createBlankSearchFilter();
       this.$emit('input', this.filters, true);
     },
     setLimit(limit) {
@@ -225,10 +206,8 @@ export default {
     setBBox(bounds) {
       if (this.provideBBox) {
         this.filters.bbox = bounds;
-        this.itemSearch.coreSearchFields.bboxQueryableInput.setValueFromLeafletBounds(bounds);
       } else {
         this.filters.bbox = null;
-        this.itemSearch.coreSearchFields.bboxQueryableInput.clearValue();
       }
     },
     setDateTime(datetime) {
@@ -242,20 +221,16 @@ export default {
           return dt;
         });
         this.filters.datetime = datetime;
-        this.queryableSet(this.itemSearch.coreSearchFields.datetimeQueryableInput, `${datetime[0].toISOString()}/${datetime[1].toISOString()}`);
       }
       else {
-        this.queryableSet(this.itemSearch.coreSearchFields.datetimeQueryableInput, '');
         this.filters.datetime = null;
       }
     },
     setCollections(collections) {
       this.filters.collections = collections;
-      this.queryableSet(this.itemSearch.coreSearchFields.collectionsQueryableInput, collections);
     },
     setIds(ids) {
       this.filters.ids = ids;
-      this.queryableSet(this.itemSearch.coreSearchFields.idsQueryableInput, ids);
     },
     formatSort() {
       if (this.sort && this.sortTerm) {
@@ -265,14 +240,6 @@ export default {
       else {
         return null;
       }
-    },
-    async createBlankSearchFilter() {
-      const itemSearch = new ItemSearch();
-      await itemSearch.init(this.stac);
-      if (this.stac.type === 'Collection') {
-        this.queryableSet(itemSearch.coreSearchFields.collectionsQueryableInput, [this.stac.id]);
-      }
-      this.itemSearch = itemSearch;
     }
   }
 };
@@ -298,27 +265,6 @@ $primary-color: map-get($theme-colors, "primary");
 
     > label {
       font-weight: 600;
-    }
-  }
-
-  .additionalFilters {
-    .row {
-      margin: 0;
-      gap: 0.5em;
-      flex-direction: row;
-      flex-wrap: nowrap;
-      align-content: center;
-    }
-
-    .op {
-      width: 5rem;
-    }
-    .delete {
-      width: auto;
-    }
-    .title, .value {
-      flex-grow: 5;
-      width: auto;
     }
   }
 }
