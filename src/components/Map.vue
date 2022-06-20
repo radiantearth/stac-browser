@@ -214,7 +214,8 @@ export default {
         animate: false,
         duration: 0
       };
-      this.map.fitBounds(this.stacLayer.getBounds(), fitOptions);
+      const bounds = this.boundsLayer !== null ? this.boundsLayer.getBounds() : this.stacLayer.getBounds();
+      this.map.fitBounds(bounds, fitOptions);
     },
     addBoundsSelector() {
       this.areaSelect = L.areaSelect({ // eslint-disable-line 
