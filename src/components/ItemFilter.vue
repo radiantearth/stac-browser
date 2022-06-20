@@ -112,7 +112,6 @@ export default {
   },
   data() {
     return {
-      itemSearch: null,
       sortOrder: 1,
       sortTerm: null,
       sortOptions: [
@@ -158,7 +157,6 @@ export default {
     },
     sortDirectionSet (value) {
       this.sortOrder = value;
-      this.itemSearch.sortFragment.direction = this.sortOrder < 0 ? '-' : '';
     },
     removeQueryable (queryableIndex) {
       this.filters.filters.splice(queryableIndex, 1);
