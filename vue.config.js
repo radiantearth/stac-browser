@@ -13,6 +13,7 @@ const configFromFile = require(configFile);
 const mergedConfig = Object.assign(configFromFile, argv);
 
 module.exports = {
+	lintOnSave: process.env.NODE_ENV !== 'production',
 	publicPath: mergedConfig.pathPrefix,
 	chainWebpack: webpackConfig => {
 		webpackConfig.plugin('define').tap(args => {
@@ -26,4 +27,4 @@ module.exports = {
 			return args;
 		});
 	}
-}
+};

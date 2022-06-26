@@ -1,31 +1,35 @@
 <template>
   <b-row>
     <b-col>
-      <b-form @submit="onSubmit">
-        <b-form-group id="select" label="Please specify a STAC Catalog or API..." label-for="url"
-          :invalid-feedback="error" :state="valid">
-          <b-form-input id="url" type="url" :value="url" @input="setUrl" placeholder="https://..."></b-form-input>
-        </b-form-group>
-        <hr />
-        <b-form-group v-if="stacIndex.length > 0" id="stacIndex" label="... or select one from STAC Index">
-          <b-list-group class="stacIndex">
-            <template v-for="catalog in stacIndex">
-              <b-list-group-item button v-if="show(catalog)" :key="catalog.id" class="flex-column align-items-start"
-                :active="url === catalog.url" @click="setUrl(catalog.url, false)">
-                <div class="d-flex w-100 justify-content-between">
-                  <strong class="mb-1">{{ catalog.title }}</strong>
-                  <small>
-                    <b-badge v-if="catalog.isApi" variant="dark" pill>API</b-badge>
-                    <b-badge v-else variant="light" pill>Catalog</b-badge>
-                  </small>
-                </div>
-                <p class="mb-1"><Description :description="catalog.summary" :compact="true" /></p>
-              </b-list-group-item>
-            </template>
-          </b-list-group>
+      <b-form @submit="go">
+        <b-form-group
+          id="select" label="Please specify a STAC Catalog or API..." label-for="url"
+          :invalid-feedback="error" :state="valid"
+        >
+          <b-form-input id="url" type="url" :value="url" @input="setUrl" placeholder="https://..." />
         </b-form-group>
         <b-button type="submit" variant="primary">Load</b-button>
       </b-form>
+      <hr>
+      <b-form-group v-if="stacIndex.length > 0" id="stacIndex" label="... or select one from STAC Index">
+        <b-list-group class="stacIndex">
+          <template v-for="catalog in stacIndex">
+            <b-list-group-item
+              button v-if="show(catalog)" :key="catalog.id" class="flex-column align-items-start"
+              :active="url === catalog.url" @click="open(catalog.url)"
+            >
+              <div class="d-flex w-100 justify-content-between">
+                <strong class="mb-1">{{ catalog.title }}</strong>
+                <small>
+                  <b-badge v-if="catalog.isApi" variant="dark" pill>API</b-badge>
+                  <b-badge v-else variant="light" pill>Catalog</b-badge>
+                </small>
+              </div>
+              <p class="mb-1"><Description :description="catalog.summary" :compact="true" /></p>
+            </b-list-group-item>
+          </template>
+        </b-list-group>
+      </b-form-group>
     </b-col>
   </b-row>
 </template>
@@ -47,8 +51,7 @@ export default {
   },
   data() {
     return {
-      url: '',
-      filter: false
+      url: ''
     };
   },
   computed: {
@@ -84,7 +87,7 @@ export default {
       if (catalog.access === 'private') {
         return false;
       }
-      else if(!this.url || !this.filter) {
+      else if(!this.url) {
         return true;
       }
 
@@ -97,11 +100,14 @@ export default {
       }
       return false;
     },
-    setUrl(url, filter = true) {
+    setUrl(url) {
       this.url = url;
-      this.filter = filter;
     },
-    onSubmit() {
+    open(url) {
+      this.url = url;
+      this.go();
+    },
+    go() {
       this.$store.commit('resetCatalog'); // Reset loaded STAC catalog
       this.$router.push(this.toBrowserPath(this.url));
     }

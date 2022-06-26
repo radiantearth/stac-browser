@@ -1,24 +1,30 @@
 <template>
   <section class="items mb-4">
     <h2>
-      Items
-      <template v-if="!api">({{ items.length }})</template>
+      <span class="title">Items</span>
+      <b-badge v-if="!api" pill variant="secondary ml-2">{{ items.length }}</b-badge>
       <SortButtons v-if="!api" class="ml-4" v-model="sort" />
     </h2>
-    <Pagination ref="topPagination" v-if="api" :pagination="pagination" placement="top" @paginate="paginate" />
+
+    <Pagination ref="topPagination" v-if="showPagination" :pagination="pagination" placement="top" @paginate="paginate" />
     <template v-if="allowFilter">
-      <b-button v-if="api" v-b-toggle.itemFilter class="mb-4 mt-2 ml-3" :pressed="filtersOpen" variant="outline-primary">
+      <b-button v-if="api" v-b-toggle.itemFilter class="mb-4 mt-2" :class="{'ml-3': showPagination}" :pressed="filtersOpen" variant="outline-primary">
         <b-icon-search /> Filter
       </b-button>
       <b-collapse id="itemFilter" v-model="filtersOpen">
         <ItemFilter :stac="stac" v-model="filters" :sort="canSort" :collectionOnly="true" />
       </b-collapse>
     </template>
+
     <b-card-group v-if="chunkedItems.length > 0" columns>
       <Item v-for="item in chunkedItems" :item="item" :key="item.href" :selected="selected" />
     </b-card-group>
-    <p v-else>Sorry, no items found.</p>
-    <Pagination v-if="api" :pagination="pagination" placement="bottom" @paginate="paginate" />
+    <b-alert v-else :variant="hasFilters ? 'warning' : 'info'" show>
+      <template v-if="hasFilters">No items found for the given filters.</template>
+      <template v-else>No items available for this collection.</template>
+    </b-alert>
+
+    <Pagination v-if="showPagination" :pagination="pagination" @paginate="paginate" />
     <b-button v-else-if="hasMore" @click="showMore" variant="primary" v-b-visible.200="showMore">Show more...</b-button>
   </section>
 </template>
@@ -89,6 +95,9 @@ export default {
     hasMore() {
       return this.items.length > this.shownItems;
     },
+    hasFilters() {
+      return Object.values(this.apiFilters).filter(filter => !(filter === null || Utils.size(filter) === 0)).length > 1; // > 1 as the limit is always present
+    },
     chunkedItems() {
       let items = this.items;
       if (this.sort !== 0) {
@@ -106,6 +115,9 @@ export default {
     },
     canSort() {
       return this.supportsConformance(ITEMSEARCH_SORT);
+    },
+    showPagination() {
+      return this.api && this.items.length > 0;
     }
   },
   watch: {
@@ -129,3 +141,13 @@ export default {
   }
 };
 </script>
+
+<style lang="scss" scoped>
+.items {
+  > h2 {
+    .title, .badge {
+      vertical-align: middle;
+    }
+  }
+}
+</style>

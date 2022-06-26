@@ -1,5 +1,5 @@
 <template>
-	<div class="styled-description" :class="{compact: compact}" v-html="markup(description)"></div>
+  <div class="styled-description" :class="{compact: compact}" v-html="markup(description)" />
 </template>
 
 <script>
@@ -34,7 +34,7 @@ export default {
 			return writer.render(parsed);
 		}
 	}
-}
+};
 </script>
 
 <style lang="scss">

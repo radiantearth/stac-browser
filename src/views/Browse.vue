@@ -1,11 +1,11 @@
 <template>
   <section class="browse d-flex flex-column">
-    <b-alert v-if="!allowExternalAccess && this.isExternal">
+    <b-alert v-if="!allowExternalAccess && isExternal">
       <p>Accessing external catalogs is not allowed!</p>
     </b-alert>
     <ErrorAlert v-if="error" :dismissible="false" :url="url" :description="errorDescription" :id="errorId" />
     <div v-else-if="loading" class="loading text-center d-flex align-items-center justify-content-center flex-grow-1">
-      <b-spinner label="Loading..."></b-spinner>
+      <b-spinner label="Loading..." />
     </div>
     <component v-else :is="component" />
   </section>

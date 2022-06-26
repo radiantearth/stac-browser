@@ -2,15 +2,17 @@
   <b-card class="asset" no-body>
     <b-card-header header-tag="header" role="tab" class="p-0">
       <b-button block v-b-toggle="uid" variant="asset" squared class="p-2 d-flex">
-        <span class="mr-1" aria-hidden="true">
-          <b-icon-chevron-down v-if="expanded" />
-          <b-icon-chevron-right v-else />
+        <span class="title">
+          <span class="mr-1" aria-hidden="true">
+            <b-icon-chevron-down v-if="expanded" />
+            <b-icon-chevron-right v-else />
+          </span>
+          {{ asset.title || id }}
         </span>
-        {{ asset.title || id }}
         <div class="badges ml-1" v-if="Array.isArray(asset.roles)">
-          <b-badge v-for="role in asset.roles" :key="role" :variant="role === 'data' ? 'primary' : 'secondary'" class="role ml-1 mb-1">{{ role }}</b-badge>
-          <b-badge v-if="asset.deprecated" variant="warning" class="deprecated ml-1 mb-1">Deprecated</b-badge>
           <b-badge v-if="shown" variant="success" class="shown ml-1 mb-1" title="This is the asset currently shown"><b-icon-eye /></b-badge>
+          <b-badge v-if="asset.deprecated" variant="warning" class="deprecated ml-1 mb-1">Deprecated</b-badge>
+          <b-badge v-for="role in asset.roles" :key="role" :variant="role === 'data' ? 'primary' : 'secondary'" class="role ml-1 mb-1">{{ role }}</b-badge>
         </div>
       </b-button>
     </b-card-header>
@@ -18,11 +20,11 @@
       <b-card-body>
         <b-card-title>{{ fileFormat }}</b-card-title>
         <b-button-group class="actions" v-if="href">
-          <CopyButton v-if="isGdalVfs" variant="outline-primary" :copyText="href">
+          <CopyButton v-if="shouldCopy" variant="outline-primary" :copyText="href">
             {{ buttonText }}
           </CopyButton>
           <b-button v-else :href="href" target="_blank" variant="outline-primary">
-            <b-icon-box-arrow-up-right v-if="browserCanOpen" /> 
+            <b-icon-box-arrow-up-right v-if="browserCanOpenFile" /> 
             <b-icon-download v-else />
             {{ buttonText }}
           </b-button>
@@ -45,12 +47,13 @@
 <script>
 import { BCollapse, BIconBoxArrowUpRight, BIconCheck, BIconChevronRight, BIconChevronDown, BIconDownload, BIconEye } from 'bootstrap-vue';
 import { Formatters } from '@radiantearth/stac-fields';
-import { MIME_TYPES } from 'stac-layer/src/data';
 import { mapGetters, mapState } from 'vuex';
 import Description from './Description.vue';
 import Metadata from './Metadata.vue';
 import STAC from '../stac';
-import Utils from '../utils';
+import Utils, { browserImageTypes, browserProtocols, geotiffMediaTypes } from '../utils';
+
+export const MIME_TYPES = browserImageTypes.concat(geotiffMediaTypes);
 
 export default {
   name: 'Asset',
@@ -101,14 +104,6 @@ export default {
       ]
     };
   },
-  created() {
-    if (typeof this.expand === 'boolean') {
-      this.expanded = this.expand;
-    }
-    else {
-      this.expanded = false;
-    }
-  },
   computed: {
     ...mapState(['url']),
     ...mapGetters(['tileRendererType', 'getRequestUrl']),
@@ -124,23 +119,29 @@ export default {
         return false;
       }
       // If the tile renderer is a tile server, we can't really know what it supports so we pass all images
-      else if (this.tileRendererType === 'server' && this.asset.type.toLowerCase().startsWith('image/')) {
+      else if (this.tileRendererType === 'server' && MIME_TYPES.includes(this.asset.type)) {
         return true;
       }
       // Don't pass GDAL VFS URIs to client-side tile renderer: https://github.com/radiantearth/stac-browser/issues/116
       else if (this.isGdalVfs && this.tileRendererType === 'client') {
         return false;
       }
-      // Otherwise, only http(s) links and relative links are supported
-      else if (!this.isBrowsable) {
+      // Only http(s) links and relative links are supported
+      else if (!this.isBrowserProtocol) {
         return false;
       }
-      for(let type in MIME_TYPES) {
-        if (MIME_TYPES[type].includes(this.asset.type)) {
-          return true;
-        }
+      // Otherwise, all images that a browser can read are supported
+      else if (MIME_TYPES.includes(this.asset.type)) {
+        return true;
       }
       return false;
+    },
+    shouldCopy() {
+      if (this.isGdalVfs) {
+        return true;
+      }
+
+      return !this.isBrowserProtocol;
     },
     fileFormat() {
       if (this.asset.type) {
@@ -159,8 +160,8 @@ export default {
       }
       return null;
     },
-    isBrowsable() {
-      return (this.protocol === 'http' || this.protocol === 'https');
+    isBrowserProtocol() {
+      return !this.protocol || browserProtocols.includes(this.protocol);
     },
     isGdalVfs() {
       return Utils.isGdalVfsUri(this.asset.href);
@@ -176,41 +177,15 @@ export default {
       return this.getRequestUrl(this.asset.href, baseUrl);
     },
     from() {
-      const s3 = 'Amazon S3';
-      const azure = 'Microsoft Azure';
-      const gc = 'Google Cloud';
-      const ftp = 'FTP';
-      const ali = 'Alibaba Cloud';
-      switch(this.protocol) {
-        case 's3':
-          return s3;
-        case 'abfs':
-        case 'abfss':
-          return azure;
-        case 'gcs':
-          return gc;
-        case 'ftp':
-          return ftp;
-      }
       if (this.isGdalVfs) {
         let type = this.asset.href.match(/^\/vsi([a-z\d]+)(_streaming)?\//);
-        if (type) {
-          switch(type[1]) {
-            case 's3':
-              return s3;
-            case 'az':
-            case 'adls':
-              return azure;
-            case 'gs':
-              return gc;
-            case 'oss':
-              return ali;
-          }
-        }
+        return this.protocolName(type);
       }
-      return '';
+      else {
+        return this.protocolName(this.protocol);
+      }
     },
-    browserCanOpen() {
+    browserCanOpenFile() {
       if (Utils.canBrowserDisplayImage(this.asset)) {
         return true;
       }
@@ -226,15 +201,34 @@ export default {
       return false;
     },
     buttonText() {
-      if (this.browserCanOpen) {
+      if (this.browserCanOpenFile && this.isBrowserProtocol) {
         return 'Open';
       }
-      let text = [this.isGdalVfs ? 'Copy GDAL VFS URL' : 'Download'];
-      if (this.from && !this.isBrowsable) {
-        text.push(this.isGdalVfs ? 'for' : 'from');
+      let text = [];
+      let preposition = 'for';
+      if (this.isGdalVfs) {
+        text.push('Copy GDAL VFS URL');
+      }
+      else if (this.shouldCopy) {
+        text.push('Copy URL');
+      }
+      else {
+        text.push('Download');
+        preposition = 'from';
+      }
+      if (!this.isBrowserProtocol && this.from) {
+        text.push(preposition);
         text.push(this.from);
       }
       return text.join(' ');
+    }
+  },
+  created() {
+    if (typeof this.expand === 'boolean') {
+      this.expanded = this.expand;
+    }
+    else {
+      this.expanded = false;
     }
   },
   methods: {
@@ -245,35 +239,58 @@ export default {
         asset.href = this.href;
       }
       this.$emit('show', asset, this.id, this.isThumbnail);
+    },
+    protocolName(protocol) {
+      if (typeof protocol !== 'string') {
+        return '';
+      }
+      switch(protocol.toLowerCase()) {
+        case 's3':
+          return 'Amazon S3';
+        case 'abfs':
+        case 'abfss':
+          return 'Microsoft Azure';
+        case 'gcs':
+          return 'Google Cloud';
+        case 'ftp':
+          return 'FTP';
+        case 'oss':
+          return 'Alibaba Cloud';
+        case 'file':
+          return 'local file system';
+      }
+      return '';
     }
   }
-}
+};
 </script>
 
 <style lang="scss">
-#stac-browser {
-  .asset {
-    .btn-asset {
-      text-align: left;
+#stac-browser .asset {
+  .btn-asset {
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0.8rem;
 
-      .badges {
-        .badge {
-          line-height: 1.2em;
-          height: 1.7em;
-          text-transform: uppercase;
-        }
+    .badges {
+      .badge {
+        line-height: 1.2em;
+        height: 1.7em;
+        text-transform: uppercase;
       }
     }
-    .metadata {
-      .card-columns {
-        column-count: 1;
-      }
-      .card {
-        border: 0;
-      }
-      .card-body {
-        padding: 0;
-      }
+  }
+  .metadata {
+    .card-columns {
+      column-count: 1;
+    }
+    .card {
+      border: 0;
+    }
+    .card-body {
+      padding: 0;
     }
   }
 }
