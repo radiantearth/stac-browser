@@ -164,15 +164,20 @@ export default {
         if (this.stac.type === 'Feature') {
           options.bbox = this.stac?.bbox;
         }
-        else if (this.stac.type === 'Collection') {
-          options.bbox = this.stac?.extent?.spatial?.bbox[0];
-        }
       }
       if (this.stac.type === 'Collection' && Array.isArray(this.stac?.extent?.spatial?.bbox[0])) {
-        const bounds = this.stac.extent.spatial.bbox[0];
+        const bounds = [Infinity, Infinity, -Infinity, -Infinity];
+        this.stac.extent.spatial.bbox.forEach((bbox) => {
+          if (bbox[0] < bounds[0]) bounds[0] = bbox[0];
+          if (bbox[1] < bounds[1]) bounds[1] = bbox[1];
+          if (bbox[2] > bounds[2]) bounds[2] = bbox[2];
+          if (bbox[3] > bounds[3]) bounds[3] = bbox[3];
+        });
+        options.bbox = bounds;
         this.boundsLayer = rectangle([[bounds[1], bounds[0]], [bounds[3], bounds[2]]], {
-          fillOpacity: 0.1,
-          weight: 1
+          fillOpacity: 0,
+          weight: 1,
+          color: '#17a2b8'
         }).addTo(this.map);
         options.displayPreview = true;
       }
