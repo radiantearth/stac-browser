@@ -1,6 +1,6 @@
 <template>
   <div :class="classes">
-    <b-spinner label="Loading..." />
+    <b-spinner label="Loading..." :small="small" />
   </div>
 </template>
 
@@ -9,6 +9,10 @@ export default {
   name: 'Loading',
   props: {
     fill: {
+      type: Boolean,
+      default: false
+    },
+    small: {
       type: Boolean,
       default: false
     }

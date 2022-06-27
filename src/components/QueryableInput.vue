@@ -1,46 +1,50 @@
 <template>
   <b-row class="queryable-row">
     <span class="title">
-      {{ queryable.queryable.title }}
+      {{ title }}
     </span>
 
     <b-form-select
       v-if="operatorOptions !== null"
-      class="op"
-      v-model="queryable.operator"
       size="sm"
+      class="op"
+      :value="operator"
+      @input="updateOperator($event)"
       :options="operatorOptions" 
     />
 
-    <b-form-input
-      v-if="queryableType === 'textField'"
+    <b-form-select
+      v-if="queryableType === 'selectField'"
+      :options="queryableOptions"
       size="sm"
       class="value"
-      v-model="queryable.value"
+      :value="value"
+      @input="updateValue($event)"
+    />
+    <b-form-input
+      v-else-if="queryableType === 'textField'"
+      size="sm"
+      class="value"
+      :value="value"
+      @input="updateValue($event)"
     />
     <b-form-input
       v-else-if="queryableType === 'numberField'"
       type="number"
       size="sm"
       class="value"
-      v-model="queryable.value"
-    />
-    <b-form-select
-      v-else-if="queryableType === 'selectField'"
-      :options="queryableOptions"
-      size="sm"
-      class="value"
-      v-model="queryable.value"
+      :value="value"
+      @input="updateValue($event)"
     />
 
-    <b-button class="delete" size="sm" variant="danger" @click="$emit('remove-queryable', queryableIndex)">
+    <b-button class="delete" size="sm" variant="danger" @click="$emit('remove-queryable')">
       <b-icon-x-circle-fill aria-hidden="true" />
     </b-button>
   </b-row>
 </template>
 
 <script>
-
+import Utils from '../utils';
 import { BFormInput, BFormSelect, BIconXCircleFill } from 'bootstrap-vue';
     
 export default {
@@ -51,27 +55,41 @@ export default {
      BIconXCircleFill
   },
   props: {
-    queryable: {
+    title: {
+      type: String
+    },
+    value: {
+      // Any type
+    },
+    operator: {
+      type: String
+    },
+    schema: {
       type: Object,
       default: () => ({})
-    },
-    queryableIndex: {
-      type: Number,
-      default: null
-    },
+    }
   },
   computed: {
-    queryableDefinition() {
-      return this.queryable.queryable.schema;
+    schemaTypes() {
+      if (this.schema.type === 'string') {
+        return [this.schema.type];
+      }
+      else if (Array.isArray(this.schema.type)) {
+        return this.schema.type;
+      }
+      return [];
+    },
+    isNumeric() {
+      return this.schemaTypes.includes('number') || this.schemaTypes.includes('integer');
     },
     queryableType() {
-      if (this.queryableDefinition.type === 'number' || this.queryableDefinition.type === 'integer') {
-        return 'numberField';
-      }
-      else if ('enum' in this.queryableDefinition) {
+      if ('enum' in this.schema) {
         return 'selectField';
       }
-      else if (this.queryableDefinition.type === 'string') {
+      else if (this.isNumeric) {
+        return 'numberField';
+      }
+      else if (this.schemaTypes.includes('string')) {
         return 'textField';
       }
       return null;
@@ -90,7 +108,12 @@ export default {
         return [EQUALS, NOT_EQUALS, LIKE];
       }
       else if (this.queryableType === 'selectField') {
-        return [EQUALS, NOT_EQUALS];
+        if (this.isNumeric) {
+          return [EQUALS, NOT_EQUALS];
+        }
+        else {
+          return [EQUALS, NOT_EQUALS, LESS_THAN, MORE_THAN];
+        }
       }
       return null;
     },
@@ -99,7 +122,7 @@ export default {
         return [];
       }
       else {
-        return this.queryableDefinition.enum.map((option) => {
+        return this.schema.enum.map((option) => {
           if (typeof option === 'string') {
             return {
               value: option,
@@ -114,29 +137,37 @@ export default {
     },
     selectedOperator() {
       if (this.operatorOptions === null) {return null;}
-      return this.operatorOptions.find(o => o.value === this.queryable.operator);
+      return this.operatorOptions.find(o => o.value === this.operator);
     }
   },
   mounted() {
-    if (this.queryable.operator === null) {
+    if (this.operator === null) {
       this.queryableVisible = true;
     }
-    if (this.queryable.operator === null) {
-      this.queryable.operator = this.operatorOptions[0].value;
+    if (this.operator === null) {
+      this.updateOperator(this.operatorOptions[0].value);
     }
-    if (this.queryable.value === null) {
-      this.queryable.value = this.calculateDefaultValue();
+    if (this.value === null) {
+      this.updateValue(this.calculateDefaultValue());
     }
   },
   methods: {
-    setOperator(e) {
-      this.queryable.operator = e.target.value;
+    updateValue(evt) {
+      let val = Utils.isObject(evt) && 'target' in evt ? evt.target.value : evt;
+      if (this.isNumeric) {
+        val = Number.parseFloat(val);
+      }
+      this.$emit('update:value', val);
+    },
+    updateOperator(evt) {
+      let val = Utils.isObject(evt) && 'target' in evt ? evt.target.value : evt;
+      this.$emit('update:operator', val);
     },
     calculateDefaultValue() {
       if (this.queryableType === 'textField') {return '';}
       else if (this.queryableType === 'numberField') {
-        if (this.queryableDefinition.minimum) {
-         return this.queryableDefinition.minimum;
+        if (this.schema.minimum) {
+         return this.schema.minimum;
         }
         return 0;
       }

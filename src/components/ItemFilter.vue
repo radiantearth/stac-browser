@@ -39,9 +39,12 @@
 
             <QueryableInput
               v-for="(queryable, index) in filters.filters" :key="queryable.id"
-              :queryable="queryable"
-              :queryable-index="index"
-              @remove-queryable="removeQueryable"
+              :title="queryable.queryable.title"
+              :value.sync="queryable.value"
+              :operator.sync="queryable.operator"
+              :schema="queryable.queryable.schema"
+              :index="index"
+              @remove-queryable="removeQueryable(index)"
             />
           </b-form-group>
         </div>
