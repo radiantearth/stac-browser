@@ -1,8 +1,6 @@
 <template>
   <div class="search">
-    <div v-if="!root" class="loading text-center">
-      <b-spinner label="Loading..." />
-    </div>
+    <Loading v-if="!root" />
     <b-alert v-else-if="!supportsSearch" variant="danger" show>Item Search (with 'GET') is not supported by the API.</b-alert>
     <b-row v-else>
       <b-col class="left">
@@ -10,9 +8,7 @@
       </b-col>
       <b-col class="right">
         <b-alert v-if="loading === null" variant="light" show>Please modify the search criteria.</b-alert>
-        <div v-else-if="loading === true" class="loading text-center">
-          <b-spinner label="Loading..." />
-        </div>
+        <Loading v-if="loading === true" />
         <b-alert v-else-if="apiItems.length === 0" variant="warning" show>No items found for the given filters.</b-alert>
         <template v-else>
           <Map :stac="root" :stacLayerData="itemCollection" @mapClicked="mapClicked" />
@@ -33,6 +29,7 @@ import { mapGetters, mapState } from "vuex";
 import Utils from '../utils';
 import { ITEMSEARCH_SORT } from '../api';
 import ItemFilter from '../components/ItemFilter.vue';
+import Loading from '../components/Loading.vue';
 
 const pageTitle = 'Search';
 
@@ -41,6 +38,7 @@ export default {
   components: {
     ItemFilter,
     Items,
+    Loading,
     Map: () => import('../components/Map.vue')
   },
   props: {
