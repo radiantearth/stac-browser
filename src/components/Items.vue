@@ -117,7 +117,16 @@ export default {
       return this.supportsConformance(ITEMSEARCH_SORT);
     },
     showPagination() {
-      return this.api && this.items.length > 0;
+      if (this.api) {
+        if (this.hasFilters) {
+          return true;
+        }
+        else if (this.items.length > 0) {
+          // Check whether any pagination links are available
+          return Object.values(this.pagination).some(link => !!link);
+        }
+      }
+      return false;
     }
   },
   watch: {

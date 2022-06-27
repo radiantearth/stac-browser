@@ -10,7 +10,7 @@
           {{ asset.title || id }}
         </span>
         <div class="badges ml-1" v-if="Array.isArray(asset.roles)">
-          <b-badge v-if="shown" variant="success" class="shown ml-1 mb-1" title="This is the asset currently shown"><b-icon-eye /></b-badge>
+          <b-badge v-if="shown" variant="success" class="shown ml-1 mb-1" title="This is the asset currently shown"><b-icon-check /> shown</b-badge>
           <b-badge v-if="asset.deprecated" variant="warning" class="deprecated ml-1 mb-1">Deprecated</b-badge>
           <b-badge v-for="role in asset.roles" :key="role" :variant="role === 'data' ? 'primary' : 'secondary'" class="role ml-1 mb-1">{{ role }}</b-badge>
         </div>
@@ -20,18 +20,15 @@
       <b-card-body>
         <b-card-title>{{ fileFormat }}</b-card-title>
         <b-button-group class="actions" v-if="href">
-          <CopyButton v-if="shouldCopy" variant="outline-primary" :copyText="href">
+          <CopyButton v-if="shouldCopy" variant="primary" :copyText="href">
             {{ buttonText }}
           </CopyButton>
-          <b-button v-else :href="href" target="_blank" variant="outline-primary">
+          <b-button v-else :href="href" target="_blank" variant="primary">
             <b-icon-box-arrow-up-right v-if="browserCanOpenFile" /> 
             <b-icon-download v-else />
             {{ buttonText }}
           </b-button>
-          <b-button v-if="canShow && shown" :pressed="true" variant="outline-primary" class="inactive">
-            <b-icon-check /> Currently shown
-          </b-button>
-          <b-button v-else-if="canShow" @click="show" variant="outline-primary">
+          <b-button v-if="canShow && !shown" @click="show" variant="primary">
             <b-icon-eye /> Show
           </b-button>
         </b-button-group>

@@ -7,7 +7,7 @@
         <ItemFilter :stac="root" title="" :value="filters" :sort="canSort" @input="setFilters" />
       </b-col>
       <b-col class="right">
-        <b-alert v-if="loading === null" variant="light" show>Please modify the search criteria.</b-alert>
+        <b-alert v-if="loading === null" variant="info" show>Please modify the search criteria.</b-alert>
         <Loading v-else-if="loading === true" />
         <b-alert v-else-if="apiItems.length === 0" variant="warning" show>No items found for the given filters.</b-alert>
         <template v-else>
