@@ -195,30 +195,33 @@ export default class Utils {
 
 		for (let key in filters) {
 			let value = filters[key];
-			if (value) {
-				if (key === 'datetime') {
-					value = Utils.formatDatetimeQuery(value);
-				}
-				else if (key === 'bbox') {
-					value = Utils.formatBboxQuery(value, postRequired);
-				}
-				else if ((key === 'collections' || key === 'ids') && Array.isArray(value)) {
-					value = value.join(',');
-				}
-				else if (key === 'filters') {
-					value = Queryable.formatJSON(value);
-					Object.assign(body, value);
-				}
-
-				if (key !== 'filters') {
-					url.setQuery(key, value);
-					if (value !== null && (Array.isArray(value) && value.length > 0)) {
-						body[key] = value;
-					}
-				}	
+			if (value === null ||
+				(typeof value === 'number' && !Number.isFinite(value)) ||
+				(typeof value === 'string' && value.length === 0) || 
+				(typeof value === 'object' && Utils.size(value) === 0)) {
+					url.removeQuery(key);
+					continue;
 			}
-			else {
-				url.removeQuery(key);
+
+			if (key === 'datetime') {
+				value = Utils.formatDatetimeQuery(value);
+			}
+			else if (key === 'bbox') {
+				value = Utils.formatBboxQuery(value, postRequired);
+			}
+			else if ((key === 'collections' || key === 'ids') && Array.isArray(value)) {
+				value = value.join(',');
+			}
+			else if (key === 'filters') {
+				value = Queryable.formatJSON(value);
+				Object.assign(body, value);
+			}
+
+			if (key !== 'filters') {
+				url.setQuery(key, value);
+				if (value !== null && (Array.isArray(value) && value.length > 0)) {
+					body[key] = value;
+				}
 			}
 		}
 
