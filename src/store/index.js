@@ -26,7 +26,7 @@ function getStore(config) {
     apiItemsFilter: {},
     apiItemsPagination: {},
 
-    queryables: []
+    queryables: null
   });
 
   const catalogDefaults = () => ({
@@ -467,10 +467,17 @@ function getStore(config) {
         state.globalError = error;
       },
       addQueryables(state, queryables) {
-        state.queryables = Object.keys(queryables.properties).map(key => new Queryable(key, queryables.properties[key]))
+        if (Utils.isObject(queryables) && Utils.isObject(queryables.properties)) {
+          state.queryables = Object.keys(queryables.properties).map(key => new Queryable(key, queryables.properties[key]))
+        }
+        else {
+          state.queryables = [];
+        }
       },
       removeQueryableByIndex (state, queryableIndex) {
-        state.queryables.splice(queryableIndex, 1);
+        if (Array.isArray(state.queryables)) {
+          state.queryables.splice(queryableIndex, 1);
+        }
       }
     },
     actions: {
@@ -594,14 +601,6 @@ function getStore(config) {
               });
             }
           }
-
-          if (data.isCollection() || cx.getters.supportsSearch) {
-            try {
-              await cx.dispatch('loadQueryables', {stac: data});
-            } catch (error) {
-              console.log(error);
-            }
-          }
         }
 
         if (loading.show) {
@@ -688,15 +687,19 @@ function getStore(config) {
           cx.commit('addApiCollections', { data: response.data, stac, show });
         }
       },
-      async loadQueryables(cx, {stac}) {
-        let response = await stacRequest(cx, Utils.toAbsolute('queryables', cx.state.url || stac.getAbsoluteUrl()));
+      async loadQueryables(cx, url) {
         let schemas;
         try {
-          const refParser = require('@apidevtools/json-schema-ref-parser');
-          schemas = await refParser.dereference(response.data);
+          let response = await stacRequest(cx, Utils.toAbsolute('queryables', url));
+          try {
+            const refParser = require('@apidevtools/json-schema-ref-parser');
+            schemas = await refParser.dereference(response.data);
+          } catch (error) {
+            schemas = response.data; // Use data with $refs included as fallback
+            console.error(error);
+          }
         } catch (error) {
-          schemas = response.data; // Use data with $refs included as fallback
-          console.error(error);
+          console.log('Queryables not supported');
         }
         cx.commit('addQueryables', schemas);
       },

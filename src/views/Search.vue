@@ -32,13 +32,14 @@ import Items from '../components/Items.vue';
 import { mapGetters, mapState } from "vuex";
 import Utils from '../utils';
 import { ITEMSEARCH_SORT } from '../api';
+import ItemFilter from '../components/ItemFilter.vue';
 
 const pageTitle = 'Search';
 
 export default {
   name: "Search",
   components: {
-    ItemFilter: () => import('../components/ItemFilter.vue'),
+    ItemFilter,
     Items,
     Map: () => import('../components/Map.vue')
   },
