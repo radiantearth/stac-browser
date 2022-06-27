@@ -34,7 +34,7 @@ import Item from './Item.vue';
 import Pagination from './Pagination.vue';
 import { BCollapse, BIconSearch } from "bootstrap-vue";
 import Utils from '../utils';
-import STAC from '../stac';
+import STAC from '../models/stac';
 import { mapGetters } from "vuex";
 import { ITEMSEARCH_SORT } from '../api';
 

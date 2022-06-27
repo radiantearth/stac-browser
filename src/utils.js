@@ -1,4 +1,5 @@
 import URI from 'urijs';
+import Queryable from './models/queryable';
 
 export const commonFileNames = ['catalog', 'collection', 'item'];
 
@@ -157,6 +158,33 @@ export default class Utils {
 		}
 	}
 
+	static formatDatetimeQuery(value) {
+		return value.map(dt => {
+			if (dt instanceof Date) {
+				return dt.toISOString();
+			}
+			else if (dt) {
+				return dt;
+			}
+			else {
+				return '..';
+			}
+		}).join('/');
+	}
+
+	static formatBboxQuery(value) {
+		let out = null;
+		if (typeof value.toBBoxString === 'function') {
+			out = value.toBBoxString();
+		}
+		else {
+			out = value.join(',');
+		}
+		if (postRequired) {
+			out = out.split(',').map(val => parseFloat(val));
+		}
+		return out;
+	}
 
 	static addFiltersToLink(link, filters = {}, searchLink = {}) {
 		// Construct new link with search params
@@ -165,71 +193,20 @@ export default class Utils {
 		let postRequired = 'filters' in filters && filters.filters.length > 0;
 		let body = {};
 
-		function formatDatetime (value) {
-			return value.map(dt => {
-				if (dt instanceof Date) {
-					return dt.toISOString();
-				}
-				else if (dt) {
-					return dt;
-				}
-				else {
-					return '..';
-				}
-			}).join('/');
-		}
-
-		function formatBbox (value) {
-			let out = null;
-			if (typeof value.toBBoxString === 'function') {
-				out = value.toBBoxString();
-			}
-			else {
-				out = value.join(',');
-			}
-			if (postRequired) {
-				out = out.split(',').map(val => parseFloat(val));
-			}
-			return out;
-		}
-
-		function formatArraysToString (value) {
-			if (Array.isArray(value) && value.length > 0) {
-				return value.join(',');
-			}
-			return value;
-		}
-
-		function formatQueryables (queryables) {
-      return {
-        "filter-lang": "cql2-json",
-        "filter": {
-          "op": 'and',
-          "args": queryables.map(q => {
-            return {
-              op: q.operator,
-              args: [{"property": q.queryable.id }, q.value ]
-            };
-          })
-        }
-      };
-		}
-
 		for (let key in filters) {
-
 			let value = filters[key];
 			if (value) {
 				if (key === 'datetime') {
-					value = formatDatetime(value);
+					value = formatDatetimeQuery(value);
 				}
 				else if (key === 'bbox') {
-					value = formatBbox(value);
+					value = formatBboxQuery(value);
 				}
-				else if (key === 'collections' || key === 'ids') {
-					value = formatArraysToString(value);
+				else if ((key === 'collections' || key === 'ids') && Array.isArray(value)) {
+					value = value.join(',');
 				}
 				else if (key === 'filters') {
-					value = formatQueryables(value);
+					value = Queryable.formatJSON(value);
 					Object.assign(body, value);
 				}
 

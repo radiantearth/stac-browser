@@ -1,4 +1,4 @@
-import Utils from "./utils";
+import Utils from "../utils";
 import Migrate from '@radiantearth/stac-migrate';
 
 let stacObjCounter = 0;

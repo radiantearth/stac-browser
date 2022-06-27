@@ -30,11 +30,13 @@
         <div class="additional-filters" v-if="queryables.length > 0">
           <b-form-group label="Additional filters" label-for="availableFields">
             <b-dropdown size="sm" text="Add filter" block variant="primary" class="mt-2 mb-3" menu-class="w-100">
-              <b-dropdown-item v-for="(queryable, index) in queryables" :key="index" @click="additionalFieldSelected(queryable)">{{ queryable.titleOrId }}</b-dropdown-item>
+              <b-dropdown-item v-for="queryable in queryables" :key="queryable.id" @click="additionalFieldSelected(queryable)">
+                {{ queryable.title }}
+              </b-dropdown-item>
             </b-dropdown>
 
             <QueryableInput
-              v-for="(queryable, index) in filters.filters" :key="index"
+              v-for="(queryable, index) in filters.filters" :key="queryable.id"
               :queryable="queryable"
               :queryable-index="index"
               @remove-queryable="removeQueryable"

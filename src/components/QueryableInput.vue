@@ -1,7 +1,7 @@
 <template>
   <b-row class="queryable-row">
     <span class="title">
-      {{ queryable.queryable.titleOrId }}
+      {{ queryable.queryable.title }}
     </span>
 
     <b-form-select
@@ -62,7 +62,7 @@ export default {
   },
   computed: {
     queryableDefinition() {
-      return this.queryable.queryable.usableDefinition;
+      return this.queryable.queryable.schema;
     },
     queryableType() {
       if (this.queryableDefinition.type === 'number' || this.queryableDefinition.type === 'integer') {

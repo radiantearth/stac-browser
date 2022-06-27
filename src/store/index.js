@@ -2,12 +2,11 @@ import Vue from "vue";
 import Vuex from "vuex";
 import axios from "axios";
 import Utils from '../utils';
-import STAC from '../stac';
+import STAC from '../models/stac';
 import bs58 from 'bs58';
 import { Loading, stacRequest } from './utils';
 import URI from "urijs";
-
-import Queryable from '../models/Queryable';
+import Queryable from '../models/queryable';
 
 Vue.use(Vuex);
 
@@ -467,8 +466,8 @@ function getStore(config) {
         console.error(error);
         state.globalError = error;
       },
-      addQueryable (state, queryable) {
-        state.queryables.push(queryable);
+      addQueryables(state, queryables) {
+        state.queryables = Object.keys(queryables.properties).map(key => new Queryable(key, queryables.properties[key]))
       },
       removeQueryableByIndex (state, queryableIndex) {
         state.queryables.splice(queryableIndex, 1);
@@ -599,8 +598,8 @@ function getStore(config) {
           if (data.isCollection() || cx.getters.supportsSearch) {
             try {
               await cx.dispatch('loadQueryables', {stac: data});
-            } catch {
-              console.log('Queryables failed to load');
+            } catch (error) {
+              console.log(error);
             }
           }
         }
@@ -690,24 +689,16 @@ function getStore(config) {
         }
       },
       async loadQueryables(cx, {stac}) {
-        const queryablesUrl = `${stac._url}/queryables`;
-        let response = await stacRequest(cx, queryablesUrl);
-        const rawQueryables = response.data.properties;
-
-        const keys = Object.keys(rawQueryables);
-
-        for (let index = 0; index < keys.length; index++) {
-          const key = keys[index];
-
-          const q = new Queryable(key, rawQueryables[key]);
-          if (q._requiresReferenceJson) {
-            const referenceUrl = q._rawJson.$ref;
-            let response = await stacRequest(cx, referenceUrl);
-            q.setDefinitionFromReference(referenceUrl, response.data);
-          }
-
-          cx.commit('addQueryable', q);
+        let response = await stacRequest(cx, Utils.toAbsolute('queryables', cx.state.url || stac.getAbsoluteUrl()));
+        let schemas;
+        try {
+          const refParser = require('@apidevtools/json-schema-ref-parser');
+          schemas = await refParser.dereference(response.data);
+        } catch (error) {
+          schemas = response.data; // Use data with $refs included as fallback
+          console.error(error);
         }
+        cx.commit('addQueryables', schemas);
       },
       async validate(cx, url) {
         if (typeof cx.state.valid === 'boolean') {

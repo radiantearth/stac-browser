@@ -17,7 +17,7 @@
 <script>
 import { mapGetters, mapState } from 'vuex';
 import StacLink from './StacLink.vue';
-import STAC from '../stac';
+import STAC from '../models/stac';
 import removeMd from 'remove-markdown';
 import { Formatters } from '@radiantearth/stac-fields';
 
