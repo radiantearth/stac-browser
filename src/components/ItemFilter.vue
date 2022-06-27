@@ -2,7 +2,7 @@
   <b-form class="filter mb-4" @submit.stop.prevent="onSubmit" @reset="onReset">
     <b-card no-body :title="title">
       <b-card-body>
-        <Loading v-if="queryables === null" fill />
+        <Loading v-if="!loaded" fill />
 
         <b-form-group label="Temporal Extent" label-for="datetime">
           <date-picker id="datetime" :value="query.datetime" @input="setDateTime" range input-class="form-control mx-input" />
@@ -14,7 +14,13 @@
         </b-form-group>
 
         <b-form-group v-if="!collectionOnly" label="Collections" label-for="collections">
+          <b-form-select
+            v-if="collections"
+            id="collections" :value="query.collections" @input="setCollections"
+            :options="collections" multiple
+          />
           <b-form-tags
+            v-else
             input-id="collections" :value="query.collections" @input="setCollections" separator=" ,;"
             remove-on-delete add-on-change
             placeholder="List one or multiple collections..."
@@ -74,7 +80,7 @@
 import { BDropdown, BDropdownItem, BForm, BFormGroup, BFormInput, BFormCheckbox, BFormSelect, BFormTags, BButton } from 'bootstrap-vue';
 
 import DatePicker from 'vue2-datepicker';
-import { mapState } from "vuex";
+import { mapGetters, mapState } from "vuex";
 import QueryableInput from './QueryableInput.vue';
 import Loading from './Loading.vue';
 
@@ -130,11 +136,24 @@ export default {
       ],
       maxItems: 10000,
       provideBBox: false,
-      query: this.getDefaultValues()
+      query: this.getDefaultValues(),
+      loaded: false
     };
   },
   computed: {
-    ...mapState(['itemsPerPage', 'queryables'])
+    ...mapState(['itemsPerPage', 'queryables', 'apiCollections']),
+    ...mapGetters(['hasMoreCollections', 'root']),
+    collections() {
+      if (this.hasMoreCollections || this.collectionOnly) {
+        return null;
+      }
+      return this.apiCollections
+        .map(c => ({
+          value: c.id,
+          text: c.title || c.id
+        }))
+        .sort((a,b) => a.text.localeCompare(b.text));
+    }
   },
   watch: {
     value: {
@@ -161,7 +180,18 @@ export default {
     }
   },
   created() {
-      this.$store.dispatch('loadQueryables', this.stac.getAbsoluteUrl()).catch(error => console.error(error));
+    let promises = [];
+    promises.push(
+      this.$store.dispatch('loadQueryables', this.stac.getAbsoluteUrl())
+        .catch(error => console.error(error))
+    );
+    if (!this.collectionOnly && this.apiCollections.length === 0) {
+      promises.push(
+        this.$store.dispatch('loadNextApiCollections', {stac: this.root, show: true})
+          .catch(error => console.error(error))
+      );
+    }
+    Promise.all(promises).finally(() => this.loaded = true);
   },
   methods: {
     sortFieldSet(value) {
