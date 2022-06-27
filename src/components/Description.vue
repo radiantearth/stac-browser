@@ -43,7 +43,6 @@ export default {
 #stac-browser {
 	.styled-description {
 		line-height: 1.4em;
-		text-align: justify;
 
 		h1, h2, h3, h4, h5, h6 {
 			color: map-get($theme-colors, "secondary");

@@ -12,6 +12,10 @@ export default {
       type: Boolean,
       default: false
     },
+    stretch: {
+      type: Boolean,
+      default: false
+    },
     small: {
       type: Boolean,
       default: false
@@ -19,7 +23,13 @@ export default {
   },
   computed: {
     classes() {
-      return this.fill ? 'loading-fill' : 'loading';
+      if (this.fill) {
+        return 'loading-fill';
+      }
+      else if (this.stretch) {
+        return 'loading-stretch';
+      }
+      return 'loading';
     }
   }
 };
@@ -27,6 +37,13 @@ export default {
 
 <style lang="scss" scoped>
 @import '../theme/variables.scss';
+
+.loading-stretch {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
 .loading-fill {
   z-index: 100;
