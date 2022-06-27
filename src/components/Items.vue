@@ -12,7 +12,7 @@
         <b-icon-search /> Filter
       </b-button>
       <b-collapse id="itemFilter" v-model="filtersOpen">
-        <ItemFilter :stac="stac" v-model="filters" :sort="canSort" :collectionOnly="true" />
+        <ItemFilter v-if="filtersOpen" :stac="stac" v-model="filters" :sort="canSort" :collectionOnly="true" />
       </b-collapse>
     </template>
 
@@ -34,7 +34,7 @@ import Item from './Item.vue';
 import Pagination from './Pagination.vue';
 import { BCollapse, BIconSearch } from "bootstrap-vue";
 import Utils from '../utils';
-import STAC from '../stac';
+import STAC from '../models/stac';
 import { mapGetters } from "vuex";
 import { ITEMSEARCH_SORT } from '../api';
 

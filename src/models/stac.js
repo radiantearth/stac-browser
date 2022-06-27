@@ -1,4 +1,4 @@
-import Utils from "./utils";
+import Utils from "../utils";
 import Migrate from '@radiantearth/stac-migrate';
 
 let stacObjCounter = 0;
@@ -232,13 +232,6 @@ class STAC {
             return true;
         }
         return false;
-    }
-
-    async getQueryables () {
-        const response = await fetch(`${this._url}/queryables`);
-        if (!response.ok) return null;
-        const queryables = await response.json();
-        return queryables.properties;
     }
 
 }

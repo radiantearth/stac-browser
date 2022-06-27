@@ -50,7 +50,7 @@ import { Formatters } from '@radiantearth/stac-fields';
 import { mapGetters, mapState } from 'vuex';
 import Description from './Description.vue';
 import Metadata from './Metadata.vue';
-import STAC from '../stac';
+import STAC from '../models/stac';
 import Utils, { browserImageTypes, browserProtocols, geotiffMediaTypes } from '../utils';
 
 export const MIME_TYPES = browserImageTypes.concat(geotiffMediaTypes);

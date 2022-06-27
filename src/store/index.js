@@ -2,10 +2,11 @@ import Vue from "vue";
 import Vuex from "vuex";
 import axios from "axios";
 import Utils from '../utils';
-import STAC from '../stac';
+import STAC from '../models/stac';
 import bs58 from 'bs58';
 import { Loading, stacRequest } from './utils';
 import URI from "urijs";
+import Queryable from '../models/queryable';
 
 Vue.use(Vuex);
 
@@ -24,6 +25,8 @@ function getStore(config) {
     apiItemsLink: null,
     apiItemsFilter: {},
     apiItemsPagination: {},
+
+    queryables: null
   });
 
   const catalogDefaults = () => ({
@@ -462,6 +465,19 @@ function getStore(config) {
       showGlobalError(state, error) {
         console.error(error);
         state.globalError = error;
+      },
+      addQueryables(state, queryables) {
+        if (Utils.isObject(queryables) && Utils.isObject(queryables.properties)) {
+          state.queryables = Object.keys(queryables.properties).map(key => new Queryable(key, queryables.properties[key]));
+        }
+        else {
+          state.queryables = [];
+        }
+      },
+      removeQueryableByIndex (state, queryableIndex) {
+        if (Array.isArray(state.queryables)) {
+          state.queryables.splice(queryableIndex, 1);
+        }
       }
     },
     actions: {
@@ -606,13 +622,8 @@ function getStore(config) {
         }
         cx.commit('setApiItemsFilter', filters);
         let showingFilteredItems = false;
-        if (filters.advancedFilters && cx.getters.root && Object.keys(filters.advancedFilters).length > 0) {
-          link = Utils.addAdvancedFiltersToLink(link, filters, cx.getters.searchLink);
-          showingFilteredItems = true;
-        }
-        else {
-          link = Utils.addFiltersToLink(link, filters);
-        }
+
+        link = Utils.addFiltersToLink(link, filters, cx.getters.searchLink);
 
         let response = await stacRequest(cx, link);
         if (!Utils.isObject(response.data) || !Array.isArray(response.data.features)) {
@@ -675,6 +686,22 @@ function getStore(config) {
           });
           cx.commit('addApiCollections', { data: response.data, stac, show });
         }
+      },
+      async loadQueryables(cx, url) {
+        let schemas;
+        try {
+          let response = await stacRequest(cx, Utils.toAbsolute('queryables', url));
+          try {
+            const refParser = require('@apidevtools/json-schema-ref-parser');
+            schemas = await refParser.dereference(response.data);
+          } catch (error) {
+            schemas = response.data; // Use data with $refs included as fallback
+            console.error(error);
+          }
+        } catch (error) {
+          console.log('Queryables not supported');
+        }
+        cx.commit('addQueryables', schemas);
       },
       async validate(cx, url) {
         if (typeof cx.state.valid === 'boolean') {

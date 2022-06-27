@@ -21,6 +21,7 @@
     "*.config.js"
   ],
   "rules": {
+    "curly": [1, "all"],
     "semi": [1, "always"],
     "vue/multi-word-component-names": "off",
     "vue/singleline-html-element-content-newline": "off",

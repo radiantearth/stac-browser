@@ -33,7 +33,7 @@
 import { mapState, mapGetters } from 'vuex';
 import StacLink from './StacLink.vue';
 import { BIconArrow90degUp, BIconBook, BIconFolderSymlink, BIconSearch } from "bootstrap-vue";
-import STAC from '../stac';
+import STAC from '../models/stac';
 import Utils from '../utils';
 
 export default {

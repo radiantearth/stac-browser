@@ -15,7 +15,7 @@
 
 <script>
 import Catalog from './Catalog.vue';
-import STAC from '../stac';
+import STAC from '../models/stac';
 import ViewMixin from './ViewMixin';
 
 export default {

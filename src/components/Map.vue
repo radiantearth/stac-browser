@@ -16,7 +16,7 @@ import LControlFullscreen from 'vue2-leaflet-fullscreen';
 import Utils from '../utils';
 import '@lweller/leaflet-areaselect';
 import { mapState } from 'vuex';
-import STAC from '../stac';
+import STAC from '../models/stac';
 
 // Fix missing icons: https://vue2-leaflet.netlify.app/quickstart/#marker-icons-are-missing
 import { Icon } from 'leaflet';
