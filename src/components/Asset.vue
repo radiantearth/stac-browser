@@ -10,7 +10,9 @@
           {{ asset.title || id }}
         </span>
         <div class="badges ml-1" v-if="Array.isArray(asset.roles)">
-          <b-badge v-if="shown" variant="success" class="shown ml-1 mb-1" title="This is the asset currently shown"><b-icon-check /> shown</b-badge>
+          <b-badge v-if="shown" variant="success" class="shown ml-1 mb-1" title="This is the asset currently shown">
+            <b-icon-check /> shown
+          </b-badge>
           <b-badge v-if="asset.deprecated" variant="warning" class="deprecated ml-1 mb-1">Deprecated</b-badge>
           <b-badge v-for="role in asset.roles" :key="role" :variant="role === 'data' ? 'primary' : 'secondary'" class="role ml-1 mb-1">{{ role }}</b-badge>
         </div>
@@ -29,7 +31,9 @@
             {{ buttonText }}
           </b-button>
           <b-button v-if="canShow && !shown" @click="show" variant="primary">
-            <b-icon-eye /> Show
+            <b-icon-eye />
+            <template v-if="isThumbnail">&nbsp;Show thumbnail</template>
+            <template v-else>&nbsp;Show on map</template>
           </b-button>
         </b-button-group>
         <b-card-text class="mt-4" v-if="asset.description">
