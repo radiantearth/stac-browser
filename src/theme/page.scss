@@ -138,6 +138,13 @@ body {
         }
     }
 
+    .btn {
+        &.disabled,
+        &:disabled {
+            cursor: not-allowed;
+        }
+    }
+
     .button-label {
         display: none;
     }
