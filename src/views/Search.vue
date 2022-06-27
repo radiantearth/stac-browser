@@ -1,16 +1,14 @@
 <template>
   <div class="search d-flex flex-column">
-    <div v-if="!root" class="loading text-center d-flex align-items-center justify-content-center flex-grow-1">
-      <Loading />
-    </div>
-    <b-alert v-else-if="!supportsSearch" variant="danger" show>Item Search (with 'GET') is not supported by the API.</b-alert>
+    <Loading v-if="!root" stretch />
+    <b-alert v-else-if="!supportsSearch" variant="danger" show>Item Search is not supported by the API.</b-alert>
     <b-row v-else>
       <b-col class="left">
         <ItemFilter :stac="root" title="" :value="filters" :sort="canSort" @input="setFilters" />
       </b-col>
       <b-col class="right">
         <b-alert v-if="loading === null" variant="light" show>Please modify the search criteria.</b-alert>
-        <Loading v-if="loading === true" />
+        <Loading v-else-if="loading === true" />
         <b-alert v-else-if="apiItems.length === 0" variant="warning" show>No items found for the given filters.</b-alert>
         <template v-else>
           <Map :stac="root" :stacLayerData="itemCollection" @mapClicked="mapClicked" />

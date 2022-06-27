@@ -4,15 +4,14 @@
       <p>Accessing external catalogs is not allowed!</p>
     </b-alert>
     <ErrorAlert v-if="error" :dismissible="false" :url="url" :description="errorDescription" :id="errorId" />
-    <div v-else-if="loading" class="loading text-center d-flex align-items-center justify-content-center flex-grow-1">
-      <b-spinner label="Loading..." />
-    </div>
+    <Loading v-else-if="loading" stretch />
     <component v-else :is="component" />
   </section>
 </template>
 
 <script>
 import ErrorAlert from '../components/ErrorAlert.vue';
+import Loading from '../components/Loading.vue';
 import { mapGetters, mapState } from "vuex";
 import Utils from '../utils';
 
@@ -20,6 +19,7 @@ export default {
   name: "Browse",
   components: {
     ErrorAlert,
+    Loading,
     Item: () => import(/* webpackChunkName: "item" */ "./Item.vue"),
     Catalog: () => import(/* webpackChunkName: "catalog" */ "./Catalog.vue")
   },
