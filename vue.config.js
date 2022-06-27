@@ -11,6 +11,7 @@ const path = require('path');
 const configFile = path.resolve(argv.CONFIG ? argv.CONFIG : './config.js');
 const configFromFile = require(configFile);
 const mergedConfig = Object.assign(configFromFile, argv);
+const NodePolyfillPlugin = require('node-polyfill-webpack-plugin')
 
 module.exports = {
 	lintOnSave: process.env.NODE_ENV !== 'production',
@@ -26,5 +27,6 @@ module.exports = {
 			args[0].title = mergedConfig.title;
 			return args;
 		});
+		webpackConfig.plugin('polyfills').use(NodePolyfillPlugin);
 	}
 };

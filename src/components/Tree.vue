@@ -39,7 +39,7 @@
 import { BIconFileEarmarkRichtext, BIconFolderMinus, BIconFolderPlus, BIconThreeDots } from "bootstrap-vue";
 import { mapGetters, mapState } from 'vuex';
 import Utils from '../utils';
-import STAC from '../stac';
+import STAC from '../models/stac';
 
 export default {
   name: 'Tree',

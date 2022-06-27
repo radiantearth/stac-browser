@@ -23,7 +23,7 @@
 <script>
 import { mapGetters, mapState } from 'vuex';
 import StacLink from './StacLink.vue';
-import STAC from '../stac';
+import STAC from '../models/stac';
 
 export default {
   name: 'Item',

@@ -10,7 +10,7 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
 import Utils from '../utils';
-import STAC from '../stac';
+import STAC from '../models/stac';
 import URI from 'urijs';
 
 export default {
