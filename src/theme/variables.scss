@@ -18,7 +18,7 @@ $theme-colors: (
   "primary":       #188191,
   "secondary":     #6c757d,
   "success":       #28a745,
-  "info":          #188191,
+  "info":          #09B3AD,
   "warning":       #ffc107,
   "danger":        #dc3545,
   "light":         #f8f9fa,
@@ -62,6 +62,3 @@ $border-radius: 0.25rem;
 
 // Max. icon size
 $max-icon-size: 32px;
-
-// Opacity for disabled buttons
-$btn-disabled-opacity: 0.5;

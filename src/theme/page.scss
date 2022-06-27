@@ -138,10 +138,20 @@ body {
         }
     }
 
+    .btn-group {
+        .btn-primary {
+            border-color: darken(map-get($theme-colors, "primary"), 15%);
+            &:hover {
+                border-color: darken(map-get($theme-colors, "primary"), 30%);
+            }
+        }
+    }
+
     .btn {
         &.disabled,
         &:disabled {
             cursor: not-allowed;
+            filter: grayscale(1);
         }
     }
 

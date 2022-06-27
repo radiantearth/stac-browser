@@ -17,10 +17,10 @@
     <b-collapse :id="id" v-model="expanded" accordion="providers" role="tabpanel">
       <b-card-body>
         <b-button-group v-if="provider.url">
-          <b-button :href="provider.url" target="_blank" variant="outline-primary">
+          <b-button :href="provider.url" target="_blank" variant="primary">
             Go to homepage
           </b-button>
-          <b-button v-if="provider.email || provider.mail" :href="`mailto:${provider.email || provider.mail}`" target="_blank" variant="outline-primary">
+          <b-button v-if="provider.email || provider.mail" :href="`mailto:${provider.email || provider.mail}`" target="_blank" variant="primary">
             Send e-mail
           </b-button>
         </b-button-group>
