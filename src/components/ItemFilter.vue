@@ -27,19 +27,18 @@
           />
         </b-form-group>
 
-        <div class="additionalFilters" v-if="queryables.length > 0">
+        <div class="additional-filters" v-if="queryables.length > 0">
           <b-form-group label="Additional filters" label-for="availableFields">
             <b-dropdown size="sm" text="Add filter" block variant="primary" class="mt-2 mb-3" menu-class="w-100">
               <b-dropdown-item v-for="(queryable, index) in queryables" :key="index" @click="additionalFieldSelected(queryable)">{{ queryable.titleOrId }}</b-dropdown-item>
             </b-dropdown>
 
-            <div v-for="(queryable, index) in filters.filters" :key="index">
-              <queryable-input
-                :queryable="queryable"
-                :queryable-index="index"
-                @remove-queryable="removeQueryable"
-              />
-            </div> 
+            <QueryableInput
+              v-for="(queryable, index) in filters.filters" :key="index"
+              :queryable="queryable"
+              :queryable-index="index"
+              @remove-queryable="removeQueryable"
+            />
           </b-form-group>
         </div>
 
@@ -144,7 +143,8 @@ export default {
             }
             return dt;
           });
-        } else if (filters.filters.length > 0) {
+        }
+        else if (filters.filters.length > 0) {
           filters.filters = filters.filters.map(f => Object.assign({}, f));
         }
         this.filters = filters;
@@ -152,16 +152,16 @@ export default {
     }
   },
   methods: {
-    sortFieldSet (value) {
+    sortFieldSet(value) {
       this.sortTerm = value;
     },
-    sortDirectionSet (value) {
+    sortDirectionSet(value) {
       this.sortOrder = value;
     },
-    removeQueryable (queryableIndex) {
+    removeQueryable(queryableIndex) {
       this.filters.filters.splice(queryableIndex, 1);
     },
-    additionalFieldSelected (queryable) {
+    additionalFieldSelected(queryable) {
       this.filters.filters.push({
         value: null,
         operator: null,
@@ -204,7 +204,8 @@ export default {
     setBBox(bounds) {
       if (this.provideBBox) {
         this.filters.bbox = bounds;
-      } else {
+      }
+      else {
         this.filters.bbox = null;
       }
     },

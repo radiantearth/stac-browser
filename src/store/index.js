@@ -698,11 +698,6 @@ function getStore(config) {
 
         for (let index = 0; index < keys.length; index++) {
           const key = keys[index];
-          
-          // MS planetary computer has this incorrectly on the global search
-          if (key === 'id') {
-            continue;
-          }
 
           const q = new Queryable(key, rawQueryables[key]);
           if (q._requiresReferenceJson) {
