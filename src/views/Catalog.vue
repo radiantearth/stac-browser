@@ -67,6 +67,8 @@ import { Formatters } from '@radiantearth/stac-fields';
 import { BTabs, BTab } from 'bootstrap-vue';
 import Utils from '../utils';
 
+const SORRY_ITEM_LIST = "Sorry, can't load the list of items.";
+
 export default {
   name: "Catalog",
   components: {
@@ -169,14 +171,17 @@ export default {
       try {
         await this.$store.dispatch('loadApiItems', {link, show: true});
       } catch (error) {
-        this.$root.$emit('error', error, 'Sorry, loading the list of STAC Items failed.');
+        this.$root.$emit('error', error, SORRY_ITEM_LIST);
       }
     },
-    async filterItems(filters) {
+    async filterItems(filters, reset) {
+      if (reset) {
+        this.$store.commit('resetApiItems');
+      }
       try {
         await this.$store.dispatch('loadApiItems', {link: this.apiItemsLink, show: true, filters});
       } catch (error) {
-        this.$root.$emit('error', error, 'Sorry, loading a filtered list of STAC Items failed.');
+        this.$root.$emit('error', error, reset ? SORRY_ITEM_LIST : "Sorry, can't load the filtered list of items.");
       }
     },
     mapClicked(stac) {

@@ -5,7 +5,7 @@
         <Loading v-if="queryables === null" fill />
 
         <b-form-group label="Temporal Extent" label-for="datetime">
-          <date-picker id="datetime" :value="filters.datetime" @input="setDateTime" range input-class="form-control mx-input" />
+          <date-picker id="datetime" :value="query.datetime" @input="setDateTime" range input-class="form-control mx-input" />
         </b-form-group>
 
         <b-form-group label="Spatial Extent" label-for="provideBBox">
@@ -15,7 +15,7 @@
 
         <b-form-group v-if="!collectionOnly" label="Collections" label-for="collections">
           <b-form-tags
-            input-id="collections" :value="filters.collections" @input="setCollections" separator=" ,;"
+            input-id="collections" :value="query.collections" @input="setCollections" separator=" ,;"
             remove-on-delete add-on-change
             placeholder="List one or multiple collections..."
           />
@@ -23,7 +23,7 @@
 
         <b-form-group v-if="!collectionOnly" label="Item IDs" label-for="ids">
           <b-form-tags
-            input-id="ids" :value="filters.ids" @input="setIds" separator=" ,;"
+            input-id="ids" :value="query.ids" @input="setIds" separator=" ,;"
             remove-on-delete add-on-change
             placeholder="List one or multiple Item IDs..."
           />
@@ -38,7 +38,7 @@
             </b-dropdown>
 
             <QueryableInput
-              v-for="(filter, index) in filters.filters" :key="filter.id"
+              v-for="(filter, index) in query.filters" :key="filter.id"
               :title="filter.queryable.title"
               :value.sync="filter.value"
               :operator.sync="filter.operator"
@@ -56,7 +56,7 @@
 
         <b-form-group label="Items per page" label-for="limit" :description="`Number of items requested per page, max. ${maxItems} items.`">
           <b-form-input
-            id="limit" :value="filters.limit" @change="setLimit" min="1"
+            id="limit" :value="query.limit" @change="setLimit" min="1"
             :max="maxItems" type="number"
             :placeholder="`Default (${itemsPerPage})`"
           />
@@ -130,7 +130,7 @@ export default {
       ],
       maxItems: 10000,
       provideBBox: false,
-      filters: this.getDefaultValues()
+      query: this.getDefaultValues()
     };
   },
   computed: {
@@ -140,11 +140,11 @@ export default {
     value: {
       immediate: true,
       handler(value) {
-        let filters = Object.assign({}, this.getDefaultValues(), value);
+        let query = Object.assign({}, this.getDefaultValues(), value);
         // Convert from UTC to locale time (needed for vue2-datetimepicker)
         // see https://github.com/mengxiong10/vue2-datepicker/issues/388
-        if (Array.isArray(filters.datetime)) {
-          filters.datetime = filters.datetime.map(dt => {
+        if (Array.isArray(query.datetime)) {
+          query.datetime = query.datetime.map(dt => {
             if (dt instanceof Date) {
               const value = new Date(dt);
               const offset = value.getTimezoneOffset();
@@ -153,10 +153,10 @@ export default {
             return dt;
           });
         }
-        else if (filters.filters.length > 0) {
-          filters.filters = filters.filters.map(f => Object.assign({}, f));
+        else if (query.filters.length > 0) {
+          query.filters = query.filters.map(f => Object.assign({}, f));
         }
-        this.filters = filters;
+        this.query = query;
       }
     }
   },
@@ -171,10 +171,10 @@ export default {
       this.sortOrder = value;
     },
     removeQueryable(queryableIndex) {
-      this.filters.filters.splice(queryableIndex, 1);
+      this.query.filters.splice(queryableIndex, 1);
     },
     additionalFieldSelected(queryable) {
-      this.filters.filters.push({
+      this.query.filters.push({
         value: null,
         operator: null,
         queryable
@@ -193,32 +193,32 @@ export default {
     },
     onSubmit() {
       if (this.sort) {
-        this.filters.sortby = this.formatSort();
+        this.query.sortby = this.formatSort();
       }
-      this.$emit('input', this.filters, false);
+      this.$emit('input', this.query, false);
     },
     async onReset() {
-      this.filters = this.getDefaultValues();
-      this.$emit('input', this.filters, true);
+      this.query = this.getDefaultValues();
+      this.$emit('input', this.query, true);
     },
     setLimit(limit) {
       limit = Number.parseInt(limit, 10);
       if (limit > this.maxItems) {
-        this.filters.limit = this.maxItems;
+        this.query.limit = this.maxItems;
       }
       else if (limit > 0) {
-        this.filters.limit = limit;
+        this.query.limit = limit;
       }
       else {
-        this.filters.limit = null;
+        this.query.limit = null;
       }
     },
     setBBox(bounds) {
       if (this.provideBBox) {
-        this.filters.bbox = bounds;
+        this.query.bbox = bounds;
       }
       else {
-        this.filters.bbox = null;
+        this.query.bbox = null;
       }
     },
     setDateTime(datetime) {
@@ -231,17 +231,17 @@ export default {
           }
           return dt;
         });
-        this.filters.datetime = datetime;
+        this.query.datetime = datetime;
       }
       else {
-        this.filters.datetime = null;
+        this.query.datetime = null;
       }
     },
     setCollections(collections) {
-      this.filters.collections = collections;
+      this.query.collections = collections;
     },
     setIds(ids) {
-      this.filters.ids = ids;
+      this.query.ids = ids;
     },
     formatSort() {
       if (this.sort && this.sortTerm) {

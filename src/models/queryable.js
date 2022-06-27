@@ -21,6 +21,22 @@ export default class Queryable {
     };
   }
 
+  toText(queryable) {
+    let value = JSON.stringify(queryable.value);
+    return `${this.id} ${queryable.operator} ${value}`;
+  }
+
+  static formatText(queryables) {
+    if (queryables.length === 0) {
+      return {};
+    }
+
+    return {
+      "filter-lang": "cql2-text",
+      filter: queryables.map(q => q.queryable.toJSON(q)).join(' AND ')
+    };
+  }
+
   static formatJSON(queryables) {
     if (queryables.length === 0) {
       return {};

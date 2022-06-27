@@ -621,9 +621,8 @@ function getStore(config) {
           filters.limit = cx.state.itemsPerPage;
         }
         cx.commit('setApiItemsFilter', filters);
-        let showingFilteredItems = false;
 
-        link = Utils.addFiltersToLink(link, filters, cx.getters.searchLink);
+        link = Utils.addFiltersToLink(link, filters);
 
         let response = await stacRequest(cx, link);
         if (!Utils.isObject(response.data) || !Array.isArray(response.data.features)) {
@@ -642,9 +641,7 @@ function getStore(config) {
             return new STAC(item, url, cx.getters.toBrowserPath(url));
           });
           if (show) {
-            if (!showingFilteredItems) {
-              cx.commit('setApiItemsLink', link);
-            }
+            cx.commit('setApiItemsLink', link);
           }
           cx.commit('setApiItems', { data: response.data, stac, show });
           return response;

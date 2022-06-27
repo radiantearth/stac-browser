@@ -172,7 +172,7 @@ export default class Utils {
 		}).join('/');
 	}
 
-	static formatBboxQuery(value, postRequired) {
+	static formatBboxQuery(value) {
 		let out = null;
 		if (typeof value.toBBoxString === 'function') {
 			out = value.toBBoxString();
@@ -180,25 +180,21 @@ export default class Utils {
 		else {
 			out = value.join(',');
 		}
-		if (postRequired) {
-			out = out.split(',').map(val => parseFloat(val));
-		}
 		return out;
 	}
 
-	static addFiltersToLink(link, filters = {}, searchLink = {}) {
+	static addFiltersToLink(link, filters = {}) {
 		// Construct new link with search params
-		let newLink = Object.assign({}, link);
-		let url = new URI(newLink.href);
-		let postRequired = 'filters' in filters && filters.filters.length > 0;
-		let body = {};
+		let url = new URI(link.href);
 
 		for (let key in filters) {
 			let value = filters[key];
-			if (value === null ||
-				(typeof value === 'number' && !Number.isFinite(value)) ||
-				(typeof value === 'string' && value.length === 0) || 
-				(typeof value === 'object' && Utils.size(value) === 0)) {
+			if (
+				value === null
+				|| (typeof value === 'number' && !Number.isFinite(value))
+				|| (typeof value === 'string' && value.length === 0)
+				|| (typeof value === 'object' && Utils.size(value) === 0)
+			) {
 					url.removeQuery(key);
 					continue;
 			}
@@ -207,32 +203,21 @@ export default class Utils {
 				value = Utils.formatDatetimeQuery(value);
 			}
 			else if (key === 'bbox') {
-				value = Utils.formatBboxQuery(value, postRequired);
+				value = Utils.formatBboxQuery(value);
 			}
 			else if ((key === 'collections' || key === 'ids') && Array.isArray(value)) {
 				value = value.join(',');
 			}
 			else if (key === 'filters') {
-				value = Queryable.formatJSON(value);
-				Object.assign(body, value);
+				let params = Queryable.formatText(value);
+				url.setQuery(params);
+				continue;
 			}
 
-			if (key !== 'filters') {
-				url.setQuery(key, value);
-				if (value !== null && (Array.isArray(value) && value.length > 0)) {
-					body[key] = value;
-				}
-			}
+			url.setQuery(key, value);
 		}
 
-		newLink.href = url.toString();
-
-		if (postRequired) {
-			newLink.href = searchLink.href;
-			newLink.method = 'post';
-			newLink.body = body;
-		}
-		return newLink;
+		return Object.assign({}, link, {href: url.toString()});
 	}
 
 	static titleForHref(href, preferFileName = false) {

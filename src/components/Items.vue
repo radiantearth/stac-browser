@@ -12,7 +12,7 @@
         <b-icon-search /> Filter
       </b-button>
       <b-collapse id="itemFilter" v-model="filtersOpen">
-        <ItemFilter v-if="filtersOpen" :stac="stac" v-model="filters" :sort="canSort" :collectionOnly="true" />
+        <ItemFilter v-if="filtersOpen" :stac="stac" :value="filters" @input="emitFilter" :sort="canSort" :collectionOnly="true" />
       </b-collapse>
     </template>
 
@@ -129,15 +129,10 @@ export default {
       return false;
     }
   },
-  watch: {
-    filters: {
-      deep: true,
-      handler(value) {
-        this.$emit('filterItems', value);
-      }
-    }
-  },
   methods: {
+    emitFilter(value, reset) {
+      this.$emit('filterItems', value, reset);
+    },
     showMore() {
       this.shownItems += this.chunkSize;
     },

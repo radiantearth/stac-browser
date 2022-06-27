@@ -75,7 +75,7 @@ export default {
   },
   computed: {
     schemaTypes() {
-      if (this.schema.type === 'string') {
+      if (typeof this.schema.type === 'string') {
         return [this.schema.type];
       }
       else if (Array.isArray(this.schema.type)) {
@@ -99,27 +99,24 @@ export default {
       return null;
     },
     operatorOptions() {
-      const LESS_THAN = {text: 'Less Than', value: '<'};
-      const MORE_THAN = {text: 'More Than', value: '>'};
-      const EQUALS = {text: 'Equals', value: '='};
-      const NOT_EQUALS = {text: 'Not Equals', value: '<>'};
-      const LIKE = {text: 'Like', value: 'LIKE'};
+      const LESS_THAN = {text: 'less than', value: '<'};
+      const MORE_THAN = {text: 'greater than', value: '>'};
+      const EQUALS = {text: 'equal to', value: '='};
+      const NOT_EQUALS = {text: 'not equal to', value: '<>'};
+      const LIKE = {text: 'contains', value: 'LIKE'};
 
-      if (this.queryableType === 'numberField') {
-        return [LESS_THAN, MORE_THAN];
+      if (this.isNumeric) {
+        return [EQUALS, NOT_EQUALS, LESS_THAN, MORE_THAN];
         }
       else if (this.queryableType === 'textField') {
         return [EQUALS, NOT_EQUALS, LIKE];
       }
       else if (this.queryableType === 'selectField') {
-        if (this.isNumeric) {
-          return [EQUALS, NOT_EQUALS];
-        }
-        else {
-          return [EQUALS, NOT_EQUALS, LESS_THAN, MORE_THAN];
-        }
+        return [EQUALS, NOT_EQUALS];
       }
-      return null;
+      else {
+        return [EQUALS, NOT_EQUALS];
+      }
     },
     queryableOptions() {
       if (this.queryableType !== 'selectField') {
@@ -140,7 +137,9 @@ export default {
       }
     },
     selectedOperator() {
-      if (this.operatorOptions === null) {return null;}
+      if (this.operatorOptions === null) {
+        return null;
+      }
       return this.operatorOptions.find(o => o.value === this.operator);
     }
   },
@@ -168,9 +167,14 @@ export default {
       this.$emit('update:operator', val);
     },
     calculateDefaultValue() {
-      if (this.queryableType === 'textField') {return '';}
+      if (typeof this.schema.default !== 'undefined') {
+        return this.schema.default;
+      }
+      else if (this.queryableType === 'textField') {
+        return '';
+      }
       else if (this.queryableType === 'numberField') {
-        if (this.schema.minimum) {
+        if (typeof this.schema.minimum !== 'undefined') {
          return this.schema.minimum;
         }
         return 0;
