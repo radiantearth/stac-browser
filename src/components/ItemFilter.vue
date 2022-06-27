@@ -38,11 +38,11 @@
             </b-dropdown>
 
             <QueryableInput
-              v-for="(queryable, index) in filters.filters" :key="queryable.id"
-              :title="queryable.queryable.title"
-              :value.sync="queryable.value"
-              :operator.sync="queryable.operator"
-              :schema="queryable.queryable.schema"
+              v-for="(filter, index) in filters.filters" :key="filter.id"
+              :title="filter.queryable.title"
+              :value.sync="filter.value"
+              :operator.sync="filter.operator"
+              :schema="filter.queryable.schema"
               :index="index"
               @remove-queryable="removeQueryable(index)"
             />
@@ -133,9 +133,6 @@ export default {
       filters: this.getDefaultValues()
     };
   },
-  created() {
-      this.$store.dispatch('loadQueryables', this.stac.getAbsoluteUrl()).catch(error => console.error(error));
-  },
   computed: {
     ...mapState(['itemsPerPage', 'queryables'])
   },
@@ -162,6 +159,9 @@ export default {
         this.filters = filters;
       }
     }
+  },
+  created() {
+      this.$store.dispatch('loadQueryables', this.stac.getAbsoluteUrl()).catch(error => console.error(error));
   },
   methods: {
     sortFieldSet(value) {

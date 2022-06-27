@@ -22,7 +22,7 @@ export default {
       return this.fill ? 'loading-fill' : 'loading';
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>

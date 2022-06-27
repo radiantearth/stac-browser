@@ -172,7 +172,7 @@ export default class Utils {
 		}).join('/');
 	}
 
-	static formatBboxQuery(value) {
+	static formatBboxQuery(value, postRequired) {
 		let out = null;
 		if (typeof value.toBBoxString === 'function') {
 			out = value.toBBoxString();
@@ -197,10 +197,10 @@ export default class Utils {
 			let value = filters[key];
 			if (value) {
 				if (key === 'datetime') {
-					value = formatDatetimeQuery(value);
+					value = Utils.formatDatetimeQuery(value);
 				}
 				else if (key === 'bbox') {
-					value = formatBboxQuery(value);
+					value = Utils.formatBboxQuery(value, postRequired);
 				}
 				else if ((key === 'collections' || key === 'ids') && Array.isArray(value)) {
 					value = value.join(',');

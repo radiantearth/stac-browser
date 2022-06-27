@@ -468,7 +468,7 @@ function getStore(config) {
       },
       addQueryables(state, queryables) {
         if (Utils.isObject(queryables) && Utils.isObject(queryables.properties)) {
-          state.queryables = Object.keys(queryables.properties).map(key => new Queryable(key, queryables.properties[key]))
+          state.queryables = Object.keys(queryables.properties).map(key => new Queryable(key, queryables.properties[key]));
         }
         else {
           state.queryables = [];

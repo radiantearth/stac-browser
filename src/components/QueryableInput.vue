@@ -56,13 +56,17 @@ export default {
   },
   props: {
     title: {
-      type: String
+      type: String,
+      required: true
     },
+    // eslint-disable-next-line vue/require-prop-types
     value: {
-      // Any type
+      // Any type is allowed
+      default: null
     },
     operator: {
-      type: String
+      type: String,
+      default: null
     },
     schema: {
       type: Object,
