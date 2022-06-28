@@ -101,8 +101,19 @@ export default {
     return {
       expanded: false,
       ignore: [
-        'href', 'title', 'description', 'type', 'roles',
-        'table:storage_options', 'xarray:open_kwargs', 'xarray:storage_options'
+        // Asset fields that are handled directly
+        'href',
+        'title',
+        'description',
+        'type',
+        'roles',
+        // Don't show these complex lists of coordinates: https://github.com/radiantearth/stac-browser/issues/141
+        'proj:bbox',
+        'proj:geometry',
+        // Don't show very specific options that can't be rendered nicely
+        'table:storage_options',
+        'xarray:open_kwargs',
+        'xarray:storage_options'
       ]
     };
   },
