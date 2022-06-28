@@ -1,7 +1,7 @@
 <template>
   <b-row>
       <b-col md="3" class="label" :title="field" v-html="label" />
-      <b-col v-if="itemOrder.length" md="12" class="value mt-2">
+      <b-col v-if="showTable" md="12" class="value mt-2">
         <MetadataTable v-bind="$props" />
       </b-col>
       <b-col v-else md="9" class="value" v-html="formatted" />
@@ -10,6 +10,7 @@
 
 <script>
 import EntryMixin from './EntryMixin';
+import Utils from '../../utils';
 
 export default {
   name: "MetadataEntry",
@@ -18,6 +19,11 @@ export default {
   ],
   components: {
     MetadataTable: () => import('./MetadataTable.vue')
+  },
+  computed: {
+    showTable() {
+      return this.itemOrder.length > 0 && Utils.size(this.value) > 3;
+    }
   }
 };
 </script>
