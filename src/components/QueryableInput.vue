@@ -1,46 +1,53 @@
 <template>
-  <b-row class="queryable-row">
-    <span class="title">
-      {{ title }}
-    </span>
+  <div class="queryable-group">
+    <b-row class="queryable-row">
+      <span class="title">
+        {{ title }}
+      </span>
 
-    <b-form-select
-      v-if="operatorOptions !== null"
-      size="sm"
-      class="op"
-      :value="operator"
-      @input="updateOperator($event)"
-      :options="operatorOptions" 
-    />
+      <b-form-select
+        v-if="operatorOptions !== null"
+        size="sm"
+        class="op"
+        :value="operator"
+        @input="updateOperator($event)"
+        :options="operatorOptions" 
+      />
 
-    <b-form-select
-      v-if="queryableType === 'selectField'"
-      :options="queryableOptions"
-      size="sm"
-      class="value"
-      :value="value"
-      @input="updateValue($event)"
-    />
-    <b-form-input
-      v-else-if="queryableType === 'textField'"
-      size="sm"
-      class="value"
-      :value="value"
-      @input="updateValue($event)"
-    />
-    <b-form-input
-      v-else-if="queryableType === 'numberField'"
-      type="number"
-      size="sm"
-      class="value"
-      :value="value"
-      @input="updateValue($event)"
-    />
+      <b-form-select
+        v-if="queryableType === 'selectField'"
+        :options="queryableOptions"
+        size="sm"
+        class="value"
+        :value="value"
+        @input="updateValue($event)"
+      />
+      <b-form-input
+        v-else-if="queryableType === 'textField'"
+        size="sm"
+        class="value"
+        :value="value"
+        @input="updateValue($event)"
+      />
+      <b-form-input
+        v-else-if="queryableType === 'numberField'"
+        number
+        type="number"
+        size="sm"
+        class="value"
+        :value="value"
+        @input="updateValue($event)"
+      />
 
-    <b-button class="delete" size="sm" variant="danger" @click="$emit('remove-queryable')">
-      <b-icon-x-circle-fill aria-hidden="true" />
-    </b-button>
-  </b-row>
+      <b-button class="delete" size="sm" variant="danger" @click="$emit('remove-queryable')">
+        <b-icon-x-circle-fill aria-hidden="true" />
+      </b-button>
+    </b-row>
+
+    <b-row v-if="help" class="queryable-help">
+      <small class="text-muted" v-html="help" />
+    </b-row>
+  </div>
 </template>
 
 <script>
@@ -86,6 +93,12 @@ export default {
     isNumeric() {
       return this.schemaTypes.includes('number') || this.schemaTypes.includes('integer');
     },
+    help() {
+      if (this.operator === 'LIKE') {
+        return 'You can use wildcard characters. <code>_</code> matches a single character, <code>%</code> matches any number of characters. To search for a wildcard character specifically, you need to add a <code>\\</code> in front of the character.';
+      }
+      return null;
+    },
     queryableType() {
       if ('enum' in this.schema) {
         return 'selectField';
@@ -103,7 +116,7 @@ export default {
       const MORE_THAN = {text: 'greater than', value: '>'};
       const EQUALS = {text: 'equal to', value: '='};
       const NOT_EQUALS = {text: 'not equal to', value: '<>'};
-      const LIKE = {text: 'contains', value: 'LIKE'};
+      const LIKE = {text: 'matches', value: 'LIKE'};
 
       if (this.isNumeric) {
         return [EQUALS, NOT_EQUALS, LESS_THAN, MORE_THAN];
@@ -157,9 +170,6 @@ export default {
   methods: {
     updateValue(evt) {
       let val = Utils.isObject(evt) && 'target' in evt ? evt.target.value : evt;
-      if (this.isNumeric) {
-        val = Number.parseFloat(val);
-      }
       this.$emit('update:value', val);
     },
     updateOperator(evt) {
@@ -208,5 +218,15 @@ export default {
     flex-grow: 4;
     width: 8rem;
   }
+}
+
+.queryable-help {
+  display: block;
+  margin: 0.25em 0 1em 0;
+  line-height: 1.1em;
+}
+
+.queryable-group {
+  margin: 0.75em 0;
 }
 </style>

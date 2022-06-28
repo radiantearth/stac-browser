@@ -22,7 +22,10 @@ export default class Queryable {
   }
 
   toText(queryable) {
-    let value = JSON.stringify(queryable.value);
+    let value = queryable.value;
+    if (typeof value === 'string') {
+      value = `'${value.replace("'", "\\'")}'`;
+    }
     return `${this.id} ${queryable.operator} ${value}`;
   }
 
@@ -33,7 +36,7 @@ export default class Queryable {
 
     return {
       "filter-lang": "cql2-text",
-      filter: queryables.map(q => q.queryable.toJSON(q)).join(' AND ')
+      filter: queryables.map(q => q.queryable.toText(q)).join(' AND ')
     };
   }
 
