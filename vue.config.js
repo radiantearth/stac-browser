@@ -1,33 +1,32 @@
-const { argv } = require("yargs");
+const yargs = require('yargs/yargs');
+const { hideBin } = require('yargs/helpers');
+const argv = yargs(hideBin(process.argv)).argv;
+// Clean-up arguments
+delete argv._;
+delete argv.$0;
 
-const DEFAULT_PATH_PREFIX = '/';
+const pkgFile = require('./package.json');
 
-function getVar(name, defaultValue) {
-	let value;
-	if (typeof argv[name] === 'string') {
-		value = argv[name];
-	}
-	else if (typeof process.env[name] === 'string') {
-		value = process.env[name];
-	}
-	else {
-		value = defaultValue;
-	}
-	return `"${value}"`;
-}
+const path = require('path');
+const configFile = path.resolve(argv.CONFIG ? argv.CONFIG : './config.js');
+const configFromFile = require(configFile);
+const mergedConfig = Object.assign(configFromFile, argv);
+const NodePolyfillPlugin = require('node-polyfill-webpack-plugin')
 
 module.exports = {
-	runtimeCompiler: true,
-	publicPath: process.env.PATH_PREFIX || argv.PATH_PREFIX || DEFAULT_PATH_PREFIX, // Set this if you'd like to deploy at a sub-path,
-	chainWebpack: config => {
-	  	config.plugin('define').tap(args => {
-			args[0]["process.env"].CATALOG_URL = getVar('CATALOG_URL', 'https://raw.githubusercontent.com/cholmes/pdd-stac/beta2/disasters/collection.json');
-			args[0]["process.env"].TILE_SOURCE_TEMPLATE = getVar('TILE_SOURCE_TEMPLATE', 'https://tiles.rdnt.io/tiles/{z}/{x}/{y}@2x?url={ASSET_HREF}');
-			args[0]["process.env"].STAC_PROXY_URL = getVar('STAC_PROXY_URL');
-			args[0]["process.env"].TILE_PROXY_URL = getVar('TILE_PROXY_URL');
-			args[0]["process.env"].PATH_PREFIX = getVar('PATH_PREFIX', DEFAULT_PATH_PREFIX);
-			args[0]["process.env"].HISTORY_MODE = getVar('HISTORY_MODE', 'history');
+	lintOnSave: process.env.NODE_ENV !== 'production',
+	publicPath: mergedConfig.pathPrefix,
+	chainWebpack: webpackConfig => {
+		webpackConfig.plugin('define').tap(args => {
+			args[0].STAC_BROWSER_VERSION = JSON.stringify(pkgFile.version);
+			args[0].CONFIG_PATH = JSON.stringify(configFile);
+			args[0].CONFIG_CLI = JSON.stringify(argv);
 			return args;
-		})
+		});
+		webpackConfig.plugin('html').tap(args => {
+			args[0].title = mergedConfig.title;
+			return args;
+		});
+		webpackConfig.plugin('polyfills').use(NodePolyfillPlugin);
 	}
-}
+};
