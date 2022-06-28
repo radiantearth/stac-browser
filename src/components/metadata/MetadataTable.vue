@@ -3,6 +3,9 @@
     <template #head()="data">
       <span v-html="data.label" />
     </template>
+    <template #cell()="data">
+      <span v-html="data.value" />
+    </template>
   </b-table>
 </template>
 
@@ -10,6 +13,7 @@
 import { BTable } from 'bootstrap-vue';
 import EntryMixin from './EntryMixin';
 import Utils from '../../utils';
+import { format } from '@radiantearth/stac-fields';
 
 export default {
   name: 'MetadataTable',
@@ -42,7 +46,8 @@ export default {
         fields.push({
           key,
           label: col.label,
-          sortable: col.sortable
+          sortable: col.sortable,
+          formatter: this.formatCell.bind(this)
         });
       }
       if (Utils.isObject(this.value)) {
@@ -53,6 +58,15 @@ export default {
         });
       }
       return fields;
+    }
+  },
+  methods: {
+    formatCell(value, key, item) {
+      let spec = this.items[key];
+      // ToDo: Set context (third param)?
+      let formatted = format(value, key, NaN, item, spec);
+      console.log(formatted);
+      return formatted;
     }
   }
 }

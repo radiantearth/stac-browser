@@ -190,6 +190,16 @@ export default {
         .checksum-input {
             width: 100%;
         }
+
+        .color {
+            text-align: center;
+            
+            .color-code {
+                color: white;
+                text-shadow: 1px 1px 1px #000;
+                text-align: center;
+            }
+        }
     }
 }
 </style>
