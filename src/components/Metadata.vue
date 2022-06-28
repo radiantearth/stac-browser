@@ -1,10 +1,10 @@
 <template>
-    <section v-if="formattedData.length > 0" class="metadata">
-        <h2 v-if="title">{{ title }}</h2>
-        <b-card-group columns :class="`count-${formattedData.length}`">
-            <MetadataGroup v-for="group in formattedData" v-bind="group" :key="group.extension" />
-        </b-card-group>
-    </section>
+  <section v-if="formattedData.length > 0" class="metadata">
+    <h2 v-if="title">{{ title }}</h2>
+    <b-card-group columns :class="`count-${formattedData.length}`">
+      <MetadataGroup v-for="group in formattedData" v-bind="group" :key="group.extension" />
+    </b-card-group>
+  </section>
 </template>
 
 <script>

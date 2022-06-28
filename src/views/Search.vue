@@ -4,22 +4,41 @@
     <b-alert v-else-if="!supportsSearch" variant="danger" show>Item Search is not supported by the API.</b-alert>
     <b-row v-else>
       <b-col class="left">
-        <ItemFilter :stac="root" title="" :value="filters" :extents="canFilterExtents" :sort="canSort" :filter="canFilterCql" @input="setFilters" />
+        <ItemFilter
+          :stac="root" title="" :value="filters" v-bind="filterComponentProps"
+          @input="setFilters"
+        />
       </b-col>
       <b-col class="right">
         <b-alert v-if="loading === null" variant="info" show>Please modify the search criteria.</b-alert>
         <Loading v-else-if="loading === true" />
         <b-alert v-else-if="apiItems.length === 0" variant="warning" show>No items found for the given filters.</b-alert>
         <template v-else>
-          <Map :stac="root" :stacLayerData="itemCollection" @mapClicked="mapClicked" />
+          <div id="search-map">
+            <Map :stac="root" :stacLayerData="itemCollection" @mapClicked="mapClicked" />
+          </div>
           <Items
             :stac="root" :items="apiItems" :api="true" :allowFilter="false"
-            :selected="selected" :pagination="itemPages"
-            @paginate="paginateItems"
+            :pagination="itemPages" @paginate="paginateItems"
           />
         </template>
       </b-col>
     </b-row>
+    <b-popover
+      v-if="selectedItem" placement="left" triggers="manual" :show="selectedItem !== null"
+      target="search-map" boundary="search-map" container="search-map"
+    >
+      <section class="items">
+        <b-card-group columns class="count-1">
+          <Item :item="selectedItem" />
+        </b-card-group>
+      </section>
+      <div class="text-center">
+        <b-button target="_blank" variant="danger" @click="mapClicked">
+          Close
+        </b-button>
+      </div>
+    </b-popover>
   </div>
 </template>
 
@@ -30,20 +49,23 @@ import Utils from '../utils';
 import sortCapabilitiesMixinGenerator from '../components/SortCapabilitiesMixin';
 import ItemFilter from '../components/ItemFilter.vue';
 import Loading from '../components/Loading.vue';
+import { BPopover } from 'bootstrap-vue';
 
 const pageTitle = 'Search';
 
 export default {
   name: "Search",
-  mixins: [
-    sortCapabilitiesMixinGenerator(false)
-  ],
   components: {
+    BPopover,
     ItemFilter,
+    Item: () => import('../components/Item.vue'),
     Items,
     Loading,
     Map: () => import('../components/Map.vue')
   },
+  mixins: [
+    sortCapabilitiesMixinGenerator(false)
+  ],
   props: {
     loadRoot: {
       type: String,
@@ -54,7 +76,7 @@ export default {
     return {
       loading: null,
       filters: {},
-      selected: []
+      selectedItem: null
     };
   },
   computed: {
@@ -133,17 +155,11 @@ export default {
     },
     mapClicked(event) {
       if (event.type !== 'Feature') {
-        return;
+        this.selectedItem = null;
       }
-
-      // ToDo: Implement something more useful
-      this.selected = [event.data];
-
-/* Doesn't work right now, scrolls to incorrect blocks?!
-      let selected = document.querySelectorAll('.item-card.border-danger');
-      if (selected.length === 1) {
-        Utils.scrollTo(selected[0]);
-      } */
+      else {
+        this.selectedItem = event.data;
+      }
     }
   }
 };
@@ -183,6 +199,10 @@ export default {
       }
       @include media-breakpoint-up(xxxl) {
         column-count: 4;
+      }
+
+      &.count-1 {
+        column-count: 1;
       }
     }
   }

@@ -4,11 +4,11 @@
       <b-card-body>
         <Loading v-if="!loaded" fill />
 
-        <b-form-group v-if="extents" label="Temporal Extent" label-for="datetime" description="All times in UTC.">
+        <b-form-group v-if="canFilterExtents" label="Temporal Extent" label-for="datetime" description="All times in UTC.">
           <date-picker id="datetime" :value="query.datetime" @input="setDateTime" range input-class="form-control mx-input" />
         </b-form-group>
 
-        <b-form-group v-if="extents" label="Spatial Extent" label-for="provideBBox">
+        <b-form-group v-if="canFilterExtents" label="Spatial Extent" label-for="provideBBox">
           <b-form-checkbox id="provideBBox" v-model="provideBBox" value="1" @change="setBBox">Filter by spatial extent</b-form-checkbox>
           <Map class="mb-4" v-if="provideBBox" :stac="stac" :selectBounds="true" @bounds="setBBox" />
         </b-form-group>
@@ -35,7 +35,7 @@
           />
         </b-form-group>
 
-        <div class="additional-filters" v-if="this.filter && Array.isArray(queryables) && queryables.length > 0">
+        <div class="additional-filters" v-if="canFilterCql && Array.isArray(queryables) && queryables.length > 0">
           <b-form-group label="Additional filters" label-for="availableFields">
             <b-alert variant="warning" show>This feature is still experimental and may give unexpected results!</b-alert>
 
@@ -57,7 +57,7 @@
           </b-form-group>
         </div>
 
-        <b-form-group v-if="sort" label="Sort" label-for="sort" description="Some APIs may not support all of the options.">
+        <b-form-group v-if="canSort" label="Sort" label-for="sort" description="Some APIs may not support all of the options.">
           <b-form-select id="sort" :value="sortTerm" :options="sortOptions" placeholder="Default" @input="sortFieldSet" />
           <SortButtons v-if="sortTerm" class="mt-1" :value="sortOrder" enforce @input="sortDirectionSet" />
         </b-form-group>
@@ -119,15 +119,15 @@ export default {
       type: String,
       default: 'Filter'
     },
-    extents: {
+    canFilterExtents: {
       type: Boolean,
       default: false
     },
-    sort: {
+    canSort: {
       type: Boolean,
       default: false
     },
-    filter: {
+    canFilterCql: {
       type: Boolean,
       default: false
     },
@@ -184,7 +184,7 @@ export default {
   },
   created() {
     let promises = [];
-    if (this.filter) {
+    if (this.canFilterCql) {
       promises.push(
         this.$store.dispatch('loadQueryables', this.stac.getAbsoluteUrl())
           .catch(error => console.error(error))

@@ -184,8 +184,8 @@ export default {
         this.$root.$emit('error', error, reset ? SORRY_ITEM_LIST : "Sorry, can't load the filtered list of items.");
       }
     },
-    mapClicked(stac) {
-      console.log(stac); // todo
+    mapClicked(/*stac*/) {
+      // todo, see search for an example
     }
   }
 };

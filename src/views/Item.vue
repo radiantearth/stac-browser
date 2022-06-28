@@ -98,8 +98,8 @@ export default {
     }
   },
   methods: {
-    mapClicked(stac) {
-      console.log(stac); // todo
+    mapClicked(/*stac*/) {
+      // todo, see search for an example
     }
   }
 };

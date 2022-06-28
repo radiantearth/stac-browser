@@ -12,12 +12,15 @@
         <b-icon-search /> Filter
       </b-button>
       <b-collapse id="itemFilter" v-model="filtersOpen">
-        <ItemFilter v-if="filtersOpen" :stac="stac" :value="filters" @input="emitFilter" :extents="canFilterExtents" :sort="canSort" :filter="canFilterCql" :collectionOnly="true" />
+        <ItemFilter
+          v-if="filtersOpen" :stac="stac" :value="filters" @input="emitFilter"
+          :collectionOnly="true" v-bind="filterComponentProps"
+        />
       </b-collapse>
     </template>
 
     <b-card-group v-if="chunkedItems.length > 0" columns>
-      <Item v-for="item in chunkedItems" :item="item" :key="item.href" :selected="selected" />
+      <Item v-for="item in chunkedItems" :item="item" :key="item.href" />
     </b-card-group>
     <b-alert v-else :variant="hasFilters ? 'warning' : 'info'" show>
       <template v-if="hasFilters">No items found for the given filters.</template>
@@ -39,9 +42,6 @@ import sortCapabilitiesMixinGenerator from './SortCapabilitiesMixin';
 
 export default {
   name: "Items",
-  mixins: [
-    sortCapabilitiesMixinGenerator(true)
-  ],
   components: {
     BCollapse,
     BIconSearch,
@@ -50,6 +50,9 @@ export default {
     Pagination,
     SortButtons: () => import('./SortButtons.vue')
   },
+  mixins: [
+    sortCapabilitiesMixinGenerator(true)
+  ],
   props: {
     items: {
       type: Array,
@@ -78,10 +81,6 @@ export default {
     chunkSize: {
       type: Number,
       default: 90
-    },
-    selected: {
-      type: Array,
-      default: () => ([])
     }
   },
   data() {

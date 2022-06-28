@@ -1,5 +1,5 @@
 <template>
-  <b-card no-body class="item-card" :class="{queued: !data, deprecated: isDeprecated}" v-bind="cardProps" v-b-visible.200="load">
+  <b-card no-body class="item-card" :class="{queued: !data, deprecated: isDeprecated}" v-b-visible.200="load">
     <b-card-img v-if="thumbnail && showThumbnail" class="thumbnail" :src="thumbnail.href" :alt="thumbnail.title" :crossorigin="crossOriginMedia" />
     <b-card-body>
       <b-card-title>
@@ -34,10 +34,6 @@ export default {
     item: {
       type: Object,
       required: true
-    },
-    selected: {
-      type: Array,
-      default: () => ([])
     }
   },
   data() {
@@ -48,13 +44,6 @@ export default {
   computed: {
     ...mapState(['crossOriginMedia']),
     ...mapGetters(['getStac']),
-    cardProps() {
-      let props = {};
-      if (Array.isArray(this.selected) && this.selected.find(obj => this.data.equals(obj))) {
-        props['border-variant'] = 'danger';
-      }
-      return props;
-    },
     data() {
       if (this.item instanceof STAC) {
         return this.item;

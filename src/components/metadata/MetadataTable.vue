@@ -1,5 +1,9 @@
 <template>
-  <b-table class="metadata-table" :items="tblItems" :fields="tblFields" variant="light" responsive small sticky-header striped>
+  <b-table
+    class="metadata-table" :items="tblItems" :fields="tblFields" variant="light"
+    responsive small
+    sticky-header striped
+  >
     <template #head()="data">
       <span v-html="data.label" />
     </template>
@@ -17,12 +21,12 @@ import { format } from '@radiantearth/stac-fields';
 
 export default {
   name: 'MetadataTable',
-  mixins: [
-    EntryMixin
-  ],
   components: {
     BTable
   },
+  mixins: [
+    EntryMixin
+  ],
   computed: {
     tblItems() {
       if (Utils.isObject(this.value)) {
@@ -64,12 +68,10 @@ export default {
     formatCell(value, key, item) {
       let spec = this.items[key];
       // ToDo: Set context (third param)?
-      let formatted = format(value, key, NaN, item, spec);
-      console.log(formatted);
-      return formatted;
+      return format(value, key, NaN, item, spec);
     }
   }
-}
+};
 </script>
 
 <style>

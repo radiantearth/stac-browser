@@ -36,6 +36,13 @@ export default ogcapi => ({
         modes.push('JSON');
       }
       return modes;
+    },
+    filterComponentProps() {
+      return {
+        canSort: this.canSort,
+        canFilterCql: this.canFilterCql,
+        canFilterExtents: this.canFilterExtents
+      };
     }
   },
 });
