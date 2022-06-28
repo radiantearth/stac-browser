@@ -473,11 +473,6 @@ function getStore(config) {
         else {
           state.queryables = [];
         }
-      },
-      removeQueryableByIndex (state, queryableIndex) {
-        if (Array.isArray(state.queryables)) {
-          state.queryables.splice(queryableIndex, 1);
-        }
       }
     },
     actions: {
@@ -696,7 +691,7 @@ function getStore(config) {
             console.error(error);
           }
         } catch (error) {
-          console.log('Queryables not supported');
+          console.log('Queryables not supported by API');
         }
         cx.commit('addQueryables', schemas);
       },

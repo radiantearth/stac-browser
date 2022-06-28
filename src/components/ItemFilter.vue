@@ -37,6 +37,8 @@
 
         <div class="additional-filters" v-if="Array.isArray(queryables) && queryables.length > 0">
           <b-form-group label="Additional filters" label-for="availableFields">
+            <b-alert variant="warning" show>This feature is still experimental and may give unexpected results!</b-alert>
+
             <b-dropdown size="sm" text="Add filter" block variant="primary" class="mt-2 mb-3" menu-class="w-100">
               <b-dropdown-item v-for="queryable in queryables" :key="queryable.id" @click="additionalFieldSelected(queryable)">
                 {{ queryable.title }}
@@ -77,16 +79,18 @@
 </template>
 
 <script>
-import { BDropdown, BDropdownItem, BForm, BFormGroup, BFormInput, BFormCheckbox, BFormSelect, BFormTags, BButton } from 'bootstrap-vue';
+import { BAlert, BDropdown, BDropdownItem, BForm, BFormGroup, BFormInput, BFormCheckbox, BFormSelect, BFormTags, BButton } from 'bootstrap-vue';
 
 import DatePicker from 'vue2-datepicker';
 import { mapGetters, mapState } from "vuex";
 import QueryableInput from './QueryableInput.vue';
 import Loading from './Loading.vue';
+import Utils from '../utils';
 
 export default {
   name: 'ItemFilter',
   components: {
+    BAlert,
     BDropdown,
     BDropdownItem,
     BForm,

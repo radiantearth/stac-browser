@@ -1,6 +1,6 @@
 <template>
   <section class="browse d-flex flex-column">
-    <b-alert v-if="!allowExternalAccess && isExternal">
+    <b-alert v-if="!allowExternalAccess && isExternal" show>
       <p>Accessing external catalogs is not allowed!</p>
     </b-alert>
     <ErrorAlert v-if="error" :dismissible="false" :url="url" :description="errorDescription" :id="errorId" />
