@@ -1,8 +1,6 @@
 <template>
   <div class="sidebar">
-    <div v-if="!parents" class="loading text-center">
-      <b-spinner label="Loading..."></b-spinner>
-    </div>
+    <Loading v-if="!parents" />
     <Tree v-else-if="root" :item="root" :path="parents" />
 
     <b-button v-if="allowSelectCatalog" class="mt-4" variant="light"><router-link to="/"><b-icon-arrow-left-right /> Switch Catalog</router-link></b-button>
@@ -12,12 +10,14 @@
 <script>
 import { BIconArrowLeftRight } from "bootstrap-vue";
 import { mapGetters, mapState } from 'vuex';
+import Loading from './Loading.vue';
 import Tree from './Tree.vue';
 
 export default {
   name: 'Sidebar',
   components: {
     BIconArrowLeftRight,
+    Loading,
     Tree
   },
   computed: {
@@ -27,7 +27,7 @@ export default {
   async created() {
     await this.$store.dispatch('loadParents');
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>

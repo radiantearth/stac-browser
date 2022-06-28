@@ -20,7 +20,7 @@
 
       <template v-if="expanded && mayHaveChildren">
         <ul v-if="loading" class="tree">
-          <li><b-spinner label="Loading..." small></b-spinner></li>
+          <li><b-spinner label="Loading..." small /></li>
         </ul>
         <ul v-else-if="childs.length === 0" class="tree">
           <li>
@@ -39,7 +39,7 @@
 import { BIconFileEarmarkRichtext, BIconFolderMinus, BIconFolderPlus, BIconThreeDots } from "bootstrap-vue";
 import { mapGetters, mapState } from 'vuex';
 import Utils from '../utils';
-import STAC from '../stac';
+import STAC from '../models/stac';
 
 export default {
   name: 'Tree',
@@ -55,7 +55,8 @@ export default {
       required: true
     },
     parent: {
-      type: Object
+      type: Object,
+      default: null
     },
     path: {
       type: Array,
@@ -67,16 +68,6 @@ export default {
       expanded: false,
       loading: false
     };
-  },
-  watch: {
-    onPath: {
-      immediate: true,
-      handler() {
-        if (this.onPath) {
-          this.expanded = true;
-        }
-      }
-    }
   },
   computed: {
     ...mapState(['data']),
@@ -112,7 +103,7 @@ export default {
           return Utils.toAbsolute(this.item.href, this.parent.getAbsoluteUrl());
         }
         else {
-          return this.item.href
+          return this.item.href;
         }
       }
       return null;
@@ -165,6 +156,16 @@ export default {
       return ['next', 'prev', 'previous'].includes(this.item.rel);
     }
   },
+  watch: {
+    onPath: {
+      immediate: true,
+      handler() {
+        if (this.onPath) {
+          this.expanded = true;
+        }
+      }
+    }
+  },
   methods: {
     load(visible) {
       if (!this.stac && this.link && !this.pagination) {
@@ -181,7 +182,7 @@ export default {
       }
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>

@@ -19,9 +19,10 @@ export default {
       }
       else if (this.tab === 1 || (this.tab === null && this.thumbnails.length > 0)) {
         let keys = [];
+        let thumbnailRefs = this.thumbnails.map(t => t.href);
         for(let key in this.assets) {
           let asset = this.assets[key];
-          if (this.thumbnails.includes(asset)) {
+          if (thumbnailRefs.includes(asset.href)) {
             keys.push(key);
           }
         }
@@ -64,4 +65,4 @@ export default {
       }
     }
   }
-}
+};

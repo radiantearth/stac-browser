@@ -1,24 +1,32 @@
 import URI from 'urijs';
+import Queryable from './models/queryable';
 
-const commonFileNames = ['catalog', 'collection', 'item'];
+export const commonFileNames = ['catalog', 'collection', 'item'];
 
-const stacMediaTypes = [
+export const stacMediaTypes = [
 	'application/json',
 	'application/geo+json',
 	'text/json'
 ];
 
-const browserImageTypes = [
-	'gif',
-	'jpg',
-	'jpeg',
-	'png',
-	'webp'
+export const browserImageTypes = [
+	'image/gif',
+	'image/jpg',
+	'image/jpeg',
+	'image/apng',
+	'image/png',
+	'image/webp'
 ];
 
-const browserMediaTypeRegexp = new RegExp(`^image/(${browserImageTypes.join('|')})`, 'i');
+export const geotiffMediaTypes = [
+  "application/geotiff",
+  "image/tiff; application=geotiff",
+  "image/tiff; application=geotiff; profile=cloud-optimized",
+  "image/vnd.stac.geotiff",
+  "image/vnd.stac.geotiff; cloud-optimized=true"
+];
 
-const browserProtocols = [
+export const browserProtocols = [
 	'http',
 	'https'
 ];
@@ -150,50 +158,85 @@ export default class Utils {
 		}
 	}
 
-	static addFiltersToLink(link, filters = {}) {
-		// Construct new link with search params
-		let newLink = Object.assign({}, link);
-		let url = new URI(newLink.href);
-		for(let key in filters) {
-			let value = filters[key];
-			if (value) {
-				if (key === 'datetime') {
-					value = value.map(dt => {
-						if (dt instanceof Date) {
-							return dt.toISOString();
-						}
-						else if (dt) {
-							return dt;
-						}
-						else {
-							return '..';
-						}
-					}).join('/');
-				}
-				else if (key === 'bbox') {
-					if (typeof value.toBBoxString === 'function') {
-						value = value.toBBoxString();
-					}
-					else {
-						value = value.join(',');
-					}
-				}
-				else if (key === 'collections' || key === 'ids') {
-					if (Array.isArray(value) && value.length > 0) {
-						value = value.join(',');
-					}
-					else {
-						continue;
-					}
-				}
-				url.setQuery(key, value);
+	// Convert from UTC to locale time (needed for vue2-datetimepicker)
+	// see https://github.com/mengxiong10/vue2-datepicker/issues/388
+	static dateFromUTC(dt) {
+		if (dt instanceof Date) {
+			const value = new Date(dt);
+			const offset = value.getTimezoneOffset();
+			dt = new Date(value.getTime() + offset * 60 * 1000);
+		}
+		return dt;
+	}
+
+	static dateToUTC(dt) {
+		if (dt instanceof Date) {
+			const offset = new Date().getTimezoneOffset();
+			return new Date(dt.getTime() - offset * 60 * 1000);
+		}
+		return dt;
+	}
+
+	static formatDatetimeQuery(value) {
+		return value.map(dt => {
+			if (dt instanceof Date) {
+				return dt.toISOString();
+			}
+			else if (dt) {
+				return dt;
 			}
 			else {
-				url.removeQuery(key);
+				return '..';
 			}
+		}).join('/');
+	}
+
+	static formatBboxQuery(value) {
+		let out = null;
+		if (typeof value.toBBoxString === 'function') {
+			out = value.toBBoxString();
 		}
-		newLink.href = url.toString();
-		return newLink;
+		else {
+			out = value.join(',');
+		}
+		return out;
+	}
+
+	static addFiltersToLink(link, filters = {}) {
+		// Construct new link with search params
+		let url = new URI(link.href);
+
+		for (let key in filters) {
+			let value = filters[key];
+			if (
+				value === null
+				|| (typeof value === 'number' && !Number.isFinite(value))
+				|| (typeof value === 'string' && value.length === 0)
+				|| (typeof value === 'object' && Utils.size(value) === 0)
+			) {
+					url.removeQuery(key);
+					continue;
+			}
+
+			if (key === 'datetime') {
+				value = Utils.formatDatetimeQuery(value);
+			}
+			else if (key === 'bbox') {
+				value = Utils.formatBboxQuery(value);
+			}
+			else if ((key === 'collections' || key === 'ids') && Array.isArray(value)) {
+				value = value.join(',');
+			}
+			else if (key === 'filters') {
+				let params = Queryable.formatText(value);
+				url.setQuery(params);
+				continue;
+			}
+
+			url.setQuery(key, value);
+		}
+
+		return Object.assign({}, link, {href: url.toString()});
 	}
 
 	static titleForHref(href, preferFileName = false) {
@@ -233,10 +276,10 @@ export default class Utils {
 		if (protocol && !browserProtocols.includes(protocol)) {
 			return false;
 		}
-		else if (browserMediaTypeRegexp.test(img.type)) {
+		else if (browserImageTypes.includes(img.type)) {
 			return true;
 		}
-		else if (browserImageTypes.includes(uri.suffix().toLowerCase())) {
+		else if (browserImageTypes.includes('image/' + uri.suffix().toLowerCase())) {
 			return true;
 		}
 		else if (img.type) {
@@ -245,6 +288,19 @@ export default class Utils {
 		else {
 			return true; // If no img.type is given, try to load it anyway: https://github.com/radiantearth/stac-browser/issues/147
 		}
+	}
+
+	// Gets the value at path of object.
+	// Drop in replacement for lodash.get
+	static getValueFromObjectUsingPath (object, path) {
+		if (object === null || typeof object !== 'object') {
+			return;
+		}
+		object = object[path[0]];
+		if (typeof object !== 'undefined' && path.length > 1) {
+			return this.getValueFromObjectUsingPath(object, path.slice(1));
+		}
+		return object;
 	}
 
 }

@@ -1,18 +1,17 @@
 <template>
-  <section>
-    <b-alert v-if="!allowExternalAccess && this.isExternal">
+  <section class="browse d-flex flex-column">
+    <b-alert v-if="!allowExternalAccess && isExternal" show>
       <p>Accessing external catalogs is not allowed!</p>
     </b-alert>
     <ErrorAlert v-if="error" :dismissible="false" :url="url" :description="errorDescription" :id="errorId" />
-    <div v-else-if="loading" class="loading text-center">
-      <b-spinner label="Loading..."></b-spinner>
-    </div>
+    <Loading v-else-if="loading" stretch />
     <component v-else :is="component" />
   </section>
 </template>
 
 <script>
 import ErrorAlert from '../components/ErrorAlert.vue';
+import Loading from '../components/Loading.vue';
 import { mapGetters, mapState } from "vuex";
 import Utils from '../utils';
 
@@ -20,6 +19,7 @@ export default {
   name: "Browse",
   components: {
     ErrorAlert,
+    Loading,
     Item: () => import(/* webpackChunkName: "item" */ "./Item.vue"),
     Catalog: () => import(/* webpackChunkName: "catalog" */ "./Catalog.vue")
   },
@@ -112,3 +112,9 @@ export default {
   }
 };
 </script>
+
+<style lang="scss" scoped>
+.browse {
+  min-height: 100%;
+}
+</style>

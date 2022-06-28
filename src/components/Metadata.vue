@@ -1,7 +1,7 @@
 <template>
     <section v-if="formattedData.length > 0" class="metadata">
         <h2 v-if="title">{{ title }}</h2>
-        <b-card-group v-if="formattedData.length > 0" columns :class="`count-${formattedData.length}`">
+        <b-card-group columns :class="`count-${formattedData.length}`">
             <MetadataGroup v-for="group in formattedData" v-bind="group" :key="group.extension" />
         </b-card-group>
     </section>
@@ -85,13 +85,20 @@ export default {
             margin-bottom: $block-margin;
             text-align: left;
 
+            .metadata-rows {
+                border-radius: $border-radius;
+            }
+
             .row {
                 padding: 0.4rem;
                 border-top: 1px solid rgba(0,0,0,0.125);
-            }
 
-            .row:nth-child(even) {
-                background: rgba(0,0,0,0.03);
+                &:first-child {
+                    border-top: 0;
+                }
+                &:nth-child(odd) {
+                    background: rgba(0,0,0,0.03);
+                }
             }
 
             .label {

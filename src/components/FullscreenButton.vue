@@ -13,18 +13,19 @@ import { BIconFullscreen, BIconFullscreenExit } from 'bootstrap-vue';
 
 export default {
   name: 'FullscreenButton',
+  components: {
+    BIconFullscreen,
+    BIconFullscreenExit
+  },
   props: {
     element: {
+      type: [Function, String, Object],
       required: true
     },
     zIndex: {
       type: Number,
       default: 9000
     }
-  },
-  components: {
-    BIconFullscreen,
-    BIconFullscreenExit
   },
   data() {
     return {

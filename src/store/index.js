@@ -1,11 +1,12 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import axios from "axios";
-import Utils from '../utils'
-import STAC from '../stac';
+import Utils from '../utils';
+import STAC from '../models/stac';
 import bs58 from 'bs58';
 import { Loading, stacRequest } from './utils';
 import URI from "urijs";
+import Queryable from '../models/queryable';
 
 Vue.use(Vuex);
 
@@ -24,6 +25,8 @@ function getStore(config) {
     apiItemsLink: null,
     apiItemsFilter: {},
     apiItemsPagination: {},
+
+    queryables: null
   });
 
   const catalogDefaults = () => ({
@@ -55,7 +58,6 @@ function getStore(config) {
         'next',
         'prev',
         'parent',
-        'preview',
         'root',
         'search',
         'self',
@@ -123,7 +125,6 @@ function getStore(config) {
       },
       parentLink: (state, getters) => getters.getLink('parent'),
       collectionLink: (state, getters) => getters.getLink('collection'),
-      // ToDo: Currently, only GET search requests are supported
       searchLink: (state, getters) => {
         let links = [];
         if (getters.root) {
@@ -132,6 +133,7 @@ function getStore(config) {
         else if (state.data instanceof STAC) {
           links = state.data.getLinksWithRels(['search']);
         }
+        // ToDo: Currently, only GET search requests are supported
         return links.find(link => Utils.isStacMediaType(link.type, true) && link.method !== 'POST');
       },
       supportsSearch: (state, getters) => Boolean(getters.searchLink),
@@ -143,7 +145,7 @@ function getStore(config) {
         else if (state.data instanceof STAC && Array.isArray(state.data.conformsTo)) {
           conformance = state.data.conformsTo;
         }
-        let regexp = new RegExp('^' + conformanceClass.replace('*', '[^/]+').replace(/\/?#/, '/?#') + '$');
+        let regexp = new RegExp('^' + conformanceClass.replaceAll('*', '[^/]+').replace(/\/?#/, '/?#') + '$');
         return !!conformance.find(uri => uri.match(regexp));
       },
 
@@ -199,7 +201,7 @@ function getStore(config) {
         }
       },
       thumbnails: state => state.data ? state.data.getThumbnails(true) : [],
-      additionalLinks: state => state.data ? state.data.getLinksWithOtherRels(state.supportedRelTypes) : [],
+      additionalLinks: state => state.data ? state.data.getLinksWithOtherRels(state.supportedRelTypes).filter(link => link.rel !== 'preview' || !Utils.canBrowserDisplayImage(link)) : [],
 
       toBrowserPath: (state, getters) => url => {
         // ToDo: proxy support
@@ -463,6 +465,14 @@ function getStore(config) {
       showGlobalError(state, error) {
         console.error(error);
         state.globalError = error;
+      },
+      addQueryables(state, queryables) {
+        if (Utils.isObject(queryables) && Utils.isObject(queryables.properties)) {
+          state.queryables = Object.keys(queryables.properties).map(key => new Queryable(key, queryables.properties[key]));
+        }
+        else {
+          state.queryables = [];
+        }
       }
     },
     actions: {
@@ -606,6 +616,7 @@ function getStore(config) {
           filters.limit = cx.state.itemsPerPage;
         }
         cx.commit('setApiItemsFilter', filters);
+
         link = Utils.addFiltersToLink(link, filters);
 
         let response = await stacRequest(cx, link);
@@ -667,6 +678,22 @@ function getStore(config) {
           });
           cx.commit('addApiCollections', { data: response.data, stac, show });
         }
+      },
+      async loadQueryables(cx, url) {
+        let schemas;
+        try {
+          let response = await stacRequest(cx, Utils.toAbsolute('queryables', url));
+          try {
+            const refParser = require('@apidevtools/json-schema-ref-parser');
+            schemas = await refParser.dereference(response.data);
+          } catch (error) {
+            schemas = response.data; // Use data with $refs included as fallback
+            console.error(error);
+          }
+        } catch (error) {
+          console.log('Queryables not supported by API');
+        }
+        cx.commit('addQueryables', schemas);
       },
       async validate(cx, url) {
         if (typeof cx.state.valid === 'boolean') {

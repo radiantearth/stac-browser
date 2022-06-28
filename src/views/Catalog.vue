@@ -43,8 +43,11 @@
         <Catalogs :catalogs="catalogs" :hasMore="hasMoreCollections" @loadMore="loadMoreCollections" />
       </b-col>
       <b-col class="items-container" v-if="hasItems">
-        <Items :stac="data" :items="items" :api="isApi" :apiFilters="apiItemsFilter" :pagination="itemPages"
-          @paginate="paginateItems" @filterItems="filterItems" />
+        <Items
+          :stac="data" :items="items" :api="isApi" :apiFilters="apiItemsFilter"
+          :pagination="itemPages"
+          @paginate="paginateItems" @filterItems="filterItems"
+        />
         <Assets v-if="hasItemAssets" :assets="data.item_assets" :definition="true" />
       </b-col>
     </b-row>
@@ -64,9 +67,10 @@ import { Formatters } from '@radiantearth/stac-fields';
 import { BTabs, BTab } from 'bootstrap-vue';
 import Utils from '../utils';
 
+const SORRY_ITEM_LIST = "Sorry, can't load the list of items.";
+
 export default {
   name: "Catalog",
-  mixins: [ShowAssetMixin],
   components: {
     AnonymizedNotice: () => import('../components/AnonymizedNotice.vue'),
     Assets: () => import('../components/Assets.vue'),
@@ -84,6 +88,7 @@ export default {
     ReadMore,
     Thumbnails: () => import('../components/Thumbnails.vue')
   },
+  mixins: [ShowAssetMixin],
   data() {
     return {
       ignoredMetadataFields: [
@@ -166,14 +171,17 @@ export default {
       try {
         await this.$store.dispatch('loadApiItems', {link, show: true});
       } catch (error) {
-        this.$root.$emit('error', error, 'Sorry, loading the list of STAC Items failed.');
+        this.$root.$emit('error', error, SORRY_ITEM_LIST);
       }
     },
-    async filterItems(filters) {
+    async filterItems(filters, reset) {
+      if (reset) {
+        this.$store.commit('resetApiItems');
+      }
       try {
         await this.$store.dispatch('loadApiItems', {link: this.apiItemsLink, show: true, filters});
       } catch (error) {
-        this.$root.$emit('error', error, 'Sorry, loading a filtered list of STAC Items failed.');
+        this.$root.$emit('error', error, reset ? SORRY_ITEM_LIST : "Sorry, can't load the filtered list of items.");
       }
     },
     mapClicked(stac) {

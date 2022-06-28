@@ -1,27 +1,20 @@
 <template>
-  <component :is="component" class="stac-link" v-bind="attributes">
+  <component :is="component" class="stac-link" v-bind="attributes" :title="tooltip">
     <template v-if="icon">
-      <img :src="icon.href" :alt="icon.title" :title="icon.title" class="icon mr-2" />
+      <img :src="icon.href" :alt="icon.title" :title="icon.title" class="icon mr-2">
     </template>
     <span class="title">{{ displayTitle }}</span>
-    <template v-if="!isStacBrowserLink">
-      <small><b-icon-box-arrow-up-right class="ml-1 align-baseline" /></small>
-    </template>
   </component>
 </template>
 
 <script>
 import { mapState, mapGetters } from 'vuex';
 import Utils from '../utils';
-import STAC from '../stac';
-import { BIconBoxArrowUpRight } from 'bootstrap-vue';
+import STAC from '../models/stac';
 import URI from 'urijs';
 
 export default {
   name: "StacLink",
-  components: {
-    BIconBoxArrowUpRight
-  },
   props: {
     data: {
       type: [Object, Array],
@@ -33,6 +26,10 @@ export default {
     },
     fallbackTitle: {
       type: [String, Function],
+      default: null
+    },
+    tooltip: {
+      type: String,
       default: null
     }
   },

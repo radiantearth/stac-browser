@@ -1,22 +1,22 @@
 <template>
-  <div class="search">
-    <div v-if="!root" class="loading text-center">
-      <b-spinner label="Loading..."></b-spinner>
-    </div>
-    <b-alert v-else-if="!supportsSearch" variant="danger" show>Item Search (with 'GET') is not supported by the API.</b-alert>
+  <div class="search d-flex flex-column">
+    <Loading v-if="!root" stretch />
+    <b-alert v-else-if="!supportsSearch" variant="danger" show>Item Search is not supported by the API.</b-alert>
     <b-row v-else>
       <b-col class="left">
-        <ItemFilter :stac="root" title="" :value="filters" :sort="canSort" @input="setFilters" />
+        <ItemFilter :stac="root" title="" :value="filters" :extents="canFilterExtents" :sort="canSort" :filter="canFilterCql" @input="setFilters" />
       </b-col>
       <b-col class="right">
-        <b-alert v-if="loading === null" variant="light" show>Please modify the search criteria.</b-alert>
-        <div v-else-if="loading === true" class="loading text-center">
-          <b-spinner label="Loading..."></b-spinner>
-        </div>
-        <b-alert v-else-if="apiItems.length === 0" variant="info" show>Sorry, no items match the given criteria.</b-alert>
+        <b-alert v-if="loading === null" variant="info" show>Please modify the search criteria.</b-alert>
+        <Loading v-else-if="loading === true" />
+        <b-alert v-else-if="apiItems.length === 0" variant="warning" show>No items found for the given filters.</b-alert>
         <template v-else>
           <Map :stac="root" :stacLayerData="itemCollection" @mapClicked="mapClicked" />
-          <Items :stac="root" :items="apiItems" :api="true" :allowFilter="false" :selected="selected" :pagination="itemPages" @paginate="paginateItems" />
+          <Items
+            :stac="root" :items="apiItems" :api="true" :allowFilter="false"
+            :selected="selected" :pagination="itemPages"
+            @paginate="paginateItems"
+          />
         </template>
       </b-col>
     </b-row>
@@ -27,16 +27,28 @@
 import Items from '../components/Items.vue';
 import { mapGetters, mapState } from "vuex";
 import Utils from '../utils';
-import { ITEMSEARCH_SORT } from '../api';
+import sortCapabilitiesMixinGenerator from '../components/SortCapabilitiesMixin';
+import ItemFilter from '../components/ItemFilter.vue';
+import Loading from '../components/Loading.vue';
 
 const pageTitle = 'Search';
 
 export default {
   name: "Search",
+  mixins: [
+    sortCapabilitiesMixinGenerator(false)
+  ],
   components: {
-    ItemFilter: () => import('../components/ItemFilter.vue'),
+    ItemFilter,
     Items,
+    Loading,
     Map: () => import('../components/Map.vue')
+  },
+  props: {
+    loadRoot: {
+      type: String,
+      default: null
+    }
   },
   data() {
     return {
@@ -45,21 +57,9 @@ export default {
       selected: []
     };
   },
-  props: {
-    loadRoot: {
-      type: String,
-      default: null
-    }
-  },
-  created() {
-    if (this.loadRoot && !this.root) {
-      let catalogUrl = this.fromBrowserPath(this.loadRoot);
-      this.$store.commit("config", { catalogUrl });
-    }
-  },
   computed: {
     ...mapState(['apiItems', 'apiItemsLink', 'apiItemsPagination', 'apiItemsFilter']),
-    ...mapGetters(["root", "searchLink", 'supportsSearch', 'supportsConformance', 'fromBrowserPath']),
+    ...mapGetters(["root", "searchLink", 'supportsSearch', 'fromBrowserPath']),
     itemCollection() {
       return {
         type: 'FeatureCollection',
@@ -74,9 +74,6 @@ export default {
         pages.first = Utils.addFiltersToLink(this.apiItemsLink, this.apiItemsFilter);
       }
       return pages;
-    },
-    canSort() {
-      return this.supportsConformance(ITEMSEARCH_SORT);
     }
   },
   watch:{
@@ -87,6 +84,12 @@ export default {
           this.showPage();
         }
       }
+    }
+  },
+  created() {
+    if (this.loadRoot && !this.root) {
+      let catalogUrl = this.fromBrowserPath(this.loadRoot);
+      this.$store.commit("config", { catalogUrl });
     }
   },
   methods: {
@@ -151,6 +154,8 @@ export default {
 @import "../theme/variables.scss";
 
 .search {
+  min-height: 100%;
+
   .left {
     min-width: 200px;
     flex-basis: 40%;

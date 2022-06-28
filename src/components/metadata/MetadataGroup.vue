@@ -4,7 +4,9 @@
           <span v-if="label" v-html="label" />
           <template v-else>General</template>
       </b-card-title>
-      <MetadataEntry v-for="(entry, key) in properties" v-bind="entry" :field="key" :key="key" />
+      <section class="border metadata-rows">
+        <MetadataEntry v-for="(entry, key) in properties" v-bind="entry" :field="key" :key="key" />
+      </section>
   </b-card>
 </template>
 

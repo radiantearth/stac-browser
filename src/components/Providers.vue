@@ -2,7 +2,11 @@
   <section class="providers mb-4">
     <h2>Providers</h2>
     <b-list-group v-if="isSimple">
-      <b-list-group-item v-for="(provider, key) in providers" :key="key" :href="provider.url" :disabled="!provider.url" target="_blank" variant="provider" class="provider">
+      <b-list-group-item
+        v-for="(provider, key) in providers" :key="key" :href="provider.url" :disabled="!provider.url"
+        target="_blank" variant="provider"
+        class="provider"
+      >
         {{ provider.name }}
         <div class="roles ml-1" v-if="Array.isArray(provider.roles)">
           <b-badge v-for="role in provider.roles" :key="role" variant="secondary" class="ml-1 mb-1">{{ role }}</b-badge>
@@ -40,7 +44,7 @@ export default {
       });
     }
   }
-}
+};
 </script>
 
 <style lang="scss">

@@ -4,7 +4,7 @@
       <Share class="float-right" :title="title" :stacUrl="url" :stacVersion="stacVersion" />
       <h1>
         <template v-if="icon">
-          <img :src="icon.href" :alt="icon.title" :title="icon.title" class="icon mr-2" />
+          <img :src="icon.href" :alt="icon.title" :title="icon.title" class="icon mr-2">
         </template>
         <span class="title">{{ title }}</span>
       </h1>
@@ -33,7 +33,7 @@
 import { mapState, mapGetters } from 'vuex';
 import StacLink from './StacLink.vue';
 import { BIconArrow90degUp, BIconBook, BIconFolderSymlink, BIconSearch } from "bootstrap-vue";
-import STAC from '../stac';
+import STAC from '../models/stac';
 import Utils from '../utils';
 
 export default {
@@ -97,7 +97,7 @@ export default {
       return this.$router.currentRoute.name === 'search';
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
