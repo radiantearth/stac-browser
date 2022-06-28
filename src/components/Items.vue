@@ -12,7 +12,7 @@
         <b-icon-search /> Filter
       </b-button>
       <b-collapse id="itemFilter" v-model="filtersOpen">
-        <ItemFilter v-if="filtersOpen" :stac="stac" :value="filters" @input="emitFilter" :sort="canSort" :collectionOnly="true" />
+        <ItemFilter v-if="filtersOpen" :stac="stac" :value="filters" @input="emitFilter" :extents="canFilterExtents" :sort="canSort" :filter="canFilterCql" :collectionOnly="true" />
       </b-collapse>
     </template>
 
@@ -35,11 +35,13 @@ import Pagination from './Pagination.vue';
 import { BCollapse, BIconSearch } from "bootstrap-vue";
 import Utils from '../utils';
 import STAC from '../models/stac';
-import { mapGetters } from "vuex";
-import { ITEMSEARCH_SORT } from '../api';
+import sortCapabilitiesMixinGenerator from './SortCapabilitiesMixin';
 
 export default {
   name: "Items",
+  mixins: [
+    sortCapabilitiesMixinGenerator(true)
+  ],
   components: {
     BCollapse,
     BIconSearch,
@@ -91,7 +93,6 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['supportsConformance']),
     hasMore() {
       return this.items.length > this.shownItems;
     },
@@ -112,9 +113,6 @@ export default {
       else {
         return items;
       }
-    },
-    canSort() {
-      return this.supportsConformance(ITEMSEARCH_SORT);
     },
     showPagination() {
       if (this.api) {

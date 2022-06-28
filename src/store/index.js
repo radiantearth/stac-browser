@@ -125,7 +125,6 @@ function getStore(config) {
       },
       parentLink: (state, getters) => getters.getLink('parent'),
       collectionLink: (state, getters) => getters.getLink('collection'),
-      // ToDo: Currently, only GET search requests are supported
       searchLink: (state, getters) => {
         let links = [];
         if (getters.root) {
@@ -134,6 +133,7 @@ function getStore(config) {
         else if (state.data instanceof STAC) {
           links = state.data.getLinksWithRels(['search']);
         }
+        // ToDo: Currently, only GET search requests are supported
         return links.find(link => Utils.isStacMediaType(link.type, true) && link.method !== 'POST');
       },
       supportsSearch: (state, getters) => Boolean(getters.searchLink),
@@ -145,7 +145,7 @@ function getStore(config) {
         else if (state.data instanceof STAC && Array.isArray(state.data.conformsTo)) {
           conformance = state.data.conformsTo;
         }
-        let regexp = new RegExp('^' + conformanceClass.replace('*', '[^/]+').replace(/\/?#/, '/?#') + '$');
+        let regexp = new RegExp('^' + conformanceClass.replaceAll('*', '[^/]+').replace(/\/?#/, '/?#') + '$');
         return !!conformance.find(uri => uri.match(regexp));
       },
 

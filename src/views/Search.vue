@@ -4,7 +4,7 @@
     <b-alert v-else-if="!supportsSearch" variant="danger" show>Item Search is not supported by the API.</b-alert>
     <b-row v-else>
       <b-col class="left">
-        <ItemFilter :stac="root" title="" :value="filters" :sort="canSort" @input="setFilters" />
+        <ItemFilter :stac="root" title="" :value="filters" :extents="canFilterExtents" :sort="canSort" :filter="canFilterCql" @input="setFilters" />
       </b-col>
       <b-col class="right">
         <b-alert v-if="loading === null" variant="info" show>Please modify the search criteria.</b-alert>
@@ -27,7 +27,7 @@
 import Items from '../components/Items.vue';
 import { mapGetters, mapState } from "vuex";
 import Utils from '../utils';
-import { ITEMSEARCH_SORT } from '../api';
+import sortCapabilitiesMixinGenerator from '../components/SortCapabilitiesMixin';
 import ItemFilter from '../components/ItemFilter.vue';
 import Loading from '../components/Loading.vue';
 
@@ -35,6 +35,9 @@ const pageTitle = 'Search';
 
 export default {
   name: "Search",
+  mixins: [
+    sortCapabilitiesMixinGenerator(false)
+  ],
   components: {
     ItemFilter,
     Items,
@@ -56,7 +59,7 @@ export default {
   },
   computed: {
     ...mapState(['apiItems', 'apiItemsLink', 'apiItemsPagination', 'apiItemsFilter']),
-    ...mapGetters(["root", "searchLink", 'supportsSearch', 'supportsConformance', 'fromBrowserPath']),
+    ...mapGetters(["root", "searchLink", 'supportsSearch', 'fromBrowserPath']),
     itemCollection() {
       return {
         type: 'FeatureCollection',
@@ -71,9 +74,6 @@ export default {
         pages.first = Utils.addFiltersToLink(this.apiItemsLink, this.apiItemsFilter);
       }
       return pages;
-    },
-    canSort() {
-      return this.supportsConformance(ITEMSEARCH_SORT);
     }
   },
   watch:{

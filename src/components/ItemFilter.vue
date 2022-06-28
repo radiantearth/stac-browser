@@ -4,11 +4,11 @@
       <b-card-body>
         <Loading v-if="!loaded" fill />
 
-        <b-form-group label="Temporal Extent" label-for="datetime" description="All times in UTC.">
+        <b-form-group v-if="extents" label="Temporal Extent" label-for="datetime" description="All times in UTC.">
           <date-picker id="datetime" :value="query.datetime" @input="setDateTime" range input-class="form-control mx-input" />
         </b-form-group>
 
-        <b-form-group label="Spatial Extent" label-for="provideBBox">
+        <b-form-group v-if="extents" label="Spatial Extent" label-for="provideBBox">
           <b-form-checkbox id="provideBBox" v-model="provideBBox" value="1" @change="setBBox">Filter by spatial extent</b-form-checkbox>
           <Map class="mb-4" v-if="provideBBox" :stac="stac" :selectBounds="true" @bounds="setBBox" />
         </b-form-group>
@@ -35,7 +35,7 @@
           />
         </b-form-group>
 
-        <div class="additional-filters" v-if="Array.isArray(queryables) && queryables.length > 0">
+        <div class="additional-filters" v-if="this.filter && Array.isArray(queryables) && queryables.length > 0">
           <b-form-group label="Additional filters" label-for="availableFields">
             <b-alert variant="warning" show>This feature is still experimental and may give unexpected results!</b-alert>
 
@@ -119,7 +119,15 @@ export default {
       type: String,
       default: 'Filter'
     },
+    extents: {
+      type: Boolean,
+      default: false
+    },
     sort: {
+      type: Boolean,
+      default: false
+    },
+    filter: {
       type: Boolean,
       default: false
     },
@@ -176,10 +184,12 @@ export default {
   },
   created() {
     let promises = [];
-    promises.push(
-      this.$store.dispatch('loadQueryables', this.stac.getAbsoluteUrl())
-        .catch(error => console.error(error))
-    );
+    if (this.filter) {
+      promises.push(
+        this.$store.dispatch('loadQueryables', this.stac.getAbsoluteUrl())
+          .catch(error => console.error(error))
+      );
+    }
     if (!this.collectionOnly && this.apiCollections.length === 0) {
       promises.push(
         this.$store.dispatch('loadNextApiCollections', {stac: this.root, show: true})
