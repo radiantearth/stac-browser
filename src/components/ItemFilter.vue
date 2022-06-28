@@ -4,7 +4,7 @@
       <b-card-body>
         <Loading v-if="!loaded" fill />
 
-        <b-form-group label="Temporal Extent" label-for="datetime">
+        <b-form-group label="Temporal Extent" label-for="datetime" description="All times in UTC.">
           <date-picker id="datetime" :value="query.datetime" @input="setDateTime" range input-class="form-control mx-input" />
         </b-form-group>
 
@@ -160,17 +160,8 @@ export default {
       immediate: true,
       handler(value) {
         let query = Object.assign({}, this.getDefaultValues(), value);
-        // Convert from UTC to locale time (needed for vue2-datetimepicker)
-        // see https://github.com/mengxiong10/vue2-datepicker/issues/388
         if (Array.isArray(query.datetime)) {
-          query.datetime = query.datetime.map(dt => {
-            if (dt instanceof Date) {
-              const value = new Date(dt);
-              const offset = value.getTimezoneOffset();
-              dt = new Date(value.getTime() + offset * 60 * 1000);
-            }
-            return dt;
-          });
+          query.datetime = query.datetime.map(Utils.dateFromUTC);
         }
         else if (query.filters.length > 0) {
           query.filters = query.filters.map(f => Object.assign({}, f));
@@ -253,14 +244,7 @@ export default {
     },
     setDateTime(datetime) {
       if (datetime.find(dt => dt instanceof Date)) {
-        datetime = datetime.map(dt => {
-          if (dt instanceof Date) {
-            // Convert to UTC
-            const offset = new Date().getTimezoneOffset();
-            return new Date(dt.getTime() - offset * 60 * 1000);
-          }
-          return dt;
-        });
+        datetime = datetime.map(Utils.dateToUTC);
         this.query.datetime = datetime;
       }
       else {

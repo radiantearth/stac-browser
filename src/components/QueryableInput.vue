@@ -38,6 +38,13 @@
         :value="value"
         @input="updateValue($event)"
       />
+      <date-picker
+        v-else-if="queryableType === 'dateField'"
+        type="datetime"
+        class="value"
+        :value="value"
+        @input="updateValue($event)"
+      />
 
       <b-button class="delete" size="sm" variant="danger" @click="$emit('remove-queryable')">
         <b-icon-x-circle-fill aria-hidden="true" />
@@ -52,14 +59,16 @@
 
 <script>
 import Utils from '../utils';
+import DatePicker from 'vue2-datepicker';
 import { BFormInput, BFormSelect, BIconXCircleFill } from 'bootstrap-vue';
     
 export default {
   name: 'QueryableInput',
   components: {
-     BFormInput,
-     BFormSelect,
-     BIconXCircleFill
+    BFormInput,
+    BFormSelect,
+    BIconXCircleFill,
+    DatePicker
   },
   props: {
     title: {
@@ -97,6 +106,9 @@ export default {
       if (this.operator === 'LIKE') {
         return 'You can use wildcard characters. <code>_</code> matches a single character, <code>%</code> matches any number of characters. To search for a wildcard character specifically, you need to add a <code>\\</code> in front of the character.';
       }
+      else if (this.queryableType === 'dateField') {
+        return 'All times in UTC.';
+      }
       return null;
     },
     queryableType() {
@@ -107,7 +119,12 @@ export default {
         return 'numberField';
       }
       else if (this.schemaTypes.includes('string')) {
-        return 'textField';
+        if (this.schema.format === 'date-time') {
+          return 'dateField';
+        }
+        else {
+          return 'textField';
+        }
       }
       return null;
     },
@@ -118,14 +135,11 @@ export default {
       const NOT_EQUALS = {text: 'not equal to', value: '<>'};
       const LIKE = {text: 'matches', value: 'LIKE'};
 
-      if (this.isNumeric) {
-        return [EQUALS, NOT_EQUALS, LESS_THAN, MORE_THAN];
+      if (this.isNumeric || this.queryableType === 'dateField') {
+        return [LESS_THAN, MORE_THAN, EQUALS, NOT_EQUALS];
         }
       else if (this.queryableType === 'textField') {
         return [EQUALS, NOT_EQUALS, LIKE];
-      }
-      else if (this.queryableType === 'selectField') {
-        return [EQUALS, NOT_EQUALS];
       }
       else {
         return [EQUALS, NOT_EQUALS];
@@ -183,6 +197,9 @@ export default {
       else if (this.queryableType === 'textField') {
         return '';
       }
+      else if (this.queryableType === 'dateField') {
+        return new Date();
+      }
       else if (this.queryableType === 'numberField') {
         if (typeof this.schema.minimum !== 'undefined') {
          return this.schema.minimum;
@@ -216,7 +233,7 @@ export default {
   }
   .title, .value {
     flex-grow: 4;
-    width: 8rem;
+    width: 8rem !important;
   }
 }
 

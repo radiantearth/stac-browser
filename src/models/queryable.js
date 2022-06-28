@@ -1,4 +1,5 @@
 import { label } from "@radiantearth/stac-fields";
+import Utils from '../utils';
 
 export default class Queryable {
 
@@ -15,15 +16,22 @@ export default class Queryable {
   }
 
   toJSON(queryable) {
+    let value = queryable.value;
+    if (value instanceof Date) {
+      value = {timestamp: Utils.dateToUTC(value).toISOString()};
+    }
     return {
       op: queryable.operator,
-      args: [{property: this.id }, queryable.value]
+      args: [{property: this.id }, value]
     };
   }
 
   toText(queryable) {
     let value = queryable.value;
-    if (typeof value === 'string') {
+    if (value instanceof Date) {
+      value = `TIMESTAMP('${Utils.dateToUTC(value).toISOString()}')`;
+    }
+    else if (typeof value === 'string') {
       value = `'${value.replace("'", "\\'")}'`;
     }
     return `${this.id} ${queryable.operator} ${value}`;
