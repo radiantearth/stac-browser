@@ -15,7 +15,7 @@
 
         <b-form-group v-if="!collectionOnly" label="Collections" label-for="collections">
           <b-form-select
-            v-if="collections"
+            v-if="collections.length > 0"
             id="collections" :value="query.collections" @input="setCollections"
             :options="collections" multiple
           />
@@ -157,7 +157,7 @@ export default {
     ...mapGetters(['hasMoreCollections', 'root']),
     collections() {
       if (this.hasMoreCollections || this.collectionOnly) {
-        return null;
+        return [];
       }
       return this.apiCollections
         .map(c => ({
