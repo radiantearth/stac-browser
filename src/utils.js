@@ -192,14 +192,16 @@ export default class Utils {
 	}
 
 	static formatBboxQuery(value) {
-		let out = null;
 		if (typeof value.toBBoxString === 'function') {
-			out = value.toBBoxString();
+			// This is a Leaflet LatLngBounds Object
+			value = [
+				Math.max(value.getWest(), -180),
+				Math.max(value.getSouth(), -90),
+				Math.min(value.getEast(), 180),
+				Math.min(value.getNorth(), 90)
+			];
 		}
-		else {
-			out = value.join(',');
-		}
-		return out;
+		return value.join(',');
 	}
 
 	static addFiltersToLink(link, filters = {}) {

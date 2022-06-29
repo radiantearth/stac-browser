@@ -38,7 +38,7 @@
     "bs58": "^4.0.1",
     "commonmark": "^0.29.3",
     "core-js": "^3.6.5",
-    "leaflet": "^1.8.0",
+    "leaflet": "1.7.0",
     "node-polyfill-webpack-plugin": "^2.0.0",
     "remove-markdown": "^0.3.0",
     "stac-layer": "^0.12.0",

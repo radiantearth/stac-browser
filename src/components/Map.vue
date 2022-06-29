@@ -112,6 +112,7 @@ export default {
   },
   created() {
     this.mapOptions.scrollWheelZoom = this.selectBounds || this.stac?.isItem();
+    this.osmOptions.noWrap = this.selectBounds;
   },
   mounted() {
     // Solves https://github.com/radiantearth/stac-browser/issues/95 by showing the map
