@@ -194,11 +194,13 @@ export default class Utils {
 	static formatBboxQuery(value) {
 		if (typeof value.toBBoxString === 'function') {
 			// This is a Leaflet LatLngBounds Object
+			const Y = 85.06;
+			const X = 180;
 			value = [
-				Math.max(value.getWest(), -180),
-				Math.max(value.getSouth(), -90),
-				Math.min(value.getEast(), 180),
-				Math.min(value.getNorth(), 90)
+				Math.max(value.getWest(), -X),
+				Math.max(value.getSouth(), -Y),
+				Math.min(value.getEast(), X),
+				Math.min(value.getNorth(), Y)
 			];
 		}
 		return value.join(',');

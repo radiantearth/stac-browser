@@ -14,7 +14,7 @@ import { CRS } from "leaflet";
 import { LMap, LTileLayer, LWMSTileLayer } from 'vue2-leaflet';
 import LControlFullscreen from 'vue2-leaflet-fullscreen';
 import Utils from '../utils';
-import '@lweller/leaflet-areaselect';
+import './map/leaflet-areaselect';
 import { mapState } from 'vuex';
 import STAC from '../models/stac';
 
@@ -222,5 +222,5 @@ export default {
 
 <style lang="scss">
   @import '~leaflet/dist/leaflet.css';
-  @import '~@lweller/leaflet-areaselect/src/leaflet-areaselect.css';
+  @import '../theme/leaflet-areaselect.scss';
 </style>
