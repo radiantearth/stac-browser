@@ -22,6 +22,7 @@ function getStore(config) {
     stateQueryParameters: {},
 
     apiItems: [],
+    apiItemsLoading: true,
     apiItemsLink: null,
     apiItemsFilter: {},
     apiItemsPagination: {},
@@ -396,6 +397,9 @@ function getStore(config) {
       setApiItemsLink(state, link) {
         state.apiItemsLink = link;
       },
+      setApiItemsLoading(state, loading = true) {
+        state.apiItemsLoading = loading;
+      },
       setApiItems(state, { data, stac, show }) {
         if (!Utils.isObject(data) || !Array.isArray(data.features)) {
           return;
@@ -603,43 +607,51 @@ function getStore(config) {
         }
       },
       async loadApiItems(cx, {link, stac, show, filters}) {
-        let baseUrl = cx.state.url;
-        if (stac instanceof STAC) {
-          link = stac.getApiItemsLink();
-          baseUrl = stac.getAbsoluteUrl();
-        }
+        cx.commit('setApiItemsLoading');
 
-        if (!Utils.isObject(filters)) {
-          filters = {};
-        }
-        if (typeof filters.limit !== 'number') {
-          filters.limit = cx.state.itemsPerPage;
-        }
-        cx.commit('setApiItemsFilter', filters);
-
-        link = Utils.addFiltersToLink(link, filters);
-
-        let response = await stacRequest(cx, link);
-        if (!Utils.isObject(response.data) || !Array.isArray(response.data.features)) {
-          throw new Error('The API response is not a valid list of STAC Items');
-        }
-        else {
-          response.data.features = response.data.features.map(item => {
-            let selfLink = Utils.getLinkWithRel(item.links, 'self');
-            let url;
-            if (selfLink?.href) {
-              url = Utils.toAbsolute(selfLink.href, baseUrl);
-            }
-            else {
-              url = Utils.toAbsolute(`./collections/${cx.state.data.id}/items/${item.id}`, cx.state.catalogUrl || baseUrl);
-            }
-            return new STAC(item, url, cx.getters.toBrowserPath(url));
-          });
-          if (show) {
-            cx.commit('setApiItemsLink', link);
+        try {
+          let baseUrl = cx.state.url;
+          if (stac instanceof STAC) {
+            link = stac.getApiItemsLink();
+            baseUrl = stac.getAbsoluteUrl();
           }
-          cx.commit('setApiItems', { data: response.data, stac, show });
-          return response;
+
+          if (!Utils.isObject(filters)) {
+            filters = {};
+          }
+          if (typeof filters.limit !== 'number') {
+            filters.limit = cx.state.itemsPerPage;
+          }
+          cx.commit('setApiItemsFilter', filters);
+
+          link = Utils.addFiltersToLink(link, filters);
+
+          let response = await stacRequest(cx, link);
+          if (!Utils.isObject(response.data) || !Array.isArray(response.data.features)) {
+            throw new Error('The API response is not a valid list of STAC Items');
+          }
+          else {
+            response.data.features = response.data.features.map(item => {
+              let selfLink = Utils.getLinkWithRel(item.links, 'self');
+              let url;
+              if (selfLink?.href) {
+                url = Utils.toAbsolute(selfLink.href, baseUrl);
+              }
+              else {
+                url = Utils.toAbsolute(`./collections/${cx.state.data.id}/items/${item.id}`, cx.state.catalogUrl || baseUrl);
+              }
+              return new STAC(item, url, cx.getters.toBrowserPath(url));
+            });
+            if (show) {
+              cx.commit('setApiItemsLink', link);
+            }
+            cx.commit('setApiItems', { data: response.data, stac, show });
+            cx.commit('setApiItemsLoading', false);
+            return response;
+          }
+        } catch (error) {
+          cx.commit('setApiItemsLoading', false);
+          throw error;
         }
       },
       async loadNextApiCollections(cx, {stac, show}) {

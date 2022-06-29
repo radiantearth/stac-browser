@@ -19,7 +19,8 @@
           </div>
           <Items
             :stac="root" :items="apiItems" :api="true" :allowFilter="false"
-            :pagination="itemPages" @paginate="paginateItems"
+            :pagination="itemPages" :loading="apiItemsLoading"
+            @paginate="paginateItems"
           />
         </template>
       </b-col>
@@ -80,7 +81,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['apiItems', 'apiItemsLink', 'apiItemsPagination', 'apiItemsFilter']),
+    ...mapState(['apiItems', 'apiItemsLink', 'apiItemsPagination', 'apiItemsFilter', 'apiItemsLoading']),
     ...mapGetters(["root", "searchLink", 'supportsSearch', 'fromBrowserPath']),
     itemCollection() {
       return {

@@ -45,7 +45,7 @@
       <b-col class="items-container" v-if="hasItems">
         <Items
           :stac="data" :items="items" :api="isApi" :apiFilters="apiItemsFilter"
-          :pagination="itemPages"
+          :pagination="itemPages" :loading="apiItemsLoading"
           @paginate="paginateItems" @filterItems="filterItems"
         />
         <Assets v-if="hasItemAssets" :assets="data.item_assets" :definition="true" />
@@ -120,7 +120,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination', 'apiItemsFilter']),
+    ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination', 'apiItemsFilter', 'apiItemsLoading']),
     ...mapGetters(['additionalLinks', 'catalogs', 'isCollection', 'items', 'hasMoreCollections']),
     licenses() {
       if (this.isCollection && this.data.license) {

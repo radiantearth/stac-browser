@@ -19,13 +19,16 @@
       </b-collapse>
     </template>
 
-    <b-card-group v-if="chunkedItems.length > 0" columns>
-      <Item v-for="item in chunkedItems" :item="item" :key="item.href" />
-    </b-card-group>
-    <b-alert v-else :variant="hasFilters ? 'warning' : 'info'" show>
-      <template v-if="hasFilters">No items found for the given filters.</template>
-      <template v-else>No items available for this collection.</template>
-    </b-alert>
+    <section class="list">
+      <Loading v-if="loading" fill top />
+      <b-card-group v-if="chunkedItems.length > 0" columns>
+        <Item v-for="item in chunkedItems" :item="item" :key="item.href" />
+      </b-card-group>
+      <b-alert v-else :variant="hasFilters ? 'warning' : 'info'" show>
+        <template v-if="hasFilters">No items found for the given filters.</template>
+        <template v-else>No items available for this collection.</template>
+      </b-alert>
+    </section>
 
     <Pagination v-if="showPagination" :pagination="pagination" @paginate="paginate" />
     <b-button v-else-if="hasMore" @click="showMore" variant="primary" v-b-visible.200="showMore">Show more...</b-button>
@@ -34,6 +37,7 @@
 
 <script>
 import Item from './Item.vue';
+import Loading from './Loading.vue';
 import Pagination from './Pagination.vue';
 import { BCollapse, BIconSearch } from "bootstrap-vue";
 import Utils from '../utils';
@@ -47,6 +51,7 @@ export default {
     BIconSearch,
     Item,
     ItemFilter: () => import('./ItemFilter.vue'),
+    Loading,
     Pagination,
     SortButtons: () => import('./SortButtons.vue')
   },
@@ -57,6 +62,10 @@ export default {
     items: {
       type: Array,
       required: true
+    },
+    loading: {
+      type: Boolean,
+      default: false
     },
     stac: {
       type: Object,
@@ -145,6 +154,11 @@ export default {
 
 <style lang="scss" scoped>
 .items {
+
+  .list {
+    position: relative;
+  }
+
   > h2 {
     .title, .badge {
       vertical-align: middle;
