@@ -62,7 +62,10 @@ function getStore(config) {
         'root',
         'search',
         'self',
-      ]
+      ],
+      appState: {
+        openAssetsUids: []
+      }
     }),
     getters: {
       loading: state => !state.url || !state.data || state.database[state.url] instanceof Loading,
@@ -331,6 +334,28 @@ function getStore(config) {
       queryParameters(state, params) {
         for(let key in params) {
           state[`${key}QueryParameters`] = params[key];
+        }
+      },
+      setAppStateFromQueryStringObject (state, queryObject) {
+        const appState = state.appState;
+        for (const [key, value] of Object.entries(queryObject)) {
+          if (Array.isArray(appState[key])) {
+            const values = value.split(',');
+            state.appState[key].push(...values);
+          }
+        }
+      },
+      addUidToOpenAssets (state, uid) {
+        const idx = state.appState.openAssetsUids.indexOf(uid);
+        // need to revent duplicates because of the way the collapse v-model works
+        if (idx === -1) {
+          state.appState.openAssetsUids.push(uid);
+        }
+      },
+      removeUidFromOpenAssets (state, uid) {
+        const idx = state.appState.openAssetsUids.indexOf(uid);
+        if (idx > -1) {
+          state.appState.openAssetsUids.splice(idx, 1);
         }
       },
       stacIndex(state, index) {

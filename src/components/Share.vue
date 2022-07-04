@@ -102,6 +102,16 @@ export default {
             let title = encodeURIComponent(this.title);
             let text = encodeURIComponent(this.message);
             return `mailto:?subject=${title}&body=${text}`;
+        },
+        appStateAsParams () {
+          var uri = new URI("?");
+          const appState = this.$store.state.appState;
+          for (const [key, value] of Object.entries(appState)) {
+            if (Array.isArray(value) && value.length > 0) {
+              uri.addSearch(key, value);
+            }
+          }
+          return uri.toString();
         }
     },
     methods: {
@@ -109,7 +119,12 @@ export default {
             await this.$store.dispatch('validate', this.stacUrl);
         },
         browserUrl() {
-            return window.location.toString();
+            let str = window.location.toString();
+            const querystring = this.appStateAsParams;
+            if (querystring !== '?') {
+              str += querystring;
+            }
+            return str;
         }
     }
 };

@@ -19,7 +19,7 @@
         </div>
       </b-button>
     </b-card-header>
-    <b-collapse :id="uid" v-model="expanded" accordion="assets" role="tabpanel">
+    <b-collapse :id="uid" v-model="expanded" accordion="assets" role="tabpanel" @input="collapseToggled">
       <b-card-body>
         <b-card-title>{{ fileFormat }}</b-card-title>
         <b-button-group class="actions" v-if="href">
@@ -240,9 +240,18 @@ export default {
         text.push(this.from);
       }
       return text.join(' ');
+    },
+    openAssetsUids () {
+      return this.$store.state.appState.openAssetsUids;
     }
   },
   created() {
+
+    if (this.openAssetsUids.indexOf(this.uid) > -1) {
+      this.expanded = true;
+      return;
+    }
+
     if (typeof this.expand === 'boolean') {
       this.expanded = this.expand;
     }
@@ -279,6 +288,13 @@ export default {
           return 'local file system';
       }
       return '';
+    },
+    collapseToggled (isVisible) {
+      if (isVisible) {
+        this.$store.commit('addUidToOpenAssets', this.uid);
+      } else {
+        this.$store.commit('removeUidFromOpenAssets', this.uid);
+      }
     }
   }
 };
