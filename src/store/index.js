@@ -22,7 +22,7 @@ function getStore(config) {
     stateQueryParameters: {},
 
     apiItems: [],
-    apiItemsLoading: true,
+    apiItemsLoading: false,
     apiItemsLink: null,
     apiItemsFilter: {},
     apiItemsPagination: {},
