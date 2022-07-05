@@ -13,6 +13,7 @@
 import StacLink from './StacLink.vue';
 import Fields from '@radiantearth/stac-fields/fields.json';
 import Utils from '../utils';
+import { Helper } from '@radiantearth/stac-fields';
 
 export default {
   name: "Links",
@@ -35,8 +36,11 @@ export default {
       if (rel in Fields.links.rel.mapping) {
         rel = Fields.links.rel.mapping[rel];
       }
+      else {
+        rel = Helper.formatKey(rel);
+      }
       let title = Utils.titleForHref(link.href);
-      return `${rel} (${title})`;
+      return `${rel}: ${title}`;
     }
   }
 };
@@ -45,12 +49,14 @@ export default {
 <style lang="scss">
 #stac-browser .links {
   > ul {
-    list-style-type: none;
+    list-style-type: '-';
     margin: 0;
+    margin-left: 1em;
     padding: 0;
 
     > li {
       margin-bottom: 0.2em;
+      padding-left: 0.5em;
     }
   }
 }
