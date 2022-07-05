@@ -6,7 +6,7 @@
       <ViewButtons class="ml-4" v-model="view" />
       <SortButtons v-if="!hasMore" class="ml-2" v-model="sort" />
     </h2>
-    <SearchBox v-if="!hasMore" class="mt-3 mb-2" v-model="searchTerm" placeholder="Search catalogs" />
+    <SearchBox v-if="!hasMore" class="mt-3 mb-2" v-model="searchTerm" placeholder="Filter catalogs by title" />
     <b-alert v-if="searchTerm && catalogView.length === 0" variant="warning" show>No catalogs found for the given search term.</b-alert>
     <component :is="cardsComponent" v-bind="cardsComponentProps">
       <Catalog v-for="catalog in catalogView" :catalog="catalog" :key="catalog.href" />
@@ -16,6 +16,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import Catalog from './Catalog.vue';
 import STAC from '../models/stac';
 import ViewMixin from './ViewMixin';
@@ -48,14 +49,35 @@ export default {
     };
   },
   computed: {
+    ...mapGetters(['getStac']),
     catalogView() {
       if (this.hasMore) {
         return this.catalogs;
       }
-      let catalogs = this.catalogs;
+      let catalogs = this.catalogs.map(catalog => {
+          if (!(catalog instanceof STAC)) {
+            let stac = this.getStac(catalog.href);
+            if (stac) {
+              return stac;
+            }
+          }
+          return catalog;
+      });
       // Filter
       if (this.searchTerm) {
-        catalogs = catalogs.filter(catalog => Utils.search(this.searchTerm, [catalog.id, catalog.title].concat(catalog.keywords || [])));
+        catalogs = catalogs.filter(catalog => {
+          let haystack = [ catalog.title ];
+          if (catalog instanceof STAC) {
+            haystack.push(catalog.id);
+            if (Array.isArray(catalog.keywords)) {
+              haystack = haystack.concat(catalog.keywords);
+            }
+          }
+          else {
+            haystack.push(catalog.href);
+          }
+          return Utils.search(this.searchTerm, haystack);
+        });
       }
       // Sort
       if (!this.hasMore && this.sort !== 0) {
