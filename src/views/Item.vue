@@ -1,5 +1,5 @@
 <template>
-  <div class="item">
+  <div class="item" :key="data.id">
     <b-row>
       <b-col class="left">
         <section class="mb-4">
@@ -22,7 +22,7 @@
           <h2 v-if="data.properties.description">Description</h2>
           <DeprecationNotice v-if="data.properties.deprecated" :data="data" />
           <AnonymizedNotice v-if="data.properties['anon:warning']" :warning="data.properties['anon:warning']" />
-          <ReadMore v-if="data.properties.description" :lines="10" :key="data.properties.description">
+          <ReadMore v-if="data.properties.description" :lines="10">
             <Description :description="data.properties.description" />
           </ReadMore>
           <Keywords v-if="Array.isArray(data.properties.keywords) && data.properties.keywords.length > 0" :keywords="data.properties.keywords" />
