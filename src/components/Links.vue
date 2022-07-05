@@ -1,7 +1,17 @@
 <template>
   <section class="links mb-4">
     <h2 v-if="title">{{ title }}</h2>
-    <ul>
+    <template v-if="hasGroups">
+      <div class="group" v-for="group in groups" :key="group.rel">
+        <h4 v-if="group.rel">{{ group.label }}</h4>
+        <ul>
+          <li v-for="(link, key) in group.links" :key="key">
+            <StacLink :data="link" :fallbackTitle="() => fallbackTitle(link)" />
+          </li>
+        </ul>
+      </div>
+    </template>
+    <ul v-else>
       <li v-for="(link, key) in links" :key="key">
         <StacLink :data="link" :fallbackTitle="() => fallbackTitle(link)" />
       </li>
@@ -30,17 +40,47 @@ export default {
       default: () => ([])
     }
   },
+  computed: {
+    groups() {
+      let groups = this.links.reduce((summary, link) => {
+        let rel = typeof link.rel === 'string' ? link.rel.toLowerCase() : "";
+        if (rel in summary) {
+          summary[rel].links.push(link);
+        }
+        else {
+          summary[rel] = {
+            rel: rel,
+            label: this.formatRel(rel),
+            links: [link]
+          };
+        }
+        return summary;
+      }, {});
+      return Object.values(groups).sort((g1, g2) => g1.rel.localeCompare(g2.rel));
+    },
+    hasGroups() {
+      return this.groups.some(group => group.rel.length > 0 && group.links.length >= 2);
+    }
+  },
   methods: {
-    fallbackTitle(link) {
-      let rel = link.rel;
-      if (rel in Fields.links.rel.mapping) {
-        rel = Fields.links.rel.mapping[rel];
+    formatRel(rel) {
+      let lc = typeof rel === 'string' ? rel.toLowerCase() : "";
+      if (lc in Fields.links.rel.mapping) {
+        return Fields.links.rel.mapping[lc];
       }
       else {
-        rel = Helper.formatKey(rel);
+        return Helper.formatKey(rel);
       }
+    },
+    fallbackTitle(link) {
       let title = Utils.titleForHref(link.href);
-      return `${rel}: ${title}`;
+      if (this.hasGroups) {
+        return title;
+      }
+      else {
+        let rel = this.formatRel(link.rel);
+        return `${rel}: ${title}`;
+      }
     }
   }
 };
@@ -48,10 +88,9 @@ export default {
 
 <style lang="scss">
 #stac-browser .links {
-  > ul {
+  ul {
     list-style-type: '-';
-    margin: 0;
-    margin-left: 1em;
+    margin: 0 0 1em 1em;
     padding: 0;
 
     > li {
