@@ -122,6 +122,16 @@ export default {
     ...mapGetters(['displayCatalogTitle']),
     browserVersion() {
       return STAC_BROWSER_VERSION;
+    },
+    appStateAsParams () {
+      const appState = this.$store.state.stateQueryParameters;
+      const out = {};
+      for (const [key, value] of Object.entries(appState)) {
+        if (Array.isArray(value) && value.length > 0) {
+          out[`.${key}`] = value;
+        }
+      }
+      return out;
     }
   },
   watch: {
@@ -134,6 +144,20 @@ export default {
         // Load the root catalog data if not available (e.g. after page refresh or external access)
         this.$store.dispatch("load", { url, loadApi: true });
       }
+    },
+    appStateAsParams () {
+      // Force vue-router to read some values as arrays
+      for (const [key, value] of Object.entries(this.$route.query)) {
+        if (Array.isArray(this.appStateAsParams[key]) && !(Array.isArray(value))) {
+          this.$route.query[key] = [value];
+        }
+      }
+      // Prevent needless navigation which vue-router doesn't lke
+      if (JSON.stringify(this.$route.query) === JSON.stringify(this.appStateAsParams)) {
+        return;
+      }
+
+      this.$router.push({ query: this.appStateAsParams });
     }
   },
   created() {

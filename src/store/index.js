@@ -333,7 +333,7 @@ function getStore(config) {
       queryParameters(state, params) {
         const appState = state.stateQueryParameters;
         for (let [key, value] of Object.entries(params.state)) {
-          if (Array.isArray(appState[key])) {
+          if (Array.isArray(appState[key]) && !(Array.isArray(value))) {
             value = value.split(',');
           }
           Vue.set(appState, key, value);
