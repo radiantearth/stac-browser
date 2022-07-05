@@ -322,7 +322,7 @@ export default class Utils {
 				return false;
 		}
 
-		let splitChars = /[\s\.,;!&\(\{\[\)\}\]]+/g;
+		let splitChars = /[\s.,;!&({[)}]]+/g;
 
 		// Prepare search terms
 		searchterm = searchterm.toLowerCase().split(splitChars);

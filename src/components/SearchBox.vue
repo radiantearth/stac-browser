@@ -1,8 +1,8 @@
 <template>
-	<div class="vue-component search-box">
-		<span class="icon">🔎</span>
-		<b-form-input type="search" v-model.trim="searchTerm" :placeholder="placeholder" />
-	</div>
+  <div class="vue-component search-box">
+    <span class="icon">🔎</span>
+    <b-form-input type="search" v-model.trim="searchTerm" :placeholder="placeholder" />
+  </div>
 </template>
 
 <script>
@@ -29,14 +29,14 @@ export default {
 		};
 	},
 	watch: {
-		searchTerm(newValue, oldValue) {
+		searchTerm(newValue) {
 			if (newValue.length < this.minLength) {
 				newValue = '';
 			}
 			this.$emit('input', newValue);
 		}
 	}
-}
+};
 </script>
 
 <style lang="scss">
