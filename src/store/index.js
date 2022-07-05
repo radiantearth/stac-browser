@@ -19,7 +19,6 @@ function getStore(config) {
     valid: null,
     parents: null,
     globalError: null,
-    stateQueryParameters: {},
 
     apiItems: [],
     apiItemsLoading: true,
@@ -63,9 +62,9 @@ function getStore(config) {
         'search',
         'self',
       ],
-      appState: {
-        openAssetsUids: []
-      }
+      stateQueryParameters: {
+        assets: []
+      },
     }),
     getters: {
       loading: state => !state.url || !state.data || state.database[state.url] instanceof Loading,
@@ -332,30 +331,25 @@ function getStore(config) {
         }
       },
       queryParameters(state, params) {
-        for(let key in params) {
-          state[`${key}QueryParameters`] = params[key];
-        }
-      },
-      setAppStateFromQueryStringObject (state, queryObject) {
-        const appState = state.appState;
-        for (const [key, value] of Object.entries(queryObject)) {
+        const appState = state.stateQueryParameters;
+        for (let [key, value] of Object.entries(params.state)) {
           if (Array.isArray(appState[key])) {
-            const values = value.split(',');
-            state.appState[key].push(...values);
+            value = value.split(',');
           }
+          Vue.set(appState, key, value);
         }
       },
       addUidToOpenAssets (state, uid) {
-        const idx = state.appState.openAssetsUids.indexOf(uid);
+        const idx = state.stateQueryParameters.assets.indexOf(uid);
         // need to revent duplicates because of the way the collapse v-model works
         if (idx === -1) {
-          state.appState.openAssetsUids.push(uid);
+          state.stateQueryParameters.assets.push(uid);
         }
       },
       removeUidFromOpenAssets (state, uid) {
-        const idx = state.appState.openAssetsUids.indexOf(uid);
+        const idx = state.stateQueryParameters.assets.indexOf(uid);
         if (idx > -1) {
-          state.appState.openAssetsUids.splice(idx, 1);
+          state.stateQueryParameters.assets.splice(idx, 1);
         }
       },
       stacIndex(state, index) {

@@ -185,7 +185,6 @@ export default {
           query
         });
       }
-      this.$store.commit('setAppStateFromQueryStringObject', query);
 
     },
     showError(error, message) {

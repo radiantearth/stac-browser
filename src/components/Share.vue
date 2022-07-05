@@ -105,10 +105,10 @@ export default {
         },
         appStateAsParams () {
           var uri = new URI("?");
-          const appState = this.$store.state.appState;
+          const appState = this.$store.state.stateQueryParameters;
           for (const [key, value] of Object.entries(appState)) {
             if (Array.isArray(value) && value.length > 0) {
-              uri.addSearch(key, value);
+              uri.addSearch(`.${key}`, value);
             }
           }
           return uri.toString();

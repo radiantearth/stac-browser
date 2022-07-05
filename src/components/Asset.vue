@@ -242,11 +242,10 @@ export default {
       return text.join(' ');
     },
     openAssetsUids () {
-      return this.$store.state.appState.openAssetsUids;
+      return this.$store.state.stateQueryParameters.assets;
     }
   },
   created() {
-
     if (this.openAssetsUids.indexOf(this.uid) > -1) {
       this.expanded = true;
       return;
