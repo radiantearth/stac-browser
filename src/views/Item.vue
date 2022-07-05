@@ -22,7 +22,7 @@
           <h2 v-if="data.properties.description">Description</h2>
           <DeprecationNotice v-if="data.properties.deprecated" :data="data" />
           <AnonymizedNotice v-if="data.properties['anon:warning']" :warning="data.properties['anon:warning']" />
-          <ReadMore v-if="data.properties.description" :lines="10">
+          <ReadMore v-if="data.properties.description" :lines="10" :key="data.properties.description">
             <Description :description="data.properties.description" />
           </ReadMore>
           <Keywords v-if="Array.isArray(data.properties.keywords) && data.properties.keywords.length > 0" :keywords="data.properties.keywords" />
