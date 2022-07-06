@@ -56,6 +56,7 @@ export default {
       map: null,
       areaSelect: null,
       stacLayer: null,
+      collectionsLayer: null,
       mapOptions: {},
       osmOptions: {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors.'
@@ -140,7 +141,12 @@ export default {
         this.map.removeLayer(this.stacLayer);
         this.stacLayer = null;
       }
+      if (this.collectionsLayer) {
+        this.map.removeLayer(this.collectionsLayer);
+        this.collectionsLayer = null;
+      }
       let data = this.stacLayerData || this.stac;
+
       if (data.type !== 'Catalog') {
         let options = {
           resolution: this.geoTiffResolution,
@@ -149,6 +155,19 @@ export default {
           buildTileUrlTemplate: this.buildTileUrlTemplate,
           crossOrigin: this.crossOriginMedia
         };
+
+        if (this.stac.type === 'Collection' && data.type === 'FeatureCollection') {
+          data = this.stac;
+          options.fillOpacity = 0;
+          this.collectionsLayer = await stacLayer(this.stacLayerData, {
+            fillOpacity: 0,
+            weight: 2,
+            color: '#188191',
+            displayPreview: this.stacLayerData.features.length < 50
+          });
+          this.collectionsLayer.addTo(this.map);
+        }
+
         if (this.stac instanceof STAC) {
           options.baseUrl = this.stac.getAbsoluteUrl();
         }
@@ -156,9 +175,9 @@ export default {
           if (this.stac.type === 'Feature') {
             options.bbox = this.stac?.bbox;
           }
-          else if (this.stac.type === 'Collection') {
-            options.bbox = this.stac?.extent?.spatial?.bbox[0];
-          }
+          // else if (this.stac.type === 'Collection') {
+          //   options.bbox = this.stac?.extent?.spatial?.bbox[0];
+          // }
         }
         try {
           this.stacLayer = await stacLayer(data, options);
