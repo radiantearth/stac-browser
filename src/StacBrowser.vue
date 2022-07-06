@@ -117,16 +117,15 @@ export default {
     };
   },
   computed: {
-    ...mapState(['title', 'globalError']),
+    ...mapState(['title', 'globalError', 'stateQueryParameters']),
     ...mapState({catalogUrlFromVueX: 'catalogUrl'}),
     ...mapGetters(['displayCatalogTitle']),
     browserVersion() {
       return STAC_BROWSER_VERSION;
     },
     appStateAsParams () {
-      const appState = this.$store.state.stateQueryParameters;
       const out = {};
-      for (const [key, value] of Object.entries(appState)) {
+      for (const [key, value] of Object.entries(this.$store.state.stateQueryParameters)) {
         if (Array.isArray(value) && value.length > 0) {
           out[`.${key}`] = value;
         }

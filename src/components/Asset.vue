@@ -240,13 +240,10 @@ export default {
         text.push(this.from);
       }
       return text.join(' ');
-    },
-    openAssetsUids () {
-      return this.$store.state.stateQueryParameters.assets;
     }
   },
   created() {
-    if (this.openAssetsUids.indexOf(this.uid) > -1) {
+    if (this.$store.state.stateQueryParameters.assets.indexOf(this.uid) > -1) {
       this.expanded = true;
       return;
     }
