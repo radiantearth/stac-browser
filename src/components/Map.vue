@@ -65,7 +65,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['buildTileUrlTemplate', 'crossOriginMedia', 'geoTiffResolution', 'tileSourceTemplate', 'useTileLayerAsFallback']),
+    ...mapState(['maxDisplayPreviewsOnMapOnCatalogPage', 'buildTileUrlTemplate', 'crossOriginMedia', 'geoTiffResolution', 'tileSourceTemplate', 'useTileLayerAsFallback']),
     baseMaps() {
       let targets = [];
       if (this.stac.isCollection() && Utils.isObject(this.stac.summaries) && Array.isArray(this.stac.summaries['ssys:targets'])) {
@@ -156,14 +156,14 @@ export default {
           crossOrigin: this.crossOriginMedia
         };
 
-        if (this.stac.type === 'Collection' && data.type === 'FeatureCollection') {
+        if ((this.stac.type === 'Collection' || this.stac.type === 'Catalog') && data.type === 'FeatureCollection') {
           data = this.stac;
           options.fillOpacity = 0;
           this.collectionsLayer = await stacLayer(this.stacLayerData, {
             fillOpacity: 0,
             weight: 2,
             color: '#188191',
-            displayPreview: this.stacLayerData.features.length < 50
+            displayPreview: this.stacLayerData.features.length < this.maxDisplayPreviewsOnMapOnCatalogPage
           });
           this.collectionsLayer.addTo(this.map);
         }
@@ -171,14 +171,7 @@ export default {
         if (this.stac instanceof STAC) {
           options.baseUrl = this.stac.getAbsoluteUrl();
         }
-        if ('href' in data) {
-          if (this.stac.type === 'Feature') {
-            options.bbox = this.stac?.bbox;
-          }
-          // else if (this.stac.type === 'Collection') {
-          //   options.bbox = this.stac?.extent?.spatial?.bbox[0];
-          // }
-        }
+
         try {
           this.stacLayer = await stacLayer(data, options);
         } catch (error) {

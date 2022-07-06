@@ -14,6 +14,7 @@ module.exports = {
     geoTiffResolution: 128,
     redirectLegacyUrls: false,
     itemsPerPage: 12,
+    maxDisplayPreviewsOnMapOnCatalogPage: 48,
     crossOriginMedia: null,
     requestHeaders: {},
     requestQueryParameters: {}
