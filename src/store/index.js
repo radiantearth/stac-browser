@@ -10,6 +10,12 @@ import Queryable from '../models/queryable';
 
 Vue.use(Vuex);
 
+function createBlankStateQueryParameters () {
+  return {
+    assets: []
+  }
+}
+
 function getStore(config) {
   // Local settings (e.g. for currently loaded STAC entity)
   const localDefaults = () => ({
@@ -62,9 +68,7 @@ function getStore(config) {
         'search',
         'self',
       ],
-      stateQueryParameters: {
-        assets: []
-      },
+      stateQueryParameters: createBlankStateQueryParameters(),
     }),
     getters: {
       loading: state => !state.url || !state.data || state.database[state.url] instanceof Loading,
@@ -329,6 +333,9 @@ function getStore(config) {
               state[key] = value;
           }
         }
+      },
+      emptyOutStateQueryParameters (state) {
+        Vue.set(state, 'stateQueryParameters', createBlankStateQueryParameters());
       },
       queryParameters(state, params) {
         const appState = state.stateQueryParameters;

@@ -143,25 +143,35 @@ export default {
         // Load the root catalog data if not available (e.g. after page refresh or external access)
         this.$store.dispatch("load", { url, loadApi: true });
       }
-    },
-    appStateAsParams () {
-      // Force vue-router to read some values as arrays
-      for (const [key, value] of Object.entries(this.$route.query)) {
-        if (Array.isArray(this.appStateAsParams[key]) && !(Array.isArray(value))) {
-          this.$route.query[key] = [value];
-        }
-      }
-      // Prevent needless navigation which vue-router doesn't lke
-      if (JSON.stringify(this.$route.query) === JSON.stringify(this.appStateAsParams)) {
-        return;
-      }
-
-      this.$router.push({ query: this.appStateAsParams });
     }
   },
   created() {
-    this.$router.onReady(() => this.parseQuery(this.$route));
-    this.$router.afterEach(to => this.parseQuery(to));
+    let unwatch = null;
+    this.$router.onReady(() => {
+      this.parseQuery(this.$route);
+      unwatch = this.$watch('stateQueryParameters', this.updateUrlOnStateChange, {deep: true});
+    });
+
+    this.$router.beforeEach((to, from, next) => {
+      if (to.path === from.path) {
+        next();
+        return;
+      }
+      if (unwatch !== null) {
+        unwatch();
+      }
+      unwatch = null;
+      this.$store.commit('emptyOutStateQueryParameters');
+      next();
+    });
+
+    this.$router.afterEach((to, from) => {
+      if (to.path === from.path) {
+        return;
+      }
+      this.parseQuery(to);
+      unwatch = this.$watch('stateQueryParameters', this.updateUrlOnStateChange, {deep: true});
+    });
 
     // Load the root catalog data if not available (e.g. after page refresh or external access)
     if (this.catalogUrl) {
@@ -209,6 +219,18 @@ export default {
         });
       }
 
+    },
+    updateUrlOnStateChange () {
+      // Force vue-router to read some values as arrays
+      for (const [key, value] of Object.entries(this.$route.query)) {
+        if (Array.isArray(this.appStateAsParams[key]) && !(Array.isArray(value))) {
+          this.$route.query[key] = [value];
+        }
+      }
+
+      this.$router.replace({ query: this.appStateAsParams }).catch((e) => {
+        console.log('Routing Error', e);
+      });
     },
     showError(error, message) {
       this.$store.commit('showGlobalError', {
