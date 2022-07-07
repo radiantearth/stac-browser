@@ -348,7 +348,7 @@ function getStore(config) {
       },
       addUidToOpenAssets (state, uid) {
         const idx = state.stateQueryParameters.assets.indexOf(uid);
-        // need to revent duplicates because of the way the collapse v-model works
+        // need to prevent duplicates because of the way the collapse v-model works
         if (idx === -1) {
           state.stateQueryParameters.assets.push(uid);
         }
