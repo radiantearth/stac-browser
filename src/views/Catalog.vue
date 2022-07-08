@@ -44,7 +44,7 @@
       </b-col>
       <b-col class="items-container" v-if="hasItems">
         <Items
-          :stac="data" :items="items" :api="isApi" :apiFilters="apiItemsFilter"
+          :stac="data" :items="itemsView" :api="isApi" :apiFilters="apiItemsFilter"
           :pagination="itemPages" :loading="apiItemsLoading"
           @paginate="paginateItems" @filterItems="filterItems"
         />
@@ -66,6 +66,7 @@ import ShowAssetMixin from '../components/ShowAssetMixin';
 import { Formatters } from '@radiantearth/stac-fields';
 import { BTabs, BTab } from 'bootstrap-vue';
 import Utils from '../utils';
+import STAC from '../models/stac';
 
 const SORRY_ITEM_LIST = "Sorry, can't load the list of items.";
 
@@ -120,8 +121,8 @@ export default {
     };
   },
   computed: {
-    ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination', 'apiItemsFilter', 'apiItemsLoading']),
-    ...mapGetters(['additionalLinks', 'catalogs', 'isCollection', 'items', 'hasMoreCollections']),
+    ...mapState(['data', 'url', 'apiItemsLink', 'apiItemsPagination', 'apiItemsFilter', 'apiItemsLoading']),
+    ...mapGetters(['additionalLinks', 'catalogs', 'isCollection', 'items', 'hasMoreCollections', 'getStac']),
     licenses() {
       if (this.isCollection && this.data.license) {
         return Formatters.formatLicense(this.data.license, null, null, this.data);
@@ -165,8 +166,16 @@ export default {
     catalogAsFc () {
       return {
         type: 'FeatureCollection',
-        features: this.items
+        features: this.itemsView
       };
+    },
+    itemsView() {
+      return this.items.map(item => {
+          if (item instanceof STAC) {
+            return item;
+          }
+          return this.getStac(item.href) || item;
+      });
     }
   },
   methods: {
