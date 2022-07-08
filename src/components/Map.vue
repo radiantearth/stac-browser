@@ -47,7 +47,11 @@ export default {
     },
     selectBounds: {
       type: Boolean,
-      required: false
+      default: false
+    },
+    scrollWheelZoom: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -111,7 +115,7 @@ export default {
     }
   },
   created() {
-    this.mapOptions.scrollWheelZoom = this.selectBounds || this.stac?.isItem();
+    this.mapOptions.scrollWheelZoom = this.selectBounds || this.scrollWheelZoom;
     this.osmOptions.noWrap = this.selectBounds;
   },
   mounted() {
@@ -128,6 +132,12 @@ export default {
   methods: {
     async init(map) {
       this.map = map;
+      if (this.$listeners.viewChanged) {
+        this.map.on('viewreset', event => this.$emit('viewChanged', event));
+        this.map.on('zoom', event => this.$emit('viewChanged', event));
+        this.map.on('move', event => this.$emit('viewChanged', event));
+        this.map.on('resize', event => this.$emit('viewChanged', event));
+      }
 
       await this.showStacLayer();
 
@@ -172,14 +182,14 @@ export default {
           return;
         }
 
-        this.$emit('mapChanged', this.stacLayer.stac);
+        this.$emit('dataChanged', this.stacLayer.stac);
         this.stacLayer.on('click', event => {
           // Debounce click event, otherwise a dblclick is fired (and fired twice)
           let clicks = event.originalEvent.detail || 1;
           if (clicks === 1) {
             this.dblClickState = window.setTimeout(() => {
               this.dblClickState = null;
-              this.$emit('mapClicked', event.stac);
+              this.$emit('mapClicked', event.stac, event);
             }, 500);
           }
           else if (clicks > 1 && this.dblClickState) {
@@ -187,7 +197,7 @@ export default {
             this.dblClickState = null;
           }
         });
-        this.stacLayer.on("fallback", event => this.$emit('mapChanged', event.stac));
+        this.stacLayer.on("fallback", event => this.$emit('dataChanged', event.stac));
         this.stacLayer.addTo(this.map);
         this.fitBounds();
       }
