@@ -38,6 +38,7 @@
 import { BForm, BFormGroup, BFormInput, BListGroup, BListGroupItem } from 'bootstrap-vue';
 import { mapGetters, mapState } from "vuex";
 import Description from '../components/Description.vue';
+import Utils from '../utils';
 
 export default {
   name: "SelectDataSource",
@@ -91,14 +92,7 @@ export default {
         return true;
       }
 
-      let searchTerm = this.url.toLowerCase();
-      if (typeof catalog.title === 'string' && catalog.title.toLowerCase().includes(searchTerm)) {
-        return true;
-      }
-      if (typeof catalog.url === 'string' && catalog.url.toLowerCase().includes(searchTerm)) {
-        return true;
-      }
-      return false;
+      return Utils.search(this.url, [catalog.title, catalog.url]);
     },
     setUrl(url) {
       this.url = url;

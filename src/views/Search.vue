@@ -15,7 +15,7 @@
         <b-alert v-else-if="apiItems.length === 0" variant="warning" show>No items found for the given filters.</b-alert>
         <template v-else>
           <div id="search-map">
-            <Map :stac="root" :stacLayerData="itemCollection" @mapClicked="mapClicked" />
+            <Map :stac="root" :stacLayerData="itemCollection" @mapClicked="mapClicked" @viewChanged="resetSelectedItem" scrollWheelZoom />
           </div>
           <Items
             :stac="root" :items="apiItems" :api="true" :allowFilter="false"
@@ -27,15 +27,15 @@
     </b-row>
     <b-popover
       v-if="selectedItem" placement="left" triggers="manual" :show="selectedItem !== null"
-      target="search-map" boundary="search-map" container="search-map"
+      :target="selectedItem.target" boundary="search-map" container="search-map" :key="selectedItem.key"
     >
       <section class="items">
         <b-card-group columns class="count-1">
-          <Item :item="selectedItem" />
+          <Item :item="selectedItem.item" />
         </b-card-group>
       </section>
       <div class="text-center">
-        <b-button target="_blank" variant="danger" @click="mapClicked">
+        <b-button target="_blank" variant="danger" @click="resetSelectedItem">
           Close
         </b-button>
       </div>
@@ -154,12 +154,25 @@ export default {
         this.$store.commit('showPage', {title: pageTitle, url: response.config.url});
       }
     },
-    mapClicked(event) {
-      if (event.type !== 'Feature') {
+    resetSelectedItem() {
+        if (this.selectedItem && this.selectedItem.oldStyle) {
+          this.selectedItem.layer.setStyle(this.selectedItem.oldStyle);
+        }
         this.selectedItem = null;
-      }
-      else {
-        this.selectedItem = event.data;
+    },
+    mapClicked(stac, event) {
+      this.resetSelectedItem();
+      if (stac.type === 'Feature') {
+        this.selectedItem = {
+          item: stac.data,
+          target: event.originalEvent.srcElement,
+          layer: event.layer,
+          key: event.layer._leaflet_id
+        };
+        if (event.layer) {
+          this.selectedItem.oldStyle = Object.assign({}, event.layer.options);
+          event.layer.setStyle(Object.assign({}, event.layer.options, {color: '#dc3545'}));
+        }
       }
     }
   }

@@ -1,12 +1,12 @@
 <template>
-  <div class="item">
+  <div class="item" :key="data.id">
     <b-row>
       <b-col class="left">
         <section class="mb-4">
           <b-card no-body class="maps-preview">
             <b-tabs v-model="tab" ref="tabs" card pills vertical end>
               <b-tab title="Map" no-body>
-                <Map :stac="data" :stacLayerData="selectedAsset" @mapClicked="mapClicked" @mapChanged="mapChanged" />
+                <Map :stac="data" :stacLayerData="selectedAsset" @mapClicked="mapClicked" @dataChanged="dataChanged" scrollWheelZoom />
               </b-tab>
               <b-tab v-if="thumbnails.length > 0" title="Thumbnails" no-body>
                 <Thumbnails :thumbnails="thumbnails" />

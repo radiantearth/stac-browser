@@ -22,7 +22,7 @@ export default {
   ],
   computed: {
     showTable() {
-      return this.itemOrder.length > 0 && Utils.size(this.value) > 3;
+      return this.itemOrder.length > 0 && Utils.size(this.value) >= 3;
     }
   }
 };

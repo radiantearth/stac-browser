@@ -1,5 +1,5 @@
 <template>
-  <div :class="{cc: true, [data.type.toLowerCase()]: true, mixed: hasCatalogs && hasItems, empty: !hasCatalogs && !hasItems}">
+  <div :class="{cc: true, [data.type.toLowerCase()]: true, mixed: hasCatalogs && hasItems, empty: !hasCatalogs && !hasItems}" :key="data.id">
     <b-row>
       <b-col class="meta">
         <section class="intro">
@@ -25,7 +25,7 @@
           <b-card no-body class="maps-preview">
             <b-tabs v-model="tab" ref="tabs" pills card vertical end>
               <b-tab v-if="isCollection" title="Map" no-body>
-                <Map :stac="data" :stacLayerData="selectedAsset" @mapClicked="mapClicked" @mapChanged="mapChanged" />
+                <Map :stac="data" :stacLayerData="selectedAsset" @mapClicked="mapClicked" @dataChanged="dataChanged" />
               </b-tab>
               <b-tab v-if="thumbnails.length > 0" title="Preview" no-body>
                 <Thumbnails :thumbnails="thumbnails" />

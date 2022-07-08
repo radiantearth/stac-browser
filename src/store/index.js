@@ -27,7 +27,7 @@ function getStore(config) {
     globalError: null,
 
     apiItems: [],
-    apiItemsLoading: true,
+    apiItemsLoading: false,
     apiItemsLink: null,
     apiItemsFilter: {},
     apiItemsPagination: {},

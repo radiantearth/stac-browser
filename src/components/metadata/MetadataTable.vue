@@ -78,4 +78,11 @@ export default {
 #stac-browser .metadata-table .table thead th {
   vertical-align: middle;
 }
+
+/*
+  Fix an issue in vue-bootstrap v2.22.0:
+  https://github.com/bootstrap-vue/bootstrap-vue/issues/6961 */
+.b-table-sticky-header > .table.b-table > thead > tr > th {
+  position: sticky !important;
+}
 </style>

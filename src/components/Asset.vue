@@ -15,13 +15,13 @@
           </b-badge>
           <b-badge v-if="asset.deprecated" variant="warning" class="deprecated ml-1 mb-1">Deprecated</b-badge>
           <b-badge v-for="role in asset.roles" :key="role" :variant="role === 'data' ? 'primary' : 'secondary'" class="role ml-1 mb-1">{{ role }}</b-badge>
-          <b-badge variant="dark" class="format ml-1 mb-1" :title="fileFormat">{{ shortFileFormat }}</b-badge>
+          <b-badge variant="dark" class="format ml-1 mb-1" :title="fileFormat"><span v-html="shortFileFormat" /></b-badge>
         </div>
       </b-button>
     </b-card-header>
     <b-collapse :id="uid" v-model="expanded" accordion="assets" role="tabpanel" @input="collapseToggled">
       <b-card-body>
-        <b-card-title>{{ fileFormat }}</b-card-title>
+        <b-card-title><span v-html="fileFormat" /></b-card-title>
         <b-button-group class="actions" v-if="href">
           <CopyButton v-if="shouldCopy" variant="primary" :copyText="href">
             {{ buttonText }}
@@ -157,13 +157,13 @@ export default {
       return !this.isBrowserProtocol;
     },
     fileFormat() {
-      if (this.asset.type) {
+      if (typeof this.asset.type === "string" && this.asset.type.length > 0) {
         return Formatters.formatMediaType(this.asset.type);
       }
       return null;
     },
     shortFileFormat() {
-      if (this.asset.type) {
+      if (typeof this.asset.type === "string" && this.asset.type.length > 0) {
         return Formatters.formatMediaType(this.asset.type, null, {shorten: true});
       }
       return null;
