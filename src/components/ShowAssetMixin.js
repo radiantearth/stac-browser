@@ -45,7 +45,7 @@ export default {
         Utils.scrollTo(this.$refs.tabs.$el);
       }
     },
-    mapChanged(data) {
+    dataChanged(data) {
       if (!Utils.isObject(data)) {
         this.shownBandsOnMap = [];
         this.shownAssetsOnMap = [];
