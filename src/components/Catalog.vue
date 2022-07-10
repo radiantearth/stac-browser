@@ -1,6 +1,10 @@
 <template>
   <b-card no-body class="catalog-card" :class="{queued: !data, deprecated: data && data.deprecated}" v-b-visible.200="load" :img-right="isList">
-    <b-card-img v-if="showThumbnail && thumbnail && thumbnailVisible" class="thumbnail" :src="thumbnail.href" :alt="thumbnail.title" :crossorigin="crossOriginMedia" :right="isList" />
+    <b-card-img
+      v-if="showThumbnail && thumbnail && thumbnailShown" class="thumbnail"
+      :src="thumbnail.href" :alt="thumbnail.title" :crossorigin="crossOriginMedia" :right="isList"
+      @error="hideBrokenImg"
+    />
     <b-card-body>
       <b-card-title>
         <StacLink :data="[data, catalog]" class="stretched-link" />
@@ -45,7 +49,9 @@ export default {
   },
   data() {
     return {
-      thumbnailVisible: false // Lazy load thumbnails and not all at once for API Collections
+      // Lazy load thumbnails and not all at once.
+      // false = don't load yet, true = try to load it, null = image errored
+      thumbnailShown: false
     };
   },
   computed: {
@@ -82,9 +88,13 @@ export default {
     }
   },
   methods: {
+    hideBrokenImg(event) {
+      console.log(`Hiding catalog thumbnail for ${event.srcElement.src} as it can't be loaded.`);
+      this.thumbnailShown = null;
+    },
     load(visible) {
-      if (visible) {
-        this.thumbnailVisible = true;
+      if (visible && this.thumbnailShown !== null) {
+        this.thumbnailShown = true;
       }
       if (this.catalog instanceof STAC) {
         return;

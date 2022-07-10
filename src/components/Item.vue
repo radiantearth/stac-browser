@@ -1,6 +1,10 @@
 <template>
   <b-card no-body class="item-card" :class="{queued: !data, deprecated: isDeprecated}" v-b-visible.200="load">
-    <b-card-img v-if="thumbnail && showThumbnail" class="thumbnail" :src="thumbnail.href" :alt="thumbnail.title" :crossorigin="crossOriginMedia" />
+    <b-card-img
+      v-if="thumbnail && thumbnailShown" class="thumbnail"
+      :src="thumbnail.href" :alt="thumbnail.title" :crossorigin="crossOriginMedia"
+      @error="hideBrokenImg"
+    />
     <b-card-body>
       <b-card-title>
         <StacLink :data="[data, item]" class="stretched-link" />
@@ -38,7 +42,9 @@ export default {
   },
   data() {
     return {
-      showThumbnail: false
+      // Lazy load thumbnails and not all at once.
+      // false = don't load yet, true = try to load it, null = image errored
+      thumbnailShown: false
     };
   },
   computed: {
@@ -84,9 +90,13 @@ export default {
     }
   },
   methods: {
+    hideBrokenImg(event) {
+      console.log(`Hiding item thumbnail for ${event.srcElement.src} as it can't be loaded.`);
+      this.thumbnailShown = null;
+    },
     load(visible) {
-      if (visible) {
-        this.showThumbnail = true;
+      if (visible && this.thumbnailShown !== null) {
+        this.thumbnailShown = true;
       }
       if (this.item instanceof STAC) {
         return;
