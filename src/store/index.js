@@ -334,7 +334,7 @@ function getStore(config) {
           }
         }
       },
-      emptyOutStateQueryParameters (state) {
+      resetStateQueryParameters (state) {
         Vue.set(state, 'stateQueryParameters', createBlankStateQueryParameters());
       },
       queryParameters(state, params) {

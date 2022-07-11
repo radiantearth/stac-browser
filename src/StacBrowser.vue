@@ -146,7 +146,6 @@ export default {
     }
   },
   created() {
-
     // The handling of unwatch and this.$watch sequence below explictly attaches the watcher
     // for stateQueryParameters AFTER the router has navigated to the page, and AFTER 
     // the parseQuery method has been run which modifies the stateQueryParameters.
@@ -161,15 +160,13 @@ export default {
     // When we're navigating to a completely different STAC page (denoted by a different path)
     // we need to clear out out the stateQueryParameters (eg what tabs were open etc)
     this.$router.beforeEach((to, from, next) => {
-      if (to.path === from.path) {
-        next();
-        return;
+      if (to.path !== from.path) {
+        if (typeof unwatch === 'function') {
+          unwatch();
+        }
+        unwatch = null;
+        this.$store.commit('resetStateQueryParameters');
       }
-      if (unwatch !== null) {
-        unwatch();
-      }
-      unwatch = null;
-      this.$store.commit('emptyOutStateQueryParameters');
       next();
     });
 
