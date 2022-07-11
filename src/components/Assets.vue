@@ -5,7 +5,7 @@
       <Asset
         v-for="(asset, key) in assets" :asset="asset" :expand="expand" :context="context"
         :definition="definition" :shown="shown.includes(key)"
-        :id="key" :key="getId(key)" @show="show"
+        :id="key" :key="key" @show="show"
       />
     </div>
   </section>
@@ -62,9 +62,6 @@ export default {
     }
   },
   methods: {
-    getId(key) {
-      return (this.definition ? 'item-def-' : 'asset-') + String(key);
-    },
     show(asset, id, isThumbnail) {
       this.$emit('showAsset', asset, id, isThumbnail);
     }

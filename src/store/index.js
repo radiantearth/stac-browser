@@ -12,8 +12,9 @@ Vue.use(Vuex);
 
 function createBlankStateQueryParameters () {
   return {
-    assets: []
-  }
+    asset: [],
+    itemdef: []
+  };
 }
 
 function getStore(config) {
@@ -334,7 +335,7 @@ function getStore(config) {
           }
         }
       },
-      resetStateQueryParameters (state) {
+      resetStateQueryParameters(state) {
         Vue.set(state, 'stateQueryParameters', createBlankStateQueryParameters());
       },
       queryParameters(state, params) {
@@ -346,17 +347,17 @@ function getStore(config) {
           Vue.set(appState, key, value);
         }
       },
-      addUidToOpenAssets (state, uid) {
-        const idx = state.stateQueryParameters.assets.indexOf(uid);
+      openCollapsible(state, {type, uid}) {
+        const idx = state.stateQueryParameters[type].indexOf(uid);
         // need to prevent duplicates because of the way the collapse v-model works
         if (idx === -1) {
-          state.stateQueryParameters.assets.push(uid);
+          state.stateQueryParameters[type].push(uid);
         }
       },
-      removeUidFromOpenAssets (state, uid) {
-        const idx = state.stateQueryParameters.assets.indexOf(uid);
+      closeCollapsible(state, {type, uid}) {
+        const idx = state.stateQueryParameters[type].indexOf(uid);
         if (idx > -1) {
-          state.stateQueryParameters.assets.splice(idx, 1);
+          state.stateQueryParameters[type].splice(idx, 1);
         }
       },
       stacIndex(state, index) {

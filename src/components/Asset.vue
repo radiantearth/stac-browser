@@ -19,7 +19,7 @@
         </div>
       </b-button>
     </b-card-header>
-    <b-collapse :id="uid" v-model="expanded" accordion="assets" role="tabpanel" @input="collapseToggled">
+    <b-collapse :id="uid" v-model="expanded" :accordion="type" role="tabpanel" @input="collapseToggled">
       <b-card-body>
         <b-card-title><span v-html="fileFormat" /></b-card-title>
         <b-button-group class="actions" v-if="href">
@@ -118,10 +118,13 @@ export default {
     };
   },
   computed: {
-    ...mapState(['url']),
+    ...mapState(['url', 'stateQueryParameters']),
     ...mapGetters(['tileRendererType', 'getRequestUrl']),
+    type() {
+      return this.definition ? 'itemdef' : 'asset';
+    },
     uid() {
-      return (this.definition ? 'item-def-' : 'asset-') + String(this.id);
+      return `${this.type}-${this.id}`;
     },
     isThumbnail() {
       return Array.isArray(this.asset.roles) && this.asset.roles.includes('thumbnail');
@@ -243,7 +246,7 @@ export default {
     }
   },
   created() {
-    if (this.$store.state.stateQueryParameters.assets.indexOf(this.uid) > -1) {
+    if (this.stateQueryParameters[this.type].indexOf(this.uid) > -1) {
       this.expanded = true;
       return;
     }
@@ -285,12 +288,9 @@ export default {
       }
       return '';
     },
-    collapseToggled (isVisible) {
-      if (isVisible) {
-        this.$store.commit('addUidToOpenAssets', this.uid);
-      } else {
-        this.$store.commit('removeUidFromOpenAssets', this.uid);
-      }
+    collapseToggled(isVisible) {
+      let event = isVisible ? 'openCollapsible' : 'closeCollapsible';
+      this.$store.commit(event, {type: this.type, uid: this.uid});
     }
   }
 };
