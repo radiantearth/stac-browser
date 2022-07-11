@@ -69,7 +69,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['maxDisplayPreviewsOnMapOnCatalogPage', 'buildTileUrlTemplate', 'crossOriginMedia', 'geoTiffResolution', 'tileSourceTemplate', 'useTileLayerAsFallback']),
+    ...mapState(['maxPreviewsOnMap', 'buildTileUrlTemplate', 'crossOriginMedia', 'geoTiffResolution', 'tileSourceTemplate', 'useTileLayerAsFallback']),
     baseMaps() {
       let targets = [];
       if (this.stac.isCollection() && Utils.isObject(this.stac.summaries) && Array.isArray(this.stac.summaries['ssys:targets'])) {
@@ -173,7 +173,7 @@ export default {
             fillOpacity: 0,
             weight: 2,
             color: '#188191',
-            displayPreview: this.stacLayerData.features.length < this.maxDisplayPreviewsOnMapOnCatalogPage
+            displayPreview: this.stacLayerData.features.length < this.maxPreviewsOnMap
           });
           this.collectionsLayer.addTo(this.map);
         }
