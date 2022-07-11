@@ -10,6 +10,12 @@ import Queryable from '../models/queryable';
 
 Vue.use(Vuex);
 
+function createBlankStateQueryParameters () {
+  return {
+    assets: []
+  }
+}
+
 function getStore(config) {
   // Local settings (e.g. for currently loaded STAC entity)
   const localDefaults = () => ({
@@ -19,7 +25,6 @@ function getStore(config) {
     valid: null,
     parents: null,
     globalError: null,
-    stateQueryParameters: {},
 
     apiItems: [],
     apiItemsLoading: false,
@@ -62,7 +67,8 @@ function getStore(config) {
         'root',
         'search',
         'self',
-      ]
+      ],
+      stateQueryParameters: createBlankStateQueryParameters(),
     }),
     getters: {
       loading: state => !state.url || !state.data || state.database[state.url] instanceof Loading,
@@ -328,9 +334,29 @@ function getStore(config) {
           }
         }
       },
+      resetStateQueryParameters (state) {
+        Vue.set(state, 'stateQueryParameters', createBlankStateQueryParameters());
+      },
       queryParameters(state, params) {
-        for(let key in params) {
-          state[`${key}QueryParameters`] = params[key];
+        const appState = state.stateQueryParameters;
+        for (let [key, value] of Object.entries(params.state)) {
+          if (Array.isArray(appState[key]) && !(Array.isArray(value))) {
+            value = value.split(',');
+          }
+          Vue.set(appState, key, value);
+        }
+      },
+      addUidToOpenAssets (state, uid) {
+        const idx = state.stateQueryParameters.assets.indexOf(uid);
+        // need to prevent duplicates because of the way the collapse v-model works
+        if (idx === -1) {
+          state.stateQueryParameters.assets.push(uid);
+        }
+      },
+      removeUidFromOpenAssets (state, uid) {
+        const idx = state.stateQueryParameters.assets.indexOf(uid);
+        if (idx > -1) {
+          state.stateQueryParameters.assets.splice(idx, 1);
         }
       },
       stacIndex(state, index) {

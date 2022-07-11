@@ -109,7 +109,7 @@ export default {
             await this.$store.dispatch('validate', this.stacUrl);
         },
         browserUrl() {
-            return window.location.toString();
+          return window.location.toString();
         }
     }
 };

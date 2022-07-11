@@ -117,11 +117,20 @@ export default {
     };
   },
   computed: {
-    ...mapState(['title', 'globalError']),
+    ...mapState(['title', 'globalError', 'stateQueryParameters']),
     ...mapState({catalogUrlFromVueX: 'catalogUrl'}),
     ...mapGetters(['displayCatalogTitle']),
     browserVersion() {
       return STAC_BROWSER_VERSION;
+    },
+    appStateAsParams () {
+      const out = {};
+      for (const [key, value] of Object.entries(this.$store.state.stateQueryParameters)) {
+        if (Array.isArray(value) && value.length > 0) {
+          out[`.${key}`] = value;
+        }
+      }
+      return out;
     }
   },
   watch: {
@@ -137,8 +146,37 @@ export default {
     }
   },
   created() {
-    this.$router.onReady(() => this.parseQuery(this.$route));
-    this.$router.afterEach(to => this.parseQuery(to));
+    // The handling of unwatch and this.$watch sequence below explictly attaches the watcher
+    // for stateQueryParameters AFTER the router has navigated to the page, and AFTER 
+    // the parseQuery method has been run which modifies the stateQueryParameters.
+    // The updateUrlOnStateChange method causes navigation to happen with vue-router, so we
+    // we don't want to happen on initial page render when the we're already at the right location
+    let unwatch = null;
+    this.$router.onReady(() => {
+      this.parseQuery(this.$route);
+      unwatch = this.$watch('stateQueryParameters', this.updateUrlOnStateChange, {deep: true});
+    });
+
+    // When we're navigating to a completely different STAC page (denoted by a different path)
+    // we need to clear out out the stateQueryParameters (eg what tabs were open etc)
+    this.$router.beforeEach((to, from, next) => {
+      if (to.path !== from.path) {
+        if (typeof unwatch === 'function') {
+          unwatch();
+        }
+        unwatch = null;
+        this.$store.commit('resetStateQueryParameters');
+      }
+      next();
+    });
+
+    this.$router.afterEach((to, from) => {
+      if (to.path === from.path) {
+        return;
+      }
+      this.parseQuery(to);
+      unwatch = this.$watch('stateQueryParameters', this.updateUrlOnStateChange, {deep: true});
+    });
 
     // Load the root catalog data if not available (e.g. after page refresh or external access)
     if (this.catalogUrl) {
@@ -185,6 +223,19 @@ export default {
           query
         });
       }
+
+    },
+    updateUrlOnStateChange () {
+      // Force vue-router to read some values as arrays
+      for (const [key, value] of Object.entries(this.$route.query)) {
+        if (Array.isArray(this.appStateAsParams[key]) && !(Array.isArray(value))) {
+          this.$route.query[key] = [value];
+        }
+      }
+
+      this.$router.replace({ query: this.appStateAsParams }).catch((e) => {
+        console.log('Routing Error', e);
+      });
     },
     showError(error, message) {
       this.$store.commit('showGlobalError', {
