@@ -181,6 +181,14 @@ export default {
         if (this.stac instanceof STAC) {
           options.baseUrl = this.stac.getAbsoluteUrl();
         }
+        if ('href' in data) {
+          if (this.stac.type === 'Feature') {
+            options.bbox = this.stac?.bbox;
+          }
+          else if (this.stac.type === 'Collection') {
+            options.bbox = this.stac?.extent?.spatial?.bbox[0];
+          }
+        }
 
         try {
           this.stacLayer = await stacLayer(data, options);
