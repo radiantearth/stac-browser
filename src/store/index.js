@@ -13,7 +13,9 @@ Vue.use(Vuex);
 function createBlankStateQueryParameters () {
   return {
     asset: [],
-    itemdef: []
+    itemdef: [],
+    itemsToken: '',
+    numItems: ''
   };
 }
 
@@ -303,6 +305,18 @@ function getStore(config) {
         }
         // If we are proxying a STAC Catalog, replace any URI with the proxied address.
         return absoluteUrl.toString();
+      },
+      appStateAsParams: (state) => {
+        const out = {};
+        for (const [key, value] of Object.entries(state.stateQueryParameters)) {
+          if (
+              (Array.isArray(value) && value.length > 0) || 
+              (typeof value === 'string' && value.length > 0)
+            ) {
+            out[`.${key}`] = value;
+          } 
+        }
+        return out;
       }
     },
     mutations: {
@@ -641,6 +655,26 @@ function getStore(config) {
           if (stac instanceof STAC) {
             link = stac.getApiItemsLink();
             baseUrl = stac.getAbsoluteUrl();
+          }
+          
+          // This if condition should capture if the app is opened
+          // to a page via a share URL that was generated from a 
+          // paginated page
+          if (
+            cx.state.stateQueryParameters.itemsToken !== '' && 
+            link.href.indexOf('token=') === -1
+          ) {
+            const uri = new URI(link.href);
+            uri.search({
+              token: cx.state.stateQueryParameters.itemsToken,
+              limit: cx.state.stateQueryParameters.numItems
+            });
+
+            link = {
+              href: uri.toString(),
+              method: 'GET',
+              type: 'application/geo+json'
+            };
           }
 
           if (!Utils.isObject(filters)) {

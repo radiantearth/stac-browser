@@ -117,20 +117,11 @@ export default {
     };
   },
   computed: {
-    ...mapState(['title', 'globalError', 'stateQueryParameters']),
+    ...mapState(['title', 'globalError', 'stateQueryParameters', 'apiItemsLink']),
     ...mapState({catalogUrlFromVueX: 'catalogUrl'}),
-    ...mapGetters(['displayCatalogTitle']),
+    ...mapGetters(['displayCatalogTitle', 'appStateAsParams']),
     browserVersion() {
       return STAC_BROWSER_VERSION;
-    },
-    appStateAsParams () {
-      const out = {};
-      for (const [key, value] of Object.entries(this.$store.state.stateQueryParameters)) {
-        if (Array.isArray(value) && value.length > 0) {
-          out[`.${key}`] = value;
-        }
-      }
-      return out;
     }
   },
   watch: {

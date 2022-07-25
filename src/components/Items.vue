@@ -43,6 +43,7 @@ import { BCollapse, BIconSearch } from "bootstrap-vue";
 import Utils from '../utils';
 import STAC from '../models/stac';
 import sortCapabilitiesMixinGenerator from './SortCapabilitiesMixin';
+import URI from 'urijs'
 
 export default {
   name: "Items",
@@ -147,6 +148,14 @@ export default {
         Utils.scrollTo(this.$refs.topPagination.$el);
       }
       this.$emit('paginate', link);
+      const uri = new URI(link.href);
+      const params = uri.search(true);
+      this.$store.commit('queryParameters', {
+        state: {
+          itemsToken: params.token,
+          numItems: params.limit
+        }
+      });
     }
   }
 };
