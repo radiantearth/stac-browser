@@ -117,7 +117,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['title', 'globalError', 'stateQueryParameters', 'apiItemsLink']),
+    ...mapState(['title', 'globalError', 'stateQueryParameters']),
     ...mapState({catalogUrlFromVueX: 'catalogUrl'}),
     ...mapGetters(['displayCatalogTitle', 'appStateAsParams']),
     browserVersion() {
