@@ -669,12 +669,7 @@ function getStore(config) {
               token: cx.state.stateQueryParameters.itemsToken,
               limit: cx.state.stateQueryParameters.numItems
             });
-
-            link = {
-              href: uri.toString(),
-              method: 'GET',
-              type: 'application/geo+json'
-            };
+            link.href = uri.toString();
           }
 
           if (!Utils.isObject(filters)) {
