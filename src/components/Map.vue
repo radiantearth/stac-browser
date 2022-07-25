@@ -190,10 +190,12 @@ export default {
           }
         }
 
-        try {
-          this.stacLayer = await stacLayer(data, options);
-        } catch (error) {
-          this.$root.$emit('error', error, 'Sorry, adding the data to the map failed.');
+        if (data.type !== 'Catalog') {
+          try {
+            this.stacLayer = await stacLayer(data, options);
+          } catch (error) {
+            this.$root.$emit('error', error, 'Sorry, adding the data to the map failed.');
+          }
         }
 
         // If the map isn't shown any more after loading the STAC data, don't try to add it to the map.

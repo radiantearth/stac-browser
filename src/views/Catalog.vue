@@ -1,5 +1,5 @@
 <template>
-  <div :class="{cc: true, [data.type.toLowerCase()]: true, mixed: hasCatalogs && hasItems, empty: !hasCatalogs && !hasItems}" :key="data.id">
+  <div :class="{cc: true, [data.type.toLowerCase()]: true, mixed: hasCatalogs && showItems, empty: !hasCatalogs && !showItems}" :key="data.id">
     <b-row>
       <b-col class="meta">
         <section class="intro">
@@ -21,10 +21,10 @@
             </b-row>
           </section>
         </section>
-        <section v-if="isCollection || thumbnails.length > 0" class="mb-4">
+        <section v-if="showMap || thumbnails.length > 0" class="mb-4">
           <b-card no-body class="maps-preview">
             <b-tabs v-model="tab" ref="tabs" pills card vertical end>
-              <b-tab v-if="isCollection" title="Map" no-body>
+              <b-tab v-if="showMap" title="Map" no-body>
                 <Map :stac="data" :stacLayerData="catalogAsFc" @mapClicked="mapClicked" @dataChanged="dataChanged" />
               </b-tab>
               <b-tab v-if="thumbnails.length > 0" title="Preview" no-body>
@@ -34,7 +34,7 @@
           </b-card>
         </section>
         <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="shownAssets" @showAsset="showAsset" />
-        <Assets v-if="hasItemAssets && !hasItems" :assets="data.item_assets" :definition="true" />
+        <Assets v-if="hasItemAssets && !showItems" :assets="data.item_assets" :definition="true" />
         <Providers v-if="hasProviders" :providers="data.providers" />
         <Metadata title="Metadata" class="mb-4" :type="data.type" :data="data" :ignoreFields="ignoredMetadataFields" />
         <Links v-if="additionalLinks.length > 0" title="Additional resources" :links="additionalLinks" />
@@ -42,9 +42,9 @@
       <b-col class="catalogs-container" v-if="hasCatalogs">
         <Catalogs :catalogs="catalogs" :hasMore="hasMoreCollections" @loadMore="loadMoreCollections" />
       </b-col>
-      <b-col class="items-container" v-if="hasItems">
+      <b-col class="items-container" v-if="showItems">
         <Items
-          :stac="data" :items="items" :api="isApi" :apiFilters="apiItemsFilter"
+          :stac="data" :items="itemsView" :api="isApi" :apiFilters="apiItemsFilter"
           :pagination="itemPages" :loading="apiItemsLoading"
           @paginate="paginateItems" @filterItems="filterItems"
         />
@@ -66,6 +66,7 @@ import ShowAssetMixin from '../components/ShowAssetMixin';
 import { Formatters } from '@radiantearth/stac-fields';
 import { BTabs, BTab } from 'bootstrap-vue';
 import Utils from '../utils';
+import STAC from '../models/stac';
 
 const SORRY_ITEM_LIST = "Sorry, can't load the list of items.";
 
@@ -120,8 +121,8 @@ export default {
     };
   },
   computed: {
-    ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination', 'apiItemsFilter', 'apiItemsLoading']),
-    ...mapGetters(['additionalLinks', 'catalogs', 'isCollection', 'items', 'hasMoreCollections']),
+    ...mapState(['data', 'url', 'apiItemsLink', 'apiItemsPagination', 'apiItemsFilter', 'apiItemsLoading']),
+    ...mapGetters(['additionalLinks', 'catalogs', 'isCollection', 'isCatalog', 'items', 'hasMoreCollections', 'getStac']),
     licenses() {
       if (this.isCollection && this.data.license) {
         return Formatters.formatLicense(this.data.license, null, null, this.data);
@@ -157,7 +158,13 @@ export default {
       return Boolean(this.apiItemsLink);
     },
     hasItems() {
-      return this.items.length > 0 || this.isApi;
+      return this.items.length > 0;
+    },
+    showItems() {
+      return this.hasItems || this.isApi;
+    },
+    showMap() {
+      return this.isCollection || (this.isCatalog && this.hasItems);
     },
     hasCatalogs() {
       return this.catalogs.length > 0;
@@ -165,8 +172,16 @@ export default {
     catalogAsFc () {
       return {
         type: 'FeatureCollection',
-        features: this.items
+        features: this.itemsView
       };
+    },
+    itemsView() {
+      return this.items.map(item => {
+          if (item instanceof STAC) {
+            return item;
+          }
+          return this.getStac(item.href) || item;
+      });
     }
   },
   methods: {
