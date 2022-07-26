@@ -7,6 +7,7 @@ import bs58 from 'bs58';
 import { Loading, stacRequest } from './utils';
 import URI from "urijs";
 import Queryable from '../models/queryable';
+import isJSON from 'is-json';
 
 Vue.use(Vuex);
 
@@ -14,8 +15,7 @@ function createBlankStateQueryParameters () {
   return {
     asset: [],
     itemdef: [],
-    itemsToken: '',
-    numItems: ''
+    itemsPage: {}
   };
 }
 
@@ -314,6 +314,10 @@ function getStore(config) {
               (typeof value === 'string' && value.length > 0)
             ) {
             out[`.${key}`] = value;
+          } else if (
+            (typeof value === 'object' && Object.keys(value).length > 0)
+          ) {
+            out[`.${key}`] = JSON.stringify(value);
           } 
         }
         return out;
@@ -357,6 +361,8 @@ function getStore(config) {
         for (let [key, value] of Object.entries(params.state)) {
           if (Array.isArray(appState[key]) && !(Array.isArray(value))) {
             value = value.split(',');
+          } else if (isJSON(value)) {
+            value = JSON.parse(value)
           }
           Vue.set(appState, key, value);
         }
@@ -652,6 +658,9 @@ function getStore(config) {
 
         try {
           let baseUrl = cx.state.url;
+          
+          const linkWasUndefined = link === undefined;
+
           if (stac instanceof STAC) {
             link = stac.getApiItemsLink();
             baseUrl = stac.getAbsoluteUrl();
@@ -661,15 +670,10 @@ function getStore(config) {
           // to a page via a share URL that was generated from a 
           // paginated page
           if (
-            cx.state.stateQueryParameters.itemsToken !== '' && 
-            link.href.indexOf('token=') === -1
+            Object.keys(cx.state.stateQueryParameters.itemsPage).length > 0 &&
+            linkWasUndefined
           ) {
-            const uri = new URI(link.href);
-            uri.search({
-              token: cx.state.stateQueryParameters.itemsToken,
-              limit: cx.state.stateQueryParameters.numItems
-            });
-            link.href = uri.toString();
+              link = cx.state.stateQueryParameters.itemsPage;
           }
 
           if (!Utils.isObject(filters)) {

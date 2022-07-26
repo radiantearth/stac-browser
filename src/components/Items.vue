@@ -43,7 +43,6 @@ import { BCollapse, BIconSearch } from "bootstrap-vue";
 import Utils from '../utils';
 import STAC from '../models/stac';
 import sortCapabilitiesMixinGenerator from './SortCapabilitiesMixin';
-import URI from 'urijs'
 
 export default {
   name: "Items",
@@ -139,6 +138,13 @@ export default {
   methods: {
     emitFilter(value, reset) {
       this.$emit('filterItems', value, reset);
+      if (Object.keys(this.$store.state.stateQueryParameters.itemsPage).length > 0) {
+        this.$store.commit('queryParameters', {
+          state: {
+            itemsPage: {}
+          }
+        });        
+      }
     },
     showMore() {
       this.shownItems += this.chunkSize;
@@ -148,12 +154,10 @@ export default {
         Utils.scrollTo(this.$refs.topPagination.$el);
       }
       this.$emit('paginate', link);
-      const uri = new URI(link.href);
-      const params = uri.search(true);
+
       this.$store.commit('queryParameters', {
         state: {
-          itemsToken: params.token,
-          numItems: params.limit
+          itemsPage: link
         }
       });
     }

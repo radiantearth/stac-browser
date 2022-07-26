@@ -46,6 +46,7 @@ import StacHeader from './components/StacHeader.vue';
 import Utils from './utils';
 import URI from 'urijs';
 
+
 const CONFIG_FILE = require(CONFIG_PATH);
 
 Vue.use(Clipboard);
