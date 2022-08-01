@@ -339,12 +339,18 @@ function getStore(config) {
         Vue.set(state, 'stateQueryParameters', createBlankStateQueryParameters());
       },
       queryParameters(state, params) {
-        const appState = state.stateQueryParameters;
-        for (let [key, value] of Object.entries(params.state)) {
-          if (Array.isArray(appState[key]) && !(Array.isArray(value))) {
-            value = value.split(',');
+        for(let key in params) {
+          if (key === 'state') {
+            for (let [key, value] of Object.entries(params.state)) {
+              if (Array.isArray(state.stateQueryParameters[key]) && !(Array.isArray(value))) {
+                value = value.split(',');
+              }
+              Vue.set(state.stateQueryParameters, key, value);
+            }
           }
-          Vue.set(appState, key, value);
+          else {
+            state[`${key}QueryParameters`] = params[key];
+          }
         }
       },
       openCollapsible(state, {type, uid}) {
