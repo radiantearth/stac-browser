@@ -25,7 +25,7 @@
           <b-card no-body class="maps-preview">
             <b-tabs v-model="tab" ref="tabs" pills card vertical end>
               <b-tab v-if="isCollection" title="Map" no-body>
-                <Map :stac="data" :stacLayerData="selectedAsset" @mapClicked="mapClicked" @dataChanged="dataChanged" />
+                <Map :stac="data" :stacLayerData="catalogAsFc" @mapClicked="mapClicked" @dataChanged="dataChanged" />
               </b-tab>
               <b-tab v-if="thumbnails.length > 0" title="Preview" no-body>
                 <Thumbnails :thumbnails="thumbnails" />
@@ -161,6 +161,12 @@ export default {
     },
     hasCatalogs() {
       return this.catalogs.length > 0;
+    },
+    catalogAsFc () {
+      return {
+        type: 'FeatureCollection',
+        features: this.items
+      };
     }
   },
   methods: {

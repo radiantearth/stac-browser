@@ -156,6 +156,10 @@ If you are updating from on old version of STAC Browser, you can set this option
 
 The number of items requested and shown per page by default. Only applies to APIs that support the `limit` query parameter.
 
+### maxPreviewsOnMap
+
+The maximum number of previews (thumbnails or overviews) of items that will be shown on the map when on Catalog or Collection pages.
+
 ### cardViewMode
 
 The default view mode for lists of catalogs/collections. Either `list` or `cards` (default). 
