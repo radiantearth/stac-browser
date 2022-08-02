@@ -15,7 +15,7 @@
           </b-badge>
           <b-badge v-if="asset.deprecated" variant="warning" class="deprecated ml-1 mb-1">Deprecated</b-badge>
           <b-badge v-for="role in asset.roles" :key="role" :variant="role === 'data' ? 'primary' : 'secondary'" class="role ml-1 mb-1">{{ role }}</b-badge>
-          <b-badge variant="dark" class="format ml-1 mb-1" :title="fileFormat"><span v-html="shortFileFormat" /></b-badge>
+          <b-badge v-if="shortFileFormat" variant="dark" class="format ml-1 mb-1" :title="fileFormat"><span v-html="shortFileFormat" /></b-badge>
         </div>
       </b-button>
     </b-card-header>
