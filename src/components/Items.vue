@@ -155,9 +155,16 @@ export default {
       }
       this.$emit('paginate', link);
 
+      let compactPageRef = {};
+      if (!('method' in link) || link.method === 'GET') {
+        compactPageRef = {
+          href: link.href.split('?')[1]
+        };
+      }
+
       this.$store.commit('queryParameters', {
         state: {
-          itemsPage: link
+          itemsPage: compactPageRef
         }
       });
     }

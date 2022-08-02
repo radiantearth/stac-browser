@@ -673,7 +673,7 @@ function getStore(config) {
             Object.keys(cx.state.stateQueryParameters.itemsPage).length > 0 &&
             linkWasUndefined
           ) {
-              link = cx.state.stateQueryParameters.itemsPage;
+              link.href = `${link.href}?${cx.state.stateQueryParameters.itemsPage.href}`;
           }
 
           if (!Utils.isObject(filters)) {
