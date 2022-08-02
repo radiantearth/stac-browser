@@ -1,7 +1,7 @@
 <template>
-  <b-card no-body class="catalog-card" :class="{queued: !data, deprecated: data && data.deprecated}" v-b-visible.200="load" :img-right="isList">
+  <b-card no-body :class="classes" v-b-visible.200="load" :img-right="isList">
     <b-card-img
-      v-if="showThumbnail && thumbnail && thumbnailShown" class="thumbnail"
+      v-if="hasImage" class="thumbnail"
       :src="thumbnail.href" :alt="thumbnail.title" :crossorigin="crossOriginMedia" :right="isList"
       @error="hideBrokenImg"
     />
@@ -57,8 +57,27 @@ export default {
   computed: {
     ...mapState(['crossOriginMedia', 'cardViewMode']),
     ...mapGetters(['getStac']),
+    classes() {
+      let classes = ['catalog-card'];
+      if (!this.data) {
+        classes.push('queued');
+      }
+      if (this.data && this.data.deprecated) {
+        classes.push('deprecated');
+      }
+      if (this.hasImage) {
+        classes.push('has-thumbnail');
+      }
+      if (this.temporalExtent) {
+        classes.push('has-extent');
+      }
+      return classes;
+    },
     isList() {
       return this.cardViewMode === 'list';
+    },
+    hasImage() {
+      return this.showThumbnail && this.thumbnail && this.thumbnailShown;
     },
     data() {
       if (this.catalog instanceof STAC) {
@@ -138,6 +157,10 @@ export default {
       box-sizing: border-box;
       margin-top: 0.5em;
       margin-bottom: 0.5em;
+
+      &.has-extent:not(.has-thumbnail) {
+        padding-top: 0.75em;
+      }
 
       .card-img-right {
         min-height: 100px;
