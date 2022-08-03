@@ -210,8 +210,8 @@ export default {
         }
         // All other parameters should be appended to the catalog requests
         else {
-          params.catalog = Utils.isObject(params.catalog) ? params.catalog : {};
-          params.catalog[key] = query[key];
+          params.request = Utils.isObject(params.request) ? params.request : {};
+          params.request[key] = query[key];
         }
       }
       if (Utils.size(params) > 0) {
