@@ -29,7 +29,10 @@
             </b-button>
           </li>
         </ul>
-        <Tree v-else v-for="(child, i) in childs" :key="i" :item="child" :parent="stac" :path="path" />
+        <template v-else>
+          <Tree v-for="(child, i) in shownChilds" :key="i" :item="child" :parent="stac" :path="path" />
+          <b-button class="show-more" v-if="hasMore" @click="showMore" variant="light" v-b-visible.200="showMore">Show more...</b-button>
+        </template>
       </template>
     </li>
   </ul>
@@ -66,7 +69,8 @@ export default {
   data() {
     return {
       expanded: false,
-      loading: false
+      loading: false,
+      chunk: 1
     };
   },
   computed: {
@@ -143,6 +147,12 @@ export default {
       }
       return this.stac.getChildren();
     },
+    hasMore() {
+      return this.childs.length > this.shownChilds.length;
+    },
+    shownChilds() {
+      return this.childs.slice(0, this.chunk * 50);
+    },
     onPath() {
       if (!Array.isArray(this.path) || !this.stac) {
         return false;
@@ -167,6 +177,9 @@ export default {
     }
   },
   methods: {
+    showMore() {
+      this.chunk++;
+    },
     load(visible) {
       if (!this.stac && this.link && !this.pagination) {
         this.$store.commit(visible ? 'queue' : 'unqueue', this.link);
@@ -200,6 +213,12 @@ export default {
   }
 
   .tree {
+    margin-left: 1.5em;
+  }
+
+  .show-more {
+    width: calc(100% - 1.5em);
+    box-sizing: border-box;
     margin-left: 1.5em;
   }
 }
