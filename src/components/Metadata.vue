@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import StacFields from '@radiantearth/stac-fields';
+import { formatAsset, formatCollection, formatItemProperties, formatLink, formatSummaries } from '@radiantearth/stac-fields';
 import MetadataGroup from './metadata/MetadataGroup.vue';
 
 export default {
@@ -45,15 +45,15 @@ export default {
             let filter = key => !key.startsWith('_') && !this.ignoreFields.includes(key);
             switch(this.type) {
                 case 'Asset':
-                    return StacFields.formatAsset(this.data, this.context, filter);
+                    return formatAsset(this.data, this.context, filter);
                 case 'Link':
-                    return StacFields.formatLink(this.data, this.context, filter);
+                    return formatLink(this.data, this.context, filter);
                 case 'Item':
-                    return StacFields.formatItemProperties(this.data, filter);
+                    return formatItemProperties(this.data, filter);
                 case 'Collection':
                 case 'Catalog': {
-                    let core = StacFields.formatCollection(this.data, filter);
-                    let summaries = StacFields.formatSummaries(this.data, filter);
+                    let core = formatCollection(this.data, filter);
+                    let summaries = formatSummaries(this.data, filter);
                     // Merge summaries into collection metadata
                     summaries.forEach(summaryGroup => {
                         let index = core.findIndex(coreGroup => summaryGroup.extension === coreGroup.extension);

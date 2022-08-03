@@ -27,6 +27,12 @@ module.exports = {
 			args[0].title = mergedConfig.title;
 			return args;
 		});
-		webpackConfig.plugin('polyfills').use(NodePolyfillPlugin);
+	},
+	configureWebpack: {
+		plugins: [
+			new NodePolyfillPlugin({
+				includeAliases: ['Buffer', 'console', 'http', 'https', 'process', 'url']
+			})
+		]
 	}
 };

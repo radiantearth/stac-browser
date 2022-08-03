@@ -48,7 +48,7 @@
 
 <script>
 import { BCollapse, BIconBoxArrowUpRight, BIconCheck, BIconChevronRight, BIconChevronDown, BIconDownload, BIconEye } from 'bootstrap-vue';
-import { Formatters } from '@radiantearth/stac-fields';
+import { formatMediaType } from '@radiantearth/stac-fields/formatters';
 import { mapGetters, mapState } from 'vuex';
 import Description from './Description.vue';
 import Metadata from './Metadata.vue';
@@ -161,13 +161,13 @@ export default {
     },
     fileFormat() {
       if (typeof this.asset.type === "string" && this.asset.type.length > 0) {
-        return Formatters.formatMediaType(this.asset.type);
+        return formatMediaType(this.asset.type);
       }
       return null;
     },
     shortFileFormat() {
       if (typeof this.asset.type === "string" && this.asset.type.length > 0) {
-        return Formatters.formatMediaType(this.asset.type, null, {shorten: true});
+        return formatMediaType(this.asset.type, null, {shorten: true});
       }
       return null;
     },

@@ -37,8 +37,6 @@ import "bootstrap-vue/dist/bootstrap-vue.css";
 
 import Clipboard from 'v-clipboard';
 
-import { Formatters } from '@radiantearth/stac-fields';
-
 import ErrorAlert from './components/ErrorAlert.vue';
 import Sidebar from './components/Sidebar.vue';
 import StacHeader from './components/StacHeader.vue';
@@ -58,19 +56,11 @@ Vue.use(CardPlugin);
 Vue.use(LayoutPlugin);
 Vue.use(SidebarPlugin);
 Vue.use(SpinnerPlugin);
-Vue.use(TablePlugin);
 
 // For collapsibles / accordions
 Vue.directive('b-toggle', VBToggle);
 // Used to detect when a catalog/item becomes visible so that further data can be loaded
 Vue.directive('b-visible', VBVisible);
-
-// Add StacField formatters as filters
-for(let name in Formatters) {
-  if (name.startsWith('format')) {
-    Vue.filter(name.replace(/^format/, ''), Formatters[name]);
-  }
-}
 
 const CONFIG = Object.assign(CONFIG_FILE, CONFIG_CLI);
 

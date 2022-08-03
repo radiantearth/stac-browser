@@ -17,6 +17,9 @@ class STAC {
         };
 
         if (migrate) {
+            // Uncomment this line if the old checksum: fields should be converted
+            // This is usually not needed so it's not enabled by default to shrink the bundle size
+            // Migrate.enableMultihash(require('multihashes'));
             if (data.type === 'FeatureCollection') {
                 data.features = data.features.map(item => Migrate.item(item, false));
             }

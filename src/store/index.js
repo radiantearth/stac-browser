@@ -724,16 +724,17 @@ function getStore(config) {
           cx.commit('addApiCollections', { data: response.data, stac, show });
         }
       },
-      async loadQueryables(cx, url) {
+      async loadQueryables(cx, {url, refParser = null}) {
         let schemas;
         try {
           let response = await stacRequest(cx, Utils.toAbsolute('queryables', url));
-          try {
-            const refParser = require('@apidevtools/json-schema-ref-parser');
-            schemas = await refParser.dereference(response.data);
-          } catch (error) {
-            schemas = response.data; // Use data with $refs included as fallback
-            console.error(error);
+          schemas = response.data; // Use data with $refs included as fallback anyway
+          if (refParser) {
+            try {
+              schemas = await refParser.dereference(schemas);
+            } catch (error) {
+              console.error(error);
+            }
           }
         } catch (error) {
           console.log('Queryables not supported by API');

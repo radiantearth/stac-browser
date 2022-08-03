@@ -23,7 +23,7 @@ import { mapGetters, mapState } from 'vuex';
 import StacLink from './StacLink.vue';
 import STAC from '../models/stac';
 import removeMd from 'remove-markdown';
-import { Formatters } from '@radiantearth/stac-fields';
+import { formatTemporalExtent } from '@radiantearth/stac-fields/formatters';
 
 export default {
   name: 'Catalog',
@@ -100,7 +100,7 @@ export default {
       if (this.data?.isCollection() && this.data.extent?.temporal?.interval.length > 0) {
         let extent = this.data.extent.temporal.interval[0];
         if (Array.isArray(extent) && (typeof extent[0] === 'string' || typeof extent[1] === 'string')) {
-          return Formatters.formatTemporalExtent(this.data.extent.temporal.interval[0], true);
+          return formatTemporalExtent(this.data.extent.temporal.interval[0], true);
         }
       }
       return null;

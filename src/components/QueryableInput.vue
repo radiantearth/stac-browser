@@ -59,7 +59,6 @@
 
 <script>
 import Utils from '../utils';
-import DatePicker from 'vue2-datepicker';
 import { BFormInput, BFormSelect, BIconXCircleFill } from 'bootstrap-vue';
     
 export default {
@@ -68,7 +67,7 @@ export default {
     BFormInput,
     BFormSelect,
     BIconXCircleFill,
-    DatePicker
+    DatePicker: () => import('vue2-datepicker')
   },
   props: {
     title: {

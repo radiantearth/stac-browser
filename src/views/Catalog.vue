@@ -63,7 +63,7 @@ import Links from '../components/Links.vue';
 import Metadata from '../components/Metadata.vue';
 import ReadMore from "vue-read-more-smooth";
 import ShowAssetMixin from '../components/ShowAssetMixin';
-import { Formatters } from '@radiantearth/stac-fields';
+import { formatLicense, formatTemporalExtents } from '@radiantearth/stac-fields/formatters';
 import { BTabs, BTab } from 'bootstrap-vue';
 import Utils from '../utils';
 
@@ -124,7 +124,7 @@ export default {
     ...mapGetters(['additionalLinks', 'catalogs', 'isCollection', 'items', 'hasMoreCollections']),
     licenses() {
       if (this.isCollection && this.data.license) {
-        return Formatters.formatLicense(this.data.license, null, null, this.data);
+        return formatLicense(this.data.license, null, null, this.data);
       }
       return null;
     },
@@ -138,7 +138,7 @@ export default {
             // Remove union temporal extent in favor of more concrete extents
             extents = extents.slice(1);
         }
-        return Formatters.formatTemporalExtents(extents);
+        return formatTemporalExtents(extents);
       }
       return null;
     },

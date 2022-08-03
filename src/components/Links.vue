@@ -23,7 +23,7 @@
 import StacLink from './StacLink.vue';
 import Fields from '@radiantearth/stac-fields/fields.json';
 import Utils from '../utils';
-import { Helper } from '@radiantearth/stac-fields';
+import { formatKey } from '@radiantearth/stac-fields/helper';
 
 export default {
   name: "Links",
@@ -69,7 +69,7 @@ export default {
         return Fields.links.rel.mapping[lc];
       }
       else {
-        return Helper.formatKey(rel);
+        return formatKey(rel);
       }
     },
     fallbackTitle(link) {

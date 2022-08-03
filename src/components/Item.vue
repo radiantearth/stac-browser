@@ -11,13 +11,13 @@
       </b-card-title>
       <b-card-text>
         <small class="text-muted">
-          <template v-if="extent">{{ extent | TemporalExtent }}</template>
-          <template v-else-if="data && data.properties.datetime">{{ data.properties.datetime | Timestamp }}</template>
+          <template v-if="extent">{{ extent | formatTemporalExtent }}</template>
+          <template v-else-if="data && data.properties.datetime">{{ data.properties.datetime | formatTimestamp }}</template>
           <template v-else>No time given</template>
         </small>
       </b-card-text>
       <b-card-text v-if="fileFormats.length > 0 || isDeprecated">
-        <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="mr-1 mt-1 fileformat">{{ format | MediaType }}</b-badge>
+        <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="mr-1 mt-1 fileformat">{{ format | formatMediaType }}</b-badge>
         <b-badge v-if="isDeprecated" variant="warning" class="mr-1 mt-1 deprecated">Deprecated</b-badge>
       </b-card-text>
     </b-card-body>
@@ -28,6 +28,7 @@
 import { mapGetters, mapState } from 'vuex';
 import StacLink from './StacLink.vue';
 import STAC from '../models/stac';
+import { formatTemporalExtent, formatTimestamp, formatMediaType } from '@radiantearth/stac-fields/formatters';
 
 export default {
   name: 'Item',
@@ -46,6 +47,11 @@ export default {
       // false = don't load yet, true = try to load it, null = image errored
       thumbnailShown: false
     };
+  },
+  filters: {
+    formatMediaType,
+    formatTemporalExtent,
+    formatTimestamp
   },
   computed: {
     ...mapState(['crossOriginMedia']),

@@ -79,18 +79,15 @@
 </template>
 
 <script>
-import { BAlert, BDropdown, BDropdownItem, BForm, BFormGroup, BFormInput, BFormCheckbox, BFormSelect, BFormTags, BButton } from 'bootstrap-vue';
+import { BDropdown, BDropdownItem, BForm, BFormGroup, BFormInput, BFormCheckbox, BFormSelect, BFormTags } from 'bootstrap-vue';
 
-import DatePicker from 'vue2-datepicker';
 import { mapGetters, mapState } from "vuex";
-import QueryableInput from './QueryableInput.vue';
 import Loading from './Loading.vue';
 import Utils from '../utils';
 
 export default {
   name: 'ItemFilter',
   components: {
-    BAlert,
     BDropdown,
     BDropdownItem,
     BForm,
@@ -99,9 +96,8 @@ export default {
     BFormCheckbox,
     BFormSelect,
     BFormTags,
-    BButton,
-    QueryableInput,
-    DatePicker,
+    DatePicker: () => import('vue2-datepicker'),
+    QueryableInput: () => import('./QueryableInput.vue'),
     Loading,
     Map: () => import('./Map.vue'),
     SortButtons: () => import('./SortButtons.vue')
@@ -186,8 +182,10 @@ export default {
     let promises = [];
     if (this.canFilterCql) {
       promises.push(
-        this.$store.dispatch('loadQueryables', this.stac.getAbsoluteUrl())
-          .catch(error => console.error(error))
+        this.$store.dispatch('loadQueryables', {
+          url: this.stac.getAbsoluteUrl(),
+          refParser: require('@apidevtools/json-schema-ref-parser')
+        }).catch(error => console.error(error))
       );
     }
     if (!this.collectionOnly && this.apiCollections.length === 0) {

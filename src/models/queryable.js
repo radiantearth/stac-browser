@@ -1,4 +1,4 @@
-import { label } from "@radiantearth/stac-fields";
+import { formatKey } from "@radiantearth/stac-fields/helper";
 import Utils from '../utils';
 
 export default class Queryable {
@@ -12,7 +12,7 @@ export default class Queryable {
     if (typeof this.schema.title === 'string') {
       return this.schema.title;
     }
-    return label(this.id);
+    return formatKey(this.id);
   }
 
   toJSON(queryable) {
