@@ -233,8 +233,10 @@ export default {
         }
       }
 
-      this.$router.replace({ query: this.appStateAsParams }).catch((e) => {
-        console.log('Routing Error', e);
+      this.$router.replace({ query: this.appStateAsParams }).catch(error => {
+        if (!VueRouter.isNavigationFailure(error, VueRouter.NavigationFailureType.duplicated)) {
+          throw Error(error);
+        }
       });
     },
     showError(error, message) {
