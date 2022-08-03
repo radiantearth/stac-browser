@@ -40,7 +40,7 @@
     "leaflet": "^1.8.0",
     "node-polyfill-webpack-plugin": "^2.0.0",
     "remove-markdown": "^0.3.0",
-    "stac-layer": "^0.13.0",
+    "stac-layer": "^0.14.0",
     "urijs": "^1.19.11",
     "v-clipboard": "^2.2.3",
     "vue": "^2.6.12",
