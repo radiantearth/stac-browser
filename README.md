@@ -178,7 +178,7 @@ The value for the [`crossorigin` attribute](https://developer.mozilla.org/en-US/
 
 The headers given in this option are added to all requests that are sent to the selected STAC catalog or API.
 
-Example: `{'Bearer': '134567984623223'}` adds a Bearer token to the HTTP headers.
+Example: `{'Authentication': 'Bearer 134567984623223'}` adds a Bearer token to the HTTP headers.
 
 ### requestQueryParameters
 
