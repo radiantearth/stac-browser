@@ -156,7 +156,14 @@ function getStore(config) {
         let regexp = new RegExp('^' + conformanceClass.replaceAll('*', '[^/]+').replace(/\/?#/, '/?#') + '$');
         return !!conformance.find(uri => uri.match(regexp));
       },
-
+      supportsExtension: state => schemaUri => {
+        let extensions = [];
+        if (state.data instanceof STAC && Array.isArray(state.data['stac_extensions'])) {
+          extensions = state.data['stac_extensions'];
+        }
+        let regexp = new RegExp('^' + schemaUri.replaceAll('*', '[^/]+') + '$');
+        return !!extensions.find(uri => uri.match(regexp));
+      },
       tileRendererType: state => {
         if ((state.tileSourceTemplate || state.buildTileUrlTemplate) && !state.useTileLayerAsFallback) {
           return 'server';
@@ -740,6 +747,14 @@ function getStore(config) {
           console.log('Queryables not supported by API');
         }
         cx.commit('addQueryables', schemas);
+      },
+      async loadGeoJson(cx, link) {
+        try {
+          let response = await stacRequest(cx, link);
+          return response.data; // Use data with $refs included as fallback anyway
+        } catch (error) {
+          return null;
+        }
       },
       async validate(cx, url) {
         if (typeof cx.state.valid === 'boolean') {

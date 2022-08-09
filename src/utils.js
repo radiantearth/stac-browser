@@ -3,9 +3,11 @@ import Queryable from './models/queryable';
 
 export const commonFileNames = ['catalog', 'collection', 'item'];
 
+export const geojsonMediaType = "application/geo+json";
+
 export const stacMediaTypes = [
 	'application/json',
-	'application/geo+json',
+	geojsonMediaType,
 	'text/json'
 ];
 
@@ -30,6 +32,9 @@ export const browserProtocols = [
 	'http',
 	'https'
 ];
+
+export const imageMediaTypes = browserImageTypes.concat(geotiffMediaTypes);
+export const mapMediaTypes = imageMediaTypes.concat([geojsonMediaType]);
 
 /**
  * General utilities

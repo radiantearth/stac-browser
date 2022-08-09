@@ -53,9 +53,7 @@ import { mapGetters, mapState } from 'vuex';
 import Description from './Description.vue';
 import Metadata from './Metadata.vue';
 import STAC from '../models/stac';
-import Utils, { browserImageTypes, browserProtocols, geotiffMediaTypes } from '../utils';
-
-export const MIME_TYPES = browserImageTypes.concat(geotiffMediaTypes);
+import Utils, { browserProtocols, imageMediaTypes, mapMediaTypes } from '../utils';
 
 export default {
   name: 'Asset',
@@ -135,7 +133,7 @@ export default {
         return false;
       }
       // If the tile renderer is a tile server, we can't really know what it supports so we pass all images
-      else if (this.tileRendererType === 'server' && MIME_TYPES.includes(this.asset.type)) {
+      else if (this.tileRendererType === 'server' && imageMediaTypes.includes(this.asset.type)) {
         return true;
       }
       // Don't pass GDAL VFS URIs to client-side tile renderer: https://github.com/radiantearth/stac-browser/issues/116
@@ -147,7 +145,7 @@ export default {
         return false;
       }
       // Otherwise, all images that a browser can read are supported
-      else if (MIME_TYPES.includes(this.asset.type)) {
+      else if (mapMediaTypes.includes(this.asset.type)) {
         return true;
       }
       return false;
