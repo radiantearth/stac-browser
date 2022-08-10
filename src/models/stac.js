@@ -10,6 +10,7 @@ class STAC {
         this._id = stacObjCounter++;
         this._url = url;
         this._path = path;
+        this._apiChildrenListeners = {};
         this._apiChildren = {
             list: [],
             prev: false,
@@ -56,6 +57,33 @@ class STAC {
 
     hasApiData() {
         return this._apiChildren.list.length > 0;
+    }
+
+    setApiDataListener(id, listener = null) {
+        if (typeof listener === 'function') {
+            this._apiChildrenListeners[id] = listener;
+        }
+        else {
+            delete this._apiChildrenListeners[id];
+        }
+    }
+
+    setApiData(list, next = null, prev = null) {
+        if (prev) {
+            this._apiChildren.prev = prev;
+        }
+        if (next) {
+            this._apiChildren.next = next;
+        }
+        this._apiChildren.list = list;
+
+        for (let id in this._apiChildrenListeners) {
+            try {
+                this._apiChildrenListeners[id](this._apiChildren);
+            } catch (error) {
+                console.log(error);
+            }
+        }
     }
 
     getChildren() {

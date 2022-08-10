@@ -482,9 +482,8 @@ function getStore(config) {
         }
 
         if (stac instanceof STAC) {
-          stac._apiChildren.prev = pages.prev; // ToDo: Only required when state.apiItems is not cached(?) -> cache apiItems?
-          stac._apiChildren.next = pages.next;
-          stac._apiChildren.list = apiItems;
+          // ToDo: Prev link only required when state.apiItems is not cached(?) -> cache apiItems?
+          stac.setApiData(apiItems, pages.next, pages.prev);
         }
       },
       addApiCollections(state, { data, stac, show }) {
@@ -499,8 +498,7 @@ function getStore(config) {
           state.apiCollections = state.apiCollections.concat(collections);
         }
         if (stac instanceof STAC) {
-          stac._apiChildren.next = nextLink;
-          stac._apiChildren.list = collections;
+          stac.setApiData(collections, nextLink);
         }
       },
       setApiItemsFilter(state, filter) {
