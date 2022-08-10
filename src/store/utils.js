@@ -34,3 +34,7 @@ export async function stacRequest(cx, link) {
   }
   return await axios(opts);
 }
+
+export function isAuthenticationError(error) {
+  return [401,403].includes(error?.response?.status);
+}

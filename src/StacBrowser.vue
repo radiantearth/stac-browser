@@ -1,5 +1,6 @@
 <template>
   <b-container id="stac-browser">
+    <Authentication v-if="doAuth.length > 0" />
     <b-sidebar id="sidebar" title="Browse" shadow lazy>
       <Sidebar />
     </b-sidebar>
@@ -94,6 +95,7 @@ export default {
   router,
   store: getStore(CONFIG),
   components: {
+    Authentication: () => import('./components/Authentication.vue'),
     ErrorAlert,
     Sidebar,
     StacHeader
@@ -107,7 +109,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['title', 'globalError', 'stateQueryParameters']),
+    ...mapState(['title', 'doAuth', 'globalError', 'stateQueryParameters']),
     ...mapState({catalogUrlFromVueX: 'catalogUrl'}),
     ...mapGetters(['displayCatalogTitle']),
     browserVersion() {

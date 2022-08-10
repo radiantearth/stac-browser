@@ -135,9 +135,10 @@ npm start -- --open --tileSourceTemplate="http://localhost:8000/cog/tiles/{z}/{x
 
 A more flexible option than `tileSourceTemplate` is passing a function to `buildTileUrlTemplate`.
 See the [documentation for the corresponding stac-layer option](https://github.com/stac-utils/stac-layer#buildtileurltemplate) for details.
-Please note that this option can only be provided through a config file and is not available via CLI.
 
-This option also replaces the v2 option `tileProxyUrl`.
+This option replaces the v2 option `tileProxyUrl`.
+
+Please note that this option can only be provided through a config file and is not available via CLI.
 
 ### useTileLayerAsFallback
 
@@ -180,6 +181,8 @@ The headers given in this option are added to all requests that are sent to the 
 
 Example: `{'Authentication': 'Bearer 134567984623223'}` adds a Bearer token to the HTTP headers.
 
+Please note that this option can only be provided through a config file and is not available via CLI.
+
 ### requestQueryParameters
 
 ***experimental***
@@ -187,6 +190,50 @@ Example: `{'Authentication': 'Bearer 134567984623223'}` adds a Bearer token to t
 The query parameters given in this option are added to all requests that are sent to the selected STAC catalog or API.
 
 Example: `{'f': 'json'}` adds a `f` query parameter to the HTTP URL, e.g. `https://example.com?f=json`.
+
+Please note that this option can only be provided through a config file and is not available via CLI.
+
+### authConfig
+
+***experimental***
+
+This allows to enable a simple authentication form where a user can input a token, an API key or similar things.
+It is disabled by default (`null`). If enabled, the token provided by the user can be used in the HTTP headers or in the query parameters of the requests.
+
+There are four options you can set in the `authConfig` object:
+
+* `type` (string): Either `query` (use token in query parameters) or `header` (use token in HTTP request headers).
+* `key` (string): The query string parameter name or the HTTP header name respecively.
+* `formatter` (function|null): You can optionally specify a formatter for the query string value or HTTP header value respectively. If not given, the token is provided as provided by the user.
+* `description` (string|null): Optionally a description that is shown to the user. This should explain how the token can be obtained for example. CommonMark is allowed.
+
+Please note that this option can only be provided through a config file and is not available via CLI.
+
+#### Example 1: Bearer Token in the HTTP header
+
+```js
+{
+  type: 'header', // null or 'query' or 'header'
+  key: 'Authentication',
+  formatter: token => `Bearer ${token}`,
+  description: `Please retrieve the token from our [API console](https://example.com/api-console).\n\nFor further questions contact <mailto:support@example.com>.`
+}
+```
+
+For a given token `123` this results in the following additional HTTP Header:
+`Authentication: Bearer 123`
+
+#### Example 2: Bearer Token in the HTTP header
+
+```js
+{
+  type: 'query',
+  key: 'API_KEY'
+}
+```
+
+For a given token `123` this results in the following query parameter:
+`https://example.com/stac/catalog.json?API_KEY=123`
 
 ## Theming
 
