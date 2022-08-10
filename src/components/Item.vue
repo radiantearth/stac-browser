@@ -35,6 +35,11 @@ export default {
   components: {
     StacLink
   },
+  filters: {
+    formatMediaType,
+    formatTemporalExtent,
+    formatTimestamp
+  },
   props: {
     item: {
       type: Object,
@@ -47,11 +52,6 @@ export default {
       // false = don't load yet, true = try to load it, null = image errored
       thumbnailShown: false
     };
-  },
-  filters: {
-    formatMediaType,
-    formatTemporalExtent,
-    formatTimestamp
   },
   computed: {
     ...mapState(['crossOriginMedia']),

@@ -30,7 +30,7 @@ import getStore from "./store";
 
 import {
   AlertPlugin, BadgePlugin, ButtonGroupPlugin, ButtonPlugin,
-  CardPlugin, LayoutPlugin, SidebarPlugin, SpinnerPlugin, TablePlugin,
+  CardPlugin, LayoutPlugin, SidebarPlugin, SpinnerPlugin,
   VBToggle, VBVisible } from "bootstrap-vue";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
