@@ -18,5 +18,6 @@ module.exports = {
     crossOriginMedia: null,
     requestHeaders: {},
     requestQueryParameters: {},
+    preprocessSTAC: null,
     authConfig: null
 };

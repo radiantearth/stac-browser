@@ -235,6 +235,33 @@ For a given token `123` this results in the following additional HTTP Header:
 For a given token `123` this results in the following query parameter:
 `https://example.com/stac/catalog.json?API_KEY=123`
 
+### preprocessSTAC
+
+***experimental***
+
+This allows to preprocess the STAC Items, Catalogs and Collections that are requested from the servers using a function.
+The function receives two parameters:
+* `stac` (object of type `STAC`)
+* `state` (the vuex state)
+
+Please note that this option can only be provided through a config file and is not available via CLI.
+
+#### Example: Update root catalog
+
+Some root catalogs in implementations don't have very useful titles, descriptions and are not a nice "intro" for new users.
+Thus, it may make sense to change the root catalog to provide more useful information.
+Of course, ideally you'd want to update the root catalog itself, but until then you can use this.
+
+```js
+preprocessSTAC: (stac, state) => {
+    if (stac.getBrowserPath() === '/') {
+        stac.title = state.catalogTitle;
+        stac.description = 'This is a **much** more useful description for this catalog!';
+    }
+    return stac;
+}
+```
+
 ## Theming
 
 You can customize STAC Browser in the `src/theme` folder. It contains Sass files (a CSS preprocessor), which you can change to suit your needs.
