@@ -12,7 +12,7 @@
         </b-card-body>
         <b-card-footer>
           <b-button type="submit" variant="primary">Submit</b-button>
-          <b-button type="reset" variant="danger" class="ml-3">Reset</b-button>
+          <b-button type="reset" variant="danger" class="ml-3">Cancel</b-button>
         </b-card-footer>
       </b-card>
     </b-form>
