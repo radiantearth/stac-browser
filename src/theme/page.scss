@@ -23,7 +23,7 @@ body {
         margin: $block-margin 0;
         
         .lead {
-            color: map-get($theme-colors, "secondary");
+            color: $gray-600;
         }
     }
     .logo {
