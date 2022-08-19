@@ -1,5 +1,5 @@
 module.exports = {
-    catalogUrl: null,
+    catalogUrl: null, // Must have a slash at the end for folders/APIs
     catalogTitle: "STAC Browser",
     allowExternalAccess: true, // Must be true if catalogUrl is not given
     useTileLayerAsFallback: true,
@@ -17,5 +17,7 @@ module.exports = {
     maxPreviewsOnMap: 50,
     crossOriginMedia: null,
     requestHeaders: {},
-    requestQueryParameters: {}
+    requestQueryParameters: {},
+    preprocessSTAC: null,
+    authConfig: null
 };

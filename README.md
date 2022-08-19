@@ -8,7 +8,7 @@ implemented as a single page application (SPA) for ease of development and to
 limit the overall number of catalog reads necessary when browsing (as catalogs
 may be nested and do not necessarily contain references to their parents).
 
-Version: **3.0.0-beta.2** (supports all STAC versions between 0.6.0 and 1.0.0)
+Version: **3.0.0-beta.3** (supports all STAC versions between 0.6.0 and 1.0.0)
 
 This package has also been published to npm as [`@radiantearth/stac-browser`](https://www.npmjs.com/package/@radiantearth/stac-browser).
 
@@ -135,9 +135,10 @@ npm start -- --open --tileSourceTemplate="http://localhost:8000/cog/tiles/{z}/{x
 
 A more flexible option than `tileSourceTemplate` is passing a function to `buildTileUrlTemplate`.
 See the [documentation for the corresponding stac-layer option](https://github.com/stac-utils/stac-layer#buildtileurltemplate) for details.
-Please note that this option can only be provided through a config file and is not available via CLI.
 
-This option also replaces the v2 option `tileProxyUrl`.
+This option replaces the v2 option `tileProxyUrl`.
+
+Please note that this option can only be provided through a config file and is not available via CLI.
 
 ### useTileLayerAsFallback
 
@@ -180,6 +181,8 @@ The headers given in this option are added to all requests that are sent to the 
 
 Example: `{'Authentication': 'Bearer 134567984623223'}` adds a Bearer token to the HTTP headers.
 
+Please note that this option can only be provided through a config file and is not available via CLI.
+
 ### requestQueryParameters
 
 ***experimental***
@@ -187,6 +190,77 @@ Example: `{'Authentication': 'Bearer 134567984623223'}` adds a Bearer token to t
 The query parameters given in this option are added to all requests that are sent to the selected STAC catalog or API.
 
 Example: `{'f': 'json'}` adds a `f` query parameter to the HTTP URL, e.g. `https://example.com?f=json`.
+
+Please note that this option can only be provided through a config file and is not available via CLI.
+
+### authConfig
+
+***experimental***
+
+This allows to enable a simple authentication form where a user can input a token, an API key or similar things.
+It is disabled by default (`null`). If enabled, the token provided by the user can be used in the HTTP headers or in the query parameters of the requests.
+
+There are four options you can set in the `authConfig` object:
+
+* `type` (string): Either `query` (use token in query parameters) or `header` (use token in HTTP request headers).
+* `key` (string): The query string parameter name or the HTTP header name respecively.
+* `formatter` (function|null): You can optionally specify a formatter for the query string value or HTTP header value respectively. If not given, the token is provided as provided by the user.
+* `description` (string|null): Optionally a description that is shown to the user. This should explain how the token can be obtained for example. CommonMark is allowed.
+
+Please note that this option can only be provided through a config file and is not available via CLI.
+
+#### Example 1: Bearer Token in the HTTP header
+
+```js
+{
+  type: 'header', // null or 'query' or 'header'
+  key: 'Authentication',
+  formatter: token => `Bearer ${token}`,
+  description: `Please retrieve the token from our [API console](https://example.com/api-console).\n\nFor further questions contact <mailto:support@example.com>.`
+}
+```
+
+For a given token `123` this results in the following additional HTTP Header:
+`Authentication: Bearer 123`
+
+#### Example 2: Bearer Token in the HTTP header
+
+```js
+{
+  type: 'query',
+  key: 'API_KEY'
+}
+```
+
+For a given token `123` this results in the following query parameter:
+`https://example.com/stac/catalog.json?API_KEY=123`
+
+### preprocessSTAC
+
+***experimental***
+
+This allows to preprocess the STAC Items, Catalogs and Collections that are requested from the servers using a function.
+The function receives two parameters:
+* `stac` (object of type `STAC`)
+* `state` (the vuex state)
+
+Please note that this option can only be provided through a config file and is not available via CLI.
+
+#### Example: Update root catalog
+
+Some root catalogs in implementations don't have very useful titles, descriptions and are not a nice "intro" for new users.
+Thus, it may make sense to change the root catalog to provide more useful information.
+Of course, ideally you'd want to update the root catalog itself, but until then you can use this.
+
+```js
+preprocessSTAC: (stac, state) => {
+    if (stac.getBrowserPath() === '/') {
+        stac.title = state.catalogTitle;
+        stac.description = 'This is a **much** more useful description for this catalog!';
+    }
+    return stac;
+}
+```
 
 ## Theming
 

@@ -70,7 +70,8 @@ export default {
     return {
       expanded: false,
       loading: false,
-      chunk: 1
+      chunk: 1,
+      childs: []
     };
   },
   computed: {
@@ -141,12 +142,6 @@ export default {
       }
       return STAC.getDisplayTitle([this.item, this.stac]);
     },
-    childs() {
-      if (!this.stac) {
-        return [];
-      }
-      return this.stac.getChildren();
-    },
     hasMore() {
       return this.childs.length > this.shownChilds.length;
     },
@@ -174,9 +169,26 @@ export default {
           this.expanded = true;
         }
       }
+    },
+    stac(newStac, oldStac) {
+      if (newStac instanceof STAC) {
+        newStac.setApiDataListener('tree', () => this.updateChilds());
+      }
+      if (oldStac instanceof STAC) {
+        oldStac.setApiDataListener('tree');
+      }
+      this.updateChilds();
     }
   },
   methods: {
+    updateChilds() {
+      if (this.stac instanceof STAC) {
+        this.childs = this.stac.getChildren();
+      }
+      else {
+        this.childs = [];
+      }
+    },
     showMore() {
       this.chunk++;
     },

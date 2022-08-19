@@ -34,3 +34,14 @@ export async function stacRequest(cx, link) {
   }
   return await axios(opts);
 }
+
+export function processSTAC(state, stac) {
+  if (typeof state.preprocessSTAC === 'function') {
+    stac = state.preprocessSTAC(stac, state);
+  }
+  return Object.freeze(stac);
+}
+
+export function isAuthenticationError(error) {
+  return [401,403].includes(error?.response?.status);
+}

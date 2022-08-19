@@ -45,10 +45,14 @@ $headings-font-family: $font-family-sans-serif;
 // Fonts for code
 $font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
+// Heading sizes
 $h1-font-size: 2.2rem;
 $h2-font-size: 1.6rem;
 $h3-font-size: 1.4rem;
 $h4-font-size: 1.2rem;
+
+// Heading color
+$headings-color: null;
 
 // Links
 $link-color: map-get($theme-colors, "primary");
