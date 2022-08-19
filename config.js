@@ -4,6 +4,7 @@ module.exports = {
     allowExternalAccess: true, // Must be true if catalogUrl is not given
     useTileLayerAsFallback: true,
     tileSourceTemplate: null,
+    displayGeoTiffByDefault: false,
     buildTileUrlTemplate: ({href, asset}) => 'https://tiles.rdnt.io/tiles/{z}/{x}/{y}@2x?url=' + encodeURIComponent(asset.href.startsWith('/vsi') ? asset.href : href),
     stacProxyUrl: null,
     pathPrefix: "/",

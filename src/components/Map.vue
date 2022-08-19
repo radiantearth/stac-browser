@@ -91,7 +91,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['maxPreviewsOnMap', 'buildTileUrlTemplate', 'crossOriginMedia', 'geoTiffResolution', 'tileSourceTemplate', 'useTileLayerAsFallback']),
+    ...mapState(['buildTileUrlTemplate', 'crossOriginMedia', 'displayGeoTiffByDefault', 'geoTiffResolution', 'maxPreviewsOnMap', 'tileSourceTemplate', 'useTileLayerAsFallback']),
     ...mapGetters(['getStac', 'supportsExtension']),
     baseMaps() {
       let targets = [];
@@ -176,14 +176,17 @@ export default {
         return;
       }
 
-      let options = {
+      let getDefaultOptions = (customOptions = {}) => Object.assign({
         baseUrl: this.stac.getAbsoluteUrl(),
         resolution: this.geoTiffResolution,
         useTileLayerAsFallback: this.useTileLayerAsFallback,
         tileUrlTemplate: this.tileSourceTemplate,
         buildTileUrlTemplate: this.buildTileUrlTemplate,
-        crossOrigin: this.crossOriginMedia
-      };
+        crossOrigin: this.crossOriginMedia,
+        displayGeoTiffByDefault: this.displayGeoTiffByDefault
+      }, customOptions);
+
+      let options = getDefaultOptions();
       if (this.stacLayerData && 'href' in this.stacLayerData) {
         if (this.stac.isItem()) {
           options.bbox = this.stac?.bbox;
@@ -238,12 +241,13 @@ export default {
 
       // Add item previews to the map
       if (addItemsPreview) {
-        this.itemPreviewsLayer = await stacLayer(this.stacLayerData, {
+        let itemPreviewOptions = getDefaultOptions({
           fillOpacity: 0,
           weight: this.secondaryWeight,
           color: this.secondaryColor,
           displayPreview: this.stacLayerData.features.length < this.maxPreviewsOnMap
         });
+        this.itemPreviewsLayer = await stacLayer(this.stacLayerData, itemPreviewOptions);
         this.itemPreviewsLayer.addTo(this.map);
         // The check for a function is currently needed as stac-layer only added that recently. 
         // todo: We can remove this once the new version has been released.
@@ -253,7 +257,7 @@ export default {
       }
 
       // label extension: Add source imagery and geojson to map
-      if (this.stac.isItem() && this.supportsExtension(LABEL_EXT)/* && this.stac.properties['label:type'] === 'vector'*/) {
+      if (this.stac.isItem() && this.supportsExtension(LABEL_EXT) && this.stac.properties['label:type'] === 'vector') {
         let sourceLinks = this.stac.getLinksWithRels(['source']);
 
         let labelAssets = this.stac.getAssetsWithRoles(['labels']);
@@ -277,16 +281,16 @@ export default {
             .then(geojson => this.geojson = geojson)
             .catch(error => console.error(error));
 
-          const layerOptions = {
+          const labelSourceLayerOptions = getDefaultOptions({
             fillOpacity: 0,
             weight: 0
-          };
+          });
           for(let link of sourceLinks) {
             this.$store.dispatch('load', {url: link.href})
               .then(() => {
                 let sourceStac = this.getStac(link.href, true);
                 if (sourceStac instanceof STAC) {
-                  return stacLayer(sourceStac, layerOptions);
+                  return stacLayer(sourceStac, labelSourceLayerOptions);
                 }
                 else {
                   throw sourceStac;

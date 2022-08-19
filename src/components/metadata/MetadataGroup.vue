@@ -1,5 +1,5 @@
 <template>
-  <b-card no-body :key="extension" :class="['metadata-card', extension]">
+  <b-card no-body :key="extension" :class="['metadata-card', `ext-${extension}`]">
     <b-card-title>
       <span v-if="label" v-html="label" />
       <template v-else>General</template>

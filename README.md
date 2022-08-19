@@ -147,6 +147,11 @@ If server-side rendering should only be used as a fallback for client-side rende
 
 By default, client-side COG rendering is enabled. A server-side fallback is provided via the [tiles.rdnt.io](https://github.com/radiantearth/tiles.rdnt.io) project, which serves publicly accessible COGs as tile layers.
 
+### displayGeoTiffByDefault
+
+If set to `true`, the map also shows non-cloud-optimized GeoTiff files by default. Otherwise (`false`, default), it only shows COGs and you can only enforce showing GeoTiffs to be loaded with the "Show on map" button but they are never loaded automatically.
+Loading non-cloud-optimized GeoTiffs only works reliably for smaller files (< 1MB). It may also work for larger files, but it is depending a lot on the underlying client hardware and software.
+
 ### redirectLegacyUrls
 
 ***experimental***
