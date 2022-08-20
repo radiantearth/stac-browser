@@ -249,11 +249,7 @@ export default {
         });
         this.itemPreviewsLayer = await stacLayer(this.stacLayerData, itemPreviewOptions);
         this.itemPreviewsLayer.addTo(this.map);
-        // The check for a function is currently needed as stac-layer only added that recently. 
-        // todo: We can remove this once the new version has been released.
-        if (typeof this.itemPreviewsLayer.bringToFront === 'function') {
-          this.itemPreviewsLayer.bringToFront();
-        }
+        this.itemPreviewsLayer.bringToFront();
       }
 
       // label extension: Add source imagery and geojson to map
