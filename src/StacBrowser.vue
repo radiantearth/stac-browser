@@ -169,11 +169,6 @@ export default {
       this.parseQuery(to);
       unwatch = this.$watch('stateQueryParameters', this.updateUrlOnStateChange, {deep: true});
     });
-
-    // Load the root catalog data if not available (e.g. after page refresh or external access)
-    if (this.catalogUrl) {
-      this.$store.dispatch("load", { url: this.catalogUrl, loadApi: true });
-    }
   },
   mounted() {
     this.$root.$on('error', this.showError);

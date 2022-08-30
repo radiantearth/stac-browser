@@ -419,6 +419,9 @@ function getStore(config) {
       loaded(state, {url, data}) {
         Vue.set(state.database, url, processSTAC(state, data));
       },
+      clear(state, url) {
+        Vue.delete(state.database, url);
+      },
       resetCatalog(state) {
         Object.assign(state, catalogDefaults());
       },
@@ -594,7 +597,7 @@ function getStore(config) {
         cx.commit('parents', parents);
       },
       async load(cx, args) {
-        let {url, fromBrowser, show, loadApi} = args;
+        let {url, fromBrowser, show, loadApi, loadRoot} = args;
         let path;
         if (fromBrowser) {
           path = url.startsWith('/') ? url : '/' + url;
@@ -603,6 +606,11 @@ function getStore(config) {
         else {
           url = Utils.toAbsolute(url, cx.state.url);
           path = cx.getters.toBrowserPath(url);
+        }
+
+        // Load the root catalog data if not available (e.g. after page refresh or external access)
+        if (!loadRoot && path !== '/' && cx.state.catalogUrl && !cx.state.database[cx.state.catalogUrl]) {
+          await cx.dispatch("load", { url: cx.state.catalogUrl, loadApi: true, loadRoot: true });
         }
 
         if (show) {
@@ -633,6 +641,7 @@ function getStore(config) {
             }
           } catch (error) {
             if (cx.state.authConfig && isAuthenticationError(error)) {
+              cx.commit('clear', url);
               cx.commit('requestAuth', () => cx.dispatch('load', args));
               return;
             }
@@ -798,7 +807,7 @@ function getStore(config) {
         }
       },
       async retryAfterAuth(cx) {
-        let errorFn = error => this.$store.commit('showGlobalError', {
+        let errorFn = error => cx.commit('showGlobalError', {
           error,
           message: 'The requests errored, the provided authentication details may be incorrect.'
         });
