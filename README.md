@@ -184,7 +184,7 @@ The value for the [`crossorigin` attribute](https://developer.mozilla.org/en-US/
 
 The headers given in this option are added to all requests that are sent to the selected STAC catalog or API.
 
-Example: `{'Authentication': 'Bearer 134567984623223'}` adds a Bearer token to the HTTP headers.
+Example: `{'Authorization': 'Bearer 134567984623223'}` adds a Bearer token to the HTTP headers.
 
 Please note that this option can only be provided through a config file and is not available via CLI.
 
@@ -207,28 +207,28 @@ It is disabled by default (`null`). If enabled, the token provided by the user c
 
 There are four options you can set in the `authConfig` object:
 
-* `type` (string): Either `query` (use token in query parameters) or `header` (use token in HTTP request headers).
+* `type` (string): `null` (disabled), `query` (use token in query parameters), or `header` (use token in HTTP request headers).
 * `key` (string): The query string parameter name or the HTTP header name respecively.
 * `formatter` (function|null): You can optionally specify a formatter for the query string value or HTTP header value respectively. If not given, the token is provided as provided by the user.
 * `description` (string|null): Optionally a description that is shown to the user. This should explain how the token can be obtained for example. CommonMark is allowed.
 
 Please note that this option can only be provided through a config file and is not available via CLI.
 
-#### Example 1: Bearer Token in the HTTP header
+#### Example 1: HTTP Request Header Value
 
 ```js
 {
-  type: 'header', // null or 'query' or 'header'
-  key: 'Authentication',
+  type: 'header',
+  key: 'Authorization',
   formatter: token => `Bearer ${token}`,
   description: `Please retrieve the token from our [API console](https://example.com/api-console).\n\nFor further questions contact <mailto:support@example.com>.`
 }
 ```
 
 For a given token `123` this results in the following additional HTTP Header:
-`Authentication: Bearer 123`
+`Authorization: Bearer 123`
 
-#### Example 2: Bearer Token in the HTTP header
+#### Example 2: Query Parameter Value
 
 ```js
 {
