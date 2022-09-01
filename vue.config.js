@@ -24,7 +24,7 @@ module.exports = {
 			return args;
 		});
 		webpackConfig.plugin('html').tap(args => {
-			args[0].title = mergedConfig.title;
+			args[0].title = mergedConfig.catalogTitle;
 			return args;
 		});
 	},
