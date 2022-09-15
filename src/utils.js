@@ -116,10 +116,12 @@ export default class Utils {
 		let uri = URI(href);
 		if (uri.is("relative") && !Utils.isGdalVfsUri(href)) { // Don't convert GDAL VFS URIs: https://github.com/radiantearth/stac-browser/issues/116
 			// Avoid that baseUrls that have a . in the last parth part will be removed (e.g. https://example.com/api/v1.0 )
-			if (!baseUrl.endsWith('/') && !baseUrl.endsWith('.json')) {
-				baseUrl += '/';
+			let baseUri = URI(baseUrl);
+			let baseUriPath = baseUri.path();
+			if (!baseUriPath.endsWith('/') && !baseUriPath.endsWith('.json')) {
+				baseUri.path(baseUriPath + '/');
 			}
-			uri = uri.absoluteTo(baseUrl);
+			uri = uri.absoluteTo(baseUri);
 		}
 		return stringify ? uri.toString() : uri;
 	}

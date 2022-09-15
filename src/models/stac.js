@@ -106,11 +106,7 @@ class STAC {
     }
 
     static addMissingChildren(catalogs, stac) {
-        let links = stac.getLinksWithRels(['child']).filter(link => {
-          // Don't add non-JSON links
-          if (!Utils.isStacMediaType(link.type, true)) {
-            return false;
-          }
+        let links = stac.getStacLinksWithRel('child').filter(link => {
           // Don't add links that are already in collections: https://github.com/radiantearth/stac-browser/issues/103
           // ToDo: The runtime of this can probably be improved
           let absoluteUrl = Utils.toAbsolute(link.href, stac.getAbsoluteUrl());
@@ -120,11 +116,11 @@ class STAC {
     }
 
     getApiCollectionsLink() {
-        return this.getLinkWithRel('data');
+        return this.getStacLinkWithRel('data');
     }
 
     getApiItemsLink() {
-        return this.getLinkWithRel('items');
+        return this.getStacLinkWithRel('items');
     }
 
     getMetadata(field) {
@@ -143,6 +139,21 @@ class STAC {
 
     getAbsoluteUrl() {
         return this._url;
+    }
+
+    getStacLinksWithRel(rel, allowEmpty = true) {
+        return Utils.getLinksWithRels(this.links, [rel])
+            .filter(link => Utils.isStacMediaType(link.type, allowEmpty));
+    }
+
+    getStacLinkWithRel(rel, allowEmpty = true) {
+        let links = this.getStacLinksWithRel(rel, allowEmpty);
+        if (links.length > 0) {
+            return links[0];
+        }
+        else {
+            return null;
+        }
     }
 
     getLinkWithRel(rel) {

@@ -66,6 +66,7 @@ function getStore(config) {
         'next',
         'prev',
         'parent',
+        'queryables',
         'root',
         'search',
         'self',
@@ -137,13 +138,13 @@ function getStore(config) {
       searchLink: (state, getters) => {
         let links = [];
         if (getters.root) {
-          links = getters.root.getLinksWithRels(['search']);
+          links = getters.root.getStacLinksWithRel('search');
         }
         else if (state.data instanceof STAC) {
-          links = state.data.getLinksWithRels(['search']);
+          links = state.data.getStacLinksWithRel('search');
         }
         // ToDo: Currently, only GET search requests are supported
-        return links.find(link => Utils.isStacMediaType(link.type, true) && link.method !== 'POST');
+        return links.find(link => link.method !== 'POST');
       },
       supportsSearch: (state, getters) => Boolean(getters.searchLink),
       supportsConformance: (state, getters) => conformanceClass => {
@@ -179,7 +180,7 @@ function getStore(config) {
           return state.apiItems;
         }
         else if (state.data) {
-          return state.data.getLinksWithRels(['item']).filter(link => Utils.isStacMediaType(link.type, true));
+          return state.data.getStacLinksWithRel('item');
         }
         return [];
       },
@@ -722,16 +723,38 @@ function getStore(config) {
           }
           else {
             response.data.features = response.data.features.map(item => {
-              let selfLink = Utils.getLinkWithRel(item.links, 'self');
-              let url;
-              if (selfLink?.href) {
-                url = Utils.toAbsolute(selfLink.href, baseUrl);
+              try {
+                if (!Utils.isObject(item)) {
+                  return null;
+                }
+                let selfLink = Utils.getLinkWithRel(item.links, 'self');
+                let url;
+                if (selfLink?.href) {
+                  url = Utils.toAbsolute(selfLink.href, baseUrl);
+                }
+                else if (typeof item.id !== 'undefined') {
+                  if (baseUrl) {
+                    url = Utils.toAbsolute(`items/${item.id}`, baseUrl);
+                  }
+                  else if (cx.getters.root && getters.root.getApiCollectionsLink()) {
+                    url = Utils.toAbsolute(`${stac.id}/items/${item.id}`, getters.root.getApiCollectionsLink().href);
+                  }
+                  else if (cx.state.catalogUrl) {
+                    url = Utils.toAbsolute(`collections/${stac.id}/items/${item.id}`, cx.state.catalogUrl);
+                  }
+                  else {
+                    return null;
+                  }
+                }
+                else {
+                  return null;
+                }
+                return new STAC(item, url, cx.getters.toBrowserPath(url));
+              } catch (error) {
+                console.error(error);
+                return null;
               }
-              else {
-                url = Utils.toAbsolute(`./collections/${cx.state.data.id}/items/${item.id}`, cx.state.catalogUrl || baseUrl);
-              }
-              return new STAC(item, url, cx.getters.toBrowserPath(url));
-            });
+            }).filter(item => item instanceof STAC);
             if (show) {
               cx.commit('setApiItemsLink', link);
             }
@@ -781,10 +804,12 @@ function getStore(config) {
           cx.commit('addApiCollections', { data: response.data, stac, show });
         }
       },
-      async loadQueryables(cx, {url, refParser = null}) {
+      async loadQueryables(cx, {stac, refParser = null}) {
         let schemas;
         try {
-          let response = await stacRequest(cx, Utils.toAbsolute('queryables', url));
+          let link = stac.getStacLinkWithRel('queryables');
+          let href = link ? link.href : Utils.toAbsolute('queryables', stac.getAbsoluteUrl());
+          let response = await stacRequest(cx, href);
           schemas = response.data; // Use data with $refs included as fallback anyway
           if (refParser) {
             try {

@@ -183,7 +183,7 @@ export default {
     if (this.canFilterCql) {
       promises.push(
         this.$store.dispatch('loadQueryables', {
-          url: this.stac.getAbsoluteUrl(),
+          stac: this.stac,
           refParser: require('@apidevtools/json-schema-ref-parser')
         }).catch(error => console.error(error))
       );
