@@ -25,6 +25,8 @@ import Fields from '@radiantearth/stac-fields/fields.json';
 import Utils from '../utils';
 import { formatKey } from '@radiantearth/stac-fields/helper';
 
+const OGC_REL_PREFIX = 'http://www.opengis.net/def/rel/ogc/1.0/';
+
 export default {
   name: "Links",
   components: {
@@ -69,6 +71,9 @@ export default {
         return Fields.links.rel.mapping[lc];
       }
       else {
+        if (rel.startsWith(OGC_REL_PREFIX)) {
+          rel = rel.substr(OGC_REL_PREFIX.length);
+        }
         return formatKey(rel);
       }
     },
