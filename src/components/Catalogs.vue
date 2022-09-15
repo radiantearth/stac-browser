@@ -55,13 +55,8 @@ export default {
         return this.catalogs;
       }
       let catalogs = this.catalogs.map(catalog => {
-          if (!(catalog instanceof STAC)) {
-            let stac = this.getStac(catalog.href);
-            if (stac) {
-              return stac;
-            }
-          }
-          return catalog;
+          let stac = this.getStac(catalog);
+          return stac ? stac : catalog;
       });
       // Filter
       if (this.searchTerm) {

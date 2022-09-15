@@ -57,12 +57,7 @@ export default {
     ...mapState(['crossOriginMedia']),
     ...mapGetters(['getStac']),
     data() {
-      if (this.item instanceof STAC) {
-        return this.item;
-      }
-      else {
-        return this.getStac(this.item.href);
-      }
+      return this.getStac(this.item);
     },
     thumbnail() {
       if (this.data) {

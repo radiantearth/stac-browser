@@ -76,11 +76,17 @@ function getStore(config) {
     getters: {
       loading: state => !state.url || !state.data || state.database[state.url] instanceof Loading,
       error: state => state.database[state.url] instanceof Error ? state.database[state.url] : null,
-      getStac: state => (url, returnErrorObject = false) => {
-        if (!url) {
+      getStac: state => (source, returnErrorObject = false) => {
+        if (source instanceof STAC) {
+          return source;
+        }
+        if (Utils.isObject(source) && Utils.hasText(source.href)) {
+          source = source.href;
+        }
+        if (!Utils.hasText(source)) {
           return null;
         }
-        let absoluteUrl = Utils.toAbsolute(url, state.url);
+        let absoluteUrl = Utils.toAbsolute(source, state.url);
         let data = state.database[absoluteUrl];
         if (data instanceof STAC || (returnErrorObject && data instanceof Error)) {
           return data;
@@ -88,10 +94,6 @@ function getStore(config) {
         else {
           return null;
         }
-      },
-      getStacFromLink: (state, getters) => (rel, fallback = null) => {
-        let link = state.data?.getLinkWithRel(rel) || {href: fallback};
-        return getters.getStac(link.href);
       },
 
       displayCatalogTitle: (state, getters) => STAC.getDisplayTitle(getters.root, state.catalogTitle),
@@ -103,38 +105,74 @@ function getStore(config) {
 
       stacVersion: state => state.data?.stac_version,
 
-      root: (state, getters) => {
-        let fallback;
-        if (state.catalogUrl) {
-          fallback = state.catalogUrl;
+      root: (_, getters) => getters.getStac(getters.rootLink),
+
+      rootLink: state => {
+        let link = state.data?.getStacLinkWithRel('root');
+        if (link) {
+          return link;
+        }
+        else if (state.catalogUrl) {
+          return Utils.createLink(state.catalogUrl, 'root');
         }
         else if (state.url && state.data instanceof STAC && state.data.getLinksWithRels(['conformance', 'service-desc', 'service-doc', 'data', 'search']).length > 0) {
-          fallback = state.url;
+          return Utils.createLink(state.url, 'root');
         }
-        return getters.getStacFromLink('root', fallback);
+        else {
+          // If we detect OGC API like paths, try to guess the paths
+          let uri = URI(state.url);
+          let path = uri.segment(-2);
+          if (['collections', 'items'].includes(path)) {
+            uri.segment(-1, "");
+            uri.segment(-1, "");
+            if (path === 'items') {
+              uri.segment(-1, "");
+              uri.segment(-1, "");
+            }
+            return Utils.createLink(uri.toString(), 'root');
+          }
+          else {
+            return null;
+          }
+        }
       },
-      parent: (state, getters) => getters.getStacFromLink('parent'),
-      collection: (state, getters) => getters.getStacFromLink('collection'),
-
-      getLink: (state, getters) => rel => {
-        let link = state.data?.getLinkWithRel(rel);
-        let stac = getters[rel];
-        let title = STAC.getDisplayTitle([stac, link]);
+      parentLink: state => {
+        let link = state.data?.getStacLinkWithRel('parent');
         if (link) {
-          link = Object.assign({}, link);
-          link.title = title;
+          return link;
         }
-        else if (stac instanceof STAC) {
-          return {
-            href: stac.getAbsoluteUrl(),
-            title,
-            rel
-          };
+        else {
+          // If we detect OGC API like paths, try to guess the paths
+          let uri = URI(state.url);
+          let path = uri.segment(-2);
+          if (['collections', 'items'].includes(path)) {
+            uri.segment(-1, "");
+            uri.segment(-1, "");
+            return Utils.createLink(uri.toString(), 'parent');
+          }
+          else {
+            return null;
+          }
         }
-        return link;
       },
-      parentLink: (state, getters) => getters.getLink('parent'),
-      collectionLink: (state, getters) => getters.getLink('collection'),
+      collectionLink: state => {
+        let link = state.data?.getStacLinkWithRel('collection');
+        if (link) {
+          return link;
+        }
+        else {
+          // If we detect OGC API like paths, try to guess the paths
+          let uri = URI(state.url);
+          let path = uri.segment(-2);
+          if (path == 'items') {
+            uri.segment(-1, "");
+            return Utils.createLink(uri.toString(), 'collection');
+          }
+          else {
+            return null;
+          }
+        }
+      },
       searchLink: (state, getters) => {
         let links = [];
         if (getters.root) {
@@ -146,6 +184,7 @@ function getStore(config) {
         // ToDo: Currently, only GET search requests are supported
         return links.find(link => link.method !== 'POST');
       },
+
       supportsSearch: (state, getters) => Boolean(getters.searchLink),
       supportsConformance: (state, getters) => conformanceClass => {
         let conformance = [];
@@ -733,11 +772,12 @@ function getStore(config) {
                   url = Utils.toAbsolute(selfLink.href, baseUrl);
                 }
                 else if (typeof item.id !== 'undefined') {
+                  let apiCollectionsLink = cx.getters.root?.getApiCollectionsLink();
                   if (baseUrl) {
                     url = Utils.toAbsolute(`items/${item.id}`, baseUrl);
                   }
-                  else if (cx.getters.root && getters.root.getApiCollectionsLink()) {
-                    url = Utils.toAbsolute(`${stac.id}/items/${item.id}`, getters.root.getApiCollectionsLink().href);
+                  else if (apiCollectionsLink) {
+                    url = Utils.toAbsolute(`${stac.id}/items/${item.id}`, apiCollectionsLink.href);
                   }
                   else if (cx.state.catalogUrl) {
                     url = Utils.toAbsolute(`collections/${stac.id}/items/${item.id}`, cx.state.catalogUrl);

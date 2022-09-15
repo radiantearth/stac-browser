@@ -127,15 +127,15 @@ export default class Utils {
 	}
 
 	static getLinkWithRel(links, rel) {
-		return Array.isArray(links) ? links.find(link => Utils.isObject(link) && typeof link.href === 'string' && link.rel === rel) : null;
+		return Array.isArray(links) ? links.find(link => Utils.isObject(link) && Utils.hasText(link.href) && link.rel === rel) : null;
 	}
 
 	static getLinksWithRels(links, rels) {
-			return Array.isArray(links) ? links.filter(link => Utils.isObject(link) && typeof link.href === 'string' && rels.includes(link.rel)) : [];
+			return Array.isArray(links) ? links.filter(link => Utils.isObject(link) && Utils.hasText(link.href) && rels.includes(link.rel)) : [];
 	}
 
 	static getLinksWithOtherRels(links, rels) {
-			return Array.isArray(links) ? links.filter(link => Utils.isObject(link) && typeof link.href === 'string' && !rels.includes(link.rel)) : [];
+			return Array.isArray(links) ? links.filter(link => Utils.isObject(link) && Utils.hasText(link.href) && !rels.includes(link.rel)) : [];
 	}
 
 	static equalUrl(a, b) {
@@ -344,6 +344,10 @@ export default class Utils {
 		// Search with "and" or "or"
 		let fn = and ? 'every' : 'some';
 		return searchterm[fn](term => target.includes(term));
-}
+	}
+
+	static createLink(href, rel) {
+		return {href, rel};
+	}
 
 }

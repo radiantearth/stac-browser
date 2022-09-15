@@ -85,7 +85,10 @@ export default {
   },
   computed: {
     ...mapState(['data', 'url']),
-    ...mapGetters(['additionalLinks', 'collection', 'collectionLink'])
+    ...mapGetters(['additionalLinks', 'collectionLink', 'getStac']),
+    collection() {
+      return this.getStac(this.collectionLink);
+    }
   },
   watch: {
     collectionLink: {

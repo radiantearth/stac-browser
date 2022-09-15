@@ -80,12 +80,7 @@ export default {
       return this.showThumbnail && this.thumbnail && this.thumbnailShown;
     },
     data() {
-      if (this.catalog instanceof STAC) {
-        return this.catalog;
-      }
-      else {
-        return this.getStac(this.catalog.href);
-      }
+      return this.getStac(this.catalog);
     },
     thumbnail() {
       if (this.data) {

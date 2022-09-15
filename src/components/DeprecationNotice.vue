@@ -15,8 +15,6 @@
 </template>
 
 <script>
-import Utils from '../utils';
-
 export default {
 	name: 'DeprecationNotice',
 	components: {
