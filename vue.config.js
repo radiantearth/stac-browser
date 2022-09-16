@@ -1,6 +1,20 @@
 const yargs = require('yargs/yargs');
 const { hideBin } = require('yargs/helpers');
-const argv = yargs(hideBin(process.argv)).argv;
+const argv = yargs(hideBin(process.argv))
+	.parserConfiguration({'camel-case-expansion': false})
+	.boolean([
+		'allowExternalAccess',
+		'displayGeoTiffByDefault',
+		'redirectLegacyUrls',
+		'showThumbnailsAsAssets',
+		'stacLint',
+		'useTileLayerAsFallback'
+	])
+	.number([
+		'itemsPerPage',
+		'maxPreviewsOnMap'
+	])
+	.argv;
 // Clean-up arguments
 delete argv._;
 delete argv.$0;

@@ -377,6 +377,9 @@ function getStore(config) {
                 state[key] = value;
               }
               break;
+            case 'crossOriginMedia':
+              state.crossOriginMedia = ['anonymous', 'use-credentials'].includes(value) ? value : null;
+              break;
             default:
               state[key] = value;
           }
