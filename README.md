@@ -12,6 +12,9 @@ Version: **3.0.0-beta.3** (supports all STAC versions between 0.6.0 and 1.0.0)
 
 This package has also been published to npm as [`@radiantearth/stac-browser`](https://www.npmjs.com/package/@radiantearth/stac-browser).
 
+It's not officially supported, but you may also be able to use it for
+certain *OGC API - Records* and *OGC API - Features* compliant servers.
+
 ## Examples
 
 For a list of examples, check out [STAC Index](https://stacindex.org).
