@@ -225,7 +225,7 @@ export default {
       };
     },
     onSubmit() {
-      if (this.sort) {
+      if (this.canSort && this.sortTerm && this.sortOrder) {
         this.query.sortby = this.formatSort();
       }
       this.$emit('input', this.query, false);
@@ -270,7 +270,7 @@ export default {
       this.query.ids = ids;
     },
     formatSort() {
-      if (this.sort && this.sortTerm) {
+      if (this.sortTerm && this.sortOrder) {
         let order = this.sortOrder < 0 ? '-' : '';
         return `${order}${this.sortTerm}`;
       }

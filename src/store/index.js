@@ -42,6 +42,7 @@ function getStore(config) {
     redirectUrl: null,
     privateQueryParameters: {},
     doAuth: [],
+    conformsTo: [],
 
     apiCollections: [],
     nextCollectionsLink: null
@@ -56,6 +57,7 @@ function getStore(config) {
       supportedRelTypes: [ // These will be handled in a special way and will not be shown in the link lists
         'child',
         'collection',
+        'conformance',
         'data',
         'first',
         'icon',
@@ -186,16 +188,13 @@ function getStore(config) {
       },
 
       supportsSearch: (state, getters) => Boolean(getters.searchLink),
-      supportsConformance: (state, getters) => conformanceClass => {
-        let conformance = [];
-        if (getters.root && Array.isArray(getters.root.conformsTo)) {
-          conformance = getters.root.conformsTo;
-        }
-        else if (state.data instanceof STAC && Array.isArray(state.data.conformsTo)) {
-          conformance = state.data.conformsTo;
-        }
-        let regexp = new RegExp('^' + conformanceClass.replaceAll('*', '[^/]+').replace(/\/?#/, '/?#') + '$');
-        return !!conformance.find(uri => uri.match(regexp));
+      supportsConformance: state => classes => {
+        let classRegexp = classes
+          .map(c => c.replaceAll('*', '[^/]+').replace(/\/?#/, '/?#'))
+          .join('|');
+        let regexp = new RegExp('^(' + classRegexp + ')$');
+        console.log('^(' + classRegexp + ')$');
+        return !!state.conformsTo.find(uri => uri.match(regexp));
       },
       supportsExtension: state => schemaUri => {
         let extensions = [];
@@ -503,6 +502,11 @@ function getStore(config) {
       removeFromQueue(state, num) {
         state.queue.splice(0, num);
       },
+      setConformanceClasses(state, classes) {
+        if (Array.isArray(classes)) {
+          state.conformsTo = classes;
+        }
+      },
       setApiItemsLink(state, link) {
         state.apiItemsLink = link;
       },
@@ -679,6 +683,14 @@ function getStore(config) {
                 cx.commit('config', { catalogUrl: Utils.toAbsolute(root.href, url) });
               }
             }
+            
+            let conformanceLink = data.getStacLinkWithRel('conformance');
+            if (Array.isArray(data.conformsTo) && data.conformsTo.length > 0) {
+              cx.commit('setConformanceClasses', data.conformsTo);
+            }
+            else if (conformanceLink) {
+              await cx.dispatch('loadOgcApiConformance', conformanceLink);
+            }
           } catch (error) {
             if (cx.state.authConfig && isAuthenticationError(error)) {
               cx.commit('clear', url);
@@ -842,6 +854,12 @@ function getStore(config) {
             return new STAC(collection, url, cx.getters.toBrowserPath(url));
           });
           cx.commit('addApiCollections', { data: response.data, stac, show });
+        }
+      },
+      async loadOgcApiConformance(cx, link) {
+        let response = await stacRequest(cx, link);
+        if (Utils.isObject(response.data) && Array.isArray(response.data.conformsTo)) {
+          cx.commit('setConformanceClasses', response.data.conformsTo);
         }
       },
       async loadQueryables(cx, {stac, refParser = null}) {
