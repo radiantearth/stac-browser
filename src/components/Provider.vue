@@ -16,7 +16,7 @@
     </b-card-header>
     <b-collapse :id="id" v-model="expanded" accordion="providers" role="tabpanel">
       <b-card-body>
-        <b-button-group v-if="provider.url">
+        <b-button-group v-if="provider.url || provider.email || provider.mail">
           <b-button :href="provider.url" target="_blank" variant="primary">
             Go to homepage
           </b-button>
