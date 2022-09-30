@@ -23,6 +23,6 @@ const getTileProxiedUri = (uri) => {
 }
 
 export const getTileSource = (assetHref) => {
-  const proxiedUri = getTileProxiedUri(assetHref);
+  const proxiedUri = encodeURIComponent(getTileProxiedUri(assetHref));
   return TILE_SOURCE_TEMPLATE.replace("{ASSET_HREF}", proxiedUri);
 }
