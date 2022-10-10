@@ -58,7 +58,7 @@ export default {
   }
 
   &.loading-fill {
-    z-index: 100;
+    z-index: 2000;
     position: absolute;
     background-color: rgba(255,255,255, 0.75);
     width: 100%;

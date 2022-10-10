@@ -28,7 +28,6 @@ function getStore(config) {
     globalError: null,
 
     apiItems: [],
-    apiItemsLoading: false,
     apiItemsLink: null,
     apiItemsFilter: {},
     apiItemsPagination: {},
@@ -45,6 +44,7 @@ function getStore(config) {
     conformsTo: [],
 
     apiCollections: [],
+    apiItemsLoading: {},
     nextCollectionsLink: null
   });
 
@@ -77,6 +77,19 @@ function getStore(config) {
     }),
     getters: {
       loading: state => !state.url || !state.data || state.database[state.url] instanceof Loading,
+      getApiItemsLoading: state => data => {
+        let id = '';
+        if (data instanceof Loading) {
+          return true;
+        }
+        else if (data instanceof STAC) {
+          id = data.id;
+        }
+        else if (typeof data === 'string') {
+          id = data;
+        }
+        return state.apiItemsLoading[id] || false;
+      },
       error: state => state.database[state.url] instanceof Error ? state.database[state.url] : null,
       getStac: state => (source, returnErrorObject = false) => {
         if (source instanceof STAC) {
@@ -120,8 +133,8 @@ function getStore(config) {
         else if (state.url && state.data instanceof STAC && state.data.getLinksWithRels(['conformance', 'service-desc', 'service-doc', 'data', 'search']).length > 0) {
           return Utils.createLink(state.url, 'root');
         }
-        else {
-          // If we detect OGC API like paths, try to guess the paths
+        else if (state.url) {
+          // Fallback: If we detect OGC API like paths, try to guess the paths
           let uri = URI(state.url);
           let path = uri.segment(-2);
           if (['collections', 'items'].includes(path)) {
@@ -133,18 +146,19 @@ function getStore(config) {
             }
             return Utils.createLink(uri.toString(), 'root');
           }
-          else {
-            return null;
-          }
         }
+        return null;
       },
       parentLink: state => {
-        let link = state.data?.getStacLinkWithRel('parent');
-        if (link) {
-          return link;
+        if (state.data instanceof STAC) {
+          let link = state.data.getStacLinkWithRel('parent');
+          if (link) {
+            return link;
+          }
         }
-        else {
-          // If we detect OGC API like paths, try to guess the paths
+
+        // Fallback: If we detect OGC API like paths, try to guess the paths
+        if (state.url) {
           let uri = URI(state.url);
           let path = uri.segment(-2);
           if (['collections', 'items'].includes(path)) {
@@ -152,28 +166,29 @@ function getStore(config) {
             uri.segment(-1, "");
             return Utils.createLink(uri.toString(), 'parent');
           }
-          else {
-            return null;
-          }
         }
+
+        return null;
       },
       collectionLink: state => {
-        let link = state.data?.getStacLinkWithRel('collection');
-        if (link) {
-          return link;
+        if (state.data instanceof STAC) {
+          let link = state.data?.getStacLinkWithRel('collection');
+          if (link) {
+            return link;
+          }
         }
-        else {
-          // If we detect OGC API like paths, try to guess the paths
+        
+        // Fallback: If we detect OGC API like paths, try to guess the paths
+        if (state.url) {
           let uri = URI(state.url);
           let path = uri.segment(-2);
           if (path == 'items') {
             uri.segment(-1, "");
             return Utils.createLink(uri.toString(), 'collection');
           }
-          else {
-            return null;
-          }
         }
+
+        return null;
       },
       searchLink: (state, getters) => {
         let links = [];
@@ -193,7 +208,6 @@ function getStore(config) {
           .map(c => c.replaceAll('*', '[^/]+').replace(/\/?#/, '/?#'))
           .join('|');
         let regexp = new RegExp('^(' + classRegexp + ')$');
-        console.log('^(' + classRegexp + ')$');
         return !!state.conformsTo.find(uri => uri.match(regexp));
       },
       supportsExtension: state => schemaUri => {
@@ -224,7 +238,7 @@ function getStore(config) {
       },
       catalogs: state => {
         let catalogs = [];
-        if (state.data.getApiCollectionsLink() && state.apiCollections.length > 0) {
+        if (state.data instanceof STAC && state.data.getApiCollectionsLink() && state.apiCollections.length > 0) {
           catalogs = catalogs.concat(state.apiCollections);
         }
         if (state.data) {
@@ -513,8 +527,13 @@ function getStore(config) {
       setApiItemsLink(state, link) {
         state.apiItemsLink = link;
       },
-      setApiItemsLoading(state, loading = true) {
-        state.apiItemsLoading = loading;
+      toggleApiItemsLoading(state, collectionId = '') {
+        if (state.apiItemsLoading[collectionId]) {
+          Vue.delete(state.apiItemsLoading, collectionId);
+        }
+        else {
+          Vue.set(state.apiItemsLoading, collectionId, true);
+        }
       },
       setApiItems(state, { data, stac, show }) {
         if (!Utils.isObject(data) || !Array.isArray(data.features)) {
@@ -752,7 +771,8 @@ function getStore(config) {
         }
       },
       async loadApiItems(cx, {link, stac, show, filters}) {
-        cx.commit('setApiItemsLoading');
+        let collectionId = stac instanceof STAC ? stac.id : '';
+        cx.commit('toggleApiItemsLoading', collectionId);
 
         try {
           let baseUrl = cx.state.url;
@@ -814,11 +834,11 @@ function getStore(config) {
               cx.commit('setApiItemsLink', link);
             }
             cx.commit('setApiItems', { data: response.data, stac, show });
-            cx.commit('setApiItemsLoading', false);
+            cx.commit('toggleApiItemsLoading', collectionId);
             return response;
           }
         } catch (error) {
-          cx.commit('setApiItemsLoading', false);
+          cx.commit('toggleApiItemsLoading', collectionId);
           throw error;
         }
       },
