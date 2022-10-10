@@ -8,7 +8,7 @@ implemented as a single page application (SPA) for ease of development and to
 limit the overall number of catalog reads necessary when browsing (as catalogs
 may be nested and do not necessarily contain references to their parents).
 
-Version: **3.0.0-beta.3** (supports all STAC versions between 0.6.0 and 1.0.0)
+Version: **3.0.0-beta.4** (supports all STAC versions between 0.6.0 and 1.0.0)
 
 This package has also been published to npm as [`@radiantearth/stac-browser`](https://www.npmjs.com/package/@radiantearth/stac-browser).
 
@@ -125,7 +125,7 @@ by using stacProxyUrl you can proxy the original STAC server with one that enabl
 
 ### tileSourceTemplate
 
-The `tileSourceTemplate` variable controls the tile layer that is used to render imagera such as (cloud-optimized) GeoTiffs.
+The `tileSourceTemplate` variable controls the tile layer that is used to render imagery such as (cloud-optimized) GeoTiffs.
 
 The format of this value is a tile layer template with an optional `{url}` that will be replaced with the COG asset href. For example,
 using a local version of [titiler](https://github.com/developmentseed/titiler) to serve local COG files would look something like:
