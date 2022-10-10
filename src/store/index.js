@@ -5,8 +5,11 @@ import Utils from '../utils';
 import STAC from '../models/stac';
 import bs58 from 'bs58';
 import { isAuthenticationError, Loading, processSTAC, stacRequest } from './utils';
+import { BrowserError } from '../utils';
 import URI from "urijs";
 import Queryable from '../models/queryable';
+
+console.log(BrowserError);
 
 Vue.use(Vuex);
 
@@ -694,7 +697,7 @@ function getStore(config) {
           try {
             let response = await stacRequest(cx, url);
             if (!Utils.isObject(response.data)) {
-              throw new Error('The response is not a valid STAC JSON');
+              throw new BrowserError('The response is not a valid STAC JSON');
             }
             data = new STAC(response.data, url, path);
             cx.commit('loaded', {url, data});
@@ -793,7 +796,7 @@ function getStore(config) {
 
           let response = await stacRequest(cx, link);
           if (!Utils.isObject(response.data) || !Array.isArray(response.data.features)) {
-            throw new Error('The API response is not a valid list of STAC Items');
+            throw new BrowserError('The API response is not a valid list of STAC Items');
           }
           else {
             response.data.features = response.data.features.map(item => {
@@ -862,7 +865,7 @@ function getStore(config) {
         }
         let response = await stacRequest(cx, link);
         if (!Utils.isObject(response.data) || !Array.isArray(response.data.collections)) {
-          throw new Error('The API response is not a valid list of STAC Collections');
+          throw new BrowserError('The API response is not a valid list of STAC Collections');
         }
         else {
           response.data.collections = response.data.collections.map(collection => {

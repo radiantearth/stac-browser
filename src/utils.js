@@ -36,6 +36,12 @@ export const browserProtocols = [
 export const imageMediaTypes = browserImageTypes.concat(geotiffMediaTypes);
 export const mapMediaTypes = imageMediaTypes.concat([geojsonMediaType]);
 
+export class BrowserError extends Error {
+  constructor(message) {
+	super(message);
+  }
+}
+
 /**
  * General utilities
  * 

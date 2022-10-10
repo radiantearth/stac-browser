@@ -13,7 +13,7 @@
 import ErrorAlert from '../components/ErrorAlert.vue';
 import Loading from '../components/Loading.vue';
 import { mapGetters, mapState } from "vuex";
-import Utils from '../utils';
+import Utils, { BrowserError } from '../utils';
 
 export default {
   name: "Browse",
@@ -72,6 +72,9 @@ export default {
         else if (res.status > 400) {
           return "The request is invalid. This might be due to invalid parameters, e.g. in a search request, or could be a bug in STAC Browser.";
         }
+      }
+      else if (this.error instanceof BrowserError) {
+        return this.error.message;
       }
 
       return "This issue may occur when servers don't allow external access via web browsers (e.g., when CORS headers are not present)." + contact;
