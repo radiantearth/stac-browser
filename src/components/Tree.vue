@@ -170,14 +170,17 @@ export default {
         }
       }
     },
-    stac(newStac, oldStac) {
-      if (newStac instanceof STAC) {
-        newStac.setApiDataListener('tree', () => this.updateChilds());
+    stac: {
+      immediate: true,
+      handler(newStac, oldStac) {
+        if (newStac instanceof STAC) {
+          newStac.setApiDataListener('tree', () => this.updateChilds());
+        }
+        if (oldStac instanceof STAC) {
+          oldStac.setApiDataListener('tree');
+        }
+        this.updateChilds();
       }
-      if (oldStac instanceof STAC) {
-        oldStac.setApiDataListener('tree');
-      }
-      this.updateChilds();
     }
   },
   methods: {
