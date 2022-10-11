@@ -172,7 +172,7 @@ export default {
       }
       let data = this.stacLayerData || this.stac;
 
-      if (!(this.stac instanceof STAC) || this.stac.isCatalog()) {
+      if (!(this.stac instanceof STAC)) {
         return;
       }
 
@@ -208,36 +208,25 @@ export default {
         addItemsPreview = true;
       }
 
-      try {
-        this.stacLayer = await stacLayer(data, options);
-      } catch (error) {
-        this.$root.$emit('error', error, 'Sorry, adding the data to the map failed.');
-      }
-
-      // If the map isn't shown any more after loading the STAC data, don't try to add it to the map.
-      // Fixes https://github.com/radiantearth/stac-browser/issues/109
-      if (!this.show || !this.stacLayer) {
-        return;
-      }
-
-      this.$emit('dataChanged', this.stacLayer.stac);
-      this.stacLayer.on('click', event => {
-        // Debounce click event, otherwise a dblclick is fired (and fired twice)
-        let clicks = event.originalEvent.detail || 1;
-        if (clicks === 1) {
-          this.dblClickState = window.setTimeout(() => {
-            this.dblClickState = null;
-            this.$emit('mapClicked', event.stac, event);
-          }, 500);
+      if (!this.stac.isCatalog()) {
+        try {
+          this.stacLayer = await stacLayer(data, options);
+        } catch (error) {
+          this.$root.$emit('error', error, 'Sorry, adding the data to the map failed.');
         }
-        else if (clicks > 1 && this.dblClickState) {
-          window.clearTimeout(this.dblClickState);
-          this.dblClickState = null;
+
+        // If the map isn't shown any more after loading the STAC data, don't try to add it to the map.
+        // Fixes https://github.com/radiantearth/stac-browser/issues/109
+        if (!this.show || !this.stacLayer) {
+          return;
         }
-      });
-      this.stacLayer.on("fallback", event => this.$emit('dataChanged', event.stac));
-      this.stacLayer.addTo(this.map);
-      this.fitBounds();
+
+        this.$emit('dataChanged', this.stacLayer.stac);
+        this.addMapClickEvent(this.stacLayer);
+        this.stacLayer.on("fallback", event => this.$emit('dataChanged', event.stac));
+        this.stacLayer.addTo(this.map);
+        this.fitBounds(this.stacLayer, this.selectBounds);
+      }
 
       // Add item previews to the map
       if (addItemsPreview) {
@@ -248,8 +237,12 @@ export default {
           displayPreview: this.stacLayerData.features.length < this.maxPreviewsOnMap
         });
         this.itemPreviewsLayer = await stacLayer(this.stacLayerData, itemPreviewOptions);
+        this.addMapClickEvent(this.itemPreviewsLayer);
         this.itemPreviewsLayer.addTo(this.map);
         this.itemPreviewsLayer.bringToFront();
+        if (!this.stacLayer) {
+          this.fitBounds(this.itemPreviewsLayer);
+        }
       }
 
       // label extension: Add source imagery and geojson to map
@@ -302,18 +295,34 @@ export default {
         }
       }
     },
+    addMapClickEvent(layer) {
+      layer.on('click', event => {
+        // Debounce click event, otherwise a dblclick is fired (and fired twice)
+        let clicks = event.originalEvent.detail || 1;
+        if (clicks === 1) {
+          this.dblClickState = window.setTimeout(() => {
+            this.dblClickState = null;
+            this.$emit('mapClicked', event.stac, event);
+          }, 500);
+        }
+        else if (clicks > 1 && this.dblClickState) {
+          window.clearTimeout(this.dblClickState);
+          this.dblClickState = null;
+        }
+      });
+    },
     geojsonToFront() {
       if (this.$refs.geojson && this.$refs.geojson.mapObject) {
         this.$refs.geojson.mapObject.bringToFront();
       }
     },
-    fitBounds() {
+    fitBounds(layer, noPadding = false) {
       let fitOptions = {
-        padding: this.selectBounds ? [0,0] : [90,90],
+        padding: noPadding ? [0,0] : [90,90],
         animate: false,
         duration: 0
       };
-      this.map.fitBounds(this.stacLayer.getBounds(), fitOptions);
+      this.map.fitBounds(layer.getBounds(), fitOptions);
     },
     showPopup(feature, layer) {
       let html = '';
