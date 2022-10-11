@@ -199,7 +199,7 @@ function getStore(config) {
         else if (state.data instanceof STAC) {
           links = state.data.getStacLinksWithRel('search');
         }
-        // ToDo: Currently, only GET search requests are supported
+        // ToDo: Currently, only GET search requests are supported #183
         return links.find(link => link.method !== 'POST');
       },
 

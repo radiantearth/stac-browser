@@ -15,7 +15,7 @@
         <b-alert v-else-if="!hasItems" variant="warning" show>No items found for the given filters.</b-alert>
         <template v-if="hasItems">
           <div id="search-map">
-            <Map :stac="root" :stacLayerData="itemCollection" @mapClicked="mapClicked" @viewChanged="resetSelectedItem" scrollWheelZoom />
+            <Map :stac="root" :stacLayerData="itemCollection" scrollWheelZoom popover />
           </div>
           <Items
             :stac="root" :items="apiItems" :api="true" :allowFilter="false"
@@ -24,21 +24,6 @@
         </template>
       </b-col>
     </b-row>
-    <b-popover
-      v-if="selectedItem" placement="left" triggers="manual" :show="selectedItem !== null"
-      :target="selectedItem.target" boundary="search-map" container="search-map" :key="selectedItem.key"
-    >
-      <section class="items">
-        <b-card-group columns class="count-1">
-          <Item :item="selectedItem.item" />
-        </b-card-group>
-      </section>
-      <div class="text-center">
-        <b-button target="_blank" variant="danger" @click="resetSelectedItem">
-          Close
-        </b-button>
-      </div>
-    </b-popover>
   </div>
 </template>
 
@@ -49,7 +34,6 @@ import Utils from '../utils';
 import sortCapabilitiesMixinGenerator from '../components/SortCapabilitiesMixin';
 import ItemFilter from '../components/ItemFilter.vue';
 import Loading from '../components/Loading.vue';
-import { BPopover } from 'bootstrap-vue';
 
 const pageTitle = 'Search';
 const searchId = '__search__';
@@ -57,9 +41,7 @@ const searchId = '__search__';
 export default {
   name: "Search",
   components: {
-    BPopover,
     ItemFilter,
-    Item: () => import('../components/Item.vue'),
     Items,
     Loading,
     Map: () => import('../components/Map.vue')
@@ -166,27 +148,6 @@ export default {
       if (response) {
         this.$store.commit('showPage', {title: pageTitle, url: response.config.url});
       }
-    },
-    resetSelectedItem() {
-        if (this.selectedItem && this.selectedItem.oldStyle) {
-          this.selectedItem.layer.setStyle(this.selectedItem.oldStyle);
-        }
-        this.selectedItem = null;
-    },
-    mapClicked(stac, event) {
-      this.resetSelectedItem();
-      if (stac.type === 'Feature') {
-        this.selectedItem = {
-          item: stac.data,
-          target: event.originalEvent.srcElement,
-          layer: event.layer,
-          key: event.layer._leaflet_id
-        };
-        if (event.layer) {
-          this.selectedItem.oldStyle = Object.assign({}, event.layer.options);
-          event.layer.setStyle(Object.assign({}, event.layer.options, {color: '#dc3545'}));
-        }
-      }
     }
   }
 };
@@ -227,10 +188,6 @@ export default {
       }
       @include media-breakpoint-up(xxxl) {
         column-count: 4;
-      }
-
-      &.count-1 {
-        column-count: 1;
       }
     }
   }

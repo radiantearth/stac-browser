@@ -95,6 +95,10 @@ body {
         }
     }
 
+    > .popover .items .card-columns.count-1 {
+        column-count: 1;
+    }
+
     .twitter {
         @include button-variant(#1DA1F2, #1DA1F2);
     }

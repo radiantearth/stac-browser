@@ -1,12 +1,29 @@
 <template>
-  <l-map class="map" v-if="show" :class="stac.type" @ready="init" :options="mapOptions">
-    <LControlFullscreen />
-    <template v-if="baseMaps.length > 0">
-      <component v-for="baseMap in baseMaps" :key="baseMap.name" :is="baseMap.component" v-bind="baseMap" :layers="baseMap.name" layer-type="base" />
-    </template>
-    <LTileLayer v-else url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" :options="osmOptions" />
-    <LGeoJson v-if="geojson" ref="geojson" :geojson="geojson" :options="{onEachFeature: showPopup}" :optionsStyle="{color: secondaryColor, weight: secondaryWeight}" />
-  </l-map>
+  <div class="map-container">
+    <l-map class="map" v-if="show" :class="stac.type" @ready="init" :options="mapOptions">
+      <LControlFullscreen />
+      <template v-if="baseMaps.length > 0">
+        <component v-for="baseMap in baseMaps" :key="baseMap.name" :is="baseMap.component" v-bind="baseMap" :layers="baseMap.name" layer-type="base" />
+      </template>
+      <LTileLayer v-else url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" :options="osmOptions" />
+      <LGeoJson v-if="geojson" ref="geojson" :geojson="geojson" :options="{onEachFeature: showPopup}" :optionsStyle="{color: secondaryColor, weight: secondaryWeight}" />
+    </l-map>
+    <b-popover
+      v-if="popover && selectedItem" placement="left" triggers="manual" :show="selectedItem !== null"
+      :target="selectedItem.target" boundary="#stac-browser" container="#stac-browser" :key="selectedItem.key"
+    >
+      <section class="items">
+        <b-card-group columns class="count-1">
+          <Item :item="selectedItem.item" />
+        </b-card-group>
+      </section>
+      <div class="text-center">
+        <b-button target="_blank" variant="danger" @click="resetSelectedItem">
+          Close
+        </b-button>
+      </div>
+    </b-popover>
+  </div>
 </template>
 
 <script>
@@ -19,6 +36,7 @@ import './map/leaflet-areaselect';
 import { mapGetters, mapState } from 'vuex';
 import STAC from '../models/stac';
 import { object as formatObject, string as formatString } from '@radiantearth/stac-fields/datatypes';
+import { BPopover } from 'bootstrap-vue';
 
 // Fix missing icons: https://vue2-leaflet.netlify.app/quickstart/#marker-icons-are-missing
 import { Icon } from 'leaflet';
@@ -49,6 +67,8 @@ const LABEL_EXT = 'https://stac-extensions.github.io/label/v1.*/schema.json';
 export default {
   name: 'Map',
   components: {
+    BPopover,
+    Item: () => import('../components/Item.vue'),
     LControlFullscreen,
     LGeoJson,
     LMap,
@@ -71,6 +91,10 @@ export default {
     scrollWheelZoom: {
       type: Boolean,
       default: false
+    },
+    popover: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -87,7 +111,8 @@ export default {
       osmOptions: {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors.'
       },
-      dblClickState: null
+      dblClickState: null,
+      selectedItem: null
     };
   },
   computed: {
@@ -148,11 +173,11 @@ export default {
   methods: {
     async init(map) {
       this.map = map;
-      if (this.$listeners.viewChanged) {
-        this.map.on('viewreset', event => this.$emit('viewChanged', event));
-        this.map.on('zoom', event => this.$emit('viewChanged', event));
-        this.map.on('move', event => this.$emit('viewChanged', event));
-        this.map.on('resize', event => this.$emit('viewChanged', event));
+      if (this.$listeners.viewChanged || this.popover) {
+        this.map.on('viewreset', this.viewChanged);
+        this.map.on('zoom', this.viewChanged);
+        this.map.on('move', this.viewChanged);
+        this.map.on('resize', this.viewChanged);
       }
 
       await this.showStacLayer();
@@ -160,6 +185,13 @@ export default {
       if (this.selectBounds) {
         this.addBoundsSelector();
       }
+    },
+    viewChanged(event) {
+      if (this.popover) {
+        this.resetSelectedItem();
+      }
+
+      this.$emit('viewChanged', event);
     },
     async showStacLayer() {
       if (this.stacLayer) {
@@ -302,7 +334,7 @@ export default {
         if (clicks === 1) {
           this.dblClickState = window.setTimeout(() => {
             this.dblClickState = null;
-            this.$emit('mapClicked', event.stac, event);
+            this.mapClicked(event.stac, event);
           }, 500);
         }
         else if (clicks > 1 && this.dblClickState) {
@@ -352,12 +384,37 @@ export default {
     },
     emitBounds() {
       this.$emit('bounds', this.areaSelect.getBounds());
+    },
+    resetSelectedItem() {
+        if (this.selectedItem && this.selectedItem.oldStyle) {
+          this.selectedItem.layer.setStyle(this.selectedItem.oldStyle);
+        }
+        this.selectedItem = null;
+    },
+    mapClicked(stac, event) {
+      if(this.popover) {
+        this.resetSelectedItem();
+        if (stac.type === 'Feature') {
+          this.selectedItem = {
+            item: stac.data,
+            target: event.originalEvent.srcElement,
+            layer: event.layer,
+            key: event.layer._leaflet_id
+          };
+          if (event.layer) {
+            this.selectedItem.oldStyle = Object.assign({}, event.layer.options);
+            event.layer.setStyle(Object.assign({}, event.layer.options, {color: '#dc3545'}));
+          }
+        }
+      }
+
+      this.$emit('mapClicked', stac, event);
     }
   }
 };
 </script>
 
 <style lang="scss">
-  @import '~leaflet/dist/leaflet.css';
-  @import '../theme/leaflet-areaselect.scss';
+@import '~leaflet/dist/leaflet.css';
+@import '../theme/leaflet-areaselect.scss';
 </style>
