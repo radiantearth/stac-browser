@@ -9,8 +9,6 @@ import { BrowserError } from '../utils';
 import URI from "urijs";
 import Queryable from '../models/queryable';
 
-console.log(BrowserError);
-
 Vue.use(Vuex);
 
 function createBlankStateQueryParameters () {

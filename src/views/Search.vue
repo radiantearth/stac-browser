@@ -127,7 +127,6 @@ export default {
   methods: {
     ...mapMutations(['toggleApiItemsLoading']),
     async setFilters(filters, reset = false) {
-      console.log(filters, reset);
       if (reset) {
         this.filters = {};
         this.$store.commit('resetApiItems');
