@@ -40,8 +40,9 @@ export default {
 <style lang="scss">
 @import '../theme/variables.scss';
 
-#stac-browser {
-	.styled-description {
+#stac-browser .metadata {
+	.styled-description,
+	.value > .description {
 		line-height: 1.4em;
 
 		h1, h2, h3, h4, h5, h6 {
@@ -49,22 +50,22 @@ export default {
 			font-weight: 600;
 		}
 		h1 {
-			font-size: 1.5rem;
+			font-size: 1.5em;
 		}
 		h2 {
-			font-size: 1.4rem;
+			font-size: 1.4em;
 		}
 		h3 {
-			font-size: 1.3rem;
+			font-size: 1.3em;
 		}
 		h4 {
-			font-size: 1.2rem;
+			font-size: 1.2em;
 		}
 		h5 {
-			font-size: 1.1rem;
+			font-size: 1.1em;
 		}
 		h6 {
-			font-size: 1.0rem;
+			font-size: 1.0em;
 		}
 		pre {
 			background-color: #eee;

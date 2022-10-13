@@ -127,8 +127,12 @@ export default {
                 overflow: auto;
             }
         }
-        ul, ol {
+        ul {
             padding-left: 1.4em;
+            margin-bottom: 0;
+        }
+        ol {
+            padding-left: 2em;
             margin-bottom: 0;
         }
         ul li {
