@@ -122,7 +122,7 @@ export default {
             margin: 0;
             padding-right: 0;
 
-            > ul, > ol, > pre, > dl {
+            > ul, > ol, > pre, > dl, > .description {
                 max-height: 15em;
                 overflow: auto;
             }
