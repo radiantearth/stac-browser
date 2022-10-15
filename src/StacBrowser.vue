@@ -16,7 +16,7 @@
     </main>
     <footer>
       <small class="poweredby text-muted">
-        Powered by <a href="https://github.com/radiantearth/stac-browser">STAC Browser</a> v{{ browserVersion }}
+        Powered by <a href="https://github.com/radiantearth/stac-browser">STAC Browser</a> {{ browserVersion }}
       </small>
     </footer>
   </b-container>
@@ -25,7 +25,7 @@
 <script>
 import Vue from "vue";
 import VueRouter from "vue-router";
-import { mapGetters, mapState } from 'vuex';
+import Vuex, { mapGetters, mapState } from 'vuex';
 import getRoutes from "./router";
 import getStore from "./store";
 
@@ -45,8 +45,6 @@ import StacHeader from './components/StacHeader.vue';
 import Utils from './utils';
 import URI from 'urijs';
 
-const CONFIG_FILE = require(CONFIG_PATH);
-
 Vue.use(Clipboard);
 
 Vue.use(AlertPlugin);
@@ -63,7 +61,17 @@ Vue.directive('b-toggle', VBToggle);
 // Used to detect when a catalog/item becomes visible so that further data can be loaded
 Vue.directive('b-visible', VBVisible);
 
-const CONFIG = Object.assign(CONFIG_FILE, CONFIG_CLI);
+let CONFIG;
+if (typeof CONFIG_PATH === 'undefined' && typeof CONFIG_CLI === 'undefined') {
+  CONFIG = require('../config');
+}
+else {
+  CONFIG = Object.assign(require(CONFIG_PATH), CONFIG_CLI);
+}
+
+// Setup store
+Vue.use(Vuex);
+const store = getStore(CONFIG);
 
 // Setup router
 Vue.use(VueRouter);
@@ -93,7 +101,7 @@ for(let key in CONFIG) {
 export default {
   name: 'StacBrowser',
   router,
-  store: getStore(CONFIG),
+  store,
   components: {
     Authentication: () => import('./components/Authentication.vue'),
     ErrorAlert,
@@ -113,7 +121,12 @@ export default {
     ...mapState({catalogUrlFromVueX: 'catalogUrl'}),
     ...mapGetters(['displayCatalogTitle']),
     browserVersion() {
-      return STAC_BROWSER_VERSION;
+      if (typeof STAC_BROWSER_VERSION !== 'undefined') {
+        return STAC_BROWSER_VERSION;
+      }
+      else {
+        return "";
+      }
     },
     appStateAsParams () {
       const out = {};

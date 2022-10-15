@@ -6,7 +6,6 @@ html {
 body {
     height: 100%;
     width: 100%;
-    display: flex;
 }
 
 #stac-browser {
@@ -15,7 +14,7 @@ body {
     max-width: 100%;
 
     @include media-breakpoint-only(xxxl) {
-      max-width: 75vw;
+        max-width: 75vw;
     }
 
     > header {
