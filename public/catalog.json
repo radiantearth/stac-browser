@@ -2,7 +2,7 @@
     "id": "geoplatform-stac",
     "stac_version": "1.0.0",
     "title": "GeoPlatform STAC Catalog",
-    "description": "GeoPlatform.gov provides offical list of National STAC Sources.",
+    "description": "GeoPlatform.gov provides official list of National STAC Sources.",
     "type": "Catalog",
     "links": [
         {
@@ -12,6 +12,11 @@
         {
             "rel": "root",
             "href": "./catalog.json"
+        },
+        {
+            "rel": "child",
+            "href": "https://gp-sit-us-east-1-public-configs.s3.amazonaws.com/stac/national_map/catalog.json",
+            "title": "The National Map"
         },
         {
             "rel": "child",
