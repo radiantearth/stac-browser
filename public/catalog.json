@@ -85,7 +85,7 @@
         },
         {
             "rel": "child",
-            "href": "https://landsatlook.usgs.gov/sat-api/stac",
+            "href": "https://landsatlook.usgs.gov/stac-server",
             "title": "USGS Landsat"
         }
     ]
