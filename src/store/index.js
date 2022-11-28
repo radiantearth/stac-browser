@@ -4,7 +4,7 @@ import axios from "axios";
 import Utils from '../utils';
 import STAC from '../models/stac';
 import bs58 from 'bs58';
-import { isAuthenticationError, Loading, processSTAC, stacRequest } from './utils';
+import { addQueryIfNotExists, isAuthenticationError, Loading, processSTAC, stacRequest } from './utils';
 import { BrowserError } from '../utils';
 import URI from "urijs";
 import Queryable from '../models/queryable';
@@ -353,12 +353,10 @@ function getStore(config) {
         let absoluteUrl = Utils.toAbsolute(getters.proxyUrl(url), baseUrl ? baseUrl : state.url, false);
         if (!getters.isExternalUrl(absoluteUrl)) {
           // Check whether private params are present and add them if the URL is part of the catalog
-          if (Utils.size(state.privateQueryParameters) > 0) {
-            absoluteUrl.addQuery(state.privateQueryParameters);
-          }
+          addQueryIfNotExists(absoluteUrl, state.privateQueryParameters);
           // Check if we need to add catalog params
-          if (addCatalogParams && Utils.size(state.requestQueryParameters) > 0) {
-            absoluteUrl.addQuery(state.requestQueryParameters);
+          if (addCatalogParams) {
+            addQueryIfNotExists(absoluteUrl, state.requestQueryParameters);
           }
         }
         // If we are proxying a STAC Catalog, replace any URI with the proxied address.

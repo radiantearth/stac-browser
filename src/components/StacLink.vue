@@ -116,27 +116,33 @@ export default {
       return this.isStacBrowserLink ? 'router-link' : 'a';
     },
     href() {
-      let href;
-      if (this.stac) {
-        href = this.stac.getBrowserPath();
-      }
-      else if (this.isStacBrowserLink) {
-        href = this.toBrowserPath(this.link.href);
+      if (this.stac || this.isStacBrowserLink) {
+        let href;
+        if (this.stac) {
+          href = this.stac.getBrowserPath();
+        }
+        else {
+          href = this.toBrowserPath(this.link.href);
+        }
+
+        // Add private query parameters to links: https://github.com/radiantearth/stac-browser/issues/142
+        if (Utils.size(this.privateQueryParameters) > 0) {
+          let uri = new URI(href);
+          for(let key in this.privateQueryParameters) {
+            let queryKey = `~${key}`;
+            if (!uri.hasQuery(queryKey)) {
+              uri.addQuery(queryKey, this.privateQueryParameters[key]);
+            }
+          }
+          href = uri.toString();
+        }
+
+        return href;
       }
       else {
-        href = this.getRequestUrl(this.link.href);
+        return this.getRequestUrl(this.link.href, null, false);
       }
 
-      // Add private query parameters to links: https://github.com/radiantearth/stac-browser/issues/142
-      if (Utils.size(this.privateQueryParameters) > 0) {
-        let uri = new URI(href);
-        for(let key in this.privateQueryParameters) {
-          uri.addQuery(`~${key}`, this.privateQueryParameters[key]);
-        }
-        href = uri.toString();
-      }
-
-      return href;
     },
     displayTitle() {
       if (this.title) {
