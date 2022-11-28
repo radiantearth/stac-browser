@@ -9,6 +9,7 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
+import { stacBrowserNavigatesTo } from "../rels";
 import Utils from '../utils';
 import STAC from '../models/stac';
 import URI from 'urijs';
@@ -74,28 +75,7 @@ export default {
       if (!Utils.isStacMediaType(this.link.type, true)) {
         return false;
       }
-      switch(this.link.rel) {
-        case 'root': // STAC hierarchical links v
-        case 'child':
-        case 'parent':
-        case 'item':
-        case 'collection':
-        case 'related': // Links to other catalogs or items v
-        case 'derived_from':
-        case 'canonical':
-        case 'latest-version': // version extension v
-        case 'predecessor-version':
-        case 'successor-version':
-        case 'source': // label extension
-        case 'first': // Pagination v
-        case 'prev':
-        case 'previous':
-        case 'next':
-        case 'last':
-          return true;
-        default:
-          return false;
-      }
+      return stacBrowserNavigatesTo.includes(this.link.rel);
     },
     attributes() {
       if (this.isStacBrowserLink) {

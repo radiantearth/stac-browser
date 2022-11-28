@@ -4,6 +4,7 @@ import axios from "axios";
 import Utils from '../utils';
 import STAC from '../models/stac';
 import bs58 from 'bs58';
+import { stacBrowserSpecialHandling, stacPagination } from "../rels";
 import { addQueryIfNotExists, isAuthenticationError, Loading, processSTAC, stacRequest } from './utils';
 import { BrowserError } from '../utils';
 import URI from "urijs";
@@ -53,25 +54,6 @@ function getStore(config) {
       // Global settings
       allowSelectCatalog: !config.catalogUrl,
       stacIndex: [],
-      supportedRelTypes: [ // These will be handled in a special way and will not be shown in the link lists
-        'child',
-        'collection',
-        'conformance',
-        'data',
-        'first',
-        'icon',
-        'item',
-        'items',
-        'last',
-        'license',
-        'next',
-        'prev',
-        'parent',
-        'queryables',
-        'root',
-        'search',
-        'self',
-      ],
       stateQueryParameters: createBlankStateQueryParameters(),
     }),
     getters: {
@@ -269,7 +251,7 @@ function getStore(config) {
         }
       },
       thumbnails: state => state.data ? state.data.getThumbnails(true) : [],
-      additionalLinks: state => state.data ? state.data.getLinksWithOtherRels(state.supportedRelTypes).filter(link => link.rel !== 'preview' || !Utils.canBrowserDisplayImage(link)) : [],
+      additionalLinks: state => state.data ? state.data.getLinksWithOtherRels(stacBrowserSpecialHandling).filter(link => link.rel !== 'preview' || !Utils.canBrowserDisplayImage(link)) : [],
 
       toBrowserPath: (state, getters) => url => {
         // ToDo: proxy support
@@ -543,7 +525,7 @@ function getStore(config) {
         }
 
         // Handle pagination links
-        let pageLinks = Utils.getLinksWithRels(data.links, ['first', 'prev', 'previous', 'next', 'last']);
+        let pageLinks = Utils.getLinksWithRels(data.links, stacPagination);
         let pages = {};
         for(let pageLink of pageLinks) {
           let rel = pageLink.rel === 'previous' ? 'prev' : pageLink.rel;
