@@ -7,12 +7,12 @@
 
 <script>
 export default {
-	name: 'AnonymizedNotice',
-	props: {
-		warning: {
-			type: String,
-			required: true
-		}
-	}
+  name: 'AnonymizedNotice',
+  props: {
+    warning: {
+      type: String,
+      required: true
+    }
+  }
 };
 </script>

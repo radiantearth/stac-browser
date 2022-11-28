@@ -16,59 +16,59 @@
 
 <script>
 export default {
-	name: 'DeprecationNotice',
-	components: {
-		StacLink: () => import('./StacLink.vue')
-	},
-	props: {
-		data: {
-			type: Object,
-			default: null
-		}
-	},
-	computed: {
-		latestLink() {
-			return this.data.getStacLinkWithRel('latest-version');
-		},
-		successorLink() {
-			return this.data.getStacLinkWithRel('successor-version');
-		},
-		predecessorLink() {
-			// Show prev. link only if not deprecated
-			return !this.isDeprecated && this.data.getStacLinkWithRel('predecessor-version');
-		},
-		variant() {
-			return this.isDeprecated ? 'warning' : 'info';
-		},
-		isDeprecated() {
-			return Boolean(this.data.isItem() ? this.data.properties.deprecated : this.data.deprecated);
-		},
-		title() {
-			if (this.isDeprecated) {
-				return 'Deprecated';
-			}
-			else if (this.latestLink || this.successorLink) {
-				return 'Outdated';
-			}
-			else {
-				return 'Other Versions';
-			}
-		},
-		type() {
-			if (this.data.isItem()) {
-				return "Item";
-			}
-			else {
-				return this.data.type;
-			}
-		}
-	}
+  name: 'DeprecationNotice',
+  components: {
+    StacLink: () => import('./StacLink.vue')
+  },
+  props: {
+    data: {
+      type: Object,
+      default: null
+    }
+  },
+  computed: {
+    latestLink() {
+      return this.data.getStacLinkWithRel('latest-version');
+    },
+    successorLink() {
+      return this.data.getStacLinkWithRel('successor-version');
+    },
+    predecessorLink() {
+      // Show prev. link only if not deprecated
+      return !this.isDeprecated && this.data.getStacLinkWithRel('predecessor-version');
+    },
+    variant() {
+      return this.isDeprecated ? 'warning' : 'info';
+    },
+    isDeprecated() {
+      return Boolean(this.data.isItem() ? this.data.properties.deprecated : this.data.deprecated);
+    },
+    title() {
+      if (this.isDeprecated) {
+        return 'Deprecated';
+      }
+      else if (this.latestLink || this.successorLink) {
+        return 'Outdated';
+      }
+      else {
+        return 'Other Versions';
+      }
+    },
+    type() {
+      if (this.data.isItem()) {
+        return "Item";
+      }
+      else {
+        return this.data.type;
+      }
+    }
+  }
 };
 </script>
 
 <style lang="scss" scoped>
 ul {
-	margin-top: 0.5em;
-	margin-bottom: 0;
+  margin-top: 0.5em;
+  margin-bottom: 0;
 }
 </style>

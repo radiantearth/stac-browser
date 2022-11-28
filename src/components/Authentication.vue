@@ -25,7 +25,7 @@ import { BForm, BFormInput } from 'bootstrap-vue';
 import { mapState } from 'vuex';
 
 export default {
-	name: 'Authentication',
+  name: 'Authentication',
   components: {
     BForm,
     BFormInput,

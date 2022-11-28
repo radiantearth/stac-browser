@@ -25,8 +25,8 @@ L.AreaSelect = L.Class.extend({
 
   addTo: function (map) {
     this.map = map;
-    if (this._container) {this.map._controlContainer.appendChild(this._container);}
-    else {this._createElements();}
+    if (this._container) { this.map._controlContainer.appendChild(this._container); }
+    else { this._createElements(); }
     this.map.on("moveend", this._onMapChange, this);
     this.map.on("zoomend", this._onMapChange, this);
     this.map.on("resize", this._onMapResize, this);
@@ -89,7 +89,7 @@ L.AreaSelect = L.Class.extend({
   },
 
   setDimensions: function (dimensions) {
-    if (!dimensions) {return;}
+    if (!dimensions) { return; }
 
     this._height = parseInt(dimensions.height) || this._height;
     this._width = parseInt(dimensions.width) || this._width;
@@ -98,7 +98,7 @@ L.AreaSelect = L.Class.extend({
   },
 
   _createElements: function () {
-    if (this._container) {return;}
+    if (this._container) { return; }
 
     this._container = L.DomUtil.create(
       "div",

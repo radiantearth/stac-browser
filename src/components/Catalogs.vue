@@ -44,7 +44,7 @@ export default {
   },
   data() {
     return {
-			searchTerm: '',
+      searchTerm: '',
       sort: 0
     };
   },

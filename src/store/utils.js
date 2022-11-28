@@ -2,7 +2,7 @@ import axios from "axios";
 import Utils from "../utils";
 
 export class Loading {
-  
+
   constructor(show = false, loadApi = false) {
     this.show = Boolean(show);
     this.loadApi = Boolean(loadApi);
@@ -43,14 +43,14 @@ export function processSTAC(state, stac) {
 }
 
 export function isAuthenticationError(error) {
-  return [401,403].includes(error?.response?.status);
+  return [401, 403].includes(error?.response?.status);
 }
 
 export function addQueryIfNotExists(uri, query) {
   if (Utils.size(query) == 0) {
     return uri;
   }
-  for(let key in query) {
+  for (let key in query) {
     if (!uri.hasQuery(key)) {
       uri.addQuery(key, query[key]);
     }

@@ -19,6 +19,7 @@ export const stacPagination = [
   'previous',
 ];
 
+// Rels that STAC Browser can navigate to and display natively (i.e. Collections, Catalogs and Items)
 export const stacBrowserNavigatesTo = [
   'canonical', // Links to other catalogs or items v
   'related',
@@ -29,6 +30,7 @@ export const stacBrowserNavigatesTo = [
   'source', // label extension
 ].concat(stacHierarchy).concat(stacPagination);
 
+// Rels that are handled in a special way and should not be shown in the link list
 export const stacBrowserSpecialHandling = [
   'conformance', // API related v
   'data',

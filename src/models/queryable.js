@@ -18,11 +18,11 @@ export default class Queryable {
   toJSON(queryable) {
     let value = queryable.value;
     if (value instanceof Date) {
-      value = {timestamp: Utils.dateToUTC(value).toISOString()};
+      value = { timestamp: Utils.dateToUTC(value).toISOString() };
     }
     return {
       op: queryable.operator,
-      args: [{property: this.id }, value]
+      args: [{ property: this.id }, value]
     };
   }
 
