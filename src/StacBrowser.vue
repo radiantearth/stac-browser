@@ -233,7 +233,8 @@ export default {
         }
       }
 
-      this.$router.replace({ query: this.appStateAsParams }).catch(error => {
+      let query = Object.assign({}, this.$route.query, this.appStateAsParams);
+      this.$router.replace({ query }).catch(error => {
         if (!VueRouter.isNavigationFailure(error, VueRouter.NavigationFailureType.duplicated)) {
           throw Error(error);
         }
