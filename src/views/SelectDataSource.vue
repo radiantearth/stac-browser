@@ -36,9 +36,10 @@
 
 <script>
 import { BForm, BFormGroup, BFormInput, BListGroup, BListGroupItem } from 'bootstrap-vue';
-import { mapGetters, mapState } from "vuex";
+import { mapGetters } from "vuex";
 import Description from '../components/Description.vue';
 import Utils from '../utils';
+import axios from "axios";
 
 export default {
   name: "SelectDataSource",
@@ -52,11 +53,11 @@ export default {
   },
   data() {
     return {
-      url: ''
+      url: '',
+      stacIndex: []
     };
   },
   computed: {
-    ...mapState(['stacIndex']),
     ...mapGetters(['toBrowserPath']),
     valid() {
       return !this.error;
@@ -79,9 +80,18 @@ export default {
       }
     }
   },
-  created() {
-    this.$store.dispatch('loadStacIndex');
-    this.$store.commit('resetPage'); // Reset loaded STAC entity
+  async created() {
+    // Reset loaded STAC entity
+    this.$store.commit('resetPage');
+    // Load entries from STAC Index
+    try {
+      let response = await axios.get('https://stacindex.org/api/catalogs');
+      if(Array.isArray(response.data)) {
+        this.stacIndex = response.data
+      }
+    } catch (error) {
+      console.error(error);
+    }
   },
   methods: {
     show(catalog) {

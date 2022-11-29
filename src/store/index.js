@@ -53,7 +53,6 @@ function getStore(config) {
     state: Object.assign({}, config, localDefaults(), catalogDefaults(), {
       // Global settings
       allowSelectCatalog: !config.catalogUrl,
-      stacIndex: [],
       stateQueryParameters: createBlankStateQueryParameters(),
     }),
     getters: {
@@ -434,9 +433,6 @@ function getStore(config) {
           state.stateQueryParameters[type].splice(idx, 1);
         }
       },
-      stacIndex(state, index) {
-        state.stacIndex = Object.freeze(index);
-      },
       tileSourceTemplate(state, tileSourceTemplate) {
         state.tileSourceTemplate = tileSourceTemplate;
       },
@@ -601,16 +597,6 @@ function getStore(config) {
           }
           cx.commit('removeFromQueue', count);
           return await Promise.all(promises);
-        }
-      },
-      async loadStacIndex(cx) {
-        try {
-          let response = await axios.get('https://stacindex.org/api/catalogs');
-          if (Array.isArray(response.data)) {
-            cx.commit('stacIndex', response.data);
-          }
-        } catch (error) {
-          console.error(error);
         }
       },
       async loadParents(cx) {
