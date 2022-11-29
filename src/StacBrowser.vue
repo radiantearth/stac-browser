@@ -127,15 +127,6 @@ export default {
       else {
         return "";
       }
-    },
-    appStateAsParams () {
-      const out = {};
-      for (const [key, value] of Object.entries(this.$store.state.stateQueryParameters)) {
-        if (Array.isArray(value) && value.length > 0) {
-          out[`.${key}`] = value;
-        }
-      }
-      return out;
     }
   },
   watch: {
@@ -151,37 +142,42 @@ export default {
     }
   },
   created() {
-    // The handling of unwatch and this.$watch sequence below explictly attaches the watcher
-    // for stateQueryParameters AFTER the router has navigated to the page, and AFTER 
-    // the parseQuery method has been run which modifies the stateQueryParameters.
-    // The updateUrlOnStateChange method causes navigation to happen with vue-router, so we
-    // we don't want to happen on initial page render when the we're already at the right location
-    let unwatch = null;
     this.$router.onReady(() => {
       this.parseQuery(this.$route);
-      unwatch = this.$watch('stateQueryParameters', this.updateUrlOnStateChange, {deep: true});
-    });
-
-    // When we're navigating to a completely different STAC page (denoted by a different path)
-    // we need to clear out out the stateQueryParameters (eg what tabs were open etc)
-    this.$router.beforeEach((to, from, next) => {
-      if (to.path !== from.path) {
-        if (typeof unwatch === 'function') {
-          unwatch();
-        }
-        unwatch = null;
-        this.$store.commit('resetStateQueryParameters');
-      }
-      next();
     });
 
     this.$router.afterEach((to, from) => {
       if (to.path === from.path) {
         return;
       }
+      
+      this.$store.commit('resetPage');
       this.parseQuery(to);
-      unwatch = this.$watch('stateQueryParameters', this.updateUrlOnStateChange, {deep: true});
     });
+  },
+  watch: {
+    stateQueryParameters: {
+      deep: true,
+      handler() {
+        let query = {};
+        for (const [key, value] of Object.entries(this.$route.query)) {
+          if (!key.startsWith('.')) {
+            query[key] = value;
+          }
+        }
+        for (const [key, value] of Object.entries(this.stateQueryParameters)) {
+          if (Array.isArray(value) && value.length > 0) {
+            query[`.${key}`] = value.join(',');
+          }
+        }
+
+        this.$router.replace({ query }).catch(error => {
+          if (!VueRouter.isNavigationFailure(error, VueRouter.NavigationFailureType.duplicated)) {
+            throw Error(error);
+          }
+        });
+      }
+    }
   },
   mounted() {
     this.$root.$on('error', this.showError);
@@ -208,10 +204,10 @@ export default {
           params.state = Utils.isObject(params.state) ? params.state : {};
           params.state[key.substr(1)] = query[key];
         }
-        // All other parameters should be appended to the catalog requests
+        // All other parameters should be appended to the main STAC requests
         else {
-          params.request = Utils.isObject(params.request) ? params.request : {};
-          params.request[key] = query[key];
+          params.localRequest = Utils.isObject(params.request) ? params.request : {};
+          params.localRequest[key] = query[key];
         }
       }
       if (Utils.size(params) > 0) {
@@ -224,21 +220,6 @@ export default {
         });
       }
 
-    },
-    updateUrlOnStateChange () {
-      // Force vue-router to read some values as arrays
-      for (const [key, value] of Object.entries(this.$route.query)) {
-        if (Array.isArray(this.appStateAsParams[key]) && !(Array.isArray(value))) {
-          this.$route.query[key] = [value];
-        }
-      }
-
-      let query = Object.assign({}, this.$route.query, this.appStateAsParams);
-      this.$router.replace({ query }).catch(error => {
-        if (!VueRouter.isNavigationFailure(error, VueRouter.NavigationFailureType.duplicated)) {
-          throw Error(error);
-        }
-      });
     },
     showError(error, message) {
       this.$store.commit('showGlobalError', {

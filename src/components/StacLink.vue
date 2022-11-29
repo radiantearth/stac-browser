@@ -120,7 +120,7 @@ export default {
         return href;
       }
       else {
-        return this.getRequestUrl(this.link.href, null, false);
+        return this.getRequestUrl(this.link.href);
       }
 
     },

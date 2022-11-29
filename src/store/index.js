@@ -10,13 +10,6 @@ import { BrowserError } from '../utils';
 import URI from "urijs";
 import Queryable from '../models/queryable';
 
-function createBlankStateQueryParameters() {
-  return {
-    asset: [],
-    itemdef: []
-  };
-}
-
 function getStore(config) {
   // Local settings (e.g. for currently loaded STAC entity)
   const localDefaults = () => ({
@@ -26,6 +19,12 @@ function getStore(config) {
     valid: null,
     parents: null,
     globalError: null,
+
+    localRequestQueryParameters: {},
+    stateQueryParameters: {
+      asset: [],
+      itemdef: []
+    },
 
     apiItems: [],
     apiItemsLink: null,
@@ -53,7 +52,7 @@ function getStore(config) {
     state: Object.assign({}, config, localDefaults(), catalogDefaults(), {
       // Global settings
       allowSelectCatalog: !config.catalogUrl,
-      stateQueryParameters: createBlankStateQueryParameters(),
+      globalRequestQueryParameters: config.requestQueryParameters
     }),
     getters: {
       loading: state => !state.url || !state.data || state.database[state.url] instanceof Loading,
@@ -229,7 +228,7 @@ function getStore(config) {
       hasMoreCollections: state => Boolean(state.nextCollectionsLink),
 
       // hasAsset also checks whether the assets have a href and thus are not item asset definitions
-      hasAssets: (state, getters) => Object.values(getters.assets).find(asset => Utils.isObject(asset) && typeof asset.href === 'string'),
+      hasAssets: (state, getters) => Boolean(Object.values(getters.assets).find(asset => Utils.isObject(asset) && typeof asset.href === 'string')),
       assets: (state, getters) => {
         if (!Utils.isObject(state.data?.assets)) {
           return {};
@@ -304,7 +303,7 @@ function getStore(config) {
         else if (!state.allowSelectCatalog && state.catalogUrl) {
           url = Utils.toAbsolute(url, state.catalogUrl, false);
         }
-        return getters.getRequestUrl(url);
+        return getters.getRequestUrl(url, null, true);
       },
       unproxyUrl: state => absoluteUrl => {
         if (absoluteUrl instanceof URI) {
@@ -330,14 +329,16 @@ function getStore(config) {
         }
         return absoluteUrl.relativeTo(state.catalogUrl) === absoluteUrl;
       },
-      getRequestUrl: (state, getters) => (url, baseUrl = null, addCatalogParams = true) => {
+      getRequestUrl: (state, getters) => (url, baseUrl = null, addLocalQueryParams = false) => {
         let absoluteUrl = Utils.toAbsolute(getters.proxyUrl(url), baseUrl ? baseUrl : state.url, false);
         if (!getters.isExternalUrl(absoluteUrl)) {
           // Check whether private params are present and add them if the URL is part of the catalog
           addQueryIfNotExists(absoluteUrl, state.privateQueryParameters);
-          // Check if we need to add catalog params
-          if (addCatalogParams) {
-            addQueryIfNotExists(absoluteUrl, state.requestQueryParameters);
+          // Check if we need to add global request params
+          addQueryIfNotExists(absoluteUrl, state.globalRequestQueryParameters);
+          if (addLocalQueryParams) {
+            // Check if we need to add local request params
+            addQueryIfNotExists(absoluteUrl, state.localRequestQueryParameters);
           }
         }
         // If we are proxying a STAC Catalog, replace any URI with the proxied address.
@@ -354,10 +355,7 @@ function getStore(config) {
               break;
             case 'catalogUrl':
               if (typeof value === 'string') {
-                let url = new URI(value);
-                state.requestQueryParameters = Object.assign({}, state.requestQueryParameters, url.query(true));
-                url.query("");
-                state.catalogUrl = url.toString();
+                state.catalogUrl = value;
               }
               break;
             case 'stacProxyUrl':
@@ -377,14 +375,11 @@ function getStore(config) {
           }
         }
       },
-      resetStateQueryParameters(state) {
-        Vue.set(state, 'stateQueryParameters', createBlankStateQueryParameters());
-      },
       queryParameters(state, params) {
         for (let key in params) {
           if (key === 'state') {
             for (let [key, value] of Object.entries(params.state)) {
-              if (Array.isArray(state.stateQueryParameters[key]) && !(Array.isArray(value))) {
+              if (Array.isArray(state.stateQueryParameters[key]) && !Array.isArray(value)) {
                 value = value.split(',');
               }
               Vue.set(state.stateQueryParameters, key, value);
@@ -430,7 +425,7 @@ function getStore(config) {
       closeCollapsible(state, { type, uid }) {
         const idx = state.stateQueryParameters[type].indexOf(uid);
         if (idx > -1) {
-          state.stateQueryParameters[type].splice(idx, 1);
+          Vue.delete(state.stateQueryParameters[type], idx);
         }
       },
       tileSourceTemplate(state, tileSourceTemplate) {
@@ -640,12 +635,8 @@ function getStore(config) {
         }
 
         // Load the root catalog data if not available (e.g. after page refresh or external access)
-        if (!loadRoot && path !== '/' && cx.state.catalogUrl && !cx.state.database[cx.state.catalogUrl]) {
+        if (!loadRoot && path !== '/' && cx.state.catalogUrl && !cx.getters.getStac(cx.state.catalogUrl)) {
           await cx.dispatch("load", { url: cx.state.catalogUrl, loadApi: true, loadRoot: true });
-        }
-
-        if (show) {
-          cx.commit('resetPage');
         }
 
         let loading = new Loading(show, loadApi);

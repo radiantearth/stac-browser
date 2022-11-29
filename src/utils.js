@@ -114,13 +114,17 @@ export default class Utils {
   }
 
   static toAbsolute(href, baseUrl, stringify = true) {
+    return Utils.normalizeUri(href, baseUrl, false, stringify);
+  }
+
+  static normalizeUri(href, baseUrl = null, noParams = false, stringify = true) {
     // Convert vsicurl URLs to normal URLs
     if (typeof href === 'string' && href.startsWith('/vsicurl/')) {
       href = href.replace(/^\/vsicurl\//, '');
     }
     // Parse URL and make absolute, if required
     let uri = URI(href);
-    if (uri.is("relative") && !Utils.isGdalVfsUri(href)) { // Don't convert GDAL VFS URIs: https://github.com/radiantearth/stac-browser/issues/116
+    if (baseUrl && uri.is("relative") && !Utils.isGdalVfsUri(href)) { // Don't convert GDAL VFS URIs: https://github.com/radiantearth/stac-browser/issues/116
       // Avoid that baseUrls that have a . in the last parth part will be removed (e.g. https://example.com/api/v1.0 )
       let baseUri = URI(baseUrl);
       let baseUriPath = baseUri.path();
@@ -135,6 +139,10 @@ export default class Utils {
     let path = uri.path();
     if (path.endsWith('/')) {
       uri.path(path.substr(0, path.length - 1));
+    }
+    if (noParams) {
+      uri.query("");
+      uri.fragment("");
     }
     return stringify ? uri.toString() : uri;
   }

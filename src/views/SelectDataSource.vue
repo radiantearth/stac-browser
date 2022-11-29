@@ -81,13 +81,11 @@ export default {
     }
   },
   async created() {
-    // Reset loaded STAC entity
-    this.$store.commit('resetPage');
     // Load entries from STAC Index
     try {
       let response = await axios.get('https://stacindex.org/api/catalogs');
       if(Array.isArray(response.data)) {
-        this.stacIndex = response.data
+        this.stacIndex = response.data;
       }
     } catch (error) {
       console.error(error);

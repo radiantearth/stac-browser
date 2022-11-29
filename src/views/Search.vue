@@ -100,7 +100,6 @@ export default {
     }
   },
   created() {
-    this.$store.commit('resetPage');
     if (this.loadRoot && !this.root) {
       let catalogUrl = this.fromBrowserPath(this.loadRoot);
       this.$store.commit("config", { catalogUrl });
