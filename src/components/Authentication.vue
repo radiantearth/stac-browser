@@ -8,7 +8,7 @@
             Please provide your authentication details in the text field below.
           </p>
           <Description v-if="authConfig.description" :description="authConfig.description" />
-          <b-form-input class="mb-2 mt-2" type="password" v-model.trim="token" autofocus required />
+          <b-form-input class="mb-2 mt-2" type="password" v-model.trim="token" autofocus :required="required" />
         </b-card-body>
         <b-card-footer>
           <b-button type="submit" variant="primary">Submit</b-button>
@@ -22,7 +22,7 @@
 <script>
 import Description from './Description.vue';
 import { BForm, BFormInput } from 'bootstrap-vue';
-import { mapState } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 
 export default {
   name: 'Authentication',
@@ -33,28 +33,26 @@ export default {
   },
   data() {
     return {
-      token: ''
+      token: '',
+      required: true
     };
   },
   computed: {
-    ...mapState(['authConfig'])
+    ...mapState(['authConfig']),
+    ...mapGetters(['authData'])
+  },
+  created() {
+    if (this.authData) {
+      this.token = this.authData;
+      this.required = false;
+    }
   },
   methods: {
     reset() {
       this.$store.commit('requestAuth', null);
     },
     async submit() {
-      let value = this.token;
-      let key = this.authConfig.key;
-      if (typeof this.authConfig.formatter === 'function') {
-        value = this.authConfig.formatter(value);
-      }
-      if (this.authConfig.type === 'query') {
-        this.$store.commit('setQueryParameter', {type: 'private', key, value});
-      }
-      else if (this.authConfig.type === 'header') {
-        this.$store.commit('setRequestHeader', {key, value});
-      }
+      await this.$store.dispatch('setAuth', this.token);
       await this.$store.dispatch('retryAfterAuth');
       this.$store.commit('requestAuth', null);
     }

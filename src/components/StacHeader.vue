@@ -23,6 +23,14 @@
           <b-button v-if="supportsSearch && !isSearchPage()" variant="outline-primary" size="sm" :to="searchBrowserLink" title="Search">
             <b-icon-search /> <span class="button-label prio">Search</span>
           </b-button>
+          <b-button v-if="authConfig" variant="outline-primary" size="sm" @click="auth" title="Provide or update your credentials">
+            <template v-if="authData">
+              <b-icon-lock /> <span class="button-label">Authenticated</span>
+            </template>
+            <template v-else>
+              <b-icon-unlock /> <span class="button-label">Authenticate</span>
+            </template>
+          </b-button>
         </b-button-group>
       </p>
     </b-col>
@@ -32,7 +40,7 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
 import StacLink from './StacLink.vue';
-import { BIconArrow90degUp, BIconBook, BIconFolderSymlink, BIconSearch } from "bootstrap-vue";
+import { BIconArrow90degUp, BIconBook, BIconFolderSymlink, BIconSearch, BIconLock, BIconUnlock } from "bootstrap-vue";
 import STAC from '../models/stac';
 import Utils from '../utils';
 
@@ -43,12 +51,14 @@ export default {
     BIconBook,
     BIconFolderSymlink,
     BIconSearch,
+    BIconLock,
+    BIconUnlock,
     StacLink,
     Share: () => import('../components/Share.vue')
   },
   computed: {
-    ...mapState(['allowSelectCatalog', 'catalogUrl', 'data', 'url', 'title']),
-    ...mapGetters(['root', 'parentLink', 'collectionLink', 'stacVersion', 'supportsSearch', 'toBrowserPath']),
+    ...mapState(['allowSelectCatalog', 'catalogUrl', 'data', 'url', 'title', 'authConfig']),
+    ...mapGetters(['authData', 'root', 'parentLink', 'collectionLink', 'stacVersion', 'supportsSearch', 'toBrowserPath']),
     icon() {
       if (this.data instanceof STAC) {
         let icons = this.data.getIcons();
@@ -95,6 +105,14 @@ export default {
   methods: {
     isSearchPage() {
       return this.$router.currentRoute.name === 'search';
+    },
+    auth() {
+      this.$store.commit('requestAuth', () => this.$store.dispatch("load", {
+        url: this.url,
+        loadApi: true,
+        show: true,
+        force: true
+      }));
     }
   }
 };

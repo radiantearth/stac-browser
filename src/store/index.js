@@ -343,6 +343,18 @@ function getStore(config) {
         }
         // If we are proxying a STAC Catalog, replace any URI with the proxied address.
         return absoluteUrl.toString();
+      },
+      authData: state => {
+        let key = state.authConfig.key;
+        if (state.authConfig.type === 'query' && key in state.privateQueryParameters) {
+          return state.privateQueryParameters[key];
+        }
+        else if (state.authConfig.type === 'header' && key in state.requestHeaders) {
+          return state.requestHeaders[key];
+        }
+        else {
+          return null;
+        }
       }
     },
     mutations: {
@@ -393,18 +405,18 @@ function getStore(config) {
       setQueryParameter(state, { type, key, value }) {
         type = `${type}QueryParameters`;
         if (typeof value === 'undefined') {
-          delete state[type][key];
+          Vue.delete(state[type], key);
         }
         else {
-          state[type][key] = value;
+          Vue.set(state[type], key, value);
         }
       },
       setRequestHeader(state, { key, value }) {
         if (typeof value === 'undefined') {
-          delete state.requestHeaders[key];
+          Vue.delete(state.requestHeaders, key);
         }
         else {
-          state.requestHeaders[key] = value;
+          Vue.set(state.requestHeaders, key, value);
         }
       },
       requestAuth(state, callback) {
@@ -583,6 +595,22 @@ function getStore(config) {
       }
     },
     actions: {
+      async setAuth(cx, value) {
+        let authConfig = cx.state.authConfig;
+        let key = authConfig.key;
+        if (typeof authConfig.formatter === 'function') {
+          value = authConfig.formatter(value);
+        }
+        if (!Utils.hasText(value)) {
+          value = undefined;
+        }
+        if (authConfig.type === 'query') {
+          cx.commit('setQueryParameter', {type: 'private', key, value});
+        }
+        else if (authConfig.type === 'header') {
+          cx.commit('setRequestHeader', {key, value});
+        }
+      },
       async loadBackground(cx, count) {
         let urls = cx.state.queue.slice(0, count);
         if (urls.length > 0) {
@@ -623,7 +651,7 @@ function getStore(config) {
         cx.commit('parents', parents);
       },
       async load(cx, args) {
-        let { url, fromBrowser, show, loadApi, loadRoot } = args;
+        let { url, fromBrowser, show, loadApi, loadRoot, force } = args;
         let path;
         if (fromBrowser) {
           path = url.startsWith('/') ? url : '/' + url;
@@ -637,6 +665,10 @@ function getStore(config) {
         // Load the root catalog data if not available (e.g. after page refresh or external access)
         if (!loadRoot && path !== '/' && cx.state.catalogUrl && !cx.getters.getStac(cx.state.catalogUrl)) {
           await cx.dispatch("load", { url: cx.state.catalogUrl, loadApi: true, loadRoot: true });
+        }
+
+        if (force) {
+          cx.commit('clear', url);
         }
 
         let loading = new Loading(show, loadApi);
