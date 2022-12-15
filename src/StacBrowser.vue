@@ -139,23 +139,7 @@ export default {
         // Load the root catalog data if not available (e.g. after page refresh or external access)
         this.$store.dispatch("load", { url, loadApi: true });
       }
-    }
-  },
-  created() {
-    this.$router.onReady(() => {
-      this.parseQuery(this.$route);
-    });
-
-    this.$router.afterEach((to, from) => {
-      if (to.path === from.path) {
-        return;
-      }
-      
-      this.$store.commit('resetPage');
-      this.parseQuery(to);
-    });
-  },
-  watch: {
+    },
     stateQueryParameters: {
       deep: true,
       handler() {
@@ -178,6 +162,20 @@ export default {
         });
       }
     }
+  },
+  created() {
+    this.$router.onReady(() => {
+      this.parseQuery(this.$route);
+    });
+
+    this.$router.afterEach((to, from) => {
+      if (to.path === from.path) {
+        return;
+      }
+      
+      this.$store.commit('resetPage');
+      this.parseQuery(to);
+    });
   },
   mounted() {
     this.$root.$on('error', this.showError);
