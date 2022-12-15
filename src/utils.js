@@ -136,10 +136,6 @@ export default class Utils {
     // Normalize URL and remove trailing slash from path
     // to avoid handling the same resource twice
     uri.normalize();
-    let path = uri.path();
-    if (path.endsWith('/')) {
-      uri.path(path.substr(0, path.length - 1));
-    }
     if (noParams) {
       uri.query("");
       uri.fragment("");
