@@ -10,6 +10,14 @@ import { BrowserError } from '../utils';
 import URI from "urijs";
 import Queryable from '../models/queryable';
 
+import VuexORM from '@vuex-orm/core';
+import { STAC as STAC2, Catalog, Item } from '@/models/orm/stac';
+
+const database = new VuexORM.Database();
+database.register(STAC2);
+database.register(Catalog);
+database.register(Item);
+
 function getStore(config) {
   // Local settings (e.g. for currently loaded STAC entity)
   const localDefaults = () => ({
@@ -49,6 +57,9 @@ function getStore(config) {
 
   return new Vuex.Store({
     strict: true,
+    plugins: [
+      VuexORM.install(database, { namespace: 'database2' })
+    ],
     state: Object.assign({}, config, localDefaults(), catalogDefaults(), {
       // Global settings
       allowSelectCatalog: !config.catalogUrl,
@@ -443,6 +454,12 @@ function getStore(config) {
         }
       },
       loaded(state, { url, data }) {
+        STAC2.insert({
+          data: {
+            url,
+            data
+          }
+        });
         Vue.set(state.database, url, processSTAC(state, data));
       },
       clear(state, url) {

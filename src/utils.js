@@ -114,10 +114,10 @@ export default class Utils {
   }
 
   static toAbsolute(href, baseUrl, stringify = true) {
-    return Utils.normalizeUri(href, baseUrl, false, stringify);
+    return Utils.normalizeUri(href, baseUrl, false, false, stringify);
   }
 
-  static normalizeUri(href, baseUrl = null, noParams = false, stringify = true) {
+  static normalizeUri(href, baseUrl = null, noParams = false, noTrailingSlash = false, stringify = true) {
     // Convert vsicurl URLs to normal URLs
     if (typeof href === 'string' && href.startsWith('/vsicurl/')) {
       href = href.replace(/^\/vsicurl\//, '');
@@ -136,6 +136,10 @@ export default class Utils {
     // Normalize URL and remove trailing slash from path
     // to avoid handling the same resource twice
     uri.normalize();
+    let path = uri.path();
+    if (noTrailingSlash && path.endsWith('/')) {
+      uri.path(path.substring(0, path.length - 1));
+    }
     if (noParams) {
       uri.query("");
       uri.fragment("");
