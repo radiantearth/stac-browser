@@ -5,6 +5,8 @@ export const commonFileNames = ['catalog', 'collection', 'item'];
 
 export const geojsonMediaType = "application/geo+json";
 
+export const schemaMediaType = "application/schema+json";
+
 export const stacMediaTypes = [
   'application/json',
   geojsonMediaType,
@@ -83,6 +85,13 @@ export default class Utils {
   }
 
   static isStacMediaType(type, allowEmpty = false) {
+    return Utils.isMediaType(type, stacMediaTypes, allowEmpty);
+  }
+
+  static isMediaType(type, types, allowEmpty = false) {
+    if (!Array.isArray(types)) {
+      types = [types];
+    }
     if (allowEmpty && !type) {
       return true;
     }
@@ -90,7 +99,7 @@ export default class Utils {
       return false;
     }
     else {
-      return stacMediaTypes.includes(type.toLowerCase());
+      return types.includes(type.toLowerCase());
     }
   }
 

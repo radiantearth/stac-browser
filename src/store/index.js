@@ -1,10 +1,10 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import axios from "axios";
-import Utils from '../utils';
+import Utils, { schemaMediaType } from '../utils';
 import STAC from '../models/stac';
 import bs58 from 'bs58';
-import { stacBrowserSpecialHandling, stacPagination } from "../rels";
+import { ogcQueryables, stacBrowserSpecialHandling, stacPagination } from "../rels";
 import { addQueryIfNotExists, isAuthenticationError, Loading, processSTAC, stacRequest } from './utils';
 import { BrowserError } from '../utils';
 import URI from "urijs";
@@ -876,8 +876,9 @@ function getStore(config) {
       async loadQueryables(cx, { stac, refParser = null }) {
         let schemas;
         try {
-          let link = stac.getStacLinkWithRel('queryables');
-          let href = link ? link.href : Utils.toAbsolute('queryables', stac.getAbsoluteUrl());
+          let link = stac.getLinksWithRels(ogcQueryables)
+            .find(link => Utils.isMediaType(link.type, schemaMediaType, true));
+          let href = Utils.isObject(link) ? link.href : Utils.toAbsolute('queryables', stac.getAbsoluteUrl());
           let response = await stacRequest(cx, href);
           schemas = response.data; // Use data with $refs included as fallback anyway
           if (refParser) {
