@@ -38,8 +38,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['authConfig']),
-    ...mapGetters(['authData'])
+    ...mapState(['authConfig', 'authData'])
   },
   created() {
     if (this.authData) {

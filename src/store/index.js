@@ -39,6 +39,7 @@ function getStore(config) {
     queue: [],
     redirectUrl: null,
     privateQueryParameters: {},
+    authData: null,
     doAuth: [],
     conformsTo: [],
 
@@ -343,18 +344,6 @@ function getStore(config) {
         }
         // If we are proxying a STAC Catalog, replace any URI with the proxied address.
         return absoluteUrl.toString();
-      },
-      authData: state => {
-        let key = state.authConfig.key;
-        if (state.authConfig.type === 'query' && key in state.privateQueryParameters) {
-          return state.privateQueryParameters[key];
-        }
-        else if (state.authConfig.type === 'header' && key in state.requestHeaders) {
-          return state.requestHeaders[key];
-        }
-        else {
-          return null;
-        }
       }
     },
     mutations: {
@@ -426,6 +415,9 @@ function getStore(config) {
         else {
           state.doAuth = [];
         }
+      },
+      setAuthData(state, value) {
+        state.authData = value;
       },
       openCollapsible(state, { type, uid }) {
         const idx = state.stateQueryParameters[type].indexOf(uid);
@@ -596,9 +588,16 @@ function getStore(config) {
     },
     actions: {
       async setAuth(cx, value) {
+        if (!Utils.hasText(value)) {
+          value = null;
+        }
+        // Set the value the user has provided separately
+        cx.commit('setAuthData', value);
+
+        // Format the value and add it to query parameters or headers
         let authConfig = cx.state.authConfig;
         let key = authConfig.key;
-        if (typeof authConfig.formatter === 'function') {
+        if (value && typeof authConfig.formatter === 'function') {
           value = authConfig.formatter(value);
         }
         if (!Utils.hasText(value)) {

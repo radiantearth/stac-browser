@@ -57,8 +57,8 @@ export default {
     Share: () => import('../components/Share.vue')
   },
   computed: {
-    ...mapState(['allowSelectCatalog', 'catalogUrl', 'data', 'url', 'title', 'authConfig']),
-    ...mapGetters(['authData', 'root', 'parentLink', 'collectionLink', 'stacVersion', 'supportsSearch', 'toBrowserPath']),
+    ...mapState(['allowSelectCatalog', 'authConfig', 'authData', 'catalogUrl', 'data', 'url', 'title']),
+    ...mapGetters(['root', 'parentLink', 'collectionLink', 'stacVersion', 'supportsSearch', 'toBrowserPath']),
     icon() {
       if (this.data instanceof STAC) {
         let icons = this.data.getIcons();
