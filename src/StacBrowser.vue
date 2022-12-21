@@ -16,7 +16,7 @@
     </main>
     <footer>
       <small class="poweredby text-muted">
-        Powered by <a href="https://github.com/radiantearth/stac-browser">STAC Browser</a> {{ browserVersion }}
+        {{ $t('poweredBy') }} <a href="https://github.com/radiantearth/stac-browser">STAC Browser</a> {{ browserVersion }}
       </small>
     </footer>
   </b-container>
@@ -26,6 +26,7 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 import Vuex, { mapGetters, mapState } from 'vuex';
+import CONFIG from './config';
 import getRoutes from "./router";
 import getStore from "./store";
 
@@ -60,14 +61,6 @@ Vue.use(SpinnerPlugin);
 Vue.directive('b-toggle', VBToggle);
 // Used to detect when a catalog/item becomes visible so that further data can be loaded
 Vue.directive('b-visible', VBVisible);
-
-let CONFIG;
-if (typeof CONFIG_PATH === 'undefined' && typeof CONFIG_CLI === 'undefined') {
-  CONFIG = require('../config');
-}
-else {
-  CONFIG = Object.assign(require(CONFIG_PATH), CONFIG_CLI);
-}
 
 // Setup store
 Vue.use(Vuex);
@@ -117,8 +110,8 @@ export default {
     };
   },
   computed: {
-    ...mapState(['title', 'doAuth', 'globalError', 'stateQueryParameters']),
-    ...mapState({catalogUrlFromVueX: 'catalogUrl'}),
+    ...mapState(['doAuth', 'globalError', 'stateQueryParameters', 'title']),
+    ...mapState({catalogUrlFromVueX: 'catalogUrl', localeFromVueX: 'locale'}),
     ...mapGetters(['displayCatalogTitle']),
     browserVersion() {
       if (typeof STAC_BROWSER_VERSION !== 'undefined') {
@@ -133,6 +126,9 @@ export default {
     ...Watchers,
     title(title) {
       document.title = title;
+    },
+    localeFromVueX(locale) {
+      this.$root.$i18n.locale = locale;
     },
     catalogUrlFromVueX(url) {
       if (url) {

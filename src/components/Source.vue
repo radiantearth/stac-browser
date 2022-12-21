@@ -1,8 +1,25 @@
 <template>
   <div class="share mt-1">
     <b-button-group>
-      <b-button v-if="stacUrl" size="sm" variant="outline-primary" id="popover-link" title="Details about the STAC source"><b-icon-link /> <span class="button-label">Source</span></b-button>
-      <b-button size="sm" variant="outline-primary" id="popover-share" title="Share this page with others"><b-icon-share /> <span class="button-label">Share</span></b-button>
+      <b-button size="sm" variant="outline-primary" id="popover-link" title="Details about the STAC source">
+        <b-icon-link /> <span class="button-label">Source</span>
+      </b-button>
+      <b-button v-if="stacUrl" size="sm" variant="outline-primary" id="popover-link" title="Details about the STAC source">
+        <b-icon-link /> <span class="button-label">Source</span>
+      </b-button>
+      <b-button size="sm" variant="outline-primary" id="popover-share" title="Share this page with others">
+        <b-icon-share /> <span class="button-label">Share</span>
+      </b-button>
+      <b-dropdown size="sm" variant="outline-primary" right>
+        <template #button-content>
+          <b-icon-flag /> <span class="button-label">Language ({{ currentLanguage }})</span>
+        </template>
+        <b-dropdown-item v-for="l of supportedLocales" :key="l" @click="switchLanguage(l)">
+          <b-icon-check v-if="locale === l" />
+          <b-icon-blank v-else />
+          {{ $t(`languages.${l}.native`) }} / {{ $t(`languages.${l}.global`) }}
+        </b-dropdown-item>
+      </b-dropdown>
     </b-button-group>
     <b-popover
       v-if="stacUrl" target="popover-link" triggers="click blur" placement="bottom"
@@ -37,7 +54,9 @@
 </template>
 
 <script>
-import { BIconEnvelope, BIconLink, BIconShare, BIconTwitter, BPopover } from 'bootstrap-vue';
+import { 
+  BIconBlank, BIconCheck, BIconEnvelope, BIconFlag, BIconLink, BIconShare, BIconTwitter,
+  BDropdown, BDropdownItem, BPopover } from 'bootstrap-vue';
 import { mapState } from 'vuex';
 
 import Url from './Url.vue';
@@ -46,9 +65,14 @@ import URI from 'urijs';
 import Utils from '../utils';
 
 export default {
-    name: "Share",
+    name: "Source",
     components: {
+        BDropdown,
+        BDropdownItem,
+        BIconBlank,
+        BIconCheck,
         BIconEnvelope,
+        BIconFlag,
         BIconLink,
         BIconShare,
         BIconTwitter,
@@ -70,7 +94,10 @@ export default {
         }
     },
     computed: {
-        ...mapState(['privateQueryParameters', 'stacLint', 'stacProxyUrl', 'valid']),
+        ...mapState(['locale', 'privateQueryParameters', 'supportedLocales', 'stacLint', 'stacProxyUrl', 'valid']),
+        currentLanguage() {
+          return this.$t(`languages.${this.locale}.native`);
+        },
         canValidate() {
             if (!this.stacLint || typeof this.stacUrl !== 'string') {
                 return false;
@@ -110,6 +137,9 @@ export default {
         },
         browserUrl() {
           return window.location.toString();
+        },
+        switchLanguage(locale) {
+          this.$store.commit('config', {locale});
         }
     }
 };

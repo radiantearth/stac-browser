@@ -1,0 +1,12 @@
+{
+  "poweredBy": "Generiert von",
+  "specifyCatalog": "Bitte gib einen STAC Catalog oder eine STAC API an...",
+  "selectStacIndex": "... oder wähle einen von STAC Index",
+  "load": "Laden",
+  "leaflet": {
+    "fullscreen": {
+      "false": "Zeige im Vollbild-Modus",
+      "true": "Verlasse den Vollbild-Modus"
+    }
+  }
+}

@@ -3,15 +3,15 @@
     <b-col>
       <b-form @submit="go">
         <b-form-group
-          id="select" label="Please specify a STAC Catalog or API..." label-for="url"
+          id="select" :label="$t('specifyCatalog')" label-for="url"
           :invalid-feedback="error" :state="valid"
         >
           <b-form-input id="url" type="url" :value="url" @input="setUrl" placeholder="https://..." />
         </b-form-group>
-        <b-button type="submit" variant="primary">Load</b-button>
+        <b-button type="submit" variant="primary">{{ $t('load') }}</b-button>
       </b-form>
       <hr>
-      <b-form-group v-if="stacIndex.length > 0" id="stacIndex" label="... or select one from STAC Index">
+      <b-form-group v-if="stacIndex.length > 0" id="stacIndex" :label="$t('selectStacIndex')">
         <b-list-group class="stacIndex">
           <template v-for="catalog in stacIndex">
             <b-list-group-item

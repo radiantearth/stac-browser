@@ -54,7 +54,7 @@ export default {
     BIconLock,
     BIconUnlock,
     StacLink,
-    Share: () => import('../components/Share.vue')
+    Share: () => import('./Source.vue')
   },
   computed: {
     ...mapState(['allowSelectCatalog', 'authConfig', 'authData', 'catalogUrl', 'data', 'url', 'title']),

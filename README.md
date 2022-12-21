@@ -68,6 +68,24 @@ This allows or disallows loading and browsing external STAC data.
 External STAC data is any data that is not a children of the given `catalogUrl`.
 Must be set to `true` if a `catalogUrl` is not given as otherwise you won't be able to browse anything.
 
+### locale
+
+The default language to use for STAC Browser, defaults to `en` (English).
+The language given here must be present in `supportedLocales`.
+
+### fallbackLocale
+
+The language to use if individual phrases are not available in the default language, defaults to `en` (English).
+The language given here must be present in `supportedLocales`.
+
+### supportedLocales
+
+A list of languages to show in the STAC Browser UI.
+The languages given here must have a corresponding JSON file in the `src/locales` folder, e.g.
+`src/locales/en.json` for English.
+
+In CLI, please provide the languages separated by a space, e.g. `--supportedLocales en de fr it`
+
 ### stacLint
 
 ***experimental***

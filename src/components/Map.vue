@@ -1,7 +1,7 @@
 <template>
   <div class="map-container">
     <l-map class="map" v-if="show" :class="stac.type" @ready="init" :options="mapOptions">
-      <LControlFullscreen />
+      <LControlFullscreen :key="fullscreenKey" :options="fullscreenOptions" />
       <template v-if="baseMaps.length > 0">
         <component v-for="baseMap in baseMaps" :key="baseMap.name" :is="baseMap.component" v-bind="baseMap" :layers="baseMap.name" layer-type="base" />
       </template>
@@ -112,12 +112,21 @@ export default {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors.'
       },
       dblClickState: null,
-      selectedItem: null
+      selectedItem: null,
+      fullscreenKey: 1
     };
   },
   computed: {
-    ...mapState(['buildTileUrlTemplate', 'crossOriginMedia', 'displayGeoTiffByDefault', 'geoTiffResolution', 'maxPreviewsOnMap', 'tileSourceTemplate', 'useTileLayerAsFallback']),
+    ...mapState(['buildTileUrlTemplate', 'crossOriginMedia', 'displayGeoTiffByDefault', 'geoTiffResolution', 'locale', 'maxPreviewsOnMap', 'tileSourceTemplate', 'useTileLayerAsFallback']),
     ...mapGetters(['getStac', 'supportsExtension']),
+    fullscreenOptions() {
+      return {
+        title: {
+          'false': this.$t('leaflet.fullscreen.false'),
+          'true': this.$t('leaflet.fullscreen.true'),
+        }
+      };
+    },
     baseMaps() {
       let targets = [];
       if (this.stac instanceof STAC) {
@@ -146,6 +155,10 @@ export default {
     }
   },
   watch: {
+    locale() {
+      // This recreates the component so that it picks up the new translations
+      this.fullscreenKey++;
+    },
     async stacLayerData() {
       await this.showStacLayer();
     },
