@@ -22,7 +22,7 @@
 <script>
 import Description from './Description.vue';
 import { BForm, BFormInput } from 'bootstrap-vue';
-import { mapGetters, mapState } from 'vuex';
+import { mapState } from 'vuex';
 
 export default {
   name: 'Authentication',
