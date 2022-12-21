@@ -1,12 +1,45 @@
 {
-  "poweredBy": "Generiert von",
-  "specifyCatalog": "Bitte gib einen STAC Catalog oder eine STAC API an...",
-  "selectStacIndex": "... oder wähle einen von STAC Index",
-  "load": "Laden",
-  "leaflet": {
-    "fullscreen": {
-      "false": "Zeige im Vollbild-Modus",
-      "true": "Verlasse den Vollbild-Modus"
+  "stacCollection": "Sammlung | Sammlungen",
+  "stacCatalog": "Katalog | Kataloge",
+  "stacItem": "Element | Elemente",
+  "poweredBy": "Generiert von {link}",
+  "loading": "Lade...",
+  "index": {
+    "specifyCatalog": "Bitte gib einen STAC Katalog oder eine STAC API an...",
+    "selectStacIndex": "... oder wähle von STAC Index:",
+    "load": "Laden",
+    "api": "API",
+    "catalog": "Katalog",
+    "urlMissingProtocol": "Der Adresse fehlt ein Protokoll.",
+    "urlMissingHost": "Der Adresse fehlt ein Host.",
+    "urlInvalid": "Die Adresse ist ungültig."
+  },
+  "fullscreen": {
+    "show": "Zeige im Vollbild-Modus",
+    "exit": "Verlasse den Vollbild-Modus"
+  },
+  "read": {
+    "less": "Zeige weniger",
+    "more": "Zeige mehr"
+  },
+  "tree": {
+    "showMore": "Zeige mehr...",
+    "noChildren": "Keine Unterpunkte verfügbar.",
+    "moreCollectionPagesAvailable": "Mehr Seiten für Sammlung verfügbar"
+  },
+  "sidebar": {
+    "switchCatalog": "Wechsle den Katalog"
+  },
+  "table": {
+    "emptyFilteredText": "Es gibt keine Einträge die dem Filter entsprechen",
+    "emptyText": "Keine Einträge verfügbar",
+    "sort": {
+      "asc": "Klicke um aufsteigend zu sortieren",
+      "desc": "Klicke um absteigend zu sortieren",
+      "clear": "Klicke um die Sortierung aufzuheben"
     }
+  },
+  "fields": {
+
   }
 }

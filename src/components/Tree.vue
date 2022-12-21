@@ -20,18 +20,18 @@
 
       <template v-if="expanded && mayHaveChildren">
         <ul v-if="loading" class="tree">
-          <li><b-spinner label="Loading..." small /></li>
+          <li><b-spinner :label="$t('loading')" small /></li>
         </ul>
         <ul v-else-if="childs.length === 0" class="tree">
           <li>
             <b-button size="sm" variant="light" disabled>
-              No children available.
+              {{ $t('tree.noChildren') }}
             </b-button>
           </li>
         </ul>
         <template v-else>
           <Tree v-for="(child, i) in shownChilds" :key="i" :item="child" :parent="stac" :path="path" />
-          <b-button class="show-more" v-if="hasMore" @click="showMore" variant="light" v-b-visible.200="showMore">Show more...</b-button>
+          <b-button class="show-more" v-if="hasMore" @click="showMore" variant="light" v-b-visible.200="showMore">{{ $t('tree.showMore') }}</b-button>
         </template>
       </template>
     </li>
@@ -138,7 +138,7 @@ export default {
     },
     title() {
       if (this.pagination) {
-        return 'more pages available for Collection';
+        return $t('moreCollectionPagesAvailable');
       }
       return STAC.getDisplayTitle([this.item, this.stac]);
     },

@@ -3,15 +3,15 @@
     <b-col>
       <b-form @submit="go">
         <b-form-group
-          id="select" :label="$t('specifyCatalog')" label-for="url"
+          id="select" :label="$t('index.specifyCatalog')" label-for="url"
           :invalid-feedback="error" :state="valid"
         >
           <b-form-input id="url" type="url" :value="url" @input="setUrl" placeholder="https://..." />
         </b-form-group>
-        <b-button type="submit" variant="primary">{{ $t('load') }}</b-button>
+        <b-button type="submit" variant="primary">{{ $t('index.load') }}</b-button>
       </b-form>
       <hr>
-      <b-form-group v-if="stacIndex.length > 0" id="stacIndex" :label="$t('selectStacIndex')">
+      <b-form-group v-if="stacIndex.length > 0" id="stacIndex" :label="$t('index.selectStacIndex')">
         <b-list-group class="stacIndex">
           <template v-for="catalog in stacIndex">
             <b-list-group-item
@@ -21,8 +21,8 @@
               <div class="d-flex w-100 justify-content-between">
                 <strong class="mb-1">{{ catalog.title }}</strong>
                 <small>
-                  <b-badge v-if="catalog.isApi" variant="dark" pill>API</b-badge>
-                  <b-badge v-else variant="light" pill>Catalog</b-badge>
+                  <b-badge v-if="catalog.isApi" variant="dark" pill>{{ $t('index.api') }}</b-badge>
+                  <b-badge v-else variant="light" pill>{{ $t('index.catalog') }}</b-badge>
                 </small>
               </div>
               <p class="mb-1"><Description :description="catalog.summary" :compact="true" /></p>
@@ -69,14 +69,14 @@ export default {
       try {
         let url = new URL(this.url);
         if (!url.protocol) {
-          return 'The URL is missing a protocol.';
+          return this.$t('index.urlMissingProtocol');
         }
         else if (!url.host) {
-          return 'The URL is missing a host.';
+          return this.$t('index.urlMissingHost');
         }
         return null;
       } catch (error) {
-        return 'The URL is invalid.';
+        return this.$t('index.urlInvalid');
       }
     }
   },

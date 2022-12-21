@@ -9,6 +9,7 @@ import { addQueryIfNotExists, isAuthenticationError, Loading, processSTAC, stacR
 import { BrowserError } from '../utils';
 import URI from "urijs";
 import Queryable from '../models/queryable';
+import i18n from '../i18n';
 
 function getStore(config) {
   // Local settings (e.g. for currently loaded STAC entity)
@@ -587,6 +588,20 @@ function getStore(config) {
       }
     },
     actions: {
+      async switchLocale(cx, locale) {
+        if (!cx.state.supportedLocales.includes(locale)) {
+          console.error(`Language '${locale}' is not supported.`);
+          return;
+        }
+
+        // No messages in cache, load them
+        if (Utils.size(i18n.messages[locale]) <= 1) { // languages key is already set thus 1 and not 0
+          const messages = await import(`../locales/${locale}/texts.json`);
+          i18n.mergeLocaleMessage(locale, messages.default);
+        }
+
+        cx.commit('config', {locale});
+      },
       async setAuth(cx, value) {
         if (!Utils.hasText(value)) {
           value = null;

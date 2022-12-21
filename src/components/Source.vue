@@ -14,7 +14,7 @@
         <template #button-content>
           <b-icon-flag /> <span class="button-label">Language ({{ currentLanguage }})</span>
         </template>
-        <b-dropdown-item v-for="l of supportedLocales" :key="l" @click="switchLanguage(l)">
+        <b-dropdown-item v-for="l of supportedLocales" :key="l" @click="switchLocale(l)">
           <b-icon-check v-if="locale === l" />
           <b-icon-blank v-else />
           {{ $t(`languages.${l}.native`) }} / {{ $t(`languages.${l}.global`) }}
@@ -57,7 +57,7 @@
 import { 
   BIconBlank, BIconCheck, BIconEnvelope, BIconFlag, BIconLink, BIconShare, BIconTwitter,
   BDropdown, BDropdownItem, BPopover } from 'bootstrap-vue';
-import { mapState } from 'vuex';
+import { mapActions, mapState } from 'vuex';
 
 import Url from './Url.vue';
 
@@ -132,14 +132,12 @@ export default {
         }
     },
     methods: {
+        ...mapActions(['switchLocale']),
         async validate() {
             await this.$store.dispatch('validate', this.stacUrl);
         },
         browserUrl() {
           return window.location.toString();
-        },
-        switchLanguage(locale) {
-          this.$store.commit('config', {locale});
         }
     }
 };

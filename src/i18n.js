@@ -9,9 +9,12 @@ function loadLocaleMessages () {
   const languages = {};
   for(let locale of CONFIG.supportedLocales) {
     languages[locale] = require(`./locales/${locale}/config.json`);
-    // ToDo: Load not yet required languages async
-    // https://kazupon.github.io/vue-i18n/guide/lazy-loading.html
-    messages[locale] = require(`./locales/${locale}/texts.json`);
+    if (CONFIG.locale == locale || CONFIG.fallbackLocale == locale) {
+      messages[locale] = require(`./locales/${locale}/texts.json`);
+    }
+    else {
+      messages[locale] = {};
+    }
   }
   for(let locale in messages) {
     messages[locale].languages = languages;

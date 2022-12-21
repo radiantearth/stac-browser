@@ -15,9 +15,11 @@
       <router-view />
     </main>
     <footer>
-      <small class="poweredby text-muted">
-        {{ $t('poweredBy') }} <a href="https://github.com/radiantearth/stac-browser">STAC Browser</a> {{ browserVersion }}
-      </small>
+      <i18n tag="small" path="poweredBy" class="poweredby text-muted">
+        <template #link>
+          <a href="https://github.com/radiantearth/stac-browser" target="_blank">STAC Browser</a> {{ browserVersion }}
+        </template>
+      </i18n>
     </footer>
   </b-container>
 </template>

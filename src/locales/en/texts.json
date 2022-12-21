@@ -1,12 +1,45 @@
 {
-  "poweredBy": "Powered by",
-  "specifyCatalog": "Please specify a STAC Catalog or API...",
-  "selectStacIndex": "... or select one from STAC Index",
-  "load": "Load",
-  "leaflet": {
-    "fullscreen": {
-      "false": "View Fullscreen",
-      "true": "Exit Fullscreen"
+  "stacCollection": "Collection | Collections",
+  "stacCatalog": "Catalog | Catalogs",
+  "stacItem": "Item | Items",
+  "poweredBy": "Powered by {link}",
+  "loading": "Loading...",
+  "index": {
+    "specifyCatalog": "Please specify a STAC Catalog or API...",
+    "selectStacIndex": "... or select one from STAC Index:",
+    "load": "Load",
+    "api": "API",
+    "catalog": "Catalog",
+    "urlMissingProtocol": "The URL is missing a protocol.",
+    "urlMissingHost": "The URL is missing a host.",
+    "urlInvalid": "The URL is invalid."
+  },
+  "fullscreen": {
+    "show": "View Fullscreen",
+    "exit": "Exit Fullscreen"
+  },
+  "read": {
+    "less": "Read less",
+    "more": "Read more"
+  },
+  "tree": {
+    "showMore": "Show more...",
+    "noChildren": "No children available.",
+    "moreCollectionPagesAvailable": "more pages available for Collection"
+  },
+  "sidebar": {
+    "switchCatalog": "Switch Catalog"
+  },
+  "table": {
+    "emptyFilteredText": "There are no records matching your request",
+    "emptyText": "There are no records to show",
+    "sort": {
+      "asc": "Click to sort ascending",
+      "desc": "Click to sort descending",
+      "clear": "Click to clear sorting"
     }
+  },
+  "fields": {
+    
   }
 }

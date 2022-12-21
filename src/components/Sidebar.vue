@@ -3,7 +3,9 @@
     <Loading v-if="!parents" />
     <Tree v-else-if="root" :item="root" :path="parents" />
 
-    <b-button v-if="allowSelectCatalog" class="switch-catalog mt-4" variant="light"><router-link to="/"><b-icon-arrow-left-right /> Switch Catalog</router-link></b-button>
+    <b-button v-if="allowSelectCatalog" class="switch-catalog mt-4" variant="light">
+      <router-link to="/"><b-icon-arrow-left-right /> {{$t('sidebar.switchCatalog') }}</router-link>
+    </b-button>
   </div>
 </template>
 

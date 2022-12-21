@@ -3,6 +3,7 @@
     class="metadata-table" :items="tblItems" :fields="tblFields" variant="light"
     responsive small
     sticky-header striped
+    v-bind="tblTexts"
   >
     <template #head()="data">
       <span v-html="data.label" />
@@ -28,6 +29,15 @@ export default {
     EntryMixin
   ],
   computed: {
+    tblTexts() {
+      return {
+        'empty-filtered-text': this.$t('table.emptyFilteredText'),
+        'empty-text': this.$t('table.emptyText'),
+        'label-sort-asc': this.$t('table.sort.asc'),
+        'label-sort-desc': this.$t('table.sort.desc'),
+        'label-sort-clear': this.$t('table.sort.clear')
+      };
+    },
     tblItems() {
       if (Utils.isObject(this.value)) {
         let items = [];

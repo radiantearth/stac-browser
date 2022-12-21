@@ -122,8 +122,8 @@ export default {
     fullscreenOptions() {
       return {
         title: {
-          'false': this.$t('leaflet.fullscreen.false'),
-          'true': this.$t('leaflet.fullscreen.true'),
+          'false': this.$t('fullscreen.show'),
+          'true': this.$t('fullscreen.exit'),
         }
       };
     },
