@@ -11,6 +11,7 @@ import URI from "urijs";
 import Queryable from '../models/queryable';
 import i18n from '../i18n';
 
+// TODO: I18N
 function getStore(config) {
   // Local settings (e.g. for currently loaded STAC entity)
   const localDefaults = () => ({
@@ -596,8 +597,9 @@ function getStore(config) {
 
         // No messages in cache, load them
         if (Utils.size(i18n.messages[locale]) <= 1) { // languages key is already set thus 1 and not 0
-          const messages = await import(`../locales/${locale}/texts.json`);
-          i18n.mergeLocaleMessage(locale, messages.default);
+          const messages = (await import(`../locales/${locale}/texts.json`)).default;
+          messages['custom'] = (await import(`../locales/${locale}/custom.json`)).default;
+          i18n.mergeLocaleMessage(locale, messages);
         }
 
         cx.commit('config', {locale});

@@ -10,6 +10,7 @@
 </template>
 
 <script>
+// TODO: I18N
 import { BIconBricks, BIconListTask } from 'bootstrap-vue';
 
 export default {

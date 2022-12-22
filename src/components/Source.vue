@@ -54,6 +54,7 @@
 </template>
 
 <script>
+// TODO: I18N
 import { 
   BIconBlank, BIconCheck, BIconEnvelope, BIconFlag, BIconLink, BIconShare, BIconTwitter,
   BDropdown, BDropdownItem, BPopover } from 'bootstrap-vue';

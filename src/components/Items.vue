@@ -1,8 +1,8 @@
 <template>
   <section class="items mb-4">
     <h2>
-      <span class="title">Items</span>
-      <b-badge v-if="!api" pill variant="secondary ml-2">{{ items.length }}</b-badge>
+      <span class="title">{{ $tc('stacItem', items.length ) }}</span>
+      <b-badge v-if="!api && items.length > 1" pill variant="secondary ml-2">{{ items.length }}</b-badge>
       <SortButtons v-if="!api" class="ml-4" v-model="sort" />
     </h2>
 
@@ -36,6 +36,7 @@
 </template>
 
 <script>
+// TODO: I18N
 import Item from './Item.vue';
 import Loading from './Loading.vue';
 import Pagination from './Pagination.vue';

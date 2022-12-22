@@ -10,10 +10,10 @@
           {{ asset.title || id }}
         </span>
         <div class="badges ml-1" v-if="Array.isArray(asset.roles)">
-          <b-badge v-if="shown" variant="success" class="shown ml-1 mb-1" title="This is the asset currently shown">
-            <b-icon-check /> shown
+          <b-badge v-if="shown" variant="success" class="shown ml-1 mb-1" :title="$t('assets.currentlyShown')">
+            <b-icon-check /> {{ $t('assets.shown') }}
           </b-badge>
-          <b-badge v-if="asset.deprecated" variant="warning" class="deprecated ml-1 mb-1">Deprecated</b-badge>
+          <b-badge v-if="asset.deprecated" variant="warning" class="deprecated ml-1 mb-1">{{ $t('deprecated') }}</b-badge>
           <b-badge v-for="role in asset.roles" :key="role" :variant="role === 'data' ? 'primary' : 'secondary'" class="role ml-1 mb-1">{{ role }}</b-badge>
           <b-badge v-if="shortFileFormat" variant="dark" class="format ml-1 mb-1" :title="fileFormat"><span v-html="shortFileFormat" /></b-badge>
         </div>
@@ -32,9 +32,9 @@
             {{ buttonText }}
           </b-button>
           <b-button v-if="canShow && !shown" @click="show" variant="primary">
-            <b-icon-eye />
-            <template v-if="isThumbnail">&nbsp;Show thumbnail</template>
-            <template v-else>&nbsp;Show on map</template>
+            <b-icon-eye />&nbsp;
+            <template v-if="isThumbnail">{{ $t('assets.showThumbnail') }}</template>
+            <template v-else>{{ $t('assets.showOnMap') }}</template>
           </b-button>
         </b-button-group>
         <b-card-text class="mt-4" v-if="asset.description">
@@ -222,25 +222,17 @@ export default {
     },
     buttonText() {
       if (this.browserCanOpenFile && this.isBrowserProtocol) {
-        return 'Open';
+        return this.$t('open');
       }
-      let text = [];
-      let preposition = 'for';
+      let what = 'download';
       if (this.isGdalVfs) {
-        text.push('Copy GDAL VFS URL');
+        what = 'copyGdalVfsUrl';
       }
       else if (this.shouldCopy) {
-        text.push('Copy URL');
+        what = 'copyUrl';
       }
-      else {
-        text.push('Download');
-        preposition = 'from';
-      }
-      if (!this.isBrowserProtocol && this.from) {
-        text.push(preposition);
-        text.push(this.from);
-      }
-      return text.join(' ');
+      let where = (!this.isBrowserProtocol && this.from) ? 'withSource' : 'generic';
+      return this.$t(`assets.${what}.${where}`, {source: this.from});
     }
   },
   created() {
@@ -271,18 +263,18 @@ export default {
       }
       switch(protocol.toLowerCase()) {
         case 's3':
-          return 'Amazon S3';
+          return this.$t('protocol.s3');
         case 'abfs':
         case 'abfss':
-          return 'Microsoft Azure';
+          return this.$t('protocol.azure');
         case 'gcs':
-          return 'Google Cloud';
+          return this.$t('protocol.gcs');
         case 'ftp':
-          return 'FTP';
+          return this.$t('protocol.ftp');
         case 'oss':
-          return 'Alibaba Cloud';
+          return this.$t('protocol.oss');
         case 'file':
-          return 'local file system';
+          return this.$t('protocol.file');
       }
       return '';
     },

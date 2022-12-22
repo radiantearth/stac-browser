@@ -1,7 +1,7 @@
 <template>
   <b-container id="stac-browser">
     <Authentication v-if="doAuth.length > 0" />
-    <b-sidebar id="sidebar" title="Browse" shadow lazy>
+    <b-sidebar id="sidebar" :title="$t('browse')" shadow lazy>
       <Sidebar />
     </b-sidebar>
     <!-- Header -->

@@ -28,6 +28,7 @@
 </template>
 
 <script>
+// TODO: I18N
 import stacLayer from 'stac-layer';
 import { CRS } from "leaflet";
 import { LMap, LControlZoom, LTileLayer, LWMSTileLayer, LGeoJson } from 'vue2-leaflet';
@@ -134,10 +135,10 @@ export default {
     },
     zoomControlTexts() {
       return {
-        zoomInText: this.$t('map.zoom.in.label'),
-        zoomInTitle: this.$t('map.zoom.in.description'),
-        zoomOutText: this.$t('map.zoom.out.label'),
-        zoomOutTitle: this.$t('map.zoom.out.description')
+        zoomInText: this.$t('leaflet.zoom.in.label'),
+        zoomInTitle: this.$t('leaflet.zoom.in.description'),
+        zoomOutText: this.$t('leaflet.zoom.out.label'),
+        zoomOutTitle: this.$t('leaflet.zoom.out.description')
       };
     },
     baseMaps() {

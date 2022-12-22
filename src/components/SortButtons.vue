@@ -10,6 +10,7 @@
 </template>
 
 <script>
+// TODO: I18N
 import { BIconSortAlphaDown, BIconSortAlphaUp } from 'bootstrap-vue';
 
 export default {

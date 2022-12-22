@@ -1,7 +1,7 @@
 <template>
   <div class="search d-flex flex-column">
     <Loading v-if="!root" stretch />
-    <b-alert v-else-if="!supportsSearch" variant="danger" show>Item Search is not supported by the API.</b-alert>
+    <b-alert v-else-if="!supportsSearch" variant="danger" show>{{ $t('search.notSupported') }}</b-alert>
     <b-row v-else>
       <b-col class="left">
         <ItemFilter
@@ -11,8 +11,8 @@
       </b-col>
       <b-col class="right">
         <Loading v-if="loading" fill top />
-        <b-alert v-else-if="!hasItems && !hasFilters" variant="info" show>Please modify the search criteria.</b-alert>
-        <b-alert v-else-if="!hasItems" variant="warning" show>No items found for the given filters.</b-alert>
+        <b-alert v-else-if="!hasItems && !hasFilters" variant="info" show>{{ $t('search.modifyCriteria') }}</b-alert>
+        <b-alert v-else-if="!hasItems" variant="warning" show>{{ $t('search.noItemsFound') }}</b-alert>
         <template v-if="hasItems">
           <div id="search-map">
             <Map :stac="root" :stacLayerData="itemCollection" scrollWheelZoom popover />
@@ -35,7 +35,6 @@ import sortCapabilitiesMixinGenerator from '../components/SortCapabilitiesMixin'
 import ItemFilter from '../components/ItemFilter.vue';
 import Loading from '../components/Loading.vue';
 
-const pageTitle = 'Search';
 const searchId = '__search__';
 
 export default {
@@ -64,6 +63,9 @@ export default {
   computed: {
     ...mapState(['apiItems', 'apiItemsLink', 'apiItemsPagination', 'apiItemsFilter']),
     ...mapGetters(["root", "searchLink", 'supportsSearch', 'fromBrowserPath', 'getApiItemsLoading']),
+    pageTitle() {
+      return this.$t('search.title');
+    },
     loading() {
       return this.getApiItemsLoading(searchId);
     },
@@ -118,7 +120,7 @@ export default {
       }
     },
     showPage() {
-      this.$store.commit('showPage', {title: pageTitle});
+      this.$store.commit('showPage', {title: this.pageTitle});
       this.$store.commit('setApiItemsLink', this.searchLink);
     },
     async paginateItems(link) {
@@ -127,7 +129,7 @@ export default {
         let response = await this.$store.dispatch('loadApiItems', {link, show: true});
         this.handleResponse(response);
       } catch (error) {
-        this.$root.$emit('error', error, 'Sorry, loading the list of STAC Items failed.');
+        this.$root.$emit('error', error, this.$t('errors.loadItems'));
       } finally {
         this.toggleApiItemsLoading(searchId);
       }
@@ -138,14 +140,14 @@ export default {
         let response = await this.$store.dispatch('loadApiItems', {link: this.searchLink, show: true, filters});
         this.handleResponse(response);
       } catch(error) {
-        this.$root.$emit('error', error, 'Sorry, loading a filtered list of STAC Items failed.');
+        this.$root.$emit('error', error, this.$t('errors.loadFilteredItems'));
       } finally {
         this.toggleApiItemsLoading(searchId);
       }
     },
     handleResponse(response) {
       if (response) {
-        this.$store.commit('showPage', {title: pageTitle, url: response.config.url});
+        this.$store.commit('showPage', {title: this.pageTitle, url: response.config.url});
       }
     }
   }

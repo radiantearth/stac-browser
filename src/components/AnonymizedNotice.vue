@@ -1,6 +1,6 @@
 <template>
   <b-alert variant="warning" show>
-    <strong>Anonymized</strong>&nbsp;
+    <strong>{{ $t('anonymized.title') }}</strong>&nbsp;
     <small>{{ warning }}</small>
   </b-alert>
 </template>

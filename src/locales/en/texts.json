@@ -1,57 +1,147 @@
 {
-  "stacCollection": "Collection | Collections",
-  "stacCatalog": "Catalog | Catalogs",
-  "stacItem": "Item | Items",
-  "poweredBy": "Powered by {link}",
-  "loading": "Loading...",
-  "index": {
-    "specifyCatalog": "Please specify a STAC Catalog or API...",
-    "selectStacIndex": "... or select one from STAC Index:",
-    "load": "Load",
-    "api": "API",
-    "catalog": "Catalog",
-    "urlMissingProtocol": "The URL is missing a protocol.",
-    "urlMissingHost": "The URL is missing a host.",
-    "urlInvalid": "The URL is invalid."
+  "additionalResources": "Additional Resources",
+  "anonymized": {
+    "title": "Anonymized"
+  },
+  "assets": {
+    "copyGdalVfsUrl": {
+      "generic": "Copy GDAL VFS URL",
+      "withSource": "Copy GDAL VFS URL for {source}"
+    },
+    "copyUrl": {
+      "generic": "Copy URL",
+      "withSource": "Copy URL for {source}"
+    },
+    "currentlyShown": "This is the asset that is currently shown.",
+    "download": {
+      "generic": "Download",
+      "withSource": "Download from {source}"
+    },
+    "inItems": "Asset in Items | Assets in Items",
+    "showOnMap": "Show on map",
+    "showThumbnail": "Show thumbnail",
+    "shown": "shown"
+  },
+  "authentication": {
+    "button": {
+      "authenticate": "Authenticate",
+      "authenticated": "Authenticated",
+      "title": "Provide or update your credentials"
+    },
+    "description": "The requested page requires authentication. Please provide your authentication details in the text field below.",
+    "title": "Authentication"
+  },
+  "browse": "Browse",
+  "cancel": "Cancel",
+  "catalog": {
+    "license": "License",
+    "temporalExtent": "Temporal Extent"
+  },
+  "catalogs": {
+    "filterByTitle": "Filter catalogs by title",
+    "loadMore": "Load more...",
+    "noMatches": "No catalogs match the given search criteria."
+  },
+  "copy": "Copy",
+  "deprecated": "Deprecated",
+  "description": "Description",
+  "errors": {
+    "badRequest": "The request is invalid. This might be due to invalid parameters, e.g. in a search request, or could be a bug in STAC Browser.",
+    "contactProvider": "Please contact the service operator to resolve this issue.",
+    "forbidden": "The credentials specified for this request are invalid, e.g. an expired or invalid API token. Please provide other credentials and try again.",
+    "loadFilteredItems": "Sorry, loading a filtered list of STAC Items failed.",
+    "loadItems": "Sorry, loading the list of STAC Items failed.",
+    "networkError": "This issue may occur when servers don't allow external access via web browsers (e.g., when CORS headers are not present). @:browse.contactProvider",
+    "noExternalAccess": "Accessing external catalogs is not allowed!",
+    "notFound": "The requested resource does not exist. @:browse.contactProvider",
+    "serverError": "The server encountered an issue. @:browse.contactProvider",
+    "unauthorized": "The request lacks credentials, e.g. an API token. Please provide your credentials and try again."
+  },
+  "fields": {
   },
   "fullscreen": {
-    "show": "View Fullscreen",
-    "exit": "Exit Fullscreen"
+    "exit": "Exit Fullscreen",
+    "show": "View Fullscreen"
+  },
+  "goToCollection": {
+    "label": "Collection",
+    "description": "Go to the associated collection",
+    "descriptionWithTitle": "@:goToCollection.description: {title}"
+  },
+  "goToParent": {
+    "label": "Up",
+    "description": "Go to parent",
+    "descriptionWithTitle": "@:goToParent.description: {title}"
+  },
+  "index": {
+    "api": "API",
+    "catalog": "Catalog",
+    "load": "Load",
+    "selectStacIndex": "... or select one from STAC Index:",
+    "specifyCatalog": "Please specify a STAC Catalog or API...",
+    "urlInvalid": "The URL is invalid.",
+    "urlMissingHost": "The URL is missing a host.",
+    "urlMissingProtocol": "The URL is missing a protocol."
+  },
+  "leaflet": {
+    "zoom": {
+      "in": {
+        "description": "Zoom in",
+        "label": "+"
+      },
+      "out": {
+        "description": "Zoom out",
+        "label": "-"
+      }
+    }
+  },
+  "loading": "Loading...",
+  "map": "Map",
+  "metadata": {
+    "general": "General",
+    "title": "Metadata"
+  },
+  "open": "Open",
+  "poweredBy": "Powered by {link}",
+  "protocol": {
+    "azure": "Microsoft Azure",
+    "file": "file system (local)",
+    "ftp": "FTP",
+    "gcs": "Google Cloud",
+    "oss": "Alibaba Cloud",
+    "s3": "Amazon S3"
   },
   "read": {
     "less": "Read less",
     "more": "Read more"
   },
-  "tree": {
-    "showMore": "Show more...",
-    "noChildren": "No children available.",
-    "moreCollectionPagesAvailable": "more pages available for Collection"
+  "search": {
+    "modifyCriteria": "Please modify the search criteria.",
+    "noItemsFound": "No items found for the given filters.",
+    "notSupported": "Item Search is not supported by the API.",
+    "title": "Search"
   },
   "sidebar": {
     "switchCatalog": "Switch Catalog"
   },
+  "stacAssets": "Asset | Assets",
+  "stacCatalog": "Catalog | Catalogs",
+  "stacCollection": "Collection | Collections",
+  "stacItem": "Item | Items",
+  "submit": "Submit",
   "table": {
     "emptyFilteredText": "There are no records matching your request",
     "emptyText": "There are no records to show",
     "sort": {
       "asc": "Click to sort ascending",
-      "desc": "Click to sort descending",
-      "clear": "Click to clear sorting"
+      "clear": "Click to clear sorting",
+      "desc": "Click to sort descending"
     }
   },
-  "map": {
-    "zoom": {
-      "in": {
-        "label": "+",
-        "description": "Zoom in"
-      },
-      "out": {
-        "label": "-",
-        "description": "Zoom out"
-      }
-    }
-  },
-  "fields": {
-    
+  "thumbnails": "Thumbnails",
+  "tree": {
+    "moreCollectionPagesAvailable": "more pages available for Collection",
+    "noChildren": "No children available.",
+    "showMore": "Show more..."
   }
 }

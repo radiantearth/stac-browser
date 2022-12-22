@@ -11,24 +11,24 @@
       <p class="lead" v-if="url || isSearchPage()">
         <span class="in mr-3" v-if="containerLink">in <StacLink :data="containerLink" /></span>
         <b-button-group>
-          <b-button v-if="parentLink" :to="toBrowserPath(parentLink.href)" :title="`Go to parent > ${parentLink.title}`" variant="outline-primary" size="sm">
-            <b-icon-arrow-90deg-up /> <span class="button-label prio">Go to Parent</span>
+          <b-button v-if="parentLink" :to="toBrowserPath(parentLink.href)" :title="parentLinkTitle" variant="outline-primary" size="sm">
+            <b-icon-arrow-90deg-up /> <span class="button-label prio">{{ $t('goToParent.label') }}</span>
           </b-button>
-          <b-button v-if="collectionLink" :to="toBrowserPath(collectionLink.href)" :title="`Go to collection > ${collectionLink.title}`" variant="outline-primary" size="sm">
-            <b-icon-folder-symlink /> <span class="button-label prio">Go to Collection</span>
+          <b-button v-if="collectionLink" :to="toBrowserPath(collectionLink.href)" :title="collectionLinkTitle" variant="outline-primary" size="sm">
+            <b-icon-folder-symlink /> <span class="button-label prio">{{ $t('goToCollection.label') }}</span>
           </b-button>
-          <b-button variant="outline-primary" size="sm" v-b-toggle.sidebar title="Browse">
-            <b-icon-book /> <span class="button-label prio">Browse</span>
+          <b-button variant="outline-primary" size="sm" v-b-toggle.sidebar :title="$t('browse')">
+            <b-icon-book /> <span class="button-label prio">{{ $t('browse') }}</span>
           </b-button>
-          <b-button v-if="supportsSearch && !isSearchPage()" variant="outline-primary" size="sm" :to="searchBrowserLink" title="Search">
-            <b-icon-search /> <span class="button-label prio">Search</span>
+          <b-button v-if="supportsSearch && !isSearchPage()" variant="outline-primary" size="sm" :to="searchBrowserLink" :title="$t('search.title')">
+            <b-icon-search /> <span class="button-label prio">{{ $t('search.title') }}</span>
           </b-button>
-          <b-button v-if="authConfig" variant="outline-primary" size="sm" @click="auth" title="Provide or update your credentials">
+          <b-button v-if="authConfig" variant="outline-primary" size="sm" @click="auth" :title="$t('authentication.button.title')">
             <template v-if="authData">
-              <b-icon-lock /> <span class="button-label">Authenticated</span>
+              <b-icon-lock /> <span class="button-label">{{ $t('authentication.button.authenticated') }}</span>
             </template>
             <template v-else>
-              <b-icon-unlock /> <span class="button-label">Authenticate</span>
+              <b-icon-unlock /> <span class="button-label">{{ $t('authentication.button.authenticate') }}</span>
             </template>
           </b-button>
         </b-button-group>
@@ -38,6 +38,7 @@
 </template>
 
 <script>
+// TODO: I18N
 import { mapState, mapGetters } from 'vuex';
 import StacLink from './StacLink.vue';
 import { BIconArrow90degUp, BIconBook, BIconFolderSymlink, BIconSearch, BIconLock, BIconUnlock } from "bootstrap-vue";
@@ -59,6 +60,22 @@ export default {
   computed: {
     ...mapState(['allowSelectCatalog', 'authConfig', 'authData', 'catalogUrl', 'data', 'url', 'title']),
     ...mapGetters(['root', 'parentLink', 'collectionLink', 'stacVersion', 'supportsSearch', 'toBrowserPath']),
+    collectionLinkTitle() {
+      if (Utils.hasText(this.collectionLink.title)) {
+        return this.$t('goToCollection.descriptionWithTitle', this.collectionLink);
+      }
+      else {
+        return this.$t('goToCollection.description');
+      }
+    },
+    parentLinkTitle() {
+      if (Utils.hasText(this.parentLink.title)) {
+        return this.$t('goToParent.descriptionWithTitle', this.parentLink);
+      }
+      else {
+        return this.$t('goToParent.description');
+      }
+    },
     icon() {
       if (this.data instanceof STAC) {
         let icons = this.data.getIcons();

@@ -15,6 +15,7 @@
 </template>
 
 <script>
+// TODO: I18N
 export default {
   name: 'DeprecationNotice',
   components: {

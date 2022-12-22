@@ -1,57 +1,135 @@
 {
-  "stacCollection": "Sammlung | Sammlungen",
-  "stacCatalog": "Katalog | Kataloge",
-  "stacItem": "Element | Elemente",
-  "poweredBy": "Generiert von {link}",
-  "loading": "Lade...",
-  "index": {
-    "specifyCatalog": "Bitte gib einen STAC Katalog oder eine STAC API an...",
-    "selectStacIndex": "... oder wähle von STAC Index:",
-    "load": "Laden",
-    "api": "API",
-    "catalog": "Katalog",
-    "urlMissingProtocol": "Der Adresse fehlt ein Protokoll.",
-    "urlMissingHost": "Der Adresse fehlt ein Host.",
-    "urlInvalid": "Die Adresse ist ungültig."
+  "additionalResources": "Zusätzliche Ressourcen",
+  "anonymized": {
+    "title": "Anonymisiert"
+  },
+  "assets": {
+    "copyGdalVfsUrl": {
+      "generic": "Kopiere GDAL VFS Adresse",
+      "withSource": "Kopiere GDAL VFS Adresse für {source}"
+    },
+    "copyUrl": {
+      "generic": "Kopiere Adresse",
+      "withSource": "Kopiere Adresse für {source}"
+    },
+    "currentlyShown": "Dieses Asset wird derzeit angezeigt.",
+    "download": {
+      "generic": "Herunterladen",
+      "withSource": "Herunterladen von {source}"
+    },
+    "inItems": "Datei in Unterlementen | Dateien in Unterelementen",
+    "showOnMap": "Auf Karte anzeigen",
+    "showThumbnail": "Zeige Vorschaubild",
+    "shown": "angezeigt"
+  },
+  "authentication": {
+    "button": {
+      "authenticate": "Anmelden",
+      "authenticated": "Angemeldet",
+      "title": "Anmeldedaten bereitstellen oder aktualisieren"
+    },
+    "description": "Die angefragte Seite erfordert eine Anmeldung. Bitte die Anmeldedaten unten in das Textfeld eingeben.",
+    "title": "Anmelden"
+  },
+  "browse": "Erkunden",
+  "cancel": "Abbrechen",
+  "catalog": {
+    "license": "Lizenz",
+    "temporalExtent": "Zeitliche Ausdehnung"
+  },
+  "catalogs": {
+    "filterByTitle": "Kataloge anhand des Titels filtern",
+    "loadMore": "Lade mehr...",
+    "noMatches": "Keiner der Kataloge entspricht den Suchkriterien."
+  },
+  "copy": "Kopieren",
+  "deprecated": "Veraltet",
+  "description": "Beschreibung",
+  "fields": {
   },
   "fullscreen": {
     "show": "Zeige im Vollbild-Modus",
     "exit": "Verlasse den Vollbild-Modus"
   },
+  "goToCollection": {
+    "label": "Sammlung",
+    "description": "Gehe zur dazugehörigen Sammlung",
+    "descriptionWithTitle": "@:goToCollection.description: {title}"
+  },
+  "goToParent": {
+    "label": "Hoch",
+    "description": "Gehe ein Level hoch",
+    "descriptionWithTitle": "@:goToParent.description: {title}"
+  },
+  "index": {
+    "api": "API",
+    "catalog": "Katalog",
+    "load": "Laden",
+    "selectStacIndex": "... oder wähle von STAC Index:",
+    "specifyCatalog": "Bitte gib einen STAC Katalog oder eine STAC API an...",
+    "urlInvalid": "Die Adresse ist ungültig.",
+    "urlMissingHost": "Der Adresse fehlt ein Host.",
+    "urlMissingProtocol": "Der Adresse fehlt ein Protokoll."
+  },
+  "leaflet": {
+    "zoom": {
+      "in": {
+        "description": "Vergrößern",
+        "label": "+"
+      },
+      "out": {
+        "description": "Verkleinern",
+        "label": "-"
+      }
+    }
+  },
+  "loading": "Lade...",
+  "map": "Karte",
+  "metadata": {
+    "general": "Allgemeines",
+    "title": "Metadaten"
+  },
+  "open": "Öffnen",
+  "poweredBy": "Generiert von {link}",
+  "protocol": {
+    "azure": "Microsoft Azure",
+    "file": "Dateisystem (lokal)",
+    "ftp": "FTP",
+    "gcs": "Google Cloud",
+    "oss": "Alibaba Cloud",
+    "s3": "Amazon S3"
+  },
   "read": {
     "less": "Zeige weniger",
     "more": "Zeige mehr"
   },
-  "tree": {
-    "showMore": "Zeige mehr...",
-    "noChildren": "Keine Unterpunkte verfügbar.",
-    "moreCollectionPagesAvailable": "Mehr Seiten für Sammlung verfügbar"
+  "search": {
+    "modifyCriteria": "Bitte die Suchkriterien ändern.",
+    "noItemsFound": "Keine Elemente gefunden für die angegebenen Filter.",
+    "notSupported": "Suchen wird von der API nicht unterstützt.",
+    "title": "Suche"
   },
   "sidebar": {
     "switchCatalog": "Wechsle den Katalog"
   },
+  "stacAssets": "Datei | Dateien",
+  "stacCatalog": "Katalog | Kataloge",
+  "stacCollection": "Sammlung | Sammlungen",
+  "stacItem": "Element | Elemente",
+  "submit": "Absenden",
   "table": {
     "emptyFilteredText": "Es gibt keine Einträge die dem Filter entsprechen",
     "emptyText": "Keine Einträge verfügbar",
     "sort": {
       "asc": "Klicke um aufsteigend zu sortieren",
-      "desc": "Klicke um absteigend zu sortieren",
-      "clear": "Klicke um die Sortierung aufzuheben"
+      "clear": "Klicke um die Sortierung aufzuheben",
+      "desc": "Klicke um absteigend zu sortieren"
     }
   },
-  "map": {
-    "zoom": {
-      "in": {
-        "label": "+",
-        "description": "Vergrößern"
-      },
-      "out": {
-        "label": "-",
-        "description": "Verkleinern"
-      }
-    }
-  },
-  "fields": {
-
+  "thumbnails": "Vorschaubilder",
+  "tree": {
+    "moreCollectionPagesAvailable": "Mehr Seiten für Sammlung verfügbar",
+    "noChildren": "Keine Unterpunkte verfügbar.",
+    "showMore": "Zeige mehr..."
   }
 }

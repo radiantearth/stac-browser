@@ -79,6 +79,7 @@
 </template>
 
 <script>
+// TODO: I18N
 import { BDropdown, BDropdownItem, BForm, BFormGroup, BFormInput, BFormCheckbox, BFormSelect, BFormTags } from 'bootstrap-vue';
 
 import { mapGetters, mapState } from "vuex";

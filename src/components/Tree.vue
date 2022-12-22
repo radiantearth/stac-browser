@@ -138,7 +138,7 @@ export default {
     },
     title() {
       if (this.pagination) {
-        return $t('moreCollectionPagesAvailable');
+        return this.$t('tree.moreCollectionPagesAvailable');
       }
       return STAC.getDisplayTitle([this.item, this.stac]);
     },

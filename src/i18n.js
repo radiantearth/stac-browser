@@ -11,6 +11,7 @@ function loadLocaleMessages () {
     languages[locale] = require(`./locales/${locale}/config.json`);
     if (CONFIG.locale == locale || CONFIG.fallbackLocale == locale) {
       messages[locale] = require(`./locales/${locale}/texts.json`);
+      messages[locale]['custom'] = require(`./locales/${locale}/custom.json`);
     }
     else {
       messages[locale] = {};

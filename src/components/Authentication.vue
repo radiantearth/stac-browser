@@ -1,18 +1,15 @@
 <template>
   <div class="auth">
     <b-form @submit.stop.prevent="submit" @reset="reset">
-      <b-card no-body header="Authentication">
+      <b-card no-body :header="$t('authentication.title')">
         <b-card-body>
-          <p>
-            The requested page requires authentication.
-            Please provide your authentication details in the text field below.
-          </p>
-          <Description v-if="authConfig.description" :description="authConfig.description" />
+          <p>{{ $t('authentication.description') }}</p>
+          <Description v-if="description" :description="description" />
           <b-form-input class="mb-2 mt-2" type="password" v-model.trim="token" autofocus :required="required" />
         </b-card-body>
         <b-card-footer>
-          <b-button type="submit" variant="primary">Submit</b-button>
-          <b-button type="reset" variant="danger" class="ml-3">Cancel</b-button>
+          <b-button type="submit" variant="primary">{{ $t('submit') }}</b-button>
+          <b-button type="reset" variant="danger" class="ml-3">{{ $t('cancel') }}</b-button>
         </b-card-footer>
       </b-card>
     </b-form>
@@ -38,7 +35,13 @@ export default {
     };
   },
   computed: {
-    ...mapState(['authConfig', 'authData'])
+    ...mapState(['authConfig', 'authData']),
+    description() {
+      if (this.authConfig.description) {
+        return this.authConfig.description;
+      }
+      return this.$t('custom.authConfig.description');
+    }
   },
   created() {
     if (this.authData) {

@@ -10,7 +10,7 @@
         <StacLink :data="[data, catalog]" class="stretched-link" />
       </b-card-title>
       <b-card-text v-if="data && (data.description || data.deprecated)" class="intro">
-        <b-badge v-if="data.deprecated" variant="warning" class="deprecated">Deprecated</b-badge>
+        <b-badge v-if="data.deprecated" variant="warning" class="deprecated">{{ $t('deprecated') }}</b-badge>
         {{ data.description | stripCommonmark }}
       </b-card-text>
       <b-card-text v-if="temporalExtent" class="datetime"><span v-html="temporalExtent" /></b-card-text>

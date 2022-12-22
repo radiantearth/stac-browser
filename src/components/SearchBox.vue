@@ -6,6 +6,7 @@
 </template>
 
 <script>
+// TODO: I18N
 import { BFormInput } from 'bootstrap-vue';
 
 export default {

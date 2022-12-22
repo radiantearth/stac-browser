@@ -15,6 +15,7 @@
 </template>
 
 <script>
+// TODO: I18N
 import { BTable } from 'bootstrap-vue';
 import EntryMixin from './EntryMixin';
 import Utils from '../../utils';

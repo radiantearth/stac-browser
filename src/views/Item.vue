@@ -5,21 +5,21 @@
         <section class="mb-4">
           <b-card no-body class="maps-preview">
             <b-tabs v-model="tab" ref="tabs" card pills vertical end>
-              <b-tab title="Map" no-body>
+              <b-tab :title="$t('map')" no-body>
                 <Map :stac="data" :stacLayerData="selectedAsset" @mapClicked="mapClicked" @dataChanged="dataChanged" scrollWheelZoom />
               </b-tab>
-              <b-tab v-if="thumbnails.length > 0" title="Thumbnails" no-body>
+              <b-tab v-if="thumbnails.length > 0" :title="$t('thumbnails')" no-body>
                 <Thumbnails :thumbnails="thumbnails" />
               </b-tab>
             </b-tabs>
           </b-card>
         </section>
         <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="shownAssets" @showAsset="showAsset" />
-        <Links v-if="additionalLinks.length > 0" title="Additional resources" :links="additionalLinks" />
+        <Links v-if="additionalLinks.length > 0" :title="$t('additionalResources')" :links="additionalLinks" />
       </b-col>
       <b-col class="right">
         <section class="intro">
-          <h2 v-if="data.properties.description">Description</h2>
+          <h2 v-if="data.properties.description">{{ $t('description') }}</h2>
           <DeprecationNotice v-if="data.properties.deprecated" :data="data" />
           <AnonymizedNotice v-if="data.properties['anon:warning']" :warning="data.properties['anon:warning']" />
           <ReadMore v-if="data.properties.description" :lines="10" :text="$t('read.more')" :text-less="$t('read.less')">
@@ -28,7 +28,7 @@
           <Keywords v-if="Array.isArray(data.properties.keywords) && data.properties.keywords.length > 0" :keywords="data.properties.keywords" />
         </section>
         <section class="item-collection card-list mb-4" v-if="collection">
-          <h2>Collection</h2>
+          <h2>{{ $tc('stacCollection') }}</h2>
           <Catalog :catalog="collection" :showThumbnail="false" />
         </section>
         <Providers v-if="data.properties.providers" :providers="data.properties.providers" />

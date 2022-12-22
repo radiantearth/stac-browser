@@ -25,6 +25,7 @@
 </template>
 
 <script>
+// TODO: I18N
 import { mapGetters, mapState } from 'vuex';
 import StacLink from './StacLink.vue';
 import STAC from '../models/stac';

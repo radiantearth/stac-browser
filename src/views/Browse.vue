@@ -1,7 +1,7 @@
 <template>
   <section class="browse d-flex flex-column">
     <b-alert v-if="!allowExternalAccess && isExternal" show>
-      <p>Accessing external catalogs is not allowed!</p>
+      <p>{{ $t('errors.noExternalAccess') }}</p>
     </b-alert>
     <ErrorAlert v-if="error" :dismissible="false" :url="url" :description="errorDescription" :id="errorId" />
     <Loading v-else-if="loading" stretch />
@@ -44,9 +44,7 @@ export default {
       }
       return null;
     },
-    errorDescription() {
-      let contact = " Please contact the service operator to resolve this issue.";
-      
+    errorDescription() {      
       if (this.error instanceof Error && this.error.isAxiosError && Utils.isObject(this.error.response)) {
         let res = this.error.response;
         if (Utils.isObject(res.data)) {
@@ -58,26 +56,26 @@ export default {
           }
         }
         if (res.status === 401) {
-          return "The request lacks credentials, e.g. an API token. Please provide your credentials and try again.";
+          return this.$t('errors.unauthorized');
         }
         else if (res.status === 403) {
-          return "The credentials specified for this request are invalid, e.g. an expired or invalid API token. Please provide other credentials and try again.";
+          return this.$t('errors.forbidden');
         }
         else if (res.status === 404) {
-          return "The requested resource does not exist." + contact;
+          return this.$t('errors.notFound');
         }
         else if (res.status > 500) {
-          return "The server encountered an issue." + contact;
+          return this.$t('errors.serverError');
         }
         else if (res.status > 400) {
-          return "The request is invalid. This might be due to invalid parameters, e.g. in a search request, or could be a bug in STAC Browser.";
+          return this.$t('errors.badRequest');
         }
       }
       else if (this.error instanceof BrowserError) {
         return this.error.message;
       }
 
-      return "This issue may occur when servers don't allow external access via web browsers (e.g., when CORS headers are not present)." + contact;
+      return this.$t('errors.networkError');
     },
     component() {
       if (this.isItem) {

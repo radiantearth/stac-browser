@@ -20,6 +20,7 @@
 </template>
 
 <script>
+// TODO: I18N
 import { BListGroup, BListGroupItem } from 'bootstrap-vue';
 
 export default {

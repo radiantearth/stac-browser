@@ -34,6 +34,7 @@
 </template>
 
 <script>
+// TODO: I18N
 import { BCollapse, BIconChevronRight, BIconChevronDown } from 'bootstrap-vue';
 import Description from './Description.vue';
 import Metadata from './Metadata.vue';
