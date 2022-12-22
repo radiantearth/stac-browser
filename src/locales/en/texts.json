@@ -39,6 +39,18 @@
       "clear": "Click to clear sorting"
     }
   },
+  "map": {
+    "zoom": {
+      "in": {
+        "label": "+",
+        "description": "Zoom in"
+      },
+      "out": {
+        "label": "-",
+        "description": "Zoom out"
+      }
+    }
+  },
   "fields": {
     
   }

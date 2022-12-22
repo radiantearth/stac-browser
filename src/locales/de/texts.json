@@ -39,6 +39,18 @@
       "clear": "Klicke um die Sortierung aufzuheben"
     }
   },
+  "map": {
+    "zoom": {
+      "in": {
+        "label": "+",
+        "description": "Vergrößern"
+      },
+      "out": {
+        "label": "-",
+        "description": "Verkleinern"
+      }
+    }
+  },
   "fields": {
 
   }

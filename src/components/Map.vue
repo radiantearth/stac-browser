@@ -1,12 +1,13 @@
 <template>
   <div class="map-container">
     <l-map class="map" v-if="show" :class="stac.type" @ready="init" :options="mapOptions">
-      <LControlFullscreen :key="fullscreenKey" :options="fullscreenOptions" />
+      <l-control-zoom :key="`z${ix}`" v-bind="zoomControlTexts" position="topleft" />
+      <l-control-fullscreen :key="`fs${ix}`" position="topleft" :options="fullscreenOptions" />
       <template v-if="baseMaps.length > 0">
         <component v-for="baseMap in baseMaps" :key="baseMap.name" :is="baseMap.component" v-bind="baseMap" :layers="baseMap.name" layer-type="base" />
       </template>
-      <LTileLayer v-else url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" :options="osmOptions" />
-      <LGeoJson v-if="geojson" ref="geojson" :geojson="geojson" :options="{onEachFeature: showPopup}" :optionsStyle="{color: secondaryColor, weight: secondaryWeight}" />
+      <l-tile-layer v-else url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" :options="osmOptions" />
+      <l-geo-json v-if="geojson" ref="geojson" :geojson="geojson" :options="{onEachFeature: showPopup}" :optionsStyle="{color: secondaryColor, weight: secondaryWeight}" />
     </l-map>
     <b-popover
       v-if="popover && selectedItem" placement="left" triggers="manual" :show="selectedItem !== null"
@@ -29,7 +30,7 @@
 <script>
 import stacLayer from 'stac-layer';
 import { CRS } from "leaflet";
-import { LMap, LTileLayer, LWMSTileLayer, LGeoJson } from 'vue2-leaflet';
+import { LMap, LControlZoom, LTileLayer, LWMSTileLayer, LGeoJson } from 'vue2-leaflet';
 import LControlFullscreen from 'vue2-leaflet-fullscreen';
 import Utils, { geojsonMediaType } from '../utils';
 import './map/leaflet-areaselect';
@@ -70,6 +71,7 @@ export default {
     BPopover,
     Item: () => import('../components/Item.vue'),
     LControlFullscreen,
+    LControlZoom,
     LGeoJson,
     LMap,
     LTileLayer,
@@ -107,13 +109,16 @@ export default {
       stacLayer: null,
       geojson: null,
       itemPreviewsLayer: null,
-      mapOptions: {},
+      mapOptions: {
+        zoomControl: false
+      },
       osmOptions: {
+        // Don't translate as this is an official reference back, which we copied from OSM and shouldn't be altered!
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors.'
       },
       dblClickState: null,
       selectedItem: null,
-      fullscreenKey: 1
+      ix: 1
     };
   },
   computed: {
@@ -125,6 +130,14 @@ export default {
           'false': this.$t('fullscreen.show'),
           'true': this.$t('fullscreen.exit'),
         }
+      };
+    },
+    zoomControlTexts() {
+      return {
+        zoomInText: this.$t('map.zoom.in.label'),
+        zoomInTitle: this.$t('map.zoom.in.description'),
+        zoomOutText: this.$t('map.zoom.out.label'),
+        zoomOutTitle: this.$t('map.zoom.out.description')
       };
     },
     baseMaps() {
@@ -147,6 +160,7 @@ export default {
           return Object.assign({
               component: "LWMSTileLayer",
               crs: CRS.EPSG4326,
+              // Don't translate as this is an official reference back, which we copied from OSM and shouldn't be altered!
               attribution: "USGS Astrogeology",
               format: "image/png"
             }, BASEMAPS[target]);
@@ -157,7 +171,7 @@ export default {
   watch: {
     locale() {
       // This recreates the component so that it picks up the new translations
-      this.fullscreenKey++;
+      this.ix++;
     },
     async stacLayerData() {
       await this.showStacLayer();
