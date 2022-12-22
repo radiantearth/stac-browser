@@ -38,7 +38,6 @@
 </template>
 
 <script>
-// TODO: I18N
 import { mapState, mapGetters } from 'vuex';
 import StacLink from './StacLink.vue';
 import { BIconArrow90degUp, BIconBook, BIconFolderSymlink, BIconSearch, BIconLock, BIconUnlock } from "bootstrap-vue";

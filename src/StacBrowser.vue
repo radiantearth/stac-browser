@@ -6,7 +6,7 @@
     </b-sidebar>
     <!-- Header -->
     <header>
-      <div class="logo">{{ catalogTitle }}</div>
+      <div class="logo">{{ displayCatalogTitle }}</div>
       <StacHeader />
     </header>
     <!-- Content (Item / Catalog) -->
@@ -148,8 +148,14 @@ export default {
           }
         }
         for (const [key, value] of Object.entries(this.stateQueryParameters)) {
-          if (Array.isArray(value) && value.length > 0) {
-            query[`.${key}`] = value.join(',');
+          let name = `.${key}`;
+          if (Array.isArray(value)) {
+            if (value.length > 0) {
+              query[name] = value.join(',');
+            }
+          }
+          else if (value !== null) {
+              query[name] = value;
           }
         }
 
@@ -189,25 +195,37 @@ export default {
       let query = Object.assign({}, route.query, privateFromHash);
       let params = {};
       for(let key in query) {
+        let value = query[key];
         // Store all private query parameters (start with ~) and replace them in the shown URI
         if (key.startsWith('~')) {
           params.private = Utils.isObject(params.private) ? params.private : {};
-          params.private[key.substr(1)] = query[key];
+          params.private[key.substr(1)] = value;
           delete query[key];
         }
         // Store all state related parameters (start with .)
         else if (key.startsWith('.')) {
+          let realKey = key.substr(1);
           params.state = Utils.isObject(params.state) ? params.state : {};
-          params.state[key.substr(1)] = query[key];
+          if (Array.isArray(this.stateQueryParameters[realKey]) && !Array.isArray(value)) {
+            value = value.split(',');
+          }
+          params.state[realKey] = value;
         }
         // All other parameters should be appended to the main STAC requests
         else {
           params.localRequest = Utils.isObject(params.request) ? params.request : {};
-          params.localRequest[key] = query[key];
+          params.localRequest[key] = value;
         }
       }
       if (Utils.size(params) > 0) {
-        this.$store.commit("queryParameters", params);
+        for (let type in params) {
+          for (let key in params[type]) {
+            this.$store.commit('setQueryParameter', {type, key, value: params[type][key]});
+          }
+        }
+      }
+      if (params?.state?.language) {
+        this.$store.dispatch('switchLocale', params.state.language);
       }
       if (Utils.size(params.private) > 0) {
         this.$router.replace({

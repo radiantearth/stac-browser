@@ -24,6 +24,7 @@ function getStore(config) {
 
     localRequestQueryParameters: {},
     stateQueryParameters: {
+      language: null,
       asset: [],
       itemdef: []
     },
@@ -378,21 +379,6 @@ function getStore(config) {
           }
         }
       },
-      queryParameters(state, params) {
-        for (let key in params) {
-          if (key === 'state') {
-            for (let [key, value] of Object.entries(params.state)) {
-              if (Array.isArray(state.stateQueryParameters[key]) && !Array.isArray(value)) {
-                value = value.split(',');
-              }
-              Vue.set(state.stateQueryParameters, key, value);
-            }
-          }
-          else {
-            state[`${key}QueryParameters`] = params[key];
-          }
-        }
-      },
       setQueryParameter(state, { type, key, value }) {
         type = `${type}QueryParameters`;
         if (typeof value === 'undefined') {
@@ -603,6 +589,7 @@ function getStore(config) {
         }
 
         cx.commit('config', {locale});
+        cx.commit('setQueryParameter', { type: 'state', key: 'language', value: locale });
       },
       async setAuth(cx, value) {
         if (!Utils.hasText(value)) {

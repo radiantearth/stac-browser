@@ -9,7 +9,7 @@
     <Pagination ref="topPagination" v-if="showPagination" :pagination="pagination" placement="top" @paginate="paginate" />
     <template v-if="allowFilter">
       <b-button v-if="api" v-b-toggle.itemFilter class="mb-4 mt-2" :class="{'ml-3': showPagination}" :pressed="filtersOpen" variant="outline-primary">
-        <b-icon-search /> Filter
+        <b-icon-search /> {{ $t('items.filter') }}
       </b-button>
       <b-collapse id="itemFilter" v-model="filtersOpen">
         <ItemFilter
@@ -25,18 +25,17 @@
         <Item v-for="item in chunkedItems" :item="item" :key="item.href" />
       </b-card-group>
       <b-alert v-else :variant="hasFilters ? 'warning' : 'info'" show>
-        <template v-if="hasFilters">No items found for the given filters.</template>
-        <template v-else>No items available for this collection.</template>
+        <template v-if="hasFilters">{{ $t('search.noItemsFound') }}</template>
+        <template v-else>{{ $t('items.noneAvailableForCollection') }}</template>
       </b-alert>
     </section>
 
     <Pagination v-if="showPagination" :pagination="pagination" @paginate="paginate" />
-    <b-button v-else-if="hasMore" @click="showMore" variant="primary" v-b-visible.200="showMore">Show more...</b-button>
+    <b-button v-else-if="hasMore" @click="showMore" variant="primary" v-b-visible.200="showMore">{{ $t('showMore') }}</b-button>
   </section>
 </template>
 
 <script>
-// TODO: I18N
 import Item from './Item.vue';
 import Loading from './Loading.vue';
 import Pagination from './Pagination.vue';

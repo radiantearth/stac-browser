@@ -1,16 +1,15 @@
 <template>
-  <b-button-group title="Sort" size="sm">
-    <b-button @click="toggle('cards')" title="Show as tiles" variant="outline-primary" :pressed="value === 'cards'">
-      <b-icon-bricks /> <span class="button-label">Tiles</span>
+  <b-button-group :title="$t('view.title')" size="sm">
+    <b-button @click="toggle('cards')" :title="$t('view.tiles.title')" variant="outline-primary" :pressed="value === 'cards'">
+      <b-icon-bricks /> <span class="button-label">{{ $t('view.tiles.label') }}</span>
     </b-button>
-    <b-button @click="toggle('list')" title="Show as list" variant="outline-primary" :pressed="value === 'list'">
-      <b-icon-list-task /> <span class="button-label">List</span>
+    <b-button @click="toggle('list')" :title="$t('view.list.title')" variant="outline-primary" :pressed="value === 'list'">
+      <b-icon-list-task /> <span class="button-label">{{ $t('view.list.label') }}</span>
     </b-button>
   </b-button-group>
 </template>
 
 <script>
-// TODO: I18N
 import { BIconBricks, BIconListTask } from 'bootstrap-vue';
 
 export default {

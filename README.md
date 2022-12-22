@@ -246,7 +246,8 @@ There are four options you can set in the `authConfig` object:
 * `type` (string): `null` (disabled), `query` (use token in query parameters), or `header` (use token in HTTP request headers).
 * `key` (string): The query string parameter name or the HTTP header name respecively.
 * `formatter` (function|null): You can optionally specify a formatter for the query string value or HTTP header value respectively. If not given, the token is provided as provided by the user.
-* `description` (string|null): Optionally a description that is shown to the user. This should explain how the token can be obtained for example. CommonMark is allowed. **Note:** You can leave the description empty in the config file and instead provide a localized string with the key `authConfig` -> `description` in the file for custom phrases (`src/locales/custom.json`).
+* `description` (string|null): Optionally a description that is shown to the user. This should explain how the token can be obtained for example. CommonMark is allowed.
+    **Note:** You can leave the description empty in the config file and instead provide a localized string with the key `authConfig` -> `description` in the file for custom phrases (`src/locales/custom.json`).
 
 Please note that this option can only be provided through a config file and is not available via CLI.
 

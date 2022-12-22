@@ -18,6 +18,10 @@
       "withSource": "Herunterladen von {source}"
     },
     "inItems": "Datei in Unterlementen | Dateien in Unterelementen",
+    "role": {
+      "data": "Daten",
+      "metadata": "Metadaten"
+    },
     "showOnMap": "Auf Karte anzeigen",
     "showThumbnail": "Zeige Vorschaubild",
     "shown": "angezeigt"
@@ -48,18 +52,18 @@
   "fields": {
   },
   "fullscreen": {
-    "show": "Zeige im Vollbild-Modus",
-    "exit": "Verlasse den Vollbild-Modus"
+    "exit": "Verlasse den Vollbild-Modus",
+    "show": "Zeige im Vollbild-Modus"
   },
   "goToCollection": {
-    "label": "Sammlung",
     "description": "Gehe zur dazugehörigen Sammlung",
-    "descriptionWithTitle": "@:goToCollection.description: {title}"
+    "descriptionWithTitle": "@:goToCollection.description: {title}",
+    "label": "Sammlung"
   },
   "goToParent": {
-    "label": "Hoch",
     "description": "Gehe ein Level hoch",
-    "descriptionWithTitle": "@:goToParent.description: {title}"
+    "descriptionWithTitle": "@:goToParent.description: {title}",
+    "label": "Hoch"
   },
   "index": {
     "api": "API",
@@ -71,7 +75,17 @@
     "urlMissingHost": "Der Adresse fehlt ein Host.",
     "urlMissingProtocol": "Der Adresse fehlt ein Protokoll."
   },
+  "items": {
+    "filter": "Filter",
+    "noTime": "Keine Zeit angegeben",
+    "noneAvailableForCollection": "Für diese Sammlung sind keine Elemente verfügbar."
+  },
   "leaflet": {
+    "close": "Schließen",
+    "noFeatureProperties": "Keine weiteren Daten verfügbar für dieses Element.",
+    "stayLayer": {
+      "error": "Entschuldigung, die Daten auf der Karte anzuzeigen ist fehlgeschlagen."
+    },
     "zoom": {
       "in": {
         "description": "Vergrößern",
@@ -90,6 +104,12 @@
     "title": "Metadaten"
   },
   "open": "Öffnen",
+  "pagination": {
+    "first": "« Anfang",
+    "last": "Ende »",
+    "next": "Nächste ›",
+    "previous": "‹ Vorherige"
+  },
   "poweredBy": "Generiert von {link}",
   "protocol": {
     "azure": "Microsoft Azure",
@@ -99,6 +119,17 @@
     "oss": "Alibaba Cloud",
     "s3": "Amazon S3"
   },
+  "providers": {
+    "email": "E-Mail senden",
+    "homepage": "Gehe zur Internetseite",
+    "role": {
+      "host": "Datenverbreiter",
+      "licensor": "Lizenzgeber",
+      "processor": "Verarbeiter",
+      "producer": "Erzeuger"
+    },
+    "title": "Anbieter"
+  },
   "read": {
     "less": "Zeige weniger",
     "more": "Zeige mehr"
@@ -107,10 +138,46 @@
     "modifyCriteria": "Bitte die Suchkriterien ändern.",
     "noItemsFound": "Keine Elemente gefunden für die angegebenen Filter.",
     "notSupported": "Suchen wird von der API nicht unterstützt.",
+    "placeholder": "Suchen...",
     "title": "Suche"
   },
+  "showMore": "Zeige mehr...",
   "sidebar": {
     "switchCatalog": "Wechsle den Katalog"
+  },
+  "sort": {
+    "asc": {
+      "label": "Aufsteigend",
+      "title": "In aufsteigender Reihenfolge sortieren (A-Z)"
+    },
+    "desc": {
+      "label": "Absteigend",
+      "title": "In absteigender Reihenfolge sortieren (Z-A)"
+    },
+    "title": "Sortieren"
+  },
+  "source": {
+    "detailsAboutSource": "Details über die STAC-Datenquelle",
+    "label": "Datenquelle",
+    "language": {
+      "label": "Sprache ({currentLanguage})",
+      "switch": "Ändern der Sprache"
+    },
+    "locatedAt": "Die Datei mit den STAC-Metadaten befindet sich: unter:",
+    "share": {
+      "email": "E-Mail",
+      "label": "Teilen",
+      "message": "{title} ist verfügbar unter {url}",
+      "sharePageWithOthers": "Teile die Adresse dieser Seite:",
+      "title": "Teilen",
+      "twitter": "Twitter",
+      "withOthers": "Teile diese Seite mit anderen"
+    },
+    "stacVersion": "STAC-Version:",
+    "title": "Datenquelle",
+    "valid": "Valide:",
+    "validating": "Validiere...",
+    "validationNA": "nicht verfügbar"
   },
   "stacAssets": "Datei | Dateien",
   "stacCatalog": "Katalog | Kataloge",
@@ -129,7 +196,17 @@
   "thumbnails": "Vorschaubilder",
   "tree": {
     "moreCollectionPagesAvailable": "Mehr Seiten für Sammlung verfügbar",
-    "noChildren": "Keine Unterpunkte verfügbar.",
-    "showMore": "Zeige mehr..."
+    "noChildren": "Keine Unterpunkte verfügbar."
+  },
+  "view": {
+    "list": {
+      "label": "Liste",
+      "title": "Anzeigen als Liste"
+    },
+    "tiles": {
+      "label": "Kacheln",
+      "title": "Anzeigen als Kacheln"
+    },
+    "title": "Anzeigeoptionen"
   }
 }

@@ -1,6 +1,6 @@
 <template>
   <section v-if="formattedData.length > 0" class="metadata">
-    <h2 v-if="title">{{ displayTitle }}</h2>
+    <h2 v-if="title">{{ title || $t('metadata.title') }}</h2>
     <b-card-group columns :class="`count-${formattedData.length}`">
       <MetadataGroup v-for="group in formattedData" v-bind="group" :key="group.extension" />
     </b-card-group>
@@ -39,9 +39,6 @@ export default {
         }
     },
     computed: {
-        displayTitle() {
-            return this.title ? this.title : this.$t('metadata');
-        },
         formattedData() {
             // Filter all fields as given in ignoreFields and also 
             // ignore fields starting with an underscore which is likely originating from the STAC class

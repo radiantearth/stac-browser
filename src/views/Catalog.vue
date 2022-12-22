@@ -36,8 +36,8 @@
         <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="shownAssets" @showAsset="showAsset" />
         <Assets v-if="hasItemAssets && !hasItems" :assets="data.item_assets" :definition="true" />
         <Providers v-if="hasProviders" :providers="data.providers" />
-        <Metadata :title="$t('metadata')" class="mb-4" :type="data.type" :data="data" :ignoreFields="ignoredMetadataFields" />
-        <Links v-if="additionalLinks.length > 0" title="$t('additionalResources')" :links="additionalLinks" />
+        <Metadata :title="$t('metadata.title')" class="mb-4" :type="data.type" :data="data" :ignoreFields="ignoredMetadataFields" />
+        <Links v-if="additionalLinks.length > 0" :title="$t('additionalResources')" :links="additionalLinks" />
       </b-col>
       <b-col class="catalogs-container" v-if="hasCatalogs">
         <Catalogs :catalogs="catalogs" :hasMore="hasMoreCollections" @loadMore="loadMoreCollections" />

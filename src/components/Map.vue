@@ -19,16 +19,13 @@
         </b-card-group>
       </section>
       <div class="text-center">
-        <b-button target="_blank" variant="danger" @click="resetSelectedItem">
-          Close
-        </b-button>
+        <b-button target="_blank" variant="danger" @click="resetSelectedItem">{{ $t('leaflet.close') }}</b-button>
       </div>
     </b-popover>
   </div>
 </template>
 
 <script>
-// TODO: I18N
 import stacLayer from 'stac-layer';
 import { CRS } from "leaflet";
 import { LMap, LControlZoom, LTileLayer, LWMSTileLayer, LGeoJson } from 'vue2-leaflet';
@@ -272,7 +269,7 @@ export default {
         try {
           this.stacLayer = await stacLayer(data, options);
         } catch (error) {
-          this.$root.$emit('error', error, 'Sorry, adding the data to the map failed.');
+          this.$root.$emit('error', error, this.$t('leaflet.stayLayer.error'));
         }
 
         // If the map isn't shown any more after loading the STAC data, don't try to add it to the map.
@@ -393,7 +390,7 @@ export default {
         html += formatObject(feature.properties);
       }
       if (html.length === 0) {
-        html += '<p>No additional data available for this feature.<7p>';
+        html += `<p>${this.$t('leaflet.noFeatureProperties')}</p>`;
       }
       layer.bindPopup(html);
     },

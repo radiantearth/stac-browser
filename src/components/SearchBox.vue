@@ -1,12 +1,11 @@
 <template>
   <div class="vue-component search-box">
     <span class="icon">🔎</span>
-    <b-form-input type="search" v-model.trim="searchTerm" :placeholder="placeholder" />
+    <b-form-input type="search" v-model.trim="searchTerm" :placeholder="placeholder || $t('search.placeholder')" />
   </div>
 </template>
 
 <script>
-// TODO: I18N
 import { BFormInput } from 'bootstrap-vue';
 
 export default {
@@ -21,7 +20,7 @@ export default {
     },
     placeholder: {
       type: String,
-      default: 'Search'
+      default: null
     }
   },
   data() {

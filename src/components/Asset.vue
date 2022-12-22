@@ -14,7 +14,7 @@
             <b-icon-check /> {{ $t('assets.shown') }}
           </b-badge>
           <b-badge v-if="asset.deprecated" variant="warning" class="deprecated ml-1 mb-1">{{ $t('deprecated') }}</b-badge>
-          <b-badge v-for="role in asset.roles" :key="role" :variant="role === 'data' ? 'primary' : 'secondary'" class="role ml-1 mb-1">{{ role }}</b-badge>
+          <b-badge v-for="role in asset.roles" :key="role" :variant="role === 'data' ? 'primary' : 'secondary'" class="role ml-1 mb-1">{{ displayRole(role) }}</b-badge>
           <b-badge v-if="shortFileFormat" variant="dark" class="format ml-1 mb-1" :title="fileFormat"><span v-html="shortFileFormat" /></b-badge>
         </div>
       </b-button>
@@ -249,6 +249,13 @@ export default {
     }
   },
   methods: {
+    displayRole(role) {
+      let key = `assets.role.${role}`;
+      if (this.$te(key)) {
+        return this.$t(key);
+      }
+      return role;
+    },
     show() {
       let asset = Object.assign({}, this.asset);
       // Override asset href with absolute URL if not a GDAL VFS
