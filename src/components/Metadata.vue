@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import { formatAsset, formatCollection, formatItemProperties, formatLink, formatSummaries } from '@radiantearth/stac-fields';
+import { formatAsset, formatCollection, formatGrouped, formatItemProperties, formatLink, formatProvider, formatSummaries } from '@radiantearth/stac-fields';
 import MetadataGroup from './metadata/MetadataGroup.vue';
 
 export default {
@@ -48,6 +48,8 @@ export default {
                     return formatAsset(this.data, this.context, filter);
                 case 'Link':
                     return formatLink(this.data, this.context, filter);
+                case 'Provider':
+                    return formatProvider(this.data, this.context, filter);
                 case 'Item':
                     return formatItemProperties(this.data, filter);
                 case 'Collection':
@@ -67,7 +69,7 @@ export default {
                     return core.sort((a,b) => a.label.localeCompare(b.label));
                 }
                 default:
-                    return [];
+                    return formatGrouped(this.context, this.data, this.type, filter);
             }
         }
     }
