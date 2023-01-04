@@ -42,6 +42,8 @@
         v-else-if="queryableType === 'dateField'"
         type="datetime"
         class="value"
+        :lang="datepickerLang"
+        :format="datepickerFormat"
         :value="value"
         @input="updateValue($event)"
       />
@@ -58,16 +60,20 @@
 </template>
 
 <script>
-import Utils from '../utils';
 import { BFormInput, BFormSelect, BIconXCircleFill } from 'bootstrap-vue';
+
+import DatePickerMixin from './DatePickerMixin';
+import Utils from '../utils';
     
 export default {
   name: 'QueryableInput',
+  mixins: [
+    DatePickerMixin
+  ],
   components: {
     BFormInput,
     BFormSelect,
     BIconXCircleFill,
-    DatePicker: () => import('vue2-datepicker'),
     Description: () => import('./Description.vue')
   },
   props: {

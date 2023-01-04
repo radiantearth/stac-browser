@@ -131,6 +131,7 @@ export default {
     },
     localeFromVueX(locale) {
       this.$root.$i18n.locale = locale;
+      require(`./locales/${locale}/datepicker.js`);
     },
     catalogUrlFromVueX(url) {
       if (url) {
