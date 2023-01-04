@@ -7,7 +7,8 @@
         <b-form-group v-if="canFilterExtents" :label="$t('search.temporalExtent')" label-for="datetime" :description="$t('search.dateDescription')">
           <date-picker
             range id="datetime" :lang="datepickerLang" :format="datepickerFormat"
-            :value="query.datetime" @input="setDateTime" input-class="form-control mx-input" />
+            :value="query.datetime" @input="setDateTime" input-class="form-control mx-input"
+          />
         </b-form-group>
 
         <b-form-group v-if="canFilterExtents" :label="$t('search.spatialExtent')" label-for="provideBBox">
@@ -90,9 +91,6 @@ import Utils from '../utils';
 
 export default {
   name: 'ItemFilter',
-  mixins: [
-    DatePickerMixin
-  ],
   components: {
     BDropdown,
     BDropdownItem,
@@ -107,6 +105,9 @@ export default {
     Map: () => import('./Map.vue'),
     SortButtons: () => import('./SortButtons.vue')
   },
+  mixins: [
+    DatePickerMixin
+  ],
   props: {
     stac: {
       type: Object,

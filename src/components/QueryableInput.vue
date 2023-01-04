@@ -67,15 +67,15 @@ import Utils from '../utils';
     
 export default {
   name: 'QueryableInput',
-  mixins: [
-    DatePickerMixin
-  ],
   components: {
     BFormInput,
     BFormSelect,
     BIconXCircleFill,
     Description: () => import('./Description.vue')
   },
+  mixins: [
+    DatePickerMixin
+  ],
   props: {
     title: {
       type: String,
