@@ -51,14 +51,13 @@
       </b-button>
     </b-row>
 
-    <b-row v-if="help" class="queryable-help">
-      <small class="text-muted" v-html="help" />
+    <b-row v-if="help" class="queryable-help text-muted small">
+      <Description :description="help" inline />
     </b-row>
   </div>
 </template>
 
 <script>
-// TODO: I18N
 import Utils from '../utils';
 import { BFormInput, BFormSelect, BIconXCircleFill } from 'bootstrap-vue';
     
@@ -68,7 +67,8 @@ export default {
     BFormInput,
     BFormSelect,
     BIconXCircleFill,
-    DatePicker: () => import('vue2-datepicker')
+    DatePicker: () => import('vue2-datepicker'),
+    Description: () => import('./Description.vue')
   },
   props: {
     title: {
@@ -104,10 +104,10 @@ export default {
     },
     help() {
       if (this.operator === 'LIKE') {
-        return 'You can use wildcard characters. <code>_</code> matches a single character, <code>%</code> matches any number of characters. To search for a wildcard character specifically, you need to add a <code>\\</code> in front of the character.';
+        return this.$t('search.likeOperatorDescription');
       }
       else if (this.queryableType === 'dateField') {
-        return 'All times in UTC.';
+        return this.$t('search.dateDescription');
       }
       return null;
     },
@@ -129,11 +129,11 @@ export default {
       return null;
     },
     operatorOptions() {
-      const LESS_THAN = {text: 'less than', value: '<'};
-      const MORE_THAN = {text: 'greater than', value: '>'};
-      const EQUALS = {text: 'equal to', value: '='};
-      const NOT_EQUALS = {text: 'not equal to', value: '<>'};
-      const LIKE = {text: 'matches', value: 'LIKE'};
+      const LESS_THAN = {text: this.$t('search.lessThan'), value: '<'};
+      const MORE_THAN = {text: this.$t('search.greaterThan'), value: '>'};
+      const EQUALS = {text: this.$t('search.equalTo'), value: '='};
+      const NOT_EQUALS = {text: this.$t('search.notEqualTo'), value: '<>'};
+      const LIKE = {text: this.$t('search.matches'), value: 'LIKE'};
 
       if (this.isNumeric || this.queryableType === 'dateField') {
         return [LESS_THAN, MORE_THAN, EQUALS, NOT_EQUALS];

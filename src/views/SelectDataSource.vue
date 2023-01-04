@@ -25,7 +25,9 @@
                   <b-badge v-else variant="light" pill>{{ $t('index.catalog') }}</b-badge>
                 </small>
               </div>
-              <p class="mb-1"><Description :description="catalog.summary" :compact="true" /></p>
+              <div class="mb-1">
+                <Description :description="catalog.summary" compact />
+              </div>
             </b-list-group-item>
           </template>
         </b-list-group>

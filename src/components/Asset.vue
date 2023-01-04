@@ -38,7 +38,7 @@
           </b-button>
         </b-button-group>
         <b-card-text class="mt-4" v-if="asset.description">
-          <Description :description="asset.description" :compact="true" />
+          <Description :description="asset.description" compact />
         </b-card-text>
         <Metadata class="mt-4" :data="asset" :context="context" :ignoreFields="ignore" title="" type="Asset" />
       </b-card-body>

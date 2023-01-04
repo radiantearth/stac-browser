@@ -685,7 +685,7 @@ function getStore(config) {
           try {
             let response = await stacRequest(cx, url);
             if (!Utils.isObject(response.data)) {
-              throw new BrowserError('The response is not a valid STAC JSON');
+              throw new BrowserError(i18n.t('errors.invalidJsonObject'));
             }
             data = new STAC(response.data, url, path);
             cx.commit('loaded', { url, data });
@@ -732,7 +732,7 @@ function getStore(config) {
               }
               else {
                 cx.commit('showGlobalError', {
-                  message: 'Sorry, the API Collections could not be loaded.',
+                  message: i18n.t('errors.loadApiCollectionsFailed'),
                   error
                 });
               }
@@ -749,7 +749,7 @@ function getStore(config) {
               }
               else {
                 cx.commit('showGlobalError', {
-                  message: 'Sorry, the API Items could not be loaded.',
+                  message: i18n.t('errors.loadApiItemsFailed'),
                   error
                 });
               }
@@ -784,7 +784,7 @@ function getStore(config) {
 
           let response = await stacRequest(cx, link);
           if (!Utils.isObject(response.data) || !Array.isArray(response.data.features)) {
-            throw new BrowserError('The API response is not a valid list of STAC Items');
+            throw new BrowserError(i18n.t('errors.invalidStacItems'));
           }
           else {
             response.data.features = response.data.features.map(item => {
@@ -853,7 +853,7 @@ function getStore(config) {
         }
         let response = await stacRequest(cx, link);
         if (!Utils.isObject(response.data) || !Array.isArray(response.data.collections)) {
-          throw new BrowserError('The API response is not a valid list of STAC Collections');
+          throw new BrowserError(i18n.t('errors.invalidStacCollections'));
         }
         else {
           response.data.collections = response.data.collections.map(collection => {
@@ -907,7 +907,7 @@ function getStore(config) {
       async retryAfterAuth(cx) {
         let errorFn = error => cx.commit('showGlobalError', {
           error,
-          message: 'The requests errored, the provided authentication details may be incorrect.'
+          message: i18n.t('errors.authFailed')
         });
 
         for (let callback of cx.state.doAuth) {

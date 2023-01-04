@@ -23,7 +23,7 @@
           </b-button>
         </b-button-group>
         <b-card-text class="mt-4" v-if="provider.description">
-          <Description :description="provider.description" :compact="true" />
+          <Description :description="provider.description" compact />
         </b-card-text>
         <Metadata class="mt-4" :data="provider" :ignoreFields="ignore" title="" type="Provider" />
       </b-card-body>
@@ -32,7 +32,6 @@
 </template>
 
 <script>
-// TODO: I18N (CSS)
 import { BCollapse, BIconChevronRight, BIconChevronDown } from 'bootstrap-vue';
 import Description from './Description.vue';
 import Metadata from './Metadata.vue';

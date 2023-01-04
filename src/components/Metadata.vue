@@ -128,6 +128,27 @@ export default {
                 max-height: 15em;
                 overflow: auto;
             }
+
+            .styled-description {
+                h1 {
+                    font-size: 1.5em;
+                }
+                h2 {
+                    font-size: 1.4em;
+                }
+                h3 {
+                    font-size: 1.3em;
+                }
+                h4 {
+                    font-size: 1.2em;
+                }
+                h5 {
+                    font-size: 1.1em;
+                }
+                h6 {
+                    font-size: 1.0em;
+                }
+            }
         }
         ul {
             padding-left: 1.4em;

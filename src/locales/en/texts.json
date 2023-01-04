@@ -47,29 +47,38 @@
     "noMatches": "No catalogs match the given search criteria."
   },
   "copy": "Copy",
+  "default": "Default",
+  "defaultWithValue": "Default ({value})",
   "deprecated": "Deprecated",
   "deprecation": {
-    "goToLatest": "Go to latest version",
-    "goToSuccessor": "Go to newer version",
-    "goToPredecessor": "Go to previous version",
-    "otherVersionsTitle": "Other Versions",
+    "fallbackTitle": "Show",
+    "latestVersion": "Latest version:",
+    "otherVersionsNotice": "This {type} is *not* deprecated, but there are other versions available:",
+    "otherVersionsTitle": "Other Versions available",
     "outdatedTitle": "Outdated",
-    "otherVersionsNotice": "This {type} is not deprecated, but there are other versions available:",
-    "warning": "Please note that this {type} is deprecated with the potential to be removed in any of the next versions. It should be transitioned out of usage as soon as possible. Refrain from using it in new projects."
+    "predecessorVersion": "Previous version:",
+    "successorVersion": "Next version:",
+    "warning": "Please note that this {type} is deprecated with the potential to be removed anytime. It should be transitioned out of usage as soon as possible. Refrain from using it in new projects."
   },
   "description": "Description",
   "errors": {
+    "authFailed": "The request errored, the provided authentication details may be incorrect.",
     "badRequest": "The request is invalid. This might be due to invalid parameters, e.g. in a search request, or could be a bug in STAC Browser.",
     "contactProvider": "Please contact the service operator to resolve this issue.",
-    "default": "Sorry, the requested page could not be loaded.",
+    "default": "The requested page could not be loaded.",
     "forbidden": "The credentials specified for this request are invalid, e.g. an expired or invalid API token. Please provide other credentials and try again.",
+    "invalidJsonObject": "The response is not a valid JSON object.",
+    "invalidStacCollections": "The API response is not a valid list of STAC Collections.",
+    "invalidStacItems": "The API response is not a valid list of STAC Items.",
     "labels": {
       "cause": "Cause:",
       "code": "Error Code:",
       "reason": "Reason:",
       "requestURL": "Request URL:"
     },
-    "loadFilteredItems": "Sorry, loading a filtered list of STAC Items failed.",
+    "loadApiCollectionsFailed": "The API Collections could not be loaded.",
+    "loadApiItemsFailed": "The API Items could not be loaded.",
+    "loadFilteredItems": "Sorry, loading a filtered list of Items failed.",
     "loadItems": "Sorry, loading the list of STAC Items failed.",
     "networkError": "This issue may occur when servers don't allow external access via web browsers (e.g., when CORS headers are not present). @:browse.contactProvider",
     "noExternalAccess": "Accessing external catalogs is not allowed!",
@@ -77,6 +86,7 @@
     "serverError": "The server encountered an issue. @:browse.contactProvider",
     "unauthorized": "The request lacks credentials, e.g. an API token. Please provide your credentials and try again."
   },
+  "featureExperimental": "This feature is still experimental and may give unexpected results!",
   "fields": {
   },
   "fullscreen": {
@@ -163,10 +173,37 @@
     "more": "Read more"
   },
   "search": {
+    "addFilter": "Add filter",
+    "additionalFilters": "Additional filters",
+    "buttons": {
+      "filter": "Filter",
+      "reset": "Reset"
+    },
+    "dateDescription": "All times in Coordinated Universal Time (UTC).",
+    "equalTo": "equal to",
+    "filterBySpatialExtent": "Filter by spatial extent",
+    "greaterThan": "greater than",
+    "itemIds": "Item IDs",
+    "itemsPerPage": "Items per page",
+    "itemsPerPageDescription": "Number of items requested per page, max. {maxItems} items.",
+    "lessThan": "less than",
+    "likeOperatorDescription": "You can use wildcard characters. `_` matches a single character, `%` matches any number of characters. To search for a wildcard character specifically, you need to add a `\\` in front of the character.",
+    "matches": "matches",
     "modifyCriteria": "Please modify the search criteria.",
     "noItemsFound": "No items found for the given filters.",
+    "notEqualTo": "not equal to",
+    "notFullySupported": "Not all of the options may be supported.",
     "notSupported": "Item Search is not supported by the API.",
     "placeholder": "Search...",
+    "selectCollections": "Select one or multiple collections...",
+    "selectItemIds": "Select one or multiple Item IDs...",
+    "sortOptions": {
+      "datetime": "Date and Time",
+      "id": "ID",
+      "title": "Title"
+    },
+    "spatialExtent": "Spatial Extent",
+    "temporalExtent": "Temporal Extent",
     "title": "Search"
   },
   "showMore": "Show more...",

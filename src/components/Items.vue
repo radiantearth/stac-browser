@@ -13,7 +13,8 @@
       </b-button>
       <b-collapse id="itemFilter" v-model="filtersOpen">
         <ItemFilter
-          v-if="filtersOpen" :stac="stac" :value="filters" @input="emitFilter"
+          v-if="filtersOpen" :title="$t('items.filter')"
+          :stac="stac" :value="filters" @input="emitFilter"
           :collectionOnly="true" v-bind="filterComponentProps"
         />
       </b-collapse>
