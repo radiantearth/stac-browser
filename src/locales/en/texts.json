@@ -19,8 +19,8 @@
     },
     "inItems": "Asset in Items | Assets in Items",
     "role": {
-      "data": "Daten",
-      "metadata": "Metadaten"
+      "data": "Data",
+      "metadata": "Metadata"
     },
     "showOnMap": "Show on map",
     "showThumbnail": "Show thumbnail",

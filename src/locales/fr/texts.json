@@ -19,8 +19,8 @@
     },
     "inItems": "Ressource des éléments | Ressources des éléments",
     "role": {
-      "data": "Daten",
-      "metadata": "Metadaten"
+      "data": "Données",
+      "metadata": "Métadonnées"
     },
     "showOnMap": "Afficher sur la carte",
     "showThumbnail": "Afficher l'aperçu",
@@ -146,7 +146,7 @@
     "first": "« Premier",
     "last": "Dernier »",
     "next": "Suivant ›",
-    "previous": "‹ précédent"
+    "previous": "‹ Précédent"
   },
   "poweredBy": "Propulsé par {link}",
   "protocol": {
@@ -222,7 +222,7 @@
     "title": "Trier"
   },
   "source": {
-    "detailsAboutSource": "À propos la source STAC",
+    "detailsAboutSource": "À propos de la source STAC",
     "label": "Source",
     "language": {
       "label": "Langue ({currentLanguage})",
@@ -240,7 +240,7 @@
     },
     "stacVersion": "Version STAC:",
     "title": "Données source",
-    "valid": "Valider:",
+    "valid": "Valide:",
     "validating": "Validation...",
     "validationNA": "s.o."
   },
