@@ -6,7 +6,8 @@ module.exports = {
     fallbackLocale: "en",
     supportedLocales: [
         "en",
-        "de"
+        "de",
+        "fr"
     ],
     useTileLayerAsFallback: true,
     tileSourceTemplate: null,
