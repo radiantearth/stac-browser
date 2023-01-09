@@ -107,7 +107,7 @@
     "api": "API",
     "catalog": "Catalogue",
     "load": "Charger",
-    "selectStacIndex": "... ou en sélectionner un dans l'index STAC:",
+    "selectStacIndex": "... ou en sélectionner un dans STAC Index:",
     "specifyCatalog": "Veuillez spécifier un catalogue STAC ou un API...",
     "urlInvalid": "Le lien URL n'est pas valide.",
     "urlMissingHost": "Le lien URL ne contient aucun hôte.",
