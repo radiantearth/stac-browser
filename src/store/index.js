@@ -199,7 +199,7 @@ function getStore(config) {
         return !!extensions.find(uri => uri.match(regexp));
       },
       tileRendererType: state => {
-        if ((state.tileSourceTemplate || state.buildTileUrlTemplate) && !state.useTileLayerAsFallback) {
+        if (state.buildTileUrlTemplate && !state.useTileLayerAsFallback) {
           return 'server';
         }
         else {
@@ -431,9 +431,6 @@ function getStore(config) {
         if (idx > -1) {
           Vue.delete(state.stateQueryParameters[type], idx);
         }
-      },
-      tileSourceTemplate(state, tileSourceTemplate) {
-        state.tileSourceTemplate = tileSourceTemplate;
       },
       updateLoading(state, { url, show, loadApi }) {
         let data = state.database[url];

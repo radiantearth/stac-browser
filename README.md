@@ -123,45 +123,34 @@ In this example, any href contained in the STAC (including link or asset hrefs) 
 This can also be helpful when proxying a STAC that does not have cors enabled;
 by using stacProxyUrl you can proxy the original STAC server with one that enables cors and be able to browse that catalog.
 
-### tileSourceTemplate
-
-The `tileSourceTemplate` variable controls the tile layer that is used to render imagery such as (cloud-optimized) GeoTiffs.
-
-The format of this value is a tile layer template with an optional `{url}` that will be replaced with the COG asset href. For example,
-using a local version of [titiler](https://github.com/developmentseed/titiler) to serve local COG files would look something like:
-
-```bash
-npm start -- --open --tileSourceTemplate="http://localhost:8000/cog/tiles/{z}/{x}/{y}?url={url}"
-```
-
-If the option `useTileLayerAsFallback` is set to `true`, the tile server is only used as a fallback.
-
 ### buildTileUrlTemplate
 
-A more flexible option than `tileSourceTemplate` is passing a function to `buildTileUrlTemplate`.
-See the [documentation for the corresponding stac-layer option](https://github.com/stac-utils/stac-layer#buildtileurltemplate) for details.
+The option controls the tile layer that is used to render imagery such as (cloud-optimized) GeoTiffs.
 
-This option replaces the v2 option `tileProxyUrl`.
+See the [documentation for the corresponding stac-layer option](https://github.com/stac-utils/stac-layer#buildtileurltemplate) for details.
 
 Please note that this option can only be provided through a config file and is not available via CLI.
 
 If the option `useTileLayerAsFallback` is set to `true`, the tile server is only used as a fallback.
 
+**Note:** This option replaces the v2 options `TILE_SOURCE_TEMPLATE` and `TILE_PROXY_URL`.
+The v3-dev option `tileSourceTemplate` has been removed in favor of this option.
+
 ### useTileLayerAsFallback
 
 Depending on this option, either client-side or server-side rendering of imagery such as (cloud-optimized) GeoTiffs can be enabled/disabled.
 
-If either `tileSourceTemplate` or `buildTileUrlTemplate` are given server-side rendering of GeoTiffs is enabled. 
+If `buildTileUrlTemplate` is given server-side rendering of GeoTiffs is enabled. 
 If server-side rendering should only be used as a fallback for client-side rendering, enable the boolean `useTileLayerAsFallback` option.
 
 To clarify the behavior, please have a look at the following table:
 
-| `useTileLayerAsFallback` | `tileSourceTemplate` / `buildTileUrlTemplate` | primary imagery renderer | fallback  imagery renderer |
+| `useTileLayerAsFallback` | `buildTileUrlTemplate` | primary imagery renderer | fallback  imagery renderer |
 | ----- | ---------------------- | ----------- | ----------- |
-| true  | one of them configured | client-side | tile-server |
-| false | one of them configured | tile-server | none        |
-| true  | none configured        | client-side | none        |
-| false | none configured        | none        | none        |
+| true  | function | client-side | tile-server |
+| false | function | tile-server | none        |
+| true  | null     | client-side | none        |
+| false | null     | none        | none        |
 
 By default, client-side rendering is enabled. A server-side fallback is provided via the [tiles.rdnt.io](https://github.com/radiantearth/tiles.rdnt.io) project, which serves publicly accessible GeoTiffs as tile layers.
 
