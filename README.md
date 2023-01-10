@@ -68,6 +68,11 @@ This allows or disallows loading and browsing external STAC data.
 External STAC data is any data that is not a children of the given `catalogUrl`.
 Must be set to `true` if a `catalogUrl` is not given as otherwise you won't be able to browse anything.
 
+### detectLocaleFromBrowser
+
+If set to `true`, tries to detect the preferred language of the user from the Browser.
+Otherwise, defaults to the language set for `locale`.
+
 ### locale
 
 The default language to use for STAC Browser, defaults to `en` (English).

@@ -1,5 +1,6 @@
 import Utils from "../utils";
 import Migrate from '@radiantearth/stac-migrate';
+import { getBest } from 'locale-id';
 
 let stacObjCounter = 0;
 
@@ -141,13 +142,29 @@ class STAC {
     return this._url;
   }
 
+  getLocaleLink(locale, fallbackLocale = null) {
+    let links = this.getStacLinksWithRel('alternate')
+      .filter(link => Utils.hasText(link.hreflang));
+    
+    let available;
+    if (Array.isArray(this.languages)) {
+      available = this.languages;
+    }
+    else {
+      available = links.map(link => link.hreflang);
+    }
+    
+    let best = getBest(available, locale, fallbackLocale, true);
+    return links.find(link => link.hreflang === best) || null;
+  }
+
   getStacLinksWithRel(rel, allowEmpty = true) {
     return Utils.getLinksWithRels(this.links, [rel])
       .filter(link => Utils.isStacMediaType(link.type, allowEmpty));
   }
 
   getStacLinkWithRel(rel, allowEmpty = true) {
-    let links = this.getStacLinksWithRel(rel, allowEmpty);
+    const links = this.getStacLinksWithRel(rel, allowEmpty);
     if (links.length > 0) {
       return links[0];
     }

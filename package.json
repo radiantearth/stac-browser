@@ -39,6 +39,7 @@
     "commonmark": "^0.29.3",
     "core-js": "^3.6.5",
     "leaflet": "^1.8.0",
+    "locale-id": "^1.1.2",
     "node-polyfill-webpack-plugin": "^2.0.0",
     "remove-markdown": "^0.5.0",
     "stac-layer": "^0.15.0",

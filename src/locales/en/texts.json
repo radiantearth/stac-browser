@@ -80,10 +80,10 @@
     "loadApiItemsFailed": "The API Items could not be loaded.",
     "loadFilteredItems": "Sorry, loading a filtered list of Items failed.",
     "loadItems": "Sorry, loading the list of STAC Items failed.",
-    "networkError": "This issue may occur when servers don't allow external access via web browsers (e.g., when CORS headers are not present). @:browse.contactProvider",
+    "networkError": "This issue may occur when servers don't allow external access via web browsers (e.g., when CORS headers are not present). @:errors.contactProvider",
     "noExternalAccess": "Accessing external catalogs is not allowed!",
-    "notFound": "The requested resource does not exist. @:browse.contactProvider",
-    "serverError": "The server encountered an issue. @:browse.contactProvider",
+    "notFound": "The requested resource does not exist. @:errors.contactProvider",
+    "serverError": "The server encountered an issue. @:errors.contactProvider",
     "unauthorized": "The request lacks credentials, e.g. an API token. Please provide your credentials and try again."
   },
   "featureExperimental": "This feature is still experimental and may give unexpected results!",

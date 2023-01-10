@@ -80,10 +80,10 @@
     "loadApiItemsFailed": "Die Elemente des Dienstanbieters konnten nicht geladen werden.",
     "loadFilteredItems": "Das Laden einer gefilterten Liste von Elementen ist leider fehlgeschlagen.",
     "loadItems": "Das Laden der Liste der Elemente ist leider fehlgeschlagen.",
-    "networkError": "Dieses Problem kann auftreten, wenn Server den externen Zugriff über Webbrowser nicht zulassen (bspw. wenn keine CORS-Kopfzeilen vorhanden sind). @:browse.contactProvider",
+    "networkError": "Dieses Problem kann auftreten, wenn Server den externen Zugriff über Webbrowser nicht zulassen (bspw. wenn keine CORS-Kopfzeilen vorhanden sind). @:errors.contactProvider",
     "noExternalAccess": "Der Zugriff auf externe Kataloge ist nicht erlaubt!",
-    "notFound": "Die angeforderte Seite existiert nicht. @:browse.contactProvider",
-    "serverError": "Auf dem Server ist ein Problem aufgetreten. @:browse.contactProvider",
+    "notFound": "Die angeforderte Seite existiert nicht. @:errors.contactProvider",
+    "serverError": "Auf dem Server ist ein Problem aufgetreten. @:errors.contactProvider",
     "unauthorized": "Der Anfrage fehlen die Anmeldedaten, bspw. ein API-Schlüssel. Bitte geben Sie Ihre Anmeldedaten an und versuchen Sie es erneut."
   },
   "featureExperimental": "Diese Funktion ist noch experimentell und kann unerwartete Ergebnisse verursachen!",

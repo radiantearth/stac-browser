@@ -1,18 +1,20 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import axios from "axios";
-import Utils, { schemaMediaType } from '../utils';
-import STAC from '../models/stac';
-import bs58 from 'bs58';
-import { ogcQueryables, stacBrowserSpecialHandling, stacPagination } from "../rels";
-import { addQueryIfNotExists, isAuthenticationError, Loading, processSTAC, stacRequest } from './utils';
-import { BrowserError } from '../utils';
-import URI from "urijs";
-import Queryable from '../models/queryable';
-import i18n from '../i18n';
 
-// TODO: I18N
-function getStore(config) {
+import axios from "axios";
+import bs58 from 'bs58';
+import { getBest, prepareSupported } from 'locale-id';
+import URI from "urijs";
+
+import i18n from '../i18n';
+import { ogcQueryables, stacBrowserSpecialHandling, stacPagination } from "../rels";
+import Utils, { schemaMediaType, BrowserError } from '../utils';
+import STAC from '../models/stac';
+import Queryable from '../models/queryable';
+
+import { addQueryIfNotExists, isAuthenticationError, Loading, processSTAC, stacRequest } from './utils';
+
+function getStore(config, router) {
   // Local settings (e.g. for currently loaded STAC entity)
   const localDefaults = () => ({
     url: '',
@@ -347,6 +349,36 @@ function getStore(config) {
         }
         // If we are proxying a STAC Catalog, replace any URI with the proxied address.
         return absoluteUrl.toString();
+      },
+
+      acceptedLanguages: state => {
+        const languages = {};
+        // Implement in ascending order:
+        languages['en'] = 0.1;
+        if (Array.isArray(state.supportedLocales)) {
+          state.supportedLocales.forEach(locale => languages[locale] = 0.2);
+        }
+        if (Utils.hasText(state.fallbackLocale)) {
+          languages[state.fallbackLocale] = 0.5;
+        }
+        if (Array.isArray(navigator.languages)) {
+          navigator.languages.forEach(locale => languages[locale] = 0.7);
+        }
+        if (Utils.hasText(state.locale)) {
+          languages[state.locale] = 1;
+        }
+        return Object.entries(languages)
+          .sort((a,b) => {
+            if (a[1] > b[1]) {
+              return -1;
+            }
+            else if (a[1] < b[1]) {
+              return 1;
+            }
+            return 0;
+          })
+          .map(([l, q]) => q >= 1 ? l : `${l};q=${q}`)
+          .join(',');
       }
     },
     mutations: {
@@ -413,6 +445,9 @@ function getStore(config) {
         if (idx === -1) {
           state.stateQueryParameters[type].push(uid);
         }
+      },
+      state(state, newState) {
+        state.stateQueryParameters = newState;
       },
       closeCollapsible(state, { type, uid }) {
         const idx = state.stateQueryParameters[type].indexOf(uid);
@@ -576,9 +611,27 @@ function getStore(config) {
     },
     actions: {
       async switchLocale(cx, locale) {
+        if (Array.isArray(locale)) {
+          const supported = prepareSupported(cx.state.supportedLocales);
+          for(let l of locale) {
+            const best = getBest(supported, l, null, true);
+            if (best) {
+              locale = best;
+              break;
+            }
+          }
+        }
+
+        if (Array.isArray(locale)) {
+          console.error(`None of the given languages is supported.`);
+          locale = cx.state.fallbackLocale;
+        }
         if (!cx.state.supportedLocales.includes(locale)) {
           console.error(`Language '${locale}' is not supported.`);
-          return;
+          if (locale === cx.state.fallbackLocale) {
+            return;
+          }
+          locale = cx.state.fallbackLocale;
         }
 
         // No messages in cache, load them
@@ -688,6 +741,15 @@ function getStore(config) {
               throw new BrowserError(i18n.t('errors.invalidJsonObject'));
             }
             data = new STAC(response.data, url, path);
+            if (show) {
+              // If we prefer another language abort redirect to the new language
+              let localeLink = data.getLocaleLink(cx.state.locale);
+              if (localeLink) {
+                router.replace(cx.getters.toBrowserPath(localeLink.href));
+                return;
+              }
+            }
+
             cx.commit('loaded', { url, data });
 
             if (!cx.getters.root) {

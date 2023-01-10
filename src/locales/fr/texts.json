@@ -80,10 +80,10 @@
     "loadApiItemsFailed": "Les éléments de l'API n'ont pas pu être chargés.",
     "loadFilteredItems": "Désolé, le chargement d'une liste d'éléments filtrés a échoué.",
     "loadItems": "Désolé, le chargement de la liste des éléments STAC a échoué.",
-    "networkError": "Ce problème peut se produire lorsque les serveurs n'autorisent pas l'accès externe via les navigateurs Web (par exemple, lorsque les en-têtes CORS ne sont pas présents). @:browse.contactProvider",
+    "networkError": "Ce problème peut se produire lorsque les serveurs n'autorisent pas l'accès externe via les navigateurs Web (par exemple, lorsque les en-têtes CORS ne sont pas présents). @:errors.contactProvider",
     "noExternalAccess": "L'accès aux catalogues externes n'est pas autorisé!",
-    "notFound": "La ressource demandée n'existe pas. @:browse.contactProvider",
-    "serverError": "Le serveur a rencontré un problème. @:browse.contactProvider",
+    "notFound": "La ressource demandée n'existe pas. @:errors.contactProvider",
+    "serverError": "Le serveur a rencontré un problème. @:errors.contactProvider",
     "unauthorized": "La requête requiert des informations d'authentification, comme par exemple un jeton API. Veuillez fournir vos informations d'authentification et réessayer"
   },
   "featureExperimental": "Cette fonctionnalité est encore expérimentale et peut donner des résultats inattendus!",

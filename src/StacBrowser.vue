@@ -45,6 +45,7 @@ import ErrorAlert from './components/ErrorAlert.vue';
 import Sidebar from './components/Sidebar.vue';
 import StacHeader from './components/StacHeader.vue';
 
+import STAC from './models/stac';
 import Utils from './utils';
 import URI from 'urijs';
 
@@ -64,10 +65,6 @@ Vue.directive('b-toggle', VBToggle);
 // Used to detect when a catalog/item becomes visible so that further data can be loaded
 Vue.directive('b-visible', VBVisible);
 
-// Setup store
-Vue.use(Vuex);
-const store = getStore(CONFIG);
-
 // Setup router
 Vue.use(VueRouter);
 const router = new VueRouter({
@@ -75,6 +72,10 @@ const router = new VueRouter({
   base: CONFIG.pathPrefix,
   routes: getRoutes(CONFIG)
 });
+
+// Setup store
+Vue.use(Vuex);
+const store = getStore(CONFIG, router);
 
 // Pass Config through from props to vuex
 let Props = {};
@@ -112,9 +113,14 @@ export default {
     };
   },
   computed: {
-    ...mapState(['doAuth', 'globalError', 'stateQueryParameters', 'title']),
-    ...mapState({catalogUrlFromVueX: 'catalogUrl', localeFromVueX: 'locale'}),
-    ...mapGetters(['displayCatalogTitle']),
+    ...mapState(['data', 'doAuth', 'globalError', 'stateQueryParameters', 'title']),
+    ...mapState({
+      catalogUrlFromVueX: 'catalogUrl',
+      localeFromVueX: 'locale',
+      detectLocaleFromBrowserFromVueX: 'detectLocaleFromBrowser',
+      fallbackLocaleFromVueX: 'fallbackLocale'
+    }),
+    ...mapGetters(['displayCatalogTitle', 'toBrowserPath']),
     browserVersion() {
       if (typeof STAC_BROWSER_VERSION !== 'undefined') {
         return STAC_BROWSER_VERSION;
@@ -129,9 +135,21 @@ export default {
     title(title) {
       document.title = title;
     },
-    localeFromVueX(locale) {
-      this.$root.$i18n.locale = locale;
-      require(`./locales/${locale}/datepicker.js`);
+    localeFromVueX: {
+      immediate: true,
+      async handler (locale) {
+        this.$root.$i18n.locale = locale;
+        require(`./locales/${locale}/datepicker.js`);
+
+        if (this.data instanceof STAC) {
+          let link = this.data.getLocaleLink(locale, this.fallbackLocaleFromVueX);
+          if (link) {
+            let state = Object.assign({}, this.stateQueryParameters);
+            this.$router.push(this.toBrowserPath(link.href));
+            this.$store.commit('state', state);
+          }
+        }
+      }
     },
     catalogUrlFromVueX(url) {
       if (url) {
@@ -181,6 +199,10 @@ export default {
       this.$store.commit('resetPage');
       this.parseQuery(to);
     });
+
+    if (this.detectLocaleFromBrowserFromVueX && Array.isArray(navigator.languages)) {
+      this.$store.dispatch('switchLocale', navigator.languages);
+    }
   },
   mounted() {
     this.$root.$on('error', this.showError);
