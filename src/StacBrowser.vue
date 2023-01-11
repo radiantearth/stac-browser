@@ -188,6 +188,10 @@ export default {
   },
   created() {
     this.$router.onReady(() => {
+      if (this.detectLocaleFromBrowserFromVueX && Array.isArray(navigator.languages)) {
+        this.$store.dispatch('switchLocale', navigator.languages);
+      }
+      
       this.parseQuery(this.$route);
     });
 
@@ -199,10 +203,6 @@ export default {
       this.$store.commit('resetPage');
       this.parseQuery(to);
     });
-
-    if (this.detectLocaleFromBrowserFromVueX && Array.isArray(navigator.languages)) {
-      this.$store.dispatch('switchLocale', navigator.languages);
-    }
   },
   mounted() {
     this.$root.$on('error', this.showError);
