@@ -17,7 +17,7 @@
       "generic": "Herunterladen",
       "withSource": "Herunterladen von {source}"
     },
-    "inItems": "Datei in Unterlementen | Dateien in Unterelementen",
+    "inItems": "Datei in Unterelementen | Dateien in Unterelementen",
     "role": {
       "data": "Daten",
       "metadata": "Metadaten"
@@ -87,8 +87,6 @@
     "unauthorized": "Der Anfrage fehlen die Anmeldedaten, bspw. ein API-Schlüssel. Bitte geben Sie Ihre Anmeldedaten an und versuchen Sie es erneut."
   },
   "featureExperimental": "Diese Funktion ist noch experimentell und kann unerwartete Ergebnisse verursachen!",
-  "fields": {
-  },
   "fullscreen": {
     "exit": "Verlasse den Vollbild-Modus",
     "show": "Zeige im Vollbild-Modus"

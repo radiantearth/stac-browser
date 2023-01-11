@@ -638,6 +638,7 @@ function getStore(config, router) {
         if (Utils.size(i18n.messages[locale]) <= 1) { // languages key is already set thus 1 and not 0
           const messages = (await import(`../locales/${locale}/texts.json`)).default;
           messages['custom'] = (await import(`../locales/${locale}/custom.json`)).default;
+          messages['fields'] = (await import(`../locales/${locale}/fields.json`)).default;
           i18n.mergeLocaleMessage(locale, messages);
         }
 

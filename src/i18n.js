@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import VueI18n from 'vue-i18n';
 import CONFIG from './config';
+import {default as Fields} from '@radiantearth/stac-fields/I18N';
 
 Vue.use(VueI18n);
 
@@ -12,6 +13,7 @@ function loadLocaleMessages () {
     if (CONFIG.locale == locale || CONFIG.fallbackLocale == locale) {
       messages[locale] = require(`./locales/${locale}/texts.json`);
       messages[locale]['custom'] = require(`./locales/${locale}/custom.json`);
+      messages[locale]['fields'] = require(`./locales/${locale}/fields.json`);
     }
     else {
       messages[locale] = {};
@@ -28,5 +30,15 @@ const i18n = new VueI18n({
   fallbackLocale: CONFIG.fallbackLocale,
   messages: loadLocaleMessages()
 });
-
 export default i18n;
+
+export function translateFields(value, vars = null) {
+  if (typeof value !== 'string' || value.length === 0) {
+    return value;
+  }
+  let key = `fields.${value}`;
+  if (i18n.te(key)) {
+    return i18n.t(key, null, vars);
+  }
+  return Fields.format(value, vars);
+}

@@ -10,6 +10,8 @@
 <script>
 import { formatAsset, formatCollection, formatGrouped, formatItemProperties, formatLink, formatProvider, formatSummaries } from '@radiantearth/stac-fields';
 import MetadataGroup from './metadata/MetadataGroup.vue';
+import { isoDuration } from '@musement/iso-duration';
+import { mapState } from 'vuex';
 
 export default {
     name: "Metadata",
@@ -38,8 +40,33 @@ export default {
             default: null
         }
     },
+    data() {
+        return {
+            formattedData: []
+        };
+    },
     computed: {
-        formattedData() {
+        ...mapState(['locale']),
+    },
+    watch: {
+        locale: {
+            immediate: true,
+            async handler (locale) {
+                if (typeof locale !== 'string') {
+                    return;
+                }
+                
+                // Update durations (for stac-fields)
+                const phrases = await import(`../locales/${locale}/duration.js`);
+                isoDuration.setLocales({en: phrases.default});
+
+                // Format the data again to update translations
+                this.formattedData = this.formatData();
+            }
+        }
+    },
+    methods: {
+        formatData() {
             // Filter all fields as given in ignoreFields and also 
             // ignore fields starting with an underscore which is likely originating from the STAC class
             let filter = key => !key.startsWith('_') && !this.ignoreFields.includes(key);
@@ -66,7 +93,7 @@ export default {
                             core.push(summaryGroup);
                         }
                     });
-                    return core.sort((a,b) => a.label.localeCompare(b.label));
+                    return core.sort((a,b) => a.label.localeCompare(b.label, [this.locale]));
                 }
                 default:
                     return formatGrouped(this.context, this.data, this.type, filter);

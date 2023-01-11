@@ -87,8 +87,6 @@
     "unauthorized": "La requête requiert des informations d'authentification, comme par exemple un jeton API. Veuillez fournir vos informations d'authentification et réessayer"
   },
   "featureExperimental": "Cette fonctionnalité est encore expérimentale et peut donner des résultats inattendus!",
-  "fields": {
-  },
   "fullscreen": {
     "exit": "Quitter le mode plein écran",
     "show": "Voir en plein écran"

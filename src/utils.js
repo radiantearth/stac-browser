@@ -287,7 +287,7 @@ export default class Utils {
         return `DOI ${path}`;
       }
       else {
-        return `${file} at ${auth}`;
+        return `${file} (${auth})`;
       }
     }
     else if (file && !commonFileNames.includes(file)) {

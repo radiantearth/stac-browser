@@ -49,6 +49,9 @@ import STAC from './models/stac';
 import Utils from './utils';
 import URI from 'urijs';
 
+import I18N from '@radiantearth/stac-fields/I18N';
+import { translateFields } from './i18n';
+
 Vue.use(Clipboard);
 
 Vue.use(AlertPlugin);
@@ -139,7 +142,13 @@ export default {
       immediate: true,
       async handler (locale) {
         this.$root.$i18n.locale = locale;
-        require(`./locales/${locale}/datepicker.js`);
+
+        // require(`./locales/${locale}/datepicker`);
+        // require(`./locales/${locale}/duration`);
+
+        // Update stac-fields
+        I18N.locales = [locale];
+        I18N.translate = translateFields;
 
         if (this.data instanceof STAC) {
           let link = this.data.getLocaleLink(locale, this.fallbackLocaleFromVueX);
