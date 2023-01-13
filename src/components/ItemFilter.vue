@@ -149,7 +149,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['itemsPerPage', 'queryables', 'apiCollections']),
+    ...mapState(['itemsPerPage', 'uiLanguage', 'queryables', 'apiCollections']),
     ...mapGetters(['hasMoreCollections', 'root']),
     sortOptions() {
       return [
@@ -168,7 +168,7 @@ export default {
           value: c.id,
           text: c.title || c.id
         }))
-        .sort((a,b) => a.text.localeCompare(b.text));
+        .sort((a,b) => a.text.localeCompare(b.text, this.uiLanguage));
     }
   },
   watch: {

@@ -46,13 +46,13 @@ export default {
         };
     },
     computed: {
-        ...mapState(['locale']),
+        ...mapState(['uiLanguage']),
     },
     watch: {
-        locale: {
+        uiLanguage: {
             immediate: true,
             async handler (locale) {
-                if (typeof locale !== 'string') {
+                if (!locale) {
                     return;
                 }
                 
@@ -93,7 +93,7 @@ export default {
                             core.push(summaryGroup);
                         }
                     });
-                    return core.sort((a,b) => a.label.localeCompare(b.label, [this.locale]));
+                    return core.sort((a,b) => a.label.localeCompare(b.label, this.uiLanguage));
                 }
                 default:
                     return formatGrouped(this.context, this.data, this.type, filter);

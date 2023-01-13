@@ -148,7 +148,7 @@ class STAC {
     
     let available;
     if (Array.isArray(this.languages)) {
-      available = this.languages;
+      available = this.languages.map(l => l.code);
     }
     else {
       available = links.map(link => link.hreflang);

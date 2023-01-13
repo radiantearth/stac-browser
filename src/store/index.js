@@ -3,7 +3,6 @@ import Vuex from "vuex";
 
 import axios from "axios";
 import bs58 from 'bs58';
-import { getBest, prepareSupported } from 'locale-id';
 import URI from "urijs";
 
 import i18n from '../i18n';
@@ -13,6 +12,7 @@ import STAC from '../models/stac';
 import Queryable from '../models/queryable';
 
 import { addQueryIfNotExists, isAuthenticationError, Loading, processSTAC, stacRequest } from './utils';
+import { getBest } from "locale-id";
 
 function getStore(config, router) {
   // Local settings (e.g. for currently loaded STAC entity)
@@ -47,6 +47,8 @@ function getStore(config, router) {
     authData: null,
     doAuth: [],
     conformsTo: [],
+    dataLanguage: null,
+    dataLanguages: [],
 
     apiCollections: [],
     apiItemsLoading: {},
@@ -58,7 +60,8 @@ function getStore(config, router) {
     state: Object.assign({}, config, localDefaults(), catalogDefaults(), {
       // Global settings
       allowSelectCatalog: !config.catalogUrl,
-      globalRequestQueryParameters: config.requestQueryParameters
+      globalRequestQueryParameters: config.requestQueryParameters,
+      uiLanguage: null
     }),
     getters: {
       loading: state => !state.url || !state.data || state.database[state.url] instanceof Loading,
@@ -411,6 +414,10 @@ function getStore(config, router) {
           }
         }
       },
+      languages(state, {uiLanguage, dataLanguage}) {
+        state.dataLanguage = dataLanguage;
+        state.uiLanguage = uiLanguage;
+      },
       setQueryParameter(state, { type, key, value }) {
         type = `${type}QueryParameters`;
         if (typeof value === 'undefined') {
@@ -477,6 +484,9 @@ function getStore(config, router) {
       },
       resetCatalog(state) {
         Object.assign(state, catalogDefaults());
+        if (!state.supportedLocales.includes(state.locale)) {
+          state.locale = config.locale;
+        }
       },
       resetPage(state) {
         Object.assign(state, localDefaults());
@@ -488,11 +498,22 @@ function getStore(config, router) {
         state.url = url || null;
         state.data = stac instanceof STAC ? stac : null;
         state.valid = null;
+
+        // Set title
         if (title) {
           state.title = title;
         }
         else {
           state.title = STAC.getDisplayTitle(stac, state.catalogTitle);
+        }
+
+        if (state.data instanceof STAC) {
+          let source = state.data.isItem() ? state.data.properties : state.data;
+          let languages = Array.isArray(source.languages) ? source.languages.slice() : [];
+          if (Utils.isObject(source.language)) {
+            languages.unshift(source.language);
+          }
+          state.dataLanguages = languages.filter(lang => Utils.isObject(lang) && typeof lang.code === 'string');
         }
       },
       errored(state, { url, error }) {
@@ -611,38 +632,16 @@ function getStore(config, router) {
     },
     actions: {
       async switchLocale(cx, locale) {
-        if (Array.isArray(locale)) {
-          const supported = prepareSupported(cx.state.supportedLocales);
-          for(let l of locale) {
-            const best = getBest(supported, l, null, true);
-            if (best) {
-              locale = best;
-              break;
-            }
-          }
-        }
-
-        if (Array.isArray(locale)) {
-          console.error(`None of the given languages is supported.`);
-          locale = cx.state.fallbackLocale;
-        }
-        if (!cx.state.supportedLocales.includes(locale)) {
-          console.error(`Language '${locale}' is not supported.`);
-          if (locale === cx.state.fallbackLocale) {
-            return;
-          }
-          locale = cx.state.fallbackLocale;
-        }
-
-        // No messages in cache, load them
-        if (Utils.size(i18n.messages[locale]) <= 1) { // languages key is already set thus 1 and not 0
-          const messages = (await import(`../locales/${locale}/texts.json`)).default;
-          messages['custom'] = (await import(`../locales/${locale}/custom.json`)).default;
-          messages['fields'] = (await import(`../locales/${locale}/fields.json`)).default;
-          i18n.mergeLocaleMessage(locale, messages);
-        }
-
         cx.commit('config', {locale});
+
+        // Locale for UI
+        let uiLanguage = getBest(cx.state.supportedLocales, locale, cx.state.fallbackLocale, true);
+        // Locale for data
+        let dataLanguageCodes = cx.state.dataLanguages.map(l => l.code);
+        let dataLanguageFallback = cx.state.dataLanguages.length > 0 ? cx.state.dataLanguages[0].code : uiLanguage;
+        let dataLanguage = getBest(dataLanguageCodes, locale, dataLanguageFallback, true);
+
+        cx.commit('languages', {dataLanguage, uiLanguage});
         cx.commit('setQueryParameter', { type: 'state', key: 'language', value: locale });
       },
       async setAuth(cx, value) {
@@ -744,7 +743,7 @@ function getStore(config, router) {
             data = new STAC(response.data, url, path);
             if (show) {
               // If we prefer another language abort redirect to the new language
-              let localeLink = data.getLocaleLink(cx.state.locale);
+              let localeLink = data.getLocaleLink(cx.state.dataLanguage);
               if (localeLink) {
                 router.replace(cx.getters.toBrowserPath(localeLink.href));
                 return;

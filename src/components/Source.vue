@@ -11,10 +11,14 @@
         <template #button-content>
           <b-icon-flag /> <span class="button-label">{{ $t('source.language.label', {currentLanguage}) }}</span>
         </template>
-        <b-dropdown-item v-for="l of supportedLocales" :key="l" @click="switchLocale(l)">
-          <b-icon-check v-if="locale === l" />
+        <b-dropdown-item v-for="l of languages" :key="l.code" class="lang-item" @click="switchLocale(l.code)">
+          <b-icon-check v-if="locale === l.code" />
           <b-icon-blank v-else />
-          {{ $t(`languages.${l}.native`) }} / {{ $t(`languages.${l}.global`) }}
+          <span class="title">
+            {{ l.native }}
+            <template v-if="l.global && l.global !== l.native"> / {{ l.global }}</template>
+          </span>
+          <b-icon-exclamation-triangle v-if="supportsLanguageExt && (!l.ui || !l.data)" :title="l.ui ? $t('source.language.onlyUI') : $t('source.language.onlyData')" class="ml-2" />
         </b-dropdown-item>
       </b-dropdown>
     </b-button-group>
@@ -52,14 +56,17 @@
 
 <script>
 import { 
-  BIconBlank, BIconCheck, BIconEnvelope, BIconFlag, BIconLink, BIconShare, BIconTwitter,
+  BIconBlank, BIconCheck, BIconEnvelope, BIconExclamationTriangle, BIconFlag, BIconLink, BIconShare, BIconTwitter,
   BDropdown, BDropdownItem, BPopover } from 'bootstrap-vue';
-import { mapActions, mapState } from 'vuex';
+import { mapActions, mapGetters, mapState } from 'vuex';
 
 import Url from './Url.vue';
 
 import URI from 'urijs';
 import Utils from '../utils';
+import { getBest, prepareSupported } from 'locale-id';
+
+const LANGUAGE_EXT = 'https://stac-extensions.github.io/language/v1.*/schema.json';
 
 export default {
     name: "Source",
@@ -69,6 +76,7 @@ export default {
         BIconBlank,
         BIconCheck,
         BIconEnvelope,
+        BIconExclamationTriangle,
         BIconFlag,
         BIconLink,
         BIconShare,
@@ -91,9 +99,16 @@ export default {
         }
     },
     computed: {
-        ...mapState(['locale', 'privateQueryParameters', 'supportedLocales', 'stacLint', 'stacProxyUrl', 'valid']),
+        ...mapState(['dataLanguages', 'locale', 'privateQueryParameters', 'supportedLocales', 'stacLint', 'stacProxyUrl', 'uiLanguage', 'valid']),
+        ...mapGetters(['supportsExtension']),
         currentLanguage() {
-          return this.$t(`languages.${this.locale}.native`);
+          let lang = this.languages.find(l => l.code === this.locale);
+          if (lang) {
+            return lang.native;
+          }
+          else {
+            return '-';
+          }
         },
         canValidate() {
             if (!this.stacLint || typeof this.stacUrl !== 'string') {
@@ -126,12 +141,58 @@ export default {
             let title = encodeURIComponent(this.title);
             let text = encodeURIComponent(this.message);
             return `mailto:?subject=${title}&body=${text}`;
+        },
+        supportsLanguageExt() {
+          return this.supportsExtension(LANGUAGE_EXT);
+        },
+        languages() {
+          let languages = [];
+
+          // Add all UI languages
+          for(let code of this.supportedLocales) {
+            languages.push({
+              code,
+              native: this.$t(`languages.${code}.native`),
+              global: this.$t(`languages.${code}.global`),
+              ui: true
+            });
+          }
+
+          // Add missing data languages
+          for(let lang of this.dataLanguages) {
+            if (!Utils.isObject(lang) || !lang.code || this.supportedLocales.includes(lang.code.toLowerCase())) {
+              continue;
+            }
+            let newLang = {
+              code: lang.code
+            };
+            newLang.native = lang.name || lang.alternate || lang.code;
+            newLang.global = lang.alternate || lang.name || lang.code;
+            newLang.data = true;
+            languages.push(newLang);
+          }
+
+          if (this.supportsExtension(LANGUAGE_EXT)) {
+            // Determine which languages are complete
+            const uiSupported = prepareSupported(this.supportedLocales);
+            const dataSupported = prepareSupported(this.dataLanguages.map(l => l.code));
+            for(let l of languages) {
+              if (!l.ui) {
+                l.ui = Boolean(getBest(uiSupported, l.code, null, true));
+              }
+              if (!l.data) {
+                l.data = Boolean(getBest(dataSupported, l.code, null, true));
+              }
+            }
+          }
+          
+          return languages.sort((a,b) => a.global.localeCompare(b.global, this.uiLanguage));
         }
     },
     methods: {
-        ...mapActions(['switchLocale']),
+        ...mapActions(['switchLocale', 'validate']),
         async validate() {
-            await this.$store.dispatch('validate', this.stacUrl);
+            await this.validate(this.stacUrl);
         },
         browserUrl() {
           return window.location.toString();
@@ -144,5 +205,11 @@ export default {
 .popover {
     width: 100%;
     max-width: 800px;
+}
+.lang-item > .dropdown-item {
+  display: flex;
+  > .title {
+    flex: 1;
+  }
 }
 </style>

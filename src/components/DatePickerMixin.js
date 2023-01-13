@@ -11,13 +11,13 @@ export default {
     };
   },
   computed: {
-    ...mapState({localeFromVueX: 'locale'})
+    ...mapState(['uiLanguage'])
   },
   watch: {
-    localeFromVueX: {
+    uiLanguage: {
       immediate: true,
-      async handler (locale) {
-        if (typeof locale !== 'string') {
+      async handler(locale) {
+        if (!locale) {
           return;
         }
         const options = await import(`../locales/${locale}/datepicker.js`);

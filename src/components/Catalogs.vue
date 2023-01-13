@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 import Catalog from './Catalog.vue';
 import STAC from '../models/stac';
 import ViewMixin from './ViewMixin';
@@ -49,6 +49,7 @@ export default {
     };
   },
   computed: {
+    ...mapState(['uiLanguage']),
     ...mapGetters(['getStac']),
     hasMultiple() {
       return !this.hasMore && this.catalogs.length > 1;
@@ -79,7 +80,7 @@ export default {
       }
       // Sort
       if (!this.hasMore && this.sort !== 0) {
-        catalogs = catalogs.slice(0).sort((a,b) => STAC.getDisplayTitle(a).localeCompare(STAC.getDisplayTitle(b)));
+        catalogs = catalogs.slice(0).sort((a,b) => STAC.getDisplayTitle(a).localeCompare(STAC.getDisplayTitle(b), this.uiLanguage));
         if (this.sort === -1) {
           catalogs = catalogs.reverse();
         }

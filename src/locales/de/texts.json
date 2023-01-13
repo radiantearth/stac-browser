@@ -224,6 +224,8 @@
     "label": "Datenquelle",
     "language": {
       "label": "Sprache: {currentLanguage}",
+      "onlyData": "Nur die Daten sind in dieser Sprache verfügbar!",
+      "onlyUI": "Nur die Benutzeroberfläsche ist in dieser Sprache verfügbar!",
       "switch": "Ändern der Sprache"
     },
     "locatedAt": "Die Datei mit den STAC-Metadaten befindet sich: unter:",

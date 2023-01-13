@@ -27,7 +27,7 @@
 <script>
 import Vue from "vue";
 import VueRouter from "vue-router";
-import Vuex, { mapGetters, mapState } from 'vuex';
+import Vuex, { mapActions, mapGetters, mapState } from 'vuex';
 import CONFIG from './config';
 import getRoutes from "./router";
 import getStore from "./store";
@@ -51,6 +51,7 @@ import URI from 'urijs';
 
 import I18N from '@radiantearth/stac-fields/I18N';
 import { translateFields } from './i18n';
+import { getBest, prepareSupported } from 'locale-id';
 
 Vue.use(Clipboard);
 
@@ -116,12 +117,12 @@ export default {
     };
   },
   computed: {
-    ...mapState(['data', 'doAuth', 'globalError', 'stateQueryParameters', 'title']),
+    ...mapState(['data', 'dataLanguage', 'doAuth', 'globalError', 'stateQueryParameters', 'title', 'uiLanguage']),
     ...mapState({
       catalogUrlFromVueX: 'catalogUrl',
-      localeFromVueX: 'locale',
       detectLocaleFromBrowserFromVueX: 'detectLocaleFromBrowser',
-      fallbackLocaleFromVueX: 'fallbackLocale'
+      fallbackLocaleFromVueX: 'fallbackLocale',
+      supportedLocalesFromVueX: 'supportedLocales'
     }),
     ...mapGetters(['displayCatalogTitle', 'toBrowserPath']),
     browserVersion() {
@@ -138,20 +139,35 @@ export default {
     title(title) {
       document.title = title;
     },
-    localeFromVueX: {
+    uiLanguage: {
       immediate: true,
-      async handler (locale) {
+      async handler(locale) {
+        if (!locale) {
+          return;
+        }
+        // No messages in cache, load them
+        if (Utils.size(this.$root.$i18n.messages[locale]) <= 1) { // languages key is already set thus 1 and not 0
+          const messages = (await import(`./locales/${locale}/texts.json`)).default;
+          messages['custom'] = (await import(`./locales/${locale}/custom.json`)).default;
+          messages['fields'] = (await import(`./locales/${locale}/fields.json`)).default;
+          this.$root.$i18n.mergeLocaleMessage(locale, messages);
+        }
+        // Set the locale for vue-i18n
         this.$root.$i18n.locale = locale;
-
-        // require(`./locales/${locale}/datepicker`);
-        // require(`./locales/${locale}/duration`);
 
         // Update stac-fields
         I18N.locales = [locale];
         I18N.translate = translateFields;
-
+      }
+    },
+    dataLanguage: {
+      immediate: true,
+      async handler(locale) {
+        if (!locale) {
+          return;
+        }
         if (this.data instanceof STAC) {
-          let link = this.data.getLocaleLink(locale, this.fallbackLocaleFromVueX);
+          let link = this.data.getLocaleLink(locale);
           if (link) {
             let state = Object.assign({}, this.stateQueryParameters);
             this.$router.push(this.toBrowserPath(link.href));
@@ -198,7 +214,16 @@ export default {
   created() {
     this.$router.onReady(() => {
       if (this.detectLocaleFromBrowserFromVueX && Array.isArray(navigator.languages)) {
-        this.$store.dispatch('switchLocale', navigator.languages);
+        // Detect the most suitable locale
+        const supported = prepareSupported(this.supportedLocalesFromVueX);
+        let locale = this.fallbackLocaleFromVueX;
+        for(let l of navigator.languages) {
+          const best = getBest(supported, l, null, true);
+          if (best) {
+            locale = best;
+          }
+        }
+        this.switchLocale(locale);
       }
       
       this.parseQuery(this.$route);
@@ -218,6 +243,7 @@ export default {
     setInterval(() => this.$store.dispatch('loadBackground', 3), 200);
   },
   methods: {
+    ...mapActions(['switchLocale']),
     parseQuery(route) {
       let privateFromHash = {};
       if (this.historyMode === 'history') {
@@ -257,7 +283,7 @@ export default {
         }
       }
       if (params?.state?.language) {
-        this.$store.dispatch('switchLocale', params.state.language);
+        this.switchLocale(params.state.language);
       }
       if (Utils.size(params.private) > 0) {
         this.$router.replace({

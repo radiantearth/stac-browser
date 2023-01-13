@@ -91,6 +91,9 @@ e.g. provide `en` (English) for the file at `src/locales/en.json`.
 
 In CLI, please provide the languages separated by a space, e.g. `--supportedLocales en de fr it`
 
+Please note that only left-to-right languages have been tested.
+I'd need help to test support for right-to-left languages.
+
 ### stacLint
 
 ***experimental***

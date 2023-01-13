@@ -44,6 +44,7 @@ import { BCollapse, BIconSearch } from "bootstrap-vue";
 import Utils from '../utils';
 import STAC from '../models/stac';
 import sortCapabilitiesMixinGenerator from './SortCapabilitiesMixin';
+import { mapState } from 'vuex';
 
 export default {
   name: "Items",
@@ -102,6 +103,7 @@ export default {
     };
   },
   computed: {
+    ...mapState(['uiLanguage']),
     hasMore() {
       return this.items.length > this.shownItems;
     },
@@ -111,7 +113,7 @@ export default {
     chunkedItems() {
       let items = this.items;
       if (this.sort !== 0) {
-        items = items.slice(0).sort((a,b) => STAC.getDisplayTitle(a).localeCompare(STAC.getDisplayTitle(b)));
+        items = items.slice(0).sort((a,b) => STAC.getDisplayTitle(a).localeCompare(STAC.getDisplayTitle(b), this.uiLanguage));
         if (this.sort === -1) {
           items = items.reverse();
         }

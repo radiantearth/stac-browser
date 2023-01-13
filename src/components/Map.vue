@@ -120,7 +120,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['buildTileUrlTemplate', 'crossOriginMedia', 'displayGeoTiffByDefault', 'geoTiffResolution', 'locale', 'maxPreviewsOnMap', 'tileSourceTemplate', 'useTileLayerAsFallback']),
+    ...mapState(['buildTileUrlTemplate', 'crossOriginMedia', 'displayGeoTiffByDefault', 'geoTiffResolution', 'maxPreviewsOnMap', 'tileSourceTemplate', 'uiLanguage', 'useTileLayerAsFallback']),
     ...mapGetters(['getStac', 'supportsExtension']),
     fullscreenOptions() {
       return {
@@ -167,7 +167,7 @@ export default {
     }
   },
   watch: {
-    locale() {
+    uiLanguage() {
       // This recreates the component so that it picks up the new translations
       this.ix++;
     },
