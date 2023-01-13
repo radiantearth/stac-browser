@@ -40,7 +40,6 @@ function getStore(config, router) {
   });
 
   const catalogDefaults = () => ({
-    database: {}, // STAC object, Error object or Loading object or Promise (when loading)
     queue: [],
     redirectUrl: null,
     privateQueryParameters: {},
@@ -59,6 +58,7 @@ function getStore(config, router) {
     strict: true,
     state: Object.assign({}, config, localDefaults(), catalogDefaults(), {
       // Global settings
+      database: {}, // STAC object, Error object or Loading object or Promise (when loading)
       allowSelectCatalog: !config.catalogUrl,
       globalRequestQueryParameters: config.requestQueryParameters,
       uiLanguage: null
@@ -207,7 +207,7 @@ function getStore(config, router) {
         return !!extensions.find(uri => uri.match(regexp));
       },
       tileRendererType: state => {
-        if ((state.tileSourceTemplate || state.buildTileUrlTemplate) && !state.useTileLayerAsFallback) {
+        if (state.buildTileUrlTemplate && !state.useTileLayerAsFallback) {
           return 'server';
         }
         else {
@@ -336,7 +336,15 @@ function getStore(config, router) {
         if (!state.catalogUrl) {
           return false;
         }
-        return absoluteUrl.relativeTo(state.catalogUrl) === absoluteUrl;
+        if (!(absoluteUrl instanceof URI)) {
+          absoluteUrl = new URI(absoluteUrl);
+        }
+        let relative = absoluteUrl.relativeTo(state.catalogUrl);
+        if (relative.equals(absoluteUrl)) {
+          return true;
+        }
+        let relativeStr = relative.toString();
+        return relativeStr.startsWith('//') || relativeStr.startsWith('../');
       },
       getRequestUrl: (state, getters) => (url, baseUrl = null, addLocalQueryParams = false) => {
         let absoluteUrl = Utils.toAbsolute(getters.proxyUrl(url), baseUrl ? baseUrl : state.url, false);
@@ -462,9 +470,6 @@ function getStore(config, router) {
           Vue.delete(state.stateQueryParameters[type], idx);
         }
       },
-      tileSourceTemplate(state, tileSourceTemplate) {
-        state.tileSourceTemplate = tileSourceTemplate;
-      },
       updateLoading(state, { url, show, loadApi }) {
         let data = state.database[url];
         Vue.set(data, 'show', show || data.show);
@@ -482,10 +487,16 @@ function getStore(config, router) {
       clear(state, url) {
         Vue.delete(state.database, url);
       },
-      resetCatalog(state) {
+      resetCatalog(state, clearAll) {
         Object.assign(state, catalogDefaults());
+        Object.assign(state, localDefaults());
         if (!state.supportedLocales.includes(state.locale)) {
           state.locale = config.locale;
+        }
+        if (clearAll) {
+          state.catalogUrl = config.catalogUrl;
+          state.catalogTitle = config.catalogTitle;
+          state.database = {};
         }
       },
       resetPage(state) {

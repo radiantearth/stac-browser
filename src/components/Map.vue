@@ -120,7 +120,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['buildTileUrlTemplate', 'crossOriginMedia', 'displayGeoTiffByDefault', 'geoTiffResolution', 'maxPreviewsOnMap', 'tileSourceTemplate', 'uiLanguage', 'useTileLayerAsFallback']),
+    ...mapState(['buildTileUrlTemplate', 'crossOriginMedia', 'displayGeoTiffByDefault', 'geoTiffResolution', 'maxPreviewsOnMap', 'uiLanguage', 'useTileLayerAsFallback']),
     ...mapGetters(['getStac', 'supportsExtension']),
     fullscreenOptions() {
       return {
@@ -237,7 +237,6 @@ export default {
         baseUrl: this.stac.getAbsoluteUrl(),
         resolution: this.geoTiffResolution,
         useTileLayerAsFallback: this.useTileLayerAsFallback,
-        tileUrlTemplate: this.tileSourceTemplate,
         buildTileUrlTemplate: this.buildTileUrlTemplate,
         crossOrigin: this.crossOriginMedia,
         displayGeoTiffByDefault: this.displayGeoTiffByDefault
