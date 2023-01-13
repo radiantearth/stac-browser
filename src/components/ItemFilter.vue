@@ -142,12 +142,6 @@ export default {
     return {
       sortOrder: 1,
       sortTerm: null,
-      sortOptions: [
-        { value: null, text: this.$t('default') },
-        { value: 'properties.datetime', text: this.$t('search.sortOptions.datetime') },
-        { value: 'id', text: this.$t('search.sortOptions.id') },
-        { value: 'properties.title', text: this.$t('search.sortOptions.title') }
-      ],
       maxItems: 10000,
       provideBBox: false,
       query: this.getDefaultValues(),
@@ -157,6 +151,14 @@ export default {
   computed: {
     ...mapState(['itemsPerPage', 'queryables', 'apiCollections']),
     ...mapGetters(['hasMoreCollections', 'root']),
+    sortOptions() {
+      return [
+        { value: null, text: this.$t('default') },
+        { value: 'properties.datetime', text: this.$t('search.sortOptions.datetime') },
+        { value: 'id', text: this.$t('search.sortOptions.id') },
+        { value: 'properties.title', text: this.$t('search.sortOptions.title') }
+      ];
+    },
     collections() {
       if (this.hasMoreCollections || this.collectionOnly) {
         return [];

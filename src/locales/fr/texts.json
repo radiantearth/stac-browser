@@ -223,7 +223,7 @@
     "detailsAboutSource": "À propos de la source STAC",
     "label": "Source",
     "language": {
-      "label": "Langue ({currentLanguage})",
+      "label": "Langue: {currentLanguage}",
       "switch": "Changer de langue"
     },
     "locatedAt": "Le fichier de métadonnées STAC se trouve à l'adresse suivante :",

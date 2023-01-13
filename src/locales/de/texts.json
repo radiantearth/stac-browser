@@ -223,7 +223,7 @@
     "detailsAboutSource": "Details über die STAC-Datenquelle",
     "label": "Datenquelle",
     "language": {
-      "label": "Sprache ({currentLanguage})",
+      "label": "Sprache: {currentLanguage}",
       "switch": "Ändern der Sprache"
     },
     "locatedAt": "Die Datei mit den STAC-Metadaten befindet sich: unter:",

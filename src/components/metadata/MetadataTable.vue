@@ -61,7 +61,8 @@ export default {
           key,
           label: col.label,
           sortable: col.sortable,
-          formatter: this.formatCell.bind(this)
+          formatter: this.formatCell.bind(this),
+          default: col.default
         });
       }
       if (Utils.isObject(this.value)) {
@@ -78,6 +79,9 @@ export default {
     formatCell(value, key, item) {
       let spec = this.items[key];
       // ToDo: Set context (third param)?
+      if (typeof spec.default !== 'undefined' && (typeof value === 'undefined' || value === null)) {
+        value = spec.default;
+      }
       return format(value, key, NaN, item, spec);
     }
   }
