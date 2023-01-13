@@ -35,7 +35,6 @@ function getStore(config) {
   });
 
   const catalogDefaults = () => ({
-    database: {}, // STAC object, Error object or Loading object or Promise (when loading)
     queue: [],
     redirectUrl: null,
     privateQueryParameters: {},
@@ -52,6 +51,7 @@ function getStore(config) {
     strict: true,
     state: Object.assign({}, config, localDefaults(), catalogDefaults(), {
       // Global settings
+      database: {}, // STAC object, Error object or Loading object or Promise (when loading)
       allowSelectCatalog: !config.catalogUrl,
       globalRequestQueryParameters: config.requestQueryParameters
     }),
@@ -328,7 +328,15 @@ function getStore(config) {
         if (!state.catalogUrl) {
           return false;
         }
-        return absoluteUrl.relativeTo(state.catalogUrl) === absoluteUrl;
+        if (!(absoluteUrl instanceof URI)) {
+          absoluteUrl = new URI(absoluteUrl);
+        }
+        let relative = absoluteUrl.relativeTo(state.catalogUrl);
+        if (relative.equals(absoluteUrl)) {
+          return true;
+        }
+        let relativeStr = relative.toString();
+        return relativeStr.startsWith('//') || relativeStr.startsWith('../');
       },
       getRequestUrl: (state, getters) => (url, baseUrl = null, addLocalQueryParams = false) => {
         let absoluteUrl = Utils.toAbsolute(getters.proxyUrl(url), baseUrl ? baseUrl : state.url, false);
@@ -449,8 +457,14 @@ function getStore(config) {
       clear(state, url) {
         Vue.delete(state.database, url);
       },
-      resetCatalog(state) {
+      resetCatalog(state, clearAll) {
         Object.assign(state, catalogDefaults());
+        Object.assign(state, localDefaults());
+        if (clearAll) {
+          state.catalogUrl = config.catalogUrl;
+          state.catalogTitle = config.catalogTitle;
+          state.database = {};
+        }
       },
       resetPage(state) {
         Object.assign(state, localDefaults());

@@ -81,6 +81,8 @@ export default {
     }
   },
   async created() {
+    // Reset loaded STAC catalog
+    this.$store.commit('resetCatalog', true);
     // Load entries from STAC Index
     try {
       let response = await axios.get('https://stacindex.org/api/catalogs');
@@ -110,7 +112,6 @@ export default {
       this.go();
     },
     go() {
-      this.$store.commit('resetCatalog'); // Reset loaded STAC catalog
       this.$router.push(this.toBrowserPath(this.url));
     }
   }

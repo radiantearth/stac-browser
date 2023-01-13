@@ -117,9 +117,9 @@ export default {
     };
   },
   computed: {
-    ...mapState(['title', 'doAuth', 'globalError', 'stateQueryParameters']),
+    ...mapState(['allowSelectCatalog', 'title', 'doAuth', 'globalError', 'stateQueryParameters']),
     ...mapState({catalogUrlFromVueX: 'catalogUrl'}),
-    ...mapGetters(['displayCatalogTitle']),
+    ...mapGetters(['displayCatalogTitle', 'fromBrowserPath', 'isExternalUrl']),
     browserVersion() {
       if (typeof STAC_BROWSER_VERSION !== 'undefined') {
         return STAC_BROWSER_VERSION;
@@ -172,8 +172,17 @@ export default {
       if (to.path === from.path) {
         return;
       }
-      
-      this.$store.commit('resetPage');
+
+      // Handle catalog change: https://github.com/radiantearth/stac-browser/issues/250
+      let resetOp = 'resetPage';
+      if (this.allowSelectCatalog && to.path) {
+        let next = this.fromBrowserPath(to.path);
+        if (this.isExternalUrl(next)) {
+          resetOp = 'resetCatalog';
+        }
+      }
+
+      this.$store.commit(resetOp);
       this.parseQuery(to);
     });
   },
