@@ -10,7 +10,7 @@
         />
       </b-col>
       <b-col class="right">
-        <Loading v-if="loading" fill top />
+        <Loading v-if="apiItemsLoading" fill top />
         <b-alert v-else-if="!hasItems && !hasFilters" variant="info" show>Please modify the search criteria.</b-alert>
         <b-alert v-else-if="!hasItems" variant="warning" show>No items found for the given filters.</b-alert>
         <template v-if="hasItems">
@@ -29,14 +29,14 @@
 
 <script>
 import Items from '../components/Items.vue';
-import { mapGetters, mapMutations, mapState } from "vuex";
+import { mapGetters } from "vuex";
 import Utils from '../utils';
-import sortCapabilitiesMixinGenerator from '../components/SortCapabilitiesMixin';
+import ApiItemsMixin from '../components/ApiItemsMixin';
+import SortCapabilitiesMixin from '../components/SortCapabilitiesMixin';
 import ItemFilter from '../components/ItemFilter.vue';
 import Loading from '../components/Loading.vue';
 
 const pageTitle = 'Search';
-const searchId = '__search__';
 
 export default {
   name: "Search",
@@ -47,7 +47,8 @@ export default {
     Map: () => import('../components/Map.vue')
   },
   mixins: [
-    sortCapabilitiesMixinGenerator(false)
+    ApiItemsMixin(true),
+    SortCapabilitiesMixin(false)
   ],
   props: {
     loadRoot: {
@@ -62,25 +63,13 @@ export default {
     };
   },
   computed: {
-    ...mapState(['apiItems', 'apiItemsLink', 'apiItemsPagination']),
-    ...mapGetters(["root", "searchLink", 'supportsSearch', 'fromBrowserPath', 'getApiItemsLoading']),
-    loading() {
-      return this.getApiItemsLoading(searchId);
-    },
+    ...mapGetters(["root", "searchLink", 'supportsSearch', 'fromBrowserPath']),
     itemCollection() {
       return {
         type: 'FeatureCollection',
         features: this.apiItems,
         links: []
       };
-    },
-    itemPages() {
-      let pages = Object.assign({}, this.apiItemsPagination);
-      // If first link is not available, add the items link as first link
-      if (!pages.first && this.data && this.apiItemsLink) {
-        pages.first = Utils.addFiltersToLink(this.apiItemsLink, this.filters);
-      }
-      return pages;
     },
     hasFilters() {
       return Utils.size(this.filters) > 0;
@@ -106,11 +95,10 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(['toggleApiItemsLoading']),
     async setFilters(filters, reset = false) {
       this.filters = filters;
       if (reset) {
-        this.$store.commit('resetApiItems');
+        this.resetApiItems();
       }
       else {
         await this.filterItems(filters);
@@ -118,29 +106,7 @@ export default {
     },
     showPage() {
       this.$store.commit('showPage', {title: pageTitle});
-      this.$store.commit('setApiItemsLink', this.searchLink);
-    },
-    async paginateItems(link) {
-      this.toggleApiItemsLoading(searchId);
-      try {
-        let response = await this.$store.dispatch('loadApiItems', {link, show: true, filters: this.filters});
-        this.handleResponse(response);
-      } catch (error) {
-        this.$root.$emit('error', error, 'Sorry, loading the list of STAC Items failed.');
-      } finally {
-        this.toggleApiItemsLoading(searchId);
-      }
-    },
-    async filterItems(filters) {
-      this.toggleApiItemsLoading(searchId);
-      try {
-        let response = await this.$store.dispatch('loadApiItems', {link: this.searchLink, show: true, filters});
-        this.handleResponse(response);
-      } catch(error) {
-        this.$root.$emit('error', error, 'Sorry, loading a filtered list of STAC Items failed.');
-      } finally {
-        this.toggleApiItemsLoading(searchId);
-      }
+      this.apiItemsLink = this.searchLink;
     },
     handleResponse(response) {
       if (response) {

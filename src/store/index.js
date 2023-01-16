@@ -26,10 +26,6 @@ function getStore(config) {
       itemdef: []
     },
 
-    apiItems: [],
-    apiItemsLink: null,
-    apiItemsPagination: {},
-
     queryables: null
   });
 
@@ -42,7 +38,6 @@ function getStore(config) {
     conformsTo: [],
 
     apiCollections: [],
-    apiItemsLoading: {},
     nextCollectionsLink: null
   });
 
@@ -56,19 +51,6 @@ function getStore(config) {
     }),
     getters: {
       loading: state => !state.url || !state.data || state.database[state.url] instanceof Loading,
-      getApiItemsLoading: state => data => {
-        let id = '';
-        if (data instanceof Loading) {
-          return true;
-        }
-        else if (data instanceof STAC) {
-          id = data.id;
-        }
-        else if (typeof data === 'string') {
-          id = data;
-        }
-        return state.apiItemsLoading[id] || false;
-      },
       error: state => state.database[state.url] instanceof Error ? state.database[state.url] : null,
       getStac: state => (source, returnErrorObject = false) => {
         if (source instanceof STAC) {
@@ -204,16 +186,6 @@ function getStore(config) {
         else {
           return 'client';
         }
-      },
-
-      items: state => {
-        if (state.apiItems.length > 0) {
-          return state.apiItems;
-        }
-        else if (state.data) {
-          return state.data.getStacLinksWithRel('item');
-        }
-        return [];
       },
       catalogs: state => {
         let catalogs = [];
@@ -508,44 +480,6 @@ function getStore(config) {
           state.conformsTo = classes;
         }
       },
-      setApiItemsLink(state, link) {
-        state.apiItemsLink = link;
-      },
-      toggleApiItemsLoading(state, collectionId = '') {
-        if (state.apiItemsLoading[collectionId]) {
-          Vue.delete(state.apiItemsLoading, collectionId);
-        }
-        else {
-          Vue.set(state.apiItemsLoading, collectionId, true);
-        }
-      },
-      setApiItems(state, { data, stac, show }) {
-        if (!Utils.isObject(data) || !Array.isArray(data.features)) {
-          return;
-        }
-        let apiItems = data.features.map(feature => processSTAC(state, feature));
-
-        if (show) {
-          state.apiItems = apiItems;
-        }
-
-        // Handle pagination links
-        let pageLinks = Utils.getLinksWithRels(data.links, stacPagination);
-        let pages = {};
-        for (let pageLink of pageLinks) {
-          let rel = pageLink.rel === 'previous' ? 'prev' : pageLink.rel;
-          pages[rel] = pageLink;
-        }
-
-        if (show) {
-          state.apiItemsPagination = pages;
-        }
-
-        if (stac instanceof STAC) {
-          // ToDo: Prev link only required when state.apiItems is not cached(?) -> cache apiItems?
-          stac.setApiData(apiItems, pages.next, pages.prev);
-        }
-      },
       addApiCollections(state, { data, stac, show }) {
         if (!Utils.isObject(data) || !Array.isArray(data.collections)) {
           return;
@@ -560,10 +494,6 @@ function getStore(config) {
         if (stac instanceof STAC) {
           stac.setApiData(collections, nextLink);
         }
-      },
-      resetApiItems(state) {
-        state.apiItems = [];
-        state.apiItemsPagination = {};
       },
       redirectLegacyUrl(state, path) {
         if (!path) {
@@ -762,77 +692,6 @@ function getStore(config) {
 
         if (loading.show) {
           cx.commit('showPage', { url });
-        }
-      },
-      async loadApiItems(cx, { link, stac, show, filters }) {
-        let collectionId = stac instanceof STAC ? stac.id : '';
-        cx.commit('toggleApiItemsLoading', collectionId);
-
-        try {
-          let baseUrl = cx.state.url;
-          if (stac instanceof STAC) {
-            link = stac.getApiItemsLink();
-            baseUrl = stac.getAbsoluteUrl();
-          }
-
-          if (!Utils.isObject(filters)) {
-            filters = {};
-          }
-          if (typeof filters.limit !== 'number') {
-            filters.limit = cx.state.itemsPerPage;
-          }
-
-          link = Utils.addFiltersToLink(link, filters);
-
-          let response = await stacRequest(cx, link);
-          if (!Utils.isObject(response.data) || !Array.isArray(response.data.features)) {
-            throw new BrowserError('The API response is not a valid list of STAC Items');
-          }
-          else {
-            response.data.features = response.data.features.map(item => {
-              try {
-                if (!Utils.isObject(item)) {
-                  return null;
-                }
-                let selfLink = Utils.getLinkWithRel(item.links, 'self');
-                let url;
-                if (selfLink?.href) {
-                  url = Utils.toAbsolute(selfLink.href, baseUrl);
-                }
-                else if (typeof item.id !== 'undefined') {
-                  let apiCollectionsLink = cx.getters.root?.getApiCollectionsLink();
-                  if (baseUrl) {
-                    url = Utils.toAbsolute(`items/${item.id}`, baseUrl);
-                  }
-                  else if (apiCollectionsLink) {
-                    url = Utils.toAbsolute(`${stac.id}/items/${item.id}`, apiCollectionsLink.href);
-                  }
-                  else if (cx.state.catalogUrl) {
-                    url = Utils.toAbsolute(`collections/${stac.id}/items/${item.id}`, cx.state.catalogUrl);
-                  }
-                  else {
-                    return null;
-                  }
-                }
-                else {
-                  return null;
-                }
-                return new STAC(item, url, cx.getters.toBrowserPath(url));
-              } catch (error) {
-                console.error(error);
-                return null;
-              }
-            }).filter(item => item instanceof STAC);
-            if (show) {
-              cx.commit('setApiItemsLink', link);
-            }
-            cx.commit('setApiItems', { data: response.data, stac, show });
-            cx.commit('toggleApiItemsLoading', collectionId);
-            return response;
-          }
-        } catch (error) {
-          cx.commit('toggleApiItemsLoading', collectionId);
-          throw error;
         }
       },
       async loadNextApiCollections(cx, { stac, show }) {

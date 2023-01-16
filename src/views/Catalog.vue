@@ -56,6 +56,7 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
+import ApiItemsMixin from '../components/ApiItemsMixin';
 import Catalogs from '../components/Catalogs.vue';
 import Description from '../components/Description.vue';
 import Items from '../components/Items.vue';
@@ -88,7 +89,10 @@ export default {
     ReadMore,
     Thumbnails: () => import('../components/Thumbnails.vue')
   },
-  mixins: [ShowAssetMixin],
+  mixins: [
+    ApiItemsMixin(false),
+    ShowAssetMixin
+  ],
   data() {
     return {
       filters: {},
@@ -121,10 +125,16 @@ export default {
     };
   },
   computed: {
-    ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination']),
-    ...mapGetters(['additionalLinks', 'catalogs', 'isCollection', 'items', 'hasMoreCollections', 'getApiItemsLoading']),
-    apiItemsLoading() {
-      return this.getApiItemsLoading(this.data);
+    ...mapState(['data', 'url']),
+    ...mapGetters(['additionalLinks', 'catalogs', 'isCollection', 'hasMoreCollections']),
+    items() {
+      if (this.apiItems.length > 0) {
+        return this.apiItems;
+      }
+      else if (!global && this.data instanceof STAC) {
+        return this.data.getStacLinksWithRel('item');
+      }
+      return [];
     },
     licenses() {
       if (this.isCollection && this.data.license) {
@@ -149,14 +159,6 @@ export default {
     hasItemAssets() {
       return Utils.size(this.data?.item_assets) > 0;
     },
-    itemPages() {
-      let pages = Object.assign({}, this.apiItemsPagination);
-      // If first link is not available, add the items link as first link
-      if (!pages.first && this.data && this.apiItemsLink && this.apiItemsLink.rel !== 'items') {
-        pages.first = Utils.addFiltersToLink(this.data.getApiItemsLink(), this.filters);
-      }
-      return pages;
-    },
     isApi() {
       return Boolean(this.apiItemsLink);
     },
@@ -176,24 +178,6 @@ export default {
   methods: {
     loadMoreCollections() {
       this.$store.dispatch('loadNextApiCollections', {show: true});
-    },
-    async paginateItems(link) {
-      try {
-        await this.$store.dispatch('loadApiItems', {link, show: true, filters: this.filters});
-      } catch (error) {
-        this.$root.$emit('error', error, SORRY_ITEM_LIST);
-      }
-    },
-    async filterItems(filters, reset) {
-      this.filters = filters;
-      if (reset) {
-        this.$store.commit('resetApiItems');
-      }
-      try {
-        await this.$store.dispatch('loadApiItems', {link: this.apiItemsLink, show: true, filters});
-      } catch (error) {
-        this.$root.$emit('error', error, reset ? SORRY_ITEM_LIST : "Sorry, can't load the filtered list of items.");
-      }
     },
     mapClicked(/*stac*/) {
       // todo, see search for an example
