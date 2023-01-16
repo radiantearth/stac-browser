@@ -46,7 +46,7 @@
     "loadMore": "Lade mehr...",
     "noMatches": "Keiner der Kataloge entspricht den Suchkriterien."
   },
-  "copy": "Copy",
+  "copy": "Kopieren",
   "default": "Standardeinstellung",
   "defaultWithValue": "Standardeinstellung ({value})",
   "deprecated": "Abgekündigt",
@@ -228,7 +228,7 @@
       "onlyUI": "Nur die Benutzeroberfläsche ist in dieser Sprache verfügbar!",
       "switch": "Ändern der Sprache"
     },
-    "locatedAt": "Die Datei mit den STAC-Metadaten befindet sich: unter:",
+    "locatedAt": "Die Datei mit den STAC-Metadaten befindet sich unter:",
     "share": {
       "email": "E-Mail",
       "label": "Teilen",
