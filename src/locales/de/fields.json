@@ -2,18 +2,12 @@
   "Internationalization / Localization": "Internationalisierung / Lokalisierung",
   "Current Language": "Aktive Sprache",
   "Available Languages": "Verfügbare Sprachen",
-  "About": "Über...",
   "Alternative representation": "Andere Varianten",
-  "Time of data": "Zeit der Daten",
   "n/a": "n.v.",
   "none": "keine",
   "Hashing algorithm:": "Hash-Code-Algorithmus:",
   "Until {0}": "Bis {0}",
   "{0} until present": "{0} bis jetzt",
-
-  "German": "Deutsch",
-  "English": "Englisch",
-  "English (US)": "Englisch (USA)",
 
   "8-bit integer": "8-Bit-Ganzzahl",
   "16-bit integer": "16-Bit-Ganzzahl",

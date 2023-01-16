@@ -7,7 +7,8 @@
     "start": "vue-cli-service serve",
     "build": "vue-cli-service build --report",
     "lint": "vue-cli-service lint",
-    "i18n:report": "vue-cli-service i18n:report --src \"./src/**/*.?(js|vue)\" --locales \"./src/locales/**/*.json\""
+    "i18n:report": "vue-cli-service i18n:report --src \"./src/**/*.?(js|vue)\" --locales \"./src/locales/**/*.json\"",
+    "i18n:fields": "node helpers/fields_locales.js"
   },
   "bugs": {
     "url": "https://github.com/radiantearth/stac-browser/issues"
@@ -32,7 +33,7 @@
   "dependencies": {
     "@apidevtools/json-schema-ref-parser": "^9.0.9",
     "@musement/iso-duration": "^1.0.0",
-    "@radiantearth/stac-fields": "1.0.0-beta.21",
+    "@radiantearth/stac-fields": "1.0.0-beta.22",
     "@radiantearth/stac-migrate": "~1.2.0",
     "axios": "^1.2.0",
     "bootstrap-vue": "^2.21.2",
