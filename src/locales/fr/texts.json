@@ -224,6 +224,8 @@
     "label": "Source",
     "language": {
       "label": "Langue: {currentLanguage}",
+      "onlyData": "Seules les données sont disponibles dans cette langue!",
+      "onlyUI": "Seule l'interface utilisateur est disponible dans cette langue!",
       "switch": "Changer de langue"
     },
     "locatedAt": "Le fichier de métadonnées STAC se trouve à l'adresse suivante :",
