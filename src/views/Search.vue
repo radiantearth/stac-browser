@@ -62,7 +62,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['apiItems', 'apiItemsLink', 'apiItemsPagination', 'apiItemsFilter']),
+    ...mapState(['apiItems', 'apiItemsLink', 'apiItemsPagination']),
     ...mapGetters(["root", "searchLink", 'supportsSearch', 'fromBrowserPath', 'getApiItemsLoading']),
     loading() {
       return this.getApiItemsLoading(searchId);
@@ -78,7 +78,7 @@ export default {
       let pages = Object.assign({}, this.apiItemsPagination);
       // If first link is not available, add the items link as first link
       if (!pages.first && this.data && this.apiItemsLink) {
-        pages.first = Utils.addFiltersToLink(this.apiItemsLink, this.apiItemsFilter);
+        pages.first = Utils.addFiltersToLink(this.apiItemsLink, this.filters);
       }
       return pages;
     },
@@ -108,12 +108,11 @@ export default {
   methods: {
     ...mapMutations(['toggleApiItemsLoading']),
     async setFilters(filters, reset = false) {
+      this.filters = filters;
       if (reset) {
-        this.filters = {};
         this.$store.commit('resetApiItems');
       }
       else {
-        this.filters = filters;
         await this.filterItems(filters);
       }
     },
@@ -124,7 +123,7 @@ export default {
     async paginateItems(link) {
       this.toggleApiItemsLoading(searchId);
       try {
-        let response = await this.$store.dispatch('loadApiItems', {link, show: true});
+        let response = await this.$store.dispatch('loadApiItems', {link, show: true, filters: this.filters});
         this.handleResponse(response);
       } catch (error) {
         this.$root.$emit('error', error, 'Sorry, loading the list of STAC Items failed.');

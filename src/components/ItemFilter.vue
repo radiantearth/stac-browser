@@ -226,48 +226,45 @@ export default {
     },
     onSubmit() {
       if (this.canSort && this.sortTerm && this.sortOrder) {
-        this.query.sortby = this.formatSort();
+        this.$set(this.query, 'sortby', this.formatSort());
       }
       this.$emit('input', this.query, false);
     },
     async onReset() {
       this.query = this.getDefaultValues();
-      this.$emit('input', this.query, true);
+      this.$emit('input', {}, true);
     },
     setLimit(limit) {
       limit = Number.parseInt(limit, 10);
       if (limit > this.maxItems) {
-        this.query.limit = this.maxItems;
+        limit = this.maxItems;
       }
-      else if (limit > 0) {
-        this.query.limit = limit;
+      else if (limit < 0) {
+        limit = null;
       }
-      else {
-        this.query.limit = null;
-      }
+      this.$set(this.query, 'limit', limit);
     },
     setBBox(bounds) {
+      let bbox = null;
       if (this.provideBBox) {
-        this.query.bbox = bounds;
+        bbox = bounds;
       }
-      else {
-        this.query.bbox = null;
-      }
+      this.$set(this.query, 'bbox', bbox);
     },
     setDateTime(datetime) {
       if (datetime.find(dt => dt instanceof Date)) {
         datetime = datetime.map(Utils.dateToUTC);
-        this.query.datetime = datetime;
       }
       else {
-        this.query.datetime = null;
+        datetime = null;
       }
+      this.$set(this.query, 'datetime', datetime);
     },
     setCollections(collections) {
-      this.query.collections = collections;
+      this.$set(this.query, 'collections', collections);
     },
     setIds(ids) {
-      this.query.ids = ids;
+      this.$set(this.query, 'ids', ids);
     },
     formatSort() {
       if (this.sortTerm && this.sortOrder) {
