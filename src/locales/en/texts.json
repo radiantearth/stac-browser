@@ -171,7 +171,9 @@
     "more": "Read more"
   },
   "search": {
+    "addCollections": "Press enter to add a collection",
     "addFilter": "Add filter",
+    "addItemIds": "Press enter to add an Item ID",
     "additionalFilters": "Additional filters",
     "buttons": {
       "filter": "Filter",

@@ -33,7 +33,6 @@ function getStore(config, router) {
 
     apiItems: [],
     apiItemsLink: null,
-    apiItemsFilter: {},
     apiItemsPagination: {},
 
     queryables: null
@@ -606,9 +605,6 @@ function getStore(config, router) {
           stac.setApiData(collections, nextLink);
         }
       },
-      setApiItemsFilter(state, filter) {
-        state.apiItemsFilter = filter;
-      },
       resetApiItems(state) {
         state.apiItems = [];
         state.apiItemsPagination = {};
@@ -851,7 +847,6 @@ function getStore(config, router) {
           if (typeof filters.limit !== 'number') {
             filters.limit = cx.state.itemsPerPage;
           }
-          cx.commit('setApiItemsFilter', filters);
 
           link = Utils.addFiltersToLink(link, filters);
 

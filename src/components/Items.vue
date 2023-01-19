@@ -13,8 +13,7 @@
       </b-button>
       <b-collapse id="itemFilter" v-model="filtersOpen">
         <ItemFilter
-          v-if="filtersOpen" :title="$t('items.filter')"
-          :stac="stac" :value="filters" @input="emitFilter"
+          v-if="filtersOpen" :stac="stac" :value="apiFilters" @input="emitFilter"
           :collectionOnly="true" v-bind="filterComponentProps"
         />
       </b-collapse>
@@ -97,7 +96,6 @@ export default {
   data() {
     return {
       shownItems: this.chunkSize,
-      filters: this.apiFilters,
       filtersOpen: false,
       sort: 0
     };

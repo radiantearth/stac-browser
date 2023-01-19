@@ -17,24 +17,28 @@
         </b-form-group>
 
         <b-form-group v-if="!collectionOnly" :label="$tc('stacCollection', collections.length)" label-for="collections">
-          <b-form-select
+          <multiselect
             v-if="collections.length > 0"
-            id="collections" :value="query.collections" @input="setCollections"
-            :options="collections" multiple
+            id="collections" :value="selectedCollections" @input="setCollections"
+            :options="collections" multiple track-by="value" label="text"
           />
-          <b-form-tags
+          <multiselect
             v-else
-            input-id="collections" :value="query.collections" @input="setCollections" separator=" ,;"
-            remove-on-delete add-on-change
+            id="collections" :value="selectedCollections" @input="setCollections"
+            multiple taggable :options="query.collections"
             :placeholder="$t('search.selectCollections')"
+            :tagPlaceholder="$t('search.addCollections')"
+            @tag="addCollection"
           />
         </b-form-group>
 
         <b-form-group v-if="!collectionOnly" :label="$t('search.itemIds')" label-for="ids">
-          <b-form-tags
-            input-id="ids" :value="query.ids" @input="setIds" separator=" ,;"
-            remove-on-delete add-on-change
+          <multiselect
+            id="ids" :value="query.ids" @input="setIds"
+            multiple taggable :options="query.ids"
             :placeholder="$t('search.selectItemIds')"
+            :tagPlaceholder="$t('search.addItemIds')"
+            @tag="addId"
           />
         </b-form-group>
 
@@ -61,7 +65,10 @@
         </div>
 
         <b-form-group v-if="canSort" :label="$t('sort.title')" label-for="sort" :description="$t('search.notFullySupported')">
-          <b-form-select id="sort" :value="sortTerm" :options="sortOptions" :placeholder="$t('default')" @input="sortFieldSet" />
+          <multiselect
+            id="sort" :value="sortTerm" :placeholder="$t('default')" @input="sortFieldSet"
+            :options="sortOptions" track-by="value" label="text"
+            />
           <SortButtons v-if="sortTerm" class="mt-1" :value="sortOrder" enforce @input="sortDirectionSet" />
         </b-form-group>
 
@@ -82,7 +89,8 @@
 </template>
 
 <script>
-import { BDropdown, BDropdownItem, BForm, BFormGroup, BFormInput, BFormCheckbox, BFormSelect, BFormTags } from 'bootstrap-vue';
+import { BDropdown, BDropdownItem, BForm, BFormGroup, BFormInput, BFormCheckbox, BFormSelect } from 'bootstrap-vue';
+import Multiselect from 'vue-multiselect';
 
 import { mapGetters, mapState } from "vuex";
 import DatePickerMixin from './DatePickerMixin';
@@ -99,11 +107,11 @@ export default {
     BFormInput,
     BFormCheckbox,
     BFormSelect,
-    BFormTags,
     QueryableInput: () => import('./QueryableInput.vue'),
     Loading,
     Map: () => import('./Map.vue'),
-    SortButtons: () => import('./SortButtons.vue')
+    SortButtons: () => import('./SortButtons.vue'),
+    Multiselect
   },
   mixins: [
     DatePickerMixin
@@ -145,7 +153,8 @@ export default {
       maxItems: 10000,
       provideBBox: false,
       query: this.getDefaultValues(),
-      loaded: false
+      loaded: false,
+      selectedCollections: []
     };
   },
   computed: {
@@ -234,48 +243,53 @@ export default {
     },
     onSubmit() {
       if (this.canSort && this.sortTerm && this.sortOrder) {
-        this.query.sortby = this.formatSort();
+        this.$set(this.query, 'sortby', this.formatSort());
       }
       this.$emit('input', this.query, false);
     },
     async onReset() {
       this.query = this.getDefaultValues();
-      this.$emit('input', this.query, true);
+      this.$emit('input', {}, true);
     },
     setLimit(limit) {
       limit = Number.parseInt(limit, 10);
       if (limit > this.maxItems) {
-        this.query.limit = this.maxItems;
+        limit = this.maxItems;
       }
-      else if (limit > 0) {
-        this.query.limit = limit;
+      else if (limit < 0) {
+        limit = null;
       }
-      else {
-        this.query.limit = null;
-      }
+      this.$set(this.query, 'limit', limit);
     },
     setBBox(bounds) {
+      let bbox = null;
       if (this.provideBBox) {
-        this.query.bbox = bounds;
+        bbox = bounds;
       }
-      else {
-        this.query.bbox = null;
-      }
+      this.$set(this.query, 'bbox', bbox);
     },
     setDateTime(datetime) {
       if (datetime.find(dt => dt instanceof Date)) {
         datetime = datetime.map(Utils.dateToUTC);
-        this.query.datetime = datetime;
       }
       else {
-        this.query.datetime = null;
+        datetime = null;
       }
+      this.$set(this.query, 'datetime', datetime);
+    },
+    addCollection(collection) {
+      this.selectedCollections.push(collection);
+      this.query.collections.push(collection.value);
     },
     setCollections(collections) {
-      this.query.collections = collections;
+      this.selectedCollections = collections;
+      this.$set(this.query, 'collections', collections.map(c => c.value));
+    },
+    addId(id) {
+      this.query.ids.push(id);
     },
     setIds(ids) {
-      this.query.ids = ids;
+      this.$set(this.query, 'ids', ids);
     },
     formatSort() {
       if (this.sortTerm && this.sortOrder) {
@@ -290,14 +304,62 @@ export default {
 };
 </script>
 
+<style src=""></style>
+
 <style lang="scss">
 @import '../theme/variables.scss';
 
+// Datepicker related style
 $default-color: map-get($theme-colors, "secondary");
 $primary-color: map-get($theme-colors, "primary");
 
 @import '~vue2-datepicker/scss/index.scss';
 
+// Multiselect related style
+@import '~vue-multiselect/dist/vue-multiselect.min.css';
+#stac-browser {
+  .multiselect__tags:focus-within {
+    border-color: #48cce1;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(24, 129, 145, 0.25);
+  }
+
+  .multiselect__select:before {
+    color: #495057;
+    border-color: #495057 transparent transparent;
+  }
+  
+  .multiselect__tags,
+  .multiselect__single {
+    border-color: #ced4da;
+    padding-left: 0.75rem;
+    font-size: 16px;
+  }
+
+  .multiselect__input,
+  .multiselect__single {
+    padding: 4px 0 3px 0;
+  }
+
+  .multiselect__tag,
+  .multiselect__tag-icon:hover,
+  .multiselect__option--highlight,
+  .multiselect__option--highlight:after {
+    background-color: map-get($theme-colors, "primary");
+  }
+
+  .multiselect__option--selected.multiselect__option--highlight,
+  .multiselect__option--selected.multiselect__option--highlight:after {
+    background-color: map-get($theme-colors, "secondary");
+  }
+
+  .multiselect__placeholder {
+    color: #999;
+    font-size: 16px;
+  }
+}
+
+// General item filter style
 .filter {
   position: relative;
 

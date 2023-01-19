@@ -44,7 +44,7 @@
       </b-col>
       <b-col class="items-container" v-if="hasItems">
         <Items
-          :stac="data" :items="items" :api="isApi" :apiFilters="apiItemsFilter"
+          :stac="data" :items="items" :api="isApi" :apiFilters="filters"
           :pagination="itemPages" :loading="apiItemsLoading"
           @paginate="paginateItems" @filterItems="filterItems"
         />
@@ -89,6 +89,7 @@ export default {
   mixins: [ShowAssetMixin],
   data() {
     return {
+      filters: {},
       ignoredMetadataFields: [
         // Catalog and Collection fields that are handled directly
         'stac_version',
@@ -118,7 +119,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination', 'apiItemsFilter']),
+    ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination']),
     ...mapGetters(['additionalLinks', 'catalogs', 'isCollection', 'items', 'hasMoreCollections', 'getApiItemsLoading']),
     apiItemsLoading() {
       return this.getApiItemsLoading(this.data);
@@ -150,7 +151,7 @@ export default {
       let pages = Object.assign({}, this.apiItemsPagination);
       // If first link is not available, add the items link as first link
       if (!pages.first && this.data && this.apiItemsLink && this.apiItemsLink.rel !== 'items') {
-        pages.first = Utils.addFiltersToLink(this.data.getApiItemsLink(), this.apiItemsFilter);
+        pages.first = Utils.addFiltersToLink(this.data.getApiItemsLink(), this.filters);
       }
       return pages;
     },
@@ -176,12 +177,13 @@ export default {
     },
     async paginateItems(link) {
       try {
-        await this.$store.dispatch('loadApiItems', {link, show: true});
+        await this.$store.dispatch('loadApiItems', {link, show: true, filters: this.filters});
       } catch (error) {
         this.$root.$emit('error', error, this.$t('errors.loadItems'));
       }
     },
     async filterItems(filters, reset) {
+      this.filters = filters;
       if (reset) {
         this.$store.commit('resetApiItems');
       }
