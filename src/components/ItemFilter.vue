@@ -65,7 +65,7 @@
           <multiselect
             id="sort" :value="sortTerm" placeholder="Default" @input="sortFieldSet"
             :options="sortOptions" track-by="value" label="text"
-            />
+          />
           <SortButtons v-if="sortTerm" class="mt-1" :value="sortOrder" enforce @input="sortDirectionSet" />
         </b-form-group>
 
@@ -86,7 +86,7 @@
 </template>
 
 <script>
-import { BDropdown, BDropdownItem, BForm, BFormGroup, BFormInput, BFormCheckbox, BFormSelect } from 'bootstrap-vue';
+import { BDropdown, BDropdownItem, BForm, BFormGroup, BFormInput, BFormCheckbox } from 'bootstrap-vue';
 import Multiselect from 'vue-multiselect';
 
 import { mapGetters, mapState } from "vuex";
@@ -102,7 +102,6 @@ export default {
     BFormGroup,
     BFormInput,
     BFormCheckbox,
-    BFormSelect,
     DatePicker: () => import('vue2-datepicker'),
     QueryableInput: () => import('./QueryableInput.vue'),
     Loading,
