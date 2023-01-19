@@ -139,6 +139,13 @@
     "general": "Allgemeines",
     "title": "Metadaten"
   },
+  "multiselect": {
+    "placeholder": "Option wählen",
+    "selectLabel": "Enter zum Selektieren",
+    "selectedLabel": "Selektiert",
+    "deselectLabel": "Enter zum Entfernen",
+    "andMore": "und {count} weitere"
+  },
   "open": "Öffnen",
   "pagination": {
     "first": "« Anfang",

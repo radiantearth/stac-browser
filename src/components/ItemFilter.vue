@@ -20,6 +20,12 @@
           <multiselect
             v-if="collections.length > 0"
             id="collections" :value="selectedCollections" @input="setCollections"
+            :placeholder="$t('multiselect.placeholder')"
+            :tagPlaceholder="$t('search.addCollections')"
+            :selectLabel="$t('multiselect.selectLabel')"
+            :selectedLabel="$t('multiselect.selectedLabel')"
+            :deselectLabel="$t('multiselect.deselectLabel')"
+            :limitText="limitText"
             :options="collections" multiple track-by="value" label="text"
           />
           <multiselect
@@ -28,6 +34,10 @@
             multiple taggable :options="query.collections"
             :placeholder="$t('search.selectCollections')"
             :tagPlaceholder="$t('search.addCollections')"
+            :selectLabel="$t('multiselect.selectLabel')"
+            :selectedLabel="$t('multiselect.selectedLabel')"
+            :deselectLabel="$t('multiselect.deselectLabel')"
+            :limitText="limitText"
             @tag="addCollection"
           />
         </b-form-group>
@@ -66,8 +76,12 @@
 
         <b-form-group v-if="canSort" :label="$t('sort.title')" label-for="sort" :description="$t('search.notFullySupported')">
           <multiselect
-            id="sort" :value="sortTerm" :placeholder="$t('default')" @input="sortFieldSet"
+            id="sort" :value="sortTerm" @input="sortFieldSet"
             :options="sortOptions" track-by="value" label="text"
+            :placeholder="$t('default')"
+            :selectLabel="$t('multiselect.selectLabel')"
+            :selectedLabel="$t('multiselect.selectedLabel')"
+            :deselectLabel="$t('multiselect.deselectLabel')"
           />
           <SortButtons v-if="sortTerm" class="mt-1" :value="sortOrder" enforce @input="sortDirectionSet" />
         </b-form-group>
@@ -213,6 +227,9 @@ export default {
     Promise.all(promises).finally(() => this.loaded = true);
   },
   methods: {
+    limitText(count) {
+      return this.$t("multiselect.andMore", {count});
+    },
     sortFieldSet(value) {
       this.sortTerm = value;
     },
