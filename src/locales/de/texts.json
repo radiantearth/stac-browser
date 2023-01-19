@@ -171,8 +171,10 @@
     "more": "Zeige mehr"
   },
   "search": {
+    "addCollections": "Hinzufügen durch Enter",
     "addFilter": "Filter hinzufügen",
     "additionalFilters": "Weitere Filter",
+    "addItemIds": "ID hinzufügen durch Enter",
     "buttons": {
       "filter": "Filtern",
       "reset": "Zurücksetzen"
