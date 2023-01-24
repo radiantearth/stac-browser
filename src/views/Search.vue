@@ -1,11 +1,11 @@
 <template>
   <div class="search d-flex flex-column">
-    <Loading v-if="!root" stretch />
-    <b-alert v-else-if="!supportsSearch" variant="danger" show>Item Search is not supported by the API.</b-alert>
+    <Loading v-if="!parent" stretch />
+    <b-alert v-else-if="!searchLink" variant="danger" show>Item Search is not supported by the API.</b-alert>
     <b-row v-else>
       <b-col class="left">
         <ItemFilter
-          :stac="root" title="" :value="filters" v-bind="filterComponentProps"
+          :stac="parent" title="" :value="filters" v-bind="filterComponentProps"
           @input="setFilters"
         />
       </b-col>
@@ -15,10 +15,10 @@
         <b-alert v-else-if="!hasItems" variant="warning" show>No items found for the given filters.</b-alert>
         <template v-if="hasItems">
           <div id="search-map">
-            <Map :stac="root" :stacLayerData="itemCollection" scrollWheelZoom popover />
+            <Map :stac="parent" :stacLayerData="itemCollection" scrollWheelZoom popover />
           </div>
           <Items
-            :stac="root" :items="apiItems" :api="true" :allowFilter="false"
+            :stac="parent" :items="apiItems" :api="true" :allowFilter="false"
             :pagination="itemPages" @paginate="paginateItems"
           />
         </template>
@@ -34,6 +34,7 @@ import Utils from '../utils';
 import sortCapabilitiesMixinGenerator from '../components/SortCapabilitiesMixin';
 import ItemFilter from '../components/ItemFilter.vue';
 import Loading from '../components/Loading.vue';
+import STAC from '../models/stac';
 
 const pageTitle = 'Search';
 const searchId = '__search__';
@@ -50,22 +51,26 @@ export default {
     sortCapabilitiesMixinGenerator(false)
   ],
   props: {
-    loadRoot: {
+    loadParent: {
       type: String,
       default: null
     }
   },
   data() {
     return {
+      parent: null,
       filters: {},
       selectedItem: null
     };
   },
   computed: {
     ...mapState(['apiItems', 'apiItemsLink', 'apiItemsPagination']),
-    ...mapGetters(["root", "searchLink", 'supportsSearch', 'fromBrowserPath', 'getApiItemsLoading']),
+    ...mapGetters(["getStac", "root", 'fromBrowserPath', 'getApiItemsLoading']),
     loading() {
       return this.getApiItemsLoading(searchId);
+    },
+    searchLink() {
+      return this.parent instanceof STAC && this.parent.getSearchLink();
     },
     itemCollection() {
       return {
@@ -90,19 +95,29 @@ export default {
     }
   },
   watch:{
-    supportsSearch: {
+    searchLink: {
       immediate: true,
       handler() {
-        if (this.supportsSearch) {
+        if (this.searchLink) {
           this.showPage();
         }
       }
     }
   },
-  created() {
-    if (this.loadRoot && !this.root) {
-      let catalogUrl = this.fromBrowserPath(this.loadRoot);
-      this.$store.commit("config", { catalogUrl });
+  async created() {
+    if (this.loadParent) {
+      let url = this.fromBrowserPath(this.loadParent);
+      this.parent = this.getStac(url);
+      if (!this.parent) {
+        await this.$store.dispatch('load', { url });
+        if (!this.root) {
+          this.$store.commit("config", { catalogUrl: url });
+        }
+        this.parent = this.getStac(url);
+      }
+    }
+    else {
+      this.parent = this.root;
     }
   },
   methods: {

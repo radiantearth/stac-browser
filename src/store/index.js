@@ -169,19 +169,6 @@ function getStore(config) {
 
         return null;
       },
-      searchLink: (state, getters) => {
-        let links = [];
-        if (getters.root) {
-          links = getters.root.getStacLinksWithRel('search');
-        }
-        else if (state.data instanceof STAC) {
-          links = state.data.getStacLinksWithRel('search');
-        }
-        // ToDo: Currently, only GET search requests are supported #183
-        return links.find(link => link.method !== 'POST');
-      },
-
-      supportsSearch: (state, getters) => Boolean(getters.searchLink),
       supportsConformance: state => classes => {
         let classRegexp = classes
           .map(c => c.replaceAll('*', '[^/]+').replace(/\/?#/, '/?#'))
