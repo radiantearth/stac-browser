@@ -28,7 +28,7 @@ function getRoutes(config) {
       component: () => import("../views/Search.vue"),
       props: route => {
         return {
-          loadRoot: `/external/${route.params.pathMatch}`
+          loadParent: `/external/${route.params.pathMatch}`
         };
       }
     });

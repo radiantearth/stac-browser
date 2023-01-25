@@ -115,6 +115,11 @@ class STAC {
     return catalogs.concat(links);
   }
 
+  getSearchLink() {
+    // ToDo: Currently, only GET search requests are supported #183
+    return this.getStacLinksWithRel('search').find(link => link.method !== 'POST');
+  }
+
   getApiCollectionsLink() {
     return this.getStacLinkWithRel('data');
   }
