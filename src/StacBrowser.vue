@@ -221,10 +221,7 @@ export default {
         this.$store.commit("queryParameters", params);
       }
       if (Utils.size(params.private) > 0) {
-        this.$router.replace({
-          ...route,
-          query
-        });
+        this.$router.replace({ query });
       }
 
     },
