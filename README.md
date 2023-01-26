@@ -68,6 +68,10 @@ This allows or disallows loading and browsing external STAC data.
 External STAC data is any data that is not a children of the given `catalogUrl`.
 Must be set to `true` if a `catalogUrl` is not given as otherwise you won't be able to browse anything.
 
+### allowedDomains
+
+You can list additional domains (e.g. `example.com`) that private data is sent to, e.g. authentication data.
+
 ### stacLint
 
 ***experimental***

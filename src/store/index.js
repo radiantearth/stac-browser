@@ -250,7 +250,7 @@ function getStore(config) {
           relative = absolute.relativeTo(state.catalogUrl);
         }
 
-        if (typeof relative === 'undefined' || getters.isExternalUrl(absolute)) {
+        if (typeof relative === 'undefined' || getters.isExternalUrl(absolute, false)) {
           if (!state.allowExternalAccess) {
             return absolute.toString();
           }
@@ -310,12 +310,15 @@ function getStore(config) {
         }
         return absoluteUrl;
       },
-      isExternalUrl: state => absoluteUrl => {
+      isExternalUrl: state => (absoluteUrl, whitelist = true) => {
         if (!state.catalogUrl) {
           return false;
         }
         if (!(absoluteUrl instanceof URI)) {
           absoluteUrl = new URI(absoluteUrl);
+        }
+        if (whitelist && Array.isArray(state.allowedDomains) && state.allowedDomains.includes(absoluteUrl.domain())) {
+          return false;
         }
         let relative = absoluteUrl.relativeTo(state.catalogUrl);
         if (relative.equals(absoluteUrl)) {
