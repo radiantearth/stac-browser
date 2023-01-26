@@ -316,6 +316,12 @@ docker build -t stac-browser:v1 --build-arg catalogURL=https://planetarycomputer
 
 If more arguments need to be passed to `npm run build`, you can add them to the Dockerfile as needed.
 
+To run the container:
+
+```
+docker run -p 8080:8080 stac-browser:v1
+```
+
 ## Contributing
 
 STAC Browser uses [Vue](https://vuejs.org/).
