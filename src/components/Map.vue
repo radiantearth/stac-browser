@@ -3,14 +3,14 @@
     <l-map class="map" v-if="show" :class="stac.type" @ready="init" :options="mapOptions">
       <LControlFullscreen />
       <LControlLayers v-if="showLayerControl" position="bottomleft" ref="layerControl" />
+      <template v-if="baseMaps.length > 0">
+        <component v-for="baseMap in baseMaps" ref="basemaps" :key="baseMap.name" :is="baseMap.component" v-bind="baseMap" :layers="baseMap.name" layerType="base" />
+      </template>
+      <LTileLayer v-else url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" ref="basemaps" :options="osmOptions" name="OpenStreetMap" layerType="base" />
       <LTileLayer
         v-for="xyz of xyzLinks" ref="overlays" :key="xyz.url" layerType="overlay"
         :name="xyz.name" :url="xyz.url" :subdomains="xyz.subdomains" :options="xyz.options" 
       />
-      <template v-if="baseMaps.length > 0">
-        <component v-for="baseMap in baseMaps" :key="baseMap.name" :is="baseMap.component" v-bind="baseMap" :layers="baseMap.name" layerType="base" />
-      </template>
-      <LTileLayer v-else url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" :options="osmOptions" name="OpenStreetMap" layerType="base" />
       <LGeoJson v-if="geojson" ref="geojson" :geojson="geojson" :options="{onEachFeature: showPopup}" :optionsStyle="{color: secondaryColor, weight: secondaryWeight}" />
     </l-map>
     <b-popover
@@ -220,8 +220,10 @@ export default {
     },
     updateLayerControl() {
       if (this.showLayerControl) {
-        this.$refs.basemaps.forEach(layer => this.$refs.layerControl.addLayer(layer));
-        this.$refs.overlays.forEach(layer => this.$refs.layerControl.addLayer(layer));
+        let basemaps = Array.isArray(this.$refs.basemaps) ? this.$refs.basemaps : [];
+        basemaps.forEach(layer => this.$refs.layerControl.addLayer(layer));
+        let overlays = Array.isArray(this.$refs.overlays) ? this.$refs.overlays : [];
+        overlays.forEach(layer => this.$refs.layerControl.addLayer(layer));
       }
     },
     viewChanged(event) {
