@@ -2,10 +2,15 @@
   <div class="map-container">
     <l-map class="map" v-if="show" :class="stac.type" @ready="init" :options="mapOptions">
       <LControlFullscreen />
+      <LControlLayers v-if="showLayerControl" position="bottomleft" ref="layerControl" />
+      <LTileLayer
+        v-for="xyz of xyzLinks" ref="overlays" :key="xyz.url" layerType="overlay"
+        :name="xyz.name" :url="xyz.url" :subdomains="xyz.subdomains" :options="xyz.options" 
+      />
       <template v-if="baseMaps.length > 0">
-        <component v-for="baseMap in baseMaps" :key="baseMap.name" :is="baseMap.component" v-bind="baseMap" :layers="baseMap.name" layer-type="base" />
+        <component v-for="baseMap in baseMaps" :key="baseMap.name" :is="baseMap.component" v-bind="baseMap" :layers="baseMap.name" layerType="base" />
       </template>
-      <LTileLayer v-else url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" :options="osmOptions" />
+      <LTileLayer v-else url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" :options="osmOptions" name="OpenStreetMap" layerType="base" />
       <LGeoJson v-if="geojson" ref="geojson" :geojson="geojson" :options="{onEachFeature: showPopup}" :optionsStyle="{color: secondaryColor, weight: secondaryWeight}" />
     </l-map>
     <b-popover
@@ -29,7 +34,7 @@
 <script>
 import stacLayer from 'stac-layer';
 import { CRS } from "leaflet";
-import { LMap, LTileLayer, LWMSTileLayer, LGeoJson } from 'vue2-leaflet';
+import { LMap, LTileLayer, LWMSTileLayer, LGeoJson, LControlLayers } from 'vue2-leaflet';
 import LControlFullscreen from 'vue2-leaflet-fullscreen';
 import Utils, { geojsonMediaType } from '../utils';
 import './map/leaflet-areaselect';
@@ -70,6 +75,7 @@ export default {
     BPopover,
     Item: () => import('../components/Item.vue'),
     LControlFullscreen,
+    LControlLayers,
     LGeoJson,
     LMap,
     LTileLayer,
@@ -143,6 +149,26 @@ export default {
             }, BASEMAPS[target]);
         }
       }).filter(map => !!map);
+    },
+    showLayerControl() {
+      return this.xyzLinks.length > 0;
+    },
+    xyzLinks() {
+      if (!(this.stac instanceof STAC)) {
+        return [];
+      }
+      let links = this.stac.getLinksWithRels('xyz');
+      if (links.length === 0) {
+        return [];
+      }
+      return links.map(link => {
+        return {
+          url: link.href,
+          name: link.title,
+          subdomains: link.servers,
+          options: {}
+        };
+      });
     }
   },
   watch: {
@@ -153,6 +179,9 @@ export default {
       if (newVal) {
         this.$nextTick(() => this.geojsonToFront());
       }
+    },
+    showLayerControl() {
+      this.updateLayerControl();
     }
   },
   created() {
@@ -162,7 +191,10 @@ export default {
   mounted() {
     // Solves https://github.com/radiantearth/stac-browser/issues/95 by showing the map
     // only after the next tick so that the page was fully rendered once before we start adding the map
-    this.$nextTick(() => this.show = true);
+    this.$nextTick(() => {
+      this.show = true;
+      this.updateLayerControl();
+    });
   },
   beforeDestroy() {
     this.show = false;
@@ -184,6 +216,12 @@ export default {
 
       if (this.selectBounds) {
         this.addBoundsSelector();
+      }
+    },
+    updateLayerControl() {
+      if (this.showLayerControl) {
+        this.$refs.basemaps.forEach(layer => this.$refs.layerControl.addLayer(layer));
+        this.$refs.overlays.forEach(layer => this.$refs.layerControl.addLayer(layer));
       }
     },
     viewChanged(event) {
