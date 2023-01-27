@@ -20,7 +20,7 @@
           <b-button variant="outline-primary" size="sm" v-b-toggle.sidebar :title="$t('browse')">
             <b-icon-book /> <span class="button-label prio">{{ $t('browse') }}</span>
           </b-button>
-          <b-button v-if="supportsSearch && !isSearchPage()" variant="outline-primary" size="sm" :to="searchBrowserLink" :title="$t('search.title')">
+          <b-button v-if="searchBrowserLink" variant="outline-primary" size="sm" :to="searchBrowserLink" :title="$t('search.title')" :pressed="isSearchPage()">
             <b-icon-search /> <span class="button-label prio">{{ $t('search.title') }}</span>
           </b-button>
           <b-button v-if="authConfig" variant="outline-primary" size="sm" @click="auth" :title="$t('authentication.button.title')">
@@ -58,7 +58,7 @@ export default {
   },
   computed: {
     ...mapState(['allowSelectCatalog', 'authConfig', 'authData', 'catalogUrl', 'data', 'url', 'title']),
-    ...mapGetters(['root', 'parentLink', 'collectionLink', 'stacVersion', 'supportsSearch', 'toBrowserPath']),
+    ...mapGetters(['root', 'parentLink', 'collectionLink', 'stacVersion', 'toBrowserPath']),
     collectionLinkTitle() {
       if (Utils.hasText(this.collectionLink.title)) {
         return this.$t('goToCollection.descriptionWithTitle', this.collectionLink);
@@ -85,18 +85,26 @@ export default {
       return null;
     },
     searchBrowserLink() {
-      if (!this.allowSelectCatalog) {
-        return '/search';
+      let rootLink;
+      let dataLink;
+      if (this.root) {
+        rootLink = this.root.getSearchLink();
       }
-      else if (this.supportsSearch && this.root) {
-        return `/search${this.root.getBrowserPath()}`;
+      if (this.data !== this.root && this.data instanceof STAC) {
+        dataLink = this.data.getSearchLink();
       }
-      else if (this.supportsSearch && this.url) {
-        return `/search${this.toBrowserPath(this.url)}`;
+      if (dataLink) {
+        return `/search${this.data.getBrowserPath()}`;
       }
-      else {
-        return null;
+      else if (rootLink) {
+        if (!this.allowSelectCatalog) {
+          return '/search';
+        }
+        else {
+          return `/search${this.root.getBrowserPath()}`;
+        }
       }
+      return null;
     },
     containerLink() {
       // Check two cases where this page is the root...

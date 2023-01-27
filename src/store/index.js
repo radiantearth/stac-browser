@@ -177,19 +177,6 @@ function getStore(config, router) {
 
         return null;
       },
-      searchLink: (state, getters) => {
-        let links = [];
-        if (getters.root) {
-          links = getters.root.getStacLinksWithRel('search');
-        }
-        else if (state.data instanceof STAC) {
-          links = state.data.getStacLinksWithRel('search');
-        }
-        // ToDo: Currently, only GET search requests are supported #183
-        return links.find(link => link.method !== 'POST');
-      },
-
-      supportsSearch: (state, getters) => Boolean(getters.searchLink),
       supportsConformance: state => classes => {
         let classRegexp = classes
           .map(c => c.replaceAll('*', '[^/]+').replace(/\/?#/, '/?#'))
@@ -271,7 +258,7 @@ function getStore(config, router) {
           relative = absolute.relativeTo(state.catalogUrl);
         }
 
-        if (typeof relative === 'undefined' || getters.isExternalUrl(absolute)) {
+        if (typeof relative === 'undefined' || getters.isExternalUrl(absolute, false)) {
           if (!state.allowExternalAccess) {
             return absolute.toString();
           }
@@ -331,12 +318,15 @@ function getStore(config, router) {
         }
         return absoluteUrl;
       },
-      isExternalUrl: state => absoluteUrl => {
+      isExternalUrl: state => (absoluteUrl, whitelist = true) => {
         if (!state.catalogUrl) {
           return false;
         }
         if (!(absoluteUrl instanceof URI)) {
           absoluteUrl = new URI(absoluteUrl);
+        }
+        if (whitelist && Array.isArray(state.allowedDomains) && state.allowedDomains.includes(absoluteUrl.domain())) {
+          return false;
         }
         let relative = absoluteUrl.relativeTo(state.catalogUrl);
         if (relative.equals(absoluteUrl)) {

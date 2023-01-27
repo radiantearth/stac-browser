@@ -68,6 +68,10 @@ This allows or disallows loading and browsing external STAC data.
 External STAC data is any data that is not a children of the given `catalogUrl`.
 Must be set to `true` if a `catalogUrl` is not given as otherwise you won't be able to browse anything.
 
+### allowedDomains
+
+You can list additional domains (e.g. `example.com`) that private data is sent to, e.g. authentication data.
+
 ### detectLocaleFromBrowser
 
 If set to `true`, tries to detect the preferred language of the user from the Browser.
@@ -342,6 +346,12 @@ docker build -t stac-browser:v1 --build-arg catalogURL=https://planetarycomputer
 ```
 
 If more arguments need to be passed to `npm run build`, you can add them to the Dockerfile as needed.
+
+To run the container:
+
+```
+docker run -p 8080:8080 stac-browser:v1
+```
 
 ## Contributing
 

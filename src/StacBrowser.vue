@@ -297,10 +297,7 @@ export default {
         this.switchLocale(params.state.language);
       }
       if (Utils.size(params.private) > 0) {
-        this.$router.replace({
-          ...route,
-          query
-        });
+        this.$router.replace({ query });
       }
 
     },
