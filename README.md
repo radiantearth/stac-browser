@@ -55,7 +55,10 @@ All the following options can be used as explained in the chapter "Running", eit
 
 ### catalogUrl
 
-The URL of the catalog to show by default. If you don't point to a specific file make sure to append a `/` at the end of the URL!
+The URL of the catalog to show by default.
+
+If you don't point to a specific file make sure to append a `/` at the end of the URL as the trailing slash is significant. Without it, the last path component is considered to be a "file" name to be removed to get at the "directory" that is used as the base for resolving relative URLs. You should also make sure that your STAC files are following this rule as otherwise you may still run into issues with STAC Browser.
+
 If `catalogUrl` is empty or set to `null` STAC Browser switches to a mode where it defaults to a screen where you can either insert a catalog URL or select a catalog from [stacindex.org](https://stacindex.org).
 
 ### catalogTitle
