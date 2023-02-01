@@ -25,7 +25,7 @@
             multiple taggable :options="query.collections"
             placeholder="List one or multiple collections..."
             tagPlaceholder="Press enter to add a collection"
-            @tag="addId"
+            @tag="addCollection"
           />
         </b-form-group>
 
