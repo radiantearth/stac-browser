@@ -4,7 +4,11 @@
       <LControlFullscreen />
       <LControlLayers v-if="showLayerControl" position="bottomleft" ref="layerControl" />
       <template v-if="baseMaps.length > 0">
-        <component v-for="baseMap in baseMaps" ref="basemaps" :key="baseMap.name" :is="baseMap.component" v-bind="baseMap" :layers="baseMap.name" layerType="base" />
+        <component
+          v-for="baseMap in baseMaps"
+          ref="basemaps" :key="baseMap.name" :is="baseMap.component"
+          v-bind="baseMap" :layers="baseMap.name" layerType="base"
+        />
       </template>
       <LTileLayer v-else url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" ref="basemaps" :options="osmOptions" name="OpenStreetMap" layerType="base" />
       <LTileLayer
