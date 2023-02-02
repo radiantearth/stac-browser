@@ -50,7 +50,7 @@ import Utils from './utils';
 import URI from 'urijs';
 
 import I18N from '@radiantearth/stac-fields/I18N';
-import { translateFields } from './i18n';
+import { translateFields, API_LANGUAGE_CONFORMANCE } from './i18n';
 import { getBest, prepareSupported } from 'locale-id';
 
 Vue.use(Clipboard);
@@ -117,14 +117,14 @@ export default {
     };
   },
   computed: {
-    ...mapState(['allowSelectCatalog', 'data', 'dataLanguage', 'doAuth', 'globalError', 'stateQueryParameters', 'title', 'uiLanguage']),
+    ...mapState(['allowSelectCatalog', 'data', 'dataLanguage', 'doAuth', 'globalError', 'stateQueryParameters', 'title', 'uiLanguage', 'url']),
     ...mapState({
       catalogUrlFromVueX: 'catalogUrl',
       detectLocaleFromBrowserFromVueX: 'detectLocaleFromBrowser',
       fallbackLocaleFromVueX: 'fallbackLocale',
       supportedLocalesFromVueX: 'supportedLocales'
     }),
-    ...mapGetters(['displayCatalogTitle', 'fromBrowserPath', 'isExternalUrl', 'toBrowserPath']),
+    ...mapGetters(['displayCatalogTitle', 'fromBrowserPath', 'isExternalUrl', 'supportsConformance', 'toBrowserPath']),
     browserVersion() {
       if (typeof STAC_BROWSER_VERSION !== 'undefined') {
         return STAC_BROWSER_VERSION;
@@ -175,6 +175,15 @@ export default {
             this.$router.push(this.toBrowserPath(link.href));
             this.$store.commit('state', state);
           }
+          else if (this.supportsConformance(API_LANGUAGE_CONFORMANCE)) {
+            // this.url gets reset with resetCatalog so store the url for use in load
+            let url = this.url;
+            // Todo: Resetting the catalogs is not ideal. 
+            // A better way would be to combine the language code and URL as the index in the browser database
+            // This needs a database refactor though: https://github.com/radiantearth/stac-browser/issues/231
+            this.$store.commit('resetCatalog', true);
+            await this.$store.dispatch("load", { url, loadApi: true, show: true });
+          }
         }
       }
     },
@@ -223,6 +232,7 @@ export default {
           const best = getBest(supported, l, null, true);
           if (best) {
             locale = best;
+            break;
           }
         }
         this.switchLocale(locale);

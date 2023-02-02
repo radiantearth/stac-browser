@@ -182,7 +182,7 @@ function getStore(config, router) {
           .map(c => c.replaceAll('*', '[^/]+').replace(/\/?#/, '/?#'))
           .join('|');
         let regexp = new RegExp('^(' + classRegexp + ')$');
-        return !!state.conformsTo.find(uri => uri.match(regexp));
+        return Boolean(state.conformsTo.find(uri => uri.match(regexp)));
       },
       supportsExtension: state => schemaUri => {
         let extensions = [];

@@ -13,7 +13,7 @@ export class Loading {
 export async function stacRequest(cx, link) {
   let opts;
   let headers = {
-    'Accept-Language': cx.acceptedLanguages
+    'Accept-Language': cx.getters.acceptedLanguages
   };
   Object.assign(headers, cx.state.requestHeaders);
   if (Utils.isObject(link)) {

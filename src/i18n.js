@@ -5,6 +5,8 @@ import {default as Fields} from '@radiantearth/stac-fields/I18N';
 
 Vue.use(VueI18n);
 
+export const API_LANGUAGE_CONFORMANCE = ['https://api.stacspec.org/v1.*/language'];
+
 function loadLocaleMessages () {
   const messages = {};
   const languages = {};
