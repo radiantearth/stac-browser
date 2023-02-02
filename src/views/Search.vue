@@ -64,8 +64,8 @@ export default {
     };
   },
   computed: {
-    ...mapState(['apiItems', 'apiItemsLink', 'apiItemsPagination']),
-    ...mapGetters(["getStac", "root", 'fromBrowserPath', 'getApiItemsLoading']),
+    ...mapState(['apiItems', 'apiItemsLink', 'apiItemsPagination', 'catalogUrl']),
+    ...mapGetters(['getStac', 'root', 'fromBrowserPath', 'getApiItemsLoading']),
     loading() {
       return this.getApiItemsLoading(searchId);
     },
@@ -105,19 +105,20 @@ export default {
     }
   },
   async created() {
+    let url = this.catalogUrl;
     if (this.loadParent) {
-      let url = this.fromBrowserPath(this.loadParent);
+      url = this.fromBrowserPath(this.loadParent);
       this.parent = this.getStac(url);
-      if (!this.parent) {
-        await this.$store.dispatch('load', { url });
-        if (!this.root) {
-          this.$store.commit("config", { catalogUrl: url });
-        }
-        this.parent = this.getStac(url);
-      }
     }
     else {
       this.parent = this.root;
+    }
+    if (!this.parent) {
+      await this.$store.dispatch('load', { url });
+      if (!this.root) {
+        this.$store.commit("config", { catalogUrl: url });
+      }
+      this.parent = this.getStac(url);
     }
   },
   methods: {
