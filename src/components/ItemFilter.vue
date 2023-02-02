@@ -295,7 +295,7 @@ export default {
     },
     addCollection(collection) {
       this.selectedCollections.push(collection);
-      this.query.collections.push(collection.value);
+      this.query.collections.push(collection);
     },
     setCollections(collections) {
       this.selectedCollections = collections;
