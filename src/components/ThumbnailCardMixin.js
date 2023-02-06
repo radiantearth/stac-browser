@@ -7,6 +7,11 @@ export default {
       default: true
     }
   },
+  data() {
+    return {
+      thumbnailError: false
+    };
+  },
   computed: {
     ...mapState(['cardViewMode', 'crossOriginMedia']),
     isList() {
@@ -25,10 +30,11 @@ export default {
             [height, width] = t['proj:shape'];
           }
           return {
-            src: t.href,
+            src: this.thumbnailError ? '/img.svg' : t.href,
             alt: t.title,
             crossorigin: this.crossOriginMedia,
             right: this.isList,
+            blankSrc: '/img.svg',
             blankColor: "rgba(0, 0, 0, 0.125)",
             width,
             height
@@ -36,6 +42,11 @@ export default {
         }
       }
       return null;
+    }
+  },
+  methods: {
+    handleImgError() {
+      this.thumbnailError = true;
     }
   }
 };
