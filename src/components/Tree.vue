@@ -31,7 +31,7 @@
         </ul>
         <template v-else>
           <Tree v-for="(child, i) in shownChilds" :key="i" :item="child" :parent="stac" :path="path" />
-          <b-button class="show-more" v-if="hasMore" @click="showMore" variant="light" v-b-visible.200="showMore">Show more...</b-button>
+          <b-button class="show-more" v-if="hasMore" @click="showMore" variant="light" v-b-visible.300="showMore">Show more...</b-button>
         </template>
       </template>
     </li>

@@ -1,6 +1,6 @@
 <template>
-  <b-card no-body :class="classes" v-b-visible.200="load" :img-right="isList">
-    <b-card-img v-if="hasImage" class="thumbnail" v-bind="thumbnail" @error="hideBrokenImg" />
+  <b-card no-body :class="classes" v-b-visible.400="load" :img-right="isList">
+    <b-card-img-lazy v-if="hasImage" class="thumbnail" offset="200" v-bind="thumbnail" />
     <b-card-body>
       <b-card-title>
         <StacLink :data="[data, catalog]" class="stretched-link" />
@@ -76,7 +76,6 @@ export default {
   },
   methods: {
     load(visible) {
-      this.loadImg(visible);
       if (this.catalog instanceof STAC) {
         return;
       }

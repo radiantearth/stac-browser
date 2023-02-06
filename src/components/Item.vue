@@ -1,6 +1,6 @@
 <template>
-  <b-card no-body class="item-card" :class="{queued: !data, deprecated: isDeprecated}" v-b-visible.200="load">
-    <b-card-img v-if="hasImage" class="thumbnail" v-bind="thumbnail" @error="hideBrokenImg" />
+  <b-card no-body class="item-card" :class="{queued: !data, deprecated: isDeprecated}" v-b-visible.400="load">
+    <b-card-img-lazy v-if="hasImage" class="thumbnail" offset="200" v-bind="thumbnail" />
     <b-card-body>
       <b-card-title>
         <StacLink :data="[data, item]" class="stretched-link" />
@@ -72,7 +72,6 @@ export default {
   },
   methods: {
     load(visible) {
-      this.loadImg(visible);
       if (this.item instanceof STAC) {
         return;
       }

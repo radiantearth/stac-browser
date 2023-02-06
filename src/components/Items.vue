@@ -31,7 +31,7 @@
     </section>
 
     <Pagination v-if="showPagination" :pagination="pagination" @paginate="paginate" />
-    <b-button v-else-if="hasMore" @click="showMore" variant="primary" v-b-visible.200="showMore">Show more...</b-button>
+    <b-button v-else-if="hasMore" @click="showMore" variant="primary" v-b-visible.300="showMore">Show more...</b-button>
   </section>
 </template>
 
