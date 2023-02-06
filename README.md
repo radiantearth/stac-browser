@@ -317,6 +317,18 @@ So for example if your API requires to pass a token via the `API_KEY` query para
 Please note: If the server hosting STAC Browser should not get aware of private query parameters and you are having `historyMode` set to `history`, you can also append the private query parameters to the hash so that it doesn't get transmitted to the server hosting STAC Browser. 
 In this case use for example `https://examples.com/stac-browser/#?~API_KEY=123` instead of `https://examples.com/stac-browser/?~API_KEY=123`.
 
+## Customize through root catalog
+
+You can also provide a couple of the config options through the root catalog. 
+You need to provide a field `stac_browser` and then you can set any of the following options:
+- `authConfig` (except for the `formatter`)
+- `cardViewMode`
+- `crossOriginMedia`
+- `defaultThumbnailSize`
+- `displayGeoTiffByDefault`
+- `showThumbnailsAsAssets`
+- `stacLint` (can only be disabled)
+
 ## Running Dockerfile
 
 When building the Dockerfile, you can add the [`catalogUrl`](#catalogurl) 
