@@ -11,7 +11,7 @@
     <component :is="cardsComponent" v-bind="cardsComponentProps">
       <Catalog v-for="catalog in catalogView" :catalog="catalog" :key="catalog.href" />
     </component>
-    <b-button v-if="hasMore" @click="loadMore" variant="primary" v-b-visible.200="loadMore">{{ $t('catalogs.loadMore') }}</b-button>
+    <b-button v-if="hasMore" @click="loadMore" variant="primary" v-b-visible.300="loadMore">{{ $t('catalogs.loadMore') }}</b-button>
   </section>
 </template>
 

@@ -124,7 +124,7 @@ export default {
       fallbackLocaleFromVueX: 'fallbackLocale',
       supportedLocalesFromVueX: 'supportedLocales'
     }),
-    ...mapGetters(['displayCatalogTitle', 'fromBrowserPath', 'isExternalUrl', 'supportsConformance', 'toBrowserPath']),
+    ...mapGetters(['displayCatalogTitle', 'fromBrowserPath', 'isExternalUrl', 'root', 'supportsConformance', 'toBrowserPath']),
     browserVersion() {
       if (typeof STAC_BROWSER_VERSION !== 'undefined') {
         return STAC_BROWSER_VERSION;
@@ -219,6 +219,40 @@ export default {
             throw Error(error);
           }
         });
+      }
+    },
+    root(root, oldRoot) {
+      const canChange = [
+        'authConfig', // except for the 'formatter', which can't be encoded in JSON
+        'cardViewMode',
+        'crossOriginMedia',
+        'defaultThumbnailSize',
+        'displayGeoTiffByDefault',
+        'showThumbnailsAsAssets',
+        'stacLint' // can only be disabled
+      ];
+
+      let doReset = !root || (oldRoot && Utils.isObject(oldRoot['stac_browser']));
+      let doSet = root && Utils.isObject(root['stac_browser']);
+
+      for(let key of canChange) {
+        let value;
+        if (doReset) {
+          value = CONFIG[key]; // Original value
+        }
+        if (doSet && typeof root['stac_browser'][key] !== 'undefined') {
+          value = root['stac_browser'][key]; // Custom value from root
+        }
+        
+        // Don't enable stacLint if it has been disabled by default
+        if (key === 'stacLint' && !CONFIG.stacLint) {
+          continue;
+        }
+
+        // Commit config
+        if (typeof value !== 'undefined') {
+          this.$store.commit('config', { [key]: value });
+        }
       }
     }
   },

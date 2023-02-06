@@ -114,7 +114,9 @@ export default {
         // Will be rendered with a custom rendered
         'deprecated',
         // Special handling for the warning of the anonymized-location extension
-        'anon:warning'
+        'anon:warning',
+        // Special handling for the STAC Browser config
+        'stac_browser'
       ]
     };
   },

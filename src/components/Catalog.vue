@@ -1,10 +1,6 @@
 <template>
-  <b-card no-body :class="classes" v-b-visible.200="load" :img-right="isList">
-    <b-card-img
-      v-if="hasImage" class="thumbnail"
-      :src="thumbnail.href" :alt="thumbnail.title" :crossorigin="crossOriginMedia" :right="isList"
-      @error="hideBrokenImg"
-    />
+  <b-card no-body :class="classes" v-b-visible.400="load" :img-right="isList">
+    <b-card-img-lazy v-if="hasImage" class="thumbnail" offset="200" v-bind="thumbnail" />
     <b-card-body>
       <b-card-title>
         <StacLink :data="[data, catalog]" class="stretched-link" />
@@ -19,7 +15,8 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex';
+import { mapGetters } from 'vuex';
+import ThumbnailCardMixin from './ThumbnailCardMixin';
 import StacLink from './StacLink.vue';
 import STAC from '../models/stac';
 import removeMd from 'remove-markdown';
@@ -37,25 +34,16 @@ export default {
       return removeMd(text);
     }
   },
+  mixins: [
+    ThumbnailCardMixin
+  ],
   props: {
     catalog: {
       type: Object,
       required: true
-    },
-    showThumbnail: {
-      type: Boolean,
-      default: true
     }
   },
-  data() {
-    return {
-      // Lazy load thumbnails and not all at once.
-      // false = don't load yet, true = try to load it, null = image errored
-      thumbnailShown: false
-    };
-  },
   computed: {
-    ...mapState(['crossOriginMedia', 'cardViewMode']),
     ...mapGetters(['getStac']),
     classes() {
       let classes = ['catalog-card'];
@@ -73,23 +61,8 @@ export default {
       }
       return classes;
     },
-    isList() {
-      return this.cardViewMode === 'list';
-    },
-    hasImage() {
-      return this.showThumbnail && this.thumbnail && this.thumbnailShown;
-    },
     data() {
       return this.getStac(this.catalog);
-    },
-    thumbnail() {
-      if (this.data) {
-        let thumbnails = this.data.getThumbnails(true, 'thumbnail');
-        if (thumbnails.length > 0) {
-          return thumbnails[0];
-        }
-      }
-      return null;
     },
     temporalExtent() {
       if (this.data?.isCollection() && this.data.extent?.temporal?.interval.length > 0) {
@@ -102,14 +75,7 @@ export default {
     }
   },
   methods: {
-    hideBrokenImg(event) {
-      console.log(`Hiding catalog thumbnail for ${event.srcElement.src} as it can't be loaded.`);
-      this.thumbnailShown = null;
-    },
     load(visible) {
-      if (visible && this.thumbnailShown !== null) {
-        this.thumbnailShown = true;
-      }
       if (this.catalog instanceof STAC) {
         return;
       }

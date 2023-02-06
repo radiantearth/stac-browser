@@ -1,10 +1,6 @@
 <template>
-  <b-card no-body class="item-card" :class="{queued: !data, deprecated: isDeprecated}" v-b-visible.200="load">
-    <b-card-img
-      v-if="thumbnail && thumbnailShown" class="thumbnail"
-      :src="thumbnail.href" :alt="thumbnail.title" :crossorigin="crossOriginMedia"
-      @error="hideBrokenImg"
-    />
+  <b-card no-body class="item-card" :class="{queued: !data, deprecated: isDeprecated}" v-b-visible.400="load">
+    <b-card-img-lazy v-if="hasImage" class="thumbnail" offset="200" v-bind="thumbnail" />
     <b-card-body>
       <b-card-title>
         <StacLink :data="[data, item]" class="stretched-link" />
@@ -25,7 +21,8 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex';
+import { mapGetters } from 'vuex';
+import ThumbnailCardMixin from './ThumbnailCardMixin';
 import StacLink from './StacLink.vue';
 import STAC from '../models/stac';
 import { formatTemporalExtent, formatTimestamp, formatMediaType } from '@radiantearth/stac-fields/formatters';
@@ -40,36 +37,19 @@ export default {
     formatTemporalExtent,
     formatTimestamp
   },
+  mixins: [
+    ThumbnailCardMixin
+  ],
   props: {
     item: {
       type: Object,
       required: true
     }
   },
-  data() {
-    return {
-      // Lazy load thumbnails and not all at once.
-      // false = don't load yet, true = try to load it, null = image errored
-      thumbnailShown: false
-    };
-  },
   computed: {
-    ...mapState(['crossOriginMedia']),
     ...mapGetters(['getStac']),
     data() {
       return this.getStac(this.item);
-    },
-    thumbnail() {
-      if (this.data) {
-        let thumbnails = this.data.getThumbnails(true, 'thumbnail');
-        if (thumbnails.length > 0) {
-          return thumbnails[0];
-        }
-      }
-      return {
-        href: null,
-        title: ''
-      };
     },
     extent() {
       if (this.data && (this.data.properties.start_datetime || this.data.properties.end_datetime)) {
@@ -91,14 +71,7 @@ export default {
     }
   },
   methods: {
-    hideBrokenImg(event) {
-      console.log(`Hiding item thumbnail for ${event.srcElement.src} as it can't be loaded.`);
-      this.thumbnailShown = null;
-    },
     load(visible) {
-      if (visible && this.thumbnailShown !== null) {
-        this.thumbnailShown = true;
-      }
       if (this.item instanceof STAC) {
         return;
       }
