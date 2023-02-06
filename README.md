@@ -188,6 +188,11 @@ The default view mode for lists of catalogs/collections. Either `list` or `cards
 
 Defines whether thumbnails are shown in the lists of assets (`true`, default) or not.
 
+### defaultThumbnailSize
+
+The default size \[Height, Width\] for thumbnails which is reserved in card and list views so that the items don't jump when loading the images.
+This can be overridden per thumbnail by declaring the [`proj:shape`](https://github.com/stac-extensions/projection/#item-properties-or-asset-fields) on the asset or link.
+
 ### crossOriginMedia
 
 The value for the [`crossorigin` attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/crossorigin) that is sent when loading images through the browser. Default to `null`. If you encounter issues with loading images, you may want to try setting this to `anonymous`.
