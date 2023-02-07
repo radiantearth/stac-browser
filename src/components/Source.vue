@@ -160,7 +160,7 @@ export default {
 
           // Add missing data languages
           for(let lang of this.dataLanguages) {
-            if (!Utils.isObject(lang) || !lang.code || this.supportedLocales.includes(lang.code.toLowerCase())) {
+            if (!Utils.isObject(lang) || !lang.code || this.supportedLocales.includes(lang.code)) {
               continue;
             }
             let newLang = {
