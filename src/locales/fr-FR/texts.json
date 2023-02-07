@@ -101,6 +101,7 @@
     "descriptionWithTitle": "@:goToParent.description: {title}",
     "label": "En haut"
   },
+  "in": "dans {catalog}",
   "index": {
     "api": "API",
     "catalog": "Catalogue",
@@ -139,6 +140,13 @@
     "general": "Général",
     "title": "Métadonnées"
   },
+  "multiselect": {
+    "placeholder": "Sélectionner une option",
+    "selectLabel": "Appuyer sur Entrée pour sélectionner",
+    "selectedLabel": "Sélectionné(e)",
+    "deselectLabel": "Appuyer sur Entrée pour désélectionner",
+    "andMore": "et {count} de plus"
+  },
   "open": "Ouvrir",
   "pagination": {
     "first": "« Premier",
@@ -171,7 +179,9 @@
     "more": "Lire plus"
   },
   "search": {
+    "addCollections": "Appuyer sur Entrée pour ajouter une Collection",
     "addFilter": "Ajouter un filtre",
+    "addItemIds": "Appuyer sur Entrée pour ajouter un ID Élément",
     "additionalFilters": "Filtres supplémentaires",
     "buttons": {
       "filter": "Filtrer",
