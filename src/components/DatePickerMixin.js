@@ -20,7 +20,7 @@ export default {
         if (!locale) {
           return;
         }
-        const options = await import(`../locales/${locale}/datepicker.js`);
+        const options = (await import(`../locales/${locale}/datepicker.js`)).default;
         if (options.locale instanceof Promise) {
           this.datepickerLang = (await options.locale).default;
         }

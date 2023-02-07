@@ -54,6 +54,7 @@ import Description from './Description.vue';
 import Metadata from './Metadata.vue';
 import STAC from '../models/stac';
 import Utils, { browserProtocols, imageMediaTypes, mapMediaTypes } from '../utils';
+import StacFieldsMixin from './StacFieldsMixin';
 
 export default {
   name: 'Asset',
@@ -69,6 +70,9 @@ export default {
     Description,
     Metadata
   },
+  mixins: [
+    StacFieldsMixin({ formatMediaType })
+  ],
   props: {
     asset: {
       type: Object,
@@ -159,13 +163,13 @@ export default {
     },
     fileFormat() {
       if (typeof this.asset.type === "string" && this.asset.type.length > 0) {
-        return formatMediaType(this.asset.type);
+        return this.formatMediaType(this.asset.type);
       }
       return null;
     },
     shortFileFormat() {
       if (typeof this.asset.type === "string" && this.asset.type.length > 0) {
-        return formatMediaType(this.asset.type, null, {shorten: true});
+        return this.formatMediaType(this.asset.type, null, {shorten: true});
       }
       return null;
     },

@@ -16,6 +16,7 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import StacFieldsMixin from './StacFieldsMixin';
 import ThumbnailCardMixin from './ThumbnailCardMixin';
 import StacLink from './StacLink.vue';
 import STAC from '../models/stac';
@@ -35,7 +36,8 @@ export default {
     }
   },
   mixins: [
-    ThumbnailCardMixin
+    ThumbnailCardMixin,
+    StacFieldsMixin({ formatTemporalExtent })
   ],
   props: {
     catalog: {
@@ -68,7 +70,7 @@ export default {
       if (this.data?.isCollection() && this.data.extent?.temporal?.interval.length > 0) {
         let extent = this.data.extent.temporal.interval[0];
         if (Array.isArray(extent) && (typeof extent[0] === 'string' || typeof extent[1] === 'string')) {
-          return formatTemporalExtent(this.data.extent.temporal.interval[0], true);
+          return this.formatTemporalExtent(this.data.extent.temporal.interval[0], true);
         }
       }
       return null;

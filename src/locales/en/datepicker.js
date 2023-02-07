@@ -48,4 +48,4 @@ const locale = {
 }
 */
 
-export {format, locale};
+export default {format, locale};

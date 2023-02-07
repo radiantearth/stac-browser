@@ -93,8 +93,8 @@ The language given here must be present in `supportedLocales`.
 ### supportedLocales
 
 A list of languages to show in the STAC Browser UI.
-The languages given here must have a corresponding JSON file in the `src/locales` folder,
-e.g. provide `en` (English) for the file at `src/locales/en.json`.
+The languages given here must have a corresponding JS and JSON file in the `src/locales` folder,
+e.g. provide `en` (English) for the files in `src/locales/en`.
 
 In CLI, please provide the languages separated by a space, e.g. `--supportedLocales en de fr it`
 
@@ -256,7 +256,7 @@ There are four options you can set in the `authConfig` object:
 * `key` (string): The query string parameter name or the HTTP header name respecively.
 * `formatter` (function|null): You can optionally specify a formatter for the query string value or HTTP header value respectively. If not given, the token is provided as provided by the user.
 * `description` (string|null): Optionally a description that is shown to the user. This should explain how the token can be obtained for example. CommonMark is allowed.
-    **Note:** You can leave the description empty in the config file and instead provide a localized string with the key `authConfig` -> `description` in the file for custom phrases (`src/locales/custom.json`).
+    **Note:** You can leave the description empty in the config file and instead provide a localized string with the key `authConfig` -> `description` in the file for custom phrases (`src/locales/custom.js`).
 
 Please note that this option can only be provided through a config file and is not available via CLI.
 

@@ -57,8 +57,8 @@ export default {
                 }
                 
                 // Update durations (for stac-fields)
-                const phrases = await import(`../locales/${locale}/duration.js`);
-                isoDuration.setLocales({en: phrases.default});
+                const en = (await import(`../locales/${locale}/duration.js`)).default;
+                isoDuration.setLocales({en});
 
                 // Format the data again to update translations
                 this.formattedData = this.formatData();

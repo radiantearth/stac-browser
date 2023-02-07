@@ -63,6 +63,7 @@ import Links from '../components/Links.vue';
 import Metadata from '../components/Metadata.vue';
 import ReadMore from "vue-read-more-smooth";
 import ShowAssetMixin from '../components/ShowAssetMixin';
+import StacFieldsMixin from '../components/StacFieldsMixin';
 import { formatLicense, formatTemporalExtents } from '@radiantearth/stac-fields/formatters';
 import { BTabs, BTab } from 'bootstrap-vue';
 import Utils from '../utils';
@@ -86,7 +87,10 @@ export default {
     ReadMore,
     Thumbnails: () => import('../components/Thumbnails.vue')
   },
-  mixins: [ShowAssetMixin],
+  mixins: [
+    ShowAssetMixin,
+    StacFieldsMixin({ formatLicense, formatTemporalExtents })
+  ],
   data() {
     return {
       filters: {},
@@ -121,14 +125,14 @@ export default {
     };
   },
   computed: {
-    ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination']),
+    ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination', 'uiLanguage']),
     ...mapGetters(['additionalLinks', 'catalogs', 'isCollection', 'items', 'hasMoreCollections', 'getApiItemsLoading']),
     apiItemsLoading() {
       return this.getApiItemsLoading(this.data);
     },
     licenses() {
       if (this.isCollection && this.data.license) {
-        return formatLicense(this.data.license, null, null, this.data);
+        return this.formatLicense(this.data.license, null, null, this.data);
       }
       return null;
     },
@@ -142,7 +146,7 @@ export default {
             // Remove union temporal extent in favor of more concrete extents
             extents = extents.slice(1);
         }
-        return formatTemporalExtents(extents);
+        return this.formatTemporalExtents(extents);
       }
       return null;
     },

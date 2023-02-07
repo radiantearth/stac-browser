@@ -178,10 +178,10 @@ export default {
             const dataSupported = prepareSupported(this.dataLanguages.map(l => l.code));
             for(let l of languages) {
               if (!l.ui) {
-                l.ui = Boolean(getBest(uiSupported, l.code, null, true));
+                l.ui = Boolean(getBest(uiSupported, l.code, null));
               }
               if (!l.data) {
-                l.data = Boolean(getBest(dataSupported, l.code, null, true));
+                l.data = Boolean(getBest(dataSupported, l.code, null));
               }
             }
           }

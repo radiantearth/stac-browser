@@ -50,7 +50,7 @@ import Utils from './utils';
 import URI from 'urijs';
 
 import I18N from '@radiantearth/stac-fields/I18N';
-import { translateFields, API_LANGUAGE_CONFORMANCE } from './i18n';
+import { translateFields, API_LANGUAGE_CONFORMANCE, loadMessages } from './i18n';
 import { getBest, prepareSupported } from 'locale-id';
 
 Vue.use(Clipboard);
@@ -145,15 +145,10 @@ export default {
         if (!locale) {
           return;
         }
-        // No messages in cache, load them
-        if (Utils.size(this.$root.$i18n.messages[locale]) <= 1) { // languages key is already set thus 1 and not 0
-          const messages = (await import(`./locales/${locale}/texts.json`)).default;
-          messages['custom'] = (await import(`./locales/${locale}/custom.json`)).default;
-          if (locale !== "en") {
-            messages['fields'] = (await import(`./locales/${locale}/fields.json`)).default;
-          }
-          this.$root.$i18n.mergeLocaleMessage(locale, messages);
-        }
+
+        // Load messages
+        await loadMessages(locale);
+
         // Set the locale for vue-i18n
         this.$root.$i18n.locale = locale;
 
@@ -263,7 +258,7 @@ export default {
         const supported = prepareSupported(this.supportedLocalesFromVueX);
         let locale = this.fallbackLocaleFromVueX;
         for(let l of navigator.languages) {
-          const best = getBest(supported, l, null, true);
+          const best = getBest(supported, l, null);
           if (best) {
             locale = best;
             break;

@@ -17,6 +17,7 @@
 <script>
 import { BTable } from 'bootstrap-vue';
 import EntryMixin from './EntryMixin';
+import StacFieldsMixin from '../StacFieldsMixin';
 import Utils from '../../utils';
 import { format } from '@radiantearth/stac-fields';
 
@@ -26,7 +27,8 @@ export default {
     BTable
   },
   mixins: [
-    EntryMixin
+    EntryMixin,
+    StacFieldsMixin({ format })
   ],
   computed: {
     tblTexts() {
@@ -82,7 +84,7 @@ export default {
       if (typeof spec.default !== 'undefined' && (typeof value === 'undefined' || value === null)) {
         value = spec.default;
       }
-      return format(value, key, NaN, item, spec);
+      return this.format(value, key, NaN, item, spec);
     }
   }
 };

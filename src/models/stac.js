@@ -159,7 +159,7 @@ class STAC {
       available = links.map(link => link.hreflang);
     }
     
-    let best = getBest(available, locale, fallbackLocale, true);
+    let best = getBest(available, locale, fallbackLocale);
     return links.find(link => link.hreflang === best) || null;
   }
 

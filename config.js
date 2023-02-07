@@ -8,8 +8,10 @@ module.exports = {
     fallbackLocale: "en",
     supportedLocales: [
         "en",
+        "en-US",
         "de",
-        "fr"
+        "fr-CA",
+        "fr-FR"
     ],
     useTileLayerAsFallback: true,
     tileSourceTemplate: null,

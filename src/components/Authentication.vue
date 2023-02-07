@@ -40,7 +40,7 @@ export default {
       if (this.authConfig.description) {
         return this.authConfig.description;
       }
-      return this.$t('custom.authConfig.description');
+      return this.$t('authConfig.description');
     }
   },
   created() {

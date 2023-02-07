@@ -632,11 +632,11 @@ function getStore(config, router) {
         cx.commit('config', {locale});
 
         // Locale for UI
-        let uiLanguage = getBest(cx.state.supportedLocales, locale, cx.state.fallbackLocale, true);
+        let uiLanguage = getBest(cx.state.supportedLocales, locale, cx.state.fallbackLocale);
         // Locale for data
         let dataLanguageCodes = cx.state.dataLanguages.map(l => l.code);
         let dataLanguageFallback = cx.state.dataLanguages.length > 0 ? cx.state.dataLanguages[0].code : uiLanguage;
-        let dataLanguage = getBest(dataLanguageCodes, locale, dataLanguageFallback, true);
+        let dataLanguage = getBest(dataLanguageCodes, locale, dataLanguageFallback);
 
         cx.commit('languages', {dataLanguage, uiLanguage});
         cx.commit('setQueryParameter', { type: 'state', key: 'language', value: locale });
