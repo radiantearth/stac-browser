@@ -101,6 +101,7 @@
     "descriptionWithTitle": "@:goToParent.description: {title}",
     "label": "Up"
   },
+  "in": "in {catalog}",
   "index": {
     "api": "API",
     "catalog": "Catalog",

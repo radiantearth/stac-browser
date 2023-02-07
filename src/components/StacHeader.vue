@@ -9,7 +9,9 @@
         <span class="title">{{ title }}</span>
       </h1>
       <p class="lead" v-if="url || isSearchPage()">
-        <span class="in mr-3" v-if="containerLink">in <StacLink :data="containerLink" /></span>
+        <i18n v-if="containerLink" tag="span" path="in" class="in mr-3">
+          <template #catalog><StacLink :data="containerLink" /></template>
+        </i18n>
         <b-button-group>
           <b-button v-if="parentLink" :to="toBrowserPath(parentLink.href)" :title="parentLinkTitle" variant="outline-primary" size="sm">
             <b-icon-arrow-90deg-up /> <span class="button-label prio">{{ $t('goToParent.label') }}</span>

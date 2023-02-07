@@ -101,6 +101,7 @@
     "descriptionWithTitle": "@:goToParent.description: {title}",
     "label": "Hoch"
   },
+  "in": "in {catalog}",
   "index": {
     "api": "API",
     "catalog": "Katalog",
@@ -140,11 +141,11 @@
     "title": "Metadaten"
   },
   "multiselect": {
+    "andMore": "und {count} weitere",
+    "deselectLabel": "Enter zum Entfernen",
     "placeholder": "Option wählen",
     "selectLabel": "Enter zum Selektieren",
-    "selectedLabel": "Selektiert",
-    "deselectLabel": "Enter zum Entfernen",
-    "andMore": "und {count} weitere"
+    "selectedLabel": "Selektiert"
   },
   "open": "Öffnen",
   "pagination": {
@@ -180,8 +181,8 @@
   "search": {
     "addCollections": "Hinzufügen durch Enter",
     "addFilter": "Filter hinzufügen",
-    "additionalFilters": "Weitere Filter",
     "addItemIds": "ID hinzufügen durch Enter",
+    "additionalFilters": "Weitere Filter",
     "buttons": {
       "filter": "Filtern",
       "reset": "Zurücksetzen"
