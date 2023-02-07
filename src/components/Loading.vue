@@ -1,6 +1,6 @@
 <template>
   <div :class="classes">
-    <b-spinner label="Loading..." :small="small" />
+    <b-spinner :label="$t('loading')" :small="small" />
   </div>
 </template>
 

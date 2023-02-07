@@ -6,7 +6,9 @@
   "scripts": {
     "start": "vue-cli-service serve",
     "build": "vue-cli-service build --report",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "i18n:report": "vue-cli-service i18n:report --src \"./src/**/*.?(js|vue)\" --locales \"./src/locales/**/*.(js|json)\"",
+    "i18n:fields": "node helpers/fields_locales.js"
   },
   "bugs": {
     "url": "https://github.com/radiantearth/stac-browser/issues"
@@ -30,6 +32,7 @@
   "license": "ISC",
   "dependencies": {
     "@apidevtools/json-schema-ref-parser": "^9.0.9",
+    "@musement/iso-duration": "^1.0.0",
     "@radiantearth/stac-fields": "1.0.0-beta.25",
     "@radiantearth/stac-migrate": "~1.2.0",
     "axios": "^1.2.0",
@@ -38,12 +41,14 @@
     "commonmark": "^0.29.3",
     "core-js": "^3.6.5",
     "leaflet": "^1.8.0",
+    "locale-id": "^1.1.2",
     "node-polyfill-webpack-plugin": "^2.0.0",
     "remove-markdown": "^0.5.0",
     "stac-layer": "^0.15.0",
     "urijs": "^1.19.11",
     "v-clipboard": "^2.2.3",
     "vue": "^2.6.12",
+    "vue-i18n": "^8.28.2",
     "vue-multiselect": "^2.1.6",
     "vue-read-more-smooth": "^0.1.8",
     "vue-router": "^3.2.0",
@@ -64,6 +69,7 @@
     "eslint-plugin-vue": "^8.7.1",
     "sass": "^1.26.5",
     "sass-loader": "^13.2.0",
+    "vue-cli-plugin-i18n": "~2.3.1",
     "vue-template-compiler": "^2.6.12"
   },
   "browserslist": [

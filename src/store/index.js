@@ -1,16 +1,20 @@
 import Vue from "vue";
 import Vuex from "vuex";
+
 import axios from "axios";
-import Utils, { schemaMediaType } from '../utils';
-import STAC from '../models/stac';
 import bs58 from 'bs58';
-import { ogcQueryables, stacBrowserSpecialHandling, stacPagination } from "../rels";
-import { addQueryIfNotExists, isAuthenticationError, Loading, processSTAC, stacRequest } from './utils';
-import { BrowserError } from '../utils';
 import URI from "urijs";
+
+import i18n from '../i18n';
+import { ogcQueryables, stacBrowserSpecialHandling, stacPagination } from "../rels";
+import Utils, { schemaMediaType, BrowserError } from '../utils';
+import STAC from '../models/stac';
 import Queryable from '../models/queryable';
 
-function getStore(config) {
+import { addQueryIfNotExists, isAuthenticationError, Loading, processSTAC, stacRequest } from './utils';
+import { getBest } from "locale-id";
+
+function getStore(config, router) {
   // Local settings (e.g. for currently loaded STAC entity)
   const localDefaults = () => ({
     url: '',
@@ -22,6 +26,7 @@ function getStore(config) {
 
     localRequestQueryParameters: {},
     stateQueryParameters: {
+      language: null,
       asset: [],
       itemdef: []
     },
@@ -40,6 +45,8 @@ function getStore(config) {
     authData: null,
     doAuth: [],
     conformsTo: [],
+    dataLanguage: null,
+    dataLanguages: [],
 
     apiCollections: [],
     apiItemsLoading: {},
@@ -52,7 +59,8 @@ function getStore(config) {
       // Global settings
       database: {}, // STAC object, Error object or Loading object or Promise (when loading)
       allowSelectCatalog: !config.catalogUrl,
-      globalRequestQueryParameters: config.requestQueryParameters
+      globalRequestQueryParameters: config.requestQueryParameters,
+      uiLanguage: config.locale
     }),
     getters: {
       loading: state => !state.url || !state.data || state.database[state.url] instanceof Loading,
@@ -174,7 +182,7 @@ function getStore(config) {
           .map(c => c.replaceAll('*', '[^/]+').replace(/\/?#/, '/?#'))
           .join('|');
         let regexp = new RegExp('^(' + classRegexp + ')$');
-        return !!state.conformsTo.find(uri => uri.match(regexp));
+        return Boolean(state.conformsTo.find(uri => uri.match(regexp)));
       },
       supportsExtension: state => schemaUri => {
         let extensions = [];
@@ -341,6 +349,36 @@ function getStore(config) {
         }
         // If we are proxying a STAC Catalog, replace any URI with the proxied address.
         return absoluteUrl.toString();
+      },
+
+      acceptedLanguages: state => {
+        const languages = {};
+        // Implement in ascending order:
+        languages['en'] = 0.1;
+        if (Array.isArray(state.supportedLocales)) {
+          state.supportedLocales.forEach(locale => languages[locale] = 0.2);
+        }
+        if (Utils.hasText(state.fallbackLocale)) {
+          languages[state.fallbackLocale] = 0.5;
+        }
+        if (Array.isArray(navigator.languages)) {
+          navigator.languages.forEach(locale => languages[locale] = 0.7);
+        }
+        if (Utils.hasText(state.locale)) {
+          languages[state.locale] = 1;
+        }
+        return Object.entries(languages)
+          .sort((a,b) => {
+            if (a[1] > b[1]) {
+              return -1;
+            }
+            else if (a[1] < b[1]) {
+              return 1;
+            }
+            return 0;
+          })
+          .map(([l, q]) => q >= 1 ? l : `${l};q=${q}`)
+          .join(',');
       }
     },
     mutations: {
@@ -373,20 +411,9 @@ function getStore(config) {
           }
         }
       },
-      queryParameters(state, params) {
-        for (let key in params) {
-          if (key === 'state') {
-            for (let [key, value] of Object.entries(params.state)) {
-              if (Array.isArray(state.stateQueryParameters[key]) && !Array.isArray(value)) {
-                value = value.split(',');
-              }
-              Vue.set(state.stateQueryParameters, key, value);
-            }
-          }
-          else {
-            state[`${key}QueryParameters`] = params[key];
-          }
-        }
+      languages(state, {uiLanguage, dataLanguage}) {
+        state.dataLanguage = dataLanguage;
+        state.uiLanguage = uiLanguage;
       },
       setQueryParameter(state, { type, key, value }) {
         type = `${type}QueryParameters`;
@@ -423,6 +450,9 @@ function getStore(config) {
           state.stateQueryParameters[type].push(uid);
         }
       },
+      state(state, newState) {
+        state.stateQueryParameters = newState;
+      },
       closeCollapsible(state, { type, uid }) {
         const idx = state.stateQueryParameters[type].indexOf(uid);
         if (idx > -1) {
@@ -449,6 +479,9 @@ function getStore(config) {
       resetCatalog(state, clearAll) {
         Object.assign(state, catalogDefaults());
         Object.assign(state, localDefaults());
+        if (!state.supportedLocales.includes(state.locale)) {
+          state.locale = config.locale;
+        }
         if (clearAll) {
           state.catalogUrl = config.catalogUrl;
           state.catalogTitle = config.catalogTitle;
@@ -465,11 +498,22 @@ function getStore(config) {
         state.url = url || null;
         state.data = stac instanceof STAC ? stac : null;
         state.valid = null;
+
+        // Set title
         if (title) {
           state.title = title;
         }
         else {
           state.title = STAC.getDisplayTitle(stac, state.catalogTitle);
+        }
+
+        if (state.data instanceof STAC) {
+          let source = state.data.isItem() ? state.data.properties : state.data;
+          let languages = Array.isArray(source.languages) ? source.languages.slice() : [];
+          if (Utils.isObject(source.language)) {
+            languages.unshift(source.language);
+          }
+          state.dataLanguages = languages.filter(lang => Utils.isObject(lang) && typeof lang.code === 'string');
         }
       },
       errored(state, { url, error }) {
@@ -584,6 +628,19 @@ function getStore(config) {
       }
     },
     actions: {
+      async switchLocale(cx, locale) {
+        cx.commit('config', {locale});
+
+        // Locale for UI
+        let uiLanguage = getBest(cx.state.supportedLocales, locale, cx.state.fallbackLocale);
+        // Locale for data
+        let dataLanguageCodes = cx.state.dataLanguages.map(l => l.code);
+        let dataLanguageFallback = cx.state.dataLanguages.length > 0 ? cx.state.dataLanguages[0].code : uiLanguage;
+        let dataLanguage = getBest(dataLanguageCodes, locale, dataLanguageFallback);
+
+        cx.commit('languages', {dataLanguage, uiLanguage});
+        cx.commit('setQueryParameter', { type: 'state', key: 'language', value: locale });
+      },
       async setAuth(cx, value) {
         if (!Utils.hasText(value)) {
           value = null;
@@ -678,9 +735,18 @@ function getStore(config) {
           try {
             let response = await stacRequest(cx, url);
             if (!Utils.isObject(response.data)) {
-              throw new BrowserError('The response is not a valid STAC JSON');
+              throw new BrowserError(i18n.t('errors.invalidJsonObject'));
             }
             data = new STAC(response.data, url, path);
+            if (show) {
+              // If we prefer another language abort redirect to the new language
+              let localeLink = data.getLocaleLink(cx.state.dataLanguage);
+              if (localeLink) {
+                router.replace(cx.getters.toBrowserPath(localeLink.href));
+                return;
+              }
+            }
+
             cx.commit('loaded', { url, data });
 
             if (!cx.getters.root) {
@@ -725,7 +791,7 @@ function getStore(config) {
               }
               else {
                 cx.commit('showGlobalError', {
-                  message: 'Sorry, the API Collections could not be loaded.',
+                  message: i18n.t('errors.loadApiCollectionsFailed'),
                   error
                 });
               }
@@ -742,7 +808,7 @@ function getStore(config) {
               }
               else {
                 cx.commit('showGlobalError', {
-                  message: 'Sorry, the API Items could not be loaded.',
+                  message: i18n.t('errors.loadApiItemsFailed'),
                   error
                 });
               }
@@ -776,7 +842,7 @@ function getStore(config) {
 
           let response = await stacRequest(cx, link);
           if (!Utils.isObject(response.data) || !Array.isArray(response.data.features)) {
-            throw new BrowserError('The API response is not a valid list of STAC Items');
+            throw new BrowserError(i18n.t('errors.invalidStacItems'));
           }
           else {
             response.data.features = response.data.features.map(item => {
@@ -845,7 +911,7 @@ function getStore(config) {
         }
         let response = await stacRequest(cx, link);
         if (!Utils.isObject(response.data) || !Array.isArray(response.data.collections)) {
-          throw new BrowserError('The API response is not a valid list of STAC Collections');
+          throw new BrowserError(i18n.t('errors.invalidStacCollections'));
         }
         else {
           response.data.collections = response.data.collections.map(collection => {
@@ -899,7 +965,7 @@ function getStore(config) {
       async retryAfterAuth(cx) {
         let errorFn = error => cx.commit('showGlobalError', {
           error,
-          message: 'The requests errored, the provided authentication details may be incorrect.'
+          message: i18n.t('errors.authFailed')
         });
 
         for (let callback of cx.state.doAuth) {

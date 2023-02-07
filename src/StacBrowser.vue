@@ -1,12 +1,12 @@
 <template>
   <b-container id="stac-browser">
     <Authentication v-if="doAuth.length > 0" />
-    <b-sidebar id="sidebar" title="Browse" shadow lazy>
+    <b-sidebar id="sidebar" :title="$t('browse')" shadow lazy>
       <Sidebar />
     </b-sidebar>
     <!-- Header -->
     <header>
-      <div class="logo">{{ catalogTitle }}</div>
+      <div class="logo">{{ displayCatalogTitle }}</div>
       <StacHeader />
     </header>
     <!-- Content (Item / Catalog) -->
@@ -15,9 +15,11 @@
       <router-view />
     </main>
     <footer>
-      <small class="poweredby text-muted">
-        Powered by <a href="https://github.com/radiantearth/stac-browser">STAC Browser</a> {{ browserVersion }}
-      </small>
+      <i18n tag="small" path="poweredBy" class="poweredby text-muted">
+        <template #link>
+          <a href="https://github.com/radiantearth/stac-browser" target="_blank">STAC Browser</a> {{ browserVersion }}
+        </template>
+      </i18n>
     </footer>
   </b-container>
 </template>
@@ -25,7 +27,8 @@
 <script>
 import Vue from "vue";
 import VueRouter from "vue-router";
-import Vuex, { mapGetters, mapState } from 'vuex';
+import Vuex, { mapActions, mapGetters, mapState } from 'vuex';
+import CONFIG from './config';
 import getRoutes from "./router";
 import getStore from "./store";
 
@@ -42,8 +45,13 @@ import ErrorAlert from './components/ErrorAlert.vue';
 import Sidebar from './components/Sidebar.vue';
 import StacHeader from './components/StacHeader.vue';
 
+import STAC from './models/stac';
 import Utils from './utils';
 import URI from 'urijs';
+
+import I18N from '@radiantearth/stac-fields/I18N';
+import { translateFields, API_LANGUAGE_CONFORMANCE, loadMessages } from './i18n';
+import { getBest, prepareSupported } from 'locale-id';
 
 Vue.use(Clipboard);
 
@@ -61,18 +69,6 @@ Vue.directive('b-toggle', VBToggle);
 // Used to detect when a catalog/item becomes visible so that further data can be loaded
 Vue.directive('b-visible', VBVisible);
 
-let CONFIG;
-if (typeof CONFIG_PATH === 'undefined' && typeof CONFIG_CLI === 'undefined') {
-  CONFIG = require('../config');
-}
-else {
-  CONFIG = Object.assign(require(CONFIG_PATH), CONFIG_CLI);
-}
-
-// Setup store
-Vue.use(Vuex);
-const store = getStore(CONFIG);
-
 // Setup router
 Vue.use(VueRouter);
 const router = new VueRouter({
@@ -80,6 +76,10 @@ const router = new VueRouter({
   base: CONFIG.pathPrefix,
   routes: getRoutes(CONFIG)
 });
+
+// Setup store
+Vue.use(Vuex);
+const store = getStore(CONFIG, router);
 
 // Pass Config through from props to vuex
 let Props = {};
@@ -117,9 +117,14 @@ export default {
     };
   },
   computed: {
-    ...mapState(['allowSelectCatalog', 'title', 'doAuth', 'globalError', 'stateQueryParameters']),
-    ...mapState({catalogUrlFromVueX: 'catalogUrl'}),
-    ...mapGetters(['displayCatalogTitle', 'fromBrowserPath', 'isExternalUrl', 'root']),
+    ...mapState(['allowSelectCatalog', 'data', 'dataLanguage', 'doAuth', 'globalError', 'stateQueryParameters', 'title', 'uiLanguage', 'url']),
+    ...mapState({
+      catalogUrlFromVueX: 'catalogUrl',
+      detectLocaleFromBrowserFromVueX: 'detectLocaleFromBrowser',
+      fallbackLocaleFromVueX: 'fallbackLocale',
+      supportedLocalesFromVueX: 'supportedLocales'
+    }),
+    ...mapGetters(['displayCatalogTitle', 'fromBrowserPath', 'isExternalUrl', 'root', 'supportsConformance', 'toBrowserPath']),
     browserVersion() {
       if (typeof STAC_BROWSER_VERSION !== 'undefined') {
         return STAC_BROWSER_VERSION;
@@ -133,6 +138,49 @@ export default {
     ...Watchers,
     title(title) {
       document.title = title;
+    },
+    uiLanguage: {
+      immediate: true,
+      async handler(locale) {
+        if (!locale) {
+          return;
+        }
+
+        // Load messages
+        await loadMessages(locale);
+
+        // Set the locale for vue-i18n
+        this.$root.$i18n.locale = locale;
+
+        // Update stac-fields
+        I18N.locales = [locale];
+        I18N.translate = translateFields;
+      }
+    },
+    dataLanguage: {
+      immediate: true,
+      async handler(locale) {
+        if (!locale) {
+          return;
+        }
+        if (this.data instanceof STAC) {
+          let link = this.data.getLocaleLink(locale);
+          if (link) {
+            let state = Object.assign({}, this.stateQueryParameters);
+            this.$router.push(this.toBrowserPath(link.href));
+            this.$store.commit('state', state);
+          }
+          else if (this.supportsConformance(API_LANGUAGE_CONFORMANCE)) {
+            // this.url gets reset with resetCatalog so store the url for use in load
+            let url = this.url;
+            // Todo: Resetting the catalogs is not ideal. 
+            // A better way would be to combine the language code and URL as the index in the browser database
+            // This needs a database refactor though: https://github.com/radiantearth/stac-browser/issues/231
+            this.$store.commit('resetCatalog', true);
+            await this.$store.dispatch("load", { url, loadApi: true, show: true });
+          }
+        }
+      }
     },
     catalogUrlFromVueX(url) {
       if (url) {
@@ -150,8 +198,14 @@ export default {
           }
         }
         for (const [key, value] of Object.entries(this.stateQueryParameters)) {
-          if (Array.isArray(value) && value.length > 0) {
-            query[`.${key}`] = value.join(',');
+          let name = `.${key}`;
+          if (Array.isArray(value)) {
+            if (value.length > 0) {
+              query[name] = value.join(',');
+            }
+          }
+          else if (value !== null) {
+              query[name] = value;
           }
         }
 
@@ -199,6 +253,20 @@ export default {
   },
   created() {
     this.$router.onReady(() => {
+      if (this.detectLocaleFromBrowserFromVueX && Array.isArray(navigator.languages)) {
+        // Detect the most suitable locale
+        const supported = prepareSupported(this.supportedLocalesFromVueX);
+        let locale = this.fallbackLocaleFromVueX;
+        for(let l of navigator.languages) {
+          const best = getBest(supported, l, null);
+          if (best) {
+            locale = best;
+            break;
+          }
+        }
+        this.switchLocale(locale);
+      }
+      
       this.parseQuery(this.$route);
     });
 
@@ -225,6 +293,7 @@ export default {
     setInterval(() => this.$store.dispatch('loadBackground', 3), 200);
   },
   methods: {
+    ...mapActions(['switchLocale']),
     parseQuery(route) {
       let privateFromHash = {};
       if (this.historyMode === 'history') {
@@ -234,25 +303,37 @@ export default {
       let query = Object.assign({}, route.query, privateFromHash);
       let params = {};
       for(let key in query) {
+        let value = query[key];
         // Store all private query parameters (start with ~) and replace them in the shown URI
         if (key.startsWith('~')) {
           params.private = Utils.isObject(params.private) ? params.private : {};
-          params.private[key.substr(1)] = query[key];
+          params.private[key.substr(1)] = value;
           delete query[key];
         }
         // Store all state related parameters (start with .)
         else if (key.startsWith('.')) {
+          let realKey = key.substr(1);
           params.state = Utils.isObject(params.state) ? params.state : {};
-          params.state[key.substr(1)] = query[key];
+          if (Array.isArray(this.stateQueryParameters[realKey]) && !Array.isArray(value)) {
+            value = value.split(',');
+          }
+          params.state[realKey] = value;
         }
         // All other parameters should be appended to the main STAC requests
         else {
           params.localRequest = Utils.isObject(params.request) ? params.request : {};
-          params.localRequest[key] = query[key];
+          params.localRequest[key] = value;
         }
       }
       if (Utils.size(params) > 0) {
-        this.$store.commit("queryParameters", params);
+        for (let type in params) {
+          for (let key in params[type]) {
+            this.$store.commit('setQueryParameter', {type, key, value: params[type][key]});
+          }
+        }
+      }
+      if (params?.state?.language) {
+        this.switchLocale(params.state.language);
       }
       if (Utils.size(params.private) > 0) {
         this.$router.replace({ query });

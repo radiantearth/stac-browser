@@ -1,6 +1,6 @@
 <template>
   <section class="providers mb-4">
-    <h2>Providers</h2>
+    <h2>{{ $tc('providers.title', count) }}</h2>
     <b-list-group v-if="isSimple">
       <b-list-group-item
         v-for="(provider, key) in providers" :key="key" :href="provider.url" :disabled="!provider.url"
@@ -8,9 +8,7 @@
         class="provider"
       >
         {{ provider.name }}
-        <div class="roles ml-1" v-if="Array.isArray(provider.roles)">
-          <b-badge v-for="role in provider.roles" :key="role" variant="secondary" class="ml-1 mb-1">{{ role }}</b-badge>
-        </div>
+        <ProviderRoles :roles="provider.roles" />
       </b-list-group-item>
     </b-list-group>
     <div v-else class="accordion" role="tablist">
@@ -21,13 +19,16 @@
 
 <script>
 import { BListGroup, BListGroupItem } from 'bootstrap-vue';
+import ProviderRoles from './ProviderRoles.vue';
+import Utils from '../utils';
 
 export default {
   name: 'Providers',
   components: {
     BListGroup,
     BListGroupItem,
-    Provider: () => import('./Provider.vue')
+    Provider: () => import('./Provider.vue'),
+    ProviderRoles
   },
   props: {
     providers: {
@@ -36,6 +37,9 @@ export default {
     }
   },
   computed: {
+    count() {
+      return Utils.size(this.providers);
+    },
     isSimple() {
       // We can show the providers much simpler if there are no additional information
       return !this.providers.find(provider => {
@@ -57,10 +61,6 @@ export default {
     align-items: center;
     padding: 0.5rem 0.8rem;
     background-color: rgba(0,0,0,0.03);
-    
-    .badge {
-      text-transform: uppercase;
-    }
   }
 }
 </style>

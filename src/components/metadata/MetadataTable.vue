@@ -3,6 +3,7 @@
     class="metadata-table" :items="tblItems" :fields="tblFields" variant="light"
     responsive small
     sticky-header striped
+    v-bind="tblTexts"
   >
     <template #head()="data">
       <span v-html="data.label" />
@@ -16,6 +17,7 @@
 <script>
 import { BTable } from 'bootstrap-vue';
 import EntryMixin from './EntryMixin';
+import StacFieldsMixin from '../StacFieldsMixin';
 import Utils from '../../utils';
 import { format } from '@radiantearth/stac-fields';
 
@@ -25,9 +27,19 @@ export default {
     BTable
   },
   mixins: [
-    EntryMixin
+    EntryMixin,
+    StacFieldsMixin({ format })
   ],
   computed: {
+    tblTexts() {
+      return {
+        'empty-filtered-text': this.$t('table.emptyFilteredText'),
+        'empty-text': this.$t('table.emptyText'),
+        'label-sort-asc': this.$t('table.sort.asc'),
+        'label-sort-desc': this.$t('table.sort.desc'),
+        'label-sort-clear': this.$t('table.sort.clear')
+      };
+    },
     tblItems() {
       if (Utils.isObject(this.value)) {
         let items = [];
@@ -51,7 +63,8 @@ export default {
           key,
           label: col.label,
           sortable: col.sortable,
-          formatter: this.formatCell.bind(this)
+          formatter: this.formatCell.bind(this),
+          default: col.default
         });
       }
       if (Utils.isObject(this.value)) {
@@ -68,7 +81,10 @@ export default {
     formatCell(value, key, item) {
       let spec = this.items[key];
       // ToDo: Set context (third param)?
-      return format(value, key, NaN, item, spec);
+      if (typeof spec.default !== 'undefined' && (typeof value === 'undefined' || value === null)) {
+        value = spec.default;
+      }
+      return this.format(value, key, NaN, item, spec);
     }
   }
 };

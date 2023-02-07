@@ -3,6 +3,16 @@ module.exports = {
     catalogTitle: "STAC Browser",
     allowExternalAccess: true, // Must be true if catalogUrl is not given
     allowedDomains: [],
+    detectLocaleFromBrowser: true,
+    locale: "en",
+    fallbackLocale: "en",
+    supportedLocales: [
+        "en",
+        "en-US",
+        "de",
+        "fr-CA",
+        "fr-FR"
+    ],
     useTileLayerAsFallback: true,
     tileSourceTemplate: null,
     displayGeoTiffByDefault: false,

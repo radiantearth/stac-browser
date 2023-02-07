@@ -75,6 +75,32 @@ Must be set to `true` if a `catalogUrl` is not given as otherwise you won't be a
 
 You can list additional domains (e.g. `example.com`) that private data is sent to, e.g. authentication data.
 
+### detectLocaleFromBrowser
+
+If set to `true`, tries to detect the preferred language of the user from the Browser.
+Otherwise, defaults to the language set for `locale`.
+
+### locale
+
+The default language to use for STAC Browser, defaults to `en` (English).
+The language given here must be present in `supportedLocales`.
+
+### fallbackLocale
+
+The language to use if individual phrases are not available in the default language, defaults to `en` (English).
+The language given here must be present in `supportedLocales`.
+
+### supportedLocales
+
+A list of languages to show in the STAC Browser UI.
+The languages given here must have a corresponding JS and JSON file in the `src/locales` folder,
+e.g. provide `en` (English) for the files in `src/locales/en`.
+
+In CLI, please provide the languages separated by a space, e.g. `--supportedLocales en de fr it`
+
+Please note that only left-to-right languages have been tested.
+I'd need help to test support for right-to-left languages.
+
 ### stacLint
 
 ***experimental***
@@ -230,6 +256,7 @@ There are four options you can set in the `authConfig` object:
 * `key` (string): The query string parameter name or the HTTP header name respecively.
 * `formatter` (function|null): You can optionally specify a formatter for the query string value or HTTP header value respectively. If not given, the token is provided as provided by the user.
 * `description` (string|null): Optionally a description that is shown to the user. This should explain how the token can be obtained for example. CommonMark is allowed.
+    **Note:** You can leave the description empty in the config file and instead provide a localized string with the key `authConfig` -> `description` in the file for custom phrases (`src/locales/custom.js`).
 
 Please note that this option can only be provided through a config file and is not available via CLI.
 

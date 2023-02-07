@@ -1,6 +1,6 @@
 <template>
   <section v-if="formattedData.length > 0" class="metadata">
-    <h2 v-if="title">{{ title }}</h2>
+    <h2 v-if="title">{{ title || $t('metadata.title') }}</h2>
     <b-card-group columns :class="`count-${formattedData.length}`">
       <MetadataGroup v-for="group in formattedData" v-bind="group" :key="group.extension" />
     </b-card-group>
@@ -10,6 +10,8 @@
 <script>
 import { formatAsset, formatCollection, formatGrouped, formatItemProperties, formatLink, formatProvider, formatSummaries } from '@radiantearth/stac-fields';
 import MetadataGroup from './metadata/MetadataGroup.vue';
+import { isoDuration } from '@musement/iso-duration';
+import { mapState } from 'vuex';
 
 export default {
     name: "Metadata",
@@ -35,11 +37,36 @@ export default {
         },
         title: {
             type: String,
-            default: 'Metadata'
+            default: null
         }
     },
+    data() {
+        return {
+            formattedData: []
+        };
+    },
     computed: {
-        formattedData() {
+        ...mapState(['uiLanguage']),
+    },
+    watch: {
+        uiLanguage: {
+            immediate: true,
+            async handler (locale) {
+                if (!locale) {
+                    return;
+                }
+                
+                // Update durations (for stac-fields)
+                const en = (await import(`../locales/${locale}/duration.js`)).default;
+                isoDuration.setLocales({en});
+
+                // Format the data again to update translations
+                this.formattedData = this.formatData();
+            }
+        }
+    },
+    methods: {
+        formatData() {
             // Filter all fields as given in ignoreFields and also 
             // ignore fields starting with an underscore which is likely originating from the STAC class
             let filter = key => !key.startsWith('_') && !this.ignoreFields.includes(key);
@@ -66,7 +93,7 @@ export default {
                             core.push(summaryGroup);
                         }
                     });
-                    return core.sort((a,b) => a.label.localeCompare(b.label));
+                    return core.sort((a,b) => a.label.localeCompare(b.label, this.uiLanguage));
                 }
                 default:
                     return formatGrouped(this.context, this.data, this.type, filter);
@@ -127,6 +154,27 @@ export default {
             > ul, > ol, > pre, > dl, > .description {
                 max-height: 15em;
                 overflow: auto;
+            }
+
+            .styled-description {
+                h1 {
+                    font-size: 1.5em;
+                }
+                h2 {
+                    font-size: 1.4em;
+                }
+                h3 {
+                    font-size: 1.3em;
+                }
+                h4 {
+                    font-size: 1.2em;
+                }
+                h5 {
+                    font-size: 1.1em;
+                }
+                h6 {
+                    font-size: 1.0em;
+                }
             }
         }
         ul {

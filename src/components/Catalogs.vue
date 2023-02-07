@@ -1,22 +1,22 @@
 <template>
   <section class="catalogs mb-4">
     <h2>
-      <span class="title">Catalogs</span>
-      <b-badge v-if="!hasMore" pill variant="secondary ml-2">{{ catalogs.length }}</b-badge>
+      <span class="title">{{ $tc('stacCatalog', catalogs.length ) }}</span>
+      <b-badge v-if="hasMultiple" pill variant="secondary ml-2">{{ catalogs.length }}</b-badge>
       <ViewButtons class="ml-4" v-model="view" />
-      <SortButtons v-if="!hasMore" class="ml-2" v-model="sort" />
+      <SortButtons v-if="hasMultiple" class="ml-2" v-model="sort" />
     </h2>
-    <SearchBox v-if="!hasMore" class="mt-3 mb-2" v-model="searchTerm" placeholder="Filter catalogs by title" />
-    <b-alert v-if="searchTerm && catalogView.length === 0" variant="warning" show>No catalogs found for the given search term.</b-alert>
+    <SearchBox v-if="hasMultiple" class="mt-3 mb-2" v-model="searchTerm" :placeholder="$t('catalogs.filterByTitle')" />
+    <b-alert v-if="searchTerm && catalogView.length === 0" variant="warning" show>{{ $t('catalogs.noMatches') }}</b-alert>
     <component :is="cardsComponent" v-bind="cardsComponentProps">
       <Catalog v-for="catalog in catalogView" :catalog="catalog" :key="catalog.href" />
     </component>
-    <b-button v-if="hasMore" @click="loadMore" variant="primary" v-b-visible.300="loadMore">Load more...</b-button>
+    <b-button v-if="hasMore" @click="loadMore" variant="primary" v-b-visible.300="loadMore">{{ $t('catalogs.loadMore') }}</b-button>
   </section>
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 import Catalog from './Catalog.vue';
 import STAC from '../models/stac';
 import ViewMixin from './ViewMixin';
@@ -49,7 +49,11 @@ export default {
     };
   },
   computed: {
+    ...mapState(['uiLanguage']),
     ...mapGetters(['getStac']),
+    hasMultiple() {
+      return !this.hasMore && this.catalogs.length > 1;
+    },
     catalogView() {
       if (this.hasMore) {
         return this.catalogs;
@@ -76,7 +80,7 @@ export default {
       }
       // Sort
       if (!this.hasMore && this.sort !== 0) {
-        catalogs = catalogs.slice(0).sort((a,b) => STAC.getDisplayTitle(a).localeCompare(STAC.getDisplayTitle(b)));
+        catalogs = catalogs.slice(0).sort((a,b) => STAC.getDisplayTitle(a).localeCompare(STAC.getDisplayTitle(b), this.uiLanguage));
         if (this.sort === -1) {
           catalogs = catalogs.reverse();
         }
