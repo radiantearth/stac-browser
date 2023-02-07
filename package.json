@@ -1,6 +1,6 @@
 {
   "name": "@radiantearth/stac-browser",
-  "version": "3.0.0-beta.6",
+  "version": "3.0.0-beta.7",
   "description": "A full-fledged UI in Vue for browsing and searching static STAC catalogs and STAC APIs.",
   "main": "src/main.js",
   "scripts": {
@@ -30,7 +30,7 @@
   "license": "ISC",
   "dependencies": {
     "@apidevtools/json-schema-ref-parser": "^9.0.9",
-    "@radiantearth/stac-fields": "1.0.0-beta.19",
+    "@radiantearth/stac-fields": "1.0.0-beta.25",
     "@radiantearth/stac-migrate": "~1.2.0",
     "axios": "^1.2.0",
     "bootstrap-vue": "^2.21.2",
