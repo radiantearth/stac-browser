@@ -11,7 +11,10 @@
         <template #button-content>
           <b-icon-flag /> <span class="button-label">{{ $t('source.language.label', {currentLanguage}) }}</span>
         </template>
-        <b-dropdown-item v-for="l of languages" :key="l.code" class="lang-item" @click="switchLocale(l.code)">
+        <b-dropdown-item
+          v-for="l of languages" :key="l.code" class="lang-item"
+          @click="switchLocale({locale: l.code, userSelected: true})"
+        >
           <b-icon-check v-if="locale === l.code" />
           <b-icon-blank v-else />
           <span class="title">

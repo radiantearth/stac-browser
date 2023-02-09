@@ -80,6 +80,11 @@ You can list additional domains (e.g. `example.com`) that private data is sent t
 If set to `true`, tries to detect the preferred language of the user from the Browser.
 Otherwise, defaults to the language set for `locale`.
 
+### storeLocale
+
+If set to `true`, stores the locale selected by the user in the `localeStorage` of the browser.
+Otherwise, doesn't store the locale across browser sessions.
+
 ### locale
 
 The default language to use for STAC Browser, defaults to `en` (English).

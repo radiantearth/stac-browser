@@ -4,6 +4,7 @@ module.exports = {
     allowExternalAccess: true, // Must be true if catalogUrl is not given
     allowedDomains: [],
     detectLocaleFromBrowser: true,
+    storeLocale: true,
     locale: "en",
     fallbackLocale: "en",
     supportedLocales: [

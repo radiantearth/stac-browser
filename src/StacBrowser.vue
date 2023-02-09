@@ -122,7 +122,8 @@ export default {
       catalogUrlFromVueX: 'catalogUrl',
       detectLocaleFromBrowserFromVueX: 'detectLocaleFromBrowser',
       fallbackLocaleFromVueX: 'fallbackLocale',
-      supportedLocalesFromVueX: 'supportedLocales'
+      supportedLocalesFromVueX: 'supportedLocales',
+      storeLocaleFromVueX: 'storeLocale'
     }),
     ...mapGetters(['displayCatalogTitle', 'fromBrowserPath', 'isExternalUrl', 'root', 'supportsConformance', 'toBrowserPath']),
     browserVersion() {
@@ -253,22 +254,7 @@ export default {
   },
   created() {
     this.$router.onReady(() => {
-      if (this.detectLocaleFromBrowserFromVueX && Array.isArray(navigator.languages)) {
-        // Detect the most suitable locale
-        const supported = prepareSupported(this.supportedLocalesFromVueX);
-        let locale = this.fallbackLocaleFromVueX;
-        for(let l of navigator.languages) {
-          const best = getBest(supported, l, null);
-          if (best) {
-            locale = best;
-            break;
-          }
-        }
-        // ToDo: This does change the UI language, but does not change the data language
-        // likely because it is executed before the data has loaded.
-        this.switchLocale(locale);
-      }
-      
+      this.detectLocale();
       this.parseQuery(this.$route);
     });
 
@@ -296,6 +282,32 @@ export default {
   },
   methods: {
     ...mapActions(['switchLocale']),
+    detectLocale() {
+      let locale;
+      if (this.storeLocaleFromVueX) {
+        try {
+          locale = window.localStorage.getItem('locale');
+        } catch(error) {
+          console.log(error);
+        }
+      }
+      if (!locale && this.detectLocaleFromBrowserFromVueX && Array.isArray(navigator.languages)) {
+        // Detect the most suitable locale
+        const supported = prepareSupported(this.supportedLocalesFromVueX);
+        for(let l of navigator.languages) {
+          const best = getBest(supported, l, null);
+          if (best) {
+            locale = best;
+            break;
+          }
+        }
+      }
+      if (locale && this.supportedLocalesFromVueX.includes(locale)) {
+        // ToDo: This does change the UI language, but does not change the data language
+        // likely because it is executed before the data has loaded.
+        this.switchLocale({locale});
+      }
+    },
     parseQuery(route) {
       let privateFromHash = {};
       if (this.historyMode === 'history') {
@@ -335,7 +347,7 @@ export default {
         }
       }
       if (params?.state?.language) {
-        this.switchLocale(params.state.language);
+        this.switchLocale({locale: params.state.language});
       }
       if (Utils.size(params.private) > 0) {
         this.$router.replace({ query });

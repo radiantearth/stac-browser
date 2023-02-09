@@ -7,6 +7,6 @@ export default function init() {
     return new Vue({
       i18n,
       render: h => h(StacBrowser)
-    }).$mount("#stac-browser")
+    }).$mount("#stac-browser");
   });
 }

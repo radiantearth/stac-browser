@@ -628,8 +628,16 @@ function getStore(config, router) {
       }
     },
     actions: {
-      async switchLocale(cx, locale) {
+      async switchLocale(cx, {locale, userSelected}) {
         cx.commit('config', {locale});
+
+        if (cx.state.storeLocale && userSelected) {
+          try {
+            window.localStorage.setItem('locale', locale);
+          } catch (error) {
+            console.log(error);
+          }
+        }
 
         // Locale for UI
         let uiLanguage = getBest(cx.state.supportedLocales, locale, cx.state.fallbackLocale);
