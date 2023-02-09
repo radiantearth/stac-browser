@@ -1,5 +1,5 @@
 // 1. Specify output format
-const format = 'YYYY-MM-DD';
+const format = 'M/D/YYYY';
 
 // 2A. Either re-use settings and phrases from vue2-datepicker...
 const locale = import('vue2-datepicker/locale/en');

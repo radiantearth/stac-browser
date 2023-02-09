@@ -1,7 +1,7 @@
 export default Object.assign(
   {
-    fields: require('../fr-FR/fields.json'),
+    fields: require('../fr/fields.json'),
   },
-  require('../fr-FR/texts.json'),
-  require('../fr-FR/custom.json')
+  require('../fr/texts.json'),
+  require('../fr/custom.json')
 );

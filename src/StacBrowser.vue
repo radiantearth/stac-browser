@@ -146,15 +146,15 @@ export default {
           return;
         }
 
+        // Update stac-fields
+        I18N.locales = [locale];
+        I18N.translate = translateFields;
+
         // Load messages
         await loadMessages(locale);
 
         // Set the locale for vue-i18n
         this.$root.$i18n.locale = locale;
-
-        // Update stac-fields
-        I18N.locales = [locale];
-        I18N.translate = translateFields;
       }
     },
     dataLanguage: {
