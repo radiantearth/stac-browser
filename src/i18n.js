@@ -30,9 +30,14 @@ const i18n = new VueI18n({
   fallbackLocale: CONFIG.fallbackLocale,
   messages: loadLocaleConfig()
 });
-loadMessages(CONFIG.locale);
-loadMessages(CONFIG.fallbackLocale);
 export default i18n;
+
+export function loadDefaultMessages() {
+  return Promise.all([
+    loadMessages(CONFIG.locale),
+    loadMessages(CONFIG.fallbackLocale)
+  ]);
+}
 
 export async function loadMessages(locale) {
   // Check whether the language has already been loaded
