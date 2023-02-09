@@ -10,8 +10,12 @@ module.exports = {
         "en",
         "en-US",
         "de",
+        "de-CH",
         "fr-CA",
-        "fr-FR"
+        "fr-CH",
+        "fr-FR",
+        "it",
+        "it-CH"
     ],
     useTileLayerAsFallback: true,
     tileSourceTemplate: null,
