@@ -113,7 +113,8 @@ export default {
   },
   data() {
     return {
-      error: null
+      error: null,
+      onDataLoaded: null
     };
   },
   computed: {
@@ -250,6 +251,14 @@ export default {
           this.$store.commit('config', { [key]: value });
         }
       }
+    },
+    data(data) {
+      if (!this.onDataLoaded) {
+        return;
+      }
+      if (data instanceof STAC) {
+        this.onDataLoaded();
+      }
     }
   },
   created() {
@@ -303,9 +312,15 @@ export default {
         }
       }
       if (locale && this.supportedLocalesFromVueX.includes(locale)) {
-        // ToDo: This does change the UI language, but does not change the data language
-        // likely because it is executed before the data has loaded.
+        // This may only change the UI language, but does not change the data language if the data is not loaded yet
         this.switchLocale({locale});
+        if (!this.data) {
+          // Thus try switching the (data) language again once the data is loaded.
+          this.onDataLoaded = () => {
+            this.switchLocale({locale});
+            this.onDataLoaded = null;
+          };
+        }
       }
     },
     parseQuery(route) {

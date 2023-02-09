@@ -247,7 +247,6 @@ function getStore(config, router) {
       additionalLinks: state => state.data ? state.data.getLinksWithOtherRels(stacBrowserSpecialHandling).filter(link => link.rel !== 'preview' || !Utils.canBrowserDisplayImage(link)) : [],
 
       toBrowserPath: (state, getters) => url => {
-        // ToDo: proxy support
         if (!Utils.hasText(url)) {
           url = '/';
         }
