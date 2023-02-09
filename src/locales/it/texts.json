@@ -125,11 +125,11 @@
     },
     "zoom": {
       "in": {
-        "description": "Zoom in",
+        "description": "Zoom avanti",
         "label": "+"
       },
       "out": {
-        "description": "Zoom out",
+        "description": "Zoom indietro",
         "label": "-"
       }
     }
@@ -154,10 +154,10 @@
     "next": "Prossimo ›",
     "previous": "‹ Precedente"
   },
-  "poweredBy": "Powered by {link}",
+  "poweredBy": "Offerto da {link}",
   "protocol": {
     "azure": "Microsoft Azure",
-    "file": "file system (local)",
+    "file": "File system (locale)",
     "ftp": "FTP",
     "gcs": "Google Cloud",
     "oss": "Alibaba Cloud",
