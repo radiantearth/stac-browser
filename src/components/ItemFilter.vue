@@ -4,6 +4,8 @@
       <b-card-body>
         <Loading v-if="!loaded" fill />
 
+        <b-card-title v-if="title" :title="title" />
+
         <b-form-group v-if="canFilterExtents" :label="$t('search.temporalExtent')" label-for="datetime" :description="$t('search.dateDescription')">
           <date-picker
             range id="datetime" :lang="datepickerLang" :format="datepickerFormat"
