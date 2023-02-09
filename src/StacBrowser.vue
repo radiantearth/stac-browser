@@ -264,6 +264,8 @@ export default {
             break;
           }
         }
+        // ToDo: This does change the UI language, but does not change the data language
+        // likely because it is executed before the data has loaded.
         this.switchLocale(locale);
       }
       

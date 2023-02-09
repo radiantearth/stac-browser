@@ -125,7 +125,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination', 'uiLanguage']),
+    ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination']),
     ...mapGetters(['additionalLinks', 'catalogs', 'isCollection', 'items', 'hasMoreCollections', 'getApiItemsLoading']),
     apiItemsLoading() {
       return this.getApiItemsLoading(this.data);
