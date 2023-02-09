@@ -1,8 +1,9 @@
 <template>
   <div class="map-container">
     <l-map class="map" v-if="show" :class="stac.type" @ready="init" :options="mapOptions">
-      <LControlFullscreen />
-      <LControlLayers v-if="showLayerControl" position="bottomleft" ref="layerControl" />
+      <l-control-fullscreen />
+      <l-control-zoom :key="`z${ix}`" v-bind="zoomControlTexts" position="topleft" />
+      <l-control-layers v-if="showLayerControl" position="bottomleft" ref="layerControl" />
       <template v-if="baseMaps.length > 0">
         <component
           v-for="baseMap in baseMaps"
@@ -10,12 +11,12 @@
           v-bind="baseMap" :layers="baseMap.name" layerType="base"
         />
       </template>
-      <LTileLayer v-else url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" ref="basemaps" :options="osmOptions" name="OpenStreetMap" layerType="base" />
-      <LTileLayer
+      <l-tile-layer v-else url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" ref="basemaps" :options="osmOptions" name="OpenStreetMap" layerType="base" />
+      <l-tile-layer
         v-for="xyz of xyzLinks" ref="overlays" :key="xyz.url" layerType="overlay"
         :name="xyz.name" :url="xyz.url" :subdomains="xyz.subdomains" :options="xyz.options" 
       />
-      <LGeoJson v-if="geojson" ref="geojson" :geojson="geojson" :options="{onEachFeature: showPopup}" :optionsStyle="{color: secondaryColor, weight: secondaryWeight}" />
+      <l-geo-json v-if="geojson" ref="geojson" :geojson="geojson" :options="{onEachFeature: showPopup}" :optionsStyle="{color: secondaryColor, weight: secondaryWeight}" />
     </l-map>
     <b-popover
       v-if="popover && selectedItem" placement="left" triggers="manual" :show="selectedItem !== null"
@@ -27,9 +28,7 @@
         </b-card-group>
       </section>
       <div class="text-center">
-        <b-button target="_blank" variant="danger" @click="resetSelectedItem">
-          Close
-        </b-button>
+        <b-button target="_blank" variant="danger" @click="resetSelectedItem">{{ $t('leaflet.close') }}</b-button>
       </div>
     </b-popover>
   </div>
@@ -38,7 +37,7 @@
 <script>
 import stacLayer from 'stac-layer';
 import { CRS } from "leaflet";
-import { LMap, LTileLayer, LWMSTileLayer, LGeoJson, LControlLayers } from 'vue2-leaflet';
+import { LMap, LControlZoom, LTileLayer, LWMSTileLayer, LGeoJson, LControlLayers } from 'vue2-leaflet';
 import LControlFullscreen from 'vue2-leaflet-fullscreen';
 import Utils, { geojsonMediaType } from '../utils';
 import './map/leaflet-areaselect';
@@ -80,6 +79,7 @@ export default {
     Item: () => import('../components/Item.vue'),
     LControlFullscreen,
     LControlLayers,
+    LControlZoom,
     LGeoJson,
     LMap,
     LTileLayer,
@@ -117,17 +117,37 @@ export default {
       stacLayer: null,
       geojson: null,
       itemPreviewsLayer: null,
-      mapOptions: {},
+      mapOptions: {
+        zoomControl: false
+      },
       osmOptions: {
+        // Don't translate as this is an official reference back, which we copied from OSM and shouldn't be altered!
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors.'
       },
       dblClickState: null,
-      selectedItem: null
+      selectedItem: null,
+      ix: 1
     };
   },
   computed: {
-    ...mapState(['buildTileUrlTemplate', 'crossOriginMedia', 'displayGeoTiffByDefault', 'geoTiffResolution', 'maxPreviewsOnMap', 'useTileLayerAsFallback']),
+    ...mapState(['buildTileUrlTemplate', 'crossOriginMedia', 'displayGeoTiffByDefault', 'geoTiffResolution', 'maxPreviewsOnMap', 'uiLanguage', 'useTileLayerAsFallback']),
     ...mapGetters(['getStac', 'supportsExtension']),
+    fullscreenOptions() {
+      return {
+        title: {
+          'false': this.$t('fullscreen.show'),
+          'true': this.$t('fullscreen.exit'),
+        }
+      };
+    },
+    zoomControlTexts() {
+      return {
+        zoomInText: this.$t('leaflet.zoom.in.label'),
+        zoomInTitle: this.$t('leaflet.zoom.in.description'),
+        zoomOutText: this.$t('leaflet.zoom.out.label'),
+        zoomOutTitle: this.$t('leaflet.zoom.out.description')
+      };
+    },
     baseMaps() {
       let targets = [];
       if (this.stac instanceof STAC) {
@@ -148,6 +168,7 @@ export default {
           return Object.assign({
               component: "LWMSTileLayer",
               crs: CRS.EPSG4326,
+              // Don't translate as this is an official reference back, which we copied from OSM and shouldn't be altered!
               attribution: "USGS Astrogeology",
               format: "image/png"
             }, BASEMAPS[target]);
@@ -176,6 +197,10 @@ export default {
     }
   },
   watch: {
+    uiLanguage() {
+      // This recreates the component so that it picks up the new translations
+      this.ix++;
+    },
     async stacLayerData() {
       await this.showStacLayer();
     },
@@ -287,7 +312,7 @@ export default {
         try {
           this.stacLayer = await stacLayer(data, options);
         } catch (error) {
-          this.$root.$emit('error', error, 'Sorry, adding the data to the map failed.');
+          this.$root.$emit('error', error, this.$t('leaflet.stayLayer.error'));
         }
 
         // If the map isn't shown any more after loading the STAC data, don't try to add it to the map.
@@ -408,7 +433,7 @@ export default {
         html += formatObject(feature.properties);
       }
       if (html.length === 0) {
-        html += '<p>No additional data available for this feature.<7p>';
+        html += `<p>${this.$t('leaflet.noFeatureProperties')}</p>`;
       }
       layer.bindPopup(html);
     },

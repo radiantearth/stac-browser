@@ -3,20 +3,20 @@
     <b-row>
       <b-col class="meta">
         <section class="intro">
-          <h2>Description</h2>
+          <h2>{{ $t('description') }}</h2>
           <DeprecationNotice v-if="data.deprecated" :data="data" />
           <AnonymizedNotice v-if="data['anon:warning']" :warning="data['anon:warning']" />
-          <ReadMore v-if="data.description" :lines="10">
+          <ReadMore v-if="data.description" :lines="10" :text="$t('read.more')" :text-less="$t('read.less')">
             <Description :description="data.description" />
           </ReadMore>
           <Keywords v-if="Array.isArray(data.keywords) && data.keywords.length > 0" :keywords="data.keywords" />
           <section v-if="isCollection" class="metadata mb-4">
             <b-row v-if="licenses">
-              <b-col md="4" class="label">License</b-col>
+              <b-col md="4" class="label">{{ $t('catalog.license') }}</b-col>
               <b-col md="8" class="value" v-html="licenses" />
             </b-row>
             <b-row v-if="temporalExtents">
-              <b-col md="4" class="label">Temporal Extents</b-col>
+              <b-col md="4" class="label">{{ $t('catalog.temporalExtent') }}</b-col>
               <b-col md="8" class="value" v-html="temporalExtents" />
             </b-row>
           </section>
@@ -24,10 +24,10 @@
         <section v-if="isCollection || thumbnails.length > 0" class="mb-4">
           <b-card no-body class="maps-preview">
             <b-tabs v-model="tab" ref="tabs" pills card vertical end>
-              <b-tab v-if="isCollection" title="Map" no-body>
+              <b-tab v-if="isCollection" :title="$t('map')" no-body>
                 <Map :stac="data" :stacLayerData="catalogAsFc" @mapClicked="mapClicked" @dataChanged="dataChanged" popover />
               </b-tab>
-              <b-tab v-if="thumbnails.length > 0" title="Preview" no-body>
+              <b-tab v-if="thumbnails.length > 0" :title="$t('thumbnails')" no-body>
                 <Thumbnails :thumbnails="thumbnails" />
               </b-tab>
             </b-tabs>
@@ -36,8 +36,8 @@
         <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="shownAssets" @showAsset="showAsset" />
         <Assets v-if="hasItemAssets && !hasItems" :assets="data.item_assets" :definition="true" />
         <Providers v-if="hasProviders" :providers="data.providers" />
-        <Metadata title="Metadata" class="mb-4" :type="data.type" :data="data" :ignoreFields="ignoredMetadataFields" />
-        <Links v-if="additionalLinks.length > 0" title="Additional resources" :links="additionalLinks" />
+        <Metadata :title="$t('metadata.title')" class="mb-4" :type="data.type" :data="data" :ignoreFields="ignoredMetadataFields" />
+        <Links v-if="additionalLinks.length > 0" :title="$t('additionalResources')" :links="additionalLinks" />
       </b-col>
       <b-col class="catalogs-container" v-if="hasCatalogs">
         <Catalogs :catalogs="catalogs" :hasMore="hasMoreCollections" @loadMore="loadMoreCollections" />
@@ -63,11 +63,10 @@ import Links from '../components/Links.vue';
 import Metadata from '../components/Metadata.vue';
 import ReadMore from "vue-read-more-smooth";
 import ShowAssetMixin from '../components/ShowAssetMixin';
+import StacFieldsMixin from '../components/StacFieldsMixin';
 import { formatLicense, formatTemporalExtents } from '@radiantearth/stac-fields/formatters';
 import { BTabs, BTab } from 'bootstrap-vue';
 import Utils from '../utils';
-
-const SORRY_ITEM_LIST = "Sorry, can't load the list of items.";
 
 export default {
   name: "Catalog",
@@ -88,7 +87,10 @@ export default {
     ReadMore,
     Thumbnails: () => import('../components/Thumbnails.vue')
   },
-  mixins: [ShowAssetMixin],
+  mixins: [
+    ShowAssetMixin,
+    StacFieldsMixin({ formatLicense, formatTemporalExtents })
+  ],
   data() {
     return {
       filters: {},
@@ -116,7 +118,9 @@ export default {
         // Will be rendered with a custom rendered
         'deprecated',
         // Special handling for the warning of the anonymized-location extension
-        'anon:warning'
+        'anon:warning',
+        // Special handling for the STAC Browser config
+        'stac_browser'
       ]
     };
   },
@@ -128,7 +132,7 @@ export default {
     },
     licenses() {
       if (this.isCollection && this.data.license) {
-        return formatLicense(this.data.license, null, null, this.data);
+        return this.formatLicense(this.data.license, null, null, this.data);
       }
       return null;
     },
@@ -142,7 +146,7 @@ export default {
             // Remove union temporal extent in favor of more concrete extents
             extents = extents.slice(1);
         }
-        return formatTemporalExtents(extents);
+        return this.formatTemporalExtents(extents);
       }
       return null;
     },
@@ -181,7 +185,7 @@ export default {
       try {
         await this.$store.dispatch('loadApiItems', {link, show: true, filters: this.filters});
       } catch (error) {
-        this.$root.$emit('error', error, SORRY_ITEM_LIST);
+        this.$root.$emit('error', error, this.$t('errors.loadItems'));
       }
     },
     async filterItems(filters, reset) {
@@ -192,7 +196,8 @@ export default {
       try {
         await this.$store.dispatch('loadApiItems', {link: this.apiItemsLink, show: true, filters});
       } catch (error) {
-        this.$root.$emit('error', error, reset ? SORRY_ITEM_LIST : "Sorry, can't load the filtered list of items.");
+        let msg = reset ? this.$t('errors.loadItems') : this.$t('errors.loadFilteredItems');
+        this.$root.$emit('error', error, msg);
       }
     },
     mapClicked(/*stac*/) {

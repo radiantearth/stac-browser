@@ -36,7 +36,7 @@ export default {
   },
   computed: {
     title() {
-      return this.isFullscreen ? 'Close Fullscreen' : 'View Fullscreen';
+      return this.isFullscreen ? this.$t('fullscreen.exit') : this.$t('fullscreen.show');
     }
   },
   mounted() {

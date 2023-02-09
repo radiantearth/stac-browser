@@ -43,9 +43,13 @@ export default {
     }
   },
   computed: {
+    count() {
+      return Utils.size(this.assets);
+    },
     displayTitle() {
       if (this.title === null) {
-        return this.definition ? 'Assets in Items' : 'Assets';
+        let langKey = this.definition ? 'assets.inItems' : 'stacAssets';
+        return this.$tc(langKey, this.count);
       }
       else {
         return this.title;
@@ -55,7 +59,7 @@ export default {
       if (this.definition) {
         return false; // Don't expand assets for Item Asset Definitions
       }
-      else if (Utils.size(this.assets) === 1 && this.stac && this.stac.isItem()) {
+      else if (this.count === 1 && this.stac && this.stac.isItem()) {
         return true; // Expand asset if it's the only asset available and it is in an Item
       }
       return null; // Let asset decide (e.g. depending on roles)

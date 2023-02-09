@@ -3,6 +3,20 @@ module.exports = {
     catalogTitle: "STAC Browser",
     allowExternalAccess: true, // Must be true if catalogUrl is not given
     allowedDomains: [],
+    detectLocaleFromBrowser: true,
+    storeLocale: true,
+    locale: "en",
+    fallbackLocale: "en",
+    supportedLocales: [
+        "de",
+//      "de-CH",
+        "en",
+        "fr",
+//      "fr-CA",
+//      "fr-CH",
+        "it",
+//      "it-CH"
+    ],
     useTileLayerAsFallback: true,
     tileSourceTemplate: null,
     displayGeoTiffByDefault: false,
@@ -16,6 +30,7 @@ module.exports = {
     geoTiffResolution: 128,
     redirectLegacyUrls: false,
     itemsPerPage: 12,
+    defaultThumbnailSize: null,
     maxPreviewsOnMap: 50,
     crossOriginMedia: null,
     requestHeaders: {},

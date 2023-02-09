@@ -13,7 +13,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['cardViewMode', 'crossOriginMedia']),
+    ...mapState(['cardViewMode', 'crossOriginMedia', 'defaultThumbnailSize']),
     isList() {
       return this.data && !this.data.isItem() && this.cardViewMode === 'list';
     },
@@ -28,6 +28,9 @@ export default {
           let width, height;
           if (Array.isArray(t['proj:shape']) && t['proj:shape'].length === 2) {
             [height, width] = t['proj:shape'];
+          }
+          else if (Array.isArray(this.defaultThumbnailSize) && this.defaultThumbnailSize.length === 2) {
+            [height, width] = this.defaultThumbnailSize;
           }
           return {
             src: this.thumbnailError ? '/img.svg' : t.href,

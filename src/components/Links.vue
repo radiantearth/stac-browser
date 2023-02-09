@@ -25,6 +25,8 @@ import Fields from '@radiantearth/stac-fields/fields.json';
 import { ogcRelPrefix } from '../rels';
 import Utils from '../utils';
 import { formatKey } from '@radiantearth/stac-fields/helper';
+import { translateFields } from '../i18n';
+import { mapState } from 'vuex';
 
 
 export default {
@@ -43,6 +45,7 @@ export default {
     }
   },
   computed: {
+    ...mapState(['uiLanguage']),
     groups() {
       let groups = this.links.reduce((summary, link) => {
         let rel = typeof link.rel === 'string' ? link.rel.toLowerCase() : "";
@@ -58,7 +61,7 @@ export default {
         }
         return summary;
       }, {});
-      return Object.values(groups).sort((g1, g2) => g1.rel.localeCompare(g2.rel));
+      return Object.values(groups).sort((g1, g2) => g1.label.localeCompare(g2.label, this.uiLanguage));
     },
     hasGroups() {
       return this.groups.some(group => group.rel.length > 0 && group.links.length >= 2);
@@ -68,7 +71,7 @@ export default {
     formatRel(rel) {
       let lc = typeof rel === 'string' ? rel.toLowerCase() : "";
       if (lc in Fields.links.rel.mapping) {
-        return Fields.links.rel.mapping[lc];
+        return translateFields(Fields.links.rel.mapping[lc]);
       }
       else {
         if (rel.startsWith(ogcRelPrefix)) {

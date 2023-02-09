@@ -1,6 +1,6 @@
 <template>
   <b-row>
-    <b-col md="3" class="label" :title="field" v-html="label" />
+    <b-col :md="showTable ? 12 : 3" class="label" :title="field" v-html="label" />
     <b-col v-if="showTable" md="12" class="value mt-2">
       <MetadataTable v-bind="$props" />
     </b-col>
@@ -12,6 +12,10 @@
 import EntryMixin from './EntryMixin';
 import Utils from '../../utils';
 
+const FORCE_TABLE = [
+  'languages'
+];
+
 export default {
   name: "MetadataEntry",
   components: {
@@ -22,7 +26,7 @@ export default {
   ],
   computed: {
     showTable() {
-      return this.itemOrder.length > 0 && Utils.size(this.value) >= 3;
+      return FORCE_TABLE.includes(this.field) || this.itemOrder.length > 0 && Utils.size(this.value) >= 3;
     }
   }
 };

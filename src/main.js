@@ -1,8 +1,6 @@
 import Vue from "vue";
-import StacBrowser from "./StacBrowser.vue";
+import init from "./init";
 
 Vue.config.productionTip = false;
 
-new Vue({
-  render: (h) => h(StacBrowser),
-}).$mount("#stac-browser");
+init();

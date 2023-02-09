@@ -14,6 +14,9 @@ const argv = yargs(hideBin(process.argv))
     'itemsPerPage',
     'maxPreviewsOnMap'
   ])
+  .array([
+    'supportedLocales'
+  ])
   .argv;
 // Clean-up arguments
 delete argv._;
@@ -48,5 +51,12 @@ module.exports = {
         includeAliases: ['Buffer', 'console', 'http', 'https', 'process', 'url']
       })
     ]
+  },
+  pluginOptions: {
+    i18n: {
+      locale: mergedConfig.locale,
+      fallbackLocale: mergedConfig.fallbackLocale,
+      enableInSFC: false
+    }
   }
 };

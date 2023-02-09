@@ -9,12 +9,12 @@
         <small class="text-muted">
           <template v-if="extent">{{ extent | formatTemporalExtent }}</template>
           <template v-else-if="data && data.properties.datetime">{{ data.properties.datetime | formatTimestamp }}</template>
-          <template v-else>No time given</template>
+          <template v-else>{{ $t('items.noTime') }}</template>
         </small>
       </b-card-text>
       <b-card-text v-if="fileFormats.length > 0 || isDeprecated">
         <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="mr-1 mt-1 fileformat">{{ format | formatMediaType }}</b-badge>
-        <b-badge v-if="isDeprecated" variant="warning" class="mr-1 mt-1 deprecated">Deprecated</b-badge>
+        <b-badge v-if="isDeprecated" variant="warning" class="mr-1 mt-1 deprecated">{{ $t('deprecated') }}</b-badge>
       </b-card-text>
     </b-card-body>
   </b-card>

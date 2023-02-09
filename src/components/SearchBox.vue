@@ -1,7 +1,7 @@
 <template>
   <div class="vue-component search-box">
     <span class="icon">🔎</span>
-    <b-form-input type="search" v-model.trim="searchTerm" :placeholder="placeholder" />
+    <b-form-input type="search" v-model.trim="searchTerm" :placeholder="placeholder || $t('search.placeholder')" />
   </div>
 </template>
 
@@ -20,7 +20,7 @@ export default {
     },
     placeholder: {
       type: String,
-      default: 'Search'
+      default: null
     }
   },
   data() {
