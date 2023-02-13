@@ -106,7 +106,7 @@
     "api": "API",
     "catalog": "Catalog",
     "load": "Încărcare",
-    "selectStacIndex": "... sau selectați unul din indexul STAC:",
+    "selectStacIndex": "... sau selectați unul din {stacIndex}:",
     "specifyCatalog": "Vă rugăm să specificați un catalog STAC sau un API...",
     "urlInvalid": "Linkul URL este invalid.",
     "urlMissingHost": "Link-ul URL nu conține nicio gazdă.",

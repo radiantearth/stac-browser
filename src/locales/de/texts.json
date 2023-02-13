@@ -106,7 +106,7 @@
     "api": "API",
     "catalog": "Katalog",
     "load": "Laden",
-    "selectStacIndex": "... oder wähle von STAC Index:",
+    "selectStacIndex": "... oder wähle von {stacIndex}:",
     "specifyCatalog": "Bitte gib einen STAC Katalog oder eine STAC API an...",
     "urlInvalid": "Die Adresse ist ungültig.",
     "urlMissingHost": "Der Adresse fehlt ein Host.",

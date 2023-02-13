@@ -11,23 +11,23 @@
         <b-button type="submit" variant="primary">{{ $t('index.load') }}</b-button>
       </b-form>
       <hr>
-      <b-form-group v-if="stacIndex.length > 0" id="stacIndex" :label="$t('index.selectStacIndex')">
+      <b-form-group v-if="stacIndex.length > 0" id="stacIndex">
+        <template #label>
+          <i18n path="index.selectStacIndex">
+            <template #stacIndex>
+              <a href="https://stacindex.org" target="_blank">STAC Index</a>
+            </template>
+          </i18n>
+        </template>
         <b-list-group class="stacIndex">
           <template v-for="catalog in stacIndex">
-            <b-list-group-item
-              button v-if="show(catalog)" :key="catalog.id" class="flex-column align-items-start"
-              :active="url === catalog.url" @click="open(catalog.url)"
-            >
-              <div class="d-flex w-100 justify-content-between">
-                <strong class="mb-1">{{ catalog.title }}</strong>
-                <small>
-                  <b-badge v-if="catalog.isApi" variant="dark" pill>{{ $t('index.api') }}</b-badge>
-                  <b-badge v-else variant="light" pill>{{ $t('index.catalog') }}</b-badge>
-                </small>
+            <b-list-group-item button v-if="show(catalog)" :key="catalog.id" :active="url === catalog.url" @click="open(catalog.url)">
+              <div class="d-flex justify-content-between align-items-baseline mb-1">
+                <strong>{{ catalog.title }}</strong>
+                <b-badge v-if="catalog.isApi" variant="danger">{{ $t('index.api') }}</b-badge>
+                <b-badge v-else variant="success">{{ $t('index.catalog') }}</b-badge>
               </div>
-              <div class="mb-1">
-                <Description :description="catalog.summary" compact />
-              </div>
+              <Description :description="catalog.summary" compact />
             </b-list-group-item>
           </template>
         </b-list-group>
@@ -77,7 +77,7 @@ export default {
           return this.$t('index.urlMissingHost');
         }
         return null;
-      } catch (error) {
+      } catch (errot) {
         return this.$t('index.urlInvalid');
       }
     }
@@ -124,7 +124,18 @@ export default {
 #stac-browser {
   .stacIndex {
     max-height: 50vh;
+    width: 100%;
     overflow: auto;
+    border: 1px solid rgba(0,0,0,.125);
+
+    .list-group-item {
+      border: 0;
+      border-bottom: 1px solid rgba(0,0,0,.125);
+
+      &:last-of-type {
+        border-bottom: 0;
+      }
+    }
 
     .active .styled-description a {
       color: white;
