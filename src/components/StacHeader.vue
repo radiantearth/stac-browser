@@ -19,7 +19,7 @@
           <b-button v-if="collectionLink" :to="toBrowserPath(collectionLink.href)" :title="collectionLinkTitle" variant="outline-primary" size="sm">
             <b-icon-folder-symlink /> <span class="button-label prio">{{ $t('goToCollection.label') }}</span>
           </b-button>
-          <b-button variant="outline-primary" size="sm" v-b-toggle.sidebar :title="$t('browse')">
+          <b-button variant="outline-primary" size="sm" :title="$t('browse')" v-b-toggle.sidebar @click="$emit('enableSidebar')">
             <b-icon-book /> <span class="button-label prio">{{ $t('browse') }}</span>
           </b-button>
           <b-button v-if="searchBrowserLink" variant="outline-primary" size="sm" :to="searchBrowserLink" :title="$t('search.title')" :pressed="isSearchPage()">

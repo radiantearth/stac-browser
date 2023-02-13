@@ -1,13 +1,11 @@
 <template>
   <b-container id="stac-browser">
     <Authentication v-if="doAuth.length > 0" />
-    <b-sidebar id="sidebar" :title="$t('browse')" shadow lazy>
-      <Sidebar />
-    </b-sidebar>
+    <Sidebar v-if="sidebar" />
     <!-- Header -->
     <header>
       <div class="logo">{{ displayCatalogTitle }}</div>
-      <StacHeader />
+      <StacHeader @enableSidebar="sidebar = true" />
     </header>
     <!-- Content (Item / Catalog) -->
     <main>
@@ -34,7 +32,7 @@ import getStore from "./store";
 
 import {
   AlertPlugin, BadgePlugin, ButtonGroupPlugin, ButtonPlugin,
-  CardPlugin, LayoutPlugin, SidebarPlugin, SpinnerPlugin,
+  CardPlugin, LayoutPlugin, SpinnerPlugin,
   VBToggle, VBVisible } from "bootstrap-vue";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
@@ -42,7 +40,6 @@ import "bootstrap-vue/dist/bootstrap-vue.css";
 import Clipboard from 'v-clipboard';
 
 import ErrorAlert from './components/ErrorAlert.vue';
-import Sidebar from './components/Sidebar.vue';
 import StacHeader from './components/StacHeader.vue';
 
 import STAC from './models/stac';
@@ -61,7 +58,6 @@ Vue.use(ButtonPlugin);
 Vue.use(BadgePlugin);
 Vue.use(CardPlugin);
 Vue.use(LayoutPlugin);
-Vue.use(SidebarPlugin);
 Vue.use(SpinnerPlugin);
 
 // For collapsibles / accordions
@@ -105,7 +101,7 @@ export default {
   components: {
     Authentication: () => import('./components/Authentication.vue'),
     ErrorAlert,
-    Sidebar,
+    Sidebar: () => import('./components/Sidebar.vue'),
     StacHeader
   },
   props: {
@@ -113,6 +109,7 @@ export default {
   },
   data() {
     return {
+      sidebar: false,
       error: null,
       onDataLoaded: null
     };
