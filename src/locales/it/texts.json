@@ -5,8 +5,8 @@
   },
   "assets": {
     "copyGdalVfsUrl": {
-      "generic": "Copia l'URL del GDAL VFS",
-      "withSource": "Copia l'URL del GDAL VFS per {source}"
+      "generic": "Copia l'URL del VFS GDAL",
+      "withSource": "Copia l'URL del VFS GDAL per {source}"
     },
     "copyUrl": {
       "generic": "Copia l'URL",
@@ -151,7 +151,7 @@
   "pagination": {
     "first": "« Primo",
     "last": "Ultimo »",
-    "next": "Prossimo ›",
+    "next": "Successivo ›",
     "previous": "‹ Precedente"
   },
   "poweredBy": "Offerto da {link}",
@@ -187,7 +187,7 @@
       "filter": "Filtra",
       "reset": "Reimposta"
     },
-    "dateDescription": "Data/ora nel sistem UTC (tempo coordinato internazionale).",
+    "dateDescription": "Data/ora nel sistema UTC (tempo coordinato internazionale).",
     "equalTo": "uguale a",
     "filterBySpatialExtent": "Filtra per estensione spaziale",
     "greaterThan": "maggiore di",
@@ -244,7 +244,7 @@
       "label": "Condividi",
       "message": "{title} è disponibile all'indirizzo {url}",
       "sharePageWithOthers": "Condividi l'URL di questa pagina dove vuoi:",
-      "title": "Condividi",
+      "title": "Condivisione",
       "twitter": "Twitter",
       "withOthers": "Condividi questa pagina con altri"
     },
@@ -268,19 +268,19 @@
       "desc": "Clicca per ordinare in ordine decrescente"
     }
   },
-  "thumbnails": "Anteprime",
+  "thumbnails": "Anteprima",
   "tree": {
-    "moreCollectionPagesAvailable": "altre pagine disponibili per la Collezione",
+    "moreCollectionPagesAvailable": "altre Collezioni disponibili",
     "noChildren": "Non sono disponibili sottovoci."
   },
   "view": {
     "list": {
       "label": "Elenco",
-      "title": "Mostra come elenco"
+      "title": "Mostra elenco"
     },
     "tiles": {
       "label": "Schede",
-      "title": "Visualizza come schede"
+      "title": "Mostra schede"
     },
     "title": "Opzioni di visualizzazione"
   }
