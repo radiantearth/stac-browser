@@ -1,5 +1,5 @@
 <template>
-  <div class="search d-flex flex-column">
+  <main class="search d-flex flex-column">
     <Loading v-if="!parent" stretch />
     <b-alert v-else-if="!searchLink" variant="danger" show>{{ $t('search.notSupported') }}</b-alert>
     <b-row v-else>
@@ -24,7 +24,7 @@
         </template>
       </b-col>
     </b-row>
-  </div>
+  </main>
 </template>
 
 <script>
@@ -174,8 +174,6 @@ export default {
 @import "../theme/variables.scss";
 
 .search {
-  min-height: 100%;
-
   .left {
     min-width: 200px;
     flex-basis: 40%;

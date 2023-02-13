@@ -1,12 +1,12 @@
 <template>
-  <section class="browse d-flex flex-column">
+  <main class="browse d-flex flex-column">
     <b-alert v-if="!allowExternalAccess && isExternal" show>
       <p>{{ $t('errors.noExternalAccess') }}</p>
     </b-alert>
     <ErrorAlert v-if="error" :dismissible="false" :url="url" :description="errorDescription" :id="errorId" />
     <Loading v-else-if="loading" stretch />
     <component v-else :is="component" />
-  </section>
+  </main>
 </template>
 
 <script>
@@ -113,9 +113,3 @@ export default {
   }
 };
 </script>
-
-<style lang="scss" scoped>
-.browse {
-  min-height: 100%;
-}
-</style>

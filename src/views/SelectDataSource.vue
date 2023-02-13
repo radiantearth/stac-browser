@@ -1,39 +1,37 @@
 <template>
-  <b-row>
-    <b-col>
-      <b-form @submit="go">
-        <b-form-group
-          id="select" :label="$t('index.specifyCatalog')" label-for="url"
-          :invalid-feedback="error" :state="valid"
-        >
-          <b-form-input id="url" type="url" :value="url" @input="setUrl" placeholder="https://..." />
-        </b-form-group>
-        <b-button type="submit" variant="primary">{{ $t('index.load') }}</b-button>
-      </b-form>
-      <hr>
-      <b-form-group v-if="stacIndex.length > 0" id="stacIndex">
-        <template #label>
-          <i18n path="index.selectStacIndex">
-            <template #stacIndex>
-              <a href="https://stacindex.org" target="_blank">STAC Index</a>
-            </template>
-          </i18n>
-        </template>
-        <b-list-group class="stacIndex">
-          <template v-for="catalog in stacIndex">
-            <b-list-group-item button v-if="show(catalog)" :key="catalog.id" :active="url === catalog.url" @click="open(catalog.url)">
-              <div class="d-flex justify-content-between align-items-baseline mb-1">
-                <strong>{{ catalog.title }}</strong>
-                <b-badge v-if="catalog.isApi" variant="danger">{{ $t('index.api') }}</b-badge>
-                <b-badge v-else variant="success">{{ $t('index.catalog') }}</b-badge>
-              </div>
-              <Description :description="catalog.summary" compact />
-            </b-list-group-item>
-          </template>
-        </b-list-group>
+  <main class="select-data-source">
+    <b-form @submit="go">
+      <b-form-group
+        id="select" :label="$t('index.specifyCatalog')" label-for="url"
+        :invalid-feedback="error" :state="valid"
+      >
+        <b-form-input id="url" type="url" :value="url" @input="setUrl" placeholder="https://..." />
       </b-form-group>
-    </b-col>
-  </b-row>
+      <b-button type="submit" variant="primary">{{ $t('index.load') }}</b-button>
+    </b-form>
+    <hr v-if="stacIndex.length > 0">
+    <b-form-group v-if="stacIndex.length > 0" class="stac-index">
+      <template #label>
+        <i18n path="index.selectStacIndex">
+          <template #stacIndex>
+            <a href="https://stacindex.org" target="_blank">STAC Index</a>
+          </template>
+        </i18n>
+      </template>
+      <b-list-group>
+        <template v-for="catalog in stacIndex">
+          <b-list-group-item button v-if="show(catalog)" :key="catalog.id" :active="url === catalog.url" @click="open(catalog.url)">
+            <div class="d-flex justify-content-between align-items-baseline mb-1">
+              <strong>{{ catalog.title }}</strong>
+              <b-badge v-if="catalog.isApi" variant="danger">{{ $t('index.api') }}</b-badge>
+              <b-badge v-else variant="success">{{ $t('index.catalog') }}</b-badge>
+            </div>
+            <Description :description="catalog.summary" compact />
+          </b-list-group-item>
+        </template>
+      </b-list-group>
+    </b-form-group>
+  </main>
 </template>
 
 <script>
@@ -121,24 +119,45 @@ export default {
 </script>
 
 <style lang="scss">
-#stac-browser {
-  .stacIndex {
-    max-height: 50vh;
+@import '../theme/variables.scss';
+
+#stac-browser .select-data-source {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+
+  hr {
     width: 100%;
-    overflow: auto;
-    border: 1px solid rgba(0,0,0,.125);
+  }
 
-    .list-group-item {
-      border: 0;
-      border-bottom: 1px solid rgba(0,0,0,.125);
+  .stac-index {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
 
-      &:last-of-type {
-        border-bottom: 0;
+    > div {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      overflow: auto;
+      border: 1px solid rgba(0,0,0,.125);
+      border-radius: $border-radius;
+
+      .list-group {
+        width: 100%;
+
+        .list-group-item {
+          border: 0;
+          border-bottom: 1px solid rgba(0,0,0,.125);
+        }
+
+        .active .styled-description a {
+          color: white;
+        }
       }
-    }
-
-    .active .styled-description a {
-      color: white;
     }
   }
 }

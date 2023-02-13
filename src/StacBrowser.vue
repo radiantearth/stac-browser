@@ -1,6 +1,7 @@
 <template>
   <b-container id="stac-browser">
     <Authentication v-if="doAuth.length > 0" />
+    <ErrorAlert class="global-error" v-if="globalError" v-bind="globalError" @close="hideError" />
     <Sidebar v-if="sidebar" />
     <!-- Header -->
     <header>
@@ -8,10 +9,7 @@
       <StacHeader @enableSidebar="sidebar = true" />
     </header>
     <!-- Content (Item / Catalog) -->
-    <main>
-      <ErrorAlert class="global-error" v-if="globalError" v-bind="globalError" @close="hideError" />
-      <router-view />
-    </main>
+    <router-view />
     <footer>
       <i18n tag="small" path="poweredBy" class="poweredby text-muted">
         <template #link>

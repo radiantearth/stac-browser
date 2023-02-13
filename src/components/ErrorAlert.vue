@@ -59,8 +59,15 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.alert {
+  margin-bottom: 0;
+}
 .message {
   font-weight: bold;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
 }
 dl {
   font-size: 0.9em;
