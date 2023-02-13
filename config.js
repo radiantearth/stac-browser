@@ -15,7 +15,8 @@ module.exports = {
 //      "fr-CA",
 //      "fr-CH",
         "it",
-//      "it-CH"
+//      "it-CH",
+        "ro"
     ],
     useTileLayerAsFallback: true,
     tileSourceTemplate: null,
