@@ -15,11 +15,23 @@ This package has also been published to npm as [`@radiantearth/stac-browser`](ht
 It's not officially supported, but you may also be able to use it for
 certain *OGC API - Records* and *OGC API - Features* compliant servers.
 
+**Table of contents:**
+* [Examples](#examples)
+* [Get Started](#get-started)
+* [Options](#options)
+* [Theming](#theming)
+* [Custom fields](#custom-fields)
+* [Private query parameters](#private-query-parameters)
+* [Customize through root catalog](#customize-through-root-catalog)
+* [Running Dockerfile](#running-dockerfile)
+* [Contributing](#contributing)
+  * [Languages](#languages)
+
 ## Examples
 
 For a list of examples, check out [STAC Index](https://stacindex.org).
 
-## Running
+## Get Started
 
 First, you need to install all dependencies:
 ```bash
@@ -52,6 +64,36 @@ You can customize STAC Browser, too. See the options and theming details below. 
 ## Options
 
 All the following options can be used as explained in the chapter "Running", either through the [config file](config.js), as CLI Parameter or as environment variable (deprecated).
+Some of them can also be set [through the root catalog](#customize-through-root-catalog).
+
+**The following options are available:**
+* [catalogUrl](#catalogurl)
+* [catalogTitle](#catalogtitle)
+* [allowExternalAccess](#allowexternalaccess)
+* [allowedDomains](#alloweddomains)
+* [detectLocaleFromBrowser](#detectlocalefrombrowser)
+* [storeLocale](#storelocale)
+* [locale](#locale)
+* [fallbackLocale](#fallbacklocale)
+* [supportedLocales](#supportedlocales)
+* [stacLint](#staclint)
+* [historyMode](#historymode)
+* [pathPrefix](#pathprefix)
+* [stacProxyUrl](#stacproxyurl)
+* [buildTileUrlTemplate](#buildtileurltemplate)
+* [useTileLayerAsFallback](#usetilelayerasfallback)
+* [displayGeoTiffByDefault](#displaygeotiffbydefault)
+* [redirectLegacyUrls](#redirectlegacyurls)
+* [itemsPerPage](#itemsperpage)
+* [maxPreviewsOnMap](#maxpreviewsonmap)
+* [cardViewMode](#cardviewmode)
+* [showThumbnailsAsAssets](#showthumbnailsasassets)
+* [defaultThumbnailSize](#defaultthumbnailsize)
+* [crossOriginMedia](#crossoriginmedia)
+* [requestHeaders](#requestheaders)
+* [requestQueryParameters](#requestqueryparameters)
+* [authConfig](#authconfig)
+* [preprocessSTAC](#preprocessstac)
 
 ### catalogUrl
 
@@ -380,6 +422,26 @@ docker run -p 8080:8080 stac-browser:v1
 
 ## Contributing
 
-STAC Browser uses [Vue](https://vuejs.org/).
+We are happy to review and accept Pull Requests.
+STAC Browser is following the [STAC code of conduct](https://github.com/radiantearth/stac-spec/blob/master/CODE_OF_CONDUCT.md).
 
-To lint the source code, run `npm run lint`
+STAC Browser uses [Vue](https://vuejs.org/) and [vue-cli](https://cli.vuejs.org/), so you need a recent version of [NodeJS and npm](https://nodejs.org/en/) installed.
+
+You can run the following commands (see also "[Running](#running)" above):
+- `npm run install`: Install the dependencies, this is required once at the beginning.
+- `npm start`: Start the development server
+- `npm run lint`: Lint the source code files
+- `npm run build`: Compile the source code into deployable files for the web. The resulting files can be found in the folder `dist` and you can then deploy STAC Browser on a web host.
+- `npm run i18n:fields`: Generates an updated version of the locales from the stac-fields package.
+
+### Languages
+
+If you want to translate STAC Browser into another language, you can copy the `en` folder and create a new folder based on it.
+The new folder must follow [RFC5646](https://www.rfc-editor.org/rfc/rfc5646).
+The first step is then to add the language to the list of supported locales (`supportedLocales`) in the `config.js` file.
+You can then translate the `.json` files, most importantly `config.json`, `fields.json` and `texts.json`. Please note that you never need to translate any object keys!
+If you base your language on another existing language (e.g. create `en-IN` based on `en`) you can delete individual files and import existing files from other languages in `default.js`.
+The `datepicker.js` and `duration.js` files usually just import the existing definitions from their corresponding external packages, but you can also define the specifics yourself.
+Persons contributing languages are expected to maintain them long-term! As such we'll invite you to this repository and add you as a code owner for the new folder.
+After translating the files, you can check it by running `npm start` and navigating to the STAC Browser instance in your browser.
+Once completed, please open a pull request and we'll get back to you as soon as possible.
