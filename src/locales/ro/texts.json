@@ -238,12 +238,12 @@
       "onlyUI": "Doar interfața cu utilizatorul este disponibilă în această limbă!",
       "switch": "Schimbă limba"
     },
-    "locatedAt": "Fișierul de metadate STAC poate fi găsit la următoarea adresă :",
+    "locatedAt": "Fișierul de metadate STAC poate fi găsit la următoarea adresă:",
     "share": {
       "email": "E-Mail",
       "label": "Partajare",
       "message": "{title} este disponibil la adresa {url}",
-      "sharePageWithOthers": "Partajați adresa cu alții::",
+      "sharePageWithOthers": "Partajați URL-ul acestei pagini cu alții:",
       "title": "Partajare",
       "twitter": "Twitter",
       "withOthers": "Partajați această pagină"
@@ -251,8 +251,8 @@
     "stacVersion": "Versiune STAC:",
     "title": "Date sursă",
     "valid": "Valid:",
-    "validating": "validare...",
-    "validationNA": "s.a."
+    "validating": "Validare...",
+    "validationNA": "n.a."
   },
   "stacAssets": "Resursă | Resurse",
   "stacCatalog": "Catalog | Cataloage",
