@@ -107,7 +107,7 @@
     "catalog": "Catálogo",
     "load": "Cargar",
     "selectStacIndex": "... o seleccione uno de {stacIndex}:",
-    "specifyCatalog": "Por favor especifique un catálogo STAC o una API...",
+    "specifyCatalog": "Por favor especifique un catálogo o una API STAC...",
     "urlInvalid": "La URL es inválida.",
     "urlMissingHost": "La URL no tiene host.",
     "urlMissingProtocol": "La URL no tiene protocolo."
