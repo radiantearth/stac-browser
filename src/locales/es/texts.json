@@ -44,7 +44,7 @@
   "catalogs": {
     "filterByTitle": "Filtrar catálogos por título",
     "loadMore": "Cargar más...",
-    "noMatches": "Ningún catálgo concuerda con los criterios de búsqueda"
+    "noMatches": "Ningún catálogo concuerda con los criterios de búsqueda"
   },
   "copy": "Copia",
   "default": "Predeterminado",
@@ -58,7 +58,7 @@
     "outdatedTitle": "Desactualizado",
     "predecessorVersion": "Versión anterior:",
     "successorVersion": "Siguiente versión:",
-    "warning": "Por favor tenga en cuenta que este {type} está obsoleto por lo que puede ser eliminado en cualquier momento. Debería dejar de usarse lo antes posible. Absténgase de usarlo en nuevos proyectos."
+    "warning": "Por favor tenga en cuenta que este {type} está obsoleto por lo que puede ser eliminado en cualquier momento. Debería dejar de usarse lo antes posible. Abstenerse de usarlo en nuevos proyectos."
   },
   "description": "Descripción",
   "errors": {
@@ -66,8 +66,8 @@
     "badRequest": "La petición es inválida. Esto puede deberse a parámetros incorrectos, por ejemplo, en la búsqueda, o puede ser un bug en STAC Browser.",
     "contactProvider": "Por favor contacte al proveedor de servicio para resolver este problema.",
     "default": "La página solicitada no se pudo cargar.",
-    "forbidden": "Las credneciales especificadas in esta solicitud son inválidos, por ejemplo, un token de la API caducado o inválido. Por favor proporcione otras credenciales y prueb de nuevo.",
-    "invalidJsonObject": "La respuesta no es un objeto J!ON válido.",
+    "forbidden": "Las credenciales especificadas en esta solicitud son inválidos, por ejemplo, un token de la API caducado o inválido. Por favor proporcione otras credenciales y pruebe de nuevo.",
+    "invalidJsonObject": "La respuesta no es un objeto JSON válido.",
     "invalidStacCollections": "La respuesta de la API no es una lista válida de Colecciones STAC.",
     "invalidStacItems": "La respuesta de la API no es una lista válida de Elementos STAC.",
     "labels": {
@@ -94,7 +94,7 @@
   "goToCollection": {
     "description": "Ir a la colección asociada",
     "descriptionWithTitle": "@:goToCollection.description: {title}",
-    "label": "Coleción"
+    "label": "Colección"
   },
   "goToParent": {
     "description": "Ir al padre",
@@ -105,7 +105,7 @@
   "index": {
     "api": "API",
     "catalog": "Catálogo",
-    "load": "Carga",
+    "load": "Cargar",
     "selectStacIndex": "... o seleccione uno de {stacIndex}:",
     "specifyCatalog": "Por favor especifique un catálogo STAC o una API...",
     "urlInvalid": "La URL es inválida.",
@@ -195,9 +195,9 @@
     "itemsPerPage": "Elementos por página",
     "itemsPerPageDescription": "Número de elementos solicitados por página, máx. {maxItems} elementos.",
     "lessThan": "menor que",
-    "likeOperatorDescription": "Puede usar caracteres comodín. `_` representa un solo caracter, `%` representa cualquier número de caracteres. Para buscar por un caracter comodín en específico, necesita añadir `\\` antes del caracter.",
+    "likeOperatorDescription": "Puede usar carácteres comodín. `_` representa un solo carácter, `%` representa cualquier número de carácteres. Para buscar por un carácter comodín en específico, necesita añadir `\\` antes del carácter.",
     "matches": "coincidencia",
-    "modifyCriteria": "Por favor modifque los criterios de búsqueda.",
+    "modifyCriteria": "Por favor modifique los criterios de búsqueda.",
     "noItemsFound": "No se encontró ningún elemento para los filtros seleccionados.",
     "notEqualTo": "no igual a",
     "notFullySupported": "Puede que no todas las opciones estén soportadas.",
@@ -220,12 +220,12 @@
   },
   "sort": {
     "asc": {
-      "label": "Ascendiente",
+      "label": "Ascendente",
       "title": "Ordenar en orden ascendente (A-Z)"
     },
     "desc": {
-      "label": "Descendiente",
-      "title": "Ordenar en orden descendiente (Z-A)"
+      "label": "Descendente",
+      "title": "Ordenar en orden descendente (Z-A)"
     },
     "title": "Ordenar"
   },
@@ -234,8 +234,8 @@
     "label": "Fuente",
     "language": {
       "label": "Idioma: {currentLanguage}",
-      "onlyData": "¡Los datos solo están disponibles en este idioma!",
-      "onlyUI": "¡El interfaz de usuario solo está disponible en este idioma!",
+      "onlyData": "¡Los datos sólo están disponibles en este idioma!",
+      "onlyUI": "¡El interfaz de usuario sólo está disponible en este idioma!",
       "switch": "Cambiar el idioma"
     },
     "locatedAt": "El archivo de metadatos STAC se encuentra en:",
@@ -248,22 +248,22 @@
       "twitter": "Twitter",
       "withOthers": "Comparta esta página con otros"
     },
-    "stacVersion": "Versión de STAC:",
+    "stacVersion": "Versión STAC:",
     "title": "Fuente de datos",
     "valid": "Valida:",
     "validating": "Validando...",
     "validationNA": "n/a"
   },
   "stacAssets": "Recurso | Recursos",
-  "stacCatalog": "Catalogo | Catalogos",
-  "stacCollection": "Colección | Colecciciones",
+  "stacCatalog": "Catálogo | Catálogos",
+  "stacCollection": "Colección | Colecciones",
   "stacItem": "Elemento | Elementos",
   "submit": "Enviar",
   "table": {
     "emptyFilteredText": "No hay ningún registro que concuerde con su búsqueda",
     "emptyText": "No hay registros para mostrar",
     "sort": {
-      "asc": "Click para ordenar en orden ascentente",
+      "asc": "Click para ordenar en orden ascendente",
       "clear": "Click para restablecer el orden",
       "desc": "Click para ordenar en orden descendente"
     }
