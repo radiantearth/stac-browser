@@ -2,7 +2,7 @@
 const format = 'DD/MM/YYYY';
 
 // 2A. Either re-use settings and phrases from vue2-datepicker...
-const locale = import('vue2-datepicker/locale/es-ES');
+const locale = import('vue2-datepicker/locale/es');
 
 // 2B. ... or define your own based on https://github.com/mengxiong10/vue2-datepicker
 /*

@@ -1,5 +1,5 @@
 // A. Either re-use phrases from iso-duration...
-import { en as locale } from '@musement/iso-duration';
+import { es as locale } from '@musement/iso-duration';
 
 // B. ... or define your own based on https://github.com/musement/iso-duration
 /*
