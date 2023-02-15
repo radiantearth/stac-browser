@@ -19,6 +19,7 @@ certain *OGC API - Records* and *OGC API - Features* compliant servers.
 - [Examples](#examples)
 - [Get Started](#get-started)
   - [Private query parameters](#private-query-parameters)
+  - [Migrate from old versions](#migrate-from-old-versions)
 - [Customize](#customize)
   - [Options](#options)
   - [Languages](#languages)
@@ -76,6 +77,25 @@ So for example if your API requires to pass a token via the `API_KEY` query para
 
 Please note: If the server hosting STAC Browser should not get aware of private query parameters and you are having `historyMode` set to `history`, you can also append the private query parameters to the hash so that it doesn't get transmitted to the server hosting STAC Browser. 
 In this case use for example `https://examples.com/stac-browser/#?~API_KEY=123` instead of `https://examples.com/stac-browser/?~API_KEY=123`.
+
+### Migrate from old versions
+
+If you are running an old (standalone) version of STAC Browser (v1 or v2) without heavy modifications,
+you can usually migrate easily.
+
+The old environment variables should be transitions out of usage. Instead please use the config file or CLI parameters.
+The names of the variables have slightly changed:
+* `CATALOG_URL` => `catalogUrl` (make sure to append a `/` at the end of folders / API endpoints)
+* `STAC_PROXY_URL` => `stacProxyUrl` (same in CLI, different format in the config file)
+* `TILE_PROXY_URL` / `TILE_SOURCE_TEMPLATE` => `buildTileUrlTemplate` (this is not a 1:1 replacement, make sure to read the documentation for `buildTileUrlTemplate`)
+* `PATH_PREFIX` => `pathPrefix`
+* `HISTORY_MODE` => `historyMode`
+
+You should also enable `redirectLegacyUrls` which makes sure that your old URLs are correctly parsed by STAC Browser v3 and links to the old version of STAC Browser don't get broken.
+
+All other options you can customize to your liking.
+
+Then simply deploy STAC Browser to the same location where you hosted STAC Browser v1/v2 before.
 
 ## Customize
 
