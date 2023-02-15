@@ -44,7 +44,7 @@ import URI from 'urijs';
 
 import I18N from '@radiantearth/stac-fields/I18N';
 import { translateFields, API_LANGUAGE_CONFORMANCE, loadMessages } from './i18n';
-import { getBest, prepareSupported } from 'locale-id';
+import { getBest, prepareSupported } from './locale-id';
 
 Vue.use(AlertPlugin);
 Vue.use(ButtonGroupPlugin);

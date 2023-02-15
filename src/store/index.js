@@ -11,7 +11,7 @@ import STAC from '../models/stac';
 import Queryable from '../models/queryable';
 
 import { addQueryIfNotExists, isAuthenticationError, Loading, processSTAC, stacRequest } from './utils';
-import { getBest } from "locale-id";
+import { getBest } from '../locale-id';
 
 function getStore(config, router) {
   // Local settings (e.g. for currently loaded STAC entity)
@@ -409,8 +409,8 @@ function getStore(config, router) {
         }
       },
       languages(state, {uiLanguage, dataLanguage}) {
-        state.dataLanguage = dataLanguage;
-        state.uiLanguage = uiLanguage;
+        state.dataLanguage = dataLanguage || null;
+        state.uiLanguage = uiLanguage || null;
       },
       setQueryParameter(state, { type, key, value }) {
         type = `${type}QueryParameters`;

@@ -1,6 +1,6 @@
 import Utils from "../utils";
 import Migrate from '@radiantearth/stac-migrate';
-import { getBest } from 'locale-id';
+import { getBest } from '../locale-id';
 
 let stacObjCounter = 0;
 

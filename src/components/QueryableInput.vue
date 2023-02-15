@@ -11,41 +11,46 @@
         class="op"
         :value="operator"
         @input="updateOperator($event)"
-        :options="operatorOptions" 
+        :options="operatorOptions"
+        v-bind="validation"
       />
 
       <b-form-select
-        v-if="queryableType === 'selectField'"
+        v-if="queryableType === 'select'"
         :options="queryableOptions"
         size="sm"
         class="value"
         :value="value"
         @input="updateValue($event)"
+        v-bind="validation"
       />
       <b-form-input
-        v-else-if="queryableType === 'textField'"
+        v-else-if="queryableType === 'text'"
         size="sm"
         class="value"
         :value="value"
         @input="updateValue($event)"
+        v-bind="validation"
       />
       <b-form-input
-        v-else-if="queryableType === 'numberField'"
+        v-else-if="queryableType === 'number'"
         number
         type="number"
         size="sm"
         class="value"
         :value="value"
         @input="updateValue($event)"
+        v-bind="validation"
       />
       <date-picker
-        v-else-if="queryableType === 'dateField'"
+        v-else-if="queryableType === 'date'"
         type="datetime"
         class="value"
         :lang="datepickerLang"
         :format="datepickerFormat"
         :value="value"
         @input="updateValue($event)"
+        v-bind="validation"
       />
 
       <b-button class="delete" size="sm" variant="danger" @click="$emit('remove-queryable')">
@@ -96,6 +101,22 @@ export default {
     }
   },
   computed: {
+    validation() {
+      if (this.queryableType === 'text') {
+        return {
+          minlength: this.schema.minLength,
+          maxlength: this.schema.maxLenggth,
+          required: this.schema.minLength > 0
+        };
+      }
+      else if (this.queryableType === 'number') {
+        return {
+          min: this.schema.minimum,
+          max: this.schema.maximum
+        };
+      }
+      return {};
+    },
     schemaTypes() {
       if (typeof this.schema.type === 'string') {
         return [this.schema.type];
@@ -112,24 +133,24 @@ export default {
       if (this.operator === 'LIKE') {
         return this.$t('search.likeOperatorDescription');
       }
-      else if (this.queryableType === 'dateField') {
+      else if (this.queryableType === 'date') {
         return this.$t('search.dateDescription');
       }
       return null;
     },
     queryableType() {
       if ('enum' in this.schema) {
-        return 'selectField';
+        return 'select';
       }
       else if (this.isNumeric) {
-        return 'numberField';
+        return 'number';
       }
       else if (this.schemaTypes.includes('string')) {
         if (this.schema.format === 'date-time') {
-          return 'dateField';
+          return 'date';
         }
         else {
-          return 'textField';
+          return 'text';
         }
       }
       return null;
@@ -141,10 +162,10 @@ export default {
       const NOT_EQUALS = {text: this.$t('search.notEqualTo'), value: '<>'};
       const LIKE = {text: this.$t('search.matches'), value: 'LIKE'};
 
-      if (this.isNumeric || this.queryableType === 'dateField') {
+      if (this.isNumeric || this.queryableType === 'date') {
         return [LESS_THAN, MORE_THAN, EQUALS, NOT_EQUALS];
         }
-      else if (this.queryableType === 'textField') {
+      else if (this.queryableType === 'text') {
         return [EQUALS, NOT_EQUALS, LIKE];
       }
       else {
@@ -152,7 +173,7 @@ export default {
       }
     },
     queryableOptions() {
-      if (this.queryableType !== 'selectField') {
+      if (this.queryableType !== 'select') {
         return [];
       }
       else {
@@ -200,19 +221,19 @@ export default {
       if (typeof this.schema.default !== 'undefined') {
         return this.schema.default;
       }
-      else if (this.queryableType === 'textField') {
+      else if (this.queryableType === 'text') {
         return '';
       }
-      else if (this.queryableType === 'dateField') {
+      else if (this.queryableType === 'date') {
         return new Date();
       }
-      else if (this.queryableType === 'numberField') {
+      else if (this.queryableType === 'number') {
         if (typeof this.schema.minimum !== 'undefined') {
          return this.schema.minimum;
         }
         return 0;
       }
-      else if (this.queryableType === 'selectField') {
+      else if (this.queryableType === 'select') {
         return this.queryableOptions[0].value;
       }
     }
