@@ -14,6 +14,7 @@ import ErrorAlert from '../components/ErrorAlert.vue';
 import Loading from '../components/Loading.vue';
 import { mapGetters, mapState } from "vuex";
 import Utils, { BrowserError } from '../utils';
+import URI from 'urijs';
 
 export default {
   name: "Browse",
@@ -119,10 +120,13 @@ export default {
         // Decode last path element from base58, the others parts are not relevant for us
         let newPath = decode(parts[parts.length - 1]).toString();
         if (newPath) {
-          // Remove trailing collections or items paths from APIs
-          newPath = newPath.replace(/(collections|items)\/?$/, '');
+          let uri = new URI(newPath);
           // Navigate to new URL
-          this.$router.replace({ path: '/' + newPath });
+          this.$router.replace({
+            // Remove trailing collections or items paths from APIs
+            path: '/' + uri.path().replace(/(collections|items)\/?$/, ''),
+            query: uri.query(true)
+          });
           return true;
         }
       }
