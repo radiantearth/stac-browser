@@ -10,14 +10,14 @@ module.exports = {
     supportedLocales: [
         "de",
 //      "de-CH",
+        "es",
         "en",
         "fr",
 //      "fr-CA",
 //      "fr-CH",
         "it",
 //      "it-CH",
-        "ro",
-        "es"
+        "ro"
     ],
     useTileLayerAsFallback: true,
     tileSourceTemplate: null,
