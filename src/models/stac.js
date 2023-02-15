@@ -12,6 +12,7 @@ class STAC {
     this._url = url;
     this._path = path;
     this._apiChildrenListeners = {};
+    this._incomplete = false;
     this._apiChildren = {
       list: [],
       prev: false,
@@ -34,6 +35,14 @@ class STAC {
         this[key] = data[key];
       }
     }
+  }
+
+  isPotentiallyIncomplete() {
+    return this._incomplete;
+  }
+
+  markPotentiallyIncomplete() {
+    this._incomplete = true;
   }
 
   isItem() {

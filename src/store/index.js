@@ -723,7 +723,7 @@ function getStore(config, router) {
           cx.commit('updateLoading', { url, show, loadApi });
           return;
         }
-        else if (!data) {
+        else if (!data || (data instanceof STAC && data.isPotentiallyIncomplete())) {
           cx.commit('loading', { url, loading });
           try {
             let response = await stacRequest(cx, url);
@@ -861,7 +861,16 @@ function getStore(config, router) {
                 else {
                   return null;
                 }
-                return new STAC(item, url, cx.getters.toBrowserPath(url));
+                let data = cx.getters.getStac(url);
+                if (data) {
+                  return data;
+                }
+                else {
+                  data = new STAC(item, url, cx.getters.toBrowserPath(url));
+                  data.markPotentiallyIncomplete();
+                  cx.commit('loaded', { data, url });
+                  return data;
+                }
               } catch (error) {
                 console.error(error);
                 return null;
@@ -911,7 +920,16 @@ function getStore(config, router) {
             else {
               url = Utils.toAbsolute(`collections/${collection.id}`, cx.state.catalogUrl || stac.getAbsoluteUrl());
             }
-            return new STAC(collection, url, cx.getters.toBrowserPath(url));
+            let data = cx.getters.getStac(url);
+            if (data) {
+              return data;
+            }
+            else {
+              data = new STAC(collection, url, cx.getters.toBrowserPath(url));
+              data.markPotentiallyIncomplete();
+              cx.commit('loaded', { data, url });
+              return data;
+            }
           });
           cx.commit('addApiCollections', { data: response.data, stac, show });
         }
