@@ -35,8 +35,6 @@ import {
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
 
-import Clipboard from 'v-clipboard';
-
 import ErrorAlert from './components/ErrorAlert.vue';
 import StacHeader from './components/StacHeader.vue';
 
@@ -47,8 +45,6 @@ import URI from 'urijs';
 import I18N from '@radiantearth/stac-fields/I18N';
 import { translateFields, API_LANGUAGE_CONFORMANCE, loadMessages } from './i18n';
 import { getBest, prepareSupported } from 'locale-id';
-
-Vue.use(Clipboard);
 
 Vue.use(AlertPlugin);
 Vue.use(ButtonGroupPlugin);

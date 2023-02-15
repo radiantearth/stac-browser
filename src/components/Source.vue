@@ -26,7 +26,7 @@
       </b-dropdown>
     </b-button-group>
     <b-popover
-      v-if="stacUrl" target="popover-link" triggers="click blur" placement="bottom"
+      v-if="stacUrl" target="popover-link" triggers="focus" placement="bottom"
       container="stac-browser" :title="$t('source.title')"
       @show="validate"
     >
@@ -48,7 +48,7 @@
       </template>
       <Url id="stacUrl" :url="stacUrl" :label="$t('source.locatedAt')" />
     </b-popover>
-    <b-popover target="popover-share" triggers="click blur" placement="bottom" container="stac-browser" :title="$t('source.share.title')">
+    <b-popover target="popover-share" triggers="focus" placement="bottom" container="stac-browser" :title="$t('source.share.title')">
       <Url id="browserUrl" :url="browserUrl()" :label="$t('source.share.sharePageWithOthers')" :open="false" />
       <hr>
       <b-button class="twitter mr-1" :href="twitterUrl"><b-icon-twitter /> {{ $t('source.share.twitter') }}</b-button>
@@ -193,9 +193,9 @@ export default {
         }
     },
     methods: {
-        ...mapActions(['switchLocale', 'validate']),
+        ...mapActions(['switchLocale']),
         async validate() {
-            await this.validate(this.stacUrl);
+            await this.$store.dispatch('validate', this.stacUrl);
         },
         browserUrl() {
           return window.location.toString();
