@@ -2,7 +2,6 @@ import Vue from "vue";
 import Vuex from "vuex";
 
 import axios from "axios";
-import bs58 from 'bs58';
 import URI from "urijs";
 
 import i18n from '../i18n';
@@ -40,7 +39,6 @@ function getStore(config, router) {
 
   const catalogDefaults = () => ({
     queue: [],
-    redirectUrl: null,
     privateQueryParameters: {},
     authData: null,
     doAuth: [],
@@ -598,18 +596,6 @@ function getStore(config, router) {
         state.apiItems = [];
         state.apiItemsPagination = {};
       },
-      redirectLegacyUrl(state, path) {
-        if (!path) {
-          return;
-        }
-        let parts = path.split('/').filter(part => part.length > 0 && part !== 'item' && part !== 'collection');
-        if (parts.length > 0 && parts.every(part => part.match(/^[123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ]+$/))) {
-          let newPath = bs58.decode(parts[parts.length - 1]).toString();
-          if (newPath) {
-            state.redirectUrl = '/' + newPath;
-          }
-        }
-      },
       parents(state, parents) {
         state.parents = parents;
       },
@@ -778,11 +764,6 @@ function getStore(config, router) {
             }
             console.error(error);
             cx.commit('errored', { url, error });
-
-            // Redirect legacy URLs
-            if (cx.state.redirectLegacyUrls && fromBrowser && show) {
-              cx.commit('redirectLegacyUrl', path);
-            }
           }
         }
 

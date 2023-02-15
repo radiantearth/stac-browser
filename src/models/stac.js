@@ -240,12 +240,7 @@ class STAC {
   }
 
   getTitle() {
-    if (this.isItem()) {
-      return this.properties.title;
-    }
-    else {
-      return this.title;
-    }
+    return this.getMetadata("title");
   }
 
   _linkToAbsolute(link) {
