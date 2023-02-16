@@ -51,7 +51,6 @@ import { BCollapse, BIconBoxArrowUpRight, BIconCheck, BIconChevronRight, BIconCh
 import { formatMediaType } from '@radiantearth/stac-fields/formatters';
 import { mapGetters, mapState } from 'vuex';
 import Description from './Description.vue';
-import Metadata from './Metadata.vue';
 import STAC from '../models/stac';
 import Utils, { browserProtocols, imageMediaTypes, mapMediaTypes } from '../utils';
 import StacFieldsMixin from './StacFieldsMixin';
@@ -68,7 +67,7 @@ export default {
     BIconEye,
     CopyButton: () => import('./CopyButton.vue'),
     Description,
-    Metadata
+    Metadata: () => import('./Metadata.vue')
   },
   mixins: [
     StacFieldsMixin({ formatMediaType })

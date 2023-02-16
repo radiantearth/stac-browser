@@ -12,12 +12,14 @@ import Queryable from '../models/queryable';
 
 import { addQueryIfNotExists, isAuthenticationError, Loading, processSTAC, stacRequest } from './utils';
 import { getBest } from '../locale-id';
+import removeMd from 'remove-markdown';
 
 function getStore(config, router) {
   // Local settings (e.g. for currently loaded STAC entity)
   const localDefaults = () => ({
     url: '',
     title: config.catalogTitle,
+    description: null,
     data: null,
     valid: null,
     parents: null,
@@ -492,23 +494,30 @@ function getStore(config, router) {
       resetPage(state) {
         Object.assign(state, localDefaults());
       },
-      showPage(state, { url, title, stac }) {
+      showPage(state, { url, title, description, stac }) {
         if (!stac) {
           stac = state.database[url] || null;
         }
         state.url = url || null;
         state.data = stac instanceof STAC ? stac : null;
         state.valid = null;
+        state.description = description;
 
         // Set title
         if (title) {
           state.title = title;
         }
         else {
-          state.title = STAC.getDisplayTitle(stac, state.catalogTitle);
+          state.title = STAC.getDisplayTitle(state.data, state.catalogTitle);
+          if (state.data) {
+            let description = state.data.getMetadata('description');
+            if (Utils.hasText(description)) {
+              state.description = removeMd(description);
+            }
+          }
         }
 
-        if (state.data instanceof STAC) {
+        if (state.data) {
           let source = state.data.isItem() ? state.data.properties : state.data;
           let languages = Array.isArray(source.languages) ? source.languages.slice() : [];
           if (Utils.isObject(source.language)) {

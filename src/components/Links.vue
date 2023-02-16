@@ -21,10 +21,10 @@
 
 <script>
 import StacLink from './StacLink.vue';
-import Fields from '@radiantearth/stac-fields/fields.json';
+import { Fields } from '@radiantearth/stac-fields';
+import { formatKey } from '@radiantearth/stac-fields/helper';
 import { ogcRelPrefix } from '../rels';
 import Utils from '../utils';
-import { formatKey } from '@radiantearth/stac-fields/helper';
 import { translateFields } from '../i18n';
 import { mapState } from 'vuex';
 

@@ -59,8 +59,6 @@ import { mapState, mapGetters } from 'vuex';
 import Catalogs from '../components/Catalogs.vue';
 import Description from '../components/Description.vue';
 import Items from '../components/Items.vue';
-import Links from '../components/Links.vue';
-import Metadata from '../components/Metadata.vue';
 import ReadMore from "vue-read-more-smooth";
 import ShowAssetMixin from '../components/ShowAssetMixin';
 import StacFieldsMixin from '../components/StacFieldsMixin';
@@ -80,9 +78,9 @@ export default {
     Description,
     Items,
     Keywords: () => import('../components/Keywords.vue'),
-    Links,
+    Links: () => import('../components/Links.vue'),
     Map: () => import('../components/Map.vue'),
-    Metadata,
+    Metadata: () => import('../components/Metadata.vue'),
     Providers: () => import('../components/Providers.vue'),
     ReadMore,
     Thumbnails: () => import('../components/Thumbnails.vue')

@@ -42,8 +42,6 @@
 import { mapState, mapGetters } from 'vuex';
 import Assets from '../components/Assets.vue';
 import Description from '../components/Description.vue';
-import Links from '../components/Links.vue';
-import Metadata from '../components/Metadata.vue';
 import ReadMore from "vue-read-more-smooth";
 import ShowAssetMixin from '../components/ShowAssetMixin';
 import { BTabs, BTab } from 'bootstrap-vue';
@@ -59,9 +57,9 @@ export default {
     Catalog: () => import('../components/Catalog.vue'),
     Description,
     DeprecationNotice: () => import('../components/DeprecationNotice.vue'),
-    Links,
+    Links: () => import('../components/Links.vue'),
     Map: () => import('../components/Map.vue'),
-    Metadata,
+    Metadata: () => import('../components/Metadata.vue'),
     Providers: () => import('../components/Providers.vue'),
     ReadMore,
     Thumbnails: () => import('../components/Thumbnails.vue')

@@ -109,7 +109,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['allowSelectCatalog', 'data', 'dataLanguage', 'doAuth', 'globalError', 'stateQueryParameters', 'title', 'uiLanguage', 'url']),
+    ...mapState(['allowSelectCatalog', 'data', 'dataLanguage', 'description', 'doAuth', 'globalError', 'stateQueryParameters', 'title', 'uiLanguage', 'url']),
     ...mapState({
       catalogUrlFromVueX: 'catalogUrl',
       detectLocaleFromBrowserFromVueX: 'detectLocaleFromBrowser',
@@ -132,6 +132,12 @@ export default {
     title(title) {
       document.title = title;
     },
+    description(description) {
+      let element = document.getElementById('meta-description');
+      if (element) {
+        element.setAttribute("content", description);
+      }
+    },
     uiLanguage: {
       immediate: true,
       async handler(locale) {
@@ -148,6 +154,9 @@ export default {
 
         // Set the locale for vue-i18n
         this.$root.$i18n.locale = locale;
+
+        // Update the HTML lang tag
+        document.documentElement.setAttribute("lang", locale);
       }
     },
     dataLanguage: {

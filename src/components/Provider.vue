@@ -34,7 +34,6 @@
 <script>
 import { BCollapse, BIconChevronRight, BIconChevronDown } from 'bootstrap-vue';
 import Description from './Description.vue';
-import Metadata from './Metadata.vue';
 import ProviderRoles from './ProviderRoles.vue';
 
 export default {
@@ -44,7 +43,7 @@ export default {
     BIconChevronDown,
     BIconChevronRight,
     Description,
-    Metadata,
+    Metadata: () => import('./Metadata.vue'),
     ProviderRoles
   },
   props: {
