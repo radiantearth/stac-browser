@@ -119,8 +119,16 @@ export default {
     };
   },
   computed: {
-    ...mapState(['url', 'stateQueryParameters']),
-    ...mapGetters(['tileRendererType', 'getRequestUrl']),
+    ...mapState(['buildTileUrlTemplate', 'useTileLayerAsFallback', 'url', 'stateQueryParameters']),
+    ...mapGetters(['getRequestUrl']),
+    tileRendererType() {
+      if (this.buildTileUrlTemplate && !this.useTileLayerAsFallback) {
+        return 'server';
+      }
+      else {
+        return 'client';
+      }
+    },
     type() {
       return this.definition ? 'itemdef' : 'asset';
     },

@@ -10,7 +10,7 @@ import Utils, { schemaMediaType, BrowserError } from '../utils';
 import STAC from '../models/stac';
 import Queryable from '../models/queryable';
 
-import { addQueryIfNotExists, isAuthenticationError, Loading, processSTAC, stacRequest } from './utils';
+import { addQueryIfNotExists, isAuthenticationError, Loading, processSTAC, proxyUrl, unproxyUrl, stacRequest } from './utils';
 import { getBest } from '../locale-id';
 
 function getStore(config, router) {
@@ -104,8 +104,6 @@ function getStore(config, router) {
       isCatalogLike: state => state.data?.isCatalogLike() || false,
       isItem: state => state.data?.isItem() || false,
 
-      stacVersion: state => state.data?.stac_version,
-
       root: (_, getters) => getters.getStac(getters.rootLink),
 
       rootLink: state => {
@@ -191,14 +189,6 @@ function getStore(config, router) {
         let regexp = new RegExp('^' + schemaUri.replaceAll('*', '[^/]+') + '$');
         return !!extensions.find(uri => uri.match(regexp));
       },
-      tileRendererType: state => {
-        if (state.buildTileUrlTemplate && !state.useTileLayerAsFallback) {
-          return 'server';
-        }
-        else {
-          return 'client';
-        }
-      },
 
       items: state => {
         if (state.apiItems.length > 0) {
@@ -254,7 +244,7 @@ function getStore(config, router) {
           url = '/';
         }
 
-        let absolute = Utils.toAbsolute(getters.unproxyUrl(url), state.url, false);
+        let absolute = Utils.toAbsolute(unproxyUrl(url, state.stacProxyUrl), state.url, false);
         let relative;
         if (!state.allowSelectCatalog && state.catalogUrl) {
           relative = absolute.relativeTo(state.catalogUrl);
@@ -302,24 +292,6 @@ function getStore(config, router) {
         }
         return getters.getRequestUrl(url, null, true);
       },
-      unproxyUrl: state => absoluteUrl => {
-        if (absoluteUrl instanceof URI) {
-          absoluteUrl = absoluteUrl.toString();
-        }
-        if (typeof absoluteUrl === 'string' && Array.isArray(state.stacProxyUrl)) {
-          return absoluteUrl.replace(state.stacProxyUrl[1], state.stacProxyUrl[0]);
-        }
-        return absoluteUrl;
-      },
-      proxyUrl: state => absoluteUrl => {
-        if (absoluteUrl instanceof URI) {
-          absoluteUrl = absoluteUrl.toString();
-        }
-        if (typeof absoluteUrl === 'string' && Array.isArray(state.stacProxyUrl)) {
-          return absoluteUrl.replace(state.stacProxyUrl[0], state.stacProxyUrl[1]);
-        }
-        return absoluteUrl;
-      },
       isExternalUrl: state => (absoluteUrl, whitelist = true) => {
         if (!state.catalogUrl) {
           return false;
@@ -338,7 +310,7 @@ function getStore(config, router) {
         return relativeStr.startsWith('//') || relativeStr.startsWith('../');
       },
       getRequestUrl: (state, getters) => (url, baseUrl = null, addLocalQueryParams = false) => {
-        let absoluteUrl = Utils.toAbsolute(getters.proxyUrl(url), baseUrl ? baseUrl : state.url, false);
+        let absoluteUrl = Utils.toAbsolute(proxyUrl(url, state.stacProxyUrl), baseUrl ? baseUrl : state.url, false);
         if (!getters.isExternalUrl(absoluteUrl)) {
           // Check whether private params are present and add them if the URL is part of the catalog
           addQueryIfNotExists(absoluteUrl, state.privateQueryParameters);

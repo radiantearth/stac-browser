@@ -61,7 +61,10 @@ export default {
   },
   computed: {
     ...mapState(['allowSelectCatalog', 'authConfig', 'authData', 'catalogUrl', 'data', 'url', 'title']),
-    ...mapGetters(['root', 'parentLink', 'collectionLink', 'stacVersion', 'toBrowserPath']),
+    ...mapGetters(['root', 'parentLink', 'collectionLink', 'toBrowserPath']),
+    stacVersion() {
+      return this.data?.stac_version;
+    },
     collectionLinkTitle() {
       if (Utils.hasText(this.collectionLink.title)) {
         return this.$t('goToCollection.descriptionWithTitle', this.collectionLink);
