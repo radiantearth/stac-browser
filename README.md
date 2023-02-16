@@ -109,6 +109,7 @@ Some of them can also be set [through the root catalog](#customize-through-root-
 * [catalogTitle](#catalogtitle)
 * [allowExternalAccess](#allowexternalaccess)
 * [allowedDomains](#alloweddomains)
+* [apiCatalogPriority](#apicatalogpriority)
 * [detectLocaleFromBrowser](#detectlocalefrombrowser)
 * [storeLocale](#storelocale)
 * [locale](#locale)
@@ -154,6 +155,19 @@ Must be set to `true` if a `catalogUrl` is not given as otherwise you won't be a
 #### allowedDomains
 
 You can list additional domains (e.g. `example.com`) that private data is sent to, e.g. authentication data.
+
+#### apiCatalogPriority
+
+For STAC APIs there are two potential sources for catalogs and collections:
+1. Collections loaded from `/collections` and detected through the `data` link
+2. Childs (i.e. Catalogs and Collections) loaded from various sources and detected through the `child` links
+
+By default, STAC Browser loads and shows data from both sources, but tries to eliminate duplicates.
+If you only want to show the data from one of the sources, you can use this option.
+The following options are available:
+- `collections`: Show only collections
+- `childs`: Show only children
+- `null`: Default behavior
 
 #### detectLocaleFromBrowser
 
@@ -430,6 +444,7 @@ If you need even more flexibility, you need to dig into the Vue files and their 
 
 You can also provide a couple of the config options through the root catalog. 
 You need to provide a field `stac_browser` and then you can set any of the following options:
+- `apiCatalogPriority`
 - `authConfig` (except for the `formatter`)
 - `cardViewMode`
 - `crossOriginMedia`

@@ -19,6 +19,7 @@ module.exports = {
 //      "it-CH",
         "ro"
     ],
+    apiCatalogPriority: null,
     useTileLayerAsFallback: true,
     tileSourceTemplate: null,
     displayGeoTiffByDefault: false,

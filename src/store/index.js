@@ -209,11 +209,15 @@ function getStore(config, router) {
         return [];
       },
       catalogs: state => {
+        let hasCollections = Boolean(state.data instanceof STAC && state.data.getApiCollectionsLink() && state.apiCollections.length > 0);
+        let hasChilds = Boolean(state.data instanceof STAC);
+        let showCollections = !state.apiCatalogPriority || state.apiCatalogPriority === 'collections';
+        let showChilds = !state.apiCatalogPriority || state.apiCatalogPriority === 'childs';
         let catalogs = [];
-        if (state.data instanceof STAC && state.data.getApiCollectionsLink() && state.apiCollections.length > 0) {
+        if (hasCollections && showCollections) {
           catalogs = catalogs.concat(state.apiCollections);
         }
-        if (state.data) {
+        if (hasChilds && showChilds) {
           catalogs = STAC.addMissingChildren(catalogs, state.data);
         }
         return catalogs;

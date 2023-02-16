@@ -75,7 +75,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['data']),
+    ...mapState(['data', 'apiCatalogPriority']),
     ...mapGetters(['getStac']),
     stac() {
       if (this.pagination) {
@@ -186,7 +186,7 @@ export default {
   methods: {
     updateChilds() {
       if (this.stac instanceof STAC) {
-        this.childs = this.stac.getChildren();
+        this.childs = this.stac.getChildren(this.apiCatalogPriority);
       }
       else {
         this.childs = [];

@@ -96,20 +96,25 @@ class STAC {
     }
   }
 
-  getChildren() {
+  getChildren(priority = null) {
     if (!this.isCatalogLike()) {
       return [];
     }
 
+    let showCollections = !priority || priority === 'collections';
+    let showChilds = !priority || priority === 'childs';
+
     let children = [];
-    if (this._apiChildren.prev) {
+    if (showCollections && this._apiChildren.prev) {
       children.push(this._apiChildren.prev);
     }
-    if (this._apiChildren.list.length > 0) {
+    if (showCollections && this._apiChildren.list.length > 0) {
       children = this._apiChildren.list;
     }
-    children = STAC.addMissingChildren(children, this).concat(this.getLinksWithRels(['item']));
-    if (this._apiChildren.next) {
+    if (showChilds) {
+      children = STAC.addMissingChildren(children, this).concat(this.getLinksWithRels(['item']));
+    }
+    if (showCollections && this._apiChildren.next) {
       children.push(this._apiChildren.next);
     }
     return children;

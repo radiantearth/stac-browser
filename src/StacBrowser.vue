@@ -211,6 +211,7 @@ export default {
     },
     root(root, oldRoot) {
       const canChange = [
+        'apiCatalogPriority',
         'authConfig', // except for the 'formatter', which can't be encoded in JSON
         'cardViewMode',
         'crossOriginMedia',
