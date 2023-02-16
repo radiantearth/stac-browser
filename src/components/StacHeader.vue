@@ -1,7 +1,7 @@
 <template>
   <b-row>
     <b-col md="12">
-      <Share class="float-right" :title="title" :stacUrl="url" :stacVersion="stacVersion" />
+      <Source class="float-right" :title="title" :stacUrl="url" :stacVersion="stacVersion" />
       <h1>
         <template v-if="icon">
           <img :src="icon.href" :alt="icon.title" :title="icon.title" class="icon mr-2">
@@ -43,6 +43,7 @@
 import { mapState, mapGetters } from 'vuex';
 import StacLink from './StacLink.vue';
 import { BIconArrow90degUp, BIconBook, BIconFolderSymlink, BIconSearch, BIconLock, BIconUnlock } from "bootstrap-vue";
+import Source from './Source.vue';
 import STAC from '../models/stac';
 import Utils from '../utils';
 
@@ -56,7 +57,7 @@ export default {
     BIconLock,
     BIconUnlock,
     StacLink,
-    Share: () => import('./Source.vue')
+    Source
   },
   computed: {
     ...mapState(['allowSelectCatalog', 'authConfig', 'authData', 'catalogUrl', 'data', 'url', 'title']),

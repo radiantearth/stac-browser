@@ -124,6 +124,10 @@ html, body {
         background: transparent;
     }
 
+    input:invalid {
+        border-color: map-get($theme-colors, "danger");
+    }
+
     a.list-group-item {
         color: $link-color;
         text-decoration: $link-decoration;

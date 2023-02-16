@@ -1,5 +1,6 @@
 import URI from 'urijs';
 import Queryable from './models/queryable';
+import removeMd from 'remove-markdown';
 
 export const commonFileNames = ['catalog', 'collection', 'item'];
 
@@ -175,6 +176,19 @@ export default class Utils {
     } catch (error) {
       return false;
     }
+  }
+
+  static summarizeMd(text, maxLength = null) {
+    if (!Utils.hasText(text)) {
+      return '';
+    }
+    // Best-effort approach to remove some CommonMark (Markdown).
+    // Likely not perfect, but seems good enough for most cases.
+    text = removeMd(text).replaceAll(/[\r\n]+/g, ' ');
+    if (maxLength > 0 && text.length > maxLength) {
+      text = text.substr(0, maxLength) + '…';
+    }
+    return text;
   }
 
   static scrollTo(el) {

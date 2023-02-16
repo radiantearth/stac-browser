@@ -11,13 +11,14 @@ import STAC from '../models/stac';
 import Queryable from '../models/queryable';
 
 import { addQueryIfNotExists, isAuthenticationError, Loading, processSTAC, stacRequest } from './utils';
-import { getBest } from "locale-id";
+import { getBest } from '../locale-id';
 
 function getStore(config, router) {
   // Local settings (e.g. for currently loaded STAC entity)
   const localDefaults = () => ({
     url: '',
     title: config.catalogTitle,
+    description: null,
     data: null,
     valid: null,
     parents: null,
@@ -209,11 +210,15 @@ function getStore(config, router) {
         return [];
       },
       catalogs: state => {
+        let hasCollections = Boolean(state.data instanceof STAC && state.data.getApiCollectionsLink() && state.apiCollections.length > 0);
+        let hasChilds = Boolean(state.data instanceof STAC);
+        let showCollections = !state.apiCatalogPriority || state.apiCatalogPriority === 'collections';
+        let showChilds = !state.apiCatalogPriority || state.apiCatalogPriority === 'childs';
         let catalogs = [];
-        if (state.data instanceof STAC && state.data.getApiCollectionsLink() && state.apiCollections.length > 0) {
+        if (hasCollections && showCollections) {
           catalogs = catalogs.concat(state.apiCollections);
         }
-        if (state.data) {
+        if (hasChilds && showChilds) {
           catalogs = STAC.addMissingChildren(catalogs, state.data);
         }
         return catalogs;
@@ -409,8 +414,8 @@ function getStore(config, router) {
         }
       },
       languages(state, {uiLanguage, dataLanguage}) {
-        state.dataLanguage = dataLanguage;
-        state.uiLanguage = uiLanguage;
+        state.dataLanguage = dataLanguage || null;
+        state.uiLanguage = uiLanguage || null;
       },
       setQueryParameter(state, { type, key, value }) {
         type = `${type}QueryParameters`;
@@ -488,23 +493,30 @@ function getStore(config, router) {
       resetPage(state) {
         Object.assign(state, localDefaults());
       },
-      showPage(state, { url, title, stac }) {
+      showPage(state, { url, title, description, stac }) {
         if (!stac) {
           stac = state.database[url] || null;
         }
         state.url = url || null;
         state.data = stac instanceof STAC ? stac : null;
         state.valid = null;
+        state.description = description;
 
         // Set title
         if (title) {
           state.title = title;
         }
         else {
-          state.title = STAC.getDisplayTitle(stac, state.catalogTitle);
+          state.title = STAC.getDisplayTitle(state.data, state.catalogTitle);
+          if (state.data) {
+            let description = state.data.getMetadata('description');
+            if (Utils.hasText(description)) {
+              state.description = description;
+            }
+          }
         }
 
-        if (state.data instanceof STAC) {
+        if (state.data) {
           let source = state.data.isItem() ? state.data.properties : state.data;
           let languages = Array.isArray(source.languages) ? source.languages.slice() : [];
           if (Utils.isObject(source.language)) {
@@ -723,7 +735,7 @@ function getStore(config, router) {
           cx.commit('updateLoading', { url, show, loadApi });
           return;
         }
-        else if (!data) {
+        else if (!data || (data instanceof STAC && data.isPotentiallyIncomplete())) {
           cx.commit('loading', { url, loading });
           try {
             let response = await stacRequest(cx, url);
@@ -861,7 +873,16 @@ function getStore(config, router) {
                 else {
                   return null;
                 }
-                return new STAC(item, url, cx.getters.toBrowserPath(url));
+                let data = cx.getters.getStac(url);
+                if (data) {
+                  return data;
+                }
+                else {
+                  data = new STAC(item, url, cx.getters.toBrowserPath(url));
+                  data.markPotentiallyIncomplete();
+                  cx.commit('loaded', { data, url });
+                  return data;
+                }
               } catch (error) {
                 console.error(error);
                 return null;
@@ -911,7 +932,16 @@ function getStore(config, router) {
             else {
               url = Utils.toAbsolute(`collections/${collection.id}`, cx.state.catalogUrl || stac.getAbsoluteUrl());
             }
-            return new STAC(collection, url, cx.getters.toBrowserPath(url));
+            let data = cx.getters.getStac(url);
+            if (data) {
+              return data;
+            }
+            else {
+              data = new STAC(collection, url, cx.getters.toBrowserPath(url));
+              data.markPotentiallyIncomplete();
+              cx.commit('loaded', { data, url });
+              return data;
+            }
           });
           cx.commit('addApiCollections', { data: response.data, stac, show });
         }

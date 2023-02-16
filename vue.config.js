@@ -47,9 +47,14 @@ const config = {
     });
   },
   configureWebpack: {
+    resolve: {
+      fallback: {
+        'fs/promises': false
+      }
+    },
     plugins: [
       new NodePolyfillPlugin({
-        includeAliases: ['Buffer', 'console', 'http', 'https', 'process', 'url']
+        includeAliases: ['Buffer', 'path']
       })
     ]
   },

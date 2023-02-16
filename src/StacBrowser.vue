@@ -44,7 +44,7 @@ import URI from 'urijs';
 
 import I18N from '@radiantearth/stac-fields/I18N';
 import { translateFields, API_LANGUAGE_CONFORMANCE, loadMessages } from './i18n';
-import { getBest, prepareSupported } from 'locale-id';
+import { getBest, prepareSupported } from './locale-id';
 
 Vue.use(AlertPlugin);
 Vue.use(ButtonGroupPlugin);
@@ -109,7 +109,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['allowSelectCatalog', 'data', 'dataLanguage', 'doAuth', 'globalError', 'stateQueryParameters', 'title', 'uiLanguage', 'url']),
+    ...mapState(['allowSelectCatalog', 'data', 'dataLanguage', 'description', 'doAuth', 'globalError', 'stateQueryParameters', 'title', 'uiLanguage', 'url']),
     ...mapState({
       catalogUrlFromVueX: 'catalogUrl',
       detectLocaleFromBrowserFromVueX: 'detectLocaleFromBrowser',
@@ -132,6 +132,12 @@ export default {
     title(title) {
       document.title = title;
     },
+    description(description) {
+      let element = document.getElementById('meta-description');
+      if (element) {
+        element.setAttribute("content", Utils.summarizeMd(description, 200));
+      }
+    },
     uiLanguage: {
       immediate: true,
       async handler(locale) {
@@ -148,6 +154,9 @@ export default {
 
         // Set the locale for vue-i18n
         this.$root.$i18n.locale = locale;
+
+        // Update the HTML lang tag
+        document.documentElement.setAttribute("lang", locale);
       }
     },
     dataLanguage: {
@@ -211,6 +220,7 @@ export default {
     },
     root(root, oldRoot) {
       const canChange = [
+        'apiCatalogPriority',
         'authConfig', // except for the 'formatter', which can't be encoded in JSON
         'cardViewMode',
         'crossOriginMedia',

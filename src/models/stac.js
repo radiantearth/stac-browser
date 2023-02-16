@@ -1,6 +1,6 @@
 import Utils from "../utils";
 import Migrate from '@radiantearth/stac-migrate';
-import { getBest } from 'locale-id';
+import { getBest } from '../locale-id';
 
 let stacObjCounter = 0;
 
@@ -12,6 +12,7 @@ class STAC {
     this._url = url;
     this._path = path;
     this._apiChildrenListeners = {};
+    this._incomplete = false;
     this._apiChildren = {
       list: [],
       prev: false,
@@ -34,6 +35,14 @@ class STAC {
         this[key] = data[key];
       }
     }
+  }
+
+  isPotentiallyIncomplete() {
+    return this._incomplete;
+  }
+
+  markPotentiallyIncomplete() {
+    this._incomplete = true;
   }
 
   isItem() {
@@ -87,20 +96,25 @@ class STAC {
     }
   }
 
-  getChildren() {
+  getChildren(priority = null) {
     if (!this.isCatalogLike()) {
       return [];
     }
 
+    let showCollections = !priority || priority === 'collections';
+    let showChilds = !priority || priority === 'childs';
+
     let children = [];
-    if (this._apiChildren.prev) {
+    if (showCollections && this._apiChildren.prev) {
       children.push(this._apiChildren.prev);
     }
-    if (this._apiChildren.list.length > 0) {
+    if (showCollections && this._apiChildren.list.length > 0) {
       children = this._apiChildren.list;
     }
-    children = STAC.addMissingChildren(children, this).concat(this.getLinksWithRels(['item']));
-    if (this._apiChildren.next) {
+    if (showChilds) {
+      children = STAC.addMissingChildren(children, this).concat(this.getLinksWithRels(['item']));
+    }
+    if (showCollections && this._apiChildren.next) {
       children.push(this._apiChildren.next);
     }
     return children;

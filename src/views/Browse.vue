@@ -12,6 +12,8 @@
 <script>
 import ErrorAlert from '../components/ErrorAlert.vue';
 import Loading from '../components/Loading.vue';
+import Item from './Item.vue';
+import Catalog from './Catalog.vue';
 import { mapGetters, mapState } from "vuex";
 import Utils, { BrowserError } from '../utils';
 import URI from 'urijs';
@@ -21,8 +23,8 @@ export default {
   components: {
     ErrorAlert,
     Loading,
-    Item: () => import(/* webpackChunkName: "item" */ "./Item.vue"),
-    Catalog: () => import(/* webpackChunkName: "catalog" */ "./Catalog.vue")
+    Catalog,
+    Item
   },
   props: {
     path: {

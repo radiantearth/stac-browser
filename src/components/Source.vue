@@ -67,7 +67,7 @@ import Url from './Url.vue';
 
 import URI from 'urijs';
 import Utils from '../utils';
-import { getBest, prepareSupported } from 'locale-id';
+import { getBest, prepareSupported } from '../locale-id';
 
 const LANGUAGE_EXT = 'https://stac-extensions.github.io/language/v1.*/schema.json';
 
