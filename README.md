@@ -34,6 +34,8 @@ certain *OGC API - Records* and *OGC API - Features* compliant servers.
 
 A demo instance is running at <https://radiantearth.github.io/stac-browser/>.
 
+An irregularly updated version of a deployment for a specific STAC API can be found at <https://mspc.lutana.de>.
+
 The catalog section of [STAC Index](https://stacindex.org) is also built on top of STAC Browser (currently v2).
 
 ## Get Started
