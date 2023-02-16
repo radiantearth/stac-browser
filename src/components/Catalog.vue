@@ -7,7 +7,7 @@
       </b-card-title>
       <b-card-text v-if="data && (data.description || data.deprecated)" class="intro">
         <b-badge v-if="data.deprecated" variant="warning" class="deprecated">{{ $t('deprecated') }}</b-badge>
-        {{ data.description | stripCommonmark }}
+        {{ data.description | summarize }}
       </b-card-text>
       <b-card-text v-if="temporalExtent" class="datetime"><span v-html="temporalExtent" /></b-card-text>
     </b-card-body>
@@ -20,8 +20,8 @@ import StacFieldsMixin from './StacFieldsMixin';
 import ThumbnailCardMixin from './ThumbnailCardMixin';
 import StacLink from './StacLink.vue';
 import STAC from '../models/stac';
-import removeMd from 'remove-markdown';
 import { formatTemporalExtent } from '@radiantearth/stac-fields/formatters';
+import Utils from '../utils';
 
 export default {
   name: 'Catalog',
@@ -29,10 +29,8 @@ export default {
     StacLink
   },
   filters: {
-    stripCommonmark(text) {
-      // Best-effort approach to remove some CommonMark (Markdown).
-      // Likely not perfect, but seems good enough for most cases.
-      return removeMd(text);
+    summarize(text) {
+      return Utils.summarizeMd(text, 300);
     }
   },
   mixins: [

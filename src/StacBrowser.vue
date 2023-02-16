@@ -135,7 +135,7 @@ export default {
     description(description) {
       let element = document.getElementById('meta-description');
       if (element) {
-        element.setAttribute("content", description);
+        element.setAttribute("content", Utils.summarizeMd(description, 200));
       }
     },
     uiLanguage: {

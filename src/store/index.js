@@ -12,7 +12,6 @@ import Queryable from '../models/queryable';
 
 import { addQueryIfNotExists, isAuthenticationError, Loading, processSTAC, stacRequest } from './utils';
 import { getBest } from '../locale-id';
-import removeMd from 'remove-markdown';
 
 function getStore(config, router) {
   // Local settings (e.g. for currently loaded STAC entity)
@@ -512,7 +511,7 @@ function getStore(config, router) {
           if (state.data) {
             let description = state.data.getMetadata('description');
             if (Utils.hasText(description)) {
-              state.description = removeMd(description);
+              state.description = description;
             }
           }
         }
