@@ -1,10 +1,8 @@
 <template>
   <b-sidebar id="sidebar" v-model="visible" :title="$t('browse')" backdrop lazy>
     <template #default>
-      <div class="sidebar">
-        <Loading v-if="!parents" />
-        <Tree v-else-if="root" :item="root" :path="parents" />
-      </div>
+      <Loading v-if="!parents" />
+      <Tree v-else-if="root" :item="root" :path="parents" />
     </template>
     <template v-if="allowSelectCatalog" #footer>
       <b-button class="switch-catalog" variant="light">
@@ -54,23 +52,24 @@ export default {
 </script>
 
 <style lang="scss">
-#sidebar {
+#stac-browser #sidebar {
   width: 33%;
   min-width: 300px;
-}
-</style>
 
-<style lang="scss" scoped>
-.sidebar {
-  padding: 0.5rem 1rem;
+  .b-sidebar-body {
+    padding: 0.5rem 1rem;
 
-  .tree.root {
-    margin: 0;
-    padding: 0;
+    .tree.root {
+      margin: 0;
+      padding: 0;
+    }
   }
-}
+  .b-sidebar-footer {
+    border-top: 1px solid rgba(0,0,0,.125);
 
-.switch-catalog {
-  width: 100%;
+    .switch-catalog {
+      width: 100%;
+    }
+  }
 }
 </style>
