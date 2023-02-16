@@ -52,7 +52,7 @@ export function unproxyUrl(absoluteUrl, proxy) {
     return absoluteUrl.replace(proxy[1], proxy[0]);
   }
   return absoluteUrl;
-};
+}
 
 export function proxyUrl(absoluteUrl, proxy) {
   if (absoluteUrl instanceof URI) {
@@ -62,7 +62,7 @@ export function proxyUrl(absoluteUrl, proxy) {
     return absoluteUrl.replace(proxy[0], proxy[1]);
   }
   return absoluteUrl;
-};
+}
 
 export function processSTAC(state, stac) {
   if (typeof state.preprocessSTAC === 'function') {
