@@ -10,6 +10,7 @@ module.exports = {
     supportedLocales: [
         "de",
 //      "de-CH",
+        "es",
         "en",
         "fr",
 //      "fr-CA",
