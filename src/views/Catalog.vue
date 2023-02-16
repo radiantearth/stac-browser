@@ -65,6 +65,7 @@ import StacFieldsMixin from '../components/StacFieldsMixin';
 import { formatLicense, formatTemporalExtents } from '@radiantearth/stac-fields/formatters';
 import { BTabs, BTab } from 'bootstrap-vue';
 import Utils from '../utils';
+import { addSchemaToDocument, createCatalogSchema } from '../schema-org';
 
 export default {
   name: "Catalog",
@@ -124,7 +125,7 @@ export default {
   },
   computed: {
     ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination']),
-    ...mapGetters(['additionalLinks', 'catalogs', 'isCollection', 'items', 'hasMoreCollections', 'getApiItemsLoading']),
+    ...mapGetters(['additionalLinks', 'catalogs', 'isCollection', 'items', 'hasMoreCollections', 'getApiItemsLoading', 'parentLink', 'rootLink']),
     apiItemsLoading() {
       return this.getApiItemsLoading(this.data);
     },
@@ -173,6 +174,19 @@ export default {
         type: 'FeatureCollection',
         features: this.items
       };
+    }
+  },
+  watch: {
+    data: {
+      immediate: true,
+      handler(data) {
+        try {
+          let schema = createCatalogSchema(data, [this.parentLink, this.rootLink]);
+          addSchemaToDocument(document, schema);
+        } catch (error) {
+          console.warn(error);
+        }
+      }
     }
   },
   methods: {

@@ -46,6 +46,7 @@ import ReadMore from "vue-read-more-smooth";
 import ShowAssetMixin from '../components/ShowAssetMixin';
 import { BTabs, BTab } from 'bootstrap-vue';
 import Utils from '../utils';
+import { addSchemaToDocument, createItemSchema } from '../schema-org';
 
 export default {
   name: "Item",
@@ -83,12 +84,23 @@ export default {
   },
   computed: {
     ...mapState(['data', 'url']),
-    ...mapGetters(['additionalLinks', 'collectionLink', 'getStac']),
+    ...mapGetters(['additionalLinks', 'collectionLink', 'getStac', 'parentLink']),
     collection() {
       return this.getStac(this.collectionLink);
     }
   },
   watch: {
+    data: {
+      immediate: true,
+      handler(data) {
+        try {
+          let schema = createItemSchema(data, [this.collectionLink, this.parentLink]);
+          addSchemaToDocument(document, schema);
+        } catch (error) {
+          console.warn(error);
+        }
+      }
+    },
     collectionLink: {
       immediate: true,
       handler(newLink) {
