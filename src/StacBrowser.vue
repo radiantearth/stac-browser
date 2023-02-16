@@ -1,19 +1,15 @@
 <template>
   <b-container id="stac-browser">
     <Authentication v-if="doAuth.length > 0" />
-    <b-sidebar id="sidebar" :title="$t('browse')" shadow lazy>
-      <Sidebar />
-    </b-sidebar>
+    <ErrorAlert class="global-error" v-if="globalError" v-bind="globalError" @close="hideError" />
+    <Sidebar v-if="sidebar" />
     <!-- Header -->
     <header>
       <div class="logo">{{ displayCatalogTitle }}</div>
-      <StacHeader />
+      <StacHeader @enableSidebar="sidebar = true" />
     </header>
     <!-- Content (Item / Catalog) -->
-    <main>
-      <ErrorAlert class="global-error" v-if="globalError" v-bind="globalError" @close="hideError" />
-      <router-view />
-    </main>
+    <router-view />
     <footer>
       <i18n tag="small" path="poweredBy" class="poweredby text-muted">
         <template #link>
@@ -34,15 +30,12 @@ import getStore from "./store";
 
 import {
   AlertPlugin, BadgePlugin, ButtonGroupPlugin, ButtonPlugin,
-  CardPlugin, LayoutPlugin, SidebarPlugin, SpinnerPlugin,
+  CardPlugin, LayoutPlugin, SpinnerPlugin,
   VBToggle, VBVisible } from "bootstrap-vue";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
 
-import Clipboard from 'v-clipboard';
-
 import ErrorAlert from './components/ErrorAlert.vue';
-import Sidebar from './components/Sidebar.vue';
 import StacHeader from './components/StacHeader.vue';
 
 import STAC from './models/stac';
@@ -51,9 +44,7 @@ import URI from 'urijs';
 
 import I18N from '@radiantearth/stac-fields/I18N';
 import { translateFields, API_LANGUAGE_CONFORMANCE, loadMessages } from './i18n';
-import { getBest, prepareSupported } from 'locale-id';
-
-Vue.use(Clipboard);
+import { getBest, prepareSupported } from './locale-id';
 
 Vue.use(AlertPlugin);
 Vue.use(ButtonGroupPlugin);
@@ -61,7 +52,6 @@ Vue.use(ButtonPlugin);
 Vue.use(BadgePlugin);
 Vue.use(CardPlugin);
 Vue.use(LayoutPlugin);
-Vue.use(SidebarPlugin);
 Vue.use(SpinnerPlugin);
 
 // For collapsibles / accordions
@@ -105,7 +95,7 @@ export default {
   components: {
     Authentication: () => import('./components/Authentication.vue'),
     ErrorAlert,
-    Sidebar,
+    Sidebar: () => import('./components/Sidebar.vue'),
     StacHeader
   },
   props: {
@@ -113,6 +103,7 @@ export default {
   },
   data() {
     return {
+      sidebar: false,
       error: null,
       onDataLoaded: null
     };

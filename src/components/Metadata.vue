@@ -95,6 +95,8 @@ export default {
                     });
                     return core.sort((a,b) => a.label.localeCompare(b.label, this.uiLanguage));
                 }
+                case 'FeatureCollection':
+                    return {};
                 default:
                     return formatGrouped(this.context, this.data, this.type, filter);
             }

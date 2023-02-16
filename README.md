@@ -15,11 +15,28 @@ This package has also been published to npm as [`@radiantearth/stac-browser`](ht
 It's not officially supported, but you may also be able to use it for
 certain *OGC API - Records* and *OGC API - Features* compliant servers.
 
+**Table of Contents:**
+- [Examples](#examples)
+- [Get Started](#get-started)
+  - [Private query parameters](#private-query-parameters)
+  - [Migrate from old versions](#migrate-from-old-versions)
+- [Customize](#customize)
+  - [Options](#options)
+  - [Languages](#languages)
+  - [Themes](#themes)
+  - [Customize through root catalog](#customize-through-root-catalog)
+  - [Custom fields](#custom-fields)
+- [Docker](#docker)
+- [Contributing](#contributing)
+  - [Adding a new language](#adding-a-new-language)
+
 ## Examples
 
-For a list of examples, check out [STAC Index](https://stacindex.org).
+A demo instance is running at <https://radiantearth.github.io/stac-browser/>.
 
-## Running
+The catalog section of [STAC Index](https://stacindex.org) is also built on top of STAC Browser (currently v2).
+
+## Get Started
 
 First, you need to install all dependencies:
 ```bash
@@ -49,11 +66,75 @@ host the browser. These can be manually copied to your web host of choice.
 
 You can customize STAC Browser, too. See the options and theming details below. If not stated otherwise, all options can either be specified via CLI or in the [config file](config.js).
 
-## Options
+### Private query parameters
+
+***experimental***
+
+STAC Browser supports "private query parameters", e.g. for passing an API key through. Any query parameter that is starting with a `~` will be stored internally, removed from the URL and be appended to STAC requests. This is useful for token-based authentication via query parameters.
+
+So for example if your API requires to pass a token via the `API_KEY` query parameter, you can request STAC Browser as such:
+`https://examples.com/stac-browser/?~API_KEY=123` which will change the URL to `https://examples.com/stac-browser/` and store the token `123` internally. The request then will have the query parameter attached and the Browser will request e.g. `https://examples.com/stac-api/?API_KEY=123`.
+
+Please note: If the server hosting STAC Browser should not get aware of private query parameters and you are having `historyMode` set to `history`, you can also append the private query parameters to the hash so that it doesn't get transmitted to the server hosting STAC Browser. 
+In this case use for example `https://examples.com/stac-browser/#?~API_KEY=123` instead of `https://examples.com/stac-browser/?~API_KEY=123`.
+
+### Migrate from old versions
+
+If you are running an old (standalone) version of STAC Browser (v1 or v2) without heavy modifications,
+you can usually migrate easily.
+
+The old environment variables should be transitions out of usage. Instead please use the config file or CLI parameters.
+The names of the variables have slightly changed:
+* `CATALOG_URL` => `catalogUrl` (make sure to append a `/` at the end of folders / API endpoints)
+* `STAC_PROXY_URL` => `stacProxyUrl` (same in CLI, different format in the config file)
+* `TILE_PROXY_URL` / `TILE_SOURCE_TEMPLATE` => `buildTileUrlTemplate` (this is not a 1:1 replacement, make sure to read the documentation for `buildTileUrlTemplate`)
+* `PATH_PREFIX` => `pathPrefix`
+* `HISTORY_MODE` => `historyMode`
+
+You should also enable `redirectLegacyUrls` which makes sure that your old URLs are correctly parsed by STAC Browser v3 and links to the old version of STAC Browser don't get broken.
+
+All other options you can customize to your liking.
+
+Then simply deploy STAC Browser to the same location where you hosted STAC Browser v1/v2 before.
+
+## Customize
+
+### Options
 
 All the following options can be used as explained in the chapter "Running", either through the [config file](config.js), as CLI Parameter or as environment variable (deprecated).
+Some of them can also be set [through the root catalog](#customize-through-root-catalog).
 
-### catalogUrl
+**The following options are available:**
+* [catalogUrl](#catalogurl)
+* [catalogTitle](#catalogtitle)
+* [allowExternalAccess](#allowexternalaccess)
+* [allowedDomains](#alloweddomains)
+* [apiCatalogPriority](#apicatalogpriority)
+* [detectLocaleFromBrowser](#detectlocalefrombrowser)
+* [storeLocale](#storelocale)
+* [locale](#locale)
+* [fallbackLocale](#fallbacklocale)
+* [supportedLocales](#supportedlocales)
+* [stacLint](#staclint)
+* [historyMode](#historymode)
+* [pathPrefix](#pathprefix)
+* [stacProxyUrl](#stacproxyurl)
+* [buildTileUrlTemplate](#buildtileurltemplate)
+* [useTileLayerAsFallback](#usetilelayerasfallback)
+* [displayGeoTiffByDefault](#displaygeotiffbydefault)
+* [redirectLegacyUrls](#redirectlegacyurls)
+* [itemsPerPage](#itemsperpage)
+* [maxPreviewsOnMap](#maxpreviewsonmap)
+* [cardViewMode](#cardviewmode)
+* [showThumbnailsAsAssets](#showthumbnailsasassets)
+* [defaultThumbnailSize](#defaultthumbnailsize)
+* [crossOriginMedia](#crossoriginmedia)
+* [requestHeaders](#requestheaders)
+* [requestQueryParameters](#requestqueryparameters)
+* [authConfig](#authconfig)
+* [preprocessSTAC](#preprocessstac)
+
+#### catalogUrl
 
 The URL of the catalog to show by default.
 
@@ -61,21 +142,21 @@ If you don't point to a specific file make sure to append a `/` at the end of th
 
 If `catalogUrl` is empty or set to `null` STAC Browser switches to a mode where it defaults to a screen where you can either insert a catalog URL or select a catalog from [stacindex.org](https://stacindex.org).
 
-### catalogTitle
+#### catalogTitle
 
 The default title shown if no title can be read from the root STAC catalog.
 
-### allowExternalAccess
+#### allowExternalAccess
 
 This allows or disallows loading and browsing external STAC data.
 External STAC data is any data that is not a children of the given `catalogUrl`.
 Must be set to `true` if a `catalogUrl` is not given as otherwise you won't be able to browse anything.
 
-### allowedDomains
+#### allowedDomains
 
 You can list additional domains (e.g. `example.com`) that private data is sent to, e.g. authentication data.
 
-### apiCatalogPriority
+#### apiCatalogPriority
 
 For STAC APIs there are two potential sources for catalogs and collections:
 1. Collections loaded from `/collections` and detected through the `data` link
@@ -88,27 +169,27 @@ The following options are available:
 - `childs`: Show only children
 - `null`: Default behavior
 
-### detectLocaleFromBrowser
+#### detectLocaleFromBrowser
 
 If set to `true`, tries to detect the preferred language of the user from the Browser.
 Otherwise, defaults to the language set for `locale`.
 
-### storeLocale
+#### storeLocale
 
 If set to `true`, stores the locale selected by the user in the `localeStorage` of the browser.
 Otherwise, doesn't store the locale across browser sessions.
 
-### locale
+#### locale
 
 The default language to use for STAC Browser, defaults to `en` (English).
 The language given here must be present in `supportedLocales`.
 
-### fallbackLocale
+#### fallbackLocale
 
 The language to use if individual phrases are not available in the default language, defaults to `en` (English).
 The language given here must be present in `supportedLocales`.
 
-### supportedLocales
+#### supportedLocales
 
 A list of languages to show in the STAC Browser UI.
 The languages given here must have a corresponding JS and JSON file in the `src/locales` folder,
@@ -119,7 +200,7 @@ In CLI, please provide the languages separated by a space, e.g. `--supportedLoca
 Please note that only left-to-right languages have been tested.
 I'd need help to test support for right-to-left languages.
 
-### stacLint
+#### stacLint
 
 ***experimental***
 
@@ -131,7 +212,7 @@ Validation is automatically disabled in the following cases:
 - [private query parameters](#private-query-parameters) have been set
 - `stacProxyUrl` is set
 
-### historyMode
+#### historyMode
 
 ***build-only option***
 
@@ -139,7 +220,7 @@ STAC Browser defaults to using [HTML5 History Mode](https://v3.router.vuejs.org/
 which can cause problems on certain web hosts. To use _hash mode_, set `--historyMode=hash` when running or building.
 This will be compatible with S3, stock Apache, etc.
 
-### pathPrefix
+#### pathPrefix
 
 ***build-only option***
 
@@ -153,7 +234,7 @@ npm run build -- --pathPrefix="/browser/"
 This will build STAC Browser in a way that it can be hosted at `https://example.com/browser` for example.
 Using this parameter for the dev server will make STAC Browser available at `http://localhost:8080/browser`.
 
-### stacProxyUrl
+#### stacProxyUrl
 
 ***experimental***
 
@@ -174,7 +255,7 @@ In this example, any href contained in the STAC (including link or asset hrefs) 
 This can also be helpful when proxying a STAC that does not have cors enabled;
 by using stacProxyUrl you can proxy the original STAC server with one that enables cors and be able to browse that catalog.
 
-### buildTileUrlTemplate
+#### buildTileUrlTemplate
 
 The option controls the tile layer that is used to render imagery such as (cloud-optimized) GeoTiffs.
 
@@ -187,7 +268,7 @@ If the option `useTileLayerAsFallback` is set to `true`, the tile server is only
 **Note:** This option replaces the v2 options `TILE_SOURCE_TEMPLATE` and `TILE_PROXY_URL`.
 The v3-dev option `tileSourceTemplate` has been removed in favor of this option.
 
-### useTileLayerAsFallback
+#### useTileLayerAsFallback
 
 Depending on this option, either client-side or server-side rendering of imagery such as (cloud-optimized) GeoTiffs can be enabled/disabled.
 
@@ -205,43 +286,43 @@ To clarify the behavior, please have a look at the following table:
 
 By default, client-side rendering is enabled. A server-side fallback is provided via the [tiles.rdnt.io](https://github.com/radiantearth/tiles.rdnt.io) project, which serves publicly accessible GeoTiffs as tile layers.
 
-### displayGeoTiffByDefault
+#### displayGeoTiffByDefault
 
 If set to `true`, the map also shows non-cloud-optimized GeoTiff files by default. Otherwise (`false`, default), it only shows COGs and you can only enforce showing GeoTiffs to be loaded with the "Show on map" button but they are never loaded automatically.
 Loading non-cloud-optimized GeoTiffs only works reliably for smaller files (< 1MB). It may also work for larger files, but it is depending a lot on the underlying client hardware and software.
 
-### redirectLegacyUrls
+#### redirectLegacyUrls
 
 ***experimental***
 
 If you are updating from on old version of STAC Browser, you can set this option to `true` to redirect users from the old "unreadable" URLs to the new human-readable URLs.
 
-### itemsPerPage
+#### itemsPerPage
 
 The number of items requested and shown per page by default. Only applies to APIs that support the `limit` query parameter.
 
-### maxPreviewsOnMap
+#### maxPreviewsOnMap
 
 The maximum number of previews (thumbnails or overviews) of items that will be shown on the map when on Catalog or Collection pages.
 
-### cardViewMode
+#### cardViewMode
 
 The default view mode for lists of catalogs/collections. Either `list` or `cards` (default). 
 
-### showThumbnailsAsAssets
+#### showThumbnailsAsAssets
 
 Defines whether thumbnails are shown in the lists of assets (`true`, default) or not.
 
-### defaultThumbnailSize
+#### defaultThumbnailSize
 
 The default size \[Height, Width\] for thumbnails which is reserved in card and list views so that the items don't jump when loading the images.
 This can be overridden per thumbnail by declaring the [`proj:shape`](https://github.com/stac-extensions/projection/#item-properties-or-asset-fields) on the asset or link.
 
-### crossOriginMedia
+#### crossOriginMedia
 
 The value for the [`crossorigin` attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/crossorigin) that is sent when loading images through the browser. Default to `null`. If you encounter issues with loading images, you may want to try setting this to `anonymous`.
 
-### requestHeaders
+#### requestHeaders
 
 ***experimental***
 
@@ -251,7 +332,7 @@ Example: `{'Authorization': 'Bearer 134567984623223'}` adds a Bearer token to th
 
 Please note that this option can only be provided through a config file and is not available via CLI.
 
-### requestQueryParameters
+#### requestQueryParameters
 
 ***experimental***
 
@@ -261,7 +342,7 @@ Example: `{'f': 'json'}` adds a `f` query parameter to the HTTP URL, e.g. `https
 
 Please note that this option can only be provided through a config file and is not available via CLI.
 
-### authConfig
+#### authConfig
 
 ***experimental***
 
@@ -278,7 +359,7 @@ There are four options you can set in the `authConfig` object:
 
 Please note that this option can only be provided through a config file and is not available via CLI.
 
-#### Example 1: HTTP Request Header Value
+##### Example 1: HTTP Request Header Value
 
 ```js
 {
@@ -292,7 +373,7 @@ Please note that this option can only be provided through a config file and is n
 For a given token `123` this results in the following additional HTTP Header:
 `Authorization: Bearer 123`
 
-#### Example 2: Query Parameter Value
+##### Example 2: Query Parameter Value
 
 ```js
 {
@@ -304,7 +385,7 @@ For a given token `123` this results in the following additional HTTP Header:
 For a given token `123` this results in the following query parameter:
 `https://example.com/stac/catalog.json?API_KEY=123`
 
-### preprocessSTAC
+#### preprocessSTAC
 
 ***experimental***
 
@@ -315,7 +396,7 @@ The function receives two parameters:
 
 Please note that this option can only be provided through a config file and is not available via CLI.
 
-#### Example: Update root catalog
+##### Example: Update root catalog
 
 Some root catalogs in implementations don't have very useful titles, descriptions and are not a nice "intro" for new users.
 Thus, it may make sense to change the root catalog to provide more useful information.
@@ -331,7 +412,23 @@ preprocessSTAC: (stac, state) => {
 }
 ```
 
-## Theming
+### Languages
+
+STAC Browser can be translated into other languages and can localize number formats, date formats etc.
+
+You need to change the [`locale`](#locale) and [`supportedLocales`](#supportedlocales) settings to select the default language and the languages available to users.
+
+The following languages are currently supported:
+- de: German (Germany, Switzerland)
+- es: Spanish
+- en: English
+- fr: French (Canada, France, Switzerland)
+- it: Italian (Italy, Switzerland)
+- ro: Romanian
+
+To add your own language, please follow the guide below: [Adding a new langauge](#adding-a-new-language)
+
+### Themes
 
 You can customize STAC Browser in the `src/theme` folder. It contains Sass files (a CSS preprocessor), which you can change to suit your needs.
 
@@ -343,26 +440,7 @@ The file `page.scss` contains some Sass declarations for the main sections of ST
 
 If you need even more flexibility, you need to dig into the Vue files and their dependencies though.
 
-## Custom fields
-
-STAC Browser supports some non-standardized fields that you can use to improve the user-experience.
-
-1. To the [Provider Object](https://github.com/radiantearth/stac-spec/blob/master/collection-spec/collection-spec.md#provider-object) you can add an `email` (or `mail`) field with an e-mail address and the mail will be shown in the Browser, too.
-2. A link with relation type `icon` and a Browser-supported media type in any STAC entity will show an icon in the header and the lists.
-
-## Private query parameters
-
-***experimental***
-
-STAC Browser supports "private query parameters", e.g. for passing an API key through. Any query parameter that is starting with a `~` will be stored internally, removed from the URL and be appended to STAC requests. This is useful for token-based authentication via query parameters.
-
-So for example if your API requires to pass a token via the `API_KEY` query parameter, you can request STAC Browser as such:
-`https://examples.com/stac-browser/?~API_KEY=123` which will change the URL to `https://examples.com/stac-browser/` and store the token `123` internally. The request then will have the query parameter attached and the Browser will request e.g. `https://examples.com/stac-api/?API_KEY=123`.
-
-Please note: If the server hosting STAC Browser should not get aware of private query parameters and you are having `historyMode` set to `history`, you can also append the private query parameters to the hash so that it doesn't get transmitted to the server hosting STAC Browser. 
-In this case use for example `https://examples.com/stac-browser/#?~API_KEY=123` instead of `https://examples.com/stac-browser/?~API_KEY=123`.
-
-## Customize through root catalog
+### Customize through root catalog
 
 You can also provide a couple of the config options through the root catalog. 
 You need to provide a field `stac_browser` and then you can set any of the following options:
@@ -375,7 +453,14 @@ You need to provide a field `stac_browser` and then you can set any of the follo
 - `showThumbnailsAsAssets`
 - `stacLint` (can only be disabled)
 
-## Running Dockerfile
+### Custom fields
+
+STAC Browser supports some non-standardized fields that you can use to improve the user-experience.
+
+1. To the [Provider Object](https://github.com/radiantearth/stac-spec/blob/master/collection-spec/collection-spec.md#provider-object) you can add an `email` (or `mail`) field with an e-mail address and the mail will be shown in the Browser, too.
+2. A link with relation type `icon` and a Browser-supported media type in any STAC entity will show an icon in the header and the lists.
+
+## Docker
 
 When building the Dockerfile, you can add the [`catalogUrl`](#catalogurl) 
 as a [build argument](https://docs.docker.com/engine/reference/commandline/build/#set-build-time-variables---build-arg). For example:
@@ -394,6 +479,32 @@ docker run -p 8080:8080 stac-browser:v1
 
 ## Contributing
 
-STAC Browser uses [Vue](https://vuejs.org/).
+We are happy to review and accept Pull Requests.
+STAC Browser is following the [STAC code of conduct](https://github.com/radiantearth/stac-spec/blob/master/CODE_OF_CONDUCT.md).
 
-To lint the source code, run `npm run lint`
+STAC Browser uses [Vue](https://vuejs.org/) and [vue-cli](https://cli.vuejs.org/), so you need a recent version of [NodeJS and npm](https://nodejs.org/en/) installed.
+
+You can run the following commands (see also "[Running](#running)" above):
+- `npm run install`: Install the dependencies, this is required once at the beginning.
+- `npm start`: Start the development server
+- `npm run lint`: Lint the source code files
+- `npm run build`: Compile the source code into deployable files for the web. The resulting files can be found in the folder `dist` and you can then deploy STAC Browser on a web host.
+- `npm run i18n:fields`: Generates an updated version of the locales from the stac-fields package.
+
+### Adding a new language
+
+You can translate STAC Browser into other languages.
+You can also use one of the existing languages and provide an alternate version for a specifc country, e.g. a Australian English (en-AU) version of the US-English language pack (en).
+
+**Please follow this guide:**
+- Copy the `en` folder (or any other language without a country code that you want to base the translation on).
+- Name the new folder according to [RFC5646](https://www.rfc-editor.org/rfc/rfc5646).
+- Add the language to the list of supported locales ([`supportedLocales`](#supportedlocales)) in the `config.js` file.
+- Add the language to the [list of languages in this README file](#languages).
+- Add yourself to the list of code owners (`.github/CODEOWNERS`) for this language (we'll invite you to this repository after you've opened a PR). **Persons contributing languages are expected to maintain them long-term! If you are not able to maintain the language pack, please indicate so in the PR and we'll release it separately.**
+- Translate the `.json` files, most importantly `config.json`, `fields.json` and `texts.json`.
+  - Please note that you never need to translate any object keys!
+  - If you base your language on another existing language (e.g. create `en-IN` based on `en`) you can delete individual files and import existing files from other languages in `default.js`.
+- Adapt the `datepicker.js` and `duration.js` files to import the existing definitions from their corresponding external packages, but you could also define the specifics yourself.
+- Check that your translation works by running the development server (`npm start`) and navigating to the STAC Browser instance in your browser (usually `http://localhost:8080`).
+- Once completed, please open a pull request and we'll get back to you as soon as possible.

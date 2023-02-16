@@ -29,8 +29,9 @@ const configFile = path.resolve(argv.CONFIG ? argv.CONFIG : './config.js');
 const configFromFile = require(configFile);
 const mergedConfig = Object.assign(configFromFile, argv);
 const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
-module.exports = {
+const config = {
   lintOnSave: process.env.NODE_ENV !== 'production',
   publicPath: mergedConfig.pathPrefix,
   chainWebpack: webpackConfig => {
@@ -46,9 +47,14 @@ module.exports = {
     });
   },
   configureWebpack: {
+    resolve: {
+      fallback: {
+        'fs/promises': false
+      }
+    },
     plugins: [
       new NodePolyfillPlugin({
-        includeAliases: ['Buffer', 'console', 'http', 'https', 'process', 'url']
+        includeAliases: ['Buffer', 'path']
       })
     ]
   },
@@ -60,3 +66,12 @@ module.exports = {
     }
   }
 };
+
+if (process.env.NODE_ENV === 'production') {
+  config.configureWebpack.plugins.push(new BundleAnalyzerPlugin({
+    analyzerMode: 'static',
+    openAnalyzer: false
+  }));
+}
+
+module.exports = config;

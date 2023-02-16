@@ -13,8 +13,9 @@
       </b-button>
       <b-collapse id="itemFilter" v-model="filtersOpen">
         <ItemFilter
-          v-if="filtersOpen" :title="$t('items.filter')" :stac="stac" :value="apiFilters" @input="emitFilter"
-          :collectionOnly="true" v-bind="filterComponentProps"
+          v-if="filtersOpen" :title="$t('items.filter')" :stac="stac"
+          :value="apiFilters" :collectionOnly="true"
+          v-bind="filterComponentProps" @input="emitFilter"
         />
       </b-collapse>
     </template>

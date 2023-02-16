@@ -2,7 +2,6 @@ import Vue from "vue";
 import Vuex from "vuex";
 
 import axios from "axios";
-import bs58 from 'bs58';
 import URI from "urijs";
 
 import i18n from '../i18n';
@@ -12,7 +11,7 @@ import STAC from '../models/stac';
 import Queryable from '../models/queryable';
 
 import { addQueryIfNotExists, isAuthenticationError, Loading, processSTAC, stacRequest } from './utils';
-import { getBest } from "locale-id";
+import { getBest } from '../locale-id';
 
 function getStore(config, router) {
   // Local settings (e.g. for currently loaded STAC entity)
@@ -40,7 +39,6 @@ function getStore(config, router) {
 
   const catalogDefaults = () => ({
     queue: [],
-    redirectUrl: null,
     privateQueryParameters: {},
     authData: null,
     doAuth: [],
@@ -415,8 +413,8 @@ function getStore(config, router) {
         }
       },
       languages(state, {uiLanguage, dataLanguage}) {
-        state.dataLanguage = dataLanguage;
-        state.uiLanguage = uiLanguage;
+        state.dataLanguage = dataLanguage || null;
+        state.uiLanguage = uiLanguage || null;
       },
       setQueryParameter(state, { type, key, value }) {
         type = `${type}QueryParameters`;
@@ -602,18 +600,6 @@ function getStore(config, router) {
         state.apiItems = [];
         state.apiItemsPagination = {};
       },
-      redirectLegacyUrl(state, path) {
-        if (!path) {
-          return;
-        }
-        let parts = path.split('/').filter(part => part.length > 0 && part !== 'item' && part !== 'collection');
-        if (parts.length > 0 && parts.every(part => part.match(/^[123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ]+$/))) {
-          let newPath = bs58.decode(parts[parts.length - 1]).toString();
-          if (newPath) {
-            state.redirectUrl = '/' + newPath;
-          }
-        }
-      },
       parents(state, parents) {
         state.parents = parents;
       },
@@ -741,7 +727,7 @@ function getStore(config, router) {
           cx.commit('updateLoading', { url, show, loadApi });
           return;
         }
-        else if (!data) {
+        else if (!data || (data instanceof STAC && data.isPotentiallyIncomplete())) {
           cx.commit('loading', { url, loading });
           try {
             let response = await stacRequest(cx, url);
@@ -782,11 +768,6 @@ function getStore(config, router) {
             }
             console.error(error);
             cx.commit('errored', { url, error });
-
-            // Redirect legacy URLs
-            if (cx.state.redirectLegacyUrls && fromBrowser && show) {
-              cx.commit('redirectLegacyUrl', path);
-            }
           }
         }
 
@@ -884,7 +865,16 @@ function getStore(config, router) {
                 else {
                   return null;
                 }
-                return new STAC(item, url, cx.getters.toBrowserPath(url));
+                let data = cx.getters.getStac(url);
+                if (data) {
+                  return data;
+                }
+                else {
+                  data = new STAC(item, url, cx.getters.toBrowserPath(url));
+                  data.markPotentiallyIncomplete();
+                  cx.commit('loaded', { data, url });
+                  return data;
+                }
               } catch (error) {
                 console.error(error);
                 return null;
@@ -934,7 +924,16 @@ function getStore(config, router) {
             else {
               url = Utils.toAbsolute(`collections/${collection.id}`, cx.state.catalogUrl || stac.getAbsoluteUrl());
             }
-            return new STAC(collection, url, cx.getters.toBrowserPath(url));
+            let data = cx.getters.getStac(url);
+            if (data) {
+              return data;
+            }
+            else {
+              data = new STAC(collection, url, cx.getters.toBrowserPath(url));
+              data.markPotentiallyIncomplete();
+              cx.commit('loaded', { data, url });
+              return data;
+            }
           });
           cx.commit('addApiCollections', { data: response.data, stac, show });
         }
