@@ -430,6 +430,22 @@ The following languages are currently supported:
 
 To add your own language, please follow the guide below: [Adding a new langauge](#adding-a-new-language)
 
+#### Custom phrases
+You can define custom phrases in the `custom.json`.
+This is especially useful for phrases that are coming from non-standadized metadata fields.
+If you've found metadata labels (e.g. "Price" and "Generation Time") that are not translated,
+you can add it to the `custom.json`. For metadata fields you need to add it to a the object `fields`
+as it is the group for the metadata-related phrases.
+There you can add as many phrases as you like. For example:
+```json
+{
+  "fields": {
+    "Price": "Preis",
+    "Generation Time": "Generierungszeit"
+  }
+}
+```
+
 ### Themes
 
 You can customize STAC Browser in the `src/theme` folder. It contains Sass files (a CSS preprocessor), which you can change to suit your needs.
