@@ -12,7 +12,7 @@ RUN npm install
 
 COPY . .
 
-RUN npm run build -- --catalogUrl=$catalogURL
+RUN npm run build -- --catalogUrl=$catalogURL --publicPath=/stac-browser/
 
 EXPOSE 8080
 
