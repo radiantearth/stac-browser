@@ -12,8 +12,11 @@ RUN npm install
 
 COPY . .
 
-RUN npm run build -- --catalogUrl=$catalogURL --publicPath=/stac-browser/
+# 2. si build time plus long
+RUN npm run build -- --catalogUrl=$catalogURL
 
 EXPOSE 8080
+
+# 1. Essayer build par entrypoint, ARG
 
 CMD [ "serve", "-s", "dist", "-l", "8080" ]
