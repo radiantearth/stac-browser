@@ -1,6 +1,7 @@
 FROM node:lts-alpine
 
-ARG catalogURL
+ENV CATALOG_URL null
+ENV ROOT_PATH /
 
 RUN npm install -g serve
 
@@ -12,11 +13,6 @@ RUN npm install
 
 COPY . .
 
-# 2. si build time plus long
-RUN npm run build -- --catalogUrl=$catalogURL
-
 EXPOSE 8080
 
-# 1. Essayer build par entrypoint, ARG
-
-CMD [ "serve", "-s", "dist", "-l", "8080" ]
+ENTRYPOINT [ "/bin/sh", "-c", "cd /app && npm run build -- --catalogUrl=${CATALOG_URL} --publicPath=${ROOT_PATH} && serve -s dist -l 8080" ]
