@@ -188,6 +188,8 @@
       "reset": "Réinitialiser"
     },
     "dateDescription": "Toutes les heures sont en temps universel coordonné (UTC).",
+    "enterCollections": "Saisissez une ou plusieurs collections...",
+    "enterItemIds": "Saisissez un ou plusieurs identifiants d'éléments...",
     "equalTo": "égal à",
     "filterBySpatialExtent": "Filtrer par étendue spatiale",
     "greaterThan": "supérieur à",
@@ -204,7 +206,6 @@
     "notSupported": "La recherche d'éléments n'est pas pris en charge par l'API.",
     "placeholder": "Rechercher...",
     "selectCollections": "Sélectionnez une ou plusieurs collections...",
-    "selectItemIds": "Sélectionnez un ou plusieurs identifiants d'éléments...",
     "sortOptions": {
       "datetime": "Date et heure",
       "id": "Identifiant",

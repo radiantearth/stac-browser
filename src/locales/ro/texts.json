@@ -188,6 +188,8 @@
       "reset": "Resetați"
     },
     "dateDescription": "Toate orele sunt timp universal coordonat (UTC).",
+    "enterCollections": "Introduceți una sau mai multe colecții...",
+    "enterItemIds": "Introduceți unul sau mai multe ID-uri de articol...",
     "equalTo": "egal cu",
     "filterBySpatialExtent": "Filtrați după extinderea spațială",
     "greaterThan": "mai mare decât",
@@ -204,7 +206,6 @@
     "notSupported": "Căutarea articolelor nu este acceptată de API.",
     "placeholder": "Căutare...",
     "selectCollections": "Selectați una sau mai multe colecții...",
-    "selectItemIds": "Selectați unul sau mai multe ID-uri de articol...",
     "sortOptions": {
       "datetime": "Data și ora",
       "id": "Identificator",

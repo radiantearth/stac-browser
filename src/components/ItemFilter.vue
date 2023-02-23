@@ -22,7 +22,7 @@
           <multiselect
             v-if="collections.length > 0"
             id="collections" :value="selectedCollections" @input="setCollections"
-            :placeholder="$t('multiselect.placeholder')"
+            :placeholder="$t('search.selectCollections')"
             :tagPlaceholder="$t('search.addCollections')"
             :selectLabel="$t('multiselect.selectLabel')"
             :selectedLabel="$t('multiselect.selectedLabel')"
@@ -34,24 +34,29 @@
             v-else
             id="collections" :value="selectedCollections" @input="setCollections"
             multiple taggable :options="query.collections"
-            :placeholder="$t('search.selectCollections')"
+            :placeholder="$t('search.enterCollections')"
             :tagPlaceholder="$t('search.addCollections')"
             :selectLabel="$t('multiselect.selectLabel')"
             :selectedLabel="$t('multiselect.selectedLabel')"
             :deselectLabel="$t('multiselect.deselectLabel')"
             :limitText="limitText"
             @tag="addCollection"
-          />
+          >
+            <template #noOptions>{{ $t('search.noOptions') }}</template>
+          </multiselect>
         </b-form-group>
 
         <b-form-group v-if="!collectionOnly" :label="$t('search.itemIds')" label-for="ids">
           <multiselect
             id="ids" :value="query.ids" @input="setIds"
             multiple taggable :options="query.ids"
-            :placeholder="$t('search.selectItemIds')"
+            :placeholder="$t('search.enterItemIds')"
             :tagPlaceholder="$t('search.addItemIds')"
+            :noOptions="$t('search.addItemIds')"
             @tag="addId"
-          />
+          >
+            <template #noOptions>{{ $t('search.noOptions') }}</template>
+          </multiselect>
         </b-form-group>
 
         <div class="additional-filters" v-if="canFilterCql && Array.isArray(queryables) && queryables.length > 0">

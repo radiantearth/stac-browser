@@ -188,6 +188,8 @@
       "reset": "Restablecer"
     },
     "dateDescription": "Todas las horas en Coordinated Universal Time (UTC).",
+    "enterCollections": "Introduzca una o varias colecciones...",
+    "enterItemIds": "Introduzca una o varias IDs de Elemento...",
     "equalTo": "igual a",
     "filterBySpatialExtent": "Filtra por extensión espacial",
     "greaterThan": "mayor que",
@@ -204,7 +206,6 @@
     "notSupported": "La API no soporta la Búsqueda por Elementos.",
     "placeholder": "Búsqueda...",
     "selectCollections": "Seleccione una o varias colecciones...",
-    "selectItemIds": "Seleccione una o varias IDs de Elemento...",
     "sortOptions": {
       "datetime": "Fecha y hora",
       "id": "ID",

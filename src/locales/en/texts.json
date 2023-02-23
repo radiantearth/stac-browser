@@ -188,6 +188,8 @@
       "reset": "Reset"
     },
     "dateDescription": "All times in Coordinated Universal Time (UTC).",
+    "enterCollections": "Enter one or more Collection IDs...",
+    "enterItemIds": "Enter one or more Item IDs...",
     "equalTo": "equal to",
     "filterBySpatialExtent": "Filter by spatial extent",
     "greaterThan": "greater than",
@@ -199,12 +201,12 @@
     "matches": "matches",
     "modifyCriteria": "Please modify the search criteria.",
     "noItemsFound": "No items found for the given filters.",
+    "noOptions": "Nothing entered yet",
     "notEqualTo": "not equal to",
     "notFullySupported": "Not all of the options may be supported.",
     "notSupported": "Item Search is not supported by the API.",
     "placeholder": "Search...",
     "selectCollections": "Select one or multiple collections...",
-    "selectItemIds": "Select one or multiple Item IDs...",
     "sortOptions": {
       "datetime": "Date and Time",
       "id": "ID",

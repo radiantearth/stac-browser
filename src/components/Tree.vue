@@ -31,7 +31,7 @@
         </ul>
         <template v-else>
           <Tree v-for="(child, i) in shownChilds" :key="i" :item="child" :parent="stac" :path="path" />
-          <b-button class="show-more" v-if="hasMore" @click="showMore" variant="light" v-b-visible.300="showMore">{{ $t('showMore') }}</b-button>
+          <b-button class="show-more" v-if="hasMore" variant="light" @click="showMore" v-b-visible.300="showMore">{{ $t('showMore') }}</b-button>
         </template>
       </template>
     </li>
@@ -124,7 +124,7 @@ export default {
     },
     to() {
       if (this.pagination) {
-        if (this.parent && this.parent.getAbsoluteUrl() !== this.data.getAbsoluteUrl()) {
+        if (this.parent && (!this.data || this.parent.getAbsoluteUrl() !== this.data.getAbsoluteUrl())) {
           return this.parent.getBrowserPath();
         }
         else {

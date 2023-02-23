@@ -188,6 +188,8 @@
       "reset": "Reimposta"
     },
     "dateDescription": "Data/ora nel sistema UTC (tempo coordinato internazionale).",
+    "enterCollections": "Inserire una o più Collezioni...",
+    "enterItemIds": "Inserire uno o più ID di Elemento...",
     "equalTo": "uguale a",
     "filterBySpatialExtent": "Filtra per estensione spaziale",
     "greaterThan": "maggiore di",
@@ -203,8 +205,7 @@
     "notFullySupported": "Alcune opzioni potrebbero non essere supportate.",
     "notSupported": "La ricerca di Elementi non è supportata dall'API.",
     "placeholder": "Cerca...",
-    "selectCollections": "Una o più Collezioni...",
-    "selectItemIds": "Uno o più ID di Elemento...",
+    "selectCollections": "Selezionare una o più Collezioni...",
     "sortOptions": {
       "datetime": "Data e ora",
       "id": "ID",
