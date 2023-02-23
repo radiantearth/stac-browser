@@ -15,4 +15,4 @@ COPY . .
 
 EXPOSE 8080
 
-ENTRYPOINT [ "/bin/sh", "-c", "cd /app && npm run build -- --catalogUrl=${CATALOG_URL} --publicPath=${ROOT_PATH} && serve -s dist -l 8080" ]
+ENTRYPOINT [ "/bin/sh", "-c", "cd /app && npm run build -- --catalogUrl=${CATALOG_URL} --pathPrefix=${ROOT_PATH} && serve -s dist -l 8080" ]
