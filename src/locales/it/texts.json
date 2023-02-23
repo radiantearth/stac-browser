@@ -141,11 +141,11 @@
     "title": "Metadati"
   },
   "multiselect": {
+    "andMore": "e {count} in più",
+    "deselectLabel": "Premi invio per rimuovere",
     "placeholder": "Seleziona un'opzione",
     "selectLabel": "Premi invio per selezionare",
-    "selectedLabel": "Selezionato",
-    "deselectLabel": "Premi invio per rimuovere",
-    "andMore": "e {count} in più"
+    "selectedLabel": "Selezionato"
   },
   "open": "Apri",
   "pagination": {
@@ -201,6 +201,7 @@
     "matches": "corrisponde a",
     "modifyCriteria": "Modifica i criteri di ricerca.",
     "noItemsFound": "Nessun Elemento corrispondente ai criteri di ricerca impostati.",
+    "noOptions": "Nessun valore inserito",
     "notEqualTo": "diverso da",
     "notFullySupported": "Alcune opzioni potrebbero non essere supportate.",
     "notSupported": "La ricerca di Elementi non è supportata dall'API.",

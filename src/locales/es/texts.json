@@ -141,11 +141,11 @@
     "title": "Metadatos"
   },
   "multiselect": {
+    "andMore": "y {count} mas",
+    "deselectLabel": "Presione enter para quitar",
     "placeholder": "Seleccionar opción",
     "selectLabel": "Presione enter para seleccionar",
-    "selectedLabel": "Seleccionado",
-    "deselectLabel": "Presione enter para quitar",
-    "andMore": "y {count} mas"
+    "selectedLabel": "Seleccionado"
   },
   "open": "Abrir",
   "pagination": {
@@ -201,6 +201,7 @@
     "matches": "coincidencia",
     "modifyCriteria": "Por favor modifique los criterios de búsqueda.",
     "noItemsFound": "No se encontró ningún elemento para los filtros seleccionados.",
+    "noOptions": "Aún no se ha introducido nada",
     "notEqualTo": "no igual a",
     "notFullySupported": "Puede que no todas las opciones estén soportadas.",
     "notSupported": "La API no soporta la Búsqueda por Elementos.",
