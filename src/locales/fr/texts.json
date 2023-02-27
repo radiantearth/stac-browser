@@ -141,11 +141,11 @@
     "title": "Métadonnées"
   },
   "multiselect": {
+    "andMore": "et {count} de plus",
+    "deselectLabel": "Appuyer sur Entrée pour désélectionner",
     "placeholder": "Sélectionner une option",
     "selectLabel": "Appuyer sur Entrée pour sélectionner",
-    "selectedLabel": "Sélectionné(e)",
-    "deselectLabel": "Appuyer sur Entrée pour désélectionner",
-    "andMore": "et {count} de plus"
+    "selectedLabel": "Sélectionné(e)"
   },
   "open": "Ouvrir",
   "pagination": {
@@ -201,6 +201,7 @@
     "matches": "correspond à",
     "modifyCriteria": "Veuillez modifier les critères de recherche.",
     "noItemsFound": "Aucun élément trouvé pour les filtres sélectionnés.",
+    "noOptions": "Aucune information saisie",
     "notEqualTo": "différent de",
     "notFullySupported": "Toutes les options ne sont pas forcément prises en charge",
     "notSupported": "La recherche d'éléments n'est pas pris en charge par l'API.",
