@@ -31,6 +31,7 @@
   ],
   "license": "ISC",
   "dependencies": {
+    "esri-leaflet": "^3.0.8",
     "@apidevtools/json-schema-ref-parser": "^10.1.0",
     "@musement/iso-duration": "^1.0.0",
     "@radiantearth/stac-fields": "1.0.0-rc.1",
@@ -58,6 +59,7 @@
     "yargs": "^17.0.1"
   },
   "devDependencies": {
+    "esri-leaflet": "^3.0.8",
     "@vue/cli-plugin-babel": "^5.0.4",
     "@vue/cli-plugin-eslint": "^5.0.4",
     "@vue/cli-plugin-router": "^5.0.4",

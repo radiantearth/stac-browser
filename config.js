@@ -1,6 +1,6 @@
 module.exports = {
     catalogUrl: null, // Must have a slash at the end for folders/APIs
-    catalogTitle: "STAC Browser",
+    catalogTitle: "PG&E STAC Browser",
     allowExternalAccess: true, // Must be true if catalogUrl is not given
     allowedDomains: [],
     detectLocaleFromBrowser: true,
@@ -39,5 +39,9 @@ module.exports = {
     requestHeaders: {},
     requestQueryParameters: {},
     preprocessSTAC: null,
-    authConfig: null
+    authConfig: {
+        type: 'header', // null or 'query' or 'header'
+        key: 'x-api-key',
+        description: `Please get the API key from Atomic Maps.`
+    }
 };

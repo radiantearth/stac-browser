@@ -85,7 +85,7 @@ export default {
       border-radius: $border-radius;
 
       > .card {
-        background-color: #fff;
+        background-color: black;
       }
     }
   }

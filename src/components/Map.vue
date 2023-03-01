@@ -1,6 +1,7 @@
 <template>
   <div class="map-container">
-    <l-map class="map" v-if="show" :class="stac.type" @ready="init" :options="mapOptions">
+    <!-- <l-map class="map" v-if="show" :class="stac.type" @ready="init" :options="mapOptions"> -->
+    <l-map class="map" ref="map" v-if="show" :class="stac.type" @ready="init" :options="mapOptions">
       <l-control-fullscreen />
       <l-control-zoom :key="`z${ix}`" v-bind="zoomControlTexts" position="topleft" />
       <l-control-layers v-if="showLayerControl" position="bottomleft" ref="layerControl" />
@@ -11,7 +12,8 @@
           v-bind="baseMap" :layers="baseMap.name" layerType="base"
         />
       </template>
-      <l-tile-layer v-else url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" ref="basemaps" :options="osmOptions" name="OpenStreetMap" layerType="base" />
+      <!-- <l-tile-layer v-else url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" ref="basemaps" :options="osmOptions" name="OpenStreetMap" layerType="base" /> -->
+      <l-tile-layer v-else url="https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}?AAPK6e6690d477354f6a9a3d0ce8125fef0bePkhWX3TW-jXqoEQYDYcihz7w5fhyPyqHiJqtifmfukOSCY_yAQRdvUYzKGNWsnH" :options="{attribution: 'Powered by &copy; Esri', maxZoom: 21, label: 'Default'}" /> 
       <l-tile-layer
         v-for="xyz of xyzLinks" ref="overlays" :key="xyz.url" layerType="overlay"
         :name="xyz.name" :url="xyz.url" :subdomains="xyz.subdomains" :options="xyz.options" 
@@ -45,6 +47,7 @@ import { mapGetters, mapState } from 'vuex';
 import STAC from '../models/stac';
 import { object as formatObject, string as formatString } from '@radiantearth/stac-fields/datatypes';
 import { BPopover } from 'bootstrap-vue';
+// import 'esri-leaflet'
 
 // Fix missing icons: https://vue2-leaflet.netlify.app/quickstart/#marker-icons-are-missing
 import { Icon } from 'leaflet';

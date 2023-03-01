@@ -39,7 +39,7 @@ import { BForm, BFormGroup, BFormInput, BListGroup, BListGroupItem } from 'boots
 import { mapGetters } from "vuex";
 import Description from '../components/Description.vue';
 import Utils from '../utils';
-import axios from "axios";
+// import axios from "axios";
 
 export default {
   name: "SelectDataSource",
@@ -85,10 +85,22 @@ export default {
     this.$store.commit('resetCatalog', true);
     // Load entries from STAC Index
     try {
-      let response = await axios.get('https://stacindex.org/api/catalogs');
-      if(Array.isArray(response.data)) {
-        this.stacIndex = response.data;
+      // let response = await axios.get('https://stacindex.org/api/catalogs');
+      // HARDCODED PG&E CATALOGS ------------------------------------------------------------------------------------------------------------------------- HARDCODED PG&E CATALOGS
+      let response = [
+            {"id":1,"url":"https://pgestacapi.atomicmaps.net/","slug":"als-ktn","title":"PG&E Substation Inspection Imagery","summary":"Substation inspection imagery catalog","access":"public","created":"2023-02-28T16:18:40.008Z","updated":"2021-03-01T16:18:40.008Z","isPrivate":false,"isApi":true,"accessInfo":null},
+            {"id":2,"url":"https://atomicmapsdemo.s3.us-west-2.amazonaws.com/christie-sub-inspection-STAC/catalog.json","slug":"als-ktn","title":"Christie Substation Catalog","summary":"Substation imagery catalog","access":"public","created":"2021-08-31T16:18:40.008Z","updated":"2021-08-31T16:18:40.008Z","isPrivate":false,"isApi":false,"accessInfo":null},
+            {"id":3,"url":"https://atomicmapsdemo.s3.us-west-2.amazonaws.com/ElectricOperations-STAC/catalog.json","slug":"als-ktn","title":"Electric Operations Catalog","summary":"Electric Operations transmission imagery","access":"public","created":"2021-08-31T16:18:40.008Z","updated":"2021-08-31T16:18:40.008Z","isPrivate":false,"isApi":false,"accessInfo":null},
+            {"id":4,"url":"https://atomicmapsdemo.s3.us-west-2.amazonaws.com/PGE-points-STAC/catalog.json","slug":"als-ktn","title":"Point Cloud Catalog","summary":"Thinned transmission LiDAR point clouds","access":"public","created":"2021-08-31T16:18:40.008Z","updated":"2021-08-31T16:18:40.008Z","isPrivate":false,"isApi":false,"accessInfo":null},
+            {"id":5,"url":"https://atomicmapsdemo.s3.us-west-2.amazonaws.com/ElectricOperationsLiDAR-STAC/catalog.json","slug":"als-ktn","title":"Electric Operations Catalog with Point Clouds","summary":"Electric Operations transmission imagery with thinned LiDAR","access":"public","created":"2021-08-31T16:18:40.008Z","updated":"2021-08-31T16:18:40.008Z","isPrivate":false,"isApi":false,"accessInfo":null}
+          ];
+      if(Array.isArray(response)) {
+        this.stacIndex = response;
       }
+      // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+      // if(Array.isArray(response.data)) {
+      //   this.stacIndex = response.data;
+      // }
     } catch (error) {
       console.error(error);
     }

@@ -1,3 +1,30 @@
+# Atomic Notes
+
+## Running locally
+
+First, you need to install all dependencies:
+```bash
+npm install
+```
+
+Start the development server locally:
+```bash
+npm start
+```
+## Deploy to AWS
+If you'd like to publish the STAC Browser instance use the following command:
+
+```bash
+npm run build
+```
+
+After building, `dist/` will contain all assets necessary to
+host the browser. These can be manually copied to your web host of choice.
+
+To update the Atomic Maps STAC Browser, publish an update build to s3:
+```bash
+aws s3 sync ./dist s3://stac.atomicmaps.net
+```
 # STAC Browser
 
 This is a [Spatio-Temporal Asset Catalog (STAC)](https://github.com/radiantearth/stac-spec) browser for static catalogs.
