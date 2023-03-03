@@ -240,7 +240,7 @@
       "onlyUI": "Only the user interface is available in this language!",
       "switch": "Switch the language"
     },
-    "locatedAt": "The STAC metdata file is located at:",
+    "locatedAt": "The STAC metadata file is located at:",
     "share": {
       "email": "E-mail",
       "label": "Share",
