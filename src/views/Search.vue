@@ -63,8 +63,8 @@ export default {
     };
   },
   computed: {
-    ...mapState(['apiItems', 'apiItemsLink', 'apiItemsPagination', 'catalogUrl']),
-    ...mapGetters(['getStac', 'root', 'fromBrowserPath', 'getApiItemsLoading']),
+    ...mapState(['apiItems', 'apiItemsLink', 'apiItemsPagination', 'catalogUrl', 'catalogTitle']),
+    ...mapGetters(['getStac', 'root', 'collectionLink', 'parentLink', 'fromBrowserPath', 'getApiItemsLoading']),
     pageTitle() {
       return this.$t('search.title');
     },
@@ -94,6 +94,10 @@ export default {
     },
     hasItems() {
       return this.apiItems.length > 0;
+    },
+    pageDescription() {
+      let title = STAC.getDisplayTitle([this.collectionLink, this.parentLink, this.root], this.catalogTitle);
+      return this.$t('search.metaDescription', {title});
     }
   },
   watch:{
@@ -135,7 +139,10 @@ export default {
       }
     },
     showPage() {
-      this.$store.commit('showPage', {title: this.pageTitle});
+      this.$store.commit('showPage', {
+        title: this.pageTitle,
+        description: this.pageDescription
+      });
       this.$store.commit('setApiItemsLink', this.searchLink);
     },
     async paginateItems(link) {
@@ -162,7 +169,11 @@ export default {
     },
     handleResponse(response) {
       if (response) {
-        this.$store.commit('showPage', {title: this.pageTitle, url: response.config.url});
+        this.$store.commit('showPage', {
+          title: this.pageTitle,
+          url: response.config.url,
+          description: this.pageDescription
+        });
       }
     }
   }

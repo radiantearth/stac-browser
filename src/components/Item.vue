@@ -26,6 +26,9 @@ import ThumbnailCardMixin from './ThumbnailCardMixin';
 import StacLink from './StacLink.vue';
 import STAC from '../models/stac';
 import { formatTemporalExtent, formatTimestamp, formatMediaType } from '@radiantearth/stac-fields/formatters';
+import Registry from '@radiantearth/stac-fields/registry';
+
+Registry.addDependency('content-type', require('content-type'));
 
 export default {
   name: 'Item',

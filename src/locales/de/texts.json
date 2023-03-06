@@ -199,6 +199,7 @@
     "lessThan": "kleiner als",
     "likeOperatorDescription": "Platzhalterzeichen können verwendet werden. `_` entspricht einem einzelnen Zeichen, `%` entspricht einer beliebigen Anzahl an Zeichen. Um nach einem Platzhalterzeichen selber zu suchen, müssen ein `\\` vor das Zeichen gesetzt werden.",
     "matches": "enthält etwa",
+    "metaDescription": "Durchsuche die angebotenen Daten von {title}.",
     "modifyCriteria": "Bitte die Suchkriterien ändern.",
     "noItemsFound": "Keine Elemente gefunden für die angegebenen Filter.",
     "noOptions": "Noch nichts eingegeben",
