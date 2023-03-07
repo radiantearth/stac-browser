@@ -199,6 +199,7 @@
     "lessThan": "inférieur à",
     "likeOperatorDescription": "Vous pouvez utiliser des caractères génériques. `_` correspond à un seul caractère, `%` correspond à un nombre quelconque de caractères. Pour rechercher spécifiquement un caractère générique, vous devez ajouter un `\\` devant le caractère.",
     "matches": "correspond à",
+    "metaDescription": "Rechercher parmi l'offre de données de {title}.",
     "modifyCriteria": "Veuillez modifier les critères de recherche.",
     "noItemsFound": "Aucun élément trouvé pour les filtres sélectionnés.",
     "noOptions": "Aucune information saisie",
