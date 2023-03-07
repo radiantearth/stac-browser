@@ -199,6 +199,7 @@
     "lessThan": "minore di",
     "likeOperatorDescription": "Puoi usare i caratteri jolly. `_` corrisponde ad un singolo carattere, `%` corrisponde ad un numero qualsiasi di caratteri. Per cercare un carattere jolly in modo specifico, devi aggiungere `\\` davanti al carattere.",
     "matches": "corrisponde a",
+    "metaDescription": "Cerca tra i dati offerti da {title}.",
     "modifyCriteria": "Modifica i criteri di ricerca.",
     "noItemsFound": "Nessun Elemento corrispondente ai criteri di ricerca impostati.",
     "noOptions": "Nessun valore inserito",
