@@ -6,6 +6,4 @@ else {
   config = Object.assign(require(CONFIG_PATH), CONFIG_CLI);
 }
 
-config.catalogUrl = new URL(config.catalogUrl, location.href).href;
-
 export default config;

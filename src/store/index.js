@@ -364,7 +364,10 @@ function getStore(config, router) {
               state.catalogTitle = value;
               break;
             case 'catalogUrl':
-              if (typeof value === 'string') {
+              if (typeof value === 'function') {
+                state.catalogUrl = value();
+              }
+              else if (typeof value === 'string') {
                 state.catalogUrl = value;
               }
               break;
