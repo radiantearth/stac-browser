@@ -25,7 +25,7 @@
           <b-card no-body class="maps-preview">
             <b-tabs v-model="tab" ref="tabs" pills card vertical end>
               <b-tab v-if="isCollection" :title="$t('map')" no-body>
-                <Map :stac="data" :stacLayerData="catalogAsFc" @mapClicked="mapClicked" @dataChanged="dataChanged" popover />
+                <Map :stac="data" :stacLayerData="catalogAsFc" @dataChanged="dataChanged" popover />
               </b-tab>
               <b-tab v-if="thumbnails.length > 0" :title="$t('thumbnails')" no-body>
                 <Thumbnails :thumbnails="thumbnails" />
@@ -181,7 +181,7 @@ export default {
       immediate: true,
       handler(data) {
         try {
-          let schema = createCatalogSchema(data, [this.parentLink, this.rootLink]);
+          let schema = createCatalogSchema(data, [this.parentLink, this.rootLink], this.$store);
           addSchemaToDocument(document, schema);
         } catch (error) {
           console.warn(error);
@@ -211,9 +211,6 @@ export default {
         let msg = reset ? this.$t('errors.loadItems') : this.$t('errors.loadFilteredItems');
         this.$root.$emit('error', error, msg);
       }
-    },
-    mapClicked(/*stac*/) {
-      // todo, see search for an example
     }
   }
 };

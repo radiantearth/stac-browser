@@ -6,7 +6,7 @@
           <b-card no-body class="maps-preview">
             <b-tabs v-model="tab" ref="tabs" card pills vertical end>
               <b-tab :title="$t('map')" no-body>
-                <Map :stac="data" :stacLayerData="selectedAsset" @mapClicked="mapClicked" @dataChanged="dataChanged" scrollWheelZoom />
+                <Map :stac="data" :stacLayerData="selectedAsset" @dataChanged="dataChanged" scrollWheelZoom />
               </b-tab>
               <b-tab v-if="thumbnails.length > 0" :title="$t('thumbnails')" no-body>
                 <Thumbnails :thumbnails="thumbnails" />
@@ -94,7 +94,7 @@ export default {
       immediate: true,
       handler(data) {
         try {
-          let schema = createItemSchema(data, [this.collectionLink, this.parentLink]);
+          let schema = createItemSchema(data, [this.collectionLink, this.parentLink], this.$store);
           addSchemaToDocument(document, schema);
         } catch (error) {
           console.warn(error);
@@ -108,11 +108,6 @@ export default {
           this.$store.dispatch("load", { url: newLink.href });
         }
       }
-    }
-  },
-  methods: {
-    mapClicked(/*stac*/) {
-      // todo, see search for an example
     }
   }
 };
