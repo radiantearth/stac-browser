@@ -43,7 +43,7 @@ import Pagination from './Pagination.vue';
 import { BCollapse, BIconSearch } from "bootstrap-vue";
 import Utils from '../utils';
 import STAC from '../models/stac';
-import sortCapabilitiesMixinGenerator from './SortCapabilitiesMixin';
+import apiCapabilitiesMixinGenerator from './ApiCapabilitiesMixin';
 import { mapState } from 'vuex';
 
 export default {
@@ -58,7 +58,7 @@ export default {
     SortButtons: () => import('./SortButtons.vue')
   },
   mixins: [
-    sortCapabilitiesMixinGenerator(true)
+    apiCapabilitiesMixinGenerator(true)
   ],
   props: {
     items: {

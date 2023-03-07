@@ -31,7 +31,7 @@
 import Items from '../components/Items.vue';
 import { mapGetters, mapMutations, mapState } from "vuex";
 import Utils from '../utils';
-import sortCapabilitiesMixinGenerator from '../components/SortCapabilitiesMixin';
+import apiCapabilitiesMixinGenerator from '../components/ApiCapabilitiesMixin';
 import ItemFilter from '../components/ItemFilter.vue';
 import Loading from '../components/Loading.vue';
 import STAC from '../models/stac';
@@ -47,7 +47,7 @@ export default {
     Map: () => import('../components/Map.vue')
   },
   mixins: [
-    sortCapabilitiesMixinGenerator(false)
+    apiCapabilitiesMixinGenerator(false)
   ],
   props: {
     loadParent: {
