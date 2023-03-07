@@ -199,7 +199,7 @@
     "lessThan": "menor que",
     "likeOperatorDescription": "Puede usar carácteres comodín. `_` representa un solo carácter, `%` representa cualquier número de carácteres. Para buscar por un carácter comodín en específico, necesita añadir `\\` antes del carácter.",
     "matches": "coincidencia",
-    "metaDescription": "Buscar en la oferta de datos de {title}.",
+    "metaDescription": "Buscar en los datos ofrecidos por {title}.",
     "modifyCriteria": "Por favor modifique los criterios de búsqueda.",
     "noItemsFound": "No se encontró ningún elemento para los filtros seleccionados.",
     "noOptions": "Aún no se ha introducido nada",
