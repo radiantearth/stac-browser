@@ -5,7 +5,9 @@
   "main": "src/main.js",
   "scripts": {
     "start": "vue-cli-service serve",
-    "build": "vue-cli-service build --report",
+    "build": "vue-cli-service build",
+    "build:report": "vue-cli-service build --report",
+    "build:minimal": "vue-cli-service build --noSourceMaps",
     "lint": "vue-cli-service lint",
     "i18n:report": "vue-cli-service i18n:report --src \"./src/**/*.?(js|vue)\" --locales \"./src/locales/**/*.?(js|json)\"",
     "i18n:fields": "node helpers/fields_locales.js"
@@ -69,8 +71,7 @@
     "sass": "^1.26.5",
     "sass-loader": "^13.2.0",
     "vue-cli-plugin-i18n": "~2.3.1",
-    "vue-template-compiler": "^2.6.12",
-    "webpack-bundle-analyzer": "^4.8.0"
+    "vue-template-compiler": "^2.6.12"
   },
   "browserslist": [
     "> 1%",

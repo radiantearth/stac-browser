@@ -8,7 +8,8 @@ const argv = yargs(hideBin(process.argv))
     'redirectLegacyUrls',
     'showThumbnailsAsAssets',
     'stacLint',
-    'useTileLayerAsFallback'
+    'useTileLayerAsFallback',
+    'noSourceMaps'
   ])
   .number([
     'itemsPerPage',
@@ -29,10 +30,10 @@ const configFile = path.resolve(argv.CONFIG ? argv.CONFIG : './config.js');
 const configFromFile = require(configFile);
 const mergedConfig = Object.assign(configFromFile, argv);
 const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 const config = {
   lintOnSave: process.env.NODE_ENV !== 'production',
+  productionSourceMap: !mergedConfig.noSourceMaps,
   publicPath: mergedConfig.pathPrefix,
   chainWebpack: webpackConfig => {
     webpackConfig.plugin('define').tap(args => {
@@ -66,12 +67,5 @@ const config = {
     }
   }
 };
-
-if (process.env.NODE_ENV === 'production') {
-  config.configureWebpack.plugins.push(new BundleAnalyzerPlugin({
-    analyzerMode: 'static',
-    openAnalyzer: false
-  }));
-}
 
 module.exports = config;

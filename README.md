@@ -508,7 +508,9 @@ You can run the following commands (see also "[Running](#running)" above):
 - `npm run install`: Install the dependencies, this is required once at the beginning.
 - `npm start`: Start the development server
 - `npm run lint`: Lint the source code files
-- `npm run build`: Compile the source code into deployable files for the web. The resulting files can be found in the folder `dist` and you can then deploy STAC Browser on a web host.
+- `npm run build`: Compile the source code into deployable files for the web. The resulting files can be found in the folder `dist` and you can then deploy STAC Browser on a web host. There are two other variants:
+  - `npm run build:report`: Same as above, but also generates a bundle size report (see `dist/report.html`), which should not be deployed.
+  - `npm run build:minimal`: Same as above, but tries to generate a minimal version without bundle size report and without source maps.
 - `npm run i18n:fields`: Generates an updated version of the locales from the stac-fields package.
 
 ### Adding a new language
