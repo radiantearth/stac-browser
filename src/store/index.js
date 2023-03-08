@@ -168,6 +168,7 @@ function getStore(config, router) {
           let path = uri.segment(-2);
           if (path == 'items') {
             uri.segment(-1, "");
+            uri.segment(-1, "");
             return Utils.createLink(uri.toString(), 'collection');
           }
         }
