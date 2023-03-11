@@ -4,14 +4,10 @@
       <l-control-fullscreen />
       <l-control-zoom :key="`z${ix}`" v-bind="zoomControlTexts" position="topleft" />
       <l-control-layers v-if="showLayerControl" position="bottomleft" ref="layerControl" />
-      <template v-if="baseMaps.length > 0">
-        <component
-          v-for="baseMap in baseMaps"
-          ref="basemaps" :key="baseMap.name" :is="baseMap.component"
-          v-bind="baseMap" :layers="baseMap.name" layerType="base"
-        />
-      </template>
-      <l-tile-layer v-else url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" ref="basemaps" :options="osmOptions" name="OpenStreetMap" layerType="base" />
+      <component
+        v-for="basemap of basemaps" :is="basemap.is" :key="basemap.key"
+        ref="basemaps" layerType="base" v-bind="basemap"
+      />
       <l-tile-layer
         v-for="xyz of xyzLinks" ref="overlays" :key="xyz.url" layerType="overlay"
         :name="xyz.name" :url="xyz.url" :subdomains="xyz.subdomains" :options="xyz.options" 
@@ -36,8 +32,7 @@
 
 <script>
 import stacLayer from 'stac-layer';
-import { CRS } from "leaflet";
-import { LMap, LControlZoom, LTileLayer, LWMSTileLayer, LGeoJson, LControlLayers } from 'vue2-leaflet';
+import { LMap, LControlZoom, LControlLayers, LGeoJson, LTileLayer, LWMSTileLayer } from 'vue2-leaflet';
 import LControlFullscreen from 'vue2-leaflet-fullscreen';
 import Utils, { geojsonMediaType } from '../utils';
 import './map/leaflet-areaselect';
@@ -45,6 +40,7 @@ import { mapGetters, mapState } from 'vuex';
 import STAC from '../models/stac';
 import { object as formatObject, string as formatString } from '@radiantearth/stac-fields/datatypes';
 import { BPopover } from 'bootstrap-vue';
+import getBasemaps from '../../basemaps.config';
 
 // Fix missing icons: https://vue2-leaflet.netlify.app/quickstart/#marker-icons-are-missing
 import { Icon } from 'leaflet';
@@ -54,21 +50,6 @@ Icon.Default.mergeOptions({
   iconUrl: require('leaflet/dist/images/marker-icon.png'),
   shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
 });
-
-const BASEMAPS = {
-  europa: {
-    baseUrl: "https://planetarymaps.usgs.gov/cgi-bin/mapserv?map=/maps/jupiter/europa_simp_cyl.map",
-    name: "GALILEO_VOYAGER"
-  },
-  mars: {
-    baseUrl: "https://planetarymaps.usgs.gov/cgi-bin/mapserv?map=/maps/mars/mars_simp_cyl.map",
-    name: "MDIM21"
-  },
-  moon: {
-    baseUrl: "https://planetarymaps.usgs.gov/cgi-bin/mapserv?map=/maps/earth/moon_simp_cyl.map",
-    name: "LROC_WAC"
-  }
-};
 
 const LABEL_EXT = 'https://stac-extensions.github.io/label/v1.*/schema.json';
 
@@ -120,10 +101,6 @@ export default {
       mapOptions: {
         zoomControl: false
       },
-      osmOptions: {
-        // Don't translate as this is an official reference back, which we copied from OSM and shouldn't be altered!
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors.'
-      },
       dblClickState: null,
       selectedItem: null,
       ix: 1
@@ -148,35 +125,18 @@ export default {
         zoomOutTitle: this.$t('leaflet.zoom.out.description')
       };
     },
-    baseMaps() {
-      let targets = [];
-      if (this.stac instanceof STAC) {
-        if (this.stac.isCollection() && Utils.isObject(this.stac.summaries) && Array.isArray(this.stac.summaries['ssys:targets'])) {
-          targets = this.stac.summaries['ssys:targets'];
-        }
-        else if (this.stac.isCollection() && Array.isArray(this.stac['ssys:targets'])) {
-          targets = this.stac['ssys:targets'];
-        }
-        else if (this.stac.isItem() && Array.isArray(this.stac.properties['ssys:targets'])) {
-          targets = this.stac.properties['ssys:targets'];
-        }
-      }
-
-      return targets.map(target => {
-        target = target.toLowerCase();
-        if (BASEMAPS[target]) {
-          return Object.assign({
-              component: "LWMSTileLayer",
-              crs: CRS.EPSG4326,
-              // Don't translate as this is an official reference back, which we copied from OSM and shouldn't be altered!
-              attribution: "USGS Astrogeology",
-              format: "image/png"
-            }, BASEMAPS[target]);
-        }
-      }).filter(map => !!map);
+    basemaps() {
+      return getBasemaps(this.stac).map(map => {
+        map = Object.assign({
+          key: map.url || map.baseUrl,
+          options: {}
+        }, map);
+        map.options.noWrap = this.selectBounds;
+        return map;
+      }).filter(map => Utils.isObject(map));
     },
     showLayerControl() {
-      return this.xyzLinks.length > 0;
+      return this.xyzLinks.length > 0 || this.basemaps.length > 1;
     },
     xyzLinks() {
       if (!(this.stac instanceof STAC)) {
@@ -215,7 +175,6 @@ export default {
   },
   created() {
     this.mapOptions.scrollWheelZoom = this.selectBounds || this.scrollWheelZoom;
-    this.osmOptions.noWrap = this.selectBounds;
   },
   mounted() {
     // Solves https://github.com/radiantearth/stac-browser/issues/95 by showing the map

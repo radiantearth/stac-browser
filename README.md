@@ -24,6 +24,7 @@ certain *OGC API - Records* and *OGC API - Features* compliant servers.
   - [Options](#options)
   - [Languages](#languages)
   - [Themes](#themes)
+  - [Basemaps](#basemaps)
   - [Customize through root catalog](#customize-through-root-catalog)
   - [Custom fields](#custom-fields)
 - [Docker](#docker)
@@ -459,6 +460,12 @@ see <https://getbootstrap.com/docs/4.0/getting-started/theming/> for details.
 The file `page.scss` contains some Sass declarations for the main sections of STAC Browser and you can adopt those to suit your needs.
 
 If you need even more flexibility, you need to dig into the Vue files and their dependencies though.
+
+### Basemaps
+
+The file `basemaps.config.js` contains the configuration for the basemaps.
+You can update either just the `BASEMAPS` object or you can write a custom function `configureBasemap` that returns the desired options for [vue2-leaflet](https://vue2-leaflet.netlify.app/).
+[XYZ](https://vue2-leaflet.netlify.app/components/LTileLayer.html#props) and [WMS](https://vue2-leaflet.netlify.app/components/LWMSTileLayer.html#props) basemaps are supported and have different options that you can set.
 
 ### Customize through root catalog
 
