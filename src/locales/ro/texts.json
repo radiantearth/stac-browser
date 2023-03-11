@@ -141,11 +141,11 @@
     "title": "Metadate"
   },
   "multiselect": {
+    "andMore": "și încă {count}",
+    "deselectLabel": "Apăsați Enter pentru a deselecta",
     "placeholder": "Selectează o opțiune",
     "selectLabel": "Apăsați Enter pentru a selecta",
-    "selectedLabel": "Selectat(e)",
-    "deselectLabel": "Apăsați Enter pentru a deselecta",
-    "andMore": "și încă {count}"
+    "selectedLabel": "Selectat(e)"
   },
   "open": "Deschide",
   "pagination": {
@@ -199,8 +199,10 @@
     "lessThan": "mai puțin decât",
     "likeOperatorDescription": "Puteți folosi metacaracterele. `_` se potrivește cu un singur caracter, `%` se potrivește cu orice număr de caractere. Pentru a căuta în mod specific un wildcard, trebuie să adăugați un `\\` în fața caracterului.",
     "matches": "corespunde cu",
+    "metaDescription": "Căutați în oferta de date a {title}.",
     "modifyCriteria": "Vă rugăm să modificați criteriile de căutare.",
     "noItemsFound": "Nu s-au găsit articole pentru filtrele selectate.",
+    "noOptions": "Nimic introdus încă",
     "notEqualTo": "diferit de",
     "notFullySupported": "Este posibil să nu fie acceptate toate opțiunile",
     "notSupported": "Căutarea articolelor nu este acceptată de API.",
