@@ -5,8 +5,9 @@
       <b-card-title>
         <StacLink :data="[data, catalog]" class="stretched-link" />
       </b-card-title>
-      <b-card-text v-if="data && (data.description || data.deprecated)" class="intro">
-        <b-badge v-if="data.deprecated" variant="warning" class="deprecated">{{ $t('deprecated') }}</b-badge>
+      <b-card-text v-if="data && (fileFormats.length > 0 || data.description || data.deprecated)" class="intro">
+        <b-badge v-if="data.deprecated" variant="warning" class="mr-1 mt-1 deprecated">{{ $t('deprecated') }}</b-badge>
+        <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="mr-1 mt-1 fileformat">{{ format | formatMediaType }}</b-badge>
         {{ data.description | summarize }}
       </b-card-text>
       <b-card-text v-if="temporalExtent" class="datetime"><span v-html="temporalExtent" /></b-card-text>
@@ -20,7 +21,7 @@ import StacFieldsMixin from './StacFieldsMixin';
 import ThumbnailCardMixin from './ThumbnailCardMixin';
 import StacLink from './StacLink.vue';
 import STAC from '../models/stac';
-import { formatTemporalExtent } from '@radiantearth/stac-fields/formatters';
+import { formatMediaType, formatTemporalExtent } from '@radiantearth/stac-fields/formatters';
 import Utils from '../utils';
 
 export default {
@@ -29,9 +30,8 @@ export default {
     StacLink
   },
   filters: {
-    summarize(text) {
-      return Utils.summarizeMd(text, 300);
-    }
+    summarize: text => Utils.summarizeMd(text, 300),
+    formatMediaType: value => formatMediaType(value, null, {shorten: true})
   },
   mixins: [
     ThumbnailCardMixin,
@@ -72,6 +72,12 @@ export default {
         }
       }
       return null;
+    },
+    fileFormats() {
+      if (this.data) {
+        return this.data.getFileFormats();
+      }
+      return [];
     }
   },
   methods: {
@@ -86,6 +92,7 @@ export default {
 </script>
 
 <style lang="scss">
+@import '~bootstrap/scss/mixins';
 @import '../theme/variables.scss';
 
 #stac-browser {
@@ -122,6 +129,14 @@ export default {
       &.has-extent:not(.has-thumbnail) {
         padding-top: 0.75em;
       }
+      
+      @include media-breakpoint-down(lg) {
+        margin-bottom: 0.2em;
+        .card-title {
+          margin-top: 0.6em;
+        }
+      }
+        
 
       .card-img-right {
         min-height: 100px;
@@ -149,6 +164,10 @@ export default {
         top: 0;
         right: 0;
         font-size: 80%;
+        white-space: nowrap;
+        max-width: 100%;
+        text-overflow: ellipsis;
+        overflow: hidden;
       }
     }
   }

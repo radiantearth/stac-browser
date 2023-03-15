@@ -2,7 +2,9 @@
   <section class="catalogs mb-4">
     <h2>
       <span class="title">{{ $tc('stacCatalog', catalogs.length ) }}</span>
-      <b-badge v-if="hasMultiple" pill variant="secondary ml-2">{{ catalogs.length }}</b-badge>
+      <b-badge v-if="hasMultiple" pill variant="secondary ml-2">
+        <template v-if="catalogs.length !== catalogView.length">{{ catalogView.length }}/</template>{{ catalogs.length }}
+      </b-badge>
       <ViewButtons class="ml-4" v-model="view" />
       <SortButtons v-if="hasMultiple" class="ml-2" v-model="sort" />
     </h2>

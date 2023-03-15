@@ -1,20 +1,21 @@
 <template>
-  <b-card no-body class="item-card" :class="{queued: !data, deprecated: isDeprecated}" v-b-visible.400="load">
+  <b-card no-body class="item-card" :class="{queued: !data, deprecated: isDeprecated, description: hasDescription}" v-b-visible.400="load">
     <b-card-img-lazy v-if="hasImage" class="thumbnail" offset="200" v-bind="thumbnail" />
     <b-card-body>
       <b-card-title>
         <StacLink :data="[data, item]" class="stretched-link" />
       </b-card-title>
+      <b-card-text v-if="fileFormats.length > 0 || hasDescription || isDeprecated" class="intro">
+        <b-badge v-if="isDeprecated" variant="warning" class="mr-1 mt-1 deprecated">{{ $t('deprecated') }}</b-badge>
+        <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="mr-1 mt-1 fileformat">{{ format | formatMediaType }}</b-badge>
+        <template v-if="hasDescription">{{ data.properties.description | summarize }}</template>
+      </b-card-text>
       <b-card-text>
         <small class="text-muted">
           <template v-if="extent">{{ extent | formatTemporalExtent }}</template>
           <template v-else-if="data && data.properties.datetime">{{ data.properties.datetime | formatTimestamp }}</template>
           <template v-else>{{ $t('items.noTime') }}</template>
         </small>
-      </b-card-text>
-      <b-card-text v-if="fileFormats.length > 0 || isDeprecated">
-        <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="mr-1 mt-1 fileformat">{{ format | formatMediaType }}</b-badge>
-        <b-badge v-if="isDeprecated" variant="warning" class="mr-1 mt-1 deprecated">{{ $t('deprecated') }}</b-badge>
       </b-card-text>
     </b-card-body>
   </b-card>
@@ -27,6 +28,7 @@ import StacLink from './StacLink.vue';
 import STAC from '../models/stac';
 import { formatTemporalExtent, formatTimestamp, formatMediaType } from '@radiantearth/stac-fields/formatters';
 import Registry from '@radiantearth/stac-fields/registry';
+import Utils from '../utils';
 
 Registry.addDependency('content-type', require('content-type'));
 
@@ -36,7 +38,8 @@ export default {
     StacLink
   },
   filters: {
-    formatMediaType,
+    summarize: text => Utils.summarizeMd(text, 150),
+    formatMediaType: value => formatMediaType(value, null, {shorten: true}),
     formatTemporalExtent,
     formatTimestamp
   },
@@ -61,16 +64,16 @@ export default {
       return null;
     },
     fileFormats() {
-      if (!this.data) {
-        return [];
+      if (this.data) {
+        return this.data.getFileFormats();
       }
-      return Object.values(this.data.assets)
-        .filter(asset => Array.isArray(asset.roles) && asset.roles.includes('data') && typeof asset.type === 'string') // Look for data files
-        .map(asset => asset.type) // Array shall only contain media types
-        .filter((v, i, a) => a.indexOf(v) === i); // Unique values
+      return [];
     },
     isDeprecated() {
       return this.data instanceof STAC && Boolean(this.data.properties.deprecated);
+    },
+    hasDescription() {
+      return this.data instanceof STAC && Utils.hasText(this.data.properties.description);
     }
   },
   methods: {
@@ -101,14 +104,23 @@ export default {
       min-height: 200px;
     }
 
-    .badge {
+    .intro {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
       overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 100%;
+      margin-bottom: 0.5rem;
+    }
 
-      &.deprecated {
-        text-transform: uppercase;
+    &.description {
+      .intro {
+        text-align: left;
+        margin-bottom: 0.75rem;
       }
+    }
+
+    .badge.deprecated {
+      text-transform: uppercase;
     }
 
     .card-img {

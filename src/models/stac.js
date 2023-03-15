@@ -96,6 +96,20 @@ class STAC {
     }
   }
 
+  getFileFormats() {
+    let assets = [];
+    if ((this.isItem() || this.isCollection()) && Utils.isObject(this.assets)) {
+      assets = assets.concat(Object.values(this.assets));
+    }
+    if (this.isCollection() && Utils.isObject(this.item_assets)) {
+      assets = assets.concat(Object.values(this.item_assets));
+    }
+    return assets
+      .filter(asset => Array.isArray(asset.roles) && asset.roles.includes('data') && typeof asset.type === 'string') // Look for data files
+      .map(asset => asset.type) // Array shall only contain media types
+      .filter((v, i, a) => a.indexOf(v) === i); // Unique values
+  }
+
   getChildren(priority = null) {
     if (!this.isCatalogLike()) {
       return [];
