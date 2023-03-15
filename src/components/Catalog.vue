@@ -5,8 +5,9 @@
       <b-card-title>
         <StacLink :data="[data, catalog]" class="stretched-link" />
       </b-card-title>
-      <b-card-text v-if="data && (fileFormats.length > 0 || data.description || data.deprecated)" class="intro">
+      <b-card-text v-if="data && (fileFormats.length > 0 || domains.length > 0 || data.description || data.deprecated)" class="intro">
         <b-badge v-if="data.deprecated" variant="warning" class="mr-1 mt-1 deprecated">{{ $t('deprecated') }}</b-badge>
+        <b-badge v-for="domain in domains" :key="domain" variant="primary" class="mr-1 mt-1 domain">{{ domain }}</b-badge>
         <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="mr-1 mt-1 fileformat">{{ format | formatMediaType }}</b-badge>
         {{ data.description | summarize }}
       </b-card-text>
@@ -78,6 +79,24 @@ export default {
         return this.data.getFileFormats();
       }
       return [];
+    },
+    domains() {
+      if (!this.data) {
+        return [];
+      }
+      let domains = {
+        'eo': 'EO',
+        'forecast': 'Forecast',
+        'insar': 'InSAR',
+        'ml-model': 'ML',
+        'pc': 'Point Cloud',
+        'sar': 'SAR',
+        'table': 'Tabular',
+        'video': 'Video'
+      };
+      return Object.keys(domains)
+        .filter(key => Utils.supportsExtension(this.data, `https://stac-extensions.github.io/${key}/v*/schema.json`))
+        .map(key => domains[key]);
     }
   },
   methods: {
