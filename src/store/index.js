@@ -183,12 +183,7 @@ function getStore(config, router) {
         return Boolean(state.conformsTo.find(uri => uri.match(regexp)));
       },
       supportsExtension: state => schemaUri => {
-        let extensions = [];
-        if (state.data instanceof STAC && Array.isArray(state.data['stac_extensions'])) {
-          extensions = state.data['stac_extensions'];
-        }
-        let regexp = new RegExp('^' + schemaUri.replaceAll('*', '[^/]+') + '$');
-        return !!extensions.find(uri => uri.match(regexp));
+        return Utils.supportsExtension(state.data, schemaUri);
       },
 
       items: state => {
