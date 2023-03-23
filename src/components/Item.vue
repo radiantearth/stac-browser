@@ -109,6 +109,7 @@ export default {
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
+      overflow-wrap: anywhere;
       margin-bottom: 0.5rem;
     }
 
