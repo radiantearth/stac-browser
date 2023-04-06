@@ -15,8 +15,8 @@ $body-color: black;
 
 // Colors
 $theme-colors: (
-  "primary":       #188191,
-  "secondary":     #6c757d,
+  "primary":       #003247,
+  "secondary":     #335E6F,
   "success":       #28a745,
   "info":          #09B3AD,
   "warning":       #ffc107,
@@ -36,12 +36,19 @@ $grid-breakpoints: (
   xxxl: 2500px
 );
 
+@font-face {
+  font-family: "NotesESABold";
+  src: url("https://opensciencedata.esa.int/_nuxt/fonts/notesesabol-webfont.c23d22c.ttf") format("truetype");
+}
+
+$esa-font-family: "NotesESABold";
+
 // Font size
 $font-size-base: 1rem;
 // Fonts for normal text
 $font-family-sans-serif: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 // Fonts for headings
-$headings-font-family: $font-family-sans-serif;
+$headings-font-family: $esa-font-family;
 // Fonts for code
 $font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
