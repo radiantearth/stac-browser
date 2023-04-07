@@ -211,6 +211,12 @@ export default {
   methods: {
     updateValue(evt) {
       let val = Utils.isObject(evt) && 'target' in evt ? evt.target.value : evt;
+      if (typeof val === "string" && this.schemaTypes.includes('integer')) {
+        val = parseInt(val, 10);
+      }
+      else if (typeof val === "string" && this.schemaTypes.includes('number')) {
+        val = parseFloat(val);
+      }
       this.$emit('update:value', val);
     },
     updateOperator(evt) {

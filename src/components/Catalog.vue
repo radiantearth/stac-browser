@@ -111,6 +111,7 @@ export default {
       -webkit-line-clamp: 3;
       -webkit-box-orient: vertical;
       overflow: hidden;
+      overflow-wrap: anywhere;
       text-align: left;
     }
       
@@ -150,6 +151,7 @@ export default {
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
+        overflow-wrap: anywhere;
         text-align: left;
         margin-bottom: 0;
       }

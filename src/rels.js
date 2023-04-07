@@ -19,9 +19,9 @@ export const stacPagination = [
   'previous',
 ];
 
-// Queryables (old and new)
+// Queryables
 export const ogcQueryables = [
-  'queryables',
+  'queryables', // Old way in STAC (deprecated)
   'http://www.opengis.net/def/rel/ogc/1.0/queryables',
 ];
 
