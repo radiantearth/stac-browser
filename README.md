@@ -358,7 +358,7 @@ There are four options you can set in the `authConfig` object:
 
 * `type` (string): `null` (disabled), `query` (use token in query parameters), or `header` (use token in HTTP request headers).
 * `key` (string): The query string parameter name or the HTTP header name respecively.
-* `formatter` (function|null): You can optionally specify a formatter for the query string value or HTTP header value respectively. If not given, the token is provided as provided by the user.
+* `formatter` (function|string|null): You can optionally specify a formatter for the query string value or HTTP header value respectively. If the string `Bearer` is provided formats as a Bearer token according to RFC 6750. If not given, the token is provided as provided by the user.
 * `description` (string|null): Optionally a description that is shown to the user. This should explain how the token can be obtained for example. CommonMark is allowed.
     **Note:** You can leave the description empty in the config file and instead provide a localized string with the key `authConfig` -> `description` in the file for custom phrases (`src/locales/custom.js`).
 
@@ -370,7 +370,7 @@ Please note that this option can only be provided through a config file and is n
 {
   type: 'header',
   key: 'Authorization',
-  formatter: token => `Bearer ${token}`,
+  formatter: token => `Bearer ${token}`, // This is an example, there's also the simpler variant to just provide the string 'Bearer' in this case
   description: `Please retrieve the token from our [API console](https://example.com/api-console).\n\nFor further questions contact <mailto:support@example.com>.`
 }
 ```
@@ -472,7 +472,7 @@ You can update either just the `BASEMAPS` object or you can write a custom funct
 You can also provide a couple of the config options through the root catalog. 
 You need to provide a field `stac_browser` and then you can set any of the following options:
 - `apiCatalogPriority`
-- `authConfig` (except for the `formatter`)
+- `authConfig` (except for the `formatter` as function)
 - `cardViewMode`
 - `crossOriginMedia`
 - `defaultThumbnailSize`
