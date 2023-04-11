@@ -14,7 +14,7 @@
         </b-form-group>
 
         <b-form-group v-if="canFilterExtents" :label="$t('search.spatialExtent')" label-for="provideBBox">
-          <b-form-checkbox id="provideBBox" v-model="provideBBox" value="1" @change="setBBox">{{ $t('search.filterBySpatialExtent') }}</b-form-checkbox>
+          <b-form-checkbox id="provideBBox" v-model="provideBBox" value="1" @change="setBBox()">{{ $t('search.filterBySpatialExtent') }}</b-form-checkbox>
           <Map class="mb-4" v-if="provideBBox" :stac="stac" selectBounds @bounds="setBBox" scrollWheelZoom />
         </b-form-group>
 
@@ -287,7 +287,20 @@ export default {
     setBBox(bounds) {
       let bbox = null;
       if (this.provideBBox) {
-        bbox = bounds;
+        if (Utils.isObject(bounds) && typeof bounds.toBBoxString === 'function') {
+          // This is a Leaflet LatLngBounds Object
+          const Y = 85.06;
+          const X = 180;
+          bbox = [
+            Math.max(bounds.getWest(), -X),
+            Math.max(bounds.getSouth(), -Y),
+            Math.min(bounds.getEast(), X),
+            Math.min(bounds.getNorth(), Y)
+          ];
+        }
+        else if (Array.isArray(bounds) && bounds.length === 4) {
+          bbox = bounds;
+        }
       }
       this.$set(this.query, 'bbox', bbox);
     },
