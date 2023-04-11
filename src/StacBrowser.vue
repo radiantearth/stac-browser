@@ -370,7 +370,9 @@ export default {
         }
         // All other parameters should be appended to the main STAC requests
         else {
-          params.localRequest = Utils.isObject(params.request) ? params.request : {};
+          if (!Utils.isObject(params.localRequest)) {
+            params.localRequest = {};
+          }
           params.localRequest[key] = value;
         }
       }
