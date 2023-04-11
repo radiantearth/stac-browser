@@ -1,6 +1,6 @@
 <template>
   <b-container id="stac-browser">
-    <Authentication v-if="doAuth.length > 0" />
+    <Authentication v-if="showAuthDialog" />
     <ErrorAlert class="global-error" v-if="globalError" v-bind="globalError" @close="hideError" />
     <Sidebar v-if="sidebar" />
     <!-- Header -->
@@ -23,7 +23,7 @@
 <script>
 import Vue from "vue";
 import VueRouter from "vue-router";
-import Vuex, { mapActions, mapGetters, mapState } from 'vuex';
+import Vuex, { mapActions, mapGetters, mapMutations, mapState } from 'vuex';
 import CONFIG from './config';
 import getRoutes from "./router";
 import getStore from "./store";
@@ -45,6 +45,9 @@ import URI from 'urijs';
 import I18N from '@radiantearth/stac-fields/I18N';
 import { translateFields, API_LANGUAGE_CONFORMANCE, loadMessages } from './i18n';
 import { getBest, prepareSupported } from './locale-id';
+
+import { OktaAuth } from '@okta/okta-auth-js';
+import OktaVue from '@okta/okta-vue';
 
 Vue.use(AlertPlugin);
 Vue.use(ButtonGroupPlugin);
@@ -70,6 +73,18 @@ const router = new VueRouter({
 // Setup store
 Vue.use(Vuex);
 const store = getStore(CONFIG, router);
+
+
+if (CONFIG.authConfig && CONFIG.authConfig.tokenGenerator === 'oidc') {
+  const oktaAuth = new OktaAuth(CONFIG.authConfig.generatorOptions);
+  // Set httpRequestClient and postLogoutRedirectUri
+  // implement logout
+  // run service and for renew and cross tabs?
+  // https://github.com/okta/okta-auth-js/tree/5.11#running-as-a-service
+  // https://github.com/okta/okta-auth-js/tree/5.11#syncstorage
+  Vue.use(OktaVue, { oktaAuth });
+}
+
 
 // Pass Config through from props to vuex
 let Props = {};
@@ -117,7 +132,7 @@ export default {
       supportedLocalesFromVueX: 'supportedLocales',
       storeLocaleFromVueX: 'storeLocale'
     }),
-    ...mapGetters(['displayCatalogTitle', 'fromBrowserPath', 'isExternalUrl', 'root', 'supportsConformance', 'toBrowserPath']),
+    ...mapGetters(['authType', 'displayCatalogTitle', 'fromBrowserPath', 'isExternalUrl', 'root', 'supportsConformance', 'toBrowserPath']),
     browserVersion() {
       if (typeof STAC_BROWSER_VERSION !== 'undefined') {
         return STAC_BROWSER_VERSION;
@@ -125,6 +140,9 @@ export default {
       else {
         return "";
       }
+    },
+    showAuthDialog() {
+      return this.authType === 'user' && this.doAuth.length > 0;
     }
   },
   watch: {

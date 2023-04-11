@@ -19,7 +19,7 @@
 <script>
 import Description from './Description.vue';
 import { BForm, BFormInput } from 'bootstrap-vue';
-import { mapState } from 'vuex';
+import { mapActions, mapMutations, mapState } from 'vuex';
 
 export default {
   name: 'Authentication',
@@ -50,13 +50,14 @@ export default {
     }
   },
   methods: {
+    ...mapMutations(['setAuthActions']),
+    ...mapActions(['setAuth']),
     reset() {
-      this.$store.commit('requestAuth', null);
+      this.setAuthActions(null);
     },
     async submit() {
-      await this.$store.dispatch('setAuth', this.token);
-      await this.$store.dispatch('retryAfterAuth');
-      this.$store.commit('requestAuth', null);
+      await this.setAuth(this.token);
+      this.setAuthActions(null);
     }
   }
 };

@@ -349,6 +349,12 @@ function getStore(config, router) {
           })
           .map(([l, q]) => q >= 1 ? l : `${l};q=${q}`)
           .join(',');
+      },
+      authType: state => {
+        if (Utils.isObject(state.authConfig)) {
+          return state.authConfig.tokenGenerator || 'user';
+        }
+        return null;
       }
     },
     mutations: {
@@ -405,7 +411,7 @@ function getStore(config, router) {
           Vue.set(state.requestHeaders, key, value);
         }
       },
-      requestAuth(state, callback) {
+      setAuthActions(state, callback) {
         if (typeof callback === 'function') {
           state.doAuth.push(callback);
         }
@@ -639,6 +645,8 @@ function getStore(config, router) {
         else if (authConfig.type === 'header') {
           cx.commit('setRequestHeader', {key, value});
         }
+
+        await cx.dispatch('retryAfterAuth');
       },
       async loadBackground(cx, count) {
         let urls = cx.state.queue.slice(0, count);
@@ -741,8 +749,9 @@ function getStore(config, router) {
             }
           } catch (error) {
             if (cx.state.authConfig && isAuthenticationError(error)) {
-              cx.commit('clear', url);
-              cx.commit('requestAuth', () => cx.dispatch('load', args));
+              //cx.commit('clear', url);
+              cx.commit('errored', { url, error: new BrowserError("You don't have permission to access this data. Please log in!") });
+              cx.commit('setAuthActions', () => cx.dispatch('load', args));
               return;
             }
             console.error(error);
@@ -758,7 +767,7 @@ function getStore(config, router) {
               await cx.dispatch('loadNextApiCollections', args);
             } catch (error) {
               if (cx.state.authConfig && isAuthenticationError(error)) {
-                cx.commit('requestAuth', () => cx.dispatch('loadNextApiCollections', args));
+                cx.commit('setAuthActions', () => cx.dispatch('loadNextApiCollections', args));
               }
               else {
                 cx.commit('showGlobalError', {
@@ -775,7 +784,7 @@ function getStore(config, router) {
               await cx.dispatch('loadApiItems', args);
             } catch (error) {
               if (cx.state.authConfig && isAuthenticationError(error)) {
-                cx.commit('requestAuth', () => cx.dispatch('loadApiItems', args));
+                cx.commit('setAuthActions', () => cx.dispatch('loadApiItems', args));
               }
               else {
                 cx.commit('showGlobalError', {

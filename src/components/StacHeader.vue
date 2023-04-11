@@ -61,7 +61,7 @@ export default {
   },
   computed: {
     ...mapState(['allowSelectCatalog', 'authConfig', 'authData', 'catalogUrl', 'data', 'url', 'title']),
-    ...mapGetters(['root', 'parentLink', 'collectionLink', 'toBrowserPath']),
+    ...mapGetters(['authType', 'root', 'parentLink', 'collectionLink', 'toBrowserPath']),
     stacVersion() {
       return this.data?.stac_version;
     },
@@ -136,8 +136,17 @@ export default {
     isSearchPage() {
       return this.$router.currentRoute.name === 'search';
     },
-    auth() {
-      this.$store.commit('requestAuth', () => this.$store.dispatch("load", {
+    async auth() {
+      if(this.authType === 'oidc') {
+        if (this.authData) {
+          await this.$auth.signOut();
+        }
+        else {
+          await this.$auth.signInWithRedirect();
+        }
+      }
+      this.$auth.setOriginalUri();
+      this.$store.commit('setAuthActions', () => this.$store.dispatch("load", {
         url: this.url,
         loadApi: true,
         show: true,

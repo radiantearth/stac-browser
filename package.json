@@ -35,6 +35,7 @@
   "dependencies": {
     "@apidevtools/json-schema-ref-parser": "^10.1.0",
     "@musement/iso-duration": "^1.0.0",
+    "@okta/okta-vue": "^3.1.0",
     "@radiantearth/stac-fields": "1.0.0",
     "@radiantearth/stac-migrate": "~1.2.0",
     "axios": "^1.2.0",

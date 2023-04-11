@@ -1,7 +1,15 @@
 import Browse from '../views/Browse.vue';
 
+
 function getRoutes(config) {
   let routes = [];
+
+  if (config.authConfig && config.authConfig.tokenGenerator === 'oidc') {
+    routes.push({
+      path: '/auth',
+      component: () => import("../views/OidcLoginCallback.vue")
+    });
+  }
 
   if (config.allowExternalAccess) {
     routes.push({
