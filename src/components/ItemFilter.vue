@@ -1,5 +1,5 @@
 <template>
-  <b-form class="filter mb-4" @submit.stop.prevent="onSubmit" @reset="onReset">
+  <b-form class="filter mb-4" @submit.stop.prevent="submit" @reset="reset">
     <b-card no-body :title="title">
       <b-card-body>
         <Loading v-if="!loaded" fill />
@@ -14,14 +14,14 @@
         </b-form-group>
 
         <b-form-group v-if="canFilterExtents" :label="$t('search.spatialExtent')" label-for="provideBBox">
-          <b-form-checkbox id="provideBBox" v-model="provideBBox" value="1" @change="setBBox()">{{ $t('search.filterBySpatialExtent') }}</b-form-checkbox>
-          <Map class="mb-4" v-if="provideBBox" :stac="stac" selectBounds @bounds="setBBox" scrollWheelZoom />
+          <b-form-checkbox id="provideBBox" v-model="provideBBox" :value="true" @change="setBBox()">{{ $t('search.filterBySpatialExtent') }}</b-form-checkbox>
+          <Map class="mb-4" v-if="provideBBox" :stac="stac" :selectBounds="selectBounds" @bounds="setBBox" scrollWheelZoom />
         </b-form-group>
 
         <b-form-group v-if="!collectionOnly" :label="$tc('stacCollection', collections.length)" label-for="collections">
           <multiselect
             v-if="collections.length > 0"
-            id="collections" :value="selectedCollections" @input="setCollections"
+            id="collections" :value="selectedCollections" @input="setCollectionsFromObjects"
             :placeholder="$t('search.selectCollections')"
             :tagPlaceholder="$t('search.addCollections')"
             :selectLabel="$t('multiselect.selectLabel')"
@@ -32,7 +32,7 @@
           />
           <multiselect
             v-else
-            id="collections" :value="selectedCollections" @input="setCollections"
+            id="collections" :value="selectedCollections" @input="setCollectionsFromObjects"
             multiple taggable :options="query.collections"
             :placeholder="$t('search.enterCollections')"
             :tagPlaceholder="$t('search.addCollections')"
@@ -70,10 +70,10 @@
             </b-dropdown>
 
             <QueryableInput
-              v-for="(filter, index) in query.filters" :key="filter.id"
+              v-for="(filter, index) in filtersWithQueryables" :key="filter.id"
               :title="filter.queryable.title"
-              :value.sync="filter.value"
-              :operator.sync="filter.operator"
+              :value.sync="filter.data.value"
+              :operator.sync="filter.data.operator"
               :schema="filter.queryable.schema"
               :index="index"
               @remove-queryable="removeQueryable(index)"
@@ -90,7 +90,7 @@
             :selectedLabel="$t('multiselect.selectedLabel')"
             :deselectLabel="$t('multiselect.deselectLabel')"
           />
-          <SortButtons v-if="sortTerm" class="mt-1" :value="sortOrder" enforce @input="sortDirectionSet" />
+          <SortButtons v-if="query.sortby" class="mt-1" :value="sortOrder" enforce @input="sortDirectionSet" />
         </b-form-group>
 
         <b-form-group :label="$t('search.itemsPerPage')" label-for="limit" :description="$t('search.itemsPerPageDescription', {maxItems})">
@@ -168,6 +168,7 @@ export default {
   },
   data() {
     return {
+      selectBounds: true,
       sortOrder: 1,
       sortTerm: null,
       maxItems: 10000,
@@ -188,6 +189,13 @@ export default {
         { value: 'properties.title', text: this.$t('search.sortOptions.title') }
       ];
     },
+    filtersWithQueryables() {
+      return this.query.filters.map(filter => ({
+        id: filter.id,
+        queryable: this.queryables.find(q => q.id = filter.id),
+        data: filter.data
+      }));
+    },
     collections() {
       if (this.hasMoreCollections || this.collectionOnly) {
         return [];
@@ -205,12 +213,32 @@ export default {
       immediate: true,
       handler(value) {
         let query = Object.assign({}, this.getDefaultValues(), value);
-        if (Array.isArray(query.datetime)) {
+        if (Utils.size(query.datetime) === 2) {
           query.datetime = query.datetime.map(Utils.dateFromUTC);
         }
-        else if (query.filters.length > 0) {
-          query.filters = query.filters.map(f => Object.assign({}, f));
+
+        if (Utils.size(query.bbox) === 4) {
+          this.provideBBox = true;
+          if (this.selectBounds === true) {
+            this.selectBounds = query.bbox;
+          }
         }
+
+        if (Utils.size(query.collections) > 0) {
+          this.setCollectionsFromStrings(query.collections);
+        }
+
+        if (Utils.size(query.filters) > 0) {
+          query.filters = query.filters.map(f => ({
+            id: f.id,
+            data: Object.assign({}, f.data)
+          }));
+        }
+
+        if (Utils.hasText(query.sortby)) {
+          this.parseSort(query.sortby);
+        }
+
         this.query = query;
       }
     }
@@ -231,7 +259,10 @@ export default {
           .catch(error => console.error(error))
       );
     }
-    Promise.all(promises).finally(() => this.loaded = true);
+    Promise.all(promises).finally(() => {
+      this.loaded = true;
+      this.$emit('loaded');
+    });
   },
   methods: {
     limitText(count) {
@@ -239,18 +270,22 @@ export default {
     },
     sortFieldSet(value) {
       this.sortTerm = value;
+      this.$set(this.query, 'sortby', this.formatSort());
     },
     sortDirectionSet(value) {
       this.sortOrder = value;
+      this.$set(this.query, 'sortby', this.formatSort());
     },
     removeQueryable(queryableIndex) {
       this.query.filters.splice(queryableIndex, 1);
     },
     additionalFieldSelected(queryable) {
       this.query.filters.push({
-        value: null,
-        operator: null,
-        queryable
+        id: queryable.id,
+        data: {
+          value: null,
+          operator: null
+        }
       });
     },
     getDefaultValues() {
@@ -264,13 +299,10 @@ export default {
         filters: []
       };
     },
-    onSubmit() {
-      if (this.canSort && this.sortTerm && this.sortOrder) {
-        this.$set(this.query, 'sortby', this.formatSort());
-      }
+    submit() {
       this.$emit('input', this.query, false);
     },
-    async onReset() {
+    async reset() {
       this.query = this.getDefaultValues();
       this.$emit('input', {}, true);
     },
@@ -279,7 +311,7 @@ export default {
       if (limit > this.maxItems) {
         limit = this.maxItems;
       }
-      else if (limit < 0) {
+      else if (limit <= 0) {
         limit = null;
       }
       this.$set(this.query, 'limit', limit);
@@ -317,7 +349,11 @@ export default {
       this.selectedCollections.push(collection);
       this.query.collections.push(collection);
     },
-    setCollections(collections) {
+    setCollectionsFromStrings(collections) {
+      this.selectedCollections = this.collections.filter(c => collections.includes(c.value));
+      this.$set(this.query, 'collections', collections);
+    },
+    setCollectionsFromObjects(collections) {
       this.selectedCollections = collections;
       this.$set(this.query, 'collections', collections.map(c => c.value));
     },
@@ -327,10 +363,22 @@ export default {
     setIds(ids) {
       this.$set(this.query, 'ids', ids);
     },
+    parseSort(value) {
+      if (Utils.hasText(value)) {
+        if (value.startsWith('-')) {
+          this.sortOrder = -1;
+          value = value.substring(1);
+        }
+        else {
+          this.sortOrder = 1;
+        }
+        this.sortTerm = this.sortOptions.find(o => o.value === value) || null;
+      }
+    },
     formatSort() {
-      if (this.sortTerm && this.sortOrder) {
+      if (this.canSort && this.sortTerm && this.sortTerm.value !== null && this.sortOrder) {
         let order = this.sortOrder < 0 ? '-' : '';
-        return `${order}${this.sortTerm}`;
+        return `${order}${this.sortTerm.value}`;
       }
       else {
         return null;

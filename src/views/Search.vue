@@ -6,7 +6,7 @@
       <b-col class="left">
         <ItemFilter
           :stac="parent" title="" :value="filters" v-bind="filterComponentProps"
-          @input="setFilters"
+          @input="setFilters" @loaded="onFiltersLoaded"
         />
       </b-col>
       <b-col class="right">
@@ -63,8 +63,9 @@ export default {
     };
   },
   computed: {
-    ...mapState(['apiItems', 'apiItemsLink', 'apiItemsPagination', 'catalogUrl', 'catalogTitle']),
+    ...mapState(['apiItems', 'apiItemsLink', 'apiItemsPagination', 'catalogUrl', 'catalogTitle', 'queryables']),
     ...mapGetters(['getStac', 'root', 'collectionLink', 'parentLink', 'fromBrowserPath', 'getApiItemsLoading']),
+    ...mapGetters('uiState', {initialSearchFilters: 'searchFilters'}),
     pageTitle() {
       return this.$t('search.title');
     },
@@ -84,8 +85,8 @@ export default {
     itemPages() {
       let pages = Object.assign({}, this.apiItemsPagination);
       // If first link is not available, add the items link as first link
-      if (!pages.first && this.data && this.apiItemsLink) {
-        pages.first = Utils.addFiltersToLink(this.apiItemsLink, this.filters);
+      if (!pages.first && this.apiItemsLink) {
+        pages.first = Utils.addFiltersToLink(this.apiItemsLink, this.filters, this.queryables);
       }
       return pages;
     },
@@ -129,8 +130,13 @@ export default {
   },
   methods: {
     ...mapMutations(['toggleApiItemsLoading']),
+    ...mapMutations('uiState', ['setSearchFilters']),
+    async onFiltersLoaded() {
+      this.setFilters(this.initialSearchFilters);
+    },
     async setFilters(filters, reset = false) {
       this.filters = filters;
+      this.setSearchFilters(filters);
       if (reset) {
         this.$store.commit('resetApiItems');
       }

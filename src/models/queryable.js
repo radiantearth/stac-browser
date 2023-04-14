@@ -15,52 +15,60 @@ export default class Queryable {
     return formatKey(this.id);
   }
 
-  toJSON(queryable) {
-    let value = queryable.value;
+  toJSON(data) {
+    let value = data.value;
     if (value instanceof Date) {
       value = { timestamp: Utils.dateToUTC(value).toISOString() };
     }
     return {
-      op: queryable.operator,
+      op: data.operator,
       args: [{ property: this.id }, value]
     };
   }
 
-  toText(queryable) {
-    let value = queryable.value;
+  toText(data) {
+    let value = data.value;
     if (value instanceof Date) {
       value = `TIMESTAMP('${Utils.dateToUTC(value).toISOString()}')`;
     }
     else if (typeof value === 'string') {
       value = `'${value.replace("'", "\\'")}'`;
     }
-    return `${this.id} ${queryable.operator} ${value}`;
+    return `${this.id} ${data.operator} ${value}`;
   }
 
-  static formatText(queryables) {
-    if (queryables.length === 0) {
+  static formatText(filters, queryables) {
+    if (filters.length === 0) {
       return {};
     }
 
     return {
       "filter-lang": "cql2-text",
-      filter: queryables.map(q => q.queryable.toText(q)).join(' AND ')
+      filter: filters.map(f => {
+        let queryable = queryables.find(q => q.id = f.id);
+        return queryable.toText(f.data);
+      }).join(' AND ')
     };
   }
 
-  static formatJSON(queryables) {
-    if (queryables.length === 0) {
+  static formatJSON(filters, queryables) {
+    if (filters.length === 0) {
       return {};
     }
 
+    filters = filters.map(f => {
+      let queryable = queryables.find(q => q.id = f.id);
+      return queryable.toJSON(f.data);
+    });
+
     let filter;
-    if (queryables.length === 1) {
-      filter = queryables[0].queryable.toJSON(queryables[0]);
+    if (filters.length === 1) {
+      filter = filters[0];
     }
     else {
       filter = {
         op: "and",
-        args: queryables.map(q => q.queryable.toJSON(q))
+        args: filters
       };
     }
 

@@ -13,6 +13,8 @@ import Queryable from '../models/queryable';
 import { addQueryIfNotExists, isAuthenticationError, Loading, processSTAC, proxyUrl, unproxyUrl, stacRequest } from './utils';
 import { getBest } from '../locale-id';
 
+import uiState from './uiState.js';
+
 function getStore(config, router) {
   // Local settings (e.g. for currently loaded STAC entity)
   const localDefaults = () => ({
@@ -25,11 +27,6 @@ function getStore(config, router) {
     globalError: null,
 
     localRequestQueryParameters: {},
-    stateQueryParameters: {
-      language: null,
-      asset: [],
-      itemdef: []
-    },
 
     apiItems: [],
     apiItemsLink: null,
@@ -54,6 +51,9 @@ function getStore(config, router) {
 
   return new Vuex.Store({
     strict: true,
+    modules: {
+      uiState
+    },
     state: Object.assign({}, config, localDefaults(), catalogDefaults(), {
       // Global settings
       database: {}, // STAC object, Error object or Loading object or Promise (when loading)
@@ -416,22 +416,6 @@ function getStore(config, router) {
       setAuthData(state, value) {
         state.authData = value;
       },
-      openCollapsible(state, { type, uid }) {
-        const idx = state.stateQueryParameters[type].indexOf(uid);
-        // need to prevent duplicates because of the way the collapse v-model works
-        if (idx === -1) {
-          state.stateQueryParameters[type].push(uid);
-        }
-      },
-      state(state, newState) {
-        state.stateQueryParameters = newState;
-      },
-      closeCollapsible(state, { type, uid }) {
-        const idx = state.stateQueryParameters[type].indexOf(uid);
-        if (idx > -1) {
-          Vue.delete(state.stateQueryParameters[type], idx);
-        }
-      },
       updateLoading(state, { url, show, loadApi }) {
         let data = state.database[url];
         Vue.set(data, 'show', show || data.show);
@@ -615,7 +599,7 @@ function getStore(config, router) {
         let dataLanguage = getBest(dataLanguageCodes, locale, dataLanguageFallback);
 
         cx.commit('languages', {dataLanguage, uiLanguage});
-        cx.commit('setQueryParameter', { type: 'state', key: 'language', value: locale });
+        cx.commit('uiState/setLanguage', locale);
       },
       async setAuth(cx, value) {
         if (!Utils.hasText(value)) {
@@ -814,7 +798,7 @@ function getStore(config, router) {
             filters.limit = cx.state.itemsPerPage;
           }
 
-          link = Utils.addFiltersToLink(link, filters);
+          link = Utils.addFiltersToLink(link, filters, cx.state.queryables);
 
           let response = await stacRequest(cx, link);
           if (!Utils.isObject(response.data) || !Array.isArray(response.data.features)) {

@@ -35,6 +35,22 @@ L.AreaSelect = L.Class.extend({
     this._render();
     return this;
   },
+  
+  setBounds: function(bounds) {
+      if (Array.isArray(bounds)) {
+        bounds = L.latLngBounds([L.latLng(bounds[1], bounds[0]), L.latLng(bounds[3], bounds[2])]);
+      }
+
+      this.map.fitBounds(bounds, {animate: false, duration: 0});
+
+      var bottomLeft = this.map.latLngToContainerPoint(bounds.getSouthWest());
+      var topRight = this.map.latLngToContainerPoint(bounds.getNorthEast());
+
+      this.setDimensions({
+          width: Math.abs(bottomLeft.x - topRight.x),
+          height: Math.abs(bottomLeft.y - topRight.y)
+      }, false);
+  },
 
   getBounds: function () {
     const size = this.map.getSize();
@@ -88,13 +104,15 @@ L.AreaSelect = L.Class.extend({
     this._container.parentNode.removeChild(this._container);
   },
 
-  setDimensions: function (dimensions) {
+  setDimensions: function (dimensions, fire = true) {
     if (!dimensions) { return; }
 
     this._height = parseInt(dimensions.height) || this._height;
     this._width = parseInt(dimensions.width) || this._width;
     this._render();
-    this.fire("change");
+    if (fire) {
+      this.fire("change");
+    }
   },
 
   _createElements: function () {

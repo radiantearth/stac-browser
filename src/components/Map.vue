@@ -76,7 +76,7 @@ export default {
       default: null
     },
     selectBounds: {
-      type: Boolean,
+      type: [Boolean, Array],
       default: false
     },
     scrollWheelZoom: {
@@ -131,7 +131,7 @@ export default {
           key: map.url || map.baseUrl,
           options: {}
         }, map);
-        map.options.noWrap = this.selectBounds;
+        map.options.noWrap = this.selectBounds !== false;
         return map;
       }).filter(map => Utils.isObject(map));
     },
@@ -171,10 +171,13 @@ export default {
     },
     showLayerControl() {
       this.updateLayerControl();
+    },
+    selectBounds() {
+      this.setBounds();
     }
   },
   created() {
-    this.mapOptions.scrollWheelZoom = this.selectBounds || this.scrollWheelZoom;
+    this.mapOptions.scrollWheelZoom = this.selectBounds !== false || this.scrollWheelZoom;
   },
   mounted() {
     // Solves https://github.com/radiantearth/stac-browser/issues/95 by showing the map
@@ -202,7 +205,7 @@ export default {
 
       await this.showStacLayer();
 
-      if (this.selectBounds) {
+      if (this.selectBounds !== false) {
         this.addBoundsSelector();
       }
     },
@@ -284,7 +287,7 @@ export default {
         this.addMapClickEvent(this.stacLayer);
         this.stacLayer.on("fallback", event => this.$emit('dataChanged', event.stac));
         this.stacLayer.addTo(this.map);
-        this.fitBounds(this.stacLayer, this.selectBounds);
+        this.fitBounds(this.stacLayer, this.selectBounds !== false);
       }
 
       // Add item previews to the map
@@ -375,6 +378,11 @@ export default {
         this.$refs.geojson.mapObject.bringToFront();
       }
     },
+    setBounds() {
+      if (Array.isArray(this.selectBounds) && this.selectBounds.length === 4) {
+        this.areaSelect.setBounds(this.selectBounds);
+      }
+    },
     fitBounds(layer, noPadding = false) {
       let fitOptions = {
         padding: noPadding ? [0,0] : [90,90],
@@ -409,6 +417,7 @@ export default {
         minVerticalSpacing: 20
       });
       this.areaSelect.addTo(this.map);
+      this.setBounds();
       this.areaSelect.on("change", () => this.emitBounds());
       this.emitBounds();
     },

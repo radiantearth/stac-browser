@@ -114,6 +114,22 @@ export default class Utils {
     return (typeof string === 'string' && string.length > 0);
   }
 
+  static isEmpty(value) {
+    if (value === null || typeof value === 'undefined') {
+      return true;
+    }
+    if (typeof value === 'object' && Utils.size(value) === 0) {
+      return true;
+    }
+    else if (typeof value === 'string' && value.length === 0) {
+      return true;
+    }
+    else if (typeof value === 'number' && isNaN(value)) {
+      return true;
+    }
+    return false;
+  }
+
   static urlType(url, type) {
     let uri = URI(url);
     return uri.is(type);
@@ -238,7 +254,7 @@ export default class Utils {
     }).join('/');
   }
 
-  static addFiltersToLink(link, filters = {}) {
+  static addFiltersToLink(link, filters = {}, queryables = []) {
     // Construct new link with search params
     let url = new URI(link.href);
 
@@ -264,7 +280,7 @@ export default class Utils {
         value = value.join(',');
       }
       else if (key === 'filters') {
-        let params = Queryable.formatText(value);
+        let params = Queryable.formatText(value, queryables);
         url.setQuery(params);
         continue;
       }

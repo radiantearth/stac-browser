@@ -23,7 +23,7 @@
 <script>
 import Vue from "vue";
 import VueRouter from "vue-router";
-import Vuex, { mapActions, mapGetters, mapState } from 'vuex';
+import Vuex, { mapActions, mapGetters, mapMutations, mapState } from 'vuex';
 import CONFIG from './config';
 import getRoutes from "./router";
 import getStore from "./store";
@@ -109,7 +109,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['allowSelectCatalog', 'data', 'dataLanguage', 'description', 'doAuth', 'globalError', 'stateQueryParameters', 'title', 'uiLanguage', 'url']),
+    ...mapState(['allowSelectCatalog', 'data', 'dataLanguage', 'description', 'doAuth', 'globalError', 'title', 'uiLanguage', 'url']),
     ...mapState({
       catalogUrlFromVueX: 'catalogUrl',
       detectLocaleFromBrowserFromVueX: 'detectLocaleFromBrowser',
@@ -118,6 +118,7 @@ export default {
       storeLocaleFromVueX: 'storeLocale'
     }),
     ...mapGetters(['displayCatalogTitle', 'fromBrowserPath', 'isExternalUrl', 'root', 'supportsConformance', 'toBrowserPath']),
+    ...mapGetters('uiState', {uiStateQuery: 'query', uiState: 'all'}),
     browserVersion() {
       if (typeof STAC_BROWSER_VERSION !== 'undefined') {
         return STAC_BROWSER_VERSION;
@@ -168,9 +169,10 @@ export default {
         if (this.data instanceof STAC) {
           let link = this.data.getLocaleLink(locale);
           if (link) {
-            let state = Object.assign({}, this.stateQueryParameters);
+            // Preserve UI state
+            let state = Object.assign({}, this.uiState);
             this.$router.push(this.toBrowserPath(link.href));
-            this.$store.commit('state', state);
+            this.replaceUiState(state);
           }
           else if (this.supportsConformance(API_LANGUAGE_CONFORMANCE)) {
             // this.url gets reset with resetCatalog so store the url for use in load
@@ -179,6 +181,7 @@ export default {
             // A better way would be to combine the language code and URL as the index in the browser database
             // This needs a database refactor though: https://github.com/radiantearth/stac-browser/issues/231
             this.$store.commit('resetCatalog', true);
+            this.$store.commit('uiState/reset');
             await this.$store.dispatch("load", { url, loadApi: true, show: true });
           }
         }
@@ -190,27 +193,9 @@ export default {
         this.$store.dispatch("load", { url, loadApi: true });
       }
     },
-    stateQueryParameters: {
+    uiStateQuery: {
       deep: true,
-      handler() {
-        let query = {};
-        for (const [key, value] of Object.entries(this.$route.query)) {
-          if (!key.startsWith('.')) {
-            query[key] = value;
-          }
-        }
-        for (const [key, value] of Object.entries(this.stateQueryParameters)) {
-          let name = `.${key}`;
-          if (Array.isArray(value)) {
-            if (value.length > 0) {
-              query[name] = value.join(',');
-            }
-          }
-          else if (value !== null) {
-              query[name] = value;
-          }
-        }
-
+      handler(query) {
         this.$router.replace({ query }).catch(error => {
           if (!VueRouter.isNavigationFailure(error, VueRouter.NavigationFailureType.duplicated)) {
             throw Error(error);
@@ -283,6 +268,7 @@ export default {
       }
 
       this.$store.commit(resetOp);
+      this.$store.commit('uiState/reset');
       this.parseQuery(to);
     });
   },
@@ -292,6 +278,7 @@ export default {
   },
   methods: {
     ...mapActions(['switchLocale']),
+    ...mapMutations('uiState', {replaceUiState: 'setAll', setUiState: 'set'}),
     detectLocale() {
       let locale;
       if (this.storeLocaleFromVueX) {
@@ -342,12 +329,10 @@ export default {
         }
         // Store all state related parameters (start with .)
         else if (key.startsWith('.')) {
-          let realKey = key.substr(1);
-          params.state = Utils.isObject(params.state) ? params.state : {};
-          if (Array.isArray(this.stateQueryParameters[realKey]) && !Array.isArray(value)) {
-            value = value.split(',');
+          this.setUiState({ key, value });
+          if (key === '.language' && value) {
+            this.switchLocale({locale: value});
           }
-          params.state[realKey] = value;
         }
         // All other parameters should be appended to the main STAC requests
         else {
@@ -364,13 +349,9 @@ export default {
           }
         }
       }
-      if (params?.state?.language) {
-        this.switchLocale({locale: params.state.language});
-      }
       if (Utils.size(params.private) > 0) {
         this.$router.replace({ query });
       }
-
     },
     showError(error, message) {
       this.$store.commit('showGlobalError', {

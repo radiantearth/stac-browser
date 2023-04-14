@@ -49,7 +49,7 @@
 <script>
 import { BCollapse, BIconBoxArrowUpRight, BIconCheck, BIconChevronRight, BIconChevronDown, BIconDownload, BIconEye } from 'bootstrap-vue';
 import { formatMediaType } from '@radiantearth/stac-fields/formatters';
-import { mapGetters, mapState } from 'vuex';
+import { mapGetters, mapMutations, mapState } from 'vuex';
 import Description from './Description.vue';
 import STAC from '../models/stac';
 import Utils, { browserProtocols, imageMediaTypes, mapMediaTypes } from '../utils';
@@ -119,7 +119,8 @@ export default {
     };
   },
   computed: {
-    ...mapState(['buildTileUrlTemplate', 'useTileLayerAsFallback', 'url', 'stateQueryParameters']),
+    ...mapState(['buildTileUrlTemplate', 'useTileLayerAsFallback', 'url']),
+    ...mapGetters('uiState', ['shouldCollapsibleOpen']),
     ...mapGetters(['getRequestUrl']),
     tileRendererType() {
       if (this.buildTileUrlTemplate && !this.useTileLayerAsFallback) {
@@ -247,7 +248,7 @@ export default {
     }
   },
   created() {
-    if (this.stateQueryParameters[this.type].indexOf(this.uid) > -1) {
+    if (this.shouldCollapsibleOpen(this.type, this.uid)) {
       this.expanded = true;
       return;
     }
@@ -260,6 +261,7 @@ export default {
     }
   },
   methods: {
+    ...mapMutations('uiState', ['toggleCollapsible']),
     displayRole(role) {
       let key = `assets.role.${role}`;
       if (this.$te(key)) {
@@ -296,9 +298,12 @@ export default {
       }
       return '';
     },
-    collapseToggled(isVisible) {
-      let event = isVisible ? 'openCollapsible' : 'closeCollapsible';
-      this.$store.commit(event, {type: this.type, uid: this.uid});
+    collapseToggled(visible) {
+      this.toggleCollapsible({
+        type: this.type,
+        uid: this.uid,
+        visible
+      });
     }
   }
 };
