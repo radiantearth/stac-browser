@@ -1,6 +1,6 @@
 <template>
   <b-container id="stac-browser">
-    <Authentication v-if="showAuthDialog" />
+    <component v-if="authComponent" :is="authComponent" />
     <ErrorAlert class="global-error" v-if="globalError" v-bind="globalError" @close="hideError" />
     <Sidebar v-if="sidebar" />
     <!-- Header -->
@@ -23,7 +23,7 @@
 <script>
 import Vue from "vue";
 import VueRouter from "vue-router";
-import Vuex, { mapActions, mapGetters, mapMutations, mapState } from 'vuex';
+import Vuex, { mapActions, mapGetters, mapState } from 'vuex';
 import CONFIG from './config';
 import getRoutes from "./router";
 import getStore from "./store";
@@ -45,9 +45,6 @@ import URI from 'urijs';
 import I18N from '@radiantearth/stac-fields/I18N';
 import { translateFields, API_LANGUAGE_CONFORMANCE, loadMessages } from './i18n';
 import { getBest, prepareSupported } from './locale-id';
-
-import { OktaAuth } from '@okta/okta-auth-js';
-import OktaVue from '@okta/okta-vue';
 
 Vue.use(AlertPlugin);
 Vue.use(ButtonGroupPlugin);
@@ -74,18 +71,6 @@ const router = new VueRouter({
 Vue.use(Vuex);
 const store = getStore(CONFIG, router);
 
-
-if (CONFIG.authConfig && CONFIG.authConfig.tokenGenerator === 'oidc') {
-  const oktaAuth = new OktaAuth(CONFIG.authConfig.generatorOptions);
-  // Set httpRequestClient and postLogoutRedirectUri
-  // implement logout
-  // run service and for renew and cross tabs?
-  // https://github.com/okta/okta-auth-js/tree/5.11#running-as-a-service
-  // https://github.com/okta/okta-auth-js/tree/5.11#syncstorage
-  Vue.use(OktaVue, { oktaAuth });
-}
-
-
 // Pass Config through from props to vuex
 let Props = {};
 let Watchers = {};
@@ -108,7 +93,6 @@ export default {
   router,
   store,
   components: {
-    Authentication: () => import('./components/Authentication.vue'),
     ErrorAlert,
     Sidebar: () => import('./components/Sidebar.vue'),
     StacHeader
@@ -124,15 +108,17 @@ export default {
     };
   },
   computed: {
-    ...mapState(['allowSelectCatalog', 'data', 'dataLanguage', 'description', 'doAuth', 'globalError', 'stateQueryParameters', 'title', 'uiLanguage', 'url']),
+    ...mapState(['allowSelectCatalog', 'data', 'dataLanguage', 'description', 'globalError', 'stateQueryParameters', 'title', 'uiLanguage', 'url']),
     ...mapState({
+      authConfigFromVueX: 'authConfig',
       catalogUrlFromVueX: 'catalogUrl',
       detectLocaleFromBrowserFromVueX: 'detectLocaleFromBrowser',
       fallbackLocaleFromVueX: 'fallbackLocale',
       supportedLocalesFromVueX: 'supportedLocales',
       storeLocaleFromVueX: 'storeLocale'
     }),
-    ...mapGetters(['authType', 'displayCatalogTitle', 'fromBrowserPath', 'isExternalUrl', 'root', 'supportsConformance', 'toBrowserPath']),
+    ...mapState('auth', { authMethod: 'method' }),
+    ...mapGetters(['displayCatalogTitle', 'fromBrowserPath', 'isExternalUrl', 'root', 'supportsConformance', 'toBrowserPath']),
     browserVersion() {
       if (typeof STAC_BROWSER_VERSION !== 'undefined') {
         return STAC_BROWSER_VERSION;
@@ -141,8 +127,8 @@ export default {
         return "";
       }
     },
-    showAuthDialog() {
-      return this.authType === 'user' && this.doAuth.length > 0;
+    authComponent() {
+      return this.authMethod ? this.authMethod.getComponent() : null;
     }
   },
   watch: {
@@ -154,6 +140,12 @@ export default {
       let element = document.getElementById('meta-description');
       if (element) {
         element.setAttribute("content", Utils.summarizeMd(description, 200));
+      }
+    },
+    authConfigFromVueX: {
+      immediate: true,
+      async handler(config) {
+        await this.$store.dispatch('auth/updateMethod', config);
       }
     },
     uiLanguage: {

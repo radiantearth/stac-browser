@@ -10,6 +10,7 @@ import Utils, { schemaMediaType, BrowserError } from '../utils';
 import STAC from '../models/stac';
 import Queryable from '../models/queryable';
 
+import auth from './auth.js';
 import { addQueryIfNotExists, isAuthenticationError, Loading, processSTAC, proxyUrl, unproxyUrl, stacRequest } from './utils';
 import { getBest } from '../locale-id';
 
@@ -41,8 +42,7 @@ function getStore(config, router) {
   const catalogDefaults = () => ({
     queue: [],
     privateQueryParameters: {},
-    authData: null,
-    doAuth: [],
+    authActions: [],
     conformsTo: [],
     dataLanguage: null,
     dataLanguages: [],
@@ -54,6 +54,9 @@ function getStore(config, router) {
 
   return new Vuex.Store({
     strict: true,
+    modules: {
+      auth
+    },
     state: Object.assign({}, config, localDefaults(), catalogDefaults(), {
       // Global settings
       database: {}, // STAC object, Error object or Loading object or Promise (when loading)
@@ -349,12 +352,6 @@ function getStore(config, router) {
           })
           .map(([l, q]) => q >= 1 ? l : `${l};q=${q}`)
           .join(',');
-      },
-      authType: state => {
-        if (Utils.isObject(state.authConfig)) {
-          return state.authConfig.tokenGenerator || 'user';
-        }
-        return null;
       }
     },
     mutations: {
@@ -410,17 +407,6 @@ function getStore(config, router) {
         else {
           Vue.set(state.requestHeaders, key, value);
         }
-      },
-      setAuthActions(state, callback) {
-        if (typeof callback === 'function') {
-          state.doAuth.push(callback);
-        }
-        else {
-          state.doAuth = [];
-        }
-      },
-      setAuthData(state, value) {
-        state.authData = value;
       },
       openCollapsible(state, { type, uid }) {
         const idx = state.stateQueryParameters[type].indexOf(uid);
@@ -623,31 +609,6 @@ function getStore(config, router) {
         cx.commit('languages', {dataLanguage, uiLanguage});
         cx.commit('setQueryParameter', { type: 'state', key: 'language', value: locale });
       },
-      async setAuth(cx, value) {
-        if (!Utils.hasText(value)) {
-          value = null;
-        }
-        // Set the value the user has provided separately
-        cx.commit('setAuthData', value);
-
-        // Format the value and add it to query parameters or headers
-        let authConfig = cx.state.authConfig;
-        let key = authConfig.key;
-        if (value && typeof authConfig.formatter === 'function') {
-          value = authConfig.formatter(value);
-        }
-        if (!Utils.hasText(value)) {
-          value = undefined;
-        }
-        if (authConfig.type === 'query') {
-          cx.commit('setQueryParameter', {type: 'private', key, value});
-        }
-        else if (authConfig.type === 'header') {
-          cx.commit('setRequestHeader', {key, value});
-        }
-
-        await cx.dispatch('retryAfterAuth');
-      },
       async loadBackground(cx, count) {
         let urls = cx.state.queue.slice(0, count);
         if (urls.length > 0) {
@@ -749,9 +710,9 @@ function getStore(config, router) {
             }
           } catch (error) {
             if (cx.state.authConfig && isAuthenticationError(error)) {
-              //cx.commit('clear', url);
+              cx.commit('clear', url);
               cx.commit('errored', { url, error: new BrowserError("You don't have permission to access this data. Please log in!") });
-              cx.commit('setAuthActions', () => cx.dispatch('load', args));
+              cx.commit('auth/addAction', () => cx.dispatch('load', args));
               return;
             }
             console.error(error);
@@ -767,7 +728,7 @@ function getStore(config, router) {
               await cx.dispatch('loadNextApiCollections', args);
             } catch (error) {
               if (cx.state.authConfig && isAuthenticationError(error)) {
-                cx.commit('setAuthActions', () => cx.dispatch('loadNextApiCollections', args));
+                cx.commit('auth/addAction', () => cx.dispatch('loadNextApiCollections', args));
               }
               else {
                 cx.commit('showGlobalError', {
@@ -784,7 +745,7 @@ function getStore(config, router) {
               await cx.dispatch('loadApiItems', args);
             } catch (error) {
               if (cx.state.authConfig && isAuthenticationError(error)) {
-                cx.commit('setAuthActions', () => cx.dispatch('loadApiItems', args));
+                cx.commit('auth/addAction', () => cx.dispatch('loadApiItems', args));
               }
               else {
                 cx.commit('showGlobalError', {
@@ -966,7 +927,7 @@ function getStore(config, router) {
           message: i18n.t('errors.authFailed')
         });
 
-        for (let callback of cx.state.doAuth) {
+        for (let callback of cx.state.authActions) {
           try {
             let p = callback();
             if (p instanceof Promise) {

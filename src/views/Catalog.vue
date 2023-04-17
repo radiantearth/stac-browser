@@ -124,7 +124,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination']),
+    ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination', 'queryables']),
     ...mapGetters(['additionalLinks', 'catalogs', 'isCollection', 'items', 'hasMoreCollections', 'getApiItemsLoading', 'parentLink', 'rootLink']),
     apiItemsLoading() {
       return this.getApiItemsLoading(this.data);
@@ -156,7 +156,7 @@ export default {
       let pages = Object.assign({}, this.apiItemsPagination);
       // If first link is not available, add the items link as first link
       if (!pages.first && this.data && this.apiItemsLink && this.apiItemsLink.rel !== 'items') {
-        pages.first = Utils.addFiltersToLink(this.data.getApiItemsLink(), this.filters);
+        pages.first = Utils.addFiltersToLink(this.data.getApiItemsLink(), this.filters, this.queryables);
       }
       return pages;
     },

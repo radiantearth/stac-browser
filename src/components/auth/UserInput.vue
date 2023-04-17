@@ -1,5 +1,5 @@
 <template>
-  <div class="auth">
+  <div v-if="actions.length > 0" class="auth">
     <b-form @submit.stop.prevent="submit" @reset="reset">
       <b-card no-body :header="$t('authentication.title')">
         <b-card-body>
@@ -17,12 +17,12 @@
 </template>
 
 <script>
-import Description from './Description.vue';
+import Description from '../Description.vue';
 import { BForm, BFormInput } from 'bootstrap-vue';
 import { mapActions, mapMutations, mapState } from 'vuex';
 
 export default {
-  name: 'Authentication',
+  name: 'UserInput',
   components: {
     BForm,
     BFormInput,
@@ -35,7 +35,8 @@ export default {
     };
   },
   computed: {
-    ...mapState(['authConfig', 'authData']),
+    ...mapState(['authConfig']),
+    ...mapState('auth', ['actions', 'credentials']),
     description() {
       if (this.authConfig.description) {
         return this.authConfig.description;
@@ -44,27 +45,29 @@ export default {
     }
   },
   created() {
-    if (this.authData) {
-      this.token = this.authData;
+    if (this.auth) {
+      this.token = this.credentials;
       this.required = false;
     }
   },
   methods: {
-    ...mapMutations(['setAuthActions']),
+    ...mapMutations(['resetActions']),
     ...mapActions(['setAuth']),
     reset() {
-      this.setAuthActions(null);
+      this.auth.setAuthData(null);
+      this.resetActions();
     },
     async submit() {
-      await this.setAuth(this.token);
-      this.setAuthActions(null);
+      this.auth.setAuthData(this.token);
+      await this.login();
+      this.resetActions();
     }
   }
 };
 </script>
 
 <style lang="scss">
-@import '../theme/variables.scss';
+@import '../../theme/variables.scss';
 
 #stac-browser {
   .auth {

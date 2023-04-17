@@ -30,6 +30,8 @@
     "button": {
       "authenticate": "Authenticate",
       "authenticated": "Authenticated",
+      "login": "Log in",
+      "logout": "Log out",
       "title": "Provide or update your credentials"
     },
     "description": "The requested page requires authentication. Please provide your authentication details in the text field below.",
@@ -141,11 +143,11 @@
     "title": "Metadata"
   },
   "multiselect": {
+    "andMore": "and {count} more",
+    "deselectLabel": "Press enter to remove",
     "placeholder": "Select option",
     "selectLabel": "Press enter to select",
-    "selectedLabel": "Selected",
-    "deselectLabel": "Press enter to remove",
-    "andMore": "and {count} more"
+    "selectedLabel": "Selected"
   },
   "open": "Open",
   "pagination": {

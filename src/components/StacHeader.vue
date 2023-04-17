@@ -25,12 +25,12 @@
           <b-button v-if="searchBrowserLink" variant="outline-primary" size="sm" :to="searchBrowserLink" :title="$t('search.title')" :pressed="isSearchPage()">
             <b-icon-search /> <span class="button-label prio">{{ $t('search.title') }}</span>
           </b-button>
-          <b-button v-if="authConfig" variant="outline-primary" size="sm" @click="auth" :title="$t('authentication.button.title')">
-            <template v-if="authData">
-              <b-icon-lock /> <span class="button-label">{{ $t('authentication.button.authenticated') }}</span>
+          <b-button v-if="canAuthenticate" variant="outline-primary" size="sm" @click="openAuthentication" :title="authMethod.getButtonTitle()">
+            <template v-if="isLoggedIn">
+              <b-icon-lock /> <span class="button-label">{{ authMethod.getAuthorizedLabel() }}</span>
             </template>
             <template v-else>
-              <b-icon-unlock /> <span class="button-label">{{ $t('authentication.button.authenticate') }}</span>
+              <b-icon-unlock /> <span class="button-label">{{ authMethod.getUnauthorizedLabel() }}</span>
             </template>
           </b-button>
         </b-button-group>
@@ -60,13 +60,15 @@ export default {
     Source
   },
   computed: {
-    ...mapState(['allowSelectCatalog', 'authConfig', 'authData', 'catalogUrl', 'data', 'url', 'title']),
-    ...mapGetters(['authType', 'root', 'parentLink', 'collectionLink', 'toBrowserPath']),
+    ...mapState(['allowSelectCatalog', 'catalogUrl', 'data', 'url', 'title']),
+    ...mapGetters(['root', 'parentLink', 'collectionLink', 'toBrowserPath']),
+    ...mapState('auth', { authMethod: 'method' }),
+    ...mapGetters('auth', ['canAuthenticate', 'isLoggedIn']),
     stacVersion() {
       return this.data?.stac_version;
     },
     collectionLinkTitle() {
-      if (Utils.hasText(this.collectionLink.title)) {
+      if (this.collectionLink && Utils.hasText(this.collectionLink.title)) {
         return this.$t('goToCollection.descriptionWithTitle', this.collectionLink);
       }
       else {
@@ -74,7 +76,7 @@ export default {
       }
     },
     parentLinkTitle() {
-      if (Utils.hasText(this.parentLink.title)) {
+      if (this.parentLink && Utils.hasText(this.parentLink.title)) {
         return this.$t('goToParent.descriptionWithTitle', this.parentLink);
       }
       else {
@@ -136,22 +138,19 @@ export default {
     isSearchPage() {
       return this.$router.currentRoute.name === 'search';
     },
-    async auth() {
-      if(this.authType === 'oidc') {
-        if (this.authData) {
-          await this.$auth.signOut();
-        }
-        else {
-          await this.$auth.signInWithRedirect();
-        }
-      }
-      this.$auth.setOriginalUri();
-      this.$store.commit('setAuthActions', () => this.$store.dispatch("load", {
+    async openAuthentication() {
+      this.$store.commit('auth/addAction', () => this.$store.dispatch("load", {
         url: this.url,
         loadApi: true,
         show: true,
         force: true
       }));
+      if (this.isLoggedIn) {
+        await this.authMethod.login();
+      }
+      else {
+        await this.authMethod.logout();
+      }
     }
   }
 };
