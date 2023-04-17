@@ -23,15 +23,6 @@ export default class Auth {
   }
 
   /**
-   * Returns a Vue component used for login purposes.
-   * 
-   * @returns {Vue|null}
-   */
-  getComponent() {
-    return null;
-  }
-
-  /**
    * A title for the authentication button.
    * 
    * @returns {string}

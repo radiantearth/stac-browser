@@ -1,5 +1,6 @@
 import Auth from "./index";
 import i18n from '../i18n';
+import Vue from 'vue';
 
 export default class UserInput extends Auth {
 
@@ -10,25 +11,36 @@ export default class UserInput extends Auth {
   getType() {
     return 'user';
   }
-
-  getComponent() {
-    return () => import('../components/auth/UserInput.vue');
-  }
-
   getButtonTitle() {
     return i18n.t('authentication.button.title');
   }
 
-  async login() {
-    return true;
-  }
+  login() {
+    return new Promise(async (resolve, reject) => {
+      let component = (await import('../components/auth/UserInput.vue')).default;
+      console.log(component);
 
-  async loginCallback() {
-    return;
+      var app = new Vue(component);
+
+      let div = document.createElement('div');
+      div.id = "uiAuth";
+      let container = document.getElementsByTagName('body')[0];
+      container.appendChild(div);
+      app.$mount('#uiAuth');
+
+      app.$on('reset', () => {
+        container.removeChild(app.$el);
+        reject();
+      });
+      app.$on('submit', token => {
+        container.removeChild(app.$el);
+        resolve(token);
+      });
+    });
   }
 
   async logout() {
-    return true;
+    return await this.login();
   }
 
 }

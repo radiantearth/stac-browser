@@ -1,6 +1,5 @@
 <template>
   <b-container id="stac-browser">
-    <component v-if="authComponent" :is="authComponent" />
     <ErrorAlert class="global-error" v-if="globalError" v-bind="globalError" @close="hideError" />
     <Sidebar v-if="sidebar" />
     <!-- Header -->
@@ -117,7 +116,6 @@ export default {
       supportedLocalesFromVueX: 'supportedLocales',
       storeLocaleFromVueX: 'storeLocale'
     }),
-    ...mapGetters('auth', { authMethod: 'method' }),
     ...mapGetters(['displayCatalogTitle', 'fromBrowserPath', 'isExternalUrl', 'root', 'supportsConformance', 'toBrowserPath']),
     browserVersion() {
       if (typeof STAC_BROWSER_VERSION !== 'undefined') {
@@ -126,9 +124,6 @@ export default {
       else {
         return "";
       }
-    },
-    authComponent() {
-      return this.authMethod ? this.authMethod.getComponent() : null;
     }
   },
   watch: {
