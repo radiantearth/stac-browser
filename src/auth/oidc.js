@@ -1,5 +1,6 @@
 import i18n from '../i18n';
 import Auth from "./index";
+import axios from 'axios';
 
 import { OktaAuth } from '@okta/okta-auth-js';
 
@@ -13,7 +14,23 @@ export default class OIDC extends Auth {
     let oktaOptions = Object.assign({}, options);
     // todo: Set httpRequestClient
     oktaOptions.restoreOriginalUri = (_, originalUri) => this.restoreOriginalUri(originalUri);
+    oktaOptions.httpRequestClient = this.httpRequest.bind(this);
     this.okta = new OktaAuth(oktaOptions);
+  }
+
+  async httpRequest(method, url, args) {
+    let headers = Object.assign({}, args.headers);
+    // This makes OktaAuth fail with a couple of OIDC instances as it's a custom header, remove it
+    delete headers["X-Okta-User-Agent-Extended"];
+    let options = {
+      method,
+      url,
+      headers,
+      data: args.data,
+      withCredentials: args.withCredentials
+    };
+    let response = await axios(options);
+    return response?.request;
   }
 
   setOriginalUri() {
