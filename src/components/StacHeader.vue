@@ -66,7 +66,7 @@ export default {
       return this.data?.stac_version;
     },
     collectionLinkTitle() {
-      if (Utils.hasText(this.collectionLink.title)) {
+      if (this.collectionLink && Utils.hasText(this.collectionLink.title)) {
         return this.$t('goToCollection.descriptionWithTitle', this.collectionLink);
       }
       else {
@@ -74,7 +74,7 @@ export default {
       }
     },
     parentLinkTitle() {
-      if (Utils.hasText(this.parentLink.title)) {
+      if (this.parentLink && Utils.hasText(this.parentLink.title)) {
         return this.$t('goToParent.descriptionWithTitle', this.parentLink);
       }
       else {
