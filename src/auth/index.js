@@ -71,7 +71,7 @@ export default class Auth {
   }
 
   async logout() {
-    return;
+    return false;
   }
 
   async logoutCallback() {
@@ -82,7 +82,7 @@ export default class Auth {
     return;
   }
 
-  static async create(config, changeListener) {
+  static async create(config, changeListener, router) {
     if (!config) {
       return new Auth();
     }
@@ -90,7 +90,7 @@ export default class Auth {
     switch (config.tokenGenerator) {
       case 'oidc': {
         const OIDC = (await import('./oidc')).default;
-        method = new OIDC(config.generatorOptions, changeListener);
+        method = new OIDC(config.generatorOptions, changeListener, router);
         break;
       }
       default: {

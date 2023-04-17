@@ -1,23 +1,29 @@
 import i18n from '../i18n';
 import Auth from "./index";
 
-import { OktaAuth, toRelativeUrl  } from '@okta/okta-auth-js';
+import { OktaAuth } from '@okta/okta-auth-js';
 
 export default class OIDC extends Auth {
 
   constructor(options, changeListener, router) {
     super(options, authState => changeListener(authState.isAuthenticated, authState?.accessToken?.accessToken));
 
-    options.restoreOriginalUri = async (oktaAuth, originalUri) => {
-      // If a router is available, provide a default implementation
-      if (router) {
-        const path = toRelativeUrl(originalUri || '/', window.location.origin);
-        router.replace({ path });
-      }
-    }
+    this.router = router;
 
-    // Set httpRequestClient
-    this.okta = new OktaAuth(options);
+    let oktaOptions = Object.assign({}, options);
+    // todo: Set httpRequestClient
+    oktaOptions.restoreOriginalUri = (_, originalUri) => this.restoreOriginalUri(originalUri);
+    this.okta = new OktaAuth(oktaOptions);
+  }
+
+  setOriginalUri() {
+    this.okta.setOriginalUri(this.router?.currentRoute?.fullPath || window.location.href);
+  }
+
+  async restoreOriginalUri(originalUri) {
+    if (this.router) {
+      this.router.replace(originalUri);
+    }
   }
 
   async init() {
@@ -53,12 +59,15 @@ export default class OIDC extends Auth {
   }
 
   async login() {
-    this.okta.setOriginalUri();
+    this.setOriginalUri();
     await this.okta.signInWithRedirect();
+    return null;
   }
 
   async logout() {
+    this.setOriginalUri();
     await this.okta.signOut();
+    return false;
   }
 
   async loginCallback() {

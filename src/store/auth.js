@@ -6,16 +6,22 @@ export default function getStore(router) {
   return {
     namespaced: true,
     state: {
-      method: new Auth(),
+      // Wrap in a function and use the getter instead of the state
+      // Unfortunately, some auth libraries have internal state, which vuex doesn't like
+      // and report: "do not mutate vuex store state outside mutation handlers."
+      method: () => new Auth(),
       actions: [],
       credentials: null
     },
     getters: {
-      canAuthenticate(state, getters, rootState) {
-        return rootState.authConfig && state.method.getType() !== null;
+      method(state) {
+        return state.method();
       },
-      credentials(state) {
-        return state.method.getCredentials();
+      canAuthenticate(state, getters, rootState) {
+        return rootState.authConfig && getters.method.getType() !== null;
+      },
+      credentials(state, getters) {
+        return getters.method.getCredentials();
       },
       isLoggedIn(state) {
         return state.credentials !== null;
@@ -25,11 +31,8 @@ export default function getStore(router) {
       setCredentials(state, credentials) {
         state.credentials = credentials; // e.g. Username + Password or a Bearer Token
       },
-      resetCredentials(state) {
-        state.credentials = null;
-      },
       setMethod(state, method) {
-        state.method = method;
+        state.method = () => method;
       },
       addAction(state, callback) {
         state.actions.push(callback);
@@ -39,53 +42,52 @@ export default function getStore(router) {
       }
     },
     actions: {
-      async login(cx) {
-        await cx.state.method.login();
-      },
-      async logout(cx) {
-        await cx.state.method.logout();
-      },
-      async loginCallback(cx) {
-        await cx.state.method.loginCallback();
-      },
-      async logoutCallback(cx) {
-        await cx.state.method.logoutCallback();
-      },
       async waitForAuth(cx) {
-        let configType = cx.state.authConfig ? cx.rootState.authConfig.tokenGenerator || 'input' : null;
-        if (!configType || cx.state.method.getType() === configType) {
+        let configType = cx.state.authConfig ? (cx.rootState.authConfig.tokenGenerator || 'input') : null;
+        if (!configType || cx.getters.method.getType() === configType) {
           return;
         }
         await cx.dispatch('updateMethod', cx.rootState.authConfig);
       },
       async updateMethod(cx, config) {
-        await cx.state.method.close();
+        await cx.getters.method.close();
         let changeListener = async (isLoggedIn, credentials) => {
-          if (isLoggedIn) {
-            cx.commit('setCredentials', credentials);
+          if (!isLoggedIn) {
+            credentials = null;
           }
-          else {
-            cx.commit('resetCredentials');
-          }
-          await cx.dispatch('updateWithCredentials');
+          await cx.dispatch('updateCredentials', credentials);
+          await cx.dispatch('executeActions');
         };
         let newAuth = await Auth.create(config, changeListener, router);
         cx.commit('setMethod', newAuth);
       },
-      async authenticate(cx) {
+      async handleAuthenticationCallback(cx) {
         if (cx.getters.isLoggedIn) {
-          await cx.state.method.logout();
-          cx.commit('resetCredentials');
+          await cx.getters.method.logoutCallback();
         }
         else {
-          let credentials = await cx.state.method.login();
-          cx.commit('setCredentials', credentials);
+          await cx.getters.method.loginCallback();
         }
-        await cx.dispatch('updateWithCredentials');
       },
-      async updateWithCredentials(cx) {
-        // Format the value and add it to query parameters or headers
-        let value = cx.state.credentials;
+      async authenticate(cx) {
+        if (cx.getters.isLoggedIn) {
+          let logout = await cx.getters.method.logout();
+          if (logout) {
+            await cx.dispatch('updateCredentials');
+            await cx.dispatch('executeActions');
+          }
+        }
+        else {
+          let credentials = await cx.getters.method.login();
+          if (credentials) {
+            await cx.dispatch('updateCredentials', credentials);
+            await cx.dispatch('executeActions');
+          }
+        }
+      },
+      // Format the value and add it to query parameters or headers
+      async updateCredentials(cx, value = null) {
+        cx.commit('setCredentials', value);
         let authConfig = cx.rootState.authConfig;
         if (value) {
           if (authConfig.formatter === 'Bearer') {
@@ -102,12 +104,13 @@ export default function getStore(router) {
         // Set query or request parameters
         let key = authConfig.key;
         if (authConfig.type === 'query') {
-          cx.commit('setQueryParameter', {type: 'private', key, value}, { root: true });
+          cx.commit('setQueryParameter', { type: 'private', key, value }, { root: true });
         }
         else if (authConfig.type === 'header') {
-          cx.commit('setRequestHeader', {key, value}, { root: true });
+          cx.commit('setRequestHeader', { key, value }, { root: true });
         }
-
+      },
+      async executeActions(cx) {
         // Retry requests
         let errorFn = error => cx.commit('showGlobalError', {
           error,
@@ -127,4 +130,4 @@ export default function getStore(router) {
       }
     }
   };
-};
+}

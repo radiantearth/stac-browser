@@ -62,7 +62,7 @@ export default {
   computed: {
     ...mapState(['allowSelectCatalog', 'catalogUrl', 'data', 'url', 'title']),
     ...mapGetters(['root', 'parentLink', 'collectionLink', 'toBrowserPath']),
-    ...mapState('auth', { authMethod: 'method' }),
+    ...mapGetters('auth', { authMethod: 'method' }),
     ...mapGetters('auth', ['canAuthenticate', 'isLoggedIn']),
     stacVersion() {
       return this.data?.stac_version;

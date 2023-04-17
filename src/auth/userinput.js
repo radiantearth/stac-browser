@@ -19,4 +19,16 @@ export default class UserInput extends Auth {
     return i18n.t('authentication.button.title');
   }
 
+  async login() {
+    return true;
+  }
+
+  async loginCallback() {
+    return;
+  }
+
+  async logout() {
+    return true;
+  }
+
 }
