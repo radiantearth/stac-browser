@@ -35,6 +35,7 @@
       "title": "Provide or update your credentials"
     },
     "description": "The requested page requires authentication. Please provide your authentication details in the text field below.",
+    "unauthorized": "You don't have permission to access this data. Please log in.",
     "title": "Authentication"
   },
   "browse": "Browse",

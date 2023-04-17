@@ -714,7 +714,7 @@ function getStore(config, router) {
           } catch (error) {
             if (cx.state.authConfig && isAuthenticationError(error)) {
               cx.commit('clear', url);
-              cx.commit('errored', { url, error: new BrowserError("You don't have permission to access this data. Please log in!") });
+              cx.commit('errored', { url, error: new BrowserError(i18n.t('authentication.unauthorized')) });
               cx.commit('auth/addAction', () => cx.dispatch('load', args));
               return;
             }
