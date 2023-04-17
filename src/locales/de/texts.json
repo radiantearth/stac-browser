@@ -30,6 +30,8 @@
     "button": {
       "authenticate": "Anmelden",
       "authenticated": "Angemeldet",
+      "login": "Anmelden",
+      "logout": "Abmelden",
       "title": "Anmeldedaten bereitstellen oder aktualisieren"
     },
     "description": "Die angefragte Seite erfordert eine Anmeldung. Bitte die Anmeldedaten unten in das Textfeld eingeben.",

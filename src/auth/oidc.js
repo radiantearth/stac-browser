@@ -1,12 +1,20 @@
 import i18n from '../i18n';
 import Auth from "./index";
 
-import { OktaAuth } from '@okta/okta-auth-js';
+import { OktaAuth, toRelativeUrl  } from '@okta/okta-auth-js';
 
 export default class OIDC extends Auth {
 
-  constructor(options, changeListener) {
-    super(options, authState => changeListener(authState.isAuthenticated, authState.accessToken));
+  constructor(options, changeListener, router) {
+    super(options, authState => changeListener(authState.isAuthenticated, authState?.accessToken?.accessToken));
+
+    options.restoreOriginalUri = async (oktaAuth, originalUri) => {
+      // If a router is available, provide a default implementation
+      if (router) {
+        const path = toRelativeUrl(originalUri || '/', window.location.origin);
+        router.replace({ path });
+      }
+    }
 
     // Set httpRequestClient
     this.okta = new OktaAuth(options);
@@ -51,6 +59,14 @@ export default class OIDC extends Auth {
 
   async logout() {
     await this.okta.signOut();
+  }
+
+  async loginCallback() {
+    await this.okta.handleLoginRedirect();
+  }
+
+  async logoutCallback() {
+    await this.okta.handleLoginRedirect(); // Correct?
   }
   
 }

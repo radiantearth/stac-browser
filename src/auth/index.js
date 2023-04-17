@@ -63,7 +63,7 @@ export default class Auth {
   }
 
   async login() {
-    return;
+    return null;
   }
 
   async loginCallback() {

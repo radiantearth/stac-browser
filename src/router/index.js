@@ -43,6 +43,11 @@ function getRoutes(config) {
   }
 
   routes.push({
+    path: '/auth',
+    component: () => import("../views/AuthCallback.vue")
+  });
+
+  routes.push({
     path: "/(.*)",
     name: "browse",
     component: Browse,
@@ -51,11 +56,6 @@ function getRoutes(config) {
         path: route.params.pathMatch
       };
     }
-  });
-
-  routes.push({
-    path: '/auth',
-    component: () => import("../views/AuthCallback.vue")
   });
 
   return routes;

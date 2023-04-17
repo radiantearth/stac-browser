@@ -51,15 +51,15 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(['resetActions']),
-    ...mapActions(['setAuth']),
+    ...mapMutations('auth', ['resetActions', 'resetCredentials', 'setCredentials']),
+    ...mapActions('auth', ['authenticate']),
     reset() {
-      this.auth.setAuthData(null);
+      this.resetCredentials(null);
       this.resetActions();
     },
     async submit() {
-      this.auth.setAuthData(this.token);
-      await this.login();
+      this.setCredentials(this.token);
+      await this.authenticate();
       this.resetActions();
     }
   }

@@ -40,7 +40,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex';
+import { mapState, mapGetters, mapMutations, mapActions } from 'vuex';
 import StacLink from './StacLink.vue';
 import { BIconArrow90degUp, BIconBook, BIconFolderSymlink, BIconSearch, BIconLock, BIconUnlock } from "bootstrap-vue";
 import Source from './Source.vue';
@@ -135,22 +135,19 @@ export default {
     }
   },
   methods: {
+    ...mapMutations('auth', ['addAction']),
+    ...mapActions('auth', ['authenticate']),
     isSearchPage() {
       return this.$router.currentRoute.name === 'search';
     },
     async openAuthentication() {
-      this.$store.commit('auth/addAction', () => this.$store.dispatch("load", {
+      this.addAction(() => this.$store.dispatch("load", {
         url: this.url,
         loadApi: true,
         show: true,
         force: true
       }));
-      if (this.isLoggedIn) {
-        await this.authMethod.login();
-      }
-      else {
-        await this.authMethod.logout();
-      }
+      await this.authenticate();
     }
   }
 };

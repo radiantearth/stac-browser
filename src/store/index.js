@@ -55,7 +55,7 @@ function getStore(config, router) {
   return new Vuex.Store({
     strict: true,
     modules: {
-      auth
+      auth: auth(router)
     },
     state: Object.assign({}, config, localDefaults(), catalogDefaults(), {
       // Global settings
@@ -660,6 +660,9 @@ function getStore(config, router) {
           path = cx.getters.toBrowserPath(url);
         }
 
+        // Make sure we have all authentication details
+        await cx.dispatch("auth/waitForAuth");
+
         // Load the root catalog data if not available (e.g. after page refresh or external access)
         if (!loadRoot && path !== '/' && cx.state.catalogUrl && !cx.getters.getStac(cx.state.catalogUrl)) {
           await cx.dispatch("load", { url: cx.state.catalogUrl, loadApi: true, loadRoot: true });
@@ -919,23 +922,6 @@ function getStore(config, router) {
           return response.data; // Use data with $refs included as fallback anyway
         } catch (error) {
           return null;
-        }
-      },
-      async retryAfterAuth(cx) {
-        let errorFn = error => cx.commit('showGlobalError', {
-          error,
-          message: i18n.t('errors.authFailed')
-        });
-
-        for (let callback of cx.state.authActions) {
-          try {
-            let p = callback();
-            if (p instanceof Promise) {
-              p.catch(errorFn);
-            }
-          } catch (error) {
-            errorFn(error);
-          }
         }
       },
       async validate(cx, url) {
