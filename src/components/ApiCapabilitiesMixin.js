@@ -20,9 +20,7 @@ const COLLECTION_ITEMS_SORT = [
   'http://www.opengis.net/spec/ogcapi-records-1/1.*/conf/sorting'
 ];
 
-// Add wildcard at the end to work around stac-fastapi issue:
-// https://github.com/stac-utils/stac-fastapi/pull/417
-const ITEMSEARCH_FILTER = ['https://api.stacspec.org/v1.*/item-search#filter*'];
+const ITEMSEARCH_FILTER = ['https://api.stacspec.org/v1.*/item-search#filter'];
 // Check for the OGC API conformance class
 // It seems some conformance classes use conf (correct) and some req (deprecated?) after the version number
 const COLLECTION_ITEMS_FILTER = ['http://www.opengis.net/spec/ogcapi-features-3/1.*/*/features-filter'];
