@@ -254,38 +254,44 @@ export default class Utils {
     }).join('/');
   }
 
-  static addFiltersToLink(link, filters = {}, queryables = []) {
+  static addFiltersToLink(link, filters, defaultPageSize = null, queryables = []) {
     // Construct new link with search params
     let url = new URI(link.href);
 
-    for (let key in filters) {
-      let value = filters[key];
-      if (
-        value === null
-        || (typeof value === 'number' && !Number.isFinite(value))
-        || (typeof value === 'string' && value.length === 0)
-        || (typeof value === 'object' && Utils.size(value) === 0)
-      ) {
-        url.removeQuery(key);
-        continue;
-      }
+    if (Utils.isObject(filters)) {
+      for (let key in filters) {
+        let value = filters[key];
+        if (
+          value === null
+          || (typeof value === 'number' && !Number.isFinite(value))
+          || (typeof value === 'string' && value.length === 0)
+          || (typeof value === 'object' && Utils.size(value) === 0)
+        ) {
+          url.removeQuery(key);
+          continue;
+        }
 
-      if (key === 'datetime') {
-        value = Utils.formatDatetimeQuery(value);
-      }
-      else if (key === 'bbox' && Array.isArray(value)) {
-        value = value.join(',');
-      }
-      else if ((key === 'collections' || key === 'ids') && Array.isArray(value)) {
-        value = value.join(',');
-      }
-      else if (key === 'filters') {
-        let params = Queryable.formatText(value, queryables);
-        url.setQuery(params);
-        continue;
-      }
+        if (key === 'datetime') {
+          value = Utils.formatDatetimeQuery(value);
+        }
+        else if (key === 'bbox' && Array.isArray(value)) {
+          value = value.join(',');
+        }
+        else if ((key === 'collections' || key === 'ids') && Array.isArray(value)) {
+          value = value.join(',');
+        }
+        else if (key === 'filters') {
+          let params = Queryable.formatText(value, queryables);
+          url.setQuery(params);
+          continue;
+        }
 
-      url.setQuery(key, value);
+        url.setQuery(key, value);
+      }
+    }
+
+    if (typeof defaultPageSize === 'number' && url.query('limit') !== 'number') {
+      url.setQuery('limit', defaultPageSize);
     }
 
     return Object.assign({}, link, { href: url.toString() });

@@ -70,12 +70,12 @@
             </b-dropdown>
 
             <QueryableInput
-              v-for="(filter, index) in filtersWithQueryables" :key="filter.id"
+              v-for="(filter, index) in filtersWithQueryables"
+              :key="filter.uid"
               :title="filter.queryable.title"
               :value.sync="filter.data.value"
               :operator.sync="filter.data.operator"
               :schema="filter.queryable.schema"
-              :index="index"
               @remove-queryable="removeQueryable(index)"
             />
           </b-form-group>
@@ -175,7 +175,8 @@ export default {
       provideBBox: false,
       query: this.getDefaultValues(),
       loaded: false,
-      selectedCollections: []
+      selectedCollections: [],
+      qid: 1
     };
   },
   computed: {
@@ -191,8 +192,8 @@ export default {
     },
     filtersWithQueryables() {
       return this.query.filters.map(filter => ({
-        id: filter.id,
-        queryable: this.queryables.find(q => q.id = filter.id),
+        uid: `queryable${filter.uid}`,
+        queryable: this.queryables.find(q => q.id == filter.qid),
         data: filter.data
       }));
     },
@@ -230,7 +231,7 @@ export default {
 
         if (Utils.size(query.filters) > 0) {
           query.filters = query.filters.map(f => ({
-            id: f.id,
+            id: f.qid,
             data: Object.assign({}, f.data)
           }));
         }
@@ -281,7 +282,8 @@ export default {
     },
     additionalFieldSelected(queryable) {
       this.query.filters.push({
-        id: queryable.id,
+        uid: this.qid++,
+        qid: queryable.id,
         data: {
           value: null,
           operator: null

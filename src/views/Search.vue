@@ -63,7 +63,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['apiItems', 'apiItemsLink', 'apiItemsPagination', 'catalogUrl', 'catalogTitle', 'queryables']),
+    ...mapState(['apiItems', 'apiItemsLink', 'apiItemsPagination', 'catalogUrl', 'catalogTitle', 'itemsPerPage', 'queryables']),
     ...mapGetters(['getStac', 'root', 'collectionLink', 'parentLink', 'fromBrowserPath', 'getApiItemsLoading']),
     ...mapGetters('uiState', {initialSearchFilters: 'searchFilters'}),
     pageTitle() {
@@ -86,7 +86,7 @@ export default {
       let pages = Object.assign({}, this.apiItemsPagination);
       // If first link is not available, add the items link as first link
       if (!pages.first && this.apiItemsLink) {
-        pages.first = Utils.addFiltersToLink(this.apiItemsLink, this.filters, this.queryables);
+        pages.first = Utils.addFiltersToLink(this.apiItemsLink, this.filters, this.itemsPerPage, this.queryables);
       }
       return pages;
     },
@@ -132,7 +132,9 @@ export default {
     ...mapMutations(['toggleApiItemsLoading']),
     ...mapMutations('uiState', ['setSearchFilters']),
     async onFiltersLoaded() {
-      this.setFilters(this.initialSearchFilters);
+      if (Utils.size(this.initialSearchFilters) > 0) {
+        this.setFilters(this.initialSearchFilters);
+      }
     },
     async setFilters(filters, reset = false) {
       this.filters = filters;

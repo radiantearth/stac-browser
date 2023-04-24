@@ -791,14 +791,7 @@ function getStore(config, router) {
             baseUrl = stac.getAbsoluteUrl();
           }
 
-          if (!Utils.isObject(filters)) {
-            filters = {};
-          }
-          if (typeof filters.limit !== 'number') {
-            filters.limit = cx.state.itemsPerPage;
-          }
-
-          link = Utils.addFiltersToLink(link, filters, cx.state.queryables);
+          link = Utils.addFiltersToLink(link, filters, cx.state.itemsPerPage, cx.state.queryables);
 
           let response = await stacRequest(cx, link);
           if (!Utils.isObject(response.data) || !Array.isArray(response.data.features)) {
