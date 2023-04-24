@@ -191,11 +191,20 @@ export default {
       ];
     },
     filtersWithQueryables() {
-      return this.query.filters.map(filter => ({
-        uid: `queryable${filter.uid}`,
-        queryable: this.queryables.find(q => q.id == filter.qid),
-        data: filter.data
-      }));
+      if (this.queryables.length === 0) {
+        return [];
+      }
+      return this.query.filters.map(filter => {
+        let queryable = this.queryables.find(q => q.id == filter.qid);
+        if (!queryable) {
+          return null;
+        }
+        return {
+          uid: `queryable${filter.uid}`,
+          queryable,
+          data: filter.data
+        };
+      }).filter(filter => Utils.isObject(filter));
     },
     collections() {
       if (this.hasMoreCollections || this.collectionOnly) {

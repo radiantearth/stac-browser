@@ -45,7 +45,7 @@ export default class Queryable {
     return {
       "filter-lang": "cql2-text",
       filter: filters.map(f => {
-        let queryable = queryables.find(q => q.id === f.id);
+        let queryable = queryables.find(q => q.id === f.qid);
         return queryable.toText(f.data);
       }).join(' AND ')
     };
@@ -57,7 +57,7 @@ export default class Queryable {
     }
 
     filters = filters.map(f => {
-      let queryable = queryables.find(q => q.id === f.id);
+      let queryable = queryables.find(q => q.id === f.qid);
       return queryable.toJSON(f.data);
     });
 

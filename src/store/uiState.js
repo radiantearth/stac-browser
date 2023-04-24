@@ -20,7 +20,7 @@ function toQuery(key, value) {
   if (!Utils.isEmpty(value)) {
     if (Array.isArray(value)) {
       if (key === 's_filters') {
-        value = JSON.stringify(value.map(f => [f.id, f.data.operator, f.data.value]));
+        value = JSON.stringify(value.map(f => [f.qid, f.data.operator, f.data.value]));
       }
       else {
         if (key === 's_datetime') {
@@ -109,7 +109,7 @@ export default {
             value = value.map(dt => new Date(Date.parse(dt)));
           }
           else if (key === 's_filters') {
-            value = JSON.parse(value).map(f => ({id: f[0], data: { operator: f[1], value: f[2] }}));
+            value = JSON.parse(value).map(f => ({qid: f[0], data: { operator: f[1], value: f[2] }}));
           }
         }
         else if (typeof base === 'number') {
