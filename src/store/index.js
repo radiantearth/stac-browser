@@ -800,7 +800,7 @@ function getStore(config, router) {
           else {
             response.data.features = response.data.features.map(item => {
               try {
-                if (!Utils.isObject(item)) {
+                if (!Utils.isObject(item) || item.type !== 'Feature') {
                   return null;
                 }
                 let selfLink = Utils.getLinkWithRel(item.links, 'self');
@@ -814,10 +814,10 @@ function getStore(config, router) {
                     url = Utils.toAbsolute(`items/${item.id}`, baseUrl);
                   }
                   else if (apiCollectionsLink) {
-                    url = Utils.toAbsolute(`${stac.id}/items/${item.id}`, apiCollectionsLink.href);
+                    url = Utils.toAbsolute(`${collectionId}/items/${item.id}`, apiCollectionsLink.href);
                   }
                   else if (cx.state.catalogUrl) {
-                    url = Utils.toAbsolute(`collections/${stac.id}/items/${item.id}`, cx.state.catalogUrl);
+                    url = Utils.toAbsolute(`collections/${collectionId}/items/${item.id}`, cx.state.catalogUrl);
                   }
                   else {
                     return null;
