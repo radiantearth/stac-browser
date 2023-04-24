@@ -627,8 +627,13 @@ function getStore(config, router) {
         // Format the value and add it to query parameters or headers
         let authConfig = cx.state.authConfig;
         let key = authConfig.key;
-        if (value && typeof authConfig.formatter === 'function') {
-          value = authConfig.formatter(value);
+        if (value) {
+          if (authConfig.formatter === 'Bearer') {
+            value = `Bearer ${value}`;
+          }
+          else if (typeof authConfig.formatter === 'function') {
+            value = authConfig.formatter(value);
+          }
         }
         if (!Utils.hasText(value)) {
           value = undefined;

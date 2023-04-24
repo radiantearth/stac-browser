@@ -238,21 +238,6 @@ export default class Utils {
     }).join('/');
   }
 
-  static formatBboxQuery(value) {
-    if (typeof value.toBBoxString === 'function') {
-      // This is a Leaflet LatLngBounds Object
-      const Y = 85.06;
-      const X = 180;
-      value = [
-        Math.max(value.getWest(), -X),
-        Math.max(value.getSouth(), -Y),
-        Math.min(value.getEast(), X),
-        Math.min(value.getNorth(), Y)
-      ];
-    }
-    return value.join(',');
-  }
-
   static addFiltersToLink(link, filters = {}) {
     // Construct new link with search params
     let url = new URI(link.href);
@@ -272,8 +257,8 @@ export default class Utils {
       if (key === 'datetime') {
         value = Utils.formatDatetimeQuery(value);
       }
-      else if (key === 'bbox') {
-        value = Utils.formatBboxQuery(value);
+      else if (key === 'bbox' && Array.isArray(value)) {
+        value = value.join(',');
       }
       else if ((key === 'collections' || key === 'ids') && Array.isArray(value)) {
         value = value.join(',');

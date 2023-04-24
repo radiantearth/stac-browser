@@ -381,7 +381,10 @@ export default {
         animate: false,
         duration: 0
       };
-      this.map.fitBounds(layer.getBounds(), fitOptions);
+      let bounds = layer.getBounds();
+      if (bounds) {
+        this.map.fitBounds(bounds, fitOptions);
+      }
     },
     showPopup(feature, layer) {
       let html = '';
