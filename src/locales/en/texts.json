@@ -199,6 +199,8 @@
     "lessThan": "less than",
     "likeOperatorDescription": "You can use wildcard characters. `_` matches a single character, `%` matches any number of characters. To search for a wildcard character specifically, you need to add a `\\` in front of the character.",
     "matches": "matches",
+    "matches_cs": "matches (case sensitive)",
+    "matches_ci": "matches (case insensitive)",
     "metaDescription": "Search through the data offering of {title}.",
     "modifyCriteria": "Please modify the search criteria.",
     "noItemsFound": "No items found for the given filters.",

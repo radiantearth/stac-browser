@@ -5,15 +5,16 @@
         {{ title }}
       </span>
 
-      <b-form-select
-        v-if="operatorOptions !== null"
-        size="sm"
-        class="op"
-        :value="operator"
-        @input="updateOperator($event)"
-        :options="operatorOptions"
-        v-bind="validation"
-      />
+      <b-dropdown size="sm" class="op" variant="light" :text="operatorTextShort">
+        <b-dropdown-item-button
+          v-for="op in operatorOptions"
+          :key="op.operator"
+          :active="selectedOperator && op.value === selectedOperator.value"
+          @click="updateOperator(op)"
+        >
+          {{ op.textLong || op.text }}
+        </b-dropdown-item-button>
+      </b-dropdown>
 
       <b-form-select
         v-if="queryableType === 'select'"
@@ -65,7 +66,7 @@
 </template>
 
 <script>
-import { BFormInput, BFormSelect, BIconXCircleFill } from 'bootstrap-vue';
+import { BDropdown, BDropdownItemButton, BFormInput, BFormSelect, BIconXCircleFill } from 'bootstrap-vue';
 
 import DatePickerMixin from './DatePickerMixin';
 import Utils from '../utils';
@@ -73,6 +74,8 @@ import Utils from '../utils';
 export default {
   name: 'QueryableInput',
   components: {
+    BDropdown,
+    BDropdownItemButton,
     BFormInput,
     BFormSelect,
     BIconXCircleFill,
@@ -130,13 +133,16 @@ export default {
       return this.schemaTypes.includes('number') || this.schemaTypes.includes('integer');
     },
     help() {
-      if (this.operator === 'LIKE') {
-        return this.$t('search.likeOperatorDescription');
+      if (this.selectedOperator && this.selectedOperator.description) {
+        return this.selectedOperator.description;
       }
       else if (this.queryableType === 'date') {
         return this.$t('search.dateDescription');
       }
       return null;
+    },
+    operatorTextShort() {
+      return this.selectedOperator ? this.selectedOperator.text : "";
     },
     queryableType() {
       if ('enum' in this.schema) {
@@ -156,17 +162,40 @@ export default {
       return null;
     },
     operatorOptions() {
-      const LESS_THAN = {text: this.$t('search.lessThan'), value: '<'};
-      const MORE_THAN = {text: this.$t('search.greaterThan'), value: '>'};
-      const EQUALS = {text: this.$t('search.equalTo'), value: '='};
-      const NOT_EQUALS = {text: this.$t('search.notEqualTo'), value: '<>'};
-      const LIKE = {text: this.$t('search.matches'), value: 'LIKE'};
+      const LESS_THAN = {
+        text: this.$t('search.lessThan'),
+        value: '<'
+      };
+      const MORE_THAN = {
+        text: this.$t('search.greaterThan'),
+        value: '>'
+      };
+      const EQUALS = {
+        text: this.$t('search.equalTo'),
+        value: '='
+      };
+      const NOT_EQUALS = {
+        text: this.$t('search.notEqualTo'),
+        value: '<>'
+      };
+      const LIKE = {
+        text: this.$t('search.matches'),
+        textLong: this.$t('search.matches_cs'),
+        description: this.$t('search.likeOperatorDescription'),
+        value: 'LIKE'
+      };
+      const ILIKE = {
+        text: this.$t('search.matches'),
+        textLong: this.$t('search.matches_ci'),
+        description: this.$t('search.likeOperatorDescription'),
+        value: 'ILIKE'
+      };
 
       if (this.isNumeric || this.queryableType === 'date') {
         return [LESS_THAN, MORE_THAN, EQUALS, NOT_EQUALS];
-        }
+      }
       else if (this.queryableType === 'text') {
-        return [EQUALS, NOT_EQUALS, LIKE];
+        return [EQUALS, NOT_EQUALS, LIKE, ILIKE];
       }
       else {
         return [EQUALS, NOT_EQUALS];
@@ -191,9 +220,6 @@ export default {
       }
     },
     selectedOperator() {
-      if (this.operatorOptions === null) {
-        return null;
-      }
       return this.operatorOptions.find(o => o.value === this.operator);
     }
   },
@@ -202,7 +228,7 @@ export default {
       this.queryableVisible = true;
     }
     if (this.operator === null) {
-      this.updateOperator(this.operatorOptions[0].value);
+      this.updateOperator(this.operatorOptions[0]);
     }
     if (this.value === null) {
       this.updateValue(this.calculateDefaultValue());
@@ -219,9 +245,8 @@ export default {
       }
       this.$emit('update:value', val);
     },
-    updateOperator(evt) {
-      let val = Utils.isObject(evt) && 'target' in evt ? evt.target.value : evt;
-      this.$emit('update:operator', val);
+    updateOperator(op) {
+      this.$emit('update:operator', op.value);
     },
     calculateDefaultValue() {
       if (typeof this.schema.default !== 'undefined') {
@@ -258,9 +283,6 @@ export default {
   flex-wrap: nowrap;
   align-content: center;
 
-  .op {
-    width: 8rem;
-  }
   .delete {
     width: auto;
   }
