@@ -14,6 +14,8 @@ const CQL_JSON = [
   'http://www.opengis.net/spec/cql2/1.*/conf/cql2-json'
 ];
 
+const CQL_ADV_COMPARISON = ['http://www.opengis.net/spec/cql2/1.*/req/advanced-comparison-operators'];
+
 const ITEMSEARCH_SORT = ['https://api.stacspec.org/v1.*/item-search#sort'];
 const COLLECTION_ITEMS_SORT = [
   'https://api.stacspec.org/v1.*/ogcapi-features#sort',
@@ -50,6 +52,9 @@ export default ogcapi => ({
         modes.push('JSON');
       }
       return modes;
+    },
+    cqlAdvComparison() {
+      return this.supportsConformance(CQL_ADV_COMPARISON);
     },
     filterComponentProps() {
       return {

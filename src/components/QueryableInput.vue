@@ -160,13 +160,38 @@ export default {
       const MORE_THAN = {text: this.$t('search.greaterThan'), value: '>'};
       const EQUALS = {text: this.$t('search.equalTo'), value: '='};
       const NOT_EQUALS = {text: this.$t('search.notEqualTo'), value: '<>'};
+      // Advanced comparison operators
+      // https://docs.ogc.org/DRAFTS/21-065.html#advanced-comparison-operators
       const LIKE = {text: this.$t('search.matches'), value: 'LIKE'};
+      const NOT_LIKE = {text: this.$t('search.matches'), value: 'NOT LIKE'};
+      const BETWEEN = {text: this.$t('search.matches'), value: 'BETWEEN'};
+      const NOT_BETWEEN = {text: this.$t('search.matches'), value: 'NOT BETWEEN'};
+      const IN = {text: this.$t('search.matches'), value: 'IN'};
+      const NOT_IN = {text: this.$t('search.matches'), value: 'NOT IN'};
+      // todo: make this and the generation rules class based
+      // todo: not like
+      // todo: between
+      // todo: not between
+      // todo: in / not in
 
-      if (this.isNumeric || this.queryableType === 'date') {
+      if (this.queryableType === 'date') {
         return [LESS_THAN, MORE_THAN, EQUALS, NOT_EQUALS];
+      }
+      else if (this.isNumeric) {
+        let ops = [LESS_THAN, MORE_THAN, EQUALS, NOT_EQUALS];
+        if (this.cqlAdvComparison) {
+          // ops.push(BETWEEN);
+          // ops.push(NOT_BETWEEN);
         }
+        return ops;
+      }
       else if (this.queryableType === 'text') {
-        return [EQUALS, NOT_EQUALS, LIKE];
+        let ops = [EQUALS, NOT_EQUALS];
+        if (this.cqlAdvComparison) {
+          ops.push(LIKE);
+          // ops.push(NOT_LIKE);
+        }
+        return ops;
       }
       else {
         return [EQUALS, NOT_EQUALS];

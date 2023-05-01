@@ -1,5 +1,4 @@
 import URI from 'urijs';
-import Queryable from './models/queryable';
 import removeMd from 'remove-markdown';
 
 export const commonFileNames = ['catalog', 'collection', 'item'];
@@ -264,7 +263,7 @@ export default class Utils {
         value = value.join(',');
       }
       else if (key === 'filters') {
-        let params = Queryable.formatText(value);
+        let params = value.toText();
         url.setQuery(params);
         continue;
       }
