@@ -59,7 +59,7 @@
           </multiselect>
         </b-form-group>
 
-        <div class="additional-filters" v-if="canFilterCql && Array.isArray(queryables) && queryables.length > 0">
+        <div class="additional-filters" v-if="cql && Array.isArray(queryables) && queryables.length > 0">
           <b-form-group :label="$t('search.additionalFilters')" label-for="availableFields">
             <b-alert variant="warning" show>{{ $t('featureExperimental') }}</b-alert>
 
@@ -76,6 +76,7 @@
               :operator.sync="filter.operator"
               :schema="filter.queryable.schema"
               :index="index"
+              :cql="cql"
               @remove-queryable="removeQueryable(index)"
             />
           </b-form-group>
@@ -157,9 +158,9 @@ export default {
       type: Boolean,
       default: false
     },
-    canFilterCql: {
-      type: Boolean,
-      default: false
+    cql: {
+      type: Object,
+      default: null
     },
     collectionOnly: {
       type: Boolean,
@@ -217,7 +218,7 @@ export default {
   },
   created() {
     let promises = [];
-    if (this.canFilterCql) {
+    if (this.cql) {
       promises.push(
         this.$store.dispatch('loadQueryables', {
           stac: this.stac,

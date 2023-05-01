@@ -98,7 +98,11 @@ export default {
     schema: {
       type: Object,
       default: () => ({})
-    }
+    },
+    cql: {
+      type: Object,
+      required: true
+    },
   },
   computed: {
     validation() {
@@ -162,15 +166,15 @@ export default {
       const NOT_EQUALS = {text: this.$t('search.notEqualTo'), value: '<>'};
       const LIKE = {text: this.$t('search.matches'), value: 'LIKE'};
 
+      let ops = [EQUALS, NOT_EQUALS];
       if (this.isNumeric || this.queryableType === 'date') {
-        return [LESS_THAN, MORE_THAN, EQUALS, NOT_EQUALS];
-        }
-      else if (this.queryableType === 'text') {
-        return [EQUALS, NOT_EQUALS, LIKE];
+        ops.push(LESS_THAN);
+        ops.push(MORE_THAN);
       }
-      else {
-        return [EQUALS, NOT_EQUALS];
+      else if (this.queryableType === 'text' && this.cql.advancedComparison) {
+        ops.push(LIKE);
       }
+      return ops;
     },
     queryableOptions() {
       if (this.queryableType !== 'select') {
