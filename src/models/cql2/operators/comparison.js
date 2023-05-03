@@ -1,4 +1,4 @@
-//import i18n from '../../../i18n.js';
+import i18n from '../../../i18n.js';
 import CqlOperator from './operator';
 
 export default class CqlComparisonOperator extends CqlOperator {
@@ -7,8 +7,8 @@ export default class CqlComparisonOperator extends CqlOperator {
     super(operator, [pred, obj]);
   }
 
-  clone(pred, obj) {
-    return new this.constructor(this.operator, pred, obj);
+  clone(value) {
+    return new this.constructor(this.operator, this.args[0], value);
   }
 
   static create(pred, op, obj) {
@@ -25,10 +25,10 @@ export default class CqlComparisonOperator extends CqlOperator {
       return new CqlGreaterThan(pred, obj);
     }
     else if (op === "<=") {
-      return new CqlLowerThanEqual(pred, obj);
+      return new CqlLessThanEqual(pred, obj);
     }
     else if (op === "<") {
-      return new CqlLowerThan(pred, obj);
+      return new CqlLessThan(pred, obj);
     }
   }
 
@@ -36,48 +36,76 @@ export default class CqlComparisonOperator extends CqlOperator {
 
 export class CqlEqual extends CqlComparisonOperator {
 
+  static SYMBOL = "=";
+
   constructor(pred = null, obj = null) {
-    super("=", pred, obj);
+    super(CqlEqual.SYMBOL, pred, obj);
+  }
+
+  static get longLabel() {
+    return i18n.t('search.equalTo');
   }
 
 }
 
 export class CqlNotEqual extends CqlComparisonOperator {
 
+  static SYMBOL = "<>";
+
   constructor(pred = null, obj = null) {
-    super("<>", pred, obj);
+    super(CqlNotEqual.SYMBOL, pred, obj);
+  }
+
+  static get longLabel() {
+    return i18n.t('search.notEqualTo');
   }
 
 }
 
 export class CqlGreaterThan extends CqlComparisonOperator {
 
+  static SYMBOL = ">";
+
   constructor(pred = null, obj = null) {
-    super(">", pred, obj);
+    super(CqlGreaterThan.SYMBOL, pred, obj);
+  }
+
+  static get longLabel() {
+    return i18n.t('search.greaterThan');
   }
 
 }
 
 export class CqlGreaterThanEqual extends CqlComparisonOperator {
 
+  static SYMBOL = ">=";
+
   constructor(pred = null, obj = null) {
-    super(">=", pred, obj);
+    super(CqlGreaterThanEqual.SYMBOL, pred, obj);
   }
 
 }
 
-export class CqlLowerThan extends CqlComparisonOperator {
+export class CqlLessThan extends CqlComparisonOperator {
+
+  static SYMBOL = "<";
 
   constructor(pred = null, obj = null) {
-    super("<", pred, obj);
+    super(CqlLessThan.SYMBOL, pred, obj);
+  }
+
+  static get longLabel() {
+    return i18n.t('search.lessThan');
   }
 
 }
 
-export class CqlLowerThanEqual extends CqlComparisonOperator {
+export class CqlLessThanEqual extends CqlComparisonOperator {
+
+  static SYMBOL = "<=";
 
   constructor(pred = null, obj = null) {
-    super("<=", pred, obj);
+    super(CqlLessThanEqual.SYMBOL, pred, obj);
   }
   
 }

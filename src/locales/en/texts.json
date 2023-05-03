@@ -198,6 +198,10 @@
     "itemsPerPageDescription": "Number of items requested per page, max. {maxItems} items.",
     "lessThan": "less than",
     "likeOperatorDescription": "You can use wildcard characters. `_` matches a single character, `%` matches any number of characters. To search for a wildcard character specifically, you need to add a `\\` in front of the character.",
+    "logical": {
+      "and": "Match all filters (and)",
+      "or": "Match any filters (or)"
+    },
     "matches": "matches",
     "metaDescription": "Search through the data offering of {title}.",
     "modifyCriteria": "Please modify the search criteria.",

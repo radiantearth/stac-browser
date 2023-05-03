@@ -1,16 +1,20 @@
 export default class Cql {
 
-  static toJSON(filter) {
+  constructor(filters) {
+    this.filters = filters;
+  }
+
+  toJSON() {
     return {
       "filter-lang": "cql2-json",
-      filter: filter.toJSON()
+      filter: this.filters.toJSON()
     };
   }
 
-  static toText(filter) {
+  toText() {
     return {
       "filter-lang": "cql2-text",
-      filter: filter.toText()
+      filter: this.filters.toText()
     };
   }
 

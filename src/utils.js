@@ -263,6 +263,7 @@ export default class Utils {
         value = value.join(',');
       }
       else if (key === 'filters') {
+        console.log(value);
         let params = value.toText();
         url.setQuery(params);
         continue;

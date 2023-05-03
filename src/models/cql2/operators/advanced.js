@@ -1,24 +1,16 @@
-//import i18n from '../../../i18n.js';
+import i18n from '../../../i18n.js';
 import CqlComparisonOperator from './comparison';
 
-export class Like extends CqlComparisonOperator {
+export class CqlLike extends CqlComparisonOperator {
 
-  constructor() {
-    super("like");
+  static SYMBOL = "like";
+
+  constructor(pred = null, obj = null) {
+    super(CqlLike.SYMBOL, pred, obj);
+  }
+
+  static get description() {
+    return i18n.t('search.likeOperatorDescription');
   }
 
 }
-
-export class Between extends CqlComparisonOperator {
-
-}
-
-export class In extends CqlComparisonOperator {
-
-}
-
-export default {
-  Like,
-  Between,
-  In
-};

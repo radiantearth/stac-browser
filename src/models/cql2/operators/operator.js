@@ -17,16 +17,16 @@ export default class CqlOperator {
     };
   }
 
-  description() {
+  static get description() {
     return "";
   }
 
-  label() {
-    return this.operator;
+  static get label() {
+    return this.SYMBOL;
   }
 
-  longLabel() {
-    return this.label();
+  static get longLabel() {
+    return this.label;
   }
 
 }

@@ -2,53 +2,55 @@
   <div class="queryable-group">
     <b-row class="queryable-row">
       <span class="title">
-        {{ title }}
+        {{ queryable.title }}
       </span>
 
-      <b-form-select
-        v-if="operatorOptions !== null"
-        size="sm"
-        class="op"
-        :value="operator"
-        @input="updateOperator($event)"
-        :options="operatorOptions"
-        v-bind="validation"
-      />
+      <b-dropdown size="sm" class="op" variant="dark" :text="operator.label">
+        <b-dropdown-item-button
+          v-for="op in operators"
+          :key="op.SYMBOL"
+          :active="op === operator"
+          @click="updateOperator(op)"
+        >
+          {{ op.longLabel }}
+          <b-badge variant="dark" class="ml-2">{{ op.label }}</b-badge>
+        </b-dropdown-item-button>
+      </b-dropdown>
 
       <b-form-select
-        v-if="queryableType === 'select'"
+        v-if="queryable.isSelection"
         :options="queryableOptions"
         size="sm"
         class="value"
-        :value="value"
+        :value="value.value"
         @input="updateValue($event)"
         v-bind="validation"
       />
       <b-form-input
-        v-else-if="queryableType === 'text'"
+        v-else-if="queryable.isText"
         size="sm"
         class="value"
-        :value="value"
+        :value="value.value"
         @input="updateValue($event)"
         v-bind="validation"
       />
       <b-form-input
-        v-else-if="queryableType === 'number'"
+        v-else-if="queryable.isNumeric"
         number
         type="number"
         size="sm"
         class="value"
-        :value="value"
+        :value="value.value"
         @input="updateValue($event)"
         v-bind="validation"
       />
       <date-picker
-        v-else-if="queryableType === 'date'"
+        v-else-if="queryable.isTemporal"
         type="datetime"
         class="value"
         :lang="datepickerLang"
         :format="datepickerFormat"
-        :value="value"
+        :value="value.value"
         @input="updateValue($event)"
         v-bind="validation"
       />
@@ -58,21 +60,26 @@
       </b-button>
     </b-row>
 
-    <b-row v-if="help" class="queryable-help text-muted small">
-      <Description :description="help" inline />
+    <b-row v-if="queryable.help || operator.description" class="queryable-help text-muted small">
+      <Description v-if="queryable.help" :description="queryable.help" inline />
+      <Description v-if="operator.description" :description="operator.description" inline />
     </b-row>
   </div>
 </template>
 
 <script>
-import { BFormInput, BFormSelect, BIconXCircleFill } from 'bootstrap-vue';
+import { BBadge, BDropdown, BDropdownItemButton, BFormInput, BFormSelect, BIconXCircleFill } from 'bootstrap-vue';
 
 import DatePickerMixin from './DatePickerMixin';
 import Utils from '../utils';
+import CqlValue from '../models/cql2/value';
     
 export default {
   name: 'QueryableInput',
   components: {
+    BBadge, 
+    BDropdown,
+    BDropdownItemButton,
     BFormInput,
     BFormSelect,
     BIconXCircleFill,
@@ -82,27 +89,22 @@ export default {
     DatePickerMixin
   ],
   props: {
-    title: {
-      type: String,
-      required: true
-    },
-    // eslint-disable-next-line vue/require-prop-types
+    // eslint-disable-next-line
     value: {
       // Any type is allowed
-      default: null
     },
     operator: {
-      type: String,
-      default: null
+      type: Function,
+      required: true
     },
-    schema: {
+    queryable: {
       type: Object,
-      default: () => ({})
+      required: true
     },
     cql: {
       type: Object,
       required: true
-    },
+    }
   },
   computed: {
     validation() {
@@ -121,144 +123,35 @@ export default {
       }
       return {};
     },
-    schemaTypes() {
-      if (typeof this.schema.type === 'string') {
-        return [this.schema.type];
-      }
-      else if (Array.isArray(this.schema.type)) {
-        return this.schema.type;
-      }
-      return [];
+    schema() {
+      return this.queryable.schema;
     },
-    isNumeric() {
-      return this.schemaTypes.includes('number') || this.schemaTypes.includes('integer');
-    },
-    help() {
-      if (this.operator === 'LIKE') {
-        return this.$t('search.likeOperatorDescription');
-      }
-      else if (this.queryableType === 'date') {
-        return this.$t('search.dateDescription');
-      }
-      return null;
-    },
-    queryableType() {
-      if ('enum' in this.schema) {
-        return 'select';
-      }
-      else if (this.isNumeric) {
-        return 'number';
-      }
-      else if (this.schemaTypes.includes('string')) {
-        if (this.schema.format === 'date-time') {
-          return 'date';
-        }
-        else {
-          return 'text';
-        }
-      }
-      return null;
-    },
-    operatorOptions() {
-      const LESS_THAN = {text: this.$t('search.lessThan'), value: '<'};
-      const MORE_THAN = {text: this.$t('search.greaterThan'), value: '>'};
-      const EQUALS = {text: this.$t('search.equalTo'), value: '='};
-      const NOT_EQUALS = {text: this.$t('search.notEqualTo'), value: '<>'};
-      // Advanced comparison operators
-      // https://docs.ogc.org/DRAFTS/21-065.html#advanced-comparison-operators
-      const LIKE = {text: this.$t('search.matches'), value: 'LIKE'};
-      const NOT_LIKE = {text: this.$t('search.matches'), value: 'NOT LIKE'};
-      const BETWEEN = {text: this.$t('search.matches'), value: 'BETWEEN'};
-      const NOT_BETWEEN = {text: this.$t('search.matches'), value: 'NOT BETWEEN'};
-      const IN = {text: this.$t('search.matches'), value: 'IN'};
-      const NOT_IN = {text: this.$t('search.matches'), value: 'NOT IN'};
-      // todo: make this and the generation rules class based
-      // todo: not like
-      // todo: between
-      // todo: not between
-      // todo: in / not in
-
-
-      let ops = [EQUALS, NOT_EQUALS];
-      if (this.isNumeric || this.queryableType === 'date') {
-        ops.push(LESS_THAN);
-        ops.push(MORE_THAN);
-      }
-      else if (this.queryableType === 'text' && this.cql.advancedComparison) {
-        ops.push(LIKE);
-      }
-      return ops;
+    operators() {
+      return this.queryable.getOperators(this.cql);
     },
     queryableOptions() {
-      if (this.queryableType !== 'select') {
-        return [];
+      if (this.queryable.isSelection) {
+        this.queryable.schema.enum.map(option => ({
+          value: option,
+          text: option
+        }));
       }
-      else {
-        return this.schema.enum.map((option) => {
-          if (typeof option === 'string') {
-            return {
-              value: option,
-              text: option
-            };
-          }
-          else {
-            return option;
-          }
-        });
-      }
-    },
-    selectedOperator() {
-      if (this.operatorOptions === null) {
-        return null;
-      }
-      return this.operatorOptions.find(o => o.value === this.operator);
-    }
-  },
-  mounted() {
-    if (this.operator === null) {
-      this.queryableVisible = true;
-    }
-    if (this.operator === null) {
-      this.updateOperator(this.operatorOptions[0].value);
-    }
-    if (this.value === null) {
-      this.updateValue(this.calculateDefaultValue());
+      return [];
     }
   },
   methods: {
     updateValue(evt) {
       let val = Utils.isObject(evt) && 'target' in evt ? evt.target.value : evt;
-      if (typeof val === "string" && this.schemaTypes.includes('integer')) {
+      if (typeof val === "string" && this.queryable.is('integer')) {
         val = parseInt(val, 10);
       }
-      else if (typeof val === "string" && this.schemaTypes.includes('number')) {
+      else if (typeof val === "string" && this.queryable.is('number')) {
         val = parseFloat(val);
       }
-      this.$emit('update:value', val);
+      this.$emit('update:value', CqlValue.create(val));
     },
-    updateOperator(evt) {
-      let val = Utils.isObject(evt) && 'target' in evt ? evt.target.value : evt;
-      this.$emit('update:operator', val);
-    },
-    calculateDefaultValue() {
-      if (typeof this.schema.default !== 'undefined') {
-        return this.schema.default;
-      }
-      else if (this.queryableType === 'text') {
-        return '';
-      }
-      else if (this.queryableType === 'date') {
-        return new Date();
-      }
-      else if (this.queryableType === 'number') {
-        if (typeof this.schema.minimum !== 'undefined') {
-         return this.schema.minimum;
-        }
-        return 0;
-      }
-      else if (this.queryableType === 'select') {
-        return this.queryableOptions[0].value;
-      }
+    updateOperator(op) {
+      this.$emit('update:operator', op);
     }
   }
 };
@@ -275,9 +168,6 @@ export default {
   flex-wrap: nowrap;
   align-content: center;
 
-  .op {
-    width: 8rem;
-  }
   .delete {
     width: auto;
   }
