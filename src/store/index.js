@@ -269,11 +269,12 @@ function getStore(config, router) {
         }
       },
       fromBrowserPath: (state, getters) => url => {
+        const externalRE = /^\/(search\/)?external\//;
         if (!Utils.hasText(url) || url === '/') {
           url = state.catalogUrl;
         }
-        else if (url.startsWith('/external/')) {
-          let parts = url.replace(/^\/external\//, '').split('/');
+        else if (url.match(externalRE)) {
+          let parts = url.replace(externalRE, '').split('/');
           let protocol;
           if (!parts[0].endsWith(':')) {
             protocol = 'https:';

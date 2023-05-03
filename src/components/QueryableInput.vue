@@ -98,7 +98,11 @@ export default {
     schema: {
       type: Object,
       default: () => ({})
-    }
+    },
+    cql: {
+      type: Object,
+      required: true
+    },
   },
   computed: {
     validation() {
@@ -174,28 +178,16 @@ export default {
       // todo: not between
       // todo: in / not in
 
-      if (this.queryableType === 'date') {
-        return [LESS_THAN, MORE_THAN, EQUALS, NOT_EQUALS];
+
+      let ops = [EQUALS, NOT_EQUALS];
+      if (this.isNumeric || this.queryableType === 'date') {
+        ops.push(LESS_THAN);
+        ops.push(MORE_THAN);
       }
-      else if (this.isNumeric) {
-        let ops = [LESS_THAN, MORE_THAN, EQUALS, NOT_EQUALS];
-        if (this.cqlAdvComparison) {
-          // ops.push(BETWEEN);
-          // ops.push(NOT_BETWEEN);
-        }
-        return ops;
+      else if (this.queryableType === 'text' && this.cql.advancedComparison) {
+        ops.push(LIKE);
       }
-      else if (this.queryableType === 'text') {
-        let ops = [EQUALS, NOT_EQUALS];
-        if (this.cqlAdvComparison) {
-          ops.push(LIKE);
-          // ops.push(NOT_LIKE);
-        }
-        return ops;
-      }
-      else {
-        return [EQUALS, NOT_EQUALS];
-      }
+      return ops;
     },
     queryableOptions() {
       if (this.queryableType !== 'select') {

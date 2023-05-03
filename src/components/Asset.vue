@@ -155,7 +155,7 @@ export default {
       else if (!this.isBrowserProtocol) {
         return false;
       }
-      // Otherwise, all images that a browser can read are supported
+      // Otherwise, all images that a browser can read are supported + JSON
       else if (mapMediaTypes.includes(this.asset.type)) {
         return true;
       }

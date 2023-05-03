@@ -39,19 +39,21 @@ export default ogcapi => ({
     canFilterExtents() {
       return ogcapi ? this.supportsConformance(FEATURES_CORE) : true;
     },
-    canFilterCql() {
-      return this.supportsConformance(ogcapi ? COLLECTION_ITEMS_FILTER : ITEMSEARCH_FILTER)
-        && this.cqlModes.includes("Text"); // ToDo: this.cqlModes.length > 0
-    },
-    cqlModes() {
-      let modes = [];
-      if (this.supportsConformance(CQL_TEXT)) {
-        modes.push('Text');
+    cql() {
+      if (!this.supportsConformance(ogcapi ? COLLECTION_ITEMS_FILTER : ITEMSEARCH_FILTER)) {
+        return null;
       }
-      if (this.supportsConformance(CQL_JSON)) {
-        modes.push('JSON');
+      let textMode = this.supportsConformance(CQL_TEXT);
+      let jsonMode = this.supportsConformance(CQL_JSON);
+      if (!textMode/* && !jsonMode*/) {
+        return null;
       }
-      return modes;
+
+      return {
+        textMode,
+        jsonMode,
+        advancedComparison: this.supportsConformance(CQL_ADV_COMPARISON)
+      };
     },
     cqlAdvComparison() {
       return this.supportsConformance(CQL_ADV_COMPARISON);
@@ -59,8 +61,8 @@ export default ogcapi => ({
     filterComponentProps() {
       return {
         canSort: this.canSort,
-        canFilterCql: this.canFilterCql,
-        canFilterExtents: this.canFilterExtents
+        canFilterExtents: this.canFilterExtents,
+        cql: this.cql
       };
     }
   },
