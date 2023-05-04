@@ -90,7 +90,7 @@
             :selectedLabel="$t('multiselect.selectedLabel')"
             :deselectLabel="$t('multiselect.deselectLabel')"
           />
-          <SortButtons v-if="sortTerm" class="mt-1" :value="sortOrder" enforce @input="sortDirectionSet" />
+          <SortButtons v-if="sortTerm && sortTerm.value" class="mt-1" :value="sortOrder" enforce @input="sortDirectionSet" />
         </b-form-group>
 
         <b-form-group :label="$t('search.itemsPerPage')" label-for="limit" :description="$t('search.itemsPerPageDescription', {maxItems})">
@@ -352,9 +352,9 @@ export default {
       this.$set(this.query, 'ids', ids);
     },
     formatSort() {
-      if (this.sortTerm && this.sortOrder) {
+      if (this.sortTerm && this.sortTerm.value && this.sortOrder) {
         let order = this.sortOrder < 0 ? '-' : '';
-        return `${order}${this.sortTerm}`;
+        return `${order}${this.sortTerm.value}`;
       }
       else {
         return null;
