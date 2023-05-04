@@ -44,6 +44,17 @@
         @input="updateValue($event)"
         v-bind="validation"
       />
+      <b-form-checkbox
+        v-else-if="queryable.isBoolean"
+        switch
+        class="value"
+        :checked="value.value"
+        @input="updateValue($event)"
+        v-bind="validation"
+      >
+        {{ $t(`checkbox.${value.value}`) }}
+      </b-form-checkbox>
+      
       <date-picker
         v-else-if="queryable.isTemporal"
         type="datetime"
@@ -68,7 +79,7 @@
 </template>
 
 <script>
-import { BBadge, BDropdown, BDropdownItemButton, BFormInput, BFormSelect, BIconXCircleFill } from 'bootstrap-vue';
+import { BBadge, BDropdown, BDropdownItemButton, BFormCheckbox, BFormInput, BFormSelect, BIconXCircleFill } from 'bootstrap-vue';
 
 import DatePickerMixin from './DatePickerMixin';
 import Utils from '../utils';
@@ -80,6 +91,7 @@ export default {
     BBadge, 
     BDropdown,
     BDropdownItemButton,
+    BFormCheckbox,
     BFormInput,
     BFormSelect,
     BIconXCircleFill,
@@ -108,14 +120,14 @@ export default {
   },
   computed: {
     validation() {
-      if (this.queryableType === 'text') {
+      if (this.isText) {
         return {
           minlength: this.schema.minLength,
           maxlength: this.schema.maxLenggth,
           required: this.schema.minLength > 0
         };
       }
-      else if (this.queryableType === 'number') {
+      else if (this.isNumeric) {
         return {
           min: this.schema.minimum,
           max: this.schema.maximum

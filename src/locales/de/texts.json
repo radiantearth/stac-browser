@@ -46,6 +46,10 @@
     "loadMore": "Lade mehr...",
     "noMatches": "Keiner der Kataloge entspricht den Suchkriterien."
   },
+  "checkbox": {
+    "false": "Nein",
+    "true": "Ja"
+  },
   "copy": "Kopieren",
   "default": "Standardeinstellung",
   "defaultWithValue": "Standardeinstellung ({value})",

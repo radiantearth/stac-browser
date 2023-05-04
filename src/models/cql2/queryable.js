@@ -38,6 +38,10 @@ export default class Queryable {
     return this.is('string');
   }
 
+  get isBoolean() {
+    return this.is('boolean');
+  }
+
   get isNumeric() {
     return this.is('number') || this.is('integer');
   }
@@ -72,6 +76,9 @@ export default class Queryable {
     }
     else if (this.isText) {
       return '';
+    }
+    else if (this.isBoolean) {
+      return false;
     }
     // todo: Support boolean
     return null;
