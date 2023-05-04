@@ -45,7 +45,7 @@ export default ogcapi => ({
       }
       let textMode = this.supportsConformance(CQL_TEXT);
       let jsonMode = this.supportsConformance(CQL_JSON);
-      if (!textMode/* && !jsonMode*/) {
+      if (!textMode && !jsonMode) {
         return null;
       }
 
@@ -54,6 +54,9 @@ export default ogcapi => ({
         jsonMode,
         advancedComparison: this.supportsConformance(CQL_ADV_COMPARISON)
       };
+    },
+    cqlAdvComparison() {
+      return this.supportsConformance(CQL_ADV_COMPARISON);
     },
     filterComponentProps() {
       return {

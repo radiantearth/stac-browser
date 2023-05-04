@@ -61,26 +61,29 @@
 
         <div class="additional-filters" v-if="cql && Array.isArray(queryables) && queryables.length > 0">
           <b-form-group :label="$t('search.additionalFilters')" label-for="availableFields">
-            <b-alert variant="warning" show>{{ $t('featureExperimental') }}</b-alert>
+            <b-form-radio-group id="logical" v-model="filtersAndOr" :options="andOrOptions" name="logical" size="sm" />
 
             <b-dropdown size="sm" :text="$t('search.addFilter')" block variant="primary" class="mt-2 mb-3" menu-class="w-100">
-              <b-dropdown-item v-for="queryable in queryables" :key="queryable.id" @click="additionalFieldSelected(queryable)">
-                {{ queryable.title }}
-              </b-dropdown-item>
+              <template v-for="queryable in queryables">
+                <b-dropdown-item v-if="queryable.supported" :key="queryable.id" @click="additionalFieldSelected(queryable)">
+                  {{ queryable.title }}
+                </b-dropdown-item>
+              </template>
             </b-dropdown>
 
             <QueryableInput
-              v-for="(filter, index) in query.filters" :key="filter.id"
-              :title="filter.queryable.title"
+              v-for="(filter, index) in filters" :key="filter.id"
               :value.sync="filter.value"
               :operator.sync="filter.operator"
-              :schema="filter.queryable.schema"
+              :queryable="filter.queryable"
               :index="index"
               :cql="cql"
               @remove-queryable="removeQueryable(index)"
             />
           </b-form-group>
         </div>
+
+        <hr>
 
         <b-form-group v-if="canSort" :label="$t('sort.title')" label-for="sort" :description="$t('search.notFullySupported')">
           <multiselect
@@ -111,13 +114,41 @@
 </template>
 
 <script>
-import { BDropdown, BDropdownItem, BForm, BFormGroup, BFormInput, BFormCheckbox } from 'bootstrap-vue';
+import { BDropdown, BDropdownItem, BForm, BFormGroup, BFormInput, BFormCheckbox, BFormRadioGroup } from 'bootstrap-vue';
 import Multiselect from 'vue-multiselect';
 
 import { mapGetters, mapState } from "vuex";
 import DatePickerMixin from './DatePickerMixin';
 import Loading from './Loading.vue';
 import Utils from '../utils';
+import CqlLogicalOperator from '../models/cql2/operators/logical';
+import Cql from '../models/cql2/cql';
+import { CqlEqual } from '../models/cql2/operators/comparison';
+import CqlValue from '../models/cql2/value';
+
+function getQueryDefaults() {
+  return {
+    datetime: null,
+    bbox: null,
+    limit: null,
+    ids: [],
+    collections: [],
+    sortby: null,
+    filters: []
+  };
+}
+
+function getDefaults() {
+  return {
+    sortOrder: 1,
+    sortTerm: null,
+    provideBBox: false,
+    query: getQueryDefaults(),
+    filtersAndOr: 'and',
+    filters: [],
+    selectedCollections: []
+  };
+}
 
 export default {
   name: 'ItemFilter',
@@ -128,6 +159,7 @@ export default {
     BFormGroup,
     BFormInput,
     BFormCheckbox,
+    BFormRadioGroup,
     QueryableInput: () => import('./QueryableInput.vue'),
     Loading,
     Map: () => import('./Map.vue'),
@@ -168,19 +200,20 @@ export default {
     }
   },
   data() {
-    return {
-      sortOrder: 1,
-      sortTerm: null,
+    return Object.assign({
       maxItems: 10000,
-      provideBBox: false,
-      query: this.getDefaultValues(),
-      loaded: false,
-      selectedCollections: []
-    };
+      loaded: false
+    }, getDefaults());
   },
   computed: {
     ...mapState(['itemsPerPage', 'uiLanguage', 'queryables', 'apiCollections']),
     ...mapGetters(['hasMoreCollections', 'root']),
+    andOrOptions() {
+      return [
+        { value: 'and', text: this.$i18n.t('search.logical.and') },
+        { value: 'or', text: this.$i18n.t('search.logical.or') },
+      ];
+    },
     sortOptions() {
       return [
         { value: null, text: this.$t('default') },
@@ -205,12 +238,9 @@ export default {
     value: {
       immediate: true,
       handler(value) {
-        let query = Object.assign({}, this.getDefaultValues(), value);
+        let query = Object.assign(getQueryDefaults(), value);
         if (Array.isArray(query.datetime)) {
           query.datetime = query.datetime.map(Utils.dateFromUTC);
-        }
-        else if (query.filters.length > 0) {
-          query.filters = query.filters.map(f => Object.assign({}, f));
         }
         this.query = query;
       }
@@ -244,35 +274,32 @@ export default {
     sortDirectionSet(value) {
       this.sortOrder = value;
     },
+    buildFilter() {
+      const args = this.filters.map(f => new f.operator(f.queryable, f.value));
+      const logical = CqlLogicalOperator.create(this.filtersAndOr, args);
+      return new Cql(logical);
+    },
     removeQueryable(queryableIndex) {
-      this.query.filters.splice(queryableIndex, 1);
+      this.filters.splice(queryableIndex, 1);
     },
     additionalFieldSelected(queryable) {
-      this.query.filters.push({
-        value: null,
-        operator: null,
+      this.filters.push({
+        value: CqlValue.create(queryable.defaultValue),
+        operator: CqlEqual,
         queryable
       });
-    },
-    getDefaultValues() {
-      return {
-        datetime: null,
-        bbox: null,
-        limit: null,
-        ids: [],
-        collections: [],
-        sortby: null,
-        filters: []
-      };
     },
     onSubmit() {
       if (this.canSort && this.sortTerm && this.sortOrder) {
         this.$set(this.query, 'sortby', this.formatSort());
       }
+      if (this.filters.length > 0) {
+        this.$set(this.query, 'filters', this.buildFilter());
+      }
       this.$emit('input', this.query, false);
     },
     async onReset() {
-      this.query = this.getDefaultValues();
+      Object.assign(this, getDefaults());
       this.$emit('input', {}, true);
     },
     setLimit(limit) {

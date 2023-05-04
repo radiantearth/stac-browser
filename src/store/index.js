@@ -8,7 +8,7 @@ import i18n from '../i18n';
 import { ogcQueryables, stacBrowserSpecialHandling, stacPagination } from "../rels";
 import Utils, { schemaMediaType, BrowserError } from '../utils';
 import STAC from '../models/stac';
-import Queryable from '../models/queryable';
+import Queryable from '../models/cql2/queryable';
 
 import { addQueryIfNotExists, isAuthenticationError, Loading, processSTAC, proxyUrl, unproxyUrl, stacRequest } from './utils';
 import { getBest } from '../locale-id';
@@ -589,7 +589,8 @@ function getStore(config, router) {
       },
       addQueryables(state, queryables) {
         if (Utils.isObject(queryables) && Utils.isObject(queryables.properties)) {
-          state.queryables = Object.keys(queryables.properties).map(key => new Queryable(key, queryables.properties[key]));
+          state.queryables = Object.entries(queryables.properties)
+            .map(([key, schema]) => new Queryable(key, schema));
         }
         else {
           state.queryables = [];
