@@ -26,6 +26,10 @@ export default class Queryable {
     return null;
   }
 
+  get supported() {
+    return this.isText || this.isNumeric || this.isBoolean;
+  }
+
   is(type) {
     return this.types.includes(type);
   }

@@ -84,6 +84,10 @@ export class CqlGreaterThanEqual extends CqlComparisonOperator {
     super(CqlGreaterThanEqual.SYMBOL, pred, obj);
   }
 
+  static get longLabel() {
+    return i18n.t('search.greaterThanEqual');
+  }
+
 }
 
 export class CqlLessThan extends CqlComparisonOperator {
@@ -106,6 +110,10 @@ export class CqlLessThanEqual extends CqlComparisonOperator {
 
   constructor(pred = null, obj = null) {
     super(CqlLessThanEqual.SYMBOL, pred, obj);
+  }
+
+  static get longLabel() {
+    return i18n.t('search.lessThanEqual');
   }
   
 }

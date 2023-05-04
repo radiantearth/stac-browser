@@ -5,7 +5,7 @@
         {{ queryable.title }}
       </span>
 
-      <b-dropdown size="sm" class="op" variant="dark" :text="operator.label">
+      <b-dropdown size="sm" class="op" variant="dark" split :text="operator.label" @click="iterateOps">
         <b-dropdown-item-button
           v-for="op in operators"
           :key="op.SYMBOL"
@@ -152,6 +152,12 @@ export default {
     }
   },
   methods: {
+    iterateOps() {
+      let findIndex = this.operators.findIndex(op => op === this.operator);
+      let nextIndex = ++findIndex % this.operators.length;
+      console.log(findIndex, nextIndex);
+      this.updateOperator(this.operators[nextIndex]);
+    },
     updateValue(evt) {
       let val = Utils.isObject(evt) && 'target' in evt ? evt.target.value : evt;
       if (typeof val === "string" && this.queryable.is('integer')) {
@@ -187,6 +193,10 @@ export default {
     flex-grow: 4;
     width: 8rem !important;
   }
+}
+
+.op {
+  min-width: 4rem;
 }
 
 .queryable-help {

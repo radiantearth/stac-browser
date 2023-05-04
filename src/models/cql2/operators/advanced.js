@@ -9,6 +9,10 @@ export class CqlLike extends CqlComparisonOperator {
     super(CqlLike.SYMBOL, pred, obj);
   }
 
+  static get longLabel() {
+    return i18n.t('search.matches');
+  }
+
   static get description() {
     return i18n.t('search.likeOperatorDescription');
   }

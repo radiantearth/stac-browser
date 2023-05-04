@@ -64,9 +64,11 @@
             <b-form-radio-group id="logical" v-model="filtersAndOr" :options="andOrOptions" name="logical" size="sm" />
 
             <b-dropdown size="sm" :text="$t('search.addFilter')" block variant="primary" class="mt-2 mb-3" menu-class="w-100">
-              <b-dropdown-item v-for="queryable in queryables" :key="queryable.id" @click="additionalFieldSelected(queryable)">
-                {{ queryable.title }}
-              </b-dropdown-item>
+              <template v-for="queryable in queryables">
+                <b-dropdown-item v-if="queryable.supported" :key="queryable.id" @click="additionalFieldSelected(queryable)">
+                  {{ queryable.title }}
+                </b-dropdown-item>
+              </template>
             </b-dropdown>
 
             <QueryableInput
@@ -80,6 +82,8 @@
             />
           </b-form-group>
         </div>
+
+        <hr>
 
         <b-form-group v-if="canSort" :label="$t('sort.title')" label-for="sort" :description="$t('search.notFullySupported')">
           <multiselect

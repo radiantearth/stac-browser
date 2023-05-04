@@ -589,7 +589,8 @@ function getStore(config, router) {
       },
       addQueryables(state, queryables) {
         if (Utils.isObject(queryables) && Utils.isObject(queryables.properties)) {
-          state.queryables = Object.entries(queryables.properties).map(([key, schema]) => new Queryable(key, schema));
+          state.queryables = Object.entries(queryables.properties)
+            .map(([key, schema]) => new Queryable(key, schema));
         }
         else {
           state.queryables = [];

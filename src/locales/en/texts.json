@@ -197,10 +197,12 @@
     "equalTo": "equal to",
     "filterBySpatialExtent": "Filter by spatial extent",
     "greaterThan": "greater than",
+    "greaterThanEqual": "greater than or equal to",
     "itemIds": "Item IDs",
     "itemsPerPage": "Items per page",
     "itemsPerPageDescription": "Number of items requested per page, max. {maxItems} items.",
     "lessThan": "less than",
+    "lessThanEqual": "less than or equal to",
     "likeOperatorDescription": "You can use wildcard characters. `_` matches a single character, `%` matches any number of characters. To search for a wildcard character specifically, you need to add a `\\` in front of the character.",
     "logical": {
       "and": "Match all filters (and)",
