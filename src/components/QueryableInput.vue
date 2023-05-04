@@ -71,9 +71,9 @@
       </b-button>
     </b-row>
 
-    <b-row v-if="queryable.help || operator.description" class="queryable-help text-muted small">
-      <Description v-if="queryable.help" :description="queryable.help" inline />
+    <b-row v-if="queryable.description || operator.description" class="queryable-help text-muted small">
       <Description v-if="operator.description" :description="operator.description" inline />
+      <Description v-if="queryable.description" :description="queryable.description" inline />
     </b-row>
   </div>
 </template>
@@ -155,7 +155,6 @@ export default {
     iterateOps() {
       let findIndex = this.operators.findIndex(op => op === this.operator);
       let nextIndex = ++findIndex % this.operators.length;
-      console.log(findIndex, nextIndex);
       this.updateOperator(this.operators[nextIndex]);
     },
     updateValue(evt) {

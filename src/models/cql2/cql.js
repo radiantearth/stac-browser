@@ -1,3 +1,5 @@
+// https://docs.ogc.org/DRAFTS/21-065.html
+
 export default class Cql {
 
   constructor(filters) {

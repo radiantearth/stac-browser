@@ -3,8 +3,6 @@ import i18n from '../../i18n.js';
 import { CqlEqual, CqlGreaterThan, CqlGreaterThanEqual, CqlLessThan, CqlLessThanEqual, CqlNotEqual } from "./operators/comparison";
 import { CqlLike } from "./operators/advanced";
 
-// https://docs.ogc.org/DRAFTS/21-065.html
-
 export default class Queryable {
 
   constructor(id, schema) {
@@ -19,11 +17,11 @@ export default class Queryable {
     return formatKey(this.id);
   }
 
-  get help() {
+  get description() {
     if (this.isTemporal) {
       return i18n.t('search.dateDescription');
     }
-    return null;
+    return "";
   }
 
   get supported() {
