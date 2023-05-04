@@ -16,9 +16,20 @@
           <b-badge variant="dark" class="ml-2">{{ op.label }}</b-badge>
         </b-dropdown-item-button>
       </b-dropdown>
+      
+      <date-picker
+        v-if="queryable.isTemporal"
+        type="date"
+        class="value"
+        :lang="datepickerLang"
+        :format="datepickerFormat"
+        :value="value.value"
+        @input="updateValue($event)"
+        v-bind="validation"
+      />
 
       <b-form-select
-        v-if="queryable.isSelection"
+        v-else-if="queryable.isSelection"
         :options="queryableOptions"
         size="sm"
         class="value"
@@ -54,17 +65,6 @@
       >
         {{ $t(`checkbox.${value.value}`) }}
       </b-form-checkbox>
-      
-      <date-picker
-        v-else-if="queryable.isTemporal"
-        type="datetime"
-        class="value"
-        :lang="datepickerLang"
-        :format="datepickerFormat"
-        :value="value.value"
-        @input="updateValue($event)"
-        v-bind="validation"
-      />
 
       <b-button class="delete" size="sm" variant="danger" @click="$emit('remove-queryable')">
         <b-icon-x-circle-fill aria-hidden="true" />
@@ -120,7 +120,7 @@ export default {
   },
   computed: {
     validation() {
-      if (this.isText) {
+      if (this.isText && !this.isTemporal) {
         return {
           minlength: this.schema.minLength,
           maxlength: this.schema.maxLenggth,

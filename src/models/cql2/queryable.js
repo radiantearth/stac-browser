@@ -100,7 +100,7 @@ export default class Queryable {
 
   getOperators(cql) {
     let ops = [CqlEqual, CqlNotEqual];
-    if (this.isNumeric || this.isDate) {
+    if (this.isNumeric || this.isTemporal) {
       ops.push(CqlLessThan);
       ops.push(CqlLessThanEqual);
       ops.push(CqlGreaterThan);
