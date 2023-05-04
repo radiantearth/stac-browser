@@ -238,41 +238,66 @@ export default class Utils {
   }
 
   static addFiltersToLink(link, filters = {}) {
-    // Construct new link with search params
-    let url = new URI(link.href);
+    let isEmpty = value => {
+      return (value === null
+      || (typeof value === 'number' && !Number.isFinite(value))
+      || (typeof value === 'string' && value.length === 0)
+      || (typeof value === 'object' && Utils.size(value) === 0));
+    };
 
-    for (let key in filters) {
-      let value = filters[key];
-      if (
-        value === null
-        || (typeof value === 'number' && !Number.isFinite(value))
-        || (typeof value === 'string' && value.length === 0)
-        || (typeof value === 'object' && Utils.size(value) === 0)
-      ) {
-        url.removeQuery(key);
-        continue;
-      }
+    if (Utils.hasText(link.method) && link.method.toUpperCase() === 'POST') {
+      let body = Object.assign({}, link.body);
 
-      if (key === 'datetime') {
-        value = Utils.formatDatetimeQuery(value);
-      }
-      else if (key === 'bbox' && Array.isArray(value)) {
-        value = value.join(',');
-      }
-      else if ((key === 'collections' || key === 'ids') && Array.isArray(value)) {
-        value = value.join(',');
-      }
-      else if (key === 'filters') {
-        console.log(value);
-        let params = value.toText();
-        url.setQuery(params);
-        continue;
-      }
+      for (let key in filters) {
+        let value = filters[key];
+        if (isEmpty(value)) {
+          delete body[key];
+          continue;
+        }
 
-      url.setQuery(key, value);
+        if (key === 'datetime') {
+          value = Utils.formatDatetimeQuery(value);
+        }
+        else if (key === 'filters') {
+          Object.assign(body, value.toJSON());
+          continue;
+        }
+
+        body[key] = value;
+      }
+      return Object.assign({}, link, { body });
     }
+    else { // GET
+      // Construct new link with search params
+      let url = new URI(link.href);
 
-    return Object.assign({}, link, { href: url.toString() });
+      for (let key in filters) {
+        let value = filters[key];
+        if (isEmpty(value)) {
+          url.removeQuery(key);
+          continue;
+        }
+
+        if (key === 'datetime') {
+          value = Utils.formatDatetimeQuery(value);
+        }
+        else if (key === 'bbox') {
+          value = value.join(',');
+        }
+        else if ((key === 'collections' || key === 'ids')) {
+          value = value.join(',');
+        }
+        else if (key === 'filters') {
+          let params = value.toText();
+          url.setQuery(params);
+          continue;
+        }
+
+        url.setQuery(key, value);
+      }
+
+      return Object.assign({}, link, { href: url.toString() });
+    }
   }
 
   static titleForHref(href, preferFileName = false) {

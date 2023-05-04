@@ -45,7 +45,7 @@ export default ogcapi => ({
       }
       let textMode = this.supportsConformance(CQL_TEXT);
       let jsonMode = this.supportsConformance(CQL_JSON);
-      if (!textMode/* && !jsonMode*/) {
+      if (!textMode && !jsonMode) {
         return null;
       }
 
