@@ -18,7 +18,7 @@
           <Map class="mb-4" v-if="provideBBox" :stac="stac" selectBounds @bounds="setBBox" scrollWheelZoom />
         </b-form-group>
 
-        <b-form-group v-if="!collectionOnly" :label="$tc('stacCollection', collections.length)" label-for="collections">
+        <b-form-group v-if="conformances.Collections" :label="$tc('stacCollection', collections.length)" label-for="collections">
           <multiselect
             v-if="collections.length > 0"
             id="collections" :value="selectedCollections" @input="setCollections"
@@ -46,7 +46,7 @@
           </multiselect>
         </b-form-group>
 
-        <b-form-group v-if="!collectionOnly" :label="$t('search.itemIds')" label-for="ids">
+        <b-form-group v-if="conformances.Items" :label="$t('search.itemIds')" label-for="ids">
           <multiselect
             id="ids" :value="query.ids" @input="setIds"
             multiple taggable :options="query.ids"
@@ -63,10 +63,11 @@
           <b-form-group :label="$t('search.additionalFilters')" label-for="availableFields">
             <b-form-radio-group id="logical" v-model="filtersAndOr" :options="andOrOptions" name="logical" size="sm" />
 
-            <b-dropdown size="sm" :text="$t('search.addFilter')" block variant="primary" class="mt-2 mb-3" menu-class="w-100">
-              <template v-for="queryable in queryables">
+            <b-dropdown size="sm" :text="$t('search.addFilter')" block variant="primary" class="queryables mt-2 mb-3" menu-class="w-100">
+              <template v-for="queryable in sortedQueryables">
                 <b-dropdown-item v-if="queryable.supported" :key="queryable.id" @click="additionalFieldSelected(queryable)">
                   {{ queryable.title }}
+                  <b-badge variant="dark" class="ml-2">{{ queryable.id }}</b-badge>
                 </b-dropdown-item>
               </template>
             </b-dropdown>
@@ -114,7 +115,7 @@
 </template>
 
 <script>
-import { BDropdown, BDropdownItem, BForm, BFormGroup, BFormInput, BFormCheckbox, BFormRadioGroup } from 'bootstrap-vue';
+import { BBadge, BDropdown, BDropdownItem, BForm, BFormGroup, BFormInput, BFormCheckbox, BFormRadioGroup } from 'bootstrap-vue';
 import Multiselect from 'vue-multiselect';
 
 import { mapGetters, mapState } from "vuex";
@@ -125,6 +126,7 @@ import CqlLogicalOperator from '../models/cql2/operators/logical';
 import Cql from '../models/cql2/cql';
 import { CqlEqual } from '../models/cql2/operators/comparison';
 import CqlValue from '../models/cql2/value';
+import ApiCapabilitiesMixin from './ApiCapabilitiesMixin';
 
 function getQueryDefaults() {
   return {
@@ -153,6 +155,7 @@ function getDefaults() {
 export default {
   name: 'ItemFilter',
   components: {
+    BBadge,
     BDropdown,
     BDropdownItem,
     BForm,
@@ -167,6 +170,7 @@ export default {
     Multiselect
   },
   mixins: [
+    ApiCapabilitiesMixin,
     DatePickerMixin
   ],
   props: {
@@ -181,22 +185,6 @@ export default {
     value: {
       type: Object,
       default: () => ({})
-    },
-    canFilterExtents: {
-      type: Boolean,
-      default: false
-    },
-    canSort: {
-      type: Boolean,
-      default: false
-    },
-    cql: {
-      type: Object,
-      default: null
-    },
-    collectionOnly: {
-      type: Boolean,
-      default: false
     }
   },
   data() {
@@ -223,7 +211,7 @@ export default {
       ];
     },
     collections() {
-      if (this.hasMoreCollections || this.collectionOnly) {
+      if (this.hasMoreCollections || !this.conformances.Collections) {
         return [];
       }
       return this.apiCollections
@@ -232,6 +220,9 @@ export default {
           text: c.title || c.id
         }))
         .sort((a,b) => a.text.localeCompare(b.text, this.uiLanguage));
+    },
+    sortedQueryables() {
+      return this.queryables.slice(0).sort((a, b) => a.title.localeCompare(b.title));
     }
   },
   watch: {
@@ -256,7 +247,7 @@ export default {
         }).catch(error => console.error(error))
       );
     }
-    if (!this.collectionOnly && this.apiCollections.length === 0) {
+    if (this.conformances.Collections && this.apiCollections.length === 0) {
       promises.push(
         this.$store.dispatch('loadNextApiCollections', {stac: this.root, show: true})
           .catch(error => console.error(error))
@@ -420,6 +411,13 @@ $primary-color: map-get($theme-colors, "primary");
   .multiselect__placeholder {
     color: #999;
     font-size: 16px;
+  }
+}
+
+.queryables {
+  .dropdown-menu {
+    max-height: 90vh;
+    overflow: auto;
   }
 }
 

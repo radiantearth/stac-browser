@@ -120,17 +120,34 @@ export default {
   },
   computed: {
     validation() {
-      if (this.isText && !this.isTemporal) {
+      if (this.queryable.isText && !this.queryable.isTemporal) {
         return {
           minlength: this.schema.minLength,
           maxlength: this.schema.maxLenggth,
           required: this.schema.minLength > 0
         };
       }
-      else if (this.isNumeric) {
+      else if (this.queryable.isNumeric) {
+        let step;
+        if (typeof this.schema.minimum === 'number' && typeof this.schema.maximum === 'number') {
+          let delta = (this.schema.maximum - this.schema.minimum);
+          if (delta <= 0.1) {
+            step = 0.01;
+          }
+          else if (delta <= 1) {
+            step = 0.1;
+          }
+          else if (delta <= 100) {
+            step = 1;
+          }
+          else {
+            step = 10;
+          }
+        }
         return {
           min: this.schema.minimum,
-          max: this.schema.maximum
+          max: this.schema.maximum,
+          step
         };
       }
       return {};
@@ -143,7 +160,7 @@ export default {
     },
     queryableOptions() {
       if (this.queryable.isSelection) {
-        this.queryable.schema.enum.map(option => ({
+        return this.schema.enum.map(option => ({
           value: option,
           text: option
         }));

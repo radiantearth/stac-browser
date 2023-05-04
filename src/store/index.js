@@ -176,6 +176,9 @@ function getStore(config, router) {
         return null;
       },
       supportsConformance: state => classes => {
+        if(!Array.isArray(classes)) {
+          return classes;
+        }
         let classRegexp = classes
           .map(c => c.replaceAll('*', '[^/]+').replace(/\/?#/, '/?#'))
           .join('|');
