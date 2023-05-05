@@ -40,7 +40,7 @@
         <Links v-if="additionalLinks.length > 0" :title="$t('additionalResources')" :links="additionalLinks" />
       </b-col>
       <b-col class="catalogs-container" v-if="hasCatalogs">
-        <Catalogs :catalogs="catalogs" :hasMore="hasMoreCollections" @loadMore="loadMoreCollections" />
+        <Catalogs :catalogs="catalogs" :hasMore="!!nextCollectionsLink" @loadMore="loadMoreCollections" />
       </b-col>
       <b-col class="items-container" v-if="hasItems">
         <Items
@@ -124,8 +124,8 @@ export default {
     };
   },
   computed: {
-    ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination']),
-    ...mapGetters(['additionalLinks', 'catalogs', 'isCollection', 'items', 'hasMoreCollections', 'getApiItemsLoading', 'parentLink', 'rootLink']),
+    ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination', 'nextCollectionsLink']),
+    ...mapGetters(['additionalLinks', 'catalogs', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
     apiItemsLoading() {
       return this.getApiItemsLoading(this.data);
     },

@@ -145,11 +145,11 @@
     "title": "Metadata"
   },
   "multiselect": {
+    "andMore": "and {count} more",
+    "deselectLabel": "Press enter to remove",
     "placeholder": "Select option",
     "selectLabel": "Press enter to select",
-    "selectedLabel": "Selected",
-    "deselectLabel": "Press enter to remove",
-    "andMore": "and {count} more"
+    "selectedLabel": "Selected"
   },
   "open": "Open",
   "pagination": {
@@ -224,6 +224,10 @@
       "title": "Title"
     },
     "spatialExtent": "Spatial Extent",
+    "tabs": {
+      "collections": "Search Collections",
+      "items": "Search Items"
+    },
     "temporalExtent": "Temporal Extent",
     "title": "Search"
   },

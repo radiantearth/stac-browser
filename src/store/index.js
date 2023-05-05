@@ -5,13 +5,14 @@ import axios from "axios";
 import URI from "urijs";
 
 import i18n from '../i18n';
-import { ogcQueryables, stacBrowserSpecialHandling, stacPagination } from "../rels";
+import { ogcQueryables, stacBrowserSpecialHandling } from "../rels";
 import Utils, { schemaMediaType, BrowserError } from '../utils';
 import STAC from '../models/stac';
 import Queryable from '../models/cql2/queryable';
 
 import { addQueryIfNotExists, isAuthenticationError, Loading, processSTAC, proxyUrl, unproxyUrl, stacRequest } from './utils';
 import { getBest } from '../locale-id';
+import { TYPES } from "../components/ApiCapabilitiesMixin";
 
 function getStore(config, router) {
   // Local settings (e.g. for currently loaded STAC entity)
@@ -189,6 +190,16 @@ function getStore(config, router) {
         return Utils.supportsExtension(state.data, schemaUri);
       },
 
+      canSearch: (state, getters) => {
+        return getters.canSearchCollections || getters.canSearchItems;
+      },
+      canSearchItems: (state, getters) => {
+        return getters.supportsConformance(TYPES.Items.BasicFilters);
+      },
+      canSearchCollections: (state, getters) => {
+        return getters.supportsConformance(TYPES.Collections.BasicFilters);
+      },
+
       items: state => {
         if (state.apiItems.length > 0) {
           return state.apiItems;
@@ -212,7 +223,6 @@ function getStore(config, router) {
         }
         return catalogs;
       },
-      hasMoreCollections: state => Boolean(state.nextCollectionsLink),
 
       // hasAsset also checks whether the assets have a href and thus are not item asset definitions
       hasAssets: (state, getters) => Boolean(Object.values(getters.assets).find(asset => Utils.isObject(asset) && typeof asset.href === 'string')),
@@ -548,12 +558,7 @@ function getStore(config, router) {
         }
 
         // Handle pagination links
-        let pageLinks = Utils.getLinksWithRels(data.links, stacPagination);
-        let pages = {};
-        for (let pageLink of pageLinks) {
-          let rel = pageLink.rel === 'previous' ? 'prev' : pageLink.rel;
-          pages[rel] = pageLink;
-        }
+        let pages = Utils.getPaginationLinks(data.links);
 
         if (show) {
           state.apiItemsPagination = pages;
@@ -812,14 +817,7 @@ function getStore(config, router) {
             baseUrl = stac.getAbsoluteUrl();
           }
 
-          if (!Utils.isObject(filters)) {
-            filters = {};
-          }
-          if (typeof filters.limit !== 'number') {
-            filters.limit = cx.state.itemsPerPage;
-          }
-
-          link = Utils.addFiltersToLink(link, filters);
+          link = Utils.addFiltersToLink(link, filters, cx.state.itemsPerPage);
 
           let response = await stacRequest(cx, link);
           if (!Utils.isObject(response.data) || !Array.isArray(response.data.features)) {

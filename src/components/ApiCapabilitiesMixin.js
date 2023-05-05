@@ -15,7 +15,7 @@ import { mapGetters } from "vuex";
 
 export const TYPES = {
   // OGC / STAC API - Features
-  Features: {
+  Items: {
     BasicFilters: [
       'https://api.stacspec.org/v1.*/ogcapi-features',
       'http://www.opengis.net/spec/ogcapi-features-1/1.*/conf/core'
@@ -39,11 +39,17 @@ export const TYPES = {
   },
   // OGC / STAC API - Collections
   Collections: {
-    BasicFilters: [],
+    BasicFilters: [
+      'https://api.stacspec.org/v*/collection-search'
+    ],
     Collections: false,
     Items: false,
-    CqlFilters: [],
-    Sort: []
+    CqlFilters: [
+      'https://api.stacspec.org/v*/collection-search#filter'
+    ],
+    Sort: [
+      'https://api.stacspec.org/v1.0.0-rc.1/collection-search#sort'
+    ]
   }
 };
 

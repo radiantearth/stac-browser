@@ -224,6 +224,10 @@
       "title": "Titel"
     },
     "spatialExtent": "Räumliche Ausdehnung",
+    "tabs": {
+      "collections": "Sammlungen durchsuchen",
+      "items": "Elemente durchsuchen"
+    },
     "temporalExtent": "Zeitliche Ausdehnung",
     "title": "Suche"
   },

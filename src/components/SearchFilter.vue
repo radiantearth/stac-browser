@@ -59,7 +59,7 @@
           </multiselect>
         </b-form-group>
 
-        <div class="additional-filters" v-if="cql && Array.isArray(queryables) && queryables.length > 0">
+        <div class="additional-filters" v-if="showAdditionalFilters">
           <b-form-group :label="$t('search.additionalFilters')" label-for="availableFields">
             <b-form-radio-group id="logical" v-model="filtersAndOr" :options="andOrOptions" name="logical" size="sm" />
 
@@ -84,7 +84,7 @@
           </b-form-group>
         </div>
 
-        <hr>
+        <hr v-if="canFilterExtents || conformances.Collections || conformances.Items || showAdditionalFilters">
 
         <b-form-group v-if="canSort" :label="$t('sort.title')" label-for="sort" :description="$t('search.notFullySupported')">
           <multiselect
@@ -153,7 +153,7 @@ function getDefaults() {
 }
 
 export default {
-  name: 'ItemFilter',
+  name: 'SearchFilter',
   components: {
     BBadge,
     BDropdown,
@@ -189,18 +189,22 @@ export default {
   },
   data() {
     return Object.assign({
+      results: null,
       maxItems: 10000,
       loaded: false
     }, getDefaults());
   },
   computed: {
-    ...mapState(['itemsPerPage', 'uiLanguage', 'queryables', 'apiCollections']),
-    ...mapGetters(['hasMoreCollections', 'root']),
+    ...mapState(['nextCollectionsLink', 'itemsPerPage', 'uiLanguage', 'queryables', 'apiCollections']),
+    ...mapGetters(['root']),
     andOrOptions() {
       return [
         { value: 'and', text: this.$i18n.t('search.logical.and') },
         { value: 'or', text: this.$i18n.t('search.logical.or') },
       ];
+    },
+    showAdditionalFilters() {
+      return this.cql && Array.isArray(this.queryables) && this.queryables.length > 0;
     },
     sortOptions() {
       return [
@@ -211,7 +215,7 @@ export default {
       ];
     },
     collections() {
-      if (this.hasMoreCollections || !this.conformances.Collections) {
+      if (this.nextCollectionsLink || !this.conformances.Collections) {
         return [];
       }
       return this.apiCollections

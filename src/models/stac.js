@@ -145,7 +145,7 @@ class STAC {
   }
 
   getSearchLink() {
-    let links = this.getStacLinksWithRel('search');
+    let links = this.getStacLinksWithRel('search').map(link => Object.assign({}, link, {href: Utils.toAbsolute(link.href, this._url)}));
     // Prefer POST if present
     let post = links.find(link => Utils.hasText(link.method) && link.method.toUpperCase() === 'POST');
     return post || links[0] || null;
