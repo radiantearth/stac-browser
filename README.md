@@ -527,6 +527,7 @@ You can also use one of the existing languages and provide an alternate version 
 
 **Please follow this guide:**
 - Copy the `en` folder (or any other language without a country code that you want to base the translation on).
+  - Note: If you start with the `en` folder, you have to remove the leading `//` from the line `// { fields: require('./fields.json') }` in the file `default.js`.
 - Name the new folder according to [RFC5646](https://www.rfc-editor.org/rfc/rfc5646).
 - Add the language to the list of supported locales ([`supportedLocales`](#supportedlocales)) in the `config.js` file.
 - Add the language to the [list of languages in this README file](#languages).
