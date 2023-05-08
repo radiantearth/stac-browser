@@ -5,7 +5,7 @@
     <b-row v-else>
       <b-col class="left">
         <ItemFilter
-          :stac="parent" title="" :value="filters" v-bind="filterComponentProps"
+          :stac="parent" title="" :value="filters" type="Global"
           @input="setFilters"
         />
       </b-col>
@@ -31,7 +31,6 @@
 import Items from '../components/Items.vue';
 import { mapGetters, mapMutations, mapState } from "vuex";
 import Utils from '../utils';
-import apiCapabilitiesMixinGenerator from '../components/ApiCapabilitiesMixin';
 import ItemFilter from '../components/ItemFilter.vue';
 import Loading from '../components/Loading.vue';
 import STAC from '../models/stac';
@@ -46,9 +45,6 @@ export default {
     Loading,
     Map: () => import('../components/Map.vue')
   },
-  mixins: [
-    apiCapabilitiesMixinGenerator(false)
-  ],
   props: {
     loadParent: {
       type: String,

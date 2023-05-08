@@ -145,8 +145,10 @@ class STAC {
   }
 
   getSearchLink() {
-    // ToDo: Currently, only GET search requests are supported #183
-    return this.getStacLinksWithRel('search').find(link => link.method !== 'POST');
+    let links = this.getStacLinksWithRel('search');
+    // Prefer POST if present
+    let post = links.find(link => Utils.hasText(link.method) && link.method.toUpperCase() === 'POST');
+    return post || links[0] || null;
   }
 
   getApiCollectionsLink() {

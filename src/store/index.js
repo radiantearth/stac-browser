@@ -8,7 +8,7 @@ import i18n from '../i18n';
 import { ogcQueryables, stacBrowserSpecialHandling, stacPagination } from "../rels";
 import Utils, { schemaMediaType, BrowserError } from '../utils';
 import STAC from '../models/stac';
-import Queryable from '../models/queryable';
+import Queryable from '../models/cql2/queryable';
 
 import { addQueryIfNotExists, isAuthenticationError, Loading, processSTAC, proxyUrl, unproxyUrl, stacRequest } from './utils';
 import { getBest } from '../locale-id';
@@ -176,6 +176,9 @@ function getStore(config, router) {
         return null;
       },
       supportsConformance: state => classes => {
+        if(!Array.isArray(classes)) {
+          return classes;
+        }
         let classRegexp = classes
           .map(c => c.replaceAll('*', '[^/]+').replace(/\/?#/, '/?#'))
           .join('|');
@@ -269,11 +272,12 @@ function getStore(config, router) {
         }
       },
       fromBrowserPath: (state, getters) => url => {
+        const externalRE = /^\/(search\/)?external\//;
         if (!Utils.hasText(url) || url === '/') {
           url = state.catalogUrl;
         }
-        else if (url.startsWith('/external/')) {
-          let parts = url.replace(/^\/external\//, '').split('/');
+        else if (url.match(externalRE)) {
+          let parts = url.replace(externalRE, '').split('/');
           let protocol;
           if (!parts[0].endsWith(':')) {
             protocol = 'https:';
@@ -588,7 +592,8 @@ function getStore(config, router) {
       },
       addQueryables(state, queryables) {
         if (Utils.isObject(queryables) && Utils.isObject(queryables.properties)) {
-          state.queryables = Object.keys(queryables.properties).map(key => new Queryable(key, queryables.properties[key]));
+          state.queryables = Object.entries(queryables.properties)
+            .map(([key, schema]) => new Queryable(key, schema));
         }
         else {
           state.queryables = [];
@@ -823,7 +828,7 @@ function getStore(config, router) {
           else {
             response.data.features = response.data.features.map(item => {
               try {
-                if (!Utils.isObject(item)) {
+                if (!Utils.isObject(item) || item.type !== 'Feature') {
                   return null;
                 }
                 let selfLink = Utils.getLinkWithRel(item.links, 'self');
@@ -837,10 +842,10 @@ function getStore(config, router) {
                     url = Utils.toAbsolute(`items/${item.id}`, baseUrl);
                   }
                   else if (apiCollectionsLink) {
-                    url = Utils.toAbsolute(`${stac.id}/items/${item.id}`, apiCollectionsLink.href);
+                    url = Utils.toAbsolute(`${collectionId}/items/${item.id}`, apiCollectionsLink.href);
                   }
                   else if (cx.state.catalogUrl) {
-                    url = Utils.toAbsolute(`collections/${stac.id}/items/${item.id}`, cx.state.catalogUrl);
+                    url = Utils.toAbsolute(`collections/${collectionId}/items/${item.id}`, cx.state.catalogUrl);
                   }
                   else {
                     return null;

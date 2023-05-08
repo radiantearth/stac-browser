@@ -8,7 +8,7 @@ implemented as a single page application (SPA) for ease of development and to
 limit the overall number of catalog reads necessary when browsing (as catalogs
 may be nested and do not necessarily contain references to their parents).
 
-Version: **3.0.0** (supports all STAC versions between 0.6.0 and 1.0.0)
+Version: **3.0.1** (supports all STAC versions between 0.6.0 and 1.0.0)
 
 This package has also been published to npm as [`@radiantearth/stac-browser`](https://www.npmjs.com/package/@radiantearth/stac-browser).
 
@@ -527,6 +527,7 @@ You can also use one of the existing languages and provide an alternate version 
 
 **Please follow this guide:**
 - Copy the `en` folder (or any other language without a country code that you want to base the translation on).
+  - Note: If you start with the `en` folder, you have to remove the leading `//` from the line `// { fields: require('./fields.json') }` in the file `default.js`.
 - Name the new folder according to [RFC5646](https://www.rfc-editor.org/rfc/rfc5646).
 - Add the language to the list of supported locales ([`supportedLocales`](#supportedlocales)) in the `config.js` file.
 - Add the language to the [list of languages in this README file](#languages).
