@@ -34,7 +34,10 @@ export default {
             right: this.isList,
             blankColor: "rgba(0, 0, 0, 0.125)",
             width,
-            height
+            height,
+            // for b-card-img-lazy
+            "blank-width": width,
+            "blank-height": height
           };
         }
       }
