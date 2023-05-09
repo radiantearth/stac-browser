@@ -144,6 +144,7 @@ export default {
         height: 100%;
         max-height: 8.5rem;
         max-width: 33%;
+        object-fit: cover;
       }
 
       .intro {
