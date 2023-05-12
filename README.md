@@ -141,7 +141,9 @@ Some of them can also be set [through the root catalog](#customize-through-root-
 
 The URL of the catalog to show by default.
 
-This is usually a URL provided as string, but in the config file you can also provide a function without parameters that returns the URL, e.g. `() => window.origin.toString().replace(/\/?$/, '/')`.s
+The URL provided here **must** match exactly with the `href` that is provided as `self` link in the response body of the URL.
+
+This is usually a URL provided as string, but in the config file you can also provide a function without parameters that returns the URL, e.g. `() => window.origin.toString().replace(/\/?$/, '/')`.
 
 If `catalogUrl` is empty or set to `null` STAC Browser switches to a mode where it defaults to a screen where you can either insert a catalog URL or select a catalog from [stacindex.org](https://stacindex.org).
 
