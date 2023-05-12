@@ -104,6 +104,9 @@ export default {
         else {
           href = this.toBrowserPath(this.link.href);
         }
+        if (!href.startsWith('/')) {
+          href = '/' + href;
+        }
 
         // Add private query parameters to links: https://github.com/radiantearth/stac-browser/issues/142
         if (Utils.size(this.privateQueryParameters) > 0) {
