@@ -107,7 +107,7 @@ export default {
 
         // Add private query parameters to links: https://github.com/radiantearth/stac-browser/issues/142
         if (Utils.size(this.privateQueryParameters) > 0) {
-          let uri = new URI(href);
+          let uri = URI(href);
           for(let key in this.privateQueryParameters) {
             let queryKey = `~${key}`;
             if (!uri.hasQuery(queryKey)) {

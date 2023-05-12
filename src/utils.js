@@ -269,7 +269,7 @@ export default class Utils {
     }
     else { // GET
       // Construct new link with search params
-      let url = new URI(link.href);
+      let url = URI(link.href);
 
       for (let key in filters) {
         let value = filters[key];
@@ -332,7 +332,7 @@ export default class Utils {
     if (typeof img.href !== 'string') {
       return false;
     }
-    let uri = new URI(img.href);
+    let uri = URI(img.href);
     let protocol = uri.protocol().toLowerCase();
     if (protocol && !browserProtocols.includes(protocol)) {
       return false;
