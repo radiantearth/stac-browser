@@ -89,7 +89,7 @@ export default {
       }
     },
     isExternal() {
-      return Utils.urlType(this.path, "absolute");
+      return URI(this.path).is("absolute");
     }
   },
   watch: {
