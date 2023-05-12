@@ -160,6 +160,7 @@ Must be set to `true` if a `catalogUrl` is not given as otherwise you won't be a
 #### allowedDomains
 
 You can list additional domains (e.g. `example.com`) that private data is sent to, e.g. authentication data.
+This applies to query paramaters and request headers.
 
 #### apiCatalogPriority
 
@@ -332,6 +333,7 @@ The value for the [`crossorigin` attribute](https://developer.mozilla.org/en-US/
 ***experimental***
 
 The headers given in this option are added to all requests that are sent to the selected STAC catalog or API.
+This is affected by [`allowedDomains`](#alloweddomains).
 
 Example: `{'Authorization': 'Bearer 134567984623223'}` adds a Bearer token to the HTTP headers.
 
@@ -342,6 +344,7 @@ Please note that this option can only be provided through a config file and is n
 ***experimental***
 
 The query parameters given in this option are added to all requests that are sent to the selected STAC catalog or API.
+This is affected by [`allowedDomains`](#alloweddomains).
 
 Example: `{'f': 'json'}` adds a `f` query parameter to the HTTP URL, e.g. `https://example.com?f=json`.
 
@@ -352,7 +355,7 @@ Please note that this option can only be provided through a config file and is n
 ***experimental***
 
 This allows to enable a simple authentication form where a user can input a token, an API key or similar things.
-It is disabled by default (`null`). If enabled, the token provided by the user can be used in the HTTP headers or in the query parameters of the requests.
+It is disabled by default (`null`). If enabled, the token provided by the user can be used in the HTTP headers or in the query parameters of the requests. This option is affected by [`allowedDomains`](#alloweddomains).
 
 There are four options you can set in the `authConfig` object:
 
