@@ -88,7 +88,7 @@ you can usually migrate easily.
 
 The old environment variables should be transitions out of usage. Instead please use the config file or CLI parameters.
 The names of the variables have slightly changed:
-* `CATALOG_URL` => `catalogUrl` (make sure to append a `/` at the end of folders / API endpoints)
+* `CATALOG_URL` => `catalogUrl`
 * `STAC_PROXY_URL` => `stacProxyUrl` (same in CLI, different format in the config file)
 * `TILE_PROXY_URL` / `TILE_SOURCE_TEMPLATE` => `buildTileUrlTemplate` (this is not a 1:1 replacement, make sure to read the documentation for `buildTileUrlTemplate`)
 * `PATH_PREFIX` => `pathPrefix`
@@ -141,9 +141,9 @@ Some of them can also be set [through the root catalog](#customize-through-root-
 
 The URL of the catalog to show by default.
 
-This is usually a URL provided as string, but in the config file you can also provide a function without parameters that returns the URL, e.g. `() => window.origin.toString().replace(/\/?$/, '/')`.
+The URL provided here **must** match exactly with the `href` that is provided as `self` link in the response body of the URL.
 
-If you don't point to a specific file make sure to append a `/` at the end of the URL as the trailing slash is significant. Without it, the last path component is considered to be a "file" name to be removed to get at the "directory" that is used as the base for resolving relative URLs. You should also make sure that your STAC files are following this rule as otherwise you may still run into issues with STAC Browser.
+This is usually a URL provided as string, but in the config file you can also provide a function without parameters that returns the URL, e.g. `() => window.origin.toString().replace(/\/?$/, '/')`.
 
 If `catalogUrl` is empty or set to `null` STAC Browser switches to a mode where it defaults to a screen where you can either insert a catalog URL or select a catalog from [stacindex.org](https://stacindex.org).
 
