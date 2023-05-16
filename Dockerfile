@@ -1,19 +1,9 @@
-FROM node:lts-alpine
-
-ARG catalogURL
-
-RUN npm install -g serve
-
-WORKDIR /app
-
-COPY package*.json ./
-
+FROM node:16 as build-step
+WORKDIR /usr/src/app
+COPY package.json .
+COPY package-lock.json .
+COPY .npmignore .
 RUN npm install
-
 COPY . .
-
-RUN npm run build -- --catalogUrl=$catalogURL
-
 EXPOSE 8080
-
-CMD [ "serve", "-s", "dist", "-l", "8080" ]
+CMD ["npm","start","--"]
