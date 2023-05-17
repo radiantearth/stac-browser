@@ -1,8 +1,5 @@
-let catalogUrl = process.env.VUE_APP_CATALOG_URL;
-let headerValueForApim = process.env.VUE_APP_HEADER_VALUE_FOR_APIM;
-
 module.exports = {
-    catalogUrl: catalogUrl, // Must have a slash at the end for folders/APIs
+    catalogUrl: null,
     catalogTitle: "STAC Browser",
     allowExternalAccess: true, // Must be true if catalogUrl is not given
     allowedDomains: [],
@@ -39,9 +36,8 @@ module.exports = {
     defaultThumbnailSize: null,
     maxPreviewsOnMap: 50,
     crossOriginMedia: null,
-    requestHeaders: {
-        'Ocp-Apim-Subscription-Key': headerValueForApim
-    },
+    requestHeaders: {},
     requestQueryParameters: {},
     preprocessSTAC: null,
+    authConfig: null
 };
