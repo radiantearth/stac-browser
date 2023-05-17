@@ -13,6 +13,7 @@ on:
 jobs:
   docker-build-push-dev:
     runs-on: ubuntu-latest
+    environment: STAGING_ENVIRONMENT
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -38,3 +39,5 @@ jobs:
           cache-to: type=registry,ref=${{ secrets.EO_PROJ_STAGING_DOCKER_REGISTRY_URL }}/stac-browser:cache,mode=max
           push: true
           tags: ${{ secrets.EO_PROJ_STAGING_DOCKER_REGISTRY_URL }}/stac-browser:${{ env.SHORT_SHA }}
+          build-args: |
+            catalog_url = ${{ secrets.STAC_BROWSER_CATALOG_URL }}
