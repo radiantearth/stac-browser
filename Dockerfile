@@ -6,7 +6,9 @@ COPY package.json .
 COPY .npmignore .
 RUN npm install
 COPY . .
-ENV VUE_APP_ENABLE_AUTH=1
+# currently the env variable is not used, but it will be used in the future
+ENV VUE_APP_ENABLE_AUTH=1 
+RUN echo "Building with catalog_url: ${catalog_url}"
 RUN npm run build -- --catalogUrl=${catalog_url}
 RUN pwd
 
