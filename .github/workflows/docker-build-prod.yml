@@ -38,3 +38,5 @@ jobs:
           cache-to: type=registry,ref=${{ secrets.EO_PROJ_PROD_DOCKER_REGISTRY_URL }}/stac-browser:cache,mode=max
           push: true
           tags: ${{ secrets.EO_PROJ_PROD_DOCKER_REGISTRY_URL }}/stac-browser:${{ env.SHORT_SHA }}
+          build-args: |
+            catalog_url = ${{ secrets.STAC_BROWSER_CATALOG_URL }}
