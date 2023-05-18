@@ -7,6 +7,7 @@
     "STAC_BROWSER_VERSION": "readonly",
     "CONFIG_PATH": "readonly",
     "CONFIG_CLI": "readonly",
+    "VUE_APP_ENABLE_AUTH": "readonly",
     "require": "readonly"
   },
   "extends": [

@@ -40,6 +40,7 @@ const config = {
       args[0].STAC_BROWSER_VERSION = JSON.stringify(pkgFile.version);
       args[0].CONFIG_PATH = JSON.stringify(configFile);
       args[0].CONFIG_CLI = JSON.stringify(argv);
+      args[0].VUE_APP_ENABLE_AUTH = JSON.stringify(process.env.NODE_ENV === 'production');
       return args;
     });
     webpackConfig.plugin('html').tap(args => {
