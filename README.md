@@ -31,6 +31,7 @@ certain *OGC API - Records* and *OGC API - Features* compliant servers.
 - [Docker](#docker)
 - [Contributing](#contributing)
   - [Adding a new language](#adding-a-new-language)
+- [Sponsors](#sponsors)
 
 ## Examples
 
@@ -593,3 +594,13 @@ You can also use one of the existing languages and provide an alternate version 
 - Adapt the `datepicker.js` and `duration.js` files to import the existing definitions from their corresponding external packages, but you could also define the specifics yourself.
 - Check that your translation works by running the development server (`npm start`) and navigating to the STAC Browser instance in your browser (usually `http://localhost:8080`).
 - Once completed, please open a pull request and we'll get back to you as soon as possible.
+
+# Sponsors
+
+The following sponsors have provided a subststantial amount of funding for STAC Browser in the past:
+
+- [Radiant Earth](https://radiant.earth) (base funding for versions 1, 2 and 3)
+- [National Resources Canada](https://natural-resources.canada.ca/home) (multi-language support, maintenance)
+- [Matthias Mohr - Softwareentwicklung](https://mohr.ws) (maintenance)
+- [Spacebel](https://spacebel.com) (collection search)
+- [Planet](https://planet.com) (OpenID Connect authentication, other features, maintenance)
