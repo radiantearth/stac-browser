@@ -7,3 +7,5 @@ import { Registry } from '@radiantearth/stac-fields';
 //     label: "Data Access",
 //     formatter: value => value ? "Public" : "Private"
 // });
+
+Registry.addExtension('osc', 'Open Science Catalog');
