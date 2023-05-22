@@ -16,7 +16,7 @@ module.exports = {
     stacProxyUrl: null,
     pathPrefix: "/",
     historyMode: "history",
-    cardViewMode: "cards",
+    cardViewMode: "list",
     showThumbnailsAsAssets: false,
     stacLint: true,
     geoTiffResolution: 128,
