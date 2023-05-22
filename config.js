@@ -7,7 +7,9 @@ module.exports = {
     storeLocale: false,
     locale: "en",
     fallbackLocale: "en",
-    supportedLocales: [],
+    supportedLocales: [
+      "en"
+    ],
     apiCatalogPriority: null,
     useTileLayerAsFallback: true,
     tileSourceTemplate: null,
