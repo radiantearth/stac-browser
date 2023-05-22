@@ -19,6 +19,9 @@ export async function stacRequest(cx, link) {
   if (Utils.isObject(link)) {
     let method = typeof link.method === 'string' ? link.method.toLowerCase() : 'get';
     let url = cx.getters.getRequestUrl(link.href);
+    if (Utils.hasText(link.type)) {
+      headers.Accept = link.type;
+    }
     if (!cx.getters.isExternalUrl(url)) {
       Object.assign(headers, cx.state.requestHeaders);
     }
