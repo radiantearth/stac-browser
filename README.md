@@ -25,8 +25,9 @@ certain *OGC API - Records* and *OGC API - Features* compliant servers.
   - [Languages](#languages)
   - [Themes](#themes)
   - [Basemaps](#basemaps)
+  - [Additional metadata fields](#additional-metadata-fields)
   - [Customize through root catalog](#customize-through-root-catalog)
-  - [Custom fields](#custom-fields)
+  - [Custom extensions](#custom-extensions)
 - [Docker](#docker)
 - [Contributing](#contributing)
   - [Adding a new language](#adding-a-new-language)
@@ -34,8 +35,6 @@ certain *OGC API - Records* and *OGC API - Features* compliant servers.
 ## Examples
 
 A demo instance is running at <https://radiantearth.github.io/stac-browser/>.
-
-An irregularly updated version of a deployment for a specific STAC API can be found at <https://mspc.lutana.de>.
 
 The catalog section of [STAC Index](https://stacindex.org) is also built on top of STAC Browser (currently v2).
 
@@ -88,7 +87,7 @@ you can usually migrate easily.
 
 The old environment variables should be transitions out of usage. Instead please use the config file or CLI parameters.
 The names of the variables have slightly changed:
-* `CATALOG_URL` => `catalogUrl` (make sure to append a `/` at the end of folders / API endpoints)
+* `CATALOG_URL` => `catalogUrl`
 * `STAC_PROXY_URL` => `stacProxyUrl` (same in CLI, different format in the config file)
 * `TILE_PROXY_URL` / `TILE_SOURCE_TEMPLATE` => `buildTileUrlTemplate` (this is not a 1:1 replacement, make sure to read the documentation for `buildTileUrlTemplate`)
 * `PATH_PREFIX` => `pathPrefix`
@@ -141,9 +140,9 @@ Some of them can also be set [through the root catalog](#customize-through-root-
 
 The URL of the catalog to show by default.
 
-This is usually a URL provided as string, but in the config file you can also provide a function without parameters that returns the URL, e.g. `() => window.origin.toString().replace(/\/?$/, '/')`.
+The URL provided here **must** match exactly with the `href` that is provided as `self` link in the response body of the URL.
 
-If you don't point to a specific file make sure to append a `/` at the end of the URL as the trailing slash is significant. Without it, the last path component is considered to be a "file" name to be removed to get at the "directory" that is used as the base for resolving relative URLs. You should also make sure that your STAC files are following this rule as otherwise you may still run into issues with STAC Browser.
+This is usually a URL provided as string, but in the config file you can also provide a function without parameters that returns the URL, e.g. `() => window.origin.toString().replace(/\/?$/, '/')`.
 
 If `catalogUrl` is empty or set to `null` STAC Browser switches to a mode where it defaults to a screen where you can either insert a catalog URL or select a catalog from [stacindex.org](https://stacindex.org).
 
@@ -160,6 +159,7 @@ Must be set to `true` if a `catalogUrl` is not given as otherwise you won't be a
 #### allowedDomains
 
 You can list additional domains (e.g. `example.com`) that private data is sent to, e.g. authentication data.
+This applies to query paramaters and request headers.
 
 #### apiCatalogPriority
 
@@ -332,6 +332,7 @@ The value for the [`crossorigin` attribute](https://developer.mozilla.org/en-US/
 ***experimental***
 
 The headers given in this option are added to all requests that are sent to the selected STAC catalog or API.
+This is affected by [`allowedDomains`](#alloweddomains).
 
 Example: `{'Authorization': 'Bearer 134567984623223'}` adds a Bearer token to the HTTP headers.
 
@@ -342,6 +343,7 @@ Please note that this option can only be provided through a config file and is n
 ***experimental***
 
 The query parameters given in this option are added to all requests that are sent to the selected STAC catalog or API.
+This is affected by [`allowedDomains`](#alloweddomains).
 
 Example: `{'f': 'json'}` adds a `f` query parameter to the HTTP URL, e.g. `https://example.com?f=json`.
 
@@ -352,7 +354,7 @@ Please note that this option can only be provided through a config file and is n
 ***experimental***
 
 This allows to enable a simple authentication form where a user can input a token, an API key or similar things.
-It is disabled by default (`null`). If enabled, the token provided by the user can be used in the HTTP headers or in the query parameters of the requests.
+It is disabled by default (`null`). If enabled, the token provided by the user can be used in the HTTP headers or in the query parameters of the requests. This option is affected by [`allowedDomains`](#alloweddomains).
 
 There are four options you can set in the `authConfig` object:
 
@@ -435,7 +437,7 @@ To add your own language, please follow the guide below: [Adding a new langauge]
 
 #### Custom phrases
 You can define custom phrases in the `custom.json`.
-This is especially useful for phrases that are coming from non-standadized metadata fields.
+This is especially useful for phrases that are coming from non-standadized metadata fields (see the chapter "[Additional metadata fields](#additional-metadata-fields)").
 If you've found metadata labels (e.g. "Price" and "Generation Time") that are not translated,
 you can add it to the `custom.json`. For metadata fields you need to add it to a the object `fields`
 as it is the group for the metadata-related phrases.
@@ -467,6 +469,59 @@ The file `basemaps.config.js` contains the configuration for the basemaps.
 You can update either just the `BASEMAPS` object or you can write a custom function `configureBasemap` that returns the desired options for [vue2-leaflet](https://vue2-leaflet.netlify.app/).
 [XYZ](https://vue2-leaflet.netlify.app/components/LTileLayer.html#props) and [WMS](https://vue2-leaflet.netlify.app/components/LWMSTileLayer.html#props) basemaps are supported and have different options that you can set.
 
+### Additional metadata fields
+
+The metadata that STAC Browser renders is rendered primarily through the library [`stac-fields`](https://www.npmjs.com/package/@radiantearth/stac-fields).
+It contains a lot of rules for rendering [many existing STAC extensions](https://github.com/stac-utils/stac-fields/blob/main/fields.json) nicely. 
+Nevertheless, if you use custom extensions to the STAC specification you may want to register your own rendering rules for the new fields.
+This can be accomplished by customizing the file [`fields.config.js`](./fields.config.js).
+It uses the [Registry](https://github.com/stac-utils/stac-fields/blob/main/README.md#registry) defined in stac-fields to add more extensions and fields to stac-fields and STAC Browser.
+
+To add your own fields, please consult the documentation for the [Registry](https://github.com/stac-utils/stac-fields/blob/main/README.md#registry).
+
+#### Example
+If you have a custom extension with the title "Radiant Earth" that uses the prefix `radiant:` you can add the extension as such:
+
+```js
+Registry.addExtension('radiant', 'Radiant Earth');
+```
+
+If this extension has a boolean field `radiant:public_access` that describes whether an entity can be accessed publicly or not, this could be described as follows:
+
+```js
+Registry.addMetadataField('radiant:public_access', {
+  label: "Data Access",
+  formatter: value => value ? "Public" : "Private"
+});
+```
+
+This displays the field (with a value of `true`) in STAC Browser as follows: `Data Access: Public`.
+
+The first parameter is the field name, the second parameter describes the field using a ["field specification"](https://github.com/stac-utils/stac-fields/blob/main/README.md#fieldsjson).
+Please check the field specification for available options.
+
+#### Translation
+
+STAC Browser supports [multiple languages](#languages).
+If you use more than one language, you likely want to also translate the phrases that you've added above (in the example `Data Access`, `Public` and `Private`, assuming that `Radiant Earth` is a name and doesn't need to be translated).
+All new phrases should be added to the [active languages](#supportedlocales).
+To add the phrases mentioned above you need to go through the folders in `src/locales` and in the folders of the active languages update the file `custom.json` as described in the section that describes [adding custom phrases](#custom-phrases).
+All new phrases must be added to the property `fields`.
+
+Below you can find an example of an updated `custom.json` for the German language (folder `de`). It also includes the `authConfig`, which is contained in the file by default for [other purposes](#authconfig).
+```
+{
+  "authConfig": {
+    "description": ""
+  },
+  "fields": {
+    "Data Access": "Zugriff auf die Daten",
+    "Public": "Öffentlich",
+    "Private": "Privat"
+  }
+}
+```
+
 ### Customize through root catalog
 
 You can also provide a couple of the config options through the root catalog. 
@@ -480,9 +535,9 @@ You need to provide a field `stac_browser` and then you can set any of the follo
 - `showThumbnailsAsAssets`
 - `stacLint` (can only be disabled)
 
-### Custom fields
+### Custom extensions
 
-STAC Browser supports some non-standardized fields that you can use to improve the user-experience.
+STAC Browser supports some non-standardized extensions to the STAC specification that you can use to improve the user-experience.
 
 1. To the [Provider Object](https://github.com/radiantearth/stac-spec/blob/master/collection-spec/collection-spec.md#provider-object) you can add an `email` (or `mail`) field with an e-mail address and the mail will be shown in the Browser, too.
 2. A link with relation type `icon` and a Browser-supported media type in any STAC entity will show an icon in the header and the lists.

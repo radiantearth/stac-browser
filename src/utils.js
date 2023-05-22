@@ -113,11 +113,6 @@ export default class Utils {
     return (typeof string === 'string' && string.length > 0);
   }
 
-  static urlType(url, type) {
-    let uri = URI(url);
-    return uri.is(type);
-  }
-
   static isGdalVfsUri(url) {
     return typeof url === 'string' && url.startsWith('/vsi') && !url.startsWith('/vsicurl/');
   }
@@ -133,17 +128,10 @@ export default class Utils {
     }
     // Parse URL and make absolute, if required
     let uri = URI(href);
-    if (baseUrl && uri.is("relative") && !Utils.isGdalVfsUri(href)) { // Don't convert GDAL VFS URIs: https://github.com/radiantearth/stac-browser/issues/116
-      // Avoid that baseUrls that have a . in the last parth part will be removed (e.g. https://example.com/api/v1.0 )
-      let baseUri = URI(baseUrl);
-      let baseUriPath = baseUri.path();
-      if (!baseUriPath.endsWith('/') && !baseUriPath.endsWith('.json')) {
-        baseUri.path(baseUriPath + '/');
-      }
-      uri = uri.absoluteTo(baseUri);
+    // Don't convert GDAL VFS URIs: https://github.com/radiantearth/stac-browser/issues/116
+    if (baseUrl && uri.is("relative") && !Utils.isGdalVfsUri(href)) {
+      uri = uri.absoluteTo(baseUrl);
     }
-    // Normalize URL and remove trailing slash from path
-    // to avoid handling the same resource twice
     uri.normalize();
     if (noParams) {
       uri.query("");
@@ -269,7 +257,7 @@ export default class Utils {
     }
     else { // GET
       // Construct new link with search params
-      let url = new URI(link.href);
+      let url = URI(link.href);
 
       for (let key in filters) {
         let value = filters[key];
@@ -332,7 +320,7 @@ export default class Utils {
     if (typeof img.href !== 'string') {
       return false;
     }
-    let uri = new URI(img.href);
+    let uri = URI(img.href);
     let protocol = uri.protocol().toLowerCase();
     if (protocol && !browserProtocols.includes(protocol)) {
       return false;

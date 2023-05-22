@@ -353,7 +353,7 @@ export default {
     parseQuery(route) {
       let privateFromHash = {};
       if (this.historyMode === 'history') {
-        let uri = new URI(route.hash.replace(/^#/, ''));
+        let uri = URI(route.hash.replace(/^#/, ''));
         privateFromHash = uri.query(true);
       }
       let query = Object.assign({}, route.query, privateFromHash);

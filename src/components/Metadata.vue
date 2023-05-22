@@ -12,6 +12,9 @@ import { formatAsset, formatCollection, formatGrouped, formatItemProperties, for
 import MetadataGroup from './metadata/MetadataGroup.vue';
 import { isoDuration } from '@musement/iso-duration';
 import { mapState } from 'vuex';
+// Register custom fields for the metadata rendering
+// eslint-disable-next-line
+import __ from '../../fields.config';
 
 export default {
     name: "Metadata",

@@ -253,7 +253,7 @@ function getStore(config, router) {
           if (!state.allowExternalAccess) {
             return absolute.toString();
           }
-          let parts = ['/external'];
+          let parts = ['/external/'];
           let protocol = absolute.protocol();
           if (protocol !== 'https') {
             parts.push(protocol + ':');
@@ -268,7 +268,7 @@ function getStore(config, router) {
           return path;
         }
         else {
-          return '/' + relative;
+          return '/' + relative.toString();
         }
       },
       fromBrowserPath: (state, getters) => url => {
@@ -297,7 +297,7 @@ function getStore(config, router) {
           return false;
         }
         if (!(absoluteUrl instanceof URI)) {
-          absoluteUrl = new URI(absoluteUrl);
+          absoluteUrl = URI(absoluteUrl);
         }
         if (whitelist && Array.isArray(state.allowedDomains) && state.allowedDomains.includes(absoluteUrl.domain())) {
           return false;
@@ -983,7 +983,7 @@ function getStore(config, router) {
           return;
         }
         try {
-          let uri = new URI('https://api.staclint.com/url');
+          let uri = URI('https://api.staclint.com/url');
           uri.addSearch('stac_url', url);
           let response = await axios.get(uri.toString());
           cx.commit('valid', Boolean(response.data?.body?.valid_stac));
