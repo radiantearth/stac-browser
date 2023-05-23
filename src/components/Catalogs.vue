@@ -51,7 +51,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['uiLanguage']),
+    ...mapState(['cardViewSort', 'uiLanguage']),
     ...mapGetters(['getStac']),
     hasMultiple() {
       return !this.hasMore && this.catalogs.length > 1;
@@ -89,6 +89,9 @@ export default {
       }
       return catalogs;
     }
+  },
+  created() {
+    this.sort = this.cardViewSort;
   },
   methods: {
     loadMore(visible = true) {

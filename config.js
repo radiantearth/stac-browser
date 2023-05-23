@@ -28,6 +28,7 @@ module.exports = {
     pathPrefix: "/",
     historyMode: "history",
     cardViewMode: "cards",
+    cardViewSort: "asc",
     showThumbnailsAsAssets: false,
     stacLint: true,
     geoTiffResolution: 128,
