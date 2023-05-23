@@ -5,10 +5,9 @@ import axios from "axios";
 import URI from "urijs";
 
 import i18n from '../i18n';
-import { ogcQueryables, stacBrowserSpecialHandling } from "../rels";
-import Utils, { schemaMediaType, BrowserError } from '../utils';
+import { stacBrowserSpecialHandling } from "../rels";
+import Utils, { BrowserError } from '../utils';
 import STAC from '../models/stac';
-import Queryable from '../models/cql2/queryable';
 
 import { addQueryIfNotExists, isAuthenticationError, Loading, processSTAC, proxyUrl, unproxyUrl, stacRequest } from './utils';
 import { getBest } from '../locale-id';
@@ -34,9 +33,7 @@ function getStore(config, router) {
 
     apiItems: [],
     apiItemsLink: null,
-    apiItemsPagination: {},
-
-    queryables: null
+    apiItemsPagination: {}
   });
 
   const catalogDefaults = () => ({
@@ -594,15 +591,6 @@ function getStore(config, router) {
       showGlobalError(state, error) {
         console.error(error);
         state.globalError = error;
-      },
-      addQueryables(state, queryables) {
-        if (Utils.isObject(queryables) && Utils.isObject(queryables.properties)) {
-          state.queryables = Object.entries(queryables.properties)
-            .map(([key, schema]) => new Queryable(key, schema));
-        }
-        else {
-          state.queryables = [];
-        }
       }
     },
     actions: {
@@ -930,26 +918,6 @@ function getStore(config, router) {
         if (Utils.isObject(response.data) && Array.isArray(response.data.conformsTo)) {
           cx.commit('setConformanceClasses', response.data.conformsTo);
         }
-      },
-      async loadQueryables(cx, { stac, refParser = null }) {
-        let schemas;
-        try {
-          let link = stac.getLinksWithRels(ogcQueryables)
-            .find(link => Utils.isMediaType(link.type, schemaMediaType, true));
-          let href = Utils.isObject(link) ? link.href : Utils.toAbsolute('queryables', stac.getAbsoluteUrl());
-          let response = await stacRequest(cx, href);
-          schemas = response.data; // Use data with $refs included as fallback anyway
-          if (refParser) {
-            try {
-              schemas = await refParser.dereference(schemas);
-            } catch (error) {
-              console.error(error);
-            }
-          }
-        } catch (error) {
-          console.log('Queryables not supported by API');
-        }
-        cx.commit('addQueryables', schemas);
       },
       async loadGeoJson(cx, link) {
         try {

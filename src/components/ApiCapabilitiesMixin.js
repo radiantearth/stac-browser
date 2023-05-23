@@ -20,8 +20,8 @@ export const TYPES = {
       'https://api.stacspec.org/v1.*/ogcapi-features',
       'http://www.opengis.net/spec/ogcapi-features-1/1.*/conf/core'
     ],
-    Collections: false,
-    Items: false,
+    CollectionIdFilter: false,
+    ItemIdFilter: false,
     // It seems some conformance classes use conf (correct) and some req (deprecated?) after the version number
     CqlFilters: ['http://www.opengis.net/spec/ogcapi-features-3/1.*/*/features-filter'],
     Sort: [
@@ -32,8 +32,8 @@ export const TYPES = {
   // STAC API - Item Search
   Global:  {
     BasicFilters: true,
-    Collections: true,
-    Items: true,
+    CollectionIdFilter: true,
+    ItemIdFilter: true,
     CqlFilters: ['https://api.stacspec.org/v1.*/item-search#filter'],
     Sort: ['https://api.stacspec.org/v1.*/item-search#sort']
   },
@@ -42,8 +42,8 @@ export const TYPES = {
     BasicFilters: [
       'https://api.stacspec.org/v*/collection-search'
     ],
-    Collections: false,
-    Items: false,
+    CollectionIdFilter: false,
+    ItemIdFilter: false,
     CqlFilters: [
       'https://api.stacspec.org/v*/collection-search#filter'
     ],

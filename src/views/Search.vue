@@ -7,13 +7,13 @@
         <b-tabs v-model="activeSearch">
           <b-tab v-if="canSearchCollections" :title="$t('search.tabs.collections')">
             <SearchFilter
-              :stac="parent" title="" :value="collectionFilters" type="Collections"
+              :parent="parent" title="" :value="collectionFilters" type="Collections"
               @input="setFilters"
             />
           </b-tab>
           <b-tab v-if="canSearchItems" :title="$t('search.tabs.items')">
             <SearchFilter
-              :stac="parent" title="" :value="itemFilters" type="Global"
+              :parent="parent" title="" :value="itemFilters" type="Global"
               @input="setFilters"
             />
           </b-tab>
@@ -26,7 +26,7 @@
         <b-alert v-else-if="results.length === 0" variant="warning" show>{{ $t('search.noItemsFound') }}</b-alert>
         <template v-else>
           <div id="search-map" v-if="itemCollection">
-            <Map :stac="parent" :stacLayerData="itemCollection" scrollWheelZoom popover />
+            <Map :stac="stac" :stacLayerData="itemCollection" scrollWheelZoom popover />
           </div>
           <Catalogs
             v-if="isCollectionSearch" :catalogs="results"
@@ -34,7 +34,7 @@
           />
           <Items
             v-else
-            :stac="parent" :items="results" :api="true" :allowFilter="false"
+            :stac="stac" :items="results" :api="true" :allowFilter="false"
             :pagination="pagination" :loading="loading" @paginate="loadResults"
           />
         </template>
@@ -86,6 +86,12 @@ export default {
   computed: {
     ...mapState(['catalogUrl', 'catalogTitle', 'itemsPerPage']),
     ...mapGetters(['canSearchItems', 'canSearchCollections', 'getStac', 'root', 'collectionLink', 'parentLink', 'fromBrowserPath', 'toBrowserPath']),
+    stac() {
+      if (this.parent instanceof STAC) {
+        return this.parent;
+      }
+      return null;
+    },
     searchLink() {
       return this.isCollectionSearch ? this.collectionSearchLink : this.itemSearchLink;
     },
@@ -106,11 +112,14 @@ export default {
       };
     },
     results() {
-      if (!this.data) {
+      if (!Utils.isObject(this.data)) {
         return [];
       }
       let list = this.isCollectionSearch ? this.data.collections : this.data.features;
       let type = this.isCollectionSearch ? 'Collection' : 'Feature';
+      if (!Array.isArray(list)) {
+        return [];
+      }
       return list
         .map(obj => {
           try {

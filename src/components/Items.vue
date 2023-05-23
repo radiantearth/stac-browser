@@ -14,7 +14,7 @@
       <b-collapse id="itemFilter" v-model="filtersOpen">
         <SearchFilter
           v-if="filtersOpen" type="Items"
-          :title="$t('items.filter')" :stac="stac"
+          :title="$t('items.filter')" :parent="stac"
           :value="apiFilters" @input="emitFilter"
         />
       </b-collapse>
