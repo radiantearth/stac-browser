@@ -1,7 +1,7 @@
 <template>
   <ul class="tree" v-b-visible="load">
     <li>
-      <b-button v-if="pagination" size="sm" variant="light" :disabled="true">
+      <b-button v-if="pagination" size="sm" variant="light" disabled>
         <b-icon-three-dots />
       </b-button>
       <template v-else-if="mayHaveChildren">
@@ -10,11 +10,11 @@
           <b-icon-folder-plus v-else />
         </b-button>
       </template>
-      <b-button v-else size="sm" variant="light" :disabled="true">
+      <b-button v-else size="sm" variant="light" :to="to">
         <b-icon-file-earmark-richtext />
       </b-button>
       
-      <b-button size="sm" variant="light" :class="{path: onPath || active}" :disabled="active || !to" :to="to">
+      <b-button size="sm" variant="light" :class="{path: onPath || active}" :disabled="!to && !active" :to="to" @click="onClick">
         {{ title }}
       </b-button>
 
@@ -77,6 +77,12 @@ export default {
   computed: {
     ...mapState(['data', 'apiCatalogPriority']),
     ...mapGetters(['getStac']),
+    onClick() {
+      if (this.active) {
+        return this.toggle;
+      }
+      return null;
+    },
     stac() {
       if (this.pagination) {
         return null;
@@ -123,6 +129,9 @@ export default {
       return false;
     },
     to() {
+      if (this.active) {
+        return null;
+      }
       if (this.pagination) {
         if (this.parent && (!this.data || this.parent.getAbsoluteUrl() !== this.data.getAbsoluteUrl())) {
           return this.parent.getBrowserPath();

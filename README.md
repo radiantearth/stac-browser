@@ -31,6 +31,7 @@ certain *OGC API - Records* and *OGC API - Features* compliant servers.
 - [Docker](#docker)
 - [Contributing](#contributing)
   - [Adding a new language](#adding-a-new-language)
+- [Sponsors](#sponsors)
 
 ## Examples
 
@@ -77,7 +78,7 @@ STAC Browser supports "private query parameters", e.g. for passing an API key th
 So for example if your API requires to pass a token via the `API_KEY` query parameter, you can request STAC Browser as such:
 `https://examples.com/stac-browser/?~API_KEY=123` which will change the URL to `https://examples.com/stac-browser/` and store the token `123` internally. The request then will have the query parameter attached and the Browser will request e.g. `https://examples.com/stac-api/?API_KEY=123`.
 
-Please note: If the server hosting STAC Browser should not get aware of private query parameters and you are having `historyMode` set to `history`, you can also append the private query parameters to the hash so that it doesn't get transmitted to the server hosting STAC Browser. 
+Please note: If the server hosting STAC Browser should not get aware of private query parameters and you are having `historyMode` set to `"history"`, you can also append the private query parameters to the hash so that it doesn't get transmitted to the server hosting STAC Browser. 
 In this case use for example `https://examples.com/stac-browser/#?~API_KEY=123` instead of `https://examples.com/stac-browser/?~API_KEY=123`.
 
 ### Migrate from old versions
@@ -128,6 +129,7 @@ Some of them can also be set [through the root catalog](#customize-through-root-
 * [itemsPerPage](#itemsperpage)
 * [maxPreviewsOnMap](#maxpreviewsonmap)
 * [cardViewMode](#cardviewmode)
+* [cardViewSort](#cardviewsort)
 * [showThumbnailsAsAssets](#showthumbnailsasassets)
 * [defaultThumbnailSize](#defaultthumbnailsize)
 * [crossOriginMedia](#crossoriginmedia)
@@ -312,7 +314,14 @@ The maximum number of previews (thumbnails or overviews) of items that will be s
 
 #### cardViewMode
 
-The default view mode for lists of catalogs/collections. Either `list` or `cards` (default). 
+The default view mode for lists of catalogs/collections. Either `"list"` or `"cards"` (default). 
+
+#### cardViewSort
+
+The default sorting for lists of catalogs/collections or items. One of:
+- `"asc"`: ascending sort (default)
+- `"desc"`: descending sort
+- `null`: sorted as in the source files
 
 #### showThumbnailsAsAssets
 
@@ -358,9 +367,9 @@ It is disabled by default (`null`). If enabled, the token provided by the user c
 
 There are four options you can set in the `authConfig` object:
 
-* `type` (string): `null` (disabled), `query` (use token in query parameters), or `header` (use token in HTTP request headers).
+* `type` (string): `null` (disabled), `"query"` (use token in query parameters), or `"header"` (use token in HTTP request headers).
 * `key` (string): The query string parameter name or the HTTP header name respecively.
-* `formatter` (function|string|null): You can optionally specify a formatter for the query string value or HTTP header value respectively. If the string `Bearer` is provided formats as a Bearer token according to RFC 6750. If not given, the token is provided as provided by the user.
+* `formatter` (function|string|null): You can optionally specify a formatter for the query string value or HTTP header value respectively. If the string `"Bearer"` is provided formats as a Bearer token according to RFC 6750. If not given, the token is provided as provided by the user.
 * `description` (string|null): Optionally a description that is shown to the user. This should explain how the token can be obtained for example. CommonMark is allowed.
     **Note:** You can leave the description empty in the config file and instead provide a localized string with the key `authConfig` -> `description` in the file for custom phrases (`src/locales/custom.js`).
 
@@ -529,6 +538,7 @@ You need to provide a field `stac_browser` and then you can set any of the follo
 - `apiCatalogPriority`
 - `authConfig` (except for the `formatter` as function)
 - `cardViewMode`
+- `cardViewSort`
 - `crossOriginMedia`
 - `defaultThumbnailSize`
 - `displayGeoTiffByDefault`
@@ -593,3 +603,13 @@ You can also use one of the existing languages and provide an alternate version 
 - Adapt the `datepicker.js` and `duration.js` files to import the existing definitions from their corresponding external packages, but you could also define the specifics yourself.
 - Check that your translation works by running the development server (`npm start`) and navigating to the STAC Browser instance in your browser (usually `http://localhost:8080`).
 - Once completed, please open a pull request and we'll get back to you as soon as possible.
+
+# Sponsors
+
+The following sponsors have provided a subststantial amount of funding for STAC Browser in the past:
+
+- [Radiant Earth](https://radiant.earth) (base funding for versions 1, 2 and 3)
+- [National Resources Canada](https://natural-resources.canada.ca/home) (multi-language support, maintenance)
+- [Matthias Mohr - Softwareentwicklung](https://mohr.ws) (maintenance)
+- [Spacebel](https://spacebel.com) (collection search)
+- [Planet](https://planet.com) (OpenID Connect authentication, other features, maintenance)

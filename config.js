@@ -19,6 +19,7 @@ module.exports = {
     pathPrefix: "/stac-browser/",
     historyMode: "history",
     cardViewMode: "list",
+    cardViewSort: "asc",
     showThumbnailsAsAssets: false,
     stacLint: true,
     geoTiffResolution: 128,
