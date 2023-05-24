@@ -253,7 +253,7 @@ function getStore(config, router) {
           if (!state.allowExternalAccess) {
             return absolute.toString();
           }
-          let parts = ['/external/'];
+          let parts = ['/external'];
           let protocol = absolute.protocol();
           if (protocol !== 'https') {
             parts.push(protocol + ':');
