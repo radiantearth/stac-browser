@@ -143,7 +143,7 @@ function getQueryDefaults() {
     ids: [],
     collections: [],
     sortby: null,
-    filters: []
+    filters: null
   };
 }
 
@@ -359,6 +359,9 @@ export default {
       this.sortOrder = value;
     },
     buildFilter() {
+      if (this.filters.length === 0) {
+        return null;
+      }
       const args = this.filters.map(f => new f.operator(f.queryable, f.value));
       const logical = CqlLogicalOperator.create(this.filtersAndOr, args);
       return new Cql(logical);
@@ -377,9 +380,8 @@ export default {
       if (this.canSort && this.sortTerm && this.sortOrder) {
         this.$set(this.query, 'sortby', this.formatSort());
       }
-      if (this.filters.length > 0) {
-        this.$set(this.query, 'filters', this.buildFilter());
-      }
+      let filters = this.buildFilter();
+      this.$set(this.query, 'filters', filters);
       this.$emit('input', this.query, false);
     },
     async onReset() {

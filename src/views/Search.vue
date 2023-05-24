@@ -140,12 +140,7 @@ export default {
         .filter(obj => obj instanceof STAC);
     },
     pagination() {
-      let pages = Utils.getPaginationLinks(this.data);
-      // If first link is not available, add the items link as first link
-      if (!pages.first && this.searchLink) {
-        pages.first = Utils.addFiltersToLink(this.searchLink, this.filters);
-      }
-      return pages;
+      return Utils.getPaginationLinks(this.data);
     },
     hasFilters() {
       return Utils.size(this.filters) > 0;
@@ -248,27 +243,27 @@ export default {
   }
 }
 </style>
-<style lang="scss" scoped>
+<style lang="scss">
 @import '~bootstrap/scss/mixins';
 @import "../theme/variables.scss";
 
-.search {
+#stac-browser .search {
   .left {
-    min-width: 200px;
+    min-width: 350px;
     flex-basis: 40%;
   }
   .right {
-    min-width: 300px;
+    min-width: 250px;
     flex-basis: 60%;
     position: relative !important;
   }
-  .items {
+  .items, .catalogs {
     .card-columns {
       @include media-breakpoint-only(sm) {
         column-count: 1;
       }
       @include media-breakpoint-only(md) {
-        column-count: 1;
+        column-count: 2;
       }
       @include media-breakpoint-only(lg) {
         column-count: 2;

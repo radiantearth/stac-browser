@@ -208,7 +208,7 @@ export default {
     async filterItems(filters, reset) {
       this.filters = filters;
       if (reset) {
-        this.$store.commit('resetApiItems');
+        this.$store.commit('resetApiItems', this.data.getApiItemsLink());
       }
       try {
         await this.$store.dispatch('loadApiItems', {link: this.apiItemsLink, show: true, filters});

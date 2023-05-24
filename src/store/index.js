@@ -593,8 +593,9 @@ function getStore(config, router) {
           stac.setApiData(collections, nextLink);
         }
       },
-      resetApiItems(state) {
+      resetApiItems(state, link) {
         state.apiItems = [];
+        state.apiItemsLink = link;
         state.apiItemsPagination = {};
       },
       parents(state, parents) {
