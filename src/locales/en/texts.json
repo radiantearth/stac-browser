@@ -225,8 +225,8 @@
     },
     "spatialExtent": "Spatial Extent",
     "tabs": {
-      "collections": "Search Collections",
-      "items": "Search Items"
+      "collections": "Search for Collections",
+      "items": "Search for Items"
     },
     "temporalExtent": "Temporal Extent",
     "title": "Search"
