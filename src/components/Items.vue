@@ -98,7 +98,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['uiLanguage']),
+    ...mapState(['cardViewSort', 'uiLanguage']),
     hasMore() {
       return this.items.length > this.shownItems;
     },
@@ -132,6 +132,9 @@ export default {
       }
       return false;
     }
+  },
+  created() {
+    this.sort = this.cardViewSort;
   },
   methods: {
     emitFilter(value, reset) {

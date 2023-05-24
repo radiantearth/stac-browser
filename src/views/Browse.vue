@@ -89,7 +89,7 @@ export default {
       }
     },
     isExternal() {
-      return Utils.urlType(this.path, "absolute");
+      return URI(this.path).is("absolute");
     }
   },
   watch: {
@@ -122,7 +122,7 @@ export default {
         // Decode last path element from base58, the others parts are not relevant for us
         let newPath = decode(parts[parts.length - 1]).toString();
         if (newPath) {
-          let uri = new URI(newPath);
+          let uri = URI(newPath);
           // Navigate to new URL
           this.$router.replace({
             // Remove trailing collections or items paths from APIs

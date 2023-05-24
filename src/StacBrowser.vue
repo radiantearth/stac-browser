@@ -223,6 +223,7 @@ export default {
         'apiCatalogPriority',
         'authConfig', // except for the 'formatter', which can't be encoded in JSON
         'cardViewMode',
+        'cardViewSort',
         'crossOriginMedia',
         'defaultThumbnailSize',
         'displayGeoTiffByDefault',
@@ -327,7 +328,7 @@ export default {
     parseQuery(route) {
       let privateFromHash = {};
       if (this.historyMode === 'history') {
-        let uri = new URI(route.hash.replace(/^#/, ''));
+        let uri = URI(route.hash.replace(/^#/, ''));
         privateFromHash = uri.query(true);
       }
       let query = Object.assign({}, route.query, privateFromHash);
