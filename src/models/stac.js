@@ -91,7 +91,7 @@ class STAC {
       try {
         this._apiChildrenListeners[id](this._apiChildren);
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     }
   }

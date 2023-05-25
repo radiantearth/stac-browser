@@ -620,7 +620,7 @@ function getStore(config, router) {
           try {
             window.localStorage.setItem('locale', locale);
           } catch (error) {
-            console.log(error);
+            console.error(error);
           }
         }
 

@@ -47,7 +47,6 @@ export default {
   },
   data() {
     return {
-      hadMore: false,
       searchTerm: '',
       sort: 0
     };
