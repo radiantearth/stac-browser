@@ -2,13 +2,14 @@
   <section class="catalogs mb-4">
     <h2>
       <span class="title">{{ $tc('stacCatalog', catalogs.length ) }}</span>
-      <b-badge v-if="hasMultiple" pill variant="secondary ml-2">
-        <template v-if="catalogs.length !== catalogView.length">{{ catalogView.length }}/</template>{{ catalogs.length }}
+      <b-badge v-if="isComplete" pill variant="secondary ml-2">
+        <template v-if="catalogs.length !== catalogView.length">{{ catalogView.length }}/{{ catalogs.length }}</template>
+        <template v-else>{{ catalogs.length }}</template>
       </b-badge>
       <ViewButtons class="ml-4" v-model="view" />
-      <SortButtons v-if="hasMultiple" class="ml-2" v-model="sort" />
+      <SortButtons v-if="isComplete && catalogs.length > 1" class="ml-2" v-model="sort" />
     </h2>
-    <SearchBox v-if="hasMultiple" class="mt-3 mb-2" v-model="searchTerm" :placeholder="$t('catalogs.filterByTitle')" />
+    <SearchBox v-if="isComplete && catalogs.length > 1" class="mt-3 mb-2" v-model="searchTerm" :placeholder="$t('catalogs.filterByTitle')" />
     <Pagination ref="topPagination" v-if="showPagination" :pagination="pagination" placement="top" @paginate="paginate" />
     <b-alert v-if="searchTerm && catalogView.length === 0" variant="warning" show>{{ $t('catalogs.noMatches') }}</b-alert>
     <section class="list">
@@ -62,6 +63,7 @@ export default {
   },
   data() {
     return {
+      hadMore: false,
       searchTerm: '',
       sort: 0
     };
@@ -69,8 +71,8 @@ export default {
   computed: {
     ...mapState(['cardViewSort', 'uiLanguage']),
     ...mapGetters(['getStac']),
-    hasMultiple() {
-      return !this.hasMore && !this.showPagination && this.catalogs.length > 1;
+    isComplete() {
+      return !this.hasMore && !this.showPagination;
     },
     showPagination() {
       // Check whether any pagination links are available
@@ -116,6 +118,9 @@ export default {
   methods: {
     loadMore(visible = true) {
       if (visible) {
+        // Disable sorting if pagination is/was active as otherwise the order of elements
+        // may change unexpectedly after the last page has been loaded.
+        this.sort = 0;
         this.$emit('loadMore');
       }
     },
