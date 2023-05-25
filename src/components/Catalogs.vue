@@ -47,6 +47,7 @@ export default {
   },
   data() {
     return {
+      hadMore: false,
       searchTerm: '',
       sort: 0
     };
@@ -97,6 +98,9 @@ export default {
   methods: {
     loadMore(visible = true) {
       if (visible) {
+        // Disable sorting if pagination is/was active as otherwise the order of elements
+        // may change unexpectedly after the last page has been loaded.
+        this.sort = 0;
         this.$emit('loadMore');
       }
     }
