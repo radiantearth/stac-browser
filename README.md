@@ -67,7 +67,7 @@ you can use the [`pathPrefix`](#pathprefix) option.
 After building, `dist/` will contain all assets necessary to
 host the browser. These can be manually copied to your web host of choice.
 
-You can customize STAC Browser, too. See the options and theming details below. If not stated otherwise, all options can either be specified via CLI or in the [config file](config.js).
+You can customize STAC Browser, too. See the options and theming details below. If not stated otherwise, all options can either be specified via CLI, ENV variables or in the [config file](config.js).
 
 ### Private query parameters
 
@@ -86,13 +86,13 @@ In this case use for example `https://examples.com/stac-browser/#?~API_KEY=123` 
 If you are running an old (standalone) version of STAC Browser (v1 or v2) without heavy modifications,
 you can usually migrate easily.
 
-The old environment variables are not supported any longer. Instead please use the config file or CLI parameters.
-The names of the variables have slightly changed:
-* `CATALOG_URL` => `catalogUrl`
-* `STAC_PROXY_URL` => `stacProxyUrl` (same in CLI, different format in the config file)
-* `TILE_PROXY_URL` / `TILE_SOURCE_TEMPLATE` => `buildTileUrlTemplate` (this is not a 1:1 replacement, make sure to read the documentation for `buildTileUrlTemplate`)
-* `PATH_PREFIX` => `pathPrefix`
-* `HISTORY_MODE` => `historyMode`
+The old environment variables have changed names. See [enviornment variables](#environment-variables) for details.
+The names of the environment variables have slightly changed:
+* `CATALOG_URL` => `SB_catalogUrl`
+* `STAC_PROXY_URL` => `SB_stacProxyUrl` (same in CLI, different format in the config file)
+* `TILE_PROXY_URL` / `TILE_SOURCE_TEMPLATE` => only available via config file, this is not a 1:1 replacement, make sure to read the documentation for `buildTileUrlTemplate`
+* `PATH_PREFIX` => `SB_pathPrefix`
+* `HISTORY_MODE` => `SB_historyMode`
 
 You should also enable `redirectLegacyUrls` which makes sure that your old URLs are correctly parsed by STAC Browser v3 and links to the old version of STAC Browser don't get broken.
 
@@ -104,8 +104,11 @@ Then simply deploy STAC Browser to the same location where you hosted STAC Brows
 
 ### Options
 
-All the following options can be used as explained in the chapter "Running", either through the [config file](config.js) or as CLI parameter.
-Some of them can also be set [through the root catalog](#customize-through-root-catalog).
+All the following options can be used as explained in the chapter "Running", either through the [config file](config.js), as CLI parameter or as environment variable.
+
+- Some of them can also be set [through the root catalog](#customize-through-root-catalog).
+- Environment variables require a prefix `SB_`. 
+  So you could for example set the catalog URL via the environment variable `SB_catalogUrl`.
 
 **The following options are available:**
 * [catalogUrl](#catalogurl)
@@ -268,7 +271,7 @@ The option controls the tile layer that is used to render imagery such as (cloud
 
 See the [documentation for the corresponding stac-layer option](https://github.com/stac-utils/stac-layer#buildtileurltemplate) for details.
 
-Please note that this option can only be provided through a config file and is not available via CLI.
+Please note that this option can only be provided through a config file and is not available via CLI/ENV.
 
 If the option `useTileLayerAsFallback` is set to `true`, the tile server is only used as a fallback.
 
@@ -345,7 +348,7 @@ This is affected by [`allowedDomains`](#alloweddomains).
 
 Example: `{'Authorization': 'Bearer 134567984623223'}` adds a Bearer token to the HTTP headers.
 
-Please note that this option can only be provided through a config file and is not available via CLI.
+Please note that this option can only be provided through a config file and is not available via CLI/ENV.
 
 #### requestQueryParameters
 
@@ -356,7 +359,7 @@ This is affected by [`allowedDomains`](#alloweddomains).
 
 Example: `{'f': 'json'}` adds a `f` query parameter to the HTTP URL, e.g. `https://example.com?f=json`.
 
-Please note that this option can only be provided through a config file and is not available via CLI.
+Please note that this option can only be provided through a config file and is not available via CLI/ENV.
 
 #### authConfig
 
@@ -373,7 +376,7 @@ There are four options you can set in the `authConfig` object:
 * `description` (string|null): Optionally a description that is shown to the user. This should explain how the token can be obtained for example. CommonMark is allowed.
     **Note:** You can leave the description empty in the config file and instead provide a localized string with the key `authConfig` -> `description` in the file for custom phrases (`src/locales/custom.js`).
 
-Please note that this option can only be provided through a config file and is not available via CLI.
+Please note that this option can only be provided through a config file and is not available via CLI/ENV.
 
 ##### Example 1: HTTP Request Header Value
 
@@ -410,7 +413,7 @@ The function receives two parameters:
 * `stac` (object of type `STAC`)
 * `state` (the vuex state)
 
-Please note that this option can only be provided through a config file and is not available via CLI.
+Please note that this option can only be provided through a config file and is not available via CLI/ENV.
 
 ##### Example: Update root catalog
 
