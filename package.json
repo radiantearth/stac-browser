@@ -34,6 +34,7 @@
   "license": "ISC",
   "dependencies": {
     "@apidevtools/json-schema-ref-parser": "^10.1.0",
+    "@babel/plugin-proposal-optional-chaining": "^7.21.0",
     "@musement/iso-duration": "^1.0.0",
     "@radiantearth/stac-fields": "1.1.1",
     "@radiantearth/stac-migrate": "~1.2.0",
