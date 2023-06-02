@@ -50,7 +50,7 @@ export default {
         this.shownBandsOnMap = [];
         this.shownAssetsOnMap = [];
       }
-      else {
+      else if (data.assets || data.bands) {
         if (Utils.size(data.assets) > 0) {
           if (this.selectedAssetKey) {
             this.shownAssetsOnMap = [this.selectedAssetKey];
@@ -62,6 +62,9 @@ export default {
         if (Utils.size(data.bands) > 0) {
           this.shownBandsOnMap = data.bands;
         }
+      }
+      else if (this.selectedAssetKey) {
+        this.shownAssetsOnMap = [this.selectedAssetKey];
       }
     }
   }

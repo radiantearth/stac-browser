@@ -5,7 +5,7 @@ import i18n from './i18n';
 
 function toBrowserUrl(url, store) {
   let path = store.getters.toBrowserPath(url);
-  let uri = new URI(window.location.origin.toString());
+  let uri = URI(window.location.origin.toString());
   if (store.state.historyMode === 'hash') {
     uri.path(store.state.pathPrefix);
     uri.fragment(path);

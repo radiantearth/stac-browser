@@ -256,6 +256,7 @@ export default {
         
         if (this.stacLayerData.type === geojsonMediaType) {
           this.geojson = await this.$store.dispatch('loadGeoJson', this.stacLayerData);
+          this.$emit('dataChanged', this.stacLayerData);
         }
       }
 
@@ -280,7 +281,9 @@ export default {
           return;
         }
 
-        this.$emit('dataChanged', this.stacLayer.stac);
+        if (this.stacLayer.stac) {
+          this.$emit('dataChanged', this.stacLayer.stac);
+        }
         this.addMapClickEvent(this.stacLayer);
         this.stacLayer.on("fallback", event => this.$emit('dataChanged', event.stac));
         this.stacLayer.addTo(this.map);
@@ -349,7 +352,7 @@ export default {
                 // Bring GeoJSON to front to allow opening the popups
                 this.geojsonToFront();
               })
-              .catch(error => console.log(error));
+              .catch(error => console.error(error));
           }
         }
       }

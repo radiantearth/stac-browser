@@ -18,7 +18,7 @@
           <Map class="mb-4" v-if="provideBBox" :stac="stac" selectBounds @bounds="setBBox" scrollWheelZoom />
         </b-form-group>
 
-        <b-form-group v-if="!collectionOnly" :label="$tc('stacCollection', collections.length)" label-for="collections">
+        <b-form-group v-if="conformances.Collections" :label="$tc('stacCollection', collections.length)" label-for="collections">
           <multiselect
             v-if="collections.length > 0"
             id="collections" :value="selectedCollections" @input="setCollections"
@@ -46,7 +46,7 @@
           </multiselect>
         </b-form-group>
 
-        <b-form-group v-if="!collectionOnly" :label="$t('search.itemIds')" label-for="ids">
+        <b-form-group v-if="conformances.Items" :label="$t('search.itemIds')" label-for="ids">
           <multiselect
             id="ids" :value="query.ids" @input="setIds"
             multiple taggable :options="query.ids"
@@ -59,27 +59,32 @@
           </multiselect>
         </b-form-group>
 
-        <div class="additional-filters" v-if="canFilterCql && Array.isArray(queryables) && queryables.length > 0">
+        <div class="additional-filters" v-if="cql && Array.isArray(queryables) && queryables.length > 0">
           <b-form-group :label="$t('search.additionalFilters')" label-for="availableFields">
-            <b-alert variant="warning" show>{{ $t('featureExperimental') }}</b-alert>
+            <b-form-radio-group id="logical" v-model="filtersAndOr" :options="andOrOptions" name="logical" size="sm" />
 
-            <b-dropdown size="sm" :text="$t('search.addFilter')" block variant="primary" class="mt-2 mb-3" menu-class="w-100">
-              <b-dropdown-item v-for="queryable in queryables" :key="queryable.id" @click="additionalFieldSelected(queryable)">
-                {{ queryable.title }}
-              </b-dropdown-item>
+            <b-dropdown size="sm" :text="$t('search.addFilter')" block variant="primary" class="queryables mt-2 mb-3" menu-class="w-100">
+              <template v-for="queryable in sortedQueryables">
+                <b-dropdown-item v-if="queryable.supported" :key="queryable.id" @click="additionalFieldSelected(queryable)">
+                  {{ queryable.title }}
+                  <b-badge variant="dark" class="ml-2">{{ queryable.id }}</b-badge>
+                </b-dropdown-item>
+              </template>
             </b-dropdown>
 
             <QueryableInput
-              v-for="(filter, index) in query.filters" :key="filter.id"
-              :title="filter.queryable.title"
+              v-for="(filter, index) in filters" :key="filter.id"
               :value.sync="filter.value"
               :operator.sync="filter.operator"
-              :schema="filter.queryable.schema"
+              :queryable="filter.queryable"
               :index="index"
+              :cql="cql"
               @remove-queryable="removeQueryable(index)"
             />
           </b-form-group>
         </div>
+
+        <hr>
 
         <b-form-group v-if="canSort" :label="$t('sort.title')" label-for="sort" :description="$t('search.notFullySupported')">
           <multiselect
@@ -90,7 +95,7 @@
             :selectedLabel="$t('multiselect.selectedLabel')"
             :deselectLabel="$t('multiselect.deselectLabel')"
           />
-          <SortButtons v-if="sortTerm" class="mt-1" :value="sortOrder" enforce @input="sortDirectionSet" />
+          <SortButtons v-if="sortTerm && sortTerm.value" class="mt-1" :value="sortOrder" enforce @input="sortDirectionSet" />
         </b-form-group>
 
         <b-form-group :label="$t('search.itemsPerPage')" label-for="limit" :description="$t('search.itemsPerPageDescription', {maxItems})">
@@ -110,23 +115,54 @@
 </template>
 
 <script>
-import { BDropdown, BDropdownItem, BForm, BFormGroup, BFormInput, BFormCheckbox } from 'bootstrap-vue';
+import { BBadge, BDropdown, BDropdownItem, BForm, BFormGroup, BFormInput, BFormCheckbox, BFormRadioGroup } from 'bootstrap-vue';
 import Multiselect from 'vue-multiselect';
 
 import { mapGetters, mapState } from "vuex";
 import DatePickerMixin from './DatePickerMixin';
 import Loading from './Loading.vue';
 import Utils from '../utils';
+import CqlLogicalOperator from '../models/cql2/operators/logical';
+import Cql from '../models/cql2/cql';
+import { CqlEqual } from '../models/cql2/operators/comparison';
+import CqlValue from '../models/cql2/value';
+import ApiCapabilitiesMixin from './ApiCapabilitiesMixin';
+
+function getQueryDefaults() {
+  return {
+    datetime: null,
+    bbox: null,
+    limit: null,
+    ids: [],
+    collections: [],
+    sortby: null,
+    filters: []
+  };
+}
+
+function getDefaults() {
+  return {
+    sortOrder: 1,
+    sortTerm: null,
+    provideBBox: false,
+    query: getQueryDefaults(),
+    filtersAndOr: 'and',
+    filters: [],
+    selectedCollections: []
+  };
+}
 
 export default {
   name: 'ItemFilter',
   components: {
+    BBadge,
     BDropdown,
     BDropdownItem,
     BForm,
     BFormGroup,
     BFormInput,
     BFormCheckbox,
+    BFormRadioGroup,
     QueryableInput: () => import('./QueryableInput.vue'),
     Loading,
     Map: () => import('./Map.vue'),
@@ -134,6 +170,7 @@ export default {
     Multiselect
   },
   mixins: [
+    ApiCapabilitiesMixin,
     DatePickerMixin
   ],
   props: {
@@ -148,38 +185,23 @@ export default {
     value: {
       type: Object,
       default: () => ({})
-    },
-    canFilterExtents: {
-      type: Boolean,
-      default: false
-    },
-    canSort: {
-      type: Boolean,
-      default: false
-    },
-    canFilterCql: {
-      type: Boolean,
-      default: false
-    },
-    collectionOnly: {
-      type: Boolean,
-      default: false
     }
   },
   data() {
-    return {
-      sortOrder: 1,
-      sortTerm: null,
+    return Object.assign({
       maxItems: 10000,
-      provideBBox: false,
-      query: this.getDefaultValues(),
-      loaded: false,
-      selectedCollections: []
-    };
+      loaded: false
+    }, getDefaults());
   },
   computed: {
     ...mapState(['itemsPerPage', 'uiLanguage', 'queryables', 'apiCollections']),
     ...mapGetters(['hasMoreCollections', 'root']),
+    andOrOptions() {
+      return [
+        { value: 'and', text: this.$i18n.t('search.logical.and') },
+        { value: 'or', text: this.$i18n.t('search.logical.or') },
+      ];
+    },
     sortOptions() {
       return [
         { value: null, text: this.$t('default') },
@@ -189,7 +211,7 @@ export default {
       ];
     },
     collections() {
-      if (this.hasMoreCollections || this.collectionOnly) {
+      if (this.hasMoreCollections || !this.conformances.Collections) {
         return [];
       }
       return this.apiCollections
@@ -198,18 +220,18 @@ export default {
           text: c.title || c.id
         }))
         .sort((a,b) => a.text.localeCompare(b.text, this.uiLanguage));
+    },
+    sortedQueryables() {
+      return this.queryables.slice(0).sort((a, b) => a.title.localeCompare(b.title));
     }
   },
   watch: {
     value: {
       immediate: true,
       handler(value) {
-        let query = Object.assign({}, this.getDefaultValues(), value);
+        let query = Object.assign(getQueryDefaults(), value);
         if (Array.isArray(query.datetime)) {
           query.datetime = query.datetime.map(Utils.dateFromUTC);
-        }
-        else if (query.filters.length > 0) {
-          query.filters = query.filters.map(f => Object.assign({}, f));
         }
         this.query = query;
       }
@@ -217,7 +239,7 @@ export default {
   },
   created() {
     let promises = [];
-    if (this.canFilterCql) {
+    if (this.cql) {
       promises.push(
         this.$store.dispatch('loadQueryables', {
           stac: this.stac,
@@ -225,7 +247,7 @@ export default {
         }).catch(error => console.error(error))
       );
     }
-    if (!this.collectionOnly && this.apiCollections.length === 0) {
+    if (this.conformances.Collections && this.apiCollections.length === 0) {
       promises.push(
         this.$store.dispatch('loadNextApiCollections', {stac: this.root, show: true})
           .catch(error => console.error(error))
@@ -243,35 +265,32 @@ export default {
     sortDirectionSet(value) {
       this.sortOrder = value;
     },
+    buildFilter() {
+      const args = this.filters.map(f => new f.operator(f.queryable, f.value));
+      const logical = CqlLogicalOperator.create(this.filtersAndOr, args);
+      return new Cql(logical);
+    },
     removeQueryable(queryableIndex) {
-      this.query.filters.splice(queryableIndex, 1);
+      this.filters.splice(queryableIndex, 1);
     },
     additionalFieldSelected(queryable) {
-      this.query.filters.push({
-        value: null,
-        operator: null,
+      this.filters.push({
+        value: CqlValue.create(queryable.defaultValue),
+        operator: CqlEqual,
         queryable
       });
-    },
-    getDefaultValues() {
-      return {
-        datetime: null,
-        bbox: null,
-        limit: null,
-        ids: [],
-        collections: [],
-        sortby: null,
-        filters: []
-      };
     },
     onSubmit() {
       if (this.canSort && this.sortTerm && this.sortOrder) {
         this.$set(this.query, 'sortby', this.formatSort());
       }
+      if (this.filters.length > 0) {
+        this.$set(this.query, 'filters', this.buildFilter());
+      }
       this.$emit('input', this.query, false);
     },
     async onReset() {
-      this.query = this.getDefaultValues();
+      Object.assign(this, getDefaults());
       this.$emit('input', {}, true);
     },
     setLimit(limit) {
@@ -328,9 +347,9 @@ export default {
       this.$set(this.query, 'ids', ids);
     },
     formatSort() {
-      if (this.sortTerm && this.sortOrder) {
+      if (this.sortTerm && this.sortTerm.value && this.sortOrder) {
         let order = this.sortOrder < 0 ? '-' : '';
-        return `${order}${this.sortTerm}`;
+        return `${order}${this.sortTerm.value}`;
       }
       else {
         return null;
@@ -392,6 +411,13 @@ $primary-color: map-get($theme-colors, "primary");
   .multiselect__placeholder {
     color: #999;
     font-size: 16px;
+  }
+}
+
+.queryables {
+  .dropdown-menu {
+    max-height: 90vh;
+    overflow: auto;
   }
 }
 

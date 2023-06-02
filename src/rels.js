@@ -22,7 +22,8 @@ export const stacPagination = [
 // Queryables
 export const ogcQueryables = [
   'queryables', // Old way in STAC (deprecated)
-  'http://www.opengis.net/def/rel/ogc/1.0/queryables',
+  'http://www.opengis.net/def/rel/ogc/1.0/queryables', // STAC and OGC APIs
+  'ogc-rel:queryables' // Alternative in OGC APIs
 ];
 
 // Rels that STAC Browser can navigate to and display natively (i.e. Collections, Catalogs and Items)

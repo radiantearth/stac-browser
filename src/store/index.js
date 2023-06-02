@@ -8,7 +8,7 @@ import i18n from '../i18n';
 import { ogcQueryables, stacBrowserSpecialHandling, stacPagination } from "../rels";
 import Utils, { schemaMediaType, BrowserError } from '../utils';
 import STAC from '../models/stac';
-import Queryable from '../models/queryable';
+import Queryable from '../models/cql2/queryable';
 
 import auth from './auth.js';
 import { addQueryIfNotExists, isAuthenticationError, Loading, processSTAC, proxyUrl, unproxyUrl, stacRequest } from './utils';
@@ -179,6 +179,9 @@ function getStore(config, router) {
         return null;
       },
       supportsConformance: state => classes => {
+        if(!Array.isArray(classes)) {
+          return classes;
+        }
         let classRegexp = classes
           .map(c => c.replaceAll('*', '[^/]+').replace(/\/?#/, '/?#'))
           .join('|');
@@ -268,15 +271,16 @@ function getStore(config, router) {
           return path;
         }
         else {
-          return '/' + relative;
+          return '/' + relative.toString();
         }
       },
       fromBrowserPath: (state, getters) => url => {
+        const externalRE = /^\/(search\/)?external\//;
         if (!Utils.hasText(url) || url === '/') {
           url = state.catalogUrl;
         }
-        else if (url.startsWith('/external/')) {
-          let parts = url.replace(/^\/external\//, '').split('/');
+        else if (url.match(externalRE)) {
+          let parts = url.replace(externalRE, '').split('/');
           let protocol;
           if (!parts[0].endsWith(':')) {
             protocol = 'https:';
@@ -296,7 +300,7 @@ function getStore(config, router) {
           return false;
         }
         if (!(absoluteUrl instanceof URI)) {
-          absoluteUrl = new URI(absoluteUrl);
+          absoluteUrl = URI(absoluteUrl);
         }
         if (whitelist && Array.isArray(state.allowedDomains) && state.allowedDomains.includes(absoluteUrl.domain())) {
           return false;
@@ -381,6 +385,18 @@ function getStore(config, router) {
               break;
             case 'crossOriginMedia':
               state.crossOriginMedia = ['anonymous', 'use-credentials'].includes(value) ? value : null;
+              break;
+            case 'cardViewSort':
+              switch(value) {
+                case 'asc':
+                  state.cardViewSort = 1;
+                  break;
+                case 'desc':
+                  state.cardViewSort = -1;
+                  break;
+                default:
+                  state.cardViewSort = 0;
+              }
               break;
             default:
               state[key] = value;
@@ -580,7 +596,8 @@ function getStore(config, router) {
       },
       addQueryables(state, queryables) {
         if (Utils.isObject(queryables) && Utils.isObject(queryables.properties)) {
-          state.queryables = Object.keys(queryables.properties).map(key => new Queryable(key, queryables.properties[key]));
+          state.queryables = Object.entries(queryables.properties)
+            .map(([key, schema]) => new Queryable(key, schema));
         }
         else {
           state.queryables = [];
@@ -595,7 +612,7 @@ function getStore(config, router) {
           try {
             window.localStorage.setItem('locale', locale);
           } catch (error) {
-            console.log(error);
+            console.error(error);
           }
         }
 
@@ -791,7 +808,7 @@ function getStore(config, router) {
           else {
             response.data.features = response.data.features.map(item => {
               try {
-                if (!Utils.isObject(item)) {
+                if (!Utils.isObject(item) || item.type !== 'Feature') {
                   return null;
                 }
                 let selfLink = Utils.getLinkWithRel(item.links, 'self');
@@ -805,10 +822,10 @@ function getStore(config, router) {
                     url = Utils.toAbsolute(`items/${item.id}`, baseUrl);
                   }
                   else if (apiCollectionsLink) {
-                    url = Utils.toAbsolute(`${stac.id}/items/${item.id}`, apiCollectionsLink.href);
+                    url = Utils.toAbsolute(`${collectionId}/items/${item.id}`, apiCollectionsLink.href);
                   }
                   else if (cx.state.catalogUrl) {
-                    url = Utils.toAbsolute(`collections/${stac.id}/items/${item.id}`, cx.state.catalogUrl);
+                    url = Utils.toAbsolute(`collections/${collectionId}/items/${item.id}`, cx.state.catalogUrl);
                   }
                   else {
                     return null;
@@ -929,7 +946,7 @@ function getStore(config, router) {
           return;
         }
         try {
-          let uri = new URI('https://api.staclint.com/url');
+          let uri = URI('https://api.staclint.com/url');
           uri.addSearch('stac_url', url);
           let response = await axios.get(uri.toString());
           cx.commit('valid', Boolean(response.data?.body?.valid_stac));

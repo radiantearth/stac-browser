@@ -125,7 +125,7 @@ export default {
                 // Don't validate if a proxy has been set
                 return false;
             }
-            let uri = new URI(this.stacUrl);
+            let uri = URI(this.stacUrl);
             let host = uri.hostname().toLowerCase();
             if (host === 'localhost' || host.startsWith('127.') || host === '::1') {
                 // Can't validate localhost
