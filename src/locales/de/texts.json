@@ -196,6 +196,8 @@
     "enterItemIds": "Gebe Element-IDs ein...",
     "equalTo": "entspricht genau",
     "filterBySpatialExtent": "Filtern nach räumlicher Ausdehnung",
+    "freeText": "Suchbegriffe",
+    "freeTextDescription": "Suche nach dem angegebenen Text in Feldern wie dem Titel und der Beschreibung.",
     "greaterThan": "größer als",
     "greaterThanEqual": "größer als oder entspricht",
     "itemIds": "Element-Identifikationsnummern",

@@ -27,7 +27,8 @@ export const TYPES = {
     Sort: [
       'https://api.stacspec.org/v1.*/ogcapi-features#sort',
       'http://www.opengis.net/spec/ogcapi-records-1/1.*/conf/sorting'
-    ]
+    ],
+    FreeText: false
   },
   // STAC API - Item Search
   Global:  {
@@ -35,21 +36,17 @@ export const TYPES = {
     CollectionIdFilter: true,
     ItemIdFilter: true,
     CqlFilters: ['https://api.stacspec.org/v1.*/item-search#filter'],
-    Sort: ['https://api.stacspec.org/v1.*/item-search#sort']
+    Sort: ['https://api.stacspec.org/v1.*/item-search#sort'],
+    FreeText: ['https://api.stacspec.org/v1.*/item-search#free-text-search']
   },
   // OGC / STAC API - Collections
   Collections: {
-    BasicFilters: [
-      'https://api.stacspec.org/v*/collection-search'
-    ],
+    BasicFilters: ['https://api.stacspec.org/v1.*/collection-search'],
     CollectionIdFilter: false,
     ItemIdFilter: false,
-    CqlFilters: [
-      'https://api.stacspec.org/v*/collection-search#filter'
-    ],
-    Sort: [
-      'https://api.stacspec.org/v1.0.0-rc.1/collection-search#sort'
-    ]
+    CqlFilters: ['https://api.stacspec.org/v1.*/collection-search#filter'],
+    Sort: ['https://api.stacspec.org/v1.*/collection-search#sort'],
+    FreeText: ['https://api.stacspec.org/v1.*/collection-search#free-text']
   }
 };
 
@@ -72,6 +69,9 @@ export default {
     },
     canFilterExtents() {
       return this.supportsConformance(this.conformances.BasicFilters);
+    },
+    canFilterFreeText() {
+      return this.supportsConformance(this.conformances.FreeText);
     },
     cql() {
       if (!this.supportsConformance(this.conformances.CqlFilters)) {

@@ -6,6 +6,10 @@
 
         <b-card-title v-if="title" :title="title" />
 
+        <b-form-group v-if="canFilterFreeText" :label="$t('search.freeText')" label-for="q" :description="$t('search.freeTextDescription')">
+          <b-form-input id="q" :value="query.q" @change="setSearchTerms"/>
+        </b-form-group>
+
         <b-form-group v-if="canFilterExtents" :label="$t('search.temporalExtent')" label-for="datetime" :description="$t('search.dateDescription')">
           <date-picker
             range id="datetime" :lang="datepickerLang" :format="datepickerFormat"
@@ -137,6 +141,7 @@ import { stacRequest } from '../store/utils';
 
 function getQueryDefaults() {
   return {
+    q: null,
     datetime: null,
     bbox: null,
     limit: null,
@@ -397,6 +402,12 @@ export default {
         limit = null;
       }
       this.$set(this.query, 'limit', limit);
+    },
+    setSearchTerms(value) {
+      if (!Utils.hasText(value)) {
+        value = null;
+      }
+      this.$set(this.query, 'q', value);
     },
     setBBox(bounds) {
       let bbox = null;
