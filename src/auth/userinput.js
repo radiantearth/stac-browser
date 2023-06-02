@@ -4,8 +4,9 @@ import Vue from 'vue';
 
 export default class UserInput extends Auth {
 
-  constructor(options, changeListener) {
+  constructor(options, changeListener, description = null) {
     super(options, changeListener);
+    this.description = description;
   }
 
   getType() {
@@ -15,12 +16,16 @@ export default class UserInput extends Auth {
     return i18n.t('authentication.button.title');
   }
 
-  login() {
+  async login(credentials = null) {
     return new Promise(async (resolve, reject) => {
       let component = (await import('../components/auth/UserInput.vue')).default;
-      console.log(component);
-
-      var app = new Vue(component);
+      let app = new Vue({
+        ...component,
+        propsData: {
+          description: this.description,
+          credentials
+        }
+      });
 
       let div = document.createElement('div');
       div.id = "uiAuth";
@@ -39,8 +44,8 @@ export default class UserInput extends Auth {
     });
   }
 
-  async logout() {
-    return await this.login();
+  async logout(credentials) {
+    return await this.login(credentials);
   }
 
 }

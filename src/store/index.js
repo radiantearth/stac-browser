@@ -665,6 +665,12 @@ function getStore(config, router) {
         }
         cx.commit('parents', parents);
       },
+      async tryLogin(cx, {url, action}) {
+        cx.commit('clear', url);
+        cx.commit('errored', { url, error: new BrowserError(i18n.t('authentication.unauthorized')) });
+        cx.commit('auth/addAction', action);
+        await cx.dispatch('auth/authenticate');
+      },
       async load(cx, args) {
         let { url, fromBrowser, show, loadApi, loadRoot, force } = args;
         let path;
@@ -730,9 +736,10 @@ function getStore(config, router) {
             }
           } catch (error) {
             if (cx.state.authConfig && isAuthenticationError(error)) {
-              cx.commit('clear', url);
-              cx.commit('errored', { url, error: new BrowserError(i18n.t('authentication.unauthorized')) });
-              cx.commit('auth/addAction', () => cx.dispatch('load', args));
+              await cx.dispatch('tryLogin', {
+                url,
+                action: () => cx.dispatch('load', args)
+              });
               return;
             }
             console.error(error);
@@ -747,15 +754,10 @@ function getStore(config, router) {
             try {
               await cx.dispatch('loadNextApiCollections', args);
             } catch (error) {
-              if (cx.state.authConfig && isAuthenticationError(error)) {
-                cx.commit('auth/addAction', () => cx.dispatch('loadNextApiCollections', args));
-              }
-              else {
-                cx.commit('showGlobalError', {
-                  message: i18n.t('errors.loadApiCollectionsFailed'),
-                  error
-                });
-              }
+              cx.commit('showGlobalError', {
+                message: i18n.t('errors.loadApiCollectionsFailed'),
+                error
+              });
             }
           }
           // Load API Items
@@ -764,15 +766,10 @@ function getStore(config, router) {
             try {
               await cx.dispatch('loadApiItems', args);
             } catch (error) {
-              if (cx.state.authConfig && isAuthenticationError(error)) {
-                cx.commit('auth/addAction', () => cx.dispatch('loadApiItems', args));
-              }
-              else {
-                cx.commit('showGlobalError', {
-                  message: i18n.t('errors.loadApiItemsFailed'),
-                  error
-                });
-              }
+              cx.commit('showGlobalError', {
+                message: i18n.t('errors.loadApiItemsFailed'),
+                error
+              });
             }
           }
         }
@@ -781,26 +778,27 @@ function getStore(config, router) {
           cx.commit('showPage', { url });
         }
       },
-      async loadApiItems(cx, { link, stac, show, filters }) {
+      async loadApiItems(cx, args) {
+        let { link, stac, show, filters } = args;
         let collectionId = stac instanceof STAC ? stac.id : '';
         cx.commit('toggleApiItemsLoading', collectionId);
 
+        let baseUrl = cx.state.url;
+        if (stac instanceof STAC) {
+          link = stac.getApiItemsLink();
+          baseUrl = stac.getAbsoluteUrl();
+        }
+
+        if (!Utils.isObject(filters)) {
+          filters = {};
+        }
+        if (typeof filters.limit !== 'number') {
+          filters.limit = cx.state.itemsPerPage;
+        }
+
+        link = Utils.addFiltersToLink(link, filters);
+
         try {
-          let baseUrl = cx.state.url;
-          if (stac instanceof STAC) {
-            link = stac.getApiItemsLink();
-            baseUrl = stac.getAbsoluteUrl();
-          }
-
-          if (!Utils.isObject(filters)) {
-            filters = {};
-          }
-          if (typeof filters.limit !== 'number') {
-            filters.limit = cx.state.itemsPerPage;
-          }
-
-          link = Utils.addFiltersToLink(link, filters);
-
           let response = await stacRequest(cx, link);
           if (!Utils.isObject(response.data) || !Array.isArray(response.data.features)) {
             throw new BrowserError(i18n.t('errors.invalidStacItems'));
@@ -858,10 +856,18 @@ function getStore(config, router) {
           }
         } catch (error) {
           cx.commit('toggleApiItemsLoading', collectionId);
+          if (cx.state.authConfig && isAuthenticationError(error)) {
+            await cx.dispatch('tryLogin', {
+              url: link.href,
+              action: () => cx.dispatch('loadApiItems', args)
+            });
+            return;
+          }
           throw error;
         }
       },
-      async loadNextApiCollections(cx, { stac, show }) {
+      async loadNextApiCollections(cx, args) {
+        let { stac, show } = args;
         let link;
         if (stac) {
           // First page
@@ -879,32 +885,43 @@ function getStore(config, router) {
         if (!link) {
           return;
         }
-        let response = await stacRequest(cx, link);
-        if (!Utils.isObject(response.data) || !Array.isArray(response.data.collections)) {
-          throw new BrowserError(i18n.t('errors.invalidStacCollections'));
-        }
-        else {
-          response.data.collections = response.data.collections.map(collection => {
-            let selfLink = Utils.getLinkWithRel(collection.links, 'self');
-            let url;
-            if (selfLink?.href) {
-              url = Utils.toAbsolute(selfLink.href, cx.state.url || stac.getAbsoluteUrl());
-            }
-            else {
-              url = Utils.toAbsolute(`collections/${collection.id}`, cx.state.catalogUrl || stac.getAbsoluteUrl());
-            }
-            let data = cx.getters.getStac(url);
-            if (data) {
-              return data;
-            }
-            else {
-              data = new STAC(collection, url, cx.getters.toBrowserPath(url));
-              data.markPotentiallyIncomplete();
-              cx.commit('loaded', { data, url });
-              return data;
-            }
-          });
-          cx.commit('addApiCollections', { data: response.data, stac, show });
+        try {
+          let response = await stacRequest(cx, link);
+          if (!Utils.isObject(response.data) || !Array.isArray(response.data.collections)) {
+            throw new BrowserError(i18n.t('errors.invalidStacCollections'));
+          }
+          else {
+            response.data.collections = response.data.collections.map(collection => {
+              let selfLink = Utils.getLinkWithRel(collection.links, 'self');
+              let url;
+              if (selfLink?.href) {
+                url = Utils.toAbsolute(selfLink.href, cx.state.url || stac.getAbsoluteUrl());
+              }
+              else {
+                url = Utils.toAbsolute(`collections/${collection.id}`, cx.state.catalogUrl || stac.getAbsoluteUrl());
+              }
+              let data = cx.getters.getStac(url);
+              if (data) {
+                return data;
+              }
+              else {
+                data = new STAC(collection, url, cx.getters.toBrowserPath(url));
+                data.markPotentiallyIncomplete();
+                cx.commit('loaded', { data, url });
+                return data;
+              }
+            });
+            cx.commit('addApiCollections', { data: response.data, stac, show });
+          }
+        } catch (error) {
+          if (cx.state.authConfig && isAuthenticationError(error)) {
+            await cx.dispatch('tryLogin', {
+              url: link.href,
+              action: () => cx.dispatch('loadNextApiCollections', args)
+            });
+            return;
+          }
+          throw error;
         }
       },
       async loadOgcApiConformance(cx, link) {
@@ -938,6 +955,7 @@ function getStore(config, router) {
           let response = await stacRequest(cx, link);
           return response.data; // Use data with $refs included as fallback anyway
         } catch (error) {
+          // todo: auth
           return null;
         }
       },

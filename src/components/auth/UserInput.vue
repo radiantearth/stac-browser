@@ -4,7 +4,7 @@
       <b-card no-body :header="t('authentication.title')">
         <b-card-body>
           <p>{{ t('authentication.description') }}</p>
-          <Description v-if="description" :description="description" />
+          <Description v-if="promptText" :description="promptText" />
           <b-form-input class="mb-2 mt-2" type="password" v-model.trim="token" autofocus :required="required" />
         </b-card-body>
         <b-card-footer>
@@ -35,21 +35,25 @@ export default {
     };
   },
   props: {
-    config: {
-      type: Object,
+    description: {
+      type: String,
       default: null
+    },
+    credentials: {
+      type: String,
+      default: ""
     }
   },
   computed: {
-    description() {
-      if (this.config?.description) {
-        return this.config.description;
+    promptText() {
+      if (this.description) {
+        return this.description;
       }
       return this.t('authConfig.description');
     }
   },
   created() {
-    if (this.auth) {
+    if (this.credentials) {
       this.token = this.credentials;
       this.required = false;
     }

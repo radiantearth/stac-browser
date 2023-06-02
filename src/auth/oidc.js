@@ -83,8 +83,7 @@ export default class OIDC extends Auth {
 
   async logout() {
     this.setOriginalUri();
-    await this.okta.signOut();
-    return false;
+    return await this.okta.signOut();
   }
 
   async loginCallback() {

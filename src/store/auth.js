@@ -8,7 +8,7 @@ export default function getStore(router) {
     state: {
       // Wrap in a function and use the getter instead of the state
       // Unfortunately, some auth libraries have internal state, which vuex doesn't like
-      // and report: "do not mutate vuex store state outside mutation handlers."
+      // and thus reports: "do not mutate vuex store state outside mutation handlers."
       method: () => new Auth(),
       actions: [],
       credentials: null
@@ -70,19 +70,23 @@ export default function getStore(router) {
         }
       },
       async authenticate(cx) {
-        if (cx.getters.isLoggedIn) {
-          let logout = await cx.getters.method.logout();
-          if (logout) {
+        try {
+          if (cx.getters.isLoggedIn) {
+            await cx.getters.method.logout(cx.state.credentials);
             await cx.dispatch('updateCredentials');
-            await cx.dispatch('executeActions');
           }
-        }
-        else {
-          let credentials = await cx.getters.method.login();
-          if (credentials) {
+          else {
+            let credentials = await cx.getters.method.login();
             await cx.dispatch('updateCredentials', credentials);
-            await cx.dispatch('executeActions');
+            if(credentials) {
+              await cx.dispatch('executeActions');
+            }
           }
+        } catch(error) {
+          if (!error) {
+            return;
+          }
+          throw error;
         }
       },
       // Format the value and add it to query parameters or headers
@@ -127,6 +131,7 @@ export default function getStore(router) {
             errorFn(error);
           }
         }
+        cx.commit('resetActions');
       }
     }
   };

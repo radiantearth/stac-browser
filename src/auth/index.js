@@ -61,8 +61,7 @@ export default class Auth {
     return;
   }
 
-  async logout() {
-    return false;
+  async logout(credentials) {
   }
 
   async logoutCallback() {
@@ -87,7 +86,7 @@ export default class Auth {
       default: {
         // "input" -> let user input auth data, e.g. Bearer Token
         const UserInput = (await import('./userinput')).default;
-        method = new UserInput(config.generatorOptions, changeListener);
+        method = new UserInput(config.generatorOptions, changeListener, config.description);
       }
     }
     await method.init();

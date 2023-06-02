@@ -147,7 +147,7 @@ export default {
         show: true,
         force: true
       }));
-      await this.authenticate();
+      await this.authenticate(this.$store);
     }
   }
 };
