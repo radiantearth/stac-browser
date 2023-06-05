@@ -23,7 +23,7 @@
       <b-card-body>
         <b-card-title><span v-html="fileFormat" /></b-card-title>
         <b-button-group class="actions" v-if="href">
-          <CopyButton v-if="shouldCopy" variant="primary" :copyText="href">
+          <CopyButton v-if="!isBrowserProtocol" variant="primary" :copyText="href">
             {{ buttonText }}
           </CopyButton>
           <b-button v-else :href="href" target="_blank" variant="primary">
@@ -161,13 +161,6 @@ export default {
       }
       return false;
     },
-    shouldCopy() {
-      if (this.isGdalVfs) {
-        return true;
-      }
-
-      return !this.isBrowserProtocol;
-    },
     fileFormat() {
       if (typeof this.asset.type === "string" && this.asset.type.length > 0) {
         return this.formatMediaType(this.asset.type);
@@ -192,7 +185,7 @@ export default {
       return null;
     },
     isBrowserProtocol() {
-      return !this.protocol || browserProtocols.includes(this.protocol);
+      return (!this.protocol && !this.isGdalVfs) || browserProtocols.includes(this.protocol);
     },
     isGdalVfs() {
       return Utils.isGdalVfsUri(this.asset.href);
@@ -217,6 +210,9 @@ export default {
       }
     },
     browserCanOpenFile() {
+      if (this.isGdalVfs)  {
+        return false;
+      }
       if (Utils.canBrowserDisplayImage(this.asset)) {
         return true;
       }
@@ -239,7 +235,7 @@ export default {
       if (this.isGdalVfs) {
         what = 'copyGdalVfsUrl';
       }
-      else if (this.shouldCopy) {
+      else if (!this.isBrowserProtocol) {
         what = 'copyUrl';
       }
       let where = (!this.isBrowserProtocol && this.from) ? 'withSource' : 'generic';
