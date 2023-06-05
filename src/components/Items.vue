@@ -2,8 +2,8 @@
   <section class="items mb-4">
     <h2>
       <span class="title">{{ $tc('stacItem', items.length ) }}</span>
-      <b-badge v-if="!api && items.length > 1" pill variant="secondary ml-2">{{ items.length }}</b-badge>
-      <SortButtons v-if="!api" class="ml-4" v-model="sort" />
+      <b-badge v-if="!api && items.length > 0" pill variant="secondary ml-2">{{ items.length }}</b-badge>
+      <SortButtons v-if="!api && items.length > 1" class="ml-4" v-model="sort" />
     </h2>
 
     <Pagination ref="topPagination" v-if="showPagination" :pagination="pagination" placement="top" @paginate="paginate" />

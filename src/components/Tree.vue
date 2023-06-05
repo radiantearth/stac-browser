@@ -78,7 +78,7 @@ export default {
     ...mapState(['data', 'apiCatalogPriority']),
     ...mapGetters(['getStac']),
     onClick() {
-      if (this.active) {
+      if (!this.to && this.mayHaveChildren) {
         return this.toggle;
       }
       return null;
@@ -164,7 +164,7 @@ export default {
       return this.path.includes(this.stac);
     },
     active() {
-      return this.stac === this.data;
+      return this.stac && this.stac === this.data;
     },
     pagination() {
       return ['next', 'prev', 'previous'].includes(this.item.rel);
@@ -190,6 +190,11 @@ export default {
         }
         this.updateChilds();
       }
+    }
+  },
+  created() {
+    if (!this.parent) {
+      this.expanded = true;
     }
   },
   methods: {

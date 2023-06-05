@@ -86,7 +86,7 @@ In this case use for example `https://examples.com/stac-browser/#?~API_KEY=123` 
 If you are running an old (standalone) version of STAC Browser (v1 or v2) without heavy modifications,
 you can usually migrate easily.
 
-The old environment variables should be transitions out of usage. Instead please use the config file or CLI parameters.
+The old environment variables are not supported any longer. Instead please use the config file or CLI parameters.
 The names of the variables have slightly changed:
 * `CATALOG_URL` => `catalogUrl`
 * `STAC_PROXY_URL` => `stacProxyUrl` (same in CLI, different format in the config file)
@@ -104,7 +104,7 @@ Then simply deploy STAC Browser to the same location where you hosted STAC Brows
 
 ### Options
 
-All the following options can be used as explained in the chapter "Running", either through the [config file](config.js), as CLI Parameter or as environment variable (deprecated).
+All the following options can be used as explained in the chapter "Running", either through the [config file](config.js) or as CLI parameter.
 Some of them can also be set [through the root catalog](#customize-through-root-catalog).
 
 **The following options are available:**

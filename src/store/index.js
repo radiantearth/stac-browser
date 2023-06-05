@@ -253,7 +253,7 @@ function getStore(config, router) {
           if (!state.allowExternalAccess) {
             return absolute.toString();
           }
-          let parts = ['/external']; // TEMP fix for iframe-parent browsing - does this break anything?
+          let parts = ['/external'];
           let protocol = absolute.protocol();
           if (protocol !== 'https') {
             parts.push(protocol + ':');
@@ -620,7 +620,7 @@ function getStore(config, router) {
           try {
             window.localStorage.setItem('locale', locale);
           } catch (error) {
-            console.log(error);
+            console.error(error);
           }
         }
 

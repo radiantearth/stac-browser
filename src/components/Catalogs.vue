@@ -2,13 +2,14 @@
   <section class="catalogs mb-4">
     <h2>
       <span class="title">{{ $tc('stacCatalog', catalogs.length ) }}</span>
-      <b-badge v-if="hasMultiple" pill variant="secondary ml-2">
-        <template v-if="catalogs.length !== catalogView.length">{{ catalogView.length }}/</template>{{ catalogs.length }}
+      <b-badge v-if="isComplete" pill variant="secondary ml-2">
+        <template v-if="catalogs.length !== catalogView.length">{{ catalogView.length }}/{{ catalogs.length }}</template>
+        <template v-else>{{ catalogs.length }}</template>
       </b-badge>
       <ViewButtons class="ml-4" v-model="view" />
-      <SortButtons v-if="hasMultiple" class="ml-2" v-model="sort" />
+      <SortButtons v-if="isComplete && catalogs.length > 1" class="ml-2" v-model="sort" />
     </h2>
-    <SearchBox v-if="hasMultiple" class="mt-3 mb-2" v-model="searchTerm" :placeholder="$t('catalogs.filterByTitle')" />
+    <SearchBox v-if="isComplete && catalogs.length > 1" class="mt-3 mb-2" v-model="searchTerm" :placeholder="$t('catalogs.filterByTitle')" />
     <b-alert v-if="searchTerm && catalogView.length === 0" variant="warning" show>{{ $t('catalogs.noMatches') }}</b-alert>
     <component :is="cardsComponent" v-bind="cardsComponentProps">
       <Catalog v-for="catalog in catalogView" :catalog="catalog" :key="catalog.href" />
@@ -53,8 +54,8 @@ export default {
   computed: {
     ...mapState(['cardViewSort', 'uiLanguage']),
     ...mapGetters(['getStac']),
-    hasMultiple() {
-      return !this.hasMore && this.catalogs.length > 1;
+    isComplete() {
+      return !this.hasMore;
     },
     catalogView() {
       if (this.hasMore) {
@@ -96,6 +97,9 @@ export default {
   methods: {
     loadMore(visible = true) {
       if (visible) {
+        // Disable sorting if pagination is/was active as otherwise the order of elements
+        // may change unexpectedly after the last page has been loaded.
+        this.sort = 0;
         this.$emit('loadMore');
       }
     }

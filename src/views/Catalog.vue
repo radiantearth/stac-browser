@@ -189,7 +189,7 @@ export default {
           let schema = createCatalogSchema(data, [this.parentLink, this.rootLink], this.$store);
           addSchemaToDocument(document, schema);
         } catch (error) {
-          console.warn(error);
+          console.error(error);
         }
       }
     }

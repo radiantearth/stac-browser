@@ -91,7 +91,7 @@ class STAC {
       try {
         this._apiChildrenListeners[id](this._apiChildren);
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     }
   }
@@ -141,7 +141,9 @@ class STAC {
       let absoluteUrl = Utils.toAbsolute(link.href, stac.getAbsoluteUrl());
       return !catalogs.find(collection => collection.getAbsoluteUrl() === absoluteUrl);
     });
-    return catalogs.concat(links);
+    // place the children first to avoid conflicts with the paginated collections
+    // where the children are always at the end and can never be reached due to infinite scrolling
+    return links.concat(catalogs);
   }
 
   getSearchLink() {

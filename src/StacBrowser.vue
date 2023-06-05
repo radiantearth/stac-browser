@@ -311,7 +311,7 @@ export default {
         try {
           locale = window.localStorage.getItem('locale');
         } catch(error) {
-          console.log(error);
+          console.error(error);
         }
       }
       if (!locale && this.detectLocaleFromBrowserFromVueX && Array.isArray(navigator.languages)) {
