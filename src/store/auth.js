@@ -61,24 +61,17 @@ export default function getStore(router) {
         let newAuth = await Auth.create(config, changeListener, router);
         cx.commit('setMethod', newAuth);
       },
-      async handleAuthenticationCallback(cx) {
-        if (cx.getters.isLoggedIn) {
-          await cx.getters.method.logoutCallback();
-        }
-        else {
-          await cx.getters.method.loginCallback();
-        }
-      },
       async authenticate(cx) {
         try {
           if (cx.getters.isLoggedIn) {
-            await cx.getters.method.logout(cx.state.credentials);
-            await cx.dispatch('updateCredentials');
+            if (await cx.getters.method.logout(cx.state.credentials)) {
+              await cx.dispatch('updateCredentials');
+            }
           }
           else {
             let credentials = await cx.getters.method.login();
             await cx.dispatch('updateCredentials', credentials);
-            if(credentials) {
+            if (credentials) {
               await cx.dispatch('executeActions');
             }
           }

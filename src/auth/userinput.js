@@ -17,8 +17,8 @@ export default class UserInput extends Auth {
   }
 
   async login(credentials = null) {
-    return new Promise(async (resolve, reject) => {
-      let component = (await import('../components/auth/UserInput.vue')).default;
+    let component = (await import('../components/auth/UserInput.vue')).default;
+    return new Promise((resolve, reject) => {
       let app = new Vue({
         ...component,
         propsData: {
@@ -45,7 +45,8 @@ export default class UserInput extends Auth {
   }
 
   async logout(credentials) {
-    return await this.login(credentials);
+    await this.login(credentials);
+    return true;
   }
 
 }

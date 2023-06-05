@@ -35,8 +35,9 @@
       "title": "Anmeldedaten bereitstellen oder aktualisieren"
     },
     "description": "Die angefragte Seite erfordert eine Anmeldung. Bitte die Anmeldedaten unten in das Textfeld eingeben.",
-    "unauthorized": "Sie haben keine Berechtigung um diese Daten abzurufen. Bitte melden Sie sich an.",
-    "title": "Anmelden"
+    "loggedOut": "Sie wurden erfolgreich abgemeldet. Sie können das Fenster nun schließen.",
+    "title": "Anmelden",
+    "unauthorized": "Sie haben keine Berechtigung um diese Daten abzurufen. Bitte melden Sie sich an."
   },
   "browse": "Erkunden",
   "cancel": "Abbrechen",

@@ -28,12 +28,6 @@ export default {
     BFormInput,
     Description
   },
-  data() {
-    return {
-      token: '',
-      required: true
-    };
-  },
   props: {
     description: {
       type: String,
@@ -43,6 +37,12 @@ export default {
       type: String,
       default: ""
     }
+  },
+  data() {
+    return {
+      token: '',
+      required: true
+    };
   },
   computed: {
     promptText() {

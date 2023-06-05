@@ -32,7 +32,7 @@ export default {
           return;
         }
         try {
-          await this.$store.dispatch('auth/handleAuthenticationCallback');
+          await this.method.loginCallback();
         }
         catch (error) {
           console.error(error);

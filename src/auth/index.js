@@ -61,11 +61,8 @@ export default class Auth {
     return;
   }
 
-  async logout(credentials) {
-  }
-
-  async logoutCallback() {
-    return;
+  async logout(/*credentials*/) {
+    return true;
   }
 
   async close() {

@@ -12,7 +12,6 @@ export default class OIDC extends Auth {
     this.router = router;
 
     let oktaOptions = Object.assign({}, options);
-    // todo: Set httpRequestClient
     oktaOptions.restoreOriginalUri = (_, originalUri) => this.restoreOriginalUri(originalUri);
     oktaOptions.httpRequestClient = this.httpRequest.bind(this);
     this.okta = new OktaAuth(oktaOptions);
@@ -31,10 +30,6 @@ export default class OIDC extends Auth {
     };
     let response = await axios(options);
     return response?.request;
-  }
-
-  setOriginalUri() {
-    this.okta.setOriginalUri(this.router?.currentRoute?.fullPath || window.location.href);
   }
 
   async restoreOriginalUri(originalUri) {
@@ -76,22 +71,23 @@ export default class OIDC extends Auth {
   }
 
   async login() {
-    this.setOriginalUri();
+    this.okta.setOriginalUri(this.router?.currentRoute?.fullPath || window.location.href);
     await this.okta.signInWithRedirect();
     return null;
   }
 
   async logout() {
-    this.setOriginalUri();
-    return await this.okta.signOut();
+    await this.okta.signOut();
+    return false; // Don't clear credentials to avoid infinite loop, we'll reload the page anyway
   }
 
   async loginCallback() {
-    await this.okta.handleLoginRedirect();
-  }
-
-  async logoutCallback() {
-    await this.okta.handleLoginRedirect(); // Correct?
+    if (this.okta.isLoginRedirect()) {
+      await this.okta.handleRedirect();
+    }
+    else {
+      console.warn("Called login redirect handler but wasn't redirected from login");
+    }
   }
   
 }
