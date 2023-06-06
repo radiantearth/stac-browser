@@ -46,7 +46,6 @@ export default {
       }
     },
     dataChanged(data) {
-      console.log(data);
       if (!Utils.isObject(data)) {
         this.shownBandsOnMap = [];
         this.shownAssetsOnMap = [];
