@@ -3,7 +3,10 @@
     "description": ""
   },
   "fields": {
-    
+    "Created": "Release date",
+    "Scientific": "Documentation",
+    "Time of Data begins": "Start date",
+    "Time of Data ends": "End date"
   },
   "browse": "Overview"
 }

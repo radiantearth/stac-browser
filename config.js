@@ -1,6 +1,6 @@
 module.exports = {
     catalogUrl: null,
-    catalogTitle: "STAC Browser",
+    catalogTitle: "Open Science Catalog",
     allowExternalAccess: true, // Must be true if catalogUrl is not given
     allowedDomains: [],
     detectLocaleFromBrowser: false,
