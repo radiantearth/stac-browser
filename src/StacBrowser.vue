@@ -223,6 +223,7 @@ export default {
         'apiCatalogPriority',
         'authConfig', // except for the 'formatter', which can't be encoded in JSON
         'cardViewMode',
+        'cardViewSort',
         'crossOriginMedia',
         'defaultThumbnailSize',
         'displayGeoTiffByDefault',
@@ -298,7 +299,7 @@ export default {
         try {
           locale = window.localStorage.getItem('locale');
         } catch(error) {
-          console.log(error);
+          console.error(error);
         }
       }
       if (!locale && this.detectLocaleFromBrowserFromVueX && Array.isArray(navigator.languages)) {

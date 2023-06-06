@@ -253,7 +253,7 @@ function getStore(config, router) {
           if (!state.allowExternalAccess) {
             return absolute.toString();
           }
-          let parts = ['/external/'];
+          let parts = ['/external'];
           let protocol = absolute.protocol();
           if (protocol !== 'https') {
             parts.push(protocol + ':');
@@ -382,6 +382,18 @@ function getStore(config, router) {
               break;
             case 'crossOriginMedia':
               state.crossOriginMedia = ['anonymous', 'use-credentials'].includes(value) ? value : null;
+              break;
+            case 'cardViewSort':
+              switch(value) {
+                case 'asc':
+                  state.cardViewSort = 1;
+                  break;
+                case 'desc':
+                  state.cardViewSort = -1;
+                  break;
+                default:
+                  state.cardViewSort = 0;
+              }
               break;
             default:
               state[key] = value;
@@ -608,7 +620,7 @@ function getStore(config, router) {
           try {
             window.localStorage.setItem('locale', locale);
           } catch (error) {
-            console.log(error);
+            console.error(error);
           }
         }
 

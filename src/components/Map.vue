@@ -352,7 +352,7 @@ export default {
                 // Bring GeoJSON to front to allow opening the popups
                 this.geojsonToFront();
               })
-              .catch(error => console.log(error));
+              .catch(error => console.error(error));
           }
         }
       }
