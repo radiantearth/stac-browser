@@ -20,14 +20,15 @@
               <b-col md="8" class="value" v-html="temporalExtents" />
             </b-row>
           </section>
+          <Links v-if="linkPosition === 'left'" :title="$t('additionalResources')" :links="additionalLinks" />
         </section>
-        <section v-if="isCollection || thumbnails.length > 0" class="mb-4">
+        <section v-if="isCollection || hasThumbnails" class="mb-4">
           <b-card no-body class="maps-preview">
             <b-tabs v-model="tab" ref="tabs" pills card vertical end>
               <b-tab v-if="isCollection" :title="$t('map')" no-body>
                 <Map :stac="data" :stacLayerData="mapData" @dataChanged="dataChanged" popover />
               </b-tab>
-              <b-tab v-if="thumbnails.length > 0" :title="$t('thumbnails')" no-body>
+              <b-tab v-if="hasThumbnails" :title="$t('thumbnails')" no-body>
                 <Thumbnails :thumbnails="thumbnails" />
               </b-tab>
             </b-tabs>
@@ -37,7 +38,7 @@
         <Assets v-if="hasItemAssets && !hasItems" :assets="data.item_assets" :definition="true" />
         <Providers v-if="hasProviders" :providers="data.providers" />
         <Metadata :title="$t('metadata.title')" class="mb-4" :type="data.type" :data="data" :ignoreFields="ignoredMetadataFields" />
-        <Links v-if="additionalLinks.length > 0" :title="$t('additionalResources')" :links="additionalLinks" />
+        <Links v-if="linkPosition === 'right'" :title="$t('additionalResources')" :links="additionalLinks" />
       </b-col>
       <b-col class="catalogs-container" v-if="hasCatalogs">
         <Catalogs :catalogs="catalogs" :hasMore="!!nextCollectionsLink" @loadMore="loadMoreCollections" />
@@ -126,6 +127,20 @@ export default {
   computed: {
     ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination', 'nextCollectionsLink']),
     ...mapGetters(['additionalLinks', 'catalogs', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
+    hasThumbnails() {
+      return this.thumbnails.length > 0;
+    },
+    linkPosition() {
+      if (this.additionalLinks.length === 0) {
+        return null;
+      }
+      if (this.isCollection || !this.hasThumbnails) {
+        return "right";
+      }
+      else {
+        return "left";
+      }
+    },
     apiItemsLoading() {
       return this.getApiItemsLoading(this.data);
     },
@@ -189,7 +204,7 @@ export default {
           let schema = createCatalogSchema(data, [this.parentLink, this.rootLink], this.$store);
           addSchemaToDocument(document, schema);
         } catch (error) {
-          console.warn(error);
+          console.error(error);
         }
       }
     }

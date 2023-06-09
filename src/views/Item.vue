@@ -97,7 +97,7 @@ export default {
           let schema = createItemSchema(data, [this.collectionLink, this.parentLink], this.$store);
           addSchemaToDocument(document, schema);
         } catch (error) {
-          console.warn(error);
+          console.error(error);
         }
       }
     },
