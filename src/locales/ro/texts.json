@@ -46,6 +46,10 @@
     "loadMore": "Încarcă mai mult...",
     "noMatches": "Niciun catalog nu corespunde criteriilor de căutare."
   },
+  "checkbox": {
+    "false": "Nu",
+    "true": "Doar"
+  },
   "copy": "Copiază",
   "default": "Implicit",
   "defaultWithValue": "Implicit ({value})",
