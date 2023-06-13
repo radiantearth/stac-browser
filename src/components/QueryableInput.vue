@@ -16,9 +16,38 @@
           <b-badge variant="dark" class="ml-2">{{ op.label }}</b-badge>
         </b-dropdown-item-button>
       </b-dropdown>
+
+      <multiselect
+        v-if="operator.SYMBOL === 'in'"
+        multiple taggable id="in-op"
+        :value="value.value" :options="queryable.isSelection ? queryableOptions : value.value"
+        @input="updateValue" @tag="addInElement"
+      >
+        <template #noOptions>{{ $t('search.noOptions') }}</template>
+      </multiselect>
+
+      <div v-else-if="operator.SYMBOL === 'between'" class="value">
+        <b-form-input
+          :number="queryable.isNumeric"
+          :type="queryable.isNumeric ? 'number' : 'text'"
+          size="sm"
+          :value="value.value[0]"
+          @input="updateBetweenValue(0, $event)"
+          v-bind="validation"
+        />
+        <span class="sep">-</span>
+        <b-form-input
+          :number="queryable.isNumeric"
+          :type="queryable.isNumeric ? 'number' : 'text'"
+          size="sm"
+          :value="value.value[1]"
+          @input="updateBetweenValue(1, $event)"
+          v-bind="validation"
+        />
+      </div>
       
       <date-picker
-        v-if="queryable.isTemporal"
+        v-else-if="queryable.isTemporal"
         type="date"
         class="value"
         :lang="datepickerLang"
@@ -76,6 +105,7 @@ import { BBadge, BDropdown, BDropdownItemButton, BFormCheckbox, BFormInput, BFor
 import DatePickerMixin from './DatePickerMixin';
 import Utils from '../utils';
 import CqlValue from '../models/cql2/value';
+import { CqlBetween, CqlIn } from '../models/cql2/operators/advanced';
     
 export default {
   name: 'QueryableInput',
@@ -87,7 +117,8 @@ export default {
     BFormInput,
     BFormSelect,
     BIconXCircleFill,
-    Description: () => import('./Description.vue')
+    Description: () => import('./Description.vue'),
+    Multiselect: () => import('vue-multiselect')
   },
   mixins: [
     DatePickerMixin
@@ -177,7 +208,24 @@ export default {
       this.$emit('update:value', CqlValue.create(val));
     },
     updateOperator(op) {
+      if (op === CqlIn) {
+        this.updateValue([]);
+      }
+      else if (op === CqlBetween) {
+        this.updateValue([this.queryable.defaultValue, this.queryable.defaultValue]);
+      }
       this.$emit('update:operator', op);
+    },
+    addInElement(element) {
+      this.updateValue(this.value.value.concat([element]));
+    },
+    setInElements(elements) {
+      this.updateValue(elements);
+    },
+    updateBetweenValue(ix, value) {
+      let values = this.value.value.slice(0);
+      values[ix] = value;
+      this.updateValue(values);
     }
   }
 };
