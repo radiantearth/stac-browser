@@ -7,7 +7,7 @@
         <b-card-title v-if="title" :title="title" />
 
         <b-form-group v-if="canFilterFreeText" :label="$t('search.freeText')" label-for="q" :description="$t('search.freeTextDescription')">
-          <b-form-input id="q" :value="query.q" @change="setSearchTerms"/>
+          <b-form-input id="q" :value="query.q" @change="setSearchTerms" />
         </b-form-group>
 
         <b-form-group v-if="canFilterExtents" :label="$t('search.temporalExtent')" label-for="datetime" :description="$t('search.dateDescription')">

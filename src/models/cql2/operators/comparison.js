@@ -15,16 +15,16 @@ export default class CqlComparisonOperator extends CqlOperator {
     if (["=", "==", "==="].includes(op)) {
       return new CqlEqual(pred, obj);
     }
-    else if (["<>", "!=", "!=="].includes(op)) {
+    else if (["<>", "!=", "!==", "≠"].includes(op)) {
       return new CqlNotEqual(pred, obj);
     }
-    else if (op === ">=") {
+    else if ([">=", "≥"].includes(op)) {
       return new CqlGreaterThanEqual(pred, obj);
     }
     else if (op === ">") {
       return new CqlGreaterThan(pred, obj);
     }
-    else if (op === "<=") {
+    else if (["<=", "≤"].includes(op)) {
       return new CqlLessThanEqual(pred, obj);
     }
     else if (op === "<") {
@@ -50,7 +50,7 @@ export class CqlEqual extends CqlComparisonOperator {
 
 export class CqlNotEqual extends CqlComparisonOperator {
 
-  static SYMBOL = "<>";
+  static SYMBOL = "≠";
 
   constructor(pred = null, obj = null) {
     super(CqlNotEqual.SYMBOL, pred, obj);
@@ -78,7 +78,7 @@ export class CqlGreaterThan extends CqlComparisonOperator {
 
 export class CqlGreaterThanEqual extends CqlComparisonOperator {
 
-  static SYMBOL = ">=";
+  static SYMBOL = "≥";
 
   constructor(pred = null, obj = null) {
     super(CqlGreaterThanEqual.SYMBOL, pred, obj);
@@ -106,7 +106,7 @@ export class CqlLessThan extends CqlComparisonOperator {
 
 export class CqlLessThanEqual extends CqlComparisonOperator {
 
-  static SYMBOL = "<=";
+  static SYMBOL = "≤";
 
   constructor(pred = null, obj = null) {
     super(CqlLessThanEqual.SYMBOL, pred, obj);
