@@ -38,6 +38,7 @@
         <Assets v-if="hasItemAssets && !hasItems" :assets="data.item_assets" :definition="true" />
         <Providers v-if="hasProviders" :providers="data.providers" />
         <Metadata :title="$t('metadata.title')" class="mb-4" :type="data.type" :data="data" :ignoreFields="ignoredMetadataFields" />
+        <CollectionLink v-if="collectionLink" :link="collectionLink" />
         <Links v-if="linkPosition === 'right'" :title="$t('additionalResources')" :links="additionalLinks" />
       </b-col>
       <b-col class="catalogs-container" v-if="hasCatalogs">
@@ -76,6 +77,7 @@ export default {
     BTabs,
     BTab,
     Catalogs,
+    CollectionLink: () => import('../components/CollectionLink.vue'),
     DeprecationNotice: () => import('../components/DeprecationNotice.vue'),
     Description,
     Items,
@@ -126,7 +128,7 @@ export default {
   },
   computed: {
     ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination']),
-    ...mapGetters(['additionalLinks', 'catalogs', 'isCollection', 'items', 'hasMoreCollections', 'getApiItemsLoading', 'parentLink', 'rootLink']),
+    ...mapGetters(['additionalLinks', 'catalogs', 'collectionLink', 'isCollection', 'items', 'hasMoreCollections', 'getApiItemsLoading', 'parentLink', 'rootLink']),
     hasThumbnails() {
       return this.thumbnails.length > 0;
     },
