@@ -5,13 +5,13 @@ import axios from "axios";
 import URI from "urijs";
 
 import i18n from '../i18n';
-import { ogcQueryables, stacBrowserSpecialHandling, stacPagination } from "../rels";
-import Utils, { schemaMediaType, BrowserError } from '../utils';
+import { stacBrowserSpecialHandling } from "../rels";
+import Utils, { BrowserError } from '../utils';
 import STAC from '../models/stac';
-import Queryable from '../models/queryable';
 
 import { addQueryIfNotExists, isAuthenticationError, Loading, processSTAC, proxyUrl, unproxyUrl, stacRequest } from './utils';
 import { getBest } from '../locale-id';
+import { TYPES } from "../components/ApiCapabilitiesMixin";
 
 function getStore(config, router) {
   // Local settings (e.g. for currently loaded STAC entity)
@@ -33,9 +33,7 @@ function getStore(config, router) {
 
     apiItems: [],
     apiItemsLink: null,
-    apiItemsPagination: {},
-
-    queryables: null
+    apiItemsPagination: {}
   });
 
   const catalogDefaults = () => ({
@@ -176,6 +174,9 @@ function getStore(config, router) {
         return null;
       },
       supportsConformance: state => classes => {
+        if(!Array.isArray(classes)) {
+          return classes;
+        }
         let classRegexp = classes
           .map(c => c.replaceAll('*', '[^/]+').replace(/\/?#/, '/?#'))
           .join('|');
@@ -184,6 +185,16 @@ function getStore(config, router) {
       },
       supportsExtension: state => schemaUri => {
         return Utils.supportsExtension(state.data, schemaUri);
+      },
+
+      canSearch: (state, getters) => {
+        return getters.canSearchCollections || getters.canSearchItems;
+      },
+      canSearchItems: (state, getters) => {
+        return getters.supportsConformance(TYPES.Items.BasicFilters);
+      },
+      canSearchCollections: (state, getters) => {
+        return getters.supportsConformance(TYPES.Collections.BasicFilters);
       },
 
       items: state => {
@@ -209,7 +220,6 @@ function getStore(config, router) {
         }
         return catalogs;
       },
-      hasMoreCollections: state => Boolean(state.nextCollectionsLink),
 
       // hasAsset also checks whether the assets have a href and thus are not item asset definitions
       hasAssets: (state, getters) => Boolean(Object.values(getters.assets).find(asset => Utils.isObject(asset) && typeof asset.href === 'string')),
@@ -265,15 +275,16 @@ function getStore(config, router) {
           return path;
         }
         else {
-          return '/' + relative;
+          return '/' + relative.toString();
         }
       },
       fromBrowserPath: (state, getters) => url => {
+        const externalRE = /^\/(search\/)?external\//;
         if (!Utils.hasText(url) || url === '/') {
           url = state.catalogUrl;
         }
-        else if (url.startsWith('/external/')) {
-          let parts = url.replace(/^\/external\//, '').split('/');
+        else if (url.match(externalRE)) {
+          let parts = url.replace(externalRE, '').split('/');
           let protocol;
           if (!parts[0].endsWith(':')) {
             protocol = 'https:';
@@ -293,7 +304,7 @@ function getStore(config, router) {
           return false;
         }
         if (!(absoluteUrl instanceof URI)) {
-          absoluteUrl = new URI(absoluteUrl);
+          absoluteUrl = URI(absoluteUrl);
         }
         if (whitelist && Array.isArray(state.allowedDomains) && state.allowedDomains.includes(absoluteUrl.domain())) {
           return false;
@@ -378,6 +389,18 @@ function getStore(config, router) {
               break;
             case 'crossOriginMedia':
               state.crossOriginMedia = ['anonymous', 'use-credentials'].includes(value) ? value : null;
+              break;
+            case 'cardViewSort':
+              switch(value) {
+                case 'asc':
+                  state.cardViewSort = 1;
+                  break;
+                case 'desc':
+                  state.cardViewSort = -1;
+                  break;
+                default:
+                  state.cardViewSort = 0;
+              }
               break;
             default:
               state[key] = value;
@@ -544,12 +567,7 @@ function getStore(config, router) {
         }
 
         // Handle pagination links
-        let pageLinks = Utils.getLinksWithRels(data.links, stacPagination);
-        let pages = {};
-        for (let pageLink of pageLinks) {
-          let rel = pageLink.rel === 'previous' ? 'prev' : pageLink.rel;
-          pages[rel] = pageLink;
-        }
+        let pages = Utils.getPaginationLinks(data.links);
 
         if (show) {
           state.apiItemsPagination = pages;
@@ -575,8 +593,9 @@ function getStore(config, router) {
           stac.setApiData(collections, nextLink);
         }
       },
-      resetApiItems(state) {
+      resetApiItems(state, link) {
         state.apiItems = [];
+        state.apiItemsLink = link;
         state.apiItemsPagination = {};
       },
       parents(state, parents) {
@@ -585,14 +604,6 @@ function getStore(config, router) {
       showGlobalError(state, error) {
         console.error(error);
         state.globalError = error;
-      },
-      addQueryables(state, queryables) {
-        if (Utils.isObject(queryables) && Utils.isObject(queryables.properties)) {
-          state.queryables = Object.keys(queryables.properties).map(key => new Queryable(key, queryables.properties[key]));
-        }
-        else {
-          state.queryables = [];
-        }
       }
     },
     actions: {
@@ -603,7 +614,7 @@ function getStore(config, router) {
           try {
             window.localStorage.setItem('locale', locale);
           } catch (error) {
-            console.log(error);
+            console.error(error);
           }
         }
 
@@ -627,8 +638,13 @@ function getStore(config, router) {
         // Format the value and add it to query parameters or headers
         let authConfig = cx.state.authConfig;
         let key = authConfig.key;
-        if (value && typeof authConfig.formatter === 'function') {
-          value = authConfig.formatter(value);
+        if (value) {
+          if (authConfig.formatter === 'Bearer') {
+            value = `Bearer ${value}`;
+          }
+          else if (typeof authConfig.formatter === 'function') {
+            value = authConfig.formatter(value);
+          }
         }
         if (!Utils.hasText(value)) {
           value = undefined;
@@ -802,14 +818,7 @@ function getStore(config, router) {
             baseUrl = stac.getAbsoluteUrl();
           }
 
-          if (!Utils.isObject(filters)) {
-            filters = {};
-          }
-          if (typeof filters.limit !== 'number') {
-            filters.limit = cx.state.itemsPerPage;
-          }
-
-          link = Utils.addFiltersToLink(link, filters);
+          link = Utils.addFiltersToLink(link, filters, cx.state.itemsPerPage);
 
           let response = await stacRequest(cx, link);
           if (!Utils.isObject(response.data) || !Array.isArray(response.data.features)) {
@@ -818,7 +827,7 @@ function getStore(config, router) {
           else {
             response.data.features = response.data.features.map(item => {
               try {
-                if (!Utils.isObject(item)) {
+                if (!Utils.isObject(item) || item.type !== 'Feature') {
                   return null;
                 }
                 let selfLink = Utils.getLinkWithRel(item.links, 'self');
@@ -832,10 +841,10 @@ function getStore(config, router) {
                     url = Utils.toAbsolute(`items/${item.id}`, baseUrl);
                   }
                   else if (apiCollectionsLink) {
-                    url = Utils.toAbsolute(`${stac.id}/items/${item.id}`, apiCollectionsLink.href);
+                    url = Utils.toAbsolute(`${collectionId}/items/${item.id}`, apiCollectionsLink.href);
                   }
                   else if (cx.state.catalogUrl) {
-                    url = Utils.toAbsolute(`collections/${stac.id}/items/${item.id}`, cx.state.catalogUrl);
+                    url = Utils.toAbsolute(`collections/${collectionId}/items/${item.id}`, cx.state.catalogUrl);
                   }
                   else {
                     return null;
@@ -923,26 +932,6 @@ function getStore(config, router) {
           cx.commit('setConformanceClasses', response.data.conformsTo);
         }
       },
-      async loadQueryables(cx, { stac, refParser = null }) {
-        let schemas;
-        try {
-          let link = stac.getLinksWithRels(ogcQueryables)
-            .find(link => Utils.isMediaType(link.type, schemaMediaType, true));
-          let href = Utils.isObject(link) ? link.href : Utils.toAbsolute('queryables', stac.getAbsoluteUrl());
-          let response = await stacRequest(cx, href);
-          schemas = response.data; // Use data with $refs included as fallback anyway
-          if (refParser) {
-            try {
-              schemas = await refParser.dereference(schemas);
-            } catch (error) {
-              console.error(error);
-            }
-          }
-        } catch (error) {
-          console.log('Queryables not supported by API');
-        }
-        cx.commit('addQueryables', schemas);
-      },
       async loadGeoJson(cx, link) {
         try {
           let response = await stacRequest(cx, link);
@@ -973,7 +962,7 @@ function getStore(config, router) {
           return;
         }
         try {
-          let uri = new URI('https://api.staclint.com/url');
+          let uri = URI('https://api.staclint.com/url');
           uri.addSearch('stac_url', url);
           let response = await axios.get(uri.toString());
           cx.commit('valid', Boolean(response.data?.body?.valid_stac));

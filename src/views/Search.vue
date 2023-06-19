@@ -4,22 +4,38 @@
     <b-alert v-else-if="!searchLink" variant="danger" show>{{ $t('search.notSupported') }}</b-alert>
     <b-row v-else>
       <b-col class="left">
-        <ItemFilter
-          :stac="parent" title="" :value="filters" v-bind="filterComponentProps"
-          @input="setFilters"
-        />
+        <b-tabs v-model="activeSearch">
+          <b-tab v-if="canSearchCollections" :title="$t('search.tabs.collections')">
+            <SearchFilter
+              :parent="parent" title="" :value="collectionFilters" type="Collections"
+              @input="setFilters"
+            />
+          </b-tab>
+          <b-tab v-if="canSearchItems" :title="$t('search.tabs.items')">
+            <SearchFilter
+              :parent="parent" title="" :value="itemFilters" type="Global"
+              @input="setFilters"
+            />
+          </b-tab>
+        </b-tabs>
       </b-col>
       <b-col class="right">
-        <Loading v-if="loading" fill top />
-        <b-alert v-else-if="!hasItems && !hasFilters" variant="info" show>{{ $t('search.modifyCriteria') }}</b-alert>
-        <b-alert v-else-if="!hasItems" variant="warning" show>{{ $t('search.noItemsFound') }}</b-alert>
-        <template v-if="hasItems">
-          <div id="search-map">
-            <Map :stac="parent" :stacLayerData="itemCollection" scrollWheelZoom popover />
+        <b-alert v-if="error" variant="error" show>{{ error }}</b-alert>
+        <b-alert v-else-if="!data && !hasFilters" variant="info" show>{{ $t('search.modifyCriteria') }}</b-alert>
+        <Loading v-else-if="!data && loading" fill top />
+        <b-alert v-else-if="results.length === 0" variant="warning" show>{{ $t('search.noItemsFound') }}</b-alert>
+        <template v-else>
+          <div id="search-map" v-if="itemCollection">
+            <Map :stac="stac" :stacLayerData="itemCollection" scrollWheelZoom popover />
           </div>
+          <Catalogs
+            v-if="isCollectionSearch" :catalogs="results"
+            :pagination="pagination" :loading="loading" @paginate="loadResults"
+          />
           <Items
-            :stac="parent" :items="apiItems" :api="true" :allowFilter="false"
-            :pagination="itemPages" @paginate="paginateItems"
+            v-else
+            :stac="stac" :items="results" :api="true" :allowFilter="false"
+            :pagination="pagination" :loading="loading" @paginate="loadResults"
           />
         </template>
       </b-col>
@@ -28,27 +44,25 @@
 </template>
 
 <script>
-import Items from '../components/Items.vue';
-import { mapGetters, mapMutations, mapState } from "vuex";
+import { mapGetters, mapState } from "vuex";
 import Utils from '../utils';
-import apiCapabilitiesMixinGenerator from '../components/ApiCapabilitiesMixin';
-import ItemFilter from '../components/ItemFilter.vue';
+import SearchFilter from '../components/SearchFilter.vue';
 import Loading from '../components/Loading.vue';
 import STAC from '../models/stac';
-
-const searchId = '__search__';
+import { BTabs, BTab } from 'bootstrap-vue';
+import { stacRequest } from '../store/utils';
 
 export default {
   name: "Search",
   components: {
-    ItemFilter,
-    Items,
+    BTab,
+    BTabs,
+    Catalogs: () => import('../components/Catalogs.vue'),
+    SearchFilter,
+    Items: () => import('../components/Items.vue'),
     Loading,
     Map: () => import('../components/Map.vue')
   },
-  mixins: [
-    apiCapabilitiesMixinGenerator(false)
-  ],
   props: {
     loadParent: {
       type: String,
@@ -58,42 +72,84 @@ export default {
   data() {
     return {
       parent: null,
-      filters: {},
-      selectedItem: null
+
+      error: null,
+      link: null,
+      loading: false,
+      data: null,
+
+      itemFilters: {},
+      collectionFilters: {},
+      activeSearch: 0
     };
   },
   computed: {
-    ...mapState(['apiItems', 'apiItemsLink', 'apiItemsPagination', 'catalogUrl', 'catalogTitle']),
-    ...mapGetters(['getStac', 'root', 'collectionLink', 'parentLink', 'fromBrowserPath', 'getApiItemsLoading']),
-    pageTitle() {
-      return this.$t('search.title');
-    },
-    loading() {
-      return this.getApiItemsLoading(searchId);
+    ...mapState(['catalogUrl', 'catalogTitle', 'itemsPerPage']),
+    ...mapGetters(['canSearchItems', 'canSearchCollections', 'getStac', 'root', 'collectionLink', 'parentLink', 'fromBrowserPath', 'toBrowserPath']),
+    stac() {
+      if (this.parent instanceof STAC) {
+        return this.parent;
+      }
+      return null;
     },
     searchLink() {
+      return this.isCollectionSearch ? this.collectionSearchLink : this.itemSearchLink;
+    },
+    collectionSearchLink() {
+      return this.parent instanceof STAC && this.parent.getApiCollectionsLink();
+    },
+    itemSearchLink() {
       return this.parent instanceof STAC && this.parent.getSearchLink();
     },
     itemCollection() {
+      if (this.isCollectionSearch) {
+        return null; // wait for stac-js to convert bboxes to geojson
+      }
       return {
         type: 'FeatureCollection',
-        features: this.apiItems,
+        features: this.results,
         links: []
       };
     },
-    itemPages() {
-      let pages = Object.assign({}, this.apiItemsPagination);
-      // If first link is not available, add the items link as first link
-      if (!pages.first && this.data && this.apiItemsLink) {
-        pages.first = Utils.addFiltersToLink(this.apiItemsLink, this.filters);
+    results() {
+      if (!Utils.isObject(this.data)) {
+        return [];
       }
-      return pages;
+      let list = this.isCollectionSearch ? this.data.collections : this.data.features;
+      let type = this.isCollectionSearch ? 'Collection' : 'Feature';
+      if (!Array.isArray(list)) {
+        return [];
+      }
+      return list
+        .map(obj => {
+          try {
+            if (!Utils.isObject(obj) || obj.type !== type) {
+              return null;
+            }
+            let selfLink = Utils.getLinkWithRel(obj.links, 'self');
+            let url;
+            if (selfLink?.href) {
+              url = Utils.toAbsolute(selfLink.href, this.link.href);
+            }
+            return new STAC(obj, url, this.toBrowserPath(url));
+          } catch (error) {
+            console.error(error);
+            return null;
+          }
+        })
+        .filter(obj => obj instanceof STAC);
+    },
+    pagination() {
+      return Utils.getPaginationLinks(this.data);
     },
     hasFilters() {
       return Utils.size(this.filters) > 0;
     },
-    hasItems() {
-      return this.apiItems.length > 0;
+    filters() {
+      return this.isCollectionSearch ? this.collectionFilters : this.itemFilters;
+    },
+    isCollectionSearch() {
+      return this.canSearchCollections && this.activeSearch === 0;
     },
     pageDescription() {
       let title = STAC.getDisplayTitle([this.collectionLink, this.parentLink, this.root], this.catalogTitle);
@@ -128,79 +184,86 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(['toggleApiItemsLoading']),
+    async loadResults(link) {
+      this.error = null;
+      this.loading = true;
+      try {
+        this.link = Utils.addFiltersToLink(link, this.filters, this.itemsPerPage);
+
+        let key = this.isCollectionSearch ? 'collections' : 'features';
+        let response = await stacRequest(this.$store, this.link);
+        if (response) {
+          this.showPage(response.config.url);
+        }
+        if (!Utils.isObject(response.data) || !Array.isArray(response.data[key])) {
+          this.data = null;
+          this.error = this.$t(this.isCollectionSearch ? 'errors.invalidStacCollections' : 'errors.invalidStacItems');
+        }
+        else {
+          this.data = response.data;
+        }
+      } catch (error) {
+        this.data = null;
+        this.error = error.message;
+      } finally {
+        this.loading = false;
+      }
+    },
     async setFilters(filters, reset = false) {
-      this.filters = filters;
-      if (reset) {
-        this.$store.commit('resetApiItems');
+      if (this.isCollectionSearch) {
+        this.collectionFilters = filters;
       }
       else {
-        await this.filterItems(filters);
+        this.itemFilters = filters;
+      }
+      if (reset) {
+        this.data = null;
+      }
+      else {
+        await this.loadResults(this.searchLink);
       }
     },
-    showPage() {
+    showPage(url) {
       this.$store.commit('showPage', {
-        title: this.pageTitle,
-        description: this.pageDescription
+        title: this.$t('search.title'),
+        description: this.pageDescription,
+        url
       });
-      this.$store.commit('setApiItemsLink', this.searchLink);
-    },
-    async paginateItems(link) {
-      this.toggleApiItemsLoading(searchId);
-      try {
-        let response = await this.$store.dispatch('loadApiItems', {link, show: true, filters: this.filters});
-        this.handleResponse(response);
-      } catch (error) {
-        this.$root.$emit('error', error, this.$t('errors.loadItems'));
-      } finally {
-        this.toggleApiItemsLoading(searchId);
-      }
-    },
-    async filterItems(filters) {
-      this.toggleApiItemsLoading(searchId);
-      try {
-        let response = await this.$store.dispatch('loadApiItems', {link: this.searchLink, show: true, filters});
-        this.handleResponse(response);
-      } catch(error) {
-        this.$root.$emit('error', error, this.$t('errors.loadFilteredItems'));
-      } finally {
-        this.toggleApiItemsLoading(searchId);
-      }
-    },
-    handleResponse(response) {
-      if (response) {
-        this.$store.commit('showPage', {
-          title: this.pageTitle,
-          url: response.config.url,
-          description: this.pageDescription
-        });
-      }
     }
   }
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
+#stac-browser {
+  .search .left .tabs .tab-content .filter .card {
+    border-top: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+}
+</style>
+<style lang="scss">
 @import '~bootstrap/scss/mixins';
 @import "../theme/variables.scss";
 
-.search {
+#stac-browser .search {
   .left {
-    min-width: 200px;
+    min-width: 350px;
     flex-basis: 40%;
   }
   .right {
-    min-width: 300px;
+    min-width: 250px;
     flex-basis: 60%;
     position: relative !important;
   }
-  .items {
+  .items, .catalogs {
     .card-columns {
       @include media-breakpoint-only(sm) {
         column-count: 1;
       }
       @include media-breakpoint-only(md) {
-        column-count: 1;
+        column-count: 2;
       }
       @include media-breakpoint-only(lg) {
         column-count: 2;

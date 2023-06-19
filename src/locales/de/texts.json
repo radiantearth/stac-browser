@@ -46,6 +46,10 @@
     "loadMore": "Lade mehr...",
     "noMatches": "Keiner der Kataloge entspricht den Suchkriterien."
   },
+  "checkbox": {
+    "false": "Nein",
+    "true": "Ja"
+  },
   "copy": "Kopieren",
   "default": "Standardeinstellung",
   "defaultWithValue": "Standardeinstellung ({value})",
@@ -192,12 +196,20 @@
     "enterItemIds": "Gebe Element-IDs ein...",
     "equalTo": "entspricht genau",
     "filterBySpatialExtent": "Filtern nach räumlicher Ausdehnung",
+    "freeText": "Suchbegriffe",
+    "freeTextDescription": "Suche nach dem angegebenen Text in Feldern wie dem Titel und der Beschreibung.",
     "greaterThan": "größer als",
+    "greaterThanEqual": "größer als oder entspricht",
     "itemIds": "Element-Identifikationsnummern",
     "itemsPerPage": "Elemente pro Seite",
     "itemsPerPageDescription": "Anzahl der Elemente die pro Seite angefragft wird, maximal {maxItems} Elemente.",
     "lessThan": "kleiner als",
+    "lessThanEqual": "kleiner als oder entspricht",
     "likeOperatorDescription": "Platzhalterzeichen können verwendet werden. `_` entspricht einem einzelnen Zeichen, `%` entspricht einer beliebigen Anzahl an Zeichen. Um nach einem Platzhalterzeichen selber zu suchen, müssen ein `\\` vor das Zeichen gesetzt werden.",
+    "logical": {
+      "and": "Berücksichtige alle Filter (und)",
+      "or": "Berücksichtige mindestens einen der Filter (oder)"
+    },
     "matches": "enthält etwa",
     "metaDescription": "Durchsuche die angebotenen Daten von {title}.",
     "modifyCriteria": "Bitte die Suchkriterien ändern.",
@@ -214,6 +226,10 @@
       "title": "Titel"
     },
     "spatialExtent": "Räumliche Ausdehnung",
+    "tabs": {
+      "collections": "Sammlungen durchsuchen",
+      "items": "Elemente durchsuchen"
+    },
     "temporalExtent": "Zeitliche Ausdehnung",
     "title": "Suche"
   },

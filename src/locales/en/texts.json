@@ -46,6 +46,10 @@
     "loadMore": "Load more...",
     "noMatches": "No catalogs match the given search criteria."
   },
+  "checkbox": {
+    "false": "no",
+    "true": "yes"
+  },
   "copy": "Copy",
   "default": "Default",
   "defaultWithValue": "Default ({value})",
@@ -141,11 +145,11 @@
     "title": "Metadata"
   },
   "multiselect": {
+    "andMore": "and {count} more",
+    "deselectLabel": "Press enter to remove",
     "placeholder": "Select option",
     "selectLabel": "Press enter to select",
-    "selectedLabel": "Selected",
-    "deselectLabel": "Press enter to remove",
-    "andMore": "and {count} more"
+    "selectedLabel": "Selected"
   },
   "open": "Open",
   "pagination": {
@@ -192,12 +196,20 @@
     "enterItemIds": "Enter one or more Item IDs...",
     "equalTo": "equal to",
     "filterBySpatialExtent": "Filter by spatial extent",
+    "freeText": "Search Terms",
+    "freeTextDescription": "Search for the given text in fields such as the title and the description.",
     "greaterThan": "greater than",
+    "greaterThanEqual": "greater than or equal to",
     "itemIds": "Item IDs",
     "itemsPerPage": "Items per page",
     "itemsPerPageDescription": "Number of items requested per page, max. {maxItems} items.",
     "lessThan": "less than",
+    "lessThanEqual": "less than or equal to",
     "likeOperatorDescription": "You can use wildcard characters. `_` matches a single character, `%` matches any number of characters. To search for a wildcard character specifically, you need to add a `\\` in front of the character.",
+    "logical": {
+      "and": "Match all filters (and)",
+      "or": "Match any filters (or)"
+    },
     "matches": "matches",
     "metaDescription": "Search through the data offering of {title}.",
     "modifyCriteria": "Please modify the search criteria.",
@@ -214,6 +226,10 @@
       "title": "Title"
     },
     "spatialExtent": "Spatial Extent",
+    "tabs": {
+      "collections": "Search for Collections",
+      "items": "Search for Items"
+    },
     "temporalExtent": "Temporal Extent",
     "title": "Search"
   },

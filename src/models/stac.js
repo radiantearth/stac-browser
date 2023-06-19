@@ -1,4 +1,4 @@
-import Utils from "../utils";
+import Utils, { geojsonMediaType } from "../utils";
 import Migrate from '@radiantearth/stac-migrate';
 import { getBest } from '../locale-id';
 
@@ -91,7 +91,7 @@ class STAC {
       try {
         this._apiChildrenListeners[id](this._apiChildren);
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     }
   }
@@ -141,12 +141,20 @@ class STAC {
       let absoluteUrl = Utils.toAbsolute(link.href, stac.getAbsoluteUrl());
       return !catalogs.find(collection => collection.getAbsoluteUrl() === absoluteUrl);
     });
-    return catalogs.concat(links);
+    // place the children first to avoid conflicts with the paginated collections
+    // where the children are always at the end and can never be reached due to infinite scrolling
+    return links.concat(catalogs);
   }
 
   getSearchLink() {
-    // ToDo: Currently, only GET search requests are supported #183
-    return this.getStacLinksWithRel('search').find(link => link.method !== 'POST');
+    // The search link MUST be 'application/geo+json' as otherwise it's likely not STAC
+    // See https://github.com/opengeospatial/ogcapi-features/issues/832
+    let links = Utils.getLinksWithRels(this.links, ['search'])
+      .filter(link => Utils.isMediaType(link.type, geojsonMediaType))
+      .map(link => Object.assign({}, link, {href: Utils.toAbsolute(link.href, this._url)}));
+    // Prefer POST if present
+    let post = links.find(link => Utils.hasText(link.method) && link.method.toUpperCase() === 'POST');
+    return post || links[0] || null;
   }
 
   getApiCollectionsLink() {

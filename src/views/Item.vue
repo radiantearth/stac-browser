@@ -27,10 +27,7 @@
           </ReadMore>
           <Keywords v-if="Array.isArray(data.properties.keywords) && data.properties.keywords.length > 0" :keywords="data.properties.keywords" />
         </section>
-        <section class="item-collection card-list mb-4" v-if="collection">
-          <h2>{{ $tc('stacCollection') }}</h2>
-          <Catalog :catalog="collection" :showThumbnail="false" />
-        </section>
+        <CollectionLink v-if="collectionLink" :link="collectionLink" />
         <Providers v-if="data.properties.providers" :providers="data.properties.providers" />
         <Metadata :data="data" type="Item" :ignoreFields="ignoredMetadataFields" />
       </b-col>
@@ -45,7 +42,6 @@ import Description from '../components/Description.vue';
 import ReadMore from "vue-read-more-smooth";
 import ShowAssetMixin from '../components/ShowAssetMixin';
 import { BTabs, BTab } from 'bootstrap-vue';
-import Utils from '../utils';
 import { addSchemaToDocument, createItemSchema } from '../schema-org';
 
 export default {
@@ -55,7 +51,7 @@ export default {
     Assets,
     BTabs,
     BTab,
-    Catalog: () => import('../components/Catalog.vue'),
+    CollectionLink: () => import('../components/CollectionLink.vue'),
     Description,
     DeprecationNotice: () => import('../components/DeprecationNotice.vue'),
     Links: () => import('../components/Links.vue'),
@@ -84,10 +80,7 @@ export default {
   },
   computed: {
     ...mapState(['data', 'url']),
-    ...mapGetters(['additionalLinks', 'collectionLink', 'getStac', 'parentLink']),
-    collection() {
-      return this.getStac(this.collectionLink);
-    }
+    ...mapGetters(['additionalLinks', 'collectionLink', 'parentLink'])
   },
   watch: {
     data: {
@@ -97,15 +90,7 @@ export default {
           let schema = createItemSchema(data, [this.collectionLink, this.parentLink], this.$store);
           addSchemaToDocument(document, schema);
         } catch (error) {
-          console.warn(error);
-        }
-      }
-    },
-    collectionLink: {
-      immediate: true,
-      handler(newLink) {
-        if (Utils.isObject(newLink)) {
-          this.$store.dispatch("load", { url: newLink.href });
+          console.error(error);
         }
       }
     }

@@ -2,8 +2,8 @@
   <section class="items mb-4">
     <h2>
       <span class="title">{{ $tc('stacItem', items.length ) }}</span>
-      <b-badge v-if="!api && items.length > 1" pill variant="secondary ml-2">{{ items.length }}</b-badge>
-      <SortButtons v-if="!api" class="ml-4" v-model="sort" />
+      <b-badge v-if="!api && items.length > 0" pill variant="secondary ml-2">{{ items.length }}</b-badge>
+      <SortButtons v-if="!api && items.length > 1" class="ml-4" v-model="sort" />
     </h2>
 
     <Pagination ref="topPagination" v-if="showPagination" :pagination="pagination" placement="top" @paginate="paginate" />
@@ -12,10 +12,10 @@
         <b-icon-search /> {{ $t('items.filter') }}
       </b-button>
       <b-collapse id="itemFilter" v-model="filtersOpen">
-        <ItemFilter
-          v-if="filtersOpen" :title="$t('items.filter')" :stac="stac"
-          :value="apiFilters" :collectionOnly="true"
-          v-bind="filterComponentProps" @input="emitFilter"
+        <SearchFilter
+          v-if="filtersOpen" type="Items"
+          :title="$t('items.filter')" :parent="stac"
+          :value="apiFilters" @input="emitFilter"
         />
       </b-collapse>
     </template>
@@ -43,7 +43,6 @@ import Pagination from './Pagination.vue';
 import { BCollapse, BIconSearch } from "bootstrap-vue";
 import Utils from '../utils';
 import STAC from '../models/stac';
-import apiCapabilitiesMixinGenerator from './ApiCapabilitiesMixin';
 import { mapState } from 'vuex';
 
 export default {
@@ -52,14 +51,11 @@ export default {
     BCollapse,
     BIconSearch,
     Item,
-    ItemFilter: () => import('./ItemFilter.vue'),
+    SearchFilter: () => import('./SearchFilter.vue'),
     Loading,
     Pagination,
     SortButtons: () => import('./SortButtons.vue')
   },
-  mixins: [
-    apiCapabilitiesMixinGenerator(true)
-  ],
   props: {
     items: {
       type: Array,
@@ -102,7 +98,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['uiLanguage']),
+    ...mapState(['cardViewSort', 'uiLanguage']),
     hasMore() {
       return this.items.length > this.shownItems;
     },
@@ -136,6 +132,9 @@ export default {
       }
       return false;
     }
+  },
+  created() {
+    this.sort = this.cardViewSort;
   },
   methods: {
     emitFilter(value, reset) {

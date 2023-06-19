@@ -1,8 +1,3 @@
-const FEATURES_CORE = [
-  'https://api.stacspec.org/v1.*/ogcapi-features',
-  'http://www.opengis.net/spec/ogcapi-features-1/1.*/conf/core'
-];
-
 // Add deprecated CQL conformance classes for stac-fastapi:
 // https://github.com/stac-utils/stac-fastapi/issues/539
 const CQL_TEXT = [
@@ -14,61 +9,85 @@ const CQL_JSON = [
   'http://www.opengis.net/spec/cql2/1.*/conf/cql2-json'
 ];
 
-const ITEMSEARCH_SORT = ['https://api.stacspec.org/v1.*/item-search#sort'];
-const COLLECTION_ITEMS_SORT = [
-  'https://api.stacspec.org/v1.*/ogcapi-features#sort',
-  'http://www.opengis.net/spec/ogcapi-records-1/1.*/conf/sorting'
-];
-
-// Add wildcard at the end to work around stac-fastapi issue:
-// https://github.com/stac-utils/stac-fastapi/pull/417
-const ITEMSEARCH_FILTER = ['https://api.stacspec.org/v1.*/item-search#filter*'];
-// Check for the OGC API conformance class
-// It seems some conformance classes use conf (correct) and some req (deprecated?) after the version number
-const COLLECTION_ITEMS_FILTER = ['http://www.opengis.net/spec/ogcapi-features-3/1.*/*/features-filter'];
+const CQL_ADV_COMPARISON = ['http://www.opengis.net/spec/cql2/1.*/req/advanced-comparison-operators'];
 
 import { mapGetters } from "vuex";
 
-export default ogcapi => ({
+export const TYPES = {
+  // OGC / STAC API - Features
+  Items: {
+    BasicFilters: [
+      'https://api.stacspec.org/v1.*/ogcapi-features',
+      'http://www.opengis.net/spec/ogcapi-features-1/1.*/conf/core'
+    ],
+    CollectionIdFilter: false,
+    ItemIdFilter: false,
+    // It seems some conformance classes use conf (correct) and some req (deprecated?) after the version number
+    CqlFilters: ['http://www.opengis.net/spec/ogcapi-features-3/1.*/*/features-filter'],
+    Sort: [
+      'https://api.stacspec.org/v1.*/ogcapi-features#sort',
+      'http://www.opengis.net/spec/ogcapi-records-1/1.*/conf/sorting'
+    ],
+    FreeText: false
+  },
+  // STAC API - Item Search
+  Global:  {
+    BasicFilters: true,
+    CollectionIdFilter: true,
+    ItemIdFilter: true,
+    CqlFilters: ['https://api.stacspec.org/v1.*/item-search#filter'],
+    Sort: ['https://api.stacspec.org/v1.*/item-search#sort'],
+    FreeText: ['https://api.stacspec.org/v1.*/item-search#free-text-search']
+  },
+  // OGC / STAC API - Collections
+  Collections: {
+    BasicFilters: ['https://api.stacspec.org/v1.*/collection-search'],
+    CollectionIdFilter: false,
+    ItemIdFilter: false,
+    CqlFilters: ['https://api.stacspec.org/v1.*/collection-search#filter'],
+    Sort: ['https://api.stacspec.org/v1.*/collection-search#sort'],
+    FreeText: ['https://api.stacspec.org/v1.*/collection-search#free-text']
+  }
+};
+
+export default {
+  props: {
+    type: {
+      type: String,
+      required: true
+    }
+  },
   computed: {
     ...mapGetters(['supportsConformance']),
 
+    conformances() {
+      return TYPES[this.type];
+    },
+
     canSort() {
-      return this.supportsConformance(ogcapi ? COLLECTION_ITEMS_SORT : ITEMSEARCH_SORT);
+      return this.supportsConformance(this.conformances.Sort);
     },
     canFilterExtents() {
-      return ogcapi ? this.supportsConformance(FEATURES_CORE) : true;
+      return this.supportsConformance(this.conformances.BasicFilters);
     },
-    canFilterCql() {
-      return this.supportsConformance(ogcapi ? COLLECTION_ITEMS_FILTER : ITEMSEARCH_FILTER)
-        && this.cqlModes.includes("Text"); // ToDo: this.cqlModes.length > 0
+    canFilterFreeText() {
+      return this.supportsConformance(this.conformances.FreeText);
     },
-    cqlModes() {
-      let modes = [];
-      if (this.supportsConformance(CQL_TEXT)) {
-        modes.push('Text');
+    cql() {
+      if (!this.supportsConformance(this.conformances.CqlFilters)) {
+        return null;
       }
-      if (this.supportsConformance(CQL_JSON)) {
-        modes.push('JSON');
+      let textMode = this.supportsConformance(CQL_TEXT);
+      let jsonMode = this.supportsConformance(CQL_JSON);
+      if (!textMode && !jsonMode) {
+        return null;
       }
-      return modes;
-    },
-    filterComponentProps() {
+
       return {
-        canSort: this.canSort,
-        canFilterCql: this.canFilterCql,
-        canFilterExtents: this.canFilterExtents
+        textMode,
+        jsonMode,
+        advancedComparison: this.supportsConformance(CQL_ADV_COMPARISON)
       };
     }
-  },
-});
-
-export {
-  FEATURES_CORE,
-  CQL_TEXT,
-  CQL_JSON,
-  ITEMSEARCH_SORT,
-  COLLECTION_ITEMS_SORT,
-  ITEMSEARCH_FILTER,
-  COLLECTION_ITEMS_FILTER
+  }
 };

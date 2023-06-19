@@ -1,6 +1,6 @@
 import URI from 'urijs';
-import Queryable from './models/queryable';
 import removeMd from 'remove-markdown';
+import { stacPagination } from "./rels";
 
 export const commonFileNames = ['catalog', 'collection', 'item'];
 
@@ -114,11 +114,6 @@ export default class Utils {
     return (typeof string === 'string' && string.length > 0);
   }
 
-  static urlType(url, type) {
-    let uri = URI(url);
-    return uri.is(type);
-  }
-
   static isGdalVfsUri(url) {
     return typeof url === 'string' && url.startsWith('/vsi') && !url.startsWith('/vsicurl/');
   }
@@ -134,17 +129,10 @@ export default class Utils {
     }
     // Parse URL and make absolute, if required
     let uri = URI(href);
-    if (baseUrl && uri.is("relative") && !Utils.isGdalVfsUri(href)) { // Don't convert GDAL VFS URIs: https://github.com/radiantearth/stac-browser/issues/116
-      // Avoid that baseUrls that have a . in the last parth part will be removed (e.g. https://example.com/api/v1.0 )
-      let baseUri = URI(baseUrl);
-      let baseUriPath = baseUri.path();
-      if (!baseUriPath.endsWith('/') && !baseUriPath.endsWith('.json')) {
-        baseUri.path(baseUriPath + '/');
-      }
-      uri = uri.absoluteTo(baseUri);
+    // Don't convert GDAL VFS URIs: https://github.com/radiantearth/stac-browser/issues/116
+    if (baseUrl && uri.is("relative") && !Utils.isGdalVfsUri(href)) {
+      uri = uri.absoluteTo(baseUrl);
     }
-    // Normalize URL and remove trailing slash from path
-    // to avoid handling the same resource twice
     uri.normalize();
     if (noParams) {
       uri.query("");
@@ -238,56 +226,88 @@ export default class Utils {
     }).join('/');
   }
 
-  static formatBboxQuery(value) {
-    if (typeof value.toBBoxString === 'function') {
-      // This is a Leaflet LatLngBounds Object
-      const Y = 85.06;
-      const X = 180;
-      value = [
-        Math.max(value.getWest(), -X),
-        Math.max(value.getSouth(), -Y),
-        Math.min(value.getEast(), X),
-        Math.min(value.getNorth(), Y)
-      ];
+  static getPaginationLinks(data) {
+    let pageLinks = Utils.getLinksWithRels(data.links, stacPagination);
+    let pages = {};
+    for (let pageLink of pageLinks) {
+      let rel = pageLink.rel === 'previous' ? 'prev' : pageLink.rel;
+      pages[rel] = pageLink;
     }
-    return value.join(',');
+    return pages;
   }
 
-  static addFiltersToLink(link, filters = {}) {
-    // Construct new link with search params
-    let url = new URI(link.href);
+  static addFiltersToLink(link, filters = {}, itemsPerPage = null) {
+    let isEmpty = value => {
+      return (value === null
+      || (typeof value === 'number' && !Number.isFinite(value))
+      || (typeof value === 'string' && value.length === 0)
+      || (typeof value === 'object' && Utils.size(value) === 0));
+    };
 
-    for (let key in filters) {
-      let value = filters[key];
-      if (
-        value === null
-        || (typeof value === 'number' && !Number.isFinite(value))
-        || (typeof value === 'string' && value.length === 0)
-        || (typeof value === 'object' && Utils.size(value) === 0)
-      ) {
-        url.removeQuery(key);
-        continue;
-      }
-
-      if (key === 'datetime') {
-        value = Utils.formatDatetimeQuery(value);
-      }
-      else if (key === 'bbox') {
-        value = Utils.formatBboxQuery(value);
-      }
-      else if ((key === 'collections' || key === 'ids') && Array.isArray(value)) {
-        value = value.join(',');
-      }
-      else if (key === 'filters') {
-        let params = Queryable.formatText(value);
-        url.setQuery(params);
-        continue;
-      }
-
-      url.setQuery(key, value);
+    if (!Utils.isObject(filters)) {
+      filters = {};
+    }
+    else {
+      filters = Object.assign({}, filters);
     }
 
-    return Object.assign({}, link, { href: url.toString() });
+    if (typeof filters.limit !== 'number' && typeof itemsPerPage === 'number') {
+      filters.limit = itemsPerPage;
+    }
+
+    if (Utils.hasText(link.method) && link.method.toUpperCase() === 'POST') {
+      let body = Object.assign({}, link.body);
+
+      for (let key in filters) {
+        let value = filters[key];
+        if (isEmpty(value)) {
+          delete body[key];
+          continue;
+        }
+
+        if (key === 'datetime') {
+          value = Utils.formatDatetimeQuery(value);
+        }
+        else if (key === 'filters') {
+          Object.assign(body, value.toJSON());
+          continue;
+        }
+
+        body[key] = value;
+      }
+      return Object.assign({}, link, { body });
+    }
+    else { // GET
+      // Construct new link with search params
+      let url = URI(link.href);
+
+      for (let key in filters) {
+        let value = filters[key];
+        if (isEmpty(value)) {
+          url.removeQuery(key);
+          continue;
+        }
+
+        if (key === 'datetime') {
+          value = Utils.formatDatetimeQuery(value);
+        }
+        else if (key === 'bbox') {
+          value = value.join(',');
+        }
+        else if ((key === 'collections' || key === 'ids')) {
+          value = value.join(',');
+        }
+        else if (key === 'filters') {
+          let params = value.toText();
+          url.setQuery(params);
+          continue;
+        }
+
+        url.setQuery(key, value);
+      }
+
+      return Object.assign({}, link, { href: url.toString() });
+    }
   }
 
   static titleForHref(href, preferFileName = false) {
@@ -322,7 +342,7 @@ export default class Utils {
     if (typeof img.href !== 'string') {
       return false;
     }
-    let uri = new URI(img.href);
+    let uri = URI(img.href);
     let protocol = uri.protocol().toLowerCase();
     if (protocol && !browserProtocols.includes(protocol)) {
       return false;
@@ -396,6 +416,33 @@ export default class Utils {
     }
     let regexp = new RegExp('^' + pattern.replaceAll('*', '[^/]+') + '$');
     return Boolean(data['stac_extensions'].find(uri => regexp.test(uri)));
+  }
+
+  /**
+   * Deep merge two objects.
+   * @param target
+   * @param ...sources
+   */
+  static mergeDeep(target, ...sources) {
+    if (!sources.length) {
+      return target;
+    }
+    const source = sources.shift();
+
+    if (Utils.isObject(target) && Utils.isObject(source)) {
+      for (const key in source) {
+        if (Utils.isObject(source[key])) {
+          if (!target[key]) {
+            Object.assign(target, { [key]: {} });
+          }
+          Utils.mergeDeep(target[key], source[key]);
+        } else {
+          Object.assign(target, { [key]: source[key] });
+        }
+      }
+    }
+
+    return Utils.mergeDeep(target, ...sources);
   }
 
 }

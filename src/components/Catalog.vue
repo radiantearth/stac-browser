@@ -130,6 +130,7 @@ export default {
       -webkit-line-clamp: 3;
       -webkit-box-orient: vertical;
       overflow: hidden;
+      overflow-wrap: anywhere;
       text-align: left;
     }
       
@@ -162,6 +163,8 @@ export default {
         height: 100%;
         max-height: 8.5rem;
         max-width: 33%;
+        object-fit: contain;
+        object-position: right;
       }
 
       .intro {
@@ -169,6 +172,7 @@ export default {
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
+        overflow-wrap: anywhere;
         text-align: left;
         margin-bottom: 0;
       }
