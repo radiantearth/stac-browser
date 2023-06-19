@@ -24,6 +24,7 @@ import StacLink from './StacLink.vue';
 import STAC from '../models/stac';
 import { formatMediaType, formatTemporalExtent } from '@radiantearth/stac-fields/formatters';
 import Utils from '../utils';
+import { translateFields } from '../i18n';
 
 export default {
   name: 'Catalog',
@@ -85,14 +86,13 @@ export default {
         return [];
       }
       let domains = {
-        'eo': 'EO',
-        'forecast': 'Forecast',
+        // todo: move translations to texts.json and add InSAR / ML
+        'eo': translateFields('Electro-Optical'),
+        'forecast': translateFields('Forecast'),
         'insar': 'InSAR',
         'ml-model': 'ML',
-        'pc': 'Point Cloud',
-        'sar': 'SAR',
-        'table': 'Tabular',
-        'video': 'Video'
+        'pc': translateFields('Point Cloud'),
+        'sar': translateFields('SAR')
       };
       return Object.keys(domains)
         .filter(key => Utils.supportsExtension(this.data, `https://stac-extensions.github.io/${key}/v*/schema.json`))
