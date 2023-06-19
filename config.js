@@ -1,23 +1,14 @@
 module.exports = {
     catalogUrl: null,
-    catalogTitle: "STAC Browser",
+    catalogTitle: "Open Science Catalog",
     allowExternalAccess: true, // Must be true if catalogUrl is not given
     allowedDomains: [],
-    detectLocaleFromBrowser: true,
-    storeLocale: true,
+    detectLocaleFromBrowser: false,
+    storeLocale: false,
     locale: "en",
     fallbackLocale: "en",
     supportedLocales: [
-        "de",
-//      "de-CH",
-        "es",
-        "en",
-        "fr",
-//      "fr-CA",
-//      "fr-CH",
-        "it",
-//      "it-CH",
-        "ro"
+      "en"
     ],
     apiCatalogPriority: null,
     useTileLayerAsFallback: true,
@@ -25,9 +16,9 @@ module.exports = {
     displayGeoTiffByDefault: false,
     buildTileUrlTemplate: ({href, asset}) => "https://tiles.rdnt.io/tiles/{z}/{x}/{y}@2x?url=" + encodeURIComponent(asset.href.startsWith("/vsi") ? asset.href : href),
     stacProxyUrl: null,
-    pathPrefix: "/",
+    pathPrefix: "/stac-browser/",
     historyMode: "history",
-    cardViewMode: "cards",
+    cardViewMode: "list",
     cardViewSort: "asc",
     showThumbnailsAsAssets: false,
     stacLint: true,
@@ -39,6 +30,14 @@ module.exports = {
     crossOriginMedia: null,
     requestHeaders: {},
     requestQueryParameters: {},
-    preprocessSTAC: null,
+    preprocessSTAC: (stacItem => {
+      const blackList= ["theme:", "variable:", "project:", "eo-mission:", "region:"];
+      const keywords = stacItem.keywords;
+      let returnItem = stacItem;
+      if (keywords) {
+        returnItem.keywords = keywords.filter(k => !blackList.find(b => k.startsWith(b)));
+      }
+      return returnItem;
+    }),
     authConfig: null
 };

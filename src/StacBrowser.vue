@@ -67,6 +67,13 @@ const router = new VueRouter({
   routes: getRoutes(CONFIG)
 });
 
+router.beforeEach((to, _, next) => {
+  window.parent.postMessage({
+    navigate: to.path
+  }, '*');
+  next();
+});
+
 // Setup store
 Vue.use(Vuex);
 const store = getStore(CONFIG, router);
@@ -211,11 +218,16 @@ export default {
           }
         }
 
-        this.$router.replace({ query }).catch(error => {
-          if (!VueRouter.isNavigationFailure(error, VueRouter.NavigationFailureType.duplicated)) {
-            throw Error(error);
-          }
-        });
+        if (query.external) {
+          // Hack for accessing the external functionality in a hosted bundle
+          this.$router.replace(`/external/${query.external}`);
+        } else {
+          this.$router.replace({ query }).catch(error => {
+            if (!VueRouter.isNavigationFailure(error, VueRouter.NavigationFailureType.duplicated)) {
+              throw Error(error);
+            }
+          });
+        }
       }
     },
     root(root, oldRoot) {
