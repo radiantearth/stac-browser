@@ -13,11 +13,11 @@
           <section v-if="isCollection" class="metadata mb-4">
             <b-row v-if="licenses">
               <b-col md="4" class="label">{{ $t('catalog.license') }}</b-col>
-              <b-col md="8" class="value" v-html="licenses" />
+              <b-col md="8" class="value"><span v-html="licenses" /></b-col>
             </b-row>
             <b-row v-if="temporalExtents">
               <b-col md="4" class="label">{{ $t('catalog.temporalExtent') }}</b-col>
-              <b-col md="8" class="value" v-html="temporalExtents" />
+              <b-col md="8" class="value"><span v-html="temporalExtents" /></b-col>
             </b-row>
           </section>
           <Links v-if="linkPosition === 'left'" :title="$t('additionalResources')" :links="additionalLinks" />
