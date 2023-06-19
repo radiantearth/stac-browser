@@ -134,13 +134,6 @@ export default {
                     background: rgba(0,0,0,0.03);
                 }
             }
-
-            .label {
-                padding-left: 0.4rem;
-            }
-            .value {
-                padding-right: 0.4rem;
-            }
         }
         .row {
             margin: 0;
@@ -200,6 +193,7 @@ export default {
 
             &:only-child {
                 margin-left: 0;
+                margin-bottom: 0;
             }
             dl:only-child {
                 margin-left: 1em;
