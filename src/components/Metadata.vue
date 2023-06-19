@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import { formatAsset, formatCollection, formatGrouped, formatItemProperties, formatLink, formatProvider, formatSummaries } from '@radiantearth/stac-fields';
+import { formatAsset, formatCatalog, formatCollection, formatGrouped, formatItemProperties, formatLink, formatProvider, formatSummaries } from '@radiantearth/stac-fields';
 import MetadataGroup from './metadata/MetadataGroup.vue';
 import { isoDuration } from '@musement/iso-duration';
 import { mapState } from 'vuex';
@@ -82,8 +82,9 @@ export default {
                     return formatProvider(this.data, this.context, filter);
                 case 'Item':
                     return formatItemProperties(this.data, filter);
-                case 'Collection':
-                case 'Catalog': {
+                case 'Catalog':
+                    return formatCatalog(this.data, filter);
+                case 'Collection': {
                     let core = formatCollection(this.data, filter);
                     let summaries = formatSummaries(this.data, filter);
                     // Merge summaries into collection metadata
