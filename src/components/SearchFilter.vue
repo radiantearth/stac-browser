@@ -6,6 +6,10 @@
 
         <b-card-title v-if="title" :title="title" />
 
+        <b-form-group v-if="canFilterFreeText" :label="$t('search.freeText')" label-for="q" :description="$t('search.freeTextDescription')">
+          <b-form-input id="q" :value="query.q" @change="setSearchTerms" />
+        </b-form-group>
+
         <b-form-group v-if="canFilterExtents" :label="$t('search.temporalExtent')" label-for="datetime" :description="$t('search.dateDescription')">
           <date-picker
             range id="datetime" :lang="datepickerLang" :format="datepickerFormat"
@@ -18,7 +22,7 @@
           <Map class="mb-4" v-if="provideBBox" :stac="stac" selectBounds @bounds="setBBox" scrollWheelZoom />
         </b-form-group>
 
-        <b-form-group v-if="conformances.Collections" :label="$tc('stacCollection', collections.length)" label-for="collections">
+        <b-form-group v-if="conformances.CollectionIdFilter" :label="$tc('stacCollection', collections.length)" label-for="collections">
           <multiselect
             v-if="collections.length > 0"
             id="collections" :value="selectedCollections" @input="setCollections"
@@ -46,7 +50,7 @@
           </multiselect>
         </b-form-group>
 
-        <b-form-group v-if="conformances.Items" :label="$t('search.itemIds')" label-for="ids">
+        <b-form-group v-if="conformances.ItemIdFilter" :label="$t('search.itemIds')" label-for="ids">
           <multiselect
             id="ids" :value="query.ids" @input="setIds"
             multiple taggable :options="query.ids"
@@ -59,7 +63,7 @@
           </multiselect>
         </b-form-group>
 
-        <div class="additional-filters" v-if="cql && Array.isArray(queryables) && queryables.length > 0">
+        <div class="additional-filters" v-if="showAdditionalFilters">
           <b-form-group :label="$t('search.additionalFilters')" label-for="availableFields">
             <b-form-radio-group id="logical" v-model="filtersAndOr" :options="andOrOptions" name="logical" size="sm" />
 
@@ -84,7 +88,7 @@
           </b-form-group>
         </div>
 
-        <hr>
+        <hr v-if="canFilterExtents || conformances.CollectionIdFilter || conformances.ItemIdFilter || showAdditionalFilters">
 
         <b-form-group v-if="canSort" :label="$t('sort.title')" label-for="sort" :description="$t('search.notFullySupported')">
           <multiselect
@@ -117,26 +121,34 @@
 <script>
 import { BBadge, BDropdown, BDropdownItem, BForm, BFormGroup, BFormInput, BFormCheckbox, BFormRadioGroup } from 'bootstrap-vue';
 import Multiselect from 'vue-multiselect';
+import { mapState } from "vuex";
+import refParser from '@apidevtools/json-schema-ref-parser';
 
-import { mapGetters, mapState } from "vuex";
+import Utils, { schemaMediaType } from '../utils';
+import { ogcQueryables } from "../rels";
+
+import ApiCapabilitiesMixin from './ApiCapabilitiesMixin';
 import DatePickerMixin from './DatePickerMixin';
 import Loading from './Loading.vue';
-import Utils from '../utils';
-import CqlLogicalOperator from '../models/cql2/operators/logical';
+
+import STAC from '../models/stac';
 import Cql from '../models/cql2/cql';
-import { CqlEqual } from '../models/cql2/operators/comparison';
+import Queryable from '../models/cql2/queryable';
 import CqlValue from '../models/cql2/value';
-import ApiCapabilitiesMixin from './ApiCapabilitiesMixin';
+import CqlLogicalOperator from '../models/cql2/operators/logical';
+import { CqlEqual } from '../models/cql2/operators/comparison';
+import { stacRequest } from '../store/utils';
 
 function getQueryDefaults() {
   return {
+    q: null,
     datetime: null,
     bbox: null,
     limit: null,
     ids: [],
     collections: [],
     sortby: null,
-    filters: []
+    filters: null
   };
 }
 
@@ -153,7 +165,7 @@ function getDefaults() {
 }
 
 export default {
-  name: 'ItemFilter',
+  name: 'SearchFilter',
   components: {
     BBadge,
     BDropdown,
@@ -174,11 +186,15 @@ export default {
     DatePickerMixin
   ],
   props: {
-    stac: {
+    parent: {
       type: Object,
       required: true
     },
     title: {
+      type: String,
+      required: true
+    },
+    type: { // Collections or Global or Items
       type: String,
       required: true
     },
@@ -189,18 +205,29 @@ export default {
   },
   data() {
     return Object.assign({
+      results: null,
       maxItems: 10000,
-      loaded: false
+      loaded: false,
+      queryables: null,
+      collections: []
     }, getDefaults());
   },
   computed: {
-    ...mapState(['itemsPerPage', 'uiLanguage', 'queryables', 'apiCollections']),
-    ...mapGetters(['hasMoreCollections', 'root']),
+    ...mapState(['apiCollections', 'nextCollectionsLink', 'itemsPerPage', 'uiLanguage']),
+    stac() {
+      if (this.parent instanceof STAC) {
+        return this.parent;
+      }
+      return null;
+    },
     andOrOptions() {
       return [
         { value: 'and', text: this.$i18n.t('search.logical.and') },
         { value: 'or', text: this.$i18n.t('search.logical.or') },
       ];
+    },
+    showAdditionalFilters() {
+      return this.cql && Array.isArray(this.queryables) && this.queryables.length > 0;
     },
     sortOptions() {
       return [
@@ -210,22 +237,21 @@ export default {
         { value: 'properties.title', text: this.$t('search.sortOptions.title') }
       ];
     },
-    collections() {
-      if (this.hasMoreCollections || !this.conformances.Collections) {
-        return [];
-      }
-      return this.apiCollections
-        .map(c => ({
-          value: c.id,
-          text: c.title || c.id
-        }))
-        .sort((a,b) => a.text.localeCompare(b.text, this.uiLanguage));
-    },
     sortedQueryables() {
       return this.queryables.slice(0).sort((a, b) => a.title.localeCompare(b.title));
     }
   },
   watch: {
+    apiCollections: {
+      immediate: true,
+      handler() {
+        if (!Array.isArray(this.apiCollections) || this.nextCollectionsLink || !this.conformances.CollectionIdFilter) {
+          this.collections = [];
+          return;
+        }
+        this.collections = this.prepareCollections(this.apiCollections);
+      }
+    },
     value: {
       immediate: true,
       handler(value) {
@@ -239,23 +265,95 @@ export default {
   },
   created() {
     let promises = [];
-    if (this.cql) {
+    if (this.cql && this.stac) {
+      let queryableLink = this.findQueryableLink(this.stac.links);
       promises.push(
-        this.$store.dispatch('loadQueryables', {
-          stac: this.stac,
-          refParser: require('@apidevtools/json-schema-ref-parser')
-        }).catch(error => console.error(error))
+        this.loadQueryables(queryableLink)
+          .catch(error => console.error(error))
       );
     }
-    if (this.conformances.Collections && this.apiCollections.length === 0) {
+    if ((this.type === 'Collections' || this.conformances.CollectionIdFilter) && this.stac) {
       promises.push(
-        this.$store.dispatch('loadNextApiCollections', {stac: this.root, show: true})
+        this.loadCollections(this.stac.getApiCollectionsLink())
+          .then(({collections, queryableLink}) => {
+            this.collections = collections;
+            return this.loadQueryables(queryableLink);
+          })
           .catch(error => console.error(error))
       );
     }
     Promise.all(promises).finally(() => this.loaded = true);
   },
   methods: {
+    async loadCollections(link) {
+      let hasMore = false;
+      let data = {
+        collections: [],
+        queryableLink: null
+      };
+
+      if (this.type === 'Global' && this.apiCollections) {
+        data.collections = this.apiCollections;
+        hasMore = Boolean(this.nextCollectionsLink);
+      }
+      else if (this.type === 'Global' || this.type === 'Collections') {
+        let response = await stacRequest(this.$store, link);
+        if (!Utils.isObject(response.data)) {
+          return {};
+        }
+
+        if (Array.isArray(response.data.links)) {
+          let links = response.data.links;
+          hasMore = Boolean(Utils.getLinkWithRel(links, 'next'));
+          data.queryableLink = this.findQueryableLink(links) || null;
+        }
+
+        if (!hasMore && Array.isArray(response.data.collections)) {
+          let collections = response.data.collections
+            .map(collection => new STAC(collection));
+          data.collections = this.prepareCollections(collections);
+        }
+      }
+      return data;
+    },
+    prepareCollections(collections) {
+      return collections
+        .map(c => ({
+          value: c.id,
+          text: c.title || c.id
+        }))
+        .sort((a,b) => a.text.localeCompare(b.text, this.uiLanguage));
+    },
+    findQueryableLink(links) {
+      return Utils.getLinksWithRels(links, ogcQueryables)
+          .find(link => Utils.isMediaType(link.type, schemaMediaType, true));
+    },
+    async loadQueryables(link) {
+      this.queryables = [];
+
+      if (!Utils.isObject(link)) {
+        return;
+      }
+
+      let response = await stacRequest(this.$store, link);
+      if (!Utils.isObject(response.data)) {
+        return;
+      }
+
+      let schemas;
+      try {
+        schemas = await refParser.dereference(response.data);
+      } catch (error) {
+        // Use data with $refs included as fallback anyway
+        console.error(error);
+        schemas = response.data;
+      }
+
+      if (Utils.isObject(schemas) && Utils.isObject(schemas.properties)) {
+        this.queryables = Object.entries(schemas.properties)
+          .map(([key, schema]) => new Queryable(key, schema));
+      }
+    },
     limitText(count) {
       return this.$t("multiselect.andMore", {count});
     },
@@ -266,6 +364,9 @@ export default {
       this.sortOrder = value;
     },
     buildFilter() {
+      if (this.filters.length === 0) {
+        return null;
+      }
       const args = this.filters.map(f => new f.operator(f.queryable, f.value));
       const logical = CqlLogicalOperator.create(this.filtersAndOr, args);
       return new Cql(logical);
@@ -284,9 +385,8 @@ export default {
       if (this.canSort && this.sortTerm && this.sortOrder) {
         this.$set(this.query, 'sortby', this.formatSort());
       }
-      if (this.filters.length > 0) {
-        this.$set(this.query, 'filters', this.buildFilter());
-      }
+      let filters = this.buildFilter();
+      this.$set(this.query, 'filters', filters);
       this.$emit('input', this.query, false);
     },
     async onReset() {
@@ -302,6 +402,12 @@ export default {
         limit = null;
       }
       this.$set(this.query, 'limit', limit);
+    },
+    setSearchTerms(value) {
+      if (!Utils.hasText(value)) {
+        value = null;
+      }
+      this.$set(this.query, 'q', value);
     },
     setBBox(bounds) {
       let bbox = null;

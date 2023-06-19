@@ -12,9 +12,9 @@
         <b-icon-search /> {{ $t('items.filter') }}
       </b-button>
       <b-collapse id="itemFilter" v-model="filtersOpen">
-        <ItemFilter
-          v-if="filtersOpen" type="Features"
-          :title="$t('items.filter')" :stac="stac"
+        <SearchFilter
+          v-if="filtersOpen" type="Items"
+          :title="$t('items.filter')" :parent="stac"
           :value="apiFilters" @input="emitFilter"
         />
       </b-collapse>
@@ -51,7 +51,7 @@ export default {
     BCollapse,
     BIconSearch,
     Item,
-    ItemFilter: () => import('./ItemFilter.vue'),
+    SearchFilter: () => import('./SearchFilter.vue'),
     Loading,
     Pagination,
     SortButtons: () => import('./SortButtons.vue')
