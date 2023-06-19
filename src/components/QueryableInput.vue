@@ -38,17 +38,9 @@
         v-bind="validation"
       />
       <b-form-input
-        v-else-if="queryable.isText"
-        size="sm"
-        class="value"
-        :value="value.value"
-        @input="updateValue($event)"
-        v-bind="validation"
-      />
-      <b-form-input
-        v-else-if="queryable.isNumeric"
-        number
-        type="number"
+        v-else-if="queryable.isText || queryable.isNumeric"
+        :number="queryable.isNumeric"
+        :type="queryable.isNumeric ? 'number' : 'text'"
         size="sm"
         class="value"
         :value="value.value"

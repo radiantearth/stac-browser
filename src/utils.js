@@ -1,5 +1,6 @@
 import URI from 'urijs';
 import removeMd from 'remove-markdown';
+import { stacPagination } from "./rels";
 
 export const commonFileNames = ['catalog', 'collection', 'item'];
 
@@ -225,13 +226,34 @@ export default class Utils {
     }).join('/');
   }
 
-  static addFiltersToLink(link, filters = {}) {
+  static getPaginationLinks(data) {
+    let pageLinks = Utils.getLinksWithRels(data.links, stacPagination);
+    let pages = {};
+    for (let pageLink of pageLinks) {
+      let rel = pageLink.rel === 'previous' ? 'prev' : pageLink.rel;
+      pages[rel] = pageLink;
+    }
+    return pages;
+  }
+
+  static addFiltersToLink(link, filters = {}, itemsPerPage = null) {
     let isEmpty = value => {
       return (value === null
       || (typeof value === 'number' && !Number.isFinite(value))
       || (typeof value === 'string' && value.length === 0)
       || (typeof value === 'object' && Utils.size(value) === 0));
     };
+
+    if (!Utils.isObject(filters)) {
+      filters = {};
+    }
+    else {
+      filters = Object.assign({}, filters);
+    }
+
+    if (typeof filters.limit !== 'number' && typeof itemsPerPage === 'number') {
+      filters.limit = itemsPerPage;
+    }
 
     if (Utils.hasText(link.method) && link.method.toUpperCase() === 'POST') {
       let body = Object.assign({}, link.body);

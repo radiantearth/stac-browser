@@ -46,6 +46,10 @@
     "loadMore": "Cargar más...",
     "noMatches": "Ningún catálogo concuerda con los criterios de búsqueda"
   },
+  "checkbox": {
+    "false": "no",
+    "true": "si"
+  },
   "copy": "Copia",
   "default": "Predeterminado",
   "defaultWithValue": "Predeterminado ({value})",
@@ -193,11 +197,17 @@
     "equalTo": "igual a",
     "filterBySpatialExtent": "Filtra por extensión espacial",
     "greaterThan": "mayor que",
+    "greaterThanEqual": "igual o mayor que",
     "itemIds": "IDs de Elementos",
     "itemsPerPage": "Elementos por página",
     "itemsPerPageDescription": "Número de elementos solicitados por página, máx. {maxItems} elementos.",
     "lessThan": "menor que",
+    "lessThanEqual": "igual o menor que",
     "likeOperatorDescription": "Puede usar carácteres comodín. `_` representa un solo carácter, `%` representa cualquier número de carácteres. Para buscar por un carácter comodín en específico, necesita añadir `\\` antes del carácter.",
+    "logical": {
+      "and": "Coincidencia con todos los filtros (and)",
+      "or": "Coincidencia con algún filtro (or)"
+    },
     "matches": "coincidencia",
     "metaDescription": "Buscar en los datos ofrecidos por {title}.",
     "modifyCriteria": "Por favor modifique los criterios de búsqueda.",

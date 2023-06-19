@@ -46,6 +46,10 @@
     "loadMore": "Carica di più...",
     "noMatches": "Nessun catalogo corrisponde ai criteri di ricerca indicati."
   },
+  "checkbox": {
+    "false": "No",
+    "true": "Si"
+  },
   "copy": "Copia",
   "default": "Predefinito",
   "defaultWithValue": "Predefinito ({value})",
