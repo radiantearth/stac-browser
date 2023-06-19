@@ -42,7 +42,7 @@
         <Links v-if="linkPosition === 'right'" :title="$t('additionalResources')" :links="additionalLinks" />
       </b-col>
       <b-col class="catalogs-container" v-if="hasCatalogs">
-        <Catalogs :catalogs="catalogs" :hasMore="hasMoreCollections" @loadMore="loadMoreCollections" />
+        <Catalogs :catalogs="catalogs" :hasMore="!!nextCollectionsLink" @loadMore="loadMoreCollections" />
       </b-col>
       <b-col class="items-container" v-if="hasItems">
         <Items
@@ -127,8 +127,8 @@ export default {
     };
   },
   computed: {
-    ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination']),
-    ...mapGetters(['additionalLinks', 'catalogs', 'collectionLink', 'isCollection', 'items', 'hasMoreCollections', 'getApiItemsLoading', 'parentLink', 'rootLink']),
+    ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination', 'nextCollectionsLink']),
+    ...mapGetters(['additionalLinks', 'catalogs', 'collectionLink', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
     hasThumbnails() {
       return this.thumbnails.length > 0;
     },
@@ -225,7 +225,7 @@ export default {
     async filterItems(filters, reset) {
       this.filters = filters;
       if (reset) {
-        this.$store.commit('resetApiItems');
+        this.$store.commit('resetApiItems', this.data.getApiItemsLink());
       }
       try {
         await this.$store.dispatch('loadApiItems', {link: this.apiItemsLink, show: true, filters});
