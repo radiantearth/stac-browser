@@ -158,6 +158,9 @@
     "next": "Next ›",
     "previous": "‹ Previous"
   },
+  "actions": {
+    "openIn": "Open in {service}"
+  },
   "poweredBy": "Powered by {link}",
   "protocol": {
     "azure": "Microsoft Azure",

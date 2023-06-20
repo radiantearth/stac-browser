@@ -21,18 +21,22 @@
       <b-card-body>
         <b-card-title><span v-html="fileFormat" /></b-card-title>
         <b-button-group class="actions" v-if="href">
-          <CopyButton v-if="!isBrowserProtocol" variant="primary" :copyText="href">
-            {{ buttonText }}
-          </CopyButton>
-          <b-button v-else :href="href" target="_blank" variant="primary">
+          <b-button v-if="isBrowserProtocol" :href="href" target="_blank" variant="primary">
             <b-icon-box-arrow-up-right v-if="browserCanOpenFile" /> 
             <b-icon-download v-else />
             {{ buttonText }}
           </b-button>
+          <CopyButton variant="primary" :copyText="href">
+            {{ copyButtonText }}
+          </CopyButton>
           <b-button v-if="canShow && !shown" @click="show" variant="primary">
-            <b-icon-eye />&nbsp;
+            <b-icon-eye class="mr-1" />
             <template v-if="isThumbnail">{{ $t('assets.showThumbnail') }}</template>
             <template v-else>{{ $t('assets.showOnMap') }}</template>
+          </b-button>
+          <b-button v-for="action of actions" v-bind="action.btnOptions" :key="action.id" variant="primary" @click="action.onClick">
+            <component v-if="action.icon" :is="action.icon" class="mr-1" />
+            {{ action.text }}
           </b-button>
         </b-button-group>
         <b-card-text class="mt-4" v-if="asset.description">
@@ -52,6 +56,7 @@ import Description from './Description.vue';
 import STAC from '../models/stac';
 import Utils, { browserProtocols, imageMediaTypes, mapMediaTypes } from '../utils';
 import StacFieldsMixin from './StacFieldsMixin';
+import AssetActions from '../../assetActions.config';
 
 export default {
   name: 'Asset',
@@ -119,6 +124,11 @@ export default {
   computed: {
     ...mapState(['buildTileUrlTemplate', 'useTileLayerAsFallback', 'url', 'stateQueryParameters']),
     ...mapGetters(['getRequestUrl']),
+    actions() {
+      return Object.entries(AssetActions)
+        .map(([id, plugin]) => new plugin(this.asset, this, id))
+        .filter(plugin => plugin.show);
+    },
     tileRendererType() {
       if (this.buildTileUrlTemplate && !this.useTileLayerAsFallback) {
         return 'server';
@@ -229,13 +239,11 @@ export default {
       if (this.browserCanOpenFile && this.isBrowserProtocol) {
         return this.$t('open');
       }
-      let what = 'download';
-      if (this.isGdalVfs) {
-        what = 'copyGdalVfsUrl';
-      }
-      else if (!this.isBrowserProtocol) {
-        what = 'copyUrl';
-      }
+      let where = (!this.isBrowserProtocol && this.from) ? 'withSource' : 'generic';
+      return this.$t(`assets.download.${where}`, {source: this.from});
+    },
+    copyButtonText() {
+      let what = this.isGdalVfs ? 'copyGdalVfsUrl' : 'copyUrl';
       let where = (!this.isBrowserProtocol && this.from) ? 'withSource' : 'generic';
       return this.$t(`assets.${what}.${where}`, {source: this.from});
     }

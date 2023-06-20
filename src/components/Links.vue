@@ -5,22 +5,18 @@
       <div class="group" v-for="group in groups" :key="group.rel">
         <h4 v-if="group.rel">{{ group.label }}</h4>
         <ul>
-          <li v-for="(link, key) in group.links" :key="key">
-            <StacLink :data="link" :fallbackTitle="() => fallbackTitle(link)" />
-          </li>
+          <Link v-for="(link, key) in group.links" :key="key" :link="link" :fallbackTitle="() => fallbackTitle(link)" />
         </ul>
       </div>
     </template>
     <ul v-else>
-      <li v-for="(link, key) in links" :key="key">
-        <StacLink :data="link" :fallbackTitle="() => fallbackTitle(link)" />
-      </li>
+      <Link v-for="(link, key) in links" :key="key" :link="link" :fallbackTitle="() => fallbackTitle(link)" />
     </ul>
   </section>
 </template>
 
 <script>
-import StacLink from './StacLink.vue';
+import Link from './Link.vue';
 import { Fields } from '@radiantearth/stac-fields';
 import { formatKey } from '@radiantearth/stac-fields/helper';
 import { ogcRelPrefix } from '../rels';
@@ -32,7 +28,7 @@ import { mapState } from 'vuex';
 export default {
   name: "Links",
   components: {
-    StacLink
+    Link
   },
   props: {
     title: {
