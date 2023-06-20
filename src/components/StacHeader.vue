@@ -91,18 +91,17 @@ export default {
       return null;
     },
     searchBrowserLink() {
-      let rootLink;
-      let dataLink;
-      if (this.root) {
-        rootLink = this.root.getSearchLink();
+      if (!this.canSearch) {
+        return null;
       }
+      let dataLink;
       if (this.data !== this.root && this.data instanceof STAC) {
         dataLink = this.data.getSearchLink();
       }
       if (dataLink) {
         return `/search${this.data.getBrowserPath()}`;
       }
-      else if (rootLink && this.allowSelectCatalog) {
+      else if (this.root && this.allowSelectCatalog) {
         return `/search${this.root.getBrowserPath()}`;
       }
       return '/search';

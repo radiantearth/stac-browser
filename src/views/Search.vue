@@ -1,7 +1,7 @@
 <template>
   <main class="search d-flex flex-column">
     <Loading v-if="!parent" stretch />
-    <b-alert v-else-if="!searchLink" variant="danger" show>{{ $t('search.notSupported') }}</b-alert>
+    <b-alert v-else-if="!canSearch" variant="danger" show>{{ $t('search.notSupported') }}</b-alert>
     <b-row v-else>
       <b-col class="left">
         <b-tabs v-model="activeSearch">
@@ -85,7 +85,7 @@ export default {
   },
   computed: {
     ...mapState(['catalogUrl', 'catalogTitle', 'itemsPerPage']),
-    ...mapGetters(['canSearchItems', 'canSearchCollections', 'getStac', 'root', 'collectionLink', 'parentLink', 'fromBrowserPath', 'toBrowserPath']),
+    ...mapGetters(['canSearch', 'canSearchItems', 'canSearchCollections', 'getStac', 'root', 'collectionLink', 'parentLink', 'fromBrowserPath', 'toBrowserPath']),
     stac() {
       if (this.parent instanceof STAC) {
         return this.parent;
@@ -181,6 +181,7 @@ export default {
         this.$store.commit("config", { catalogUrl: url });
       }
       this.parent = this.getStac(url);
+      this.showPage();
     }
   },
   methods: {
