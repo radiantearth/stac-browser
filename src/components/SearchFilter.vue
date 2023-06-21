@@ -6,26 +6,26 @@
 
         <b-card-title v-if="title" :title="title" />
 
-        <b-form-group v-if="canFilterFreeText" :label="$t('search.freeText')" label-for="q" :description="$t('search.freeTextDescription')">
-          <b-form-input id="q" :value="query.q" @change="setSearchTerms" />
+        <b-form-group v-if="canFilterFreeText" :label="$t('search.freeText')" :label-for="ids.q" :description="$t('search.freeTextDescription')">
+          <b-form-input :id="ids.q" :value="query.q" @change="setSearchTerms" />
         </b-form-group>
 
-        <b-form-group v-if="canFilterExtents" :label="$t('search.temporalExtent')" label-for="datetime" :description="$t('search.dateDescription')">
+        <b-form-group v-if="canFilterExtents" :label="$t('search.temporalExtent')" :label-for="ids.datetime" :description="$t('search.dateDescription')">
           <date-picker
-            range id="datetime" :lang="datepickerLang" :format="datepickerFormat"
+            range :id="ids.datetime" :lang="datepickerLang" :format="datepickerFormat"
             :value="query.datetime" @input="setDateTime" input-class="form-control mx-input"
           />
         </b-form-group>
 
-        <b-form-group v-if="canFilterExtents" :label="$t('search.spatialExtent')" label-for="provideBBox">
-          <b-form-checkbox id="provideBBox" v-model="provideBBox" value="1" @change="setBBox()">{{ $t('search.filterBySpatialExtent') }}</b-form-checkbox>
+        <b-form-group v-if="canFilterExtents" :label="$t('search.spatialExtent')" :label-for="ids.bbox">
+          <b-form-checkbox :id="ids.bbox" v-model="provideBBox" value="1" @change="setBBox()">{{ $t('search.filterBySpatialExtent') }}</b-form-checkbox>
           <Map class="mb-4" v-if="provideBBox" :stac="stac" selectBounds @bounds="setBBox" scrollWheelZoom />
         </b-form-group>
 
-        <b-form-group v-if="conformances.CollectionIdFilter" :label="$tc('stacCollection', collections.length)" label-for="collections">
+        <b-form-group v-if="conformances.CollectionIdFilter" :label="$tc('stacCollection', collections.length)" :label-for="ids.collections">
           <multiselect
             v-if="collections.length > 0"
-            id="collections" :value="selectedCollections" @input="setCollections"
+            :id="ids.collections" :value="selectedCollections" @input="setCollections"
             :placeholder="$t('search.selectCollections')"
             :tagPlaceholder="$t('search.addCollections')"
             :selectLabel="$t('multiselect.selectLabel')"
@@ -36,7 +36,7 @@
           />
           <multiselect
             v-else
-            id="collections" :value="selectedCollections" @input="setCollections"
+            :id="ids.collections" :value="selectedCollections" @input="setCollections"
             multiple taggable :options="query.collections"
             :placeholder="$t('search.enterCollections')"
             :tagPlaceholder="$t('search.addCollections')"
@@ -50,9 +50,9 @@
           </multiselect>
         </b-form-group>
 
-        <b-form-group v-if="conformances.ItemIdFilter" :label="$t('search.itemIds')" label-for="ids">
+        <b-form-group v-if="conformances.ItemIdFilter" :label="$t('search.itemIds')" :label-for="ids.ids">
           <multiselect
-            id="ids" :value="query.ids" @input="setIds"
+            :id="ids.ids" :value="query.ids" @input="setIds"
             multiple taggable :options="query.ids"
             :placeholder="$t('search.enterItemIds')"
             :tagPlaceholder="$t('search.addItemIds')"
@@ -64,8 +64,8 @@
         </b-form-group>
 
         <div class="additional-filters" v-if="showAdditionalFilters">
-          <b-form-group :label="$t('search.additionalFilters')" label-for="availableFields">
-            <b-form-radio-group id="logical" v-model="filtersAndOr" :options="andOrOptions" name="logical" size="sm" />
+          <b-form-group :label="$t('search.additionalFilters')">
+            <b-form-radio-group v-model="filtersAndOr" :options="andOrOptions" name="logical" size="sm" />
 
             <b-dropdown size="sm" :text="$t('search.addFilter')" block variant="primary" class="queryables mt-2 mb-3" menu-class="w-100">
               <template v-for="queryable in sortedQueryables">
@@ -90,9 +90,9 @@
 
         <hr v-if="canFilterExtents || conformances.CollectionIdFilter || conformances.ItemIdFilter || showAdditionalFilters">
 
-        <b-form-group v-if="canSort" :label="$t('sort.title')" label-for="sort" :description="$t('search.notFullySupported')">
+        <b-form-group v-if="canSort" :label="$t('sort.title')" :label-for="ids.sort" :description="$t('search.notFullySupported')">
           <multiselect
-            id="sort" :value="sortTerm" @input="sortFieldSet"
+            :id="ids.sort" :value="sortTerm" @input="sortFieldSet"
             :options="sortOptions" track-by="value" label="text"
             :placeholder="$t('default')"
             :selectLabel="$t('multiselect.selectLabel')"
@@ -102,9 +102,9 @@
           <SortButtons v-if="sortTerm && sortTerm.value" class="mt-1" :value="sortOrder" enforce @input="sortDirectionSet" />
         </b-form-group>
 
-        <b-form-group :label="$t('search.itemsPerPage')" label-for="limit" :description="$t('search.itemsPerPageDescription', {maxItems})">
+        <b-form-group :label="$t('search.itemsPerPage')" :label-for="ids.limit" :description="$t('search.itemsPerPageDescription', {maxItems})">
           <b-form-input
-            id="limit" :value="query.limit" @change="setLimit" min="1"
+            :id="ids.limit" :value="query.limit" @change="setLimit" min="1"
             :max="maxItems" type="number"
             :placeholder="$t('defaultWithValue', {value: itemsPerPage})"
           />
@@ -164,6 +164,8 @@ function getDefaults() {
   };
 }
 
+let formId = 0;
+
 export default {
   name: 'SearchFilter',
   components: {
@@ -212,8 +214,17 @@ export default {
       collections: []
     }, getDefaults());
   },
+  beforeCreate() {
+    formId++;
+  },
   computed: {
     ...mapState(['apiCollections', 'nextCollectionsLink', 'itemsPerPage', 'uiLanguage']),
+    ids() {
+      let obj = {};
+      ['q', 'datetime', 'bbox', 'collections', 'ids', 'sort', 'limit']
+        .forEach(field => obj[field] = field + formId);
+      return obj;
+    },
     stac() {
       if (this.parent instanceof STAC) {
         return this.parent;
