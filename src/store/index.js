@@ -309,9 +309,15 @@ function getStore(config, router) {
         if (whitelist && Array.isArray(state.allowedDomains) && state.allowedDomains.includes(absoluteUrl.domain())) {
           return false;
         }
-        let relative = absoluteUrl.relativeTo(state.catalogUrl);
-        if (relative.equals(absoluteUrl)) {
-          return true;
+        let relative;
+        if (absoluteUrl.is("relative")) {
+          relative = absoluteUrl;
+        }
+        else {
+          relative = absoluteUrl.relativeTo(state.catalogUrl);
+          if (relative.equals(absoluteUrl)) {
+            return true;
+          }
         }
         let relativeStr = relative.toString();
         return relativeStr.startsWith('//') || relativeStr.startsWith('../');
