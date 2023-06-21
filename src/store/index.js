@@ -573,7 +573,7 @@ function getStore(config, router) {
         }
 
         // Handle pagination links
-        let pages = Utils.getPaginationLinks(data.links);
+        let pages = Utils.getPaginationLinks(data);
 
         if (show) {
           state.apiItemsPagination = pages;
