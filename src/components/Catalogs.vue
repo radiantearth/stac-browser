@@ -1,7 +1,7 @@
 <template>
   <section class="catalogs mb-4">
     <h2>
-      <span class="title">{{ $tc('stacCatalog', catalogs.length ) }}</span>
+      <span class="title">{{ title }}</span>
       <b-badge v-if="isComplete" pill variant="secondary ml-2">
         <template v-if="catalogs.length !== catalogView.length">{{ catalogView.length }}/{{ catalogs.length }}</template>
         <template v-else>{{ catalogs.length }}</template>
@@ -48,6 +48,10 @@ export default {
       type: Array,
       required: true
     },
+    collectionsOnly: {
+      type: Boolean,
+      required: false
+    },
     loading: {
       type: Boolean,
       default: false
@@ -70,6 +74,14 @@ export default {
   computed: {
     ...mapState(['cardViewSort', 'uiLanguage']),
     ...mapGetters(['getStac']),
+    title() {
+      if (this.collectionsOnly) {
+        return this.$tc('stacCollection', this.catalogs.length );
+      }
+      else {
+        return this.$tc('stacCatalog', this.catalogs.length );
+      }
+    },
     isComplete() {
       return !this.hasMore && !this.showPagination;
     },

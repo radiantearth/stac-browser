@@ -29,7 +29,7 @@
             <Map :stac="stac" :stacLayerData="itemCollection" scrollWheelZoom popover />
           </div>
           <Catalogs
-            v-if="isCollectionSearch" :catalogs="results"
+            v-if="isCollectionSearch" :catalogs="results" collectionsOnly
             :pagination="pagination" :loading="loading" @paginate="loadResults"
           />
           <Items
