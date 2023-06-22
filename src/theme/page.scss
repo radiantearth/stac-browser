@@ -168,4 +168,32 @@ html, body {
             display: inline;
         }
     }
+
+    .expandable-card > .card-header {
+        padding: 0;
+        background-color: transparent;
+    }
+    .expandable-card > .card-header > .btn,
+    .mimic-expandable-card > .list-group-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.5rem;
+        background-color: rgba(0,0,0,0.03);
+        
+        > .title {
+            text-align: left;
+            flex-grow: 9;
+        }
+        > .badges {
+            flex-grow: 1;
+            text-align: right;
+
+            .badge {
+                margin: 0.125rem;
+                text-transform: uppercase;
+            }
+        }
+    }
 }

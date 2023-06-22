@@ -1,7 +1,7 @@
 <template>
   <section class="catalogs mb-4">
     <h2>
-      <span class="title">{{ $tc('stacCatalog', catalogs.length ) }}</span>
+      <span class="title">{{ title }}</span>
       <b-badge v-if="isComplete" pill variant="secondary ml-2">
         <template v-if="catalogs.length !== catalogView.length">{{ catalogView.length }}/{{ catalogs.length }}</template>
         <template v-else>{{ catalogs.length }}</template>
@@ -10,17 +10,23 @@
       <SortButtons v-if="isComplete && catalogs.length > 1" class="ml-2" v-model="sort" />
     </h2>
     <SearchBox v-if="isComplete && catalogs.length > 1" class="mt-3 mb-2" v-model="searchTerm" :placeholder="$t('catalogs.filterByTitle')" />
+    <Pagination ref="topPagination" v-if="showPagination" :pagination="pagination" placement="top" @paginate="paginate" />
     <b-alert v-if="searchTerm && catalogView.length === 0" variant="warning" show>{{ $t('catalogs.noMatches') }}</b-alert>
-    <component :is="cardsComponent" v-bind="cardsComponentProps">
-      <Catalog v-for="catalog in catalogView" :catalog="catalog" :key="catalog.href" />
-    </component>
-    <b-button v-if="hasMore" @click="loadMore" variant="primary" v-b-visible.300="loadMore">{{ $t('catalogs.loadMore') }}</b-button>
+    <section class="list">
+      <Loading v-if="loading" fill top />
+      <component :is="cardsComponent" v-bind="cardsComponentProps">
+        <Catalog v-for="catalog in catalogView" :catalog="catalog" :key="catalog.href" />
+      </component>
+    </section>
+    <Pagination v-if="showPagination" :pagination="pagination" @paginate="paginate" />
+    <b-button v-else-if="hasMore" @click="loadMore" variant="primary" v-b-visible.300="loadMore">{{ $t('catalogs.loadMore') }}</b-button>
   </section>
 </template>
 
 <script>
 import { mapGetters, mapState } from 'vuex';
 import Catalog from './Catalog.vue';
+import Loading from './Loading.vue';
 import STAC from '../models/stac';
 import ViewMixin from './ViewMixin';
 import Utils from '../utils';
@@ -29,6 +35,8 @@ export default {
   name: "Catalogs",
   components: {
     Catalog,
+    Loading,
+    Pagination: () => import('./Pagination.vue'),
     SearchBox: () => import('./SearchBox.vue'),
     SortButtons: () => import('./SortButtons.vue')
   },
@@ -40,9 +48,21 @@ export default {
       type: Array,
       required: true
     },
+    collectionsOnly: {
+      type: Boolean,
+      required: false
+    },
+    loading: {
+      type: Boolean,
+      default: false
+    },
     hasMore: {
       type: Boolean,
       default: false
+    },
+    pagination: {
+      type: Object,
+      default: () => ({})
     }
   },
   data() {
@@ -54,8 +74,20 @@ export default {
   computed: {
     ...mapState(['cardViewSort', 'uiLanguage']),
     ...mapGetters(['getStac']),
+    title() {
+      if (this.collectionsOnly) {
+        return this.$tc('stacCollection', this.catalogs.length );
+      }
+      else {
+        return this.$tc('stacCatalog', this.catalogs.length );
+      }
+    },
     isComplete() {
-      return !this.hasMore;
+      return !this.hasMore && !this.showPagination;
+    },
+    showPagination() {
+      // Check whether any pagination links are available
+      return Object.values(this.pagination).some(link => !!link);
     },
     catalogView() {
       if (this.hasMore) {
@@ -102,15 +134,28 @@ export default {
         this.sort = 0;
         this.$emit('loadMore');
       }
+    },
+    paginate(link, placement) {
+      if (placement === 'bottom' && this.$refs.topPagination) {
+        Utils.scrollTo(this.$refs.topPagination.$el);
+      }
+      this.$emit('paginate', link);
     }
   }
 };
 </script>
 
 <style lang="scss" scoped>
-.catalogs > h2 {
-  .title, .badge {
-    vertical-align: middle;
+.catalogs {
+
+  .list {
+    position: relative;
+  }
+
+  > h2 {
+    .title, .badge {
+      vertical-align: middle;
+    }
   }
 }
 </style>

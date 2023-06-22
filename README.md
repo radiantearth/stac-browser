@@ -8,7 +8,7 @@ implemented as a single page application (SPA) for ease of development and to
 limit the overall number of catalog reads necessary when browsing (as catalogs
 may be nested and do not necessarily contain references to their parents).
 
-Version: **3.0.1** (supports all STAC versions between 0.6.0 and 1.0.0)
+Version: **3.0.2** (supports all STAC versions between 0.6.0 and 1.0.0)
 
 This package has also been published to npm as [`@radiantearth/stac-browser`](https://www.npmjs.com/package/@radiantearth/stac-browser).
 
@@ -62,7 +62,7 @@ npm run build -- --catalogUrl="http://path/to/catalog.json"
 ```
 
 This will only work on the root path of your domain though. If you'd like to publish in a sub-folder, 
-you can use the [`pathPrefix`](#pathprefix) option.
+you can use the [`pathPrefix`](docs/options.md#pathprefix) option.
 
 After building, `dist/` will contain all assets necessary to
 host the browser. These can be manually copied to your web host of choice.
@@ -83,359 +83,21 @@ In this case use for example `https://examples.com/stac-browser/#?~API_KEY=123` 
 
 ### Migrate from old versions
 
-If you are running an old (standalone) version of STAC Browser (v1 or v2) without heavy modifications,
-you can usually migrate easily.
-
-The old environment variables have changed names. See [enviornment variables](#environment-variables) for details.
-The names of the environment variables have slightly changed:
-* `CATALOG_URL` => `SB_catalogUrl`
-* `STAC_PROXY_URL` => `SB_stacProxyUrl` (same in CLI, different format in the config file)
-* `TILE_PROXY_URL` / `TILE_SOURCE_TEMPLATE` => only available via config file, this is not a 1:1 replacement, make sure to read the documentation for `buildTileUrlTemplate`
-* `PATH_PREFIX` => `SB_pathPrefix`
-* `HISTORY_MODE` => `SB_historyMode`
-
-You should also enable `redirectLegacyUrls` which makes sure that your old URLs are correctly parsed by STAC Browser v3 and links to the old version of STAC Browser don't get broken.
-
-All other options you can customize to your liking.
-
-Then simply deploy STAC Browser to the same location where you hosted STAC Browser v1/v2 before.
+Please read the [migration documentation](docs/migrate.md) for details.
 
 ## Customize
 
 ### Options
 
-All the following options can be used as explained in the chapter "Running", either through the [config file](config.js), as CLI parameter or as environment variable.
+STAC Browser supports customization through a long list of options that can be set in the [config.js file](config.js) or as CLI parameter.
 
-- Some of them can also be set [through the root catalog](#customize-through-root-catalog).
-- Environment variables require a prefix `SB_`. 
-  So you could for example set the catalog URL via the environment variable `SB_catalogUrl`.
-
-**The following options are available:**
-* [catalogUrl](#catalogurl)
-* [catalogTitle](#catalogtitle)
-* [allowExternalAccess](#allowexternalaccess)
-* [allowedDomains](#alloweddomains)
-* [apiCatalogPriority](#apicatalogpriority)
-* [detectLocaleFromBrowser](#detectlocalefrombrowser)
-* [storeLocale](#storelocale)
-* [locale](#locale)
-* [fallbackLocale](#fallbacklocale)
-* [supportedLocales](#supportedlocales)
-* [stacLint](#staclint)
-* [historyMode](#historymode)
-* [pathPrefix](#pathprefix)
-* [stacProxyUrl](#stacproxyurl)
-* [buildTileUrlTemplate](#buildtileurltemplate)
-* [useTileLayerAsFallback](#usetilelayerasfallback)
-* [displayGeoTiffByDefault](#displaygeotiffbydefault)
-* [redirectLegacyUrls](#redirectlegacyurls)
-* [itemsPerPage](#itemsperpage)
-* [maxPreviewsOnMap](#maxpreviewsonmap)
-* [cardViewMode](#cardviewmode)
-* [cardViewSort](#cardviewsort)
-* [showThumbnailsAsAssets](#showthumbnailsasassets)
-* [defaultThumbnailSize](#defaultthumbnailsize)
-* [crossOriginMedia](#crossoriginmedia)
-* [requestHeaders](#requestheaders)
-* [requestQueryParameters](#requestqueryparameters)
-* [authConfig](#authconfig)
-* [preprocessSTAC](#preprocessstac)
-
-#### catalogUrl
-
-The URL of the catalog to show by default.
-
-The URL provided here **must** match exactly with the `href` that is provided as `self` link in the response body of the URL.
-
-This is usually a URL provided as string, but in the config file you can also provide a function without parameters that returns the URL, e.g. `() => window.origin.toString().replace(/\/?$/, '/')`.
-
-If `catalogUrl` is empty or set to `null` STAC Browser switches to a mode where it defaults to a screen where you can either insert a catalog URL or select a catalog from [stacindex.org](https://stacindex.org).
-
-#### catalogTitle
-
-The default title shown if no title can be read from the root STAC catalog.
-
-#### allowExternalAccess
-
-This allows or disallows loading and browsing external STAC data.
-External STAC data is any data that is not a children of the given `catalogUrl`.
-Must be set to `true` if a `catalogUrl` is not given as otherwise you won't be able to browse anything.
-
-#### allowedDomains
-
-You can list additional domains (e.g. `example.com`) that private data is sent to, e.g. authentication data.
-This applies to query paramaters and request headers.
-
-#### apiCatalogPriority
-
-For STAC APIs there are two potential sources for catalogs and collections:
-1. Collections loaded from `/collections` and detected through the `data` link
-2. Childs (i.e. Catalogs and Collections) loaded from various sources and detected through the `child` links
-
-By default, STAC Browser loads and shows data from both sources, but tries to eliminate duplicates.
-If you only want to show the data from one of the sources, you can use this option.
-The following options are available:
-- `collections`: Show only collections
-- `childs`: Show only children
-- `null`: Default behavior
-
-#### detectLocaleFromBrowser
-
-If set to `true`, tries to detect the preferred language of the user from the Browser.
-Otherwise, defaults to the language set for `locale`.
-
-#### storeLocale
-
-If set to `true`, stores the locale selected by the user in the `localeStorage` of the browser.
-Otherwise, doesn't store the locale across browser sessions.
-
-#### locale
-
-The default language to use for STAC Browser, defaults to `en` (English).
-The language given here must be present in `supportedLocales`.
-
-#### fallbackLocale
-
-The language to use if individual phrases are not available in the default language, defaults to `en` (English).
-The language given here must be present in `supportedLocales`.
-
-#### supportedLocales
-
-A list of languages to show in the STAC Browser UI.
-The languages given here must have a corresponding JS and JSON file in the `src/locales` folder,
-e.g. provide `en` (English) for the files in `src/locales/en`.
-
-In CLI, please provide the languages separated by a space, e.g. `--supportedLocales en de fr it`
-
-Please note that only left-to-right languages have been tested.
-I'd need help to test support for right-to-left languages.
-
-#### stacLint
-
-***experimental***
-
-Enables or disables a feature that validates the STAC catalog when opening the "Source Data" popup.
-Validation uses the external service [staclint.com](https://staclint.com).
-
-Validation is automatically disabled in the following cases:
-- the host of a catalog is `localhost`, `127.0.0.1` and `::1`
-- [private query parameters](#private-query-parameters) have been set
-- `stacProxyUrl` is set
-
-#### historyMode
-
-***build-only option***
-
-STAC Browser defaults to using [HTML5 History Mode](https://v3.router.vuejs.org/guide/essentials/history-mode.html#html5-history-mode),
-which can cause problems on certain web hosts. To use _hash mode_, set `--historyMode=hash` when running or building.
-This will be compatible with S3, stock Apache, etc.
-
-#### pathPrefix
-
-***build-only option***
-
-If you don't deploy the STAC Browser instance at the root path of your (sub) domain, then you need to set the path prefix
-when building (or running) STAC Browser.
-
-```bash
-npm run build -- --pathPrefix="/browser/"
-```
-
-This will build STAC Browser in a way that it can be hosted at `https://example.com/browser` for example.
-Using this parameter for the dev server will make STAC Browser available at `http://localhost:8080/browser`.
-
-#### stacProxyUrl
-
-***experimental***
-
-Setting the `stacProxyUrl` allows users to modify the URLs contained in the catalog to point to another location.
-For instance, if you are serving a catalog on the local file system at `/home/user/catalog.json`, but want to serve
-the data out from a server located at `http://localhost:8888/`, you can use:
-
-```bash
-npm start -- --open --stacProxyUrl="/home/user;http://localhost:8888"
-```
-
-Notice the format of the value:
-* In CLI it is the original location and the proxy location separated by the `;` character, i.e. `{original};{proxy}`.
-* In the config file it is a two-element array with the original location as first element and the proxy location as the second element. Set to `null` to disable (default).
-
-In this example, any href contained in the STAC (including link or asset hrefs) will replace any occurrence of `/home/user/` with `http://localhost:8888`.
-
-This can also be helpful when proxying a STAC that does not have cors enabled;
-by using stacProxyUrl you can proxy the original STAC server with one that enables cors and be able to browse that catalog.
-
-#### buildTileUrlTemplate
-
-The option controls the tile layer that is used to render imagery such as (cloud-optimized) GeoTiffs.
-
-See the [documentation for the corresponding stac-layer option](https://github.com/stac-utils/stac-layer#buildtileurltemplate) for details.
-
-Please note that this option can only be provided through a config file and is not available via CLI/ENV.
-
-If the option `useTileLayerAsFallback` is set to `true`, the tile server is only used as a fallback.
-
-**Note:** This option replaces the v2 options `TILE_SOURCE_TEMPLATE` and `TILE_PROXY_URL`.
-The v3-dev option `tileSourceTemplate` has been removed in favor of this option.
-
-#### useTileLayerAsFallback
-
-Depending on this option, either client-side or server-side rendering of imagery such as (cloud-optimized) GeoTiffs can be enabled/disabled.
-
-If `buildTileUrlTemplate` is given server-side rendering of GeoTiffs is enabled. 
-If server-side rendering should only be used as a fallback for client-side rendering, enable the boolean `useTileLayerAsFallback` option.
-
-To clarify the behavior, please have a look at the following table:
-
-| `useTileLayerAsFallback` | `buildTileUrlTemplate` | primary imagery renderer | fallback  imagery renderer |
-| ----- | ---------------------- | ----------- | ----------- |
-| true  | function | client-side | tile-server |
-| false | function | tile-server | none        |
-| true  | null     | client-side | none        |
-| false | null     | none        | none        |
-
-By default, client-side rendering is enabled. A server-side fallback is provided via the [tiles.rdnt.io](https://github.com/radiantearth/tiles.rdnt.io) project, which serves publicly accessible GeoTiffs as tile layers.
-
-#### displayGeoTiffByDefault
-
-If set to `true`, the map also shows non-cloud-optimized GeoTiff files by default. Otherwise (`false`, default), it only shows COGs and you can only enforce showing GeoTiffs to be loaded with the "Show on map" button but they are never loaded automatically.
-Loading non-cloud-optimized GeoTiffs only works reliably for smaller files (< 1MB). It may also work for larger files, but it is depending a lot on the underlying client hardware and software.
-
-#### redirectLegacyUrls
-
-***experimental***
-
-If you are updating from on old version of STAC Browser, you can set this option to `true` to redirect users from the old "unreadable" URLs to the new human-readable URLs.
-
-#### itemsPerPage
-
-The number of items requested and shown per page by default. Only applies to APIs that support the `limit` query parameter.
-
-#### maxPreviewsOnMap
-
-The maximum number of previews (thumbnails or overviews) of items that will be shown on the map when on Catalog or Collection pages.
-
-#### cardViewMode
-
-The default view mode for lists of catalogs/collections. Either `"list"` or `"cards"` (default). 
-
-#### cardViewSort
-
-The default sorting for lists of catalogs/collections or items. One of:
-- `"asc"`: ascending sort (default)
-- `"desc"`: descending sort
-- `null`: sorted as in the source files
-
-#### showThumbnailsAsAssets
-
-Defines whether thumbnails are shown in the lists of assets (`true`, default) or not.
-
-#### defaultThumbnailSize
-
-The default size \[Height, Width\] for thumbnails which is reserved in card and list views so that the items don't jump when loading the images.
-This can be overridden per thumbnail by declaring the [`proj:shape`](https://github.com/stac-extensions/projection/#item-properties-or-asset-fields) on the asset or link.
-
-#### crossOriginMedia
-
-The value for the [`crossorigin` attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/crossorigin) that is sent when loading images through the browser. Default to `null`. If you encounter issues with loading images, you may want to try setting this to `anonymous`.
-
-#### requestHeaders
-
-***experimental***
-
-The headers given in this option are added to all requests that are sent to the selected STAC catalog or API.
-This is affected by [`allowedDomains`](#alloweddomains).
-
-Example: `{'Authorization': 'Bearer 134567984623223'}` adds a Bearer token to the HTTP headers.
-
-Please note that this option can only be provided through a config file and is not available via CLI/ENV.
-
-#### requestQueryParameters
-
-***experimental***
-
-The query parameters given in this option are added to all requests that are sent to the selected STAC catalog or API.
-This is affected by [`allowedDomains`](#alloweddomains).
-
-Example: `{'f': 'json'}` adds a `f` query parameter to the HTTP URL, e.g. `https://example.com?f=json`.
-
-Please note that this option can only be provided through a config file and is not available via CLI/ENV.
-
-#### authConfig
-
-***experimental***
-
-This allows to enable a simple authentication form where a user can input a token, an API key or similar things.
-It is disabled by default (`null`). If enabled, the token provided by the user can be used in the HTTP headers or in the query parameters of the requests. This option is affected by [`allowedDomains`](#alloweddomains).
-
-There are four options you can set in the `authConfig` object:
-
-* `type` (string): `null` (disabled), `"query"` (use token in query parameters), or `"header"` (use token in HTTP request headers).
-* `key` (string): The query string parameter name or the HTTP header name respecively.
-* `formatter` (function|string|null): You can optionally specify a formatter for the query string value or HTTP header value respectively. If the string `"Bearer"` is provided formats as a Bearer token according to RFC 6750. If not given, the token is provided as provided by the user.
-* `description` (string|null): Optionally a description that is shown to the user. This should explain how the token can be obtained for example. CommonMark is allowed.
-    **Note:** You can leave the description empty in the config file and instead provide a localized string with the key `authConfig` -> `description` in the file for custom phrases (`src/locales/custom.js`).
-
-Please note that this option can only be provided through a config file and is not available via CLI/ENV.
-
-##### Example 1: HTTP Request Header Value
-
-```js
-{
-  type: 'header',
-  key: 'Authorization',
-  formatter: token => `Bearer ${token}`, // This is an example, there's also the simpler variant to just provide the string 'Bearer' in this case
-  description: `Please retrieve the token from our [API console](https://example.com/api-console).\n\nFor further questions contact <mailto:support@example.com>.`
-}
-```
-
-For a given token `123` this results in the following additional HTTP Header:
-`Authorization: Bearer 123`
-
-##### Example 2: Query Parameter Value
-
-```js
-{
-  type: 'query',
-  key: 'API_KEY'
-}
-```
-
-For a given token `123` this results in the following query parameter:
-`https://example.com/stac/catalog.json?API_KEY=123`
-
-#### preprocessSTAC
-
-***experimental***
-
-This allows to preprocess the STAC Items, Catalogs and Collections that are requested from the servers using a function.
-The function receives two parameters:
-* `stac` (object of type `STAC`)
-* `state` (the vuex state)
-
-Please note that this option can only be provided through a config file and is not available via CLI/ENV.
-
-##### Example: Update root catalog
-
-Some root catalogs in implementations don't have very useful titles, descriptions and are not a nice "intro" for new users.
-Thus, it may make sense to change the root catalog to provide more useful information.
-Of course, ideally you'd want to update the root catalog itself, but until then you can use this.
-
-```js
-preprocessSTAC: (stac, state) => {
-    if (stac.getBrowserPath() === '/') {
-        stac.title = state.catalogTitle;
-        stac.description = 'This is a **much** more useful description for this catalog!';
-    }
-    return stac;
-}
-```
+Please read the **[documentation for the options](docs/options.md)**.
 
 ### Languages
 
 STAC Browser can be translated into other languages and can localize number formats, date formats etc.
 
-You need to change the [`locale`](#locale) and [`supportedLocales`](#supportedlocales) settings to select the default language and the languages available to users.
+You need to change the [`locale`](docs/options.md#locale) and [`supportedLocales`](docs/options.md#supportedlocales) settings to select the default language and the languages available to users.
 
 The following languages are currently supported:
 - de: German (Germany, Switzerland)
@@ -516,11 +178,11 @@ Please check the field specification for available options.
 
 STAC Browser supports [multiple languages](#languages).
 If you use more than one language, you likely want to also translate the phrases that you've added above (in the example `Data Access`, `Public` and `Private`, assuming that `Radiant Earth` is a name and doesn't need to be translated).
-All new phrases should be added to the [active languages](#supportedlocales).
+All new phrases should be added to the [active languages](docs/options.md#supportedlocales).
 To add the phrases mentioned above you need to go through the folders in `src/locales` and in the folders of the active languages update the file `custom.json` as described in the section that describes [adding custom phrases](#custom-phrases).
 All new phrases must be added to the property `fields`.
 
-Below you can find an example of an updated `custom.json` for the German language (folder `de`). It also includes the `authConfig`, which is contained in the file by default for [other purposes](#authconfig).
+Below you can find an example of an updated `custom.json` for the German language (folder `de`). It also includes the `authConfig`, which is contained in the file by default for [other purposes](docs/options.md#authconfig).
 ```
 {
   "authConfig": {
@@ -557,7 +219,7 @@ STAC Browser supports some non-standardized extensions to the STAC specification
 
 ## Docker
 
-When building the Dockerfile, you can add the [`catalogUrl`](#catalogurl) 
+When building the Dockerfile, you can add the [`catalogUrl`](docs/options.md#catalogurl) 
 as a [build argument](https://docs.docker.com/engine/reference/commandline/build/#set-build-time-variables---build-arg). For example:
 
 ```
@@ -579,7 +241,7 @@ STAC Browser is following the [STAC code of conduct](https://github.com/radiante
 
 STAC Browser uses [Vue](https://vuejs.org/) and [vue-cli](https://cli.vuejs.org/), so you need a recent version of [NodeJS and npm](https://nodejs.org/en/) installed.
 
-You can run the following commands (see also "[Running](#running)" above):
+You can run the following commands (see also "[Get started](#get-started)" above):
 - `npm run install`: Install the dependencies, this is required once at the beginning.
 - `npm start`: Start the development server
 - `npm run lint`: Lint the source code files
@@ -587,6 +249,8 @@ You can run the following commands (see also "[Running](#running)" above):
   - `npm run build:report`: Same as above, but also generates a bundle size report (see `dist/report.html`), which should not be deployed.
   - `npm run build:minimal`: Same as above, but tries to generate a minimal version without bundle size report and without source maps.
 - `npm run i18n:fields`: Generates an updated version of the locales from the stac-fields package.
+
+The [release process is documented separately](docs/release.md).
 
 ### Adding a new language
 
@@ -597,7 +261,7 @@ You can also use one of the existing languages and provide an alternate version 
 - Copy the `en` folder (or any other language without a country code that you want to base the translation on).
   - Note: If you start with the `en` folder, you have to remove the leading `//` from the line `// { fields: require('./fields.json') }` in the file `default.js`.
 - Name the new folder according to [RFC5646](https://www.rfc-editor.org/rfc/rfc5646).
-- Add the language to the list of supported locales ([`supportedLocales`](#supportedlocales)) in the `config.js` file.
+- Add the language to the list of supported locales ([`supportedLocales`](docs/options.md#supportedlocales)) in the `config.js` file.
 - Add the language to the [list of languages in this README file](#languages).
 - Add yourself to the list of code owners (`.github/CODEOWNERS`) for this language (we'll invite you to this repository after you've opened a PR). **Persons contributing languages are expected to maintain them long-term! If you are not able to maintain the language pack, please indicate so in the PR and we'll release it separately.**
 - Translate the `.json` files, most importantly `config.json`, `fields.json` and `texts.json`.

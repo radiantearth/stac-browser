@@ -145,11 +145,11 @@
     "title": "Metadata"
   },
   "multiselect": {
+    "andMore": "and {count} more",
+    "deselectLabel": "Press enter to remove",
     "placeholder": "Select option",
     "selectLabel": "Press enter to select",
-    "selectedLabel": "Selected",
-    "deselectLabel": "Press enter to remove",
-    "andMore": "and {count} more"
+    "selectedLabel": "Selected"
   },
   "open": "Open",
   "pagination": {
@@ -196,6 +196,8 @@
     "enterItemIds": "Enter one or more Item IDs...",
     "equalTo": "equal to",
     "filterBySpatialExtent": "Filter by spatial extent",
+    "freeText": "Search Terms",
+    "freeTextDescription": "Search for the given text in fields such as the title and the description.",
     "greaterThan": "greater than",
     "greaterThanEqual": "greater than or equal to",
     "itemIds": "Item IDs",
@@ -224,6 +226,10 @@
       "title": "Title"
     },
     "spatialExtent": "Spatial Extent",
+    "tabs": {
+      "collections": "Search for Collections",
+      "items": "Search for Items"
+    },
     "temporalExtent": "Temporal Extent",
     "title": "Search"
   },

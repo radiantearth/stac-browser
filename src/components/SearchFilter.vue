@@ -6,22 +6,26 @@
 
         <b-card-title v-if="title" :title="title" />
 
-        <b-form-group v-if="canFilterExtents" :label="$t('search.temporalExtent')" label-for="datetime" :description="$t('search.dateDescription')">
+        <b-form-group v-if="canFilterFreeText" :label="$t('search.freeText')" :label-for="ids.q" :description="$t('search.freeTextDescription')">
+          <b-form-input :id="ids.q" :value="query.q" @change="setSearchTerms" />
+        </b-form-group>
+
+        <b-form-group v-if="canFilterExtents" :label="$t('search.temporalExtent')" :label-for="ids.datetime" :description="$t('search.dateDescription')">
           <date-picker
-            range id="datetime" :lang="datepickerLang" :format="datepickerFormat"
+            range :id="ids.datetime" :lang="datepickerLang" :format="datepickerFormat"
             :value="query.datetime" @input="setDateTime" input-class="form-control mx-input"
           />
         </b-form-group>
 
-        <b-form-group v-if="canFilterExtents" :label="$t('search.spatialExtent')" label-for="provideBBox">
-          <b-form-checkbox id="provideBBox" v-model="provideBBox" value="1" @change="setBBox()">{{ $t('search.filterBySpatialExtent') }}</b-form-checkbox>
+        <b-form-group v-if="canFilterExtents" :label="$t('search.spatialExtent')" :label-for="ids.bbox">
+          <b-form-checkbox :id="ids.bbox" v-model="provideBBox" value="1" @change="setBBox()">{{ $t('search.filterBySpatialExtent') }}</b-form-checkbox>
           <Map class="mb-4" v-if="provideBBox" :stac="stac" selectBounds @bounds="setBBox" scrollWheelZoom />
         </b-form-group>
 
-        <b-form-group v-if="conformances.Collections" :label="$tc('stacCollection', collections.length)" label-for="collections">
+        <b-form-group v-if="conformances.CollectionIdFilter" :label="$tc('stacCollection', collections.length)" :label-for="ids.collections">
           <multiselect
             v-if="collections.length > 0"
-            id="collections" :value="selectedCollections" @input="setCollections"
+            :id="ids.collections" :value="selectedCollections" @input="setCollections"
             :placeholder="$t('search.selectCollections')"
             :tagPlaceholder="$t('search.addCollections')"
             :selectLabel="$t('multiselect.selectLabel')"
@@ -32,7 +36,7 @@
           />
           <multiselect
             v-else
-            id="collections" :value="selectedCollections" @input="setCollections"
+            :id="ids.collections" :value="selectedCollections" @input="setCollections"
             multiple taggable :options="query.collections"
             :placeholder="$t('search.enterCollections')"
             :tagPlaceholder="$t('search.addCollections')"
@@ -46,9 +50,9 @@
           </multiselect>
         </b-form-group>
 
-        <b-form-group v-if="conformances.Items" :label="$t('search.itemIds')" label-for="ids">
+        <b-form-group v-if="conformances.ItemIdFilter" :label="$t('search.itemIds')" :label-for="ids.ids">
           <multiselect
-            id="ids" :value="query.ids" @input="setIds"
+            :id="ids.ids" :value="query.ids" @input="setIds"
             multiple taggable :options="query.ids"
             :placeholder="$t('search.enterItemIds')"
             :tagPlaceholder="$t('search.addItemIds')"
@@ -59,9 +63,9 @@
           </multiselect>
         </b-form-group>
 
-        <div class="additional-filters" v-if="cql && Array.isArray(queryables) && queryables.length > 0">
-          <b-form-group :label="$t('search.additionalFilters')" label-for="availableFields">
-            <b-form-radio-group id="logical" v-model="filtersAndOr" :options="andOrOptions" name="logical" size="sm" />
+        <div class="additional-filters" v-if="showAdditionalFilters">
+          <b-form-group :label="$t('search.additionalFilters')">
+            <b-form-radio-group v-model="filtersAndOr" :options="andOrOptions" name="logical" size="sm" />
 
             <b-dropdown size="sm" :text="$t('search.addFilter')" block variant="primary" class="queryables mt-2 mb-3" menu-class="w-100">
               <template v-for="queryable in sortedQueryables">
@@ -84,11 +88,11 @@
           </b-form-group>
         </div>
 
-        <hr>
+        <hr v-if="canFilterExtents || conformances.CollectionIdFilter || conformances.ItemIdFilter || showAdditionalFilters">
 
-        <b-form-group v-if="canSort" :label="$t('sort.title')" label-for="sort" :description="$t('search.notFullySupported')">
+        <b-form-group v-if="canSort" :label="$t('sort.title')" :label-for="ids.sort" :description="$t('search.notFullySupported')">
           <multiselect
-            id="sort" :value="sortTerm" @input="sortFieldSet"
+            :id="ids.sort" :value="sortTerm" @input="sortFieldSet"
             :options="sortOptions" track-by="value" label="text"
             :placeholder="$t('default')"
             :selectLabel="$t('multiselect.selectLabel')"
@@ -98,9 +102,9 @@
           <SortButtons v-if="sortTerm && sortTerm.value" class="mt-1" :value="sortOrder" enforce @input="sortDirectionSet" />
         </b-form-group>
 
-        <b-form-group :label="$t('search.itemsPerPage')" label-for="limit" :description="$t('search.itemsPerPageDescription', {maxItems})">
+        <b-form-group :label="$t('search.itemsPerPage')" :label-for="ids.limit" :description="$t('search.itemsPerPageDescription', {maxItems})">
           <b-form-input
-            id="limit" :value="query.limit" @change="setLimit" min="1"
+            :id="ids.limit" :value="query.limit" @change="setLimit" min="1"
             :max="maxItems" type="number"
             :placeholder="$t('defaultWithValue', {value: itemsPerPage})"
           />
@@ -117,26 +121,34 @@
 <script>
 import { BBadge, BDropdown, BDropdownItem, BForm, BFormGroup, BFormInput, BFormCheckbox, BFormRadioGroup } from 'bootstrap-vue';
 import Multiselect from 'vue-multiselect';
+import { mapState } from "vuex";
+import refParser from '@apidevtools/json-schema-ref-parser';
 
-import { mapGetters, mapState } from "vuex";
+import Utils, { schemaMediaType } from '../utils';
+import { ogcQueryables } from "../rels";
+
+import ApiCapabilitiesMixin from './ApiCapabilitiesMixin';
 import DatePickerMixin from './DatePickerMixin';
 import Loading from './Loading.vue';
-import Utils from '../utils';
-import CqlLogicalOperator from '../models/cql2/operators/logical';
+
+import STAC from '../models/stac';
 import Cql from '../models/cql2/cql';
-import { CqlEqual } from '../models/cql2/operators/comparison';
+import Queryable from '../models/cql2/queryable';
 import CqlValue from '../models/cql2/value';
-import ApiCapabilitiesMixin from './ApiCapabilitiesMixin';
+import CqlLogicalOperator from '../models/cql2/operators/logical';
+import { CqlEqual } from '../models/cql2/operators/comparison';
+import { stacRequest } from '../store/utils';
 
 function getQueryDefaults() {
   return {
+    q: null,
     datetime: null,
     bbox: null,
     limit: null,
     ids: [],
     collections: [],
     sortby: null,
-    filters: []
+    filters: null
   };
 }
 
@@ -152,8 +164,10 @@ function getDefaults() {
   };
 }
 
+let formId = 0;
+
 export default {
-  name: 'ItemFilter',
+  name: 'SearchFilter',
   components: {
     BBadge,
     BDropdown,
@@ -174,11 +188,15 @@ export default {
     DatePickerMixin
   ],
   props: {
-    stac: {
+    parent: {
       type: Object,
       required: true
     },
     title: {
+      type: String,
+      required: true
+    },
+    type: { // Collections or Global or Items
       type: String,
       required: true
     },
@@ -189,18 +207,35 @@ export default {
   },
   data() {
     return Object.assign({
+      results: null,
       maxItems: 10000,
-      loaded: false
+      loaded: false,
+      queryables: null,
+      collections: []
     }, getDefaults());
   },
   computed: {
-    ...mapState(['itemsPerPage', 'uiLanguage', 'queryables', 'apiCollections']),
-    ...mapGetters(['hasMoreCollections', 'root']),
+    ...mapState(['apiCollections', 'nextCollectionsLink', 'itemsPerPage', 'uiLanguage']),
+    ids() {
+      let obj = {};
+      ['q', 'datetime', 'bbox', 'collections', 'ids', 'sort', 'limit']
+        .forEach(field => obj[field] = field + formId);
+      return obj;
+    },
+    stac() {
+      if (this.parent instanceof STAC) {
+        return this.parent;
+      }
+      return null;
+    },
     andOrOptions() {
       return [
         { value: 'and', text: this.$i18n.t('search.logical.and') },
         { value: 'or', text: this.$i18n.t('search.logical.or') },
       ];
+    },
+    showAdditionalFilters() {
+      return this.cql && Array.isArray(this.queryables) && this.queryables.length > 0;
     },
     sortOptions() {
       return [
@@ -210,22 +245,21 @@ export default {
         { value: 'properties.title', text: this.$t('search.sortOptions.title') }
       ];
     },
-    collections() {
-      if (this.hasMoreCollections || !this.conformances.Collections) {
-        return [];
-      }
-      return this.apiCollections
-        .map(c => ({
-          value: c.id,
-          text: c.title || c.id
-        }))
-        .sort((a,b) => a.text.localeCompare(b.text, this.uiLanguage));
-    },
     sortedQueryables() {
       return this.queryables.slice(0).sort((a, b) => a.title.localeCompare(b.title));
     }
   },
   watch: {
+    apiCollections: {
+      immediate: true,
+      handler() {
+        if (!Array.isArray(this.apiCollections) || this.nextCollectionsLink || !this.conformances.CollectionIdFilter) {
+          this.collections = [];
+          return;
+        }
+        this.collections = this.prepareCollections(this.apiCollections);
+      }
+    },
     value: {
       immediate: true,
       handler(value) {
@@ -237,25 +271,100 @@ export default {
       }
     }
   },
+  beforeCreate() {
+    formId++;
+  },
   created() {
     let promises = [];
-    if (this.cql) {
+    if (this.cql && this.stac) {
+      let queryableLink = this.findQueryableLink(this.stac.links);
       promises.push(
-        this.$store.dispatch('loadQueryables', {
-          stac: this.stac,
-          refParser: require('@apidevtools/json-schema-ref-parser')
-        }).catch(error => console.error(error))
+        this.loadQueryables(queryableLink)
+          .catch(error => console.error(error))
       );
     }
-    if (this.conformances.Collections && this.apiCollections.length === 0) {
+    if ((this.type === 'Collections' || this.conformances.CollectionIdFilter) && this.stac) {
       promises.push(
-        this.$store.dispatch('loadNextApiCollections', {stac: this.root, show: true})
+        this.loadCollections(this.stac.getApiCollectionsLink())
+          .then(({collections, queryableLink}) => {
+            this.collections = collections;
+            return this.loadQueryables(queryableLink);
+          })
           .catch(error => console.error(error))
       );
     }
     Promise.all(promises).finally(() => this.loaded = true);
   },
   methods: {
+    async loadCollections(link) {
+      let hasMore = false;
+      let data = {
+        collections: [],
+        queryableLink: null
+      };
+
+      if (this.type === 'Global' && this.apiCollections) {
+        data.collections = this.apiCollections;
+        hasMore = Boolean(this.nextCollectionsLink);
+      }
+      else if (this.type === 'Global' || this.type === 'Collections') {
+        let response = await stacRequest(this.$store, link);
+        if (!Utils.isObject(response.data)) {
+          return {};
+        }
+
+        if (Array.isArray(response.data.links)) {
+          let links = response.data.links;
+          hasMore = Boolean(Utils.getLinkWithRel(links, 'next'));
+          data.queryableLink = this.findQueryableLink(links) || null;
+        }
+
+        if (!hasMore && Array.isArray(response.data.collections)) {
+          let collections = response.data.collections
+            .map(collection => new STAC(collection));
+          data.collections = this.prepareCollections(collections);
+        }
+      }
+      return data;
+    },
+    prepareCollections(collections) {
+      return collections
+        .map(c => ({
+          value: c.id,
+          text: c.title || c.id
+        }))
+        .sort((a,b) => a.text.localeCompare(b.text, this.uiLanguage));
+    },
+    findQueryableLink(links) {
+      return Utils.getLinksWithRels(links, ogcQueryables)
+          .find(link => Utils.isMediaType(link.type, schemaMediaType, true));
+    },
+    async loadQueryables(link) {
+      this.queryables = [];
+
+      if (!Utils.isObject(link)) {
+        return;
+      }
+
+      let response = await stacRequest(this.$store, link);
+      if (!Utils.isObject(response.data)) {
+        return;
+      }
+
+      let schemas;
+      try {
+        schemas = await refParser.dereference(response.data);
+      } catch (error) {
+        // Use data with $refs included as fallback anyway
+        console.error(error);
+        schemas = response.data;
+      }
+
+      if (Utils.isObject(schemas) && Utils.isObject(schemas.properties)) {
+        this.queryables = Object.entries(schemas.properties)
+          .map(([key, schema]) => new Queryable(key, schema));
+      }
+    },
     limitText(count) {
       return this.$t("multiselect.andMore", {count});
     },
@@ -266,6 +375,9 @@ export default {
       this.sortOrder = value;
     },
     buildFilter() {
+      if (this.filters.length === 0) {
+        return null;
+      }
       const args = this.filters.map(f => new f.operator(f.queryable, f.value));
       const logical = CqlLogicalOperator.create(this.filtersAndOr, args);
       return new Cql(logical);
@@ -284,9 +396,8 @@ export default {
       if (this.canSort && this.sortTerm && this.sortOrder) {
         this.$set(this.query, 'sortby', this.formatSort());
       }
-      if (this.filters.length > 0) {
-        this.$set(this.query, 'filters', this.buildFilter());
-      }
+      let filters = this.buildFilter();
+      this.$set(this.query, 'filters', filters);
       this.$emit('input', this.query, false);
     },
     async onReset() {
@@ -302,6 +413,12 @@ export default {
         limit = null;
       }
       this.$set(this.query, 'limit', limit);
+    },
+    setSearchTerms(value) {
+      if (!Utils.hasText(value)) {
+        value = null;
+      }
+      this.$set(this.query, 'q', value);
     },
     setBBox(bounds) {
       let bbox = null;

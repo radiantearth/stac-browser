@@ -82,7 +82,6 @@ export default class Queryable {
     else if (this.isBoolean) {
       return false;
     }
-    // todo: Support boolean
     return null;
   }
 

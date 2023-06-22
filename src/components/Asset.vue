@@ -1,21 +1,19 @@
 <template>
-  <b-card class="asset" no-body>
-    <b-card-header header-tag="header" role="tab" class="p-0">
-      <b-button block v-b-toggle="uid" variant="asset" squared class="p-2 d-flex">
-        <span class="title">
-          <span class="mr-1" aria-hidden="true">
-            <b-icon-chevron-down v-if="expanded" />
-            <b-icon-chevron-right v-else />
-          </span>
-          {{ asset.title || id }}
+  <b-card class="asset expandable-card" no-body>
+    <b-card-header header-tag="header" role="tab">
+      <b-button block v-b-toggle="uid" variant="asset" squared>
+        <span class="chevron" aria-hidden="true">
+          <b-icon-chevron-down v-if="expanded" />
+          <b-icon-chevron-right v-else />
         </span>
+        <span class="title">{{ asset.title || id }}</span>
         <div class="badges ml-1" v-if="Array.isArray(asset.roles)">
-          <b-badge v-if="shown" variant="success" class="shown ml-1 mb-1" :title="$t('assets.currentlyShown')">
+          <b-badge v-if="shown" variant="success" class="shown" :title="$t('assets.currentlyShown')">
             <b-icon-check /> {{ $t('assets.shown') }}
           </b-badge>
-          <b-badge v-if="asset.deprecated" variant="warning" class="deprecated ml-1 mb-1">{{ $t('deprecated') }}</b-badge>
-          <b-badge v-for="role in asset.roles" :key="role" :variant="role === 'data' ? 'primary' : 'secondary'" class="role ml-1 mb-1">{{ displayRole(role) }}</b-badge>
-          <b-badge v-if="shortFileFormat" variant="dark" class="format ml-1 mb-1" :title="fileFormat"><span v-html="shortFileFormat" /></b-badge>
+          <b-badge v-if="asset.deprecated" variant="warning" class="deprecated">{{ $t('deprecated') }}</b-badge>
+          <b-badge v-for="role in asset.roles" :key="role" :variant="role === 'data' ? 'primary' : 'secondary'" class="role">{{ displayRole(role) }}</b-badge>
+          <b-badge v-if="shortFileFormat" variant="dark" class="format" :title="fileFormat"><span v-html="shortFileFormat" /></b-badge>
         </div>
       </b-button>
     </b-card-header>
@@ -23,7 +21,7 @@
       <b-card-body>
         <b-card-title><span v-html="fileFormat" /></b-card-title>
         <b-button-group class="actions" v-if="href">
-          <CopyButton v-if="shouldCopy" variant="primary" :copyText="href">
+          <CopyButton v-if="!isBrowserProtocol" variant="primary" :copyText="href">
             {{ buttonText }}
           </CopyButton>
           <b-button v-else :href="href" target="_blank" variant="primary">
@@ -161,13 +159,6 @@ export default {
       }
       return false;
     },
-    shouldCopy() {
-      if (this.isGdalVfs) {
-        return true;
-      }
-
-      return !this.isBrowserProtocol;
-    },
     fileFormat() {
       if (typeof this.asset.type === "string" && this.asset.type.length > 0) {
         return this.formatMediaType(this.asset.type);
@@ -192,7 +183,7 @@ export default {
       return null;
     },
     isBrowserProtocol() {
-      return !this.protocol || browserProtocols.includes(this.protocol);
+      return (!this.protocol && !this.isGdalVfs) || browserProtocols.includes(this.protocol);
     },
     isGdalVfs() {
       return Utils.isGdalVfsUri(this.asset.href);
@@ -217,6 +208,9 @@ export default {
       }
     },
     browserCanOpenFile() {
+      if (this.isGdalVfs)  {
+        return false;
+      }
       if (Utils.canBrowserDisplayImage(this.asset)) {
         return true;
       }
@@ -239,7 +233,7 @@ export default {
       if (this.isGdalVfs) {
         what = 'copyGdalVfsUrl';
       }
-      else if (this.shouldCopy) {
+      else if (!this.isBrowserProtocol) {
         what = 'copyUrl';
       }
       let where = (!this.isBrowserProtocol && this.from) ? 'withSource' : 'generic';
@@ -306,21 +300,6 @@ export default {
 
 <style lang="scss">
 #stac-browser .asset {
-  .btn-asset {
-    text-align: left;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem 0.8rem;
-
-    .badges {
-      .badge {
-        line-height: 1.2em;
-        height: 1.7em;
-        text-transform: uppercase;
-      }
-    }
-  }
   .metadata {
     .card-columns {
       column-count: 1;
