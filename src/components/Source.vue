@@ -195,7 +195,10 @@ export default {
     methods: {
         ...mapActions(['switchLocale']),
         async validate() {
-            await this.$store.dispatch('validate', this.stacUrl);
+          if (!this.canValidate) {
+            return;
+          }
+          await this.$store.dispatch('validate', this.stacUrl);
         },
         browserUrl() {
           return window.location.toString();
