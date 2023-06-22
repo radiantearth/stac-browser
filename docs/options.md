@@ -79,7 +79,7 @@ Otherwise, defaults to the language set for `locale`.
 
 ## storeLocale
 
-If set to `true`, stores the locale selected by the user in the `localeStorage` of the browser.
+If set to `true`, stores the locale selected by the user in the `localStorage` of the browser.
 Otherwise, doesn't store the locale across browser sessions.
 
 ## locale
