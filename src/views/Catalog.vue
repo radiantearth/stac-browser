@@ -13,11 +13,11 @@
           <section v-if="isCollection" class="metadata mb-4">
             <b-row v-if="licenses">
               <b-col md="4" class="label">{{ $t('catalog.license') }}</b-col>
-              <b-col md="8" class="value" v-html="licenses" />
+              <b-col md="8" class="value"><span v-html="licenses" /></b-col>
             </b-row>
             <b-row v-if="temporalExtents">
               <b-col md="4" class="label">{{ $t('catalog.temporalExtent') }}</b-col>
-              <b-col md="8" class="value" v-html="temporalExtents" />
+              <b-col md="8" class="value"><span v-html="temporalExtents" /></b-col>
             </b-row>
           </section>
           <Links v-if="linkPosition === 'left'" :title="$t('additionalResources')" :links="additionalLinks" />
@@ -36,7 +36,7 @@
         </section>
         <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="shownAssets" @showAsset="showAsset" />
         <Assets v-if="hasItemAssets && !hasItems" :assets="data.item_assets" :definition="true" />
-        <Providers v-if="hasProviders" :providers="data.providers" />
+        <Providers v-if="providers" :providers="providers" />
         <Metadata :title="$t('metadata.title')" class="mb-4" :type="data.type" :data="data" :ignoreFields="ignoredMetadataFields" />
         <CollectionLink v-if="collectionLink" :link="collectionLink" />
         <Links v-if="linkPosition === 'right'" :title="$t('additionalResources')" :links="additionalLinks" />
@@ -152,11 +152,18 @@ export default {
       }
       return null;
     },
-    hasProviders() {
-      return (this.isCollection && Array.isArray(this.data.providers) && this.data.providers.length > 0);
+    providers() {
+      let providers = [];
+      if (Array.isArray(this.data.providers) && this.data.providers.length > 0) {
+        providers = this.data.providers;
+      }
+      else if (this.isCollection && Utils.isObject(this.data.summaries) && Array.isArray(this.data.summaries.providers)) {
+        providers = this.data.summaries.providers;
+      }
+      return providers.length > 0 ? providers : null;
     },
     temporalExtents() {
-      if (this.data && this.data.isCollection() && this.data.extent.temporal.interval.length > 0) {
+      if (this.isCollection && this.data.extent.temporal.interval.length > 0) {
         let extents = this.data.extent.temporal.interval;
         if (extents.length > 1) {
             // Remove union temporal extent in favor of more concrete extents
