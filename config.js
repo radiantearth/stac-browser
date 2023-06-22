@@ -21,7 +21,6 @@ module.exports = {
     ],
     apiCatalogPriority: null,
     useTileLayerAsFallback: true,
-    tileSourceTemplate: null,
     displayGeoTiffByDefault: false,
     buildTileUrlTemplate: ({href, asset}) => "https://tiles.rdnt.io/tiles/{z}/{x}/{y}@2x?url=" + encodeURIComponent(asset.href.startsWith("/vsi") ? asset.href : href),
     stacProxyUrl: null,
@@ -29,6 +28,8 @@ module.exports = {
     historyMode: "history",
     cardViewMode: "cards",
     cardViewSort: "asc",
+    showKeywordsInItemCards: false,
+    showKeywordsInCatalogCards: false,
     showThumbnailsAsAssets: false,
     stacLint: true,
     geoTiffResolution: 128,
@@ -40,8 +41,5 @@ module.exports = {
     requestHeaders: {},
     requestQueryParameters: {},
     preprocessSTAC: null,
-    authConfig: {
-        type: 'query',
-        key: 'key'
-    }
+    authConfig: null
 };

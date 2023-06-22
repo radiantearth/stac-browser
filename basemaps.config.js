@@ -8,7 +8,7 @@ const XYZ = 'LTileLayer';
 
 const BASEMAPS = {
   earth: {
-    url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     name: 'OpenStreetMap',
     is: XYZ,
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors.'

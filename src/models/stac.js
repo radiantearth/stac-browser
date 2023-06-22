@@ -123,7 +123,7 @@ class STAC {
       children.push(this._apiChildren.prev);
     }
     if (showCollections && this._apiChildren.list.length > 0) {
-      children = this._apiChildren.list;
+      children = this._apiChildren.list.slice(0);
     }
     if (showChilds) {
       children = STAC.addMissingChildren(children, this).concat(this.getLinksWithRels(['item']));
@@ -150,7 +150,8 @@ class STAC {
     // The search link MUST be 'application/geo+json' as otherwise it's likely not STAC
     // See https://github.com/opengeospatial/ogcapi-features/issues/832
     let links = Utils.getLinksWithRels(this.links, ['search'])
-      .filter(link => Utils.isMediaType(link.type, geojsonMediaType));
+      .filter(link => Utils.isMediaType(link.type, geojsonMediaType))
+      .map(link => Object.assign({}, link, {href: Utils.toAbsolute(link.href, this._url)}));
     // Prefer POST if present
     let post = links.find(link => Utils.hasText(link.method) && link.method.toUpperCase() === 'POST');
     return post || links[0] || null;
@@ -297,9 +298,6 @@ class STAC {
    */
   getThumbnails(browserOnly = false, prefer = null) { // prefer can be either 
     let thumbnails = this.getAssetsWithRoles(['thumbnail', 'overview']);
-    if (prefer && thumbnails.length > 1) {
-      thumbnails.sort(a => a.roles.includes(prefer) ? -1 : 1);
-    }
     // Get from links only if no assets are available as they should usually be the same as in assets
     if (thumbnails.length === 0) {
       thumbnails = this.getLinksWithRels(['preview']);
@@ -311,6 +309,15 @@ class STAC {
     if (browserOnly) {
       // Remove all images that can't be displayed in a browser
       thumbnails = thumbnails.filter(img => Utils.canBrowserDisplayImage(img));
+    }
+    if (prefer && thumbnails.length > 1) {
+      // Prefer one role over the other.
+      // The two step approach with two filters ensures the same sort bevahiour across all browsers:
+      // see https://github.com/radiantearth/stac-browser/issues/370
+      let filter = img => img.roles.includes(prefer);
+      thumbnails = thumbnails
+        .filter(filter)
+        .concat(thumbnails.filter(img => !filter(img)));
     }
     return thumbnails.map(img => this._linkToAbsolute(img));
   }

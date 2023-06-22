@@ -1,5 +1,6 @@
 import URI from 'urijs';
 import removeMd from 'remove-markdown';
+import { stacPagination } from "./rels";
 
 export const commonFileNames = ['catalog', 'collection', 'item'];
 
@@ -22,13 +23,16 @@ export const browserImageTypes = [
   'image/webp'
 ];
 
+export const cogMediaTypes = [
+  "image/tiff; application=geotiff; profile=cloud-optimized",
+  "image/vnd.stac.geotiff; cloud-optimized=true"
+];
+
 export const geotiffMediaTypes = [
   "application/geotiff",
   "image/tiff; application=geotiff",
-  "image/tiff; application=geotiff; profile=cloud-optimized",
   "image/vnd.stac.geotiff",
-  "image/vnd.stac.geotiff; cloud-optimized=true"
-];
+].concat(cogMediaTypes);
 
 export const browserProtocols = [
   'http',
@@ -111,6 +115,20 @@ export default class Utils {
    */
   static hasText(string) {
     return (typeof string === 'string' && string.length > 0);
+  }
+
+  static shortenTitle(fullStr, strLen, separator = '…') {
+    if (fullStr.length <= strLen) {
+      return fullStr;
+    }
+
+    let sepLen = separator.length;
+    let charsToShow = strLen - sepLen;
+    let frontChars = Math.ceil(charsToShow/2);
+    let backChars = Math.floor(charsToShow/2);
+    return fullStr.substr(0, frontChars) + 
+           separator + 
+           fullStr.substr(fullStr.length - backChars);
   }
 
   static isGdalVfsUri(url) {
@@ -225,13 +243,59 @@ export default class Utils {
     }).join('/');
   }
 
-  static addFiltersToLink(link, filters = {}) {
+  static formatSortbyForPOST(value) {
+    // POST search requires sortby to be an array of objects containing a property name and sort direction.
+    // See spec here: https://api.stacspec.org/v1.0.0-rc.1/item-search/#tag/Item-Search/operation/postItemSearch
+    // This function converts the property name to the desired format.
+    const sortby = {
+      field: '',
+      direction: 'asc'
+    };
+  
+    // Check if the value starts with a minus sign ("-")
+    if (value.startsWith('-')) {
+      // sort by descending order
+      sortby.field = value.substring(1);
+      sortby.direction = 'desc';
+    } else {
+      //sort by ascending order
+      sortby.field = value;
+    }
+    
+    // Put the object in an array
+    return [sortby];
+  }
+
+  static getPaginationLinks(data) {
+    let pages = {};
+    if (Utils.isObject(data)) {
+      let pageLinks = Utils.getLinksWithRels(data.links, stacPagination);
+      for (let pageLink of pageLinks) {
+        let rel = pageLink.rel === 'previous' ? 'prev' : pageLink.rel;
+        pages[rel] = pageLink;
+      }
+    }
+    return pages;
+  }
+
+  static addFiltersToLink(link, filters = {}, itemsPerPage = null) {
     let isEmpty = value => {
       return (value === null
       || (typeof value === 'number' && !Number.isFinite(value))
       || (typeof value === 'string' && value.length === 0)
       || (typeof value === 'object' && Utils.size(value) === 0));
     };
+
+    if (!Utils.isObject(filters)) {
+      filters = {};
+    }
+    else {
+      filters = Object.assign({}, filters);
+    }
+
+    if (typeof filters.limit !== 'number' && typeof itemsPerPage === 'number') {
+      filters.limit = itemsPerPage;
+    }
 
     if (Utils.hasText(link.method) && link.method.toUpperCase() === 'POST') {
       let body = Object.assign({}, link.body);
@@ -243,7 +307,10 @@ export default class Utils {
           continue;
         }
 
-        if (key === 'datetime') {
+        if (key === 'sortby') {
+          value = Utils.formatSortbyForPOST(value);
+        }
+        else if (key === 'datetime') {
           value = Utils.formatDatetimeQuery(value);
         }
         else if (key === 'filters') {
@@ -272,7 +339,7 @@ export default class Utils {
         else if (key === 'bbox') {
           value = value.join(',');
         }
-        else if ((key === 'collections' || key === 'ids')) {
+        else if ((key === 'collections' || key === 'ids' || key === 'q')) {
           value = value.join(',');
         }
         else if (key === 'filters') {

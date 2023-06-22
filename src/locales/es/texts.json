@@ -1,4 +1,8 @@
 {
+  "actions": {
+    "openIn": "Abrir en {service}"
+  },
+  "additionalActions": "Acciones Adicionales",
   "additionalResources": "Recursos adicionales",
   "anonymized": {
     "title": "Anonimizado"
@@ -45,6 +49,10 @@
     "filterByTitle": "Filtrar catálogos por título",
     "loadMore": "Cargar más...",
     "noMatches": "Ningún catálogo concuerda con los criterios de búsqueda"
+  },
+  "checkbox": {
+    "false": "no",
+    "true": "si"
   },
   "copy": "Copia",
   "default": "Predeterminado",
@@ -113,9 +121,11 @@
     "urlMissingProtocol": "La URL no tiene protocolo."
   },
   "items": {
-    "filter": "Filtro",
+    "filter": "Filtros",
+    "hideFilter": "Ocultar Filtros",
     "noTime": "No se indicó un tiempo",
-    "noneAvailableForCollection": "No hay elementos disponibles para esta colección."
+    "noneAvailableForCollection": "No hay elementos disponibles para esta colección.",
+    "showFilter": "Mostrar Filtros"
   },
   "leaflet": {
     "close": "Cerrar",
@@ -161,7 +171,10 @@
     "ftp": "FTP",
     "gcs": "Google Cloud",
     "oss": "Alibaba Cloud",
-    "s3": "Amazon S3"
+    "s3": {
+      "default": "S3",
+      "amazonaws.com": "Amazon S3"
+    }
   },
   "providers": {
     "email": "Enviar e-mail",
@@ -178,26 +191,34 @@
     "less": "Leer menos",
     "more": "Leer más"
   },
+  "reset": "Restablecer",
   "search": {
     "addCollections": "Presione enter para añadir una colección",
     "addFilter": "Añadir filtro",
     "addItemIds": "Presione enter para añadir el ID de un elemento",
+    "addSearchTerm": "Presione Enter para añadir un término de búsqueda",
     "additionalFilters": "Filtros adicionales",
-    "buttons": {
-      "filter": "Filtro",
-      "reset": "Restablecer"
-    },
     "dateDescription": "Todas las horas en Coordinated Universal Time (UTC).",
     "enterCollections": "Introduzca una o varias colecciones...",
     "enterItemIds": "Introduzca una o varias IDs de Elemento...",
+    "enterSearchTerms": "Introduzca uno o más términos de búsqueda...",
     "equalTo": "igual a",
     "filterBySpatialExtent": "Filtra por extensión espacial",
+    "filterCollection": "Filtrar colección",
+    "freeText": "Términos de Búsqueda",
+    "freeTextDescription": "Buscar al menos uno de los términos proporcionados en campos como el título y la descripción.",
     "greaterThan": "mayor que",
+    "greaterThanEqual": "igual o mayor que",
     "itemIds": "IDs de Elementos",
     "itemsPerPage": "Elementos por página",
     "itemsPerPageDescription": "Número de elementos solicitados por página, máx. {maxItems} elementos.",
     "lessThan": "menor que",
+    "lessThanEqual": "igual o menor que",
     "likeOperatorDescription": "Puede usar carácteres comodín. `_` representa un solo carácter, `%` representa cualquier número de carácteres. Para buscar por un carácter comodín en específico, necesita añadir `\\` antes del carácter.",
+    "logical": {
+      "and": "Coincidencia con todos los filtros (and)",
+      "or": "Coincidencia con algún filtro (or)"
+    },
     "matches": "coincidencia",
     "metaDescription": "Buscar en los datos ofrecidos por {title}.",
     "modifyCriteria": "Por favor modifique los criterios de búsqueda.",
@@ -208,14 +229,20 @@
     "notSupported": "La API no soporta la Búsqueda por Elementos.",
     "placeholder": "Búsqueda...",
     "selectCollections": "Seleccione una o varias colecciones...",
+    "selectForItemSearch": "Seleccionar para Búsqueda de Elementos",
     "sortOptions": {
       "datetime": "Fecha y hora",
       "id": "ID",
       "title": "Título"
     },
     "spatialExtent": "Extensión espacial",
+    "tabs": {
+      "collections": "Buscar colecciones",
+      "items": "Buscar elementos"
+    },
     "temporalExtent": "Extensión temporal",
-    "title": "Buscar"
+    "title": "Buscar",
+    "useInItemSearch": "Abrir colección en Búsqueda de Elementos | Abrir {count} Colecciones en Búsqueda de Elementos"
   },
   "showMore": "Mostrar más...",
   "sidebar": {
@@ -233,7 +260,10 @@
     "title": "Ordenar"
   },
   "source": {
+    "conformanceClasses": "Clases de conformidad",
     "detailsAboutSource": "Detalles sobre la fuente STAC",
+    "fileFormat": "Formato de archivo",
+    "id": "ID",
     "label": "Fuente",
     "language": {
       "label": "Idioma: {currentLanguage}",
@@ -251,9 +281,11 @@
       "twitter": "Twitter",
       "withOthers": "Comparta esta página con otros"
     },
-    "stacVersion": "Versión STAC:",
+    "stacExtension": "Extensión STAC",
+    "stacVersion": "Versión STAC",
+    "statistics": "Estadísticas",
     "title": "Fuente de datos",
-    "valid": "Valida:",
+    "valid": "Valida",
     "validating": "Validando...",
     "validationNA": "n/a"
   },

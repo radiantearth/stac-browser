@@ -46,6 +46,10 @@
     "loadMore": "Încarcă mai mult...",
     "noMatches": "Niciun catalog nu corespunde criteriilor de căutare."
   },
+  "checkbox": {
+    "false": "Nu",
+    "true": "Doar"
+  },
   "copy": "Copiază",
   "default": "Implicit",
   "defaultWithValue": "Implicit ({value})",
@@ -161,7 +165,10 @@
     "ftp": "FTP",
     "gcs": "Google Cloud",
     "oss": "Alibaba Cloud",
-    "s3": "Amazon S3"
+    "s3": {
+      "default": "S3",
+      "amazonaws.com": "Amazon S3"
+    }
   },
   "providers": {
     "email": "Trimite un email",
@@ -178,15 +185,12 @@
     "less": "Citiți mai puțin",
     "more": "Citiți mai mult"
   },
+  "reset": "Resetați",
   "search": {
     "addCollections": "Apăsați Enter pentru a adăuga o colecție",
     "addFilter": "Adăugați un filtru",
     "addItemIds": "Apăsați Enter pentru a adăuga un ID de articol",
     "additionalFilters": "Filtre suplimentare",
-    "buttons": {
-      "filter": "Filtru",
-      "reset": "Resetați"
-    },
     "dateDescription": "Toate orele sunt timp universal coordonat (UTC).",
     "enterCollections": "Introduceți una sau mai multe colecții...",
     "enterItemIds": "Introduceți unul sau mai multe ID-uri de articol...",
@@ -234,6 +238,8 @@
   },
   "source": {
     "detailsAboutSource": "Despre sursa STAC",
+    "fileFormat": "Formatul fișierului",
+    "id": "Identificator",
     "label": "Sursă",
     "language": {
       "label": "Limbă: {currentLanguage}",
@@ -251,9 +257,10 @@
       "twitter": "Twitter",
       "withOthers": "Partajați această pagină"
     },
-    "stacVersion": "Versiune STAC:",
+    "stacVersion": "Versiune STAC",
+    "statistics": "Statistici",
     "title": "Date sursă",
-    "valid": "Valid:",
+    "valid": "Valid",
     "validating": "Validare...",
     "validationNA": "n.a."
   },

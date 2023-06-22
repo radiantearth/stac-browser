@@ -1,9 +1,16 @@
 {
+  "actions": {
+    "openIn": "Öffne in {service}"
+  },
+  "additionalActions": "Weitere Aktionen",
   "additionalResources": "Zusätzliche Ressourcen",
   "anonymized": {
     "title": "Anonymisiert"
   },
   "assets": {
+    "alternate": {
+      "main": "Bevorzugt"
+    },
     "copyGdalVfsUrl": {
       "generic": "Kopiere GDAL VFS Adresse",
       "withSource": "Kopiere GDAL VFS Adresse für {source}"
@@ -47,6 +54,7 @@
   },
   "catalogs": {
     "filterByTitle": "Kataloge anhand des Titels filtern",
+    "filterByTitleAndMore": "Kataloge anhand von Titel, Beschreibung oder Schlüsselwörtern filtern",
     "loadMore": "Lade mehr...",
     "noMatches": "Keiner der Kataloge entspricht den Suchkriterien."
   },
@@ -76,7 +84,7 @@
     "default": "Die angeforderte Seite konnte nicht geladen werden.",
     "forbidden": "Die für diese Anfrage angegebenen Anmeldedaten sind ungültig, bspw. ein abgelaufener oder ungültiger API-Schlüssel. Bitte geben Sie andere Anmeldedaten an und versuchen Sie es erneut.",
     "invalidJsonObject": "Die Antwort des Dienstanbieters ist kein gültiges JSON-Objeckt.",
-    "invalidStacCollections": "Die Antwort des Dienstanbieters ist keine gültige Liste mit Sammlungen.",
+    "invalidStacCollections": "Die Antwort des Dienstanbieters ist keine gültige Liste mit Katalogen.",
     "invalidStacItems": "Die Antwort des Dienstanbieters ist keine fültige Liste mit Elementen.",
     "labels": {
       "cause": "Ursache:",
@@ -84,7 +92,7 @@
       "reason": "Grund:",
       "requestURL": "Anfrageadresse:"
     },
-    "loadApiCollectionsFailed": "Die Sammlungen des Dienstanbieters konnten nicht geladen werden.",
+    "loadApiCollectionsFailed": "Die Kataloge des Dienstanbieters konnten nicht geladen werden.",
     "loadApiItemsFailed": "Die Elemente des Dienstanbieters konnten nicht geladen werden.",
     "loadFilteredItems": "Das Laden einer gefilterten Liste von Elementen ist leider fehlgeschlagen.",
     "loadItems": "Das Laden der Liste der Elemente ist leider fehlgeschlagen.",
@@ -100,9 +108,9 @@
     "show": "Zeige im Vollbild-Modus"
   },
   "goToCollection": {
-    "description": "Gehe zur dazugehörigen Sammlung",
+    "description": "Gehe zum dazugehörigen Katalog",
     "descriptionWithTitle": "@:goToCollection.description: {title}",
-    "label": "Sammlung"
+    "label": "Katalog"
   },
   "goToParent": {
     "description": "Gehe ein Level hoch",
@@ -122,8 +130,10 @@
   },
   "items": {
     "filter": "Filter",
+    "hideFilter": "Verstecke Filter",
     "noTime": "Keine Zeit angegeben",
-    "noneAvailableForCollection": "Für diese Sammlung sind keine Elemente verfügbar."
+    "noneAvailableForCollection": "Für diesen Katalog sind keine Elemente verfügbar.",
+    "showFilter": "Zeige Filter"
   },
   "leaflet": {
     "close": "Schließen",
@@ -151,7 +161,8 @@
   "multiselect": {
     "andMore": "und {count} weitere",
     "deselectLabel": "Enter zum Entfernen",
-    "placeholder": "Option wählen",
+    "placeholder": "Option auswählen",
+    "keywordsPlaceholder": "Schlüsselwörter auswählen",
     "selectLabel": "Enter zum Selektieren",
     "selectedLabel": "Selektiert"
   },
@@ -169,7 +180,10 @@
     "ftp": "FTP",
     "gcs": "Google Cloud",
     "oss": "Alibaba Cloud",
-    "s3": "Amazon S3"
+    "s3": {
+      "default": "S3",
+      "amazonaws.com": "Amazon S3"
+    }
   },
   "providers": {
     "email": "E-Mail senden",
@@ -186,20 +200,22 @@
     "less": "Zeige weniger",
     "more": "Zeige mehr"
   },
+  "reset": "Zurücksetzen",
   "search": {
-    "addCollections": "Hinzufügen durch Enter",
+    "addCollections": "Hinzufügen mittels Enter-Taste",
     "addFilter": "Filter hinzufügen",
-    "addItemIds": "ID hinzufügen durch Enter",
+    "addItemIds": "Element-Identifikationsnummern hinzufügen mittels Enter-Taste",
+    "addSearchTerm": "Suchbegriff hinzufügen mittels Enter-Taste",
     "additionalFilters": "Weitere Filter",
-    "buttons": {
-      "filter": "Filtern",
-      "reset": "Zurücksetzen"
-    },
     "dateDescription": "Alle Zeiten in koordinierter Weltzeit (UTC).",
-    "enterCollections": "Gebe Sammlungs-IDs ein...",
-    "enterItemIds": "Gebe Element-IDs ein...",
+    "enterCollections": "Gebe Katalog-Identifikationsnummern ein...",
+    "enterItemIds": "Gebe Element-Identifikationsnummern ein...",
+    "enterSearchTerms": "Gebe Suchbegriffe ein...",
     "equalTo": "entspricht genau",
     "filterBySpatialExtent": "Filtern nach räumlicher Ausdehnung",
+    "filterCollection": "Im Katalog filtern",
+    "freeText": "Suchbegriffe",
+    "freeTextDescription": "Suche nach mindestens einem der angegebene Begriffen in Feldern wie dem Titel und der Beschreibung.",
     "greaterThan": "größer als",
     "greaterThanEqual": "größer als oder entspricht",
     "itemIds": "Element-Identifikationsnummern",
@@ -219,17 +235,23 @@
     "noOptions": "Noch nichts eingegeben",
     "notEqualTo": "entspricht nicht",
     "notFullySupported": "Eventuell werden nicht alle Optionen unterstützt.",
-    "notSupported": "Suchen wird von dem Dienstanbieter nicht unterstützt.",
+    "notSupported": "Suchen wird von dem Diensteanbieter nicht unterstützt.",
     "placeholder": "Suchen...",
-    "selectCollections": "Wähle Sammlungen...",
+    "selectCollections": "Wähle Kataloge...",
+    "selectForItemSearch": "Markiere für Elementsuche",
     "sortOptions": {
       "datetime": "Datum und Zeit",
       "id": "Identifikationsnummer",
       "title": "Titel"
     },
     "spatialExtent": "Räumliche Ausdehnung",
+    "tabs": {
+      "collections": "Kataloge durchsuchen",
+      "items": "Elemente durchsuchen"
+    },
     "temporalExtent": "Zeitliche Ausdehnung",
-    "title": "Suche"
+    "title": "Suche",
+    "useInItemSearch": "Nutze Katalog in Elementsuche | Nutze {count} Kataloge in Elementsuche"
   },
   "showMore": "Zeige mehr...",
   "sidebar": {
@@ -247,7 +269,10 @@
     "title": "Sortieren"
   },
   "source": {
+    "conformanceClasses": "Konformitätsklasse",
     "detailsAboutSource": "Details über die STAC-Datenquelle",
+    "fileFormat": "Dateiformat",
+    "id": "Identifikationsnummer",
     "label": "Datenquelle",
     "language": {
       "label": "Sprache: {currentLanguage}",
@@ -265,15 +290,17 @@
       "twitter": "Twitter",
       "withOthers": "Teile diese Seite mit anderen"
     },
-    "stacVersion": "STAC-Version:",
+    "stacExtension": "STAC-Erweiterung",
+    "stacVersion": "STAC-Version",
+    "statistics": "Statistiken",
     "title": "Datenquelle",
-    "valid": "Valide:",
+    "valid": "Valide",
     "validating": "Validiere...",
     "validationNA": "nicht verfügbar"
   },
   "stacAssets": "Datei | Dateien",
   "stacCatalog": "Katalog | Kataloge",
-  "stacCollection": "Sammlung | Sammlungen",
+  "stacCollection": "Katalog | Kataloge",
   "stacItem": "Element | Elemente",
   "submit": "Absenden",
   "table": {
@@ -287,7 +314,7 @@
   },
   "thumbnails": "Vorschaubilder",
   "tree": {
-    "moreCollectionPagesAvailable": "Mehr Seiten für Sammlung verfügbar",
+    "moreCollectionPagesAvailable": "Mehre Katalog-Seiten verfügbar",
     "noChildren": "Keine Unterpunkte verfügbar."
   },
   "view": {

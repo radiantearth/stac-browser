@@ -25,12 +25,9 @@
           <ReadMore v-if="data.properties.description" :lines="10" :text="$t('read.more')" :text-less="$t('read.less')">
             <Description :description="data.properties.description" />
           </ReadMore>
-          <Keywords v-if="Array.isArray(data.properties.keywords) && data.properties.keywords.length > 0" :keywords="data.properties.keywords" />
+          <Keywords v-if="Array.isArray(data.properties.keywords) && data.properties.keywords.length > 0" :keywords="data.properties.keywords" class="mb-3" />
         </section>
-        <section class="item-collection card-list mb-4" v-if="collection">
-          <h2>{{ $tc('stacCollection') }}</h2>
-          <Catalog :catalog="collection" :showThumbnail="false" />
-        </section>
+        <CollectionLink v-if="collectionLink" :link="collectionLink" />
         <Providers v-if="data.properties.providers" :providers="data.properties.providers" />
         <Metadata :data="data" type="Item" :ignoreFields="ignoredMetadataFields" />
       </b-col>
@@ -40,24 +37,23 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
-import Assets from '../components/Assets.vue';
 import Description from '../components/Description.vue';
 import ReadMore from "vue-read-more-smooth";
 import ShowAssetMixin from '../components/ShowAssetMixin';
 import { BTabs, BTab } from 'bootstrap-vue';
-import Utils from '../utils';
 import { addSchemaToDocument, createItemSchema } from '../schema-org';
 
 export default {
   name: "Item",
   components: {
     AnonymizedNotice: () => import('../components/AnonymizedNotice.vue'),
-    Assets,
+    Assets: () => import('../components/Assets.vue'),
     BTabs,
     BTab,
-    Catalog: () => import('../components/Catalog.vue'),
+    CollectionLink: () => import('../components/CollectionLink.vue'),
     Description,
     DeprecationNotice: () => import('../components/DeprecationNotice.vue'),
+    Keywords: () => import('../components/Keywords.vue'),
     Links: () => import('../components/Links.vue'),
     Map: () => import('../components/Map.vue'),
     Metadata: () => import('../components/Metadata.vue'),
@@ -69,9 +65,10 @@ export default {
   data() {
     return {
       ignoredMetadataFields: [
-        'title',
         'description',
+        'keywords',
         'providers',
+        'title',
         // Will be rendered with a custom rendered
         'deprecated',
         // Don't show these complex lists of coordinates: https://github.com/radiantearth/stac-browser/issues/141
@@ -84,10 +81,7 @@ export default {
   },
   computed: {
     ...mapState(['data', 'url']),
-    ...mapGetters(['additionalLinks', 'collectionLink', 'getStac', 'parentLink']),
-    collection() {
-      return this.getStac(this.collectionLink);
-    }
+    ...mapGetters(['additionalLinks', 'collectionLink', 'parentLink'])
   },
   watch: {
     data: {
@@ -98,14 +92,6 @@ export default {
           addSchemaToDocument(document, schema);
         } catch (error) {
           console.error(error);
-        }
-      }
-    },
-    collectionLink: {
-      immediate: true,
-      handler(newLink) {
-        if (Utils.isObject(newLink)) {
-          this.$store.dispatch("load", { url: newLink.href });
         }
       }
     }

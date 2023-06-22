@@ -1,6 +1,6 @@
 <template>
   <section v-if="formattedData.length > 0" class="metadata">
-    <h2 v-if="title">{{ title || $t('metadata.title') }}</h2>
+    <component :is="headerTag" v-if="title">{{ titleText }}</component>
     <b-card-group columns :class="`count-${formattedData.length}`">
       <MetadataGroup v-for="group in formattedData" v-bind="group" :key="group.extension" />
     </b-card-group>
@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import { formatAsset, formatCollection, formatGrouped, formatItemProperties, formatLink, formatProvider, formatSummaries } from '@radiantearth/stac-fields';
+import { formatAsset, formatCatalog, formatCollection, formatGrouped, formatItemProperties, formatLink, formatProvider, formatSummaries } from '@radiantearth/stac-fields';
 import MetadataGroup from './metadata/MetadataGroup.vue';
 import { isoDuration } from '@musement/iso-duration';
 import { mapState } from 'vuex';
@@ -39,8 +39,12 @@ export default {
             default: () => ([])
         },
         title: {
+            type: [Boolean, String],
+            default: true
+        },
+        headerTag: {
             type: String,
-            default: null
+            default: 'h2'
         }
     },
     data() {
@@ -50,6 +54,12 @@ export default {
     },
     computed: {
         ...mapState(['uiLanguage']),
+        titleText() {
+          if (typeof this.title === 'string') {
+            return this.title;
+          }
+          return this.$t('metadata.title');
+        }
     },
     watch: {
         uiLanguage: {
@@ -82,8 +92,9 @@ export default {
                     return formatProvider(this.data, this.context, filter);
                 case 'Item':
                     return formatItemProperties(this.data, filter);
-                case 'Collection':
-                case 'Catalog': {
+                case 'Catalog':
+                    return formatCatalog(this.data, filter);
+                case 'Collection': {
                     let core = formatCollection(this.data, filter);
                     let summaries = formatSummaries(this.data, filter);
                     // Merge summaries into collection metadata
@@ -133,13 +144,6 @@ export default {
                 &:nth-child(odd) {
                     background: rgba(0,0,0,0.03);
                 }
-            }
-
-            .label {
-                padding-left: 0.4rem;
-            }
-            .value {
-                padding-right: 0.4rem;
             }
         }
         .row {
@@ -200,6 +204,7 @@ export default {
 
             &:only-child {
                 margin-left: 0;
+                margin-bottom: 0;
             }
             dl:only-child {
                 margin-left: 1em;

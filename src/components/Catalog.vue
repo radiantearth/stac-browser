@@ -10,13 +10,17 @@
         <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="mr-1 mt-1 fileformat">{{ format | formatMediaType }}</b-badge>
         {{ data.description | summarize }}
       </b-card-text>
-      <b-card-text v-if="temporalExtent" class="datetime"><span v-html="temporalExtent" /></b-card-text>
+      <Keywords v-if="showKeywordsInCatalogCards && keywords.length > 0" :keywords="keywords" variant="primary" :center="!isList" />
+      <b-card-text v-if="temporalExtent" class="datetime"><small v-html="temporalExtent" /></b-card-text>
     </b-card-body>
+    <b-card-footer>
+      <slot name="footer" :data="data" />
+    </b-card-footer>
   </b-card>
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import StacFieldsMixin from './StacFieldsMixin';
 import ThumbnailCardMixin from './ThumbnailCardMixin';
 import StacLink from './StacLink.vue';
@@ -27,7 +31,8 @@ import Utils from '../utils';
 export default {
   name: 'Catalog',
   components: {
-    StacLink
+    StacLink,
+    Keywords: () => import('./Keywords.vue')
   },
   filters: {
     summarize: text => Utils.summarizeMd(text, 300),
@@ -44,6 +49,7 @@ export default {
     }
   },
   computed: {
+    ...mapState(['showKeywordsInCatalogCards']),
     ...mapGetters(['getStac']),
     classes() {
       let classes = ['catalog-card'];
@@ -78,6 +84,12 @@ export default {
         return this.data.getFileFormats();
       }
       return [];
+    },
+    keywords() {
+      if (this.data) {
+        return this.data.getMetadata('keywords') || [];
+      }
+      return [];
     }
   },
   methods: {
@@ -97,7 +109,6 @@ export default {
 
 #stac-browser {
   .catalog-card {
-
     &.deprecated {
       opacity: 0.5;
 
@@ -106,6 +117,15 @@ export default {
       }
     }
 
+    .card-body, .card-footer {
+      position: relative;
+    }
+    .card-footer:empty {
+      display: none;
+    }
+    .card-title {
+      margin-bottom: 0.5rem;
+    }
     .intro {
       display: -webkit-box;
       -webkit-line-clamp: 3;
@@ -114,30 +134,23 @@ export default {
       overflow-wrap: anywhere;
       text-align: left;
     }
-      
+    &.has-extent {
+      .intro {
+        margin-bottom: 0.5rem;
+      }
+    }
+    .datetime {
+      color: map-get($theme-colors, "secondary");
+    }
     .badge.deprecated {
       text-transform: uppercase;
     }
   }
   .card-list {
-    flex-direction: row;
-
     .catalog-card {
       box-sizing: border-box;
-      margin-top: 0.5em;
-      margin-bottom: 0.5em;
-
-      &.has-extent:not(.has-thumbnail) {
-        padding-top: 0.75em;
-      }
-      
-      @include media-breakpoint-down(lg) {
-        margin-bottom: 0.2em;
-        .card-title {
-          margin-top: 0.6em;
-        }
-      }
-        
+      margin: 0.5em 0;
+      display: flex;
 
       .card-img-right {
         min-height: 100px;
@@ -147,45 +160,25 @@ export default {
         object-fit: contain;
         object-position: right;
       }
-
-      .intro {
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        overflow-wrap: anywhere;
-        text-align: left;
-        margin-bottom: 0;
+      .card-footer {
+        min-width: 175px;
+        max-width: 175px;
+        border-top: 0;
       }
-      .datetime {
-        display: inline-block;
-        padding: $border-radius;
-        border: 0;
-        background-color: rgba(0,0,0,0.6);
-        color: map-get($theme-colors, "light");
-        border-radius: 0 0 0 $border-radius;
-        position: absolute;
-        top: 0;
-        right: 0;
-        font-size: 80%;
-        white-space: nowrap;
-        max-width: 100%;
-        text-overflow: ellipsis;
-        overflow: hidden;
+      .intro {
+        -webkit-line-clamp: 2;
       }
     }
   }
   .card-columns {
     .catalog-card {
       box-sizing: border-box;
-      margin-top: 0.5em;
-      margin-bottom: 0.5em;
+      margin-top: 0.5em 0;
       text-align: center;
 
       &.queued {
         min-height: 10rem;
       }
-
       .card-img {
         width: auto;
         height: auto;
@@ -194,10 +187,6 @@ export default {
       }
       .card-title {
         text-align: center;
-      }
-      .datetime {
-        color: map-get($theme-colors, "secondary");
-        font-size: 85%;
       }
     }
   }
