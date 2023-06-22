@@ -214,9 +214,6 @@ export default {
       collections: []
     }, getDefaults());
   },
-  beforeCreate() {
-    formId++;
-  },
   computed: {
     ...mapState(['apiCollections', 'nextCollectionsLink', 'itemsPerPage', 'uiLanguage']),
     ids() {
@@ -273,6 +270,9 @@ export default {
         this.query = query;
       }
     }
+  },
+  beforeCreate() {
+    formId++;
   },
   created() {
     let promises = [];
