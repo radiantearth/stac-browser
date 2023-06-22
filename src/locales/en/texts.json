@@ -187,6 +187,8 @@
     "addFilter": "Add filter",
     "addItemIds": "Press enter to add an Item ID",
     "additionalFilters": "Additional filters",
+    "between": "between",
+    "betweenOperatorDescription": "Tests whether a numeric field value lies within the given range. The given range is inclusive.",
     "buttons": {
       "filter": "Filter",
       "reset": "Reset"
@@ -200,6 +202,8 @@
     "freeTextDescription": "Search for the given text in fields such as the title and the description.",
     "greaterThan": "greater than",
     "greaterThanEqual": "greater than or equal to",
+    "in": "included in",
+    "inOperatorDescription": "Checks whether the field value is any of the given values.",
     "itemIds": "Item IDs",
     "itemsPerPage": "Items per page",
     "itemsPerPageDescription": "Number of items requested per page, max. {maxItems} items.",

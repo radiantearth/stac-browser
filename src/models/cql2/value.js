@@ -7,7 +7,10 @@ export default class CqlValue {
   }
 
   static create(value) {
-    if (value instanceof Date) {
+    if (Array.isArray(value)) {
+      return new CqlArray(value);
+    }
+    else if (value instanceof Date) {
       return new CqlTimestamp(value);
     }
     else if (typeof value === 'string') {
@@ -60,6 +63,25 @@ export class CqlString extends CqlValue {
 
   toText() {
     return `'${this.value.replace("'", "''")}'`;
+  }
+
+}
+
+export class CqlArray extends CqlValue {
+
+  constructor(value) {
+    super(value);
+  }
+
+  toJSON() {
+    return this.value;
+  }
+
+  toText() {
+    return this.value.map(elem => {
+      let cql = elem instanceof CqlValue ? elem : CqlValue.create(elem);
+      return cql.toText();
+    });
   }
 
 }
