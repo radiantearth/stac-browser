@@ -1,13 +1,12 @@
 <template>
   <section class="providers mb-4">
     <h2>{{ $tc('providers.title', count) }}</h2>
-    <b-list-group v-if="isSimple">
+    <b-list-group v-if="isSimple" class="mimic-expandable-card">
       <b-list-group-item
         v-for="(provider, key) in providers" :key="key" :href="provider.url" :disabled="!provider.url"
-        target="_blank" variant="provider"
-        class="provider"
+        target="_blank" variant="provider" class="provider"
       >
-        {{ provider.name }}
+        <span class="title">{{ provider.name }}</span>
         <ProviderRoles :roles="provider.roles" />
       </b-list-group-item>
     </b-list-group>
@@ -50,18 +49,3 @@ export default {
   }
 };
 </script>
-
-<style lang="scss">
-@import "../theme/variables.scss";
-
-#stac-browser .providers {
-  .list-group-item-provider, .btn-provider {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem 0.8rem;
-    background-color: rgba(0,0,0,0.03);
-  }
-}
-</style>
-

@@ -1,6 +1,6 @@
 <template>
-  <div class="roles ml-1" v-if="Array.isArray(roles)">
-    <b-badge v-for="role in roles" :key="role" variant="secondary" class="ml-1 mb-1">
+  <div class="roles badges" v-if="Array.isArray(roles)">
+    <b-badge v-for="role in roles" :key="role" variant="secondary">
       {{ displayRole(role) }}
     </b-badge>
   </div>

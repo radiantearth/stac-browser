@@ -1,21 +1,19 @@
 <template>
-  <b-card class="asset" no-body>
-    <b-card-header header-tag="header" role="tab" class="p-0">
-      <b-button block v-b-toggle="uid" variant="asset" squared class="p-2 d-flex">
-        <span class="title">
-          <span class="mr-1" aria-hidden="true">
-            <b-icon-chevron-down v-if="expanded" />
-            <b-icon-chevron-right v-else />
-          </span>
-          {{ asset.title || id }}
+  <b-card class="asset expandable-card" no-body>
+    <b-card-header header-tag="header" role="tab">
+      <b-button block v-b-toggle="uid" variant="asset" squared>
+        <span class="chevron" aria-hidden="true">
+          <b-icon-chevron-down v-if="expanded" />
+          <b-icon-chevron-right v-else />
         </span>
+        <span class="title">{{ asset.title || id }}</span>
         <div class="badges ml-1" v-if="Array.isArray(asset.roles)">
-          <b-badge v-if="shown" variant="success" class="shown ml-1 mb-1" :title="$t('assets.currentlyShown')">
+          <b-badge v-if="shown" variant="success" class="shown" :title="$t('assets.currentlyShown')">
             <b-icon-check /> {{ $t('assets.shown') }}
           </b-badge>
-          <b-badge v-if="asset.deprecated" variant="warning" class="deprecated ml-1 mb-1">{{ $t('deprecated') }}</b-badge>
-          <b-badge v-for="role in asset.roles" :key="role" :variant="role === 'data' ? 'primary' : 'secondary'" class="role ml-1 mb-1">{{ displayRole(role) }}</b-badge>
-          <b-badge v-if="shortFileFormat" variant="dark" class="format ml-1 mb-1" :title="fileFormat"><span v-html="shortFileFormat" /></b-badge>
+          <b-badge v-if="asset.deprecated" variant="warning" class="deprecated">{{ $t('deprecated') }}</b-badge>
+          <b-badge v-for="role in asset.roles" :key="role" :variant="role === 'data' ? 'primary' : 'secondary'" class="role">{{ displayRole(role) }}</b-badge>
+          <b-badge v-if="shortFileFormat" variant="dark" class="format" :title="fileFormat"><span v-html="shortFileFormat" /></b-badge>
         </div>
       </b-button>
     </b-card-header>
@@ -302,21 +300,6 @@ export default {
 
 <style lang="scss">
 #stac-browser .asset {
-  .btn-asset {
-    text-align: left;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem 0.8rem;
-
-    .badges {
-      .badge {
-        line-height: 1.2em;
-        height: 1.7em;
-        text-transform: uppercase;
-      }
-    }
-  }
   .metadata {
     .card-columns {
       column-count: 1;
