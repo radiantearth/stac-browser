@@ -1,5 +1,5 @@
 module.exports = {
-    catalogUrl: "https://api.radiant.earth/mlhub/v1/",
+    catalogUrl: null,
     catalogTitle: "STAC Browser",
     allowExternalAccess: true, // Must be true if catalogUrl is not given
     allowedDomains: [],
