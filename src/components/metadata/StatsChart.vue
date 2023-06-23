@@ -119,7 +119,6 @@ export default {
         labels,
         datasets: [
           {
-            label: this.title,
             data: values
           }
         ]
