@@ -2,7 +2,7 @@
   <section class="catalogs mb-4">
     <h2>
       <span class="title">{{ title }}</span>
-      <b-badge v-if="isComplete" pill variant="secondary">
+      <b-badge v-if="isComplete" pill variant="secondary" class="ml-2">
         <template v-if="catalogs.length !== catalogView.length">{{ catalogView.length }}/{{ catalogs.length }}</template>
         <template v-else>{{ catalogs.length }}</template>
       </b-badge>
