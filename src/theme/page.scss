@@ -3,6 +3,10 @@ html, body {
     width: 100%;
 }
 
+body {
+    margin-top: $header-margin;
+}
+
 #stac-browser {
     display: flex;
     flex-direction: column;
