@@ -2,7 +2,7 @@
   <section class="items mb-4">
     <h2>
       <span class="title">{{ $tc('stacItem', items.length ) }}</span>
-      <b-badge v-if="!api && items.length > 0" pill variant="secondary ml-2">{{ items.length }}</b-badge>
+      <b-badge v-if="!api && items.length > 0" pill variant="secondary">{{ items.length }}</b-badge>
       <SortButtons v-if="!api && items.length > 1" class="ml-4" v-model="sort" />
     </h2>
 

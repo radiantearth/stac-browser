@@ -114,6 +114,20 @@ export default class Utils {
     return (typeof string === 'string' && string.length > 0);
   }
 
+  static shortenTitle(fullStr, strLen, separator = '…') {
+    if (fullStr.length <= strLen) {
+      return fullStr;
+    }
+
+    let sepLen = separator.length;
+    let charsToShow = strLen - sepLen;
+    let frontChars = Math.ceil(charsToShow/2);
+    let backChars = Math.floor(charsToShow/2);
+    return fullStr.substr(0, frontChars) + 
+           separator + 
+           fullStr.substr(fullStr.length - backChars);
+  }
+
   static isGdalVfsUri(url) {
     return typeof url === 'string' && url.startsWith('/vsi') && !url.startsWith('/vsicurl/');
   }

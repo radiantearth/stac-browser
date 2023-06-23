@@ -244,6 +244,7 @@
   },
   "source": {
     "detailsAboutSource": "Detalles sobre la fuente STAC",
+    "fileFormat": "Formato de archivo",
     "label": "Fuente",
     "language": {
       "label": "Idioma: {currentLanguage}",
@@ -261,9 +262,10 @@
       "twitter": "Twitter",
       "withOthers": "Comparta esta página con otros"
     },
-    "stacVersion": "Versión STAC:",
+    "stacVersion": "Versión STAC",
+    "statistics": "Estadísticas",
     "title": "Fuente de datos",
-    "valid": "Valida:",
+    "valid": "Valida",
     "validating": "Validando...",
     "validationNA": "n/a"
   },

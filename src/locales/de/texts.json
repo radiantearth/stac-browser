@@ -249,7 +249,9 @@
     "title": "Sortieren"
   },
   "source": {
+    "conformanceClasses": "Konformitätsklasse",
     "detailsAboutSource": "Details über die STAC-Datenquelle",
+    "fileFormat": "Dateiformat",
     "label": "Datenquelle",
     "language": {
       "label": "Sprache: {currentLanguage}",
@@ -267,9 +269,11 @@
       "twitter": "Twitter",
       "withOthers": "Teile diese Seite mit anderen"
     },
-    "stacVersion": "STAC-Version:",
+    "stacExtension": "STAC-Erweiterung",
+    "stacVersion": "STAC-Version",
+    "statistics": "Statistiken",
     "title": "Datenquelle",
-    "valid": "Valide:",
+    "valid": "Valide",
     "validating": "Validiere...",
     "validationNA": "nicht verfügbar"
   },

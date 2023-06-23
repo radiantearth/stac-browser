@@ -249,7 +249,9 @@
     "title": "Sort"
   },
   "source": {
+    "conformanceClasses": "Conformance Classes",
     "detailsAboutSource": "Details about the STAC source",
+    "fileFormat": "File Format",
     "label": "Source",
     "language": {
       "label": "Language: {currentLanguage}",
@@ -267,9 +269,11 @@
       "twitter": "Twitter",
       "withOthers": "Share this page with others"
     },
-    "stacVersion": "STAC Version:",
+    "stacExtension": "STAC Extension",
+    "stacVersion": "STAC Version",
+    "statistics": "Statistics",
     "title": "Source Data",
-    "valid": "Valid:",
+    "valid": "Valid",
     "validating": "Validating...",
     "validationNA": "n/a"
   },

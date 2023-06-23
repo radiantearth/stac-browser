@@ -1,10 +1,13 @@
 <template>
   <div class="share mt-1">
     <b-button-group>
-      <b-button v-if="stacUrl" size="sm" variant="outline-primary" id="popover-link" :title="$t('source.detailsAboutSource')">
+      <b-button v-if="showRoot" size="sm" variant="outline-primary" id="popover-root-btn">
+        <b-icon-box /> <span class="button-label">{{ rootTitle }}</span>
+      </b-button>
+      <b-button v-if="stacUrl" size="sm" variant="outline-primary" id="popover-link-btn" :title="$t('source.detailsAboutSource')">
         <b-icon-link /> <span class="button-label">{{ $t('source.label') }}</span>
       </b-button>
-      <b-button size="sm" variant="outline-primary" id="popover-share" :title="$t('source.share.withOthers')">
+      <b-button size="sm" variant="outline-primary" id="popover-share-btn" :title="$t('source.share.withOthers')">
         <b-icon-share /> <span class="button-label">{{ $t('source.share.label') }}</span>
       </b-button>
       <b-dropdown size="sm" variant="outline-primary" right :title="$t('source.language.switch')">
@@ -25,18 +28,26 @@
         </b-dropdown-item>
       </b-dropdown>
     </b-button-group>
+
     <b-popover
-      v-if="stacUrl" target="popover-link" triggers="focus" placement="bottom"
-      container="stac-browser" :title="$t('source.title')"
+      v-if="showRoot" id="popover-root" target="popover-root-btn" triggers="focus"
+      placement="bottom" container="stac-browser" :title="rootTitle"
+    >
+      <RootStats />
+    </b-popover>
+
+    <b-popover
+      v-if="stacUrl" id="popover-link" target="popover-link-btn" triggers="focus"
+      placement="bottom" container="stac-browser" :title="$t('source.title')" 
       @show="validate"
     >
       <template v-if="stacVersion">
         <b-row>
-          <b-col cols="2">{{ $t('source.stacVersion') }}</b-col>
+          <b-col cols="4">{{ $t('source.stacVersion') }}</b-col>
           <b-col>{{ stacVersion }}</b-col>
         </b-row>
         <b-row v-if="canValidate">
-          <b-col cols="2">{{ $t('source.valid') }}</b-col>
+          <b-col cols="4">{{ $t('source.valid') }}</b-col>
           <b-col>
             <b-spinner v-if="valid === null" :label="$t('source.validating')" small />
             <template v-else-if="valid === true">✔️</template>
@@ -48,7 +59,8 @@
       </template>
       <Url id="stacUrl" :url="stacUrl" :label="$t('source.locatedAt')" />
     </b-popover>
-    <b-popover target="popover-share" triggers="focus" placement="bottom" container="stac-browser" :title="$t('source.share.title')">
+
+    <b-popover id="popover-share" target="popover-share-btn" triggers="focus" placement="bottom" container="stac-browser" :title="$t('source.share.title')">
       <Url id="browserUrl" :url="browserUrl()" :label="$t('source.share.sharePageWithOthers')" :open="false" />
       <hr>
       <b-button class="twitter mr-1" :href="twitterUrl"><b-icon-twitter /> {{ $t('source.share.twitter') }}</b-button>
@@ -59,7 +71,7 @@
 
 <script>
 import { 
-  BIconBlank, BIconCheck, BIconEnvelope, BIconExclamationTriangle, BIconFlag, BIconLink, BIconShare, BIconTwitter,
+  BIconBlank, BIconBox, BIconCheck, BIconEnvelope, BIconExclamationTriangle, BIconFlag, BIconLink, BIconShare, BIconTwitter,
   BDropdown, BDropdownItem, BPopover } from 'bootstrap-vue';
 import { mapActions, mapGetters, mapState } from 'vuex';
 
@@ -74,19 +86,21 @@ const LANGUAGE_EXT = 'https://stac-extensions.github.io/language/v1.*/schema.jso
 export default {
     name: "Source",
     components: {
-        BDropdown,
-        BDropdownItem,
-        BIconBlank,
-        BIconCheck,
-        BIconEnvelope,
-        BIconExclamationTriangle,
-        BIconFlag,
-        BIconLink,
-        BIconShare,
-        BIconTwitter,
-        BPopover,
-        Url
-    },
+    BDropdown,
+    BDropdownItem,
+    BIconBlank,
+    BIconBox,
+    BIconCheck,
+    BIconEnvelope,
+    BIconExclamationTriangle,
+    BIconFlag,
+    BIconLink,
+    BIconShare,
+    BIconTwitter,
+    BPopover,
+    RootStats: () => import('./RootStats.vue'),
+    Url
+},
     props: {
         title: {
             type: String,
@@ -102,8 +116,20 @@ export default {
         }
     },
     computed: {
-        ...mapState(['dataLanguages', 'locale', 'privateQueryParameters', 'supportedLocales', 'stacLint', 'stacProxyUrl', 'uiLanguage', 'valid']),
-        ...mapGetters(['supportsExtension']),
+        ...mapState(['conformsTo', 'dataLanguages', 'locale', 'privateQueryParameters', 'supportedLocales', 'stacLint', 'stacProxyUrl', 'uiLanguage', 'valid']),
+        ...mapGetters(['supportsExtension', 'root']),
+        showRoot() {
+          if (!this.root) {
+            return false;
+          }
+          return (Array.isArray(this.conformsTo) && this.conformsTo.length > 0)
+            || Utils.isObject(this.root['stats:collections'])
+            || Utils.isObject(this.root['stats:catalogs'])
+            || Utils.isObject(this.root['stats:items']);
+        },
+        rootTitle() {
+          return Array.isArray(this.conformsTo) && this.conformsTo.length > 0 ? this.$t('index.api') : this.$t('index.catalog');
+        },
         currentLanguage() {
           let lang = this.languages.find(l => l.code === this.locale);
           if (lang) {
@@ -207,11 +233,19 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-.popover {
-    width: 100%;
+<style lang="scss">
+#popover-link, #popover-root, #popover-share {
+    width: 80%;
     max-width: 800px;
+
+    .popover-body {
+      overflow-y: auto;
+      overflow-x: hidden;
+      max-height: 80vh;
+    }
 }
+</style>
+<style lang="scss" scoped>
 .lang-item > .dropdown-item {
   display: flex;
   > .title {
