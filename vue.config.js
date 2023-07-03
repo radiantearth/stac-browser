@@ -28,7 +28,8 @@ const pkgFile = require('./package.json');
 const path = require('path');
 const configFile = path.resolve(argv.CONFIG ? argv.CONFIG : './config.js');
 const configFromFile = require(configFile);
-const mergedConfig = Object.assign(configFromFile, argv);
+const buildConfig = require('./build.config.js');
+const mergedConfig = Object.assign(buildConfig, configFromFile, argv);
 const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 
 const config = {
@@ -46,6 +47,26 @@ const config = {
       args[0].title = mergedConfig.catalogTitle;
       return args;
     });
+    if (mergedConfig.extractConfig) {
+      webpackConfig.optimization.merge({
+        splitChunks: {
+          cacheGroups: {
+            vendor: {
+              test: configFile,
+              name: 'config',
+              filename: 'config.js',
+              chunks: 'initial',
+              enforce: true
+            }
+          }
+        }
+      });
+      // todo: this as no effect
+      webpackConfig.optimization.minimizer('terser').tap(args => {
+        args[0].exclude = /\/config\.js$/;
+        return args;
+      });
+    }
   },
   configureWebpack: {
     resolve: {

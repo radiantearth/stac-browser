@@ -6,4 +6,7 @@ else {
   config = Object.assign(require(CONFIG_PATH), CONFIG_CLI);
 }
 
+const buildConfig = require('../build.config');
+config = Object.assign(buildConfig, config);
+
 export default config;
