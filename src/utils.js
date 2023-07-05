@@ -241,11 +241,13 @@ export default class Utils {
   }
 
   static getPaginationLinks(data) {
-    let pageLinks = Utils.getLinksWithRels(data.links, stacPagination);
     let pages = {};
-    for (let pageLink of pageLinks) {
-      let rel = pageLink.rel === 'previous' ? 'prev' : pageLink.rel;
-      pages[rel] = pageLink;
+    if (Utils.isObject(data)) {
+      let pageLinks = Utils.getLinksWithRels(data.links, stacPagination);
+      for (let pageLink of pageLinks) {
+        let rel = pageLink.rel === 'previous' ? 'prev' : pageLink.rel;
+        pages[rel] = pageLink;
+      }
     }
     return pages;
   }
