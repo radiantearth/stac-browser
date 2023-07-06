@@ -7,7 +7,16 @@
         <b-card-title v-if="title" :title="title" />
 
         <b-form-group v-if="canFilterFreeText" :label="$t('search.freeText')" :label-for="ids.q" :description="$t('search.freeTextDescription')">
-          <b-form-input :id="ids.q" :value="query.q" @change="setSearchTerms" />
+          <multiselect
+            :id="ids.q" :value="query.q" @input="setSearchTerms"
+            multiple taggable :options="query.ids"
+            :placeholder="$t('search.enterSearchTerms')"
+            :tagPlaceholder="$t('search.addSearchTerms')"
+            :noOptions="$t('search.addSearchTerms')"
+            @tag="addSearchTerm"
+          >
+            <template #noOptions>{{ $t('search.noOptions') }}</template>
+          </multiselect>
         </b-form-group>
 
         <b-form-group v-if="canFilterExtents" :label="$t('search.temporalExtent')" :label-for="ids.datetime" :description="$t('search.dateDescription')">
@@ -141,7 +150,7 @@ import { stacRequest } from '../store/utils';
 
 function getQueryDefaults() {
   return {
-    q: null,
+    q: [],
     datetime: null,
     bbox: null,
     limit: null,
@@ -428,11 +437,14 @@ export default {
       }
       this.$set(this.query, 'limit', limit);
     },
-    setSearchTerms(value) {
-      if (!Utils.hasText(value)) {
-        value = null;
+    addSearchTerm(term) {
+      if (!Utils.hasText(term)) {
+        return;
       }
-      this.$set(this.query, 'q', value);
+      this.query.q.push(term);
+    },
+    setSearchTerms(terms) {
+      this.$set(this.query, 'q', terms);
     },
     setBBox(bounds) {
       let bbox = null;

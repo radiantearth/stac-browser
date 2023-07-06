@@ -183,9 +183,10 @@
     "more": "Zeige mehr"
   },
   "search": {
-    "addCollections": "Hinzufügen durch Enter",
+    "addCollections": "Hinzufügen mittels Enter-Taste",
     "addFilter": "Filter hinzufügen",
-    "addItemIds": "ID hinzufügen durch Enter",
+    "addItemIds": "ID hinzufügen mittels Enter-Taste",
+    "addSearchTerm": "Suchbegriff hinzufügen mittels Enter-Taste",
     "additionalFilters": "Weitere Filter",
     "buttons": {
       "filter": "Filtern",
@@ -194,10 +195,11 @@
     "dateDescription": "Alle Zeiten in koordinierter Weltzeit (UTC).",
     "enterCollections": "Gebe Sammlungs-IDs ein...",
     "enterItemIds": "Gebe Element-IDs ein...",
+    "enterSearchTerms": "Gebe Suchbegriffe ein...",
     "equalTo": "entspricht genau",
     "filterBySpatialExtent": "Filtern nach räumlicher Ausdehnung",
     "freeText": "Suchbegriffe",
-    "freeTextDescription": "Suche nach dem angegebenen Text in Feldern wie dem Titel und der Beschreibung.",
+    "freeTextDescription": "Suche nach mindestens einem der angegebene Begriffen in Feldern wie dem Titel und der Beschreibung.",
     "greaterThan": "größer als",
     "greaterThanEqual": "größer als oder entspricht",
     "itemIds": "Element-Identifikationsnummern",
