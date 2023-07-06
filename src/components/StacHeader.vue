@@ -95,7 +95,7 @@ export default {
         return null;
       }
       let dataLink;
-      if (this.data !== this.root && this.data instanceof STAC) {
+      if (this.data instanceof STAC && !this.data.equals(this.root)) {
         dataLink = this.data.getSearchLink();
       }
       if (dataLink) {

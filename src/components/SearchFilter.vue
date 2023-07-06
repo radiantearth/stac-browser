@@ -215,7 +215,7 @@ export default {
     }, getDefaults());
   },
   computed: {
-    ...mapState(['apiCollections', 'nextCollectionsLink', 'itemsPerPage', 'uiLanguage']),
+    ...mapState(['itemsPerPage', 'uiLanguage']),
     ids() {
       let obj = {};
       ['q', 'datetime', 'bbox', 'collections', 'ids', 'sort', 'limit']
@@ -250,14 +250,16 @@ export default {
     }
   },
   watch: {
-    apiCollections: {
+    parent: {
       immediate: true,
-      handler() {
-        if (!Array.isArray(this.apiCollections) || this.nextCollectionsLink || !this.conformances.CollectionIdFilter) {
-          this.collections = [];
-          return;
+      handler(newStac, oldStac) {
+        if (newStac instanceof STAC) {
+          newStac.setApiDataListener('searchfilter' + formId, () => this.updateApiCollections());
         }
-        this.collections = this.prepareCollections(this.apiCollections);
+        if (oldStac instanceof STAC) {
+          oldStac.setApiDataListener('searchfilter' + formId);
+        }
+        this.updateApiCollections();
       }
     },
     value: {
@@ -303,9 +305,9 @@ export default {
         queryableLink: null
       };
 
-      if (this.type === 'Global' && this.apiCollections) {
-        data.collections = this.apiCollections;
-        hasMore = Boolean(this.nextCollectionsLink);
+      if (this.type === 'Global' && this.collections) {
+        data.collections = this.collections;
+        hasMore = false;
       }
       else if (this.type === 'Global' || this.type === 'Collections') {
         let response = await stacRequest(this.$store, link);
@@ -326,6 +328,18 @@ export default {
         }
       }
       return data;
+    },
+    updateApiCollections() {
+      if (!this.parent) {
+        return;
+      }
+      let apiCollections = this.parent.getChildren('collections');
+      let nextCollectionsLink = this.parent._apiChildren.next;
+      if (!Array.isArray(apiCollections) || nextCollectionsLink || !this.conformances.CollectionIdFilter) {
+          this.collections = [];
+          return;
+        }
+        this.collections = this.prepareCollections(apiCollections);
     },
     prepareCollections(collections) {
       return collections
