@@ -72,7 +72,7 @@
     "default": "Die angeforderte Seite konnte nicht geladen werden.",
     "forbidden": "Die für diese Anfrage angegebenen Anmeldedaten sind ungültig, bspw. ein abgelaufener oder ungültiger API-Schlüssel. Bitte geben Sie andere Anmeldedaten an und versuchen Sie es erneut.",
     "invalidJsonObject": "Die Antwort des Dienstanbieters ist kein gültiges JSON-Objeckt.",
-    "invalidStacCollections": "Die Antwort des Dienstanbieters ist keine gültige Liste mit Sammlungen.",
+    "invalidStacCollections": "Die Antwort des Dienstanbieters ist keine gültige Liste mit Katalogen.",
     "invalidStacItems": "Die Antwort des Dienstanbieters ist keine fültige Liste mit Elementen.",
     "labels": {
       "cause": "Ursache:",
@@ -80,7 +80,7 @@
       "reason": "Grund:",
       "requestURL": "Anfrageadresse:"
     },
-    "loadApiCollectionsFailed": "Die Sammlungen des Dienstanbieters konnten nicht geladen werden.",
+    "loadApiCollectionsFailed": "Die Kataloge des Dienstanbieters konnten nicht geladen werden.",
     "loadApiItemsFailed": "Die Elemente des Dienstanbieters konnten nicht geladen werden.",
     "loadFilteredItems": "Das Laden einer gefilterten Liste von Elementen ist leider fehlgeschlagen.",
     "loadItems": "Das Laden der Liste der Elemente ist leider fehlgeschlagen.",
@@ -96,9 +96,9 @@
     "show": "Zeige im Vollbild-Modus"
   },
   "goToCollection": {
-    "description": "Gehe zur dazugehörigen Sammlung",
+    "description": "Gehe zum dazugehörigen Katalog",
     "descriptionWithTitle": "@:goToCollection.description: {title}",
-    "label": "Sammlung"
+    "label": "Katalog"
   },
   "goToParent": {
     "description": "Gehe ein Level hoch",
@@ -119,7 +119,7 @@
   "items": {
     "filter": "Filter",
     "noTime": "Keine Zeit angegeben",
-    "noneAvailableForCollection": "Für diese Sammlung sind keine Elemente verfügbar."
+    "noneAvailableForCollection": "Für diesen Katalog sind keine Elemente verfügbar."
   },
   "leaflet": {
     "close": "Schließen",
@@ -185,7 +185,7 @@
   "search": {
     "addCollections": "Hinzufügen mittels Enter-Taste",
     "addFilter": "Filter hinzufügen",
-    "addItemIds": "ID hinzufügen mittels Enter-Taste",
+    "addItemIds": "Element-Identifikationsnummern hinzufügen mittels Enter-Taste",
     "addSearchTerm": "Suchbegriff hinzufügen mittels Enter-Taste",
     "additionalFilters": "Weitere Filter",
     "buttons": {
@@ -193,8 +193,8 @@
       "reset": "Zurücksetzen"
     },
     "dateDescription": "Alle Zeiten in koordinierter Weltzeit (UTC).",
-    "enterCollections": "Gebe Sammlungs-IDs ein...",
-    "enterItemIds": "Gebe Element-IDs ein...",
+    "enterCollections": "Gebe Katalog-Identifikationsnummern ein...",
+    "enterItemIds": "Gebe Element-Identifikationsnummern ein...",
     "enterSearchTerms": "Gebe Suchbegriffe ein...",
     "equalTo": "entspricht genau",
     "filterBySpatialExtent": "Filtern nach räumlicher Ausdehnung",
@@ -221,7 +221,7 @@
     "notFullySupported": "Eventuell werden nicht alle Optionen unterstützt.",
     "notSupported": "Suchen wird von dem Diensteanbieter nicht unterstützt.",
     "placeholder": "Suchen...",
-    "selectCollections": "Wähle Sammlungen...",
+    "selectCollections": "Wähle Kataloge...",
     "sortOptions": {
       "datetime": "Datum und Zeit",
       "id": "Identifikationsnummer",
@@ -229,7 +229,7 @@
     },
     "spatialExtent": "Räumliche Ausdehnung",
     "tabs": {
-      "collections": "Sammlungen durchsuchen",
+      "collections": "Kataloge durchsuchen",
       "items": "Elemente durchsuchen"
     },
     "temporalExtent": "Zeitliche Ausdehnung",
@@ -281,7 +281,7 @@
   },
   "stacAssets": "Datei | Dateien",
   "stacCatalog": "Katalog | Kataloge",
-  "stacCollection": "Sammlung | Sammlungen",
+  "stacCollection": "Katalog | Kataloge",
   "stacItem": "Element | Elemente",
   "submit": "Absenden",
   "table": {
@@ -295,7 +295,7 @@
   },
   "thumbnails": "Vorschaubilder",
   "tree": {
-    "moreCollectionPagesAvailable": "Mehr Seiten für Sammlung verfügbar",
+    "moreCollectionPagesAvailable": "Mehre Katalog-Seiten verfügbar",
     "noChildren": "Keine Unterpunkte verfügbar."
   },
   "view": {
