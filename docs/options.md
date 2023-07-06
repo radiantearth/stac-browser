@@ -1,7 +1,14 @@
 # Options
 
-All the following options can be used as explained in the chapter "Running", either through the [config file](../config.js) or as CLI parameter.
-Some of them can also be set [through the root catalog](../README.md#customize-through-root-catalog).
+STAC Browser exposes a wide variety of configuration options.
+The following options can be provided in various ways to STAC Browser, either when running it or when building it.
+
+The following ways to set config options are possible:
+- Customize the **[config file](../config.js)** (recommended)
+- Additionally, some options can be [provided through the **root catalog**](../README.md#customize-through-root-catalog) for consistency across multiple deployments (recommended)
+- Append them to the **CLI** command as parameter (see [Get Started](../README.md#get-started) for an example)
+- Set **environment variables**, all options need a `SB_` prefix.
+  So you could for example set the catalog URL via the environment variable `SB_catalogUrl`.
 
 **The following options are available:**
 * [catalogUrl](#catalogurl)
