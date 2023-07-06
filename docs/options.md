@@ -1,9 +1,9 @@
 # Options
 
-All the following options can be used as explained in the chapter "Running", either through the [config file](../config.js), the [build config file](../build.config.js) or as CLI parameter.
+All the following options can be used as explained in the chapter "Running", either through the [config file](../config.js) or as CLI parameter.
 Some of them can also be set [through the root catalog](../README.md#customize-through-root-catalog).
 
-**The following options are available in the `config.js`:**
+**The following options are available:**
 * [catalogUrl](#catalogurl)
 * [catalogTitle](#catalogtitle)
 * [allowExternalAccess](#allowexternalaccess)
@@ -15,6 +15,8 @@ Some of them can also be set [through the root catalog](../README.md#customize-t
 * [fallbackLocale](#fallbacklocale)
 * [supportedLocales](#supportedlocales)
 * [stacLint](#staclint)
+* [historyMode](#historymode)
+* [pathPrefix](#pathprefix)
 * [stacProxyUrl](#stacproxyurl)
 * [buildTileUrlTemplate](#buildtileurltemplate)
 * [useTileLayerAsFallback](#usetilelayerasfallback)
@@ -31,11 +33,6 @@ Some of them can also be set [through the root catalog](../README.md#customize-t
 * [requestQueryParameters](#requestqueryparameters)
 * [authConfig](#authconfig)
 * [preprocessSTAC](#preprocessstac)
-
-**The following options are available in the `build.config.js`:**
-* [historyMode](#historymode)
-* [pathPrefix](#pathprefix)
-* [extractConfig](#extractconfig)
 
 ## catalogUrl
 
@@ -117,6 +114,28 @@ Validation is automatically disabled in the following cases:
 - the host of a catalog is `localhost`, `127.0.0.1` and `::1`
 - [private query parameters](../README.md#private-query-parameters) have been set
 - `stacProxyUrl` is set
+
+## historyMode
+
+***build-only option***
+
+STAC Browser defaults to using [HTML5 History Mode](https://v3.router.vuejs.org/guide/essentials/history-mode.html#html5-history-mode),
+which can cause problems on certain web hosts. To use _hash mode_, set `--historyMode=hash` when running or building.
+This will be compatible with S3, stock Apache, etc.
+
+## pathPrefix
+
+***build-only option***
+
+If you don't deploy the STAC Browser instance at the root path of your (sub) domain, then you need to set the path prefix
+when building (or running) STAC Browser.
+
+```bash
+npm run build -- --pathPrefix="/browser/"
+```
+
+This will build STAC Browser in a way that it can be hosted at `https://example.com/browser` for example.
+Using this parameter for the dev server will make STAC Browser available at `http://localhost:8080/browser`.
 
 ## stacProxyUrl
 
@@ -304,29 +323,3 @@ preprocessSTAC: (stac, state) => {
     return stac;
 }
 ```
-
-## Build-only options
-
-### historyMode
-
-STAC Browser defaults to using [HTML5 History Mode](https://v3.router.vuejs.org/guide/essentials/history-mode.html#html5-history-mode),
-which can cause problems on certain web hosts. To use _hash mode_, set `--historyMode=hash` when running or building.
-This will be compatible with S3, stock Apache, etc.
-
-### pathPrefix
-
-If you don't deploy the STAC Browser instance at the root path of your (sub) domain, then you need to set the path prefix
-when building (or running) STAC Browser.
-
-```bash
-npm run build -- --pathPrefix="/browser/"
-```
-
-This will build STAC Browser in a way that it can be hosted at `https://example.com/browser` for example.
-Using this parameter for the dev server will make STAC Browser available at `http://localhost:8080/browser`.
-
-### extractConfig
-
-Extracts the `config.js` into a separate file in the `dist` folder  if set to `true`.
-This allows to easily change options after the build process, e.g. the `catalogUrl`.
-This defaults to `false` for a more optimized page load behavior.
