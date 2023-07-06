@@ -67,7 +67,9 @@ you can use the [`pathPrefix`](docs/options.md#pathprefix) option.
 After building, `dist/` will contain all assets necessary to
 host the browser. These can be manually copied to your web host of choice.
 
-You can customize STAC Browser, too. See the options and theming details below. If not stated otherwise, all options can either be specified via CLI, ENV variables or in the [config file](config.js).
+You can customize STAC Browser, too. See the options and theming details below.
+If not stated otherwise, all options can either be specified via CLI, ENV variables or in the [config file](config.js).
+You can also provide configuration options "at runtime" (after the build).
 
 ### Private query parameters
 
@@ -89,7 +91,7 @@ Please read the [migration documentation](docs/migrate.md) for details.
 
 ### Options
 
-STAC Browser supports customization through a long list of options that can be set in the [config.js file](config.js) or as CLI parameter.
+STAC Browser supports customization through a long list of options that can be set in various ways.
 
 Please read the **[documentation for the options](docs/options.md)**.
 
