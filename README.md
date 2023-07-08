@@ -53,7 +53,7 @@ To browse only your own static STAC catalog or STAC API, set the `catalogUrl` CL
 ```bash
 npm start -- --open --catalogUrl="http://path/to/catalog.json"
 ```
-To open a local file on your system, see the chapter [Using Local Files](local_files.md).
+To open a local file on your system, see the chapter [Using Local Files](docs/local_files.md).
 
 If you'd like to publish the STAC Browser instance use the following command:
 
