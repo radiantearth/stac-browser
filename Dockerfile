@@ -8,7 +8,7 @@ RUN npm install
 COPY . .
 RUN npm run build -- --catalogUrl=$catalogURL
 
-FROM nginx:alpine-slim
+FROM nginx:1-alpine
 COPY --from=build-step /app/dist /usr/share/nginx/html
 
 # change default port to 8080
