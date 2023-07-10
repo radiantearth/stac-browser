@@ -1,4 +1,4 @@
-FROM node:lts-alpine AS build-step
+FROM node:lts-alpine3.18 AS build-step
 
 ARG catalogURL
 
