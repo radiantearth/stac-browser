@@ -1,4 +1,4 @@
-FROM node:lts-alpine AS build-step
+FROM node:lts-alpine3.18 AS build-step
 ARG DYNAMIC_CONFIG=false
 
 WORKDIR /app
@@ -8,8 +8,7 @@ COPY . .
 RUN \[ "${DYNAMIC_CONFIG}" == "true" \] && sed -i 's/<!-- <script defer="defer" src=".\/config.js"><\/script> -->/<script defer="defer" src=".\/config.js"><\/script>/g' public/index.html
 RUN npm run build -- --catalogUrl=$catalogURL
 
-
-FROM nginx:alpine-slim
+FROM nginx:1-alpine-slim
 
 ENV CATALOG_URL= \
     CATALOG_TITLE="STAC Browser" \
