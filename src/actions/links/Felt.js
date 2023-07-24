@@ -23,6 +23,8 @@ export default class Felt extends LinkActionPlugin {
       xyz = xyz.replace('{s}', this.link['href:servers'][0]);
     }
     uri.addQuery('layer_urls[]', xyz);
+    // once we migrate to stac-js:
+    // todo: add title from STAC entity
     // todo: add lat/lon from item/collection: lat=57.14926&lon=-2.09348
     return uri;
   }

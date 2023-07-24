@@ -8,7 +8,7 @@ For example, you could open COPC files in a dedicated COPC Viewer, which otherwi
 ## Assets
 
 All actions for assets are stored in the folder [`src/actions/assets`](../src/actions/assets).
-They all implement the [AssetActionPlugin interface](../src/actions/AssetActionPlugin.js).
+They all implement the [`AssetActionPlugin` interface](../src/actions/AssetActionPlugin.js).
 The actions can be enabled by adding them to the [`assetActions.config.js`](../assetActions.config.js) file.
 
 ### cogeo.xyz
@@ -50,7 +50,7 @@ export default { GeoJsonIo };
 ## Links
 
 All actions for links are stored in the folder [`src/actions/links`](../src/actions/links).
-They all implement the [LinkActionPlugin interface](../src/actions/LinkActionPlugin.js).
+They all implement the [`LinkActionPlugin` interface](../src/actions/LinkActionPlugin.js).
 The actions can be enabled by adding them to the [`linkActions.config.js`](../linkActions.config.js) file.
 
 ### Felt (Links)
