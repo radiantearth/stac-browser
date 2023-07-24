@@ -121,6 +121,10 @@ export default {
         'deprecated',
         // Special handling for the warning of the anonymized-location extension
         'anon:warning',
+        // Special handling for the stats extension
+        'stats:catalogs',
+        'stats:collections',
+        'stats:items',
         // Special handling for the STAC Browser config
         'stac_browser'
       ]

@@ -334,7 +334,9 @@ export default {
 
           const labelSourceLayerOptions = getDefaultOptions({
             fillOpacity: 0,
-            weight: 0
+            weight: 0,
+            // Usually these are smaller GeoTiffs, so load them by default
+            displayGeoTiffByDefault: true
           });
           for(let link of sourceLinks) {
             this.$store.dispatch('load', {url: link.href})

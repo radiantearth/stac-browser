@@ -1,7 +1,17 @@
 # Options
 
-All the following options can be used as explained in the chapter "Running", either through the [config file](../config.js) or as CLI parameter.
-Some of them can also be set [through the root catalog](../README.md#customize-through-root-catalog).
+STAC Browser exposes a wide variety of configuration options.
+The following options can be provided in various ways to STAC Browser, either when running it or when building it.
+
+The following ways to set config options are possible:
+- Customize the **[config file](../config.js)** (recommended)
+- Additionally, some options can be [provided through the **root catalog**](../README.md#customize-through-root-catalog) for consistency across multiple deployments (recommended)
+- Append them to the **CLI** command as parameter (see [Get Started](../README.md#get-started) for an example)
+- Set **environment variables**, all options need a `SB_` prefix.
+  So you could for example set the catalog URL via the environment variable `SB_catalogUrl`.
+- Optionally, you can also set options after the build, basically **at "runtime"**.
+  Enable this by removing the `<!--` and `-->` around the `<script defer="defer" src="./config.js"></script>` in the [`public/index.html`](../public/index.html).
+  Then run the build procedure and after completion, you can fill the `dist/config.js` with any options that you want to customize.
 
 **The following options are available:**
 * [catalogUrl](#catalogurl)
@@ -79,7 +89,7 @@ Otherwise, defaults to the language set for `locale`.
 
 ## storeLocale
 
-If set to `true`, stores the locale selected by the user in the `localeStorage` of the browser.
+If set to `true`, stores the locale selected by the user in the `localStorage` of the browser.
 Otherwise, doesn't store the locale across browser sessions.
 
 ## locale
@@ -164,7 +174,7 @@ The option controls the tile layer that is used to render imagery such as (cloud
 
 See the [documentation for the corresponding stac-layer option](https://github.com/stac-utils/stac-layer#buildtileurltemplate) for details.
 
-Please note that this option can only be provided through a config file and is not available via CLI.
+Please note that this option can only be provided through a config file and is not available via CLI/ENV.
 
 If the option `useTileLayerAsFallback` is set to `true`, the tile server is only used as a fallback.
 
@@ -241,7 +251,7 @@ This is affected by [`allowedDomains`](#alloweddomains).
 
 Example: `{'Authorization': 'Bearer 134567984623223'}` adds a Bearer token to the HTTP headers.
 
-Please note that this option can only be provided through a config file and is not available via CLI.
+Please note that this option can only be provided through a config file and is not available via CLI/ENV.
 
 ## requestQueryParameters
 
@@ -252,7 +262,7 @@ This is affected by [`allowedDomains`](#alloweddomains).
 
 Example: `{'f': 'json'}` adds a `f` query parameter to the HTTP URL, e.g. `https://example.com?f=json`.
 
-Please note that this option can only be provided through a config file and is not available via CLI.
+Please note that this option can only be provided through a config file and is not available via CLI/ENV.
 
 ## authConfig
 
@@ -269,7 +279,7 @@ There are four options you can set in the `authConfig` object:
 * `description` (string|null): Optionally a description that is shown to the user. This should explain how the token can be obtained for example. CommonMark is allowed.
     **Note:** You can leave the description empty in the config file and instead provide a localized string with the key `authConfig` -> `description` in the file for custom phrases (`src/locales/custom.js`).
 
-Please note that this option can only be provided through a config file and is not available via CLI.
+Please note that this option can only be provided through a config file and is not available via CLI/ENV.
 
 ### Example 1: HTTP Request Header Value
 
@@ -306,7 +316,7 @@ The function receives two parameters:
 * `stac` (object of type `STAC`)
 * `state` (the vuex state)
 
-Please note that this option can only be provided through a config file and is not available via CLI.
+Please note that this option can only be provided through a config file and is not available via CLI/ENV.
 
 ### Example: Update root catalog
 

@@ -117,6 +117,20 @@ export default class Utils {
     return (typeof string === 'string' && string.length > 0);
   }
 
+  static shortenTitle(fullStr, strLen, separator = '…') {
+    if (fullStr.length <= strLen) {
+      return fullStr;
+    }
+
+    let sepLen = separator.length;
+    let charsToShow = strLen - sepLen;
+    let frontChars = Math.ceil(charsToShow/2);
+    let backChars = Math.floor(charsToShow/2);
+    return fullStr.substr(0, frontChars) + 
+           separator + 
+           fullStr.substr(fullStr.length - backChars);
+  }
+
   static isGdalVfsUri(url) {
     return typeof url === 'string' && url.startsWith('/vsi') && !url.startsWith('/vsicurl/');
   }
@@ -230,11 +244,13 @@ export default class Utils {
   }
 
   static getPaginationLinks(data) {
-    let pageLinks = Utils.getLinksWithRels(data.links, stacPagination);
     let pages = {};
-    for (let pageLink of pageLinks) {
-      let rel = pageLink.rel === 'previous' ? 'prev' : pageLink.rel;
-      pages[rel] = pageLink;
+    if (Utils.isObject(data)) {
+      let pageLinks = Utils.getLinksWithRels(data.links, stacPagination);
+      for (let pageLink of pageLinks) {
+        let rel = pageLink.rel === 'previous' ? 'prev' : pageLink.rel;
+        pages[rel] = pageLink;
+      }
     }
     return pages;
   }
@@ -297,7 +313,7 @@ export default class Utils {
         else if (key === 'bbox') {
           value = value.join(',');
         }
-        else if ((key === 'collections' || key === 'ids')) {
+        else if ((key === 'collections' || key === 'ids' || key === 'q')) {
           value = value.join(',');
         }
         else if (key === 'filters') {

@@ -7,7 +7,16 @@
         <b-card-title v-if="title" :title="title" />
 
         <b-form-group v-if="canFilterFreeText" :label="$t('search.freeText')" :label-for="ids.q" :description="$t('search.freeTextDescription')">
-          <b-form-input :id="ids.q" :value="query.q" @change="setSearchTerms" />
+          <multiselect
+            :id="ids.q" :value="query.q" @input="setSearchTerms"
+            multiple taggable :options="query.ids"
+            :placeholder="$t('search.enterSearchTerms')"
+            :tagPlaceholder="$t('search.addSearchTerms')"
+            :noOptions="$t('search.addSearchTerms')"
+            @tag="addSearchTerm"
+          >
+            <template #noOptions>{{ $t('search.noOptions') }}</template>
+          </multiselect>
         </b-form-group>
 
         <b-form-group v-if="canFilterExtents" :label="$t('search.temporalExtent')" :label-for="ids.datetime" :description="$t('search.dateDescription')">
@@ -141,7 +150,7 @@ import { stacRequest } from '../store/utils';
 
 function getQueryDefaults() {
   return {
-    q: null,
+    q: [],
     datetime: null,
     bbox: null,
     limit: null,
@@ -215,7 +224,7 @@ export default {
     }, getDefaults());
   },
   computed: {
-    ...mapState(['apiCollections', 'nextCollectionsLink', 'itemsPerPage', 'uiLanguage']),
+    ...mapState(['itemsPerPage', 'uiLanguage']),
     ids() {
       let obj = {};
       ['q', 'datetime', 'bbox', 'collections', 'ids', 'sort', 'limit']
@@ -250,14 +259,16 @@ export default {
     }
   },
   watch: {
-    apiCollections: {
+    parent: {
       immediate: true,
-      handler() {
-        if (!Array.isArray(this.apiCollections) || this.nextCollectionsLink || !this.conformances.CollectionIdFilter) {
-          this.collections = [];
-          return;
+      handler(newStac, oldStac) {
+        if (newStac instanceof STAC) {
+          newStac.setApiDataListener('searchfilter' + formId, () => this.updateApiCollections());
         }
-        this.collections = this.prepareCollections(this.apiCollections);
+        if (oldStac instanceof STAC) {
+          oldStac.setApiDataListener('searchfilter' + formId);
+        }
+        this.updateApiCollections();
       }
     },
     value: {
@@ -303,9 +314,9 @@ export default {
         queryableLink: null
       };
 
-      if (this.type === 'Global' && this.apiCollections) {
-        data.collections = this.apiCollections;
-        hasMore = Boolean(this.nextCollectionsLink);
+      if (this.type === 'Global' && this.collections) {
+        data.collections = this.collections;
+        hasMore = false;
       }
       else if (this.type === 'Global' || this.type === 'Collections') {
         let response = await stacRequest(this.$store, link);
@@ -326,6 +337,18 @@ export default {
         }
       }
       return data;
+    },
+    updateApiCollections() {
+      if (!this.parent) {
+        return;
+      }
+      let apiCollections = this.parent.getChildren('collections');
+      let nextCollectionsLink = this.parent._apiChildren.next;
+      if (!Array.isArray(apiCollections) || nextCollectionsLink || !this.conformances.CollectionIdFilter) {
+          this.collections = [];
+          return;
+        }
+        this.collections = this.prepareCollections(apiCollections);
     },
     prepareCollections(collections) {
       return collections
@@ -414,11 +437,14 @@ export default {
       }
       this.$set(this.query, 'limit', limit);
     },
-    setSearchTerms(value) {
-      if (!Utils.hasText(value)) {
-        value = null;
+    addSearchTerm(term) {
+      if (!Utils.hasText(term)) {
+        return;
       }
-      this.$set(this.query, 'q', value);
+      this.query.q.push(term);
+    },
+    setSearchTerms(terms) {
+      this.$set(this.query, 'q', terms);
     },
     setBBox(bounds) {
       let bbox = null;
