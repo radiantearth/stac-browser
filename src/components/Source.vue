@@ -84,8 +84,8 @@ import { getBest, prepareSupported } from '../locale-id';
 const LANGUAGE_EXT = 'https://stac-extensions.github.io/language/v1.*/schema.json';
 
 export default {
-    name: "Source",
-    components: {
+  name: "Source",
+  components: {
     BDropdown,
     BDropdownItem,
     BIconBlank,
@@ -99,150 +99,150 @@ export default {
     BIconTwitter,
     BPopover,
     RootStats: () => import('./RootStats.vue'),
-    Url
-},
-    props: {
-        title: {
-            type: String,
-            required: true
-        },
-        stacUrl: {
-            type: String,
-            default: null
-        },
-        stacVersion: {
-            type: String,
-            default: null
-        }
+    Url,
+  },
+  props: {
+    title: {
+      type: String,
+      required: true
     },
-    computed: {
-        ...mapState(['conformsTo', 'dataLanguages', 'locale', 'privateQueryParameters', 'supportedLocales', 'stacLint', 'stacProxyUrl', 'uiLanguage', 'valid']),
-        ...mapGetters(['supportsExtension', 'root']),
-        showRoot() {
-          if (!this.root) {
-            return false;
-          }
-          return (Array.isArray(this.conformsTo) && this.conformsTo.length > 0)
-            || Utils.isObject(this.root['stats:collections'])
-            || Utils.isObject(this.root['stats:catalogs'])
-            || Utils.isObject(this.root['stats:items']);
-        },
-        rootTitle() {
-          return Array.isArray(this.conformsTo) && this.conformsTo.length > 0 ? this.$t('index.api') : this.$t('index.catalog');
-        },
-        currentLanguage() {
-          let lang = this.languages.find(l => l.code === this.locale);
-          if (lang) {
-            return lang.native;
-          }
-          else {
-            return '-';
-          }
-        },
-        canValidate() {
-            if (!this.stacLint || typeof this.stacUrl !== 'string') {
-                return false;
-            }
-            else if (Utils.size(this.privateQueryParameters) > 0) {
-                // Don't expose private query parameters to externals
-                return false;
-            }
-            else if (Array.isArray(this.stacProxyUrl)) {
-                // Don't validate if a proxy has been set
-                return false;
-            }
-            let uri = URI(this.stacUrl);
-            let host = uri.hostname().toLowerCase();
-            if (host === 'localhost' || host.startsWith('127.') || host === '::1') {
-                // Can't validate localhost
-                return false;
-            }
-            return true;
-        },
-        message() {
-            return this.$t('source.share.message', {title: this.title, url: this.browserUrl()});
-        },
-        twitterUrl() {
-            let text = encodeURIComponent(this.message);
-            return `https://twitter.com/intent/tweet?text=${text}`;
-        },
-        mailTo() {
-            let title = encodeURIComponent(this.title);
-            let text = encodeURIComponent(this.message);
-            return `mailto:?subject=${title}&body=${text}`;
-        },
-        supportsLanguageExt() {
-          return this.supportsExtension(LANGUAGE_EXT);
-        },
-        languages() {
-          let languages = [];
-
-          // Add all UI languages
-          for(let code of this.supportedLocales) {
-            languages.push({
-              code,
-              native: this.$t(`languages.${code}.native`),
-              global: this.$t(`languages.${code}.global`),
-              ui: true
-            });
-          }
-
-          // Add missing data languages
-          for(let lang of this.dataLanguages) {
-            if (!Utils.isObject(lang) || !lang.code || this.supportedLocales.includes(lang.code)) {
-              continue;
-            }
-            let newLang = {
-              code: lang.code
-            };
-            newLang.native = lang.name || lang.alternate || lang.code;
-            newLang.global = lang.alternate || lang.name || lang.code;
-            newLang.data = true;
-            languages.push(newLang);
-          }
-
-          if (this.supportsExtension(LANGUAGE_EXT)) {
-            // Determine which languages are complete
-            const uiSupported = prepareSupported(this.supportedLocales);
-            const dataSupported = prepareSupported(this.dataLanguages.map(l => l.code));
-            for(let l of languages) {
-              if (!l.ui) {
-                l.ui = Boolean(getBest(uiSupported, l.code, null));
-              }
-              if (!l.data) {
-                l.data = Boolean(getBest(dataSupported, l.code, null));
-              }
-            }
-          }
-          
-          return languages.sort((a,b) => a.global.localeCompare(b.global, this.uiLanguage));
-        }
+    stacUrl: {
+      type: String,
+      default: null
     },
-    methods: {
-        ...mapActions(['switchLocale']),
-        async validate() {
-          if (!this.canValidate) {
-            return;
-          }
-          await this.$store.dispatch('validate', this.stacUrl);
-        },
-        browserUrl() {
-          return window.location.toString();
-        }
+    stacVersion: {
+      type: String,
+      default: null
     }
+  },
+  computed: {
+    ...mapState(['conformsTo', 'dataLanguages', 'locale', 'privateQueryParameters', 'supportedLocales', 'stacLint', 'stacProxyUrl', 'uiLanguage', 'valid']),
+    ...mapGetters(['supportsExtension', 'root']),
+    showRoot() {
+      if (!this.root) {
+        return false;
+      }
+      return (Array.isArray(this.conformsTo) && this.conformsTo.length > 0)
+        || Utils.isObject(this.root['stats:collections'])
+        || Utils.isObject(this.root['stats:catalogs'])
+        || Utils.isObject(this.root['stats:items']);
+    },
+    rootTitle() {
+      return Array.isArray(this.conformsTo) && this.conformsTo.length > 0 ? this.$t('index.api') : this.$t('index.catalog');
+    },
+    currentLanguage() {
+      let lang = this.languages.find(l => l.code === this.locale);
+      if (lang) {
+        return lang.native;
+      }
+      else {
+        return '-';
+      }
+    },
+    canValidate() {
+      if (!this.stacLint || typeof this.stacUrl !== 'string') {
+        return false;
+      }
+      else if (Utils.size(this.privateQueryParameters) > 0) {
+        // Don't expose private query parameters to externals
+        return false;
+      }
+      else if (Array.isArray(this.stacProxyUrl)) {
+        // Don't validate if a proxy has been set
+        return false;
+      }
+      let uri = URI(this.stacUrl);
+      let host = uri.hostname().toLowerCase();
+      if (host === 'localhost' || host.startsWith('127.') || host === '::1') {
+        // Can't validate localhost
+        return false;
+      }
+      return true;
+    },
+    message() {
+      return this.$t('source.share.message', {title: this.title, url: this.browserUrl()});
+    },
+    twitterUrl() {
+      let text = encodeURIComponent(this.message);
+      return `https://twitter.com/intent/tweet?text=${text}`;
+    },
+    mailTo() {
+      let title = encodeURIComponent(this.title);
+      let text = encodeURIComponent(this.message);
+      return `mailto:?subject=${title}&body=${text}`;
+    },
+    supportsLanguageExt() {
+      return this.supportsExtension(LANGUAGE_EXT);
+    },
+    languages() {
+      let languages = [];
+
+      // Add all UI languages
+      for(let code of this.supportedLocales) {
+        languages.push({
+          code,
+          native: this.$t(`languages.${code}.native`),
+          global: this.$t(`languages.${code}.global`),
+          ui: true
+        });
+      }
+
+      // Add missing data languages
+      for(let lang of this.dataLanguages) {
+        if (!Utils.isObject(lang) || !lang.code || this.supportedLocales.includes(lang.code)) {
+          continue;
+        }
+        let newLang = {
+          code: lang.code
+        };
+        newLang.native = lang.name || lang.alternate || lang.code;
+        newLang.global = lang.alternate || lang.name || lang.code;
+        newLang.data = true;
+        languages.push(newLang);
+      }
+
+      if (this.supportsExtension(LANGUAGE_EXT)) {
+        // Determine which languages are complete
+        const uiSupported = prepareSupported(this.supportedLocales);
+        const dataSupported = prepareSupported(this.dataLanguages.map(l => l.code));
+        for(let l of languages) {
+          if (!l.ui) {
+            l.ui = Boolean(getBest(uiSupported, l.code, null));
+          }
+          if (!l.data) {
+            l.data = Boolean(getBest(dataSupported, l.code, null));
+          }
+        }
+      }
+      
+      return languages.sort((a,b) => a.global.localeCompare(b.global, this.uiLanguage));
+    }
+  },
+  methods: {
+    ...mapActions(['switchLocale']),
+    async validate() {
+      if (!this.canValidate) {
+        return;
+      }
+      await this.$store.dispatch('validate', this.stacUrl);
+    },
+    browserUrl() {
+      return window.location.toString();
+    }
+  }
 };
 </script>
 
 <style lang="scss">
 #popover-link, #popover-root, #popover-share {
-    width: 80%;
-    max-width: 800px;
+  width: 80%;
+  max-width: 800px;
 
-    .popover-body {
-      overflow-y: auto;
-      overflow-x: hidden;
-      max-height: 80vh;
-    }
+  .popover-body {
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: 80vh;
+  }
 }
 </style>
 <style lang="scss" scoped>

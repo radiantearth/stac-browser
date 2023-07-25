@@ -12,44 +12,44 @@
 
 <script>
 import {
-    BFormInput, BFormGroup,
-    BIconArrowUpRightSquare,
-    BInputGroup, BInputGroupAppend } from 'bootstrap-vue';
+  BFormInput, BFormGroup,
+  BIconArrowUpRightSquare,
+  BInputGroup, BInputGroupAppend } from 'bootstrap-vue';
 
 export default {
-    name: "Share",
-    components: {
-        BFormGroup,
-        BFormInput,
-        BIconArrowUpRightSquare,
-        BInputGroup,
-        BInputGroupAppend,
-        CopyButton: () => import('./CopyButton.vue')
+  name: "Share",
+  components: {
+    BFormGroup,
+    BFormInput,
+    BIconArrowUpRightSquare,
+    BInputGroup,
+    BInputGroupAppend,
+    CopyButton: () => import('./CopyButton.vue')
+  },
+  props: {
+    id: {
+      type: String,
+      required: true
     },
-    props: {
-        id: {
-            type: String,
-            required: true
-        },
-        url: {
-            type: String,
-            required: true
-        },
-        label: {
-            type: String,
-            required: true
-        },
-        open: {
-            type: Boolean,
-            default: true
-        }
+    url: {
+      type: String,
+      required: true
+    },
+    label: {
+      type: String,
+      required: true
+    },
+    open: {
+      type: Boolean,
+      default: true
     }
+  }
 };
 </script>
 
 <style lang="scss" scoped>
 .popover {
-    width: 100%;
-    max-width: 800px;
+  width: 100%;
+  max-width: 800px;
 }
 </style>
