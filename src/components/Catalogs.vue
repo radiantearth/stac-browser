@@ -1,15 +1,15 @@
 <template>
   <section class="catalogs mb-4">
-    <h2>
-      <span class="title">{{ title }}</span>
-      <b-badge v-if="isComplete" pill variant="secondary" class="ml-2">
+    <header>
+      <h2 class="title mr-2">{{ title }}</h2>
+      <b-badge v-if="isComplete" pill variant="secondary" class="mr-4">
         <template v-if="catalogs.length !== catalogView.length">{{ catalogView.length }}/{{ catalogs.length }}</template>
         <template v-else>{{ catalogs.length }}</template>
       </b-badge>
-      <ViewButtons class="ml-4" v-model="view" />
-      <SortButtons v-if="isComplete && catalogs.length > 1" class="ml-2" v-model="sort" />
-    </h2>
-    <SearchBox v-if="isComplete && catalogs.length > 1" class="mt-3 mb-2" v-model="searchTerm" :placeholder="$t('catalogs.filterByTitle')" />
+      <ViewButtons class="mr-2" v-model="view" />
+      <SortButtons v-if="isComplete && catalogs.length > 1" v-model="sort" />
+    </header>
+    <SearchBox v-if="isComplete && catalogs.length > 1" class="mt-1 mb-1" v-model="searchTerm" :placeholder="$t('catalogs.filterByTitle')" />
     <Pagination ref="topPagination" v-if="showPagination" :pagination="pagination" placement="top" @paginate="paginate" />
     <b-alert v-if="searchTerm && catalogView.length === 0" variant="warning" show>{{ $t('catalogs.noMatches') }}</b-alert>
     <section class="list">
@@ -144,18 +144,3 @@ export default {
   }
 };
 </script>
-
-<style lang="scss" scoped>
-.catalogs {
-
-  .list {
-    position: relative;
-  }
-
-  > h2 {
-    .title, .badge {
-      vertical-align: middle;
-    }
-  }
-}
-</style>

@@ -2,8 +2,8 @@ import ActionPlugin from './ActionPlugin';
 
 export default class LinkActionPlugin extends ActionPlugin {
 
-  constructor(link, id) {
-    super(id);
+  constructor(link, component, id) {
+    super(id, component);
     this.link = link;
   }
 

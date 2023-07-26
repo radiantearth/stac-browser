@@ -1,4 +1,8 @@
 {
+  "actions": {
+    "openIn": "Öffne in {service}"
+  },
+  "additionalActions": "Weitere Aktionen",
   "additionalResources": "Zusätzliche Ressourcen",
   "anonymized": {
     "title": "Anonymisiert"
@@ -157,9 +161,6 @@
     "last": "Ende »",
     "next": "Nächste ›",
     "previous": "‹ Vorherige"
-  },
-  "actions": {
-    "openIn": "Öffne in {service}"
   },
   "poweredBy": "Generiert von {link}",
   "protocol": {

@@ -3,8 +3,9 @@ import URI from 'urijs';
 
 export default class ActionPlugin {
 
-  constructor(id) {
+  constructor(id, component) {
     this.id = id;
+    this.component = component;
   }
 
   get btnOptions() {
