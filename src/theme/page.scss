@@ -23,7 +23,7 @@ body {
         padding-top: $block-margin;
 
         .lead {
-            color: $gray-600;
+            color: map-get($theme-colors, 'secondary');
         }
     }
     .logo {
@@ -63,7 +63,7 @@ body {
     }
 
     h2 {
-        color: $gray-600;
+        color: map-get($theme-colors, 'secondary');
         font-weight: 600;
     }
 
@@ -142,12 +142,23 @@ body {
         }
     }
 
-    .btn-group {
-        .btn-primary {
+    .btn-group, .btn-group-vertical {
+        .btn-primary, .btn-secondary {
             border-color: darken(map-get($theme-colors, "primary"), 15%);
             &:hover {
                 border-color: darken(map-get($theme-colors, "primary"), 30%);
             }
+        }
+        .btn-secondary {
+            background-color: lighten(desaturate(map-get($theme-colors, "primary"), 50%), 20%);
+            &:hover {
+                background-color: darken(map-get($theme-colors, "primary"), 5%);
+            }
+        }
+    }
+    .btn-group-vertical.actions {
+        .btn {
+            text-align: left
         }
     }
 
@@ -197,6 +208,30 @@ body {
             .badge {
                 margin: 0.125rem;
                 text-transform: uppercase;
+            }
+        }
+    }
+
+    
+    .items, .catalogs {
+        > .list {
+            position: relative;
+        }
+    
+        > header {
+            margin-bottom: 0.5rem;
+
+            > h2.title {
+                vertical-align: middle;
+                display: inline-block;
+                margin-bottom: 0.25rem;
+            }
+            .badge {
+                vertical-align: middle;
+            }
+            .btn-group {
+                vertical-align: middle;
+                margin: 0.25rem 0;
             }
         }
     }

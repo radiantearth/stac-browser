@@ -1,4 +1,8 @@
 {
+  "actions": {
+    "openIn": "Öffne in {service}"
+  },
+  "additionalActions": "Weitere Aktionen",
   "additionalResources": "Zusätzliche Ressourcen",
   "anonymized": {
     "title": "Anonymisiert"
