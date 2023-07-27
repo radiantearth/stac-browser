@@ -35,8 +35,8 @@ export default {
     }
   },
   computed: {
-    ...mapState(['privateQueryParameters']),
-    ...mapGetters(['toBrowserPath', 'getRequestUrl']),
+    ...mapState(['allowExternalAccess', 'privateQueryParameters']),
+    ...mapGetters(['toBrowserPath', 'getRequestUrl', 'isExternalUrl']),
     icon() {
       if (this.stac) {
         let icons = this.stac.getIcons();
@@ -73,6 +73,9 @@ export default {
         return true;
       }
       if (!Utils.isStacMediaType(this.link.type, true)) {
+        return false;
+      }
+      if (!this.allowExternalAccess && this.isExternalUrl(this.link.href)) {
         return false;
       }
       return stacBrowserNavigatesTo.includes(this.link.rel);
