@@ -1,9 +1,7 @@
 <template>
   <main class="browse d-flex flex-column">
-    <b-alert v-if="!allowExternalAccess && isExternal" show>
-      <p>{{ $t('errors.noExternalAccess') }}</p>
-    </b-alert>
-    <ErrorAlert v-if="error" :dismissible="false" :url="url" :description="errorDescription" :id="errorId" />
+    <b-alert v-if="!allowExternalAccess && isExternal" show>{{ $t('errors.noExternalAccess') }}</b-alert>
+    <ErrorAlert v-else-if="error" :dismissible="false" :url="url" :description="errorDescription" :id="errorId" />
     <Loading v-else-if="loading" stretch />
     <component v-else :is="component" />
   </main>
@@ -99,8 +97,10 @@ export default {
         if (path === oldPath) {
           return;
         }
-
-        if (this.redirectLegacyUrls && await this.redirectLegacyUrl(path)) {
+        else if (!this.allowExternalAccess && this.isExternal) {
+          return;
+        }
+        else if (this.redirectLegacyUrls && await this.redirectLegacyUrl(path)) {
           return;
         }
 
