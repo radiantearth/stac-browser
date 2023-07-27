@@ -48,13 +48,8 @@ export default {
     errorDescription() {      
       if (this.error instanceof Error && this.error.isAxiosError && Utils.isObject(this.error.response)) {
         let res = this.error.response;
-        if (Utils.isObject(res.data)) {
-          if (typeof res.data.description === 'string') { // STAC API compliant error response
-            return res.data.description;
-          }
-          else if (typeof res.data.detail === 'string') { // stac-fastapi returns an invalid "detail" property, see https://github.com/stac-utils/stac-fastapi/issues/360
-            return res.data.detail;
-          }
+        if (Utils.isObject(res.data) && typeof res.data.description === 'string') { // STAC API compliant error response
+          return res.data.description;
         }
         if (res.status === 401) {
           return this.$t('errors.unauthorized');
