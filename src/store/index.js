@@ -384,15 +384,6 @@ function getStore(config, router) {
                 state.catalogUrl = value;
               }
               break;
-            case 'stacProxyUrl':
-              // Proxy URLs coming from CLI have the form https://thingtoproxy.com;http://proxy:111
-              if (typeof value === 'string' && value.includes(';')) {
-                state[key] = value.split(';');
-              }
-              else {
-                state[key] = value;
-              }
-              break;
             case 'crossOriginMedia':
               state.crossOriginMedia = ['anonymous', 'use-credentials'].includes(value) ? value : null;
               break;

@@ -1,38 +1,30 @@
 const yargs = require('yargs/yargs');
 const { hideBin } = require('yargs/helpers');
+const path = require('path');
+const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
+
+const { properties } = require('./config.schema.json');
+const pkgFile = require('./package.json');
+
+const optionsForType = (type) => Object.entries(properties)
+  .filter(([_, schema]) => Array.isArray(schema.type) && schema.type.includes(type))
+  .map(([key]) => key);
 const argv = yargs(hideBin(process.argv))
   .parserConfiguration({'camel-case-expansion': false})
   .env('SB')
-  .boolean([
-    'allowExternalAccess',
-    'displayGeoTiffByDefault',
-    'redirectLegacyUrls',
-    'showThumbnailsAsAssets',
-    'stacLint',
-    'useTileLayerAsFallback',
-    'noSourceMaps'
-  ])
-  .number([
-    'itemsPerPage',
-    'maxPreviewsOnMap'
-  ])
-  .array([
-    'supportedLocales'
-  ])
+  .boolean(optionsForType("boolean"))
+  .number(optionsForType("number").concat(optionsForType("integer")))
+  .array(optionsForType("array"))
   .argv;
 // Clean-up arguments
 delete argv._;
 delete argv.$0;
 
-const pkgFile = require('./package.json');
-
-const path = require('path');
 const configFile = path.resolve(argv.CONFIG ? argv.CONFIG : './config.js');
 const configFromFile = require(configFile);
 const mergedConfig = Object.assign(configFromFile, argv);
-const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 
-const config = {
+const vueConfig = {
   lintOnSave: process.env.NODE_ENV !== 'production',
   productionSourceMap: !mergedConfig.noSourceMaps,
   publicPath: mergedConfig.pathPrefix,
@@ -69,4 +61,4 @@ const config = {
   }
 };
 
-module.exports = config;
+module.exports = vueConfig;
