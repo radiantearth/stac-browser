@@ -224,6 +224,7 @@
     "notFullySupported": "Eventuell werden nicht alle Optionen unterstützt.",
     "notSupported": "Suchen wird von dem Diensteanbieter nicht unterstützt.",
     "placeholder": "Suchen...",
+    "searchItemsForCollection": "Suche nach Elementen",
     "selectCollections": "Wähle Kataloge...",
     "sortOptions": {
       "datetime": "Datum und Zeit",

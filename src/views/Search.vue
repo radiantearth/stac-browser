@@ -31,7 +31,11 @@
           <Catalogs
             v-if="isCollectionSearch" :catalogs="results" collectionsOnly
             :pagination="pagination" :loading="loading" @paginate="loadResults"
-          />
+          >
+            <template v-if="canSearchItems" #catalogFooter="{data}">
+              <a href="#" @click.prevent="openInItemSearch(data)" class="stretched-link">{{ $t('search.searchItemsForCollection') }}</a>
+            </template>
+          </Catalogs>
           <Items
             v-else
             :stac="stac" :items="results" :api="true" :allowFilter="false"
@@ -185,6 +189,12 @@ export default {
     }
   },
   methods: {
+    openInItemSearch(collection) {
+      if (Utils.isObject(collection) && collection.id) {
+        this.$set(this.itemFilters, 'collections', [collection.id]);
+      }
+      this.activeSearch = 1;
+    },
     async loadResults(link) {
       this.error = null;
       this.loading = true;

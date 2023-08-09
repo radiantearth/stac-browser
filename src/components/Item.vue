@@ -130,8 +130,10 @@ export default {
       max-width: 100%;
       max-height: 200px;
     }
+
     .card-body {
       text-align: center;
+      position: relative;
     }
   }
 }

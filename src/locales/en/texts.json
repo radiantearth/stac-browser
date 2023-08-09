@@ -224,6 +224,7 @@
     "notFullySupported": "Not all of the options may be supported.",
     "notSupported": "Item Search is not supported by the API.",
     "placeholder": "Search...",
+    "searchItemsForCollection": "Search for Items",
     "selectCollections": "Select one or multiple collections...",
     "sortOptions": {
       "datetime": "Date and Time",

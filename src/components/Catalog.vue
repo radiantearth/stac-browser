@@ -12,6 +12,9 @@
       </b-card-text>
       <b-card-text v-if="temporalExtent" class="datetime"><span v-html="temporalExtent" /></b-card-text>
     </b-card-body>
+    <b-card-footer>
+      <slot name="footer" v-bind:data="data"></slot>
+    </b-card-footer>
   </b-card>
 </template>
 
@@ -97,13 +100,20 @@ export default {
 
 #stac-browser {
   .catalog-card {
-
     &.deprecated {
       opacity: 0.5;
 
       &:hover {
         opacity: 1;
       }
+    }
+
+    .card-body, .card-footer {
+      position: relative;
+    }
+
+    .card-footer:empty {
+      display: none;
     }
 
     .intro {
