@@ -16,8 +16,8 @@
       <Loading v-if="loading" fill top />
       <component :is="cardsComponent" v-bind="cardsComponentProps">
         <Catalog v-for="catalog in catalogView" :catalog="catalog" :key="catalog.href">
-          <template v-slot:footer="{data}">
-            <slot name="catalogFooter" v-bind:data="data"></slot>
+          <template #footer="{data}">
+            <slot name="catalogFooter" :data="data" />
           </template>
         </Catalog>
       </component>

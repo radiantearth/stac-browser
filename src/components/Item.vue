@@ -116,7 +116,7 @@ export default {
     &.description {
       .intro {
         text-align: left;
-        margin-bottom: 0.75rem;
+        margin-bottom: 0.5rem;
       }
     }
 

@@ -201,6 +201,7 @@
     "enterSearchTerms": "Gebe Suchbegriffe ein...",
     "equalTo": "entspricht genau",
     "filterBySpatialExtent": "Filtern nach räumlicher Ausdehnung",
+    "filterCollection": "Im Katalog filtern",
     "freeText": "Suchbegriffe",
     "freeTextDescription": "Suche nach mindestens einem der angegebene Begriffen in Feldern wie dem Titel und der Beschreibung.",
     "greaterThan": "größer als",
@@ -224,8 +225,8 @@
     "notFullySupported": "Eventuell werden nicht alle Optionen unterstützt.",
     "notSupported": "Suchen wird von dem Diensteanbieter nicht unterstützt.",
     "placeholder": "Suchen...",
-    "searchItemsForCollection": "Suche nach Elementen",
     "selectCollections": "Wähle Kataloge...",
+    "selectForItemSearch": "Markiere für Elementsuche",
     "sortOptions": {
       "datetime": "Datum und Zeit",
       "id": "Identifikationsnummer",
@@ -237,7 +238,8 @@
       "items": "Elemente durchsuchen"
     },
     "temporalExtent": "Zeitliche Ausdehnung",
-    "title": "Suche"
+    "title": "Suche",
+    "useInItemSearch": "Nutze Katalog in Elementsuche | Nutze {count} Kataloge in Elementsuche"
   },
   "showMore": "Zeige mehr...",
   "sidebar": {
