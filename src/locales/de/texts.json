@@ -122,6 +122,8 @@
   },
   "items": {
     "filter": "Filter",
+    "showFilter": "Zeige Filter",
+    "hideFilter": "Verstecke Filter",
     "noTime": "Keine Zeit angegeben",
     "noneAvailableForCollection": "Für diesen Katalog sind keine Elemente verfügbar."
   },
@@ -186,16 +188,13 @@
     "less": "Zeige weniger",
     "more": "Zeige mehr"
   },
+  "reset": "Zurücksetzen",
   "search": {
     "addCollections": "Hinzufügen mittels Enter-Taste",
     "addFilter": "Filter hinzufügen",
     "addItemIds": "Element-Identifikationsnummern hinzufügen mittels Enter-Taste",
     "addSearchTerm": "Suchbegriff hinzufügen mittels Enter-Taste",
     "additionalFilters": "Weitere Filter",
-    "buttons": {
-      "filter": "Filtern",
-      "reset": "Zurücksetzen"
-    },
     "dateDescription": "Alle Zeiten in koordinierter Weltzeit (UTC).",
     "enterCollections": "Gebe Katalog-Identifikationsnummern ein...",
     "enterItemIds": "Gebe Element-Identifikationsnummern ein...",

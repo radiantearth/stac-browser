@@ -120,8 +120,8 @@
         </b-form-group>
       </b-card-body>
       <b-card-footer>
-        <b-button type="submit" variant="primary">{{ $t('search.buttons.filter') }}</b-button>
-        <b-button type="reset" variant="danger" class="ml-3">{{ $t('search.buttons.reset') }}</b-button>
+        <b-button type="submit" variant="primary">{{ $t('submit') }}</b-button>
+        <b-button type="reset" variant="danger" class="ml-3">{{ $t('reset') }}</b-button>
       </b-card-footer>
     </b-card>
   </b-form>

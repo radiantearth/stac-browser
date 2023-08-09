@@ -117,7 +117,7 @@
     "urlMissingProtocol": "Protocollo mancante."
   },
   "items": {
-    "filter": "Filtro",
+    "filter": "Filtri",
     "noTime": "Nessuna data/ora indicata",
     "noneAvailableForCollection": "Non ci sono Elementi disponibili per questa Collezione."
   },
@@ -182,15 +182,12 @@
     "less": "Mostra di meno",
     "more": "Mostra di più"
   },
+  "reset": "Reimposta",
   "search": {
     "addCollections": "Premi invio per aggiungere una Collezione",
     "addFilter": "Aggiungi filtro",
     "addItemIds": "Premi invio per aggiungere l'ID di un Elemento",
     "additionalFilters": "Filtri aggiuntivi",
-    "buttons": {
-      "filter": "Filtra",
-      "reset": "Reimposta"
-    },
     "dateDescription": "Data/ora nel sistema UTC (tempo coordinato internazionale).",
     "enterCollections": "Inserire una o più Collezioni...",
     "enterItemIds": "Inserire uno o più ID di Elemento...",
