@@ -41,9 +41,9 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
+import Source from './Source.vue';
 import StacLink from './StacLink.vue';
 import { BIconArrow90degUp, BIconBook, BIconFolderSymlink, BIconSearch, BIconLock, BIconUnlock } from "bootstrap-vue";
-import Source from './Source.vue';
 import STAC from '../models/stac';
 import Utils from '../utils';
 

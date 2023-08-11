@@ -121,7 +121,7 @@ Enables or disables a feature that validates the STAC catalog when opening the "
 Validation uses the external service [staclint.com](https://staclint.com).
 
 Validation is automatically disabled in the following cases:
-- the host of a catalog is `localhost`, `127.0.0.1` and `::1`
+- the host of a catalog is `localhost`, `127.0.0.1` or `::1`
 - [private query parameters](../README.md#private-query-parameters) have been set
 - `stacProxyUrl` is set
 
@@ -156,7 +156,7 @@ For instance, if you are serving a catalog on the local file system at `/home/us
 the data out from a server located at `http://localhost:8888/`, you can use:
 
 ```bash
-npm start -- --open --stacProxyUrl="/home/user;http://localhost:8888"
+npm start -- --open --stacProxyUrl=/home/user http://localhost:8888
 ```
 
 Notice the format of the value:

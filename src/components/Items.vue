@@ -1,10 +1,10 @@
 <template>
   <section class="items mb-4">
-    <h2>
-      <span class="title">{{ $tc('stacItem', items.length ) }}</span>
-      <b-badge v-if="!api && items.length > 0" pill variant="secondary" class="ml-2">{{ items.length }}</b-badge>
-      <SortButtons v-if="!api && items.length > 1" class="ml-4" v-model="sort" />
-    </h2>
+    <header>
+      <h2 class="title mr-2">{{ $tc('stacItem', items.length ) }}</h2>
+      <b-badge v-if="!api && items.length > 0" pill variant="secondary" class="mr-4">{{ items.length }}</b-badge>
+      <SortButtons v-if="!api && items.length > 1" v-model="sort" />
+    </header>
 
     <Pagination ref="topPagination" v-if="showPagination" :pagination="pagination" placement="top" @paginate="paginate" />
     <template v-if="allowFilter">
@@ -152,18 +152,3 @@ export default {
   }
 };
 </script>
-
-<style lang="scss" scoped>
-.items {
-
-  .list {
-    position: relative;
-  }
-
-  > h2 {
-    .title, .badge {
-      vertical-align: middle;
-    }
-  }
-}
-</style>
