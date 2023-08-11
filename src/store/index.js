@@ -702,16 +702,10 @@ function getStore(config, router) {
         cx.commit('parents', parents);
       },
       async load(cx, args) {
-        let { url, fromBrowser, show, loadApi, loadRoot, force } = args;
-        let path;
-        if (fromBrowser) {
-          path = url.startsWith('/') ? url : '/' + url;
-          url = cx.getters.fromBrowserPath(url);
-        }
-        else {
-          url = Utils.toAbsolute(url, cx.state.url);
-          path = cx.getters.toBrowserPath(url);
-        }
+        let { url, show, loadApi, loadRoot, force } = args;
+
+        let path = cx.getters.toBrowserPath(url);
+        url = Utils.toAbsolute(url, cx.state.url);
 
         // Load the root catalog data if not available (e.g. after page refresh or external access)
         if (!loadRoot && path !== '/' && cx.state.catalogUrl && !cx.getters.getStac(cx.state.catalogUrl)) {
