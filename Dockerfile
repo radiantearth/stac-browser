@@ -6,11 +6,12 @@ COPY package*.json ./
 RUN npm install
 COPY . .
 RUN \[ "${DYNAMIC_CONFIG}" == "true" \] && sed -i 's/<!-- <script defer="defer" src=".\/config.js"><\/script> -->/<script defer="defer" src=".\/config.js"><\/script>/g' public/index.html
-RUN npm run build -- --catalogUrl=$catalogURL
-
+RUN npm run build -- --catalogUrl=$catalogUrl
 FROM nginx:1-alpine-slim
 
-ENV CATALOG_URL= \
+ENV PATH_PREFIX="/" \
+    HISTORY_MODE="history" \
+    CATALOG_URL= \
     CATALOG_TITLE="STAC Browser" \
     ALLOW_EXTERNAL_ACCESS=true \
     ALLOWED_DOMAINS= \
@@ -43,7 +44,8 @@ ENV CATALOG_URL= \
 COPY --from=build-step /app/dist /usr/share/nginx/html
 
 # change default port to 8080
-RUN sed -i 's/\s*listen\s*80;/    listen 8080;/' /etc/nginx/conf.d/default.conf
+RUN sed -i 's/\s*listen\s*80;/    listen 8080;/' /etc/nginx/conf.d/default.conf && \
+    sed -i's/\s*location \/ {/    location \/ {\n        try_files $uri $uri\/ \/index.html;/' default.conf
 
 EXPOSE 8080
 
