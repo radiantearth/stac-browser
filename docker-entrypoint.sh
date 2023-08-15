@@ -5,7 +5,7 @@ str_or_null() {
     if [ -z "$1" ]
     then
         echo -n "null"
-    elif echo "$1" | grep -qzoP '\n.+\n$'
+    elif echo "$1" | pcregrep -qoM '\n.+\n$'
     then
         echo -n "\`$1\`"
     else
@@ -52,10 +52,10 @@ object_or_null() {
     fi
 }
 
-config_schema=$(cat config.schema.json)
+config_schema=$(cat /etc/nginx/conf.d/config.schema.json)
 
 # get all env var names prefixed with "SB_"
-env -0 | cut -z -f1 -d= | tr '\0' '\n' | grep "^SB_"| {
+env -0 | cut -f1 -d= | tr '\0' '\n' | grep "^SB_" | {
     echo "window.STAC_BROWSER_CONFIG = {"
     while IFS='=' read -r name  ; do
         # strip the prefix
