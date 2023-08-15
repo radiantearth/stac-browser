@@ -4,79 +4,96 @@
 str_or_null() {
     if [ -z "$1" ]
     then
-        echo "null"
-    else
-        echo "'$1'"
-    fi
-}
-
-object_or_null() {
-    if [ -z "$1" ]
+        echo -n "null"
+    elif echo "$1" | grep -qzoP '\n.+\n$'
     then
-        echo "null"
+        echo -n "\`$1\`"
     else
-        echo "$1"
+        echo -n "'$1'"
     fi
-}
-
-bool() {
-    case "$1" in
-        true | TRUE | yes | t | True)
-            echo true ;;
-        false| FALSE | no | n | False)
-            echo false ;;
-        *)
-            echo "Err: Unknown boolean value \"$1\"" 1>&1; exit 1 ;;
-    esac
 }
 
 str_list() {
     if [ -z "$1" ]
     then
-        echo "[]"
+        echo -n "[]"
     else
-        echo "['$(echo $1 | sed "s/,/', '/g")']"
+        echo -n "['$(echo $1 | sed "s/,/', '/g")']"
     fi
 }
 
 object_list_or_null() {
     if [ -z "$1" ]
     then
-        echo "null"
+        echo -n "null"
     else
-        echo "[$(echo $1 | sed "s/,/, /g")]"
+        echo -n "[$(echo $1 | sed "s/,/, /g")]"
     fi
 }
 
-cat >/usr/share/nginx/html/config.js <<EOF
-window.STAC_BROWSER_CONFIG = {
-    catalogUrl: $(str_or_null $CATALOG_URL),
-    catalogTitle: '${CATALOG_TITLE}',
-    allowExternalAccess: $(bool $ALLOW_EXTERNAL_ACCESS),
-    allowedDomains: $(str_list $ALLOWED_DOMAINS),
-    detectLocaleFromBrowser: $(bool $DETECT_LOCALE_FROM_BROWSER),
-    storeLocale: $(bool $STORE_LOCALE),
-    locale: '${LOCALE}',
-    fallbackLocale: '${FALLBACK_LOCALE}',
-    supportedLocales: $(str_list $SUPPORTED_LOCALES),
-    apiCatalogPriority: $(str_or_null $API_CATALOG_PRIORITY),
-    useTileLayerAsFallback: $(bool $USE_TILE_LAYER_AS_FALLBACK),
-    displayGeoTiffByDefault: $(bool $DISPLAY_GEOTIFF_BY_DEFAULT),
-    buildTileUrlTemplate: ${BUILD_URL_TEMPLATE},
-    stacProxyUrl: $(str_or_null $STAC_PROXY_URL),
-    cardViewMode: $(str_or_null $CARD_VIEW_MODE),
-    cardViewSort: $(str_or_null $CARD_VIEW_SORT),
-    showThumbnailsAsAssets: $(bool $SHOW_THUMBNAILS_AS_ASSETS),
-    stacLint: $(bool $STAC_LINT),
-    geoTiffResolution: ${GEO_TIFF_RESOLUTION},
-    redirectLegacyUrls: $(bool $REDIRECT_LEGACY_URLS),
-    itemsPerPage: ${ITEM_PER_PAGE},
-    defaultThumbnailSize: $(object_list_or_null $DEFAULT_THUMBNAIL_SIZE),
-    maxPreviewsOnMap: ${MAX_PREVIEWS_ON_MAP},
-    crossOriginMedia: $(str_or_null $CROSS_ORIGIN_MEDIA),
-    requestHeaders: $(object_or_null $REQUEST_HEADERS),
-    requestQueryParameters: $(object_or_null $REQUEST_QUERY_PARAMETERS),
-    preprocessSTAC: $(object_or_null $PREPROCESS_STAC),
-    authConfig: $(object_or_null $AUTH_CONFIG),
+
+bool() {
+    case "$1" in
+        true | TRUE | yes | t | True)
+            echo -n true ;;
+        false| FALSE | no | n | False)
+            echo -n false ;;
+        *)
+            echo "Err: Unknown boolean value \"$1\"" 1>&1; exit 1 ;;
+    esac
 }
-EOF
+
+object_or_null() {
+    if [ -z "$1" ]
+    then
+        echo -n "null"
+    else
+        echo -n "$1"
+    fi
+}
+
+config_schema=$(cat config.schema.json)
+
+# get all env var names prefixed with "SB_"
+env -0 | cut -z -f1 -d= | tr '\0' '\n' | grep "^SB_"| {
+    echo "window.STAC_BROWSER_CONFIG = {"
+    while IFS='=' read -r name  ; do
+        # strip the prefix
+        argname=$(echo "${name#SB_}")
+        # read te vars value
+        value=$(eval "echo \"\$$name\"")
+
+        # get the argument type from the schema
+        argtype=$(echo $config_schema | jq -r ".properties.$argname.type[0]")
+
+        # encode key/value
+        echo -n "  $argname: "
+        case "$argtype" in
+            string)
+                str_or_null "$value"
+                ;;
+            boolean)
+                bool "$value"
+                ;;
+            integer | number)
+                object_or_null "$value"
+                ;;
+            array)
+                arraytype=$(echo $config_schema | jq -r ".properties.$argname.items.type[0]")
+                case "$arraytype" in
+                    string)
+                        str_list "$value"
+                        ;;
+                    *)
+                        object_list_or_null "$value"
+                        ;;
+                esac
+                ;;
+            *)
+                str_or_null "$value"
+                ;;
+        esac
+        echo ","
+    done
+    echo "}"
+} > /usr/share/nginx/html/config.js

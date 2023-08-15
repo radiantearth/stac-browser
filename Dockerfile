@@ -45,7 +45,7 @@ COPY --from=build-step /app/dist /usr/share/nginx/html
 
 # change default port to 8080
 RUN sed -i 's/\s*listen\s*80;/    listen 8080;/' /etc/nginx/conf.d/default.conf && \
-    sed -i's/\s*location \/ {/    location \/ {\n        try_files $uri $uri\/ \/index.html;/' default.conf
+    sed -i 's/\s*location \/ {/    location \/ {\n        try_files $uri $uri\/ \/index.html;/' /etc/nginx/conf.d/default.conf
 
 EXPOSE 8080
 
