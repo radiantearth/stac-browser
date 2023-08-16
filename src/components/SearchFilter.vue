@@ -11,8 +11,8 @@
             :id="ids.q" :value="query.q" @input="setSearchTerms"
             multiple taggable :options="query.ids"
             :placeholder="$t('search.enterSearchTerms')"
-            :tagPlaceholder="$t('search.addSearchTerms')"
-            :noOptions="$t('search.addSearchTerms')"
+            :tagPlaceholder="$t('search.addSearchTerm')"
+            :noOptions="$t('search.addSearchTerm')"
             @tag="addSearchTerm"
           >
             <template #noOptions>{{ $t('search.noOptions') }}</template>
@@ -33,27 +33,10 @@
 
         <b-form-group v-if="conformances.CollectionIdFilter" :label="$tc('stacCollection', collections.length)" :label-for="ids.collections">
           <multiselect
-            v-if="collections.length > 0"
-            :id="ids.collections" :value="selectedCollections" @input="setCollections"
-            :placeholder="$t('search.selectCollections')"
-            :tagPlaceholder="$t('search.addCollections')"
-            :selectLabel="$t('multiselect.selectLabel')"
-            :selectedLabel="$t('multiselect.selectedLabel')"
-            :deselectLabel="$t('multiselect.deselectLabel')"
-            :limitText="limitText"
-            :options="collections" multiple track-by="value" label="text"
-          />
-          <multiselect
-            v-else
-            :id="ids.collections" :value="selectedCollections" @input="setCollections"
-            multiple taggable :options="query.collections"
-            :placeholder="$t('search.enterCollections')"
-            :tagPlaceholder="$t('search.addCollections')"
-            :selectLabel="$t('multiselect.selectLabel')"
-            :selectedLabel="$t('multiselect.selectedLabel')"
-            :deselectLabel="$t('multiselect.deselectLabel')"
-            :limitText="limitText"
+            v-bind="collectionSelectOptions"
+            @input="setCollections"
             @tag="addCollection"
+            @search-change="searchCollections"
           >
             <template #noOptions>{{ $t('search.noOptions') }}</template>
           </multiselect>
@@ -130,13 +113,13 @@
 <script>
 import { BBadge, BDropdown, BDropdownItem, BForm, BFormGroup, BFormInput, BFormCheckbox, BFormRadioGroup } from 'bootstrap-vue';
 import Multiselect from 'vue-multiselect';
-import { mapState } from "vuex";
+import { mapGetters, mapState } from "vuex";
 import refParser from '@apidevtools/json-schema-ref-parser';
 
 import Utils, { schemaMediaType } from '../utils';
 import { ogcQueryables } from "../rels";
 
-import ApiCapabilitiesMixin from './ApiCapabilitiesMixin';
+import ApiCapabilitiesMixin, { TYPES } from './ApiCapabilitiesMixin';
 import DatePickerMixin from './DatePickerMixin';
 import Loading from './Loading.vue';
 
@@ -220,11 +203,40 @@ export default {
       maxItems: 10000,
       loaded: false,
       queryables: null,
-      collections: []
+      hasAllCollections: false,
+      collections: [],
+      collectionsLoadingTimer: null
     }, getDefaults());
   },
   computed: {
     ...mapState(['itemsPerPage', 'uiLanguage']),
+    ...mapGetters(['canSearchCollections', 'supportsConformance']),
+    collectionSelectOptions() {
+      let taggable = !this.hasAllCollections;
+      return {
+        id: this.ids.collections,
+        value: this.selectedCollections,
+        multiple: true,
+        taggable,
+        options: this.collections, // query.collections
+        trackBy: "value",
+        label: "text",
+        placeholder: taggable ? this.$t('search.enterCollections') : this.$t('search.selectCollections'),
+        tagPlaceholder: this.$t('search.addCollections'),
+        selectLabel: this.$t('multiselect.selectLabel'),
+        selectedLabel: this.$t('multiselect.selectedLabel'),
+        deselectLabel: this.$t('multiselect.deselectLabel'),
+        limitText: count => this.$t("multiselect.andMore", {count}),
+        loading: this.collectionsLoadingTimer !== null,
+        showNoResults: false
+      };
+    },
+    collectionSearchLink() {
+      return this.parent instanceof STAC && this.parent.getApiCollectionsLink();
+    },
+    canSearchCollectionsFreeText() {
+      return this.canSearchCollections && this.supportsConformance(TYPES.Collections.FreeText);
+    },
     ids() {
       let obj = {};
       ['q', 'datetime', 'bbox', 'collections', 'ids', 'sort', 'limit']
@@ -280,14 +292,14 @@ export default {
           query.datetime = query.datetime.map(Utils.dateFromUTC);
         }
         this.query = query;
-        if (Array.isArray(query.collections)) {
-          if (this.collections.length > 0) {
-            this.selectedCollections = this.collections
-              .filter(c => query.collections.includes(c.value));
-          }
-          else {
-            this.selectedCollections = query.collections.slice(0);
-          }
+        if (this.collections.length > 0 && this.hasAllCollections) {
+          this.selectedCollections = this.collections.filter(c => query.collections.includes(c.value));
+        }
+        else {
+          this.selectedCollections = query.collections.map(id => {
+            let collection = this.selectedCollections.find(c => c.value === id);
+            return collection ? collection : this.collectionToMultiSelect({id});
+          });
         }
       }
     }
@@ -309,6 +321,9 @@ export default {
         this.loadCollections(this.stac.getApiCollectionsLink())
           .then(({collections, queryableLink}) => {
             this.collections = collections;
+            if (this.collections.length > 0) {
+              this.hasAllCollections = true;
+            }
             return this.loadQueryables(queryableLink);
           })
           .catch(error => console.error(error))
@@ -317,6 +332,36 @@ export default {
     Promise.all(promises).finally(() => this.loaded = true);
   },
   methods: {
+    resetSearchCollection() {
+      clearTimeout(this.collectionsLoadingTimer);
+      this.collectionsLoadingTimer = null;
+    },
+    searchCollections(text) {
+      if (!this.canSearchCollectionsFreeText || this.hasAllCollections) {
+        return;
+      }
+      this.resetSearchCollection();
+      if (typeof text !== 'string' || text.trim().length < 2) {
+        this.collections = [];
+        return;
+      }
+      this.collectionsLoadingTimer = setTimeout(async () => {
+        try {
+          const link = Utils.addFiltersToLink(this.collectionSearchLink, {q: [text]});
+          const response = await stacRequest(this.$store, link);
+          // Only set collections if response is valid AND collectionsLoadingTimer has not been reset.
+          // If collectionsLoadingTimer has been reset, the result is not relevant anylonger.
+          if (this.collectionsLoadingTimer && Utils.isObject(response.data) && Array.isArray(response.data.collections)) {
+            this.collections = this.prepareCollections(response.data.collections);
+          }
+        } catch (error) {
+          console.error(error);
+          this.collections = [];
+        } finally {
+          this.resetSearchCollection();
+        }
+      }, 250);
+    },
     async loadCollections(link) {
       let hasMore = false;
       let data = {
@@ -359,6 +404,9 @@ export default {
         return;
       }
       this.collections = this.prepareCollections(apiCollections);
+      if (this.collections.length > 0) {
+        this.hasAllCollections = true;
+      }
     },
     collectionToMultiSelect(c) {
       return {
@@ -400,9 +448,6 @@ export default {
         this.queryables = Object.entries(schemas.properties)
           .map(([key, schema]) => new Queryable(key, schema));
       }
-    },
-    limitText(count) {
-      return this.$t("multiselect.andMore", {count});
     },
     sortFieldSet(value) {
       this.sortTerm = value;
@@ -489,7 +534,13 @@ export default {
       this.$set(this.query, 'datetime', datetime);
     },
     addCollection(collection) {
-      this.selectedCollections.push(collection);
+      if (!this.collectionSelectOptions.taggable) {
+        return;
+      }
+      this.resetSearchCollection();
+      let opt = this.collectionToMultiSelect({id: collection});
+      this.selectedCollections.push(opt);
+      this.collections.push(opt);
       this.query.collections.push(collection);
     },
     setCollections(collections) {
