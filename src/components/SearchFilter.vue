@@ -273,12 +273,22 @@ export default {
     },
     value: {
       immediate: true,
+      deep: true,
       handler(value) {
         let query = Object.assign(getQueryDefaults(), value);
         if (Array.isArray(query.datetime)) {
           query.datetime = query.datetime.map(Utils.dateFromUTC);
         }
         this.query = query;
+        if (Array.isArray(query.collections)) {
+          if (this.collections.length > 0) {
+            this.selectedCollections = this.collections
+              .filter(c => query.collections.includes(c.value));
+          }
+          else {
+            this.selectedCollections = query.collections.slice(0);
+          }
+        }
       }
     }
   },
@@ -345,17 +355,20 @@ export default {
       let apiCollections = this.parent.getChildren('collections');
       let nextCollectionsLink = this.parent._apiChildren.next;
       if (!Array.isArray(apiCollections) || nextCollectionsLink || !this.conformances.CollectionIdFilter) {
-          this.collections = [];
-          return;
-        }
-        this.collections = this.prepareCollections(apiCollections);
+        this.collections = [];
+        return;
+      }
+      this.collections = this.prepareCollections(apiCollections);
+    },
+    collectionToMultiSelect(c) {
+      return {
+        value: c.id,
+        text: c.title || c.id
+      };
     },
     prepareCollections(collections) {
       return collections
-        .map(c => ({
-          value: c.id,
-          text: c.title || c.id
-        }))
+        .map(this.collectionToMultiSelect)
         .sort((a,b) => a.text.localeCompare(b.text, this.uiLanguage));
     },
     findQueryableLink(links) {

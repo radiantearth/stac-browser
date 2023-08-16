@@ -15,7 +15,11 @@
     <section class="list">
       <Loading v-if="loading" fill top />
       <component :is="cardsComponent" v-bind="cardsComponentProps">
-        <Catalog v-for="catalog in catalogView" :catalog="catalog" :key="catalog.href" />
+        <Catalog v-for="catalog in catalogView" :catalog="catalog" :key="catalog.href">
+          <template #footer="{data}">
+            <slot name="catalogFooter" :data="data" />
+          </template>
+        </Catalog>
       </component>
     </section>
     <Pagination v-if="showPagination" :pagination="pagination" @paginate="paginate" />

@@ -436,15 +436,23 @@ function getStore(config, router) {
       setAuthData(state, value) {
         state.authData = value;
       },
+      state(state, newState) {
+        state.stateQueryParameters = newState;
+      },
+      updateState(state, {type, value}) {
+        if (value === null || typeof value === 'undefined') {
+          Vue.delete(state.stateQueryParameters, type);
+        }
+        else {
+          Vue.set(state.stateQueryParameters, type, value);
+        }
+      },
       openCollapsible(state, { type, uid }) {
         const idx = state.stateQueryParameters[type].indexOf(uid);
         // need to prevent duplicates because of the way the collapse v-model works
         if (idx === -1) {
           state.stateQueryParameters[type].push(uid);
         }
-      },
-      state(state, newState) {
-        state.stateQueryParameters = newState;
       },
       closeCollapsible(state, { type, uid }) {
         const idx = state.stateQueryParameters[type].indexOf(uid);

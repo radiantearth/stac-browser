@@ -122,10 +122,10 @@
   },
   "items": {
     "filter": "Filters",
-    "showFilter": "Show Filters",
     "hideFilter": "Hide Filters",
     "noTime": "No time given",
-    "noneAvailableForCollection": "No items available for this collection."
+    "noneAvailableForCollection": "No items available for this collection.",
+    "showFilter": "Show Filters"
   },
   "leaflet": {
     "close": "Close",
@@ -201,6 +201,7 @@
     "enterSearchTerms": "Enter one or more search terms...",
     "equalTo": "equal to",
     "filterBySpatialExtent": "Filter by spatial extent",
+    "filterCollection": "Filter Collection",
     "freeText": "Search Terms",
     "freeTextDescription": "Search for at least one of the given terms in fields such as the title and the description.",
     "greaterThan": "greater than",
@@ -225,6 +226,7 @@
     "notSupported": "Item Search is not supported by the API.",
     "placeholder": "Search...",
     "selectCollections": "Select one or multiple collections...",
+    "selectForItemSearch": "Select for Item Search",
     "sortOptions": {
       "datetime": "Date and Time",
       "id": "ID",
@@ -236,7 +238,8 @@
       "items": "Search for Items"
     },
     "temporalExtent": "Temporal Extent",
-    "title": "Search"
+    "title": "Search",
+    "useInItemSearch": "Open Collection in Item Search | Open {count} Collections in Item Search"
   },
   "showMore": "Show more...",
   "sidebar": {

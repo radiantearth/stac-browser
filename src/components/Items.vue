@@ -77,6 +77,10 @@ export default {
       type: Boolean,
       default: true
     },
+    showFilters: {
+      type: Boolean,
+      default: false
+    },
     apiFilters: {
       type: Object,
       default: () => ({})
@@ -93,7 +97,7 @@ export default {
   data() {
     return {
       shownItems: this.chunkSize,
-      filtersOpen: false,
+      filtersOpen: this.showFilters,
       sort: 0
     };
   },
@@ -133,8 +137,21 @@ export default {
       return false;
     }
   },
+  watch: {
+    showFilters() {
+      this.filter = this.showFilters;
+    },
+    filtersOpen() {
+      this.$emit('filtersShown', this.filtersOpen);
+    }
+  },
   created() {
     this.sort = this.cardViewSort;
+  },
+  mounted() {
+    if (this.showFilters) {
+      setTimeout(() => Utils.scrollTo(this.$el), 250);
+    }
   },
   methods: {
     emitFilter(value, reset) {
