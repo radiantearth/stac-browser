@@ -1,4 +1,8 @@
 {
+  "actions": {
+    "openIn": "Open in {service}"
+  },
+  "additionalActions": "Additional Actions",
   "additionalResources": "Resurse suplimentare",
   "anonymized": {
     "title": "Anonimizat"
@@ -118,8 +122,10 @@
   },
   "items": {
     "filter": "Filtrat",
+    "hideFilter": "Hide Filters",
     "noTime": "Niciun timp selectat",
-    "noneAvailableForCollection": "Nu există articole disponibile pentru această colecție."
+    "noneAvailableForCollection": "Nu există articole disponibile pentru această colecție.",
+    "showFilter": "Show Filters"
   },
   "leaflet": {
     "close": "Închidere",
@@ -187,18 +193,29 @@
     "addCollections": "Apăsați Enter pentru a adăuga o colecție",
     "addFilter": "Adăugați un filtru",
     "addItemIds": "Apăsați Enter pentru a adăuga un ID de articol",
+    "addSearchTerm": "Press enter to add a search term",
     "additionalFilters": "Filtre suplimentare",
     "dateDescription": "Toate orele sunt timp universal coordonat (UTC).",
     "enterCollections": "Introduceți una sau mai multe colecții...",
     "enterItemIds": "Introduceți unul sau mai multe ID-uri de articol...",
+    "enterSearchTerms": "Enter one or more search terms...",
     "equalTo": "egal cu",
     "filterBySpatialExtent": "Filtrați după extinderea spațială",
+    "filterCollection": "Filter Collection",
+    "freeText": "Search Terms",
+    "freeTextDescription": "Search for at least one of the given terms in fields such as the title and the description.",
     "greaterThan": "mai mare decât",
+    "greaterThanEqual": "greater than or equal to",
     "itemIds": "Identificatori de elemente",
     "itemsPerPage": "Elemente per pagină",
     "itemsPerPageDescription": "Număr de elemente solicitate pe pagină, max. {maxItems} elemente",
     "lessThan": "mai puțin decât",
+    "lessThanEqual": "less than or equal to",
     "likeOperatorDescription": "Puteți folosi metacaracterele. `_` se potrivește cu un singur caracter, `%` se potrivește cu orice număr de caractere. Pentru a căuta în mod specific un wildcard, trebuie să adăugați un `\\` în fața caracterului.",
+    "logical": {
+      "and": "Match all filters (and)",
+      "or": "Match any filters (or)"
+    },
     "matches": "corespunde cu",
     "metaDescription": "Căutați în oferta de date a {title}.",
     "modifyCriteria": "Vă rugăm să modificați criteriile de căutare.",
@@ -209,14 +226,20 @@
     "notSupported": "Căutarea articolelor nu este acceptată de API.",
     "placeholder": "Căutare...",
     "selectCollections": "Selectați una sau mai multe colecții...",
+    "selectForItemSearch": "Select for Item Search",
     "sortOptions": {
       "datetime": "Data și ora",
       "id": "Identificator",
       "title": "Titlu"
     },
     "spatialExtent": "Întinderea spațială",
+    "tabs": {
+      "collections": "Search for Collections",
+      "items": "Search for Items"
+    },
     "temporalExtent": "Interval de timp",
-    "title": "Căutare"
+    "title": "Căutare",
+    "useInItemSearch": "Open Collection in Item Search | Open {count} Collections in Item Search"
   },
   "showMore": "Afișați mai multe...",
   "sidebar": {
@@ -234,6 +257,7 @@
     "title": "Sortare"
   },
   "source": {
+    "conformanceClasses": "Conformance Classes",
     "detailsAboutSource": "Despre sursa STAC",
     "fileFormat": "Formatul fișierului",
     "label": "Sursă",
@@ -253,6 +277,7 @@
       "twitter": "Twitter",
       "withOthers": "Partajați această pagină"
     },
+    "stacExtension": "STAC Extension",
     "stacVersion": "Versiune STAC",
     "statistics": "Statistici",
     "title": "Date sursă",
