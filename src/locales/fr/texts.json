@@ -1,4 +1,8 @@
 {
+  "actions": {
+    "openIn": "Open in {service}"
+  },
+  "additionalActions": "Additional Actions",
   "additionalResources": "Ressources supplémentaires",
   "anonymized": {
     "title": "Anonymat"
@@ -118,8 +122,10 @@
   },
   "items": {
     "filter": "Filtres",
+    "hideFilter": "Hide Filters",
     "noTime": "Aucun temps sélectionné",
-    "noneAvailableForCollection": "Aucun item disponible pour cette collection."
+    "noneAvailableForCollection": "Aucun item disponible pour cette collection.",
+    "showFilter": "Show Filters"
   },
   "leaflet": {
     "close": "Fermer",
@@ -187,12 +193,17 @@
     "addCollections": "Appuyer sur Entrée pour ajouter une Collection",
     "addFilter": "Ajouter un filtre",
     "addItemIds": "Appuyer sur Entrée pour ajouter un ID Élément",
+    "addSearchTerm": "Press enter to add a search term",
     "additionalFilters": "Filtres supplémentaires",
     "dateDescription": "Toutes les heures sont en temps universel coordonné (UTC).",
     "enterCollections": "Saisissez une ou plusieurs collections...",
     "enterItemIds": "Saisissez un ou plusieurs identifiants d'éléments...",
+    "enterSearchTerms": "Enter one or more search terms...",
     "equalTo": "égal à",
     "filterBySpatialExtent": "Filtrer par étendue spatiale",
+    "filterCollection": "Filter Collection",
+    "freeText": "Search Terms",
+    "freeTextDescription": "Search for at least one of the given terms in fields such as the title and the description.",
     "greaterThan": "supérieur à",
     "greaterThanEqual": "supérieur ou égal à",
     "itemIds": "Identifiants des éléments",
@@ -215,14 +226,20 @@
     "notSupported": "La recherche d'éléments n'est pas pris en charge par l'API.",
     "placeholder": "Rechercher...",
     "selectCollections": "Sélectionnez une ou plusieurs collections...",
+    "selectForItemSearch": "Select for Item Search",
     "sortOptions": {
       "datetime": "Date et heure",
       "id": "Identifiant",
       "title": "Titre"
     },
     "spatialExtent": "Étendue spatiale",
+    "tabs": {
+      "collections": "Search for Collections",
+      "items": "Search for Items"
+    },
     "temporalExtent": "Étendue temporelle",
-    "title": "Rechercher"
+    "title": "Rechercher",
+    "useInItemSearch": "Open Collection in Item Search | Open {count} Collections in Item Search"
   },
   "showMore": "Montrer plus...",
   "sidebar": {
