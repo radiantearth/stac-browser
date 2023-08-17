@@ -1,4 +1,8 @@
 {
+  "actions": {
+    "openIn": "Open in {service}"
+  },
+  "additionalActions": "Additional Actions",
   "additionalResources": "Altre risorse",
   "anonymized": {
     "title": "Anonimizzato"
@@ -118,8 +122,10 @@
   },
   "items": {
     "filter": "Filtri",
+    "hideFilter": "Hide Filters",
     "noTime": "Nessuna data/ora indicata",
-    "noneAvailableForCollection": "Non ci sono Elementi disponibili per questa Collezione."
+    "noneAvailableForCollection": "Non ci sono Elementi disponibili per questa Collezione.",
+    "showFilter": "Show Filters"
   },
   "leaflet": {
     "close": "Chiudi",
@@ -187,18 +193,29 @@
     "addCollections": "Premi invio per aggiungere una Collezione",
     "addFilter": "Aggiungi filtro",
     "addItemIds": "Premi invio per aggiungere l'ID di un Elemento",
+    "addSearchTerm": "Press enter to add a search term",
     "additionalFilters": "Filtri aggiuntivi",
     "dateDescription": "Data/ora nel sistema UTC (tempo coordinato internazionale).",
     "enterCollections": "Inserire una o più Collezioni...",
     "enterItemIds": "Inserire uno o più ID di Elemento...",
+    "enterSearchTerms": "Enter one or more search terms...",
     "equalTo": "uguale a",
     "filterBySpatialExtent": "Filtra per estensione spaziale",
+    "filterCollection": "Filter Collection",
+    "freeText": "Search Terms",
+    "freeTextDescription": "Search for at least one of the given terms in fields such as the title and the description.",
     "greaterThan": "maggiore di",
+    "greaterThanEqual": "greater than or equal to",
     "itemIds": "ID di Elementi",
     "itemsPerPage": "Elementi per pagina",
     "itemsPerPageDescription": "Numero di Elementi richiesti per pagina, massimo {maxItems} Elementi.",
     "lessThan": "minore di",
+    "lessThanEqual": "less than or equal to",
     "likeOperatorDescription": "Puoi usare i caratteri jolly. `_` corrisponde ad un singolo carattere, `%` corrisponde ad un numero qualsiasi di caratteri. Per cercare un carattere jolly in modo specifico, devi aggiungere `\\` davanti al carattere.",
+    "logical": {
+      "and": "Match all filters (and)",
+      "or": "Match any filters (or)"
+    },
     "matches": "corrisponde a",
     "metaDescription": "Cerca tra i dati offerti da {title}.",
     "modifyCriteria": "Modifica i criteri di ricerca.",
@@ -209,14 +226,20 @@
     "notSupported": "La ricerca di Elementi non è supportata dall'API.",
     "placeholder": "Cerca...",
     "selectCollections": "Selezionare una o più Collezioni...",
+    "selectForItemSearch": "Select for Item Search",
     "sortOptions": {
       "datetime": "Data e ora",
       "id": "ID",
       "title": "Titolo"
     },
     "spatialExtent": "Estensione spaziale",
+    "tabs": {
+      "collections": "Search for Collections",
+      "items": "Search for Items"
+    },
     "temporalExtent": "Estensione temporale",
-    "title": "Ricerca"
+    "title": "Ricerca",
+    "useInItemSearch": "Open Collection in Item Search | Open {count} Collections in Item Search"
   },
   "showMore": "Mostra di più...",
   "sidebar": {
@@ -234,6 +257,7 @@
     "title": "Ordina"
   },
   "source": {
+    "conformanceClasses": "Conformance Classes",
     "detailsAboutSource": "Informazioni sulla fonte STAC",
     "fileFormat": "Formato file",
     "label": "Fonte",
@@ -253,6 +277,7 @@
       "twitter": "Twitter",
       "withOthers": "Condividi questa pagina con altri"
     },
+    "stacExtension": "STAC Extension",
     "stacVersion": "Versione STAC",
     "statistics": "Statistiche",
     "title": "Fonte dati",
