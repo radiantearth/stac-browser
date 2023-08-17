@@ -129,9 +129,24 @@ Validation is automatically disabled in the following cases:
 
 ***build-only option***
 
-STAC Browser defaults to using [HTML5 History Mode](https://v3.router.vuejs.org/guide/essentials/history-mode.html#html5-history-mode),
-which can cause problems on certain web hosts. To use _hash mode_, set `--historyMode=hash` when running or building.
-This will be compatible with S3, stock Apache, etc.
+### `history`
+STAC Browser defaults to _history mode_ (value `history` in the config file), which is based on 
+[HTML5 History Mode](https://v3.router.vuejs.org/guide/essentials/history-mode.html#html5-history-mode).
+It gives the best experience and allows search engines to better crawl STAC Browser so that it can be found in search engines.
+
+**History mode requires that you enable custom URL rewriting rules on your host/server**, otherwise people can not reload pages 
+or share URLs without getting a "page not found" error (404).
+The following link explains the details and provides examples for various common server software:
+**<https://v3.router.vuejs.org/guide/essentials/history-mode.html#example-server-configurations>**
+
+Please note that you can't host any other files in the folder that STAC Browser is in as the URL rewriting
+will redirect all requests to these (sub)-folders and included files to STAC Browser.
+This also excludes hosting your STAC catalog in the STAC Browser (sub-)folders.
+
+### `hash`
+If your host/server doesn't support URL rewriting or you experience other related problems, you can enable _hash mode_.
+Either set this option to `hash` in the config file or append `--historyMode=hash` when running or building.
+Known hosts that require hash mode are Amazon S3 and GitHub Pages.
 
 ## pathPrefix
 
