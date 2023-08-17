@@ -31,6 +31,7 @@
           <Catalogs
             v-if="isCollectionSearch" :catalogs="results" collectionsOnly
             :pagination="pagination" :loading="loading" @paginate="loadResults"
+            :count="totalCount"
           >
             <template #catalogFooter="slot">
               <b-button-group v-if="canSearchItems || canFilterItems(slot.data)" vertical size="sm">
@@ -47,6 +48,7 @@
             v-else
             :stac="stac" :items="results" :api="true" :allowFilter="false"
             :pagination="pagination" :loading="loading" @paginate="loadResults"
+            :count="totalCount"
           />
         </template>
       </b-col>
@@ -108,6 +110,12 @@ export default {
     ...mapGetters(['canSearch', 'canSearchItems', 'canSearchCollections', 'getStac', 'root', 'collectionLink', 'parentLink', 'fromBrowserPath', 'toBrowserPath']),
     selectedCollectionCount() {
       return Utils.size(this.selectedCollections);
+    },
+    totalCount() {
+      if (typeof this.data.numberMatched === 'number') {
+        return this.data.numberMatched;
+      }
+      return null;
     },
     stac() {
       if (this.parent instanceof STAC) {

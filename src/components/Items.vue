@@ -2,7 +2,7 @@
   <section class="items mb-4">
     <header>
       <h2 class="title mr-2">{{ $tc('stacItem', items.length ) }}</h2>
-      <b-badge v-if="!api && items.length > 0" pill variant="secondary" class="mr-4">{{ items.length }}</b-badge>
+      <b-badge v-if="itemCount !== null" pill variant="secondary" class="mr-4">{{ itemCount }}</b-badge>
       <SortButtons v-if="!api && items.length > 1" v-model="sort" />
     </header>
 
@@ -92,6 +92,10 @@ export default {
     chunkSize: {
       type: Number,
       default: 90
+    },
+    count: {
+      type: Number,
+      default: null
     }
   },
   data() {
@@ -103,6 +107,15 @@ export default {
   },
   computed: {
     ...mapState(['cardViewSort', 'uiLanguage']),
+    itemCount() {
+      if (this.count !== null) {
+        return this.count;
+      }
+      else if (!this.api && this.items.length > 0) {
+        return this.items.length;
+      }
+      return null;
+    },
     hasMore() {
       return this.items.length > this.shownItems;
     },
