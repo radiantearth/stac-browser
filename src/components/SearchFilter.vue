@@ -40,9 +40,11 @@
           >
             <template #noOptions>{{ $t('search.noOptions') }}</template>
             <template v-if="additionalCollectionCount > 0" #afterList>
-              <li><strong class="multiselect__option multiselect__option--disabled">
-                {{ $t("multiselect.andMore", {count: additionalCollectionCount}) }}
-              </strong></li>
+              <li>
+                <strong class="multiselect__option multiselect__option--disabled">
+                  {{ $t("multiselect.andMore", {count: additionalCollectionCount}) }}
+                </strong>
+              </li>
             </template>
           </multiselect>
         </b-form-group>
