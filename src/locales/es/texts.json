@@ -1,4 +1,8 @@
 {
+  "actions": {
+    "openIn": "Open in {service}"
+  },
+  "additionalActions": "Additional Actions",
   "additionalResources": "Recursos adicionales",
   "anonymized": {
     "title": "Anonimizado"
@@ -118,8 +122,10 @@
   },
   "items": {
     "filter": "Filtros",
+    "hideFilter": "Hide Filters",
     "noTime": "No se indicó un tiempo",
-    "noneAvailableForCollection": "No hay elementos disponibles para esta colección."
+    "noneAvailableForCollection": "No hay elementos disponibles para esta colección.",
+    "showFilter": "Show Filters"
   },
   "leaflet": {
     "close": "Cerrar",
@@ -187,12 +193,17 @@
     "addCollections": "Presione enter para añadir una colección",
     "addFilter": "Añadir filtro",
     "addItemIds": "Presione enter para añadir el ID de un elemento",
+    "addSearchTerm": "Press enter to add a search term",
     "additionalFilters": "Filtros adicionales",
     "dateDescription": "Todas las horas en Coordinated Universal Time (UTC).",
     "enterCollections": "Introduzca una o varias colecciones...",
     "enterItemIds": "Introduzca una o varias IDs de Elemento...",
+    "enterSearchTerms": "Enter one or more search terms...",
     "equalTo": "igual a",
     "filterBySpatialExtent": "Filtra por extensión espacial",
+    "filterCollection": "Filter Collection",
+    "freeText": "Search Terms",
+    "freeTextDescription": "Search for at least one of the given terms in fields such as the title and the description.",
     "greaterThan": "mayor que",
     "greaterThanEqual": "igual o mayor que",
     "itemIds": "IDs de Elementos",
@@ -215,14 +226,20 @@
     "notSupported": "La API no soporta la Búsqueda por Elementos.",
     "placeholder": "Búsqueda...",
     "selectCollections": "Seleccione una o varias colecciones...",
+    "selectForItemSearch": "Select for Item Search",
     "sortOptions": {
       "datetime": "Fecha y hora",
       "id": "ID",
       "title": "Título"
     },
     "spatialExtent": "Extensión espacial",
+    "tabs": {
+      "collections": "Search for Collections",
+      "items": "Search for Items"
+    },
     "temporalExtent": "Extensión temporal",
-    "title": "Buscar"
+    "title": "Buscar",
+    "useInItemSearch": "Open Collection in Item Search | Open {count} Collections in Item Search"
   },
   "showMore": "Mostrar más...",
   "sidebar": {
@@ -240,6 +257,7 @@
     "title": "Ordenar"
   },
   "source": {
+    "conformanceClasses": "Conformance Classes",
     "detailsAboutSource": "Detalles sobre la fuente STAC",
     "fileFormat": "Formato de archivo",
     "label": "Fuente",
@@ -259,6 +277,7 @@
       "twitter": "Twitter",
       "withOthers": "Comparta esta página con otros"
     },
+    "stacExtension": "STAC Extension",
     "stacVersion": "Versión STAC",
     "statistics": "Estadísticas",
     "title": "Fuente de datos",
