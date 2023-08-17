@@ -122,10 +122,10 @@
   },
   "items": {
     "filter": "Filter",
-    "showFilter": "Zeige Filter",
     "hideFilter": "Verstecke Filter",
     "noTime": "Keine Zeit angegeben",
-    "noneAvailableForCollection": "Für diesen Katalog sind keine Elemente verfügbar."
+    "noneAvailableForCollection": "Für diesen Katalog sind keine Elemente verfügbar.",
+    "showFilter": "Zeige Filter"
   },
   "leaflet": {
     "close": "Schließen",
