@@ -175,8 +175,8 @@ npm start -- --open --stacProxyUrl=/home/user http://localhost:8888
 ```
 
 Notice the format of the value:
-* In CLI it is the original location and the proxy location separated by the `;` character, i.e. `{original};{proxy}`.
-* In the config file it is a two-element array with the original location as first element and the proxy location as the second element. Set to `null` to disable (default).
+* In CLI it is the original location and the proxy location separated by a space character, i.e. `{original} {proxy}` as in the example above.
+* In the config file it is a two-element array with the original location as first element and the proxy location as the second element. Set the option to `null` to disable it (default).
 
 In this example, any href contained in the STAC (including link or asset hrefs) will replace any occurrence of `/home/user/` with `http://localhost:8888`.
 
