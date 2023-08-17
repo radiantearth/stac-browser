@@ -39,6 +39,11 @@
             @search-change="searchCollections"
           >
             <template #noOptions>{{ $t('search.noOptions') }}</template>
+            <template v-if="additionalCollectionCount > 0" #afterList>
+              <li><strong class="multiselect__option multiselect__option--disabled">
+                {{ $t("multiselect.andMore", {count: additionalCollectionCount}) }}
+              </strong></li>
+            </template>
           </multiselect>
         </b-form-group>
 
@@ -205,7 +210,8 @@ export default {
       queryables: null,
       hasAllCollections: false,
       collections: [],
-      collectionsLoadingTimer: null
+      collectionsLoadingTimer: null,
+      additionalCollectionCount: 0
     }, getDefaults());
   },
   computed: {
@@ -213,6 +219,7 @@ export default {
     ...mapGetters(['canSearchCollections', 'supportsConformance']),
     collectionSelectOptions() {
       let taggable = !this.hasAllCollections;
+      let isResult = this.collections.length > 0 && !this.hasAllCollections;
       return {
         id: this.ids.collections,
         value: this.selectedCollections,
@@ -228,7 +235,8 @@ export default {
         deselectLabel: this.$t('multiselect.deselectLabel'),
         limitText: count => this.$t("multiselect.andMore", {count}),
         loading: this.collectionsLoadingTimer !== null,
-        showNoResults: false
+        showNoResults: false,
+        internalSearch: !isResult
       };
     },
     collectionSearchLink() {
@@ -341,6 +349,7 @@ export default {
         return;
       }
       this.resetSearchCollection();
+      this.additionalCollectionCount = 0;
       if (typeof text !== 'string' || text.trim().length < 2) {
         this.collections = [];
         return;
@@ -353,6 +362,9 @@ export default {
           // If collectionsLoadingTimer has been reset, the result is not relevant anylonger.
           if (this.collectionsLoadingTimer && Utils.isObject(response.data) && Array.isArray(response.data.collections)) {
             this.collections = this.prepareCollections(response.data.collections);
+            if (typeof response.data.numberMatched === 'number') {
+              this.additionalCollectionCount = response.data.numberMatched - this.collections.length;
+            }
           }
         } catch (error) {
           console.error(error);

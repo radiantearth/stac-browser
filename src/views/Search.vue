@@ -39,7 +39,7 @@
                   <b-icon-square v-else />
                   <span class="ml-2">{{ $t('search.selectForItemSearch') }}</span>
                 </b-button>
-                <StacLink :button="{variant: 'outline-primary', disabled: canFilterItems(slot.data)}" :data="slot.data" :title="$t('search.filterCollection')" :state="{itemFilterOpen: 1}" />
+                <StacLink :button="{variant: 'outline-primary', disabled: !canFilterItems(slot.data)}" :data="slot.data" :title="$t('search.filterCollection')" :state="{itemFilterOpen: 1}" />
               </b-button-group>
             </template>
           </Catalogs>
