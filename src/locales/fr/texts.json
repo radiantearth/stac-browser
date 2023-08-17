@@ -1,8 +1,8 @@
 {
   "actions": {
-    "openIn": "Open in {service}"
+    "openIn": "Ouvrir dans {service}"
   },
-  "additionalActions": "Additional Actions",
+  "additionalActions": "Actions supplémentaires",
   "additionalResources": "Ressources supplémentaires",
   "anonymized": {
     "title": "Anonymat"
@@ -122,10 +122,10 @@
   },
   "items": {
     "filter": "Filtres",
-    "hideFilter": "Hide Filters",
+    "hideFilter": "Masquer les filtres",
     "noTime": "Aucun temps sélectionné",
     "noneAvailableForCollection": "Aucun item disponible pour cette collection.",
-    "showFilter": "Show Filters"
+    "showFilter": "Afficher les filtres"
   },
   "leaflet": {
     "close": "Fermer",
@@ -193,17 +193,17 @@
     "addCollections": "Appuyer sur Entrée pour ajouter une Collection",
     "addFilter": "Ajouter un filtre",
     "addItemIds": "Appuyer sur Entrée pour ajouter un ID Élément",
-    "addSearchTerm": "Press enter to add a search term",
+    "addSearchTerm": "Appuyez sur entrée pour ajouter un terme de recherche",
     "additionalFilters": "Filtres supplémentaires",
     "dateDescription": "Toutes les heures sont en temps universel coordonné (UTC).",
     "enterCollections": "Saisissez une ou plusieurs collections...",
     "enterItemIds": "Saisissez un ou plusieurs identifiants d'éléments...",
-    "enterSearchTerms": "Enter one or more search terms...",
+    "enterSearchTerms": "Saisissez un ou plusieurs termes de recherche...",
     "equalTo": "égal à",
     "filterBySpatialExtent": "Filtrer par étendue spatiale",
-    "filterCollection": "Filter Collection",
-    "freeText": "Search Terms",
-    "freeTextDescription": "Search for at least one of the given terms in fields such as the title and the description.",
+    "filterCollection": "Filtrer la collection",
+    "freeText": "Mots clé de recherche",
+    "freeTextDescription": "Rechercher au moins un des termes donnés dans des champs tels que le titre et la description.",
     "greaterThan": "supérieur à",
     "greaterThanEqual": "supérieur ou égal à",
     "itemIds": "Identifiants des éléments",
@@ -226,7 +226,7 @@
     "notSupported": "La recherche d'éléments n'est pas pris en charge par l'API.",
     "placeholder": "Rechercher...",
     "selectCollections": "Sélectionnez une ou plusieurs collections...",
-    "selectForItemSearch": "Select for Item Search",
+    "selectForItemSearch": "Sélectionner pour la recherche d'élément",
     "sortOptions": {
       "datetime": "Date et heure",
       "id": "Identifiant",
@@ -234,12 +234,12 @@
     },
     "spatialExtent": "Étendue spatiale",
     "tabs": {
-      "collections": "Search for Collections",
-      "items": "Search for Items"
+      "collections": "Rechercher des collections",
+      "items": "Rechercher des éléments"
     },
     "temporalExtent": "Étendue temporelle",
     "title": "Rechercher",
-    "useInItemSearch": "Open Collection in Item Search | Open {count} Collections in Item Search"
+    "useInItemSearch": "Ouvrir la collection dans la recherche d'élément | Ouvrir les collections {count} dans la recherche d'élément"
   },
   "showMore": "Montrer plus...",
   "sidebar": {
