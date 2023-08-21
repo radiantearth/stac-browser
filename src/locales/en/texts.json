@@ -121,7 +121,9 @@
     "urlMissingProtocol": "The URL is missing a protocol."
   },
   "items": {
-    "filter": "Filter",
+    "filter": "Filters",
+    "showFilter": "Show Filters",
+    "hideFilter": "Hide Filters",
     "noTime": "No time given",
     "noneAvailableForCollection": "No items available for this collection."
   },
@@ -186,16 +188,13 @@
     "less": "Read less",
     "more": "Read more"
   },
+  "reset": "Reset",
   "search": {
     "addCollections": "Press enter to add a collection",
     "addFilter": "Add filter",
     "addItemIds": "Press enter to add an Item ID",
     "addSearchTerm": "Press enter to add a search term",
     "additionalFilters": "Additional filters",
-    "buttons": {
-      "filter": "Filter",
-      "reset": "Reset"
-    },
     "dateDescription": "All times in Coordinated Universal Time (UTC).",
     "enterCollections": "Enter one or more Collection IDs...",
     "enterItemIds": "Enter one or more Item IDs...",

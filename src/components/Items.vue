@@ -8,8 +8,8 @@
 
     <Pagination ref="topPagination" v-if="showPagination" :pagination="pagination" placement="top" @paginate="paginate" />
     <template v-if="allowFilter">
-      <b-button v-if="api" v-b-toggle.itemFilter class="mb-4 mt-2" :class="{'ml-3': showPagination}" :pressed="filtersOpen" variant="outline-primary">
-        <b-icon-search /> {{ $t('items.filter') }}
+      <b-button v-if="api" v-b-toggle.itemFilter class="mb-4 mt-2" :class="{'ml-3': showPagination}" variant="outline-primary">
+        <b-icon-search /> {{ filtersOpen ? $t('items.hideFilter') : $t('items.showFilter') }}
       </b-button>
       <b-collapse id="itemFilter" v-model="filtersOpen">
         <SearchFilter

@@ -117,7 +117,7 @@
     "urlMissingProtocol": "Le lien URL ne contient pas de protocole."
   },
   "items": {
-    "filter": "Filtre",
+    "filter": "Filtres",
     "noTime": "Aucun temps sélectionné",
     "noneAvailableForCollection": "Aucun item disponible pour cette collection."
   },
@@ -182,15 +182,12 @@
     "less": "Lire moins",
     "more": "Lire plus"
   },
+  "reset": "Réinitialiser",
   "search": {
     "addCollections": "Appuyer sur Entrée pour ajouter une Collection",
     "addFilter": "Ajouter un filtre",
     "addItemIds": "Appuyer sur Entrée pour ajouter un ID Élément",
     "additionalFilters": "Filtres supplémentaires",
-    "buttons": {
-      "filter": "Filtrer",
-      "reset": "Réinitialiser"
-    },
     "dateDescription": "Toutes les heures sont en temps universel coordonné (UTC).",
     "enterCollections": "Saisissez une ou plusieurs collections...",
     "enterItemIds": "Saisissez un ou plusieurs identifiants d'éléments...",

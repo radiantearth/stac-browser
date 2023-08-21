@@ -117,7 +117,7 @@
     "urlMissingProtocol": "La URL no tiene protocolo."
   },
   "items": {
-    "filter": "Filtro",
+    "filter": "Filtros",
     "noTime": "No se indicó un tiempo",
     "noneAvailableForCollection": "No hay elementos disponibles para esta colección."
   },
@@ -182,15 +182,12 @@
     "less": "Leer menos",
     "more": "Leer más"
   },
+  "reset": "Restablecer",
   "search": {
     "addCollections": "Presione enter para añadir una colección",
     "addFilter": "Añadir filtro",
     "addItemIds": "Presione enter para añadir el ID de un elemento",
     "additionalFilters": "Filtros adicionales",
-    "buttons": {
-      "filter": "Filtro",
-      "reset": "Restablecer"
-    },
     "dateDescription": "Todas las horas en Coordinated Universal Time (UTC).",
     "enterCollections": "Introduzca una o varias colecciones...",
     "enterItemIds": "Introduzca una o varias IDs de Elemento...",
