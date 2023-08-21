@@ -32,6 +32,14 @@ export default {
     tooltip: {
       type: String,
       default: null
+    },
+    button: {
+      type: [Boolean, Object],
+      default: false
+    },
+    state: {
+      type: Object,
+      default: null
     }
   },
   computed: {
@@ -81,11 +89,15 @@ export default {
       return stacBrowserNavigatesTo.includes(this.link.rel);
     },
     attributes() {
-      if (this.isStacBrowserLink) {
-        return {
+      if (this.isStacBrowserLink || this.button) {
+        let obj = {
           to: this.href,
           rel: this.rel
         };
+        if (Utils.isObject(this.button)) {
+          Object.assign(obj, this.button);
+        }
+        return obj;
       }
       else {
         return {
@@ -96,6 +108,9 @@ export default {
       }
     },
     component() {
+      if (this.button) {
+        return 'b-button';
+      }
       return this.isStacBrowserLink ? 'router-link' : 'a';
     },
     href() {
@@ -112,14 +127,18 @@ export default {
         }
 
         // Add private query parameters to links: https://github.com/radiantearth/stac-browser/issues/142
-        if (Utils.size(this.privateQueryParameters) > 0) {
+        if (Utils.size(this.privateQueryParameters) > 0 || Utils.size(this.state) > 0) {
           let uri = URI(href);
-          for(let key in this.privateQueryParameters) {
-            let queryKey = `~${key}`;
-            if (!uri.hasQuery(queryKey)) {
-              uri.addQuery(queryKey, this.privateQueryParameters[key]);
+          let addParameters = (obj, prefix) => {
+            for(let key in obj) {
+              let queryKey = `${prefix}${key}`;
+              if (!uri.hasQuery(queryKey)) {
+                uri.addQuery(queryKey, obj[key]);
+              }
             }
-          }
+          };
+          addParameters(this.privateQueryParameters, '~');
+          addParameters(this.state, '.');
           href = uri.toString();
         }
 
