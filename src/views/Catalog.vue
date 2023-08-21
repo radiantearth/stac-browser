@@ -46,9 +46,11 @@
       </b-col>
       <b-col class="items-container" v-if="hasItems">
         <Items
-          :stac="data" :items="items" :api="isApi" :apiFilters="filters"
+          :stac="data" :items="items" :api="isApi"
+          :showFilters="showFilters" :apiFilters="filters"
           :pagination="itemPages" :loading="apiItemsLoading"
           @paginate="paginateItems" @filterItems="filterItems"
+          @filtersShown="filtersShown"
         />
         <Assets v-if="hasItemAssets" :assets="data.item_assets" :definition="true" />
       </b-col>
@@ -131,8 +133,11 @@ export default {
     };
   },
   computed: {
-    ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination', 'nextCollectionsLink']),
+    ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination', 'nextCollectionsLink', 'stateQueryParameters']),
     ...mapGetters(['additionalLinks', 'catalogs', 'collectionLink', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
+    showFilters() {
+      return Boolean(this.stateQueryParameters['itemFilterOpen']);
+    },
     hasThumbnails() {
       return this.thumbnails.length > 0;
     },
@@ -223,6 +228,9 @@ export default {
     }
   },
   methods: {
+    filtersShown(show) {
+        this.$store.commit('updateState', {type: 'itemFilterOpen', value: show ? 1 : null});
+    },
     loadMoreCollections() {
       this.$store.dispatch('loadNextApiCollections', {show: true});
     },

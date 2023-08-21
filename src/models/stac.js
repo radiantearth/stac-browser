@@ -123,7 +123,7 @@ class STAC {
       children.push(this._apiChildren.prev);
     }
     if (showCollections && this._apiChildren.list.length > 0) {
-      children = this._apiChildren.list;
+      children = this._apiChildren.list.slice(0);
     }
     if (showChilds) {
       children = STAC.addMissingChildren(children, this).concat(this.getLinksWithRels(['item']));
