@@ -504,7 +504,7 @@ export default {
       if (limit > this.maxItems) {
         limit = this.maxItems;
       }
-      else if (limit < 0) {
+      else if (typeof limit !== 'number' || isNaN(limit)|| limit < 1) {
         limit = null;
       }
       this.$set(this.query, 'limit', limit);

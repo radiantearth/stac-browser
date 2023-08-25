@@ -86,6 +86,10 @@ export default {
     popover: {
       type: Boolean,
       default: false
+    },
+    fitBoundsOnce: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -222,9 +226,11 @@ export default {
       this.$emit('viewChanged', event);
     },
     async showStacLayer() {
+      let hadLayer = false;
       if (this.stacLayer) {
         this.map.removeLayer(this.stacLayer);
         this.stacLayer = null;
+        hadLayer = true;
       }
       if (this.itemPreviewsLayer) {
         this.map.removeLayer(this.itemPreviewsLayer);
@@ -287,7 +293,9 @@ export default {
         this.addMapClickEvent(this.stacLayer);
         this.stacLayer.on("fallback", event => this.$emit('dataChanged', event.stac));
         this.stacLayer.addTo(this.map);
-        this.fitBounds(this.stacLayer, this.selectBounds);
+        if (!this.fitBoundsOnce || !hadLayer) {
+          this.fitBounds(this.stacLayer, this.selectBounds);
+        }
       }
 
       // Add item previews to the map

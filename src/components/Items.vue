@@ -8,12 +8,14 @@
 
     <Pagination ref="topPagination" v-if="showPagination" :pagination="pagination" placement="top" @paginate="paginate" />
     <template v-if="allowFilter">
-      <b-button v-if="api" v-b-toggle.itemFilter class="mb-4 mt-2" :class="{'ml-3': showPagination}" variant="outline-primary">
-        <b-icon-search /> {{ filtersOpen ? $t('items.hideFilter') : $t('items.showFilter') }}
+      <b-button v-if="api" v-b-toggle.itemFilter class="mb-4 mt-2" :class="{'ml-3': showPagination}" :variant="hasFilters && !filtersOpen ? 'primary' : 'outline-primary'">
+        <b-icon-search />
+        {{ filtersOpen ? $t('items.hideFilter') : $t('items.showFilter') }}
+        <b-badge v-if="hasFilters && !filtersOpen" variant="dark">{{ filterCount }}</b-badge>
       </b-button>
       <b-collapse id="itemFilter" v-model="filtersOpen">
         <SearchFilter
-          v-if="filtersOpen" type="Items"
+          type="Items"
           :title="$t('items.filter')" :parent="stac"
           :value="apiFilters" @input="emitFilter"
         />
@@ -119,8 +121,11 @@ export default {
     hasMore() {
       return this.items.length > this.shownItems;
     },
+    filterCount() {
+      return Object.values(this.apiFilters).filter(filter => !(filter === null || Utils.size(filter) === 0)).length;
+    },
     hasFilters() {
-      return Object.values(this.apiFilters).filter(filter => !(filter === null || Utils.size(filter) === 0)).length > 1; // > 1 as the limit is always present
+      return this.filterCount > 0;
     },
     chunkedItems() {
       let items = this.items;
