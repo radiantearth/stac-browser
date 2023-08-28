@@ -1,9 +1,9 @@
 let config;
-if (typeof CONFIG_PATH === 'undefined' && typeof CONFIG_CLI === 'undefined') {
+if (typeof CONFIG_PATH === 'undefined') {
   config = require('../config');
 }
 else {
-  config = Object.assign(require(CONFIG_PATH), CONFIG_CLI);
+  config = require(CONFIG_PATH);
 }
 
-export default config;
+export default Object.assign(config, CONFIG_CLI, window.STAC_BROWSER_CONFIG);

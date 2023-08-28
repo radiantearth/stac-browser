@@ -309,9 +309,15 @@ function getStore(config, router) {
         if (whitelist && Array.isArray(state.allowedDomains) && state.allowedDomains.includes(absoluteUrl.domain())) {
           return false;
         }
-        let relative = absoluteUrl.relativeTo(state.catalogUrl);
-        if (relative.equals(absoluteUrl)) {
-          return true;
+        let relative;
+        if (absoluteUrl.is("relative")) {
+          relative = absoluteUrl;
+        }
+        else {
+          relative = absoluteUrl.relativeTo(state.catalogUrl);
+          if (relative.equals(absoluteUrl)) {
+            return true;
+          }
         }
         let relativeStr = relative.toString();
         return relativeStr.startsWith('//') || relativeStr.startsWith('../');
@@ -378,15 +384,6 @@ function getStore(config, router) {
                 state.catalogUrl = value;
               }
               break;
-            case 'stacProxyUrl':
-              // Proxy URLs coming from CLI have the form https://thingtoproxy.com;http://proxy:111
-              if (typeof value === 'string' && value.includes(';')) {
-                state[key] = value.split(';');
-              }
-              else {
-                state[key] = value;
-              }
-              break;
             case 'crossOriginMedia':
               state.crossOriginMedia = ['anonymous', 'use-credentials'].includes(value) ? value : null;
               break;
@@ -439,15 +436,23 @@ function getStore(config, router) {
       setAuthData(state, value) {
         state.authData = value;
       },
+      state(state, newState) {
+        state.stateQueryParameters = newState;
+      },
+      updateState(state, {type, value}) {
+        if (value === null || typeof value === 'undefined') {
+          Vue.delete(state.stateQueryParameters, type);
+        }
+        else {
+          Vue.set(state.stateQueryParameters, type, value);
+        }
+      },
       openCollapsible(state, { type, uid }) {
         const idx = state.stateQueryParameters[type].indexOf(uid);
         // need to prevent duplicates because of the way the collapse v-model works
         if (idx === -1) {
           state.stateQueryParameters[type].push(uid);
         }
-      },
-      state(state, newState) {
-        state.stateQueryParameters = newState;
       },
       closeCollapsible(state, { type, uid }) {
         const idx = state.stateQueryParameters[type].indexOf(uid);
@@ -567,7 +572,7 @@ function getStore(config, router) {
         }
 
         // Handle pagination links
-        let pages = Utils.getPaginationLinks(data.links);
+        let pages = Utils.getPaginationLinks(data);
 
         if (show) {
           state.apiItemsPagination = pages;
@@ -696,16 +701,10 @@ function getStore(config, router) {
         cx.commit('parents', parents);
       },
       async load(cx, args) {
-        let { url, fromBrowser, show, loadApi, loadRoot, force } = args;
-        let path;
-        if (fromBrowser) {
-          path = url.startsWith('/') ? url : '/' + url;
-          url = cx.getters.fromBrowserPath(url);
-        }
-        else {
-          url = Utils.toAbsolute(url, cx.state.url);
-          path = cx.getters.toBrowserPath(url);
-        }
+        let { url, show, loadApi, loadRoot, force } = args;
+
+        let path = cx.getters.toBrowserPath(url);
+        url = Utils.toAbsolute(url, cx.state.url);
 
         // Load the root catalog data if not available (e.g. after page refresh or external access)
         if (!loadRoot && path !== '/' && cx.state.catalogUrl && !cx.getters.getStac(cx.state.catalogUrl)) {

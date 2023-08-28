@@ -3,6 +3,10 @@ html, body {
     width: 100%;
 }
 
+body {
+    margin-top: $header-margin;
+}
+
 #stac-browser {
     display: flex;
     flex-direction: column;
@@ -19,7 +23,7 @@ html, body {
         padding-top: $block-margin;
 
         .lead {
-            color: $gray-600;
+            color: map-get($theme-colors, 'secondary');
         }
     }
     .logo {
@@ -59,7 +63,7 @@ html, body {
     }
 
     h2 {
-        color: $gray-600;
+        color: map-get($theme-colors, 'secondary');
         font-weight: 600;
     }
 
@@ -138,12 +142,23 @@ html, body {
         }
     }
 
-    .btn-group {
-        .btn-primary {
+    .btn-group, .btn-group-vertical {
+        .btn-primary, .btn-secondary {
             border-color: darken(map-get($theme-colors, "primary"), 15%);
             &:hover {
                 border-color: darken(map-get($theme-colors, "primary"), 30%);
             }
+        }
+        .btn-secondary {
+            background-color: lighten(desaturate(map-get($theme-colors, "primary"), 50%), 20%);
+            &:hover {
+                background-color: darken(map-get($theme-colors, "primary"), 5%);
+            }
+        }
+    }
+    .btn-group-vertical.actions {
+        .btn {
+            text-align: left
         }
     }
 
@@ -166,6 +181,58 @@ html, body {
     @include media-breakpoint-up(md) {
         .button-label {
             display: inline;
+        }
+    }
+
+    .expandable-card > .card-header {
+        padding: 0;
+        background-color: transparent;
+    }
+    .expandable-card > .card-header > .btn,
+    .mimic-expandable-card > .list-group-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.5rem;
+        background-color: rgba(0,0,0,0.03);
+        
+        > .title {
+            text-align: left;
+            flex-grow: 9;
+        }
+        > .badges {
+            flex-grow: 1;
+            text-align: right;
+
+            .badge {
+                margin: 0.125rem;
+                text-transform: uppercase;
+            }
+        }
+    }
+
+    
+    .items, .catalogs {
+        > .list {
+            position: relative;
+        }
+    
+        > header {
+            margin-bottom: 0.5rem;
+
+            > h2.title {
+                vertical-align: middle;
+                display: inline-block;
+                margin-bottom: 0.25rem;
+            }
+            .badge {
+                vertical-align: middle;
+            }
+            .btn-group {
+                vertical-align: middle;
+                margin: 0.25rem 0;
+            }
         }
     }
 }

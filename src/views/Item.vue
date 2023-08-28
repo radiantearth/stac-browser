@@ -37,7 +37,6 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
-import Assets from '../components/Assets.vue';
 import Description from '../components/Description.vue';
 import ReadMore from "vue-read-more-smooth";
 import ShowAssetMixin from '../components/ShowAssetMixin';
@@ -48,7 +47,7 @@ export default {
   name: "Item",
   components: {
     AnonymizedNotice: () => import('../components/AnonymizedNotice.vue'),
-    Assets,
+    Assets: () => import('../components/Assets.vue'),
     BTabs,
     BTab,
     CollectionLink: () => import('../components/CollectionLink.vue'),

@@ -1,21 +1,22 @@
 <template>
   <section class="catalogs mb-4">
-    <h2>
-      <span class="title">{{ $tc('stacCatalog', catalogs.length ) }}</span>
-      <b-badge v-if="isComplete" pill variant="secondary ml-2">
-        <template v-if="catalogs.length !== catalogView.length">{{ catalogView.length }}/{{ catalogs.length }}</template>
-        <template v-else>{{ catalogs.length }}</template>
-      </b-badge>
-      <ViewButtons class="ml-4" v-model="view" />
-      <SortButtons v-if="isComplete && catalogs.length > 1" class="ml-2" v-model="sort" />
-    </h2>
-    <SearchBox v-if="isComplete && catalogs.length > 1" class="mt-3 mb-2" v-model="searchTerm" :placeholder="$t('catalogs.filterByTitle')" />
+    <header>
+      <h2 class="title mr-2">{{ title }}</h2>
+      <b-badge v-if="catalogCount !== null" pill variant="secondary" class="mr-4">{{ catalogCount }}</b-badge>
+      <ViewButtons class="mr-2" v-model="view" />
+      <SortButtons v-if="isComplete && catalogs.length > 1" v-model="sort" />
+    </header>
+    <SearchBox v-if="isComplete && catalogs.length > 1" class="mt-1 mb-1" v-model="searchTerm" :placeholder="$t('catalogs.filterByTitle')" />
     <Pagination ref="topPagination" v-if="showPagination" :pagination="pagination" placement="top" @paginate="paginate" />
     <b-alert v-if="searchTerm && catalogView.length === 0" variant="warning" show>{{ $t('catalogs.noMatches') }}</b-alert>
     <section class="list">
       <Loading v-if="loading" fill top />
       <component :is="cardsComponent" v-bind="cardsComponentProps">
-        <Catalog v-for="catalog in catalogView" :catalog="catalog" :key="catalog.href" />
+        <Catalog v-for="catalog in catalogView" :catalog="catalog" :key="catalog.href">
+          <template #footer="{data}">
+            <slot name="catalogFooter" :data="data" />
+          </template>
+        </Catalog>
       </component>
     </section>
     <Pagination v-if="showPagination" :pagination="pagination" @paginate="paginate" />
@@ -48,6 +49,10 @@ export default {
       type: Array,
       required: true
     },
+    collectionsOnly: {
+      type: Boolean,
+      required: false
+    },
     loading: {
       type: Boolean,
       default: false
@@ -59,6 +64,10 @@ export default {
     pagination: {
       type: Object,
       default: () => ({})
+    },
+    count: {
+      type: Number,
+      default: null
     }
   },
   data() {
@@ -70,6 +79,26 @@ export default {
   computed: {
     ...mapState(['cardViewSort', 'uiLanguage']),
     ...mapGetters(['getStac']),
+    catalogCount() {
+      if (this.catalogs.length !== this.catalogView.length) {
+        return this.catalogView.length + '/' + this.catalogs.length;
+      }
+      else if (this.count !== null) {
+        return this.count;
+      }
+      else if (this.isComplete) {
+        return this.catalogs.length;
+      }
+      return null;
+    },
+    title() {
+      if (this.collectionsOnly) {
+        return this.$tc('stacCollection', this.catalogs.length );
+      }
+      else {
+        return this.$tc('stacCatalog', this.catalogs.length );
+      }
+    },
     isComplete() {
       return !this.hasMore && !this.showPagination;
     },
@@ -132,18 +161,3 @@ export default {
   }
 };
 </script>
-
-<style lang="scss" scoped>
-.catalogs {
-
-  .list {
-    position: relative;
-  }
-
-  > h2 {
-    .title, .badge {
-      vertical-align: middle;
-    }
-  }
-}
-</style>
