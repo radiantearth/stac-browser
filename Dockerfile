@@ -24,4 +24,4 @@ EXPOSE 8080
 STOPSIGNAL SIGTERM
 
 # override entrypoint, which calls nginx-entrypoint underneath
-ADD docker-entrypoint.sh /docker-entrypoint.d/40-stac-browser-entrypoint.sh
+ADD docker/docker-entrypoint.sh /docker-entrypoint.d/40-stac-browser-entrypoint.sh
