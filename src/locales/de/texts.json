@@ -260,6 +260,7 @@
     "conformanceClasses": "Konformitätsklasse",
     "detailsAboutSource": "Details über die STAC-Datenquelle",
     "fileFormat": "Dateiformat",
+    "id": "Identifikationsnummer",
     "label": "Datenquelle",
     "language": {
       "label": "Sprache: {currentLanguage}",

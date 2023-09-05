@@ -37,22 +37,29 @@
     </b-popover>
 
     <b-popover
-      v-if="stacUrl" id="popover-link" target="popover-link-btn" triggers="focus"
+      v-if="stacUrl" id="popover-link" target="popover-link-btn" triggers="click"
       placement="bottom" container="stac-browser" :title="$t('source.title')" 
       @show="validate"
     >
-      <template v-if="stacVersion">
-        <b-row>
+      <template v-if="stac">
+        <b-row v-if="stacId" class="stac-id">
+          <b-col cols="4">{{ $t('source.id') }}</b-col>
+          <b-col>
+            <code>{{ stacId }}</code>
+            <CopyButton :copyText="stacId" :button-props="{size: 'sm'}" variant="primary" class="ml-2" />
+          </b-col>
+        </b-row>
+        <b-row v-if="stacVersion" class="stac-version">
           <b-col cols="4">{{ $t('source.stacVersion') }}</b-col>
           <b-col>{{ stacVersion }}</b-col>
         </b-row>
-        <b-row v-if="canValidate">
+        <b-row v-if="canValidate" class="validation">
           <b-col cols="4">{{ $t('source.valid') }}</b-col>
           <b-col>
             <b-spinner v-if="valid === null" :label="$t('source.validating')" small />
             <template v-else-if="valid === true">✔️</template>
             <template v-else-if="valid === false">❌</template>
-            <template v-else>$t('source.validationNA')</template>
+            <template v-else>{{ $t('source.validationNA') }}</template>
           </b-col>
         </b-row>
         <hr>
@@ -80,6 +87,7 @@ import Url from './Url.vue';
 import URI from 'urijs';
 import Utils from '../utils';
 import { getBest, prepareSupported } from '../locale-id';
+import CopyButton from './CopyButton.vue';
 
 const LANGUAGE_EXT = 'https://stac-extensions.github.io/language/v1.*/schema.json';
 
@@ -100,6 +108,7 @@ export default {
     BPopover,
     RootStats: () => import('./RootStats.vue'),
     Url,
+    CopyButton,
   },
   props: {
     title: {
@@ -110,7 +119,7 @@ export default {
       type: String,
       default: null
     },
-    stacVersion: {
+    stac: {
       type: String,
       default: null
     }
@@ -118,6 +127,12 @@ export default {
   computed: {
     ...mapState(['conformsTo', 'dataLanguages', 'locale', 'privateQueryParameters', 'supportedLocales', 'stacLint', 'stacProxyUrl', 'uiLanguage', 'valid']),
     ...mapGetters(['supportsExtension', 'root']),
+    stacVersion() {
+      return this.stac?.stac_version;
+    },
+    stacId() {
+      return this.stac?.id;
+    },
     showRoot() {
       if (!this.root) {
         return false;
@@ -244,6 +259,13 @@ export default {
     max-height: 80vh;
   }
 }
+
+#popover-link .stac-id .copy-button {
+    padding-top: 0.1rem;
+    padding-bottom: 0.1rem;
+    font-size: 0.7rem;
+}
+
 </style>
 <style lang="scss" scoped>
 .lang-item > .dropdown-item {

@@ -1,7 +1,7 @@
 <template>
   <b-row>
     <b-col md="12">
-      <Source class="float-right" :title="title" :stacUrl="url" :stacVersion="stacVersion" />
+      <Source class="float-right" :title="title" :stacUrl="url" :stac="data" />
       <h1>
         <template v-if="icon">
           <img :src="icon.href" :alt="icon.title" :title="icon.title" class="icon mr-2">
@@ -62,9 +62,6 @@ export default {
   computed: {
     ...mapState(['allowSelectCatalog', 'authConfig', 'authData', 'catalogUrl', 'data', 'url', 'title']),
     ...mapGetters(['canSearch', 'root', 'parentLink', 'collectionLink', 'toBrowserPath']),
-    stacVersion() {
-      return this.data?.stac_version;
-    },
     collectionLinkTitle() {
       if (this.collectionLink && Utils.hasText(this.collectionLink.title)) {
         return this.$t('goToCollection.descriptionWithTitle', this.collectionLink);
