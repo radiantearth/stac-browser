@@ -298,3 +298,6 @@ The following sponsors have provided a subststantial amount of funding for STAC 
 - [Matthias Mohr - Softwareentwicklung](https://mohr.ws) (maintenance)
 - [Spacebel](https://spacebel.com) (collection search)
 - [Planet](https://planet.com) (OpenID Connect authentication, other features, maintenance)
+
+**Please note that STAC Browser is currently mostly without funding for both maintenance, bug fixes and improvements.
+If you care about STAC Browser and have some funds to support the future of STAC Browser, please contact me: matthias@mohr.ws**
