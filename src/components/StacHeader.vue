@@ -1,7 +1,7 @@
 <template>
   <b-row>
     <b-col md="12">
-      <Source class="float-right" :title="title" :stacUrl="url" :stacVersion="stacVersion" />
+      <Source class="float-right" :title="title" :stacUrl="url" :stac="data" />
       <h1>
         <template v-if="icon">
           <img :src="icon.href" :alt="icon.title" :title="icon.title" class="icon mr-2">
@@ -22,7 +22,7 @@
           <b-button variant="outline-primary" size="sm" :title="$t('browse')" v-b-toggle.sidebar @click="$emit('enableSidebar')">
             <b-icon-book /> <span class="button-label prio">{{ $t('browse') }}</span>
           </b-button>
-          <b-button v-if="searchBrowserLink" variant="outline-primary" size="sm" :to="searchBrowserLink" :title="$t('search.title')" :pressed="isSearchPage()">
+          <b-button v-if="canSearch" variant="outline-primary" size="sm" :to="searchBrowserLink" :title="$t('search.title')" :pressed="isSearchPage()">
             <b-icon-search /> <span class="button-label prio">{{ $t('search.title') }}</span>
           </b-button>
           <b-button v-if="authConfig" variant="outline-primary" size="sm" @click="auth" :title="$t('authentication.button.title')">
@@ -41,9 +41,9 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
+import Source from './Source.vue';
 import StacLink from './StacLink.vue';
 import { BIconArrow90degUp, BIconBook, BIconFolderSymlink, BIconSearch, BIconLock, BIconUnlock } from "bootstrap-vue";
-import Source from './Source.vue';
 import STAC from '../models/stac';
 import Utils from '../utils';
 
@@ -61,10 +61,7 @@ export default {
   },
   computed: {
     ...mapState(['allowSelectCatalog', 'authConfig', 'authData', 'catalogUrl', 'data', 'url', 'title']),
-    ...mapGetters(['root', 'parentLink', 'collectionLink', 'toBrowserPath']),
-    stacVersion() {
-      return this.data?.stac_version;
-    },
+    ...mapGetters(['canSearch', 'root', 'parentLink', 'collectionLink', 'toBrowserPath']),
     collectionLinkTitle() {
       if (this.collectionLink && Utils.hasText(this.collectionLink.title)) {
         return this.$t('goToCollection.descriptionWithTitle', this.collectionLink);
@@ -91,26 +88,20 @@ export default {
       return null;
     },
     searchBrowserLink() {
-      let rootLink;
-      let dataLink;
-      if (this.root) {
-        rootLink = this.root.getSearchLink();
+      if (!this.canSearch) {
+        return null;
       }
-      if (this.data !== this.root && this.data instanceof STAC) {
+      let dataLink;
+      if (this.data instanceof STAC && !this.data.equals(this.root)) {
         dataLink = this.data.getSearchLink();
       }
       if (dataLink) {
         return `/search${this.data.getBrowserPath()}`;
       }
-      else if (rootLink) {
-        if (!this.allowSelectCatalog) {
-          return '/search';
-        }
-        else {
-          return `/search${this.root.getBrowserPath()}`;
-        }
+      else if (this.root && this.allowSelectCatalog) {
+        return `/search${this.root.getBrowserPath()}`;
       }
-      return null;
+      return '/search';
     },
     containerLink() {
       // Check two cases where this page is the root...

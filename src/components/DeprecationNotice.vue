@@ -5,15 +5,15 @@
     <ul v-if="latestLink || successorLink || predecessorLink">
       <li v-if="latestLink">
         {{ $t('deprecation.latestVersion') }}
-        <StacLink :data="latestLink" :fallbackTitle="$t('fallbackTitle')" />
+        <StacLink :data="latestLink" :fallbackTitle="$t('deprecation.fallbackTitle')" />
       </li>
       <li v-if="successorLink">
         {{ $t('deprecation.successorVersion') }}
-        <StacLink :data="successorLink" :fallbackTitle="$t('fallbackTitle')" />
+        <StacLink :data="successorLink" :fallbackTitle="$t('deprecation.fallbackTitle')" />
       </li>
       <li v-if="predecessorLink">
         {{ $t('deprecation.predecessorVersion') }}
-        <StacLink :data="predecessorLink" :fallbackTitle="$t('fallbackTitle')" />
+        <StacLink :data="predecessorLink" :fallbackTitle="$t('deprecation.fallbackTitle')" />
       </li>
     </ul>
   </b-alert>

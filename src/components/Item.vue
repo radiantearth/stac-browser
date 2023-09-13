@@ -116,7 +116,7 @@ export default {
     &.description {
       .intro {
         text-align: left;
-        margin-bottom: 0.75rem;
+        margin-bottom: 0.5rem;
       }
     }
 
@@ -130,8 +130,10 @@ export default {
       max-width: 100%;
       max-height: 200px;
     }
+
     .card-body {
       text-align: center;
+      position: relative;
     }
   }
 }

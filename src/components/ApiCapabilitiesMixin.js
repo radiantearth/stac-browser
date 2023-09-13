@@ -15,35 +15,38 @@ import { mapGetters } from "vuex";
 
 export const TYPES = {
   // OGC / STAC API - Features
-  Features: {
+  Items: {
     BasicFilters: [
       'https://api.stacspec.org/v1.*/ogcapi-features',
       'http://www.opengis.net/spec/ogcapi-features-1/1.*/conf/core'
     ],
-    Collections: false,
-    Items: false,
+    CollectionIdFilter: false,
+    ItemIdFilter: false,
     // It seems some conformance classes use conf (correct) and some req (deprecated?) after the version number
     CqlFilters: ['http://www.opengis.net/spec/ogcapi-features-3/1.*/*/features-filter'],
     Sort: [
       'https://api.stacspec.org/v1.*/ogcapi-features#sort',
       'http://www.opengis.net/spec/ogcapi-records-1/1.*/conf/sorting'
-    ]
+    ],
+    FreeText: ['https://api.stacspec.org/v1.*/ogcapi-features#free-text']
   },
   // STAC API - Item Search
   Global:  {
     BasicFilters: true,
-    Collections: true,
-    Items: true,
+    CollectionIdFilter: true,
+    ItemIdFilter: true,
     CqlFilters: ['https://api.stacspec.org/v1.*/item-search#filter'],
-    Sort: ['https://api.stacspec.org/v1.*/item-search#sort']
+    Sort: ['https://api.stacspec.org/v1.*/item-search#sort'],
+    FreeText: ['https://api.stacspec.org/v1.*/item-search#free-text']
   },
   // OGC / STAC API - Collections
   Collections: {
-    BasicFilters: [],
-    Collections: false,
-    Items: false,
-    CqlFilters: [],
-    Sort: []
+    BasicFilters: ['https://api.stacspec.org/v1.*/collection-search'],
+    CollectionIdFilter: false,
+    ItemIdFilter: false,
+    CqlFilters: ['https://api.stacspec.org/v1.*/collection-search#filter'],
+    Sort: ['https://api.stacspec.org/v1.*/collection-search#sort'],
+    FreeText: ['https://api.stacspec.org/v1.*/collection-search#free-text']
   }
 };
 
@@ -66,6 +69,9 @@ export default {
     },
     canFilterExtents() {
       return this.supportsConformance(this.conformances.BasicFilters);
+    },
+    canFilterFreeText() {
+      return this.supportsConformance(this.conformances.FreeText);
     },
     cql() {
       if (!this.supportsConformance(this.conformances.CqlFilters)) {

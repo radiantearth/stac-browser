@@ -5,13 +5,13 @@ import axios from "axios";
 import URI from "urijs";
 
 import i18n from '../i18n';
-import { ogcQueryables, stacBrowserSpecialHandling, stacPagination } from "../rels";
-import Utils, { schemaMediaType, BrowserError } from '../utils';
+import { stacBrowserSpecialHandling } from "../rels";
+import Utils, { BrowserError } from '../utils';
 import STAC from '../models/stac';
-import Queryable from '../models/cql2/queryable';
 
 import { addQueryIfNotExists, isAuthenticationError, Loading, processSTAC, proxyUrl, unproxyUrl, stacRequest } from './utils';
 import { getBest } from '../locale-id';
+import { TYPES } from "../components/ApiCapabilitiesMixin";
 
 function getStore(config, router) {
   // Local settings (e.g. for currently loaded STAC entity)
@@ -33,9 +33,7 @@ function getStore(config, router) {
 
     apiItems: [],
     apiItemsLink: null,
-    apiItemsPagination: {},
-
-    queryables: null
+    apiItemsPagination: {}
   });
 
   const catalogDefaults = () => ({
@@ -189,6 +187,16 @@ function getStore(config, router) {
         return Utils.supportsExtension(state.data, schemaUri);
       },
 
+      canSearch: (state, getters) => {
+        return getters.canSearchCollections || getters.canSearchItems;
+      },
+      canSearchItems: (state, getters) => {
+        return getters.supportsConformance(TYPES.Items.BasicFilters);
+      },
+      canSearchCollections: (state, getters) => {
+        return getters.supportsConformance(TYPES.Collections.BasicFilters);
+      },
+
       items: state => {
         if (state.apiItems.length > 0) {
           return state.apiItems;
@@ -212,7 +220,6 @@ function getStore(config, router) {
         }
         return catalogs;
       },
-      hasMoreCollections: state => Boolean(state.nextCollectionsLink),
 
       // hasAsset also checks whether the assets have a href and thus are not item asset definitions
       hasAssets: (state, getters) => Boolean(Object.values(getters.assets).find(asset => Utils.isObject(asset) && typeof asset.href === 'string')),
@@ -302,9 +309,15 @@ function getStore(config, router) {
         if (whitelist && Array.isArray(state.allowedDomains) && state.allowedDomains.includes(absoluteUrl.domain())) {
           return false;
         }
-        let relative = absoluteUrl.relativeTo(state.catalogUrl);
-        if (relative.equals(absoluteUrl)) {
-          return true;
+        let relative;
+        if (absoluteUrl.is("relative")) {
+          relative = absoluteUrl;
+        }
+        else {
+          relative = absoluteUrl.relativeTo(state.catalogUrl);
+          if (relative.equals(absoluteUrl)) {
+            return true;
+          }
         }
         let relativeStr = relative.toString();
         return relativeStr.startsWith('//') || relativeStr.startsWith('../');
@@ -371,15 +384,6 @@ function getStore(config, router) {
                 state.catalogUrl = value;
               }
               break;
-            case 'stacProxyUrl':
-              // Proxy URLs coming from CLI have the form https://thingtoproxy.com;http://proxy:111
-              if (typeof value === 'string' && value.includes(';')) {
-                state[key] = value.split(';');
-              }
-              else {
-                state[key] = value;
-              }
-              break;
             case 'crossOriginMedia':
               state.crossOriginMedia = ['anonymous', 'use-credentials'].includes(value) ? value : null;
               break;
@@ -432,15 +436,23 @@ function getStore(config, router) {
       setAuthData(state, value) {
         state.authData = value;
       },
+      state(state, newState) {
+        state.stateQueryParameters = newState;
+      },
+      updateState(state, {type, value}) {
+        if (value === null || typeof value === 'undefined') {
+          Vue.delete(state.stateQueryParameters, type);
+        }
+        else {
+          Vue.set(state.stateQueryParameters, type, value);
+        }
+      },
       openCollapsible(state, { type, uid }) {
         const idx = state.stateQueryParameters[type].indexOf(uid);
         // need to prevent duplicates because of the way the collapse v-model works
         if (idx === -1) {
           state.stateQueryParameters[type].push(uid);
         }
-      },
-      state(state, newState) {
-        state.stateQueryParameters = newState;
       },
       closeCollapsible(state, { type, uid }) {
         const idx = state.stateQueryParameters[type].indexOf(uid);
@@ -560,12 +572,7 @@ function getStore(config, router) {
         }
 
         // Handle pagination links
-        let pageLinks = Utils.getLinksWithRels(data.links, stacPagination);
-        let pages = {};
-        for (let pageLink of pageLinks) {
-          let rel = pageLink.rel === 'previous' ? 'prev' : pageLink.rel;
-          pages[rel] = pageLink;
-        }
+        let pages = Utils.getPaginationLinks(data);
 
         if (show) {
           state.apiItemsPagination = pages;
@@ -591,8 +598,9 @@ function getStore(config, router) {
           stac.setApiData(collections, nextLink);
         }
       },
-      resetApiItems(state) {
+      resetApiItems(state, link) {
         state.apiItems = [];
+        state.apiItemsLink = link;
         state.apiItemsPagination = {};
       },
       parents(state, parents) {
@@ -601,15 +609,6 @@ function getStore(config, router) {
       showGlobalError(state, error) {
         console.error(error);
         state.globalError = error;
-      },
-      addQueryables(state, queryables) {
-        if (Utils.isObject(queryables) && Utils.isObject(queryables.properties)) {
-          state.queryables = Object.entries(queryables.properties)
-            .map(([key, schema]) => new Queryable(key, schema));
-        }
-        else {
-          state.queryables = [];
-        }
       }
     },
     actions: {
@@ -702,16 +701,10 @@ function getStore(config, router) {
         cx.commit('parents', parents);
       },
       async load(cx, args) {
-        let { url, fromBrowser, show, loadApi, loadRoot, force } = args;
-        let path;
-        if (fromBrowser) {
-          path = url.startsWith('/') ? url : '/' + url;
-          url = cx.getters.fromBrowserPath(url);
-        }
-        else {
-          url = Utils.toAbsolute(url, cx.state.url);
-          path = cx.getters.toBrowserPath(url);
-        }
+        let { url, show, loadApi, loadRoot, force } = args;
+
+        let path = cx.getters.toBrowserPath(url);
+        url = Utils.toAbsolute(url, cx.state.url);
 
         // Load the root catalog data if not available (e.g. after page refresh or external access)
         if (!loadRoot && path !== '/' && cx.state.catalogUrl && !cx.getters.getStac(cx.state.catalogUrl)) {
@@ -824,14 +817,7 @@ function getStore(config, router) {
             baseUrl = stac.getAbsoluteUrl();
           }
 
-          if (!Utils.isObject(filters)) {
-            filters = {};
-          }
-          if (typeof filters.limit !== 'number') {
-            filters.limit = cx.state.itemsPerPage;
-          }
-
-          link = Utils.addFiltersToLink(link, filters);
+          link = Utils.addFiltersToLink(link, filters, cx.state.itemsPerPage);
 
           let response = await stacRequest(cx, link);
           if (!Utils.isObject(response.data) || !Array.isArray(response.data.features)) {
@@ -944,26 +930,6 @@ function getStore(config, router) {
         if (Utils.isObject(response.data) && Array.isArray(response.data.conformsTo)) {
           cx.commit('setConformanceClasses', response.data.conformsTo);
         }
-      },
-      async loadQueryables(cx, { stac, refParser = null }) {
-        let schemas;
-        try {
-          let link = stac.getLinksWithRels(ogcQueryables)
-            .find(link => Utils.isMediaType(link.type, schemaMediaType, true));
-          let href = Utils.isObject(link) ? link.href : Utils.toAbsolute('queryables', stac.getAbsoluteUrl());
-          let response = await stacRequest(cx, href);
-          schemas = response.data; // Use data with $refs included as fallback anyway
-          if (refParser) {
-            try {
-              schemas = await refParser.dereference(schemas);
-            } catch (error) {
-              console.error(error);
-            }
-          }
-        } catch (error) {
-          console.log('Queryables not supported by API');
-        }
-        cx.commit('addQueryables', schemas);
       },
       async loadGeoJson(cx, link) {
         try {

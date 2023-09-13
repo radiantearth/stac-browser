@@ -1,14 +1,12 @@
 <template>
-  <b-card class="provider" no-body>
-    <b-card-header header-tag="header" role="tab" class="p-0">
+  <b-card class="provider expandable-card" no-body>
+    <b-card-header header-tag="header" role="tab">
       <b-button block v-b-toggle="id" variant="provider" squared>
-        <span class="name">
-          <span class="mr-1" aria-hidden="true">
-            <b-icon-chevron-down v-if="expanded" />
-            <b-icon-chevron-right v-else />
-          </span>
-          {{ provider.name }}
+        <span class="chevron" aria-hidden="true">
+          <b-icon-chevron-down v-if="expanded" />
+          <b-icon-chevron-right v-else />
         </span>
+        <span class="title">{{ provider.name }}</span>
         <ProviderRoles :roles="provider.roles" />
       </b-button>
     </b-card-header>
@@ -68,9 +66,6 @@ export default {
 <style lang="scss">
 #stac-browser {
   .provider {
-    .btn-provider .badge {
-      text-transform: uppercase;
-    }
     .metadata {
       .card-columns {
         column-count: 1;

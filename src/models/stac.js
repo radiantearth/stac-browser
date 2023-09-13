@@ -123,7 +123,7 @@ class STAC {
       children.push(this._apiChildren.prev);
     }
     if (showCollections && this._apiChildren.list.length > 0) {
-      children = this._apiChildren.list;
+      children = this._apiChildren.list.slice(0);
     }
     if (showChilds) {
       children = STAC.addMissingChildren(children, this).concat(this.getLinksWithRels(['item']));
@@ -150,7 +150,8 @@ class STAC {
     // The search link MUST be 'application/geo+json' as otherwise it's likely not STAC
     // See https://github.com/opengeospatial/ogcapi-features/issues/832
     let links = Utils.getLinksWithRels(this.links, ['search'])
-      .filter(link => Utils.isMediaType(link.type, geojsonMediaType));
+      .filter(link => Utils.isMediaType(link.type, geojsonMediaType))
+      .map(link => Object.assign({}, link, {href: Utils.toAbsolute(link.href, this._url)}));
     // Prefer POST if present
     let post = links.find(link => Utils.hasText(link.method) && link.method.toUpperCase() === 'POST');
     return post || links[0] || null;

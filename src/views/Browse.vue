@@ -1,9 +1,7 @@
 <template>
   <main class="browse d-flex flex-column">
-    <b-alert v-if="!allowExternalAccess && isExternal" show>
-      <p>{{ $t('errors.noExternalAccess') }}</p>
-    </b-alert>
-    <ErrorAlert v-if="error" :dismissible="false" :url="url" :description="errorDescription" :id="errorId" />
+    <b-alert v-if="!allowExternalAccess && isExternal" show>{{ $t('errors.noExternalAccess') }}</b-alert>
+    <ErrorAlert v-else-if="error" :dismissible="false" :url="url" :description="errorDescription" :id="errorId" />
     <Loading v-else-if="loading" stretch />
     <component v-else :is="component" />
   </main>
@@ -34,7 +32,7 @@ export default {
   },
   computed: {
     ...mapState(["allowExternalAccess", "url", "data", "redirectLegacyUrls"]),
-    ...mapGetters(["isItem", "error", "loading"]),
+    ...mapGetters(["fromBrowserPath", "isItem", "error", "loading"]),
     errorId() {
       if (this.error instanceof Error && this.error.isAxiosError && Utils.isObject(this.error.response)) {
         let res = this.error.response;
@@ -50,13 +48,8 @@ export default {
     errorDescription() {      
       if (this.error instanceof Error && this.error.isAxiosError && Utils.isObject(this.error.response)) {
         let res = this.error.response;
-        if (Utils.isObject(res.data)) {
-          if (typeof res.data.description === 'string') { // STAC API compliant error response
-            return res.data.description;
-          }
-          else if (typeof res.data.detail === 'string') { // stac-fastapi returns an invalid "detail" property, see https://github.com/stac-utils/stac-fastapi/issues/360
-            return res.data.detail;
-          }
+        if (Utils.isObject(res.data) && typeof res.data.description === 'string') { // STAC API compliant error response
+          return res.data.description;
         }
         if (res.status === 401) {
           return this.$t('errors.unauthorized');
@@ -99,12 +92,15 @@ export default {
         if (path === oldPath) {
           return;
         }
-
-        if (this.redirectLegacyUrls && await this.redirectLegacyUrl(path)) {
+        else if (!this.allowExternalAccess && this.isExternal) {
+          return;
+        }
+        else if (this.redirectLegacyUrls && await this.redirectLegacyUrl(path)) {
           return;
         }
 
-        this.$store.dispatch("load", { url: path || '/', fromBrowser: true, show: true, loadApi: true });
+        let url = this.fromBrowserPath(path || '/');
+        this.$store.dispatch("load", { url, show: true, loadApi: true });
       }
     }
   },
