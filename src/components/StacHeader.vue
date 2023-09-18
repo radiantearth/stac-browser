@@ -41,9 +41,9 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
+import Source from './Source.vue';
 import StacLink from './StacLink.vue';
 import { BIconArrow90degUp, BIconBook, BIconFolderSymlink, BIconSearch, BIconLock, BIconUnlock } from "bootstrap-vue";
-import Source from './Source.vue';
 import STAC from '../models/stac';
 import Utils from '../utils';
 
@@ -91,18 +91,17 @@ export default {
       return null;
     },
     searchBrowserLink() {
-      let rootLink;
-      let dataLink;
-      if (this.root) {
-        rootLink = this.root.getSearchLink();
+      if (!this.canSearch) {
+        return null;
       }
-      if (this.data !== this.root && this.data instanceof STAC) {
+      let dataLink;
+      if (this.data instanceof STAC && !this.data.equals(this.root)) {
         dataLink = this.data.getSearchLink();
       }
       if (dataLink) {
         return `/search${this.data.getBrowserPath()}`;
       }
-      else if (rootLink && this.allowSelectCatalog) {
+      else if (this.root && this.allowSelectCatalog) {
         return `/search${this.root.getBrowserPath()}`;
       }
       return '/search';

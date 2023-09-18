@@ -23,13 +23,16 @@ export const browserImageTypes = [
   'image/webp'
 ];
 
+export const cogMediaTypes = [
+  "image/tiff; application=geotiff; profile=cloud-optimized",
+  "image/vnd.stac.geotiff; cloud-optimized=true"
+];
+
 export const geotiffMediaTypes = [
   "application/geotiff",
   "image/tiff; application=geotiff",
-  "image/tiff; application=geotiff; profile=cloud-optimized",
   "image/vnd.stac.geotiff",
-  "image/vnd.stac.geotiff; cloud-optimized=true"
-];
+].concat(cogMediaTypes);
 
 export const browserProtocols = [
   'http',
@@ -112,6 +115,20 @@ export default class Utils {
    */
   static hasText(string) {
     return (typeof string === 'string' && string.length > 0);
+  }
+
+  static shortenTitle(fullStr, strLen, separator = '…') {
+    if (fullStr.length <= strLen) {
+      return fullStr;
+    }
+
+    let sepLen = separator.length;
+    let charsToShow = strLen - sepLen;
+    let frontChars = Math.ceil(charsToShow/2);
+    let backChars = Math.floor(charsToShow/2);
+    return fullStr.substr(0, frontChars) + 
+           separator + 
+           fullStr.substr(fullStr.length - backChars);
   }
 
   static isGdalVfsUri(url) {
@@ -227,11 +244,13 @@ export default class Utils {
   }
 
   static getPaginationLinks(data) {
-    let pageLinks = Utils.getLinksWithRels(data.links, stacPagination);
     let pages = {};
-    for (let pageLink of pageLinks) {
-      let rel = pageLink.rel === 'previous' ? 'prev' : pageLink.rel;
-      pages[rel] = pageLink;
+    if (Utils.isObject(data)) {
+      let pageLinks = Utils.getLinksWithRels(data.links, stacPagination);
+      for (let pageLink of pageLinks) {
+        let rel = pageLink.rel === 'previous' ? 'prev' : pageLink.rel;
+        pages[rel] = pageLink;
+      }
     }
     return pages;
   }
@@ -294,7 +313,7 @@ export default class Utils {
         else if (key === 'bbox') {
           value = value.join(',');
         }
-        else if ((key === 'collections' || key === 'ids')) {
+        else if ((key === 'collections' || key === 'ids' || key === 'q')) {
           value = value.join(',');
         }
         else if (key === 'filters') {

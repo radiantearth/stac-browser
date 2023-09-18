@@ -1,4 +1,8 @@
 {
+  "actions": {
+    "openIn": "Open in {service}"
+  },
+  "additionalActions": "Additional Actions",
   "additionalResources": "Additional Resources",
   "anonymized": {
     "title": "Anonymized"
@@ -117,9 +121,11 @@
     "urlMissingProtocol": "The URL is missing a protocol."
   },
   "items": {
-    "filter": "Filter",
+    "filter": "Filters",
+    "hideFilter": "Hide Filters",
     "noTime": "No time given",
-    "noneAvailableForCollection": "No items available for this collection."
+    "noneAvailableForCollection": "No items available for this collection.",
+    "showFilter": "Show Filters"
   },
   "leaflet": {
     "close": "Close",
@@ -182,22 +188,22 @@
     "less": "Read less",
     "more": "Read more"
   },
+  "reset": "Reset",
   "search": {
     "addCollections": "Press enter to add a collection",
     "addFilter": "Add filter",
     "addItemIds": "Press enter to add an Item ID",
+    "addSearchTerm": "Press enter to add a search term",
     "additionalFilters": "Additional filters",
-    "buttons": {
-      "filter": "Filter",
-      "reset": "Reset"
-    },
     "dateDescription": "All times in Coordinated Universal Time (UTC).",
     "enterCollections": "Enter one or more Collection IDs...",
     "enterItemIds": "Enter one or more Item IDs...",
+    "enterSearchTerms": "Enter one or more search terms...",
     "equalTo": "equal to",
     "filterBySpatialExtent": "Filter by spatial extent",
+    "filterCollection": "Filter Collection",
     "freeText": "Search Terms",
-    "freeTextDescription": "Search for the given text in fields such as the title and the description.",
+    "freeTextDescription": "Search for at least one of the given terms in fields such as the title and the description.",
     "greaterThan": "greater than",
     "greaterThanEqual": "greater than or equal to",
     "itemIds": "Item IDs",
@@ -220,6 +226,7 @@
     "notSupported": "Item Search is not supported by the API.",
     "placeholder": "Search...",
     "selectCollections": "Select one or multiple collections...",
+    "selectForItemSearch": "Select for Item Search",
     "sortOptions": {
       "datetime": "Date and Time",
       "id": "ID",
@@ -231,7 +238,8 @@
       "items": "Search for Items"
     },
     "temporalExtent": "Temporal Extent",
-    "title": "Search"
+    "title": "Search",
+    "useInItemSearch": "Open Collection in Item Search | Open {count} Collections in Item Search"
   },
   "showMore": "Show more...",
   "sidebar": {
@@ -249,7 +257,9 @@
     "title": "Sort"
   },
   "source": {
+    "conformanceClasses": "Conformance Classes",
     "detailsAboutSource": "Details about the STAC source",
+    "fileFormat": "File Format",
     "label": "Source",
     "language": {
       "label": "Language: {currentLanguage}",
@@ -267,9 +277,11 @@
       "twitter": "Twitter",
       "withOthers": "Share this page with others"
     },
-    "stacVersion": "STAC Version:",
+    "stacExtension": "STAC Extension",
+    "stacVersion": "STAC Version",
+    "statistics": "Statistics",
     "title": "Source Data",
-    "valid": "Valid:",
+    "valid": "Valid",
     "validating": "Validating...",
     "validationNA": "n/a"
   },

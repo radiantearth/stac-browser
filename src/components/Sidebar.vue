@@ -42,6 +42,13 @@ export default {
         if (visible) {
           await this.$store.dispatch('loadParents');
         }
+
+        if (visible) {
+          document.body.classList.add("sidebar");
+        }
+        else {
+          document.body.classList.remove("sidebar");
+        }
       }
     }
   },
@@ -52,9 +59,14 @@ export default {
 </script>
 
 <style lang="scss">
+@import '~bootstrap/scss/mixins';
+@import "../theme/variables.scss";
+
 #stac-browser #sidebar {
-  width: 33%;
-  min-width: 300px;
+  width: 50%;
+  min-width: 400px;
+  max-width: 600px;
+  padding-top: $header-margin;
 
   .b-sidebar-body {
     padding: 0.5rem 1rem;
@@ -70,6 +82,17 @@ export default {
     .switch-catalog {
       width: 100%;
     }
+  }
+}
+
+@include media-breakpoint-down(sm) {
+  body.sidebar {
+    overflow: hidden;
+  }
+
+  #stac-browser #sidebar {
+    width: 100%;
+    max-width: 100%;
   }
 }
 </style>

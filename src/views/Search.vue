@@ -1,7 +1,7 @@
 <template>
   <main class="search d-flex flex-column">
     <Loading v-if="!parent" stretch />
-    <b-alert v-else-if="!searchLink" variant="danger" show>{{ $t('search.notSupported') }}</b-alert>
+    <b-alert v-else-if="!canSearch" variant="danger" show>{{ $t('search.notSupported') }}</b-alert>
     <b-row v-else>
       <b-col class="left">
         <b-tabs v-model="activeSearch">
@@ -21,25 +21,43 @@
       </b-col>
       <b-col class="right">
         <b-alert v-if="error" variant="error" show>{{ error }}</b-alert>
-        <b-alert v-else-if="!data && !hasFilters" variant="info" show>{{ $t('search.modifyCriteria') }}</b-alert>
         <Loading v-else-if="!data && loading" fill top />
+        <b-alert v-else-if="data === null" variant="info" show>{{ $t('search.modifyCriteria') }}</b-alert>
         <b-alert v-else-if="results.length === 0" variant="warning" show>{{ $t('search.noItemsFound') }}</b-alert>
         <template v-else>
           <div id="search-map" v-if="itemCollection">
             <Map :stac="stac" :stacLayerData="itemCollection" scrollWheelZoom popover />
           </div>
           <Catalogs
-            v-if="isCollectionSearch" :catalogs="results"
+            v-if="isCollectionSearch" :catalogs="results" collectionsOnly
             :pagination="pagination" :loading="loading" @paginate="loadResults"
-          />
+            :count="totalCount"
+          >
+            <template #catalogFooter="slot">
+              <b-button-group v-if="canSearchItems || canFilterItems(slot.data)" vertical size="sm">
+                <b-button v-if="canSearchItems" variant="outline-primary" :pressed="selectedCollections[slot.data.id]" @click="selectForItemSearch(slot.data)">
+                  <b-icon-check-square v-if="selectedCollections[slot.data.id]" />
+                  <b-icon-square v-else />
+                  <span class="ml-2">{{ $t('search.selectForItemSearch') }}</span>
+                </b-button>
+                <StacLink :button="{variant: 'outline-primary', disabled: !canFilterItems(slot.data)}" :data="slot.data" :title="$t('search.filterCollection')" :state="{itemFilterOpen: 1}" />
+              </b-button-group>
+            </template>
+          </Catalogs>
           <Items
             v-else
             :stac="stac" :items="results" :api="true" :allowFilter="false"
             :pagination="pagination" :loading="loading" @paginate="loadResults"
+            :count="totalCount"
           />
         </template>
       </b-col>
     </b-row>
+    <b-alert v-if="selectedCollectionCount > 0" show variant="dark" class="selected-collections-action">
+      <b-button @click="openItemSearch" variant="primary" size="lg">
+        {{ $tc('search.useInItemSearch', selectedCollectionCount, {count: selectedCollectionCount}) }}
+      </b-button>
+    </b-alert>
   </main>
 </template>
 
@@ -49,19 +67,22 @@ import Utils from '../utils';
 import SearchFilter from '../components/SearchFilter.vue';
 import Loading from '../components/Loading.vue';
 import STAC from '../models/stac';
-import { BTabs, BTab } from 'bootstrap-vue';
-import { stacRequest } from '../store/utils';
+import { BIconCheckSquare, BIconSquare, BTabs, BTab } from 'bootstrap-vue';
+import { processSTAC, stacRequest } from '../store/utils';
 
 export default {
   name: "Search",
   components: {
+    BIconCheckSquare,
+    BIconSquare,
     BTab,
     BTabs,
     Catalogs: () => import('../components/Catalogs.vue'),
-    SearchFilter,
-    Items: () => import('../components/Items.vue'),
     Loading,
-    Map: () => import('../components/Map.vue')
+    Items: () => import('../components/Items.vue'),
+    Map: () => import('../components/Map.vue'),
+    SearchFilter,
+    StacLink: () => import('../components/StacLink.vue')
   },
   props: {
     loadParent: {
@@ -80,12 +101,22 @@ export default {
 
       itemFilters: {},
       collectionFilters: {},
-      activeSearch: 0
+      activeSearch: 0,
+      selectedCollections: {}
     };
   },
   computed: {
     ...mapState(['catalogUrl', 'catalogTitle', 'itemsPerPage']),
-    ...mapGetters(['canSearchItems', 'canSearchCollections', 'getStac', 'root', 'collectionLink', 'parentLink', 'fromBrowserPath', 'toBrowserPath']),
+    ...mapGetters(['canSearch', 'canSearchItems', 'canSearchCollections', 'getStac', 'root', 'collectionLink', 'parentLink', 'fromBrowserPath', 'toBrowserPath']),
+    selectedCollectionCount() {
+      return Utils.size(this.selectedCollections);
+    },
+    totalCount() {
+      if (typeof this.data.numberMatched === 'number') {
+        return this.data.numberMatched;
+      }
+      return null;
+    },
     stac() {
       if (this.parent instanceof STAC) {
         return this.parent;
@@ -112,7 +143,7 @@ export default {
       };
     },
     results() {
-      if (!Utils.isObject(this.data)) {
+      if (Utils.size(this.data) === 0) {
         return [];
       }
       let list = this.isCollectionSearch ? this.data.collections : this.data.features;
@@ -131,7 +162,9 @@ export default {
             if (selfLink?.href) {
               url = Utils.toAbsolute(selfLink.href, this.link.href);
             }
-            return new STAC(obj, url, this.toBrowserPath(url));
+            let stac = new STAC(obj, url, this.toBrowserPath(url));
+            stac = processSTAC(this.$store.state, stac);
+            return stac;
           } catch (error) {
             console.error(error);
             return null;
@@ -141,9 +174,6 @@ export default {
     },
     pagination() {
       return Utils.getPaginationLinks(this.data);
-    },
-    hasFilters() {
-      return Utils.size(this.filters) > 0;
     },
     filters() {
       return this.isCollectionSearch ? this.collectionFilters : this.itemFilters;
@@ -157,6 +187,9 @@ export default {
     }
   },
   watch:{
+    activeSearch() {
+      this.data = null;
+    },
     searchLink: {
       immediate: true,
       handler() {
@@ -181,9 +214,29 @@ export default {
         this.$store.commit("config", { catalogUrl: url });
       }
       this.parent = this.getStac(url);
+      this.showPage();
     }
   },
   methods: {
+    openItemSearch() {
+      this.$set(this.itemFilters, 'collections', Object.keys(this.selectedCollections));
+      this.activeSearch = 1;
+      this.selectedCollections = {};
+    },
+    selectForItemSearch(collection) {
+      if (this.selectedCollections[collection.id]) {
+        this.$delete(this.selectedCollections, collection.id);
+      }
+      else {
+        this.$set(this.selectedCollections, collection.id, true);
+      }
+    },
+    canFilterItems(data) {
+      if (data instanceof STAC) {
+        return Boolean(data.getApiItemsLink());
+      }
+      return false;
+    },
     async loadResults(link) {
       this.error = null;
       this.loading = true;
@@ -196,14 +249,14 @@ export default {
           this.showPage(response.config.url);
         }
         if (!Utils.isObject(response.data) || !Array.isArray(response.data[key])) {
-          this.data = null;
+          this.data = {};
           this.error = this.$t(this.isCollectionSearch ? 'errors.invalidStacCollections' : 'errors.invalidStacItems');
         }
         else {
           this.data = response.data;
         }
       } catch (error) {
-        this.data = null;
+        this.data = {};
         this.error = error.message;
       } finally {
         this.loading = false;
@@ -235,6 +288,9 @@ export default {
 </script>
 
 <style lang="scss">
+@import '~bootstrap/scss/mixins';
+@import "../theme/variables.scss";
+
 #stac-browser {
   .search .left .tabs .tab-content .filter .card {
     border-top: 0;
@@ -242,12 +298,17 @@ export default {
     border-top-right-radius: 0;
   }
 }
-</style>
-<style lang="scss">
-@import '~bootstrap/scss/mixins';
-@import "../theme/variables.scss";
 
 #stac-browser .search {
+  .selected-collections-action {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    z-index: 5000;
+    margin: 1rem;
+    box-shadow: 2px 2px 4px 0px rgba(0, 0, 0, 0.25);
+  }
+
   .left {
     min-width: 350px;
     flex-basis: 40%;

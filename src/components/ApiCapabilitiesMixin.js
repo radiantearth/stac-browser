@@ -28,7 +28,7 @@ export const TYPES = {
       'https://api.stacspec.org/v1.*/ogcapi-features#sort',
       'http://www.opengis.net/spec/ogcapi-records-1/1.*/conf/sorting'
     ],
-    FreeText: false
+    FreeText: ['https://api.stacspec.org/v1.*/ogcapi-features#free-text']
   },
   // STAC API - Item Search
   Global:  {
@@ -37,7 +37,7 @@ export const TYPES = {
     ItemIdFilter: true,
     CqlFilters: ['https://api.stacspec.org/v1.*/item-search#filter'],
     Sort: ['https://api.stacspec.org/v1.*/item-search#sort'],
-    FreeText: ['https://api.stacspec.org/v1.*/item-search#free-text-search']
+    FreeText: ['https://api.stacspec.org/v1.*/item-search#free-text']
   },
   // OGC / STAC API - Collections
   Collections: {
