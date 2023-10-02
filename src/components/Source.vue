@@ -120,7 +120,7 @@ export default {
       default: null
     },
     stac: {
-      type: String,
+      type: Object,
       default: null
     }
   },
