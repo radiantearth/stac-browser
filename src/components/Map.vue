@@ -41,6 +41,7 @@ import STAC from '../models/stac';
 import { object as formatObject, string as formatString } from '@radiantearth/stac-fields/datatypes';
 import { BPopover } from 'bootstrap-vue';
 import getBasemaps from '../../basemaps.config';
+import { STACObject } from 'stac-js';
 
 // Fix missing icons: https://vue2-leaflet.netlify.app/quickstart/#marker-icons-are-missing
 import { Icon } from 'leaflet';
@@ -269,7 +270,8 @@ export default {
       let addItemsPreview = false;
       // Check whether we could add item previews to the map
       if (this.stac.isCatalogLike() && data.type === 'FeatureCollection') {
-        data = this.stac;
+        // ToDo: Temporary workaround to ensure we don't pass a freezed object
+        data = JSON.parse(JSON.stringify(this.stac));
         options.fillOpacity = 0;
         addItemsPreview = true;
       }
