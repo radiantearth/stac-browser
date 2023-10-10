@@ -43,6 +43,9 @@ The following ways to set config options are possible:
 * [requestQueryParameters](#requestqueryparameters)
 * [authConfig](#authconfig)
 * [preprocessSTAC](#preprocessstac)
+* [indexURL](#indexurl)
+* [indexCatalogsURL](#indexcatalogsurl)
+* [indexName](#indexname)
 
 ## catalogUrl
 
@@ -52,7 +55,7 @@ The URL provided here **must** match exactly with the `href` that is provided as
 
 This is usually a URL provided as string, but in the config file you can also provide a function without parameters that returns the URL, e.g. `() => window.origin.toString().replace(/\/?$/, '/')`.
 
-If `catalogUrl` is empty or set to `null` STAC Browser switches to a mode where it defaults to a screen where you can either insert a catalog URL or select a catalog from [stacindex.org](https://stacindex.org).
+If `catalogUrl` is empty or set to `null` STAC Browser switches to a mode where it defaults to a screen where you can either insert a catalog URL or select a catalog from [indexUrl](#indexurl).
 
 ## catalogTitle
 
@@ -348,3 +351,35 @@ preprocessSTAC: (stac, state) => {
     return stac;
 }
 ```
+
+## indexURL
+
+The URL of a webpage that displays information about the STAC catalogs listed in [indexCatalogsURL](#indexcatalogsurl)
+on the default landing page when [catalogUrl](#catalogurl) is not set.
+
+If this is set to `null` or an empty string, no link will be displayed.
+
+Please note that this URL is used for informational purposes only and there is no validation that checks that the
+[indexURL](#indexurl) and the [indexCatalogsURL](#indexcatalogsurl) contain information about the same catalogs.
+
+The default value is: [https://stacindex.org](https://stacindex.org)
+
+## indexCatalogsURL
+
+A URL that returns a JSON array of STAC catalog objects to be displayed on the default landing page when 
+[catalogUrl](#catalogurl) is not set.
+
+If this is set to `null` or an empty string, no catalogs will be displayed and the user will only have the option to
+select a catalog by providing a URL themselves.
+
+Please note that there is no validation that checks that the [indexURL](#indexurl) and the 
+[indexCatalogsURL](#indexcatalogsurl) contain information about the same catalogs.
+
+The default value is: [https://stacindex.org/api/catalogs](https://stacindex.org/api/catalogs)
+
+## indexName
+
+The name of the page referred to by [indexURL](#indexurl). This name will be used as the text for a link on the default 
+landing page when [catalogUrl](#catalogurl) is not set.
+
+The default value is: `STAC Index`

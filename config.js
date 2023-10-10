@@ -39,5 +39,8 @@ module.exports = {
     requestHeaders: {},
     requestQueryParameters: {},
     preprocessSTAC: null,
-    authConfig: null
+    authConfig: null,
+    indexURL: "https://stacindex.org",
+    indexCatalogsURL: "https://stacindex.org/api/catalogs",
+    indexName: "STAC Index"
 };
