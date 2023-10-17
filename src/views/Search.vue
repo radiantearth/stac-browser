@@ -17,40 +17,58 @@
               @input="setFilters"
             />
           </b-tab>
+
         </b-tabs>
       </b-col>
       <b-col class="right">
-        <b-alert v-if="error" variant="error" show>{{ error }}</b-alert>
-        <Loading v-else-if="!data && loading" fill top />
-        <b-alert v-else-if="data === null" variant="info" show>{{ $t('search.modifyCriteria') }}</b-alert>
-        <b-alert v-else-if="results.length === 0" variant="warning" show>{{ $t('search.noItemsFound') }}</b-alert>
-        <template v-else>
-          <div id="search-map" v-if="itemCollection">
-            <Map :stac="stac" :stacLayerData="itemCollection" scrollWheelZoom popover />
-          </div>
-          <Catalogs
-            v-if="isCollectionSearch" :catalogs="results" collectionsOnly
-            :pagination="pagination" :loading="loading" @paginate="loadResults"
-            :count="totalCount"
-          >
-            <template #catalogFooter="slot">
-              <b-button-group v-if="itemSearch || canFilterItems(slot.data)" vertical size="sm">
-                <b-button v-if="itemSearch" variant="outline-primary" :pressed="selectedCollections[slot.data.id]" @click="selectForItemSearch(slot.data)">
-                  <b-icon-check-square v-if="selectedCollections[slot.data.id]" />
-                  <b-icon-square v-else />
-                  <span class="ml-2">{{ $t('search.selectForItemSearch') }}</span>
-                </b-button>
-                <StacLink :button="{variant: 'outline-primary', disabled: !canFilterItems(slot.data)}" :data="slot.data" :title="$t('search.filterCollection')" :state="{itemFilterOpen: 1}" />
-              </b-button-group>
-            </template>
-          </Catalogs>
-          <Items
-            v-else
-            :stac="stac" :items="results" :api="true" :allowFilter="false"
-            :pagination="pagination" :loading="loading" @paginate="loadResults"
-            :count="totalCount"
-          />
-        </template>
+          <b-alert v-if="error" variant="error" show>{{ error }}</b-alert>
+          <Loading v-else-if="!data && loading" fill top />
+          <b-alert v-else-if="data === null" variant="info" show>{{ $t('search.modifyCriteria') }}</b-alert>
+          <b-alert v-else-if="results.length === 0" variant="warning" show>{{ $t('search.noItemsFound') }}</b-alert>
+          <template v-else>
+            <b-row>
+            <b-col class="left">
+              <b-tabs>
+                <b-tab title="Python">
+                  <CodeBox :code="pythonCode" language="python" />
+                </b-tab>
+                <b-tab title="Javascript">
+                  <CodeBox :code="javascriptCode" language="javascript" />
+                </b-tab>
+                <b-tab title="R">
+                  <CodeBox :code="rCode" language="r" />
+                </b-tab>
+              </b-tabs>
+            </b-col>
+            <b-col class="right">
+              <div id="search-map" v-if="itemCollection">
+                <Map :stac="stac" :stacLayerData="itemCollection" scrollWheelZoom popover />
+              </div>
+            </b-col>
+            </b-row>
+              <Catalogs
+                v-if="isCollectionSearch" :catalogs="results" collectionsOnly
+                :pagination="pagination" :loading="loading" @paginate="loadResults"
+                :count="totalCount"
+              >
+                <template #catalogFooter="slot">
+                  <b-button-group v-if="itemSearch || canFilterItems(slot.data)" vertical size="sm">
+                    <b-button v-if="itemSearch" variant="outline-primary" :pressed="selectedCollections[slot.data.id]" @click="selectForItemSearch(slot.data)">
+                      <b-icon-check-square v-if="selectedCollections[slot.data.id]" />
+                      <b-icon-square v-else />
+                      <span class="ml-2">{{ $t('search.selectForItemSearch') }}</span>
+                    </b-button>
+                    <StacLink :button="{variant: 'outline-primary', disabled: !canFilterItems(slot.data)}" :data="slot.data" :title="$t('search.filterCollection')" :state="{itemFilterOpen: 1}" />
+                  </b-button-group>
+                </template>
+              </Catalogs>
+              <Items
+                v-else
+                :stac="stac" :items="results" :api="true" :allowFilter="false"
+                :pagination="pagination" :loading="loading" @paginate="loadResults"
+                :count="totalCount"
+              />
+          </template>
       </b-col>
     </b-row>
     <b-alert v-if="selectedCollectionCount > 0" show variant="dark" class="selected-collections-action">
@@ -78,6 +96,7 @@ export default {
     BTab,
     BTabs,
     Catalogs: () => import('../components/Catalogs.vue'),
+    CodeBox: () => import('../components/CodeBox.vue'),
     Loading,
     Items: () => import('../components/Items.vue'),
     Map: () => import('../components/Map.vue'),
@@ -102,7 +121,11 @@ export default {
       itemFilters: {},
       collectionFilters: {},
       activeSearch: 0,
-      selectedCollections: {}
+      selectedCollections: {},
+
+      pythonCode: null,
+      javascriptCode: null,
+      rCode: null
     };
   },
   computed: {
@@ -237,13 +260,90 @@ export default {
       }
       return false;
     },
+    filterString() {
+      let obj = this.filters || {}
+      for (let key in obj) {
+        if (obj[key] === null || (Array.isArray(obj[key]) && obj[key].length === 0)) {
+          delete obj[key];
+        }
+      }
+      return JSON.stringify(obj)
+    },
+    generatePython() {
+      return `
+      from pystac_client import Client
+
+      # Connect to STAC API
+      stac_endpoint = '${this.searchLink.href}'
+      client = Client.open(stac_endpoint)
+
+      # Build query
+      query = ${this.filterString()}
+
+      # Perform search
+      search_result = client.search(query)
+      `
+    },
+    generateJavascript() {
+      return `
+      // Define the STAC API endpoint
+      const STAC_ENDPOINT = '${this.searchLink.href}';
+
+      // Define your search parameters
+      const searchParams = ${this.filterString()};
+
+      // Perform the search
+      fetch(STAC_ENDPOINT, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(searchParams)
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log("STAC search results:", data);
+      })
+      .catch(error => {
+        console.error("Error fetching STAC data:", error);
+      });
+      `
+    },
+    generateR() {
+      let filterString = JSON.stringify(this.filters || {})
+      return `
+      from pystac_client import Client
+
+      # Connect to STAC API
+      stac_api_url = '${this.searchLink}'
+      client = Client.open(stac_api_url)
+
+      # Build query
+      query = ${filterString}
+
+      # Perform search
+      search_result = client.search(query)
+      `
+    },
+    updateCode() {
+      this.pythonCode = this.generatePython()
+      this.javascriptCode = this.generateJavascript()
+      this.rCode = this.generateR()
+    },
     async loadResults(link) {
       this.error = null;
       this.loading = true;
       try {
         this.link = Utils.addFiltersToLink(link, this.filters, this.itemsPerPage);
+        console.log("link", this.link)
+        this.pythonCode = this.generatePython(this.link)
+        this.javascriptCode = this.generateJavascript(this.link)
+        this.rCode = this.generateR(this.link)
 
         let key = this.isCollectionSearch ? 'collections' : 'features';
+        // console.log(1, this.$store)
+        // console.log(2, this.link)
+        // console.log(3, key)
         let response = await stacRequest(this.$store, this.link);
         if (response) {
           this.showPage(response.config.url);
@@ -274,6 +374,7 @@ export default {
       }
       else {
         await this.loadResults(this.searchLink);
+        this.updateCode(this.searchLink)
       }
     },
     showPage(url) {
