@@ -54,8 +54,8 @@ import { getBest, prepareSupported } from './locale-id';
 Vue.use(AlertPlugin);
 Vue.use(ButtonGroupPlugin);
 Vue.use(ButtonPlugin);
-Vue.use(CardPlugin);
 Vue.use(BadgePlugin)
+Vue.use(CardPlugin);
 Vue.use(VueHighlightJS);
 Vue.use(LayoutPlugin);
 Vue.use(SpinnerPlugin);
