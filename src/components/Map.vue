@@ -144,7 +144,7 @@ export default {
       const links = this.getWebMapLinks('xyz');
       return links.map(link => ({
         url: link.href,
-        name: link.title || link.href,
+        name: link.title || Utils.titleForHref(link.href),
         subdomains: link.servers,
         attribution: link.attribution || this.stac.getMetadata('attribution')
       }));
@@ -156,19 +156,24 @@ export default {
         if (!Array.isArray(link['wms:layers'])) {
           continue;
         }
-        for(const layer of link['wms:layers']) {
+        for(const i in link['wms:layers']) {
+          const layers = link['wms:layers'][i];
+          let styles;
+          if (Array.isArray(link['wms:styles']) && typeof link['wms:styles'][i] === 'string') {
+            styles = link['wms:styles'][i];
+          }
+          const name = [link.title, layers].filter(x => Boolean(x)).join(' - ');
           const props = {
             baseUrl: link.href,
-            name: link.title || layer,
+            name,
             attribution: link.attribution || this.stac.getMetadata('attribution'),
             version: '1.3.0',
-            layers: layer
+            layers,
+            transparent: String(link['wms:transparent'] || false),
+            styles
           };
           if (typeof link['type'] === 'string' && link['type'].startsWith('image/')) {
             props.format = link['type'];
-          }
-          if (Array.isArray(link['wms:styles'])) {
-            props.styles = link['wms:styles'].join(',');
           }
           if (Utils.isObject(link['wms:dimensions'])) {
             props.options = link['wms:dimensions'];
