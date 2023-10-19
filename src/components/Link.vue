@@ -1,9 +1,10 @@
 <template>
-  <li>
+  <li class="link">
     <StacLink :id="popoverId" :data="link" :fallbackTitle="fallbackTitle" class="pr-1" />
-    <b-popover :target="popoverId" triggers="hover" placement="right" container="#stac-browser">
-      <h6 class="small text-muted text-center">{{ $t('additionalActions') }}</h6>
+    <b-popover :target="popoverId" triggers="hover" placement="right" container="#stac-browser" custom-class="link-more">
+      <h3 class="first">{{ $t('additionalActions') }}</h3>
       <HrefActions vertical :data="link" size="sm" />
+      <Metadata :data="link" type="link" headerTag="h3" :ignoreFields="ignore" />
     </b-popover>
   </li>
 </template>
@@ -20,7 +21,8 @@ export default {
   components: {
     BPopover,
     HrefActions,
-    StacLink
+    StacLink,
+    Metadata: () => import('./Metadata.vue')
   },
   props: {
     link: {
@@ -32,6 +34,11 @@ export default {
       required: true
     }
   },
+  data() {
+    return {
+      ignore: ['href', 'type', 'rel', 'title']
+    };
+  },
   computed: {
     popoverId() {
       return "popover-link-" + linkId;
@@ -42,3 +49,46 @@ export default {
   }
 };
 </script>
+
+<style lang="scss">
+#stac-browser .link-more {
+  width: auto;
+  max-width: 600px;
+
+  h3 {
+    font-size: 0.85rem;
+    color: #6c757d;
+    text-align: center;
+    padding: 0;
+    font-weight: 600;
+    margin: 1rem 0 0.7rem;
+
+    &.first {
+      margin-top: 0;
+    }
+  }
+  
+  .metadata {
+    min-width: 400px;
+
+    h4 {
+      font-size: 0.85rem;
+      font-weight: normal;
+      margin-top: 0;
+      margin-bottom: 0.5rem;
+    }
+
+    .card-columns {
+      column-count: 1;
+    }
+    .card {
+      border: 0;
+      margin-top: 0;
+      font-size: 0.8rem;
+    }
+    .card-body {
+      padding: 0;
+    }
+  }
+}
+</style>

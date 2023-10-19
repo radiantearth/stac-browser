@@ -23,7 +23,7 @@
         <b-card-text class="mt-4" v-if="provider.description">
           <Description :description="provider.description" compact />
         </b-card-text>
-        <Metadata class="mt-4" :data="provider" :ignoreFields="ignore" title="" type="Provider" />
+        <Metadata class="mt-4" :data="provider" :ignoreFields="ignore" :title="false" type="Provider" />
       </b-card-body>
     </b-collapse>
   </b-card>
