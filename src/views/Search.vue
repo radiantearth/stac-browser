@@ -7,58 +7,54 @@
         <b-tabs v-model="activeSearch">
           <b-tab v-if="collectionSearch" :title="$t('search.tabs.collections')">
             <SearchFilter
-              :parent="parent" title="" :value="collectionFilters" :searchLink="searchLink" type="Collections"
+              :parent="parent" title="" :value="collectionFilters" :searchLink="searchLink"
+              type="Collections"
               @input="setFilters"
             />
           </b-tab>
           <b-tab v-if="itemSearch" :title="$t('search.tabs.items')">
             <SearchFilter
-              :parent="parent" title="" :value="itemFilters" :searchLink="searchLink" type="Global"
+              :parent="parent" title="" :value="itemFilters" :searchLink="searchLink"
+              type="Global"
               @input="setFilters"
             />
           </b-tab>
-
         </b-tabs>
       </b-col>
       <b-col class="right">
-          <b-alert v-if="error" variant="error" show>{{ error }}</b-alert>
-          <Loading v-else-if="!data && loading" fill top />
-          <b-alert v-else-if="data === null" variant="info" show>{{ $t('search.modifyCriteria') }}</b-alert>
-          <b-alert v-else-if="results.length === 0" variant="warning" show>{{ $t('search.noItemsFound') }}</b-alert>
-          <template v-else>
-            <b-row>
-            <b-col class="left">
-              <SearchCode :filters="filters" :catalogHref="searchLink.href"></SearchCode>
-            </b-col>
-            <b-col class="right">
-              <div id="search-map" v-if="itemCollection">
-                <Map :stac="stac" :stacLayerData="itemCollection" scrollWheelZoom popover />
-              </div>
-            </b-col>
-            </b-row>
-              <Catalogs
-                v-if="isCollectionSearch" :catalogs="results" collectionsOnly
-                :pagination="pagination" :loading="loading" @paginate="loadResults"
-                :count="totalCount"
-              >
-                <template #catalogFooter="slot">
-                  <b-button-group v-if="itemSearch || canFilterItems(slot.data)" vertical size="sm">
-                    <b-button v-if="itemSearch" variant="outline-primary" :pressed="selectedCollections[slot.data.id]" @click="selectForItemSearch(slot.data)">
-                      <b-icon-check-square v-if="selectedCollections[slot.data.id]" />
-                      <b-icon-square v-else />
-                      <span class="ml-2">{{ $t('search.selectForItemSearch') }}</span>
-                    </b-button>
-                    <StacLink :button="{variant: 'outline-primary', disabled: !canFilterItems(slot.data)}" :data="slot.data" :title="$t('search.filterCollection')" :state="{itemFilterOpen: 1}" />
-                  </b-button-group>
-                </template>
-              </Catalogs>
-              <Items
-                v-else
-                :stac="stac" :items="results" :api="true" :allowFilter="false"
-                :pagination="pagination" :loading="loading" @paginate="loadResults"
-                :count="totalCount"
-              />
-          </template>
+        <b-alert v-if="error" variant="error" show>{{ error }}</b-alert>
+        <Loading v-else-if="!data && loading" fill top />
+        <b-alert v-else-if="data === null" variant="info" show>{{ $t('search.modifyCriteria') }}</b-alert>
+        <b-alert v-else-if="results.length === 0" variant="warning" show>{{ $t('search.noItemsFound') }}</b-alert>
+        <template v-else>
+          <b-col class="right">
+            <div id="search-map" v-if="itemCollection">
+              <Map :stac="stac" :stacLayerData="itemCollection" scrollWheelZoom popover />
+            </div>
+          </b-col>
+          <Catalogs
+            v-if="isCollectionSearch" :catalogs="results" collectionsOnly
+            :pagination="pagination" :loading="loading" @paginate="loadResults"
+            :count="totalCount"
+          >
+            <template #catalogFooter="slot">
+              <b-button-group v-if="itemSearch || canFilterItems(slot.data)" vertical size="sm">
+                <b-button v-if="itemSearch" variant="outline-primary" :pressed="selectedCollections[slot.data.id]" @click="selectForItemSearch(slot.data)">
+                  <b-icon-check-square v-if="selectedCollections[slot.data.id]" />
+                  <b-icon-square v-else />
+                  <span class="ml-2">{{ $t('search.selectForItemSearch') }}</span>
+                </b-button>
+                <StacLink :button="{variant: 'outline-primary', disabled: !canFilterItems(slot.data)}" :data="slot.data" :title="$t('search.filterCollection')" :state="{itemFilterOpen: 1}" />
+              </b-button-group>
+            </template>
+          </Catalogs>
+          <Items
+            v-else
+            :stac="stac" :items="results" :api="true" :allowFilter="false"
+            :pagination="pagination" :loading="loading" @paginate="loadResults"
+            :count="totalCount"
+          />
+        </template>
       </b-col>
     </b-row>
     <b-alert v-if="selectedCollectionCount > 0" show variant="dark" class="selected-collections-action">
@@ -86,7 +82,6 @@ export default {
     BTab,
     BTabs,
     Catalogs: () => import('../components/Catalogs.vue'),
-    SearchCode: () => import('../components/SearchCode.vue'),
     Loading,
     Items: () => import('../components/Items.vue'),
     Map: () => import('../components/Map.vue'),

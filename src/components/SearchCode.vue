@@ -16,14 +16,22 @@
     import { BTabs, BTab } from 'bootstrap-vue';
     export default {
       name: "SearchCode",
-      props: {
-        catalogHref: String,
-        filters: Object,
-      },
       components: {
         BTab,
         BTabs,
         CodeBox: () => import('./CodeBox.vue'),
+      },
+      props: {
+        catalogHref: {
+          type: String,
+          default: '',
+        },
+        filters: {
+          type: Object,
+          default() {
+             return {};
+           },
+        },
       },
       data() {
         return {
@@ -31,7 +39,18 @@
           pythonCode: null,
           javascriptCode: null,
           rCode: null
+        };
+      },
+      watch: {
+        filters: {
+          deep: true,
+          handler() {
+            this.updateCode();
+          }
         }
+      },
+      created() {
+        this.updateCode();
       },
       methods: {
         dedent(str) {
@@ -39,13 +58,13 @@
           return lines.join('\n').trim();
         },
         filterString() {
-          let obj = this.filters || {}
+          let obj = this.filters || {};
           for (let key in obj) {
             if (obj[key] === null || (Array.isArray(obj[key]) && obj[key].length === 0)) {
               delete obj[key];
             }
           }
-          return JSON.stringify(obj)
+          return JSON.stringify(obj);
         },
         generatePython() {
           return this.dedent(`from pystac_client import Client
@@ -58,7 +77,7 @@
           query = ${this.filterString()}
 
           # Perform search
-          search_result = client.search(query )`)
+          search_result = client.search(query )`);
         },
         generateJavascript() {
           return this.dedent(`// Define the STAC API endpoint
@@ -81,7 +100,7 @@
           })
           .catch(error => {
             console.error("Error fetching STAC data:", error);
-          });`)
+          });`);
         },
         generateR() {
           return this.dedent(`from pystac_client import Client
@@ -94,25 +113,14 @@
           query = ${this.filterString()}
 
           # Perform search
-          search_result = client.search(query)`)
+          search_result = client.search(query)`);
         },
         updateCode() {
-          console.log(this.generatePython())
-          this.pythonCode = this.generatePython()
-          this.javascriptCode = this.generateJavascript()
-          this.rCode = this.generateR()
+          console.log('updating code');
+          this.pythonCode = this.generatePython();
+          this.javascriptCode = this.generateJavascript();
+          this.rCode = this.generateR();
         }
-      },
-      watch: {
-        filters: {
-          deep: true,
-          handler() {
-            this.updateCode();
-          }
-        }
-      },
-      mounted() {
-        this.updateCode();
       },
     };
   </script>

@@ -112,11 +112,11 @@
       <b-card-footer>
         <b-button type="submit" variant="primary">{{ $t('submit') }}</b-button>
         <b-button type="reset" variant="danger" class="ml-3">{{ $t('reset') }}</b-button>
-        <b-button type="button" variant="info" class="ml-3" v-b-modal.code>Example Code</b-button>
+        <b-button type="button" variant="info" class="ml-3" v-b-modal.code>{{ $t('exampleCode') }}</b-button>
       </b-card-footer>
     </b-card>
-    <b-modal id="code" title="BootstrapVue" size="lg">
-      <SearchCode :filters="query || {}" :catalogHref="searchLink.href"></SearchCode>
+    <b-modal id="code" :title="$t('exampleCode')" size="lg">
+      <SearchCode :filters="query" :catalogHref="searchLink.href" />
     </b-modal>
   </b-form>
 </template>

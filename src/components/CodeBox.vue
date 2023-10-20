@@ -3,24 +3,31 @@
     <pre v-highlightjs>
       <code :class="language" :id="componentId">{{ code }}</code>
     </pre>
-    <CopyButton variant="primary" :copyText="code">copy</CopyButton>
+    <CopyButton variant="primary" :copyText="code">{{ $t('copy') }}</CopyButton>
   </div>
 </template>
   
 <script>
   export default {
     name: "CodeBox",
-    props: {
-      code: String,
-      language: String
-    },
     components: {
-      Copybutton: () => import("./CopyButton.vue")
+      CopyButton: () => import("./CopyButton.vue")
+    },
+    props: {
+      code: {
+        type: String,
+        default: "",
+      },
+       
+      language: {
+        type: String,
+        default: "",
+      },
     },
     data() {
       return {
         componentId: `${this.language}Content`
-      }
+      };
     },
   };
 </script>
