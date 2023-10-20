@@ -77,7 +77,7 @@
           query = ${this.filterString()}
 
           # Perform search
-          search_result = client.search(query )`);
+          search_result = client.search(query)`);
         },
         generateJavascript() {
           return this.dedent(`// Define the STAC API endpoint
