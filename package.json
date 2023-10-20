@@ -41,7 +41,6 @@
     "bootstrap-vue": "^2.21.2",
     "bs58": "^4.0.1",
     "chart.js": "^4.3.0",
-    "clipboard": "^2.0.11",
     "commonmark": "^0.29.3",
     "core-js": "^3.6.5",
     "highlight.js": "^11.9.0",

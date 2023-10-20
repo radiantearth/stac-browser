@@ -1,30 +1,26 @@
 <template>
   <div class="codebox">
     <pre v-highlightjs>
-      <code :class="language" :id="componentId">
-        {{ code }}
-      </code>
+      <code :class="language" :id="componentId">{{ code }}</code>
     </pre>
-    <button ref="copyButton" :data-clipboard-target="'#' + componentId">Copy</button>
+    <CopyButton variant="primary" :copyText="code">copy</CopyButton>
   </div>
 </template>
   
 <script>
-  import Clipboard from 'clipboard';
-
   export default {
     name: "CodeBox",
     props: {
       code: String,
       language: String
     },
+    components: {
+      Copybutton: () => import("./CopyButton.vue")
+    },
     data() {
       return {
         componentId: `${this.language}Content`
       }
-    },
-    mounted() {
-        new Clipboard(this.$refs.copyButton);
     },
   };
 </script>

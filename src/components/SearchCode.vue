@@ -34,6 +34,10 @@
         }
       },
       methods: {
+        dedent(str) {
+          const lines = str.split('\n').map(line => line.trim());
+          return lines.join('\n').trim();
+        },
         filterString() {
           let obj = this.filters || {}
           for (let key in obj) {
@@ -44,8 +48,7 @@
           return JSON.stringify(obj)
         },
         generatePython() {
-          return `
-          from pystac_client import Client
+          return this.dedent(`from pystac_client import Client
 
           # Connect to STAC API
           stac_endpoint = '${this.catalogHref}'
@@ -55,12 +58,10 @@
           query = ${this.filterString()}
 
           # Perform search
-          search_result = client.search(query )
-          `
+          search_result = client.search(query )`)
         },
         generateJavascript() {
-          return `
-          // Define the STAC API endpoint
+          return this.dedent(`// Define the STAC API endpoint
           const STAC_ENDPOINT = '${this.catalogHref}';
 
           // Define your search parameters
@@ -80,12 +81,10 @@
           })
           .catch(error => {
             console.error("Error fetching STAC data:", error);
-          });
-          `
+          });`)
         },
         generateR() {
-          return `
-          from pystac_client import Client
+          return this.dedent(`from pystac_client import Client
 
           # Connect to STAC API
           stac_api_url = '${this.catalogHref}'
@@ -95,10 +94,10 @@
           query = ${this.filterString()}
 
           # Perform search
-          search_result = client.search(query)
-          `
+          search_result = client.search(query)`)
         },
         updateCode() {
+          console.log(this.generatePython())
           this.pythonCode = this.generatePython()
           this.javascriptCode = this.generateJavascript()
           this.rCode = this.generateR()

@@ -7,13 +7,13 @@
         <b-tabs v-model="activeSearch">
           <b-tab v-if="collectionSearch" :title="$t('search.tabs.collections')">
             <SearchFilter
-              :parent="parent" title="" :value="collectionFilters" type="Collections"
+              :parent="parent" title="" :value="collectionFilters" :searchLink="searchLink" type="Collections"
               @input="setFilters"
             />
           </b-tab>
           <b-tab v-if="itemSearch" :title="$t('search.tabs.items')">
             <SearchFilter
-              :parent="parent" title="" :value="itemFilters" type="Global"
+              :parent="parent" title="" :value="itemFilters" :searchLink="searchLink" type="Global"
               @input="setFilters"
             />
           </b-tab>
