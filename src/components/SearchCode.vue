@@ -116,7 +116,6 @@
           search_result = client.search(query)`);
         },
         updateCode() {
-          console.log('updating code');
           this.pythonCode = this.generatePython();
           this.javascriptCode = this.generateJavascript();
           this.rCode = this.generateR();
