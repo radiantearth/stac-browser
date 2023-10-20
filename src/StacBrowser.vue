@@ -36,7 +36,6 @@ import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
 
 import VueHighlightJS from "vue-highlightjs";
-import highlight from 'highlight.js';
 import 'highlight.js/lib/languages/python';
 import 'highlight.js/styles/github.css';
 
