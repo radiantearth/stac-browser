@@ -3,6 +3,7 @@ name: Build and push Docker image for staging/development environment
 permissions:
   contents: read
 on:
+  workflow_dispatch:
   push:
     branches:
       - dev

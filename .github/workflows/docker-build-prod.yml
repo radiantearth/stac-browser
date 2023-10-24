@@ -3,6 +3,7 @@ name: Build and push Docker image for prod environment
 permissions:
   contents: read
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
