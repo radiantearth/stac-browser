@@ -53,6 +53,7 @@ export default {
     CollectionLink: () => import('../components/CollectionLink.vue'),
     Description,
     DeprecationNotice: () => import('../components/DeprecationNotice.vue'),
+    Keywords: () => import('../components/Keywords.vue'),
     Links: () => import('../components/Links.vue'),
     Map: () => import('../components/Map.vue'),
     Metadata: () => import('../components/Metadata.vue'),
@@ -64,9 +65,10 @@ export default {
   data() {
     return {
       ignoredMetadataFields: [
-        'title',
         'description',
+        'keywords',
         'providers',
+        'title',
         // Will be rendered with a custom rendered
         'deprecated',
         // Don't show these complex lists of coordinates: https://github.com/radiantearth/stac-browser/issues/141

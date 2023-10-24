@@ -236,6 +236,7 @@
   "source": {
     "detailsAboutSource": "Despre sursa STAC",
     "fileFormat": "Formatul fișierului",
+    "id": "Identificator",
     "label": "Sursă",
     "language": {
       "label": "Limbă: {currentLanguage}",

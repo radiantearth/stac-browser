@@ -260,6 +260,7 @@
     "conformanceClasses": "Conformance Classes",
     "detailsAboutSource": "Details about the STAC source",
     "fileFormat": "File Format",
+    "id": "ID",
     "label": "Source",
     "language": {
       "label": "Language: {currentLanguage}",

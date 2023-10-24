@@ -298,9 +298,6 @@ class STAC {
    */
   getThumbnails(browserOnly = false, prefer = null) { // prefer can be either 
     let thumbnails = this.getAssetsWithRoles(['thumbnail', 'overview']);
-    if (prefer && thumbnails.length > 1) {
-      thumbnails.sort(a => a.roles.includes(prefer) ? -1 : 1);
-    }
     // Get from links only if no assets are available as they should usually be the same as in assets
     if (thumbnails.length === 0) {
       thumbnails = this.getLinksWithRels(['preview']);
@@ -312,6 +309,15 @@ class STAC {
     if (browserOnly) {
       // Remove all images that can't be displayed in a browser
       thumbnails = thumbnails.filter(img => Utils.canBrowserDisplayImage(img));
+    }
+    if (prefer && thumbnails.length > 1) {
+      // Prefer one role over the other.
+      // The two step approach with two filters ensures the same sort bevahiour across all browsers:
+      // see https://github.com/radiantearth/stac-browser/issues/370
+      let filter = img => img.roles.includes(prefer);
+      thumbnails = thumbnails
+        .filter(filter)
+        .concat(thumbnails.filter(img => !filter(img)));
     }
     return thumbnails.map(img => this._linkToAbsolute(img));
   }
