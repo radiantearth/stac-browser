@@ -1,17 +1,17 @@
 <template>
   <main class="search d-flex flex-column">
     <Loading v-if="!parent" stretch />
-    <b-alert v-else-if="!canSearch" variant="danger" show>{{ $t('search.notSupported') }}</b-alert>
+    <b-alert v-else-if="!searchLink" variant="danger" show>{{ $t('search.notSupported') }}</b-alert>
     <b-row v-else>
       <b-col class="left">
         <b-tabs v-model="activeSearch">
-          <b-tab v-if="canSearchCollections" :title="$t('search.tabs.collections')">
+          <b-tab v-if="collectionSearch" :title="$t('search.tabs.collections')">
             <SearchFilter
               :parent="parent" title="" :value="collectionFilters" type="Collections"
               @input="setFilters"
             />
           </b-tab>
-          <b-tab v-if="canSearchItems" :title="$t('search.tabs.items')">
+          <b-tab v-if="itemSearch" :title="$t('search.tabs.items')">
             <SearchFilter
               :parent="parent" title="" :value="itemFilters" type="Global"
               @input="setFilters"
@@ -34,8 +34,8 @@
             :count="totalCount"
           >
             <template #catalogFooter="slot">
-              <b-button-group v-if="canSearchItems || canFilterItems(slot.data)" vertical size="sm">
-                <b-button v-if="canSearchItems" variant="outline-primary" :pressed="selectedCollections[slot.data.id]" @click="selectForItemSearch(slot.data)">
+              <b-button-group v-if="itemSearch || canFilterItems(slot.data)" vertical size="sm">
+                <b-button v-if="itemSearch" variant="outline-primary" :pressed="selectedCollections[slot.data.id]" @click="selectForItemSearch(slot.data)">
                   <b-icon-check-square v-if="selectedCollections[slot.data.id]" />
                   <b-icon-square v-else />
                   <span class="ml-2">{{ $t('search.selectForItemSearch') }}</span>
@@ -107,7 +107,7 @@ export default {
   },
   computed: {
     ...mapState(['catalogUrl', 'catalogTitle', 'itemsPerPage']),
-    ...mapGetters(['canSearch', 'canSearchItems', 'canSearchCollections', 'getStac', 'root', 'collectionLink', 'parentLink', 'fromBrowserPath', 'toBrowserPath']),
+    ...mapGetters(['canSearchItems', 'canSearchCollections', 'getStac', 'root', 'collectionLink', 'parentLink', 'fromBrowserPath', 'toBrowserPath']),
     selectedCollectionCount() {
       return Utils.size(this.selectedCollections);
     },
@@ -124,13 +124,13 @@ export default {
       return null;
     },
     searchLink() {
-      return this.isCollectionSearch ? this.collectionSearchLink : this.itemSearchLink;
+      return this.isCollectionSearch ? this.collectionSearch : this.itemSearch;
     },
-    collectionSearchLink() {
-      return this.parent instanceof STAC && this.parent.getApiCollectionsLink();
+    collectionSearch() {
+      return this.canSearchCollections && this.parent instanceof STAC && this.parent.getApiCollectionsLink();
     },
-    itemSearchLink() {
-      return this.parent instanceof STAC && this.parent.getSearchLink();
+    itemSearch() {
+      return this.canSearchItems && this.parent instanceof STAC && this.parent.getSearchLink();
     },
     itemCollection() {
       if (this.isCollectionSearch) {
@@ -179,7 +179,7 @@ export default {
       return this.isCollectionSearch ? this.collectionFilters : this.itemFilters;
     },
     isCollectionSearch() {
-      return this.canSearchCollections && this.activeSearch === 0;
+      return this.collectionSearch && this.activeSearch === 0;
     },
     pageDescription() {
       let title = STAC.getDisplayTitle([this.collectionLink, this.parentLink, this.root], this.catalogTitle);
