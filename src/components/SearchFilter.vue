@@ -111,6 +111,7 @@
       </b-card-body>
       <b-card-footer>
         <b-button type="submit" variant="primary">{{ $t('submit') }}</b-button>
+        <b-button type="button" @click="getQueryParams">print query</b-button>
         <b-button type="reset" variant="danger" class="ml-3">{{ $t('reset') }}</b-button>
       </b-card-footer>
     </b-card>
@@ -138,6 +139,17 @@ import CqlLogicalOperator from '../models/cql2/operators/logical';
 import { CqlEqual } from '../models/cql2/operators/comparison';
 import { stacRequest } from '../store/utils';
 
+const allowedQueryParams = [
+  'q',
+  'datetime',
+  'bbox',
+  'limit',
+  'ids',
+  'collections',
+  'sortby',
+  'filters',
+  'itemsPerPage'];
+
 function getQueryDefaults() {
   return {
     q: [],
@@ -149,6 +161,10 @@ function getQueryDefaults() {
     sortby: null,
     filters: null
   };
+}
+
+function getQueryValues() {
+  return {...getQueryDefaults()};
 }
 
 function getDefaults() {
@@ -200,6 +216,10 @@ export default {
       required: true
     },
     value: {
+      type: Object,
+      default: () => ({})
+    },
+    searchLink: {
       type: Object,
       default: () => ({})
     }
@@ -297,7 +317,7 @@ export default {
       immediate: true,
       deep: true,
       handler(value) {
-        let query = Object.assign(getQueryDefaults(), value);
+        let query = Object.assign(getQueryValues(), value);
         if (Array.isArray(query.datetime)) {
           query.datetime = query.datetime.map(Utils.dateFromUTC);
         }
@@ -312,7 +332,8 @@ export default {
           });
         }
       }
-    }
+    },
+    $route() {},
   },
   beforeCreate() {
     formId++;
@@ -494,10 +515,12 @@ export default {
       let filters = this.buildFilter();
       this.$set(this.query, 'filters', filters);
       this.$emit('input', this.query, false);
+      this.updateQueryParams();
     },
     async onReset() {
       Object.assign(this, getDefaults());
       this.$emit('input', {}, true);
+      this.removeQueryParams();
     },
     setLimit(limit) {
       limit = Number.parseInt(limit, 10);
@@ -575,8 +598,39 @@ export default {
       else {
         return null;
       }
+    },
+    async updateQueryParams() {
+      const currentParams = this.$route.query;
+      console.log('current parameters in url: ', JSON.stringify(currentParams));
+      const currentQuery = this.query;
+      const newQuery = {};
+      for (const [key, value] of Object.entries(currentQuery)) {
+        if ( allowedQueryParams.includes(key) && value && value.length) {
+          newQuery[key] = value; 
+        }
+      }
+      const params = {...currentParams, ...newQuery};
+      console.log('my new query: ', JSON.stringify(newQuery))
+      if (JSON.stringify(currentParams) !== JSON.stringify(params)) {
+        this.$router.replace({query: {...params}});
+      }
+    },
+    removeQueryParams() {
+      this.$router.replace({name: "search"});
+    },
+    getQueryParams() {
+      const currentParams = this.$route.query;
+      // remove invalid query params
+      const cleanParams = {};
+      for (const [key, value] of Object.entries(currentParams)) {
+        if ( allowedQueryParams.includes(key) && value && value.length) {
+          cleanParams[key]=value;
+        }
+      }
+      console.log(cleanParams);
+      return cleanParams;
     }
-  }
+  },
 };
 </script>
 
