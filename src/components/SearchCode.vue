@@ -6,9 +6,6 @@
     <b-tab title="Javascript">
       <CodeBox :code="javascriptCode" language="javascript" />
     </b-tab>
-    <b-tab title="R">
-      <CodeBox :code="rCode" language="r" />
-    </b-tab>
   </b-tabs>
 </template>
     
@@ -89,9 +86,7 @@
           // Perform the search
           fetch(STAC_ENDPOINT, {
             method: "POST",
-            headers: {
-            "Content-Type": "application/json"
-          },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(searchParams)
           })
           .then(response => response.json())
@@ -102,23 +97,9 @@
             console.error("Error fetching STAC data:", error);
           });`);
         },
-        generateR() {
-          return this.dedent(`from pystac_client import Client
-
-          # Connect to STAC API
-          stac_api_url = '${this.catalogHref}'
-          client = Client.open(stac_api_url)
-
-          # Build query
-          query = ${this.filterString()}
-
-          # Perform search
-          search_result = client.search(query)`);
-        },
         updateCode() {
           this.pythonCode = this.generatePython();
           this.javascriptCode = this.generateJavascript();
-          this.rCode = this.generateR();
         }
       },
     };
