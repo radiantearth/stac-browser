@@ -111,7 +111,6 @@
       </b-card-body>
       <b-card-footer>
         <b-button type="submit" variant="primary">{{ $t('submit') }}</b-button>
-        <b-button type="button" @click="getQueryParams">print query</b-button>
         <b-button type="reset" variant="danger" class="ml-3">{{ $t('reset') }}</b-button>
       </b-card-footer>
     </b-card>
@@ -164,19 +163,52 @@ function getQueryDefaults() {
 }
 
 function getQueryValues() {
-  return {...getQueryDefaults()};
+  const searchURL = new URL(window.location);
+  const params = searchURL.searchParams;
+  const urlParams = {};
+  const arrayParams = ['bbox', 'collections', 'ids']
+  allowedQueryParams.forEach((allowedParam) => {
+    if (params.has(allowedParam)) {
+      if( arrayParams.includes(allowedParam)) {
+        urlParams[allowedParam] = params.get(allowedParam).split(',');
+      } else {
+        urlParams[allowedParam] = params.get(allowedParam);
+      }
+    }
+  });
+
+  const combinedQuery = { ...getQueryDefaults(), ...urlParams};
+  return combinedQuery;
 }
 
 function getDefaults() {
   return {
     sortOrder: 1,
     sortTerm: null,
-    provideBBox: false,
+    provideBBox: true,
     query: getQueryDefaults(),
     filtersAndOr: 'and',
     filters: [],
     selectedCollections: []
   };
+}
+
+function updateQueryString(key, value) {
+  console.log(`update called for ${key}: ${value}`);
+  // remove parameters if new value is null
+  const searchURL = new URL(window.location);
+  if (value === null || value.length === 0 || value.value === null) {
+    searchURL.searchParams.delete(key);
+    window.history.pushState({}, '', searchURL);
+    return;
+  }
+  if(key === 'sortTerm') {
+    searchURL.searchParams.set(key, value.value);
+  } else {
+    searchURL.searchParams.set(key, value);
+  }
+
+  window.history.pushState({}, '', searchURL);
 }
 
 let formId = 0;
@@ -486,9 +518,11 @@ export default {
     },
     sortFieldSet(value) {
       this.sortTerm = value;
+      updateQueryString('sortTerm', value);
     },
     sortDirectionSet(value) {
       this.sortOrder = value;
+      updateQueryString('sortOrder', value);
     },
     buildFilter() {
       if (this.filters.length === 0) {
@@ -515,7 +549,6 @@ export default {
       let filters = this.buildFilter();
       this.$set(this.query, 'filters', filters);
       this.$emit('input', this.query, false);
-      this.updateQueryParams();
     },
     async onReset() {
       Object.assign(this, getDefaults());
@@ -531,15 +564,18 @@ export default {
         limit = null;
       }
       this.$set(this.query, 'limit', limit);
+      updateQueryString('limit', limit);
     },
     addSearchTerm(term) {
       if (!Utils.hasText(term)) {
         return;
       }
       this.query.q.push(term);
+      updateQueryString('q', term);
     },
     setSearchTerms(terms) {
       this.$set(this.query, 'q', terms);
+      updateQueryString('q', terms);
     },
     setBBox(bounds) {
       let bbox = null;
@@ -560,6 +596,7 @@ export default {
         }
       }
       this.$set(this.query, 'bbox', bbox);
+      updateQueryString('bbox', bbox);
     },
     setDateTime(datetime) {
       if (datetime.find(dt => dt instanceof Date)) {
@@ -569,6 +606,7 @@ export default {
         datetime = null;
       }
       this.$set(this.query, 'datetime', datetime);
+      updateQueryString('datetime', datetime);
     },
     addCollection(collection) {
       if (!this.collectionSelectOptions.taggable) {
@@ -579,16 +617,20 @@ export default {
       this.selectedCollections.push(opt);
       this.collections.push(opt);
       this.query.collections.push(collection);
+      updateQueryString('collections', collection);
     },
     setCollections(collections) {
       this.selectedCollections = collections;
       this.$set(this.query, 'collections', collections.map(c => c.value));
+      updateQueryString('collections', collections.map(c => c.value));
     },
     addId(id) {
       this.query.ids.push(id);
+      updateQueryString('ids', id);
     },
     setIds(ids) {
       this.$set(this.query, 'ids', ids);
+      updateQueryString('ids', ids);
     },
     formatSort() {
       if (this.sortTerm && this.sortTerm.value && this.sortOrder) {
@@ -599,37 +641,9 @@ export default {
         return null;
       }
     },
-    async updateQueryParams() {
-      const currentParams = this.$route.query;
-      console.log('current parameters in url: ', JSON.stringify(currentParams));
-      const currentQuery = this.query;
-      const newQuery = {};
-      for (const [key, value] of Object.entries(currentQuery)) {
-        if ( allowedQueryParams.includes(key) && value && value.length) {
-          newQuery[key] = value; 
-        }
-      }
-      const params = {...currentParams, ...newQuery};
-      console.log('my new query: ', JSON.stringify(newQuery))
-      if (JSON.stringify(currentParams) !== JSON.stringify(params)) {
-        this.$router.replace({query: {...params}});
-      }
-    },
     removeQueryParams() {
       this.$router.replace({name: "search"});
     },
-    getQueryParams() {
-      const currentParams = this.$route.query;
-      // remove invalid query params
-      const cleanParams = {};
-      for (const [key, value] of Object.entries(currentParams)) {
-        if ( allowedQueryParams.includes(key) && value && value.length) {
-          cleanParams[key]=value;
-        }
-      }
-      console.log(cleanParams);
-      return cleanParams;
-    }
   },
 };
 </script>
