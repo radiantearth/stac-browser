@@ -166,7 +166,7 @@ function getQueryValues() {
   const searchURL = new URL(window.location);
   const params = searchURL.searchParams;
   const urlParams = {};
-  const arrayParams = ['bbox', 'collections', 'ids']
+  const arrayParams = ['bbox', 'collections', 'ids'];
   allowedQueryParams.forEach((allowedParam) => {
     if (params.has(allowedParam)) {
       if( arrayParams.includes(allowedParam)) {
@@ -191,7 +191,7 @@ function getDefaults() {
   return {
     sortOrder: 1,
     sortTerm: null,
-    provideBBox: bboxProvided(),
+    provideBBox: false,
     query: getQueryDefaults(),
     filtersAndOr: 'and',
     filters: [],
@@ -199,8 +199,35 @@ function getDefaults() {
   };
 }
 
+function overwriteDefaults() {
+  const searchURL = new URL(window.location);
+  const params = searchURL.searchParams;
+  const permittedOverwrites = ['sortOrder', 'sortTerm', 'provideBBox'];
+  const numericParams=['sortOrder', 'limit'];
+  const defaultOverwrites = {
+    provideBBox: bboxProvided()
+  };
+
+
+  permittedOverwrites.forEach((allowedValue) => {
+    if(params.has(allowedValue)) {
+      // sortTerm is a json object, not a string
+      if (allowedValue === 'sortTerm') {
+        defaultOverwrites[allowedValue] = JSON.parse(params.get(allowedValue));
+      }
+      else if(numericParams.includes(allowedValue)) {
+        defaultOverwrites[allowedValue] = parseInt(params.get(allowedValue));
+      } else {
+        defaultOverwrites[allowedValue] = params.get(allowedValue);
+      }
+    }
+  });
+
+  return {...getDefaults(), ...defaultOverwrites};
+
+}
+
 function updateQueryString(key, value) {
-  console.log(`update called for ${key}: ${value}`);
   // remove parameters if new value is null
   const searchURL = new URL(window.location);
   if (value === null || value.length === 0 || value.value === null) {
@@ -208,8 +235,9 @@ function updateQueryString(key, value) {
     window.history.pushState({}, '', searchURL);
     return;
   }
+  // sortTerm is an object
   if(key === 'sortTerm') {
-    searchURL.searchParams.set(key, value.value);
+    searchURL.searchParams.set(key, JSON.stringify(value));
   } else {
     searchURL.searchParams.set(key, value);
   }
@@ -272,7 +300,7 @@ export default {
       collections: [],
       collectionsLoadingTimer: null,
       additionalCollectionCount: 0
-    }, getDefaults());
+    }, overwriteDefaults());
   },
   computed: {
     ...mapState(['itemsPerPage', 'uiLanguage']),
