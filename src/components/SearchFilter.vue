@@ -110,7 +110,7 @@
         </b-form-group>
       </b-card-body>
       <b-card-footer>
-        <b-button type="submit" variant="primary">{{ $t('submit') }}</b-button>
+        <b-button id="submitBtn" type="submit" variant="primary">{{ $t('submit') }}</b-button>
         <b-button type="reset" variant="danger" class="ml-3">{{ $t('reset') }}</b-button>
       </b-card-footer>
     </b-card>
@@ -138,17 +138,6 @@ import CqlLogicalOperator from '../models/cql2/operators/logical';
 import { CqlEqual } from '../models/cql2/operators/comparison';
 import { stacRequest } from '../store/utils';
 
-const allowedQueryParams = [
-  'q',
-  'datetime',
-  'bbox',
-  'limit',
-  'ids',
-  'collections',
-  'sortby',
-  'filters',
-  'itemsPerPage'];
-
 function getQueryDefaults() {
   return {
     q: [],
@@ -167,10 +156,25 @@ function getQueryValues() {
   const params = searchURL.searchParams;
   const urlParams = {};
   const arrayParams = ['bbox', 'collections', 'ids'];
+  const allowedQueryParams = [
+  'q',
+  'datetime',
+  'bbox',
+  'limit',
+  'ids',
+  'collections',
+  'sortby',
+  'filters',
+  'itemsPerPage'];
+  
   allowedQueryParams.forEach((allowedParam) => {
     if (params.has(allowedParam)) {
       if( arrayParams.includes(allowedParam)) {
         urlParams[allowedParam] = params.get(allowedParam).split(',');
+        // bbox bust be array of numbers
+        if(allowedParam === 'bbox') {
+          urlParams[allowedParam] = urlParams[allowedParam].map(Number);
+        }
       } else {
         urlParams[allowedParam] = params.get(allowedParam);
       }
@@ -427,6 +431,14 @@ export default {
       );
     }
     Promise.all(promises).finally(() => this.loaded = true);
+  },
+  mounted() {
+    // submit form if loaded with url params
+  const searchURL = new URL(window.location);
+  const params = searchURL.searchParams;
+    if(params.size > 1) {
+      document.getElementById("submitBtn").click();
+    }
   },
   methods: {
     resetSearchCollection() {
