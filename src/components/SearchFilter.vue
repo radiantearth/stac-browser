@@ -27,7 +27,7 @@
         </b-form-group>
 
         <b-form-group v-if="canFilterExtents" :label="$t('search.spatialExtent')" :label-for="ids.bbox">
-          <b-form-checkbox :id="ids.bbox" v-model="provideBBox" value="1" @change="setBBox()">{{ $t('search.filterBySpatialExtent') }}</b-form-checkbox>
+          <b-form-checkbox :id="ids.bbox" v-model="provideBBox" @change="setBBox()">{{ $t('search.filterBySpatialExtent') }}</b-form-checkbox>
           <Map class="mb-4" v-if="provideBBox" :stac="stac" selectBounds @bounds="setBBox" scrollWheelZoom />
         </b-form-group>
 
@@ -181,11 +181,17 @@ function getQueryValues() {
   return combinedQuery;
 }
 
+function bboxProvided() {
+      const searchURL = new URL(window.location);
+      const hasBbox = searchURL.searchParams.has('bbox');
+      return hasBbox;
+    }
+
 function getDefaults() {
   return {
     sortOrder: 1,
     sortTerm: null,
-    provideBBox: true,
+    provideBBox: bboxProvided(),
     query: getQueryDefaults(),
     filtersAndOr: 'and',
     filters: [],
