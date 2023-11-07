@@ -238,6 +238,7 @@ STAC Browser supports some non-standardized extensions to the STAC specification
 2. A link with relation type `icon` and a Browser-supported media type in any STAC entity will show an icon in the header and the lists.
 
 ## Docker
+### Create custom image
 
 When building the Dockerfile, you can add the [`catalogUrl`](docs/options.md#catalogurl) 
 as a [build argument](https://docs.docker.com/engine/reference/commandline/build/#set-build-time-variables---build-arg). For example:
@@ -252,6 +253,18 @@ To run the container:
 
 ```bash
 docker run -p 8080:8080 stac-browser:v1
+```
+
+### Use existing image
+You can add an existing image from [Packages](https://github.com/GeoWerkstatt/stac-browser/pkgs/container/stac-browser) to your docker-compose.yml:
+```
+services:
+  stac-browser:
+    image: ghcr.io/geowerkstatt/stac-browser:latest
+    ports:
+      - 8080:8080
+    environment:
+      SB_catalogUrl: "https://localhost:7188"
 ```
 
 ## Contributing
