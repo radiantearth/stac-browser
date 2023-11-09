@@ -40,66 +40,7 @@
                 <b-form-radio value="text">{{ $t('search.defineBbox.text') }}</b-form-radio>
               </b-form-radio-group>
             </b-form-group>
-            <b-form-group v-if="provideBBox && bboxSelectionStyle === 'text'">
-              <b-form-row>
-                <b-col>
-                  <b-form-group label="x_min" label-for="x_min">
-                    <b-form-input
-                      id="x_min"
-                      @input="updateBBoxArray($event, 0)" 
-                      :value="query.bbox ? query.bbox[0] : -180"
-                      type="number"
-                      no-wheel
-                      step="any"
-                      min="-180"
-                      max="180"
-                    />
-                  </b-form-group>
-                </b-col>
-                <b-col>
-                  <b-form-group label="y_min" label-for="y_min">
-                    <b-form-input
-                      id="y_min"
-                      @input="updateBBoxArray($event, 1)" 
-                      :value="query.bbox ? query.bbox[1] : -80"
-                      type="number"
-                      no-wheel
-                      step="any"
-                      min="-90"
-                      max="90"
-                    />
-                  </b-form-group>
-                </b-col>
-                <b-col>
-                  <b-form-group label="x_max" label-for="x_max">  
-                    <b-form-input
-                      id="x_max"
-                      @input="updateBBoxArray($event, 2)" 
-                      :value="query.bbox ? query.bbox[2] : 180"
-                      type="number"
-                      no-wheel
-                      step="any"
-                      min="-180"
-                      max="180"
-                    />
-                  </b-form-group>
-                </b-col>
-                <b-col>
-                  <b-form-group label="y_max" label-for="y_max">
-                    <b-form-input
-                      id="y_max"
-                      @input="updateBBoxArray($event, 3)"
-                      :value="query?.bbox ? query.bbox[3] : 80"
-                      type="number"
-                      no-wheel
-                      step="any"
-                      min="-90"
-                      max="90"
-                    />
-                  </b-form-group>
-                </b-col>
-              </b-form-row>
-            </b-form-group>
+            <BBoxEntry v-if="provideBBox && bboxSelectionStyle === 'text'" :bbox="query.bbox || [180, 80, 180, 80]" @updateBBoxArray="updateBBoxArray" />
             <Map class="mb-4" v-if="provideBBox && bboxSelectionStyle === 'map'" :stac="stac" selectBounds @bounds="setBBox" scrollWheelZoom />
           </template>
         </b-form-group>
@@ -196,6 +137,7 @@ import Multiselect from 'vue-multiselect';
 import { mapGetters, mapState } from "vuex";
 import refParser from '@apidevtools/json-schema-ref-parser';
 
+import BBoxEntry from './BBoxEntry.vue';
 import Utils, { schemaMediaType } from '../utils';
 import { ogcQueryables } from "../rels";
 
@@ -339,6 +281,7 @@ export default {
   name: 'SearchFilter',
   components: {
     BBadge,
+    BBoxEntry,
     BDropdown,
     BDropdownItem,
     BForm,
