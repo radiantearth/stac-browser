@@ -224,7 +224,7 @@ function getQueryDefaults() {
   };
 }
 
-function getQueryValues() {
+function getUrlParamValues() {
   const searchURL = new URL(window.location);
   const params = searchURL.searchParams;
   const urlParams = {};
@@ -248,7 +248,13 @@ function getQueryValues() {
         if(allowedParam === 'bbox') {
           urlParams[allowedParam] = urlParams[allowedParam].map(Number);
         }
-      } else {
+      } else if(allowedParam === 'datetime') {
+        // datetime must be array of date objects
+          urlParams[allowedParam] = params.get(allowedParam);
+          const dateArray= urlParams['datetime'].split('/').map( day => new Date(day));
+          urlParams[allowedParam] = dateArray;
+        } else {
+        // all others are strings
         urlParams[allowedParam] = params.get(allowedParam);
       }
     }
@@ -306,7 +312,7 @@ function overwriteDefaults() {
 
 }
 
-function updateQueryString(key, value) {
+function updateUrlParamString(key, value) {
   // remove parameters if new value is null
   const searchURL = new URL(window.location);
   if (value === null || value.length === 0 || value.value === null) {
@@ -317,6 +323,9 @@ function updateQueryString(key, value) {
   // sortTerm is an object
   if(key === 'sortTerm') {
     searchURL.searchParams.set(key, JSON.stringify(value));
+  } else if(key ==='datetime') {
+    const dateFormattedForPicker = `${JSON.stringify(value['0'])}/${JSON.stringify(value['1'])}`
+    searchURL.searchParams.set(key, dateFormattedForPicker.replaceAll('"',''));
   } else {
     searchURL.searchParams.set(key, value);
   }
@@ -463,7 +472,7 @@ export default {
       immediate: true,
       deep: true,
       handler(value) {
-        let query = Object.assign(getQueryValues(), value);
+        let query = Object.assign(getUrlParamValues(), value);
         if (Array.isArray(query.datetime)) {
           query.datetime = query.datetime.map(Utils.dateFromUTC);
         }
@@ -640,11 +649,11 @@ export default {
     },
     sortFieldSet(value) {
       this.sortTerm = value;
-      updateQueryString('sortTerm', value);
+      updateUrlParamString('sortTerm', value);
     },
     sortDirectionSet(value) {
       this.sortOrder = value;
-      updateQueryString('sortOrder', value);
+      updateUrlParamString('sortOrder', value);
     },
     buildFilter() {
       if (this.filters.length === 0) {
@@ -686,24 +695,24 @@ export default {
         limit = null;
       }
       this.$set(this.query, 'limit', limit);
-      updateQueryString('limit', limit);
+      updateUrlParamString('limit', limit);
     },
     addSearchTerm(term) {
       if (!Utils.hasText(term)) {
         return;
       }
       this.query.q.push(term);
-      updateQueryString('q', term);
+      updateUrlParamString('q', term);
     },
     setSearchTerms(terms) {
       this.$set(this.query, 'q', terms);
-      updateQueryString('q', terms);
+      updateUrlParamString('q', terms);
     },
     updateBBoxArray(entry, position) {
       const bbox = this.query.bbox;
       bbox[position] = Number(entry);
       this.$set(this.query, 'bbox', bbox);
-      updateQueryString('bbox', bbox);
+      updateUrlParamString('bbox', bbox);
     },
     setBBox(bounds) {
       let bbox = null;
@@ -724,7 +733,7 @@ export default {
         }
       }
       this.$set(this.query, 'bbox', bbox);
-      updateQueryString('bbox', bbox);
+      updateUrlParamString('bbox', bbox);
     },
     setDateTime(datetime) {
       if (datetime.find(dt => dt instanceof Date)) {
@@ -734,7 +743,7 @@ export default {
         datetime = null;
       }
       this.$set(this.query, 'datetime', datetime);
-      updateQueryString('datetime', datetime);
+      updateUrlParamString('datetime', datetime);
     },
     addCollection(collection) {
       if (!this.collectionSelectOptions.taggable) {
@@ -745,20 +754,20 @@ export default {
       this.selectedCollections.push(opt);
       this.collections.push(opt);
       this.query.collections.push(collection);
-      updateQueryString('collections', collection);
+      updateUrlParamString('collections', collection);
     },
     setCollections(collections) {
       this.selectedCollections = collections;
       this.$set(this.query, 'collections', collections.map(c => c.value));
-      updateQueryString('collections', collections.map(c => c.value));
+      updateUrlParamString('collections', collections.map(c => c.value));
     },
     addId(id) {
       this.query.ids.push(id);
-      updateQueryString('ids', id);
+      updateUrlParamString('ids', id);
     },
     setIds(ids) {
       this.$set(this.query, 'ids', ids);
-      updateQueryString('ids', ids);
+      updateUrlParamString('ids', ids);
     },
     formatSort() {
       if (this.sortTerm && this.sortTerm.value && this.sortOrder) {
