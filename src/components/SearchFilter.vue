@@ -28,7 +28,80 @@
 
         <b-form-group v-if="canFilterExtents" :label="$t('search.spatialExtent')" :label-for="ids.bbox">
           <b-form-checkbox :id="ids.bbox" v-model="provideBBox" @change="setBBox()">{{ $t('search.filterBySpatialExtent') }}</b-form-checkbox>
-          <Map class="mb-4" v-if="provideBBox" :stac="stac" selectBounds @bounds="setBBox" scrollWheelZoom />
+          <template>
+            <b-form-group v-if="provideBBox">
+              <b-form-radio-group
+                v-model="bboxSelectionStyle"
+                buttons
+                size="sm"
+                button-variant="outline-primary"
+              >
+                <b-form-radio value="map">{{ $t('search.defineBbox.map') }}</b-form-radio>
+                <b-form-radio value="text">{{ $t('search.defineBbox.text') }}</b-form-radio>
+              </b-form-radio-group>
+            </b-form-group>
+            <b-form-group v-if="provideBBox && bboxSelectionStyle === 'text'">
+              <b-form-row>
+                <b-col>
+                  <b-form-group label="x_min" label-for="x_min">
+                    <b-form-input
+                      id="x_min"
+                      @input="updateBBoxArray($event, 0)" 
+                      :value="query.bbox ? query.bbox[0] : -180"
+                      type="number"
+                      no-wheel
+                      step="any"
+                      min="-180"
+                      max="180"
+                    />
+                  </b-form-group>
+                </b-col>
+                <b-col>
+                  <b-form-group label="y_min" label-for="y_min">
+                    <b-form-input
+                      id="y_min"
+                      @input="updateBBoxArray($event, 1)" 
+                      :value="query.bbox ? query.bbox[1] : -80"
+                      type="number"
+                      no-wheel
+                      step="any"
+                      min="-90"
+                      max="90"
+                    />
+                  </b-form-group>
+                </b-col>
+                <b-col>
+                  <b-form-group label="x_max" label-for="x_max">  
+                    <b-form-input
+                      id="x_max"
+                      @input="updateBBoxArray($event, 2)" 
+                      :value="query.bbox ? query.bbox[2] : 180"
+                      type="number"
+                      no-wheel
+                      step="any"
+                      min="-180"
+                      max="180"
+                    />
+                  </b-form-group>
+                </b-col>
+                <b-col>
+                  <b-form-group label="y_max" label-for="y_max">
+                    <b-form-input
+                      id="y_max"
+                      @input="updateBBoxArray($event, 3)"
+                      :value="query?.bbox ? query.bbox[3] : 80"
+                      type="number"
+                      no-wheel
+                      step="any"
+                      min="-90"
+                      max="90"
+                    />
+                  </b-form-group>
+                </b-col>
+              </b-form-row>
+            </b-form-group>
+            <Map class="mb-4" v-if="provideBBox && bboxSelectionStyle === 'map'" :stac="stac" selectBounds @bounds="setBBox" scrollWheelZoom />
+          </template>
         </b-form-group>
 
         <b-form-group v-if="conformances.CollectionIdFilter" :label="$tc('stacCollection', collections.length)" :label-for="ids.collections">
@@ -118,7 +191,7 @@
 </template>
 
 <script>
-import { BBadge, BDropdown, BDropdownItem, BForm, BFormGroup, BFormInput, BFormCheckbox, BFormRadioGroup } from 'bootstrap-vue';
+import { BBadge, BDropdown, BDropdownItem, BForm, BFormGroup, BFormInput, BFormCheckbox, BFormRadioGroup, BFormRadio } from 'bootstrap-vue';
 import Multiselect from 'vue-multiselect';
 import { mapGetters, mapState } from "vuex";
 import refParser from '@apidevtools/json-schema-ref-parser';
@@ -199,7 +272,8 @@ function getDefaults() {
     query: getQueryDefaults(),
     filtersAndOr: 'and',
     filters: [],
-    selectedCollections: []
+    selectedCollections: [],
+    bboxSelectionStyle: 'map'
   };
 }
 
@@ -209,7 +283,8 @@ function overwriteDefaults() {
   const permittedOverwrites = ['sortOrder', 'sortTerm', 'provideBBox'];
   const numericParams=['sortOrder', 'limit'];
   const defaultOverwrites = {
-    provideBBox: bboxProvided()
+    provideBBox: bboxProvided(),
+    bboxSelectionStyle: bboxProvided() ? 'text' : 'map',
   };
 
 
@@ -261,6 +336,7 @@ export default {
     BFormGroup,
     BFormInput,
     BFormCheckbox,
+    BFormRadio,
     BFormRadioGroup,
     QueryableInput: () => import('./QueryableInput.vue'),
     Loading,
@@ -622,6 +698,12 @@ export default {
     setSearchTerms(terms) {
       this.$set(this.query, 'q', terms);
       updateQueryString('q', terms);
+    },
+    updateBBoxArray(entry, position) {
+      const bbox = this.query.bbox;
+      bbox[position] = Number(entry);
+      this.$set(this.query, 'bbox', bbox);
+      updateQueryString('bbox', bbox);
     },
     setBBox(bounds) {
       let bbox = null;

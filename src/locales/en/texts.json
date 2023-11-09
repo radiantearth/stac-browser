@@ -196,6 +196,10 @@
     "addSearchTerm": "Press enter to add a search term",
     "additionalFilters": "Additional filters",
     "dateDescription": "All times in Coordinated Universal Time (UTC).",
+    "defineBbox": {
+      "map": "Draw bounding box on map",
+      "text": "Enter coordinates"
+    },
     "enterCollections": "Enter one or more Collection IDs...",
     "enterItemIds": "Enter one or more Item IDs...",
     "enterSearchTerms": "Enter one or more search terms...",
