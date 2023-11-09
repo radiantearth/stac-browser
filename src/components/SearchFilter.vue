@@ -266,7 +266,7 @@ function updateUrlParamString(key, value) {
   if(key === 'sortTerm') {
     searchURL.searchParams.set(key, JSON.stringify(value));
   } else if(key ==='datetime') {
-    const dateFormattedForPicker = `${JSON.stringify(value['0'])}/${JSON.stringify(value['1'])}`
+    const dateFormattedForPicker = `${JSON.stringify(value['0'])}/${JSON.stringify(value['1'])}`;
     searchURL.searchParams.set(key, dateFormattedForPicker.replaceAll('"',''));
   } else {
     searchURL.searchParams.set(key, value);
