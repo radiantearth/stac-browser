@@ -206,7 +206,6 @@ function getDefaults() {
     filtersAndOr: 'and',
     filters: [],
     selectedCollections: [],
-    bboxSelectionStyle: 'map'
   };
 }
 
