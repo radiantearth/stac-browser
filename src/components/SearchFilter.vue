@@ -27,22 +27,8 @@
         </b-form-group>
 
         <b-form-group v-if="canFilterExtents" :label="$t('search.spatialExtent')" :label-for="ids.bbox">
-          <b-form-checkbox :id="ids.bbox" v-model="provideBBox" @change="setBBox()">{{ $t('search.filterBySpatialExtent') }}</b-form-checkbox>
-          <template>
-            <b-form-group v-if="provideBBox">
-              <b-form-radio-group
-                v-model="bboxSelectionStyle"
-                buttons
-                size="sm"
-                button-variant="outline-primary"
-              >
-                <b-form-radio value="map">{{ $t('search.defineBbox.map') }}</b-form-radio>
-                <b-form-radio value="text">{{ $t('search.defineBbox.text') }}</b-form-radio>
-              </b-form-radio-group>
-            </b-form-group>
-            <BBoxEntry v-if="provideBBox && bboxSelectionStyle === 'text'" :bbox="query.bbox || [180, 80, 180, 80]" @updateBBoxArray="updateBBoxArray" />
-            <Map class="mb-4" v-if="provideBBox && bboxSelectionStyle === 'map'" :stac="stac" selectBounds @bounds="setBBox" scrollWheelZoom />
-          </template>
+          <b-form-checkbox :id="ids.bbox" v-model="provideBBox" value="1" @change="setBBox()">{{ $t('search.filterBySpatialExtent') }}</b-form-checkbox>
+          <Map class="mb-4" v-if="provideBBox" :stac="stac" selectBounds @bounds="setBBox" scrollWheelZoom />
         </b-form-group>
 
         <b-form-group v-if="conformances.CollectionIdFilter" :label="$tc('stacCollection', collections.length)" :label-for="ids.collections">
@@ -132,12 +118,11 @@
 </template>
 
 <script>
-import { BBadge, BDropdown, BDropdownItem, BForm, BFormGroup, BFormInput, BFormCheckbox, BFormRadioGroup, BFormRadio } from 'bootstrap-vue';
+import { BBadge, BDropdown, BDropdownItem, BForm, BFormGroup, BFormInput, BFormCheckbox, BFormRadioGroup } from 'bootstrap-vue';
 import Multiselect from 'vue-multiselect';
 import { mapGetters, mapState } from "vuex";
 import refParser from '@apidevtools/json-schema-ref-parser';
 
-import BBoxEntry from './BBoxEntry.vue';
 import Utils, { schemaMediaType } from '../utils';
 import { ogcQueryables } from "../rels";
 
@@ -281,14 +266,12 @@ export default {
   name: 'SearchFilter',
   components: {
     BBadge,
-    BBoxEntry,
     BDropdown,
     BDropdownItem,
     BForm,
     BFormGroup,
     BFormInput,
     BFormCheckbox,
-    BFormRadio,
     BFormRadioGroup,
     QueryableInput: () => import('./QueryableInput.vue'),
     Loading,
