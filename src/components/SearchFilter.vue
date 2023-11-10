@@ -124,7 +124,7 @@
         </b-form-group>
       </b-card-body>
       <b-card-footer>
-        <b-button id="submitBtn" type="submit" variant="primary">{{ $t('submit') }}</b-button>
+        <b-button type="submit" variant="primary">{{ $t('submit') }}</b-button>
         <b-button type="reset" variant="danger" class="ml-3">{{ $t('reset') }}</b-button>
       </b-card-footer>
     </b-card>
@@ -166,52 +166,6 @@ function getQueryDefaults() {
   };
 }
 
-function getUrlParamValues() {
-  const searchURL = new URL(window.location);
-  const params = searchURL.searchParams;
-  const urlParams = {};
-  const arrayParams = ['bbox', 'collections', 'ids'];
-  const allowedQueryParams = [
-  'q',
-  'datetime',
-  'bbox',
-  'limit',
-  'ids',
-  'collections',
-  'sortby',
-  'filters',
-  'itemsPerPage'];
-  
-  allowedQueryParams.forEach((allowedParam) => {
-    if (params.has(allowedParam)) {
-      if( arrayParams.includes(allowedParam)) {
-        urlParams[allowedParam] = params.get(allowedParam).split(',');
-        // bbox bust be array of numbers
-        if(allowedParam === 'bbox') {
-          urlParams[allowedParam] = urlParams[allowedParam].map(Number);
-        }
-      } else if(allowedParam === 'datetime') {
-        // datetime must be array of date objects
-          urlParams[allowedParam] = params.get(allowedParam);
-          const dateArray= urlParams['datetime'].split('/').map( day => new Date(day));
-          urlParams[allowedParam] = dateArray;
-        } else {
-        // all others are strings
-        urlParams[allowedParam] = params.get(allowedParam);
-      }
-    }
-  });
-
-  const combinedQuery = { ...getQueryDefaults(), ...urlParams};
-  return combinedQuery;
-}
-
-function bboxProvided() {
-      const searchURL = new URL(window.location);
-      const hasBbox = searchURL.searchParams.has('bbox');
-      return hasBbox;
-    }
-
 function getDefaults() {
   return {
     sortOrder: 1,
@@ -223,56 +177,6 @@ function getDefaults() {
     selectedCollections: [],
     bboxSelectionStyle: 'map'
   };
-}
-
-function overwriteDefaults() {
-  const searchURL = new URL(window.location);
-  const params = searchURL.searchParams;
-  const permittedOverwrites = ['sortOrder', 'sortTerm', 'provideBBox'];
-  const numericParams=['sortOrder', 'limit'];
-  const defaultOverwrites = {
-    provideBBox: bboxProvided(),
-    bboxSelectionStyle: bboxProvided() ? 'text' : 'map',
-  };
-
-
-  permittedOverwrites.forEach((allowedValue) => {
-    if(params.has(allowedValue)) {
-      // sortTerm is a json object, not a string
-      if (allowedValue === 'sortTerm') {
-        defaultOverwrites[allowedValue] = JSON.parse(params.get(allowedValue));
-      }
-      else if(numericParams.includes(allowedValue)) {
-        defaultOverwrites[allowedValue] = parseInt(params.get(allowedValue));
-      } else {
-        defaultOverwrites[allowedValue] = params.get(allowedValue);
-      }
-    }
-  });
-
-  return {...getDefaults(), ...defaultOverwrites};
-
-}
-
-function updateUrlParamString(key, value) {
-  // remove parameters if new value is null
-  const searchURL = new URL(window.location);
-  if (value === null || value.length === 0 || value.value === null) {
-    searchURL.searchParams.delete(key);
-    window.history.pushState({}, '', searchURL);
-    return;
-  }
-  // sortTerm is an object
-  if(key === 'sortTerm') {
-    searchURL.searchParams.set(key, JSON.stringify(value));
-  } else if(key ==='datetime') {
-    const dateFormattedForPicker = `${JSON.stringify(value['0'])}/${JSON.stringify(value['1'])}`;
-    searchURL.searchParams.set(key, dateFormattedForPicker.replaceAll('"',''));
-  } else {
-    searchURL.searchParams.set(key, value);
-  }
-
-  window.history.pushState({}, '', searchURL);
 }
 
 let formId = 0;
@@ -288,8 +192,8 @@ export default {
     BFormGroup,
     BFormInput,
     BFormCheckbox,
-    BFormRadio,
     BFormRadioGroup,
+    BFormRadio,
     QueryableInput: () => import('./QueryableInput.vue'),
     Loading,
     Map: () => import('./Map.vue'),
@@ -316,10 +220,6 @@ export default {
     value: {
       type: Object,
       default: () => ({})
-    },
-    searchLink: {
-      type: Object,
-      default: () => ({})
     }
   },
   data() {
@@ -332,7 +232,7 @@ export default {
       collections: [],
       collectionsLoadingTimer: null,
       additionalCollectionCount: 0
-    }, overwriteDefaults());
+    }, getDefaults());
   },
   computed: {
     ...mapState(['itemsPerPage', 'uiLanguage']),
@@ -415,7 +315,7 @@ export default {
       immediate: true,
       deep: true,
       handler(value) {
-        let query = Object.assign(getUrlParamValues(), value);
+        let query = Object.assign(getQueryDefaults(), value);
         if (Array.isArray(query.datetime)) {
           query.datetime = query.datetime.map(Utils.dateFromUTC);
         }
@@ -430,8 +330,7 @@ export default {
           });
         }
       }
-    },
-    $route() {},
+    }
   },
   beforeCreate() {
     formId++;
@@ -459,14 +358,6 @@ export default {
       );
     }
     Promise.all(promises).finally(() => this.loaded = true);
-  },
-  mounted() {
-    // submit form if loaded with url params
-  const searchURL = new URL(window.location);
-  const params = searchURL.searchParams;
-    if(params.size > 1) {
-      document.getElementById("submitBtn").click();
-    }
   },
   methods: {
     resetSearchCollection() {
@@ -592,11 +483,9 @@ export default {
     },
     sortFieldSet(value) {
       this.sortTerm = value;
-      updateUrlParamString('sortTerm', value);
     },
     sortDirectionSet(value) {
       this.sortOrder = value;
-      updateUrlParamString('sortOrder', value);
     },
     buildFilter() {
       if (this.filters.length === 0) {
@@ -627,7 +516,6 @@ export default {
     async onReset() {
       Object.assign(this, getDefaults());
       this.$emit('input', {}, true);
-      this.removeQueryParams();
     },
     setLimit(limit) {
       limit = Number.parseInt(limit, 10);
@@ -638,24 +526,20 @@ export default {
         limit = null;
       }
       this.$set(this.query, 'limit', limit);
-      updateUrlParamString('limit', limit);
     },
     addSearchTerm(term) {
       if (!Utils.hasText(term)) {
         return;
       }
       this.query.q.push(term);
-      updateUrlParamString('q', term);
     },
     setSearchTerms(terms) {
       this.$set(this.query, 'q', terms);
-      updateUrlParamString('q', terms);
     },
     updateBBoxArray(entry, position) {
       const bbox = this.query.bbox;
       bbox[position] = Number(entry);
       this.$set(this.query, 'bbox', bbox);
-      updateUrlParamString('bbox', bbox);
     },
     setBBox(bounds) {
       let bbox = null;
@@ -676,7 +560,6 @@ export default {
         }
       }
       this.$set(this.query, 'bbox', bbox);
-      updateUrlParamString('bbox', bbox);
     },
     setDateTime(datetime) {
       if (datetime.find(dt => dt instanceof Date)) {
@@ -686,7 +569,6 @@ export default {
         datetime = null;
       }
       this.$set(this.query, 'datetime', datetime);
-      updateUrlParamString('datetime', datetime);
     },
     addCollection(collection) {
       if (!this.collectionSelectOptions.taggable) {
@@ -697,20 +579,16 @@ export default {
       this.selectedCollections.push(opt);
       this.collections.push(opt);
       this.query.collections.push(collection);
-      updateUrlParamString('collections', collection);
     },
     setCollections(collections) {
       this.selectedCollections = collections;
       this.$set(this.query, 'collections', collections.map(c => c.value));
-      updateUrlParamString('collections', collections.map(c => c.value));
     },
     addId(id) {
       this.query.ids.push(id);
-      updateUrlParamString('ids', id);
     },
     setIds(ids) {
       this.$set(this.query, 'ids', ids);
-      updateUrlParamString('ids', ids);
     },
     formatSort() {
       if (this.sortTerm && this.sortTerm.value && this.sortOrder) {
@@ -720,11 +598,8 @@ export default {
       else {
         return null;
       }
-    },
-    removeQueryParams() {
-      this.$router.replace({name: "search"});
-    },
-  },
+    }
+  }
 };
 </script>
 
