@@ -542,9 +542,6 @@ export default {
     setBBox(bounds) {
       let bbox = null;
       if (this.provideBBox) {
-        if(this.bboxSelectionStyle ==="text") {
-          console.log("bbox selection is text")
-        }
         if (Utils.isObject(bounds) && typeof bounds.toBBoxString === 'function') {
           // This is a Leaflet LatLngBounds Object
           const Y = 85.06;
