@@ -1,10 +1,10 @@
 <template>
-  <b-form-group>
+  <b-container>
     <b-form-row>
       <b-col>
-        <b-form-group label="x_min" label-for="x_min">
+        <b-form-group label="Southwest Latitude" label-for="sw_latitude">
           <b-form-input
-            id="x_min"
+            id="sw_latitude"
             @input="updateBBoxArray($event, 0)" 
             :value="bbox[0]"
             type="number"
@@ -16,9 +16,9 @@
         </b-form-group>
       </b-col>
       <b-col>
-        <b-form-group label="y_min" label-for="y_min">
+        <b-form-group label="Southwest Longitude" label-for="sw_longitude">
           <b-form-input
-            id="y_min"
+            id="sw_longitude"
             @input="updateBBoxArray($event, 1)" 
             :value="bbox[1]"
             type="number"
@@ -29,10 +29,12 @@
           />
         </b-form-group>
       </b-col>
+    </b-form-row>
+    <b-form-row>
       <b-col>
-        <b-form-group label="x_max" label-for="x_max">  
+        <b-form-group label="Northeast Latitude" label-for="ne_latitude">  
           <b-form-input
-            id="x_max"
+            id="ne_latitude"
             @input="updateBBoxArray($event, 2)" 
             :value="bbox[2]"
             type="number"
@@ -44,9 +46,9 @@
         </b-form-group>
       </b-col>
       <b-col>
-        <b-form-group label="y_max" label-for="y_max">
+        <b-form-group label="Northeast Longitude" label-for="ne_longitude">
           <b-form-input
-            id="y_max"
+            id="ne_longitude"
             @input="updateBBoxArray($event, 3)"
             :value="bbox[3]"
             type="number"
@@ -58,7 +60,7 @@
         </b-form-group>
       </b-col>
     </b-form-row>
-  </b-form-group>
+  </b-container>
 </template>
 
 <script>
@@ -83,3 +85,11 @@ props: {
  }
 };
 </script>
+
+<style lang="scss">
+@import "../theme/variables.scss";
+
+legend {
+  font-size: 1.3em
+}
+</style>

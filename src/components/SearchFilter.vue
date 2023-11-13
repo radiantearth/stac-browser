@@ -30,18 +30,15 @@
           <b-form-checkbox :id="ids.bbox" v-model="provideBBox" @change="setBBox()">{{ $t('search.filterBySpatialExtent') }}</b-form-checkbox>
           <template>
             <b-form-group v-if="provideBBox">
-              <b-form-radio-group
-                v-model="bboxSelectionStyle"
-                buttons
-                size="sm"
-                button-variant="outline-primary"
-              >
-                <b-form-radio value="map">{{ $t('search.defineBbox.map') }}</b-form-radio>
-                <b-form-radio value="text">{{ $t('search.defineBbox.text') }}</b-form-radio>
-              </b-form-radio-group>
+              <b-tabs>
+                <b-tab v-model="bboxSelectionStyle" :title="$t('search.defineBbox.map')">
+                  <Map class="mb-4" :stac="stac" selectBounds @bounds="setBBox" scrollWheelZoom />
+                </b-tab>
+                <b-tab v-model="bboxSelectionStyle" :title="$t('search.defineBbox.text')">
+                  <BBoxEntry :bbox="query.bbox || [-180, -80, 180, 80]" @updateBBoxArray="updateBBoxArray" />
+                </b-tab>
+              </b-tabs>
             </b-form-group>
-            <BBoxEntry v-if="provideBBox && bboxSelectionStyle === 'text'" :bbox="query.bbox || [180, 80, 180, 80]" @updateBBoxArray="updateBBoxArray" />
-            <Map class="mb-4" v-if="provideBBox && bboxSelectionStyle === 'map'" :stac="stac" selectBounds @bounds="setBBox" scrollWheelZoom />
           </template>
         </b-form-group>
 
@@ -132,7 +129,7 @@
 </template>
 
 <script>
-import { BBadge, BDropdown, BDropdownItem, BForm, BFormGroup, BFormInput, BFormCheckbox, BFormRadioGroup, BFormRadio } from 'bootstrap-vue';
+import { BBadge, BDropdown, BDropdownItem, BForm, BFormGroup, BFormInput, BFormCheckbox, BFormRadioGroup, BTabs, BTab } from 'bootstrap-vue';
 import Multiselect from 'vue-multiselect';
 import { mapGetters, mapState } from "vuex";
 import refParser from '@apidevtools/json-schema-ref-parser';
@@ -193,7 +190,8 @@ export default {
     BFormInput,
     BFormCheckbox,
     BFormRadioGroup,
-    BFormRadio,
+    BTabs,
+    BTab,
     QueryableInput: () => import('./QueryableInput.vue'),
     Loading,
     Map: () => import('./Map.vue'),
@@ -544,6 +542,9 @@ export default {
     setBBox(bounds) {
       let bbox = null;
       if (this.provideBBox) {
+        if(this.bboxSelectionStyle ==="text") {
+          console.log("bbox selection is text")
+        }
         if (Utils.isObject(bounds) && typeof bounds.toBBoxString === 'function') {
           // This is a Leaflet LatLngBounds Object
           const Y = 85.06;
