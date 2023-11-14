@@ -35,7 +35,7 @@
                   <Map class="mb-4" :stac="stac" selectBounds @bounds="setBBox" scrollWheelZoom />
                 </b-tab>
                 <b-tab v-model="bboxSelectionStyle" :title="$t('search.defineBbox.text')">
-                  <BBoxEntry :bbox="query.bbox || [-180, -80, 180, 80]" @updateBBoxArray="updateBBoxArray" />
+                  <BBoxEntry :bbox="query.bbox" @updateBBoxArray="updateBBoxArray" />
                 </b-tab>
               </b-tabs>
             </b-form-group>
