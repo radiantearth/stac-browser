@@ -2,9 +2,12 @@
   <li class="link">
     <StacLink :id="popoverId" :data="link" :fallbackTitle="fallbackTitle" class="pr-1" />
     <b-popover :target="popoverId" triggers="hover" placement="right" container="#stac-browser" custom-class="link-more">
-      <h3 class="first">{{ $t('additionalActions') }}</h3>
-      <HrefActions vertical :data="link" size="sm" />
-      <Metadata :data="link" type="link" headerTag="h3" :ignoreFields="ignore" />
+      <Description v-if="link.description" :description="link.description" compact />
+      <section class="link-actions">
+        <h3 class="first">{{ $t('additionalActions') }}</h3>
+        <HrefActions vertical :data="link" size="sm" />
+      </section>
+      <Metadata :data="link" type="Link" headerTag="h3" :ignoreFields="ignore" />
     </b-popover>
   </li>
 </template>
@@ -22,6 +25,7 @@ export default {
     BPopover,
     HrefActions,
     StacLink,
+    Description: () => import('./Description.vue'),
     Metadata: () => import('./Metadata.vue')
   },
   props: {
@@ -36,7 +40,7 @@ export default {
   },
   data() {
     return {
-      ignore: ['href', 'type', 'rel', 'title']
+      ignore: ['href', 'type', 'rel', 'title', 'description']
     };
   },
   computed: {
@@ -54,6 +58,10 @@ export default {
 #stac-browser .link-more {
   width: auto;
   max-width: 600px;
+
+  .styled-description {
+    margin-bottom: 1rem;
+  }
 
   h3 {
     font-size: 0.85rem;
