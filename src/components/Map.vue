@@ -8,10 +8,8 @@
         v-for="basemap of basemaps" :is="basemap.is" :key="basemap.key"
         ref="basemaps" layerType="base" v-bind="basemap"
       />
-      <l-tile-layer
-        v-for="xyz of xyzLinks" ref="overlays" :key="xyz.url" layerType="overlay"
-        :name="xyz.name" :url="xyz.url" :subdomains="xyz.subdomains" :options="xyz.options" 
-      />
+      <l-tile-layer v-for="xyz of xyzLinks" ref="overlays" :key="xyz.url" layerType="overlay" v-bind="xyz" />
+      <LWMSTileLayer v-for="wms of wmsLinks" ref="overlays" :key="wms.url" layerType="overlay" v-bind="wms" />
       <l-geo-json v-if="geojson" ref="geojson" :geojson="geojson" :options="{onEachFeature: showPopup}" :optionsStyle="{color: secondaryColor, weight: secondaryWeight}" />
     </l-map>
     <b-popover
@@ -140,24 +138,50 @@ export default {
       }).filter(map => Utils.isObject(map));
     },
     showLayerControl() {
-      return this.xyzLinks.length > 0 || this.basemaps.length > 1;
+      return this.xyzLinks.length > 0 || this.wmsLinks.length > 0 || this.basemaps.length > 1;
     },
     xyzLinks() {
-      if (!(this.stac instanceof STAC)) {
-        return [];
+      const links = this.getWebMapLinks('xyz');
+      return links.map(link => ({
+        url: link.href,
+        name: link.title || Utils.titleForHref(link.href),
+        subdomains: link.servers,
+        attribution: link.attribution || this.stac.getMetadata('attribution')
+      }));
+    },
+    wmsLinks() {
+      const links = this.getWebMapLinks('wms');
+      const wmsLinks = [];
+      for(const link of links) {
+        if (!Array.isArray(link['wms:layers'])) {
+          continue;
+        }
+        for(const i in link['wms:layers']) {
+          const layers = link['wms:layers'][i];
+          let styles;
+          if (Array.isArray(link['wms:styles']) && typeof link['wms:styles'][i] === 'string') {
+            styles = link['wms:styles'][i];
+          }
+          const name = [link.title, layers].filter(x => Boolean(x)).join(' - ');
+          const props = {
+            baseUrl: link.href,
+            name,
+            attribution: link.attribution || this.stac.getMetadata('attribution'),
+            version: '1.3.0',
+            layers,
+            transparent: String(link['wms:transparent'] || false),
+            styles
+          };
+          if (typeof link['type'] === 'string' && link['type'].startsWith('image/')) {
+            props.format = link['type'];
+          }
+          if (Utils.isObject(link['wms:dimensions'])) {
+            props.options = link['wms:dimensions'];
+          }
+          wmsLinks.push(props);
+        }
       }
-      let links = this.stac.getLinksWithRels('xyz');
-      if (links.length === 0) {
-        return [];
-      }
-      return links.map(link => {
-        return {
-          url: link.href,
-          name: link.title,
-          subdomains: link.servers,
-          options: {}
-        };
-      });
+      return wmsLinks;
     }
   },
   watch: {
@@ -210,12 +234,23 @@ export default {
         this.addBoundsSelector();
       }
     },
+    getWebMapLinks(rel) {
+      if (!(this.stac instanceof STAC)) {
+        return [];
+      }
+      let links = this.stac.getLinksWithRels(rel);
+      if (links.length === 0) {
+        return [];
+      }
+      return links;
+    },
     updateLayerControl() {
       if (this.showLayerControl) {
-        let basemaps = Array.isArray(this.$refs.basemaps) ? this.$refs.basemaps : [];
-        basemaps.forEach(layer => this.$refs.layerControl.addLayer(layer));
-        let overlays = Array.isArray(this.$refs.overlays) ? this.$refs.overlays : [];
-        overlays.forEach(layer => this.$refs.layerControl.addLayer(layer));
+        const basemaps = Array.isArray(this.$refs.basemaps) ? this.$refs.basemaps : [];
+        const xyzOverlays = Array.isArray(this.$refs.xyzOverlays) ? this.$refs.xyzOverlays : [];
+        const wmsOverlays = Array.isArray(this.$refs.wmsOverlays) ? this.$refs.wmsOverlays : [];
+        const layers = basemaps.concat(xyzOverlays).concat(wmsOverlays);
+        layers.forEach(layer => this.$refs.layerControl.addLayer(layer));
       }
     },
     viewChanged(event) {
