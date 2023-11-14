@@ -77,7 +77,7 @@ export default {
       type: [Array, null],
       default: () => ([-180, -80, 180, 80]),
       validator(value) {
-        return value.length === 4 && value.every((e) => typeof e === 'number');
+        return Array.isArray(value) && value.length === 4 && value.every((e) => typeof e === 'number');
       }
     }
   },
