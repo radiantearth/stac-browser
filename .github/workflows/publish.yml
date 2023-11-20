@@ -1,13 +1,17 @@
 name: Publish
 
 on:
-  push:
-    branches:
-      - main
+  release:
+    types: [released]
   workflow_dispatch:
+    inputs:
+      TAG_NAME:
+        description: "Tag name"
+        required: true
 
 env:
   REGISTRY: ghcr.io
+  TAG_NAME: ${{ github.event.inputs.TAG_NAME || github.event.release.tag_name }}
 
 jobs:
   retag-docker-image:
@@ -18,13 +22,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Extract version
-        id: extract_version
-        uses: Saionaro/extract-package-version@v1.2.1
-
       - name: Set environment variables
         run: |
-          echo VERSION=${{ steps.extract_version.outputs.version }} >> $GITHUB_ENV
+          echo VERSION=${TAG_NAME#v} >> $GITHUB_ENV
           echo IMAGE_NAME=$REGISTRY/$(echo ${GITHUB_REPOSITORY,,}) >> $GITHUB_ENV
           echo COMMITED_AT=$(git show -s --format=%cI `git rev-parse HEAD`) >> $GITHUB_ENV
           echo REVISION=$(git rev-parse --short HEAD) >> $GITHUB_ENV
