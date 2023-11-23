@@ -31,8 +31,8 @@
           <template>
             <b-form-group v-if="provideBBox">
               <b-tabs>
-                <b-tab v-model="bboxSelectionStyle" :title="$t('search.defineBbox.map')">
-                  <Map class="mb-4" :stac="stac" selectBounds @bounds="setBBox" scrollWheelZoom />
+                <b-tab v-model="bboxSelectionStyle" :title="$t('search.defineBbox.map')" lazy>
+                  <Map class="mb-4" :stac="stac" :bbox="query.bbox" selectBounds @bounds="setBBox" scrollWheelZoom />
                 </b-tab>
                 <b-tab v-model="bboxSelectionStyle" :title="$t('search.defineBbox.text')">
                   <BBoxEntry :bbox="query.bbox" @updateBBoxArray="updateBBoxArray" />

@@ -90,6 +90,10 @@ export default {
     fitBoundsOnce: {
       type: Boolean,
       default: false
+    },
+    bbox: {
+      type: Array,
+      default: null,
     }
   },
   data() {
@@ -161,6 +165,9 @@ export default {
     }
   },
   watch: {
+    bbox: function(newVal) {
+      return newVal;
+    },
     uiLanguage() {
       // This recreates the component so that it picks up the new translations
       this.ix++;
@@ -419,9 +426,11 @@ export default {
         minWidth: 20,
         minHeight: 20,
         minHorizontalSpacing: 20,
-        minVerticalSpacing: 20
+        minVerticalSpacing: 20, 
+        bbox: this.bbox,
       });
       this.areaSelect.addTo(this.map);
+      this.areaSelect.setInitialBounds(this.bbox);
       this.areaSelect.on("change", () => this.emitBounds());
       this.emitBounds();
     },

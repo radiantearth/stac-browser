@@ -14,6 +14,7 @@ L.AreaSelect = L.Class.extend({
     minHorizontalSpacing: 30,
     minVerticalSpacing: 30,
     keepAspectRatio: false,
+    bbox: null,
   },
 
   initialize: function (options) {
@@ -21,6 +22,7 @@ L.AreaSelect = L.Class.extend({
 
     this._width = this.options.width;
     this._height = this.options.height;
+    this._bbox = this.options.bbox;
   },
 
   addTo: function (map) {
@@ -34,6 +36,20 @@ L.AreaSelect = L.Class.extend({
     this.fire("change");
     this._render();
     return this;
+  },
+
+  setInitialBounds: function ( bounds) {
+    if(bounds) {
+      const sw = this.map.latLngToContainerPoint([bounds[0], bounds[1]]);
+      const ne =this.map.latLngToContainerPoint([bounds[2], bounds[3]]);
+  
+      const bboxWidth = ne['x'] - sw['x'];
+      const bboxHeight = sw['y'] - ne['y'];
+  
+      this._width = bboxWidth;
+      this._height = bboxHeight;
+      this._render();
+    }
   },
 
   getBounds: function () {
