@@ -1,0 +1,62 @@
+name: Publish
+
+on:
+  release:
+    types: [released]
+  workflow_dispatch:
+    inputs:
+      TAG_NAME:
+        description: "Tag name"
+        required: true
+
+env:
+  REGISTRY: ghcr.io
+  TAG_NAME: ${{ github.event.inputs.TAG_NAME || github.event.release.tag_name }}
+
+jobs:
+  retag-docker-image:
+    runs-on: ubuntu-latest
+    name: Push updated Docker image
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set environment variables
+        run: |
+          echo VERSION=${TAG_NAME#v} >> $GITHUB_ENV
+          echo IMAGE_NAME=$REGISTRY/$(echo ${GITHUB_REPOSITORY,,}) >> $GITHUB_ENV
+          echo COMMITED_AT=$(git show -s --format=%cI `git rev-parse HEAD`) >> $GITHUB_ENV
+          echo REVISION=$(git rev-parse --short HEAD) >> $GITHUB_ENV
+
+      - name: Collect Docker image metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE_NAME }}
+          labels: |
+            org.opencontainers.image.created=${{ env.COMMITED_AT }}
+            org.opencontainers.image.version=v${{ env.VERSION }}
+            org.opencontainers.image.maintainer=$({github.repository_owner})
+          tags: |
+            type=semver,pattern={{version}},value=v${{ env.VERSION }}
+
+      - name: Log in to the GitHub container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.repository_owner  }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          build-args: |
+            VERSION=${{ env.VERSION }}
+            REVISION=${{ env.REVISION }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=registry,ref=${{ env.IMAGE_NAME }}:edge
+          cache-to: type=inline
