@@ -15,6 +15,9 @@ This package has also been published to npm as [`@radiantearth/stac-browser`](ht
 It's not officially supported, but you may also be able to use it for
 certain *OGC API - Records* and *OGC API - Features* compliant servers.
 
+**Please note that STAC Browser is currently without funding for both maintenance, bug fixes and improvements. This means issues and PRs may be adressed very slowly.
+If you care about STAC Browser and have some funds to support the future of STAC Browser, please contact matthias@mohr.ws**
+
 **Table of Contents:**
 - [Examples](#examples)
 - [Get Started](#get-started)
@@ -301,6 +304,3 @@ The following sponsors have provided a subststantial amount of funding for STAC 
 - [Matthias Mohr - Softwareentwicklung](https://mohr.ws) (maintenance)
 - [Spacebel](https://spacebel.com) (collection search)
 - [Planet](https://planet.com) (OpenID Connect authentication, other features, maintenance)
-
-**Please note that STAC Browser is currently mostly without funding for both maintenance, bug fixes and improvements.
-If you care about STAC Browser and have some funds to support the future of STAC Browser, please contact me: matthias@mohr.ws**
