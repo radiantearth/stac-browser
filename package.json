@@ -35,7 +35,7 @@
   "dependencies": {
     "@apidevtools/json-schema-ref-parser": "^10.1.0",
     "@musement/iso-duration": "^1.0.0",
-    "@radiantearth/stac-fields": "1.3.0",
+    "@radiantearth/stac-fields": "1.3.2",
     "@radiantearth/stac-migrate": "~1.6.0",
     "axios": "^1.2.0",
     "bootstrap-vue": "^2.21.2",

@@ -1,6 +1,6 @@
 <template>
   <section v-if="formattedData.length > 0" class="metadata">
-    <h2 v-if="title">{{ title || $t('metadata.title') }}</h2>
+    <component :is="headerTag" v-if="title">{{ titleText }}</component>
     <b-card-group columns :class="`count-${formattedData.length}`">
       <MetadataGroup v-for="group in formattedData" v-bind="group" :key="group.extension" />
     </b-card-group>
@@ -39,8 +39,12 @@ export default {
             default: () => ([])
         },
         title: {
+            type: [Boolean, String],
+            default: true
+        },
+        headerTag: {
             type: String,
-            default: null
+            default: 'h2'
         }
     },
     data() {
@@ -50,6 +54,12 @@ export default {
     },
     computed: {
         ...mapState(['uiLanguage']),
+        titleText() {
+          if (typeof this.title === 'string') {
+            return this.title;
+          }
+          return this.$t('metadata.title');
+        }
     },
     watch: {
         uiLanguage: {
