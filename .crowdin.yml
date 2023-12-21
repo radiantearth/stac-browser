@@ -1,0 +1,6 @@
+files:
+  - source: src/locales/en/*.json
+    ignore:
+      - config.json
+      - custom.json
+    translation: /src/locales/%two_letters_code%/%original_file_name%
