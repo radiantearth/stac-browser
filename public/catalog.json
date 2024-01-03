@@ -1,0 +1,98 @@
+{
+    "id": "geoplatform-stac",
+    "stac_version": "1.0.0",
+    "title": "GeoPlatform STAC Catalog",
+    "description": "GeoPlatform.gov provides official list of National STAC Sources.",
+    "type": "Catalog",
+    "links": [
+        {
+            "rel": "self",
+            "href": "./catalog.json"
+        },
+        {
+            "rel": "root",
+            "href": "./catalog.json"
+        },
+        {
+            "rel": "child",
+            "href": "https://gp-sit-us-east-1-public-configs.s3.amazonaws.com/stac/national_map/catalog.json",
+            "title": "The National Map"
+        },
+        
+        {
+            "rel": "child",
+            "href": "https://gp-sit-us-east-1-public-configs.s3.amazonaws.com/stac/test_census_tiger/catalog.json",
+            "title": "Census"
+        },
+        {
+            "rel": "child",
+            "href": "https://landsat-stac.s3.amazonaws.com/catalog.json",
+            "title": "Landsat STAC Data"
+        },
+        {
+            "rel": "child",
+            "href": "https://franklin.nasa-hsi.azavea.com/",
+            "title": "NASA AVIRIS catalog"
+        },
+        {
+            "rel": "child",
+            "href": "https://cmr.earthdata.nasa.gov/stac",
+            "title": "NASA CMR"
+        },
+        {
+            "rel": "child",
+            "href": "https://cmr.earthdata.nasa.gov/cloudstac",
+            "title": "NASA CMR Cloud"
+        },
+        {
+            "rel": "child",
+            "href": "https://nasa-iserv.s3-us-west-2.amazonaws.com/catalog/catalog.json",
+            "title": "NASA ISERV"
+        },
+        {
+            "rel": "child",
+            "href": "https://cmr.earthdata.nasa.gov/stac",
+            "title": "NASA STAC Data"
+        },
+        {
+            "rel": "child",
+            "href": "https://raw.githubusercontent.com/scottyhq/sentinel1-rtc-stac/main/collection.json",
+            "title": "Sentinel-1 Analysis Ready Backscatter Imagery"
+        },
+        {
+            "rel": "child",
+            "href": "https://tamn.snapplanet.io",
+            "title": "Sentinel-2 and Landsat-8 catalog"
+        },
+        {
+            "rel": "child",
+            "href": "https://earth-search.aws.element84.com/v0/collections/sentinel-s2-l2a",
+            "title": "Sentinel 2 L2A"
+        },
+        {
+            "rel": "child",
+            "href": "https://stacindex.org/api/proxy?https%3A%2F%2Fmeeo-s5p.s3.amazonaws.com%2Fcatalog.json",
+            "title": "Sentinel 5P Level 2 and Level 3"
+        },
+        {
+            "rel": "child",
+            "href": "https://sentinel-stac.s3.amazonaws.com/catalog.json",
+            "title": "Sentinel STAC Data"
+        },
+        {
+            "rel": "child",
+            "href": "https://usgs-lidar-stac.s3-us-west-2.amazonaws.com/ept/catalog.json",
+            "title": "USGS 3DEP LiDAR Point Clouds"
+        },
+        {
+            "rel": "child",
+            "href": "https://asc-stacbrowser.s3.us-west-2.amazonaws.com/catalog.json",
+            "title": "USGS Astrogeology Provided Analysis Ready Data"
+        },
+        {
+            "rel": "child",
+            "href": "https://landsatlook.usgs.gov/stac-server",
+            "title": "USGS Landsat"
+        }
+    ]
+}

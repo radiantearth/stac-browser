@@ -1,16 +1,118 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>STAC Browser</title>
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+  
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css"
+      integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+    <!-- <script src="https://kit.fontawesome.com/29d955169e.js" crossorigin="anonymous"></script> -->
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+  
+    <!-- <link rel="stylesheet" type="text/css" href="/geoplatform-demos/assets/css/reset.css" />
+    <link rel="stylesheet" type="text/css" href="/geoplatform-demos/assets/css/code-styler.css" />
+    <link rel="stylesheet" type="text/css" href="/geoplatform-demos/assets/css/gh-pages-overrides.css" /> -->
+    <link rel="stylesheet" type="text/css" href="https://sit.geoplatform.info/assets/css/gp-external.min.css" />
+  
+    <link rel="icon" type="image/x-icon" href="https://www.geoplatform.gov/assets/images/web-icons/favicon.ico" />
+    <title>GeoPlatform STAC</title>
+    <style>
+      #rendered {
+        position: relative;
+        flex-direction: column;
+        padding: 20px;
+        flex-grow: 1;
+        display: flex;
+        align-self: center;
+        width: 100%;
+      }
+    </style>
   </head>
   <body>
-    <noscript>
-      <strong>We're sorry but STAC Browser doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
-    </noscript>
-    <div id="app"></div>
+    <div id="root">
+      <header class="site-header">
+        <nav class="navbar navbar-dark navbar-expand-lg">
+          <a class="navbar-brand" href="http://www.geoplatform.gov/">
+            <img title="Home" src="https://sit.geoplatform.info/assets/images/logos/gp/full-light.svg"
+              alt="GeoPlatform Logo">
+          </a>
+          <div>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
+              aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+          </div>
+          <div class="navbar-collapse collapse" id="navbarCollapse" style="height: 0px">
+            <links>
+              <ul id="primary-nav" class="navbar-nav ml-auto">
+                <li class="nav-item">
+                  <a class="nav-link" href="https://www.geoplatform.gov/search">Search</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="https://www.geoplatform.gov/ngda">NGDA Themes</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="https://www.geoplatform.gov/communities">Communities</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="https://www.geoplatform.gov/apps">Apps</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="https://www.geoplatform.gov/demos">Demos</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="https://www.geoplatform.gov/cloud-hosting">Cloud Hosting</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="https://www.geoplatform.gov/about">About</a>
+                </li>
+              </ul>
+            </links>
+          </div>
+        </nav>
+        <div class="hero-push"></div>
+        <div class="hero-container">
+          <section class="hero-root">
+            <div class="hero-content-container">
+              <h1 class="hero-title">GeoPlatform <span id='orange-text'>STAC</span></h1>
+              <h5 class="hero-subtitle">GeoPlatform is making Federal GeoData <span>F</span>indable,
+                <span>A</span>ccessible, <span>I</span>nteroperable, and <span>R</span>eusable
+              </h5>
+            </div>
+            <div id="hero-image" aria-label="decorative" class="hero-image-container">
+              <div role="img" aria-labelledby="hero-image" class="hero-image"></div>
+            </div>
+          </section>
+        </div>
+      </header>
+      <noscript>
+        <strong>We're sorry but STAC Browser doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+      </noscript>
+      <div id="stac-browser"></div>
+      <footer class="site-footer h-card">
+        <div class="footer-container">
+          <div id="logo" aria-label="GeoPlatform Logo" class="footer-logo">
+            <img src="https://sit.geoplatform.info/assets/images/logos/gp/full-light.svg" alt="GeoPlatform Logo"
+              aria-labelledby="logo">
+          </div>
+          <p>The GeoPlatform was developed by the member agencies of the Federal Geographic Data Committee (FGDC)
+            through collaboration with partners and stakeholders. The target audience for the GeoPlatform includes
+            Federal agencies, State, local, and Tribal
+            governments, private sector, academia, and the general public. <br>
+          </p>
+          <p>
+            <span><a href="https://geoplatform.atlassian.net/wiki/spaces/GC/pages/661553196/#Data-Policy">Data
+                Policy</a></span>
+            <span><a href="https://geoplatform.atlassian.net/wiki/spaces/GC/pages/661553196/#Privacy-Policy">Privacy
+                Policy</a></span>
+            <span><a href="https://geoplatform.atlassian.net/servicedesk/customer/portals">Service Desk</a></span>
+            <span><a href="https://geoplatform.atlassian.net/wiki/spaces/GC/overview">Guides and
+                Documentation</a></span>
+          </p>
+          <span class="poweredby text-muted">
+            Powered by <a href="https://github.com/geoplatform/stac-browser" target="_blank">STAC Browser</a>
+          </span>
+        </div>
+      </footer>
+    </div>
   </body>
 </html>
