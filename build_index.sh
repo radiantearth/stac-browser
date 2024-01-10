@@ -5,7 +5,7 @@ if [ "$STG_ENV" = "sit" ]; then
 elif [ "$STG_ENV" = "stg" ]; then
     endpoint="https://stg.geoplatform.gov"
 elif [ "$STG_ENV" = "prd" ]; then
-    endpoint="https://geoplatform.gov"
+    endpoint="https://www.geoplatform.gov"
 fi
 
 sed -i.bak "s|#PUBLIC_URL#|${endpoint}|g" ./public/index.html
