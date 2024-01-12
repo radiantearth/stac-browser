@@ -39,6 +39,12 @@
     "description": "The requested page requires authentication. Please provide your authentication details in the text field below.",
     "title": "Authentication"
   },
+  "boundingBox": {
+    "neLatitude": "Northeast Latitude",
+    "neLongitude": "Northeast Longitude",
+    "swLatitude": "Southwest Latitude",
+    "swLongitude": "Southwest Longitude"
+  },
   "browse": "Browse",
   "cancel": "Cancel",
   "catalog": {

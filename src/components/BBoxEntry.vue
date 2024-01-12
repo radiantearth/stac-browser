@@ -2,7 +2,7 @@
   <b-container>
     <b-form-row>
       <b-col>
-        <b-form-group label="Southwest Latitude" label-for="sw_latitude">
+        <b-form-group :label="$t('boundingBox.swLatitude')" label-for="sw_latitude">
           <b-form-input
             id="sw_latitude"
             @input="updateBBoxArray($event, 0)" 
@@ -16,7 +16,7 @@
         </b-form-group>
       </b-col>
       <b-col>
-        <b-form-group label="Southwest Longitude" label-for="sw_longitude">
+        <b-form-group :label="$t('boundingBox.swLongitude')" label-for="sw_longitude">
           <b-form-input
             id="sw_longitude"
             @input="updateBBoxArray($event, 1)" 
@@ -32,7 +32,7 @@
     </b-form-row>
     <b-form-row>
       <b-col>
-        <b-form-group label="Northeast Latitude" label-for="ne_latitude">  
+        <b-form-group :label="$t('boundingBox.neLatitude')" label-for="ne_latitude">  
           <b-form-input
             id="ne_latitude"
             @input="updateBBoxArray($event, 2)" 
@@ -46,7 +46,7 @@
         </b-form-group>
       </b-col>
       <b-col>
-        <b-form-group label="Northeast Longitude" label-for="ne_longitude">
+        <b-form-group :label="$t('boundingBox.neLongitude')" label-for="ne_longitude">
           <b-form-input
             id="ne_longitude"
             @input="updateBBoxArray($event, 3)"
