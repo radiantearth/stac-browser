@@ -43,8 +43,8 @@ L.AreaSelect = L.Class.extend({
   // and set bounding box height & width to those bounds
   setInitialBounds: function ( bounds) {
     if (Array.isArray(bounds) && bounds.length >= 4) {
-      const corner1 = L.latLng(bounds[0], bounds[1]);
-      const corner2 = L.latLng(bounds[2], bounds[3]);
+      const corner1 = L.latLng(bounds[1], bounds[0]);
+      const corner2 = L.latLng(bounds[3], bounds[2]);
       bounds = L.latLngBounds(corner1, corner2);
       const bottomLeft = this.map.latLngToContainerPoint(bounds.getSouthWest());
       const topRight = this.map.latLngToContainerPoint(bounds.getNorthEast());
