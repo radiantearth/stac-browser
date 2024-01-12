@@ -14,7 +14,6 @@ L.AreaSelect = L.Class.extend({
     minHorizontalSpacing: 30,
     minVerticalSpacing: 30,
     keepAspectRatio: false,
-    bbox: null,
   },
 
   initialize: function (options) {

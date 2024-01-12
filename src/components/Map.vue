@@ -165,9 +165,6 @@ export default {
     }
   },
   watch: {
-    bbox: function(newVal) {
-      return newVal;
-    },
     uiLanguage() {
       // This recreates the component so that it picks up the new translations
       this.ix++;
