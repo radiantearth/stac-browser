@@ -278,10 +278,8 @@ For example, to run the container with a pre-defined
 [`catalogUrl`](docs/options.md#catalogurl) and [`catalogTitle`](docs/options.md#catalogtitle):
 
 ```bash
-docker run -p 8080:8080 -e SB_catalogUrl="https://earth-search.aws.element84.com/v1/" -e SB_catalogTitle="Earth Search" -e pathPrefix="/browser/" stac-browser:v1
+docker run -p 8080:8080 -e SB_catalogUrl="https://earth-search.aws.element84.com/v1/" -e SB_catalogTitle="Earth Search" stac-browser:v1
 ```
-
-Please note that if given the `pathPrefix` also needs to be repeated in the `docker run` command.
 
 If you want to pass all the other arguments to `npm run build` directly, you can modify to the Dockerfile as needed.
 
