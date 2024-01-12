@@ -21,7 +21,6 @@ L.AreaSelect = L.Class.extend({
 
     this._width = this.options.width;
     this._height = this.options.height;
-    this._bbox = this.options.bbox;
   },
 
   addTo: function (map) {
