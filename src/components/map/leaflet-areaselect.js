@@ -38,16 +38,20 @@ L.AreaSelect = L.Class.extend({
     return this;
   },
 
+  // Given array of bounds coordinates, 
+  // determine the corresponding pixel coordinates relative to the map container
+  // and set bounding box height & width to those bounds
   setInitialBounds: function ( bounds) {
-    if(bounds) {
-      const sw = this.map.latLngToContainerPoint([bounds[0], bounds[1]]);
-      const ne =this.map.latLngToContainerPoint([bounds[2], bounds[3]]);
+    if (Array.isArray(bounds) && bounds.length >= 4) {
+      const corner1 = L.latLng(bounds[0], bounds[1]);
+      const corner2 = L.latLng(bounds[2], bounds[3]);
+      bounds = L.latLngBounds(corner1, corner2);
+      const bottomLeft = this.map.latLngToContainerPoint(bounds.getSouthWest());
+      const topRight = this.map.latLngToContainerPoint(bounds.getNorthEast());
   
-      const bboxWidth = ne['x'] - sw['x'];
-      const bboxHeight = sw['y'] - ne['y'];
-  
-      this._width = bboxWidth;
-      this._height = bboxHeight;
+      this._width = Math.abs(bottomLeft.x - topRight.x);
+      this._height = Math.abs(bottomLeft.y - topRight.y);
+
       this._render();
     }
   },
