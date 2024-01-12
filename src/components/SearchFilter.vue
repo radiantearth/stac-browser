@@ -537,7 +537,7 @@ export default {
     updateBBoxArray(entry, position) {
       const bbox = this.query.bbox;
       bbox[position] = Number(entry);
-      this.$set(this.query, 'bbox', bbox);
+      this.setBbox(bbox);
     },
     setBBox(bounds) {
       let bbox = null;
