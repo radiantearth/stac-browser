@@ -289,7 +289,7 @@ STAC browser is now available at `http://localhost:8080/browser`
 
 ### Use an existing image
 
-You can add an existing image from [Packages](https://github.com/radiantearth/stac-browser/pkgs/container/stac-browser) to your docker-compose.yml:
+Since version 3.1.1, you can add an existing image from [Packages](https://github.com/radiantearth/stac-browser/pkgs/container/stac-browser) to your docker-compose.yml:
 ```
 services:
   stac-browser:
