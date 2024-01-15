@@ -244,20 +244,49 @@ STAC Browser supports some non-standardized extensions to the STAC specification
 
 ### Create a custom image
 
-When building the Dockerfile, you can add the [`catalogUrl`](docs/options.md#catalogurl) 
-as a [build argument](https://docs.docker.com/engine/reference/commandline/build/#set-build-time-variables---build-arg). For example:
+Building the Dockerfile without changing any build options:
+
 
 ```bash
-docker build -t stac-browser:v1 --build-arg catalogURL=https://planetarycomputer.microsoft.com/api/stac/v1/ .
+docker build -t stac-browser:v1 .
 ```
 
-If more arguments need to be passed to `npm run build`, you can add them to the Dockerfile as needed.
-
-To run the container:
+Run the container for a specific URL:
 
 ```bash
-docker run -p 8080:8080 stac-browser:v1
+docker run -p 8080:8080 -e SB_catalogUrl="https://earth-search.aws.element84.com/v1/" stac-browser:v1
 ```
+
+STAC Browser is now available at `http://localhost:8080`
+
+---
+
+You can pass further options to STAC Browser to customize it to your needs.
+
+The build-only options
+[`pathPrefix`](docs/options.md#pathprefix) and [`historyMode`](docs/options.md#historymode)
+can be provided as a
+[build argument](https://docs.docker.com/engine/reference/commandline/build#set-build-time-variables---build-arg)
+when building the Dockerfile.
+
+For example:
+
+```bash
+docker build -t stac-browser:v1 --build-arg pathPrefix="/browser/" --build-arg historyMode=hash .
+```
+
+All other options, except the ones that are explicitly excluded from CLI/ENV usage,
+can be passed as environment variables when running the container.
+For example, to run the container with a pre-defined
+[`catalogUrl`](docs/options.md#catalogurl) and [`catalogTitle`](docs/options.md#catalogtitle):
+
+```bash
+docker run -p 8080:8080 -e SB_catalogUrl="https://earth-search.aws.element84.com/v1/" -e SB_catalogTitle="Earth Search" stac-browser:v1
+```
+
+If you want to pass all the other arguments to `npm run build` directly, you can modify to the Dockerfile as needed.
+
+STAC browser is now available at `http://localhost:8080/browser`
 
 ### Use an existing image
 
