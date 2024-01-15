@@ -241,7 +241,8 @@ STAC Browser supports some non-standardized extensions to the STAC specification
 2. A link with relation type `icon` and a Browser-supported media type in any STAC entity will show an icon in the header and the lists.
 
 ## Docker
-### Create custom image
+
+### Create a custom image
 
 When building the Dockerfile, you can add the [`catalogUrl`](docs/options.md#catalogurl) 
 as a [build argument](https://docs.docker.com/engine/reference/commandline/build/#set-build-time-variables---build-arg). For example:
