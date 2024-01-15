@@ -246,7 +246,6 @@ STAC Browser supports some non-standardized extensions to the STAC specification
 
 Building the Dockerfile without changing any build options:
 
-
 ```bash
 docker build -t stac-browser:v1 .
 ```
