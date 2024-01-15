@@ -242,6 +242,8 @@ STAC Browser supports some non-standardized extensions to the STAC specification
 
 ## Docker
 
+### Create a custom image
+
 Building the Dockerfile without changing any build options:
 
 ```bash
@@ -284,6 +286,19 @@ docker run -p 8080:8080 -e SB_catalogUrl="https://earth-search.aws.element84.com
 If you want to pass all the other arguments to `npm run build` directly, you can modify to the Dockerfile as needed.
 
 STAC browser is now available at `http://localhost:8080/browser`
+
+### Use an existing image
+
+You can add an existing image from [Packages](https://github.com/radiantearth/stac-browser/pkgs/container/stac-browser) to your docker-compose.yml:
+```
+services:
+  stac-browser:
+    image: ghcr.io/radiantearth/stac-browser:latest
+    ports:
+      - 8080:8080
+    environment:
+      SB_catalogUrl: "https://localhost:7188"
+```
 
 ## Contributing
 
