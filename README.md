@@ -258,7 +258,8 @@ To run the container:
 docker run -p 8080:8080 stac-browser:v1
 ```
 
-### Use existing image
+### Use an existing image
+
 You can add an existing image from [Packages](https://github.com/radiantearth/stac-browser/pkgs/container/stac-browser) to your docker-compose.yml:
 ```
 services:
