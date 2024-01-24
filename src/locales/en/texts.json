@@ -40,10 +40,16 @@
     "title": "Authentication"
   },
   "boundingBox": {
+    "latitudeRangeError": "Value must be between -90 and 90",
+    "longitudeRangeError": "Value must be between -180 and 180",
     "neLatitude": "Northeast Latitude",
+    "neLatitudeSizeError": "Value must be more than Southwest Latitude",
     "neLongitude": "Northeast Longitude",
+    "neLongitudeSizeError": "Value must be more than Southwest Longitude",
     "swLatitude": "Southwest Latitude",
-    "swLongitude": "Southwest Longitude"
+    "swLatitudeSizeError": "Value must be less than Northeast Latitude",
+    "swLongitude": "Southwest Longitude",
+    "swLongitudeSizeError": "Value must be less than Northeast Longitude"
   },
   "browse": "Browse",
   "cancel": "Cancel",

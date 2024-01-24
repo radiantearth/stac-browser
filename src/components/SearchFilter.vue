@@ -31,11 +31,11 @@
           <template>
             <b-form-group v-if="provideBBox">
               <b-tabs>
-                <b-tab v-model="bboxSelectionStyle" :title="$t('search.defineBbox.map')" lazy>
+                <b-tab :title="$t('search.defineBbox.map')" lazy>
                   <Map class="mb-4" :stac="stac" :bbox="query.bbox" selectBounds @bounds="setBBox" scrollWheelZoom />
                 </b-tab>
-                <b-tab v-model="bboxSelectionStyle" :title="$t('search.defineBbox.text')">
-                  <BBoxEntry :bbox="query.bbox" @updateBBoxArray="updateBBoxArray" />
+                <b-tab :title="$t('search.defineBbox.text')" lazy>
+                  <BBoxEntry :bbox="query.bbox" @bounds="setBBox" />
                 </b-tab>
               </b-tabs>
             </b-form-group>
@@ -172,7 +172,6 @@ function getDefaults() {
     filtersAndOr: 'and',
     filters: [],
     selectedCollections: [],
-    bboxSelectionStyle: 'map'
   };
 }
 
@@ -533,11 +532,6 @@ export default {
     },
     setSearchTerms(terms) {
       this.$set(this.query, 'q', terms);
-    },
-    updateBBoxArray(entry, position) {
-      const bbox = this.query.bbox;
-      bbox[position] = Number(entry);
-      this.setBbox(bbox);
     },
     setBBox(bounds) {
       let bbox = null;

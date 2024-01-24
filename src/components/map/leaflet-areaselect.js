@@ -23,7 +23,7 @@ L.AreaSelect = L.Class.extend({
     this._height = this.options.height;
   },
 
-  addTo: function (map) {
+  addTo: function (map, bounds) {
     this.map = map;
     if (this._container) { this.map._controlContainer.appendChild(this._container); }
     else { this._createElements(); }
@@ -32,7 +32,11 @@ L.AreaSelect = L.Class.extend({
     this.map.on("resize", this._onMapResize, this);
 
     this.fire("change");
-    this._render();
+    if(bounds) {
+      this.setInitialBounds(bounds);
+    } else {
+      this._render();
+    }
     return this;
   },
 
@@ -44,6 +48,8 @@ L.AreaSelect = L.Class.extend({
       const corner1 = L.latLng(bounds[1], bounds[0]);
       const corner2 = L.latLng(bounds[3], bounds[2]);
       bounds = L.latLngBounds(corner1, corner2);
+      // make sure map is centered on bounds before adding bounding box
+      this.map.panTo(bounds.getCenter());
       const bottomLeft = this.map.latLngToContainerPoint(bounds.getSouthWest());
       const topRight = this.map.latLngToContainerPoint(bounds.getNorthEast());
   
