@@ -72,8 +72,7 @@ L.AreaSelect = L.Class.extend({
 
     const sw = this.map.containerPointToLatLng(bottomLeft);
     const ne = this.map.containerPointToLatLng(topRight);
-
-    return new L.LatLngBounds(sw, ne);
+    return new L.LatLngBounds(roundPoint(sw), roundPoint(ne));
   },
 
   getBBoxCoordinates: function () {
@@ -314,3 +313,11 @@ L.AreaSelect = L.Class.extend({
 L.areaSelect = function (options) {
   return new L.AreaSelect(options);
 };
+
+
+function roundPoint(point) {
+  return {
+    lat: Math.round(point['lat']),
+    lng: Math.round(point['lng'])
+  }
+}
