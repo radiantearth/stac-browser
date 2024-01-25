@@ -216,7 +216,8 @@
       "and": "Match all filters (and)",
       "or": "Match any filters (or)"
     },
-    "matches": "matches",
+    "matches": "matches (case-sensitive)",
+    "matches_ci": "matches (case-insensitive)",
     "metaDescription": "Search through the data offering of {title}.",
     "modifyCriteria": "Please modify the search criteria.",
     "noItemsFound": "No items found for the given filters.",

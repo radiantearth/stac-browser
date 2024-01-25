@@ -1,7 +1,7 @@
 import { formatKey } from "@radiantearth/stac-fields/helper";
 import i18n from '../../i18n.js';
 import { CqlEqual, CqlGreaterThan, CqlGreaterThanEqual, CqlLessThan, CqlLessThanEqual, CqlNotEqual } from "./operators/comparison";
-import { CqlLike } from "./operators/advanced";
+import { CqlLike, CqlILike } from "./operators/advanced";
 
 export default class Queryable {
 
@@ -105,6 +105,7 @@ export default class Queryable {
     }
     else if (this.isText && cql.advancedComparison) {
       ops.push(CqlLike);
+      ops.push(CqlILike);
     }
     return ops;
   }

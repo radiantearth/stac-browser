@@ -22,3 +22,25 @@ export class CqlLike extends CqlComparisonOperator {
   }
 
 }
+
+export class CqlILike extends CqlComparisonOperator {
+
+  static SYMBOL = "ilike";
+
+  constructor(pred = null, obj = null) {
+    super(CqlILike.SYMBOL, pred, obj);
+  }
+
+  static get label() {
+    return "~ (Aa)";
+  }
+
+  static get longLabel() {
+    return i18n.t('search.matches_ci');
+  }
+
+  static get description() {
+    return i18n.t('search.likeOperatorDescription');
+  }
+
+}
