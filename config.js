@@ -1,7 +1,7 @@
 module.exports = {
     catalogUrl: 'https://sit-stac.geoplatform.info/catalog.json',
     catalogTitle: "STAC Browser",
-    allowExternalAccess: true, // Must be true if catalogUrl is not given
+    allowExternalAccess: false, // Must be true if catalogUrl is not given
     allowedDomains: [],
     detectLocaleFromBrowser: true,
     storeLocale: true,
