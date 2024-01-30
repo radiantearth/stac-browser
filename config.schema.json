@@ -1,0 +1,279 @@
+{
+  "$comment": "Defines a JSON Schema for the config file. Note that JS functions are specified as type 'null' with format 'function'.",
+  "type": [
+    "object"
+  ],
+  "properties": {
+    "catalogUrl": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uri"
+    },
+    "catalogTitle": {
+      "type": [
+        "string"
+      ]
+    },
+    "allowExternalAccess": {
+      "type": [
+        "boolean"
+      ]
+    },
+    "allowedDomains": {
+      "type": [
+        "array"
+      ],
+      "items": {
+        "type": [
+          "string"
+        ]
+      }
+    },
+    "detectLocaleFromBrowser": {
+      "type": [
+        "boolean"
+      ]
+    },
+    "storeLocale": {
+      "type": [
+        "boolean"
+      ]
+    },
+    "locale": {
+      "type": [
+        "string"
+      ]
+    },
+    "fallbackLocale": {
+      "type": [
+        "string"
+      ]
+    },
+    "supportedLocales": {
+      "type": [
+        "array"
+      ],
+      "items": {
+        "type": [
+          "string"
+        ]
+      }
+    },
+    "apiCatalogPriority": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "collections",
+        "childs",
+        null
+      ]
+    },
+    "useTileLayerAsFallback": {
+      "type": [
+        "boolean"
+      ]
+    },
+    "displayGeoTiffByDefault": {
+      "type": [
+        "boolean"
+      ]
+    },
+    "buildTileUrlTemplate": {
+      "type": [
+        "null"
+      ],
+      "format": "function",
+      "noCLI": true,
+      "noEnv": true
+    },
+    "stacProxyUrl": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "prefixItems": [
+        {
+          "type": [
+            "string"
+          ],
+          "format": "uri-reference"
+        },
+        {
+          "type": [
+            "string"
+          ],
+          "format": "uri"
+        }
+      ],
+      "items": false
+    },
+    "pathPrefix": {
+      "type": [
+        "string"
+      ],
+      "buildOnly": true
+    },
+    "historyMode": {
+      "type": [
+        "string"
+      ],
+      "enum": [
+        "history",
+        "hash"
+      ],
+      "buildOnly": true
+    },
+    "cardViewMode": {
+      "type": [
+        "string"
+      ],
+      "enum": [
+        "list",
+        "cards"
+      ]
+    },
+    "cardViewSort": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "asc",
+        "desc",
+        null
+      ]
+    },
+    "showThumbnailsAsAssets": {
+      "type": [
+        "boolean"
+      ]
+    },
+    "stacLint": {
+      "type": [
+        "boolean"
+      ]
+    },
+    "geoTiffResolution": {
+      "type": [
+        "integer"
+      ],
+      "minimum": 1
+    },
+    "redirectLegacyUrls": {
+      "type": [
+        "boolean"
+      ]
+    },
+    "itemsPerPage": {
+      "type": [
+        "integer"
+      ],
+      "minimum": 1
+    },
+    "defaultThumbnailSize": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": [
+          "number"
+        ]
+      }
+    },
+    "maxPreviewsOnMap": {
+      "type": [
+        "integer"
+      ],
+      "minimum": 1
+    },
+    "crossOriginMedia": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "anonymous",
+        "use-credentials",
+        "",
+        null
+      ]
+    },
+    "requestHeaders": {
+      "type": [
+        "object"
+      ],
+      "noCLI": true,
+      "noEnv": false
+    },
+    "requestQueryParameters": {
+      "type": [
+        "object"
+      ],
+      "noCLI": true,
+      "noEnv": true
+    },
+    "preprocessSTAC": {
+      "type": [
+        "null"
+      ],
+      "format": "function",
+      "noCLI": true,
+      "noEnv": true
+    },
+    "authConfig": {
+      "type": [
+        "object"
+      ],
+      "properties": {
+        "type": {
+          "type": [
+            "null",
+            "string"
+          ],
+          "enum": [
+            "query",
+            "header"
+          ]
+        },
+        "key": {
+          "type": [
+            "string"
+          ]
+        },
+        "formatter": {
+          "oneOf": [
+            {
+              "type": [
+                "null"
+              ],
+              "format": "function"
+            },
+            {
+              "type": [
+                "string"
+              ],
+              "enum": [
+                "Bearer"
+              ]
+            }
+          ]
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "noCLI": true,
+      "noEnv": true
+    }
+  }
+}
