@@ -37,7 +37,7 @@
     </b-popover>
 
     <b-popover
-      v-if="stacUrl" id="popover-link" target="popover-link-btn" triggers="click"
+      v-if="stacUrl" id="popover-link" target="popover-link-btn" triggers="focus"
       placement="bottom" container="stac-browser" :title="$t('source.title')" 
       @show="validate"
     >
