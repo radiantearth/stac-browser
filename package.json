@@ -6,9 +6,9 @@
   "scripts": {
     "start": "vue-cli-service serve --CATALOG_URL=http://localhost:8080/catalog.json",
     "build": "vue-cli-service build",
-    "build:sit": "STG_ENV='sit' ./build_index.sh && vue-cli-service build --CATALOG_URL=https://sit-stac.geoplatform.info/catalog.json --HISTORY_MODE=hash",
-    "build:stg": "STG_ENV='stg' ./build_index.sh && vue-cli-service build --CATALOG_URL=https://stg-stac.geoplatform.gov/catalog.json --HISTORY_MODE=hash",
-    "build:prd": "STG_ENV='prd' ./build_index.sh && vue-cli-service build --CATALOG_URL=https://stac.geoplatform.gov/catalog.json --HISTORY_MODE=hash",
+    "build:sit": "STG_ENV='sit' ./build-environment.sh && vue-cli-service build --CATALOG_URL=https://sit-stac.geoplatform.info/catalog.json --HISTORY_MODE=hash",
+    "build:stg": "STG_ENV='stg' ./build-environment.sh && vue-cli-service build --CATALOG_URL=https://stg-stac.geoplatform.gov/catalog.json --HISTORY_MODE=hash",
+    "build:prd": "STG_ENV='prd' ./build-environment.sh && vue-cli-service build --CATALOG_URL=https://stac.geoplatform.gov/catalog.json --HISTORY_MODE=hash",
     "build:report": "vue-cli-service build --report",
     "build:minimal": "vue-cli-service build --noSourceMaps",
     "deploy:sit": "aws s3 sync ./dist s3://gp-sit-us-east-1-stac --acl public-read --profile sit",

@@ -9,3 +9,6 @@ elif [ "$STG_ENV" = "prd" ]; then
 fi
 
 sed -i.bak "s|#PUBLIC_URL#|${endpoint}|g" ./public/index.html
+
+cp -f ./config_template.js ./config.js
+sed -i.bak "s|#STG_ENV#|$STG_ENV|g" ./config.js
