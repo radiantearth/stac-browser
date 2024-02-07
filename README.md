@@ -1,3 +1,17 @@
+# GeoPlatform Deploy
+
+Deploying stac browser necessitates passing staging environment variables into the configuration file (./config.js) and the index file (./public/index.html). This is handled by running the build-environment.sh script. For convenience this script has been bundled into an node package script. To build and deploy the application for it's specific staging environment, follow these steps. 
+
+1. Build (per environment):
+  * SIT - `npm run build:sit`
+  * STG - `npm run build:stg`
+  * PRD - `npm run build:prd`
+2. Deploy (per environment):
+  * SIT - `npm run deploy:sit`
+  * STG - `npm run deploy:stg`
+  * PRD - `npm run deploy:prd`
+
+
 # STAC Browser
 
 This is a [Spatio-Temporal Asset Catalog (STAC)](https://github.com/radiantearth/stac-spec) browser for static catalogs.
