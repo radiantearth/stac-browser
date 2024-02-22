@@ -108,7 +108,7 @@ export default {
     },
     isThumbnail() {
       if (this.isAsset) {
-        return Array.isArray(this.data.roles) && this.data.roles.includes('thumbnail');
+        return Array.isArray(this.data.roles) && this.data.roles.includes('thumbnail') && !this.data.roles.includes('overview');
       }
       else {
         return this.data.rel === 'preview' && Utils.canBrowserDisplayImage(this.data);
