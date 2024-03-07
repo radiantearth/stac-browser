@@ -47,6 +47,7 @@
   },
   "catalogs": {
     "filterByTitle": "Filter catalogs by title",
+    "filterByTitleAndMore": "Filter catalogs by title, description or keywords",
     "loadMore": "Load more...",
     "noMatches": "No catalogs match the given search criteria."
   },

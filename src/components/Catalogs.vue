@@ -6,7 +6,7 @@
       <ViewButtons class="mr-2" v-model="view" />
       <SortButtons v-if="isComplete && catalogs.length > 1" v-model="sort" />
     </header>
-    <SearchBox v-if="isComplete && catalogs.length > 1" class="mt-1 mb-1" v-model="searchTerm" :placeholder="$t('catalogs.filterByTitle')" />
+    <SearchBox v-if="isComplete && catalogs.length > 1" class="mt-1 mb-1" v-model="searchTerm" :placeholder="filterPlaceholder" />
     <Pagination ref="topPagination" v-if="showPagination" :pagination="pagination" placement="top" @paginate="paginate" />
     <b-alert v-if="searchTerm && catalogView.length === 0" variant="warning" show>{{ $t('catalogs.noMatches') }}</b-alert>
     <section class="list">
@@ -102,6 +102,9 @@ export default {
     isComplete() {
       return !this.hasMore && !this.showPagination;
     },
+    filterPlaceholder() {
+      return this.isComplete ? this.$t('catalogs.filterByTitleAndMore') : this.$t('catalogs.filterByTitle');
+    },
     showPagination() {
       // Check whether any pagination links are available
       return Object.values(this.pagination).some(link => !!link);
@@ -118,14 +121,11 @@ export default {
       if (this.searchTerm) {
         catalogs = catalogs.filter(catalog => {
           let haystack = [ catalog.title ];
-          if (catalog instanceof STAC) {
+          if (catalog instanceof STAC && this.isComplete) {
             haystack.push(catalog.id);
             if (Array.isArray(catalog.keywords)) {
               haystack = haystack.concat(catalog.keywords);
             }
-          }
-          else {
-            haystack.push(catalog.href);
           }
           return Utils.search(this.searchTerm, haystack);
         });
