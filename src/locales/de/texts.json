@@ -47,6 +47,7 @@
   },
   "catalogs": {
     "filterByTitle": "Kataloge anhand des Titels filtern",
+    "filterByTitleAndMore": "Kataloge anhand von Titel, Beschreibung oder Schlüsselwörtern filtern",
     "loadMore": "Lade mehr...",
     "noMatches": "Keiner der Kataloge entspricht den Suchkriterien."
   },
