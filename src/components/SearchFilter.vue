@@ -580,8 +580,6 @@ export default {
 };
 </script>
 
-<style src=""></style>
-
 <style lang="scss">
 @import '../theme/variables.scss';
 
@@ -591,55 +589,9 @@ $primary-color: map-get($theme-colors, "primary");
 
 @import '~vue2-datepicker/scss/index.scss';
 
-// Multiselect related style
-@import '~vue-multiselect/dist/vue-multiselect.min.css';
-#stac-browser {
-  .multiselect__tags:focus-within {
-    border-color: #48cce1;
-    outline: 0;
-    box-shadow: 0 0 0 0.2rem rgba(24, 129, 145, 0.25);
-  }
-
-  .multiselect__select:before {
-    color: #495057;
-    border-color: #495057 transparent transparent;
-  }
-  
-  .multiselect__tags,
-  .multiselect__single {
-    border-color: #ced4da;
-    padding-left: 0.75rem;
-    font-size: 16px;
-  }
-
-  .multiselect__input,
-  .multiselect__single {
-    padding: 4px 0 3px 0;
-  }
-
-  .multiselect__tag,
-  .multiselect__tag-icon:hover,
-  .multiselect__option--highlight,
-  .multiselect__option--highlight:after {
-    background-color: map-get($theme-colors, "primary");
-  }
-
-  .multiselect__option--selected.multiselect__option--highlight,
-  .multiselect__option--selected.multiselect__option--highlight:after {
-    background-color: map-get($theme-colors, "secondary");
-  }
-
-  .multiselect__placeholder {
-    color: #999;
-    font-size: 16px;
-  }
-}
-
-.queryables {
-  .dropdown-menu {
-    max-height: 90vh;
-    overflow: auto;
-  }
+.queryables .dropdown-menu {
+  max-height: 90vh;
+  overflow: auto;
 }
 
 // General item filter style

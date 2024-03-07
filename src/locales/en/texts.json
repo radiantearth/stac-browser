@@ -155,6 +155,7 @@
     "andMore": "and {count} more",
     "deselectLabel": "Press enter to remove",
     "placeholder": "Select option",
+    "keywordsPlaceholder": "Select keywords",
     "selectLabel": "Press enter to select",
     "selectedLabel": "Selected"
   },

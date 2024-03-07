@@ -154,7 +154,8 @@
   "multiselect": {
     "andMore": "und {count} weitere",
     "deselectLabel": "Enter zum Entfernen",
-    "placeholder": "Option wählen",
+    "placeholder": "Option auswählen",
+    "keywordsPlaceholder": "Schlüsselwörter auswählen",
     "selectLabel": "Enter zum Selektieren",
     "selectedLabel": "Selektiert"
   },
