@@ -19,6 +19,8 @@ module.exports = {
     historyMode: "hash",
     cardViewMode: "list",
     cardViewSort: "asc",
+    showKeywordsInItemCards: false,
+    showKeywordsInCatalogCards: false,
     showThumbnailsAsAssets: false,
     stacLint: true,
     geoTiffResolution: 128,
