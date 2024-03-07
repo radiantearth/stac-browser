@@ -28,6 +28,8 @@ module.exports = {
     historyMode: "history",
     cardViewMode: "cards",
     cardViewSort: "asc",
+    showKeywordsInItemCards: false,
+    showKeywordsInCatalogCards: false,
     showThumbnailsAsAssets: false,
     stacLint: true,
     geoTiffResolution: 128,

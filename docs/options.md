@@ -36,6 +36,8 @@ The following ways to set config options are possible:
 * [maxPreviewsOnMap](#maxpreviewsonmap)
 * [cardViewMode](#cardviewmode)
 * [cardViewSort](#cardviewsort)
+* [showKeywordsInItemCards](#showkeywordsinitemcards)
+* [showKeywordsInCatalogCards](#showkeywordsincatalogcards)
 * [showThumbnailsAsAssets](#showthumbnailsasassets)
 * [defaultThumbnailSize](#defaultthumbnailsize)
 * [crossOriginMedia](#crossoriginmedia)
@@ -243,6 +245,14 @@ The default sorting for lists of catalogs/collections or items. One of:
 - `"asc"`: ascending sort (default)
 - `"desc"`: descending sort
 - `null`: sorted as in the source files
+
+## showKeywordsInItemCards
+
+Enables keywords in the lists of items if set to `true`. Defaults to `false`.
+
+## showKeywordsInCatalogCards
+
+Enables keywords in the lists of catalogs/collections if set to `true`. Defaults to `false`.
 
 ## showThumbnailsAsAssets
 
