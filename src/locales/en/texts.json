@@ -251,7 +251,7 @@
   "sort": {
     "asc": {
       "label": "Ascending",
-      "title": "Sort in acending order (A-Z)"
+      "title": "Sort in ascending order (A-Z)"
     },
     "desc": {
       "label": "Descending",
