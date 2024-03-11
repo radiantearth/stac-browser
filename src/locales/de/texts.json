@@ -8,6 +8,9 @@
     "title": "Anonymisiert"
   },
   "assets": {
+    "alternate": {
+      "main": "Bevorzugt"
+    },
     "copyGdalVfsUrl": {
       "generic": "Kopiere GDAL VFS Adresse",
       "withSource": "Kopiere GDAL VFS Adresse für {source}"
