@@ -16,6 +16,8 @@ import { mapGetters, mapState } from "vuex";
 import Utils, { BrowserError } from '../utils';
 import URI from 'urijs';
 
+import config from '../config';
+
 export default {
   name: "Browse",
   components: {
@@ -70,7 +72,6 @@ export default {
       else if (this.error instanceof BrowserError) {
         return this.error.message;
       }
-
       return this.$t('errors.networkError');
     },
     component() {
@@ -82,7 +83,7 @@ export default {
       }
     },
     isExternal() {
-      return URI(this.path).is("absolute");
+      return URI(this.path).is("absolute") &&  !config.whitelistedExternalCatalogs.includes(this.path);
     }
   },
   watch: {
