@@ -27,10 +27,10 @@
           </b-button>
           <b-button v-if="canAuthenticate" variant="outline-primary" size="sm" @click="openAuthentication" :title="authMethod.getButtonTitle()">
             <template v-if="isLoggedIn">
-              <b-icon-lock /> <span class="button-label">{{ authMethod.getAuthorizedLabel() }}</span>
+              <b-icon-unlock /> <span class="button-label">{{ authMethod.getAuthorizedLabel() }}</span>
             </template>
             <template v-else>
-              <b-icon-unlock /> <span class="button-label">{{ authMethod.getUnauthorizedLabel() }}</span>
+              <b-icon-lock /> <span class="button-label">{{ authMethod.getUnauthorizedLabel() }}</span>
             </template>
           </b-button>
         </b-button-group>
@@ -138,7 +138,7 @@ export default {
         show: true,
         force: true
       }));
-      await this.authenticate(this.$store);
+      await this.authenticate();
     }
   }
 };

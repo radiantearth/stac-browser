@@ -787,10 +787,8 @@ function getStore(config, router) {
         let collectionId = stac instanceof STAC ? stac.id : '';
         cx.commit('toggleApiItemsLoading', collectionId);
 
-        let baseUrl = cx.state.url;
         if (stac instanceof STAC) {
           link = stac.getApiItemsLink();
-          baseUrl = stac.getAbsoluteUrl();
         }
 
         if (!Utils.isObject(filters)) {
