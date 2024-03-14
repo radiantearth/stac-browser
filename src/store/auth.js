@@ -1,6 +1,7 @@
 import Auth from '../auth';
 import Utils from '../utils';
 import i18n from '../i18n';
+import AuthUtils from '../components/auth/utils';
 
 export default function getStore(router) {
   return {
@@ -19,9 +20,6 @@ export default function getStore(router) {
       },
       canAuthenticate(state, getters, rootState) {
         return rootState.authConfig && getters.method.getType() !== null;
-      },
-      credentials(state, getters) {
-        return getters.method.getCredentials();
       },
       isLoggedIn(state) {
         return state.credentials !== null;
@@ -50,6 +48,7 @@ export default function getStore(router) {
         await cx.dispatch('updateMethod', cx.rootState.authConfig);
       },
       async updateMethod(cx, config) {
+        config = AuthUtils.convertLegacyAuthConfig(config);
         await cx.getters.method.close();
         let changeListener = async (isLoggedIn, credentials) => {
           if (!isLoggedIn) {
@@ -86,25 +85,28 @@ export default function getStore(router) {
       async updateCredentials(cx, value = null) {
         cx.commit('setCredentials', value);
         let authConfig = cx.rootState.authConfig;
-        if (value) {
-          if (authConfig.formatter === 'Bearer') {
-            value = `Bearer ${value}`;
+        if (authConfig.type === 'apiKey') {
+          // Todo: Move to Auth class?
+          if (value) {
+            if (authConfig.formatter === 'Bearer') {
+              value = `Bearer ${value}`;
+            }
+            else if (typeof authConfig.formatter === 'function') {
+              value = authConfig.formatter(value);
+            }
           }
-          else if (typeof authConfig.formatter === 'function') {
-            value = authConfig.formatter(value);
+          if (!Utils.hasText(value)) {
+            value = undefined;
           }
-        }
-        if (!Utils.hasText(value)) {
-          value = undefined;
-        }
 
-        // Set query or request parameters
-        let key = authConfig.key;
-        if (authConfig.type === 'query') {
-          cx.commit('setQueryParameter', { type: 'private', key, value }, { root: true });
-        }
-        else if (authConfig.type === 'header') {
-          cx.commit('setRequestHeader', { key, value }, { root: true });
+          // Set query or request parameters
+          let key = authConfig.name;
+          if (authConfig.in === 'query') {
+            cx.commit('setQueryParameter', { type: 'private', key, value }, { root: true });
+          }
+          else if (authConfig.in === 'header') {
+            cx.commit('setRequestHeader', { key, value }, { root: true });
+          }
         }
       },
       async executeActions(cx) {

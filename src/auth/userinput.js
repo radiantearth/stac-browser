@@ -4,9 +4,8 @@ import Vue from 'vue';
 
 export default class UserInput extends Auth {
 
-  constructor(options, changeListener, description = null) {
+  constructor(options, changeListener) {
     super(options, changeListener);
-    this.description = description;
   }
 
   getType() {
@@ -22,7 +21,7 @@ export default class UserInput extends Auth {
       let app = new Vue({
         ...component,
         propsData: {
-          description: this.description,
+          description: this.options.description,
           credentials
         }
       });

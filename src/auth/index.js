@@ -74,16 +74,16 @@ export default class Auth {
       return new Auth();
     }
     let method;
-    switch (config.tokenGenerator) {
-      case 'oidc': {
+    switch (config.type) {
+      case 'openIdConnect': {
         const OIDC = (await import('./oidc')).default;
-        method = new OIDC(config.generatorOptions, changeListener, router);
+        method = new OIDC(config, changeListener, router);
         break;
       }
       default: {
         // "input" -> let user input auth data, e.g. Bearer Token
         const UserInput = (await import('./userinput')).default;
-        method = new UserInput(config.generatorOptions, changeListener, config.description);
+        method = new UserInput(config, changeListener);
       }
     }
     await method.init();

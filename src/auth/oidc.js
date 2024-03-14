@@ -11,7 +11,8 @@ export default class OIDC extends Auth {
 
     this.router = router;
 
-    let oktaOptions = Object.assign({}, options);
+    let issuer = options.openIdConnectUrl.replace(/\/\.well-known\/openid-configuration\/?$/, '');
+    let oktaOptions = Object.assign({ issuer, clientId: 'stac-browser' }, options.oidcOptions);
     oktaOptions.restoreOriginalUri = (_, originalUri) => this.restoreOriginalUri(originalUri);
     oktaOptions.httpRequestClient = this.httpRequest.bind(this);
     this.okta = new OktaAuth(oktaOptions);

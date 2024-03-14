@@ -293,25 +293,40 @@ Please note that this option can only be provided through a config file and is n
 
 ***experimental***
 
-This allows to enable a simple authentication form where a user can input a token, an API key or similar things.
-It is disabled by default (`null`). If enabled, the token provided by the user can be used in the HTTP headers or in the query parameters of the requests. This option is affected by [`allowedDomains`](#alloweddomains).
+This allows to enable some authentication methods. Currently the supported methods are:
+- API Keys (`type: apiKey`) via query parameter (`in: query`) or HTTP Header (`in: header`)
+- OpenID Connect (`type: openIdConnect`)
 
-There are four options you can set in the `authConfig` object:
+Authentication is disabled by default (`null`).
 
-* `type` (string): `null` (disabled), `"query"` (use token in query parameters), or `"header"` (use token in HTTP request headers).
-* `key` (string): The query string parameter name or the HTTP header name respecively.
-* `formatter` (function|string|null): You can optionally specify a formatter for the query string value or HTTP header value respectively. If the string `"Bearer"` is provided formats as a Bearer token according to RFC 6750. If not given, the token is provided as provided by the user.
-* `description` (string|null): Optionally a description that is shown to the user. This should explain how the token can be obtained for example. CommonMark is allowed.
+The options you can set in the `authConfig` object are defined in the
+[Authentication Scheme Object of the STAC Authentication Extension](https://github.com/stac-extensions/authentication?tab=readme-ov-file#authentication-scheme-object) (limited by the supported methods listed above).
+
+**Note:** Before STAC Browser 3.2.0 a different type of object was supported.
+The old way is deprecated, but will be converted to the new object internally.
+
+In addition the following properties are supported:
+
+* `formatter` (function|string|null): You can optionally specify a formatter for the query string value or HTTP header value respectively. If the string `"Bearer"` is provided formats as a Bearer token according to RFC 6750. If not given, the token is sent as provided by the user.
+* `description` (string|null): Optionally a description that is shown to the user. This should explain how the credentials can be obtained for example. CommonMark is allowed.
     **Note:** You can leave the description empty in the config file and instead provide a localized string with the key `authConfig` -> `description` in the file for custom phrases (`src/locales/custom.js`).
 
-Please note that this option can only be provided through a config file and is not available via CLI/ENV.
+For OpenID Connect some additional options must be provided, which currently follow the
+[OktaAuth Configuration options](https://github.com/okta/okta-auth-js?tab=readme-ov-file#configuration-options).
+These options (except for `issuer`) must be provided in the property `oidcConfig`.
+The `clientId` option defaults to `stac-browser`.
+
+Authentication is generally affected by the [`allowedDomains`](#alloweddomains) option.
+
+The `authConfig` option can only be provided through a config file and is not available via CLI/ENV.
 
 ### Example 1: HTTP Request Header Value
 
 ```js
 {
-  type: 'header',
-  key: 'Authorization',
+  type: 'apiKey',
+  in: 'header',
+  name: 'Authorization',
   formatter: token => `Bearer ${token}`, // This is an example, there's also the simpler variant to just provide the string 'Bearer' in this case
   description: `Please retrieve the token from our [API console](https://example.com/api-console).\n\nFor further questions contact <mailto:support@example.com>.`
 }
@@ -324,8 +339,24 @@ For a given token `123` this results in the following additional HTTP Header:
 
 ```js
 {
-  type: 'query',
-  key: 'API_KEY'
+  type: 'apiKey',
+  in: 'query',
+  name: 'API_KEY'
+}
+```
+
+For a given token `123` this results in the following query parameter:
+`https://example.com/stac/catalog.json?API_KEY=123`
+
+### Example 3: OpenID Connect
+
+```js
+{
+  type: 'openIdConnect',
+  openIdConnectUrl: 'https://stac.example/.well-known/openid-configuration',
+  oidcOptions: {
+    clientId: 'abc123'
+  }
 }
 ```
 
