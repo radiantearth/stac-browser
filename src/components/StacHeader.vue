@@ -13,6 +13,9 @@
           <template #catalog><StacLink :data="containerLink" /></template>
         </i18n>
         <b-button-group>
+          <b-button v-if="back" :to="selfBrowserLink" :title="$t('goBack.description', {type})" variant="outline-primary" size="sm">
+            <b-icon-arrow-left /> <span class="button-label prio">{{ $t('goBack.label') }}</span>
+          </b-button>
           <b-button v-if="parentLink" :to="toBrowserPath(parentLink.href)" :title="parentLinkTitle" variant="outline-primary" size="sm">
             <b-icon-arrow-90deg-up /> <span class="button-label prio">{{ $t('goToParent.label') }}</span>
           </b-button>
@@ -43,7 +46,7 @@
 import { mapState, mapGetters } from 'vuex';
 import Source from './Source.vue';
 import StacLink from './StacLink.vue';
-import { BIconArrow90degUp, BIconBook, BIconFolderSymlink, BIconSearch, BIconLock, BIconUnlock } from "bootstrap-vue";
+import { BIconArrow90degUp, BIconArrowLeft, BIconBook, BIconFolderSymlink, BIconSearch, BIconLock, BIconUnlock } from "bootstrap-vue";
 import STAC from '../models/stac';
 import Utils from '../utils';
 
@@ -51,6 +54,7 @@ export default {
   name: 'StacHeader',
   components: {
     BIconArrow90degUp,
+    BIconArrowLeft,
     BIconBook,
     BIconFolderSymlink,
     BIconSearch,
@@ -62,6 +66,29 @@ export default {
   computed: {
     ...mapState(['allowSelectCatalog', 'authConfig', 'authData', 'catalogUrl', 'data', 'url', 'title']),
     ...mapGetters(['canSearch', 'root', 'parentLink', 'collectionLink', 'toBrowserPath']),
+    back() {
+      return this.$route.name === 'validation';
+    },
+    selfBrowserLink() {
+      return this.toBrowserPath(this.url);
+    },
+    type() {
+      if (this.data instanceof STAC) {
+        if (this.data.isItem()) {
+          return this.$tc('stacItem');
+        }
+        else if (this.data.isCollection()) {
+          return this.$tc(`stacCollection`);
+        }
+        else if (this.data.isCatalog()) {
+          return this.$tc(`stacCatalog`);
+        }
+        else {
+          return this.data.type;
+        }
+      }
+      return null;
+    },
     collectionLinkTitle() {
       if (this.collectionLink && Utils.hasText(this.collectionLink.title)) {
         return this.$t('goToCollection.descriptionWithTitle', this.collectionLink);

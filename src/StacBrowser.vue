@@ -1,7 +1,7 @@
 <template>
   <b-container id="stac-browser">
     <Authentication v-if="doAuth.length > 0" />
-    <ErrorAlert class="global-error" v-if="globalError" v-bind="globalError" @close="hideError" />
+    <ErrorAlert v-if="globalError" dismissible class="global-error" v-bind="globalError" @close="hideError" />
     <Sidebar v-if="sidebar" />
     <!-- Header -->
     <header>
@@ -239,8 +239,7 @@ export default {
         'crossOriginMedia',
         'defaultThumbnailSize',
         'displayGeoTiffByDefault',
-        'showThumbnailsAsAssets',
-        'stacLint' // can only be disabled
+        'showThumbnailsAsAssets'
       ];
 
       let doReset = !root || (oldRoot && Utils.isObject(oldRoot['stac_browser']));
@@ -253,11 +252,6 @@ export default {
         }
         if (doSet && typeof root['stac_browser'][key] !== 'undefined') {
           value = root['stac_browser'][key]; // Custom value from root
-        }
-        
-        // Don't enable stacLint if it has been disabled by default
-        if (key === 'stacLint' && !CONFIG.stacLint) {
-          continue;
         }
 
         // Commit config

@@ -32,7 +32,6 @@ module.exports = {
     showKeywordsInItemCards: false,
     showKeywordsInCatalogCards: false,
     showThumbnailsAsAssets: false,
-    stacLint: true,
     geoTiffResolution: 128,
     redirectLegacyUrls: false,
     itemsPerPage: 12,
