@@ -261,8 +261,8 @@ export default {
     },
     andOrOptions() {
       return [
-        { value: 'and', text: this.$i18n.t('search.logical.and') },
-        { value: 'or', text: this.$i18n.t('search.logical.or') },
+        { value: 'and', text: this.$t('search.logical.and') },
+        { value: 'or', text: this.$t('search.logical.or') },
       ];
     },
     showAdditionalFilters() {

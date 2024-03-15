@@ -217,8 +217,7 @@ export default {
         'crossOriginMedia',
         'defaultThumbnailSize',
         'displayGeoTiffByDefault',
-        'showThumbnailsAsAssets',
-        'stacLint' // can only be disabled
+        'showThumbnailsAsAssets'
       ];
 
       let doReset = !root || (oldRoot && Utils.isObject(oldRoot['stac_browser']));
@@ -231,11 +230,6 @@ export default {
         }
         if (doSet && typeof root['stac_browser'][key] !== 'undefined') {
           value = root['stac_browser'][key]; // Custom value from root
-        }
-        
-        // Don't enable stacLint if it has been disabled by default
-        if (key === 'stacLint' && !CONFIG.stacLint) {
-          continue;
         }
 
         // Update config in store

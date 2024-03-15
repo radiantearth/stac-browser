@@ -12,12 +12,14 @@ module.exports = {
 //      "de-CH",
         "es",
         "en",
+//      "en-GB",
         "fr",
 //      "fr-CA",
 //      "fr-CH",
         "it",
 //      "it-CH",
-        "ro"
+        "ro",
+        "ja"
     ],
     apiCatalogPriority: null,
     useTileLayerAsFallback: true,
@@ -31,7 +33,6 @@ module.exports = {
     showKeywordsInItemCards: false,
     showKeywordsInCatalogCards: false,
     showThumbnailsAsAssets: false,
-    stacLint: true,
     geoTiffResolution: 128,
     redirectLegacyUrls: false,
     itemsPerPage: 12,

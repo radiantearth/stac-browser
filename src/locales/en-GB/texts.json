@@ -1,0 +1,21 @@
+{
+  "anonymized": {
+    "title": "Anonymised"
+  },
+  "catalogs": {
+    "filterByTitle": "Filter catalogues by title",
+    "filterByTitleAndMore": "Filter catalogues by title, description or keywords",
+    "noMatches": "No catalogues match the given search criteria."
+  },
+  "errors": {
+    "noExternalAccess": "Accessing external catalogues is not allowed!"
+  },
+  "index": {
+    "catalog": "Catalogue",
+    "specifyCatalog": "Please specify a STAC Catalogue or API..."
+  },
+  "sidebar": {
+    "switchCatalog": "Switch Catalogue"
+  },
+  "stacCatalog": "Catalogue | Catalogues"
+}

@@ -1,7 +1,6 @@
 import Vue from "vue";
 import Vuex from "vuex";
 
-import axios from "axios";
 import URI from "urijs";
 
 import i18n from '../i18n';
@@ -21,7 +20,6 @@ function getStore(config, router) {
     title: config.catalogTitle,
     description: null,
     data: null,
-    valid: null,
     parents: null,
     globalError: null,
 
@@ -502,7 +500,6 @@ function getStore(config, router) {
         }
         state.url = url || null;
         state.data = stac instanceof STAC ? stac : null;
-        state.valid = null;
         state.description = description;
 
         // Set title
@@ -533,9 +530,6 @@ function getStore(config, router) {
           error = new Error(error);
         }
         Vue.set(state.database, url, error);
-      },
-      valid(state, valid) {
-        state.valid = valid;
       },
       queue(state, url) {
         state.queue.push(url);
@@ -968,17 +962,21 @@ function getStore(config, router) {
           return null;
         }
       },
-      async validate(cx, url) {
-        if (typeof cx.state.valid === 'boolean') {
-          return;
-        }
-        try {
-          let uri = URI('https://api.staclint.com/url');
-          uri.addSearch('stac_url', url);
-          let response = await axios.get(uri.toString());
-          cx.commit('valid', Boolean(response.data?.body?.valid_stac));
-        } catch (error) {
-          cx.commit('valid', error);
+      async retryAfterAuth(cx) {
+        let errorFn = error => cx.commit('showGlobalError', {
+          error,
+          message: i18n.t('errors.authFailed')
+        });
+
+        for (let callback of cx.state.doAuth) {
+          try {
+            let p = callback();
+            if (p instanceof Promise) {
+              p.catch(errorFn);
+            }
+          } catch (error) {
+            errorFn(error);
+          }
         }
       }
     },

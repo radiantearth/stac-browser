@@ -119,6 +119,7 @@ The following languages are currently supported:
 - fr: French (Canada, France, Switzerland)
 - it: Italian (Italy, Switzerland)
 - ro: Romanian
+- ja: Japanese
 
 We manage the translations in Crowdin, please see <https://crowdin.com/project/stac-browser/> for details.
 
@@ -231,7 +232,6 @@ You need to provide a field `stac_browser` and then you can set any of the follo
 - `defaultThumbnailSize`
 - `displayGeoTiffByDefault`
 - `showThumbnailsAsAssets`
-- `stacLint` (can only be disabled)
 
 ### Custom extensions
 

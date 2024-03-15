@@ -1,17 +1,18 @@
 # echo a string, handling different types
 safe_echo() {
-    local value="$1"
-    if [ -z "$value" ]; then
+    # $1 = value
+    if [ -z "$1" ]; then
         echo -n "null"
-    elif printf '%s\n' "$value" | grep -qE '\n.+\n$'; then
-        echo -n "\`$value\`"
+    elif printf '%s\n' "$1" | grep -qE '\n.+\n$'; then
+        echo -n "\`$1\`"
     else
-        echo -n "'$value'"
+        echo -n "'$1'"
     fi
 }
 
 #  handle boolean
 bool() {
+    # $1 = value
     case "$1" in
         true | TRUE | yes | t | True)
             echo -n true ;;
@@ -25,17 +26,17 @@ bool() {
 
 # handle array values
 array() {
-    local value="$1"
-    local arraytype="$2"
-    if [ -z "$value" ]; then
+    # $1 = value
+    # $2 = arraytype
+    if [ -z "$1" ]; then
         echo -n "[]"
     else
-        case "$arraytype" in
+        case "$2" in
             string)
-                echo -n "['$(echo "$value" | sed "s/,/', '/g")']"
+                echo -n "['$(echo "$1" | sed "s/,/', '/g")']"
                 ;;
             *)
-                echo -n "[$value]"
+                echo -n "[$1]"
                 ;;
         esac
     fi
@@ -43,11 +44,11 @@ array() {
 
 # handle object values
 object() {
-    local value="$1"
-    if [ -z "$value" ]; then
+    # $1 = value
+    if [ -z "$1" ]; then
         echo -n "null"
     else
-        echo -n "$value"
+        echo -n "$1"
     fi
 }
 

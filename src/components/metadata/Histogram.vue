@@ -37,6 +37,7 @@ export default {
     allOptions() {
       let options = {
         responsive: true,
+        animation: false,
         scales: {
           x: {
             ticks: {
@@ -80,3 +81,9 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.histogram {
+  min-width: 150px;
+}
+</style>
