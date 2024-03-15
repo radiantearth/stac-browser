@@ -6,14 +6,19 @@
       <b-badge v-if="!isCore" variant="dark ml-1">{{ $t('source.extension') }}</b-badge>
     </b-card-header>
     <b-list-group flush>
-      <b-list-group-item v-if="errors.length === 0" variant="success">
-        {{ $t('source.valid') }}
-      </b-list-group-item>
-      <template v-else>
+      <template v-if="errors.length > 0">
         <b-list-group-item v-for="(error, i) in errors" :key="i" variant="danger">
           {{ makeAjvErrorMessage(error) }}
         </b-list-group-item>
       </template>
+      <template v-if="hasWarnings">
+        <b-list-group-item v-for="(warning, i) in warnings" :key="i" variant="warning">
+          {{ makeAjvErrorMessage(warning) }}
+        </b-list-group-item>
+      </template>
+      <b-list-group-item v-if="errors.length === 0 && !hasWarnings" variant="success">
+        {{ $t('source.valid') }}
+      </b-list-group-item>
     </b-list-group>
   </b-card>
 </template>
@@ -40,12 +45,19 @@ export default {
       type: Array,
       required: true
     },
+    warnings: {
+      type: Array,
+      default: null
+    },
     context: {
       type: Object,
       required: true
     }
   },
   computed: {
+    hasWarnings() {
+      return Array.isArray(this.warnings) && this.warnings.length > 0;
+    },
     isCore() {
       return this.id === 'core';
     },
@@ -74,7 +86,8 @@ export default {
       }
       return this.id
         .replace(/^\w+:\/\//, '')
-        .replace(/\.github\.io/, '')
+        .replace(/(\.github\.io|raw\.githubusercontent\.com)\/?/, '')
+        .replace(/\/json-schema/, '')
         .replace(/\/[^/]+\.json$/, '')
         .replace(VERSION_REGEXP, '');
     },

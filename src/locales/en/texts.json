@@ -301,8 +301,9 @@
     "validating": "Validating...",
     "validationNA": "n/a",
     "validationReport": {
-      "title": "Validation Report",
-      "result": "Result"
+      "disclaimer": "The validation report is generated based on schemas, which often are not exhaustive. As such they may not cover all aspects of the STAC specification and its extensions. The validation report is not a guarantee that the STAC entity is fully compliant with the specification and its extensions.",
+      "result": "Result",
+      "title": "Validation Report"
     }
   },
   "stacAssets": "Asset | Assets",

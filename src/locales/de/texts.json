@@ -275,7 +275,7 @@
     "extension": "Erweiterung",
     "fileFormat": "Dateiformat",
     "id": "Identifikationsnummer",
-    "invalid": "Ungültig",
+    "invalid": "Nicht konform",
     "label": "Datenquelle",
     "language": {
       "label": "Sprache: {currentLanguage}",
@@ -297,12 +297,13 @@
     "stacVersion": "STAC-Version",
     "statistics": "Statistiken",
     "title": "Datenquelle",
-    "valid": "Gültig",
+    "valid": "Konform",
     "validating": "Validiere...",
     "validationNA": "nicht verfügbar",
     "validationReport": {
-      "result": "Ergebnis",
-      "title": "Gültigkeitsprüfung"
+      "disclaimer": "Der Konformitätsbericht wird auf der Grundlage von Schemata erstellt, die oft nicht vollständig sind. Sie decken daher möglicherweise nicht alle Aspekte der STAC-Spezifikation und ihrer Erweiterungen ab. Der Konformitätsbericht ist keine Garantie dafür, dass die STAC-Daten vollständig mit der Spezifikation und ihren Erweiterungen konform ist.",
+      "title": "Konformitätsbericht",
+      "result": "Ergebnis"
     }
   },
   "stacAssets": "Datei | Dateien",

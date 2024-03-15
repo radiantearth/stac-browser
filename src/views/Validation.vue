@@ -6,28 +6,25 @@
     <Loading v-else-if="loading || working" stretch />
     <section v-else-if="report">
       <h2>{{ $t('source.validationReport.title') }}</h2>
-      <b-row class="result">
-        <b-col cols="4">{{ $t('source.validationReport.result') }}</b-col>
-        <b-col class="text-bold">
-          <span class="text-success" v-if="report.valid">{{ $t('source.valid') }}</span>
-          <span class="text-danger" v-else>{{ $t('source.invalid') }}</span>
-        </b-col>
-      </b-row>
+      <b-alert variant="info" show>{{ $t('source.validationReport.disclaimer') }}</b-alert>
       <b-row class="stac-id">
         <b-col cols="4">{{ $t('source.id') }}</b-col>
         <b-col>
           <code>{{ report.id }}</code>
         </b-col>
       </b-row>
-
-      <ul v-if="report.messages.length > 0">
-        <li v-for="message in report.messages" :key="message">{{ message }}</li>
-      </ul>
+      <b-row class="result">
+        <b-col cols="4">{{ $t('source.validationReport.result') }}</b-col>
+        <b-col>
+          <span class="text-success" v-if="report.valid">{{ $t('source.valid') }}</span>
+          <span class="text-danger" v-else>{{ $t('source.invalid') }}</span>
+        </b-col>
+      </b-row>
 
       <hr class="my-4">
 
       <b-card-group class="results" columns>
-        <ValidationResult id="core" :errors="report.results.core" :context="report" />
+        <ValidationResult id="core" :errors="report.results.core" :warnings="report.messages" :context="report" />
         <ValidationResult v-for="(errors, key) in report.results.extensions" :key="key" :id="key" :errors="errors" :context="report" />
       </b-card-group>
     </section>
@@ -94,3 +91,26 @@ export default {
   }
 };
 </script>
+
+<style lang="scss" scoped>
+.report {
+  font-weight: bold;
+}
+</style>
+
+<style lang="scss">
+@import '~bootstrap/scss/mixins';
+@import "../theme/variables.scss";
+
+#stac-browser .validation .results.card-columns {
+  @include media-breakpoint-up(sm) {
+    column-count: 2;
+  }
+  @include media-breakpoint-up(lg) {
+    column-count: 3;
+  }
+  @include media-breakpoint-up(xxxl) {
+    column-count: 4;
+  }
+}
+</style>
