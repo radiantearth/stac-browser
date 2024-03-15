@@ -1,9 +1,16 @@
 {
+  "actions": {
+    "openIn": ""
+  },
+  "additionalActions": "",
   "additionalResources": "Resurse suplimentare",
   "anonymized": {
     "title": "Anonimizat"
   },
   "assets": {
+    "alternate": {
+      "main": ""
+    },
     "copyGdalVfsUrl": {
       "generic": "Copiați link-ul GDAL VFS",
       "withSource": "Copiați link-ul GDAL VFS al {source}"
@@ -43,6 +50,7 @@
   },
   "catalogs": {
     "filterByTitle": "Filtrați cataloagele după titlu",
+    "filterByTitleAndMore": "",
     "loadMore": "Încarcă mai mult...",
     "noMatches": "Niciun catalog nu corespunde criteriilor de căutare."
   },
@@ -118,8 +126,10 @@
   },
   "items": {
     "filter": "Filtrat",
+    "hideFilter": "",
     "noTime": "Niciun timp selectat",
-    "noneAvailableForCollection": "Nu există articole disponibile pentru această colecție."
+    "noneAvailableForCollection": "Nu există articole disponibile pentru această colecție.",
+    "showFilter": ""
   },
   "leaflet": {
     "close": "Închidere",
@@ -148,6 +158,7 @@
     "andMore": "și încă {count}",
     "deselectLabel": "Apăsați Enter pentru a deselecta",
     "placeholder": "Selectează o opțiune",
+    "keywordsPlaceholder": "",
     "selectLabel": "Apăsați Enter pentru a selecta",
     "selectedLabel": "Selectat(e)"
   },
@@ -190,18 +201,29 @@
     "addCollections": "Apăsați Enter pentru a adăuga o colecție",
     "addFilter": "Adăugați un filtru",
     "addItemIds": "Apăsați Enter pentru a adăuga un ID de articol",
+    "addSearchTerm": "",
     "additionalFilters": "Filtre suplimentare",
     "dateDescription": "Toate orele sunt timp universal coordonat (UTC).",
     "enterCollections": "Introduceți una sau mai multe colecții...",
     "enterItemIds": "Introduceți unul sau mai multe ID-uri de articol...",
+    "enterSearchTerms": "",
     "equalTo": "egal cu",
     "filterBySpatialExtent": "Filtrați după extinderea spațială",
+    "filterCollection": "",
+    "freeText": "",
+    "freeTextDescription": "",
     "greaterThan": "mai mare decât",
+    "greaterThanEqual": "",
     "itemIds": "Identificatori de elemente",
     "itemsPerPage": "Elemente per pagină",
     "itemsPerPageDescription": "Număr de elemente solicitate pe pagină, max. {maxItems} elemente",
     "lessThan": "mai puțin decât",
+    "lessThanEqual": "",
     "likeOperatorDescription": "Puteți folosi metacaracterele. `_` se potrivește cu un singur caracter, `%` se potrivește cu orice număr de caractere. Pentru a căuta în mod specific un wildcard, trebuie să adăugați un `\\` în fața caracterului.",
+    "logical": {
+      "and": "",
+      "or": ""
+    },
     "matches": "corespunde cu",
     "metaDescription": "Căutați în oferta de date a {title}.",
     "modifyCriteria": "Vă rugăm să modificați criteriile de căutare.",
@@ -212,14 +234,20 @@
     "notSupported": "Căutarea articolelor nu este acceptată de API.",
     "placeholder": "Căutare...",
     "selectCollections": "Selectați una sau mai multe colecții...",
+    "selectForItemSearch": "",
     "sortOptions": {
       "datetime": "Data și ora",
       "id": "Identificator",
       "title": "Titlu"
     },
     "spatialExtent": "Întinderea spațială",
+    "tabs": {
+      "collections": "",
+      "items": ""
+    },
     "temporalExtent": "Interval de timp",
-    "title": "Căutare"
+    "title": "Căutare",
+    "useInItemSearch": ""
   },
   "showMore": "Afișați mai multe...",
   "sidebar": {
@@ -237,6 +265,7 @@
     "title": "Sortare"
   },
   "source": {
+    "conformanceClasses": "",
     "detailsAboutSource": "Despre sursa STAC",
     "fileFormat": "Formatul fișierului",
     "id": "Identificator",
@@ -257,6 +286,7 @@
       "twitter": "Twitter",
       "withOthers": "Partajați această pagină"
     },
+    "stacExtension": "",
     "stacVersion": "Versiune STAC",
     "statistics": "Statistici",
     "title": "Date sursă",
