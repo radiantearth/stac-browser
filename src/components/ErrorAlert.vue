@@ -52,7 +52,7 @@ export default {
     },
     dismissible: {
       type: Boolean,
-      default: true
+      default: false
     }
   }
 };
