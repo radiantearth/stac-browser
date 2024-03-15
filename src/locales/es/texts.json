@@ -8,9 +8,6 @@
     "title": "Anonimizado"
   },
   "assets": {
-    "alternate": {
-      "main": ""
-    },
     "copyGdalVfsUrl": {
       "generic": "Copiar la URL del VFS de GDAL",
       "withSource": "Copiar la URL del VFS de GDAL para {source}"
@@ -50,7 +47,6 @@
   },
   "catalogs": {
     "filterByTitle": "Filtrar catálogos por título",
-    "filterByTitleAndMore": "",
     "loadMore": "Cargar más...",
     "noMatches": "Ningún catálogo concuerda con los criterios de búsqueda"
   },
@@ -158,7 +154,6 @@
     "andMore": "y {count} mas",
     "deselectLabel": "Presione enter para quitar",
     "placeholder": "Seleccionar opción",
-    "keywordsPlaceholder": "",
     "selectLabel": "Presione enter para seleccionar",
     "selectedLabel": "Seleccionado"
   },
