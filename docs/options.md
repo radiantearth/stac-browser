@@ -117,7 +117,7 @@ I'd need help to test support for right-to-left languages.
 
 ## stacLint
 
-***experimental***
+**deprecated**
 
 Enables or disables a feature that validates the STAC catalog when opening the "Source Data" popup.
 Validation uses the external service [staclint.com](https://staclint.com).
