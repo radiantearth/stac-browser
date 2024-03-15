@@ -8,6 +8,9 @@
     "title": "Anonimizzato"
   },
   "assets": {
+    "alternate": {
+      "main": ""
+    },
     "copyGdalVfsUrl": {
       "generic": "Copia l'URL del VFS GDAL",
       "withSource": "Copia l'URL del VFS GDAL per {source}"
@@ -47,6 +50,7 @@
   },
   "catalogs": {
     "filterByTitle": "Filtra i cataloghi per titolo",
+    "filterByTitleAndMore": "",
     "loadMore": "Carica di più...",
     "noMatches": "Nessun catalogo corrisponde ai criteri di ricerca indicati."
   },
@@ -99,6 +103,10 @@
     "exit": "Esci dalla modalità a schermo intero",
     "show": "Mostra in modalità a schermo intero"
   },
+  "goBack": {
+    "description": "",
+    "label": ""
+  },
   "goToCollection": {
     "description": "Vai alla Collezione associata",
     "descriptionWithTitle": "@:goToCollection.description: {title}",
@@ -146,6 +154,7 @@
   },
   "loading": "Carico...",
   "map": "Mappa",
+  "messageForSchemaError": "",
   "metadata": {
     "general": "Generale",
     "title": "Metadati"
@@ -153,6 +162,7 @@
   "multiselect": {
     "andMore": "e {count} in più",
     "deselectLabel": "Premi invio per rimuovere",
+    "keywordsPlaceholder": "",
     "placeholder": "Seleziona un'opzione",
     "selectLabel": "Premi invio per selezionare",
     "selectedLabel": "Selezionato"
@@ -172,8 +182,8 @@
     "gcs": "Google Cloud",
     "oss": "Alibaba Cloud",
     "s3": {
-      "default": "S3",
-      "amazonaws.com": "Amazon S3"
+      "amazonaws.com": "Amazon S3",
+      "default": "S3"
     }
   },
   "providers": {
@@ -262,8 +272,10 @@
   "source": {
     "conformanceClasses": "Classi di conformità",
     "detailsAboutSource": "Informazioni sulla fonte STAC",
+    "extension": "",
     "fileFormat": "Formato file",
     "id": "ID",
+    "invalid": "",
     "label": "Fonte",
     "language": {
       "label": "Lingua: {currentLanguage}",
@@ -287,7 +299,12 @@
     "title": "Fonte dati",
     "valid": "Valido",
     "validating": "In corso di validazione...",
-    "validationNA": "n/a"
+    "validationNA": "n/a",
+    "validationReport": {
+      "disclaimer": "",
+      "result": "",
+      "title": ""
+    }
   },
   "stacAssets": "Risorsa | Risorse",
   "stacCatalog": "Catalogo | Cataloghi",
