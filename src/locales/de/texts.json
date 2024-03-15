@@ -103,6 +103,10 @@
     "exit": "Verlasse den Vollbild-Modus",
     "show": "Zeige im Vollbild-Modus"
   },
+  "goBack": {
+    "description": "Gehe zurück zu: {type}",
+    "label": "Zurück"
+  },
   "goToCollection": {
     "description": "Gehe zum dazugehörigen Katalog",
     "descriptionWithTitle": "@:goToCollection.description: {title}",
@@ -150,6 +154,7 @@
   },
   "loading": "Lade...",
   "map": "Karte",
+  "messageForSchemaError": "{message}, für Schema {schemaPath}",
   "metadata": {
     "general": "Allgemeines",
     "title": "Metadaten"
@@ -157,8 +162,8 @@
   "multiselect": {
     "andMore": "und {count} weitere",
     "deselectLabel": "Enter zum Entfernen",
-    "placeholder": "Option auswählen",
     "keywordsPlaceholder": "Schlüsselwörter auswählen",
+    "placeholder": "Option auswählen",
     "selectLabel": "Enter zum Selektieren",
     "selectedLabel": "Selektiert"
   },
@@ -177,8 +182,8 @@
     "gcs": "Google Cloud",
     "oss": "Alibaba Cloud",
     "s3": {
-      "default": "S3",
-      "amazonaws.com": "Amazon S3"
+      "amazonaws.com": "Amazon S3",
+      "default": "S3"
     }
   },
   "providers": {
@@ -267,8 +272,10 @@
   "source": {
     "conformanceClasses": "Konformitätsklasse",
     "detailsAboutSource": "Details über die STAC-Datenquelle",
+    "extension": "Erweiterung",
     "fileFormat": "Dateiformat",
     "id": "Identifikationsnummer",
+    "invalid": "Ungültig",
     "label": "Datenquelle",
     "language": {
       "label": "Sprache: {currentLanguage}",
@@ -290,9 +297,13 @@
     "stacVersion": "STAC-Version",
     "statistics": "Statistiken",
     "title": "Datenquelle",
-    "valid": "Valide",
+    "valid": "Gültig",
     "validating": "Validiere...",
-    "validationNA": "nicht verfügbar"
+    "validationNA": "nicht verfügbar",
+    "validationReport": {
+      "result": "Ergebnis",
+      "title": "Gültigkeitsprüfung"
+    }
   },
   "stacAssets": "Datei | Dateien",
   "stacCatalog": "Katalog | Kataloge",
