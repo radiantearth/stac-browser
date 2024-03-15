@@ -8,7 +8,17 @@ module.exports = {
     locale: "en",
     fallbackLocale: "en",
     supportedLocales: [
-      "en"
+        "de",
+//      "de-CH",
+        "es",
+        "en",
+//      "en-GB",
+        "fr",
+//      "fr-CA",
+//      "fr-CH",
+        "it",
+//      "it-CH",
+        "ro"
     ],
     apiCatalogPriority: null,
     useTileLayerAsFallback: true,
