@@ -103,10 +103,6 @@
     "exit": "Exit Fullscreen",
     "show": "View Fullscreen"
   },
-  "goBack": {
-    "description": "Go back to the {type}",
-    "label": "Back"
-  },
   "goToCollection": {
     "description": "Go to the associated collection",
     "descriptionWithTitle": "@:goToCollection.description: {title}",
@@ -154,7 +150,6 @@
   },
   "loading": "Loading...",
   "map": "Map",
-  "messageForSchemaError": "{message}, for schema {schemaPath}",
   "metadata": {
     "general": "General",
     "title": "Metadata"
@@ -162,8 +157,8 @@
   "multiselect": {
     "andMore": "and {count} more",
     "deselectLabel": "Press enter to remove",
-    "keywordsPlaceholder": "Select keywords",
     "placeholder": "Select option",
+    "keywordsPlaceholder": "Select keywords",
     "selectLabel": "Press enter to select",
     "selectedLabel": "Selected"
   },
@@ -182,8 +177,8 @@
     "gcs": "Google Cloud",
     "oss": "Alibaba Cloud",
     "s3": {
-      "amazonaws.com": "Amazon S3",
-      "default": "S3"
+      "default": "S3",
+      "amazonaws.com": "Amazon S3"
     }
   },
   "providers": {
@@ -272,10 +267,8 @@
   "source": {
     "conformanceClasses": "Conformance Classes",
     "detailsAboutSource": "Details about the STAC source",
-    "extension": "Extension",
     "fileFormat": "File Format",
     "id": "ID",
-    "invalid": "Invalid",
     "label": "Source",
     "language": {
       "label": "Language: {currentLanguage}",
@@ -299,12 +292,7 @@
     "title": "Source Data",
     "valid": "Valid",
     "validating": "Validating...",
-    "validationNA": "n/a",
-    "validationReport": {
-      "disclaimer": "The validation report is generated based on schemas, which often are not exhaustive. As such they may not cover all aspects of the STAC specification and its extensions. The validation report is not a guarantee that the STAC entity is fully compliant with the specification and its extensions.",
-      "result": "Result",
-      "title": "Validation Report"
-    }
+    "validationNA": "n/a"
   },
   "stacAssets": "Asset | Assets",
   "stacCatalog": "Catalog | Catalogs",
