@@ -9,7 +9,7 @@
   },
   "assets": {
     "alternate": {
-      "main": ""
+      "main": "Preferito"
     },
     "copyGdalVfsUrl": {
       "generic": "Copia l'URL del VFS GDAL",
@@ -50,7 +50,7 @@
   },
   "catalogs": {
     "filterByTitle": "Filtra i cataloghi per titolo",
-    "filterByTitleAndMore": "",
+    "filterByTitleAndMore": "Filtra i cataloghi per titolo, descrizione o parole chiave",
     "loadMore": "Carica di più...",
     "noMatches": "Nessun catalogo corrisponde ai criteri di ricerca indicati."
   },
@@ -104,8 +104,8 @@
     "show": "Mostra in modalità a schermo intero"
   },
   "goBack": {
-    "description": "",
-    "label": ""
+    "description": "Torna a {type}",
+    "label": "Indietro"
   },
   "goToCollection": {
     "description": "Vai alla Collezione associata",
@@ -154,7 +154,7 @@
   },
   "loading": "Carico...",
   "map": "Mappa",
-  "messageForSchemaError": "",
+  "messageForSchemaError": "{message} per lo schema {schemaPath}",
   "metadata": {
     "general": "Generale",
     "title": "Metadati"
@@ -162,7 +162,7 @@
   "multiselect": {
     "andMore": "e {count} in più",
     "deselectLabel": "Premi invio per rimuovere",
-    "keywordsPlaceholder": "",
+    "keywordsPlaceholder": "Seleziona parole chiave",
     "placeholder": "Seleziona un'opzione",
     "selectLabel": "Premi invio per selezionare",
     "selectedLabel": "Selezionato"
@@ -272,10 +272,10 @@
   "source": {
     "conformanceClasses": "Classi di conformità",
     "detailsAboutSource": "Informazioni sulla fonte STAC",
-    "extension": "",
+    "extension": "Estensione",
     "fileFormat": "Formato file",
     "id": "ID",
-    "invalid": "",
+    "invalid": "Non valido",
     "label": "Fonte",
     "language": {
       "label": "Lingua: {currentLanguage}",
@@ -301,9 +301,9 @@
     "validating": "In corso di validazione...",
     "validationNA": "n/a",
     "validationReport": {
-      "disclaimer": "",
-      "result": "",
-      "title": ""
+      "disclaimer": "Il rapporto di validazione è generato sulla base di schemi spesso non esaustivi, che non possono coprire tutti gli aspetti della specifica STAC e delle sue estensioni. Il rapporto di validazione non garantisce la completa conformità di un'entità STAC alla specifica e delle sue estensioni.",
+      "result": "Risultato",
+      "title": "Rapporto di validazione"
     }
   },
   "stacAssets": "Risorsa | Risorse",
