@@ -17,7 +17,8 @@ module.exports = {
 //      "fr-CH",
         "it",
 //      "it-CH",
-        "ro"
+        "ro",
+        "ja"
     ],
     apiCatalogPriority: null,
     useTileLayerAsFallback: true,
