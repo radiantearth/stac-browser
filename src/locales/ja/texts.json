@@ -1,9 +1,9 @@
 {
   "actions": {
-    "openIn": ""
+    "openIn": "{service}で開く"
   },
   "additionalActions": "",
-  "additionalResources": "",
+  "additionalResources": "追加のリソース",
   "anonymized": {
     "title": ""
   },
@@ -42,16 +42,16 @@
     "description": "",
     "title": ""
   },
-  "browse": "",
+  "browse": "ブラウズ",
   "cancel": "",
   "catalog": {
     "license": "",
     "temporalExtent": ""
   },
   "catalogs": {
-    "filterByTitle": "",
-    "filterByTitleAndMore": "",
-    "loadMore": "",
+    "filterByTitle": "カタログをフィルタ (タイトル)",
+    "filterByTitleAndMore": "カタログをフィルタ (タイトル / 説明 / キーワード)",
+    "loadMore": "さらに読み込み",
     "noMatches": ""
   },
   "checkbox": {
@@ -72,7 +72,7 @@
     "successorVersion": "",
     "warning": ""
   },
-  "description": "",
+  "description": "説明",
   "errors": {
     "authFailed": "",
     "badRequest": "",
@@ -109,21 +109,21 @@
   },
   "goToCollection": {
     "description": "",
-    "descriptionWithTitle": "",
+    "descriptionWithTitle": "@:goToCollection.description: {title}",
     "label": ""
   },
   "goToParent": {
     "description": "",
-    "descriptionWithTitle": "",
-    "label": ""
+    "descriptionWithTitle": "@:goToParent.description: {title}",
+    "label": "上へ"
   },
   "in": "",
   "index": {
     "api": "",
-    "catalog": "",
-    "load": "",
-    "selectStacIndex": "",
-    "specifyCatalog": "",
+    "catalog": "カタログ",
+    "load": "読み込み",
+    "selectStacIndex": "あるいは {stacIndex} から選んでください",
+    "specifyCatalog": "STACカタログ / STAC APIのURLを指定してください",
     "urlInvalid": "",
     "urlMissingHost": "",
     "urlMissingProtocol": ""
@@ -144,11 +144,11 @@
     "zoom": {
       "in": {
         "description": "",
-        "label": ""
+        "label": "+"
       },
       "out": {
         "description": "",
-        "label": ""
+        "label": "-"
       }
     }
   },
@@ -156,8 +156,8 @@
   "map": "",
   "messageForSchemaError": "",
   "metadata": {
-    "general": "",
-    "title": ""
+    "general": "一般",
+    "title": "メタデータ"
   },
   "multiselect": {
     "andMore": "",
@@ -260,11 +260,11 @@
   },
   "sort": {
     "asc": {
-      "label": "",
+      "label": "昇順",
       "title": ""
     },
     "desc": {
-      "label": "",
+      "label": "降順",
       "title": ""
     },
     "title": ""
@@ -276,22 +276,22 @@
     "fileFormat": "",
     "id": "",
     "invalid": "",
-    "label": "",
+    "label": "ソース",
     "language": {
-      "label": "",
+      "label": "言語: {currentLanguage}",
       "onlyData": "",
       "onlyUI": "",
-      "switch": ""
+      "switch": "言語の切り替え"
     },
     "locatedAt": "",
     "share": {
-      "email": "",
-      "label": "",
-      "message": "",
-      "sharePageWithOthers": "",
-      "title": "",
+      "email": "Eメール",
+      "label": "共有",
+      "message": "{title} はこちらのページで利用できます: {url}",
+      "sharePageWithOthers": "このページのURLを共有しましょう:",
+      "title": "共有",
       "twitter": "",
-      "withOthers": ""
+      "withOthers": "このページを共有しましょう"
     },
     "stacExtension": "",
     "stacVersion": "",
@@ -306,10 +306,10 @@
       "title": ""
     }
   },
-  "stacAssets": "",
-  "stacCatalog": "",
-  "stacCollection": "",
-  "stacItem": "",
+  "stacAssets": "アセット",
+  "stacCatalog": "カタログ",
+  "stacCollection": "コレクション",
+  "stacItem": "アイテム",
   "submit": "",
   "table": {
     "emptyFilteredText": "",
@@ -320,20 +320,20 @@
       "desc": ""
     }
   },
-  "thumbnails": "",
+  "thumbnails": "サムネイル",
   "tree": {
     "moreCollectionPagesAvailable": "",
     "noChildren": ""
   },
   "view": {
     "list": {
-      "label": "",
-      "title": ""
+      "label": "リスト",
+      "title": "リスト表示"
     },
     "tiles": {
-      "label": "",
-      "title": ""
+      "label": "タイル",
+      "title": "タイル表示"
     },
-    "title": ""
+    "title": "表示オプション"
   }
 }
