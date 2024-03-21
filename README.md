@@ -119,6 +119,7 @@ The following languages are currently supported:
 - fr: French (Canada, France, Switzerland)
 - it: Italian (Italy, Switzerland)
 - ro: Romanian
+- ja: Japanese
 
 We manage the translations in Crowdin, please see <https://crowdin.com/project/stac-browser/> for details.
 
