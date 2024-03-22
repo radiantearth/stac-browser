@@ -3,6 +3,7 @@ import Auth from "./index";
 import axios from 'axios';
 
 import { OktaAuth } from '@okta/okta-auth-js';
+import Utils from '../utils';
 
 export default class OIDC extends Auth {
 
@@ -10,15 +11,10 @@ export default class OIDC extends Auth {
     super(options, authState => changeListener(authState.isAuthenticated, authState?.accessToken?.accessToken));
 
     this.router = router;
-
-    let issuer = options.openIdConnectUrl.replace(/\/\.well-known\/openid-configuration\/?$/, '');
-    let oktaOptions = Object.assign({ issuer, clientId: 'stac-browser' }, options.oidcOptions);
-    oktaOptions.restoreOriginalUri = (_, originalUri) => this.restoreOriginalUri(originalUri);
-    oktaOptions.httpRequestClient = this.httpRequest.bind(this);
-    this.okta = new OktaAuth(oktaOptions);
+    this.initialized = false;
   }
 
-  async httpRequest(method, url, args) {
+  async httpRequest(method, url, args = {}) {
     let headers = Object.assign({}, args.headers);
     // This makes OktaAuth fail with a couple of OIDC instances as it's a custom header, remove it
     delete headers["X-Okta-User-Agent-Extended"];
@@ -39,9 +35,58 @@ export default class OIDC extends Auth {
     }
   }
 
+  getRedirectUri(appPath) {
+    let base = this.router.options.base;
+    let path = this.router.resolve(appPath).href;
+    if (base.endsWith('/') && path.startsWith('/')) {
+      base = base.substring(0, base.length - 1);
+    }
+    return window.location.origin + base + path;
+  }
+
   async init() {
+    if (this.initialized) {
+      return;
+    }
+
+    let oktaOptions = {};
+    if (this.options.openIdConnectUrl) {
+      Object.assign(oktaOptions, {
+        issuer: this.options.openIdConnectUrl.replace(/\/\.well-known\/openid-configuration\/?$/, ''),
+        clientId: 'stac-browser',
+        redirectUri: this.getRedirectUri('/auth'),
+        logoutRedirectUri: this.getRedirectUri('/auth/logout')
+      }, this.options.oidcOptions);
+
+
+      // Workaround for bug https://github.com/okta/okta-auth-js/issues/377
+      try {
+        let wkd = await axios(this.options.openIdConnectUrl);
+        if (Utils.isObject(wkd.data)) {
+          if (!oktaOptions.authorizeUrl) {
+            oktaOptions.authorizeUrl = wkd.data.authorization_endpoint;
+          }
+          if (!oktaOptions.userinfoUrl) {
+            oktaOptions.userinfoUrl = wkd.data.userinfo_endpoint;
+          }
+          if (!oktaOptions.tokenUrl) {
+            oktaOptions.tokenUrl = wkd.data.token_endpoint;
+          }
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    oktaOptions.restoreOriginalUri = (_, originalUri) => this.restoreOriginalUri(originalUri);
+    oktaOptions.httpRequestClient = this.httpRequest.bind(this);
+
+    this.okta = new OktaAuth(oktaOptions);
+
     this.okta.authStateManager.subscribe(this.changeListener);
     await this.okta.start();
+    
+    this.initialized = true;
   }
 
   async close() {

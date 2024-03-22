@@ -90,7 +90,7 @@ Otherwise, defaults to the language set for `locale`.
 
 ## storeLocale
 
-If set to `true`, stores the locale selected by the user in the `localStorage` of the browser.
+If set to `true`, stores the locale selected by the user in the storage of the browser.
 Otherwise, doesn't store the locale across browser sessions.
 
 ## locale
@@ -281,7 +281,7 @@ Please note that this option can only be provided through a config file and is n
 ***experimental***
 
 This allows to enable some authentication methods. Currently the supported methods are:
-- API Keys (`type: apiKey`) via query parameter (`in: query`) or HTTP Header (`in: header`)
+- API Keys (`type: apiKey`) via query parameter or HTTP Header
 - OpenID Connect (`type: openIdConnect`)
 
 Authentication is disabled by default (`null`).
@@ -298,16 +298,20 @@ In addition the following properties are supported:
 * `description` (string|null): Optionally a description that is shown to the user. This should explain how the credentials can be obtained for example. CommonMark is allowed.
     **Note:** You can leave the description empty in the config file and instead provide a localized string with the key `authConfig` -> `description` in the file for custom phrases (`src/locales/custom.js`).
 
-For OpenID Connect some additional options must be provided, which currently follow the
-[OktaAuth Configuration options](https://github.com/okta/okta-auth-js?tab=readme-ov-file#configuration-options).
-These options (except for `issuer`) must be provided in the property `oidcConfig`.
-The `clientId` option defaults to `stac-browser`.
-
 Authentication is generally affected by the [`allowedDomains`](#alloweddomains) option.
 
 The `authConfig` option can only be provided through a config file and is not available via CLI/ENV.
 
-### Example 1: HTTP Request Header Value
+### API Keys
+
+API keys can be configured to be sent via HTTP header or query parameter:
+
+- For query parameters you need to set `in: query` with a respective `name` for the query parameter
+- For HTTP headers you need to set `in: header` with a respective `name` for the header field
+
+Note: For HTTP headers the headers can't be sent to the assets for download requests.
+
+#### Example 1: HTTP Request Header Value
 
 ```js
 {
@@ -322,7 +326,7 @@ The `authConfig` option can only be provided through a config file and is not av
 For a given token `123` this results in the following additional HTTP Header:
 `Authorization: Bearer 123`
 
-### Example 2: Query Parameter Value
+#### Example 2: Query Parameter Value
 
 ```js
 {
@@ -335,7 +339,15 @@ For a given token `123` this results in the following additional HTTP Header:
 For a given token `123` this results in the following query parameter:
 `https://example.com/stac/catalog.json?API_KEY=123`
 
-### Example 3: OpenID Connect
+### OpenID Connect
+
+For OpenID Connect some additional options must be provided, which currently follow the
+[OktaAuth Configuration options](https://github.com/okta/okta-auth-js?tab=readme-ov-file#configuration-options).
+These options (except for `issuer`) must be provided in the property `oidcConfig`.
+The `clientId` option defaults to `stac-browser`.
+The redirect URL for the OIDC client must be set as follows:
+
+#### Example
 
 ```js
 {
@@ -347,8 +359,8 @@ For a given token `123` this results in the following query parameter:
 }
 ```
 
-For a given token `123` this results in the following query parameter:
-`https://example.com/stac/catalog.json?API_KEY=123`
+For a given token `123` this results in the following additional HTTP Header:
+`Authorization: Bearer 123`
 
 ## preprocessSTAC
 

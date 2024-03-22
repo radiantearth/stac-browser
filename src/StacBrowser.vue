@@ -1,6 +1,6 @@
 <template>
   <b-container id="stac-browser">
-    <ErrorAlert class="global-error" v-if="globalError" v-bind="globalError" @close="hideError" />
+    <ErrorAlert v-if="globalError" dismissible class="global-error" v-bind="globalError" @close="hideError" />
     <Sidebar v-if="sidebar" />
     <!-- Header -->
     <header>
@@ -44,6 +44,7 @@ import URI from 'urijs';
 import I18N from '@radiantearth/stac-fields/I18N';
 import { translateFields, API_LANGUAGE_CONFORMANCE, loadMessages } from './i18n';
 import { getBest, prepareSupported } from './locale-id';
+import BrowserStorage from "./browser-store";
 
 Vue.use(AlertPlugin);
 Vue.use(ButtonGroupPlugin);
@@ -248,7 +249,7 @@ export default {
       }
     }
   },
-  created() {
+  async created() {
     this.$router.onReady(() => {
       this.detectLocale();
       this.parseQuery(this.$route);
@@ -271,6 +272,19 @@ export default {
       this.$store.commit(resetOp);
       this.parseQuery(to);
     });
+
+    const storage = new BrowserStorage(true);
+    const authConfig = storage.get('authConfig');
+    if (authConfig) {
+      storage.remove('authConfig');
+      await this.$store.dispatch('config', { authConfig });
+        try {
+          await this.$store.getters['auth/method'].loginCallback();
+        }
+        catch (error) {
+          this.showError(error);
+        }
+    }
   },
   mounted() {
     this.$root.$on('error', this.showError);
@@ -281,11 +295,8 @@ export default {
     detectLocale() {
       let locale;
       if (this.storeLocaleFromVueX) {
-        try {
-          locale = window.localStorage.getItem('locale');
-        } catch(error) {
-          console.error(error);
-        }
+        const storage = new BrowserStorage();
+        locale = storage.get('locale');
       }
       if (!locale && this.detectLocaleFromBrowserFromVueX && Array.isArray(navigator.languages)) {
         // Detect the most suitable locale

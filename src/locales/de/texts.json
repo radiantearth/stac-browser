@@ -56,7 +56,7 @@
     },
     "title": "Anmelden",
     "unauthorized": "Sie haben keine Berechtigung um diese Daten abzurufen. Bitte melden Sie sich an.",
-    "unsupported": "nicht unterstützt",
+    "unsupported": "Nicht unterstützt",
     "unsupportedLong": "Die Anmeldemethode {method} wird von STAC Browser leider nicht unterstützt."
   },
   "browse": "Erkunden",

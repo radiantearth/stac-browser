@@ -1,6 +1,6 @@
 <template>
   <main class="auth d-flex flex-column">
-    <ErrorAlert v-if="error" message="Login failed" :error="error" :dismissible="false" />
+    <ErrorAlert v-if="error" message="Login failed" :error="error" />
     <Loading v-else stretch />
   </main>
 </template>
@@ -32,10 +32,9 @@ export default {
           return;
         }
         try {
-          await this.method.loginCallback();
+          await method.loginCallback();
         }
         catch (error) {
-          console.error(error);
           this.error = error;
         }
       }

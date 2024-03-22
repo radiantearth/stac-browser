@@ -256,8 +256,8 @@ export default {
       }
       else {
         const name = this.$i18n.t(`authentication.schemeTypes.${method.type}`);
-        // ToDo: don't use alert
-        alert(this.$i18n.t('authentication.unsupportedLong', {method: name}));
+        const message = this.$i18n.t('authentication.unsupportedLong', {method: name});
+        this.$root.$emit('error', new Error(message), this.$i18n.t('authentication.unsupported'));
       }
     }
   }

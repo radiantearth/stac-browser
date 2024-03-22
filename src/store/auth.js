@@ -2,6 +2,7 @@ import Auth from '../auth';
 import Utils from '../utils';
 import i18n from '../i18n';
 import AuthUtils from '../components/auth/utils';
+import BrowserStorage from '../browser-store';
 
 export default function getStore(router) {
   return {
@@ -57,6 +58,10 @@ export default function getStore(router) {
           await cx.dispatch('updateCredentials', credentials);
           await cx.dispatch('executeActions');
         };
+        
+        const storage = new BrowserStorage(true);
+        storage.set('authConfig', config);
+
         let newAuth = await Auth.create(config, changeListener, router);
         cx.commit('setMethod', newAuth);
       },

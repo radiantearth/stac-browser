@@ -12,6 +12,7 @@ import auth from './auth.js';
 import { addQueryIfNotExists, isAuthenticationError, Loading, processSTAC, proxyUrl, unproxyUrl, stacRequest } from './utils';
 import { getBest } from '../locale-id';
 import { TYPES } from "../components/ApiCapabilitiesMixin";
+import BrowserStorage from "../browser-store.js";
 
 function getStore(config, router) {
   // Local settings (e.g. for currently loaded STAC entity)
@@ -632,11 +633,8 @@ function getStore(config, router) {
         await cx.dispatch('config', {locale});
 
         if (cx.state.storeLocale && userSelected) {
-          try {
-            window.localStorage.setItem('locale', locale);
-          } catch (error) {
-            console.error(error);
-          }
+          const storage = new BrowserStorage();
+          locale = storage.set('locale', locale);
         }
 
         // Locale for UI
