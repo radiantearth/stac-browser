@@ -320,8 +320,7 @@
       "pattern": "pattern",
       "property": "property",
       "propertyName": "property name",
-      "type": "type",
-      "unevaluatedProperty": "unevaluated property"
+      "type": "type"
     },
     "validationReport": {
       "disclaimer": "The validation report is generated based on schemas, which often are not exhaustive. As such they may not cover all aspects of the STAC specification and its extensions. The validation report is not a guarantee that the STAC entity is fully compliant with the specification and its extensions.",
