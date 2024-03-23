@@ -240,7 +240,7 @@ STAC Browser supports some non-standardized extensions to the STAC specification
 1. [Provider Object](https://github.com/radiantearth/stac-spec/blob/master/collection-spec/collection-spec.md#provider-object):
    Add an `email` (or `mail`) field with an e-mail address and the mail will be shown in the Browser.
 2. [Alternative Assets Object](https://github.com/stac-extensions/alternate-assets?tab=readme-ov-file#alternate-asset-object):
-   Add a `name` field and it will be used as title in the tab header.
+   Add a `name` field and it will be used as title in the tab header, the same applies for the core Asset Object.
 3. A link with relation type `icon` and a Browser-supported media type in any STAC entity will show an icon in the header and the lists of Catalogs, Collections and Items.
 
 ## Docker
