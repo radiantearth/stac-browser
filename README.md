@@ -336,7 +336,7 @@ You can also use one of the existing languages and provide an alternate version 
 - Translate the `.json` files, most importantly `config.json`, `fields.json` and `texts.json`.
   - Please note that you never need to translate any object keys!
   - If you base your language on another existing language (e.g. create `en-IN` based on `en`) you can delete individual files and import existing files from other languages in `default.js`.
-- Adapt the `datepicker.js` and `duration.js` files to import the existing definitions from their corresponding external packages, but you could also define the specifics yourself.
+- Adapt the `datepicker.js`, `duration.js` and `validation.js` files to import the existing definitions from their corresponding external packages, but you could also define the specifics yourself.
 - Check that your translation works by running the development server (`npm start`) and navigating to the STAC Browser instance in your browser (usually `http://localhost:8080`).
 - Once completed, please open a pull request and we'll get back to you as soon as possible.
 - After merging the PR for the first time, we'll add you to our translation management tool Crowdin: <https://crowdin.com/project/stac-browser/>. Please get in touch to get your invite!
