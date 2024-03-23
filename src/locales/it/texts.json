@@ -320,8 +320,7 @@
       "pattern": "",
       "property": "",
       "propertyName": "",
-      "type": "",
-      "unevaluatedProperty": ""
+      "type": ""
     },
     "validationReport": {
       "disclaimer": "Il rapporto di validazione è generato sulla base di schemi spesso non esaustivi, che non possono coprire tutti gli aspetti della specifica STAC e delle sue estensioni. Il rapporto di validazione non garantisce la completa conformità di un'entità STAC alla specifica e delle sue estensioni.",
