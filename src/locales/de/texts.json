@@ -320,8 +320,7 @@
       "pattern": "Muster",
       "property": "Attribut",
       "propertyName": "Attributname",
-      "type": "Datentyp",
-      "unevaluatedProperty": ""
+      "type": "Datentyp"
     },
     "validationReport": {
       "disclaimer": "Der Konformitätsbericht wird auf der Grundlage von Schemata erstellt, die oft nicht vollständig sind. Sie decken daher möglicherweise nicht alle Aspekte der STAC-Spezifikation und ihrer Erweiterungen ab. Der Konformitätsbericht ist keine Garantie dafür, dass die STAC-Daten vollständig mit der Spezifikation und ihren Erweiterungen konform ist.",
