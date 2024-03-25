@@ -156,7 +156,7 @@
   "map": "マップ",
   "messageForSchemaError": "{message}, スキーマ {schemaPath}",
   "metadata": {
-    "general": "一般",
+    "general": "General",
     "title": "メタデータ"
   },
   "multiselect": {
