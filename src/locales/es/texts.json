@@ -8,9 +8,6 @@
     "title": "Anonimizado"
   },
   "assets": {
-    "alternate": {
-      "main": ""
-    },
     "copyGdalVfsUrl": {
       "generic": "Copiar la URL del VFS de GDAL",
       "withSource": "Copiar la URL del VFS de GDAL para {source}"
@@ -50,7 +47,6 @@
   },
   "catalogs": {
     "filterByTitle": "Filtrar catálogos por título",
-    "filterByTitleAndMore": "",
     "loadMore": "Cargar más...",
     "noMatches": "Ningún catálogo concuerda con los criterios de búsqueda"
   },
@@ -103,10 +99,6 @@
     "exit": "Salir de pantalla completa",
     "show": "Ver en pantalla completa"
   },
-  "goBack": {
-    "description": "",
-    "label": ""
-  },
   "goToCollection": {
     "description": "Ir a la colección asociada",
     "descriptionWithTitle": "@:goToCollection.description: {title}",
@@ -154,7 +146,6 @@
   },
   "loading": "Cargando...",
   "map": "Mapa",
-  "messageForSchemaError": "",
   "metadata": {
     "general": "General",
     "title": "Metadatos"
@@ -162,7 +153,6 @@
   "multiselect": {
     "andMore": "y {count} mas",
     "deselectLabel": "Presione enter para quitar",
-    "keywordsPlaceholder": "",
     "placeholder": "Seleccionar opción",
     "selectLabel": "Presione enter para seleccionar",
     "selectedLabel": "Seleccionado"
@@ -272,10 +262,8 @@
   "source": {
     "conformanceClasses": "Clases de conformidad",
     "detailsAboutSource": "Detalles sobre la fuente STAC",
-    "extension": "",
     "fileFormat": "Formato de archivo",
     "id": "ID",
-    "invalid": "",
     "label": "Fuente",
     "language": {
       "label": "Idioma: {currentLanguage}",
@@ -299,34 +287,7 @@
     "title": "Fuente de datos",
     "valid": "Valida",
     "validating": "Validando...",
-    "validationNA": "n/a",
-    "validationParams": {
-      "additionalProperty": "",
-      "allowedValue": "",
-      "allowedValues": "",
-      "comparison": "",
-      "depsCount": "",
-      "exclusive": "",
-      "failingKeyword": "",
-      "format": "",
-      "i": "",
-      "j": "",
-      "limit": "",
-      "maxContains": "",
-      "minContains": "",
-      "missingProperty": "",
-      "multipleOf": "",
-      "passingSchemas": "",
-      "pattern": "",
-      "property": "",
-      "propertyName": "",
-      "type": ""
-    },
-    "validationReport": {
-      "disclaimer": "",
-      "result": "",
-      "title": ""
-    }
+    "validationNA": "n/a"
   },
   "stacAssets": "Recurso | Recursos",
   "stacCatalog": "Catálogo | Catálogos",
