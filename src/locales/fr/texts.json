@@ -8,6 +8,9 @@
     "title": "Anonymat"
   },
   "assets": {
+    "alternate": {
+      "main": ""
+    },
     "copyGdalVfsUrl": {
       "generic": "Copier le lien du GDAL VFS",
       "withSource": "Copier le lien du GDAL VFS de {source}"
@@ -47,6 +50,7 @@
   },
   "catalogs": {
     "filterByTitle": "Filtrer les catalogues par titre",
+    "filterByTitleAndMore": "",
     "loadMore": "Charger plus...",
     "noMatches": "Aucun catalogue ne correspond aux critères de recherche."
   },
@@ -99,6 +103,10 @@
     "exit": "Quitter le mode plein écran",
     "show": "Voir en plein écran"
   },
+  "goBack": {
+    "description": "",
+    "label": ""
+  },
   "goToCollection": {
     "description": "Accéder à la collection associée",
     "descriptionWithTitle": "@:goToCollection.description: {title}",
@@ -146,6 +154,7 @@
   },
   "loading": "Chargement...",
   "map": "Carte",
+  "messageForSchemaError": "",
   "metadata": {
     "general": "Général",
     "title": "Métadonnées"
@@ -153,6 +162,7 @@
   "multiselect": {
     "andMore": "et {count} de plus",
     "deselectLabel": "Appuyer sur Entrée pour désélectionner",
+    "keywordsPlaceholder": "",
     "placeholder": "Sélectionner une option",
     "selectLabel": "Appuyer sur Entrée pour sélectionner",
     "selectedLabel": "Sélectionné(e)"
@@ -262,8 +272,10 @@
   "source": {
     "conformanceClasses": "Classes de conformité",
     "detailsAboutSource": "À propos de la source STAC",
+    "extension": "",
     "fileFormat": "Format de fichier",
     "id": "Identifiant",
+    "invalid": "",
     "label": "Source",
     "language": {
       "label": "Langue: {currentLanguage}",
@@ -287,7 +299,34 @@
     "title": "Données source",
     "valid": "Valide",
     "validating": "Validation...",
-    "validationNA": "s.o."
+    "validationNA": "s.o.",
+    "validationParams": {
+      "additionalProperty": "",
+      "allowedValue": "",
+      "allowedValues": "",
+      "comparison": "",
+      "depsCount": "",
+      "exclusive": "",
+      "failingKeyword": "",
+      "format": "",
+      "i": "",
+      "j": "",
+      "limit": "",
+      "maxContains": "",
+      "minContains": "",
+      "missingProperty": "",
+      "multipleOf": "",
+      "passingSchemas": "",
+      "pattern": "",
+      "property": "",
+      "propertyName": "",
+      "type": ""
+    },
+    "validationReport": {
+      "disclaimer": "",
+      "result": "",
+      "title": ""
+    }
   },
   "stacAssets": "Ressource | Ressources",
   "stacCatalog": "Catalogue | Catalogues",
