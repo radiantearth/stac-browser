@@ -1,13 +1,13 @@
 <template>
   <b-card no-body>
     <b-card-header>
-      <component :is="isCore ? 'span': 'code'" class="name mr-1" :title="id">{{ name }}</component>
+      <component :is="titleComponent" class="name mr-1" :title="id">{{ name }}</component>
       <b-badge v-if="version" variant="primary ml-1">{{ version }}</b-badge>
       <b-badge v-if="!isCore" variant="dark ml-1">{{ $t('source.extension') }}</b-badge>
     </b-card-header>
     <b-list-group flush>
       <template v-if="errors.length > 0">
-        <b-list-group-item v-for="(error, i) in errors" :key="i" variant="danger">
+        <b-list-group-item v-for="(error, i) in localizedErrors" :key="i" variant="danger">
           {{ makeAjvErrorMessage(error) }}
         </b-list-group-item>
       </template>
@@ -49,12 +49,26 @@ export default {
       type: Array,
       default: null
     },
+    locale: {
+      type: Function,
+      default: null
+    },
     context: {
       type: Object,
       required: true
     }
   },
   computed: {
+    titleComponent() {
+      return this.isCore ? 'span': 'code';
+    },
+    localizedErrors() {
+      if (typeof this.locale !== 'function') {
+        return this.errors;
+      }
+      this.locale(this.errors);
+      return this.errors;
+    },
     hasWarnings() {
       return Array.isArray(this.warnings) && this.warnings.length > 0;
     },
@@ -108,8 +122,16 @@ export default {
       if (Utils.isObject(error.params) && Object.keys(error.params).length > 0) {
         let params = Object.entries(error.params)
           .map(([key, value]) => {
-            let label = key.replace(/([^A-Z]+)([A-Z])/g, "$1 $2").toLowerCase();
-            return `${label}: ${value}`;
+            let localizedLabel;
+            const labelKey = `source.validationParams.${key}`;
+            if (this.$te(labelKey)) {
+              localizedLabel = this.$t(labelKey);
+            }
+            else {
+              localizedLabel = key.replace(/([^A-Z]+)([A-Z])/g, "$1 $2").toLowerCase();
+            }
+
+            return `${localizedLabel}: ${value}`;
           })
           .join(', ');
         message += ` (${params})`;

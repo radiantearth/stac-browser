@@ -24,8 +24,14 @@
       <hr class="my-4">
 
       <b-card-group class="results" columns>
-        <ValidationResult id="core" :errors="report.results.core" :warnings="report.messages" :context="report" />
-        <ValidationResult v-for="(errors, key) in report.results.extensions" :key="key" :id="key" :errors="errors" :context="report" />
+        <ValidationResult
+          id="core" :errors="report.results.core" :warnings="report.messages"
+          :locale="locale" :context="report"
+        />
+        <ValidationResult
+          v-for="(errors, key) in report.results.extensions" :key="key"
+          :id="key" :errors="errors" :locale="locale" :context="report"
+        />
       </b-card-group>
     </section>
     <ErrorAlert v-else :description="$t('errors.default')" />
@@ -57,11 +63,12 @@ export default {
     return {
       working: true,
       report: null,
-      internalError: null
+      internalError: null,
+      locale: null
     };
   },
   computed: {
-    ...mapState(["data"]),
+    ...mapState(["data", "uiLanguage"]),
     variant() {
       return this.report && this.report.valid ? "success" : "danger";
     }
@@ -71,6 +78,21 @@ export default {
       immediate: true,
       async handler() {
         await this.validate();
+      }
+    },
+    uiLanguage: {
+      immediate: true,
+      async handler(locale) {
+        if (!locale) {
+          return;
+        }
+        const i18nFn = (await import(`../locales/${locale}/validation.js`)).default;
+        if (i18nFn instanceof Promise) {
+          this.locale = (await i18nFn).default;
+        }
+        else {
+          this.locale = i18nFn;
+        }
       }
     }
   },

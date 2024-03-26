@@ -166,8 +166,8 @@
     "gcs": "Google Cloud",
     "oss": "Alibaba Cloud",
     "s3": {
-      "default": "S3",
-      "amazonaws.com": "Amazon S3"
+      "amazonaws.com": "Amazon S3",
+      "default": "S3"
     }
   },
   "providers": {
