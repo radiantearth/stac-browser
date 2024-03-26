@@ -122,8 +122,8 @@
     "api": "API",
     "catalog": "カタログ",
     "load": "読み込み",
-    "selectStacIndex": "あるいは {stacIndex} から選んでください",
-    "specifyCatalog": "STACカタログ / STAC APIのURLを指定してください",
+    "selectStacIndex": "または {stacIndex} から選択:",
+    "specifyCatalog": "STACカタログやSTAC APIのURLを指定:",
     "urlInvalid": "URLが無効です。",
     "urlMissingHost": "URLにホストがありません。",
     "urlMissingProtocol": "URLにプロトコルがありません。"
