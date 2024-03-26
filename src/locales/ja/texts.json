@@ -46,7 +46,7 @@
   "cancel": "キャンセル",
   "catalog": {
     "license": "ライセンス",
-    "temporalExtent": ""
+    "temporalExtent": "時刻の範囲"
   },
   "catalogs": {
     "filterByTitle": "カタログをフィルタ (タイトル)",
@@ -117,7 +117,7 @@
     "descriptionWithTitle": "@:goToParent.description: {title}",
     "label": "上へ"
   },
-  "in": "",
+  "in": "{catalog} 内",
   "index": {
     "api": "API",
     "catalog": "カタログ",
@@ -208,20 +208,20 @@
     "addItemIds": "Enterキーを押してアイテムIDを追加",
     "addSearchTerm": "Enter キーを押して検索語句を追加",
     "additionalFilters": "追加のフィルター",
-    "dateDescription": "",
+    "dateDescription": "すべての時刻はUTC (協定世界時) です",
     "enterCollections": "1つ以上のコレクションIDを入力してください...",
     "enterItemIds": "1つ以上のアイテムIDを入力してください...",
     "enterSearchTerms": "1つ以上の検索語句を入力してください...",
     "equalTo": "等しい",
-    "filterBySpatialExtent": "",
+    "filterBySpatialExtent": "場所でフィルタ",
     "filterCollection": "コレクションをフィルター",
     "freeText": "検索語句",
     "freeTextDescription": "タイトルや説明などのフィールドで、与えられた語句のうち少なくとも1つを検索します。",
     "greaterThan": "より大きい",
     "greaterThanEqual": "以上",
     "itemIds": "アイテム ID",
-    "itemsPerPage": "",
-    "itemsPerPageDescription": "",
+    "itemsPerPage": "ページあたりの件数",
+    "itemsPerPageDescription": "ページあたりのアイテム表示件数 （最大 {maxItems} 件）",
     "lessThan": "より小さい",
     "lessThanEqual": "以下",
     "likeOperatorDescription": "ワイルドカード文字を使用できます。 `_` は1文字にマッチし、 `%` は任意の文字数にマッチします。 ワイルドカード文字自体を検索するには、文字の前に `\\` を付ける必要があります。",
@@ -245,12 +245,12 @@
       "id": "ID",
       "title": "タイトル"
     },
-    "spatialExtent": "",
+    "spatialExtent": "場所の範囲",
     "tabs": {
       "collections": "コレクションを検索",
       "items": "アイテムを検索"
     },
-    "temporalExtent": "",
+    "temporalExtent": "時刻の範囲",
     "title": "検索",
     "useInItemSearch": "アイテム検索でコレクションを開く | アイテム検索で {count} 件のコレクションを開く"
   },
@@ -270,7 +270,7 @@
     "title": "並べ替え"
   },
   "source": {
-    "conformanceClasses": "",
+    "conformanceClasses": "準拠クラス",
     "detailsAboutSource": "STACソースの詳細",
     "extension": "",
     "fileFormat": "ファイル形式",
@@ -298,7 +298,7 @@
     "statistics": "統計",
     "title": "ソースデータ",
     "valid": "有効",
-    "validating": "",
+    "validating": "検証中...",
     "validationNA": "",
     "validationParams": {
       "additionalProperty": "",
@@ -323,28 +323,28 @@
       "type": ""
     },
     "validationReport": {
-      "disclaimer": "",
-      "result": "",
-      "title": ""
+      "disclaimer": "検証レポートはスキーマに基づいて生成されますが、網羅していないことがあります。 これらはSTAC仕様とその拡張のすべてをカバーするわけではありません。 この検証レポートは、STACエンティティが仕様およびその拡張に完全に準拠している保証ではありません。",
+      "result": "結果",
+      "title": "検証レポート"
     }
   },
   "stacAssets": "アセット",
   "stacCatalog": "カタログ",
   "stacCollection": "コレクション",
   "stacItem": "アイテム",
-  "submit": "",
+  "submit": "送信",
   "table": {
-    "emptyFilteredText": "",
-    "emptyText": "",
+    "emptyFilteredText": "リクエストにマッチするレコードはありません",
+    "emptyText": "表示するレコードがありません",
     "sort": {
-      "asc": "",
-      "clear": "",
-      "desc": ""
+      "asc": "クリックして昇順に並べ替え",
+      "clear": "クリックして並べ替えをクリア",
+      "desc": "クリックして降順に並べ替え"
     }
   },
   "thumbnails": "サムネイル",
   "tree": {
-    "moreCollectionPagesAvailable": "",
+    "moreCollectionPagesAvailable": "さらに利用可能なページがあります",
     "noChildren": ""
   },
   "view": {
