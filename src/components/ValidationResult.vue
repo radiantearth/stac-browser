@@ -128,7 +128,7 @@ export default {
               localizedLabel = this.$t(labelKey);
             }
             else {
-              localizedLabel = key.replace(/([^A-Z]+)([A-Z])/g, "$1 $2").toLowerCase()
+              localizedLabel = key.replace(/([^A-Z]+)([A-Z])/g, "$1 $2").toLowerCase();
             }
 
             return `${localizedLabel}: ${value}`;
