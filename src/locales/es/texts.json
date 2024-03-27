@@ -296,8 +296,8 @@
     "stacExtension": "Extensión STAC",
     "stacVersion": "Versión STAC",
     "statistics": "Estadísticas",
-    "title": "Fuente de datos",
-    "valid": "Valida",
+    "title": "Título",
+    "valid": "válido",
     "validating": "Validando...",
     "validationNA": "n/a",
     "validationParams": {
