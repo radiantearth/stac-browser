@@ -305,10 +305,10 @@
       "allowedValue": "Valor permitido",
       "allowedValues": "Valores permitidos",
       "comparison": "Comparación",
-      "depsCount": "",
-      "exclusive": "exclusivo",
+      "depsCount": "Número de dependencias",
+      "exclusive": "Exclusivo",
       "failingKeyword": "Palabra clave fallida",
-      "format": "formato",
+      "format": "Formato",
       "i": "i",
       "j": "j",
       "limit": "Límite",
@@ -316,7 +316,7 @@
       "minContains": "Mínimo contiene",
       "missingProperty": "Propiedad faltante",
       "multipleOf": "Multiplo de",
-      "passingSchemas": "Esquemas pasados",
+      "passingSchemas": "Esquemas aprobados",
       "pattern": "Patrón",
       "property": "Propiedad",
       "propertyName": "Nombre de la propiedad",
@@ -324,8 +324,8 @@
     },
     "validationReport": {
       "disclaimer": "Descargo de responsabilidad",
-      "result": "resultado",
-      "title": "título"
+      "result": "Resultado",
+      "title": "Título"
     }
   },
   "stacAssets": "Recurso | Recursos",
