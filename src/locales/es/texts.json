@@ -9,7 +9,7 @@
   },
   "assets": {
     "alternate": {
-      "main": ""
+      "main": "Preferido"
     },
     "copyGdalVfsUrl": {
       "generic": "Copiar la URL del VFS de GDAL",
@@ -50,7 +50,7 @@
   },
   "catalogs": {
     "filterByTitle": "Filtrar catálogos por título",
-    "filterByTitleAndMore": "",
+    "filterByTitleAndMore": "Filtrar catálogo por título, descripción o palabras clave",
     "loadMore": "Cargar más...",
     "noMatches": "Ningún catálogo concuerda con los criterios de búsqueda"
   },
@@ -104,8 +104,8 @@
     "show": "Ver en pantalla completa"
   },
   "goBack": {
-    "description": "",
-    "label": ""
+    "description": "Volver al {type}",
+    "label": "Volver"
   },
   "goToCollection": {
     "description": "Ir a la colección asociada",
@@ -154,7 +154,7 @@
   },
   "loading": "Cargando...",
   "map": "Mapa",
-  "messageForSchemaError": "",
+  "messageForSchemaError": "{message}, para el esquema {schemaPath}",
   "metadata": {
     "general": "General",
     "title": "Metadatos"
@@ -162,7 +162,7 @@
   "multiselect": {
     "andMore": "y {count} mas",
     "deselectLabel": "Presione enter para quitar",
-    "keywordsPlaceholder": "",
+    "keywordsPlaceholder": "Seleccionar palabras clave",
     "placeholder": "Seleccionar opción",
     "selectLabel": "Presione enter para seleccionar",
     "selectedLabel": "Seleccionado"
@@ -272,10 +272,10 @@
   "source": {
     "conformanceClasses": "Clases de conformidad",
     "detailsAboutSource": "Detalles sobre la fuente STAC",
-    "extension": "",
+    "extension": "Extensión",
     "fileFormat": "Formato de archivo",
     "id": "ID",
-    "invalid": "",
+    "invalid": "Ínvalido",
     "label": "Fuente",
     "language": {
       "label": "Idioma: {currentLanguage}",
@@ -296,36 +296,36 @@
     "stacExtension": "Extensión STAC",
     "stacVersion": "Versión STAC",
     "statistics": "Estadísticas",
-    "title": "Título",
-    "valid": "Válido",
+    "title": "Fuente de datos",
+    "valid": "Valida",
     "validating": "Validando...",
     "validationNA": "n/a",
     "validationParams": {
-      "additionalProperty": "Propiedad adicional",
-      "allowedValue": "Valor permitido",
-      "allowedValues": "Valores permitidos",
-      "comparison": "Comparación",
-      "depsCount": "Número de dependencias",
-      "exclusive": "Exclusivo",
-      "failingKeyword": "Palabra clave fallida",
-      "format": "Formato",
-      "i": "i",
-      "j": "j",
-      "limit": "Límite",
-      "maxContains": "Máximo contiene",
-      "minContains": "Mínimo contiene",
-      "missingProperty": "Propiedad faltante",
-      "multipleOf": "Multiplo de",
-      "passingSchemas": "Esquemas aprobsquemasados",
-      "pattern": "Patrón",
-      "property": "Propiedad",
-      "propertyName": "Nombre de la propiedad",
-      "type": "Tipo"
+      "additionalProperty": "propiedad adicional",
+      "allowedValue": "valor permitido",
+      "allowedValues": "valores permitidos",
+      "comparison": "comparación",
+      "depsCount": "cantidad",
+      "exclusive": "excluir el límite",
+      "failingKeyword": "palabra clave fallida",
+      "format": "formato",
+      "i": "primer elemento",
+      "j": "segundo elemento",
+      "limit": "límite",
+      "maxContains": "contiene como mucho",
+      "minContains": "contiene al menos",
+      "missingProperty": "propiedad faltante",
+      "multipleOf": "multiplo de",
+      "passingSchemas": "esquemas aprobados",
+      "pattern": "patrón",
+      "property": "propiedad",
+      "propertyName": "nombre de la propiedad",
+      "type": "tipo"
     },
     "validationReport": {
-      "disclaimer": "Descargo de responsabilidad",
+      "disclaimer": "El informe de la validación se genera en base a esquemas, que frecuentemente no son exaustivos. Por lo que puede no cubrir todos los aspectos de la especificación STAC y sus extensiones. El informe de validación no es una garantía de que la entidad STAC se ajuste completamente a la especificación y sus exetensiones.",
       "result": "Resultado",
-      "title": "Título"
+      "title": "Informe de Validación"
     }
   },
   "stacAssets": "Recurso | Recursos",
