@@ -37,6 +37,15 @@ function getRoutes(config) {
   }
 
   routes.push({
+    path: '/auth/logout',
+    component: () => import("../views/LogoutCallback.vue")
+  });
+  routes.push({
+    path: '/auth',
+    component: () => import("../views/AuthCallback.vue")
+  });
+
+  routes.push({
     path: "/validation/(.*)",
     name: "validation",
     component: () => import("../views/Validation.vue"),

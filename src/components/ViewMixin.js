@@ -26,8 +26,8 @@ export default {
       get() {
         return this.$store.state.cardViewMode;
       },
-      set(cardViewMode) {
-        this.$store.commit('config', { cardViewMode });
+      async set(cardViewMode) {
+        await this.$store.dispatch('config', { cardViewMode });
       }
     }
   }

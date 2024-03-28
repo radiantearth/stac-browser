@@ -37,10 +37,27 @@
     "button": {
       "authenticate": "Anmelden",
       "authenticated": "Angemeldet",
+      "login": "Anmelden",
+      "logout": "Abmelden",
       "title": "Anmeldedaten bereitstellen oder aktualisieren"
     },
+    "chooseMethod": "Wähle Anmeldemethode",
     "description": "Die angefragte Seite erfordert eine Anmeldung. Bitte die Anmeldedaten unten in das Textfeld eingeben.",
-    "title": "Anmelden"
+    "loggedOut": "Sie wurden erfolgreich abgemeldet. Sie können das Fenster nun schließen.",
+    "required": "Anmeldung erforderlich",
+    "schemeTypes": {
+      "s3": "S3",
+      "planetaryComputer": "Microsoft Planetary Computer",
+      "earthdata": "Earthdata",
+      "signedUrl": "Signierte URL",
+      "oauth2": "OAuth 2",
+      "apiKey": "API-Schlüssel",
+      "openIdConnect": "OpenID Connect"
+    },
+    "title": "Anmelden",
+    "unauthorized": "Sie haben keine Berechtigung um diese Daten abzurufen. Bitte melden Sie sich an.",
+    "unsupported": "Nicht unterstützt",
+    "unsupportedLong": "Die Anmeldemethode {method} wird von STAC Browser leider nicht unterstützt."
   },
   "browse": "Erkunden",
   "cancel": "Abbrechen",

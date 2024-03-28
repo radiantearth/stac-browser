@@ -28,12 +28,12 @@
           <b-button v-if="canSearch" variant="outline-primary" size="sm" :to="searchBrowserLink" :title="$t('search.title')" :pressed="isSearchPage()">
             <b-icon-search /> <span class="button-label prio">{{ $t('search.title') }}</span>
           </b-button>
-          <b-button v-if="authConfig" variant="outline-primary" size="sm" @click="auth" :title="$t('authentication.button.title')">
-            <template v-if="authData">
-              <b-icon-lock /> <span class="button-label">{{ $t('authentication.button.authenticated') }}</span>
+          <b-button v-if="canAuthenticate" variant="outline-primary" size="sm" @click="openAuthentication" :title="authMethod.getButtonTitle()">
+            <template v-if="isLoggedIn">
+              <b-icon-unlock /> <span class="button-label">{{ authMethod.getAuthorizedLabel() }}</span>
             </template>
             <template v-else>
-              <b-icon-unlock /> <span class="button-label">{{ $t('authentication.button.authenticate') }}</span>
+              <b-icon-lock /> <span class="button-label">{{ authMethod.getUnauthorizedLabel() }}</span>
             </template>
           </b-button>
         </b-button-group>
@@ -43,7 +43,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex';
+import { mapState, mapGetters, mapMutations, mapActions } from 'vuex';
 import Source from './Source.vue';
 import StacLink from './StacLink.vue';
 import { BIconArrow90degUp, BIconArrowLeft, BIconBook, BIconFolderSymlink, BIconSearch, BIconLock, BIconUnlock } from "bootstrap-vue";
@@ -64,8 +64,10 @@ export default {
     Source
   },
   computed: {
-    ...mapState(['allowSelectCatalog', 'authConfig', 'authData', 'catalogUrl', 'data', 'url', 'title']),
+    ...mapState(['allowSelectCatalog', 'catalogUrl', 'data', 'url', 'title']),
     ...mapGetters(['canSearch', 'root', 'parentLink', 'collectionLink', 'toBrowserPath']),
+    ...mapGetters('auth', { authMethod: 'method' }),
+    ...mapGetters('auth', ['canAuthenticate', 'isLoggedIn']),
     back() {
       return this.$route.name === 'validation';
     },
@@ -151,16 +153,19 @@ export default {
     }
   },
   methods: {
+    ...mapMutations('auth', ['addAction']),
+    ...mapActions('auth', ['authenticate']),
     isSearchPage() {
       return this.$router.currentRoute.name === 'search';
     },
-    auth() {
-      this.$store.commit('requestAuth', () => this.$store.dispatch("load", {
+    async openAuthentication() {
+      this.addAction(() => this.$store.dispatch("load", {
         url: this.url,
         loadApi: true,
         show: true,
         force: true
       }));
+      await this.authenticate();
     }
   }
 };
