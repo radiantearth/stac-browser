@@ -27,8 +27,19 @@
         </b-form-group>
 
         <b-form-group v-if="canFilterExtents" :label="$t('search.spatialExtent')" :label-for="ids.bbox">
-          <b-form-checkbox :id="ids.bbox" v-model="provideBBox" value="1" @change="setBBox()">{{ $t('search.filterBySpatialExtent') }}</b-form-checkbox>
-          <Map class="mb-4" v-if="provideBBox" :stac="stac" selectBounds @bounds="setBBox" scrollWheelZoom />
+          <b-form-checkbox :id="ids.bbox" v-model="provideBBox" @change="setBBox()">{{ $t('search.filterBySpatialExtent') }}</b-form-checkbox>
+          <template>
+            <b-form-group v-if="provideBBox">
+              <b-tabs>
+                <b-tab :title="$t('search.defineBbox.map')" lazy>
+                  <Map class="mb-4" :stac="stac" :bbox="query.bbox" selectBounds @bounds="setBBox" scrollWheelZoom />
+                </b-tab>
+                <b-tab :title="$t('search.defineBbox.text')" lazy>
+                  <BBoxEntry :bbox="query.bbox" @bounds="setBBox" />
+                </b-tab>
+              </b-tabs>
+            </b-form-group>
+          </template>
         </b-form-group>
 
         <b-form-group v-if="conformances.CollectionIdFilter" :label="$tc('stacCollection', collections.length)" :label-for="ids.collections">
@@ -118,11 +129,12 @@
 </template>
 
 <script>
-import { BBadge, BDropdown, BDropdownItem, BForm, BFormGroup, BFormInput, BFormCheckbox, BFormRadioGroup } from 'bootstrap-vue';
+import { BBadge, BDropdown, BDropdownItem, BForm, BFormGroup, BFormInput, BFormCheckbox, BFormRadioGroup, BTabs, BTab } from 'bootstrap-vue';
 import Multiselect from 'vue-multiselect';
 import { mapGetters, mapState } from "vuex";
 import refParser from '@apidevtools/json-schema-ref-parser';
 
+import BBoxEntry from './BBoxEntry.vue';
 import Utils, { schemaMediaType } from '../utils';
 import { ogcQueryables } from "../rels";
 
@@ -159,7 +171,7 @@ function getDefaults() {
     query: getQueryDefaults(),
     filtersAndOr: 'and',
     filters: [],
-    selectedCollections: []
+    selectedCollections: [],
   };
 }
 
@@ -169,6 +181,7 @@ export default {
   name: 'SearchFilter',
   components: {
     BBadge,
+    BBoxEntry,
     BDropdown,
     BDropdownItem,
     BForm,
@@ -176,6 +189,8 @@ export default {
     BFormInput,
     BFormCheckbox,
     BFormRadioGroup,
+    BTabs,
+    BTab,
     QueryableInput: () => import('./QueryableInput.vue'),
     Loading,
     Map: () => import('./Map.vue'),

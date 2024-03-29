@@ -88,6 +88,10 @@ export default {
     fitBoundsOnce: {
       type: Boolean,
       default: false
+    },
+    bbox: {
+      type: Array,
+      default: null,
     }
   },
   data() {
@@ -454,11 +458,16 @@ export default {
         minWidth: 20,
         minHeight: 20,
         minHorizontalSpacing: 20,
-        minVerticalSpacing: 20
+        minVerticalSpacing: 20, 
+        bbox: this.bbox,
       });
-      this.areaSelect.addTo(this.map);
+      this.areaSelect.addTo(this.map, this.bbox);
       this.areaSelect.on("change", () => this.emitBounds());
-      this.emitBounds();
+
+      // don't emit bounds on load if already known in order to avoid rounding box entries
+      if(!this.bbox) {
+        this.emitBounds();
+      }
     },
     emitBounds() {
       this.$emit('bounds', this.areaSelect.getBounds());

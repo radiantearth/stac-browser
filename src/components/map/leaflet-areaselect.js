@@ -23,7 +23,7 @@ L.AreaSelect = L.Class.extend({
     this._height = this.options.height;
   },
 
-  addTo: function (map) {
+  addTo: function (map, bounds) {
     this.map = map;
     if (this._container) { this.map._controlContainer.appendChild(this._container); }
     else { this._createElements(); }
@@ -32,8 +32,32 @@ L.AreaSelect = L.Class.extend({
     this.map.on("resize", this._onMapResize, this);
 
     this.fire("change");
-    this._render();
+    if(bounds) {
+      this.setInitialBounds(bounds);
+    } else {
+      this._render();
+    }
     return this;
+  },
+
+  // Given array of bounds coordinates, 
+  // determine the corresponding pixel coordinates relative to the map container
+  // and set bounding box height & width to those bounds
+  setInitialBounds: function ( bounds) {
+    if (Array.isArray(bounds) && bounds.length >= 4) {
+      const corner1 = L.latLng(bounds[1], bounds[0]);
+      const corner2 = L.latLng(bounds[3], bounds[2]);
+      bounds = L.latLngBounds(corner1, corner2);
+      // make sure map is centered on bounds before adding bounding box
+      this.map.panTo(bounds.getCenter());
+      const bottomLeft = this.map.latLngToContainerPoint(bounds.getSouthWest());
+      const topRight = this.map.latLngToContainerPoint(bounds.getNorthEast());
+  
+      this._width = Math.abs(bottomLeft.x - topRight.x);
+      this._height = Math.abs(bottomLeft.y - topRight.y);
+
+      this._render();
+    }
   },
 
   getBounds: function () {
@@ -48,8 +72,7 @@ L.AreaSelect = L.Class.extend({
 
     const sw = this.map.containerPointToLatLng(bottomLeft);
     const ne = this.map.containerPointToLatLng(topRight);
-
-    return new L.LatLngBounds(sw, ne);
+    return new L.LatLngBounds(roundPoint(sw), roundPoint(ne));
   },
 
   getBBoxCoordinates: function () {
@@ -290,3 +313,11 @@ L.AreaSelect = L.Class.extend({
 L.areaSelect = function (options) {
   return new L.AreaSelect(options);
 };
+
+
+function roundPoint(point) {
+  return {
+    lat: Math.round(point['lat']),
+    lng: Math.round(point['lng'])
+  }
+}
