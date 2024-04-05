@@ -11,7 +11,7 @@ function toBrowserUrl(url, store) {
     uri.fragment(path);
   }
   else {
-    uri.path(store.state.pathPrefix.replace(/\/$/, '') + path);
+    uri.path(Utils.removeTrailingSlash(store.state.pathPrefix) + path);
   }
   return uri.toString();
 }
