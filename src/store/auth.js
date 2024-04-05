@@ -90,7 +90,14 @@ export default function getStore(router) {
       async updateCredentials(cx, value = null) {
         cx.commit('setCredentials', value);
         let authConfig = cx.rootState.authConfig;
-        if (authConfig.type === 'apiKey') {
+        // Set sensible defaults for OpenID Connect
+        if (authConfig.type === 'openIdConnect') {
+          authConfig.formatter = authConfig.formatter || 'Bearer';
+          authConfig.name = authConfig.name || 'Authorization';
+          authConfig.in = authConfig.in || 'header';
+        }
+        // Format and set the credentials
+        if (['openIdConnect', 'apiKey'].includes(authConfig.type)) {
           // Todo: Move to Auth class?
           if (value) {
             if (authConfig.formatter === 'Bearer') {

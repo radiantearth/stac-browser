@@ -131,9 +131,6 @@ export default class OIDC extends Auth {
     if (this.okta.isLoginRedirect()) {
       await this.okta.handleRedirect();
     }
-    else {
-      console.warn("Called login redirect handler but wasn't redirected from login");
-    }
   }
   
 }
