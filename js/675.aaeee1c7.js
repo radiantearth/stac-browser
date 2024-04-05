@@ -1,0 +1,2 @@
+"use strict";(self["webpackChunk_radiantearth_stac_browser"]=self["webpackChunk_radiantearth_stac_browser"]||[]).push([[675],{70675:function(e,a,t){t.r(a);const r="YYYY/MM/DD",s=Promise.all([t.e(259),t.e(2986)]).then(t.t.bind(t,12986,23));a["default"]={format:r,locale:s}}}]);
+//# sourceMappingURL=675.aaeee1c7.js.map
