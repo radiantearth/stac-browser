@@ -606,7 +606,9 @@ function getStore(config, router) {
         state.parents = parents;
       },
       showGlobalError(state, error) {
-        console.error(error);
+        if(error) {
+          console.error(error);
+        }
         state.globalError = error;
       }
     },
