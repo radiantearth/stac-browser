@@ -4,15 +4,16 @@
       <b-button variant="danger" v-if="requiresAuth" :id="`popover-href-${id}-btn`" @click="handleAuthButton">
         <b-icon-lock /> {{ $i18n.t('authentication.required') }}
       </b-button>
-      <b-button v-if="isBrowserProtocol && isAsset" :disabled="requiresAuth" :href="href" target="_blank" variant="primary">
-        <b-icon-box-arrow-up-right v-if="browserCanOpenFile" /> 
+      <b-button v-if="hasDownloadButton" :disabled="requiresAuth" v-bind="downloadProps" v-on="downloadEvents" variant="primary">
+        <b-spinner v-if="loading" small variant="light" />
+        <b-icon-box-arrow-up-right v-else-if="browserCanOpenFile" /> 
         <b-icon-download v-else />
         {{ buttonText }}
       </b-button>
       <CopyButton variant="primary" :copyText="href">
         {{ copyButtonText }}
       </CopyButton>
-      <b-button v-if="isAsset && canShow && !shown" @click="show" variant="primary">
+      <b-button v-if="hasShowButton" @click="show" variant="primary">
         <b-icon-eye class="mr-1" />
         <template v-if="isThumbnail">{{ $t('assets.showThumbnail') }}</template>
         <template v-else>{{ $t('assets.showOnMap') }}</template>
@@ -37,13 +38,14 @@
 
 
 <script>
-import { BIconBoxArrowUpRight, BIconDownload, BIconEye, BIconLock, BListGroup, BPopover } from 'bootstrap-vue';
+import { BIconBoxArrowUpRight, BIconDownload, BIconEye, BIconLock, BListGroup, BPopover, BSpinner } from 'bootstrap-vue';
 import Description from './Description.vue';
 import STAC from '../models/stac';
 import Utils, { browserProtocols, imageMediaTypes, mapMediaTypes } from '../utils';
-import { mapGetters } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 import AssetActions from '../../assetActions.config';
 import LinkActions from '../../linkActions.config';
+import { stacRequestOptions } from '../store/utils';
 import URI from 'urijs';
 import AuthUtils from './auth/utils';
 
@@ -59,6 +61,7 @@ export default {
     BIconLock,
     BListGroup,
     BPopover,
+    BSpinner,
     CopyButton: () => import('./CopyButton.vue'),
     Description,
     Metadata: () => import('./Metadata.vue')
@@ -91,10 +94,12 @@ export default {
   },
   data() {
     return {
-      id: i++
+      id: i++,
+      loading: false
     };
   },
   computed: {
+    ...mapState(['pathPrefix', 'requestHeaders']),
     ...mapGetters(['getRequestUrl']),
     ...mapGetters('auth', ['isLoggedIn']),
     requiresAuth() {
@@ -124,6 +129,50 @@ export default {
       }
       // Otherwise, all images that a browser can read are supported + JSON
       else if (mapMediaTypes.includes(this.data.type)) {
+        return true;
+      }
+      return false;
+    },
+    hasShowButton() {
+      return this.isAsset && this.canShow && !this.shown;
+    },
+    hasDownloadButton() {
+      return this.isAsset && this.isBrowserProtocol;
+    },
+    downloadEvents() {
+      if (this.hasDownloadButton && this.useAltDownloadMethod) {
+        return {
+          click: async (event) => {
+            event.preventDefault();
+            this.altDownload();
+          }
+        };
+      }
+      return {};
+    },
+    downloadProps() {
+      if (this.hasDownloadButton && !this.useAltDownloadMethod) {
+        return {
+          href: this.href,
+          target: '_blank'
+        };
+      }
+      return {};
+    },
+    useAltDownloadMethod() {
+      if (!this.isBrowserProtocol || !window.isSecureContext) {
+        return false;
+      }
+      else if (this.data) {
+        return true;
+      }
+      else if (this.data.method && this.method !== 'GET') {
+        return true;
+      }
+      else if (Utils.size(this.data.headers) > 0) {
+        return true;
+      }
+      else if (Utils.size(this.requestHeaders) > 0) {
         return true;
       }
       return false;
@@ -173,7 +222,7 @@ export default {
       }
     },
     browserCanOpenFile() {
-      if (this.isGdalVfs)  {
+      if (this.isGdalVfs || this.useAltDownloadMethod)  {
         return false;
       }
       if (Utils.canBrowserDisplayImage(this.data)) {
@@ -204,6 +253,84 @@ export default {
     }
   },
   methods: {
+    async altDownload() {
+      if (!window.isSecureContext) {
+        window.location.href = this.href;
+      }
+
+      try {
+        this.loading = true;
+        const StreamSaver = require('streamsaver-js');
+
+        const uri = URI(window.origin.toString());
+        uri.path(Utils.removeTrailingSlash(this.pathPrefix) + '/mitm.html');
+        StreamSaver.mitm = uri.toString();
+
+        const link = Object.assign({}, this.data, {href: this.href});
+        const options = stacRequestOptions(this.$store, link);
+
+        // Convert from axios to fetch
+        const url = options.url;
+        delete options.url;
+        if (typeof options.data !== 'undefined') {
+          options.body = options.data;
+          delete options.data;
+        }
+
+        //options.credentials = 'include';
+
+        // Use fetch because stacRequest uses axios
+        // and axios doesn't support responseType: 'stream'
+        const res = await fetch(url, options);
+        if (res.status >= 400) {
+          let msg;
+          switch(res.status) {
+            case 401:
+              msg = this.$t('errors.unauthorized');
+              break;
+            case 403:
+              msg = this.$t('errors.authFailed');
+              break;
+            case 404:
+              msg = this.$t('errors.notFound');
+              break;
+            case 500:
+              msg = this.$t('errors.serverError');
+              break;
+            default:
+              msg = this.$t('errors.networkError')
+              break;
+          }
+          throw new Error(msg);
+        }
+
+        const name = this.href.substr(this.href.lastIndexOf('/') + 1);
+        const fileStream = StreamSaver.createWriteStream(name);
+
+        // Prevent the user from leaving the page while the download is in progress
+        // As this is not a normal download a user need to stay on the page for the download to complete
+        window.addEventListener('unload', () => {
+          if (this.loading) {
+            fileStream.abort();
+          }
+        });
+        window.addEventListener('beforeunload', (evt) => {
+          if (this.loading) {
+            evt.preventDefault();
+          }
+        });
+
+        await res.body.pipeTo(fileStream);
+      } catch (error) {
+        if (error instanceof DOMException && error.name === 'AbortError') {
+          // When the download was aborted, we don't want to show an error
+          return;
+        }
+        this.$store.commit('showGlobalError', { error });
+      } finally {
+        this.loading = false;
+      }
+    },
     protocolName(protocol, href = null) {
       if (typeof protocol !== 'string') {
         return '';
