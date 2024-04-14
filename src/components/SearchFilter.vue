@@ -6,7 +6,7 @@
 
         <b-card-title v-if="title" :title="title" />
 
-        <b-form-group v-if="canFilterFreeText" :label="$t('search.freeText')" :label-for="ids.q" :description="$t('search.freeTextDescription')">
+        <b-form-group v-if="canFilterFreeText" class="filter-freetext" :label="$t('search.freeText')" :label-for="ids.q" :description="$t('search.freeTextDescription')">
           <multiselect
             :id="ids.q" :value="query.q" @input="setSearchTerms"
             multiple taggable :options="query.ids"
@@ -19,19 +19,19 @@
           </multiselect>
         </b-form-group>
 
-        <b-form-group v-if="canFilterExtents" :label="$t('search.temporalExtent')" :label-for="ids.datetime" :description="$t('search.dateDescription')">
+        <b-form-group v-if="canFilterExtents" class="filter-datetime" :label="$t('search.temporalExtent')" :label-for="ids.datetime" :description="$t('search.dateDescription')">
           <date-picker
             range :id="ids.datetime" :lang="datepickerLang" :format="datepickerFormat"
             :value="query.datetime" @input="setDateTime" input-class="form-control mx-input"
           />
         </b-form-group>
 
-        <b-form-group v-if="canFilterExtents" :label="$t('search.spatialExtent')" :label-for="ids.bbox">
+        <b-form-group v-if="canFilterExtents" class="filter-bbox" :label="$t('search.spatialExtent')" :label-for="ids.bbox">
           <b-form-checkbox :id="ids.bbox" v-model="provideBBox" value="1" @change="setBBox()">{{ $t('search.filterBySpatialExtent') }}</b-form-checkbox>
           <Map class="mb-4" v-if="provideBBox" :stac="stac" selectBounds @bounds="setBBox" scrollWheelZoom />
         </b-form-group>
 
-        <b-form-group v-if="conformances.CollectionIdFilter" :label="$tc('stacCollection', collections.length)" :label-for="ids.collections">
+        <b-form-group v-if="conformances.CollectionIdFilter" class="filter-collection" :label="$tc('stacCollection', collections.length)" :label-for="ids.collections">
           <multiselect
             v-bind="collectionSelectOptions"
             @input="setCollections"
@@ -49,7 +49,7 @@
           </multiselect>
         </b-form-group>
 
-        <b-form-group v-if="conformances.ItemIdFilter" :label="$t('search.itemIds')" :label-for="ids.ids">
+        <b-form-group v-if="conformances.ItemIdFilter" class="filter-item-id" :label="$t('search.itemIds')" :label-for="ids.ids">
           <multiselect
             :id="ids.ids" :value="query.ids" @input="setIds"
             multiple taggable :options="query.ids"
@@ -62,7 +62,7 @@
           </multiselect>
         </b-form-group>
 
-        <div class="additional-filters" v-if="showAdditionalFilters">
+        <div v-if="showAdditionalFilters" class="additional-filters">
           <b-form-group :label="$t('search.additionalFilters')">
             <b-form-radio-group v-model="filtersAndOr" :options="andOrOptions" name="logical" size="sm" />
 
@@ -89,7 +89,7 @@
 
         <hr v-if="canFilterExtents || conformances.CollectionIdFilter || conformances.ItemIdFilter || showAdditionalFilters">
 
-        <b-form-group v-if="canSort" :label="$t('sort.title')" :label-for="ids.sort" :description="$t('search.notFullySupported')">
+        <b-form-group v-if="canSort" class="sort" :label="$t('sort.title')" :label-for="ids.sort" :description="$t('search.notFullySupported')">
           <multiselect
             :id="ids.sort" :value="sortTerm" @input="sortFieldSet"
             :options="sortOptions" track-by="value" label="text"
@@ -101,7 +101,7 @@
           <SortButtons v-if="sortTerm && sortTerm.value" class="mt-1" :value="sortOrder" enforce @input="sortDirectionSet" />
         </b-form-group>
 
-        <b-form-group :label="$t('search.itemsPerPage')" :label-for="ids.limit" :description="$t('search.itemsPerPageDescription', {maxItems})">
+        <b-form-group class="limit" :label="$t('search.itemsPerPage')" :label-for="ids.limit" :description="$t('search.itemsPerPageDescription', {maxItems})">
           <b-form-input
             :id="ids.limit" :value="query.limit" @change="setLimit" min="1"
             :max="maxItems" type="number"
@@ -603,12 +603,26 @@ $primary-color: map-get($theme-colors, "primary");
   }
 
   .form-group {
+
     > div {
       margin-left: 1em;
     }
 
     > label {
       font-weight: 600;
+    }
+
+    // Shows multi-select and datepicker components over map
+    position: relative;
+    z-index: 0;
+
+    &.filter-collection,
+    &.filter-item-id,
+    &.filter-datetime,
+    &.additional-filters,
+    &.sort {
+      position: relative;
+      z-index: 1;
     }
   }
 }
