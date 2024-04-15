@@ -232,6 +232,7 @@
     "matches": "coincidencia",
     "metaDescription": "Buscar en los datos ofrecidos por {title}.",
     "modifyCriteria": "Por favor modifique los criterios de búsqueda.",
+    "noFurtherItemsFound": "",
     "noItemsFound": "No se encontró ningún elemento para los filtros seleccionados.",
     "noOptions": "Aún no se ha introducido nada",
     "notEqualTo": "no igual a",
