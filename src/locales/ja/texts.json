@@ -232,6 +232,7 @@
     "matches": "マッチ",
     "metaDescription": "{title} のデータを検索します。",
     "modifyCriteria": "検索条件を変更してください。",
+    "noFurtherItemsFound": "",
     "noItemsFound": "指定されたフィルターにアイテムが見つかりませんでした。",
     "noOptions": "まだ何も入力されていません",
     "notEqualTo": "等しくない",
