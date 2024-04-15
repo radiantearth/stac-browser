@@ -232,6 +232,7 @@
     "matches": "corrisponde a",
     "metaDescription": "Cerca tra i dati offerti da {title}.",
     "modifyCriteria": "Modifica i criteri di ricerca.",
+    "noFurtherItemsFound": "",
     "noItemsFound": "Nessun Elemento corrispondente ai criteri di ricerca impostati.",
     "noOptions": "Nessun valore inserito",
     "notEqualTo": "diverso da",
