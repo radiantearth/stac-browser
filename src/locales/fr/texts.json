@@ -9,7 +9,7 @@
   },
   "assets": {
     "alternate": {
-      "main": ""
+      "main": "Préféré"
     },
     "copyGdalVfsUrl": {
       "generic": "Copier le lien du GDAL VFS",
@@ -50,7 +50,7 @@
   },
   "catalogs": {
     "filterByTitle": "Filtrer les catalogues par titre",
-    "filterByTitleAndMore": "",
+    "filterByTitleAndMore": "Filtrer les catalogues par titre, description ou mots-clés",
     "loadMore": "Charger plus...",
     "noMatches": "Aucun catalogue ne correspond aux critères de recherche."
   },
@@ -104,8 +104,8 @@
     "show": "Voir en plein écran"
   },
   "goBack": {
-    "description": "",
-    "label": ""
+    "description": "Revenir au {type}",
+    "label": "Précédent"
   },
   "goToCollection": {
     "description": "Accéder à la collection associée",
@@ -154,7 +154,7 @@
   },
   "loading": "Chargement...",
   "map": "Carte",
-  "messageForSchemaError": "",
+  "messageForSchemaError": "{message}, pour le schéma {schemaPath}",
   "metadata": {
     "general": "Général",
     "title": "Métadonnées"
@@ -162,7 +162,7 @@
   "multiselect": {
     "andMore": "et {count} de plus",
     "deselectLabel": "Appuyer sur Entrée pour désélectionner",
-    "keywordsPlaceholder": "",
+    "keywordsPlaceholder": "Sélectionner des mots clés",
     "placeholder": "Sélectionner une option",
     "selectLabel": "Appuyer sur Entrée pour sélectionner",
     "selectedLabel": "Sélectionné(e)"
@@ -232,7 +232,7 @@
     "matches": "correspond à",
     "metaDescription": "Rechercher parmi l'offre de données de {title}.",
     "modifyCriteria": "Veuillez modifier les critères de recherche.",
-    "noFurtherItemsFound": "",
+    "noFurtherItemsFound": "Aucun autre élément n'est disponible.",
     "noItemsFound": "Aucun élément trouvé pour les filtres sélectionnés.",
     "noOptions": "Aucune information saisie",
     "notEqualTo": "différent de",
@@ -273,10 +273,10 @@
   "source": {
     "conformanceClasses": "Classes de conformité",
     "detailsAboutSource": "À propos de la source STAC",
-    "extension": "",
+    "extension": "Extension",
     "fileFormat": "Format de fichier",
     "id": "Identifiant",
-    "invalid": "",
+    "invalid": "Invalide",
     "label": "Source",
     "language": {
       "label": "Langue: {currentLanguage}",
@@ -302,31 +302,31 @@
     "validating": "Validation...",
     "validationNA": "s.o.",
     "validationParams": {
-      "additionalProperty": "",
-      "allowedValue": "",
-      "allowedValues": "",
-      "comparison": "",
-      "depsCount": "",
-      "exclusive": "",
-      "failingKeyword": "",
-      "format": "",
-      "i": "",
-      "j": "",
-      "limit": "",
-      "maxContains": "",
-      "minContains": "",
-      "missingProperty": "",
-      "multipleOf": "",
-      "passingSchemas": "",
-      "pattern": "",
-      "property": "",
-      "propertyName": "",
-      "type": ""
+      "additionalProperty": "propriété supplémentaire",
+      "allowedValue": "valeur autorisée",
+      "allowedValues": "valeurs autorisées",
+      "comparison": "comparaison",
+      "depsCount": "nombre",
+      "exclusive": "excluant la limite",
+      "failingKeyword": "mot-clé en échec",
+      "format": "format",
+      "i": "premier élément",
+      "j": "second élément",
+      "limit": "limite",
+      "maxContains": "contient au plus",
+      "minContains": "contient au moins",
+      "missingProperty": "propriété manquante",
+      "multipleOf": "multiple de",
+      "passingSchemas": "schémas conformes",
+      "pattern": "modèle",
+      "property": "propriété",
+      "propertyName": "nom de propriété",
+      "type": "type"
     },
     "validationReport": {
-      "disclaimer": "",
-      "result": "",
-      "title": ""
+      "disclaimer": "Le rapport de validation est généré à partir de schémas, qui souvent ne sont pas exhaustifs. À ce titre, ils ne peuvent pas couvrir tous les aspects de la spécification STAC et de ses extensions. Le rapport de validation n'est pas une garantie que l'entité STAC est pleinement conforme à la spécification et à ses extensions.",
+      "result": "Résultat",
+      "title": "Rapport de validation"
     }
   },
   "stacAssets": "Ressource | Ressources",
