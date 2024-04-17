@@ -62,30 +62,28 @@
           </multiselect>
         </b-form-group>
 
-        <div v-if="showAdditionalFilters" class="additional-filters">
-          <b-form-group :label="$t('search.additionalFilters')">
-            <b-form-radio-group v-model="filtersAndOr" :options="andOrOptions" name="logical" size="sm" />
+        <b-form-group v-if="showAdditionalFilters" class="additional-filters" :label="$t('search.additionalFilters')">
+          <b-form-radio-group v-model="filtersAndOr" :options="andOrOptions" name="logical" size="sm" />
 
-            <b-dropdown size="sm" :text="$t('search.addFilter')" block variant="primary" class="queryables mt-2 mb-3" menu-class="w-100">
-              <template v-for="queryable in sortedQueryables">
-                <b-dropdown-item v-if="queryable.supported" :key="queryable.id" @click="additionalFieldSelected(queryable)">
-                  {{ queryable.title }}
-                  <b-badge variant="dark" class="ml-2">{{ queryable.id }}</b-badge>
-                </b-dropdown-item>
-              </template>
-            </b-dropdown>
+          <b-dropdown size="sm" :text="$t('search.addFilter')" block variant="primary" class="queryables mt-2 mb-3" menu-class="w-100">
+            <template v-for="queryable in sortedQueryables">
+              <b-dropdown-item v-if="queryable.supported" :key="queryable.id" @click="additionalFieldSelected(queryable)">
+                {{ queryable.title }}
+                <b-badge variant="dark" class="ml-2">{{ queryable.id }}</b-badge>
+              </b-dropdown-item>
+            </template>
+          </b-dropdown>
 
-            <QueryableInput
-              v-for="(filter, index) in filters" :key="filter.id"
-              :value.sync="filter.value"
-              :operator.sync="filter.operator"
-              :queryable="filter.queryable"
-              :index="index"
-              :cql="cql"
-              @remove-queryable="removeQueryable(index)"
-            />
-          </b-form-group>
-        </div>
+          <QueryableInput
+            v-for="(filter, index) in filters" :key="filter.id"
+            :value.sync="filter.value"
+            :operator.sync="filter.operator"
+            :queryable="filter.queryable"
+            :index="index"
+            :cql="cql"
+            @remove-queryable="removeQueryable(index)"
+          />
+        </b-form-group>
 
         <hr v-if="canFilterExtents || conformances.CollectionIdFilter || conformances.ItemIdFilter || showAdditionalFilters">
 
