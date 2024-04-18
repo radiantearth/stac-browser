@@ -1,9 +1,13 @@
 {
+  "actions": {
+  },
   "additionalResources": "Resurse suplimentare",
   "anonymized": {
     "title": "Anonimizat"
   },
   "assets": {
+    "alternate": {
+    },
     "copyGdalVfsUrl": {
       "generic": "Copiați link-ul GDAL VFS",
       "withSource": "Copiați link-ul GDAL VFS al {source}"
@@ -94,6 +98,8 @@
   "fullscreen": {
     "exit": "Ieși din modul ecran complet",
     "show": "Vizualizați pe tot ecranul"
+  },
+  "goBack": {
   },
   "goToCollection": {
     "description": "Accesați colecția asociată",
@@ -202,6 +208,8 @@
     "itemsPerPageDescription": "Număr de elemente solicitate pe pagină, max. {maxItems} elemente",
     "lessThan": "mai puțin decât",
     "likeOperatorDescription": "Puteți folosi metacaracterele. `_` se potrivește cu un singur caracter, `%` se potrivește cu orice număr de caractere. Pentru a căuta în mod specific un wildcard, trebuie să adăugați un `\\` în fața caracterului.",
+    "logical": {
+    },
     "matches": "corespunde cu",
     "metaDescription": "Căutați în oferta de date a {title}.",
     "modifyCriteria": "Vă rugăm să modificați criteriile de căutare.",
@@ -218,6 +226,8 @@
       "title": "Titlu"
     },
     "spatialExtent": "Întinderea spațială",
+    "tabs": {
+    },
     "temporalExtent": "Interval de timp",
     "title": "Căutare"
   },
@@ -262,7 +272,11 @@
     "title": "Date sursă",
     "valid": "Valid",
     "validating": "Validare...",
-    "validationNA": "n.a."
+    "validationNA": "n.a.",
+    "validationParams": {
+    },
+    "validationReport": {
+    }
   },
   "stacAssets": "Resursă | Resurse",
   "stacCatalog": "Catalog | Cataloage",
