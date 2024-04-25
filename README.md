@@ -115,7 +115,7 @@ You need to change the [`locale`](docs/options.md#locale) and [`supportedLocales
 The following languages are currently supported:
 - de: German (Germany, Switzerland)
 - es: Spanish
-- en: English
+- en: English (US, UK)
 - fr: French (Canada, France, Switzerland)
 - it: Italian (Italy, Switzerland)
 - ro: Romanian
