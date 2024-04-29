@@ -70,13 +70,13 @@
     "outdatedTitle": "Desatualizado",
     "predecessorVersion": "Versão anterior:",
     "successorVersion": "Versão posterior:",
-    "warning": "Observe que este {type} está obsoleto e pode ser removido a qualquer momento. Provavelmente ele deve ser retirado de uso o mais rápido possível. Evite usá-lo em novos projetos."
+    "warning": "Observe que este {type} está descontinuado e pode ser removido a qualquer momento. Provavelmente ele deve ser retirado de uso o mais rápido possível. Evite usá-lo em novos projetos."
   },
   "description": "Descrição",
   "errors": {
     "authFailed": "A solicitação apresentou erro. Os detalhes de autenticação fornecidos podem estar incorretos.",
-    "badRequest": "A solicitação é inválida. Isto pode ser devido a parâmetros inválidos. ex.: uma solicitação de pesquisa ou pode ser um bug no STAC Browser.",
-    "contactProvider": "Entre em contato com a operadora de serviço para resolver esse problema.",
+    "badRequest": "A solicitação é inválida. Isto pode ser devido a parâmetros inválidos, por exemplo, uma solicitação de pesquisa ou pode ser um bug no STAC Browser.",
+    "contactProvider": "Entre em contato com o operador do serviço para resolver esse problema.",
     "default": "A página solicitada não pôde ser carregada.",
     "forbidden": "As credenciais fornecidas para esta solicitação são inválidas, por exemplo, um token de API expirado ou inválido. Forneça outras credenciais e tente novamente.",
     "invalidJsonObject": "A resposta não é um objeto JSON válido.",
@@ -218,12 +218,12 @@
     "freeText": "Termos de Pesquisa",
     "freeTextDescription": "Pesquise pelo menos um dos termos fornecidos em campos como título e descrição.",
     "greaterThan": "maior que",
-    "greaterThanEqual": "maior ou igual a",
+    "greaterThanEqual": "maior que ou igual a",
     "itemIds": "IDs dos itens",
     "itemsPerPage": "Itens por página",
     "itemsPerPageDescription": "Número de itens solicitados por página, máx. {maxItems} items.",
     "lessThan": "menor que",
-    "lessThanEqual": "menor ou igual a",
+    "lessThanEqual": "menor que ou igual a",
     "likeOperatorDescription": "Você pode usar caracteres curinga. `_` corresponde a um único caractere, `%` corresponde a qualquer número de caracteres. Para pesquisar especificamente um caractere curinga, você precisa adicionar `\\` na frente do caractere.",
     "logical": {
       "and": "Considere todos os filtros (e)",
@@ -246,7 +246,7 @@
       "id": "ID",
       "title": "Título"
     },
-    "spatialExtent": "Extensão espacial",
+    "spatialExtent": "Extensão Espacial",
     "tabs": {
       "collections": "Pesquisar coleções",
       "items": "Pesquisar itens"
@@ -271,11 +271,11 @@
     "title": "Ordenar"
   },
   "source": {
-    "conformanceClasses": "Classes de conformidade",
+    "conformanceClasses": "Classes de Conformidade",
     "detailsAboutSource": "Detalhes sobre a fonte STAC",
     "extension": "Extensão",
     "fileFormat": "Formato de arquivo",
-    "id": "EU IA",
+    "id": "ID",
     "invalid": "Inválido",
     "label": "Fonte",
     "language": {
@@ -292,7 +292,7 @@
       "sharePageWithOthers": "Compartilhe a URL desta página onde quiser:",
       "title": "Compartilhar",
       "twitter": "Twitter",
-      "withOthers": "Compartilhe esta página com os outros"
+      "withOthers": "Compartilhe esta página com outros"
     },
     "stacExtension": "Extensão STAC",
     "stacVersion": "Versão STAC",
