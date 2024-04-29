@@ -123,7 +123,7 @@ The following languages are currently supported:
 - it: Italian (Italy, Switzerland)
 - ro: Romanian
 - ja: Japanese
-- pt-BR: Portuguese (Brazil)
+- pt: Portuguese
 
 We manage the translations in Crowdin, please see <https://crowdin.com/project/stac-browser/> for details.
 

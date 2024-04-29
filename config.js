@@ -20,7 +20,7 @@ module.exports = {
 //      "it-CH",
         "ro",
         "ja",
-        "pt-BR"
+        "pt"
     ],
     apiCatalogPriority: null,
     useTileLayerAsFallback: true,
