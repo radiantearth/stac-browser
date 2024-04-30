@@ -8,17 +8,18 @@ implemented as a single page application (SPA) for ease of development and to
 limit the overall number of catalog reads necessary when browsing (as catalogs
 may be nested and do not necessarily contain references to their parents).
 
-Version: **3.2.0-rc.1** (supports all STAC versions between 0.6.0 and 1.0.0)
+Version: **3.2.0** (supports all STAC versions between 0.6.0 and 1.0.0)
 
 This package has also been published to npm as [`@radiantearth/stac-browser`](https://www.npmjs.com/package/@radiantearth/stac-browser).
 
 It's not officially supported, but you may also be able to use it for
-certain *OGC API - Records* and *OGC API - Features* compliant servers.
+certain _OGC API - Records_ and _OGC API - Features_ compliant servers.
 
-**Please note that STAC Browser is currently without funding for both maintenance, bug fixes and improvements. This means issues and PRs may be adressed very slowly.
+**Please note that STAC Browser is currently without funding for both maintenance, bug fixes and improvements. This means issues and PRs may be addressed very slowly.
 If you care about STAC Browser and have some funds to support the future of STAC Browser, please contact matthias@mohr.ws**
 
 **Table of Contents:**
+
 - [Examples](#examples)
 - [Get Started](#get-started)
   - [Private query parameters](#private-query-parameters)
@@ -61,6 +62,7 @@ In this example we point to EarthSearch (`https://earth-search.aws.element84.com
 ```bash
 npm start -- --open --catalogUrl="https://earth-search.aws.element84.com/v1/"
 ```
+
 To open a local file on your system, see the chapter [Using Local Files](docs/local_files.md).
 
 If you'd like to publish the STAC Browser instance use the following command:
@@ -69,7 +71,7 @@ If you'd like to publish the STAC Browser instance use the following command:
 npm run build -- --catalogUrl="https://earth-search.aws.element84.com/v1/"
 ```
 
-This will only work on the root path of your domain though. If you'd like to publish in a sub-folder, 
+This will only work on the root path of your domain though. If you'd like to publish in a sub-folder,
 you can use the [`pathPrefix`](docs/options.md#pathprefix) option.
 
 After building, `dist/` will contain all assets necessary
@@ -84,14 +86,14 @@ You can also provide configuration options "at runtime" (after the build).
 
 ### Private query parameters
 
-***experimental***
+**_experimental_**
 
 STAC Browser supports "private query parameters", e.g. for passing an API key through. Any query parameter that is starting with a `~` will be stored internally, removed from the URL and be appended to STAC requests. This is useful for token-based authentication via query parameters.
 
 So for example if your API requires to pass a token via the `API_KEY` query parameter, you can request STAC Browser as such:
 `https://examples.com/stac-browser/?~API_KEY=123` which will change the URL to `https://examples.com/stac-browser/` and store the token `123` internally. The request then will have the query parameter attached and the Browser will request e.g. `https://examples.com/stac-api/?API_KEY=123`.
 
-Please note: If the server hosting STAC Browser should not get aware of private query parameters and you are having `historyMode` set to `"history"`, you can also append the private query parameters to the hash so that it doesn't get transmitted to the server hosting STAC Browser. 
+Please note: If the server hosting STAC Browser should not get aware of private query parameters and you are having `historyMode` set to `"history"`, you can also append the private query parameters to the hash so that it doesn't get transmitted to the server hosting STAC Browser.
 In this case use for example `https://examples.com/stac-browser/#?~API_KEY=123` instead of `https://examples.com/stac-browser/?~API_KEY=123`.
 
 ### Migrate from old versions
@@ -113,19 +115,22 @@ STAC Browser can be translated into other languages and can localize number form
 You need to change the [`locale`](docs/options.md#locale) and [`supportedLocales`](docs/options.md#supportedlocales) settings to select the default language and the languages available to users.
 
 The following languages are currently supported:
+
 - de: German (Germany, Switzerland)
 - es: Spanish
-- en: English
+- en: English (US, UK)
 - fr: French (Canada, France, Switzerland)
 - it: Italian (Italy, Switzerland)
 - ro: Romanian
 - ja: Japanese
+- pt: Portuguese
 
 We manage the translations in Crowdin, please see <https://crowdin.com/project/stac-browser/> for details.
 
-To add your own language, please follow the guide below: [Adding a new langauge](#adding-a-new-language)
+To add your own language, please follow the guide below: [Adding a new language](#adding-a-new-language)
 
 #### Custom phrases
+
 You can define custom phrases in the `custom.json`.
 This is especially useful for phrases that are coming from non-standadized metadata fields (see the chapter "[Additional metadata fields](#additional-metadata-fields)").
 If you've found metadata labels (e.g. "Price" and "Generation Time") that are not translated,
@@ -169,7 +174,7 @@ More information about how to add or implement actions can be found in the **[do
 ### Additional metadata fields
 
 The metadata that STAC Browser renders is rendered primarily through the library [`stac-fields`](https://www.npmjs.com/package/@radiantearth/stac-fields).
-It contains a lot of rules for rendering [many existing STAC extensions](https://github.com/stac-utils/stac-fields/blob/main/fields.json) nicely. 
+It contains a lot of rules for rendering [many existing STAC extensions](https://github.com/stac-utils/stac-fields/blob/main/fields.json) nicely.
 Nevertheless, if you use custom extensions to the STAC specification you may want to register your own rendering rules for the new fields.
 This can be accomplished by customizing the file [`fields.config.js`](./fields.config.js).
 It uses the [Registry](https://github.com/stac-utils/stac-fields/blob/main/README.md#registry) defined in stac-fields to add more extensions and fields to stac-fields and STAC Browser.
@@ -177,18 +182,19 @@ It uses the [Registry](https://github.com/stac-utils/stac-fields/blob/main/READM
 To add your own fields, please consult the documentation for the [Registry](https://github.com/stac-utils/stac-fields/blob/main/README.md#registry).
 
 #### Example
+
 If you have a custom extension with the title "Radiant Earth" that uses the prefix `radiant:` you can add the extension as such:
 
 ```js
-Registry.addExtension('radiant', 'Radiant Earth');
+Registry.addExtension("radiant", "Radiant Earth");
 ```
 
 If this extension has a boolean field `radiant:public_access` that describes whether an entity can be accessed publicly or not, this could be described as follows:
 
 ```js
-Registry.addMetadataField('radiant:public_access', {
+Registry.addMetadataField("radiant:public_access", {
   label: "Data Access",
-  formatter: value => value ? "Public" : "Private"
+  formatter: (value) => (value ? "Public" : "Private"),
 });
 ```
 
@@ -222,8 +228,9 @@ Below you can find an example of an updated `custom.json` for the German languag
 
 ### Customize through root catalog
 
-You can also provide a couple of the config options through the root catalog. 
+You can also provide a couple of the config options through the root catalog.
 You need to provide a field `stac_browser` and then you can set any of the following options:
+
 - `apiCatalogPriority`
 - `authConfig` (except for the `formatter` as function)
 - `cardViewMode`
@@ -293,6 +300,7 @@ STAC browser is now available at `http://localhost:8080/browser`
 ### Use an existing image
 
 Since version 3.1.1, you can add an existing image from [Packages](https://github.com/radiantearth/stac-browser/pkgs/container/stac-browser) to your docker-compose.yml:
+
 ```
 services:
   stac-browser:
@@ -311,6 +319,7 @@ STAC Browser is following the [STAC code of conduct](https://github.com/radiante
 STAC Browser uses [Vue](https://vuejs.org/) and [vue-cli](https://cli.vuejs.org/), so you need a recent version of [NodeJS and npm](https://nodejs.org/en/) installed.
 
 You can run the following commands (see also "[Get started](#get-started)" above):
+
 - `npm run install`: Install the dependencies, this is required once at the beginning.
 - `npm start`: Start the development server
 - `npm run lint`: Lint the source code files
@@ -327,6 +336,7 @@ You can translate STAC Browser into other languages.
 You can also use one of the existing languages and provide an alternate version for a specifc country, e.g. a Australian English (en-AU) version of the US-English language pack (en).
 
 **Please follow this guide:**
+
 - Copy the `en` folder (or any other language without a country code that you want to base the translation on).
   - Note: If you start with the `en` folder, you have to remove the leading `//` from the line `// { fields: require('./fields.json') }` in the file `default.js`.
 - Name the new folder according to [RFC5646](https://www.rfc-editor.org/rfc/rfc5646).
@@ -343,7 +353,7 @@ You can also use one of the existing languages and provide an alternate version 
 
 ## Sponsors
 
-The following sponsors have provided a subststantial amount of funding for STAC Browser in the past:
+The following sponsors have provided a substantial amount of funding for STAC Browser in the past:
 
 - [Radiant Earth](https://radiant.earth) (base funding for versions 1, 2 and 3)
 - [National Resources Canada](https://natural-resources.canada.ca/home) (multi-language support, maintenance)
