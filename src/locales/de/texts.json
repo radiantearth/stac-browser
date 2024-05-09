@@ -190,7 +190,7 @@
     "email": "E-Mail senden",
     "homepage": "Gehe zur Internetseite",
     "role": {
-      "host": "Datenverbreiter",
+      "host": "Anbieter",
       "licensor": "Lizenzgeber",
       "processor": "Verarbeiter",
       "producer": "Erzeuger"
