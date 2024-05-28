@@ -1,25 +1,21 @@
 module.exports = {
-    catalogUrl: null,
-    catalogTitle: "STAC Browser",
+    catalogUrl: "https://pgstac.demo.cloudferro.com/",
+    catalogTitle: "Copernicus Datastapce Ecosystem (Demo)",
     allowExternalAccess: true, // Must be true if catalogUrl is not given
-    allowedDomains: [],
+    allowedDomains: [
+      "copernicus.eu"
+    ],
     detectLocaleFromBrowser: true,
     storeLocale: true,
     locale: "en",
     fallbackLocale: "en",
     supportedLocales: [
         "de",
-//      "de-CH",
         "es",
         "en",
-//      "en-GB",
         "fr",
-//      "fr-CA",
-//      "fr-CH",
         "it",
-//      "it-CH",
         "ro",
-        "ja",
         "pt"
     ],
     apiCatalogPriority: null,
@@ -42,6 +38,15 @@ module.exports = {
     crossOriginMedia: null,
     requestHeaders: {},
     requestQueryParameters: {},
-    preprocessSTAC: null,
-    authConfig: null
+    preprocessSTAC: stac => {
+      if (stac.getBrowserPath() === '/') {
+        stac.title = 'Copernicus Datastapce Ecosystem (Demo)';
+        stac.description = 'This is a demo instance of the development version of the CDSE STAC API, including authentication.';
+      }
+      return stac;
+    },
+    authConfig: {
+        type: "openIdConnect",
+        openIdConnectUrl:"https://identity.dataspace.copernicus.eu/auth/realms/CDSE/.well-known/openid-configuration"
+    }
 };
