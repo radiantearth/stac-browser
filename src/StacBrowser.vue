@@ -1,6 +1,5 @@
 <template>
   <b-container id="stac-browser">
-    <Authentication v-if="doAuth.length > 0" />
     <ErrorAlert v-if="globalError" dismissible class="global-error" v-bind="globalError" @close="hideError" />
     <Sidebar v-if="sidebar" />
     <!-- Header -->
@@ -45,6 +44,7 @@ import URI from 'urijs';
 import I18N from '@radiantearth/stac-fields/I18N';
 import { translateFields, API_LANGUAGE_CONFORMANCE, loadMessages } from './i18n';
 import { getBest, prepareSupported } from './locale-id';
+import BrowserStorage from "./browser-store";
 
 Vue.use(AlertPlugin);
 Vue.use(ButtonGroupPlugin);
@@ -80,8 +80,8 @@ for(let key in CONFIG) {
   };
   Watchers[key] = {
     immediate: true,
-    handler: function(newValue) {
-      this.$store.commit('config', {
+    handler: async function(newValue) {
+      await this.$store.dispatch('config', {
         [key]: newValue
       });
     }
@@ -93,7 +93,6 @@ export default {
   router,
   store,
   components: {
-    Authentication: () => import('./components/Authentication.vue'),
     ErrorAlert,
     Sidebar: () => import('./components/Sidebar.vue'),
     StacHeader
@@ -109,11 +108,9 @@ export default {
     };
   },
   computed: {
-    ...mapState(['allowSelectCatalog', 'data', 'dataLanguage', 'description', 'doAuth', 'globalError', 'stateQueryParameters', 'title', 'uiLanguage', 'url']),
+    ...mapState(['allowSelectCatalog', 'data', 'dataLanguage', 'description', 'globalError', 'stateQueryParameters', 'title', 'uiLanguage', 'url']),
     ...mapState({
-      catalogUrlFromVueX: 'catalogUrl',
       detectLocaleFromBrowserFromVueX: 'detectLocaleFromBrowser',
-      fallbackLocaleFromVueX: 'fallbackLocale',
       supportedLocalesFromVueX: 'supportedLocales',
       storeLocaleFromVueX: 'storeLocale'
     }),
@@ -186,12 +183,6 @@ export default {
         }
       }
     },
-    catalogUrlFromVueX(url) {
-      if (url) {
-        // Load the root catalog data if not available (e.g. after page refresh or external access)
-        this.$store.dispatch("load", { url, loadApi: true });
-      }
-    },
     stateQueryParameters: {
       deep: true,
       handler() {
@@ -244,9 +235,10 @@ export default {
           value = root['stac_browser'][key]; // Custom value from root
         }
 
-        // Commit config
+        // Update config in store
         if (typeof value !== 'undefined') {
-          this.$store.commit('config', { [key]: value });
+          this.$store.dispatch('config', { [key]: value })
+            .catch(error => console.error(error));
         }
       }
     },
@@ -259,7 +251,7 @@ export default {
       }
     }
   },
-  created() {
+  async created() {
     this.$router.onReady(() => {
       this.detectLocale();
       this.parseQuery(this.$route);
@@ -282,6 +274,19 @@ export default {
       this.$store.commit(resetOp);
       this.parseQuery(to);
     });
+
+    const storage = new BrowserStorage(true);
+    const authConfig = storage.get('authConfig');
+    if (authConfig) {
+      storage.remove('authConfig');
+      await this.$store.dispatch('config', { authConfig });
+        try {
+          await this.$store.getters['auth/method'].loginCallback();
+        }
+        catch (error) {
+          this.showError(error);
+        }
+    }
   },
   mounted() {
     this.$root.$on('error', this.showError);
@@ -292,11 +297,8 @@ export default {
     detectLocale() {
       let locale;
       if (this.storeLocaleFromVueX) {
-        try {
-          locale = window.localStorage.getItem('locale');
-        } catch(error) {
-          console.error(error);
-        }
+        const storage = new BrowserStorage();
+        locale = storage.get('locale');
       }
       if (!locale && this.detectLocaleFromBrowserFromVueX && Array.isArray(navigator.languages)) {
         // Detect the most suitable locale

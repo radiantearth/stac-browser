@@ -15,7 +15,7 @@
           </b-card>
         </section>
         <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="shownAssets" @showAsset="showAsset" />
-        <Links v-if="additionalLinks.length > 0" :title="$t('additionalResources')" :links="additionalLinks" />
+        <Links v-if="additionalLinks.length > 0" :title="$t('additionalResources')" :links="additionalLinks" :context="data" />
       </b-col>
       <b-col class="right">
         <section class="intro">
@@ -74,6 +74,8 @@ export default {
         // Don't show these complex lists of coordinates: https://github.com/radiantearth/stac-browser/issues/141
         'proj:bbox',
         'proj:geometry',
+        // Special handling for auth
+        'auth:schemes',
         // Special handling for the warning of the anonymized-location extension
         'anon:warning'
       ]

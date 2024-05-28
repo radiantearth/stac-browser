@@ -219,7 +219,7 @@ export default {
     if (!this.parent) {
       await this.$store.dispatch('load', { url });
       if (!this.root) {
-        this.$store.commit("config", { catalogUrl: url });
+        await this.$store.dispatch("config", { catalogUrl: url });
       }
       this.parent = this.getStac(url);
       this.showPage();
