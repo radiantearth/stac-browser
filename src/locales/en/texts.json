@@ -8,6 +8,9 @@
     "title": "Anonymized"
   },
   "assets": {
+    "alternate": {
+      "main": "Preferred"
+    },
     "copyGdalVfsUrl": {
       "generic": "Copy GDAL VFS URL",
       "withSource": "Copy GDAL VFS URL for {source}"
@@ -47,6 +50,7 @@
   },
   "catalogs": {
     "filterByTitle": "Filter catalogs by title",
+    "filterByTitleAndMore": "Filter catalogs by title, description or keywords",
     "loadMore": "Load more...",
     "noMatches": "No catalogs match the given search criteria."
   },
@@ -99,6 +103,10 @@
     "exit": "Exit Fullscreen",
     "show": "View Fullscreen"
   },
+  "goBack": {
+    "description": "Go back to the {type}",
+    "label": "Back"
+  },
   "goToCollection": {
     "description": "Go to the associated collection",
     "descriptionWithTitle": "@:goToCollection.description: {title}",
@@ -146,6 +154,7 @@
   },
   "loading": "Loading...",
   "map": "Map",
+  "messageForSchemaError": "{message}, for schema {schemaPath}",
   "metadata": {
     "general": "General",
     "title": "Metadata"
@@ -153,6 +162,7 @@
   "multiselect": {
     "andMore": "and {count} more",
     "deselectLabel": "Press enter to remove",
+    "keywordsPlaceholder": "Select keywords",
     "placeholder": "Select option",
     "selectLabel": "Press enter to select",
     "selectedLabel": "Selected"
@@ -171,7 +181,10 @@
     "ftp": "FTP",
     "gcs": "Google Cloud",
     "oss": "Alibaba Cloud",
-    "s3": "Amazon S3"
+    "s3": {
+      "amazonaws.com": "Amazon S3",
+      "default": "S3"
+    }
   },
   "providers": {
     "email": "Send e-mail",
@@ -219,6 +232,7 @@
     "matches": "matches",
     "metaDescription": "Search through the data offering of {title}.",
     "modifyCriteria": "Please modify the search criteria.",
+    "noFurtherItemsFound": "No further items available.",
     "noItemsFound": "No items found for the given filters.",
     "noOptions": "Nothing entered yet",
     "notEqualTo": "not equal to",
@@ -248,7 +262,7 @@
   "sort": {
     "asc": {
       "label": "Ascending",
-      "title": "Sort in acending order (A-Z)"
+      "title": "Sort in ascending order (A-Z)"
     },
     "desc": {
       "label": "Descending",
@@ -259,8 +273,10 @@
   "source": {
     "conformanceClasses": "Conformance Classes",
     "detailsAboutSource": "Details about the STAC source",
+    "extension": "Extension",
     "fileFormat": "File Format",
     "id": "ID",
+    "invalid": "Invalid",
     "label": "Source",
     "language": {
       "label": "Language: {currentLanguage}",
@@ -284,7 +300,34 @@
     "title": "Source Data",
     "valid": "Valid",
     "validating": "Validating...",
-    "validationNA": "n/a"
+    "validationNA": "n/a",
+    "validationParams": {
+      "additionalProperty": "additional property",
+      "allowedValue": "allowed value",
+      "allowedValues": "allowed values",
+      "comparison": "comparison",
+      "depsCount": "count",
+      "exclusive": "excluding the boundary",
+      "failingKeyword": "failing keyword",
+      "format": "format",
+      "i": "first item",
+      "j": "second item",
+      "limit": "limit",
+      "maxContains": "contains at most",
+      "minContains": "contains at least",
+      "missingProperty": "missing property",
+      "multipleOf": "multiple of",
+      "passingSchemas": "passing schemas",
+      "pattern": "pattern",
+      "property": "property",
+      "propertyName": "property name",
+      "type": "type"
+    },
+    "validationReport": {
+      "disclaimer": "The validation report is generated based on schemas, which often are not exhaustive. As such they may not cover all aspects of the STAC specification and its extensions. The validation report is not a guarantee that the STAC entity is fully compliant with the specification and its extensions.",
+      "result": "Result",
+      "title": "Validation Report"
+    }
   },
   "stacAssets": "Asset | Assets",
   "stacCatalog": "Catalog | Catalogs",

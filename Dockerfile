@@ -1,23 +1,27 @@
+ARG pathPrefix="/"
+
 FROM node:lts-alpine3.18 AS build-step
 ARG DYNAMIC_CONFIG=true
+ARG historyMode="history"
+ARG pathPrefix
 
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
-RUN \[ "${DYNAMIC_CONFIG}" == "true" \] && sed -i 's/<!-- <script defer="defer" src=".\/config.js"><\/script> -->/<script defer="defer" src=".\/config.js"><\/script>/g' public/index.html
-RUN npm run build
+RUN \[ "${DYNAMIC_CONFIG}" == "true" \] && sed -i "s|<!-- <script defer=\"defer\" src=\"/config.js\"></script> -->|<script defer=\"defer\" src=\"${pathPrefix}config.js\"></script>|g" public/index.html
+RUN npm run build -- --historyMode="${historyMode}" --pathPrefix="${pathPrefix}"
 
 
 FROM nginx:1-alpine-slim
+ARG pathPrefix
 
-COPY --from=build-step /app/dist /usr/share/nginx/html
+RUN apk add jq pcre-tools
+
 COPY ./config.schema.json /etc/nginx/conf.d/config.schema.json
-
-# change default port to 8080
-RUN apk add jq pcre-tools && \
-    sed -i 's/\s*listen\s*80;/    listen 8080;/' /etc/nginx/conf.d/default.conf && \
-    sed -i 's/\s*location \/ {/    location \/ {\n        try_files $uri $uri\/ \/index.html;/' /etc/nginx/conf.d/default.conf
+COPY --from=build-step /app/dist /usr/share/nginx/html
+COPY --from=build-step /app/docker/default.conf /etc/nginx/conf.d/default.conf
+RUN sed -i "s|<pathPrefix>|${pathPrefix}|" /etc/nginx/conf.d/default.conf
 
 EXPOSE 8080
 

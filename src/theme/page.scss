@@ -11,7 +11,7 @@ body {
     display: flex;
     flex-direction: column;
     max-width: 100%;
-	height: 100%;
+    height: 100%;
     min-height: 100%;
     gap: $block-margin;
 
@@ -235,4 +235,55 @@ body {
             }
         }
     }
+}
+
+@import '~vue-multiselect/dist/vue-multiselect.min.css';
+
+// Datepicker related style
+$default-color: map-get($theme-colors, "secondary");
+$primary-color: map-get($theme-colors, "primary");
+
+// Multiselect related style
+#stac-browser {
+  
+  .multiselect__tags:focus-within {
+    border-color: #48cce1;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(24, 129, 145, 0.25);
+  }
+
+  .multiselect__select:before {
+    color: #495057;
+    border-color: #495057 transparent transparent;
+  }
+  
+  .multiselect__tags,
+  .multiselect__single {
+    border-color: #ccc;
+    padding-left: 0.75rem;
+    font-size: 16px;
+    height: 100%;
+  }
+
+  .multiselect__input,
+  .multiselect__single {
+    padding: 4px 0 3px 0;
+  }
+
+  .multiselect__tag,
+  .multiselect__tag-icon:hover,
+  .multiselect__option--highlight,
+  .multiselect__option--highlight:after {
+    background-color: map-get($theme-colors, "primary");
+  }
+
+  .multiselect__option--selected.multiselect__option--highlight,
+  .multiselect__option--selected.multiselect__option--highlight:after {
+    background-color: map-get($theme-colors, "secondary");
+  }
+
+  .multiselect__placeholder {
+    color: #999;
+    font-size: 16px;
+  }
 }

@@ -17,7 +17,10 @@ import EntryMixin from './EntryMixin';
 import Utils from '../../utils';
 
 const FORCE_TABLE = [
-  'languages'
+  'languages',
+  'eo:bands',
+  'raster:bands',
+  'bands'
 ];
 
 export default {
