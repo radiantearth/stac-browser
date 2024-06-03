@@ -150,12 +150,22 @@ export default {
       }
       return {};
     },
+    filename() {
+      if (typeof this.data['file:local_path'] === 'string') {
+        return this.getFilename(this.data['file:local_path']);
+      }
+      return this.getFilename(this.href);
+    },
     downloadProps() {
       if (this.hasDownloadButton && !this.useAltDownloadMethod) {
-        return {
+        const props = {
           href: this.href,
-          target: '_blank'
+          target: '_blank',
         };
+        if (!this.browserCanOpenFile) {
+          props.download = this.filename;
+        }
+        return props;
       }
       return {};
     },
@@ -253,6 +263,9 @@ export default {
     }
   },
   methods: {
+    getFilename(path) {
+      return path.split(/[\\/]/).pop();
+    },
     async altDownload() {
       if (!window.isSecureContext) {
         window.location.href = this.href;
@@ -304,8 +317,7 @@ export default {
           throw new Error(msg);
         }
 
-        const name = this.href.substr(this.href.lastIndexOf('/') + 1);
-        const fileStream = StreamSaver.createWriteStream(name);
+        const fileStream = StreamSaver.createWriteStream(this.filename);
 
         // Prevent the user from leaving the page while the download is in progress
         // As this is not a normal download a user need to stay on the page for the download to complete
