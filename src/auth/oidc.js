@@ -58,7 +58,6 @@ export default class OIDC extends Auth {
         logoutRedirectUri: this.getRedirectUri('/auth/logout')
       }, this.options.oidcOptions);
 
-
       // Workaround for bug https://github.com/okta/okta-auth-js/issues/377
       try {
         let wkd = await axios(this.options.openIdConnectUrl);
@@ -71,6 +70,12 @@ export default class OIDC extends Auth {
           }
           if (!oktaOptions.tokenUrl) {
             oktaOptions.tokenUrl = wkd.data.token_endpoint;
+          }
+          if (!oktaOptions.logoutUrl) {
+            oktaOptions.logoutUrl = wkd.data.end_session_endpoint;
+          }
+          if (!oktaOptions.revokeUrl) {
+            oktaOptions.revokeUrl = wkd.data.revocation_endpoint;
           }
         }
       } catch (e) {
