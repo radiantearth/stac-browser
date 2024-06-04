@@ -80,10 +80,8 @@ export default function getStore(router) {
             }
           }
         } catch(error) {
-          if (!error) {
-            return;
-          }
-          throw error;
+          const err = error ? error : new Error(i18n.t('errors.networkError'));
+          cx.commit('showGlobalError', err, { root: true });
         }
       },
       // Format the value and add it to query parameters or headers
