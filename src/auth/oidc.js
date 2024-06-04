@@ -55,7 +55,7 @@ export default class OIDC extends Auth {
         issuer: this.options.openIdConnectUrl.replace(/\/\.well-known\/openid-configuration\/?$/, ''),
         clientId: 'stac-browser',
         redirectUri: this.getRedirectUri('/auth'),
-        logoutRedirectUri: this.getRedirectUri('/auth/logout')
+        postLogoutRedirectUri: this.getRedirectUri('/auth/logout')
       }, this.options.oidcOptions);
 
       // Workaround for bug https://github.com/okta/okta-auth-js/issues/377
