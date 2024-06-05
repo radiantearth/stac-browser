@@ -368,6 +368,7 @@ function getStore(config, router) {
     },
     mutations: {
       config(state, config) {
+        // This should only be called from the config action
         for (let key in config) {
           let value = config[key];
           switch (key) {
@@ -614,8 +615,23 @@ function getStore(config, router) {
       }
     },
     actions: {
+      async config(cx, config) {
+        cx.commit('config', config);
+        // React on config changes
+        for (let key in config) {
+          let value = cx.state[key];
+          switch (key) {
+            case 'catalogUrl':
+              if (value) {
+                // Load the root catalog data if not available (e.g. after page refresh or external access)
+                await cx.dispatch("load", { url: value, loadApi: true });
+              }
+              break;
+          }
+        }
+      },
       async switchLocale(cx, {locale, userSelected}) {
-        cx.commit('config', {locale});
+        await cx.dispatch('config', {locale});
 
         if (cx.state.storeLocale && userSelected) {
           try {
@@ -745,7 +761,7 @@ function getStore(config, router) {
             if (!cx.getters.root) {
               let root = data.getLinkWithRel('root');
               if (root) {
-                cx.commit('config', { catalogUrl: Utils.toAbsolute(root.href, url) });
+                await cx.dispatch('config', { catalogUrl: Utils.toAbsolute(root.href, url) });
               }
             }
 

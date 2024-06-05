@@ -80,8 +80,8 @@ for(let key in CONFIG) {
   };
   Watchers[key] = {
     immediate: true,
-    handler: function(newValue) {
-      this.$store.commit('config', {
+    handler: async function(newValue) {
+      await this.$store.dispatch('config', {
         [key]: newValue
       });
     }
@@ -111,9 +111,7 @@ export default {
   computed: {
     ...mapState(['allowSelectCatalog', 'data', 'dataLanguage', 'description', 'doAuth', 'globalError', 'stateQueryParameters', 'title', 'uiLanguage', 'url']),
     ...mapState({
-      catalogUrlFromVueX: 'catalogUrl',
       detectLocaleFromBrowserFromVueX: 'detectLocaleFromBrowser',
-      fallbackLocaleFromVueX: 'fallbackLocale',
       supportedLocalesFromVueX: 'supportedLocales',
       storeLocaleFromVueX: 'storeLocale'
     }),
@@ -186,12 +184,6 @@ export default {
         }
       }
     },
-    catalogUrlFromVueX(url) {
-      if (url) {
-        // Load the root catalog data if not available (e.g. after page refresh or external access)
-        this.$store.dispatch("load", { url, loadApi: true });
-      }
-    },
     stateQueryParameters: {
       deep: true,
       handler() {
@@ -244,9 +236,10 @@ export default {
           value = root['stac_browser'][key]; // Custom value from root
         }
 
-        // Commit config
+        // Update config in store
         if (typeof value !== 'undefined') {
-          this.$store.commit('config', { [key]: value });
+          this.$store.dispatch('config', { [key]: value })
+            .catch(error => console.error(error));
         }
       }
     },
