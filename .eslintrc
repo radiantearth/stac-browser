@@ -7,7 +7,8 @@
     "STAC_BROWSER_VERSION": "readonly",
     "CONFIG_PATH": "readonly",
     "CONFIG_CLI": "readonly",
-    "require": "readonly"
+    "require": "readonly",
+    "process": "readonly"
   },
   "extends": [
     "plugin:vue/strongly-recommended",

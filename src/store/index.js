@@ -50,7 +50,7 @@ function getStore(config, router) {
   });
 
   return new Vuex.Store({
-    strict: true,
+    strict: process.env.NODE_ENV !== 'production',
     state: Object.assign({}, config, localDefaults(), catalogDefaults(), {
       // Global settings
       database: {}, // STAC object, Error object or Loading object or Promise (when loading)
