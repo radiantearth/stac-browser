@@ -170,13 +170,17 @@ export default class Utils {
     return Array.isArray(links) ? links.filter(link => Utils.isObject(link) && Utils.hasText(link.href) && !rels.includes(link.rel)) : [];
   }
 
+  static removeTrailingSlash(str) {
+    return str.replace(/\/$/, '');
+  }
+
   static equalUrl(a, b) {
     try {
       let uri1 = URI(a);
       let uri2 = URI(b);
       // Ignore trailing slash in URL paths
-      uri1.path(uri1.path().replace(/\/$/, ''));
-      uri2.path(uri2.path().replace(/\/$/, ''));
+      uri1.path(Utils.removeTrailingSlash(uri1.path()));
+      uri2.path(Utils.removeTrailingSlash(uri2.path()));
       return uri1.equals(uri2);
     } catch (error) {
       return false;
