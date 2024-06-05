@@ -154,6 +154,8 @@ export default {
 
         // Update the HTML lang tag
         document.documentElement.setAttribute("lang", locale);
+
+        this.$root.$emit('uiLanguageChanged', locale);
       }
     },
     dataLanguage: {

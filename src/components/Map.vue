@@ -1,7 +1,7 @@
 <template>
   <div class="map-container">
     <l-map class="map" v-if="show" :class="stac.type" @ready="init" :options="mapOptions">
-      <l-control-fullscreen />
+      <l-control-fullscreen :key="`z${ix}`" :options="fullscreenOptions" />
       <l-control-zoom :key="`z${ix}`" v-bind="zoomControlTexts" position="topleft" />
       <l-control-layers v-if="showLayerControl" position="bottomleft" ref="layerControl" />
       <component
@@ -109,7 +109,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['buildTileUrlTemplate', 'crossOriginMedia', 'displayGeoTiffByDefault', 'geoTiffResolution', 'maxPreviewsOnMap', 'uiLanguage', 'useTileLayerAsFallback']),
+    ...mapState(['buildTileUrlTemplate', 'crossOriginMedia', 'displayGeoTiffByDefault', 'geoTiffResolution', 'maxPreviewsOnMap', 'useTileLayerAsFallback']),
     ...mapGetters(['getStac', 'supportsExtension']),
     fullscreenOptions() {
       return {
@@ -185,10 +185,6 @@ export default {
     }
   },
   watch: {
-    uiLanguage() {
-      // This recreates the component so that it picks up the new translations
-      this.ix++;
-    },
     async stacLayerData() {
       await this.showStacLayer();
     },
@@ -203,6 +199,8 @@ export default {
   },
   created() {
     this.mapOptions.scrollWheelZoom = this.selectBounds || this.scrollWheelZoom;
+    // This recreates the component so that it picks up the new translations
+    this.$root.$on('uiLanguageChanged', () => this.ix++);
   },
   mounted() {
     // Solves https://github.com/radiantearth/stac-browser/issues/95 by showing the map

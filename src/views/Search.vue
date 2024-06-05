@@ -23,6 +23,7 @@
         <b-alert v-if="error" variant="error" show>{{ error }}</b-alert>
         <Loading v-else-if="!data && loading" fill top />
         <b-alert v-else-if="data === null" variant="info" show>{{ $t('search.modifyCriteria') }}</b-alert>
+        <b-alert v-else-if="results.length === 0 && noFurtherItems" variant="info" show>{{ $t('search.noFurtherItemsFound') }}</b-alert>
         <b-alert v-else-if="results.length === 0" variant="warning" show>{{ $t('search.noItemsFound') }}</b-alert>
         <template v-else>
           <div id="search-map" v-if="itemCollection">
@@ -184,6 +185,13 @@ export default {
     pageDescription() {
       let title = STAC.getDisplayTitle([this.collectionLink, this.parentLink, this.root], this.catalogTitle);
       return this.$t('search.metaDescription', {title});
+    },
+    noFurtherItems() {
+      // Ideally this would be dertmined by the prev link, but it's not required
+      // so we check whether our current link has a next rel type which indicates
+      // that it's a subsequent page. On the first pages the link rel type would be
+      // "search" (or "prev" or "first"). This only works for forward navigation.
+      return this.link.rel === 'next';
     }
   },
   watch:{
@@ -216,6 +224,14 @@ export default {
       this.parent = this.getStac(url);
       this.showPage();
     }
+    
+    // Fixes https://github.com/radiantearth/stac-browser/issues/428
+    this.$root.$on('uiLanguageChanged', () => {
+      this.$store.commit('setPageMetadata', {
+        title: this.$t('search.title'),
+        description: this.pageDescription
+      });
+    });
   },
   methods: {
     openItemSearch() {

@@ -495,6 +495,12 @@ function getStore(config, router) {
       resetPage(state) {
         Object.assign(state, localDefaults());
       },
+      setPageMetadata(state, { title, description }) {
+        state.title = title;
+        if (typeof description !== 'undefined') {
+          state.description = description;
+        }
+      },
       showPage(state, { url, title, description, stac }) {
         if (!stac) {
           stac = state.database[url] || null;

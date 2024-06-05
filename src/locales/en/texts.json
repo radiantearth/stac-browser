@@ -249,6 +249,7 @@
     "matches": "matches",
     "metaDescription": "Search through the data offering of {title}.",
     "modifyCriteria": "Please modify the search criteria.",
+    "noFurtherItemsFound": "No further items available.",
     "noItemsFound": "No items found for the given filters.",
     "noOptions": "Nothing entered yet",
     "notEqualTo": "not equal to",

@@ -158,11 +158,14 @@ export default {
     },
     downloadProps() {
       if (this.hasDownloadButton && !this.useAltDownloadMethod) {
-        return {
+        const props = {
           href: this.href,
           target: '_blank',
-          download: this.filename
         };
+        if (!this.browserCanOpenFile) {
+          props.download = this.filename;
+        }
+        return props;
       }
       return {};
     },
