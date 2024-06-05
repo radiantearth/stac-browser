@@ -291,6 +291,7 @@ The options you can set in the `authConfig` object are defined in the
 
 **Note:** Before STAC Browser 3.2.0 a different type of object was supported.
 The old way is deprecated, but will be converted to the new object internally.
+Please migrate to the new configuration options now.
 
 In addition the following properties are supported:
 
