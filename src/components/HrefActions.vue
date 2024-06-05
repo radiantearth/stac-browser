@@ -1,44 +1,66 @@
 <template>
-  <b-button-group class="actions" :vertical="vertical" :size="size" v-if="href">
-    <b-button v-if="hasDownloadButton" v-bind="downloadProps" v-on="downloadEvents" variant="primary">
-      <b-spinner v-if="loading" small variant="light" />
-      <b-icon-box-arrow-up-right v-else-if="browserCanOpenFile" /> 
-      <b-icon-download v-else />
-      {{ buttonText }}
-    </b-button>
-    <CopyButton variant="primary" :copyText="href">
-      {{ copyButtonText }}
-    </CopyButton>
-    <b-button v-if="hasShowButton" @click="show" variant="primary">
-      <b-icon-eye class="mr-1" />
-      <template v-if="isThumbnail">{{ $t('assets.showThumbnail') }}</template>
-      <template v-else>{{ $t('assets.showOnMap') }}</template>
-    </b-button>
-    <b-button v-for="action of actions" v-bind="action.btnOptions" :key="action.id" variant="primary" @click="action.onClick">
-      <component v-if="action.icon" :is="action.icon" class="mr-1" />
-      {{ action.text }}
-    </b-button>
-  </b-button-group>
+  <div>
+    <b-button-group class="actions" :vertical="vertical" :size="size" v-if="href">
+      <b-button variant="danger" v-if="requiresAuth" :id="`popover-href-${id}-btn`" @click="handleAuthButton">
+        <b-icon-lock /> {{ $i18n.t('authentication.required') }}
+      </b-button>
+      <b-button v-if="hasDownloadButton" :disabled="requiresAuth" v-bind="downloadProps" v-on="downloadEvents" variant="primary">
+        <b-spinner v-if="loading" small variant="light" />
+        <b-icon-box-arrow-up-right v-else-if="browserCanOpenFile" /> 
+        <b-icon-download v-else />
+        {{ buttonText }}
+      </b-button>
+      <CopyButton variant="primary" :copyText="href">
+        {{ copyButtonText }}
+      </CopyButton>
+      <b-button v-if="hasShowButton" @click="show" variant="primary">
+        <b-icon-eye class="mr-1" />
+        <template v-if="isThumbnail">{{ $t('assets.showThumbnail') }}</template>
+        <template v-else>{{ $t('assets.showOnMap') }}</template>
+      </b-button>
+      <b-button v-for="action of actions" v-bind="action.btnOptions" :key="action.id" variant="primary" @click="action.onClick">
+        <component v-if="action.icon" :is="action.icon" class="mr-1" />
+        {{ action.text }}
+      </b-button>
+    </b-button-group>
+    
+    <b-popover
+      v-if="auth.length > 1"
+      :id="`popover-href-${id}`" custom-class="href-auth-methods" :target="`popover-href-${id}-btn`"
+      triggers="focus" container="stac-browser" :title="$i18n.t('authentication.chooseMethod')"
+    >
+      <b-list-group>
+        <AuthSchemeItem v-for="(method, i) in auth" :key="i" :method="method" @authenticate="startAuth" />
+      </b-list-group>
+    </b-popover>
+  </div>
 </template>
 
 
 <script>
-import { BIconBoxArrowUpRight, BIconDownload, BIconEye, BSpinner } from 'bootstrap-vue';
+import { BIconBoxArrowUpRight, BIconDownload, BIconEye, BIconLock, BListGroup, BPopover, BSpinner } from 'bootstrap-vue';
 import Description from './Description.vue';
 import STAC from '../models/stac';
 import Utils, { browserProtocols, imageMediaTypes, mapMediaTypes } from '../utils';
 import { mapGetters, mapState } from 'vuex';
 import AssetActions from '../../assetActions.config';
 import LinkActions from '../../linkActions.config';
-import URI from 'urijs';
 import { stacRequestOptions } from '../store/utils';
+import URI from 'urijs';
+import AuthUtils from './auth/utils';
+
+let i = 0;
 
 export default {
   name: 'HrefActions',
   components: {
+    AuthSchemeItem: () => import('./AuthSchemeItem.vue'),
     BIconBoxArrowUpRight,
     BIconDownload,
     BIconEye,
+    BIconLock,
+    BListGroup,
+    BPopover,
     BSpinner,
     CopyButton: () => import('./CopyButton.vue'),
     Description,
@@ -64,16 +86,25 @@ export default {
     shown: {
       type: Boolean,
       default: false
+    },
+    auth: {
+      type: Array,
+      default: () => {[]}
     }
   },
   data() {
     return {
+      id: i++,
       loading: false
     };
   },
   computed: {
     ...mapState(['pathPrefix', 'requestHeaders']),
     ...mapGetters(['getRequestUrl']),
+    ...mapGetters('auth', ['isLoggedIn']),
+    requiresAuth() {
+      return !this.isLoggedIn && this.auth.length > 0;
+    },
     actions() {
       return Object.entries(this.isAsset ? AssetActions : LinkActions)
         .map(([id, plugin]) => new plugin(this.data, this, id))
@@ -351,7 +382,29 @@ export default {
         data.href = this.href;
       }
       this.$emit('show', data, this.id, this.isThumbnail);
+    },
+    handleAuthButton() {
+      if (this.auth.length === 1) {
+        this.startAuth(this.auth[0]);
+      }
+    },
+    async startAuth(method) {
+      if (AuthUtils.isSupported(method)) {
+        await this.$store.dispatch('config', { authConfig: method });
+        await this.$store.dispatch('auth/requestLogin');
+      }
+      else {
+        const name = this.$i18n.t(`authentication.schemeTypes.${method.type}`);
+        const message = this.$i18n.t('authentication.unsupportedLong', {method: name});
+        this.$root.$emit('error', new Error(message), this.$i18n.t('authentication.unsupported'));
+      }
     }
   }
 };
 </script>
+
+<style lang="scss">
+#stac-browser .href-auth-methods .popover-body {
+  padding: 0;
+}
+</style>

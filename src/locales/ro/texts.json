@@ -32,8 +32,6 @@
   },
   "authentication": {
     "button": {
-      "authenticate": "Autentificați-vă",
-      "authenticated": "Autentificat",
       "title": "Introduceți sau actualizați informațiile de autentificare"
     },
     "description": "Pagina solicitată necesită autentificare. Vă rugăm să furnizați informațiile dvs. de autentificare în câmpul de text de mai jos.",
