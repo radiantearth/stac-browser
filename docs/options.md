@@ -90,8 +90,16 @@ Otherwise, defaults to the language set for `locale`.
 
 ## storeLocale
 
-If set to `true`, stores the locale selected by the user in the `localStorage` of the browser.
-Otherwise, doesn't store the locale across browser sessions.
+If set to `true` (default), stores the locale selected by the user in the storage of the browser.
+If set to `false`, doesn't store the locale across browser sessions.
+
+Depending on the browser settings, this may store in either:
+- `localeStorage`
+- `sessionStorage`
+- cookies
+
+In some countries this may have implications with regards to GDPR etc.
+If you want to avoid this, disable this setting.
 
 ## locale
 

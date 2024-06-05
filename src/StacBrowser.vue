@@ -45,6 +45,7 @@ import URI from 'urijs';
 import I18N from '@radiantearth/stac-fields/I18N';
 import { translateFields, API_LANGUAGE_CONFORMANCE, loadMessages } from './i18n';
 import { getBest, prepareSupported } from './locale-id';
+import BrowserStorage from "./browser-store";
 
 Vue.use(AlertPlugin);
 Vue.use(ButtonGroupPlugin);
@@ -285,11 +286,8 @@ export default {
     detectLocale() {
       let locale;
       if (this.storeLocaleFromVueX) {
-        try {
-          locale = window.localStorage.getItem('locale');
-        } catch(error) {
-          console.error(error);
-        }
+        const storage = new BrowserStorage();
+        locale = storage.get('locale');
       }
       if (!locale && this.detectLocaleFromBrowserFromVueX && Array.isArray(navigator.languages)) {
         // Detect the most suitable locale
