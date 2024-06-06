@@ -89,7 +89,7 @@ export default {
     },
     auth: {
       type: Array,
-      default: () => {[]}
+      default: () => ([])
     }
   },
   data() {
@@ -389,7 +389,7 @@ export default {
       }
     },
     async startAuth(method) {
-      if (AuthUtils.isSupported(method)) {
+      if (AuthUtils.isSupported(method, this.$store.state)) {
         await this.$store.dispatch('config', { authConfig: method });
         await this.$store.dispatch('auth/requestLogin');
       }

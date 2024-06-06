@@ -291,6 +291,7 @@ Please note that this option can only be provided through a config file and is n
 This allows to enable some authentication methods. Currently the supported methods are:
 - API Keys (`type: apiKey`) via query parameter or HTTP Header
 - HTTP Basic (`type: http`, `scheme: basic`)
+- OpenID Connect (`type: openIdConnect`)
 
 Authentication is disabled by default (`null`).
 
@@ -358,6 +359,31 @@ HTTP Basic is supported according to [RFC 7617](https://datatracker.ietf.org/doc
   scheme: 'basic'
 }
 ```
+
+### OpenID Connect
+
+**IMPORTANT: OpenID Connect is only supported if `historyMode` is set to `history`!**
+
+For OpenID Connect some additional options must be provided, which currently follow the
+[oidc-client-ts Configuration options](https://github.com/okta/okta-auth-js?tab=readme-ov-file#configuration-options).
+These options (except for `issuer`) must be provided in the property `oidcConfig`.
+The `clientId` option defaults to `stac-browser`.
+The redirect URL for the OIDC client must be set as follows:
+
+#### Example
+
+```js
+{
+  type: 'openIdConnect',
+  openIdConnectUrl: 'https://stac.example/.well-known/openid-configuration',
+  oidcOptions: {
+    client_id: 'abc123'
+  }
+}
+```
+
+For a given token `123` this results in the following additional HTTP Header:
+`Authorization: Bearer 123`
 
 ## preprocessSTAC
 

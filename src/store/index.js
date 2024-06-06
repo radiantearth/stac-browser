@@ -613,7 +613,7 @@ function getStore(config, router) {
       },
       showGlobalError(state, error) {
         if(error) {
-          console.error(error);
+          console.trace(error);
         }
         state.globalError = error;
       }

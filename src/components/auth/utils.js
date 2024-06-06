@@ -1,5 +1,6 @@
 import Utils from '../../utils.js';
 import STAC from '../../models/stac.js';
+import Auth from '../../auth/index.js';
 
 export default class AuthUtils {
 
@@ -15,12 +16,17 @@ export default class AuthUtils {
     return [];
   }
 
-  static isSupported(method) {
+  static isSupported(method, config) {
+    if (method instanceof Auth) {
+      method = method.options;
+    }
     switch(method.type) {
       case 'http':
         return (method.schema === 'basic');
       case 'apiKey':
         return (method.in === 'header' || method.in === 'query');
+      case 'openIdConnect':
+        return (config.historyMode === 'history');
       default:
         return false;
     }

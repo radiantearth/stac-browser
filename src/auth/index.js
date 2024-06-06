@@ -6,12 +6,12 @@ export default class Auth {
   /**
    * Constructs the authentication method.
    * 
-   * @param {Object.<string, *>} options  Any potential options the authentication m
-   * @param {Function} changeListener A change listener with two parameters: loggedIn (boolean) and accessToken (string|null)
-   * @param {Object} router The router instance
+   * @param {Object.<string, *>} options  Any potential options the authentication method needs
+   * @param {Function} changeListener A change listener with two parameters: loggedIn (boolean) and credentials (string|null)
+   * @param {Router} router The Vue router instance
    */
-  constructor(options, changeListener, router) {
-    this.options = options || {};
+  constructor(options = {}, changeListener = null, router = null) {
+    this.options = options;
     this.changeListener = changeListener;
     this.router = router;
   }
@@ -56,19 +56,21 @@ export default class Auth {
   }
 
   async login() {
-    return true;
   }
 
-  async confirmLogin(/*credentials*/) {
-    return true;
+  async confirmLogin(credentials) {
+    if (this.changeListener) {
+      await this.changeListener(true, credentials);
+    }
   }
 
   async logout(/*credentials*/) {
-    return true;
   }
 
   async confirmLogout() {
-    return true;
+    if (this.changeListener) {
+      await this.changeListener(false);
+    }
   }
 
   async close() {
@@ -89,6 +91,10 @@ export default class Auth {
       else if (config.type === 'apiKey') {
         const ApIKey = (await import('./apiKey')).default;
         method = new ApIKey(config, changeListener, router);
+      }
+      else if (config.type === 'openIdConnect') {
+        const OIDC = (await import('./oidc')).default;
+        method = new OIDC(config, changeListener, router);
       }
     }
     await method.init();

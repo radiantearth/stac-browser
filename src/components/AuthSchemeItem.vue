@@ -24,7 +24,7 @@ export default {
   },
   computed: {
     isSupported() {
-      return AuthUtils.isSupported(this.method);
+      return AuthUtils.isSupported(this.method, this.$store.state);
     }
   },
   methods: {

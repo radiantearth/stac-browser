@@ -2,7 +2,6 @@ import Auth from '../auth';
 import i18n from '../i18n';
 import AuthUtils from '../components/auth/utils';
 import BrowserStorage from '../browser-store';
-import Utils from '../utils';
 
 const handleAuthError = async (cx, error) => {
   cx.commit('showGlobalError', {
@@ -28,8 +27,8 @@ export default function getStore(router) {
       method(state) {
         return state.method();
       },
-      canAuthenticate(state, getters) {
-        return AuthUtils.isSupported(getters.method);
+      canAuthenticate(state, getters, rootState) {
+        return AuthUtils.isSupported(getters.method, rootState);
       },
       isLoggedIn(state) {
         return state.credentials !== null;
@@ -65,18 +64,24 @@ export default function getStore(router) {
       async updateMethod(cx, config) {
         config = AuthUtils.convertLegacyAuthConfig(config);
         await cx.getters.method.close();
-        let changeListener = async (isLoggedIn, credentials) => {
+
+        const changeListener = async (isLoggedIn, credentials) => {
           if (!isLoggedIn) {
             credentials = null;
           }
           await cx.dispatch('updateCredentials', credentials);
-          await cx.dispatch('executeActions');
+          if (isLoggedIn) {
+            await cx.dispatch('executeActions');
+          }
+          else {
+            cx.commit('resetActions');
+          }
         };
         
         const storage = new BrowserStorage(true);
         storage.set('authConfig', config);
 
-        let newAuth = await Auth.create(config, changeListener, router);
+        const newAuth = await Auth.create(config, changeListener, router);
         cx.commit('setMethod', newAuth);
       },
       async requestLogin(cx) {
@@ -90,13 +95,10 @@ export default function getStore(router) {
           handleAuthError(cx, error);
         }
       },
-      async finalizeLogin(cx, credentials) {
+      async finalizeLogin(cx, credentials = null) {
         cx.commit('setInProgress', false);
         try {
-          if (await cx.getters.method.confirmLogin(credentials)) {
-            await cx.dispatch('updateCredentials', credentials);
-            await cx.dispatch('executeActions');
-          }
+          await cx.getters.method.confirmLogin(credentials);
         } catch(error) {
           handleAuthError(cx, error);
         }
@@ -114,10 +116,7 @@ export default function getStore(router) {
       async finalizeLogout(cx) {
         cx.commit('setInProgress', false);
         try {
-          if (await cx.getters.method.confirmLogout()) {
-            await cx.dispatch('updateCredentials');
-            cx.commit('resetActions');
-          }
+          await cx.getters.method.confirmLogout();
         } catch(error) {
           handleAuthError(cx, error);
         }
