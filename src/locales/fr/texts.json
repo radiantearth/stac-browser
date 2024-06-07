@@ -1,362 +1,362 @@
 {
   "actions": {
-    "openIn": "Ouvrir dans {service}"
+    "openIn": ""
   },
-  "additionalActions": "Actions supplémentaires",
-  "additionalResources": "Ressources supplémentaires",
+  "additionalActions": "",
+  "additionalResources": "",
   "anonymized": {
-    "title": "Anonymat"
+    "title": "Anonymised"
   },
   "assets": {
     "alternate": {
-      "main": "Préféré"
+      "main": ""
     },
     "copyGdalVfsUrl": {
-      "generic": "Copier le lien du GDAL VFS",
-      "withSource": "Copier le lien du GDAL VFS de {source}"
+      "generic": "",
+      "withSource": ""
     },
     "copyUrl": {
-      "generic": "Copier le  lien",
-      "withSource": "Copier le  lien de {source}"
+      "generic": "",
+      "withSource": ""
     },
-    "currentlyShown": "Ceci est la ressource actuellement affichée.",
+    "currentlyShown": "",
     "download": {
-      "generic": "Télécharger",
-      "withSource": "Télécharger à partir de {source}"
+      "generic": "",
+      "withSource": ""
     },
-    "inItems": "Ressource des éléments | Ressources des éléments",
+    "inItems": "",
     "role": {
-      "data": "Données",
-      "metadata": "Métadonnées"
+      "data": "",
+      "metadata": ""
     },
-    "showOnMap": "Afficher sur la carte",
-    "showThumbnail": "Afficher l'aperçu",
-    "shown": "Affiché"
+    "showOnMap": "",
+    "showThumbnail": "",
+    "shown": ""
   },
   "authentication": {
     "button": {
-      "authenticate": "Authentifiez vous",
-      "authenticated": "Authentifié",
-      "title": "Saisir ou mettre à jour vos informations d'authentification"
+      "authenticate": "",
+      "authenticated": "",
+      "title": ""
     },
-    "description": "La page demandée nécessite une authentification. Veuillez fournir vos informations d'authentification dans le champ de texte ci-dessous.",
-    "title": "Authentification"
+    "description": "",
+    "title": ""
   },
-  "browse": "Parcourir",
-  "cancel": "Annuler",
+  "browse": "",
+  "cancel": "",
   "catalog": {
-    "license": "Licence",
-    "temporalExtent": "Étendue temporelle"
+    "license": "",
+    "temporalExtent": ""
   },
   "catalogs": {
-    "filterByTitle": "Filtrer les catalogues par titre",
-    "filterByTitleAndMore": "Filtrer les catalogues par titre, description ou mots-clés",
-    "loadMore": "Charger plus...",
-    "noMatches": "Aucun catalogue ne correspond aux critères de recherche."
+    "filterByTitle": "Filter catalogues by title",
+    "filterByTitleAndMore": "Filter catalogues by title, description or keywords",
+    "loadMore": "",
+    "noMatches": "No catalogues match the given search criteria."
   },
   "checkbox": {
-    "false": "Non",
-    "true": "Oui"
+    "false": "",
+    "true": ""
   },
-  "copy": "Copier",
-  "default": "Défault",
-  "defaultWithValue": "Défault ({value})",
-  "deprecated": "Déprécié",
+  "copy": "",
+  "default": "",
+  "defaultWithValue": "",
+  "deprecated": "",
   "deprecation": {
-    "fallbackTitle": "Afficher",
-    "latestVersion": "Dernière version:",
-    "otherVersionsNotice": "Ce {type} n'est *pas* déprécié, mais il existe d'autres versions disponibles:",
-    "otherVersionsTitle": "Autres versions disponibles",
-    "outdatedTitle": "Désuet",
-    "predecessorVersion": "Version précédente:",
-    "successorVersion": "Version suivante:",
-    "warning": "Veuillez noter que ce {type} est déprécié et peut être supprimé à tout moment. Son usage devrait être abandonné dès que possible. Évitez de l'utiliser dans les nouveaux projets."
+    "fallbackTitle": "",
+    "latestVersion": "",
+    "otherVersionsNotice": "",
+    "otherVersionsTitle": "",
+    "outdatedTitle": "",
+    "predecessorVersion": "",
+    "successorVersion": "",
+    "warning": ""
   },
-  "description": "Description",
+  "description": "",
   "errors": {
-    "authFailed": "La requête a échoué, les informations d'authentification fournies peuvent être incorrectes.",
-    "badRequest": "La requête n'est pas valide. Cela peut être dû à des paramètres de recherche invalides ou à un bogue au niveau de STAC Browser",
-    "contactProvider": "Veuillez contacter l'exploitant du service afin de résoudre ce problème.",
-    "default": "La page demandée n'a pas pu être chargée.",
-    "forbidden": "Les informations d'authentification spécifiées pour cette requête ne sont pas valides, par exemple un jeton d'API expiré ou est non valide. Veuillez fournir d'autres informations d'authentification et réessayer",
-    "invalidJsonObject": "La réponse n'est pas un objet JSON valide.",
-    "invalidStacCollections": "La réponse de l'API n'est pas une liste valide de collections STAC.",
-    "invalidStacItems": "La réponse de l'API n'est pas une liste valide d'éléments STAC.",
+    "authFailed": "",
+    "badRequest": "",
+    "contactProvider": "",
+    "default": "",
+    "forbidden": "",
+    "invalidJsonObject": "",
+    "invalidStacCollections": "",
+    "invalidStacItems": "",
     "labels": {
-      "cause": "Cause:",
-      "code": "Code d'erreur:",
-      "reason": "Raison:",
-      "requestURL": "URL demandé:"
+      "cause": "",
+      "code": "",
+      "reason": "",
+      "requestURL": ""
     },
-    "loadApiCollectionsFailed": "Les collections de l'API n'ont pas pu être chargées.",
-    "loadApiItemsFailed": "Les éléments de l'API n'ont pas pu être chargés.",
-    "loadFilteredItems": "Désolé, le chargement d'une liste d'éléments filtrés a échoué.",
-    "loadItems": "Désolé, le chargement de la liste des éléments STAC a échoué.",
-    "networkError": "Ce problème peut se produire lorsque les serveurs n'autorisent pas l'accès externe via les navigateurs Web (par exemple, lorsque les en-têtes CORS ne sont pas présents). @:errors.contactProvider",
-    "noExternalAccess": "L'accès aux catalogues externes n'est pas autorisé!",
-    "notFound": "La ressource demandée n'existe pas. @:errors.contactProvider",
-    "serverError": "Le serveur a rencontré un problème. @:errors.contactProvider",
-    "unauthorized": "La requête requiert des informations d'authentification, comme par exemple un jeton API. Veuillez fournir vos informations d'authentification et réessayer"
+    "loadApiCollectionsFailed": "",
+    "loadApiItemsFailed": "",
+    "loadFilteredItems": "",
+    "loadItems": "",
+    "networkError": "",
+    "noExternalAccess": "Accessing external catalogues is not allowed!",
+    "notFound": "",
+    "serverError": "",
+    "unauthorized": ""
   },
-  "featureExperimental": "Cette fonctionnalité est encore expérimentale et peut donner des résultats inattendus!",
+  "featureExperimental": "",
   "fullscreen": {
-    "exit": "Quitter le mode plein écran",
-    "show": "Voir en plein écran"
+    "exit": "",
+    "show": ""
   },
   "goBack": {
-    "description": "Revenir au {type}",
-    "label": "Précédent"
+    "description": "",
+    "label": ""
   },
   "goToCollection": {
-    "description": "Accéder à la collection associée",
-    "descriptionWithTitle": "@:goToCollection.description: {title}",
-    "label": "Collection"
+    "description": "",
+    "descriptionWithTitle": "",
+    "label": ""
   },
   "goToParent": {
-    "description": "Accéder au parent",
-    "descriptionWithTitle": "@:goToParent.description: {title}",
-    "label": "En haut"
+    "description": "",
+    "descriptionWithTitle": "",
+    "label": ""
   },
-  "in": "dans {catalog}",
+  "in": "",
   "index": {
-    "api": "API",
+    "api": "",
     "catalog": "Catalogue",
-    "load": "Charger",
-    "selectStacIndex": "... ou en sélectionner un dans {stacIndex}:",
-    "specifyCatalog": "Veuillez spécifier un catalogue STAC ou un API...",
-    "urlInvalid": "Le lien URL n'est pas valide.",
-    "urlMissingHost": "Le lien URL ne contient aucun hôte.",
-    "urlMissingProtocol": "Le lien URL ne contient pas de protocole."
+    "load": "",
+    "selectStacIndex": "",
+    "specifyCatalog": "Please specify a STAC Catalogue or API...",
+    "urlInvalid": "",
+    "urlMissingHost": "",
+    "urlMissingProtocol": ""
   },
   "items": {
-    "filter": "Filtres",
-    "hideFilter": "Masquer les filtres",
-    "noTime": "Aucun temps sélectionné",
-    "noneAvailableForCollection": "Aucun item disponible pour cette collection.",
-    "showFilter": "Afficher les filtres"
+    "filter": "",
+    "hideFilter": "",
+    "noTime": "",
+    "noneAvailableForCollection": "",
+    "showFilter": ""
   },
   "leaflet": {
-    "close": "Fermer",
-    "noFeatureProperties": "Aucune donnée supplémentaire n'est disponible pour cette fonctionnalité.",
+    "close": "",
+    "noFeatureProperties": "",
     "stayLayer": {
-      "error": "Désolé, l'ajout des données à la carte a échoué."
+      "error": ""
     },
     "zoom": {
       "in": {
-        "description": "Zoom avant",
-        "label": "+"
+        "description": "",
+        "label": ""
       },
       "out": {
-        "description": "Zoom arrière",
-        "label": "-"
+        "description": "",
+        "label": ""
       }
     }
   },
-  "loading": "Chargement...",
-  "map": "Carte",
-  "messageForSchemaError": "{message}, pour le schéma {schemaPath}",
+  "loading": "",
+  "map": "",
+  "messageForSchemaError": "",
   "metadata": {
-    "general": "Général",
-    "title": "Métadonnées"
+    "general": "",
+    "title": ""
   },
   "multiselect": {
-    "andMore": "et {count} de plus",
-    "deselectLabel": "Appuyer sur Entrée pour désélectionner",
-    "keywordsPlaceholder": "Sélectionner des mots clés",
-    "placeholder": "Sélectionner une option",
-    "selectLabel": "Appuyer sur Entrée pour sélectionner",
-    "selectedLabel": "Sélectionné(e)"
+    "andMore": "",
+    "deselectLabel": "",
+    "keywordsPlaceholder": "",
+    "placeholder": "",
+    "selectLabel": "",
+    "selectedLabel": ""
   },
-  "open": "Ouvrir",
+  "open": "",
   "pagination": {
-    "first": "« Premier",
-    "last": "Dernier »",
-    "next": "Suivant ›",
-    "previous": "‹ Précédent"
+    "first": "",
+    "last": "",
+    "next": "",
+    "previous": ""
   },
-  "poweredBy": "Propulsé par {link}",
+  "poweredBy": "",
   "protocol": {
-    "azure": "Microsoft Azure",
-    "file": "Système de fichiers (local)",
-    "ftp": "FTP",
-    "gcs": "Google Cloud",
-    "oss": "Alibaba Cloud",
+    "azure": "",
+    "file": "",
+    "ftp": "",
+    "gcs": "",
+    "oss": "",
     "s3": {
-      "amazonaws.com": "Amazon S3",
-      "default": "S3"
+      "amazonaws.com": "",
+      "default": ""
     }
   },
   "providers": {
-    "email": "Envoyer un courriel",
-    "homepage": "Aller à la page d'accueil",
+    "email": "",
+    "homepage": "",
     "role": {
-      "host": "Hébergeur",
-      "licensor": "Concédant de licence",
-      "processor": "Transformateur",
-      "producer": "Producteur"
+      "host": "",
+      "licensor": "",
+      "processor": "",
+      "producer": ""
     },
-    "title": "Fournisseur | Fournisseurs"
+    "title": ""
   },
   "read": {
-    "less": "Lire moins",
-    "more": "Lire plus"
+    "less": "",
+    "more": ""
   },
-  "reset": "Réinitialiser",
+  "reset": "",
   "search": {
-    "addCollections": "Appuyer sur Entrée pour ajouter une Collection",
-    "addFilter": "Ajouter un filtre",
-    "addItemIds": "Appuyer sur Entrée pour ajouter un ID Élément",
-    "addSearchTerm": "Appuyez sur entrée pour ajouter un terme de recherche",
-    "additionalFilters": "Filtres supplémentaires",
-    "dateDescription": "Toutes les heures sont en temps universel coordonné (UTC).",
-    "enterCollections": "Saisissez une ou plusieurs collections...",
-    "enterItemIds": "Saisissez un ou plusieurs identifiants d'éléments...",
-    "enterSearchTerms": "Saisissez un ou plusieurs termes de recherche...",
-    "equalTo": "égal à",
-    "filterBySpatialExtent": "Filtrer par étendue spatiale",
-    "filterCollection": "Filtrer la collection",
-    "freeText": "Mots clé de recherche",
-    "freeTextDescription": "Rechercher au moins un des termes donnés dans des champs tels que le titre et la description.",
-    "greaterThan": "supérieur à",
-    "greaterThanEqual": "supérieur ou égal à",
-    "itemIds": "Identifiants des éléments",
-    "itemsPerPage": "Éléments par page",
-    "itemsPerPageDescription": "Nombre d'éléments demandés par page, max. {maxItems} éléments",
-    "lessThan": "inférieur à",
-    "lessThanEqual": "inférieur ou égal à",
-    "likeOperatorDescription": "Vous pouvez utiliser des caractères génériques. `_` correspond à un seul caractère, `%` correspond à un nombre quelconque de caractères. Pour rechercher spécifiquement un caractère générique, vous devez ajouter un `\\` devant le caractère.",
+    "addCollections": "",
+    "addFilter": "",
+    "addItemIds": "",
+    "addSearchTerm": "",
+    "additionalFilters": "",
+    "dateDescription": "",
+    "enterCollections": "",
+    "enterItemIds": "",
+    "enterSearchTerms": "",
+    "equalTo": "",
+    "filterBySpatialExtent": "",
+    "filterCollection": "",
+    "freeText": "",
+    "freeTextDescription": "",
+    "greaterThan": "",
+    "greaterThanEqual": "",
+    "itemIds": "",
+    "itemsPerPage": "",
+    "itemsPerPageDescription": "",
+    "lessThan": "",
+    "lessThanEqual": "",
+    "likeOperatorDescription": "",
     "logical": {
-      "and": "Correspond à tous les filtres (et)",
-      "or": "Correspond à n'importe quel filtre (ou)"
+      "and": "",
+      "or": ""
     },
-    "matches": "correspond à",
-    "metaDescription": "Rechercher parmi l'offre de données de {title}.",
-    "modifyCriteria": "Veuillez modifier les critères de recherche.",
-    "noFurtherItemsFound": "Aucun autre élément n'est disponible.",
-    "noItemsFound": "Aucun élément trouvé pour les filtres sélectionnés.",
-    "noOptions": "Aucune information saisie",
-    "notEqualTo": "différent de",
-    "notFullySupported": "Toutes les options ne sont pas forcément prises en charge",
-    "notSupported": "La recherche d'éléments n'est pas pris en charge par l'API.",
-    "placeholder": "Rechercher...",
-    "selectCollections": "Sélectionnez une ou plusieurs collections...",
-    "selectForItemSearch": "Sélectionner pour la recherche d'élément",
+    "matches": "",
+    "metaDescription": "",
+    "modifyCriteria": "",
+    "noFurtherItemsFound": "",
+    "noItemsFound": "",
+    "noOptions": "",
+    "notEqualTo": "",
+    "notFullySupported": "",
+    "notSupported": "",
+    "placeholder": "",
+    "selectCollections": "",
+    "selectForItemSearch": "",
     "sortOptions": {
-      "datetime": "Date et heure",
-      "id": "Identifiant",
-      "title": "Titre"
+      "datetime": "",
+      "id": "",
+      "title": ""
     },
-    "spatialExtent": "Étendue spatiale",
+    "spatialExtent": "",
     "tabs": {
-      "collections": "Rechercher des collections",
-      "items": "Rechercher des éléments"
+      "collections": "",
+      "items": ""
     },
-    "temporalExtent": "Étendue temporelle",
-    "title": "Rechercher",
-    "useInItemSearch": "Ouvrir la collection dans la recherche d'élément | Ouvrir les collections {count} dans la recherche d'élément"
+    "temporalExtent": "",
+    "title": "",
+    "useInItemSearch": ""
   },
-  "showMore": "Montrer plus...",
+  "showMore": "",
   "sidebar": {
-    "switchCatalog": "Changer de catalogue"
+    "switchCatalog": "Switch Catalogue"
   },
   "sort": {
     "asc": {
-      "label": "Ordre croissant",
-      "title": "Trier par ordre croissant (A-Z)"
+      "label": "",
+      "title": ""
     },
     "desc": {
-      "label": "Ordre décroissant",
-      "title": "Trier par ordre décroissant (Z-A)"
+      "label": "",
+      "title": ""
     },
-    "title": "Trier"
+    "title": ""
   },
   "source": {
-    "conformanceClasses": "Classes de conformité",
-    "detailsAboutSource": "À propos de la source STAC",
-    "extension": "Extension",
-    "fileFormat": "Format de fichier",
-    "id": "Identifiant",
-    "invalid": "Invalide",
-    "label": "Source",
+    "conformanceClasses": "",
+    "detailsAboutSource": "",
+    "extension": "",
+    "fileFormat": "",
+    "id": "",
+    "invalid": "",
+    "label": "",
     "language": {
-      "label": "Langue: {currentLanguage}",
-      "onlyData": "Seules les données sont disponibles dans cette langue!",
-      "onlyUI": "Seule l'interface utilisateur est disponible dans cette langue!",
-      "switch": "Changer de langue"
+      "label": "",
+      "onlyData": "",
+      "onlyUI": "",
+      "switch": ""
     },
-    "locatedAt": "Le fichier de métadonnées STAC se trouve à l'adresse suivante :",
+    "locatedAt": "",
     "share": {
-      "email": "Courriel",
-      "label": "Partager",
-      "message": "{title} est disponible à l'adresse {url}",
-      "sharePageWithOthers": "Partagez l'URL de cette page:",
-      "title": "Partager",
-      "twitter": "Twitter",
-      "withOthers": "Partagez cette page"
+      "email": "",
+      "label": "",
+      "message": "",
+      "sharePageWithOthers": "",
+      "title": "",
+      "twitter": "",
+      "withOthers": ""
     },
-    "stacExtension": "Extension du STAC",
-    "stacVersion": "Version STAC",
-    "statistics": "Statistiques",
-    "title": "Données source",
-    "valid": "Valide",
-    "validating": "Validation...",
-    "validationNA": "s.o.",
+    "stacExtension": "",
+    "stacVersion": "",
+    "statistics": "",
+    "title": "",
+    "valid": "",
+    "validating": "",
+    "validationNA": "",
     "validationParams": {
-      "additionalProperty": "propriété supplémentaire",
-      "allowedValue": "valeur autorisée",
-      "allowedValues": "valeurs autorisées",
-      "comparison": "comparaison",
-      "depsCount": "nombre",
-      "exclusive": "excluant la limite",
-      "failingKeyword": "mot-clé en échec",
-      "format": "format",
-      "i": "premier élément",
-      "j": "second élément",
-      "limit": "limite",
-      "maxContains": "contient au plus",
-      "minContains": "contient au moins",
-      "missingProperty": "propriété manquante",
-      "multipleOf": "multiple de",
-      "passingSchemas": "schémas conformes",
-      "pattern": "modèle",
-      "property": "propriété",
-      "propertyName": "nom de propriété",
-      "type": "type"
+      "additionalProperty": "",
+      "allowedValue": "",
+      "allowedValues": "",
+      "comparison": "",
+      "depsCount": "",
+      "exclusive": "",
+      "failingKeyword": "",
+      "format": "",
+      "i": "",
+      "j": "",
+      "limit": "",
+      "maxContains": "",
+      "minContains": "",
+      "missingProperty": "",
+      "multipleOf": "",
+      "passingSchemas": "",
+      "pattern": "",
+      "property": "",
+      "propertyName": "",
+      "type": ""
     },
     "validationReport": {
-      "disclaimer": "Le rapport de validation est généré à partir de schémas, qui souvent ne sont pas exhaustifs. À ce titre, ils ne peuvent pas couvrir tous les aspects de la spécification STAC et de ses extensions. Le rapport de validation n'est pas une garantie que l'entité STAC est pleinement conforme à la spécification et à ses extensions.",
-      "result": "Résultat",
-      "title": "Rapport de validation"
+      "disclaimer": "",
+      "result": "",
+      "title": ""
     }
   },
-  "stacAssets": "Ressource | Ressources",
+  "stacAssets": "",
   "stacCatalog": "Catalogue | Catalogues",
-  "stacCollection": "Collection | Collections",
-  "stacItem": "Élément | Éléments",
-  "submit": "Soumettre",
+  "stacCollection": "",
+  "stacItem": "",
+  "submit": "",
   "table": {
-    "emptyFilteredText": "Il n'y a aucun enregistrement correspondant à votre requête",
-    "emptyText": "Il n'y a aucun enregistrement à afficher",
+    "emptyFilteredText": "",
+    "emptyText": "",
     "sort": {
-      "asc": "Cliquez pour trier par ordre croissant",
-      "clear": "Cliquez pour effacer le tri",
-      "desc": "Cliquer pour trier par ordre décroissant"
+      "asc": "",
+      "clear": "",
+      "desc": ""
     }
   },
-  "thumbnails": "Aperçus",
+  "thumbnails": "",
   "tree": {
-    "moreCollectionPagesAvailable": "plus de pages disponibles pour la Collection",
-    "noChildren": "Aucun enfant n'est disponible."
+    "moreCollectionPagesAvailable": "",
+    "noChildren": ""
   },
   "view": {
     "list": {
-      "label": "Liste",
-      "title": "Afficher sous forme de liste"
+      "label": "",
+      "title": ""
     },
     "tiles": {
-      "label": "Tuiles",
-      "title": "Afficher sous forme de tuiles"
+      "label": "",
+      "title": ""
     },
-    "title": "Options d'affichage"
+    "title": ""
   }
 }
