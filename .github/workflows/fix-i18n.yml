@@ -1,7 +1,11 @@
 name: Fix CrowdIn commits
-on: workflow_dispatch
+on:
+  pull_request:
+    types:
+      - unlabeled
 jobs:
   deploy:
+    if: ${{ github.event.label.name == 'CI run required' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/setup-node@v4
