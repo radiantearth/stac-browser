@@ -21,8 +21,8 @@
           <b-icon-check v-if="locale === l.code" />
           <b-icon-blank v-else />
           <span class="title">
-            {{ l.native }}
-            <template v-if="l.global && l.global !== l.native"> / {{ l.global }}</template>
+            <span :lang="l.code">{{ l.native }}</span>
+            <template v-if="l.global && l.global !== l.native"> / <span lang="en">{{ l.global }}</span></template>
           </span>
           <b-icon-exclamation-triangle v-if="supportsLanguageExt && (!l.ui || !l.data)" :title="l.ui ? $t('source.language.onlyUI') : $t('source.language.onlyData')" class="ml-2" />
         </b-dropdown-item>

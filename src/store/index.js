@@ -636,7 +636,7 @@ function getStore(config, router) {
 
         if (cx.state.storeLocale && userSelected) {
           const storage = new BrowserStorage();
-          locale = storage.set('locale', locale);
+          storage.set('locale', locale);
         }
 
         // Locale for UI
