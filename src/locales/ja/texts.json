@@ -12,8 +12,7 @@
       "main": "推奨"
     },
     "copyGdalVfsUrl": {
-      "generic": "GDAL VFS URLをコピー",
-      "withSource": ""
+      "generic": "GDAL VFS URLをコピー"
     },
     "copyUrl": {
       "generic": "URLをコピー",
@@ -30,8 +29,7 @@
       "metadata": "メタデータ"
     },
     "showOnMap": "地図上に表示",
-    "showThumbnail": "サムネイルを表示",
-    "shown": ""
+    "showThumbnail": "サムネイルを表示"
   },
   "authentication": {
     "button": {
@@ -67,7 +65,6 @@
     "latestVersion": "最新バージョン:",
     "otherVersionsNotice": "この {type} は非推奨では *ありません* が、他のバージョンが利用可能です:",
     "otherVersionsTitle": "他のバージョンが利用可能です",
-    "outdatedTitle": "",
     "predecessorVersion": "前のバージョン",
     "successorVersion": "次のバージョン",
     "warning": "この {type} は非推奨であり、いつでも削除される可能性があります。 できるだけ早く移行すべきです。新しいプロジェクトで使用しないでください。"
@@ -131,7 +128,6 @@
   "items": {
     "filter": "フィルター",
     "hideFilter": "フィルターを非表示",
-    "noTime": "",
     "noneAvailableForCollection": "このコレクションに利用可能なアイテムはありません。",
     "showFilter": "フィルターを表示"
   },
@@ -232,7 +228,6 @@
     "matches": "マッチ",
     "metaDescription": "{title} のデータを検索します。",
     "modifyCriteria": "検索条件を変更してください。",
-    "noFurtherItemsFound": "",
     "noItemsFound": "指定されたフィルターにアイテムが見つかりませんでした。",
     "noOptions": "まだ何も入力されていません",
     "notEqualTo": "等しくない",
@@ -273,7 +268,6 @@
   "source": {
     "conformanceClasses": "準拠クラス",
     "detailsAboutSource": "STACソースの詳細",
-    "extension": "",
     "fileFormat": "ファイル形式",
     "id": "ID",
     "invalid": "無効",
@@ -294,35 +288,11 @@
       "twitter": "Twitter",
       "withOthers": "このページを共有しましょう"
     },
-    "stacExtension": "",
-    "stacVersion": "",
     "statistics": "統計",
     "title": "ソースデータ",
     "valid": "有効",
     "validating": "検証中...",
-    "validationNA": "",
-    "validationParams": {
-      "additionalProperty": "",
-      "allowedValue": "",
-      "allowedValues": "",
-      "comparison": "",
-      "depsCount": "",
-      "exclusive": "",
-      "failingKeyword": "",
-      "format": "",
-      "i": "",
-      "j": "",
-      "limit": "",
-      "maxContains": "",
-      "minContains": "",
-      "missingProperty": "",
-      "multipleOf": "",
-      "passingSchemas": "",
-      "pattern": "",
-      "property": "",
-      "propertyName": "",
-      "type": ""
-    },
+    "validationParams": {},
     "validationReport": {
       "disclaimer": "検証レポートはスキーマに基づいて生成されますが、網羅していないことがあります。 これらはSTAC仕様とその拡張のすべてをカバーするわけではありません。 この検証レポートは、STACエンティティが仕様およびその拡張に完全に準拠している保証ではありません。",
       "result": "結果",
@@ -345,8 +315,7 @@
   },
   "thumbnails": "サムネイル",
   "tree": {
-    "moreCollectionPagesAvailable": "さらに利用可能なページがあります",
-    "noChildren": ""
+    "moreCollectionPagesAvailable": "さらに利用可能なページがあります"
   },
   "view": {
     "list": {
