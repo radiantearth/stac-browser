@@ -21,7 +21,7 @@
     },
     "currentlyShown": "Este é o recurso que está a ser mostrado.",
     "download": {
-      "generic": "Download",
+      "generic": "",
       "withSource": "Download de {source}"
     },
     "inItems": "Recurso em Itens | Recursos em Itens",
@@ -59,7 +59,7 @@
     "true": "sim"
   },
   "copy": "Cópia",
-  "default": "Default",
+  "default": "",
   "defaultWithValue": "Valor default ({value})",
   "deprecated": "Descontinuado",
   "deprecation": {
@@ -109,17 +109,17 @@
   },
   "goToCollection": {
     "description": "Ir para a coleção associada",
-    "descriptionWithTitle": "@:goToCollection.description: {title}",
+    "descriptionWithTitle": "",
     "label": "Coleção"
   },
   "goToParent": {
     "description": "Ir para o nó superior",
-    "descriptionWithTitle": "@:goToParent.description: {title}",
+    "descriptionWithTitle": "",
     "label": "Acima"
   },
   "in": "em {catalog}",
   "index": {
-    "api": "API",
+    "api": "",
     "catalog": "Catálogo",
     "load": "Carregar",
     "selectStacIndex": "... ou selecione um de {stacIndex}:",
@@ -144,11 +144,11 @@
     "zoom": {
       "in": {
         "description": "Aumentar o zoom",
-        "label": "+"
+        "label": ""
       },
       "out": {
         "description": "Diminuir o zoom",
-        "label": "-"
+        "label": ""
       }
     }
   },
@@ -176,21 +176,21 @@
   },
   "poweredBy": "Distribuído por {link}",
   "protocol": {
-    "azure": "Microsoft Azure",
+    "azure": "",
     "file": "sistema de ficheiros (local)",
-    "ftp": "FTP",
-    "gcs": "Google Cloud",
-    "oss": "Alibaba Cloud",
+    "ftp": "",
+    "gcs": "",
+    "oss": "",
     "s3": {
-      "amazonaws.com": "Amazon S3",
-      "default": "S3"
+      "amazonaws.com": "",
+      "default": ""
     }
   },
   "providers": {
     "email": "Enviar e-mail",
     "homepage": "Ir para a página inicial",
     "role": {
-      "host": "Host",
+      "host": "",
       "licensor": "Licenciador",
       "processor": "Processador",
       "producer": "Produtor"
@@ -243,7 +243,7 @@
     "selectForItemSearch": "Selecione para pesquisa de itens",
     "sortOptions": {
       "datetime": "Data e hora",
-      "id": "ID",
+      "id": "",
       "title": "Título"
     },
     "spatialExtent": "Extensão Espacial",
@@ -275,7 +275,7 @@
     "detailsAboutSource": "Detalhes da fonte STAC",
     "extension": "Extensão",
     "fileFormat": "Formato de ficheiro",
-    "id": "ID",
+    "id": "",
     "invalid": "Inválido",
     "label": "Fonte",
     "language": {
@@ -286,12 +286,12 @@
     },
     "locatedAt": "O ficheiro de metadados STAC está localizado em:",
     "share": {
-      "email": "E-mail",
+      "email": "",
       "label": "Partilhar",
       "message": "{title} está disponível em {url}",
       "sharePageWithOthers": "Partilhe o URL desta página onde quiser:",
       "title": "Partilhar",
-      "twitter": "Twitter",
+      "twitter": "",
       "withOthers": "Partilhe esta página com outros"
     },
     "stacExtension": "Extensão STAC",
@@ -300,7 +300,7 @@
     "title": "Dados-fonte",
     "valid": "Válido",
     "validating": "A validar...",
-    "validationNA": "n/a",
+    "validationNA": "",
     "validationParams": {
       "additionalProperty": "propriedade adicional",
       "allowedValue": "valor permitido",
@@ -332,7 +332,7 @@
   "stacAssets": "Recurso | Recursos",
   "stacCatalog": "Catálogo | Catálogos",
   "stacCollection": "Coleção | Coleções",
-  "stacItem": "Item | Items",
+  "stacItem": "",
   "submit": "Submeter",
   "table": {
     "emptyFilteredText": "Não há registos que correspondam ao seu pedido",
@@ -343,7 +343,7 @@
       "desc": "Clique para ordenar por ordem decrescente"
     }
   },
-  "thumbnails": "Thumbnails",
+  "thumbnails": "",
   "tree": {
     "moreCollectionPagesAvailable": "mais páginas disponíveis para a Coleção",
     "noChildren": "Não há nós-filho disponíveis."
