@@ -6,7 +6,7 @@
       <b-icon-download v-else />
       {{ buttonText }}
     </b-button>
-    <CopyButton variant="primary" :copyText="href">
+    <CopyButton variant="primary" :copyText="href" :title="href">
       {{ copyButtonText }}
     </CopyButton>
     <b-button v-if="hasShowButton" @click="show" variant="primary">
