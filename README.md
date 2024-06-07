@@ -118,7 +118,7 @@ The following languages are currently supported:
 
 - German (Germany, Switzerland)
 - Spanish
-- English (US, UK)
+- English (International, US, UK)
 - French (Canada, France, Switzerland)
 - Italian (Italy, Switzerland)
 - Romanian

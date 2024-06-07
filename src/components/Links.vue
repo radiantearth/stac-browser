@@ -61,7 +61,8 @@ export default {
         }
         return summary;
       }, {});
-      return Object.values(groups).sort((g1, g2) => g1.label.localeCompare(g2.label, this.uiLanguage));
+      const collator = new Intl.Collator(this.uiLanguage);
+      return Object.values(groups).sort((g1, g2) => collator.compare(g1.label, g2.label));
     },
     hasGroups() {
       return this.groups.some(group => group.rel.length > 0 && group.links.length >= 2);

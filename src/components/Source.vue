@@ -206,7 +206,8 @@ export default {
         }
       }
       
-      return languages.sort((a,b) => a.global.localeCompare(b.global, this.uiLanguage));
+      const collator = new Intl.Collator(this.uiLanguage);
+      return languages.sort((a,b) => collator.compare(a.global, b.global));
     }
   },
   methods: {

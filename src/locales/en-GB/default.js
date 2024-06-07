@@ -4,5 +4,5 @@ export default Utils.mergeDeep(
     fields: require('./fields.json')
   },
   require('./texts.json'),
-  require('../en/custom.json')
+  require('./custom.json')
 );

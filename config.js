@@ -13,6 +13,7 @@ module.exports = {
         "es",
         "en",
 //      "en-GB",
+//      "en-US",
         "fr",
 //      "fr-CA",
 //      "fr-CH",
