@@ -1,8 +1,5 @@
 name: Fix CrowdIn commits
-on:
-  push:
-    branches:
-      - l10n_main2
+on: workflow_dispatch
 jobs:
   deploy:
     runs-on: ubuntu-latest
