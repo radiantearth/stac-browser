@@ -280,7 +280,7 @@ export default {
               msg = this.$t('errors.serverError');
               break;
             default:
-              msg = this.$t('errors.networkError')
+              msg = this.$t('errors.networkError');
               break;
           }
           throw new Error(msg);
