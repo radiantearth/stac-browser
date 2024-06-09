@@ -121,9 +121,9 @@ export default {
     },
     filename() {
       if (typeof this.data['file:local_path'] === 'string') {
-        return this.getFilename(this.data['file:local_path']);
+        return URI(this.data['file:local_path']).filename();
       }
-      return this.getFilename(this.href);
+      return this.parsedHref.filename();
     },
     downloadProps() {
       if (this.hasDownloadButton && !this.useAltDownloadMethod) {
@@ -142,16 +142,10 @@ export default {
       if (!this.isBrowserProtocol || !window.isSecureContext) {
         return false;
       }
-      else if (this.data) {
+      else if (typeof this.data.method === 'string' && this.method.toUpperCase() !== 'GET') {
         return true;
       }
-      else if (this.data.method && this.method !== 'GET') {
-        return true;
-      }
-      else if (Utils.size(this.data.headers) > 0) {
-        return true;
-      }
-      else if (Utils.size(this.requestHeaders) > 0) {
+      else if (Utils.size(this.data.headers) > 0 || Utils.size(this.requestHeaders) > 0) {
         return true;
       }
       return false;
@@ -191,13 +185,16 @@ export default {
       }
       return this.getRequestUrl(this.data.href, baseUrl);
     },
+    parsedHref() {
+      return URI(this.href);
+    },
     from() {
       if (this.isGdalVfs) {
         let type = this.href.match(/^\/vsi([a-z\d]+)(_streaming)?\//);
-        return this.protocolName(type, this.href);
+        return this.protocolName(type);
       }
       else {
-        return this.protocolName(this.protocol, this.href);
+        return this.protocolName(this.protocol);
       }
     },
     browserCanOpenFile() {
@@ -232,9 +229,6 @@ export default {
     }
   },
   methods: {
-    getFilename(path) {
-      return path.split(/[\\/]/).pop();
-    },
     async altDownload() {
       if (!window.isSecureContext) {
         window.location.href = this.href;
@@ -264,6 +258,7 @@ export default {
         // Use fetch because stacRequest uses axios
         // and axios doesn't support responseType: 'stream'
         const res = await fetch(url, options);
+        console.log(res);
         if (res.status >= 400) {
           let msg;
           switch(res.status) {
@@ -286,7 +281,15 @@ export default {
           throw new Error(msg);
         }
 
-        const fileStream = StreamSaver.createWriteStream(this.filename);
+        let filename = this.filename;
+        const contentDisposition = res.headers.get('content-disposition');
+        if (typeof contentDisposition === 'string') {
+          const parts = contentDisposition.match(/filename=(?:"|)([^"]+)(?:"|)(?:;|$)/);
+          if (parts) {
+            filename = parts[1];
+          }
+        }
+        const fileStream = StreamSaver.createWriteStream(filename);
 
         // Prevent the user from leaving the page while the download is in progress
         // As this is not a normal download a user need to stay on the page for the download to complete
@@ -312,22 +315,19 @@ export default {
         this.loading = false;
       }
     },
-    protocolName(protocol, href = null) {
+    protocolName(protocol) {
       if (typeof protocol !== 'string') {
         return '';
       }
       switch(protocol.toLowerCase()) {
         case 's3':
-          if (href) {
-            try {
-              const uri = new URI(href);
-              const key = `protocol.s3.${uri.domain()}`;
-              if (this.$te(key)) {
-                return this.$t(key);
-              }
-            } catch (e) {
-              // Fall back to the default
+          try {
+            const key = `protocol.s3.${this.parsedHref.domain()}`;
+            if (this.$te(key)) {
+              return this.$t(key);
             }
+          } catch (e) {
+            // Fall back to the default
           }
           return this.$t('protocol.s3.default');
         case 'abfs':
