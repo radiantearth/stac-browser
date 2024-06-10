@@ -276,12 +276,6 @@ export default {
     if (authConfig) {
       storage.remove('authConfig');
       await this.$store.dispatch('config', { authConfig });
-      // try {
-      //   await this.$store.getters['auth/method'].loginCallback();
-      // }
-      // catch (error) {
-      //   this.showError(error);
-      // }
     }
   },
   mounted() {
