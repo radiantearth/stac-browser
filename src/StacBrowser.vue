@@ -42,8 +42,7 @@ import STAC from './models/stac';
 import Utils from './utils';
 import URI from 'urijs';
 
-import I18N from '@radiantearth/stac-fields/I18N';
-import { translateFields, API_LANGUAGE_CONFORMANCE, loadMessages } from './i18n';
+import { API_LANGUAGE_CONFORMANCE } from './i18n';
 import { getBest, prepareSupported } from './locale-id';
 import BrowserStorage from "./browser-store";
 import Authentication from "./components/Authentication.vue";
@@ -145,13 +144,6 @@ export default {
         if (!locale) {
           return;
         }
-
-        // Update stac-fields
-        I18N.locales = [locale];
-        I18N.translate = translateFields;
-
-        // Load messages
-        await loadMessages(locale);
 
         // Set the locale for vue-i18n
         this.$root.$i18n.locale = locale;

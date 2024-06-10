@@ -11,6 +11,8 @@ import STAC from '../models/stac';
 import auth from './auth.js';
 import { addQueryIfNotExists, isAuthenticationError, Loading, processSTAC, proxyUrl, unproxyUrl, stacRequest } from './utils';
 import { getBest } from '../locale-id';
+import I18N from '@radiantearth/stac-fields/I18N';
+import { translateFields, executeCustomFunctions, loadMessages } from '../i18n';
 import { TYPES } from "../components/ApiCapabilitiesMixin";
 import BrowserStorage from "../browser-store.js";
 
@@ -642,7 +644,7 @@ function getStore(config, router) {
 
         if (cx.state.storeLocale && userSelected) {
           const storage = new BrowserStorage();
-          locale = storage.set('locale', locale);
+          storage.set('locale', locale);
         }
 
         // Locale for UI
@@ -651,6 +653,16 @@ function getStore(config, router) {
         let dataLanguageCodes = cx.state.dataLanguages.map(l => l.code);
         let dataLanguageFallback = cx.state.dataLanguages.length > 0 ? cx.state.dataLanguages[0].code : uiLanguage;
         let dataLanguage = getBest(dataLanguageCodes, locale, dataLanguageFallback);
+
+        // Load messages
+        await loadMessages(uiLanguage);
+
+        // Update stac-fields
+        I18N.setLocales([uiLanguage, cx.state.fallbackLocale]);
+        I18N.setTranslator(translateFields);
+
+        // Execute other custom functions required to localize
+        await executeCustomFunctions(uiLanguage);
 
         cx.commit('languages', {dataLanguage, uiLanguage});
         cx.commit('setQueryParameter', { type: 'state', key: 'language', value: locale });

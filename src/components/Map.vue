@@ -1,8 +1,8 @@
 <template>
   <div class="map-container">
     <l-map class="map" v-if="show" :class="stac.type" @ready="init" :options="mapOptions">
-      <l-control-fullscreen :key="`z${ix}`" :options="fullscreenOptions" />
-      <l-control-zoom :key="`z${ix}`" v-bind="zoomControlTexts" position="topleft" />
+      <l-control-fullscreen :key="`fullscreen${ix}`" :options="fullscreenOptions" />
+      <l-control-zoom :key="`zoom${ix}`" v-bind="zoomControlTexts" position="topleft" />
       <l-control-layers v-if="showLayerControl" position="bottomleft" ref="layerControl" />
       <component
         v-for="basemap of basemaps" :is="basemap.is" :key="basemap.key"

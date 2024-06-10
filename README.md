@@ -116,14 +116,14 @@ You need to change the [`locale`](docs/options.md#locale) and [`supportedLocales
 
 The following languages are currently supported:
 
-- de: German (Germany, Switzerland)
-- es: Spanish
-- en: English (US, UK)
-- fr: French (Canada, France, Switzerland)
-- it: Italian (Italy, Switzerland)
-- ro: Romanian
-- ja: Japanese
-- pt: Portuguese
+- German (Germany, Switzerland)
+- Spanish
+- English (International, US, UK)
+- French (Canada, France, Switzerland)
+- Italian (Italy, Switzerland)
+- Romanian
+- Japanese
+- Portuguese (Brazil, Portugal)
 
 We manage the translations in Crowdin, please see <https://crowdin.com/project/stac-browser/> for details.
 

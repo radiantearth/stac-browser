@@ -18,8 +18,8 @@ export function stacRequestOptions(cx, link) {
       href: link
     };
   }
-  // Return if the link is not an object
-  if (!Utils.isObject(link) && typeof link.href === 'string') {
+  // Return if the link is not an object or doesn't contain an href
+  if (!Utils.isObject(link) || typeof link.href !== 'string') {
     return {};
   }
 
@@ -42,7 +42,7 @@ export function stacRequestOptions(cx, link) {
 
   // Combine all options for axios request
   return {
-    method: link.method === 'string' ? link.method.toLowerCase() : 'get',
+    method: typeof link.method === 'string' ? link.method.toLowerCase() : 'get',
     url,
     headers,
     data: link.body
