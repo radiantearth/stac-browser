@@ -738,7 +738,7 @@ function getStore(config, router) {
           cx.commit('updateLoading', { url, show, loadApi });
           return;
         }
-        else if (!data || (data instanceof STAC && data.isPotentiallyIncomplete())) {
+        else if (!data || data instanceof Error || (data instanceof STAC && data.isPotentiallyIncomplete())) {
           cx.commit('loading', { url, loading });
           try {
             let response = await stacRequest(cx, url);
@@ -746,6 +746,8 @@ function getStore(config, router) {
               throw new BrowserError(i18n.t('errors.invalidJsonObject'));
             }
             data = new STAC(response.data, url, path);
+            cx.commit('loaded', { url, data });
+
             if (show) {
               // If we prefer another language abort redirect to the new language
               let localeLink = data.getLocaleLink(cx.state.dataLanguage);
@@ -754,8 +756,6 @@ function getStore(config, router) {
                 return;
               }
             }
-
-            cx.commit('loaded', { url, data });
 
             if (!cx.getters.root) {
               let root = data.getLinkWithRel('root');
@@ -775,7 +775,7 @@ function getStore(config, router) {
             if (!noRetry && cx.state.authConfig && isAuthenticationError(error)) {
               await cx.dispatch('tryLogin', {
                 url,
-                action: () => cx.dispatch('load', Object.assign({noRetry: true}, args))
+                action: () => cx.dispatch('load', Object.assign({noRetry: true, force: true, show: true}, args))
               });
               return;
             }
@@ -889,7 +889,7 @@ function getStore(config, router) {
           if (!noRetry && cx.state.authConfig && isAuthenticationError(error)) {
             await cx.dispatch('tryLogin', {
               url: link.href,
-              action: () => cx.dispatch('loadApiItems', Object.assign({noRetry: true}, args))
+              action: () => cx.dispatch('loadApiItems', Object.assign({noRetry: true, force: true}, args))
             });
             return;
           }
@@ -947,7 +947,7 @@ function getStore(config, router) {
           if (!noRetry && cx.state.authConfig && isAuthenticationError(error)) {
             await cx.dispatch('tryLogin', {
               url: link.href,
-              action: () => cx.dispatch('loadNextApiCollections', Object.assign({noRetry: true}, args))
+              action: () => cx.dispatch('loadNextApiCollections', Object.assign({noRetry: true, force: true}, args))
             });
             return;
           }
