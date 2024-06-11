@@ -35,10 +35,29 @@
   },
   "authentication": {
     "button": {
+      "login": "Login",
+      "logout": "Logout",
       "title": "Fornisci o aggiorna le tue credenziali"
     },
+    "chooseMethod": "Scegliere il metodo di autenticazione",
     "description": "La pagina richiesta è ad accesso controllato. Inserisci i tuoi dati di autenticazione nel campo di testo sottostante.",
-    "title": "Accesso"
+    "loggedOut": "Sei stato disconnesso con successo. Puoi chiudere questa finestra ora.",
+    "password": "Password",
+    "required": "Autenticazione richiesta",
+    "schemeTypes": {
+      "s3": "S3",
+      "planetaryComputer": "Microsoft Planetary Computer",
+      "earthdata": "Earthdata",
+      "signedUrl": "URL firmato",
+      "oauth2": "OAuth 2",
+      "apiKey": "Chiave API",
+      "openIdConnect": "OpenId Connect"
+    },
+    "title": "Accesso",
+    "unauthorized": "Non hai i permessi per accedere a questi dati. Effettua il login.",
+    "unsupported": "Non supportato",
+    "unsupportedLong": "Il metodo di autenticazione {method} non è supportato dal browser STAC.",
+    "user": "Utente"
   },
   "browse": "Esplora",
   "cancel": "Annulla",
