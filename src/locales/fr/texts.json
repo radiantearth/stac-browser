@@ -35,12 +35,29 @@
   },
   "authentication": {
     "button": {
-      "authenticate": "Authentifiez vous",
-      "authenticated": "Authentifié",
+      "login": "",
+      "logout": "",
       "title": "Saisir ou mettre à jour vos informations d'authentification"
     },
+    "chooseMethod": "",
     "description": "La page demandée nécessite une authentification. Veuillez fournir vos informations d'authentification dans le champ de texte ci-dessous.",
-    "title": "Authentification"
+    "loggedOut": "",
+    "password": "",
+    "required": "",
+    "schemeTypes": {
+      "s3": "",
+      "planetaryComputer": "",
+      "earthdata": "",
+      "signedUrl": "",
+      "oauth2": "",
+      "apiKey": "",
+      "openIdConnect": ""
+    },
+    "title": "Authentification",
+    "unauthorized": "",
+    "unsupported": "",
+    "unsupportedLong": "",
+    "user": ""
   },
   "browse": "Parcourir",
   "cancel": "Annuler",
