@@ -38,6 +38,7 @@
       "title": "Forneça ou atualize as suas credenciais"
     },
     "description": "A página solicitada requer autenticação. Por favor, forneça os detalhes da sua autenticação no campo de texto abaixo.",
+    "schemeTypes": {},
     "title": "Autenticação"
   },
   "browse": "Navegar",
