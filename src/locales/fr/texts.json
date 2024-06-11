@@ -45,7 +45,7 @@
     "password": "Mot de passe",
     "required": "Authentification requise",
     "schemeTypes": {
-      "http": "",
+      "http": "HTTP {scheme}",
       "s3": "S3",
       "signedUrl": "URL signée",
       "oauth2": "OAuth 2",
