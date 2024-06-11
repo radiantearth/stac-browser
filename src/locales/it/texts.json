@@ -50,7 +50,7 @@
       "signedUrl": "URL firmato",
       "oauth2": "OAuth 2",
       "apiKey": "Chiave API",
-      "openIdConnect": "OpenId Connect"
+      "openIdConnect": "OpenID Connect"
     },
     "title": "Accesso",
     "unauthorized": "Non hai i permessi per accedere a questi dati. Effettua il login.",
