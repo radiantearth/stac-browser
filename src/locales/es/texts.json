@@ -35,28 +35,28 @@
   },
   "authentication": {
     "button": {
-      "login": "",
-      "logout": "",
+      "login": "Entrar",
+      "logout": "Salir",
       "title": "Proporciona o actualiza tus credenciales"
     },
-    "chooseMethod": "",
+    "chooseMethod": "Elija el método de autenticación",
     "description": "La página solicitada requiere autenticación. Por favor proporcione sus datos de autenticación en el campo de texto que aparece a continuación.",
-    "loggedOut": "",
-    "password": "",
-    "required": "",
+    "loggedOut": "Ha cerrado la sesión con éxito. Ahora puede cerrar esta ventana.",
+    "password": "Contraseña",
+    "required": "Se necesita autenticación",
     "schemeTypes": {
-      "http": "",
-      "s3": "",
-      "signedUrl": "",
-      "oauth2": "",
-      "apiKey": "",
-      "openIdConnect": ""
+      "http": "HTTP {scheme}",
+      "s3": "S3",
+      "signedUrl": "URL Firmada",
+      "oauth2": "OAuth 2",
+      "apiKey": "Llave de API",
+      "openIdConnect": "OpenID Connect"
     },
     "title": "Autenticación",
-    "unauthorized": "",
-    "unsupported": "",
-    "unsupportedLong": "",
-    "user": ""
+    "unauthorized": "No tiene permiso para acceder a estos datos. Por favor, inicie sesión.",
+    "unsupported": "No compatible",
+    "unsupportedLong": "Lo sentimos, el método de autenticación {method} no es compatible con STAC Browser.",
+    "user": "Usuario"
   },
   "browse": "Explorar",
   "cancel": "Cancelar",
