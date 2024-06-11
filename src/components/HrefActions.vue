@@ -394,7 +394,7 @@ export default {
         await this.$store.dispatch('auth/requestLogin');
       }
       else {
-        const name = this.$i18n.t(`authentication.schemeTypes.${method.type}`);
+        const name = this.$i18n.t(`authentication.schemeTypes.${method.type}`, method);
         const message = this.$i18n.t('authentication.unsupportedLong', {method: name});
         this.$root.$emit('error', new Error(message), this.$i18n.t('authentication.unsupported'));
       }

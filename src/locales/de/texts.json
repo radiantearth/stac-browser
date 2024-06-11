@@ -45,9 +45,8 @@
     "password": "Passwort",
     "required": "Anmeldung erforderlich",
     "schemeTypes": {
+      "http": "HTTP {scheme}",
       "s3": "S3",
-      "planetaryComputer": "Microsoft Planetary Computer",
-      "earthdata": "Earthdata",
       "signedUrl": "Signierte URL",
       "oauth2": "OAuth 2",
       "apiKey": "API-Schlüssel",
