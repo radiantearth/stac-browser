@@ -35,12 +35,29 @@
   },
   "authentication": {
     "button": {
-      "authenticate": "Authenticate",
-      "authenticated": "Authenticated",
+      "login": "Log in",
+      "logout": "Log out",
       "title": "Provide or update your credentials"
     },
+    "chooseMethod": "Choose authentication method",
     "description": "The requested page requires authentication. Please provide your authentication details in the text field below.",
-    "title": "Authentication"
+    "loggedOut": "You've been logged out successfully. You can close this window now.",
+    "password": "Password",
+    "required": "Authentication required",
+    "schemeTypes": {
+      "s3": "S3",
+      "planetaryComputer": "Microsoft Planetary Computer",
+      "earthdata": "Earthdata",
+      "signedUrl": "Signed URL",
+      "oauth2": "OAuth 2",
+      "apiKey": "API key",
+      "openIdConnect": "OpenID Connect"
+    },
+    "title": "Authentication",
+    "unauthorized": "You don't have permission to access this data. Please log in.",
+    "unsupported": "Unsupported",
+    "unsupportedLong": "Sorry, the authentication method {method} is not supported by STAC Browser.",
+    "user": "User"
   },
   "browse": "Browse",
   "cancel": "Cancel",

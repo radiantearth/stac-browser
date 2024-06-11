@@ -35,8 +35,6 @@
   },
   "authentication": {
     "button": {
-      "authenticate": "Authentifiez vous",
-      "authenticated": "Authentifié",
       "title": "Saisir ou mettre à jour vos informations d'authentification"
     },
     "description": "La page demandée nécessite une authentification. Veuillez fournir vos informations d'authentification dans le champ de texte ci-dessous.",

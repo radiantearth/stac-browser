@@ -33,8 +33,6 @@
   },
   "authentication": {
     "button": {
-      "authenticate": "認証",
-      "authenticated": "認証済",
       "title": "資格情報の入力または更新"
     },
     "description": "要求されたページには認証が必要です。以下のテキストフィールドに認証情報を入力してください。",

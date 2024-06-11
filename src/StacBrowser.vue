@@ -1,6 +1,6 @@
 <template>
   <b-container id="stac-browser">
-    <Authentication v-if="doAuth.length > 0" />
+    <Authentication v-if="showLogin" />
     <ErrorAlert v-if="globalError" dismissible class="global-error" v-bind="globalError" @close="hideError" />
     <Sidebar v-if="sidebar" />
     <!-- Header -->
@@ -45,6 +45,7 @@ import URI from 'urijs';
 import { API_LANGUAGE_CONFORMANCE } from './i18n';
 import { getBest, prepareSupported } from './locale-id';
 import BrowserStorage from "./browser-store";
+import Authentication from "./components/Authentication.vue";
 
 Vue.use(AlertPlugin);
 Vue.use(ButtonGroupPlugin);
@@ -93,7 +94,7 @@ export default {
   router,
   store,
   components: {
-    Authentication: () => import('./components/Authentication.vue'),
+    Authentication,
     ErrorAlert,
     Sidebar: () => import('./components/Sidebar.vue'),
     StacHeader
@@ -109,13 +110,14 @@ export default {
     };
   },
   computed: {
-    ...mapState(['allowSelectCatalog', 'data', 'dataLanguage', 'description', 'doAuth', 'globalError', 'stateQueryParameters', 'title', 'uiLanguage', 'url']),
+    ...mapState(['allowSelectCatalog', 'data', 'dataLanguage', 'description', 'globalError', 'stateQueryParameters', 'title', 'uiLanguage', 'url']),
     ...mapState({
       detectLocaleFromBrowserFromVueX: 'detectLocaleFromBrowser',
       supportedLocalesFromVueX: 'supportedLocales',
       storeLocaleFromVueX: 'storeLocale'
     }),
     ...mapGetters(['displayCatalogTitle', 'fromBrowserPath', 'isExternalUrl', 'root', 'supportsConformance', 'toBrowserPath']),
+    ...mapGetters('auth', ['showLogin']),
     browserVersion() {
       if (typeof STAC_BROWSER_VERSION !== 'undefined') {
         return STAC_BROWSER_VERSION;
@@ -245,7 +247,7 @@ export default {
       }
     }
   },
-  created() {
+  async created() {
     this.$router.onReady(() => {
       this.detectLocale();
       this.parseQuery(this.$route);
@@ -268,6 +270,13 @@ export default {
       this.$store.commit(resetOp);
       this.parseQuery(to);
     });
+
+    const storage = new BrowserStorage(true);
+    const authConfig = storage.get('authConfig');
+    if (authConfig) {
+      storage.remove('authConfig');
+      await this.$store.dispatch('config', { authConfig });
+    }
   },
   mounted() {
     this.$root.$on('error', this.showError);

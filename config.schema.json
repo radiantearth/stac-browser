@@ -226,47 +226,11 @@
       "type": [
         "object"
       ],
-      "properties": {
-        "type": {
-          "type": [
-            "null",
-            "string"
-          ],
-          "enum": [
-            "query",
-            "header"
-          ]
-        },
-        "key": {
-          "type": [
-            "string"
-          ]
-        },
-        "formatter": {
-          "oneOf": [
-            {
-              "type": [
-                "null"
-              ],
-              "format": "function"
-            },
-            {
-              "type": [
-                "string"
-              ],
-              "enum": [
-                "Bearer"
-              ]
-            }
-          ]
-        },
-        "description": {
-          "type": [
-            "string",
-            "null"
-          ]
+      "allOf": [
+        {
+          "$ref": "https://stac-extensions.github.io/authentication/v1.1.0/schema.json"
         }
-      },
+      ],
       "noCLI": true,
       "noEnv": true
     }

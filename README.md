@@ -360,3 +360,4 @@ The following sponsors have provided a substantial amount of funding for STAC Br
 - [Matthias Mohr - Softwareentwicklung](https://mohr.ws) (maintenance)
 - [Spacebel](https://spacebel.com) (collection search)
 - [Planet](https://planet.com) (OpenID Connect authentication, other features, maintenance)
+- [CloudFerro](https://cloudferro.com) (authentication, Alternate Asset and Storage extensions)

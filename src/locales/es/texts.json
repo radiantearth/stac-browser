@@ -35,8 +35,6 @@
   },
   "authentication": {
     "button": {
-      "authenticate": "Autenticar",
-      "authenticated": "Autenticado",
       "title": "Proporciona o actualiza tus credenciales"
     },
     "description": "La página solicitada requiere autenticación. Por favor proporcione sus datos de autenticación en el campo de texto que aparece a continuación.",

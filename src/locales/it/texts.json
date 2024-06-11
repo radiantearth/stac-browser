@@ -35,8 +35,6 @@
   },
   "authentication": {
     "button": {
-      "authenticate": "Accedi",
-      "authenticated": "Autenticato",
       "title": "Fornisci o aggiorna le tue credenziali"
     },
     "description": "La pagina richiesta è ad accesso controllato. Inserisci i tuoi dati di autenticazione nel campo di testo sottostante.",
