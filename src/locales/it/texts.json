@@ -35,12 +35,29 @@
   },
   "authentication": {
     "button": {
-      "authenticate": "Accedi",
-      "authenticated": "Autenticato",
+      "login": "",
+      "logout": "",
       "title": "Fornisci o aggiorna le tue credenziali"
     },
+    "chooseMethod": "",
     "description": "La pagina richiesta è ad accesso controllato. Inserisci i tuoi dati di autenticazione nel campo di testo sottostante.",
-    "title": "Accesso"
+    "loggedOut": "",
+    "password": "",
+    "required": "",
+    "schemeTypes": {
+      "s3": "",
+      "planetaryComputer": "",
+      "earthdata": "",
+      "signedUrl": "",
+      "oauth2": "",
+      "apiKey": "",
+      "openIdConnect": ""
+    },
+    "title": "Accesso",
+    "unauthorized": "",
+    "unsupported": "",
+    "unsupportedLong": "",
+    "user": ""
   },
   "browse": "Esplora",
   "cancel": "Annulla",
