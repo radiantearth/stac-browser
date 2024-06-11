@@ -35,11 +35,28 @@
   },
   "authentication": {
     "button": {
+      "login": "",
+      "logout": "",
       "title": "Proporciona o actualiza tus credenciales"
     },
+    "chooseMethod": "",
     "description": "La página solicitada requiere autenticación. Por favor proporcione sus datos de autenticación en el campo de texto que aparece a continuación.",
-    "schemeTypes": {},
-    "title": "Autenticación"
+    "loggedOut": "",
+    "password": "",
+    "required": "",
+    "schemeTypes": {
+      "http": "",
+      "s3": "",
+      "signedUrl": "",
+      "oauth2": "",
+      "apiKey": "",
+      "openIdConnect": ""
+    },
+    "title": "Autenticación",
+    "unauthorized": "",
+    "unsupported": "",
+    "unsupportedLong": "",
+    "user": ""
   },
   "browse": "Explorar",
   "cancel": "Cancelar",
