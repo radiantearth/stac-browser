@@ -12,6 +12,9 @@ jobs:
         with:
           node-version: 'lts/*'
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{github.event.pull_request.head.ref}}
       - run: npm install
       - run: node helpers/fix-crowdin.js
       - name: Commit changes
