@@ -7,13 +7,15 @@
         <b-tabs v-model="activeSearch">
           <b-tab v-if="collectionSearch" :title="$t('search.tabs.collections')">
             <SearchFilter
-              :parent="parent" title="" :value="collectionFilters" type="Collections"
+              :parent="parent" title="" :value="collectionFilters" :searchLink="searchLink"
+              type="Collections"
               @input="setFilters"
             />
           </b-tab>
           <b-tab v-if="itemSearch" :title="$t('search.tabs.items')">
             <SearchFilter
-              :parent="parent" title="" :value="itemFilters" type="Global"
+              :parent="parent" title="" :value="itemFilters" :searchLink="searchLink"
+              type="Global"
               @input="setFilters"
             />
           </b-tab>
@@ -26,9 +28,11 @@
         <b-alert v-else-if="results.length === 0 && noFurtherItems" variant="info" show>{{ $t('search.noFurtherItemsFound') }}</b-alert>
         <b-alert v-else-if="results.length === 0" variant="warning" show>{{ $t('search.noItemsFound') }}</b-alert>
         <template v-else>
-          <div id="search-map" v-if="itemCollection">
-            <Map :stac="stac" :stacLayerData="itemCollection" scrollWheelZoom popover />
-          </div>
+          <b-col class="right">
+            <div id="search-map" v-if="itemCollection">
+              <Map :stac="stac" :stacLayerData="itemCollection" scrollWheelZoom popover />
+            </div>
+          </b-col>
           <Catalogs
             v-if="isCollectionSearch" :catalogs="results" collectionsOnly
             :pagination="pagination" :loading="loading" @paginate="loadResults"
@@ -103,7 +107,7 @@ export default {
       itemFilters: {},
       collectionFilters: {},
       activeSearch: 0,
-      selectedCollections: {}
+      selectedCollections: {},
     };
   },
   computed: {
@@ -258,7 +262,6 @@ export default {
       this.loading = true;
       try {
         this.link = Utils.addFiltersToLink(link, this.filters, this.itemsPerPage);
-
         let key = this.isCollectionSearch ? 'collections' : 'features';
         let response = await stacRequest(this.$store, this.link);
         if (response) {
