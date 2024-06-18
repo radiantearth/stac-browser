@@ -214,7 +214,11 @@ export default {
       if (this.context instanceof STAC) {
         baseUrl = this.context.getAbsoluteUrl();
       }
-      return this.getRequestUrl(this.data.href, baseUrl);
+      try {
+        return this.getRequestUrl(this.data.href, baseUrl);
+      } catch (e) {
+        return this.data.href;
+      }
     },
     parsedHref() {
       return URI(this.href);
@@ -289,7 +293,6 @@ export default {
         // Use fetch because stacRequest uses axios
         // and axios doesn't support responseType: 'stream'
         const res = await fetch(url, options);
-        console.log(res);
         if (res.status >= 400) {
           let msg;
           switch(res.status) {

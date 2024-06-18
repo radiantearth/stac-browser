@@ -21,14 +21,14 @@
       <template v-if="hasAlternatives">
         <b-tabs card>
           <b-tab :title="asset.name || $t('assets.alternate.main')" active>
-            <AssetAlternative :asset="asset" :context="context" :shown="shown" hasAlternatives />
+            <AssetAlternative :asset="asset" :context="context" :shown="shown" hasAlternatives @show="show" />
           </b-tab>
           <b-tab v-for="(altAsset, key) in alternatives" :title="altAsset.name || key" :key="key">
-            <AssetAlternative :asset="altAsset" :context="context" :shown="shown" hasAlternatives :key="key" />
+            <AssetAlternative :asset="altAsset" :context="context" :shown="shown" hasAlternatives :key="key" @show="show" />
           </b-tab>
         </b-tabs>
       </template>
-      <AssetAlternative v-else :asset="asset" :context="context" />
+      <AssetAlternative v-else :asset="asset" :context="context" @show="show" />
     </b-collapse>
   </b-card>
 </template>
@@ -149,6 +149,9 @@ export default {
     collapseToggled(isVisible) {
       let event = isVisible ? 'openCollapsible' : 'closeCollapsible';
       this.$store.commit(event, {type: this.type, uid: this.uid});
+    },
+    show() {
+      this.$emit('show', ...arguments);
     }
   }
 };
