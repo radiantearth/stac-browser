@@ -37,8 +37,13 @@ $grid-breakpoints: (
 );
 
 @font-face {
-  font-family: "NotesESABold";
-  src: url("https://opensciencedata.esa.int/_nuxt/fonts/notesesabol-webfont.c23d22c.ttf") format("truetype");
+  font-family: "NotesESAbold";
+  src: url("https://opensciencedata.esa.int/css/fonts/notesesabold/NotesESAbold.svgNotesESAbold.eot");
+  src: url("https://opensciencedata.esa.int/css/fonts/notesesabold/NotesESAbold.svgNotesESAbold.woff") format("woff"),
+    url("https://opensciencedata.esa.int/css/fonts/notesesabold/NotesESAbold.svgNotesESAbold.ttf") format("truetype"),
+    url("https://opensciencedata.esa.int/css/fonts/notesesabold/NotesESAbold.svgNotesESAbold.svg") format("svg");
+  font-weight: normal;
+  font-style: normal;
 }
 
 $esa-font-family: "NotesESABold";
