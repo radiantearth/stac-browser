@@ -367,7 +367,7 @@ HTTP Basic is supported according to [RFC 7617](https://datatracker.ietf.org/doc
 For OpenID Connect some additional options must be provided, which currently follow the
 [oidc-client-ts Configuration options](https://github.com/okta/okta-auth-js?tab=readme-ov-file#configuration-options).
 These options (except for `issuer`) must be provided in the property `oidcConfig`.
-The `clientId` option defaults to `stac-browser`.
+The `client_id` option defaults to `stac-browser`.
 The redirect URL for the OIDC client must be set as follows:
 
 #### Example
@@ -376,7 +376,7 @@ The redirect URL for the OIDC client must be set as follows:
 {
   type: 'openIdConnect',
   openIdConnectUrl: 'https://stac.example/.well-known/openid-configuration',
-  oidcOptions: {
+  oidcConfig: {
     client_id: 'abc123'
   }
 }
