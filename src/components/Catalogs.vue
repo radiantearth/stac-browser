@@ -21,13 +21,13 @@
     <b-alert v-if="hasSearchCritera && catalogView.length === 0" variant="warning" class="mt-2" show>{{ $t('catalogs.noMatches') }}</b-alert>
     <section class="list">
       <Loading v-if="loading" fill top />
-      <component :is="cardsComponent" v-bind="cardsComponentProps">
-        <Catalog v-for="catalog in catalogView" :catalog="catalog" :key="catalog.href">
+      <div class="row">
+        <Catalog v-for="catalog in catalogView" :catalog="catalog" :isList="isList" :key="catalog.href" >
           <template #footer="{data}">
             <slot name="catalogFooter" :data="data" />
           </template>
         </Catalog>
-      </component>
+      </div>
     </section>
     <Pagination v-if="showPagination" :pagination="pagination" @paginate="paginate" />
     <b-button v-else-if="hasMore" @click="loadMore" variant="primary" v-b-visible.300="loadMore">{{ $t('catalogs.loadMore') }}</b-button>

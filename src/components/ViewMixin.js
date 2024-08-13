@@ -5,22 +5,8 @@ export default {
     ViewButtons
   },
   computed: {
-    cardsComponent() {
-      return (this.view === 'list') ? 'div' : 'b-card-group';
-    },
-    cardsComponentProps() {
-      if (this.view === 'list') {
-        return {
-          class: [
-            'card-list'
-          ]
-        };
-      }
-      else {
-        return {
-          columns: true
-        };
-      }
+    isList() {
+      return this.view === 'list'
     },
     view: {
       get() {
