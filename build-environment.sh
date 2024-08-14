@@ -1,7 +1,7 @@
 cp -fp ./src/index_template.html ./public/index.html
 
 if [ "$STG_ENV" = "sit" ]; then
-    endpoint="https://sit-stac.geoplatform.info"
+    endpoint="https://sit.geoplatform.info"
     support="https://sit-kb.geoplatform.info"
 elif [ "$STG_ENV" = "stg" ]; then
     endpoint="https://stg.geoplatform.gov"
