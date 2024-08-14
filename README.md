@@ -1,5 +1,9 @@
 # GeoPlatform Deploy
 
+**Use the master branch for deployment to GP**
+
+**The version2.0 branch has the STAC Browser version 2 GP release**
+
 Deploying stac browser necessitates passing staging environment variables into the configuration file (./config.js) and the index file (./public/index.html). This is handled by running the build-environment.sh script. For convenience this script has been bundled into an node package script. To build and deploy the application for it's specific staging environment, follow these steps. 
 
 1. Build (per environment):
