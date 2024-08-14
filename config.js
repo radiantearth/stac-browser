@@ -1,7 +1,7 @@
 module.exports = {
-    catalogUrl: 'https://sit-stac.geoplatform.info/catalog.json',
+    catalogUrl: 'https://gp-sit-us-east-1-stac.s3.amazonaws.com/catalog.json',
     catalogTitle: "STAC Browser",
-    allowExternalAccess: false, // Must be true if catalogUrl is not given
+    allowExternalAccess: true, // Must be true if catalogUrl is not given
     allowedDomains: [],
     whitelistedExternalCatalogs: [
         "https://gp-sit-us-east-1-public-configs.s3.amazonaws.com/stac/national_map/catalog.json",
