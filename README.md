@@ -26,7 +26,7 @@ implemented as a single page application (SPA) for ease of development and to
 limit the overall number of catalog reads necessary when browsing (as catalogs
 may be nested and do not necessarily contain references to their parents).
 
-Version: **3.1.0** (supports all STAC versions between 0.6.0 and 1.0.0)
+Version: **3.2.0** (supports all STAC versions between 0.6.0 and 1.0.0)
 
 This package has also been published to npm as [`@radiantearth/stac-browser`](https://www.npmjs.com/package/@radiantearth/stac-browser).
 
@@ -137,6 +137,7 @@ The following languages are currently supported:
 - fr: French (Canada, France, Switzerland)
 - it: Italian (Italy, Switzerland)
 - ro: Romanian
+- ja: Japanese
 
 We manage the translations in Crowdin, please see <https://crowdin.com/project/stac-browser/> for details.
 
@@ -249,30 +250,75 @@ You need to provide a field `stac_browser` and then you can set any of the follo
 - `defaultThumbnailSize`
 - `displayGeoTiffByDefault`
 - `showThumbnailsAsAssets`
-- `stacLint` (can only be disabled)
 
 ### Custom extensions
 
 STAC Browser supports some non-standardized extensions to the STAC specification that you can use to improve the user-experience.
 
-1. To the [Provider Object](https://github.com/radiantearth/stac-spec/blob/master/collection-spec/collection-spec.md#provider-object) you can add an `email` (or `mail`) field with an e-mail address and the mail will be shown in the Browser, too.
-2. A link with relation type `icon` and a Browser-supported media type in any STAC entity will show an icon in the header and the lists.
+1. [Provider Object](https://github.com/radiantearth/stac-spec/blob/master/collection-spec/collection-spec.md#provider-object):
+   Add an `email` (or `mail`) field with an e-mail address and the mail will be shown in the Browser.
+2. [Alternative Assets Object](https://github.com/stac-extensions/alternate-assets?tab=readme-ov-file#alternate-asset-object):
+   Add a `name` field and it will be used as title in the tab header, the same applies for the core Asset Object.
+3. A link with relation type `icon` and a Browser-supported media type in any STAC entity will show an icon in the header and the lists of Catalogs, Collections and Items.
 
 ## Docker
 
-When building the Dockerfile, you can add the [`catalogUrl`](docs/options.md#catalogurl) 
-as a [build argument](https://docs.docker.com/engine/reference/commandline/build/#set-build-time-variables---build-arg). For example:
+### Create a custom image
+
+Building the Dockerfile without changing any build options:
 
 ```bash
-docker build -t stac-browser:v1 --build-arg catalogURL=https://planetarycomputer.microsoft.com/api/stac/v1/ .
+docker build -t stac-browser:v1 .
 ```
 
-If more arguments need to be passed to `npm run build`, you can add them to the Dockerfile as needed.
-
-To run the container:
+Run the container for a specific URL:
 
 ```bash
-docker run -p 8080:8080 stac-browser:v1
+docker run -p 8080:8080 -e SB_catalogUrl="https://earth-search.aws.element84.com/v1/" stac-browser:v1
+```
+
+STAC Browser is now available at `http://localhost:8080`
+
+---
+
+You can pass further options to STAC Browser to customize it to your needs.
+
+The build-only options
+[`pathPrefix`](docs/options.md#pathprefix) and [`historyMode`](docs/options.md#historymode)
+can be provided as a
+[build argument](https://docs.docker.com/engine/reference/commandline/build#set-build-time-variables---build-arg)
+when building the Dockerfile.
+
+For example:
+
+```bash
+docker build -t stac-browser:v1 --build-arg pathPrefix="/browser/" --build-arg historyMode=hash .
+```
+
+All other options, except the ones that are explicitly excluded from CLI/ENV usage,
+can be passed as environment variables when running the container.
+For example, to run the container with a pre-defined
+[`catalogUrl`](docs/options.md#catalogurl) and [`catalogTitle`](docs/options.md#catalogtitle):
+
+```bash
+docker run -p 8080:8080 -e SB_catalogUrl="https://earth-search.aws.element84.com/v1/" -e SB_catalogTitle="Earth Search" stac-browser:v1
+```
+
+If you want to pass all the other arguments to `npm run build` directly, you can modify to the Dockerfile as needed.
+
+STAC browser is now available at `http://localhost:8080/browser`
+
+### Use an existing image
+
+Since version 3.1.1, you can add an existing image from [Packages](https://github.com/radiantearth/stac-browser/pkgs/container/stac-browser) to your docker-compose.yml:
+```
+services:
+  stac-browser:
+    image: ghcr.io/radiantearth/stac-browser:latest
+    ports:
+      - 8080:8080
+    environment:
+      SB_catalogUrl: "https://localhost:7188"
 ```
 
 ## Contributing
@@ -308,7 +354,7 @@ You can also use one of the existing languages and provide an alternate version 
 - Translate the `.json` files, most importantly `config.json`, `fields.json` and `texts.json`.
   - Please note that you never need to translate any object keys!
   - If you base your language on another existing language (e.g. create `en-IN` based on `en`) you can delete individual files and import existing files from other languages in `default.js`.
-- Adapt the `datepicker.js` and `duration.js` files to import the existing definitions from their corresponding external packages, but you could also define the specifics yourself.
+- Adapt the `datepicker.js`, `duration.js` and `validation.js` files to import the existing definitions from their corresponding external packages, but you could also define the specifics yourself.
 - Check that your translation works by running the development server (`npm start`) and navigating to the STAC Browser instance in your browser (usually `http://localhost:8080`).
 - Once completed, please open a pull request and we'll get back to you as soon as possible.
 - After merging the PR for the first time, we'll add you to our translation management tool Crowdin: <https://crowdin.com/project/stac-browser/>. Please get in touch to get your invite!

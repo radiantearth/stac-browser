@@ -24,7 +24,6 @@ The following ways to set config options are possible:
 * [locale](#locale)
 * [fallbackLocale](#fallbacklocale)
 * [supportedLocales](#supportedlocales)
-* [stacLint](#staclint)
 * [historyMode](#historymode)
 * [pathPrefix](#pathprefix)
 * [stacProxyUrl](#stacproxyurl)
@@ -36,6 +35,8 @@ The following ways to set config options are possible:
 * [maxPreviewsOnMap](#maxpreviewsonmap)
 * [cardViewMode](#cardviewmode)
 * [cardViewSort](#cardviewsort)
+* [showKeywordsInItemCards](#showkeywordsinitemcards)
+* [showKeywordsInCatalogCards](#showkeywordsincatalogcards)
 * [showThumbnailsAsAssets](#showthumbnailsasassets)
 * [defaultThumbnailSize](#defaultthumbnailsize)
 * [crossOriginMedia](#crossoriginmedia)
@@ -112,18 +113,6 @@ In CLI, please provide the languages separated by a space, e.g. `--supportedLoca
 
 Please note that only left-to-right languages have been tested.
 I'd need help to test support for right-to-left languages.
-
-## stacLint
-
-***experimental***
-
-Enables or disables a feature that validates the STAC catalog when opening the "Source Data" popup.
-Validation uses the external service [staclint.com](https://staclint.com).
-
-Validation is automatically disabled in the following cases:
-- the host of a catalog is `localhost`, `127.0.0.1` or `::1`
-- [private query parameters](../README.md#private-query-parameters) have been set
-- `stacProxyUrl` is set
 
 ## historyMode
 
@@ -243,6 +232,14 @@ The default sorting for lists of catalogs/collections or items. One of:
 - `"asc"`: ascending sort (default)
 - `"desc"`: descending sort
 - `null`: sorted as in the source files
+
+## showKeywordsInItemCards
+
+Enables keywords in the lists of items if set to `true`. Defaults to `false`.
+
+## showKeywordsInCatalogCards
+
+Enables keywords in the lists of catalogs/collections if set to `true`. Defaults to `false`.
 
 ## showThumbnailsAsAssets
 

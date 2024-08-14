@@ -152,11 +152,6 @@
         "boolean"
       ]
     },
-    "stacLint": {
-      "type": [
-        "boolean"
-      ]
-    },
     "geoTiffResolution": {
       "type": [
         "integer"

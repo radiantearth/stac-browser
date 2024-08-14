@@ -8,6 +8,9 @@
     "title": "Anonymisiert"
   },
   "assets": {
+    "alternate": {
+      "main": "Bevorzugt"
+    },
     "copyGdalVfsUrl": {
       "generic": "Kopiere GDAL VFS Adresse",
       "withSource": "Kopiere GDAL VFS Adresse für {source}"
@@ -47,6 +50,7 @@
   },
   "catalogs": {
     "filterByTitle": "Kataloge anhand des Titels filtern",
+    "filterByTitleAndMore": "Kataloge anhand von Titel, Beschreibung oder Schlüsselwörtern filtern",
     "loadMore": "Lade mehr...",
     "noMatches": "Keiner der Kataloge entspricht den Suchkriterien."
   },
@@ -99,6 +103,10 @@
     "exit": "Verlasse den Vollbild-Modus",
     "show": "Zeige im Vollbild-Modus"
   },
+  "goBack": {
+    "description": "Gehe zurück zu: {type}",
+    "label": "Zurück"
+  },
   "goToCollection": {
     "description": "Gehe zum dazugehörigen Katalog",
     "descriptionWithTitle": "@:goToCollection.description: {title}",
@@ -146,6 +154,7 @@
   },
   "loading": "Lade...",
   "map": "Karte",
+  "messageForSchemaError": "{message}, für Schema {schemaPath}",
   "metadata": {
     "general": "Allgemeines",
     "title": "Metadaten"
@@ -153,7 +162,8 @@
   "multiselect": {
     "andMore": "und {count} weitere",
     "deselectLabel": "Enter zum Entfernen",
-    "placeholder": "Option wählen",
+    "keywordsPlaceholder": "Schlüsselwörter auswählen",
+    "placeholder": "Option auswählen",
     "selectLabel": "Enter zum Selektieren",
     "selectedLabel": "Selektiert"
   },
@@ -171,7 +181,10 @@
     "ftp": "FTP",
     "gcs": "Google Cloud",
     "oss": "Alibaba Cloud",
-    "s3": "Amazon S3"
+    "s3": {
+      "amazonaws.com": "Amazon S3",
+      "default": "S3"
+    }
   },
   "providers": {
     "email": "E-Mail senden",
@@ -219,6 +232,7 @@
     "matches": "enthält etwa",
     "metaDescription": "Durchsuche die angebotenen Daten von {title}.",
     "modifyCriteria": "Bitte die Suchkriterien ändern.",
+    "noFurtherItemsFound": "Keine weiteren Elemente verfügbar.",
     "noItemsFound": "Keine Elemente gefunden für die angegebenen Filter.",
     "noOptions": "Noch nichts eingegeben",
     "notEqualTo": "entspricht nicht",
@@ -259,8 +273,10 @@
   "source": {
     "conformanceClasses": "Konformitätsklasse",
     "detailsAboutSource": "Details über die STAC-Datenquelle",
+    "extension": "Erweiterung",
     "fileFormat": "Dateiformat",
     "id": "Identifikationsnummer",
+    "invalid": "Nicht konform",
     "label": "Datenquelle",
     "language": {
       "label": "Sprache: {currentLanguage}",
@@ -282,9 +298,36 @@
     "stacVersion": "STAC-Version",
     "statistics": "Statistiken",
     "title": "Datenquelle",
-    "valid": "Valide",
+    "valid": "Konform",
     "validating": "Validiere...",
-    "validationNA": "nicht verfügbar"
+    "validationNA": "nicht verfügbar",
+    "validationParams": {
+      "additionalProperty": "zusätzliches Attribut",
+      "allowedValue": "erlaubter Wert",
+      "allowedValues": "erlaubte Werte",
+      "comparison": "Vergleich",
+      "depsCount": "Anzahl",
+      "exclusive": "exklusive der Grenze",
+      "failingKeyword": "nicht konforme Schemata",
+      "format": "Format",
+      "i": "erstes Element",
+      "j": "zweites Element",
+      "limit": "Grenze",
+      "maxContains": "enthält höchstens",
+      "minContains": "enthält mindestens",
+      "missingProperty": "fehlendes Attribut",
+      "multipleOf": "Vielfaches von",
+      "passingSchemas": "konforme Schemata",
+      "pattern": "Muster",
+      "property": "Attribut",
+      "propertyName": "Attributname",
+      "type": "Datentyp"
+    },
+    "validationReport": {
+      "disclaimer": "Der Konformitätsbericht wird auf der Grundlage von Schemata erstellt, die oft nicht vollständig sind. Sie decken daher möglicherweise nicht alle Aspekte der STAC-Spezifikation und ihrer Erweiterungen ab. Der Konformitätsbericht ist keine Garantie dafür, dass die STAC-Daten vollständig mit der Spezifikation und ihren Erweiterungen konform ist.",
+      "result": "Ergebnis",
+      "title": "Konformitätsbericht"
+    }
   },
   "stacAssets": "Datei | Dateien",
   "stacCatalog": "Katalog | Kataloge",
