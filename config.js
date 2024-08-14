@@ -1,7 +1,7 @@
 module.exports = {
     catalogUrl: 'https://sit-stac.geoplatform.info/catalog.json',
     catalogTitle: "STAC Browser",
-    allowExternalAccess: false, // Must be true if catalogUrl is not given
+    allowExternalAccess: true, // Must be true if catalogUrl is not given
     allowedDomains: [],
     detectLocaleFromBrowser: true,
     storeLocale: true,
@@ -12,14 +12,12 @@ module.exports = {
 //      "de-CH",
         "es",
         "en",
-//      "en-GB",
         "fr",
 //      "fr-CA",
 //      "fr-CH",
         "it",
 //      "it-CH",
-        "ro",
-        "ja"
+        "ro"
     ],
     apiCatalogPriority: null,
     useTileLayerAsFallback: true,
@@ -30,9 +28,8 @@ module.exports = {
     historyMode: "history",
     cardViewMode: "cards",
     cardViewSort: "asc",
-    showKeywordsInItemCards: false,
-    showKeywordsInCatalogCards: false,
     showThumbnailsAsAssets: false,
+    stacLint: true,
     geoTiffResolution: 128,
     redirectLegacyUrls: false,
     itemsPerPage: 12,
