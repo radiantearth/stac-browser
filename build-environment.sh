@@ -1,8 +1,8 @@
 cp -fp ./src/index_template.html ./public/index.html
 
 if [ "$STG_ENV" = "sit" ]; then
-    endpoint="https://gp-sit-us-east-1-stac.s3.amazonaws.com"
-    support="https://sit-kb.geoplatform.info/"
+    endpoint="https://sit-stac.geoplatform.info"
+    support="https://sit-kb.geoplatform.info"
 elif [ "$STG_ENV" = "stg" ]; then
     endpoint="https://stg.geoplatform.gov"
     support="https://stg-kb.geoplatform.gov"

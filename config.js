@@ -1,5 +1,5 @@
 module.exports = {
-    catalogUrl: 'https://gp-sit-us-east-1-stac.s3.amazonaws.com/catalog.json',
+    catalogUrl: 'https://sit-stac.geoplatform.info/catalog.json',
     catalogTitle: "STAC Browser",
     allowExternalAccess: true, // Must be true if catalogUrl is not given
     allowedDomains: [],
