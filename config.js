@@ -1,8 +1,26 @@
 module.exports = {
     catalogUrl: 'https://sit-stac.geoplatform.info/catalog.json',
     catalogTitle: "STAC Browser",
-    allowExternalAccess: true, // Must be true if catalogUrl is not given
+    allowExternalAccess: false, // Must be true if catalogUrl is not given
     allowedDomains: [],
+    whitelistedExternalCatalogs: [
+        "https://gp-sit-us-east-1-public-configs.s3.amazonaws.com/stac/national_map/catalog.json",
+        "https://gp-sit-us-east-1-public-configs.s3.amazonaws.com/stac/test_census_tiger/catalog.json",
+        "https://landsat-stac.s3.amazonaws.com/catalog.json",
+        "https://franklin.nasa-hsi.azavea.com/",
+        "https://cmr.earthdata.nasa.gov/stac",
+        "https://cmr.earthdata.nasa.gov/cloudstac",
+        "https://nasa-iserv.s3-us-west-2.amazonaws.com/catalog/catalog.json",
+        "https://cmr.earthdata.nasa.gov/stac",
+        "https://raw.githubusercontent.com/scottyhq/sentinel1-rtc-stac/main/collection.json",
+        "https://tamn.snapplanet.io",
+        "https://earth-search.aws.element84.com/v0/collections/sentinel-s2-l2a",
+        "https://stacindex.org/api/proxy?https%3A%2F%2Fmeeo-s5p.s3.amazonaws.com%2Fcatalog.json",
+        "https://sentinel-stac.s3.amazonaws.com/catalog.json",
+        "https://usgs-lidar-stac.s3-us-west-2.amazonaws.com/ept/catalog.json",
+        "https://asc-stacbrowser.s3.us-west-2.amazonaws.com/catalog.json",
+        "https://landsatlook.usgs.gov/stac-server",
+    ],
     detectLocaleFromBrowser: true,
     storeLocale: true,
     locale: "en",
