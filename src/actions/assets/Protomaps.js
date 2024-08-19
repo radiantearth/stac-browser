@@ -10,8 +10,11 @@ const PROTOMAPS_SUPPORTED_TYPES = [
 export default class Protomaps extends AssetActionPlugin {
 
   get show() {
-    // Can we rather check if .pmtiles substring present in this.asset.href or simply this.component.filename.endsWith('pmtiles')
-    return true || this.component.isBrowserProtocol && PROTOMAPS_SUPPORTED_TYPES.includes(this.asset.type);
+    // Rather check if .pmtiles substring present in this.asset.href or simply this.component.filename.endsWith('pmtiles')
+    return this.component.isBrowserProtocol && (
+      PROTOMAPS_SUPPORTED_TYPES.includes(this.asset.type)
+      || this.asset.href.toLowerCase().includes('.pmtiles')
+    );
   }
 
   get uri() {

@@ -5,7 +5,7 @@ import i18n from "../../i18n";
 // See mime types discussion for 3d-tiles here and there
 // https://github.com/opengeospatial/ogcapi-3d-geovolumes/issues/13
 const OGC3DTILES_SUPPORTED_TYPES = [
-  'application/json',
+  // 'application/json',
   'application/3dtiles+json',
 ];
 

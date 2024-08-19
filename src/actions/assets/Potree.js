@@ -4,14 +4,23 @@ import i18n from "../../i18n";
 
 const POTREE_SUPPORTED_TYPES = [
   'application/vnd.laszip+copc',
-  'text/javascript',
-  'application/json',
+];
+
+// this.component.filename.endsWith or this.asset.href.includes
+const POTREE_SUPPORTED_FILEEXTS = [
+ 'cloud.js', 'metadata.json', 'ept.json'
+ // potree v1, potree v2, EPT Entwine Point Tiles
 ];
   
 export default class Potree extends AssetActionPlugin {
 
   get show() {
-    return this.component.isBrowserProtocol && POTREE_SUPPORTED_TYPES.includes(this.asset.type);
+    return this.component.isBrowserProtocol && (
+      POTREE_SUPPORTED_TYPES.includes(this.asset.type)
+      || POTREE_SUPPORTED_FILEEXTS.map(
+        f => this.component.filename.endsWith(f)
+      ).some(e => e)
+  );
   }
 
   get uri() {
@@ -19,6 +28,7 @@ export default class Potree extends AssetActionPlugin {
     // https://github.com/potree/potree/pull/1456
     let uri = new URI("https://3d.iconem.com/tools/load_potree_project_from_urlparam.html");
     uri.addQuery('fit', true);
+    uri.addQuery('c', 'rgba'); // rgba, elevation, intensity etc
 
     const datasetUrl = this.component.href;
     const potreeProject = {
@@ -40,6 +50,9 @@ export default class Potree extends AssetActionPlugin {
             "edlEnabled": true,
             "edlStrength": 0.4,
             "background": "gradient",
+            "edlRadius": 1.4,
+            "minNodeSize": 30,
+            "showBoundingBoxes": false
         },
         "measurements": [],
         "volumes": [],
@@ -54,6 +67,8 @@ export default class Potree extends AssetActionPlugin {
         },
     };
     uri.addQuery('potreeProjectJson', JSON.stringify(potreeProject));
+    // console.log(potreeProject);
+    // uri.addQuery('potreeDatasetUrl', datasetUrl); // potreeDatasetUrl or shortcut r
     return uri;
   }
 
