@@ -28,7 +28,7 @@ export default class Potree extends AssetActionPlugin {
     // https://github.com/potree/potree/pull/1456
     let uri = new URI("https://3d.iconem.com/tools/load_potree_project_from_urlparam.html");
     uri.addQuery('fit', true);
-    uri.addQuery('c', 'rgba'); // rgba, elevation, intensity etc
+    uri.addQuery('c', 'elevation'); // rgba, elevation, intensity etc
 
     const datasetUrl = this.component.href;
     const potreeProject = {
@@ -66,9 +66,9 @@ export default class Potree extends AssetActionPlugin {
             "target": [ 0, 0, 0 ]
         },
     };
-    uri.addQuery('potreeProjectJson', JSON.stringify(potreeProject));
-    // console.log(potreeProject);
-    // uri.addQuery('potreeDatasetUrl', datasetUrl); // potreeDatasetUrl or shortcut r
+    // uri.addQuery('potreeProjectJson', JSON.stringify(potreeProject));
+    console.log(potreeProject);
+    uri.addQuery('potreeDatasetUrl', datasetUrl); // potreeDatasetUrl or shortcut r
     return uri;
   }
 
