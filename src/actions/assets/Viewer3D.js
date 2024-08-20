@@ -16,7 +16,7 @@ export default class Viewer3D extends AssetActionPlugin {
     return this.component.isBrowserProtocol && (
       VIEWER3D_SUPPORTED_TYPES.includes(this.asset.type)
       || VIEWER3D_SUPPORTED_FILEEXTS.map(
-        f => this.component.filename.toLowerCase().endsWith(f)
+        f => this.asset.href.toLowerCase().includes(f)
       ).some(e => e)
     );
   }
@@ -24,7 +24,7 @@ export default class Viewer3D extends AssetActionPlugin {
   get uri() {
     // `https://3dviewer.net/#model=${modelUrl}` misconception, # is not a fragment but a query, can be replaced
     let uri = new URI("https://3dviewer.net/");
-    uri.addQuery("model", 'toto' + this.component.href); // returns the URI instance for chaining
+    uri.addQuery("model", this.component.href); // returns the URI instance for chaining
     uri = uri.toString().replace('?', '#');
     return uri;
   }

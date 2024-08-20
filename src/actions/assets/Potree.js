@@ -18,7 +18,7 @@ export default class Potree extends AssetActionPlugin {
     return this.component.isBrowserProtocol && (
       POTREE_SUPPORTED_TYPES.includes(this.asset.type)
       || POTREE_SUPPORTED_FILEEXTS.map(
-        f => this.component.filename.endsWith(f)
+        f => this.asset.href.toLowerCase().includes(f)
       ).some(e => e)
   );
   }
