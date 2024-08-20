@@ -15,7 +15,7 @@ export default class CesiumSandcastle extends AssetActionPlugin {
     return this.component.isBrowserProtocol && OGC3DTILES_SUPPORTED_TYPES.includes(this.asset.type);
   }
 
-  get uri() {
+  get uri_CesiumSandcastle() {
     let uri = new URI("https://sandcastle.cesium.com/index.html");
     const tileset_url = this.component.href;
     const code_payload = {
@@ -42,8 +42,14 @@ export default class CesiumSandcastle extends AssetActionPlugin {
     return uri;
   }
 
+  get uri() {
+    let uri = new URI("https://viewer.geofox.ai/");
+    uri.addQuery('tileset', encodeURI(this.component.href));
+    return uri;
+  }
+
   get text() {
-    return i18n.t('actions.openIn', {service: 'Cesium Sandcastle'});
+    return i18n.t('actions.openIn', {service: 'Geofox.ai'});
   }
 
 }
