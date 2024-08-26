@@ -14,7 +14,10 @@ Deploying stac browser necessitates passing staging environment variables into t
   * SIT - `npm run deploy:sit`
   * STG - `npm run deploy:stg`
   * PRD - `npm run deploy:prd`
-
+3. Deploy Invalidate CloudFront (per environment):
+  * SIT - `npm run deploy:sit:cf`
+  * STG - `npm run deploy:stg:cf`
+  * PRD - `npm run deploy:prd:cf`
 
 # STAC Browser
 
