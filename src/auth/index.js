@@ -81,6 +81,39 @@ export default class Auth {
     return {};
   }
 
+  _updateStore(value, defaultName = null, defaultIn = null, defaultFormatter = null) {
+    const formatter = this.options.formatter || defaultFormatter;
+    const key = this.options.name || defaultName;
+    const in_ = this.options.in || defaultIn;
+
+    // Format the credentials
+    if (value) {
+      if (formatter === 'Bearer') {
+        value = `Bearer ${value}`;
+      }
+      else if (typeof formatter === 'function') {
+        value = formatter(value);
+      }
+    }
+    if (!Utils.hasText(value)) {
+      value = undefined;
+    }
+
+    // Set cookie, query or request parameters
+    if (in_ === 'query') {
+      return { query: { type: 'private', key, value } };
+    }
+    else if (in_ === 'cookie') {
+      return { cookie: { key, value } };
+    }
+    else if (in_ === 'header') {
+      return { header: { key, value } };
+    }
+    else {
+      return {};
+    }
+  }
+
   static async create(config, changeListener, router) {
     let method = new Auth();
     if (Utils.isObject(config)) {

@@ -385,6 +385,8 @@ The redirect URL for the OIDC client must be set as follows:
 For a given token `123` this results in the following additional HTTP Header:
 `Authorization: Bearer 123`
 
+You can change the default behaviour to send it as a Bearer token by providing `in`, `name` and `format`.
+
 ## preprocessSTAC
 
 ***experimental***
