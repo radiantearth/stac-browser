@@ -5,7 +5,7 @@ import GeoJsonIo from './src/actions/assets/GeoJsonIo.js';
 import Potree from './src/actions/assets/Potree.js';
 import Protomaps from './src/actions/assets/Protomaps.js';
 import OGC3dTiles from './src/actions/assets/OGC3dTiles.js';
-import Viewer3D from './src/actions/assets/Viewer3D.js';
+import F3D from './src/actions/assets/F3D.js';
 
 export default {
   //Felt
@@ -15,5 +15,5 @@ export default {
   // Geoparquet, // not ready yet
   Potree,
   Protomaps,
-  Viewer3D,
+  F3D,
 };
