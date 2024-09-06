@@ -28,7 +28,24 @@ function loadLocaleConfig() {
 const i18n = new VueI18n({
   locale: CONFIG.locale,
   fallbackLocale: CONFIG.fallbackLocale,
-  messages: loadLocaleConfig()
+  messages: loadLocaleConfig(),
+  // Todo: Workaround for https://github.com/kazupon/vue-i18n/issues/563
+  postTranslation: (value, path) => {
+    if (value === "") {
+      const parts = path.split('.');
+      let message = i18n.messages[CONFIG.fallbackLocale];
+      for (const key of parts) {
+        if (key in message) {
+          message = message[key];
+        }
+        else {
+          return value;
+        }
+      }
+      return message;
+    }
+    return value;
+  }
 });
 export default i18n;
 

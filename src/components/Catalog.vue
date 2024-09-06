@@ -10,6 +10,7 @@
         <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="mr-1 mt-1 fileformat">{{ format | formatMediaType }}</b-badge>
         {{ data.description | summarize }}
       </b-card-text>
+      <Keywords v-if="showKeywordsInCatalogCards && keywords.length > 0" :keywords="keywords" variant="primary" :center="!isList" />
       <b-card-text v-if="temporalExtent" class="datetime"><small v-html="temporalExtent" /></b-card-text>
     </b-card-body>
     <b-card-footer>
@@ -19,7 +20,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import StacFieldsMixin from './StacFieldsMixin';
 import ThumbnailCardMixin from './ThumbnailCardMixin';
 import StacLink from './StacLink.vue';
@@ -30,7 +31,8 @@ import Utils from '../utils';
 export default {
   name: 'Catalog',
   components: {
-    StacLink
+    StacLink,
+    Keywords: () => import('./Keywords.vue')
   },
   filters: {
     summarize: text => Utils.summarizeMd(text, 300),
@@ -47,6 +49,7 @@ export default {
     }
   },
   computed: {
+    ...mapState(['showKeywordsInCatalogCards']),
     ...mapGetters(['getStac']),
     classes() {
       let classes = ['catalog-card'];
@@ -79,6 +82,12 @@ export default {
     fileFormats() {
       if (this.data) {
         return this.data.getFileFormats();
+      }
+      return [];
+    },
+    keywords() {
+      if (this.data) {
+        return this.data.getMetadata('keywords') || [];
       }
       return [];
     }

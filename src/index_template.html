@@ -3,6 +3,16 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1QVX78HYFS"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-1QVX78HYFS');
+    </script>
   
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css"
       integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
@@ -49,10 +59,10 @@
                   <a class="nav-link" href="#PUBLIC_URL#/search">Search</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="#PUBLIC_URL#/ngda">NGDA Themes</a>
+                  <a class="nav-link" href="#PUBLIC_URL#/ngda-communities">NGDA Communities</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="#PUBLIC_URL#/communities">Communities</a>
+                  <a class="nav-link" href="#PUBLIC_URL#/geoplatform-hub">GeoPlatform Hub</a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" href="#PUBLIC_URL#/apps">Apps</a>
@@ -65,6 +75,9 @@
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" href="#PUBLIC_URL#/about">About</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#SUPPORT_URL#">Support</a>
                 </li>
               </ul>
             </links>
@@ -101,16 +114,14 @@
             governments, private sector, academia, and the general public. <br>
           </p>
           <p>
-            <span><a href="https://geoplatform.atlassian.net/wiki/spaces/GC/pages/661553196/#Data-Policy">Data
-                Policy</a></span>
-            <span><a href="https://geoplatform.atlassian.net/wiki/spaces/GC/pages/661553196/#Privacy-Policy">Privacy
-                Policy</a></span>
+            <span><a href="#SUPPORT_URL#/gp-info/data-and-privacy-policies.html">Data and Privacy Policies</a></span>
             <span><a href="https://geoplatform.atlassian.net/servicedesk/customer/portals">Service Desk</a></span>
-            <span><a href="https://geoplatform.atlassian.net/wiki/spaces/GC/overview">Guides and
+            <span><a href="#SUPPORT_URL#/gp-info/guiding-documents-and-references.html">Guides and
                 Documentation</a></span>
+            <span><a href="https://www.doi.gov/accessibility">Accessibility</a></span>
           </p>
           <span class="poweredby text-muted">
-            Powered by <a href="https://github.com/geoplatform/stac-browser" target="_blank">STAC Browser</a>
+            Powered by <a href="https://github.com/radiantearth/stac-browser/" target="_blank">STAC Browser</a>
           </span>
         </div>
       </footer>

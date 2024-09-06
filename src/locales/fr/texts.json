@@ -8,6 +8,9 @@
     "title": "Anonymat"
   },
   "assets": {
+    "alternate": {
+      "main": "Préféré"
+    },
     "copyGdalVfsUrl": {
       "generic": "Copier le lien du GDAL VFS",
       "withSource": "Copier le lien du GDAL VFS de {source}"
@@ -47,6 +50,7 @@
   },
   "catalogs": {
     "filterByTitle": "Filtrer les catalogues par titre",
+    "filterByTitleAndMore": "Filtrer les catalogues par titre, description ou mots-clés",
     "loadMore": "Charger plus...",
     "noMatches": "Aucun catalogue ne correspond aux critères de recherche."
   },
@@ -99,6 +103,10 @@
     "exit": "Quitter le mode plein écran",
     "show": "Voir en plein écran"
   },
+  "goBack": {
+    "description": "Revenir au {type}",
+    "label": "Précédent"
+  },
   "goToCollection": {
     "description": "Accéder à la collection associée",
     "descriptionWithTitle": "@:goToCollection.description: {title}",
@@ -146,6 +154,7 @@
   },
   "loading": "Chargement...",
   "map": "Carte",
+  "messageForSchemaError": "{message}, pour le schéma {schemaPath}",
   "metadata": {
     "general": "Général",
     "title": "Métadonnées"
@@ -153,6 +162,7 @@
   "multiselect": {
     "andMore": "et {count} de plus",
     "deselectLabel": "Appuyer sur Entrée pour désélectionner",
+    "keywordsPlaceholder": "Sélectionner des mots clés",
     "placeholder": "Sélectionner une option",
     "selectLabel": "Appuyer sur Entrée pour sélectionner",
     "selectedLabel": "Sélectionné(e)"
@@ -171,7 +181,10 @@
     "ftp": "FTP",
     "gcs": "Google Cloud",
     "oss": "Alibaba Cloud",
-    "s3": "Amazon S3"
+    "s3": {
+      "amazonaws.com": "Amazon S3",
+      "default": "S3"
+    }
   },
   "providers": {
     "email": "Envoyer un courriel",
@@ -219,6 +232,7 @@
     "matches": "correspond à",
     "metaDescription": "Rechercher parmi l'offre de données de {title}.",
     "modifyCriteria": "Veuillez modifier les critères de recherche.",
+    "noFurtherItemsFound": "Aucun autre élément n'est disponible.",
     "noItemsFound": "Aucun élément trouvé pour les filtres sélectionnés.",
     "noOptions": "Aucune information saisie",
     "notEqualTo": "différent de",
@@ -259,8 +273,10 @@
   "source": {
     "conformanceClasses": "Classes de conformité",
     "detailsAboutSource": "À propos de la source STAC",
+    "extension": "Extension",
     "fileFormat": "Format de fichier",
     "id": "Identifiant",
+    "invalid": "Invalide",
     "label": "Source",
     "language": {
       "label": "Langue: {currentLanguage}",
@@ -284,7 +300,34 @@
     "title": "Données source",
     "valid": "Valide",
     "validating": "Validation...",
-    "validationNA": "s.o."
+    "validationNA": "s.o.",
+    "validationParams": {
+      "additionalProperty": "propriété supplémentaire",
+      "allowedValue": "valeur autorisée",
+      "allowedValues": "valeurs autorisées",
+      "comparison": "comparaison",
+      "depsCount": "nombre",
+      "exclusive": "excluant la limite",
+      "failingKeyword": "mot-clé en échec",
+      "format": "format",
+      "i": "premier élément",
+      "j": "second élément",
+      "limit": "limite",
+      "maxContains": "contient au plus",
+      "minContains": "contient au moins",
+      "missingProperty": "propriété manquante",
+      "multipleOf": "multiple de",
+      "passingSchemas": "schémas conformes",
+      "pattern": "modèle",
+      "property": "propriété",
+      "propertyName": "nom de propriété",
+      "type": "type"
+    },
+    "validationReport": {
+      "disclaimer": "Le rapport de validation est généré à partir de schémas, qui souvent ne sont pas exhaustifs. À ce titre, ils ne peuvent pas couvrir tous les aspects de la spécification STAC et de ses extensions. Le rapport de validation n'est pas une garantie que l'entité STAC est pleinement conforme à la spécification et à ses extensions.",
+      "result": "Résultat",
+      "title": "Rapport de validation"
+    }
   },
   "stacAssets": "Ressource | Ressources",
   "stacCatalog": "Catalogue | Catalogues",

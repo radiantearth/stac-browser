@@ -10,6 +10,7 @@
         <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="mr-1 mt-1 fileformat">{{ format | formatMediaType }}</b-badge>
         <template v-if="hasDescription">{{ data.properties.description | summarize }}</template>
       </b-card-text>
+      <Keywords v-if="showKeywordsInItemCards && keywords.length > 0" :keywords="keywords" variant="primary" center />
       <b-card-text>
         <small class="text-muted">
           <template v-if="extent">{{ extent | formatTemporalExtent }}</template>
@@ -22,7 +23,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import ThumbnailCardMixin from './ThumbnailCardMixin';
 import StacLink from './StacLink.vue';
 import STAC from '../models/stac';
@@ -35,7 +36,8 @@ Registry.addDependency('content-type', require('content-type'));
 export default {
   name: 'Item',
   components: {
-    StacLink
+    StacLink,
+    Keywords: () => import('./Keywords.vue')
   },
   filters: {
     summarize: text => Utils.summarizeMd(text, 150),
@@ -53,6 +55,7 @@ export default {
     }
   },
   computed: {
+    ...mapState(['showKeywordsInItemCards']),
     ...mapGetters(['getStac']),
     data() {
       return this.getStac(this.item);
@@ -66,6 +69,12 @@ export default {
     fileFormats() {
       if (this.data) {
         return this.data.getFileFormats();
+      }
+      return [];
+    },
+    keywords() {
+      if (this.data) {
+        return this.data.getMetadata('keywords') || [];
       }
       return [];
     },

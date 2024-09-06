@@ -18,36 +18,39 @@
       </b-button>
     </b-card-header>
     <b-collapse :id="uid" v-model="expanded" :accordion="type" role="tabpanel" @input="collapseToggled">
-      <b-card-body>
-        <b-card-title><span v-html="fileFormat" /></b-card-title>
-        <HrefActions isAsset :data="asset" :shown="shown" @show="show" />
-        <b-card-text class="mt-4" v-if="asset.description">
-          <Description :description="asset.description" compact />
-        </b-card-text>
-        <Metadata class="mt-4" :data="asset" :context="context" :ignoreFields="ignore" title="" type="Asset" />
-      </b-card-body>
+      <template v-if="hasAlternatives">
+        <b-tabs card>
+          <b-tab :title="asset.name || $t('assets.alternate.main')" active>
+            <AssetAlternative :asset="asset" :context="context" :shown="shown" hasAlternatives />
+          </b-tab>
+          <b-tab v-for="(altAsset, key) in alternatives" :title="altAsset.name || key" :key="key">
+            <AssetAlternative :asset="altAsset" :context="context" :shown="shown" hasAlternatives :key="key" />
+          </b-tab>
+        </b-tabs>
+      </template>
+      <AssetAlternative v-else :asset="asset" :context="context" />
     </b-collapse>
   </b-card>
 </template>
 
 <script>
-import { BCollapse, BIconCheck, BIconChevronRight, BIconChevronDown } from 'bootstrap-vue';
+import { BCollapse, BIconCheck, BIconChevronRight, BIconChevronDown, BTabs, BTab } from 'bootstrap-vue';
 import { formatMediaType } from '@radiantearth/stac-fields/formatters';
 import { mapState } from 'vuex';
-import Description from './Description.vue';
-import HrefActions from './HrefActions.vue';
+import AssetAlternative from './AssetAlternative.vue';
 import StacFieldsMixin from './StacFieldsMixin';
+import Utils from '../utils';
 
 export default {
   name: 'Asset',
   components: {
+    AssetAlternative,
     BCollapse,
     BIconCheck,
     BIconChevronDown,
     BIconChevronRight,
-    Description,
-    HrefActions,
-    Metadata: () => import('./Metadata.vue')
+    BTabs,
+    BTab
   },
   mixins: [
     StacFieldsMixin({ formatMediaType })
@@ -80,34 +83,11 @@ export default {
   },
   data() {
     return {
-      expanded: false,
-      ignore: [
-        // Asset fields that are handled directly
-        'href',
-        'title',
-        'description',
-        'type',
-        'roles',
-        // Don't show these complex lists of coordinates: https://github.com/radiantearth/stac-browser/issues/141
-        'proj:bbox',
-        'proj:geometry',
-        // Don't show very specific options that can't be rendered nicely
-        'table:storage_options',
-        'xarray:open_kwargs',
-        'xarray:storage_options'
-      ]
+      expanded: false
     };
   },
   computed: {
-    ...mapState(['buildTileUrlTemplate', 'useTileLayerAsFallback', 'url', 'stateQueryParameters']),
-    tileRendererType() {
-      if (this.buildTileUrlTemplate && !this.useTileLayerAsFallback) {
-        return 'server';
-      }
-      else {
-        return 'client';
-      }
-    },
+    ...mapState(['stateQueryParameters']),
     type() {
       return this.definition ? 'itemdef' : 'asset';
     },
@@ -125,6 +105,24 @@ export default {
         return this.formatMediaType(this.asset.type, null, {shorten: true});
       }
       return null;
+    },
+    alternatives() {
+      if (!Utils.isObject(this.asset.alternate)) {
+        return {};
+      }
+
+      const asset = Object.assign({}, this.asset);
+      delete asset.alternate;
+
+      const merged = {};
+      for (const key in this.asset.alternate) {
+        merged[key] = Object.assign({}, asset, this.asset.alternate[key]);
+      }
+      
+      return merged;
+    },
+    hasAlternatives() {
+      return Utils.size(this.alternatives) > 0;
     }
   },
   created() {
@@ -147,9 +145,6 @@ export default {
         return this.$t(key);
       }
       return role;
-    },
-    show() {
-      this.$emit('show', ...arguments);
     },
     collapseToggled(isVisible) {
       let event = isVisible ? 'openCollapsible' : 'closeCollapsible';

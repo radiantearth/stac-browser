@@ -29,6 +29,7 @@ import Utils, { browserProtocols, imageMediaTypes, mapMediaTypes } from '../util
 import { mapGetters } from 'vuex';
 import AssetActions from '../../assetActions.config';
 import LinkActions from '../../linkActions.config';
+import URI from 'urijs';
 
 export default {
   name: 'HrefActions',
@@ -108,14 +109,14 @@ export default {
     },
     isThumbnail() {
       if (this.isAsset) {
-        return Array.isArray(this.data.roles) && this.data.roles.includes('thumbnail');
+        return Array.isArray(this.data.roles) && this.data.roles.includes('thumbnail') && !this.data.roles.includes('overview');
       }
       else {
         return this.data.rel === 'preview' && Utils.canBrowserDisplayImage(this.data);
       }
     },
     isGdalVfs() {
-      return Utils.isGdalVfsUri(this.data.href);
+      return Utils.isGdalVfsUri(this.href);
     },
     href() {
       if (typeof this.data.href !== 'string') {
@@ -129,11 +130,11 @@ export default {
     },
     from() {
       if (this.isGdalVfs) {
-        let type = this.data.href.match(/^\/vsi([a-z\d]+)(_streaming)?\//);
-        return this.protocolName(type);
+        let type = this.href.match(/^\/vsi([a-z\d]+)(_streaming)?\//);
+        return this.protocolName(type, this.href);
       }
       else {
-        return this.protocolName(this.protocol);
+        return this.protocolName(this.protocol, this.href);
       }
     },
     browserCanOpenFile() {
@@ -168,13 +169,24 @@ export default {
     }
   },
   methods: {
-    protocolName(protocol) {
+    protocolName(protocol, href = null) {
       if (typeof protocol !== 'string') {
         return '';
       }
       switch(protocol.toLowerCase()) {
         case 's3':
-          return this.$t('protocol.s3');
+          if (href) {
+            try {
+              const uri = new URI(href);
+              const key = `protocol.s3.${uri.domain()}`;
+              if (this.$te(key)) {
+                return this.$t(key);
+              }
+            } catch (e) {
+              // Fall back to the default
+            }
+          }
+          return this.$t('protocol.s3.default');
         case 'abfs':
         case 'abfss':
           return this.$t('protocol.azure');

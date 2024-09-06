@@ -1,7 +1,6 @@
 import Vue from "vue";
 import Vuex from "vuex";
 
-import axios from "axios";
 import URI from "urijs";
 
 import i18n from '../i18n';
@@ -20,7 +19,6 @@ function getStore(config, router) {
     title: config.catalogTitle,
     description: null,
     data: null,
-    valid: null,
     parents: null,
     globalError: null,
 
@@ -492,13 +490,18 @@ function getStore(config, router) {
       resetPage(state) {
         Object.assign(state, localDefaults());
       },
+      setPageMetadata(state, { title, description }) {
+        state.title = title;
+        if (typeof description !== 'undefined') {
+          state.description = description;
+        }
+      },
       showPage(state, { url, title, description, stac }) {
         if (!stac) {
           stac = state.database[url] || null;
         }
         state.url = url || null;
         state.data = stac instanceof STAC ? stac : null;
-        state.valid = null;
         state.description = description;
 
         // Set title
@@ -529,9 +532,6 @@ function getStore(config, router) {
           error = new Error(error);
         }
         Vue.set(state.database, url, error);
-      },
-      valid(state, valid) {
-        state.valid = valid;
       },
       queue(state, url) {
         state.queue.push(url);
@@ -607,7 +607,9 @@ function getStore(config, router) {
         state.parents = parents;
       },
       showGlobalError(state, error) {
-        console.error(error);
+        if(error) {
+          console.error(error);
+        }
         state.globalError = error;
       }
     },
@@ -954,19 +956,6 @@ function getStore(config, router) {
           } catch (error) {
             errorFn(error);
           }
-        }
-      },
-      async validate(cx, url) {
-        if (typeof cx.state.valid === 'boolean') {
-          return;
-        }
-        try {
-          let uri = URI('https://api.staclint.com/url');
-          uri.addSearch('stac_url', url);
-          let response = await axios.get(uri.toString());
-          cx.commit('valid', Boolean(response.data?.body?.valid_stac));
-        } catch (error) {
-          cx.commit('valid', error);
         }
       }
     },
