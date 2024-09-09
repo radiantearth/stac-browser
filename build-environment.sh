@@ -13,3 +13,6 @@ fi
 
 sed -i "s|#PUBLIC_URL#|${endpoint}|g" ./public/index.html
 sed -i "s|#SUPPORT_URL#|${support}|g" ./public/index.html
+
+sed -i "s|#PUBLIC_URL#|${endpoint}|g" ./src/theme/page.scss
+sed -i "s|#PUBLIC_URL#|${endpoint}|g" ./config.js
