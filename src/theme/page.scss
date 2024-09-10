@@ -364,7 +364,7 @@ body {
     filter: blur(5px);
     width: calc(100vw + 16px);
     height: calc(100% + 16px);
-    background-image: url('https://sit.geoplatform.info/assets/images/theme/gp-backdrop.jpg');
+    background-image: url('#PUBLIC_URL#/assets/images/theme/gp-backdrop.webp');
     margin: -8px 0 0 -8px;
     background-size: cover;
   }

@@ -6,6 +6,14 @@
 
 Deploying stac browser necessitates passing staging environment variables into the configuration file (./config.js) and the index file (./public/index.html). This is handled by running the build-environment.sh script. For convenience this script has been bundled into an node package script. To build and deploy the application for it's specific staging environment, follow these steps. 
 
+**Note** the catalog.json will be updated with what's in public/catalog.json.
+
+Before the build verifiy src/theme/page.scss and ./config.js are set up to get the public URL for the stage. These will be overwritten during the build. Don't check the updated files from the build into the repo.
+
+`background-image: url('#PUBLIC_URL#/assets/images/theme/gp-backdrop.webp');`
+
+`catalogUrl: '#PUBLIC_URL#/catalog.json',`
+
 1. Build (per environment):
   * SIT - `npm run build:sit`
   * STG - `npm run build:stg`

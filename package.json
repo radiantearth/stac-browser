@@ -16,6 +16,7 @@
     "deploy:stg": "aws s3 sync ./dist s3://gp-stg-us-east-1-stac --acl public-read --profile stg",
     "deploy:stg:cf": "aws cloudfront create-invalidation --distribution-id E29TLYMUJPWCX8 --paths \"/*\" --profile stg",
     "deploy:prd": "echo aws s3 sync ./dist s3://gp-prd-us-east-1-stac --acl public-read --profile prd",
+    "deploy:prd:cf": "echo aws cloudfront create-invalidation --distribution-id EUWLY7KX1DHJQ --paths \"/*\" --profile prd",
     "lint": "vue-cli-service lint",
     "i18n:report": "vue-cli-service i18n:report --src \"./src/**/*.?(js|vue)\" --locales \"./src/locales/**/*.?(js|json)\"",
     "i18n:fields": "node helpers/fields_locales.js"
