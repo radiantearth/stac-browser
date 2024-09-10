@@ -15,7 +15,7 @@ Before the build verifiy src/theme/page.scss and ./config.js are set up to get t
 `catalogUrl: '#PUBLIC_URL#/catalog.json',`
 
 1. Build (per environment):
-  * SIT - `npm run build:t`
+  * SIT - `npm run build:sit`
   * STG - `npm run build:stg`
   * PRD - `npm run build:prd`
 2. Deploy (per environment):
