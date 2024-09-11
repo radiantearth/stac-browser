@@ -35,6 +35,10 @@ import {
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
 
+import VueHighlightJS from "vue-highlightjs";
+import 'highlight.js/lib/languages/python';
+import 'highlight.js/styles/github.css';
+
 import ErrorAlert from './components/ErrorAlert.vue';
 import StacHeader from './components/StacHeader.vue';
 
@@ -50,8 +54,9 @@ import Authentication from "./components/Authentication.vue";
 Vue.use(AlertPlugin);
 Vue.use(ButtonGroupPlugin);
 Vue.use(ButtonPlugin);
-Vue.use(BadgePlugin);
+Vue.use(BadgePlugin)
 Vue.use(CardPlugin);
+Vue.use(VueHighlightJS);
 Vue.use(LayoutPlugin);
 Vue.use(SpinnerPlugin);
 
