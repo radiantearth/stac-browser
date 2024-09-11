@@ -1,5 +1,4 @@
 import BrowserStorage from "../browser-store";
-import Utils from "../utils";
 import Auth from "./index";
 
 import { UserManager } from 'oidc-client-ts';
@@ -72,21 +71,7 @@ export default class OIDC extends Auth {
   }
 
   updateStore(value) {
-    if (value) {
-      if (typeof this.options.formatter === 'function') {
-        value = this.options.formatter(value);
-      }
-      else {
-        value = `Bearer ${value}`;
-      }
-    }
-    if (!Utils.hasText(value)) {
-      value = undefined;
-    }
-
-    return {
-      header: { key: 'Authorization', value }
-    };
+    return this._updateStore(value, 'Authorization', 'header', 'Bearer');
   }
 
 }
