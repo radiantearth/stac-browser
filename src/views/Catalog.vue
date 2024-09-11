@@ -249,7 +249,7 @@ export default {
         this.$store.commit('resetApiItems', this.data.getApiItemsLink());
       }
       try {
-        await this.$store.dispatch('loadApiItems', {link: this.apiItemsLink, show: true, filters});
+        await this.$store.dispatch('loadApiItems', {link: this.data.getApiItemsLink(), show: true, filters});
       } catch (error) {
         let msg = reset ? this.$t('errors.loadItems') : this.$t('errors.loadFilteredItems');
         this.$root.$emit('error', error, msg);
