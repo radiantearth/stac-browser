@@ -275,6 +275,9 @@ export default {
       ];
     },
     sortedQueryables() {
+      if (!Array.isArray(this.queryables)) {
+        return [];
+      }
       const collator = new Intl.Collator(this.uiLanguage);
       return this.queryables.slice(0).sort((a, b) => collator.compare(a.title, b.title));
     }
