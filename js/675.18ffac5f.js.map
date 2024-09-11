@@ -1,0 +1,1 @@
+{"version":3,"file":"js/675.18ffac5f.js","mappings":"2JAAA,MAAMA,EAAS,aACTC,EAAS,6DACf,cAAgBD,SAAQC,S","sources":["webpack://@radiantearth/stac-browser/./src/locales/ja/datepicker.js"],"sourcesContent":["const format = 'YYYY/MM/DD';\nconst locale = import('vue2-datepicker/locale/ja');\nexport default {format, locale};\n"],"names":["format","locale"],"sourceRoot":""}
