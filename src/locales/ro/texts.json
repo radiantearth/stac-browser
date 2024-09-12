@@ -268,7 +268,8 @@
       "items": "Caută Articole"
     },
     "temporalExtent": "Interval de timp",
-    "title": "Căutare"
+    "title": "Căutare",
+    "useInItemSearch": ""
   },
   "showMore": "Afișați mai multe...",
   "sidebar": {
@@ -322,6 +323,8 @@
       "allowedValues": "valori permise",
       "comparison": "comparare",
       "depsCount": "număr",
+      "exclusive": "",
+      "failingKeyword": "",
       "format": "format",
       "i": "primul articol",
       "j": "al doilea articol",
