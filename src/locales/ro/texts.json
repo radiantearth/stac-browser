@@ -329,18 +329,18 @@
       "i": "",
       "j": "",
       "limit": "",
-      "maxContains": "",
-      "minContains": "",
-      "missingProperty": "",
+      "maxContains": "conține cel mult",
+      "minContains": "conține cel puțin",
+      "missingProperty": "proprietate lipsă",
       "multipleOf": "",
       "passingSchemas": "",
-      "pattern": "",
-      "property": "",
-      "propertyName": "",
-      "type": ""
+      "pattern": "șablon",
+      "property": "proprietate",
+      "propertyName": "nume proprietate",
+      "type": "tip"
     },
     "validationReport": {
-      "disclaimer": "",
+      "disclaimer": "Raportul de validare este generat pe baza unor scheme care adesea nu sunt exhaustive. Prin urmare, ele s-ar putea să nu acopere toate aspectele specificației STAC sau ale extensiilor acesteia. Raportul de validare nu reprezintă o garanția a faptului că entitatea STAC este pe deplin conformă cu specificații sau extensiile acesteia.",
       "result": "Rezultat",
       "title": ""
     }
