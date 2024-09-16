@@ -271,8 +271,6 @@ This is affected by [`allowedDomains`](#alloweddomains).
 
 Example: `{'Authorization': 'Bearer 134567984623223'}` adds a Bearer token to the HTTP headers.
 
-Please note that this option can only be provided through a config file and is not available via CLI/ENV.
-
 ## requestQueryParameters
 
 ***experimental***
@@ -281,8 +279,6 @@ The query parameters given in this option are added to all requests that are sen
 This is affected by [`allowedDomains`](#alloweddomains).
 
 Example: `{'f': 'json'}` adds a `f` query parameter to the HTTP URL, e.g. `https://example.com?f=json`.
-
-Please note that this option can only be provided through a config file and is not available via CLI/ENV.
 
 ## authConfig
 
@@ -309,8 +305,6 @@ In addition the following properties are supported:
     **Note:** You can leave the description empty in the config file and instead provide a localized string with the key `authConfig` -> `description` in the file for custom phrases (`src/locales/custom.js`).
 
 Authentication is generally affected by the [`allowedDomains`](#alloweddomains) option.
-
-The `authConfig` option can only be provided through a config file and is not available via CLI/ENV.
 
 ### API Keys
 
