@@ -268,7 +268,8 @@
       "items": "Caută Articole"
     },
     "temporalExtent": "Interval de timp",
-    "title": "Căutare"
+    "title": "Căutare",
+    "useInItemSearch": "Deschide Colecția în Căutare Articole | Deschide {count} Colecții în Căutare Articole"
   },
   "showMore": "Afișați mai multe...",
   "sidebar": {
@@ -322,6 +323,8 @@
       "allowedValues": "valori permise",
       "comparison": "comparare",
       "depsCount": "număr",
+      "exclusive": "mai puțin frontiera",
+      "failingKeyword": "cuvânt cheie eșuat",
       "format": "format",
       "i": "primul articol",
       "j": "al doilea articol",
