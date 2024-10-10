@@ -846,16 +846,13 @@ function getStore(config, router) {
                 }
                 else if (typeof item.id !== 'undefined') {
                   let apiCollectionsLink = cx.getters.root?.getApiCollectionsLink();
-                  if (baseUrl) {
-                    url = Utils.toAbsolute(`items/${item.id}`, baseUrl);
-                  }
-                  else if (apiCollectionsLink) {
-                    url = Utils.toAbsolute(`${collectionId}/items/${item.id}`, apiCollectionsLink.href);
-                  }
-                  else if (cx.state.catalogUrl) {
+                  if (cx.state.catalogUrl) {
                     url = Utils.toAbsolute(`collections/${collectionId}/items/${item.id}`, cx.state.catalogUrl);
-                  }
-                  else {
+                  } else if (apiCollectionsLink) {
+                    url = Utils.toAbsolute(`${collectionId}/items/${item.id}`, apiCollectionsLink.href);
+                  } else if (baseUrl) {
+                    url = Utils.toAbsolute(`items/${item.id}`, baseUrl);
+                  } else {
                     return null;
                   }
                 }
