@@ -852,7 +852,8 @@ function getStore(config, router) {
                     url = Utils.toAbsolute(`${collectionId}/items/${item.id}`, apiCollectionsLink.href);
                   } else if (baseUrl) {
                     url = Utils.toAbsolute(`items/${item.id}`, baseUrl);
-                  } else {
+                  } 
+                  else {
                     return null;
                   }
                 }
