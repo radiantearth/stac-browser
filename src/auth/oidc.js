@@ -35,12 +35,8 @@ export default class OIDC extends Auth {
   }
 
   getRedirectUri(appPath) {
-    let base = this.router.options.base;
-    let path = this.router.resolve(appPath).href;
-    if (base.endsWith('/') && path.startsWith('/')) {
-      base = base.substring(0, base.length - 1);
-    }
-    return window.location.origin + base + path;
+    const path = this.router.resolve(appPath).href;
+    return window.location.origin + path;
   }
 
   async close() {
