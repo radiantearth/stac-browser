@@ -112,11 +112,11 @@ export default {
     },
     canShow() {
       // We need to know the type, otherwise we don't even try to show it
-      if (typeof this.data.type !== 'string') {
+      if (typeof this.data?.type !== 'string') {
         return false;
       }
       // If the tile renderer is a tile server, we can't really know what it supports so we pass all images
-      else if (this.tileRendererType === 'server' && imageMediaTypes.includes(this.data.type)) {
+      else if (this.tileRendererType === 'server' && imageMediaTypes.includes(this.data?.type)) {
         return true;
       }
       // Don't pass GDAL VFS URIs to client-side tile renderer: https://github.com/radiantearth/stac-browser/issues/116
@@ -128,7 +128,7 @@ export default {
         return false;
       }
       // Otherwise, all images that a browser can read are supported + JSON
-      else if (mapMediaTypes.includes(this.data.type)) {
+      else if (mapMediaTypes.includes(this.data?.type)) {
         return true;
       }
       return false;
@@ -239,7 +239,7 @@ export default {
       if (Utils.canBrowserDisplayImage(this.data)) {
         return true;
       }
-      else if (typeof this.data.type === 'string') {
+      else if (typeof this.data?.type === 'string') {
         switch(this.data.type.toLowerCase()) {
           case 'text/html':
           case 'application/xhtml+xml':

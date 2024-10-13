@@ -89,7 +89,7 @@ export default {
         else if (this.data.isCatalog()) {
           return this.$tc(`stacCatalog`);
         }
-        else {
+        else if (Utils.hasText(this.data.type)) {
           return this.data.type;
         }
       }

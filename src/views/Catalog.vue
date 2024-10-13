@@ -1,5 +1,5 @@
 <template>
-  <div :class="{cc: true, [data.type.toLowerCase()]: true, mixed: hasCatalogs && hasItems, empty: !hasCatalogs && !hasItems}" :key="data.id">
+  <div :class="{cc: true, [cssStacType]: true, mixed: hasCatalogs && hasItems, empty: !hasCatalogs && !hasItems}" :key="data.id">
     <b-row>
       <b-col class="meta">
         <section class="intro">
@@ -137,6 +137,12 @@ export default {
   computed: {
     ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination', 'nextCollectionsLink', 'stateQueryParameters']),
     ...mapGetters(['additionalLinks', 'catalogs', 'collectionLink', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
+    cssStacType() {
+      if (Utils.hasText(this.data?.type)) {
+        return this.data?.type.toLowerCase();
+      }
+      return null;
+    },
     showFilters() {
       return Boolean(this.stateQueryParameters['itemFilterOpen']);
     },
