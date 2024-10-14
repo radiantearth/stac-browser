@@ -627,12 +627,6 @@ function getStore(config, router) {
         for (let key in config) {
           let value = cx.state[key];
           switch (key) {
-            case 'catalogUrl':
-              if (value) {
-                // Load the root catalog data if not available (e.g. after page refresh or external access)
-                await cx.dispatch("load", { url: value, loadApi: true });
-              }
-              break;
             case 'authConfig':
               await cx.dispatch('auth/updateMethod', value);
               break;

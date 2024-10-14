@@ -368,7 +368,8 @@ For OpenID Connect some additional options must be provided, which currently fol
 [oidc-client-ts Configuration options](https://github.com/okta/okta-auth-js?tab=readme-ov-file#configuration-options).
 These options (except for `issuer`) must be provided in the property `oidcConfig`.
 The `client_id` option defaults to `stac-browser`.
-The redirect URL for the OIDC client must be set as follows:
+
+The redirect URL for the OIDC client must be the STAC Browser URL, e.g. `https://mycompany.com/browser`, plus an appended `/auth`, so for example `https://mycompany.com/browser/auth`.
 
 #### Example
 
