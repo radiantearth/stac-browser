@@ -22,7 +22,7 @@
         <b-form-group v-if="canFilterExtents" class="filter-datetime" :label="$t('search.temporalExtent')" :label-for="ids.datetime" :description="$t('search.dateDescription')">
           <date-picker
             range :id="ids.datetime" :lang="datepickerLang" :format="datepickerFormat"
-            :value="query.datetime" @input="setDateTime" input-class="form-control mx-input"
+            v-model="datetime" input-class="form-control mx-input"
           />
         </b-form-group>
 
@@ -280,6 +280,14 @@ export default {
       }
       const collator = new Intl.Collator(this.uiLanguage);
       return this.queryables.slice(0).sort((a, b) => collator.compare(a.title, b.title));
+    },
+    datetime: {
+      get() {
+        return Array.isArray(this.query.datetime) ? this.query.datetime.map(d => Utils.dateFromUTC(d)) : null;
+      },
+      set(val) {
+        this.query.datetime = Array.isArray(val) ? val.map(d => Utils.dateToUTC(d)) : null;
+      }
     }
   },
   watch: {
@@ -299,16 +307,12 @@ export default {
       immediate: true,
       deep: true,
       handler(value) {
-        let query = Object.assign(getQueryDefaults(), value);
-        if (Array.isArray(query.datetime)) {
-          query.datetime = query.datetime.map(Utils.dateFromUTC);
-        }
-        this.query = query;
+        this.query = Object.assign(getQueryDefaults(), value);
         if (this.collections.length > 0 && this.hasAllCollections) {
-          this.selectedCollections = this.collections.filter(c => query.collections.includes(c.value));
+          this.selectedCollections = this.collections.filter(c => this.query.collections.includes(c.value));
         }
         else {
-          this.selectedCollections = query.collections.map(id => {
+          this.selectedCollections = this.query.collections.map(id => {
             let collection = this.selectedCollections.find(c => c.value === id);
             return collection ? collection : this.collectionToMultiSelect({id});
           });
@@ -540,15 +544,6 @@ export default {
         }
       }
       this.$set(this.query, 'bbox', bbox);
-    },
-    setDateTime(datetime) {
-      if (datetime.find(dt => dt instanceof Date)) {
-        datetime = datetime.map(Utils.dateToUTC);
-      }
-      else {
-        datetime = null;
-      }
-      this.$set(this.query, 'datetime', datetime);
     },
     addCollection(collection) {
       if (!this.collectionSelectOptions.taggable) {
