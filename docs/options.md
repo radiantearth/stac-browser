@@ -232,14 +232,17 @@ The maximum number of previews (thumbnails or overviews) of items that will be s
 
 ## cardViewMode
 
-The default view mode for lists of catalogs/collections. Either `"list"` or `"cards"` (default). 
+The default view mode for lists of catalogs/collections. Either `"list"` or `"cards"` (default).
 
 ## cardViewSort
 
 The default sorting for lists of catalogs/collections or items. One of:
+
 - `"asc"`: ascending sort (default)
 - `"desc"`: descending sort
 - `null`: sorted as in the source files
+
+Doesn't apply when API search filters are applied.
 
 ## showKeywordsInItemCards
 
