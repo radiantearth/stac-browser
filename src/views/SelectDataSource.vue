@@ -14,7 +14,8 @@
       <template #label>
         <i18n path="index.selectStacIndex">
           <template #stacIndex>
-            <a href="https://stacindex.org" target="_blank">STAC Index</a>
+            <a v-if="indexURL()" v-bind:href="indexURL()" target="_blank">{{ indexName() }}</a>
+            <span v-else>{{ indexName() }}</span>
           </template>
         </i18n>
       </template>
@@ -40,6 +41,7 @@ import { mapGetters } from "vuex";
 import Description from '../components/Description.vue';
 import Utils from '../utils';
 import axios from "axios";
+import {indexCatalogsURL, indexName, indexURL} from "../../config";
 
 export default {
   name: "SelectDataSource",
@@ -83,9 +85,12 @@ export default {
   async created() {
     // Reset loaded STAC catalog
     this.$store.commit('resetCatalog', true);
+    if (!indexCatalogsURL) {
+      return
+    }
     // Load entries from STAC Index
     try {
-      let response = await axios.get('https://stacindex.org/api/catalogs');
+      let response = await axios.get(indexCatalogsURL);
       if(Array.isArray(response.data)) {
         this.stacIndex = response.data;
       }
@@ -94,6 +99,12 @@ export default {
     }
   },
   methods: {
+    indexURL() {
+      return indexURL
+    },
+    indexName() {
+      return indexName || ""
+    },
     show(catalog) {
       if (catalog.access === 'private') {
         return false;
