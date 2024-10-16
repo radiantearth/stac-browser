@@ -76,7 +76,7 @@ env -0 | cut -f1 -d= | tr '\0' '\n' | grep "^SB_" | {
             boolean)
                 bool "$value"
                 ;;
-            integer | number)
+            integer | number | object)
                 object "$value"
                 ;;
             array)
