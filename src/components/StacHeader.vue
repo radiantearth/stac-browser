@@ -169,7 +169,6 @@ export default {
       if (this.url) {
         this.addAction(() => this.$store.dispatch("load", {
           url: this.url,
-          loadApi: true,
           show: true,
           force: true,
           noRetry: true

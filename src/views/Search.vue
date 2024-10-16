@@ -217,7 +217,7 @@ export default {
       this.parent = this.root;
     }
     if (!this.parent) {
-      await this.$store.dispatch('load', { url, loadApi: true });
+      await this.$store.dispatch('load', { url });
       if (!this.root) {
         await this.$store.dispatch("config", { catalogUrl: url });
       }

@@ -174,7 +174,7 @@ export default {
             // A better way would be to combine the language code and URL as the index in the browser database
             // This needs a database refactor though: https://github.com/radiantearth/stac-browser/issues/231
             this.$store.commit('resetCatalog', true);
-            await this.$store.dispatch("load", { url, loadApi: true, show: true });
+            await this.$store.dispatch("load", { url, show: true });
           }
         }
       }

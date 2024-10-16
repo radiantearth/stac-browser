@@ -77,7 +77,7 @@ export default {
         }
 
         let url = this.fromBrowserPath(path || '/');
-        this.$store.dispatch("load", { url, show: true, loadApi: true });
+        this.$store.dispatch("load", { url, show: true });
       }
     }
   },
