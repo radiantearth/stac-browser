@@ -124,11 +124,11 @@ export default {
       if (!this.canSearch) {
         return null;
       }
-      let dataLink;
+      let searchLink;
       if (this.data instanceof STAC && !this.data.equals(this.root)) {
-        dataLink = this.data.getSearchLink();
+        searchLink = this.data.getSearchLink();
       }
-      if (dataLink) {
+      if (searchLink) {
         return `/search${this.data.getBrowserPath()}`;
       }
       else if (this.root && this.allowSelectCatalog) {

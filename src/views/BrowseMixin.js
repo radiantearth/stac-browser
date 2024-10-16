@@ -30,12 +30,6 @@ export default {
       }
       return null;
     },
-    created() {
-      // Load the root catalog data if not available (e.g. after page refresh or external access)
-      if (this.catalogUrl) {
-        this.$store.dispatch("load", { url: this.catalogUrl, loadApi: true });
-      }
-    },
     errorDescription() {      
       if (this.error instanceof Error && this.error.isAxiosError && Utils.isObject(this.error.response)) {
         let res = this.error.response;
