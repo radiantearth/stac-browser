@@ -57,7 +57,7 @@
     "streamsaver-js": "^2.0.7",
     "urijs": "^1.19.11",
     "v-clipboard": "3.0.0-next.1",
-    "vue": "^2.6.12",
+    "vue": "^3.0.0",
     "vue-chartjs": "^5.2.0",
     "vue-i18n": "^8.28.2",
     "vue-multiselect": "^2.1.6",
