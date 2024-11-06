@@ -601,6 +601,9 @@ $primary-color: map-get($theme-colors, "primary");
   }
 
   .form-group {
+    // Shows multi-select and datepicker components over map
+    position: relative;
+    z-index: 0;
 
     > div {
       margin-left: 1em;
@@ -609,10 +612,6 @@ $primary-color: map-get($theme-colors, "primary");
     > label {
       font-weight: 600;
     }
-
-    // Shows multi-select and datepicker components over map
-    position: relative;
-    z-index: 0;
 
     &.filter-collection,
     &.filter-item-id,
