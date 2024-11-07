@@ -90,8 +90,16 @@ Otherwise, defaults to the language set for `locale`.
 
 ## storeLocale
 
-If set to `true`, stores the locale selected by the user in the `localStorage` of the browser.
-Otherwise, doesn't store the locale across browser sessions.
+If set to `true` (default), stores the locale selected by the user in the storage of the browser.
+If set to `false`, doesn't store the locale across browser sessions.
+
+Depending on the browser settings, this may store in either:
+- `localeStorage`
+- `sessionStorage`
+- cookies
+
+In some countries this may have implications with regards to GDPR etc.
+If you want to avoid this, disable this setting.
 
 ## locale
 
@@ -224,14 +232,17 @@ The maximum number of previews (thumbnails or overviews) of items that will be s
 
 ## cardViewMode
 
-The default view mode for lists of catalogs/collections. Either `"list"` or `"cards"` (default). 
+The default view mode for lists of catalogs/collections. Either `"list"` or `"cards"` (default).
 
 ## cardViewSort
 
 The default sorting for lists of catalogs/collections or items. One of:
+
 - `"asc"`: ascending sort (default)
 - `"desc"`: descending sort
 - `null`: sorted as in the source files
+
+Doesn't apply when API search filters are applied.
 
 ## showKeywordsInItemCards
 
@@ -280,25 +291,44 @@ Please note that this option can only be provided through a config file and is n
 
 ***experimental***
 
-This allows to enable a simple authentication form where a user can input a token, an API key or similar things.
-It is disabled by default (`null`). If enabled, the token provided by the user can be used in the HTTP headers or in the query parameters of the requests. This option is affected by [`allowedDomains`](#alloweddomains).
+This allows to enable some authentication methods. Currently the supported methods are:
+- API Keys (`type: apiKey`) via query parameter or HTTP Header
+- HTTP Basic (`type: http`, `scheme: basic`)
+- OpenID Connect (`type: openIdConnect`)
 
-There are four options you can set in the `authConfig` object:
+Authentication is disabled by default (`null`).
 
-* `type` (string): `null` (disabled), `"query"` (use token in query parameters), or `"header"` (use token in HTTP request headers).
-* `key` (string): The query string parameter name or the HTTP header name respecively.
-* `formatter` (function|string|null): You can optionally specify a formatter for the query string value or HTTP header value respectively. If the string `"Bearer"` is provided formats as a Bearer token according to RFC 6750. If not given, the token is provided as provided by the user.
-* `description` (string|null): Optionally a description that is shown to the user. This should explain how the token can be obtained for example. CommonMark is allowed.
+The options you can set in the `authConfig` object are defined in the
+[Authentication Scheme Object of the STAC Authentication Extension](https://github.com/stac-extensions/authentication?tab=readme-ov-file#authentication-scheme-object) (limited by the supported methods listed above).
+
+**Note:** Before STAC Browser 3.2.0 a different type of object was supported.
+The old way is deprecated, but will be converted to the new object internally.
+Please migrate to the new configuration options now.
+
+In addition the following properties are supported:
+
+* `formatter` (function|string|null): You can optionally specify a formatter for the query string value or HTTP header value respectively. If the string `"Bearer"` is provided formats as a Bearer token according to RFC 6750. If not given, the token is sent as provided by the user.
+* `description` (string|null): Optionally a description that is shown to the user. This should explain how the credentials can be obtained for example. CommonMark is allowed.
     **Note:** You can leave the description empty in the config file and instead provide a localized string with the key `authConfig` -> `description` in the file for custom phrases (`src/locales/custom.js`).
 
-Please note that this option can only be provided through a config file and is not available via CLI/ENV.
+Authentication is generally affected by the [`allowedDomains`](#alloweddomains) option.
 
-### Example 1: HTTP Request Header Value
+The `authConfig` option can only be provided through a config file and is not available via CLI/ENV.
+
+### API Keys
+
+API keys can be configured to be sent via HTTP header or query parameter:
+
+- For query parameters you need to set `in: query` with a respective `name` for the query parameter
+- For HTTP headers you need to set `in: header` with a respective `name` for the header field
+
+#### Example 1: HTTP Request Header Value
 
 ```js
 {
-  type: 'header',
-  key: 'Authorization',
+  type: 'apiKey',
+  in: 'header',
+  name: 'Authorization',
   formatter: token => `Bearer ${token}`, // This is an example, there's also the simpler variant to just provide the string 'Bearer' in this case
   description: `Please retrieve the token from our [API console](https://example.com/api-console).\n\nFor further questions contact <mailto:support@example.com>.`
 }
@@ -307,17 +337,59 @@ Please note that this option can only be provided through a config file and is n
 For a given token `123` this results in the following additional HTTP Header:
 `Authorization: Bearer 123`
 
-### Example 2: Query Parameter Value
+#### Example 2: Query Parameter Value
 
 ```js
 {
-  type: 'query',
-  key: 'API_KEY'
+  type: 'apiKey',
+  in: 'query',
+  name: 'API_KEY'
 }
 ```
 
 For a given token `123` this results in the following query parameter:
 `https://example.com/stac/catalog.json?API_KEY=123`
+
+### HTTP Basic
+
+HTTP Basic is supported according to [RFC 7617](https://datatracker.ietf.org/doc/html/rfc7617).
+
+**Example:**
+
+```js
+{
+  type: 'http',
+  scheme: 'basic'
+}
+```
+
+### OpenID Connect
+
+**IMPORTANT: OpenID Connect is only supported if `historyMode` is set to `history`!**
+
+For OpenID Connect some additional options must be provided, which currently follow the
+[oidc-client-ts Configuration options](https://github.com/okta/okta-auth-js?tab=readme-ov-file#configuration-options).
+These options (except for `issuer`) must be provided in the property `oidcConfig`.
+The `client_id` option defaults to `stac-browser`.
+
+The redirect URL for the OIDC client must be the STAC Browser URL, e.g. `https://mycompany.com/browser`, plus an appended `/auth`, so for example `https://mycompany.com/browser/auth`.
+
+#### Example
+
+```js
+{
+  type: 'openIdConnect',
+  openIdConnectUrl: 'https://stac.example/.well-known/openid-configuration',
+  oidcConfig: {
+    client_id: 'abc123'
+  }
+}
+```
+
+For a given token `123` this results in the following additional HTTP Header:
+`Authorization: Bearer 123`
+
+You can change the default behaviour to send it as a Bearer token by providing `in`, `name` and `format`.
 
 ## preprocessSTAC
 

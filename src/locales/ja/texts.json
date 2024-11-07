@@ -33,11 +33,10 @@
   },
   "authentication": {
     "button": {
-      "authenticate": "認証",
-      "authenticated": "認証済",
       "title": "資格情報の入力または更新"
     },
     "description": "要求されたページには認証が必要です。以下のテキストフィールドに認証情報を入力してください。",
+    "schemeTypes": {},
     "title": "認証"
   },
   "browse": "ブラウズ",
@@ -292,6 +291,7 @@
     "title": "ソースデータ",
     "valid": "有効",
     "validating": "検証中...",
+    "validationParams": {},
     "validationReport": {
       "disclaimer": "検証レポートはスキーマに基づいて生成されますが、網羅していないことがあります。 これらはSTAC仕様とその拡張のすべてをカバーするわけではありません。 この検証レポートは、STACエンティティが仕様およびその拡張に完全に準拠している保証ではありません。",
       "result": "結果",

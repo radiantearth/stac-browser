@@ -1,0 +1,378 @@
+{
+  "actions": {
+    "openIn": "Abrir em {service}"
+  },
+  "additionalActions": "Ações Adicionais",
+  "additionalResources": "Recursos Adicionais",
+  "anonymized": {
+    "title": "Anonimizado"
+  },
+  "assets": {
+    "alternate": {
+      "main": "Preferido"
+    },
+    "copyGdalVfsUrl": {
+      "generic": "Copiar URL GDAL VFS",
+      "withSource": "Copiar URL GDAL VFS para {source}"
+    },
+    "copyUrl": {
+      "generic": "Copiar URL",
+      "withSource": "Copiar URL para {source}"
+    },
+    "currentlyShown": "Este é o recurso que está sendo exibido.",
+    "download": {
+      "generic": "Download",
+      "withSource": "Download de {source}"
+    },
+    "inItems": "Recurso em Itens | Recursos em Itens",
+    "role": {
+      "data": "Dados",
+      "metadata": "Metadados"
+    },
+    "showOnMap": "Mostrar no mapa",
+    "showThumbnail": "Mostrar thumbnail",
+    "shown": "exibido"
+  },
+  "authentication": {
+    "button": {
+      "login": "Log in",
+      "logout": "Desconectar",
+      "title": "Forneça ou atualize suas credenciais"
+    },
+    "chooseMethod": "Escolha o método de autenticação",
+    "description": "A página solicitada requer autenticação. Por favor, forneça detalhes de sua autenticação no campo de texto abaixo.",
+    "loggedOut": "Você foi desconectado com sucesso. Você pode fechar esta janela agora.",
+    "password": "Senha",
+    "required": "Autenticação requerida",
+    "schemeTypes": {
+      "http": "HTTP {scheme}",
+      "s3": "S3",
+      "signedUrl": "URL Assinada",
+      "oauth2": "OAuth 2",
+      "apiKey": "Chave da API",
+      "openIdConnect": "OpenID Connect"
+    },
+    "title": "Autenticação",
+    "unauthorized": "Você não tem permissão para acessar esses dados. Por favor, faça login.",
+    "unsupported": "Não suportado",
+    "unsupportedLong": "Desculpe, o método de autenticação {method} não é suportado pelo STAC Browser.",
+    "user": "Usuário"
+  },
+  "browse": "Navegar",
+  "cancel": "Cancelar",
+  "catalog": {
+    "license": "Licença",
+    "temporalExtent": "Extensão Temporal"
+  },
+  "catalogs": {
+    "filterByTitle": "Filtrar catálogos por título",
+    "filterByTitleAndMore": "Filtrar catálogos por título, descrição ou palavras-chave",
+    "loadMore": "Carregar mais...",
+    "noMatches": "Nenhum catálogo corresponde aos critérios de pesquisa fornecidos."
+  },
+  "checkbox": {
+    "false": "não",
+    "true": "sim"
+  },
+  "copy": "Cópia",
+  "default": "Padrão",
+  "defaultWithValue": "Valor padrão ({value})",
+  "deprecated": "Descontinuado",
+  "deprecation": {
+    "fallbackTitle": "Mostrar",
+    "latestVersion": "Última versão:",
+    "otherVersionsNotice": "Este {type} *não* está descontinuado, mas existem outras versões disponíveis:",
+    "otherVersionsTitle": "Outras versões disponíveis",
+    "outdatedTitle": "Desatualizado",
+    "predecessorVersion": "Versão anterior:",
+    "successorVersion": "Versão posterior:",
+    "warning": "Observe que este {type} está descontinuado e pode ser removido a qualquer momento. Provavelmente ele deve ser retirado de uso o mais rápido possível. Evite usá-lo em novos projetos."
+  },
+  "description": "Descrição",
+  "errors": {
+    "authFailed": "A solicitação apresentou erro. Os detalhes de autenticação fornecidos podem estar incorretos.",
+    "badRequest": "A solicitação é inválida. Isto pode ser devido a parâmetros inválidos, por exemplo, uma solicitação de pesquisa ou pode ser um bug no STAC Browser.",
+    "contactProvider": "Entre em contato com o operador do serviço para resolver esse problema.",
+    "default": "A página solicitada não pôde ser carregada.",
+    "forbidden": "As credenciais fornecidas para esta solicitação são inválidas, por exemplo, um token de API expirado ou inválido. Forneça outras credenciais e tente novamente.",
+    "invalidJsonObject": "A resposta não é um objeto JSON válido.",
+    "invalidStacCollections": "A resposta da API não é uma lista válida de coleções STAC.",
+    "invalidStacItems": "A resposta da API não é uma lista válida de itens STAC.",
+    "labels": {
+      "cause": "Causa:",
+      "code": "Código do Erro:",
+      "reason": "Razão:",
+      "requestURL": "URL de solicitação:"
+    },
+    "loadApiCollectionsFailed": "As coleções da API não puderam ser carregadas.",
+    "loadApiItemsFailed": "Os itens da API não puderam ser carregados.",
+    "loadFilteredItems": "Desculpe, mas não foi possível carregar uma lista filtrada de itens.",
+    "loadItems": "Desculpe, mas não foi possível carregar a lista de itens STAC.",
+    "networkError": "Este problema pode ocorrer quando os servidores não permitem acesso externo através de navegadores web (por exemplo, quando os cabeçalhos CORS não estão presentes). @:errors.contactProvider",
+    "noExternalAccess": "Não é permitido acessar catálogos externos!",
+    "notFound": "O recurso solicitado não existe. @:errors.contactProvider",
+    "serverError": "O servidor encontrou um problema. @:errors.contactProvider",
+    "unauthorized": "A solicitação não possui credenciais, por exemplo, um token de API. Forneça suas credenciais e tente novamente."
+  },
+  "featureExperimental": "Esta funcionalidade ainda é experimental e pode dar resultados inesperados!",
+  "fullscreen": {
+    "exit": "Sair da tela cheia",
+    "show": "Ver tela cheia"
+  },
+  "goBack": {
+    "description": "Voltar para {type}",
+    "label": "Voltar"
+  },
+  "goToCollection": {
+    "description": "Ir para a coleção associada",
+    "descriptionWithTitle": "@:goToCollection.description: {title}",
+    "label": "Coleção"
+  },
+  "goToParent": {
+    "description": "Ir para o nó pai",
+    "descriptionWithTitle": "@:goToParent.description: {title}",
+    "label": "Acima"
+  },
+  "in": "em {catalog}",
+  "index": {
+    "api": "API",
+    "catalog": "Catálogo",
+    "load": "Carregar",
+    "selectStacIndex": "... ou selecione um de {stacIndex}:",
+    "specifyCatalog": "Especifique um catálogo STAC ou API...",
+    "urlInvalid": "A URL é inválida.",
+    "urlMissingHost": "Falta especificar um host na URL.",
+    "urlMissingProtocol": "Falta especificar um protocolo na URL."
+  },
+  "items": {
+    "filter": "Filtros",
+    "hideFilter": "Ocultar filtros",
+    "noTime": "Nenhuma data informada",
+    "noneAvailableForCollection": "Nenhum item disponível para esta coleção.",
+    "showFilter": "Mostrar filtros"
+  },
+  "leaflet": {
+    "close": "Fechar",
+    "noFeatureProperties": "Não há dados adicionais disponíveis para este elemento.",
+    "stayLayer": {
+      "error": "Desculpe, não foi possível adicionar os dados ao mapa."
+    },
+    "zoom": {
+      "in": {
+        "description": "Aumentar o zoom",
+        "label": "+"
+      },
+      "out": {
+        "description": "Diminuir o zoom",
+        "label": "-"
+      }
+    }
+  },
+  "loading": "Carregando...",
+  "map": "Mapa",
+  "messageForSchemaError": "{message}, para esquema {schemaPath}",
+  "metadata": {
+    "general": "Geral",
+    "title": "Metadados"
+  },
+  "multiselect": {
+    "andMore": "e {count} mais",
+    "deselectLabel": "Pressione Enter para remover",
+    "keywordsPlaceholder": "Selecione palavras-chave",
+    "placeholder": "Selecione a opção",
+    "selectLabel": "Pressione Enter para selecionar",
+    "selectedLabel": "Selecionado"
+  },
+  "open": "Abrir",
+  "pagination": {
+    "first": "« Primeiro",
+    "last": "Último »",
+    "next": "Próximo ›",
+    "previous": "‹ Anterior"
+  },
+  "poweredBy": "Distribuído por {link}",
+  "protocol": {
+    "azure": "Microsoft Azure",
+    "file": "sistema de arquivos (local)",
+    "ftp": "FTP",
+    "gcs": "Google Nuvem",
+    "oss": "Alibaba Cloud",
+    "s3": {
+      "amazonaws.com": "Amazon S3",
+      "default": "S3"
+    }
+  },
+  "providers": {
+    "email": "Enviar e-mail",
+    "homepage": "Ir para a página inicial",
+    "role": {
+      "host": "Host",
+      "licensor": "Licenciante",
+      "processor": "Elaborador",
+      "producer": "Produtor"
+    },
+    "title": "Provedor | Provedores"
+  },
+  "read": {
+    "less": "Ler menos",
+    "more": "Mais informações"
+  },
+  "reset": "Redefinir",
+  "search": {
+    "addCollections": "Pressione Enter para adicionar uma coleção",
+    "addFilter": "Adicionar filtro",
+    "addItemIds": "Pressione Enter para adicionar um ID de item",
+    "addSearchTerm": "Pressione Enter para adicionar um termo de pesquisa",
+    "additionalFilters": "Filtros adicionais",
+    "dateDescription": "Todos os horários em Tempo Universal Coordenado (UTC).",
+    "enterCollections": "Insira um ou mais IDs de coleção...",
+    "enterItemIds": "Insira um ou mais IDs de item...",
+    "enterSearchTerms": "Insira um ou mais termos de pesquisa...",
+    "equalTo": "igual a",
+    "filterBySpatialExtent": "Filtrar por extensão espacial",
+    "filterCollection": "Filtrar Coleções",
+    "freeText": "Termos de Pesquisa",
+    "freeTextDescription": "Pesquise pelo menos um dos termos fornecidos em campos como título e descrição.",
+    "greaterThan": "maior que",
+    "greaterThanEqual": "maior que ou igual a",
+    "itemIds": "IDs dos itens",
+    "itemsPerPage": "Itens por página",
+    "itemsPerPageDescription": "Número de itens solicitados por página, máx. {maxItems} items.",
+    "lessThan": "menor que",
+    "lessThanEqual": "menor que ou igual a",
+    "likeOperatorDescription": "Você pode usar caracteres curinga. `_` corresponde a um único caractere, `%` corresponde a qualquer número de caracteres. Para pesquisar especificamente um caractere curinga, você precisa adicionar `\\` na frente do caractere.",
+    "logical": {
+      "and": "Considere todos os filtros (e)",
+      "or": "Considere qualquer filtro (ou)"
+    },
+    "matches": "combinações",
+    "metaDescription": "Pesquise os dados de {title}.",
+    "modifyCriteria": "Por favor, modifique os critérios de pesquisa.",
+    "noFurtherItemsFound": "Não há mais itens disponíveis.",
+    "noItemsFound": "Nenhum item encontrado para os filtros fornecidos.",
+    "noOptions": "Nenhuma entrada realizada",
+    "notEqualTo": "não é igual a",
+    "notFullySupported": "Nem todas as opções podem ser suportadas.",
+    "notSupported": "A pesquisa de itens não é suportada pela API.",
+    "placeholder": "Pesquisar...",
+    "selectCollections": "Selecione uma ou várias coleções...",
+    "selectForItemSearch": "Selecione para pesquisa de itens",
+    "sortOptions": {
+      "datetime": "Data e hora",
+      "id": "ID",
+      "title": "Título"
+    },
+    "spatialExtent": "Extensão Espacial",
+    "tabs": {
+      "collections": "Pesquisar coleções",
+      "items": "Pesquisar itens"
+    },
+    "temporalExtent": "Extensão Temporal",
+    "title": "Procurar",
+    "useInItemSearch": "Abrir coleção na pesquisa de itens | Abrir {count} coleção na pesquisa de itens"
+  },
+  "showMore": "Mostre mais...",
+  "sidebar": {
+    "switchCatalog": "Mudar o catálogo"
+  },
+  "sort": {
+    "asc": {
+      "label": "Ascendente",
+      "title": "Ordenar em ordem crescente (A-Z)"
+    },
+    "desc": {
+      "label": "Descendente",
+      "title": "Ordenar em ordem decrescente (Z-A)"
+    },
+    "title": "Ordenar"
+  },
+  "source": {
+    "conformanceClasses": "Classes de Conformidade",
+    "detailsAboutSource": "Detalhes sobre a fonte STAC",
+    "extension": "Extensão",
+    "fileFormat": "Formato de arquivo",
+    "id": "ID",
+    "invalid": "Inválido",
+    "label": "Fonte",
+    "language": {
+      "label": "Idioma: {currentLanguage}",
+      "onlyData": "Apenas os dados estão disponíveis neste idioma!",
+      "onlyUI": "Apenas a interface do usuário está disponível neste idioma!",
+      "switch": "Mudar o idioma"
+    },
+    "locatedAt": "O arquivo de metadados STAC está localizado em:",
+    "share": {
+      "email": "E-mail",
+      "label": "Compartilhar",
+      "message": "{title} está disponível em {url}",
+      "sharePageWithOthers": "Compartilhe a URL desta página onde quiser:",
+      "title": "Compartilhar",
+      "twitter": "Twitter",
+      "withOthers": "Compartilhe esta página com outros"
+    },
+    "stacExtension": "Extensão STAC",
+    "stacVersion": "Versão STAC",
+    "statistics": "Estatísticas",
+    "title": "Fonte de dados",
+    "valid": "Válido",
+    "validating": "Validando...",
+    "validationNA": "n/a",
+    "validationParams": {
+      "additionalProperty": "propriedade adicional",
+      "allowedValue": "valor permitido",
+      "allowedValues": "valores permitidos",
+      "comparison": "comparação",
+      "depsCount": "quantidade",
+      "exclusive": "excluir o limite",
+      "failingKeyword": "palavra-chave com falha",
+      "format": "formatar",
+      "i": "primeiro item",
+      "j": "segundo item",
+      "limit": "limite",
+      "maxContains": "contém no máximo",
+      "minContains": "contém pelo menos",
+      "missingProperty": "propriedade faltante",
+      "multipleOf": "múltiplo de",
+      "passingSchemas": "esquemas aprovados",
+      "pattern": "padrão",
+      "property": "propriedade",
+      "propertyName": "nome da propriedade",
+      "type": "tipo"
+    },
+    "validationReport": {
+      "disclaimer": "O relatório de validação é gerado com base em esquemas, que muitas vezes não são exaustivos. Desse modo, podem não abranger todos os aspectos da especificação STAC e suas extensões. O relatório de validação não é uma garantia de que a entidade STAC esteja totalmente em conformidade com a especificação e suas extensões.",
+      "result": "Resultado",
+      "title": "Relatório de Validação"
+    }
+  },
+  "stacAssets": "Recurso | Recursos",
+  "stacCatalog": "Catálogo | Catálogos",
+  "stacCollection": "Coleção | Coleções",
+  "stacItem": "Item | Items",
+  "submit": "Enviar",
+  "table": {
+    "emptyFilteredText": "Não há registros que correspondem à sua solicitação",
+    "emptyText": "Não há registros para mostrar",
+    "sort": {
+      "asc": "Clique para ordenar em ordem crescente",
+      "clear": "Clique para remover a ordenação",
+      "desc": "Clique para ordenar em ordem decrescente"
+    }
+  },
+  "thumbnails": "Thumbnails",
+  "tree": {
+    "moreCollectionPagesAvailable": "mais páginas disponíveis para a Coleção",
+    "noChildren": "Não há nós-filho disponíveis."
+  },
+  "view": {
+    "list": {
+      "label": "Lista",
+      "title": "Mostrar como lista"
+    },
+    "tiles": {
+      "label": "Grade",
+      "title": "Mostrar como grade"
+    },
+    "title": "Opções de exibição"
+  }
+}

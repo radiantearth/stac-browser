@@ -1,0 +1,29 @@
+name: Fix CrowdIn commits
+on:
+  pull_request:
+    types:
+      - unlabeled
+jobs:
+  deploy:
+    if: ${{ github.event.label.name == 'CI run required' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{github.event.pull_request.head.ref}}
+      - run: npm install
+      - run: node helpers/fix-crowdin.js
+      - name: Commit changes
+        run: |
+          git config user.name "STAC Browser CI"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          timestamp=$(date -u)
+          git commit -m ":robot: Automated update for locales: ${timestamp} [skip ci]" || exit 0
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

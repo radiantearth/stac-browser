@@ -16,7 +16,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["allowExternalAccess", "url", "redirectLegacyUrls"]),
+    ...mapState(["allowExternalAccess", "catalogUrl", "url", "redirectLegacyUrls"]),
     ...mapGetters(["fromBrowserPath", "error", "loading"]),
     errorId() {
       if (this.error instanceof Error && this.error.isAxiosError && Utils.isObject(this.error.response)) {
@@ -77,7 +77,7 @@ export default {
         }
 
         let url = this.fromBrowserPath(path || '/');
-        this.$store.dispatch("load", { url, show: true, loadApi: true });
+        this.$store.dispatch("load", { url, show: true });
       }
     }
   },

@@ -60,6 +60,17 @@ body {
         font-weight: 700;
         display: flex;
         align-items: center;
+        font-size: 2.2rem;
+    }
+    @include media-breakpoint-down(xl) {
+      h1 {
+          font-size: 2rem;
+      }
+    }
+    @include media-breakpoint-down(md) {
+      h1 {
+          font-size: 1.75rem;
+      }
     }
 
     h2 {
@@ -285,5 +296,29 @@ $primary-color: map-get($theme-colors, "primary");
   .multiselect__placeholder {
     color: #999;
     font-size: 16px;
+  }
+}
+
+#stac-browser-auth-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0,0,0, 0.5);
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+
+  > form {
+      min-width: 200px;
+      width: 50vw;
+      border-radius: $border-radius;
+
+      > .card {
+          background-color: #fff;
+      }
   }
 }

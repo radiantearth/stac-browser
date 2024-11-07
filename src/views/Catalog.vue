@@ -1,5 +1,5 @@
 <template>
-  <div :class="{cc: true, [data.type.toLowerCase()]: true, mixed: hasCatalogs && hasItems, empty: !hasCatalogs && !hasItems}" :key="data.id">
+  <div :class="{cc: true, [cssStacType]: true, mixed: hasCatalogs && hasItems, empty: !hasCatalogs && !hasItems}" :key="data.id">
     <b-row>
       <b-col class="meta">
         <section class="intro">
@@ -20,7 +20,7 @@
               <b-col md="8" class="value"><span v-html="temporalExtents" /></b-col>
             </b-row>
           </section>
-          <Links v-if="linkPosition === 'left'" :title="$t('additionalResources')" :links="additionalLinks" />
+          <Links v-if="linkPosition === 'left'" :title="$t('additionalResources')" :links="additionalLinks" :context="data" />
         </section>
         <section v-if="isCollection || hasThumbnails" class="mb-4">
           <b-card no-body class="maps-preview">
@@ -35,11 +35,11 @@
           </b-card>
         </section>
         <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="shownAssets" @showAsset="showAsset" />
-        <Assets v-if="hasItemAssets && !hasItems" :assets="data.item_assets" :definition="true" />
+        <Assets v-if="hasItemAssets && !hasItems" :assets="data.item_assets" :context="data" :definition="true" />
         <Providers v-if="providers" :providers="providers" />
         <Metadata class="mb-4" :type="data.type" :data="data" :ignoreFields="ignoredMetadataFields" />
         <CollectionLink v-if="collectionLink" :link="collectionLink" />
-        <Links v-if="linkPosition === 'right'" :title="$t('additionalResources')" :links="additionalLinks" />
+        <Links v-if="linkPosition === 'right'" :title="$t('additionalResources')" :links="additionalLinks" :context="data" />
       </b-col>
       <b-col class="catalogs-container" v-if="hasCatalogs">
         <Catalogs :catalogs="catalogs" :hasMore="!!nextCollectionsLink" @loadMore="loadMoreCollections" />
@@ -52,7 +52,7 @@
           @paginate="paginateItems" @filterItems="filterItems"
           @filtersShown="filtersShown"
         />
-        <Assets v-if="hasItemAssets" :assets="data.item_assets" :definition="true" />
+        <Assets v-if="hasItemAssets" :assets="data.item_assets" :context="data" :definition="true" />
       </b-col>
     </b-row>
   </div>
@@ -127,6 +127,8 @@ export default {
         'stats:catalogs',
         'stats:collections',
         'stats:items',
+        // Special handling for auth
+        'auth:schemes',
         // Special handling for the STAC Browser config
         'stac_browser'
       ]
@@ -135,6 +137,12 @@ export default {
   computed: {
     ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination', 'nextCollectionsLink', 'stateQueryParameters']),
     ...mapGetters(['additionalLinks', 'catalogs', 'collectionLink', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
+    cssStacType() {
+      if (Utils.hasText(this.data?.type)) {
+        return this.data?.type.toLowerCase();
+      }
+      return null;
+    },
     showFilters() {
       return Boolean(this.stateQueryParameters['itemFilterOpen']);
     },
@@ -247,7 +255,7 @@ export default {
         this.$store.commit('resetApiItems', this.data.getApiItemsLink());
       }
       try {
-        await this.$store.dispatch('loadApiItems', {link: this.apiItemsLink, show: true, filters});
+        await this.$store.dispatch('loadApiItems', {link: this.data.getApiItemsLink(), show: true, filters});
       } catch (error) {
         let msg = reset ? this.$t('errors.loadItems') : this.$t('errors.loadFilteredItems');
         this.$root.$emit('error', error, msg);

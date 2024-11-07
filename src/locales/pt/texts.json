@@ -19,7 +19,7 @@
       "generic": "Copiar URL",
       "withSource": "Copiar URL para {source}"
     },
-    "currentlyShown": "Este é o recurso que está sendo exibido.",
+    "currentlyShown": "Este é o recurso que está a ser mostrado.",
     "download": {
       "generic": "Download",
       "withSource": "Download de {source}"
@@ -35,11 +35,10 @@
   },
   "authentication": {
     "button": {
-      "authenticate": "Autenticar",
-      "authenticated": "Autenticado",
-      "title": "Forneça ou atualize suas credenciais"
+      "title": "Forneça ou atualize as suas credenciais"
     },
-    "description": "A página solicitada requer autenticação. Por favor, forneça detalhes de sua autenticação no campo de texto abaixo.",
+    "description": "A página solicitada requer autenticação. Por favor, forneça os detalhes da sua autenticação no campo de texto abaixo.",
+    "schemeTypes": {},
     "title": "Autenticação"
   },
   "browse": "Navegar",
@@ -59,8 +58,8 @@
     "true": "sim"
   },
   "copy": "Cópia",
-  "default": "Padrão",
-  "defaultWithValue": "Valor padrão ({value})",
+  "default": "Default",
+  "defaultWithValue": "Valor default ({value})",
   "deprecated": "Descontinuado",
   "deprecation": {
     "fallbackTitle": "Mostrar",
@@ -69,16 +68,16 @@
     "otherVersionsTitle": "Outras versões disponíveis",
     "outdatedTitle": "Desatualizado",
     "predecessorVersion": "Versão anterior:",
-    "successorVersion": "Versão posterior:",
-    "warning": "Observe que este {type} está descontinuado e pode ser removido a qualquer momento. Provavelmente ele deve ser retirado de uso o mais rápido possível. Evite usá-lo em novos projetos."
+    "successorVersion": "Versão seguinte:",
+    "warning": "Tenha em atenção que este {type} está descontinuado e pode ser removido a qualquer momento. Provavelmente deve deixar de ser usado o mais rapidamente possível. Evite usá-lo em novos projetos."
   },
   "description": "Descrição",
   "errors": {
-    "authFailed": "A solicitação apresentou erro. Os detalhes de autenticação fornecidos podem estar incorretos.",
-    "badRequest": "A solicitação é inválida. Isto pode ser devido a parâmetros inválidos, por exemplo, uma solicitação de pesquisa ou pode ser um bug no STAC Browser.",
-    "contactProvider": "Entre em contato com o operador do serviço para resolver esse problema.",
-    "default": "A página solicitada não pôde ser carregada.",
-    "forbidden": "As credenciais fornecidas para esta solicitação são inválidas, por exemplo, um token de API expirado ou inválido. Forneça outras credenciais e tente novamente.",
+    "authFailed": "O pedido resultou em erro. Os detalhes de autenticação fornecidos podem estar incorretos.",
+    "badRequest": "O pedido é inválido. Isto pode ser devido a parâmetros inválidos, por exemplo num pedido de pesquisa, ou pode ser um bug no STAC Browser.",
+    "contactProvider": "Por favor contacte o operador do serviço para resolver o problema.",
+    "default": "A página pedida não pôde ser carregada.",
+    "forbidden": "As credenciais especificadas para este pedido são inválidas, por exemplo um token da API expirado ou inválido. Forneça outras credenciais e tente novamente.",
     "invalidJsonObject": "A resposta não é um objeto JSON válido.",
     "invalidStacCollections": "A resposta da API não é uma lista válida de coleções STAC.",
     "invalidStacItems": "A resposta da API não é uma lista válida de itens STAC.",
@@ -86,22 +85,22 @@
       "cause": "Causa:",
       "code": "Código do Erro:",
       "reason": "Razão:",
-      "requestURL": "URL de solicitação:"
+      "requestURL": "URL do pedido:"
     },
     "loadApiCollectionsFailed": "As coleções da API não puderam ser carregadas.",
     "loadApiItemsFailed": "Os itens da API não puderam ser carregados.",
     "loadFilteredItems": "Desculpe, mas não foi possível carregar uma lista filtrada de itens.",
-    "loadItems": "Desculpe, mas não foi possível carregar a lista de itens STAC.",
-    "networkError": "Este problema pode ocorrer quando os servidores não permitem acesso externo através de navegadores web (por exemplo, quando os cabeçalhos CORS não estão presentes). @:errors.contactProvider",
-    "noExternalAccess": "Não é permitido acessar catálogos externos!",
-    "notFound": "O recurso solicitado não existe. @:errors.contactProvider",
+    "loadItems": "Desculpe, o carregamento da lista de itens STAC falhou.",
+    "networkError": "Este problema pode ocorrer quando os servidores não permitem acesso externo através de navegadores web (por exemplo quando os cabeçalhos CORS não estão presentes). @:errors.contactProvider",
+    "noExternalAccess": "Não é permitido aceder a catálogos externos!",
+    "notFound": "O recurso pedido não existe. @:errors.contactProvider",
     "serverError": "O servidor encontrou um problema. @:errors.contactProvider",
-    "unauthorized": "A solicitação não possui credenciais, por exemplo, um token de API. Forneça suas credenciais e tente novamente."
+    "unauthorized": "O pedido não possui credenciais, por exemplo um token da API. Forneça as suas credenciais e tente novamente."
   },
   "featureExperimental": "Esta funcionalidade ainda é experimental e pode dar resultados inesperados!",
   "fullscreen": {
-    "exit": "Sair da tela cheia",
-    "show": "Ver tela cheia"
+    "exit": "Sair do ecrã completo",
+    "show": "Ver ecrã completo"
   },
   "goBack": {
     "description": "Voltar para {type}",
@@ -113,7 +112,7 @@
     "label": "Coleção"
   },
   "goToParent": {
-    "description": "Ir para o nó pai",
+    "description": "Ir para o nó superior",
     "descriptionWithTitle": "@:goToParent.description: {title}",
     "label": "Acima"
   },
@@ -123,21 +122,21 @@
     "catalog": "Catálogo",
     "load": "Carregar",
     "selectStacIndex": "... ou selecione um de {stacIndex}:",
-    "specifyCatalog": "Especifique um catálogo STAC ou API...",
-    "urlInvalid": "A URL é inválida.",
-    "urlMissingHost": "Falta especificar um host na URL.",
-    "urlMissingProtocol": "Falta especificar um protocolo na URL."
+    "specifyCatalog": "Por favor especifique um catálogo STAC ou API...",
+    "urlInvalid": "O URL é inválido.",
+    "urlMissingHost": "Falta um host no URL.",
+    "urlMissingProtocol": "Falta um protocolo no URL."
   },
   "items": {
     "filter": "Filtros",
     "hideFilter": "Ocultar filtros",
-    "noTime": "Nenhuma data informada",
+    "noTime": "Nenhuma data fornecida",
     "noneAvailableForCollection": "Nenhum item disponível para esta coleção.",
     "showFilter": "Mostrar filtros"
   },
   "leaflet": {
     "close": "Fechar",
-    "noFeatureProperties": "Não há dados adicionais disponíveis para este elemento.",
+    "noFeatureProperties": "Não há informação adicional disponível para este elemento.",
     "stayLayer": {
       "error": "Desculpe, não foi possível adicionar os dados ao mapa."
     },
@@ -160,7 +159,7 @@
     "title": "Metadados"
   },
   "multiselect": {
-    "andMore": "e {count} mais",
+    "andMore": "e mais {count}",
     "deselectLabel": "Pressione Enter para remover",
     "keywordsPlaceholder": "Selecione palavras-chave",
     "placeholder": "Selecione a opção",
@@ -171,15 +170,15 @@
   "pagination": {
     "first": "« Primeiro",
     "last": "Último »",
-    "next": "Próximo ›",
+    "next": "Seguinte ›",
     "previous": "‹ Anterior"
   },
   "poweredBy": "Distribuído por {link}",
   "protocol": {
     "azure": "Microsoft Azure",
-    "file": "sistema de arquivos (local)",
+    "file": "sistema de ficheiros (local)",
     "ftp": "FTP",
-    "gcs": "Google Nuvem",
+    "gcs": "Google Cloud",
     "oss": "Alibaba Cloud",
     "s3": {
       "amazonaws.com": "Amazon S3",
@@ -191,8 +190,8 @@
     "homepage": "Ir para a página inicial",
     "role": {
       "host": "Host",
-      "licensor": "Licenciante",
-      "processor": "Elaborador",
+      "licensor": "Licenciador",
+      "processor": "Processador",
       "producer": "Produtor"
     },
     "title": "Provedor | Provedores"
@@ -205,10 +204,10 @@
   "search": {
     "addCollections": "Pressione Enter para adicionar uma coleção",
     "addFilter": "Adicionar filtro",
-    "addItemIds": "Pressione Enter para adicionar um ID de item",
+    "addItemIds": "Pressione Enter para adicionar o ID de um item",
     "addSearchTerm": "Pressione Enter para adicionar um termo de pesquisa",
     "additionalFilters": "Filtros adicionais",
-    "dateDescription": "Todos os horários em Tempo Universal Coordenado (UTC).",
+    "dateDescription": "Todos os horários em UTC.",
     "enterCollections": "Insira um ou mais IDs de coleção...",
     "enterItemIds": "Insira um ou mais IDs de item...",
     "enterSearchTerms": "Insira um ou mais termos de pesquisa...",
@@ -216,27 +215,27 @@
     "filterBySpatialExtent": "Filtrar por extensão espacial",
     "filterCollection": "Filtrar Coleções",
     "freeText": "Termos de Pesquisa",
-    "freeTextDescription": "Pesquise pelo menos um dos termos fornecidos em campos como título e descrição.",
-    "greaterThan": "maior que",
-    "greaterThanEqual": "maior que ou igual a",
+    "freeTextDescription": "Pesquise por pelo menos um dos termos fornecidos em campos como o título e a descrição.",
+    "greaterThan": "maior de",
+    "greaterThanEqual": "maior de ou igual a",
     "itemIds": "IDs dos itens",
     "itemsPerPage": "Itens por página",
-    "itemsPerPageDescription": "Número de itens solicitados por página, máx. {maxItems} items.",
-    "lessThan": "menor que",
-    "lessThanEqual": "menor que ou igual a",
-    "likeOperatorDescription": "Você pode usar caracteres curinga. `_` corresponde a um único caractere, `%` corresponde a qualquer número de caracteres. Para pesquisar especificamente um caractere curinga, você precisa adicionar `\\` na frente do caractere.",
+    "itemsPerPageDescription": "Número de itens pedidos por página, máx. {maxItems} items.",
+    "lessThan": "menor de",
+    "lessThanEqual": "menor de ou igual a",
+    "likeOperatorDescription": "Pode usar wildcards. `_` corresponde a um único caractere, `%` corresponde a um qualquer número de caracteres. Para pesquisar por um caractere wildcard específico, tem de adicionar `\\` antes do caractere.",
     "logical": {
-      "and": "Considere todos os filtros (e)",
-      "or": "Considere qualquer filtro (ou)"
+      "and": "Inclua resultados que respeitem todos os filtros (e)",
+      "or": "Inclua resultados que respeitem qualquer um dos filtros (ou)"
     },
-    "matches": "combinações",
+    "matches": "resultados",
     "metaDescription": "Pesquise os dados de {title}.",
-    "modifyCriteria": "Por favor, modifique os critérios de pesquisa.",
+    "modifyCriteria": "Por favor, mude os critérios de pesquisa.",
     "noFurtherItemsFound": "Não há mais itens disponíveis.",
-    "noItemsFound": "Nenhum item encontrado para os filtros fornecidos.",
-    "noOptions": "Nenhuma entrada realizada",
+    "noItemsFound": "Nenhum item encontrado correspondente aos filtros especificados.",
+    "noOptions": "Nada introduzido ainda",
     "notEqualTo": "não é igual a",
-    "notFullySupported": "Nem todas as opções podem ser suportadas.",
+    "notFullySupported": "Algumas opções podem não ser suportadas.",
     "notSupported": "A pesquisa de itens não é suportada pela API.",
     "placeholder": "Pesquisar...",
     "selectCollections": "Selecione uma ou várias coleções...",
@@ -252,12 +251,12 @@
       "items": "Pesquisar itens"
     },
     "temporalExtent": "Extensão Temporal",
-    "title": "Procurar",
-    "useInItemSearch": "Abrir coleção na pesquisa de itens | Abrir {count} coleção na pesquisa de itens"
+    "title": "Pesquisar",
+    "useInItemSearch": "Abrir coleção na pesquisa de itens | Abrir {count} coleções na pesquisa de itens"
   },
   "showMore": "Mostre mais...",
   "sidebar": {
-    "switchCatalog": "Mudar o catálogo"
+    "switchCatalog": "Mudar de catálogo"
   },
   "sort": {
     "asc": {
@@ -272,34 +271,34 @@
   },
   "source": {
     "conformanceClasses": "Classes de Conformidade",
-    "detailsAboutSource": "Detalhes sobre a fonte STAC",
+    "detailsAboutSource": "Detalhes da fonte STAC",
     "extension": "Extensão",
-    "fileFormat": "Formato de arquivo",
+    "fileFormat": "Formato de ficheiro",
     "id": "ID",
     "invalid": "Inválido",
     "label": "Fonte",
     "language": {
-      "label": "Idioma: {currentLanguage}",
-      "onlyData": "Apenas os dados estão disponíveis neste idioma!",
-      "onlyUI": "Apenas a interface do usuário está disponível neste idioma!",
-      "switch": "Mudar o idioma"
+      "label": "Língua: {currentLanguage}",
+      "onlyData": "Apenas os dados estão disponíveis nesta língua!",
+      "onlyUI": "Apenas a interface do utilizador está disponível nesta língua!",
+      "switch": "Mudar de língua"
     },
-    "locatedAt": "O arquivo de metadados STAC está localizado em:",
+    "locatedAt": "O ficheiro de metadados STAC está localizado em:",
     "share": {
       "email": "E-mail",
-      "label": "Compartilhar",
+      "label": "Partilhar",
       "message": "{title} está disponível em {url}",
-      "sharePageWithOthers": "Compartilhe a URL desta página onde quiser:",
-      "title": "Compartilhar",
+      "sharePageWithOthers": "Partilhe o URL desta página onde quiser:",
+      "title": "Partilhar",
       "twitter": "Twitter",
-      "withOthers": "Compartilhe esta página com outros"
+      "withOthers": "Partilhe esta página com outros"
     },
     "stacExtension": "Extensão STAC",
     "stacVersion": "Versão STAC",
     "statistics": "Estatísticas",
-    "title": "Fonte de dados",
+    "title": "Dados-fonte",
     "valid": "Válido",
-    "validating": "Validando...",
+    "validating": "A validar...",
     "validationNA": "n/a",
     "validationParams": {
       "additionalProperty": "propriedade adicional",
@@ -307,7 +306,7 @@
       "allowedValues": "valores permitidos",
       "comparison": "comparação",
       "depsCount": "quantidade",
-      "exclusive": "excluir o limite",
+      "exclusive": "excluindo a fronteira",
       "failingKeyword": "palavra-chave com falha",
       "format": "formatar",
       "i": "primeiro item",
@@ -315,16 +314,16 @@
       "limit": "limite",
       "maxContains": "contém no máximo",
       "minContains": "contém pelo menos",
-      "missingProperty": "propriedade faltante",
+      "missingProperty": "propriedade em falta",
       "multipleOf": "múltiplo de",
-      "passingSchemas": "esquemas aprovados",
+      "passingSchemas": "esquemas válidos",
       "pattern": "padrão",
       "property": "propriedade",
       "propertyName": "nome da propriedade",
       "type": "tipo"
     },
     "validationReport": {
-      "disclaimer": "O relatório de validação é gerado com base em esquemas, que muitas vezes não são exaustivos. Desse modo, podem não abranger todos os aspectos da especificação STAC e suas extensões. O relatório de validação não é uma garantia de que a entidade STAC esteja totalmente em conformidade com a especificação e suas extensões.",
+      "disclaimer": "O relatório de validação é gerado com base em esquemas que frequentemente não são exaustivos. Portanto, podem não cobrir todos os aspectos da especificação STAC e das suas extensões. O relatório de validação não é uma garantia de que a entidade STAC é totalmente conforme a especificação e as suas extensões.",
       "result": "Resultado",
       "title": "Relatório de Validação"
     }
@@ -333,14 +332,14 @@
   "stacCatalog": "Catálogo | Catálogos",
   "stacCollection": "Coleção | Coleções",
   "stacItem": "Item | Items",
-  "submit": "Enviar",
+  "submit": "Submeter",
   "table": {
-    "emptyFilteredText": "Não há registros que correspondem à sua solicitação",
-    "emptyText": "Não há registros para mostrar",
+    "emptyFilteredText": "Não há registos que correspondam ao seu pedido",
+    "emptyText": "Não há registos a mostrar",
     "sort": {
-      "asc": "Clique para ordenar em ordem crescente",
-      "clear": "Clique para remover a ordenação",
-      "desc": "Clique para ordenar em ordem decrescente"
+      "asc": "Clique para ordenar por ordem crescente",
+      "clear": "Clique para limpar a ordenação",
+      "desc": "Clique para ordenar por ordem decrescente"
     }
   },
   "thumbnails": "Thumbnails",
@@ -354,9 +353,9 @@
       "title": "Mostrar como lista"
     },
     "tiles": {
-      "label": "Grade",
-      "title": "Mostrar como grade"
+      "label": "Grelha",
+      "title": "Mostrar como grelha"
     },
-    "title": "Opções de exibição"
+    "title": "Opções de vista"
   }
 }

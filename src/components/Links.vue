@@ -5,12 +5,12 @@
       <div class="group" v-for="group in groups" :key="group.rel">
         <h4 v-if="group.rel">{{ group.label }}</h4>
         <ul>
-          <Link v-for="(link, key) in group.links" :key="key" :link="link" :fallbackTitle="() => fallbackTitle(link)" />
+          <Link v-for="(link, key) in group.links" :key="key" :link="link" :context="context" :fallbackTitle="() => fallbackTitle(link)" />
         </ul>
       </div>
     </template>
     <ul v-else>
-      <Link v-for="(link, key) in links" :key="key" :link="link" :fallbackTitle="() => fallbackTitle(link)" />
+      <Link v-for="(link, key) in links" :key="key" :link="link" :context="context" :fallbackTitle="() => fallbackTitle(link)" />
     </ul>
   </section>
 </template>
@@ -38,6 +38,10 @@ export default {
     links: {
       type: Array,
       default: () => ([])
+    },
+    context: {
+      type: Object,
+      default: null
     }
   },
   computed: {
@@ -57,7 +61,8 @@ export default {
         }
         return summary;
       }, {});
-      return Object.values(groups).sort((g1, g2) => g1.label.localeCompare(g2.label, this.uiLanguage));
+      const collator = new Intl.Collator(this.uiLanguage);
+      return Object.values(groups).sort((g1, g2) => collator.compare(g1.label, g2.label));
     },
     hasGroups() {
       return this.groups.some(group => group.rel.length > 0 && group.links.length >= 2);

@@ -3,4 +3,9 @@ files:
     ignore:
       - config.json
       - custom.json
-    translation: /src/locales/%two_letters_code%/%original_file_name%
+    translation: /src/locales/%locale%/%original_file_name%
+pull_request_title: "Update translations"
+pull_request_labels: [
+  "i18n / l10n",
+  "CI run required"
+]

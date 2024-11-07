@@ -128,10 +128,10 @@ export default {
       return this.isCollectionSearch ? this.collectionSearch : this.itemSearch;
     },
     collectionSearch() {
-      return this.canSearchCollections && this.parent instanceof STAC && this.parent.getApiCollectionsLink();
+      return this.canSearchCollections && this.stac && this.stac.getApiCollectionsLink();
     },
     itemSearch() {
-      return this.canSearchItems && this.parent instanceof STAC && this.parent.getSearchLink();
+      return this.canSearchItems && this.stac && this.stac.getSearchLink();
     },
     itemCollection() {
       if (this.isCollectionSearch) {
@@ -191,7 +191,7 @@ export default {
       // so we check whether our current link has a next rel type which indicates
       // that it's a subsequent page. On the first pages the link rel type would be
       // "search" (or "prev" or "first"). This only works for forward navigation.
-      return this.link.rel === 'next';
+      return this.link && this.link.rel === 'next';
     }
   },
   watch:{
@@ -219,7 +219,7 @@ export default {
     if (!this.parent) {
       await this.$store.dispatch('load', { url });
       if (!this.root) {
-        this.$store.commit("config", { catalogUrl: url });
+        await this.$store.dispatch("config", { catalogUrl: url });
       }
       this.parent = this.getStac(url);
       this.showPage();

@@ -8,7 +8,7 @@ implemented as a single page application (SPA) for ease of development and to
 limit the overall number of catalog reads necessary when browsing (as catalogs
 may be nested and do not necessarily contain references to their parents).
 
-Version: **3.2.0** (supports all STAC versions between 0.6.0 and 1.0.0)
+Version: **3.2.0** (supports all STAC versions between 0.6.0 and 1.1.0)
 
 This package has also been published to npm as [`@radiantearth/stac-browser`](https://www.npmjs.com/package/@radiantearth/stac-browser).
 
@@ -116,14 +116,14 @@ You need to change the [`locale`](docs/options.md#locale) and [`supportedLocales
 
 The following languages are currently supported:
 
-- de: German (Germany, Switzerland)
-- es: Spanish
-- en: English (US, UK)
-- fr: French (Canada, France, Switzerland)
-- it: Italian (Italy, Switzerland)
-- ro: Romanian
-- ja: Japanese
-- pt: Portuguese
+- German (Germany, Switzerland)
+- Spanish
+- English (International, US, UK)
+- French (Canada, France, Switzerland)
+- Italian (Italy, Switzerland)
+- Romanian
+- Japanese
+- Portuguese (Brazil, Portugal)
 
 We manage the translations in Crowdin, please see <https://crowdin.com/project/stac-browser/> for details.
 
@@ -360,3 +360,4 @@ The following sponsors have provided a substantial amount of funding for STAC Br
 - [Matthias Mohr - Softwareentwicklung](https://mohr.ws) (maintenance)
 - [Spacebel](https://spacebel.com) (collection search)
 - [Planet](https://planet.com) (OpenID Connect authentication, other features, maintenance)
+- [CloudFerro](https://cloudferro.com) (authentication, Alternate Asset and Storage extensions)

@@ -8,7 +8,7 @@
         </template>
         <span class="title">{{ title }}</span>
       </h1>
-      <p class="lead" v-if="url || isSearchPage()">
+      <p class="lead" v-if="!isStacChooser()">
         <i18n v-if="containerLink" tag="span" path="in" class="in mr-3">
           <template #catalog><StacLink :data="containerLink" /></template>
         </i18n>
@@ -28,13 +28,8 @@
           <b-button v-if="canSearch" variant="outline-primary" size="sm" :to="searchBrowserLink" :title="$t('search.title')" :pressed="isSearchPage()">
             <b-icon-search /> <span class="button-label prio">{{ $t('search.title') }}</span>
           </b-button>
-          <b-button v-if="authConfig" variant="outline-primary" size="sm" @click="auth" :title="$t('authentication.button.title')">
-            <template v-if="authData">
-              <b-icon-lock /> <span class="button-label">{{ $t('authentication.button.authenticated') }}</span>
-            </template>
-            <template v-else>
-              <b-icon-unlock /> <span class="button-label">{{ $t('authentication.button.authenticate') }}</span>
-            </template>
+          <b-button v-if="canAuthenticate" variant="outline-primary" size="sm" @click="logInOut" :title="authTitle">
+            <component :is="authIcon" /> <span class="button-label">{{ authLabel }}</span>
           </b-button>
         </b-button-group>
       </p>
@@ -43,7 +38,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex';
+import { mapState, mapGetters, mapMutations, mapActions } from 'vuex';
 import Source from './Source.vue';
 import StacLink from './StacLink.vue';
 import { BIconArrow90degUp, BIconArrowLeft, BIconBook, BIconFolderSymlink, BIconSearch, BIconLock, BIconUnlock } from "bootstrap-vue";
@@ -64,8 +59,19 @@ export default {
     Source
   },
   computed: {
-    ...mapState(['allowSelectCatalog', 'authConfig', 'authData', 'catalogUrl', 'data', 'url', 'title']),
+    ...mapState(['allowSelectCatalog', 'catalogUrl', 'data', 'url', 'title']),
     ...mapGetters(['canSearch', 'root', 'parentLink', 'collectionLink', 'toBrowserPath']),
+    ...mapGetters('auth', { authMethod: 'method' }),
+    ...mapGetters('auth', ['canAuthenticate', 'isLoggedIn']),
+    authIcon() {
+      return this.isLoggedIn ? 'b-icon-unlock' : 'b-icon-lock';
+    },
+    authTitle() {
+      return this.authMethod.getButtonTitle();
+    },
+    authLabel() {
+      return this.isLoggedIn ? this.authMethod.getLogoutLabel() : this.authMethod.getLoginLabel();
+    },
     back() {
       return this.$route.name === 'validation';
     },
@@ -83,7 +89,7 @@ export default {
         else if (this.data.isCatalog()) {
           return this.$tc(`stacCatalog`);
         }
-        else {
+        else if (Utils.hasText(this.data.type)) {
           return this.data.type;
         }
       }
@@ -118,11 +124,11 @@ export default {
       if (!this.canSearch) {
         return null;
       }
-      let dataLink;
+      let searchLink;
       if (this.data instanceof STAC && !this.data.equals(this.root)) {
-        dataLink = this.data.getSearchLink();
+        searchLink = this.data.getSearchLink();
       }
-      if (dataLink) {
+      if (searchLink) {
         return `/search${this.data.getBrowserPath()}`;
       }
       else if (this.root && this.allowSelectCatalog) {
@@ -151,16 +157,29 @@ export default {
     }
   },
   methods: {
+    ...mapMutations('auth', ['addAction']),
+    ...mapActions('auth', ['requestLogin', 'requestLogout']),
     isSearchPage() {
       return this.$router.currentRoute.name === 'search';
     },
-    auth() {
-      this.$store.commit('requestAuth', () => this.$store.dispatch("load", {
-        url: this.url,
-        loadApi: true,
-        show: true,
-        force: true
-      }));
+    isStacChooser() {
+      return this.$router.currentRoute.name === 'choose';
+    },
+    async logInOut() {
+      if (this.url) {
+        this.addAction(() => this.$store.dispatch("load", {
+          url: this.url,
+          show: true,
+          force: true,
+          noRetry: true
+        }));
+      }
+      if (this.isLoggedIn) {
+        await this.requestLogout();
+      }
+      else {
+        await this.requestLogin();
+      }
     }
   }
 };

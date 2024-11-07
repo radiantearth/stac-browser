@@ -170,13 +170,17 @@ export default class Utils {
     return Array.isArray(links) ? links.filter(link => Utils.isObject(link) && Utils.hasText(link.href) && !rels.includes(link.rel)) : [];
   }
 
+  static removeTrailingSlash(str) {
+    return str.replace(/\/$/, '');
+  }
+
   static equalUrl(a, b) {
     try {
       let uri1 = URI(a);
       let uri2 = URI(b);
       // Ignore trailing slash in URL paths
-      uri1.path(uri1.path().replace(/\/$/, ''));
-      uri2.path(uri2.path().replace(/\/$/, ''));
+      uri1.path(Utils.removeTrailingSlash(uri1.path()));
+      uri2.path(Utils.removeTrailingSlash(uri2.path()));
       return uri1.equals(uri2);
     } catch (error) {
       return false;
@@ -213,18 +217,16 @@ export default class Utils {
   // Convert from UTC to locale time (needed for vue2-datetimepicker)
   // see https://github.com/mengxiong10/vue2-datepicker/issues/388
   static dateFromUTC(dt) {
-    if (dt instanceof Date) {
+    if (dt) {
       const value = new Date(dt);
-      const offset = value.getTimezoneOffset();
-      dt = new Date(value.getTime() + offset * 60 * 1000);
+      dt = new Date(value.getTime() + value.getTimezoneOffset() * 60 * 1000);
     }
     return dt;
   }
 
   static dateToUTC(dt) {
     if (dt instanceof Date) {
-      const offset = new Date().getTimezoneOffset();
-      return new Date(dt.getTime() - offset * 60 * 1000);
+      dt = new Date(dt.getTime() - dt.getTimezoneOffset() * 60 * 1000);
     }
     return dt;
   }

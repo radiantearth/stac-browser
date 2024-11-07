@@ -11,7 +11,7 @@ function toBrowserUrl(url, store) {
     uri.fragment(path);
   }
   else {
-    uri.path(store.state.pathPrefix.replace(/\/$/, '') + path);
+    uri.path(Utils.removeTrailingSlash(store.state.pathPrefix) + path);
   }
   return uri.toString();
 }
@@ -110,7 +110,7 @@ function createBaseSchema(data, type, store) {
     thumbnailUrl = Utils.toAbsolute(thumbnails[0].href, data.getAbsoluteUrl());
   }
   let license = data.getMetadata('license');
-  if (license && license !== 'proprietary' && license !== 'various') {
+  if (license && license !== 'proprietary' && license !== 'various' && license !== 'other') {
     license = `https://spdx.org/licenses/${license}.html`;
   }
   else {

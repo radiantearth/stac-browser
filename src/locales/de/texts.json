@@ -35,12 +35,28 @@
   },
   "authentication": {
     "button": {
-      "authenticate": "Anmelden",
-      "authenticated": "Angemeldet",
+      "login": "Anmelden",
+      "logout": "Abmelden",
       "title": "Anmeldedaten bereitstellen oder aktualisieren"
     },
+    "chooseMethod": "Wähle Anmeldemethode",
     "description": "Die angefragte Seite erfordert eine Anmeldung. Bitte die Anmeldedaten unten in das Textfeld eingeben.",
-    "title": "Anmelden"
+    "loggedOut": "Sie wurden erfolgreich abgemeldet. Sie können das Fenster nun schließen.",
+    "password": "Passwort",
+    "required": "Anmeldung erforderlich",
+    "schemeTypes": {
+      "http": "HTTP {scheme}",
+      "s3": "S3",
+      "signedUrl": "Signierte URL",
+      "oauth2": "OAuth 2",
+      "apiKey": "API-Schlüssel",
+      "openIdConnect": "OpenID Connect"
+    },
+    "title": "Anmelden",
+    "unauthorized": "Sie haben keine Berechtigung um diese Daten abzurufen. Bitte melden Sie sich an.",
+    "unsupported": "Nicht unterstützt",
+    "unsupportedLong": "Die Anmeldemethode {method} wird von STAC Browser leider nicht unterstützt.",
+    "user": "Benutzer"
   },
   "browse": "Erkunden",
   "cancel": "Abbrechen",
