@@ -3,13 +3,13 @@
     <l-map class="map" v-if="show" :class="stac.type" @ready="init" :options="mapOptions">
       <l-control-fullscreen :key="`fullscreen${ix}`" :options="fullscreenOptions" />
       <l-control-zoom :key="`zoom${ix}`" v-bind="zoomControlTexts" position="topleft" />
-      <l-control-layers v-if="showLayerControl" position="bottomleft" ref="layerControl" />
+      <l-control-layers position="bottomleft" ref="layerControl" />
       <component
         v-for="basemap of basemaps" :is="basemap.is" :key="basemap.key"
         ref="basemaps" layerType="base" v-bind="basemap"
       />
-      <l-tile-layer v-for="xyz of xyzLinks" ref="overlays" :key="xyz.url" layerType="overlay" v-bind="xyz" />
-      <LWMSTileLayer v-for="wms of wmsLinks" ref="overlays" :key="wms.url" layerType="overlay" v-bind="wms" />
+      <l-tile-layer v-for="xyz of xyzLinks" ref="xyzOverlays" :key="xyz.url" layerType="overlay" v-bind="xyz" />
+      <LWMSTileLayer v-for="wms of wmsLinks" ref="wmsOverlays" :key="wms.url" layerType="overlay" v-bind="wms" />
       <l-geo-json v-if="geojson" ref="geojson" :geojson="geojson" :options="{onEachFeature: showPopup}" :optionsStyle="{color: secondaryColor, weight: secondaryWeight}" />
     </l-map>
     <b-popover
@@ -137,9 +137,6 @@ export default {
         return map;
       }).filter(map => Utils.isObject(map));
     },
-    showLayerControl() {
-      return this.xyzLinks.length > 0 || this.wmsLinks.length > 0 || this.basemaps.length > 1;
-    },
     xyzLinks() {
       const links = this.getWebMapLinks('xyz');
       return links.map(link => ({
@@ -163,13 +160,14 @@ export default {
             styles = link['wms:styles'][i];
           }
           const name = [link.title, layers].filter(x => Boolean(x)).join(' - ');
+          const transparent = Utils.hasText(link['wms:transparent']) ? link['wms:transparent'].toLowerCase() === "true" : true;
           const props = {
             baseUrl: link.href,
             name,
             attribution: link.attribution || this.stac.getMetadata('attribution'),
             version: '1.3.0',
             layers,
-            transparent: String(link['wms:transparent'] || false),
+            transparent,
             styles
           };
           if (typeof link['type'] === 'string' && link['type'].startsWith('image/')) {
@@ -192,9 +190,6 @@ export default {
       if (newVal) {
         this.$nextTick(() => this.geojsonToFront());
       }
-    },
-    showLayerControl() {
-      this.updateLayerControl();
     }
   },
   created() {
@@ -243,13 +238,16 @@ export default {
       return links;
     },
     updateLayerControl() {
-      if (this.showLayerControl) {
-        const basemaps = Array.isArray(this.$refs.basemaps) ? this.$refs.basemaps : [];
-        const xyzOverlays = Array.isArray(this.$refs.xyzOverlays) ? this.$refs.xyzOverlays : [];
-        const wmsOverlays = Array.isArray(this.$refs.wmsOverlays) ? this.$refs.wmsOverlays : [];
-        const layers = basemaps.concat(xyzOverlays).concat(wmsOverlays);
-        layers.forEach(layer => this.$refs.layerControl.addLayer(layer));
-      }
+      const basemaps = Array.isArray(this.$refs.basemaps) ? this.$refs.basemaps : [];
+      basemaps.forEach(layer => this.$refs.layerControl.mapObject.addBaseLayer(layer, layer.name));
+
+      const xyzOverlays = Array.isArray(this.$refs.xyzOverlays) ? this.$refs.xyzOverlays : [];
+      const wmsOverlays = Array.isArray(this.$refs.wmsOverlays) ? this.$refs.wmsOverlays : [];
+      const geojsonOverlays = Array.isArray(this.$refs.geojson) ? this.$refs.geojson : [];
+      xyzOverlays
+        .concat(wmsOverlays)
+        .concat(geojsonOverlays)
+        .forEach(layer => this.$refs.layerControl.mapObject.addOverlay(layer, layer.name));
     },
     viewChanged(event) {
       if (this.popover) {
@@ -262,6 +260,7 @@ export default {
       let hadLayer = false;
       if (this.stacLayer) {
         this.map.removeLayer(this.stacLayer);
+        this.$refs.layerControl.mapObject.removeLayer(this.stacLayer);
         this.stacLayer = null;
         hadLayer = true;
       }
@@ -275,6 +274,8 @@ export default {
         return;
       }
 
+      let isLinkOrAsset = this.stacLayerData && ('href' in this.stacLayerData);
+
       let getDefaultOptions = (customOptions = {}) => Object.assign({
         baseUrl: this.stac.getAbsoluteUrl(),
         resolution: this.geoTiffResolution,
@@ -284,8 +285,10 @@ export default {
         displayGeoTiffByDefault: this.displayGeoTiffByDefault
       }, customOptions);
 
-      let options = getDefaultOptions();
-      if (this.stacLayerData && 'href' in this.stacLayerData) {
+      let options = getDefaultOptions({
+        displayOverview: !isLinkOrAsset
+      });
+      if (isLinkOrAsset) {
         if (this.stac.isItem()) {
           options.bbox = this.stac?.bbox;
         }
@@ -326,6 +329,8 @@ export default {
         this.addMapClickEvent(this.stacLayer);
         this.stacLayer.on("fallback", event => this.$emit('dataChanged', event.stac));
         this.stacLayer.addTo(this.map);
+        const title = this.stac.type === 'Feature' ? `stacItem` : `stac${this.stac.type}`;
+        this.$refs.layerControl.mapObject.addOverlay(this.stacLayer, this.$tc(title));
         if (!this.fitBoundsOnce || !hadLayer) {
           this.fitBounds(this.stacLayer, this.selectBounds);
         }
@@ -342,6 +347,7 @@ export default {
         this.itemPreviewsLayer = await stacLayer(this.stacLayerData, itemPreviewOptions);
         this.addMapClickEvent(this.itemPreviewsLayer);
         this.itemPreviewsLayer.addTo(this.map);
+        this.$refs.layerControl.mapObject.addOverlay(this.itemPreviewsLayer, this.$tc('stacItem', this.stacLayerData.features.length));
         this.itemPreviewsLayer.bringToFront();
         if (!this.stacLayer) {
           this.fitBounds(this.itemPreviewsLayer);
@@ -392,6 +398,7 @@ export default {
               })
               .then(layer => {
                 layer.addTo(this.map);
+                this.$refs.layerControl.mapObject.addOverlay(layer, layer.name || link.title);
                 // Bring GeoJSON to front to allow opening the popups
                 this.geojsonToFront();
               })
