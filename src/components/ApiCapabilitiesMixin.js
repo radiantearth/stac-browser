@@ -9,7 +9,7 @@ const CQL_JSON = [
   'http://www.opengis.net/spec/cql2/1.*/conf/cql2-json'
 ];
 
-const CQL_ADV_COMPARISON = ['http://www.opengis.net/spec/cql2/1.*/req/advanced-comparison-operators'];
+const CQL_ADV_COMPARISON = ['http://www.opengis.net/spec/cql2/1.*/conf/advanced-comparison-operators'];
 
 import { mapGetters } from "vuex";
 
