@@ -726,49 +726,46 @@ function getStore(config, router) {
           cx.commit('updateLoading', { url, show });
           return;
         }
-        else if (data instanceof STAC && !data.isPotentiallyIncomplete()) {
-          if (show) {
-            cx.commit('showPage', { url });
-          }
-          return;
-        }
 
-        cx.commit('loading', { url, loading });
-        try {
-          const response = await stacRequest(cx, url);
-          if (!Utils.isObject(response.data)) {
-            throw new BrowserError(i18n.t('errors.invalidJsonObject'));
-          }
-          data = new STAC(response.data, url, path);
-          cx.commit('loaded', { url, data });
+        const hasData = data instanceof STAC && !data.isPotentiallyIncomplete();
+        if (!hasData) {
+          cx.commit('loading', { url, loading });
+          try {
+            const response = await stacRequest(cx, url);
+            if (!Utils.isObject(response.data)) {
+              throw new BrowserError(i18n.t('errors.invalidJsonObject'));
+            }
+            data = new STAC(response.data, url, path);
+            cx.commit('loaded', { url, data });
 
-          if (show) {
-            // If we prefer another language abort redirect to the new language
-            let localeLink = data.getLocaleLink(cx.state.dataLanguage);
-            if (localeLink) {
-              router.replace(cx.getters.toBrowserPath(localeLink.href));
+            if (show) {
+              // If we prefer another language abort redirect to the new language
+              let localeLink = data.getLocaleLink(cx.state.dataLanguage);
+              if (localeLink) {
+                router.replace(cx.getters.toBrowserPath(localeLink.href));
+                return;
+              }
+            }
+
+            // Handle conformance classes
+            let conformanceLink = data.getStacLinkWithRel('conformance');
+            if (Array.isArray(data.conformsTo) && data.conformsTo.length > 0) {
+              cx.commit('setConformanceClasses', data.conformsTo);
+            }
+            else if (conformanceLink) {
+              await cx.dispatch('loadOgcApiConformance', conformanceLink);
+            }
+          } catch (error) {
+            if (!noRetry && cx.state.authConfig && isAuthenticationError(error)) {
+              await cx.dispatch('tryLogin', {
+                url,
+                action: () => cx.dispatch('load', Object.assign({noRetry: true, force: true, show: true}, args))
+              });
               return;
             }
+            console.error(error);
+            cx.commit('errored', { url, error });
           }
-
-          // Handle conformance classes
-          let conformanceLink = data.getStacLinkWithRel('conformance');
-          if (Array.isArray(data.conformsTo) && data.conformsTo.length > 0) {
-            cx.commit('setConformanceClasses', data.conformsTo);
-          }
-          else if (conformanceLink) {
-            await cx.dispatch('loadOgcApiConformance', conformanceLink);
-          }
-        } catch (error) {
-          if (!noRetry && cx.state.authConfig && isAuthenticationError(error)) {
-            await cx.dispatch('tryLogin', {
-              url,
-              action: () => cx.dispatch('load', Object.assign({noRetry: true, force: true, show: true}, args))
-            });
-            return;
-          }
-          console.error(error);
-          cx.commit('errored', { url, error });
         }
 
         // Load API Collections
@@ -784,7 +781,7 @@ function getStore(config, router) {
           }
         }
         // Load API Items
-        if (data.getApiItemsLink()) {
+        else if (data.getApiItemsLink()) {
           let args = { stac: data, show: loading.show };
           try {
             await cx.dispatch('loadApiItems', args);
