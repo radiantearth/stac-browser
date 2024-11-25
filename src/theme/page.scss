@@ -54,6 +54,8 @@ body {
         height: 350px;
         background-color: transparent;
         @include border-radius($border-radius);
+        position: relative;
+        z-index: 0;
     }
 
     h1 {

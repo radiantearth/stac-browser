@@ -601,25 +601,12 @@ $primary-color: map-get($theme-colors, "primary");
   }
 
   .form-group {
-    // Shows multi-select and datepicker components over map
-    position: relative;
-    z-index: 0;
-
     > div {
       margin-left: 1em;
     }
 
     > label {
       font-weight: 600;
-    }
-
-    &.filter-collection,
-    &.filter-item-id,
-    &.filter-datetime,
-    &.additional-filters,
-    &.sort {
-      position: relative;
-      z-index: 1;
     }
   }
 }
