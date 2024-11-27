@@ -50,6 +50,8 @@ jobs:
             org.opencontainers.image.created=${{ env.COMMITED_AT }}
             org.opencontainers.image.version=v${{ env.VERSION }}
             org.opencontainers.image.maintainer=${{github.repository_owner}}
+            org.opencontainers.image.title=${{ env.IMAGE_NAME }}-prefix
+            org.opencontainers.image.description=stac-browser but built with pathPrefix set to /browser/
           tags: |
             type=semver,pattern={{version}},value=v${{ env.VERSION }}
     
