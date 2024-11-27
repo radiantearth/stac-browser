@@ -37,10 +37,22 @@ jobs:
           labels: |
             org.opencontainers.image.created=${{ env.COMMITED_AT }}
             org.opencontainers.image.version=v${{ env.VERSION }}
-            org.opencontainers.image.maintainer=$({github.repository_owner})
+            org.opencontainers.image.maintainer=${{github.repository_owner}}
           tags: |
             type=semver,pattern={{version}},value=v${{ env.VERSION }}
 
+      - name: Collect Docker image metadata (with /browser/ pathPrefix)
+        id: meta-prefix
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE_NAME }}-prefix
+          labels: |
+            org.opencontainers.image.created=${{ env.COMMITED_AT }}
+            org.opencontainers.image.version=v${{ env.VERSION }}
+            org.opencontainers.image.maintainer=${{github.repository_owner}}
+          tags: |
+            type=semver,pattern={{version}},value=v${{ env.VERSION }}
+    
       - name: Log in to the GitHub container registry
         uses: docker/login-action@v3
         with:
@@ -60,3 +72,18 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=registry,ref=${{ env.IMAGE_NAME }}:edge
           cache-to: type=inline
+
+      - name: Build and push Docker image (with /browser/ pathPrefix)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          build-args: |
+            pathPrefix="/browser/"
+            VERSION=${{ env.VERSION }}
+            REVISION=${{ env.REVISION }}
+          tags: ${{ steps.meta-prefix.outputs.tags }}
+          labels: ${{ steps.meta-prefix.outputs.labels }}
+          cache-from: type=registry,ref=${{ env.IMAGE_NAME }}-prefix:edge
+          cache-to: type=inline
+  
