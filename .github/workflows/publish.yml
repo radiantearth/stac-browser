@@ -79,7 +79,7 @@ jobs:
           context: .
           push: true
           build-args: |
-            pathPrefix="/browser/"
+            pathPrefix=/browser/
             VERSION=${{ env.VERSION }}
             REVISION=${{ env.REVISION }}
           tags: ${{ steps.meta-prefix.outputs.tags }}
