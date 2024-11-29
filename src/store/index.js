@@ -765,6 +765,7 @@ function getStore(config, router) {
             }
             console.error(error);
             cx.commit('errored', { url, error });
+            return;
           }
         }
 
