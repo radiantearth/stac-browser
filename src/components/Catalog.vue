@@ -1,22 +1,24 @@
 <template>
-  <b-card no-body :class="classes" v-b-visible.400="load" :img-right="isList">
-    <b-card-img-lazy v-if="hasImage" class="thumbnail" offset="200" v-bind="thumbnail" />
-    <b-card-body>
-      <b-card-title>
-        <StacLink :data="[data, catalog]" class="stretched-link" />
-      </b-card-title>
-      <b-card-text v-if="data && (fileFormats.length > 0 || data.description || data.deprecated)" class="intro">
-        <b-badge v-if="data.deprecated" variant="warning" class="mr-1 mt-1 deprecated">{{ $t('deprecated') }}</b-badge>
-        <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="mr-1 mt-1 fileformat">{{ format | formatMediaType }}</b-badge>
-        {{ data.description | summarize }}
-      </b-card-text>
-      <Keywords v-if="showKeywordsInCatalogCards && keywords.length > 0" :keywords="keywords" variant="primary" :center="!isList" />
-      <b-card-text v-if="temporalExtent" class="datetime"><small v-html="temporalExtent" /></b-card-text>
-    </b-card-body>
-    <b-card-footer>
-      <slot name="footer" :data="data" />
-    </b-card-footer>
-  </b-card>
+  <div :class="containerClasses">
+    <b-card no-body :class="classes" v-b-visible.400="load" :img-right="isList">
+      <b-card-img-lazy v-if="hasImage" class="thumbnail" offset="200" v-bind="thumbnail" />
+      <b-card-body>
+        <b-card-title>
+          <StacLink :data="[data, catalog]" class="stretched-link" />
+        </b-card-title>
+        <b-card-text v-if="data && (fileFormats.length > 0 || data.description || data.deprecated)" class="intro">
+          <b-badge v-if="data.deprecated" variant="warning" class="mr-1 mt-1 deprecated">{{ $t('deprecated') }}</b-badge>
+          <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="mr-1 mt-1 fileformat">{{ format | formatMediaType }}</b-badge>
+          {{ data.description | summarize }}
+        </b-card-text>
+        <Keywords v-if="showKeywordsInCatalogCards && keywords.length > 0" :keywords="keywords" variant="primary" :center="!isList" />
+        <b-card-text v-if="temporalExtent" class="datetime"><small v-html="temporalExtent" /></b-card-text>
+      </b-card-body>
+      <b-card-footer>
+        <slot name="footer" :data="data" />
+      </b-card-footer>
+    </b-card>
+  </div>
 </template>
 
 <script>
@@ -46,6 +48,10 @@ export default {
     catalog: {
       type: Object,
       required: true
+    },
+    isList:  {
+      type: Boolean,
+      required: true,
     }
   },
   computed: {
@@ -64,6 +70,15 @@ export default {
       }
       if (this.temporalExtent) {
         classes.push('has-extent');
+      }
+      return classes;
+    },
+    containerClasses() {
+      let classes = ['p-1', 'm-0']
+      if (this.isList) {
+        classes.push('w-100')
+      } else {
+        classes.push(...['col-sm-6', 'col-md-4'])
       }
       return classes;
     },
