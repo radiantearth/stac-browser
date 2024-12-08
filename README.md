@@ -311,6 +311,8 @@ services:
       SB_catalogUrl: "https://localhost:7188"
 ```
 
+More details available at docs/docker.md
+
 ## Contributing
 
 We are happy to review and accept Pull Requests.
