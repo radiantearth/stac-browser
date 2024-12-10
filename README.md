@@ -252,7 +252,7 @@ STAC Browser supports some non-standardized extensions to the STAC specification
 
 ## Docker
 
-You can use the docker image available in the repo. Please read [docs/docker.md](docs/docker.md) for more details.
+You can use the Docker to work with STAC Browser. Please read [Docker documentation](docs/docker.md) for more details.
 
 ## Contributing
 
