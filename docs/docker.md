@@ -62,17 +62,20 @@ services:
 ```
 
 ## How it works
+
 The docker image uses a multi stage build.
 The first stage is based on a node image and runs `npm build` to produce a `/dist` folder with static files (HTML, CSS, and JavaScript).
 The second stage is based on an nginx image that serves the folder with static files and deals with the build-only options such as  `pathPrefix`.
 So, essentialy, in the end you get an nginx instance that serves static files.
 
 ## Essential parts
+
 1. [Dockerfile](../Dockerfile) - contains information on how to build the image.
 2. [docker/default.conf](../docker/default.conf) - nginx configuration template, where `<pathPrefix>` is replaced during build.
 3. [docker/docker-entrypoint.sh](../docker/docker-entrypoint.sh) - a start script to read the passed variables and produce the `config.js` file.
 
 ## FAQ
+
 > Can I use `ghcr.io/radiantearth/stac-browser` image with the `pathPrefix`?
 
 You can not. You need to build your own image because `pathPrefix` is a build-only option.
