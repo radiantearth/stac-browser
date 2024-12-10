@@ -252,64 +252,7 @@ STAC Browser supports some non-standardized extensions to the STAC specification
 
 ## Docker
 
-### Create a custom image
-
-Building the Dockerfile without changing any build options:
-
-```bash
-docker build -t stac-browser:v1 .
-```
-
-Run the container for a specific URL:
-
-```bash
-docker run -p 8080:8080 -e SB_catalogUrl="https://earth-search.aws.element84.com/v1/" stac-browser:v1
-```
-
-STAC Browser is now available at `http://localhost:8080`
-
----
-
-You can pass further options to STAC Browser to customize it to your needs.
-
-The build-only options
-[`pathPrefix`](docs/options.md#pathprefix) and [`historyMode`](docs/options.md#historymode)
-can be provided as a
-[build argument](https://docs.docker.com/engine/reference/commandline/build#set-build-time-variables---build-arg)
-when building the Dockerfile.
-
-For example:
-
-```bash
-docker build -t stac-browser:v1 --build-arg pathPrefix="/browser/" --build-arg historyMode=hash .
-```
-
-All other options, except the ones that are explicitly excluded from CLI/ENV usage,
-can be passed as environment variables when running the container.
-For example, to run the container with a pre-defined
-[`catalogUrl`](docs/options.md#catalogurl) and [`catalogTitle`](docs/options.md#catalogtitle):
-
-```bash
-docker run -p 8080:8080 -e SB_catalogUrl="https://earth-search.aws.element84.com/v1/" -e SB_catalogTitle="Earth Search" stac-browser:v1
-```
-
-If you want to pass all the other arguments to `npm run build` directly, you can modify to the Dockerfile as needed.
-
-STAC browser is now available at `http://localhost:8080/browser`
-
-### Use an existing image
-
-Since version 3.1.1, you can add an existing image from [Packages](https://github.com/radiantearth/stac-browser/pkgs/container/stac-browser) to your docker-compose.yml:
-
-```
-services:
-  stac-browser:
-    image: ghcr.io/radiantearth/stac-browser:latest
-    ports:
-      - 8080:8080
-    environment:
-      SB_catalogUrl: "https://localhost:7188"
-```
+You can use the Docker to work with STAC Browser. Please read [Docker documentation](docs/docker.md) for more details.
 
 ## Contributing
 
