@@ -195,7 +195,7 @@ function getStore(config, router) {
         return getters.canSearchCollections || getters.canSearchItems;
       },
       canSearchItems: (state, getters) => {
-        return getters.supportsConformance(TYPES.Items.BasicFilters);
+        return getters.supportsConformance(TYPES.Global.BasicFilters);
       },
       canSearchCollections: (state, getters) => {
         return getters.supportsConformance(TYPES.Collections.BasicFilters);
