@@ -63,7 +63,9 @@ export default function getStore(router) {
       },
       async updateMethod(cx, config) {
         config = AuthUtils.convertLegacyAuthConfig(config);
-        await cx.getters.method.close();
+        if (!Auth.equals(cx.getters.method, config)) {
+          await cx.getters.method.close();
+        }
 
         const changeListener = async (isLoggedIn, credentials) => {
           if (!isLoggedIn) {
