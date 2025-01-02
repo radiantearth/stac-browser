@@ -44,6 +44,7 @@ module.exports = {
     crossOriginMedia: null,
     requestHeaders: {},
     requestQueryParameters: {},
+    disableSocialSharing: false,
     preprocessSTAC: null,
     authConfig: null
 };

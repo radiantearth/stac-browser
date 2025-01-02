@@ -66,16 +66,23 @@
     <b-popover id="popover-share" target="popover-share-btn" triggers="focus" placement="bottom" container="stac-browser" :title="$t('source.share.title')">
       <Url id="browserUrl" :url="browserUrl()" :label="$t('source.share.sharePageWithOthers')" :open="false" />
       <hr>
-      <b-button class="twitter mr-1" :href="twitterUrl"><b-icon-twitter /> {{ $t('source.share.twitter') }}</b-button>
-      <b-button variant="dark" :href="mailTo"><b-icon-envelope /> {{ $t('source.share.email') }}</b-button>
+      <b-button variant="dark mr-1" :href="mailTo"><b-icon-envelope /> {{ $t('source.share.email') }}</b-button>
+      <template v-if="!disableSocialSharing">
+        <b-button class="service bsky mr-1" :href="bskyUrl"><bsky-logo /> {{ $t('source.share.bsky') }}</b-button>
+        <b-button class="service mastodon mr-1" :href="mastodonUrl"><mastodon-logo /> {{ $t('source.share.mastodon') }}</b-button>
+        <b-button class="service x" :href="xUrl"><x-logo /> {{ $t('source.share.twitter') }}</b-button>
+      </template>
     </b-popover>
   </div>
 </template>
 
 <script>
 import { 
-  BIconBlank, BIconBox, BIconCheck, BIconEnvelope, BIconExclamationTriangle, BIconFlag, BIconLink, BIconShare, BIconTwitter,
+  BIconBlank, BIconBox, BIconCheck, BIconEnvelope, BIconExclamationTriangle, BIconFlag, BIconLink, BIconShare,
   BDropdown, BDropdownItem, BPopover } from 'bootstrap-vue';
+import BskyLogo from '../media/bsky.svg';
+import MastodonLogo from '../media/mastodon.svg';
+import XLogo from '../media/x.svg';
 import { mapActions, mapGetters, mapState } from 'vuex';
 
 import Url from './Url.vue';
@@ -99,8 +106,10 @@ export default {
     BIconFlag,
     BIconLink,
     BIconShare,
-    BIconTwitter,
     BPopover,
+    BskyLogo,
+    MastodonLogo,
+    XLogo,
     RootStats: () => import('./RootStats.vue'),
     Url,
     CopyButton,
@@ -121,7 +130,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(['conformsTo', 'dataLanguages', 'locale', 'supportedLocales', 'uiLanguage', 'valid']),
+    ...mapState(['conformsTo', 'dataLanguages', 'disableSocialSharing', 'locale', 'supportedLocales', 'uiLanguage', 'valid']),
     ...mapGetters(['supportsExtension', 'root']),
     stacVersion() {
       return this.stac?.stac_version;
@@ -153,14 +162,21 @@ export default {
     message() {
       return this.$t('source.share.message', {title: this.title, url: this.browserUrl()});
     },
-    twitterUrl() {
-      let text = encodeURIComponent(this.message);
-      return `https://twitter.com/intent/tweet?text=${text}`;
+    uriMessage() {
+      return encodeURIComponent(this.message);
+    },
+    bskyUrl() {
+      return `https://bsky.app/intent/compose?text=${this.uriMessage}`;
+    },
+    mastodonUrl() {
+      return `https://mastodon.social/share?text=${this.uriMessage}`;
+    },
+    xUrl() {
+      return `https://x.com/intent/tweet?text=${this.uriMessage}`;
     },
     mailTo() {
       let title = encodeURIComponent(this.title);
-      let text = encodeURIComponent(this.message);
-      return `mailto:?subject=${title}&body=${text}`;
+      return `mailto:?subject=${title}&body=${this.uriMessage}`;
     },
     supportsLanguageExt() {
       return this.supportsExtension(LANGUAGE_EXT);
@@ -229,6 +245,12 @@ export default {
     overflow-x: hidden;
     max-height: 80vh;
   }
+}
+
+#popover-share .service svg {
+  vertical-align: sub;
+  height: 16px;
+  width: auto;
 }
 
 #popover-link .stac-id .btn-sm,

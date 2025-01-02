@@ -214,6 +214,11 @@
       "noCLI": true,
       "noEnv": true
     },
+    "disableSocialSharing": {
+      "type": [
+        "boolean"
+      ]
+    },
     "preprocessSTAC": {
       "type": [
         "null"

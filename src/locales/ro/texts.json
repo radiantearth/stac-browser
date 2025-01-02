@@ -302,12 +302,14 @@
     },
     "locatedAt": "Fișierul de metadate STAC poate fi găsit la următoarea adresă:",
     "share": {
+      "bsky": "Bluesky",
       "email": "E-Mail",
       "label": "Partajare",
+      "mastodon": "Mastodon.social",
       "message": "{title} este disponibil la adresa {url}",
       "sharePageWithOthers": "Partajați URL-ul acestei pagini cu alții:",
       "title": "Partajare",
-      "twitter": "Twitter",
+      "twitter": "X (Twitter)",
       "withOthers": "Partajați această pagină"
     },
     "stacExtension": "Extensie STAC",

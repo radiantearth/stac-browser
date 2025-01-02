@@ -35,10 +35,22 @@ const vueConfig = {
       args[0].CONFIG_CLI = JSON.stringify(argv);
       return args;
     });
+
     webpackConfig.plugin('html').tap(args => {
       args[0].title = mergedConfig.catalogTitle;
       return args;
     });
+
+    const svgRule = webpackConfig.module.rule('svg');
+    svgRule.uses.clear();
+    svgRule.delete('type');
+    svgRule.delete('generator');
+    svgRule
+      .use('vue-loader')
+      .loader('vue-loader')
+      .end()
+      .use("./vue-svg-loader")
+      .loader("./vue-svg-loader");
   },
   configureWebpack: {
     resolve: {
