@@ -214,10 +214,15 @@
       "noCLI": true,
       "noEnv": true
     },
-    "disableSocialSharing": {
+    "socialSharing": {
       "type": [
-        "boolean"
-      ]
+        "array"
+      ],
+      "items": {
+        "type": [
+          "string"
+        ]
+      }
     },
     "preprocessSTAC": {
       "type": [

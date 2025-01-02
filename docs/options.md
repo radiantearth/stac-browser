@@ -45,7 +45,7 @@ The following ways to set config options are possible:
   - [crossOriginMedia](#crossoriginmedia)
   - [requestHeaders](#requestheaders)
   - [requestQueryParameters](#requestqueryparameters)
-  - [disableSocialSharing](#disablesocialsharing)
+  - [socialSharing](#socialsharing)
   - [authConfig](#authconfig)
     - [API Keys](#api-keys)
       - [Example 1: HTTP Request Header Value](#example-1-http-request-header-value)
@@ -298,12 +298,16 @@ Example: `{'f': 'json'}` adds a `f` query parameter to the HTTP URL, e.g. `https
 
 Please note that this option can only be provided through a config file and is not available via CLI/ENV.
 
-## disableSocialSharing
+## socialSharing
 
-Disables the social sharing buttons (Bluesky, Mastodon, X) in the "Share" panel.
-Doesn't apply to the e-mail button.
+Lists the social sharing service for which buttons should be shown in the "Share" panel.
 
-Defaults to `false`, which shows the buttons.
+The following services are supported:
+
+- `email` (Send via e-email)
+- `bsky` (Bluesky)
+- `mastodon` (Mastodon.social)
+- `x` (X, formerly Twitter)
 
 ## authConfig
 

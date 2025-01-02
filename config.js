@@ -44,7 +44,7 @@ module.exports = {
     crossOriginMedia: null,
     requestHeaders: {},
     requestQueryParameters: {},
-    disableSocialSharing: false,
+    socialSharing: ['email', 'bsky', 'mastodon', 'x'],
     preprocessSTAC: null,
     authConfig: null
 };
