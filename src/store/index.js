@@ -621,10 +621,14 @@ function getStore(config, router) {
     },
     actions: {
       async config(cx, config) {
+        const oldConfig = Object.assign({}, cx.state);
         cx.commit('config', config);
         // React on config changes
         for (let key in config) {
           let value = cx.state[key];
+          if (value !== oldConfig[key]) {
+            continue;
+          }
           switch (key) {
             case 'authConfig':
               await cx.dispatch('auth/updateMethod', value);
