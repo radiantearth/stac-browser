@@ -309,7 +309,7 @@
       "message": "{title} はこちらのページで利用できます: {url}",
       "sharePageWithOthers": "このページのURLを共有しましょう:",
       "title": "共有",
-      "twitter": "X (Twitter)",
+      "x": "X (Twitter)",
       "withOthers": "このページを共有しましょう"
     },
     "stacExtension": "",
