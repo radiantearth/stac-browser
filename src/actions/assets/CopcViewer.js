@@ -5,7 +5,11 @@ import i18n from "../../i18n";
 export default class CopcViewer extends AssetActionPlugin {
 
   get show() {
-    return this.component.isBrowserProtocol && this.asset.type === 'application/vnd.laszip+copc';
+    return this.component.isBrowserProtocol && (
+      this.asset.type === 'application/vnd.laszip+copc'
+      || this.asset.href.toLowerCase().includes('ept.json')
+
+    );
   }
 
   get uri() {
