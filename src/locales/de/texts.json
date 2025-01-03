@@ -309,7 +309,7 @@
       "message": "{title} ist verfügbar unter {url}",
       "sharePageWithOthers": "Teile die Adresse dieser Seite:",
       "title": "Teilen",
-      "twitter": "X (Twitter)",
+      "x": "X (Twitter)",
       "withOthers": "Teile diese Seite mit anderen"
     },
     "stacExtension": "STAC-Erweiterung",
