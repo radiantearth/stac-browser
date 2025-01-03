@@ -38,6 +38,7 @@ const vueConfig = {
 
     webpackConfig.plugin('html').tap(args => {
       args[0].title = mergedConfig.catalogTitle;
+      args[0].url = mergedConfig.catalogUrl;
       return args;
     });
 
