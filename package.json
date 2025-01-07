@@ -11,7 +11,7 @@
     "lint": "vue-cli-service lint",
     "i18n:report": "vue-cli-service i18n:report --src \"./src/**/*.?(js|vue)\" --locales \"./src/locales/**/*.?(js|json)\"",
     "i18n:fields": "node helpers/fields_locales.js",
-    "test": "jest --coverage"
+    "test": "jest --coverage --collectCoverageFrom=\"./src/**\""
   },
   "bugs": {
     "url": "https://github.com/radiantearth/stac-browser/issues"
