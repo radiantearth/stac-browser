@@ -54,6 +54,13 @@ Then switch into the newly created folder and install all dependencies:
 npm install
 ```
 
+Ensure that the unit tests are working correctly:
+
+```bash
+npm test
+```
+STAC Browser uses [Jest](https://jestjs.io/) to perform unit tests. Any code you add should have unit tests associated with it an should not break any existing tests.
+
 By default, STAC Browser will let you browse all catalogs on STAC Index.
 
 To browse only your own static STAC catalog or STAC API, set the `catalogUrl` CLI parameter when running the dev server.
@@ -323,6 +330,7 @@ You can run the following commands (see also "[Get started](#get-started)" above
 - `npm install`: Install the dependencies, this is required once at the beginning.
 - `npm start`: Start the development server
 - `npm run lint`: Lint the source code files
+- `npm test`: ensure that you have not broken any tests
 - `npm run build`: Compile the source code into deployable files for the web. The resulting files can be found in the folder `dist` and you can then deploy STAC Browser on a web host. There are two other variants:
   - `npm run build:report`: Same as above, but also generates a bundle size report (see `dist/report.html`), which should not be deployed.
   - `npm run build:minimal`: Same as above, but tries to generate a minimal version without bundle size report and without source maps.
