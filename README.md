@@ -320,7 +320,7 @@ STAC Browser uses [Vue](https://vuejs.org/) and [vue-cli](https://cli.vuejs.org/
 
 You can run the following commands (see also "[Get started](#get-started)" above):
 
-- `npm run install`: Install the dependencies, this is required once at the beginning.
+- `npm install`: Install the dependencies, this is required once at the beginning.
 - `npm start`: Start the development server
 - `npm run lint`: Lint the source code files
 - `npm run build`: Compile the source code into deployable files for the web. The resulting files can be found in the folder `dist` and you can then deploy STAC Browser on a web host. There are two other variants:
