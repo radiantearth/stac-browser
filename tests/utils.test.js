@@ -2,6 +2,20 @@ import {test, expect, describe} from '@jest/globals'
 
 import Utils from '../src/utils';
 
+describe('Utils.isObject', () => {
+  test('When supplied a real object, true is returned', () => {
+    expect(Utils.isObject({a: 1, b:2})).toBe(true);
+  });
+
+  test('When supplied an array, false is returned', () => {
+    expect(Utils.isObject([1, 2, 3])).toBe(false);
+  });
+
+  test('When supplied null, false is returned', () => {
+    expect(Utils.isObject(null)).toBe(false);
+  });
+});
+
 describe('Utils.size', () => {
   test('When supplied a valid array size is calculated correctly', () => {
     expect(Utils.size([1, 2, 3])).toBe(3);
