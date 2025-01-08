@@ -8,7 +8,7 @@ implemented as a single page application (SPA) for ease of development and to
 limit the overall number of catalog reads necessary when browsing (as catalogs
 may be nested and do not necessarily contain references to their parents).
 
-Version: **3.2.0** (supports all STAC versions between 0.6.0 and 1.1.0)
+Version: **3.3.0-rc.1** (supports all STAC versions between 0.6.0 and 1.1.0)
 
 This package has also been published to npm as [`@radiantearth/stac-browser`](https://www.npmjs.com/package/@radiantearth/stac-browser).
 
@@ -20,23 +20,27 @@ If you care about STAC Browser and have some funds to support the future of STAC
 
 **Table of Contents:**
 
-- [Examples](#examples)
-- [Get Started](#get-started)
-  - [Private query parameters](#private-query-parameters)
-  - [Migrate from old versions](#migrate-from-old-versions)
-- [Customize](#customize)
-  - [Options](#options)
-  - [Languages](#languages)
-  - [Themes](#themes)
-  - [Basemaps](#basemaps)
-  - [Actions](#actions)
-  - [Additional metadata fields](#additional-metadata-fields)
-  - [Customize through root catalog](#customize-through-root-catalog)
-  - [Custom extensions](#custom-extensions)
-- [Docker](#docker)
-- [Contributing](#contributing)
-  - [Adding a new language](#adding-a-new-language)
-- [Sponsors](#sponsors)
+- [STAC Browser](#stac-browser)
+  - [Examples](#examples)
+  - [Get Started](#get-started)
+    - [Private query parameters](#private-query-parameters)
+    - [Migrate from old versions](#migrate-from-old-versions)
+  - [Customize](#customize)
+    - [Options](#options)
+    - [Languages](#languages)
+      - [Custom phrases](#custom-phrases)
+    - [Themes](#themes)
+    - [Basemaps](#basemaps)
+    - [Actions](#actions)
+    - [Additional metadata fields](#additional-metadata-fields)
+      - [Example](#example)
+      - [Translation](#translation)
+    - [Customize through root catalog](#customize-through-root-catalog)
+    - [Custom extensions](#custom-extensions)
+  - [Docker](#docker)
+  - [Contributing](#contributing)
+    - [Adding a new language](#adding-a-new-language)
+  - [Sponsors](#sponsors)
 
 ## Examples
 
