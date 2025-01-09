@@ -10,7 +10,7 @@ export default class Geofox extends LinkActionPlugin {
 
   get uri() {
     let uri = new URI("https://viewer.geofox.ai/");
-    uri.addQuery('tileset', encodeURI(this.link.href));
+    uri.addQuery('tileset', this.link.href);
     return uri;
   }
 
