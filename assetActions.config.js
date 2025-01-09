@@ -15,6 +15,6 @@ export default {
   F3D,
   GeoJsonIo,
   // Geoparquet, // not ready yet
-  Potree,
+  // Potree,
   Protomaps,
 };
