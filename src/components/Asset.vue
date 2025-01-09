@@ -92,7 +92,7 @@ export default {
       return this.definition ? 'itemdef' : 'asset';
     },
     uid() {
-      return `${this.type}-${this.id}`;
+      return `${this.type}-${this.id.toLowerCase().replace(/[^\w]/g, '-')}`;
     },
     fileFormat() {
       if (typeof this.asset.type === "string" && this.asset.type.length > 0) {
