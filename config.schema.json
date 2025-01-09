@@ -203,7 +203,9 @@
     "requestHeaders": {
       "type": [
         "object"
-      ]
+      ],
+      "noCLI": true,
+      "noEnv": true
     },
     "requestQueryParameters": {
       "type": [
