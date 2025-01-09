@@ -4,10 +4,10 @@
 // For simplicity we just provide some common options as default, but you can override all Bootstrap Sass variables.
 
 // Header / Logo, either image (see below), text (shows CATALOG_TITLE) or none
-$logo: 'none'; 
+$logo: 'image'; 
 // If 'image' has been chosen above
-$logo-image: 'https://raw.githubusercontent.com/radiantearth/stac-site/master/images/logo/stac-030-long.png';
-$logo-image-height: 100px;
+$logo-image: 'https://knowledge.wyvern.space/images/wyvern_logo_horizontal_tagline.png';
+$logo-image-height: 80px;
 
 // Background and text default colors
 $body-bg: white;
@@ -15,14 +15,14 @@ $body-color: black;
 
 // Colors
 $theme-colors: (
-  "primary":       #188191,
-  "secondary":     #6c757d,
-  "success":       #28a745,
-  "info":          #09B3AD,
+  "primary":       #3b26f9,
+  "secondary":     #f4037b,
+  "success":       #00aa51,
+  "info":          #00e1ff,
   "warning":       #ffc107,
-  "danger":        #dc3545,
+  "danger":        #ff4848,
   "light":         #f8f9fa,
-  "dark":          #343a40
+  "dark":          #000000
 );
 
 // Breakpoints for responsive design
