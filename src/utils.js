@@ -23,13 +23,16 @@ export const browserImageTypes = [
   'image/webp'
 ];
 
+export const cogMediaTypes = [
+  "image/tiff; application=geotiff; profile=cloud-optimized",
+  "image/vnd.stac.geotiff; cloud-optimized=true"
+];
+
 export const geotiffMediaTypes = [
   "application/geotiff",
   "image/tiff; application=geotiff",
-  "image/tiff; application=geotiff; profile=cloud-optimized",
   "image/vnd.stac.geotiff",
-  "image/vnd.stac.geotiff; cloud-optimized=true"
-];
+].concat(cogMediaTypes);
 
 export const browserProtocols = [
   'http',
@@ -114,6 +117,20 @@ export default class Utils {
     return (typeof string === 'string' && string.length > 0);
   }
 
+  static shortenTitle(fullStr, strLen, separator = '…') {
+    if (fullStr.length <= strLen) {
+      return fullStr;
+    }
+
+    let sepLen = separator.length;
+    let charsToShow = strLen - sepLen;
+    let frontChars = Math.ceil(charsToShow/2);
+    let backChars = Math.floor(charsToShow/2);
+    return fullStr.substr(0, frontChars) + 
+           separator + 
+           fullStr.substr(fullStr.length - backChars);
+  }
+
   static isGdalVfsUri(url) {
     return typeof url === 'string' && url.startsWith('/vsi') && !url.startsWith('/vsicurl/');
   }
@@ -153,13 +170,17 @@ export default class Utils {
     return Array.isArray(links) ? links.filter(link => Utils.isObject(link) && Utils.hasText(link.href) && !rels.includes(link.rel)) : [];
   }
 
+  static removeTrailingSlash(str) {
+    return str.replace(/\/$/, '');
+  }
+
   static equalUrl(a, b) {
     try {
       let uri1 = URI(a);
       let uri2 = URI(b);
       // Ignore trailing slash in URL paths
-      uri1.path(uri1.path().replace(/\/$/, ''));
-      uri2.path(uri2.path().replace(/\/$/, ''));
+      uri1.path(Utils.removeTrailingSlash(uri1.path()));
+      uri2.path(Utils.removeTrailingSlash(uri2.path()));
       return uri1.equals(uri2);
     } catch (error) {
       return false;
@@ -196,18 +217,16 @@ export default class Utils {
   // Convert from UTC to locale time (needed for vue2-datetimepicker)
   // see https://github.com/mengxiong10/vue2-datepicker/issues/388
   static dateFromUTC(dt) {
-    if (dt instanceof Date) {
+    if (dt) {
       const value = new Date(dt);
-      const offset = value.getTimezoneOffset();
-      dt = new Date(value.getTime() + offset * 60 * 1000);
+      dt = new Date(value.getTime() + value.getTimezoneOffset() * 60 * 1000);
     }
     return dt;
   }
 
   static dateToUTC(dt) {
     if (dt instanceof Date) {
-      const offset = new Date().getTimezoneOffset();
-      return new Date(dt.getTime() - offset * 60 * 1000);
+      dt = new Date(dt.getTime() - dt.getTimezoneOffset() * 60 * 1000);
     }
     return dt;
   }
@@ -226,12 +245,37 @@ export default class Utils {
     }).join('/');
   }
 
+  static formatSortbyForPOST(value) {
+    // POST search requires sortby to be an array of objects containing a property name and sort direction.
+    // See spec here: https://api.stacspec.org/v1.0.0-rc.1/item-search/#tag/Item-Search/operation/postItemSearch
+    // This function converts the property name to the desired format.
+    const sortby = {
+      field: '',
+      direction: 'asc'
+    };
+  
+    // Check if the value starts with a minus sign ("-")
+    if (value.startsWith('-')) {
+      // sort by descending order
+      sortby.field = value.substring(1);
+      sortby.direction = 'desc';
+    } else {
+      //sort by ascending order
+      sortby.field = value;
+    }
+    
+    // Put the object in an array
+    return [sortby];
+  }
+
   static getPaginationLinks(data) {
-    let pageLinks = Utils.getLinksWithRels(data.links, stacPagination);
     let pages = {};
-    for (let pageLink of pageLinks) {
-      let rel = pageLink.rel === 'previous' ? 'prev' : pageLink.rel;
-      pages[rel] = pageLink;
+    if (Utils.isObject(data)) {
+      let pageLinks = Utils.getLinksWithRels(data.links, stacPagination);
+      for (let pageLink of pageLinks) {
+        let rel = pageLink.rel === 'previous' ? 'prev' : pageLink.rel;
+        pages[rel] = pageLink;
+      }
     }
     return pages;
   }
@@ -265,7 +309,10 @@ export default class Utils {
           continue;
         }
 
-        if (key === 'datetime') {
+        if (key === 'sortby') {
+          value = Utils.formatSortbyForPOST(value);
+        }
+        else if (key === 'datetime') {
           value = Utils.formatDatetimeQuery(value);
         }
         else if (key === 'filters') {
@@ -294,7 +341,7 @@ export default class Utils {
         else if (key === 'bbox') {
           value = value.join(',');
         }
-        else if ((key === 'collections' || key === 'ids')) {
+        else if ((key === 'collections' || key === 'ids' || key === 'q')) {
           value = value.join(',');
         }
         else if (key === 'filters') {

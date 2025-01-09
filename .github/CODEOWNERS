@@ -1,5 +1,6 @@
 * @m-mohr
-Dockerfile @waystilos @geospatial-jeff
+docker/ @waystilos @geospatial-jeff @constantinius
+Dockerfile @waystilos @geospatial-jeff @constantinius
 src/locales/de-CH @p1d1d1
 src/locales/es @rnanclares
 src/locales/fr @jfbourgon
@@ -8,3 +9,5 @@ src/locales/fr-CH @p1d1d1
 src/locales/it @p1d1d1
 src/locales/it-CH @p1d1d1
 src/locales/ro @mneagul
+src/locales/pt @psacra
+src/locales/pt-BR @uba

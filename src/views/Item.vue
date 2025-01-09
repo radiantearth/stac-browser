@@ -15,7 +15,7 @@
           </b-card>
         </section>
         <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="shownAssets" @showAsset="showAsset" />
-        <Links v-if="additionalLinks.length > 0" :title="$t('additionalResources')" :links="additionalLinks" />
+        <Links v-if="additionalLinks.length > 0" :title="$t('additionalResources')" :links="additionalLinks" :context="data" />
       </b-col>
       <b-col class="right">
         <section class="intro">
@@ -25,7 +25,7 @@
           <ReadMore v-if="data.properties.description" :lines="10" :text="$t('read.more')" :text-less="$t('read.less')">
             <Description :description="data.properties.description" />
           </ReadMore>
-          <Keywords v-if="Array.isArray(data.properties.keywords) && data.properties.keywords.length > 0" :keywords="data.properties.keywords" />
+          <Keywords v-if="Array.isArray(data.properties.keywords) && data.properties.keywords.length > 0" :keywords="data.properties.keywords" class="mb-3" />
         </section>
         <CollectionLink v-if="collectionLink" :link="collectionLink" />
         <Providers v-if="data.properties.providers" :providers="data.properties.providers" />
@@ -37,7 +37,6 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
-import Assets from '../components/Assets.vue';
 import Description from '../components/Description.vue';
 import ReadMore from "vue-read-more-smooth";
 import ShowAssetMixin from '../components/ShowAssetMixin';
@@ -48,12 +47,13 @@ export default {
   name: "Item",
   components: {
     AnonymizedNotice: () => import('../components/AnonymizedNotice.vue'),
-    Assets,
+    Assets: () => import('../components/Assets.vue'),
     BTabs,
     BTab,
     CollectionLink: () => import('../components/CollectionLink.vue'),
     Description,
     DeprecationNotice: () => import('../components/DeprecationNotice.vue'),
+    Keywords: () => import('../components/Keywords.vue'),
     Links: () => import('../components/Links.vue'),
     Map: () => import('../components/Map.vue'),
     Metadata: () => import('../components/Metadata.vue'),
@@ -65,14 +65,17 @@ export default {
   data() {
     return {
       ignoredMetadataFields: [
-        'title',
         'description',
+        'keywords',
         'providers',
+        'title',
         // Will be rendered with a custom rendered
         'deprecated',
         // Don't show these complex lists of coordinates: https://github.com/radiantearth/stac-browser/issues/141
         'proj:bbox',
         'proj:geometry',
+        // Special handling for auth
+        'auth:schemes',
         // Special handling for the warning of the anonymized-location extension
         'anon:warning'
       ]

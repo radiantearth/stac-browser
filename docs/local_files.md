@@ -14,7 +14,7 @@ npx http-server -p 8000 --cors
 
 You can then use the CLI option `--catalogUrl="http://localhost:8000/catalog.json"` when starting STAC Browser.
 
-If your catalog uses absolute file locations, you can use the [`stacProxyUrl`](options.md#stacproxyurl) option to convert local file locations to local web browser URLs. For instance, if you are serving a catalog on the local file system at `/home/user/catalog.json`, but want to serve the data out from a server located at `http://localhost:8000/`, you can use `--stacProxyUrl="/home/user;http://localhost:8000"`.
+If your catalog uses absolute file locations, you can use the [`stacProxyUrl`](options.md#stacproxyurl) option to convert local file locations to local web browser URLs. For instance, if you are serving a catalog on the local file system at `/home/user/catalog.json`, but want to serve the data out from a server located at `http://localhost:8000/`, you can use `--stacProxyUrl=/home/user http://localhost:8000`.
 
 ## Using STAC Browser somewhere else
 

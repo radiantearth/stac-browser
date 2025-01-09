@@ -4,53 +4,56 @@ import Utils from "../utils";
 
 export class Loading {
 
-  constructor(show = false, loadApi = false) {
+  constructor(show = false) {
     this.show = Boolean(show);
-    this.loadApi = Boolean(loadApi);
   }
 
 }
 
-export async function stacRequest(cx, link) {
-  let opts;
+export function stacRequestOptions(cx, link) {
+  // Convert a URL string to a Link Object
+  if (typeof link === 'string') {
+    link = {
+      href: link
+    };
+  }
+  // Return if the link is not an object or doesn't contain an href
+  if (!Utils.isObject(link) || typeof link.href !== 'string') {
+    return {};
+  }
+
+  // Generate URL including query strings
+  const url = cx.getters.getRequestUrl(link.href);
+
+  // Combine headers
   let headers = {
     'Accept-Language': cx.getters.acceptedLanguages
   };
-  if (Utils.isObject(link)) {
-    let method = typeof link.method === 'string' ? link.method.toLowerCase() : 'get';
-    let url = cx.getters.getRequestUrl(link.href);
-    if (Utils.hasText(link.type)) {
-      headers.Accept = link.type;
-    }
-    if (!cx.getters.isExternalUrl(url)) {
-      Object.assign(headers, cx.state.requestHeaders);
-    }
-    if (Utils.isObject(link.headers)) {
-      Object.assign(headers, link.headers);
-    }
-    opts = {
-      method,
-      url,
-      headers,
-      data: link.body
-      // ToDo: Support for merge property from STAC API
-    };
+  if (Utils.hasText(link.type)) {
+    headers.Accept = link.type;
   }
-  else if (typeof link === 'string') {
-    let url = cx.getters.getRequestUrl(link);
-    if (!cx.getters.isExternalUrl(url)) {
-      Object.assign(headers, cx.state.requestHeaders);
-    }
-    opts = {
-      method: 'get',
-      url,
-      headers
-    };
+  if (!cx.getters.isExternalUrl(url)) {
+    Object.assign(headers, cx.state.requestHeaders);
   }
-  else {
-    opts = link;
+  if (Utils.isObject(link.headers)) {
+    Object.assign(headers, link.headers);
   }
-  return await axios(opts);
+
+  // Combine all options for axios request
+  return {
+    method: typeof link.method === 'string' ? link.method.toLowerCase() : 'get',
+    url,
+    headers,
+    data: link.body
+    // ToDo: Support for merge property from STAC API
+  };
+}
+
+export async function stacRequest(cx, link, axiosOptions = {}) {
+  // Get options
+  const options = stacRequestOptions(cx, link);
+  // Execute the request
+  return await axios(Object.assign(options, axiosOptions));
 }
 
 

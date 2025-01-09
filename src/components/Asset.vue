@@ -18,54 +18,39 @@
       </b-button>
     </b-card-header>
     <b-collapse :id="uid" v-model="expanded" :accordion="type" role="tabpanel" @input="collapseToggled">
-      <b-card-body>
-        <b-card-title><span v-html="fileFormat" /></b-card-title>
-        <b-button-group class="actions" v-if="href">
-          <CopyButton v-if="!isBrowserProtocol" variant="primary" :copyText="href">
-            {{ buttonText }}
-          </CopyButton>
-          <b-button v-else :href="href" target="_blank" variant="primary">
-            <b-icon-box-arrow-up-right v-if="browserCanOpenFile" /> 
-            <b-icon-download v-else />
-            {{ buttonText }}
-          </b-button>
-          <b-button v-if="canShow && !shown" @click="show" variant="primary">
-            <b-icon-eye />&nbsp;
-            <template v-if="isThumbnail">{{ $t('assets.showThumbnail') }}</template>
-            <template v-else>{{ $t('assets.showOnMap') }}</template>
-          </b-button>
-        </b-button-group>
-        <b-card-text class="mt-4" v-if="asset.description">
-          <Description :description="asset.description" compact />
-        </b-card-text>
-        <Metadata class="mt-4" :data="asset" :context="context" :ignoreFields="ignore" title="" type="Asset" />
-      </b-card-body>
+      <template v-if="hasAlternatives">
+        <b-tabs card>
+          <b-tab :title="asset['alternate:name'] || $t('assets.alternate.main')" active>
+            <AssetAlternative :asset="asset" :context="context" :shown="shown" hasAlternatives @show="show" />
+          </b-tab>
+          <b-tab v-for="(altAsset, key) in alternatives" :title="altAsset['alternate:name'] || key" :key="key">
+            <AssetAlternative :asset="altAsset" :context="context" :shown="shown" hasAlternatives :key="key" @show="show" />
+          </b-tab>
+        </b-tabs>
+      </template>
+      <AssetAlternative v-else :asset="asset" :context="context" @show="show" />
     </b-collapse>
   </b-card>
 </template>
 
 <script>
-import { BCollapse, BIconBoxArrowUpRight, BIconCheck, BIconChevronRight, BIconChevronDown, BIconDownload, BIconEye } from 'bootstrap-vue';
+import { BCollapse, BIconCheck, BIconChevronRight, BIconChevronDown, BTabs, BTab } from 'bootstrap-vue';
 import { formatMediaType } from '@radiantearth/stac-fields/formatters';
-import { mapGetters, mapState } from 'vuex';
-import Description from './Description.vue';
-import STAC from '../models/stac';
-import Utils, { browserProtocols, imageMediaTypes, mapMediaTypes } from '../utils';
+import { mapState } from 'vuex';
+import AssetAlternative from './AssetAlternative.vue';
 import StacFieldsMixin from './StacFieldsMixin';
+import Utils from '../utils';
 
 export default {
   name: 'Asset',
   components: {
+    AssetAlternative,
     BCollapse,
-    BIconBoxArrowUpRight,
     BIconCheck,
     BIconChevronDown,
     BIconChevronRight,
-    BIconDownload,
-    BIconEye,
-    CopyButton: () => import('./CopyButton.vue'),
-    Description,
-    Metadata: () => import('./Metadata.vue')
+    BTabs,
+    BTab
   },
   mixins: [
     StacFieldsMixin({ formatMediaType })
@@ -98,66 +83,16 @@ export default {
   },
   data() {
     return {
-      expanded: false,
-      ignore: [
-        // Asset fields that are handled directly
-        'href',
-        'title',
-        'description',
-        'type',
-        'roles',
-        // Don't show these complex lists of coordinates: https://github.com/radiantearth/stac-browser/issues/141
-        'proj:bbox',
-        'proj:geometry',
-        // Don't show very specific options that can't be rendered nicely
-        'table:storage_options',
-        'xarray:open_kwargs',
-        'xarray:storage_options'
-      ]
+      expanded: false
     };
   },
   computed: {
-    ...mapState(['buildTileUrlTemplate', 'useTileLayerAsFallback', 'url', 'stateQueryParameters']),
-    ...mapGetters(['getRequestUrl']),
-    tileRendererType() {
-      if (this.buildTileUrlTemplate && !this.useTileLayerAsFallback) {
-        return 'server';
-      }
-      else {
-        return 'client';
-      }
-    },
+    ...mapState(['stateQueryParameters']),
     type() {
       return this.definition ? 'itemdef' : 'asset';
     },
     uid() {
       return `${this.type}-${this.id}`;
-    },
-    isThumbnail() {
-      return Array.isArray(this.asset.roles) && this.asset.roles.includes('thumbnail');
-    },
-    canShow() {
-      // We need to know the type, otherwise we don't even try to show it
-      if (typeof this.asset.type !== 'string') {
-        return false;
-      }
-      // If the tile renderer is a tile server, we can't really know what it supports so we pass all images
-      else if (this.tileRendererType === 'server' && imageMediaTypes.includes(this.asset.type)) {
-        return true;
-      }
-      // Don't pass GDAL VFS URIs to client-side tile renderer: https://github.com/radiantearth/stac-browser/issues/116
-      else if (this.isGdalVfs && this.tileRendererType === 'client') {
-        return false;
-      }
-      // Only http(s) links and relative links are supported
-      else if (!this.isBrowserProtocol) {
-        return false;
-      }
-      // Otherwise, all images that a browser can read are supported + JSON
-      else if (mapMediaTypes.includes(this.asset.type)) {
-        return true;
-      }
-      return false;
     },
     fileFormat() {
       if (typeof this.asset.type === "string" && this.asset.type.length > 0) {
@@ -171,73 +106,23 @@ export default {
       }
       return null;
     },
-    protocol() {
-      if (typeof this.href === 'string') {
-        if (this.href) {
-          let match = this.href.match(/^(\w+):\/\//);
-          if (match) {
-            return match[1].toLowerCase();
-          }
-        }
+    alternatives() {
+      if (!Utils.isObject(this.asset.alternate)) {
+        return {};
       }
-      return null;
+
+      const asset = Object.assign({}, this.asset);
+      delete asset.alternate;
+
+      const merged = {};
+      for (const key in this.asset.alternate) {
+        merged[key] = Object.assign({}, asset, this.asset.alternate[key]);
+      }
+      
+      return merged;
     },
-    isBrowserProtocol() {
-      return (!this.protocol && !this.isGdalVfs) || browserProtocols.includes(this.protocol);
-    },
-    isGdalVfs() {
-      return Utils.isGdalVfsUri(this.asset.href);
-    },
-    href() {
-      if (typeof this.asset.href !== 'string') {
-        return null;
-      }
-      let baseUrl = null;
-      if (this.context instanceof STAC) {
-        baseUrl = this.context.getAbsoluteUrl();
-      }
-      return this.getRequestUrl(this.asset.href, baseUrl);
-    },
-    from() {
-      if (this.isGdalVfs) {
-        let type = this.asset.href.match(/^\/vsi([a-z\d]+)(_streaming)?\//);
-        return this.protocolName(type);
-      }
-      else {
-        return this.protocolName(this.protocol);
-      }
-    },
-    browserCanOpenFile() {
-      if (this.isGdalVfs)  {
-        return false;
-      }
-      if (Utils.canBrowserDisplayImage(this.asset)) {
-        return true;
-      }
-      else if (typeof this.asset.type === 'string') {
-        switch(this.asset.type.toLowerCase()) {
-          case 'text/html':
-          case 'application/xhtml+xml':
-          case 'text/plain':
-          case 'application/pdf':
-            return true;
-        }
-      }
-      return false;
-    },
-    buttonText() {
-      if (this.browserCanOpenFile && this.isBrowserProtocol) {
-        return this.$t('open');
-      }
-      let what = 'download';
-      if (this.isGdalVfs) {
-        what = 'copyGdalVfsUrl';
-      }
-      else if (!this.isBrowserProtocol) {
-        what = 'copyUrl';
-      }
-      let where = (!this.isBrowserProtocol && this.from) ? 'withSource' : 'generic';
-      return this.$t(`assets.${what}.${where}`, {source: this.from});
+    hasAlternatives() {
+      return Utils.size(this.alternatives) > 0;
     }
   },
   created() {
@@ -261,38 +146,12 @@ export default {
       }
       return role;
     },
-    show() {
-      let asset = Object.assign({}, this.asset);
-      // Override asset href with absolute URL if not a GDAL VFS
-      if (!this.isGdalVfs) {
-        asset.href = this.href;
-      }
-      this.$emit('show', asset, this.id, this.isThumbnail);
-    },
-    protocolName(protocol) {
-      if (typeof protocol !== 'string') {
-        return '';
-      }
-      switch(protocol.toLowerCase()) {
-        case 's3':
-          return this.$t('protocol.s3');
-        case 'abfs':
-        case 'abfss':
-          return this.$t('protocol.azure');
-        case 'gcs':
-          return this.$t('protocol.gcs');
-        case 'ftp':
-          return this.$t('protocol.ftp');
-        case 'oss':
-          return this.$t('protocol.oss');
-        case 'file':
-          return this.$t('protocol.file');
-      }
-      return '';
-    },
     collapseToggled(isVisible) {
       let event = isVisible ? 'openCollapsible' : 'closeCollapsible';
       this.$store.commit(event, {type: this.type, uid: this.uid});
+    },
+    show() {
+      this.$emit('show', ...arguments);
     }
   }
 };

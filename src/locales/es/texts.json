@@ -1,9 +1,16 @@
 {
+  "actions": {
+    "openIn": "Abrir en {service}"
+  },
+  "additionalActions": "Acciones Adicionales",
   "additionalResources": "Recursos adicionales",
   "anonymized": {
     "title": "Anonimizado"
   },
   "assets": {
+    "alternate": {
+      "main": "Preferido"
+    },
     "copyGdalVfsUrl": {
       "generic": "Copiar la URL del VFS de GDAL",
       "withSource": "Copiar la URL del VFS de GDAL para {source}"
@@ -28,12 +35,28 @@
   },
   "authentication": {
     "button": {
-      "authenticate": "Autenticar",
-      "authenticated": "Autenticado",
+      "login": "Entrar",
+      "logout": "Salir",
       "title": "Proporciona o actualiza tus credenciales"
     },
+    "chooseMethod": "Elija el método de autenticación",
     "description": "La página solicitada requiere autenticación. Por favor proporcione sus datos de autenticación en el campo de texto que aparece a continuación.",
-    "title": "Autenticación"
+    "loggedOut": "Ha cerrado la sesión con éxito. Ahora puede cerrar esta ventana.",
+    "password": "Contraseña",
+    "required": "Se necesita autenticación",
+    "schemeTypes": {
+      "http": "HTTP {scheme}",
+      "s3": "S3",
+      "signedUrl": "URL Firmada",
+      "oauth2": "OAuth 2",
+      "apiKey": "Llave de API",
+      "openIdConnect": "OpenID Connect"
+    },
+    "title": "Autenticación",
+    "unauthorized": "No tiene permiso para acceder a estos datos. Por favor, inicie sesión.",
+    "unsupported": "No compatible",
+    "unsupportedLong": "Lo sentimos, el método de autenticación {method} no es compatible con STAC Browser.",
+    "user": "Usuario"
   },
   "browse": "Explorar",
   "cancel": "Cancelar",
@@ -43,6 +66,7 @@
   },
   "catalogs": {
     "filterByTitle": "Filtrar catálogos por título",
+    "filterByTitleAndMore": "Filtrar catálogo por título, descripción o palabras clave",
     "loadMore": "Cargar más...",
     "noMatches": "Ningún catálogo concuerda con los criterios de búsqueda"
   },
@@ -95,6 +119,10 @@
     "exit": "Salir de pantalla completa",
     "show": "Ver en pantalla completa"
   },
+  "goBack": {
+    "description": "Volver al {type}",
+    "label": "Volver"
+  },
   "goToCollection": {
     "description": "Ir a la colección asociada",
     "descriptionWithTitle": "@:goToCollection.description: {title}",
@@ -117,9 +145,11 @@
     "urlMissingProtocol": "La URL no tiene protocolo."
   },
   "items": {
-    "filter": "Filtro",
+    "filter": "Filtros",
+    "hideFilter": "Ocultar Filtros",
     "noTime": "No se indicó un tiempo",
-    "noneAvailableForCollection": "No hay elementos disponibles para esta colección."
+    "noneAvailableForCollection": "No hay elementos disponibles para esta colección.",
+    "showFilter": "Mostrar Filtros"
   },
   "leaflet": {
     "close": "Cerrar",
@@ -140,6 +170,7 @@
   },
   "loading": "Cargando...",
   "map": "Mapa",
+  "messageForSchemaError": "{message}, para el esquema {schemaPath}",
   "metadata": {
     "general": "General",
     "title": "Metadatos"
@@ -147,6 +178,7 @@
   "multiselect": {
     "andMore": "y {count} mas",
     "deselectLabel": "Presione enter para quitar",
+    "keywordsPlaceholder": "Seleccionar palabras clave",
     "placeholder": "Seleccionar opción",
     "selectLabel": "Presione enter para seleccionar",
     "selectedLabel": "Seleccionado"
@@ -165,7 +197,10 @@
     "ftp": "FTP",
     "gcs": "Google Cloud",
     "oss": "Alibaba Cloud",
-    "s3": "Amazon S3"
+    "s3": {
+      "amazonaws.com": "Amazon S3",
+      "default": "S3"
+    }
   },
   "providers": {
     "email": "Enviar e-mail",
@@ -182,20 +217,22 @@
     "less": "Leer menos",
     "more": "Leer más"
   },
+  "reset": "Restablecer",
   "search": {
     "addCollections": "Presione enter para añadir una colección",
     "addFilter": "Añadir filtro",
     "addItemIds": "Presione enter para añadir el ID de un elemento",
+    "addSearchTerm": "Presione Enter para añadir un término de búsqueda",
     "additionalFilters": "Filtros adicionales",
-    "buttons": {
-      "filter": "Filtro",
-      "reset": "Restablecer"
-    },
     "dateDescription": "Todas las horas en Coordinated Universal Time (UTC).",
     "enterCollections": "Introduzca una o varias colecciones...",
     "enterItemIds": "Introduzca una o varias IDs de Elemento...",
+    "enterSearchTerms": "Introduzca uno o más términos de búsqueda...",
     "equalTo": "igual a",
     "filterBySpatialExtent": "Filtra por extensión espacial",
+    "filterCollection": "Filtrar colección",
+    "freeText": "Términos de Búsqueda",
+    "freeTextDescription": "Buscar al menos uno de los términos proporcionados en campos como el título y la descripción.",
     "greaterThan": "mayor que",
     "greaterThanEqual": "igual o mayor que",
     "itemIds": "IDs de Elementos",
@@ -211,6 +248,7 @@
     "matches": "coincidencia",
     "metaDescription": "Buscar en los datos ofrecidos por {title}.",
     "modifyCriteria": "Por favor modifique los criterios de búsqueda.",
+    "noFurtherItemsFound": "No hay más elementos disponibles.",
     "noItemsFound": "No se encontró ningún elemento para los filtros seleccionados.",
     "noOptions": "Aún no se ha introducido nada",
     "notEqualTo": "no igual a",
@@ -218,14 +256,20 @@
     "notSupported": "La API no soporta la Búsqueda por Elementos.",
     "placeholder": "Búsqueda...",
     "selectCollections": "Seleccione una o varias colecciones...",
+    "selectForItemSearch": "Seleccionar para Búsqueda de Elementos",
     "sortOptions": {
       "datetime": "Fecha y hora",
       "id": "ID",
       "title": "Título"
     },
     "spatialExtent": "Extensión espacial",
+    "tabs": {
+      "collections": "Buscar colecciones",
+      "items": "Buscar elementos"
+    },
     "temporalExtent": "Extensión temporal",
-    "title": "Buscar"
+    "title": "Buscar",
+    "useInItemSearch": "Abrir colección en Búsqueda de Elementos | Abrir {count} Colecciones en Búsqueda de Elementos"
   },
   "showMore": "Mostrar más...",
   "sidebar": {
@@ -243,7 +287,12 @@
     "title": "Ordenar"
   },
   "source": {
+    "conformanceClasses": "Clases de conformidad",
     "detailsAboutSource": "Detalles sobre la fuente STAC",
+    "extension": "Extensión",
+    "fileFormat": "Formato de archivo",
+    "id": "ID",
+    "invalid": "Ínvalido",
     "label": "Fuente",
     "language": {
       "label": "Idioma: {currentLanguage}",
@@ -253,19 +302,50 @@
     },
     "locatedAt": "El archivo de metadatos STAC se encuentra en:",
     "share": {
+      "bsky": "Bluesky",
       "email": "E-mail",
       "label": "Compartir",
+      "mastodon": "Mastodon.social",
       "message": "{title} está disponible en {url}",
       "sharePageWithOthers": "Comparta la URL de está página donde guste:",
       "title": "Compartir",
-      "twitter": "Twitter",
+      "x": "X (Twitter)",
       "withOthers": "Comparta esta página con otros"
     },
-    "stacVersion": "Versión STAC:",
+    "stacExtension": "Extensión STAC",
+    "stacVersion": "Versión STAC",
+    "statistics": "Estadísticas",
     "title": "Fuente de datos",
-    "valid": "Valida:",
+    "valid": "Valida",
     "validating": "Validando...",
-    "validationNA": "n/a"
+    "validationNA": "n/a",
+    "validationParams": {
+      "additionalProperty": "propiedad adicional",
+      "allowedValue": "valor permitido",
+      "allowedValues": "valores permitidos",
+      "comparison": "comparación",
+      "depsCount": "cantidad",
+      "exclusive": "excluir el límite",
+      "failingKeyword": "palabra clave fallida",
+      "format": "formato",
+      "i": "primer elemento",
+      "j": "segundo elemento",
+      "limit": "límite",
+      "maxContains": "contiene como mucho",
+      "minContains": "contiene al menos",
+      "missingProperty": "propiedad faltante",
+      "multipleOf": "multiplo de",
+      "passingSchemas": "esquemas aprobados",
+      "pattern": "patrón",
+      "property": "propiedad",
+      "propertyName": "nombre de la propiedad",
+      "type": "tipo"
+    },
+    "validationReport": {
+      "disclaimer": "El informe de la validación se genera en base a esquemas, que frecuentemente no son exaustivos. Por lo que puede no cubrir todos los aspectos de la especificación STAC y sus extensiones. El informe de validación no es una garantía de que la entidad STAC se ajuste completamente a la especificación y sus exetensiones.",
+      "result": "Resultado",
+      "title": "Informe de Validación"
+    }
   },
   "stacAssets": "Recurso | Recursos",
   "stacCatalog": "Catálogo | Catálogos",

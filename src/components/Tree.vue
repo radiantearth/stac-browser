@@ -219,7 +219,7 @@ export default {
       if (this.expanded && !this.pagination) {
         this.loading = true;
         let url = this.item instanceof STAC ? this.item.getAbsoluteUrl() : this.item.href;
-        await this.$store.dispatch("load", { url, loadApi: true });
+        await this.$store.dispatch("load", { url });
         this.loading = false;
       }
     }

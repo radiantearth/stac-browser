@@ -1,5 +1,5 @@
 <template>
-  <div :class="{cc: true, [data.type.toLowerCase()]: true, mixed: hasCatalogs && hasItems, empty: !hasCatalogs && !hasItems}" :key="data.id">
+  <div :class="{cc: true, [cssStacType]: true, mixed: hasCatalogs && hasItems, empty: !hasCatalogs && !hasItems}" :key="data.id">
     <b-row>
       <b-col class="meta">
         <section class="intro">
@@ -9,7 +9,7 @@
           <ReadMore v-if="data.description" :lines="10" :text="$t('read.more')" :text-less="$t('read.less')">
             <Description :description="data.description" />
           </ReadMore>
-          <Keywords v-if="Array.isArray(data.keywords) && data.keywords.length > 0" :keywords="data.keywords" />
+          <Keywords v-if="Array.isArray(data.keywords) && data.keywords.length > 0" :keywords="data.keywords" class="mb-3" />
           <section v-if="isCollection" class="metadata mb-4">
             <b-row v-if="licenses">
               <b-col md="4" class="label">{{ $t('catalog.license') }}</b-col>
@@ -20,13 +20,13 @@
               <b-col md="8" class="value"><span v-html="temporalExtents" /></b-col>
             </b-row>
           </section>
-          <Links v-if="linkPosition === 'left'" :title="$t('additionalResources')" :links="additionalLinks" />
+          <Links v-if="linkPosition === 'left'" :title="$t('additionalResources')" :links="additionalLinks" :context="data" />
         </section>
         <section v-if="isCollection || hasThumbnails" class="mb-4">
           <b-card no-body class="maps-preview">
             <b-tabs v-model="tab" ref="tabs" pills card vertical end>
               <b-tab v-if="isCollection" :title="$t('map')" no-body>
-                <Map :stac="data" :stacLayerData="mapData" @dataChanged="dataChanged" popover />
+                <Map :stac="data" :stacLayerData="mapData" @dataChanged="dataChanged" fitBoundsOnce popover />
               </b-tab>
               <b-tab v-if="hasThumbnails" :title="$t('thumbnails')" no-body>
                 <Thumbnails :thumbnails="thumbnails" />
@@ -35,22 +35,24 @@
           </b-card>
         </section>
         <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="shownAssets" @showAsset="showAsset" />
-        <Assets v-if="hasItemAssets && !hasItems" :assets="data.item_assets" :definition="true" />
+        <Assets v-if="hasItemAssets && !hasItems" :assets="data.item_assets" :context="data" :definition="true" />
         <Providers v-if="providers" :providers="providers" />
-        <Metadata :title="$t('metadata.title')" class="mb-4" :type="data.type" :data="data" :ignoreFields="ignoredMetadataFields" />
+        <Metadata class="mb-4" :type="data.type" :data="data" :ignoreFields="ignoredMetadataFields" />
         <CollectionLink v-if="collectionLink" :link="collectionLink" />
-        <Links v-if="linkPosition === 'right'" :title="$t('additionalResources')" :links="additionalLinks" />
+        <Links v-if="linkPosition === 'right'" :title="$t('additionalResources')" :links="additionalLinks" :context="data" />
       </b-col>
       <b-col class="catalogs-container" v-if="hasCatalogs">
         <Catalogs :catalogs="catalogs" :hasMore="!!nextCollectionsLink" @loadMore="loadMoreCollections" />
       </b-col>
       <b-col class="items-container" v-if="hasItems">
         <Items
-          :stac="data" :items="items" :api="isApi" :apiFilters="filters"
+          :stac="data" :items="items" :api="isApi"
+          :showFilters="showFilters" :apiFilters="filters"
           :pagination="itemPages" :loading="apiItemsLoading"
           @paginate="paginateItems" @filterItems="filterItems"
+          @filtersShown="filtersShown"
         />
-        <Assets v-if="hasItemAssets" :assets="data.item_assets" :definition="true" />
+        <Assets v-if="hasItemAssets" :assets="data.item_assets" :context="data" :definition="true" />
       </b-col>
     </b-row>
   </div>
@@ -121,14 +123,29 @@ export default {
         'deprecated',
         // Special handling for the warning of the anonymized-location extension
         'anon:warning',
+        // Special handling for the stats extension
+        'stats:catalogs',
+        'stats:collections',
+        'stats:items',
+        // Special handling for auth
+        'auth:schemes',
         // Special handling for the STAC Browser config
         'stac_browser'
       ]
     };
   },
   computed: {
-    ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination', 'nextCollectionsLink']),
+    ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination', 'nextCollectionsLink', 'stateQueryParameters']),
     ...mapGetters(['additionalLinks', 'catalogs', 'collectionLink', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
+    cssStacType() {
+      if (Utils.hasText(this.data?.type)) {
+        return this.data?.type.toLowerCase();
+      }
+      return null;
+    },
+    showFilters() {
+      return Boolean(this.stateQueryParameters['itemFilterOpen']);
+    },
     hasThumbnails() {
       return this.thumbnails.length > 0;
     },
@@ -219,6 +236,9 @@ export default {
     }
   },
   methods: {
+    filtersShown(show) {
+        this.$store.commit('updateState', {type: 'itemFilterOpen', value: show ? 1 : null});
+    },
     loadMoreCollections() {
       this.$store.dispatch('loadNextApiCollections', {show: true});
     },
@@ -235,7 +255,7 @@ export default {
         this.$store.commit('resetApiItems', this.data.getApiItemsLink());
       }
       try {
-        await this.$store.dispatch('loadApiItems', {link: this.apiItemsLink, show: true, filters});
+        await this.$store.dispatch('loadApiItems', {link: this.data.getApiItemsLink(), show: true, filters});
       } catch (error) {
         let msg = reset ? this.$t('errors.loadItems') : this.$t('errors.loadFilteredItems');
         this.$root.$emit('error', error, msg);

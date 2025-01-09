@@ -5,22 +5,18 @@
       <div class="group" v-for="group in groups" :key="group.rel">
         <h4 v-if="group.rel">{{ group.label }}</h4>
         <ul>
-          <li v-for="(link, key) in group.links" :key="key">
-            <StacLink :data="link" :fallbackTitle="() => fallbackTitle(link)" />
-          </li>
+          <Link v-for="(link, key) in group.links" :key="key" :link="link" :context="context" :fallbackTitle="() => fallbackTitle(link)" />
         </ul>
       </div>
     </template>
     <ul v-else>
-      <li v-for="(link, key) in links" :key="key">
-        <StacLink :data="link" :fallbackTitle="() => fallbackTitle(link)" />
-      </li>
+      <Link v-for="(link, key) in links" :key="key" :link="link" :context="context" :fallbackTitle="() => fallbackTitle(link)" />
     </ul>
   </section>
 </template>
 
 <script>
-import StacLink from './StacLink.vue';
+import Link from './Link.vue';
 import { Fields } from '@radiantearth/stac-fields';
 import { formatKey } from '@radiantearth/stac-fields/helper';
 import { ogcRelPrefix } from '../rels';
@@ -32,7 +28,7 @@ import { mapState } from 'vuex';
 export default {
   name: "Links",
   components: {
-    StacLink
+    Link
   },
   props: {
     title: {
@@ -42,6 +38,10 @@ export default {
     links: {
       type: Array,
       default: () => ([])
+    },
+    context: {
+      type: Object,
+      default: null
     }
   },
   computed: {
@@ -61,7 +61,8 @@ export default {
         }
         return summary;
       }, {});
-      return Object.values(groups).sort((g1, g2) => g1.label.localeCompare(g2.label, this.uiLanguage));
+      const collator = new Intl.Collator(this.uiLanguage);
+      return Object.values(groups).sort((g1, g2) => collator.compare(g1.label, g2.label));
     },
     hasGroups() {
       return this.groups.some(group => group.rel.length > 0 && group.links.length >= 2);

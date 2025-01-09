@@ -1,38 +1,60 @@
 # Options
 
-All the following options can be used as explained in the chapter "Running", either through the [config file](../config.js) or as CLI parameter.
-Some of them can also be set [through the root catalog](../README.md#customize-through-root-catalog).
+STAC Browser exposes a wide variety of configuration options.
+The following options can be provided in various ways to STAC Browser, either when running it or when building it.
+
+The following ways to set config options are possible:
+- Customize the **[config file](../config.js)** (recommended)
+- Additionally, some options can be [provided through the **root catalog**](../README.md#customize-through-root-catalog) for consistency across multiple deployments (recommended)
+- Append them to the **CLI** command as parameter (see [Get Started](../README.md#get-started) for an example)
+- Set **environment variables**, all options need a `SB_` prefix.
+  So you could for example set the catalog URL via the environment variable `SB_catalogUrl`.
+- Optionally, you can also set options after the build, basically **at "runtime"**.
+  Enable this by removing the `<!--` and `-->` around the `<script defer="defer" src="./config.js"></script>` in the [`public/index.html`](../public/index.html).
+  Then run the build procedure and after completion, you can fill the `dist/config.js` with any options that you want to customize.
 
 **The following options are available:**
-* [catalogUrl](#catalogurl)
-* [catalogTitle](#catalogtitle)
-* [allowExternalAccess](#allowexternalaccess)
-* [allowedDomains](#alloweddomains)
-* [apiCatalogPriority](#apicatalogpriority)
-* [detectLocaleFromBrowser](#detectlocalefrombrowser)
-* [storeLocale](#storelocale)
-* [locale](#locale)
-* [fallbackLocale](#fallbacklocale)
-* [supportedLocales](#supportedlocales)
-* [stacLint](#staclint)
-* [historyMode](#historymode)
-* [pathPrefix](#pathprefix)
-* [stacProxyUrl](#stacproxyurl)
-* [buildTileUrlTemplate](#buildtileurltemplate)
-* [useTileLayerAsFallback](#usetilelayerasfallback)
-* [displayGeoTiffByDefault](#displaygeotiffbydefault)
-* [redirectLegacyUrls](#redirectlegacyurls)
-* [itemsPerPage](#itemsperpage)
-* [maxPreviewsOnMap](#maxpreviewsonmap)
-* [cardViewMode](#cardviewmode)
-* [cardViewSort](#cardviewsort)
-* [showThumbnailsAsAssets](#showthumbnailsasassets)
-* [defaultThumbnailSize](#defaultthumbnailsize)
-* [crossOriginMedia](#crossoriginmedia)
-* [requestHeaders](#requestheaders)
-* [requestQueryParameters](#requestqueryparameters)
-* [authConfig](#authconfig)
-* [preprocessSTAC](#preprocessstac)
+- [Options](#options)
+  - [catalogUrl](#catalogurl)
+  - [catalogTitle](#catalogtitle)
+  - [allowExternalAccess](#allowexternalaccess)
+  - [allowedDomains](#alloweddomains)
+  - [apiCatalogPriority](#apicatalogpriority)
+  - [detectLocaleFromBrowser](#detectlocalefrombrowser)
+  - [storeLocale](#storelocale)
+  - [locale](#locale)
+  - [fallbackLocale](#fallbacklocale)
+  - [supportedLocales](#supportedlocales)
+  - [historyMode](#historymode)
+    - [`history`](#history)
+    - [`hash`](#hash)
+  - [pathPrefix](#pathprefix)
+  - [stacProxyUrl](#stacproxyurl)
+  - [buildTileUrlTemplate](#buildtileurltemplate)
+  - [useTileLayerAsFallback](#usetilelayerasfallback)
+  - [displayGeoTiffByDefault](#displaygeotiffbydefault)
+  - [redirectLegacyUrls](#redirectlegacyurls)
+  - [itemsPerPage](#itemsperpage)
+  - [maxPreviewsOnMap](#maxpreviewsonmap)
+  - [cardViewMode](#cardviewmode)
+  - [cardViewSort](#cardviewsort)
+  - [showKeywordsInItemCards](#showkeywordsinitemcards)
+  - [showKeywordsInCatalogCards](#showkeywordsincatalogcards)
+  - [showThumbnailsAsAssets](#showthumbnailsasassets)
+  - [defaultThumbnailSize](#defaultthumbnailsize)
+  - [crossOriginMedia](#crossoriginmedia)
+  - [requestHeaders](#requestheaders)
+  - [requestQueryParameters](#requestqueryparameters)
+  - [socialSharing](#socialsharing)
+  - [authConfig](#authconfig)
+    - [API Keys](#api-keys)
+      - [Example 1: HTTP Request Header Value](#example-1-http-request-header-value)
+      - [Example 2: Query Parameter Value](#example-2-query-parameter-value)
+    - [HTTP Basic](#http-basic)
+    - [OpenID Connect](#openid-connect)
+      - [Example](#example)
+  - [preprocessSTAC](#preprocessstac)
+    - [Example: Update root catalog](#example-update-root-catalog)
 
 ## catalogUrl
 
@@ -79,8 +101,16 @@ Otherwise, defaults to the language set for `locale`.
 
 ## storeLocale
 
-If set to `true`, stores the locale selected by the user in the `localStorage` of the browser.
-Otherwise, doesn't store the locale across browser sessions.
+If set to `true` (default), stores the locale selected by the user in the storage of the browser.
+If set to `false`, doesn't store the locale across browser sessions.
+
+Depending on the browser settings, this may store in either:
+- `localeStorage`
+- `sessionStorage`
+- cookies
+
+In some countries this may have implications with regards to GDPR etc.
+If you want to avoid this, disable this setting.
 
 ## locale
 
@@ -103,25 +133,28 @@ In CLI, please provide the languages separated by a space, e.g. `--supportedLoca
 Please note that only left-to-right languages have been tested.
 I'd need help to test support for right-to-left languages.
 
-## stacLint
-
-***experimental***
-
-Enables or disables a feature that validates the STAC catalog when opening the "Source Data" popup.
-Validation uses the external service [staclint.com](https://staclint.com).
-
-Validation is automatically disabled in the following cases:
-- the host of a catalog is `localhost`, `127.0.0.1` and `::1`
-- [private query parameters](../README.md#private-query-parameters) have been set
-- `stacProxyUrl` is set
-
 ## historyMode
 
 ***build-only option***
 
-STAC Browser defaults to using [HTML5 History Mode](https://v3.router.vuejs.org/guide/essentials/history-mode.html#html5-history-mode),
-which can cause problems on certain web hosts. To use _hash mode_, set `--historyMode=hash` when running or building.
-This will be compatible with S3, stock Apache, etc.
+### `history`
+STAC Browser defaults to _history mode_ (value `history` in the config file), which is based on 
+[HTML5 History Mode](https://v3.router.vuejs.org/guide/essentials/history-mode.html#html5-history-mode).
+It gives the best experience and allows search engines to better crawl STAC Browser so that it can be found in search engines.
+
+**History mode requires that you enable custom URL rewriting rules on your host/server**, otherwise people can not reload pages 
+or share URLs without getting a "page not found" error (404).
+The following link explains the details and provides examples for various common server software:
+**<https://v3.router.vuejs.org/guide/essentials/history-mode.html#example-server-configurations>**
+
+Please note that you can't host any other files in the folder that STAC Browser is in as the URL rewriting
+will redirect all requests to these (sub)-folders and included files to STAC Browser.
+This also excludes hosting your STAC catalog in the STAC Browser (sub-)folders.
+
+### `hash`
+If your host/server doesn't support URL rewriting or you experience other related problems, you can enable _hash mode_.
+Either set this option to `hash` in the config file or append `--historyMode=hash` when running or building.
+Known hosts that require hash mode are Amazon S3 and GitHub Pages.
 
 ## pathPrefix
 
@@ -146,12 +179,12 @@ For instance, if you are serving a catalog on the local file system at `/home/us
 the data out from a server located at `http://localhost:8888/`, you can use:
 
 ```bash
-npm start -- --open --stacProxyUrl="/home/user;http://localhost:8888"
+npm start -- --open --stacProxyUrl=/home/user http://localhost:8888
 ```
 
 Notice the format of the value:
-* In CLI it is the original location and the proxy location separated by the `;` character, i.e. `{original};{proxy}`.
-* In the config file it is a two-element array with the original location as first element and the proxy location as the second element. Set to `null` to disable (default).
+* In CLI it is the original location and the proxy location separated by a space character, i.e. `{original} {proxy}` as in the example above.
+* In the config file it is a two-element array with the original location as first element and the proxy location as the second element. Set the option to `null` to disable it (default).
 
 In this example, any href contained in the STAC (including link or asset hrefs) will replace any occurrence of `/home/user/` with `http://localhost:8888`.
 
@@ -164,7 +197,7 @@ The option controls the tile layer that is used to render imagery such as (cloud
 
 See the [documentation for the corresponding stac-layer option](https://github.com/stac-utils/stac-layer#buildtileurltemplate) for details.
 
-Please note that this option can only be provided through a config file and is not available via CLI.
+Please note that this option can only be provided through a config file and is not available via CLI/ENV.
 
 If the option `useTileLayerAsFallback` is set to `true`, the tile server is only used as a fallback.
 
@@ -210,14 +243,25 @@ The maximum number of previews (thumbnails or overviews) of items that will be s
 
 ## cardViewMode
 
-The default view mode for lists of catalogs/collections. Either `"list"` or `"cards"` (default). 
+The default view mode for lists of catalogs/collections. Either `"list"` or `"cards"` (default).
 
 ## cardViewSort
 
 The default sorting for lists of catalogs/collections or items. One of:
+
 - `"asc"`: ascending sort (default)
 - `"desc"`: descending sort
 - `null`: sorted as in the source files
+
+Doesn't apply when API search filters are applied.
+
+## showKeywordsInItemCards
+
+Enables keywords in the lists of items if set to `true`. Defaults to `false`.
+
+## showKeywordsInCatalogCards
+
+Enables keywords in the lists of catalogs/collections if set to `true`. Defaults to `false`.
 
 ## showThumbnailsAsAssets
 
@@ -241,7 +285,7 @@ This is affected by [`allowedDomains`](#alloweddomains).
 
 Example: `{'Authorization': 'Bearer 134567984623223'}` adds a Bearer token to the HTTP headers.
 
-Please note that this option can only be provided through a config file and is not available via CLI.
+Please note that this option can only be provided through a config file and is not available via CLI/ENV.
 
 ## requestQueryParameters
 
@@ -252,31 +296,61 @@ This is affected by [`allowedDomains`](#alloweddomains).
 
 Example: `{'f': 'json'}` adds a `f` query parameter to the HTTP URL, e.g. `https://example.com?f=json`.
 
-Please note that this option can only be provided through a config file and is not available via CLI.
+Please note that this option can only be provided through a config file and is not available via CLI/ENV.
+
+## socialSharing
+
+Lists the social sharing service for which buttons should be shown in the "Share" panel.
+
+The following services are supported:
+
+- `email` (Send via e-email)
+- `bsky` (Bluesky)
+- `mastodon` (Mastodon.social)
+- `x` (X, formerly Twitter)
 
 ## authConfig
 
 ***experimental***
 
-This allows to enable a simple authentication form where a user can input a token, an API key or similar things.
-It is disabled by default (`null`). If enabled, the token provided by the user can be used in the HTTP headers or in the query parameters of the requests. This option is affected by [`allowedDomains`](#alloweddomains).
+This allows to enable some authentication methods. Currently the supported methods are:
+- API Keys (`type: apiKey`) via query parameter or HTTP Header
+- HTTP Basic (`type: http`, `scheme: basic`)
+- OpenID Connect (`type: openIdConnect`)
 
-There are four options you can set in the `authConfig` object:
+Authentication is disabled by default (`null`).
 
-* `type` (string): `null` (disabled), `"query"` (use token in query parameters), or `"header"` (use token in HTTP request headers).
-* `key` (string): The query string parameter name or the HTTP header name respecively.
-* `formatter` (function|string|null): You can optionally specify a formatter for the query string value or HTTP header value respectively. If the string `"Bearer"` is provided formats as a Bearer token according to RFC 6750. If not given, the token is provided as provided by the user.
-* `description` (string|null): Optionally a description that is shown to the user. This should explain how the token can be obtained for example. CommonMark is allowed.
+The options you can set in the `authConfig` object are defined in the
+[Authentication Scheme Object of the STAC Authentication Extension](https://github.com/stac-extensions/authentication?tab=readme-ov-file#authentication-scheme-object) (limited by the supported methods listed above).
+
+**Note:** Before STAC Browser 3.2.0 a different type of object was supported.
+The old way is deprecated, but will be converted to the new object internally.
+Please migrate to the new configuration options now.
+
+In addition the following properties are supported:
+
+* `formatter` (function|string|null): You can optionally specify a formatter for the query string value or HTTP header value respectively. If the string `"Bearer"` is provided formats as a Bearer token according to RFC 6750. If not given, the token is sent as provided by the user.
+* `description` (string|null): Optionally a description that is shown to the user. This should explain how the credentials can be obtained for example. CommonMark is allowed.
     **Note:** You can leave the description empty in the config file and instead provide a localized string with the key `authConfig` -> `description` in the file for custom phrases (`src/locales/custom.js`).
 
-Please note that this option can only be provided through a config file and is not available via CLI.
+Authentication is generally affected by the [`allowedDomains`](#alloweddomains) option.
 
-### Example 1: HTTP Request Header Value
+The `authConfig` option can only be provided through a config file and is not available via CLI/ENV.
+
+### API Keys
+
+API keys can be configured to be sent via HTTP header or query parameter:
+
+- For query parameters you need to set `in: query` with a respective `name` for the query parameter
+- For HTTP headers you need to set `in: header` with a respective `name` for the header field
+
+#### Example 1: HTTP Request Header Value
 
 ```js
 {
-  type: 'header',
-  key: 'Authorization',
+  type: 'apiKey',
+  in: 'header',
+  name: 'Authorization',
   formatter: token => `Bearer ${token}`, // This is an example, there's also the simpler variant to just provide the string 'Bearer' in this case
   description: `Please retrieve the token from our [API console](https://example.com/api-console).\n\nFor further questions contact <mailto:support@example.com>.`
 }
@@ -285,17 +359,59 @@ Please note that this option can only be provided through a config file and is n
 For a given token `123` this results in the following additional HTTP Header:
 `Authorization: Bearer 123`
 
-### Example 2: Query Parameter Value
+#### Example 2: Query Parameter Value
 
 ```js
 {
-  type: 'query',
-  key: 'API_KEY'
+  type: 'apiKey',
+  in: 'query',
+  name: 'API_KEY'
 }
 ```
 
 For a given token `123` this results in the following query parameter:
 `https://example.com/stac/catalog.json?API_KEY=123`
+
+### HTTP Basic
+
+HTTP Basic is supported according to [RFC 7617](https://datatracker.ietf.org/doc/html/rfc7617).
+
+**Example:**
+
+```js
+{
+  type: 'http',
+  scheme: 'basic'
+}
+```
+
+### OpenID Connect
+
+**IMPORTANT: OpenID Connect is only supported if `historyMode` is set to `history`!**
+
+For OpenID Connect some additional options must be provided, which currently follow the
+[oidc-client-ts Configuration options](https://github.com/okta/okta-auth-js?tab=readme-ov-file#configuration-options).
+These options (except for `issuer`) must be provided in the property `oidcConfig`.
+The `client_id` option defaults to `stac-browser`.
+
+The redirect URL for the OIDC client must be the STAC Browser URL, e.g. `https://mycompany.com/browser`, plus an appended `/auth`, so for example `https://mycompany.com/browser/auth`.
+
+#### Example
+
+```js
+{
+  type: 'openIdConnect',
+  openIdConnectUrl: 'https://stac.example/.well-known/openid-configuration',
+  oidcConfig: {
+    client_id: 'abc123'
+  }
+}
+```
+
+For a given token `123` this results in the following additional HTTP Header:
+`Authorization: Bearer 123`
+
+You can change the default behaviour to send it as a Bearer token by providing `in`, `name` and `format`.
 
 ## preprocessSTAC
 
@@ -306,7 +422,7 @@ The function receives two parameters:
 * `stac` (object of type `STAC`)
 * `state` (the vuex state)
 
-Please note that this option can only be provided through a config file and is not available via CLI.
+Please note that this option can only be provided through a config file and is not available via CLI/ENV.
 
 ### Example: Update root catalog
 

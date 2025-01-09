@@ -1,17 +1,15 @@
 <template>
   <div class="map-container">
     <l-map class="map" v-if="show" :class="stac.type" @ready="init" :options="mapOptions">
-      <l-control-fullscreen />
-      <l-control-zoom :key="`z${ix}`" v-bind="zoomControlTexts" position="topleft" />
-      <l-control-layers v-if="showLayerControl" position="bottomleft" ref="layerControl" />
+      <l-control-fullscreen :key="`fullscreen${ix}`" :options="fullscreenOptions" />
+      <l-control-zoom :key="`zoom${ix}`" v-bind="zoomControlTexts" position="topleft" />
+      <l-control-layers position="bottomleft" ref="layerControl" />
       <component
         v-for="basemap of basemaps" :is="basemap.is" :key="basemap.key"
         ref="basemaps" layerType="base" v-bind="basemap"
       />
-      <l-tile-layer
-        v-for="xyz of xyzLinks" ref="overlays" :key="xyz.url" layerType="overlay"
-        :name="xyz.name" :url="xyz.url" :subdomains="xyz.subdomains" :options="xyz.options" 
-      />
+      <l-tile-layer v-for="xyz of xyzLinks" ref="xyzOverlays" :key="xyz.url" layerType="overlay" v-bind="xyz" />
+      <LWMSTileLayer v-for="wms of wmsLinks" ref="wmsOverlays" :key="wms.url" layerType="overlay" v-bind="wms" />
       <l-geo-json v-if="geojson" ref="geojson" :geojson="geojson" :options="{onEachFeature: showPopup}" :optionsStyle="{color: secondaryColor, weight: secondaryWeight}" />
     </l-map>
     <b-popover
@@ -86,6 +84,10 @@ export default {
     popover: {
       type: Boolean,
       default: false
+    },
+    fitBoundsOnce: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -107,7 +109,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['buildTileUrlTemplate', 'crossOriginMedia', 'displayGeoTiffByDefault', 'geoTiffResolution', 'maxPreviewsOnMap', 'uiLanguage', 'useTileLayerAsFallback']),
+    ...mapState(['buildTileUrlTemplate', 'crossOriginMedia', 'displayGeoTiffByDefault', 'geoTiffResolution', 'maxPreviewsOnMap', 'useTileLayerAsFallback']),
     ...mapGetters(['getStac', 'supportsExtension']),
     fullscreenOptions() {
       return {
@@ -135,32 +137,52 @@ export default {
         return map;
       }).filter(map => Utils.isObject(map));
     },
-    showLayerControl() {
-      return this.xyzLinks.length > 0 || this.basemaps.length > 1;
-    },
     xyzLinks() {
-      if (!(this.stac instanceof STAC)) {
-        return [];
+      const links = this.getWebMapLinks('xyz');
+      return links.map(link => ({
+        url: link.href,
+        name: link.title || Utils.titleForHref(link.href),
+        subdomains: link.servers,
+        attribution: link.attribution || this.stac.getMetadata('attribution')
+      }));
+    },
+    wmsLinks() {
+      const links = this.getWebMapLinks('wms');
+      const wmsLinks = [];
+      for(const link of links) {
+        if (!Array.isArray(link['wms:layers'])) {
+          continue;
+        }
+        for(const i in link['wms:layers']) {
+          const layers = link['wms:layers'][i];
+          let styles;
+          if (Array.isArray(link['wms:styles']) && typeof link['wms:styles'][i] === 'string') {
+            styles = link['wms:styles'][i];
+          }
+          const name = [link.title, layers].filter(x => Boolean(x)).join(' - ');
+          const transparent = Utils.hasText(link['wms:transparent']) ? link['wms:transparent'].toLowerCase() === "true" : true;
+          const props = {
+            baseUrl: link.href,
+            name,
+            attribution: link.attribution || this.stac.getMetadata('attribution'),
+            version: '1.3.0',
+            layers,
+            transparent,
+            styles
+          };
+          if (typeof link['type'] === 'string' && link['type'].startsWith('image/')) {
+            props.format = link['type'];
+          }
+          if (Utils.isObject(link['wms:dimensions'])) {
+            props.options = link['wms:dimensions'];
+          }
+          wmsLinks.push(props);
+        }
       }
-      let links = this.stac.getLinksWithRels('xyz');
-      if (links.length === 0) {
-        return [];
-      }
-      return links.map(link => {
-        return {
-          url: link.href,
-          name: link.title,
-          subdomains: link.servers,
-          options: {}
-        };
-      });
+      return wmsLinks;
     }
   },
   watch: {
-    uiLanguage() {
-      // This recreates the component so that it picks up the new translations
-      this.ix++;
-    },
     async stacLayerData() {
       await this.showStacLayer();
     },
@@ -168,13 +190,12 @@ export default {
       if (newVal) {
         this.$nextTick(() => this.geojsonToFront());
       }
-    },
-    showLayerControl() {
-      this.updateLayerControl();
     }
   },
   created() {
     this.mapOptions.scrollWheelZoom = this.selectBounds || this.scrollWheelZoom;
+    // This recreates the component so that it picks up the new translations
+    this.$root.$on('uiLanguageChanged', () => this.ix++);
   },
   mounted() {
     // Solves https://github.com/radiantearth/stac-browser/issues/95 by showing the map
@@ -206,13 +227,27 @@ export default {
         this.addBoundsSelector();
       }
     },
-    updateLayerControl() {
-      if (this.showLayerControl) {
-        let basemaps = Array.isArray(this.$refs.basemaps) ? this.$refs.basemaps : [];
-        basemaps.forEach(layer => this.$refs.layerControl.addLayer(layer));
-        let overlays = Array.isArray(this.$refs.overlays) ? this.$refs.overlays : [];
-        overlays.forEach(layer => this.$refs.layerControl.addLayer(layer));
+    getWebMapLinks(rel) {
+      if (!(this.stac instanceof STAC)) {
+        return [];
       }
+      let links = this.stac.getLinksWithRels(rel);
+      if (links.length === 0) {
+        return [];
+      }
+      return links;
+    },
+    updateLayerControl() {
+      const basemaps = Array.isArray(this.$refs.basemaps) ? this.$refs.basemaps : [];
+      basemaps.forEach(layer => this.$refs.layerControl.mapObject.addBaseLayer(layer, layer.name));
+
+      const xyzOverlays = Array.isArray(this.$refs.xyzOverlays) ? this.$refs.xyzOverlays : [];
+      const wmsOverlays = Array.isArray(this.$refs.wmsOverlays) ? this.$refs.wmsOverlays : [];
+      const geojsonOverlays = Array.isArray(this.$refs.geojson) ? this.$refs.geojson : [];
+      xyzOverlays
+        .concat(wmsOverlays)
+        .concat(geojsonOverlays)
+        .forEach(layer => this.$refs.layerControl.mapObject.addOverlay(layer, layer.name));
     },
     viewChanged(event) {
       if (this.popover) {
@@ -222,9 +257,12 @@ export default {
       this.$emit('viewChanged', event);
     },
     async showStacLayer() {
+      let hadLayer = false;
       if (this.stacLayer) {
         this.map.removeLayer(this.stacLayer);
+        this.$refs.layerControl.mapObject.removeLayer(this.stacLayer);
         this.stacLayer = null;
+        hadLayer = true;
       }
       if (this.itemPreviewsLayer) {
         this.map.removeLayer(this.itemPreviewsLayer);
@@ -236,6 +274,8 @@ export default {
         return;
       }
 
+      let isLinkOrAsset = this.stacLayerData && ('href' in this.stacLayerData);
+
       let getDefaultOptions = (customOptions = {}) => Object.assign({
         baseUrl: this.stac.getAbsoluteUrl(),
         resolution: this.geoTiffResolution,
@@ -245,8 +285,10 @@ export default {
         displayGeoTiffByDefault: this.displayGeoTiffByDefault
       }, customOptions);
 
-      let options = getDefaultOptions();
-      if (this.stacLayerData && 'href' in this.stacLayerData) {
+      let options = getDefaultOptions({
+        displayOverview: !isLinkOrAsset
+      });
+      if (isLinkOrAsset) {
         if (this.stac.isItem()) {
           options.bbox = this.stac?.bbox;
         }
@@ -287,7 +329,11 @@ export default {
         this.addMapClickEvent(this.stacLayer);
         this.stacLayer.on("fallback", event => this.$emit('dataChanged', event.stac));
         this.stacLayer.addTo(this.map);
-        this.fitBounds(this.stacLayer, this.selectBounds);
+        const title = this.stac.type === 'Feature' ? `stacItem` : `stac${this.stac.type}`;
+        this.$refs.layerControl.mapObject.addOverlay(this.stacLayer, this.$tc(title));
+        if (!this.fitBoundsOnce || !hadLayer) {
+          this.fitBounds(this.stacLayer, this.selectBounds);
+        }
       }
 
       // Add item previews to the map
@@ -301,6 +347,7 @@ export default {
         this.itemPreviewsLayer = await stacLayer(this.stacLayerData, itemPreviewOptions);
         this.addMapClickEvent(this.itemPreviewsLayer);
         this.itemPreviewsLayer.addTo(this.map);
+        this.$refs.layerControl.mapObject.addOverlay(this.itemPreviewsLayer, this.$tc('stacItem', this.stacLayerData.features.length));
         this.itemPreviewsLayer.bringToFront();
         if (!this.stacLayer) {
           this.fitBounds(this.itemPreviewsLayer);
@@ -334,7 +381,9 @@ export default {
 
           const labelSourceLayerOptions = getDefaultOptions({
             fillOpacity: 0,
-            weight: 0
+            weight: 0,
+            // Usually these are smaller GeoTiffs, so load them by default
+            displayGeoTiffByDefault: true
           });
           for(let link of sourceLinks) {
             this.$store.dispatch('load', {url: link.href})
@@ -349,6 +398,7 @@ export default {
               })
               .then(layer => {
                 layer.addTo(this.map);
+                this.$refs.layerControl.mapObject.addOverlay(layer, layer.name || link.title);
                 // Bring GeoJSON to front to allow opening the popups
                 this.geojsonToFront();
               })

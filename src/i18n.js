@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import VueI18n from 'vue-i18n';
 import CONFIG from './config';
-import {default as Fields} from '@radiantearth/stac-fields/I18N';
+import { default as Fields } from '@radiantearth/stac-fields/I18N';
 import Utils from './utils';
 
 Vue.use(VueI18n);
@@ -12,15 +12,15 @@ const LOCALE_CONFIG = {};
 
 function loadLocaleConfig() {
   // Load locale config
-  for(let locale of CONFIG.supportedLocales) {
+  for (let locale of CONFIG.supportedLocales) {
     LOCALE_CONFIG[locale] = require(`./locales/${locale}/config.json`);
   }
   const messages = {};
   // Add language names all other languages
-  for(let locale in LOCALE_CONFIG) {
-      messages[locale] = {
-        languages: LOCALE_CONFIG
-      };
+  for (let locale in LOCALE_CONFIG) {
+    messages[locale] = {
+      languages: LOCALE_CONFIG
+    };
   }
   return messages;
 }
@@ -28,7 +28,24 @@ function loadLocaleConfig() {
 const i18n = new VueI18n({
   locale: CONFIG.locale,
   fallbackLocale: CONFIG.fallbackLocale,
-  messages: loadLocaleConfig()
+  messages: loadLocaleConfig(),
+  // Todo: Workaround for https://github.com/kazupon/vue-i18n/issues/563
+  postTranslation: (value, path) => {
+    if (value === "") {
+      const parts = path.split('.');
+      let message = i18n.messages[CONFIG.fallbackLocale];
+      for (const key of parts) {
+        if (key in message) {
+          message = message[key];
+        }
+        else {
+          return value;
+        }
+      }
+      return message;
+    }
+    return value;
+  }
 });
 export default i18n;
 
@@ -47,6 +64,18 @@ export async function loadMessages(locale) {
   }
   const messages = (await import(`./locales/${locale}/default.js`)).default;
   i18n.mergeLocaleMessage(locale, messages);
+}
+
+export async function executeCustomFunctions(locale) {
+  const customizeFiles = LOCALE_CONFIG[locale].customize;
+  if (Utils.size(LOCALE_CONFIG[locale].customize) === 0) {
+    return;
+  }
+  const p = customizeFiles.map(async (file) => {
+    const fn = (await import(`./locales/${locale}/${file}`)).default;
+    return await fn(locale);
+  });
+  return Promise.all(p);
 }
 
 export function translateFields(value, vars = null) {
