@@ -35,6 +35,9 @@ class STAC {
         this[key] = data[key];
       }
     }
+    if (!Utils.hasText(this.type)) {
+      throw new Error('Not a valid STAC data source (no `type` present)');
+    }
   }
 
   isPotentiallyIncomplete() {

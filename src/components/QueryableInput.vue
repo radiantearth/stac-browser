@@ -39,8 +39,6 @@
       />
       <b-form-input
         v-else-if="queryable.isText || queryable.isNumeric"
-        :number="queryable.isNumeric"
-        :type="queryable.isNumeric ? 'number' : 'text'"
         size="sm"
         class="value"
         :value="value.value"
@@ -114,32 +112,19 @@ export default {
     validation() {
       if (this.queryable.isText && !this.queryable.isTemporal) {
         return {
+          type: 'text',
           minlength: this.schema.minLength,
           maxlength: this.schema.maxLenggth,
           required: this.schema.minLength > 0
         };
       }
       else if (this.queryable.isNumeric) {
-        let step;
-        if (typeof this.schema.minimum === 'number' && typeof this.schema.maximum === 'number') {
-          let delta = (this.schema.maximum - this.schema.minimum);
-          if (delta <= 0.1) {
-            step = 0.01;
-          }
-          else if (delta <= 1) {
-            step = 0.1;
-          }
-          else if (delta <= 100) {
-            step = 1;
-          }
-          else {
-            step = 10;
-          }
-        }
         return {
+          type: 'number',
+          number: true,
           min: this.schema.minimum,
           max: this.schema.maximum,
-          step
+          step: this.schema.multipleOf || 'any'
         };
       }
       return {};

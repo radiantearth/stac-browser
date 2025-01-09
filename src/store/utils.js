@@ -4,9 +4,8 @@ import Utils from "../utils";
 
 export class Loading {
 
-  constructor(show = false, loadApi = false) {
+  constructor(show = false) {
     this.show = Boolean(show);
-    this.loadApi = Boolean(loadApi);
   }
 
 }

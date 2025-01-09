@@ -1,7 +1,7 @@
 import Auth from '../auth';
 import i18n from '../i18n';
 import AuthUtils from '../components/auth/utils';
-import BrowserStorage from '../browser-store';
+import BrowserStorage, { Cookies } from '../browser-store';
 
 const handleAuthError = async (cx, error) => {
   cx.commit('showGlobalError', {
@@ -63,7 +63,9 @@ export default function getStore(router) {
       },
       async updateMethod(cx, config) {
         config = AuthUtils.convertLegacyAuthConfig(config);
-        await cx.getters.method.close();
+        if (!Auth.equals(cx.getters.method, config)) {
+          await cx.getters.method.close();
+        }
 
         const changeListener = async (isLoggedIn, credentials) => {
           if (!isLoggedIn) {
@@ -128,8 +130,12 @@ export default function getStore(router) {
         if (intent.query) {
           cx.commit('setQueryParameter', intent.query, { root: true });
         }
-        if (intent.header) {
+        else if (intent.header) {
           cx.commit('setRequestHeader', intent.header, { root: true });
+        }
+        else if (intent.cookie) {
+          const cookie = new Cookies(true);
+          cookie.setItem(intent.cookie.key, intent.cookie.value);
         }
       },
       async executeActions(cx) {

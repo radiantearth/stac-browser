@@ -129,7 +129,7 @@ export default {
     },
     chunkedItems() {
       let items = this.items;
-      if (this.sort !== 0) {
+      if (!this.apiFilters.sortby && this.sort !== 0) {
         const collator = new Intl.Collator(this.uiLanguage);
         items = items.slice(0).sort((a,b) => collator.compare(STAC.getDisplayTitle(a), STAC.getDisplayTitle(b)));
         if (this.sort === -1) {

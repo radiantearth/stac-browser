@@ -9,7 +9,7 @@ const CQL_JSON = [
   'http://www.opengis.net/spec/cql2/1.*/conf/cql2-json'
 ];
 
-const CQL_ADV_COMPARISON = ['http://www.opengis.net/spec/cql2/1.*/req/advanced-comparison-operators'];
+const CQL_ADV_COMPARISON = ['http://www.opengis.net/spec/cql2/1.*/conf/advanced-comparison-operators'];
 
 import { mapGetters } from "vuex";
 
@@ -32,7 +32,7 @@ export const TYPES = {
   },
   // STAC API - Item Search
   Global:  {
-    BasicFilters: true,
+    BasicFilters: ['https://api.stacspec.org/v1.*/item-search'],
     CollectionIdFilter: true,
     ItemIdFilter: true,
     CqlFilters: ['https://api.stacspec.org/v1.*/item-search#filter'],

@@ -1,11 +1,16 @@
 {
-  "actions": {},
+  "actions": {
+    "openIn": "Deschide în {service}"
+  },
+  "additionalActions": "Acțiuni suplimentare",
   "additionalResources": "Resurse suplimentare",
   "anonymized": {
     "title": "Anonimizat"
   },
   "assets": {
-    "alternate": {},
+    "alternate": {
+      "main": "Preferat"
+    },
     "copyGdalVfsUrl": {
       "generic": "Copiați link-ul GDAL VFS",
       "withSource": "Copiați link-ul GDAL VFS al {source}"
@@ -30,11 +35,28 @@
   },
   "authentication": {
     "button": {
+      "login": "Autentificare",
+      "logout": "Deconectare",
       "title": "Introduceți sau actualizați informațiile de autentificare"
     },
+    "chooseMethod": "Alegeți metoda de autentificare",
     "description": "Pagina solicitată necesită autentificare. Vă rugăm să furnizați informațiile dvs. de autentificare în câmpul de text de mai jos.",
-    "schemeTypes": {},
-    "title": "Autentificare"
+    "loggedOut": "Ați fost deconectat. Puteți închide această fereastră.",
+    "password": "Parola",
+    "required": "Autentificare necesară",
+    "schemeTypes": {
+      "http": "HTTP {scheme}",
+      "s3": "S3",
+      "signedUrl": "URL Semnat",
+      "oauth2": "OAuth 2",
+      "apiKey": "Cheie API",
+      "openIdConnect": "OpenID Connect"
+    },
+    "title": "Autentificare",
+    "unauthorized": "Nu aveți permisiuni să accesați aceste date. Autentificare necesară.",
+    "unsupported": "Neacceptat",
+    "unsupportedLong": "Ne pare rău, metoda de autentificare {method} nu este acceptată de STAC Browser.",
+    "user": "Utilizator"
   },
   "browse": "Navigare",
   "cancel": "Anulare",
@@ -44,6 +66,7 @@
   },
   "catalogs": {
     "filterByTitle": "Filtrați cataloagele după titlu",
+    "filterByTitleAndMore": "Filtrează cataloagele după titlu, descriere sau cuvinte cheie",
     "loadMore": "Încarcă mai mult...",
     "noMatches": "Niciun catalog nu corespunde criteriilor de căutare."
   },
@@ -96,7 +119,10 @@
     "exit": "Ieși din modul ecran complet",
     "show": "Vizualizați pe tot ecranul"
   },
-  "goBack": {},
+  "goBack": {
+    "description": "Reveniți la {type}",
+    "label": "Înapoi"
+  },
   "goToCollection": {
     "description": "Accesați colecția asociată",
     "descriptionWithTitle": "@:goToCollection.description: {title}",
@@ -120,8 +146,10 @@
   },
   "items": {
     "filter": "Filtrat",
+    "hideFilter": "Ascunde filtrele",
     "noTime": "Niciun timp selectat",
-    "noneAvailableForCollection": "Nu există articole disponibile pentru această colecție."
+    "noneAvailableForCollection": "Nu există articole disponibile pentru această colecție.",
+    "showFilter": "Afișează filtre"
   },
   "leaflet": {
     "close": "Închidere",
@@ -142,6 +170,7 @@
   },
   "loading": "Încărcare...",
   "map": "Hartă",
+  "messageForSchemaError": "{message}, pentru schema {schemaPath}",
   "metadata": {
     "general": "General",
     "title": "Metadate"
@@ -149,6 +178,7 @@
   "multiselect": {
     "andMore": "și încă {count}",
     "deselectLabel": "Apăsați Enter pentru a deselecta",
+    "keywordsPlaceholder": "Selectați cuvintele cheie",
     "placeholder": "Selectează o opțiune",
     "selectLabel": "Apăsați Enter pentru a selecta",
     "selectedLabel": "Selectat(e)"
@@ -192,22 +222,33 @@
     "addCollections": "Apăsați Enter pentru a adăuga o colecție",
     "addFilter": "Adăugați un filtru",
     "addItemIds": "Apăsați Enter pentru a adăuga un ID de articol",
+    "addSearchTerm": "Apăsați enter pentru a adăuga un termen de căutare",
     "additionalFilters": "Filtre suplimentare",
     "dateDescription": "Toate orele sunt timp universal coordonat (UTC).",
     "enterCollections": "Introduceți una sau mai multe colecții...",
     "enterItemIds": "Introduceți unul sau mai multe ID-uri de articol...",
+    "enterSearchTerms": "Introduceți unul sau mai mulți termeni de căutare...",
     "equalTo": "egal cu",
     "filterBySpatialExtent": "Filtrați după extinderea spațială",
+    "filterCollection": "Filtru Colecție",
+    "freeText": "Termeni de căutare",
+    "freeTextDescription": "Căutați cel puțin unul dintre termenii specificați în câmpuri precum titlul și descrierea.",
     "greaterThan": "mai mare decât",
+    "greaterThanEqual": "mai mare sau egal cu",
     "itemIds": "Identificatori de elemente",
     "itemsPerPage": "Elemente per pagină",
     "itemsPerPageDescription": "Număr de elemente solicitate pe pagină, max. {maxItems} elemente",
     "lessThan": "mai puțin decât",
+    "lessThanEqual": "mai mic sau egal cu",
     "likeOperatorDescription": "Puteți folosi metacaracterele. `_` se potrivește cu un singur caracter, `%` se potrivește cu orice număr de caractere. Pentru a căuta în mod specific un wildcard, trebuie să adăugați un `\\` în fața caracterului.",
-    "logical": {},
+    "logical": {
+      "and": "Potrivește toate filtrele (și)",
+      "or": "Potrivește orice filtru (or)"
+    },
     "matches": "corespunde cu",
     "metaDescription": "Căutați în oferta de date a {title}.",
     "modifyCriteria": "Vă rugăm să modificați criteriile de căutare.",
+    "noFurtherItemsFound": "Nici un alt articol disponibil.",
     "noItemsFound": "Nu s-au găsit articole pentru filtrele selectate.",
     "noOptions": "Nimic introdus încă",
     "notEqualTo": "diferit de",
@@ -215,15 +256,20 @@
     "notSupported": "Căutarea articolelor nu este acceptată de API.",
     "placeholder": "Căutare...",
     "selectCollections": "Selectați una sau mai multe colecții...",
+    "selectForItemSearch": "Selectați pentru Căutare Articol",
     "sortOptions": {
       "datetime": "Data și ora",
       "id": "Identificator",
       "title": "Titlu"
     },
     "spatialExtent": "Întinderea spațială",
-    "tabs": {},
+    "tabs": {
+      "collections": "Caută Colecții",
+      "items": "Caută Articole"
+    },
     "temporalExtent": "Interval de timp",
-    "title": "Căutare"
+    "title": "Căutare",
+    "useInItemSearch": "Deschide Colecția în Căutare Articole | Deschide {count} Colecții în Căutare Articole"
   },
   "showMore": "Afișați mai multe...",
   "sidebar": {
@@ -241,9 +287,12 @@
     "title": "Sortare"
   },
   "source": {
+    "conformanceClasses": "Clase de conformitate",
     "detailsAboutSource": "Despre sursa STAC",
+    "extension": "Extensie",
     "fileFormat": "Formatul fișierului",
     "id": "Identificator",
+    "invalid": "Invalid",
     "label": "Sursă",
     "language": {
       "label": "Limbă: {currentLanguage}",
@@ -253,22 +302,50 @@
     },
     "locatedAt": "Fișierul de metadate STAC poate fi găsit la următoarea adresă:",
     "share": {
+      "bsky": "Bluesky",
       "email": "E-Mail",
       "label": "Partajare",
+      "mastodon": "Mastodon.social",
       "message": "{title} este disponibil la adresa {url}",
       "sharePageWithOthers": "Partajați URL-ul acestei pagini cu alții:",
       "title": "Partajare",
-      "twitter": "Twitter",
+      "x": "X (Twitter)",
       "withOthers": "Partajați această pagină"
     },
+    "stacExtension": "Extensie STAC",
     "stacVersion": "Versiune STAC",
     "statistics": "Statistici",
     "title": "Date sursă",
     "valid": "Valid",
     "validating": "Validare...",
     "validationNA": "n.a.",
-    "validationParams": {},
-    "validationReport": {}
+    "validationParams": {
+      "additionalProperty": "proprietate adițională",
+      "allowedValue": "valoare permisă",
+      "allowedValues": "valori permise",
+      "comparison": "comparare",
+      "depsCount": "număr",
+      "exclusive": "mai puțin frontiera",
+      "failingKeyword": "cuvânt cheie eșuat",
+      "format": "format",
+      "i": "primul articol",
+      "j": "al doilea articol",
+      "limit": "limită",
+      "maxContains": "conține cel mult",
+      "minContains": "conține cel puțin",
+      "missingProperty": "proprietate lipsă",
+      "multipleOf": "multiplu de",
+      "passingSchemas": "scheme conforme",
+      "pattern": "șablon",
+      "property": "proprietate",
+      "propertyName": "nume proprietate",
+      "type": "tip"
+    },
+    "validationReport": {
+      "disclaimer": "Raportul de validare este generat pe baza unor scheme care adesea nu sunt exhaustive. Prin urmare, ele s-ar putea să nu acopere toate aspectele specificației STAC sau ale extensiilor acesteia. Raportul de validare nu reprezintă o garanția a faptului că entitatea STAC este pe deplin conformă cu specificații sau extensiile acesteia.",
+      "result": "Rezultat",
+      "title": "Raport de validare"
+    }
   },
   "stacAssets": "Resursă | Resurse",
   "stacCatalog": "Catalog | Cataloage",

@@ -40,6 +40,7 @@ export default {
         this.tab = 0;
         this.selectedAsset = asset;
         this.selectedAssetKey = id;
+        this.shownAssetsOnMap = [this.selectedAssetKey];
       }
       if (this.$refs.tabs) {
         Utils.scrollTo(this.$refs.tabs.$el);

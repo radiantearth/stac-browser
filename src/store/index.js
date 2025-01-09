@@ -195,7 +195,7 @@ function getStore(config, router) {
         return getters.canSearchCollections || getters.canSearchItems;
       },
       canSearchItems: (state, getters) => {
-        return getters.supportsConformance(TYPES.Items.BasicFilters);
+        return getters.supportsConformance(TYPES.Global.BasicFilters);
       },
       canSearchCollections: (state, getters) => {
         return getters.supportsConformance(TYPES.Collections.BasicFilters);
@@ -465,10 +465,9 @@ function getStore(config, router) {
           Vue.delete(state.stateQueryParameters[type], idx);
         }
       },
-      updateLoading(state, { url, show, loadApi }) {
+      updateLoading(state, { url, show }) {
         let data = state.database[url];
         Vue.set(data, 'show', show || data.show);
-        Vue.set(data, 'loadApi', loadApi || data.loadApi);
       },
       loading(state, { url, loading }) {
         Vue.set(state.database, url, loading);
@@ -622,17 +621,15 @@ function getStore(config, router) {
     },
     actions: {
       async config(cx, config) {
+        const oldConfig = Object.assign({}, cx.state);
         cx.commit('config', config);
         // React on config changes
         for (let key in config) {
           let value = cx.state[key];
+          if (value !== oldConfig[key]) {
+            continue;
+          }
           switch (key) {
-            case 'catalogUrl':
-              if (value) {
-                // Load the root catalog data if not available (e.g. after page refresh or external access)
-                await cx.dispatch("load", { url: value, loadApi: true });
-              }
-              break;
             case 'authConfig':
               await cx.dispatch('auth/updateMethod', value);
               break;
@@ -692,7 +689,7 @@ function getStore(config, router) {
             break;
           }
           let url = Utils.toAbsolute(parentLink.href, stac.getAbsoluteUrl());
-          await cx.dispatch('load', { url, loadApi: true });
+          await cx.dispatch('load', { url });
           let parentStac = cx.getters.getStac(url, true);
           if (parentStac instanceof Error) {
             cx.commit('parents', parentStac);
@@ -715,33 +712,30 @@ function getStore(config, router) {
         await cx.dispatch('auth/requestLogin');
       },
       async load(cx, args) {
-        let { url, show, loadApi, loadRoot, force, noRetry } = args;
+        let { url, show, force, noRetry } = args;
 
-        let path = cx.getters.toBrowserPath(url);
+        const path = cx.getters.toBrowserPath(url);
         url = Utils.toAbsolute(url, cx.state.url);
 
         // Make sure we have all authentication details
         await cx.dispatch("auth/waitForAuth");
 
-        // Load the root catalog data if not available (e.g. after page refresh or external access)
-        if (!loadRoot && path !== '/' && cx.state.catalogUrl && !cx.getters.getStac(cx.state.catalogUrl)) {
-          await cx.dispatch("load", { url: cx.state.catalogUrl, loadApi: true, loadRoot: true });
-        }
-
         if (force) {
           cx.commit('clear', url);
         }
 
-        let loading = new Loading(show, loadApi);
+        let loading = new Loading(show);
         let data = cx.state.database[url];
         if (data instanceof Loading) {
-          cx.commit('updateLoading', { url, show, loadApi });
+          cx.commit('updateLoading', { url, show });
           return;
         }
-        else if (!data || data instanceof Error || (data instanceof STAC && data.isPotentiallyIncomplete())) {
+
+        const hasData = data instanceof STAC && !data.isPotentiallyIncomplete();
+        if (!hasData) {
           cx.commit('loading', { url, loading });
           try {
-            let response = await stacRequest(cx, url);
+            const response = await stacRequest(cx, url);
             if (!Utils.isObject(response.data)) {
               throw new BrowserError(i18n.t('errors.invalidJsonObject'));
             }
@@ -757,13 +751,7 @@ function getStore(config, router) {
               }
             }
 
-            if (!cx.getters.root) {
-              let root = data.getLinkWithRel('root');
-              if (root) {
-                await cx.dispatch('config', { catalogUrl: Utils.toAbsolute(root.href, url) });
-              }
-            }
-
+            // Handle conformance classes
             let conformanceLink = data.getStacLinkWithRel('conformance');
             if (Array.isArray(data.conformsTo) && data.conformsTo.length > 0) {
               cx.commit('setConformanceClasses', data.conformsTo);
@@ -781,36 +769,51 @@ function getStore(config, router) {
             }
             console.error(error);
             cx.commit('errored', { url, error });
+            return;
           }
         }
 
-        if (loading.loadApi && data instanceof STAC) {
-          // Load API Collections
-          if (data.getApiCollectionsLink()) {
-            let args = { stac: data, show: loading.show };
-            try {
-              await cx.dispatch('loadNextApiCollections', args);
-            } catch (error) {
-              cx.commit('showGlobalError', {
-                message: i18n.t('errors.loadApiCollectionsFailed'),
-                error
-              });
-            }
+        // Load API Collections
+        if (data.getApiCollectionsLink()) {
+          let args = { stac: data, show: loading.show };
+          try {
+            await cx.dispatch('loadNextApiCollections', args);
+          } catch (error) {
+            cx.commit('showGlobalError', {
+              message: i18n.t('errors.loadApiCollectionsFailed'),
+              error
+            });
           }
-          // Load API Items
-          if (data.getApiItemsLink()) {
-            let args = { stac: data, show: loading.show };
-            try {
-              await cx.dispatch('loadApiItems', args);
-            } catch (error) {
-              cx.commit('showGlobalError', {
-                message: i18n.t('errors.loadApiItemsFailed'),
-                error
-              });
-            }
+        }
+        // Load API Items
+        else if (data.getApiItemsLink()) {
+          let args = { stac: data, show: loading.show };
+          try {
+            await cx.dispatch('loadApiItems', args);
+          } catch (error) {
+            cx.commit('showGlobalError', {
+              message: i18n.t('errors.loadApiItemsFailed'),
+              error
+            });
           }
         }
 
+        // Load the root catalog data if not available (e.g. after page refresh or external access)
+        if (!cx.getters.root) {
+          let catalogUrl = cx.state.catalogUrl;
+          if (!catalogUrl) {
+            const root = data.getLinkWithRel('root');
+            if (root) {
+              catalogUrl = Utils.toAbsolute(root.href, url);
+              await cx.dispatch('config', { catalogUrl });
+            }
+          }
+          if (catalogUrl) {
+            await cx.dispatch("load", { url: catalogUrl });
+          }
+        }
+
+        // All tasks finished, show the page if requested
         if (loading.show) {
           cx.commit('showPage', { url });
         }

@@ -131,12 +131,12 @@ export default {
     ...Watchers,
     title(title) {
       document.title = title;
+      document.getElementById('og-title').setAttribute("content", title);
     },
     description(description) {
-      let element = document.getElementById('meta-description');
-      if (element) {
-        element.setAttribute("content", Utils.summarizeMd(description, 200));
-      }
+      const summary = Utils.summarizeMd(description, 200);
+      document.getElementById('meta-description').setAttribute("content", summary);
+      document.getElementById('og-description').setAttribute("content", summary);
     },
     uiLanguage: {
       immediate: true,
@@ -150,6 +150,7 @@ export default {
 
         // Update the HTML lang tag
         document.documentElement.setAttribute("lang", locale);
+        document.getElementById('og-locale').setAttribute("content", locale);
 
         this.$root.$emit('uiLanguageChanged', locale);
       }
@@ -174,7 +175,7 @@ export default {
             // A better way would be to combine the language code and URL as the index in the browser database
             // This needs a database refactor though: https://github.com/radiantearth/stac-browser/issues/231
             this.$store.commit('resetCatalog', true);
-            await this.$store.dispatch("load", { url, loadApi: true, show: true });
+            await this.$store.dispatch("load", { url, show: true });
           }
         }
       }
@@ -269,6 +270,8 @@ export default {
 
       this.$store.commit(resetOp);
       this.parseQuery(to);
+
+      document.getElementById('og-url').setAttribute("content", window.location.href);
     });
 
     const storage = new BrowserStorage(true);

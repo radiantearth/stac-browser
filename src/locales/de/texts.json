@@ -302,12 +302,14 @@
     },
     "locatedAt": "Die Datei mit den STAC-Metadaten befindet sich unter:",
     "share": {
+      "bsky": "Bluesky",
       "email": "E-Mail",
       "label": "Teilen",
+      "mastodon": "Mastodon.social",
       "message": "{title} ist verfügbar unter {url}",
       "sharePageWithOthers": "Teile die Adresse dieser Seite:",
       "title": "Teilen",
-      "twitter": "Twitter",
+      "x": "X (Twitter)",
       "withOthers": "Teile diese Seite mit anderen"
     },
     "stacExtension": "STAC-Erweiterung",

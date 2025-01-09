@@ -210,6 +210,16 @@
         "object"
       ]
     },
+    "socialSharing": {
+      "type": [
+        "array"
+      ],
+      "items": {
+        "type": [
+          "string"
+        ]
+      }
+    },
     "preprocessSTAC": {
       "type": [
         "null"

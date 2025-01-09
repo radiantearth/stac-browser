@@ -35,11 +35,28 @@
   },
   "authentication": {
     "button": {
+      "login": "Login",
+      "logout": "Logout",
       "title": "Forneça ou atualize as suas credenciais"
     },
+    "chooseMethod": "Escolha o método de autenticação",
     "description": "A página solicitada requer autenticação. Por favor, forneça os detalhes da sua autenticação no campo de texto abaixo.",
-    "schemeTypes": {},
-    "title": "Autenticação"
+    "loggedOut": "Logout bem sucedido. Pode fechar esta janela agora.",
+    "password": "Password",
+    "required": "Autenticação necessária",
+    "schemeTypes": {
+      "http": "HTTP {scheme}",
+      "s3": "S3",
+      "signedUrl": "URL Assinado",
+      "oauth2": "OAuth 2",
+      "apiKey": "Chave da API",
+      "openIdConnect": "OpenID Connect"
+    },
+    "title": "Autenticação",
+    "unauthorized": "Não tem autorização para aceder a estes dados. Por favor, faça login.",
+    "unsupported": "Não suportado",
+    "unsupportedLong": "Desculpe, o método de autenticação {method} não é suportado pelo STAC Browser.",
+    "user": "Utilizador"
   },
   "browse": "Navegar",
   "cancel": "Cancelar",
@@ -285,12 +302,14 @@
     },
     "locatedAt": "O ficheiro de metadados STAC está localizado em:",
     "share": {
+      "bsky": "Bluesky",
       "email": "E-mail",
       "label": "Partilhar",
+      "mastodon": "Mastodon.social",
       "message": "{title} está disponível em {url}",
       "sharePageWithOthers": "Partilhe o URL desta página onde quiser:",
       "title": "Partilhar",
-      "twitter": "Twitter",
+      "x": "X (Twitter)",
       "withOthers": "Partilhe esta página com outros"
     },
     "stacExtension": "Extensão STAC",

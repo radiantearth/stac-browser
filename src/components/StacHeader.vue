@@ -89,7 +89,7 @@ export default {
         else if (this.data.isCatalog()) {
           return this.$tc(`stacCatalog`);
         }
-        else {
+        else if (Utils.hasText(this.data.type)) {
           return this.data.type;
         }
       }
@@ -124,11 +124,11 @@ export default {
       if (!this.canSearch) {
         return null;
       }
-      let dataLink;
+      let searchLink;
       if (this.data instanceof STAC && !this.data.equals(this.root)) {
-        dataLink = this.data.getSearchLink();
+        searchLink = this.data.getSearchLink();
       }
-      if (dataLink) {
+      if (searchLink) {
         return `/search${this.data.getBrowserPath()}`;
       }
       else if (this.root && this.allowSelectCatalog) {
@@ -169,7 +169,6 @@ export default {
       if (this.url) {
         this.addAction(() => this.$store.dispatch("load", {
           url: this.url,
-          loadApi: true,
           show: true,
           force: true,
           noRetry: true
