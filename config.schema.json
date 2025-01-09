@@ -205,7 +205,7 @@
         "object"
       ],
       "noCLI": true,
-      "noEnv": false
+      "noEnv": true
     },
     "requestQueryParameters": {
       "type": [
