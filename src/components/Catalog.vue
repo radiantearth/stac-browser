@@ -5,8 +5,9 @@
       <b-card-title>
         <StacLink :data="[data, catalog]" class="stretched-link" />
       </b-card-title>
-      <b-card-text v-if="data && (fileFormats.length > 0 || data.description || data.deprecated)" class="intro">
+      <b-card-text v-if="data && (fileFormats.length > 0 || domains.length > 0 || data.description || data.deprecated)" class="intro">
         <b-badge v-if="data.deprecated" variant="warning" class="mr-1 mt-1 deprecated">{{ $t('deprecated') }}</b-badge>
+        <b-badge v-for="domain in domains" :key="domain" variant="primary" class="mr-1 mt-1 domain">{{ domain }}</b-badge>
         <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="mr-1 mt-1 fileformat">{{ format | formatMediaType }}</b-badge>
         {{ data.description | summarize }}
       </b-card-text>
@@ -27,6 +28,7 @@ import StacLink from './StacLink.vue';
 import STAC from '../models/stac';
 import { formatMediaType, formatTemporalExtent } from '@radiantearth/stac-fields/formatters';
 import Utils from '../utils';
+import { translateFields } from '../i18n';
 
 export default {
   name: 'Catalog',
@@ -84,6 +86,23 @@ export default {
         return this.data.getFileFormats();
       }
       return [];
+    },
+    domains() {
+      if (!this.data) {
+        return [];
+      }
+      let domains = {
+        // todo: move translations to texts.json and add InSAR / ML
+        'eo': translateFields('Electro-Optical'),
+        'forecast': translateFields('Forecast'),
+        'insar': 'InSAR',
+        'ml-model': 'ML',
+        'pc': translateFields('Point Cloud'),
+        'sar': translateFields('SAR')
+      };
+      return Object.keys(domains)
+        .filter(key => Utils.supportsExtension(this.data, `https://stac-extensions.github.io/${key}/v*/schema.json`))
+        .map(key => domains[key]);
     },
     keywords() {
       if (this.data) {
