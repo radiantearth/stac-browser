@@ -34,8 +34,7 @@ export default class F3D extends AssetActionPlugin {
     // let uri = new URI("https://3dviewer.net/");
     // uri.addQuery("model", this.component.href); 
     // uri = uri.toString().replace('?', '#');
-    const extension = ''; // '.obj';
-    let uri = `https://3dviewer.net/#model=${this.component.href.replace('%2F', '/')}#${extension}`;
+    let uri = `https://3dviewer.net/#model=${this.component.href.replace('%2F', '/')}`;
     return uri;
   }
 
