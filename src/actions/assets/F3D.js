@@ -9,15 +9,14 @@ const F3D_SUPPORTED_TYPES = [
   'application/fbx',
 ];
 // below is usually text/plain
-const F3D_SUPPORTED_FILEEXTS = ['.obj', '.ply', '.fbx', '.glb', '.gltf'];
+const F3D_SUPPORTED_FILEEXTS = ['obj', 'ply', 'fbx', 'glb', 'gltf'];
 export default class F3D extends AssetActionPlugin {
 
   get show() {
+    const suffix = URI(this.asset.href).suffix();
     return this.component.isBrowserProtocol && (
       F3D_SUPPORTED_TYPES.includes(this.asset.type)
-      || F3D_SUPPORTED_FILEEXTS.map(
-        ext => URI(this.asset.href).filename().endsWith(ext)
-      ).some(e => e)
+      || F3D_SUPPORTED_FILEEXTS.some(ext => (suffix === ext))
     );
   }
 
