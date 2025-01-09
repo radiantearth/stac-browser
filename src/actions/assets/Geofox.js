@@ -17,7 +17,7 @@ export default class Geofox extends AssetActionPlugin {
 
   get uri() {
     let uri = new URI("https://viewer.geofox.ai/");
-    uri.addQuery('tileset', encodeURI(this.component.href));
+    uri.addQuery('tileset', this.component.href);
     return uri;
   }
 
