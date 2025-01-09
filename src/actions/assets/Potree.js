@@ -15,6 +15,8 @@ const POTREE_SUPPORTED_FILEEXTS = [
 export default class Potree extends AssetActionPlugin {
 
   get show() {
+    // todo: this should check for the pointcloud extension or other indications that this asset is actually point cloud related
+    // as the metadata.json matching is rather greedy. Should be possible once stac-js is implemented.
     return this.component.isBrowserProtocol && (
       POTREE_SUPPORTED_TYPES.includes(this.asset.type)
       || POTREE_SUPPORTED_FILEEXTS.map(
