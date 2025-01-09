@@ -1,16 +1,24 @@
-import LinkActionPlugin from "../LinkActionPlugin";
+import AssetActionPlugin from "../AssetActionPlugin";
 import URI from 'urijs';
 import i18n from "../../i18n";
 
-export default class CesiumSandcastle extends LinkActionPlugin {
+// See mime types discussion for 3d-tiles here and there
+// https://github.com/opengeospatial/ogcapi-3d-geovolumes/issues/13
+const OGC3DTILES_SUPPORTED_TYPES = [
+  // 'application/json',
+  'application/3dtiles+json',
+];
+
+export default class Cesium extends AssetActionPlugin {
 
   get show() {
-    return this.link.rel === '3d-tiles';
+    return this.component.isBrowserProtocol && OGC3DTILES_SUPPORTED_TYPES.includes(this.asset.type);
   }
 
-  get uri_CesiumSandcastle() {
-    let uri = new URI("https://sandcastle.cesium.com/index.html");
-    const tileset_url = this.link.href;
+  get uri() {
+    // https://sandcastle.cesium.com/standalone.html vs https://sandcastle.cesium.com/index.html
+    let uri = new URI("https://sandcastle.cesium.com/standalone.html");
+    const tileset_url = this.component.href;
     const code_payload = {
       html: `
         <style> @import url(../templates/bucket.css); </style>
@@ -35,14 +43,8 @@ export default class CesiumSandcastle extends LinkActionPlugin {
     return uri;
   }
 
-  get uri() {
-    let uri = new URI("https://viewer.geofox.ai/");
-    uri.addQuery('tileset', encodeURI(this.link.href));
-    return uri;
-  }
-
   get text() {
-    return i18n.t('actions.openIn', {service: 'Geofox.ai'});
+    return i18n.t('actions.openIn', {service: 'Cesium Sandcastle'});
   }
 
 }

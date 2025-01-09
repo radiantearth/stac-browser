@@ -18,7 +18,7 @@ export default class Potree extends AssetActionPlugin {
     return this.component.isBrowserProtocol && (
       POTREE_SUPPORTED_TYPES.includes(this.asset.type)
       || POTREE_SUPPORTED_FILEEXTS.map(
-        f => this.asset.href.toLowerCase().includes(f)
+        f => URI(this.asset.href).filename().endsWith(f)
       ).some(e => e)
   );
   }
@@ -28,21 +28,14 @@ export default class Potree extends AssetActionPlugin {
     // https://github.com/potree/potree/pull/1456 
     // would be accessible via https://potree.org/potree/examples/load_potree_project_from_urlparam.html
     // Can also parse pointSize, FOV, opacity, edlEnabled, edlRadius, edlStrength, pointBudget, showBoundingBox, pointSizing, quality, position, target, background via loadSettingsFromURL
-    let uri = new URI("https://3d.iconem.com/tools/load_potree_project_from_urlparam.html");
+    // Alternatives with single potree-supported tileset support and less param parsed
+    // https://mpc-copc-viewer.netlify.app?c=rgba&r= Darren Wiens app, which works eg with IGN COPC: 
+    // https://potree.org/potree/examples/copc.html?c=rgba&r= Potree copc app
+    let uri = new URI("https://3d.iconem.com/apps/load_potree_project_from_urlparam");
     const datasetUrl = this.component.href;
     uri.addQuery('fit', 'true');
     uri.addQuery('c', 'elevation'); // rgba, elevation, intensity etc
     uri.addQuery('datasetsUrls', `["${datasetUrl}"]`); 
-    return uri;
-  }
-
-  get uri2() {
-    // Could also use directly Darren Wiens app, which works eg with IGN COPC: 
-    let uri = new URI("https://mpc-copc-viewer.netlify.app");
-    uri.addQuery('c', 'rgba');
-    uri.addQuery('r', this.component.href);
-    // color type can be among rgba, elevation, color, elevation, etc
-    // https://potree.org/potree/examples/copc.html?c=rgba&r=
     return uri;
   }
 

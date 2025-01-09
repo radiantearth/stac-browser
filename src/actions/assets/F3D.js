@@ -16,7 +16,7 @@ export default class F3D extends AssetActionPlugin {
     return this.component.isBrowserProtocol && (
       F3D_SUPPORTED_TYPES.includes(this.asset.type)
       || F3D_SUPPORTED_FILEEXTS.map(
-        f => this.asset.href.toLowerCase().includes(f)
+        ext => URI(this.asset.href).filename().endsWith(ext)
       ).some(e => e)
     );
   }
