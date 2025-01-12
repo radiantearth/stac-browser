@@ -6,7 +6,7 @@
           <b-card no-body class="maps-preview">
             <b-tabs v-model="tab" ref="tabs" card pills vertical end>
               <b-tab :title="$t('map')" no-body>
-                <Map :stac="data" :stacLayerData="selectedAsset" @dataChanged="dataChanged" scrollWheelZoom />
+                <Map :stac="data" :shownData="selectedAsset" @dataChanged="dataChanged" scrollWheelZoom />
               </b-tab>
               <b-tab v-if="thumbnails.length > 0" :title="$t('thumbnails')" no-body>
                 <Thumbnails :thumbnails="thumbnails" />

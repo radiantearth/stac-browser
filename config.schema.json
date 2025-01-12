@@ -152,12 +152,6 @@
         "boolean"
       ]
     },
-    "geoTiffResolution": {
-      "type": [
-        "integer"
-      ],
-      "minimum": 1
-    },
     "redirectLegacyUrls": {
       "type": [
         "boolean"

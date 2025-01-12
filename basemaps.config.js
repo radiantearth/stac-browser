@@ -1,4 +1,3 @@
-import { CRS } from 'leaflet';
 import STAC from './src/models/stac';
 import Utils from './src/utils';
 
@@ -18,7 +17,7 @@ const BASEMAPS = {
     is: WMS,
     name: 'USGS Europa',
     attribution: USGS_ATTRIBUTION,
-    crs: CRS.EPSG4326,
+    crs: "EPSG:4326",
     format: 'image/png',
     layers: 'GALILEO_VOYAGER'
   },
@@ -27,7 +26,7 @@ const BASEMAPS = {
     is: WMS,
     name: 'USGS Mars',
     attribution: USGS_ATTRIBUTION,
-    crs: CRS.EPSG4326,
+    crs: "EPSG:4326",
     format: 'image/png',
     layers: 'MDIM21'
   },
@@ -36,23 +35,16 @@ const BASEMAPS = {
     is: WMS,
     name: 'USGS Moon',
     attribution: USGS_ATTRIBUTION,
-    crs: CRS.EPSG4326,
+    crs: "EPSG:4326",
     format: 'image/png',
     layers: 'LROC_WAC'
   }
 };
 
 /**
- * @typedef BasemapOptions
- * @type {Object}
- * @property {string} is Component: LWMSTileLayer or LTileLayer
- * @see https://vue2-leaflet.netlify.app/components/
- */
-
-/**
  * 
  * @param {Object} stac The STAC object
- * @param {Object} map The Leaflet map object
+ * @param {Object} map The OL map object
  * @param {Object} i18n Vue I18N object
  * @returns {Array.<BasemapOptions>}
  */
