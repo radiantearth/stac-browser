@@ -1,7 +1,7 @@
 module.exports = {
-    catalogUrl: null,
-    catalogTitle: "STAC Browser",
-    allowExternalAccess: true, // Must be true if catalogUrl is not given
+    catalogUrl: "https://wyvern-prod-public-open-data-program.s3.ca-central-1.amazonaws.com/catalog.json",
+    catalogTitle: "Wyvern STAC Browser",
+    allowExternalAccess: false, // Must be true if catalogUrl is not given
     allowedDomains: [],
     detectLocaleFromBrowser: true,
     storeLocale: true,
