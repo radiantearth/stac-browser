@@ -78,6 +78,9 @@ npm run build -- --catalogUrl="https://earth-search.aws.element84.com/v1/"
 This will only work on the root path of your domain though. If you'd like to publish in a sub-folder,
 you can use the [`pathPrefix`](docs/options.md#pathprefix) option.
 
+> [!NOTE]  
+> If you are using a recent version of node/npm on Windows, you may need to use `npm run build -- -- ...` instead of `npm run build -- ...`, see <https://github.com/npm/cli/issues/7375> for details.
+
 After building, `dist/` will contain all assets necessary
 host the browser. These can be manually copied to your web host of choice.
 **Important:** If `historyMode` is set to `history` (which is the default value), you'll need to add

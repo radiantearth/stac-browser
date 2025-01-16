@@ -203,16 +203,12 @@
     "requestHeaders": {
       "type": [
         "object"
-      ],
-      "noCLI": true,
-      "noEnv": true
+      ]
     },
     "requestQueryParameters": {
       "type": [
         "object"
-      ],
-      "noCLI": true,
-      "noEnv": true
+      ]
     },
     "socialSharing": {
       "type": [
@@ -240,9 +236,7 @@
         {
           "$ref": "https://stac-extensions.github.io/authentication/v1.1.0/schema.json"
         }
-      ],
-      "noCLI": true,
-      "noEnv": true
+      ]
     }
   }
 }

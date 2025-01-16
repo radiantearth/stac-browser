@@ -15,6 +15,11 @@ const argv = yargs(hideBin(process.argv))
   .boolean(optionsForType("boolean"))
   .number(optionsForType("number").concat(optionsForType("integer")))
   .array(optionsForType("array"))
+  .option(
+    Object.fromEntries(
+      optionsForType("object").map((k) => [k, { coerce: JSON.parse }])
+    )
+  )
   .argv;
 // Clean-up arguments
 delete argv._;
