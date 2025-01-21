@@ -67,7 +67,7 @@ export default { Geoparquet };
 
 ### potree.org
 
-Adds an `Open in potree.org` button that allows to open COPC and Potree files on <https://potree.org> (via [Darren Wiens](https://mpc-copc-viewer.netlify.app) or [Iconem](https://3d.iconem.com/tools/load_potree_project_from_urlparam.html) apps)
+Adds an `Open in potree.org` button that allows to open COPC and Potree files on <https://potree.org> (via [Darren Wiens](https://mpc-copc-viewer.netlify.app) or [Iconem](https://3d.iconem.com/apps/load_potree_project_from_urlparam) apps)
 
 ```js
 import Potree from './src/actions/assets/Potree.js';
