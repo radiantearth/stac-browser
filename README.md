@@ -15,7 +15,7 @@ This package has also been published to npm as [`@radiantearth/stac-browser`](ht
 It's not officially supported, but you may also be able to use it for
 certain _OGC API - Records_ and _OGC API - Features_ compliant servers.
 
-**Please note that STAC Browser is currently without funding for both maintenance, bug fixes and improvements. This means issues and PRs may be addressed very slowly.
+**Please note that STAC Browser is currently with limited funding for both maintenance, bug fixes and improvements. This means issues and PRs may be addressed very slowly.
 If you care about STAC Browser and have some funds to support the future of STAC Browser, please contact matthias@mohr.ws**
 
 **Table of Contents:**
@@ -306,8 +306,10 @@ You can also use one of the existing languages and provide an alternate version 
 The following sponsors have provided a substantial amount of funding for STAC Browser in the past:
 
 - [Radiant Earth](https://radiant.earth) (base funding for versions 1, 2 and 3)
+- [swisstopo](https://www.swisstopo.admin.ch/) (maintenance, base funding for version 3 and 4)
 - [National Resources Canada](https://natural-resources.canada.ca/home) (multi-language support, maintenance)
 - [Matthias Mohr - Softwareentwicklung](https://mohr.ws) (maintenance)
-- [Spacebel](https://spacebel.com) (collection search)
-- [Planet](https://planet.com) (OpenID Connect authentication, other features, maintenance)
-- [CloudFerro](https://cloudferro.com) (authentication, Alternate Asset and Storage extensions)
+- [Spacebel](https://spacebel.com) (collection search, mapping)
+- [Planet](https://planet.com) (authentication, maintenance)
+- [CloudFerro](https://cloudferro.com) (authentication, alternate asset and storage extension)
+- [Geobeyond](http://www.geobeyond.it/) (mapping)
