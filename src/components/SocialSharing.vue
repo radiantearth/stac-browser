@@ -1,25 +1,17 @@
 <template>
   <section>
     <b-button v-for="href, service in urls" :key="service" class="service mr-1" :class="service" :href="href" target="_blank">
-      <component :is="service" /> {{ $t(`source.share.${service}`) }}
+      <i class="svg" :class="service" /> {{ $t(`source.share.${service}`) }}
     </b-button>
   </section>
 </template>
 
 
 <script>
-import { BIconEnvelope as Email } from 'bootstrap-vue';
 import { mapState } from 'vuex';
-
 
 export default {
   name: "Source",
-  components: {
-    Email,
-    Bsky: () => import('../media/bsky.svg'),
-    Mastodon: () => import('../media/mastodon.svg'),
-    X: () => import('../media/x.svg'),
-  },
   props: {
     text: {
       type: String,
@@ -68,9 +60,27 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.service svg {
+.service .svg {
+  display: inline-block;
   vertical-align: sub;
-  height: 16px;
-  width: auto;
+  height: 1em;
+  width: 1em;
+  background-color: #fff;
+  mask-size: 1em 1em;
+  mask-repeat: no-repeat;
+  mask-position: center;
+
+  &.email {
+    mask-image: url('@/media/email.svg');
+  }
+  &.bsky {
+    mask-image: url('@/media/bsky.svg');
+  }
+  &.mastodon {
+    mask-image: url('@/media/mastodon.svg');
+  }
+  &.x {
+    mask-image: url('@/media/x.svg');
+  }
 }
 </style>
