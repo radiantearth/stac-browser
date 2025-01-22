@@ -172,7 +172,7 @@ Using this parameter for the dev server will make STAC Browser available at `htt
 
 ## stacProxyUrl
 
-***experimental***
+**DEPRECATED!**
 
 Setting the `stacProxyUrl` allows users to modify the URLs contained in the catalog to point to another location.
 For instance, if you are serving a catalog on the local file system at `/home/user/catalog.json`, but want to serve
@@ -229,7 +229,7 @@ Loading non-cloud-optimized GeoTiffs only works reliably for smaller files (< 1M
 
 ## redirectLegacyUrls
 
-***experimental***
+**DEPRECATED!**
 
 If you are updating from on old version of STAC Browser, you can set this option to `true` to redirect users from the old "unreadable" URLs to the new human-readable URLs.
 
