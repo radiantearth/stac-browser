@@ -325,7 +325,7 @@ export default {
   },
   created() {
     let promises = [];
-    if (this.cql && this.stac) {
+    if (this.cql && this.stac && this.type !== 'Collections') {
       let queryableLink = this.findQueryableLink(this.stac.links);
       promises.push(
         this.loadQueryables(queryableLink)
