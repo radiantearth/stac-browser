@@ -65,16 +65,17 @@
 
     <b-popover id="popover-share" target="popover-share-btn" triggers="focus" placement="bottom" container="stac-browser" :title="$t('source.share.title')">
       <Url id="browserUrl" :url="browserUrl()" :label="$t('source.share.sharePageWithOthers')" :open="false" />
-      <hr>
-      <b-button class="twitter mr-1" :href="twitterUrl"><b-icon-twitter /> {{ $t('source.share.twitter') }}</b-button>
-      <b-button variant="dark" :href="mailTo"><b-icon-envelope /> {{ $t('source.share.email') }}</b-button>
+      <template v-if="enableSocialSharing">
+        <hr>
+        <SocialSharing :text="sharingMessage" :title="title" :url="browserUrl()" />
+      </template>
     </b-popover>
   </div>
 </template>
 
 <script>
 import { 
-  BIconBlank, BIconBox, BIconCheck, BIconEnvelope, BIconExclamationTriangle, BIconFlag, BIconLink, BIconShare, BIconTwitter,
+  BIconBlank, BIconBox, BIconCheck, BIconExclamationTriangle, BIconFlag, BIconLink, BIconShare,
   BDropdown, BDropdownItem, BPopover } from 'bootstrap-vue';
 import { mapActions, mapGetters, mapState } from 'vuex';
 
@@ -83,6 +84,7 @@ import Url from './Url.vue';
 import Utils from '../utils';
 import { getBest, prepareSupported } from '../locale-id';
 import CopyButton from './CopyButton.vue';
+import SocialSharing from './SocialSharing.vue';
 
 const LANGUAGE_EXT = 'https://stac-extensions.github.io/language/v1.*/schema.json';
 
@@ -94,16 +96,15 @@ export default {
     BIconBlank,
     BIconBox,
     BIconCheck,
-    BIconEnvelope,
     BIconExclamationTriangle,
     BIconFlag,
     BIconLink,
     BIconShare,
-    BIconTwitter,
     BPopover,
     RootStats: () => import('./RootStats.vue'),
     Url,
     CopyButton,
+    SocialSharing,
     Validation: () => import('./Validation.vue')
   },
   props: {
@@ -121,7 +122,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(['conformsTo', 'dataLanguages', 'locale', 'supportedLocales', 'uiLanguage', 'valid']),
+    ...mapState(['conformsTo', 'dataLanguages', 'locale', 'socialSharing', 'supportedLocales', 'uiLanguage', 'valid']),
     ...mapGetters(['supportsExtension', 'root']),
     stacVersion() {
       return this.stac?.stac_version;
@@ -150,17 +151,12 @@ export default {
         return '-';
       }
     },
-    message() {
-      return this.$t('source.share.message', {title: this.title, url: this.browserUrl()});
+    enableSocialSharing() {
+      return Array.isArray(this.socialSharing) && this.socialSharing.length > 0;
     },
-    twitterUrl() {
-      let text = encodeURIComponent(this.message);
-      return `https://twitter.com/intent/tweet?text=${text}`;
-    },
-    mailTo() {
-      let title = encodeURIComponent(this.title);
-      let text = encodeURIComponent(this.message);
-      return `mailto:?subject=${title}&body=${text}`;
+    sharingMessage() {
+      const url = window.location.toString();
+      return this.$t('source.share.message', {title: this.title, url: url});
     },
     supportsLanguageExt() {
       return this.supportsExtension(LANGUAGE_EXT);

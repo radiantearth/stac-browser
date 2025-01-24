@@ -106,8 +106,16 @@ body {
         column-count: 1;
     }
 
-    .twitter {
-        @include button-variant(#1DA1F2, #1DA1F2);
+    .service {
+      &.bsky {
+          @include button-variant(#1185fe, #1185fe);
+      }
+      &.mastodon {
+          @include button-variant(#6364FF, #6364FF);
+      }
+      &.x {
+          @include button-variant(#000000, #000000);
+      }
     }
 
     .icon {

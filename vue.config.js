@@ -15,6 +15,11 @@ const argv = yargs(hideBin(process.argv))
   .boolean(optionsForType("boolean"))
   .number(optionsForType("number").concat(optionsForType("integer")))
   .array(optionsForType("array"))
+  .option(
+    Object.fromEntries(
+      optionsForType("object").map((k) => [k, { coerce: JSON.parse }])
+    )
+  )
   .argv;
 // Clean-up arguments
 delete argv._;
@@ -35,8 +40,10 @@ const vueConfig = {
       args[0].CONFIG_CLI = JSON.stringify(argv);
       return args;
     });
+
     webpackConfig.plugin('html').tap(args => {
       args[0].title = mergedConfig.catalogTitle;
+      args[0].url = mergedConfig.catalogUrl;
       return args;
     });
   },

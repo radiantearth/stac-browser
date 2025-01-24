@@ -279,12 +279,14 @@
     },
     "locatedAt": "STACメタデータファイルは以下の場所にあります:",
     "share": {
+      "bsky": "Bluesky",
       "email": "Eメール",
       "label": "共有",
+      "mastodon": "Mastodon.social",
       "message": "{title} はこちらのページで利用できます: {url}",
       "sharePageWithOthers": "このページのURLを共有しましょう:",
       "title": "共有",
-      "twitter": "Twitter",
+      "x": "X (Twitter)",
       "withOthers": "このページを共有しましょう"
     },
     "statistics": "統計",

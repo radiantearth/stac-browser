@@ -32,7 +32,7 @@ export const TYPES = {
   },
   // STAC API - Item Search
   Global:  {
-    BasicFilters: true,
+    BasicFilters: ['https://api.stacspec.org/v1.*/item-search'],
     CollectionIdFilter: true,
     ItemIdFilter: true,
     CqlFilters: ['https://api.stacspec.org/v1.*/item-search#filter'],

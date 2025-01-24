@@ -195,7 +195,7 @@ function getStore(config, router) {
         return getters.canSearchCollections || getters.canSearchItems;
       },
       canSearchItems: (state, getters) => {
-        return getters.supportsConformance(TYPES.Items.BasicFilters);
+        return getters.supportsConformance(TYPES.Global.BasicFilters);
       },
       canSearchCollections: (state, getters) => {
         return getters.supportsConformance(TYPES.Collections.BasicFilters);
@@ -621,10 +621,14 @@ function getStore(config, router) {
     },
     actions: {
       async config(cx, config) {
+        const oldConfig = Object.assign({}, cx.state);
         cx.commit('config', config);
         // React on config changes
         for (let key in config) {
           let value = cx.state[key];
+          if (value !== oldConfig[key]) {
+            continue;
+          }
           switch (key) {
             case 'authConfig':
               await cx.dispatch('auth/updateMethod', value);
@@ -765,6 +769,7 @@ function getStore(config, router) {
             }
             console.error(error);
             cx.commit('errored', { url, error });
+            return;
           }
         }
 

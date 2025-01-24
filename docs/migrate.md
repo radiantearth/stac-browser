@@ -5,7 +5,7 @@
 If you are running an old (standalone) version of STAC Browser (v1 or v2) without heavy modifications,
 you can usually migrate easily to v3.
 
-The old environment variables have changed names. See [enviornment variables](#environment-variables) for details.
+The old environment variables have changed names. See [environment variables](#environment-variables) for details.
 The names of the environment variables have slightly changed:
 * `CATALOG_URL` => `SB_catalogUrl`
 * `STAC_PROXY_URL` => `SB_stacProxyUrl` (same in CLI, different format in the config file)

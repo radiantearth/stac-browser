@@ -15,10 +15,12 @@ export default class OIDC extends Auth {
       redirect_uri: this.getRedirectUri('/auth'),
       automaticSilentRenew: true
     };
-    this.manager = new UserManager(Object.assign(oidcConfig, options.oidcConfig));
-    this.manager.events.addAccessTokenExpired(() => changeListener(false));
-    this.manager.events.addUserUnloaded(() => changeListener(false));
     this.user = null;
+    this.manager = new UserManager(Object.assign(oidcConfig, options.oidcConfig));
+    const callback = this.setUser.bind(this);
+    this.manager.events.addAccessTokenExpired(callback);
+    this.manager.events.addUserLoaded(callback);
+    this.manager.events.addUserUnloaded(callback);
     this.browserStorage = new BrowserStorage();
   }
 
@@ -51,8 +53,8 @@ export default class OIDC extends Auth {
   }
 
   async confirmLogin() {
-    this.user = await this.manager.signinRedirectCallback();
-    await this.changeListener(true, this.user.access_token);
+    const user = await this.manager.signinRedirectCallback();
+    await this.setUser(user);
     this.restoreOriginalUri();
   }
 
@@ -62,8 +64,17 @@ export default class OIDC extends Auth {
 
   async confirmLogout() {
     await this.manager.signoutRedirectCallback();
-    await this.changeListener(false);
-    this.user = null;
+    await this.setUser(null);
+  }
+
+  async setUser(user = null) {
+    this.user = user;
+    if (user) {
+      await this.changeListener(true, user.access_token);
+    }
+    else {
+      await this.changeListener(false);
+    }
   }
 
   updateStore(value) {
