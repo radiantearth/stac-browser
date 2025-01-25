@@ -26,3 +26,6 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+
+# Unit test coverage artifacts
+/coverage
