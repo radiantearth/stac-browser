@@ -18,7 +18,7 @@ import StacFieldsMixin from './StacFieldsMixin';
 import AuthUtils from './auth/utils';
 
 export default {
-  name: 'Asset',
+  name: 'AssetAlternative',
   components: {
     Description,
     HrefActions,

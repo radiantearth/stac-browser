@@ -7,12 +7,14 @@
           <b-icon-chevron-right v-else />
         </span>
         <span class="title">{{ asset.title || id }}</span>
-        <div class="badges ml-1" v-if="Array.isArray(asset.roles)">
+        <div class="badges ml-1">
           <b-badge v-if="shown" variant="success" class="shown" :title="$t('assets.currentlyShown')">
             <b-icon-check /> {{ $t('assets.shown') }}
           </b-badge>
           <b-badge v-if="asset.deprecated" variant="warning" class="deprecated">{{ $t('deprecated') }}</b-badge>
-          <b-badge v-for="role in asset.roles" :key="role" :variant="role === 'data' ? 'primary' : 'secondary'" class="role">{{ displayRole(role) }}</b-badge>
+          <template v-if="Array.isArray(asset.roles)">
+            <b-badge v-for="role in asset.roles" :key="role" :variant="role === 'data' ? 'primary' : 'secondary'" class="role">{{ displayRole(role) }}</b-badge>
+          </template>
           <b-badge v-if="shortFileFormat" variant="dark" class="format" :title="fileFormat"><span v-html="shortFileFormat" /></b-badge>
         </div>
       </b-button>
@@ -28,7 +30,7 @@
           </b-tab>
         </b-tabs>
       </template>
-      <AssetAlternative v-else :asset="asset" :context="context" @show="show" />
+      <AssetAlternative v-else :asset="asset" :context="context" :shown="shown" @show="show" />
     </b-collapse>
   </b-card>
 </template>

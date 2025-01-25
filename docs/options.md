@@ -265,7 +265,7 @@ Enables keywords in the lists of catalogs/collections if set to `true`. Defaults
 
 ## showThumbnailsAsAssets
 
-Defines whether thumbnails are shown in the lists of assets (`true`, default) or not.
+Defines whether thumbnails are shown in the lists of assets (`true`) or not (`false`, default).
 
 ## defaultThumbnailSize
 
