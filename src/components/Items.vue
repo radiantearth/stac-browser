@@ -6,9 +6,12 @@
       <SortButtons v-if="!api && items.length > 1" v-model="sort" />
     </header>
 
-    <Pagination ref="topPagination" v-if="showPagination" :pagination="pagination" placement="top" @paginate="paginate" />
+    <Pagination
+      v-if="showPagination" ref="topPagination" class="mb-3" :class="{'mr-3': allowFilter}"
+      :pagination="pagination" placement="top" @paginate="paginate"
+    />
     <template v-if="allowFilter">
-      <b-button v-if="api" v-b-toggle.itemFilter class="mb-4 mt-2" :class="{'ml-3': showPagination}" :variant="hasFilters && !filtersOpen ? 'primary' : 'outline-primary'">
+      <b-button v-if="api" class="mb-3" v-b-toggle.itemFilter :variant="hasFilters && !filtersOpen ? 'primary' : 'outline-primary'">
         <b-icon-search />
         {{ filtersOpen ? $t('items.hideFilter') : $t('items.showFilter') }}
         <b-badge v-if="hasFilters && !filtersOpen" variant="dark">{{ filterCount }}</b-badge>
@@ -33,7 +36,7 @@
       </b-alert>
     </section>
 
-    <Pagination v-if="showPagination" :pagination="pagination" @paginate="paginate" />
+    <Pagination v-if="showPagination" class="mb-3" :pagination="pagination" @paginate="paginate" />
     <b-button v-else-if="hasMore" @click="showMore" variant="primary" v-b-visible.300="showMore">{{ $t('showMore') }}</b-button>
   </section>
 </template>

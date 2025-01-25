@@ -17,7 +17,7 @@
         :limitText="limitText"
       />
     </section>
-    <Pagination ref="topPagination" v-if="showPagination" :pagination="pagination" placement="top" @paginate="paginate" />
+    <Pagination v-if="showPagination" ref="topPagination" class="mb-3" :pagination="pagination" placement="top" @paginate="paginate" />
     <b-alert v-if="hasSearchCritera && catalogView.length === 0" variant="warning" class="mt-2" show>{{ $t('catalogs.noMatches') }}</b-alert>
     <section class="list">
       <Loading v-if="loading" fill top />
@@ -29,7 +29,7 @@
         </Catalog>
       </component>
     </section>
-    <Pagination v-if="showPagination" :pagination="pagination" @paginate="paginate" />
+    <Pagination v-if="showPagination" class="mb-3" :pagination="pagination" @paginate="paginate" />
     <b-button v-else-if="hasMore" @click="loadMore" variant="primary" v-b-visible.300="loadMore">{{ $t('catalogs.loadMore') }}</b-button>
   </section>
 </template>
@@ -212,6 +212,7 @@ export default {
 <style lang="scss" scoped>
 .catalog-filter {
   display: flex;
+  flex-wrap: wrap;
   margin-top: 0.25rem;
   margin-bottom: 0.25rem;
   gap: 1rem;
@@ -219,8 +220,8 @@ export default {
 
   > * {
     flex-grow: 1;
+    flex-basis: 300px;
     min-width: 300px;
-    width: 50%;
   }
 }
 </style>
