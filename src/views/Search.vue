@@ -27,7 +27,7 @@
         <b-alert v-else-if="results.length === 0" variant="warning" show>{{ $t('search.noItemsFound') }}</b-alert>
         <template v-else>
           <div id="search-map" v-if="itemCollection">
-            <Map :stac="stac" :stacLayerData="itemCollection" scrollWheelZoom popover />
+            <Map :stac="parent" :items="itemCollection" popover />
           </div>
           <Catalogs
             v-if="isCollectionSearch" :catalogs="results" collectionsOnly
@@ -118,20 +118,14 @@ export default {
       }
       return null;
     },
-    stac() {
-      if (this.parent instanceof STAC) {
-        return this.parent;
-      }
-      return null;
-    },
     searchLink() {
       return this.isCollectionSearch ? this.collectionSearch : this.itemSearch;
     },
     collectionSearch() {
-      return this.canSearchCollections && this.stac && this.stac.getApiCollectionsLink();
+      return this.canSearchCollections && this.parent && this.parent.getApiCollectionsLink();
     },
     itemSearch() {
-      return this.canSearchItems && this.stac && this.stac.getSearchLink();
+      return this.canSearchItems && this.parent && this.parent.getSearchLink();
     },
     itemCollection() {
       if (this.isCollectionSearch) {

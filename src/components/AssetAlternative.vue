@@ -32,10 +32,6 @@ export default {
       type: Object,
       required: true
     },
-    context: {
-      type: Object,
-      default: null
-    },
     hasAlternatives: {
       type: Boolean,
       default: false
@@ -71,6 +67,9 @@ export default {
   },
   computed: {
     ...mapState(['buildTileUrlTemplate', 'useTileLayerAsFallback']),
+    context() {
+      return this.asset.getContext();
+    },
     component() {
       return this.hasAlternatives ? 'div' : 'b-card-body';
     },

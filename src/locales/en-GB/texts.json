@@ -34,8 +34,8 @@
     "specifyCatalog": "Please specify a STAC Catalogue or API..."
   },
   "items": {},
-  "leaflet": {
-    "stayLayer": {},
+  "mapping": {
+    "attribution": {},
     "zoom": {
       "in": {},
       "out": {}

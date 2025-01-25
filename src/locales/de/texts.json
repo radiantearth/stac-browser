@@ -41,12 +41,12 @@
     "password": "Passwort",
     "required": "Anmeldung erforderlich",
     "schemeTypes": {
-      "http": "HTTP {scheme}",
-      "s3": "S3",
-      "signedUrl": "Signierte URL",
-      "oauth2": "OAuth 2",
       "apiKey": "API-Schlüssel",
-      "openIdConnect": "OpenID Connect"
+      "http": "HTTP {scheme}",
+      "oauth2": "OAuth 2",
+      "openIdConnect": "OpenID Connect",
+      "s3": "S3",
+      "signedUrl": "Signierte URL"
     },
     "title": "Anmelden",
     "unauthorized": "Sie haben keine Berechtigung um diese Daten abzurufen. Bitte melden Sie sich an.",
@@ -113,7 +113,9 @@
   "featureExperimental": "Diese Funktion ist noch experimentell und kann unerwartete Ergebnisse verursachen!",
   "fullscreen": {
     "exit": "Verlasse den Vollbild-Modus",
-    "show": "Zeige im Vollbild-Modus"
+    "exitLabel": "✕",
+    "show": "Öffne im Vollbild-Modus",
+    "showLabel": "⛶"
   },
   "goBack": {
     "description": "Gehe zurück zu: {type}",
@@ -147,12 +149,31 @@
     "noneAvailableForCollection": "Für diesen Katalog sind keine Elemente verfügbar.",
     "showFilter": "Zeige Filter"
   },
-  "leaflet": {
-    "close": "Schließen",
-    "noFeatureProperties": "Keine weiteren Daten verfügbar für dieses Element.",
-    "stayLayer": {
-      "error": "Entschuldigung, die Daten auf der Karte anzuzeigen ist fehlgeschlagen."
+  "loading": "Lade...",
+  "map": "Karte",
+  "mapping": {
+    "attribution": {
+      "collapseLabel": "✕",
+      "description": "Namensnennungen",
+      "label": "i"
     },
+    "bboxSelect": {
+      "add": "Klicke auf die Karte, um eine Box für die räumliche Ausdehnung zu erstellen.",
+      "remove": "Klicke in die Box, um sie zu entfernen."
+    },
+    "close": "Schließen",
+    "fit": "Ansicht an räumliche Ausdehnung anpassen",
+    "layers": {
+      "base": "Grundkarten",
+      "footprint": "Räumliche Ausdehnung",
+      "title": "Kartenebenen",
+      "unnamed": "Unbenannt #{id}"
+    },
+    "location": {
+      "description": "Springe zu deiner Position"
+    },
+    "nobasemap": "Keine Grundkarten verfügbar.",
+    "nodata": "In den Metadaten sind keine räumlichen Informationen verfügbar.",
     "zoom": {
       "in": {
         "description": "Vergrößern",
@@ -160,12 +181,10 @@
       },
       "out": {
         "description": "Verkleinern",
-        "label": "-"
+        "label": "–"
       }
     }
   },
-  "loading": "Lade...",
-  "map": "Karte",
   "messageForSchemaError": "{message}, für Schema {schemaPath}",
   "metadata": {
     "general": "Allgemeines",
@@ -305,8 +324,8 @@
       "message": "{title} ist verfügbar unter {url}",
       "sharePageWithOthers": "Teile die Adresse dieser Seite:",
       "title": "Teilen",
-      "x": "X (Twitter)",
-      "withOthers": "Teile diese Seite mit anderen"
+      "withOthers": "Teile diese Seite mit anderen",
+      "x": "X (Twitter)"
     },
     "stacExtension": "STAC-Erweiterung",
     "stacVersion": "STAC-Version",

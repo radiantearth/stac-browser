@@ -2,7 +2,7 @@
   <div>
     <b-button-group class="actions" :vertical="vertical" :size="size" v-if="href">
       <b-button variant="danger" v-if="requiresAuth" :id="`popover-href-${id}-btn`" @click="handleAuthButton">
-        <b-icon-lock /> {{ $i18n.t('authentication.required') }}
+        <b-icon-lock /> {{ $t('authentication.required') }}
       </b-button>
       <b-button v-if="hasDownloadButton" :disabled="requiresAuth" v-bind="downloadProps" v-on="downloadEvents" variant="primary">
         <b-spinner v-if="loading" small variant="light" />
@@ -27,7 +27,7 @@
     <b-popover
       v-if="auth.length > 1"
       :id="`popover-href-${id}`" custom-class="href-auth-methods" :target="`popover-href-${id}-btn`"
-      triggers="focus" container="stac-browser" :title="$i18n.t('authentication.chooseMethod')"
+      triggers="focus" container="stac-browser" :title="$t('authentication.chooseMethod')"
     >
       <b-list-group>
         <AuthSchemeItem v-for="(method, i) in auth" :key="i" :method="method" @authenticate="startAuth" />
@@ -40,7 +40,6 @@
 <script>
 import { BIconBoxArrowUpRight, BIconDownload, BIconEye, BIconLock, BListGroup, BPopover, BSpinner } from 'bootstrap-vue';
 import Description from './Description.vue';
-import STAC from '../models/stac';
 import Utils, { browserProtocols, imageMediaTypes, mapMediaTypes } from '../utils';
 import { mapGetters, mapState } from 'vuex';
 import AssetActions from '../../assetActions.config';
@@ -48,6 +47,7 @@ import LinkActions from '../../linkActions.config';
 import { stacRequestOptions } from '../store/utils';
 import URI from 'urijs';
 import AuthUtils from './auth/utils';
+import { Asset } from 'stac-js';
 
 let i = 0;
 
@@ -123,7 +123,7 @@ export default {
       else if (!this.isBrowserProtocol) {
         return false;
       }
-      // Otherwise, all images that a browser can read are supported + JSON
+      // Otherwise, all images that a browser can read are supported + GeoJSON
       else if (mapMediaTypes.includes(this.data?.type)) {
         return true;
       }
@@ -193,7 +193,7 @@ export default {
     },
     isThumbnail() {
       if (this.isAsset) {
-        return Array.isArray(this.data.roles) && this.data.roles.includes('thumbnail') && !this.data.roles.includes('overview');
+        return this.data.isPreview() && this.data.canBrowserDisplayImage();
       }
       else {
         return this.data.rel === 'preview' && Utils.canBrowserDisplayImage(this.data);
@@ -203,12 +203,8 @@ export default {
       if (typeof this.data.href !== 'string') {
         return null;
       }
-      let baseUrl = null;
-      if (this.context instanceof STAC) {
-        baseUrl = this.context.getAbsoluteUrl();
-      }
       try {
-        return this.getRequestUrl(this.data.href, baseUrl);
+        return this.getRequestUrl(this.data.getAbsoluteHref());
       } catch (e) {
         return this.data.href;
       }
@@ -365,8 +361,12 @@ export default {
       return '';
     },
     show() {
-      let data = Object.assign({}, this.data, {href: this.href});
-      this.$emit('show', data, this.id, this.isThumbnail);
+      // Override asset href with absolute URL
+      // Clone asset so that we can change the href
+      const data = new Asset(this.data);
+      data.href = this.href;
+      // todo: can we use data.getAbsoluteUrl in all places where we handle the event in favor of the cloning/updating here?
+      this.$emit('show', data);
     },
     handleAuthButton() {
       if (this.auth.length === 1) {
@@ -379,9 +379,9 @@ export default {
         await this.$store.dispatch('auth/requestLogin');
       }
       else {
-        const name = this.$i18n.t(`authentication.schemeTypes.${method.type}`, method);
-        const message = this.$i18n.t('authentication.unsupportedLong', {method: name});
-        this.$root.$emit('error', new Error(message), this.$i18n.t('authentication.unsupported'));
+        const name = this.$t(`authentication.schemeTypes.${method.type}`, method);
+        const message = this.$t('authentication.unsupportedLong', {method: name});
+        this.$root.$emit('error', new Error(message), this.$t('authentication.unsupported'));
       }
     }
   }

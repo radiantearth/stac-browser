@@ -152,12 +152,6 @@
         "boolean"
       ]
     },
-    "geoTiffResolution": {
-      "type": [
-        "integer"
-      ],
-      "minimum": 1
-    },
     "redirectLegacyUrls": {
       "type": [
         "boolean"
@@ -181,12 +175,6 @@
           "number"
         ]
       }
-    },
-    "maxPreviewsOnMap": {
-      "type": [
-        "integer"
-      ],
-      "minimum": 1
     },
     "crossOriginMedia": {
       "type": [

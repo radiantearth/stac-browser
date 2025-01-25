@@ -73,7 +73,7 @@ export default {
       z-index: 1;
 
       .fullscreen-button {
-        margin: 10px;
+        margin: 5px;
       }
     }
 

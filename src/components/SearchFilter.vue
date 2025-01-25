@@ -27,8 +27,8 @@
         </b-form-group>
 
         <b-form-group v-if="canFilterExtents" class="filter-bbox" :label="$t('search.spatialExtent')" :label-for="ids.bbox">
-          <b-form-checkbox :id="ids.bbox" v-model="provideBBox" value="1" @change="setBBox()">{{ $t('search.filterBySpatialExtent') }}</b-form-checkbox>
-          <Map class="mb-4" v-if="provideBBox" :stac="stac" selectBounds @bounds="setBBox" scrollWheelZoom />
+          <b-form-checkbox :id="ids.bbox" v-model="provideBBox" value="1">{{ $t('search.filterBySpatialExtent') }}</b-form-checkbox>
+          <MapSelect class="mb-4" v-if="provideBBox" v-model="bbox" :stac="stac" />
         </b-form-group>
 
         <b-form-group v-if="conformances.CollectionIdFilter" class="filter-collection" :label="$tc('stacCollection', collections.length)" :label-for="ids.collections">
@@ -176,7 +176,7 @@ export default {
     BFormRadioGroup,
     QueryableInput: () => import('./QueryableInput.vue'),
     Loading,
-    Map: () => import('./Map.vue'),
+    MapSelect: () => import('./maps/MapSelect.vue'),
     SortButtons: () => import('./SortButtons.vue'),
     Multiselect
   },
@@ -187,7 +187,7 @@ export default {
   props: {
     parent: {
       type: Object,
-      required: true
+      default: null
     },
     title: {
       type: String,
@@ -280,6 +280,17 @@ export default {
       }
       const collator = new Intl.Collator(this.uiLanguage);
       return this.queryables.slice(0).sort((a, b) => collator.compare(a.title, b.title));
+    },
+    bbox: {
+      get() {
+        if (!this.provideBBox) {
+          return null;
+        }
+        return this.query.bbox;
+      },
+      set(val) {
+        this.query.bbox = val;
+      }
     },
     datetime: {
       get() {
@@ -524,26 +535,6 @@ export default {
     },
     setSearchTerms(terms) {
       this.$set(this.query, 'q', terms);
-    },
-    setBBox(bounds) {
-      let bbox = null;
-      if (this.provideBBox) {
-        if (Utils.isObject(bounds) && typeof bounds.toBBoxString === 'function') {
-          // This is a Leaflet LatLngBounds Object
-          const Y = 85.06;
-          const X = 180;
-          bbox = [
-            Math.max(bounds.getWest(), -X),
-            Math.max(bounds.getSouth(), -Y),
-            Math.min(bounds.getEast(), X),
-            Math.min(bounds.getNorth(), Y)
-          ];
-        }
-        else if (Array.isArray(bounds) && bounds.length === 4) {
-          bbox = bounds;
-        }
-      }
-      this.$set(this.query, 'bbox', bbox);
     },
     addCollection(collection) {
       if (!this.collectionSelectOptions.taggable) {
