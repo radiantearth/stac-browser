@@ -66,7 +66,7 @@ services:
 The docker image uses a multi stage build.
 The first stage is based on a node image and runs `npm build` to produce a `/dist` folder with static files (HTML, CSS, and JavaScript).
 The second stage is based on an nginx image that serves the folder with static files and deals with the build-only options such as  `pathPrefix`.
-So, essentialy, in the end you get an nginx instance that serves static files.
+So, essentially, in the end you get an nginx instance that serves static files.
 
 ## Essential parts
 
