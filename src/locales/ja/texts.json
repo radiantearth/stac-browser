@@ -11,9 +11,6 @@
     "alternate": {
       "main": "推奨"
     },
-    "copyGdalVfsUrl": {
-      "generic": "GDAL VFS URLをコピー"
-    },
     "copyUrl": {
       "generic": "URLをコピー",
       "withSource": "{source} のURLをコピー"

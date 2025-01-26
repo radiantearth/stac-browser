@@ -11,10 +11,6 @@
     "alternate": {
       "main": "Préféré"
     },
-    "copyGdalVfsUrl": {
-      "generic": "Copier le lien du GDAL VFS",
-      "withSource": "Copier le lien du GDAL VFS de {source}"
-    },
     "copyUrl": {
       "generic": "Copier le  lien",
       "withSource": "Copier le  lien de {source}"

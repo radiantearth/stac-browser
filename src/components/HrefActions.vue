@@ -119,10 +119,6 @@ export default {
       else if (this.tileRendererType === 'server' && imageMediaTypes.includes(this.data?.type)) {
         return true;
       }
-      // Don't pass GDAL VFS URIs to client-side tile renderer: https://github.com/radiantearth/stac-browser/issues/116
-      else if (this.isGdalVfs && this.tileRendererType === 'client') {
-        return false;
-      }
       // Only http(s) links and relative links are supported
       else if (!this.isBrowserProtocol) {
         return false;
@@ -193,7 +189,7 @@ export default {
       return null;
     },
     isBrowserProtocol() {
-      return (!this.protocol && !this.isGdalVfs) || browserProtocols.includes(this.protocol);
+      return !this.protocol || browserProtocols.includes(this.protocol);
     },
     isThumbnail() {
       if (this.isAsset) {
@@ -202,9 +198,6 @@ export default {
       else {
         return this.data.rel === 'preview' && Utils.canBrowserDisplayImage(this.data);
       }
-    },
-    isGdalVfs() {
-      return Utils.isGdalVfsUri(this.href);
     },
     href() {
       if (typeof this.data.href !== 'string') {
@@ -224,16 +217,10 @@ export default {
       return URI(this.href);
     },
     from() {
-      if (this.isGdalVfs) {
-        let type = this.href.match(/^\/vsi([a-z\d]+)(_streaming)?\//);
-        return this.protocolName(type);
-      }
-      else {
-        return this.protocolName(this.protocol);
-      }
+      return this.protocolName(this.protocol);
     },
     browserCanOpenFile() {
-      if (this.isGdalVfs || this.useAltDownloadMethod)  {
+      if (this.useAltDownloadMethod)  {
         return false;
       }
       if (Utils.canBrowserDisplayImage(this.data)) {
@@ -258,9 +245,8 @@ export default {
       return this.$t(`assets.download.${where}`, {source: this.from});
     },
     copyButtonText() {
-      let what = this.isGdalVfs ? 'copyGdalVfsUrl' : 'copyUrl';
       let where = (!this.isBrowserProtocol && this.from) ? 'withSource' : 'generic';
-      return this.$t(`assets.${what}.${where}`, {source: this.from});
+      return this.$t(`assets.copyUrl.${where}`, {source: this.from});
     }
   },
   methods: {
@@ -379,11 +365,7 @@ export default {
       return '';
     },
     show() {
-      let data = Object.assign({}, this.data);
-      // Override asset href with absolute URL if not a GDAL VFS
-      if (!this.isGdalVfs) {
-        data.href = this.href;
-      }
+      let data = Object.assign({}, this.data, {href: this.href});
       this.$emit('show', data, this.id, this.isThumbnail);
     },
     handleAuthButton() {
