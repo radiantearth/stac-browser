@@ -11,10 +11,6 @@
     "alternate": {
       "main": "Preferat"
     },
-    "copyGdalVfsUrl": {
-      "generic": "Copiați link-ul GDAL VFS",
-      "withSource": "Copiați link-ul GDAL VFS al {source}"
-    },
     "copyUrl": {
       "generic": "Copiați link-ul",
       "withSource": "Copiați link-ul al {source}"
