@@ -66,7 +66,15 @@ const router = new VueRouter({
   mode: CONFIG.historyMode,
   base: CONFIG.pathPrefix,
   routes: getRoutes(CONFIG),
-  scrollBehavior: () => ({ x: 0, y: 0 })
+  scrollBehavior: (to, from, savedPosition) => {
+    console.log(to, from);
+    if (to.path !== from.path) {
+      return { x: 0, y: 0 };
+    }
+    else {
+      return savedPosition;
+    }
+  }
 });
 
 // Setup store
