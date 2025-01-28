@@ -123,18 +123,28 @@ You need to change the [`locale`](docs/options.md#locale) and [`supportedLocales
 
 The following languages are currently supported:
 
-- German (Germany, Switzerland)
-- Spanish
-- English (International, US, UK)
-- French (Canada, France, Switzerland)
-- Italian (Italy, Switzerland)
-- Romanian
-- Japanese
-- Portuguese (Brazil, Portugal)
+- German `de` (Germany `de`, Switzerland `de-CH`)
+- Spanish `es`
+- English `en` (International `en`, US `en-US`, UK `en-GB`)
+- French `fr` (Canada `fr-CA`, France `fr`, Switzerland `fr-CH`)
+- Italian `it` (Italy `it`, Switzerland `it-CH`)
+- Romanian `ro`
+- Japanese `ja`
+- Portuguese `pt` (Brazil `pt-BR`, Portugal `pt`)
 
 We manage the translations in Crowdin, please see <https://crowdin.com/project/stac-browser/> for details.
 
 To add your own language, please follow the guide below: [Adding a new language](#adding-a-new-language)
+
+The following contributors kindly provide the translations:
+
+- [@jfbourgon](https://github.com/jfbourgon): `fr`, `fr-CA`
+- [@mneagul](https://github.com/mneagul): `ro`
+- [@m-mohr](https://github.com/m-mohr): `de`, `en`, `en-GB`, `en-US`
+- [@p1d1d1](https://github.com/p1d1d1): `de-CH`, `fr-CH`, `it`, `it-CH`
+- [@psacra](https://github.com/psacra): `pt`
+- [@rnanclares](https://github.com/rnanclares): `es`
+- [@uba](https://github.com/uba): `pt-BR`
 
 #### Custom phrases
 
