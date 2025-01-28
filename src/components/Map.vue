@@ -6,9 +6,10 @@
       <TextControl v-if="empty" :map="map" :text="$t('mapping.nodata')" />
       <TextControl v-else-if="!hasBasemap" :map="map" :text="$t('mapping.nobasemap')" />
     </div>
+    <div ref="target" class="popover-target" />
     <b-popover
       v-if="popover && selectedItems" show placement="left" triggers="manual"
-      :target="selectedItems.target" container="#stac-browser" :key="selectedItems.key"
+      :target="selectedItems.target" container="#stac-browser"
     >
       <section class="popover-items">
         <Items :stac="stac" :items="selectedItems.items" />
@@ -28,10 +29,19 @@ import { mapGetters } from 'vuex';
 import { BPopover } from 'bootstrap-vue';
 import proj4 from 'proj4';
 import {register} from 'ol/proj/proj4.js';
+import Select from 'ol/interaction/Select';
 import StacLayer from 'ol-stac';
 import { getStacObjectsForEvent } from 'ol-stac/util.js';
+import { Stroke, Style } from 'ol/style.js';
 
 register(proj4); // required to support source reprojection
+
+const selectStyle = new Style({
+  stroke: new Stroke({
+      color: '#ff0000',
+      width: 2,
+  }),
+});
 
 export default {
   name: 'Map',
@@ -70,7 +80,8 @@ export default {
     return {
       stacLayer: null,
       selectedItems: null,
-      empty: false
+      empty: false,
+      selector: null
     };
   },
   computed: {
@@ -96,6 +107,11 @@ export default {
     empty(empty) {
       if (empty) {
         this.$emit('empty');
+      }
+    },
+    selectedItems(selectedItems) {
+      if (!selectedItems && this.selector) {
+        this.selector.getFeatures().clear();
       }
     }
   },
@@ -128,8 +144,6 @@ export default {
         disableMigration: true,
       });
       this.stacLayer = new StacLayer(options);
-      console.log(this.stacLayer.getData().getBoundingBoxes());
-      console.log(JSON.stringify(this.stacLayer.getData().toGeoJSON()));
       this.stacLayer.on('error', error => {
         console.warn(error);
         this.fit();
@@ -142,12 +156,26 @@ export default {
       this.map.addLayer(this.stacLayer);
 
       if (this.popover) {
+        this.selector = new Select({
+          toggleCondition: () => false, // Only add features manually
+          condition: () => false, // Only add features manually
+          style: selectStyle
+        });
+        this.map.addInteraction(this.selector);
         this.map.on('singleclick', async (event) => {
-          const objects = await getStacObjectsForEvent(event, this.stacLayer.getData());
+          // The event doesn't contain a target element for the popover to attach to.
+          // Thus we move a hidden target element to the click position and attach the popover to it.
+          // See also https://github.com/bootstrap-vue/bootstrap-vue/issues/5285
+          this.$refs.target.style.left = event.pixel[0] + 'px';
+          this.$refs.target.style.top = event.pixel[1] + 'px';
+
+          this.selector.getFeatures().clear();
+          const features = this.selector.getFeatures();
+          const container = this.stacLayer.getData();
+          const objects = await getStacObjectsForEvent(event, container, features, 5);
           if (objects.length > 0) {
             this.selectedItems = {
-              target: event.originalEvent.srcElement || event.originalEvent.target,
-              key: event.map.ol_uid,
+              target: this.$refs.target,
               // Map from stac-js object back to STAC Browser STAC class
               items: objects.map(obj => this.getStac(obj.getAbsoluteUrl()))
             };
@@ -156,6 +184,8 @@ export default {
             this.selectedItems = null;
           }
         });
+        this.map.on('change', () => this.selectedItems = null);
+        this.map.on('movestart', () => this.selectedItems = null);
       }
     },
     fit() {
@@ -176,20 +206,31 @@ export default {
 <style lang="scss">
 @import "../../node_modules/ol/ol.css";
 
-#stac-browser .popover-items {
-  max-height: 500px;
-  overflow: auto;
-  margin-top: -0.5rem;
-  margin-left: -0.75rem;
-  margin-right: -0.75rem;
-  padding: 0.5rem 0.75rem 0  0.75rem;
-
-  .items {
-    margin-bottom: 0 !important;
+#stac-browser {
+  .popover-target {
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    position: absolute;
+    top: -1px;
+    left: -1px;
   }
+  
+  .popover-items {
+    max-height: 500px;
+    overflow: auto;
+    margin-top: -0.5rem;
+    margin-left: -0.75rem;
+    margin-right: -0.75rem;
+    padding: 0.5rem 0.75rem 0  0.75rem;
 
-  .card-columns {
-    column-count: 1;
+    .items {
+      margin-bottom: 0 !important;
+    }
+
+    .card-columns {
+      column-count: 1;
+    }
   }
 }
 </style>
