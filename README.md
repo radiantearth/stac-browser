@@ -180,7 +180,7 @@ If you need even more flexibility, you need to dig into the Vue files and their 
 
 The file `basemaps.config.js` contains the configuration for the basemaps.
 You can update either just the `BASEMAPS` object or you can write a custom function `configureBasemap` that returns the desired options for OpenLayers.
-XYZ and WMS basemaps are supported and have different options that you can set.
+XYZ, WMTS and WMS basemaps are supported and have different options that you can set.
 
 ### Actions
 
