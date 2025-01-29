@@ -484,7 +484,7 @@ export default {
             layer: event.layer,
             key: event.layer._leaflet_id
           };
-          if (event.layer) {
+          if (event.layer && typeof event.layer.setStyle === 'function') {
             this.selectedItem.oldStyle = Object.assign({}, event.layer.options);
             event.layer.setStyle(Object.assign({}, event.layer.options, {color: '#dc3545'}));
           }
