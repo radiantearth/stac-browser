@@ -28,20 +28,14 @@ import TextControl from './maps/TextControl.vue';
 import { mapGetters } from 'vuex';
 import { BPopover } from 'bootstrap-vue';
 import proj4 from 'proj4';
-import {register} from 'ol/proj/proj4.js';
 import Select from 'ol/interaction/Select';
+import {register} from 'ol/proj/proj4.js';
 import StacLayer from 'ol-stac';
-import { getStacObjectsForEvent } from 'ol-stac/util.js';
-import { Stroke, Style } from 'ol/style.js';
+import { getStacObjectsForEvent, getStyle } from 'ol-stac/util.js';
 
 register(proj4); // required to support source reprojection
 
-const selectStyle = new Style({
-  stroke: new Stroke({
-      color: '#ff0000',
-      width: 2,
-  }),
-});
+const selectStyle = getStyle('#ff0000', 2, null);
 
 export default {
   name: 'Map',

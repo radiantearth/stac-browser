@@ -340,6 +340,7 @@ If the option `useTileLayerAsFallback` is set to `true`, the tile server is only
 `buildTileUrlTemplate` is disabled by default (i.e. set to `null`) since v3.4.0.
 
 You can enable this option by providing a function with a single parameter that returns a tile server template url.
+The given function can optionally be async (i.e. return a Promise).
 The parameter passed into the function is an [Asset object](https://m-mohr.github.io/stac-js/latest/#asset) as defined in stac-js.
 
 **Example**:

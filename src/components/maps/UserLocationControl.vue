@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import { Point } from 'ol/geom';
+import Point from 'ol/geom/Point';
 import ControlMixin from './ControlMixin';
 import { fromLonLat } from 'ol/proj';
 import { BIconPinMapFill } from 'bootstrap-vue';
