@@ -65,7 +65,7 @@ export default {
         'auth:refs',
         // Alternative Assets are displayed separately
         'alternate',
-        'name'
+        'alternate:name',
       ]
     };
   },
