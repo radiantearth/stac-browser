@@ -12,7 +12,8 @@
       :target="selectedItems.target" container="#stac-browser"
     >
       <section class="popover-items">
-        <Items :stac="stac" :items="selectedItems.items" />
+        <Catalogs v-if="itemsAreCollections" :catalogs="selectedItems.items" collectionsOnly simple />
+        <Items v-else :stac="stac" :items="selectedItems.items" simple />
       </section>
       <div class="text-center">
         <b-button target="_blank" variant="danger" @click="resetSelectedItems">{{ $t('mapping.close') }}</b-button>
@@ -41,6 +42,7 @@ export default {
   name: 'Map',
   components: {
     BPopover,
+    Catalogs: () => import('../components/Catalogs.vue'),
     Items: () => import('../components/Items.vue'),
     LayerControl,
     TextControl
@@ -58,7 +60,7 @@ export default {
       default: null
     },
     items: {
-      type: Object,
+      type: [Object, Array], // Array = Collections, Object = Items
       default: null
     },
     noscroll: {
@@ -79,7 +81,10 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['getStac'])
+    ...mapGetters(['getStac']),
+    itemsAreCollections() {
+      return Array.isArray(this.items);
+    },
   },
   watch: {
     async stac() {
@@ -218,7 +223,7 @@ export default {
     margin-right: -0.75rem;
     padding: 0.5rem 0.75rem 0  0.75rem;
 
-    .items {
+    .items, .catalogs {
       margin-bottom: 0 !important;
     }
 
