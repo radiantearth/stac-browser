@@ -363,7 +363,7 @@ export default {
     show() {
       // Override asset href with absolute URL
       // Clone asset so that we can change the href
-      const data = new Asset(this.data);
+      const data = new Asset(this.data, this.data.getKey(), this.data.getContext());
       data.href = this.href;
       // todo: can we use data.getAbsoluteUrl in all places where we handle the event in favor of the cloning/updating here?
       this.$emit('show', data);

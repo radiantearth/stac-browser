@@ -17,8 +17,7 @@ import HrefActions from './HrefActions.vue';
 import StacFieldsMixin from './StacFieldsMixin';
 import AuthUtils from './auth/utils';
 import Utils from '../utils';
-import STAC from '../models/stac';
-import { Asset } from 'ol-stac';
+import { Asset, STAC } from 'stac-js';
 
 export default {
   name: 'AssetAlternative',
@@ -77,7 +76,7 @@ export default {
     resolvedAsset() {
       if (Array.isArray(this.asset['storage:refs'])) {
         const storage = this.resolveStorage(this.asset, this.context);
-        const asset = new Asset(this.asset, this.context);
+        const asset = new Asset(this.asset, this.asset.getKey(), this.context);
         asset['storage:schemes'] = storage;
         return asset;
       }
