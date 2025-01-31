@@ -26,7 +26,7 @@
           <b-card no-body class="maps-preview">
             <b-tabs v-model="tab" ref="tabs" pills card vertical end>
               <b-tab v-if="isCollection" :title="$t('map')" no-body>
-                <Map :stac="data" :stacLayerData="mapData" @dataChanged="dataChanged" fitBoundsOnce popover />
+                <Map :stac="data" v-bind="mapData" @assets="dataChanged" @empty="handleEmptyMap" noscroll popover />
               </b-tab>
               <b-tab v-if="hasThumbnails" :title="$t('thumbnails')" no-body>
                 <Thumbnails :thumbnails="thumbnails" />
@@ -34,8 +34,8 @@
             </b-tabs>
           </b-card>
         </section>
-        <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="shownAssets" @showAsset="showAsset" />
-        <Assets v-if="hasItemAssets && !hasItems" :assets="data.item_assets" :context="data" :definition="true" />
+        <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="selectedAssets" @showAsset="showAsset" />
+        <Assets v-if="hasItemAssets && !hasItems" :assets="itemAssets" :context="data" :definition="true" />
         <Providers v-if="providers" :providers="providers" />
         <Metadata class="mb-4" :type="data.type" :data="data" :ignoreFields="ignoredMetadataFields" />
         <CollectionLink v-if="collectionLink" :link="collectionLink" />
@@ -52,7 +52,7 @@
           @paginate="paginateItems" @filterItems="filterItems"
           @filtersShown="filtersShown"
         />
-        <Assets v-if="hasItemAssets" :assets="data.item_assets" :context="data" :definition="true" />
+        <Assets v-if="hasItemAssets" :assets="itemAssets" :context="data" :definition="true" />
       </b-col>
     </b-row>
   </div>
@@ -64,7 +64,7 @@ import Catalogs from '../components/Catalogs.vue';
 import Description from '../components/Description.vue';
 import Items from '../components/Items.vue';
 import ReadMore from "vue-read-more-smooth";
-import ShowAssetMixin from '../components/ShowAssetMixin';
+import ShowAssetLinkMixin from '../components/ShowAssetLinkMixin';
 import StacFieldsMixin from '../components/StacFieldsMixin';
 import { formatLicense, formatTemporalExtents } from '@radiantearth/stac-fields/formatters';
 import { BTabs, BTab } from 'bootstrap-vue';
@@ -92,7 +92,7 @@ export default {
     Thumbnails: () => import('../components/Thumbnails.vue')
   },
   mixins: [
-    ShowAssetMixin,
+    ShowAssetLinkMixin,
     StacFieldsMixin({ formatLicense, formatTemporalExtents })
   ],
   data() {
@@ -136,7 +136,7 @@ export default {
   },
   computed: {
     ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination', 'nextCollectionsLink', 'stateQueryParameters']),
-    ...mapGetters(['additionalLinks', 'catalogs', 'collectionLink', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
+    ...mapGetters(['catalogs', 'collectionLink', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
     cssStacType() {
       if (Utils.hasText(this.data?.type)) {
         return this.data?.type.toLowerCase();
@@ -145,9 +145,6 @@ export default {
     },
     showFilters() {
       return Boolean(this.stateQueryParameters['itemFilterOpen']);
-    },
-    hasThumbnails() {
-      return this.thumbnails.length > 0;
     },
     linkPosition() {
       if (this.additionalLinks.length === 0) {
@@ -191,7 +188,13 @@ export default {
       return null;
     },
     hasItemAssets() {
-      return Utils.size(this.data?.item_assets) > 0;
+      return this.itemAssets.length > 0;
+    },
+    itemAssets() {
+      if (!this.data2 || !Utils.isObject(this.data2.item_assets)) {
+        return [];
+      }
+      return Object.values(this.data2.item_assets);
     },
     itemPages() {
       let pages = Object.assign({}, this.apiItemsPagination);
@@ -211,15 +214,20 @@ export default {
       return this.catalogs.length > 0;
     },
     mapData() {
-      if (this.selectedAsset) {
-        return this.selectedAsset;
+      const data = {};
+      if (this.selectedAssets.length > 0) {
+        data.assets = this.selectedAssets;
       }
       else {
-        return {
-          type: 'FeatureCollection',
-          features: this.items
-        };
+        const items = this.items.filter(item => item.type === 'Feature');
+        if (items.length > 0) {
+          data.items = {
+            type: 'FeatureCollection',
+            features: items
+          };
+        }
       }
+      return data;
     }
   },
   watch: {
