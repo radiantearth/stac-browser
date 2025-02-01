@@ -3,7 +3,7 @@
     <header>
       <h2 class="title mr-2">{{ $tc('stacItem', items.length ) }}</h2>
       <b-badge v-if="itemCount !== null" pill variant="secondary" class="mr-4">{{ itemCount }}</b-badge>
-      <SortButtons v-if="!api && items.length > 1" v-model="sort" />
+      <SortButtons v-if="!simple && !api && items.length > 1" v-model="sort" />
     </header>
 
     <Pagination
@@ -101,6 +101,10 @@ export default {
     count: {
       type: Number,
       default: null
+    },
+    simple: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
