@@ -3,7 +3,7 @@ import Utils from '../../utils';
 import { mapState } from 'vuex';
 import Map from 'ol/Map.js';
 import View from 'ol/View.js';
-import MouseWheelZoom from 'ol/interaction/MouseWheelZoom.js';
+import { defaults } from 'ol/interaction/defaults';
 import TileLayer from 'ol/layer/WebGLTile.js';
 import ZoomControl from 'ol/control/Zoom.js';
 import AttributionControl from 'ol/control/Attribution.js';
@@ -42,7 +42,7 @@ export default {
     this.$root.$on('uiLanguageChanged', this.translate);
   },
   methods: {
-    async createMap(element, stac) {
+    async createMap(element, stac, onfocusOnly = false) {
       let projection = 'EPSG:3857';
       let visibleLayer = 0;
 
@@ -63,6 +63,11 @@ export default {
       this.map = new Map({
         target: element,
         controls: [],
+        interactions: defaults({
+          altShiftDragRotate: false,
+          pinchRotate: false,
+          onfocusOnly
+        }),
         view: new View({
           center: [0, 0],
           zoom: 0,
@@ -113,13 +118,6 @@ export default {
         this.fullScreenControl.button_.title = this.$t('fullscreen.show')
       });
       this.map.addControl(this.fullScreenControl);
-    },
-    disableMouseWheelZoom() {
-      const interaction = this.map.getInteractions().getArray()
-        .find(interaction => interaction instanceof MouseWheelZoom);
-      if (interaction) {
-        this.map.removeInteraction(interaction);
-      }
     },
     translate() {
       this.createControls();

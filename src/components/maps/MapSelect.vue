@@ -14,6 +14,7 @@ import MapMixin from './MapMixin.js';
 import LayerControl from './LayerControl.vue';
 import TextControl from './TextControl.vue';
 import UserLocationControl from './UserLocationControl.vue';
+import {shiftKeyOnly} from 'ol/events/condition.js';
 import ExtentInteraction from 'ol/interaction/Extent';
 import { containsXY } from 'ol/extent';
 import { transformExtent } from 'ol/proj';
@@ -53,7 +54,8 @@ export default {
   data() {
     return {
       crs: 'EPSG:4326',
-      extent: this.value
+      extent: this.value,
+      dragging: false
     };
   },
   computed: {
@@ -85,8 +87,7 @@ export default {
     async initMap() {
       this.map = null;
 
-      await this.createMap(this.$refs.map, this.stac);
-      this.disableMouseWheelZoom();
+      await this.createMap(this.$refs.map, this.stac, true);
 
       // Add extent interaction for bbox selection
       const condition = (event) => {
@@ -116,13 +117,12 @@ export default {
         else if (this.interaction.handlingDownUpSequence || this.interaction.snapToVertex_(event.pixel, event.map)) {
           return true;
         }
-        return false;
+        return shiftKeyOnly(event);
       };
       this.interaction = new ExtentInteraction({
         extent: this.projectedExtent,
         condition,
-        boxStyle: createDefaultStyle(),
-        pixelTolerance: 15
+        boxStyle: createDefaultStyle()
       });
       this.interaction.on('extentchanged', this.update);
       this.map.addInteraction(this.interaction);

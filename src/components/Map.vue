@@ -61,7 +61,7 @@ export default {
       type: Object,
       default: null
     },
-    noscroll: {
+    onfocusOnly: {
       type: Boolean,
       default: false
     },
@@ -117,14 +117,10 @@ export default {
       this.map = null;
       this.stacLayer = null;
 
-      await this.createMap(this.$refs.map, this.stac);
+      await this.createMap(this.$refs.map, this.stac, this.onfocusOnly);
 
       if (this.stac) {
         await this.addStacLayer();
-      }
-
-      if (this.noscroll) {
-        this.disableMouseWheelZoom();
       }
     },
     async addStacLayer() {
