@@ -127,37 +127,47 @@ export default {
       this.interaction.on('extentchanged', this.update);
       this.map.addInteraction(this.interaction);
   
+      this.addMask();
+    },
+    addMask() {
       // Darken areas outside of the available area
-      if (this.stac) {
-        const stac = create(this.stac);
-        if (stac && stac.toGeoJSON) {
-          // Create a mask for the available area
-          const geojson = stac.toGeoJSON();
-          const world = toGeoJSON([-180, -90, 180, 90]);
-          const masked = mask(geojson, world);
+      if (!this.stac) {
+        return;
+      }
+      const stac = create(this.stac);
+      if (!stac || typeof stac.toGeoJSON !== 'function') {
+        return;
+      }
 
-          // Parse the GeoJSON
-          const features = new GeoJSON().readFeatures(masked, {
-            featureProjection: this.map.getView().getProjection(),
-          });
+      const geojson = stac.toGeoJSON();
+      if (!geojson) {
+        return;
+      }
 
-          /// Add the mask layer, make it half-transparent
-          const maskLayer = new VectorLayer({
-            source: new VectorSource({ features }),
-            style: new Style({
-              fill: new Fill({
-                color: 'rgba(0, 0, 0, 0.5)',
-              }),
-            }),
-          });
-          this.map.addLayer(maskLayer);
+      // Create a mask for the available area
+      const world = toGeoJSON([-180, -90, 180, 90]);
+      const masked = mask(geojson, world);
 
-          const bbox = stac.getBoundingBox();
-          if (bbox) {
-            const extent = transformExtent(bbox, this.crs, this.map.getView().getProjection());
-            this.map.getView().fit(extent, { padding: [10,10,10,10] });
-          }
-        }
+      // Parse the GeoJSON
+      const features = new GeoJSON().readFeatures(masked, {
+        featureProjection: this.map.getView().getProjection(),
+      });
+
+      /// Add the mask layer, make it half-transparent
+      const maskLayer = new VectorLayer({
+        source: new VectorSource({ features }),
+        style: new Style({
+          fill: new Fill({
+            color: 'rgba(0, 0, 0, 0.5)',
+          }),
+        }),
+      });
+      this.map.addLayer(maskLayer);
+
+      const bbox = stac.getBoundingBox();
+      if (bbox) {
+        const extent = transformExtent(bbox, this.crs, this.map.getView().getProjection());
+        this.map.getView().fit(extent, { padding: [10,10,10,10] });
       }
     },
     fixX(x) {
