@@ -4,7 +4,6 @@ import Vuex from "vuex";
 import URI from "urijs";
 
 import i18n from '../i18n';
-import { stacBrowserSpecialHandling } from "../rels";
 import Utils, { BrowserError } from '../utils';
 import STAC from '../models/stac';
 
@@ -224,30 +223,6 @@ function getStore(config, router) {
         }
         return catalogs;
       },
-
-      // hasAsset also checks whether the assets have a href and thus are not item asset definitions
-      hasAssets: (state, getters) => Boolean(Object.values(getters.assets).find(asset => Utils.isObject(asset) && typeof asset.href === 'string')),
-      assets: (state, getters) => {
-        if (!Utils.isObject(state.data?.assets)) {
-          return {};
-        }
-        else if (state.showThumbnailsAsAssets) {
-          return state.data.assets;
-        }
-        else {
-          let assets = {};
-          let thumbnails = getters.thumbnails;
-          for (let key in state.data.assets) {
-            let asset = state.data.assets[key];
-            if (!thumbnails.includes(asset)) {
-              assets[key] = asset;
-            }
-          }
-          return assets;
-        }
-      },
-      thumbnails: state => state.data ? state.data.getThumbnails(true) : [],
-      additionalLinks: state => state.data ? state.data.getLinksWithOtherRels(stacBrowserSpecialHandling).filter(link => link.rel !== 'preview' || !Utils.canBrowserDisplayImage(link)) : [],
 
       toBrowserPath: (state, getters) => url => {
         if (!Utils.hasText(url)) {
@@ -961,14 +936,6 @@ function getStore(config, router) {
         let response = await stacRequest(cx, link);
         if (Utils.isObject(response.data) && Array.isArray(response.data.conformsTo)) {
           cx.commit('setConformanceClasses', response.data.conformsTo);
-        }
-      },
-      async loadGeoJson(cx, link) {
-        try {
-          let response = await stacRequest(cx, link);
-          return response.data; // Use data with $refs included as fallback anyway
-        } catch (error) {
-          return null;
         }
       },
       async retryAfterAuth(cx) {
