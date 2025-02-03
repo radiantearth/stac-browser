@@ -386,7 +386,7 @@ export default {
             displayGeoTiffByDefault: true
           });
           for(let link of sourceLinks) {
-            this.$store.dispatch('load', {url: link.href})
+            this.$store.dispatch('load', { url: link.href, omitApi: true })
               .then(() => {
                 let sourceStac = this.getStac(link.href, true);
                 if (sourceStac instanceof STAC) {
