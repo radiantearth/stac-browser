@@ -27,7 +27,7 @@
         <b-alert v-else-if="results.length === 0" variant="warning" show>{{ $t('search.noItemsFound') }}</b-alert>
         <template v-else>
           <div id="search-map" v-if="itemCollection">
-            <Map :stac="parent" :items="itemCollection" popover />
+            <Map :stac="parent" :items="itemCollection" onfocusOnly popover />
           </div>
           <Catalogs
             v-if="isCollectionSearch" :catalogs="results" collectionsOnly
@@ -47,7 +47,7 @@
           </Catalogs>
           <Items
             v-else
-            :stac="stac" :items="results" :api="true" :allowFilter="false"
+            :stac="parent" :items="results" :api="true" :allowFilter="false"
             :pagination="pagination" :loading="loading" @paginate="loadResults"
             :count="totalCount"
           />

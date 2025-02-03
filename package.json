@@ -1,6 +1,6 @@
 {
   "name": "@radiantearth/stac-browser",
-  "version": "3.3.3",
+  "version": "3.4.0-dev",
   "description": "A full-fledged UI in Vue for browsing and searching static STAC catalogs and STAC APIs.",
   "main": "src/main.js",
   "scripts": {
@@ -52,7 +52,7 @@
     "node-polyfill-webpack-plugin": "^2.0.0",
     "oidc-client-ts": "^3.0.1",
     "ol": "~10.4.0",
-    "ol-stac": "^1.0.0-rc.7",
+    "ol-stac": "^1.0.0-rc.8",
     "proj4": "^2.15.0",
     "remove-markdown": "^0.5.0",
     "stac-js": "~0.1.4",

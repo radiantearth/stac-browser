@@ -28,7 +28,7 @@
 
         <b-form-group v-if="canFilterExtents" class="filter-bbox" :label="$t('search.spatialExtent')" :label-for="ids.bbox">
           <b-form-checkbox :id="ids.bbox" v-model="provideBBox" value="1">{{ $t('search.filterBySpatialExtent') }}</b-form-checkbox>
-          <MapSelect class="mb-4" v-if="provideBBox" v-model="bbox" :stac="stac" />
+          <MapSelect class="mb-4" v-if="provideBBox" v-model="query.bbox" :stac="stac" />
         </b-form-group>
 
         <b-form-group v-if="conformances.CollectionIdFilter" class="filter-collection" :label="$tc('stacCollection', collections.length)" :label-for="ids.collections">
@@ -154,6 +154,8 @@ function getDefaults() {
     sortOrder: 1,
     sortTerm: null,
     provideBBox: false,
+    // Store previous bbox so that it survives when the map is temporarily hidden
+    bbox: null,
     query: getQueryDefaults(),
     filtersAndOr: 'and',
     filters: [],
@@ -281,17 +283,6 @@ export default {
       const collator = new Intl.Collator(this.uiLanguage);
       return this.queryables.slice(0).sort((a, b) => collator.compare(a.title, b.title));
     },
-    bbox: {
-      get() {
-        if (!this.provideBBox) {
-          return null;
-        }
-        return this.query.bbox;
-      },
-      set(val) {
-        this.query.bbox = val;
-      }
-    },
     datetime: {
       get() {
         return Array.isArray(this.query.datetime) ? this.query.datetime.map(d => Utils.dateFromUTC(d)) : null;
@@ -328,6 +319,24 @@ export default {
             return collection ? collection : this.collectionToMultiSelect({id});
           });
         }
+      }
+    },
+    query: {
+      deep: true,
+      handler(query) {
+        if (query?.bbox) {
+          // Store the previously selected bbox so that it can be restored after the
+          // map had been hidden accidentally.
+          this.bbox = query.bbox;
+        }
+      }
+    },
+    provideBBox(shown) {
+      if (!shown) {
+        this.query.bbox = null;
+      }
+      else {
+        this.query.bbox = this.bbox;
       }
     }
   },

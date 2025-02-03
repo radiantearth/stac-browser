@@ -127,14 +127,28 @@ export default {
       this.interaction.on('extentchanged', this.update);
       this.map.addInteraction(this.interaction);
   
-      this.addMask();
-    },
-    addMask() {
-      // Darken areas outside of the available area
-      if (!this.stac) {
-        return;
+      let stac;
+      if (this.stac) {
+        stac = create(this.stac);
+        this.addMask(stac);
       }
-      const stac = create(this.stac);
+
+      let extent;
+      if (this.projectedExtent) {
+        extent = this.projectedExtent;
+      }
+      else if (stac) {
+        const bbox = stac.getBoundingBox();
+        if (bbox) {
+          extent = transformExtent(bbox, this.crs, this.map.getView().getProjection());
+        }
+      }
+      if (extent) {
+        this.map.getView().fit(extent, { padding: [50,50,50,50] });
+      }
+    },
+    addMask(stac) {
+      // Darken areas outside of the available area
       if (!stac || typeof stac.toGeoJSON !== 'function') {
         return;
       }
@@ -163,12 +177,6 @@ export default {
         }),
       });
       this.map.addLayer(maskLayer);
-
-      const bbox = stac.getBoundingBox();
-      if (bbox) {
-        const extent = transformExtent(bbox, this.crs, this.map.getView().getProjection());
-        this.map.getView().fit(extent, { padding: [10,10,10,10] });
-      }
     },
     fixX(x) {
       return (x + 180) % 360 - 180;

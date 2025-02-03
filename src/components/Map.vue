@@ -97,6 +97,7 @@ export default {
       }
       await this.stacLayer.setAssets(null);
       await this.stacLayer.setChildren(this.items, {displayPreview: true});
+      this.fit();
     },
     empty(empty) {
       if (empty) {
@@ -183,7 +184,7 @@ export default {
       if (extent) {
         // Update the sizes, otherwise the fit will not work properly and compute a wrong zoom level
         this.map.updateSize();
-        this.map.getView().fit(extent, { padding: [100,150,100,150] });
+        this.map.getView().fit(extent, { padding: [50,50,50,50] });
       }
     },
     resetSelectedItems() {
