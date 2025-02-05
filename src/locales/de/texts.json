@@ -93,7 +93,7 @@
     "forbidden": "Die für diese Anfrage angegebenen Anmeldedaten sind ungültig, bspw. ein abgelaufener oder ungültiger API-Schlüssel. Bitte geben Sie andere Anmeldedaten an und versuchen Sie es erneut.",
     "invalidJsonObject": "Die Antwort des Dienstanbieters ist kein gültiges JSON-Objeckt.",
     "invalidStacCollections": "Die Antwort des Dienstanbieters ist keine gültige Liste mit Katalogen.",
-    "invalidStacItems": "Die Antwort des Dienstanbieters ist keine fültige Liste mit Elementen.",
+    "invalidStacItems": "Die Antwort des Dienstanbieters ist keine gültige Liste mit Elementen.",
     "labels": {
       "cause": "Ursache:",
       "code": "Fehlercode:",
@@ -233,7 +233,7 @@
     "greaterThanEqual": "größer als oder entspricht",
     "itemIds": "Element-Identifikationsnummern",
     "itemsPerPage": "Elemente pro Seite",
-    "itemsPerPageDescription": "Anzahl der Elemente die pro Seite angefragft wird, maximal {maxItems} Elemente.",
+    "itemsPerPageDescription": "Anzahl der Elemente die pro Seite angefragt wird, maximal {maxItems} Elemente.",
     "lessThan": "kleiner als",
     "lessThanEqual": "kleiner als oder entspricht",
     "likeOperatorDescription": "Platzhalterzeichen können verwendet werden. `_` entspricht einem einzelnen Zeichen, `%` entspricht einer beliebigen Anzahl an Zeichen. Um nach einem Platzhalterzeichen selber zu suchen, müssen ein `\\` vor das Zeichen gesetzt werden.",
