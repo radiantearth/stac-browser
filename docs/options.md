@@ -35,6 +35,7 @@ The following ways to set config options are possible:
   - [displayGeoTiffByDefault](#displaygeotiffbydefault)
   - [redirectLegacyUrls](#redirectlegacyurls)
   - [itemsPerPage](#itemsperpage)
+  - [maxItemsPerPage](#maxitemsperpage)
   - [maxPreviewsOnMap](#maxpreviewsonmap)
   - [cardViewMode](#cardviewmode)
   - [cardViewSort](#cardviewsort)
@@ -236,6 +237,10 @@ If you are updating from on old version of STAC Browser, you can set this option
 ## itemsPerPage
 
 The number of items requested and shown per page by default. Only applies to APIs that support the `limit` query parameter.
+
+## maxItemsPerPage
+
+The maximum number of items to request through the `limit` query parameter (`10000` by default).
 
 ## maxPreviewsOnMap
 

@@ -39,6 +39,7 @@ module.exports = {
     geoTiffResolution: 128,
     redirectLegacyUrls: false,
     itemsPerPage: 12,
+    maxItemsPerPage: 10000,
     defaultThumbnailSize: null,
     maxPreviewsOnMap: 50,
     crossOriginMedia: null,
