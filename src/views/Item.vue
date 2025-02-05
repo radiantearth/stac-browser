@@ -2,13 +2,13 @@
   <div class="item" :key="data.id">
     <b-row>
       <b-col class="left">
-        <section class="mb-4">
+        <section v-if="hasGeometry || hasThumbnails" class="mb-4">
           <b-card no-body class="maps-preview">
             <b-tabs v-model="tab" ref="tabs" card pills vertical end>
-              <b-tab :title="$t('map')" no-body>
+              <b-tab v-if="hasGeometry" :title="$t('map')" no-body>
                 <Map :stac="data" :stacLayerData="selectedAsset" @dataChanged="dataChanged" scrollWheelZoom />
               </b-tab>
-              <b-tab v-if="thumbnails.length > 0" :title="$t('thumbnails')" no-body>
+              <b-tab v-if="hasThumbnails" :title="$t('thumbnails')" no-body>
                 <Thumbnails :thumbnails="thumbnails" />
               </b-tab>
             </b-tabs>
@@ -83,7 +83,13 @@ export default {
   },
   computed: {
     ...mapState(['data', 'url']),
-    ...mapGetters(['additionalLinks', 'collectionLink', 'parentLink'])
+    ...mapGetters(['additionalLinks', 'collectionLink', 'parentLink']),
+    hasGeometry() {
+      return this.data.geometry != null;
+    },
+    hasThumbnails() {
+      return this.thumbnails.length > 0;
+    }
   },
   watch: {
     data: {
