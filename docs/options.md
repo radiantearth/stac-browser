@@ -47,6 +47,8 @@ The following ways to set config options are possible:
   - [displayGeoTiffByDefault](#displaygeotiffbydefault)
 - [User Interface](#user-interface)
   - [itemsPerPage](#itemsperpage)
+  - [maxItemsPerPage](#maxitemsperpage)
+  - [maxPreviewsOnMap](#maxpreviewsonmap)
   - [cardViewMode](#cardviewmode)
   - [cardViewSort](#cardviewsort)
   - [showKeywordsInItemCards](#showkeywordsinitemcards)
@@ -377,6 +379,10 @@ Loading non-cloud-optimized GeoTiffs only works reliably for smaller files (< 1M
 ### itemsPerPage
 
 The number of items requested and shown per page by default. Only applies to APIs that support the `limit` query parameter.
+
+## maxItemsPerPage
+
+The maximum number of items per page that a user can request through the `limit` query parameter (`1000` by default).
 
 ### cardViewMode
 

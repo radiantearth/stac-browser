@@ -644,7 +644,7 @@ function getStore(config, router) {
         if (urls.length > 0) {
           let promises = [];
           for (let url of urls) {
-            promises.push(cx.dispatch('load', { url }));
+            promises.push(cx.dispatch('load', { url, omitApi: true }));
           }
           cx.commit('removeFromQueue', count);
           return await Promise.all(promises);
@@ -664,7 +664,7 @@ function getStore(config, router) {
             break;
           }
           let url = Utils.toAbsolute(parentLink.href, stac.getAbsoluteUrl());
-          await cx.dispatch('load', { url });
+          await cx.dispatch('load', { url, omitApi: true });
           let parentStac = cx.getters.getStac(url, true);
           if (parentStac instanceof Error) {
             cx.commit('parents', parentStac);
@@ -687,7 +687,7 @@ function getStore(config, router) {
         await cx.dispatch('auth/requestLogin');
       },
       async load(cx, args) {
-        let { url, show, force, noRetry } = args;
+        let { url, show, force, noRetry, omitApi } = args;
 
         const path = cx.getters.toBrowserPath(url);
         url = Utils.toAbsolute(url, cx.state.url);
@@ -749,7 +749,9 @@ function getStore(config, router) {
         }
 
         // Load API Collections
-        if (data.getApiCollectionsLink()) {
+        const apiCollectionLink = data.getApiCollectionsLink();
+        const apiItemLink = data.getApiItemsLink();
+        if (!omitApi && apiCollectionLink) {
           let args = { stac: data, show: loading.show };
           try {
             await cx.dispatch('loadNextApiCollections', args);
@@ -761,7 +763,7 @@ function getStore(config, router) {
           }
         }
         // Load API Items
-        else if (data.getApiItemsLink()) {
+        else if (!omitApi && apiItemLink) {
           let args = { stac: data, show: loading.show };
           try {
             await cx.dispatch('loadApiItems', args);
@@ -784,7 +786,7 @@ function getStore(config, router) {
             }
           }
           if (catalogUrl) {
-            await cx.dispatch("load", { url: catalogUrl });
+            await cx.dispatch("load", { url: catalogUrl, omitApi: true });
           }
         }
 

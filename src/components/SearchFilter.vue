@@ -207,7 +207,6 @@ export default {
   data() {
     return Object.assign({
       results: null,
-      maxItems: 10000,
       loaded: false,
       queryables: null,
       hasAllCollections: false,
@@ -217,7 +216,7 @@ export default {
     }, getDefaults());
   },
   computed: {
-    ...mapState(['itemsPerPage', 'uiLanguage']),
+    ...mapState(['itemsPerPage', 'maxItemsPerPage', 'uiLanguage']),
     ...mapGetters(['canSearchCollections', 'supportsConformance']),
     collectionSelectOptions() {
       let taggable = !this.hasAllCollections;
@@ -282,6 +281,9 @@ export default {
       }
       const collator = new Intl.Collator(this.uiLanguage);
       return this.queryables.slice(0).sort((a, b) => collator.compare(a.title, b.title));
+    },
+    maxItems() {
+      return this.maxItemsPerPage || 1000;
     },
     datetime: {
       get() {
