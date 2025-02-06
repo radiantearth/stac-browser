@@ -240,7 +240,7 @@ The number of items requested and shown per page by default. Only applies to API
 
 ## maxItemsPerPage
 
-The maximum number of items to request through the `limit` query parameter (`10000` by default).
+The maximum number of items to request through the `limit` query parameter (`1000` by default).
 
 ## maxPreviewsOnMap
 

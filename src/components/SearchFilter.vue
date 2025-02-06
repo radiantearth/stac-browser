@@ -281,7 +281,7 @@ export default {
       return this.queryables.slice(0).sort((a, b) => collator.compare(a.title, b.title));
     },
     maxItems() {
-      return this.maxItemsPerPage || 10000;
+      return this.maxItemsPerPage || 1000;
     },
     datetime: {
       get() {
