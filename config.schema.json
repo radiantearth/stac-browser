@@ -169,6 +169,12 @@
       ],
       "minimum": 1
     },
+    "maxItemsPerPage": {
+      "type": [
+        "integer"
+      ],
+      "minimum": 1
+    },
     "defaultThumbnailSize": {
       "type": [
         "array",
