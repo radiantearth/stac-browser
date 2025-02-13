@@ -11,15 +11,6 @@ All actions for assets are stored in the folder [`src/actions/assets`](../src/ac
 They all implement the [`AssetActionPlugin` interface](../src/actions/AssetActionPlugin.js).
 The actions can be enabled by adding them to the [`assetActions.config.js`](../assetActions.config.js) file.
 
-### cogeo.xyz
-
-Adds an `Open in cogeo.xyz` button that allows to open Cloud-Optimized GeoTiff (COG) files on <https://cogeo.xyz>.
-
-```js
-import CoGeoXyz from './src/actions/assets/CoGeoXyz.js';
-export default { CoGeoXyz };
-```
-
 ### copc.io
 
 Adds an `Open in copc.io` button that allows to open Cloud-Optimized Point Cloud (COPC) files on <https://viewer.copc.io>.
