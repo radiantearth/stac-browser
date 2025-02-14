@@ -1,65 +1,71 @@
 <template>
-  <b-button v-show="element" variant="light" class="fullscreen-button" type="button" @click="toggleFullscreen" :title="title">
-    <span v-show="isFullscreen"><b-icon-fullscreen-exit /></span>
-    <span v-show="!isFullscreen"><b-icon-fullscreen /></span>
+  <b-button
+    v-if="isSupported" @click.prevent="toggleFullscreen"
+    ref="button" variant="dark" class="fullscreen-button" :title="title"
+  >
+    <span v-show="isFullscreen">{{ $t('fullscreen.exitLabel') }}</span>
+    <span v-show="!isFullscreen">{{ $t('fullscreen.showLabel') }}</span>
   </b-button>
 </template>
 
 <script>
-// This is taken from the openEO Web Editor:
-// https://raw.githubusercontent.com/Open-EO/openeo-web-editor/master/src/components/FullscreenButton.vue
-
-import { BIconFullscreen, BIconFullscreenExit } from 'bootstrap-vue';
-
 export default {
   name: 'FullscreenButton',
-  components: {
-    BIconFullscreen,
-    BIconFullscreenExit
-  },
   props: {
     element: {
       type: [Function, String, Object],
       required: true
-    },
-    zIndex: {
-      type: Number,
-      default: 9000
     }
   },
   data() {
     return {
       isFullscreen: false,
-      keyDownFn: null,
-      oldZIndex: 'auto'
+      doc: document,
+      listener: this.onChange.bind(this)
     };
   },
   computed: {
     title() {
       return this.isFullscreen ? this.$t('fullscreen.exit') : this.$t('fullscreen.show');
+    },
+    isSupported() {
+      if (!this.getElement()) {
+        return false;
+      }
+      return Boolean(this.doc.body.requestFullscreen && this.doc.fullscreenEnabled);
     }
   },
-  mounted() {
-    this.keyDownFn = this.onkeyDown.bind(this);
-    let el = this.getElement();
-    if (el) {
-      el.style.position = "relative";
-      el.addEventListener('keydown', this.keyDownFn);
+  watch: {
+    element: {
+      immediate: true,
+      handler() {
+        this.forceClose();
+        const el = this.getElement();
+        if (el) {
+          this.doc = el.ownerDocument;
+        }
+      }
+    },
+    isFullscreen(active) {
+      console.trace(active);
+      if (active) {
+        this.doc.addEventListener('fullscreenchange', this.listener);
+      }
+      else {
+        this.doc.removeEventListener('fullscreenchange', this.listener);
+      }
+      this.getElement().classList.toggle('fullscreen', active);
+      this.$refs.button.blur();
+      this.$emit('changed', active);
     }
   },
   beforeDestroy() {
-    let el = this.getElement();
-    if (el) {
-      el.removeEventListener('keydown', this.keyDownFn);
-    }
+    this.forceClose();
   },
   methods: {
-    onkeyDown(e) {
-      // ToDo: This is bugged and needs some attention
-      if(this.isFullscreen && (e.key === "F11" || e.key === "Escape")) {
-        this.toggleFullscreen();
-        e.preventDefault();
-        e.stopPropagation();
+    forceClose() {
+      if (this.isFullscreen) {
+        this.doc.exitFullscreen();
       }
     },
     getElement() {
@@ -73,24 +79,22 @@ export default {
         return this.element;
       }
     },
-    toggleFullscreen() {
-      let el = this.getElement();
-      if (!this.isFullscreen) {
-        document.body.style.overflow = "hidden";
-        this.isFullscreen = true;
-        el.classList.add('fullscreen');
-        this.oldZIndex = el.style.zIndex;
-        el.style.zIndex = this.zIndex;
-      }
-      else {
+    onChange() {
+      if (this.isFullscreen && !this.doc.fullscreenElement) {
         this.isFullscreen = false;
-        document.body.style.overflow = null;
-        el.classList.remove('fullscreen');
-        // Revert z-index changes
-        el.style.zIndex = this.oldZIndex;
       }
-
-      this.$emit('changed', this.isFullscreen);
+    },
+    toggleFullscreen() {
+      if (!this.isSupported) {
+        return;
+      }
+      if (this.isFullscreen) {
+        this.doc.exitFullscreen()
+          .then(() => this.isFullscreen = false);
+      } else {
+        this.getElement().requestFullscreen()
+          .then(() => this.isFullscreen = true);
+      }
     },
   }
 };
@@ -99,11 +103,6 @@ export default {
 <style lang="scss">
 #stac-browser {
   .fullscreen {
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
     background-color: white;
     overflow: auto;
   }
