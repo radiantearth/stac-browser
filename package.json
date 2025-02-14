@@ -52,7 +52,7 @@
     "node-polyfill-webpack-plugin": "^2.0.0",
     "oidc-client-ts": "^3.0.1",
     "ol": "~10.4.0",
-    "ol-stac": "^1.0.0-rc.8",
+    "ol-stac": "^1.0.0-rc.9",
     "proj4": "^2.15.0",
     "remove-markdown": "^0.5.0",
     "stac-js": "~0.1.4",
