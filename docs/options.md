@@ -329,7 +329,7 @@ If you want to avoid this, disable this setting.
 ## Mapping
 
 All the mapping-related options are passed through to [ol-stac](https://m-mohr.github.io/ol-stac/).
-More information on these confguration options may be found in the [ol-stac documentation](https://m-mohr.github.io/ol-stac/en/latest/apidoc/module-ol_layer_STAC-STACLayer.html).
+More information on these configuration options may be found in the [ol-stac documentation](https://m-mohr.github.io/ol-stac/en/latest/apidoc/module-ol_layer_STAC-STACLayer.html).
 
 ### buildTileUrlTemplate
 
