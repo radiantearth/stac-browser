@@ -42,11 +42,13 @@
         <Links v-if="linkPosition === 'right'" :title="$t('additionalResources')" :links="additionalLinks" :context="data" />
       </b-col>
       <b-col class="catalogs-container" v-if="hasCatalogs">
-        <Catalogs :catalogs="catalogs" :hasMore="!!nextCollectionsLink" @loadMore="loadMoreCollections" />
+        <Catalogs :catalogs="catalogs" :hasMore="!!nextCollectionsLink" @loadMore="loadMoreCollections">
+          <Map v-if="isCollectionApi && !isCollection && apiCatalogPriority !== 'childs'" class="mb-2" :stac="data" :items="catalogs" v-bind="catalogs" noscroll popover />
+        </Catalogs>
       </b-col>
       <b-col class="items-container" v-if="hasItems">
         <Items
-          :stac="data" :items="items" :api="isApi"
+          :stac="data" :items="items" :api="isItemsApi"
           :showFilters="showFilters" :apiFilters="filters"
           :pagination="itemPages" :loading="apiItemsLoading"
           @paginate="paginateItems" @filterItems="filterItems"
@@ -135,7 +137,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination', 'nextCollectionsLink', 'stateQueryParameters']),
+    ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination', 'apiCatalogPriority', 'nextCollectionsLink', 'stateQueryParameters']),
     ...mapGetters(['catalogs', 'collectionLink', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
     cssStacType() {
       if (Utils.hasText(this.data?.type)) {
@@ -204,11 +206,14 @@ export default {
       }
       return pages;
     },
-    isApi() {
+    isCollectionApi() {
+      return this.data && this.data.getApiCollectionsLink();
+    },
+    isItemsApi() {
       return Boolean(this.apiItemsLink);
     },
     hasItems() {
-      return this.items.length > 0 || this.isApi;
+      return this.items.length > 0 || this.isItemsApi;
     },
     hasCatalogs() {
       return this.catalogs.length > 0;
