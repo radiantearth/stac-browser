@@ -31,153 +31,153 @@
   },
   "authentication": {
     "button": {
-      "login": "Log in",
-      "logout": "Log out",
-      "title": "Provide or update your credentials"
+      "login": "تسجيل الدخول ",
+      "logout": "تسجيل الخروج ",
+      "title": "تقديم أو تحديث بيانات الاعتماد الخاصة بك"
     },
-    "chooseMethod": "Choose authentication method",
-    "description": "The requested page requires authentication. Please provide your authentication details in the text field below.",
-    "loggedOut": "You've been logged out successfully. You can close this window now.",
-    "password": "Password",
-    "required": "Authentication required",
+    "chooseMethod": "اختر طريقة المصادقة",
+    "description": "الصفحة المطلوبة تتطلب المصادقة. يرجى إدخال تفاصيل المصادقة في الحقل أدناه.",
+    "loggedOut": "تم تسجيل خروجك بنجاح. يمكنك إغلاق هذه النافذة الآن.",
+    "password": "كلمة المرور",
+    "required": "المصادقة مطلوبة",
     "schemeTypes": {
-      "http": "HTTP {scheme}",
-      "s3": "S3",
-      "signedUrl": "Signed URL",
-      "oauth2": "OAuth 2",
-      "apiKey": "API key",
-      "openIdConnect": "OpenID Connect"
+        "http": "HTTP {scheme}",
+        "s3": "S3",
+        "signedUrl": "عنوان URL موقّع",
+        "oauth2": "OAuth 2",
+        "apiKey": "مفتاح API",
+        "openIdConnect": "OpenID Connect"
     },
-    "title": "Authentication",
-    "unauthorized": "You don't have permission to access this data. Please log in.",
-    "unsupported": "Unsupported",
-    "unsupportedLong": "Sorry, the authentication method {method} is not supported by STAC Browser.",
-    "user": "User"
+    "title": "المصادقة",
+    "unauthorized": "ليس لديك إذن للوصول إلى هذه البيانات. يرجى تسجيل الدخول.",
+    "unsupported": "غير مدعوم",
+    "unsupportedLong": "عذرًا، طريقة المصادقة {method} غير مدعومة بواسطة STAC Browser.",
+    "user": "المستخدم"
   },
-  "browse": "Browse",
-  "cancel": "Cancel",
+  "browse": "تصفح",
+  "cancel": "إلغاء",
   "catalog": {
-    "license": "License",
-    "temporalExtent": "Temporal Extent"
+    "license": "الترخيص",
+    "temporalExtent": "النطاق الزمني"
   },
   "catalogs": {
-    "filterByTitle": "Filter catalogs by title",
-    "filterByTitleAndMore": "Filter catalogs by title, description or keywords",
-    "loadMore": "Load more...",
-    "noMatches": "No catalogs match the given search criteria."
+    "filterByTitle": "تصفية الكتالوجات حسب العنوان",
+    "filterByTitleAndMore": "تصفية الكتالوجات حسب العنوان أو الوصف أو الكلمات المفتاحية",
+    "loadMore": "تحميل المزيد...",
+    "noMatches": "لا توجد كتالوجات تطابق معايير البحث المحددة."
   },
   "checkbox": {
-    "false": "no",
-    "true": "yes"
+    "false": "لا",
+    "true": "نعم"
   },
-  "copy": "Copy",
-  "default": "Default",
-  "defaultWithValue": "Default ({value})",
-  "deprecated": "Deprecated",
+  "copy": "نسخ",
+  "default": "افتراضي",
+  "defaultWithValue": "افتراضي ({value})",
+  "deprecated": "مهمل",
   "deprecation": {
-    "fallbackTitle": "Show",
-    "latestVersion": "Latest version:",
-    "otherVersionsNotice": "This {type} is *not* deprecated, but there are other versions available:",
-    "otherVersionsTitle": "Other Versions available",
-    "outdatedTitle": "Outdated",
-    "predecessorVersion": "Previous version:",
-    "successorVersion": "Next version:",
-    "warning": "Please note that this {type} is deprecated with the potential to be removed anytime. It should be transitioned out of usage as soon as possible. Refrain from using it in new projects."
+    "fallbackTitle": "عرض",
+    "latestVersion": "أحدث إصدار:",
+    "otherVersionsNotice": "هذا {type} *غير* مهمل، ولكن هناك إصدارات أخرى متاحة:",
+    "otherVersionsTitle": "إصدارات أخرى متاحة",
+    "outdatedTitle": "قديم",
+    "predecessorVersion": "الإصدار السابق:",
+    "successorVersion": "الإصدار التالي:",
+    "warning": "يرجى ملاحظة أن {type} هذا مهمل وقد يتم إزالته في أي وقت. يجب التوقف عن استخدامه في أقرب وقت ممكن. يُفضل عدم استخدامه في المشاريع الجديدة."
   },
-  "description": "Description",
+ "description": "الوصف",
   "errors": {
-    "authFailed": "The request errored, the provided authentication details may be incorrect.",
-    "badRequest": "The request is invalid. This might be due to invalid parameters, e.g. in a search request, or could be a bug in STAC Browser.",
-    "contactProvider": "Please contact the service operator to resolve this issue.",
-    "default": "The requested page could not be loaded.",
-    "forbidden": "The credentials specified for this request are invalid, e.g. an expired or invalid API token. Please provide other credentials and try again.",
-    "invalidJsonObject": "The response is not a valid JSON object.",
-    "invalidStacCollections": "The API response is not a valid list of STAC Collections.",
-    "invalidStacItems": "The API response is not a valid list of STAC Items.",
+    "authFailed": "حدث خطأ في الطلب، قد تكون بيانات المصادقة المقدمة غير صحيحة.",
+    "badRequest": "الطلب غير صالح. قد يكون ذلك بسبب معلمات غير صحيحة، مثل طلب بحث غير صحيح، أو قد يكون خطأ في STAC Browser.",
+    "contactProvider": "يرجى التواصل مع مشغل الخدمة لحل هذه المشكلة.",
+    "default": "تعذر تحميل الصفحة المطلوبة.",
+    "forbidden": "بيانات الاعتماد المحددة لهذا الطلب غير صالحة، مثل رمز API منتهي الصلاحية أو غير صحيح. يرجى تقديم بيانات اعتماد أخرى والمحاولة مرة أخرى.",
+    "invalidJsonObject": "الاستجابة ليست كائن JSON صالحًا.",
+    "invalidStacCollections": "استجابة API ليست قائمة صالحة من مجموعات STAC.",
+    "invalidStacItems": "استجابة API ليست قائمة صالحة من عناصر STAC.",
     "labels": {
-      "cause": "Cause:",
-      "code": "Error Code:",
-      "reason": "Reason:",
-      "requestURL": "Request URL:"
+      "cause": "السبب:",
+      "code": "رمز الخطأ:",
+      "reason": "السبب:",
+      "requestURL": "عنوان URL للطلب:"
     },
-    "loadApiCollectionsFailed": "The API Collections could not be loaded.",
-    "loadApiItemsFailed": "The API Items could not be loaded.",
-    "loadFilteredItems": "Sorry, loading a filtered list of Items failed.",
-    "loadItems": "Sorry, loading the list of STAC Items failed.",
-    "networkError": "This issue may occur when servers don't allow external access via web browsers (e.g., when CORS headers are not present). @:errors.contactProvider",
-    "noExternalAccess": "Accessing external catalogs is not allowed!",
-    "notFound": "The requested resource does not exist. @:errors.contactProvider",
-    "serverError": "The server encountered an issue. @:errors.contactProvider",
-    "unauthorized": "The request lacks credentials, e.g. an API token. Please provide your credentials and try again."
+    "loadApiCollectionsFailed": "تعذر تحميل مجموعات API.",
+    "loadApiItemsFailed": "تعذر تحميل عناصر API.",
+    "loadFilteredItems": "عذرًا، فشل تحميل قائمة العناصر المصفاة.",
+    "loadItems": "عذرًا، فشل تحميل قائمة عناصر STAC.",
+    "networkError": "قد تحدث هذه المشكلة عندما لا تسمح الخوادم بالوصول الخارجي عبر متصفحات الويب (مثل عدم وجود رؤوس CORS). @:errors.contactProvider",
+    "noExternalAccess": "الوصول إلى الكتالوجات الخارجية غير مسموح!",
+    "notFound": "المورد المطلوب غير موجود. @:errors.contactProvider",
+    "serverError": "واجه الخادم مشكلة. @:errors.contactProvider",
+    "unauthorized": "يفتقر الطلب إلى بيانات الاعتماد، مثل رمز API. يرجى تقديم بيانات الاعتماد والمحاولة مرة أخرى."
   },
-  "featureExperimental": "This feature is still experimental and may give unexpected results!",
+  "featureExperimental": "هذه الميزة لا تزال تجريبية وقد تعطي نتائج غير متوقعة!",
   "fullscreen": {
-    "exit": "Exit Fullscreen",
-    "show": "View Fullscreen"
+    "exit": "الخروج من وضع ملء الشاشة",
+    "show": "عرض بملء الشاشة"
   },
   "goBack": {
-    "description": "Go back to the {type}",
-    "label": "Back"
+    "description": "العودة إلى {type}",
+    "label": "رجوع"
   },
   "goToCollection": {
-    "description": "Go to the associated collection",
+    "description": "الانتقال إلى المجموعة المرتبطة",
     "descriptionWithTitle": "@:goToCollection.description: {title}",
-    "label": "Collection"
+    "label": "مجموعة"
   },
   "goToParent": {
-    "description": "Go to parent",
+    "description": "الانتقال إلى الأصل",
     "descriptionWithTitle": "@:goToParent.description: {title}",
-    "label": "Up"
+    "label": "أعلى"
   },
-  "in": "in {catalog}",
+  "in": "في {catalog}",
   "index": {
-    "api": "API",
-    "catalog": "Catalog",
+    "api": "واجهة برمجة التطبيقات",
+    "catalog": "الكتالوج",
     "load": "تحميل",
-    "selectStacIndex": "... or select one from {stacIndex}:",
-    "specifyCatalog": "Please specify a STAC Catalog or API...",
-    "urlInvalid": "The URL is invalid.",
-    "urlMissingHost": "The URL is missing a host.",
-    "urlMissingProtocol": "The URL is missing a protocol."
+    "selectStacIndex": "... أو اختر واحدًا من {stacIndex}:",
+    "specifyCatalog": "يرجى تحديد كتالوج STAC أو API...",
+    "urlInvalid": "عنوان URL غير صالح.",
+    "urlMissingHost": "عنوان URL يفتقد إلى المضيف.",
+    "urlMissingProtocol": "عنوان URL يفتقد إلى البروتوكول."
   },
   "items": {
-    "filter": "Filters",
-    "hideFilter": "Hide Filters",
-    "noTime": "No time given",
-    "noneAvailableForCollection": "No items available for this collection.",
-    "showFilter": "Show Filters"
+    "filter": "عوامل التصفية",
+    "hideFilter": "إخفاء عوامل التصفية",
+    "noTime": "لم يتم تحديد وقت",
+    "noneAvailableForCollection": "لا توجد عناصر متاحة لهذه المجموعة.",
+    "showFilter": "إظهار عوامل التصفية"
   },
   "leaflet": {
-    "close": "Close",
-    "noFeatureProperties": "No additional data available for this feature.",
+    "close": "إغلاق",
+    "noFeatureProperties": "لا توجد بيانات إضافية متاحة لهذه الميزة.",
     "stayLayer": {
-      "error": "Sorry, adding the data to the map failed."
+      "error": "عذرًا، فشل إضافة البيانات إلى الخريطة."
     },
     "zoom": {
       "in": {
-        "description": "Zoom in",
+        "description": "تكبير",
         "label": "+"
       },
       "out": {
-        "description": "Zoom out",
+        "description": "تصغير",
         "label": "-"
       }
     }
   },
-  "loading": "Loading...",
-  "map": "Map",
-  "messageForSchemaError": "{message}, for schema {schemaPath}",
+  "loading": "جارٍ التحميل...",
+  "map": "الخريطة",
+  "messageForSchemaError": "{message}، للمخطط {schemaPath}",
   "metadata": {
-    "general": "General",
-    "title": "Metadata"
+    "general": "عام",
+    "title": "البيانات الوصفية"
   },
   "multiselect": {
-    "andMore": "and {count} more",
-    "deselectLabel": "Press enter to remove",
-    "keywordsPlaceholder": "Select keywords",
-    "placeholder": "Select option",
-    "selectLabel": "Press enter to select",
-    "selectedLabel": "Selected"
+    "andMore": "و {count} المزيد",
+    "deselectLabel": "اضغط على Enter للإزالة",
+    "keywordsPlaceholder": "اختر الكلمات المفتاحية",
+    "placeholder": "اختر خيارًا",
+    "selectLabel": "اضغط على Enter للاختيار",
+    "selectedLabel": "تم الاختيار"
   },
   "open": "Open",
   "pagination": {
