@@ -199,178 +199,178 @@
     }
   },
   "providers": {
-    "email": "Send e-mail",
-    "homepage": "Go to homepage",
+    "email": "إرسال بريد إلكتروني",
+    "homepage": "الانتقال إلى الصفحة الرئيسية",
     "role": {
-      "host": "Host",
-      "licensor": "Licensor",
-      "processor": "Processor",
-      "producer": "Producer"
+      "host": "المضيف",
+      "licensor": "المرخّص",
+      "processor": "المعالج",
+      "producer": "المنتج"
     },
-    "title": "Provider | Providers"
+    "title": "المزود | المزودون"
   },
   "read": {
-    "less": "Read less",
-    "more": "Read more"
+    "less": "قراءة أقل",
+    "more": "قراءة المزيد"
   },
-  "reset": "Reset",
+  "reset": "إعادة تعيين",
   "search": {
-    "addCollections": "Press enter to add a collection",
-    "addFilter": "Add filter",
-    "addItemIds": "Press enter to add an Item ID",
-    "addSearchTerm": "Press enter to add a search term",
-    "additionalFilters": "Additional filters",
-    "dateDescription": "All times in Coordinated Universal Time (UTC).",
-    "enterCollections": "Enter one or more Collection IDs...",
-    "enterItemIds": "Enter one or more Item IDs...",
-    "enterSearchTerms": "Enter one or more search terms...",
-    "equalTo": "equal to",
-    "filterBySpatialExtent": "Filter by spatial extent",
-    "filterCollection": "Filter Collection",
-    "freeText": "Search Terms",
-    "freeTextDescription": "Search for at least one of the given terms in fields such as the title and the description.",
-    "greaterThan": "greater than",
-    "greaterThanEqual": "greater than or equal to",
-    "itemIds": "Item IDs",
-    "itemsPerPage": "Items per page",
-    "itemsPerPageDescription": "Number of items requested per page, max. {maxItems} items.",
-    "lessThan": "less than",
-    "lessThanEqual": "less than or equal to",
-    "likeOperatorDescription": "You can use wildcard characters. `_` matches a single character, `%` matches any number of characters. To search for a wildcard character specifically, you need to add a `\\` in front of the character.",
+    "addCollections": "اضغط على Enter لإضافة مجموعة",
+    "addFilter": "إضافة فلتر",
+    "addItemIds": "اضغط على Enter لإضافة معرّف عنصر",
+    "addSearchTerm": "اضغط على Enter لإضافة مصطلح بحث",
+    "additionalFilters": "فلاتر إضافية",
+    "dateDescription": "جميع الأوقات بتوقيت UTC (التوقيت العالمي المنسق).",
+    "enterCollections": "أدخل معرّف مجموعة واحد أو أكثر...",
+    "enterItemIds": "أدخل معرّف عنصر واحد أو أكثر...",
+    "enterSearchTerms": "أدخل مصطلح بحث واحد أو أكثر...",
+    "equalTo": "يساوي",
+    "filterBySpatialExtent": "التصفية حسب النطاق المكاني",
+    "filterCollection": "تصفية المجموعة",
+    "freeText": "مصطلحات البحث",
+    "freeTextDescription": "ابحث عن واحد على الأقل من المصطلحات المحددة في الحقول مثل العنوان والوصف.",
+    "greaterThan": "أكبر من",
+    "greaterThanEqual": "أكبر من أو يساوي",
+    "itemIds": "معرّفات العناصر",
+    "itemsPerPage": "عناصر لكل صفحة",
+    "itemsPerPageDescription": "عدد العناصر المطلوبة لكل صفحة، الحد الأقصى {maxItems} عنصر.",
+    "lessThan": "أقل من",
+    "lessThanEqual": "أقل من أو يساوي",
+    "likeOperatorDescription": "يمكنك استخدام أحرف البدل. `_` يطابق حرفًا واحدًا، `%` يطابق أي عدد من الأحرف. للبحث عن حرف بدل محدد، تحتاج إلى إضافة `\\` قبله.",
     "logical": {
-      "and": "Match all filters (and)",
-      "or": "Match any filters (or)"
+      "and": "مطابقة جميع الفلاتر (و)",
+      "or": "مطابقة أي فلتر (أو)"
     },
-    "matches": "matches",
-    "metaDescription": "Search through the data offering of {title}.",
-    "modifyCriteria": "Please modify the search criteria.",
-    "noFurtherItemsFound": "No further items available.",
-    "noItemsFound": "No items found for the given filters.",
-    "noOptions": "Nothing entered yet",
-    "notEqualTo": "not equal to",
-    "notFullySupported": "Not all of the options may be supported.",
-    "notSupported": "Item Search is not supported by the API.",
-    "placeholder": "Search...",
-    "selectCollections": "Select one or multiple collections...",
-    "selectForItemSearch": "Select for Item Search",
+    "matches": "يطابق",
+    "metaDescription": "البحث في البيانات المتاحة في {title}.",
+    "modifyCriteria": "يرجى تعديل معايير البحث.",
+    "noFurtherItemsFound": "لا توجد عناصر إضافية متاحة.",
+    "noItemsFound": "لم يتم العثور على عناصر للفلاتر المحددة.",
+    "noOptions": "لم يتم إدخال أي شيء بعد",
+    "notEqualTo": "لا يساوي",
+    "notFullySupported": "قد لا تكون جميع الخيارات مدعومة.",
+    "notSupported": "بحث العناصر غير مدعوم من قبل API.",
+    "placeholder": "بحث...",
+    "selectCollections": "حدد مجموعة واحدة أو أكثر...",
+    "selectForItemSearch": "حدد للبحث عن عنصر",
     "sortOptions": {
-      "datetime": "Date and Time",
-      "id": "ID",
-      "title": "Title"
+      "datetime": "التاريخ والوقت",
+      "id": "المعرّف",
+      "title": "العنوان"
     },
-    "spatialExtent": "Spatial Extent",
+    "spatialExtent": "النطاق المكاني",
     "tabs": {
-      "collections": "Search for Collections",
-      "items": "Search for Items"
+      "collections": "البحث عن المجموعات",
+      "items": "البحث عن العناصر"
     },
-    "temporalExtent": "Temporal Extent",
-    "title": "Search",
-    "useInItemSearch": "Open Collection in Item Search | Open {count} Collections in Item Search"
+      "temporalExtent": "النطاق الزمني",
+      "title": "بحث",
+      "useInItemSearch": "فتح المجموعة في بحث العناصر | فتح {count} مجموعات في بحث العناصر",
   },
-  "showMore": "Show more...",
-  "sidebar": {
-    "switchCatalog": "Switch Catalog"
-  },
-  "sort": {
-    "asc": {
-      "label": "Ascending",
-      "title": "Sort in ascending order (A-Z)"
-    },
-    "desc": {
-      "label": "Descending",
-      "title": "Sort in descending order (Z-A)"
-    },
-    "title": "Sort"
-  },
-  "source": {
-    "conformanceClasses": "Conformance Classes",
-    "detailsAboutSource": "Details about the STAC source",
-    "extension": "Extension",
-    "fileFormat": "File Format",
-    "id": "ID",
-    "invalid": "Invalid",
-    "label": "Source",
-    "language": {
-      "label": "Language: {currentLanguage}",
-      "onlyData": "Only the data is available in this language!",
-      "onlyUI": "Only the user interface is available in this language!",
-      "switch": "Switch the language"
-    },
-    "locatedAt": "The STAC metadata file is located at:",
-    "share": {
-      "bsky": "Bluesky",
-      "email": "E-mail",
-      "label": "Share",
-      "mastodon": "Mastodon.social",
-      "message": "{title} is available at {url}",
-      "sharePageWithOthers": "Share the URL of this page anywhere you like:",
-      "title": "Share",
-      "x": "X (Twitter)",
-      "withOthers": "Share this page with others"
-    },
-    "stacExtension": "STAC Extension",
-    "stacVersion": "STAC Version",
-    "statistics": "Statistics",
-    "title": "Source Data",
-    "valid": "Valid",
-    "validating": "Validating...",
-    "validationNA": "n/a",
-    "validationParams": {
-      "additionalProperty": "additional property",
-      "allowedValue": "allowed value",
-      "allowedValues": "allowed values",
-      "comparison": "comparison",
-      "depsCount": "count",
-      "exclusive": "excluding the boundary",
-      "failingKeyword": "failing keyword",
-      "format": "format",
-      "i": "first item",
-      "j": "second item",
-      "limit": "limit",
-      "maxContains": "contains at most",
-      "minContains": "contains at least",
-      "missingProperty": "missing property",
-      "multipleOf": "multiple of",
-      "passingSchemas": "passing schemas",
-      "pattern": "pattern",
-      "property": "property",
-      "propertyName": "property name",
-      "type": "type"
-    },
-    "validationReport": {
-      "disclaimer": "The validation report is generated based on schemas, which often are not exhaustive. As such they may not cover all aspects of the STAC specification and its extensions. The validation report is not a guarantee that the STAC entity is fully compliant with the specification and its extensions.",
-      "result": "Result",
-      "title": "Validation Report"
-    }
-  },
-  "stacAssets": "Asset | Assets",
-  "stacCatalog": "Catalog | Catalogs",
-  "stacCollection": "Collection | Collections",
-  "stacItem": "Item | Items",
-  "submit": "Submit",
-  "table": {
-    "emptyFilteredText": "There are no records matching your request",
-    "emptyText": "There are no records to show",
-    "sort": {
-      "asc": "Click to sort ascending",
-      "clear": "Click to clear sorting",
-      "desc": "Click to sort descending"
-    }
-  },
-  "thumbnails": "Thumbnails",
-  "tree": {
-    "moreCollectionPagesAvailable": "more pages available for Collection",
-    "noChildren": "No children available."
-  },
-  "view": {
-    "list": {
-      "label": "List",
-      "title": "Show as list"
-    },
-    "tiles": {
-      "label": "Tiles",
-      "title": "Show as tiles"
-    },
-    "title": "Display Options"
+      "showMore": "عرض المزيد...",
+      "sidebar": {
+        "switchCatalog": "تبديل الكتالوج"
+      },
+      "sort": {
+        "asc": {
+          "label": "تصاعدي",
+          "title": "فرز بترتيب تصاعدي (أ-ي)"
+        },
+        "desc": {
+          "label": "تنازلي",
+          "title": "فرز بترتيب تنازلي (ي-أ)"
+        },
+        "title": "فرز"
+      },
+      "source": {
+        "conformanceClasses": "فئات الامتثال",
+        "detailsAboutSource": "تفاصيل حول مصدر STAC",
+        "extension": "امتداد",
+        "fileFormat": "تنسيق الملف",
+        "id": "المعرّف",
+        "invalid": "غير صالح",
+        "label": "المصدر",
+        "language": {
+          "label": "اللغة: {currentLanguage}",
+          "onlyData": "البيانات فقط متاحة بهذه اللغة!",
+          "onlyUI": "واجهة المستخدم فقط متاحة بهذه اللغة!",
+          "switch": "تغيير اللغة"
+        },
+        "locatedAt": "تم العثور على ملف بيانات STAC في:",
+        "share": {
+          "bsky": "Bluesky",
+          "email": "البريد الإلكتروني",
+          "label": "مشاركة",
+          "mastodon": "Mastodon.social",
+          "message": "{title} متاح على {url}",
+          "sharePageWithOthers": "مشاركة رابط هذه الصفحة في أي مكان تريده:",
+          "title": "مشاركة",
+          "x": "إكس (تويتر)",
+          "withOthers": "مشاركة هذه الصفحة مع الآخرين"
+        },
+        "stacExtension": "امتداد STAC",
+        "stacVersion": "إصدار STAC",
+        "statistics": "الإحصائيات",
+        "title": "بيانات المصدر",
+        "valid": "صالح",
+        "validating": "جارٍ التحقق...",
+        "validationNA": "غير متاح",
+        "validationParams": {
+          "additionalProperty": "خاصية إضافية",
+          "allowedValue": "القيمة المسموحة",
+          "allowedValues": "القيم المسموحة",
+          "comparison": "المقارنة",
+          "depsCount": "العدد",
+          "exclusive": "باستثناء الحد",
+          "failingKeyword": "الكلمة المفتاحية الفاشلة",
+          "format": "التنسيق",
+          "i": "العنصر الأول",
+          "j": "العنصر الثاني",
+          "limit": "الحد",
+          "maxContains": "يحتوي على الأكثر",
+          "minContains": "يحتوي على الأقل",
+          "missingProperty": "خاصية مفقودة",
+          "multipleOf": "مضاعف لـ",
+          "passingSchemas": "المخططات الناجحة",
+          "pattern": "النمط",
+          "property": "الخاصية",
+          "propertyName": "اسم الخاصية",
+          "type": "النوع"
+        },
+        "validationReport": {
+          "disclaimer": "يتم إنشاء تقرير التحقق استنادًا إلى المخططات، التي غالبًا لا تكون شاملة. لذلك قد لا تغطي جميع جوانب مواصفات STAC وامتداداتها. تقرير التحقق ليس ضمانًا بأن كيان STAC متوافق بالكامل مع المواصفات وامتداداتها.",
+          "result": "النتيجة",
+          "title": "تقرير التحقق"
+        }
+      },
+      "stacAssets": "أصل | الأصول",
+      "stacCatalog": "كتالوج | كتالوجات",
+      "stacCollection": "مجموعة | مجموعات",
+      "stacItem": "عنصر | عناصر",
+      "submit": "إرسال",
+      "table": {
+        "emptyFilteredText": "لا توجد سجلات تطابق طلبك",
+        "emptyText": "لا توجد سجلات لعرضها",
+        "sort": {
+          "asc": "انقر للفرز تصاعديًا",
+          "clear": "انقر لمسح الفرز",
+          "desc": "انقر للفرز تنازليًا"
+        }
+      },
+      "thumbnails": "الصور المصغرة",
+      "tree": {
+        "moreCollectionPagesAvailable": "مزيد من الصفحات المتاحة للمجموعة",
+        "noChildren": "لا توجد عناصر فرعية متاحة."
+      },
+      "view": {
+        "list": {
+          "label": "قائمة",
+          "title": "عرض كقائمة"
+        },
+        "tiles": {
+          "label": "مربعات",
+          "title": "عرض كمربعات"
+        },
+        "title": "خيارات العرض"
   }
 }
