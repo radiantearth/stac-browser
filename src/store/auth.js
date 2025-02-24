@@ -92,7 +92,7 @@ export default function getStore(router) {
         }
         cx.commit('setInProgress');
         try {
-          await cx.getters.method.login();
+          await cx.getters.method.login(window.location.pathname);
         } catch(error) {
           handleAuthError(cx, error);
         }

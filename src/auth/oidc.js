@@ -24,8 +24,9 @@ export default class OIDC extends Auth {
     this.browserStorage = new BrowserStorage();
   }
 
-  setOriginalUri() {
-    this.browserStorage.set('oidc-original-uri', '/');
+  setOriginalUri(redirectUrl) {
+    redirectUrl = (redirectUrl=='/auth/logout' || redirectUrl ==undefined) ? '/' : redirectUrl;
+    this.browserStorage.set('oidc-original-uri', redirectUrl);
   }
 
   restoreOriginalUri() {
@@ -46,8 +47,8 @@ export default class OIDC extends Auth {
     await this.manager.clearStaleState();
   }
 
-  async login() {
-    this.setOriginalUri();
+  async login(redirectUrl) {
+    this.setOriginalUri(redirectUrl);
     await this.manager.signinRedirect();
     return null;
   }
