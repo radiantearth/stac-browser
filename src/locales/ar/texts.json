@@ -41,12 +41,12 @@
     "password": "كلمة المرور",
     "required": "المصادقة مطلوبة",
     "schemeTypes": {
-      "http": "",
-      "s3": "",
+      "http": "HTTP {scheme}",
+      "s3": "S3",
       "signedUrl": "عنوان URL موقّع",
-      "oauth2": "",
+      "oauth2": "OAuth 2",
       "apiKey": "مفتاح API",
-      "openIdConnect": ""
+      "openIdConnect": "OpenID Connect"
     },
     "title": "المصادقة",
     "unauthorized": "ليس لديك إذن للوصول إلى هذه البيانات. يرجى تسجيل الدخول.",
@@ -121,12 +121,12 @@
   },
   "goToCollection": {
     "description": "الانتقال إلى المجموعة المرتبطة",
-    "descriptionWithTitle": "",
+    "descriptionWithTitle": "@:goToCollection.description: {title}",
     "label": "مجموعة"
   },
   "goToParent": {
     "description": "الانتقال إلى الأصل",
-    "descriptionWithTitle": "",
+    "descriptionWithTitle": "@:goToParent.description: {title}",
     "label": "أعلى"
   },
   "in": "في {catalog}",
@@ -156,11 +156,11 @@
     "zoom": {
       "in": {
         "description": "تكبير",
-        "label": ""
+        "label": "+"
       },
       "out": {
         "description": "تصغير",
-        "label": ""
+        "label": "-"
       }
     }
   },
@@ -195,7 +195,7 @@
     "oss": "علي بابا كلاود",
     "s3": {
       "amazonaws.com": "أمازون S3",
-      "default": ""
+      "default": "S3"
     }
   },
   "providers": {
@@ -298,10 +298,10 @@
     },
     "locatedAt": "تم العثور على ملف بيانات STAC في:",
     "share": {
-      "bsky": "",
+      "bsky": "Bluesky",
       "email": "البريد الإلكتروني",
       "label": "مشاركة",
-      "mastodon": "",
+      "mastodon": "Mastodon.social",
       "message": "{title} متاح على {url}",
       "sharePageWithOthers": "مشاركة رابط هذه الصفحة في أي مكان تريده:",
       "title": "مشاركة",
