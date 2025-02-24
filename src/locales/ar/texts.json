@@ -1,376 +1,376 @@
 {
   "actions": {
-    "openIn": ""
+    "openIn": "افتح في {service}"
   },
-  "additionalActions": "",
-  "additionalResources": "",
+  "additionalActions": " افعال إضافية",
+  "additionalResources": "مصادر إضافية ",
   "anonymized": {
-    "title": ""
+    "title": "مجهول"
   },
   "assets": {
     "alternate": {
-      "main": ""
+      "main": "المفضل"
     },
     "copyUrl": {
-      "generic": "",
-      "withSource": ""
+      "generic": "إنسخ الرابط ",
+      "withSource": "إنسخ الرابط ل {source}"
     },
-    "currentlyShown": "",
+    "currentlyShown": "هذا هو الأصل الذي يظهر حاليًا.",
     "download": {
-      "generic": "",
-      "withSource": ""
+      "generic": "تحميل",
+      "withSource": " تحميل من {source}"
     },
-    "inItems": "",
+    "inItems": "الأصول في العناصر | الأصول في العناصر",
     "role": {
-      "data": "",
-      "metadata": ""
+      "data": "البيانات",
+      "metadata": "البيانات الوصفية"
     },
-    "showOnMap": "",
-    "showThumbnail": "",
-    "shown": ""
+    "showOnMap": "عرض على الخريطة",
+    "showThumbnail": "إظهار الصورة المصغرة",
+    "shown": "عرض"
   },
   "authentication": {
     "button": {
-      "login": "",
-      "logout": "",
-      "title": ""
+      "login": "تسجيل الدخول ",
+      "logout": "تسجيل الخروج ",
+      "title": "تقديم أو تحديث بيانات الاعتماد الخاصة بك"
     },
-    "chooseMethod": "",
-    "description": "",
-    "loggedOut": "",
-    "password": "",
-    "required": "",
+    "chooseMethod": "اختر طريقة المصادقة",
+    "description": "الصفحة المطلوبة تتطلب المصادقة. يرجى إدخال تفاصيل المصادقة في الحقل أدناه.",
+    "loggedOut": "تم تسجيل خروجك بنجاح. يمكنك إغلاق هذه النافذة الآن.",
+    "password": "كلمة المرور",
+    "required": "المصادقة مطلوبة",
     "schemeTypes": {
       "http": "",
       "s3": "",
-      "signedUrl": "",
+      "signedUrl": "عنوان URL موقّع",
       "oauth2": "",
-      "apiKey": "",
+      "apiKey": "مفتاح API",
       "openIdConnect": ""
     },
-    "title": "",
-    "unauthorized": "",
-    "unsupported": "",
-    "unsupportedLong": "",
-    "user": ""
+    "title": "المصادقة",
+    "unauthorized": "ليس لديك إذن للوصول إلى هذه البيانات. يرجى تسجيل الدخول.",
+    "unsupported": "غير مدعوم",
+    "unsupportedLong": "عذرًا، طريقة المصادقة {method} غير مدعومة بواسطة STAC Browser.",
+    "user": "المستخدم"
   },
-  "browse": "",
-  "cancel": "",
+  "browse": "تصفح",
+  "cancel": "إلغاء",
   "catalog": {
-    "license": "",
-    "temporalExtent": ""
+    "license": "الترخيص",
+    "temporalExtent": "النطاق الزمني"
   },
   "catalogs": {
-    "filterByTitle": "",
-    "filterByTitleAndMore": "",
-    "loadMore": "",
-    "noMatches": ""
+    "filterByTitle": "تصفية الكتالوجات حسب العنوان",
+    "filterByTitleAndMore": "تصفية الكتالوجات حسب العنوان أو الوصف أو الكلمات المفتاحية",
+    "loadMore": "تحميل المزيد...",
+    "noMatches": "لا توجد كتالوجات تطابق معايير البحث المحددة."
   },
   "checkbox": {
-    "false": "",
-    "true": ""
+    "false": "لا",
+    "true": "نعم"
   },
-  "copy": "",
-  "default": "",
-  "defaultWithValue": "",
-  "deprecated": "",
+  "copy": "نسخ",
+  "default": "افتراضي",
+  "defaultWithValue": "افتراضي ({value})",
+  "deprecated": "مهمل",
   "deprecation": {
-    "fallbackTitle": "",
-    "latestVersion": "",
-    "otherVersionsNotice": "",
-    "otherVersionsTitle": "",
-    "outdatedTitle": "",
-    "predecessorVersion": "",
-    "successorVersion": "",
-    "warning": ""
+    "fallbackTitle": "عرض",
+    "latestVersion": "أحدث إصدار:",
+    "otherVersionsNotice": "هذا {type} *غير* مهمل، ولكن هناك إصدارات أخرى متاحة:",
+    "otherVersionsTitle": "إصدارات أخرى متاحة",
+    "outdatedTitle": "قديم",
+    "predecessorVersion": "الإصدار السابق:",
+    "successorVersion": "الإصدار التالي:",
+    "warning": "يرجى ملاحظة أن {type} هذا مهمل وقد يتم إزالته في أي وقت. يجب التوقف عن استخدامه في أقرب وقت ممكن. يُفضل عدم استخدامه في المشاريع الجديدة."
   },
-  "description": "",
+  "description": "الوصف",
   "errors": {
-    "authFailed": "",
-    "badRequest": "",
-    "contactProvider": "",
-    "default": "",
-    "forbidden": "",
-    "invalidJsonObject": "",
-    "invalidStacCollections": "",
-    "invalidStacItems": "",
+    "authFailed": "حدث خطأ في الطلب، قد تكون بيانات المصادقة المقدمة غير صحيحة.",
+    "badRequest": "الطلب غير صالح. قد يكون ذلك بسبب معلمات غير صحيحة، مثل طلب بحث غير صحيح، أو قد يكون خطأ في STAC Browser.",
+    "contactProvider": "يرجى التواصل مع مشغل الخدمة لحل هذه المشكلة.",
+    "default": "تعذر تحميل الصفحة المطلوبة.",
+    "forbidden": "بيانات الاعتماد المحددة لهذا الطلب غير صالحة، مثل رمز API منتهي الصلاحية أو غير صحيح. يرجى تقديم بيانات اعتماد أخرى والمحاولة مرة أخرى.",
+    "invalidJsonObject": "الاستجابة ليست كائن JSON صالحًا.",
+    "invalidStacCollections": "استجابة API ليست قائمة صالحة من مجموعات STAC.",
+    "invalidStacItems": "استجابة API ليست قائمة صالحة من عناصر STAC.",
     "labels": {
-      "cause": "",
-      "code": "",
-      "reason": "",
-      "requestURL": ""
+      "cause": "السبب:",
+      "code": "رمز الخطأ:",
+      "reason": "السبب:",
+      "requestURL": "عنوان URL للطلب:"
     },
-    "loadApiCollectionsFailed": "",
-    "loadApiItemsFailed": "",
-    "loadFilteredItems": "",
-    "loadItems": "",
-    "networkError": "",
-    "noExternalAccess": "",
-    "notFound": "",
-    "serverError": "",
-    "unauthorized": ""
+    "loadApiCollectionsFailed": "تعذر تحميل مجموعات API.",
+    "loadApiItemsFailed": "تعذر تحميل عناصر API.",
+    "loadFilteredItems": "عذرًا، فشل تحميل قائمة العناصر المصفاة.",
+    "loadItems": "عذرًا، فشل تحميل قائمة عناصر STAC.",
+    "networkError": "قد تحدث هذه المشكلة عندما لا تسمح الخوادم بالوصول الخارجي عبر متصفحات الويب (مثل عدم وجود رؤوس CORS). @:errors.contactProvider",
+    "noExternalAccess": "الوصول إلى الكتالوجات الخارجية غير مسموح!",
+    "notFound": "المورد المطلوب غير موجود. @:errors.contactProvider",
+    "serverError": "واجه الخادم مشكلة. @:errors.contactProvider",
+    "unauthorized": "يفتقر الطلب إلى بيانات الاعتماد، مثل رمز API. يرجى تقديم بيانات الاعتماد والمحاولة مرة أخرى."
   },
-  "featureExperimental": "",
+  "featureExperimental": "هذه الميزة لا تزال تجريبية وقد تعطي نتائج غير متوقعة!",
   "fullscreen": {
-    "exit": "",
-    "show": ""
+    "exit": "الخروج من وضع ملء الشاشة",
+    "show": "عرض بملء الشاشة"
   },
   "goBack": {
-    "description": "",
-    "label": ""
+    "description": "العودة إلى {type}",
+    "label": "رجوع"
   },
   "goToCollection": {
-    "description": "",
+    "description": "الانتقال إلى المجموعة المرتبطة",
     "descriptionWithTitle": "",
-    "label": ""
+    "label": "مجموعة"
   },
   "goToParent": {
-    "description": "",
+    "description": "الانتقال إلى الأصل",
     "descriptionWithTitle": "",
-    "label": ""
+    "label": "أعلى"
   },
-  "in": "",
+  "in": "في {catalog}",
   "index": {
-    "api": "",
-    "catalog": "",
-    "load": "",
-    "selectStacIndex": "",
-    "specifyCatalog": "",
-    "urlInvalid": "",
-    "urlMissingHost": "",
-    "urlMissingProtocol": ""
+    "api": "واجهة برمجة التطبيقات",
+    "catalog": "الكتالوج",
+    "load": "تحميل",
+    "selectStacIndex": "... أو اختر واحدًا من {stacIndex}:",
+    "specifyCatalog": "يرجى تحديد كتالوج STAC أو API...",
+    "urlInvalid": "عنوان URL غير صالح.",
+    "urlMissingHost": "عنوان URL يفتقد إلى المضيف.",
+    "urlMissingProtocol": "عنوان URL يفتقد إلى البروتوكول."
   },
   "items": {
-    "filter": "",
-    "hideFilter": "",
-    "noTime": "",
-    "noneAvailableForCollection": "",
-    "showFilter": ""
+    "filter": "عوامل التصفية",
+    "hideFilter": "إخفاء عوامل التصفية",
+    "noTime": "لم يتم تحديد وقت",
+    "noneAvailableForCollection": "لا توجد عناصر متاحة لهذه المجموعة.",
+    "showFilter": "إظهار عوامل التصفية"
   },
   "leaflet": {
-    "close": "",
-    "noFeatureProperties": "",
+    "close": "إغلاق",
+    "noFeatureProperties": "لا توجد بيانات إضافية متاحة لهذه الميزة.",
     "stayLayer": {
-      "error": ""
+      "error": "عذرًا، فشل إضافة البيانات إلى الخريطة."
     },
     "zoom": {
       "in": {
-        "description": "",
+        "description": "تكبير",
         "label": ""
       },
       "out": {
-        "description": "",
+        "description": "تصغير",
         "label": ""
       }
     }
   },
-  "loading": "",
-  "map": "",
-  "messageForSchemaError": "",
+  "loading": "جارٍ التحميل...",
+  "map": "الخريطة",
+  "messageForSchemaError": "{message}، للمخطط {schemaPath}",
   "metadata": {
-    "general": "",
-    "title": ""
+    "general": "عام",
+    "title": "البيانات الوصفية"
   },
   "multiselect": {
-    "andMore": "",
-    "deselectLabel": "",
-    "keywordsPlaceholder": "",
-    "placeholder": "",
-    "selectLabel": "",
-    "selectedLabel": ""
+    "andMore": "و {count} المزيد",
+    "deselectLabel": "اضغط على Enter للإزالة",
+    "keywordsPlaceholder": "اختر الكلمات المفتاحية",
+    "placeholder": "اختر خيارًا",
+    "selectLabel": "اضغط على Enter للاختيار",
+    "selectedLabel": "تم الاختيار"
   },
-  "open": "",
+  "open": "فتح",
   "pagination": {
-    "first": "",
-    "last": "",
-    "next": "",
-    "previous": ""
+    "first": "« الأول",
+    "last": "الأخير »",
+    "next": "التالي ›",
+    "previous": "‹ السابق"
   },
-  "poweredBy": "",
+  "poweredBy": "مشغل بواسطة {link}",
   "protocol": {
-    "azure": "",
-    "file": "",
-    "ftp": "",
-    "gcs": "",
-    "oss": "",
+    "azure": "مايكروسوفت أزور",
+    "file": "نظام الملفات (محلي)",
+    "ftp": "بروتوكول نقل الملفات (FTP)",
+    "gcs": "جوجل كلاود",
+    "oss": "علي بابا كلاود",
     "s3": {
-      "amazonaws.com": "",
+      "amazonaws.com": "أمازون S3",
       "default": ""
     }
   },
   "providers": {
-    "email": "",
-    "homepage": "",
+    "email": "إرسال بريد إلكتروني",
+    "homepage": "الانتقال إلى الصفحة الرئيسية",
     "role": {
-      "host": "",
-      "licensor": "",
-      "processor": "",
-      "producer": ""
+      "host": "المضيف",
+      "licensor": "المرخّص",
+      "processor": "المعالج",
+      "producer": "المنتج"
     },
-    "title": ""
+    "title": "المزود | المزودون"
   },
   "read": {
-    "less": "",
-    "more": ""
+    "less": "قراءة أقل",
+    "more": "قراءة المزيد"
   },
-  "reset": "",
+  "reset": "إعادة تعيين",
   "search": {
-    "addCollections": "",
-    "addFilter": "",
-    "addItemIds": "",
-    "addSearchTerm": "",
-    "additionalFilters": "",
-    "dateDescription": "",
-    "enterCollections": "",
-    "enterItemIds": "",
-    "enterSearchTerms": "",
-    "equalTo": "",
-    "filterBySpatialExtent": "",
-    "filterCollection": "",
-    "freeText": "",
-    "freeTextDescription": "",
-    "greaterThan": "",
-    "greaterThanEqual": "",
-    "itemIds": "",
-    "itemsPerPage": "",
-    "itemsPerPageDescription": "",
-    "lessThan": "",
-    "lessThanEqual": "",
-    "likeOperatorDescription": "",
+    "addCollections": "اضغط على Enter لإضافة مجموعة",
+    "addFilter": "إضافة فلتر",
+    "addItemIds": "اضغط على Enter لإضافة معرّف عنصر",
+    "addSearchTerm": "اضغط على Enter لإضافة مصطلح بحث",
+    "additionalFilters": "فلاتر إضافية",
+    "dateDescription": "جميع الأوقات بتوقيت UTC (التوقيت العالمي المنسق).",
+    "enterCollections": "أدخل معرّف مجموعة واحد أو أكثر...",
+    "enterItemIds": "أدخل معرّف عنصر واحد أو أكثر...",
+    "enterSearchTerms": "أدخل مصطلح بحث واحد أو أكثر...",
+    "equalTo": "يساوي",
+    "filterBySpatialExtent": "التصفية حسب النطاق المكاني",
+    "filterCollection": "تصفية المجموعة",
+    "freeText": "مصطلحات البحث",
+    "freeTextDescription": "ابحث عن واحد على الأقل من المصطلحات المحددة في الحقول مثل العنوان والوصف.",
+    "greaterThan": "أكبر من",
+    "greaterThanEqual": "أكبر من أو يساوي",
+    "itemIds": "معرّفات العناصر",
+    "itemsPerPage": "عناصر لكل صفحة",
+    "itemsPerPageDescription": "عدد العناصر المطلوبة لكل صفحة، الحد الأقصى {maxItems} عنصر.",
+    "lessThan": "أقل من",
+    "lessThanEqual": "أقل من أو يساوي",
+    "likeOperatorDescription": "يمكنك استخدام أحرف البدل. `_` يطابق حرفًا واحدًا، `%` يطابق أي عدد من الأحرف. للبحث عن حرف بدل محدد، تحتاج إلى إضافة `\\` قبله.",
     "logical": {
-      "and": "",
-      "or": ""
+      "and": "مطابقة جميع الفلاتر (و)",
+      "or": "مطابقة أي فلتر (أو)"
     },
-    "matches": "",
-    "metaDescription": "",
-    "modifyCriteria": "",
-    "noFurtherItemsFound": "",
-    "noItemsFound": "",
-    "noOptions": "",
-    "notEqualTo": "",
-    "notFullySupported": "",
-    "notSupported": "",
-    "placeholder": "",
-    "selectCollections": "",
-    "selectForItemSearch": "",
+    "matches": "يطابق",
+    "metaDescription": "البحث في البيانات المتاحة في {title}.",
+    "modifyCriteria": "يرجى تعديل معايير البحث.",
+    "noFurtherItemsFound": "لا توجد عناصر إضافية متاحة.",
+    "noItemsFound": "لم يتم العثور على عناصر للفلاتر المحددة.",
+    "noOptions": "لم يتم إدخال أي شيء بعد",
+    "notEqualTo": "لا يساوي",
+    "notFullySupported": "قد لا تكون جميع الخيارات مدعومة.",
+    "notSupported": "بحث العناصر غير مدعوم من قبل API.",
+    "placeholder": "بحث...",
+    "selectCollections": "حدد مجموعة واحدة أو أكثر...",
+    "selectForItemSearch": "حدد للبحث عن عنصر",
     "sortOptions": {
-      "datetime": "",
-      "id": "",
-      "title": ""
+      "datetime": "التاريخ والوقت",
+      "id": "المعرّف",
+      "title": "العنوان"
     },
-    "spatialExtent": "",
+    "spatialExtent": "النطاق المكاني",
     "tabs": {
-      "collections": "",
-      "items": ""
+      "collections": "البحث عن المجموعات",
+      "items": "البحث عن العناصر"
     },
-    "temporalExtent": "",
-    "title": "",
-    "useInItemSearch": ""
+    "temporalExtent": "النطاق الزمني",
+    "title": "بحث",
+    "useInItemSearch": "فتح المجموعة في بحث العناصر | فتح {count} مجموعات في بحث العناصر"
   },
-  "showMore": "",
+  "showMore": "عرض المزيد...",
   "sidebar": {
-    "switchCatalog": ""
+    "switchCatalog": "تبديل الكتالوج"
   },
   "sort": {
     "asc": {
-      "label": "",
-      "title": ""
+      "label": "تصاعدي",
+      "title": "فرز بترتيب تصاعدي (أ-ي)"
     },
     "desc": {
-      "label": "",
-      "title": ""
+      "label": "تنازلي",
+      "title": "فرز بترتيب تنازلي (ي-أ)"
     },
-    "title": ""
+    "title": "فرز"
   },
   "source": {
-    "conformanceClasses": "",
-    "detailsAboutSource": "",
-    "extension": "",
-    "fileFormat": "",
-    "id": "",
-    "invalid": "",
-    "label": "",
+    "conformanceClasses": "فئات الامتثال",
+    "detailsAboutSource": "تفاصيل حول مصدر STAC",
+    "extension": "امتداد",
+    "fileFormat": "تنسيق الملف",
+    "id": "المعرّف",
+    "invalid": "غير صالح",
+    "label": "المصدر",
     "language": {
-      "label": "",
-      "onlyData": "",
-      "onlyUI": "",
-      "switch": ""
+      "label": "اللغة: {currentLanguage}",
+      "onlyData": "البيانات فقط متاحة بهذه اللغة!",
+      "onlyUI": "واجهة المستخدم فقط متاحة بهذه اللغة!",
+      "switch": "تغيير اللغة"
     },
-    "locatedAt": "",
+    "locatedAt": "تم العثور على ملف بيانات STAC في:",
     "share": {
       "bsky": "",
-      "email": "",
-      "label": "",
+      "email": "البريد الإلكتروني",
+      "label": "مشاركة",
       "mastodon": "",
-      "message": "",
-      "sharePageWithOthers": "",
-      "title": "",
-      "x": "",
-      "withOthers": ""
+      "message": "{title} متاح على {url}",
+      "sharePageWithOthers": "مشاركة رابط هذه الصفحة في أي مكان تريده:",
+      "title": "مشاركة",
+      "x": "إكس (تويتر)",
+      "withOthers": "مشاركة هذه الصفحة مع الآخرين"
     },
-    "stacExtension": "",
-    "stacVersion": "",
-    "statistics": "",
-    "title": "",
-    "valid": "",
-    "validating": "",
-    "validationNA": "",
+    "stacExtension": "امتداد STAC",
+    "stacVersion": "إصدار STAC",
+    "statistics": "الإحصائيات",
+    "title": "بيانات المصدر",
+    "valid": "صالح",
+    "validating": "جارٍ التحقق...",
+    "validationNA": "غير متاح",
     "validationParams": {
-      "additionalProperty": "",
-      "allowedValue": "",
-      "allowedValues": "",
-      "comparison": "",
-      "depsCount": "",
-      "exclusive": "",
-      "failingKeyword": "",
-      "format": "",
-      "i": "",
-      "j": "",
-      "limit": "",
-      "maxContains": "",
-      "minContains": "",
-      "missingProperty": "",
-      "multipleOf": "",
-      "passingSchemas": "",
-      "pattern": "",
-      "property": "",
-      "propertyName": "",
-      "type": ""
+      "additionalProperty": "خاصية إضافية",
+      "allowedValue": "القيمة المسموحة",
+      "allowedValues": "القيم المسموحة",
+      "comparison": "المقارنة",
+      "depsCount": "العدد",
+      "exclusive": "باستثناء الحد",
+      "failingKeyword": "الكلمة المفتاحية الفاشلة",
+      "format": "التنسيق",
+      "i": "العنصر الأول",
+      "j": "العنصر الثاني",
+      "limit": "الحد",
+      "maxContains": "يحتوي على الأكثر",
+      "minContains": "يحتوي على الأقل",
+      "missingProperty": "خاصية مفقودة",
+      "multipleOf": "مضاعف لـ",
+      "passingSchemas": "المخططات الناجحة",
+      "pattern": "النمط",
+      "property": "الخاصية",
+      "propertyName": "اسم الخاصية",
+      "type": "النوع"
     },
     "validationReport": {
-      "disclaimer": "",
-      "result": "",
-      "title": ""
+      "disclaimer": "يتم إنشاء تقرير التحقق استنادًا إلى المخططات، التي غالبًا لا تكون شاملة. لذلك قد لا تغطي جميع جوانب مواصفات STAC وامتداداتها. تقرير التحقق ليس ضمانًا بأن كيان STAC متوافق بالكامل مع المواصفات وامتداداتها.",
+      "result": "النتيجة",
+      "title": "تقرير التحقق"
     }
   },
-  "stacAssets": "",
-  "stacCatalog": "",
-  "stacCollection": "",
-  "stacItem": "",
-  "submit": "",
+  "stacAssets": "أصل | الأصول",
+  "stacCatalog": "كتالوج | كتالوجات",
+  "stacCollection": "مجموعة | مجموعات",
+  "stacItem": "عنصر | عناصر",
+  "submit": "إرسال",
   "table": {
-    "emptyFilteredText": "",
-    "emptyText": "",
+    "emptyFilteredText": "لا توجد سجلات تطابق طلبك",
+    "emptyText": "لا توجد سجلات لعرضها",
     "sort": {
-      "asc": "",
-      "clear": "",
-      "desc": ""
+      "asc": "انقر للفرز تصاعديًا",
+      "clear": "انقر لمسح الفرز",
+      "desc": "انقر للفرز تنازليًا"
     }
   },
-  "thumbnails": "",
+  "thumbnails": "الصور المصغرة",
   "tree": {
-    "moreCollectionPagesAvailable": "",
-    "noChildren": ""
+    "moreCollectionPagesAvailable": "مزيد من الصفحات المتاحة للمجموعة",
+    "noChildren": "لا توجد عناصر فرعية متاحة."
   },
   "view": {
     "list": {
-      "label": "",
-      "title": ""
+      "label": "قائمة",
+      "title": "عرض كقائمة"
     },
     "tiles": {
-      "label": "",
-      "title": ""
+      "label": "مربعات",
+      "title": "عرض كمربعات"
     },
-    "title": ""
+    "title": "خيارات العرض"
   }
 }
