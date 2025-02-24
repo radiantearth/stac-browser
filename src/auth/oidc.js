@@ -25,7 +25,7 @@ export default class OIDC extends Auth {
   }
 
   setOriginalUri() {
-    this.browserStorage.set('oidc-original-uri', this.router?.currentRoute?.fullPath || window.location.href);
+    this.browserStorage.set('oidc-original-uri', '/');
   }
 
   restoreOriginalUri() {
