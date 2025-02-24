@@ -123,6 +123,7 @@ You need to change the [`locale`](docs/options.md#locale) and [`supportedLocales
 
 The following languages are currently supported:
 
+- Arabic `ar`
 - German `de` (Germany `de`, Switzerland `de-CH`)
 - Spanish `es`
 - English `en` (International `en`, US `en-US`, UK `en-GB`)
@@ -143,6 +144,7 @@ The following contributors kindly provide the translations:
 - [@m-mohr](https://github.com/m-mohr): `de`, `en`, `en-GB`, `en-US`
 - [@p1d1d1](https://github.com/p1d1d1): `de-CH`, `fr-CH`, `it`, `it-CH`
 - [@psacra](https://github.com/psacra): `pt`
+- [@randa-11295](https://github.com/randa-11295): `ar`
 - [@rnanclares](https://github.com/rnanclares): `es`
 - [@uba](https://github.com/uba): `pt-BR`
 
