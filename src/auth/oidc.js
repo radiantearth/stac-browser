@@ -25,7 +25,7 @@ export default class OIDC extends Auth {
   }
 
   setOriginalUri(redirectUrl) {
-    redirectUrl = (redirectUrl=='/auth/logout' || redirectUrl ==undefined) ? '/' : redirectUrl;
+    redirectUrl = (redirectUrl=='auth/logout' || redirectUrl ==undefined) ? '/' : redirectUrl;
     this.browserStorage.set('oidc-original-uri', redirectUrl);
   }
 
