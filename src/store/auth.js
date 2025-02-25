@@ -2,6 +2,7 @@ import Auth from '../auth';
 import i18n from '../i18n';
 import AuthUtils from '../components/auth/utils';
 import BrowserStorage, { Cookies } from '../browser-store';
+import config from '../../config';
 
 const handleAuthError = async (cx, error) => {
   cx.commit('showGlobalError', {
@@ -92,7 +93,8 @@ export default function getStore(router) {
         }
         cx.commit('setInProgress');
         try {
-          await cx.getters.method.login(window.location.pathname);
+          await cx.getters.method.login(window.location.pathname.replace(config.pathPrefix, '') || '/');
+
         } catch(error) {
           handleAuthError(cx, error);
         }
