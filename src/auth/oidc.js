@@ -29,8 +29,11 @@ export default class OIDC extends Auth {
   }
 
   restoreOriginalUri() {
-    const originalUri = this.browserStorage.get('oidc-original-uri');
+    let originalUri = this.browserStorage.get('oidc-original-uri');
     if (this.router && originalUri) {
+      if (originalUri == '/auth/logout') {
+        originalUri = '/';
+      }
       this.router.replace(originalUri);
     }
     this.browserStorage.remove('oidc-original-uri');
