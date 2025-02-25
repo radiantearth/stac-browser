@@ -17,7 +17,7 @@ import HrefActions from './HrefActions.vue';
 import StacFieldsMixin from './StacFieldsMixin';
 import AuthUtils from './auth/utils';
 import Utils from '../utils';
-import STAC from '../models/stac';
+import { Asset, STAC } from 'stac-js';
 
 export default {
   name: 'AssetAlternative',
@@ -33,10 +33,6 @@ export default {
     asset: {
       type: Object,
       required: true
-    },
-    context: {
-      type: Object,
-      default: null
     },
     hasAlternatives: {
       type: Boolean,
@@ -74,10 +70,13 @@ export default {
   },
   computed: {
     ...mapState(['buildTileUrlTemplate', 'useTileLayerAsFallback']),
+    context() {
+      return this.asset.getContext();
+    },
     resolvedAsset() {
       if (Array.isArray(this.asset['storage:refs'])) {
         const storage = this.resolveStorage(this.asset, this.context);
-        const asset = Object.assign({}, this.asset);
+        const asset = new Asset(this.asset, this.asset.getKey(), this.context);
         asset['storage:schemes'] = storage;
         return asset;
       }
