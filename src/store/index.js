@@ -656,6 +656,10 @@ function getStore(config, router) {
 
         // Update stac-fields
         I18N.setLocales([uiLanguage, cx.state.fallbackLocale]);
+
+        // add rtl when user chose uiLanguage language
+       document.documentElement.setAttribute("dir", uiLanguage === "ar" ? "rtl" : "ltr");
+       console.log([uiLanguage, cx.state.fallbackLocale]);
         I18N.setTranslator(translateFields);
 
         // Execute other custom functions required to localize
