@@ -5,9 +5,11 @@
         id="select" :label="$t('index.specifyCatalog')" label-for="url"
         :invalid-feedback="error" :state="valid"
       >
-        <b-form-input id="url" type="url" :value="url" @input="setUrl" placeholder="https://..." />
+        <div class="form-action">
+          <b-form-input id="url" type="url" :value="url" @input="setUrl" placeholder="https://..." />
+          <b-button type="submit" variant="primary">{{ $t('index.load') }}</b-button>
+        </div>
       </b-form-group>
-      <b-button type="submit" variant="primary">{{ $t('index.load') }}</b-button>
     </b-form>
     <hr v-if="stacIndex.length > 0">
     <b-form-group v-if="stacIndex.length > 0" class="stac-index">
@@ -159,6 +161,11 @@ export default {
         }
       }
     }
+  }
+
+  .form-action {
+    display: flex;
+    gap: 10px;
   }
 }
 </style>
