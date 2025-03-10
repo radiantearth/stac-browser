@@ -1,49 +1,51 @@
 <template>
   <b-card no-body :class="classes" v-b-visible.400="load" :img-right="isList">
-    <div class="test" v-if="hasImage">
+    <div class="card-img-container" v-if="hasImage">
       <b-card-img-lazy class="thumbnail" offset="200" v-bind="thumbnail" />
     </div>
-    <b-card-body>
-      <b-card-title>
-        <StacLink :data="[data, catalog]" class="stretched-link" />
-      </b-card-title>
-      <b-card-text
-        v-if="
-          data &&
-          (fileFormats.length > 0 || data.description || data.deprecated)
-        "
-        class="intro"
-      >
-        <b-badge
-          v-if="data.deprecated"
-          variant="warning"
-          class="mr-1 mt-1 deprecated"
+    <div class="card-content">
+      <b-card-body>
+        <b-card-title>
+          <StacLink :data="[data, catalog]" class="stretched-link" />
+        </b-card-title>
+        <b-card-text
+          v-if="
+            data &&
+            (fileFormats.length > 0 || data.description || data.deprecated)
+          "
+          class="intro"
         >
-          {{ $t("deprecated") }}</b-badge
-        >
-        <b-badge
-          v-for="format in fileFormats"
-          :key="format"
-          variant="secondary"
-          class="mr-1 mt-1 fileformat"
-        >
-          {{ format | formatMediaType }}</b-badge
-        >
-        {{ data.description | summarize }}
-      </b-card-text>
-      <Keywords
-        v-if="showKeywordsInCatalogCards && keywords.length > 0"
-        :keywords="keywords"
-        variant="primary"
-        :center="!isList"
-      />
-      <b-card-text v-if="temporalExtent" class="datetime"
-        ><small v-html="temporalExtent"
-      /></b-card-text>
-    </b-card-body>
-    <b-card-footer>
-      <slot name="footer" :data="data" />
-    </b-card-footer>
+          <b-badge
+            v-if="data.deprecated"
+            variant="warning"
+            class="mr-1 mt-1 deprecated"
+          >
+            {{ $t("deprecated") }}</b-badge
+          >
+          <b-badge
+            v-for="format in fileFormats"
+            :key="format"
+            variant="secondary"
+            class="mr-1 mt-1 fileformat"
+          >
+            {{ format | formatMediaType }}</b-badge
+          >
+          {{ data.description | summarize }}
+        </b-card-text>
+        <Keywords
+          v-if="showKeywordsInCatalogCards && keywords.length > 0"
+          :keywords="keywords"
+          variant="primary"
+          :center="!isList"
+        />
+        <b-card-text v-if="temporalExtent" class="datetime"
+          ><small v-html="temporalExtent"
+        /></b-card-text>
+      </b-card-body>
+      <b-card-footer>
+        <slot name="footer" :data="data" />
+      </b-card-footer>
+    </div>
   </b-card>
 </template>
 
@@ -156,7 +158,7 @@ export default {
 
     .card-body,
     .card-footer {
-      // position: relative;
+      position: relative;
     }
     .card-footer:empty {
       display: none;
@@ -175,7 +177,6 @@ export default {
       overflow: hidden;
       overflow-wrap: anywhere;
       text-align: left;
-      background-color: greenyellow;
     }
 
     &.has-extent {
@@ -183,7 +184,7 @@ export default {
         margin-bottom: 0.5rem;
       }
     }
-        .datetime {
+    .datetime {
       color: map-get($theme-colors, "secondary");
     }
     .badge.deprecated {
@@ -195,54 +196,73 @@ export default {
       box-sizing: border-box;
       margin: 0.5em 0;
       display: flex;
-
-      .card-img-right {
-        min-height: 100px;
+      max-height: 170px;
+      overflow: hidden;
+      align-items: center;
+      .card-content {
+        width: 65%;
+        flex-grow: 1;
+      }
+      .card-img-container {
+        width: 35%;
         height: 100%;
-        max-height: 8.5rem;
-        max-width: 33%;
-        object-fit: contain;
-        object-position: right;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        .card-img-right {
+          width: auto;
+          height: auto;
+          max-width: 100%;
+          max-height: 100%;
+          object-position: center;
+        }
       }
       .card-footer {
-        min-width: 175px;
-        max-width: 175px;
+        width: 175px;
         border-top: 0;
       }
       .intro {
         -webkit-line-clamp: 2;
       }
     }
+
+    @media (min-width: 768px) {
+      .catalog-card {
+
+        .card-img-container {
+          width: 15%;
+        }
+
+        .card-content {
+          width: 85%;
+        }
+      }
+    }
   }
   .card-columns {
     .catalog-card {
       box-sizing: border-box;
-      margin-top: 0.5em 0;
       text-align: center;
 
-      // &.queued {
-      //   min-height: 10rem;
-      // }
-      .test {
-        background-color: rgb(204, 204, 204);
+      .card-img-container {
+        background-color: #fff;
         width: 100%;
         height: 220px;
-      }
-      .card-img {
-        width: 100%;
-        height: 100%;
-        background-color: rgb(0, 255, 21);
+        .card-img {
+          width: auto;
+          max-width: 100%;
+          height: 100%;
+        }
       }
 
       .card-body {
-        // position: relative;
-        background-color: rgb(241, 180, 180);
         height: 180px;
         display: flex;
         flex-direction: column;
         justify-content: space-evenly;
         text-align: start;
-        padding: 8px
+        padding: 8px;
       }
     }
   }
