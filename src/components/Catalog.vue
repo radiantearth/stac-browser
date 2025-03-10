@@ -38,9 +38,9 @@
           variant="primary"
           :center="!isList"
         />
-        <b-card-text v-if="temporalExtent" class="datetime"
-          ><small v-html="temporalExtent"
-        /></b-card-text>
+        <b-card-text v-if="temporalExtent" class="datetime">
+          <small v-html="temporalExtent" F />
+        </b-card-text>
       </b-card-body>
       <b-card-footer>
         <slot name="footer" :data="data" />
@@ -229,7 +229,6 @@ export default {
 
     @media (min-width: 768px) {
       .catalog-card {
-
         .card-img-container {
           width: 15%;
         }
