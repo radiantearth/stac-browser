@@ -46,7 +46,7 @@ export default {
       type: Object,
       default: null
     },
-    value: {
+    initExtent: {
       type: Array,
       default: null
     },
@@ -58,8 +58,8 @@ export default {
   data() {
     return {
       crs: 'EPSG:4326',
-      extent: this.value,
-      dragging: false
+      extent: this.initExtent,
+      dragging: true
     };
   },
   computed: {
