@@ -74,13 +74,13 @@ The default title shown if no title can be read from the root STAC catalog.
 ## allowExternalAccess
 
 This allows or disallows loading and browsing external STAC data.
-External STAC data is any data that is not a children of the given `catalogUrl`.
+External STAC data is any data that is not a child of the given `catalogUrl`.
 Must be set to `true` if a `catalogUrl` is not given as otherwise you won't be able to browse anything.
 
 ## allowedDomains
 
 You can list additional domains (e.g. `example.com`) that private data is sent to, e.g. authentication data.
-This applies to query paramaters and request headers.
+This applies to query parameters and request headers.
 
 ## apiCatalogPriority
 
@@ -209,7 +209,7 @@ The v3-dev option `tileSourceTemplate` has been removed in favor of this option.
 
 Depending on this option, either client-side or server-side rendering of imagery such as (cloud-optimized) GeoTiffs can be enabled/disabled.
 
-If `buildTileUrlTemplate` is given server-side rendering of GeoTiffs is enabled. 
+If `buildTileUrlTemplate` is given, server-side rendering of GeoTiffs is enabled. 
 If server-side rendering should only be used as a fallback for client-side rendering, enable the boolean `useTileLayerAsFallback` option.
 
 To clarify the behavior, please have a look at the following table:
@@ -226,13 +226,13 @@ By default, client-side rendering is enabled. A server-side fallback is provided
 ## displayGeoTiffByDefault
 
 If set to `true`, the map also shows non-cloud-optimized GeoTiff files by default. Otherwise (`false`, default), it only shows COGs and you can only enforce showing GeoTiffs to be loaded with the "Show on map" button but they are never loaded automatically.
-Loading non-cloud-optimized GeoTiffs only works reliably for smaller files (< 1MB). It may also work for larger files, but it is depending a lot on the underlying client hardware and software.
+Loading non-cloud-optimized GeoTiffs only works reliably for smaller files (< 1MB). It may also work for larger files, but it depends a lot on the underlying client hardware and software.
 
 ## redirectLegacyUrls
 
 **DEPRECATED!**
 
-If you are updating from on old version of STAC Browser, you can set this option to `true` to redirect users from the old "unreadable" URLs to the new human-readable URLs.
+If you are updating from an old version of STAC Browser, you can set this option to `true` to redirect users from the old "unreadable" URLs to the new human-readable URLs.
 
 ## itemsPerPage
 
