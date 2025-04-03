@@ -22,7 +22,7 @@ export default class AuthUtils {
     }
     switch(method.type) {
       case 'http':
-        return (method.schema === 'basic');
+        return (method.scheme === 'basic');
       case 'apiKey':
         return (method.in === 'header' || method.in === 'query');
       case 'openIdConnect':
