@@ -20,8 +20,8 @@
         </b-tabs>
       </b-col>
       <b-col class="right">
-        <b-alert v-if="error" variant="error" show>{{ error }}</b-alert>
-        <Loading v-else-if="!data && loading" fill top />
+        <Loading v-if="loading" fill top />
+        <b-alert v-else-if="error" variant="error" show>{{ error }}</b-alert>
         <b-alert v-else-if="data === null" variant="info" show>{{ $t('search.modifyCriteria') }}</b-alert>
         <b-alert v-else-if="results.length === 0 && noFurtherItems" variant="info" show>{{ $t('search.noFurtherItemsFound') }}</b-alert>
         <b-alert v-else-if="results.length === 0" variant="warning" show>{{ $t('search.noItemsFound') }}</b-alert>

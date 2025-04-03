@@ -126,7 +126,7 @@ export default {
       }
       let searchLink;
       if (this.data instanceof STAC && !this.data.equals(this.root)) {
-        searchLink = this.data.getSearchLink();
+        searchLink = this.data.getSearchLink() || this.data.getApiCollectionsLink();
       }
       if (searchLink) {
         return `/search${this.data.getBrowserPath()}`;

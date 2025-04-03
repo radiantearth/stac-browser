@@ -579,6 +579,11 @@ function getStore(config, router) {
           stac.setApiData(collections, nextLink);
         }
       },
+      resetApiCollections(state) {
+        state.apiCollections = [];
+        state.apiItemsLoading = {};
+        state.nextCollectionsLink = null;
+      },
       resetApiItems(state, link) {
         state.apiItems = [];
         state.apiItemsLink = link;
@@ -687,7 +692,14 @@ function getStore(config, router) {
         await cx.dispatch('auth/requestLogin');
       },
       async load(cx, args) {
-        let { url, show, force, noRetry, omitApi } = args;
+        let {
+          url, // URL to load
+          show, // Show the page when loading is finished, otherwise it's likely loaded in the background for completing specific parts of the page
+          force, // Force reloading the data, omit the cache
+          noRetry, // Don't retry on authentication errors
+          omitApi, // Don't load API collections or API items yet
+          isRoot // Is a request for the root catalog initiated by this function, avoiding endless loops in some mis-configured instances (see https://github.com/radiantearth/stac-browser/issues/580)
+        } = args;
 
         const path = cx.getters.toBrowserPath(url);
         url = Utils.toAbsolute(url, cx.state.url);
@@ -776,7 +788,7 @@ function getStore(config, router) {
         }
 
         // Load the root catalog data if not available (e.g. after page refresh or external access)
-        if (!cx.getters.root) {
+        if (!cx.getters.root && !isRoot) {
           let catalogUrl = cx.state.catalogUrl;
           if (!catalogUrl) {
             const root = data.getLinkWithRel('root');
@@ -786,7 +798,7 @@ function getStore(config, router) {
             }
           }
           if (catalogUrl) {
-            await cx.dispatch("load", { url: catalogUrl, omitApi: true });
+            await cx.dispatch("load", { url: catalogUrl, omitApi: true, isRoot: true });
           }
         }
 
@@ -879,16 +891,14 @@ function getStore(config, router) {
       async loadNextApiCollections(cx, args) {
         let { stac, show, noRetry } = args;
         let link;
-        if (stac) {
-          // First page
-          if (cx.state.apiCollections.length > 0) {
-            // If we have already loaded collections, skip loading the first page
-            return;
-          }
+        if (stac) { // First page
+          // If we load from new collections, reset list of collections.
+          // Otherwise we may append to collections from a parent entity.
+          // https://github.com/radiantearth/stac-browser/issues/617
+          cx.commit('resetApiCollections');
           link = stac.getLinkWithRel('data');
         }
-        else {
-          // Second page and after
+        else { // Second page and after
           stac = cx.state.data;
           link = cx.state.nextCollectionsLink;
         }

@@ -223,17 +223,17 @@ export default class Utils {
   }
 
   static formatDatetimeQuery(value) {
-    return value.map(dt => {
-      if (dt instanceof Date) {
-        return dt.toISOString();
-      }
-      else if (dt) {
-        return dt;
-      }
-      else {
-        return '..';
-      }
-    }).join('/');
+    if (Array.isArray(value) && value.length === 2 && (value[0] || value[1])) {
+      return value.map(dt => {
+        if (dt instanceof Date) {
+          return dt.toISOString();
+        }
+        else {
+          return dt || '..';
+        }
+      }).join('/');
+    }
+    return null;
   }
 
   static formatSortbyForPOST(value) {
@@ -305,6 +305,9 @@ export default class Utils {
         }
         else if (key === 'datetime') {
           value = Utils.formatDatetimeQuery(value);
+          if (!value) {
+            continue; // skip empty datetime
+          }
         }
         else if (key === 'filters') {
           Object.assign(body, value.toJSON());
