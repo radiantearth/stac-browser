@@ -1,7 +1,6 @@
 import Utils from '../utils';
 import { mapGetters, mapState } from 'vuex';
 import { stacBrowserSpecialHandling } from "../rels";
-import create from 'stac-js';
 
 export default {
   data() {
@@ -13,22 +12,15 @@ export default {
   computed: {
     ...mapState(['showThumbnailsAsAssets']),
     ...mapGetters(['data']),
-    // hasAsset also checks whether the assets have a href and thus are not item asset definitions
-    data2() {
-      // todo: remove once stac-js is implemented fully
-      if (!this.data) {
-        return null;
-      }
-      return create(this.data, false);
-    },
+    // hasAssets in stac-js also checks whether the assets have a href and thus are not item asset definitions
     hasAssets() {
       return this.assets.length > 0;
     },
     assets() {
-      if (!this.data2) {
+      if (!this.data) {
         return [];
       }
-      let assets = this.data2.getAssets();
+      let assets = this.data.getAssets();
       if (!this.showThumbnailsAsAssets) {
         assets = assets.filter(asset => !asset.isPreview());
       }
@@ -38,10 +30,10 @@ export default {
       return this.thumbnails.length > 0;
     },
     thumbnails() {
-      if (!this.data2) {
+      if (!this.data) {
         return [];
       }
-      return this.data2.getThumbnails();
+      return this.data.getThumbnails();
     },
     additionalLinks() {
       if (!this.data) {

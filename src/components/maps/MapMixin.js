@@ -1,24 +1,37 @@
-import configureBasemap from '../../../basemaps.config';
 import Utils from '../../utils';
 import { mapState } from 'vuex';
 import Map from 'ol/Map.js';
 import View from 'ol/View.js';
 import { defaults } from 'ol/interaction/defaults';
-import TileLayer from 'ol/layer/WebGLTile.js';
 import ZoomControl from 'ol/control/Zoom.js';
 import AttributionControl from 'ol/control/Attribution.js';
 import FullScreenControl from 'ol/control/FullScreen.js';
 import { stacRequest } from '../../store/utils';
 
+import configureBasemap from '../../../basemaps.config';
+import CONFIG from '../../../config';
+import proj4 from 'proj4';
+import {register} from 'ol/proj/proj4.js';
+// Register pre-defined CRS from config in proj4
+if (Utils.isObject(CONFIG.crs)) {
+  for (const code in CONFIG.crs) {
+    proj4.defs(code, CONFIG.crs[code]);
+  }
+}
+register(proj4); // required to support source reprojection
+
 export default {
   computed: {
-    ...mapState(['buildTileUrlTemplate', 'crossOriginMedia', 'displayGeoTiffByDefault', 'useTileLayerAsFallback']),
+    ...mapState(['buildTileUrlTemplate', 'crossOriginMedia', 'displayGeoTiffByDefault', 'displayPreview', 'displayOverview', 'getMapSourceOptions', 'useTileLayerAsFallback']),
     stacLayerOptions() {
       return {
         buildTileUrlTemplate: this.buildTileUrlTemplate,
         crossOriginMedia: this.crossOriginMedia,
+        displayPreview: this.displayPreview,
+        displayOverview: this.displayOverview,
         displayGeoTiffByDefault: this.displayGeoTiffByDefault,
         useTileLayerAsFallback: this.useTileLayerAsFallback,
+        getSourceOptions: this.getMapSourceOptions,
         httpRequestFn: async (url, responseType) => {
           const response = await stacRequest(this.$store, url, {responseType});
           return response.data;
@@ -32,10 +45,12 @@ export default {
   data() {
     return {
       map: null,
+      maxZoom: 16,
       zoomControl: null,
       attributionControl: null,
       fullScreenControl: null,
       basemaps: [],
+      isFullScreen: false,
     };
   },
   created() {
@@ -53,7 +68,7 @@ export default {
         if (ix >= 0) {
           visibleLayer = ix;
         }
-        const currentBasemap = this.basemaps[visibleLayer]; 
+        const currentBasemap = this.basemaps[visibleLayer];
         if (currentBasemap?.projection) {
           projection = currentBasemap?.projection;
         }
@@ -112,10 +127,12 @@ export default {
         tipLabel: this.$t('fullscreen.show'),
       });
       this.fullScreenControl.on('enterfullscreen', () => {
-        this.fullScreenControl.button_.title = this.$t('fullscreen.exit')
+        this.fullScreenControl.button_.title = this.$t('fullscreen.exit');
+        this.isFullScreen = true;
       });
       this.fullScreenControl.on('leavefullscreen', () => {
-        this.fullScreenControl.button_.title = this.$t('fullscreen.show')
+        this.fullScreenControl.button_.title = this.$t('fullscreen.show');
+        this.isFullScreen = false;
       });
       this.map.addControl(this.fullScreenControl);
     },
@@ -125,12 +142,21 @@ export default {
     async addBasemaps(basemaps, visibleLayer = 0) {
       const promises = basemaps.map(async (options) => {
         try {
-          const cls = (await import(`ol/source/${options.is}.js`)).default;
-          return {
-            source: new cls(options),
+          const layerClassName = options.is === 'VectorTile' ? 'VectorTile' : 'WebGLTile';
+          const [{default: sourceCls}, {default: layerCls}] = await Promise.all([
+            import(`ol/source/${options.is}.js`),
+            import(`ol/layer/${layerClassName}.js`)
+          ]);
+          const source = new sourceCls(options);
+          const layer = new layerCls({
+            source,
             title: options.title,
             base: true
-          };
+          });
+          if (options.layerCreated) {
+            return await options.layerCreated(layer, source);
+          }
+          return layer;
         } catch (error) {
           console.error(`Failed to load basemap source for ${options.is}`, error);
           return null;
@@ -138,7 +164,6 @@ export default {
       });
       (await Promise.all(promises))
         .filter(options => Utils.isObject(options))
-        .map(options => new TileLayer(options))
         .forEach((layer, i) => {
           layer.setVisible(i === visibleLayer);
           this.map.addLayer(layer);

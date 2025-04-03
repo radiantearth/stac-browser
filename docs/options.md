@@ -25,8 +25,6 @@ The following ways to set config options are possible:
     - [`history`](#history)
     - [`hash`](#hash)
   - [pathPrefix](#pathprefix)
-  - [stacProxyUrl](#stacproxyurl)
-  - [redirectLegacyUrls](#redirectlegacyurls)
 - [Security](#security)
   - [allowExternalAccess](#allowexternalaccess)
   - [allowedDomains](#alloweddomains)
@@ -44,10 +42,16 @@ The following ways to set config options are possible:
 - [Mapping](#mapping)
   - [buildTileUrlTemplate](#buildtileurltemplate)
   - [useTileLayerAsFallback](#usetilelayerasfallback)
+  - [displayPreview](#displaypreview)
+  - [displayOverview](#displayoverview)
   - [displayGeoTiffByDefault](#displaygeotiffbydefault)
+  - [crs](#crs)
+  - [getMapSourceOptions](#getmapsourceoptions)
 - [User Interface](#user-interface)
+  - [searchResultsPerPage](#searchresultsperpage)
   - [itemsPerPage](#itemsperpage)
-  - [maxItemsPerPage](#maxitemsperpage)
+  - [collectionsPerPage](#collectionsperpage)
+  - [maxEntriesPerPage](#maxentriesperpage)
   - [cardViewMode](#cardviewmode)
   - [cardViewSort](#cardviewsort)
   - [showKeywordsInItemCards](#showkeywordsinitemcards)
@@ -136,46 +140,18 @@ npm run build -- --pathPrefix="/browser/"
 This will build STAC Browser in a way that it can be hosted at `https://example.com/browser` for example.
 Using this parameter for the dev server will make STAC Browser available at `http://localhost:8080/browser`.
 
-### stacProxyUrl
-
-**DEPRECATED!**
-
-Setting the `stacProxyUrl` allows users to modify the URLs contained in the catalog to point to another location.
-For instance, if you are serving a catalog on the local file system at `/home/user/catalog.json`, but want to serve
-the data out from a server located at `http://localhost:8888/`, you can use:
-
-```bash
-npm start -- --open --stacProxyUrl=/home/user http://localhost:8888
-```
-
-Notice the format of the value:
-
-- In CLI it is the original location and the proxy location separated by a space character, i.e. `{original} {proxy}` as in the example above.
-- In the config file it is a two-element array with the original location as first element and the proxy location as the second element. Set the option to `null` to disable it (default).
-
-In this example, any href contained in the STAC (including link or asset hrefs) will replace any occurrence of `/home/user/` with `http://localhost:8888`.
-
-This can also be helpful when proxying a STAC that does not have cors enabled;
-by using stacProxyUrl you can proxy the original STAC server with one that enables cors and be able to browse that catalog.
-
-### redirectLegacyUrls
-
-**DEPRECATED!**
-
-If you are updating from on old version of STAC Browser, you can set this option to `true` to redirect users from the old "unreadable" URLs to the new human-readable URLs.
-
 ## Security
 
 ### allowExternalAccess
 
 This allows or disallows loading and browsing external STAC data.
-External STAC data is any data that is not a children of the given `catalogUrl`.
+External STAC data is any data that is not a child of the given `catalogUrl`.
 Must be set to `true` if a `catalogUrl` is not given as otherwise you won't be able to browse anything.
 
 ### allowedDomains
 
 You can list additional domains (e.g. `example.com`) that private data is sent to, e.g. authentication data.
-This applies to query paramaters and request headers.
+This applies to query parameters and request headers.
 
 ### crossOriginMedia
 
@@ -338,7 +314,7 @@ It allows rendering imagery such as (cloud-optimized) GeoTiffs through a tile se
 
 If the option `useTileLayerAsFallback` is set to `true`, the tile server is only used as a fallback.
 
-`buildTileUrlTemplate` is disabled by default (i.e. set to `null`) since v3.4.0.
+`buildTileUrlTemplate` is disabled by default (i.e. set to `null`) since v4.0.0.
 
 You can enable this option by providing a function with a single parameter that returns a tile server template url.
 The given function can optionally be async (i.e. return a Promise).
@@ -356,7 +332,7 @@ Please note that this option can only be provided through a config file and is n
 
 Depending on this option, either client-side or server-side rendering of imagery such as (cloud-optimized) GeoTiffs can be enabled/disabled.
 
-If `buildTileUrlTemplate` is given server-side rendering of GeoTiffs is enabled.
+If `buildTileUrlTemplate` is given, server-side rendering of GeoTiffs is enabled.
 If server-side rendering should only be used as a fallback for client-side rendering, enable the boolean `useTileLayerAsFallback` option.
 
 To clarify the behavior, please have a look at the following table:
@@ -368,18 +344,95 @@ To clarify the behavior, please have a look at the following table:
 | true  | null     | client-side | none        |
 | false | null     | none        | none        |
 
+### displayPreview
+
+If set to `true` (default), displays preview images that a browser can display (e.g. PNG, JPEG) on the map as default visualization, i.e. from assets with any of the roles `thumbnail`, `overview`, or a link with relation type `preview`.
+The previews are often not covering the full extents and as such may be placed incorrectly on the map.
+
+If both `displayPreview` and `displayOverview` (see below) are enabled, STAC Browser prefers the overviews (COGs) over the previews (PNG, JPEG, ...).
+
+### displayOverview
+
+If set to `true` (default), allows to display COGs and, if `displayGeoTiffByDefault` is enabled, GeoTiffs on the map as default visualization, usually from an asset with role `overview` or `visual`.
+
 ### displayGeoTiffByDefault
 
 If set to `true`, the map also shows non-cloud-optimized GeoTiff files by default. Otherwise (`false`, default), it only shows COGs and you can only enforce showing GeoTiffs to be loaded with the "Show on map" button but they are never loaded automatically.
-Loading non-cloud-optimized GeoTiffs only works reliably for smaller files (< 1MB). It may also work for larger files, but it is depending a lot on the underlying client hardware and software.
+Loading non-cloud-optimized GeoTiffs only works reliably for smaller files (< 1MB) with a certain structure. It may also work for larger files, but it depends a lot on the underlying client hardware and software.
+
+Related OpenLayers issue: [openlayers#16961](https://github.com/openlayers/openlayers/issues/16961)
+
+### crs
+
+An object of coordinate reference systems that the system needs to know.
+The key is the code for the CRS, the value is the CRS definition as OGC WKT string (WKT2 is not supported).
+`EPSG:3857` (Web Mercator) and `EPSG:4326` (WGS 84) don't need to be registered, they are included by default.
+
+This is primarily useful for CRS that are used for the basemaps (see `basemaps.config.js`).
+All CRS not listed here will be requested from an external service over HTTP, which is slower.
+
+Example for EPSG:2056:
+
+```js
+{
+  'EPSG:2056': 'PROJCS["CH1903+ / LV95",GEOGCS["CH1903+",DATUM["CH1903+",SPHEROID["Bessel 1841",6377397.155,299.1528128,AUTHORITY["EPSG","7004"]],AUTHORITY["EPSG","6150"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4150"]],PROJECTION["Hotine_Oblique_Mercator_Azimuth_Center"],PARAMETER["latitude_of_center",46.9524055555556],PARAMETER["longitude_of_center",7.43958333333333],PARAMETER["azimuth",90],PARAMETER["rectified_grid_angle",90],PARAMETER["scale_factor",1],PARAMETER["false_easting",2600000],PARAMETER["false_northing",1200000],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Easting",EAST],AXIS["Northing",NORTH],AUTHORITY["EPSG","2056"]]'
+}
+```
+
+### getMapSourceOptions
+
+Corresponds to the ol-stac parameter `getSourceOptions`:
+
+> Optional function that can be used to configure the underlying sources. The function can do any additional work and return the completed options or a promise for the same. The function will be called with the current source options and the STAC Asset or Link. This can be useful for adding auth information such as an API token, either via query parameter or HTTP headers. Please be aware that sending HTTP headers may not be supported by all sources.
+
+The function that can be provided for getMapSourceOptions has the following signure:
+
+```js
+async getSourceOptions(type, options) => options
+```
+
+For example, the following code would set the `jsonp` option for the OpenLayers TileJSON layer:
+
+```js
+getSourceOptions: async (type, options) => {
+  if (type.name === 'TileJSON') {
+    options.jsonp = true;
+  }
+  return options;
+}
+```
 
 ## User Interface
 
+### searchResultsPerPage
+
+The number of items requested and shown per page by default for search results, i.e. global item search and collection search.
+If set to `null`, the server's default will be used.
+
+This applies to the following requests:
+
+- `GET /search`
+- `GET /collections` (in Collection Search only - see `collectionsPerPage` for other cases)
+
 ### itemsPerPage
 
-The number of items requested and shown per page by default. Only applies to APIs that support the `limit` query parameter.
+The number of items requested and shown per page by default for item lists, except for item search.
+If set to `null`, the server's default will be used.
 
-### maxItemsPerPage
+This applies to the following requests:
+
+- `GET /collection/{collectionId}/items`
+
+### collectionsPerPage
+
+The number of collections requested and shown per page by default for collection lists, except for collection search.
+If set to `null`, the server's default will be used.
+
+This applies to the following requests:
+
+- `GET /collections` (for collection lists while browsing the API/catalog - see `searchResultsPerPage` for collection search)
+
+### maxEntriesPerPage
 
 The maximum number of items per page that a user can request through the `limit` query parameter (`1000` by default).
 
@@ -396,6 +449,7 @@ The default sorting for lists of catalogs/collections or items. One of:
 - `null`: sorted as in the source files
 
 Doesn't apply when API search filters are applied.
+Also doesn't apply when pagination on the server-side is enabled.
 
 ### showKeywordsInItemCards
 

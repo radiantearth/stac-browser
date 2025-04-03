@@ -21,8 +21,8 @@
 
         <b-form-group v-if="canFilterExtents" class="filter-datetime" :label="$t('search.temporalExtent')" :label-for="ids.datetime" :description="$t('search.dateDescription')">
           <date-picker
-            range :id="ids.datetime" :lang="datepickerLang" :format="datepickerFormat"
-            v-model="datetime" input-class="form-control mx-input"
+            range type="datetime" v-model="datetime" input-class="form-control mx-input"
+            :id="ids.datetime" :lang="datepickerLang" :format="dateTimeFormat"
           />
         </b-form-group>
 
@@ -103,7 +103,7 @@
           <b-form-input
             :id="ids.limit" :value="query.limit" @change="setLimit" min="1"
             :max="maxItems" type="number"
-            :placeholder="$t('defaultWithValue', {value: itemsPerPage})"
+            :placeholder="limitPlaceholder"
           />
         </b-form-group>
       </b-card-body>
@@ -128,12 +128,12 @@ import ApiCapabilitiesMixin, { TYPES } from './ApiCapabilitiesMixin';
 import DatePickerMixin from './DatePickerMixin';
 import Loading from './Loading.vue';
 
-import STAC from '../models/stac';
+import { CatalogLike, STAC } from 'stac-js';
+import { createSTAC } from '../models/stac'; 
 import Cql from '../models/cql2/cql';
 import Queryable from '../models/cql2/queryable';
 import CqlValue from '../models/cql2/value';
 import CqlLogicalOperator from '../models/cql2/operators/logical';
-import { CqlEqual } from '../models/cql2/operators/comparison';
 import { stacRequest } from '../store/utils';
 
 function getQueryDefaults() {
@@ -216,7 +216,7 @@ export default {
     }, getDefaults());
   },
   computed: {
-    ...mapState(['itemsPerPage', 'maxItemsPerPage', 'uiLanguage']),
+    ...mapState(['searchResultsPerPage', 'maxEntriesPerPage', 'uiLanguage']),
     ...mapGetters(['canSearchCollections', 'supportsConformance']),
     collectionSelectOptions() {
       let taggable = !this.hasAllCollections;
@@ -241,7 +241,7 @@ export default {
       };
     },
     collectionSearchLink() {
-      return this.parent instanceof STAC && this.parent.getApiCollectionsLink();
+      return this.parent instanceof CatalogLike && this.parent.getApiCollectionsLink();
     },
     canSearchCollectionsFreeText() {
       return this.canSearchCollections && this.supportsConformance(TYPES.Collections.FreeText);
@@ -283,7 +283,13 @@ export default {
       return this.queryables.slice(0).sort((a, b) => collator.compare(a.title, b.title));
     },
     maxItems() {
-      return this.maxItemsPerPage || 1000;
+      return this.maxEntriesPerPage || 1000;
+    },
+    limitPlaceholder() {
+      if (this.searchResultsPerPage > 0) {
+        return this.$t('defaultWithValue', {value: this.searchResultsPerPage});
+      }
+      return this.$t('default');
     },
     datetime: {
       get() {
@@ -427,9 +433,10 @@ export default {
           data.queryableLink = this.findQueryableLink(links) || null;
         }
 
+        // todo: use ItemCollection / CollectionCollection
         if (!hasMore && Array.isArray(response.data.collections)) {
           let collections = response.data.collections
-            .map(collection => new STAC(collection));
+            .map(collection => createSTAC(collection));
           data.collections = this.prepareCollections(collections);
         }
       }
@@ -510,9 +517,10 @@ export default {
       this.filters.splice(queryableIndex, 1);
     },
     additionalFieldSelected(queryable) {
+      const operators = queryable.getOperators(this.cql);
       this.filters.push({
         value: CqlValue.create(queryable.defaultValue),
-        operator: CqlEqual,
+        operator: operators[0],
         queryable
       });
     },
@@ -533,7 +541,7 @@ export default {
       if (limit > this.maxItems) {
         limit = this.maxItems;
       }
-      else if (typeof limit !== 'number' || isNaN(limit)|| limit < 1) {
+      else if (typeof limit !== 'number' || isNaN(limit) || limit < 1) {
         limit = null;
       }
       this.$set(this.query, 'limit', limit);

@@ -4,8 +4,8 @@
       <FullscreenButton :element="() => $refs.previews" />
     </div>
     <div class="content">
-      <a v-for="thumbnail in thumbnails" :key="thumbnail.href" :href="thumbnail.href" target="_blank" download>
-        <img class="thumbnail" :src="thumbnail.href" :crossorigin="crossOriginMedia">
+      <a v-for="thumbnail in thumbnails" :key="thumbnail.href" :href="thumbnail.getAbsoluteUrl()" target="_blank" download>
+        <img class="thumbnail" :src="thumbnail.getAbsoluteUrl()" :crossorigin="crossOriginMedia">
       </a>
     </div>
   </div>

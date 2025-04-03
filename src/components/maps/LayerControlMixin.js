@@ -5,7 +5,7 @@ export default {
       if (layer.get('bounds')) {
         return this.$t('mapping.layers.footprint');
       }
-      let stac = layer.get('stac');
+      const stac = layer.get('stac');
       if (stac) {
         if (stac.isAsset() || stac.isLink()) {
           title = stac.getMetadata('title') || stac.getKey();

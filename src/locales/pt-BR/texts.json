@@ -156,7 +156,10 @@
       "label": "i",
       "collapseLabel": "✕"
     },
+    "bboxSelect": {},
     "close": "Fechar",
+    "layers": {},
+    "location": {},
     "zoom": {
       "in": {
         "description": "Aumentar o zoom",

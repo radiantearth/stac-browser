@@ -1,13 +1,17 @@
 <template>
   <div class="share mt-1">
     <b-button-group>
-      <b-button v-if="showRoot" size="sm" variant="outline-primary" id="popover-root-btn">
+      <b-button v-if="showRoot" tag="a" tabindex="0" size="sm" variant="outline-primary" id="popover-root-btn">
         <b-icon-box /> <span class="button-label">{{ rootTitle }}</span>
       </b-button>
-      <b-button v-if="stacUrl" size="sm" variant="outline-primary" id="popover-link-btn" :title="$t('source.detailsAboutSource')">
+      <b-button
+        v-if="stacUrl" tag="a" tabindex="0" size="sm"
+        variant="outline-primary" id="popover-link-btn"
+        :title="$t('source.detailsAboutSource')"
+      >
         <b-icon-link /> <span class="button-label">{{ $t('source.label') }}</span>
       </b-button>
-      <b-button size="sm" variant="outline-primary" id="popover-share-btn" :title="$t('source.share.withOthers')">
+      <b-button tag="a" tabindex="0" size="sm" variant="outline-primary" id="popover-share-btn" :title="$t('source.share.withOthers')">
         <b-icon-share /> <span class="button-label">{{ $t('source.share.label') }}</span>
       </b-button>
       <b-dropdown size="sm" variant="outline-primary" right :title="$t('source.language.switch')">
@@ -82,7 +86,7 @@ import { mapActions, mapGetters, mapState } from 'vuex';
 import Url from './Url.vue';
 
 import Utils from '../utils';
-import { getBest, prepareSupported } from '../locale-id';
+import { getBest, prepareSupported } from 'stac-js/src/locales';
 import CopyButton from './CopyButton.vue';
 import SocialSharing from './SocialSharing.vue';
 

@@ -1,5 +1,5 @@
 import Utils from '../../utils.js';
-import STAC from '../../models/stac.js';
+import { STAC } from 'stac-js';
 import Auth from '../../auth/index.js';
 
 export default class AuthUtils {
@@ -22,7 +22,7 @@ export default class AuthUtils {
     }
     switch(method.type) {
       case 'http':
-        return (method.schema === 'basic');
+        return (method.scheme === 'basic');
       case 'apiKey':
         return (method.in === 'header' || method.in === 'query');
       case 'openIdConnect':
