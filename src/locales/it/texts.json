@@ -154,9 +154,26 @@
   "mapping": {
     "attribution": {
       "label": "i",
+      "description": "Crediti",
       "collapseLabel": "✕"
     },
+    "bboxSelect": {
+      "add": "Cliccare sulla mappa per aggiungere un box di selezione.",
+      "remove": "Cliccare dentro il box per eliminarlo."
+    },
     "close": "Chiudi",
+    "fit": "Adatta alla estensione",
+    "layers": {
+      "title": "Livelli",
+      "base": "Livelli di base",
+      "unnamed": "Senza Nome #{id}",
+      "footprint": "Impronta a terra"
+    },
+    "location": {
+      "description": "Vai alla tua posizione attuale"
+    },
+    "nobasemap": "Mappa base non disponibile.",
+    "nodata": "Informazione spaziale mancante nei metadati.",
     "zoom": {
       "in": {
         "description": "Zoom avanti",

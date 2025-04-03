@@ -3,8 +3,8 @@
     <div ref="map" class="map">
       <!-- this will be filled by OpenLayers -->
       <TextControl :text="help" :map="map" />
-      <UserLocationControl :map="map" />
-      <LayerControl :map="map" />
+      <UserLocationControl :map="map" :maxZoom="maxZoom" />
+      <LayerControl :map="map" :maxZoom="maxZoom" />
     </div>
   </div>
 </template>
@@ -18,18 +18,13 @@ import {shiftKeyOnly} from 'ol/events/condition.js';
 import ExtentInteraction from 'ol/interaction/Extent';
 import { containsXY } from 'ol/extent';
 import { transformExtent } from 'ol/proj';
-import { register } from 'ol/proj/proj4.js';
 import Style, { createDefaultStyle } from 'ol/style/Style';
-import proj4 from 'proj4';
 import VectorSource from 'ol/source/Vector';
 import GeoJSON from 'ol/format/GeoJSON';
 import Fill from 'ol/style/Fill';
 import VectorLayer from 'ol/layer/Vector';
-import create from 'stac-js';
 import { toGeoJSON } from 'stac-js/src/geo.js';
 import mask from '@turf/mask';
-
-register(proj4); // required to support source reprojection
 
 export default {
   name: 'MapSelect',
@@ -127,24 +122,22 @@ export default {
       this.interaction.on('extentchanged', this.update);
       this.map.addInteraction(this.interaction);
   
-      let stac;
       if (this.stac) {
-        stac = create(this.stac);
-        this.addMask(stac);
+        this.addMask(this.stac);
       }
 
       let extent;
       if (this.projectedExtent) {
         extent = this.projectedExtent;
       }
-      else if (stac) {
-        const bbox = stac.getBoundingBox();
+      else if (this.stac) {
+        const bbox = this.stac.getBoundingBox();
         if (bbox) {
           extent = transformExtent(bbox, this.crs, this.map.getView().getProjection());
         }
       }
       if (extent) {
-        this.map.getView().fit(extent, { padding: [50,50,50,50] });
+        this.map.getView().fit(extent, { padding: [50,50,50,50], maxZoom: this.maxZoom });
       }
     },
     addMask(stac) {

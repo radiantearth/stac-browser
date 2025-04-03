@@ -9,20 +9,20 @@ const OGC3DTILES_SUPPORTED_TYPES = [
   'application/3dtiles+json',
 ];
 
-export default class Geofox extends AssetActionPlugin {
+export default class NASA_AMMOS_3DTiles extends AssetActionPlugin {
 
   get show() {
     return this.component.isBrowserProtocol && OGC3DTILES_SUPPORTED_TYPES.includes(this.asset.type);
   }
 
   get uri() {
-    let uri = new URI("https://viewer.geofox.ai/");
-    uri.addQuery('tileset', this.component.href);
+    let uri = new URI("https://nasa-ammos.github.io/3DTilesRendererJS/example/bundle/index.html");
+    uri.hash(this.link.href);
     return uri;
   }
 
   get text() {
-    return i18n.t('actions.openIn', {service: 'Geofox.ai'});
+    return i18n.t('actions.openIn', {service: 'NASA-AMMOS 3DTilesRendererJS'});
   }
 
 }

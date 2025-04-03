@@ -9,6 +9,7 @@ module.exports = {
     fallbackLocale: "en",
     supportedLocales: [
         "de",
+        "ar",
 //      "de-CH",
         "es",
         "en",
@@ -23,12 +24,15 @@ module.exports = {
         "ja",
         "pt",
 //      "pt-BR"
+        "id"
     ],
     apiCatalogPriority: null,
     useTileLayerAsFallback: false,
     displayGeoTiffByDefault: false,
+    displayPreview: true,
+    displayOverview: true,
     buildTileUrlTemplate: null,
-    stacProxyUrl: null,
+    getMapSourceOptions: null,
     pathPrefix: "/",
     historyMode: "history",
     cardViewMode: "cards",
@@ -36,14 +40,16 @@ module.exports = {
     showKeywordsInItemCards: false,
     showKeywordsInCatalogCards: false,
     showThumbnailsAsAssets: false,
-    redirectLegacyUrls: false,
-    itemsPerPage: 12,
-    maxItemsPerPage: 1000,
+    searchResultsPerPage: null,
+    itemsPerPage: null,
+    collectionsPerPage: null,
+    maxEntriesPerPage: 1000,
     defaultThumbnailSize: null,
     crossOriginMedia: null,
     requestHeaders: {},
     requestQueryParameters: {},
     socialSharing: ['email', 'bsky', 'mastodon', 'x'],
     preprocessSTAC: null,
-    authConfig: null
+    authConfig: null,
+    crs: {}
 };

@@ -8,7 +8,7 @@ implemented as a single page application (SPA) for ease of development and to
 limit the overall number of catalog reads necessary when browsing (as catalogs
 may be nested and do not necessarily contain references to their parents).
 
-Version: **3.3.3** (supports all STAC versions between 0.6.0 and 1.1.0)
+Version: **3.3.5** (supports all STAC versions between 0.6.0 and 1.1.0)
 
 This package has also been published to npm as [`@radiantearth/stac-browser`](https://www.npmjs.com/package/@radiantearth/stac-browser).
 
@@ -123,6 +123,7 @@ You need to change the [`locale`](docs/options.md#locale) and [`supportedLocales
 
 The following languages are currently supported:
 
+- Arabic `ar`
 - German `de` (Germany `de`, Switzerland `de-CH`)
 - Spanish `es`
 - English `en` (International `en`, US `en-US`, UK `en-GB`)
@@ -143,6 +144,7 @@ The following contributors kindly provide the translations:
 - [@m-mohr](https://github.com/m-mohr): `de`, `en`, `en-GB`, `en-US`
 - [@p1d1d1](https://github.com/p1d1d1): `de-CH`, `fr-CH`, `it`, `it-CH`
 - [@psacra](https://github.com/psacra): `pt`
+- [@randa-11295](https://github.com/randa-11295): `ar`
 - [@rnanclares](https://github.com/rnanclares): `es`
 - [@uba](https://github.com/uba): `pt-BR`
 
@@ -318,7 +320,7 @@ The following sponsors have provided a substantial amount of funding for STAC Br
 - [Radiant Earth](https://radiant.earth) (base funding for versions 1, 2 and 3)
 - [swisstopo](https://www.swisstopo.admin.ch/) (maintenance, base funding for version 3 and 4)
 - [National Resources Canada](https://natural-resources.canada.ca/home) (multi-language support, maintenance)
-- [Matthias Mohr - Softwareentwicklung](https://mohr.ws) (maintenance)
+- [moreGeo GmbH](https://moregeo.it) (maintenance)
 - [Spacebel](https://spacebel.com) (collection search, mapping)
 - [Planet](https://planet.com) (authentication, maintenance)
 - [CloudFerro](https://cloudferro.com) (authentication, alternate asset and storage extension)

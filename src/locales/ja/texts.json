@@ -133,7 +133,10 @@
   "map": "マップ",
   "mapping": {
     "attribution": {},
+    "bboxSelect": {},
     "close": "閉じる",
+    "layers": {},
+    "location": {},
     "zoom": {
       "in": {
         "description": "拡大",

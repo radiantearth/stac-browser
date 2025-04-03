@@ -1,11 +1,14 @@
-import STAC from './src/models/stac';
-import Utils from './src/utils';
+import { Collection } from './src/models/stac';
 
 const USGS_ATTRIBUTION = 'USGS Astrogeology';
 const WMS = 'TileWMS';
 const XYZ = 'XYZ';
 
 // All options (except for 'is') follow the OpenLayers options for the respective source class.
+// Projections (except for EPSG:3857 and EPSG:4326) must be listed in the `crs` array in the config.js.
+//
+// There's a layerCreated callback that can be used to modify the layer and source after it has been created:
+// async layerCreated(Layer layer, Source source) => Layer
 const BASEMAPS = {
   earth: [
     {
@@ -22,7 +25,7 @@ const BASEMAPS = {
       is: WMS,
       title: 'USGS Europa',
       attributions: USGS_ATTRIBUTION,
-      projection: "EPSG:4326",
+      projection: 'EPSG:4326',
       params: {
         FORMAT: 'image/png',
         LAYERS: 'GALILEO_VOYAGER'
@@ -35,7 +38,7 @@ const BASEMAPS = {
       is: WMS,
       title: 'USGS Mars',
       attributions: USGS_ATTRIBUTION,
-      projection: "EPSG:4326",
+      projection: 'EPSG:4326',
       params: {
         FORMAT: 'image/png',
         LAYERS: 'MDIM21'
@@ -48,7 +51,7 @@ const BASEMAPS = {
       is: WMS,
       title: 'USGS Moon',
       attributions: USGS_ATTRIBUTION,
-      projection: "EPSG:4326",
+      projection: 'EPSG:4326',
       params: {
         FORMAT: 'image/png',
         LAYERS: 'LROC_WAC'
@@ -64,17 +67,15 @@ const BASEMAPS = {
  * @returns {Array.<BasemapOptions>}
  */
 export default function configureBasemap(stac, i18n) {
-  let targets = ['earth'];
-  if (stac instanceof STAC) {
-    if (stac.isCollection() && Utils.isObject(stac.summaries) && Array.isArray(stac.summaries['ssys:targets'])) {
-      targets = stac.summaries['ssys:targets'];
-    }
-    else if (stac.isCollection() && Array.isArray(stac['ssys:targets'])) {
-      targets = stac['ssys:targets'];
-    }
-    else if (stac.isItem() && Array.isArray(stac.properties['ssys:targets'])) {
-      targets = stac.properties['ssys:targets'];
-    }
+  let targets;
+  if (stac instanceof Collection) {
+    targets = stac.getSummary('ssys:targets');
+  }
+  if (!targets) {
+    targets = stac.getMetadata('ssys:targets');
+  }
+  if (!targets) {
+    targets = ['earth'];
   }
 
   let layers = [];

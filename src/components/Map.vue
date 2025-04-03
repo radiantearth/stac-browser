@@ -1,15 +1,15 @@
 <template>
   <div class="map-container">
-    <div ref="map" class="map">
+    <div ref="map" class="map" :id="mapId">
       <!-- this will be filled by OpenLayers -->
-      <LayerControl :map="map" />
+      <LayerControl :map="map" :maxZoom="maxZoom" />
       <TextControl v-if="empty" :map="map" :text="$t('mapping.nodata')" />
       <TextControl v-else-if="!hasBasemap" :map="map" :text="$t('mapping.nobasemap')" />
     </div>
     <div ref="target" class="popover-target" />
     <b-popover
-      v-if="popover && selectedItems" show placement="left" triggers="manual"
-      :target="selectedItems.target" container="#stac-browser"
+      v-if="popover && selectedItems" show placement="auto" triggers="manual"
+      :target="selectedItems.target" :container="container"
     >
       <section class="popover-items">
         <Items :stac="stac" :items="selectedItems.items" />
@@ -27,15 +27,12 @@ import LayerControl from './maps/LayerControl.vue';
 import TextControl from './maps/TextControl.vue';
 import { mapGetters } from 'vuex';
 import { BPopover } from 'bootstrap-vue';
-import proj4 from 'proj4';
 import Select from 'ol/interaction/Select';
-import {register} from 'ol/proj/proj4.js';
 import StacLayer from 'ol-stac';
 import { getStacObjectsForEvent, getStyle } from 'ol-stac/util.js';
 
-register(proj4); // required to support source reprojection
-
 const selectStyle = getStyle('#ff0000', 2, null);
+let mapId = 0;
 
 export default {
   name: 'Map',
@@ -75,11 +72,20 @@ export default {
       stacLayer: null,
       selectedItems: null,
       empty: false,
-      selector: null
+      selector: null,
+      mapId: `map-${++mapId}`,
     };
   },
   computed: {
-    ...mapGetters(['getStac'])
+    ...mapGetters(['getStac']),
+    container() {
+      if (this.isFullScreen) {
+        return '#' + this.mapId;
+      }
+      else {
+        return '#stac-browser';
+      }
+    },
   },
   watch: {
     async stac() {
@@ -126,12 +132,12 @@ export default {
     },
     async addStacLayer() {
       let options = Object.assign({}, this.stacLayerOptions, {
-        url: this.stac.getAbsoluteUrl(),
+        // Don't set the URL here, as it is already set in the STAC object and is read-only.
+        // url: this.stac.getAbsoluteUrl(),
         data: this.stac,
         children: this.items,
         assets: this.assets || null,
         displayWebMapLink: true,
-        displayPreview: !this.items,
         disableMigration: true,
       });
       this.stacLayer = new StacLayer(options);
@@ -167,8 +173,7 @@ export default {
           if (objects.length > 0) {
             this.selectedItems = {
               target: this.$refs.target,
-              // Map from stac-js object back to STAC Browser STAC class
-              items: objects.map(obj => this.getStac(obj.getAbsoluteUrl()))
+              items: objects
             };
           }
           else {
@@ -180,11 +185,11 @@ export default {
       }
     },
     fit() {
-      let extent = this.stacLayer.getExtent();
+      const extent = this.stacLayer.getExtent();
       if (extent) {
         // Update the sizes, otherwise the fit will not work properly and compute a wrong zoom level
         this.map.updateSize();
-        this.map.getView().fit(extent, { padding: [50,50,50,50] });
+        this.map.getView().fit(extent, { padding: [50,50,50,50], maxZoom: this.maxZoom });
       }
     },
     resetSelectedItems() {

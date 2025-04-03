@@ -49,6 +49,7 @@
           :stac="data" :items="items" :api="isApi"
           :showFilters="showFilters" :apiFilters="filters"
           :pagination="itemPages" :loading="apiItemsLoading"
+          :count="apiItemsNumberMatched"
           @paginate="paginateItems" @filterItems="filterItems"
           @filtersShown="filtersShown"
         />
@@ -70,6 +71,7 @@ import { formatLicense, formatTemporalExtents } from '@radiantearth/stac-fields/
 import { BTabs, BTab } from 'bootstrap-vue';
 import Utils from '../utils';
 import { addSchemaToDocument, createCatalogSchema } from '../schema-org';
+import { ItemCollection } from '../models/stac.js';
 
 export default {
   name: "Catalog",
@@ -135,7 +137,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination', 'nextCollectionsLink', 'stateQueryParameters']),
+    ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination', 'apiItemsNumberMatched', 'nextCollectionsLink', 'stateQueryParameters']),
     ...mapGetters(['catalogs', 'collectionLink', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
     cssStacType() {
       if (Utils.hasText(this.data?.type)) {
@@ -221,10 +223,10 @@ export default {
       else {
         const items = this.items.filter(item => item.type === 'Feature');
         if (items.length > 0) {
-          data.items = {
+          data.items = new ItemCollection({
             type: 'FeatureCollection',
             features: items
-          };
+          });
         }
       }
       return data;

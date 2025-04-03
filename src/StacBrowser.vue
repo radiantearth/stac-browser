@@ -38,12 +38,12 @@ import "bootstrap-vue/dist/bootstrap-vue.css";
 import ErrorAlert from './components/ErrorAlert.vue';
 import StacHeader from './components/StacHeader.vue';
 
-import STAC from './models/stac';
+import { STAC } from 'stac-js';
 import Utils from './utils';
 import URI from 'urijs';
 
 import { API_LANGUAGE_CONFORMANCE } from './i18n';
-import { getBest, prepareSupported } from './locale-id';
+import { getBest, prepareSupported } from 'stac-js/src/locales';
 import BrowserStorage from "./browser-store";
 import Authentication from "./components/Authentication.vue";
 
