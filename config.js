@@ -9,6 +9,7 @@ module.exports = {
     fallbackLocale: "en",
     supportedLocales: [
         "de",
+        "ar",
 //      "de-CH",
         "es",
         "en",
@@ -23,6 +24,7 @@ module.exports = {
         "ja",
         "pt",
 //      "pt-BR"
+        "id"
     ],
     apiCatalogPriority: null,
     useTileLayerAsFallback: false,
@@ -45,5 +47,6 @@ module.exports = {
     requestQueryParameters: {},
     socialSharing: ['email', 'bsky', 'mastodon', 'x'],
     preprocessSTAC: null,
-    authConfig: null
+    authConfig: null,
+    crs: {}
 };

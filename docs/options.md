@@ -45,6 +45,7 @@ The following ways to set config options are possible:
   - [buildTileUrlTemplate](#buildtileurltemplate)
   - [useTileLayerAsFallback](#usetilelayerasfallback)
   - [displayGeoTiffByDefault](#displaygeotiffbydefault)
+  - [crs](#crs)
 - [User Interface](#user-interface)
   - [itemsPerPage](#itemsperpage)
   - [maxItemsPerPage](#maxitemsperpage)
@@ -162,20 +163,20 @@ by using stacProxyUrl you can proxy the original STAC server with one that enabl
 
 **DEPRECATED!**
 
-If you are updating from on old version of STAC Browser, you can set this option to `true` to redirect users from the old "unreadable" URLs to the new human-readable URLs.
+If you are updating from an old version of STAC Browser, you can set this option to `true` to redirect users from the old "unreadable" URLs to the new human-readable URLs.
 
 ## Security
 
 ### allowExternalAccess
 
 This allows or disallows loading and browsing external STAC data.
-External STAC data is any data that is not a children of the given `catalogUrl`.
+External STAC data is any data that is not a child of the given `catalogUrl`.
 Must be set to `true` if a `catalogUrl` is not given as otherwise you won't be able to browse anything.
 
 ### allowedDomains
 
 You can list additional domains (e.g. `example.com`) that private data is sent to, e.g. authentication data.
-This applies to query paramaters and request headers.
+This applies to query parameters and request headers.
 
 ### crossOriginMedia
 
@@ -356,7 +357,7 @@ Please note that this option can only be provided through a config file and is n
 
 Depending on this option, either client-side or server-side rendering of imagery such as (cloud-optimized) GeoTiffs can be enabled/disabled.
 
-If `buildTileUrlTemplate` is given server-side rendering of GeoTiffs is enabled.
+If `buildTileUrlTemplate` is given, server-side rendering of GeoTiffs is enabled.
 If server-side rendering should only be used as a fallback for client-side rendering, enable the boolean `useTileLayerAsFallback` option.
 
 To clarify the behavior, please have a look at the following table:
@@ -371,13 +372,36 @@ To clarify the behavior, please have a look at the following table:
 ### displayGeoTiffByDefault
 
 If set to `true`, the map also shows non-cloud-optimized GeoTiff files by default. Otherwise (`false`, default), it only shows COGs and you can only enforce showing GeoTiffs to be loaded with the "Show on map" button but they are never loaded automatically.
-Loading non-cloud-optimized GeoTiffs only works reliably for smaller files (< 1MB). It may also work for larger files, but it is depending a lot on the underlying client hardware and software.
+Loading non-cloud-optimized GeoTiffs only works reliably for smaller files (< 1MB). It may also work for larger files, but it depends a lot on the underlying client hardware and software.
+
+### crs
+
+An object of coordinate reference systems that the system needs to know.
+The key is the code for the CRS, the value is the CRS definition as OGC WKT string (WKT2 is not supported).
+`EPSG:3857` (Web Mercator) and `EPSG:4326` (WGS 84) don't need to be registered, they are included by default.
+
+This is primarily useful for CRS that are used for the basemaps (see `basemaps.config.js`).
+All CRS not listed here will be requested from an external service over HTTP, which is slower.
+
+Example for EPSG:2056:
+
+```js
+{
+  'EPSG:2056': 'PROJCS["CH1903+ / LV95",GEOGCS["CH1903+",DATUM["CH1903+",SPHEROID["Bessel 1841",6377397.155,299.1528128,AUTHORITY["EPSG","7004"]],AUTHORITY["EPSG","6150"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4150"]],PROJECTION["Hotine_Oblique_Mercator_Azimuth_Center"],PARAMETER["latitude_of_center",46.9524055555556],PARAMETER["longitude_of_center",7.43958333333333],PARAMETER["azimuth",90],PARAMETER["rectified_grid_angle",90],PARAMETER["scale_factor",1],PARAMETER["false_easting",2600000],PARAMETER["false_northing",1200000],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Easting",EAST],AXIS["Northing",NORTH],AUTHORITY["EPSG","2056"]]'
+}
+```
 
 ## User Interface
 
 ### itemsPerPage
 
 The number of items requested and shown per page by default. Only applies to APIs that support the `limit` query parameter.
+
+This is applied to the following requests:
+
+- `GET /collection/*/items`
+- `GET /search`
+- Only in Collection Search: `GET /collections` (i.e. **not** applied to the default collection list request)
 
 ### maxItemsPerPage
 
@@ -396,6 +420,7 @@ The default sorting for lists of catalogs/collections or items. One of:
 - `null`: sorted as in the source files
 
 Doesn't apply when API search filters are applied.
+Also doesn't apply when pagination on the server-side is enabled.
 
 ### showKeywordsInItemCards
 

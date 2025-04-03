@@ -6,6 +6,10 @@ const WMS = 'TileWMS';
 const XYZ = 'XYZ';
 
 // All options (except for 'is') follow the OpenLayers options for the respective source class.
+// Projections (except for EPSG:3857 and EPSG:4326) must be listed in the `crs` array in the config.js.
+//
+// There's a layerCreated callback that can be used to modify the layer and source after it has been created:
+// async layerCreated(Layer layer, Source source) => Layer
 const BASEMAPS = {
   earth: [
     {
@@ -22,7 +26,7 @@ const BASEMAPS = {
       is: WMS,
       title: 'USGS Europa',
       attributions: USGS_ATTRIBUTION,
-      projection: "EPSG:4326",
+      projection: 'EPSG:4326',
       params: {
         FORMAT: 'image/png',
         LAYERS: 'GALILEO_VOYAGER'
@@ -35,7 +39,7 @@ const BASEMAPS = {
       is: WMS,
       title: 'USGS Mars',
       attributions: USGS_ATTRIBUTION,
-      projection: "EPSG:4326",
+      projection: 'EPSG:4326',
       params: {
         FORMAT: 'image/png',
         LAYERS: 'MDIM21'
@@ -48,7 +52,7 @@ const BASEMAPS = {
       is: WMS,
       title: 'USGS Moon',
       attributions: USGS_ATTRIBUTION,
-      projection: "EPSG:4326",
+      projection: 'EPSG:4326',
       params: {
         FORMAT: 'image/png',
         LAYERS: 'LROC_WAC'
