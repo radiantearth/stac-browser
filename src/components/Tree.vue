@@ -42,7 +42,8 @@
 import { BIconFileEarmarkRichtext, BIconFolderMinus, BIconFolderPlus, BIconThreeDots } from "bootstrap-vue";
 import { mapGetters, mapState } from 'vuex';
 import Utils from '../utils';
-import STAC from '../models/stac';
+import { getDisplayTitle } from '../models/stac';
+import { STAC, CatalogLike } from 'stac-js';
 
 export default {
   name: 'Tree',
@@ -149,7 +150,7 @@ export default {
       if (this.pagination) {
         return this.$t('tree.moreCollectionPagesAvailable');
       }
-      return STAC.getDisplayTitle([this.item, this.stac]);
+      return getDisplayTitle([this.item, this.stac]);
     },
     hasMore() {
       return this.childs.length > this.shownChilds.length;
@@ -199,7 +200,7 @@ export default {
   },
   methods: {
     updateChilds() {
-      if (this.stac instanceof STAC) {
+      if (this.stac instanceof CatalogLike) {
         this.childs = this.stac.getChildren(this.apiCatalogPriority);
       }
       else {

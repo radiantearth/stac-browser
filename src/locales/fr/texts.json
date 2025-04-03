@@ -150,12 +150,30 @@
     "showFilter": "Afficher les filtres"
   },
   "loading": "Chargement...",
+  "map": "Carte",
   "mapping": {
     "attribution": {
       "label": "i",
+      "description": "Attributions",
       "collapseLabel": "✕"
     },
+    "bboxSelect": {
+      "add": "Cliquez sur la carte pour ajouter une boîte englobante.",
+      "remove": "Cliquez à l'intérieur de la boîte englobante pour la supprimer."
+    },
     "close": "Fermer",
+    "fit": "Adapter à l'étendue",
+    "layers": {
+      "title": "Couches",
+      "base": "Couches de base",
+      "unnamed": "#{id} non nommé",
+      "footprint": "Empreinte"
+    },
+    "location": {
+      "description": "Aller à votre position"
+    },
+    "nobasemap": "Aucune carte de base disponible.",
+    "nodata": "Aucune information spatiale disponible dans les métadonnées.",
     "zoom": {
       "in": {
         "description": "Zoom avant",
@@ -167,7 +185,6 @@
       }
     }
   },
-  "map": "Carte",
   "messageForSchemaError": "{message}, pour le schéma {schemaPath}",
   "metadata": {
     "general": "Général",

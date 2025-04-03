@@ -19,10 +19,7 @@
       
       <date-picker
         v-if="queryable.isTemporal"
-        type="date"
         class="value"
-        :lang="datepickerLang"
-        :format="datepickerFormat"
         :value="value.value"
         @input="updateValue($event)"
         v-bind="validation"
@@ -110,7 +107,14 @@ export default {
   },
   computed: {
     validation() {
-      if (this.queryable.isText && !this.queryable.isTemporal) {
+      if (this.queryable.isTemporal) {
+        return {
+          type: this.queryable.isDateTime ? 'datetime' : 'date',
+          lang: this.datepickerLang,
+          format: this.queryable.isDateTime ? this.dateTimeFormat : this.dateFormat
+        };
+      }
+      else if (this.queryable.isText) {
         return {
           type: 'text',
           minlength: this.schema.minLength,

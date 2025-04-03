@@ -4,7 +4,7 @@
       <Source class="float-right" :title="title" :stacUrl="url" :stac="data" />
       <h1>
         <template v-if="icon">
-          <img :src="icon.href" :alt="icon.title" :title="icon.title" class="icon mr-2">
+          <img :src="icon.getAbsoluteUrl()" :alt="icon.title" :title="icon.title" class="icon mr-2">
         </template>
         <span class="title">{{ title }}</span>
       </h1>
@@ -42,7 +42,8 @@ import { mapState, mapGetters, mapMutations, mapActions } from 'vuex';
 import Source from './Source.vue';
 import StacLink from './StacLink.vue';
 import { BIconArrow90degUp, BIconArrowLeft, BIconBook, BIconFolderSymlink, BIconSearch, BIconLock, BIconUnlock } from "bootstrap-vue";
-import STAC from '../models/stac';
+import { getDisplayTitle } from '../models/stac';
+import { CatalogLike, STAC } from 'stac-js';
 import Utils from '../utils';
 
 export default {
@@ -113,7 +114,7 @@ export default {
     },
     icon() {
       if (this.data instanceof STAC) {
-        let icons = this.data.getIcons();
+        const icons = this.data.getIcons();
         if (icons.length > 0) {
           return icons[0];
         }
@@ -125,8 +126,8 @@ export default {
         return null;
       }
       let searchLink;
-      if (this.data instanceof STAC && !this.data.equals(this.root)) {
-        searchLink = this.data.getSearchLink();
+      if (this.data instanceof CatalogLike && !this.data.equals(this.root)) {
+        searchLink = this.data.getSearchLink() || this.data.getApiCollectionsLink();
       }
       if (searchLink) {
         return `/search${this.data.getBrowserPath()}`;
@@ -149,7 +150,7 @@ export default {
           return {
             href: this.root.getAbsoluteUrl(),
             rel: 'root',
-            title: STAC.getDisplayTitle(this.root)
+            title: getDisplayTitle(this.root)
           };
         }
       }

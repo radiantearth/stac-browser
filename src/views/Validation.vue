@@ -42,7 +42,7 @@
 import { mapState } from 'vuex';
 import validateSTAC from 'stac-node-validator';
 import BrowseMixin from './BrowseMixin.js';
-import STAC from '../models/stac.js';
+import { STAC } from 'stac-js';
 import ValidationResult from '../components/ValidationResult.vue';
 
 export default {
