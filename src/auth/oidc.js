@@ -1,5 +1,6 @@
 import BrowserStorage from "../browser-store";
 import Auth from "./index";
+import Utils from "../utils";
 
 import { UserManager } from 'oidc-client-ts';
 
@@ -29,8 +30,11 @@ export default class OIDC extends Auth {
   }
 
   restoreOriginalUri() {
-    const originalUri = this.browserStorage.get('oidc-original-uri');
-    if (this.router && originalUri) {
+    let originalUri = this.browserStorage.get('oidc-original-uri');
+    if (this.router && Utils.hasText(originalUri)) {
+      if (originalUri.startsWith('/auth/logout')) {
+        originalUri = '/';
+      }
       this.router.replace(originalUri);
     }
     this.browserStorage.remove('oidc-original-uri');

@@ -1,5 +1,6 @@
 import { BIconBoxArrowUpRight } from 'bootstrap-vue';
 import URI from 'urijs';
+import i18n from "../i18n";
 
 export default class ActionPlugin {
 
@@ -39,6 +40,10 @@ export default class ActionPlugin {
 
   get icon() {
     return BIconBoxArrowUpRight;
+  }
+
+  get text() {
+    return i18n.t('open');
   }
 
 }
