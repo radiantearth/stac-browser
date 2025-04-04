@@ -1,14 +1,24 @@
-import configureBasemap from '../../../basemaps.config';
 import Utils from '../../utils';
 import { mapState } from 'vuex';
 import Map from 'ol/Map.js';
 import View from 'ol/View.js';
 import { defaults } from 'ol/interaction/defaults';
-import TileLayer from 'ol/layer/WebGLTile.js';
 import ZoomControl from 'ol/control/Zoom.js';
 import AttributionControl from 'ol/control/Attribution.js';
 import FullScreenControl from 'ol/control/FullScreen.js';
 import { stacRequest } from '../../store/utils';
+
+import configureBasemap from '../../../basemaps.config';
+import CONFIG from '../../../config';
+import proj4 from 'proj4';
+import {register} from 'ol/proj/proj4.js';
+// Register pre-defined CRS from config in proj4
+if (Utils.isObject(CONFIG.crs)) {
+  for (const code in CONFIG.crs) {
+    proj4.defs(code, CONFIG.crs[code]);
+  }
+}
+register(proj4); // required to support source reprojection
 
 export default {
   computed: {
@@ -53,7 +63,7 @@ export default {
         if (ix >= 0) {
           visibleLayer = ix;
         }
-        const currentBasemap = this.basemaps[visibleLayer]; 
+        const currentBasemap = this.basemaps[visibleLayer];
         if (currentBasemap?.projection) {
           projection = currentBasemap?.projection;
         }
@@ -125,12 +135,16 @@ export default {
     async addBasemaps(basemaps, visibleLayer = 0) {
       const promises = basemaps.map(async (options) => {
         try {
-          const cls = (await import(`ol/source/${options.is}.js`)).default;
-          return {
-            source: new cls(options),
+          const layerClassName = options.is === 'VectorTile' ? 'VectorTile' : 'WebGLTile';
+          const [{default: sourceCls}, {default: layerCls}] = await Promise.all([
+            import(`ol/source/${options.is}.js`),
+            import(`ol/layer/${layerClassName}.js`)
+          ]);
+          return new layerCls({
+            source: new sourceCls(options),
             title: options.title,
             base: true
-          };
+          });
         } catch (error) {
           console.error(`Failed to load basemap source for ${options.is}`, error);
           return null;
@@ -138,7 +152,6 @@ export default {
       });
       (await Promise.all(promises))
         .filter(options => Utils.isObject(options))
-        .map(options => new TileLayer(options))
         .forEach((layer, i) => {
           layer.setVisible(i === visibleLayer);
           this.map.addLayer(layer);

@@ -45,6 +45,7 @@ The following ways to set config options are possible:
   - [buildTileUrlTemplate](#buildtileurltemplate)
   - [useTileLayerAsFallback](#usetilelayerasfallback)
   - [displayGeoTiffByDefault](#displaygeotiffbydefault)
+  - [crs](#crs)
 - [User Interface](#user-interface)
   - [itemsPerPage](#itemsperpage)
   - [maxItemsPerPage](#maxitemsperpage)
@@ -372,6 +373,23 @@ To clarify the behavior, please have a look at the following table:
 
 If set to `true`, the map also shows non-cloud-optimized GeoTiff files by default. Otherwise (`false`, default), it only shows COGs and you can only enforce showing GeoTiffs to be loaded with the "Show on map" button but they are never loaded automatically.
 Loading non-cloud-optimized GeoTiffs only works reliably for smaller files (< 1MB). It may also work for larger files, but it is depending a lot on the underlying client hardware and software.
+
+### crs
+
+An object of coordinate reference systems that the system needs to know.
+The key is the code for the CRS, the value is the CRS definition as OGC WKT string (WKT2 is not supported).
+`EPSG:3857` (Web Mercator) and `EPSG:4326` (WGS 84) don't need to be registered, they are included by default.
+
+This is primarily useful for CRS that are used for the basemaps (see `basemaps.config.js`).
+All CRS not listed here will be requested from an external service over HTTP, which is slower.
+
+Example for EPSG:2056:
+
+```js
+{
+  'EPSG:2056': 'PROJCS["CH1903+ / LV95",GEOGCS["CH1903+",DATUM["CH1903+",SPHEROID["Bessel 1841",6377397.155,299.1528128,AUTHORITY["EPSG","7004"]],AUTHORITY["EPSG","6150"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4150"]],PROJECTION["Hotine_Oblique_Mercator_Azimuth_Center"],PARAMETER["latitude_of_center",46.9524055555556],PARAMETER["longitude_of_center",7.43958333333333],PARAMETER["azimuth",90],PARAMETER["rectified_grid_angle",90],PARAMETER["scale_factor",1],PARAMETER["false_easting",2600000],PARAMETER["false_northing",1200000],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Easting",EAST],AXIS["Northing",NORTH],AUTHORITY["EPSG","2056"]]'
+}
+```
 
 ## User Interface
 

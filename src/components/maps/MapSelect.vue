@@ -18,9 +18,7 @@ import {shiftKeyOnly} from 'ol/events/condition.js';
 import ExtentInteraction from 'ol/interaction/Extent';
 import { containsXY } from 'ol/extent';
 import { transformExtent } from 'ol/proj';
-import { register } from 'ol/proj/proj4.js';
 import Style, { createDefaultStyle } from 'ol/style/Style';
-import proj4 from 'proj4';
 import VectorSource from 'ol/source/Vector';
 import GeoJSON from 'ol/format/GeoJSON';
 import Fill from 'ol/style/Fill';
@@ -28,8 +26,6 @@ import VectorLayer from 'ol/layer/Vector';
 import create from 'stac-js';
 import { toGeoJSON } from 'stac-js/src/geo.js';
 import mask from '@turf/mask';
-
-register(proj4); // required to support source reprojection
 
 export default {
   name: 'MapSelect',
