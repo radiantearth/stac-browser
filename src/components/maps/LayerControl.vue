@@ -6,10 +6,6 @@
       :target="id" container="#stac-browser"
     >
       <div class="layercontrol">
-        <section v-if="hasLayers">
-          <h5>{{ $t('mapping.layers.title') }}</h5>
-          <LayerControlGroup :map="map" :group="layerGroup" />
-        </section>
         <section>
           <h5>{{ $t('mapping.layers.base') }}</h5>
           <span v-if="baseLayers.length === 0">{{ $t('mapping.nobasemap') }}</span>
@@ -19,17 +15,23 @@
             </b-form-radio>
           </b-form-radio-group>
         </section>
+        <section v-if="hasLayers">
+          <h5>{{ $t('mapping.layers.title') }}</h5>
+          <LayerControlGroup :map="map" :group="layerGroup" />
+        </section>
       </div>
     </b-popover>
   </div>
 </template>
 
 <script>
-//import View from 'ol/View';
+import View from 'ol/View';
 import ControlMixin from './ControlMixin';
 import LayerControlMixin from './LayerControlMixin';
 import { BFormRadio, BFormRadioGroup, BIconLayersFill, BPopover } from 'bootstrap-vue';
-//import { transformWithProjections } from 'ol/proj';
+import { transformWithProjections } from 'ol/proj';
+import Group from 'ol/layer/Group';
+import { Vector } from 'ol/source';
 
 export default {
   name: 'LayerControl',
@@ -66,23 +68,52 @@ export default {
         return;
       }
       // todo: switching between base layers with different projections is not working yet
-      //let projection;
+      let projection;
       for (const data of this.baseLayers) {
         data.layer.setVisible(data.id === newId);
-        //projection = data.layer.getSource().getProjection();
+        if (data.id === newId) {
+          projection = data.layer.getSource().getProjection();
+        }
       }
-      // const view = this.map.getView();
-      // if (view.getProjection() !== projection) {
-      //   this.map.setView(new View({
-      //     showFullExtent: true,
-      //     projection,
-      //     zoom: view.getZoom(),
-      //     center: transformWithProjections(view.getCenter(), view.getProjection(), projection)
-      //   }));
-      // }
+      const view = this.map.getView();
+      const currentProjection = view.getProjection();
+      if (currentProjection !== projection) {
+        this.map.setView(new View({
+          showFullExtent: true,
+          projection,
+          zoom: view.getZoom(),
+          center: transformWithProjections(view.getCenter(), currentProjection, projection)
+        }));
+        this.reprojectLayers(this.map.getLayers(), currentProjection, projection);
+      }
     }
   },
   methods: {
+    reprojectLayers(layers, sourceProjection, targetProjection) {
+      for (const layer of layers.getArray()) {
+        if (layer.get('base')) {
+          continue;
+        }
+        if (layer instanceof Group) {
+          this.reprojectLayers(layer.getLayers(), sourceProjection, targetProjection);
+          continue;
+        }
+        const source = layer.getSource();
+        if (source instanceof Vector) {
+          // Handle vector layers
+          const currentProjection = source.getProjection() || sourceProjection;
+          const features = source.getFeatures();
+          for (const feature of features) {
+            const geometry = feature.getGeometry();
+            if (geometry) {
+              geometry.transform(currentProjection, targetProjection);
+            }
+          }
+          source.refresh();
+        }
+        // else: todo: Handle other layer types if needed
+      }
+    },
     update() {
       this.layerGroup = this.map.getLayerGroup();
       this.baseLayers = [];
