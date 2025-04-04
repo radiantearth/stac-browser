@@ -47,5 +47,6 @@ module.exports = {
     requestQueryParameters: {},
     socialSharing: ['email', 'bsky', 'mastodon', 'x'],
     preprocessSTAC: null,
-    authConfig: null
+    authConfig: null,
+    crs: {}
 };
