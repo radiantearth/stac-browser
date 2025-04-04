@@ -63,6 +63,9 @@ function getStore(config, router) {
       uiLanguage: config.locale
     }),
     getters: {
+      defaultSearchExtent: state => {
+        return state.defaultSearchExtent? state.defaultSearchExtent : null;
+      },
       loading: state => !state.url || !state.data || state.database[state.url] instanceof Loading,
       getApiItemsLoading: state => data => {
         let id = '';
