@@ -690,7 +690,14 @@ function getStore(config, router) {
         await cx.dispatch('auth/requestLogin');
       },
       async load(cx, args) {
-        let { url, show, force, noRetry, omitApi } = args;
+        let {
+          url, // URL to load
+          show, // Show the page when loading is finished, otherwise it's likely loaded in the background for completing specific parts of the page
+          force, // Force reloading the data, omit the cache
+          noRetry, // Don't retry on authentication errors
+          omitApi, // Don't load API collections or API items yet
+          isRoot // Is a request for the root catalog initiated by this function, avoiding endless loops in some mis-configured instances (see https://github.com/radiantearth/stac-browser/issues/580)
+        } = args;
 
         const path = cx.getters.toBrowserPath(url);
         url = Utils.toAbsolute(url, cx.state.url);
@@ -779,7 +786,7 @@ function getStore(config, router) {
         }
 
         // Load the root catalog data if not available (e.g. after page refresh or external access)
-        if (!cx.getters.root) {
+        if (!cx.getters.root && !isRoot) {
           let catalogUrl = cx.state.catalogUrl;
           if (!catalogUrl) {
             const root = data.getLinkWithRel('root');
@@ -789,7 +796,7 @@ function getStore(config, router) {
             }
           }
           if (catalogUrl) {
-            await cx.dispatch("load", { url: catalogUrl, omitApi: true });
+            await cx.dispatch("load", { url: catalogUrl, omitApi: true, isRoot: true });
           }
         }
 

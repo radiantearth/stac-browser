@@ -9,6 +9,7 @@ module.exports = {
     fallbackLocale: "en",
     supportedLocales: [
         "de",
+        "ar",
 //      "de-CH",
         "es",
         "en",
@@ -48,4 +49,5 @@ module.exports = {
     authConfig: null,
     // defaultSearchExtent e.g. [12.227593034455793, 41.78656913683952, 12.652310726657447, 42.02970865107619]
     defaultSearchExtent: null,
+    crs: {}
 };
