@@ -156,7 +156,17 @@
       "label": "i",
       "collapseLabel": "✕"
     },
+    "bboxSelect": {
+      "add": "Cliccare sulla mappa per aggiungere un box di selezione.",
+      "remove": "Cliccare dentro il box per eliminarlo."
+    },
     "close": "Chiudi",
+    "fit": "Adatta alla estensione",
+    "location": {
+      "description": "Vai alla tua posizione attuale"
+    },
+    "nobasemap": "Mappa base non disponibile.",
+    "nodata": "Indormazione spaziale mancante nei metadati.",
     "zoom": {
       "in": {
         "description": "Zoom avanti",
