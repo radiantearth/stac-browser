@@ -152,7 +152,7 @@ function getDefaults() {
   return {
     sortOrder: 1,
     sortTerm: null,
-    provideBBox: true,
+    provideBBox: false,
     // Store previous bbox so that it survives when the map is temporarily hidden
     bbox: null,
     query: getQueryDefaults(),
@@ -340,7 +340,7 @@ export default {
         this.query.bbox = null;
       }
       else {
-        this.query.bbox = this.bbox;
+        this.query.bbox = this.bbox? this.bbox : this.defaultExtent;
       }
     }
   },
