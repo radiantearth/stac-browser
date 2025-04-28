@@ -1,1013 +1,149 @@
 <template>
-  <div>
-    <b-alert v-if="errored" variant="danger" show>{{ _entity.message }}</b-alert>
-    <b-spinner v-else-if="!loaded" label="Loading..."></b-spinner>
-    <b-container v-else :class="loaded && 'loaded'">
-      <b-row>
-        <b-col md="12">
-          <header>
-            <div>
-              <b-breadcrumb :items="breadcrumbs" />
-            </div>
-          </header>
-        </b-col>
-      </b-row>
-      <b-row>
-        <b-col md="8">
-          <h1 class="scroll">{{ title }}</h1>
-          <p class="scroll">
-            <small>
-              <!-- <b-button
-                v-clipboard="url"
-                variant="link"
-                size="sm"
-                class="clipboard"
-              > -->
-              <span
-                v-if="validationErrors"
-                title="Validation errors present; please check the JavaScript Console"
-                >⚠️</span
-              >
-              <!-- <i class="far fa-copy" />&nbsp; -->
-              <code>{{ url }}</code>
-              <!-- </b-button> -->
-            </small>
-          </p>
-          <b-tabs v-model="tabIndex">
-            <b-tab
-              v-if="visibleTabs.includes('preview')"
-              title="Preview"
-              active
-            >
-              <div id="map-container">
-                <div id="map"></div>
-              </div>
-              <multiselect
-                v-if="cogs.length > 1"
-                v-model="selectedImage"
-                :options="cogs"
-                placeholder="Select an image"
-                track-by="href"
-                label="title"
-              />
-              <multiselect
-                v-if="features.length > 0"
-                v-model="selectedFeatures"
-                :options="features"
-                placeholder="Select a set of features"
-                track-by="href"
-                label="title"
-              />
-            </b-tab>
-            <b-tab
-              v-if="visibleTabs.includes('thumbnail')"
-              title="Thumbnail"
-              :active="!visibleTabs.includes('preview')"
-            >
-              <a :href="thumbnail">
-                <img id="thumbnail" align="center" :src="thumbnail" />
-              </a>
-            </b-tab>
-            <AssetTab
-              v-if="visibleTabs.includes('assets')"
-              :assets="assets"
-              :bands="bands"
-              :hasBands="hasBands"
-              :active="
-                !visibleTabs.includes('preview') &&
-                  !visibleTabs.includes('thumbnail')
-              "
-            ></AssetTab>
-            <b-tab
-              v-if="visibleTabs.includes('bands')"
-              title="Bands"
-              :active="
-                !visibleTabs.includes('preview') &&
-                  !visibleTabs.includes('thumbnail') &&
-                  !visibleTabs.includes('assets')
-              "
-            >
-              <b-table
-                :items="bands"
-                :fields="bandFields"
-                responsive
-                small
-                striped
-              />
-            </b-tab>
-          </b-tabs>
-        </b-col>
-
-        <b-col md="4">
-          <b-card bg-variant="light">
-            <div id="locator-map" />
-            <MetadataSidebar
-              :properties="properties"
-              :keywords="keywords"
-              :collection="collection"
-              :collectionLink="collectionLink"
-              :providers="providers"
-              :slugify="slugify"
-            />
-          </b-card>
-        </b-col>
-      </b-row>
-    </b-container>
-    <footer class="footer">
-      <b-container>
-        <span class="poweredby text-muted">
-          Powered by
-          <a href="https://github.com/radiantearth/stac-browser"
-            >STAC Browser</a
-          >
-        </span>
-      </b-container>
-    </footer>
-  </div>
+  <b-card no-body class="item-card" :class="{queued: !data, deprecated: isDeprecated, description: hasDescription}" v-b-visible.400="load">
+    <b-card-img-lazy v-if="hasImage" class="thumbnail" offset="200" v-bind="thumbnail" />
+    <b-card-body>
+      <b-card-title>
+        <StacLink :data="[data, item]" class="stretched-link" />
+      </b-card-title>
+      <b-card-text v-if="fileFormats.length > 0 || hasDescription || isDeprecated" class="intro">
+        <b-badge v-if="isDeprecated" variant="warning" class="mr-1 mt-1 deprecated">{{ $t('deprecated') }}</b-badge>
+        <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="mr-1 mt-1 fileformat">{{ format | formatMediaType }}</b-badge>
+        <template v-if="hasDescription">{{ data.properties.description | summarize }}</template>
+      </b-card-text>
+      <Keywords v-if="showKeywordsInItemCards && keywords.length > 0" :keywords="keywords" variant="primary" center />
+      <b-card-text>
+        <small class="text-muted">
+          <template v-if="extent">{{ extent | formatTemporalExtent }}</template>
+          <template v-else-if="data && data.properties.datetime">{{ data.properties.datetime | formatTimestamp }}</template>
+          <template v-else>{{ $t('items.noTime') }}</template>
+        </small>
+      </b-card-text>
+    </b-card-body>
+  </b-card>
 </template>
 
 <script>
-import path from "path";
-import url from "url";
+import { mapState, mapGetters } from 'vuex';
+import ThumbnailCardMixin from './ThumbnailCardMixin';
+import StacLink from './StacLink.vue';
+import STAC from '../models/stac';
+import { formatTemporalExtent, formatTimestamp, formatMediaType } from '@radiantearth/stac-fields/formatters';
+import Registry from '@radiantearth/stac-fields/registry';
+import Utils from '../utils';
 
-import * as d3 from "d3-scale-chromatic";
-import escape from "lodash.escape";
-import isEqual from "lodash.isequal";
-import Leaflet from "leaflet";
-import "leaflet-easybutton";
-import { mapActions, mapGetters } from "vuex";
-
-import common from "./common";
-import { getTileSource } from "../util";
-import { transformItem } from "../migrate";
-
-import AssetTab from './AssetTab.vue';
-import MetadataSidebar from './MetadataSidebar.vue';
-
-const COG_TYPES = [
-  "image/vnd.stac.geotiff; cloud-optimized=true",
-  "image/x.geotiff", // generated by sat-api
-  "image/tiff; application=geotiff; profile=cloud-optimized"
-];
-
-const FEATURES_TYPES = ["application/geo+json"];
+Registry.addDependency('content-type', require('content-type'));
 
 export default {
-  ...common,
-  name: "ItemDetail",
+  name: 'Item',
+  components: {
+    StacLink,
+    Keywords: () => import('./Keywords.vue')
+  },
+  filters: {
+    summarize: text => Utils.summarizeMd(text, 150),
+    formatMediaType: value => formatMediaType(value, null, {shorten: true}),
+    formatTemporalExtent,
+    formatTimestamp
+  },
+  mixins: [
+    ThumbnailCardMixin
+  ],
   props: {
-    ancestors: {
-      type: Array,
-      required: true
-    },
-    center: {
-      type: Array,
-      default: null
-    },
-    path: {
-      type: String,
-      required: true
-    },
-    resolve: {
-      type: Function,
-      required: true
-    },
-    slugify: {
-      type: Function,
-      required: true
-    },
-    url: {
-      type: String,
-      required: true
-    },
-    validate: {
-      type: Function,
+    item: {
+      type: Object,
       required: true
     }
-  },
-  components: {
-    AssetTab,
-    MetadataSidebar
-  },
-  data() {
-    return {
-      fullscreen: false,
-      locatorMap: null,
-      map: null,
-      featuresLayer: null,
-      tileLayer: null,
-      overlayLayer: null,
-      locatorOverlayLayer: null,
-      geojsonOptions: {
-        style: function() {
-          return {
-            weight: 2,
-            color: "#333",
-            opacity: 1,
-            fillOpacity: 0
-          };
-        }
-      },
-      selectedFeatures: null,
-      selectedImage: null,
-      selectedTab: null,
-      validationErrors: null
-    };
   },
   computed: {
-    ...common.computed,
-    ...mapGetters(["getEntity"]),
-    _entity() {
-      return transformItem(this.getEntity(this.url));
+    ...mapState(['showKeywordsInItemCards']),
+    ...mapGetters(['getStac']),
+    data() {
+      return this.getStac(this.item);
     },
-    _collectionLinks() {
-      return this.links.filter(x => x.rel === "collection");
-    },
-    _description() {
-      return this._properties.description;
-    },
-    _keywords() {
-      return (
-        (this.collection && this.collection.keywords) ||
-        common.computed._keywords.apply(this)
-      );
-    },
-    _license() {
-      return (
-        this._properties["item:license"] ||
-        this._properties["license"] ||
-        (this.collection && this.collection.license) ||
-        (this.rootCatalog && this.rootCatalog.license)
-      );
-    },
-    _providers() {
-      return (
-        this._properties["item:providers"] ||
-        this._properties["providers"] ||
-        (this.collection && this.collection.providers) ||
-        common.computed._providers.apply(this)
-      );
-    },
-    _temporalCoverage() {
-      if (this._properties["dtr:start_datetime"] != null) {
-        return [
-          this._properties["dtr:start_datetime"],
-          this._properties["dtr:end_datetime"]
-        ]
-          .map(x => x || "..")
-          .join("/");
+    extent() {
+      if (this.data && (this.data.properties.start_datetime || this.data.properties.end_datetime)) {
+        return [this.data.properties.start_datetime, this.data.properties.end_datetime];
       }
-
-      return this._properties.datetime;
-    },
-    _title() {
-      return this._properties.title;
-    },
-    attribution() {
-      if (this.license != null || this.licensor != null) {
-        return `Imagery ${this.license || ""} ${this.licensor || ""}`;
-      }
-
       return null;
     },
-    bands() {
-      return (
-        this._properties["eo:bands"] ||
-        (this.collection &&
-          this.collection.properties &&
-          this.collection.properties["eo:bands"]) ||
-        (this.rootCatalog &&
-          this.rootCatalog.properties &&
-          this.rootCatalog.properties["eo:bands"]) ||
-        []
-      );
-    },
-    cog() {
-      return (
-        this.cogs
-          .slice()
-          // prefer COGs with "visual" key
-          .sort((a, b) => b.key.indexOf("visual") - a.key.indexOf("visual"))
-          .shift()
-      );
-    },
-    cogs() {
-      return this.assets
-        .filter(x => COG_TYPES.includes(x.type))
-        .map(cog => ({
-          ...cog,
-          title:
-            cog.bandNames.length > 0
-              ? `${cog.title} (${cog.bandNames})`
-              : cog.title
-        }))
-        .map(cog => ({
-          ...cog,
-          title: `Image: ${cog.title}`
-        }));
-    },
-    collection() {
-      if (this.collectionLink != null) {
-        this.load(this.collectionLink.href);
-
-        return this.getEntity(this.collectionLink.href);
+    fileFormats() {
+      if (this.data) {
+        return this.data.getFileFormats();
       }
-
-      return null;
+      return [];
     },
-    collectionLink() {
-      return this._collectionLinks
-        .map(x => ({
-          ...x,
-          href: this.resolve(x.href, this.url),
-          slug: this.slugify(this.resolve(x.href, this.url))
-        }))
-        .pop();
-    },
-    entity() {
-      return this.item;
-    },
-    features() {
-      return this.assets
-        .filter(x => FEATURES_TYPES.includes(x.type))
-        .map(features => ({
-          ...features,
-          title: `Features: ${features.title}`
-        }));
-    },
-    featuresSource() {
-      if (this.selectedFeatures == null) {
-        return "";
+    keywords() {
+      if (this.data) {
+        return this.data.getMetadata('keywords') || [];
       }
-
-      return this.selectedFeatures.href;
+      return [];
     },
-    item() {
-      if (this._entity.type === "FeatureCollection") {
-        const { hash } = url.parse(this.url);
-        const idx = hash.slice(1);
-
-        return this._entity.features[idx];
-      }
-
-      return this._entity;
+    isDeprecated() {
+      return this.data instanceof STAC && Boolean(this.data.properties.deprecated);
     },
-    jsonLD() {
-      const dataset = {
-        "@context": "https://schema.org/",
-        "@type": "Dataset",
-        // required
-        name: this.title,
-        description: this.description || `${this.title} STAC Item`,
-        // recommended
-        citation: this._properties["sci:citation"],
-        identifier: this._properties["sci:doi"] || this.item.id,
-        keywords: this._keywords,
-        license: this.licenseUrl,
-        isBasedOn: this.url,
-        url: this.path,
-        workExample: (this._properties["sci:publications"] || []).map(p => ({
-          identifier: p.doi,
-          citation: p.citation
-        })),
-        includedInDataCatalog: [this.collectionLink, this.parentLink]
-          .filter(x => !!x)
-          .map(l => ({
-            isBasedOn: l.href,
-            url: l.slug
-          })),
-        spatialCoverage: {
-          "@type": "Place",
-          geo: {
-            "@type": "GeoShape",
-            box: (this.item.bbox || []).join(" ")
-          }
-        },
-        temporalCoverage: this._temporalCoverage,
-        distribution: this.assets.map(a => ({
-          contentUrl: a.href,
-          fileFormat: a.type,
-          name: a.title
-        })),
-        image: this.thumbnail
-      };
-
-      return dataset;
-    },
-    licensor() {
-      return this.providers
-        .filter(x => (x.roles || []).includes("licensor"))
-        .map(x => {
-          if (x.url != null) {
-            return `<a href=${x.url}>${x.name}</a>`;
-          }
-
-          return x.name;
-        })
-        .pop();
-    },
-    parentLink() {
-      return this.links
-        .filter(x => x.rel === "parent")
-        .map(x => ({
-          ...x,
-          href: this.resolve(x.href, this.url),
-          slug: this.slugify(this.resolve(x.href, this.url))
-        }))
-        .pop();
-    },
-    properties() {
-      return {
-        ...this._collectionProperties,
-        ...this._properties
-      };
-    },
-    tabIndex: {
-      get: function() {
-        return this.visibleTabs.indexOf(this.selectedTab);
-      },
-      set: function(tabIndex) {
-        // wait for the DOM to update
-        this.$nextTick(() => {
-          this.selectedTab = this.visibleTabs[tabIndex];
-        });
-      }
-    },
-    thumbnail() {
-      const thumbnail = this.assets.find(x => x.key === "thumbnail");
-
-      if (thumbnail != null) {
-        return this.resolve(thumbnail.href, this.url);
-      }
-
-      return null;
-    },
-    tileSource() {
-      if (this.selectedImage == null) {
-        return "";
-      }
-
-      return getTileSource(this.selectedImage.href);
-    },
-    visibleTabs() {
-      return [
-        this.cogs.length > 0 && "preview",
-        this.thumbnail != null && "thumbnail",
-        this.assets.length > 0 && "assets",
-        this.bands.length > 0 && "bands"
-      ].filter(x => x != null && x !== false);
-    }
-  },
-  watch: {
-    ...common.watch,
-    featuresSource(to, from) {
-      if (to !== from) {
-        if (this.map != null) {
-          this.initializeFeaturesLayer();
-        }
-      }
-    },
-    fullscreen(to, from) {
-      if (to !== from) {
-        if (this.map != null) {
-          if (to) {
-            this.map.getContainer().classList.add("leaflet-pseudo-fullscreen");
-          } else {
-            this.map
-              .getContainer()
-              .classList.remove("leaflet-pseudo-fullscreen");
-          }
-        }
-
-        this.updateState({
-          fullscreen: to
-        });
-
-        if (this.map != null) {
-          this.map.invalidateSize();
-        }
-      }
-    },
-    selectedFeatures(to, from) {
-      if (!isEqual(to, from)) {
-        const idx = this.features.indexOf(to);
-
-        if (idx >= 0) {
-          this.updateState({
-            sf: idx
-          });
-        } else {
-          this.updateState({
-            sf: null
-          });
-        }
-      }
-    },
-    selectedImage(to, from) {
-      if (!isEqual(to, from)) {
-        const idx = this.cogs.indexOf(to);
-
-        if (idx >= 0) {
-          this.updateState({
-            si: idx
-          });
-        } else {
-          this.updateState({
-            si: null
-          });
-        }
-      }
-    },
-    selectedTab(to, from) {
-      if (to !== from) {
-        this.updateState({
-          t: to
-        });
-
-        if (to === "preview") {
-          this.map && this.map.invalidateSize();
-        }
-      }
-    },
-    tileSource(to, from) {
-      if (to !== from) {
-        if (this.map != null) {
-          if (this.tileLayer != null) {
-            this.tileLayer.removeFrom(this.map);
-          }
-
-          this.tileLayer = Leaflet.tileLayer(to, {
-            attribution: this.attribution
-          }).addTo(this.map);
-        }
-      }
+    hasDescription() {
+      return this.data instanceof STAC && Utils.hasText(this.data.properties.description);
     }
   },
   methods: {
-    ...common.methods,
-    ...mapActions(["load"]),
-    initialize() {
-      this.syncWithQueryState(this.$route.query);
-
-      this.$nextTick(() => {
-        if (this.cog != null) {
-          this.selectedImage = this.selectedImage || this.cog;
-
-          this.initializePreviewMap();
-        }
-        this.initializeLocatorMap();
-      });
-    },
-    initializeFeaturesLayer() {
-      if (this.featuresLayer != null) {
-        this.featuresLayer.removeFrom(this.map);
-      }
-
-      this.featuresLayer = Leaflet.geoJSON(null, {
-        onEachFeature: (feature, layer) =>
-          layer.bindPopup(() => {
-            const el = document.createElement("table");
-
-            const labelProperties = this._properties["label:property"] || [];
-
-            el.innerHTML = Object.entries(feature.properties)
-              .filter(([k]) =>
-                labelProperties.length > 0 ? labelProperties.includes(k) : true
-              )
-              .map(
-                ([k, v]) =>
-                  `<tr><td><strong>${k}</strong></td><td><code>${v}</code></td></tr>`
-              )
-              .join("");
-
-            return el;
-          }),
-        style: feature => {
-          const labelClasses = this._properties["label:classes"];
-          const classes = (labelClasses || [])
-            .map(x => x.classes.map(c => `${x.name}-${c}`))
-            .flat();
-          const classification = (
-            labelClasses
-              .map(x => [x.name, feature.properties[x.name]])
-              .find(x => x[1] != null) || []
-          ).join("-");
-          const color =
-            d3.schemeTableau10[
-              classes.indexOf(classification) % d3.schemeTableau10.length
-            ] || "#fc0";
-
-          return {
-            color,
-            weight: 1,
-            opacity: 1,
-            fillOpacity: 0.25
-          };
-        }
-      }).addTo(this.map);
-
-      this.$nextTick(async () => {
-        try {
-          const rsp = await fetch(this.featuresSource);
-          const data = await rsp.json();
-          this.featuresLayer.addData(data);
-        } catch (err) {
-          console.warn(err);
-        }
-      });
-    },
-    initializeLocatorMap() {
-      if (this.locatorMap == null) {
-        this.locatorMap = Leaflet.map("locator-map", {
-          attributionControl: false,
-          zoomControl: false,
-          boxZoom: false,
-          doubleClickZoom: false,
-          dragging: false,
-          scrollWheelZoom: false,
-          touchZoom: false
-        });
-
-        Leaflet.tileLayer(
-          "https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}@2x.png",
-          {
-            attribution: `Map data <a href="https://www.openstreetmap.org/copyright">&copy; OpenStreetMap contributors</a>, &copy; <a href="https://carto.com/attributions">CARTO</a>`
-          }
-        ).addTo(this.locatorMap);
-        Leaflet.tileLayer(
-          "https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}@2x.png",
-          {
-            opacity: 0.6,
-            zIndex: 1000
-          }
-        ).addTo(this.locatorMap);
-      } else {
-        this.locatorOverlayLayer.removeFrom(this.locatorMap);
-      }
-
-      this.locatorOverlayLayer = Leaflet.geoJSON(this.item, {
-        pane: "tilePane",
-        style: {
-          weight: 1,
-          color: "#ffd65d",
-          opacity: 1,
-          fillOpacity: 1
-        }
-      }).addTo(this.locatorMap);
-
-      this.locatorMap.fitBounds(this.locatorOverlayLayer.getBounds(), {
-        padding: [95, 95]
-      });
-    },
-    initializePreviewMap() {
-      if (this.map == null) {
-        this.map = Leaflet.map("map", {
-          scrollWheelZoom: false
-        });
-
-        this.map.on("moveend", this.updateHash);
-        this.map.on("zoomend", this.updateHash);
-
-        this.map.attributionControl.setPrefix("");
-
-        this.button = Leaflet.easyButton(
-          "fas fa-expand fa-2x",
-          () => (this.fullscreen = !this.fullscreen),
-          {
-            position: "topright"
-          }
-        ).addTo(this.map);
-
-        if (this.fullscreen) {
-          this.map.getContainer().classList.add("leaflet-pseudo-fullscreen");
-        }
-
-        Leaflet.tileLayer(
-          "https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}@2x.png",
-          {
-            attribution: `Map data <a href="https://www.openstreetmap.org/copyright">&copy; OpenStreetMap contributors</a>, &copy; <a href="https://carto.com/attributions">CARTO</a>`
-          }
-        ).addTo(this.map);
-        Leaflet.tileLayer(
-          "https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}@2x.png",
-          {
-            zIndex: 1000
-          }
-        ).addTo(this.map);
-      } else {
-        if (this.tileLayer != null) {
-          this.tileLayer.removeFrom(this.map);
-        }
-
-        if (this.featuresLayer != null) {
-          this.featuresLayer.removeFrom(this.map);
-        }
-
-        this.overlayLayer.removeFrom(this.map);
-      }
-
-      if (this.tileSource) {
-        this.tileLayer = Leaflet.tileLayer(this.tileSource, {
-          attribution: this.attribution,
-          maxZoom: 22
-        }).addTo(this.map);
-      }
-
-      if (this.featuresSource) {
-        this.initializeFeaturesLayer();
-      }
-
-      this.overlayLayer = Leaflet.geoJSON(this.item, {
-        ...this.geojsonOptions,
-        pane: "tilePane"
-      }).addTo(this.map);
-
-      if (this.center != null) {
-        const [zoom, lat, lng] = this.center;
-
-        this.map.setView([lat, lng], zoom);
-      } else {
-        this.map.fitBounds(this.overlayLayer.getBounds());
-      }
-    },
-    syncWithQueryState(query) {
-      this.selectedTab = query.t;
-
-      if (query.si != null) {
-        this.selectedImage = this.cogs[query.si];
-      } else {
-        this.selectedImage = this.cog;
-      }
-
-      if (query.sf != null) {
-        this.selectedFeatures = this.features[query.sf];
-      }
-
-      this.fullscreen = [true, "true"].includes(query.fullscreen);
-    },
-    async updateHash() {
-      const center = this.map.getCenter();
-      const zoom = this.map.getZoom();
-      const hash = `${zoom}/${center.lat.toFixed(6)}/${center.lng.toFixed(6)}`;
-
-      if (isEqual(this.$route.hash, `#${hash}`)) {
+    load(visible) {
+      if (this.item instanceof STAC) {
         return;
       }
-
-      try {
-        await this.$router.replace({
-          ...this.$route,
-          hash
-        });
-      } catch (err) {
-        console.warn(err);
-      }
+      this.$store.commit(visible ? 'queue' : 'unqueue', this.item.href);
     }
   }
 };
 </script>
 
-<style lang="css">
-html {
-  position: relative;
-  min-height: 100%;
-}
+<style lang="scss">
+#stac-browser {
+  .item-card {
+    text-align: center;
 
-body {
-  line-height: 24px;
-  color: #111;
-  font-family: Arial, sans-serif;
-  margin-bottom: 40px;
-}
+    &.deprecated {
+      opacity: 0.7;
 
-blockquote,
-body {
-  font-size: 16px;
-}
-table {
-  font-size: 80%;
-}
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  padding: 0;
-  margin: 0;
-}
-h1,
-h2,
-h3,
-h4 {
-  font-family: Arial, sans-serif;
-  text-rendering: optimizeLegibility;
-  padding-bottom: 4px;
-}
-h1:last-child,
-h2:last-child,
-h3:last-child,
-h4:last-child {
-  padding-bottom: 0;
-}
-h1 {
-  font-weight: 400;
-  font-size: 28px;
-  line-height: 1.2;
-}
-h2 {
-  font-weight: 700;
-  font-size: 21px;
-  line-height: 1.3;
-}
-h3 {
-  font-weight: 700;
-}
-h3,
-h4 {
-  font-size: 17px;
-  line-height: 1.255;
-}
-h4 {
-  font-weight: 400;
-}
-h5 {
-  font-size: 13px;
-  line-height: 19px;
-}
-h5,
-h6 {
-  font-weight: 700;
-}
-h6 {
-  text-transform: uppercase;
-  font-size: 11px;
-  line-height: 1.465;
-  padding-bottom: 1px;
-}
-p {
-  padding: 0;
-  margin: 0 0 14px;
-}
-p:last-child {
-  margin-bottom: 0;
-}
-p + p {
-  margin-top: -4px;
-}
-b,
-strong {
-  font-weight: 700;
-}
-em,
-i {
-  font-style: italic;
-}
-blockquote {
-  margin: 13px;
-}
-small {
-  font-size: 12px;
-}
-a,
-a:active,
-a:link,
-a:visited {
-  color: #0066c0;
-}
-header {
-  padding: 1.5em 0 0.5em;
-}
-code {
-  color: #555;
-  white-space: nowrap;
-}
+      &:hover {
+        opacity: 1;
+      }
+    }
 
-.scroll {
-  overflow-x: scroll;
-  -ms-overflow-style: none;
-  overflow: -moz-scrollbars-none;
-  scrollbar-width: none;
-}
+    &.queued {
+      min-height: 200px;
+    }
 
-.scroll::-webkit-scrollbar {
-  display: none;
-}
+    .intro {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      overflow-wrap: anywhere;
+      margin-bottom: 0.5rem;
+    }
 
-.btn code {
-  font-size: 10.5px;
-}
+    &.description {
+      .intro {
+        text-align: left;
+        margin-bottom: 0.5rem;
+      }
+    }
 
-.btn.clipboard {
-  white-space: nowrap;
-}
+    .badge.deprecated {
+      text-transform: uppercase;
+    }
 
-.btn.clipboard:hover {
-  text-decoration: none;
-}
+    .card-img {
+      width: auto;
+      height: auto;
+      max-width: 100%;
+      max-height: 200px;
+    }
 
-.footer {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  height: 40px;
-  line-height: 40px;
-  text-align: right;
-  font-size: 0.75em;
-}
-
-.poweredby {
-  border: 1px dotted hotpink;
-  border-radius: 4px;
-  padding: 5px 10px;
-  background-color: #f9f9f9;
-}
-
-.tabs {
-  margin-top: 25px;
-}
-
-.table th,
-.table td {
-  border: none;
-  padding: 0.25rem;
-  vertical-align: middle
-}
-
-.table td.title {
-  border-right: 1px solid #ddd;
-}
-
-.table td.group {
-  border-radius: 5px;
-  background-color: #ddd;
-  padding-left: 7px;
-}
-
-.table td.group h4 {
-  font-size: 14px;
-  font-weight: normal;
-  color: #555;
-  text-transform: uppercase;
-}
-
-.table th {
-  border-top: none;
-  border-bottom: 1px solid #dee2e6;
-}
-
-.metadata td.title {
-  font-weight: bold;
-  width: 33%;
-  text-align: right;
-}
-</style>
-
-<style scoped lang="css">
-.leaflet-pseudo-fullscreen {
-  position: fixed !important;
-  width: 100% !important;
-  height: 100% !important;
-  top: 0 !important;
-  left: 0 !important;
-  z-index: 99999;
-}
-
-.leaflet-container {
-  background-color: #262626;
-}
-
-#locator-map {
-  height: 200px;
-  width: 100%;
-  margin-bottom: 10px;
-}
-
-#map-container {
-  height: 500px;
-}
-
-#map {
-  height: 100%;
-  width: 100%;
-}
-
-#thumbnail {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  max-height: 500px;
-}
-
-#header_logo {
-  max-width: 100px;
-}
-
-.table-responsive.assets {
-  padding: 15px;
-}
-
-.multiselect {
-  margin-top: 5px;
+    .card-body {
+      text-align: center;
+      position: relative;
+    }
+  }
 }
 </style>

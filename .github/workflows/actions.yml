@@ -1,0 +1,22 @@
+name: Deploy
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+      - uses: actions/checkout@v4
+      - run: npm install
+      - run: npm run build -- --pathPrefix="/stac-browser" --historyMode=hash
+      - uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: dist
+          exclude_assets: 'report.html'
+          user_name: 'STAC Browser CI'
+          user_email: matthias.mohr@radiant.earth

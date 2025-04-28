@@ -1,0 +1,73 @@
+// Default Theme for STAC Browser
+
+// Most of the variables below are Bootstrap variables, see https://getbootstrap.com/docs/4.0/getting-started/theming/ for details.
+// For simplicity we just provide some common options as default, but you can override all Bootstrap Sass variables.
+
+// Header / Logo, either image (see below), text (shows CATALOG_TITLE) or none
+$logo: 'none'; 
+// If 'image' has been chosen above
+$logo-image: 'https://raw.githubusercontent.com/radiantearth/stac-site/master/images/logo/stac-030-long.png';
+$logo-image-height: 100px;
+
+// Background and text default colors
+$body-bg: white;
+$body-color: black;
+
+// Colors
+$theme-colors: (
+  "primary":       #188191,
+  "secondary":     #6c757d,
+  "success":       #28a745,
+  "info":          #09B3AD,
+  "warning":       #ffc107,
+  "danger":        #dc3545,
+  "light":         #f8f9fa,
+  "dark":          #343a40
+);
+
+// Breakpoints for responsive design
+$grid-breakpoints: (
+  xs: 0,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1100px,
+  xxl: 1600px,
+  xxxl: 2500px
+);
+
+// Font size
+$font-size-base: 1rem;
+// Fonts for normal text
+$font-family-sans-serif: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+// Fonts for headings
+$headings-font-family: $font-family-sans-serif;
+// Fonts for code
+$font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+// Heading sizes
+$h1-font-size: 2.2rem;
+$h2-font-size: 1.6rem;
+$h3-font-size: 1.4rem;
+$h4-font-size: 1.2rem;
+
+// Heading color
+$headings-color: null;
+
+// Links
+$link-color: map-get($theme-colors, "primary");
+$link-decoration: none;
+$link-hover-color: darken($link-color, 15%);
+$link-hover-decoration: underline;
+
+// Margin between the main sections of the page (header, content, footer)
+$block-margin: 1rem;
+
+// Margin at the top of the page (for a custom header)
+$header-margin: 0px;
+
+// Border radius
+$border-radius: 0.25rem;
+
+// Max. icon size
+$max-icon-size: 32px;

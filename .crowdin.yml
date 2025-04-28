@@ -1,0 +1,11 @@
+files:
+  - source: src/locales/en/*.json
+    ignore:
+      - config.json
+      - custom.json
+    translation: /src/locales/%locale%/%original_file_name%
+pull_request_title: "Update translations"
+pull_request_labels: [
+  "i18n / l10n",
+  "CI run required"
+]

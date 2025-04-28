@@ -1,0 +1,334 @@
+html, body {
+    height: 100%;
+    width: 100%;
+}
+
+body {
+    margin-top: $header-margin;
+}
+
+#stac-browser {
+    display: flex;
+    flex-direction: column;
+    max-width: 100%;
+    height: 100%;
+    min-height: 100%;
+    gap: $block-margin;
+
+    @include media-breakpoint-only(xxxl) {
+        max-width: 75vw;
+    }
+
+    > header {
+        padding-top: $block-margin;
+
+        .lead {
+            color: map-get($theme-colors, 'secondary');
+        }
+    }
+    .logo {
+        @if $logo == 'image' {
+            // Hide text
+            color: transparent;
+            font-size: 0;
+            // Show image
+            background-image: url($logo-image);
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: contain;
+            height: $logo-image-height;
+            margin-bottom: $block-margin;
+        } @else if $logo == 'none' {
+            display: none;
+        }
+    }
+    > main {
+        flex: 1;
+    }
+    > footer {
+        padding-bottom: $block-margin;
+        text-align: center;
+    }
+
+    .map {
+        height: 350px;
+        background-color: transparent;
+        @include border-radius($border-radius);
+        position: relative;
+        z-index: 0;
+    }
+
+    h1 {
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        font-size: 2.2rem;
+    }
+    @include media-breakpoint-down(xl) {
+      h1 {
+          font-size: 2rem;
+      }
+    }
+    @include media-breakpoint-down(md) {
+      h1 {
+          font-size: 1.75rem;
+      }
+    }
+
+    h2 {
+        color: map-get($theme-colors, 'secondary');
+        font-weight: 600;
+    }
+
+    .maps-preview {
+        position: static;
+
+        .nav-pills {
+            margin: 0;
+            padding: 0;
+            
+            > li {
+                margin: 0 0.5rem;
+                &:only-child {
+                    display: none;
+                }
+                &:first-of-type {
+                    margin-top: 0.5rem;
+                }
+                &:last-of-type {
+                    margin-bottom: 0.5rem;
+                }
+            }
+        }
+    }
+
+    > .popover .items .card-columns.count-1 {
+        column-count: 1;
+    }
+
+    .service {
+      &.bsky {
+          @include button-variant(#1185fe, #1185fe);
+      }
+      &.mastodon {
+          @include button-variant(#6364FF, #6364FF);
+      }
+      &.x {
+          @include button-variant(#000000, #000000);
+      }
+    }
+
+    .icon {
+        max-width: $max-icon-size;
+        max-height: $max-icon-size;
+    }
+    h1 > .icon {
+        max-width: 1.2em;
+        max-height: 1.2em;
+    }
+
+    .global-error {
+        position: fixed;
+        bottom: 0;
+        right: 0;
+        z-index: 5000;
+        opacity: 0.9;
+        max-width: 50vh;
+        margin: 1rem;
+    }
+
+    abbr[title], abbr[data-original-title] {
+        text-decoration: none;
+        border-bottom: 1px dotted $body-color;
+    }
+
+    [class*='col'] {
+        position: static;
+    }
+    .card {
+        background: transparent;
+    }
+
+    input:invalid {
+        border-color: map-get($theme-colors, "danger");
+    }
+
+    a.list-group-item {
+        color: $link-color;
+        text-decoration: $link-decoration;
+
+        &:hover {
+            color: $link-hover-color;
+            text-decoration: $link-hover-decoration;
+        }
+    }
+
+    .btn-group, .btn-group-vertical {
+        .btn-primary, .btn-secondary {
+            border-color: darken(map-get($theme-colors, "primary"), 15%);
+            &:hover {
+                border-color: darken(map-get($theme-colors, "primary"), 30%);
+            }
+        }
+        .btn-secondary {
+            background-color: lighten(desaturate(map-get($theme-colors, "primary"), 50%), 20%);
+            &:hover {
+                background-color: darken(map-get($theme-colors, "primary"), 5%);
+            }
+        }
+    }
+    .btn-group-vertical.actions {
+        .btn {
+            text-align: left
+        }
+    }
+
+    .btn {
+        &.disabled,
+        &:disabled {
+            cursor: not-allowed;
+            filter: grayscale(1);
+        }
+    }
+
+    .button-label {
+        display: none;
+    }
+    @include media-breakpoint-up(sm) {
+        .button-label.prio {
+            display: inline;
+        }
+    }
+    @include media-breakpoint-up(md) {
+        .button-label {
+            display: inline;
+        }
+    }
+
+    .expandable-card > .card-header {
+        padding: 0;
+        background-color: transparent;
+    }
+    .expandable-card > .card-header > .btn,
+    .mimic-expandable-card > .list-group-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.5rem;
+        background-color: rgba(0,0,0,0.03);
+        
+        > .title {
+            text-align: left;
+            flex-grow: 9;
+        }
+        > .badges {
+            flex-grow: 1;
+            text-align: right;
+
+            .badge {
+                margin: 0.125rem;
+                text-transform: uppercase;
+            }
+        }
+    }
+
+    
+    .items, .catalogs {
+        > .list {
+            position: relative;
+        }
+    
+        > header {
+            margin-bottom: 0.5rem;
+
+            > h2.title {
+                vertical-align: middle;
+                display: inline-block;
+                margin-bottom: 0.25rem;
+            }
+            .badge {
+                vertical-align: middle;
+            }
+            .btn-group {
+                vertical-align: middle;
+                margin: 0.25rem 0;
+            }
+        }
+    }
+}
+
+@import '~vue-multiselect/dist/vue-multiselect.min.css';
+
+// Datepicker related style
+$default-color: map-get($theme-colors, "secondary");
+$primary-color: map-get($theme-colors, "primary");
+
+// Multiselect related style
+#stac-browser {
+  
+  .multiselect__tags:focus-within {
+    border-color: #48cce1;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(24, 129, 145, 0.25);
+  }
+
+  .multiselect__select:before {
+    color: #495057;
+    border-color: #495057 transparent transparent;
+  }
+  
+  .multiselect__tags,
+  .multiselect__single {
+    border-color: #ccc;
+    padding-left: 0.75rem;
+    font-size: 16px;
+    height: 100%;
+  }
+
+  .multiselect__input,
+  .multiselect__single {
+    padding: 4px 0 3px 0;
+  }
+
+  .multiselect__tag,
+  .multiselect__tag-icon:hover,
+  .multiselect__option--highlight,
+  .multiselect__option--highlight:after {
+    background-color: map-get($theme-colors, "primary");
+  }
+
+  .multiselect__option--selected.multiselect__option--highlight,
+  .multiselect__option--selected.multiselect__option--highlight:after {
+    background-color: map-get($theme-colors, "secondary");
+  }
+
+  .multiselect__placeholder {
+    color: #999;
+    font-size: 16px;
+  }
+}
+
+#stac-browser-auth-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0,0,0, 0.5);
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+
+  > form {
+      min-width: 200px;
+      width: 50vw;
+      border-radius: $border-radius;
+
+      > .card {
+          background-color: #fff;
+      }
+  }
+}
