@@ -122,10 +122,10 @@ export default {
         tipLabel: this.$t('fullscreen.show'),
       });
       this.fullScreenControl.on('enterfullscreen', () => {
-        this.fullScreenControl.button_.title = this.$t('fullscreen.exit')
+        this.fullScreenControl.button_.title = this.$t('fullscreen.exit');
       });
       this.fullScreenControl.on('leavefullscreen', () => {
-        this.fullScreenControl.button_.title = this.$t('fullscreen.show')
+        this.fullScreenControl.button_.title = this.$t('fullscreen.show');
       });
       this.map.addControl(this.fullScreenControl);
     },

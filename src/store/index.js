@@ -5,11 +5,12 @@ import URI from "urijs";
 
 import i18n from '../i18n';
 import Utils, { BrowserError } from '../utils';
-import STAC from '../models/stac';
+import { addMissingChildren, getDisplayTitle, createSTAC } from '../models/stac';
+import { Collection, CatalogLike, STAC } from 'stac-js';
 
 import auth from './auth.js';
 import { addQueryIfNotExists, isAuthenticationError, Loading, processSTAC, proxyUrl, unproxyUrl, stacRequest } from './utils';
-import { getBest } from '../locale-id';
+import { getBest } from 'stac-js/src/locales';
 import I18N from '@radiantearth/stac-fields/I18N';
 import { translateFields, executeCustomFunctions, loadMessages } from '../i18n';
 import { TYPES } from "../components/ApiCapabilitiesMixin";
@@ -98,7 +99,7 @@ function getStore(config, router) {
         }
       },
 
-      displayCatalogTitle: (state, getters) => STAC.getDisplayTitle(getters.root, state.catalogTitle),
+      displayCatalogTitle: (state, getters) => getDisplayTitle(getters.root, state.catalogTitle),
 
       isCollection: state => state.data?.isCollection() || false,
       isCatalog: state => state.data?.isCatalog() || false,
@@ -210,8 +211,8 @@ function getStore(config, router) {
         return [];
       },
       catalogs: state => {
-        let hasCollections = Boolean(state.data instanceof STAC && state.data.getApiCollectionsLink() && state.apiCollections.length > 0);
-        let hasChilds = Boolean(state.data instanceof STAC);
+        let hasCollections = Boolean(state.data instanceof CatalogLike && state.data.getApiCollectionsLink() && state.apiCollections.length > 0);
+        let hasChilds = Boolean(state.data instanceof CatalogLike);
         let showCollections = !state.apiCatalogPriority || state.apiCatalogPriority === 'collections';
         let showChilds = !state.apiCatalogPriority || state.apiCatalogPriority === 'childs';
         let catalogs = [];
@@ -219,7 +220,7 @@ function getStore(config, router) {
           catalogs = catalogs.concat(state.apiCollections);
         }
         if (hasChilds && showChilds) {
-          catalogs = STAC.addMissingChildren(catalogs, state.data);
+          catalogs = addMissingChildren(catalogs, state.data);
         }
         return catalogs;
       },
@@ -490,7 +491,7 @@ function getStore(config, router) {
           state.title = title;
         }
         else {
-          state.title = STAC.getDisplayTitle(state.data, state.catalogTitle);
+          state.title = getDisplayTitle(state.data, state.catalogTitle);
           if (state.data) {
             let description = state.data.getMetadata('description');
             if (Utils.hasText(description)) {
@@ -718,7 +719,7 @@ function getStore(config, router) {
           return;
         }
 
-        const hasData = data instanceof STAC && !data.isPotentiallyIncomplete();
+        const hasData = data instanceof STAC && !data._incomplete;
         if (!hasData) {
           cx.commit('loading', { url, loading });
           try {
@@ -726,7 +727,7 @@ function getStore(config, router) {
             if (!Utils.isObject(response.data)) {
               throw new BrowserError(i18n.t('errors.invalidJsonObject'));
             }
-            data = new STAC(response.data, url, path);
+            data = createSTAC(response.data, url, path);
             cx.commit('loaded', { url, data });
 
             if (show) {
@@ -761,8 +762,8 @@ function getStore(config, router) {
         }
 
         // Load API Collections
-        const apiCollectionLink = data.getApiCollectionsLink();
-        const apiItemLink = data.getApiItemsLink();
+        const apiCollectionLink = data instanceof CatalogLike && data.getApiCollectionsLink();
+        const apiItemLink = data instanceof Collection && data.getApiItemsLink();
         if (!omitApi && apiCollectionLink) {
           let args = { stac: data, show: loading.show };
           try {
@@ -859,8 +860,8 @@ function getStore(config, router) {
                   return data;
                 }
                 else {
-                  data = new STAC(item, url, cx.getters.toBrowserPath(url));
-                  data.markPotentiallyIncomplete();
+                  data = createSTAC(item, url, cx.getters.toBrowserPath(url));
+                  data._incomplete = true;
                   cx.commit('loaded', { data, url });
                   return data;
                 }
@@ -925,8 +926,8 @@ function getStore(config, router) {
                 return data;
               }
               else {
-                data = new STAC(collection, url, cx.getters.toBrowserPath(url));
-                data.markPotentiallyIncomplete();
+                data = createSTAC(collection, url, cx.getters.toBrowserPath(url));
+                data._incomplete = true;
                 cx.commit('loaded', { data, url });
                 return data;
               }

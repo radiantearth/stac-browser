@@ -128,7 +128,8 @@ import ApiCapabilitiesMixin, { TYPES } from './ApiCapabilitiesMixin';
 import DatePickerMixin from './DatePickerMixin';
 import Loading from './Loading.vue';
 
-import STAC from '../models/stac';
+import { CatalogLike, STAC } from 'stac-js';
+import { createSTAC } from '../models/stac'; 
 import Cql from '../models/cql2/cql';
 import Queryable from '../models/cql2/queryable';
 import CqlValue from '../models/cql2/value';
@@ -240,7 +241,7 @@ export default {
       };
     },
     collectionSearchLink() {
-      return this.parent instanceof STAC && this.parent.getApiCollectionsLink();
+      return this.parent instanceof CatalogLike && this.parent.getApiCollectionsLink();
     },
     canSearchCollectionsFreeText() {
       return this.canSearchCollections && this.supportsConformance(TYPES.Collections.FreeText);
@@ -426,9 +427,10 @@ export default {
           data.queryableLink = this.findQueryableLink(links) || null;
         }
 
+        // todo: use ItemCollection / CollectionCollection
         if (!hasMore && Array.isArray(response.data.collections)) {
           let collections = response.data.collections
-            .map(collection => new STAC(collection));
+            .map(collection => createSTAC(collection));
           data.collections = this.prepareCollections(collections);
         }
       }

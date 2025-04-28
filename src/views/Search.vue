@@ -67,7 +67,8 @@ import { mapGetters, mapState } from "vuex";
 import Utils from '../utils';
 import SearchFilter from '../components/SearchFilter.vue';
 import Loading from '../components/Loading.vue';
-import STAC from '../models/stac';
+import { getDisplayTitle, createSTAC } from '../models/stac';
+import { STAC } from 'stac-js';
 import { BIconCheckSquare, BIconSquare, BTabs, BTab } from 'bootstrap-vue';
 import { processSTAC, stacRequest } from '../store/utils';
 
@@ -146,6 +147,7 @@ export default {
       if (!Array.isArray(list)) {
         return [];
       }
+      // todo: use itemcollection class
       return list
         .map(obj => {
           try {
@@ -157,7 +159,7 @@ export default {
             if (selfLink?.href) {
               url = Utils.toAbsolute(selfLink.href, this.link.href);
             }
-            let stac = new STAC(obj, url, this.toBrowserPath(url));
+            let stac = createSTAC(obj, url, this.toBrowserPath(url));
             stac = processSTAC(this.$store.state, stac);
             return stac;
           } catch (error) {
@@ -177,7 +179,7 @@ export default {
       return this.collectionSearch && this.activeSearch === 0;
     },
     pageDescription() {
-      let title = STAC.getDisplayTitle([this.collectionLink, this.parentLink, this.root], this.catalogTitle);
+      let title = getDisplayTitle([this.collectionLink, this.parentLink, this.root], this.catalogTitle);
       return this.$t('search.metaDescription', {title});
     },
     noFurtherItems() {

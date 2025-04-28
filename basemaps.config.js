@@ -1,4 +1,4 @@
-import STAC from './src/models/stac';
+import { Collection, Item } from './src/models/stac';
 import Utils from './src/utils';
 
 const USGS_ATTRIBUTION = 'USGS Astrogeology';
@@ -68,17 +68,15 @@ const BASEMAPS = {
  * @returns {Array.<BasemapOptions>}
  */
 export default function configureBasemap(stac, i18n) {
-  let targets = ['earth'];
-  if (stac instanceof STAC) {
-    if (stac.isCollection() && Utils.isObject(stac.summaries) && Array.isArray(stac.summaries['ssys:targets'])) {
-      targets = stac.summaries['ssys:targets'];
-    }
-    else if (stac.isCollection() && Array.isArray(stac['ssys:targets'])) {
-      targets = stac['ssys:targets'];
-    }
-    else if (stac.isItem() && Array.isArray(stac.properties['ssys:targets'])) {
-      targets = stac.properties['ssys:targets'];
-    }
+  let targets;
+  if (stac instanceof Collection) {
+    targets = stac.getSummary('ssys:targets');
+  }
+  if (!targets) {
+    targets = stac.getMetadata('ssys:targets');
+  }
+  if (!targets) {
+    targets = ['earth'];
   }
 
   let layers = [];

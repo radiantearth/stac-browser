@@ -23,7 +23,6 @@ import VectorSource from 'ol/source/Vector';
 import GeoJSON from 'ol/format/GeoJSON';
 import Fill from 'ol/style/Fill';
 import VectorLayer from 'ol/layer/Vector';
-import create from 'stac-js';
 import { toGeoJSON } from 'stac-js/src/geo.js';
 import mask from '@turf/mask';
 
@@ -123,18 +122,16 @@ export default {
       this.interaction.on('extentchanged', this.update);
       this.map.addInteraction(this.interaction);
   
-      let stac;
       if (this.stac) {
-        stac = create(this.stac);
-        this.addMask(stac);
+        this.addMask(this.stac);
       }
 
       let extent;
       if (this.projectedExtent) {
         extent = this.projectedExtent;
       }
-      else if (stac) {
-        const bbox = stac.getBoundingBox();
+      else if (this.stac) {
+        const bbox = this.stac.getBoundingBox();
         if (bbox) {
           extent = transformExtent(bbox, this.crs, this.map.getView().getProjection());
         }
