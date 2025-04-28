@@ -88,9 +88,6 @@ fi
 echo "${YELLOW}NPM install...${RESET}"
 npm install
 
-echo "${YELLOW}Cleaning previous build...${RESET}"
-npm run clean
-
 echo "${YELLOW}Building with catalog ${CATALOG_URL}...${RESET}"
 HISTORY_MODE=hash CATALOG_URL=${CATALOG_URL} npm run build -- --public-url ./
 
