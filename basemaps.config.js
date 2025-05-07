@@ -1,9 +1,13 @@
 import STAC from './src/models/stac';
 import Utils from './src/utils';
+import MVT from 'ol/format/MVT';
+// needs ol-mapbox-style to be installed
+import { applyBackground, applyStyle } from 'ol-mapbox-style';
 
 const USGS_ATTRIBUTION = 'USGS Astrogeology';
 const WMS = 'TileWMS';
 const XYZ = 'XYZ';
+const VectorTile = 'VectorTile';
 
 // All options (except for 'is') follow the OpenLayers options for the respective source class.
 // Projections (except for EPSG:3857 and EPSG:4326) must be listed in the `crs` array in the config.js.
@@ -13,10 +17,37 @@ const XYZ = 'XYZ';
 const BASEMAPS = {
   earth: [
     {
-      url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+      url: 'https://vectortiles.geo.admin.ch/tiles/ch.swisstopo.leichte-basiskarte.vt/v2.0.0/{z}/{x}/{y}.pbf',
+      is: VectorTile,
+      title: 'Swisstopo VectorTiles',
+      attributions: '&copy; swisstopo',
+      // Seems 2056 is not yet supported:
+      // https://groups.google.com/g/geoadmin-api/c/iB8zbkggH7k
+      projection: 'EPSG:3857',
+      format: new MVT(),
+      layerCreated: layer => {
+        const url = 'https://vectortiles.geo.admin.ch/styles/ch.swisstopo.leichte-basiskarte.vt/style.json';
+        applyStyle(layer, url);
+        applyBackground(layer, url);
+        return layer;
+      }
+    },
+    {
+      url: 'https://wms.geo.admin.ch/',
+      is: WMS,
+      title: 'Swisstopo WMS ',
+      attributions: '&copy; swisstopo',
+      projection: 'EPSG:2056',
+      params: {
+        LAYERS: 'ch.swisstopo.landeskarte-farbe-10',
+        FORMAT: 'image/png',
+      }
+    },
+    {
+      url: 'https://wmts.geo.admin.ch/1.0.0/ch.swisstopo.swissimage/default/current/3857/{z}/{x}/{y}.jpeg',
       is: XYZ,
-      title: 'OpenStreetMap',
-      attributions: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors.',
+      title: 'Swisstopo XYZ',
+      attributions: '&copy; swisstopo',
       projection: "EPSG:3857"
     }
   ],

@@ -20,6 +20,8 @@ if (Utils.isObject(CONFIG.crs)) {
 }
 register(proj4); // required to support source reprojection
 
+import { apply } from 'ol-mapbox-style';
+
 export default {
   computed: {
     ...mapState(['buildTileUrlTemplate', 'crossOriginMedia', 'displayGeoTiffByDefault', 'useTileLayerAsFallback']),
@@ -85,6 +87,9 @@ export default {
           projection,
         }),
       });
+
+      apply(this.map, "https://vectortiles.geo.admin.ch/styles/ch.swisstopo.leichte-basiskarte.vt/style.json");
+      
 
       // Add controls
       this.createControls();
