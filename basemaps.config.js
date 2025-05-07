@@ -1,19 +1,40 @@
 import STAC from './src/models/stac';
 import Utils from './src/utils';
+import MVT from 'ol/format/MVT';
 
 const USGS_ATTRIBUTION = 'USGS Astrogeology';
 const WMS = 'TileWMS';
 const XYZ = 'XYZ';
+const VectorTile = 'VectorTile';
 
 // All options (except for 'is') follow the OpenLayers options for the respective source class.
 // Projections (except for EPSG:3857 and EPSG:4326) must be listed in the `crs` array in the config.js.
 const BASEMAPS = {
   earth: [
     {
-      url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+      url: 'https://vectortiles.geo.admin.ch/tiles/ch.swisstopo.base.vt/v1.0.0/{z}/{x}/{y}.pbf',
+      is: VectorTile,
+      title: 'Swisstopo VectorTiles',
+      attributions: '&copy; swisstopo',
+      projection: 'EPSG:2056',
+      format: new MVT(),
+    },
+    {
+      url: 'https://wms.geo.admin.ch/',
+      is: WMS,
+      title: 'Swisstopo WMS ',
+      attributions: '&copy; swisstopo',
+      projection: 'EPSG:2056',
+      params: {
+        LAYERS: 'ch.swisstopo.landeskarte-farbe-10',
+        FORMAT: 'image/png',
+      }
+    },
+    {
+      url: 'https://wmts.geo.admin.ch/1.0.0/ch.swisstopo.swissimage/default/current/3857/{z}/{x}/{y}.jpeg',
       is: XYZ,
-      title: 'OpenStreetMap',
-      attributions: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors.',
+      title: 'Swisstopo XYZ',
+      attributions: '&copy; swisstopo',
       projection: "EPSG:3857"
     }
   ],
