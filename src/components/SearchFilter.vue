@@ -27,8 +27,8 @@
         </b-form-group>
 
         <b-form-group v-if="canFilterExtents" class="filter-bbox" :label="$t('search.spatialExtent')" :label-for="ids.bbox">
-          <b-form-checkbox :id="ids.bbox" v-model="provideBBox" value="1">{{ $t('search.filterBySpatialExtent') }}</b-form-checkbox>
-          <MapSelect class="mb-4" v-if="provideBBox" v-model="query.bbox" :stac="stac" />
+          <b-form-checkbox :id="ids.bbox" v-model="provideBBox" checked="provideBBox">{{ $t('search.filterBySpatialExtent') }}</b-form-checkbox>
+          <MapSelect class="mb-4" v-if="provideBBox" v-model="query.bbox" :stac="stac" :initExtent="defaultExtent" />
         </b-form-group>
 
         <b-form-group v-if="conformances.CollectionIdFilter" class="filter-collection" :label="$tc('stacCollection', collections.length)" :label-for="ids.collections">
@@ -216,7 +216,7 @@ export default {
   },
   computed: {
     ...mapState(['itemsPerPage', 'maxItemsPerPage', 'uiLanguage']),
-    ...mapGetters(['canSearchCollections', 'supportsConformance']),
+    ...mapGetters(['canSearchCollections', 'supportsConformance', 'defaultSearchExtent']),
     collectionSelectOptions() {
       let taggable = !this.hasAllCollections;
       let isResult = this.collections.length > 0 && !this.hasAllCollections;
@@ -257,6 +257,9 @@ export default {
       }
       return null;
     },
+    defaultExtent() {
+      return this.query?.bbox? this.query.bbox : this.defaultSearchExtent;
+    },
     andOrOptions() {
       return [
         { value: 'and', text: this.$t('search.logical.and') },
@@ -291,7 +294,7 @@ export default {
       set(val) {
         this.query.datetime = Array.isArray(val) ? val.map(d => Utils.dateToUTC(d)) : null;
       }
-    }
+    },
   },
   watch: {
     parent: {
@@ -337,7 +340,7 @@ export default {
         this.query.bbox = null;
       }
       else {
-        this.query.bbox = this.bbox;
+        this.query.bbox = this.bbox? this.bbox : this.defaultExtent;
       }
     }
   },
