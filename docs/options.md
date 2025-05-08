@@ -397,6 +397,12 @@ Example for EPSG:2056:
 
 The number of items requested and shown per page by default. Only applies to APIs that support the `limit` query parameter.
 
+This is applied to the following requests:
+
+- `GET /collection/*/items`
+- `GET /search`
+- Only in Collection Search: `GET /collections` (i.e. **not** applied to the default collection list request)
+
 ### maxItemsPerPage
 
 The maximum number of items per page that a user can request through the `limit` query parameter (`1000` by default).
@@ -414,6 +420,7 @@ The default sorting for lists of catalogs/collections or items. One of:
 - `null`: sorted as in the source files
 
 Doesn't apply when API search filters are applied.
+Also doesn't apply when pagination on the server-side is enabled.
 
 ### showKeywordsInItemCards
 
