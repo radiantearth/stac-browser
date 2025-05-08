@@ -166,7 +166,7 @@
       "description": "Vai alla tua posizione attuale"
     },
     "nobasemap": "Mappa base non disponibile.",
-    "nodata": "Indormazione spaziale mancante nei metadati.",
+    "nodata": "Informazione spaziale mancante nei metadati.",
     "zoom": {
       "in": {
         "description": "Zoom avanti",
