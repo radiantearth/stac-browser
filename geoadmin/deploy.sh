@@ -60,7 +60,7 @@ fi
 # Setting catalog URL
 CATALOG_URL=https://data.geo.admin.ch/api/stac/v0.9/
 if [[ "${STAGING:-}" == "dev" ]] || [[ "${STAGING:-}" == "int" ]]; then
-    CATALOG_URL=https://service-stac.${STAGING}.bgdi.ch/api/stac/v0.9/
+    CATALOG_URL=https://sys-data.${STAGING}.bgdi.ch/api/stac/v0.9/
 fi
 
 # Setting default cache control max-age
@@ -88,11 +88,8 @@ fi
 echo "${YELLOW}NPM install...${RESET}"
 npm install
 
-echo "${YELLOW}Cleaning previous build...${RESET}"
-npm run clean
-
 echo "${YELLOW}Building with catalog ${CATALOG_URL}...${RESET}"
-HISTORY_MODE=hash CATALOG_URL=${CATALOG_URL} npm run build -- --public-url ./
+npm run build -- --historyMode=hash --cardViewSort=desc --catalogUrl="${CATALOG_URL}" --catalogTitle="data.geo.admin.ch" --pathPrefix="/browser/" ./
 
 echo "${YELLOW}Uploading to ${S3_BUCKET_NAME}...${RESET}"
 aws --profile ${AWS_PROFILE} \
