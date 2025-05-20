@@ -134,7 +134,7 @@
   "in": "in {catalog}",
   "index": {
     "api": "API",
-    "catalog": "Catalog",
+    "catalog": "Static Catalog",
     "load": "Load",
     "selectStacIndex": "... or select one from {stacIndex}:",
     "specifyCatalog": "Please specify a STAC Catalog or API...",
@@ -286,6 +286,7 @@
     "title": "Search",
     "useInItemSearch": "Open Collection in Item Search | Open {count} Collections in Item Search"
   },
+  "server": "Server",
   "showMore": "Show more...",
   "sidebar": {
     "switchCatalog": "Switch Catalog"

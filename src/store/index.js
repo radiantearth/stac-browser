@@ -99,8 +99,6 @@ function getStore(config, router) {
         }
       },
 
-      displayCatalogTitle: (state, getters) => getDisplayTitle(getters.root, state.catalogTitle),
-
       isCollection: state => state.data?.isCollection() || false,
       isCatalog: state => state.data?.isCatalog() || false,
       isCatalogLike: state => state.data?.isCatalogLike() || false,
@@ -109,20 +107,20 @@ function getStore(config, router) {
       root: (_, getters) => getters.getStac(getters.rootLink),
 
       rootLink: state => {
-        let link = state.data?.getStacLinkWithRel('root');
+        if (state.catalogUrl) {
+          return Utils.createLink(state.catalogUrl, 'root', state.catalogTitle);
+        }
+        const link = state.data?.getStacLinkWithRel('root');
         if (link) {
           return link;
         }
-        else if (state.catalogUrl) {
-          return Utils.createLink(state.catalogUrl, 'root');
-        }
         else if (state.url && state.data instanceof STAC && state.data.getLinksWithRels(['conformance', 'service-desc', 'service-doc', 'data', 'search']).length > 0) {
-          return Utils.createLink(state.url, 'root');
+          return Utils.createLink(state.url, 'root', state.title);
         }
         else if (state.url) {
           // Fallback: If we detect OGC API like paths, try to guess the paths
-          let uri = URI(state.url);
-          let path = uri.segment(-2);
+          const uri = URI(state.url);
+          const path = uri.segment(-2);
           if (['collections', 'items'].includes(path)) {
             uri.segment(-1, "");
             uri.segment(-1, "");
@@ -130,7 +128,7 @@ function getStore(config, router) {
               uri.segment(-1, "");
               uri.segment(-1, "");
             }
-            return Utils.createLink(uri.toString(), 'root');
+            return Utils.createLink(uri.toString(), 'root', state.catalogTitle);
           }
         }
         return null;
