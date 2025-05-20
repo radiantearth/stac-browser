@@ -1,2 +1,0 @@
-"use strict";(self["webpackChunk_radiantearth_stac_browser"]=self["webpackChunk_radiantearth_stac_browser"]||[]).push([[9856],{59856:function(t,e,a){a.r(e);const r="DD/MM/YYYY",o=Promise.all([a.e(259),a.e(1935)]).then(a.t.bind(a,51935,23));e["default"]={dateFormat:r,timeFormat:timeFormat,dateTimeFormat:dateTimeFormat,locale:o}}}]);
-//# sourceMappingURL=9856.0bb48449.js.map
