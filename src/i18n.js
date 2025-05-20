@@ -7,6 +7,7 @@ import Utils from './utils';
 Vue.use(VueI18n);
 
 export const API_LANGUAGE_CONFORMANCE = ['https://api.stacspec.org/v1.*/language'];
+export const STAC_LANGUAGE_EXT = 'https://stac-extensions.github.io/language/v1.*/schema.json'
 
 const LOCALE_CONFIG = {};
 
