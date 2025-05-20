@@ -447,8 +447,8 @@ export default class Utils {
     return searchterm[fn](term => target.includes(term));
   }
 
-  static createLink(href, rel) {
-    return { href, rel };
+  static createLink(href, rel, title) {
+    return { href, rel, title };
   }
 
   static supportsExtension(data, pattern) {
