@@ -1,5 +1,6 @@
 <template>
   <div class="root-stats">
+    <Url v-if="rootUrl" id="stacUrl" :url="rootUrl" :label="$t('source.locatedAt')" />
     <template v-if="hasConformances">
       <h4>{{ $t('source.conformanceClasses') }}</h4>
       <dl v-for="(classes, group) in conformances" :key="group">
@@ -35,16 +36,21 @@
 <script>
 import { formatKey } from "@radiantearth/stac-fields/helper";
 import { mapGetters, mapState } from "vuex";
+import Url from './Url.vue';
 import Utils from "../utils";
 
 export default {
   name: "RootStats",
   components: {
-    StatsChart: () => import('./metadata/StatsChart.vue')
+    StatsChart: () => import('./metadata/StatsChart.vue'),
+    Url
   },
   computed: {
     ...mapState(['conformsTo']),
     ...mapGetters(['root']),
+    rootUrl() {
+      return this.root ? this.root.getAbsoluteUrl() : null;
+    },
     hasConformances() {
       return Array.isArray(this.conformsTo) && this.conformsTo.length > 0;
     },

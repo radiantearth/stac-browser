@@ -140,6 +140,7 @@
     "urlMissingHost": "The URL is missing a host.",
     "urlMissingProtocol": "The URL is missing a protocol."
   },
+  "info": "Information",
   "items": {
     "filter": "Filters",
     "hideFilter": "Hide Filters",
