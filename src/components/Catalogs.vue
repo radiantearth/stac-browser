@@ -3,10 +3,10 @@
     <header>
       <h2 class="title mr-2">{{ title }}</h2>
       <b-badge v-if="catalogCount !== null" pill variant="secondary" class="mr-4">{{ catalogCount }}</b-badge>
-      <ViewButtons class="mr-2" v-model="view" />
-      <SortButtons v-if="isComplete && catalogs.length > 1" v-model="sort" />
+      <ViewButtons v-if="!simple" class="mr-2" v-model="view" />
+      <SortButtons v-if="!simple && isComplete && catalogs.length > 1" v-model="sort" />
     </header>
-    <section v-if="isComplete && catalogs.length > 1" class="catalog-filter mb-2">
+    <section v-if="!simple && isComplete && catalogs.length > 1" class="catalog-filter mb-2">
       <SearchBox v-model="searchTerm" :placeholder="filterPlaceholder" />
       <multiselect
         v-if="allKeywords.length > 0" v-model="selectedKeywords" multiple :options="allKeywords"
@@ -17,6 +17,7 @@
         :limitText="limitText"
       />
     </section>
+    <slot></slot>
     <Pagination v-if="showPagination" ref="topPagination" class="mb-3" :pagination="pagination" placement="top" @paginate="paginate" />
     <b-alert v-if="hasSearchCritera && catalogView.length === 0" variant="warning" class="mt-2" show>{{ $t('catalogs.noMatches') }}</b-alert>
     <section class="list">
@@ -79,7 +80,11 @@ export default {
     count: {
       type: Number,
       default: null
-    }
+    },
+    simple: {
+      type: Boolean,
+      default: false
+    },
   },
   data() {
     return {
