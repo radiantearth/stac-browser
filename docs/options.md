@@ -17,6 +17,7 @@ The following ways to set config options are possible:
 
 - [catalogUrl](#catalogurl)
 - [catalogTitle](#catalogtitle)
+- [catalogImage](#catalogimage)
 - [allowExternalAccess](#allowexternalaccess)
 - [allowedDomains](#alloweddomains)
 - [apiCatalogPriority](#apicatalogpriority)
@@ -70,6 +71,11 @@ If `catalogUrl` is empty or set to `null` STAC Browser switches to a mode where 
 ## catalogTitle
 
 The default title shown if no title can be read from the root STAC catalog.
+
+## catalogImage
+
+URL to an image to use as a logo with the title.
+Should be an image that browsers can display, e.g. PNG, JPEG, WebP, or SVG.
 
 ## allowExternalAccess
 
