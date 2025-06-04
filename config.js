@@ -27,9 +27,9 @@ module.exports = {
         "id"
     ],
     apiCatalogPriority: null,
-    useTileLayerAsFallback: true,
+    useTileLayerAsFallback: false,
     displayGeoTiffByDefault: false,
-    buildTileUrlTemplate: ({href, asset}) => "https://tiles.rdnt.io/tiles/{z}/{x}/{y}@2x?url=" + encodeURIComponent(href),
+    buildTileUrlTemplate: null,
     stacProxyUrl: null,
     pathPrefix: "/",
     historyMode: "history",
@@ -38,16 +38,15 @@ module.exports = {
     showKeywordsInItemCards: false,
     showKeywordsInCatalogCards: false,
     showThumbnailsAsAssets: false,
-    geoTiffResolution: 128,
     redirectLegacyUrls: false,
     itemsPerPage: 12,
     maxItemsPerPage: 1000,
     defaultThumbnailSize: null,
-    maxPreviewsOnMap: 50,
     crossOriginMedia: null,
     requestHeaders: {},
     requestQueryParameters: {},
     socialSharing: ['email', 'bsky', 'mastodon', 'x'],
     preprocessSTAC: null,
-    authConfig: null
+    authConfig: null,
+    crs: {}
 };
