@@ -585,8 +585,12 @@ function getStore(config, router) {
           state.apiItemsPagination = pages;
         }
 
-        if (show && data.numberMatched) {
-          state.apiItemsNumberMatched = data.numberMatched;
+        if (show) {
+          if (typeof data.numberMatched === 'number') {
+            state.apiItemsNumberMatched = data.numberMatched;
+          } else {
+            state.apiItemsNumberMatched = null;
+          }
         }
 
         if (stac instanceof STAC) {
