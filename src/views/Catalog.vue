@@ -49,6 +49,7 @@
           :stac="data" :items="items" :api="isApi"
           :showFilters="showFilters" :apiFilters="filters"
           :pagination="itemPages" :loading="apiItemsLoading"
+          :count="apiItemsNumberMatched"
           @paginate="paginateItems" @filterItems="filterItems"
           @filtersShown="filtersShown"
         />
@@ -135,7 +136,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination', 'nextCollectionsLink', 'stateQueryParameters']),
+    ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination', 'apiItemsNumberMatched', 'nextCollectionsLink', 'stateQueryParameters']),
     ...mapGetters(['additionalLinks', 'catalogs', 'collectionLink', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
     cssStacType() {
       if (Utils.hasText(this.data?.type)) {
@@ -291,7 +292,7 @@ export default {
   &.catalog { // Catalog has items or catalogs
     .items-container, .catalogs-container {
       max-width: 100%;
-      
+
       .items, .catalogs {
         .card-columns {
           @include media-breakpoint-up(sm) {
@@ -354,7 +355,7 @@ export default {
     .items-container, .catalogs-container {
       max-width: 33%;
 
-      
+
       .items, .catalogs {
         .card-columns {
           @include media-breakpoint-up(lg) {
