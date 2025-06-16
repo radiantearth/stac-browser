@@ -35,6 +35,17 @@ module.exports = {
     requestHeaders: {},
     requestQueryParameters: {},
     socialSharing: ['email', 'bsky', 'mastodon', 'x'],
-    preprocessSTAC: null,
+    preprocessSTAC: stac => {
+        if (stac.getBrowserPath() == '/') {
+          stac.conformsTo.push('https://api.stacspec.org/v1.0.0/item-search');
+          stac.links = stac.links.map(link => {
+            if (link.rel === 'search') {
+              link.type = 'application/geo+json';
+            }
+            return link;
+          });
+        }
+        return stac;
+      },
     authConfig: null
 };
