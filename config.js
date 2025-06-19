@@ -31,7 +31,7 @@ module.exports = {
     displayGeoTiffByDefault: false,
     buildTileUrlTemplate: ({href, asset}) => "https://tiles.rdnt.io/tiles/{z}/{x}/{y}@2x?url=" + encodeURIComponent(href),
     stacProxyUrl: null,
-    pathPrefix: "/",
+    pathPrefix: "./",
     historyMode: "history",
     cardViewMode: "cards",
     cardViewSort: "asc",
