@@ -32,7 +32,7 @@ module.exports = {
     buildTileUrlTemplate: ({href, asset}) => "https://tiles.rdnt.io/tiles/{z}/{x}/{y}@2x?url=" + encodeURIComponent(href),
     stacProxyUrl: null,
     pathPrefix: "./",
-    historyMode: "history",
+    historyMode: "hash",
     cardViewMode: "cards",
     cardViewSort: "asc",
     showKeywordsInItemCards: false,
