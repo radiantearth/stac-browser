@@ -110,13 +110,17 @@
       <b-card-footer>
         <b-button type="submit" variant="primary">{{ $t('submit') }}</b-button>
         <b-button type="reset" variant="danger" class="ml-3">{{ $t('reset') }}</b-button>
+        <b-button type="button" variant="info" class="ml-3" v-b-modal.code>{{ $t('exampleCode') }}</b-button>
       </b-card-footer>
     </b-card>
+    <b-modal id="code" :title="$t('exampleCode')" size="lg">
+      <SearchCode :filters="query" :catalogHref="searchLink.href" />
+    </b-modal>
   </b-form>
 </template>
 
 <script>
-import { BBadge, BDropdown, BDropdownItem, BForm, BFormGroup, BFormInput, BFormCheckbox, BFormRadioGroup } from 'bootstrap-vue';
+import { BBadge, BDropdown, BDropdownItem, BForm, BFormGroup, BFormInput, BFormCheckbox, BFormRadioGroup, BModal, VBModal } from 'bootstrap-vue';
 import Multiselect from 'vue-multiselect';
 import { mapGetters, mapState } from "vuex";
 import refParser from '@apidevtools/json-schema-ref-parser';
@@ -173,11 +177,16 @@ export default {
     BFormInput,
     BFormCheckbox,
     BFormRadioGroup,
+    BModal,
     QueryableInput: () => import('./QueryableInput.vue'),
     Loading,
     Map: () => import('./Map.vue'),
+    SearchCode: () => import('../components/SearchCode.vue'),
     SortButtons: () => import('./SortButtons.vue'),
     Multiselect
+  },
+  directives: {
+    'b-modal': VBModal
   },
   mixins: [
     ApiCapabilitiesMixin,
@@ -197,6 +206,10 @@ export default {
       required: true
     },
     value: {
+      type: Object,
+      default: () => ({})
+    },
+    searchLink: {
       type: Object,
       default: () => ({})
     }

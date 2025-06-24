@@ -110,6 +110,7 @@
     "serverError": "The server encountered an issue. @:errors.contactProvider",
     "unauthorized": "The request lacks credentials, e.g. an API token. Please provide your credentials and try again."
   },
+  "exampleCode": "Example Code",
   "featureExperimental": "This feature is still experimental and may give unexpected results!",
   "fullscreen": {
     "exit": "Exit Fullscreen",
