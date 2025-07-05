@@ -82,7 +82,7 @@ import { mapActions, mapGetters, mapState } from 'vuex';
 import Url from './Url.vue';
 
 import Utils from '../utils';
-import { getBest, prepareSupported } from '../locale-id';
+import { getBest, prepareSupported } from 'stac-js/src/locales';
 import CopyButton from './CopyButton.vue';
 import SocialSharing from './SocialSharing.vue';
 

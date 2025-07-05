@@ -6,15 +6,15 @@
           <b-card no-body class="maps-preview">
             <b-tabs v-model="tab" ref="tabs" card pills vertical end>
               <b-tab :title="$t('map')" no-body>
-                <Map :stac="data" :stacLayerData="selectedAsset" @dataChanged="dataChanged" scrollWheelZoom />
+                <Map :stac="data" :assets="selectedAssets" @assets="dataChanged" @empty="handleEmptyMap" />
               </b-tab>
-              <b-tab v-if="thumbnails.length > 0" :title="$t('thumbnails')" no-body>
+              <b-tab v-if="hasThumbnails" :title="$t('thumbnails')" no-body>
                 <Thumbnails :thumbnails="thumbnails" />
               </b-tab>
             </b-tabs>
           </b-card>
         </section>
-        <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="shownAssets" @showAsset="showAsset" />
+        <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="selectedAssets" @showAsset="showAsset" />
         <Links v-if="additionalLinks.length > 0" :title="$t('additionalResources')" :links="additionalLinks" :context="data" />
       </b-col>
       <b-col class="right">
@@ -39,7 +39,7 @@
 import { mapState, mapGetters } from 'vuex';
 import Description from '../components/Description.vue';
 import ReadMore from "vue-read-more-smooth";
-import ShowAssetMixin from '../components/ShowAssetMixin';
+import ShowAssetLinkMixin from '../components/ShowAssetLinkMixin';
 import { BTabs, BTab } from 'bootstrap-vue';
 import { addSchemaToDocument, createItemSchema } from '../schema-org';
 
@@ -61,7 +61,9 @@ export default {
     ReadMore,
     Thumbnails: () => import('../components/Thumbnails.vue')
   },
-  mixins: [ShowAssetMixin],
+  mixins: [
+    ShowAssetLinkMixin
+  ],
   data() {
     return {
       ignoredMetadataFields: [
@@ -83,7 +85,7 @@ export default {
   },
   computed: {
     ...mapState(['data', 'url']),
-    ...mapGetters(['additionalLinks', 'collectionLink', 'parentLink'])
+    ...mapGetters(['collectionLink', 'parentLink'])
   },
   watch: {
     data: {

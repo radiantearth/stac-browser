@@ -8,10 +8,9 @@
 </template>
 
 <script>
-import STAC from '../models/stac.js';
+import { STAC } from 'stac-js';
 import validateSTAC from 'stac-node-validator';
 import { BIconCheck, BIconX } from 'bootstrap-vue';
-import { mapGetters } from 'vuex';
 
 export default {
   name: "Validation",
@@ -36,10 +35,9 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['toBrowserPath']),
     validationLink() {
       if (this.data instanceof STAC) {
-        return '/validation' + this.toBrowserPath(this.data.getAbsoluteUrl());
+        return '/validation' + this.data.getBrowserPath();
       }
       else {
         return null;

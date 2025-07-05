@@ -27,8 +27,8 @@
         </b-form-group>
 
         <b-form-group v-if="canFilterExtents" class="filter-bbox" :label="$t('search.spatialExtent')" :label-for="ids.bbox">
-          <b-form-checkbox :id="ids.bbox" v-model="provideBBox" value="1" @change="setBBox()">{{ $t('search.filterBySpatialExtent') }}</b-form-checkbox>
-          <Map class="mb-4" v-if="provideBBox" :stac="stac" selectBounds @bounds="setBBox" scrollWheelZoom />
+          <b-form-checkbox :id="ids.bbox" v-model="provideBBox" value="1">{{ $t('search.filterBySpatialExtent') }}</b-form-checkbox>
+          <MapSelect class="mb-4" v-if="provideBBox" v-model="query.bbox" :stac="stac" />
         </b-form-group>
 
         <b-form-group v-if="conformances.CollectionIdFilter" class="filter-collection" :label="$tc('stacCollection', collections.length)" :label-for="ids.collections">
@@ -128,7 +128,8 @@ import ApiCapabilitiesMixin, { TYPES } from './ApiCapabilitiesMixin';
 import DatePickerMixin from './DatePickerMixin';
 import Loading from './Loading.vue';
 
-import STAC from '../models/stac';
+import { CatalogLike, STAC } from 'stac-js';
+import { createSTAC } from '../models/stac'; 
 import Cql from '../models/cql2/cql';
 import Queryable from '../models/cql2/queryable';
 import CqlValue from '../models/cql2/value';
@@ -153,6 +154,8 @@ function getDefaults() {
     sortOrder: 1,
     sortTerm: null,
     provideBBox: false,
+    // Store previous bbox so that it survives when the map is temporarily hidden
+    bbox: null,
     query: getQueryDefaults(),
     filtersAndOr: 'and',
     filters: [],
@@ -175,7 +178,7 @@ export default {
     BFormRadioGroup,
     QueryableInput: () => import('./QueryableInput.vue'),
     Loading,
-    Map: () => import('./Map.vue'),
+    MapSelect: () => import('./maps/MapSelect.vue'),
     SortButtons: () => import('./SortButtons.vue'),
     Multiselect
   },
@@ -186,7 +189,7 @@ export default {
   props: {
     parent: {
       type: Object,
-      required: true
+      default: null
     },
     title: {
       type: String,
@@ -238,7 +241,7 @@ export default {
       };
     },
     collectionSearchLink() {
-      return this.parent instanceof STAC && this.parent.getApiCollectionsLink();
+      return this.parent instanceof CatalogLike && this.parent.getApiCollectionsLink();
     },
     canSearchCollectionsFreeText() {
       return this.canSearchCollections && this.supportsConformance(TYPES.Collections.FreeText);
@@ -318,6 +321,24 @@ export default {
             return collection ? collection : this.collectionToMultiSelect({id});
           });
         }
+      }
+    },
+    query: {
+      deep: true,
+      handler(query) {
+        if (query?.bbox) {
+          // Store the previously selected bbox so that it can be restored after the
+          // map had been hidden accidentally.
+          this.bbox = query.bbox;
+        }
+      }
+    },
+    provideBBox(shown) {
+      if (!shown) {
+        this.query.bbox = null;
+      }
+      else {
+        this.query.bbox = this.bbox;
       }
     }
   },
@@ -406,9 +427,10 @@ export default {
           data.queryableLink = this.findQueryableLink(links) || null;
         }
 
+        // todo: use ItemCollection / CollectionCollection
         if (!hasMore && Array.isArray(response.data.collections)) {
           let collections = response.data.collections
-            .map(collection => new STAC(collection));
+            .map(collection => createSTAC(collection));
           data.collections = this.prepareCollections(collections);
         }
       }
@@ -526,26 +548,6 @@ export default {
     },
     setSearchTerms(terms) {
       this.$set(this.query, 'q', terms);
-    },
-    setBBox(bounds) {
-      let bbox = null;
-      if (this.provideBBox) {
-        if (Utils.isObject(bounds) && typeof bounds.toBBoxString === 'function') {
-          // This is a Leaflet LatLngBounds Object
-          const Y = 85.06;
-          const X = 180;
-          bbox = [
-            Math.max(bounds.getWest(), -X),
-            Math.max(bounds.getSouth(), -Y),
-            Math.min(bounds.getEast(), X),
-            Math.min(bounds.getNorth(), Y)
-          ];
-        }
-        else if (Array.isArray(bounds) && bounds.length === 4) {
-          bbox = bounds;
-        }
-      }
-      this.$set(this.query, 'bbox', bbox);
     },
     addCollection(collection) {
       if (!this.collectionSelectOptions.taggable) {

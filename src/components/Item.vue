@@ -24,9 +24,10 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
+import FileFormatsMixin from './FileFormatsMixin';
 import ThumbnailCardMixin from './ThumbnailCardMixin';
 import StacLink from './StacLink.vue';
-import STAC from '../models/stac';
+import { STAC } from 'stac-js';
 import { formatTemporalExtent, formatTimestamp, formatMediaType } from '@radiantearth/stac-fields/formatters';
 import Registry from '@radiantearth/stac-fields/registry';
 import Utils from '../utils';
@@ -46,6 +47,7 @@ export default {
     formatTimestamp
   },
   mixins: [
+    FileFormatsMixin,
     ThumbnailCardMixin
   ],
   props: {
@@ -65,12 +67,6 @@ export default {
         return [this.data.properties.start_datetime, this.data.properties.end_datetime];
       }
       return null;
-    },
-    fileFormats() {
-      if (this.data) {
-        return this.data.getFileFormats();
-      }
-      return [];
     },
     keywords() {
       if (this.data) {

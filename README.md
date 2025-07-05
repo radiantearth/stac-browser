@@ -8,7 +8,7 @@ implemented as a single page application (SPA) for ease of development and to
 limit the overall number of catalog reads necessary when browsing (as catalogs
 may be nested and do not necessarily contain references to their parents).
 
-Version: **3.3.4** (supports all STAC versions between 0.6.0 and 1.1.0)
+Version: **3.3.5** (supports all STAC versions between 0.6.0 and 1.1.0)
 
 This package has also been published to npm as [`@radiantearth/stac-browser`](https://www.npmjs.com/package/@radiantearth/stac-browser).
 
@@ -181,8 +181,8 @@ If you need even more flexibility, you need to dig into the Vue files and their 
 ### Basemaps
 
 The file `basemaps.config.js` contains the configuration for the basemaps.
-You can update either just the `BASEMAPS` object or you can write a custom function `configureBasemap` that returns the desired options for [vue2-leaflet](https://vue2-leaflet.netlify.app/).
-[XYZ](https://vue2-leaflet.netlify.app/components/LTileLayer.html#props) and [WMS](https://vue2-leaflet.netlify.app/components/LWMSTileLayer.html#props) basemaps are supported and have different options that you can set.
+You can update either just the `BASEMAPS` object or you can write a custom function `configureBasemap` that returns the desired options for OpenLayers.
+XYZ, WMTS, and WMS basemaps are supported and have different options that you can set.
 
 ### Actions
 
