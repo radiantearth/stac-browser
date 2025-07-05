@@ -7,6 +7,9 @@ const XYZ = 'XYZ';
 
 // All options (except for 'is') follow the OpenLayers options for the respective source class.
 // Projections (except for EPSG:3857 and EPSG:4326) must be listed in the `crs` array in the config.js.
+//
+// There's a layerCreated callback that can be used to modify the layer and source after it has been created:
+// async layerCreated(Layer layer, Source source) => Layer
 const BASEMAPS = {
   earth: [
     {
