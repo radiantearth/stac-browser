@@ -604,6 +604,11 @@ function getStore(config, router) {
           stac.setApiData(collections, nextLink);
         }
       },
+      resetApiCollections(state) {
+        state.apiCollections = [];
+        state.apiItemsLoading = {};
+        state.nextCollectionsLink = null;
+      },
       resetApiItems(state, link) {
         state.apiItems = [];
         state.apiItemsLink = link;
@@ -911,16 +916,14 @@ function getStore(config, router) {
       async loadNextApiCollections(cx, args) {
         let { stac, show, noRetry } = args;
         let link;
-        if (stac) {
-          // First page
-          if (cx.state.apiCollections.length > 0) {
-            // If we have already loaded collections, skip loading the first page
-            return;
-          }
+        if (stac) { // First page
+          // If we load from new collections, reset list of collections.
+          // Otherwise we may append to collections from a parent entity.
+          // https://github.com/radiantearth/stac-browser/issues/617
+          cx.commit('resetApiCollections');
           link = stac.getLinkWithRel('data');
         }
-        else {
-          // Second page and after
+        else { // Second page and after
           stac = cx.state.data;
           link = cx.state.nextCollectionsLink;
         }
