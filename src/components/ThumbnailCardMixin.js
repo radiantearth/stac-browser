@@ -21,14 +21,15 @@ export default {
         if (thumbnails.length > 0) {
           let t = thumbnails[0];
           let width, height;
-          if (Array.isArray(t['proj:shape']) && t['proj:shape'].length === 2) {
-            [height, width] = t['proj:shape'];
+          const shape = t.getMetadata('proj:shape');
+          if (Array.isArray(shape) && shape.length === 2) {
+            [height, width] = shape;
           }
           else if (Array.isArray(this.defaultThumbnailSize) && this.defaultThumbnailSize.length === 2) {
             [height, width] = this.defaultThumbnailSize;
           }
           return {
-            src: t.href,
+            src: t.getAbsoluteUrl(),
             alt: t.title,
             crossorigin: this.crossOriginMedia,
             right: this.isList,

@@ -11,7 +11,8 @@
 import { mapState, mapGetters } from 'vuex';
 import { stacBrowserNavigatesTo } from "../rels";
 import Utils from '../utils';
-import STAC from '../models/stac';
+import { getDisplayTitle } from '../models/stac';
+import { STAC } from 'stac-js';
 import URI from 'urijs';
 
 export default {
@@ -47,9 +48,9 @@ export default {
     ...mapGetters(['toBrowserPath', 'getRequestUrl', 'isExternalUrl']),
     icon() {
       if (this.stac) {
-        let icons = this.stac.getIcons();
+        const icons = this.stac.getIcons();
         if (icons.length > 0) {
-          return icons[0];
+          return icons[0].getAbsoluteUrl();
         }
       }
       return null;
@@ -116,7 +117,7 @@ export default {
     href() {
       if (this.stac || this.isStacBrowserLink) {
         let href;
-        if (this.stac) {
+        if (this.stac instanceof STAC) {
           href = this.stac.getBrowserPath();
         }
         else {
@@ -155,7 +156,7 @@ export default {
       }
 
       let fallback = typeof this.fallbackTitle === 'function' ? this.fallbackTitle() : this.fallbackTitle;
-      return STAC.getDisplayTitle(this.data, fallback);
+      return getDisplayTitle(this.data, fallback);
     }
   },
   methods: {

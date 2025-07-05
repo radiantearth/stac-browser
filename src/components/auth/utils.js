@@ -1,5 +1,5 @@
 import Utils from '../../utils.js';
-import STAC from '../../models/stac.js';
+import { STAC } from 'stac-js';
 import Auth from '../../auth/index.js';
 
 export default class AuthUtils {

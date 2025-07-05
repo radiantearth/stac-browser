@@ -113,7 +113,9 @@
   "featureExperimental": "Această funcție este încă experimentală și poate da rezultate neașteptate!",
   "fullscreen": {
     "exit": "Ieși din modul ecran complet",
-    "show": "Vizualizați pe tot ecranul"
+    "exitLabel": "✕",
+    "show": "Vizualizați pe tot ecranul",
+    "showLabel": "⛶"
   },
   "goBack": {
     "description": "Reveniți la {type}",
@@ -147,12 +149,14 @@
     "noneAvailableForCollection": "Nu există articole disponibile pentru această colecție.",
     "showFilter": "Afișează filtre"
   },
-  "leaflet": {
-    "close": "Închidere",
-    "noFeatureProperties": "Nu sunt disponibile date suplimentare pentru această caracteristică.",
-    "stayLayer": {
-      "error": "Ne pare rău, adăugarea datelor pe hartă nu a reușit."
+  "loading": "Încărcare...",
+  "map": "Hartă",
+  "mapping": {
+    "attribution": {
+      "label": "i",
+      "collapseLabel": "✕"
     },
+    "close": "Închidere",
     "zoom": {
       "in": {
         "description": "Mărire",
@@ -160,12 +164,10 @@
       },
       "out": {
         "description": "Micșorare",
-        "label": "-"
+        "label": "–"
       }
     }
   },
-  "loading": "Încărcare...",
-  "map": "Hartă",
   "messageForSchemaError": "{message}, pentru schema {schemaPath}",
   "metadata": {
     "general": "General",
