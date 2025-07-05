@@ -140,11 +140,16 @@ export default {
             import(`ol/source/${options.is}.js`),
             import(`ol/layer/${layerClassName}.js`)
           ]);
-          return new layerCls({
-            source: new sourceCls(options),
+          const source = new sourceCls(options);
+          const layer = new layerCls({
+            source,
             title: options.title,
             base: true
           });
+          if (options.layerCreated) {
+            return await options.layerCreated(layer, source);
+          }
+          return layer;
         } catch (error) {
           console.error(`Failed to load basemap source for ${options.is}`, error);
           return null;
