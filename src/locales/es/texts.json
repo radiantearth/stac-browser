@@ -113,7 +113,9 @@
   "featureExperimental": "¡Esta funcionalidad es experimental y puede producir resultados inesperados!",
   "fullscreen": {
     "exit": "Salir de pantalla completa",
-    "show": "Ver en pantalla completa"
+    "exitLabel": "✕",
+    "show": "Ver en pantalla completa",
+    "showLabel": "⛶"
   },
   "goBack": {
     "description": "Volver al {type}",
@@ -147,12 +149,31 @@
     "noneAvailableForCollection": "No hay elementos disponibles para esta colección.",
     "showFilter": "Mostrar Filtros"
   },
-  "leaflet": {
-    "close": "Cerrar",
-    "noFeatureProperties": "No hay datos adicionales disponibles para este objeto.",
-    "stayLayer": {
-      "error": "Perdón, la carga de datos en el mapa falló."
+  "loading": "Cargando...",
+  "map": "Mapa",
+  "mapping": {
+    "attribution": {
+      "label": "i",
+      "description": "",
+      "collapseLabel": "✕"
     },
+    "bboxSelect": {
+      "add": "",
+      "remove": ""
+    },
+    "close": "Cerrar",
+    "fit": "",
+    "layers": {
+      "title": "",
+      "base": "",
+      "unnamed": "",
+      "footprint": ""
+    },
+    "location": {
+      "description": ""
+    },
+    "nobasemap": "",
+    "nodata": "",
     "zoom": {
       "in": {
         "description": "Acercar el zoom",
@@ -160,12 +181,10 @@
       },
       "out": {
         "description": "Alejar el zoom",
-        "label": "-"
+        "label": "–"
       }
     }
   },
-  "loading": "Cargando...",
-  "map": "Mapa",
   "messageForSchemaError": "{message}, para el esquema {schemaPath}",
   "metadata": {
     "general": "General",
