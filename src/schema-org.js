@@ -30,7 +30,7 @@ function addSpatialCoverage(schema, bbox) {
 
 function formatTemporalCoverage(dates) {
   if (Array.isArray(dates) && dates.length === 2 && (typeof dates[0] === 'string' || typeof dates[1] === 'string')) {
-    return dates.map(dt => dt ? dt : '..').join('/');
+    return dates.map(dt => dt || '..').join('/');
   }
   return null;
 }
