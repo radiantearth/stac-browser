@@ -113,7 +113,9 @@
   "featureExperimental": "Cette fonctionnalité est encore expérimentale et peut donner des résultats inattendus!",
   "fullscreen": {
     "exit": "Quitter le mode plein écran",
-    "show": "Voir en plein écran"
+    "exitLabel": "✕",
+    "show": "Voir en plein écran",
+    "showLabel": "⛶"
   },
   "goBack": {
     "description": "Revenir au {type}",
@@ -147,12 +149,31 @@
     "noneAvailableForCollection": "Aucun item disponible pour cette collection.",
     "showFilter": "Afficher les filtres"
   },
-  "leaflet": {
-    "close": "Fermer",
-    "noFeatureProperties": "Aucune donnée supplémentaire n'est disponible pour cette fonctionnalité.",
-    "stayLayer": {
-      "error": "Désolé, l'ajout des données à la carte a échoué."
+  "loading": "Chargement...",
+  "map": "Carte",
+  "mapping": {
+    "attribution": {
+      "label": "i",
+      "description": "",
+      "collapseLabel": "✕"
     },
+    "bboxSelect": {
+      "add": "",
+      "remove": ""
+    },
+    "close": "Fermer",
+    "fit": "",
+    "layers": {
+      "title": "",
+      "base": "",
+      "unnamed": "",
+      "footprint": ""
+    },
+    "location": {
+      "description": ""
+    },
+    "nobasemap": "",
+    "nodata": "",
     "zoom": {
       "in": {
         "description": "Zoom avant",
@@ -160,12 +181,10 @@
       },
       "out": {
         "description": "Zoom arrière",
-        "label": "-"
+        "label": "–"
       }
     }
   },
-  "loading": "Chargement...",
-  "map": "Carte",
   "messageForSchemaError": "{message}, pour le schéma {schemaPath}",
   "metadata": {
     "general": "Général",
