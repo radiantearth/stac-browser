@@ -113,7 +113,9 @@
   "featureExperimental": "Diese Funktion ist noch experimentell und kann unerwartete Ergebnisse verursachen!",
   "fullscreen": {
     "exit": "Verlasse den Vollbild-Modus",
-    "show": "Zeige im Vollbild-Modus"
+    "exitLabel": "✕",
+    "show": "Öffne im Vollbild-Modus",
+    "showLabel": "⛶"
   },
   "goBack": {
     "description": "Gehe zurück zu: {type}",
@@ -147,12 +149,31 @@
     "noneAvailableForCollection": "Für diesen Katalog sind keine Elemente verfügbar.",
     "showFilter": "Zeige Filter"
   },
-  "leaflet": {
-    "close": "Schließen",
-    "noFeatureProperties": "Keine weiteren Daten verfügbar für dieses Element.",
-    "stayLayer": {
-      "error": "Entschuldigung, die Daten auf der Karte anzuzeigen ist fehlgeschlagen."
+  "loading": "Lade...",
+  "map": "Karte",
+  "mapping": {
+    "attribution": {
+      "label": "i",
+      "description": "Namensnennungen",
+      "collapseLabel": "✕"
     },
+    "bboxSelect": {
+      "add": "Klicke auf die Karte, um eine Box für die räumliche Ausdehnung zu erstellen.",
+      "remove": "Klicke in die Box, um sie zu entfernen."
+    },
+    "close": "Schließen",
+    "fit": "Ansicht an räumliche Ausdehnung anpassen",
+    "layers": {
+      "title": "Kartenebenen",
+      "base": "Grundkarten",
+      "unnamed": "Unbenannt #{id}",
+      "footprint": "Räumliche Ausdehnung"
+    },
+    "location": {
+      "description": "Springe zu deiner Position"
+    },
+    "nobasemap": "Keine Grundkarten verfügbar.",
+    "nodata": "In den Metadaten sind keine räumlichen Informationen verfügbar.",
     "zoom": {
       "in": {
         "description": "Vergrößern",
@@ -160,12 +181,10 @@
       },
       "out": {
         "description": "Verkleinern",
-        "label": "-"
+        "label": "–"
       }
     }
   },
-  "loading": "Lade...",
-  "map": "Karte",
   "messageForSchemaError": "{message}, für Schema {schemaPath}",
   "metadata": {
     "general": "Allgemeines",
