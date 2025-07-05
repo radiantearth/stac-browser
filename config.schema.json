@@ -152,12 +152,6 @@
         "boolean"
       ]
     },
-    "geoTiffResolution": {
-      "type": [
-        "integer"
-      ],
-      "minimum": 1
-    },
     "redirectLegacyUrls": {
       "type": [
         "boolean"
@@ -187,12 +181,6 @@
           "number"
         ]
       }
-    },
-    "maxPreviewsOnMap": {
-      "type": [
-        "integer"
-      ],
-      "minimum": 1
     },
     "crossOriginMedia": {
       "type": [
@@ -242,6 +230,11 @@
         {
           "$ref": "https://stac-extensions.github.io/authentication/v1.1.0/schema.json"
         }
+      ]
+    },
+    "crs": {
+      "type": [
+        "object"
       ]
     }
   }

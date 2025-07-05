@@ -27,7 +27,7 @@
         <b-alert v-else-if="results.length === 0" variant="warning" show>{{ $t('search.noItemsFound') }}</b-alert>
         <template v-else>
           <div id="search-map" v-if="itemCollection">
-            <Map :stac="stac" :stacLayerData="itemCollection" scrollWheelZoom popover />
+            <Map :stac="parent" :items="itemCollection" onfocusOnly popover />
           </div>
           <Catalogs
             v-if="isCollectionSearch" :catalogs="results" collectionsOnly
@@ -47,7 +47,7 @@
           </Catalogs>
           <Items
             v-else
-            :stac="stac" :items="results" :api="true" :allowFilter="false"
+            :stac="parent" :items="results" :api="true" :allowFilter="false"
             :pagination="pagination" :loading="loading" @paginate="loadResults"
             :count="totalCount"
           />
@@ -67,7 +67,8 @@ import { mapGetters, mapState } from "vuex";
 import Utils from '../utils';
 import SearchFilter from '../components/SearchFilter.vue';
 import Loading from '../components/Loading.vue';
-import STAC from '../models/stac';
+import { getDisplayTitle, createSTAC } from '../models/stac';
+import { STAC } from 'stac-js';
 import { BIconCheckSquare, BIconSquare, BTabs, BTab } from 'bootstrap-vue';
 import { processSTAC, stacRequest } from '../store/utils';
 
@@ -118,20 +119,14 @@ export default {
       }
       return null;
     },
-    stac() {
-      if (this.parent instanceof STAC) {
-        return this.parent;
-      }
-      return null;
-    },
     searchLink() {
       return this.isCollectionSearch ? this.collectionSearch : this.itemSearch;
     },
     collectionSearch() {
-      return this.canSearchCollections && this.stac && this.stac.getApiCollectionsLink();
+      return this.canSearchCollections && this.parent && this.parent.getApiCollectionsLink();
     },
     itemSearch() {
-      return this.canSearchItems && this.stac && this.stac.getSearchLink();
+      return this.canSearchItems && this.parent && this.parent.getSearchLink();
     },
     itemCollection() {
       if (this.isCollectionSearch) {
@@ -152,6 +147,7 @@ export default {
       if (!Array.isArray(list)) {
         return [];
       }
+      // todo: use itemcollection class
       return list
         .map(obj => {
           try {
@@ -163,7 +159,7 @@ export default {
             if (selfLink?.href) {
               url = Utils.toAbsolute(selfLink.href, this.link.href);
             }
-            let stac = new STAC(obj, url, this.toBrowserPath(url));
+            let stac = createSTAC(obj, url, this.toBrowserPath(url));
             stac = processSTAC(this.$store.state, stac);
             return stac;
           } catch (error) {
@@ -183,7 +179,7 @@ export default {
       return this.collectionSearch && this.activeSearch === 0;
     },
     pageDescription() {
-      let title = STAC.getDisplayTitle([this.collectionLink, this.parentLink, this.root], this.catalogTitle);
+      let title = getDisplayTitle([this.collectionLink, this.parentLink, this.root], this.catalogTitle);
       return this.$t('search.metaDescription', {title});
     },
     noFurtherItems() {

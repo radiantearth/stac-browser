@@ -142,7 +142,7 @@ body {
         border-bottom: 1px dotted $body-color;
     }
 
-    [class*='col'] {
+    [class^='col'] {
         position: static;
     }
     .card {

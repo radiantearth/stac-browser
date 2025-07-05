@@ -38,7 +38,8 @@
 import { mapGetters, mapState } from 'vuex';
 import Catalog from './Catalog.vue';
 import Loading from './Loading.vue';
-import STAC from '../models/stac';
+import { getDisplayTitle } from '../models/stac';
+import { STAC } from 'stac-js';
 import ViewMixin from './ViewMixin';
 import Utils from '../utils';
 
@@ -160,7 +161,7 @@ export default {
       // Sort
       if (!this.hasMore && this.sort !== 0) {
         const collator = new Intl.Collator(this.uiLanguage);
-        catalogs = catalogs.slice(0).sort((a,b) => collator.compare(STAC.getDisplayTitle(a), STAC.getDisplayTitle(b)));
+        catalogs = catalogs.slice(0).sort((a,b) => collator.compare(getDisplayTitle(a), getDisplayTitle(b)));
         if (this.sort === -1) {
           catalogs = catalogs.reverse();
         }
