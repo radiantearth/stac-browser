@@ -4,7 +4,8 @@ import {
   Item as BaseItem,
   ItemCollection as BaseItemCollection,
   CollectionCollection as BaseCollectionCollection,
-  STAC
+  STAC,
+  STACReference
 } from 'stac-js';
 import Migrate from '@radiantearth/stac-migrate';
 import Utils, { geojsonMediaType } from "../utils";
@@ -45,41 +46,29 @@ export function addMissingChildren(catalogs, stac) {
   return links.concat(catalogs);
 }
 
-export function getDisplayTitle(sources, fallbackTitle = null) {
-  if (!Array.isArray(sources)) {
-    sources = [sources];
+export function getDisplayTitle(entities, fallbackTitle = "") {
+  if (!Array.isArray(entities)) {
+    entities = [entities];
   }
-  let stac = sources.find(o => o instanceof STAC);
-  let link = sources.find(o => Utils.isObject(o) && !(o instanceof STAC));
-  // Get title from STAC item/catalog/collection
-  const title = stac && stac.getMetadata("title");
+  const stac = entities.find(o => o instanceof STAC);
+  const ref = entities.find(o => o instanceof STACReference);
+  const entity = stac || ref;
+  if (!entity) {
+    return fallbackTitle;
+  }
+  const title = entity.getMetadata("title");
   if (Utils.hasText(title)) {
     return title;
   }
-  // Get title from link
-  else if (link && Utils.hasText(link.title)) {
-    return link.title;
+  const id = entity.getMetadata("id");
+  if (Utils.hasText(id)) {
+    return id;
   }
-  // Use id from STAC item/catalog/collection instead of titles
-  else if (stac && Utils.hasText(stac.id)) {
-    return stac.id;
-  }
-  // Use fallback title
-  else if (Utils.hasText(fallbackTitle)) {
+  if (Utils.hasText(fallbackTitle)) {
     return fallbackTitle;
   }
-  // Use file or directory name from STAC as title
-  else if (stac) {
-    return Utils.titleForHref(stac.getAbsoluteUrl(), true);
-  }
-  // Use file or directory name from link as title
-  else if (link && Utils.hasText(link.href)) {
-    return Utils.titleForHref(link.href, true);
-  }
-  // Nothing available, return "untitled"
-  else {
-    return "Untitled";
-  }
+  // Use file or directory name from STAC entity as title
+  return Utils.titleForHref(entity.getAbsoluteUrl(), true);
 }
 
 function getChildren(stac, priority = null) {

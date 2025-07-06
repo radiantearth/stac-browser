@@ -108,6 +108,7 @@
     "noExternalAccess": "Accessing external catalogs is not allowed!",
     "notFound": "The requested resource does not exist. @:errors.contactProvider",
     "serverError": "The server encountered an issue. @:errors.contactProvider",
+    "title": "Error",
     "unauthorized": "The request lacks credentials, e.g. an API token. Please provide your credentials and try again."
   },
   "featureExperimental": "This feature is still experimental and may give unexpected results!",
@@ -286,7 +287,6 @@
     "title": "Search",
     "useInItemSearch": "Open Collection in Item Search | Open {count} Collections in Item Search"
   },
-  "server": "Server",
   "showMore": "Show more...",
   "sidebar": {
     "switchCatalog": "Switch Catalog"
