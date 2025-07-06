@@ -20,9 +20,9 @@ function getStore(config, router) {
   // Local settings (e.g. for currently loaded STAC entity)
   const localDefaults = () => ({
     url: '',
-    title: config.catalogTitle,
-    description: null,
+    page: null, // Function that returns title and optionally description of the current page as object
     data: null,
+    loading: true,
     parents: null,
     globalError: null,
 
@@ -64,7 +64,30 @@ function getStore(config, router) {
       uiLanguage: config.locale
     }),
     getters: {
-      loading: state => !state.url || !state.data || state.database[state.url] instanceof Loading,
+      title: state => {
+        if (state.page) {
+          const meta = state.page();
+          return meta.title;
+        }
+        else if (state.data instanceof STAC) {
+          const fallback = state.data.getBrowserPath() === '/' ? state.catalogTitle : '';
+          return getDisplayTitle(state.data, fallback);
+        }
+        else {
+          return "";
+        }
+      },
+      description: state => {
+        let description;
+        if (state.page) {
+          const meta = state.page();
+          description = meta.description;
+        }
+        else if (state.data instanceof STAC) {
+          description = state.data.getMetadata('description');
+        }
+        return Utils.hasText(description) ? description : "";
+      },
       getApiItemsLoading: state => data => {
         let id = '';
         if (data instanceof Loading) {
@@ -115,7 +138,7 @@ function getStore(config, router) {
           return link;
         }
         else if (state.url && state.data instanceof STAC && state.data.getLinksWithRels(['conformance', 'service-desc', 'service-doc', 'data', 'search']).length > 0) {
-          return Utils.createLink(state.url, 'root', state.title);
+          return Utils.createLink(state.url, 'root', getDisplayTitle(state.data, state.catalogTitle));
         }
         else if (state.url) {
           // Fallback: If we detect OGC API like paths, try to guess the paths
@@ -443,6 +466,7 @@ function getStore(config, router) {
       loading(state, { url, loading }) {
         Vue.set(state.database, url, loading);
         if (loading.show) {
+          state.loading = true;
           state.url = url;
         }
       },
@@ -467,35 +491,23 @@ function getStore(config, router) {
       resetPage(state) {
         Object.assign(state, localDefaults());
       },
-      setPageMetadata(state, { title, description }) {
-        state.title = title;
-        if (typeof description !== 'undefined') {
-          state.description = description;
-        }
-      },
-      showPage(state, { url, title, description, stac }) {
+      showPage(state, { url, stac, page }) {
         if (!stac) {
           stac = state.database[url] || null;
         }
         state.url = url || null;
         state.data = stac instanceof STAC ? stac : null;
-        state.description = description;
-
-        // Set title
-        if (title) {
-          state.title = title;
-        }
-        else {
-          state.title = getDisplayTitle(state.data);
-          if (state.data) {
-            let description = state.data.getMetadata('description');
-            if (Utils.hasText(description)) {
-              state.description = description;
-            }
-          }
-        }
+        state.page = page;
+        state.loading = false;
       },
       errored(state, { url, error }) {
+        const status = state.database[url];
+        if (status instanceof Loading && status.show) {
+          state.loading = false;
+          state.page = () => ({
+            title: i18n.t('errors.title')
+          });
+        }
         if (!(error instanceof Error)) {
           error = new Error(error);
         }

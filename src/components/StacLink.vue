@@ -1,8 +1,6 @@
 <template>
   <component :is="component" class="stac-link" v-bind="attributes" :title="tooltip">
-    <template v-if="icon">
-      <img :src="icon.href" :alt="icon.title" :title="icon.title" class="icon mr-2">
-    </template>
+    <img v-if="icon && !hideIcon" :src="icon.getAbsoluteUrl()" :alt="icon.title" :title="icon.title" class="icon mr-2">
     <span class="title">{{ displayTitle }}</span>
   </component>
 </template>
@@ -41,16 +39,20 @@ export default {
     state: {
       type: Object,
       default: null
+    },
+    hideIcon: {
+      type: Boolean,
+      default: false
     }
   },
   computed: {
     ...mapState(['allowExternalAccess', 'privateQueryParameters']),
     ...mapGetters(['toBrowserPath', 'getRequestUrl', 'isExternalUrl']),
     icon() {
-      if (this.stac) {
+      if (this.stac instanceof STAC) {
         const icons = this.stac.getIcons();
         if (icons.length > 0) {
-          return icons[0].getAbsoluteUrl();
+          return icons[0];
         }
       }
       return null;

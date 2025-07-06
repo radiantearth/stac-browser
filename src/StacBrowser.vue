@@ -8,13 +8,13 @@
       <b-row class="site">
         <b-col md="12">
           <div class="title">
-            <img v-if="catalogImageFromVueX" :src="catalogImageFromVueX" class="logo">
+            <img v-if="logo" :src="logo.getAbsoluteUrl()" :alt="logo.title" :title="logo.title" class="logo">
             <h2>
-              <StacLink v-if="root" :data="root" />
+              <StacLink v-if="root" :data="root" hideIcon />
               <template v-else>{{ catalogTitle }}</template>
             </h2>
-            <b-button v-if="root" size="sm" variant="outline-primary" id="popover-root-btn" :title="$t('server')">
-              <b-icon-server /><span class="button-label">{{ $t('server') }}</span>
+            <b-button v-if="root" size="sm" variant="outline-primary" id="popover-root-btn" :title="serviceType">
+              <b-icon-server /><span class="button-label">{{ serviceType }}</span>
             </b-button>
           </div>
           <nav class="actions">
@@ -40,10 +40,10 @@
           </nav>
         </b-col>
       </b-row>
-      <b-row class="page">
+      <b-row class="page" v-if="!loading">
         <b-col md="12">
           <div class="title">
-            <img v-if="icon" :src="icon.href" :alt="icon.title" :title="icon.title" class="icon mr-2">
+            <img v-if="icon" :src="icon.getAbsoluteUrl()" :alt="icon.title" :title="icon.title" class="icon">
             <h1>{{ title }}</h1>
             <Source class="title-actions" :title="title" :stacUrl="url" :stac="data" />
           </div>
@@ -77,9 +77,7 @@
       triggers="focus" placement="bottom" container="stac-browser"
     >
       <template #title>
-        {{ $t('server') }}
-        <b-badge v-if="isApi" variant="danger">{{ $t('index.api') }}</b-badge>
-        <b-badge v-else variant="success">{{ $t('index.catalog') }}</b-badge>
+        {{ serviceType }}
       </template>
       <RootStats />
     </b-popover>
@@ -198,7 +196,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['allowSelectCatalog', 'conformsTo', 'data', 'dataLanguage', 'description', 'globalError', 'stateQueryParameters', 'title', 'uiLanguage', 'url']),
+    ...mapState(['allowSelectCatalog', 'conformsTo', 'data', 'dataLanguage', 'globalError', 'loading', 'stateQueryParameters', 'uiLanguage', 'url']),
     ...mapState({
       catalogImageFromVueX: 'catalogImage',
       localeFromVueX: 'locale',
@@ -206,7 +204,7 @@ export default {
       supportedLocalesFromVueX: 'supportedLocales',
       storeLocaleFromVueX: 'storeLocale'
     }),
-    ...mapGetters(['canSearch', 'collectionLink', 'fromBrowserPath', 'isExternalUrl', 'parentLink', 'root', 'rootLink', 'supportsConformance', 'toBrowserPath']),
+    ...mapGetters(['canSearch', 'collectionLink', 'description', 'fromBrowserPath', 'isExternalUrl', 'parentLink', 'root', 'rootLink', 'supportsConformance', 'title', 'toBrowserPath']),
     ...mapGetters('auth', { authMethod: 'method' }),
     ...mapGetters('auth', ['canAuthenticate', 'isLoggedIn', 'showLogin']),
     browserVersion() {
@@ -245,6 +243,9 @@ export default {
     isApi() {
       // todo: This gives false results for a statically hosted OGC API - Records, which may include conformance classes
       return Array.isArray(this.conformsTo) && this.conformsTo.length > 0;
+    },
+    serviceType() {
+      return this.isApi ? this.$t('index.api') : this.$t('index.catalog');
     },
     back() {
       return this.$route.name === 'validation';
@@ -286,13 +287,15 @@ export default {
       }
     },
     icon() {
-      if (this.data instanceof STAC) {
-        let icons = this.data.getIcons();
-        if (icons.length > 0) {
-          return icons[0];
-        }
+      return this.getIcon(this.data);
+    },
+    logo() {
+      if (this.catalogImageFromVueX) {
+        return Utils.createLink(this.catalogImageFromVueX, 'icon', this.rootLink?.title);
       }
-      return null;
+      else {
+        return this.getIcon(this.root);
+      }
     }
   },
   watch: {
@@ -457,6 +460,15 @@ export default {
     ...mapActions(['switchLocale']),
     ...mapMutations('auth', ['addAction']),
     ...mapActions('auth', ['requestLogin', 'requestLogout']),
+    getIcon(data) {
+      if (data instanceof STAC) {
+        let icons = data.getIcons();
+        if (icons.length > 0) {
+          return icons[0];
+        }
+      }
+      return null;
+    },
     async logInOut() {
       if (this.url) {
         this.addAction(() => this.$store.dispatch("load", {
