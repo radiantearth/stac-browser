@@ -9,10 +9,10 @@
         <b-col md="12">
           <div class="title">
             <img v-if="logo" :src="logo.getAbsoluteUrl()" :alt="logo.title" :title="logo.title" class="logo">
-            <h2>
+            <span role="banner">
               <StacLink v-if="root" :data="root" hideIcon />
               <template v-else>{{ catalogTitle }}</template>
-            </h2>
+            </span>
             <b-button v-if="root" size="sm" variant="outline-primary" id="popover-root-btn" :title="serviceType">
               <b-icon-server /><span class="button-label">{{ serviceType }}</span>
             </b-button>
@@ -43,8 +43,11 @@
       <b-row class="page" v-if="!loading">
         <b-col md="12">
           <div class="title">
-            <img v-if="icon" :src="icon.getAbsoluteUrl()" :alt="icon.title" :title="icon.title" class="icon">
-            <h1>{{ title }}</h1>
+            <img v-if="icon && !isRoot" :src="icon.getAbsoluteUrl()" :alt="icon.title" :title="icon.title" class="icon">
+            <h1>
+              <template v-if="isRoot">{{ $t('frontpage') }}</template>
+              <template v-else>{{ title }}</template>
+            </h1>
             <Source class="title-actions" :title="title" :stacUrl="url" :stac="data" />
           </div>
           <nav class="actions">
@@ -113,6 +116,7 @@ import { getBest, prepareSupported } from 'stac-js/src/locales';
 import BrowserStorage from "./browser-store";
 import Authentication from "./components/Authentication.vue";
 import LanguageChooser from "./components/LanguageChooser.vue";
+import { getDisplayTitle } from "./models/stac";
 
 Vue.use(AlertPlugin);
 Vue.use(ButtonGroupPlugin);
@@ -204,7 +208,7 @@ export default {
       supportedLocalesFromVueX: 'supportedLocales',
       storeLocaleFromVueX: 'storeLocale'
     }),
-    ...mapGetters(['canSearch', 'collectionLink', 'description', 'fromBrowserPath', 'isExternalUrl', 'parentLink', 'root', 'rootLink', 'supportsConformance', 'title', 'toBrowserPath']),
+    ...mapGetters(['canSearch', 'collectionLink', 'description', 'fromBrowserPath', 'isExternalUrl', 'isRoot', 'parentLink', 'root', 'rootLink', 'supportsConformance', 'title', 'toBrowserPath']),
     ...mapGetters('auth', { authMethod: 'method' }),
     ...mapGetters('auth', ['canAuthenticate', 'isLoggedIn', 'showLogin']),
     browserVersion() {
@@ -301,6 +305,12 @@ export default {
   watch: {
     ...Watchers,
     title(title) {
+      if (this.root) {
+        const rootTitle = getDisplayTitle(this.root);
+        if (rootTitle !== title) {
+          title += ` - ${rootTitle}`;
+        }
+      }
       document.title = title;
       document.getElementById('og-title').setAttribute("content", title);
     },
