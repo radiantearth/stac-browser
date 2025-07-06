@@ -451,14 +451,6 @@ export default class Utils {
     return { href, rel, title };
   }
 
-  static supportsExtension(data, pattern) {
-    if (!Utils.isObject(data) || !Array.isArray(data['stac_extensions'])) {
-      return false;
-    }
-    let regexp = new RegExp('^' + pattern.replaceAll('*', '[^/]+') + '$');
-    return Boolean(data['stac_extensions'].find(uri => regexp.test(uri)));
-  }
-
   /**
    * Deep merge two objects.
    * @param target

@@ -32,23 +32,10 @@
               <b-button v-if="canAuthenticate" variant="primary" size="sm" @click="logInOut" :title="authTitle">
                 <component :is="authIcon" /><span class="button-label">{{ authLabel }}</span>
               </b-button>
-              <b-dropdown size="sm" variant="primary" right :title="$t('source.language.switch')">
-                <template #button-content>
-                  <b-icon-flag /><span class="button-label">{{ $t('source.language.label', {currentLanguage}) }}</span>
-                </template>
-                <b-dropdown-item
-                  v-for="l of languages" :key="l.code" class="lang-item"
-                  @click="switchLocale({locale: l.code, userSelected: true})"
-                >
-                  <b-icon-check v-if="localeFromVueX === l.code" />
-                  <b-icon-blank v-else />
-                  <span class="title">
-                    <span :lang="l.code">{{ l.native }}</span>
-                    <template v-if="l.global && l.global !== l.native"> / <span lang="en">{{ l.global }}</span></template>
-                  </span>
-                  <b-icon-exclamation-triangle v-if="supportsLanguageExt && (!l.ui || !l.data)" :title="l.ui ? $t('source.language.onlyUI') : $t('source.language.onlyData')" class="ml-2" />
-                </b-dropdown-item>
-              </b-dropdown>
+              <LanguageChooser
+                :data="data" :currentLocale="localeFromVueX" :locales="supportedLocalesFromVueX"
+                @setLocale="locale => switchLocale({locale, userSelected: true})"
+              />
             </b-button-group>
           </nav>
         </b-col>
@@ -108,9 +95,9 @@ import getRoutes from "./router";
 import getStore from "./store";
 
 import {
-  AlertPlugin, BadgePlugin, BDropdown, BDropdownItem, BPopover,
-  BIconArrow90degUp, BIconArrowLeft, BIconBlank, BIconCheck, BIconExclamationTriangle,
-  BIconFlag, BIconFolderSymlink, BIconInfoLg, BIconList, BIconSearch, BIconServer,
+  AlertPlugin, BadgePlugin, BPopover,
+  BIconArrow90degUp, BIconArrowLeft, BIconFolderSymlink, BIconInfoLg,
+  BIconList, BIconSearch, BIconServer,
   ButtonGroupPlugin, ButtonPlugin, CardPlugin, LayoutPlugin, SpinnerPlugin,
   VBToggle, VBVisible } from "bootstrap-vue";
 import "bootstrap/dist/css/bootstrap.css";
@@ -119,14 +106,15 @@ import "bootstrap-vue/dist/bootstrap-vue.css";
 import ErrorAlert from './components/ErrorAlert.vue';
 import StacLink from './components/StacLink.vue';
 
-import { STAC } from 'stac-js';
+import { CatalogLike, STAC } from 'stac-js';
 import Utils from './utils';
 import URI from 'urijs';
 
-import { API_LANGUAGE_CONFORMANCE, STAC_LANGUAGE_EXT } from './i18n';
+import { API_LANGUAGE_CONFORMANCE } from './i18n';
 import { getBest, prepareSupported } from 'stac-js/src/locales';
 import BrowserStorage from "./browser-store";
 import Authentication from "./components/Authentication.vue";
+import LanguageChooser from "./components/LanguageChooser.vue";
 
 Vue.use(AlertPlugin);
 Vue.use(ButtonGroupPlugin);
@@ -184,14 +172,8 @@ export default {
   store,
   components: {
     Authentication,
-    BDropdown,
-    BDropdownItem,
     BIconArrow90degUp,
     BIconArrowLeft,
-    BIconBlank,
-    BIconCheck,
-    BIconExclamationTriangle,
-    BIconFlag,
     BIconFolderSymlink,
     BIconInfoLg,
     BIconList,
@@ -199,6 +181,7 @@ export default {
     BIconServer,
     BPopover,
     ErrorAlert,
+    LanguageChooser,
     RootStats: () => import('./components/RootStats.vue'),
     Sidebar: () => import('./components/Sidebar.vue'),
     StacLink,
@@ -215,7 +198,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['allowSelectCatalog', 'conformsTo', 'data', 'dataLanguage', 'dataLanguages', 'description', 'globalError', 'stateQueryParameters', 'title', 'uiLanguage', 'url']),
+    ...mapState(['allowSelectCatalog', 'conformsTo', 'data', 'dataLanguage', 'description', 'globalError', 'stateQueryParameters', 'title', 'uiLanguage', 'url']),
     ...mapState({
       catalogImageFromVueX: 'catalogImage',
       localeFromVueX: 'locale',
@@ -223,7 +206,7 @@ export default {
       supportedLocalesFromVueX: 'supportedLocales',
       storeLocaleFromVueX: 'storeLocale'
     }),
-    ...mapGetters(['canSearch', 'collectionLink', 'fromBrowserPath', 'isExternalUrl', 'parentLink', 'root', 'rootLink', 'supportsConformance', 'supportsExtension', 'toBrowserPath']),
+    ...mapGetters(['canSearch', 'collectionLink', 'fromBrowserPath', 'isExternalUrl', 'parentLink', 'root', 'rootLink', 'supportsConformance', 'toBrowserPath']),
     ...mapGetters('auth', { authMethod: 'method' }),
     ...mapGetters('auth', ['canAuthenticate', 'isLoggedIn', 'showLogin']),
     browserVersion() {
@@ -248,7 +231,7 @@ export default {
         return null;
       }
       let searchLink;
-      if (this.data instanceof STAC && !this.data.equals(this.root)) {
+      if (this.data instanceof CatalogLike && !this.data.equals(this.root)) {
         searchLink = this.data.getSearchLink();
       }
       if (searchLink) {
@@ -258,62 +241,6 @@ export default {
         return `/search${this.root.getBrowserPath()}`;
       }
       return '/search';
-    },
-    currentLanguage() {
-      let lang = this.languages.find(l => l.code === this.localeFromVueX);
-      if (lang) {
-        return lang.native;
-      }
-      else {
-        return '-';
-      }
-    },
-    supportsLanguageExt() {
-      return this.supportsExtension(STAC_LANGUAGE_EXT);
-    },
-    languages() {
-      let languages = [];
-
-      // Add all UI languages
-      for(let code of this.supportedLocalesFromVueX) {
-        languages.push({
-          code,
-          native: this.$t(`languages.${code}.native`),
-          global: this.$t(`languages.${code}.global`),
-          ui: true
-        });
-      }
-
-      // Add missing data languages
-      for(let lang of this.dataLanguages) {
-        if (!Utils.isObject(lang) || !lang.code || this.supportedLocalesFromVueX.includes(lang.code)) {
-          continue;
-        }
-        let newLang = {
-          code: lang.code
-        };
-        newLang.native = lang.name || lang.alternate || lang.code;
-        newLang.global = lang.alternate || lang.name || lang.code;
-        newLang.data = true;
-        languages.push(newLang);
-      }
-
-      if (this.supportsLanguageExt) {
-        // Determine which languages are complete
-        const uiSupported = prepareSupported(this.supportedLocalesFromVueX);
-        const dataSupported = prepareSupported(this.dataLanguages.map(l => l.code));
-        for(let l of languages) {
-          if (!l.ui) {
-            l.ui = Boolean(getBest(uiSupported, l.code, null));
-          }
-          if (!l.data) {
-            l.data = Boolean(getBest(dataSupported, l.code, null));
-          }
-        }
-      }
-      
-      const collator = new Intl.Collator(this.uiLanguage);
-      return languages.sort((a,b) => collator.compare(a.global, b.global));
     },
     isApi() {
       // todo: This gives false results for a statically hosted OGC API - Records, which may include conformance classes
@@ -645,13 +572,5 @@ export default {
 @import '~bootstrap-vue/src/index.scss';
 @import "./theme/page.scss";
 @import "./theme/custom.scss";
-</style>
-<style lang="scss" scoped>
-.lang-item > .dropdown-item {
-  display: flex;
-  > .title {
-    flex: 1;
-  }
-}
 </style>
 

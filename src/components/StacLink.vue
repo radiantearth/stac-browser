@@ -28,7 +28,7 @@ export default {
     },
     fallbackTitle: {
       type: [String, Function],
-      default: null
+      default: ""
     },
     tooltip: {
       type: String,
