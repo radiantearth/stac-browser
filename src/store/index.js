@@ -3,7 +3,7 @@ import Vuex from "vuex";
 
 import URI from "urijs";
 
-import i18n from '../i18n';
+import i18n, { getDataLanguages } from '../i18n';
 import Utils, { BrowserError } from '../utils';
 import { addMissingChildren, getDisplayTitle, createSTAC } from '../models/stac';
 import { Collection, CatalogLike, STAC } from 'stac-js';
@@ -45,7 +45,6 @@ function getStore(config, router) {
     authActions: [],
     conformsTo: [],
     dataLanguage: null,
-    dataLanguages: [],
 
     apiCollections: [],
     apiItemsLoading: {},
@@ -185,9 +184,6 @@ function getStore(config, router) {
           .join('|');
         let regexp = new RegExp('^(' + classRegexp + ')$');
         return Boolean(state.conformsTo.find(uri => uri.match(regexp)));
-      },
-      supportsExtension: state => schemaUri => {
-        return Utils.supportsExtension(state.data, schemaUri);
       },
 
       canSearch: (state, getters) => {
@@ -490,22 +486,13 @@ function getStore(config, router) {
           state.title = title;
         }
         else {
-          state.title = getDisplayTitle(state.data, state.catalogTitle);
+          state.title = getDisplayTitle(state.data);
           if (state.data) {
             let description = state.data.getMetadata('description');
             if (Utils.hasText(description)) {
               state.description = description;
             }
           }
-        }
-
-        if (state.data) {
-          let source = state.data.isItem() ? state.data.properties : state.data;
-          let languages = Array.isArray(source.languages) ? source.languages.slice() : [];
-          if (Utils.isObject(source.language)) {
-            languages.unshift(source.language);
-          }
-          state.dataLanguages = languages.filter(lang => Utils.isObject(lang) && typeof lang.code === 'string');
         }
       },
       errored(state, { url, error }) {
@@ -633,11 +620,12 @@ function getStore(config, router) {
         }
 
         // Locale for UI
-        let uiLanguage = getBest(cx.state.supportedLocales, locale, cx.state.fallbackLocale);
+        const uiLanguage = getBest(cx.state.supportedLocales, locale, cx.state.fallbackLocale);
         // Locale for data
-        let dataLanguageCodes = cx.state.dataLanguages.map(l => l.code);
-        let dataLanguageFallback = cx.state.dataLanguages.length > 0 ? cx.state.dataLanguages[0].code : uiLanguage;
-        let dataLanguage = getBest(dataLanguageCodes, locale, dataLanguageFallback);
+        const dataLanguages = getDataLanguages(cx.state.data);
+        const dataLanguageCodes = dataLanguages.map(l => l.code);
+        const dataLanguageFallback = dataLanguages.length > 0 ? dataLanguages[0].code : uiLanguage;
+        const dataLanguage = getBest(dataLanguageCodes, locale, dataLanguageFallback);
 
         // Load messages
         await loadMessages(uiLanguage);
