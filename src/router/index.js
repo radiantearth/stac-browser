@@ -60,6 +60,9 @@ function getRoutes(config) {
     props: route => getPath(route, config)
   });
 
+  // if you add new routes that may include .../external/... in the path make sure
+  // to add the new path prefix to the fromBrowserPath regexp in store/index.js
+
   return routes;
 }
 

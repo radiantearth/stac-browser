@@ -259,7 +259,7 @@ function getStore(config, router) {
         }
       },
       fromBrowserPath: (state, getters) => url => {
-        const externalRE = /^\/(search\/)?external\//;
+        const externalRE = /^\/((search|validation)\/)?external\//;
         if (!Utils.hasText(url) || url === '/') {
           url = state.catalogUrl;
         }
