@@ -122,7 +122,8 @@ export default {
     },
     async addStacLayer() {
       let options = Object.assign({}, this.stacLayerOptions, {
-        url: this.stac.getAbsoluteUrl(),
+        // Don't set the URL here, as it is already set in the STAC object and is read-only.
+        // url: this.stac.getAbsoluteUrl(),
         data: this.stac,
         children: this.items,
         assets: this.assets || null,
@@ -176,7 +177,7 @@ export default {
       }
     },
     fit() {
-      let extent = this.stacLayer.getExtent();
+      const extent = this.stacLayer.getExtent();
       if (extent) {
         // Update the sizes, otherwise the fit will not work properly and compute a wrong zoom level
         this.map.updateSize();
