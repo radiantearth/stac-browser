@@ -112,6 +112,7 @@
     "unauthorized": "The request lacks credentials, e.g. an API token. Please provide your credentials and try again."
   },
   "featureExperimental": "This feature is still experimental and may give unexpected results!",
+  "frontpage": "Start",
   "fullscreen": {
     "exit": "Exit fullscreen mode",
     "exitLabel": "✕",

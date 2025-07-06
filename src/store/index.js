@@ -63,13 +63,19 @@ function getStore(config, router) {
       uiLanguage: config.locale
     }),
     getters: {
-      title: state => {
+      isRoot: (state, getters) => {
+        if (state.data instanceof STAC) {
+          return state.data.equals(getters.root);
+        }
+        return false;
+      },
+      title: (state, getters) => {
         if (state.page) {
           const meta = state.page();
           return meta.title;
         }
         else if (state.data instanceof STAC) {
-          const fallback = state.data.getBrowserPath() === '/' ? state.catalogTitle : '';
+          const fallback = getters.isRoot ? state.catalogTitle : '';
           return getDisplayTitle(state.data, fallback);
         }
         else {
