@@ -58,6 +58,22 @@ body {
             margin: 0;
             padding: 0;
           }
+
+          h1 {
+            font-weight: 700;
+            align-items: center;
+            font-size: 2.2rem;
+          }
+          @include media-breakpoint-down(xl) {
+            h1 {
+              font-size: 2rem;
+            }
+          }
+          @include media-breakpoint-down(md) {
+            h1 {
+              font-size: 1.75rem;
+            }
+          }
         }
       }
     }
@@ -87,23 +103,6 @@ body {
     @include border-radius($border-radius);
     position: relative;
     z-index: 0;
-  }
-
-  h1 {
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    font-size: 2.2rem;
-  }
-  @include media-breakpoint-down(xl) {
-    h1 {
-      font-size: 2rem;
-    }
-  }
-  @include media-breakpoint-down(md) {
-    h1 {
-      font-size: 1.75rem;
-    }
   }
 
   h2 {
@@ -232,6 +231,7 @@ body {
     .button-label {
       display: inline-block;
       margin-left: 0.25rem;
+      white-space: nowrap;
     }
   }
 
