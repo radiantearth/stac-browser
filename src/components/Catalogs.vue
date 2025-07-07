@@ -73,6 +73,10 @@ export default {
       type: Boolean,
       default: false
     },
+    apiFilters: {
+      type: Object,
+      default: () => ({})
+    },
     pagination: {
       type: Object,
       default: () => ({})
@@ -159,7 +163,7 @@ export default {
         });
       }
       // Sort
-      if (!this.hasMore && this.sort !== 0) {
+      if (!this.hasMore && !this.apiFilters.sortby && this.sort !== 0) {
         const collator = new Intl.Collator(this.uiLanguage);
         catalogs = catalogs.slice(0).sort((a,b) => collator.compare(getDisplayTitle(a), getDisplayTitle(b)));
         if (this.sort === -1) {

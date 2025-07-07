@@ -32,7 +32,7 @@
           <Catalogs
             v-if="isCollectionSearch" :catalogs="results" collectionsOnly
             :pagination="pagination" :loading="loading" @paginate="loadResults"
-            :count="totalCount"
+            :count="totalCount" :apiFilters="collectionFilters"
           >
             <template #catalogFooter="slot">
               <b-button-group v-if="itemSearch || canFilterItems(slot.data)" vertical size="sm">
@@ -49,7 +49,7 @@
             v-else
             :stac="parent" :items="results" :api="true" :allowFilter="false"
             :pagination="pagination" :loading="loading" @paginate="loadResults"
-            :count="totalCount"
+            :count="totalCount" :apiFilters="itemFilters"
           />
         </template>
       </b-col>
