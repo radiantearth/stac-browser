@@ -7,17 +7,7 @@
     <header>
       <b-row class="site">
         <b-col md="12">
-          <div class="title">
-            <img v-if="logo" :src="logo.getAbsoluteUrl()" :alt="logo.title" :title="logo.title" class="logo">
-            <span role="banner">
-              <StacLink v-if="root" :data="root" hideIcon />
-              <template v-else>{{ catalogTitle }}</template>
-            </span>
-            <b-button v-if="root" size="sm" variant="outline-primary" id="popover-root-btn" :title="serviceType">
-              <b-icon-server /><span class="button-label">{{ serviceType }}</span>
-            </b-button>
-          </div>
-          <nav class="actions">
+          <nav class="actions navigation">
             <b-button-group v-if="canSearch || isServerSelector">
               <b-button v-if="isServerSelector" variant="primary" size="sm" :title="$t('browse')" v-b-toggle.sidebar @click="sidebar = true">
                 <b-icon-list /><span class="button-label">{{ $t('browse') }}</span>
@@ -27,7 +17,17 @@
               </b-button>
             </b-button-group>
           </nav>
-          <nav class="actions">
+          <div class="title">
+            <img v-if="logo" :src="logo.getAbsoluteUrl()" :alt="logo.title" :title="logo.title" class="logo">
+            <span role="banner">
+              <StacLink v-if="root" :data="root" hideIcon />
+              <template v-else>{{ catalogTitle }}</template>
+            </span>
+            <b-button v-if="root" size="sm" variant="outline-primary" id="popover-root-btn" :title="serviceType">
+              <b-icon-caret-down-fill />
+            </b-button>
+          </div>
+          <nav class="actions user">
             <b-button-group>
               <b-button v-if="canAuthenticate" variant="primary" size="sm" @click="logInOut" :title="authTitle">
                 <component :is="authIcon" /><span class="button-label">{{ authLabel }}</span>
@@ -42,27 +42,27 @@
       </b-row>
       <b-row class="page" v-if="!loading">
         <b-col md="12">
+          <nav class="actions navigation">
+            <b-button-group>
+              <b-button v-if="back" :to="selfBrowserLink" :title="$t('goBack.description', {type})" variant="outline-primary" size="sm">
+                <b-icon-arrow-left /><span class="button-label">{{ $t('goBack.label') }}</span>
+              </b-button>
+              <b-button v-if="parentLink" :to="toBrowserPath(parentLink.href)" :title="parentLinkTitle" variant="outline-primary" size="sm">
+                <b-icon-arrow-90deg-up /><span class="button-label">{{ $t('goToParent.label') }}</span>
+              </b-button>
+              <b-button v-if="collectionLink" :to="toBrowserPath(collectionLink.href)" :title="collectionLinkTitle" variant="outline-primary" size="sm">
+                <b-icon-folder-symlink /><span class="button-label">{{ $t('goToCollection.label') }}</span>
+              </b-button>
+            </b-button-group>
+          </nav>
           <div class="title">
             <img v-if="icon && !isRoot" :src="icon.getAbsoluteUrl()" :alt="icon.title" :title="icon.title" class="icon">
             <h1>
               <template v-if="isRoot">{{ $t('frontpage') }}</template>
               <template v-else>{{ title }}</template>
             </h1>
-            <Source class="title-actions" :title="title" :stacUrl="url" :stac="data" />
           </div>
-          <nav class="actions">
-            <b-button-group class="actions">
-              <b-button v-if="back" :to="selfBrowserLink" :title="$t('goBack.description', {type})" variant="outline-primary" size="sm">
-                <b-icon-arrow-left /><span class="button-label">{{ $t('goBack.label') }}</span>
-              </b-button>
-              <b-button v-if="collectionLink" :to="toBrowserPath(collectionLink.href)" :title="collectionLinkTitle" variant="outline-primary" size="sm">
-                <b-icon-folder-symlink /><span class="button-label">{{ $t('goToCollection.label') }}</span>
-              </b-button>
-              <b-button v-if="parentLink" :to="toBrowserPath(parentLink.href)" :title="parentLinkTitle" variant="outline-primary" size="sm">
-                <b-icon-arrow-90deg-up /><span class="button-label">{{ $t('goToParent.label') }}</span>
-              </b-button>
-            </b-button-group>
-          </nav>
+          <Source class="actions" :title="title" :stacUrl="url" :stac="data" />
         </b-col>
       </b-row>
     </header>
@@ -97,8 +97,8 @@ import getStore from "./store";
 
 import {
   AlertPlugin, BadgePlugin, BPopover,
-  BIconArrow90degUp, BIconArrowLeft, BIconFolderSymlink, BIconInfoLg,
-  BIconList, BIconSearch, BIconServer,
+  BIconArrow90degUp, BIconArrowLeft, BIconCaretDownFill,
+  BIconFolderSymlink, BIconInfoLg, BIconList, BIconSearch,
   ButtonGroupPlugin, ButtonPlugin, CardPlugin, LayoutPlugin, SpinnerPlugin,
   VBToggle, VBVisible } from "bootstrap-vue";
 import "bootstrap/dist/css/bootstrap.css";
@@ -176,11 +176,11 @@ export default {
     Authentication,
     BIconArrow90degUp,
     BIconArrowLeft,
+    BIconCaretDownFill,
     BIconFolderSymlink,
     BIconInfoLg,
     BIconList,
     BIconSearch,
-    BIconServer,
     BPopover,
     ErrorAlert,
     LanguageChooser,

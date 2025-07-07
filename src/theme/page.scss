@@ -8,6 +8,10 @@ body {
   margin-top: $header-margin;
 }
 
+#popover-root-btn {
+  border: 0;
+}
+
 #stac-browser {
   display: flex;
   flex-direction: column;
@@ -26,8 +30,10 @@ body {
 
       > .col-md-12 {
         > .title {
-          font-size: 1.5rem;
-          font-weight: 600;
+          > span {
+            font-size: 1.5rem;
+            font-weight: 600;
+          }
         }
 
         .logo {
@@ -51,6 +57,7 @@ body {
           margin: 0;
           padding: 0;
           align-items: center;
+          justify-content: center;
           gap: 1rem;
 
           h1,
