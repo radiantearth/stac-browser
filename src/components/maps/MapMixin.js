@@ -46,6 +46,7 @@ export default {
       attributionControl: null,
       fullScreenControl: null,
       basemaps: [],
+      isFullScreen: false,
     };
   },
   created() {
@@ -123,9 +124,11 @@ export default {
       });
       this.fullScreenControl.on('enterfullscreen', () => {
         this.fullScreenControl.button_.title = this.$t('fullscreen.exit');
+        this.isFullScreen = true;
       });
       this.fullScreenControl.on('leavefullscreen', () => {
         this.fullScreenControl.button_.title = this.$t('fullscreen.show');
+        this.isFullScreen = false;
       });
       this.map.addControl(this.fullScreenControl);
     },

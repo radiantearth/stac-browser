@@ -1,6 +1,6 @@
 <template>
   <div class="map-container">
-    <div ref="map" class="map">
+    <div ref="map" class="map" :id="mapId">
       <!-- this will be filled by OpenLayers -->
       <LayerControl :map="map" />
       <TextControl v-if="empty" :map="map" :text="$t('mapping.nodata')" />
@@ -8,8 +8,8 @@
     </div>
     <div ref="target" class="popover-target" />
     <b-popover
-      v-if="popover && selectedItems" show placement="left" triggers="manual"
-      :target="selectedItems.target" container="#stac-browser"
+      v-if="popover && selectedItems" show placement="auto" triggers="manual"
+      :target="selectedItems.target" :container="container"
     >
       <section class="popover-items">
         <Items :stac="stac" :items="selectedItems.items" />
@@ -32,6 +32,7 @@ import StacLayer from 'ol-stac';
 import { getStacObjectsForEvent, getStyle } from 'ol-stac/util.js';
 
 const selectStyle = getStyle('#ff0000', 2, null);
+let mapId = 0;
 
 export default {
   name: 'Map',
@@ -71,11 +72,20 @@ export default {
       stacLayer: null,
       selectedItems: null,
       empty: false,
-      selector: null
+      selector: null,
+      mapId: `map-${++mapId}`,
     };
   },
   computed: {
-    ...mapGetters(['getStac'])
+    ...mapGetters(['getStac']),
+    container() {
+      if (this.isFullScreen) {
+        return '#' + this.mapId;
+      }
+      else {
+        return '#stac-browser';
+      }
+    },
   },
   watch: {
     async stac() {
