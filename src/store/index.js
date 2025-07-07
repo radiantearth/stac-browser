@@ -35,7 +35,8 @@ function getStore(config, router) {
 
     apiItems: [],
     apiItemsLink: null,
-    apiItemsPagination: {}
+    apiItemsPagination: {},
+    apiItemsNumberMatched: null,
   });
 
   const catalogDefaults = () => ({
@@ -558,6 +559,14 @@ function getStore(config, router) {
 
         if (show) {
           state.apiItemsPagination = pages;
+        }
+
+        if (show) {
+          if (typeof data.numberMatched === 'number') {
+            state.apiItemsNumberMatched = data.numberMatched;
+          } else {
+            state.apiItemsNumberMatched = null;
+          }
         }
 
         if (stac instanceof STAC) {
