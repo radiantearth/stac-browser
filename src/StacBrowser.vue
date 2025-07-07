@@ -18,8 +18,8 @@
             </b-button>
           </div>
           <nav class="actions">
-            <b-button-group>
-              <b-button variant="primary" size="sm" :title="$t('browse')" v-b-toggle.sidebar @click="sidebar = true">
+            <b-button-group v-if="canSearch || canBrowse">
+              <b-button v-if="canBrowse" variant="primary" size="sm" :title="$t('browse')" v-b-toggle.sidebar @click="sidebar = true">
                 <b-icon-list /><span class="button-label">{{ $t('browse') }}</span>
               </b-button>
               <b-button v-if="canSearch" variant="primary" size="sm" :to="searchBrowserLink" :title="$t('search.title')" :pressed="isSearchPage()">
@@ -218,6 +218,9 @@ export default {
       else {
         return "";
       }
+    },
+    canBrowse() {
+      return this.$route.name !== 'select';
     },
     authIcon() {
       return this.isLoggedIn ? 'b-icon-unlock' : 'b-icon-lock';
