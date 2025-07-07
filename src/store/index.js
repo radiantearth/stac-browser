@@ -23,7 +23,6 @@ function getStore(config, router) {
     page: null, // Function that returns title and optionally description of the current page as object
     data: null,
     loading: true,
-    parents: null,
     globalError: null,
 
     localRequestQueryParameters: {},
@@ -593,9 +592,6 @@ function getStore(config, router) {
         state.apiItemsLink = link;
         state.apiItemsPagination = {};
       },
-      parents(state, parents) {
-        state.parents = parents;
-      },
       showGlobalError(state, error) {
         if(error) {
           console.trace(error);
@@ -659,34 +655,6 @@ function getStore(config, router) {
           cx.commit('removeFromQueue', count);
           return await Promise.all(promises);
         }
-      },
-      async loadParents(cx) {
-        if (!(cx.state.data instanceof STAC)) {
-          cx.commit('parents', []);
-          return;
-        }
-
-        let parents = [];
-        let stac = cx.state.data;
-        while (stac) {
-          let parentLink = stac.getLinkWithRel('parent') || stac.getLinkWithRel('root');
-          if (!parentLink) {
-            break;
-          }
-          let url = Utils.toAbsolute(parentLink.href, stac.getAbsoluteUrl());
-          await cx.dispatch('load', { url, omitApi: true });
-          let parentStac = cx.getters.getStac(url, true);
-          if (parentStac instanceof Error) {
-            cx.commit('parents', parentStac);
-            return;
-          }
-          if (parentStac === stac) {
-            break;
-          }
-          parents.push(parentStac);
-          stac = parentStac;
-        }
-        cx.commit('parents', parents);
       },
       async tryLogin(cx, {url, action}) {
         cx.commit('clear', url);

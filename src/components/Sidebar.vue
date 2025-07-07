@@ -1,7 +1,7 @@
 <template>
-  <b-sidebar id="sidebar" v-model="visible" :title="$t('browse')" backdrop lazy>
+  <b-sidebar id="sidebar" v-model="visible" :title="$t('browse')" backdrop>
     <template #default>
-      <Loading v-if="!parents" />
+      <Loading v-if="loading" />
       <Tree v-else-if="root" :item="root" :path="parents" />
     </template>
     <template v-if="allowSelectCatalog" #footer>
@@ -17,6 +17,8 @@ import { BIconArrowLeftRight, BSidebar } from "bootstrap-vue";
 import { mapGetters, mapState } from 'vuex';
 import Loading from './Loading.vue';
 import Tree from './Tree.vue';
+import { STAC } from "stac-js";
+import { mapActions } from "vuex/dist/vuex.common.js";
 
 export default {
   name: 'Sidebar',
@@ -28,19 +30,43 @@ export default {
   },
   data() {
     return {
-      visible: false
+      visible: false,
+      loading: true
     };
   },
   computed: {
-    ...mapState(['allowSelectCatalog', 'parents']),
-    ...mapGetters(['root'])
+    ...mapState(['allowSelectCatalog', 'data']),
+    ...mapGetters(['getStac', 'root']),
+    parents() {
+      const parents = [];
+      let stac = this.data;
+      while (stac instanceof STAC) {
+        const parentLink = stac.getLinkWithRel('parent') || stac.getLinkWithRel('root');
+        if (!parentLink) {
+          break;
+        }
+        const parentStac = this.getStac(parentLink.getAbsoluteUrl());
+        if (!parentStac) {
+          parents.push(parentLink);
+        }
+        else if (parentStac === stac) {
+          // Avoid inifinite loops
+          break;
+        }
+        else {
+          parents.push(parentStac);
+        }
+        stac = parentStac;
+      }
+      return parents;
+    },
   },
   watch: {
     visible: {
       immediate: true,
       async handler(visible) {
         if (visible) {
-          await this.$store.dispatch('loadParents');
+          await this.loadParents();
         }
 
         if (visible) {
@@ -52,8 +78,29 @@ export default {
       }
     }
   },
-  mounted() {
-    this.visible = true;
+  methods: {
+    ...mapActions(['load']),
+    async loadParents() {
+      this.loading = true;
+      let stac = this.data;
+      while (stac instanceof STAC) {
+        const parentLink = stac.getLinkWithRel('parent') || stac.getLinkWithRel('root');
+        if (!parentLink) {
+          break;
+        }
+        const url = parentLink.getAbsoluteUrl();
+        let parentStac = this.getStac(url);
+        if (!parentStac) {
+          await this.load({ url });
+          parentStac = this.getStac(url);
+        }
+        if (parentStac.equals(stac)) {
+          break;
+        }
+        stac = parentStac;
+      }
+      this.loading = false;
+    },
   }
 };
 </script>

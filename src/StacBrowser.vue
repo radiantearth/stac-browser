@@ -2,7 +2,7 @@
   <b-container id="stac-browser">
     <Authentication v-if="showLogin" />
     <ErrorAlert v-if="globalError" dismissible class="global-error" v-bind="globalError" @close="hideError" />
-    <Sidebar v-if="sidebar" />
+    <Sidebar />
     <!-- Header -->
     <header>
       <b-row class="site">
@@ -19,7 +19,7 @@
           </div>
           <nav class="actions">
             <b-button-group>
-              <b-button variant="primary" size="sm" :title="$t('browse')" v-b-toggle.sidebar @click="sidebar = true">
+              <b-button variant="primary" size="sm" :title="$t('browse')" v-b-toggle.sidebar>
                 <b-icon-list /><span class="button-label">{{ $t('browse') }}</span>
               </b-button>
               <b-button v-if="canSearch" variant="primary" size="sm" :to="searchBrowserLink" :title="$t('search.title')" :pressed="isSearchPage()">
@@ -194,7 +194,6 @@ export default {
   },
   data() {
     return {
-      sidebar: false,
       error: null,
       onDataLoaded: null
     };

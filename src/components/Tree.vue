@@ -183,10 +183,10 @@ export default {
     stac: {
       immediate: true,
       handler(newStac, oldStac) {
-        if (newStac instanceof STAC) {
+        if (newStac instanceof CatalogLike) {
           newStac.setApiDataListener('tree', () => this.updateChilds());
         }
-        if (oldStac instanceof STAC) {
+        if (oldStac instanceof CatalogLike) {
           oldStac.setApiDataListener('tree');
         }
         this.updateChilds();
