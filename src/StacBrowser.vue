@@ -18,11 +18,11 @@
             </b-button>
           </div>
           <nav class="actions">
-            <b-button-group v-if="canSearch || canBrowse">
-              <b-button v-if="canBrowse" variant="primary" size="sm" :title="$t('browse')" v-b-toggle.sidebar @click="sidebar = true">
+            <b-button-group v-if="canSearch || isServerSelector">
+              <b-button v-if="isServerSelector" variant="primary" size="sm" :title="$t('browse')" v-b-toggle.sidebar @click="sidebar = true">
                 <b-icon-list /><span class="button-label">{{ $t('browse') }}</span>
               </b-button>
-              <b-button v-if="canSearch" variant="primary" size="sm" :to="searchBrowserLink" :title="$t('search.title')" :pressed="isSearchPage()">
+              <b-button v-if="canSearch" variant="primary" size="sm" :to="searchBrowserLink" :title="$t('search.title')" :pressed="isSearchPage">
                 <b-icon-search /><span class="button-label">{{ $t('search.title') }}</span>
               </b-button>
             </b-button-group>
@@ -219,7 +219,10 @@ export default {
         return "";
       }
     },
-    canBrowse() {
+    isSearchPage() {
+      return this.$route.name === 'search';
+    },
+    isServerSelector() {
       return this.$route.name !== 'select';
     },
     authIcon() {
@@ -583,9 +586,6 @@ export default {
     },
     hideError() {
       this.$store.commit('showGlobalError', null);
-    },
-    isSearchPage() {
-      return this.$router.currentRoute.name === 'search';
     }
   }
 };
