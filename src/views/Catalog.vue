@@ -10,6 +10,7 @@
             <Description :description="data.description" />
           </ReadMore>
           <Keywords v-if="Array.isArray(data.keywords) && data.keywords.length > 0" :keywords="data.keywords" class="mb-3" />
+          <CollectionLink v-if="collectionLink" :link="collectionLink" />
           <section v-if="isCollection" class="metadata mb-4">
             <b-row v-if="licenses">
               <b-col md="4" class="label">{{ $t('catalog.license') }}</b-col>
@@ -38,13 +39,12 @@
         <Assets v-if="hasItemAssets && !hasItems" :assets="itemAssets" :context="data" :definition="true" />
         <Providers v-if="providers" :providers="providers" />
         <Metadata class="mb-4" :type="data.type" :data="data" :ignoreFields="ignoredMetadataFields" />
-        <CollectionLink v-if="collectionLink" :link="collectionLink" />
         <Links v-if="linkPosition === 'right'" :title="$t('additionalResources')" :links="additionalLinks" :context="data" />
       </b-col>
       <b-col class="catalogs-container" v-if="hasCatalogs">
         <Catalogs :catalogs="catalogs" :hasMore="!!nextCollectionsLink" @loadMore="loadMoreCollections" />
       </b-col>
-      <b-col class="items-container" v-if="hasItems">
+      <b-col class="items-container" v-if="hasItems || hasItemAssets">
         <Items
           :stac="data" :items="items" :api="isApi"
           :showFilters="showFilters" :apiFilters="filters"

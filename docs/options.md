@@ -78,7 +78,12 @@ If `catalogUrl` is empty or set to `null` STAC Browser switches to a mode where 
 
 The default title shown if no title can be read from the root STAC catalog.
 
-### apiCatalogPriority
+## catalogImage
+
+URL to an image to use as a logo with the title.
+Should be an image that browsers can display, e.g. PNG, JPEG, WebP, or SVG.
+
+## apiCatalogPriority
 
 For STAC APIs there are two potential sources for catalogs and collections:
 

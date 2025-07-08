@@ -220,14 +220,6 @@ export default {
       this.parent = this.getStac(url);
       this.showPage();
     }
-    
-    // Fixes https://github.com/radiantearth/stac-browser/issues/428
-    this.$root.$on('uiLanguageChanged', () => {
-      this.$store.commit('setPageMetadata', {
-        title: this.$t('search.title'),
-        description: this.pageDescription
-      });
-    });
   },
   methods: {
     openItemSearch() {
@@ -290,9 +282,11 @@ export default {
     },
     showPage(url) {
       this.$store.commit('showPage', {
-        title: this.$t('search.title'),
-        description: this.pageDescription,
-        url
+        url,
+        page: () => ({
+          title: this.$t('search.title'),
+          description: this.pageDescription,
+        })
       });
     }
   }
