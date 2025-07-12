@@ -90,6 +90,14 @@
       "noCLI": true,
       "noEnv": true
     },
+    "getMapSourceOptions": {
+      "type": [
+        "null"
+      ],
+      "format": "function",
+      "noCLI": true,
+      "noEnv": true
+    },
     "stacProxyUrl": {
       "type": [
         "array",
