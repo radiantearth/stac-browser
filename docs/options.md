@@ -22,8 +22,6 @@ The following ways to set config options are possible:
   - [apiCatalogPriority](#apicatalogpriority)
 - [Deployment](#deployment)
   - [historyMode](#historymode)
-    - [`history`](#history)
-    - [`hash`](#hash)
   - [pathPrefix](#pathprefix)
   - [stacProxyUrl](#stacproxyurl)
   - [redirectLegacyUrls](#redirectlegacyurls)
@@ -32,9 +30,6 @@ The following ways to set config options are possible:
   - [allowedDomains](#alloweddomains)
   - [crossOriginMedia](#crossoriginmedia)
   - [authConfig](#authconfig)
-    - [API Keys](#api-keys)
-    - [HTTP Basic](#http-basic)
-    - [OpenID Connect](#openid-connect)
 - [Internationalization and Localization](#internationalization-and-localization)
   - [locale](#locale)
   - [fallbackLocale](#fallbacklocale)
@@ -46,6 +41,7 @@ The following ways to set config options are possible:
   - [useTileLayerAsFallback](#usetilelayerasfallback)
   - [displayGeoTiffByDefault](#displaygeotiffbydefault)
   - [crs](#crs)
+  - [getMapSourceOptions](#getmapsourceoptions)
 - [User Interface](#user-interface)
   - [itemsPerPage](#itemsperpage)
   - [maxItemsPerPage](#maxitemsperpage)
@@ -388,6 +384,29 @@ Example for EPSG:2056:
 ```js
 {
   'EPSG:2056': 'PROJCS["CH1903+ / LV95",GEOGCS["CH1903+",DATUM["CH1903+",SPHEROID["Bessel 1841",6377397.155,299.1528128,AUTHORITY["EPSG","7004"]],AUTHORITY["EPSG","6150"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4150"]],PROJECTION["Hotine_Oblique_Mercator_Azimuth_Center"],PARAMETER["latitude_of_center",46.9524055555556],PARAMETER["longitude_of_center",7.43958333333333],PARAMETER["azimuth",90],PARAMETER["rectified_grid_angle",90],PARAMETER["scale_factor",1],PARAMETER["false_easting",2600000],PARAMETER["false_northing",1200000],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Easting",EAST],AXIS["Northing",NORTH],AUTHORITY["EPSG","2056"]]'
+}
+```
+
+### getMapSourceOptions
+
+Corresponds to the ol-stac parameter `getSourceOptions`:
+
+> Optional function that can be used to configure the underlying sources. The function can do any additional work and return the completed options or a promise for the same. The function will be called with the current source options and the STAC Asset or Link. This can be useful for adding auth information such as an API token, either via query parameter or HTTP headers. Please be aware that sending HTTP headers may not be supported by all sources.
+
+The function that can be provided for getMapSourceOptions has the following signure:
+
+```js
+async getSourceOptions(type, options) => options
+```
+
+For example, the following code would set the `jsonp` option for the OpenLayers TileJSON layer:
+
+```js
+getSourceOptions: async (type, options) => {
+  if (type.name === 'TileJSON') {
+    options.jsonp = true;
+  }
+  return options;
 }
 ```
 
