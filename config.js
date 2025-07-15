@@ -30,6 +30,7 @@ module.exports = {
     useTileLayerAsFallback: false,
     displayGeoTiffByDefault: false,
     buildTileUrlTemplate: null,
+    getMapSourceOptions: null,
     stacProxyUrl: null,
     pathPrefix: "/",
     historyMode: "history",
