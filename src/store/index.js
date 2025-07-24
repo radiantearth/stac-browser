@@ -6,7 +6,7 @@ import URI from "urijs";
 import i18n from '../i18n';
 import Utils, { BrowserError } from '../utils';
 import { addMissingChildren, getDisplayTitle, createSTAC } from '../models/stac';
-import { Collection, CatalogLike, STAC } from 'stac-js';
+import { CatalogLike, STAC } from 'stac-js';
 
 import auth from './auth.js';
 import { addQueryIfNotExists, isAuthenticationError, Loading, processSTAC, proxyUrl, unproxyUrl, stacRequest } from './utils';
@@ -772,7 +772,7 @@ function getStore(config, router) {
 
         // Load API Collections
         const apiCollectionLink = data instanceof CatalogLike && data.getApiCollectionsLink();
-        const apiItemLink = data instanceof Collection && data.getApiItemsLink();
+        const apiItemLink = data instanceof CatalogLike && data.getApiItemsLink();
         if (!omitApi && apiCollectionLink) {
           let args = { stac: data, show: loading.show };
           try {
@@ -828,6 +828,9 @@ function getStore(config, router) {
             link = stac.getApiItemsLink();
             baseUrl = stac.getAbsoluteUrl();
           }
+          if (baseUrl) {
+            baseUrl = new URI(baseUrl);
+          }
 
           link = Utils.addFiltersToLink(link, filters, cx.state.itemsPerPage);
 
@@ -841,21 +844,31 @@ function getStore(config, router) {
                 if (!Utils.isObject(item) || item.type !== 'Feature') {
                   return null;
                 }
+                // See https://github.com/radiantearth/stac-browser/issues/486
                 let selfLink = Utils.getLinkWithRel(item.links, 'self');
                 let url;
                 if (selfLink?.href) {
-                  url = Utils.toAbsolute(selfLink.href, baseUrl);
+                  url = Utils.toAbsolute(selfLink.href, baseUrl, false);
                 }
                 else if (typeof item.id !== 'undefined') {
-                  let apiCollectionsLink = cx.getters.root?.getApiCollectionsLink();
-                  if (baseUrl) {
-                    url = Utils.toAbsolute(`items/${item.id}`, baseUrl);
+                  let apiCollectionsLink = cx.getters.root?.getApiCollectionsLink()?.href;
+                  if (apiCollectionsLink) {
+                    apiCollectionsLink = new URI(apiCollectionsLink);
+                  }
+                  if (baseUrl && baseUrl.path().endsWith('/')) {
+                    url = Utils.toAbsolute(`items/${item.id}`, baseUrl, false);
+                  }
+                  else if (baseUrl) {
+                    url = Utils.toAbsolute(`${collectionId}/items/${item.id}`, baseUrl, false);
+                  }
+                  else if (apiCollectionsLink?.path().endsWith('/')) {
+                    url = Utils.toAbsolute(`${collectionId}/items/${item.id}`, apiCollectionsLink, false);
                   }
                   else if (apiCollectionsLink) {
-                    url = Utils.toAbsolute(`${collectionId}/items/${item.id}`, apiCollectionsLink.href);
+                    url = Utils.toAbsolute(`collections/${collectionId}/items/${item.id}`, apiCollectionsLink, false);
                   }
                   else if (cx.state.catalogUrl) {
-                    url = Utils.toAbsolute(`collections/${collectionId}/items/${item.id}`, cx.state.catalogUrl);
+                    url = Utils.toAbsolute(`collections/${collectionId}/items/${item.id}`, cx.state.catalogUrl, false);
                   }
                   else {
                     return null;
@@ -864,6 +877,7 @@ function getStore(config, router) {
                 else {
                   return null;
                 }
+                url = url.toString();
                 let data = cx.getters.getStac(url);
                 if (data) {
                   return data;
@@ -925,11 +939,23 @@ function getStore(config, router) {
               let selfLink = Utils.getLinkWithRel(collection.links, 'self');
               let url;
               if (selfLink?.href) {
-                url = Utils.toAbsolute(selfLink.href, cx.state.url || stac.getAbsoluteUrl());
+                url = Utils.toAbsolute(selfLink.href, cx.state.url || stac.getAbsoluteUrl(), false);
               }
               else {
-                url = Utils.toAbsolute(`collections/${collection.id}`, cx.state.catalogUrl || stac.getAbsoluteUrl());
+                // see https://github.com/radiantearth/stac-browser/issues/486
+                let baseUrl = cx.state.catalogUrl || stac.getAbsoluteUrl();
+                if (baseUrl) {
+                  baseUrl = new URI(baseUrl);
+                  if (!baseUrl.path().endsWith('/')) {
+                    baseUrl.path(baseUrl.path() + '/');
+                  }
+                  url = Utils.toAbsolute(`collections/${collection.id}`, baseUrl, false);
+                }
               }
+              if (!url) {
+                return null; // We can't detect a URL, skip this flawed collection
+              }
+              url = url.toString();
               let data = cx.getters.getStac(url);
               if (data) {
                 return data;
