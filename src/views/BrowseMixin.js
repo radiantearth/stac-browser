@@ -16,8 +16,8 @@ export default {
     }
   },
   computed: {
-    ...mapState(["allowExternalAccess", "catalogUrl", "url", "redirectLegacyUrls"]),
-    ...mapGetters(["fromBrowserPath", "error", "loading"]),
+    ...mapState(["allowExternalAccess", "catalogUrl", "loading", "url", "redirectLegacyUrls"]),
+    ...mapGetters(["fromBrowserPath", "error"]),
     errorId() {
       if (this.error instanceof Error && this.error.isAxiosError && Utils.isObject(this.error.response)) {
         let res = this.error.response;
