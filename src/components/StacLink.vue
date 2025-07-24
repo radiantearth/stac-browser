@@ -1,7 +1,7 @@
 <template>
   <component :is="component" class="stac-link" v-bind="attributes" :title="tooltip">
     <template v-if="icon">
-      <img :src="icon.href" :alt="icon.title" :title="icon.title" class="icon mr-2">
+      <img :src="icon.getAbsoluteUrl()" :alt="icon.title" :title="icon.title" class="icon mr-2">
     </template>
     <span class="title">{{ displayTitle }}</span>
   </component>
@@ -50,7 +50,7 @@ export default {
       if (this.stac) {
         const icons = this.stac.getIcons();
         if (icons.length > 0) {
-          return icons[0].getAbsoluteUrl();
+          return icons[0];
         }
       }
       return null;

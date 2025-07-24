@@ -4,7 +4,7 @@
       <Source class="float-right" :title="title" :stacUrl="url" :stac="data" />
       <h1>
         <template v-if="icon">
-          <img :src="icon.href" :alt="icon.title" :title="icon.title" class="icon mr-2">
+          <img :src="icon.getAbsoluteUrl()" :alt="icon.title" :title="icon.title" class="icon mr-2">
         </template>
         <span class="title">{{ title }}</span>
       </h1>
@@ -116,7 +116,7 @@ export default {
       if (this.data instanceof STAC) {
         const icons = this.data.getIcons();
         if (icons.length > 0) {
-          return icons[0].getAbsoluteUrl();
+          return icons[0];
         }
       }
       return null;
