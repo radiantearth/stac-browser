@@ -32,7 +32,7 @@
   "authentication": {
     "button": {
       "login": "Connexion",
-      "logout": "Déconnexion",
+      "logout": "Deconnexion",
       "title": "Saisir ou mettre à jour vos informations d'authentification"
     },
     "chooseMethod": "Choisir la méthode d'authentification",
@@ -376,7 +376,7 @@
       "desc": "Cliquer pour trier par ordre décroissant"
     }
   },
-  "thumbnails": "Miniatures",
+  "thumbnails": "Aperçus",
   "tree": {
     "moreCollectionPagesAvailable": "plus de pages disponibles pour la Collection",
     "noChildren": "Aucun enfant n'est disponible."
