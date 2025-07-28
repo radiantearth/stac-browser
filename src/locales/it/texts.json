@@ -154,6 +154,7 @@
   "mapping": {
     "attribution": {
       "label": "i",
+      "description": "Crediti",
       "collapseLabel": "✕"
     },
     "bboxSelect": {
@@ -162,6 +163,12 @@
     },
     "close": "Chiudi",
     "fit": "Adatta alla estensione",
+    "layers": {
+      "title": "Livelli",
+      "base": "Livelli di base",
+      "unnamed": "Senza Nome #{id}",
+      "footprint": "Impronta a terra"
+    },
     "location": {
       "description": "Vai alla tua posizione attuale"
     },

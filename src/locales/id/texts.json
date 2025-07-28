@@ -147,25 +147,18 @@
     "noneAvailableForCollection": "Tidak ada item yang tersedia untuk koleksi ini.",
     "showFilter": "Tampilkan Filter"
   },
-  "leaflet": {
-    "close": "Tutup",
-    "noFeatureProperties": "Tidak ada data tambahan yang tersedia untuk fitur ini.",
-    "stayLayer": {
-      "error": "Maaf, menambahkan data ke peta gagal."
-    },
-    "zoom": {
-      "in": {
-        "description": "Perbesar",
-        "label": "+"
-      },
-      "out": {
-        "description": "Perkecil",
-        "label": "-"
-      }
-    }
-  },
   "loading": "Memuat...",
   "map": "Peta",
+  "mapping": {
+    "attribution": {},
+    "bboxSelect": {},
+    "layers": {},
+    "location": {},
+    "zoom": {
+      "in": {},
+      "out": {}
+    }
+  },
   "messageForSchemaError": "{message}, untuk skema {schemaPath}",
   "metadata": {
     "general": "Umum",
