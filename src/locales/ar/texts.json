@@ -113,7 +113,9 @@
   "featureExperimental": "هذه الميزة لا تزال تجريبية وقد تعطي نتائج غير متوقعة!",
   "fullscreen": {
     "exit": "الخروج من وضع ملء الشاشة",
-    "show": "عرض بملء الشاشة"
+    "exitLabel": "",
+    "show": "عرض بملء الشاشة",
+    "showLabel": ""
   },
   "goBack": {
     "description": "العودة إلى {type}",
@@ -147,25 +149,42 @@
     "noneAvailableForCollection": "لا توجد عناصر متاحة لهذه المجموعة.",
     "showFilter": "إظهار عوامل التصفية"
   },
-  "leaflet": {
-    "close": "إغلاق",
-    "noFeatureProperties": "لا توجد بيانات إضافية متاحة لهذه الميزة.",
-    "stayLayer": {
-      "error": "عذرًا، فشل إضافة البيانات إلى الخريطة."
+  "loading": "جارٍ التحميل...",
+  "map": "الخريطة",
+  "mapping": {
+    "attribution": {
+      "label": "",
+      "description": "",
+      "collapseLabel": ""
     },
+    "bboxSelect": {
+      "add": "",
+      "remove": ""
+    },
+    "close": "",
+    "fit": "",
+    "layers": {
+      "title": "",
+      "base": "",
+      "unnamed": "",
+      "footprint": ""
+    },
+    "location": {
+      "description": ""
+    },
+    "nobasemap": "",
+    "nodata": "",
     "zoom": {
       "in": {
-        "description": "تكبير",
-        "label": "+"
+        "description": "",
+        "label": ""
       },
       "out": {
-        "description": "تصغير",
-        "label": "-"
+        "description": "",
+        "label": ""
       }
     }
   },
-  "loading": "جارٍ التحميل...",
-  "map": "الخريطة",
   "messageForSchemaError": "{message}، للمخطط {schemaPath}",
   "metadata": {
     "general": "عام",
