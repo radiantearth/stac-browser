@@ -113,9 +113,7 @@
   "featureExperimental": "Fitur ini masih eksperimental dan mungkin memberikan hasil yang tidak terduga!",
   "fullscreen": {
     "exit": "Keluar dari Layar Penuh",
-    "exitLabel": "",
-    "show": "Lihat Layar Penuh",
-    "showLabel": ""
+    "show": "Lihat Layar Penuh"
   },
   "goBack": {
     "description": "Kembali ke {type}",
@@ -152,37 +150,13 @@
   "loading": "Memuat...",
   "map": "Peta",
   "mapping": {
-    "attribution": {
-      "label": "",
-      "description": "",
-      "collapseLabel": ""
-    },
-    "bboxSelect": {
-      "add": "",
-      "remove": ""
-    },
-    "close": "",
-    "fit": "",
-    "layers": {
-      "title": "",
-      "base": "",
-      "unnamed": "",
-      "footprint": ""
-    },
-    "location": {
-      "description": ""
-    },
-    "nobasemap": "",
-    "nodata": "",
+    "attribution": {},
+    "bboxSelect": {},
+    "layers": {},
+    "location": {},
     "zoom": {
-      "in": {
-        "description": "",
-        "label": ""
-      },
-      "out": {
-        "description": "",
-        "label": ""
-      }
+      "in": {},
+      "out": {}
     }
   },
   "messageForSchemaError": "{message}, untuk skema {schemaPath}",

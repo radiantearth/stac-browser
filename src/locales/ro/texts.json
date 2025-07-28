@@ -154,26 +154,12 @@
   "mapping": {
     "attribution": {
       "label": "i",
-      "description": "",
       "collapseLabel": "✕"
     },
-    "bboxSelect": {
-      "add": "",
-      "remove": ""
-    },
+    "bboxSelect": {},
     "close": "Închidere",
-    "fit": "",
-    "layers": {
-      "title": "",
-      "base": "",
-      "unnamed": "",
-      "footprint": ""
-    },
-    "location": {
-      "description": ""
-    },
-    "nobasemap": "",
-    "nodata": "",
+    "layers": {},
+    "location": {},
     "zoom": {
       "in": {
         "description": "Mărire",
