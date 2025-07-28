@@ -113,7 +113,9 @@
   "featureExperimental": "Fitur ini masih eksperimental dan mungkin memberikan hasil yang tidak terduga!",
   "fullscreen": {
     "exit": "Keluar dari Layar Penuh",
-    "show": "Lihat Layar Penuh"
+    "exitLabel": "",
+    "show": "Lihat Layar Penuh",
+    "showLabel": ""
   },
   "goBack": {
     "description": "Kembali ke {type}",
@@ -147,25 +149,42 @@
     "noneAvailableForCollection": "Tidak ada item yang tersedia untuk koleksi ini.",
     "showFilter": "Tampilkan Filter"
   },
-  "leaflet": {
-    "close": "Tutup",
-    "noFeatureProperties": "Tidak ada data tambahan yang tersedia untuk fitur ini.",
-    "stayLayer": {
-      "error": "Maaf, menambahkan data ke peta gagal."
+  "loading": "Memuat...",
+  "map": "Peta",
+  "mapping": {
+    "attribution": {
+      "label": "",
+      "description": "",
+      "collapseLabel": ""
     },
+    "bboxSelect": {
+      "add": "",
+      "remove": ""
+    },
+    "close": "",
+    "fit": "",
+    "layers": {
+      "title": "",
+      "base": "",
+      "unnamed": "",
+      "footprint": ""
+    },
+    "location": {
+      "description": ""
+    },
+    "nobasemap": "",
+    "nodata": "",
     "zoom": {
       "in": {
-        "description": "Perbesar",
-        "label": "+"
+        "description": "",
+        "label": ""
       },
       "out": {
-        "description": "Perkecil",
-        "label": "-"
+        "description": "",
+        "label": ""
       }
     }
   },
-  "loading": "Memuat...",
-  "map": "Peta",
   "messageForSchemaError": "{message}, untuk skema {schemaPath}",
   "metadata": {
     "general": "Umum",
