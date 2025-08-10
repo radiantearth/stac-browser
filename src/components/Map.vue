@@ -174,8 +174,7 @@ export default {
           if (objects.length > 0) {
             this.selectedItems = {
               target: this.$refs.target,
-              // Map from stac-js object back to STAC Browser STAC class
-              items: objects.map(obj => this.getStac(obj.getAbsoluteUrl()))
+              items: objects
             };
           }
           else {
