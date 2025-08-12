@@ -156,7 +156,10 @@
       "label": "i",
       "collapseLabel": "✕"
     },
+    "bboxSelect": {},
     "close": "Cerrar",
+    "layers": {},
+    "location": {},
     "zoom": {
       "in": {
         "description": "Acercar el zoom",
