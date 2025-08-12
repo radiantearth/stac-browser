@@ -365,10 +365,23 @@ To clarify the behavior, please have a look at the following table:
 | true  | null     | client-side | none        |
 | false | null     | none        | none        |
 
+### displayPreview
+
+If set to `true` (default), displays preview images that a browser can display (e.g. PNG, JPEG) on the map as default visualization, i.e. from assets with any of the roles `thumbnail`, `overview`, or a link with relation type `preview`.
+The previews are often not covering the full extents and as such may be placed incorrectly on the map.
+
+If both `displayPreview` and `displayOverview` (see below) are enabled, STAC Browser prefers the overviews (COGs) over the previews (PNG, JPEG, ...).
+
+### displayOverview
+
+If set to `true` (default), allows to display COGs and, if `displayGeoTiffByDefault` is enabled, GeoTiffs on the map as default visualization, usually from an asset with role `overview` or `visual`.
+
 ### displayGeoTiffByDefault
 
 If set to `true`, the map also shows non-cloud-optimized GeoTiff files by default. Otherwise (`false`, default), it only shows COGs and you can only enforce showing GeoTiffs to be loaded with the "Show on map" button but they are never loaded automatically.
-Loading non-cloud-optimized GeoTiffs only works reliably for smaller files (< 1MB). It may also work for larger files, but it depends a lot on the underlying client hardware and software.
+Loading non-cloud-optimized GeoTiffs only works reliably for smaller files (< 1MB) with a certain structure. It may also work for larger files, but it depends a lot on the underlying client hardware and software.
+
+Related OpenLayers issue: [openlayers#16961](https://github.com/openlayers/openlayers/issues/16961)
 
 ### crs
 

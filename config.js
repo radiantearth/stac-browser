@@ -29,6 +29,8 @@ module.exports = {
     apiCatalogPriority: null,
     useTileLayerAsFallback: false,
     displayGeoTiffByDefault: false,
+    displayPreview: true,
+    displayOverview: true,
     buildTileUrlTemplate: null,
     getMapSourceOptions: null,
     stacProxyUrl: null,

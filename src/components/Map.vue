@@ -138,7 +138,6 @@ export default {
         children: this.items,
         assets: this.assets || null,
         displayWebMapLink: true,
-        displayPreview: !this.items,
         disableMigration: true,
       });
       this.stacLayer = new StacLayer(options);

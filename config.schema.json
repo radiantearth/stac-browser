@@ -82,6 +82,16 @@
         "boolean"
       ]
     },
+    "displayPreview": {
+      "type": [
+        "boolean"
+      ]
+    },
+    "displayOverview": {
+      "type": [
+        "boolean"
+      ]
+    },
     "buildTileUrlTemplate": {
       "type": [
         "null"
