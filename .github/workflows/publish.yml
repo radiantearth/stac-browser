@@ -16,7 +16,7 @@ on:
 env:
   REGISTRY: ghcr.io
   TAG_NAME: ${{ github.event.inputs.TAG_NAME || github.event.release.tag_name }}
-  pathPrefix: "${{ github.event.inputs.pathPrefix }}"
+  pathPrefix: ${{ github.event.inputs.pathPrefix }}
 
 jobs:
   retag-docker-image:
@@ -61,7 +61,7 @@ jobs:
           build-args: |
             VERSION=${{ env.VERSION }}
             REVISION=${{ env.REVISION }}
-            pathPrefix="${{ env.pathPrefix }}"
+            pathPrefix=${{ env.pathPrefix }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=registry,ref=${{ env.IMAGE_NAME }}:edge
