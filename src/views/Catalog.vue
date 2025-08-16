@@ -1,54 +1,59 @@
 <template>
-  <div :class="{cc: true, [data.type.toLowerCase()]: true, mixed: hasCatalogs && hasItems, empty: !hasCatalogs && !hasItems}" :key="data.id">
+  <div :class="{cc: true, [cssStacType]: true, mixed: hasCatalogs && hasItems, empty: !hasCatalogs && !hasItems}" :key="data.id">
     <b-row>
       <b-col class="meta">
         <section class="intro">
-          <h2>Description</h2>
+          <h2>{{ $t('description') }}</h2>
           <DeprecationNotice v-if="data.deprecated" :data="data" />
           <AnonymizedNotice v-if="data['anon:warning']" :warning="data['anon:warning']" />
-          <ReadMore v-if="data.description" :lines="10">
+          <ReadMore v-if="data.description" :lines="10" :text="$t('read.more')" :text-less="$t('read.less')">
             <Description :description="data.description" />
           </ReadMore>
-          <Keywords v-if="Array.isArray(data.keywords) && data.keywords.length > 0" :keywords="data.keywords" />
+          <Keywords v-if="Array.isArray(data.keywords) && data.keywords.length > 0" :keywords="data.keywords" class="mb-3" />
           <section v-if="isCollection" class="metadata mb-4">
             <b-row v-if="licenses">
-              <b-col md="4" class="label">License</b-col>
-              <b-col md="8" class="value" v-html="licenses" />
+              <b-col md="4" class="label">{{ $t('catalog.license') }}</b-col>
+              <b-col md="8" class="value"><span v-html="licenses" /></b-col>
             </b-row>
             <b-row v-if="temporalExtents">
-              <b-col md="4" class="label">Temporal Extents</b-col>
-              <b-col md="8" class="value" v-html="temporalExtents" />
+              <b-col md="4" class="label">{{ $t('catalog.temporalExtent') }}</b-col>
+              <b-col md="8" class="value"><span v-html="temporalExtents" /></b-col>
             </b-row>
           </section>
+          <Links v-if="linkPosition === 'left'" :title="$t('additionalResources')" :links="additionalLinks" :context="data" />
         </section>
-        <section v-if="isCollection || thumbnails.length > 0" class="mb-4">
+        <section v-if="isCollection || hasThumbnails" class="mb-4">
           <b-card no-body class="maps-preview">
             <b-tabs v-model="tab" ref="tabs" pills card vertical end>
-              <b-tab v-if="isCollection" title="Map" no-body>
-                <Map :stac="data" :stacLayerData="catalogAsFc" @mapClicked="mapClicked" @dataChanged="dataChanged" popover />
+              <b-tab v-if="isCollection" :title="$t('map')" no-body>
+                <Map :stac="data" v-bind="mapData" @assets="dataChanged" @empty="handleEmptyMap" onfocusOnly popover />
               </b-tab>
-              <b-tab v-if="thumbnails.length > 0" title="Preview" no-body>
+              <b-tab v-if="hasThumbnails" :title="$t('thumbnails')" no-body>
                 <Thumbnails :thumbnails="thumbnails" />
               </b-tab>
             </b-tabs>
           </b-card>
         </section>
-        <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="shownAssets" @showAsset="showAsset" />
-        <Assets v-if="hasItemAssets && !hasItems" :assets="data.item_assets" :definition="true" />
-        <Providers v-if="hasProviders" :providers="data.providers" />
-        <Metadata title="Metadata" class="mb-4" :type="data.type" :data="data" :ignoreFields="ignoredMetadataFields" />
-        <Links v-if="additionalLinks.length > 0" title="Additional resources" :links="additionalLinks" />
+        <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="selectedAssets" @showAsset="showAsset" />
+        <Assets v-if="hasItemAssets && !hasItems" :assets="itemAssets" :context="data" :definition="true" />
+        <Providers v-if="providers" :providers="providers" />
+        <Metadata class="mb-4" :type="data.type" :data="data" :ignoreFields="ignoredMetadataFields" />
+        <CollectionLink v-if="collectionLink" :link="collectionLink" />
+        <Links v-if="linkPosition === 'right'" :title="$t('additionalResources')" :links="additionalLinks" :context="data" />
       </b-col>
       <b-col class="catalogs-container" v-if="hasCatalogs">
-        <Catalogs :catalogs="catalogs" :hasMore="hasMoreCollections" @loadMore="loadMoreCollections" />
+        <Catalogs :catalogs="catalogs" :hasMore="!!nextCollectionsLink" @loadMore="loadMoreCollections" />
       </b-col>
       <b-col class="items-container" v-if="hasItems">
         <Items
-          :stac="data" :items="items" :api="isApi" :apiFilters="apiItemsFilter"
+          :stac="data" :items="items" :api="isApi"
+          :showFilters="showFilters" :apiFilters="filters"
           :pagination="itemPages" :loading="apiItemsLoading"
+          :count="apiItemsNumberMatched"
           @paginate="paginateItems" @filterItems="filterItems"
+          @filtersShown="filtersShown"
         />
-        <Assets v-if="hasItemAssets" :assets="data.item_assets" :definition="true" />
+        <Assets v-if="hasItemAssets" :assets="itemAssets" :context="data" :definition="true" />
       </b-col>
     </b-row>
   </div>
@@ -59,15 +64,13 @@ import { mapState, mapGetters } from 'vuex';
 import Catalogs from '../components/Catalogs.vue';
 import Description from '../components/Description.vue';
 import Items from '../components/Items.vue';
-import Links from '../components/Links.vue';
-import Metadata from '../components/Metadata.vue';
 import ReadMore from "vue-read-more-smooth";
-import ShowAssetMixin from '../components/ShowAssetMixin';
+import ShowAssetLinkMixin from '../components/ShowAssetLinkMixin';
+import StacFieldsMixin from '../components/StacFieldsMixin';
 import { formatLicense, formatTemporalExtents } from '@radiantearth/stac-fields/formatters';
 import { BTabs, BTab } from 'bootstrap-vue';
 import Utils from '../utils';
-
-const SORRY_ITEM_LIST = "Sorry, can't load the list of items.";
+import { addSchemaToDocument, createCatalogSchema } from '../schema-org';
 
 export default {
   name: "Catalog",
@@ -77,20 +80,25 @@ export default {
     BTabs,
     BTab,
     Catalogs,
+    CollectionLink: () => import('../components/CollectionLink.vue'),
     DeprecationNotice: () => import('../components/DeprecationNotice.vue'),
     Description,
     Items,
     Keywords: () => import('../components/Keywords.vue'),
-    Links,
+    Links: () => import('../components/Links.vue'),
     Map: () => import('../components/Map.vue'),
-    Metadata,
+    Metadata: () => import('../components/Metadata.vue'),
     Providers: () => import('../components/Providers.vue'),
     ReadMore,
     Thumbnails: () => import('../components/Thumbnails.vue')
   },
-  mixins: [ShowAssetMixin],
+  mixins: [
+    ShowAssetLinkMixin,
+    StacFieldsMixin({ formatLicense, formatTemporalExtents })
+  ],
   data() {
     return {
+      filters: {},
       ignoredMetadataFields: [
         // Catalog and Collection fields that are handled directly
         'stac_version',
@@ -115,44 +123,85 @@ export default {
         // Will be rendered with a custom rendered
         'deprecated',
         // Special handling for the warning of the anonymized-location extension
-        'anon:warning'
+        'anon:warning',
+        // Special handling for the stats extension
+        'stats:catalogs',
+        'stats:collections',
+        'stats:items',
+        // Special handling for auth
+        'auth:schemes',
+        // Special handling for the STAC Browser config
+        'stac_browser'
       ]
     };
   },
   computed: {
-    ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination', 'apiItemsFilter']),
-    ...mapGetters(['additionalLinks', 'catalogs', 'isCollection', 'items', 'hasMoreCollections', 'getApiItemsLoading']),
+    ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination', 'apiItemsNumberMatched', 'nextCollectionsLink', 'stateQueryParameters']),
+    ...mapGetters(['catalogs', 'collectionLink', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
+    cssStacType() {
+      if (Utils.hasText(this.data?.type)) {
+        return this.data?.type.toLowerCase();
+      }
+      return null;
+    },
+    showFilters() {
+      return Boolean(this.stateQueryParameters['itemFilterOpen']);
+    },
+    linkPosition() {
+      if (this.additionalLinks.length === 0) {
+        return null;
+      }
+      if (this.isCollection || !this.hasThumbnails) {
+        return "right";
+      }
+      else {
+        return "left";
+      }
+    },
     apiItemsLoading() {
       return this.getApiItemsLoading(this.data);
     },
     licenses() {
       if (this.isCollection && this.data.license) {
-        return formatLicense(this.data.license, null, null, this.data);
+        return this.formatLicense(this.data.license, null, null, this.data);
       }
       return null;
     },
-    hasProviders() {
-      return (this.isCollection && Array.isArray(this.data.providers) && this.data.providers.length > 0);
+    providers() {
+      let providers = [];
+      if (Array.isArray(this.data.providers) && this.data.providers.length > 0) {
+        providers = this.data.providers;
+      }
+      else if (this.isCollection && Utils.isObject(this.data.summaries) && Array.isArray(this.data.summaries.providers)) {
+        providers = this.data.summaries.providers;
+      }
+      return providers.length > 0 ? providers : null;
     },
     temporalExtents() {
-      if (this.data && this.data.isCollection() && this.data.extent.temporal.interval.length > 0) {
+      if (this.isCollection && this.data.extent.temporal.interval.length > 0) {
         let extents = this.data.extent.temporal.interval;
         if (extents.length > 1) {
             // Remove union temporal extent in favor of more concrete extents
             extents = extents.slice(1);
         }
-        return formatTemporalExtents(extents);
+        return this.formatTemporalExtents(extents);
       }
       return null;
     },
     hasItemAssets() {
-      return Utils.size(this.data?.item_assets) > 0;
+      return this.itemAssets.length > 0;
+    },
+    itemAssets() {
+      if (!this.data2 || !Utils.isObject(this.data2.item_assets)) {
+        return [];
+      }
+      return Object.values(this.data2.item_assets);
     },
     itemPages() {
       let pages = Object.assign({}, this.apiItemsPagination);
       // If first link is not available, add the items link as first link
       if (!pages.first && this.data && this.apiItemsLink && this.apiItemsLink.rel !== 'items') {
-        pages.first = Utils.addFiltersToLink(this.data.getApiItemsLink(), this.apiItemsFilter);
+        pages.first = Utils.addFiltersToLink(this.data.getApiItemsLink(), this.filters);
       }
       return pages;
     },
@@ -165,36 +214,61 @@ export default {
     hasCatalogs() {
       return this.catalogs.length > 0;
     },
-    catalogAsFc () {
-      return {
-        type: 'FeatureCollection',
-        features: this.items
-      };
+    mapData() {
+      const data = {};
+      if (this.selectedAssets.length > 0) {
+        data.assets = this.selectedAssets;
+      }
+      else {
+        const items = this.items.filter(item => item.type === 'Feature');
+        if (items.length > 0) {
+          data.items = {
+            type: 'FeatureCollection',
+            features: items
+          };
+        }
+      }
+      return data;
+    }
+  },
+  watch: {
+    data: {
+      immediate: true,
+      handler(data) {
+        try {
+          let schema = createCatalogSchema(data, [this.parentLink, this.rootLink], this.$store);
+          addSchemaToDocument(document, schema);
+        } catch (error) {
+          console.error(error);
+        }
+      }
     }
   },
   methods: {
+    filtersShown(show) {
+        this.$store.commit('updateState', {type: 'itemFilterOpen', value: show ? 1 : null});
+    },
     loadMoreCollections() {
       this.$store.dispatch('loadNextApiCollections', {show: true});
     },
     async paginateItems(link) {
       try {
-        await this.$store.dispatch('loadApiItems', {link, show: true});
+        await this.$store.dispatch('loadApiItems', {link, show: true, filters: this.filters});
       } catch (error) {
-        this.$root.$emit('error', error, SORRY_ITEM_LIST);
+        this.$root.$emit('error', error, this.$t('errors.loadItems'));
       }
     },
     async filterItems(filters, reset) {
+      this.filters = filters;
       if (reset) {
-        this.$store.commit('resetApiItems');
+        this.$store.commit('resetApiItems', this.data.getApiItemsLink());
       }
       try {
-        await this.$store.dispatch('loadApiItems', {link: this.apiItemsLink, show: true, filters});
+        await this.$store.dispatch('loadApiItems', {link: this.data.getApiItemsLink(), show: true, filters});
       } catch (error) {
-        this.$root.$emit('error', error, reset ? SORRY_ITEM_LIST : "Sorry, can't load the filtered list of items.");
+        let msg = reset ? this.$t('errors.loadItems') : this.$t('errors.loadFilteredItems');
+        this.$root.$emit('error', error, msg);
       }
-    },
-    mapClicked(/*stac*/) {
-      // todo, see search for an example
     }
   }
 };

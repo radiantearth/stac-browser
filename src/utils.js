@@ -1,9 +1,12 @@
 import URI from 'urijs';
-import Queryable from './models/queryable';
+import removeMd from 'remove-markdown';
+import { stacPagination } from "./rels";
 
 export const commonFileNames = ['catalog', 'collection', 'item'];
 
 export const geojsonMediaType = "application/geo+json";
+
+export const schemaMediaType = "application/schema+json";
 
 export const stacMediaTypes = [
   'application/json',
@@ -20,13 +23,16 @@ export const browserImageTypes = [
   'image/webp'
 ];
 
+export const cogMediaTypes = [
+  "image/tiff; application=geotiff; profile=cloud-optimized",
+  "image/vnd.stac.geotiff; cloud-optimized=true"
+];
+
 export const geotiffMediaTypes = [
   "application/geotiff",
   "image/tiff; application=geotiff",
-  "image/tiff; application=geotiff; profile=cloud-optimized",
   "image/vnd.stac.geotiff",
-  "image/vnd.stac.geotiff; cloud-optimized=true"
-];
+].concat(cogMediaTypes);
 
 export const browserProtocols = [
   'http',
@@ -83,6 +89,13 @@ export default class Utils {
   }
 
   static isStacMediaType(type, allowEmpty = false) {
+    return Utils.isMediaType(type, stacMediaTypes, allowEmpty);
+  }
+
+  static isMediaType(type, types, allowEmpty = false) {
+    if (!Array.isArray(types)) {
+      types = [types];
+    }
     if (allowEmpty && !type) {
       return true;
     }
@@ -90,7 +103,7 @@ export default class Utils {
       return false;
     }
     else {
-      return stacMediaTypes.includes(type.toLowerCase());
+      return types.includes(type.toLowerCase());
     }
   }
 
@@ -104,13 +117,18 @@ export default class Utils {
     return (typeof string === 'string' && string.length > 0);
   }
 
-  static urlType(url, type) {
-    let uri = URI(url);
-    return uri.is(type);
-  }
+  static shortenTitle(fullStr, strLen, separator = '…') {
+    if (fullStr.length <= strLen) {
+      return fullStr;
+    }
 
-  static isGdalVfsUri(url) {
-    return typeof url === 'string' && url.startsWith('/vsi') && !url.startsWith('/vsicurl/');
+    let sepLen = separator.length;
+    let charsToShow = strLen - sepLen;
+    let frontChars = Math.ceil(charsToShow/2);
+    let backChars = Math.floor(charsToShow/2);
+    return fullStr.substr(0, frontChars) + 
+           separator + 
+           fullStr.substr(fullStr.length - backChars);
   }
 
   static toAbsolute(href, baseUrl, stringify = true) {
@@ -118,28 +136,12 @@ export default class Utils {
   }
 
   static normalizeUri(href, baseUrl = null, noParams = false, stringify = true) {
-    // Convert vsicurl URLs to normal URLs
-    if (typeof href === 'string' && href.startsWith('/vsicurl/')) {
-      href = href.replace(/^\/vsicurl\//, '');
-    }
     // Parse URL and make absolute, if required
     let uri = URI(href);
-    if (baseUrl && uri.is("relative") && !Utils.isGdalVfsUri(href)) { // Don't convert GDAL VFS URIs: https://github.com/radiantearth/stac-browser/issues/116
-      // Avoid that baseUrls that have a . in the last parth part will be removed (e.g. https://example.com/api/v1.0 )
-      let baseUri = URI(baseUrl);
-      let baseUriPath = baseUri.path();
-      if (!baseUriPath.endsWith('/') && !baseUriPath.endsWith('.json')) {
-        baseUri.path(baseUriPath + '/');
-      }
-      uri = uri.absoluteTo(baseUri);
+    if (baseUrl && uri.is("relative")) {
+      uri = uri.absoluteTo(baseUrl);
     }
-    // Normalize URL and remove trailing slash from path
-    // to avoid handling the same resource twice
     uri.normalize();
-    let path = uri.path();
-    if (path.endsWith('/')) {
-      uri.path(path.substr(0, path.length - 1));
-    }
     if (noParams) {
       uri.query("");
       uri.fragment("");
@@ -159,17 +161,34 @@ export default class Utils {
     return Array.isArray(links) ? links.filter(link => Utils.isObject(link) && Utils.hasText(link.href) && !rels.includes(link.rel)) : [];
   }
 
+  static removeTrailingSlash(str) {
+    return str.replace(/\/$/, '');
+  }
+
   static equalUrl(a, b) {
     try {
       let uri1 = URI(a);
       let uri2 = URI(b);
       // Ignore trailing slash in URL paths
-      uri1.path(uri1.path().replace(/\/$/, ''));
-      uri2.path(uri2.path().replace(/\/$/, ''));
+      uri1.path(Utils.removeTrailingSlash(uri1.path()));
+      uri2.path(Utils.removeTrailingSlash(uri2.path()));
       return uri1.equals(uri2);
     } catch (error) {
       return false;
     }
+  }
+
+  static summarizeMd(text, maxLength = null) {
+    if (!Utils.hasText(text)) {
+      return '';
+    }
+    // Best-effort approach to remove some CommonMark (Markdown).
+    // Likely not perfect, but seems good enough for most cases.
+    text = removeMd(text).replaceAll(/[\r\n]+/g, ' ');
+    if (maxLength > 0 && text.length > maxLength) {
+      text = text.substr(0, maxLength) + '…';
+    }
+    return text;
   }
 
   static scrollTo(el) {
@@ -189,86 +208,147 @@ export default class Utils {
   // Convert from UTC to locale time (needed for vue2-datetimepicker)
   // see https://github.com/mengxiong10/vue2-datepicker/issues/388
   static dateFromUTC(dt) {
-    if (dt instanceof Date) {
+    if (dt) {
       const value = new Date(dt);
-      const offset = value.getTimezoneOffset();
-      dt = new Date(value.getTime() + offset * 60 * 1000);
+      dt = new Date(value.getTime() + value.getTimezoneOffset() * 60 * 1000);
     }
     return dt;
   }
 
   static dateToUTC(dt) {
     if (dt instanceof Date) {
-      const offset = new Date().getTimezoneOffset();
-      return new Date(dt.getTime() - offset * 60 * 1000);
+      dt = new Date(dt.getTime() - dt.getTimezoneOffset() * 60 * 1000);
     }
     return dt;
   }
 
   static formatDatetimeQuery(value) {
-    return value.map(dt => {
-      if (dt instanceof Date) {
-        return dt.toISOString();
-      }
-      else if (dt) {
-        return dt;
-      }
-      else {
-        return '..';
-      }
-    }).join('/');
+    if (Array.isArray(value) && value.length === 2 && (value[0] || value[1])) {
+      return value.map(dt => {
+        if (dt instanceof Date) {
+          return dt.toISOString();
+        }
+        else {
+          return dt || '..';
+        }
+      }).join('/');
+    }
+    return null;
   }
 
-  static formatBboxQuery(value) {
-    if (typeof value.toBBoxString === 'function') {
-      // This is a Leaflet LatLngBounds Object
-      const Y = 85.06;
-      const X = 180;
-      value = [
-        Math.max(value.getWest(), -X),
-        Math.max(value.getSouth(), -Y),
-        Math.min(value.getEast(), X),
-        Math.min(value.getNorth(), Y)
-      ];
+  static formatSortbyForPOST(value) {
+    // POST search requires sortby to be an array of objects containing a property name and sort direction.
+    // See spec here: https://api.stacspec.org/v1.0.0-rc.1/item-search/#tag/Item-Search/operation/postItemSearch
+    // This function converts the property name to the desired format.
+    const sortby = {
+      field: '',
+      direction: 'asc'
+    };
+  
+    // Check if the value starts with a minus sign ("-")
+    if (value.startsWith('-')) {
+      // sort by descending order
+      sortby.field = value.substring(1);
+      sortby.direction = 'desc';
+    } else {
+      //sort by ascending order
+      sortby.field = value;
     }
-    return value.join(',');
+    
+    // Put the object in an array
+    return [sortby];
   }
 
-  static addFiltersToLink(link, filters = {}) {
-    // Construct new link with search params
-    let url = new URI(link.href);
+  static getPaginationLinks(data) {
+    let pages = {};
+    if (Utils.isObject(data)) {
+      let pageLinks = Utils.getLinksWithRels(data.links, stacPagination);
+      for (let pageLink of pageLinks) {
+        let rel = pageLink.rel === 'previous' ? 'prev' : pageLink.rel;
+        pages[rel] = pageLink;
+      }
+    }
+    return pages;
+  }
 
-    for (let key in filters) {
-      let value = filters[key];
-      if (
-        value === null
-        || (typeof value === 'number' && !Number.isFinite(value))
-        || (typeof value === 'string' && value.length === 0)
-        || (typeof value === 'object' && Utils.size(value) === 0)
-      ) {
-        url.removeQuery(key);
-        continue;
-      }
+  static addFiltersToLink(link, filters = {}, itemsPerPage = null) {
+    let isEmpty = value => {
+      return (value === null
+      || (typeof value === 'number' && !Number.isFinite(value))
+      || (typeof value === 'string' && value.length === 0)
+      || (typeof value === 'object' && Utils.size(value) === 0));
+    };
 
-      if (key === 'datetime') {
-        value = Utils.formatDatetimeQuery(value);
-      }
-      else if (key === 'bbox') {
-        value = Utils.formatBboxQuery(value);
-      }
-      else if ((key === 'collections' || key === 'ids') && Array.isArray(value)) {
-        value = value.join(',');
-      }
-      else if (key === 'filters') {
-        let params = Queryable.formatText(value);
-        url.setQuery(params);
-        continue;
-      }
-
-      url.setQuery(key, value);
+    if (!Utils.isObject(filters)) {
+      filters = {};
+    }
+    else {
+      filters = Object.assign({}, filters);
     }
 
-    return Object.assign({}, link, { href: url.toString() });
+    if (typeof filters.limit !== 'number' && typeof itemsPerPage === 'number') {
+      filters.limit = itemsPerPage;
+    }
+
+    if (Utils.hasText(link.method) && link.method.toUpperCase() === 'POST') {
+      let body = Object.assign({}, link.body);
+
+      for (let key in filters) {
+        let value = filters[key];
+        if (isEmpty(value)) {
+          delete body[key];
+          continue;
+        }
+
+        if (key === 'sortby') {
+          value = Utils.formatSortbyForPOST(value);
+        }
+        else if (key === 'datetime') {
+          value = Utils.formatDatetimeQuery(value);
+          if (!value) {
+            continue; // skip empty datetime
+          }
+        }
+        else if (key === 'filters') {
+          Object.assign(body, value.toJSON());
+          continue;
+        }
+
+        body[key] = value;
+      }
+      return Object.assign({}, link, { body });
+    }
+    else { // GET
+      // Construct new link with search params
+      let url = URI(link.href);
+
+      for (let key in filters) {
+        let value = filters[key];
+        if (isEmpty(value)) {
+          url.removeQuery(key);
+          continue;
+        }
+
+        if (key === 'datetime') {
+          value = Utils.formatDatetimeQuery(value);
+        }
+        else if (key === 'bbox') {
+          value = value.join(',');
+        }
+        else if ((key === 'collections' || key === 'ids' || key === 'q')) {
+          value = value.join(',');
+        }
+        else if (key === 'filters') {
+          let params = value.toText();
+          url.setQuery(params);
+          continue;
+        }
+
+        url.setQuery(key, value);
+      }
+
+      return Object.assign({}, link, { href: url.toString() });
+    }
   }
 
   static titleForHref(href, preferFileName = false) {
@@ -282,7 +362,7 @@ export default class Utils {
         return `DOI ${path}`;
       }
       else {
-        return `${file} at ${auth}`;
+        return `${file} (${auth})`;
       }
     }
     else if (file && !commonFileNames.includes(file)) {
@@ -303,7 +383,7 @@ export default class Utils {
     if (typeof img.href !== 'string') {
       return false;
     }
-    let uri = new URI(img.href);
+    let uri = URI(img.href);
     let protocol = uri.protocol().toLowerCase();
     if (protocol && !browserProtocols.includes(protocol)) {
       return false;
@@ -369,6 +449,41 @@ export default class Utils {
 
   static createLink(href, rel) {
     return { href, rel };
+  }
+
+  static supportsExtension(data, pattern) {
+    if (!Utils.isObject(data) || !Array.isArray(data['stac_extensions'])) {
+      return false;
+    }
+    let regexp = new RegExp('^' + pattern.replaceAll('*', '[^/]+') + '$');
+    return Boolean(data['stac_extensions'].find(uri => regexp.test(uri)));
+  }
+
+  /**
+   * Deep merge two objects.
+   * @param target
+   * @param ...sources
+   */
+  static mergeDeep(target, ...sources) {
+    if (!sources.length) {
+      return target;
+    }
+    const source = sources.shift();
+
+    if (Utils.isObject(target) && Utils.isObject(source)) {
+      for (const key in source) {
+        if (Utils.isObject(source[key])) {
+          if (!target[key]) {
+            Object.assign(target, { [key]: {} });
+          }
+          Utils.mergeDeep(target[key], source[key]);
+        } else {
+          Object.assign(target, { [key]: source[key] });
+        }
+      }
+    }
+
+    return Utils.mergeDeep(target, ...sources);
   }
 
 }

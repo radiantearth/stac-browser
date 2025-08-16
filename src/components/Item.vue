@@ -1,75 +1,66 @@
 <template>
-  <b-card no-body class="item-card" :class="{queued: !data, deprecated: isDeprecated}" v-b-visible.200="load">
-    <b-card-img
-      v-if="thumbnail && thumbnailShown" class="thumbnail"
-      :src="thumbnail.href" :alt="thumbnail.title" :crossorigin="crossOriginMedia"
-      @error="hideBrokenImg"
-    />
+  <b-card no-body class="item-card" :class="{queued: !data, deprecated: isDeprecated, description: hasDescription}" v-b-visible.400="load">
+    <b-card-img-lazy v-if="hasImage" class="thumbnail" offset="200" v-bind="thumbnail" />
     <b-card-body>
       <b-card-title>
         <StacLink :data="[data, item]" class="stretched-link" />
       </b-card-title>
+      <b-card-text v-if="fileFormats.length > 0 || hasDescription || isDeprecated" class="intro">
+        <b-badge v-if="isDeprecated" variant="warning" class="mr-1 mt-1 deprecated">{{ $t('deprecated') }}</b-badge>
+        <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="mr-1 mt-1 fileformat">{{ format | formatMediaType }}</b-badge>
+        <template v-if="hasDescription">{{ data.properties.description | summarize }}</template>
+      </b-card-text>
+      <Keywords v-if="showKeywordsInItemCards && keywords.length > 0" :keywords="keywords" variant="primary" center />
       <b-card-text>
         <small class="text-muted">
           <template v-if="extent">{{ extent | formatTemporalExtent }}</template>
           <template v-else-if="data && data.properties.datetime">{{ data.properties.datetime | formatTimestamp }}</template>
-          <template v-else>No time given</template>
+          <template v-else>{{ $t('items.noTime') }}</template>
         </small>
-      </b-card-text>
-      <b-card-text v-if="fileFormats.length > 0 || isDeprecated">
-        <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="mr-1 mt-1 fileformat">{{ format | formatMediaType }}</b-badge>
-        <b-badge v-if="isDeprecated" variant="warning" class="mr-1 mt-1 deprecated">Deprecated</b-badge>
       </b-card-text>
     </b-card-body>
   </b-card>
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
+import FileFormatsMixin from './FileFormatsMixin';
+import ThumbnailCardMixin from './ThumbnailCardMixin';
 import StacLink from './StacLink.vue';
-import STAC from '../models/stac';
+import { STAC } from 'stac-js';
 import { formatTemporalExtent, formatTimestamp, formatMediaType } from '@radiantearth/stac-fields/formatters';
+import Registry from '@radiantearth/stac-fields/registry';
+import Utils from '../utils';
+
+Registry.addDependency('content-type', require('content-type'));
 
 export default {
   name: 'Item',
   components: {
-    StacLink
+    StacLink,
+    Keywords: () => import('./Keywords.vue')
   },
   filters: {
-    formatMediaType,
+    summarize: text => Utils.summarizeMd(text, 150),
+    formatMediaType: value => formatMediaType(value, null, {shorten: true}),
     formatTemporalExtent,
     formatTimestamp
   },
+  mixins: [
+    FileFormatsMixin,
+    ThumbnailCardMixin
+  ],
   props: {
     item: {
       type: Object,
       required: true
     }
   },
-  data() {
-    return {
-      // Lazy load thumbnails and not all at once.
-      // false = don't load yet, true = try to load it, null = image errored
-      thumbnailShown: false
-    };
-  },
   computed: {
-    ...mapState(['crossOriginMedia']),
+    ...mapState(['showKeywordsInItemCards']),
     ...mapGetters(['getStac']),
     data() {
       return this.getStac(this.item);
-    },
-    thumbnail() {
-      if (this.data) {
-        let thumbnails = this.data.getThumbnails(true, 'thumbnail');
-        if (thumbnails.length > 0) {
-          return thumbnails[0];
-        }
-      }
-      return {
-        href: null,
-        title: ''
-      };
     },
     extent() {
       if (this.data && (this.data.properties.start_datetime || this.data.properties.end_datetime)) {
@@ -77,28 +68,21 @@ export default {
       }
       return null;
     },
-    fileFormats() {
-      if (!this.data) {
-        return [];
+    keywords() {
+      if (this.data) {
+        return this.data.getMetadata('keywords') || [];
       }
-      return Object.values(this.data.assets)
-        .filter(asset => Array.isArray(asset.roles) && asset.roles.includes('data') && typeof asset.type === 'string') // Look for data files
-        .map(asset => asset.type) // Array shall only contain media types
-        .filter((v, i, a) => a.indexOf(v) === i); // Unique values
+      return [];
     },
     isDeprecated() {
       return this.data instanceof STAC && Boolean(this.data.properties.deprecated);
+    },
+    hasDescription() {
+      return this.data instanceof STAC && Utils.hasText(this.data.properties.description);
     }
   },
   methods: {
-    hideBrokenImg(event) {
-      console.log(`Hiding item thumbnail for ${event.srcElement.src} as it can't be loaded.`);
-      this.thumbnailShown = null;
-    },
     load(visible) {
-      if (visible && this.thumbnailShown !== null) {
-        this.thumbnailShown = true;
-      }
       if (this.item instanceof STAC) {
         return;
       }
@@ -125,14 +109,24 @@ export default {
       min-height: 200px;
     }
 
-    .badge {
+    .intro {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
       overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 100%;
+      overflow-wrap: anywhere;
+      margin-bottom: 0.5rem;
+    }
 
-      &.deprecated {
-        text-transform: uppercase;
+    &.description {
+      .intro {
+        text-align: left;
+        margin-bottom: 0.5rem;
       }
+    }
+
+    .badge.deprecated {
+      text-transform: uppercase;
     }
 
     .card-img {
@@ -141,8 +135,10 @@ export default {
       max-width: 100%;
       max-height: 200px;
     }
+
     .card-body {
       text-align: center;
+      position: relative;
     }
   }
 }

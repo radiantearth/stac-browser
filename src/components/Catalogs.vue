@@ -1,24 +1,45 @@
 <template>
   <section class="catalogs mb-4">
-    <h2>
-      <span class="title">Catalogs</span>
-      <b-badge v-if="!hasMore" pill variant="secondary ml-2">{{ catalogs.length }}</b-badge>
-      <ViewButtons class="ml-4" v-model="view" />
-      <SortButtons v-if="!hasMore" class="ml-2" v-model="sort" />
-    </h2>
-    <SearchBox v-if="!hasMore" class="mt-3 mb-2" v-model="searchTerm" placeholder="Filter catalogs by title" />
-    <b-alert v-if="searchTerm && catalogView.length === 0" variant="warning" show>No catalogs found for the given search term.</b-alert>
-    <component :is="cardsComponent" v-bind="cardsComponentProps">
-      <Catalog v-for="catalog in catalogView" :catalog="catalog" :key="catalog.href" />
-    </component>
-    <b-button v-if="hasMore" @click="loadMore" variant="primary" v-b-visible.200="loadMore">Load more...</b-button>
+    <header>
+      <h2 class="title mr-2">{{ title }}</h2>
+      <b-badge v-if="catalogCount !== null" pill variant="secondary" class="mr-4">{{ catalogCount }}</b-badge>
+      <ViewButtons class="mr-2" v-model="view" />
+      <SortButtons v-if="isComplete && catalogs.length > 1" v-model="sort" />
+    </header>
+    <section v-if="isComplete && catalogs.length > 1" class="catalog-filter mb-2">
+      <SearchBox v-model="searchTerm" :placeholder="filterPlaceholder" />
+      <multiselect
+        v-if="allKeywords.length > 0" v-model="selectedKeywords" multiple :options="allKeywords"
+        :placeholder="$t('multiselect.keywordsPlaceholder')"
+        :selectLabel="$t('multiselect.selectLabel')"
+        :selectedLabel="$t('multiselect.selectedLabel')"
+        :deselectLabel="$t('multiselect.deselectLabel')"
+        :limitText="limitText"
+      />
+    </section>
+    <Pagination v-if="showPagination" ref="topPagination" class="mb-3" :pagination="pagination" placement="top" @paginate="paginate" />
+    <b-alert v-if="hasSearchCritera && catalogView.length === 0" variant="warning" class="mt-2" show>{{ $t('catalogs.noMatches') }}</b-alert>
+    <section class="list">
+      <Loading v-if="loading" fill top />
+      <component :is="cardsComponent" v-bind="cardsComponentProps">
+        <Catalog v-for="catalog in catalogView" :catalog="catalog" :key="catalog.href">
+          <template #footer="{data}">
+            <slot name="catalogFooter" :data="data" />
+          </template>
+        </Catalog>
+      </component>
+    </section>
+    <Pagination v-if="showPagination" class="mb-3" :pagination="pagination" @paginate="paginate" />
+    <b-button v-else-if="hasMore" @click="loadMore" variant="primary" v-b-visible.300="loadMore">{{ $t('catalogs.loadMore') }}</b-button>
   </section>
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 import Catalog from './Catalog.vue';
-import STAC from '../models/stac';
+import Loading from './Loading.vue';
+import { getDisplayTitle } from '../models/stac';
+import { STAC } from 'stac-js';
 import ViewMixin from './ViewMixin';
 import Utils from '../utils';
 
@@ -26,8 +47,11 @@ export default {
   name: "Catalogs",
   components: {
     Catalog,
+    Loading,
+    Pagination: () => import('./Pagination.vue'),
     SearchBox: () => import('./SearchBox.vue'),
-    SortButtons: () => import('./SortButtons.vue')
+    SortButtons: () => import('./SortButtons.vue'),
+    Multiselect: () => import('vue-multiselect')
   },
   mixins: [
     ViewMixin
@@ -37,67 +61,172 @@ export default {
       type: Array,
       required: true
     },
+    collectionsOnly: {
+      type: Boolean,
+      required: false
+    },
+    loading: {
+      type: Boolean,
+      default: false
+    },
     hasMore: {
       type: Boolean,
       default: false
+    },
+    apiFilters: {
+      type: Object,
+      default: () => ({})
+    },
+    pagination: {
+      type: Object,
+      default: () => ({})
+    },
+    count: {
+      type: Number,
+      default: null
     }
   },
   data() {
     return {
       searchTerm: '',
-      sort: 0
+      sort: 0,
+      selectedKeywords: []
     };
   },
   computed: {
+    ...mapState(['cardViewSort', 'uiLanguage']),
     ...mapGetters(['getStac']),
+    catalogCount() {
+      if (this.catalogs.length !== this.catalogView.length) {
+        return this.catalogView.length + '/' + this.catalogs.length;
+      }
+      else if (this.count !== null) {
+        return this.count;
+      }
+      else if (this.isComplete) {
+        return this.catalogs.length;
+      }
+      return null;
+    },
+    title() {
+      if (this.collectionsOnly) {
+        return this.$tc('stacCollection', this.catalogs.length );
+      }
+      else {
+        return this.$tc('stacCatalog', this.catalogs.length );
+      }
+    },
+    isComplete() {
+      return !this.hasMore && !this.showPagination;
+    },
+    filterPlaceholder() {
+      return this.isComplete ? this.$t('catalogs.filterByTitleAndMore') : this.$t('catalogs.filterByTitle');
+    },
+    showPagination() {
+      // Check whether any pagination links are available
+      return Object.values(this.pagination).some(link => !!link);
+    },
+    allCatalogs() {
+      return this.catalogs.map(catalog => {
+          let stac = this.getStac(catalog);
+          return stac ? stac : catalog;
+      });
+    },
+    hasSearchCritera() {
+      return this.searchTerm || this.selectedKeywords.length > 0;
+    },
     catalogView() {
       if (this.hasMore) {
         return this.catalogs;
       }
-      let catalogs = this.catalogs.map(catalog => {
-          let stac = this.getStac(catalog);
-          return stac ? stac : catalog;
-      });
       // Filter
-      if (this.searchTerm) {
+      let catalogs = this.allCatalogs;
+      if (this.hasSearchCritera) {
         catalogs = catalogs.filter(catalog => {
-          let haystack = [ catalog.title ];
-          if (catalog instanceof STAC) {
-            haystack.push(catalog.id);
-            if (Array.isArray(catalog.keywords)) {
-              haystack = haystack.concat(catalog.keywords);
+          if (this.selectedKeywords.length > 0 && catalog instanceof STAC && Array.isArray(catalog.keywords)) {
+            let hasKeywords = this.selectedKeywords.every(keyword => catalog.keywords.includes(keyword));
+            if (!hasKeywords) {
+              return false;
             }
           }
-          else {
-            haystack.push(catalog.href);
+          if (this.searchTerm) {
+            let haystack = [ catalog.title ];
+            if (catalog instanceof STAC && this.isComplete) {
+              haystack.push(catalog.id);
+              if (Array.isArray(catalog.keywords)) {
+                haystack = haystack.concat(catalog.keywords);
+              }
+            }
+            return Utils.search(this.searchTerm, haystack);
           }
-          return Utils.search(this.searchTerm, haystack);
+          return true;
         });
       }
       // Sort
-      if (!this.hasMore && this.sort !== 0) {
-        catalogs = catalogs.slice(0).sort((a,b) => STAC.getDisplayTitle(a).localeCompare(STAC.getDisplayTitle(b)));
+      if (!this.hasMore && !this.apiFilters.sortby && this.sort !== 0) {
+        const collator = new Intl.Collator(this.uiLanguage);
+        catalogs = catalogs.slice(0).sort((a,b) => collator.compare(getDisplayTitle(a), getDisplayTitle(b)));
         if (this.sort === -1) {
           catalogs = catalogs.reverse();
         }
       }
       return catalogs;
+    },
+    allKeywords() {
+      if (!this.isComplete) {
+        return [];
+      }
+      let keywords = [];
+      for(let catalog of this.allCatalogs) {
+        if (catalog instanceof STAC && Array.isArray(catalog.keywords)) {
+          for(let keyword of catalog.keywords) {
+            if (!keywords.includes(keyword)) {
+              keywords.push(keyword);
+            }
+          }
+        }
+      }
+      return keywords.sort();
     }
+  },
+  created() {
+    this.sort = this.cardViewSort;
   },
   methods: {
     loadMore(visible = true) {
       if (visible) {
+        // Disable sorting if pagination is/was active as otherwise the order of elements
+        // may change unexpectedly after the last page has been loaded.
+        this.sort = 0;
         this.$emit('loadMore');
       }
+    },
+    paginate(link, placement) {
+      if (placement === 'bottom' && this.$refs.topPagination) {
+        Utils.scrollTo(this.$refs.topPagination.$el);
+      }
+      this.$emit('paginate', link);
+    },
+    limitText(count) {
+      return this.$t("multiselect.andMore", {count});
     }
   }
 };
 </script>
 
 <style lang="scss" scoped>
-.catalogs > h2 {
-  .title, .badge {
-    vertical-align: middle;
+.catalog-filter {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+  gap: 1rem;
+  align-items: stretch;
+
+  > * {
+    flex-grow: 1;
+    flex-basis: 300px;
+    min-width: 300px;
   }
 }
 </style>

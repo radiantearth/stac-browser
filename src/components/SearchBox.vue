@@ -1,7 +1,7 @@
 <template>
   <div class="vue-component search-box">
     <span class="icon">🔎</span>
-    <b-form-input type="search" v-model.trim="searchTerm" :placeholder="placeholder" />
+    <b-form-input type="search" v-model.trim="searchTerm" :placeholder="placeholder || $t('search.placeholder')" />
   </div>
 </template>
 
@@ -20,7 +20,7 @@ export default {
     },
     placeholder: {
       type: String,
-      default: 'Search'
+      default: null
     }
   },
   data() {
@@ -42,13 +42,14 @@ export default {
 <style lang="scss">
 #stac-browser .search-box {
   position: relative;
+  box-sizing: border-box;
 
   input, .icon {
-    height: 1.5em;
     font-size: 1em;
     margin: 0;
   }
   input {
+    min-height: 1.5em;
     padding: 0.25em 0.3em;
     padding-left: 1.9em;
     z-index: 1;
@@ -59,13 +60,14 @@ export default {
     width: calc(100% - 1.9em - 0.25em - 2px);
   }
   .icon {
+    height: 1.5em;
     user-select: none;
-    margin-top: 0.3em;
+    margin-top: -0.75em;
     margin-left: 0.3em;
     width: 1em;
     z-index: 2;
     position: absolute;
-    top: 0;
+    top: 50%;
     left: 0;
   }
 }

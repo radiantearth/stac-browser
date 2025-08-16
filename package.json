@@ -1,12 +1,16 @@
 {
   "name": "@radiantearth/stac-browser",
-  "version": "3.0.0-beta.5",
-  "description": "A Vue-based STAC browser intended for static + dynamic deployment",
+  "version": "3.4.0-dev",
+  "description": "A full-fledged UI in Vue for browsing and searching static STAC catalogs and STAC APIs.",
   "main": "src/main.js",
   "scripts": {
     "start": "vue-cli-service serve",
-    "build": "vue-cli-service build --report",
-    "lint": "vue-cli-service lint"
+    "build": "vue-cli-service build",
+    "build:report": "vue-cli-service build --report",
+    "build:minimal": "vue-cli-service build --noSourceMaps",
+    "lint": "vue-cli-service lint",
+    "i18n:report": "vue-cli-service i18n:report --src \"./src/**/*.?(js|vue)\" --locales \"./src/locales/**/*.?(js|json)\"",
+    "i18n:fields": "node helpers/fields_locales.js"
   },
   "bugs": {
     "url": "https://github.com/radiantearth/stac-browser/issues"
@@ -14,6 +18,10 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/radiantearth/stac-browser.git"
+  },
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/m-mohr"
   },
   "author": "Radiant Earth Foundation <hello@radiant.earth>",
   "contributors": [
@@ -29,30 +37,42 @@
   ],
   "license": "ISC",
   "dependencies": {
-    "@apidevtools/json-schema-ref-parser": "^9.0.9",
-    "@radiantearth/stac-fields": "1.0.0-beta.18",
-    "@radiantearth/stac-migrate": "~1.1.0",
-    "axios": "^0.21.4",
+    "@apidevtools/json-schema-ref-parser": "^14.0.0",
+    "@musement/iso-duration": "^1.0.0",
+    "@radiantearth/stac-fields": "~1.5.2",
+    "@radiantearth/stac-migrate": "~2.0.2",
+    "@turf/mask": "^7.2.0",
+    "ajv-i18n": "^4.2.0",
+    "axios": "^1.2.0",
     "bootstrap-vue": "^2.21.2",
     "bs58": "^4.0.1",
-    "commonmark": "^0.29.3",
+    "chart.js": "^4.3.0",
+    "commonmark": "^0.31.2",
     "core-js": "^3.6.5",
-    "leaflet": "^1.8.0",
-    "node-polyfill-webpack-plugin": "^2.0.0",
-    "remove-markdown": "^0.3.0",
-    "stac-layer": "^0.15.0",
+    "node-polyfill-webpack-plugin": "^4.0.0",
+    "oidc-client-ts": "^3.0.1",
+    "ol": "~10.6.0",
+    "ol-stac": "^1.0.3",
+    "proj4": "^2.15.0",
+    "remove-markdown": "^0.6.2",
+    "stac-js": "~0.1.6",
+    "stac-node-validator": "2.0.0-rc.1",
+    "streamsaver-js": "^2.0.7",
     "urijs": "^1.19.11",
-    "v-clipboard": "^2.2.3",
-    "vue": "^2.6.12",
+    "v-clipboard": "3.0.0-next.1",
+    "vue": "^2.7.0",
+    "vue-chartjs": "^5.2.0",
+    "vue-i18n": "^8.28.2",
+    "vue-multiselect": "^2.1.6",
     "vue-read-more-smooth": "^0.1.8",
     "vue-router": "^3.2.0",
     "vue2-datepicker": "^3.9.2",
-    "vue2-leaflet": "^2.7.0",
-    "vue2-leaflet-fullscreen": "^1.0.1",
     "vuex": "^3.4.0",
     "yargs": "^17.0.1"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.18.6",
+    "@babel/plugin-proposal-optional-chaining": "^7.21.0",
     "@vue/cli-plugin-babel": "^5.0.4",
     "@vue/cli-plugin-eslint": "^5.0.4",
     "@vue/cli-plugin-router": "^5.0.4",
@@ -62,7 +82,8 @@
     "eslint": "^8.17.0",
     "eslint-plugin-vue": "^8.7.1",
     "sass": "^1.26.5",
-    "sass-loader": "^8.0.2",
+    "sass-loader": "^13.2.0",
+    "vue-cli-plugin-i18n": "~2.3.1",
     "vue-template-compiler": "^2.6.12"
   },
   "browserslist": [

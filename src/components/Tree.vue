@@ -1,7 +1,7 @@
 <template>
   <ul class="tree" v-b-visible="load">
     <li>
-      <b-button v-if="pagination" size="sm" variant="light" :disabled="true">
+      <b-button v-if="pagination" size="sm" variant="light" disabled>
         <b-icon-three-dots />
       </b-button>
       <template v-else-if="mayHaveChildren">
@@ -10,28 +10,28 @@
           <b-icon-folder-plus v-else />
         </b-button>
       </template>
-      <b-button v-else size="sm" variant="light" :disabled="true">
+      <b-button v-else size="sm" variant="light" :to="to">
         <b-icon-file-earmark-richtext />
       </b-button>
       
-      <b-button size="sm" variant="light" :class="{path: onPath || active}" :disabled="active || !to" :to="to">
+      <b-button size="sm" variant="light" :class="{path: onPath || active}" :disabled="!to && !active" :to="to" @click="onClick">
         {{ title }}
       </b-button>
 
       <template v-if="expanded && mayHaveChildren">
         <ul v-if="loading" class="tree">
-          <li><b-spinner label="Loading..." small /></li>
+          <li><b-spinner :label="$t('loading')" small /></li>
         </ul>
         <ul v-else-if="childs.length === 0" class="tree">
           <li>
             <b-button size="sm" variant="light" disabled>
-              No children available.
+              {{ $t('tree.noChildren') }}
             </b-button>
           </li>
         </ul>
         <template v-else>
           <Tree v-for="(child, i) in shownChilds" :key="i" :item="child" :parent="stac" :path="path" />
-          <b-button class="show-more" v-if="hasMore" @click="showMore" variant="light" v-b-visible.200="showMore">Show more...</b-button>
+          <b-button class="show-more" v-if="hasMore" variant="light" @click="showMore" v-b-visible.300="showMore">{{ $t('showMore') }}</b-button>
         </template>
       </template>
     </li>
@@ -42,7 +42,8 @@
 import { BIconFileEarmarkRichtext, BIconFolderMinus, BIconFolderPlus, BIconThreeDots } from "bootstrap-vue";
 import { mapGetters, mapState } from 'vuex';
 import Utils from '../utils';
-import STAC from '../models/stac';
+import { getDisplayTitle } from '../models/stac';
+import { STAC, CatalogLike } from 'stac-js';
 
 export default {
   name: 'Tree',
@@ -75,8 +76,14 @@ export default {
     };
   },
   computed: {
-    ...mapState(['data']),
+    ...mapState(['data', 'apiCatalogPriority']),
     ...mapGetters(['getStac']),
+    onClick() {
+      if (!this.to && this.mayHaveChildren) {
+        return this.toggle;
+      }
+      return null;
+    },
     stac() {
       if (this.pagination) {
         return null;
@@ -123,8 +130,11 @@ export default {
       return false;
     },
     to() {
+      if (this.active) {
+        return null;
+      }
       if (this.pagination) {
-        if (this.parent && this.parent.getAbsoluteUrl() !== this.data.getAbsoluteUrl()) {
+        if (this.parent && (!this.data || this.parent.getAbsoluteUrl() !== this.data.getAbsoluteUrl())) {
           return this.parent.getBrowserPath();
         }
         else {
@@ -138,9 +148,9 @@ export default {
     },
     title() {
       if (this.pagination) {
-        return 'more pages available for Collection';
+        return this.$t('tree.moreCollectionPagesAvailable');
       }
-      return STAC.getDisplayTitle([this.item, this.stac]);
+      return getDisplayTitle([this.item, this.stac]);
     },
     hasMore() {
       return this.childs.length > this.shownChilds.length;
@@ -155,7 +165,7 @@ export default {
       return this.path.includes(this.stac);
     },
     active() {
-      return this.stac === this.data;
+      return this.stac && this.stac === this.data;
     },
     pagination() {
       return ['next', 'prev', 'previous'].includes(this.item.rel);
@@ -183,10 +193,15 @@ export default {
       }
     }
   },
+  created() {
+    if (!this.parent) {
+      this.expanded = true;
+    }
+  },
   methods: {
     updateChilds() {
-      if (this.stac instanceof STAC) {
-        this.childs = this.stac.getChildren();
+      if (this.stac instanceof CatalogLike) {
+        this.childs = this.stac.getChildren(this.apiCatalogPriority);
       }
       else {
         this.childs = [];
@@ -205,7 +220,7 @@ export default {
       if (this.expanded && !this.pagination) {
         this.loading = true;
         let url = this.item instanceof STAC ? this.item.getAbsoluteUrl() : this.item.href;
-        await this.$store.dispatch("load", { url, loadApi: true });
+        await this.$store.dispatch("load", { url });
         this.loading = false;
       }
     }

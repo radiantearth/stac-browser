@@ -1,7 +1,7 @@
 <template>
   <component :is="component" class="stac-link" v-bind="attributes" :title="tooltip">
     <template v-if="icon">
-      <img :src="icon.href" :alt="icon.title" :title="icon.title" class="icon mr-2">
+      <img :src="icon.getAbsoluteUrl()" :alt="icon.title" :title="icon.title" class="icon mr-2">
     </template>
     <span class="title">{{ displayTitle }}</span>
   </component>
@@ -11,7 +11,8 @@
 import { mapState, mapGetters } from 'vuex';
 import { stacBrowserNavigatesTo } from "../rels";
 import Utils from '../utils';
-import STAC from '../models/stac';
+import { getDisplayTitle } from '../models/stac';
+import { STAC } from 'stac-js';
 import URI from 'urijs';
 
 export default {
@@ -32,14 +33,22 @@ export default {
     tooltip: {
       type: String,
       default: null
+    },
+    button: {
+      type: [Boolean, Object],
+      default: false
+    },
+    state: {
+      type: Object,
+      default: null
     }
   },
   computed: {
-    ...mapState(['privateQueryParameters']),
-    ...mapGetters(['toBrowserPath', 'getRequestUrl']),
+    ...mapState(['allowExternalAccess', 'privateQueryParameters']),
+    ...mapGetters(['toBrowserPath', 'getRequestUrl', 'isExternalUrl']),
     icon() {
       if (this.stac) {
-        let icons = this.stac.getIcons();
+        const icons = this.stac.getIcons();
         if (icons.length > 0) {
           return icons[0];
         }
@@ -75,14 +84,21 @@ export default {
       if (!Utils.isStacMediaType(this.link.type, true)) {
         return false;
       }
+      if (!this.allowExternalAccess && this.isExternalUrl(this.link.href)) {
+        return false;
+      }
       return stacBrowserNavigatesTo.includes(this.link.rel);
     },
     attributes() {
-      if (this.isStacBrowserLink) {
-        return {
+      if (this.isStacBrowserLink || this.button) {
+        let obj = {
           to: this.href,
           rel: this.rel
         };
+        if (Utils.isObject(this.button)) {
+          Object.assign(obj, this.button);
+        }
+        return obj;
       }
       else {
         return {
@@ -93,27 +109,37 @@ export default {
       }
     },
     component() {
+      if (this.button) {
+        return 'b-button';
+      }
       return this.isStacBrowserLink ? 'router-link' : 'a';
     },
     href() {
       if (this.stac || this.isStacBrowserLink) {
         let href;
-        if (this.stac) {
+        if (this.stac instanceof STAC) {
           href = this.stac.getBrowserPath();
         }
         else {
           href = this.toBrowserPath(this.link.href);
         }
+        if (!href.startsWith('/')) {
+          href = '/' + href;
+        }
 
         // Add private query parameters to links: https://github.com/radiantearth/stac-browser/issues/142
-        if (Utils.size(this.privateQueryParameters) > 0) {
-          let uri = new URI(href);
-          for(let key in this.privateQueryParameters) {
-            let queryKey = `~${key}`;
-            if (!uri.hasQuery(queryKey)) {
-              uri.addQuery(queryKey, this.privateQueryParameters[key]);
+        if (Utils.size(this.privateQueryParameters) > 0 || Utils.size(this.state) > 0) {
+          let uri = URI(href);
+          let addParameters = (obj, prefix) => {
+            for(let key in obj) {
+              let queryKey = `${prefix}${key}`;
+              if (!uri.hasQuery(queryKey)) {
+                uri.addQuery(queryKey, obj[key]);
+              }
             }
-          }
+          };
+          addParameters(this.privateQueryParameters, '~');
+          addParameters(this.state, '.');
           href = uri.toString();
         }
 
@@ -130,7 +156,7 @@ export default {
       }
 
       let fallback = typeof this.fallbackTitle === 'function' ? this.fallbackTitle() : this.fallbackTitle;
-      return STAC.getDisplayTitle(this.data, fallback);
+      return getDisplayTitle(this.data, fallback);
     }
   },
   methods: {

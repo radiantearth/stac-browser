@@ -1,62 +1,173 @@
-import Utils from "../utils";
+import {
+  Catalog as BaseCatalog,
+  Collection as BaseCollection,
+  Item as BaseItem,
+  ItemCollection as BaseItemCollection,
+  CollectionCollection as BaseCollectionCollection,
+  STAC
+} from 'stac-js';
 import Migrate from '@radiantearth/stac-migrate';
+import Utils, { geojsonMediaType } from "../utils";
 
-let stacObjCounter = 0;
+export function createSTAC(data, url, path, migrate = true, updateVersionNumber = false) {
+  if (migrate) {
+    // Uncomment this line if the old checksum: fields should be converted
+    // This is usually not needed so it's not enabled by default to shrink the bundle size
+    // Migrate.enableMultihash(require('multihashes'));
+    data = Migrate.stac(data, updateVersionNumber);
+  }
+  if (data.type === 'Feature') {
+    return new Item(data, url, path);
+  }
+  else if (data.type === 'FeatureCollection') {
+    return new ItemCollection(data, url, path);
+  }
+  else if (data.type === 'Collection' || (!data.type && typeof data.extent !== 'undefined' && typeof data.license !== 'undefined')) {
+    return new Collection(data, url, path);
+  }
+  else if (!data.type && Array.isArray(data.collections)) {
+    return new CollectionCollection(data, url, path);
+  }
+  else {
+    return new Catalog(data, url, path);
+  }
+}
 
-// STAC Entity
-class STAC {
+export function addMissingChildren(catalogs, stac) {
+  let links = stac.getStacLinksWithRel('child').filter(link => {
+    // Don't add links that are already in collections: https://github.com/radiantearth/stac-browser/issues/103
+    // ToDo: The runtime of this can probably be improved
+    let absoluteUrl = Utils.toAbsolute(link.href, stac.getAbsoluteUrl());
+    return !catalogs.find(collection => collection.getAbsoluteUrl() === absoluteUrl);
+  });
+  // place the children first to avoid conflicts with the paginated collections
+  // where the children are always at the end and can never be reached due to infinite scrolling
+  return links.concat(catalogs);
+}
 
-  constructor(data, url, path, migrate = true) {
-    this._id = stacObjCounter++;
-    this._url = url;
+export function getDisplayTitle(sources, fallbackTitle = null) {
+  if (!Array.isArray(sources)) {
+    sources = [sources];
+  }
+  let stac = sources.find(o => o instanceof STAC);
+  let link = sources.find(o => Utils.isObject(o) && !(o instanceof STAC));
+  // Get title from STAC item/catalog/collection
+  const title = stac && stac.getMetadata("title");
+  if (Utils.hasText(title)) {
+    return title;
+  }
+  // Get title from link
+  else if (link && Utils.hasText(link.title)) {
+    return link.title;
+  }
+  // Use id from STAC item/catalog/collection instead of titles
+  else if (stac && Utils.hasText(stac.id)) {
+    return stac.id;
+  }
+  // Use fallback title
+  else if (Utils.hasText(fallbackTitle)) {
+    return fallbackTitle;
+  }
+  // Use file or directory name from STAC as title
+  else if (stac) {
+    return Utils.titleForHref(stac.getAbsoluteUrl(), true);
+  }
+  // Use file or directory name from link as title
+  else if (link && Utils.hasText(link.href)) {
+    return Utils.titleForHref(link.href, true);
+  }
+  // Nothing available, return "untitled"
+  else {
+    return "Untitled";
+  }
+}
+
+function getChildren(stac, priority = null) {
+  if (!stac.isCatalogLike()) {
+    return [];
+  }
+
+  let showCollections = !priority || priority === 'collections';
+  let showChilds = !priority || priority === 'childs';
+
+  let children = [];
+  if (showCollections && stac._apiChildren.prev) {
+    children.push(stac._apiChildren.prev);
+  }
+  if (showCollections && stac._apiChildren.list.length > 0) {
+    children = stac._apiChildren.list.slice(0);
+  }
+  if (showChilds) {
+    children = addMissingChildren(children, stac).concat(stac.getLinksWithRels(['item']));
+  }
+  if (showCollections && stac._apiChildren.next) {
+    children.push(stac._apiChildren.next);
+  }
+  return children;
+}
+
+
+function getSearchLink(stac) {
+  // The search link MUST be 'application/geo+json' as otherwise it's likely not STAC
+  // See https://github.com/opengeospatial/ogcapi-features/issues/832
+  let links = Utils.getLinksWithRels(stac.links, ['search'])
+    .filter(link => Utils.isMediaType(link.type, geojsonMediaType))
+    .map(link => Object.assign({}, link, {href: Utils.toAbsolute(link.href, stac.getAbsoluteUrl())}));
+  // Prefer POST if present
+  let post = links.find(link => Utils.hasText(link.method) && link.method.toUpperCase() === 'POST');
+  return post || links[0] || null;
+}
+
+export class ItemCollection extends BaseItemCollection {
+
+  constructor(data, url, path) {
+    super(data, url);
     this._path = path;
+  }
+
+  getBrowserPath() {
+    return this._path;
+  }
+
+}
+
+export class CollectionCollection extends BaseCollectionCollection {
+
+  constructor(data, url, path) {
+    super(data, url);
+    this._path = path;
+  }
+
+  getBrowserPath() {
+    return this._path;
+  }
+
+}
+
+export class Collection extends BaseCollection {
+
+  constructor(data, url, path) {
+    super(data, url);
+    this._path = path;
+    this._incomplete = false;
     this._apiChildrenListeners = {};
     this._apiChildren = {
       list: [],
       prev: false,
       next: false
     };
-
-    if (migrate) {
-      // Uncomment this line if the old checksum: fields should be converted
-      // This is usually not needed so it's not enabled by default to shrink the bundle size
-      // Migrate.enableMultihash(require('multihashes'));
-      if (data.type === 'FeatureCollection') {
-        data.features = data.features.map(item => Migrate.item(item, false));
-      }
-      else {
-        data = Migrate.stac(data, false);
-      }
-    }
-    for (let key in data) {
-      if (typeof this[key] === 'undefined') {
-        this[key] = data[key];
-      }
-    }
   }
 
-  isItem() {
-    return this.type === 'Feature';
+  getBrowserPath() {
+    return this._path;
   }
 
-  isCatalog() {
-    return this.type === 'Catalog';
+  getSearchLink() {
+    return getSearchLink(this);
   }
 
-  isCatalogLike() {
-    return this.isCatalog() || this.isCollection();
-  }
-
-  isCollection() {
-    return this.type === 'Collection';
-  }
-
-  isItemCollection() {
-    return this.type === 'FeatureCollection';
-  }
-
-  hasApiData() {
-    return this._apiChildren.list.length > 0;
+  getChildren(priority = null) {
+    return getChildren(this, priority);
   }
 
   setApiDataListener(id, listener = null) {
@@ -81,201 +192,78 @@ class STAC {
       try {
         this._apiChildrenListeners[id](this._apiChildren);
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     }
   }
 
-  getChildren() {
-    if (!this.isCatalogLike()) {
-      return [];
-    }
+}
 
-    let children = [];
-    if (this._apiChildren.prev) {
-      children.push(this._apiChildren.prev);
-    }
-    if (this._apiChildren.list.length > 0) {
-      children = this._apiChildren.list;
-    }
-    children = STAC.addMissingChildren(children, this).concat(this.getLinksWithRels(['item']));
-    if (this._apiChildren.next) {
-      children.push(this._apiChildren.next);
-    }
-    return children;
-  }
+export class Catalog extends BaseCatalog {
 
-  static addMissingChildren(catalogs, stac) {
-    let links = stac.getStacLinksWithRel('child').filter(link => {
-      // Don't add links that are already in collections: https://github.com/radiantearth/stac-browser/issues/103
-      // ToDo: The runtime of this can probably be improved
-      let absoluteUrl = Utils.toAbsolute(link.href, stac.getAbsoluteUrl());
-      return !catalogs.find(collection => collection.getAbsoluteUrl() === absoluteUrl);
-    });
-    return catalogs.concat(links);
-  }
-
-  getApiCollectionsLink() {
-    return this.getStacLinkWithRel('data');
-  }
-
-  getApiItemsLink() {
-    return this.getStacLinkWithRel('items');
-  }
-
-  getMetadata(field) {
-    if (this.isItem()) {
-      return this.properties[field];
-    }
-    else if (this.isCatalogLike()) {
-      return this[field];
-    }
-    return null;
+  constructor(data, url, path) {
+    super(data, url);
+    this._path = path;
+    this._incomplete = false;
+    this._apiChildrenListeners = {};
+    this._apiChildren = {
+      list: [],
+      prev: false,
+      next: false
+    };
   }
 
   getBrowserPath() {
     return this._path;
   }
 
-  getAbsoluteUrl() {
-    return this._url;
+  getSearchLink() {
+    return getSearchLink(this);
   }
 
-  getStacLinksWithRel(rel, allowEmpty = true) {
-    return Utils.getLinksWithRels(this.links, [rel])
-      .filter(link => Utils.isStacMediaType(link.type, allowEmpty));
+  getChildren(priority = null) {
+    return getChildren(this, priority);
   }
 
-  getStacLinkWithRel(rel, allowEmpty = true) {
-    let links = this.getStacLinksWithRel(rel, allowEmpty);
-    if (links.length > 0) {
-      return links[0];
+  setApiDataListener(id, listener = null) {
+    if (typeof listener === 'function') {
+      this._apiChildrenListeners[id] = listener;
     }
     else {
-      return null;
+      delete this._apiChildrenListeners[id];
     }
   }
 
-  getLinkWithRel(rel) {
-    return Utils.getLinkWithRel(this.links, rel);
-  }
+  setApiData(list, next = null, prev = null) {
+    if (prev) {
+      this._apiChildren.prev = prev;
+    }
+    if (next) {
+      this._apiChildren.next = next;
+    }
+    this._apiChildren.list = list;
 
-  getLinksWithRels(rels) {
-    return Utils.getLinksWithRels(this.links, rels);
-  }
-
-  getLinksWithOtherRels(rels) {
-    return Utils.getLinksWithOtherRels(this.links, rels);
-  }
-
-  getAssetsWithRoles(roles) {
-    let matches = [];
-    if (Utils.isObject(this.assets)) {
-      for (let key in this.assets) {
-        let asset = this.assets[key];
-        if (Utils.isObject(asset) && typeof asset.href === 'string' && Array.isArray(asset.roles) && asset.roles.find(role => roles.includes(role))) {
-          matches.push(asset);
-        }
+    for (let id in this._apiChildrenListeners) {
+      try {
+        this._apiChildrenListeners[id](this._apiChildren);
+      } catch (error) {
+        console.error(error);
       }
     }
-    return matches;
-  }
-
-  static getDisplayTitle(sources, fallbackTitle = null) {
-    if (!Array.isArray(sources)) {
-      sources = [sources];
-    }
-    let stac = sources.find(o => o instanceof STAC);
-    let link = sources.find(o => Utils.isObject(o) && !(o instanceof STAC));
-    // Get title from STAC item/catalog/collection
-    if (stac && Utils.hasText(stac.getTitle())) {
-      return stac.getTitle();
-    }
-    // Get title from link
-    else if (link && Utils.hasText(link.title)) {
-      return link.title;
-    }
-    // Use id from STAC item/catalog/collection instead of titles
-    else if (stac && Utils.hasText(stac.id)) {
-      return stac.id;
-    }
-    // Use fallback title
-    else if (Utils.hasText(fallbackTitle)) {
-      return fallbackTitle;
-    }
-    // Use file or directory name from STAC as title
-    else if (stac) {
-      return Utils.titleForHref(stac.getAbsoluteUrl(), true);
-    }
-    // Use file or directory name from link as title
-    else if (link && Utils.hasText(link.href)) {
-      return Utils.titleForHref(link.href, true);
-    }
-    // Nothing available, return "untitled"
-    else {
-      return "Untitled";
-    }
-  }
-
-  getTitle() {
-    if (this.isItem()) {
-      return this.properties.title;
-    }
-    else {
-      return this.title;
-    }
-  }
-
-  _linkToAbsolute(link) {
-    return Object.assign({}, link, { href: Utils.toAbsolute(link.href, this.getAbsoluteUrl()) });
-  }
-
-  getIcons() {
-    return this.getLinksWithRels(['icon'])
-      .filter(img => Utils.canBrowserDisplayImage(img))
-      .map(img => this._linkToAbsolute(img));
-  }
-
-  /**
-   * Get the thumbnails from the assets and links in a STAC entity.
-   * 
-   * @param {boolean} browserOnly - Return only images that can be shown in a browser natively (PNG/JPG/GIF/WEBP).
-   * @param {?string} prefer - If not `null` (default), prefers a role over the other. Either `thumbnail` or `overview`.
-   * @returns 
-   */
-  getThumbnails(browserOnly = false, prefer = null) { // prefer can be either 
-    let thumbnails = this.getAssetsWithRoles(['thumbnail', 'overview']);
-    if (prefer && thumbnails.length > 1) {
-      thumbnails.sort(a => a.roles.includes(prefer) ? -1 : 1);
-    }
-    // Get from links only if no assets are available as they should usually be the same as in assets
-    if (thumbnails.length === 0) {
-      thumbnails = this.getLinksWithRels(['preview']);
-    }
-    // Some old catalogs use just a asset key
-    if (thumbnails.length === 0 && Utils.isObject(this.assets) && Utils.isObject(this.assets.thumbnail)) {
-      thumbnails = [this.assets.thumbnail];
-    }
-    if (browserOnly) {
-      // Remove all images that can't be displayed in a browser
-      thumbnails = thumbnails.filter(img => Utils.canBrowserDisplayImage(img));
-    }
-    return thumbnails.map(img => this._linkToAbsolute(img));
-  }
-
-  equals(other) {
-    if (!Utils.isObject(other)) {
-      return false;
-    }
-    if (this === other) {
-      return true;
-    }
-    if (this.id === other.id && this.type == other.type) {
-      return true;
-    }
-    return false;
   }
 
 }
 
-export default STAC;
+export class Item extends BaseItem {
+
+  constructor(data, url, path) {
+    super(data, url);
+    this._path = path;
+    this._incomplete = false;
+  }
+
+  getBrowserPath() {
+    return this._path;
+  }
+
+}

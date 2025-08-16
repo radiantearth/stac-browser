@@ -1,9 +1,9 @@
 <template>
-  <b-button-group :class="classes">
-    <b-button @click="paginate(pagination.first)" :disabled="!pagination.first" variant="primary">« First</b-button>
-    <b-button @click="paginate(pagination.prev)" :disabled="!pagination.prev" variant="primary">‹ Previous</b-button>
-    <b-button @click="paginate(pagination.next)" :disabled="!pagination.next" variant="primary">Next ›</b-button>
-    <b-button v-if="pagination.last" @click="paginate(pagination.last)" variant="primary">Last »</b-button>
+  <b-button-group>
+    <b-button @click="paginate(pagination.first)" :disabled="!pagination.first" variant="primary">{{ $t('pagination.first') }}</b-button>
+    <b-button @click="paginate(pagination.prev)" :disabled="!pagination.prev" variant="primary">{{ $t('pagination.previous') }}</b-button>
+    <b-button @click="paginate(pagination.next)" :disabled="!pagination.next" variant="primary">{{ $t('pagination.next') }}</b-button>
+    <b-button v-if="pagination.last" @click="paginate(pagination.last)" variant="primary">{{ $t('pagination.last') }}</b-button>
   </b-button-group>
 </template>
 
@@ -18,11 +18,6 @@ export default {
     placement: { // top or bottom
       type: String,
       default: "bottom"
-    }
-  },
-  computed: {
-    classes() {
-      return this.placement === 'top' ? 'mb-4 mt-2' : 'mb-2 mt-2';
     }
   },
   methods: {

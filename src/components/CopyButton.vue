@@ -1,18 +1,20 @@
 <template>
-  <b-button @click="copy" :variant="copyColor" v-bind="buttonProps" title="Copy">
+  <b-button class="copy-button" @click.prevent.stop="copy" :variant="copyColor" v-bind="buttonProps" :title="$t('copy')">
     <component :is="copyIcon" />
-    <slot />    
+    <slot />
   </b-button>
 </template>
 
 <script>
-import { BIconClipboard, BIconClipboardCheck } from 'bootstrap-vue';
+import { BIconClipboard, BIconClipboardCheck, BIconClipboardX } from 'bootstrap-vue';
+import { Clipboard } from "v-clipboard";
 
 export default {
     name: "CopyButton",
     components: {
         BIconClipboard,
-        BIconClipboardCheck
+        BIconClipboardCheck,
+        BIconClipboardX
     },
     props: {
         copyText: {
@@ -30,32 +32,49 @@ export default {
     },
     data() {
         return {
-            copyConfirm: false
+            status: null
         };
     },
     computed: {
         copyColor() {
-            if (this.copyConfirm) {
-                if (this.variant.startsWith('outline-')) {
-                    return 'outline-success';
-                }
-                else {
-                    return 'success';
-                }
+            let variant = this.variant;
+            if (this.status === true) {
+                variant = 'success';
             }
-            else {
-                return this.variant;
+            else if (this.status === false) {
+                variant = 'danger';
             }
+            if (this.variant.startsWith('outline-')) {
+                variant = 'outline-' + variant;
+            }
+            return variant;
         },
         copyIcon() {
-            return this.copyConfirm ? 'b-icon-clipboard-check' : 'b-icon-clipboard';
+            if (this.status === true) {
+                return 'b-icon-clipboard-check';
+            }
+            else if (this.status === false) {
+                return 'b-icon-clipboard-x';
+            }
+            else {
+                return 'b-icon-clipboard';
+            }
         }
     },
     methods: {
-        copy() {
-            this.copyConfirm = true;
-            this.$clipboard(this.copyText);
-            setTimeout(() => this.copyConfirm = false, 2500);
+        async copy() {
+            try {
+                // We need to store the focus and restore it again as the clipboard 
+                // may steal the focus
+                let focus = document.activeElement;
+                await Clipboard.copy(this.copyText);
+                focus.focus();
+                this.status = true;
+            } catch(error) {
+                console.error(error);
+                this.status = false;
+            }
+            setTimeout(() => this.status = null, 2500);
         }
     }
 };

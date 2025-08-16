@@ -1,20 +1,20 @@
 <template>
   <b-alert variant="danger" show @dismissed="$emit('close')" :dismissible="dismissible">
-    <p class="message">{{ message }}</p>
+    <p class="message">{{ message || $t('errors.default') }}</p>
     <dl class="error" v-if="error && error.message">
-      <dt>Caused by:</dt>
+      <dt>{{ $t('errors.labels.cause') }}</dt>
       <dd>{{ error.message }}</dd>
     </dl>
     <dl class="description" v-if="description">
-      <dt>Reasoning:</dt>
+      <dt>{{ $t('errors.labels.reason') }}</dt>
       <dd>{{ description }}</dd>
     </dl>
     <dl class="id" v-if="id">
-      <dt>Error code:</dt>
+      <dt>{{ $t('errors.labels.code') }}</dt>
       <dd><code>{{ id }}</code></dd>
     </dl>
     <dl class="url" v-if="url">
-      <dt>Requested URL:</dt>
+      <dt>{{ $t('errors.labels.requestURL') }}</dt>
       <dd><code>{{ url }}</code></dd>
     </dl>
   </b-alert>
@@ -26,7 +26,7 @@ export default {
   props: {
     message: {
       type: String,
-      default: 'Sorry, the requested page could not be loaded.'
+      default: null
     },
     description: {
       type: String,
@@ -52,15 +52,22 @@ export default {
     },
     dismissible: {
       type: Boolean,
-      default: true
+      default: false
     }
   }
 };
 </script>
 
 <style lang="scss" scoped>
+.alert {
+  margin-bottom: 0;
+}
 .message {
   font-weight: bold;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
 }
 dl {
   font-size: 0.9em;

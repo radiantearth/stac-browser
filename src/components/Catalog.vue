@@ -1,61 +1,57 @@
 <template>
-  <b-card no-body :class="classes" v-b-visible.200="load" :img-right="isList">
-    <b-card-img
-      v-if="hasImage" class="thumbnail"
-      :src="thumbnail.href" :alt="thumbnail.title" :crossorigin="crossOriginMedia" :right="isList"
-      @error="hideBrokenImg"
-    />
+  <b-card no-body :class="classes" v-b-visible.400="load" :img-right="isList">
+    <b-card-img-lazy v-if="hasImage" class="thumbnail" offset="200" v-bind="thumbnail" />
     <b-card-body>
       <b-card-title>
         <StacLink :data="[data, catalog]" class="stretched-link" />
       </b-card-title>
-      <b-card-text v-if="data && (data.description || data.deprecated)" class="intro">
-        <b-badge v-if="data.deprecated" variant="warning" class="deprecated">Deprecated</b-badge>
-        {{ data.description | stripCommonmark }}
+      <b-card-text v-if="data && (fileFormats.length > 0 || data.description || data.deprecated)" class="intro">
+        <b-badge v-if="data.deprecated" variant="warning" class="mr-1 mt-1 deprecated">{{ $t('deprecated') }}</b-badge>
+        <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="mr-1 mt-1 fileformat">{{ format | formatMediaType }}</b-badge>
+        {{ data.description | summarize }}
       </b-card-text>
-      <b-card-text v-if="temporalExtent" class="datetime"><span v-html="temporalExtent" /></b-card-text>
+      <Keywords v-if="showKeywordsInCatalogCards && keywords.length > 0" :keywords="keywords" variant="primary" :center="!isList" />
+      <b-card-text v-if="temporalExtent" class="datetime"><small v-html="temporalExtent" /></b-card-text>
     </b-card-body>
+    <b-card-footer>
+      <slot name="footer" :data="data" />
+    </b-card-footer>
   </b-card>
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
+import FileFormatsMixin from './FileFormatsMixin';
+import StacFieldsMixin from './StacFieldsMixin';
+import ThumbnailCardMixin from './ThumbnailCardMixin';
 import StacLink from './StacLink.vue';
-import STAC from '../models/stac';
-import removeMd from 'remove-markdown';
-import { formatTemporalExtent } from '@radiantearth/stac-fields/formatters';
+import { STAC } from 'stac-js';
+import { formatMediaType, formatTemporalExtent } from '@radiantearth/stac-fields/formatters';
+import Utils from '../utils';
 
 export default {
   name: 'Catalog',
   components: {
-    StacLink
+    StacLink,
+    Keywords: () => import('./Keywords.vue')
   },
   filters: {
-    stripCommonmark(text) {
-      // Best-effort approach to remove some CommonMark (Markdown).
-      // Likely not perfect, but seems good enough for most cases.
-      return removeMd(text);
-    }
+    summarize: text => Utils.summarizeMd(text, 300),
+    formatMediaType: value => formatMediaType(value, null, {shorten: true})
   },
+  mixins: [
+    FileFormatsMixin,
+    ThumbnailCardMixin,
+    StacFieldsMixin({ formatTemporalExtent })
+  ],
   props: {
     catalog: {
       type: Object,
       required: true
-    },
-    showThumbnail: {
-      type: Boolean,
-      default: true
     }
   },
-  data() {
-    return {
-      // Lazy load thumbnails and not all at once.
-      // false = don't load yet, true = try to load it, null = image errored
-      thumbnailShown: false
-    };
-  },
   computed: {
-    ...mapState(['crossOriginMedia', 'cardViewMode']),
+    ...mapState(['showKeywordsInCatalogCards']),
     ...mapGetters(['getStac']),
     classes() {
       let classes = ['catalog-card'];
@@ -73,43 +69,27 @@ export default {
       }
       return classes;
     },
-    isList() {
-      return this.cardViewMode === 'list';
-    },
-    hasImage() {
-      return this.showThumbnail && this.thumbnail && this.thumbnailShown;
-    },
     data() {
       return this.getStac(this.catalog);
-    },
-    thumbnail() {
-      if (this.data) {
-        let thumbnails = this.data.getThumbnails(true, 'thumbnail');
-        if (thumbnails.length > 0) {
-          return thumbnails[0];
-        }
-      }
-      return null;
     },
     temporalExtent() {
       if (this.data?.isCollection() && this.data.extent?.temporal?.interval.length > 0) {
         let extent = this.data.extent.temporal.interval[0];
         if (Array.isArray(extent) && (typeof extent[0] === 'string' || typeof extent[1] === 'string')) {
-          return formatTemporalExtent(this.data.extent.temporal.interval[0], true);
+          return this.formatTemporalExtent(this.data.extent.temporal.interval[0], true);
         }
       }
       return null;
+    },
+    keywords() {
+      if (this.data) {
+        return this.data.getMetadata('keywords') || [];
+      }
+      return [];
     }
   },
   methods: {
-    hideBrokenImg(event) {
-      console.log(`Hiding catalog thumbnail for ${event.srcElement.src} as it can't be loaded.`);
-      this.thumbnailShown = null;
-    },
     load(visible) {
-      if (visible && this.thumbnailShown !== null) {
-        this.thumbnailShown = true;
-      }
       if (this.catalog instanceof STAC) {
         return;
       }
@@ -120,11 +100,11 @@ export default {
 </script>
 
 <style lang="scss">
+@import '~bootstrap/scss/mixins';
 @import '../theme/variables.scss';
 
 #stac-browser {
   .catalog-card {
-
     &.deprecated {
       opacity: 0.5;
 
@@ -133,70 +113,68 @@ export default {
       }
     }
 
+    .card-body, .card-footer {
+      position: relative;
+    }
+    .card-footer:empty {
+      display: none;
+    }
+    .card-title {
+      margin-bottom: 0.5rem;
+    }
     .intro {
       display: -webkit-box;
       -webkit-line-clamp: 3;
       -webkit-box-orient: vertical;
       overflow: hidden;
+      overflow-wrap: anywhere;
       text-align: left;
     }
-      
+    &.has-extent {
+      .intro {
+        margin-bottom: 0.5rem;
+      }
+    }
+    .datetime {
+      color: map-get($theme-colors, "secondary");
+    }
     .badge.deprecated {
       text-transform: uppercase;
     }
   }
   .card-list {
-    flex-direction: row;
-
     .catalog-card {
       box-sizing: border-box;
-      margin-top: 0.5em;
-      margin-bottom: 0.5em;
-
-      &.has-extent:not(.has-thumbnail) {
-        padding-top: 0.75em;
-      }
+      margin: 0.5em 0;
+      display: flex;
 
       .card-img-right {
         min-height: 100px;
         height: 100%;
         max-height: 8.5rem;
         max-width: 33%;
+        object-fit: contain;
+        object-position: right;
       }
-
+      .card-footer {
+        min-width: 175px;
+        max-width: 175px;
+        border-top: 0;
+      }
       .intro {
-        display: -webkit-box;
         -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        text-align: left;
-        margin-bottom: 0;
-      }
-      .datetime {
-        display: inline-block;
-        padding: $border-radius;
-        border: 0;
-        background-color: rgba(0,0,0,0.6);
-        color: map-get($theme-colors, "light");
-        border-radius: 0 0 0 $border-radius;
-        position: absolute;
-        top: 0;
-        right: 0;
-        font-size: 80%;
       }
     }
   }
   .card-columns {
     .catalog-card {
       box-sizing: border-box;
-      margin-top: 0.5em;
-      margin-bottom: 0.5em;
+      margin-top: 0.5em 0;
       text-align: center;
 
       &.queued {
         min-height: 10rem;
       }
-
       .card-img {
         width: auto;
         height: auto;
@@ -205,10 +183,6 @@ export default {
       }
       .card-title {
         text-align: center;
-      }
-      .datetime {
-        color: map-get($theme-colors, "secondary");
-        font-size: 85%;
       }
     }
   }
