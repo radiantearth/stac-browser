@@ -8,10 +8,15 @@ on:
       TAG_NAME:
         description: "Tag name"
         required: true
+      pathPrefix:
+        description: "Prefix path for the STAC Browser"
+        required: false
+        default: "/stac-browser/"  # original default '' (empty)
 
 env:
   REGISTRY: ghcr.io
   TAG_NAME: ${{ github.event.inputs.TAG_NAME || github.event.release.tag_name }}
+  pathPrefix: "${{ github.event.inputs.pathPrefix }}"
 
 jobs:
   retag-docker-image:
@@ -56,6 +61,7 @@ jobs:
           build-args: |
             VERSION=${{ env.VERSION }}
             REVISION=${{ env.REVISION }}
+            pathPrefix="${{ env.pathPrefix }}"
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=registry,ref=${{ env.IMAGE_NAME }}:edge

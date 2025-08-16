@@ -1,7 +1,7 @@
 FROM node:lts-alpine3.18 AS build-step
 ARG DYNAMIC_CONFIG=true
 ARG historyMode="history"
-ARG pathPrefix="/stac-browser/"
+ARG pathPrefix
 
 WORKDIR /app
 COPY package*.json ./
@@ -11,7 +11,7 @@ RUN \[ "${DYNAMIC_CONFIG}" == "true" \] && sed -i "s|<!-- <script defer=\"defer\
 RUN npm run build -- --historyMode="${historyMode}" --pathPrefix="${pathPrefix}"
 
 FROM nginx:1-alpine-slim
-ARG pathPrefix="/stac-browser/"
+ARG pathPrefix
 
 RUN apk add jq pcre-tools
 
@@ -19,6 +19,7 @@ COPY ./config.schema.json /etc/nginx/conf.d/config.schema.json
 COPY --from=build-step /app/dist /usr/share/nginx/html
 COPY --from=build-step /app/docker/default.conf /etc/nginx/conf.d/default.conf
 RUN sed -i "s|<pathPrefix>|${pathPrefix}|" /etc/nginx/conf.d/default.conf
+RUN ln -s /usr/share/nginx/html /etc/nginx/html
 
 EXPOSE 8080
 
