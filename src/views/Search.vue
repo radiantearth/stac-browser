@@ -67,7 +67,7 @@ import { mapGetters, mapState } from "vuex";
 import Utils from '../utils';
 import SearchFilter from '../components/SearchFilter.vue';
 import Loading from '../components/Loading.vue';
-import { getDisplayTitle, createSTAC } from '../models/stac';
+import { getDisplayTitle, createSTAC, ItemCollection } from '../models/stac';
 import { STAC } from 'stac-js';
 import { BIconCheckSquare, BIconSquare, BTabs, BTab } from 'bootstrap-vue';
 import { processSTAC, stacRequest } from '../store/utils';
@@ -132,11 +132,11 @@ export default {
       if (this.isCollectionSearch) {
         return null; // wait for stac-js to convert bboxes to geojson
       }
-      return {
+      return new ItemCollection({
         type: 'FeatureCollection',
         features: this.results,
         links: []
-      };
+      });
     },
     results() {
       if (Utils.size(this.data) === 0) {
