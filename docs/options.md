@@ -39,6 +39,8 @@ The following ways to set config options are possible:
 - [Mapping](#mapping)
   - [buildTileUrlTemplate](#buildtileurltemplate)
   - [useTileLayerAsFallback](#usetilelayerasfallback)
+  - [displayPreview](#displaypreview)
+  - [displayOverview](#displayoverview)
   - [displayGeoTiffByDefault](#displaygeotiffbydefault)
   - [crs](#crs)
   - [getMapSourceOptions](#getmapsourceoptions)
@@ -335,7 +337,7 @@ It allows rendering imagery such as (cloud-optimized) GeoTiffs through a tile se
 
 If the option `useTileLayerAsFallback` is set to `true`, the tile server is only used as a fallback.
 
-`buildTileUrlTemplate` is disabled by default (i.e. set to `null`) since v3.4.0.
+`buildTileUrlTemplate` is disabled by default (i.e. set to `null`) since v4.0.0.
 
 You can enable this option by providing a function with a single parameter that returns a tile server template url.
 The given function can optionally be async (i.e. return a Promise).
