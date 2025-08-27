@@ -36,6 +36,9 @@
   "items": {},
   "mapping": {
     "attribution": {},
+    "bboxSelect": {},
+    "layers": {},
+    "location": {},
     "zoom": {
       "in": {},
       "out": {}
