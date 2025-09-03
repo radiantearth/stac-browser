@@ -320,7 +320,7 @@ The following sponsors have provided a substantial amount of funding for STAC Br
 - [Radiant Earth](https://radiant.earth) (base funding for versions 1, 2 and 3)
 - [swisstopo](https://www.swisstopo.admin.ch/) (maintenance, base funding for version 3 and 4)
 - [National Resources Canada](https://natural-resources.canada.ca/home) (multi-language support, maintenance)
-- [Matthias Mohr - Softwareentwicklung](https://mohr.ws) (maintenance)
+- [moreGeo GmbH](https://moregeo.it) (maintenance)
 - [Spacebel](https://spacebel.com) (collection search, mapping)
 - [Planet](https://planet.com) (authentication, maintenance)
 - [CloudFerro](https://cloudferro.com) (authentication, alternate asset and storage extension)
