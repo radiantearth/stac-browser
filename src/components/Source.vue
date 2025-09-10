@@ -4,7 +4,11 @@
       <b-button v-if="showRoot" tag="a" tabindex="0" size="sm" variant="outline-primary" id="popover-root-btn">
         <b-icon-box /> <span class="button-label">{{ rootTitle }}</span>
       </b-button>
-      <b-button v-if="stacUrl" tag="a" tabindex="0" size="sm" variant="outline-primary" id="popover-link-btn" :title="$t('source.detailsAboutSource')">
+      <b-button
+        v-if="stacUrl" tag="a" tabindex="0" size="sm"
+        variant="outline-primary" id="popover-link-btn"
+        :title="$t('source.detailsAboutSource')"
+      >
         <b-icon-link /> <span class="button-label">{{ $t('source.label') }}</span>
       </b-button>
       <b-button tag="a" tabindex="0" size="sm" variant="outline-primary" id="popover-share-btn" :title="$t('source.share.withOthers')">

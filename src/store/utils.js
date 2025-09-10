@@ -1,5 +1,4 @@
 import axios from "axios";
-import URI from "urijs";
 import Utils from "../utils";
 
 export class Loading {
