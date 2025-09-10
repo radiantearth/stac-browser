@@ -108,7 +108,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['catalogUrl', 'catalogTitle', 'itemsPerPage']),
+    ...mapState(['catalogUrl', 'catalogTitle', 'searchResultsPerPage', 'itemsPerPage', 'collectionsPerPage']),
     ...mapGetters(['canSearchItems', 'canSearchCollections', 'getStac', 'root', 'collectionLink', 'parentLink', 'fromBrowserPath', 'toBrowserPath']),
     selectedCollectionCount() {
       return Utils.size(this.selectedCollections);
@@ -177,6 +177,13 @@ export default {
     },
     isCollectionSearch() {
       return this.collectionSearch && this.activeSearch === 0;
+    },
+    currentPaginationLimit() {
+      if (this.isCollectionSearch) {
+        return this.collectionsPerPage;
+      } else {
+        return this.searchResultsPerPage;
+      }
     },
     pageDescription() {
       let title = getDisplayTitle([this.collectionLink, this.parentLink, this.root], this.catalogTitle);
@@ -253,7 +260,7 @@ export default {
       this.error = null;
       this.loading = true;
       try {
-        this.link = Utils.addFiltersToLink(link, this.filters, this.itemsPerPage);
+        this.link = Utils.addFiltersToLink(link, this.filters, this.currentPaginationLimit);
 
         let key = this.isCollectionSearch ? 'collections' : 'features';
         let response = await stacRequest(this.$store, this.link);
