@@ -108,27 +108,6 @@
       "noCLI": true,
       "noEnv": true
     },
-    "stacProxyUrl": {
-      "type": [
-        "array",
-        "null"
-      ],
-      "prefixItems": [
-        {
-          "type": [
-            "string"
-          ],
-          "format": "uri-reference"
-        },
-        {
-          "type": [
-            "string"
-          ],
-          "format": "uri"
-        }
-      ],
-      "items": false
-    },
     "pathPrefix": {
       "type": [
         "string"
@@ -166,11 +145,6 @@
       ]
     },
     "showThumbnailsAsAssets": {
-      "type": [
-        "boolean"
-      ]
-    },
-    "redirectLegacyUrls": {
       "type": [
         "boolean"
       ]
