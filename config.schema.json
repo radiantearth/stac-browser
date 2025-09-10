@@ -151,8 +151,7 @@
     },
     "searchResultsPerPage": {
       "type": [
-        "integer",
-        "null"
+        "integer"
       ],
       "minimum": 1
     },
