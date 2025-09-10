@@ -175,13 +175,27 @@
         "boolean"
       ]
     },
-    "itemsPerPage": {
+    "searchResultsPerPage": {
       "type": [
         "integer"
       ],
       "minimum": 1
     },
-    "maxItemsPerPage": {
+    "itemsPerPage": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "collectionsPerPage": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "maxSearchResultsPerPage": {
       "type": [
         "integer"
       ],
