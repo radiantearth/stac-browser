@@ -22,14 +22,17 @@ The following ways to set config options are possible:
   - [apiCatalogPriority](#apicatalogpriority)
 - [Deployment](#deployment)
   - [historyMode](#historymode)
+    - [`history`](#history)
+    - [`hash`](#hash)
   - [pathPrefix](#pathprefix)
-  - [stacProxyUrl](#stacproxyurl)
-  - [redirectLegacyUrls](#redirectlegacyurls)
 - [Security](#security)
   - [allowExternalAccess](#allowexternalaccess)
   - [allowedDomains](#alloweddomains)
   - [crossOriginMedia](#crossoriginmedia)
   - [authConfig](#authconfig)
+    - [API Keys](#api-keys)
+    - [HTTP Basic](#http-basic)
+    - [OpenID Connect](#openid-connect)
 - [Internationalization and Localization](#internationalization-and-localization)
   - [locale](#locale)
   - [fallbackLocale](#fallbacklocale)
@@ -136,34 +139,6 @@ npm run build -- --pathPrefix="/browser/"
 
 This will build STAC Browser in a way that it can be hosted at `https://example.com/browser` for example.
 Using this parameter for the dev server will make STAC Browser available at `http://localhost:8080/browser`.
-
-### stacProxyUrl
-
-**DEPRECATED!**
-
-Setting the `stacProxyUrl` allows users to modify the URLs contained in the catalog to point to another location.
-For instance, if you are serving a catalog on the local file system at `/home/user/catalog.json`, but want to serve
-the data out from a server located at `http://localhost:8888/`, you can use:
-
-```bash
-npm start -- --open --stacProxyUrl=/home/user http://localhost:8888
-```
-
-Notice the format of the value:
-
-- In CLI it is the original location and the proxy location separated by a space character, i.e. `{original} {proxy}` as in the example above.
-- In the config file it is a two-element array with the original location as first element and the proxy location as the second element. Set the option to `null` to disable it (default).
-
-In this example, any href contained in the STAC (including link or asset hrefs) will replace any occurrence of `/home/user/` with `http://localhost:8888`.
-
-This can also be helpful when proxying a STAC that does not have cors enabled;
-by using stacProxyUrl you can proxy the original STAC server with one that enables cors and be able to browse that catalog.
-
-### redirectLegacyUrls
-
-**DEPRECATED!**
-
-If you are updating from an old version of STAC Browser, you can set this option to `true` to redirect users from the old "unreadable" URLs to the new human-readable URLs.
 
 ## Security
 

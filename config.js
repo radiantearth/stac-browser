@@ -33,7 +33,6 @@ module.exports = {
     displayOverview: true,
     buildTileUrlTemplate: null,
     getMapSourceOptions: null,
-    stacProxyUrl: null,
     pathPrefix: "/",
     historyMode: "history",
     cardViewMode: "cards",
