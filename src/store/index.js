@@ -9,7 +9,7 @@ import { addMissingChildren, getDisplayTitle, createSTAC } from '../models/stac'
 import { CatalogLike, STAC } from 'stac-js';
 
 import auth from './auth.js';
-import { addQueryIfNotExists, isAuthenticationError, Loading, processSTAC, proxyUrl, unproxyUrl, stacRequest } from './utils';
+import { addQueryIfNotExists, isAuthenticationError, Loading, processSTAC, stacRequest } from './utils';
 import { getBest } from 'stac-js/src/locales';
 import I18N from '@radiantearth/stac-fields/I18N';
 import { translateFields, executeCustomFunctions, loadMessages } from '../i18n';
@@ -231,7 +231,7 @@ function getStore(config, router) {
           url = '/';
         }
 
-        let absolute = Utils.toAbsolute(unproxyUrl(url, state.stacProxyUrl), state.url, false);
+        let absolute = Utils.toAbsolute(url, state.url, false);
         let relative;
         if (!state.allowSelectCatalog && state.catalogUrl) {
           relative = absolute.relativeTo(state.catalogUrl);
@@ -304,7 +304,7 @@ function getStore(config, router) {
         return relativeStr.startsWith('//') || relativeStr.startsWith('../');
       },
       getRequestUrl: (state, getters) => (url, baseUrl = null, addLocalQueryParams = false) => {
-        let absoluteUrl = Utils.toAbsolute(proxyUrl(url, state.stacProxyUrl), baseUrl ? baseUrl : state.url, false);
+        let absoluteUrl = Utils.toAbsolute(url, baseUrl ? baseUrl : state.url, false);
         if (!getters.isExternalUrl(absoluteUrl)) {
           // Check whether private params are present and add them if the URL is part of the catalog
           addQueryIfNotExists(absoluteUrl, state.privateQueryParameters);
@@ -315,7 +315,6 @@ function getStore(config, router) {
             addQueryIfNotExists(absoluteUrl, state.localRequestQueryParameters);
           }
         }
-        // If we are proxying a STAC Catalog, replace any URI with the proxied address.
         return absoluteUrl.toString();
       },
 
