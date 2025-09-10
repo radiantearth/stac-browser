@@ -73,6 +73,7 @@
   "copy": "Copy",
   "default": "Default",
   "defaultWithValue": "Default ({value})",
+  "serverDefault": "server default",
   "deprecated": "Deprecated",
   "deprecation": {
     "fallbackTitle": "Show",
