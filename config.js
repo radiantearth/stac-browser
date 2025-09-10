@@ -40,7 +40,6 @@ module.exports = {
     showKeywordsInItemCards: false,
     showKeywordsInCatalogCards: false,
     showThumbnailsAsAssets: false,
-    redirectLegacyUrls: false,
     searchResultsPerPage: 12,
     itemsPerPage: null,
     collectionsPerPage: null,
