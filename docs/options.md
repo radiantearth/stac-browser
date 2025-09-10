@@ -45,8 +45,10 @@ The following ways to set config options are possible:
   - [crs](#crs)
   - [getMapSourceOptions](#getmapsourceoptions)
 - [User Interface](#user-interface)
+  - [searchResultsPerPage](#searchresultsperpage)
   - [itemsPerPage](#itemsperpage)
-  - [maxItemsPerPage](#maxitemsperpage)
+  - [collectionsPerPage](#collectionsperpage)
+  - [maxSearchResultsPerPage](#maxsearchresultsperpage)
   - [cardViewMode](#cardviewmode)
   - [cardViewSort](#cardviewsort)
   - [showKeywordsInItemCards](#showkeywordsinitemcards)
@@ -427,19 +429,33 @@ getSourceOptions: async (type, options) => {
 
 ## User Interface
 
+### searchResultsPerPage
+
+The number of items requested and shown per page by default for search results. Only applies to APIs that support the `limit` query parameter.
+
+This is applied to the following requests:
+
+- `GET /search` (when searching both collections and items)
+
 ### itemsPerPage
 
-The number of items requested and shown per page by default. Only applies to APIs that support the `limit` query parameter.
+The number of items requested and shown per page by default for individual collection item lists. Only applies to APIs that support the `limit` query parameter. If set to `null`, the server's default will be used.
 
 This is applied to the following requests:
 
 - `GET /collection/*/items`
-- `GET /search`
-- Only in Collection Search: `GET /collections` (i.e. **not** applied to the default collection list request)
 
-### maxItemsPerPage
+### collectionsPerPage
 
-The maximum number of items per page that a user can request through the `limit` query parameter (`1000` by default).
+The number of collections requested and shown per page by default for collection lists. Only applies to APIs that support the `limit` query parameter. If set to `null`, the server's default will be used.
+
+This is applied to the following requests:
+
+- `GET /collections` (when used in collection search)
+
+### maxSearchResultsPerPage
+
+The maximum number of items per page that a user can request through the `limit` query parameter for search results (`1000` by default).
 
 ### cardViewMode
 
