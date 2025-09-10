@@ -45,7 +45,7 @@ module.exports = {
     searchResultsPerPage: 12,
     itemsPerPage: null,
     collectionsPerPage: null,
-    maxSearchResultsPerPage: 1000,
+    maxEntriesPerPage: 1000,
     defaultThumbnailSize: null,
     crossOriginMedia: null,
     requestHeaders: {},

@@ -216,7 +216,7 @@ export default {
     }, getDefaults());
   },
   computed: {
-    ...mapState(['searchResultsPerPage', 'itemsPerPage', 'collectionsPerPage', 'maxSearchResultsPerPage', 'uiLanguage']),
+    ...mapState(['searchResultsPerPage', 'itemsPerPage', 'collectionsPerPage', 'maxEntriesPerPage', 'uiLanguage']),
     ...mapGetters(['canSearchCollections', 'supportsConformance']),
     collectionSelectOptions() {
       let taggable = !this.hasAllCollections;
@@ -284,10 +284,10 @@ export default {
     },
     maxItems() {
       if (this.type === 'Global') {
-        return this.maxSearchResultsPerPage || 1000;
+        return this.maxEntriesPerPage || 1000;
       }
       // For Items and Collections, we could set different max limits in the future
-      return this.maxSearchResultsPerPage || 1000;
+      return this.maxEntriesPerPage || 1000;
     },
     currentDefaultLimit() {
       if (this.type === 'Global') {

@@ -195,7 +195,7 @@
       ],
       "minimum": 1
     },
-    "maxSearchResultsPerPage": {
+    "maxEntriesPerPage": {
       "type": [
         "integer"
       ],

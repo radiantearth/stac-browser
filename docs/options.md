@@ -48,7 +48,7 @@ The following ways to set config options are possible:
   - [searchResultsPerPage](#searchresultsperpage)
   - [itemsPerPage](#itemsperpage)
   - [collectionsPerPage](#collectionsperpage)
-  - [maxSearchResultsPerPage](#maxsearchresultsperpage)
+  - [maxEntriesPerPage](#maxEntriesPerPage)
   - [cardViewMode](#cardviewmode)
   - [cardViewSort](#cardviewsort)
   - [showKeywordsInItemCards](#showkeywordsinitemcards)
@@ -453,7 +453,7 @@ This is applied to the following requests:
 
 - `GET /collections` (when used in collection search)
 
-### maxSearchResultsPerPage
+### maxEntriesPerPage
 
 The maximum number of items per page that a user can request through the `limit` query parameter for search results (`1000` by default).
 
