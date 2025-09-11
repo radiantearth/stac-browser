@@ -147,25 +147,18 @@
     "noneAvailableForCollection": "لا توجد عناصر متاحة لهذه المجموعة.",
     "showFilter": "إظهار عوامل التصفية"
   },
-  "leaflet": {
-    "close": "إغلاق",
-    "noFeatureProperties": "لا توجد بيانات إضافية متاحة لهذه الميزة.",
-    "stayLayer": {
-      "error": "عذرًا، فشل إضافة البيانات إلى الخريطة."
-    },
-    "zoom": {
-      "in": {
-        "description": "تكبير",
-        "label": "+"
-      },
-      "out": {
-        "description": "تصغير",
-        "label": "-"
-      }
-    }
-  },
   "loading": "جارٍ التحميل...",
   "map": "الخريطة",
+  "mapping": {
+    "attribution": {},
+    "bboxSelect": {},
+    "layers": {},
+    "location": {},
+    "zoom": {
+      "in": {},
+      "out": {}
+    }
+  },
   "messageForSchemaError": "{message}، للمخطط {schemaPath}",
   "metadata": {
     "general": "عام",

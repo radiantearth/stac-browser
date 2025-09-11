@@ -108,27 +108,6 @@
       "noCLI": true,
       "noEnv": true
     },
-    "stacProxyUrl": {
-      "type": [
-        "array",
-        "null"
-      ],
-      "prefixItems": [
-        {
-          "type": [
-            "string"
-          ],
-          "format": "uri-reference"
-        },
-        {
-          "type": [
-            "string"
-          ],
-          "format": "uri"
-        }
-      ],
-      "items": false
-    },
     "pathPrefix": {
       "type": [
         "string"
@@ -170,18 +149,27 @@
         "boolean"
       ]
     },
-    "redirectLegacyUrls": {
-      "type": [
-        "boolean"
-      ]
-    },
-    "itemsPerPage": {
+    "searchResultsPerPage": {
       "type": [
         "integer"
       ],
       "minimum": 1
     },
-    "maxItemsPerPage": {
+    "itemsPerPage": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "collectionsPerPage": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "maxEntriesPerPage": {
       "type": [
         "integer"
       ],
