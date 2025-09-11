@@ -103,7 +103,7 @@
           <b-form-input
             :id="ids.limit" :value="query.limit" @change="setLimit" min="1"
             :max="maxItems" type="number"
-            :placeholder="$t('defaultWithValue', {value: itemsPerPage})"
+            :placeholder="limitPlaceholder"
           />
         </b-form-group>
       </b-card-body>
@@ -216,7 +216,7 @@ export default {
     }, getDefaults());
   },
   computed: {
-    ...mapState(['itemsPerPage', 'maxItemsPerPage', 'uiLanguage']),
+    ...mapState(['searchResultsPerPage', 'maxEntriesPerPage', 'uiLanguage']),
     ...mapGetters(['canSearchCollections', 'supportsConformance']),
     collectionSelectOptions() {
       let taggable = !this.hasAllCollections;
@@ -283,7 +283,13 @@ export default {
       return this.queryables.slice(0).sort((a, b) => collator.compare(a.title, b.title));
     },
     maxItems() {
-      return this.maxItemsPerPage || 1000;
+      return this.maxEntriesPerPage || 1000;
+    },
+    limitPlaceholder() {
+      if (this.searchResultsPerPage > 0) {
+        return this.$t('defaultWithValue', {value: this.searchResultsPerPage});
+      }
+      return this.$t('default');
     },
     datetime: {
       get() {
@@ -535,7 +541,7 @@ export default {
       if (limit > this.maxItems) {
         limit = this.maxItems;
       }
-      else if (typeof limit !== 'number' || isNaN(limit)|| limit < 1) {
+      else if (typeof limit !== 'number' || isNaN(limit) || limit < 1) {
         limit = null;
       }
       this.$set(this.query, 'limit', limit);

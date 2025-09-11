@@ -920,6 +920,7 @@ function getStore(config, router) {
           // https://github.com/radiantearth/stac-browser/issues/617
           cx.commit('resetApiCollections');
           link = stac.getLinkWithRel('data');
+          link = Utils.addFiltersToLink(link, {}, cx.state.collectionsPerPage);
         }
         else { // Second page and after
           stac = cx.state.data;

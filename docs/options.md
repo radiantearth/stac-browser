@@ -48,8 +48,10 @@ The following ways to set config options are possible:
   - [crs](#crs)
   - [getMapSourceOptions](#getmapsourceoptions)
 - [User Interface](#user-interface)
+  - [searchResultsPerPage](#searchresultsperpage)
   - [itemsPerPage](#itemsperpage)
-  - [maxItemsPerPage](#maxitemsperpage)
+  - [collectionsPerPage](#collectionsperpage)
+  - [maxEntriesPerPage](#maxentriesperpage)
   - [cardViewMode](#cardviewmode)
   - [cardViewSort](#cardviewsort)
   - [showKeywordsInItemCards](#showkeywordsinitemcards)
@@ -402,17 +404,35 @@ getSourceOptions: async (type, options) => {
 
 ## User Interface
 
+### searchResultsPerPage
+
+The number of items requested and shown per page by default for search results, i.e. global item search and collection search.
+If set to `null`, the server's default will be used.
+
+This applies to the following requests:
+
+- `GET /search`
+- `GET /collections` (in Collection Search only - see `collectionsPerPage` for other cases)
+
 ### itemsPerPage
 
-The number of items requested and shown per page by default. Only applies to APIs that support the `limit` query parameter.
+The number of items requested and shown per page by default for item lists, except for item search.
+If set to `null`, the server's default will be used.
 
-This is applied to the following requests:
+This applies to the following requests:
 
-- `GET /collection/*/items`
-- `GET /search`
-- Only in Collection Search: `GET /collections` (i.e. **not** applied to the default collection list request)
+- `GET /collection/{collectionId}/items`
 
-### maxItemsPerPage
+### collectionsPerPage
+
+The number of collections requested and shown per page by default for collection lists, except for collection search.
+If set to `null`, the server's default will be used.
+
+This applies to the following requests:
+
+- `GET /collections` (for collection lists while browsing the API/catalog - see `searchResultsPerPage` for collection search)
+
+### maxEntriesPerPage
 
 The maximum number of items per page that a user can request through the `limit` query parameter (`1000` by default).
 

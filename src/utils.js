@@ -271,7 +271,7 @@ export default class Utils {
     return pages;
   }
 
-  static addFiltersToLink(link, filters = {}, itemsPerPage = null) {
+  static addFiltersToLink(link, filters = {}, defaultLimit = null) {
     let isEmpty = value => {
       return (value === null
       || (typeof value === 'number' && !Number.isFinite(value))
@@ -286,8 +286,8 @@ export default class Utils {
       filters = Object.assign({}, filters);
     }
 
-    if (typeof filters.limit !== 'number' && typeof itemsPerPage === 'number') {
-      filters.limit = itemsPerPage;
+    if (typeof filters.limit !== 'number' && typeof defaultLimit === 'number') {
+      filters.limit = defaultLimit;
     }
 
     if (Utils.hasText(link.method) && link.method.toUpperCase() === 'POST') {

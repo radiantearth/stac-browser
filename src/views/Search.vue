@@ -108,7 +108,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['catalogUrl', 'catalogTitle', 'itemsPerPage']),
+    ...mapState(['catalogUrl', 'catalogTitle', 'searchResultsPerPage', 'itemsPerPage', 'collectionsPerPage']),
     ...mapGetters(['canSearchItems', 'canSearchCollections', 'getStac', 'root', 'collectionLink', 'parentLink', 'fromBrowserPath', 'toBrowserPath']),
     selectedCollectionCount() {
       return Utils.size(this.selectedCollections);
@@ -253,7 +253,7 @@ export default {
       this.error = null;
       this.loading = true;
       try {
-        this.link = Utils.addFiltersToLink(link, this.filters, this.itemsPerPage);
+        this.link = Utils.addFiltersToLink(link, this.filters, this.searchResultsPerPage);
 
         let key = this.isCollectionSearch ? 'collections' : 'features';
         let response = await stacRequest(this.$store, this.link);
