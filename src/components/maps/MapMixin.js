@@ -142,19 +142,48 @@ export default {
     async addBasemaps(basemaps, visibleLayer = 0) {
       const promises = basemaps.map(async (options) => {
         try {
-          const layerClassName = options.is === 'VectorTile' ? 'VectorTile' : 'WebGLTile';
+          let layerClassName = 'WebGLTile';
+          let sourceClassName = options.is;
+          if (options.is === 'VectorTileStyle') {
+            layerClassName = 'Group';
+            sourceClassName = null;
+            const {apply} = await import('ol-mapbox-style');
+            const callback = options.layerCreated;
+            options.layerCreated = async (layer, source, map) => {
+              layer = await apply(layer, options.url);
+              if (callback) {
+                layer = await callback(layer, source, map);
+              }
+              return layer;
+            };
+          }
+          else if (options.is === 'WMTS' && !options.url.includes('{') && !options.url.includes('}')) {
+            // Request capabilities if URL does not seem to be a URL template
+            const [{optionsFromCapabilities}, {default: WMTSCapabilities}] = await Promise.all([
+              import('ol/source/WMTS.js'),
+              import('ol/format/WMTSCapabilities.js')
+            ]);
+            try {
+              const response = await fetch(options.url, {method: 'GET'});
+              const capabilities = new WMTSCapabilities().read(await response.text());
+              const wmtsOptions = optionsFromCapabilities(capabilities, options);
+              Object.assign(options, wmtsOptions);
+            } catch (e) {
+              console.error('Failed to fetch WMTS capabilities', e);
+            }
+          }
           const [{default: sourceCls}, {default: layerCls}] = await Promise.all([
-            import(`ol/source/${options.is}.js`),
+            sourceClassName ? import(`ol/source/${sourceClassName}.js`) : Promise.resolve({default: null}),
             import(`ol/layer/${layerClassName}.js`)
           ]);
-          const source = new sourceCls(options);
+          const source = sourceCls ? new sourceCls(options) : undefined;
           const layer = new layerCls({
             source,
             title: options.title,
             base: true
           });
           if (options.layerCreated) {
-            return await options.layerCreated(layer, source);
+            return await options.layerCreated(layer, source, this.map);
           }
           return layer;
         } catch (error) {
@@ -163,7 +192,7 @@ export default {
         }
       });
       (await Promise.all(promises))
-        .filter(options => Utils.isObject(options))
+        .filter(layer => Utils.isObject(layer))
         .forEach((layer, i) => {
           layer.setVisible(i === visibleLayer);
           this.map.addLayer(layer);
