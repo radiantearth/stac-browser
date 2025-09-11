@@ -178,13 +178,6 @@ export default {
     isCollectionSearch() {
       return this.collectionSearch && this.activeSearch === 0;
     },
-    currentPaginationLimit() {
-      if (this.isCollectionSearch) {
-        return this.collectionsPerPage;
-      } else {
-        return this.searchResultsPerPage;
-      }
-    },
     pageDescription() {
       let title = getDisplayTitle([this.collectionLink, this.parentLink, this.root], this.catalogTitle);
       return this.$t('search.metaDescription', {title});
@@ -260,7 +253,7 @@ export default {
       this.error = null;
       this.loading = true;
       try {
-        this.link = Utils.addFiltersToLink(link, this.filters, this.currentPaginationLimit);
+        this.link = Utils.addFiltersToLink(link, this.filters, this.searchResultsPerPage);
 
         let key = this.isCollectionSearch ? 'collections' : 'features';
         let response = await stacRequest(this.$store, this.link);
