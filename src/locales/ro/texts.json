@@ -156,7 +156,10 @@
       "label": "i",
       "collapseLabel": "✕"
     },
+    "bboxSelect": {},
     "close": "Închidere",
+    "layers": {},
+    "location": {},
     "zoom": {
       "in": {
         "description": "Mărire",
