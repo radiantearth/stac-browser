@@ -17,7 +17,7 @@
         </section>
         <section v-if="hasLayers">
           <h5>{{ $t('mapping.layers.title') }}</h5>
-          <LayerControlGroup :map="map" :group="layerGroup" />
+          <LayerControlGroup :map="map" :group="layerGroup" :maxZoom="maxZoom" />
         </section>
       </div>
     </b-popover>
@@ -46,6 +46,12 @@ export default {
     ControlMixin,
     LayerControlMixin
   ],
+  props: {
+    maxZoom: {
+      type: Number,
+      default: undefined
+    }
+  },
   data() {
     return {
       id: null,

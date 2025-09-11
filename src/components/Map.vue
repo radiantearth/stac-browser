@@ -2,7 +2,7 @@
   <div class="map-container">
     <div ref="map" class="map" :id="mapId">
       <!-- this will be filled by OpenLayers -->
-      <LayerControl :map="map" />
+      <LayerControl :map="map" :maxZoom="maxZoom" />
       <TextControl v-if="empty" :map="map" :text="$t('mapping.nodata')" />
       <TextControl v-else-if="!hasBasemap" :map="map" :text="$t('mapping.nobasemap')" />
     </div>
@@ -189,7 +189,7 @@ export default {
       if (extent) {
         // Update the sizes, otherwise the fit will not work properly and compute a wrong zoom level
         this.map.updateSize();
-        this.map.getView().fit(extent, { padding: [50,50,50,50] });
+        this.map.getView().fit(extent, { padding: [50,50,50,50], maxZoom: this.maxZoom });
       }
     },
     resetSelectedItems() {

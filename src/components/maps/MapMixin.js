@@ -45,6 +45,7 @@ export default {
   data() {
     return {
       map: null,
+      maxZoom: 16,
       zoomControl: null,
       attributionControl: null,
       fullScreenControl: null,

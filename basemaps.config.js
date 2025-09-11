@@ -1,5 +1,4 @@
-import { Collection, Item } from './src/models/stac';
-import Utils from './src/utils';
+import { Collection } from './src/models/stac';
 
 const USGS_ATTRIBUTION = 'USGS Astrogeology';
 const WMS = 'TileWMS';

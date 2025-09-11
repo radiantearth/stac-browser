@@ -20,6 +20,12 @@ export default {
   mixins: [
     ControlMixin
   ],
+  props: {
+    maxZoom: {
+      type: Number,
+      default: undefined
+    }
+  },
   methods: {
     request() {
       if ("geolocation" in navigator) {
@@ -28,7 +34,7 @@ export default {
             const view = this.map.getView();
             const coords = fromLonLat([position.coords.longitude, position.coords.latitude], view.getProjection());
             const point = new Point(coords);
-            view.fit(point, {maxZoom: 10});
+            view.fit(point, {maxZoom: this.maxZoom});
           },
           error => this.$root.$emit('error', error, error.message),
           {

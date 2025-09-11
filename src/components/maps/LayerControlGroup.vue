@@ -9,7 +9,7 @@
           <b-icon-zoom-in />
         </b-button>
       </div>
-      <LayerControlGroup v-if="l.group > 1" :map="map" :group="l.layer" />
+      <LayerControlGroup v-if="l.group > 1" :map="map" :group="l.layer" :maxZoom="maxZoom" />
     </li>
   </ul>
 </template>
@@ -38,6 +38,10 @@ export default {
     group: {
       type: Object,
       required: true
+    },
+    maxZoom: {
+      type: Number,
+      default: undefined
     }
   },
   computed: {
@@ -102,7 +106,7 @@ export default {
         }
       }
       if (extent) {
-        this.map.getView().fit(extent, { padding: [10,10,10,10] });
+        this.map.getView().fit(extent, { padding: [10,10,10,10], maxZoom: this.maxZoom });
       }
     }
   }
