@@ -406,27 +406,31 @@ getSourceOptions: async (type, options) => {
 
 ### searchResultsPerPage
 
-The number of items requested and shown per page by default for global search results. Only applies to APIs that support the `limit` query parameter.
+The number of items requested and shown per page by default for search results, i.e. global item search and collection search.
+If set to `null`, the server's default will be used.
 
-This is applied to the following requests:
+This applies to the following requests:
 
-- `GET /search` (global search irrespective of items or collections)
+- `GET /search`
+- `GET /collections` (in Collection Search only - see `collectionsPerPage` for other cases)
 
 ### itemsPerPage
 
-The number of items requested and shown per page by default for individual collection item lists. Only applies to APIs that support the `limit` query parameter. If set to `null`, the server's default will be used.
+The number of items requested and shown per page by default for item lists, except for item search.
+If set to `null`, the server's default will be used.
 
-This is applied to the following requests:
+This applies to the following requests:
 
-- `GET /collection/*/items`
+- `GET /collection/{collectionId}/items`
 
 ### collectionsPerPage
 
-The number of collections requested and shown per page by default for collection search. Only applies to APIs that support the `limit` query parameter. If set to `null`, the server's default will be used.
+The number of collections requested and shown per page by default for collection lists, except for collection search.
+If set to `null`, the server's default will be used.
 
-This is applied to the following requests:
+This applies to the following requests:
 
-- `GET /collections` (when used in collection search)
+- `GET /collections` (for collection lists while browsing the API/catalog - see `searchResultsPerPage` for collection search)
 
 ### maxEntriesPerPage
 
