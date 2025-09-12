@@ -3,7 +3,16 @@ import { transformWithProjections } from 'ol/proj';
 import Vector from 'ol/source/Vector';
 import Group from 'ol/layer/Group';
 
-const ReprojectMap = {
+const MapUtils = {
+
+  isLayerVisible(layer) {
+    if (layer instanceof Group) {
+      return layer.getLayers().getArray().some(l => this.isLayerVisible(l));
+    }
+    else {
+      return layer.isVisible();
+    }
+  },
 
   reproject(map, projection) {
     const view = map.getView();
@@ -48,4 +57,4 @@ const ReprojectMap = {
   }
 };
 
-export default ReprojectMap;
+export default MapUtils;

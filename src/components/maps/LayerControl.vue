@@ -29,7 +29,7 @@ import ControlMixin from './ControlMixin';
 import LayerControlMixin from './LayerControlMixin';
 import { BFormRadio, BFormRadioGroup, BIconLayersFill, BPopover } from 'bootstrap-vue';
 import Group from 'ol/layer/Group';
-import ReprojectMap from './reproject';
+import MapUtils from './mapUtils';
 
 export default {
   name: 'LayerControl',
@@ -87,7 +87,7 @@ export default {
         }
       }
       if (projection) {
-        ReprojectMap.reproject(this.map, projection);
+        MapUtils.reproject(this.map, projection);
       }
     }
   },
@@ -105,15 +105,7 @@ export default {
           title: this.getTitle(layer)
         };
         this.baseLayers.push(data);
-
-        let isVisible = false;
-        if (layer instanceof Group) {
-          isVisible = layer.getLayers().getArray().some(l => l.isVisible());
-        }
-        else {
-          isVisible = layer.isVisible();
-        }
-        if (isVisible) {
+        if (MapUtils.isLayerVisible(layer)) {
           this.visibleBaseLayer = data.id;
         }
       }
