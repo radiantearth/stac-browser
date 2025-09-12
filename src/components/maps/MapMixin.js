@@ -150,7 +150,7 @@ export default {
             const {apply} = await import('ol-mapbox-style');
             const callback = options.layerCreated;
             options.layerCreated = async (layer, source, map) => {
-              layer = await apply(layer, options.url);
+              layer = await apply(layer, options.url, options);
               if (callback) {
                 layer = await callback(layer, source, map);
               }
