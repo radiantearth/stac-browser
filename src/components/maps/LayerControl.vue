@@ -73,12 +73,19 @@ export default {
       if (oldId === null || oldId === newId) {
         return;
       }
-      // todo: switching between base layers with different projections is not working yet
       let projection;
       for (const data of this.baseLayers) {
         data.layer.setVisible(data.id === newId);
         if (data.id === newId) {
-          projection = data.layer.getSource().getProjection();
+          if (data.layer instanceof Group) {
+            const layerWithProjection = data.layer.getLayers().getArray().find(layer => layer.getSource().getProjection() !== null);
+            if (layerWithProjection) {
+              projection = layerWithProjection.getSource().getProjection();
+            }
+          }
+          else {
+            projection = data.layer.getSource().getProjection();
+          }
         }
       }
       const view = this.map.getView();
@@ -128,12 +135,20 @@ export default {
           continue;
         }
         const data = {
-          layer: layer,
+          layer,
           id: layer.ol_uid,
           title: this.getTitle(layer)
         };
         this.baseLayers.push(data);
-        if (layer.isVisible()) {
+
+        let isVisible = false;
+        if (layer instanceof Group) {
+          isVisible = layer.getLayers().getArray().some(l => l.isVisible());
+        }
+        else {
+          isVisible = layer.isVisible();
+        }
+        if (isVisible) {
           this.visibleBaseLayer = data.id;
         }
       }

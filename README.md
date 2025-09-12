@@ -180,15 +180,15 @@ If you need even more flexibility, you need to dig into the Vue files and their 
 
 ### Basemaps
 
-The file `basemaps.config.js` contains the configuration for the basemaps.
-You can update either just the `BASEMAPS` object or you can write a custom function `configureBasemap` that returns the desired options for OpenLayers.
-XYZ, WMTS, and WMS basemaps are supported and have different options that you can set.
+STAC Browser supports various types of basemaps and projections.
+
+More information about how to configure and customize the basemaps can be found in the **[Basemap documentation](docs/basemaps.md)**.
 
 ### Actions
 
 STAC Browser has a pluggable interface to share or open assets and links with other services, which we call "actions".
 
-More information about how to add or implement actions can be found in the **[documentation](docs/actions.md)**.
+More information about how to add or implement actions can be found in the **[Actions documentation](docs/actions.md)**.
 
 ### Additional metadata fields
 
