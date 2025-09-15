@@ -4,7 +4,7 @@
       <b-col class="meta">
         <section class="intro">
           <h2>{{ $t('description') }}</h2>
-          <DeprecationNotice v-if="data.deprecated" :data="data" />
+          <DeprecationNotice v-if="showDeprecation" :data="data" />
           <AnonymizedNotice v-if="data['anon:warning']" :warning="data['anon:warning']" />
           <ReadMore v-if="data.description" :lines="10" :text="$t('read.more')" :text-less="$t('read.less')">
             <Description :description="data.description" />
@@ -72,6 +72,7 @@ import { BTabs, BTab } from 'bootstrap-vue';
 import Utils from '../utils';
 import { addSchemaToDocument, createCatalogSchema } from '../schema-org';
 import { ItemCollection } from '../models/stac.js';
+import DeprecationMixin from '../components/DeprecationMixin.js';
 
 export default {
   name: "Catalog",
@@ -95,7 +96,8 @@ export default {
   },
   mixins: [
     ShowAssetLinkMixin,
-    StacFieldsMixin({ formatLicense, formatTemporalExtents })
+    StacFieldsMixin({ formatLicense, formatTemporalExtents }),
+    DeprecationMixin
   ],
   data() {
     return {

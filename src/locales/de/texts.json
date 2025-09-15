@@ -77,7 +77,7 @@
   "deprecation": {
     "fallbackTitle": "Anzeigen",
     "latestVersion": "Neueste Version:",
-    "otherVersionsNotice": "Dies ist *nicht* abgekündigt, aber andere Versionen sind verfügbar:",
+    "otherVersionsNotice": "Diese {type}-Version ist *nicht* abgekündigt, aber andere Versionen sind verfügbar:",
     "otherVersionsTitle": "Andere Versionen verfügbar",
     "outdatedTitle": "Veraltet",
     "predecessorVersion": "Vorherige Version:",
