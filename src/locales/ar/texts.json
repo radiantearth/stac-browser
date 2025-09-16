@@ -113,7 +113,9 @@
   "featureExperimental": "هذه الميزة لا تزال تجريبية وقد تعطي نتائج غير متوقعة!",
   "fullscreen": {
     "exit": "الخروج من وضع ملء الشاشة",
-    "show": "عرض بملء الشاشة"
+    "exitLabel": "",
+    "show": "عرض بملء الشاشة",
+    "showLabel": ""
   },
   "goBack": {
     "description": "العودة إلى {type}",
@@ -150,13 +152,37 @@
   "loading": "جارٍ التحميل...",
   "map": "الخريطة",
   "mapping": {
-    "attribution": {},
-    "bboxSelect": {},
-    "layers": {},
-    "location": {},
+    "attribution": {
+      "label": "",
+      "description": "",
+      "collapseLabel": ""
+    },
+    "bboxSelect": {
+      "add": "",
+      "remove": ""
+    },
+    "close": "",
+    "fit": "",
+    "layers": {
+      "title": "",
+      "base": "",
+      "unnamed": "",
+      "footprint": ""
+    },
+    "location": {
+      "description": ""
+    },
+    "nobasemap": "",
+    "nodata": "",
     "zoom": {
-      "in": {},
-      "out": {}
+      "in": {
+        "description": "",
+        "label": ""
+      },
+      "out": {
+        "description": "",
+        "label": ""
+      }
     }
   },
   "messageForSchemaError": "{message}، للمخطط {schemaPath}",
@@ -246,11 +272,6 @@
     "placeholder": "بحث...",
     "selectCollections": "حدد مجموعة واحدة أو أكثر...",
     "selectForItemSearch": "حدد للبحث عن عنصر",
-    "sortOptions": {
-      "datetime": "التاريخ والوقت",
-      "id": "المعرّف",
-      "title": "العنوان"
-    },
     "spatialExtent": "النطاق المكاني",
     "tabs": {
       "collections": "البحث عن المجموعات",
