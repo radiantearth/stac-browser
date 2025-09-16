@@ -113,7 +113,9 @@
   "featureExperimental": "Fitur ini masih eksperimental dan mungkin memberikan hasil yang tidak terduga!",
   "fullscreen": {
     "exit": "Keluar dari Layar Penuh",
-    "show": "Lihat Layar Penuh"
+    "exitLabel": "",
+    "show": "Lihat Layar Penuh",
+    "showLabel": ""
   },
   "goBack": {
     "description": "Kembali ke {type}",
@@ -150,13 +152,37 @@
   "loading": "Memuat...",
   "map": "Peta",
   "mapping": {
-    "attribution": {},
-    "bboxSelect": {},
-    "layers": {},
-    "location": {},
+    "attribution": {
+      "label": "",
+      "description": "",
+      "collapseLabel": ""
+    },
+    "bboxSelect": {
+      "add": "",
+      "remove": ""
+    },
+    "close": "",
+    "fit": "",
+    "layers": {
+      "title": "",
+      "base": "",
+      "unnamed": "",
+      "footprint": ""
+    },
+    "location": {
+      "description": ""
+    },
+    "nobasemap": "",
+    "nodata": "",
     "zoom": {
-      "in": {},
-      "out": {}
+      "in": {
+        "description": "",
+        "label": ""
+      },
+      "out": {
+        "description": "",
+        "label": ""
+      }
     }
   },
   "messageForSchemaError": "{message}, untuk skema {schemaPath}",
@@ -246,11 +272,6 @@
     "placeholder": "Cari...",
     "selectCollections": "Pilih satu atau beberapa koleksi...",
     "selectForItemSearch": "Pilih untuk Pencarian Item",
-    "sortOptions": {
-      "datetime": "Tanggal dan Waktu",
-      "id": "ID",
-      "title": "Judul"
-    },
     "spatialExtent": "Cakupan Spasial",
     "tabs": {
       "collections": "Cari Koleksi",
