@@ -67,8 +67,8 @@
 
           <b-dropdown size="sm" :text="$t('search.addFilter')" block variant="primary" class="queryables mt-2 mb-3" menu-class="w-100">
             <template v-for="queryable in sortedQueryables">
-              <b-dropdown-item v-if="queryable.supported" :key="queryable.id" @click="additionalFieldSelected(queryable)">
-                {{ queryable.title }}
+              <b-dropdown-item v-if="queryable.supported" :key="queryable.id" @click="additionalFieldSelected(queryable)" link-class="d-flex justify-content-between align-items-center">
+                <span>{{ queryable.title }}</span>
                 <b-badge variant="dark" class="ml-2">{{ queryable.id }}</b-badge>
               </b-dropdown-item>
             </template>
@@ -95,7 +95,14 @@
             :selectLabel="$t('multiselect.selectLabel')"
             :selectedLabel="$t('multiselect.selectedLabel')"
             :deselectLabel="$t('multiselect.deselectLabel')"
-          />
+          >
+            <template #option="{option}">
+              <span class="d-flex justify-content-between align-items-center">
+                <span>{{ option.text }}</span>
+                <b-badge v-if="option.value" variant="dark" class="ml-2">{{ option.value }}</b-badge>
+              </span>
+            </template>
+          </multiselect>
           <SortButtons v-if="sortTerm && sortTerm.value" class="mt-1" :value="sortOrder" enforce @input="sortDirectionSet" />
         </b-form-group>
 
@@ -268,12 +275,20 @@ export default {
       return this.cql && Array.isArray(this.queryables) && this.queryables.length > 0;
     },
     sortOptions() {
-      return [
-        { value: null, text: this.$t('default') },
-        { value: 'properties.datetime', text: this.$t('search.sortOptions.datetime') },
-        { value: 'id', text: this.$t('search.sortOptions.id') },
-        { value: 'properties.title', text: this.$t('search.sortOptions.title') }
+      // todo: this should use queryables when available
+      // nevertheless, let's try to provide some reasonable defaults
+      const criteria = [
+        { text: this.$t('default'), value: null },
+        { text: this.$t('Identifier'), value: 'id' },
       ];
+      const prefix = this.type === 'Collections' ? '' : 'properties.';
+      criteria.push({ text: this.$t('Title'), value: `${prefix}title` });
+      if (this.type !== 'Collections') {
+        criteria.push({ text: this.$t('Time of Data'), value: 'properties.datetime' });
+      }
+      criteria.push({ text: this.$t('Created'), value: `${prefix}created` });
+      criteria.push({ text: this.$t('Updated'), value: `${prefix}updated` });
+      return criteria;
     },
     sortedQueryables() {
       if (!Array.isArray(this.queryables)) {

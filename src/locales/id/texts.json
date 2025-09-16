@@ -246,11 +246,6 @@
     "placeholder": "Cari...",
     "selectCollections": "Pilih satu atau beberapa koleksi...",
     "selectForItemSearch": "Pilih untuk Pencarian Item",
-    "sortOptions": {
-      "datetime": "Tanggal dan Waktu",
-      "id": "ID",
-      "title": "Judul"
-    },
     "spatialExtent": "Cakupan Spasial",
     "tabs": {
       "collections": "Cari Koleksi",

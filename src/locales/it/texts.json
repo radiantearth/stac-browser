@@ -272,11 +272,6 @@
     "placeholder": "Cerca...",
     "selectCollections": "Selezionare una o più Collezioni...",
     "selectForItemSearch": "Seleziona per Ricerca Elemento",
-    "sortOptions": {
-      "datetime": "Data e ora",
-      "id": "ID",
-      "title": "Titolo"
-    },
     "spatialExtent": "Estensione spaziale",
     "tabs": {
       "collections": "Cerca Collezioni",
