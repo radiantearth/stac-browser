@@ -154,12 +154,26 @@
   "mapping": {
     "attribution": {
       "label": "i",
+      "description": "Créditos",
       "collapseLabel": "✕"
     },
-    "bboxSelect": {},
+    "bboxSelect": {
+      "add": "Clique no mapa para adicionar um retângulo envolvente.",
+      "remove": "Clique no retângulo envolvente para removê-lo."
+    },
     "close": "Fechar",
-    "layers": {},
-    "location": {},
+    "fit": "Ajustar à extensão",
+    "layers": {
+      "title": "Camadas",
+      "base": "Mapas de Fundo",
+      "unnamed": "Sem nome #{id}",
+      "footprint": "Footprint"
+    },
+    "location": {
+      "description": "Ir para sua localização"
+    },
+    "nobasemap": "Não há mapas de fundo disponíveis.",
+    "nodata": "Nenhuma informação espacial disponível nos metadados.",
     "zoom": {
       "in": {
         "description": "Aumentar o zoom",
@@ -258,11 +272,6 @@
     "placeholder": "Pesquisar...",
     "selectCollections": "Selecione uma ou várias coleções...",
     "selectForItemSearch": "Selecione para pesquisa de itens",
-    "sortOptions": {
-      "datetime": "Data e hora",
-      "id": "ID",
-      "title": "Título"
-    },
     "spatialExtent": "Extensão Espacial",
     "tabs": {
       "collections": "Pesquisar coleções",
