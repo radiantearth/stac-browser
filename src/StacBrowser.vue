@@ -23,7 +23,10 @@
               <StacLink v-if="root" :data="root" hideIcon />
               <template v-else>{{ catalogTitle }}</template>
             </span>
-            <b-button v-if="root" size="sm" variant="outline-primary" id="popover-root-btn" :title="serviceType">
+            <b-button
+              v-if="root" size="sm" variant="outline-primary" id="popover-root-btn"
+              :title="serviceType" tag="a" tabindex="0"
+            >
               <b-icon-caret-down-fill />
             </b-button>
           </div>
