@@ -43,7 +43,9 @@ export default {
   },
   computed: {
     shownKeys() {
-      return this.shown.map(asset => asset.getKey());
+      return this.shown
+        .filter(asset => asset.isAsset())
+        .map(asset => asset.getKey());
     },
     displayTitle() {
       if (this.title === null) {
