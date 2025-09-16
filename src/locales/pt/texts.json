@@ -154,12 +154,26 @@
   "mapping": {
     "attribution": {
       "label": "i",
+      "description": "",
       "collapseLabel": "✕"
     },
-    "bboxSelect": {},
+    "bboxSelect": {
+      "add": "",
+      "remove": ""
+    },
     "close": "Fechar",
-    "layers": {},
-    "location": {},
+    "fit": "",
+    "layers": {
+      "title": "",
+      "base": "",
+      "unnamed": "",
+      "footprint": ""
+    },
+    "location": {
+      "description": ""
+    },
+    "nobasemap": "",
+    "nodata": "",
     "zoom": {
       "in": {
         "description": "Aumentar o zoom",
@@ -258,11 +272,6 @@
     "placeholder": "Pesquisar...",
     "selectCollections": "Selecione uma ou várias coleções...",
     "selectForItemSearch": "Selecione para pesquisa de itens",
-    "sortOptions": {
-      "datetime": "Data e hora",
-      "id": "ID",
-      "title": "Título"
-    },
     "spatialExtent": "Extensão Espacial",
     "tabs": {
       "collections": "Pesquisar coleções",
