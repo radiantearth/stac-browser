@@ -77,3 +77,33 @@ export function addQueryIfNotExists(uri, query) {
   }
   return uri;
 }
+
+/**
+ * Checks whether a given URI is in the authority of a given pattern.
+ * 
+ * Pattern can be one of the following:
+ * - A regular expression that will be tested against the normalized absolute URL.
+ * - A domain (e.g. `example.com`) -> It will match example.com and any subdomains (case insensitive).
+ * - A subdomain (e.g. stac.example.com) -> It will match stac.example.com and any subdomains (case insensitive).
+ * 
+ * Domain and subdomain patterns ignore schema, userinfo, port, path, query and fragment.
+ * 
+ * @param {RegExp|string} pattern The pattern to check against.
+ * @param {URI} uri The absolute URI object.
+ * @returns {boolean} true if the URI is in the authority of the pattern, false otherwise.
+ */
+export function hasAuthority(pattern, uri) {
+  if (pattern instanceof RegExp) {
+    return pattern.test(uri.normalize().toString());
+  }
+  else if (typeof pattern !== 'string') {
+    return false;
+  }
+  else if (uri.domain().toLowerCase() === pattern.toLowerCase()) {
+    return true;
+  }
+  else {
+    pattern = new RegExp('(^|\\.)' + RegExp.escape(pattern) + '$', 'i');
+    return pattern.test(uri.hostname());
+  }
+}
