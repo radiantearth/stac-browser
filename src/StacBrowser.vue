@@ -11,29 +11,16 @@
     <!-- Content (Item / Catalog) -->
     <router-view />
     <footer>
-      <i18n tag="small" path="poweredBy" class="poweredby text-muted">
-        <template #link>
-          <a href="https://github.com/radiantearth/stac-browser" target="_blank">STAC Browser</a> {{ browserVersion }}
-        </template>
-      </i18n>
+      <small class="poweredby text-muted" v-html="poweredByText"></small>
     </footer>
   </b-container>
 </template>
 
 <script>
-import Vue from "vue";
-import VueRouter from "vue-router";
-import Vuex, { mapActions, mapGetters, mapState } from 'vuex';
-import CONFIG from './config';
-import getRoutes from "./router";
-import getStore from "./store";
 
-import {
-  AlertPlugin, BadgePlugin, ButtonGroupPlugin, ButtonPlugin,
-  CardPlugin, LayoutPlugin, SpinnerPlugin,
-  VBToggle, VBVisible } from "bootstrap-vue";
-import "bootstrap/dist/css/bootstrap.css";
-import "bootstrap-vue/dist/bootstrap-vue.css";
+import { mapActions, mapGetters, mapState } from 'vuex';
+import { isNavigationFailure, NavigationFailureType } from 'vue-router';
+import CONFIG from './config';
 
 import ErrorAlert from './components/ErrorAlert.vue';
 import StacHeader from './components/StacHeader.vue';
@@ -46,39 +33,6 @@ import { API_LANGUAGE_CONFORMANCE } from './i18n';
 import { getBest, prepareSupported } from 'stac-js/src/locales';
 import BrowserStorage from "./browser-store";
 import Authentication from "./components/Authentication.vue";
-
-Vue.use(AlertPlugin);
-Vue.use(ButtonGroupPlugin);
-Vue.use(ButtonPlugin);
-Vue.use(BadgePlugin);
-Vue.use(CardPlugin);
-Vue.use(LayoutPlugin);
-Vue.use(SpinnerPlugin);
-
-// For collapsibles / accordions
-Vue.directive('b-toggle', VBToggle);
-// Used to detect when a catalog/item becomes visible so that further data can be loaded
-Vue.directive('b-visible', VBVisible);
-
-// Setup router
-Vue.use(VueRouter);
-const router = new VueRouter({
-  mode: CONFIG.historyMode,
-  base: CONFIG.pathPrefix,
-  routes: getRoutes(CONFIG),
-  scrollBehavior: (to, from, savedPosition) => {
-    if (to.path !== from.path) {
-      return { x: 0, y: 0 };
-    }
-    else {
-      return savedPosition;
-    }
-  }
-});
-
-// Setup store
-Vue.use(Vuex);
-const store = getStore(CONFIG, router);
 
 // Pass Config through from props to vuex
 let Props = {};
@@ -99,8 +53,6 @@ for(let key in CONFIG) {
 
 export default {
   name: 'StacBrowser',
-  router,
-  store,
   components: {
     Authentication,
     ErrorAlert,
@@ -133,6 +85,10 @@ export default {
       else {
         return "";
       }
+    },
+    poweredByText() {
+      const link = `<a href="https://github.com/radiantearth/stac-browser" target="_blank">STAC Browser</a> ${this.browserVersion}`;
+      return this.$t('poweredBy', { link });
     }
   },
   watch: {
@@ -210,7 +166,7 @@ export default {
         }
 
         this.$router.replace({ query }).catch(error => {
-          if (!VueRouter.isNavigationFailure(error, VueRouter.NavigationFailureType.duplicated)) {
+          if (!isNavigationFailure(error, NavigationFailureType.duplicated)) {
             throw Error(error);
           }
         });
@@ -257,10 +213,9 @@ export default {
     }
   },
   async created() {
-    this.$router.onReady(() => {
-      this.detectLocale();
-      this.parseQuery(this.$route);
-    });
+    // In Vue Router 4, the router is immediately ready, no need for onReady
+    this.detectLocale();
+    this.parseQuery(this.$route);
 
     this.$router.afterEach((to, from) => {
       if (to.path === from.path) {

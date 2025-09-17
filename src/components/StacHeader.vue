@@ -9,9 +9,10 @@
         <span class="title">{{ title }}</span>
       </h1>
       <p class="lead" v-if="!isStacChooser()">
-        <i18n v-if="containerLink" tag="span" path="in" class="in mr-3">
-          <template #catalog><StacLink :data="containerLink" /></template>
-        </i18n>
+        <span v-if="containerLink" class="in mr-3">
+          {{ inText }}
+          <StacLink :data="containerLink" />
+        </span>
         <b-button-group>
           <b-button v-if="back" :to="selfBrowserLink" :title="$t('goBack.description', {type})" variant="outline-primary" size="sm">
             <b-icon-arrow-left /> <span class="button-label prio">{{ $t('goBack.label') }}</span>
@@ -155,16 +156,19 @@ export default {
         }
       }
       return this.collectionLink || this.parentLink;
-    }
+    },
+    inText() {
+      return this.$t('in');
+    },
   },
   methods: {
     ...mapMutations('auth', ['addAction']),
     ...mapActions('auth', ['requestLogin', 'requestLogout']),
     isSearchPage() {
-      return this.$router.currentRoute.name === 'search';
+      return this.$route.name === 'search';
     },
     isStacChooser() {
-      return this.$router.currentRoute.name === 'choose';
+      return this.$route.name === 'choose';
     },
     async logInOut() {
       if (this.url) {
