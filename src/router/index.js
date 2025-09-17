@@ -1,7 +1,9 @@
 import Browse from '../views/Browse.vue';
 
 function getPath(route, config) {
-  let path = route.params.pathMatch;
+  let pathMatch = route.params.pathMatch;
+  // pathMatch can be an array so convert to string
+  let path = Array.isArray(pathMatch) ? pathMatch.join('/') : pathMatch;
   if (config.allowExternalAccess && path.startsWith("external/")) {
     path = '/' + path;
   }
@@ -18,7 +20,7 @@ function getRoutes(config) {
       component: () => import("../views/SelectDataSource.vue")
     });
     routes.push({
-      path: "/search/external/(.*)",
+      path: "/search/external/:pathMatch(.*)*",
       name: "search",
       component: () => import("../views/Search.vue"),
       props: route => {
@@ -47,14 +49,14 @@ function getRoutes(config) {
   });
 
   routes.push({
-    path: "/validation/(.*)",
+    path: "/validation/:pathMatch(.*)*",
     name: "validation",
     component: () => import("../views/Validation.vue"),
     props: route => getPath(route, config)
   });
 
   routes.push({
-    path: "/(.*)",
+    path: "/:pathMatch(.*)*",
     name: "browse",
     component: Browse,
     props: route => getPath(route, config)

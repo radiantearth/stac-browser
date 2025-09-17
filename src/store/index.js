@@ -1,5 +1,4 @@
-import Vue from "vue";
-import Vuex from "vuex";
+import { createStore } from "vuex";
 
 import URI from "urijs";
 
@@ -52,7 +51,7 @@ function getStore(config, router) {
     nextCollectionsLink: null
   });
 
-  return new Vuex.Store({
+  return createStore({
     strict: process.env.NODE_ENV !== 'production',
     modules: {
       auth: auth(router)
@@ -392,18 +391,18 @@ function getStore(config, router) {
       setQueryParameter(state, { type, key, value }) {
         type = `${type}QueryParameters`;
         if (typeof value === 'undefined') {
-          Vue.delete(state[type], key);
+          delete state[type][key];
         }
         else {
-          Vue.set(state[type], key, value);
+          state[type][key] = value;
         }
       },
       setRequestHeader(state, { key, value }) {
         if (typeof value === 'undefined') {
-          Vue.delete(state.requestHeaders, key);
+          delete state.requestHeaders[key];
         }
         else {
-          Vue.set(state.requestHeaders, key, value);
+          state.requestHeaders[key] = value;
         }
       },
       requestAuth(state, callback) {
@@ -422,10 +421,10 @@ function getStore(config, router) {
       },
       updateState(state, {type, value}) {
         if (value === null || typeof value === 'undefined') {
-          Vue.delete(state.stateQueryParameters, type);
+          delete state.stateQueryParameters[type];
         }
         else {
-          Vue.set(state.stateQueryParameters, type, value);
+          state.stateQueryParameters[type] = value;
         }
       },
       openCollapsible(state, { type, uid }) {
@@ -438,24 +437,24 @@ function getStore(config, router) {
       closeCollapsible(state, { type, uid }) {
         const idx = state.stateQueryParameters[type].indexOf(uid);
         if (idx > -1) {
-          Vue.delete(state.stateQueryParameters[type], idx);
+          state.stateQueryParameters[type].splice(idx, 1);
         }
       },
       updateLoading(state, { url, show }) {
         let data = state.database[url];
-        Vue.set(data, 'show', show || data.show);
+        data.show = show || data.show;
       },
       loading(state, { url, loading }) {
-        Vue.set(state.database, url, loading);
+        state.database[url] = loading;
         if (loading.show) {
           state.url = url;
         }
       },
       loaded(state, { url, data }) {
-        Vue.set(state.database, url, processSTAC(state, data));
+        state.database[url] = processSTAC(state, data);
       },
       clear(state, url) {
-        Vue.delete(state.database, url);
+        delete state.database[url];
       },
       resetCatalog(state, clearAll) {
         Object.assign(state, catalogDefaults());
@@ -513,7 +512,7 @@ function getStore(config, router) {
         if (!(error instanceof Error)) {
           error = new Error(error);
         }
-        Vue.set(state.database, url, error);
+        state.database[url] = error;
       },
       queue(state, url) {
         state.queue.push(url);
@@ -537,10 +536,10 @@ function getStore(config, router) {
       },
       toggleApiItemsLoading(state, collectionId = '') {
         if (state.apiItemsLoading[collectionId]) {
-          Vue.delete(state.apiItemsLoading, collectionId);
+          delete state.apiItemsLoading[collectionId];
         }
         else {
-          Vue.set(state.apiItemsLoading, collectionId, true);
+          state.apiItemsLoading[collectionId] = true;
         }
       },
       setApiItems(state, { data, stac, show }) {
@@ -882,7 +881,8 @@ function getStore(config, router) {
                   return data;
                 }
                 else {
-                  data = createSTAC(item, url, cx.getters.toBrowserPath(url));
+                  let itemPath = cx.getters.toBrowserPath(url);
+                  data = createSTAC(item, url, itemPath);
                   data._incomplete = true;
                   cx.commit('loaded', { data, url });
                   return data;
@@ -961,7 +961,8 @@ function getStore(config, router) {
                 return data;
               }
               else {
-                data = createSTAC(collection, url, cx.getters.toBrowserPath(url));
+                let collectionPath = cx.getters.toBrowserPath(url);
+                data = createSTAC(collection, url, collectionPath);
                 data._incomplete = true;
                 cx.commit('loaded', { data, url });
                 return data;
