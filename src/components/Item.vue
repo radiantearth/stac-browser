@@ -7,14 +7,14 @@
       </b-card-title>
       <b-card-text v-if="fileFormats.length > 0 || hasDescription || isDeprecated" class="intro">
         <b-badge v-if="isDeprecated" variant="warning" class="mr-1 mt-1 deprecated">{{ $t('deprecated') }}</b-badge>
-        <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="mr-1 mt-1 fileformat">{{ format | formatMediaType }}</b-badge>
-        <template v-if="hasDescription">{{ data.properties.description | summarize }}</template>
+        <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="mr-1 mt-1 fileformat">{{ formatMediaType(format) }}</b-badge>
+        <template v-if="hasDescription">{{ summarize(data.properties.description) }}</template>
       </b-card-text>
       <Keywords v-if="showKeywordsInItemCards && keywords.length > 0" :keywords="keywords" variant="primary" center />
       <b-card-text>
         <small class="text-muted">
-          <template v-if="extent">{{ extent | formatTemporalExtent }}</template>
-          <template v-else-if="data && data.properties.datetime">{{ data.properties.datetime | formatTimestamp }}</template>
+          <template v-if="extent">{{ formatTemporalExtent(extent) }}</template>
+          <template v-else-if="data && data.properties.datetime">{{ formatTimestamp(data.properties.datetime) }}</template>
           <template v-else>{{ $t('items.noTime') }}</template>
         </small>
       </b-card-text>
@@ -39,12 +39,6 @@ export default {
   components: {
     StacLink,
     Keywords: () => import('./Keywords.vue')
-  },
-  filters: {
-    summarize: text => Utils.summarizeMd(text, 150),
-    formatMediaType: value => formatMediaType(value, null, {shorten: true}),
-    formatTemporalExtent,
-    formatTimestamp
   },
   mixins: [
     FileFormatsMixin,
@@ -82,6 +76,18 @@ export default {
     }
   },
   methods: {
+    summarize(text) {
+      return Utils.summarizeMd(text, 150);
+    },
+    formatMediaType(value) {
+      return formatMediaType(value, null, {shorten: true});
+    },
+    formatTemporalExtent(extent) {
+      return formatTemporalExtent(extent);
+    },
+    formatTimestamp(timestamp) {
+      return formatTimestamp(timestamp);
+    },
     load(visible) {
       if (this.item instanceof STAC) {
         return;
@@ -112,6 +118,7 @@ export default {
     .intro {
       display: -webkit-box;
       -webkit-line-clamp: 2;
+      line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
       overflow-wrap: anywhere;
