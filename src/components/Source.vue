@@ -1,19 +1,63 @@
 <template>
   <div class="share mt-1">
     <b-button-group>
-      <b-button v-if="showRoot" tag="a" tabindex="0" size="sm" variant="outline-primary" id="popover-root-btn">
-        <b-icon-box /> <span class="button-label">{{ rootTitle }}</span>
-      </b-button>
-      <b-button
-        v-if="stacUrl" tag="a" tabindex="0" size="sm"
-        variant="outline-primary" id="popover-link-btn"
-        :title="$t('source.detailsAboutSource')"
-      >
-        <b-icon-link /> <span class="button-label">{{ $t('source.label') }}</span>
-      </b-button>
-      <b-button tag="a" tabindex="0" size="sm" variant="outline-primary" id="popover-share-btn" :title="$t('source.share.withOthers')">
-        <b-icon-share /> <span class="button-label">{{ $t('source.share.label') }}</span>
-      </b-button>
+      <TeleportPopover v-if="showRoot" placement="bottom" :title="rootTitle">
+        <template #trigger>
+          <b-button tag="a" tabindex="0" size="sm" variant="outline-primary">
+            <b-icon-box /> <span class="button-label">{{ rootTitle }}</span>
+          </b-button>
+        </template>
+        <template #content>
+          <RootStats />
+        </template>
+      </TeleportPopover>
+
+      <TeleportPopover v-if="stacUrl" placement="bottom" :title="$t('source.title')">
+        <template #trigger>
+          <b-button tag="a" tabindex="0" size="sm" variant="outline-primary" :title="$t('source.detailsAboutSource')">
+            <b-icon-link /> <span class="button-label">{{ $t('source.label') }}</span>
+          </b-button>
+        </template>
+        <template #content>
+          <template v-if="stac">
+            <b-row v-if="stacId" class="stac-id">
+              <b-col cols="4">{{ $t('source.id') }}</b-col>
+              <b-col>
+                <code>{{ stacId }}</code>
+                <CopyButton :copyText="stacId" :button-props="{size: 'sm'}" variant="primary" class="ml-2" />
+              </b-col>
+            </b-row>
+            <b-row v-if="stacVersion" class="stac-version">
+              <b-col cols="4">{{ $t('source.stacVersion') }}</b-col>
+              <b-col>{{ stacVersion }}</b-col>
+            </b-row>
+            <b-row class="stac-valid">
+              <b-col cols="4">{{ $t('source.valid') }}</b-col>
+              <b-col>
+                <Validation :data="stac" />
+              </b-col>
+            </b-row>
+            <hr>
+          </template>
+          <Url id="stacUrl" :url="stacUrl" :label="$t('source.locatedAt')" />
+        </template>
+      </TeleportPopover>
+
+      <TeleportPopover placement="bottom" :title="$t('source.share.title')">
+        <template #trigger>
+          <b-button tag="a" tabindex="0" size="sm" variant="outline-primary" :title="$t('source.share.withOthers')">
+            <b-icon-share /> <span class="button-label">{{ $t('source.share.label') }}</span>
+          </b-button>
+        </template>
+        <template #content>
+          <Url id="browserUrl" :url="browserUrl()" :label="$t('source.share.sharePageWithOthers')" :open="false" />
+          <template v-if="enableSocialSharing">
+            <hr>
+            <SocialSharing :text="sharingMessage" :title="title" :url="browserUrl()" />
+          </template>
+        </template>
+      </TeleportPopover>
+
       <b-dropdown size="sm" variant="outline-primary" right :title="$t('source.language.switch')">
         <template #button-content>
           <b-icon-flag /> <span class="button-label">{{ $t('source.language.label', {currentLanguage}) }}</span>
@@ -32,58 +76,17 @@
         </b-dropdown-item>
       </b-dropdown>
     </b-button-group>
-
-    <b-popover
-      v-if="showRoot" id="popover-root" target="popover-root-btn" triggers="focus"
-      placement="bottom" container="stac-browser" :title="rootTitle"
-    >
-      <RootStats />
-    </b-popover>
-
-    <b-popover
-      v-if="stacUrl" id="popover-link" target="popover-link-btn" triggers="focus"
-      placement="bottom" container="stac-browser" :title="$t('source.title')"
-    >
-      <template v-if="stac">
-        <b-row v-if="stacId" class="stac-id">
-          <b-col cols="4">{{ $t('source.id') }}</b-col>
-          <b-col>
-            <code>{{ stacId }}</code>
-            <CopyButton :copyText="stacId" :button-props="{size: 'sm'}" variant="primary" class="ml-2" />
-          </b-col>
-        </b-row>
-        <b-row v-if="stacVersion" class="stac-version">
-          <b-col cols="4">{{ $t('source.stacVersion') }}</b-col>
-          <b-col>{{ stacVersion }}</b-col>
-        </b-row>
-        <b-row class="stac-valid">
-          <b-col cols="4">{{ $t('source.valid') }}</b-col>
-          <b-col>
-            <Validation :data="stac" />
-          </b-col>
-        </b-row>
-        <hr>
-      </template>
-      <Url id="stacUrl" :url="stacUrl" :label="$t('source.locatedAt')" />
-    </b-popover>
-
-    <b-popover id="popover-share" target="popover-share-btn" triggers="focus" placement="bottom" container="stac-browser" :title="$t('source.share.title')">
-      <Url id="browserUrl" :url="browserUrl()" :label="$t('source.share.sharePageWithOthers')" :open="false" />
-      <template v-if="enableSocialSharing">
-        <hr>
-        <SocialSharing :text="sharingMessage" :title="title" :url="browserUrl()" />
-      </template>
-    </b-popover>
   </div>
 </template>
 
 <script>
 import { 
   BIconBlank, BIconBox, BIconCheck, BIconExclamationTriangle, BIconFlag, BIconLink, BIconShare,
-  BDropdown, BDropdownItem, BPopover } from 'bootstrap-vue';
+  BDropdown, BDropdownItem } from 'bootstrap-vue';
 import { mapActions, mapGetters, mapState } from 'vuex';
 
 import Url from './Url.vue';
+import TeleportPopover from './TeleportPopover.vue';
 
 import Utils from '../utils';
 import { getBest, prepareSupported } from 'stac-js/src/locales';
@@ -104,8 +107,8 @@ export default {
     BIconFlag,
     BIconLink,
     BIconShare,
-    BPopover,
     RootStats: () => import('./RootStats.vue'),
+    TeleportPopover,
     Url,
     CopyButton,
     SocialSharing,

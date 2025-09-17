@@ -1,26 +1,27 @@
 <template>
   <div class="ol-layercontrol ol-unselectable ol-control" style="pointer-events: auto;">
-    <button :id="id"><b-icon-layers-fill /></button>
-    <b-popover
-      v-if="id" placement="top" triggers="click" @show="update"
-      :target="id" container="#stac-browser"
-    >
-      <div class="layercontrol">
-        <section>
-          <h5>{{ $t('mapping.layers.base') }}</h5>
-          <span v-if="baseLayers.length === 0">{{ $t('mapping.nobasemap') }}</span>
-          <b-form-radio-group v-else v-model="visibleBaseLayer">
-            <b-form-radio v-for="layer in baseLayers" :key="layer.id" :value="layer.id">
-              {{ layer.title }}
-            </b-form-radio>
-          </b-form-radio-group>
-        </section>
-        <section v-if="hasLayers">
-          <h5>{{ $t('mapping.layers.title') }}</h5>
-          <LayerControlGroup :map="map" :group="layerGroup" />
-        </section>
-      </div>
-    </b-popover>
+    <TeleportPopover v-if="id" placement="top" @show="update">
+      <template #trigger>
+        <button :id="id"><b-icon-layers-fill /></button>
+      </template>
+      <template #content>
+        <div class="layercontrol">
+          <section>
+            <h5>{{ $t('mapping.layers.base') }}</h5>
+            <span v-if="baseLayers.length === 0">{{ $t('mapping.nobasemap') }}</span>
+            <b-form-radio-group v-else v-model="visibleBaseLayer">
+              <b-form-radio v-for="layer in baseLayers" :key="layer.id" :value="layer.id">
+                {{ layer.title }}
+              </b-form-radio>
+            </b-form-radio-group>
+          </section>
+          <section v-if="hasLayers">
+            <h5>{{ $t('mapping.layers.title') }}</h5>
+            <LayerControlGroup :map="map" :group="layerGroup" />
+          </section>
+        </div>
+      </template>
+    </TeleportPopover>
   </div>
 </template>
 
@@ -32,6 +33,7 @@ import { BFormRadio, BFormRadioGroup, BIconLayersFill, BPopover } from 'bootstra
 import { transformWithProjections } from 'ol/proj';
 import Group from 'ol/layer/Group';
 import { Vector } from 'ol/source';
+import TeleportPopover from '../TeleportPopover.vue';
 
 export default {
   name: 'LayerControl',
@@ -40,7 +42,8 @@ export default {
     BFormRadio,
     BIconLayersFill,
     BPopover,
-    LayerControlGroup: () => import('./LayerControlGroup.vue')
+    LayerControlGroup: () => import('./LayerControlGroup.vue'),
+    TeleportPopover
   },
   mixins: [
     ControlMixin,
