@@ -8,7 +8,7 @@
 <script>
 import ErrorAlert from '../components/ErrorAlert.vue';
 import Loading from '../components/Loading.vue';
-import { mapActions, mapGetters } from 'vuex/dist/vuex.common.js';
+import { mapActions, mapGetters } from 'vuex';
 export default {
   name: "LoginCallback",
   components: {
