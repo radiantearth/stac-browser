@@ -1,10 +1,7 @@
-import Vue from 'vue';
-import VueI18n from 'vue-i18n';
+import { createI18n } from 'vue-i18n';
 import CONFIG from './config';
 import { default as Fields } from '@radiantearth/stac-fields/I18N';
 import Utils from './utils';
-
-Vue.use(VueI18n);
 
 export const API_LANGUAGE_CONFORMANCE = ['https://api.stacspec.org/v1.*/language'];
 
@@ -25,15 +22,18 @@ function loadLocaleConfig() {
   return messages;
 }
 
-const i18n = new VueI18n({
+const i18n = createI18n({
+  legacy: true,
+  globalInjection: true,
   locale: CONFIG.locale,
   fallbackLocale: CONFIG.fallbackLocale,
   messages: loadLocaleConfig(),
-  // Todo: Workaround for https://github.com/kazupon/vue-i18n/issues/563
+  // Workaround for https://github.com/kazupon/vue-i18n/issues/563
   postTranslation: (value, path) => {
     if (value === "") {
       const parts = path.split('.');
-      let message = i18n.messages[CONFIG.fallbackLocale];
+      // Access messages in a mode-agnostic way
+      let message = i18n.global.getLocaleMessage(CONFIG.fallbackLocale);
       for (const key of parts) {
         if (key in message) {
           message = message[key];
@@ -59,11 +59,11 @@ export function loadDefaultMessages() {
 export async function loadMessages(locale) {
   // Check whether the language has already been loaded
   // Note that a languages key is already present thus check >1 and not >0
-  if (Utils.size(i18n.messages[locale]) > 1) {
+  if (Utils.size(i18n.global.getLocaleMessage(locale)) > 1) {
     return;
   }
   const messages = (await import(`./locales/${locale}/default.js`)).default;
-  i18n.mergeLocaleMessage(locale, messages);
+  i18n.global.mergeLocaleMessage(locale, messages);
 }
 
 export async function executeCustomFunctions(locale) {
@@ -83,8 +83,8 @@ export function translateFields(value, vars = null) {
     return value;
   }
   let key = `fields.${value}`;
-  if (i18n.te(key)) {
-    return i18n.t(key, null, vars);
+  if (i18n.global.te(key)) {
+    return i18n.global.t(key, null, vars);
   }
   return Fields.format(value, vars);
 }
