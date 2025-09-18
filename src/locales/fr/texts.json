@@ -108,6 +108,7 @@
     "noExternalAccess": "L'accès aux catalogues externes n'est pas autorisé!",
     "notFound": "La ressource demandée n'existe pas. @:errors.contactProvider",
     "serverError": "Le serveur a rencontré un problème. @:errors.contactProvider",
+    "title": "",
     "unauthorized": "La requête requiert des informations d'authentification, comme par exemple un jeton API. Veuillez fournir vos informations d'authentification et réessayer"
   },
   "featureExperimental": "Cette fonctionnalité est encore expérimentale et peut donner des résultats inattendus!",
@@ -134,7 +135,7 @@
   "in": "dans {catalog}",
   "index": {
     "api": "API",
-    "catalog": "Catalogue",
+    "catalog": "",
     "load": "Charger",
     "selectStacIndex": "... ou en sélectionner un dans {stacIndex}:",
     "specifyCatalog": "Veuillez spécifier un catalogue STAC ou un API...",
