@@ -108,6 +108,7 @@
     "noExternalAccess": "L'accesso a cataloghi esterni non è consentito!",
     "notFound": "La risorsa richiesta non esiste. @:errors.contactProvider",
     "serverError": "Il server ha riscontrato un problema. @:errors.contactProvider",
+    "title": "",
     "unauthorized": "La richiesta necessita di credenziali, ad esempio un token API. Inserisci i tuoi dati di accesso e riprova."
   },
   "featureExperimental": "Questa funzione è ancora sperimentale e potrebbe dare risultati inaspettati!",
@@ -134,7 +135,7 @@
   "in": "in {catalog}",
   "index": {
     "api": "API",
-    "catalog": "Catalogo",
+    "catalog": "",
     "load": "Carica",
     "selectStacIndex": "... o selezionane uno da {stacIndex}:",
     "specifyCatalog": "Inserisci l'indirizzo di un Catalogo o di un'API STAC...",
