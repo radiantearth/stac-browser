@@ -134,7 +134,6 @@
   "in": "in {catalog}",
   "index": {
     "api": "API",
-    "catalog": "Catalogo",
     "load": "Carica",
     "selectStacIndex": "... o selezionane uno da {stacIndex}:",
     "specifyCatalog": "Inserisci l'indirizzo di un Catalogo o di un'API STAC...",
