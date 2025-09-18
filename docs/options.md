@@ -150,8 +150,16 @@ Must be set to `true` if a `catalogUrl` is not given as otherwise you won't be a
 
 ### allowedDomains
 
-You can list additional domains (e.g. `example.com`) that private data is sent to, e.g. authentication data.
-This applies to query parameters and request headers.
+You can list additional domains or patterns that private data (query parameters and headers) is sent to, e.g. authentication data.
+
+The provided patterns can be one of the following:
+
+- A regular expression (i.e. a JavaScript `RegExp` object) that will be tested against the normalized absolute URL.
+  (Note: Can't be provided through CLI/ENV).
+- A domain (e.g. `example.com`): Matches for example.com and any subdomains (case insensitive).
+- A subdomain (e.g. `stac.example.com`): Matches for stac.example.com and any subdomains (case insensitive).
+
+Domain and subdomain patterns ignore schema, userinfo, port, path, query and fragment.
 
 ### crossOriginMedia
 

@@ -1,20 +1,12 @@
-import { Collection, Item } from './src/models/stac';
-import Utils from './src/utils';
+import { Collection } from './src/models/stac';
 
-const USGS_ATTRIBUTION = 'USGS Astrogeology';
-const WMS = 'TileWMS';
-const XYZ = 'XYZ';
+// For documentation see https://github.com/radiantearth/stac-browser/blob/main/docs/basemaps.md
 
-// All options (except for 'is') follow the OpenLayers options for the respective source class.
-// Projections (except for EPSG:3857 and EPSG:4326) must be listed in the `crs` array in the config.js.
-//
-// There's a layerCreated callback that can be used to modify the layer and source after it has been created:
-// async layerCreated(Layer layer, Source source) => Layer
 const BASEMAPS = {
   earth: [
     {
       url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-      is: XYZ,
+      is: 'XYZ',
       title: 'OpenStreetMap',
       attributions: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors.',
       projection: "EPSG:3857"
@@ -23,9 +15,9 @@ const BASEMAPS = {
   europa: [
     {
       url: 'https://planetarymaps.usgs.gov/cgi-bin/mapserv?map=/maps/jupiter/europa_simp_cyl.map',
-      is: WMS,
+      is: 'TileWMS',
       title: 'USGS Europa',
-      attributions: USGS_ATTRIBUTION,
+      attributions: 'USGS Astrogeology',
       projection: 'EPSG:4326',
       params: {
         FORMAT: 'image/png',
@@ -36,9 +28,9 @@ const BASEMAPS = {
   mars: [
     {
       url: 'https://planetarymaps.usgs.gov/cgi-bin/mapserv?map=/maps/mars/mars_simp_cyl.map',
-      is: WMS,
+      is: 'TileWMS',
       title: 'USGS Mars',
-      attributions: USGS_ATTRIBUTION,
+      attributions: 'USGS Astrogeology',
       projection: 'EPSG:4326',
       params: {
         FORMAT: 'image/png',
@@ -49,9 +41,9 @@ const BASEMAPS = {
   moon: [
     {
       url: 'https://planetarymaps.usgs.gov/cgi-bin/mapserv?map=/maps/earth/moon_simp_cyl.map',
-      is: WMS,
+      is: 'TileWMS',
       title: 'USGS Moon',
-      attributions: USGS_ATTRIBUTION,
+      attributions: 'USGS Astrogeology',
       projection: 'EPSG:4326',
       params: {
         FORMAT: 'image/png',

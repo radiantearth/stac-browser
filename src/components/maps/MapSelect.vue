@@ -3,8 +3,8 @@
     <div ref="map" class="map">
       <!-- this will be filled by OpenLayers -->
       <TextControl :text="help" :map="map" />
-      <UserLocationControl :map="map" />
-      <LayerControl :map="map" />
+      <UserLocationControl :map="map" :maxZoom="maxZoom" />
+      <LayerControl :map="map" :maxZoom="maxZoom" />
     </div>
   </div>
 </template>
@@ -137,7 +137,7 @@ export default {
         }
       }
       if (extent) {
-        this.map.getView().fit(extent, { padding: [50,50,50,50] });
+        this.map.getView().fit(extent, { padding: [50,50,50,50], maxZoom: this.maxZoom });
       }
     },
     addMask(stac) {

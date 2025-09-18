@@ -246,11 +246,6 @@
     "placeholder": "بحث...",
     "selectCollections": "حدد مجموعة واحدة أو أكثر...",
     "selectForItemSearch": "حدد للبحث عن عنصر",
-    "sortOptions": {
-      "datetime": "التاريخ والوقت",
-      "id": "المعرّف",
-      "title": "العنوان"
-    },
     "spatialExtent": "النطاق المكاني",
     "tabs": {
       "collections": "البحث عن المجموعات",

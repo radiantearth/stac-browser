@@ -8,7 +8,7 @@ import { addMissingChildren, getDisplayTitle, createSTAC } from '../models/stac'
 import { CatalogLike, STAC } from 'stac-js';
 
 import auth from './auth.js';
-import { addQueryIfNotExists, isAuthenticationError, Loading, processSTAC, stacRequest } from './utils';
+import { addQueryIfNotExists, hasAuthority, isAuthenticationError, Loading, processSTAC, stacRequest } from './utils';
 import { getBest } from 'stac-js/src/locales';
 import I18N from '@radiantearth/stac-fields/I18N';
 import { translateFields, executeCustomFunctions, loadMessages } from '../i18n';
@@ -286,7 +286,7 @@ function getStore(config, router) {
         if (!(absoluteUrl instanceof URI)) {
           absoluteUrl = URI(absoluteUrl);
         }
-        if (whitelist && Array.isArray(state.allowedDomains) && state.allowedDomains.includes(absoluteUrl.domain())) {
+        if (whitelist && Array.isArray(state.allowedDomains) && state.allowedDomains.some(d => hasAuthority(d, absoluteUrl))) {
           return false;
         }
         let relative;

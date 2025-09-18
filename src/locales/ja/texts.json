@@ -234,11 +234,6 @@
     "placeholder": "検索...",
     "selectCollections": "1つ以上のコレクションを選択...",
     "selectForItemSearch": "アイテム検索用に選択",
-    "sortOptions": {
-      "datetime": "日付と時刻",
-      "id": "ID",
-      "title": "タイトル"
-    },
     "spatialExtent": "場所の範囲",
     "tabs": {
       "collections": "コレクションを検索",

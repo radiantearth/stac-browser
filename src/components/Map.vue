@@ -2,7 +2,7 @@
   <div class="map-container">
     <div ref="map" class="map" :id="mapId">
       <!-- this will be filled by OpenLayers -->
-      <LayerControl :map="map" />
+      <LayerControl :map="map" :maxZoom="maxZoom" />
       <TextControl v-if="empty" :map="map" :text="$t('mapping.nodata')" />
       <TextControl v-else-if="!hasBasemap" :map="map" :text="$t('mapping.nobasemap')" />
     </div>
@@ -30,6 +30,8 @@ import { BPopover } from 'bootstrap-vue';
 import Select from 'ol/interaction/Select';
 import StacLayer from 'ol-stac';
 import { getStacObjectsForEvent, getStyle } from 'ol-stac/util.js';
+import { STACReference } from 'stac-js';
+import MapUtils from './maps/mapUtils.js';
 
 const selectStyle = getStyle('#ff0000', 2, null);
 let mapId = 0;
@@ -101,8 +103,9 @@ export default {
       if (!this.stacLayer) {
         return;
       }
-      await this.stacLayer.setAssets(null);
-      await this.stacLayer.setChildren(this.items, {displayPreview: true});
+      await this.stacLayer.setAssets(null, false);
+      await this.stacLayer.setChildren(this.items, {displayPreview: true}, false);
+      await this.stacLayer.updateLayers();
       this.fit();
     },
     empty(empty) {
@@ -148,7 +151,7 @@ export default {
       this.stacLayer.on('sourceready', this.fit);
       this.stacLayer.on('layersready', () => {
         this.empty = this.stacLayer.isEmpty();
-        this.$emit('assets', this.stacLayer.getAssets());
+        this.$emit('changed', this.getShownData());
       });
       this.map.addLayer(this.stacLayer);
 
@@ -189,11 +192,20 @@ export default {
       if (extent) {
         // Update the sizes, otherwise the fit will not work properly and compute a wrong zoom level
         this.map.updateSize();
-        this.map.getView().fit(extent, { padding: [50,50,50,50] });
+        this.map.getView().fit(extent, { padding: [50,50,50,50], maxZoom: this.maxZoom });
       }
     },
     resetSelectedItems() {
       this.selectedItems = null;
+    },
+    getShownData() {
+      if (!this.stacLayer) {
+        return null;
+      }
+      return this.stacLayer.getLayers().getArray()
+        .filter(layer => MapUtils.isLayerVisible(layer))
+        .map(layer => layer.get('stac'))
+        .filter(stac => stac instanceof STACReference);
     }
   }
 };

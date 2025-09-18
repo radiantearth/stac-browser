@@ -6,7 +6,7 @@
           <b-card no-body class="maps-preview">
             <b-tabs v-model="tab" ref="tabs" card pills vertical end>
               <b-tab :title="$t('map')" no-body>
-                <Map :stac="data" :assets="selectedAssets" @assets="dataChanged" @empty="handleEmptyMap" />
+                <Map :stac="data" :assets="selectedAssets" @changed="dataChanged" @empty="handleEmptyMap" />
               </b-tab>
               <b-tab v-if="hasThumbnails" :title="$t('thumbnails')" no-body>
                 <Thumbnails :thumbnails="thumbnails" />
@@ -14,13 +14,13 @@
             </b-tabs>
           </b-card>
         </section>
-        <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="selectedAssets" @showAsset="showAsset" />
+        <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="selectedReferences" @showAsset="showAsset" />
         <Links v-if="additionalLinks.length > 0" :title="$t('additionalResources')" :links="additionalLinks" :context="data" />
       </b-col>
       <b-col class="right">
         <section class="intro">
           <h2 v-if="data.properties.description">{{ $t('description') }}</h2>
-          <DeprecationNotice v-if="data.properties.deprecated" :data="data" />
+          <DeprecationNotice v-if="showDeprecation" :data="data" />
           <AnonymizedNotice v-if="data.properties['anon:warning']" :warning="data.properties['anon:warning']" />
           <ReadMore v-if="data.properties.description" :lines="10" :text="$t('read.more')" :text-less="$t('read.less')">
             <Description :description="data.properties.description" />
@@ -40,6 +40,7 @@ import { mapState, mapGetters } from 'vuex';
 import Description from '../components/Description.vue';
 import ReadMore from "vue-read-more-smooth";
 import ShowAssetLinkMixin from '../components/ShowAssetLinkMixin';
+import DeprecationMixin from '../components/DeprecationMixin';
 import { BTabs, BTab } from 'bootstrap-vue';
 import { addSchemaToDocument, createItemSchema } from '../schema-org';
 
@@ -62,7 +63,8 @@ export default {
     Thumbnails: () => import('../components/Thumbnails.vue')
   },
   mixins: [
-    ShowAssetLinkMixin
+    ShowAssetLinkMixin,
+    DeprecationMixin
   ],
   data() {
     return {
