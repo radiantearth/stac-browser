@@ -6,13 +6,15 @@
           <b-icon-chevron-down v-if="expanded" />
           <b-icon-chevron-right v-else />
         </span>
-        <span class="title">{{ asset.title || id }}</span>
-        <div class="badges ml-1" v-if="Array.isArray(asset.roles)">
+        <span class="title">{{ title }}</span>
+        <div class="badges ml-1">
           <b-badge v-if="shown" variant="success" class="shown" :title="$t('assets.currentlyShown')">
             <b-icon-check /> {{ $t('assets.shown') }}
           </b-badge>
           <b-badge v-if="asset.deprecated" variant="warning" class="deprecated">{{ $t('deprecated') }}</b-badge>
-          <b-badge v-for="role in asset.roles" :key="role" :variant="role === 'data' ? 'primary' : 'secondary'" class="role">{{ displayRole(role) }}</b-badge>
+          <template v-if="Array.isArray(asset.roles)">
+            <b-badge v-for="role in asset.roles" :key="role" :variant="role === 'data' ? 'primary' : 'secondary'" class="role">{{ displayRole(role) }}</b-badge>
+          </template>
           <b-badge v-if="shortFileFormat" variant="dark" class="format" :title="fileFormat"><span v-html="shortFileFormat" /></b-badge>
         </div>
       </b-button>
@@ -21,14 +23,14 @@
       <template v-if="hasAlternatives">
         <b-tabs card>
           <b-tab :title="asset['alternate:name'] || $t('assets.alternate.main')" active>
-            <AssetAlternative :asset="asset" :context="context" :shown="shown" hasAlternatives @show="show" />
+            <AssetAlternative :asset="asset" :shown="shown" hasAlternatives @show="show" />
           </b-tab>
           <b-tab v-for="(altAsset, key) in alternatives" :title="altAsset['alternate:name'] || key" :key="key">
-            <AssetAlternative :asset="altAsset" :context="context" :shown="shown" hasAlternatives :key="key" @show="show" />
+            <AssetAlternative :asset="altAsset" :shown="shown" hasAlternatives :key="key" @show="show" />
           </b-tab>
         </b-tabs>
       </template>
-      <AssetAlternative v-else :asset="asset" :context="context" @show="show" />
+      <AssetAlternative v-else :asset="asset" :shown="shown" @show="show" />
     </b-collapse>
   </b-card>
 </template>
@@ -40,6 +42,7 @@ import { mapState } from 'vuex';
 import AssetAlternative from './AssetAlternative.vue';
 import StacFieldsMixin from './StacFieldsMixin';
 import Utils from '../utils';
+import { Asset } from 'stac-js';
 
 export default {
   name: 'Asset',
@@ -59,14 +62,6 @@ export default {
     asset: {
       type: Object,
       required: true
-    },
-    id: {
-      type: String,
-      required: true
-    },
-    context: {
-      type: Object,
-      default: null
     },
     definition: {
       type: Boolean,
@@ -92,7 +87,10 @@ export default {
       return this.definition ? 'itemdef' : 'asset';
     },
     uid() {
-      return `${this.type}-${this.id}`;
+      return `${this.type}-${this.asset.getKey().toLowerCase().replace(/[^\w]/g, '-')}`;
+    },
+    title() {
+      return this.asset.title || this.asset.getKey();
     },
     fileFormat() {
       if (typeof this.asset.type === "string" && this.asset.type.length > 0) {
@@ -111,15 +109,17 @@ export default {
         return {};
       }
 
-      const asset = Object.assign({}, this.asset);
-      delete asset.alternate;
+      const inherit = this.asset.toJSON();
+      delete inherit.alternate;
 
-      const merged = {};
+      const alternates = {};
       for (const key in this.asset.alternate) {
-        merged[key] = Object.assign({}, asset, this.asset.alternate[key]);
+        const alternate = this.asset.alternate[key];
+        const merged = Object.assign({}, inherit, alternate.toJSON());
+        alternates[key] = new Asset(merged, key, alternate.getContext());
       }
       
-      return merged;
+      return alternates;
     },
     hasAlternatives() {
       return Utils.size(this.alternatives) > 0;

@@ -20,19 +20,19 @@
         </b-tabs>
       </b-col>
       <b-col class="right">
-        <b-alert v-if="error" variant="error" show>{{ error }}</b-alert>
-        <Loading v-else-if="!data && loading" fill top />
+        <Loading v-if="loading" fill top />
+        <b-alert v-else-if="error" variant="error" show>{{ error }}</b-alert>
         <b-alert v-else-if="data === null" variant="info" show>{{ $t('search.modifyCriteria') }}</b-alert>
         <b-alert v-else-if="results.length === 0 && noFurtherItems" variant="info" show>{{ $t('search.noFurtherItemsFound') }}</b-alert>
         <b-alert v-else-if="results.length === 0" variant="warning" show>{{ $t('search.noItemsFound') }}</b-alert>
         <template v-else>
           <div id="search-map" v-if="itemCollection">
-            <Map :stac="stac" :stacLayerData="itemCollection" scrollWheelZoom popover />
+            <Map :stac="parent" :items="itemCollection" onfocusOnly popover />
           </div>
           <Catalogs
             v-if="isCollectionSearch" :catalogs="results" collectionsOnly
             :pagination="pagination" :loading="loading" @paginate="loadResults"
-            :count="totalCount"
+            :count="totalCount" :apiFilters="collectionFilters"
           >
             <template #catalogFooter="slot">
               <b-button-group v-if="itemSearch || canFilterItems(slot.data)" vertical size="sm">
@@ -47,9 +47,9 @@
           </Catalogs>
           <Items
             v-else
-            :stac="stac" :items="results" :api="true" :allowFilter="false"
+            :stac="parent" :items="results" :api="true" :allowFilter="false"
             :pagination="pagination" :loading="loading" @paginate="loadResults"
-            :count="totalCount"
+            :count="totalCount" :apiFilters="itemFilters"
           />
         </template>
       </b-col>
@@ -67,7 +67,8 @@ import { mapGetters, mapState } from "vuex";
 import Utils from '../utils';
 import SearchFilter from '../components/SearchFilter.vue';
 import Loading from '../components/Loading.vue';
-import STAC from '../models/stac';
+import { getDisplayTitle, createSTAC, ItemCollection } from '../models/stac';
+import { STAC } from 'stac-js';
 import { BIconCheckSquare, BIconSquare, BTabs, BTab } from 'bootstrap-vue';
 import { processSTAC, stacRequest } from '../store/utils';
 
@@ -107,7 +108,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['catalogUrl', 'catalogTitle', 'itemsPerPage']),
+    ...mapState(['catalogUrl', 'catalogTitle', 'searchResultsPerPage', 'itemsPerPage', 'collectionsPerPage']),
     ...mapGetters(['canSearchItems', 'canSearchCollections', 'getStac', 'root', 'collectionLink', 'parentLink', 'fromBrowserPath', 'toBrowserPath']),
     selectedCollectionCount() {
       return Utils.size(this.selectedCollections);
@@ -118,30 +119,24 @@ export default {
       }
       return null;
     },
-    stac() {
-      if (this.parent instanceof STAC) {
-        return this.parent;
-      }
-      return null;
-    },
     searchLink() {
       return this.isCollectionSearch ? this.collectionSearch : this.itemSearch;
     },
     collectionSearch() {
-      return this.canSearchCollections && this.parent instanceof STAC && this.parent.getApiCollectionsLink();
+      return this.canSearchCollections && this.parent && this.parent.getApiCollectionsLink();
     },
     itemSearch() {
-      return this.canSearchItems && this.parent instanceof STAC && this.parent.getSearchLink();
+      return this.canSearchItems && this.parent && this.parent.getSearchLink();
     },
     itemCollection() {
       if (this.isCollectionSearch) {
         return null; // wait for stac-js to convert bboxes to geojson
       }
-      return {
+      return new ItemCollection({
         type: 'FeatureCollection',
         features: this.results,
         links: []
-      };
+      });
     },
     results() {
       if (Utils.size(this.data) === 0) {
@@ -152,6 +147,7 @@ export default {
       if (!Array.isArray(list)) {
         return [];
       }
+      // todo: use itemcollection class
       return list
         .map(obj => {
           try {
@@ -163,7 +159,7 @@ export default {
             if (selfLink?.href) {
               url = Utils.toAbsolute(selfLink.href, this.link.href);
             }
-            let stac = new STAC(obj, url, this.toBrowserPath(url));
+            let stac = createSTAC(obj, url, this.toBrowserPath(url));
             stac = processSTAC(this.$store.state, stac);
             return stac;
           } catch (error) {
@@ -183,7 +179,7 @@ export default {
       return this.collectionSearch && this.activeSearch === 0;
     },
     pageDescription() {
-      let title = STAC.getDisplayTitle([this.collectionLink, this.parentLink, this.root], this.catalogTitle);
+      let title = getDisplayTitle([this.collectionLink, this.parentLink, this.root], this.catalogTitle);
       return this.$t('search.metaDescription', {title});
     },
     noFurtherItems() {
@@ -191,7 +187,7 @@ export default {
       // so we check whether our current link has a next rel type which indicates
       // that it's a subsequent page. On the first pages the link rel type would be
       // "search" (or "prev" or "first"). This only works for forward navigation.
-      return this.link.rel === 'next';
+      return this.link && this.link.rel === 'next';
     }
   },
   watch:{
@@ -224,14 +220,6 @@ export default {
       this.parent = this.getStac(url);
       this.showPage();
     }
-    
-    // Fixes https://github.com/radiantearth/stac-browser/issues/428
-    this.$root.$on('uiLanguageChanged', () => {
-      this.$store.commit('setPageMetadata', {
-        title: this.$t('search.title'),
-        description: this.pageDescription
-      });
-    });
   },
   methods: {
     openItemSearch() {
@@ -257,7 +245,7 @@ export default {
       this.error = null;
       this.loading = true;
       try {
-        this.link = Utils.addFiltersToLink(link, this.filters, this.itemsPerPage);
+        this.link = Utils.addFiltersToLink(link, this.filters, this.searchResultsPerPage);
 
         let key = this.isCollectionSearch ? 'collections' : 'features';
         let response = await stacRequest(this.$store, this.link);
@@ -294,9 +282,11 @@ export default {
     },
     showPage(url) {
       this.$store.commit('showPage', {
-        title: this.$t('search.title'),
-        description: this.pageDescription,
-        url
+        url,
+        page: () => ({
+          title: this.$t('search.title'),
+          description: this.pageDescription,
+        })
       });
     }
   }

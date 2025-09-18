@@ -99,7 +99,7 @@ export default {
         !key.startsWith("_") && !this.ignoreFields.includes(key);
       switch (this.type) {
         case "Asset":
-          return formatAsset(this.data, this.context, filter);
+          return formatAsset(this.data.toJSON(), this.context, filter);
         case "Link":
           return formatLink(this.data, this.context, filter);
         case "Provider":

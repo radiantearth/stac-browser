@@ -82,6 +82,16 @@
         "boolean"
       ]
     },
+    "displayPreview": {
+      "type": [
+        "boolean"
+      ]
+    },
+    "displayOverview": {
+      "type": [
+        "boolean"
+      ]
+    },
     "buildTileUrlTemplate": {
       "type": [
         "null"
@@ -90,26 +100,13 @@
       "noCLI": true,
       "noEnv": true
     },
-    "stacProxyUrl": {
+    "getMapSourceOptions": {
       "type": [
-        "array",
         "null"
       ],
-      "prefixItems": [
-        {
-          "type": [
-            "string"
-          ],
-          "format": "uri-reference"
-        },
-        {
-          "type": [
-            "string"
-          ],
-          "format": "uri"
-        }
-      ],
-      "items": false
+      "format": "function",
+      "noCLI": true,
+      "noEnv": true
     },
     "pathPrefix": {
       "type": [
@@ -152,18 +149,27 @@
         "boolean"
       ]
     },
-    "geoTiffResolution": {
+    "searchResultsPerPage": {
       "type": [
         "integer"
       ],
       "minimum": 1
     },
-    "redirectLegacyUrls": {
-      "type": [
-        "boolean"
-      ]
-    },
     "itemsPerPage": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "collectionsPerPage": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "maxEntriesPerPage": {
       "type": [
         "integer"
       ],
@@ -182,12 +188,6 @@
         ]
       }
     },
-    "maxPreviewsOnMap": {
-      "type": [
-        "integer"
-      ],
-      "minimum": 1
-    },
     "crossOriginMedia": {
       "type": [
         "string",
@@ -203,16 +203,22 @@
     "requestHeaders": {
       "type": [
         "object"
-      ],
-      "noCLI": true,
-      "noEnv": false
+      ]
     },
     "requestQueryParameters": {
       "type": [
         "object"
+      ]
+    },
+    "socialSharing": {
+      "type": [
+        "array"
       ],
-      "noCLI": true,
-      "noEnv": true
+      "items": {
+        "type": [
+          "string"
+        ]
+      }
     },
     "preprocessSTAC": {
       "type": [
@@ -230,9 +236,12 @@
         {
           "$ref": "https://stac-extensions.github.io/authentication/v1.1.0/schema.json"
         }
-      ],
-      "noCLI": true,
-      "noEnv": true
+      ]
+    },
+    "crs": {
+      "type": [
+        "object"
+      ]
     }
   }
 }

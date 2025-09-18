@@ -1,8 +1,8 @@
 <template>
   <div>
     <b-button-group class="actions" :vertical="vertical" :size="size" v-if="href">
-      <b-button variant="danger" v-if="requiresAuth" :id="`popover-href-${id}-btn`" @click="handleAuthButton">
-        <b-icon-lock /> {{ $i18n.t('authentication.required') }}
+      <b-button variant="danger" v-if="requiresAuth" tag="a" tabindex="0" :id="`popover-href-${id}-btn`" @click="handleAuthButton">
+        <b-icon-lock /> {{ $t('authentication.required') }}
       </b-button>
       <b-button v-if="hasDownloadButton" :disabled="requiresAuth" v-bind="downloadProps" v-on="downloadEvents" variant="primary">
         <b-spinner v-if="loading" small variant="light" />
@@ -27,7 +27,7 @@
     <b-popover
       v-if="auth.length > 1"
       :id="`popover-href-${id}`" custom-class="href-auth-methods" :target="`popover-href-${id}-btn`"
-      triggers="focus" container="stac-browser" :title="$i18n.t('authentication.chooseMethod')"
+      triggers="focus" container="stac-browser" :title="$t('authentication.chooseMethod')"
     >
       <b-list-group>
         <AuthSchemeItem v-for="(method, i) in auth" :key="i" :method="method" @authenticate="startAuth" />
@@ -40,7 +40,6 @@
 <script>
 import { BIconBoxArrowUpRight, BIconDownload, BIconEye, BIconLock, BListGroup, BPopover, BSpinner } from 'bootstrap-vue';
 import Description from './Description.vue';
-import STAC from '../models/stac';
 import Utils, { browserProtocols, imageMediaTypes, mapMediaTypes } from '../utils';
 import { mapGetters, mapState } from 'vuex';
 import AssetActions from '../../assetActions.config';
@@ -48,6 +47,7 @@ import LinkActions from '../../linkActions.config';
 import { stacRequestOptions } from '../store/utils';
 import URI from 'urijs';
 import AuthUtils from './auth/utils';
+import { Asset } from 'stac-js';
 
 let i = 0;
 
@@ -112,23 +112,19 @@ export default {
     },
     canShow() {
       // We need to know the type, otherwise we don't even try to show it
-      if (typeof this.data.type !== 'string') {
+      if (typeof this.data?.type !== 'string') {
         return false;
       }
       // If the tile renderer is a tile server, we can't really know what it supports so we pass all images
-      else if (this.tileRendererType === 'server' && imageMediaTypes.includes(this.data.type)) {
+      else if (this.tileRendererType === 'server' && imageMediaTypes.includes(this.data?.type)) {
         return true;
-      }
-      // Don't pass GDAL VFS URIs to client-side tile renderer: https://github.com/radiantearth/stac-browser/issues/116
-      else if (this.isGdalVfs && this.tileRendererType === 'client') {
-        return false;
       }
       // Only http(s) links and relative links are supported
       else if (!this.isBrowserProtocol) {
         return false;
       }
-      // Otherwise, all images that a browser can read are supported + JSON
-      else if (mapMediaTypes.includes(this.data.type)) {
+      // Otherwise, all images that a browser can read are supported + GeoJSON
+      else if (mapMediaTypes.includes(this.data?.type)) {
         return true;
       }
       return false;
@@ -193,29 +189,22 @@ export default {
       return null;
     },
     isBrowserProtocol() {
-      return (!this.protocol && !this.isGdalVfs) || browserProtocols.includes(this.protocol);
+      return !this.protocol || browserProtocols.includes(this.protocol);
     },
     isThumbnail() {
       if (this.isAsset) {
-        return Array.isArray(this.data.roles) && this.data.roles.includes('thumbnail') && !this.data.roles.includes('overview');
+        return this.data.isPreview() && this.data.canBrowserDisplayImage();
       }
       else {
         return this.data.rel === 'preview' && Utils.canBrowserDisplayImage(this.data);
       }
     },
-    isGdalVfs() {
-      return Utils.isGdalVfsUri(this.href);
-    },
     href() {
       if (typeof this.data.href !== 'string') {
         return null;
       }
-      let baseUrl = null;
-      if (this.context instanceof STAC) {
-        baseUrl = this.context.getAbsoluteUrl();
-      }
       try {
-        return this.getRequestUrl(this.data.href, baseUrl);
+        return this.getRequestUrl(this.data.getAbsoluteHref());
       } catch (e) {
         return this.data.href;
       }
@@ -224,22 +213,16 @@ export default {
       return URI(this.href);
     },
     from() {
-      if (this.isGdalVfs) {
-        let type = this.href.match(/^\/vsi([a-z\d]+)(_streaming)?\//);
-        return this.protocolName(type);
-      }
-      else {
-        return this.protocolName(this.protocol);
-      }
+      return this.protocolName(this.protocol);
     },
     browserCanOpenFile() {
-      if (this.isGdalVfs || this.useAltDownloadMethod)  {
+      if (this.useAltDownloadMethod)  {
         return false;
       }
       if (Utils.canBrowserDisplayImage(this.data)) {
         return true;
       }
-      else if (typeof this.data.type === 'string') {
+      else if (typeof this.data?.type === 'string') {
         switch(this.data.type.toLowerCase()) {
           case 'text/html':
           case 'application/xhtml+xml':
@@ -258,9 +241,8 @@ export default {
       return this.$t(`assets.download.${where}`, {source: this.from});
     },
     copyButtonText() {
-      let what = this.isGdalVfs ? 'copyGdalVfsUrl' : 'copyUrl';
       let where = (!this.isBrowserProtocol && this.from) ? 'withSource' : 'generic';
-      return this.$t(`assets.${what}.${where}`, {source: this.from});
+      return this.$t(`assets.copyUrl.${where}`, {source: this.from});
     }
   },
   methods: {
@@ -379,12 +361,12 @@ export default {
       return '';
     },
     show() {
-      let data = Object.assign({}, this.data);
-      // Override asset href with absolute URL if not a GDAL VFS
-      if (!this.isGdalVfs) {
-        data.href = this.href;
-      }
-      this.$emit('show', data, this.id, this.isThumbnail);
+      // Override asset href with absolute URL
+      // Clone asset so that we can change the href
+      const data = new Asset(this.data, this.data.getKey(), this.data.getContext());
+      data.href = this.href;
+      // todo: can we use data.getAbsoluteUrl in all places where we handle the event in favor of the cloning/updating here?
+      this.$emit('show', data);
     },
     handleAuthButton() {
       if (this.auth.length === 1) {
@@ -397,9 +379,9 @@ export default {
         await this.$store.dispatch('auth/requestLogin');
       }
       else {
-        const name = this.$i18n.t(`authentication.schemeTypes.${method.type}`, method);
-        const message = this.$i18n.t('authentication.unsupportedLong', {method: name});
-        this.$root.$emit('error', new Error(message), this.$i18n.t('authentication.unsupported'));
+        const name = this.$t(`authentication.schemeTypes.${method.type}`, method);
+        const message = this.$t('authentication.unsupportedLong', {method: name});
+        this.$root.$emit('error', new Error(message), this.$t('authentication.unsupported'));
       }
     }
   }

@@ -1,8 +1,6 @@
 <template>
-  <component :is="component" class="stac-link" v-bind="attributes" :title="tooltip">
-    <template v-if="icon">
-      <img :src="icon.href" :alt="icon.title" :title="icon.title" class="icon mr-2">
-    </template>
+  <component :is="component" class="stac-link" v-bind="attributes" :id="id" :title="tooltip">
+    <img v-if="icon && !hideIcon" :src="icon.getAbsoluteUrl()" :alt="icon.title" :title="icon.title" class="icon mr-2">
     <span class="title">{{ displayTitle }}</span>
   </component>
 </template>
@@ -11,7 +9,8 @@
 import { mapState, mapGetters } from 'vuex';
 import { stacBrowserNavigatesTo } from "../rels";
 import Utils from '../utils';
-import STAC from '../models/stac';
+import { getDisplayTitle } from '../models/stac';
+import { STAC } from 'stac-js';
 import URI from 'urijs';
 
 export default {
@@ -27,7 +26,7 @@ export default {
     },
     fallbackTitle: {
       type: [String, Function],
-      default: null
+      default: ""
     },
     tooltip: {
       type: String,
@@ -40,14 +39,22 @@ export default {
     state: {
       type: Object,
       default: null
+    },
+    hideIcon: {
+      type: Boolean,
+      default: false
+    },
+    id: {
+      type: String,
+      default: null
     }
   },
   computed: {
     ...mapState(['allowExternalAccess', 'privateQueryParameters']),
     ...mapGetters(['toBrowserPath', 'getRequestUrl', 'isExternalUrl']),
     icon() {
-      if (this.stac) {
-        let icons = this.stac.getIcons();
+      if (this.stac instanceof STAC) {
+        const icons = this.stac.getIcons();
         if (icons.length > 0) {
           return icons[0];
         }
@@ -100,11 +107,16 @@ export default {
         return obj;
       }
       else {
-        return {
+        const obj = {
           href: this.href,
           target: '_blank',
-          rel: this.rel
+          rel: this.rel,
         };
+        if (this.id) {
+          // Add tab index when an ID is given for popoversto make it clickable on MacOS (#655)
+          obj.tabindex = 0;
+        }
+        return obj;
       }
     },
     component() {
@@ -116,7 +128,7 @@ export default {
     href() {
       if (this.stac || this.isStacBrowserLink) {
         let href;
-        if (this.stac) {
+        if (this.stac instanceof STAC) {
           href = this.stac.getBrowserPath();
         }
         else {
@@ -155,7 +167,7 @@ export default {
       }
 
       let fallback = typeof this.fallbackTitle === 'function' ? this.fallbackTitle() : this.fallbackTitle;
-      return STAC.getDisplayTitle(this.data, fallback);
+      return getDisplayTitle(this.data, fallback);
     }
   },
   methods: {

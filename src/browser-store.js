@@ -83,7 +83,7 @@ export default class BrowserStorage {
 
 }
 
-class Cookies {
+export class Cookies {
 
   constructor(session = false) {
     this.session = session;

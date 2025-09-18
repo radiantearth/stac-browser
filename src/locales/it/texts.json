@@ -11,10 +11,6 @@
     "alternate": {
       "main": "Preferito"
     },
-    "copyGdalVfsUrl": {
-      "generic": "Copia l'URL del VFS GDAL",
-      "withSource": "Copia l'URL del VFS GDAL per {source}"
-    },
     "copyUrl": {
       "generic": "Copia l'URL",
       "withSource": "Copia l'URL per {source}"
@@ -117,7 +113,9 @@
   "featureExperimental": "Questa funzione è ancora sperimentale e potrebbe dare risultati inaspettati!",
   "fullscreen": {
     "exit": "Esci dalla modalità a schermo intero",
-    "show": "Mostra in modalità a schermo intero"
+    "exitLabel": "✕",
+    "show": "Mostra in modalità a schermo intero",
+    "showLabel": "⛶"
   },
   "goBack": {
     "description": "Torna a {type}",
@@ -151,12 +149,31 @@
     "noneAvailableForCollection": "Non ci sono Elementi disponibili per questa Collezione.",
     "showFilter": "Mostra filtri"
   },
-  "leaflet": {
-    "close": "Chiudi",
-    "noFeatureProperties": "Non ci sono altri dati disponibili per questo Elemento.",
-    "stayLayer": {
-      "error": "Non è stato possibile aggiungere i dati alla mappa"
+  "loading": "Carico...",
+  "map": "Mappa",
+  "mapping": {
+    "attribution": {
+      "label": "i",
+      "description": "Crediti",
+      "collapseLabel": "✕"
     },
+    "bboxSelect": {
+      "add": "Cliccare sulla mappa per aggiungere un box di selezione.",
+      "remove": "Cliccare dentro il box per eliminarlo."
+    },
+    "close": "Chiudi",
+    "fit": "Adatta alla estensione",
+    "layers": {
+      "title": "Livelli",
+      "base": "Livelli di base",
+      "unnamed": "Senza Nome #{id}",
+      "footprint": "Impronta a terra"
+    },
+    "location": {
+      "description": "Vai alla tua posizione attuale"
+    },
+    "nobasemap": "Mappa base non disponibile.",
+    "nodata": "Informazione spaziale mancante nei metadati.",
     "zoom": {
       "in": {
         "description": "Zoom avanti",
@@ -164,12 +181,10 @@
       },
       "out": {
         "description": "Zoom indietro",
-        "label": "-"
+        "label": "–"
       }
     }
   },
-  "loading": "Carico...",
-  "map": "Mappa",
   "messageForSchemaError": "{message} per lo schema {schemaPath}",
   "metadata": {
     "general": "Generale",
@@ -257,11 +272,6 @@
     "placeholder": "Cerca...",
     "selectCollections": "Selezionare una o più Collezioni...",
     "selectForItemSearch": "Seleziona per Ricerca Elemento",
-    "sortOptions": {
-      "datetime": "Data e ora",
-      "id": "ID",
-      "title": "Titolo"
-    },
     "spatialExtent": "Estensione spaziale",
     "tabs": {
       "collections": "Cerca Collezioni",
@@ -302,12 +312,14 @@
     },
     "locatedAt": "Il file di metadati STAC si trova all'indirizzo:",
     "share": {
+      "bsky": "Bluesky",
       "email": "E-mail",
       "label": "Condividi",
+      "mastodon": "Mastodon.social",
       "message": "{title} è disponibile all'indirizzo {url}",
       "sharePageWithOthers": "Condividi l'URL di questa pagina dove vuoi:",
       "title": "Condivisione",
-      "twitter": "Twitter",
+      "x": "X (Twitter)",
       "withOthers": "Condividi questa pagina con altri"
     },
     "stacExtension": "Estensione STAC",

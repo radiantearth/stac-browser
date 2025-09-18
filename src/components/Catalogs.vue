@@ -17,7 +17,7 @@
         :limitText="limitText"
       />
     </section>
-    <Pagination ref="topPagination" v-if="showPagination" :pagination="pagination" placement="top" @paginate="paginate" />
+    <Pagination v-if="showPagination" ref="topPagination" class="mb-3" :pagination="pagination" placement="top" @paginate="paginate" />
     <b-alert v-if="hasSearchCritera && catalogView.length === 0" variant="warning" class="mt-2" show>{{ $t('catalogs.noMatches') }}</b-alert>
     <section class="list">
       <Loading v-if="loading" fill top />
@@ -29,7 +29,7 @@
         </Catalog>
       </div>
     </section>
-    <Pagination v-if="showPagination" :pagination="pagination" @paginate="paginate" />
+    <Pagination v-if="showPagination" class="mb-3" :pagination="pagination" @paginate="paginate" />
     <b-button v-else-if="hasMore" @click="loadMore" variant="primary" v-b-visible.300="loadMore">{{ $t('catalogs.loadMore') }}</b-button>
   </section>
 </template>
@@ -38,7 +38,8 @@
 import { mapGetters, mapState } from 'vuex';
 import Catalog from './Catalog.vue';
 import Loading from './Loading.vue';
-import STAC from '../models/stac';
+import { getDisplayTitle } from '../models/stac';
+import { STAC } from 'stac-js';
 import ViewMixin from './ViewMixin';
 import Utils from '../utils';
 
@@ -71,6 +72,10 @@ export default {
     hasMore: {
       type: Boolean,
       default: false
+    },
+    apiFilters: {
+      type: Object,
+      default: () => ({})
     },
     pagination: {
       type: Object,
@@ -158,9 +163,9 @@ export default {
         });
       }
       // Sort
-      if (!this.hasMore && this.sort !== 0) {
+      if (!this.hasMore && !this.apiFilters.sortby && this.sort !== 0) {
         const collator = new Intl.Collator(this.uiLanguage);
-        catalogs = catalogs.slice(0).sort((a,b) => collator.compare(STAC.getDisplayTitle(a), STAC.getDisplayTitle(b)));
+        catalogs = catalogs.slice(0).sort((a,b) => collator.compare(getDisplayTitle(a), getDisplayTitle(b)));
         if (this.sort === -1) {
           catalogs = catalogs.reverse();
         }
@@ -212,6 +217,7 @@ export default {
 <style lang="scss" scoped>
 .catalog-filter {
   display: flex;
+  flex-wrap: wrap;
   margin-top: 0.25rem;
   margin-bottom: 0.25rem;
   gap: 1rem;
@@ -219,8 +225,8 @@ export default {
 
   > * {
     flex-grow: 1;
+    flex-basis: 300px;
     min-width: 300px;
-    width: 50%;
   }
 }
 </style>

@@ -36,7 +36,7 @@ export default {
       immediate: true,
       handler(newLink) {
         if (Utils.isObject(newLink)) {
-          this.$store.dispatch("load", { url: newLink.href });
+          this.$store.dispatch("load", { url: newLink.href, omitApi: true });
         }
       }
     }

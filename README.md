@@ -8,35 +8,39 @@ implemented as a single page application (SPA) for ease of development and to
 limit the overall number of catalog reads necessary when browsing (as catalogs
 may be nested and do not necessarily contain references to their parents).
 
-Version: **3.2.0** (supports all STAC versions between 0.6.0 and 1.1.0)
+Version: **3.3.5** (supports all STAC versions between 0.6.0 and 1.1.0)
 
 This package has also been published to npm as [`@radiantearth/stac-browser`](https://www.npmjs.com/package/@radiantearth/stac-browser).
 
 It's not officially supported, but you may also be able to use it for
 certain _OGC API - Records_ and _OGC API - Features_ compliant servers.
 
-**Please note that STAC Browser is currently without funding for both maintenance, bug fixes and improvements. This means issues and PRs may be addressed very slowly.
+**Please note that STAC Browser is currently with limited funding for both maintenance, bug fixes and improvements. This means issues and PRs may be addressed very slowly.
 If you care about STAC Browser and have some funds to support the future of STAC Browser, please contact matthias@mohr.ws**
 
 **Table of Contents:**
 
-- [Examples](#examples)
-- [Get Started](#get-started)
-  - [Private query parameters](#private-query-parameters)
-  - [Migrate from old versions](#migrate-from-old-versions)
-- [Customize](#customize)
-  - [Options](#options)
-  - [Languages](#languages)
-  - [Themes](#themes)
-  - [Basemaps](#basemaps)
-  - [Actions](#actions)
-  - [Additional metadata fields](#additional-metadata-fields)
-  - [Customize through root catalog](#customize-through-root-catalog)
-  - [Custom extensions](#custom-extensions)
-- [Docker](#docker)
-- [Contributing](#contributing)
-  - [Adding a new language](#adding-a-new-language)
-- [Sponsors](#sponsors)
+- [STAC Browser](#stac-browser)
+  - [Examples](#examples)
+  - [Get Started](#get-started)
+    - [Private query parameters](#private-query-parameters)
+    - [Migrate from old versions](#migrate-from-old-versions)
+  - [Customize](#customize)
+    - [Options](#options)
+    - [Languages](#languages)
+      - [Custom phrases](#custom-phrases)
+    - [Themes](#themes)
+    - [Basemaps](#basemaps)
+    - [Actions](#actions)
+    - [Additional metadata fields](#additional-metadata-fields)
+      - [Example](#example)
+      - [Translation](#translation)
+    - [Customize through root catalog](#customize-through-root-catalog)
+    - [Custom extensions](#custom-extensions)
+  - [Docker](#docker)
+  - [Contributing](#contributing)
+    - [Adding a new language](#adding-a-new-language)
+  - [Sponsors](#sponsors)
 
 ## Examples
 
@@ -73,6 +77,9 @@ npm run build -- --catalogUrl="https://earth-search.aws.element84.com/v1/"
 
 This will only work on the root path of your domain though. If you'd like to publish in a sub-folder,
 you can use the [`pathPrefix`](docs/options.md#pathprefix) option.
+
+> [!NOTE]  
+> If you are using a recent version of node/npm on Windows, you may need to use `npm run build -- -- ...` instead of `npm run build -- ...`, see <https://github.com/npm/cli/issues/7375> for details.
 
 After building, `dist/` will contain all assets necessary
 host the browser. These can be manually copied to your web host of choice.
@@ -116,18 +123,30 @@ You need to change the [`locale`](docs/options.md#locale) and [`supportedLocales
 
 The following languages are currently supported:
 
-- German (Germany, Switzerland)
-- Spanish
-- English (International, US, UK)
-- French (Canada, France, Switzerland)
-- Italian (Italy, Switzerland)
-- Romanian
-- Japanese
-- Portuguese (Brazil, Portugal)
+- Arabic `ar`
+- German `de` (Germany `de`, Switzerland `de-CH`)
+- Spanish `es`
+- English `en` (International `en`, US `en-US`, UK `en-GB`)
+- French `fr` (Canada `fr-CA`, France `fr`, Switzerland `fr-CH`)
+- Italian `it` (Italy `it`, Switzerland `it-CH`)
+- Romanian `ro`
+- Japanese `ja`
+- Portuguese `pt` (Brazil `pt-BR`, Portugal `pt`)
 
 We manage the translations in Crowdin, please see <https://crowdin.com/project/stac-browser/> for details.
 
 To add your own language, please follow the guide below: [Adding a new language](#adding-a-new-language)
+
+The following contributors kindly provide the translations:
+
+- [@jfbourgon](https://github.com/jfbourgon): `fr`, `fr-CA`
+- [@mneagul](https://github.com/mneagul): `ro`
+- [@m-mohr](https://github.com/m-mohr): `de`, `en`, `en-GB`, `en-US`
+- [@p1d1d1](https://github.com/p1d1d1): `de-CH`, `fr-CH`, `it`, `it-CH`
+- [@psacra](https://github.com/psacra): `pt`
+- [@randa-11295](https://github.com/randa-11295): `ar`
+- [@rnanclares](https://github.com/rnanclares): `es`
+- [@uba](https://github.com/uba): `pt-BR`
 
 #### Custom phrases
 
@@ -161,15 +180,15 @@ If you need even more flexibility, you need to dig into the Vue files and their 
 
 ### Basemaps
 
-The file `basemaps.config.js` contains the configuration for the basemaps.
-You can update either just the `BASEMAPS` object or you can write a custom function `configureBasemap` that returns the desired options for [vue2-leaflet](https://vue2-leaflet.netlify.app/).
-[XYZ](https://vue2-leaflet.netlify.app/components/LTileLayer.html#props) and [WMS](https://vue2-leaflet.netlify.app/components/LWMSTileLayer.html#props) basemaps are supported and have different options that you can set.
+STAC Browser supports various types of basemaps and projections.
+
+More information about how to configure and customize the basemaps can be found in the **[Basemap documentation](docs/basemaps.md)**.
 
 ### Actions
 
 STAC Browser has a pluggable interface to share or open assets and links with other services, which we call "actions".
 
-More information about how to add or implement actions can be found in the **[documentation](docs/actions.md)**.
+More information about how to add or implement actions can be found in the **[Actions documentation](docs/actions.md)**.
 
 ### Additional metadata fields
 
@@ -252,64 +271,7 @@ STAC Browser supports some non-standardized extensions to the STAC specification
 
 ## Docker
 
-### Create a custom image
-
-Building the Dockerfile without changing any build options:
-
-```bash
-docker build -t stac-browser:v1 .
-```
-
-Run the container for a specific URL:
-
-```bash
-docker run -p 8080:8080 -e SB_catalogUrl="https://earth-search.aws.element84.com/v1/" stac-browser:v1
-```
-
-STAC Browser is now available at `http://localhost:8080`
-
----
-
-You can pass further options to STAC Browser to customize it to your needs.
-
-The build-only options
-[`pathPrefix`](docs/options.md#pathprefix) and [`historyMode`](docs/options.md#historymode)
-can be provided as a
-[build argument](https://docs.docker.com/engine/reference/commandline/build#set-build-time-variables---build-arg)
-when building the Dockerfile.
-
-For example:
-
-```bash
-docker build -t stac-browser:v1 --build-arg pathPrefix="/browser/" --build-arg historyMode=hash .
-```
-
-All other options, except the ones that are explicitly excluded from CLI/ENV usage,
-can be passed as environment variables when running the container.
-For example, to run the container with a pre-defined
-[`catalogUrl`](docs/options.md#catalogurl) and [`catalogTitle`](docs/options.md#catalogtitle):
-
-```bash
-docker run -p 8080:8080 -e SB_catalogUrl="https://earth-search.aws.element84.com/v1/" -e SB_catalogTitle="Earth Search" stac-browser:v1
-```
-
-If you want to pass all the other arguments to `npm run build` directly, you can modify to the Dockerfile as needed.
-
-STAC browser is now available at `http://localhost:8080/browser`
-
-### Use an existing image
-
-Since version 3.1.1, you can add an existing image from [Packages](https://github.com/radiantearth/stac-browser/pkgs/container/stac-browser) to your docker-compose.yml:
-
-```
-services:
-  stac-browser:
-    image: ghcr.io/radiantearth/stac-browser:latest
-    ports:
-      - 8080:8080
-    environment:
-      SB_catalogUrl: "https://localhost:7188"
-```
+You can use the Docker to work with STAC Browser. Please read [Docker documentation](docs/docker.md) for more details.
 
 ## Contributing
 
@@ -356,8 +318,10 @@ You can also use one of the existing languages and provide an alternate version 
 The following sponsors have provided a substantial amount of funding for STAC Browser in the past:
 
 - [Radiant Earth](https://radiant.earth) (base funding for versions 1, 2 and 3)
+- [swisstopo](https://www.swisstopo.admin.ch/) (maintenance, base funding for version 3 and 4)
 - [National Resources Canada](https://natural-resources.canada.ca/home) (multi-language support, maintenance)
-- [Matthias Mohr - Softwareentwicklung](https://mohr.ws) (maintenance)
-- [Spacebel](https://spacebel.com) (collection search)
-- [Planet](https://planet.com) (OpenID Connect authentication, other features, maintenance)
-- [CloudFerro](https://cloudferro.com) (authentication, Alternate Asset and Storage extensions)
+- [moreGeo GmbH](https://moregeo.it) (maintenance)
+- [Spacebel](https://spacebel.com) (collection search, mapping)
+- [Planet](https://planet.com) (authentication, maintenance)
+- [CloudFerro](https://cloudferro.com) (authentication, alternate asset and storage extension)
+- [Geobeyond](http://www.geobeyond.it/) (mapping)

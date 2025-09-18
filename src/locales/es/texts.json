@@ -11,10 +11,6 @@
     "alternate": {
       "main": "Preferido"
     },
-    "copyGdalVfsUrl": {
-      "generic": "Copiar la URL del VFS de GDAL",
-      "withSource": "Copiar la URL del VFS de GDAL para {source}"
-    },
     "copyUrl": {
       "generic": "Copiar la URL",
       "withSource": "Copiar la URL para {source}"
@@ -117,7 +113,9 @@
   "featureExperimental": "¡Esta funcionalidad es experimental y puede producir resultados inesperados!",
   "fullscreen": {
     "exit": "Salir de pantalla completa",
-    "show": "Ver en pantalla completa"
+    "exitLabel": "✕",
+    "show": "Ver en pantalla completa",
+    "showLabel": "⛶"
   },
   "goBack": {
     "description": "Volver al {type}",
@@ -151,12 +149,17 @@
     "noneAvailableForCollection": "No hay elementos disponibles para esta colección.",
     "showFilter": "Mostrar Filtros"
   },
-  "leaflet": {
-    "close": "Cerrar",
-    "noFeatureProperties": "No hay datos adicionales disponibles para este objeto.",
-    "stayLayer": {
-      "error": "Perdón, la carga de datos en el mapa falló."
+  "loading": "Cargando...",
+  "map": "Mapa",
+  "mapping": {
+    "attribution": {
+      "label": "i",
+      "collapseLabel": "✕"
     },
+    "bboxSelect": {},
+    "close": "Cerrar",
+    "layers": {},
+    "location": {},
     "zoom": {
       "in": {
         "description": "Acercar el zoom",
@@ -164,12 +167,10 @@
       },
       "out": {
         "description": "Alejar el zoom",
-        "label": "-"
+        "label": "–"
       }
     }
   },
-  "loading": "Cargando...",
-  "map": "Mapa",
   "messageForSchemaError": "{message}, para el esquema {schemaPath}",
   "metadata": {
     "general": "General",
@@ -257,11 +258,6 @@
     "placeholder": "Búsqueda...",
     "selectCollections": "Seleccione una o varias colecciones...",
     "selectForItemSearch": "Seleccionar para Búsqueda de Elementos",
-    "sortOptions": {
-      "datetime": "Fecha y hora",
-      "id": "ID",
-      "title": "Título"
-    },
     "spatialExtent": "Extensión espacial",
     "tabs": {
       "collections": "Buscar colecciones",
@@ -302,12 +298,14 @@
     },
     "locatedAt": "El archivo de metadatos STAC se encuentra en:",
     "share": {
+      "bsky": "Bluesky",
       "email": "E-mail",
       "label": "Compartir",
+      "mastodon": "Mastodon.social",
       "message": "{title} está disponible en {url}",
       "sharePageWithOthers": "Comparta la URL de está página donde guste:",
       "title": "Compartir",
-      "twitter": "Twitter",
+      "x": "X (Twitter)",
       "withOthers": "Comparta esta página con otros"
     },
     "stacExtension": "Extensión STAC",

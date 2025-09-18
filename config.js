@@ -1,6 +1,7 @@
 module.exports = {
     catalogUrl: null,
     catalogTitle: "STAC Browser",
+    catalogImage: null,
     allowExternalAccess: true, // Must be true if catalogUrl is not given
     allowedDomains: [],
     detectLocaleFromBrowser: true,
@@ -9,6 +10,7 @@ module.exports = {
     fallbackLocale: "en",
     supportedLocales: [
         "de",
+        "ar",
 //      "de-CH",
         "es",
         "en",
@@ -23,12 +25,15 @@ module.exports = {
         "ja",
         "pt",
 //      "pt-BR"
+        "id"
     ],
     apiCatalogPriority: null,
-    useTileLayerAsFallback: true,
+    useTileLayerAsFallback: false,
     displayGeoTiffByDefault: false,
-    buildTileUrlTemplate: ({href, asset}) => "https://tiles.rdnt.io/tiles/{z}/{x}/{y}@2x?url=" + encodeURIComponent(asset.href.startsWith("/vsi") ? asset.href : href),
-    stacProxyUrl: null,
+    displayPreview: true,
+    displayOverview: true,
+    buildTileUrlTemplate: null,
+    getMapSourceOptions: null,
     pathPrefix: "/",
     historyMode: "history",
     cardViewMode: "cards",
@@ -36,14 +41,16 @@ module.exports = {
     showKeywordsInItemCards: false,
     showKeywordsInCatalogCards: false,
     showThumbnailsAsAssets: false,
-    geoTiffResolution: 128,
-    redirectLegacyUrls: false,
-    itemsPerPage: 12,
+    searchResultsPerPage: null,
+    itemsPerPage: null,
+    collectionsPerPage: null,
+    maxEntriesPerPage: 1000,
     defaultThumbnailSize: null,
-    maxPreviewsOnMap: 50,
     crossOriginMedia: null,
     requestHeaders: {},
     requestQueryParameters: {},
+    socialSharing: ['email', 'bsky', 'mastodon', 'x'],
     preprocessSTAC: null,
-    authConfig: null
+    authConfig: null,
+    crs: {}
 };

@@ -131,23 +131,14 @@ export default class Utils {
            fullStr.substr(fullStr.length - backChars);
   }
 
-  static isGdalVfsUri(url) {
-    return typeof url === 'string' && url.startsWith('/vsi') && !url.startsWith('/vsicurl/');
-  }
-
   static toAbsolute(href, baseUrl, stringify = true) {
     return Utils.normalizeUri(href, baseUrl, false, stringify);
   }
 
   static normalizeUri(href, baseUrl = null, noParams = false, stringify = true) {
-    // Convert vsicurl URLs to normal URLs
-    if (typeof href === 'string' && href.startsWith('/vsicurl/')) {
-      href = href.replace(/^\/vsicurl\//, '');
-    }
     // Parse URL and make absolute, if required
     let uri = URI(href);
-    // Don't convert GDAL VFS URIs: https://github.com/radiantearth/stac-browser/issues/116
-    if (baseUrl && uri.is("relative") && !Utils.isGdalVfsUri(href)) {
+    if (baseUrl && uri.is("relative")) {
       uri = uri.absoluteTo(baseUrl);
     }
     uri.normalize();
@@ -217,34 +208,32 @@ export default class Utils {
   // Convert from UTC to locale time (needed for vue2-datetimepicker)
   // see https://github.com/mengxiong10/vue2-datepicker/issues/388
   static dateFromUTC(dt) {
-    if (dt instanceof Date) {
+    if (dt) {
       const value = new Date(dt);
-      const offset = value.getTimezoneOffset();
-      dt = new Date(value.getTime() + offset * 60 * 1000);
+      dt = new Date(value.getTime() + value.getTimezoneOffset() * 60 * 1000);
     }
     return dt;
   }
 
   static dateToUTC(dt) {
     if (dt instanceof Date) {
-      const offset = new Date().getTimezoneOffset();
-      return new Date(dt.getTime() - offset * 60 * 1000);
+      dt = new Date(dt.getTime() - dt.getTimezoneOffset() * 60 * 1000);
     }
     return dt;
   }
 
   static formatDatetimeQuery(value) {
-    return value.map(dt => {
-      if (dt instanceof Date) {
-        return dt.toISOString();
-      }
-      else if (dt) {
-        return dt;
-      }
-      else {
-        return '..';
-      }
-    }).join('/');
+    if (Array.isArray(value) && value.length === 2 && (value[0] || value[1])) {
+      return value.map(dt => {
+        if (dt instanceof Date) {
+          return dt.toISOString();
+        }
+        else {
+          return dt || '..';
+        }
+      }).join('/');
+    }
+    return null;
   }
 
   static formatSortbyForPOST(value) {
@@ -282,7 +271,7 @@ export default class Utils {
     return pages;
   }
 
-  static addFiltersToLink(link, filters = {}, itemsPerPage = null) {
+  static addFiltersToLink(link, filters = {}, defaultLimit = null) {
     let isEmpty = value => {
       return (value === null
       || (typeof value === 'number' && !Number.isFinite(value))
@@ -297,8 +286,8 @@ export default class Utils {
       filters = Object.assign({}, filters);
     }
 
-    if (typeof filters.limit !== 'number' && typeof itemsPerPage === 'number') {
-      filters.limit = itemsPerPage;
+    if (typeof filters.limit !== 'number' && typeof defaultLimit === 'number') {
+      filters.limit = defaultLimit;
     }
 
     if (Utils.hasText(link.method) && link.method.toUpperCase() === 'POST') {
@@ -316,6 +305,9 @@ export default class Utils {
         }
         else if (key === 'datetime') {
           value = Utils.formatDatetimeQuery(value);
+          if (!value) {
+            continue; // skip empty datetime
+          }
         }
         else if (key === 'filters') {
           Object.assign(body, value.toJSON());
@@ -455,16 +447,8 @@ export default class Utils {
     return searchterm[fn](term => target.includes(term));
   }
 
-  static createLink(href, rel) {
-    return { href, rel };
-  }
-
-  static supportsExtension(data, pattern) {
-    if (!Utils.isObject(data) || !Array.isArray(data['stac_extensions'])) {
-      return false;
-    }
-    let regexp = new RegExp('^' + pattern.replaceAll('*', '[^/]+') + '$');
-    return Boolean(data['stac_extensions'].find(uri => regexp.test(uri)));
+  static createLink(href, rel, title) {
+    return { href, rel, title };
   }
 
   /**

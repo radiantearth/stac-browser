@@ -23,10 +23,11 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
+import FileFormatsMixin from './FileFormatsMixin';
 import StacFieldsMixin from './StacFieldsMixin';
 import ThumbnailCardMixin from './ThumbnailCardMixin';
 import StacLink from './StacLink.vue';
-import STAC from '../models/stac';
+import { STAC } from 'stac-js';
 import { formatMediaType, formatTemporalExtent } from '@radiantearth/stac-fields/formatters';
 import Utils from '../utils';
 
@@ -41,6 +42,7 @@ export default {
     formatMediaType: value => formatMediaType(value, null, {shorten: true})
   },
   mixins: [
+    FileFormatsMixin,
     ThumbnailCardMixin,
     StacFieldsMixin({ formatTemporalExtent })
   ],
@@ -93,12 +95,6 @@ export default {
         }
       }
       return null;
-    },
-    fileFormats() {
-      if (this.data) {
-        return this.data.getFileFormats();
-      }
-      return [];
     },
     keywords() {
       if (this.data) {

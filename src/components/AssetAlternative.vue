@@ -5,7 +5,7 @@
     <b-card-text class="mt-4" v-if="asset.description">
       <Description :description="asset.description" compact />
     </b-card-text>
-    <Metadata class="mt-4" :data="asset" :context="context" :ignoreFields="ignore" title="" type="Asset" />
+    <Metadata class="mt-4" :data="resolvedAsset" :context="context" :ignoreFields="ignore" title="" type="Asset" />
   </component>
 </template>
 
@@ -16,9 +16,11 @@ import Description from './Description.vue';
 import HrefActions from './HrefActions.vue';
 import StacFieldsMixin from './StacFieldsMixin';
 import AuthUtils from './auth/utils';
+import Utils from '../utils';
+import { Asset, STAC } from 'stac-js';
 
 export default {
-  name: 'Asset',
+  name: 'AssetAlternative',
   components: {
     Description,
     HrefActions,
@@ -31,10 +33,6 @@ export default {
     asset: {
       type: Object,
       required: true
-    },
-    context: {
-      type: Object,
-      default: null
     },
     hasAlternatives: {
       type: Boolean,
@@ -61,16 +59,29 @@ export default {
         'table:storage_options',
         'xarray:open_kwargs',
         'xarray:storage_options',
-        // Special handling for auth
+        // Special handling for auth and storage
         'auth:refs',
+        'storage:refs',
         // Alternative Assets are displayed separately
         'alternate',
-        'name'
+        'alternate:name',
       ]
     };
   },
   computed: {
     ...mapState(['buildTileUrlTemplate', 'useTileLayerAsFallback']),
+    context() {
+      return this.asset.getContext();
+    },
+    resolvedAsset() {
+      if (Array.isArray(this.asset['storage:refs'])) {
+        const storage = this.resolveStorage(this.asset, this.context);
+        const asset = new Asset(this.asset, this.asset.getKey(), this.context);
+        asset['storage:schemes'] = storage;
+        return asset;
+      }
+      return this.asset;
+    },
     component() {
       return this.hasAlternatives ? 'div' : 'b-card-body';
     },
@@ -93,6 +104,22 @@ export default {
     }
   },
   methods: {
+    resolveStorage(obj, context) {
+      if (context instanceof STAC && Utils.size(obj['storage:refs']) > 0) {
+        const scheme = context.getMetadata('storage:schemes');
+        if (Utils.size(scheme) > 0) {
+          const schemes = {};
+          for (const key in scheme) {
+            const value = scheme[key];
+            if (Utils.isObject(value)) {
+              schemes[key] = value;
+            }
+          }
+          return schemes;
+        }
+      }
+      return [];
+    },
     show() {
       this.$emit('show', ...arguments);
     }

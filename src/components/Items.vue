@@ -6,9 +6,12 @@
       <SortButtons v-if="!api && items.length > 1" v-model="sort" />
     </header>
 
-    <Pagination ref="topPagination" v-if="showPagination" :pagination="pagination" placement="top" @paginate="paginate" />
+    <Pagination
+      v-if="showPagination" ref="topPagination" class="mb-3" :class="{'mr-3': allowFilter}"
+      :pagination="pagination" placement="top" @paginate="paginate"
+    />
     <template v-if="allowFilter">
-      <b-button v-if="api" v-b-toggle.itemFilter class="mb-4 mt-2" :class="{'ml-3': showPagination}" :variant="hasFilters && !filtersOpen ? 'primary' : 'outline-primary'">
+      <b-button v-if="api" class="mb-3" v-b-toggle.itemFilter :variant="hasFilters && !filtersOpen ? 'primary' : 'outline-primary'">
         <b-icon-search />
         {{ filtersOpen ? $t('items.hideFilter') : $t('items.showFilter') }}
         <b-badge v-if="hasFilters && !filtersOpen" variant="dark">{{ filterCount }}</b-badge>
@@ -33,7 +36,7 @@
       </b-alert>
     </section>
 
-    <Pagination v-if="showPagination" :pagination="pagination" @paginate="paginate" />
+    <Pagination v-if="showPagination" class="mb-3" :pagination="pagination" @paginate="paginate" />
     <b-button v-else-if="hasMore" @click="showMore" variant="primary" v-b-visible.300="showMore">{{ $t('showMore') }}</b-button>
   </section>
 </template>
@@ -44,7 +47,7 @@ import Loading from './Loading.vue';
 import Pagination from './Pagination.vue';
 import { BCollapse, BIconSearch } from "bootstrap-vue";
 import Utils from '../utils';
-import STAC from '../models/stac';
+import { getDisplayTitle } from '../models/stac';
 import { mapState } from 'vuex';
 
 export default {
@@ -129,9 +132,9 @@ export default {
     },
     chunkedItems() {
       let items = this.items;
-      if (this.sort !== 0) {
+      if (!this.apiFilters.sortby && this.sort !== 0) {
         const collator = new Intl.Collator(this.uiLanguage);
-        items = items.slice(0).sort((a,b) => collator.compare(STAC.getDisplayTitle(a), STAC.getDisplayTitle(b)));
+        items = items.slice(0).sort((a,b) => collator.compare(getDisplayTitle(a), getDisplayTitle(b)));
         if (this.sort === -1) {
           items = items.reverse();
         }

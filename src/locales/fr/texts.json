@@ -11,10 +11,6 @@
     "alternate": {
       "main": "Préféré"
     },
-    "copyGdalVfsUrl": {
-      "generic": "Copier le lien du GDAL VFS",
-      "withSource": "Copier le lien du GDAL VFS de {source}"
-    },
     "copyUrl": {
       "generic": "Copier le  lien",
       "withSource": "Copier le  lien de {source}"
@@ -117,7 +113,9 @@
   "featureExperimental": "Cette fonctionnalité est encore expérimentale et peut donner des résultats inattendus!",
   "fullscreen": {
     "exit": "Quitter le mode plein écran",
-    "show": "Voir en plein écran"
+    "exitLabel": "✕",
+    "show": "Voir en plein écran",
+    "showLabel": "⛶"
   },
   "goBack": {
     "description": "Revenir au {type}",
@@ -151,12 +149,31 @@
     "noneAvailableForCollection": "Aucun item disponible pour cette collection.",
     "showFilter": "Afficher les filtres"
   },
-  "leaflet": {
-    "close": "Fermer",
-    "noFeatureProperties": "Aucune donnée supplémentaire n'est disponible pour cette fonctionnalité.",
-    "stayLayer": {
-      "error": "Désolé, l'ajout des données à la carte a échoué."
+  "loading": "Chargement...",
+  "map": "Carte",
+  "mapping": {
+    "attribution": {
+      "label": "i",
+      "description": "Attributions",
+      "collapseLabel": "✕"
     },
+    "bboxSelect": {
+      "add": "Cliquez sur la carte pour ajouter une boîte englobante.",
+      "remove": "Cliquez à l'intérieur de la boîte englobante pour la supprimer."
+    },
+    "close": "Fermer",
+    "fit": "Adapter à l'étendue",
+    "layers": {
+      "title": "Couches",
+      "base": "Couches de base",
+      "unnamed": "#{id} non nommé",
+      "footprint": "Empreinte"
+    },
+    "location": {
+      "description": "Aller à votre position"
+    },
+    "nobasemap": "Aucune carte de base disponible.",
+    "nodata": "Aucune information spatiale disponible dans les métadonnées.",
     "zoom": {
       "in": {
         "description": "Zoom avant",
@@ -164,12 +181,10 @@
       },
       "out": {
         "description": "Zoom arrière",
-        "label": "-"
+        "label": "–"
       }
     }
   },
-  "loading": "Chargement...",
-  "map": "Carte",
   "messageForSchemaError": "{message}, pour le schéma {schemaPath}",
   "metadata": {
     "general": "Général",
@@ -257,11 +272,6 @@
     "placeholder": "Rechercher...",
     "selectCollections": "Sélectionnez une ou plusieurs collections...",
     "selectForItemSearch": "Sélectionner pour la recherche d'élément",
-    "sortOptions": {
-      "datetime": "Date et heure",
-      "id": "Identifiant",
-      "title": "Titre"
-    },
     "spatialExtent": "Étendue spatiale",
     "tabs": {
       "collections": "Rechercher des collections",
@@ -302,12 +312,14 @@
     },
     "locatedAt": "Le fichier de métadonnées STAC se trouve à l'adresse suivante :",
     "share": {
+      "bsky": "Bluesky",
       "email": "Courriel",
       "label": "Partager",
+      "mastodon": "Mastodon.social",
       "message": "{title} est disponible à l'adresse {url}",
       "sharePageWithOthers": "Partagez l'URL de cette page:",
       "title": "Partager",
-      "twitter": "Twitter",
+      "x": "X (Twitter)",
       "withOthers": "Partagez cette page"
     },
     "stacExtension": "Extension du STAC",
