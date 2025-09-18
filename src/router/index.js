@@ -24,8 +24,11 @@ function getRoutes(config) {
       name: "search",
       component: () => import("../views/Search.vue"),
       props: route => {
+        let pathMatch = route.params.pathMatch;
+        // pathMatch can be an array so convert to string properly
+        let path = Array.isArray(pathMatch) ? pathMatch.join('/') : pathMatch;
         return {
-          loadParent: `/external/${route.params.pathMatch}`
+          loadParent: `/external/${path}`
         };
       }
     });

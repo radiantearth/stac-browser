@@ -8,11 +8,14 @@
 
         <b-form-group v-if="canFilterFreeText" class="filter-freetext" :label="$t('search.freeText')" :label-for="ids.q" :description="$t('search.freeTextDescription')">
           <multiselect
-            :id="ids.q" :value="query.q" @input="setSearchTerms"
-            multiple taggable :options="query.ids"
+            :id="ids.q"
+            v-model="query.q"
+            :multiple="true"
+            :taggable="true"
+            :options="query.q"
             :placeholder="$t('search.enterSearchTerms')"
-            :tagPlaceholder="$t('search.addSearchTerm')"
-            :noOptions="$t('search.addSearchTerm')"
+            :tag-placeholder="$t('search.addSearchTerm')"
+            :no-options="$t('search.addSearchTerm')"
             @tag="addSearchTerm"
           >
             <template #noOptions>{{ $t('search.noOptions') }}</template>
@@ -33,8 +36,22 @@
 
         <b-form-group v-if="conformances.CollectionIdFilter" class="filter-collection" :label="$tc('stacCollection', collections.length)" :label-for="ids.collections">
           <multiselect
-            v-bind="collectionSelectOptions"
-            @input="setCollections"
+            :id="ids.collections"
+            v-model="selectedCollections"
+            :options="collections"
+            :multiple="true"
+            :taggable="!hasAllCollections"
+            track-by="value"
+            label="text"
+            :placeholder="!hasAllCollections ? $t('search.enterCollections') : $t('search.selectCollections')"
+            :tag-placeholder="$t('search.addCollections')"
+            :select-label="$t('multiselect.selectLabel')"
+            :selected-label="$t('multiselect.selectedLabel')"
+            :deselect-label="$t('multiselect.deselectLabel')"
+            :limit-text="count => $t('multiselect.andMore', {count})"
+            :loading="collectionsLoadingTimer !== null"
+            :show-no-results="false"
+            :internal-search="collections.length === 0 || !hasAllCollections"
             @tag="addCollection"
             @search-change="searchCollections"
           >
@@ -51,11 +68,14 @@
 
         <b-form-group v-if="conformances.ItemIdFilter" class="filter-item-id" :label="$t('search.itemIds')" :label-for="ids.ids">
           <multiselect
-            :id="ids.ids" :value="query.ids" @input="setIds"
-            multiple taggable :options="query.ids"
+            :id="ids.ids"
+            v-model="query.ids"
+            :multiple="true"
+            :taggable="true"
+            :options="query.ids"
             :placeholder="$t('search.enterItemIds')"
-            :tagPlaceholder="$t('search.addItemIds')"
-            :noOptions="$t('search.addItemIds')"
+            :tag-placeholder="$t('search.addItemIds')"
+            :no-options="$t('search.addItemIds')"
             @tag="addId"
           >
             <template #noOptions>{{ $t('search.noOptions') }}</template>
@@ -89,12 +109,15 @@
 
         <b-form-group v-if="canSort" class="sort" :label="$t('sort.title')" :label-for="ids.sort" :description="$t('search.notFullySupported')">
           <multiselect
-            :id="ids.sort" :value="sortTerm" @input="sortFieldSet"
-            :options="sortOptions" track-by="value" label="text"
+            :id="ids.sort"
+            v-model="sortTerm"
+            :options="sortOptions"
+            track-by="value"
+            label="text"
             :placeholder="$t('default')"
-            :selectLabel="$t('multiselect.selectLabel')"
-            :selectedLabel="$t('multiselect.selectedLabel')"
-            :deselectLabel="$t('multiselect.deselectLabel')"
+            :select-label="$t('multiselect.selectLabel')"
+            :selected-label="$t('multiselect.selectedLabel')"
+            :deselect-label="$t('multiselect.deselectLabel')"
           >
             <template #option="{option}">
               <span class="d-flex justify-content-between align-items-center">
@@ -225,28 +248,6 @@ export default {
   computed: {
     ...mapState(['searchResultsPerPage', 'maxEntriesPerPage', 'uiLanguage']),
     ...mapGetters(['canSearchCollections', 'supportsConformance']),
-    collectionSelectOptions() {
-      let taggable = !this.hasAllCollections;
-      let isResult = this.collections.length > 0 && !this.hasAllCollections;
-      return {
-        id: this.ids.collections,
-        value: this.selectedCollections,
-        multiple: true,
-        taggable,
-        options: this.collections, // query.collections
-        trackBy: "value",
-        label: "text",
-        placeholder: taggable ? this.$t('search.enterCollections') : this.$t('search.selectCollections'),
-        tagPlaceholder: this.$t('search.addCollections'),
-        selectLabel: this.$t('multiselect.selectLabel'),
-        selectedLabel: this.$t('multiselect.selectedLabel'),
-        deselectLabel: this.$t('multiselect.deselectLabel'),
-        limitText: count => this.$t("multiselect.andMore", {count}),
-        loading: this.collectionsLoadingTimer !== null,
-        showNoResults: false,
-        internalSearch: !isResult
-      };
-    },
     collectionSearchLink() {
       return this.parent instanceof CatalogLike && this.parent.getApiCollectionsLink();
     },
@@ -354,6 +355,12 @@ export default {
         }
       }
     },
+    selectedCollections: {
+      deep: true,
+      handler(collections) {
+        this.query.collections = collections.map(c => c.value);
+      }
+    },
     provideBBox(shown) {
       if (!shown) {
         this.query.bbox = null;
@@ -409,6 +416,7 @@ export default {
         try {
           const link = Utils.addFiltersToLink(this.collectionSearchLink, {q: [text]});
           const response = await stacRequest(this.$store, link);
+          
           // Only set collections if response is valid AND collectionsLoadingTimer has not been reset.
           // If collectionsLoadingTimer has been reset, the result is not relevant anylonger.
           if (this.collectionsLoadingTimer && Utils.isObject(response.data) && Array.isArray(response.data.collections)) {
@@ -438,6 +446,7 @@ export default {
       }
       else if (this.type === 'Global' || this.type === 'Collections') {
         let response = await stacRequest(this.$store, link);
+        
         if (!Utils.isObject(response.data)) {
           return {};
         }
@@ -541,10 +550,10 @@ export default {
     },
     onSubmit() {
       if (this.canSort && this.sortTerm && this.sortOrder) {
-        this.$set(this.query, 'sortby', this.formatSort());
+        this.query.sortby = this.formatSort();
       }
       let filters = this.buildFilter();
-      this.$set(this.query, 'filters', filters);
+      this.query.filters = filters;
       this.$emit('input', this.query, false);
     },
     async onReset() {
@@ -559,7 +568,7 @@ export default {
       else if (typeof limit !== 'number' || isNaN(limit) || limit < 1) {
         limit = null;
       }
-      this.$set(this.query, 'limit', limit);
+      this.query.limit = limit;
     },
     addSearchTerm(term) {
       if (!Utils.hasText(term)) {
@@ -568,7 +577,7 @@ export default {
       this.query.q.push(term);
     },
     setSearchTerms(terms) {
-      this.$set(this.query, 'q', terms);
+      this.query.q = terms;
     },
     addCollection(collection) {
       if (!this.collectionSelectOptions.taggable) {
@@ -582,13 +591,13 @@ export default {
     },
     setCollections(collections) {
       this.selectedCollections = collections;
-      this.$set(this.query, 'collections', collections.map(c => c.value));
+      this.query.collections = collections.map(c => c.value);
     },
     addId(id) {
       this.query.ids.push(id);
     },
     setIds(ids) {
-      this.$set(this.query, 'ids', ids);
+      this.query.ids = ids;
     },
     formatSort() {
       if (this.sortTerm && this.sortTerm.value && this.sortOrder) {
