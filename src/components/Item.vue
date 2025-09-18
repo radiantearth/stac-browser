@@ -1,25 +1,27 @@
 <template>
-  <b-card no-body class="item-card" :class="{queued: !data, deprecated: isDeprecated, description: hasDescription}" v-b-visible.400="load">
-    <b-card-img-lazy v-if="hasImage" class="thumbnail" offset="200" v-bind="thumbnail" />
-    <b-card-body>
-      <b-card-title>
-        <StacLink :data="[data, item]" class="stretched-link" />
-      </b-card-title>
-      <b-card-text v-if="fileFormats.length > 0 || hasDescription || isDeprecated" class="intro">
-        <b-badge v-if="isDeprecated" variant="warning" class="mr-1 mt-1 deprecated">{{ $t('deprecated') }}</b-badge>
-        <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="mr-1 mt-1 fileformat">{{ format | formatMediaType }}</b-badge>
-        <template v-if="hasDescription">{{ data.properties.description | summarize }}</template>
-      </b-card-text>
-      <Keywords v-if="showKeywordsInItemCards && keywords.length > 0" :keywords="keywords" variant="primary" center />
-      <b-card-text>
-        <small class="text-muted">
-          <template v-if="extent">{{ extent | formatTemporalExtent }}</template>
-          <template v-else-if="data && data.properties.datetime">{{ data.properties.datetime | formatTimestamp }}</template>
-          <template v-else>{{ $t('items.noTime') }}</template>
-        </small>
-      </b-card-text>
-    </b-card-body>
-  </b-card>
+  <div class="p-1 m-0 col-sm-6 col-md-4">
+    <b-card no-body class="item-card" :class="{queued: !data, deprecated: isDeprecated, description: hasDescription}" v-b-visible.400="load">
+      <b-card-img-lazy v-if="hasImage" class="thumbnail" offset="200" v-bind="thumbnail" />
+      <b-card-body>
+        <b-card-title>
+          <StacLink :data="[data, item]" class="stretched-link" />
+        </b-card-title>
+        <b-card-text v-if="fileFormats.length > 0 || hasDescription || isDeprecated" class="intro">
+          <b-badge v-if="isDeprecated" variant="warning" class="mr-1 mt-1 deprecated">{{ $t('deprecated') }}</b-badge>
+          <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="mr-1 mt-1 fileformat">{{ format | formatMediaType }}</b-badge>
+          <template v-if="hasDescription">{{ data.properties.description | summarize }}</template>
+        </b-card-text>
+        <Keywords v-if="showKeywordsInItemCards && keywords.length > 0" :keywords="keywords" variant="primary" center />
+        <b-card-text>
+          <small class="text-muted">
+            <template v-if="extent">{{ extent | formatTemporalExtent }}</template>
+            <template v-else-if="data && data.properties.datetime">{{ data.properties.datetime | formatTimestamp }}</template>
+            <template v-else>{{ $t('items.noTime') }}</template>
+          </small>
+        </b-card-text>
+      </b-card-body>
+    </b-card>
+  </div>
 </template>
 
 <script>
