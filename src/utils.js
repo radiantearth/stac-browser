@@ -447,16 +447,8 @@ export default class Utils {
     return searchterm[fn](term => target.includes(term));
   }
 
-  static createLink(href, rel) {
-    return { href, rel };
-  }
-
-  static supportsExtension(data, pattern) {
-    if (!Utils.isObject(data) || !Array.isArray(data['stac_extensions'])) {
-      return false;
-    }
-    let regexp = new RegExp('^' + pattern.replaceAll('*', '[^/]+') + '$');
-    return Boolean(data['stac_extensions'].find(uri => regexp.test(uri)));
+  static createLink(href, rel, title) {
+    return { href, rel, title };
   }
 
   /**

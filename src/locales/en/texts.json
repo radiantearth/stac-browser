@@ -108,6 +108,7 @@
     "noExternalAccess": "Accessing external catalogs is not allowed!",
     "notFound": "The requested resource does not exist. @:errors.contactProvider",
     "serverError": "The server encountered an issue. @:errors.contactProvider",
+    "title": "Error",
     "unauthorized": "The request lacks credentials, e.g. an API token. Please provide your credentials and try again."
   },
   "featureExperimental": "This feature is still experimental and may give unexpected results!",
@@ -134,7 +135,7 @@
   "in": "in {catalog}",
   "index": {
     "api": "API",
-    "catalog": "Catalog",
+    "catalog": "Static Catalog",
     "load": "Load",
     "selectStacIndex": "... or select one from {stacIndex}:",
     "specifyCatalog": "Please specify a STAC Catalog or API...",
