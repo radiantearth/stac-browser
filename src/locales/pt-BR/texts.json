@@ -108,6 +108,7 @@
     "noExternalAccess": "Não é permitido acessar catálogos externos!",
     "notFound": "O recurso solicitado não existe. @:errors.contactProvider",
     "serverError": "O servidor encontrou um problema. @:errors.contactProvider",
+    "title": "",
     "unauthorized": "A solicitação não possui credenciais, por exemplo, um token de API. Forneça suas credenciais e tente novamente."
   },
   "featureExperimental": "Esta funcionalidade ainda é experimental e pode dar resultados inesperados!",
@@ -134,7 +135,7 @@
   "in": "em {catalog}",
   "index": {
     "api": "API",
-    "catalog": "Catálogo",
+    "catalog": "",
     "load": "Carregar",
     "selectStacIndex": "... ou selecione um de {stacIndex}:",
     "specifyCatalog": "Especifique um catálogo STAC ou API...",
@@ -154,12 +155,26 @@
   "mapping": {
     "attribution": {
       "label": "i",
+      "description": "Créditos",
       "collapseLabel": "✕"
     },
-    "bboxSelect": {},
+    "bboxSelect": {
+      "add": "Clique no mapa para adicionar um retângulo envolvente.",
+      "remove": "Clique no retângulo envolvente para removê-lo."
+    },
     "close": "Fechar",
-    "layers": {},
-    "location": {},
+    "fit": "Ajustar à extensão",
+    "layers": {
+      "title": "Camadas",
+      "base": "Mapas de Fundo",
+      "unnamed": "Sem nome #{id}",
+      "footprint": "Footprint"
+    },
+    "location": {
+      "description": "Ir para sua localização"
+    },
+    "nobasemap": "Não há mapas de fundo disponíveis.",
+    "nodata": "Nenhuma informação espacial disponível nos metadados.",
     "zoom": {
       "in": {
         "description": "Aumentar o zoom",
