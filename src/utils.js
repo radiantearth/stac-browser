@@ -223,17 +223,17 @@ export default class Utils {
   }
 
   static formatDatetimeQuery(value) {
-    return value.map(dt => {
-      if (dt instanceof Date) {
-        return dt.toISOString();
-      }
-      else if (dt) {
-        return dt;
-      }
-      else {
-        return '..';
-      }
-    }).join('/');
+    if (Array.isArray(value) && value.length === 2 && (value[0] || value[1])) {
+      return value.map(dt => {
+        if (dt instanceof Date) {
+          return dt.toISOString();
+        }
+        else {
+          return dt || '..';
+        }
+      }).join('/');
+    }
+    return null;
   }
 
   static formatSortbyForPOST(value) {
@@ -271,7 +271,7 @@ export default class Utils {
     return pages;
   }
 
-  static addFiltersToLink(link, filters = {}, itemsPerPage = null) {
+  static addFiltersToLink(link, filters = {}, defaultLimit = null) {
     let isEmpty = value => {
       return (value === null
       || (typeof value === 'number' && !Number.isFinite(value))
@@ -286,8 +286,8 @@ export default class Utils {
       filters = Object.assign({}, filters);
     }
 
-    if (typeof filters.limit !== 'number' && typeof itemsPerPage === 'number') {
-      filters.limit = itemsPerPage;
+    if (typeof filters.limit !== 'number' && typeof defaultLimit === 'number') {
+      filters.limit = defaultLimit;
     }
 
     if (Utils.hasText(link.method) && link.method.toUpperCase() === 'POST') {
@@ -305,6 +305,9 @@ export default class Utils {
         }
         else if (key === 'datetime') {
           value = Utils.formatDatetimeQuery(value);
+          if (!value) {
+            continue; // skip empty datetime
+          }
         }
         else if (key === 'filters') {
           Object.assign(body, value.toJSON());
@@ -444,16 +447,8 @@ export default class Utils {
     return searchterm[fn](term => target.includes(term));
   }
 
-  static createLink(href, rel) {
-    return { href, rel };
-  }
-
-  static supportsExtension(data, pattern) {
-    if (!Utils.isObject(data) || !Array.isArray(data['stac_extensions'])) {
-      return false;
-    }
-    let regexp = new RegExp('^' + pattern.replaceAll('*', '[^/]+') + '$');
-    return Boolean(data['stac_extensions'].find(uri => regexp.test(uri)));
+  static createLink(href, rel, title) {
+    return { href, rel, title };
   }
 
   /**

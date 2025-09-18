@@ -3,9 +3,9 @@
     <h2 v-if="displayTitle">{{ displayTitle }}</h2>
     <div class="accordion" role="tablist">
       <Asset
-        v-for="(asset, key) in assets" :asset="asset" :expand="expand" :context="context"
-        :definition="definition" :shown="shown.includes(key)"
-        :id="key" :key="key" @show="show"
+        v-for="asset in assets" :asset="asset" :expand="expand" :context="context"
+        :definition="definition" :shown="shownKeys.includes(asset.getKey())"
+        :key="asset.getKey()" @show="show"
       />
     </div>
   </section>
@@ -13,7 +13,6 @@
 
 <script>
 import Asset from './Asset.vue';
-import Utils from '../utils';
 
 export default {
   name: 'Assets',
@@ -22,7 +21,7 @@ export default {
   },
   props: {
     assets: {
-      type: Object,
+      type: Array,
       required: true
     },
     shown: {
@@ -43,13 +42,15 @@ export default {
     }
   },
   computed: {
-    count() {
-      return Utils.size(this.assets);
+    shownKeys() {
+      return this.shown
+        .filter(asset => asset.isAsset())
+        .map(asset => asset.getKey());
     },
     displayTitle() {
       if (this.title === null) {
         let langKey = this.definition ? 'assets.inItems' : 'stacAssets';
-        return this.$tc(langKey, this.count);
+        return this.$tc(langKey, this.assets.length);
       }
       else {
         return this.title;
@@ -59,15 +60,15 @@ export default {
       if (this.definition) {
         return false; // Don't expand assets for Item Asset Definitions
       }
-      else if (this.count === 1 && this.stac && this.stac.isItem()) {
+      else if (this.assets.length === 1 && this.stac && this.stac.isItem()) {
         return true; // Expand asset if it's the only asset available and it is in an Item
       }
       return null; // Let asset decide (e.g. depending on roles)
     }
   },
   methods: {
-    show(asset, id, isThumbnail) {
-      this.$emit('showAsset', asset, id, isThumbnail);
+    show() {
+      this.$emit('showAsset', ...arguments);
     }
   }
 };

@@ -4,12 +4,13 @@
       <b-col class="meta">
         <section class="intro">
           <h2>{{ $t('description') }}</h2>
-          <DeprecationNotice v-if="data.deprecated" :data="data" />
+          <DeprecationNotice v-if="showDeprecation" :data="data" />
           <AnonymizedNotice v-if="data['anon:warning']" :warning="data['anon:warning']" />
           <ReadMore v-if="data.description" :lines="10" :text="$t('read.more')" :text-less="$t('read.less')">
             <Description :description="data.description" />
           </ReadMore>
           <Keywords v-if="Array.isArray(data.keywords) && data.keywords.length > 0" :keywords="data.keywords" class="mb-3" />
+          <CollectionLink v-if="collectionLink" :link="collectionLink" />
           <section v-if="isCollection" class="metadata mb-4">
             <b-row v-if="licenses">
               <b-col md="4" class="label">{{ $t('catalog.license') }}</b-col>
@@ -26,7 +27,7 @@
           <b-card no-body class="maps-preview">
             <b-tabs v-model="tab" ref="tabs" pills card vertical end>
               <b-tab v-if="isCollection" :title="$t('map')" no-body>
-                <Map :stac="data" :stacLayerData="mapData" @dataChanged="dataChanged" fitBoundsOnce popover />
+                <Map :stac="data" v-bind="mapData" @changed="dataChanged" @empty="handleEmptyMap" onfocusOnly popover />
               </b-tab>
               <b-tab v-if="hasThumbnails" :title="$t('thumbnails')" no-body>
                 <Thumbnails :thumbnails="thumbnails" />
@@ -34,25 +35,25 @@
             </b-tabs>
           </b-card>
         </section>
-        <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="shownAssets" @showAsset="showAsset" />
-        <Assets v-if="hasItemAssets && !hasItems" :assets="data.item_assets" :context="data" :definition="true" />
+        <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="selectedReferences" @showAsset="showAsset" />
+        <Assets v-if="hasItemAssets && !hasItems" :assets="itemAssets" :context="data" :definition="true" />
         <Providers v-if="providers" :providers="providers" />
         <Metadata class="mb-4" :type="data.type" :data="data" :ignoreFields="ignoredMetadataFields" />
-        <CollectionLink v-if="collectionLink" :link="collectionLink" />
         <Links v-if="linkPosition === 'right'" :title="$t('additionalResources')" :links="additionalLinks" :context="data" />
       </b-col>
       <b-col class="catalogs-container" v-if="hasCatalogs">
         <Catalogs :catalogs="catalogs" :hasMore="!!nextCollectionsLink" @loadMore="loadMoreCollections" />
       </b-col>
-      <b-col class="items-container" v-if="hasItems">
+      <b-col class="items-container" v-if="hasItems || hasItemAssets">
         <Items
           :stac="data" :items="items" :api="isApi"
           :showFilters="showFilters" :apiFilters="filters"
           :pagination="itemPages" :loading="apiItemsLoading"
+          :count="apiItemsNumberMatched"
           @paginate="paginateItems" @filterItems="filterItems"
           @filtersShown="filtersShown"
         />
-        <Assets v-if="hasItemAssets" :assets="data.item_assets" :context="data" :definition="true" />
+        <Assets v-if="hasItemAssets" :assets="itemAssets" :context="data" :definition="true" />
       </b-col>
     </b-row>
   </div>
@@ -64,12 +65,14 @@ import Catalogs from '../components/Catalogs.vue';
 import Description from '../components/Description.vue';
 import Items from '../components/Items.vue';
 import ReadMore from "vue-read-more-smooth";
-import ShowAssetMixin from '../components/ShowAssetMixin';
+import ShowAssetLinkMixin from '../components/ShowAssetLinkMixin';
 import StacFieldsMixin from '../components/StacFieldsMixin';
 import { formatLicense, formatTemporalExtents } from '@radiantearth/stac-fields/formatters';
 import { BTabs, BTab } from 'bootstrap-vue';
 import Utils from '../utils';
 import { addSchemaToDocument, createCatalogSchema } from '../schema-org';
+import { ItemCollection } from '../models/stac.js';
+import DeprecationMixin from '../components/DeprecationMixin.js';
 
 export default {
   name: "Catalog",
@@ -92,8 +95,9 @@ export default {
     Thumbnails: () => import('../components/Thumbnails.vue')
   },
   mixins: [
-    ShowAssetMixin,
-    StacFieldsMixin({ formatLicense, formatTemporalExtents })
+    ShowAssetLinkMixin,
+    StacFieldsMixin({ formatLicense, formatTemporalExtents }),
+    DeprecationMixin
   ],
   data() {
     return {
@@ -135,8 +139,8 @@ export default {
     };
   },
   computed: {
-    ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination', 'nextCollectionsLink', 'stateQueryParameters']),
-    ...mapGetters(['additionalLinks', 'catalogs', 'collectionLink', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
+    ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination', 'apiItemsNumberMatched', 'nextCollectionsLink', 'stateQueryParameters']),
+    ...mapGetters(['catalogs', 'collectionLink', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
     cssStacType() {
       if (Utils.hasText(this.data?.type)) {
         return this.data?.type.toLowerCase();
@@ -145,9 +149,6 @@ export default {
     },
     showFilters() {
       return Boolean(this.stateQueryParameters['itemFilterOpen']);
-    },
-    hasThumbnails() {
-      return this.thumbnails.length > 0;
     },
     linkPosition() {
       if (this.additionalLinks.length === 0) {
@@ -191,7 +192,13 @@ export default {
       return null;
     },
     hasItemAssets() {
-      return Utils.size(this.data?.item_assets) > 0;
+      return this.itemAssets.length > 0;
+    },
+    itemAssets() {
+      if (!this.data2 || !Utils.isObject(this.data2.item_assets)) {
+        return [];
+      }
+      return Object.values(this.data2.item_assets);
     },
     itemPages() {
       let pages = Object.assign({}, this.apiItemsPagination);
@@ -211,15 +218,20 @@ export default {
       return this.catalogs.length > 0;
     },
     mapData() {
-      if (this.selectedAsset) {
-        return this.selectedAsset;
+      const data = {};
+      if (this.selectedAssets.length > 0) {
+        data.assets = this.selectedAssets;
       }
       else {
-        return {
-          type: 'FeatureCollection',
-          features: this.items
-        };
+        const items = this.items.filter(item => item.type === 'Feature');
+        if (items.length > 0) {
+          data.items = new ItemCollection({
+            type: 'FeatureCollection',
+            features: items
+          });
+        }
       }
+      return data;
     }
   },
   watch: {

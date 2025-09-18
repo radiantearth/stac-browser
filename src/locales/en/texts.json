@@ -108,12 +108,15 @@
     "noExternalAccess": "Accessing external catalogs is not allowed!",
     "notFound": "The requested resource does not exist. @:errors.contactProvider",
     "serverError": "The server encountered an issue. @:errors.contactProvider",
+    "title": "Error",
     "unauthorized": "The request lacks credentials, e.g. an API token. Please provide your credentials and try again."
   },
   "featureExperimental": "This feature is still experimental and may give unexpected results!",
   "fullscreen": {
-    "exit": "Exit Fullscreen",
-    "show": "View Fullscreen"
+    "exit": "Exit fullscreen mode",
+    "exitLabel": "✕",
+    "show": "Open in fullscreen mode",
+    "showLabel": "⛶"
   },
   "goBack": {
     "description": "Go back to the {type}",
@@ -132,7 +135,7 @@
   "in": "in {catalog}",
   "index": {
     "api": "API",
-    "catalog": "Catalog",
+    "catalog": "Static Catalog",
     "load": "Load",
     "selectStacIndex": "... or select one from {stacIndex}:",
     "specifyCatalog": "Please specify a STAC Catalog or API...",
@@ -147,12 +150,31 @@
     "noneAvailableForCollection": "No items available for this collection.",
     "showFilter": "Show Filters"
   },
-  "leaflet": {
-    "close": "Close",
-    "noFeatureProperties": "No additional data available for this feature.",
-    "stayLayer": {
-      "error": "Sorry, adding the data to the map failed."
+  "loading": "Loading...",
+  "map": "Map",
+  "mapping": {
+    "attribution": {
+      "label": "i",
+      "description": "Attributions",
+      "collapseLabel": "✕"
     },
+    "bboxSelect": {
+      "add": "Click on the map to add a bounding box.",
+      "remove": "Click inside the bounding box to remove it."
+    },
+    "close": "Close",
+    "fit": "Fit to extent",
+    "layers": {
+      "title": "Layers",
+      "base": "Base Layers",
+      "unnamed": "Unnamed #{id}",
+      "footprint": "Footprint"
+    },
+    "location": {
+      "description": "Go to your location"
+    },
+    "nobasemap": "No basemaps available.",
+    "nodata": "No spatial information available in the metadata.",
     "zoom": {
       "in": {
         "description": "Zoom in",
@@ -160,12 +182,10 @@
       },
       "out": {
         "description": "Zoom out",
-        "label": "-"
+        "label": "–"
       }
     }
   },
-  "loading": "Loading...",
-  "map": "Map",
   "messageForSchemaError": "{message}, for schema {schemaPath}",
   "metadata": {
     "general": "General",
@@ -253,11 +273,6 @@
     "placeholder": "Search...",
     "selectCollections": "Select one or multiple collections...",
     "selectForItemSearch": "Select for Item Search",
-    "sortOptions": {
-      "datetime": "Date and Time",
-      "id": "ID",
-      "title": "Title"
-    },
     "spatialExtent": "Spatial Extent",
     "tabs": {
       "collections": "Search for Collections",

@@ -27,8 +27,8 @@
         </b-form-group>
 
         <b-form-group v-if="canFilterExtents" class="filter-bbox" :label="$t('search.spatialExtent')" :label-for="ids.bbox">
-          <b-form-checkbox :id="ids.bbox" v-model="provideBBox" value="1" @change="setBBox()">{{ $t('search.filterBySpatialExtent') }}</b-form-checkbox>
-          <Map class="mb-4" v-if="provideBBox" :stac="stac" selectBounds @bounds="setBBox" scrollWheelZoom />
+          <b-form-checkbox :id="ids.bbox" v-model="provideBBox" value="1">{{ $t('search.filterBySpatialExtent') }}</b-form-checkbox>
+          <MapSelect class="mb-4" v-if="provideBBox" v-model="query.bbox" :stac="stac" />
         </b-form-group>
 
         <b-form-group v-if="conformances.CollectionIdFilter" class="filter-collection" :label="$tc('stacCollection', collections.length)" :label-for="ids.collections">
@@ -67,8 +67,8 @@
 
           <b-dropdown size="sm" :text="$t('search.addFilter')" block variant="primary" class="queryables mt-2 mb-3" menu-class="w-100">
             <template v-for="queryable in sortedQueryables">
-              <b-dropdown-item v-if="queryable.supported" :key="queryable.id" @click="additionalFieldSelected(queryable)">
-                {{ queryable.title }}
+              <b-dropdown-item v-if="queryable.supported" :key="queryable.id" @click="additionalFieldSelected(queryable)" link-class="d-flex justify-content-between align-items-center">
+                <span>{{ queryable.title }}</span>
                 <b-badge variant="dark" class="ml-2">{{ queryable.id }}</b-badge>
               </b-dropdown-item>
             </template>
@@ -95,7 +95,14 @@
             :selectLabel="$t('multiselect.selectLabel')"
             :selectedLabel="$t('multiselect.selectedLabel')"
             :deselectLabel="$t('multiselect.deselectLabel')"
-          />
+          >
+            <template #option="{option}">
+              <span class="d-flex justify-content-between align-items-center">
+                <span>{{ option.text }}</span>
+                <b-badge v-if="option.value" variant="dark" class="ml-2">{{ option.value }}</b-badge>
+              </span>
+            </template>
+          </multiselect>
           <SortButtons v-if="sortTerm && sortTerm.value" class="mt-1" :value="sortOrder" enforce @input="sortDirectionSet" />
         </b-form-group>
 
@@ -103,7 +110,7 @@
           <b-form-input
             :id="ids.limit" :value="query.limit" @change="setLimit" min="1"
             :max="maxItems" type="number"
-            :placeholder="$t('defaultWithValue', {value: itemsPerPage})"
+            :placeholder="limitPlaceholder"
           />
         </b-form-group>
       </b-card-body>
@@ -128,7 +135,8 @@ import ApiCapabilitiesMixin, { TYPES } from './ApiCapabilitiesMixin';
 import DatePickerMixin from './DatePickerMixin';
 import Loading from './Loading.vue';
 
-import STAC from '../models/stac';
+import { CatalogLike, STAC } from 'stac-js';
+import { createSTAC } from '../models/stac'; 
 import Cql from '../models/cql2/cql';
 import Queryable from '../models/cql2/queryable';
 import CqlValue from '../models/cql2/value';
@@ -153,6 +161,8 @@ function getDefaults() {
     sortOrder: 1,
     sortTerm: null,
     provideBBox: false,
+    // Store previous bbox so that it survives when the map is temporarily hidden
+    bbox: null,
     query: getQueryDefaults(),
     filtersAndOr: 'and',
     filters: [],
@@ -175,7 +185,7 @@ export default {
     BFormRadioGroup,
     QueryableInput: () => import('./QueryableInput.vue'),
     Loading,
-    Map: () => import('./Map.vue'),
+    MapSelect: () => import('./maps/MapSelect.vue'),
     SortButtons: () => import('./SortButtons.vue'),
     Multiselect
   },
@@ -186,7 +196,7 @@ export default {
   props: {
     parent: {
       type: Object,
-      required: true
+      default: null
     },
     title: {
       type: String,
@@ -213,7 +223,7 @@ export default {
     }, getDefaults());
   },
   computed: {
-    ...mapState(['itemsPerPage', 'maxItemsPerPage', 'uiLanguage']),
+    ...mapState(['searchResultsPerPage', 'maxEntriesPerPage', 'uiLanguage']),
     ...mapGetters(['canSearchCollections', 'supportsConformance']),
     collectionSelectOptions() {
       let taggable = !this.hasAllCollections;
@@ -238,7 +248,7 @@ export default {
       };
     },
     collectionSearchLink() {
-      return this.parent instanceof STAC && this.parent.getApiCollectionsLink();
+      return this.parent instanceof CatalogLike && this.parent.getApiCollectionsLink();
     },
     canSearchCollectionsFreeText() {
       return this.canSearchCollections && this.supportsConformance(TYPES.Collections.FreeText);
@@ -265,12 +275,20 @@ export default {
       return this.cql && Array.isArray(this.queryables) && this.queryables.length > 0;
     },
     sortOptions() {
-      return [
-        { value: null, text: this.$t('default') },
-        { value: 'properties.datetime', text: this.$t('search.sortOptions.datetime') },
-        { value: 'id', text: this.$t('search.sortOptions.id') },
-        { value: 'properties.title', text: this.$t('search.sortOptions.title') }
+      // todo: this should use queryables when available
+      // nevertheless, let's try to provide some reasonable defaults
+      const criteria = [
+        { text: this.$t('default'), value: null },
+        { text: this.$t('Identifier'), value: 'id' },
       ];
+      const prefix = this.type === 'Collections' ? '' : 'properties.';
+      criteria.push({ text: this.$t('Title'), value: `${prefix}title` });
+      if (this.type !== 'Collections') {
+        criteria.push({ text: this.$t('Time of Data'), value: 'properties.datetime' });
+      }
+      criteria.push({ text: this.$t('Created'), value: `${prefix}created` });
+      criteria.push({ text: this.$t('Updated'), value: `${prefix}updated` });
+      return criteria;
     },
     sortedQueryables() {
       if (!Array.isArray(this.queryables)) {
@@ -280,7 +298,13 @@ export default {
       return this.queryables.slice(0).sort((a, b) => collator.compare(a.title, b.title));
     },
     maxItems() {
-      return this.maxItemsPerPage || 1000;
+      return this.maxEntriesPerPage || 1000;
+    },
+    limitPlaceholder() {
+      if (this.searchResultsPerPage > 0) {
+        return this.$t('defaultWithValue', {value: this.searchResultsPerPage});
+      }
+      return this.$t('default');
     },
     datetime: {
       get() {
@@ -318,6 +342,24 @@ export default {
             return collection ? collection : this.collectionToMultiSelect({id});
           });
         }
+      }
+    },
+    query: {
+      deep: true,
+      handler(query) {
+        if (query?.bbox) {
+          // Store the previously selected bbox so that it can be restored after the
+          // map had been hidden accidentally.
+          this.bbox = query.bbox;
+        }
+      }
+    },
+    provideBBox(shown) {
+      if (!shown) {
+        this.query.bbox = null;
+      }
+      else {
+        this.query.bbox = this.bbox;
       }
     }
   },
@@ -406,9 +448,10 @@ export default {
           data.queryableLink = this.findQueryableLink(links) || null;
         }
 
+        // todo: use ItemCollection / CollectionCollection
         if (!hasMore && Array.isArray(response.data.collections)) {
           let collections = response.data.collections
-            .map(collection => new STAC(collection));
+            .map(collection => createSTAC(collection));
           data.collections = this.prepareCollections(collections);
         }
       }
@@ -513,7 +556,7 @@ export default {
       if (limit > this.maxItems) {
         limit = this.maxItems;
       }
-      else if (typeof limit !== 'number' || isNaN(limit)|| limit < 1) {
+      else if (typeof limit !== 'number' || isNaN(limit) || limit < 1) {
         limit = null;
       }
       this.$set(this.query, 'limit', limit);
@@ -526,26 +569,6 @@ export default {
     },
     setSearchTerms(terms) {
       this.$set(this.query, 'q', terms);
-    },
-    setBBox(bounds) {
-      let bbox = null;
-      if (this.provideBBox) {
-        if (Utils.isObject(bounds) && typeof bounds.toBBoxString === 'function') {
-          // This is a Leaflet LatLngBounds Object
-          const Y = 85.06;
-          const X = 180;
-          bbox = [
-            Math.max(bounds.getWest(), -X),
-            Math.max(bounds.getSouth(), -Y),
-            Math.min(bounds.getEast(), X),
-            Math.min(bounds.getNorth(), Y)
-          ];
-        }
-        else if (Array.isArray(bounds) && bounds.length === 4) {
-          bbox = bounds;
-        }
-      }
-      this.$set(this.query, 'bbox', bbox);
     },
     addCollection(collection) {
       if (!this.collectionSelectOptions.taggable) {

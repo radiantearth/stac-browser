@@ -94,7 +94,9 @@
   "featureExperimental": "この機能はまだ実験的で、予期しない結果をもたらす可能性があります。",
   "fullscreen": {
     "exit": "全画面表示を終了",
-    "show": "全画面表示"
+    "exitLabel": "✕",
+    "show": "全画面表示",
+    "showLabel": "⛶"
   },
   "goBack": {
     "description": "{type} に戻る",
@@ -127,12 +129,14 @@
     "noneAvailableForCollection": "このコレクションに利用可能なアイテムはありません。",
     "showFilter": "フィルターを表示"
   },
-  "leaflet": {
+  "loading": "読み込み中...",
+  "map": "マップ",
+  "mapping": {
+    "attribution": {},
+    "bboxSelect": {},
     "close": "閉じる",
-    "noFeatureProperties": "この機能には追加のデータはありません。",
-    "stayLayer": {
-      "error": "マップへのデータの追加に失敗しました。"
-    },
+    "layers": {},
+    "location": {},
     "zoom": {
       "in": {
         "description": "拡大",
@@ -140,12 +144,10 @@
       },
       "out": {
         "description": "縮小",
-        "label": "-"
+        "label": "–"
       }
     }
   },
-  "loading": "読み込み中...",
-  "map": "マップ",
   "messageForSchemaError": "{message}, スキーマ {schemaPath}",
   "metadata": {
     "general": "一般",
@@ -232,11 +234,6 @@
     "placeholder": "検索...",
     "selectCollections": "1つ以上のコレクションを選択...",
     "selectForItemSearch": "アイテム検索用に選択",
-    "sortOptions": {
-      "datetime": "日付と時刻",
-      "id": "ID",
-      "title": "タイトル"
-    },
     "spatialExtent": "場所の範囲",
     "tabs": {
       "collections": "コレクションを検索",

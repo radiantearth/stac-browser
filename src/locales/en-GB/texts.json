@@ -34,8 +34,11 @@
     "specifyCatalog": "Please specify a STAC Catalogue or API..."
   },
   "items": {},
-  "leaflet": {
-    "stayLayer": {},
+  "mapping": {
+    "attribution": {},
+    "bboxSelect": {},
+    "layers": {},
+    "location": {},
     "zoom": {
       "in": {},
       "out": {}
@@ -53,7 +56,6 @@
   "read": {},
   "search": {
     "logical": {},
-    "sortOptions": {},
     "tabs": {}
   },
   "sidebar": {

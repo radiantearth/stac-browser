@@ -82,6 +82,16 @@
         "boolean"
       ]
     },
+    "displayPreview": {
+      "type": [
+        "boolean"
+      ]
+    },
+    "displayOverview": {
+      "type": [
+        "boolean"
+      ]
+    },
     "buildTileUrlTemplate": {
       "type": [
         "null"
@@ -90,26 +100,13 @@
       "noCLI": true,
       "noEnv": true
     },
-    "stacProxyUrl": {
+    "getMapSourceOptions": {
       "type": [
-        "array",
         "null"
       ],
-      "prefixItems": [
-        {
-          "type": [
-            "string"
-          ],
-          "format": "uri-reference"
-        },
-        {
-          "type": [
-            "string"
-          ],
-          "format": "uri"
-        }
-      ],
-      "items": false
+      "format": "function",
+      "noCLI": true,
+      "noEnv": true
     },
     "pathPrefix": {
       "type": [
@@ -152,24 +149,27 @@
         "boolean"
       ]
     },
-    "geoTiffResolution": {
+    "searchResultsPerPage": {
       "type": [
         "integer"
       ],
       "minimum": 1
-    },
-    "redirectLegacyUrls": {
-      "type": [
-        "boolean"
-      ]
     },
     "itemsPerPage": {
       "type": [
-        "integer"
+        "integer",
+        "null"
       ],
       "minimum": 1
     },
-    "maxItemsPerPage": {
+    "collectionsPerPage": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "maxEntriesPerPage": {
       "type": [
         "integer"
       ],
@@ -187,12 +187,6 @@
           "number"
         ]
       }
-    },
-    "maxPreviewsOnMap": {
-      "type": [
-        "integer"
-      ],
-      "minimum": 1
     },
     "crossOriginMedia": {
       "type": [
@@ -242,6 +236,11 @@
         {
           "$ref": "https://stac-extensions.github.io/authentication/v1.1.0/schema.json"
         }
+      ]
+    },
+    "crs": {
+      "type": [
+        "object"
       ]
     }
   }
