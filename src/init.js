@@ -39,8 +39,10 @@ export default function init() {
     app.use(ButtonGroupPlugin);
     app.use(ButtonPlugin);
     app.use(BadgePlugin);
+    app.use(VBVisible);
     app.use(CardPlugin);
     app.use(LayoutPlugin);
+    app.use(VBToggle);
     app.use(SpinnerPlugin);
     
     // Add directives

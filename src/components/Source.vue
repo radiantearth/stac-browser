@@ -1,21 +1,17 @@
 <template>
-  <div class="share mt-1">
+  <nav class="share">
     <b-button-group>
-      <TeleportPopover v-if="showRoot" placement="bottom" :title="rootTitle">
+      <TeleportPopover
+        v-if="stacUrl"
+        :title="$t('source.title')"
+        placement="bottom"
+        custom-class="popover-large"
+      >
         <template #trigger>
-          <b-button tag="a" tabindex="0" size="sm" variant="outline-primary">
-            <b-icon-box /> <span class="button-label">{{ rootTitle }}</span>
-          </b-button>
-        </template>
-        <template #content>
-          <RootStats />
-        </template>
-      </TeleportPopover>
-
-      <TeleportPopover v-if="stacUrl" placement="bottom" :title="$t('source.title')">
-        <template #trigger>
-          <b-button tag="a" tabindex="0" size="sm" variant="outline-primary" :title="$t('source.detailsAboutSource')">
-            <b-icon-link /> <span class="button-label">{{ $t('source.label') }}</span>
+          <b-button
+            size="sm" variant="outline-primary"
+            :title="$t('source.detailsAboutSource')" tag="a" tabindex="0">
+            <b-icon-info-lg /><span class="button-label">{{ $t('source.label') }}</span>
           </b-button>
         </template>
         <template #content>
@@ -43,10 +39,16 @@
         </template>
       </TeleportPopover>
 
-      <TeleportPopover placement="bottom" :title="$t('source.share.title')">
+      <TeleportPopover
+        :title="$t('source.share.title')"
+        placement="bottom"
+        custom-class="popover-large"
+      >
         <template #trigger>
-          <b-button tag="a" tabindex="0" size="sm" variant="outline-primary" :title="$t('source.share.withOthers')">
-            <b-icon-share /> <span class="button-label">{{ $t('source.share.label') }}</span>
+          <b-button
+            size="sm" variant="outline-primary"
+            :title="$t('source.share.withOthers')" tag="a" tabindex="0">
+            <b-icon-share /><span class="button-label">{{ $t('source.share.title') }}</span>
           </b-button>
         </template>
         <template #content>
@@ -57,57 +59,24 @@
           </template>
         </template>
       </TeleportPopover>
-
-      <b-dropdown size="sm" variant="outline-primary" right :title="$t('source.language.switch')">
-        <template #button-content>
-          <b-icon-flag /> <span class="button-label">{{ $t('source.language.label', {currentLanguage}) }}</span>
-        </template>
-        <b-dropdown-item
-          v-for="l of languages" :key="l.code" class="lang-item"
-          @click="switchLocale({locale: l.code, userSelected: true})"
-        >
-          <b-icon-check v-if="locale === l.code" />
-          <b-icon-blank v-else />
-          <span class="title">
-            <span :lang="l.code">{{ l.native }}</span>
-            <template v-if="l.global && l.global !== l.native"> / <span lang="en">{{ l.global }}</span></template>
-          </span>
-          <b-icon-exclamation-triangle v-if="supportsLanguageExt && (!l.ui || !l.data)" :title="l.ui ? $t('source.language.onlyUI') : $t('source.language.onlyData')" class="ml-2" />
-        </b-dropdown-item>
-      </b-dropdown>
     </b-button-group>
-  </div>
+  </nav>
 </template>
 
 <script>
-import { 
-  BIconBlank, BIconBox, BIconCheck, BIconExclamationTriangle, BIconFlag, BIconLink, BIconShare,
-  BDropdown, BDropdownItem } from 'bootstrap-vue';
-import { mapActions, mapGetters, mapState } from 'vuex';
+import { BIconInfoLg, BIconShare } from 'bootstrap-vue';
+import { mapState } from 'vuex';
 
 import Url from './Url.vue';
 import TeleportPopover from './TeleportPopover.vue';
-
-import Utils from '../utils';
-import { getBest, prepareSupported } from 'stac-js/src/locales';
 import CopyButton from './CopyButton.vue';
 import SocialSharing from './SocialSharing.vue';
-
-const LANGUAGE_EXT = 'https://stac-extensions.github.io/language/v1.*/schema.json';
 
 export default {
   name: "Source",
   components: {
-    BDropdown,
-    BDropdownItem,
-    BIconBlank,
-    BIconBox,
-    BIconCheck,
-    BIconExclamationTriangle,
-    BIconFlag,
-    BIconLink,
+    BIconInfoLg,
     BIconShare,
-    RootStats: () => import('./RootStats.vue'),
     TeleportPopover,
     Url,
     CopyButton,
@@ -129,34 +98,12 @@ export default {
     }
   },
   computed: {
-    ...mapState(['conformsTo', 'dataLanguages', 'locale', 'socialSharing', 'supportedLocales', 'uiLanguage', 'valid']),
-    ...mapGetters(['supportsExtension', 'root']),
+    ...mapState(['socialSharing', 'valid']),
     stacVersion() {
       return this.stac?.stac_version;
     },
     stacId() {
       return this.stac?.id;
-    },
-    showRoot() {
-      if (!this.root) {
-        return false;
-      }
-      return (Array.isArray(this.conformsTo) && this.conformsTo.length > 0)
-        || Utils.isObject(this.root['stats:collections'])
-        || Utils.isObject(this.root['stats:catalogs'])
-        || Utils.isObject(this.root['stats:items']);
-    },
-    rootTitle() {
-      return Array.isArray(this.conformsTo) && this.conformsTo.length > 0 ? this.$t('index.api') : this.$t('index.catalog');
-    },
-    currentLanguage() {
-      let lang = this.languages.find(l => l.code === this.locale);
-      if (lang) {
-        return lang.native;
-      }
-      else {
-        return '-';
-      }
     },
     enableSocialSharing() {
       return Array.isArray(this.socialSharing) && this.socialSharing.length > 0;
@@ -164,57 +111,9 @@ export default {
     sharingMessage() {
       const url = window.location.toString();
       return this.$t('source.share.message', {title: this.title, url: url});
-    },
-    supportsLanguageExt() {
-      return this.supportsExtension(LANGUAGE_EXT);
-    },
-    languages() {
-      let languages = [];
-
-      // Add all UI languages
-      for(let code of this.supportedLocales) {
-        languages.push({
-          code,
-          native: this.$t(`languages.${code}.native`),
-          global: this.$t(`languages.${code}.global`),
-          ui: true
-        });
-      }
-
-      // Add missing data languages
-      for(let lang of this.dataLanguages) {
-        if (!Utils.isObject(lang) || !lang.code || this.supportedLocales.includes(lang.code)) {
-          continue;
-        }
-        let newLang = {
-          code: lang.code
-        };
-        newLang.native = lang.name || lang.alternate || lang.code;
-        newLang.global = lang.alternate || lang.name || lang.code;
-        newLang.data = true;
-        languages.push(newLang);
-      }
-
-      if (this.supportsExtension(LANGUAGE_EXT)) {
-        // Determine which languages are complete
-        const uiSupported = prepareSupported(this.supportedLocales);
-        const dataSupported = prepareSupported(this.dataLanguages.map(l => l.code));
-        for(let l of languages) {
-          if (!l.ui) {
-            l.ui = Boolean(getBest(uiSupported, l.code, null));
-          }
-          if (!l.data) {
-            l.data = Boolean(getBest(dataSupported, l.code, null));
-          }
-        }
-      }
-      
-      const collator = new Intl.Collator(this.uiLanguage);
-      return languages.sort((a,b) => collator.compare(a.global, b.global));
     }
   },
   methods: {
-    ...mapActions(['switchLocale']),
     browserUrl() {
       return window.location.toString();
     }
@@ -222,31 +121,22 @@ export default {
 };
 </script>
 
-<style lang="scss">
-#popover-link, #popover-root, #popover-share {
-  width: 80%;
-  max-width: 800px;
-
-  .popover-body {
-    overflow-y: auto;
-    overflow-x: hidden;
-    max-height: 80vh;
-  }
+<style lang="scss" scoped>
+.share {
+  display: flex;
+  gap: 0.25rem;
 }
-
-#popover-link .stac-id .btn-sm,
-#popover-link .stac-valid .btn-sm {
+</style>
+<style lang="scss">
+.teleport-popover.popover-large .stac-id .btn-sm,
+.teleport-popover.popover-large .stac-valid .btn-sm {
     padding-top: 0.1rem;
     padding-bottom: 0.1rem;
     font-size: 0.7rem;
 }
 
-</style>
-<style lang="scss" scoped>
-.lang-item > .dropdown-item {
-  display: flex;
-  > .title {
-    flex: 1;
-  }
+.teleport-popover.popover-large .popover-body {
+  white-space: normal;
+  min-width: 300px;
 }
 </style>

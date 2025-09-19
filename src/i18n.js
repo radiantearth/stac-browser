@@ -4,6 +4,7 @@ import { default as Fields } from '@radiantearth/stac-fields/I18N';
 import Utils from './utils';
 
 export const API_LANGUAGE_CONFORMANCE = ['https://api.stacspec.org/v1.*/language'];
+export const STAC_LANGUAGE_EXT = 'https://stac-extensions.github.io/language/v1.*/schema.json'
 
 const LOCALE_CONFIG = {};
 
@@ -87,4 +88,26 @@ export function translateFields(value, vars = null) {
     return i18n.global.t(key, null, vars);
   }
   return Fields.format(value, vars);
+}
+
+/**
+ * Get the languages available for the given STAC entity.
+ * 
+ * @param {STAC} data The STAC entity.
+ * @returns {Array.<object>} An array of language objects, each with a `code` property.
+ */
+export function getDataLanguages(data) {
+    let dataLanguages = [];
+    if (data) {
+      const languages = data.getMetadata('languages');
+      // Ensure the other languages are always an array
+      if (Array.isArray(languages) && languages.length > 0) {
+        dataLanguages = languages.slice();
+      }
+      // Add the current language of the data to the list of languages
+      // No need to check the language as checks will be done in the filter below
+      dataLanguages.unshift(data.getMetadata('language'));
+    }
+    // Filter out invalid languages
+    return dataLanguages.filter(lang => Utils.isObject(lang) && typeof lang.code === 'string');
 }

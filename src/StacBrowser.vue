@@ -5,8 +5,78 @@
     <Sidebar v-if="sidebar" />
     <!-- Header -->
     <header>
-      <div class="logo">{{ displayCatalogTitle }}</div>
-      <StacHeader @enableSidebar="sidebar = true" />
+      <b-row class="site">
+        <b-col md="12">
+          <nav class="actions navigation">
+            <b-button-group v-if="canSearch || isServerSelector">
+              <b-button v-if="isServerSelector" variant="primary" size="sm" :title="$t('browse')" v-b-toggle.sidebar @click="sidebar = true">
+                <b-icon-list /><span class="button-label">{{ $t('browse') }}</span>
+              </b-button>
+              <b-button v-if="canSearch" variant="primary" size="sm" :to="searchBrowserLink" :title="$t('search.title')" :pressed="isSearchPage">
+                <b-icon-search /><span class="button-label">{{ $t('search.title') }}</span>
+              </b-button>
+            </b-button-group>
+          </nav>
+          <div class="title">
+            <img v-if="logo" :src="logo.getAbsoluteUrl()" :alt="logo.title" :title="logo.title" class="logo">
+            <span role="banner">
+              <StacLink v-if="root" :data="root" hideIcon />
+              <template v-else>{{ catalogTitle }}</template>
+            </span>
+            <TeleportPopover
+              v-if="root"
+              :title="serviceType"
+              placement="bottom"
+              custom-class="popover-large"
+            >
+              <template #trigger>
+                <b-button
+                  size="sm" variant="outline-primary"
+                  :title="serviceType" tag="a" tabindex="0"
+                >
+                  <b-icon-caret-down-fill />
+                </b-button>
+              </template>
+              <template #content>
+                <RootStats />
+              </template>
+            </TeleportPopover>
+          </div>
+          <nav class="actions user">
+            <b-button-group>
+              <b-button v-if="canAuthenticate" variant="primary" size="sm" @click="logInOut" :title="authTitle">
+                <component :is="authIcon" /><span class="button-label">{{ authLabel }}</span>
+              </b-button>
+              <LanguageChooser
+                :data="data" :currentLocale="localeFromVueX" :locales="supportedLocalesFromVueX"
+                @setLocale="locale => switchLocale({locale, userSelected: true})"
+              />
+            </b-button-group>
+          </nav>
+        </b-col>
+      </b-row>
+      <b-row class="page" v-if="!loading">
+        <b-col md="12">
+          <div class="title">
+            <img v-if="icon && !isRoot" :src="icon.getAbsoluteUrl()" :alt="icon.title" :title="icon.title" class="icon">
+            <h1>{{ title }}</h1>
+          </div>
+          <nav class="actions navigation">
+            <b-button-group>
+              <b-button v-if="back" :to="selfBrowserLink" :title="$t('goBack.description', {type})" variant="outline-primary" size="sm">
+                <b-icon-arrow-left /><span class="button-label">{{ $t('goBack.label') }}</span>
+              </b-button>
+              <b-button v-if="collectionLink" :to="toBrowserPath(collectionLink.href)" :title="collectionLinkTitle" variant="outline-primary" size="sm">
+                <b-icon-folder-symlink /><span class="button-label">{{ $t('goToCollection.label') }}</span>
+              </b-button>
+              <b-button v-if="parentLink" :to="toBrowserPath(parentLink.href)" :title="parentLinkTitle" variant="outline-primary" size="sm">
+                <b-icon-arrow-90deg-up /><span class="button-label">{{ $t('goToParent.label') }}</span>
+              </b-button>
+            </b-button-group>
+          </nav>
+          <Source class="actions" :title="title" :stacUrl="url" :stac="data" />
+        </b-col>
+      </b-row>
     </header>
     <!-- Content (Item / Catalog) -->
     <router-view />
@@ -17,15 +87,23 @@
 </template>
 
 <script>
-
-import { mapActions, mapGetters, mapState } from 'vuex';
 import { isNavigationFailure, NavigationFailureType } from 'vue-router';
+import { mapMutations, mapActions, mapGetters, mapState } from 'vuex';
 import CONFIG from './config';
 
-import ErrorAlert from './components/ErrorAlert.vue';
-import StacHeader from './components/StacHeader.vue';
+import {
+  BIconArrow90degUp, BIconArrowLeft, BIconCaretDownFill,
+  BIconFolderSymlink, BIconList, BIconLock, BIconSearch, BIconUnlock,
+  } from "bootstrap-vue";
 
-import { STAC } from 'stac-js';
+import "bootstrap/dist/css/bootstrap.css";
+import "bootstrap-vue/dist/bootstrap-vue.css";
+
+import ErrorAlert from './components/ErrorAlert.vue';
+import StacLink from './components/StacLink.vue';
+import TeleportPopover from './components/TeleportPopover.vue';
+
+import { CatalogLike, STAC } from 'stac-js';
 import Utils from './utils';
 import URI from 'urijs';
 
@@ -33,6 +111,8 @@ import { API_LANGUAGE_CONFORMANCE } from './i18n';
 import { getBest, prepareSupported } from 'stac-js/src/locales';
 import BrowserStorage from "./browser-store";
 import Authentication from "./components/Authentication.vue";
+import LanguageChooser from "./components/LanguageChooser.vue";
+import { getDisplayTitle } from "./models/stac";
 
 // Pass Config through from props to vuex
 let Props = {};
@@ -42,11 +122,13 @@ for(let key in CONFIG) {
     default: ['object', 'function'].includes(typeof CONFIG[key]) ? () => CONFIG[key] : CONFIG[key]
   };
   Watchers[key] = {
-    immediate: true,
+    immediate: false, // Changed from true to avoid accessing store before it's ready
     handler: async function(newValue) {
-      await this.$store.dispatch('config', {
-        [key]: newValue
-      });
+      if (this.$store) { // Add safety check
+        await this.$store.dispatch('config', {
+          [key]: newValue
+        });
+      }
     }
   };
 }
@@ -55,9 +137,21 @@ export default {
   name: 'StacBrowser',
   components: {
     Authentication,
+    BIconArrow90degUp,
+    BIconArrowLeft,
+    BIconCaretDownFill,
+    BIconFolderSymlink,
+    BIconList,
+    BIconLock,
+    BIconSearch,
+    BIconUnlock,
     ErrorAlert,
+    LanguageChooser,
+    RootStats: () => import('./components/RootStats.vue'),
     Sidebar: () => import('./components/Sidebar.vue'),
-    StacHeader
+    StacLink,
+    Source: () => import('./components/Source.vue'),
+    TeleportPopover
   },
   props: {
     ...Props
@@ -70,14 +164,17 @@ export default {
     };
   },
   computed: {
-    ...mapState(['allowSelectCatalog', 'data', 'dataLanguage', 'description', 'globalError', 'stateQueryParameters', 'title', 'uiLanguage', 'url']),
+    ...mapState(['allowSelectCatalog', 'conformsTo', 'data', 'dataLanguage', 'globalError', 'loading', 'stateQueryParameters', 'uiLanguage', 'url']),
     ...mapState({
+      catalogImageFromVueX: 'catalogImage',
+      localeFromVueX: 'locale',
       detectLocaleFromBrowserFromVueX: 'detectLocaleFromBrowser',
       supportedLocalesFromVueX: 'supportedLocales',
       storeLocaleFromVueX: 'storeLocale'
     }),
-    ...mapGetters(['displayCatalogTitle', 'fromBrowserPath', 'isExternalUrl', 'root', 'supportsConformance', 'toBrowserPath']),
-    ...mapGetters('auth', ['showLogin']),
+    ...mapGetters(['canSearch', 'collectionLink', 'description', 'fromBrowserPath', 'isExternalUrl', 'isRoot', 'parentLink', 'root', 'rootLink', 'supportsConformance', 'title', 'toBrowserPath']),
+    ...mapGetters('auth', { authMethod: 'method' }),
+    ...mapGetters('auth', ['canAuthenticate', 'isLoggedIn', 'showLogin']),
     browserVersion() {
       if (typeof STAC_BROWSER_VERSION !== 'undefined') {
         return STAC_BROWSER_VERSION;
@@ -89,11 +186,105 @@ export default {
     poweredByText() {
       const link = `<a href="https://github.com/radiantearth/stac-browser" target="_blank">STAC Browser</a> ${this.browserVersion}`;
       return this.$t('poweredBy', { link });
+    },
+    isSearchPage() {
+      return this.$route.name === 'search';
+    },
+    isServerSelector() {
+      return this.$route.name !== 'select';
+    },
+    authIcon() {
+      return this.isLoggedIn ? 'b-icon-unlock' : 'b-icon-lock';
+    },
+    authTitle() {
+      return this.authMethod.getButtonTitle();
+    },
+    authLabel() {
+      return this.isLoggedIn ? this.authMethod.getLogoutLabel() : this.authMethod.getLoginLabel();
+    },
+    searchBrowserLink() {
+      if (!this.canSearch) {
+        return null;
+      }
+      let searchLink;
+      if (this.data instanceof CatalogLike && !this.data.equals(this.root)) {
+        searchLink = this.data.getSearchLink();
+      }
+      if (searchLink) {
+        return `/search${this.data.getBrowserPath()}`;
+      }
+      else if (this.root && this.allowSelectCatalog) {
+        return `/search${this.root.getBrowserPath()}`;
+      }
+      return '/search';
+    },
+    isApi() {
+      // todo: This gives false results for a statically hosted OGC API - Records, which may include conformance classes
+      return Array.isArray(this.conformsTo) && this.conformsTo.length > 0;
+    },
+    serviceType() {
+      return this.isApi ? this.$t('index.api') : this.$t('index.catalog');
+    },
+    back() {
+      return this.$route.name === 'validation';
+    },
+    selfBrowserLink() {
+      return this.toBrowserPath(this.url);
+    },
+    type() {
+      if (this.data instanceof STAC) {
+        if (this.data.isItem()) {
+          return this.$tc('stacItem');
+        }
+        else if (this.data.isCollection()) {
+          return this.$tc(`stacCollection`);
+        }
+        else if (this.data.isCatalog()) {
+          return this.$tc(`stacCatalog`);
+        }
+        else if (Utils.hasText(this.data.type)) {
+          return this.data.type;
+        }
+      }
+      return null;
+    },
+    collectionLinkTitle() {
+      if (this.collectionLink && Utils.hasText(this.collectionLink.title)) {
+        return this.$t('goToCollection.descriptionWithTitle', this.collectionLink);
+      }
+      else {
+        return this.$t('goToCollection.description');
+      }
+    },
+    parentLinkTitle() {
+      if (this.parentLink && Utils.hasText(this.parentLink.title)) {
+        return this.$t('goToParent.descriptionWithTitle', this.parentLink);
+      }
+      else {
+        return this.$t('goToParent.description');
+      }
+    },
+    icon() {
+      return this.getIcon(this.data);
+    },
+    logo() {
+      if (this.catalogImageFromVueX) {
+        return Utils.createLink(this.catalogImageFromVueX, 'icon', this.rootLink?.title);
+      }
+      else {
+        return this.getIcon(this.root);
+      }
     }
   },
   watch: {
     ...Watchers,
     title(title) {
+      if (this.root) {
+        const rootTitle = getDisplayTitle(this.root);
+        if (rootTitle !== title) {
+          title += ` - ${rootTitle}`;
+        }
+      }
       document.title = title;
       document.getElementById('og-title').setAttribute("content", title);
     },
@@ -246,10 +437,47 @@ export default {
   },
   mounted() {
     this.$root.$on('error', this.showError);
+    
+    // Initialize config once store is available
+    for(let key in CONFIG) {
+      if (this[key] !== undefined) {
+        this.$store.dispatch('config', {
+          [key]: this[key]
+        });
+      }
+    }
+    
     setInterval(() => this.$store.dispatch('loadBackground', 3), 200);
   },
   methods: {
     ...mapActions(['switchLocale']),
+    ...mapMutations('auth', ['addAction']),
+    ...mapActions('auth', ['requestLogin', 'requestLogout']),
+    getIcon(data) {
+      if (data instanceof STAC) {
+        const icons = data.getIcons();
+        if (icons.length > 0) {
+          return icons[0];
+        }
+      }
+      return null;
+    },
+    async logInOut() {
+      if (this.url) {
+        this.addAction(() => this.$store.dispatch("load", {
+          url: this.url,
+          show: true,
+          force: true,
+          noRetry: true
+        }));
+      }
+      if (this.isLoggedIn) {
+        await this.requestLogout();
+      }
+      else {
+        await this.requestLogin();
+      }
+    },
     detectLocale() {
       let locale;
       if (this.storeLocaleFromVueX) {
@@ -347,3 +575,4 @@ export default {
 @import "./theme/page.scss";
 @import "./theme/custom.scss";
 </style>
+

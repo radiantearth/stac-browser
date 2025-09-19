@@ -134,7 +134,6 @@
   "in": "em {catalog}",
   "index": {
     "api": "API",
-    "catalog": "Catálogo",
     "load": "Carregar",
     "selectStacIndex": "... ou selecione um de {stacIndex}:",
     "specifyCatalog": "Especifique um catálogo STAC ou API...",
@@ -154,12 +153,26 @@
   "mapping": {
     "attribution": {
       "label": "i",
+      "description": "Créditos",
       "collapseLabel": "✕"
     },
-    "bboxSelect": {},
+    "bboxSelect": {
+      "add": "Clique no mapa para adicionar um retângulo envolvente.",
+      "remove": "Clique no retângulo envolvente para removê-lo."
+    },
     "close": "Fechar",
-    "layers": {},
-    "location": {},
+    "fit": "Ajustar à extensão",
+    "layers": {
+      "title": "Camadas",
+      "base": "Mapas de Fundo",
+      "unnamed": "Sem nome #{id}",
+      "footprint": "Footprint"
+    },
+    "location": {
+      "description": "Ir para sua localização"
+    },
+    "nobasemap": "Não há mapas de fundo disponíveis.",
+    "nodata": "Nenhuma informação espacial disponível nos metadados.",
     "zoom": {
       "in": {
         "description": "Aumentar o zoom",

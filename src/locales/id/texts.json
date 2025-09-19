@@ -132,7 +132,6 @@
   "in": "dalam {catalog}",
   "index": {
     "api": "API",
-    "catalog": "Katalog",
     "load": "Muat",
     "selectStacIndex": "... atau pilih satu dari {stacIndex}:",
     "specifyCatalog": "Silakan tentukan Katalog atau API STAC...",

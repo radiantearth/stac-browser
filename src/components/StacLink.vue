@@ -1,8 +1,6 @@
 <template>
-  <component :is="component" class="stac-link" v-bind="attributes" :title="tooltip">
-    <template v-if="icon">
-      <img :src="icon.getAbsoluteUrl()" :alt="icon.title" :title="icon.title" class="icon mr-2">
-    </template>
+  <component :is="component" class="stac-link" v-bind="attributes" :id="id" :title="tooltip">
+    <img v-if="icon && !hideIcon" :src="icon.getAbsoluteUrl()" :alt="icon.title" :title="icon.title" class="icon mr-2">
     <span class="title">{{ displayTitle }}</span>
   </component>
 </template>
@@ -28,7 +26,7 @@ export default {
     },
     fallbackTitle: {
       type: [String, Function],
-      default: null
+      default: ""
     },
     tooltip: {
       type: String,
@@ -41,13 +39,21 @@ export default {
     state: {
       type: Object,
       default: null
+    },
+    hideIcon: {
+      type: Boolean,
+      default: false
+    },
+    id: {
+      type: String,
+      default: null
     }
   },
   computed: {
     ...mapState(['allowExternalAccess', 'privateQueryParameters']),
     ...mapGetters(['toBrowserPath', 'getRequestUrl', 'isExternalUrl']),
     icon() {
-      if (this.stac) {
+      if (this.stac instanceof STAC) {
         const icons = this.stac.getIcons();
         if (icons.length > 0) {
           return icons[0];
@@ -101,11 +107,16 @@ export default {
         return obj;
       }
       else {
-        return {
+        const obj = {
           href: this.href,
           target: '_blank',
-          rel: this.rel
+          rel: this.rel,
         };
+        if (this.id) {
+          // Add tab index when an ID is given for popoversto make it clickable on MacOS (#655)
+          obj.tabindex = 0;
+        }
+        return obj;
       }
     },
     component() {
