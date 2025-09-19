@@ -132,7 +132,6 @@
   "in": "dalam {catalog}",
   "index": {
     "api": "API",
-    "catalog": "Katalog",
     "load": "Muat",
     "selectStacIndex": "... atau pilih satu dari {stacIndex}:",
     "specifyCatalog": "Silakan tentukan Katalog atau API STAC...",
@@ -246,11 +245,6 @@
     "placeholder": "Cari...",
     "selectCollections": "Pilih satu atau beberapa koleksi...",
     "selectForItemSearch": "Pilih untuk Pencarian Item",
-    "sortOptions": {
-      "datetime": "Tanggal dan Waktu",
-      "id": "ID",
-      "title": "Judul"
-    },
     "spatialExtent": "Cakupan Spasial",
     "tabs": {
       "collections": "Cari Koleksi",

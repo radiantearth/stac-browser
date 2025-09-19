@@ -134,7 +134,6 @@
   "in": "în {catalog}",
   "index": {
     "api": "API",
-    "catalog": "Catalog",
     "load": "Încărcare",
     "selectStacIndex": "... sau selectați unul din {stacIndex}:",
     "specifyCatalog": "Vă rugăm să specificați un catalog STAC sau un API...",
@@ -258,11 +257,6 @@
     "placeholder": "Căutare...",
     "selectCollections": "Selectați una sau mai multe colecții...",
     "selectForItemSearch": "Selectați pentru Căutare Articol",
-    "sortOptions": {
-      "datetime": "Data și ora",
-      "id": "Identificator",
-      "title": "Titlu"
-    },
     "spatialExtent": "Întinderea spațială",
     "tabs": {
       "collections": "Caută Colecții",

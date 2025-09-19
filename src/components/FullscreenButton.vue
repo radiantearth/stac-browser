@@ -47,7 +47,6 @@ export default {
       }
     },
     isFullscreen(active) {
-      console.trace(active);
       if (active) {
         this.doc.addEventListener('fullscreenchange', this.listener);
       }

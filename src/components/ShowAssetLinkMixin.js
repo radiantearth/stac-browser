@@ -7,6 +7,7 @@ export default {
     return {
       tab: null,
       shownOnMap: [],
+      selectedAssets: []
     };
   },
   computed: {
@@ -42,7 +43,7 @@ export default {
       return this.data.getLinksWithOtherRels(stacBrowserSpecialHandling)
         .filter(link => link.rel !== 'preview' || !Utils.canBrowserDisplayImage(link));
     },
-    selectedAssets() {
+    selectedReferences() {
       if (this.tab === 0) {
         return this.shownOnMap;
       }
@@ -58,7 +59,7 @@ export default {
       }
       else {
         this.tab = 0;
-        this.shownOnMap = [asset];
+        this.selectedAssets = [asset];
       }
       if (this.$refs.tabs) {
         Utils.scrollTo(this.$refs.tabs.$el);

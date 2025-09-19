@@ -30,7 +30,6 @@
   "goToCollection": {},
   "goToParent": {},
   "index": {
-    "catalog": "Catalogue",
     "specifyCatalog": "Please specify a STAC Catalogue or API..."
   },
   "items": {},
@@ -56,7 +55,6 @@
   "read": {},
   "search": {
     "logical": {},
-    "sortOptions": {},
     "tabs": {}
   },
   "sidebar": {

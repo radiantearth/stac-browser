@@ -115,7 +115,6 @@
   "in": "{catalog} 内",
   "index": {
     "api": "API",
-    "catalog": "カタログ",
     "load": "読み込み",
     "selectStacIndex": "または {stacIndex} から選択:",
     "specifyCatalog": "STACカタログやSTAC APIのURLを指定:",
@@ -234,11 +233,6 @@
     "placeholder": "検索...",
     "selectCollections": "1つ以上のコレクションを選択...",
     "selectForItemSearch": "アイテム検索用に選択",
-    "sortOptions": {
-      "datetime": "日付と時刻",
-      "id": "ID",
-      "title": "タイトル"
-    },
     "spatialExtent": "場所の範囲",
     "tabs": {
       "collections": "コレクションを検索",

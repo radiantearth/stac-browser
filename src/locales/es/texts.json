@@ -134,7 +134,6 @@
   "in": "en {catalog}",
   "index": {
     "api": "API",
-    "catalog": "Catálogo",
     "load": "Cargar",
     "selectStacIndex": "... o seleccione uno de {stacIndex}:",
     "specifyCatalog": "Por favor especifique un catálogo o una API STAC...",
@@ -258,11 +257,6 @@
     "placeholder": "Búsqueda...",
     "selectCollections": "Seleccione una o varias colecciones...",
     "selectForItemSearch": "Seleccionar para Búsqueda de Elementos",
-    "sortOptions": {
-      "datetime": "Fecha y hora",
-      "id": "ID",
-      "title": "Título"
-    },
     "spatialExtent": "Extensión espacial",
     "tabs": {
       "collections": "Buscar colecciones",

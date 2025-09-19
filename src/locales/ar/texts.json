@@ -132,7 +132,6 @@
   "in": "في {catalog}",
   "index": {
     "api": "واجهة برمجة التطبيقات",
-    "catalog": "الكتالوج",
     "load": "تحميل",
     "selectStacIndex": "... أو اختر واحدًا من {stacIndex}:",
     "specifyCatalog": "يرجى تحديد كتالوج STAC أو API...",
@@ -246,11 +245,6 @@
     "placeholder": "بحث...",
     "selectCollections": "حدد مجموعة واحدة أو أكثر...",
     "selectForItemSearch": "حدد للبحث عن عنصر",
-    "sortOptions": {
-      "datetime": "التاريخ والوقت",
-      "id": "المعرّف",
-      "title": "العنوان"
-    },
     "spatialExtent": "النطاق المكاني",
     "tabs": {
       "collections": "البحث عن المجموعات",

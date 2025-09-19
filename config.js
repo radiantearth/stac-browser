@@ -1,6 +1,7 @@
 module.exports = {
     catalogUrl: null,
     catalogTitle: "STAC Browser",
+    catalogImage: null,
     allowExternalAccess: true, // Must be true if catalogUrl is not given
     allowedDomains: [],
     detectLocaleFromBrowser: true,

@@ -11,8 +11,9 @@
           :key="op.SYMBOL"
           :active="op === operator"
           @click="updateOperator(op)"
+          button-class="d-flex justify-content-between align-items-center"
         >
-          {{ op.longLabel }}
+          <span>{{ op.longLabel }}</span>
           <b-badge variant="dark" class="ml-2">{{ op.label }}</b-badge>
         </b-dropdown-item-button>
       </b-dropdown>

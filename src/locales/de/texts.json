@@ -77,7 +77,7 @@
   "deprecation": {
     "fallbackTitle": "Anzeigen",
     "latestVersion": "Neueste Version:",
-    "otherVersionsNotice": "Dies ist *nicht* abgekündigt, aber andere Versionen sind verfügbar:",
+    "otherVersionsNotice": "Diese {type}-Version ist *nicht* abgekündigt, aber andere Versionen sind verfügbar:",
     "otherVersionsTitle": "Andere Versionen verfügbar",
     "outdatedTitle": "Veraltet",
     "predecessorVersion": "Vorherige Version:",
@@ -108,6 +108,7 @@
     "noExternalAccess": "Der Zugriff auf externe Kataloge ist nicht erlaubt!",
     "notFound": "Die angeforderte Seite existiert nicht. @:errors.contactProvider",
     "serverError": "Auf dem Server ist ein Problem aufgetreten. @:errors.contactProvider",
+    "title": "Fehler",
     "unauthorized": "Der Anfrage fehlen die Anmeldedaten, bspw. ein API-Schlüssel. Bitte geben Sie Ihre Anmeldedaten an und versuchen Sie es erneut."
   },
   "featureExperimental": "Diese Funktion ist noch experimentell und kann unerwartete Ergebnisse verursachen!",
@@ -272,11 +273,6 @@
     "placeholder": "Suchen...",
     "selectCollections": "Wähle Kataloge...",
     "selectForItemSearch": "Markiere für Elementsuche",
-    "sortOptions": {
-      "datetime": "Datum und Zeit",
-      "id": "Identifikationsnummer",
-      "title": "Titel"
-    },
     "spatialExtent": "Räumliche Ausdehnung",
     "tabs": {
       "collections": "Kataloge durchsuchen",
