@@ -23,7 +23,7 @@ export default {
       }
       let assets = this.data.getAssets();
       if (!this.showThumbnailsAsAssets) {
-        assets = assets.filter(asset => !asset.isPreview());
+        assets = assets.filter(asset => !this.thumbnails.includes(asset));
       }
       return assets;
     },
@@ -41,7 +41,7 @@ export default {
         return [];
       }
       return this.data.getLinksWithOtherRels(stacBrowserSpecialHandling)
-        .filter(link => link.rel !== 'preview' || !Utils.canBrowserDisplayImage(link));
+        .filter(link => link.rel !== 'preview' || !link.canBrowserDisplayImage());
     },
     selectedReferences() {
       if (this.tab === 0) {

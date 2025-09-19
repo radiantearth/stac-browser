@@ -54,7 +54,7 @@
     "ol-stac": "^1.0.5",
     "proj4": "^2.15.0",
     "remove-markdown": "^0.6.2",
-    "stac-js": "~0.1.8",
+    "stac-js": "~0.1.9",
     "stac-node-validator": "2.0.0-rc.1",
     "streamsaver-js": "^2.0.7",
     "urijs": "^1.19.11",
