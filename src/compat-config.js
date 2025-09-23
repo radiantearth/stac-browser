@@ -13,11 +13,6 @@ configureCompat({
   INSTANCE_LISTENERS: 'suppress-warning',
   INSTANCE_SCOPED_SLOTS: 'suppress-warning',
   
-  // Keep this suppressed for existing filter usage (if any remain)
-  FILTERS: 'suppress-warning',
-  
   // Keep this suppressed for transition compatibility
   TRANSITION_CLASSES: 'suppress-warning'
-  
-  // All other Vue 2 features will show warnings to help identify migration opportunities
 });

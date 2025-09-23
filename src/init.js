@@ -6,10 +6,10 @@ import CONFIG from './config';
 import getRoutes from "./router";
 import getStore from "./store";
 
-import {
+import { 
   AlertPlugin, BadgePlugin, ButtonGroupPlugin, ButtonPlugin,
-  CardPlugin, FormPlugin, FormGroupPlugin, FormInputPlugin, 
-  LayoutPlugin, ListGroupPlugin, SpinnerPlugin,
+  CardPlugin, FormPlugin, FormGroupPlugin, FormInputPlugin, FormCheckboxPlugin, FormRadioPlugin,
+  LayoutPlugin, ListGroupPlugin, PopoverPlugin, SpinnerPlugin,
   VBToggle, VBVisible } from "bootstrap-vue";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
@@ -44,8 +44,11 @@ export default function init() {
     app.use(FormPlugin);
     app.use(FormGroupPlugin);
     app.use(FormInputPlugin);
+    app.use(FormCheckboxPlugin);
+    app.use(FormRadioPlugin);
     app.use(LayoutPlugin);
     app.use(ListGroupPlugin);
+    app.use(PopoverPlugin);
     app.use(SpinnerPlugin);
     
     // Add directives
