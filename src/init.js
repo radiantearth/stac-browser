@@ -8,7 +8,8 @@ import getStore from "./store";
 
 import {
   AlertPlugin, BadgePlugin, ButtonGroupPlugin, ButtonPlugin,
-  CardPlugin, LayoutPlugin, SpinnerPlugin,
+  CardPlugin, FormPlugin, FormGroupPlugin, FormInputPlugin, 
+  LayoutPlugin, ListGroupPlugin, SpinnerPlugin,
   VBToggle, VBVisible } from "bootstrap-vue";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
@@ -36,13 +37,15 @@ export default function init() {
     
     // Add plugins
     app.use(AlertPlugin);
+    app.use(BadgePlugin);
     app.use(ButtonGroupPlugin);
     app.use(ButtonPlugin);
-    app.use(BadgePlugin);
-    app.use(VBVisible);
     app.use(CardPlugin);
+    app.use(FormPlugin);
+    app.use(FormGroupPlugin);
+    app.use(FormInputPlugin);
     app.use(LayoutPlugin);
-    app.use(VBToggle);
+    app.use(ListGroupPlugin);
     app.use(SpinnerPlugin);
     
     // Add directives

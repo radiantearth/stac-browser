@@ -12,15 +12,16 @@
     <hr v-if="stacIndex.length > 0">
     <b-form-group v-if="stacIndex.length > 0" class="stac-index">
       <template #label>
-        <i18n path="index.selectStacIndex">
-          <template #stacIndex>
-            <a href="https://stacindex.org" target="_blank">STAC Index</a>
-          </template>
-        </i18n>
+        <span v-html="$t('index.selectStacIndex', { stacIndex: '<a href=&quot;https://stacindex.org&quot; target=&quot;_blank&quot;>STAC Index</a>' })"></span>
       </template>
       <b-list-group>
-        <template v-for="catalog in stacIndex">
-          <b-list-group-item button v-if="show(catalog)" :key="catalog.id" :active="url === catalog.url" @click="open(catalog.url)">
+        <template v-for="catalog in stacIndex" :key="catalog.id">
+          <b-list-group-item 
+            v-if="show(catalog)" 
+            button 
+            :active="url === catalog.url" 
+            @click="open(catalog.url)"
+          >
             <div class="d-flex justify-content-between align-items-baseline mb-1">
               <strong>{{ catalog.title }}</strong>
               <b-badge v-if="catalog.isApi" variant="danger">{{ $t('index.api') }}</b-badge>
@@ -35,7 +36,7 @@
 </template>
 
 <script>
-import { BForm, BFormGroup, BFormInput, BListGroup, BListGroupItem } from 'bootstrap-vue';
+import { BForm, BFormGroup, BFormInput, BListGroup, BListGroupItem, BBadge, BButton } from 'bootstrap-vue';
 import { mapGetters } from "vuex";
 import Description from '../components/Description.vue';
 import Utils from '../utils';
@@ -49,6 +50,8 @@ export default {
     BFormInput,
     BListGroup,
     BListGroupItem,
+    BBadge,
+    BButton,
     Description
   },
   data() {
@@ -90,7 +93,7 @@ export default {
         this.stacIndex = response.data;
       }
     } catch (error) {
-      console.error(error);
+      console.error('Failed to load STAC Index:', error);
     }
   },
   methods: {
