@@ -43,7 +43,7 @@
 import { BIconBoxArrowUpRight, BIconDownload, BIconEye, BIconLock, BListGroup, BSpinner } from 'bootstrap-vue';
 import Description from './Description.vue';
 import TeleportPopover from './TeleportPopover.vue';
-import Utils, { browserProtocols, imageMediaTypes, mapMediaTypes } from '../utils';
+import Utils, { imageMediaTypes, mapMediaTypes } from '../utils';
 import { mapGetters, mapState } from 'vuex';
 import AssetActions from '../../assetActions.config';
 import LinkActions from '../../linkActions.config';
@@ -51,6 +51,7 @@ import { stacRequestOptions } from '../store/utils';
 import URI from 'urijs';
 import AuthUtils from './auth/utils';
 import { Asset } from 'stac-js';
+import { browserProtocols } from 'stac-js/src/http';
 
 let i = 0;
 
@@ -199,7 +200,7 @@ export default {
         return this.data.isPreview() && this.data.canBrowserDisplayImage();
       }
       else {
-        return this.data.rel === 'preview' && Utils.canBrowserDisplayImage(this.data);
+        return this.data.rel === 'preview' && this.data.canBrowserDisplayImage();
       }
     },
     href() {
@@ -222,7 +223,7 @@ export default {
       if (this.useAltDownloadMethod)  {
         return false;
       }
-      if (Utils.canBrowserDisplayImage(this.data)) {
+      if (this.data.canBrowserDisplayImage()) {
         return true;
       }
       else if (typeof this.data?.type === 'string') {
