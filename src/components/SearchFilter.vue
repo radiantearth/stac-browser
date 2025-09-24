@@ -146,6 +146,7 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
 import { BBadge, BDropdown, BDropdownItem, BForm, BFormGroup, BFormInput, BFormCheckbox, BFormRadioGroup } from 'bootstrap-vue';
 import Multiselect from 'vue-multiselect';
 import { mapGetters, mapState } from "vuex";
@@ -195,7 +196,7 @@ function getDefaults() {
 
 let formId = 0;
 
-export default {
+export default defineComponent({
   name: 'SearchFilter',
   components: {
     BBadge,
@@ -609,7 +610,7 @@ export default {
       }
     }
   }
-};
+});
 </script>
 
 <style lang="scss">

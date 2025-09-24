@@ -60,6 +60,7 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
 import { mapState, mapGetters } from 'vuex';
 import Catalogs from '../components/Catalogs.vue';
 import Description from '../components/Description.vue';
@@ -74,7 +75,7 @@ import { addSchemaToDocument, createCatalogSchema } from '../schema-org';
 import { ItemCollection } from '../models/stac.js';
 import DeprecationMixin from '../components/DeprecationMixin.js';
 
-export default {
+export default defineComponent({
   name: "Catalog",
   components: {
     AnonymizedNotice: () => import('../components/AnonymizedNotice.vue'),
@@ -274,7 +275,7 @@ export default {
       }
     }
   }
-};
+});
 </script>
 
 <style lang="scss">

@@ -42,12 +42,13 @@ import { mapGetters, mapState } from 'vuex';
 import Catalog from './Catalog.vue';
 import Loading from './Loading.vue';
 import { getDisplayTitle } from '../models/stac';
+import { defineComponent } from 'vue';
 import { STAC } from 'stac-js';
 import ViewMixin from './ViewMixin';
 import Utils from '../utils';
 import Multiselect from 'vue-multiselect';
 
-export default {
+export default defineComponent({
   name: "Catalogs",
   components: {
     Catalog,
@@ -215,7 +216,7 @@ export default {
       return this.$t("multiselect.andMore", {count});
     }
   }
-};
+});
 </script>
 
 <style lang="scss" scoped>

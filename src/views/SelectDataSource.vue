@@ -38,11 +38,12 @@
 <script>
 import { BForm, BFormGroup, BFormInput, BListGroup, BListGroupItem, BBadge, BButton } from 'bootstrap-vue';
 import { mapGetters } from "vuex";
+import { defineComponent } from 'vue';
 import Description from '../components/Description.vue';
 import Utils from '../utils';
 import axios from "axios";
 
-export default {
+export default defineComponent({
   name: "SelectDataSource",
   components: {
     BForm,
@@ -118,7 +119,7 @@ export default {
       this.$router.push(this.toBrowserPath(this.url));
     }
   }
-};
+});
 </script>
 
 <style lang="scss">

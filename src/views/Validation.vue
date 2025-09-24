@@ -40,12 +40,13 @@
 
 <script>
 import { mapState } from 'vuex';
+import { defineComponent } from 'vue';
 import validateSTAC from 'stac-node-validator';
 import BrowseMixin from './BrowseMixin.js';
 import { STAC } from 'stac-js';
 import ValidationResult from '../components/ValidationResult.vue';
 
-export default {
+export default defineComponent({
   name: "Validation",
   components: {
     ValidationResult
@@ -111,7 +112,7 @@ export default {
       }
     }
   }
-};
+});
 </script>
 
 <style lang="scss" scoped>

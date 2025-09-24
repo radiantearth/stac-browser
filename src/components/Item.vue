@@ -23,6 +23,7 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
 import { mapState, mapGetters } from 'vuex';
 import FileFormatsMixin from './FileFormatsMixin';
 import ThumbnailCardMixin from './ThumbnailCardMixin';
@@ -34,7 +35,7 @@ import Utils from '../utils';
 
 Registry.addDependency('content-type', require('content-type'));
 
-export default {
+export default defineComponent({
   name: 'Item',
   components: {
     StacLink,
@@ -95,7 +96,7 @@ export default {
       this.$store.commit(visible ? 'queue' : 'unqueue', this.item.href);
     }
   }
-};
+});
 </script>
 
 <style lang="scss">

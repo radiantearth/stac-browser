@@ -108,6 +108,7 @@ import Utils from './utils';
 import URI from 'urijs';
 
 import { API_LANGUAGE_CONFORMANCE } from './i18n';
+import { defineComponent } from 'vue';
 import { getBest, prepareSupported } from 'stac-js/src/locales';
 import BrowserStorage from "./browser-store";
 import Authentication from "./components/Authentication.vue";
@@ -133,7 +134,7 @@ for(let key in CONFIG) {
   };
 }
 
-export default {
+export default defineComponent({
   name: 'StacBrowser',
   components: {
     Authentication,
@@ -565,7 +566,7 @@ export default {
       this.$store.commit('showGlobalError', null);
     }
   }
-};
+});
 </script>
 
 <style lang="scss">
