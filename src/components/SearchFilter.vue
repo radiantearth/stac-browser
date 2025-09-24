@@ -96,8 +96,8 @@
 
           <QueryableInput
             v-for="(filter, index) in filters" :key="filter.id"
-            :value.sync="filter.value"
-            :operator.sync="filter.operator"
+            v-model:value="filter.value"
+            v-model:operator="filter.operator"
             :queryable="filter.queryable"
             :index="index"
             :cql="cql"
