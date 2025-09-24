@@ -86,8 +86,8 @@
           <b-form-radio-group v-model="filtersAndOr" :options="andOrOptions" name="logical" size="sm" />
 
           <b-dropdown size="sm" :text="$t('search.addFilter')" block variant="primary" class="queryables mt-2 mb-3" menu-class="w-100">
-            <template v-for="queryable in sortedQueryables">
-              <b-dropdown-item v-if="queryable.supported" :key="queryable.id" @click="additionalFieldSelected(queryable)" link-class="d-flex justify-content-between align-items-center">
+            <template v-for="queryable in sortedQueryables" :key="queryable.id">
+              <b-dropdown-item v-if="queryable.supported" @click="additionalFieldSelected(queryable)" link-class="d-flex justify-content-between align-items-center">
                 <span>{{ queryable.title }}</span>
                 <b-badge variant="dark" class="ml-2">{{ queryable.id }}</b-badge>
               </b-dropdown-item>
