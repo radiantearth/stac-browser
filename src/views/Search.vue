@@ -223,16 +223,16 @@ export default {
   },
   methods: {
     openItemSearch() {
-      this.$set(this.itemFilters, 'collections', Object.keys(this.selectedCollections));
+      this.itemFilters.collections = Object.keys(this.selectedCollections);
       this.activeSearch = 1;
       this.selectedCollections = {};
     },
     selectForItemSearch(collection) {
       if (this.selectedCollections[collection.id]) {
-        this.$delete(this.selectedCollections, collection.id);
+        delete this.selectedCollections[collection.id];
       }
       else {
-        this.$set(this.selectedCollections, collection.id, true);
+        this.selectedCollections[collection.id] = true;
       }
     },
     canFilterItems(data) {
