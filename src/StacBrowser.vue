@@ -307,8 +307,6 @@ export default defineComponent({
         // Update the HTML lang tag
         document.documentElement.setAttribute("lang", locale);
         document.getElementById('og-locale').setAttribute("content", locale);
-
-        this.$root.$emit('uiLanguageChanged', locale);
       }
     },
     dataLanguage: {
@@ -437,8 +435,6 @@ export default defineComponent({
     }
   },
   mounted() {
-    this.$root.$on('error', this.showError);
-    
     // Initialize config once store is available
     for(let key in CONFIG) {
       if (this[key] !== undefined) {

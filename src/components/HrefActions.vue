@@ -385,7 +385,10 @@ export default {
       else {
         const name = this.$t(`authentication.schemeTypes.${method.type}`, method);
         const message = this.$t('authentication.unsupportedLong', {method: name});
-        this.$root.$emit('error', new Error(message), this.$t('authentication.unsupported'));
+        this.$store.commit('showGlobalError', {
+          error: new Error(message),
+          message: this.$t('authentication.unsupported')
+        });
       }
     }
   }

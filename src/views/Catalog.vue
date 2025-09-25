@@ -259,7 +259,10 @@ export default defineComponent({
       try {
         await this.$store.dispatch('loadApiItems', {link, show: true, filters: this.filters});
       } catch (error) {
-        this.$root.$emit('error', error, this.$t('errors.loadItems'));
+        this.$store.commit('showGlobalError', {
+          error,
+          message: this.$t('errors.loadItems')
+        });
       }
     },
     async filterItems(filters, reset) {
@@ -271,7 +274,10 @@ export default defineComponent({
         await this.$store.dispatch('loadApiItems', {link: this.data.getApiItemsLink(), show: true, filters});
       } catch (error) {
         let msg = reset ? this.$t('errors.loadItems') : this.$t('errors.loadFilteredItems');
-        this.$root.$emit('error', error, msg);
+        this.$store.commit('showGlobalError', {
+          error,
+          message: msg
+        });
       }
     }
   }

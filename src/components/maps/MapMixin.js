@@ -22,7 +22,7 @@ register(proj4); // required to support source reprojection
 
 export default {
   computed: {
-    ...mapState(['buildTileUrlTemplate', 'crossOriginMedia', 'displayGeoTiffByDefault', 'displayPreview', 'displayOverview', 'getMapSourceOptions', 'useTileLayerAsFallback']),
+    ...mapState(['buildTileUrlTemplate', 'crossOriginMedia', 'displayGeoTiffByDefault', 'displayPreview', 'displayOverview', 'getMapSourceOptions', 'useTileLayerAsFallback', 'uiLanguage']),
     stacLayerOptions() {
       return {
         buildTileUrlTemplate: this.buildTileUrlTemplate,
@@ -53,8 +53,10 @@ export default {
       isFullScreen: false,
     };
   },
-  created() {
-    this.$root.$on('uiLanguageChanged', this.translate);
+  watch: {
+    uiLanguage() {
+      this.translate();
+    }
   },
   methods: {
     async createMap(element, stac, onfocusOnly = false) {

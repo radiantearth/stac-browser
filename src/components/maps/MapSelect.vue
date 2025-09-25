@@ -54,6 +54,7 @@ export default {
     };
   },
   computed: {
+    ...mapState(['uiLanguage']),
     projectedExtent() {
       if (this.extent) {
         return transformExtent(this.extent, this.crs, this.map.getView().getProjection());
@@ -67,13 +68,12 @@ export default {
   watch: {
     async stac() {
       await this.initMap();
-    }
-  },
-  created() {
-    // This recreates the component so that it picks up the new translations
-    this.$root.$on('uiLanguageChanged', () => {
+    },
+    uiLanguage() {
+      () => {
       // todo: update the language resources
-    });
+    }
+    },
   },
   async mounted() {
     await this.initMap();
