@@ -81,10 +81,10 @@ export default {
     this.initMap();
     document.addEventListener('visibilitychange', this.handleVis);
   },
-  beforeUnmount() {
-    document.removeEventListener('visibilitychange', this.handleVis);
-    if (this.map) this.map.remove();
-  },
+  // beforeUnmount() {
+  //   document.removeEventListener('visibilitychange', this.handleVis);
+  //   if (this.map) this.map.remove();
+  // },
   methods: {
     handleResize() { this.$forceUpdate(); },
       handleVis() {

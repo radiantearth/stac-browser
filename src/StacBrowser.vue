@@ -6,7 +6,7 @@
       <div class="top-bar__left" @click="goHome" title="Go to Open Data Home">
         <img
           class="top-bar__logo"
-          src="https://knowledge.wyvern.space/images/wyvern_logo_horizontal_tagline.png"
+          src="https://guide.wyvern.space/img/wyvern-logo-all-blue-no-tagline.png"
           alt="Wyvern Logo"
         />
         <span class="top-bar__title">Open Data Program</span>
@@ -56,11 +56,11 @@
     </div>
 
     <!-- Main Content Areas -->
-    <div v-if="showMap" class="map-wrapper">
+    <div :class="['map-wrapper', { 'is-hidden': !showMap }]">
       <ArchiveMap @open-stac="openStacFromMap" ref="archiveMap" />
     </div>
 
-    <div v-else class="browser-wrapper">
+    <div :class="['browser-wrapper', { 'is-hidden': showMap }]">
       <Authentication v-if="showLogin" />
       <ErrorAlert
         v-if="globalError"
@@ -316,10 +316,13 @@ export default {
       }
     },
     showMap(isMap) {
-      // When returning to map, ensure resize (for potential black globe issue)
       if (isMap) {
         this.$nextTick(() => {
-          this.$refs.archiveMap?.resizeMap?.();
+          const mapComp = this.$refs.archiveMap;
+          mapComp?.resizeMap?.();
+
+          // NEW: Force a globe refresh to avoid black globe
+          mapComp?.refreshGlobe?.(); 
         });
       }
     }
@@ -370,16 +373,11 @@ export default {
     openStacFromMap(id) {
       if (!id) return;
       this.showMap = false;
-      this.persistPreference();
       const targetPath = `/${id}/${id}.json`;
       this.$router.push({ path: targetPath }).catch(() => {});
     },
     goHome() {
-      // Behavior of clicking the left section; adjust if you want something else.
-      if (!this.showMap) {
-        this.showMap = true;
-        this.persistPreference();
-      }
+      if (!this.showMap) this.showMap = true;
     },
     detectLocale() {
       let locale;
@@ -517,6 +515,7 @@ export default {
   letter-spacing: 0.5px;
   color: #222;
   white-space: nowrap;
+  margin-left: 5px;
 }
 
 .top-bar__center {
@@ -603,5 +602,9 @@ export default {
   height: 14px;
   flex-shrink: 0;
   stroke: currentColor;
+}
+
+.is-hidden {
+  display: none !important;
 }
 </style>
