@@ -58,7 +58,7 @@ export default {
       this.$emit('changed', active);
     }
   },
-  beforeDestroy() {
+  beforeUnmount() {
     this.forceClose();
   },
   methods: {

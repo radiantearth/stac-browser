@@ -63,16 +63,18 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from "vuex";
 import Utils from '../utils';
-import SearchFilter from '../components/SearchFilter.vue';
 import Loading from '../components/Loading.vue';
-import { getDisplayTitle, createSTAC, ItemCollection } from '../models/stac';
-import { STAC } from 'stac-js';
-import { BIconCheckSquare, BIconSquare, BTabs, BTab } from 'bootstrap-vue';
 import { processSTAC, stacRequest } from '../store/utils';
+import SearchFilter from '../components/SearchFilter.vue';
+import { getDisplayTitle, createSTAC, ItemCollection } from '../models/stac';
 
-export default {
+import { STAC } from 'stac-js';
+import { defineComponent } from 'vue';
+import { mapGetters, mapState } from "vuex";
+import { BIconCheckSquare, BIconSquare, BTabs, BTab } from 'bootstrap-vue';
+
+export default defineComponent({
   name: "Search",
   components: {
     BIconCheckSquare,
@@ -223,16 +225,16 @@ export default {
   },
   methods: {
     openItemSearch() {
-      this.$set(this.itemFilters, 'collections', Object.keys(this.selectedCollections));
+      this.itemFilters.collections = Object.keys(this.selectedCollections);
       this.activeSearch = 1;
       this.selectedCollections = {};
     },
     selectForItemSearch(collection) {
       if (this.selectedCollections[collection.id]) {
-        this.$delete(this.selectedCollections, collection.id);
+        delete this.selectedCollections[collection.id];
       }
       else {
-        this.$set(this.selectedCollections, collection.id, true);
+        this.selectedCollections[collection.id] = true;
       }
     },
     canFilterItems(data) {
@@ -290,7 +292,7 @@ export default {
       });
     }
   }
-};
+});
 </script>
 
 <style lang="scss">

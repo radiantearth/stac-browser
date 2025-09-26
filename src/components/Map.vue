@@ -6,18 +6,25 @@
       <TextControl v-if="empty" :map="map" :text="$t('mapping.nodata')" />
       <TextControl v-else-if="!hasBasemap" :map="map" :text="$t('mapping.nobasemap')" />
     </div>
-    <div ref="target" class="popover-target" />
-    <b-popover
-      v-if="popover && selectedItems" show placement="auto" triggers="manual"
-      :target="selectedItems.target" :container="container"
+    <TeleportPopover
+      v-if="popover && selectedItems"
+      trigger-mode="manual"
+      :show="!!selectedItems"
+      placement="bottom"
+      custom-class="map-popover"
     >
-      <section class="popover-items">
-        <Items :stac="stac" :items="selectedItems.items" />
-      </section>
-      <div class="text-center">
-        <b-button target="_blank" variant="danger" @click="resetSelectedItems">{{ $t('mapping.close') }}</b-button>
-      </div>
-    </b-popover>
+      <template #trigger>
+        <div class="popover-trigger-point" :style="triggerStyle"></div>
+      </template>
+      <template #content>
+        <section class="popover-items">
+          <Items :stac="stac" :items="selectedItems.items" />
+        </section>
+        <div class="text-center">
+          <b-button variant="danger" @click="resetSelectedItems">{{ $t('mapping.close') }}</b-button>
+        </div>
+      </template>
+    </TeleportPopover>
   </div>
 </template>
 
@@ -25,8 +32,8 @@
 import MapMixin from './maps/MapMixin.js';
 import LayerControl from './maps/LayerControl.vue';
 import TextControl from './maps/TextControl.vue';
+import TeleportPopover from './TeleportPopover.vue';
 import { mapGetters } from 'vuex';
-import { BPopover } from 'bootstrap-vue';
 import Select from 'ol/interaction/Select';
 import StacLayer from 'ol-stac';
 import { getStacObjectsForEvent, getStyle } from 'ol-stac/util.js';
@@ -39,7 +46,7 @@ let mapId = 0;
 export default {
   name: 'Map',
   components: {
-    BPopover,
+    TeleportPopover,
     Items: () => import('../components/Items.vue'),
     LayerControl,
     TextControl
@@ -73,6 +80,7 @@ export default {
     return {
       stacLayer: null,
       selectedItems: null,
+      clickPosition: { x: 0, y: 0 },
       empty: false,
       selector: null,
       mapId: `map-${++mapId}`,
@@ -88,6 +96,16 @@ export default {
         return '#stac-browser';
       }
     },
+    triggerStyle() {
+      return {
+        position: 'absolute',
+        left: `${this.clickPosition.x}px`,
+        top: `${this.clickPosition.y}px`,
+        width: '1px',
+        height: '1px',
+        pointerEvents: 'none'
+      };
+    }
   },
   watch: {
     async stac() {
@@ -163,11 +181,11 @@ export default {
         });
         this.map.addInteraction(this.selector);
         this.map.on('singleclick', async (event) => {
-          // The event doesn't contain a target element for the popover to attach to.
-          // Thus we move a hidden target element to the click position and attach the popover to it.
-          // See also https://github.com/bootstrap-vue/bootstrap-vue/issues/5285
-          this.$refs.target.style.left = event.pixel[0] + 'px';
-          this.$refs.target.style.top = event.pixel[1] + 'px';
+          // Store click position for popover positioning
+          this.clickPosition = {
+            x: event.pixel[0],
+            y: event.pixel[1]
+          };
 
           this.selector.getFeatures().clear();
           const features = this.selector.getFeatures();
@@ -175,7 +193,6 @@ export default {
           const objects = await getStacObjectsForEvent(event, container, features, 5);
           if (objects.length > 0) {
             this.selectedItems = {
-              target: this.$refs.target,
               items: objects
             };
           }
@@ -215,13 +232,12 @@ export default {
 @import "../../node_modules/ol/ol.css";
 
 #stac-browser {
-  .popover-target {
+  .popover-trigger-point {
     width: 1px;
     height: 1px;
     opacity: 0;
     position: absolute;
-    top: -1px;
-    left: -1px;
+    pointer-events: none;
   }
   
   .popover-items {

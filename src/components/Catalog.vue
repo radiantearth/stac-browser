@@ -7,8 +7,8 @@
       </b-card-title>
       <b-card-text v-if="data && (fileFormats.length > 0 || data.description || data.deprecated)" class="intro">
         <b-badge v-if="data.deprecated" variant="warning" class="mr-1 mt-1 deprecated">{{ $t('deprecated') }}</b-badge>
-        <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="mr-1 mt-1 fileformat">{{ format | formatMediaType }}</b-badge>
-        {{ data.description | summarize }}
+        <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="mr-1 mt-1 fileformat">{{ formatMediaType(format) }}</b-badge>
+        {{ summarizeDescription(data.description) }}
       </b-card-text>
       <Keywords v-if="showKeywordsInCatalogCards && keywords.length > 0" :keywords="keywords" variant="primary" :center="!isList" />
       <b-card-text v-if="temporalExtent" class="datetime"><small v-html="temporalExtent" /></b-card-text>
@@ -34,10 +34,6 @@ export default {
   components: {
     StacLink,
     Keywords: () => import('./Keywords.vue')
-  },
-  filters: {
-    summarize: text => Utils.summarizeMd(text, 300),
-    formatMediaType: value => formatMediaType(value, null, {shorten: true})
   },
   mixins: [
     FileFormatsMixin,
@@ -94,6 +90,12 @@ export default {
         return;
       }
       this.$store.commit(visible ? 'queue' : 'unqueue', this.catalog.href);
+    },
+    summarizeDescription(text) {
+      return Utils.summarizeMd(text, 300);
+    },
+    formatMediaType(value) {
+      return formatMediaType(value, null, {shorten: true});
     }
   }
 };
