@@ -124,6 +124,7 @@ for(let key in CONFIG) {
   };
   Watchers[key] = {
     immediate: false, // Changed from true to avoid accessing store before it's ready
+    deep: ['object', 'array'].includes(typeof CONFIG[key]), // Deep watch for objects and arrays
     handler: async function(newValue) {
       if (this.$store) { // Add safety check
         await this.$store.dispatch('config', {
