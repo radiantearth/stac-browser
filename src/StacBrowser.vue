@@ -1,22 +1,89 @@
 <template>
   <b-container id="stac-browser">
-    <Authentication v-if="showLogin" />
-    <ErrorAlert v-if="globalError" dismissible class="global-error" v-bind="globalError" @close="hideError" />
-    <Sidebar v-if="sidebar" />
-    <!-- Header -->
-    <header>
-      <div class="logo">{{ displayCatalogTitle }}</div>
-      <StacHeader @enableSidebar="sidebar = true" />
-    </header>
-    <!-- Content (Item / Catalog) -->
-    <router-view />
-    <footer>
-      <i18n tag="small" path="poweredBy" class="poweredby text-muted">
-        <template #link>
-          <a href="https://github.com/radiantearth/stac-browser" target="_blank">STAC Browser</a> {{ browserVersion }}
-        </template>
-      </i18n>
-    </footer>
+    <!-- New Top Bar -->
+    <div class="top-bar">
+      <!-- Left Section -->
+      <div class="top-bar__left" @click="goHome" title="Go to Open Data Home">
+        <img
+          class="top-bar__logo"
+          src="https://knowledge.wyvern.space/images/wyvern_logo_horizontal_tagline.png"
+          alt="Wyvern Logo"
+        />
+        <span class="top-bar__title">Open Data Program</span>
+      </div>
+
+      <!-- Center Section (Toggle Buttons) -->
+      <div class="top-bar__center">
+        <button
+          :class="['toggle-btn', { active: showMap }]"
+          @click="showMap = true; persistPreference();"
+          aria-pressed="showMap"
+        >🗺️ Map Browser</button>
+        <button
+          :class="['toggle-btn', { active: !showMap }]"
+          @click="showMap = false; persistPreference();"
+          aria-pressed="!showMap"
+        >🌐 STAC Browser</button>
+      </div>
+
+      <!-- Right Section (External Links) -->
+      <div class="top-bar__right">
+        <a
+          href="https://knowledge.wyvern.space"
+          target="_blank"
+          rel="noopener"
+          class="top-link"
+        >
+          Knowledge Centre
+          <svg class="ext-icon" aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M14 3h7v7m0-7L10 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M5 5v14h14v-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+        <a
+          href="https://guide.wyvern.space"
+          target="_blank"
+          rel="noopener"
+          class="top-link"
+        >
+          Product Guide
+          <svg class="ext-icon" aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M14 3h7v7m0-7L10 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M5 5v14h14v-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- Main Content Areas -->
+    <div v-if="showMap" class="map-wrapper">
+      <ArchiveMap @open-stac="openStacFromMap" ref="archiveMap" />
+    </div>
+
+    <div v-else class="browser-wrapper">
+      <Authentication v-if="showLogin" />
+      <ErrorAlert
+        v-if="globalError"
+        dismissible
+        class="global-error"
+        v-bind="globalError"
+        @close="hideError"
+      />
+      <Sidebar v-if="sidebar" />
+      <!-- Existing STAC Browser header (optional to keep/remove) -->
+      <header>
+        <div class="logo">{{ displayCatalogTitle }}</div>
+        <StacHeader @enableSidebar="sidebar = true" />
+      </header>
+      <router-view />
+      <footer>
+        <i18n tag="small" path="poweredBy" class="poweredby text-muted">
+          <template #link>
+            <a href="https://github.com/radiantearth/stac-browser" target="_blank">STAC Browser</a> {{ browserVersion }}
+          </template>
+        </i18n>
+      </footer>
+    </div>
   </b-container>
 </template>
 
@@ -31,23 +98,22 @@ import getStore from "./store";
 import {
   AlertPlugin, BadgePlugin, ButtonGroupPlugin, ButtonPlugin,
   CardPlugin, LayoutPlugin, SpinnerPlugin,
-  VBToggle, VBVisible } from "bootstrap-vue";
+  VBToggle, VBVisible
+} from "bootstrap-vue";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
 
 import ErrorAlert from './components/ErrorAlert.vue';
 import StacHeader from './components/StacHeader.vue';
-
 import { STAC } from 'stac-js';
 import Utils from './utils';
 import URI from 'urijs';
-
 import { API_LANGUAGE_CONFORMANCE } from './i18n';
 import { getBest, prepareSupported } from 'stac-js/src/locales';
 import BrowserStorage from "./browser-store";
 import Authentication from "./components/Authentication.vue";
-
-import VueGtag from 'vue-gtag'
+import ArchiveMap from './components/ArchiveMap.vue';
+import VueGtag from 'vue-gtag';
 
 Vue.use(AlertPlugin);
 Vue.use(ButtonGroupPlugin);
@@ -56,13 +122,9 @@ Vue.use(BadgePlugin);
 Vue.use(CardPlugin);
 Vue.use(LayoutPlugin);
 Vue.use(SpinnerPlugin);
-
-// For collapsibles / accordions
 Vue.directive('b-toggle', VBToggle);
-// Used to detect when a catalog/item becomes visible so that further data can be loaded
 Vue.directive('b-visible', VBVisible);
 
-// Setup router
 Vue.use(VueRouter);
 const router = new VueRouter({
   mode: CONFIG.historyMode,
@@ -79,19 +141,17 @@ const router = new VueRouter({
 });
 
 Vue.use(VueGtag, {
-    config: {
-        id: 'G-SJ7Y1HXN04'
-    }
-}, router)
+  config: {
+    id: 'G-SJ7Y1HXN04'
+  }
+}, router);
 
-// Setup store
 Vue.use(Vuex);
 const store = getStore(CONFIG, router);
 
-// Pass Config through from props to vuex
 let Props = {};
 let Watchers = {};
-for(let key in CONFIG) {
+for (let key in CONFIG) {
   Props[key] = {
     default: ['object', 'function'].includes(typeof CONFIG[key]) ? () => CONFIG[key] : CONFIG[key]
   };
@@ -113,7 +173,8 @@ export default {
     Authentication,
     ErrorAlert,
     Sidebar: () => import('./components/Sidebar.vue'),
-    StacHeader
+    StacHeader,
+    ArchiveMap
   },
   props: {
     ...Props
@@ -122,7 +183,8 @@ export default {
     return {
       sidebar: false,
       error: null,
-      onDataLoaded: null
+      onDataLoaded: null,
+      showMap: false
     };
   },
   computed: {
@@ -160,14 +222,9 @@ export default {
         if (!locale) {
           return;
         }
-
-        // Set the locale for vue-i18n
         this.$root.$i18n.locale = locale;
-
-        // Update the HTML lang tag
         document.documentElement.setAttribute("lang", locale);
         document.getElementById('og-locale').setAttribute("content", locale);
-
         this.$root.$emit('uiLanguageChanged', locale);
       }
     },
@@ -185,11 +242,7 @@ export default {
             this.$store.commit('state', state);
           }
           else if (this.supportsConformance(API_LANGUAGE_CONFORMANCE)) {
-            // this.url gets reset with resetCatalog so store the url for use in load
             let url = this.url;
-            // Todo: Resetting the catalogs is not ideal. 
-            // A better way would be to combine the language code and URL as the index in the browser database
-            // This needs a database refactor though: https://github.com/radiantearth/stac-browser/issues/231
             this.$store.commit('resetCatalog', true);
             await this.$store.dispatch("load", { url, show: true });
           }
@@ -213,7 +266,7 @@ export default {
             }
           }
           else if (value !== null) {
-              query[name] = value;
+            query[name] = value;
           }
         }
 
@@ -227,7 +280,7 @@ export default {
     root(root, oldRoot) {
       const canChange = [
         'apiCatalogPriority',
-        'authConfig', // except for the 'formatter', which can't be encoded in JSON
+        'authConfig',
         'cardViewMode',
         'cardViewSort',
         'crossOriginMedia',
@@ -239,16 +292,15 @@ export default {
       let doReset = !root || (oldRoot && Utils.isObject(oldRoot['stac_browser']));
       let doSet = root && Utils.isObject(root['stac_browser']);
 
-      for(let key of canChange) {
+      for (let key of canChange) {
         let value;
         if (doReset) {
-          value = CONFIG[key]; // Original value
+          value = CONFIG[key];
         }
         if (doSet && typeof root['stac_browser'][key] !== 'undefined') {
-          value = root['stac_browser'][key]; // Custom value from root
+          value = root['stac_browser'][key];
         }
 
-        // Update config in store
         if (typeof value !== 'undefined') {
           this.$store.dispatch('config', { [key]: value })
             .catch(error => console.error(error));
@@ -262,9 +314,22 @@ export default {
       if (data instanceof STAC) {
         this.onDataLoaded();
       }
+    },
+    showMap(isMap) {
+      // When returning to map, ensure resize (for potential black globe issue)
+      if (isMap) {
+        this.$nextTick(() => {
+          this.$refs.archiveMap?.resizeMap?.();
+        });
+      }
     }
   },
   async created() {
+    try {
+      const pref = localStorage.getItem('wyvern-map-root-pref');
+      if (pref === 'map') this.showMap = true;
+    } catch (e) { /* ignore */ }
+
     this.$router.onReady(() => {
       this.detectLocale();
       this.parseQuery(this.$route);
@@ -275,7 +340,6 @@ export default {
         return;
       }
 
-      // Handle catalog change: https://github.com/radiantearth/stac-browser/issues/250
       let resetOp = 'resetPage';
       if (this.allowSelectCatalog && to.path) {
         let next = this.fromBrowserPath(to.path);
@@ -303,6 +367,20 @@ export default {
   },
   methods: {
     ...mapActions(['switchLocale']),
+    openStacFromMap(id) {
+      if (!id) return;
+      this.showMap = false;
+      this.persistPreference();
+      const targetPath = `/${id}/${id}.json`;
+      this.$router.push({ path: targetPath }).catch(() => {});
+    },
+    goHome() {
+      // Behavior of clicking the left section; adjust if you want something else.
+      if (!this.showMap) {
+        this.showMap = true;
+        this.persistPreference();
+      }
+    },
     detectLocale() {
       let locale;
       if (this.storeLocaleFromVueX) {
@@ -310,9 +388,8 @@ export default {
         locale = storage.get('locale');
       }
       if (!locale && this.detectLocaleFromBrowserFromVueX && Array.isArray(navigator.languages)) {
-        // Detect the most suitable locale
         const supported = prepareSupported(this.supportedLocalesFromVueX);
-        for(let l of navigator.languages) {
+        for (let l of navigator.languages) {
           const best = getBest(supported, l, null);
           if (best) {
             locale = best;
@@ -321,16 +398,19 @@ export default {
         }
       }
       if (locale && this.supportedLocalesFromVueX.includes(locale)) {
-        // This may only change the UI language, but does not change the data language if the data is not loaded yet
         this.switchLocale({locale});
         if (!this.data) {
-          // Thus try switching the (data) language again once the data is loaded.
           this.onDataLoaded = () => {
             this.switchLocale({locale});
             this.onDataLoaded = null;
           };
         }
       }
+    },
+    persistPreference() {
+      try {
+        localStorage.setItem('wyvern-map-root-pref', this.showMap ? 'map' : 'browser');
+      } catch (e) { /* ignore */ }
     },
     parseQuery(route) {
       let privateFromHash = {};
@@ -340,24 +420,21 @@ export default {
       }
       let query = Object.assign({}, route.query, privateFromHash);
       let params = {};
-      for(let key in query) {
+      for (let key in query) {
         let value = query[key];
-        // Store all private query parameters (start with ~) and replace them in the shown URI
         if (key.startsWith('~')) {
           params.private = Utils.isObject(params.private) ? params.private : {};
           params.private[key.substr(1)] = value;
           delete query[key];
         }
-        // Store all state related parameters (start with .)
         else if (key.startsWith('.')) {
           let realKey = key.substr(1);
           params.state = Utils.isObject(params.state) ? params.state : {};
           if (Array.isArray(this.stateQueryParameters[realKey]) && !Array.isArray(value)) {
             value = value.split(',');
           }
-          params.state[realKey] = value;
+            params.state[realKey] = value;
         }
-        // All other parameters should be appended to the main STAC requests
         else {
           if (!Utils.isObject(params.localRequest)) {
             params.localRequest = {};
@@ -378,11 +455,10 @@ export default {
       if (Utils.size(params.private) > 0) {
         this.$router.replace({ query });
       }
-
     },
     showError(error, message) {
       this.$store.commit('showGlobalError', {
-        error, 
+        error,
         message
       });
     },
@@ -399,4 +475,133 @@ export default {
 @import '~bootstrap-vue/src/index.scss';
 @import "./theme/page.scss";
 @import "./theme/custom.scss";
+
+#stac-browser {
+  padding: 0;
+  max-width: 100%;
+}
+
+/* New Top Bar */
+.top-bar {
+  position: relative;
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 18px;
+  background: #ffffff;
+  border-bottom: 1px solid #e1e1e1;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  font-family: "Roboto", sans-serif;
+}
+
+.top-bar__left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.top-bar__logo {
+  height: 34px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.top-bar__title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: #222;
+  white-space: nowrap;
+}
+
+.top-bar__center {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.top-bar__right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.top-link {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #3b26f9;
+  text-decoration: none;
+  letter-spacing: 0.3px;
+  padding: 4px 6px;
+  border-radius: 4px;
+  transition: background .18s, color .18s;
+}
+.top-link:hover {
+  background: #f4f4ff;
+  color: #301fd0;
+  text-decoration: none;
+}
+
+.toggle-btn {
+  cursor: pointer;
+  background: #ffffff;
+  border: 1px solid #ccc;
+  padding: 6px 16px;
+  font-size: 0.85rem;
+  border-radius: 5px;
+  font-weight: 500;
+  color: #333;
+  transition: background .18s, color .18s, box-shadow .18s, border-color .18s;
+  line-height: 1.1;
+}
+.toggle-btn.active {
+  background: #3b26f9;
+  color: #fff;
+  border-color: #3b26f9;
+  box-shadow: 0 0 0 1px #3b26f9 inset;
+}
+.toggle-btn:hover {
+  background: #ecebff;
+}
+
+@media (max-width: 850px) {
+  .top-bar {
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 10px 12px;
+  }
+  .top-bar__left {
+    order: 1;
+  }
+  .top-bar__center {
+    order: 3;
+  }
+  .top-bar__right {
+    order: 2;
+  }
+}
+
+.map-wrapper, .browser-wrapper {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 60px); /* account for top bar height */
+  overflow: hidden;
+}
+
+.browser-wrapper {
+  padding: 15px 15px 0 15px;
+}
+
+.ext-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  stroke: currentColor;
+}
 </style>
