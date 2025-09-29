@@ -509,7 +509,7 @@ function getStore(config, router) {
         if (status instanceof Loading && status.show) {
           state.loading = false;
           state.page = () => ({
-            title: i18n.t('errors.title')
+            title: i18n.global.t('errors.title')
           });
         }
         if (!(error instanceof Error)) {
@@ -697,7 +697,7 @@ function getStore(config, router) {
       },
       async tryLogin(cx, {url, action}) {
         cx.commit('clear', url);
-        cx.commit('errored', { url, error: new BrowserError(i18n.t('authentication.unauthorized')) });
+        cx.commit('errored', { url, error: new BrowserError(i18n.global.t('authentication.unauthorized')) });
         if (action) {
           cx.commit('auth/addAction', action);
         }
@@ -736,7 +736,7 @@ function getStore(config, router) {
           try {
             const response = await stacRequest(cx, url);
             if (!Utils.isObject(response.data)) {
-              throw new BrowserError(i18n.t('errors.invalidJsonObject'));
+              throw new BrowserError(i18n.global.t('errors.invalidJsonObject'));
             }
             data = createSTAC(response.data, url, path);
             cx.commit('loaded', { url, data });
@@ -781,7 +781,7 @@ function getStore(config, router) {
             await cx.dispatch('loadNextApiCollections', args);
           } catch (error) {
             cx.commit('showGlobalError', {
-              message: i18n.t('errors.loadApiCollectionsFailed'),
+              message: i18n.global.t('errors.loadApiCollectionsFailed'),
               error
             });
           }
@@ -793,7 +793,7 @@ function getStore(config, router) {
             await cx.dispatch('loadApiItems', args);
           } catch (error) {
             cx.commit('showGlobalError', {
-              message: i18n.t('errors.loadApiItemsFailed'),
+              message: i18n.global.t('errors.loadApiItemsFailed'),
               error
             });
           }
@@ -838,7 +838,7 @@ function getStore(config, router) {
 
           let response = await stacRequest(cx, link);
           if (!Utils.isObject(response.data) || !Array.isArray(response.data.features)) {
-            throw new BrowserError(i18n.t('errors.invalidStacItems'));
+            throw new BrowserError(i18n.global.t('errors.invalidStacItems'));
           }
           else {
             response.data.features = response.data.features.map(item => {
@@ -936,7 +936,7 @@ function getStore(config, router) {
         try {
           let response = await stacRequest(cx, link);
           if (!Utils.isObject(response.data) || !Array.isArray(response.data.collections)) {
-            throw new BrowserError(i18n.t('errors.invalidStacCollections'));
+            throw new BrowserError(i18n.global.t('errors.invalidStacCollections'));
           }
           else {
             response.data.collections = response.data.collections.map(collection => {
@@ -994,7 +994,7 @@ function getStore(config, router) {
       async retryAfterAuth(cx) {
         let errorFn = error => cx.commit('showGlobalError', {
           error,
-          message: i18n.t('errors.authFailed')
+          message: i18n.global.t('errors.authFailed')
         });
 
         for (let callback of cx.state.doAuth) {
