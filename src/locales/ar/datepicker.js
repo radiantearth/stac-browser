@@ -1,4 +1,13 @@
-const format = 'YYYY-MM-DD';
-const locale = import('vue2-datepicker/locale/ar');
-(await locale).default.formatLocale.firstDayOfWeek = 1;
+import { ar } from 'date-fns/locale';
+
+const format = 'yyyy-MM-dd';
+
+const locale = {
+    ...ar,
+    options: {
+        ...ar.options,
+        weekStartsOn: 1, // Monday is the first day of the week.
+    }, 
+}
+
 export default {format, locale};

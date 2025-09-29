@@ -43,6 +43,7 @@
     "@radiantearth/stac-migrate": "~2.0.2",
     "@turf/mask": "^7.2.0",
     "@vue/compat": "^3.5.21",
+    "@vuepic/vue-datepicker": "^11.0.2",
     "ajv-i18n": "^4.2.0",
     "axios": "^1.2.0",
     "bootstrap-vue": "^2.21.2",
@@ -66,7 +67,6 @@
     "vue-multiselect": "^3.3.1",
     "vue-read-more-smooth": "^0.1.8",
     "vue-router": "^4.5.1",
-    "vue2-datepicker": "^3.11.1",
     "vuex": "^4.1.0",
     "yargs": "^17.0.1"
   },
@@ -78,13 +78,13 @@
     "@vue/cli-plugin-router": "^5.0.4",
     "@vue/cli-plugin-vuex": "^5.0.4",
     "@vue/cli-service": "^5.0.4",
+    "@vue/compiler-sfc": "^3.5.21",
     "babel-eslint": "^10.1.0",
     "eslint": "^8.17.0",
     "eslint-plugin-vue": "^8.7.1",
     "sass": "^1.26.5",
     "sass-loader": "^13.2.0",
-    "vue-cli-plugin-i18n": "~2.3.1",
-    "@vue/compiler-sfc": "^3.5.21"
+    "vue-cli-plugin-i18n": "~2.3.1"
   },
   "optionalDependencies": {
     "ol-mapbox-style": "~13.0.1"

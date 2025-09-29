@@ -23,9 +23,10 @@
         </b-form-group>
 
         <b-form-group v-if="canFilterExtents" class="filter-datetime" :label="$t('search.temporalExtent')" :label-for="ids.datetime" :description="$t('search.dateDescription')">
-          <date-picker
-            range type="datetime" v-model="datetime" input-class="form-control mx-input"
-            :id="ids.datetime" :lang="datepickerLang" :format="dateTimeFormat"
+          <VueDatePicker
+            :id="ids.datetime" v-model="datetime" range :format="dateTimeFormat" input-class="form-control mx-input"
+            :enable-time-picker="true" :time-picker-inline="false" :time-picker-seconds="true" auto-apply :clearable="true" :close-on-scroll="false"
+            multi-calendars="2" :placeholder="$t('search.selectDateRange')"
           />
         </b-form-group>
 
@@ -544,6 +545,7 @@ export default defineComponent({
     additionalFieldSelected(queryable) {
       const operators = queryable.getOperators(this.cql);
       this.filters.push({
+        id: `${queryable.id}-${Date.now()}-${Math.random()}`, // Unique ID
         value: CqlValue.create(queryable.defaultValue),
         operator: operators[0],
         queryable
@@ -620,7 +622,7 @@ export default defineComponent({
 $default-color: map-get($theme-colors, "secondary");
 $primary-color: map-get($theme-colors, "primary");
 
-@import '~vue2-datepicker/scss/index.scss';
+@import '@vuepic/vue-datepicker/dist/main.css';
 
 .queryables .dropdown-menu {
   max-height: 90vh;
