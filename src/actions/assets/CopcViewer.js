@@ -18,7 +18,7 @@ export default class CopcViewer extends AssetActionPlugin {
   }
 
   get text() {
-    return i18n.t('actions.openIn', {service: 'copc.io'});
+    return i18n.global.t('actions.openIn', {service: 'copc.io'});
   }
 
 }
