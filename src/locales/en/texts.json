@@ -58,7 +58,8 @@
   "cancel": "Cancel",
   "catalog": {
     "license": "License",
-    "temporalExtent": "Temporal Extent"
+    "temporalExtent": "Temporal Extent",
+    "selectDateRange": "Select date range"
   },
   "catalogs": {
     "filterByTitle": "Filter catalogs by title",
@@ -279,6 +280,7 @@
       "items": "Search for Items"
     },
     "temporalExtent": "Temporal Extent",
+    "selectDateRange": "Select date range",
     "title": "Search",
     "useInItemSearch": "Open Collection in Item Search | Open {count} Collections in Item Search"
   },

@@ -26,6 +26,18 @@
         v-bind="validation"
       />
 
+      <VueDatePicker
+        v-if="queryable.isTemporal"
+        class="value"
+        :model-value="value?.value"
+        @update:model-value="updateValue"
+        :locale="datepickerLang"
+        :format="queryable.isDateTime ? dateTimeFormat : dateFormat"
+        :enable-time-picker="queryable.isDateTime"
+        auto-apply
+        :clearable="true"
+      />
+
       <b-form-select
         v-else-if="queryable.isSelection"
         :options="queryableOptions"
@@ -109,17 +121,13 @@ export default {
   computed: {
     validation() {
       if (this.queryable.isTemporal) {
-        return {
-          type: this.queryable.isDateTime ? 'datetime' : 'date',
-          lang: this.datepickerLang,
-          format: this.queryable.isDateTime ? this.dateTimeFormat : this.dateFormat
-        };
+        return {};
       }
       else if (this.queryable.isText) {
         return {
           type: 'text',
           minlength: this.schema.minLength,
-          maxlength: this.schema.maxLenggth,
+          maxlength: this.schema.maxLength,
           required: this.schema.minLength > 0
         };
       }

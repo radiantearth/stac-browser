@@ -14,11 +14,11 @@ export class CqlLike extends CqlComparisonOperator {
   }
 
   static get longLabel() {
-    return i18n.t('search.matches');
+  return i18n.global.t('search.matches');
   }
 
   static get description() {
-    return i18n.t('search.likeOperatorDescription');
+  return i18n.global.t('search.likeOperatorDescription');
   }
 
 }

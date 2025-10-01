@@ -31,7 +31,7 @@ export default class F3D extends AssetActionPlugin {
   }
 
   get text() {
-    return i18n.t('actions.openIn', {service: 'f3d.app'});
+    return i18n.global.t('actions.openIn', {service: 'f3d.app'});
   }
 
 }

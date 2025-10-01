@@ -7,12 +7,14 @@
 </template>
 
 <script>
-export default {
+import { defineComponent } from 'vue';
+
+export default defineComponent({
   name: "Logout",
   async created() {
     await this.$store.dispatch("auth/finalizeLogout");
   }
-};
+});
 </script>
 
 <style lang="scss" scoped>
