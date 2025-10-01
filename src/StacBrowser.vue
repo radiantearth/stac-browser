@@ -81,7 +81,7 @@
     <!-- Content (Item / Catalog) -->
     <router-view />
     <footer>
-      <small class="poweredby text-muted" v-html="poweredByText"></small>
+      <small class="poweredby text-muted" v-html="poweredByText" />
     </footer>
   </b-container>
 </template>

@@ -10,7 +10,8 @@
         <template #trigger>
           <b-button
             size="sm" variant="outline-primary"
-            :title="$t('source.detailsAboutSource')" tag="a" tabindex="0">
+            :title="$t('source.detailsAboutSource')" tag="a" tabindex="0"
+          >
             <b-icon-info-lg /><span class="button-label">{{ $t('source.label') }}</span>
           </b-button>
         </template>
@@ -47,7 +48,8 @@
         <template #trigger>
           <b-button
             size="sm" variant="outline-primary"
-            :title="$t('source.share.withOthers')" tag="a" tabindex="0">
+            :title="$t('source.share.withOthers')" tag="a" tabindex="0"
+          >
             <b-icon-share /><span class="button-label">{{ $t('source.share.title') }}</span>
           </b-button>
         </template>

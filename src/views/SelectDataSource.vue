@@ -12,7 +12,7 @@
     <hr v-if="stacIndex.length > 0">
     <b-form-group v-if="stacIndex.length > 0" class="stac-index">
       <template #label>
-        <span v-html="$t('index.selectStacIndex', { stacIndex: '<a href=&quot;https://stacindex.org&quot; target=&quot;_blank&quot;>STAC Index</a>' })"></span>
+        <span v-html="$t('index.selectStacIndex', { stacIndex: '<a href=&quot;https://stacindex.org&quot; target=&quot;_blank&quot;>STAC Index</a>' })" />
       </template>
       <b-list-group>
         <template v-for="catalog in stacIndex" :key="catalog.id">

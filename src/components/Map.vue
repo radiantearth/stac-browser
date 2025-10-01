@@ -14,7 +14,7 @@
       custom-class="map-popover"
     >
       <template #trigger>
-        <div class="popover-trigger-point" :style="triggerStyle"></div>
+        <div class="popover-trigger-point" :style="triggerStyle" />
       </template>
       <template #content>
         <section class="popover-items">

@@ -72,7 +72,7 @@ export default {
     uiLanguage() {
       () => {
       // todo: update the language resources
-    }
+    };
     },
   },
   async mounted() {

@@ -8,6 +8,6 @@ const locale = {
         ...ar.options,
         weekStartsOn: 1, // Monday is the first day of the week.
     }, 
-}
+};
 
 export default {format, locale};

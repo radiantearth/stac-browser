@@ -1,7 +1,7 @@
 <template>
   <!-- Keep trigger in original location for layout -->
   <div ref="triggerRef" class="teleport-popover-trigger">
-    <slot name="trigger"></slot>
+    <slot name="trigger" />
   </div>
   
   <!-- Teleport custom popover content to preserve full Vue context -->
@@ -15,10 +15,10 @@
       @mouseenter="onPopoverMouseEnter"
       @mouseleave="onPopoverMouseLeave"
     >
-      <div class="popover-arrow" :style="arrowStyle"></div>
+      <div class="popover-arrow" :style="arrowStyle" />
       <h3 v-if="title" class="popover-header">{{ title }}</h3>
       <div class="popover-body">
-        <slot name="content"></slot>
+        <slot name="content" />
       </div>
     </div>
   </Teleport>
@@ -162,7 +162,7 @@ export default {
       }
     },
     updatePosition() {
-      if (!this.$refs.popoverElement || !this.$refs.triggerRef) return;
+      if (!this.$refs.popoverElement || !this.$refs.triggerRef) {return;}
       
       const trigger = this.$refs.triggerRef;
       const popover = this.$refs.popoverElement;
@@ -201,11 +201,11 @@ export default {
       
       // Ensure popover stays within viewport
       const margin = 10;
-      if (left < margin) left = margin;
+      if (left < margin) {left = margin;}
       if (left + popoverRect.width > window.innerWidth - margin) {
         left = window.innerWidth - popoverRect.width - margin;
       }
-      if (top < margin) top = margin;
+      if (top < margin) {top = margin;}
       if (top + popoverRect.height > window.innerHeight - margin) {
         top = window.innerHeight - popoverRect.height - margin;
       }

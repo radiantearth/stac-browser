@@ -24,8 +24,10 @@
 
         <b-form-group v-if="canFilterExtents" class="filter-datetime" :label="$t('search.temporalExtent')" :label-for="ids.datetime" :description="$t('search.dateDescription')">
           <VueDatePicker
-            :id="ids.datetime" v-model="datetime" range :format="dateTimeFormat" input-class="form-control mx-input"
-            :enable-time-picker="true" :time-picker-inline="false" :time-picker-seconds="true" auto-apply :clearable="true" :close-on-scroll="false"
+            :id="ids.datetime" v-model="datetime" range :format="dateTimeFormat"
+            input-class="form-control mx-input"
+            :enable-time-picker="true" :time-picker-inline="false" :time-picker-seconds="true" auto-apply
+            :clearable="true" :close-on-scroll="false"
             multi-calendars="2" :placeholder="$t('search.selectDateRange')"
           />
         </b-form-group>
