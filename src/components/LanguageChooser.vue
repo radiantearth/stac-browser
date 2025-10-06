@@ -129,7 +129,7 @@ export default {
       this.$emit('setLocale', locale);
     }
   }  
-}
+};
 </script>
 
 <style lang="scss" scoped>

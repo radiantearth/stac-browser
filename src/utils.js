@@ -1,7 +1,6 @@
 import URI from 'urijs';
 import removeMd from 'remove-markdown';
 import { stacPagination } from "./rels";
-import { browserProtocols } from 'stac-js/src/http.js';
 
 export const commonFileNames = ['catalog', 'collection', 'item'];
 
