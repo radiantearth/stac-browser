@@ -1,5 +1,5 @@
 import Utils from '../../utils';
-import { i18nGlobal } from '../../i18n';
+import i18n from '../../i18n';
 import { mapState } from 'vuex';
 import Map from 'ol/Map.js';
 import View from 'ol/View.js';
@@ -110,31 +110,31 @@ export default {
       });
 
       this.zoomControl = new ZoomControl({
-        zoomInLabel: i18nGlobal.t('mapping.zoom.in.label'),
-        zoomOutLabel: i18nGlobal.t('mapping.zoom.out.label'),
-        zoomInTipLabel: i18nGlobal.t('mapping.zoom.in.description'),
-        zoomOutTipLabel: i18nGlobal.t('mapping.zoom.out.description')
+        zoomInLabel: i18n.global.t('mapping.zoom.in.label'),
+        zoomOutLabel: i18n.global.t('mapping.zoom.out.label'),
+        zoomInTipLabel: i18n.global.t('mapping.zoom.in.description'),
+        zoomOutTipLabel: i18n.global.t('mapping.zoom.out.description')
       });
       this.map.addControl(this.zoomControl);
 
       this.attributionControl = new AttributionControl({
-        tipLabel: i18nGlobal.t('mapping.attribution.description'),
-        label: i18nGlobal.t('mapping.attribution.label'),
-        collapseLabel: i18nGlobal.t('mapping.attribution.collapseLabel'),
+        tipLabel: i18n.global.t('mapping.attribution.description'),
+        label: i18n.global.t('mapping.attribution.label'),
+        collapseLabel: i18n.global.t('mapping.attribution.collapseLabel'),
       });
       this.map.addControl(this.attributionControl);
 
       this.fullScreenControl = new FullScreenControl({
-        label: i18nGlobal.t('fullscreen.showLabel'),
-        labelActive: i18nGlobal.t('fullscreen.exitLabel'),
-        tipLabel: i18nGlobal.t('fullscreen.show'),
+        label: i18n.global.t('fullscreen.showLabel'),
+        labelActive: i18n.global.t('fullscreen.exitLabel'),
+        tipLabel: i18n.global.t('fullscreen.show'),
       });
       this.fullScreenControl.on('enterfullscreen', () => {
-        this.fullScreenControl.button_.title = i18nGlobal.t('fullscreen.exit');
+        this.fullScreenControl.button_.title = i18n.global.t('fullscreen.exit');
         this.isFullScreen = true;
       });
       this.fullScreenControl.on('leavefullscreen', () => {
-        this.fullScreenControl.button_.title = i18nGlobal.t('fullscreen.show');
+        this.fullScreenControl.button_.title = i18n.global.t('fullscreen.show');
         this.isFullScreen = false;
       });
       this.map.addControl(this.fullScreenControl);

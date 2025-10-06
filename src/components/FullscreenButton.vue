@@ -9,7 +9,6 @@
 </template>
 
 <script>
-import { i18nGlobal } from '../i18n';
 export default {
   name: 'FullscreenButton',
   props: {
@@ -27,7 +26,7 @@ export default {
   },
   computed: {
     title() {
-      return this.isFullscreen ? i18nGlobal.t('fullscreen.exit') : i18nGlobal.t('fullscreen.show');
+      return this.isFullscreen ? this.$t('fullscreen.exit') : this.$t('fullscreen.show');
     },
     isSupported() {
       if (!this.getElement()) {

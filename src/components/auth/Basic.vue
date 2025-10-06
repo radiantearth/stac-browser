@@ -75,7 +75,7 @@ export default {
   },
   methods: {
     t(key) {
-  return i18n.global.t(key);
+      return i18n.global.t(key);
     },
     reset() {
       this.$emit('reset');
