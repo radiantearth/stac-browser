@@ -1,27 +1,29 @@
 <template>
-  <!-- Keep trigger in original location for layout -->
-  <div ref="triggerRef" class="teleport-popover-trigger">
-    <slot name="trigger" />
-  </div>
-  
-  <!-- Teleport custom popover content to preserve full Vue context -->
-  <Teleport to="#stac-browser">
-    <div
-      v-if="isVisible"
-      ref="popoverElement"
-      :class="['popover', 'bs-popover-' + placement, customClass]"
-      :style="popoverStyle"
-      role="tooltip"
-      @mouseenter="onPopoverMouseEnter"
-      @mouseleave="onPopoverMouseLeave"
-    >
-      <div class="popover-arrow" :style="arrowStyle" />
-      <h3 v-if="title" class="popover-header">{{ title }}</h3>
-      <div class="popover-body">
-        <slot name="content" />
-      </div>
+  <div>
+    <!-- Keep trigger in original location for layout -->
+    <div ref="triggerRef" class="teleport-popover-trigger">
+      <slot name="trigger" />
     </div>
-  </Teleport>
+    
+    <!-- Teleport custom popover content to preserve full Vue context -->
+    <Teleport to="#stac-browser">
+      <div
+        v-if="isVisible"
+        ref="popoverElement"
+        :class="['popover', 'bs-popover-' + placement, customClass]"
+        :style="popoverStyle"
+        role="tooltip"
+        @mouseenter="onPopoverMouseEnter"
+        @mouseleave="onPopoverMouseLeave"
+      >
+        <div class="popover-arrow" :style="arrowStyle" />
+        <h3 v-if="title" class="popover-header">{{ title }}</h3>
+        <div class="popover-body">
+          <slot name="content" />
+        </div>
+      </div>
+    </Teleport>
+  </div>
 </template>
 
 <script>
