@@ -34,11 +34,6 @@ export const geotiffMediaTypes = [
   "image/vnd.stac.geotiff",
 ].concat(cogMediaTypes);
 
-export const browserProtocols = [
-  'http',
-  'https'
-];
-
 export const imageMediaTypes = browserImageTypes.concat(geotiffMediaTypes);
 export const mapMediaTypes = imageMediaTypes.concat([geojsonMediaType]);
 
@@ -376,29 +371,6 @@ export default class Utils {
     }
     else {
       return href;
-    }
-  }
-
-  static canBrowserDisplayImage(img) {
-    if (typeof img.href !== 'string') {
-      return false;
-    }
-    let uri = URI(img.href);
-    let protocol = uri.protocol().toLowerCase();
-    if (protocol && !browserProtocols.includes(protocol)) {
-      return false;
-    }
-    else if (browserImageTypes.includes(img.type)) {
-      return true;
-    }
-    else if (browserImageTypes.includes('image/' + uri.suffix().toLowerCase())) {
-      return true;
-    }
-    else if (img.type) {
-      return false;
-    }
-    else {
-      return true; // If no img.type is given, try to load it anyway: https://github.com/radiantearth/stac-browser/issues/147
     }
   }
 
