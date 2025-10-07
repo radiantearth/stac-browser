@@ -39,22 +39,8 @@
 
         <b-form-group v-if="conformances.CollectionIdFilter" class="filter-collection" :label="$tc('stacCollection', collections.length)" :label-for="ids.collections">
           <multiselect
-            :id="ids.collections"
             v-model="selectedCollections"
-            :options="collections"
-            :multiple="true"
-            :taggable="!hasAllCollections"
-            track-by="value"
-            label="text"
-            :placeholder="!hasAllCollections ? $t('search.enterCollections') : $t('search.selectCollections')"
-            :tag-placeholder="$t('search.addCollections')"
-            :select-label="$t('multiselect.selectLabel')"
-            :selected-label="$t('multiselect.selectedLabel')"
-            :deselect-label="$t('multiselect.deselectLabel')"
-            :limit-text="count => $t('multiselect.andMore', {count})"
-            :loading="collectionsLoadingTimer !== null"
-            :show-no-results="false"
-            :internal-search="collections.length === 0 || !hasAllCollections"
+            v-bind="collectionSelectOptions"
             @tag="addCollection"
             @search-change="searchCollections"
           >
@@ -256,6 +242,29 @@ export default defineComponent({
     ...mapGetters(['canSearchCollections', 'supportsConformance']),
     collectionSearchLink() {
       return this.parent instanceof CatalogLike && this.parent.getApiCollectionsLink();
+    },
+    collectionSelectOptions() {
+      let taggable = !this.hasAllCollections;
+      let isResult = this.collections.length > 0 && taggable;
+      return {
+        id: this.ids.collections,
+        options: this.collections,
+        multiple: true,
+        taggable: taggable,
+        trackBy: 'value',
+        label: 'text',
+        placeholder: taggable 
+          ? this.$t('search.enterCollections') 
+          : this.$t('search.selectCollections'),
+        tagPlaceholder: this.$t('search.addCollections'),
+        selectLabel: this.$t('multiselect.selectLabel'),
+        selectedLabel: this.$t('multiselect.selectedLabel'),
+        deselectLabel: this.$t('multiselect.deselectLabel'),
+        limitText: count => this.$t('multiselect.andMore', {count}),
+        loading: this.collectionsLoadingTimer !== null,
+        showNoResults: false,
+        internalSearch: !isResult,
+      };
     },
     canSearchCollectionsFreeText() {
       return this.canSearchCollections && this.supportsConformance(TYPES.Collections.FreeText);
