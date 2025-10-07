@@ -170,7 +170,7 @@ export default {
       if (!this.isBrowserProtocol || !window.isSecureContext) {
         return false;
       }
-      else if (typeof this.data.method === 'string' && this.method.toUpperCase() !== 'GET') {
+      else if (typeof this.data.method === 'string' && this.data.method.toUpperCase() !== 'GET') {
         return true;
       }
       else if (Utils.size(this.data.headers) > 0 || Utils.size(this.requestHeaders) > 0) {
