@@ -99,7 +99,7 @@ export default {
       if (this.isStacBrowserLink || this.button) {
         let obj = {
           to: this.href,
-          rel: this.rel
+          rel: this.link.rel
         };
         if (Utils.isObject(this.button)) {
           Object.assign(obj, this.button);
@@ -110,7 +110,7 @@ export default {
         const obj = {
           href: this.href,
           target: '_blank',
-          rel: this.rel,
+          rel: this.link.rel,
         };
         if (this.id) {
           // Add tab index when an ID is given for popoversto make it clickable on MacOS (#655)
