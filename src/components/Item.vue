@@ -8,14 +8,12 @@
       <b-card-text v-if="fileFormats.length > 0 || hasDescription || isDeprecated" class="intro">
         <b-badge v-if="isDeprecated" variant="warning" class="mr-1 mt-1 deprecated">{{ $t('deprecated') }}</b-badge>
         <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="mr-1 mt-1 fileformat">{{ formatMediaType(format) }}</b-badge>
-        <template v-if="hasDescription">{{ summarize(data.properties.description) }}</template>
+        <template v-if="hasDescription">{{ summarizeDescription }}</template>
       </b-card-text>
       <Keywords v-if="showKeywordsInItemCards && keywords.length > 0" :keywords="keywords" variant="primary" center />
       <b-card-text>
         <small class="text-muted">
-          <template v-if="extent">{{ formatTemporalExtent(extent) }}</template>
-          <template v-else-if="data && data.properties.datetime">{{ formatTimestamp(data.properties.datetime) }}</template>
-          <template v-else>{{ $t('items.noTime') }}</template>
+          {{ displayTime }}
         </small>
       </b-card-text>
     </b-card-body>
@@ -74,20 +72,25 @@ export default defineComponent({
     },
     hasDescription() {
       return this.data instanceof STAC && Utils.hasText(this.data.properties.description);
-    }
+    },
+    summarizeDescription() {
+      return this.hasDescription ? Utils.summarizeMd(this.data.properties.description, 150) : '';
+    },
+    displayTime() {
+      if (this.extent) {
+        return formatTemporalExtent(this.extent);
+      }
+      else if (this.data && this.data.properties.datetime) {
+        return formatTimestamp(this.data.properties.datetime);
+      }
+      else {
+        return this.$t('items.noTime');
+      }
+    },
   },
   methods: {
-    summarize(text) {
-      return Utils.summarizeMd(text, 150);
-    },
     formatMediaType(value) {
       return formatMediaType(value, null, {shorten: true});
-    },
-    formatTemporalExtent(extent) {
-      return formatTemporalExtent(extent);
-    },
-    formatTimestamp(timestamp) {
-      return formatTimestamp(timestamp);
     },
     load(visible) {
       if (this.item instanceof STAC) {
