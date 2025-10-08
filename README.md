@@ -132,6 +132,7 @@ The following languages are currently supported:
 - Romanian `ro`
 - Japanese `ja`
 - Portuguese `pt` (Brazil `pt-BR`, Portugal `pt`)
+- Polish `pl`
 
 We manage the translations in Crowdin, please see <https://crowdin.com/project/stac-browser/> for details.
 
@@ -147,6 +148,7 @@ The following contributors kindly provide the translations:
 - [@randa-11295](https://github.com/randa-11295): `ar`
 - [@rnanclares](https://github.com/rnanclares): `es`
 - [@uba](https://github.com/uba): `pt-BR`
+- [@jtreska](https://github.com/jtreska): `pl`
 
 #### Custom phrases
 
