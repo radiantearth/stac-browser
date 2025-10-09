@@ -537,9 +537,6 @@ export default defineComponent({
           .map(([key, schema]) => new Queryable(key, schema));
       }
     },
-    sortFieldSet(value) {
-      this.sortTerm = value;
-    },
     sortDirectionSet(value) {
       this.sortOrder = value;
     },
@@ -591,9 +588,6 @@ export default defineComponent({
       }
       this.query.q.push(term);
     },
-    setSearchTerms(terms) {
-      this.query.q = terms;
-    },
     addCollection(collection) {
       if (!this.collectionSelectOptions.taggable) {
         return;
@@ -604,15 +598,8 @@ export default defineComponent({
       this.collections.push(opt);
       this.query.collections.push(collection);
     },
-    setCollections(collections) {
-      this.selectedCollections = collections;
-      this.query.collections = collections.map(c => c.value);
-    },
     addId(id) {
       this.query.ids.push(id);
-    },
-    setIds(ids) {
-      this.query.ids = ids;
     },
     formatSort() {
       if (this.sortTerm && this.sortTerm.value && this.sortOrder) {
