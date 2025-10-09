@@ -25,11 +25,12 @@ function loadLocaleConfig() {
 
 const i18n = createI18n({
   legacy: true,
+  allowComposition: true,
   globalInjection: true,
   locale: CONFIG.locale,
   fallbackLocale: CONFIG.fallbackLocale,
   messages: loadLocaleConfig(),
-  // Workaround for https://github.com/kazupon/vue-i18n/issues/563
+  // Todo: Workaround for https://github.com/kazupon/vue-i18n/issues/563
   postTranslation: (value, path) => {
     if (value === "") {
       const parts = path.split('.');
