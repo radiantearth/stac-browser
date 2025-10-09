@@ -245,16 +245,16 @@ export default defineComponent({
       return {
         id: this.ids.collections,
         multiple: true,
-        taggable: taggable,
-        options: this.collections,
-        trackBy: 'value',
-        label: 'text',
+        taggable,
+        options: this.collections, // query.collections
+        trackBy: "value",
+        label: "text",
         placeholder: taggable ? this.$t('search.enterCollections') : this.$t('search.selectCollections'),
         tagPlaceholder: this.$t('search.addCollections'),
         selectLabel: this.$t('multiselect.selectLabel'),
         selectedLabel: this.$t('multiselect.selectedLabel'),
         deselectLabel: this.$t('multiselect.deselectLabel'),
-        limitText: count => this.$t('multiselect.andMore', {count}),
+        limitText: count => this.$t("multiselect.andMore", {count}),
         loading: this.collectionsLoadingTimer !== null,
         showNoResults: false,
         internalSearch: !isResult
