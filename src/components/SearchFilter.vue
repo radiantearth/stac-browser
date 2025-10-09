@@ -239,22 +239,17 @@ export default defineComponent({
   computed: {
     ...mapState(['searchResultsPerPage', 'maxEntriesPerPage', 'uiLanguage']),
     ...mapGetters(['canSearchCollections', 'supportsConformance']),
-    collectionSearchLink() {
-      return this.parent instanceof CatalogLike && this.parent.getApiCollectionsLink();
-    },
     collectionSelectOptions() {
       let taggable = !this.hasAllCollections;
-      let isResult = this.collections.length > 0 && taggable;
+      let isResult = this.collections.length > 0 && !this.hasAllCollections;
       return {
         id: this.ids.collections,
-        options: this.collections,
         multiple: true,
         taggable: taggable,
+        options: this.collections,
         trackBy: 'value',
         label: 'text',
-        placeholder: taggable 
-          ? this.$t('search.enterCollections') 
-          : this.$t('search.selectCollections'),
+        placeholder: taggable ? this.$t('search.enterCollections') : this.$t('search.selectCollections'),
         tagPlaceholder: this.$t('search.addCollections'),
         selectLabel: this.$t('multiselect.selectLabel'),
         selectedLabel: this.$t('multiselect.selectedLabel'),
@@ -262,8 +257,11 @@ export default defineComponent({
         limitText: count => this.$t('multiselect.andMore', {count}),
         loading: this.collectionsLoadingTimer !== null,
         showNoResults: false,
-        internalSearch: !isResult,
+        internalSearch: !isResult
       };
+    },
+    collectionSearchLink() {
+      return this.parent instanceof CatalogLike && this.parent.getApiCollectionsLink();
     },
     canSearchCollectionsFreeText() {
       return this.canSearchCollections && this.supportsConformance(TYPES.Collections.FreeText);
