@@ -49,7 +49,7 @@
               </b-button>
               <LanguageChooser
                 :data="data" :currentLocale="localeFromVueX" :locales="supportedLocalesFromVueX"
-                @setLocale="locale => switchLocale({locale, userSelected: true})"
+                @set-locale="locale => switchLocale({locale, userSelected: true})"
               />
             </b-button-group>
           </nav>
