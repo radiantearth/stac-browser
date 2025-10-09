@@ -37,6 +37,22 @@ const vueConfig = {
     // Configure Vue 3 compatibility mode
     webpackConfig.resolve.alias.set('vue', '@vue/compat');
 
+    // Configure Vue 3 template compiler options
+    webpackConfig.module
+      .rule('vue')
+      .use('vue-loader')
+      .tap(options => {
+        if (!options.compilerOptions) {
+          options.compilerOptions = {};
+        }
+        // Preserve whitespace behavior from Vue 2
+        options.compilerOptions.whitespace = 'preserve';
+        // Preserve comments during development for better debugging
+        // In production, comments are removed for smaller bundle size
+        options.compilerOptions.comments = process.env.NODE_ENV !== 'production';
+        return options;
+      });
+
     webpackConfig.plugin('define').tap(args => {
       args[0].STAC_BROWSER_VERSION = JSON.stringify(pkgFile.version);
       args[0].CONFIG_PATH = JSON.stringify(configFile);
