@@ -113,6 +113,11 @@ export default {
       required: true
     }
   },
+  emits: [
+    'remove-queryable',
+    'update:value',
+    'update:operator'
+  ],
   computed: {
     validation() {
       if (this.queryable.isText) {

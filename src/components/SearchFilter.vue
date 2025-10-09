@@ -86,13 +86,11 @@
 
           <QueryableInput
             v-for="(filter, index) in filters" :key="filter.id"
-            :value="filter.value"
-            :operator="filter.operator"
+            v-model:value="filter.value"
+            v-model:operator="filter.operator"
             :queryable="filter.queryable"
             :index="index"
             :cql="cql"
-            @update:value="val => filter.value = val"
-            @update:operator="op => filter.operator = op"
             @remove-queryable="removeQueryable(index)"
           />
         </b-form-group>
