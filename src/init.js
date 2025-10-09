@@ -22,7 +22,7 @@ export default function init() {
       routes: getRoutes(CONFIG),
       scrollBehavior: (to, from, savedPosition) => {
         if (to.path !== from.path) {
-          return { x: 0, y: 0 };
+          return { left: 0, top: 0 };
         }
         else {
           return savedPosition;
