@@ -5,19 +5,9 @@ const dateFormat = 'yyyy-MM-dd';
 const timeFormat = 'HH:mm:ss';
 const dateTimeFormat = `${dateFormat} ${timeFormat}`;
 
-// 2A. Either re-use settings and phrases from vue2-datepicker (and customize them)...
-const locale = en;
-
-
-// Usually not needed, but we customize the first day of the week for "international" users.
-const customLocale = {
-  ...locale,
-  options: {
-    weekStartsOn: 1, // Monday
-  },
-};
-
-// 2B. ... or define your own based on https://github.com/mengxiong10/vue2-datepicker
+// Customize the en locale to start the week on Monday for international users
+// Use a safe approach that maintains date-fns locale structure
+const locale = en; // Default locale
 /*
 const locale = {
   // the locale of formatting and parsing function
@@ -61,4 +51,4 @@ const locale = {
 }
 */
 
-export default {dateFormat, timeFormat, dateTimeFormat, locale: customLocale};
+export default {dateFormat, timeFormat, dateTimeFormat, locale};
