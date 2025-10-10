@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import { BForm, BFormGroup, BFormInput, BListGroup, BListGroupItem, BBadge, BButton } from 'bootstrap-vue';
+import { BForm, BFormGroup, BFormInput, BListGroup, BListGroupItem } from 'bootstrap-vue';
 import { mapGetters } from "vuex";
 import { defineComponent } from 'vue';
 import Description from '../components/Description.vue';
@@ -56,8 +56,6 @@ export default defineComponent({
     BFormInput,
     BListGroup,
     BListGroupItem,
-    BBadge,
-    BButton,
     Description
   },
   data() {
