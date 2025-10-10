@@ -8,8 +8,10 @@
 <script>
 import ErrorAlert from '../components/ErrorAlert.vue';
 import Loading from '../components/Loading.vue';
-import { mapActions, mapGetters } from 'vuex/dist/vuex.common.js';
-export default {
+import { defineComponent } from 'vue';
+import { mapActions, mapGetters } from 'vuex';
+
+export default defineComponent({
   name: "LoginCallback",
   components: {
     ErrorAlert,
@@ -38,5 +40,5 @@ export default {
   methods: {
     ...mapActions('auth', ['finalizeLogin'])
   }
-};
+});
 </script>

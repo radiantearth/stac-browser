@@ -43,7 +43,7 @@ export default class ActionPlugin {
   }
 
   get text() {
-    return i18n.t('open');
+  return i18n.global.t('open');
   }
 
 }

@@ -10,9 +10,10 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
 import { BIconSortAlphaDown, BIconSortAlphaUp } from 'bootstrap-vue';
 
-export default {
+export default defineComponent({
   name: "SortButtons",
   components: {
     BIconSortAlphaDown,
@@ -37,5 +38,5 @@ export default {
       this.$emit('input', newValue);
     }
   }
-};
+});
 </script>

@@ -27,7 +27,7 @@ export default class Felt extends AssetActionPlugin {
   }
 
   get text() {
-    return i18n.t('actions.openIn', {service: 'Felt'});
+    return i18n.global.t('actions.openIn', {service: 'Felt'});
   }
 
 }

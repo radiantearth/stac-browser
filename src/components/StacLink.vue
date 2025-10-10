@@ -6,6 +6,7 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
 import { mapState, mapGetters } from 'vuex';
 import { stacBrowserNavigatesTo } from "../rels";
 import Utils from '../utils';
@@ -13,7 +14,7 @@ import { getDisplayTitle } from '../models/stac';
 import { STAC } from 'stac-js';
 import URI from 'urijs';
 
-export default {
+export default defineComponent({
   name: "StacLink",
   props: {
     data: {
@@ -134,6 +135,11 @@ export default {
         else {
           href = this.toBrowserPath(this.link.href);
         }
+        // Ensure href is a non-empty string
+        if (typeof href !== 'string' || href.length === 0) {
+          href = '/';
+        }
+        // Normalize to start with a slash for router-link navigation
         if (!href.startsWith('/')) {
           href = '/' + href;
         }
@@ -175,5 +181,5 @@ export default {
       return Utils.isObject(o) && !(o instanceof STAC);
     }
   }
-};
+});
 </script>

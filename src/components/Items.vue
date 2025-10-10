@@ -42,6 +42,7 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
 import Item from './Item.vue';
 import Loading from './Loading.vue';
 import Pagination from './Pagination.vue';
@@ -50,7 +51,7 @@ import Utils from '../utils';
 import { getDisplayTitle } from '../models/stac';
 import { mapState } from 'vuex';
 
-export default {
+export default defineComponent({
   name: "Items",
   components: {
     BCollapse,
@@ -189,5 +190,5 @@ export default {
       this.$emit('paginate', link);
     }
   }
-};
+});
 </script>
