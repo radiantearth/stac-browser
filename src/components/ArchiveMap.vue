@@ -50,7 +50,7 @@ export default {
   props: {
     accessToken: {
       type: String,
-      default: 'pk.eyJ1Ijoid3l2ZXJuZGV2ZWxvcGVycyIsImEiOiJjbHlzdGJwNmkwbGtqMmpxNW1weGk2b3k0In0.EE7ezYVlB6gF_HjFikgcxg'
+      default: 'pk.eyJ1Ijoid3l2ZXJuZGV2ZWxvcGVycyIsImEiOiJjbWU4cG92dnQwaTNwMmpwd3B3NXJ0bGR2In0.KxjqgZ71F8GOzLUJS8XZmg'
     },
     geojsonUrl: {
       type: String,
