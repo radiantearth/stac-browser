@@ -29,6 +29,7 @@ export default defineComponent({
       default: false
     }
   },
+  emits: ['input'],
   methods: {
     toggle(selectedValue) {
       let newValue = this.enforce ? 1 : 0;

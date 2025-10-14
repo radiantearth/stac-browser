@@ -104,6 +104,7 @@ export default defineComponent({
       default: null
     }
   },
+  emits: ['filtersShown', 'filterItems', 'paginate'],
   data() {
     return {
       shownItems: this.chunkSize,

@@ -17,6 +17,7 @@ export default {
       required: true
     }
   },
+  emits: ['changed'],
   data() {
     return {
       isFullscreen: false,
