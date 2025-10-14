@@ -57,7 +57,7 @@ function writeToFile(file, locales) {
   const data = {};
   Object.keys(locales).sort().forEach(key => data[key] = key);
   const json = JSON.stringify(data, null, 2);
-  fs.writeFileSync(file, json);
+  fs.writeFileSync(file, json + "\n");
 }
 
 function generateLocales() {
