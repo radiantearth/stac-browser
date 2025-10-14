@@ -46,6 +46,7 @@ export default {
       default: null
     }
   },
+  emits: ['submit', 'reset'],
   data() {
     return {
       username: '',

@@ -91,6 +91,7 @@ export default defineComponent({
       default: null
     }
   },
+  emits: ['loadMore', 'paginate'],
   data() {
     return {
       searchTerm: '',

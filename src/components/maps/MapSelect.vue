@@ -47,6 +47,7 @@ export default {
       default: null
     }
   },
+  emits: ['input'],
   data() {
     return {
       crs: 'EPSG:4326',

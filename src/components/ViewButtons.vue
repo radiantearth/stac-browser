@@ -24,6 +24,7 @@ export default {
       default: 'cards'
     }
   },
+  emits: ['input'],
   methods: {
     toggle(selectedValue) {
       if(this.value !== selectedValue) {

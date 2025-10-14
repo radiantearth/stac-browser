@@ -96,6 +96,7 @@ export default {
       default: () => ([])
     }
   },
+  emits: ['show'],
   data() {
     return {
       id: i++,

@@ -41,6 +41,7 @@ export default {
       default: null
     }
   },
+  emits: ['showAsset'],
   computed: {
     shownKeys() {
       return this.shown

@@ -225,6 +225,7 @@ export default defineComponent({
       default: () => ({})
     }
   },
+  emits: ['input'],
   data() {
     return Object.assign({
       results: null,

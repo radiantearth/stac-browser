@@ -76,6 +76,7 @@ export default {
       default: false
     }
   },
+  emits: ['empty', 'changed'],
   data() {
     return {
       stacLayer: null,

@@ -39,6 +39,7 @@ export default {
       default: ''
     }
   },
+  emits: ['submit', 'reset'],
   data() {
     return {
       token: '',
