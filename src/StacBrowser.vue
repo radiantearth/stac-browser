@@ -591,7 +591,7 @@ export default {
   position: relative;
   width: 100%;
   height: calc(100vh - 60px); /* account for top bar height */
-  overflow: hidden;
+  overflow:auto;
 }
 
 .browser-wrapper {
