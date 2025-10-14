@@ -15,7 +15,7 @@
       "generic": "Kopiuj adres URL",
       "withSource": "Kopiuj adres URL do {source}"
     },
-      "currentlyShown": "To jest aktualnie wyświetlany zasób",
+    "currentlyShown": "To jest aktualnie wyświetlany zasób",
     "download": {
       "generic": "Pobierz",
       "withSource": "Pobierz z {source}"
@@ -50,7 +50,7 @@
     },
     "title": "Uwierzytelnienie",
     "unauthorized": "Nie masz uprawnień do dostępu do tych danych. Zaloguj się.",
-    "unsupportetd": "Nieobsługiwane",
+    "unsupported": "",
     "unsupportedLong": "Przepraszamy, metoda uwierzytelniania {method} nie jest obsługiwana przez STAC Browser.",
     "user": "Użytkownik"
   },
@@ -167,7 +167,8 @@
     "layers": {
       "title": "Warstwy",
       "base": "Warstwy podstawowe",
-      "unnamed": "Bez nazwy #{id}"
+      "unnamed": "Bez nazwy #{id}",
+      "footprint": ""
     },
     "location": {
       "description": "Przejdź do swojej lokalizacji"
@@ -208,6 +209,7 @@
   "poweredBy": "Wspierane przez {link}",
   "protocol": {
     "azure": "Microsoft Azure",
+    "file": "",
     "ftp": "FTP",
     "gcs": "Google Cloud",
     "oss": "Alibaba Cloud",
