@@ -81,10 +81,10 @@ export default {
     this.initMap();
     document.addEventListener('visibilitychange', this.handleVis);
   },
-  // beforeUnmount() {
-  //   document.removeEventListener('visibilitychange', this.handleVis);
-  //   if (this.map) this.map.remove();
-  // },
+  beforeUnmount() {
+    document.removeEventListener('visibilitychange', this.handleVis);
+    if (this.map) this.map.remove();
+  },
   methods: {
     handleResize() { this.$forceUpdate(); },
       handleVis() {
@@ -496,6 +496,13 @@ export default {
   max-width: 280px;
   font-size: 0.9em;
 }
+
+@media (max-width: 800px)  {
+  #upload-card {
+    visibility: hidden;
+  }
+}
+
 #upload-card h3 {
   margin: 0 0 10px;
   font-size: 1em;

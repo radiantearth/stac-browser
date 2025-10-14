@@ -330,7 +330,7 @@ export default {
   async created() {
     try {
       const pref = localStorage.getItem('wyvern-map-root-pref');
-      if (pref === 'map') this.showMap = true;
+      if (pref === 'map' && this.$route.path == '/') this.showMap = true;
     } catch (e) { /* ignore */ }
 
     this.$router.onReady(() => {
@@ -577,6 +577,7 @@ export default {
   }
   .top-bar__left {
     order: 1;
+    display: inline-block;
   }
   .top-bar__center {
     order: 3;
