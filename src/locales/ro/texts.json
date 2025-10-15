@@ -108,6 +108,7 @@
     "noExternalAccess": "Accesul la cataloage externe nu este permis!",
     "notFound": "Resursa solicitată nu există. @:errors.contactProvider",
     "serverError": "Serverul a întâmpinat o problemă. @:errors.contactProvider",
+    "title": "",
     "unauthorized": "Solicitarea necesită informații de autentificare, cum ar fi un token API. Vă rugăm să furnizați acreditările și să încercați din nou"
   },
   "featureExperimental": "Această funcție este încă experimentală și poate da rezultate neașteptate!",
@@ -134,6 +135,7 @@
   "in": "în {catalog}",
   "index": {
     "api": "API",
+    "catalog": "",
     "load": "Încărcare",
     "selectStacIndex": "... sau selectați unul din {stacIndex}:",
     "specifyCatalog": "Vă rugăm să specificați un catalog STAC sau un API...",
@@ -153,12 +155,26 @@
   "mapping": {
     "attribution": {
       "label": "i",
+      "description": "",
       "collapseLabel": "✕"
     },
-    "bboxSelect": {},
+    "bboxSelect": {
+      "add": "",
+      "remove": ""
+    },
     "close": "Închidere",
-    "layers": {},
-    "location": {},
+    "fit": "",
+    "layers": {
+      "title": "",
+      "base": "",
+      "unnamed": "",
+      "footprint": ""
+    },
+    "location": {
+      "description": ""
+    },
+    "nobasemap": "",
+    "nodata": "",
     "zoom": {
       "in": {
         "description": "Mărire",
