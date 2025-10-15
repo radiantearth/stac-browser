@@ -50,7 +50,7 @@
     },
     "title": "Uwierzytelnienie",
     "unauthorized": "Nie masz uprawnień do dostępu do tych danych. Zaloguj się.",
-    "unsupported": "",
+    "unsupported": "Nieobsługiwane",
     "unsupportedLong": "Przepraszamy, metoda uwierzytelniania {method} nie jest obsługiwana przez STAC Browser.",
     "user": "Użytkownik"
   },
