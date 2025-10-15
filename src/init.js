@@ -1,12 +1,65 @@
-import Vue from "vue";
+import { createApp } from "vue";
+import { createRouter, createWebHistory, createWebHashHistory } from "vue-router";
 import StacBrowser from "./StacBrowser.vue";
 import i18n, { loadDefaultMessages } from './i18n';
+import CONFIG from './config';
+import getRoutes from "./router";
+import getStore from "./store";
+
+import { 
+  AlertPlugin, BadgePlugin, ButtonGroupPlugin, ButtonPlugin,
+  CardPlugin, FormPlugin, FormGroupPlugin, FormInputPlugin, FormCheckboxPlugin, FormRadioPlugin,
+  LayoutPlugin, ListGroupPlugin, PopoverPlugin, SpinnerPlugin,
+  VBToggle, VBVisible } from "bootstrap-vue";
+import "bootstrap/dist/css/bootstrap.css";
+import "bootstrap-vue/dist/bootstrap-vue.css";
 
 export default function init() {
   return loadDefaultMessages().then(() => {
-    return new Vue({
-      i18n,
-      render: h => h(StacBrowser)
-    }).$mount("#stac-browser");
+    // Setup router
+    const router = createRouter({
+      history: CONFIG.historyMode === 'history' ? createWebHistory(CONFIG.pathPrefix) : createWebHashHistory(CONFIG.pathPrefix),
+      routes: getRoutes(CONFIG),
+      scrollBehavior: (to, from, savedPosition) => {
+        if (to.path !== from.path) {
+          return { left: 0, top: 0 };
+        }
+        else {
+          return savedPosition;
+        }
+      }
+    });
+
+    // Setup store
+    const store = getStore(CONFIG, router);
+
+    const app = createApp(StacBrowser);
+    
+    // Add plugins
+    app.use(AlertPlugin);
+    app.use(BadgePlugin);
+    app.use(ButtonGroupPlugin);
+    app.use(ButtonPlugin);
+    app.use(CardPlugin);
+    app.use(FormPlugin);
+    app.use(FormGroupPlugin);
+    app.use(FormInputPlugin);
+    app.use(FormCheckboxPlugin);
+    app.use(FormRadioPlugin);
+    app.use(LayoutPlugin);
+    app.use(ListGroupPlugin);
+    app.use(PopoverPlugin);
+    app.use(SpinnerPlugin);
+    
+    // Add directives
+    app.directive('b-toggle', VBToggle);
+    app.directive('b-visible', VBVisible);
+    
+    // Add router, store, and i18n
+    app.use(i18n);
+    app.use(router);
+    app.use(store);
+
+    return app.mount("#stac-browser");
   });
 }

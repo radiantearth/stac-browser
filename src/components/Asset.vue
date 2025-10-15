@@ -76,6 +76,7 @@ export default {
       default: false
     }
   },
+  emits: ['show'],
   data() {
     return {
       expanded: false

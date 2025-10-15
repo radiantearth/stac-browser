@@ -17,13 +17,20 @@
           <b-badge variant="dark" class="ml-2">{{ op.label }}</b-badge>
         </b-dropdown-item-button>
       </b-dropdown>
-      
-      <date-picker
+
+      <VueDatePicker
         v-if="queryable.isTemporal"
         class="value"
-        :value="value.value"
-        @input="updateValue($event)"
-        v-bind="validation"
+        :model-value="value?.value"
+        @update:model-value="updateValue"
+        :locale="uiLanguage"
+        :format-locale="datepickerLang"
+        :format="queryable.isDateTime ? dateTimeFormat : dateFormat"
+        :enable-time-picker="queryable.isDateTime"
+        :time-picker-inline="false"
+        :time-picker-seconds="queryable.isDateTime"
+        auto-apply
+        clearable
       />
 
       <b-form-select
@@ -106,16 +113,14 @@ export default {
       required: true
     }
   },
+  emits: [
+    'remove-queryable',
+    'update:value',
+    'update:operator'
+  ],
   computed: {
     validation() {
-      if (this.queryable.isTemporal) {
-        return {
-          type: this.queryable.isDateTime ? 'datetime' : 'date',
-          lang: this.datepickerLang,
-          format: this.queryable.isDateTime ? this.dateTimeFormat : this.dateFormat
-        };
-      }
-      else if (this.queryable.isText) {
+      if (this.queryable.isText) {
         return {
           type: 'text',
           minlength: this.schema.minLength,

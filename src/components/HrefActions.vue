@@ -1,7 +1,19 @@
 <template>
   <div>
     <b-button-group class="actions" :vertical="vertical" :size="size" v-if="href">
-      <b-button variant="danger" v-if="requiresAuth" tag="a" tabindex="0" :id="`popover-href-${id}-btn`" @click="handleAuthButton">
+      <TeleportPopover v-if="requiresAuth && auth.length > 1" placement="bottom" :title="$t('authentication.chooseMethod')">
+        <template #trigger>
+          <b-button variant="danger" tag="a" tabindex="0">
+            <b-icon-lock /> {{ $t('authentication.required') }}
+          </b-button>
+        </template>
+        <template #content>
+          <b-list-group>
+            <AuthSchemeItem v-for="(method, i) in auth" :key="i" :method="method" @authenticate="startAuth" />
+          </b-list-group>
+        </template>
+      </TeleportPopover>
+      <b-button v-else-if="requiresAuth" variant="danger" tag="a" tabindex="0" @click="handleAuthButton">
         <b-icon-lock /> {{ $t('authentication.required') }}
       </b-button>
       <b-button v-if="hasDownloadButton" :disabled="requiresAuth" v-bind="downloadProps" v-on="downloadEvents" variant="primary">
@@ -23,23 +35,14 @@
         {{ action.text }}
       </b-button>
     </b-button-group>
-    
-    <b-popover
-      v-if="auth.length > 1"
-      :id="`popover-href-${id}`" custom-class="href-auth-methods" :target="`popover-href-${id}-btn`"
-      triggers="focus" container="stac-browser" :title="$t('authentication.chooseMethod')"
-    >
-      <b-list-group>
-        <AuthSchemeItem v-for="(method, i) in auth" :key="i" :method="method" @authenticate="startAuth" />
-      </b-list-group>
-    </b-popover>
   </div>
 </template>
 
 
 <script>
-import { BIconBoxArrowUpRight, BIconDownload, BIconEye, BIconLock, BListGroup, BPopover, BSpinner } from 'bootstrap-vue';
+import { BIconBoxArrowUpRight, BIconDownload, BIconEye, BIconLock, BListGroup, BSpinner } from 'bootstrap-vue';
 import Description from './Description.vue';
+import TeleportPopover from './TeleportPopover.vue';
 import Utils, { imageMediaTypes, mapMediaTypes } from '../utils';
 import { mapGetters, mapState } from 'vuex';
 import AssetActions from '../../assetActions.config';
@@ -61,11 +64,11 @@ export default {
     BIconEye,
     BIconLock,
     BListGroup,
-    BPopover,
     BSpinner,
     CopyButton: () => import('./CopyButton.vue'),
     Description,
-    Metadata: () => import('./Metadata.vue')
+    Metadata: () => import('./Metadata.vue'),
+    TeleportPopover
   },
   props: {
     data: {
@@ -93,6 +96,7 @@ export default {
       default: () => ([])
     }
   },
+  emits: ['show'],
   data() {
     return {
       id: i++,
@@ -382,7 +386,10 @@ export default {
       else {
         const name = this.$t(`authentication.schemeTypes.${method.type}`, method);
         const message = this.$t('authentication.unsupportedLong', {method: name});
-        this.$root.$emit('error', new Error(message), this.$t('authentication.unsupported'));
+        this.$store.commit('showGlobalError', {
+          error: new Error(message),
+          message: this.$t('authentication.unsupported')
+        });
       }
     }
   }

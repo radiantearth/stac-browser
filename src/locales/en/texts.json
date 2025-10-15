@@ -279,6 +279,7 @@
       "items": "Search for Items"
     },
     "temporalExtent": "Temporal Extent",
+    "selectDateRange": "Select date range",
     "title": "Search",
     "useInItemSearch": "Open Collection in Item Search | Open {count} Collections in Item Search"
   },

@@ -31,7 +31,7 @@ export default class Auth {
    * @returns {string}
    */
   getLoginLabel() {
-    return i18n.t('authentication.button.login');
+  return i18n.global.t('authentication.button.login');
   }
 
   /**
@@ -40,7 +40,7 @@ export default class Auth {
    * @returns {string}
    */
   getLogoutLabel() {
-    return i18n.t('authentication.button.logout');
+  return i18n.global.t('authentication.button.logout');
   }
 
   getComponent() {

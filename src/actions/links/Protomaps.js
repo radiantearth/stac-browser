@@ -16,7 +16,7 @@ export default class Protomaps extends LinkActionPlugin {
   }
 
   get text() {
-    return i18n.t('actions.openIn', {service: 'Protomaps'});
+    return i18n.global.t('actions.openIn', {service: 'Protomaps'});
   }
 
 }

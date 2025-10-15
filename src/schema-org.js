@@ -94,8 +94,8 @@ function fallbackDescription(data, store) {
     stacType = "Item";
   }
   if (stacType) {
-    let type = i18n.tc(`stac${stacType}`);
-    let inX = i18n.t('in', {catalog: container || store.catalogTitle});
+    let type = i18n.global.tc(`stac${stacType}`);
+    let inX = i18n.global.t('in', {catalog: container || store.catalogTitle});
     return `SpatioTemporal Asset Catalog (STAC)\n${type} - ${data.id} ${inX}`;
   }
 }

@@ -35,14 +35,14 @@
             </b-tabs>
           </b-card>
         </section>
-        <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="selectedReferences" @showAsset="showAsset" />
+        <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="selectedReferences" @show-asset="showAsset" />
         <Assets v-if="hasItemAssets && !hasItems" :assets="itemAssets" :context="data" :definition="true" />
         <Providers v-if="providers" :providers="providers" />
         <Metadata class="mb-4" :type="data.type" :data="data" :ignoreFields="ignoredMetadataFields" />
         <Links v-if="linkPosition === 'right'" :title="$t('additionalResources')" :links="additionalLinks" :context="data" />
       </b-col>
       <b-col class="catalogs-container" v-if="hasCatalogs">
-        <Catalogs :catalogs="catalogs" :hasMore="!!nextCollectionsLink" @loadMore="loadMoreCollections" />
+        <Catalogs :catalogs="catalogs" :hasMore="!!nextCollectionsLink" @load-more="loadMoreCollections" />
       </b-col>
       <b-col class="items-container" v-if="hasItems || hasItemAssets">
         <Items
@@ -50,8 +50,8 @@
           :showFilters="showFilters" :apiFilters="filters"
           :pagination="itemPages" :loading="apiItemsLoading"
           :count="apiItemsNumberMatched"
-          @paginate="paginateItems" @filterItems="filterItems"
-          @filtersShown="filtersShown"
+          @paginate="paginateItems" @filter-items="filterItems"
+          @filters-shown="filtersShown"
         />
         <Assets v-if="hasItemAssets" :assets="itemAssets" :context="data" :definition="true" />
       </b-col>
@@ -60,6 +60,7 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
 import { mapState, mapGetters } from 'vuex';
 import Catalogs from '../components/Catalogs.vue';
 import Description from '../components/Description.vue';
@@ -74,7 +75,7 @@ import { addSchemaToDocument, createCatalogSchema } from '../schema-org';
 import { ItemCollection } from '../models/stac.js';
 import DeprecationMixin from '../components/DeprecationMixin.js';
 
-export default {
+export default defineComponent({
   name: "Catalog",
   components: {
     AnonymizedNotice: () => import('../components/AnonymizedNotice.vue'),
@@ -258,7 +259,10 @@ export default {
       try {
         await this.$store.dispatch('loadApiItems', {link, show: true, filters: this.filters});
       } catch (error) {
-        this.$root.$emit('error', error, this.$t('errors.loadItems'));
+        this.$store.commit('showGlobalError', {
+          error,
+          message: this.$t('errors.loadItems')
+        });
       }
     },
     async filterItems(filters, reset) {
@@ -270,11 +274,14 @@ export default {
         await this.$store.dispatch('loadApiItems', {link: this.data.getApiItemsLink(), show: true, filters});
       } catch (error) {
         let msg = reset ? this.$t('errors.loadItems') : this.$t('errors.loadFilteredItems');
-        this.$root.$emit('error', error, msg);
+        this.$store.commit('showGlobalError', {
+          error,
+          message: msg
+        });
       }
     }
   }
-};
+});
 </script>
 
 <style lang="scss">

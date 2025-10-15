@@ -6,7 +6,7 @@ import BrowserStorage, { Cookies } from '../browser-store';
 const handleAuthError = async (cx, error) => {
   cx.commit('showGlobalError', {
     error,
-    message: i18n.t('errors.authFailed')
+    message: i18n.global.t('errors.authFailed')
   }, { root: true });
   await cx.dispatch('updateCredentials');
 };

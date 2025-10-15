@@ -1,11 +1,13 @@
 import { mapState } from "vuex";
+import VueDatePicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css';
 
 export default {
   components: {
-    DatePicker: () => import('vue2-datepicker')
+    VueDatePicker
   },
   data() {
-    const dateFormat = 'YYYY-MM-DD';
+    const dateFormat = 'yyyy-MM-dd';
     const timeFormat = 'HH:mm:ss';
     return {
       datepickerLang: null,
@@ -25,16 +27,19 @@ export default {
         if (!locale) {
           return;
         }
-        const options = (await import(`../locales/${locale}/datepicker.js`)).default;
-        if (options.locale instanceof Promise) {
-          this.datepickerLang = (await options.locale).default;
-        }
-        else {
+
+        try {
+          const options = (await import(`../locales/${locale}/datepicker.js`)).default;
+        
           this.datepickerLang = options.locale;
+          this.dateFormat = options.dateFormat || options.dateFormat;
+          this.timeFormat = options.timeFormat;
+          this.dateTimeFormat = options.dateTimeFormat;
+        } catch (e) {
+          console.error(`Could not load datepicker locale for ${locale}`, e);
+          
+          this.datepickerLang = null;
         }
-        this.dateFormat = options.dateFormat;
-        this.timeFormat = options.timeFormat;
-        this.dateTimeFormat = options.dateTimeFormat;
       }
     }
   }

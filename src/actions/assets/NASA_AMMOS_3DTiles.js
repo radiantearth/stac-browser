@@ -22,7 +22,7 @@ export default class NASA_AMMOS_3DTiles extends AssetActionPlugin {
   }
 
   get text() {
-    return i18n.t('actions.openIn', {service: 'NASA-AMMOS 3DTilesRendererJS'});
+    return i18n.global.t('actions.openIn', {service: 'NASA-AMMOS 3DTilesRendererJS'});
   }
 
 }

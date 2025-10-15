@@ -14,7 +14,7 @@
             </b-tabs>
           </b-card>
         </section>
-        <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="selectedReferences" @showAsset="showAsset" />
+        <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="selectedReferences" @show-asset="showAsset" />
         <Links v-if="additionalLinks.length > 0" :title="$t('additionalResources')" :links="additionalLinks" :context="data" />
       </b-col>
       <b-col class="right">
@@ -36,6 +36,7 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
 import { mapState, mapGetters } from 'vuex';
 import Description from '../components/Description.vue';
 import ReadMore from "vue-read-more-smooth";
@@ -44,7 +45,7 @@ import DeprecationMixin from '../components/DeprecationMixin';
 import { BTabs, BTab } from 'bootstrap-vue';
 import { addSchemaToDocument, createItemSchema } from '../schema-org';
 
-export default {
+export default defineComponent({
   name: "Item",
   components: {
     AnonymizedNotice: () => import('../components/AnonymizedNotice.vue'),
@@ -102,7 +103,7 @@ export default {
       }
     }
   }
-};
+});
 </script>
 
 <style lang="scss">

@@ -22,6 +22,7 @@ export default {
       required: true
     }
   },
+  emits: ['authenticate'],
   computed: {
     isSupported() {
       return AuthUtils.isSupported(this.method, this.$store.state);

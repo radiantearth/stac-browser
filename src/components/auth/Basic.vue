@@ -46,6 +46,7 @@ export default {
       default: null
     }
   },
+  emits: ['submit', 'reset'],
   data() {
     return {
       username: '',
@@ -75,7 +76,7 @@ export default {
   },
   methods: {
     t(key) {
-      return i18n.t(key);
+      return i18n.global.t(key);
     },
     reset() {
       this.$emit('reset');

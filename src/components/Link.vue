@@ -1,30 +1,35 @@
 <template>
   <li class="link">
-    <StacLink :id="popoverId" :data="link" :fallbackTitle="fallbackTitle" class="pr-1" />
-    <b-popover :target="popoverId" triggers="hover" placement="right" container="#stac-browser" custom-class="link-more">
-      <Description v-if="link.description" :description="link.description" compact />
-      <section class="link-actions">
-        <h3 class="first">{{ $t('additionalActions') }}</h3>
-        <HrefActions vertical :data="link" size="sm" />
-      </section>
-      <Metadata :data="link" type="Link" headerTag="h3" :ignoreFields="ignore" />
-    </b-popover>
+    <TeleportPopover placement="right" custom-class="link-more">
+      <template #trigger>
+        <StacLink :id="popoverId" :data="link" :fallbackTitle="fallbackTitle" class="pr-1" />
+      </template>
+      
+      <template #content>
+        <Description v-if="link.description" :description="link.description" compact />
+        <section class="link-actions">
+          <h3 class="first">{{ $t('additionalActions') }}</h3>
+          <HrefActions vertical :data="link" size="sm" />
+        </section>
+        <Metadata :data="link" type="Link" headerTag="h3" :ignoreFields="ignore" />
+      </template>
+    </TeleportPopover>
   </li>
 </template>
 
 <script>
 import HrefActions from './HrefActions.vue';
 import StacLink from './StacLink.vue';
-import { BPopover } from 'bootstrap-vue';
+import TeleportPopover from './TeleportPopover.vue';
 
 let linkId = 0;
 
 export default {
   name: "Link",
   components: {
-    BPopover,
     HrefActions,
     StacLink,
+    TeleportPopover,
     Description: () => import('./Description.vue'),
     Metadata: () => import('./Metadata.vue')
   },

@@ -1,8 +1,9 @@
+import { defineComponent } from 'vue';
 import Utils from '../utils';
 import { mapGetters, mapState } from 'vuex';
 import { stacBrowserSpecialHandling } from "../rels";
 
-export default {
+export default defineComponent({
   data() {
     return {
       tab: null,
@@ -79,4 +80,4 @@ export default {
       }
     }
   }
-};
+});

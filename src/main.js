@@ -1,6 +1,4 @@
-import Vue from "vue";
+import "./compat-config";
 import init from "./init";
-
-Vue.config.productionTip = false;
 
 init();
