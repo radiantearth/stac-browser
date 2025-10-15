@@ -36,7 +36,8 @@
 </template>
 
 <script>
-import { BCollapse, BIconCheck, BIconChevronRight, BIconChevronDown, BTabs, BTab } from 'bootstrap-vue';
+import { BCollapse, BTabs, BTab } from 'bootstrap-vue-next';
+import { BIconCheck, BIconChevronDown, BIconChevronRight } from 'bootstrap-icons-vue';
 import { formatMediaType } from '@radiantearth/stac-fields/formatters';
 import { mapState } from 'vuex';
 import AssetAlternative from './AssetAlternative.vue';

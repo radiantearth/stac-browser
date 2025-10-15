@@ -28,7 +28,8 @@
 <script>
 import ControlMixin from './ControlMixin';
 import LayerControlMixin from './LayerControlMixin';
-import { BFormRadio, BFormRadioGroup, BIconLayersFill } from 'bootstrap-vue';
+import { BFormRadio, BFormRadioGroup } from 'bootstrap-vue-next';
+import { BIconLayersFill } from 'bootstrap-icons-vue';
 import Group from 'ol/layer/Group';
 import TeleportPopover from '../TeleportPopover.vue';
 import MapUtils from './mapUtils';

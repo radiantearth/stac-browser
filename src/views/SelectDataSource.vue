@@ -1,11 +1,18 @@
 <template>
   <main class="select-data-source">
-    <b-form @submit="go">
+    <b-form @submit.prevent="go">
       <b-form-group
         id="select" :label="$t('index.specifyCatalog')" label-for="url"
         :invalid-feedback="error" :state="valid"
+        class="mb-3"
       >
-        <b-form-input id="url" type="url" :value="url" @input="setUrl" placeholder="https://..." />
+        <b-form-input 
+          id="url" 
+          type="url" 
+          :model-value="url" 
+          @update:model-value="setUrl"
+          placeholder="https://..."
+        />
       </b-form-group>
       <b-button type="submit" variant="primary">{{ $t('index.load') }}</b-button>
     </b-form>
@@ -18,13 +25,13 @@
           </template>
         </i18n-t>
       </template>
-      <b-list-group>
+      <b-list-group> 
         <template v-for="catalog in stacIndex">
-          <b-list-group-item 
+          <b-list-group-item
             v-if="show(catalog)" 
             :key="catalog.id"
-            button 
-            :active="url === catalog.url" 
+            button
+            :active="url === catalog.url"
             @click="open(catalog.url)"
           >
             <div class="d-flex justify-content-between align-items-baseline mb-1">
@@ -41,22 +48,26 @@
 </template>
 
 <script>
-import { BForm, BFormGroup, BFormInput, BListGroup, BListGroupItem } from 'bootstrap-vue';
+import { BBadge, BButton, BForm, BFormGroup, BFormInput, BListGroup, BListGroupItem } from 'bootstrap-vue-next';
 import { mapGetters } from "vuex";
 import { defineComponent } from 'vue';
 import Description from '../components/Description.vue';
 import Utils from '../utils';
 import axios from "axios";
+import { Translation } from 'vue-i18n';
 
 export default defineComponent({
   name: "SelectDataSource",
   components: {
+    BBadge,
+    BButton,
     BForm,
     BFormGroup,
     BFormInput,
     BListGroup,
     BListGroupItem,
-    Description
+    Description,
+    'i18n-t': Translation
   },
   data() {
     return {
@@ -119,7 +130,9 @@ export default defineComponent({
       this.go();
     },
     go() {
-      this.$router.push(this.toBrowserPath(this.url));
+      if (this.url) {
+        this.$router.push(this.toBrowserPath(this.url));  // Vue Router navigation
+      }
     }
   }
 });

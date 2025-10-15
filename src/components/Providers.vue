@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import { BListGroup, BListGroupItem } from 'bootstrap-vue';
+import { BListGroup, BListGroupItem } from 'bootstrap-vue-next';
 import ProviderRoles from './ProviderRoles.vue';
 import Utils from '../utils';
 

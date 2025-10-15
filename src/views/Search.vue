@@ -72,7 +72,8 @@ import { getDisplayTitle, createSTAC, ItemCollection } from '../models/stac';
 import { STAC } from 'stac-js';
 import { defineComponent } from 'vue';
 import { mapGetters, mapState } from "vuex";
-import { BIconCheckSquare, BIconSquare, BTabs, BTab } from 'bootstrap-vue';
+import { BTabs, BTab } from 'bootstrap-vue-next';
+import { BIconCheckSquare, BIconSquare } from 'bootstrap-icons-vue';
 
 export default defineComponent({
   name: "Search",

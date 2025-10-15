@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import { BIconClipboard, BIconClipboardCheck, BIconClipboardX } from 'bootstrap-vue';
+import { BIconClipboard, BIconClipboardCheck, BIconClipboardX } from 'bootstrap-icons-vue';
 import { Clipboard } from "v-clipboard";
 
 export default {

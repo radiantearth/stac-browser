@@ -69,7 +69,7 @@ import ReadMore from "vue-read-more-smooth";
 import ShowAssetLinkMixin from '../components/ShowAssetLinkMixin';
 import StacFieldsMixin from '../components/StacFieldsMixin';
 import { formatLicense, formatTemporalExtents } from '@radiantearth/stac-fields/formatters';
-import { BTabs, BTab } from 'bootstrap-vue';
+import { BTabs, BTab, BCard } from 'bootstrap-vue-next';
 import Utils from '../utils';
 import { addSchemaToDocument, createCatalogSchema } from '../schema-org';
 import { ItemCollection } from '../models/stac.js';
@@ -80,6 +80,7 @@ export default defineComponent({
   components: {
     AnonymizedNotice: () => import('../components/AnonymizedNotice.vue'),
     Assets: () => import('../components/Assets.vue'),
+    BCard,
     BTabs,
     BTab,
     Catalogs,

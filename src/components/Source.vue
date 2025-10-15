@@ -66,7 +66,7 @@
 </template>
 
 <script>
-import { BIconInfoLg, BIconShare } from 'bootstrap-vue';
+import { BIconInfoLg, BIconShare } from 'bootstrap-icons-vue';
 import { mapState } from 'vuex';
 
 import Url from './Url.vue';

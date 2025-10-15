@@ -16,9 +16,8 @@
 </template>
 
 <script>
-import {
-  BDropdown, BDropdownItem, 
-  BIconBlank, BIconCheck, BIconExclamationTriangle, BIconFlag } from "bootstrap-vue";
+import { BDropdown, BDropdownItem } from 'bootstrap-vue-next';
+import { BIconFlag, BIconBlank, BIconCheck, BIconExclamationTriangle } from 'bootstrap-icons-vue';
 
 import { STAC } from 'stac-js';
 import { getBest, prepareSupported } from 'stac-js/src/locales';

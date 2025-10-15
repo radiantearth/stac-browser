@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import { BIconBricks, BIconListTask } from 'bootstrap-vue';
+import { BIconBricks, BIconListTask } from 'bootstrap-icons-vue';
 
 export default {
   id: "SortButtons",

@@ -42,7 +42,7 @@ import Description from '../components/Description.vue';
 import ReadMore from "vue-read-more-smooth";
 import ShowAssetLinkMixin from '../components/ShowAssetLinkMixin';
 import DeprecationMixin from '../components/DeprecationMixin';
-import { BTabs, BTab } from 'bootstrap-vue';
+import { BTabs, BTab, BCard } from 'bootstrap-vue-next';
 import { addSchemaToDocument, createItemSchema } from '../schema-org';
 
 export default defineComponent({
@@ -50,6 +50,7 @@ export default defineComponent({
   components: {
     AnonymizedNotice: () => import('../components/AnonymizedNotice.vue'),
     Assets: () => import('../components/Assets.vue'),
+    BCard,
     BTabs,
     BTab,
     CollectionLink: () => import('../components/CollectionLink.vue'),

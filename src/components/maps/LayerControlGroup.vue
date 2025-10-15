@@ -16,7 +16,8 @@
 
 <script>
 import LayerControlMixin from './LayerControlMixin';
-import { BFormCheckbox, BIconZoomIn } from 'bootstrap-vue';
+import { BFormCheckbox } from 'bootstrap-vue-next';
+import { BIconZoomIn } from 'bootstrap-icons-vue';
 import LayerGroup from 'ol/layer/Group';
 import { transformExtent } from 'ol/proj';
 

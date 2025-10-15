@@ -11,10 +11,7 @@
 </template>
 
 <script>
-import {
-  BFormInput, BFormGroup,
-  BIconArrowUpRightSquare,
-  BInputGroup, BInputGroupAppend } from 'bootstrap-vue';
+import { BFormInput, BFormGroup, BIconArrowUpRightSquare, BInputGroup, BInputGroupAppend } from 'bootstrap-vue-next';
 
 export default {
   name: "Share",

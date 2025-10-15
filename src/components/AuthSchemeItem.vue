@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import { BListGroupItem } from 'bootstrap-vue';
+import { BListGroupItem } from 'bootstrap-vue-next';
 import AuthUtils from './auth/utils';
 
 export default {

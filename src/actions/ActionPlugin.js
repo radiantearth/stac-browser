@@ -1,4 +1,4 @@
-import { BIconBoxArrowUpRight } from 'bootstrap-vue';
+import { BIconBoxArrowUpRight } from 'bootstrap-icons-vue';
 import URI from 'urijs';
 import i18n from "../i18n";
 

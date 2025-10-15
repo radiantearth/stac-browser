@@ -39,7 +39,7 @@
 </template>
 
 <script>
-import { BIconFileEarmarkRichtext, BIconFolderMinus, BIconFolderPlus, BIconThreeDots } from "bootstrap-vue";
+import { BIconFileEarmarkRichtext, BIconFolderMinus, BIconFolderPlus, BIconThreeDots } from 'bootstrap-icons-vue';
 import { mapGetters, mapState } from 'vuex';
 import Utils from '../utils';
 import { getDisplayTitle } from '../models/stac';

@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import { BFormInput } from 'bootstrap-vue';
+import { BFormInput } from 'bootstrap-vue-next';
 
 export default {
   name: 'SearchBox',

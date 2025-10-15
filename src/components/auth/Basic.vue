@@ -23,7 +23,7 @@
 
 <script>
 import Description from '../Description.vue';
-import { BForm, BFormInput, BFormGroup } from 'bootstrap-vue';
+import { BForm, BFormInput, BFormGroup } from 'bootstrap-vue-next';
 import i18n from '../../i18n';
 import Utils from '../../utils';
 import { mapGetters } from 'vuex';

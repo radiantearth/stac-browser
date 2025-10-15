@@ -94,10 +94,13 @@ import CONFIG from './config';
 import {
   BIconArrow90degUp, BIconArrowLeft, BIconCaretDownFill,
   BIconFolderSymlink, BIconList, BIconLock, BIconSearch, BIconUnlock,
-  } from "bootstrap-vue";
+  } from "bootstrap-icons-vue";
 
-import "bootstrap/dist/css/bootstrap.css";
-import "bootstrap-vue/dist/bootstrap-vue.css";
+import { 
+  BContainer, BRow, BCol, BButton, BButtonGroup 
+} from 'bootstrap-vue-next';
+
+// CSS imports are handled in init.js
 
 import ErrorAlert from './components/ErrorAlert.vue';
 import StacLink from './components/StacLink.vue';
@@ -139,6 +142,11 @@ export default defineComponent({
   name: 'StacBrowser',
   components: {
     Authentication,
+    BButton,
+    BButtonGroup,
+    BCol,
+    BContainer,
+    BRow,
     BIconArrow90degUp,
     BIconArrowLeft,
     BIconCaretDownFill,
@@ -567,9 +575,12 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
+// Import Bootstrap functions, variables, and mixins only (not full bootstrap)
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins';
+// Import custom theme
 @import "./theme/variables.scss";
-@import '~bootstrap/scss/bootstrap.scss';
-@import '~bootstrap-vue/src/index.scss';
 @import "./theme/page.scss";
 @import "./theme/custom.scss";
 </style>

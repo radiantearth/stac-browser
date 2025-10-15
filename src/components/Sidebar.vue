@@ -13,7 +13,8 @@
 </template>
 
 <script>
-import { BIconArrowLeftRight, BSidebar } from "bootstrap-vue";
+import { BSidebar } from 'bootstrap-vue-next';
+import { BIconArrowLeftRight } from 'bootstrap-icons-vue';
 import { mapGetters, mapState } from 'vuex';
 import Loading from './Loading.vue';
 import Tree from './Tree.vue';

@@ -10,7 +10,7 @@
 import Point from 'ol/geom/Point';
 import ControlMixin from './ControlMixin';
 import { fromLonLat } from 'ol/proj';
-import { BIconPinMapFill } from 'bootstrap-vue';
+import { BIconPinMapFill } from 'bootstrap-icons-vue';
 
 export default {
   name: 'UserLocationControl',

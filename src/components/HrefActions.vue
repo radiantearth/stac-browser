@@ -40,7 +40,8 @@
 
 
 <script>
-import { BIconBoxArrowUpRight, BIconDownload, BIconEye, BIconLock, BListGroup, BSpinner } from 'bootstrap-vue';
+import { BListGroup, BSpinner } from 'bootstrap-vue-next';
+import { BIconBoxArrowUpRight, BIconDownload, BIconEye, BIconLock } from 'bootstrap-icons-vue';
 import Description from './Description.vue';
 import TeleportPopover from './TeleportPopover.vue';
 import Utils, { imageMediaTypes, mapMediaTypes } from '../utils';

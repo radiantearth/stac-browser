@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import { BTable } from 'bootstrap-vue';
+import { BTable } from 'bootstrap-vue-next';
 import EntryMixin from './EntryMixin';
 import StacFieldsMixin from '../StacFieldsMixin';
 import Utils from '../../utils';

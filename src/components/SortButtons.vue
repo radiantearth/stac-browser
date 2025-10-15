@@ -11,7 +11,7 @@
 
 <script>
 import { defineComponent } from 'vue';
-import { BIconSortAlphaDown, BIconSortAlphaUp } from 'bootstrap-vue';
+import { BIconSortAlphaDown, BIconSortAlphaUp } from 'bootstrap-icons-vue';
 
 export default defineComponent({
   name: "SortButtons",

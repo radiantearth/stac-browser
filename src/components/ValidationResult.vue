@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import { BListGroup, BListGroupItem } from 'bootstrap-vue';
+import { BListGroup, BListGroupItem } from 'bootstrap-vue-next';
 import URI from 'urijs';
 import Utils from '../utils';
 
