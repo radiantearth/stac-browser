@@ -108,15 +108,12 @@
     "noExternalAccess": "الوصول إلى الكتالوجات الخارجية غير مسموح!",
     "notFound": "المورد المطلوب غير موجود. @:errors.contactProvider",
     "serverError": "واجه الخادم مشكلة. @:errors.contactProvider",
-    "title": "",
     "unauthorized": "يفتقر الطلب إلى بيانات الاعتماد، مثل رمز API. يرجى تقديم بيانات الاعتماد والمحاولة مرة أخرى."
   },
   "featureExperimental": "هذه الميزة لا تزال تجريبية وقد تعطي نتائج غير متوقعة!",
   "fullscreen": {
     "exit": "الخروج من وضع ملء الشاشة",
-    "exitLabel": "",
-    "show": "عرض بملء الشاشة",
-    "showLabel": ""
+    "show": "عرض بملء الشاشة"
   },
   "goBack": {
     "description": "العودة إلى {type}",
@@ -135,7 +132,6 @@
   "in": "في {catalog}",
   "index": {
     "api": "واجهة برمجة التطبيقات",
-    "catalog": "",
     "load": "تحميل",
     "selectStacIndex": "... أو اختر واحدًا من {stacIndex}:",
     "specifyCatalog": "يرجى تحديد كتالوج STAC أو API...",
@@ -153,37 +149,13 @@
   "loading": "جارٍ التحميل...",
   "map": "الخريطة",
   "mapping": {
-    "attribution": {
-      "label": "",
-      "description": "",
-      "collapseLabel": ""
-    },
-    "bboxSelect": {
-      "add": "",
-      "remove": ""
-    },
-    "close": "",
-    "fit": "",
-    "layers": {
-      "title": "",
-      "base": "",
-      "unnamed": "",
-      "footprint": ""
-    },
-    "location": {
-      "description": ""
-    },
-    "nobasemap": "",
-    "nodata": "",
+    "attribution": {},
+    "bboxSelect": {},
+    "layers": {},
+    "location": {},
     "zoom": {
-      "in": {
-        "description": "",
-        "label": ""
-      },
-      "out": {
-        "description": "",
-        "label": ""
-      }
+      "in": {},
+      "out": {}
     }
   },
   "messageForSchemaError": "{message}، للمخطط {schemaPath}",
