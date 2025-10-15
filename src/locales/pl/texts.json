@@ -167,7 +167,8 @@
     "layers": {
       "title": "Warstwy",
       "base": "Warstwy podstawowe",
-      "unnamed": "Bez nazwy #{id}"
+      "unnamed": "Bez nazwy #{id}",
+      "footprint": ""
     },
     "location": {
       "description": "Przejdź do swojej lokalizacji"
@@ -208,6 +209,7 @@
   "poweredBy": "Wspierane przez {link}",
   "protocol": {
     "azure": "Microsoft Azure",
+    "file": "",
     "ftp": "FTP",
     "gcs": "Google Cloud",
     "oss": "Alibaba Cloud",
