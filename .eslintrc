@@ -16,8 +16,7 @@
   ],
   "env": {
     "browser": true,
-    "es2022": true,
-    "node": true
+    "es2022": true
   },
   "ignorePatterns": [
     "**/stac-fields",
