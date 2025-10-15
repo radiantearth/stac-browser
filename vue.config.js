@@ -58,7 +58,6 @@ const vueConfig = {
       args[0].CONFIG_PATH = JSON.stringify(configFile);
       args[0].CONFIG_CLI = JSON.stringify(argv);
       args[0].__VUE_OPTIONS_API__ = true;
-      args[0].__VUE_PROD_DEVTOOLS__ = false;
       args[0].__VUE_PROD_HYDRATION_MISMATCH_DETAILS__ = false;
       return args;
     });
