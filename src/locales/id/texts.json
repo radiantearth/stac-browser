@@ -108,12 +108,15 @@
     "noExternalAccess": "Mengakses katalog eksternal tidak diizinkan!",
     "notFound": "Sumber daya yang diminta tidak ada. @:errors.contactProvider",
     "serverError": "Server mengalami masalah. @:errors.contactProvider",
+    "title": "",
     "unauthorized": "Permintaan tidak memiliki kredensial, misalnya token API. Silakan berikan kredensial Anda dan coba lagi."
   },
   "featureExperimental": "Fitur ini masih eksperimental dan mungkin memberikan hasil yang tidak terduga!",
   "fullscreen": {
     "exit": "Keluar dari Layar Penuh",
-    "show": "Lihat Layar Penuh"
+    "exitLabel": "",
+    "show": "Lihat Layar Penuh",
+    "showLabel": ""
   },
   "goBack": {
     "description": "Kembali ke {type}",
@@ -132,6 +135,7 @@
   "in": "dalam {catalog}",
   "index": {
     "api": "API",
+    "catalog": "",
     "load": "Muat",
     "selectStacIndex": "... atau pilih satu dari {stacIndex}:",
     "specifyCatalog": "Silakan tentukan Katalog atau API STAC...",
@@ -149,13 +153,37 @@
   "loading": "Memuat...",
   "map": "Peta",
   "mapping": {
-    "attribution": {},
-    "bboxSelect": {},
-    "layers": {},
-    "location": {},
+    "attribution": {
+      "label": "",
+      "description": "",
+      "collapseLabel": ""
+    },
+    "bboxSelect": {
+      "add": "",
+      "remove": ""
+    },
+    "close": "",
+    "fit": "",
+    "layers": {
+      "title": "",
+      "base": "",
+      "unnamed": "",
+      "footprint": ""
+    },
+    "location": {
+      "description": ""
+    },
+    "nobasemap": "",
+    "nodata": "",
     "zoom": {
-      "in": {},
-      "out": {}
+      "in": {
+        "description": "",
+        "label": ""
+      },
+      "out": {
+        "description": "",
+        "label": ""
+      }
     }
   },
   "messageForSchemaError": "{message}, untuk skema {schemaPath}",
