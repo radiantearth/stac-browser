@@ -1,11 +1,14 @@
-import Browse from '../views/Browse.vue';
+import Browse from "../views/Browse.vue";
+
+function catchAllString(route) {
+  const pathMatch = route.params.pathMatch;
+  return Array.isArray(pathMatch) ? pathMatch.join("/") : pathMatch;
+}
 
 function getPath(route, config) {
-  let pathMatch = route.params.pathMatch;
-  // pathMatch can be an array so convert to string
-  let path = Array.isArray(pathMatch) ? pathMatch.join('/') : pathMatch;
+  let path = catchAllString(route);
   if (config.allowExternalAccess && path.startsWith("external/")) {
-    path = '/' + path;
+    path = "/" + path;
   }
   return {path};
 }
@@ -24,9 +27,7 @@ function getRoutes(config) {
       name: "search",
       component: () => import("../views/Search.vue"),
       props: route => {
-        let pathMatch = route.params.pathMatch;
-        // pathMatch can be an array so convert to string properly
-        let path = Array.isArray(pathMatch) ? pathMatch.join('/') : pathMatch;
+        const path = catchAllString(route, config);
         return {
           loadParent: `/external/${path}`
         };
@@ -42,12 +43,12 @@ function getRoutes(config) {
   }
 
   routes.push({
-    path: '/auth/logout',
+    path: "/auth/logout",
     name: "logout",
     component: () => import("../views/Logout.vue")
   });
   routes.push({
-    path: '/auth',
+    path: "/auth",
     component: () => import("../views/LoginCallback.vue")
   });
 
