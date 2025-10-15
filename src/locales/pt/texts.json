@@ -108,6 +108,7 @@
     "noExternalAccess": "Não é permitido aceder a catálogos externos!",
     "notFound": "O recurso pedido não existe. @:errors.contactProvider",
     "serverError": "O servidor encontrou um problema. @:errors.contactProvider",
+    "title": "",
     "unauthorized": "O pedido não possui credenciais, por exemplo um token da API. Forneça as suas credenciais e tente novamente."
   },
   "featureExperimental": "Esta funcionalidade ainda é experimental e pode dar resultados inesperados!",
@@ -134,6 +135,7 @@
   "in": "em {catalog}",
   "index": {
     "api": "API",
+    "catalog": "",
     "load": "Carregar",
     "selectStacIndex": "... ou selecione um de {stacIndex}:",
     "specifyCatalog": "Por favor especifique um catálogo STAC ou API...",
@@ -153,12 +155,26 @@
   "mapping": {
     "attribution": {
       "label": "i",
+      "description": "",
       "collapseLabel": "✕"
     },
-    "bboxSelect": {},
+    "bboxSelect": {
+      "add": "",
+      "remove": ""
+    },
     "close": "Fechar",
-    "layers": {},
-    "location": {},
+    "fit": "",
+    "layers": {
+      "title": "",
+      "base": "",
+      "unnamed": "",
+      "footprint": ""
+    },
+    "location": {
+      "description": ""
+    },
+    "nobasemap": "",
+    "nodata": "",
     "zoom": {
       "in": {
         "description": "Aumentar o zoom",
