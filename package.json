@@ -42,7 +42,6 @@
     "@radiantearth/stac-fields": "~1.5.5",
     "@radiantearth/stac-migrate": "~2.0.2",
     "@turf/mask": "^7.2.0",
-    "@vue/compat": "^3.5.22",
     "@vuepic/vue-datepicker": "^11.0.2",
     "ajv-i18n": "^4.2.0",
     "axios": "^1.2.0",
@@ -67,7 +66,6 @@
     "vue-chartjs": "^5.2.0",
     "vue-i18n": "^9.14.5",
     "vue-multiselect": "^3.3.1",
-    "vue-read-more-smooth": "^0.1.8",
     "vue-router": "^4.5.1",
     "vuex": "^4.1.0",
     "yargs": "^17.0.1"

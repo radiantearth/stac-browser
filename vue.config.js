@@ -34,10 +34,9 @@ const vueConfig = {
   productionSourceMap: !mergedConfig.noSourceMaps,
   publicPath: mergedConfig.pathPrefix,
   chainWebpack: webpackConfig => {
-    // Configure Vue 3 compatibility mode
-    webpackConfig.resolve.alias.set('vue', '@vue/compat');
+    // Pure Vue 3 configuration - no compatibility mode needed
 
-    // Configure Vue 3 template compiler options
+    // Vue 3 template compiler options - using defaults for pure Vue 3
     webpackConfig.module
       .rule('vue')
       .use('vue-loader')
@@ -45,10 +44,7 @@ const vueConfig = {
         if (!options.compilerOptions) {
           options.compilerOptions = {};
         }
-        // Preserve whitespace behavior from Vue 2
-        options.compilerOptions.whitespace = 'preserve';
-        // Preserve comments during development for better debugging
-        // In production, comments are removed for smaller bundle size
+        // Keep comments during development for better debugging
         options.compilerOptions.comments = process.env.NODE_ENV !== 'production';
         return options;
       });
