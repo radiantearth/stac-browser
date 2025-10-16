@@ -38,11 +38,12 @@ import { formatKey } from "@radiantearth/stac-fields/helper";
 import { mapGetters, mapState } from "vuex";
 import Url from './Url.vue';
 import Utils from "../utils";
+import { defineAsyncComponent } from 'vue';
 
 export default {
   name: "RootStats",
   components: {
-    StatsChart: () => import('./metadata/StatsChart.vue'),
+    StatsChart: defineAsyncComponent(() => import('./metadata/StatsChart.vue')),
     Url
   },
   computed: {

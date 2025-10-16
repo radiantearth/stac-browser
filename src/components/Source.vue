@@ -66,8 +66,10 @@
 </template>
 
 <script>
-import { BIconInfoLg, BIconShare } from 'bootstrap-icons-vue';
 import { mapState } from 'vuex';
+import { defineAsyncComponent } from 'vue';
+import { BIconInfoLg, BIconShare } from 'bootstrap-icons-vue';
+import { BButton, BButtonGroup, BRow, BCol } from 'bootstrap-vue-next';
 
 import Url from './Url.vue';
 import TeleportPopover from './TeleportPopover.vue';
@@ -77,13 +79,17 @@ import SocialSharing from './SocialSharing.vue';
 export default {
   name: "Source",
   components: {
+    BButton,
+    BButtonGroup,
+    BCol,
+    BRow,
     BIconInfoLg,
     BIconShare,
     TeleportPopover,
     Url,
     CopyButton,
     SocialSharing,
-    Validation: () => import('./Validation.vue')
+    Validation: defineAsyncComponent(() => import('./Validation.vue'))
   },
   props: {
     title: {

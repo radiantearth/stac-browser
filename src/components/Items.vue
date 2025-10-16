@@ -42,7 +42,7 @@
 </template>
 
 <script>
-import { defineComponent } from 'vue';
+import { defineComponent, defineAsyncComponent } from 'vue';
 import Item from './Item.vue';
 import Loading from './Loading.vue';
 import Pagination from './Pagination.vue';
@@ -58,10 +58,10 @@ export default defineComponent({
     BCollapse,
     BIconSearch,
     Item,
-    SearchFilter: () => import('./SearchFilter.vue'),
+    SearchFilter: defineAsyncComponent(() => import('./SearchFilter.vue')),
     Loading,
     Pagination,
-    SortButtons: () => import('./SortButtons.vue')
+    SortButtons: defineAsyncComponent(() => import('./SortButtons.vue'))
   },
   props: {
     items: {

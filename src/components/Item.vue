@@ -21,8 +21,11 @@
 </template>
 
 <script>
-import { defineComponent } from 'vue';
+import { defineComponent, defineAsyncComponent } from 'vue';
 import { mapState, mapGetters } from 'vuex';
+import { 
+  BCard, BCardImg, BCardBody, BCardTitle, BCardText, BBadge 
+} from 'bootstrap-vue-next';
 import FileFormatsMixin from './FileFormatsMixin';
 import ThumbnailCardMixin from './ThumbnailCardMixin';
 import StacLink from './StacLink.vue';
@@ -36,8 +39,14 @@ Registry.addDependency('content-type', require('content-type'));
 export default defineComponent({
   name: 'Item',
   components: {
+    BCard,
+    BCardImg, 
+    BCardBody,
+    BCardTitle,
+    BCardText,
+    BBadge,
     StacLink,
-    Keywords: () => import('./Keywords.vue')
+    Keywords: defineAsyncComponent(() => import('./Keywords.vue'))
   },
   mixins: [
     FileFormatsMixin,

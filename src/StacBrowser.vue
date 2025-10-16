@@ -87,6 +87,7 @@
 </template>
 
 <script>
+import { defineComponent, defineAsyncComponent } from 'vue';
 import { isNavigationFailure, NavigationFailureType } from 'vue-router';
 import { mapMutations, mapActions, mapGetters, mapState } from 'vuex';
 import CONFIG from './config';
@@ -111,7 +112,6 @@ import Utils from './utils';
 import URI from 'urijs';
 
 import { API_LANGUAGE_CONFORMANCE } from './i18n';
-import { defineComponent } from 'vue';
 import { getBest, prepareSupported } from 'stac-js/src/locales';
 import BrowserStorage from "./browser-store";
 import Authentication from "./components/Authentication.vue";
@@ -157,10 +157,10 @@ export default defineComponent({
     BIconUnlock,
     ErrorAlert,
     LanguageChooser,
-    RootStats: () => import('./components/RootStats.vue'),
-    Sidebar: () => import('./components/Sidebar.vue'),
+    RootStats: defineAsyncComponent(() => import('./components/RootStats.vue')),
+    Sidebar: defineAsyncComponent(() => import('./components/Sidebar.vue')),
     StacLink,
-    Source: () => import('./components/Source.vue'),
+    Source: defineAsyncComponent(() => import('./components/Source.vue')),
     TeleportPopover
   },
   props: {

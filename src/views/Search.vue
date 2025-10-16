@@ -70,7 +70,7 @@ import SearchFilter from '../components/SearchFilter.vue';
 import { getDisplayTitle, createSTAC, ItemCollection } from '../models/stac';
 
 import { STAC } from 'stac-js';
-import { defineComponent } from 'vue';
+import { defineComponent, defineAsyncComponent } from 'vue';
 import { mapGetters, mapState } from "vuex";
 import { BTabs, BTab } from 'bootstrap-vue-next';
 import { BIconCheckSquare, BIconSquare } from 'bootstrap-icons-vue';
@@ -82,12 +82,12 @@ export default defineComponent({
     BIconSquare,
     BTab,
     BTabs,
-    Catalogs: () => import('../components/Catalogs.vue'),
+    Catalogs: defineAsyncComponent(() => import('../components/Catalogs.vue')),
     Loading,
-    Items: () => import('../components/Items.vue'),
-    Map: () => import('../components/Map.vue'),
+    Items: defineAsyncComponent(() => import('../components/Items.vue')),
+    Map: defineAsyncComponent(() => import('../components/Map.vue')),
     SearchFilter,
-    StacLink: () => import('../components/StacLink.vue')
+    StacLink: defineAsyncComponent(() => import('../components/StacLink.vue'))
   },
   props: {
     loadParent: {

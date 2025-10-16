@@ -39,10 +39,11 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex';
+import { defineComponent, defineAsyncComponent } from 'vue';
+
 import Catalog from './Catalog.vue';
 import Loading from './Loading.vue';
 import { getDisplayTitle } from '../models/stac';
-import { defineComponent } from 'vue';
 import { STAC } from 'stac-js';
 import ViewMixin from './ViewMixin';
 import Utils from '../utils';
@@ -54,9 +55,9 @@ export default defineComponent({
     Catalog,
     Loading,
     Multiselect,
-    Pagination: () => import('./Pagination.vue'),
-    SearchBox: () => import('./SearchBox.vue'),
-    SortButtons: () => import('./SortButtons.vue')
+    Pagination: defineAsyncComponent(() => import('./Pagination.vue')),
+    SearchBox: defineAsyncComponent(() => import('./SearchBox.vue')),
+    SortButtons: defineAsyncComponent(() => import('./SortButtons.vue'))
   },
   mixins: [
     ViewMixin

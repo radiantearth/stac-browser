@@ -17,6 +17,7 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
 import { BListGroup, BListGroupItem } from 'bootstrap-vue-next';
 import ProviderRoles from './ProviderRoles.vue';
 import Utils from '../utils';
@@ -26,7 +27,7 @@ export default {
   components: {
     BListGroup,
     BListGroupItem,
-    Provider: () => import('./Provider.vue'),
+    Provider: defineAsyncComponent(() => import('./Provider.vue')),
     ProviderRoles
   },
   props: {

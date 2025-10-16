@@ -21,12 +21,13 @@ import EntryMixin from './EntryMixin';
 import StacFieldsMixin from '../StacFieldsMixin';
 import Utils from '../../utils';
 import { format } from '@radiantearth/stac-fields';
+import { defineAsyncComponent } from 'vue';
 
 export default {
   name: 'MetadataTable',
   components: {
     BTable,
-    Histogram: () => import('./Histogram.vue')
+    Histogram: defineAsyncComponent(() => import('./Histogram.vue'))
   },
   mixins: [
     EntryMixin,

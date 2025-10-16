@@ -11,6 +11,7 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
 import { BFormInput, BFormGroup, BIconArrowUpRightSquare, BInputGroup, BInputGroupAppend } from 'bootstrap-vue-next';
 
 export default {
@@ -21,7 +22,7 @@ export default {
     BIconArrowUpRightSquare,
     BInputGroup,
     BInputGroupAppend,
-    CopyButton: () => import('./CopyButton.vue')
+    CopyButton: defineAsyncComponent(() => import('./CopyButton.vue'))
   },
   props: {
     id: {
