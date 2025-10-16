@@ -23,12 +23,24 @@
               <StacLink v-if="root" :data="root" hideIcon />
               <template v-else>{{ catalogTitle }}</template>
             </span>
-            <b-button
-              v-if="root" size="sm" variant="outline-primary" id="popover-root-btn"
-              :title="serviceType" tag="a" tabindex="0"
+            <TeleportPopover
+              v-if="root"
+              :title="serviceType"
+              placement="bottom"
+              custom-class="popover-large"
             >
-              <b-icon-caret-down-fill />
-            </b-button>
+              <template #trigger>
+                <b-button
+                  size="sm" variant="outline-primary"
+                  :title="serviceType" tag="a" tabindex="0"
+                >
+                  <b-icon-caret-down-fill />
+                </b-button>
+              </template>
+              <template #content>
+                <RootStats />
+              </template>
+            </TeleportPopover>
           </div>
           <nav class="actions user">
             <b-button-group>
@@ -37,7 +49,7 @@
               </b-button>
               <LanguageChooser
                 :data="data" :currentLocale="localeFromVueX" :locales="supportedLocalesFromVueX"
-                @setLocale="locale => switchLocale({locale, userSelected: true})"
+                @set-locale="locale => switchLocale({locale, userSelected: true})"
               />
             </b-button-group>
           </nav>
@@ -69,87 +81,39 @@
     <!-- Content (Item / Catalog) -->
     <router-view />
     <footer>
-      <i18n tag="small" path="poweredBy" class="poweredby text-muted">
-        <template #link>
-          <a href="https://github.com/radiantearth/stac-browser" target="_blank">STAC Browser</a> {{ browserVersion }}
-        </template>
-      </i18n>
+      <small class="poweredby text-muted" v-html="poweredByText" />
     </footer>
-    <b-popover
-      v-if="root" id="popover-root" custom-class="popover-large" target="popover-root-btn"
-      triggers="focus" placement="bottom" container="stac-browser"
-    >
-      <template #title>
-        {{ serviceType }}
-      </template>
-      <RootStats />
-    </b-popover>
   </b-container>
 </template>
 
 <script>
-import Vue from "vue";
-import VueRouter from "vue-router";
-import Vuex, { mapMutations, mapActions, mapGetters, mapState } from 'vuex';
+import { isNavigationFailure, NavigationFailureType } from 'vue-router';
+import { mapMutations, mapActions, mapGetters, mapState } from 'vuex';
 import CONFIG from './config';
-import getRoutes from "./router";
-import getStore from "./store";
 
 import {
-  AlertPlugin, BadgePlugin, BPopover,
   BIconArrow90degUp, BIconArrowLeft, BIconCaretDownFill,
-  BIconFolderSymlink, BIconInfoLg, BIconList, BIconSearch,
-  ButtonGroupPlugin, ButtonPlugin, CardPlugin, LayoutPlugin, SpinnerPlugin,
-  VBToggle, VBVisible } from "bootstrap-vue";
+  BIconFolderSymlink, BIconList, BIconLock, BIconSearch, BIconUnlock,
+  } from "bootstrap-vue";
+
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
 
 import ErrorAlert from './components/ErrorAlert.vue';
 import StacLink from './components/StacLink.vue';
+import TeleportPopover from './components/TeleportPopover.vue';
 
 import { CatalogLike, STAC } from 'stac-js';
 import Utils from './utils';
 import URI from 'urijs';
 
 import { API_LANGUAGE_CONFORMANCE } from './i18n';
+import { defineComponent } from 'vue';
 import { getBest, prepareSupported } from 'stac-js/src/locales';
 import BrowserStorage from "./browser-store";
 import Authentication from "./components/Authentication.vue";
 import LanguageChooser from "./components/LanguageChooser.vue";
 import { getDisplayTitle } from "./models/stac";
-
-Vue.use(AlertPlugin);
-Vue.use(ButtonGroupPlugin);
-Vue.use(ButtonPlugin);
-Vue.use(BadgePlugin);
-Vue.use(CardPlugin);
-Vue.use(LayoutPlugin);
-Vue.use(SpinnerPlugin);
-
-// For collapsibles / accordions
-Vue.directive('b-toggle', VBToggle);
-// Used to detect when a catalog/item becomes visible so that further data can be loaded
-Vue.directive('b-visible', VBVisible);
-
-// Setup router
-Vue.use(VueRouter);
-const router = new VueRouter({
-  mode: CONFIG.historyMode,
-  base: CONFIG.pathPrefix,
-  routes: getRoutes(CONFIG),
-  scrollBehavior: (to, from, savedPosition) => {
-    if (to.path !== from.path) {
-      return { x: 0, y: 0 };
-    }
-    else {
-      return savedPosition;
-    }
-  }
-});
-
-// Setup store
-Vue.use(Vuex);
-const store = getStore(CONFIG, router);
 
 // Pass Config through from props to vuex
 let Props = {};
@@ -159,35 +123,37 @@ for(let key in CONFIG) {
     default: ['object', 'function'].includes(typeof CONFIG[key]) ? () => CONFIG[key] : CONFIG[key]
   };
   Watchers[key] = {
-    immediate: true,
+    immediate: false, // Changed from true to avoid accessing store before it's ready
+    deep: ['object', 'array'].includes(typeof CONFIG[key]), // Deep watch for objects and arrays
     handler: async function(newValue) {
-      await this.$store.dispatch('config', {
-        [key]: newValue
-      });
+      if (this.$store) { // Add safety check
+        await this.$store.dispatch('config', {
+          [key]: newValue
+        });
+      }
     }
   };
 }
 
-export default {
+export default defineComponent({
   name: 'StacBrowser',
-  router,
-  store,
   components: {
     Authentication,
     BIconArrow90degUp,
     BIconArrowLeft,
     BIconCaretDownFill,
     BIconFolderSymlink,
-    BIconInfoLg,
     BIconList,
+    BIconLock,
     BIconSearch,
-    BPopover,
+    BIconUnlock,
     ErrorAlert,
     LanguageChooser,
     RootStats: () => import('./components/RootStats.vue'),
     Sidebar: () => import('./components/Sidebar.vue'),
     StacLink,
-    Source: () => import('./components/Source.vue')
+    Source: () => import('./components/Source.vue'),
+    TeleportPopover
   },
   props: {
     ...Props
@@ -218,6 +184,10 @@ export default {
       else {
         return "";
       }
+    },
+    poweredByText() {
+      const link = `<a href="https://github.com/radiantearth/stac-browser" target="_blank">STAC Browser</a> ${this.browserVersion}`;
+      return this.$t('poweredBy', { link });
     },
     isSearchPage() {
       return this.$route.name === 'search';
@@ -338,8 +308,6 @@ export default {
         // Update the HTML lang tag
         document.documentElement.setAttribute("lang", locale);
         document.getElementById('og-locale').setAttribute("content", locale);
-
-        this.$root.$emit('uiLanguageChanged', locale);
       }
     },
     dataLanguage: {
@@ -389,7 +357,7 @@ export default {
         }
 
         this.$router.replace({ query }).catch(error => {
-          if (!VueRouter.isNavigationFailure(error, VueRouter.NavigationFailureType.duplicated)) {
+          if (!isNavigationFailure(error, NavigationFailureType.duplicated)) {
             throw Error(error);
           }
         });
@@ -436,10 +404,9 @@ export default {
     }
   },
   async created() {
-    this.$router.onReady(() => {
-      this.detectLocale();
-      this.parseQuery(this.$route);
-    });
+    // In Vue Router 4, the router is immediately ready, no need for onReady
+    this.detectLocale();
+    this.parseQuery(this.$route);
 
     this.$router.afterEach((to, from) => {
       if (to.path === from.path) {
@@ -469,7 +436,15 @@ export default {
     }
   },
   mounted() {
-    this.$root.$on('error', this.showError);
+    // Initialize config once store is available
+    for(let key in CONFIG) {
+      if (this[key] !== undefined) {
+        this.$store.dispatch('config', {
+          [key]: this[key]
+        });
+      }
+    }
+    
     setInterval(() => this.$store.dispatch('loadBackground', 3), 200);
   },
   methods: {
@@ -588,7 +563,7 @@ export default {
       this.$store.commit('showGlobalError', null);
     }
   }
-};
+});
 </script>
 
 <style lang="scss">

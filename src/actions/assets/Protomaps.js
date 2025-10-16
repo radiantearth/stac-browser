@@ -24,7 +24,7 @@ export default class Protomaps extends AssetActionPlugin {
   }
 
   get text() {
-    return i18n.t('actions.openIn', {service: 'Protomaps'});
+    return i18n.global.t('actions.openIn', {service: 'Protomaps'});
   }
 
 }

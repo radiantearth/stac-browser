@@ -50,6 +50,7 @@ export default {
       required: true
     }
   },
+  emits: ['setLocale'],
   computed: {
     dataLanguages() {
       let dataLanguages = [];

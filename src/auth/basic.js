@@ -19,7 +19,7 @@ export default class BasicAuth extends Auth {
   }
 
   getButtonTitle() {
-    return i18n.t('authentication.button.title');
+  return i18n.global.t('authentication.button.title');
   }
 
   async logout(/*credentials*/) {

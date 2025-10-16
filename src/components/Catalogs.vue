@@ -9,12 +9,15 @@
     <section v-if="isComplete && catalogs.length > 1" class="catalog-filter mb-2">
       <SearchBox v-model="searchTerm" :placeholder="filterPlaceholder" />
       <multiselect
-        v-if="allKeywords.length > 0" v-model="selectedKeywords" multiple :options="allKeywords"
+        v-if="allKeywords.length > 0"
+        v-model="selectedKeywords"
+        :options="allKeywords"
+        :multiple="true"
         :placeholder="$t('multiselect.keywordsPlaceholder')"
-        :selectLabel="$t('multiselect.selectLabel')"
-        :selectedLabel="$t('multiselect.selectedLabel')"
-        :deselectLabel="$t('multiselect.deselectLabel')"
-        :limitText="limitText"
+        :select-label="$t('multiselect.selectLabel')"
+        :selected-label="$t('multiselect.selectedLabel')"
+        :deselect-label="$t('multiselect.deselectLabel')"
+        :limit-text="limitText"
       />
     </section>
     <Pagination v-if="showPagination" ref="topPagination" class="mb-3" :pagination="pagination" placement="top" @paginate="paginate" />
@@ -39,19 +42,21 @@ import { mapGetters, mapState } from 'vuex';
 import Catalog from './Catalog.vue';
 import Loading from './Loading.vue';
 import { getDisplayTitle } from '../models/stac';
+import { defineComponent } from 'vue';
 import { STAC } from 'stac-js';
 import ViewMixin from './ViewMixin';
 import Utils from '../utils';
+import Multiselect from 'vue-multiselect';
 
-export default {
+export default defineComponent({
   name: "Catalogs",
   components: {
     Catalog,
     Loading,
+    Multiselect,
     Pagination: () => import('./Pagination.vue'),
     SearchBox: () => import('./SearchBox.vue'),
-    SortButtons: () => import('./SortButtons.vue'),
-    Multiselect: () => import('vue-multiselect')
+    SortButtons: () => import('./SortButtons.vue')
   },
   mixins: [
     ViewMixin
@@ -86,6 +91,7 @@ export default {
       default: null
     }
   },
+  emits: ['loadMore', 'paginate'],
   data() {
     return {
       searchTerm: '',
@@ -211,7 +217,7 @@ export default {
       return this.$t("multiselect.andMore", {count});
     }
   }
-};
+});
 </script>
 
 <style lang="scss" scoped>

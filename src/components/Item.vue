@@ -7,15 +7,13 @@
       </b-card-title>
       <b-card-text v-if="fileFormats.length > 0 || hasDescription || isDeprecated" class="intro">
         <b-badge v-if="isDeprecated" variant="warning" class="mr-1 mt-1 deprecated">{{ $t('deprecated') }}</b-badge>
-        <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="mr-1 mt-1 fileformat">{{ format | formatMediaType }}</b-badge>
-        <template v-if="hasDescription">{{ data.properties.description | summarize }}</template>
+        <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="mr-1 mt-1 fileformat">{{ formatMediaType(format) }}</b-badge>
+        <template v-if="hasDescription">{{ summarizeDescription }}</template>
       </b-card-text>
       <Keywords v-if="showKeywordsInItemCards && keywords.length > 0" :keywords="keywords" variant="primary" center />
       <b-card-text>
         <small class="text-muted">
-          <template v-if="extent">{{ extent | formatTemporalExtent }}</template>
-          <template v-else-if="data && data.properties.datetime">{{ data.properties.datetime | formatTimestamp }}</template>
-          <template v-else>{{ $t('items.noTime') }}</template>
+          {{ displayTime }}
         </small>
       </b-card-text>
     </b-card-body>
@@ -23,6 +21,7 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
 import { mapState, mapGetters } from 'vuex';
 import FileFormatsMixin from './FileFormatsMixin';
 import ThumbnailCardMixin from './ThumbnailCardMixin';
@@ -34,17 +33,11 @@ import Utils from '../utils';
 
 Registry.addDependency('content-type', require('content-type'));
 
-export default {
+export default defineComponent({
   name: 'Item',
   components: {
     StacLink,
     Keywords: () => import('./Keywords.vue')
-  },
-  filters: {
-    summarize: text => Utils.summarizeMd(text, 150),
-    formatMediaType: value => formatMediaType(value, null, {shorten: true}),
-    formatTemporalExtent,
-    formatTimestamp
   },
   mixins: [
     FileFormatsMixin,
@@ -79,9 +72,26 @@ export default {
     },
     hasDescription() {
       return this.data instanceof STAC && Utils.hasText(this.data.properties.description);
-    }
+    },
+    summarizeDescription() {
+      return this.hasDescription ? Utils.summarizeMd(this.data.properties.description, 150) : '';
+    },
+    displayTime() {
+      if (this.extent) {
+        return formatTemporalExtent(this.extent);
+      }
+      else if (this.data && this.data.properties.datetime) {
+        return formatTimestamp(this.data.properties.datetime);
+      }
+      else {
+        return this.$t('items.noTime');
+      }
+    },
   },
   methods: {
+    formatMediaType(value) {
+      return formatMediaType(value, null, {shorten: true});
+    },
     load(visible) {
       if (this.item instanceof STAC) {
         return;
@@ -89,7 +99,7 @@ export default {
       this.$store.commit(visible ? 'queue' : 'unqueue', this.item.href);
     }
   }
-};
+});
 </script>
 
 <style lang="scss">
