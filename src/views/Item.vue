@@ -39,10 +39,10 @@
 import { defineComponent } from 'vue';
 import { mapState, mapGetters } from 'vuex';
 import Description from '../components/Description.vue';
-import ReadMore from "vue-read-more-smooth";
+import ReadMore from "../components/ReadMore.vue";
 import ShowAssetLinkMixin from '../components/ShowAssetLinkMixin';
 import DeprecationMixin from '../components/DeprecationMixin';
-import { BTabs, BTab, BCard } from 'bootstrap-vue-next';
+import { BTabs, BTab, BCard, BRow, BCol } from 'bootstrap-vue-next';
 import { addSchemaToDocument, createItemSchema } from '../schema-org';
 
 export default defineComponent({
@@ -51,6 +51,8 @@ export default defineComponent({
     AnonymizedNotice: () => import('../components/AnonymizedNotice.vue'),
     Assets: () => import('../components/Assets.vue'),
     BCard,
+    BCol,
+    BRow,
     BTabs,
     BTab,
     CollectionLink: () => import('../components/CollectionLink.vue'),

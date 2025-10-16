@@ -65,11 +65,11 @@ import { mapState, mapGetters } from 'vuex';
 import Catalogs from '../components/Catalogs.vue';
 import Description from '../components/Description.vue';
 import Items from '../components/Items.vue';
-import ReadMore from "vue-read-more-smooth";
+import ReadMore from "../components/ReadMore.vue";
 import ShowAssetLinkMixin from '../components/ShowAssetLinkMixin';
 import StacFieldsMixin from '../components/StacFieldsMixin';
 import { formatLicense, formatTemporalExtents } from '@radiantearth/stac-fields/formatters';
-import { BTabs, BTab, BCard } from 'bootstrap-vue-next';
+import { BTabs, BTab, BCard, BRow, BCol } from 'bootstrap-vue-next';
 import Utils from '../utils';
 import { addSchemaToDocument, createCatalogSchema } from '../schema-org';
 import { ItemCollection } from '../models/stac.js';
@@ -81,6 +81,8 @@ export default defineComponent({
     AnonymizedNotice: () => import('../components/AnonymizedNotice.vue'),
     Assets: () => import('../components/Assets.vue'),
     BCard,
+    BCol,
+    BRow,
     BTabs,
     BTab,
     Catalogs,

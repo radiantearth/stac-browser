@@ -8,6 +8,7 @@
 </template>
 
 <script>
+import { BAlert } from 'bootstrap-vue-next';
 import Item from './Item.vue';
 import Catalog from './Catalog.vue';
 import { mapGetters } from "vuex";
@@ -17,6 +18,7 @@ import BrowseMixin from './BrowseMixin';
 export default defineComponent({
   name: "Browse",
   components: {
+    BAlert,
     Catalog,
     Item
   },
