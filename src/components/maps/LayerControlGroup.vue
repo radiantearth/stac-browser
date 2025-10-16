@@ -15,6 +15,7 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
 import LayerControlMixin from './LayerControlMixin';
 import { BFormCheckbox } from 'bootstrap-vue-next';
 import { BIconZoomIn } from 'bootstrap-icons-vue';
@@ -24,7 +25,7 @@ import { transformExtent } from 'ol/proj';
 export default {
   name: 'LayerControlGroup',
   components: {
-    LayerControlGroup: () => import('./LayerControlGroup.vue'),
+    LayerControlGroup: defineAsyncComponent(() => import('./LayerControlGroup.vue')),
     BFormCheckbox,
     BIconZoomIn
   },

@@ -40,6 +40,7 @@
 
 
 <script>
+import { defineAsyncComponent } from 'vue';
 import { BListGroup, BSpinner } from 'bootstrap-vue-next';
 import { BIconBoxArrowUpRight, BIconDownload, BIconEye, BIconLock } from 'bootstrap-icons-vue';
 import Description from './Description.vue';
@@ -59,16 +60,16 @@ let i = 0;
 export default {
   name: 'HrefActions',
   components: {
-    AuthSchemeItem: () => import('./AuthSchemeItem.vue'),
+    AuthSchemeItem: defineAsyncComponent(() => import('./AuthSchemeItem.vue')),
     BIconBoxArrowUpRight,
     BIconDownload,
     BIconEye,
     BIconLock,
     BListGroup,
     BSpinner,
-    CopyButton: () => import('./CopyButton.vue'),
+    CopyButton: defineAsyncComponent(() => import('./CopyButton.vue')),
     Description,
-    Metadata: () => import('./Metadata.vue'),
+    Metadata: defineAsyncComponent(() => import('./Metadata.vue')),
     TeleportPopover
   },
   props: {

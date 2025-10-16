@@ -18,6 +18,7 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
 import HrefActions from './HrefActions.vue';
 import StacLink from './StacLink.vue';
 import TeleportPopover from './TeleportPopover.vue';
@@ -30,8 +31,8 @@ export default {
     HrefActions,
     StacLink,
     TeleportPopover,
-    Description: () => import('./Description.vue'),
-    Metadata: () => import('./Metadata.vue')
+    Description: defineAsyncComponent(() => import('./Description.vue')),
+    Metadata: defineAsyncComponent(() => import('./Metadata.vue'))
   },
   props: {
     link: {

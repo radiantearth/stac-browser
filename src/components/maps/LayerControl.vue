@@ -26,6 +26,7 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
 import ControlMixin from './ControlMixin';
 import LayerControlMixin from './LayerControlMixin';
 import { BFormRadio, BFormRadioGroup } from 'bootstrap-vue-next';
@@ -40,7 +41,7 @@ export default {
     BFormRadioGroup,
     BFormRadio,
     BIconLayersFill,
-    LayerControlGroup: () => import('./LayerControlGroup.vue'),
+    LayerControlGroup: defineAsyncComponent(() => import('./LayerControlGroup.vue')),
     TeleportPopover
   },
   mixins: [

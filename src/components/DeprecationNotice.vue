@@ -20,13 +20,14 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
 import Description from './Description.vue';
 import DeprecationMixin from './DeprecationMixin';
 
 export default {
   name: 'DeprecationNotice',
   components: {
-    StacLink: () => import('./StacLink.vue'),
+    StacLink: defineAsyncComponent(() => import('./StacLink.vue')),
     Description
   },
   mixins: [
