@@ -12,7 +12,7 @@
     />
     <template v-if="allowFilter">
       <b-button v-if="api" class="mb-3" v-b-toggle.itemFilter :variant="hasFilters && !filtersOpen ? 'primary' : 'outline-primary'">
-        <b-icon-search />
+        <b-icon-filter />
         {{ filtersOpen ? $t('items.hideFilter') : $t('items.showFilter') }}
         <b-badge v-if="hasFilters && !filtersOpen" variant="dark">{{ filterCount }}</b-badge>
       </b-button>
@@ -42,21 +42,20 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
+import { BCollapse } from 'bootstrap-vue-next';
 import { defineComponent, defineAsyncComponent } from 'vue';
+
+import Utils from '../utils';
 import Item from './Item.vue';
 import Loading from './Loading.vue';
 import Pagination from './Pagination.vue';
-import { BCollapse } from 'bootstrap-vue-next';
-import { BIconSearch } from 'bootstrap-icons-vue';
-import Utils from '../utils';
 import { getDisplayTitle } from '../models/stac';
-import { mapState } from 'vuex';
 
 export default defineComponent({
   name: "Items",
   components: {
     BCollapse,
-    BIconSearch,
     Item,
     SearchFilter: defineAsyncComponent(() => import('./SearchFilter.vue')),
     Loading,

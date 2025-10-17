@@ -2,6 +2,9 @@ const yargs = require('yargs/yargs');
 const { hideBin } = require('yargs/helpers');
 const path = require('path');
 const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
+const Icons = require('unplugin-icons/webpack');
+const Components = require('unplugin-vue-components/webpack');
+const IconsResolver = require('unplugin-icons/resolver');
 
 const { properties } = require('./config.schema.json');
 const pkgFile = require('./package.json');
@@ -34,8 +37,6 @@ const vueConfig = {
   productionSourceMap: !mergedConfig.noSourceMaps,
   publicPath: mergedConfig.pathPrefix,
   chainWebpack: webpackConfig => {
-    // Pure Vue 3 configuration - no compatibility mode needed
-
     // Vue 3 template compiler options - using defaults for pure Vue 3
     webpackConfig.module
       .rule('vue')
@@ -44,6 +45,8 @@ const vueConfig = {
         if (!options.compilerOptions) {
           options.compilerOptions = {};
         }
+        // Preserve whitespace behavior from Vue 2
+        options.compilerOptions.whitespace = 'preserve';
         // Keep comments during development for better debugging
         options.compilerOptions.comments = process.env.NODE_ENV !== 'production';
         return options;
@@ -72,7 +75,20 @@ const vueConfig = {
     plugins: [
       new NodePolyfillPlugin({
         includeAliases: ['Buffer', 'path']
-      })
+      }),
+      Components({
+        resolvers: [IconsResolver({ 
+          prefix: false,
+          enabledCollections: ['bi'],
+          alias: {
+            'b-icon': 'bi'
+          }
+        })],
+        dts: true,
+      }),
+      Icons({
+        compiler: 'vue3',
+      }),
     ]
   },
   pluginOptions: {

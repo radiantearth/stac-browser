@@ -2,7 +2,7 @@
   <ul class="tree" v-b-visible="load">
     <li>
       <b-button v-if="pagination" size="sm" variant="light" disabled>
-        <b-icon-three-dots />
+        <b-icon-chevron-left />
       </b-button>
       <template v-else-if="mayHaveChildren">
         <b-button size="sm" variant="light" @click="toggle">
@@ -39,7 +39,6 @@
 </template>
 
 <script>
-import { BIconFileEarmarkRichtext, BIconFolderMinus, BIconFolderPlus, BIconThreeDots } from 'bootstrap-icons-vue';
 import { mapGetters, mapState } from 'vuex';
 import Utils from '../utils';
 import { getDisplayTitle } from '../models/stac';
@@ -47,12 +46,7 @@ import { STAC, CatalogLike } from 'stac-js';
 
 export default {
   name: 'Tree',
-  components: {
-    BIconFileEarmarkRichtext,
-    BIconFolderMinus,
-    BIconFolderPlus,
-    BIconThreeDots
-  },
+  components: {},
   props: {
     item: {
       type: Object,

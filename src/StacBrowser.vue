@@ -92,13 +92,12 @@ import { isNavigationFailure, NavigationFailureType } from 'vue-router';
 import { mapMutations, mapActions, mapGetters, mapState } from 'vuex';
 import CONFIG from './config';
 
-import {
-  BIconArrow90degUp, BIconArrowLeft, BIconCaretDownFill,
-  BIconFolderSymlink, BIconList, BIconLock, BIconSearch, BIconUnlock,
-  } from "bootstrap-icons-vue";
+// Import icons needed for dynamic component usage
+import BIconLock from '~icons/bi/lock';
+import BIconUnlock from '~icons/bi/unlock';
 
-import { 
-  BContainer, BRow, BCol, BButton, BButtonGroup 
+import {
+  BContainer, BRow, BCol, BButton, BButtonGroup
 } from 'bootstrap-vue-next';
 
 // CSS imports are handled in init.js
@@ -147,15 +146,9 @@ export default defineComponent({
     BCol,
     BContainer,
     BRow,
-    BIconArrow90degUp,
-    BIconArrowLeft,
-    BIconCaretDownFill,
-    BIconFolderSymlink,
-    BIconList,
-    BIconLock,
-    BIconSearch,
-    BIconUnlock,
     ErrorAlert,
+    BIconLock,
+    BIconUnlock,
     LanguageChooser,
     RootStats: defineAsyncComponent(() => import('./components/RootStats.vue')),
     Sidebar: defineAsyncComponent(() => import('./components/Sidebar.vue')),
@@ -204,7 +197,7 @@ export default defineComponent({
       return this.$route.name !== 'select';
     },
     authIcon() {
-      return this.isLoggedIn ? 'b-icon-unlock' : 'b-icon-lock';
+      return this.isLoggedIn ? BIconUnlock : BIconLock;
     },
     authTitle() {
       return this.authMethod.getButtonTitle();

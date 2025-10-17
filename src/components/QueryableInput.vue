@@ -76,7 +76,6 @@
 <script>
 import { defineAsyncComponent } from 'vue';
 import { BBadge, BDropdown, BDropdownItemButton, BFormCheckbox, BFormInput, BFormSelect, BRow } from 'bootstrap-vue-next';
-import { BIconXCircleFill } from 'bootstrap-icons-vue';
 
 import DatePickerMixin from './DatePickerMixin';
 import Utils from '../utils';
@@ -92,7 +91,6 @@ export default {
     BFormInput,
     BFormSelect,
     BRow,
-    BIconXCircleFill,
     Description: defineAsyncComponent(() => import('./Description.vue'))
   },
   mixins: [

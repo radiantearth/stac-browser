@@ -18,7 +18,7 @@
       </b-button>
       <b-button v-if="hasDownloadButton" :disabled="requiresAuth" v-bind="downloadProps" v-on="downloadEvents" variant="primary">
         <b-spinner v-if="loading" small variant="light" />
-        <b-icon-box-arrow-up-right v-else-if="browserCanOpenFile" /> 
+        <b-icon-box-arrow-up-right v-else-if="browserCanOpenFile" />
         <b-icon-download v-else />
         {{ buttonText }}
       </b-button>
@@ -42,7 +42,7 @@
 <script>
 import { defineAsyncComponent } from 'vue';
 import { BListGroup, BSpinner } from 'bootstrap-vue-next';
-import { BIconBoxArrowUpRight, BIconDownload, BIconEye, BIconLock } from 'bootstrap-icons-vue';
+
 import Description from './Description.vue';
 import TeleportPopover from './TeleportPopover.vue';
 import Utils, { imageMediaTypes, mapMediaTypes } from '../utils';
@@ -61,10 +61,6 @@ export default {
   name: 'HrefActions',
   components: {
     AuthSchemeItem: defineAsyncComponent(() => import('./AuthSchemeItem.vue')),
-    BIconBoxArrowUpRight,
-    BIconDownload,
-    BIconEye,
-    BIconLock,
     BListGroup,
     BSpinner,
     CopyButton: defineAsyncComponent(() => import('./CopyButton.vue')),

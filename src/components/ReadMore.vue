@@ -7,13 +7,13 @@
     }"
   >
     <div ref="contentRef" class="text-overflow-content">
-      <slot></slot>
+      <slot />
     </div>
 
-    <div ref="shadowRef" class="hide-text" v-if="!noShadow"></div>
+    <div ref="shadowRef" class="hide-text" v-if="!noShadow" />
 
     <div @click="toggle" class="button-read-more" v-if="!noButton">
-      <slot name="more" v-bind:open="expanded">
+      <slot name="more" :open="expanded">
         <div class="read-more-button" :class="{ 'show-less': !noLess }">
           <span>{{ expanded ? textLess : text }}</span>
         </div>
@@ -81,7 +81,7 @@ export default defineComponent({
     });
 
     const getLineHeight = (element) => {
-      if (!element || !element.children[0]) return 20; // fallback
+      if (!element || !element.children[0]) {return 20;} // fallback
       
       const temp = document.createElement(element.children[0].nodeName);
       const cpStyle = getComputedStyle(element.children[0]);

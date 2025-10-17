@@ -68,7 +68,6 @@
 <script>
 import { mapState } from 'vuex';
 import { defineAsyncComponent } from 'vue';
-import { BIconInfoLg, BIconShare } from 'bootstrap-icons-vue';
 import { BButton, BButtonGroup, BRow, BCol } from 'bootstrap-vue-next';
 
 import Url from './Url.vue';
@@ -83,8 +82,6 @@ export default {
     BButtonGroup,
     BCol,
     BRow,
-    BIconInfoLg,
-    BIconShare,
     TeleportPopover,
     Url,
     CopyButton,

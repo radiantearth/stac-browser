@@ -31,7 +31,7 @@
 
 <script>
 import { defineAsyncComponent } from 'vue';
-import { BCard, BCardBody, BCardHeader, BCardText, BCollapse, BIconChevronRight, BIconChevronDown } from 'bootstrap-vue-next';
+import { BCard, BCardBody, BCardHeader, BCardText, BCollapse } from 'bootstrap-vue-next';
 import Description from './Description.vue';
 import ProviderRoles from './ProviderRoles.vue';
 
@@ -43,8 +43,6 @@ export default {
     BCardHeader,
     BCardText,
     BCollapse,
-    BIconChevronDown,
-    BIconChevronRight,
     Description,
     Metadata: defineAsyncComponent(() => import('./Metadata.vue')),
     ProviderRoles

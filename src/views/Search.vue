@@ -73,13 +73,10 @@ import { STAC } from 'stac-js';
 import { defineComponent, defineAsyncComponent } from 'vue';
 import { mapGetters, mapState } from "vuex";
 import { BTabs, BTab } from 'bootstrap-vue-next';
-import { BIconCheckSquare, BIconSquare } from 'bootstrap-icons-vue';
 
 export default defineComponent({
   name: "Search",
   components: {
-    BIconCheckSquare,
-    BIconSquare,
     BTab,
     BTabs,
     Catalogs: defineAsyncComponent(() => import('../components/Catalogs.vue')),

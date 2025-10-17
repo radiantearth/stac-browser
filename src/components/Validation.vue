@@ -10,14 +10,10 @@
 <script>
 import { STAC } from 'stac-js';
 import validateSTAC from 'stac-node-validator';
-import { BIconCheck, BIconX } from 'bootstrap-icons-vue';
 
 export default {
   name: "Validation",
-  components: {
-    BIconCheck,
-    BIconX
-  },
+  components: {},
   props: {
     data: {
       type: Object,
