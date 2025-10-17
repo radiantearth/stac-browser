@@ -10,10 +10,10 @@
           <nav class="actions navigation">
             <b-button-group v-if="canSearch || isServerSelector">
               <b-button v-if="isServerSelector" variant="primary" size="sm" :title="$t('browse')" v-b-toggle.sidebar @click="sidebar = true">
-                <b-icon-list /><span class="button-label">{{ $t('browse') }}</span>
+                <IBiList /><span class="button-label">{{ $t('browse') }}</span>
               </b-button>
               <b-button v-if="canSearch" variant="primary" size="sm" :to="searchBrowserLink" :title="$t('search.title')" :pressed="isSearchPage">
-                <b-icon-search /><span class="button-label">{{ $t('search.title') }}</span>
+                <IBiSearch /><span class="button-label">{{ $t('search.title') }}</span>
               </b-button>
             </b-button-group>
           </nav>
@@ -34,7 +34,7 @@
                   size="sm" variant="outline-primary"
                   :title="serviceType" tag="a" tabindex="0"
                 >
-                  <b-icon-caret-down-fill />
+                  <IBiCaretDownFill />
                 </b-button>
               </template>
               <template #content>
@@ -64,13 +64,13 @@
           <nav class="actions navigation">
             <b-button-group>
               <b-button v-if="back" :to="selfBrowserLink" :title="$t('goBack.description', {type})" variant="outline-primary" size="sm">
-                <b-icon-arrow-left /><span class="button-label">{{ $t('goBack.label') }}</span>
+                <IBiArrowLeft /><span class="button-label">{{ $t('goBack.label') }}</span>
               </b-button>
               <b-button v-if="collectionLink" :to="toBrowserPath(collectionLink.href)" :title="collectionLinkTitle" variant="outline-primary" size="sm">
-                <b-icon-folder-symlink /><span class="button-label">{{ $t('goToCollection.label') }}</span>
+                <IBiFolderSymlink /><span class="button-label">{{ $t('goToCollection.label') }}</span>
               </b-button>
               <b-button v-if="parentLink" :to="toBrowserPath(parentLink.href)" :title="parentLinkTitle" variant="outline-primary" size="sm">
-                <b-icon-arrow-90deg-up /><span class="button-label">{{ $t('goToParent.label') }}</span>
+                <IBiArrow90degUp /><span class="button-label">{{ $t('goToParent.label') }}</span>
               </b-button>
             </b-button-group>
           </nav>
@@ -92,10 +92,10 @@ import { isNavigationFailure, NavigationFailureType } from 'vue-router';
 import { mapMutations, mapActions, mapGetters, mapState } from 'vuex';
 import CONFIG from './config';
 
-import {
-  BIconArrow90degUp, BIconArrowLeft, BIconCaretDownFill,
-  BIconFolderSymlink, BIconList, BIconLock, BIconSearch, BIconUnlock,
-  } from "bootstrap-icons-vue";
+// Import icons needed for dynamic component usage
+import IBiLock from '~icons/bi/lock'
+import IBiUnlock from '~icons/bi/unlock'
+
 
 import { 
   BContainer, BRow, BCol, BButton, BButtonGroup 
@@ -147,15 +147,9 @@ export default defineComponent({
     BCol,
     BContainer,
     BRow,
-    BIconArrow90degUp,
-    BIconArrowLeft,
-    BIconCaretDownFill,
-    BIconFolderSymlink,
-    BIconList,
-    BIconLock,
-    BIconSearch,
-    BIconUnlock,
     ErrorAlert,
+    IBiLock,
+    IBiUnlock,
     LanguageChooser,
     RootStats: defineAsyncComponent(() => import('./components/RootStats.vue')),
     Sidebar: defineAsyncComponent(() => import('./components/Sidebar.vue')),
@@ -204,7 +198,7 @@ export default defineComponent({
       return this.$route.name !== 'select';
     },
     authIcon() {
-      return this.isLoggedIn ? 'b-icon-unlock' : 'b-icon-lock';
+      return this.isLoggedIn ? IBiUnlock : IBiLock;
     },
     authTitle() {
       return this.authMethod.getButtonTitle();

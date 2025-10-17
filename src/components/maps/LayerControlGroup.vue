@@ -6,7 +6,7 @@
           <span class="title">{{ l.title }}</span>
         </b-form-checkbox>
         <b-button variant="light" size="sm" :title="$t('mapping.fit')" @click.prevent.stop="fitToExtent(l)">
-          <b-icon-zoom-in />
+          <IBiZoomIn />
         </b-button>
       </div>
       <LayerControlGroup v-if="l.group > 1" :map="map" :group="l.layer" :maxZoom="maxZoom" />
@@ -18,7 +18,6 @@
 import { defineAsyncComponent } from 'vue';
 import LayerControlMixin from './LayerControlMixin';
 import { BFormCheckbox } from 'bootstrap-vue-next';
-import { BIconZoomIn } from 'bootstrap-icons-vue';
 import LayerGroup from 'ol/layer/Group';
 import { transformExtent } from 'ol/proj';
 
@@ -26,8 +25,7 @@ export default {
   name: 'LayerControlGroup',
   components: {
     LayerControlGroup: defineAsyncComponent(() => import('./LayerControlGroup.vue')),
-    BFormCheckbox,
-    BIconZoomIn
+    BFormCheckbox
   },
   mixins: [
     LayerControlMixin

@@ -12,7 +12,7 @@
             size="sm" variant="outline-primary"
             :title="$t('source.detailsAboutSource')" tag="a" tabindex="0"
           >
-            <b-icon-info-lg /><span class="button-label">{{ $t('source.label') }}</span>
+            <IBiInfoLg /><span class="button-label">{{ $t('source.label') }}</span>
           </b-button>
         </template>
         <template #content>
@@ -50,7 +50,7 @@
             size="sm" variant="outline-primary"
             :title="$t('source.share.withOthers')" tag="a" tabindex="0"
           >
-            <b-icon-share /><span class="button-label">{{ $t('source.share.title') }}</span>
+            <IBiShare /><span class="button-label">{{ $t('source.share.title') }}</span>
           </b-button>
         </template>
         <template #content>
@@ -68,7 +68,6 @@
 <script>
 import { mapState } from 'vuex';
 import { defineAsyncComponent } from 'vue';
-import { BIconInfoLg, BIconShare } from 'bootstrap-icons-vue';
 import { BButton, BButtonGroup, BRow, BCol } from 'bootstrap-vue-next';
 
 import Url from './Url.vue';
@@ -83,8 +82,6 @@ export default {
     BButtonGroup,
     BCol,
     BRow,
-    BIconInfoLg,
-    BIconShare,
     TeleportPopover,
     Url,
     CopyButton,

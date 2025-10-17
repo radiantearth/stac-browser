@@ -1,20 +1,19 @@
 <template>
-  <b-sidebar id="sidebar" v-model="visible" :title="$t('browse')" backdrop lazy>
+  <b-offcanvas id="sidebar" v-model="visible" :title="$t('browse')" backdrop lazy>
     <template #default>
       <Loading v-if="!parents" />
       <Tree v-else-if="root" :item="root" :path="parents" />
     </template>
     <template v-if="allowSelectCatalog" #footer>
       <b-button class="switch-catalog" variant="light">
-        <router-link to="/"><b-icon-arrow-left-right /> {{ $t('sidebar.switchCatalog') }}</router-link>
+        <router-link to="/"><IBiArrowLeftRight /> {{ $t('sidebar.switchCatalog') }}</router-link>
       </b-button>
     </template>
-  </b-sidebar>
+  </b-offcanvas>
 </template>
 
 <script>
-import { BSidebar } from 'bootstrap-vue-next';
-import { BIconArrowLeftRight } from 'bootstrap-icons-vue';
+import { BOffcanvas } from 'bootstrap-vue-next';
 import { mapGetters, mapState } from 'vuex';
 import Loading from './Loading.vue';
 import Tree from './Tree.vue';
@@ -22,8 +21,7 @@ import Tree from './Tree.vue';
 export default {
   name: 'Sidebar',
   components: {
-    BIconArrowLeftRight,
-    BSidebar,
+    BOffcanvas,
     Loading,
     Tree
   },

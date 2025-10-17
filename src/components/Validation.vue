@@ -1,8 +1,8 @@
 <template>
   <div class="valid">
     <b-spinner v-if="working" :label="$t('source.validating')" small />
-    <b-button v-else-if="valid === true" variant="success" :size="size" :to="validationLink"><b-icon-check /> {{ $t('checkbox.true') }}</b-button>
-    <b-button v-else-if="valid === false" variant="danger" :size="size" :to="validationLink"><b-icon-x /> {{ $t('checkbox.false') }}</b-button>
+    <b-button v-else-if="valid === true" variant="success" :size="size" :to="validationLink"><IBiCheck /> {{ $t('checkbox.true') }}</b-button>
+    <b-button v-else-if="valid === false" variant="danger" :size="size" :to="validationLink"><IBiX /> {{ $t('checkbox.false') }}</b-button>
     <template v-else>{{ $t('source.validationNA') }}</template>
   </div>
 </template>
@@ -10,14 +10,10 @@
 <script>
 import { STAC } from 'stac-js';
 import validateSTAC from 'stac-node-validator';
-import { BIconCheck, BIconX } from 'bootstrap-icons-vue';
 
 export default {
   name: "Validation",
-  components: {
-    BIconCheck,
-    BIconX
-  },
+  components: {},
   props: {
     data: {
       type: Object,

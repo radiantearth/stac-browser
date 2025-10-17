@@ -2,6 +2,9 @@ const yargs = require('yargs/yargs');
 const { hideBin } = require('yargs/helpers');
 const path = require('path');
 const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
+const Icons = require('unplugin-icons/webpack');
+const Components = require('unplugin-vue-components/webpack');
+const IconsResolver = require('unplugin-icons/resolver');
 
 const { properties } = require('./config.schema.json');
 const pkgFile = require('./package.json');
@@ -72,7 +75,14 @@ const vueConfig = {
     plugins: [
       new NodePolyfillPlugin({
         includeAliases: ['Buffer', 'path']
-      })
+      }),
+      Components({
+        resolvers: [IconsResolver()],
+        dts: true,
+      }),
+      Icons({
+        compiler: 'vue3',
+      }),
     ]
   },
   pluginOptions: {

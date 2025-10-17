@@ -2,26 +2,24 @@
   <b-form-group :label="label" :label-for="id">
     <b-input-group size="sm">
       <b-form-input :id="id" ref="input" :value="url" readonly />
-      <b-input-group-append>
+      <template #append>
         <CopyButton :copyText="url" variant="primary" />
-        <b-button v-if="open" :href="url" target="_blank" variant="primary" :title="$t('open')"><b-icon-arrow-up-right-square /></b-button>
-      </b-input-group-append>
+        <b-button v-if="open" :href="url" target="_blank" variant="primary" :title="$t('open')"><IBiArrowUpRightSquare /></b-button>
+      </template>
     </b-input-group>
   </b-form-group>
 </template>
 
 <script>
 import { defineAsyncComponent } from 'vue';
-import { BFormInput, BFormGroup, BIconArrowUpRightSquare, BInputGroup, BInputGroupAppend } from 'bootstrap-vue-next';
+import { BFormInput, BFormGroup, BInputGroup } from 'bootstrap-vue-next';
 
 export default {
   name: "Share",
   components: {
     BFormGroup,
     BFormInput,
-    BIconArrowUpRightSquare,
     BInputGroup,
-    BInputGroupAppend,
     CopyButton: defineAsyncComponent(() => import('./CopyButton.vue'))
   },
   props: {

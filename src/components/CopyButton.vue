@@ -6,15 +6,17 @@
 </template>
 
 <script>
-import { BIconClipboard, BIconClipboardCheck, BIconClipboardX } from 'bootstrap-icons-vue';
 import { Clipboard } from "v-clipboard";
+import IBiClipboard from '~icons/bi/clipboard'
+import IBiClipboardCheck from '~icons/bi/clipboard-check'
+import IBiClipboardX from '~icons/bi/clipboard-x'
 
 export default {
     name: "CopyButton",
     components: {
-        BIconClipboard,
-        BIconClipboardCheck,
-        BIconClipboardX
+        IBiClipboard,
+        IBiClipboardCheck,
+        IBiClipboardX
     },
     props: {
         copyText: {
@@ -51,13 +53,13 @@ export default {
         },
         copyIcon() {
             if (this.status === true) {
-                return 'b-icon-clipboard-check';
+                return IBiClipboardCheck;
             }
             else if (this.status === false) {
-                return 'b-icon-clipboard-x';
+                return IBiClipboardX;
             }
             else {
-                return 'b-icon-clipboard';
+                return IBiClipboard;
             }
         }
     },

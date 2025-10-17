@@ -1,7 +1,7 @@
 <template>
   <div class="ol-location ol-unselectable ol-control" style="pointer-events: auto;">
     <button @click.prevent.stop="request" :title="$t('mapping.location.description')">
-      <b-icon-pin-map-fill />
+      <IBiPinMapFill />
     </button>
   </div>
 </template>
@@ -10,13 +10,10 @@
 import Point from 'ol/geom/Point';
 import ControlMixin from './ControlMixin';
 import { fromLonLat } from 'ol/proj';
-import { BIconPinMapFill } from 'bootstrap-icons-vue';
 
 export default {
   name: 'UserLocationControl',
-  components: {
-    BIconPinMapFill
-  },
+  components: {},
   mixins: [
     ControlMixin
   ],

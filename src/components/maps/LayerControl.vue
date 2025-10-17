@@ -2,7 +2,7 @@
   <div class="ol-layercontrol ol-unselectable ol-control" style="pointer-events: auto;">
     <TeleportPopover v-if="id" placement="top" @show="update">
       <template #trigger>
-        <button :id="id"><b-icon-layers-fill /></button>
+        <button :id="id"><IBiLayersFill /></button>
       </template>
       <template #content>
         <div class="layercontrol">
@@ -30,7 +30,6 @@ import { defineAsyncComponent } from 'vue';
 import ControlMixin from './ControlMixin';
 import LayerControlMixin from './LayerControlMixin';
 import { BFormRadio, BFormRadioGroup } from 'bootstrap-vue-next';
-import { BIconLayersFill } from 'bootstrap-icons-vue';
 import Group from 'ol/layer/Group';
 import TeleportPopover from '../TeleportPopover.vue';
 import MapUtils from './mapUtils';
@@ -40,7 +39,6 @@ export default {
   components: {
     BFormRadioGroup,
     BFormRadio,
-    BIconLayersFill,
     LayerControlGroup: defineAsyncComponent(() => import('./LayerControlGroup.vue')),
     TeleportPopover
   },

@@ -3,13 +3,13 @@
     <b-card-header header-tag="header" role="tab">
       <b-button block v-b-toggle="uid" variant="asset" squared>
         <span class="chevron" aria-hidden="true">
-          <b-icon-chevron-down v-if="expanded" />
-          <b-icon-chevron-right v-else />
+          <IBiChevronDown v-if="expanded" />
+          <IBiChevronRight v-else />
         </span>
         <span class="title">{{ title }}</span>
         <div class="badges ml-1">
           <b-badge v-if="shown" variant="success" class="shown" :title="$t('assets.currentlyShown')">
-            <b-icon-check /> {{ $t('assets.shown') }}
+            <IBiCheck /> {{ $t('assets.shown') }}
           </b-badge>
           <b-badge v-if="asset.deprecated" variant="warning" class="deprecated">{{ $t('deprecated') }}</b-badge>
           <template v-if="Array.isArray(asset.roles)">
@@ -37,7 +37,6 @@
 
 <script>
 import { BCollapse, BTabs, BTab } from 'bootstrap-vue-next';
-import { BIconCheck, BIconChevronDown, BIconChevronRight } from 'bootstrap-icons-vue';
 import { formatMediaType } from '@radiantearth/stac-fields/formatters';
 import { mapState } from 'vuex';
 import AssetAlternative from './AssetAlternative.vue';
@@ -50,9 +49,6 @@ export default {
   components: {
     AssetAlternative,
     BCollapse,
-    BIconCheck,
-    BIconChevronDown,
-    BIconChevronRight,
     BTabs,
     BTab
   },

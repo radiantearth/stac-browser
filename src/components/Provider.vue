@@ -3,8 +3,8 @@
     <b-card-header header-tag="header" role="tab">
       <b-button block v-b-toggle="id" variant="provider" squared>
         <span class="chevron" aria-hidden="true">
-          <b-icon-chevron-down v-if="expanded" />
-          <b-icon-chevron-right v-else />
+          <IBiChevronDown v-if="expanded" />
+          <IBiChevronRight v-else />
         </span>
         <span class="title">{{ provider.name }}</span>
         <ProviderRoles :roles="provider.roles" />
@@ -31,7 +31,7 @@
 
 <script>
 import { defineAsyncComponent } from 'vue';
-import { BCard, BCardBody, BCardHeader, BCardText, BCollapse, BIconChevronRight, BIconChevronDown } from 'bootstrap-vue-next';
+import { BCard, BCardBody, BCardHeader, BCardText, BCollapse } from 'bootstrap-vue-next';
 import Description from './Description.vue';
 import ProviderRoles from './ProviderRoles.vue';
 
@@ -43,8 +43,6 @@ export default {
     BCardHeader,
     BCardText,
     BCollapse,
-    BIconChevronDown,
-    BIconChevronRight,
     Description,
     Metadata: defineAsyncComponent(() => import('./Metadata.vue')),
     ProviderRoles

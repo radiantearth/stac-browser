@@ -4,7 +4,7 @@
       <TeleportPopover v-if="requiresAuth && auth.length > 1" placement="bottom" :title="$t('authentication.chooseMethod')">
         <template #trigger>
           <b-button variant="danger" tag="a" tabindex="0">
-            <b-icon-lock /> {{ $t('authentication.required') }}
+            <IBiLock /> {{ $t('authentication.required') }}
           </b-button>
         </template>
         <template #content>
@@ -14,19 +14,19 @@
         </template>
       </TeleportPopover>
       <b-button v-else-if="requiresAuth" variant="danger" tag="a" tabindex="0" @click="handleAuthButton">
-        <b-icon-lock /> {{ $t('authentication.required') }}
+        <IBiLock /> {{ $t('authentication.required') }}
       </b-button>
       <b-button v-if="hasDownloadButton" :disabled="requiresAuth" v-bind="downloadProps" v-on="downloadEvents" variant="primary">
         <b-spinner v-if="loading" small variant="light" />
-        <b-icon-box-arrow-up-right v-else-if="browserCanOpenFile" /> 
-        <b-icon-download v-else />
+        <IBiBoxArrowUpRight v-else-if="browserCanOpenFile" />
+        <IBiDownload v-else />
         {{ buttonText }}
       </b-button>
       <CopyButton variant="primary" :copyText="href" :title="href">
         {{ copyButtonText }}
       </CopyButton>
       <b-button v-if="hasShowButton" @click="show" variant="primary">
-        <b-icon-eye class="mr-1" />
+        <IBiEye class="mr-1" />
         <template v-if="isThumbnail">{{ $t('assets.showThumbnail') }}</template>
         <template v-else>{{ $t('assets.showOnMap') }}</template>
       </b-button>
@@ -42,7 +42,7 @@
 <script>
 import { defineAsyncComponent } from 'vue';
 import { BListGroup, BSpinner } from 'bootstrap-vue-next';
-import { BIconBoxArrowUpRight, BIconDownload, BIconEye, BIconLock } from 'bootstrap-icons-vue';
+
 import Description from './Description.vue';
 import TeleportPopover from './TeleportPopover.vue';
 import Utils, { imageMediaTypes, mapMediaTypes } from '../utils';
@@ -61,10 +61,6 @@ export default {
   name: 'HrefActions',
   components: {
     AuthSchemeItem: defineAsyncComponent(() => import('./AuthSchemeItem.vue')),
-    BIconBoxArrowUpRight,
-    BIconDownload,
-    BIconEye,
-    BIconLock,
     BListGroup,
     BSpinner,
     CopyButton: defineAsyncComponent(() => import('./CopyButton.vue')),
