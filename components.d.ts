@@ -54,6 +54,7 @@ declare module 'vue' {
     BIconSortAlphaDown: typeof import('~icons/bi/sort-alpha-down')['default']
     BIconSortAlphaUp: typeof import('~icons/bi/sort-alpha-up')['default']
     BIconSquare: typeof import('~icons/bi/square')['default']
+    BIconThreeDots: typeof import('~icons/bi/three-dots')['default']
     BIconX: typeof import('~icons/bi/x')['default']
     BIconXCircleFill: typeof import('~icons/bi/x-circle-fill')['default']
     BIconZoomIn: typeof import('~icons/bi/zoom-in')['default']

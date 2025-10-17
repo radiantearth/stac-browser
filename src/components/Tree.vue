@@ -2,7 +2,7 @@
   <ul class="tree" v-b-visible="load">
     <li>
       <b-button v-if="pagination" size="sm" variant="light" disabled>
-        <b-icon-chevron-left />
+        <b-icon-three-dots />
       </b-button>
       <template v-else-if="mayHaveChildren">
         <b-button size="sm" variant="light" @click="toggle">
