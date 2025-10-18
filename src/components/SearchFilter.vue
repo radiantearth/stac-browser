@@ -136,8 +136,7 @@
 </template>
 
 <script>
-import { defineComponent } from 'vue';
-import { BBadge, BDropdown, BDropdownItem, BForm, BFormGroup, BFormInput, BFormCheckbox, BFormRadioGroup } from 'bootstrap-vue';
+import { defineComponent, defineAsyncComponent } from 'vue';
 import Multiselect from 'vue-multiselect';
 import { mapGetters, mapState } from "vuex";
 import refParser from '@apidevtools/json-schema-ref-parser';
@@ -189,18 +188,10 @@ let formId = 0;
 export default defineComponent({
   name: 'SearchFilter',
   components: {
-    BBadge,
-    BDropdown,
-    BDropdownItem,
-    BForm,
-    BFormGroup,
-    BFormInput,
-    BFormCheckbox,
-    BFormRadioGroup,
-    QueryableInput: () => import('./QueryableInput.vue'),
+    QueryableInput: defineAsyncComponent(() => import('./QueryableInput.vue')),
     Loading,
-    MapSelect: () => import('./maps/MapSelect.vue'),
-    SortButtons: () => import('./SortButtons.vue'),
+    MapSelect: defineAsyncComponent(() => import('./maps/MapSelect.vue')),
+    SortButtons: defineAsyncComponent(() => import('./SortButtons.vue')),
     Multiselect
   },
   mixins: [

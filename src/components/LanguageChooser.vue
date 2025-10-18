@@ -4,8 +4,8 @@
       <b-icon-flag /><span class="button-label">{{ $t('source.language.label', {currentLanguage}) }}</span>
     </template>
     <b-dropdown-item v-for="l of languages" :key="l.code" class="lang-item" @click="setLocale(l.code)">
-      <b-icon-check v-if="currentLocale === l.code" />
-      <b-icon-blank v-else />
+      <b-icon-check-square v-if="currentLocale === l.code" />
+      <b-icon-square v-else />
       <span class="title">
         <span :lang="l.code">{{ l.native }}</span>
         <template v-if="l.global && l.global !== l.native"> / <span lang="en">{{ l.global }}</span></template>
@@ -16,9 +16,6 @@
 </template>
 
 <script>
-import {
-  BDropdown, BDropdownItem, 
-  BIconBlank, BIconCheck, BIconExclamationTriangle, BIconFlag } from "bootstrap-vue";
 
 import { STAC } from 'stac-js';
 import { getBest, prepareSupported } from 'stac-js/src/locales';
@@ -28,14 +25,6 @@ import Utils from '../utils';
 
 export default {
   name: 'LanguageChooser',
-  components:  {
-    BDropdown,
-    BDropdownItem,
-    BIconBlank,
-    BIconCheck,
-    BIconExclamationTriangle,
-    BIconFlag,
-  },
   props: {
     data: {
       type: Object,

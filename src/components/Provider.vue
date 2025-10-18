@@ -30,18 +30,15 @@
 </template>
 
 <script>
-import { BCollapse, BIconChevronRight, BIconChevronDown } from 'bootstrap-vue';
+import { defineAsyncComponent } from 'vue';
 import Description from './Description.vue';
 import ProviderRoles from './ProviderRoles.vue';
 
 export default {
   name: 'Provider',
   components: {
-    BCollapse,
-    BIconChevronDown,
-    BIconChevronRight,
     Description,
-    Metadata: () => import('./Metadata.vue'),
+    Metadata: defineAsyncComponent(() => import('./Metadata.vue')),
     ProviderRoles
   },
   props: {

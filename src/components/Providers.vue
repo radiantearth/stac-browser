@@ -17,16 +17,14 @@
 </template>
 
 <script>
-import { BListGroup, BListGroupItem } from 'bootstrap-vue';
+import { defineAsyncComponent } from 'vue';
 import ProviderRoles from './ProviderRoles.vue';
 import Utils from '../utils';
 
 export default {
   name: 'Providers',
   components: {
-    BListGroup,
-    BListGroupItem,
-    Provider: () => import('./Provider.vue'),
+    Provider: defineAsyncComponent(() => import('./Provider.vue')),
     ProviderRoles
   },
   props: {

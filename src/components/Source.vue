@@ -66,8 +66,8 @@
 </template>
 
 <script>
-import { BIconInfoLg, BIconShare } from 'bootstrap-vue';
 import { mapState } from 'vuex';
+import { defineAsyncComponent } from 'vue';
 
 import Url from './Url.vue';
 import TeleportPopover from './TeleportPopover.vue';
@@ -77,13 +77,11 @@ import SocialSharing from './SocialSharing.vue';
 export default {
   name: "Source",
   components: {
-    BIconInfoLg,
-    BIconShare,
     TeleportPopover,
     Url,
     CopyButton,
     SocialSharing,
-    Validation: () => import('./Validation.vue')
+    Validation: defineAsyncComponent(() => import('./Validation.vue'))
   },
   props: {
     title: {

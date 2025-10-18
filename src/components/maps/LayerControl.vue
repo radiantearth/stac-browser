@@ -26,9 +26,9 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
 import ControlMixin from './ControlMixin';
 import LayerControlMixin from './LayerControlMixin';
-import { BFormRadio, BFormRadioGroup, BIconLayersFill } from 'bootstrap-vue';
 import Group from 'ol/layer/Group';
 import TeleportPopover from '../TeleportPopover.vue';
 import MapUtils from './mapUtils';
@@ -36,10 +36,7 @@ import MapUtils from './mapUtils';
 export default {
   name: 'LayerControl',
   components: {
-    BFormRadioGroup,
-    BFormRadio,
-    BIconLayersFill,
-    LayerControlGroup: () => import('./LayerControlGroup.vue'),
+    LayerControlGroup: defineAsyncComponent(() => import('./LayerControlGroup.vue')),
     TeleportPopover
   },
   mixins: [

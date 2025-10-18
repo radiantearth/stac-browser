@@ -87,17 +87,16 @@
 </template>
 
 <script>
+import { defineComponent, defineAsyncComponent } from 'vue';
 import { isNavigationFailure, NavigationFailureType } from 'vue-router';
 import { mapMutations, mapActions, mapGetters, mapState } from 'vuex';
 import CONFIG from './config';
 
-import {
-  BIconArrow90degUp, BIconArrowLeft, BIconCaretDownFill,
-  BIconFolderSymlink, BIconList, BIconLock, BIconSearch, BIconUnlock,
-  } from "bootstrap-vue";
+// Import icons needed for dynamic component usage
+import BIconLock from '~icons/bi/lock';
+import BIconUnlock from '~icons/bi/unlock';
 
-import "bootstrap/dist/css/bootstrap.css";
-import "bootstrap-vue/dist/bootstrap-vue.css";
+// CSS imports are handled in init.js
 
 import ErrorAlert from './components/ErrorAlert.vue';
 import StacLink from './components/StacLink.vue';
@@ -108,7 +107,6 @@ import Utils from './utils';
 import URI from 'urijs';
 
 import { API_LANGUAGE_CONFORMANCE } from './i18n';
-import { defineComponent } from 'vue';
 import { getBest, prepareSupported } from 'stac-js/src/locales';
 import BrowserStorage from "./browser-store";
 import Authentication from "./components/Authentication.vue";
@@ -139,20 +137,14 @@ export default defineComponent({
   name: 'StacBrowser',
   components: {
     Authentication,
-    BIconArrow90degUp,
-    BIconArrowLeft,
-    BIconCaretDownFill,
-    BIconFolderSymlink,
-    BIconList,
-    BIconLock,
-    BIconSearch,
-    BIconUnlock,
     ErrorAlert,
+    BIconLock,
+    BIconUnlock,
     LanguageChooser,
-    RootStats: () => import('./components/RootStats.vue'),
-    Sidebar: () => import('./components/Sidebar.vue'),
+    RootStats: defineAsyncComponent(() => import('./components/RootStats.vue')),
+    Sidebar: defineAsyncComponent(() => import('./components/Sidebar.vue')),
     StacLink,
-    Source: () => import('./components/Source.vue'),
+    Source: defineAsyncComponent(() => import('./components/Source.vue')),
     TeleportPopover
   },
   props: {
@@ -196,7 +188,7 @@ export default defineComponent({
       return this.$route.name !== 'select';
     },
     authIcon() {
-      return this.isLoggedIn ? 'b-icon-unlock' : 'b-icon-lock';
+      return this.isLoggedIn ? BIconUnlock : BIconLock;
     },
     authTitle() {
       return this.authMethod.getButtonTitle();
@@ -567,9 +559,12 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
+// Import Bootstrap functions, variables, and mixins only (not full bootstrap)
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins';
+// Import custom theme
 @import "./theme/variables.scss";
-@import '~bootstrap/scss/bootstrap.scss';
-@import '~bootstrap-vue/src/index.scss';
 @import "./theme/page.scss";
 @import "./theme/custom.scss";
 </style>

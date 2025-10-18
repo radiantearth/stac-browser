@@ -36,32 +36,29 @@
 </template>
 
 <script>
-import { defineComponent } from 'vue';
+import { defineComponent, defineAsyncComponent } from 'vue';
 import { mapState, mapGetters } from 'vuex';
 import Description from '../components/Description.vue';
-import ReadMore from "vue-read-more-smooth";
+import ReadMore from "../components/ReadMore.vue";
 import ShowAssetLinkMixin from '../components/ShowAssetLinkMixin';
 import DeprecationMixin from '../components/DeprecationMixin';
-import { BTabs, BTab } from 'bootstrap-vue';
 import { addSchemaToDocument, createItemSchema } from '../schema-org';
 
 export default defineComponent({
   name: "Item",
   components: {
-    AnonymizedNotice: () => import('../components/AnonymizedNotice.vue'),
-    Assets: () => import('../components/Assets.vue'),
-    BTabs,
-    BTab,
-    CollectionLink: () => import('../components/CollectionLink.vue'),
+    AnonymizedNotice: defineAsyncComponent(() => import('../components/AnonymizedNotice.vue')),
+    Assets: defineAsyncComponent(() => import('../components/Assets.vue')),
+    CollectionLink: defineAsyncComponent(() => import('../components/CollectionLink.vue')),
     Description,
-    DeprecationNotice: () => import('../components/DeprecationNotice.vue'),
-    Keywords: () => import('../components/Keywords.vue'),
-    Links: () => import('../components/Links.vue'),
-    Map: () => import('../components/Map.vue'),
-    Metadata: () => import('../components/Metadata.vue'),
-    Providers: () => import('../components/Providers.vue'),
+    DeprecationNotice: defineAsyncComponent(() => import('../components/DeprecationNotice.vue')),
+    Keywords: defineAsyncComponent(() => import('../components/Keywords.vue')),
+    Links: defineAsyncComponent(() => import('../components/Links.vue')),
+    Map: defineAsyncComponent(() => import('../components/Map.vue')),
+    Metadata: defineAsyncComponent(() => import('../components/Metadata.vue')),
+    Providers: defineAsyncComponent(() => import('../components/Providers.vue')),
     ReadMore,
-    Thumbnails: () => import('../components/Thumbnails.vue')
+    Thumbnails: defineAsyncComponent(() => import('../components/Thumbnails.vue'))
   },
   mixins: [
     ShowAssetLinkMixin,

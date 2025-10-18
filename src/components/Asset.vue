@@ -36,7 +36,6 @@
 </template>
 
 <script>
-import { BCollapse, BIconCheck, BIconChevronRight, BIconChevronDown, BTabs, BTab } from 'bootstrap-vue';
 import { formatMediaType } from '@radiantearth/stac-fields/formatters';
 import { mapState } from 'vuex';
 import AssetAlternative from './AssetAlternative.vue';
@@ -47,13 +46,7 @@ import { Asset } from 'stac-js';
 export default {
   name: 'Asset',
   components: {
-    AssetAlternative,
-    BCollapse,
-    BIconCheck,
-    BIconChevronDown,
-    BIconChevronRight,
-    BTabs,
-    BTab
+    AssetAlternative
   },
   mixins: [
     StacFieldsMixin({ formatMediaType })

@@ -29,6 +29,7 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
 import MapMixin from './maps/MapMixin.js';
 import LayerControl from './maps/LayerControl.vue';
 import TextControl from './maps/TextControl.vue';
@@ -47,7 +48,7 @@ export default {
   name: 'Map',
   components: {
     TeleportPopover,
-    Items: () => import('../components/Items.vue'),
+    Items: defineAsyncComponent(() => import('../components/Items.vue')),
     LayerControl,
     TextControl
   },

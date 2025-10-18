@@ -20,6 +20,7 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
 import { mapState, mapGetters } from 'vuex';
 import FileFormatsMixin from './FileFormatsMixin';
 import StacFieldsMixin from './StacFieldsMixin';
@@ -33,7 +34,7 @@ export default {
   name: 'Catalog',
   components: {
     StacLink,
-    Keywords: () => import('./Keywords.vue')
+    Keywords: defineAsyncComponent(() => import('./Keywords.vue'))
   },
   mixins: [
     FileFormatsMixin,
@@ -127,6 +128,7 @@ export default {
     .intro {
       display: -webkit-box;
       -webkit-line-clamp: 3;
+      line-clamp: 3;
       -webkit-box-orient: vertical;
       overflow: hidden;
       overflow-wrap: anywhere;
@@ -165,6 +167,7 @@ export default {
       }
       .intro {
         -webkit-line-clamp: 2;
+        line-clamp: 2;
       }
     }
   }
