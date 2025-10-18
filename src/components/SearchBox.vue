@@ -6,15 +6,11 @@
 </template>
 
 <script>
-import { BFormInput } from 'bootstrap-vue-next';
 
 export default {
   name: 'SearchBox',
-  components: {
-    BFormInput
-  },
   props: {
-    value: {
+    modelValue: {
       type: String,
       default: ''
     },
@@ -23,18 +19,18 @@ export default {
       default: null
     }
   },
-  emits: ['input'],
+  emits: ['update:modelValue'],
   data() {
     return {
-      searchTerm: this.value
+      searchTerm: this.modelValue
     };
   },
   watch: {
+    modelValue(newValue) {
+      this.searchTerm = newValue;
+    },
     searchTerm(newValue) {
-      if (newValue.length < this.minLength) {
-        newValue = '';
-      }
-      this.$emit('input', newValue);
+      this.$emit('update:modelValue', newValue);
     }
   }
 };
