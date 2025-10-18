@@ -5,6 +5,7 @@ const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 const Icons = require('unplugin-icons/webpack');
 const Components = require('unplugin-vue-components/webpack');
 const IconsResolver = require('unplugin-icons/resolver');
+const { BootstrapVueNextResolver } = require('bootstrap-vue-next/resolvers');
 
 const { properties } = require('./config.schema.json');
 const pkgFile = require('./package.json');
@@ -77,13 +78,16 @@ const vueConfig = {
         includeAliases: ['Buffer', 'path']
       }),
       Components({
-        resolvers: [IconsResolver({ 
-          prefix: false,
-          enabledCollections: ['bi'],
-          alias: {
-            'b-icon': 'bi'
-          }
-        })],
+        resolvers: [
+          BootstrapVueNextResolver(), // Auto-register Bootstrap components
+          IconsResolver({ 
+            prefix: false,
+            enabledCollections: ['bi'],
+            alias: {
+              'b-icon': 'bi'
+            }
+          })
+        ],
         dts: true,
       }),
       Icons({

@@ -8,14 +8,11 @@
 </template>
 
 <script>
-import { BListGroupItem } from 'bootstrap-vue-next';
 import AuthUtils from './auth/utils';
 
 export default {
   name: 'AuthSchemeItem',
-  components: {
-    BListGroupItem
-  },
+  components: {},
   props: {
     method: {
       type: Object,

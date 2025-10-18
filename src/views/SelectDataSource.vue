@@ -48,7 +48,6 @@
 </template>
 
 <script>
-import { BBadge, BButton, BForm, BFormGroup, BFormInput, BListGroup, BListGroupItem } from 'bootstrap-vue-next';
 import { mapGetters } from "vuex";
 import { defineComponent } from 'vue';
 import Description from '../components/Description.vue';
@@ -59,13 +58,6 @@ import { Translation } from 'vue-i18n';
 export default defineComponent({
   name: "SelectDataSource",
   components: {
-    BBadge,
-    BButton,
-    BForm,
-    BFormGroup,
-    BFormInput,
-    BListGroup,
-    BListGroupItem,
     Description,
     'i18n-t': Translation
   },

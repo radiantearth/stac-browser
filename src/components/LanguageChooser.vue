@@ -16,7 +16,6 @@
 </template>
 
 <script>
-import { BDropdown, BDropdownItem } from 'bootstrap-vue-next';
 
 import { STAC } from 'stac-js';
 import { getBest, prepareSupported } from 'stac-js/src/locales';
@@ -26,10 +25,6 @@ import Utils from '../utils';
 
 export default {
   name: 'LanguageChooser',
-  components:  {
-    BDropdown,
-    BDropdownItem
-  },
   props: {
     data: {
       type: Object,

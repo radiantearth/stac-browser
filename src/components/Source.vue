@@ -68,7 +68,6 @@
 <script>
 import { mapState } from 'vuex';
 import { defineAsyncComponent } from 'vue';
-import { BButton, BButtonGroup, BRow, BCol } from 'bootstrap-vue-next';
 
 import Url from './Url.vue';
 import TeleportPopover from './TeleportPopover.vue';
@@ -78,10 +77,6 @@ import SocialSharing from './SocialSharing.vue';
 export default {
   name: "Source",
   components: {
-    BButton,
-    BButtonGroup,
-    BCol,
-    BRow,
     TeleportPopover,
     Url,
     CopyButton,

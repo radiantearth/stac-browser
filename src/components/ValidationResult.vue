@@ -24,7 +24,6 @@
 </template>
 
 <script>
-import { BListGroup, BListGroupItem } from 'bootstrap-vue-next';
 import URI from 'urijs';
 import Utils from '../utils';
 
@@ -32,10 +31,6 @@ const VERSION_REGEXP = /\/(v?\d+\.\d+[^/]+)(\/|$)/;
 
 export default {
   name: "ValidationResult",
-  components: {
-    BListGroup,
-    BListGroupItem
-  },
   props: {
     id: {
       type: String,

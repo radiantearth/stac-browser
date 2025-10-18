@@ -41,7 +41,6 @@
 
 <script>
 import { defineAsyncComponent } from 'vue';
-import { BListGroup, BSpinner } from 'bootstrap-vue-next';
 
 import Description from './Description.vue';
 import TeleportPopover from './TeleportPopover.vue';
@@ -61,8 +60,6 @@ export default {
   name: 'HrefActions',
   components: {
     AuthSchemeItem: defineAsyncComponent(() => import('./AuthSchemeItem.vue')),
-    BListGroup,
-    BSpinner,
     CopyButton: defineAsyncComponent(() => import('./CopyButton.vue')),
     Description,
     Metadata: defineAsyncComponent(() => import('./Metadata.vue')),

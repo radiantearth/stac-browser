@@ -75,7 +75,6 @@
 
 <script>
 import { defineAsyncComponent } from 'vue';
-import { BBadge, BDropdown, BDropdownItemButton, BFormCheckbox, BFormInput, BFormSelect, BRow } from 'bootstrap-vue-next';
 
 import DatePickerMixin from './DatePickerMixin';
 import Utils from '../utils';
@@ -84,13 +83,6 @@ import CqlValue from '../models/cql2/value';
 export default {
   name: 'QueryableInput',
   components: {
-    BBadge, 
-    BDropdown,
-    BDropdownItemButton,
-    BFormCheckbox,
-    BFormInput,
-    BFormSelect,
-    BRow,
     Description: defineAsyncComponent(() => import('./Description.vue'))
   },
   mixins: [

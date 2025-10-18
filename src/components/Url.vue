@@ -12,14 +12,10 @@
 
 <script>
 import { defineAsyncComponent } from 'vue';
-import { BFormInput, BFormGroup, BInputGroup } from 'bootstrap-vue-next';
 
 export default {
   name: "Share",
   components: {
-    BFormGroup,
-    BFormInput,
-    BInputGroup,
     CopyButton: defineAsyncComponent(() => import('./CopyButton.vue'))
   },
   props: {

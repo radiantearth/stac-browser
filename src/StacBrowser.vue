@@ -96,10 +96,6 @@ import CONFIG from './config';
 import BIconLock from '~icons/bi/lock';
 import BIconUnlock from '~icons/bi/unlock';
 
-import {
-  BContainer, BRow, BCol, BButton, BButtonGroup
-} from 'bootstrap-vue-next';
-
 // CSS imports are handled in init.js
 
 import ErrorAlert from './components/ErrorAlert.vue';
@@ -141,11 +137,6 @@ export default defineComponent({
   name: 'StacBrowser',
   components: {
     Authentication,
-    BButton,
-    BButtonGroup,
-    BCol,
-    BContainer,
-    BRow,
     ErrorAlert,
     BIconLock,
     BIconUnlock,

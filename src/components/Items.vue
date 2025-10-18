@@ -43,7 +43,6 @@
 
 <script>
 import { mapState } from 'vuex';
-import { BCollapse } from 'bootstrap-vue-next';
 import { defineComponent, defineAsyncComponent } from 'vue';
 
 import Utils from '../utils';
@@ -55,7 +54,6 @@ import { getDisplayTitle } from '../models/stac';
 export default defineComponent({
   name: "Items",
   components: {
-    BCollapse,
     Item,
     SearchFilter: defineAsyncComponent(() => import('./SearchFilter.vue')),
     Loading,

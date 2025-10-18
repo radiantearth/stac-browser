@@ -69,7 +69,6 @@ import ReadMore from "../components/ReadMore.vue";
 import ShowAssetLinkMixin from '../components/ShowAssetLinkMixin';
 import StacFieldsMixin from '../components/StacFieldsMixin';
 import { formatLicense, formatTemporalExtents } from '@radiantearth/stac-fields/formatters';
-import { BTabs, BTab, BCard, BRow, BCol } from 'bootstrap-vue-next';
 import Utils from '../utils';
 import { addSchemaToDocument, createCatalogSchema } from '../schema-org';
 import { ItemCollection } from '../models/stac.js';
@@ -80,11 +79,6 @@ export default defineComponent({
   components: {
     AnonymizedNotice: defineAsyncComponent(() => import('../components/AnonymizedNotice.vue')),
     Assets: defineAsyncComponent(() => import('../components/Assets.vue')),
-    BCard,
-    BCol,
-    BRow,
-    BTabs,
-    BTab,
     Catalogs,
     CollectionLink: defineAsyncComponent(() => import('../components/CollectionLink.vue')),
     DeprecationNotice: defineAsyncComponent(() => import('../components/DeprecationNotice.vue')),

@@ -22,9 +22,6 @@
 <script>
 import { defineAsyncComponent } from 'vue';
 import { mapState, mapGetters } from 'vuex';
-import { 
-  BCard, BCardImg, BCardBody, BCardTitle, BCardText, BBadge 
-} from 'bootstrap-vue-next';
 import FileFormatsMixin from './FileFormatsMixin';
 import StacFieldsMixin from './StacFieldsMixin';
 import ThumbnailCardMixin from './ThumbnailCardMixin';
@@ -36,12 +33,6 @@ import Utils from '../utils';
 export default {
   name: 'Catalog',
   components: {
-    BCard,
-    BCardImg,
-    BCardBody,
-    BCardTitle,
-    BCardText,
-    BBadge,
     StacLink,
     Keywords: defineAsyncComponent(() => import('./Keywords.vue'))
   },

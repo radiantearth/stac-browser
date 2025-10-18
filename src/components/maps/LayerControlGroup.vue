@@ -17,7 +17,6 @@
 <script>
 import { defineAsyncComponent } from 'vue';
 import LayerControlMixin from './LayerControlMixin';
-import { BFormCheckbox } from 'bootstrap-vue-next';
 import LayerGroup from 'ol/layer/Group';
 import { transformExtent } from 'ol/proj';
 
@@ -25,7 +24,6 @@ export default {
   name: 'LayerControlGroup',
   components: {
     LayerControlGroup: defineAsyncComponent(() => import('./LayerControlGroup.vue')),
-    BFormCheckbox
   },
   mixins: [
     LayerControlMixin

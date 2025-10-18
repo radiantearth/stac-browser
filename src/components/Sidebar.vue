@@ -13,7 +13,6 @@
 </template>
 
 <script>
-import { BOffcanvas } from 'bootstrap-vue-next';
 import { mapGetters, mapState } from 'vuex';
 import Loading from './Loading.vue';
 import Tree from './Tree.vue';
@@ -21,7 +20,6 @@ import Tree from './Tree.vue';
 export default {
   name: 'Sidebar',
   components: {
-    BOffcanvas,
     Loading,
     Tree
   },

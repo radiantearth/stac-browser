@@ -40,7 +40,6 @@
 <script>
 import { mapGetters, mapState } from 'vuex';
 import { defineComponent, defineAsyncComponent } from 'vue';
-import { BBadge, BButton, BAlert } from 'bootstrap-vue-next';
 
 import Catalog from './Catalog.vue';
 import Loading from './Loading.vue';
@@ -55,9 +54,6 @@ export default defineComponent({
   components: {
     Catalog,
     Loading,
-    BBadge,
-    BButton,
-    BAlert,
     Multiselect,
     Pagination: defineAsyncComponent(() => import('./Pagination.vue')),
     SearchBox: defineAsyncComponent(() => import('./SearchBox.vue')),

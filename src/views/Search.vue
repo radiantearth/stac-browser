@@ -72,13 +72,10 @@ import { getDisplayTitle, createSTAC, ItemCollection } from '../models/stac';
 import { STAC } from 'stac-js';
 import { defineComponent, defineAsyncComponent } from 'vue';
 import { mapGetters, mapState } from "vuex";
-import { BTabs, BTab } from 'bootstrap-vue-next';
 
 export default defineComponent({
   name: "Search",
   components: {
-    BTab,
-    BTabs,
     Catalogs: defineAsyncComponent(() => import('../components/Catalogs.vue')),
     Loading,
     Items: defineAsyncComponent(() => import('../components/Items.vue')),

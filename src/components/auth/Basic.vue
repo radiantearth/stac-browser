@@ -23,7 +23,6 @@
 
 <script>
 import Description from '../Description.vue';
-import { BForm, BFormInput, BFormGroup } from 'bootstrap-vue-next';
 import i18n from '../../i18n';
 import Utils from '../../utils';
 import { mapGetters } from 'vuex';
@@ -31,9 +30,6 @@ import { mapGetters } from 'vuex';
 export default {
   name: 'Basic',
   components: {
-    BForm,
-    BFormInput,
-    BFormGroup,
     Description
   },
   props: {

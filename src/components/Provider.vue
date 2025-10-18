@@ -31,18 +31,12 @@
 
 <script>
 import { defineAsyncComponent } from 'vue';
-import { BCard, BCardBody, BCardHeader, BCardText, BCollapse } from 'bootstrap-vue-next';
 import Description from './Description.vue';
 import ProviderRoles from './ProviderRoles.vue';
 
 export default {
   name: 'Provider',
   components: {
-    BCard,
-    BCardBody,
-    BCardHeader,
-    BCardText,
-    BCollapse,
     Description,
     Metadata: defineAsyncComponent(() => import('./Metadata.vue')),
     ProviderRoles

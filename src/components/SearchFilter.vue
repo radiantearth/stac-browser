@@ -137,7 +137,6 @@
 
 <script>
 import { defineComponent, defineAsyncComponent } from 'vue';
-import { BBadge, BDropdown, BDropdownItem, BForm, BFormGroup, BFormInput, BFormCheckbox, BFormRadioGroup } from 'bootstrap-vue-next';
 import Multiselect from 'vue-multiselect';
 import { mapGetters, mapState } from "vuex";
 import refParser from '@apidevtools/json-schema-ref-parser';
@@ -189,14 +188,6 @@ let formId = 0;
 export default defineComponent({
   name: 'SearchFilter',
   components: {
-    BBadge,
-    BDropdown,
-    BDropdownItem,
-    BForm,
-    BFormGroup,
-    BFormInput,
-    BFormCheckbox,
-    BFormRadioGroup,
     QueryableInput: defineAsyncComponent(() => import('./QueryableInput.vue')),
     Loading,
     MapSelect: defineAsyncComponent(() => import('./maps/MapSelect.vue')),

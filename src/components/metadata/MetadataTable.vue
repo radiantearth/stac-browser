@@ -16,7 +16,6 @@
 </template>
 
 <script>
-import { BTable } from 'bootstrap-vue-next';
 import EntryMixin from './EntryMixin';
 import StacFieldsMixin from '../StacFieldsMixin';
 import Utils from '../../utils';
@@ -26,7 +25,6 @@ import { defineAsyncComponent } from 'vue';
 export default {
   name: 'MetadataTable',
   components: {
-    BTable,
     Histogram: defineAsyncComponent(() => import('./Histogram.vue'))
   },
   mixins: [

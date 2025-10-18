@@ -18,15 +18,12 @@
 
 <script>
 import { defineAsyncComponent } from 'vue';
-import { BListGroup, BListGroupItem } from 'bootstrap-vue-next';
 import ProviderRoles from './ProviderRoles.vue';
 import Utils from '../utils';
 
 export default {
   name: 'Providers',
   components: {
-    BListGroup,
-    BListGroupItem,
     Provider: defineAsyncComponent(() => import('./Provider.vue')),
     ProviderRoles
   },
