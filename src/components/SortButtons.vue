@@ -14,7 +14,6 @@ import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: "SortButtons",
-  components: {},
   props: {
     modelValue: {
       type: Number,

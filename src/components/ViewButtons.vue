@@ -13,7 +13,6 @@
 
 export default {
   name: "SortButtons",
-  components: {},
   props: {
     modelValue: {
       type: String,

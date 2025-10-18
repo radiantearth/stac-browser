@@ -46,7 +46,6 @@ import { STAC, CatalogLike } from 'stac-js';
 
 export default {
   name: 'Tree',
-  components: {},
   props: {
     item: {
       type: Object,

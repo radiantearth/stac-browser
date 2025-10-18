@@ -12,7 +12,6 @@ import AuthUtils from './auth/utils';
 
 export default {
   name: 'AuthSchemeItem',
-  components: {},
   props: {
     method: {
       type: Object,

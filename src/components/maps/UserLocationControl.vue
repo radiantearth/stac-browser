@@ -13,7 +13,6 @@ import { fromLonLat } from 'ol/proj';
 
 export default {
   name: 'UserLocationControl',
-  components: {},
   mixins: [
     ControlMixin
   ],

@@ -13,7 +13,6 @@ import validateSTAC from 'stac-node-validator';
 
 export default {
   name: "Validation",
-  components: {},
   props: {
     data: {
       type: Object,
