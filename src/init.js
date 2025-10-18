@@ -33,15 +33,11 @@ export default function init() {
 
     const app = createApp(StacBrowser);
     
-    // Add BootstrapVueNext plugin
+    // Add BootstrapVueNext plugin with minimal config
+    // Components are auto-registered via BootstrapVueNextResolver in vue.config.js
     app.use(createBootstrap({
-      plugins: {
-        BToast: {
-          // Enable toast auto-hide
-          autoHide: true,
-          delay: 5000,
-        },
-      },
+      components: false,
+      directives: true
     }));
     
     // Add router, store, and i18n

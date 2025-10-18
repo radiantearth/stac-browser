@@ -87,8 +87,7 @@ const vueConfig = {
               'b-icon': 'bi'
             }
           })
-        ],
-        dts: true,
+        ]
       }),
       Icons({
         compiler: 'vue3',
