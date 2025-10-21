@@ -1,9 +1,9 @@
 <template>
   <section class="catalogs mb-4">
     <header>
-      <h2 class="title mr-2">{{ title }}</h2>
-      <b-badge v-if="catalogCount !== null" pill variant="secondary" class="mr-4">{{ catalogCount }}</b-badge>
-      <ViewButtons class="mr-2" v-model="view" />
+      <h2 class="title me-2">{{ title }}</h2>
+      <b-badge v-if="catalogCount !== null" pill variant="secondary" class="me-4">{{ catalogCount }}</b-badge>
+      <ViewButtons class="me-2" v-model="view" />
       <SortButtons v-if="isComplete && catalogs.length > 1" v-model="sort" />
     </header>
     <section v-if="isComplete && catalogs.length > 1" class="catalog-filter mb-2">

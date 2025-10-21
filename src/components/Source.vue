@@ -21,7 +21,7 @@
               <b-col cols="4">{{ $t('source.id') }}</b-col>
               <b-col>
                 <code>{{ stacId }}</code>
-                <CopyButton :copyText="stacId" :button-props="{size: 'sm'}" variant="primary" class="ml-2" />
+                <CopyButton :copyText="stacId" :button-props="{size: 'sm'}" variant="primary" class="ms-2" />
               </b-col>
             </b-row>
             <b-row v-if="stacVersion" class="stac-version">

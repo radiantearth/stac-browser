@@ -6,8 +6,8 @@
         <StacLink :data="[data, item]" class="stretched-link" />
       </b-card-title>
       <b-card-text v-if="fileFormats.length > 0 || hasDescription || isDeprecated" class="intro">
-        <b-badge v-if="isDeprecated" variant="warning" class="mr-1 mt-1 deprecated">{{ $t('deprecated') }}</b-badge>
-        <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="mr-1 mt-1 fileformat">{{ formatMediaType(format) }}</b-badge>
+        <b-badge v-if="isDeprecated" variant="warning" class="me-1 mt-1 deprecated">{{ $t('deprecated') }}</b-badge>
+        <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="me-1 mt-1 fileformat">{{ formatMediaType(format) }}</b-badge>
         <template v-if="hasDescription">{{ summarizeDescription }}</template>
       </b-card-text>
       <Keywords v-if="showKeywordsInItemCards && keywords.length > 0" :keywords="keywords" variant="primary" center />

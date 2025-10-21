@@ -26,12 +26,12 @@
         {{ copyButtonText }}
       </CopyButton>
       <b-button v-if="hasShowButton" @click="show" variant="primary">
-        <b-icon-eye class="mr-1" />
+        <b-icon-eye class="me-1" />
         <template v-if="isThumbnail">{{ $t('assets.showThumbnail') }}</template>
         <template v-else>{{ $t('assets.showOnMap') }}</template>
       </b-button>
       <b-button v-for="action of actions" v-bind="action.btnOptions" :key="action.id" variant="primary" @click="action.onClick">
-        <component v-if="action.icon" :is="action.icon" class="mr-1" />
+        <component v-if="action.icon" :is="action.icon" class="me-1" />
         {{ action.text }}
       </b-button>
     </b-button-group>

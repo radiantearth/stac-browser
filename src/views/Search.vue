@@ -39,7 +39,7 @@
                 <b-button v-if="itemSearch" variant="outline-primary" :pressed="selectedCollections[slot.data.id]" @click="selectForItemSearch(slot.data)">
                   <IBiCheckSquare v-if="selectedCollections[slot.data.id]" />
                   <IBiSquare v-else />
-                  <span class="ml-2">{{ $t('search.selectForItemSearch') }}</span>
+                  <span class="ms-2">{{ $t('search.selectForItemSearch') }}</span>
                 </b-button>
                 <StacLink :button="{variant: 'outline-primary', disabled: !canFilterItems(slot.data)}" :data="slot.data" :title="$t('search.filterCollection')" :state="{itemFilterOpen: 1}" />
               </b-button-group>

@@ -79,7 +79,7 @@
             <template v-for="queryable in sortedQueryables">
               <b-dropdown-item v-if="queryable.supported" :key="queryable.id" @click="additionalFieldSelected(queryable)" link-class="d-flex justify-content-between align-items-center">
                 <span>{{ queryable.title }}</span>
-                <b-badge variant="dark" class="ml-2">{{ queryable.id }}</b-badge>
+                <b-badge variant="dark" class="ms-2">{{ queryable.id }}</b-badge>
               </b-dropdown-item>
             </template>
           </b-dropdown>
@@ -112,7 +112,7 @@
             <template #option="{option}">
               <span class="d-flex justify-content-between align-items-center">
                 <span>{{ option.text }}</span>
-                <b-badge v-if="option.value" variant="dark" class="ml-2">{{ option.value }}</b-badge>
+                <b-badge v-if="option.value" variant="dark" class="ms-2">{{ option.value }}</b-badge>
               </span>
             </template>
           </multiselect>
@@ -129,7 +129,7 @@
       </b-card-body>
       <b-card-footer>
         <b-button type="submit" variant="primary">{{ $t('submit') }}</b-button>
-        <b-button type="reset" variant="danger" class="ml-3">{{ $t('reset') }}</b-button>
+        <b-button type="reset" variant="danger" class="ms-3">{{ $t('reset') }}</b-button>
       </b-card-footer>
     </b-card>
   </b-form>

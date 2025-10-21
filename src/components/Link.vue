@@ -2,7 +2,7 @@
   <li class="link">
     <TeleportPopover placement="right" custom-class="link-more">
       <template #trigger>
-        <StacLink :id="popoverId" :data="link" :fallbackTitle="fallbackTitle" class="pr-1" />
+        <StacLink :id="popoverId" :data="link" :fallbackTitle="fallbackTitle" class="pe-1" />
       </template>
       
       <template #content>

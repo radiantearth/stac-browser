@@ -14,7 +14,7 @@
         </b-card-body>
         <b-card-footer>
           <b-button type="submit" variant="primary">{{ t('submit') }}</b-button>
-          <b-button type="reset" variant="danger" class="ml-3">{{ t('cancel') }}</b-button>
+          <b-button type="reset" variant="danger" class="ms-3">{{ t('cancel') }}</b-button>
         </b-card-footer>
       </b-card>
     </b-form>

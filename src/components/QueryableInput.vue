@@ -14,7 +14,7 @@
           button-class="d-flex justify-content-between align-items-center"
         >
           <span>{{ op.longLabel }}</span>
-          <b-badge variant="dark" class="ml-2">{{ op.label }}</b-badge>
+          <b-badge variant="dark" class="ms-2">{{ op.label }}</b-badge>
         </b-dropdown-item-button>
       </b-dropdown>
 

@@ -1,9 +1,9 @@
 <template>
   <b-card no-body>
     <b-card-header>
-      <component :is="titleComponent" class="name mr-1" :title="id">{{ name }}</component>
-      <b-badge v-if="version" variant="primary ml-1">{{ version }}</b-badge>
-      <b-badge v-if="!isCore" variant="dark ml-1">{{ $t('source.extension') }}</b-badge>
+      <component :is="titleComponent" class="name me-1" :title="id">{{ name }}</component>
+      <b-badge v-if="version" variant="primary ms-1">{{ version }}</b-badge>
+      <b-badge v-if="!isCore" variant="dark ms-1">{{ $t('source.extension') }}</b-badge>
     </b-card-header>
     <b-list-group flush>
       <template v-if="errors.length > 0">

@@ -7,7 +7,7 @@
           <b-icon-chevron-right v-else />
         </span>
         <span class="title">{{ title }}</span>
-        <div class="badges ml-1">
+        <div class="badges ms-1">
           <b-badge v-if="shown" variant="success" class="shown" :title="$t('assets.currentlyShown')">
             <b-icon-check /> {{ $t('assets.shown') }}
           </b-badge>

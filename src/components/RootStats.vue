@@ -9,7 +9,7 @@
           <ul>
             <li v-for="(conf, uri) in classes" :key="uri" :title="uri">
               {{ conf.title }}
-              <b-badge v-if="conf.version" pill variant="secondary" class="ml-1">{{ conf.version }}</b-badge>
+              <b-badge v-if="conf.version" pill variant="secondary" class="ms-1">{{ conf.version }}</b-badge>
             </li>
           </ul>
         </dd>
@@ -20,8 +20,8 @@
       <dl v-for="(group, key) in stats" :key="key">
         <dt>
           {{ group.label }}
-          <b-badge pill variant="primary" class="ml-1">{{ group.count }}</b-badge>
-          <b-badge v-if="group.version" pill variant="secondary" class="ml-1">{{ group.version }}</b-badge>
+          <b-badge pill variant="primary" class="ms-1">{{ group.count }}</b-badge>
+          <b-badge v-if="group.version" pill variant="secondary" class="ms-1">{{ group.version }}</b-badge>
         </dt>
         <dd class="charts">
           <StatsChart v-if="group.extensions" type="extensions" :data="group.extensions" :count="group.count" />

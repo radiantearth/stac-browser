@@ -1,13 +1,13 @@
 <template>
   <section class="items mb-4">
     <header>
-      <h2 class="title mr-2">{{ $tc('stacItem', items.length ) }}</h2>
-      <b-badge v-if="itemCount !== null" pill variant="secondary" class="mr-4">{{ itemCount }}</b-badge>
+      <h2 class="title me-2">{{ $tc('stacItem', items.length ) }}</h2>
+      <b-badge v-if="itemCount !== null" pill variant="secondary" class="me-4">{{ itemCount }}</b-badge>
       <SortButtons v-if="!api && items.length > 1" v-model="sort" />
     </header>
 
     <Pagination
-      v-if="showPagination" ref="topPagination" class="mb-3" :class="{'mr-3': allowFilter}"
+      v-if="showPagination" ref="topPagination" class="mb-3" :class="{'me-3': allowFilter}"
       :pagination="pagination" placement="top" @paginate="paginate"
     />
     <template v-if="allowFilter">
