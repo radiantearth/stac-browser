@@ -7,10 +7,8 @@ import getRoutes from "./router";
 import getStore from "./store";
 
 import { createBootstrap } from 'bootstrap-vue-next';
-// Import Bootstrap CSS
-import 'bootstrap/dist/css/bootstrap.min.css';
-// Import BootstrapVueNext CSS
-import 'bootstrap-vue-next/dist/bootstrap-vue-next.css';
+// Import your custom theme SCSS (includes Bootstrap and variables)
+import './theme/custom.scss';
 
 export default function init() {
   return loadDefaultMessages().then(() => {
