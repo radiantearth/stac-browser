@@ -1,7 +1,7 @@
 <template>
   <b-form-group :label="label" :label-for="id">
     <b-input-group size="sm">
-      <b-form-input :id="id" ref="input" :value="url" readonly />
+      <b-form-input :id="id" ref="input" :model-value="url" readonly />
       <template #append>
         <CopyButton :copyText="url" variant="primary" />
         <b-button v-if="open" :href="url" target="_blank" variant="primary" :title="$t('open')"><b-icon-arrow-up-right-square /></b-button>
@@ -14,7 +14,7 @@
 import { defineAsyncComponent } from 'vue';
 
 export default {
-  name: "Share",
+  name: "Url",
   components: {
     CopyButton: defineAsyncComponent(() => import('./CopyButton.vue'))
   },
