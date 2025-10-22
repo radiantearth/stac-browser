@@ -1,6 +1,6 @@
 <template>
   <b-card no-body class="item-card" :class="{queued: !data, deprecated: isDeprecated, description: hasDescription}" v-b-visible.400="load">
-    <b-card-img-lazy v-if="hasImage" class="thumbnail" offset="200" v-bind="thumbnail" />
+    <b-card-img v-if="hasImage" v-bind="thumbnail" lazy />
     <b-card-body>
       <b-card-title>
         <StacLink :data="[data, item]" class="stretched-link" />
@@ -120,6 +120,16 @@ export default defineComponent({
       min-height: 200px;
     }
 
+    /* Card image styling */
+    .card-img-top {
+      width: auto;
+      height: auto;
+      max-width: 100%;
+      max-height: 200px;
+      object-fit: contain;
+      object-position: center;
+    }
+
     .intro {
       display: -webkit-box;
       -webkit-line-clamp: 2;
@@ -139,13 +149,6 @@ export default defineComponent({
 
     .badge.deprecated {
       text-transform: uppercase;
-    }
-
-    .card-img {
-      width: auto;
-      height: auto;
-      max-width: 100%;
-      max-height: 200px;
     }
 
     .card-body {

@@ -32,13 +32,9 @@ export default {
             src: t.getAbsoluteUrl(),
             alt: t.title,
             crossorigin: this.crossOriginMedia,
-            right: this.isList,
-            blankColor: "rgba(0, 0, 0, 0.125)",
             width,
             height,
-            // for b-card-img-lazy
-            "blank-width": width,
-            "blank-height": height
+            placement: this.isList ? 'end' : 'top'
           };
         }
       }

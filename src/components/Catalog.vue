@@ -1,6 +1,6 @@
 <template>
-  <b-card no-body :class="classes" v-b-visible.400="load" :img-right="isList">
-    <b-card-img-lazy v-if="hasImage" class="thumbnail" offset="200" v-bind="thumbnail" />
+  <b-card no-body :class="classes" v-b-visible.400="load">
+    <b-card-img v-if="hasImage" v-bind="thumbnail" lazy />
     <b-card-body>
       <b-card-title>
         <StacLink :data="[data, catalog]" class="stretched-link" />
@@ -125,6 +125,15 @@ export default {
     .card-title {
       margin-bottom: 0.5rem;
     }
+    
+    /* Card image base styling */
+    .card-img-top,
+    .card-img-end,
+    .card-img-start {
+      object-fit: contain;
+      object-position: center;
+    }
+    
     .intro {
       display: -webkit-box;
       -webkit-line-clamp: 3;
@@ -152,13 +161,13 @@ export default {
       margin: 0.5em 0;
       display: flex;
 
-      .card-img-right {
+      .card-img-end {
         min-height: 100px;
         height: 100%;
         max-height: 8.5rem;
         max-width: 33%;
         object-fit: contain;
-        object-position: right;
+        object-position: center right;
       }
       .card-footer {
         min-width: 175px;
@@ -180,11 +189,13 @@ export default {
       &.queued {
         min-height: 10rem;
       }
-      .card-img {
+      .card-img-top {
         width: auto;
         height: auto;
         max-width: 100%;
         max-height: 300px;
+        object-fit: contain;
+        object-position: center;
       }
       .card-title {
         text-align: center;
