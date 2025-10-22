@@ -46,26 +46,30 @@ export default {
     margin: 0;
   }
   input {
-    min-height: 1.5em;
-    padding: 0.25em 0.3em;
-    padding-left: 1.9em;
+    min-height: 2.75em;
+    padding: 0.75em 0.75em;
+    padding-left: 2.75em;
     z-index: 1;
     display: inline-block;
     border: 1px solid #ccc;
-    box-sizing: content-box;
+    box-sizing: border-box;
     background-color: #fff;
-    width: calc(100% - 1.9em - 0.25em - 2px);
+    width: 100%;
   }
   .icon {
-    height: 1.5em;
+    height: 1em;
     user-select: none;
-    margin-top: -0.75em;
-    margin-left: 0.3em;
+    margin-left: 0.75em;
     width: 1em;
     z-index: 2;
     position: absolute;
     top: 50%;
     left: 0;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
   }
 }
 </style>
