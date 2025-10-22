@@ -111,6 +111,7 @@
     "unauthorized": "Permintaan tidak memiliki kredensial, misalnya token API. Silakan berikan kredensial Anda dan coba lagi."
   },
   "featureExperimental": "Fitur ini masih eksperimental dan mungkin memberikan hasil yang tidak terduga!",
+  "features": {},
   "fullscreen": {
     "exit": "Keluar dari Layar Penuh",
     "show": "Lihat Layar Penuh"
