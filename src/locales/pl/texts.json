@@ -112,6 +112,11 @@
     "unauthorized": "Żądanie nie zawiera danych uwierzytelniających, np. tokenu API. Podaj dane uwierzytelniające i spróbuj ponownie."
   },
   "featureExperimental": "Ta funkcja jest w fazie testowej i może dawać nieoczekiwane wyniki!",
+  "features": {
+    "empty": "",
+    "noProperties": "",
+    "title": ""
+  },
   "fullscreen": {
     "exit": "Wyjdź z trybu pełnoekranowego",
     "exitLabel": "✕",
@@ -167,7 +172,8 @@
     "layers": {
       "title": "Warstwy",
       "base": "Warstwy podstawowe",
-      "unnamed": "Bez nazwy #{id}"
+      "unnamed": "Bez nazwy #{id}",
+      "footprint": ""
     },
     "location": {
       "description": "Przejdź do swojej lokalizacji"
@@ -208,6 +214,7 @@
   "poweredBy": "Wspierane przez {link}",
   "protocol": {
     "azure": "Microsoft Azure",
+    "file": "",
     "ftp": "FTP",
     "gcs": "Google Cloud",
     "oss": "Alibaba Cloud",
