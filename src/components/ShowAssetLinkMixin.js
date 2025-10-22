@@ -54,7 +54,9 @@ export default {
   },
   methods: {
     showAsset(asset) {
-      if (asset.isPreview()) {
+      // todo: Replace find method with equals method when available in stac-js
+      // see https://github.com/moregeo-it/stac-js/issues/12
+      if (this.thumbnails.find(t => t.getAbsoluteUrl() === asset.getAbsoluteUrl())) {
         this.tab = 1;
       }
       else {
