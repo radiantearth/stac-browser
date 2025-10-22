@@ -1,82 +1,396 @@
 {
-  "actions": {},
+  "actions": {
+    "openIn": ""
+  },
+  "additionalActions": "",
+  "additionalResources": "",
   "anonymized": {
     "title": "Anonymised"
   },
   "assets": {
-    "alternate": {},
-    "copyUrl": {},
-    "download": {},
-    "role": {}
+    "alternate": {
+      "main": ""
+    },
+    "copyUrl": {
+      "generic": "",
+      "withSource": ""
+    },
+    "currentlyShown": "",
+    "download": {
+      "generic": "",
+      "withSource": ""
+    },
+    "inItems": "",
+    "role": {
+      "data": "",
+      "metadata": ""
+    },
+    "showOnMap": "",
+    "showThumbnail": "",
+    "shown": ""
   },
   "authentication": {
-    "button": {},
-    "schemeTypes": {}
+    "button": {
+      "login": "",
+      "logout": "",
+      "title": ""
+    },
+    "chooseMethod": "",
+    "description": "",
+    "loggedOut": "",
+    "password": "",
+    "required": "",
+    "schemeTypes": {
+      "http": "",
+      "s3": "",
+      "signedUrl": "",
+      "oauth2": "",
+      "apiKey": "",
+      "openIdConnect": ""
+    },
+    "title": "",
+    "unauthorized": "",
+    "unsupported": "",
+    "unsupportedLong": "",
+    "user": ""
   },
-  "catalog": {},
+  "browse": "",
+  "cancel": "",
+  "catalog": {
+    "license": "",
+    "temporalExtent": ""
+  },
   "catalogs": {
     "filterByTitle": "Filter catalogues by title",
     "filterByTitleAndMore": "Filter catalogues by title, description or keywords",
+    "loadMore": "",
     "noMatches": "No catalogues match the given search criteria."
   },
-  "checkbox": {},
-  "deprecation": {},
+  "checkbox": {
+    "false": "",
+    "true": ""
+  },
+  "copy": "",
+  "default": "",
+  "defaultWithValue": "",
+  "deprecated": "",
+  "deprecation": {
+    "fallbackTitle": "",
+    "latestVersion": "",
+    "otherVersionsNotice": "",
+    "otherVersionsTitle": "",
+    "outdatedTitle": "",
+    "predecessorVersion": "",
+    "successorVersion": "",
+    "warning": ""
+  },
+  "description": "",
   "errors": {
-    "labels": {},
-    "noExternalAccess": "Accessing external catalogues is not allowed!"
+    "authFailed": "",
+    "badRequest": "",
+    "contactProvider": "",
+    "default": "",
+    "forbidden": "",
+    "invalidJsonObject": "",
+    "invalidStacCollections": "",
+    "invalidStacItems": "",
+    "labels": {
+      "cause": "",
+      "code": "",
+      "reason": "",
+      "requestURL": ""
+    },
+    "loadApiCollectionsFailed": "",
+    "loadApiItemsFailed": "",
+    "loadFilteredItems": "",
+    "loadItems": "",
+    "networkError": "",
+    "noExternalAccess": "Accessing external catalogues is not allowed!",
+    "notFound": "",
+    "serverError": "",
+    "title": "",
+    "unauthorized": ""
   },
-  "fullscreen": {},
-  "goBack": {},
-  "goToCollection": {},
-  "goToParent": {},
+  "featureExperimental": "",
+  "features": {
+    "empty": "",
+    "noProperties": "",
+    "title": ""
+  },
+  "fullscreen": {
+    "exit": "",
+    "exitLabel": "",
+    "show": "",
+    "showLabel": ""
+  },
+  "goBack": {
+    "description": "",
+    "label": ""
+  },
+  "goToCollection": {
+    "description": "",
+    "descriptionWithTitle": "",
+    "label": ""
+  },
+  "goToParent": {
+    "description": "",
+    "descriptionWithTitle": "",
+    "label": ""
+  },
+  "in": "",
   "index": {
-    "specifyCatalog": "Please specify a STAC Catalogue or API..."
+    "api": "",
+    "catalog": "",
+    "load": "",
+    "selectStacIndex": "",
+    "specifyCatalog": "Please specify a STAC Catalogue or API...",
+    "urlInvalid": "",
+    "urlMissingHost": "",
+    "urlMissingProtocol": ""
   },
-  "items": {},
+  "items": {
+    "filter": "",
+    "hideFilter": "",
+    "noTime": "",
+    "noneAvailableForCollection": "",
+    "showFilter": ""
+  },
+  "loading": "",
+  "map": "",
   "mapping": {
-    "attribution": {},
-    "bboxSelect": {},
-    "layers": {},
-    "location": {},
+    "attribution": {
+      "label": "",
+      "description": "",
+      "collapseLabel": ""
+    },
+    "bboxSelect": {
+      "add": "",
+      "remove": ""
+    },
+    "close": "",
+    "fit": "",
+    "layers": {
+      "title": "",
+      "base": "",
+      "unnamed": "",
+      "footprint": ""
+    },
+    "location": {
+      "description": ""
+    },
+    "nobasemap": "",
+    "nodata": "",
     "zoom": {
-      "in": {},
-      "out": {}
+      "in": {
+        "description": "",
+        "label": ""
+      },
+      "out": {
+        "description": "",
+        "label": ""
+      }
     }
   },
-  "metadata": {},
-  "multiselect": {},
-  "pagination": {},
+  "messageForSchemaError": "",
+  "metadata": {
+    "general": "",
+    "title": ""
+  },
+  "multiselect": {
+    "andMore": "",
+    "deselectLabel": "",
+    "keywordsPlaceholder": "",
+    "placeholder": "",
+    "selectLabel": "",
+    "selectedLabel": ""
+  },
+  "open": "",
+  "pagination": {
+    "first": "",
+    "last": "",
+    "next": "",
+    "previous": ""
+  },
+  "poweredBy": "",
   "protocol": {
-    "s3": {}
+    "azure": "",
+    "file": "",
+    "ftp": "",
+    "gcs": "",
+    "oss": "",
+    "s3": {
+      "amazonaws.com": "",
+      "default": ""
+    }
   },
   "providers": {
-    "role": {}
+    "email": "",
+    "homepage": "",
+    "role": {
+      "host": "",
+      "licensor": "",
+      "processor": "",
+      "producer": ""
+    },
+    "title": ""
   },
-  "read": {},
+  "read": {
+    "less": "",
+    "more": ""
+  },
+  "reset": "",
   "search": {
-    "logical": {},
-    "tabs": {}
+    "addCollections": "",
+    "addFilter": "",
+    "addItemIds": "",
+    "addSearchTerm": "",
+    "additionalFilters": "",
+    "dateDescription": "",
+    "enterCollections": "",
+    "enterItemIds": "",
+    "enterSearchTerms": "",
+    "equalTo": "",
+    "filterBySpatialExtent": "",
+    "filterCollection": "",
+    "freeText": "",
+    "freeTextDescription": "",
+    "greaterThan": "",
+    "greaterThanEqual": "",
+    "itemIds": "",
+    "itemsPerPage": "",
+    "itemsPerPageDescription": "",
+    "lessThan": "",
+    "lessThanEqual": "",
+    "likeOperatorDescription": "",
+    "logical": {
+      "and": "",
+      "or": ""
+    },
+    "matches": "",
+    "metaDescription": "",
+    "modifyCriteria": "",
+    "noFurtherItemsFound": "",
+    "noItemsFound": "",
+    "noOptions": "",
+    "notEqualTo": "",
+    "notFullySupported": "",
+    "notSupported": "",
+    "placeholder": "",
+    "selectCollections": "",
+    "selectForItemSearch": "",
+    "spatialExtent": "",
+    "tabs": {
+      "collections": "",
+      "items": ""
+    },
+    "temporalExtent": "",
+    "title": "",
+    "useInItemSearch": ""
   },
+  "showMore": "",
   "sidebar": {
     "switchCatalog": "Switch Catalogue"
   },
   "sort": {
-    "asc": {},
-    "desc": {}
+    "asc": {
+      "label": "",
+      "title": ""
+    },
+    "desc": {
+      "label": "",
+      "title": ""
+    },
+    "title": ""
   },
   "source": {
-    "language": {},
-    "share": {},
-    "validationParams": {},
-    "validationReport": {}
+    "conformanceClasses": "",
+    "detailsAboutSource": "",
+    "extension": "",
+    "fileFormat": "",
+    "id": "",
+    "invalid": "",
+    "label": "",
+    "language": {
+      "label": "",
+      "onlyData": "",
+      "onlyUI": "",
+      "switch": ""
+    },
+    "locatedAt": "",
+    "share": {
+      "bsky": "",
+      "email": "",
+      "label": "",
+      "mastodon": "",
+      "message": "",
+      "sharePageWithOthers": "",
+      "title": "",
+      "x": "",
+      "withOthers": ""
+    },
+    "stacExtension": "",
+    "stacVersion": "",
+    "statistics": "",
+    "title": "",
+    "valid": "",
+    "validating": "",
+    "validationNA": "",
+    "validationParams": {
+      "additionalProperty": "",
+      "allowedValue": "",
+      "allowedValues": "",
+      "comparison": "",
+      "depsCount": "",
+      "exclusive": "",
+      "failingKeyword": "",
+      "format": "",
+      "i": "",
+      "j": "",
+      "limit": "",
+      "maxContains": "",
+      "minContains": "",
+      "missingProperty": "",
+      "multipleOf": "",
+      "passingSchemas": "",
+      "pattern": "",
+      "property": "",
+      "propertyName": "",
+      "type": ""
+    },
+    "validationReport": {
+      "disclaimer": "",
+      "result": "",
+      "title": ""
+    }
   },
+  "stacAssets": "",
   "stacCatalog": "Catalogue | Catalogues",
+  "stacCollection": "",
+  "stacItem": "",
+  "submit": "",
   "table": {
-    "sort": {}
+    "emptyFilteredText": "",
+    "emptyText": "",
+    "sort": {
+      "asc": "",
+      "clear": "",
+      "desc": ""
+    }
   },
-  "tree": {},
+  "thumbnails": "",
+  "tree": {
+    "moreCollectionPagesAvailable": "",
+    "noChildren": ""
+  },
   "view": {
-    "list": {},
-    "tiles": {}
+    "list": {
+      "label": "",
+      "title": ""
+    },
+    "tiles": {
+      "label": "",
+      "title": ""
+    },
+    "title": ""
   }
 }
