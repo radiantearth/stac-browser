@@ -112,7 +112,11 @@
     "unauthorized": "Der Anfrage fehlen die Anmeldedaten, bspw. ein API-Schlüssel. Bitte geben Sie Ihre Anmeldedaten an und versuchen Sie es erneut."
   },
   "featureExperimental": "Diese Funktion ist noch experimentell und kann unerwartete Ergebnisse verursachen!",
-  "features": {},
+  "features": {
+    "empty": "Keine Features verfügbar.",
+    "noProperties": "Keine Eigenschaften vorhanden.",
+    "title": "Feature | Features"
+  },
   "fullscreen": {
     "exit": "Verlasse den Vollbild-Modus",
     "exitLabel": "✕",
