@@ -165,7 +165,7 @@ export default {
       return this.getApiItemsLoading(this.data);
     },
     licenses() {
-      if (this.isCollection && this.data.license) {
+      if (this.data.license) {
         return this.formatLicense(this.data.license, null, null, this.data);
       }
       return null;
