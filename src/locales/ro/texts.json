@@ -111,6 +111,7 @@
     "unauthorized": "Solicitarea necesită informații de autentificare, cum ar fi un token API. Vă rugăm să furnizați acreditările și să încercați din nou"
   },
   "featureExperimental": "Această funcție este încă experimentală și poate da rezultate neașteptate!",
+  "features": {},
   "fullscreen": {
     "exit": "Ieși din modul ecran complet",
     "exitLabel": "✕",

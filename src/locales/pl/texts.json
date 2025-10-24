@@ -112,6 +112,7 @@
     "unauthorized": "Żądanie nie zawiera danych uwierzytelniających, np. tokenu API. Podaj dane uwierzytelniające i spróbuj ponownie."
   },
   "featureExperimental": "Ta funkcja jest w fazie testowej i może dawać nieoczekiwane wyniki!",
+  "features": {},
   "fullscreen": {
     "exit": "Wyjdź z trybu pełnoekranowego",
     "exitLabel": "✕",

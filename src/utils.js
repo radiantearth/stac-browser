@@ -1,6 +1,7 @@
 import URI from 'urijs';
 import removeMd from 'remove-markdown';
 import { stacPagination } from "./rels";
+import Link from 'stac-js/src/link.js';
 
 export const commonFileNames = ['catalog', 'collection', 'item'];
 
@@ -420,7 +421,7 @@ export default class Utils {
   }
 
   static createLink(href, rel, title) {
-    return { href, rel, title };
+    return new Link({ href, rel, title });
   }
 
   /**
