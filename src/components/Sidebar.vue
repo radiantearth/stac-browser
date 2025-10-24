@@ -47,6 +47,10 @@ export default {
           document.body.classList.remove("sidebar");
         }
       }
+    },
+    $route() {
+      // Close sidebar when route changes
+      this.visible = false;
     }
   },
   mounted() {
@@ -65,7 +69,7 @@ export default {
   max-width: 600px;
   padding-top: $header-margin;
 
-  .b-sidebar-body {
+  .offcanvas-body {
     padding: 0.5rem 1rem;
 
     .tree.root {
@@ -73,12 +77,12 @@ export default {
       padding: 0;
     }
   }
-  .b-sidebar-footer {
+  .offcanvas-footer {
     border-top: 1px solid rgba(0,0,0,.125);
+  }
 
-    .switch-catalog {
-      width: 100%;
-    }
+  .switch-catalog {
+    width: 100%;
   }
 }
 
