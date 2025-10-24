@@ -2,14 +2,14 @@
   <b-container id="stac-browser">
     <Authentication v-if="showLogin" />
     <ErrorAlert v-if="globalError" dismissible class="global-error" v-bind="globalError" @close="hideError" />
-    <Sidebar v-if="sidebar" />
+    <Sidebar v-if="sidebar !== null" v-model="sidebar" />
     <!-- Header -->
     <header>
       <b-row class="site">
         <b-col md="12">
           <nav class="actions navigation">
             <b-button-group v-if="canSearch || isServerSelector">
-              <b-button v-if="isServerSelector" variant="primary" size="sm" :title="$t('browse')" v-b-toggle.sidebar @click="sidebar = true">
+              <b-button v-if="isServerSelector" variant="primary" size="sm" :title="$t('browse')" @click="sidebar = !sidebar">
                 <b-icon-list /><span class="button-label">{{ $t('browse') }}</span>
               </b-button>
               <b-button v-if="canSearch" variant="primary" size="sm" :to="searchBrowserLink" :title="$t('search.title')" :pressed="isSearchPage">
@@ -144,7 +144,7 @@ export default defineComponent({
   },
   data() {
     return {
-      sidebar: false,
+      sidebar: null,
       error: null,
       onDataLoaded: null
     };

@@ -1,5 +1,8 @@
 <template>
-  <b-offcanvas id="sidebar" v-model="visible" :title="$t('browse')" backdrop lazy teleport-to="#stac-browser">
+  <b-offcanvas
+    initial-animation id="sidebar" :model-value="modelValue" @update:model-value="emit"
+    :title="$t('browse')" teleport-to="#stac-browser" footer-class="offcanvas-footer">
+    <!-- todo: footer-class to be removed when https://github.com/bootstrap-vue-next/bootstrap-vue-next/pull/2889 is merged -->
     <template #default>
       <Loading v-if="!parents" />
       <Tree v-else-if="root" :item="root" :path="parents" />
@@ -23,17 +26,19 @@ export default {
     Loading,
     Tree
   },
-  data() {
-    return {
-      visible: false
-    };
+  props: {
+    modelValue: {
+      type: Boolean,
+      required: true
+    }
   },
+  emits: ['update:modelValue'],
   computed: {
     ...mapState(['allowSelectCatalog', 'parents']),
     ...mapGetters(['root'])
   },
   watch: {
-    visible: {
+    modelValue: {
       immediate: true,
       async handler(visible) {
         if (visible) {
@@ -48,13 +53,11 @@ export default {
         }
       }
     },
-    $route() {
-      // Close sidebar when route changes
-      this.visible = false;
-    }
   },
-  mounted() {
-    this.visible = true;
+  methods: {
+    emit(value) {
+      this.$emit('update:modelValue', value);
+    }
   }
 };
 </script>
@@ -68,32 +71,40 @@ export default {
   min-width: 400px;
   max-width: 600px;
   padding-top: $header-margin;
+  background-color: $light;
+
+  @include media-breakpoint-down(sm) {
+    width: 100%;
+    min-width: 100px;
+    max-width: 100%;
+  }
+
+  .offcanvas-header {
+    padding: 0.5rem 1rem;
+
+    .offcanvas-title {
+      font-size: 1.5rem;
+    }
+  }
 
   .offcanvas-body {
     padding: 0.5rem 1rem;
 
-    .tree.root {
-      margin: 0;
-      padding: 0;
+    .tree {
+      &.root {
+        margin: 0;
+        padding: 0;
+      }
     }
   }
+
   .offcanvas-footer {
     border-top: 1px solid rgba(0,0,0,.125);
-  }
 
-  .switch-catalog {
-    width: 100%;
+    .switch-catalog {
+      width: 100%;
+    }
   }
 }
 
-@include media-breakpoint-down(sm) {
-  body.sidebar {
-    overflow: hidden;
-  }
-
-  #stac-browser #sidebar {
-    width: 100%;
-    max-width: 100%;
-  }
-}
 </style>

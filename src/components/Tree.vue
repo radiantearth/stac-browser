@@ -12,9 +12,9 @@
       </template>
       <b-button v-else size="sm" variant="light" :to="to">
         <b-icon-file-earmark-richtext />
-      </b-button>
+      </b-button><!--
       
-      <b-button size="sm" variant="light" :class="{path: onPath || active}" :disabled="!to && !active" :to="to" @click="onClick">
+      --><b-button size="sm" variant="light" :class="{path: onPath || active}" :disabled="!to && !active" :to="to" @click="onClick">
         {{ title }}
       </b-button>
 
