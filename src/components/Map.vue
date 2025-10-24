@@ -6,26 +6,18 @@
       <TextControl v-if="empty" :map="map" :text="$t('mapping.nodata')" />
       <TextControl v-else-if="!hasBasemap" :map="map" :text="$t('mapping.nobasemap')" />
     </div>
-    <TeleportPopover
-      v-if="popover && selection"
-      trigger-mode="manual"
-      :show="!!selection"
-      placement="bottom"
-      custom-class="map-popover"
+    <div v-if="popover && selection" ref="target" class="popover-target" />
+    <b-popover v-if="popover && selection" show placement="bottom" triggers="manual" teleport-to="#stac-browser"
+      :target="selection.target" class="map-popover"
     >
-      <template #trigger>
-        <div class="popover-trigger-point" :style="triggerStyle" />
-      </template>
-      <template #content>
-        <section class="popover-items">
-          <Items v-if="selection.type === 'items'" :stac="stac" :items="selection.items" />
-          <Features v-else :features="selection.items" />
-        </section>
-        <div class="text-center">
-          <b-button target="_blank" variant="danger" @click="resetselection">{{ $t('mapping.close') }}</b-button>
-        </div>
-      </template>
-    </TeleportPopover>
+      <section class="popover-items">
+        <Items v-if="selection && selection.type === 'items'" :stac="stac" :items="selection.items" />
+        <Features v-else-if="selection" :features="selection.items" />
+      </section>
+      <div class="text-center">
+        <b-button variant="danger" @click="resetSelection">{{ $t('mapping.close') }}</b-button>
+      </div>
+    </b-popover>
   </div>
 </template>
 
@@ -34,7 +26,6 @@ import { defineAsyncComponent } from 'vue';
 import MapMixin from './maps/MapMixin.js';
 import LayerControl from './maps/LayerControl.vue';
 import TextControl from './maps/TextControl.vue';
-import TeleportPopover from './TeleportPopover.vue';
 import { mapGetters } from 'vuex';
 import Select from 'ol/interaction/Select';
 import StacLayer from 'ol-stac';
@@ -49,9 +40,8 @@ let mapId = 0;
 export default {
   name: 'Map',
   components: {
-    Features: () => import('../components/Features.vue'),
-    Items: () => import('../components/Items.vue'),
-    TeleportPopover,
+    Features: defineAsyncComponent(() => import('../components/Features.vue')),
+    Items: defineAsyncComponent(() => import('../components/Items.vue')),
     LayerControl,
     TextControl
   },
@@ -101,16 +91,6 @@ export default {
         return '#stac-browser';
       }
     },
-    triggerStyle() {
-      return {
-        position: 'absolute',
-        left: `${this.clickPosition.x}px`,
-        top: `${this.clickPosition.y}px`,
-        width: '1px',
-        height: '1px',
-        pointerEvents: 'none'
-      };
-    }
   },
   watch: {
     async stac() {
@@ -195,7 +175,7 @@ export default {
           }
         });
         this.selector.on('select', (event) => {
-          // For feature selction
+          // For feature selection
           this.selection = null;
           this.setTargetPosition(event.mapBrowserEvent);
           const features = this.selector.getFeatures();
@@ -210,12 +190,6 @@ export default {
         });
         this.map.addInteraction(this.selector);
         this.map.on('singleclick', async (event) => {
-          // Store click position for popover positioning
-          this.clickPosition = {
-            x: event.pixel[0],
-            y: event.pixel[1]
-          };
-
           // For item selection
           this.selection = null;
           if (this.items) {
@@ -276,12 +250,13 @@ export default {
     max-width: 400px;
   }
 
-  .popover-trigger-point {
+  .popover-trigger {
     width: 1px;
     height: 1px;
     opacity: 0;
     position: absolute;
-    pointer-events: none;
+    top: -1px;
+    left: -1px;
   }
   
   .popover-items {

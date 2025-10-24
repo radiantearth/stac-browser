@@ -116,7 +116,7 @@
               </span>
             </template>
           </multiselect>
-          <SortButtons v-if="sortTerm && sortTerm.value" class="mt-1" :value="sortOrder" enforce @input="sortDirectionSet" />
+          <SortButtons v-if="sortTerm && sortTerm.value" class="mt-1" v-model="sortOrder" :enforce="true" />
         </b-form-group>
 
         <b-form-group class="limit" :label="$t('search.itemsPerPage')" :label-for="ids.limit" :description="$t('search.itemsPerPageDescription', {maxItems})">
@@ -526,9 +526,6 @@ export default defineComponent({
         this.queryables = Object.entries(schemas.properties)
           .map(([key, schema]) => new Queryable(key, schema));
       }
-    },
-    sortDirectionSet(value) {
-      this.sortOrder = value;
     },
     buildFilter() {
       if (this.filters.length === 0) {

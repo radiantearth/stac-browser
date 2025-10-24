@@ -23,24 +23,12 @@
               <StacLink v-if="root" :data="root" hideIcon />
               <template v-else>{{ catalogTitle }}</template>
             </span>
-            <TeleportPopover
-              v-if="root"
-              :title="serviceType"
-              placement="bottom"
-              custom-class="popover-large"
+            <b-button
+              v-if="root" size="sm" variant="outline-primary" id="popover-root-btn"
+              :title="serviceType" tag="a" tabindex="0"
             >
-              <template #trigger>
-                <b-button
-                  size="sm" variant="outline-primary"
-                  :title="serviceType" tag="a" tabindex="0"
-                >
-                  <b-icon-caret-down-fill />
-                </b-button>
-              </template>
-              <template #content>
-                <RootStats />
-              </template>
-            </TeleportPopover>
+              <b-icon-caret-down-fill />
+            </b-button>
           </div>
           <nav class="actions user">
             <b-button-group>
@@ -83,6 +71,12 @@
     <footer>
       <small class="poweredby text-muted" v-html="poweredByText" />
     </footer>
+    <b-popover
+      v-if="root" id="popover-root" class="popover-large" target="popover-root-btn"
+      triggers="hover focus" placement="bottom" :title="serviceType" teleport-to="#stac-browser"
+    >
+      <RootStats />
+    </b-popover>
   </b-container>
 </template>
 
@@ -100,7 +94,6 @@ import BIconUnlock from '~icons/bi/unlock';
 
 import ErrorAlert from './components/ErrorAlert.vue';
 import StacLink from './components/StacLink.vue';
-import TeleportPopover from './components/TeleportPopover.vue';
 
 import { CatalogLike, STAC } from 'stac-js';
 import Utils from './utils';
@@ -144,8 +137,7 @@ export default defineComponent({
     RootStats: defineAsyncComponent(() => import('./components/RootStats.vue')),
     Sidebar: defineAsyncComponent(() => import('./components/Sidebar.vue')),
     StacLink,
-    Source: defineAsyncComponent(() => import('./components/Source.vue')),
-    TeleportPopover
+    Source: defineAsyncComponent(() => import('./components/Source.vue'))
   },
   props: {
     ...Props

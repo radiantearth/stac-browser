@@ -1,5 +1,5 @@
 <template>
-  <b-offcanvas id="sidebar" v-model="visible" :title="$t('browse')" backdrop lazy>
+  <b-offcanvas id="sidebar" v-model="visible" :title="$t('browse')" backdrop lazy teleport-to="#stac-browser">
     <template #default>
       <Loading v-if="!parents" />
       <Tree v-else-if="root" :item="root" :path="parents" />

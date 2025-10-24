@@ -1,27 +1,26 @@
 <template>
   <div class="ol-layercontrol ol-unselectable ol-control" style="pointer-events: auto;">
-    <TeleportPopover v-if="id" placement="top" @show="update">
-      <template #trigger>
-        <button :id="id"><b-icon-layers-fill /></button>
-      </template>
-      <template #content>
-        <div class="layercontrol">
-          <section>
-            <h5>{{ $t('mapping.layers.base') }}</h5>
-            <span v-if="baseLayers.length === 0">{{ $t('mapping.nobasemap') }}</span>
-            <b-form-radio-group v-else v-model="visibleBaseLayer">
-              <b-form-radio v-for="layer in baseLayers" :key="layer.id" :value="layer.id">
-                {{ layer.title }}
-              </b-form-radio>
-            </b-form-radio-group>
-          </section>
-          <section v-if="hasLayers">
-            <h5>{{ $t('mapping.layers.title') }}</h5>
-            <LayerControlGroup :map="map" :group="layerGroup" />
-          </section>
-        </div>
-      </template>
-    </TeleportPopover>
+    <button v-if="id" :id="id"><b-icon-layers-fill /></button>
+    <b-popover
+      v-if="id" placement="top" triggers="click" @show="update"
+      :target="id" teleport-to="#stac-browser"
+    >
+      <div class="layercontrol">
+        <section>
+          <h5>{{ $t('mapping.layers.base') }}</h5>
+          <span v-if="baseLayers.length === 0">{{ $t('mapping.nobasemap') }}</span>
+          <b-form-radio-group v-else v-model="visibleBaseLayer">
+            <b-form-radio v-for="layer in baseLayers" :key="layer.id" :value="layer.id">
+              {{ layer.title }}
+            </b-form-radio>
+          </b-form-radio-group>
+        </section>
+        <section v-if="hasLayers">
+          <h5>{{ $t('mapping.layers.title') }}</h5>
+          <LayerControlGroup :map="map" :group="layerGroup" />
+        </section>
+      </div>
+    </b-popover>
   </div>
 </template>
 
@@ -30,14 +29,12 @@ import { defineAsyncComponent } from 'vue';
 import ControlMixin from './ControlMixin';
 import LayerControlMixin from './LayerControlMixin';
 import Group from 'ol/layer/Group';
-import TeleportPopover from '../TeleportPopover.vue';
 import MapUtils from './mapUtils';
 
 export default {
   name: 'LayerControl',
   components: {
-    LayerControlGroup: defineAsyncComponent(() => import('./LayerControlGroup.vue')),
-    TeleportPopover
+    LayerControlGroup: defineAsyncComponent(() => import('./LayerControlGroup.vue'))
   },
   mixins: [
     ControlMixin,
