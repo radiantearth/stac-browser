@@ -1,24 +1,12 @@
 <template>
   <div>
     <b-button-group class="actions" :vertical="vertical" :size="size" v-if="href">
-      <TeleportPopover v-if="requiresAuth && auth.length > 1" placement="bottom" :title="$t('authentication.chooseMethod')">
-        <template #trigger>
-          <b-button variant="danger" tag="a" tabindex="0">
-            <b-icon-lock /> {{ $t('authentication.required') }}
-          </b-button>
-        </template>
-        <template #content>
-          <b-list-group>
-            <AuthSchemeItem v-for="(method, i) in auth" :key="i" :method="method" @authenticate="startAuth" />
-          </b-list-group>
-        </template>
-      </TeleportPopover>
-      <b-button v-else-if="requiresAuth" variant="danger" tag="a" tabindex="0" @click="handleAuthButton">
+      <b-button variant="danger" v-if="requiresAuth" tag="a"  tabindex="0" :id="`popover-href-${id}-btn`" @click="handleAuthButton">
         <b-icon-lock /> {{ $t('authentication.required') }}
       </b-button>
       <b-button v-if="hasDownloadButton" :disabled="requiresAuth" v-bind="downloadProps" v-on="downloadEvents" variant="primary">
         <b-spinner v-if="loading" small variant="light" />
-        <b-icon-box-arrow-up-right v-else-if="browserCanOpenFile" /> 
+        <b-icon-box-arrow-up-right v-else-if="browserCanOpenFile" />
         <b-icon-download v-else />
         {{ buttonText }}
       </b-button>
@@ -26,23 +14,33 @@
         {{ copyButtonText }}
       </CopyButton>
       <b-button v-if="hasShowButton" @click="show" variant="primary">
-        <b-icon-eye class="mr-1" />
+        <b-icon-eye class="me-1" />
         <template v-if="isThumbnail">{{ $t('assets.showThumbnail') }}</template>
         <template v-else>{{ $t('assets.showOnMap') }}</template>
       </b-button>
       <b-button v-for="action of actions" v-bind="action.btnOptions" :key="action.id" variant="primary" @click="action.onClick">
-        <component v-if="action.icon" :is="action.icon" class="mr-1" />
+        <component v-if="action.icon" :is="action.icon" class="me-1" />
         {{ action.text }}
       </b-button>
     </b-button-group>
+
+    <b-popover
+        v-if="auth.length > 1"
+        :id="`popover-href-${id}`" class="href-auth-methods" :target="`popover-href-${id}-btn`"
+        triggers="focus" :title="$t('authentication.chooseMethod')" teleport-to="#stac-browser"
+      >
+        <b-list-group>
+          <AuthSchemeItem v-for="(method, i) in auth" :key="i" :method="method" @authenticate="startAuth" />
+        </b-list-group>
+      </b-popover>
   </div>
 </template>
 
 
 <script>
-import { BIconBoxArrowUpRight, BIconDownload, BIconEye, BIconLock, BListGroup, BSpinner } from 'bootstrap-vue';
+import { defineAsyncComponent } from 'vue';
+
 import Description from './Description.vue';
-import TeleportPopover from './TeleportPopover.vue';
 import Utils, { imageMediaTypes, mapMediaTypes } from '../utils';
 import { mapGetters, mapState } from 'vuex';
 import AssetActions from '../../assetActions.config';
@@ -58,17 +56,10 @@ let i = 0;
 export default {
   name: 'HrefActions',
   components: {
-    AuthSchemeItem: () => import('./AuthSchemeItem.vue'),
-    BIconBoxArrowUpRight,
-    BIconDownload,
-    BIconEye,
-    BIconLock,
-    BListGroup,
-    BSpinner,
-    CopyButton: () => import('./CopyButton.vue'),
+    AuthSchemeItem: defineAsyncComponent(() => import('./AuthSchemeItem.vue')),
+    CopyButton: defineAsyncComponent(() => import('./CopyButton.vue')),
     Description,
-    Metadata: () => import('./Metadata.vue'),
-    TeleportPopover
+    Metadata: defineAsyncComponent(() => import('./Metadata.vue'))
   },
   props: {
     data: {

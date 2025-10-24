@@ -1,6 +1,6 @@
 // Default Theme for STAC Browser
 
-// Most of the variables below are Bootstrap variables, see https://getbootstrap.com/docs/4.0/getting-started/theming/ for details.
+// Most of the variables below are Bootstrap variables, see https://getbootstrap.com/docs/5.0/customize/color/ for details.
 // For simplicity we just provide some common options as default, but you can override all Bootstrap Sass variables.
 
 $logo-image-height: 2rem;
@@ -9,17 +9,27 @@ $logo-image-height: 2rem;
 $body-bg: white;
 $body-color: black;
 
-// Colors
+$primary:       #188191;
+$secondary:     #6c757d;
+$success:       #28a745;
+$info:          #09B3AD;
+$warning:       #ffc107;
+$danger:        #dc3545;
+$light:         #f8f9fa;
+$dark:          #343a40;
+
 $theme-colors: (
-  "primary":       #188191,
-  "secondary":     #6c757d,
-  "success":       #28a745,
-  "info":          #09B3AD,
-  "warning":       #ffc107,
-  "danger":        #dc3545,
-  "light":         #f8f9fa,
-  "dark":          #343a40
+  "primary":    $primary,
+  "secondary":  $secondary,
+  "success":    $success,
+  "info":       $info,
+  "warning":    $warning,
+  "danger":     $danger,
+  "light":      $light,
+  "dark":       $dark
 );
+
+$min-contrast-ratio:   3;
 
 // Breakpoints for responsive design
 $grid-breakpoints: (
@@ -35,7 +45,7 @@ $grid-breakpoints: (
 // Font size
 $font-size-base: 1rem;
 // Fonts for normal text
-$font-family-sans-serif: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+$font-family-sans-serif: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 // Fonts for headings
 $headings-font-family: $font-family-sans-serif;
 // Fonts for code
@@ -48,10 +58,10 @@ $h3-font-size: 1.4rem;
 $h4-font-size: 1.2rem;
 
 // Heading color
-$headings-color: null;
+$headings-color: inherit;
 
 // Links
-$link-color: map-get($theme-colors, "primary");
+$link-color: $primary;
 $link-decoration: none;
 $link-hover-color: darken($link-color, 15%);
 $link-hover-decoration: underline;
@@ -63,7 +73,7 @@ $block-margin: 1rem;
 $header-margin: 0px;
 
 // Border radius
-$border-radius: 0.25rem;
+$border-radius: .375rem;
 
 // Max. icon size
 $max-icon-size: 32px;

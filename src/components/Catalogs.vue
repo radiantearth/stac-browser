@@ -1,9 +1,9 @@
 <template>
   <section class="catalogs mb-4">
     <header>
-      <h2 class="title mr-2">{{ title }}</h2>
-      <b-badge v-if="catalogCount !== null" pill variant="secondary" class="mr-4">{{ catalogCount }}</b-badge>
-      <ViewButtons class="mr-2" v-model="view" />
+      <h2 class="title me-2">{{ title }}</h2>
+      <b-badge v-if="catalogCount !== null" pill variant="secondary" class="me-4">{{ catalogCount }}</b-badge>
+      <ViewButtons class="me-2" v-model="view" />
       <SortButtons v-if="isComplete && catalogs.length > 1" v-model="sort" />
     </header>
     <section v-if="isComplete && catalogs.length > 1" class="catalog-filter mb-2">
@@ -39,10 +39,11 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex';
+import { defineComponent, defineAsyncComponent } from 'vue';
+
 import Catalog from './Catalog.vue';
 import Loading from './Loading.vue';
 import { getDisplayTitle } from '../models/stac';
-import { defineComponent } from 'vue';
 import { STAC } from 'stac-js';
 import ViewMixin from './ViewMixin';
 import Utils from '../utils';
@@ -54,9 +55,9 @@ export default defineComponent({
     Catalog,
     Loading,
     Multiselect,
-    Pagination: () => import('./Pagination.vue'),
-    SearchBox: () => import('./SearchBox.vue'),
-    SortButtons: () => import('./SortButtons.vue')
+    Pagination: defineAsyncComponent(() => import('./Pagination.vue')),
+    SearchBox: defineAsyncComponent(() => import('./SearchBox.vue')),
+    SortButtons: defineAsyncComponent(() => import('./SortButtons.vue'))
   },
   mixins: [
     ViewMixin

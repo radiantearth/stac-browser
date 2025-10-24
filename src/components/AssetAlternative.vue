@@ -10,6 +10,7 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
 import { formatMediaType } from '@radiantearth/stac-fields/formatters';
 import { mapState } from 'vuex';
 import Description from './Description.vue';
@@ -24,7 +25,7 @@ export default {
   components: {
     Description,
     HrefActions,
-    Metadata: () => import('./Metadata.vue')
+    Metadata: defineAsyncComponent(() => import('./Metadata.vue'))
   },
   mixins: [
     StacFieldsMixin({ formatMediaType })

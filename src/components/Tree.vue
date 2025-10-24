@@ -12,9 +12,9 @@
       </template>
       <b-button v-else size="sm" variant="light" :to="to">
         <b-icon-file-earmark-richtext />
-      </b-button>
+      </b-button><!--
       
-      <b-button size="sm" variant="light" :class="{path: onPath || active}" :disabled="!to && !active" :to="to" @click="onClick">
+      --><b-button size="sm" variant="light" :class="{path: onPath || active}" :disabled="!to && !active" :to="to" @click="onClick">
         {{ title }}
       </b-button>
 
@@ -39,7 +39,6 @@
 </template>
 
 <script>
-import { BIconFileEarmarkRichtext, BIconFolderMinus, BIconFolderPlus, BIconThreeDots } from "bootstrap-vue";
 import { mapGetters, mapState } from 'vuex';
 import Utils from '../utils';
 import { getDisplayTitle } from '../models/stac';
@@ -47,12 +46,6 @@ import { STAC, CatalogLike } from 'stac-js';
 
 export default {
   name: 'Tree',
-  components: {
-    BIconFileEarmarkRichtext,
-    BIconFolderMinus,
-    BIconFolderPlus,
-    BIconThreeDots
-  },
   props: {
     item: {
       type: Object,

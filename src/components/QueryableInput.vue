@@ -14,7 +14,7 @@
           button-class="d-flex justify-content-between align-items-center"
         >
           <span>{{ op.longLabel }}</span>
-          <b-badge variant="dark" class="ml-2">{{ op.label }}</b-badge>
+          <b-badge variant="dark" class="ms-2">{{ op.label }}</b-badge>
         </b-dropdown-item-button>
       </b-dropdown>
 
@@ -38,24 +38,24 @@
         :options="queryableOptions"
         size="sm"
         class="value"
-        :value="value.value"
-        @input="updateValue($event)"
+        :model-value="value.value"
+        @update:model-value="updateValue($event)"
         v-bind="validation"
       />
       <b-form-input
         v-else-if="queryable.isText || queryable.isNumeric"
         size="sm"
         class="value"
-        :value="value.value"
-        @input="updateValue($event)"
+        :model-value="value.value"
+        @update:model-value="updateValue($event)"
         v-bind="validation"
       />
       <b-form-checkbox
         v-else-if="queryable.isBoolean"
         switch
         class="value"
-        :checked="value.value"
-        @input="updateValue($event)"
+        :model-value="value.value"
+        @update:model-value="updateValue($event)"
         v-bind="validation"
       >
         {{ $t(`checkbox.${value.value}`) }}
@@ -74,7 +74,7 @@
 </template>
 
 <script>
-import { BBadge, BDropdown, BDropdownItemButton, BFormCheckbox, BFormInput, BFormSelect, BIconXCircleFill } from 'bootstrap-vue';
+import { defineAsyncComponent } from 'vue';
 
 import DatePickerMixin from './DatePickerMixin';
 import Utils from '../utils';
@@ -83,14 +83,7 @@ import CqlValue from '../models/cql2/value';
 export default {
   name: 'QueryableInput',
   components: {
-    BBadge, 
-    BDropdown,
-    BDropdownItemButton,
-    BFormCheckbox,
-    BFormInput,
-    BFormSelect,
-    BIconXCircleFill,
-    Description: () => import('./Description.vue')
+    Description: defineAsyncComponent(() => import('./Description.vue'))
   },
   mixins: [
     DatePickerMixin

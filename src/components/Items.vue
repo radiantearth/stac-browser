@@ -1,18 +1,18 @@
 <template>
   <section class="items mb-4">
     <header>
-      <h2 class="title mr-2">{{ $tc('stacItem', items.length ) }}</h2>
-      <b-badge v-if="itemCount !== null" pill variant="secondary" class="mr-4">{{ itemCount }}</b-badge>
+      <h2 class="title me-2">{{ $tc('stacItem', items.length ) }}</h2>
+      <b-badge v-if="itemCount !== null" pill variant="secondary" class="me-4">{{ itemCount }}</b-badge>
       <SortButtons v-if="!api && items.length > 1" v-model="sort" />
     </header>
 
     <Pagination
-      v-if="showPagination" ref="topPagination" class="mb-3" :class="{'mr-3': allowFilter}"
+      v-if="showPagination" ref="topPagination" class="mb-3" :class="{'me-3': allowFilter}"
       :pagination="pagination" placement="top" @paginate="paginate"
     />
     <template v-if="allowFilter">
       <b-button v-if="api" class="mb-3" v-b-toggle.itemFilter :variant="hasFilters && !filtersOpen ? 'primary' : 'outline-primary'">
-        <b-icon-search />
+        <b-icon-filter />
         {{ filtersOpen ? $t('items.hideFilter') : $t('items.showFilter') }}
         <b-badge v-if="hasFilters && !filtersOpen" variant="dark">{{ filterCount }}</b-badge>
       </b-button>
@@ -42,25 +42,23 @@
 </template>
 
 <script>
-import { defineComponent } from 'vue';
+import { mapState } from 'vuex';
+import { defineComponent, defineAsyncComponent } from 'vue';
+
+import Utils from '../utils';
 import Item from './Item.vue';
 import Loading from './Loading.vue';
 import Pagination from './Pagination.vue';
-import { BCollapse, BIconSearch } from "bootstrap-vue";
-import Utils from '../utils';
 import { getDisplayTitle } from '../models/stac';
-import { mapState } from 'vuex';
 
 export default defineComponent({
   name: "Items",
   components: {
-    BCollapse,
-    BIconSearch,
     Item,
-    SearchFilter: () => import('./SearchFilter.vue'),
+    SearchFilter: defineAsyncComponent(() => import('./SearchFilter.vue')),
     Loading,
     Pagination,
-    SortButtons: () => import('./SortButtons.vue')
+    SortButtons: defineAsyncComponent(() => import('./SortButtons.vue'))
   },
   props: {
     items: {

@@ -2,14 +2,14 @@
   <b-container id="stac-browser">
     <Authentication v-if="showLogin" />
     <ErrorAlert v-if="globalError" dismissible class="global-error" v-bind="globalError" @close="hideError" />
-    <Sidebar v-if="sidebar" />
+    <Sidebar v-if="sidebar !== null" v-model="sidebar" />
     <!-- Header -->
     <header>
       <b-row class="site">
         <b-col md="12">
           <nav class="actions navigation">
             <b-button-group v-if="canSearch || isServerSelector">
-              <b-button v-if="isServerSelector" variant="primary" size="sm" :title="$t('browse')" v-b-toggle.sidebar @click="sidebar = true">
+              <b-button v-if="isServerSelector" variant="primary" size="sm" :title="$t('browse')" @click="sidebar = !sidebar">
                 <b-icon-list /><span class="button-label">{{ $t('browse') }}</span>
               </b-button>
               <b-button v-if="canSearch" variant="primary" size="sm" :to="searchBrowserLink" :title="$t('search.title')" :pressed="isSearchPage">
@@ -23,24 +23,12 @@
               <StacLink v-if="root" :data="root" hideIcon />
               <template v-else>{{ catalogTitle }}</template>
             </span>
-            <TeleportPopover
-              v-if="root"
-              :title="serviceType"
-              placement="bottom"
-              custom-class="popover-large"
+            <b-button
+              v-if="root" size="sm" variant="outline-primary" id="popover-root-btn"
+              :title="serviceType" tag="a" tabindex="0"
             >
-              <template #trigger>
-                <b-button
-                  size="sm" variant="outline-primary"
-                  :title="serviceType" tag="a" tabindex="0"
-                >
-                  <b-icon-caret-down-fill />
-                </b-button>
-              </template>
-              <template #content>
-                <RootStats />
-              </template>
-            </TeleportPopover>
+              <b-icon-caret-down-fill />
+            </b-button>
           </div>
           <nav class="actions user">
             <b-button-group>
@@ -83,32 +71,35 @@
     <footer>
       <small class="poweredby text-muted" v-html="poweredByText" />
     </footer>
+    <b-popover
+      v-if="root" id="popover-root" class="popover-large" target="popover-root-btn"
+      triggers="hover focus" placement="bottom" :title="serviceType" teleport-to="#stac-browser"
+    >
+      <RootStats />
+    </b-popover>
   </b-container>
 </template>
 
 <script>
+import { defineComponent, defineAsyncComponent } from 'vue';
 import { isNavigationFailure, NavigationFailureType } from 'vue-router';
 import { mapMutations, mapActions, mapGetters, mapState } from 'vuex';
 import CONFIG from './config';
 
-import {
-  BIconArrow90degUp, BIconArrowLeft, BIconCaretDownFill,
-  BIconFolderSymlink, BIconList, BIconLock, BIconSearch, BIconUnlock,
-  } from "bootstrap-vue";
+// Import icons needed for dynamic component usage
+import BIconLock from '~icons/bi/lock';
+import BIconUnlock from '~icons/bi/unlock';
 
-import "bootstrap/dist/css/bootstrap.css";
-import "bootstrap-vue/dist/bootstrap-vue.css";
+// CSS imports are handled in init.js
 
 import ErrorAlert from './components/ErrorAlert.vue';
 import StacLink from './components/StacLink.vue';
-import TeleportPopover from './components/TeleportPopover.vue';
 
 import { CatalogLike, STAC } from 'stac-js';
 import Utils from './utils';
 import URI from 'urijs';
 
 import { API_LANGUAGE_CONFORMANCE } from './i18n';
-import { defineComponent } from 'vue';
 import { getBest, prepareSupported } from 'stac-js/src/locales';
 import BrowserStorage from "./browser-store";
 import Authentication from "./components/Authentication.vue";
@@ -139,28 +130,21 @@ export default defineComponent({
   name: 'StacBrowser',
   components: {
     Authentication,
-    BIconArrow90degUp,
-    BIconArrowLeft,
-    BIconCaretDownFill,
-    BIconFolderSymlink,
-    BIconList,
-    BIconLock,
-    BIconSearch,
-    BIconUnlock,
     ErrorAlert,
+    BIconLock,
+    BIconUnlock,
     LanguageChooser,
-    RootStats: () => import('./components/RootStats.vue'),
-    Sidebar: () => import('./components/Sidebar.vue'),
+    RootStats: defineAsyncComponent(() => import('./components/RootStats.vue')),
+    Sidebar: defineAsyncComponent(() => import('./components/Sidebar.vue')),
     StacLink,
-    Source: () => import('./components/Source.vue'),
-    TeleportPopover
+    Source: defineAsyncComponent(() => import('./components/Source.vue'))
   },
   props: {
     ...Props
   },
   data() {
     return {
-      sidebar: false,
+      sidebar: null,
       error: null,
       onDataLoaded: null
     };
@@ -196,7 +180,7 @@ export default defineComponent({
       return this.$route.name !== 'select';
     },
     authIcon() {
-      return this.isLoggedIn ? 'b-icon-unlock' : 'b-icon-lock';
+      return this.isLoggedIn ? BIconUnlock : BIconLock;
     },
     authTitle() {
       return this.authMethod.getButtonTitle();
@@ -572,8 +556,8 @@ export default defineComponent({
 
 <style lang="scss">
 @import "./theme/variables.scss";
-@import '~bootstrap/scss/bootstrap.scss';
-@import '~bootstrap-vue/src/index.scss';
+@import '~bootstrap/scss/bootstrap';
+@import '~bootstrap-vue-next/dist/bootstrap-vue-next.css';
 @import "./theme/page.scss";
 @import "./theme/custom.scss";
 </style>

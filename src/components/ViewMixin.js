@@ -6,7 +6,7 @@ export default {
   },
   computed: {
     cardsComponent() {
-      return (this.view === 'list') ? 'div' : 'b-card-group';
+      return (this.view === 'list') ? 'div' : 'div';
     },
     cardsComponentProps() {
       if (this.view === 'list') {
@@ -18,7 +18,9 @@ export default {
       }
       else {
         return {
-          columns: true
+          class: [
+            'card-columns'
+          ]
         };
       }
     },

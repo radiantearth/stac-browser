@@ -1,8 +1,8 @@
 <template>
   <section class="features">
     <header>
-      <h2 class="title mr-2">{{ $tc('features.title', count ) }}</h2>
-      <b-badge pill variant="secondary" class="mr-4">{{ count }}</b-badge>
+      <h2 class="title me-2">{{ $tc('features.title', count ) }}</h2>
+      <b-badge pill variant="secondary" class="me-4">{{ count }}</b-badge>
     </header>
     <section class="list">
       <b-card-group v-if="count > 0" columns>

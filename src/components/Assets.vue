@@ -1,13 +1,13 @@
 <template>
   <section class="assets mb-4">
     <h2 v-if="displayTitle">{{ displayTitle }}</h2>
-    <div class="accordion" role="tablist">
+    <b-accordion>
       <Asset
         v-for="asset in assets" :asset="asset" :expand="expand" :context="context"
         :definition="definition" :shown="shownKeys.includes(asset.getKey())"
         :key="asset.getKey()" @show="show"
       />
-    </div>
+    </b-accordion>
   </section>
 </template>
 

@@ -37,9 +37,9 @@
             <template #catalogFooter="slot">
               <b-button-group v-if="itemSearch || canFilterItems(slot.data)" vertical size="sm">
                 <b-button v-if="itemSearch" variant="outline-primary" :pressed="selectedCollections[slot.data.id]" @click="selectForItemSearch(slot.data)">
-                  <b-icon-check-square v-if="selectedCollections[slot.data.id]" />
-                  <b-icon-square v-else />
-                  <span class="ml-2">{{ $t('search.selectForItemSearch') }}</span>
+                  <IBiCheckSquare v-if="selectedCollections[slot.data.id]" />
+                  <IBiSquare v-else />
+                  <span class="ms-2">{{ $t('search.selectForItemSearch') }}</span>
                 </b-button>
                 <StacLink :button="{variant: 'outline-primary', disabled: !canFilterItems(slot.data)}" :data="slot.data" :title="$t('search.filterCollection')" :state="{itemFilterOpen: 1}" />
               </b-button-group>
@@ -70,23 +70,18 @@ import SearchFilter from '../components/SearchFilter.vue';
 import { getDisplayTitle, createSTAC, ItemCollection } from '../models/stac';
 
 import { STAC } from 'stac-js';
-import { defineComponent } from 'vue';
+import { defineComponent, defineAsyncComponent } from 'vue';
 import { mapGetters, mapState } from "vuex";
-import { BIconCheckSquare, BIconSquare, BTabs, BTab } from 'bootstrap-vue';
 
 export default defineComponent({
   name: "Search",
   components: {
-    BIconCheckSquare,
-    BIconSquare,
-    BTab,
-    BTabs,
-    Catalogs: () => import('../components/Catalogs.vue'),
+    Catalogs: defineAsyncComponent(() => import('../components/Catalogs.vue')),
     Loading,
-    Items: () => import('../components/Items.vue'),
-    Map: () => import('../components/Map.vue'),
+    Items: defineAsyncComponent(() => import('../components/Items.vue')),
+    Map: defineAsyncComponent(() => import('../components/Map.vue')),
     SearchFilter,
-    StacLink: () => import('../components/StacLink.vue')
+    StacLink: defineAsyncComponent(() => import('../components/StacLink.vue'))
   },
   props: {
     loadParent: {

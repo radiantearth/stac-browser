@@ -22,6 +22,7 @@ export default {
     return {
       isFullscreen: false,
       doc: document,
+      node: null,
       listener: this.onChange.bind(this)
     };
   },
@@ -30,21 +31,14 @@ export default {
       return this.isFullscreen ? this.$t('fullscreen.exit') : this.$t('fullscreen.show');
     },
     isSupported() {
-      if (!this.getElement()) {
-        return false;
-      }
-      return Boolean(this.doc.body.requestFullscreen && this.doc.fullscreenEnabled);
+      return Boolean(this.node && this.doc.body.requestFullscreen && this.doc.fullscreenEnabled);
     }
   },
   watch: {
     element: {
       immediate: true,
       handler() {
-        this.forceClose();
-        const el = this.getElement();
-        if (el) {
-          this.doc = el.ownerDocument;
-        }
+        this.update();
       }
     },
     isFullscreen(active) {
@@ -54,15 +48,25 @@ export default {
       else {
         this.doc.removeEventListener('fullscreenchange', this.listener);
       }
-      this.getElement().classList.toggle('fullscreen', active);
-      this.$refs.button.blur();
+      this.node.classList.toggle('fullscreen', active);
+      this.$refs.button.$el.blur();
       this.$emit('changed', active);
     }
+  },
+  mounted() {
+    this.update();
   },
   beforeUnmount() {
     this.forceClose();
   },
   methods: {
+    update() {
+      this.forceClose();
+      this.node = this.getElement();
+      if (this.node) {
+        this.doc = this.node.ownerDocument;
+      }
+    },
     forceClose() {
       if (this.isFullscreen) {
         this.doc.exitFullscreen();
@@ -92,7 +96,7 @@ export default {
         this.doc.exitFullscreen()
           .then(() => this.isFullscreen = false);
       } else {
-        this.getElement().requestFullscreen()
+        this.node.requestFullscreen()
           .then(() => this.isFullscreen = true);
       }
     },
