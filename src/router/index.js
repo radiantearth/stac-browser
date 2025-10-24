@@ -1,9 +1,14 @@
-import Browse from '../views/Browse.vue';
+import Browse from "../views/Browse.vue";
+
+function catchAllString(route) {
+  const pathMatch = route.params.pathMatch;
+  return Array.isArray(pathMatch) ? pathMatch.join("/") : pathMatch;
+}
 
 function getPath(route, config) {
-  let path = route.params.pathMatch;
+  let path = catchAllString(route);
   if (config.allowExternalAccess && path.startsWith("external/")) {
-    path = '/' + path;
+    path = "/" + path;
   }
   return {path};
 }
@@ -18,12 +23,13 @@ function getRoutes(config) {
       component: () => import("../views/SelectDataSource.vue")
     });
     routes.push({
-      path: "/search/external/(.*)",
+      path: "/search/external/:pathMatch(.*)*",
       name: "search",
       component: () => import("../views/Search.vue"),
       props: route => {
+        const path = catchAllString(route, config);
         return {
-          loadParent: `/external/${route.params.pathMatch}`
+          loadParent: `/external/${path}`
         };
       }
     });
@@ -37,24 +43,24 @@ function getRoutes(config) {
   }
 
   routes.push({
-    path: '/auth/logout',
+    path: "/auth/logout",
     name: "logout",
     component: () => import("../views/Logout.vue")
   });
   routes.push({
-    path: '/auth',
+    path: "/auth",
     component: () => import("../views/LoginCallback.vue")
   });
 
   routes.push({
-    path: "/validation/(.*)",
+    path: "/validation/:pathMatch(.*)*",
     name: "validation",
     component: () => import("../views/Validation.vue"),
     props: route => getPath(route, config)
   });
 
   routes.push({
-    path: "/(.*)",
+    path: "/:pathMatch(.*)*",
     name: "browse",
     component: Browse,
     props: route => getPath(route, config)

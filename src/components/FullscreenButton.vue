@@ -17,6 +17,7 @@ export default {
       required: true
     }
   },
+  emits: ['changed'],
   data() {
     return {
       isFullscreen: false,
@@ -58,7 +59,7 @@ export default {
       this.$emit('changed', active);
     }
   },
-  beforeDestroy() {
+  beforeUnmount() {
     this.forceClose();
   },
   methods: {

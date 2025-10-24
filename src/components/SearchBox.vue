@@ -23,6 +23,7 @@ export default {
       default: null
     }
   },
+  emits: ['input'],
   data() {
     return {
       searchTerm: this.value
