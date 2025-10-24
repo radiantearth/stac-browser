@@ -4,8 +4,7 @@
       <b-icon-flag /><span class="button-label">{{ $t('source.language.label', {currentLanguage}) }}</span>
     </template>
     <b-dropdown-item v-for="l of languages" :key="l.code" class="lang-item" @click="setLocale(l.code)">
-      <b-icon-check-square v-if="currentLocale === l.code" />
-      <b-icon-square v-else />
+      <b-icon-check :class="{hide: currentLocale !== l.code}" />
       <span class="title">
         <span :lang="l.code">{{ l.native }}</span>
         <template v-if="l.global && l.global !== l.native"> / <span lang="en">{{ l.global }}</span></template>
@@ -125,6 +124,9 @@ export default {
 <style lang="scss" scoped>
 .lang-item > .dropdown-item {
   display: flex;
+  svg.hide {
+    opacity: 0;
+  }
   > .title {
     flex: 1;
   }

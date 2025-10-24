@@ -49,7 +49,7 @@ export default {
       border-radius: $border-radius;
 
       &:hover {
-        border-color: map-get($theme-colors, "primary");
+        border-color: $primary;
       }
     }
 

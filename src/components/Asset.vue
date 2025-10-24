@@ -1,7 +1,7 @@
 <template>
   <b-card class="asset expandable-card" no-body>
     <b-card-header header-tag="header" role="tab">
-      <b-button block v-b-toggle="uid" variant="asset" squared>
+      <b-button block v-b-toggle="uid" variant="asset" squared class="w-100">
         <span class="chevron" aria-hidden="true">
           <b-icon-chevron-down v-if="expanded" />
           <b-icon-chevron-right v-else />

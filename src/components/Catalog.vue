@@ -149,7 +149,7 @@ export default {
       }
     }
     .datetime {
-      color: map-get($theme-colors, "secondary");
+      color: $secondary;
     }
     .badge.deprecated {
       text-transform: uppercase;

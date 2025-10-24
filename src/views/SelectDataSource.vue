@@ -70,6 +70,9 @@ export default defineComponent({
   computed: {
     ...mapGetters(['toBrowserPath']),
     valid() {
+      if (this.url.length === 0) {
+        return null;
+      }
       return !this.error;
     },
     error() {

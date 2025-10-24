@@ -555,12 +555,9 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-// Import Bootstrap functions, variables, and mixins only (not full bootstrap)
-@import 'bootstrap/scss/functions';
-@import 'bootstrap/scss/variables';
-@import 'bootstrap/scss/mixins';
-// Import custom theme
 @import "./theme/variables.scss";
+@import '~bootstrap/scss/bootstrap';
+@import '~bootstrap-vue-next/dist/bootstrap-vue-next.css';
 @import "./theme/page.scss";
 @import "./theme/custom.scss";
 </style>

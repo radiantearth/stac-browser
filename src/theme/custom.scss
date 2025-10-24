@@ -1,8 +1,0 @@
-// Import your custom variables FIRST
-@import 'variables';
-
-// Then import Bootstrap's SCSS (not the compiled CSS)
-@import '~bootstrap/scss/bootstrap';
-
-// Import BootstrapVueNext styles
-@import '~bootstrap-vue-next/dist/bootstrap-vue-next.css';
