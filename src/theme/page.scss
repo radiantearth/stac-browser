@@ -264,18 +264,22 @@ body {
     }
   }
 
-  .expandable-card > .card-header {
+  .accordion-item > .accordion-header {
     padding: 0;
     background-color: transparent;
   }
-  .expandable-card > .card-header > .btn,
-  .mimic-expandable-card > .list-group-item {
+  .accordion-item > .accordion-header > .accordion-button,
+  .mimic-accordion > .list-group-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 0.25rem;
     padding: 0.5rem;
     background-color: rgba(0, 0, 0, 0.03);
+
+    &::after {
+      display: none;
+    }
 
     > .title {
       text-align: left;

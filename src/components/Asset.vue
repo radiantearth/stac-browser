@@ -1,38 +1,35 @@
 <template>
-  <b-card class="asset expandable-card" no-body>
-    <b-card-header header-tag="header" role="tab">
-      <b-button block v-b-toggle="uid" variant="asset" squared class="w-100">
-        <span class="chevron" aria-hidden="true">
-          <b-icon-chevron-down v-if="expanded" />
-          <b-icon-chevron-right v-else />
-        </span>
-        <span class="title">{{ title }}</span>
-        <div class="badges ms-1">
-          <b-badge v-if="shown" variant="success" class="shown" :title="$t('assets.currentlyShown')">
-            <b-icon-check /> {{ $t('assets.shown') }}
-          </b-badge>
-          <b-badge v-if="asset.deprecated" variant="warning" class="deprecated">{{ $t('deprecated') }}</b-badge>
-          <template v-if="Array.isArray(asset.roles)">
-            <b-badge v-for="role in asset.roles" :key="role" :variant="role === 'data' ? 'primary' : 'secondary'" class="role">{{ displayRole(role) }}</b-badge>
-          </template>
-          <b-badge v-if="shortFileFormat" variant="dark" class="format" :title="fileFormat"><span v-html="shortFileFormat" /></b-badge>
-        </div>
-      </b-button>
-    </b-card-header>
-    <b-collapse :id="uid" v-model="expanded" :accordion="type" role="tabpanel" @input="collapseToggled">
-      <template v-if="hasAlternatives">
-        <b-tabs card>
-          <b-tab :title="asset['alternate:name'] || $t('assets.alternate.main')" active>
-            <AssetAlternative :asset="asset" :shown="shown" hasAlternatives @show="show" />
-          </b-tab>
-          <b-tab v-for="(altAsset, key) in alternatives" :title="altAsset['alternate:name'] || key" :key="key">
-            <AssetAlternative :asset="altAsset" :shown="shown" hasAlternatives :key="key" @show="show" />
-          </b-tab>
-        </b-tabs>
-      </template>
-      <AssetAlternative v-else :asset="asset" :shown="shown" @show="show" />
-    </b-collapse>
-  </b-card>
+ <b-accordion-item :id="uid" class="asset expandable-card" v-model="expanded">
+   <template #title>
+      <span class="chevron" aria-hidden="true">
+        <b-icon-chevron-down v-if="expanded" />
+        <b-icon-chevron-right v-else />
+      </span>
+     <span class="title">{{ title }}</span>
+     <div class="badges ms-1">
+       <b-badge v-if="shown" variant="success" class="shown" :title="$t('assets.currentlyShown')">
+         <b-icon-check /> {{ $t('assets.shown') }}
+       </b-badge>
+       <b-badge v-if="asset.deprecated" variant="warning" class="deprecated">{{ $t('deprecated') }}</b-badge>
+       <template v-if="Array.isArray(asset.roles)">
+         <b-badge v-for="role in asset.roles" :key="role" :variant="role === 'data' ? 'primary' : 'secondary'" class="role">{{ displayRole(role) }}</b-badge>
+       </template>
+       <b-badge v-if="shortFileFormat" variant="dark" class="format" :title="fileFormat"><span v-html="shortFileFormat" /></b-badge>
+     </div>
+   </template>
+   
+   <template v-if="hasAlternatives">
+     <b-tabs card>
+       <b-tab :title="asset['alternate:name'] || $t('assets.alternate.main')" active>
+         <AssetAlternative :asset="asset" :shown="shown" hasAlternatives @show="show" />
+       </b-tab>
+       <b-tab v-for="(altAsset, key) in alternatives" :title="altAsset['alternate:name'] || key" :key="key">
+         <AssetAlternative :asset="altAsset" :shown="shown" hasAlternatives :key="key" @show="show" />
+       </b-tab>
+     </b-tabs>
+   </template>
+   <AssetAlternative v-else :asset="asset" :shown="shown" @show="show" />
+ </b-accordion-item>
 </template>
 
 <script>

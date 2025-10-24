@@ -1,7 +1,7 @@
 <template>
   <section class="providers mb-4">
     <h2>{{ $tc('providers.title', count) }}</h2>
-    <b-list-group v-if="isSimple" class="mimic-expandable-card">
+    <b-list-group v-if="isSimple" class="mimic-accordion">
       <b-list-group-item
         v-for="(provider, key) in providers" :key="key" :href="provider.url" :disabled="!provider.url"
         target="_blank" variant="provider" class="provider"
@@ -10,9 +10,9 @@
         <ProviderRoles :roles="provider.roles" />
       </b-list-group-item>
     </b-list-group>
-    <div v-else class="accordion" role="tablist">
+    <b-accordion v-else>
       <Provider v-for="(provider, key) in providers" :key="key" :id="String(key)" :provider="provider" />
-    </div>
+    </b-accordion>
   </section>
 </template>
 
