@@ -6,9 +6,10 @@
       <TextControl v-if="empty" :map="map" :text="$t('mapping.nodata')" />
       <TextControl v-else-if="!hasBasemap" :map="map" :text="$t('mapping.nobasemap')" />
     </div>
-    <div v-if="popover && selection" ref="target" class="popover-target" />
-    <b-popover v-if="popover && selection" show placement="bottom" triggers="manual" teleport-to="#stac-browser"
-      :target="selection.target" class="map-popover"
+    <div ref="target" class="popover-target" />
+    <b-popover
+      v-if="popover && selection" show placement="auto" triggers="manual"
+      :target="selection.target" :teleport-to="container" class="map-popover"
     >
       <section class="popover-items">
         <Items v-if="selection && selection.type === 'items'" :stac="stac" :items="selection.items" />
@@ -250,7 +251,7 @@ export default {
     max-width: 400px;
   }
 
-  .popover-trigger {
+  .popover-target {
     width: 1px;
     height: 1px;
     opacity: 0;
