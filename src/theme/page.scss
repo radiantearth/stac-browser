@@ -126,20 +126,35 @@ body {
   .maps-preview {
     position: static;
 
-    .nav-pills {
-      margin: 0;
-      padding: 0;
+    .tabs {
+      align-items: stretch !important;
 
-      > li {
-        margin: 0 0.5rem;
-        &:only-child {
-          display: none;
-        }
-        &:first-of-type {
-          margin-top: 0.5rem;
-        }
-        &:last-of-type {
-          margin-bottom: 0.5rem;
+      .tab-content {
+        width: 100%;
+      }
+
+      .card-header {
+        margin: 0;
+        padding: 0;
+        border-bottom: 0;
+
+        .nav-pills {
+          margin: 0;
+          margin-right: 0 !important;
+          padding: 0;
+
+          > li {
+            margin: 0 0.5rem;
+            &:only-child {
+              display: none;
+            }
+            &:first-of-type {
+              margin-top: 0.5rem;
+            }
+            &:last-of-type {
+              margin-bottom: 0.5rem;
+            }
+          }
         }
       }
     }
