@@ -405,6 +405,10 @@ export default defineComponent({
         return;
       }
 
+      // Reset the callback for updating the data locale
+      // see https://github.com/radiantearth/stac-browser/issues/683
+      this.onDataLoaded = null;
+
       // Handle catalog change: https://github.com/radiantearth/stac-browser/issues/250
       let resetOp = 'resetPage';
       if (this.allowSelectCatalog && to.path) {

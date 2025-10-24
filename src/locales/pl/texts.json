@@ -15,7 +15,7 @@
       "generic": "Kopiuj adres URL",
       "withSource": "Kopiuj adres URL do {source}"
     },
-      "currentlyShown": "To jest aktualnie wyświetlany zasób",
+    "currentlyShown": "To jest aktualnie wyświetlany zasób",
     "download": {
       "generic": "Pobierz",
       "withSource": "Pobierz z {source}"
@@ -50,7 +50,7 @@
     },
     "title": "Uwierzytelnienie",
     "unauthorized": "Nie masz uprawnień do dostępu do tych danych. Zaloguj się.",
-    "unsupportetd": "Nieobsługiwane",
+    "unsupported": "Nieobsługiwane",
     "unsupportedLong": "Przepraszamy, metoda uwierzytelniania {method} nie jest obsługiwana przez STAC Browser.",
     "user": "Użytkownik"
   },
@@ -112,6 +112,7 @@
     "unauthorized": "Żądanie nie zawiera danych uwierzytelniających, np. tokenu API. Podaj dane uwierzytelniające i spróbuj ponownie."
   },
   "featureExperimental": "Ta funkcja jest w fazie testowej i może dawać nieoczekiwane wyniki!",
+  "features": {},
   "fullscreen": {
     "exit": "Wyjdź z trybu pełnoekranowego",
     "exitLabel": "✕",

@@ -111,6 +111,7 @@
     "unauthorized": "O pedido não possui credenciais, por exemplo um token da API. Forneça as suas credenciais e tente novamente."
   },
   "featureExperimental": "Esta funcionalidade ainda é experimental e pode dar resultados inesperados!",
+  "features": {},
   "fullscreen": {
     "exit": "Sair do ecrã completo",
     "exitLabel": "✕",

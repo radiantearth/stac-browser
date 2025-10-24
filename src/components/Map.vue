@@ -7,9 +7,9 @@
       <TextControl v-else-if="!hasBasemap" :map="map" :text="$t('mapping.nobasemap')" />
     </div>
     <TeleportPopover
-      v-if="popover && selectedItems"
+      v-if="popover && selection"
       trigger-mode="manual"
-      :show="!!selectedItems"
+      :show="!!selection"
       placement="bottom"
       custom-class="map-popover"
     >
@@ -18,10 +18,11 @@
       </template>
       <template #content>
         <section class="popover-items">
-          <Items :stac="stac" :items="selectedItems.items" />
+          <Items v-if="selection.type === 'items'" :stac="stac" :items="selection.items" />
+          <Features v-else :features="selection.items" />
         </section>
         <div class="text-center">
-          <b-button variant="danger" @click="resetSelectedItems">{{ $t('mapping.close') }}</b-button>
+          <b-button target="_blank" variant="danger" @click="resetselection">{{ $t('mapping.close') }}</b-button>
         </div>
       </template>
     </TeleportPopover>
@@ -40,6 +41,7 @@ import StacLayer from 'ol-stac';
 import { getStacObjectsForEvent, getStyle } from 'ol-stac/util.js';
 import { STACReference } from 'stac-js';
 import MapUtils from './maps/mapUtils.js';
+import GeoJSON from 'ol/format/GeoJSON.js';
 
 const selectStyle = getStyle('#ff0000', 2, null);
 let mapId = 0;
@@ -47,8 +49,9 @@ let mapId = 0;
 export default {
   name: 'Map',
   components: {
+    Features: () => import('../components/Features.vue'),
+    Items: () => import('../components/Items.vue'),
     TeleportPopover,
-    Items: defineAsyncComponent(() => import('../components/Items.vue')),
     LayerControl,
     TextControl
   },
@@ -81,7 +84,7 @@ export default {
   data() {
     return {
       stacLayer: null,
-      selectedItems: null,
+      selection: null,
       clickPosition: { x: 0, y: 0 },
       empty: false,
       selector: null,
@@ -133,8 +136,8 @@ export default {
         this.$emit('empty');
       }
     },
-    selectedItems(selectedItems) {
-      if (!selectedItems && this.selector) {
+    selection(selection) {
+      if (!selection && this.selector) {
         this.selector.getFeatures().clear();
       }
     }
@@ -177,9 +180,33 @@ export default {
 
       if (this.popover) {
         this.selector = new Select({
-          toggleCondition: () => false, // Only add features manually
-          condition: () => false, // Only add features manually
-          style: selectStyle
+          multi: true,
+          style: selectStyle,
+          layers: (layer) => {
+            if (this.items) {
+              // For item selection
+              return false;
+            }
+            else {
+              // For feature selection
+              const stac = layer.get('stac');
+              return stac && stac.isAsset();
+            }
+          }
+        });
+        this.selector.on('select', (event) => {
+          // For feature selction
+          this.selection = null;
+          this.setTargetPosition(event.mapBrowserEvent);
+          const features = this.selector.getFeatures();
+          if (features.getLength() > 0) {
+            const writer = new GeoJSON();
+            this.selection = {
+              target: this.$refs.target,
+              type: 'features',
+              items: features.getArray().map(f => writer.writeFeatureObject(f))
+            };
+          }
         });
         this.map.addInteraction(this.selector);
         this.map.on('singleclick', async (event) => {
@@ -189,22 +216,33 @@ export default {
             y: event.pixel[1]
           };
 
-          this.selector.getFeatures().clear();
-          const features = this.selector.getFeatures();
-          const container = this.stacLayer.getData();
-          const objects = await getStacObjectsForEvent(event, container, features, 5);
-          if (objects.length > 0) {
-            this.selectedItems = {
-              items: objects
-            };
-          }
-          else {
-            this.selectedItems = null;
+          // For item selection
+          this.selection = null;
+          if (this.items) {
+            this.setTargetPosition(event);
+            this.selector.getFeatures().clear();
+            const features = this.selector.getFeatures();
+            const container = this.stacLayer.getData();
+            const objects = await getStacObjectsForEvent(event, container, features, 5);
+            if (objects.length > 0) {
+              this.selection = {
+                target: this.$refs.target,
+                type: 'items',
+                items: objects
+              };
+            }
           }
         });
-        this.map.on('change', () => this.selectedItems = null);
-        this.map.on('movestart', () => this.selectedItems = null);
+        this.map.on('change', () => this.selection = null);
+        this.map.on('movestart', () => this.selection = null);
       }
+    },
+    setTargetPosition(event) {
+      // The event doesn't contain a target element for the popover to attach to.
+      // Thus we move a hidden target element to the click position and attach the popover to it.
+      // See also https://github.com/bootstrap-vue/bootstrap-vue/issues/5285
+      this.$refs.target.style.left = event.pixel[0] + 'px';
+      this.$refs.target.style.top = event.pixel[1] + 'px';
     },
     fit() {
       const extent = this.stacLayer.getExtent();
@@ -214,8 +252,8 @@ export default {
         this.map.getView().fit(extent, { padding: [50,50,50,50], maxZoom: this.maxZoom });
       }
     },
-    resetSelectedItems() {
-      this.selectedItems = null;
+    resetSelection() {
+      this.selection = null;
     },
     getShownData() {
       if (!this.stacLayer) {
@@ -234,6 +272,10 @@ export default {
 @import "../../node_modules/ol/ol.css";
 
 #stac-browser {
+  .map-popover {
+    max-width: 400px;
+  }
+
   .popover-trigger-point {
     width: 1px;
     height: 1px;

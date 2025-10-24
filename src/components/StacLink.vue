@@ -135,13 +135,9 @@ export default defineComponent({
         else {
           href = this.toBrowserPath(this.link.href);
         }
-        // Ensure href is a non-empty string
-        if (typeof href !== 'string' || href.length === 0) {
-          href = '/';
-        }
         // Normalize to start with a slash for router-link navigation
         if (!href.startsWith('/')) {
-          href = '/' + href;
+          href = '/' + (href || '');
         }
 
         // Add private query parameters to links: https://github.com/radiantearth/stac-browser/issues/142
