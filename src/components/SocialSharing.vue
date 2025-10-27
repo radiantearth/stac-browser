@@ -11,7 +11,7 @@
 import { mapState } from 'vuex';
 
 export default {
-  name: "Source",
+  name: "SocialSharing",
   props: {
     text: {
       type: String,
