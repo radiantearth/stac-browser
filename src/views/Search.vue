@@ -97,13 +97,11 @@ export default {
   data() {
     return {
       parent: null,
-
       error: null,
       errorId: null,
       link: null,
       loading: false,
       data: null,
-
       itemFilters: {},
       collectionFilters: {},
       activeSearch: 0,
