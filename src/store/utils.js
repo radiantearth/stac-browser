@@ -1,5 +1,6 @@
 import axios from "axios";
 import Utils from "../utils";
+import i18n from '../i18n';
 
 export class Loading {
 
@@ -64,6 +65,56 @@ export function processSTAC(state, stac) {
 
 export function isAuthenticationError(error) {
   return [401, 403].includes(error?.response?.status);
+}
+
+export function getErrorCode(error) {
+  if (error instanceof Error && error.isAxiosError && Utils.isObject(error.response)) {
+    const res = error.response;
+    if (Utils.isObject(res.data) && res.data.code) {
+      return res.data.code;
+    }
+    else {
+      return res.code || res.status;
+    }
+  }
+  return null;
+}
+
+export function getErrorMessage(error) {
+  if (error instanceof Error) {
+    if (error.isAxiosError) {
+      const res = error.response;
+      if (error.response) {
+        // Get a error message for HTTP codes where it's clear what the issue is
+        if (res.status === 401) {
+          return i18n.global.t('errors.unauthorized');
+        } else if (res.status === 403) {
+          return i18n.global.t('errors.authFailed');
+        } else if (res.status === 404) {
+          return i18n.global.t('errors.notFound');
+        } else if (Utils.isObject(res.data) && Utils.hasText(res.data.description)) {
+          // Get the error message from the error object as defined for STAC API JSON responses
+          return res.data.description;
+        } else if (Utils.hasText(res.data)) {
+          // Get the error message from the plain text response
+          return res.data;
+        } else if (res.status >= 500 && res.status < 600) {
+          // Return a generic error message for server issues (HTTP 5xx)
+          return i18n.global.t('errors.serverError');
+        } else if (res.status >= 400 && res.status < 500) {
+          // Return a generic error message for issues that originate in the client request (HTTP 4xx)
+          return i18n.global.t('errors.badRequest');
+        }
+      }
+      else if (error.code === 'ERR_NETWORK') {
+        return i18n.global.t('errors.networkError');
+      }
+    }
+    else if (Utils.hasText(error.message)) {
+      return error.message;
+    }
+  }
+  return String(error);
 }
 
 export function addQueryIfNotExists(uri, query) {

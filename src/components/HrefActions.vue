@@ -280,6 +280,7 @@ export default {
         // Use fetch because stacRequest uses axios
         // and axios doesn't support responseType: 'stream'
         const res = await fetch(url, options);
+        // todo: use getErrorMessage / getErrorCode instead?
         if (res.status >= 400) {
           let msg;
           switch(res.status) {

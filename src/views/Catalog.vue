@@ -196,10 +196,10 @@ export default defineComponent({
       return this.itemAssets.length > 0;
     },
     itemAssets() {
-      if (!this.data2 || !Utils.isObject(this.data2.item_assets)) {
+      if (!this.data || !Utils.isObject(this.data.item_assets)) {
         return [];
       }
-      return Object.values(this.data2.item_assets);
+      return Object.values(this.data.item_assets);
     },
     itemPages() {
       let pages = Object.assign({}, this.apiItemsPagination);

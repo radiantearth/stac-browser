@@ -1,7 +1,7 @@
 <template>
   <main class="search d-flex flex-column">
     <Loading v-if="!parent" stretch />
-    <b-alert v-else-if="!searchLink" variant="danger" show>{{ $t('search.notSupported') }}</b-alert>
+    <ErrorAlert v-else-if="!searchLink" :description="$t('search.notSupported')" />
     <b-row v-else>
       <b-col class="left">
         <b-tabs v-model="activeSearch">
@@ -21,7 +21,7 @@
       </b-col>
       <b-col class="right">
         <Loading v-if="loading" fill top />
-        <b-alert v-else-if="error" variant="error" show>{{ error }}</b-alert>
+        <ErrorAlert v-else-if="error" :description="error" :id="errorId" />
         <b-alert v-else-if="data === null" variant="info" show>{{ $t('search.modifyCriteria') }}</b-alert>
         <b-alert v-else-if="results.length === 0 && noFurtherItems" variant="info" show>{{ $t('search.noFurtherItemsFound') }}</b-alert>
         <b-alert v-else-if="results.length === 0" variant="warning" show>{{ $t('search.noItemsFound') }}</b-alert>
@@ -64,24 +64,20 @@
 
 <script>
 import Utils from '../utils';
-import Loading from '../components/Loading.vue';
-import { processSTAC, stacRequest } from '../store/utils';
 import SearchFilter from '../components/SearchFilter.vue';
+import Loading from '../components/Loading.vue';
+import ErrorAlert from '../components/ErrorAlert.vue';
 import { getDisplayTitle, createSTAC, ItemCollection } from '../models/stac';
-
 import { STAC } from 'stac-js';
+import { getErrorCode, getErrorMessage, processSTAC, stacRequest } from '../store/utils';
 import { defineComponent } from 'vue';
 import { mapGetters, mapState } from "vuex";
-import { BIconCheckSquare, BIconSquare, BTabs, BTab } from 'bootstrap-vue';
 
 export default defineComponent({
   name: "Search",
   components: {
-    BIconCheckSquare,
-    BIconSquare,
-    BTab,
-    BTabs,
     Catalogs: () => import('../components/Catalogs.vue'),
+    ErrorAlert,
     Loading,
     Items: () => import('../components/Items.vue'),
     Map: () => import('../components/Map.vue'),
@@ -97,12 +93,11 @@ export default defineComponent({
   data() {
     return {
       parent: null,
-
       error: null,
+      errorId: null,
       link: null,
       loading: false,
       data: null,
-
       itemFilters: {},
       collectionFilters: {},
       activeSearch: 0,
@@ -245,6 +240,7 @@ export default defineComponent({
     },
     async loadResults(link) {
       this.error = null;
+      this.errorId = null;
       this.loading = true;
       try {
         this.link = Utils.addFiltersToLink(link, this.filters, this.searchResultsPerPage);
@@ -263,7 +259,8 @@ export default defineComponent({
         }
       } catch (error) {
         this.data = {};
-        this.error = error.message;
+        this.error = getErrorMessage(error);
+        this.errorId = getErrorCode(error);
       } finally {
         this.loading = false;
       }
