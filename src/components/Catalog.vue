@@ -1,6 +1,6 @@
 <template>
-  <b-card no-body :class="classes" v-b-visible.400="load">
-    <b-card-img v-if="hasImage" v-bind="thumbnail" lazy />
+  <b-card no-body :class="classes" v-b-visible.400="load" :img-placement="isList ? 'end' : undefined">
+    <b-card-img v-if="hasImage" class="thumbnail" v-bind="thumbnail" lazy />
     <b-card-body>
       <b-card-title>
         <StacLink :data="[data, catalog]" class="stretched-link" />
