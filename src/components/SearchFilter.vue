@@ -605,8 +605,8 @@ export default defineComponent({
 @import '../theme/variables.scss';
 
 // Datepicker related style
-$default-color: map-get($theme-colors, "secondary");
-$primary-color: map-get($theme-colors, "primary");
+$default-color: $secondary;
+$primary-color: $primary;
 
 @import '@vuepic/vue-datepicker/dist/main.css';
 
