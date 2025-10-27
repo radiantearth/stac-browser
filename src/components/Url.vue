@@ -17,7 +17,7 @@ import {
   BInputGroup, BInputGroupAppend } from 'bootstrap-vue';
 
 export default {
-  name: "Share",
+  name: "Url",
   components: {
     BFormGroup,
     BFormInput,
