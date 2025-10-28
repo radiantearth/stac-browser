@@ -1,9 +1,9 @@
 <template>
   <b-button-group :title="$t('sort.title')" size="sm">
-    <b-button @click="toggle(1)" variant="outline-primary" :title="$t('sort.asc.title')" :pressed="value === 1 || (enforce && value !== -1)">
+    <b-button @click="toggle(1)" variant="outline-primary" :title="$t('sort.asc.title')" :pressed="modelValue === 1 || (enforce && modelValue !== -1)">
       <b-icon-sort-alpha-down /> <span class="button-label">{{ $t('sort.asc.label') }}</span>
     </b-button>
-    <b-button @click="toggle(-1)" variant="outline-primary" :title="$t('sort.desc.title')" :pressed="value === -1">
+    <b-button @click="toggle(-1)" variant="outline-primary" :title="$t('sort.desc.title')" :pressed="modelValue === -1">
       <b-icon-sort-alpha-up /> <span class="button-label">{{ $t('sort.desc.label') }}</span>
     </b-button>
   </b-button-group>
@@ -11,16 +11,11 @@
 
 <script>
 import { defineComponent } from 'vue';
-import { BIconSortAlphaDown, BIconSortAlphaUp } from 'bootstrap-vue';
 
 export default defineComponent({
   name: "SortButtons",
-  components: {
-    BIconSortAlphaDown,
-    BIconSortAlphaUp
-  },
   props: {
-    value: {
+    modelValue: {
       type: Number,
       default: 0
     },
@@ -29,14 +24,14 @@ export default defineComponent({
       default: false
     }
   },
-  emits: ['input'],
+  emits: ['update:modelValue'],
   methods: {
     toggle(selectedValue) {
       let newValue = this.enforce ? 1 : 0;
-      if(this.value !== selectedValue) {
+      if(this.modelValue !== selectedValue) {
         newValue = selectedValue;
       }
-      this.$emit('input', newValue);
+      this.$emit('update:modelValue', newValue);
     }
   }
 });

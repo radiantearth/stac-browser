@@ -14,7 +14,7 @@
         </b-card-body>
         <b-card-footer>
           <b-button type="submit" variant="primary">{{ t('submit') }}</b-button>
-          <b-button type="reset" variant="danger" class="ml-3">{{ t('cancel') }}</b-button>
+          <b-button type="reset" variant="danger" class="ms-3">{{ t('cancel') }}</b-button>
         </b-card-footer>
       </b-card>
     </b-form>
@@ -23,7 +23,6 @@
 
 <script>
 import Description from '../Description.vue';
-import { BForm, BFormInput, BFormGroup } from 'bootstrap-vue';
 import i18n from '../../i18n';
 import Utils from '../../utils';
 import { mapGetters } from 'vuex';
@@ -31,9 +30,6 @@ import { mapGetters } from 'vuex';
 export default {
   name: 'Basic',
   components: {
-    BForm,
-    BFormInput,
-    BFormGroup,
     Description
   },
   props: {

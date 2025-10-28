@@ -1,13 +1,13 @@
 <template>
   <b-card no-body class="item-card" :class="{queued: !data, deprecated: isDeprecated, description: hasDescription}" v-b-visible.400="load">
-    <b-card-img-lazy v-if="hasImage" class="thumbnail" offset="200" v-bind="thumbnail" />
+    <b-card-img v-if="hasImage" v-bind="thumbnail" lazy />
     <b-card-body>
       <b-card-title>
         <StacLink :data="[data, item]" class="stretched-link" />
       </b-card-title>
       <b-card-text v-if="fileFormats.length > 0 || hasDescription || isDeprecated" class="intro">
-        <b-badge v-if="isDeprecated" variant="warning" class="mr-1 mt-1 deprecated">{{ $t('deprecated') }}</b-badge>
-        <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="mr-1 mt-1 fileformat">{{ formatMediaType(format) }}</b-badge>
+        <b-badge v-if="isDeprecated" variant="warning" class="me-1 mt-1 deprecated">{{ $t('deprecated') }}</b-badge>
+        <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="me-1 mt-1 fileformat">{{ formatMediaType(format) }}</b-badge>
         <template v-if="hasDescription">{{ summarizeDescription }}</template>
       </b-card-text>
       <Keywords v-if="showKeywordsInItemCards && keywords.length > 0" :keywords="keywords" variant="primary" center />
@@ -21,8 +21,9 @@
 </template>
 
 <script>
-import { defineComponent } from 'vue';
+import { defineComponent, defineAsyncComponent } from 'vue';
 import { mapState, mapGetters } from 'vuex';
+
 import FileFormatsMixin from './FileFormatsMixin';
 import ThumbnailCardMixin from './ThumbnailCardMixin';
 import StacLink from './StacLink.vue';
@@ -37,7 +38,7 @@ export default defineComponent({
   name: 'Item',
   components: {
     StacLink,
-    Keywords: () => import('./Keywords.vue')
+    Keywords: defineAsyncComponent(() => import('./Keywords.vue'))
   },
   mixins: [
     FileFormatsMixin,
@@ -119,6 +120,16 @@ export default defineComponent({
       min-height: 200px;
     }
 
+    /* Card image styling */
+    .card-img-top {
+      width: auto;
+      height: auto;
+      max-width: 100%;
+      max-height: 200px;
+      object-fit: contain;
+      object-position: center;
+    }
+
     .intro {
       display: -webkit-box;
       -webkit-line-clamp: 2;
@@ -138,13 +149,6 @@ export default defineComponent({
 
     .badge.deprecated {
       text-transform: uppercase;
-    }
-
-    .card-img {
-      width: auto;
-      height: auto;
-      max-width: 100%;
-      max-height: 200px;
     }
 
     .card-body {

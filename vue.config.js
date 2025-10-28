@@ -2,6 +2,10 @@ const yargs = require('yargs/yargs');
 const { hideBin } = require('yargs/helpers');
 const path = require('path');
 const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
+const Icons = require('unplugin-icons/webpack');
+const Components = require('unplugin-vue-components/webpack');
+const IconsResolver = require('unplugin-icons/resolver');
+const { BootstrapVueNextResolver } = require('bootstrap-vue-next/resolvers');
 
 const { properties } = require('./config.schema.json');
 const pkgFile = require('./package.json');
@@ -34,10 +38,7 @@ const vueConfig = {
   productionSourceMap: !mergedConfig.noSourceMaps,
   publicPath: mergedConfig.pathPrefix,
   chainWebpack: webpackConfig => {
-    // Configure Vue 3 compatibility mode
-    webpackConfig.resolve.alias.set('vue', '@vue/compat');
-
-    // Configure Vue 3 template compiler options
+    // Vue 3 template compiler options - using defaults for pure Vue 3
     webpackConfig.module
       .rule('vue')
       .use('vue-loader')
@@ -47,8 +48,7 @@ const vueConfig = {
         }
         // Preserve whitespace behavior from Vue 2
         options.compilerOptions.whitespace = 'preserve';
-        // Preserve comments during development for better debugging
-        // In production, comments are removed for smaller bundle size
+        // Keep comments during development for better debugging
         options.compilerOptions.comments = process.env.NODE_ENV !== 'production';
         return options;
       });
@@ -76,7 +76,22 @@ const vueConfig = {
     plugins: [
       new NodePolyfillPlugin({
         includeAliases: ['Buffer', 'path']
-      })
+      }),
+      Components({
+        resolvers: [
+          BootstrapVueNextResolver(), // Auto-register Bootstrap components
+          IconsResolver({ 
+            prefix: false,
+            enabledCollections: ['bi'],
+            alias: {
+              'b-icon': 'bi'
+            }
+          })
+        ]
+      }),
+      Icons({
+        compiler: 'vue3',
+      }),
     ]
   },
   pluginOptions: {

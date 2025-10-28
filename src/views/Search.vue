@@ -39,7 +39,7 @@
                 <b-button v-if="itemSearch" variant="outline-primary" :pressed="selectedCollections[slot.data.id]" @click="selectForItemSearch(slot.data)">
                   <b-icon-check-square v-if="selectedCollections[slot.data.id]" />
                   <b-icon-square v-else />
-                  <span class="ml-2">{{ $t('search.selectForItemSearch') }}</span>
+                  <span class="ms-2">{{ $t('search.selectForItemSearch') }}</span>
                 </b-button>
                 <StacLink :button="{variant: 'outline-primary', disabled: !canFilterItems(slot.data)}" :data="slot.data" :title="$t('search.filterCollection')" :state="{itemFilterOpen: 1}" />
               </b-button-group>
@@ -69,8 +69,8 @@ import Loading from '../components/Loading.vue';
 import ErrorAlert from '../components/ErrorAlert.vue';
 import { getDisplayTitle, createSTAC, ItemCollection } from '../models/stac';
 import { STAC } from 'stac-js';
+import { defineComponent, defineAsyncComponent } from 'vue';
 import { getErrorCode, getErrorMessage, processSTAC, stacRequest } from '../store/utils';
-import { defineComponent } from 'vue';
 import { mapGetters, mapState } from "vuex";
 
 export default defineComponent({
@@ -79,10 +79,10 @@ export default defineComponent({
     Catalogs: () => import('../components/Catalogs.vue'),
     ErrorAlert,
     Loading,
-    Items: () => import('../components/Items.vue'),
-    Map: () => import('../components/Map.vue'),
+    Items: defineAsyncComponent(() => import('../components/Items.vue')),
+    Map: defineAsyncComponent(() => import('../components/Map.vue')),
     SearchFilter,
-    StacLink: () => import('../components/StacLink.vue')
+    StacLink: defineAsyncComponent(() => import('../components/StacLink.vue'))
   },
   props: {
     loadParent: {

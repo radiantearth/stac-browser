@@ -1,6 +1,6 @@
 <template>
   <section>
-    <b-button v-for="href, service in urls" :key="service" class="service mr-1" :class="service" :href="href" target="_blank">
+    <b-button v-for="href, service in urls" :key="service" class="service me-1" :class="service" :href="href" target="_blank">
       <i class="svg" :class="service" /> {{ $t(`source.share.${service}`) }}
     </b-button>
   </section>

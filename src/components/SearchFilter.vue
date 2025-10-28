@@ -79,7 +79,7 @@
             <template v-for="queryable in sortedQueryables">
               <b-dropdown-item v-if="queryable.supported" :key="queryable.id" @click="additionalFieldSelected(queryable)" link-class="d-flex justify-content-between align-items-center">
                 <span>{{ queryable.title }}</span>
-                <b-badge variant="dark" class="ml-2">{{ queryable.id }}</b-badge>
+                <b-badge variant="dark" class="ms-2">{{ queryable.id }}</b-badge>
               </b-dropdown-item>
             </template>
           </b-dropdown>
@@ -112,11 +112,11 @@
             <template #option="{option}">
               <span class="d-flex justify-content-between align-items-center">
                 <span>{{ option.text }}</span>
-                <b-badge v-if="option.value" variant="dark" class="ml-2">{{ option.value }}</b-badge>
+                <b-badge v-if="option.value" variant="dark" class="ms-2">{{ option.value }}</b-badge>
               </span>
             </template>
           </multiselect>
-          <SortButtons v-if="sortTerm && sortTerm.value" class="mt-1" :value="sortOrder" enforce @input="sortDirectionSet" />
+          <SortButtons v-if="sortTerm && sortTerm.value" class="mt-1" v-model="sortOrder" :enforce="true" />
         </b-form-group>
 
         <b-form-group class="limit" :label="$t('search.itemsPerPage')" :label-for="ids.limit" :description="$t('search.itemsPerPageDescription', {maxItems})">
@@ -129,15 +129,14 @@
       </b-card-body>
       <b-card-footer>
         <b-button type="submit" variant="primary">{{ $t('submit') }}</b-button>
-        <b-button type="reset" variant="danger" class="ml-3">{{ $t('reset') }}</b-button>
+        <b-button type="reset" variant="danger" class="ms-3">{{ $t('reset') }}</b-button>
       </b-card-footer>
     </b-card>
   </b-form>
 </template>
 
 <script>
-import { defineComponent } from 'vue';
-import { BBadge, BDropdown, BDropdownItem, BForm, BFormGroup, BFormInput, BFormCheckbox, BFormRadioGroup } from 'bootstrap-vue';
+import { defineComponent, defineAsyncComponent } from 'vue';
 import Multiselect from 'vue-multiselect';
 import { mapGetters, mapState } from "vuex";
 import refParser from '@apidevtools/json-schema-ref-parser';
@@ -189,18 +188,10 @@ let formId = 0;
 export default defineComponent({
   name: 'SearchFilter',
   components: {
-    BBadge,
-    BDropdown,
-    BDropdownItem,
-    BForm,
-    BFormGroup,
-    BFormInput,
-    BFormCheckbox,
-    BFormRadioGroup,
-    QueryableInput: () => import('./QueryableInput.vue'),
+    QueryableInput: defineAsyncComponent(() => import('./QueryableInput.vue')),
     Loading,
-    MapSelect: () => import('./maps/MapSelect.vue'),
-    SortButtons: () => import('./SortButtons.vue'),
+    MapSelect: defineAsyncComponent(() => import('./maps/MapSelect.vue')),
+    SortButtons: defineAsyncComponent(() => import('./SortButtons.vue')),
     Multiselect
   },
   mixins: [
@@ -536,9 +527,6 @@ export default defineComponent({
           .map(([key, schema]) => new Queryable(key, schema));
       }
     },
-    sortDirectionSet(value) {
-      this.sortOrder = value;
-    },
     buildFilter() {
       if (this.filters.length === 0) {
         return null;
@@ -617,8 +605,8 @@ export default defineComponent({
 @import '../theme/variables.scss';
 
 // Datepicker related style
-$default-color: map-get($theme-colors, "secondary");
-$primary-color: map-get($theme-colors, "primary");
+$default-color: $secondary;
+$primary-color: $primary;
 
 @import '@vuepic/vue-datepicker/dist/main.css';
 

@@ -6,13 +6,7 @@ import CONFIG from './config';
 import getRoutes from "./router";
 import getStore from "./store";
 
-import { 
-  AlertPlugin, BadgePlugin, ButtonGroupPlugin, ButtonPlugin,
-  CardPlugin, FormPlugin, FormGroupPlugin, FormInputPlugin, FormCheckboxPlugin, FormRadioPlugin,
-  LayoutPlugin, ListGroupPlugin, PopoverPlugin, SpinnerPlugin,
-  VBToggle, VBVisible } from "bootstrap-vue";
-import "bootstrap/dist/css/bootstrap.css";
-import "bootstrap-vue/dist/bootstrap-vue.css";
+import { createBootstrap } from 'bootstrap-vue-next';
 
 export default function init() {
   return loadDefaultMessages().then(() => {
@@ -35,25 +29,12 @@ export default function init() {
 
     const app = createApp(StacBrowser);
     
-    // Add plugins
-    app.use(AlertPlugin);
-    app.use(BadgePlugin);
-    app.use(ButtonGroupPlugin);
-    app.use(ButtonPlugin);
-    app.use(CardPlugin);
-    app.use(FormPlugin);
-    app.use(FormGroupPlugin);
-    app.use(FormInputPlugin);
-    app.use(FormCheckboxPlugin);
-    app.use(FormRadioPlugin);
-    app.use(LayoutPlugin);
-    app.use(ListGroupPlugin);
-    app.use(PopoverPlugin);
-    app.use(SpinnerPlugin);
-    
-    // Add directives
-    app.directive('b-toggle', VBToggle);
-    app.directive('b-visible', VBVisible);
+    // Add BootstrapVueNext plugin with minimal config
+    // Components are auto-registered via BootstrapVueNextResolver in vue.config.js
+    app.use(createBootstrap({
+      components: false,
+      directives: true
+    }));
     
     // Add router, store, and i18n
     app.use(i18n);
