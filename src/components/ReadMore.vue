@@ -56,7 +56,7 @@ export default defineComponent({
     setTimeout(() => {
       this.readmore = this.$refs.to.offsetHeight < this.$refs.to.scrollHeight;
 
-      const localMaxLines = this.lines + 1 * lh;
+      const localMaxLines = (this.lines + 1) * lh;
       if (this.$refs.to.scrollHeight <= localMaxLines) {
         this.inMaxRange = true;
       }
