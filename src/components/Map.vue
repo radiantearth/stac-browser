@@ -8,7 +8,7 @@
     </div>
     <div ref="target" class="popover-target" />
     <b-popover
-      v-if="popover && selection" show placement="auto" triggers="manual"
+      v-if="popover && selection" show manual placement="auto"
       :target="selection.target" :teleport-to="container" class="map-popover"
     >
       <section class="popover-items">

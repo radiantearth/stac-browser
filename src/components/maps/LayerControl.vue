@@ -2,7 +2,7 @@
   <div class="ol-layercontrol ol-unselectable ol-control" style="pointer-events: auto;">
     <button v-if="id" :id="id"><b-icon-layers-fill /></button>
     <b-popover
-      v-if="id" placement="top" triggers="click" @show="update"
+      v-if="id" click placement="top" @show="update"
       :target="id" teleport-to="#stac-browser"
     >
       <div class="layercontrol">
