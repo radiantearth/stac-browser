@@ -10,7 +10,7 @@
         <h3 class="first">{{ $t('additionalActions') }}</h3>
         <HrefActions vertical :data="link" size="sm" />
       </section>
-      <Metadata :data="link" type="Link" headerTag="h3" :ignoreFields="ignore" />
+      <MetadataGroups :data="link" type="Link" headerTag="h3" :ignoreFields="ignore" />
     </b-popover>
   </li>
 </template>
@@ -23,12 +23,12 @@ import StacLink from './StacLink.vue';
 let linkId = 0;
 
 export default {
-  name: "Link",
+  name: "LinkListEntry",
   components: {
     HrefActions,
     StacLink,
     Description: defineAsyncComponent(() => import('./Description.vue')),
-    Metadata: defineAsyncComponent(() => import('./Metadata.vue'))
+    MetadataGroups: defineAsyncComponent(() => import('./MetadataGroups.vue'))
   },
   props: {
     link: {

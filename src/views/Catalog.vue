@@ -21,13 +21,13 @@
               <b-col md="8" class="value"><span v-html="temporalExtents" /></b-col>
             </b-row>
           </section>
-          <Links v-if="linkPosition === 'left'" :title="$t('additionalResources')" :links="additionalLinks" :context="data" />
+          <LinkList v-if="linkPosition === 'left'" :title="$t('additionalResources')" :links="additionalLinks" :context="data" />
         </section>
         <section v-if="isCollection || hasThumbnails" class="mb-4">
           <b-card no-body class="maps-preview">
             <b-tabs v-model="tab" ref="tabs" pills card vertical end>
               <b-tab v-if="isCollection" :title="$t('map')" no-body>
-                <Map onfocusOnly popover :stac="data" v-bind="mapData" @changed="dataChanged" @empty="handleEmptyMap" />
+                <MapView :stac="data" v-bind="mapData" @changed="dataChanged" @empty="handleEmptyMap" onfocusOnly popover />
               </b-tab>
               <b-tab v-if="hasThumbnails" :title="$t('thumbnails')" no-body>
                 <Thumbnails :thumbnails="thumbnails" />
@@ -38,7 +38,7 @@
         <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="selectedReferences" @show-asset="showAsset" />
         <Assets v-if="hasItemAssets && !hasItems" :assets="itemAssets" :context="data" :definition="true" />
         <Providers v-if="providers" :providers="providers" />
-        <Metadata class="mb-4" :type="data.type" :data="data" :ignoreFields="ignoredMetadataFields" />
+        <MetadataGroups class="mb-4" :type="data.type" :data="data" :ignoreFields="ignoredMetadataFields" />
         <Links v-if="linkPosition === 'right'" :title="$t('additionalResources')" :links="additionalLinks" :context="data" />
       </b-col>
       <b-col class="catalogs-container" v-if="hasCatalogs">
@@ -85,9 +85,9 @@ export default defineComponent({
     Description,
     Items,
     Keywords: defineAsyncComponent(() => import('../components/Keywords.vue')),
-    Links: defineAsyncComponent(() => import('../components/Links.vue')),
-    Map: defineAsyncComponent(() => import('../components/Map.vue')),
-    Metadata: defineAsyncComponent(() => import('../components/Metadata.vue')),
+    LinkList: defineAsyncComponent(() => import('../components/LinkList.vue')),
+    MapView: defineAsyncComponent(() => import('../components/MapView.vue')),
+    MetadataGroups: defineAsyncComponent(() => import('../components/MetadataGroups.vue')),
     Providers: defineAsyncComponent(() => import('../components/Providers.vue')),
     ReadMore,
     Thumbnails: defineAsyncComponent(() => import('../components/Thumbnails.vue'))

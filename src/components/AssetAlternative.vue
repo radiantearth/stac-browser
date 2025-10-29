@@ -5,7 +5,7 @@
     <b-card-text class="mt-4" v-if="asset.description">
       <Description :description="asset.description" compact />
     </b-card-text>
-    <Metadata class="mt-4" :data="resolvedAsset" :context="context" :ignoreFields="ignore" title="" type="Asset" />
+    <MetadataGroups class="mt-4" :data="resolvedAsset" :context="context" :ignoreFields="ignore" title="" type="Asset" />
   </component>
 </template>
 
@@ -25,7 +25,7 @@ export default {
   components: {
     Description,
     HrefActions,
-    Metadata: defineAsyncComponent(() => import('./Metadata.vue'))
+    MetadataGroups: defineAsyncComponent(() => import('./MetadataGroups.vue'))
   },
   mixins: [
     StacFieldsMixin({ formatMediaType })

@@ -62,7 +62,7 @@
               </b-button>
             </b-button-group>
           </nav>
-          <Source class="actions" :title="title" :stacUrl="url" :stac="data" />
+          <StacSource class="actions" :title="title" :stacUrl="url" :stac="data" />
         </b-col>
       </b-row>
     </header>
@@ -138,7 +138,7 @@ export default defineComponent({
     RootStats: defineAsyncComponent(() => import('./components/RootStats.vue')),
     Sidebar: defineAsyncComponent(() => import('./components/Sidebar.vue')),
     StacLink,
-    Source: defineAsyncComponent(() => import('./components/Source.vue'))
+    StacSource: defineAsyncComponent(() => import('./components/StacSource.vue'))
   },
   props: {
     ...Props

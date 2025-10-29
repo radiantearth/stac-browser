@@ -27,7 +27,7 @@
         <b-alert v-else-if="results.length === 0" variant="warning" show>{{ $t('search.noItemsFound') }}</b-alert>
         <template v-else>
           <div id="search-map" v-if="itemCollection">
-            <Map :stac="parent" :items="itemCollection" onfocusOnly popover />
+            <MapView :stac="parent" :items="itemCollection" onfocusOnly popover />
           </div>
           <Catalogs
             v-if="isCollectionSearch" :catalogs="results" collectionsOnly
@@ -79,9 +79,9 @@ export default defineComponent({
     Catalogs: () => import('../components/Catalogs.vue'),
     ErrorAlert,
     Loading,
-    Items: defineAsyncComponent(() => import('../components/Items.vue')),
-    Map: defineAsyncComponent(() => import('../components/Map.vue')),
     SearchFilter,
+    Items: defineAsyncComponent(() => import('../components/Items.vue')),
+    MapView: defineAsyncComponent(() => import('../components/MapView.vue')),
     StacLink: defineAsyncComponent(() => import('../components/StacLink.vue'))
   },
   props: {
