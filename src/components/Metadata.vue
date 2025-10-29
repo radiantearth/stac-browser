@@ -4,8 +4,8 @@
     <b-card-group columns :class="`count-${formattedData.length}`">
       <MetadataGroup
         v-for="group in formattedData"
-        v-bind="group"
         :key="group.extension"
+        v-bind="group"
       />
     </b-card-group>
   </section>

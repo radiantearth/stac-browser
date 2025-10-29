@@ -1,5 +1,5 @@
 <template>
-  <b-button class="copy-button" @click.prevent.stop="copy" :variant="copyColor" v-bind="buttonProps" :title="$t('copy')">
+  <b-button class="copy-button" @click.prevent.stop="copy" :variant="copyColor" :title="$t('copy')" v-bind="buttonProps">
     <component :is="copyIcon" />
     <slot />
   </b-button>

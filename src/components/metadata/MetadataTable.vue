@@ -1,8 +1,7 @@
 <template>
   <b-table
     class="metadata-table" :items="tblItems" :fields="tblFields" variant="light"
-    responsive small
-    sticky-header striped
+    responsive small sticky-header striped
     v-bind="tblTexts"
   >
     <template #head()="data">
