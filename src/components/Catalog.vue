@@ -1,5 +1,5 @@
 <template>
-  <b-card no-body :class="classes" v-b-visible.400="load" :img-placement="isList ? 'end' : undefined">
+  <b-card no-body :class="classes" v-visible.400="load" :img-placement="isList ? 'end' : undefined">
     <b-card-img v-if="hasImage" class="thumbnail" v-bind="thumbnail" lazy />
     <b-card-body>
       <b-card-title>
@@ -90,7 +90,7 @@ export default {
       if (this.catalog instanceof STAC) {
         return;
       }
-      this.$store.commit(visible ? 'queue' : 'unqueue', this.catalog.href);
+      this.$store.commit(visible ? 'queue' : 'unqueue', this.catalog.getAbsoluteUrl());
     },
     summarizeDescription(text) {
       return Utils.summarizeMd(text, 300);

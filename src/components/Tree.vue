@@ -1,5 +1,5 @@
 <template>
-  <ul class="tree" v-b-visible="load">
+  <ul class="tree" v-visible="load">
     <li>
       <b-button v-if="pagination" size="sm" variant="light" disabled>
         <b-icon-three-dots />
@@ -31,7 +31,7 @@
         </ul>
         <template v-else>
           <Tree v-for="(child, i) in shownChilds" :key="i" :item="child" :parent="stac" :path="path" />
-          <b-button class="show-more" v-if="hasMore" variant="light" @click="showMore" v-b-visible.300="showMore">{{ $t('showMore') }}</b-button>
+          <b-button class="show-more" v-if="hasMore" variant="light" @click="showMore" v-visible.300="showMore">{{ $t('showMore') }}</b-button>
         </template>
       </template>
     </li>
