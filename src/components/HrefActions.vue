@@ -1,7 +1,7 @@
 <template>
   <div>
     <b-button-group class="actions" :vertical="vertical" :size="size" v-if="href">
-      <b-button variant="danger" v-if="requiresAuth" tag="a"  tabindex="0" :id="`popover-href-${id}-btn`" @click="handleAuthButton">
+      <b-button variant="danger" v-if="requiresAuth" tag="a" tabindex="0" :id="`popover-href-${id}-btn`" @click="handleAuthButton">
         <b-icon-lock /> {{ $t('authentication.required') }}
       </b-button>
       <b-button v-if="hasDownloadButton" :disabled="requiresAuth" v-bind="downloadProps" v-on="downloadEvents" variant="primary">
@@ -25,14 +25,14 @@
     </b-button-group>
 
     <b-popover
-        v-if="auth.length > 1"
-        :id="`popover-href-${id}`" class="href-auth-methods" :target="`popover-href-${id}-btn`"
-        triggers="focus" :title="$t('authentication.chooseMethod')" teleport-to="#stac-browser"
-      >
-        <b-list-group>
-          <AuthSchemeItem v-for="(method, i) in auth" :key="i" :method="method" @authenticate="startAuth" />
-        </b-list-group>
-      </b-popover>
+      v-if="auth.length > 1"
+      :id="`popover-href-${id}`" class="href-auth-methods" :target="`popover-href-${id}-btn`"
+      triggers="focus" :title="$t('authentication.chooseMethod')" teleport-to="#stac-browser"
+    >
+      <b-list-group>
+        <AuthSchemeItem v-for="(method, i) in auth" :key="i" :method="method" @authenticate="startAuth" />
+      </b-list-group>
+    </b-popover>
   </div>
 </template>
 
