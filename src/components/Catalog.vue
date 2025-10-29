@@ -122,9 +122,6 @@ export default {
     .card-footer:empty {
       display: none;
     }
-    .card-title {
-      margin-bottom: 0.5rem;
-    }
     
     /* Card image base styling */
     .card-img-top,

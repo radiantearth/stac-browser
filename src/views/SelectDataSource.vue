@@ -28,8 +28,7 @@
       <b-list-group> 
         <template v-for="catalog in stacIndex" :key="catalog.id">
           <b-list-group-item
-            v-if="show(catalog)" 
-            button
+            v-if="show(catalog)" button
             :active="url === catalog.url"
             @click="open(catalog.url)"
           >
