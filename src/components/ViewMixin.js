@@ -6,23 +6,14 @@ export default {
   },
   computed: {
     cardsComponent() {
-      return (this.view === 'list') ? 'div' : 'div';
+      return 'div';
     },
     cardsComponentProps() {
-      if (this.view === 'list') {
-        return {
+      return {
           class: [
-            'card-list'
+            (this.view === 'list') ? 'card-list' : 'card-grid'
           ]
         };
-      }
-      else {
-        return {
-          class: [
-            'card-columns'
-          ]
-        };
-      }
     },
     view: {
       get() {
