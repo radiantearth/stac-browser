@@ -1,6 +1,6 @@
 <template>
   <div class="queryable-group">
-    <b-row class="queryable-row">
+    <div class="queryable-row">
       <span class="title">
         {{ queryable.title }}
       </span>
@@ -64,12 +64,12 @@
       <b-button class="delete" size="sm" variant="danger" @click="$emit('remove-queryable')">
         <b-icon-x-circle-fill aria-hidden="true" />
       </b-button>
-    </b-row>
+    </div>
 
-    <b-row v-if="queryable.description || operator.description" class="queryable-help text-muted small">
+    <div v-if="queryable.description || operator.description" class="queryable-help text-muted small">
       <Description v-if="operator.description" :description="operator.description" inline />
       <Description v-if="queryable.description" :description="queryable.description" inline />
-    </b-row>
+    </div>
   </div>
 </template>
 
@@ -181,18 +181,19 @@ export default {
   flex-direction: row;
   flex-wrap: nowrap;
   align-content: center;
+  display: flex;
 
+  .title, .value {
+    flex-grow: 4;
+    width: 7rem !important;
+  }
+  .op {
+    min-width: 4rem;
+    width: auto;
+  }
   .delete {
     width: auto;
   }
-  .title, .value {
-    flex-grow: 4;
-    width: 8rem !important;
-  }
-}
-
-.op {
-  min-width: 4rem;
 }
 
 .queryable-help {
