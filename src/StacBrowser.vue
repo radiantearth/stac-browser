@@ -73,7 +73,8 @@
     </footer>
     <b-popover
       v-if="root" id="popover-root" class="popover-large" target="popover-root-btn"
-      triggers="hover focus" placement="bottom" :title="serviceType" teleport-to="#stac-browser"
+      placement="bottom" :title="serviceType" teleport-to="#stac-browser"
+      click focus hover :boundary-padding="20"
     >
       <RootStats />
     </b-popover>
