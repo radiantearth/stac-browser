@@ -1,5 +1,5 @@
 <template>
-  <component :is="component" class="stac-link" v-bind="attributes" :id="id" :title="tooltip">
+  <component :is="component" class="stac-link" :id="id" :title="tooltip" v-bind="attributes">
     <img v-if="icon && !hideIcon" :src="icon.getAbsoluteUrl()" :alt="icon.title" :title="icon.title" class="icon me-2">
     <span class="title">{{ displayTitle }}</span>
   </component>

@@ -8,8 +8,9 @@
     </div>
     <div ref="target" class="popover-target" />
     <b-popover
-      v-if="popover && selection" show placement="auto" triggers="manual"
+      v-if="popover && selection" show manual placement="auto"
       :target="selection.target" :teleport-to="container" class="map-popover"
+      :boundary-padding="20"
     >
       <section class="popover-items">
         <Items v-if="selection && selection.type === 'items'" :stac="stac" :items="selection.items" />

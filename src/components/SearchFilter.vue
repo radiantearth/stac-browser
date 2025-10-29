@@ -75,7 +75,7 @@
         <b-form-group v-if="showAdditionalFilters" class="additional-filters" :label="$t('search.additionalFilters')">
           <b-form-radio-group v-model="filtersAndOr" :options="andOrOptions" name="logical" size="sm" />
 
-          <b-dropdown size="sm" :text="$t('search.addFilter')" block variant="primary" class="queryables mt-2 mb-3" menu-class="w-100">
+          <b-dropdown size="sm" :text="$t('search.addFilter')" variant="primary" class="queryables mt-2 mb-3" menu-class="w-100" toggle-class="w-100">
             <template v-for="queryable in sortedQueryables">
               <b-dropdown-item v-if="queryable.supported" :key="queryable.id" @click="additionalFieldSelected(queryable)" link-class="d-flex justify-content-between align-items-center">
                 <span>{{ queryable.title }}</span>
@@ -618,18 +618,24 @@ $primary-color: $primary;
 // General item filter style
 .filter {
   position: relative;
+  min-width: 400px;
 
   .mx-datepicker {
     width: 100%;
   }
 
-  .form-group {
-    > div {
-      margin-left: 1em;
+  .b-form-group {
+    padding-left: 1em;
+    margin-bottom: 1em;
+
+    > label,
+    > legend {
+      margin-left: -1em;
+      font-weight: 600;
     }
 
-    > label {
-      font-weight: 600;
+    > small {
+      display: block;
     }
   }
 }

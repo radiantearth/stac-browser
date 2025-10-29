@@ -5,7 +5,7 @@
       <template v-else>{{ $t('metadata.general') }}</template>
     </b-card-title>
     <section class="border metadata-rows">
-      <MetadataEntry v-for="(entry, key) in properties" v-bind="entry" :field="key" :key="key" />
+      <MetadataEntry v-for="(entry, key) in properties" :field="key" :key="key" v-bind="entry" />
     </section>
   </b-card>
 </template>

@@ -315,7 +315,7 @@ export default defineComponent({
   }
 
   .left {
-    min-width: 350px;
+    min-width: 420px;
     flex-basis: 40%;
   }
   .right {
