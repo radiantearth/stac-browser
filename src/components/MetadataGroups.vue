@@ -30,7 +30,7 @@ import { mapState } from "vuex";
 import __ from "../../fields.config";
 
 export default {
-  name: "Metadata",
+  name: "MetadataGroups",
   components: {
     MetadataGroup,
   },

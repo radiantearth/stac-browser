@@ -63,7 +63,7 @@ import CopyButton from './CopyButton.vue';
 import SocialSharing from './SocialSharing.vue';
 
 export default {
-  name: "Source",
+  name: "StacSource",
   components: {
     Url,
     CopyButton,

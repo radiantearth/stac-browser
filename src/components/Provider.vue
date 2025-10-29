@@ -20,7 +20,7 @@
       <div class="mt-4" v-if="provider.description">
         <Description :description="provider.description" compact />
       </div>
-      <Metadata class="mt-4" :data="provider" :ignoreFields="ignore" :title="false" type="Provider" />
+      <MetadataGroups class="mt-4" :data="provider" :ignoreFields="ignore" :title="false" type="Provider" />
     </div>
   </b-accordion-item>
 </template>
@@ -34,7 +34,7 @@ export default {
   name: 'Provider',
   components: {
     Description,
-    Metadata: defineAsyncComponent(() => import('./Metadata.vue')),
+    MetadataGroups: defineAsyncComponent(() => import('./MetadataGroups.vue')),
     ProviderRoles
   },
   props: {

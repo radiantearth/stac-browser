@@ -59,7 +59,6 @@ export default {
     AuthSchemeItem: defineAsyncComponent(() => import('./AuthSchemeItem.vue')),
     CopyButton: defineAsyncComponent(() => import('./CopyButton.vue')),
     Description,
-    Metadata: defineAsyncComponent(() => import('./Metadata.vue'))
   },
   props: {
     data: {

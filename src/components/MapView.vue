@@ -39,7 +39,7 @@ const selectStyle = getStyle('#ff0000', 2, null);
 let mapId = 0;
 
 export default {
-  name: 'Map',
+  name: 'MapView',
   components: {
     Features: defineAsyncComponent(() => import('../components/Features.vue')),
     Items: defineAsyncComponent(() => import('../components/Items.vue')),
