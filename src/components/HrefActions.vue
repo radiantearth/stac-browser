@@ -27,7 +27,7 @@
     <b-popover
       v-if="auth.length > 1" click focus hover
       :id="`popover-href-${id}`" class="href-auth-methods" :target="`popover-href-${id}-btn`"
-      :title="$t('authentication.chooseMethod')" teleport-to="#stac-browser"
+      :title="$t('authentication.chooseMethod')" teleport-to="#stac-browser" :boundary-padding="20"
     >
       <b-list-group>
         <AuthSchemeItem v-for="(method, i) in auth" :key="i" :method="method" @authenticate="startAuth" />

@@ -3,7 +3,7 @@
     <StacLink :id="popoverId" :data="link" :fallbackTitle="fallbackTitle" class="pe-1" />
     <b-popover
       :target="popoverId" placement="auto" teleport-to="#stac-browser" class="link-more"
-      click focus hover
+      click focus hover :boundary-padding="20"
     >
       <Description v-if="link.description" :description="link.description" compact />
       <section class="link-actions">
