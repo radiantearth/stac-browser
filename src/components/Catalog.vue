@@ -163,6 +163,7 @@ export default {
   }
   .card-list {
     display: flex;
+    flex-direction: column;
     gap: 1rem;
     padding: 0.5rem 0;
 
