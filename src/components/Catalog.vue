@@ -211,7 +211,6 @@ export default {
       grid-row: span 3;
       gap: 0;
       box-sizing: border-box;
-      text-align: center;
       overflow: hidden;
       // See note in .card-grid why margin-bottom is used instead of row-gap
       margin-bottom: 1rem;
@@ -234,9 +233,6 @@ export default {
         max-height: 300px;
         object-fit: contain;
         object-position: center;
-      }
-      .card-title {
-        text-align: center;
       }
     }
   }
