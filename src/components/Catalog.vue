@@ -221,6 +221,11 @@ export default {
       }
       .card-img-wrapper {
         background-color: #f5f5f5;
+        display: grid;
+        img {
+          margin: auto;
+          border-radius: 0;
+        }
       }
       .card-img-top {
         width: auto;
