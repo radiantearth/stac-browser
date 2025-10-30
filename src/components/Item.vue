@@ -112,7 +112,15 @@ export default defineComponent({
 <style lang="scss">
 #stac-browser {
   .item-card {
+    display: grid;
+    grid-template-rows: subgrid;
+    grid-row: span 3;
+    gap: 0;
+    box-sizing: border-box;
     text-align: center;
+    overflow: hidden;
+    // See note in Catalog.vue > .card-grid why margin-bottom is used instead of row-gap
+    margin-bottom: 1rem;
 
     &.deprecated {
       opacity: 0.7;
