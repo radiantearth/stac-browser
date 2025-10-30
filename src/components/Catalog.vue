@@ -208,7 +208,7 @@ export default {
     .catalog-card {
       display: grid;
       grid-template-rows: subgrid;
-      grid-row: span 3;
+      grid-row: span 6;
       gap: 0;
       box-sizing: border-box;
       overflow: hidden;
@@ -233,6 +233,11 @@ export default {
         max-height: 300px;
         object-fit: contain;
         object-position: center;
+      }
+      .card-body {
+        display: grid;
+        grid-template-rows: subgrid;
+        grid-row: span 3;
       }
     }
   }
