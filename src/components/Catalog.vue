@@ -196,7 +196,7 @@ export default {
   }
   .card-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
     grid-auto-rows: min-content;
     // The layout uses margin-bottom instead of row-gap (on .catalog-grid), because 
     // the .card-img-wrapper is supposed to collapse to 0px height when there are no
