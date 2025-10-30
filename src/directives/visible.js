@@ -4,10 +4,12 @@
  * Usage:
  * - v-visible="callback" - triggers when element becomes visible
  * - v-visible.once="callback" - triggers only once when element becomes visible
- * - v-visible.100="callback" - triggers with 100px threshold
- * - v-visible.0.5="callback" - triggers when 50% of element is visible
+ * - v-visible.100="callback" - triggers when the element is within 100px of the viewport (100px root margin)
+ * - v-visible.0.5="callback" - triggers when 50% of the element is visible (intersection ratio threshold)
  * 
- * The callback receives a boolean indicating visibility state.
+ * The callback receives two parameters:
+ *   - isVisible (boolean): true if the element is visible/intersecting
+ *   - entry (IntersectionObserverEntry): the observer entry object
  */
 
 const observerMap = new WeakMap();
