@@ -72,9 +72,7 @@ export default {
       await this.initMap();
     },
     uiLanguage() {
-      () => {
-      // todo: update the language resources
-    };
+      
     },
   },
   async mounted() {
