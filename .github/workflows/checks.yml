@@ -14,7 +14,7 @@ jobs:
         with:
           node-version: 'lts/*'
       - uses: actions/checkout@v4
-      - run: npm install
+      - run: npm ci
       - name: I18N messages for stac-fields are complete
         run: npm run i18n:fields
       - uses: infotroph/tree-is-clean@v1
