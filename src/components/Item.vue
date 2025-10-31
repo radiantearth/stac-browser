@@ -1,5 +1,5 @@
 <template>
-  <b-card no-body class="item-card" :class="{queued: !data, deprecated: isDeprecated, description: hasDescription}" v-b-visible.400="load">
+  <b-card no-body class="item-card" :class="{queued: !data, deprecated: isDeprecated, description: hasDescription}" v-visible.400="load">
     <b-card-img v-if="hasImage" v-bind="thumbnail" lazy />
     <b-card-body>
       <b-card-title>
@@ -102,7 +102,7 @@ export default defineComponent({
       if (this.item instanceof STAC) {
         return;
       }
-      this.$store.commit(visible ? 'queue' : 'unqueue', this.item.href);
+      this.$store.commit(visible ? 'queue' : 'unqueue', this.item.getAbsoluteUrl());
     }
   }
 });

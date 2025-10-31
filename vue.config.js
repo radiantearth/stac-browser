@@ -48,8 +48,6 @@ const vueConfig = {
         }
         // Preserve whitespace behavior from Vue 2
         options.compilerOptions.whitespace = 'preserve';
-        // Keep comments during development for better debugging
-        options.compilerOptions.comments = process.env.NODE_ENV !== 'production';
         return options;
       });
 
