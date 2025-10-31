@@ -118,11 +118,9 @@ for(let key in CONFIG) {
     immediate: false, // Changed from true to avoid accessing store before it's ready
     deep: ['object', 'array'].includes(typeof CONFIG[key]), // Deep watch for objects and arrays
     handler: async function(newValue) {
-      if (this.$store) { // Add safety check
-        await this.$store.dispatch('config', {
-          [key]: newValue
-        });
-      }
+      await this.$store.dispatch('config', {
+        [key]: newValue
+      });
     }
   };
 }
@@ -424,16 +422,7 @@ export default defineComponent({
       await this.$store.dispatch('config', { authConfig });
     }
   },
-  mounted() {
-    // Initialize config once store is available
-    for(let key in CONFIG) {
-      if (this[key] !== undefined) {
-        this.$store.dispatch('config', {
-          [key]: this[key]
-        });
-      }
-    }
-    
+  mounted() {    
     setInterval(() => this.$store.dispatch('loadBackground', 3), 200);
   },
   methods: {
