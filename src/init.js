@@ -6,7 +6,8 @@ import CONFIG from './config';
 import getRoutes from "./router";
 import getStore from "./store";
 
-import { createBootstrap } from 'bootstrap-vue-next';
+import { createBootstrap } from 'bootstrap-vue-next/plugins/createBootstrap';
+import { vBToggle } from 'bootstrap-vue-next/directives/BToggle';
 import visible from './directives/visible';
 
 export default function init() {
@@ -32,10 +33,9 @@ export default function init() {
     
     // Add BootstrapVueNext plugin with minimal config
     // Components are auto-registered via BootstrapVueNextResolver in vue.config.js
-    app.use(createBootstrap({
-      components: false
-    }));
+    app.use(createBootstrap());
     app.directive('visible', visible);
+    app.directive('b-toggle', vBToggle);
     
     // Add router, store, and i18n
     app.use(i18n);

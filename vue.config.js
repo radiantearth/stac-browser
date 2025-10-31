@@ -76,8 +76,34 @@ const vueConfig = {
         includeAliases: ['Buffer', 'path']
       }),
       Components({
+        dirs: [],
+        globs: [],
         resolvers: [
-          BootstrapVueNextResolver(), // Auto-register Bootstrap components
+          BootstrapVueNextResolver({
+            components: {
+              'BContainer': true,
+              'BRow': true,
+              'BCol': true,
+              'BAlert': true,
+              'BButton': true,
+              'BButtonGroup': true,
+              'BBadge': true,
+              'BDropdown': true,
+              'BDropdownItem': true,
+              'BForm': true,
+              'BFormGroup': true,
+              'BFormInput': true,
+              'BFormSelect': true,
+              'BFormCheckbox': true,
+              'BFormRadio': true,
+              'BFormRadioGroup': true,
+              'BInputGroup': true,
+              'BListGroup': true,
+              'BListGroupItem': true,
+              'BPopover': true,
+              'BSpinner': true,
+            }
+          }), // Auto-register Bootstrap components
           IconsResolver({ 
             prefix: false,
             enabledCollections: ['bi'],
@@ -96,7 +122,6 @@ const vueConfig = {
     i18n: {
       locale: mergedConfig.locale,
       fallbackLocale: mergedConfig.fallbackLocale,
-      enableInSFC: false
     }
   }
 };

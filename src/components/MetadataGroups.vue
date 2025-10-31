@@ -12,6 +12,7 @@
 </template>
 
 <script>
+import { BCardGroup } from 'bootstrap-vue-next';
 import {
   formatAsset,
   formatCatalog,
@@ -32,6 +33,7 @@ import __ from "../../fields.config";
 export default {
   name: "MetadataGroups",
   components: {
+    BCardGroup,
     MetadataGroup,
   },
   props: {

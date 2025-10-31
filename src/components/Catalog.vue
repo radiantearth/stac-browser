@@ -29,10 +29,17 @@ import StacLink from './StacLink.vue';
 import { STAC } from 'stac-js';
 import { formatMediaType, formatTemporalExtent } from '@radiantearth/stac-fields/formatters';
 import Utils from '../utils';
+import { BCard, BCardBody, BCardFooter, BCardImg, BCardText, BCardTitle } from 'bootstrap-vue-next';
 
 export default {
   name: 'Catalog',
   components: {
+    BCard,
+    BCardBody,
+    BCardFooter,
+    BCardImg,
+    BCardText,
+    BCardTitle,
     StacLink,
     Keywords: defineAsyncComponent(() => import('./Keywords.vue'))
   },

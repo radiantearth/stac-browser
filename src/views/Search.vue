@@ -72,11 +72,14 @@ import { STAC } from 'stac-js';
 import { defineComponent, defineAsyncComponent } from 'vue';
 import { getErrorCode, getErrorMessage, processSTAC, stacRequest } from '../store/utils';
 import { mapGetters, mapState } from "vuex";
+import { BTab, BTabs } from 'bootstrap-vue-next';
 
 export default defineComponent({
   name: "Search",
   components: {
     Catalogs: () => import('../components/Catalogs.vue'),
+    BTabs,
+    BTab,
     ErrorAlert,
     Loading,
     SearchFilter,

@@ -38,6 +38,7 @@
 <script>
 import { defineComponent, defineAsyncComponent } from 'vue';
 import { mapState, mapGetters } from 'vuex';
+import { BTab, BTabs, BCard } from 'bootstrap-vue-next';
 import Description from '../components/Description.vue';
 import ReadMore from "../components/ReadMore.vue";
 import ShowAssetLinkMixin from '../components/ShowAssetLinkMixin';
@@ -47,6 +48,9 @@ import { addSchemaToDocument, createItemSchema } from '../schema-org';
 export default defineComponent({
   name: "Item",
   components: {
+    BTab,
+    BTabs,
+    BCard,
     AnonymizedNotice: defineAsyncComponent(() => import('../components/AnonymizedNotice.vue')),
     Assets: defineAsyncComponent(() => import('../components/Assets.vue')),
     CollectionLink: defineAsyncComponent(() => import('../components/CollectionLink.vue')),

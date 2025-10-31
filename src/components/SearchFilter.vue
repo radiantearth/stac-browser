@@ -137,8 +137,8 @@
 
 <script>
 import { defineComponent, defineAsyncComponent } from 'vue';
-import Multiselect from 'vue-multiselect';
 import { mapGetters, mapState } from "vuex";
+import { BCard, BCardBody, BCardFooter, BCardTitle } from 'bootstrap-vue-next';
 import refParser from '@apidevtools/json-schema-ref-parser';
 
 import Utils, { schemaMediaType } from '../utils';
@@ -188,11 +188,15 @@ let formId = 0;
 export default defineComponent({
   name: 'SearchFilter',
   components: {
-    QueryableInput: defineAsyncComponent(() => import('./QueryableInput.vue')),
     Loading,
+    BCard,
+    BCardBody,
+    BCardFooter,
+    BCardTitle,
+    QueryableInput: defineAsyncComponent(() => import('./QueryableInput.vue')),
     MapSelect: defineAsyncComponent(() => import('./maps/MapSelect.vue')),
     SortButtons: defineAsyncComponent(() => import('./SortButtons.vue')),
-    Multiselect
+    Multiselect: defineAsyncComponent(() => import('vue-multiselect')),
   },
   mixins: [
     ApiCapabilitiesMixin,

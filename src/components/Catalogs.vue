@@ -47,14 +47,13 @@ import { getDisplayTitle } from '../models/stac';
 import { STAC } from 'stac-js';
 import ViewMixin from './ViewMixin';
 import Utils from '../utils';
-import Multiselect from 'vue-multiselect';
 
 export default defineComponent({
   name: "Catalogs",
   components: {
     Catalog,
     Loading,
-    Multiselect,
+    Multiselect: defineAsyncComponent(() => import('vue-multiselect')),
     Pagination: defineAsyncComponent(() => import('./Pagination.vue')),
     SearchBox: defineAsyncComponent(() => import('./SearchBox.vue')),
     SortButtons: defineAsyncComponent(() => import('./SortButtons.vue'))

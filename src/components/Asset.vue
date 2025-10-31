@@ -39,11 +39,15 @@ import AssetAlternative from './AssetAlternative.vue';
 import StacFieldsMixin from './StacFieldsMixin';
 import Utils from '../utils';
 import { Asset } from 'stac-js';
+import { BTab, BTabs, BAccordionItem } from 'bootstrap-vue-next';
 
 export default {
   name: 'Asset',
   components: {
-    AssetAlternative
+    AssetAlternative,
+    BTab,
+    BTabs,
+    BAccordionItem
   },
   mixins: [
     StacFieldsMixin({ formatMediaType })

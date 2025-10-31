@@ -19,12 +19,14 @@
 import { mapGetters, mapState } from 'vuex';
 import Loading from './Loading.vue';
 import Tree from './Tree.vue';
+import { BOffcanvas } from 'bootstrap-vue-next';
 
 export default {
   name: 'Sidebar',
   components: {
     Loading,
-    Tree
+    Tree,
+    BOffcanvas
   },
   props: {
     modelValue: {

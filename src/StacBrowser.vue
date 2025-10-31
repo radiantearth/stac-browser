@@ -91,8 +91,6 @@ import CONFIG from './config';
 import BIconLock from '~icons/bi/lock';
 import BIconUnlock from '~icons/bi/unlock';
 
-// CSS imports are handled in init.js
-
 import ErrorAlert from './components/ErrorAlert.vue';
 import StacLink from './components/StacLink.vue';
 
@@ -129,9 +127,9 @@ export default defineComponent({
   name: 'StacBrowser',
   components: {
     Authentication,
-    ErrorAlert,
     BIconLock,
     BIconUnlock,
+    ErrorAlert,
     LanguageChooser,
     RootStats: defineAsyncComponent(() => import('./components/RootStats.vue')),
     Sidebar: defineAsyncComponent(() => import('./components/Sidebar.vue')),

@@ -31,6 +31,7 @@ import { STAC } from 'stac-js';
 import { formatTemporalExtent, formatTimestamp, formatMediaType } from '@radiantearth/stac-fields/formatters';
 import Registry from '@radiantearth/stac-fields/registry';
 import Utils from '../utils';
+import { BCard, BCardBody, BCardText, BCardTitle, BCardImg } from 'bootstrap-vue-next';
 
 Registry.addDependency('content-type', require('content-type'));
 
@@ -38,6 +39,11 @@ export default defineComponent({
   name: 'Item',
   components: {
     StacLink,
+    BCard,
+    BCardImg,
+    BCardBody,
+    BCardText,
+    BCardTitle,
     Keywords: defineAsyncComponent(() => import('./Keywords.vue'))
   },
   mixins: [

@@ -12,11 +12,14 @@
 
 <script>
 import MetadataEntry from './MetadataEntry.vue';
+import { BCard, BCardTitle } from 'bootstrap-vue-next';
 
 export default {
   name: "MetadataGroup",
   components: {
-    MetadataEntry
+    MetadataEntry,
+    BCard,
+    BCardTitle
   },
   props: {
       label: {

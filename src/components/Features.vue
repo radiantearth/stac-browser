@@ -16,11 +16,13 @@
 </template>
 
 <script>
+import { BCardGroup } from 'bootstrap-vue-next';
 import Feature from './Feature.vue';
 
 export default {
   name: "Features",
   components: {
+    BCardGroup,
     Feature
   },
   props: {
