@@ -19,7 +19,7 @@
     </template>
    
     <template v-if="hasAlternatives">
-      <b-tabs card>
+      <b-tabs content-class="mt-3" lazy>
         <b-tab :title="asset['alternate:name'] || $t('assets.alternate.main')" active>
           <AssetAlternative :asset="asset" :shown="shown" hasAlternatives @show="show" />
         </b-tab>

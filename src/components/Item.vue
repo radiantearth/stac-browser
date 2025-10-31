@@ -1,5 +1,5 @@
 <template>
-  <b-card no-body class="item-card" :class="{queued: !data, deprecated: isDeprecated, description: hasDescription}" v-b-visible.400="load">
+  <b-card no-body class="item-card" :class="{queued: !data, deprecated: isDeprecated, description: hasDescription}" v-visible.400="load">
     <b-card-img v-if="hasImage" v-bind="thumbnail" lazy />
     <b-card-body>
       <b-card-title>
@@ -31,7 +31,7 @@ import { STAC } from 'stac-js';
 import { formatTemporalExtent, formatTimestamp, formatMediaType } from '@radiantearth/stac-fields/formatters';
 import Registry from '@radiantearth/stac-fields/registry';
 import Utils from '../utils';
-import { BCard, BCardBody, BCardText, BCardTitle } from 'bootstrap-vue-next';
+import { BCard, BCardBody, BCardText, BCardTitle, BCardImg } from 'bootstrap-vue-next';
 
 Registry.addDependency('content-type', require('content-type'));
 
@@ -40,6 +40,7 @@ export default defineComponent({
   components: {
     StacLink,
     BCard,
+    BCardImg,
     BCardBody,
     BCardText,
     BCardTitle,
@@ -102,7 +103,7 @@ export default defineComponent({
       if (this.item instanceof STAC) {
         return;
       }
-      this.$store.commit(visible ? 'queue' : 'unqueue', this.item.href);
+      this.$store.commit(visible ? 'queue' : 'unqueue', this.item.getAbsoluteUrl());
     }
   }
 });

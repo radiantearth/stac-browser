@@ -25,7 +25,6 @@ function loadLocaleConfig() {
 
 const i18n = createI18n({
   legacy: true,
-  allowComposition: true,
   globalInjection: true,
   locale: CONFIG.locale,
   fallbackLocale: CONFIG.fallbackLocale,
