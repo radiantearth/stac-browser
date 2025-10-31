@@ -204,11 +204,7 @@ export default {
       if (typeof this.data.href !== 'string') {
         return null;
       }
-      try {
-        return this.getRequestUrl(this.data.getAbsoluteHref());
-      } catch (e) {
-        return this.data.href;
-      }
+      return this.getRequestUrl(this.data.getAbsoluteUrl());
     },
     parsedHref() {
       return URI(this.href);
