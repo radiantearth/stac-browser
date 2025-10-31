@@ -73,10 +73,14 @@ import Utils from '../utils';
 import { addSchemaToDocument, createCatalogSchema } from '../schema-org';
 import { ItemCollection } from '../models/stac.js';
 import DeprecationMixin from '../components/DeprecationMixin.js';
+import { BTab, BTabs, BCard } from 'bootstrap-vue-next';
 
 export default defineComponent({
   name: "Catalog",
   components: {
+    BTab,
+    BTabs,
+    BCard,
     AnonymizedNotice: defineAsyncComponent(() => import('../components/AnonymizedNotice.vue')),
     Assets: defineAsyncComponent(() => import('../components/Assets.vue')),
     Catalogs,

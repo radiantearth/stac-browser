@@ -26,6 +26,7 @@ import Description from '../Description.vue';
 import i18n from '../../i18n';
 import Utils from '../../utils';
 import { mapGetters } from 'vuex';
+import { BCard, BCardBody, BCardFooter } from 'bootstrap-vue-next';
 
 export default {
   name: 'Basic',

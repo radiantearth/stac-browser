@@ -29,11 +29,13 @@
 import { defineAsyncComponent } from 'vue';
 import Description from './Description.vue';
 import ProviderRoles from './ProviderRoles.vue';
+import { BAccordionItem } from 'bootstrap-vue-next';
 
 export default {
   name: 'Provider',
   components: {
     Description,
+    BAccordionItem,
     MetadataGroups: defineAsyncComponent(() => import('./MetadataGroups.vue')),
     ProviderRoles
   },

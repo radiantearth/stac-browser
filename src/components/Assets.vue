@@ -13,11 +13,13 @@
 
 <script>
 import Asset from './Asset.vue';
+import { BAccordion } from 'bootstrap-vue-next';
 
 export default {
   name: 'Assets',
   components: {
-    Asset
+    Asset,
+    BAccordion
   },
   props: {
     assets: {

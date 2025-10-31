@@ -20,11 +20,13 @@
 import { defineAsyncComponent } from 'vue';
 import ProviderRoles from './ProviderRoles.vue';
 import Utils from '../utils';
+import { BAccordion } from 'bootstrap-vue-next';
 
 export default {
   name: 'Providers',
   components: {
     Provider: defineAsyncComponent(() => import('./Provider.vue')),
+    BAccordion,
     ProviderRoles
   },
   props: {

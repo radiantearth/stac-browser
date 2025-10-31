@@ -44,11 +44,13 @@ import { defineComponent } from 'vue';
 import validateSTAC from 'stac-node-validator';
 import BrowseMixin from './BrowseMixin.js';
 import { STAC } from 'stac-js';
+import { BCardBody } from 'bootstrap-vue-next';
 import ValidationResult from '../components/ValidationResult.vue';
 
 export default defineComponent({
   name: "Validation",
   components: {
+    BCardBody,
     ValidationResult
   },
   mixins: [

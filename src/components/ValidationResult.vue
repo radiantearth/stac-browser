@@ -26,11 +26,16 @@
 <script>
 import URI from 'urijs';
 import Utils from '../utils';
+import { BCard, BCardHeader } from 'bootstrap-vue-next';
 
 const VERSION_REGEXP = /\/(v?\d+\.\d+[^/]+)(\/|$)/;
 
 export default {
   name: "ValidationResult",
+  components: {
+    BCard,
+    BCardHeader
+  },
   props: {
     id: {
       type: String,

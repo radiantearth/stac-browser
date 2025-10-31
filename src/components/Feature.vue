@@ -18,13 +18,16 @@
 
 <script>
 import Utils from '../utils';
+import { defineComponent } from 'vue';
+import { BCard } from 'bootstrap-vue-next';
 import { formatKey } from '@radiantearth/stac-fields/helper';
 import DataTypes from '@radiantearth/stac-fields/datatypes';
 
-export default {
+export default defineComponent({
   name: "Feature",
   props: {
     feature: {
+      BCard,
       type: Object,
       required: true
     }
@@ -52,5 +55,5 @@ export default {
       return Utils.size(this.feature.properties) > 0;
     }
   }
-};
+});
 </script>
