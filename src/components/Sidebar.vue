@@ -4,7 +4,7 @@
     :title="$t('browse')" teleport-to="#stac-browser" footer-class="offcanvas-footer"
   >
     <template #default>
-      <Loading v-if="!parents" />
+      <Loading v-if="loading" />
       <Tree v-else-if="root" :item="root" :path="parents" />
     </template>
     <template v-if="allowSelectCatalog" #footer>
@@ -33,6 +33,11 @@ export default {
     }
   },
   emits: ['update:modelValue'],
+  data() {
+    return {
+      loading: true
+    };
+  },
   computed: {
     ...mapState(['allowSelectCatalog', 'parents']),
     ...mapGetters(['root'])
@@ -42,7 +47,12 @@ export default {
       immediate: true,
       async handler(visible) {
         if (visible) {
-          await this.$store.dispatch('loadParents');
+          try {
+            this.loading = true;
+            await this.$store.dispatch('loadParents');
+          } finally {
+            this.loading = false;
+          }
         }
 
         if (visible) {
@@ -53,6 +63,10 @@ export default {
         }
       }
     },
+    $route() {
+      // Close sidebar when route changes
+      this.emit(false);
+    }
   },
   methods: {
     emit(value) {

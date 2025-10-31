@@ -41,8 +41,8 @@
 <script>
 import { mapGetters, mapState } from 'vuex';
 import Utils from '../utils';
-import { getDisplayTitle } from '../models/stac';
-import { STAC, CatalogLike } from 'stac-js';
+import { getDisplayTitle, Collection } from '../models/stac';
+import { STAC } from 'stac-js';
 
 export default {
   name: 'Tree',
@@ -176,10 +176,10 @@ export default {
     stac: {
       immediate: true,
       handler(newStac, oldStac) {
-        if (newStac instanceof STAC) {
+        if (newStac instanceof Collection) {
           newStac.setApiDataListener('tree', () => this.updateChilds());
         }
-        if (oldStac instanceof STAC) {
+        if (oldStac instanceof Collection) {
           oldStac.setApiDataListener('tree');
         }
         this.updateChilds();
@@ -193,7 +193,7 @@ export default {
   },
   methods: {
     updateChilds() {
-      if (this.stac instanceof CatalogLike) {
+      if (this.stac && this.stac.isCatalogLike()) {
         this.childs = this.stac.getChildren(this.apiCatalogPriority);
       }
       else {
