@@ -1,6 +1,8 @@
 <template>
   <b-card no-body :class="classes" v-b-visible.400="load" :img-placement="isList ? 'end' : undefined">
-    <b-card-img v-if="hasImage" class="thumbnail" v-bind="thumbnail" lazy />
+    <div class="card-img-wrapper">
+      <b-card-img v-if="hasImage" class="thumbnail" v-bind="thumbnail" lazy />
+    </div>
     <b-card-body>
       <b-card-title>
         <StacLink :data="[data, catalog]" class="stretched-link" />
@@ -153,10 +155,18 @@ export default {
     }
   }
   .card-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 0.5rem 0;
+
     .catalog-card {
       box-sizing: border-box;
-      margin: 0.5em 0;
       display: flex;
+      
+      .card-img-wrapper {
+        display: contents;
+      }
 
       .card-img-end {
         min-height: 100px;
@@ -177,14 +187,37 @@ export default {
       }
     }
   }
-  .card-columns {
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    grid-auto-rows: min-content;
+    // The layout uses margin-bottom instead of row-gap (on .catalog-grid), because 
+    // the .card-img-wrapper is supposed to collapse to 0px height when there are no
+    // images in a row. row-gap would prevent that from happening.
+    column-gap: 1rem;
+    padding: 0.5rem 0;
+    grid-auto-flow: dense;
+    
     .catalog-card {
+      display: grid;
+      grid-template-rows: subgrid;
+      grid-row: span 6;
+      gap: 0;
       box-sizing: border-box;
-      margin-top: 0.5em 0;
-      text-align: center;
+      overflow: hidden;
+      // See note in .card-grid why margin-bottom is used instead of row-gap
+      margin-bottom: 1rem;
 
       &.queued {
         min-height: 10rem;
+      }
+      .card-img-wrapper {
+        background-color: #f5f5f5;
+        display: grid;
+        img {
+          margin: auto;
+          border-radius: 0;
+        }
       }
       .card-img-top {
         width: auto;
@@ -194,10 +227,18 @@ export default {
         object-fit: contain;
         object-position: center;
       }
-      .card-title {
-        text-align: center;
+      .card-body {
+        display: grid;
+        grid-template-rows: subgrid;
+        grid-row: span 3;
       }
     }
   }
+  /* Limit to maximum 4 columns on large screens */
+  // @media (min-width: 1200px) {
+  //   .card-grid {
+  //     grid-template-columns: repeat(4, minmax(300px, 1fr)) !important;
+  //   }
+  // }
 }
 </style>
