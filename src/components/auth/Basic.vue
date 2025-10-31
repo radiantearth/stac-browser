@@ -31,6 +31,9 @@ import { BCard, BCardBody, BCardFooter } from 'bootstrap-vue-next';
 export default {
   name: 'Basic',
   components: {
+    BCard,
+    BCardBody,
+    BCardFooter,
     Description
   },
   props: {
