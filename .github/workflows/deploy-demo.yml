@@ -11,7 +11,7 @@ jobs:
         with:
           node-version: 'lts/*'
       - uses: actions/checkout@v4
-      - run: npm install
+      - run: npm ci
       - run: npm run build -- --pathPrefix="/stac-browser" --historyMode=hash
       - uses: peaceiris/actions-gh-pages@v3
         with:
