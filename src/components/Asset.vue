@@ -24,7 +24,7 @@
           <AssetAlternative :asset="asset" :shown="shown" hasAlternatives @show="show" />
         </b-tab>
         <b-tab v-for="(altAsset, key) in alternatives" :title="altAsset['alternate:name'] || key" :key="key">
-          <AssetAlternative :asset="altAsset" :shown="shown" hasAlternatives :key="key" @show="show" />
+          <AssetAlternative :asset="altAsset" :shown="shown" hasAlternatives @show="show" />
         </b-tab>
       </b-tabs>
     </template>

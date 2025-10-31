@@ -360,7 +360,7 @@ export default defineComponent({
       }
     },
     selectedCollections: {
-      deep: true,
+      deep: 1,
       handler(collections) {
         this.query.collections = collections.map(c => c.value);
       }
