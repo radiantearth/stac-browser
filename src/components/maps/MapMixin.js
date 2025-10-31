@@ -56,7 +56,7 @@ export default {
   },
   watch: {
     uiLanguage() {
-      this.translate();
+      this.createControls();
     }
   },
   methods: {
@@ -138,9 +138,6 @@ export default {
         this.isFullScreen = false;
       });
       this.map.addControl(this.fullScreenControl);
-    },
-    translate() {
-      this.createControls();
     },
     async addBasemaps(basemaps, visibleLayer = 0) {
       const promises = basemaps.map(async (options) => {

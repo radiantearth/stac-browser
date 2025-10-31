@@ -2,7 +2,7 @@ import { createStore } from "vuex";
 
 import URI from "urijs";
 
-import i18n, { getDataLanguages } from '../i18n';
+import i18n, { getDataLanguages, translateFields, executeCustomFunctions, loadMessages } from '../i18n';
 import Utils, { BrowserError } from '../utils';
 import { addMissingChildren, getDisplayTitle, createSTAC } from '../models/stac';
 import { CatalogLike, STAC } from 'stac-js';
@@ -10,8 +10,7 @@ import { CatalogLike, STAC } from 'stac-js';
 import auth from './auth.js';
 import { addQueryIfNotExists, hasAuthority, isAuthenticationError, Loading, processSTAC, stacRequest } from './utils';
 import { getBest } from 'stac-js/src/locales';
-import I18N from '@radiantearth/stac-fields/I18N';
-import { translateFields, executeCustomFunctions, loadMessages } from '../i18n';
+import fieldsI18n from '@radiantearth/stac-fields/I18N';
 import { TYPES } from "../components/ApiCapabilitiesMixin";
 import BrowserStorage from "../browser-store.js";
 
@@ -408,6 +407,7 @@ function getStore(config, router) {
         }
       },
       languages(state, {uiLanguage, dataLanguage}) {
+        i18n.global.locale = uiLanguage;
         state.dataLanguage = dataLanguage || null;
         state.uiLanguage = uiLanguage || null;
       },
@@ -647,8 +647,8 @@ function getStore(config, router) {
         await loadMessages(uiLanguage);
 
         // Update stac-fields
-        I18N.setLocales([uiLanguage, cx.state.fallbackLocale]);
-        I18N.setTranslator(translateFields);
+        fieldsI18n.setLocales([uiLanguage, cx.state.fallbackLocale]);
+        fieldsI18n.setTranslator(translateFields);
 
         // Execute other custom functions required to localize
         await executeCustomFunctions(uiLanguage);

@@ -285,9 +285,6 @@ export default defineComponent({
           return;
         }
 
-        // Set the locale for vue-i18n
-        this.$root.$i18n.locale = locale;
-
         // Update the HTML lang tag
         document.documentElement.setAttribute("lang", locale);
         document.getElementById('og-locale').setAttribute("content", locale);
