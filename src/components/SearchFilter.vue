@@ -148,8 +148,8 @@ import ApiCapabilitiesMixin, { TYPES } from './ApiCapabilitiesMixin';
 import DatePickerMixin from './DatePickerMixin';
 import Loading from './Loading.vue';
 
-import { CatalogLike, STAC } from 'stac-js';
-import { createSTAC } from '../models/stac'; 
+import { STAC } from 'stac-js'; 
+import { createSTAC, Collection } from '../models/stac';
 import Cql from '../models/cql2/cql';
 import Queryable from '../models/cql2/queryable';
 import CqlValue from '../models/cql2/value';
@@ -253,7 +253,7 @@ export default defineComponent({
       };
     },
     collectionSearchLink() {
-      return this.parent instanceof CatalogLike && this.parent.getApiCollectionsLink();
+      return this.parent && this.parent.isCatalogLike() && this.parent.getApiCollectionsLink();
     },
     canSearchCollectionsFreeText() {
       return this.canSearchCollections && this.supportsConformance(TYPES.Collections.FreeText);
@@ -324,10 +324,10 @@ export default defineComponent({
     parent: {
       immediate: true,
       handler(newStac, oldStac) {
-        if (newStac instanceof STAC) {
+        if (newStac instanceof Collection) {
           newStac.setApiDataListener('searchfilter' + formId, () => this.updateApiCollections());
         }
-        if (oldStac instanceof STAC) {
+        if (oldStac instanceof Collection) {
           oldStac.setApiDataListener('searchfilter' + formId);
         }
         this.updateApiCollections();
