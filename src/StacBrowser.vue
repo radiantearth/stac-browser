@@ -87,7 +87,9 @@ import { isNavigationFailure, NavigationFailureType } from 'vue-router';
 import { mapMutations, mapActions, mapGetters, mapState } from 'vuex';
 import CONFIG from './config';
 
-// CSS imports are handled in init.js
+// Import icons needed for dynamic component usage
+import BIconLock from '~icons/bi/lock';
+import BIconUnlock from '~icons/bi/unlock';
 
 import ErrorAlert from './components/ErrorAlert.vue';
 import StacLink from './components/StacLink.vue';
@@ -127,6 +129,8 @@ export default defineComponent({
   name: 'StacBrowser',
   components: {
     Authentication,
+    BIconLock,
+    BIconUnlock,
     ErrorAlert,
     LanguageChooser,
     RootStats: defineAsyncComponent(() => import('./components/RootStats.vue')),
