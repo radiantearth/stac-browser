@@ -1,12 +1,12 @@
 <template>
-  <component :is="component">
-    <b-card-title><span v-html="fileFormat" /></b-card-title>
+  <div>
+    <h4 class="mb-4" v-html="fileFormat" />
     <HrefActions isAsset :data="asset" :shown="shown" @show="show" :auth="auth" />
-    <b-card-text class="mt-4" v-if="asset.description">
+    <div class="mt-4" v-if="asset.description">
       <Description :description="asset.description" compact />
-    </b-card-text>
+    </div>
     <MetadataGroups class="mt-4" :data="resolvedAsset" :context="context" :ignoreFields="ignore" title="" type="Asset" />
-  </component>
+  </div>
 </template>
 
 <script>
@@ -83,9 +83,6 @@ export default {
         return asset;
       }
       return this.asset;
-    },
-    component() {
-      return this.hasAlternatives ? 'div' : 'b-card-body';
     },
     tileRendererType() {
       if (this.buildTileUrlTemplate && !this.useTileLayerAsFallback) {
