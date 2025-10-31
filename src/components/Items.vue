@@ -43,7 +43,7 @@
 
 <script>
 import { mapState } from 'vuex';
-import { BCardGroup } from 'bootstrap-vue-next';
+import { BCardGroup, BCollapse } from 'bootstrap-vue-next';
 import { defineComponent, defineAsyncComponent } from 'vue';
 
 import Utils from '../utils';
@@ -60,6 +60,7 @@ export default defineComponent({
     Loading,
     Pagination,
     BCardGroup,
+    BCollapse,
     SortButtons: defineAsyncComponent(() => import('./SortButtons.vue'))
   },
   props: {

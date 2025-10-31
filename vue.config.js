@@ -102,10 +102,7 @@ const vueConfig = {
               'BListGroupItem': true,
               'BPopover': true,
               'BSpinner': true,
-            },
-            directives: {
-              'VBToggle': true
-            },
+            }
           }), // Auto-register Bootstrap components
           IconsResolver({ 
             prefix: false,
