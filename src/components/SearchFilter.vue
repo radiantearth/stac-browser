@@ -137,7 +137,6 @@
 
 <script>
 import { defineComponent, defineAsyncComponent } from 'vue';
-import Multiselect from 'vue-multiselect';
 import { mapGetters, mapState } from "vuex";
 import refParser from '@apidevtools/json-schema-ref-parser';
 
@@ -192,7 +191,7 @@ export default defineComponent({
     Loading,
     MapSelect: defineAsyncComponent(() => import('./maps/MapSelect.vue')),
     SortButtons: defineAsyncComponent(() => import('./SortButtons.vue')),
-    Multiselect
+    Multiselect: defineAsyncComponent(() => import('vue-multiselect')),
   },
   mixins: [
     ApiCapabilitiesMixin,

@@ -6,7 +6,7 @@ import CONFIG from './config';
 import getRoutes from "./router";
 import getStore from "./store";
 
-import { createBootstrap } from 'bootstrap-vue-next';
+import { createBootstrap } from 'bootstrap-vue-next/plugins/createBootstrap';
 
 export default function init() {
   return loadDefaultMessages().then(() => {
@@ -31,10 +31,7 @@ export default function init() {
     
     // Add BootstrapVueNext plugin with minimal config
     // Components are auto-registered via BootstrapVueNextResolver in vue.config.js
-    app.use(createBootstrap({
-      components: false,
-      directives: true
-    }));
+    app.use(createBootstrap());
     
     // Add router, store, and i18n
     app.use(i18n);

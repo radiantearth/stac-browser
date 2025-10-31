@@ -87,10 +87,6 @@ import { isNavigationFailure, NavigationFailureType } from 'vue-router';
 import { mapMutations, mapActions, mapGetters, mapState } from 'vuex';
 import CONFIG from './config';
 
-// Import icons needed for dynamic component usage
-import BIconLock from '~icons/bi/lock';
-import BIconUnlock from '~icons/bi/unlock';
-
 // CSS imports are handled in init.js
 
 import ErrorAlert from './components/ErrorAlert.vue';
@@ -132,8 +128,6 @@ export default defineComponent({
   components: {
     Authentication,
     ErrorAlert,
-    BIconLock,
-    BIconUnlock,
     LanguageChooser,
     RootStats: defineAsyncComponent(() => import('./components/RootStats.vue')),
     Sidebar: defineAsyncComponent(() => import('./components/Sidebar.vue')),
