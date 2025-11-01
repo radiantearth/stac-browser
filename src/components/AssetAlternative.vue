@@ -12,7 +12,6 @@
 <script>
 import { defineAsyncComponent } from 'vue';
 import { formatMediaType } from '@radiantearth/stac-fields/formatters';
-import { mapState } from 'vuex';
 import Description from './Description.vue';
 import HrefActions from './HrefActions.vue';
 import StacFieldsMixin from './StacFieldsMixin';
@@ -71,7 +70,6 @@ export default {
     };
   },
   computed: {
-    ...mapState(['buildTileUrlTemplate', 'useTileLayerAsFallback']),
     context() {
       return this.asset.getContext();
     },

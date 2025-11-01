@@ -24,13 +24,13 @@
     <b-alert v-if="hasSearchCritera && catalogView.length === 0" variant="warning" class="mt-2" show>{{ $t('catalogs.noMatches') }}</b-alert>
     <section class="list">
       <Loading v-if="loading" fill top />
-      <component :is="cardsComponent" v-bind="cardsComponentProps">
+      <div :class="view === 'list' ? 'card-list' : 'card-columns'">
         <Catalog v-for="catalog in catalogView" :catalog="catalog" :key="catalog.href">
           <template #footer="{data}">
             <slot name="catalogFooter" :data="data" />
           </template>
         </Catalog>
-      </component>
+      </div>
     </section>
     <Pagination v-if="showPagination" class="mb-3" :pagination="pagination" @paginate="paginate" />
     <b-button v-else-if="hasMore" @click="loadMore" variant="primary" v-visible.300="loadMore">{{ $t('catalogs.loadMore') }}</b-button>
@@ -45,7 +45,7 @@ import Catalog from './Catalog.vue';
 import Loading from './Loading.vue';
 import { getDisplayTitle } from '../models/stac';
 import { STAC } from 'stac-js';
-import ViewMixin from './ViewMixin';
+import ViewButtons from './ViewButtons.vue';
 import Utils from '../utils';
 
 export default defineComponent({
@@ -56,11 +56,9 @@ export default defineComponent({
     Multiselect: defineAsyncComponent(() => import('vue-multiselect')),
     Pagination: defineAsyncComponent(() => import('./Pagination.vue')),
     SearchBox: defineAsyncComponent(() => import('./SearchBox.vue')),
-    SortButtons: defineAsyncComponent(() => import('./SortButtons.vue'))
+    SortButtons: defineAsyncComponent(() => import('./SortButtons.vue')),
+    ViewButtons
   },
-  mixins: [
-    ViewMixin
-  ],
   props: {
     catalogs: {
       type: Array,
@@ -193,10 +191,18 @@ export default defineComponent({
         }
       }
       return keywords.sort();
+    },
+    view: {
+      get() {
+        return this.$store.state.cardViewMode;
+      },
+      async set(cardViewMode) {
+        await this.$store.dispatch('config', { cardViewMode });
+      }
     }
   },
   created() {
-    this.sort = this.cardViewSort;
+    this.sort = Utils.convertHumanizedSortOrder(this.cardViewSort);
   },
   methods: {
     loadMore(visible = true) {

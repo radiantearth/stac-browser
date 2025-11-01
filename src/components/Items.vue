@@ -171,7 +171,7 @@ export default defineComponent({
     }
   },
   created() {
-    this.sort = this.cardViewSort;
+    this.sort = Utils.convertHumanizedSortOrder(this.cardViewSort);
   },
   mounted() {
     if (this.showFilters) {

@@ -94,11 +94,19 @@ export default {
     };
   },
   computed: {
-    ...mapState(['pathPrefix', 'requestHeaders']),
+    ...mapState(['pathPrefix', 'requestHeaders', 'buildTileUrlTemplate', 'useTileLayerAsFallback']),
     ...mapGetters(['getRequestUrl']),
     ...mapGetters('auth', ['isLoggedIn']),
     requiresAuth() {
       return !this.isLoggedIn && this.auth.length > 0;
+    },
+    tileRendererType() {
+      if (this.buildTileUrlTemplate && !this.useTileLayerAsFallback) {
+        return 'server';
+      }
+      else {
+        return 'client';
+      }
     },
     actions() {
       return Object.entries(this.isAsset ? AssetActions : LinkActions)
