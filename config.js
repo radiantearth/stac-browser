@@ -38,7 +38,7 @@ module.exports = {
     pathPrefix: "/",
     historyMode: "history",
     cardViewMode: "cards",
-    cardViewSort: "asc",
+    cardViewSort: 1,
     showKeywordsInItemCards: false,
     showKeywordsInCatalogCards: false,
     showThumbnailsAsAssets: false,

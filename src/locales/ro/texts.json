@@ -258,6 +258,7 @@
     "notSupported": "Căutarea articolelor nu este acceptată de API.",
     "placeholder": "Căutare...",
     "selectCollections": "Selectați una sau mai multe colecții...",
+    "selectDateRange": "Selectați un interval de date",
     "selectForItemSearch": "Selectați pentru Căutare Articol",
     "spatialExtent": "Întinderea spațială",
     "tabs": {
