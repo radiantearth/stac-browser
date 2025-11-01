@@ -198,5 +198,5 @@ export default {
 </script>
 
 <style lang="scss">
-@import "../../../node_modules/ol/ol.css";
+@import "ol/ol.css";
 </style>

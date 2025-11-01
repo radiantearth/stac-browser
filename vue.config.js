@@ -3,6 +3,7 @@ const { hideBin } = require('yargs/helpers');
 const path = require('path');
 const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 const Icons = require('unplugin-icons/webpack');
+const { FileSystemIconLoader } = require('unplugin-icons/loaders');
 const Components = require('unplugin-vue-components/webpack');
 const IconsResolver = require('unplugin-icons/resolver');
 const { BootstrapVueNextResolver } = require('bootstrap-vue-next/resolvers');
@@ -55,7 +56,6 @@ const vueConfig = {
       args[0].STAC_BROWSER_VERSION = JSON.stringify(pkgFile.version);
       args[0].CONFIG_PATH = JSON.stringify(configFile);
       args[0].CONFIG_CLI = JSON.stringify(argv);
-      args[0].__VUE_OPTIONS_API__ = true;
       return args;
     });
 
@@ -110,12 +110,16 @@ const vueConfig = {
             enabledCollections: ['bi'],
             alias: {
               'b-icon': 'bi'
-            }
+            },
+            customCollections: ['share'],
           })
         ]
       }),
       Icons({
         compiler: 'vue3',
+        customCollections: {
+          'share': FileSystemIconLoader('./src/media/'),
+        },
       }),
     ]
   },
