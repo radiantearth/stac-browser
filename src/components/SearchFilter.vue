@@ -121,7 +121,7 @@
 
         <b-form-group class="limit" :label="$t('search.itemsPerPage')" :label-for="ids.limit" :description="$t('search.itemsPerPageDescription', {maxItems})">
           <b-form-input
-            :id="ids.limit" :value="query.limit" @change="setLimit" min="1"
+            :id="ids.limit" :model-value="query.limit" @update:model-value="setLimit" min="1"
             :max="maxItems" type="number"
             :placeholder="limitPlaceholder"
           />
