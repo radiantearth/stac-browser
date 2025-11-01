@@ -74,7 +74,7 @@
     <b-popover
       v-if="root" id="popover-root" class="popover-large" target="popover-root-btn"
       placement="bottom" :title="serviceType" teleport-to="#stac-browser"
-      click focus hover :boundary-padding="20"
+      click focus :boundary-padding="10"
     >
       <RootStats />
     </b-popover>

@@ -3,7 +3,7 @@
     <button v-if="id" :id="id"><b-icon-layers-fill /></button>
     <b-popover
       v-if="id" click placement="top" @show="update"
-      :target="id" teleport-to="#stac-browser" :boundary-padding="20"
+      :target="id" teleport-to="#stac-browser" :boundary-padding="10"
     >
       <div class="layercontrol">
         <section>

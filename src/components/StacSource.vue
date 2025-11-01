@@ -17,7 +17,7 @@
       <b-popover
         v-if="stacUrl" id="popover-link" class="popover-large" target="popover-link-btn"
         placement="bottom" :title="$t('source.title')" teleport-to="#stac-browser"
-        click focus hover :boundary-padding="20"
+        click focus :boundary-padding="10"
       >
         <template v-if="stac">
           <b-row v-if="stacId" class="stac-id">
@@ -44,7 +44,7 @@
       <b-popover
         id="popover-share" class="popover-large" target="popover-share-btn"
         placement="bottom" :title="$t('source.share.title')" teleport-to="#stac-browser"
-        click focus hover :boundary-padding="20"
+        click focus :boundary-padding="10"
       >
         <Url id="browserUrl" :url="browserUrl()" :label="$t('source.share.sharePageWithOthers')" :open="false" />
         <template v-if="enableSocialSharing">
