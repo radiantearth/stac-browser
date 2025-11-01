@@ -90,6 +90,7 @@ const vueConfig = {
               'BBadge': true,
               'BDropdown': true,
               'BDropdownItem': true,
+              'BDropdownItemButton': true,
               'BForm': true,
               'BFormGroup': true,
               'BFormInput': true,

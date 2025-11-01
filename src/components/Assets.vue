@@ -63,7 +63,7 @@ export default {
       if (this.definition) {
         return false; // Don't expand assets for Item Asset Definitions
       }
-      else if (this.assets.length === 1 && this.context && this.context.isItem()) {
+      else if (this.assets.length === 1 && this.stac && this.stac.isItem()) {
         return true; // Expand asset if it's the only asset available and it is in an Item
       }
       return null; // Let asset decide (e.g. depending on roles)
