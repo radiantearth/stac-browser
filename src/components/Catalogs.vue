@@ -40,7 +40,7 @@ import Catalog from './Catalog.vue';
 import Loading from './Loading.vue';
 import { getDisplayTitle } from '../models/stac';
 import { STAC } from 'stac-js';
-import ViewMixin from './ViewMixin';
+import ViewButtons from './ViewButtons.vue';
 import Utils from '../utils';
 
 export default {
@@ -51,11 +51,9 @@ export default {
     Pagination: () => import('./Pagination.vue'),
     SearchBox: () => import('./SearchBox.vue'),
     SortButtons: () => import('./SortButtons.vue'),
-    Multiselect: () => import('vue-multiselect')
+    Multiselect: () => import('vue-multiselect'),
+    ViewButtons
   },
-  mixins: [
-    ViewMixin
-  ],
   props: {
     catalogs: {
       type: Array,
@@ -187,10 +185,35 @@ export default {
         }
       }
       return keywords.sort();
+    },
+    cardsComponent() {
+      return (this.view === 'list') ? 'div' : 'b-card-group';
+    },
+    cardsComponentProps() {
+      if (this.view === 'list') {
+        return {
+          class: [
+            'card-list'
+          ]
+        };
+      }
+      else {
+        return {
+          columns: true
+        };
+      }
+    },
+    view: {
+      get() {
+        return this.$store.state.cardViewMode;
+      },
+      async set(cardViewMode) {
+        await this.$store.dispatch('config', { cardViewMode });
+      }
     }
   },
   created() {
-    this.sort = this.cardViewSort;
+    this.sort = Utils.convertHumanizedSortOrder(this.cardViewSort);
   },
   methods: {
     loadMore(visible = true) {

@@ -460,7 +460,7 @@ The default sorting for lists of catalogs/collections or items. One of:
 
 - `"asc"`: ascending sort (default)
 - `"desc"`: descending sort
-- `null`: sorted as in the source files
+- `null`: sorted as in the source
 
 Doesn't apply when API search filters are applied.
 Also doesn't apply when pagination on the server-side is enabled.

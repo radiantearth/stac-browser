@@ -451,4 +451,15 @@ export default class Utils {
     return Utils.mergeDeep(target, ...sources);
   }
 
+  static convertHumanizedSortOrder(value) {
+    switch (value) {
+      case 'asc':
+        return 1;
+      case 'desc':
+        return -1;
+      default:
+        return 0;
+    }
+  }
+
 }
