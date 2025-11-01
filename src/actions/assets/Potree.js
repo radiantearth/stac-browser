@@ -1,6 +1,5 @@
 import AssetActionPlugin from "../AssetActionPlugin";
 import URI from 'urijs';
-import i18n from "../../i18n";
 
 const POTREE_SUPPORTED_TYPES = [
   'application/vnd.laszip+copc',
@@ -42,7 +41,7 @@ export default class Potree extends AssetActionPlugin {
   }
 
   get text() {
-    return i18n.global.t('actions.openIn', {service: 'potree.org'});
+    return this.i18n.t('actions.openIn', {service: 'potree.org'});
   }
 
 }

@@ -1,6 +1,5 @@
 import AssetActionPlugin from "../AssetActionPlugin";
 import URI from 'urijs';
-import i18n from "../../i18n";
 
 // obj & ply files are usually with mime-type text/plain 
 const F3D_SUPPORTED_TYPES = [
@@ -31,7 +30,7 @@ export default class F3D extends AssetActionPlugin {
   }
 
   get text() {
-    return i18n.global.t('actions.openIn', {service: 'f3d.app'});
+    return this.i18n.t('actions.openIn', {service: 'f3d.app'});
   }
 
 }

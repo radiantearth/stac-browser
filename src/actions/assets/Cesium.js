@@ -1,6 +1,5 @@
 import AssetActionPlugin from "../AssetActionPlugin";
 import URI from 'urijs';
-import i18n from "../../i18n";
 
 // See mime types discussion for 3d-tiles here and there
 // https://github.com/opengeospatial/ogcapi-3d-geovolumes/issues/13
@@ -44,7 +43,7 @@ export default class Cesium extends AssetActionPlugin {
   }
 
   get text() {
-    return i18n.global.t('actions.openIn', {service: 'Cesium Sandcastle'});
+    return this.i18n.t('actions.openIn', {service: 'Cesium Sandcastle'});
   }
 
 }

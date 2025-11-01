@@ -1,6 +1,5 @@
 import LinkActionPlugin from "../LinkActionPlugin";
 import URI from 'urijs';
-import i18n from "../../i18n";
 
 export default class NASA_AMMOS_3DTiles extends LinkActionPlugin {
 
@@ -15,7 +14,7 @@ export default class NASA_AMMOS_3DTiles extends LinkActionPlugin {
   }
 
   get text() {
-    return i18n.global.t('actions.openIn', {service: 'NASA-AMMOS 3DTilesRendererJS'});
+    return this.i18n.t('actions.openIn', {service: 'NASA-AMMOS 3DTilesRendererJS'});
   }
 
 }

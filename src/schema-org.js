@@ -2,7 +2,6 @@ import Utils from './utils';
 import { getDisplayTitle } from './models/stac';
 import { STAC } from 'stac-js';
 import URI from 'urijs';
-import i18n from './i18n';
 
 function toBrowserUrl(url, store) {
   let path = store.getters.toBrowserPath(url);
@@ -94,9 +93,7 @@ function fallbackDescription(data, store) {
     stacType = "Item";
   }
   if (stacType) {
-    let type = i18n.global.tc(`stac${stacType}`);
-    let inX = i18n.global.t('in', {catalog: container || store.catalogTitle});
-    return `SpatioTemporal Asset Catalog (STAC)\n${type} - ${data.id} ${inX}`;
+    return `SpatioTemporal Asset Catalog (STAC)\n${stacType} - ${data.id} in ${container || store.catalogTitle}`;
   }
 }
 

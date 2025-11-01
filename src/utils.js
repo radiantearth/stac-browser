@@ -38,6 +38,9 @@ export const geotiffMediaTypes = [
 export const imageMediaTypes = browserImageTypes.concat(geotiffMediaTypes);
 export const mapMediaTypes = imageMediaTypes.concat([geojsonMediaType]);
 
+export const languageConformance = ['https://api.stacspec.org/v1.*/language'];
+export const languageExtension = 'https://stac-extensions.github.io/language/v1.*/schema.json';
+
 export class BrowserError extends Error {
   constructor(message) {
     super(message);

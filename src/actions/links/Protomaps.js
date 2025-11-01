@@ -1,6 +1,5 @@
 import LinkActionPlugin from "../LinkActionPlugin";
 import URI from 'urijs';
-import i18n from "../../i18n";
 
 export default class Protomaps extends LinkActionPlugin {
 
@@ -16,7 +15,7 @@ export default class Protomaps extends LinkActionPlugin {
   }
 
   get text() {
-    return i18n.global.t('actions.openIn', {service: 'Protomaps'});
+    return this.i18n.t('actions.openIn', {service: 'Protomaps'});
   }
 
 }

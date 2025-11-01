@@ -1,6 +1,5 @@
 import axios from "axios";
 import Utils from "../utils";
-import i18n from '../i18n';
 
 export class Loading {
 
@@ -80,18 +79,18 @@ export function getErrorCode(error) {
   return null;
 }
 
-export function getErrorMessage(error) {
+export function getErrorMessage(i18n, error) {
   if (error instanceof Error) {
     if (error.isAxiosError) {
       const res = error.response;
       if (error.response) {
         // Get a error message for HTTP codes where it's clear what the issue is
         if (res.status === 401) {
-          return i18n.global.t('errors.unauthorized');
+          return i18n.t('errors.unauthorized');
         } else if (res.status === 403) {
-          return i18n.global.t('errors.authFailed');
+          return i18n.t('errors.authFailed');
         } else if (res.status === 404) {
-          return i18n.global.t('errors.notFound');
+          return i18n.t('errors.notFound');
         } else if (Utils.isObject(res.data) && Utils.hasText(res.data.description)) {
           // Get the error message from the error object as defined for STAC API JSON responses
           return res.data.description;
@@ -100,14 +99,14 @@ export function getErrorMessage(error) {
           return res.data;
         } else if (res.status >= 500 && res.status < 600) {
           // Return a generic error message for server issues (HTTP 5xx)
-          return i18n.global.t('errors.serverError');
+          return i18n.t('errors.serverError');
         } else if (res.status >= 400 && res.status < 500) {
           // Return a generic error message for issues that originate in the client request (HTTP 4xx)
-          return i18n.global.t('errors.badRequest');
+          return i18n.t('errors.badRequest');
         }
       }
       else if (error.code === 'ERR_NETWORK') {
-        return i18n.global.t('errors.networkError');
+        return i18n.t('errors.networkError');
       }
     }
     else if (Utils.hasText(error.message)) {

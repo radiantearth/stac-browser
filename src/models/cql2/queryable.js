@@ -1,5 +1,4 @@
 import { formatKey } from "@radiantearth/stac-fields/helper";
-import i18n from '../../i18n.js';
 import { CqlEqual, CqlGreaterThan, CqlGreaterThanEqual, CqlLessThan, CqlLessThanEqual, CqlNotEqual } from "./operators/comparison";
 import { CqlLike } from "./operators/advanced";
 
@@ -19,9 +18,9 @@ export default class Queryable {
 
   get description() {
     if (this.isTemporal) {
-      return i18n.global.t('search.dateDescription');
+      return 'search.dateDescription';
     }
-    return "";
+    return null;
   }
 
   get supported() {

@@ -1,20 +1,20 @@
 <template>
   <div id="stac-browser-auth-modal">
     <b-form @submit.stop.prevent="submit" @reset="reset">
-      <b-card no-body :header="t('authentication.title')">
+      <b-card no-body :header="$t('authentication.title')">
         <b-card-body>
-          <p>{{ t('authentication.description') }}</p>
+          <p>{{ $t('authentication.description') }}</p>
           <Description v-if="promptText" :description="promptText" />
-          <b-form-group :label="t('authentication.user')" label-for="basicUser">
+          <b-form-group :label="$t('authentication.user')" label-for="basicUser">
             <b-form-input id="basicUser" type="text" v-model.trim="username" autofocus :required="required" />
           </b-form-group>
-          <b-form-group :label="t('authentication.password')" label-for="basicPassword">
+          <b-form-group :label="$t('authentication.password')" label-for="basicPassword">
             <b-form-input id="basicPassword" type="password" v-model.trim="password" :required="required" />
           </b-form-group>
         </b-card-body>
         <b-card-footer>
-          <b-button type="submit" variant="primary">{{ t('submit') }}</b-button>
-          <b-button type="reset" variant="danger" class="ms-3">{{ t('cancel') }}</b-button>
+          <b-button type="submit" variant="primary">{{ $t('submit') }}</b-button>
+          <b-button type="reset" variant="danger" class="ms-3">{{ $t('cancel') }}</b-button>
         </b-card-footer>
       </b-card>
     </b-form>
@@ -23,7 +23,6 @@
 
 <script>
 import Description from '../Description.vue';
-import i18n from '../../i18n';
 import Utils from '../../utils';
 import { mapGetters } from 'vuex';
 import { BCard, BCardBody, BCardFooter } from 'bootstrap-vue-next';
@@ -60,7 +59,7 @@ export default {
       if (this.description) {
         return this.description;
       }
-      return this.t('authConfig.description');
+      return this.$i18n.t('authConfig.description');
     }
   },
   created() {
@@ -75,9 +74,6 @@ export default {
     }
   },
   methods: {
-    t(key) {
-      return i18n.global.t(key);
-    },
     reset() {
       this.$emit('reset');
     },

@@ -1,7 +1,6 @@
 import { geojsonMediaType, geotiffMediaTypes } from "../../utils";
 import AssetActionPlugin from "../AssetActionPlugin";
 import URI from 'urijs';
-import i18n from "../../i18n";
 
 // For more options see https://feltmaps.notion.site/Upload-Anything-b26d739e80184127872faa923b55d232
 const FELT_SUPPORTED_TYPES = geotiffMediaTypes.concat([
@@ -27,7 +26,7 @@ export default class Felt extends AssetActionPlugin {
   }
 
   get text() {
-    return i18n.global.t('actions.openIn', {service: 'Felt'});
+    return this.i18n.t('actions.openIn', {service: 'Felt'});
   }
 
 }
