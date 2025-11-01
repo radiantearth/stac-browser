@@ -13,7 +13,7 @@
 import { BIconBricks, BIconListTask } from 'bootstrap-vue';
 
 export default {
-  id: "SortButtons",
+  name: "ViewButtons",
   components: {
     BIconBricks,
     BIconListTask
