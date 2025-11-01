@@ -11,7 +11,6 @@
 
 <script>
 import { formatMediaType } from '@radiantearth/stac-fields/formatters';
-import { mapState } from 'vuex';
 import Description from './Description.vue';
 import HrefActions from './HrefActions.vue';
 import StacFieldsMixin from './StacFieldsMixin';
@@ -69,7 +68,6 @@ export default {
     };
   },
   computed: {
-    ...mapState(['buildTileUrlTemplate', 'useTileLayerAsFallback']),
     context() {
       return this.asset.getContext();
     },
@@ -84,14 +82,6 @@ export default {
     },
     component() {
       return this.hasAlternatives ? 'div' : 'b-card-body';
-    },
-    tileRendererType() {
-      if (this.buildTileUrlTemplate && !this.useTileLayerAsFallback) {
-        return 'server';
-      }
-      else {
-        return 'client';
-      }
     },
     fileFormat() {
       if (typeof this.asset.type === "string" && this.asset.type.length > 0) {
