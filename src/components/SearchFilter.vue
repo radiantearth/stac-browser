@@ -279,15 +279,15 @@ export default {
       // nevertheless, let's try to provide some reasonable defaults
       const criteria = [
         { text: this.$t('default'), value: null },
-        { text: this.$t('Identifier'), value: 'id' },
+        { text: this.$t('fields.Identifier'), value: 'id' },
       ];
       const prefix = this.type === 'Collections' ? '' : 'properties.';
-      criteria.push({ text: this.$t('Title'), value: `${prefix}title` });
+      criteria.push({ text: this.$t('fields.Title'), value: `${prefix}title` });
       if (this.type !== 'Collections') {
-        criteria.push({ text: this.$t('Time of Data'), value: 'properties.datetime' });
+        criteria.push({ text: this.$t('fields.Time of Data'), value: 'properties.datetime' });
       }
-      criteria.push({ text: this.$t('Created'), value: `${prefix}created` });
-      criteria.push({ text: this.$t('Updated'), value: `${prefix}updated` });
+      criteria.push({ text: this.$t('fields.Created'), value: `${prefix}created` });
+      criteria.push({ text: this.$t('fields.Updated'), value: `${prefix}updated` });
       return criteria;
     },
     sortedQueryables() {
