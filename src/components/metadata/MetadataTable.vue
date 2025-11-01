@@ -8,7 +8,7 @@
       <span v-html="data.label" />
     </template>
     <template #cell()="data">
-      <Histogram v-if="data.field.key === 'histogram'" :data="data.unformatted" />
+      <Histogram v-if="data.field.key === 'histogram' && isObject(data.unformatted)" :data="data.unformatted" />
       <span v-else v-html="data.value" />
     </template>
   </b-table>
@@ -80,6 +80,9 @@ export default {
     }
   },
   methods: {
+    isObject(value) {
+      return Utils.isObject(value);
+    },
     formatCell(value, key, item) {
       let spec = this.items[key];
       // ToDo: Set context (third param)?

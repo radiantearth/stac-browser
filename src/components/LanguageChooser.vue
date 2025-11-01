@@ -72,10 +72,12 @@ export default {
 
       // Add all UI languages
       for(let code of this.locales) {
+        const t_key = `languages.${code}.transliteration`;
         languages.push({
           code,
           native: this.$t(`languages.${code}.native`),
           global: this.$t(`languages.${code}.global`),
+          transliteration: this.$te(t_key) ? this.$t(t_key) : null,
           ui: true
         });
       }
@@ -109,8 +111,13 @@ export default {
         }
       }
       
-      const collator = new Intl.Collator(this.locale);
-      return languages.sort((a,b) => collator.compare(a.global, b.global));
+      const collator = new Intl.Collator('en', { sensitivity: 'base' });
+      return languages.sort((a,b) => {
+        return collator.compare(
+          a.transliteration || a.native,
+          b.transliteration || b.native
+        );
+      });
     },
   },
   methods: {
