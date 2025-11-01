@@ -2,14 +2,14 @@
   <b-container id="stac-browser">
     <Authentication v-if="showLogin" />
     <ErrorAlert v-if="globalError" dismissible class="global-error" v-bind="globalError" @close="hideError" />
-    <Sidebar v-if="sidebar" />
+    <Sidebar v-if="sidebar !== null" v-model="sidebar" />
     <!-- Header -->
     <header>
       <b-row class="site">
         <b-col md="12">
           <nav class="actions navigation">
             <b-button-group v-if="canSearch || isServerSelector">
-              <b-button v-if="isServerSelector" variant="primary" size="sm" :title="$t('browse')" v-b-toggle.sidebar @click="sidebar = true">
+              <b-button v-if="isServerSelector" variant="primary" size="sm" :title="$t('browse')" @click="sidebar = !sidebar">
                 <b-icon-list /><span class="button-label">{{ $t('browse') }}</span>
               </b-button>
               <b-button v-if="canSearch" variant="primary" size="sm" :to="searchBrowserLink" :title="$t('search.title')" :pressed="isSearchPage">
@@ -37,7 +37,7 @@
               </b-button>
               <LanguageChooser
                 :data="data" :currentLocale="localeFromVueX" :locales="supportedLocalesFromVueX"
-                @setLocale="locale => switchLocale({locale, userSelected: true})"
+                @set-locale="locale => switchLocale({locale, userSelected: true})"
               />
             </b-button-group>
           </nav>
@@ -62,47 +62,34 @@
               </b-button>
             </b-button-group>
           </nav>
-          <Source class="actions" :title="title" :stacUrl="url" :stac="data" />
+          <StacSource class="actions" :title="title" :stacUrl="url" :stac="data" />
         </b-col>
       </b-row>
     </header>
     <!-- Content (Item / Catalog) -->
     <router-view />
     <footer>
-      <i18n tag="small" path="poweredBy" class="poweredby text-muted">
-        <template #link>
-          <a href="https://github.com/radiantearth/stac-browser" target="_blank">STAC Browser</a> {{ browserVersion }}
-        </template>
-      </i18n>
+      <small class="poweredby text-muted" v-html="poweredByText" />
     </footer>
     <b-popover
-      v-if="root" id="popover-root" custom-class="popover-large" target="popover-root-btn"
-      triggers="focus" placement="bottom" container="stac-browser"
+      v-if="root" id="popover-root" class="popover-large" target="popover-root-btn"
+      placement="bottom" :title="serviceType" teleport-to="#stac-browser"
+      click focus :boundary-padding="10"
     >
-      <template #title>
-        {{ serviceType }}
-      </template>
       <RootStats />
     </b-popover>
   </b-container>
 </template>
 
 <script>
-import Vue from "vue";
-import VueRouter from "vue-router";
-import Vuex, { mapMutations, mapActions, mapGetters, mapState } from 'vuex';
+import { defineComponent, defineAsyncComponent } from 'vue';
+import { isNavigationFailure, NavigationFailureType } from 'vue-router';
+import { mapMutations, mapActions, mapGetters, mapState } from 'vuex';
 import CONFIG from './config';
-import getRoutes from "./router";
-import getStore from "./store";
 
-import {
-  AlertPlugin, BadgePlugin, BPopover,
-  BIconArrow90degUp, BIconArrowLeft, BIconCaretDownFill,
-  BIconFolderSymlink, BIconInfoLg, BIconList, BIconSearch,
-  ButtonGroupPlugin, ButtonPlugin, CardPlugin, LayoutPlugin, SpinnerPlugin,
-  VBToggle, VBVisible } from "bootstrap-vue";
-import "bootstrap/dist/css/bootstrap.css";
-import "bootstrap-vue/dist/bootstrap-vue.css";
+// Import icons needed for dynamic component usage
+import BIconLock from '~icons/bi/lock';
+import BIconUnlock from '~icons/bi/unlock';
 
 import ErrorAlert from './components/ErrorAlert.vue';
 import StacLink from './components/StacLink.vue';
@@ -118,39 +105,6 @@ import Authentication from "./components/Authentication.vue";
 import LanguageChooser from "./components/LanguageChooser.vue";
 import { getDisplayTitle } from "./models/stac";
 
-Vue.use(AlertPlugin);
-Vue.use(ButtonGroupPlugin);
-Vue.use(ButtonPlugin);
-Vue.use(BadgePlugin);
-Vue.use(CardPlugin);
-Vue.use(LayoutPlugin);
-Vue.use(SpinnerPlugin);
-
-// For collapsibles / accordions
-Vue.directive('b-toggle', VBToggle);
-// Used to detect when a catalog/item becomes visible so that further data can be loaded
-Vue.directive('b-visible', VBVisible);
-
-// Setup router
-Vue.use(VueRouter);
-const router = new VueRouter({
-  mode: CONFIG.historyMode,
-  base: CONFIG.pathPrefix,
-  routes: getRoutes(CONFIG),
-  scrollBehavior: (to, from, savedPosition) => {
-    if (to.path !== from.path) {
-      return { x: 0, y: 0 };
-    }
-    else {
-      return savedPosition;
-    }
-  }
-});
-
-// Setup store
-Vue.use(Vuex);
-const store = getStore(CONFIG, router);
-
 // Pass Config through from props to vuex
 let Props = {};
 let Watchers = {};
@@ -159,7 +113,8 @@ for(let key in CONFIG) {
     default: ['object', 'function'].includes(typeof CONFIG[key]) ? () => CONFIG[key] : CONFIG[key]
   };
   Watchers[key] = {
-    immediate: true,
+    immediate: false, // Changed from true to avoid accessing store before it's ready
+    deep: ['object', 'array'].includes(typeof CONFIG[key]), // Deep watch for objects and arrays
     handler: async function(newValue) {
       await this.$store.dispatch('config', {
         [key]: newValue
@@ -168,33 +123,25 @@ for(let key in CONFIG) {
   };
 }
 
-export default {
+export default defineComponent({
   name: 'StacBrowser',
-  router,
-  store,
   components: {
     Authentication,
-    BIconArrow90degUp,
-    BIconArrowLeft,
-    BIconCaretDownFill,
-    BIconFolderSymlink,
-    BIconInfoLg,
-    BIconList,
-    BIconSearch,
-    BPopover,
+    BIconLock,
+    BIconUnlock,
     ErrorAlert,
     LanguageChooser,
-    RootStats: () => import('./components/RootStats.vue'),
-    Sidebar: () => import('./components/Sidebar.vue'),
+    RootStats: defineAsyncComponent(() => import('./components/RootStats.vue')),
+    Sidebar: defineAsyncComponent(() => import('./components/Sidebar.vue')),
     StacLink,
-    Source: () => import('./components/Source.vue')
+    StacSource: defineAsyncComponent(() => import('./components/StacSource.vue'))
   },
   props: {
     ...Props
   },
   data() {
     return {
-      sidebar: false,
+      sidebar: null,
       error: null,
       onDataLoaded: null
     };
@@ -219,6 +166,10 @@ export default {
         return "";
       }
     },
+    poweredByText() {
+      const link = `<a href="https://github.com/radiantearth/stac-browser" target="_blank">STAC Browser</a> ${this.browserVersion}`;
+      return this.$t('poweredBy', { link });
+    },
     isSearchPage() {
       return this.$route.name === 'search';
     },
@@ -226,7 +177,7 @@ export default {
       return this.$route.name !== 'select';
     },
     authIcon() {
-      return this.isLoggedIn ? 'b-icon-unlock' : 'b-icon-lock';
+      return this.isLoggedIn ? BIconUnlock : BIconLock;
     },
     authTitle() {
       return this.authMethod.getButtonTitle();
@@ -332,14 +283,9 @@ export default {
           return;
         }
 
-        // Set the locale for vue-i18n
-        this.$root.$i18n.locale = locale;
-
         // Update the HTML lang tag
         document.documentElement.setAttribute("lang", locale);
         document.getElementById('og-locale').setAttribute("content", locale);
-
-        this.$root.$emit('uiLanguageChanged', locale);
       }
     },
     dataLanguage: {
@@ -389,7 +335,7 @@ export default {
         }
 
         this.$router.replace({ query }).catch(error => {
-          if (!VueRouter.isNavigationFailure(error, VueRouter.NavigationFailureType.duplicated)) {
+          if (!isNavigationFailure(error, NavigationFailureType.duplicated)) {
             throw Error(error);
           }
         });
@@ -436,10 +382,9 @@ export default {
     }
   },
   async created() {
-    this.$router.onReady(() => {
-      this.detectLocale();
-      this.parseQuery(this.$route);
-    });
+    // In Vue Router 4, the router is immediately ready, no need for onReady
+    this.detectLocale();
+    this.parseQuery(this.$route);
 
     this.$router.afterEach((to, from) => {
       if (to.path === from.path) {
@@ -472,8 +417,7 @@ export default {
       await this.$store.dispatch('config', { authConfig });
     }
   },
-  mounted() {
-    this.$root.$on('error', this.showError);
+  mounted() {    
     setInterval(() => this.$store.dispatch('loadBackground', 3), 200);
   },
   methods: {
@@ -592,13 +536,13 @@ export default {
       this.$store.commit('showGlobalError', null);
     }
   }
-};
+});
 </script>
 
 <style lang="scss">
 @import "./theme/variables.scss";
-@import '~bootstrap/scss/bootstrap.scss';
-@import '~bootstrap-vue/src/index.scss';
+@import '~bootstrap/scss/bootstrap';
+@import '~bootstrap-vue-next/dist/bootstrap-vue-next.css';
 @import "./theme/page.scss";
 @import "./theme/custom.scss";
 </style>

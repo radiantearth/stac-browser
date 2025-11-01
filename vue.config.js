@@ -2,6 +2,10 @@ const yargs = require('yargs/yargs');
 const { hideBin } = require('yargs/helpers');
 const path = require('path');
 const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
+const Icons = require('unplugin-icons/webpack');
+const Components = require('unplugin-vue-components/webpack');
+const IconsResolver = require('unplugin-icons/resolver');
+const { BootstrapVueNextResolver } = require('bootstrap-vue-next/resolvers');
 
 const { properties } = require('./config.schema.json');
 const pkgFile = require('./package.json');
@@ -34,10 +38,24 @@ const vueConfig = {
   productionSourceMap: !mergedConfig.noSourceMaps,
   publicPath: mergedConfig.pathPrefix,
   chainWebpack: webpackConfig => {
+    // Vue 3 template compiler options - using defaults for pure Vue 3
+    webpackConfig.module
+      .rule('vue')
+      .use('vue-loader')
+      .tap(options => {
+        if (!options.compilerOptions) {
+          options.compilerOptions = {};
+        }
+        // Preserve whitespace behavior from Vue 2
+        options.compilerOptions.whitespace = 'preserve';
+        return options;
+      });
+
     webpackConfig.plugin('define').tap(args => {
       args[0].STAC_BROWSER_VERSION = JSON.stringify(pkgFile.version);
       args[0].CONFIG_PATH = JSON.stringify(configFile);
       args[0].CONFIG_CLI = JSON.stringify(argv);
+      args[0].__VUE_OPTIONS_API__ = true;
       return args;
     });
 
@@ -56,14 +74,54 @@ const vueConfig = {
     plugins: [
       new NodePolyfillPlugin({
         includeAliases: ['Buffer', 'path']
-      })
+      }),
+      Components({
+        dirs: [],
+        globs: [],
+        resolvers: [
+          BootstrapVueNextResolver({
+            components: {
+              'BContainer': true,
+              'BRow': true,
+              'BCol': true,
+              'BAlert': true,
+              'BButton': true,
+              'BButtonGroup': true,
+              'BBadge': true,
+              'BDropdown': true,
+              'BDropdownItem': true,
+              'BForm': true,
+              'BFormGroup': true,
+              'BFormInput': true,
+              'BFormSelect': true,
+              'BFormCheckbox': true,
+              'BFormRadio': true,
+              'BFormRadioGroup': true,
+              'BInputGroup': true,
+              'BListGroup': true,
+              'BListGroupItem': true,
+              'BPopover': true,
+              'BSpinner': true,
+            }
+          }), // Auto-register Bootstrap components
+          IconsResolver({ 
+            prefix: false,
+            enabledCollections: ['bi'],
+            alias: {
+              'b-icon': 'bi'
+            }
+          })
+        ]
+      }),
+      Icons({
+        compiler: 'vue3',
+      }),
     ]
   },
   pluginOptions: {
     i18n: {
       locale: mergedConfig.locale,
       fallbackLocale: mergedConfig.fallbackLocale,
-      enableInSFC: false
     }
   }
 };

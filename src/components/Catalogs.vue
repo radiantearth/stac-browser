@@ -1,41 +1,46 @@
 <template>
   <section class="catalogs mb-4">
     <header>
-      <h2 class="title mr-2">{{ title }}</h2>
-      <b-badge v-if="catalogCount !== null" pill variant="secondary" class="mr-4">{{ catalogCount }}</b-badge>
-      <ViewButtons class="mr-2" v-model="view" />
+      <h2 class="title me-2">{{ title }}</h2>
+      <b-badge v-if="catalogCount !== null" pill variant="secondary" class="me-4">{{ catalogCount }}</b-badge>
+      <ViewButtons class="me-2" v-model="view" />
       <SortButtons v-if="isComplete && catalogs.length > 1" v-model="sort" />
     </header>
     <section v-if="isComplete && catalogs.length > 1" class="catalog-filter mb-2">
       <SearchBox v-model="searchTerm" :placeholder="filterPlaceholder" />
       <multiselect
-        v-if="allKeywords.length > 0" v-model="selectedKeywords" multiple :options="allKeywords"
+        v-if="allKeywords.length > 0"
+        v-model="selectedKeywords"
+        :options="allKeywords"
+        :multiple="true"
         :placeholder="$t('multiselect.keywordsPlaceholder')"
-        :selectLabel="$t('multiselect.selectLabel')"
-        :selectedLabel="$t('multiselect.selectedLabel')"
-        :deselectLabel="$t('multiselect.deselectLabel')"
-        :limitText="limitText"
+        :select-label="$t('multiselect.selectLabel')"
+        :selected-label="$t('multiselect.selectedLabel')"
+        :deselect-label="$t('multiselect.deselectLabel')"
+        :limit-text="limitText"
       />
     </section>
     <Pagination v-if="showPagination" ref="topPagination" class="mb-3" :pagination="pagination" placement="top" @paginate="paginate" />
     <b-alert v-if="hasSearchCritera && catalogView.length === 0" variant="warning" class="mt-2" show>{{ $t('catalogs.noMatches') }}</b-alert>
     <section class="list">
       <Loading v-if="loading" fill top />
-      <component :is="cardsComponent" v-bind="cardsComponentProps">
+      <div :class="view === 'list' ? 'card-list' : 'card-columns'">
         <Catalog v-for="catalog in catalogView" :catalog="catalog" :key="catalog.href">
           <template #footer="{data}">
             <slot name="catalogFooter" :data="data" />
           </template>
         </Catalog>
-      </component>
+      </div>
     </section>
     <Pagination v-if="showPagination" class="mb-3" :pagination="pagination" @paginate="paginate" />
-    <b-button v-else-if="hasMore" @click="loadMore" variant="primary" v-b-visible.300="loadMore">{{ $t('catalogs.loadMore') }}</b-button>
+    <b-button v-else-if="hasMore" @click="loadMore" variant="primary" v-visible.300="loadMore">{{ $t('catalogs.loadMore') }}</b-button>
   </section>
 </template>
 
 <script>
 import { mapGetters, mapState } from 'vuex';
+import { defineComponent, defineAsyncComponent } from 'vue';
+
 import Catalog from './Catalog.vue';
 import Loading from './Loading.vue';
 import { getDisplayTitle } from '../models/stac';
@@ -43,15 +48,15 @@ import { STAC } from 'stac-js';
 import ViewButtons from './ViewButtons.vue';
 import Utils from '../utils';
 
-export default {
+export default defineComponent({
   name: "Catalogs",
   components: {
     Catalog,
     Loading,
-    Pagination: () => import('./Pagination.vue'),
-    SearchBox: () => import('./SearchBox.vue'),
-    SortButtons: () => import('./SortButtons.vue'),
-    Multiselect: () => import('vue-multiselect'),
+    Multiselect: defineAsyncComponent(() => import('vue-multiselect')),
+    Pagination: defineAsyncComponent(() => import('./Pagination.vue')),
+    SearchBox: defineAsyncComponent(() => import('./SearchBox.vue')),
+    SortButtons: defineAsyncComponent(() => import('./SortButtons.vue')),
     ViewButtons
   },
   props: {
@@ -84,6 +89,7 @@ export default {
       default: null
     }
   },
+  emits: ['loadMore', 'paginate'],
   data() {
     return {
       searchTerm: '',
@@ -186,23 +192,6 @@ export default {
       }
       return keywords.sort();
     },
-    cardsComponent() {
-      return (this.view === 'list') ? 'div' : 'b-card-group';
-    },
-    cardsComponentProps() {
-      if (this.view === 'list') {
-        return {
-          class: [
-            'card-list'
-          ]
-        };
-      }
-      else {
-        return {
-          columns: true
-        };
-      }
-    },
     view: {
       get() {
         return this.$store.state.cardViewMode;
@@ -234,7 +223,7 @@ export default {
       return this.$t("multiselect.andMore", {count});
     }
   }
-};
+});
 </script>
 
 <style lang="scss" scoped>

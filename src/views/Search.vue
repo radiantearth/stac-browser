@@ -27,7 +27,7 @@
         <b-alert v-else-if="results.length === 0" variant="warning" show>{{ $t('search.noItemsFound') }}</b-alert>
         <template v-else>
           <div id="search-map" v-if="itemCollection">
-            <Map :stac="parent" :items="itemCollection" onfocusOnly popover />
+            <MapView :stac="parent" :items="itemCollection" onfocusOnly popover />
           </div>
           <Catalogs
             v-if="isCollectionSearch" :catalogs="results" collectionsOnly
@@ -39,7 +39,7 @@
                 <b-button v-if="itemSearch" variant="outline-primary" :pressed="selectedCollections[slot.data.id]" @click="selectForItemSearch(slot.data)">
                   <b-icon-check-square v-if="selectedCollections[slot.data.id]" />
                   <b-icon-square v-else />
-                  <span class="ml-2">{{ $t('search.selectForItemSearch') }}</span>
+                  <span class="ms-2">{{ $t('search.selectForItemSearch') }}</span>
                 </b-button>
                 <StacLink :button="{variant: 'outline-primary', disabled: !canFilterItems(slot.data)}" :data="slot.data" :title="$t('search.filterCollection')" :state="{itemFilterOpen: 1}" />
               </b-button-group>
@@ -63,30 +63,29 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from "vuex";
 import Utils from '../utils';
 import SearchFilter from '../components/SearchFilter.vue';
 import Loading from '../components/Loading.vue';
 import ErrorAlert from '../components/ErrorAlert.vue';
 import { getDisplayTitle, createSTAC, ItemCollection } from '../models/stac';
 import { STAC } from 'stac-js';
-import { BIconCheckSquare, BIconSquare, BTabs, BTab } from 'bootstrap-vue';
+import { defineComponent, defineAsyncComponent } from 'vue';
 import { getErrorCode, getErrorMessage, processSTAC, stacRequest } from '../store/utils';
+import { mapGetters, mapState } from "vuex";
+import { BTab, BTabs } from 'bootstrap-vue-next';
 
-export default {
+export default defineComponent({
   name: "Search",
   components: {
-    BIconCheckSquare,
-    BIconSquare,
-    BTab,
-    BTabs,
     Catalogs: () => import('../components/Catalogs.vue'),
+    BTabs,
+    BTab,
     ErrorAlert,
     Loading,
-    Items: () => import('../components/Items.vue'),
-    Map: () => import('../components/Map.vue'),
     SearchFilter,
-    StacLink: () => import('../components/StacLink.vue')
+    Items: defineAsyncComponent(() => import('../components/Items.vue')),
+    MapView: defineAsyncComponent(() => import('../components/MapView.vue')),
+    StacLink: defineAsyncComponent(() => import('../components/StacLink.vue'))
   },
   props: {
     loadParent: {
@@ -224,16 +223,16 @@ export default {
   },
   methods: {
     openItemSearch() {
-      this.$set(this.itemFilters, 'collections', Object.keys(this.selectedCollections));
+      this.itemFilters.collections = Object.keys(this.selectedCollections);
       this.activeSearch = 1;
       this.selectedCollections = {};
     },
     selectForItemSearch(collection) {
       if (this.selectedCollections[collection.id]) {
-        this.$delete(this.selectedCollections, collection.id);
+        delete this.selectedCollections[collection.id];
       }
       else {
-        this.$set(this.selectedCollections, collection.id, true);
+        this.selectedCollections[collection.id] = true;
       }
     },
     canFilterItems(data) {
@@ -293,7 +292,7 @@ export default {
       });
     }
   }
-};
+});
 </script>
 
 <style lang="scss">
@@ -319,7 +318,7 @@ export default {
   }
 
   .left {
-    min-width: 350px;
+    min-width: 420px;
     flex-basis: 40%;
   }
   .right {

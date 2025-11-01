@@ -8,11 +8,14 @@
 
         <b-form-group v-if="canFilterFreeText" class="filter-freetext" :label="$t('search.freeText')" :label-for="ids.q" :description="$t('search.freeTextDescription')">
           <multiselect
-            :id="ids.q" :value="query.q" @input="setSearchTerms"
-            multiple taggable :options="query.ids"
+            :id="ids.q"
+            v-model="query.q"
+            :multiple="true"
+            :taggable="true"
+            :options="query.q"
             :placeholder="$t('search.enterSearchTerms')"
-            :tagPlaceholder="$t('search.addSearchTerm')"
-            :noOptions="$t('search.addSearchTerm')"
+            :tag-placeholder="$t('search.addSearchTerm')"
+            :no-options="$t('search.addSearchTerm')"
             @tag="addSearchTerm"
           >
             <template #noOptions>{{ $t('search.noOptions') }}</template>
@@ -20,9 +23,13 @@
         </b-form-group>
 
         <b-form-group v-if="canFilterExtents" class="filter-datetime" :label="$t('search.temporalExtent')" :label-for="ids.datetime" :description="$t('search.dateDescription')">
-          <date-picker
-            range type="datetime" v-model="datetime" input-class="form-control mx-input"
-            :id="ids.datetime" :lang="datepickerLang" :format="dateTimeFormat"
+          <VueDatePicker
+            :id="ids.datetime" v-model="datetime" range :format="dateTimeFormat"
+            :locale="uiLanguage" :format-locale="datepickerLang"
+            input-class="form-control mx-input"
+            :enable-time-picker="true" :time-picker-inline="false" :time-picker-seconds="true" auto-apply
+            :clearable="true" :close-on-scroll="false"
+            multi-calendars="2" :placeholder="$t('search.selectDateRange')"
           />
         </b-form-group>
 
@@ -33,8 +40,8 @@
 
         <b-form-group v-if="conformances.CollectionIdFilter" class="filter-collection" :label="$tc('stacCollection', collections.length)" :label-for="ids.collections">
           <multiselect
+            v-model="selectedCollections"
             v-bind="collectionSelectOptions"
-            @input="setCollections"
             @tag="addCollection"
             @search-change="searchCollections"
           >
@@ -51,11 +58,14 @@
 
         <b-form-group v-if="conformances.ItemIdFilter" class="filter-item-id" :label="$t('search.itemIds')" :label-for="ids.ids">
           <multiselect
-            :id="ids.ids" :value="query.ids" @input="setIds"
-            multiple taggable :options="query.ids"
+            :id="ids.ids"
+            v-model="query.ids"
+            :multiple="true"
+            :taggable="true"
+            :options="query.ids"
             :placeholder="$t('search.enterItemIds')"
-            :tagPlaceholder="$t('search.addItemIds')"
-            :noOptions="$t('search.addItemIds')"
+            :tag-placeholder="$t('search.addItemIds')"
+            :no-options="$t('search.addItemIds')"
             @tag="addId"
           >
             <template #noOptions>{{ $t('search.noOptions') }}</template>
@@ -65,19 +75,19 @@
         <b-form-group v-if="showAdditionalFilters" class="additional-filters" :label="$t('search.additionalFilters')">
           <b-form-radio-group v-model="filtersAndOr" :options="andOrOptions" name="logical" size="sm" />
 
-          <b-dropdown size="sm" :text="$t('search.addFilter')" block variant="primary" class="queryables mt-2 mb-3" menu-class="w-100">
-            <template v-for="queryable in sortedQueryables">
-              <b-dropdown-item v-if="queryable.supported" :key="queryable.id" @click="additionalFieldSelected(queryable)" link-class="d-flex justify-content-between align-items-center">
+          <b-dropdown size="sm" :text="$t('search.addFilter')" variant="primary" class="queryables mt-2 mb-3" menu-class="w-100" toggle-class="w-100">
+            <template v-for="queryable in sortedQueryables" :key="queryable.id">
+              <b-dropdown-item v-if="queryable.supported" @click="additionalFieldSelected(queryable)" link-class="d-flex justify-content-between align-items-center">
                 <span>{{ queryable.title }}</span>
-                <b-badge variant="dark" class="ml-2">{{ queryable.id }}</b-badge>
+                <b-badge variant="dark" class="ms-2">{{ queryable.id }}</b-badge>
               </b-dropdown-item>
             </template>
           </b-dropdown>
 
           <QueryableInput
             v-for="(filter, index) in filters" :key="filter.id"
-            :value.sync="filter.value"
-            :operator.sync="filter.operator"
+            v-model:value="filter.value"
+            v-model:operator="filter.operator"
             :queryable="filter.queryable"
             :index="index"
             :cql="cql"
@@ -89,21 +99,24 @@
 
         <b-form-group v-if="canSort" class="sort" :label="$t('sort.title')" :label-for="ids.sort" :description="$t('search.notFullySupported')">
           <multiselect
-            :id="ids.sort" :value="sortTerm" @input="sortFieldSet"
-            :options="sortOptions" track-by="value" label="text"
+            :id="ids.sort"
+            v-model="sortTerm"
+            :options="sortOptions"
+            track-by="value"
+            label="text"
             :placeholder="$t('default')"
-            :selectLabel="$t('multiselect.selectLabel')"
-            :selectedLabel="$t('multiselect.selectedLabel')"
-            :deselectLabel="$t('multiselect.deselectLabel')"
+            :select-label="$t('multiselect.selectLabel')"
+            :selected-label="$t('multiselect.selectedLabel')"
+            :deselect-label="$t('multiselect.deselectLabel')"
           >
             <template #option="{option}">
               <span class="d-flex justify-content-between align-items-center">
                 <span>{{ option.text }}</span>
-                <b-badge v-if="option.value" variant="dark" class="ml-2">{{ option.value }}</b-badge>
+                <b-badge v-if="option.value" variant="dark" class="ms-2">{{ option.value }}</b-badge>
               </span>
             </template>
           </multiselect>
-          <SortButtons v-if="sortTerm && sortTerm.value" class="mt-1" :value="sortOrder" enforce @input="sortDirectionSet" />
+          <SortButtons v-if="sortTerm && sortTerm.value" class="mt-1" v-model="sortOrder" :enforce="true" />
         </b-form-group>
 
         <b-form-group class="limit" :label="$t('search.itemsPerPage')" :label-for="ids.limit" :description="$t('search.itemsPerPageDescription', {maxItems})">
@@ -116,16 +129,16 @@
       </b-card-body>
       <b-card-footer>
         <b-button type="submit" variant="primary">{{ $t('submit') }}</b-button>
-        <b-button type="reset" variant="danger" class="ml-3">{{ $t('reset') }}</b-button>
+        <b-button type="reset" variant="danger" class="ms-3">{{ $t('reset') }}</b-button>
       </b-card-footer>
     </b-card>
   </b-form>
 </template>
 
 <script>
-import { BBadge, BDropdown, BDropdownItem, BForm, BFormGroup, BFormInput, BFormCheckbox, BFormRadioGroup } from 'bootstrap-vue';
-import Multiselect from 'vue-multiselect';
+import { defineComponent, defineAsyncComponent } from 'vue';
 import { mapGetters, mapState } from "vuex";
+import { BCard, BCardBody, BCardFooter, BCardTitle } from 'bootstrap-vue-next';
 import refParser from '@apidevtools/json-schema-ref-parser';
 
 import Utils, { schemaMediaType } from '../utils';
@@ -135,8 +148,8 @@ import ApiCapabilitiesMixin, { TYPES } from './ApiCapabilitiesMixin';
 import DatePickerMixin from './DatePickerMixin';
 import Loading from './Loading.vue';
 
-import { CatalogLike, STAC } from 'stac-js';
-import { createSTAC } from '../models/stac'; 
+import { STAC } from 'stac-js'; 
+import { createSTAC, Collection } from '../models/stac';
 import Cql from '../models/cql2/cql';
 import Queryable from '../models/cql2/queryable';
 import CqlValue from '../models/cql2/value';
@@ -172,22 +185,18 @@ function getDefaults() {
 
 let formId = 0;
 
-export default {
+export default defineComponent({
   name: 'SearchFilter',
   components: {
-    BBadge,
-    BDropdown,
-    BDropdownItem,
-    BForm,
-    BFormGroup,
-    BFormInput,
-    BFormCheckbox,
-    BFormRadioGroup,
-    QueryableInput: () => import('./QueryableInput.vue'),
     Loading,
-    MapSelect: () => import('./maps/MapSelect.vue'),
-    SortButtons: () => import('./SortButtons.vue'),
-    Multiselect
+    BCard,
+    BCardBody,
+    BCardFooter,
+    BCardTitle,
+    QueryableInput: defineAsyncComponent(() => import('./QueryableInput.vue')),
+    MapSelect: defineAsyncComponent(() => import('./maps/MapSelect.vue')),
+    SortButtons: defineAsyncComponent(() => import('./SortButtons.vue')),
+    Multiselect: defineAsyncComponent(() => import('vue-multiselect')),
   },
   mixins: [
     ApiCapabilitiesMixin,
@@ -211,6 +220,7 @@ export default {
       default: () => ({})
     }
   },
+  emits: ['input'],
   data() {
     return Object.assign({
       results: null,
@@ -230,7 +240,6 @@ export default {
       let isResult = this.collections.length > 0 && !this.hasAllCollections;
       return {
         id: this.ids.collections,
-        value: this.selectedCollections,
         multiple: true,
         taggable,
         options: this.collections, // query.collections
@@ -248,7 +257,7 @@ export default {
       };
     },
     collectionSearchLink() {
-      return this.parent instanceof CatalogLike && this.parent.getApiCollectionsLink();
+      return this.parent && this.parent.isCatalogLike() && this.parent.getApiCollectionsLink();
     },
     canSearchCollectionsFreeText() {
       return this.canSearchCollections && this.supportsConformance(TYPES.Collections.FreeText);
@@ -319,10 +328,10 @@ export default {
     parent: {
       immediate: true,
       handler(newStac, oldStac) {
-        if (newStac instanceof STAC) {
+        if (newStac instanceof Collection) {
           newStac.setApiDataListener('searchfilter' + formId, () => this.updateApiCollections());
         }
-        if (oldStac instanceof STAC) {
+        if (oldStac instanceof Collection) {
           oldStac.setApiDataListener('searchfilter' + formId);
         }
         this.updateApiCollections();
@@ -352,6 +361,12 @@ export default {
           // map had been hidden accidentally.
           this.bbox = query.bbox;
         }
+      }
+    },
+    selectedCollections: {
+      deep: 1,
+      handler(collections) {
+        this.query.collections = collections.map(c => c.value);
       }
     },
     provideBBox(shown) {
@@ -409,6 +424,7 @@ export default {
         try {
           const link = Utils.addFiltersToLink(this.collectionSearchLink, {q: [text]});
           const response = await stacRequest(this.$store, link);
+          
           // Only set collections if response is valid AND collectionsLoadingTimer has not been reset.
           // If collectionsLoadingTimer has been reset, the result is not relevant anylonger.
           if (this.collectionsLoadingTimer && Utils.isObject(response.data) && Array.isArray(response.data.collections)) {
@@ -438,6 +454,7 @@ export default {
       }
       else if (this.type === 'Global' || this.type === 'Collections') {
         let response = await stacRequest(this.$store, link);
+        
         if (!Utils.isObject(response.data)) {
           return {};
         }
@@ -514,12 +531,6 @@ export default {
           .map(([key, schema]) => new Queryable(key, schema));
       }
     },
-    sortFieldSet(value) {
-      this.sortTerm = value;
-    },
-    sortDirectionSet(value) {
-      this.sortOrder = value;
-    },
     buildFilter() {
       if (this.filters.length === 0) {
         return null;
@@ -534,6 +545,7 @@ export default {
     additionalFieldSelected(queryable) {
       const operators = queryable.getOperators(this.cql);
       this.filters.push({
+        id: `${queryable.id}-${Date.now()}-${Math.random()}`, // Unique ID
         value: CqlValue.create(queryable.defaultValue),
         operator: operators[0],
         queryable
@@ -541,10 +553,10 @@ export default {
     },
     onSubmit() {
       if (this.canSort && this.sortTerm && this.sortOrder) {
-        this.$set(this.query, 'sortby', this.formatSort());
+        this.query.sortby = this.formatSort();
       }
       let filters = this.buildFilter();
-      this.$set(this.query, 'filters', filters);
+      this.query.filters = filters;
       this.$emit('input', this.query, false);
     },
     async onReset() {
@@ -559,16 +571,13 @@ export default {
       else if (typeof limit !== 'number' || isNaN(limit) || limit < 1) {
         limit = null;
       }
-      this.$set(this.query, 'limit', limit);
+      this.query.limit = limit;
     },
     addSearchTerm(term) {
       if (!Utils.hasText(term)) {
         return;
       }
       this.query.q.push(term);
-    },
-    setSearchTerms(terms) {
-      this.$set(this.query, 'q', terms);
     },
     addCollection(collection) {
       if (!this.collectionSelectOptions.taggable) {
@@ -580,15 +589,8 @@ export default {
       this.collections.push(opt);
       this.query.collections.push(collection);
     },
-    setCollections(collections) {
-      this.selectedCollections = collections;
-      this.$set(this.query, 'collections', collections.map(c => c.value));
-    },
     addId(id) {
       this.query.ids.push(id);
-    },
-    setIds(ids) {
-      this.$set(this.query, 'ids', ids);
     },
     formatSort() {
       if (this.sortTerm && this.sortTerm.value && this.sortOrder) {
@@ -600,17 +602,17 @@ export default {
       }
     }
   }
-};
+});
 </script>
 
 <style lang="scss">
 @import '../theme/variables.scss';
 
 // Datepicker related style
-$default-color: map-get($theme-colors, "secondary");
-$primary-color: map-get($theme-colors, "primary");
+$default-color: $secondary;
+$primary-color: $primary;
 
-@import '~vue2-datepicker/scss/index.scss';
+@import '@vuepic/vue-datepicker/dist/main.css';
 
 .queryables .dropdown-menu {
   max-height: 90vh;
@@ -620,18 +622,24 @@ $primary-color: map-get($theme-colors, "primary");
 // General item filter style
 .filter {
   position: relative;
+  min-width: 400px;
 
   .mx-datepicker {
     width: 100%;
   }
 
-  .form-group {
-    > div {
-      margin-left: 1em;
+  .b-form-group {
+    padding-left: 1em;
+    margin-bottom: 1em;
+
+    > label,
+    > legend {
+      margin-left: -1em;
+      font-weight: 600;
     }
 
-    > label {
-      font-weight: 600;
+    > small {
+      display: block;
     }
   }
 }

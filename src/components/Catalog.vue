@@ -1,14 +1,14 @@
 <template>
-  <b-card no-body :class="classes" v-b-visible.400="load" :img-right="isList">
-    <b-card-img-lazy v-if="hasImage" class="thumbnail" offset="200" v-bind="thumbnail" />
+  <b-card no-body :class="classes" v-visible.400="load" :img-placement="isList ? 'end' : undefined">
+    <b-card-img v-if="hasImage" class="thumbnail" v-bind="thumbnail" lazy />
     <b-card-body>
       <b-card-title>
         <StacLink :data="[data, catalog]" class="stretched-link" />
       </b-card-title>
       <b-card-text v-if="data && (fileFormats.length > 0 || data.description || data.deprecated)" class="intro">
-        <b-badge v-if="data.deprecated" variant="warning" class="mr-1 mt-1 deprecated">{{ $t('deprecated') }}</b-badge>
-        <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="mr-1 mt-1 fileformat">{{ format | formatMediaType }}</b-badge>
-        {{ data.description | summarize }}
+        <b-badge v-if="data.deprecated" variant="warning" class="me-1 mt-1 deprecated">{{ $t('deprecated') }}</b-badge>
+        <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="me-1 mt-1 fileformat">{{ formatMediaType(format) }}</b-badge>
+        {{ summarizeDescription(data.description) }}
       </b-card-text>
       <Keywords v-if="showKeywordsInCatalogCards && keywords.length > 0" :keywords="keywords" variant="primary" :center="!isList" />
       <b-card-text v-if="temporalExtent" class="datetime"><small v-html="temporalExtent" /></b-card-text>
@@ -20,6 +20,7 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
 import { mapState, mapGetters } from 'vuex';
 import FileFormatsMixin from './FileFormatsMixin';
 import StacFieldsMixin from './StacFieldsMixin';
@@ -28,16 +29,19 @@ import StacLink from './StacLink.vue';
 import { STAC } from 'stac-js';
 import { formatMediaType, formatTemporalExtent } from '@radiantearth/stac-fields/formatters';
 import Utils from '../utils';
+import { BCard, BCardBody, BCardFooter, BCardImg, BCardText, BCardTitle } from 'bootstrap-vue-next';
 
 export default {
   name: 'Catalog',
   components: {
+    BCard,
+    BCardBody,
+    BCardFooter,
+    BCardImg,
+    BCardText,
+    BCardTitle,
     StacLink,
-    Keywords: () => import('./Keywords.vue')
-  },
-  filters: {
-    summarize: text => Utils.summarizeMd(text, 300),
-    formatMediaType: value => formatMediaType(value, null, {shorten: true})
+    Keywords: defineAsyncComponent(() => import('./Keywords.vue'))
   },
   mixins: [
     FileFormatsMixin,
@@ -93,7 +97,13 @@ export default {
       if (this.catalog instanceof STAC) {
         return;
       }
-      this.$store.commit(visible ? 'queue' : 'unqueue', this.catalog.href);
+      this.$store.commit(visible ? 'queue' : 'unqueue', this.catalog.getAbsoluteUrl());
+    },
+    summarizeDescription(text) {
+      return Utils.summarizeMd(text, 300);
+    },
+    formatMediaType(value) {
+      return formatMediaType(value, null, {shorten: true});
     }
   }
 };
@@ -119,9 +129,15 @@ export default {
     .card-footer:empty {
       display: none;
     }
-    .card-title {
-      margin-bottom: 0.5rem;
+    
+    /* Card image base styling */
+    .card-img-top,
+    .card-img-end,
+    .card-img-start {
+      object-fit: contain;
+      object-position: center;
     }
+    
     .intro {
       display: -webkit-box;
       -webkit-line-clamp: 3;
@@ -137,7 +153,7 @@ export default {
       }
     }
     .datetime {
-      color: map-get($theme-colors, "secondary");
+      color: $secondary;
     }
     .badge.deprecated {
       text-transform: uppercase;
@@ -149,13 +165,13 @@ export default {
       margin: 0.5em 0;
       display: flex;
 
-      .card-img-right {
+      .card-img-end {
         min-height: 100px;
         height: 100%;
         max-height: 8.5rem;
         max-width: 33%;
         object-fit: contain;
-        object-position: right;
+        object-position: center right;
       }
       .card-footer {
         min-width: 175px;
@@ -164,7 +180,7 @@ export default {
       }
       .intro {
         -webkit-line-clamp: 2;
-        line-clamp: 3;
+        line-clamp: 2;
       }
     }
   }
@@ -177,11 +193,13 @@ export default {
       &.queued {
         min-height: 10rem;
       }
-      .card-img {
+      .card-img-top {
         width: auto;
         height: auto;
         max-width: 100%;
         max-height: 300px;
+        object-fit: contain;
+        object-position: center;
       }
       .card-title {
         text-align: center;

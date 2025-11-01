@@ -9,7 +9,7 @@
         </b-card-body>
         <b-card-footer>
           <b-button type="submit" variant="primary">{{ t('submit') }}</b-button>
-          <b-button type="reset" variant="danger" class="ml-3">{{ t('cancel') }}</b-button>
+          <b-button type="reset" variant="danger" class="ms-3">{{ t('cancel') }}</b-button>
         </b-card-footer>
       </b-card>
     </b-form>
@@ -18,16 +18,17 @@
 
 <script>
 import Description from '../Description.vue';
-import { BForm, BFormInput } from 'bootstrap-vue';
 import i18n from '../../i18n';
 import { mapGetters } from 'vuex';
+import { BCard, BCardBody, BCardFooter } from 'bootstrap-vue-next';
 
 export default {
   name: 'ApiKey',
   components: {
-    BForm,
-    BFormInput,
-    Description
+    Description,
+    BCard,
+    BCardBody,
+    BCardFooter
   },
   props: {
     description: {
@@ -39,6 +40,7 @@ export default {
       default: ''
     }
   },
+  emits: ['submit', 'reset'],
   data() {
     return {
       token: '',
@@ -67,7 +69,7 @@ export default {
   },
   methods: {
     t(key) {
-      return i18n.t(key);
+      return i18n.global.t(key);
     },
     reset() {
       this.$emit('reset');
