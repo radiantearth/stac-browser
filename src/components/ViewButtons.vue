@@ -12,7 +12,7 @@
 <script>
 
 export default {
-  name: "SortButtons",
+  name: "ViewButtons",
   props: {
     modelValue: {
       type: String,
