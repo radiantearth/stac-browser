@@ -23,7 +23,7 @@ export default defineComponent({
       return getErrorCode(this.error);
     },
     errorDescription() {
-      return getErrorMessage(this.error);
+      return getErrorMessage(this.$i18n, this.error);
     },
     isExternal() {
       return URI(this.path).is("absolute");

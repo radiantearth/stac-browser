@@ -17,16 +17,20 @@ export default class CqlOperator {
     };
   }
 
+  // Returns a locale key for long label, or null if not available.
   static get description() {
-    return "";
+    return null;
   }
 
+  // Returns a string that is internationally understood.
+  // This does not get localized.
   static get label() {
     return this.SYMBOL;
   }
 
+  // Returns a locale key for long label, or null if not available.
   static get longLabel() {
-    return this.label;
+    return null;
   }
 
 }

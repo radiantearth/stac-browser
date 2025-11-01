@@ -1,3 +1,5 @@
-import init from "./init";
+import createStacBrowser from "./app";
+import config from './config';
 
-init();
+createStacBrowser(config, STAC_BROWSER_VERSION)
+  .then(app => app.mount("body"));

@@ -1,11 +1,10 @@
 import Auth from "./index";
-import i18n from '../i18n';
 import Utils from "../utils";
 
 export default class BasicAuth extends Auth {
 
-  constructor(router, options, changeListener) {
-    super(router, options, changeListener);
+  constructor(router, i18n, options, changeListener) {
+    super(router, i18n, options, changeListener);
   }
 
   getComponent() {
@@ -19,7 +18,7 @@ export default class BasicAuth extends Auth {
   }
 
   getButtonTitle() {
-  return i18n.global.t('authentication.button.title');
+    return this.i18n.t('authentication.button.title');
   }
 
   async logout(/*credentials*/) {

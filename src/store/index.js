@@ -2,7 +2,7 @@ import { createStore } from "vuex";
 
 import URI from "urijs";
 
-import i18n, { getDataLanguages, translateFields, executeCustomFunctions, loadMessages } from '../i18n';
+import { getDataLanguages, translateFields, executeCustomFunctions, loadMessages } from '../i18n';
 import Utils, { BrowserError } from '../utils';
 import { addMissingChildren, getDisplayTitle, createSTAC } from '../models/stac';
 import { CatalogLike, STAC } from 'stac-js';
@@ -14,7 +14,7 @@ import fieldsI18n from '@radiantearth/stac-fields/I18N';
 import { TYPES } from "../components/ApiCapabilitiesMixin";
 import BrowserStorage from "../browser-store.js";
 
-function getStore(config, router) {
+function getStore(config, router, i18n) {
   // Local settings (e.g. for currently loaded STAC entity)
   const localDefaults = () => ({
     url: '',
@@ -52,7 +52,7 @@ function getStore(config, router) {
   return createStore({
     strict: import.meta.env.NODE_ENV !== 'production',
     modules: {
-      auth: auth(router)
+      auth: auth(router, i18n)
     },
     state: Object.assign({}, config, localDefaults(), catalogDefaults(), {
       // Global settings
@@ -404,7 +404,7 @@ function getStore(config, router) {
         }
       },
       languages(state, {uiLanguage, dataLanguage}) {
-        i18n.global.locale = uiLanguage;
+        i18n.locale = uiLanguage;
         state.dataLanguage = dataLanguage || null;
         state.uiLanguage = uiLanguage || null;
       },
@@ -506,7 +506,7 @@ function getStore(config, router) {
         if (status instanceof Loading && status.show) {
           state.loading = false;
           state.page = () => ({
-            title: i18n.global.t('errors.title')
+            title: i18n.t('errors.title')
           });
         }
         if (!(error instanceof Error)) {
@@ -641,14 +641,14 @@ function getStore(config, router) {
         const dataLanguage = getBest(dataLanguageCodes, locale, dataLanguageFallback);
 
         // Load messages
-        await loadMessages(uiLanguage);
+        await loadMessages(i18n, uiLanguage);
 
         // Update stac-fields
         fieldsI18n.setLocales([uiLanguage, cx.state.fallbackLocale]);
-        fieldsI18n.setTranslator(translateFields);
+        fieldsI18n.setTranslator((value, vars) => translateFields(i18n, value, vars));
 
         // Execute other custom functions required to localize
-        await executeCustomFunctions(uiLanguage);
+        await executeCustomFunctions(i18n, uiLanguage);
 
         cx.commit('languages', {dataLanguage, uiLanguage});
         cx.commit('setQueryParameter', { type: 'state', key: 'language', value: locale });
@@ -694,7 +694,7 @@ function getStore(config, router) {
       },
       async tryLogin(cx, {url, action}) {
         cx.commit('clear', url);
-        cx.commit('errored', { url, error: new BrowserError(i18n.global.t('authentication.unauthorized')) });
+        cx.commit('errored', { url, error: new BrowserError(i18n.t('authentication.unauthorized')) });
         if (action) {
           cx.commit('auth/addAction', action);
         }
@@ -733,7 +733,7 @@ function getStore(config, router) {
           try {
             const response = await stacRequest(cx, url);
             if (!Utils.isObject(response.data)) {
-              throw new BrowserError(i18n.global.t('errors.invalidJsonObject'));
+              throw new BrowserError(i18n.t('errors.invalidJsonObject'));
             }
             data = createSTAC(response.data, url, path);
             cx.commit('loaded', { url, data });
@@ -778,7 +778,7 @@ function getStore(config, router) {
             await cx.dispatch('loadNextApiCollections', args);
           } catch (error) {
             cx.commit('showGlobalError', {
-              message: i18n.global.t('errors.loadApiCollectionsFailed'),
+              message: i18n.t('errors.loadApiCollectionsFailed'),
               error
             });
           }
@@ -790,7 +790,7 @@ function getStore(config, router) {
             await cx.dispatch('loadApiItems', args);
           } catch (error) {
             cx.commit('showGlobalError', {
-              message: i18n.global.t('errors.loadApiItemsFailed'),
+              message: i18n.t('errors.loadApiItemsFailed'),
               error
             });
           }
@@ -835,7 +835,7 @@ function getStore(config, router) {
 
           let response = await stacRequest(cx, link);
           if (!Utils.isObject(response.data) || !Array.isArray(response.data.features)) {
-            throw new BrowserError(i18n.global.t('errors.invalidStacItems'));
+            throw new BrowserError(i18n.t('errors.invalidStacItems'));
           }
           else {
             response.data.features = response.data.features.map(item => {
@@ -933,7 +933,7 @@ function getStore(config, router) {
         try {
           let response = await stacRequest(cx, link);
           if (!Utils.isObject(response.data) || !Array.isArray(response.data.collections)) {
-            throw new BrowserError(i18n.global.t('errors.invalidStacCollections'));
+            throw new BrowserError(i18n.t('errors.invalidStacCollections'));
           }
           else {
             response.data.collections = response.data.collections.map(collection => {
@@ -991,7 +991,7 @@ function getStore(config, router) {
       async retryAfterAuth(cx) {
         let errorFn = error => cx.commit('showGlobalError', {
           error,
-          message: i18n.global.t('errors.authFailed')
+          message: i18n.t('errors.authFailed')
         });
 
         for (let callback of cx.state.doAuth) {

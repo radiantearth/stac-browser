@@ -1,24 +1,23 @@
 import Auth from '../auth';
-import i18n from '../i18n';
 import AuthUtils from '../components/auth/utils';
 import BrowserStorage, { Cookies } from '../browser-store';
 
-const handleAuthError = async (cx, error) => {
-  cx.commit('showGlobalError', {
-    error,
-    message: i18n.global.t('errors.authFailed')
-  }, { root: true });
-  await cx.dispatch('updateCredentials');
-};
+export default function getStore(router, i18n) {
+  const handleAuthError = async (cx, error) => {
+    cx.commit('showGlobalError', {
+      error,
+      message: i18n.t('errors.authFailed')
+    }, { root: true });
+    await cx.dispatch('updateCredentials');
+  };
 
-export default function getStore(router) {
   return {
     namespaced: true,
     state: {
       // Wrap in a function and use the getter instead of the state
       // Unfortunately, some auth libraries have internal state, which vuex doesn't like
       // and thus reports: "do not mutate vuex store state outside mutation handlers."
-      method: () => new Auth(router),
+      method: () => new Auth(router, i18n),
       actions: [],
       credentials: null,
       inProgress: false
@@ -82,7 +81,7 @@ export default function getStore(router) {
         const storage = new BrowserStorage(true);
         storage.set('authConfig', config);
 
-        const newAuth = await Auth.create(router, config, changeListener);
+        const newAuth = await Auth.create(router, i18n, config, changeListener);
         cx.commit('setMethod', newAuth);
       },
       async requestLogin(cx) {

@@ -72,7 +72,7 @@ export default {
     formatRel(rel) {
       let lc = typeof rel === 'string' ? rel.toLowerCase() : "";
       if (lc in Fields.links.rel.mapping) {
-        return translateFields(Fields.links.rel.mapping[lc]);
+        return translateFields(this.$i18n, Fields.links.rel.mapping[lc]);
       }
       else {
         if (rel.startsWith(ogcRelPrefix)) {

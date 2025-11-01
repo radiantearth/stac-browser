@@ -13,7 +13,10 @@
           @click="updateOperator(op)"
           button-class="d-flex justify-content-between align-items-center"
         >
-          <span>{{ op.longLabel }}</span>
+          <span>
+            <template v-if="op.longLabel">{{ $t(op.longLabel) }}</template>
+            <template v-else>{{ op.label }}</template>
+          </span>
           <b-badge variant="dark" class="ms-2">{{ op.label }}</b-badge>
         </b-dropdown-item-button>
       </b-dropdown>
@@ -68,9 +71,9 @@
       </b-button>
     </div>
 
-    <div v-if="queryable.description || operator.description" class="queryable-help text-muted small">
-      <Description v-if="operator.description" :description="operator.description" inline />
-      <Description v-if="queryable.description" :description="queryable.description" inline />
+    <div class="queryable-help text-muted small">
+      <Description v-if="operator.description" :description="$t(operator.description)" inline />
+      <Description v-if="queryable.description" :description="$t(queryable.description)" inline />
     </div>
   </div>
 </template>
@@ -207,6 +210,10 @@ export default {
   display: block;
   margin: 0.25em 0 1em 0;
   line-height: 1.1em;
+
+  &:empty {
+    display: none;
+  }
 }
 
 .queryable-group {

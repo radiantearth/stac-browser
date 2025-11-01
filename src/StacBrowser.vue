@@ -1,5 +1,5 @@
 <template>
-  <b-container id="stac-browser">
+  <b-container id="stac-browser" :lang="uiLanguage">
     <Authentication v-if="showLogin" />
     <ErrorAlert v-if="globalError" dismissible class="global-error" v-bind="globalError" @close="hideError" />
     <Sidebar v-if="sidebar !== null" v-model="sidebar" />
@@ -36,7 +36,7 @@
                 <component :is="authIcon" /><span class="button-label">{{ authLabel }}</span>
               </b-button>
               <LanguageChooser
-                :data="data" :currentLocale="localeFromVueX" :locales="supportedLocalesFromVueX"
+                :data="data" :currentLocale="locale" :locales="supportedLocales"
                 @set-locale="locale => switchLocale({locale, userSelected: true})"
               />
             </b-button-group>
@@ -85,7 +85,6 @@
 import { defineComponent, defineAsyncComponent } from 'vue';
 import { isNavigationFailure, NavigationFailureType } from 'vue-router';
 import { mapMutations, mapActions, mapGetters, mapState } from 'vuex';
-import CONFIG from './config';
 
 // Import icons needed for dynamic component usage
 import BIconLock from '~icons/bi/lock';
@@ -95,32 +94,13 @@ import ErrorAlert from './components/ErrorAlert.vue';
 import StacLink from './components/StacLink.vue';
 
 import { CatalogLike, STAC } from 'stac-js';
-import Utils from './utils';
+import Utils, { languageConformance } from './utils';
 import URI from 'urijs';
 
-import { API_LANGUAGE_CONFORMANCE } from './i18n';
 import { getBest, prepareSupported } from 'stac-js/src/locales';
 import BrowserStorage from "./browser-store";
 import Authentication from "./components/Authentication.vue";
 import { getDisplayTitle } from "./models/stac";
-
-// Pass Config through from props to vuex
-let Props = {};
-let Watchers = {};
-for(let key in CONFIG) {
-  Props[key] = {
-    default: ['object', 'function'].includes(typeof CONFIG[key]) ? () => CONFIG[key] : CONFIG[key]
-  };
-  Watchers[key] = {
-    immediate: true,
-    deep: ['object', 'array'].includes(typeof CONFIG[key]),
-    handler: async function(newValue) {
-      await this.$store.dispatch('config', {
-        [key]: newValue
-      });
-    }
-  };
-}
 
 export default defineComponent({
   name: 'StacBrowser',
@@ -136,9 +116,7 @@ export default defineComponent({
     StacLink,
     StacSource: defineAsyncComponent(() => import('./components/StacSource.vue'))
   },
-  props: {
-    ...Props
-  },
+  inject: ['config', 'browserVersion'],
   data() {
     return {
       sidebar: null,
@@ -147,27 +125,15 @@ export default defineComponent({
     };
   },
   computed: {
-    ...mapState(['allowSelectCatalog', 'conformsTo', 'data', 'dataLanguage', 'globalError', 'loading', 'stateQueryParameters', 'uiLanguage', 'url']),
-    ...mapState({
-      catalogImageFromVueX: 'catalogImage',
-      localeFromVueX: 'locale',
-      detectLocaleFromBrowserFromVueX: 'detectLocaleFromBrowser',
-      supportedLocalesFromVueX: 'supportedLocales',
-      storeLocaleFromVueX: 'storeLocale'
-    }),
+    ...mapState(['allowSelectCatalog', 'catalogImage', 'conformsTo', 'data', 'dataLanguage', 'detectLocaleFromBrowser', 'globalError', 'loading', 'locale','stateQueryParameters', 'storeLocale', 'supportedLocales', 'uiLanguage', 'url']),
     ...mapGetters(['canSearch', 'collectionLink', 'description', 'fromBrowserPath', 'isExternalUrl', 'isRoot', 'parentLink', 'root', 'rootLink', 'supportsConformance', 'title', 'toBrowserPath']),
     ...mapGetters('auth', { authMethod: 'method' }),
     ...mapGetters('auth', ['canAuthenticate', 'isLoggedIn', 'showLogin']),
-    browserVersion() {
-      if (typeof STAC_BROWSER_VERSION !== 'undefined') {
-        return STAC_BROWSER_VERSION;
-      }
-      else {
-        return "";
-      }
-    },
     poweredByText() {
-      const link = `<a href="https://github.com/radiantearth/stac-browser" target="_blank">STAC Browser</a> ${this.browserVersion}`;
+      let link = `<a href="https://github.com/radiantearth/stac-browser" target="_blank">STAC Browser</a>`;
+      if (this.browserVersion) {
+        link += ` ${this.browserVersion}`;
+      }
       return this.$t('poweredBy', { link });
     },
     isSearchPage() {
@@ -251,8 +217,8 @@ export default defineComponent({
       return this.getIcon(this.data);
     },
     logo() {
-      if (this.catalogImageFromVueX) {
-        return Utils.createLink(this.catalogImageFromVueX, 'icon', this.rootLink?.title);
+      if (this.catalogImage) {
+        return Utils.createLink(this.catalogImage, 'icon', this.rootLink?.title);
       }
       else {
         return this.getIcon(this.root);
@@ -260,7 +226,6 @@ export default defineComponent({
     }
   },
   watch: {
-    ...Watchers,
     title(title) {
       if (this.root) {
         const rootTitle = getDisplayTitle(this.root);
@@ -269,12 +234,12 @@ export default defineComponent({
         }
       }
       document.title = title;
-      document.getElementById('og-title').setAttribute("content", title);
+      this.setHtmlContent('og-title', title);
     },
     description(description) {
       const summary = Utils.summarizeMd(description, 200);
-      document.getElementById('meta-description').setAttribute("content", summary);
-      document.getElementById('og-description').setAttribute("content", summary);
+      this.setHtmlContent('meta-description', summary);
+      this.setHtmlContent('og-description', summary);
     },
     uiLanguage: {
       immediate: true,
@@ -282,10 +247,7 @@ export default defineComponent({
         if (!locale) {
           return;
         }
-
-        // Update the HTML lang tag
-        document.documentElement.setAttribute("lang", locale);
-        document.getElementById('og-locale').setAttribute("content", locale);
+        this.setHtmlContent('og-locale', locale);
       }
     },
     dataLanguage: {
@@ -301,7 +263,7 @@ export default defineComponent({
             this.$router.push(this.toBrowserPath(link.href));
             this.$store.commit('state', state);
           }
-          else if (this.supportsConformance(API_LANGUAGE_CONFORMANCE)) {
+          else if (this.supportsConformance(languageConformance)) {
             // this.url gets reset with resetCatalog so store the url for use in load
             let url = this.url;
             // Todo: Resetting the catalogs is not ideal. 
@@ -359,7 +321,7 @@ export default defineComponent({
       for(let key of canChange) {
         let value;
         if (doReset) {
-          value = CONFIG[key]; // Original value
+          value = this.config[key]; // Original value
         }
         if (doSet && typeof root['stac_browser'][key] !== 'undefined') {
           value = root['stac_browser'][key]; // Custom value from root
@@ -407,6 +369,7 @@ export default defineComponent({
       this.$store.commit(resetOp);
       this.parseQuery(to);
 
+
       document.getElementById('og-url').setAttribute("content", window.location.href);
     });
 
@@ -424,6 +387,12 @@ export default defineComponent({
     ...mapActions(['switchLocale']),
     ...mapMutations('auth', ['addAction']),
     ...mapActions('auth', ['requestLogin', 'requestLogout']),
+    setHtmlContent(id, value) {
+      const node = document.getElementById(id);
+      if (node) {
+        node.setAttribute("content", value);
+      }
+    },
     getIcon(data) {
       if (data instanceof STAC) {
         const icons = data.getIcons();
@@ -451,13 +420,13 @@ export default defineComponent({
     },
     detectLocale() {
       let locale;
-      if (this.storeLocaleFromVueX) {
+      if (this.storeLocale) {
         const storage = new BrowserStorage();
         locale = storage.get('locale');
       }
-      if (!locale && this.detectLocaleFromBrowserFromVueX && Array.isArray(navigator.languages)) {
+      if (!locale && this.detectLocaleFromBrowser && Array.isArray(navigator.languages)) {
         // Detect the most suitable locale
-        const supported = prepareSupported(this.supportedLocalesFromVueX);
+        const supported = prepareSupported(this.supportedLocales);
         for(let l of navigator.languages) {
           const best = getBest(supported, l, null);
           if (best) {
@@ -466,7 +435,7 @@ export default defineComponent({
           }
         }
       }
-      if (locale && this.supportedLocalesFromVueX.includes(locale)) {
+      if (locale && this.supportedLocales.includes(locale)) {
         // This may only change the UI language, but does not change the data language if the data is not loaded yet
         this.switchLocale({locale});
         if (!this.data) {

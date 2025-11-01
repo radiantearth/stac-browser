@@ -6,8 +6,8 @@ import { UserManager } from 'oidc-client-ts';
 
 export default class OIDC extends Auth {
 
-  constructor(router, options, changeListener) {
-    super(router, options, changeListener);
+  constructor(router, i18n, options, changeListener) {
+    super(router, i18n, options, changeListener);
 
     const oidcConfig = {
       authority: options.openIdConnectUrl.replace('/.well-known/openid-configuration', ''),

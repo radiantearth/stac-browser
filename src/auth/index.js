@@ -1,4 +1,3 @@
-import i18n from '../i18n';
 import Utils from '../utils';
 
 export default class Auth {
@@ -10,10 +9,11 @@ export default class Auth {
    * @param {Object.<string, *>} options  Any potential options the authentication method needs
    * @param {Function} changeListener A change listener with two parameters: loggedIn (boolean) and credentials (string|null)
    */
-  constructor(router, options = {}, changeListener = null) {
-    this.options = Utils.isObject(options) ? options : {};
-    this.changeListener = changeListener;
+  constructor(router, i18n = null, options = {}, changeListener = null) {
     this.router = router;
+    this.i18n = i18n;
+    this.options = options;
+    this.changeListener = changeListener;
   }
 
   /**
@@ -31,7 +31,7 @@ export default class Auth {
    * @returns {string}
    */
   getLoginLabel() {
-  return i18n.global.t('authentication.button.login');
+    return this.i18n.t('authentication.button.login');
   }
 
   /**
@@ -40,7 +40,7 @@ export default class Auth {
    * @returns {string}
    */
   getLogoutLabel() {
-  return i18n.global.t('authentication.button.logout');
+    return this.i18n.t('authentication.button.logout');
   }
 
   getComponent() {
@@ -114,20 +114,20 @@ export default class Auth {
     }
   }
 
-  static async create(router, config, changeListener) {
-    let method = new Auth(router, config, changeListener);
+  static async create(router, i18n, config, changeListener) {
+    let method = new Auth(router, i18n, config, changeListener);
     if (Utils.isObject(config)) {
       if (config.type === 'http' && config.scheme === 'basic') {
         const BasicAuth = (await import('./basic')).default;
-        method = new BasicAuth(router, config, changeListener);
+        method = new BasicAuth(router, i18n, config, changeListener);
       }
       else if (config.type === 'apiKey') {
         const ApIKey = (await import('./apiKey')).default;
-        method = new ApIKey(router, config, changeListener);
+        method = new ApIKey(router, i18n, config, changeListener);
       }
       else if (config.type === 'openIdConnect') {
         const OIDC = (await import('./oidc')).default;
-        method = new OIDC(router, config, changeListener);
+        method = new OIDC(router, i18n, config, changeListener);
       }
     }
     await method.init();

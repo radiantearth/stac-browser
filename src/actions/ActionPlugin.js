@@ -1,5 +1,4 @@
 import URI from 'urijs';
-import i18n from "../i18n";
 import BIconBoxArrowUpRight from '~icons/bi/box-arrow-up-right';
 
 export default class ActionPlugin {
@@ -7,6 +6,7 @@ export default class ActionPlugin {
   constructor(id, component) {
     this.id = id;
     this.component = component;
+    this.i18n = component.$i18n;
   }
 
   get btnOptions() {
@@ -43,7 +43,7 @@ export default class ActionPlugin {
   }
 
   get text() {
-  return i18n.global.t('open');
+    return this.i18n.t('open');
   }
 
 }

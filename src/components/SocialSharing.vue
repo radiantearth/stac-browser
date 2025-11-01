@@ -9,18 +9,15 @@
 
 <script>
 import { mapState } from 'vuex';
-import IconBsky from '~icons/share/bsky';
-import IconEmail from '~icons/share/email';
-import IconMastodon from '~icons/share/mastodon';
-import IconX from '~icons/share/x';
+import { defineAsyncComponent } from 'vue';
 
 export default {
   name: "SocialSharing",
   components: {
-    IconBsky,
-    IconEmail,
-    IconMastodon,
-    IconX
+    IconBsky: defineAsyncComponent(() => import('~icons/share/bsky')),
+    IconEmail: defineAsyncComponent(() => import('~icons/share/email')),
+    IconMastodon: defineAsyncComponent(() => import('~icons/share/mastodon')),
+    IconX: defineAsyncComponent(() => import('~icons/share/x'))
   },
   props: {
     text: {

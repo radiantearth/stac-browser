@@ -1,5 +1,4 @@
 import Utils from '../../utils';
-import i18n from '../../i18n';
 import { mapState } from 'vuex';
 import Map from 'ol/Map.js';
 import View from 'ol/View.js';
@@ -10,20 +9,12 @@ import FullScreenControl from 'ol/control/FullScreen.js';
 import { stacRequest } from '../../store/utils';
 
 import configureBasemap from '../../../basemaps.config';
-import CONFIG from '../../config';
 import proj4 from 'proj4';
-import {register} from 'ol/proj/proj4.js';
-// Register pre-defined CRS from config in proj4
-if (Utils.isObject(CONFIG.crs)) {
-  for (const code in CONFIG.crs) {
-    proj4.defs(code, CONFIG.crs[code]);
-  }
-}
-register(proj4); // required to support source reprojection
+import { register, isRegistered } from 'ol/proj/proj4.js';
 
 export default {
   computed: {
-    ...mapState(['buildTileUrlTemplate', 'crossOriginMedia', 'displayGeoTiffByDefault', 'displayPreview', 'displayOverview', 'getMapSourceOptions', 'useTileLayerAsFallback', 'uiLanguage']),
+    ...mapState(['buildTileUrlTemplate', 'crossOriginMedia', 'crs', 'displayGeoTiffByDefault', 'displayPreview', 'displayOverview', 'getMapSourceOptions', 'useTileLayerAsFallback', 'uiLanguage']),
     stacLayerOptions() {
       return {
         buildTileUrlTemplate: this.buildTileUrlTemplate,
@@ -41,6 +32,16 @@ export default {
     },
     hasBasemap() {
       return this.basemaps.length > 0;
+    }
+  },
+  beforeCreated() {
+    if(!isRegistered()) {
+      if (Utils.isObject(this.crs)) {
+        for (const code in this.crs) {
+          proj4.defs(code, this.crs[code]);
+        }
+      }
+      register(proj4); // required to support source reprojection
     }
   },
   data() {
@@ -110,31 +111,31 @@ export default {
       });
 
       this.zoomControl = new ZoomControl({
-        zoomInLabel: i18n.global.t('mapping.zoom.in.label'),
-        zoomOutLabel: i18n.global.t('mapping.zoom.out.label'),
-        zoomInTipLabel: i18n.global.t('mapping.zoom.in.description'),
-        zoomOutTipLabel: i18n.global.t('mapping.zoom.out.description')
+        zoomInLabel: this.$t('mapping.zoom.in.label'),
+        zoomOutLabel: this.$t('mapping.zoom.out.label'),
+        zoomInTipLabel: this.$t('mapping.zoom.in.description'),
+        zoomOutTipLabel: this.$t('mapping.zoom.out.description')
       });
       this.map.addControl(this.zoomControl);
 
       this.attributionControl = new AttributionControl({
-        tipLabel: i18n.global.t('mapping.attribution.description'),
-        label: i18n.global.t('mapping.attribution.label'),
-        collapseLabel: i18n.global.t('mapping.attribution.collapseLabel'),
+        tipLabel: this.$t('mapping.attribution.description'),
+        label: this.$t('mapping.attribution.label'),
+        collapseLabel: this.$t('mapping.attribution.collapseLabel'),
       });
       this.map.addControl(this.attributionControl);
 
       this.fullScreenControl = new FullScreenControl({
-        label: i18n.global.t('fullscreen.showLabel'),
-        labelActive: i18n.global.t('fullscreen.exitLabel'),
-        tipLabel: i18n.global.t('fullscreen.show'),
+        label: this.$t('fullscreen.showLabel'),
+        labelActive: this.$t('fullscreen.exitLabel'),
+        tipLabel: this.$t('fullscreen.show'),
       });
       this.fullScreenControl.on('enterfullscreen', () => {
-        this.fullScreenControl.button_.title = i18n.global.t('fullscreen.exit');
+        this.fullScreenControl.button_.title = this.$t('fullscreen.exit');
         this.isFullScreen = true;
       });
       this.fullScreenControl.on('leavefullscreen', () => {
-        this.fullScreenControl.button_.title = i18n.global.t('fullscreen.show');
+        this.fullScreenControl.button_.title = this.$t('fullscreen.show');
         this.isFullScreen = false;
       });
       this.map.addControl(this.fullScreenControl);
