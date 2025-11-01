@@ -1,14 +1,13 @@
 import Auth from "./index";
-import i18n from '../i18n';
 
 export default class ApiKey extends Auth {
 
-  constructor(options, changeListener, router) {
-    super(options, changeListener, router);
+  constructor(options, changeListener, router, i18n) {
+    super(options, changeListener, router, i18n);
   }
 
   getButtonTitle() {
-  return i18n.global.t('authentication.button.title');
+    return this.i18n.t('authentication.button.title');
   }
 
   getComponent() {

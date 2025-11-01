@@ -1,4 +1,3 @@
-import i18n from '../../../i18n.js';
 import CqlComparisonOperator from './comparison';
 
 export class CqlLike extends CqlComparisonOperator {
@@ -14,11 +13,11 @@ export class CqlLike extends CqlComparisonOperator {
   }
 
   static get longLabel() {
-    return i18n.global.t('search.matches');
+    return 'search.matches';
   }
 
   static get description() {
-    return i18n.global.t('search.likeOperatorDescription');
+    return 'search.likeOperatorDescription';
   }
 
 }

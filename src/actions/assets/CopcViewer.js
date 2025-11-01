@@ -1,6 +1,5 @@
 import AssetActionPlugin from "../AssetActionPlugin";
 import URI from 'urijs';
-import i18n from "../../i18n";
 
 export default class CopcViewer extends AssetActionPlugin {
 
@@ -18,7 +17,7 @@ export default class CopcViewer extends AssetActionPlugin {
   }
 
   get text() {
-    return i18n.global.t('actions.openIn', {service: 'copc.io'});
+    return this.i18n.t('actions.openIn', {service: 'copc.io'});
   }
 
 }

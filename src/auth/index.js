@@ -1,4 +1,3 @@
-import i18n from '../i18n';
 import Utils from '../utils';
 
 export default class Auth {
@@ -10,10 +9,11 @@ export default class Auth {
    * @param {Function} changeListener A change listener with two parameters: loggedIn (boolean) and credentials (string|null)
    * @param {Router} router The Vue router instance
    */
-  constructor(options = {}, changeListener = null, router = null) {
+  constructor(options = {}, changeListener = null, router = null, i18n = null) {
     this.options = options;
     this.changeListener = changeListener;
     this.router = router;
+    this.i18n = i18n;
   }
 
   /**
@@ -31,7 +31,7 @@ export default class Auth {
    * @returns {string}
    */
   getLoginLabel() {
-  return i18n.global.t('authentication.button.login');
+    return this.i18n.t('authentication.button.login');
   }
 
   /**
@@ -40,7 +40,7 @@ export default class Auth {
    * @returns {string}
    */
   getLogoutLabel() {
-  return i18n.global.t('authentication.button.logout');
+    return this.i18n.t('authentication.button.logout');
   }
 
   getComponent() {
@@ -114,20 +114,20 @@ export default class Auth {
     }
   }
 
-  static async create(config, changeListener, router) {
+  static async create(config, changeListener, router, i18n) {
     let method = new Auth();
     if (Utils.isObject(config)) {
       if (config.type === 'http' && config.scheme === 'basic') {
         const BasicAuth = (await import('./basic')).default;
-        method = new BasicAuth(config, changeListener, router);
+        method = new BasicAuth(config, changeListener, router, i18n);
       }
       else if (config.type === 'apiKey') {
         const ApIKey = (await import('./apiKey')).default;
-        method = new ApIKey(config, changeListener, router);
+        method = new ApIKey(config, changeListener, router, i18n);
       }
       else if (config.type === 'openIdConnect') {
         const OIDC = (await import('./oidc')).default;
-        method = new OIDC(config, changeListener, router);
+        method = new OIDC(config, changeListener, router, i18n);
       }
     }
     await method.init();

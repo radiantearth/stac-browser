@@ -1,6 +1,5 @@
 import LinkActionPlugin from "../LinkActionPlugin";
 import URI from 'urijs';
-import i18n from "../../i18n";
 
 export default class Cesium extends LinkActionPlugin {
 
@@ -37,7 +36,7 @@ export default class Cesium extends LinkActionPlugin {
   }
 
   get text() {
-    return i18n.global.t('actions.openIn', {service: 'Cesium Sandcastle'});
+    return this.i18n.t('actions.openIn', {service: 'Cesium Sandcastle'});
   }
 
 }
