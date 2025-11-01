@@ -54,6 +54,9 @@ export default defineComponent({
     this.$refs.ht.style.setProperty("--nlines", gLines);
 
     setTimeout(() => {
+      if (!this.$refs.to || !this.$refs.ht) {
+        return;
+      }
       this.readmore = this.$refs.to.offsetHeight < this.$refs.to.scrollHeight;
 
       const localMaxLines = (this.lines + 1) * lh;
