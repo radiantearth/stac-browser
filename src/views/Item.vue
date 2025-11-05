@@ -120,10 +120,6 @@ export default defineComponent({
     }
   }
 
-  .card-columns .thumbnail {
-    align-self: center;
-  }
-
   .metadata .card-columns {
     column-count: 1;
 

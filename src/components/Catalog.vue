@@ -7,12 +7,12 @@
       <b-card-title>
         <StacLink :data="[data, catalog]" class="stretched-link" />
       </b-card-title>
-      <b-card-text v-if="data && (fileFormats.length > 0 || data.description || data.deprecated)" class="intro">
-        <b-badge v-if="data.deprecated" variant="warning" class="me-1 mt-1 deprecated">{{ $t('deprecated') }}</b-badge>
+      <b-card-text v-if="fileFormats.length > 0 || hasDescription || isDeprecated" class="intro">
+        <b-badge v-if="isDeprecated" variant="warning" class="me-1 mt-1 deprecated">{{ $t('deprecated') }}</b-badge>
         <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="me-1 mt-1 fileformat">{{ formatMediaType(format) }}</b-badge>
-        {{ summarizeDescription(data.description) }}
+        {{ summarizeDescription }}
       </b-card-text>
-      <Keywords v-if="showKeywordsInCatalogCards && keywords.length > 0" :keywords="keywords" variant="primary" :center="!isList" />
+      <Keywords v-if="showKeywordsInCatalogCards && keywords.length > 0" :keywords="keywords" variant="primary" />
       <b-card-text v-if="temporalExtent" class="datetime"><small v-html="temporalExtent" /></b-card-text>
     </b-card-body>
     <b-card-footer>
@@ -26,11 +26,10 @@ import { defineAsyncComponent } from 'vue';
 import { mapState, mapGetters } from 'vuex';
 import FileFormatsMixin from './FileFormatsMixin';
 import StacFieldsMixin from './StacFieldsMixin';
-import ThumbnailCardMixin from './ThumbnailCardMixin';
+import CardMixin from './CardMixin';
 import StacLink from './StacLink.vue';
 import { STAC } from 'stac-js';
 import { formatMediaType, formatTemporalExtent } from '@radiantearth/stac-fields/formatters';
-import Utils from '../utils';
 import { BCard, BCardBody, BCardFooter, BCardImg, BCardText, BCardTitle } from 'bootstrap-vue-next';
 
 export default {
@@ -47,7 +46,7 @@ export default {
   },
   mixins: [
     FileFormatsMixin,
-    ThumbnailCardMixin,
+    CardMixin,
     StacFieldsMixin({ formatTemporalExtent })
   ],
   props: {
@@ -86,12 +85,6 @@ export default {
         }
       }
       return null;
-    },
-    keywords() {
-      if (this.data) {
-        return this.data.getMetadata('keywords') || [];
-      }
-      return [];
     }
   },
   methods: {
@@ -101,151 +94,9 @@ export default {
       }
       this.$store.commit(visible ? 'queue' : 'unqueue', this.catalog.getAbsoluteUrl());
     },
-    summarizeDescription(text) {
-      return Utils.summarizeMd(text, 300);
-    },
     formatMediaType(value) {
       return formatMediaType(value, null, {shorten: true});
     }
   }
 };
 </script>
-
-<style lang="scss">
-@import '~bootstrap/scss/mixins';
-@import '../theme/variables.scss';
-
-#stac-browser {
-  .catalog-card {
-    &.deprecated {
-      opacity: 0.5;
-
-      &:hover {
-        opacity: 1;
-      }
-    }
-
-    .card-body, .card-footer {
-      position: relative;
-    }
-    .card-footer:empty {
-      display: none;
-    }
-    
-    /* Card image base styling */
-    .card-img-top,
-    .card-img-end,
-    .card-img-start {
-      object-fit: contain;
-      object-position: center;
-    }
-    
-    .intro {
-      display: -webkit-box;
-      -webkit-line-clamp: 3;
-      line-clamp: 3;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      overflow-wrap: anywhere;
-      text-align: left;
-    }
-    &.has-extent {
-      .intro {
-        margin-bottom: 0.5rem;
-      }
-    }
-    .datetime {
-      color: $secondary;
-    }
-    .badge.deprecated {
-      text-transform: uppercase;
-    }
-  }
-  .card-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    padding: 0.5rem 0;
-
-    .catalog-card {
-      box-sizing: border-box;
-      display: flex;
-      
-      .card-img-wrapper {
-        display: contents;
-      }
-
-      .card-img-end {
-        min-height: 100px;
-        height: 100%;
-        max-height: 8.5rem;
-        max-width: 33%;
-        object-fit: contain;
-        object-position: center right;
-      }
-      .card-footer {
-        min-width: 175px;
-        max-width: 175px;
-        border-top: 0;
-      }
-      .intro {
-        -webkit-line-clamp: 2;
-        line-clamp: 2;
-      }
-    }
-  }
-  .card-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    grid-auto-rows: min-content;
-    // The layout uses margin-bottom instead of row-gap (on .catalog-grid), because 
-    // the .card-img-wrapper is supposed to collapse to 0px height when there are no
-    // images in a row. row-gap would prevent that from happening.
-    column-gap: 1rem;
-    padding: 0.5rem 0;
-    grid-auto-flow: dense;
-    
-    .catalog-card {
-      display: grid;
-      grid-template-rows: subgrid;
-      grid-row: span 6;
-      gap: 0;
-      box-sizing: border-box;
-      overflow: hidden;
-      // See note in .card-grid why margin-bottom is used instead of row-gap
-      margin-bottom: 1rem;
-
-      &.queued {
-        min-height: 10rem;
-      }
-      .card-img-wrapper {
-        background-color: #f5f5f5;
-        display: grid;
-        img {
-          margin: auto;
-          border-radius: 0;
-        }
-      }
-      .card-img-top {
-        width: auto;
-        height: auto;
-        max-width: 100%;
-        max-height: 300px;
-        object-fit: contain;
-        object-position: center;
-      }
-      .card-body {
-        display: grid;
-        grid-template-rows: subgrid;
-        grid-row: span 3;
-      }
-    }
-  }
-  /* Limit to maximum 4 columns on large screens */
-  // @media (min-width: 1200px) {
-  //   .card-grid {
-  //     grid-template-columns: repeat(4, minmax(300px, 1fr)) !important;
-  //   }
-  // }
-}
-</style>
