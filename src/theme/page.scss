@@ -324,10 +324,6 @@ body {
 
 @import "~vue-multiselect/dist/vue-multiselect.min.css";
 
-// Datepicker related style
-$default-color: $secondary;
-$primary-color: $primary;
-
 // Multiselect related style
 #stac-browser {
   .multiselect__tags:focus-within {
