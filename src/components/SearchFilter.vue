@@ -607,12 +607,17 @@ export default defineComponent({
 
 <style lang="scss">
 @import '../theme/variables.scss';
-
-// Datepicker related style
-$default-color: $secondary;
-$primary-color: $primary;
-
 @import '@vuepic/vue-datepicker/dist/main.css';
+
+// VueDatePicker theming using CSS variables
+.dp__theme_light {
+  --dp-primary-color: #{$primary};
+  --dp-primary-text-color: #{$body-bg};
+  --dp-secondary-color: #{$secondary};
+  --dp-background-color: #{$body-bg};
+  --dp-text-color: #{$body-color};
+  --dp-hover-color: #{lighten($primary, 60%)};
+}
 
 .queryables .dropdown-menu {
   max-height: 90vh;
