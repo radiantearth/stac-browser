@@ -27,7 +27,7 @@
             :id="ids.datetime" v-model="datetime" range :format="dateTimeFormat"
             :locale="uiLanguage" :format-locale="datepickerLang"
             input-class="form-control mx-input"
-            :enable-time-picker="true" :time-picker-inline="false" :time-picker-seconds="true" auto-apply
+            :enable-time-picker="true" :enableSeconds="true" auto-apply
             :clearable="true" :close-on-scroll="false"
             multi-calendars="2" :placeholder="$t('search.selectDateRange')"
           />

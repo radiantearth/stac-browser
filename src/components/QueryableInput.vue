@@ -27,8 +27,7 @@
         :format-locale="datepickerLang"
         :format="queryable.isDateTime ? dateTimeFormat : dateFormat"
         :enable-time-picker="queryable.isDateTime"
-        :time-picker-inline="false"
-        :time-picker-seconds="queryable.isDateTime"
+        :enableSeconds="queryable.isDateTime"
         auto-apply
         clearable
       />
