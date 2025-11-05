@@ -2,7 +2,7 @@
   <ul>
     <li v-for="l in layers" :key="l.id">
       <div class="d-flex justify-content-between">
-        <b-form-checkbox inline :name="l.id" :checked="l.visible" @input="setVisibility(l, $event)">
+        <b-form-checkbox inline :name="l.id" :model-value="l.visible" @update:model-value="setVisibility(l, $event)">
           <span class="title">{{ l.title }}</span>
         </b-form-checkbox>
         <b-button variant="light" size="sm" :title="$t('mapping.fit')" @click.prevent.stop="fitToExtent(l)">
