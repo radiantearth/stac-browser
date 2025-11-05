@@ -113,9 +113,7 @@
   },
   "featureExperimental": "Această funcție este încă experimentală și poate da rezultate neașteptate!",
   "features": {
-    "empty": "",
-    "noProperties": "Nu au fost furnizate proprietăți.",
-    "title": ""
+    "noProperties": "Nu au fost furnizate proprietăți."
   },
   "fullscreen": {
     "exit": "Ieși din modul ecran complet",
@@ -160,15 +158,10 @@
   "mapping": {
     "attribution": {
       "label": "i",
-      "description": "",
       "collapseLabel": "✕"
     },
-    "bboxSelect": {
-      "add": "",
-      "remove": ""
-    },
+    "bboxSelect": {},
     "close": "Închidere",
-    "fit": "",
     "layers": {
       "title": "Straturi",
       "base": "Straturi de bază",
@@ -178,7 +171,6 @@
     "location": {
       "description": "Mergi la locație"
     },
-    "nobasemap": "",
     "nodata": "Nu sunt informații spațiale disponibile în metadate.",
     "zoom": {
       "in": {
