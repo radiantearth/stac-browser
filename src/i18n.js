@@ -29,6 +29,8 @@ const i18n = createI18n({
   locale: CONFIG.locale,
   fallbackLocale: CONFIG.fallbackLocale,
   messages: loadLocaleConfig(),
+  // Suppress fallback warnings - these are expected when translations are incomplete
+  silentFallbackWarn: true,
   // Todo: Workaround for https://github.com/kazupon/vue-i18n/issues/563
   postTranslation: (value, path) => {
     if (value === "") {

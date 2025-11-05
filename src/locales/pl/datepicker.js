@@ -1,6 +1,6 @@
 import { pl } from 'date-fns/locale';
 
-const dateFormat = 'YYYY-MM-DD';
+const dateFormat = 'yyyy-MM-dd';
 const timeFormat = 'HH:mm:ss';
 const dateTimeFormat = `${dateFormat} ${timeFormat}`;
 

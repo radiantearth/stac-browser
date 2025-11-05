@@ -24,12 +24,21 @@
 
         <b-form-group v-if="canFilterExtents" class="filter-datetime" :label="$t('search.temporalExtent')" :label-for="ids.datetime" :description="$t('search.dateDescription')">
           <VueDatePicker
-            :id="ids.datetime" v-model="datetime" range :format="dateTimeFormat"
-            :locale="uiLanguage" :format-locale="datepickerLang"
             input-class="form-control mx-input"
-            :enable-time-picker="true" :time-picker-inline="false" :time-picker-seconds="true" auto-apply
-            :clearable="true" :close-on-scroll="false"
-            multi-calendars="2" :placeholder="$t('search.selectDateRange')"
+            :id="ids.datetime" 
+            v-model="datetime"
+            :locale="uiLanguage"
+            :format-locale="datepickerLang"
+            :format="dateTimeFormat"
+            :close-on-scroll="false"
+            :placeholder="$t('search.selectDateRange')"
+            enable-time-picker 
+            enableSeconds
+            time-picker-inline
+            auto-apply
+            clearable
+            range
+            multi-calendars="2"
           />
         </b-form-group>
 
@@ -606,13 +615,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-@import '../theme/variables.scss';
-
-// Datepicker related style
-$default-color: $secondary;
-$primary-color: $primary;
-
-@import '@vuepic/vue-datepicker/dist/main.css';
+@import '../theme/datepicker.scss';
 
 .queryables .dropdown-menu {
   max-height: 90vh;
@@ -623,10 +626,6 @@ $primary-color: $primary;
 .filter {
   position: relative;
   min-width: 400px;
-
-  .mx-datepicker {
-    width: 100%;
-  }
 
   .b-form-group {
     padding-left: 1em;

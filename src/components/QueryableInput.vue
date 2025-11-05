@@ -26,9 +26,10 @@
         :locale="uiLanguage"
         :format-locale="datepickerLang"
         :format="queryable.isDateTime ? dateTimeFormat : dateFormat"
+        :close-on-scroll="false"
         :enable-time-picker="queryable.isDateTime"
-        :time-picker-inline="false"
-        :time-picker-seconds="queryable.isDateTime"
+        :enableSeconds="queryable.isDateTime"
+        time-picker-inline
         auto-apply
         clearable
       />
@@ -174,6 +175,7 @@ export default {
 <style lang="scss">
 @import '~bootstrap/scss/mixins';
 @import "../theme/variables.scss";
+@import '../theme/datepicker.scss';
 
 .queryable-row {
   margin: 0.25em 0;
