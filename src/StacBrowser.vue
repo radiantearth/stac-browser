@@ -382,7 +382,7 @@ export default defineComponent({
     }
   },
   async created() {
-    // In Vue Router 4, the router is immediately ready, no need for onReady
+    await this.$router.isReady();
     this.detectLocale();
     this.parseQuery(this.$route);
 
