@@ -314,7 +314,6 @@ export default defineComponent({
       }
     },
     stateQueryParameters: {
-      deep: true,
       handler() {
         let query = {};
         for (const [key, value] of Object.entries(this.$route.query)) {
