@@ -30,7 +30,23 @@ const i18n = new VueI18n({
   locale: CONFIG.locale,
   fallbackLocale: CONFIG.fallbackLocale,
   messages: loadLocaleConfig(),
-  // Todo: Workaround for https://github.com/kazupon/vue-i18n/issues/563
+  // Suppress fallback warnings - these are expected when translations are incomplete
+  silentFallbackWarn: true,
+  // We do not expose/import the phrases from the fields.json in the 'en' locale
+  // because it's a 1:1 mapping, i.e. key == value, and we want to save some
+  // initial loading time. We prepend a 'fields.' prefix though, so we need to
+  // remove the prefix here from the key.
+  missing: (locale, key) => {
+    if (key.startsWith('fields.') && locale.startsWith('en')) {
+      return key.slice(7);
+    }
+    return key;
+  },
+  // This is handling cases where there are missing empty phrases coming in from
+  // CrowdIn. It should be captured by our CI Action that removes empty phrases
+  // from the JSON, but in case this gets forgotten, we have this fallback to avoid
+  // showing empty texts in the UI.
+  // See https://github.com/kazupon/vue-i18n/issues/563 for details.
   postTranslation: (value, path) => {
     if (value === "") {
       const parts = path.split('.');
