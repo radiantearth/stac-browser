@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-button-group class="actions" :vertical="vertical" :size="size" v-if="href">
+    <b-button-group class="actions" :vertical="vertical" :size="size" v-if="hasButtons">
       <b-button variant="danger" v-if="requiresAuth" tag="a" tabindex="0" :id="`popover-href-${id}-btn`" @click="handleAuthButton">
         <b-icon-lock /> {{ $t('authentication.required') }}
       </b-button>
@@ -10,7 +10,7 @@
         <b-icon-download v-else />
         {{ buttonText }}
       </b-button>
-      <CopyButton variant="primary" :copyText="href" :title="href">
+      <CopyButton variant="primary" :copyText="href" :title="href" v-if="!isItem">
         {{ copyButtonText }}
       </CopyButton>
       <b-button v-if="hasShowButton" @click="show" variant="primary">
@@ -43,6 +43,7 @@ import Description from './Description.vue';
 import Utils, { imageMediaTypes, mapMediaTypes } from '../utils';
 import { mapGetters, mapState } from 'vuex';
 import AssetActions from '../../assetActions.config';
+import ItemActions from '../../itemActions.config';
 import LinkActions from '../../linkActions.config';
 import { stacRequestOptions } from '../store/utils';
 import URI from 'urijs';
@@ -73,6 +74,10 @@ export default {
       required: true
     },
     isAsset: {
+      type: Boolean,
+      default: false
+    },
+    isItem: {
       type: Boolean,
       default: false
     },
@@ -115,7 +120,7 @@ export default {
       }
     },
     actions() {
-      return Object.entries(this.isAsset ? AssetActions : LinkActions)
+      return Object.entries(this.isAsset ? AssetActions : this.isItem ? ItemActions : LinkActions)
         .map(([id, plugin]) => new plugin(this.data, this, id))
         .filter(plugin => plugin.show);
     },
@@ -143,6 +148,13 @@ export default {
     },
     hasDownloadButton() {
       return this.isAsset && this.isBrowserProtocol;
+    },
+    hasButtons() {
+      return this.href && (this.requiresAuth
+                        || this.hasDownloadButton()
+                        || !this.isItem
+                        || this.hasShowButton()
+                        || (this.actions && this.actions.length > 0));
     },
     downloadEvents() {
       if (this.hasDownloadButton && this.useAltDownloadMethod) {
@@ -209,7 +221,7 @@ export default {
       }
     },
     href() {
-      if (typeof this.data.href !== 'string') {
+      if (typeof this.data.href !== 'string' && !this.isItem) {
         return null;
       }
       return this.getRequestUrl(this.data.getAbsoluteUrl());
