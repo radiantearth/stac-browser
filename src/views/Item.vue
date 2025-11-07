@@ -14,6 +14,7 @@
             </b-tabs>
           </b-card>
         </section>
+        <HrefActions isItem :data="data" />
         <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="selectedReferences" @showAsset="showAsset" />
         <Links v-if="additionalLinks.length > 0" :title="$t('additionalResources')" :links="additionalLinks" :context="data" />
       </b-col>
@@ -38,6 +39,7 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
 import Description from '../components/Description.vue';
+import HrefActions from '../components/HrefActions.vue';
 import ReadMore from "vue-read-more-smooth";
 import ShowAssetLinkMixin from '../components/ShowAssetLinkMixin';
 import DeprecationMixin from '../components/DeprecationMixin';
@@ -53,6 +55,7 @@ export default {
     BTab,
     CollectionLink: () => import('../components/CollectionLink.vue'),
     Description,
+    HrefActions,
     DeprecationNotice: () => import('../components/DeprecationNotice.vue'),
     Keywords: () => import('../components/Keywords.vue'),
     Links: () => import('../components/Links.vue'),
@@ -120,6 +123,10 @@ export default {
 
   .card-columns .thumbnail {
     align-self: center;
+  }
+
+  div:has(> .actions) + .assets {
+    margin-top: 1rem;
   }
 
   .metadata .card-columns {
