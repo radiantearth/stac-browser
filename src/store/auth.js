@@ -18,7 +18,7 @@ export default function getStore(router) {
       // Wrap in a function and use the getter instead of the state
       // Unfortunately, some auth libraries have internal state, which vuex doesn't like
       // and thus reports: "do not mutate vuex store state outside mutation handlers."
-      method: () => new Auth(),
+      method: () => new Auth(router),
       actions: [],
       credentials: null,
       inProgress: false
@@ -62,7 +62,6 @@ export default function getStore(router) {
         await cx.dispatch('updateMethod', cx.rootState.authConfig);
       },
       async updateMethod(cx, config) {
-        config = AuthUtils.convertLegacyAuthConfig(config);
         if (!Auth.equals(cx.getters.method, config)) {
           await cx.getters.method.close();
         }
@@ -83,7 +82,7 @@ export default function getStore(router) {
         const storage = new BrowserStorage(true);
         storage.set('authConfig', config);
 
-        const newAuth = await Auth.create(config, changeListener, router);
+        const newAuth = await Auth.create(router, config, changeListener);
         cx.commit('setMethod', newAuth);
       },
       async requestLogin(cx) {

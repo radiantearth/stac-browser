@@ -59,7 +59,7 @@ The following actions are available:
 - `Geofox`: Allows to open OGC 3D Tiles (relation type `3d-tiles`, see [web-map-links extension](https://github.com/stac-extensions/web-map-links/blob/v1.2.0/README.md#3d-tiles)) files through the 3D Assets Viewer at <https://viewer.geofox.ai>.
 - `Protomaps`: Allows to open PMTiles (relation type `pmtiles`, see [web-map-links extension](https://github.com/stac-extensions/web-map-links/blob/v1.2.0/README.md#pmtiles)) files through PMTiles Viewer at <https://pmtiles.io>.
 
-All actions for assets are stored in the folder [`src/actions/links`](../src/actions/links) if you want to inspect them.
+All actions for links are stored in the folder [`src/actions/links`](../src/actions/links) if you want to inspect them.
 
 The actions can be enabled by adding them to the [`linkActions.config.js`](../linkActions.config.js) file.
 Open the file and you'll see a number of imports and exports.

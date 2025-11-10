@@ -149,11 +149,11 @@ export default {
       }
       return {};
     },
-    filename() {
+    localFilename() {
       if (typeof this.data['file:local_path'] === 'string') {
         return URI(this.data['file:local_path']).filename();
       }
-      return this.parsedHref.filename();
+      return null;
     },
     downloadProps() {
       if (this.hasDownloadButton && !this.useAltDownloadMethod) {
@@ -162,7 +162,7 @@ export default {
           target: '_blank',
         };
         if (!this.browserCanOpenFile) {
-          props.download = this.filename;
+          props.download = this.localFilename || this.parsedHref.filename();
         }
         return props;
       }
@@ -297,13 +297,18 @@ export default {
           throw new Error(msg);
         }
 
-        let filename = this.filename;
-        const contentDisposition = res.headers.get('content-disposition');
-        if (typeof contentDisposition === 'string') {
-          const parts = contentDisposition.match(/filename=(?:"|)([^"]+)(?:"|)(?:;|$)/);
-          if (parts) {
-            filename = parts[1];
+        let filename = this.localFilename;
+        if (!this.localFilename) {
+          const contentDisposition = res.headers.get('content-disposition');
+          if (typeof contentDisposition === 'string') {
+            const parts = contentDisposition.match(/filename=(?:"|)([^"]+)(?:"|)(?:;|$)/);
+            if (parts) {
+              filename = parts[1];
+            }
           }
+        }
+        if (!filename) {
+          filename = this.parsedHref.filename();
         }
         const fileStream = StreamSaver.createWriteStream(filename);
 

@@ -27,7 +27,7 @@ function getRoutes(config) {
       name: "search",
       component: () => import("../views/Search.vue"),
       props: route => {
-        const path = catchAllString(route, config);
+        const path = catchAllString(route);
         return {
           loadParent: `/external/${path}`
         };

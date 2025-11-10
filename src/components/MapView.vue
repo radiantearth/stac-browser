@@ -75,7 +75,6 @@ export default {
   emits: ['empty', 'changed'],
   data() {
     return {
-      stacLayer: null,
       selection: null,
       clickPosition: { x: 0, y: 0 },
       empty: false,
@@ -123,6 +122,10 @@ export default {
         this.selector.getFeatures().clear();
       }
     }
+  },
+  created() {
+    // This is created here and not in data() to avoid it being reactive
+    this.stacLayer = null;
   },
   async mounted() {
     await this.showStacLayer();

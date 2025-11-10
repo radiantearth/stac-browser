@@ -1,15 +1,15 @@
 <template>
   <div id="stac-browser-auth-modal">
     <b-form @submit.stop.prevent="submit" @reset="reset">
-      <b-card no-body :header="t('authentication.title')">
+      <b-card no-body :header="$t('authentication.title')">
         <b-card-body>
-          <p>{{ t('authentication.description') }}</p>
+          <p>{{ $t('authentication.description') }}</p>
           <Description v-if="promptText" :description="promptText" />
-          <b-form-input class="mb-2 mt-2" type="password" v-model.trim="token" autofocus :required="required" />
+          <b-form-input autofocus type="password" v-model.trim="token" :required="required" />
         </b-card-body>
         <b-card-footer>
-          <b-button type="submit" variant="primary">{{ t('submit') }}</b-button>
-          <b-button type="reset" variant="danger" class="ms-3">{{ t('cancel') }}</b-button>
+          <b-button type="submit" variant="primary">{{ $t('submit') }}</b-button>
+          <b-button type="reset" variant="danger" class="ms-3">{{ $t('cancel') }}</b-button>
         </b-card-footer>
       </b-card>
     </b-form>
@@ -18,7 +18,6 @@
 
 <script>
 import Description from '../Description.vue';
-import i18n from '../../i18n';
 import { mapGetters } from 'vuex';
 import { BCard, BCardBody, BCardFooter } from 'bootstrap-vue-next';
 
@@ -53,7 +52,7 @@ export default {
       if (this.description) {
         return this.description;
       }
-      return this.t('authConfig.description');
+      return this.$t('authConfig.description');
     }
   },
   beforeCreate() {
@@ -68,9 +67,6 @@ export default {
     }
   },
   methods: {
-    t(key) {
-      return i18n.global.t(key);
-    },
     reset() {
       this.$emit('reset');
     },

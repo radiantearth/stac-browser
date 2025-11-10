@@ -4,8 +4,8 @@ import Utils from "../utils";
 
 export default class BasicAuth extends Auth {
 
-  constructor(options, changeListener, router) {
-    super(options, changeListener, router);
+  constructor(router, options, changeListener) {
+    super(router, options, changeListener);
   }
 
   getComponent() {
@@ -23,7 +23,7 @@ export default class BasicAuth extends Auth {
   }
 
   async logout(/*credentials*/) {
-    if (this.router.currentRoute.name !== 'logout') {
+    if (this.router.currentRoute.value.name !== 'logout') {
       this.router.push('/auth/logout');
     }
     return true;

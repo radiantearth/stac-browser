@@ -108,10 +108,13 @@
     "noExternalAccess": "Accesul la cataloage externe nu este permis!",
     "notFound": "Resursa solicitată nu există. @:errors.contactProvider",
     "serverError": "Serverul a întâmpinat o problemă. @:errors.contactProvider",
+    "title": "Eroare",
     "unauthorized": "Solicitarea necesită informații de autentificare, cum ar fi un token API. Vă rugăm să furnizați acreditările și să încercați din nou"
   },
   "featureExperimental": "Această funcție este încă experimentală și poate da rezultate neașteptate!",
-  "features": {},
+  "features": {
+    "noProperties": "Nu au fost furnizate proprietăți."
+  },
   "fullscreen": {
     "exit": "Ieși din modul ecran complet",
     "exitLabel": "✕",
@@ -135,6 +138,7 @@
   "in": "în {catalog}",
   "index": {
     "api": "API",
+    "catalog": "Catalog Static",
     "load": "Încărcare",
     "selectStacIndex": "... sau selectați unul din {stacIndex}:",
     "specifyCatalog": "Vă rugăm să specificați un catalog STAC sau un API...",
@@ -158,8 +162,16 @@
     },
     "bboxSelect": {},
     "close": "Închidere",
-    "layers": {},
-    "location": {},
+    "layers": {
+      "title": "Straturi",
+      "base": "Straturi de bază",
+      "unnamed": "Fără nume #{id}",
+      "footprint": "Amprentă la sol"
+    },
+    "location": {
+      "description": "Mergi la locație"
+    },
+    "nodata": "Nu sunt informații spațiale disponibile în metadate.",
     "zoom": {
       "in": {
         "description": "Mărire",
@@ -278,7 +290,7 @@
     },
     "desc": {
       "label": "Descendent",
-      "title": "Sortați descendentă (Z-A)"
+      "title": "Sortare descendentă (Z-A)"
     },
     "title": "Sortare"
   },
