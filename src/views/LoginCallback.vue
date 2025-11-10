@@ -8,7 +8,7 @@
 <script>
 import ErrorAlert from '../components/ErrorAlert.vue';
 import Loading from '../components/Loading.vue';
-import { mapActions, mapGetters } from 'vuex/dist/vuex.common.js';
+import { mapActions, mapGetters, mapState } from 'vuex/dist/vuex.common.js';
 export default {
   name: "LoginCallback",
   components: {
@@ -21,9 +21,19 @@ export default {
     };
   },
   computed: {
+    ...mapState(['globalError']),
     ...mapGetters('auth', ['method'])
   },
   watch: {
+    globalError: {
+      immediate: true,
+      handler(newValue) {
+        if (newValue) {
+          this.error = newValue;
+          this.$store.commit('showGlobalError', null);
+        }
+      }
+    },
     method: {
       immediate: true,
       async handler() {
