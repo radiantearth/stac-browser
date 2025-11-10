@@ -98,7 +98,8 @@ import getStore from "./store";
 import {
   AlertPlugin, BadgePlugin, BPopover,
   BIconArrow90degUp, BIconArrowLeft, BIconCaretDownFill,
-  BIconFolderSymlink, BIconInfoLg, BIconList, BIconSearch,
+  BIconFolderSymlink, BIconInfoLg, BIconList, BIconLock,
+  BIconSearch, BIconUnlock,
   ButtonGroupPlugin, ButtonPlugin, CardPlugin, LayoutPlugin, SpinnerPlugin,
   VBToggle, VBVisible } from "bootstrap-vue";
 import "bootstrap/dist/css/bootstrap.css";
@@ -180,7 +181,9 @@ export default {
     BIconFolderSymlink,
     BIconInfoLg,
     BIconList,
+    BIconLock,
     BIconSearch,
+    BIconUnlock,
     BPopover,
     ErrorAlert,
     LanguageChooser,
