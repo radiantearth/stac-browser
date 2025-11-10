@@ -32,24 +32,4 @@ export default class AuthUtils {
     }
   }
 
-  static convertLegacyAuthConfig(config) {
-    if (!Utils.isObject(config) || config.type === null) {
-      return null;
-    }
-    else if (config.type === 'query' || config.type === 'header') {
-      // It is the old format
-      return {
-        type: 'apiKey',
-        in: config.type,
-        name: config.key,
-        description: config.description,
-        formatter: config.formatter
-      };
-    }
-    else {
-      // Is the new format from the authentication extension
-      return config;
-    }
-  }
-
 }

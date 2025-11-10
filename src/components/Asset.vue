@@ -1,5 +1,5 @@
 <template>
-  <b-accordion-item :id="uid" class="asset expandable-card" v-model="expanded">
+  <b-accordion-item :id="uid" class="asset expandable-card" v-model="expanded" @update:model-value="collapseToggled">
     <template #title>
       <span class="chevron" aria-hidden="true">
         <b-icon-chevron-down v-if="expanded" />
