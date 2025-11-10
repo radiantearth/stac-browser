@@ -202,10 +202,6 @@ body {
     background: transparent;
   }
 
-  input:invalid {
-    border-color: $danger;
-  }
-
   a.list-group-item {
     color: $link-color;
     text-decoration: $link-decoration;
@@ -426,6 +422,8 @@ body {
       overflow: hidden;
       overflow-wrap: anywhere;
       text-align: left;
+      line-height: 1.5em;
+      max-height: 4.5em; /* 3 lines at 1.5em line-height */
     }
 
     &.has-extent {
@@ -547,6 +545,13 @@ body {
     min-width: 200px;
     width: 50vw;
     border-radius: $border-radius;
+
+    .b-form-group {
+      margin-bottom: 0.5rem;
+    }
+    .b-form-group:last-of-type {
+      margin-bottom: 0;
+    }
 
     > .card {
       background-color: #fff;

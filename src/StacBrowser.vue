@@ -8,8 +8,8 @@
       <b-row class="site">
         <b-col md="12">
           <nav class="actions navigation">
-            <b-button-group v-if="canSearch || isServerSelector">
-              <b-button v-if="isServerSelector" variant="primary" size="sm" :title="$t('browse')" @click="sidebar = !sidebar">
+            <b-button-group v-if="canSearch || !isServerSelector">
+              <b-button v-if="!isServerSelector" variant="primary" size="sm" :title="$t('browse')" @click="sidebar = !sidebar">
                 <b-icon-list /><span class="button-label">{{ $t('browse') }}</span>
               </b-button>
               <b-button v-if="canSearch" variant="primary" size="sm" :to="searchBrowserLink" :title="$t('search.title')" :pressed="isSearchPage">
@@ -113,8 +113,8 @@ for(let key in CONFIG) {
     default: ['object', 'function'].includes(typeof CONFIG[key]) ? () => CONFIG[key] : CONFIG[key]
   };
   Watchers[key] = {
-    immediate: false, // Changed from true to avoid accessing store before it's ready
-    deep: ['object', 'array'].includes(typeof CONFIG[key]), // Deep watch for objects and arrays
+    immediate: true,
+    deep: ['object', 'array'].includes(typeof CONFIG[key]),
     handler: async function(newValue) {
       await this.$store.dispatch('config', {
         [key]: newValue
@@ -174,7 +174,7 @@ export default defineComponent({
       return this.$route.name === 'search';
     },
     isServerSelector() {
-      return this.$route.name !== 'select';
+      return this.$route.name === 'select';
     },
     authIcon() {
       return this.isLoggedIn ? BIconUnlock : BIconLock;
@@ -382,7 +382,7 @@ export default defineComponent({
     }
   },
   async created() {
-    // In Vue Router 4, the router is immediately ready, no need for onReady
+    await this.$router.isReady();
     this.detectLocale();
     this.parseQuery(this.$route);
 
