@@ -6,8 +6,8 @@ import { UserManager } from 'oidc-client-ts';
 
 export default class OIDC extends Auth {
 
-  constructor(options, changeListener, router) {
-    super(options, changeListener, router);
+  constructor(router, options, changeListener) {
+    super(router, options, changeListener);
 
     const oidcConfig = {
       authority: options.openIdConnectUrl.replace('/.well-known/openid-configuration', ''),
@@ -26,7 +26,7 @@ export default class OIDC extends Auth {
   }
 
   setOriginalUri() {
-    this.browserStorage.set('oidc-original-uri', this.router?.currentRoute?.fullPath || window.location.href);
+    this.browserStorage.set('oidc-original-uri', this.router.currentRoute.value.fullPath);
   }
 
   restoreOriginalUri() {
