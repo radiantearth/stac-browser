@@ -62,7 +62,6 @@ export default function getStore(router) {
         await cx.dispatch('updateMethod', cx.rootState.authConfig);
       },
       async updateMethod(cx, config) {
-        config = AuthUtils.convertLegacyAuthConfig(config);
         if (!Auth.equals(cx.getters.method, config)) {
           await cx.getters.method.close();
         }
