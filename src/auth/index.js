@@ -11,7 +11,7 @@ export default class Auth {
    * @param {Function} changeListener A change listener with two parameters: loggedIn (boolean) and credentials (string|null)
    */
   constructor(router, options = {}, changeListener = null) {
-    this.options = options;
+    this.options = Utils.isObject(options) ? options : {};
     this.changeListener = changeListener;
     this.router = router;
   }
