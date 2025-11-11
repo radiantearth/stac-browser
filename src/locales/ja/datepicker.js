@@ -6,4 +6,4 @@ const dateTimeFormat = `${dateFormat} ${timeFormat}`;
 
 const locale = ja;
 
-export default {dateFormat, timeFormat, dateTimeFormat, locale};
+export default { dateFormat, timeFormat, dateTimeFormat, locale };
