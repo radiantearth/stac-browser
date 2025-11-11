@@ -1,4 +1,4 @@
-import { en } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 
 // 1. Specify output format
 const dateFormat = 'yyyy-MM-dd';
@@ -6,8 +6,16 @@ const timeFormat = 'HH:mm:ss';
 const dateTimeFormat = `${dateFormat} ${timeFormat}`;
 
 // Customize the en locale to start the week on Monday for international users
-// Use a safe approach that maintains date-fns locale structure
-const locale = en; // Default locale
+// Create a derived locale from enUS and override only the options we need.
+const baseLocale = enUS;
+const locale = {
+  ...baseLocale,
+  // ensure options object exists and override the week start
+  options: {
+    ...baseLocale.options,
+    weekStartsOn: 1, // Monday
+  }
+};
 /*
 const locale = {
   // the locale of formatting and parsing function

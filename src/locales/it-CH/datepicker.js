@@ -4,6 +4,19 @@ const dateFormat = 'dd.MM.yyyy';
 const timeFormat = 'H:mm:ss';
 const dateTimeFormat = `${dateFormat} ${timeFormat}`;
 
-const locale = itCH;
+// short weekday tokens used in compact calendar headers
+const dayValues = ['do', 'lu', 'ma', 'me', 'gi', 've', 'sa'];
 
-export default {dateFormat, timeFormat, dateTimeFormat, locale};
+const localize = {
+    ...itCH.localize,
+    day: (dayIndex) => {
+        return dayValues[dayIndex];
+    },
+};
+
+const locale = {
+    ...itCH,
+    localize,
+};
+
+export default { dateFormat, timeFormat, dateTimeFormat, locale };
