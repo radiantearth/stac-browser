@@ -113,8 +113,8 @@ for(let key in CONFIG) {
     default: ['object', 'function'].includes(typeof CONFIG[key]) ? () => CONFIG[key] : CONFIG[key]
   };
   Watchers[key] = {
-    immediate: false, // Changed from true to avoid accessing store before it's ready
-    deep: ['object', 'array'].includes(typeof CONFIG[key]), // Deep watch for objects and arrays
+    immediate: true,
+    deep: ['object', 'array'].includes(typeof CONFIG[key]),
     handler: async function(newValue) {
       await this.$store.dispatch('config', {
         [key]: newValue
