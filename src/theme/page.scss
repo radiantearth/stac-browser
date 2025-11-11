@@ -422,6 +422,8 @@ body {
       overflow: hidden;
       overflow-wrap: anywhere;
       text-align: left;
+      line-height: 1.5em;
+      max-height: 4.5em; /* 3 lines at 1.5em line-height */
     }
 
     &.has-extent {
