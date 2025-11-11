@@ -1,7 +1,7 @@
 <template>
   <section>
-    <b-button v-for="href, service in urls" :key="service" class="service mr-1" :class="service" :href="href" target="_blank">
-      <i class="svg" :class="service" /> {{ $t(`source.share.${service}`) }}
+    <b-button v-for="href, service in urls" :key="service" class="service me-1" :class="service" :href="href" target="_blank">
+      <component :is="`icon-${service}`" /> {{ $t(`source.share.${service}`) }}
     </b-button>
   </section>
 </template>
@@ -9,9 +9,19 @@
 
 <script>
 import { mapState } from 'vuex';
+import IconBsky from '~icons/share/bsky';
+import IconEmail from '~icons/share/email';
+import IconMastodon from '~icons/share/mastodon';
+import IconX from '~icons/share/x';
 
 export default {
   name: "SocialSharing",
+  components: {
+    IconBsky,
+    IconEmail,
+    IconMastodon,
+    IconX
+  },
   props: {
     text: {
       type: String,
@@ -58,29 +68,3 @@ export default {
   }
 };
 </script>
-
-<style lang="scss" scoped>
-.service .svg {
-  display: inline-block;
-  vertical-align: sub;
-  height: 1em;
-  width: 1em;
-  background-color: #fff;
-  mask-size: 1em 1em;
-  mask-repeat: no-repeat;
-  mask-position: center;
-
-  &.email {
-    mask-image: url('@/media/email.svg');
-  }
-  &.bsky {
-    mask-image: url('@/media/bsky.svg');
-  }
-  &.mastodon {
-    mask-image: url('@/media/mastodon.svg');
-  }
-  &.x {
-    mask-image: url('@/media/x.svg');
-  }
-}
-</style>

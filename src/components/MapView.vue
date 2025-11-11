@@ -8,26 +8,27 @@
     </div>
     <div ref="target" class="popover-target" />
     <b-popover
-      v-if="popover && selection" show placement="auto" triggers="manual"
-      :target="selection.target" :container="container" custom-class="map-popover"
+      v-if="popover && selection" show manual placement="auto"
+      :target="selection.target" :teleport-to="container" class="map-popover"
+      :boundary-padding="10"
     >
       <section class="popover-items">
-        <Items v-if="selection.type === 'items'" :stac="stac" :items="selection.items" />
-        <Features v-else :features="selection.items" />
+        <Items v-if="selection && selection.type === 'items'" :stac="stac" :items="selection.items" />
+        <Features v-else-if="selection" :features="selection.items" />
       </section>
       <div class="text-center">
-        <b-button target="_blank" variant="danger" @click="resetSelection">{{ $t('mapping.close') }}</b-button>
+        <b-button variant="danger" @click="resetSelection">{{ $t('mapping.close') }}</b-button>
       </div>
     </b-popover>
   </div>
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
 import MapMixin from './maps/MapMixin.js';
 import LayerControl from './maps/LayerControl.vue';
 import TextControl from './maps/TextControl.vue';
 import { mapGetters } from 'vuex';
-import { BPopover } from 'bootstrap-vue';
 import Select from 'ol/interaction/Select';
 import StacLayer from 'ol-stac';
 import { getStacObjectsForEvent, getStyle } from 'ol-stac/util.js';
@@ -39,11 +40,10 @@ const selectStyle = getStyle('#ff0000', 2, null);
 let mapId = 0;
 
 export default {
-  name: 'Map',
+  name: 'MapView',
   components: {
-    BPopover,
-    Features: () => import('../components/Features.vue'),
-    Items: () => import('../components/Items.vue'),
+    Features: defineAsyncComponent(() => import('../components/Features.vue')),
+    Items: defineAsyncComponent(() => import('../components/Items.vue')),
     LayerControl,
     TextControl
   },
@@ -72,10 +72,11 @@ export default {
       default: false
     }
   },
+  emits: ['empty', 'changed'],
   data() {
     return {
-      stacLayer: null,
       selection: null,
+      clickPosition: { x: 0, y: 0 },
       empty: false,
       selector: null,
       mapId: `map-${++mapId}`,
@@ -121,6 +122,10 @@ export default {
         this.selector.getFeatures().clear();
       }
     }
+  },
+  created() {
+    // This is created here and not in data() to avoid it being reactive
+    this.stacLayer = null;
   },
   async mounted() {
     await this.showStacLayer();
@@ -175,7 +180,7 @@ export default {
           }
         });
         this.selector.on('select', (event) => {
-          // For feature selction
+          // For feature selection
           this.selection = null;
           this.setTargetPosition(event.mapBrowserEvent);
           const features = this.selector.getFeatures();
@@ -243,7 +248,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import "../../node_modules/ol/ol.css";
+@import "ol/ol.css";
 
 #stac-browser {
   .map-popover {

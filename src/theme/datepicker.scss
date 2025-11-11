@@ -1,0 +1,24 @@
+@import 'variables.scss';
+@import '@vuepic/vue-datepicker/dist/main.css';
+
+// VueDatePicker theming using CSS variables
+.dp__theme_light {
+  --dp-primary-color: #{$primary};
+  --dp-primary-text-color: #{$body-bg};
+  --dp-secondary-color: #{$secondary};
+  --dp-background-color: #{$body-bg};
+  --dp-text-color: #{$body-color};
+  --dp-hover-color: #{lighten($primary, 60%)};
+}
+
+.dp__main {
+  .dp__time_picker_inline_container {
+    > .dp__flex {
+      width: 100%; // Center the time picker under each of the the calenders
+    }
+  }
+
+  .dp--tp-wrap {
+    max-width: none; // Fix issue with the datepickers being too far on the left
+  }
+}
