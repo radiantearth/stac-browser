@@ -9,7 +9,10 @@
     "build:report": "vue-cli-service build --report",
     "build:minimal": "vue-cli-service build --noSourceMaps",
     "lint": "vue-cli-service lint",
-    "i18n:fields": "node helpers/fields_locales.js"
+    "i18n:fields": "node helpers/fields_locales.js",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run",
+    "test:e2e": "start-server-and-test start http://localhost:8080 cypress:run"
   },
   "bugs": {
     "url": "https://github.com/radiantearth/stac-browser/issues"
@@ -78,10 +81,12 @@
     "@vue/cli-plugin-vuex": "^5.0.9",
     "@vue/cli-service": "^5.0.9",
     "@vue/compiler-sfc": "^3.5.22",
+    "cypress": "^15.6.0",
     "eslint": "^8.57.1",
     "eslint-plugin-vue": "^9.28.0",
     "sass": "^1.26.5",
     "sass-loader": "^13.2.0",
+    "start-server-and-test": "^2.1.2",
     "unplugin-icons": "^22.4.2",
     "unplugin-vue-components": "^29.1.0",
     "vue-cli-plugin-i18n": "~2.3.1"
