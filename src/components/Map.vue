@@ -175,7 +175,7 @@ export default {
           }
         });
         this.selector.on('select', (event) => {
-          // For feature selction
+          // For feature selection
           this.selection = null;
           this.setTargetPosition(event.mapBrowserEvent);
           const features = this.selector.getFeatures();

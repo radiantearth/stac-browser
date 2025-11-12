@@ -112,13 +112,13 @@ self.onfetch = event => {
 
   // data, data.filename and size should not be used anymore
   if (data.size) {
-    console.warn('Depricated');
+    console.warn('Deprecated');
     responseHeaders.set('Content-Length', data.size);
   }
 
   let fileName = typeof data === 'string' ? data : data.filename;
   if (fileName) {
-    console.warn('Depricated');
+    console.warn('Deprecated');
     // Make filename RFC5987 compatible
     fileName = encodeURIComponent(fileName).replace(/['()]/g, escape).replace(/\*/g, '%2A');
     responseHeaders.set('Content-Disposition', "attachment; filename*=UTF-8''" + fileName);
