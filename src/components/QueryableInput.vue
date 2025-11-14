@@ -173,7 +173,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import '~bootstrap/scss/mixins';
+@import 'bootstrap/scss/mixins';
 @import "../theme/variables.scss";
 @import '../theme/datepicker.scss';
 

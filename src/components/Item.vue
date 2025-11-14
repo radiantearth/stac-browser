@@ -32,8 +32,9 @@ import { formatTemporalExtent, formatTimestamp, formatMediaType } from '@radiant
 import Registry from '@radiantearth/stac-fields/registry';
 import Utils from '../utils';
 import { BCard, BCardBody, BCardText, BCardTitle, BCardImg } from 'bootstrap-vue-next';
+import contentType from 'content-type';
 
-Registry.addDependency('content-type', require('content-type'));
+Registry.addDependency('content-type', contentType);
 
 export default defineComponent({
   name: 'Item',

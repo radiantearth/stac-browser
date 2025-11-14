@@ -8,10 +8,11 @@ export const STAC_LANGUAGE_EXT = 'https://stac-extensions.github.io/language/v1.
 
 const LOCALE_CONFIG = {};
 
-function loadLocaleConfig() {
+async function loadLocaleConfig() {
   // Load locale config
   for (let locale of CONFIG.supportedLocales) {
-    LOCALE_CONFIG[locale] = require(`./locales/${locale}/config.json`);
+    // todo: does this work? see console warnings
+    LOCALE_CONFIG[locale] = await import(`./locales/${locale}/config.json`);
   }
   const messages = {};
   // Add language names all other languages
@@ -28,7 +29,8 @@ const i18n = createI18n({
   globalInjection: true,
   locale: CONFIG.locale,
   fallbackLocale: CONFIG.fallbackLocale,
-  messages: loadLocaleConfig(),
+  // todo: check whether this is working as expected with async
+  messages: await loadLocaleConfig(),
   // Suppress fallback warnings - these are expected when translations are incomplete
   silentFallbackWarn: true,
   // We do not expose/import the phrases from the fields.json in the 'en' locale
