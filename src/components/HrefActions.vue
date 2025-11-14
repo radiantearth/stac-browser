@@ -10,7 +10,7 @@
         <b-icon-download v-else />
         {{ buttonText }}
       </b-button>
-      <CopyButton variant="primary" :copyText="href" :title="href" v-if="!isItem">
+      <CopyButton variant="primary" :copyText="href" :title="href">
         {{ copyButtonText }}
       </CopyButton>
       <b-button v-if="hasShowButton" @click="show" variant="primary">
@@ -43,7 +43,6 @@ import Description from './Description.vue';
 import Utils, { imageMediaTypes, mapMediaTypes } from '../utils';
 import { mapGetters, mapState } from 'vuex';
 import AssetActions from '../../assetActions.config';
-import ItemActions from '../../itemActions.config';
 import LinkActions from '../../linkActions.config';
 import { stacRequestOptions } from '../store/utils';
 import URI from 'urijs';
@@ -74,10 +73,6 @@ export default {
       required: true
     },
     isAsset: {
-      type: Boolean,
-      default: false
-    },
-    isItem: {
       type: Boolean,
       default: false
     },
@@ -120,7 +115,7 @@ export default {
       }
     },
     actions() {
-      return Object.entries(this.isAsset ? AssetActions : this.isItem ? ItemActions : LinkActions)
+      return Object.entries(this.isAsset ? AssetActions : LinkActions)
         .map(([id, plugin]) => new plugin(this.data, this, id))
         .filter(plugin => plugin.show);
     },
@@ -152,7 +147,6 @@ export default {
     hasButtons() {
       return this.href && (this.requiresAuth
                         || this.hasDownloadButton()
-                        || !this.isItem
                         || this.hasShowButton()
                         || (this.actions && this.actions.length > 0));
     },
@@ -221,7 +215,7 @@ export default {
       }
     },
     href() {
-      if (typeof this.data.href !== 'string' && !this.isItem) {
+      if (typeof this.data.href !== 'string') {
         return null;
       }
       return this.getRequestUrl(this.data.getAbsoluteUrl());

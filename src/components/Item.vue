@@ -19,7 +19,7 @@
         </small>
       </b-card-text>
     </b-card-body>
-    <HrefActions isItem :data="item" size="sm" />
+    <ObjectActions :data="item" size="sm" />
   </b-card>
 </template>
 
@@ -27,7 +27,7 @@
 import { mapState, mapGetters } from 'vuex';
 import FileFormatsMixin from './FileFormatsMixin';
 import ThumbnailCardMixin from './ThumbnailCardMixin';
-import HrefActions from './HrefActions.vue';
+import ObjectActions from './ObjectActions.vue';
 import StacLink from './StacLink.vue';
 import { STAC } from 'stac-js';
 import { formatTemporalExtent, formatTimestamp, formatMediaType } from '@radiantearth/stac-fields/formatters';
@@ -40,7 +40,7 @@ export default {
   name: 'Item',
   components: {
     StacLink,
-    HrefActions,
+    ObjectActions,
     Keywords: () => import('./Keywords.vue')
   },
   filters: {
@@ -145,7 +145,7 @@ export default {
       position: relative;
     }
 
-    &:has(.actions) {
+    &:has(.obj-actions) {
       padding-bottom: 0.5rem;
     }
   }
