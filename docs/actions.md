@@ -57,17 +57,17 @@ The following actions are available:
 
 - `stac-map`: Allows to open items through stac-map at <https://developmentseed.org/stac-map/>.
 
-All actions for items are stored in the folder [`src/actions/items`](../src/actions/items) if you want to inspect them.
+All actions for items are stored in the folder [`src/actions/objects`](../src/actions/objects) if you want to inspect them.
 
-The actions can be enabled by adding them to the [`itemActions.config.js`](../itemActions.config.js) file.
+The actions can be enabled by adding them to the [`objectActions.config.js`](../objectActions.config.js) file.
 Open the file and you'll see a number of imports and exports.
 Import the file for the action that you want to enable, e.g. for stac-map:
 
 ```js
-import Stacmap from './src/actions/items/Stacmap.js';
+import StacMap from './src/actions/objects/StacMap.js';
 ```
 
-The path is fixed to `./src/actions/items/`, the file extension is always `.js`.
+The path is fixed to `./src/actions/objects/`, the file extension is always `.js`.
 In-between add the file name from the list above.
 The import name should be the file name without extension (i.e. `Stacmap` again).
 
@@ -76,7 +76,7 @@ Lastly, add the import name to the list of exports, e.g.
 ```js
 export default {
   OtherAction,
-  Stacmap
+  StacMap
 };
 ```
 
@@ -121,17 +121,17 @@ Save the file and rebuild / restart STAC Browser.
 Implementing actions for assets, items and links follows a very similar pattern.
 The main difference is that each action implements its own interface:
 - assets implement the [`AssetActionPlugin` interface](../src/actions/AssetActionPlugin.js)
-- items implement the [`ItemActionPlugin` interface](../src/actions/ItemActionPlugin.js)
+- items implement the [`ObjectActionPlugin` interface](../src/actions/ObjectActionPlugin.js)
 - links implement the [`LinkActionPlugin` interface](../src/actions/LinkActionPlugin.js)
 Similarly, actions are stored in their own folder:
 - assets are stored in the folder [`src/actions/assets`](../src/actions/assets)
-- items are stored in the folder [`src/actions/items`](../src/actions/items)
+- items are stored in the folder [`src/actions/objects`](../src/actions/objects)
 - links are stored in the folder [`src/actions/links`](../src/actions/links)
 
 All interfaces look as follows:
 
 - `constructor(data: object, component: Vue, id: string)`
-  - `data`: The asset, item or link object, it is available in the class through `this.asset` (for assets), `this.item` (for items) and `this.link` (for links).
+  - `data`: The asset, item or link object, it is available in the class through `this.asset` (for assets), `this.object` (for items) and `this.link` (for links).
   - `component`: The parent Asset/Item/Link Vue component (available in the class through `this.component`)
   - `id`: Internal ID of the asset, item or link, not meant to be used.
 - `get btnOptions() : object`
