@@ -50,7 +50,7 @@ function getStore(config, router) {
   });
 
   return createStore({
-    strict: process.env.NODE_ENV !== 'production',
+    strict: import.meta.env.NODE_ENV !== 'production',
     modules: {
       auth: auth(router)
     },

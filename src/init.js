@@ -42,6 +42,6 @@ export default function init() {
     app.use(router);
     app.use(store);
 
-    return app.mount("body");
+    return app.mount("#stac-browser");
   });
 }

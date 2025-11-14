@@ -124,7 +124,7 @@ export default defineComponent({
 </style>
 
 <style lang="scss">
-@import '~bootstrap/scss/mixins';
+@import 'bootstrap/scss/mixins';
 @import "../theme/variables.scss";
 
 #stac-browser .validation .results.card-columns {
