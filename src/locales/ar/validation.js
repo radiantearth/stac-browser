@@ -1,1 +1,3 @@
-export default require('ajv-i18n/localize/ar');
+import ajvI18n from "../en/validation";
+
+export default ajvI18n;
