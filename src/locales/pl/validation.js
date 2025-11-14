@@ -1,3 +1,3 @@
-import ajvI18n from 'ajv-i18n/localize/pl.js';
+import ajvI18n from 'ajv-i18n/localize/pl';
 
-export default ajvI18n;    
+export default ajvI18n;

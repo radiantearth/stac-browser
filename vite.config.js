@@ -3,6 +3,7 @@ import vue from '@vitejs/plugin-vue';
 import { fileURLToPath, URL } from 'node:url';
 import path from 'path';
 import { createRequire } from 'module';
+import { nodePolyfills } from 'vite-plugin-node-polyfills';
 
 import Icons from 'unplugin-icons/vite';
 import IconsResolver from 'unplugin-icons/resolver';
@@ -128,7 +129,14 @@ export default defineConfig({
                     .replace(/<title>.*?<\/title>/, `<title>${mergedConfig.catalogTitle || 'STAC Browser'}</title>`)
                     .replace('<head>', `<head>\n    <meta property="og:url" content="${mergedConfig.catalogUrl || ''}" />`);
             }
-        }
+        },
+        nodePolyfills({
+            include: ['buffer', 'path', 'process'],
+            globals: {
+                Buffer: true,
+                process: true,
+            },
+        }),
     ],
     resolve: {
         alias: {
