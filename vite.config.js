@@ -10,6 +10,7 @@ import IconsResolver from 'unplugin-icons/resolver';
 import Components from 'unplugin-vue-components/vite';
 import { FileSystemIconLoader } from 'unplugin-icons/loaders';
 import { BootstrapVueNextResolver } from 'bootstrap-vue-next/resolvers';
+import { visualizer } from 'rollup-plugin-visualizer';
 
 const require = createRequire(import.meta.url);
 const yargs = require('yargs/yargs');
@@ -136,6 +137,12 @@ export default defineConfig({
                 Buffer: true,
                 process: true,
             },
+        }),
+        visualizer({
+            filename: './dist/report.html',
+            open: true,
+            gzipSize: true,
+            brotliSize: true,
         }),
     ],
     resolve: {

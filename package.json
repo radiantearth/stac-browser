@@ -7,8 +7,6 @@
     "start": "vite",
     "build": "vite build",
     "serve": "vite preview",
-    "build:report": "vite build --report",
-    "build:minimal": "vite build --noSourceMaps",
     "lint": "eslint --ext .js,.vue --ignore-path .gitignore --fix src",
     "i18n:fields": "node helpers/fields_locales.js"
   },
@@ -73,6 +71,7 @@
     "@vue/compiler-sfc": "^3.5.22",
     "eslint": "^8.57.1",
     "eslint-plugin-vue": "^9.28.0",
+    "rollup-plugin-visualizer": "^6.0.5",
     "sass": "^1.26.5",
     "unplugin-icons": "^22.4.2",
     "unplugin-vue-components": "^29.1.0",
