@@ -10,7 +10,7 @@ import FullScreenControl from 'ol/control/FullScreen.js';
 import { stacRequest } from '../../store/utils';
 
 import configureBasemap from '../../../basemaps.config';
-import CONFIG from '../../../config';
+import CONFIG from '../../config';
 import proj4 from 'proj4';
 import {register} from 'ol/proj/proj4.js';
 // Register pre-defined CRS from config in proj4
