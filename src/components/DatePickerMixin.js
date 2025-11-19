@@ -2,6 +2,8 @@ import { mapState } from "vuex";
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 
+const datepickerModules = import.meta.glob('../locales/*/datepicker.js');
+
 export default {
   components: {
     VueDatePicker
@@ -29,7 +31,11 @@ export default {
         }
 
         try {
-          const options = (await import(`../locales/${locale}/datepicker.js`)).default;
+          const modulePath = `../locales/${locale}/datepicker.js`;
+
+          const module = await datepickerModules[modulePath]();
+          
+          const options = module.default;
         
           this.datepickerLang = options.locale;
           this.dateFormat = options.dateFormat || options.dateFormat;
