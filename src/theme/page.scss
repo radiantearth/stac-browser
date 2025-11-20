@@ -325,7 +325,8 @@ body {
     grid-auto-flow: dense;
 
     .catalog-card,
-    .item-card {
+    .item-card,
+    .feature-card {
       display: grid;
       grid-template-rows: subgrid;
       gap: 0;
@@ -352,6 +353,10 @@ body {
     .item-card {
       grid-row: span 3;
     }
+
+    .feature-card {
+      grid-row: span 1;
+    }
   }
 
   /* Limit to maximum 4 columns on large screens */
@@ -362,7 +367,8 @@ body {
   // }
   
   .catalog-card,
-  .item-card {
+  .item-card,
+  .feature-card {
     &.deprecated {
       opacity: 0.5;
 

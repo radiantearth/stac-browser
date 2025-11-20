@@ -5,9 +5,9 @@
       <b-badge pill variant="secondary" class="me-4">{{ count }}</b-badge>
     </header>
     <section class="list">
-      <b-card-group v-if="count > 0" columns>
+      <div v-if="count > 0" class="card-grid">
         <Feature v-for="(feature, i) in features" :key="feature.id || i" :feature="feature" />
-      </b-card-group>
+      </div>
       <b-alert v-else variant="info" show>
         {{ $t('features.empty') }}
       </b-alert>
@@ -16,13 +16,11 @@
 </template>
 
 <script>
-import { BCardGroup } from 'bootstrap-vue-next';
 import Feature from './Feature.vue';
 
 export default {
   name: "Features",
   components: {
-    BCardGroup,
     Feature
   },
   props: {
