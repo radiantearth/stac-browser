@@ -30,6 +30,7 @@
             :locale="uiLanguage"
             :format-locale="datepickerLang"
             :format="dateTimeFormat"
+            :week-start="weekStartDay"
             :close-on-scroll="false"
             :placeholder="$t('search.selectDateRange')"
             enable-time-picker 

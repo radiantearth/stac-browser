@@ -1,9 +1,7 @@
-import { es } from 'date-fns/locale';
+import { es as locale } from 'date-fns/locale';
 
 const dateFormat = 'dd/MM/yyyy';
 const timeFormat = 'H:mm:ss';
 const dateTimeFormat = `${dateFormat} ${timeFormat}`;
-
-const locale = es;
 
 export default {dateFormat, timeFormat, dateTimeFormat, locale};
