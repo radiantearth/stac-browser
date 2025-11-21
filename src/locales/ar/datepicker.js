@@ -10,8 +10,10 @@ const locale = {
     ...ar.localize,
     // Override day to always use narrow width by default
     day: (dayIndex, options = {}) => {
-      const width = 'narrow';
-      return ar.localize.day(dayIndex, { ...options, width });
+        if (options.width === 'short') {
+            options.width = 'narrow';
+        }
+      return ar.localize.day(dayIndex, options);
     },
   },
 

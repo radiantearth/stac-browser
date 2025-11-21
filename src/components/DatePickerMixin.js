@@ -33,7 +33,7 @@ export default {
           const options = (await import(`../locales/${locale}/datepicker.js`)).default;
 
           this.datepickerLang = options.locale;
-          this.dateFormat = options.dateFormat || this.dateFormat;
+          this.dateFormat = options.dateFormat;
           this.timeFormat = options.timeFormat;
           this.dateTimeFormat = options.dateTimeFormat;
           this.weekStartDay = options.locale.options.weekStartsOn;
