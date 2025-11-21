@@ -165,6 +165,7 @@ import Queryable from '../models/cql2/queryable';
 import CqlValue from '../models/cql2/value';
 import CqlLogicalOperator from '../models/cql2/operators/logical';
 import { stacRequest } from '../store/utils';
+import { WeakSet } from 'core-js';
 
 function getQueryDefaults() {
   return {
