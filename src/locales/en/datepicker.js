@@ -1,12 +1,10 @@
 import { enUS as locale } from 'date-fns/locale';
 
-// 1. Specify output format
 const dateFormat = 'yyyy-MM-dd';
 const timeFormat = 'HH:mm:ss';
 const dateTimeFormat = `${dateFormat} ${timeFormat}`;
 
 locale.options.weekStartsOn = 1; // Monday is the first day of the week.
-locale.options.firstWeekContainsDate = 1; // The week that contains Jan 1st is the first week of the year.
 /*
 const locale = {
   // the locale of formatting and parsing function
@@ -50,4 +48,4 @@ const locale = {
 }
 */
 
-export default {dateFormat, timeFormat, dateTimeFormat, locale};
+export default { dateFormat, timeFormat, dateTimeFormat, locale };

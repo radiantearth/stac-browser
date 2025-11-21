@@ -4,13 +4,20 @@ const dateFormat = 'yyyy-MM-dd';
 const timeFormat = 'HH:mm:ss';
 const dateTimeFormat = `${dateFormat} ${timeFormat}`;
 
-// Minimal override: default weekday width is 'narrow'. Delegate to base locale otherwise.
-locale.localize.day = (dayIndex, options = {}) => {
-    const width = 'narrow';
-    return ar.localize.day(dayIndex, { ...options, width });
-};
+const locale = {
+  ...ar,
+  localize: {
+    ...ar.localize,
+    // Override day to always use narrow width by default
+    day: (dayIndex, options = {}) => {
+      const width = 'narrow';
+      return ar.localize.day(dayIndex, { ...options, width });
+    },
+  },
 
-locale.options.weekStartsOn = 1; // Monday is the first day of the week.
-locale.options.firstWeekContainsDate = 12; // The week that contains Jan 12th is the first week of the year.
+  options: {
+    weekStartsOn: 1, // Monday is the first day of the week in Arabic countries
+  },
+};
 
 export default { dateFormat, timeFormat, dateTimeFormat, locale };
