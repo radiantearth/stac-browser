@@ -112,6 +112,11 @@
     "unauthorized": "La richiesta necessita di credenziali, ad esempio un token API. Inserisci i tuoi dati di accesso e riprova."
   },
   "featureExperimental": "Questa funzione è ancora sperimentale e potrebbe dare risultati inaspettati!",
+  "features": {
+    "empty": "Nessuna feature disponibile",
+    "noProperties": "Nessuna proprietà fornita.",
+    "title": "Feature | Features"
+  },
   "fullscreen": {
     "exit": "Esci dalla modalità a schermo intero",
     "exitLabel": "✕",

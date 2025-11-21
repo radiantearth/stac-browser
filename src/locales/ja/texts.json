@@ -92,6 +92,7 @@
     "unauthorized": "リクエストには認証情報がありません（例:APIトークン。）認証情報を入力して再度お試し下さい。"
   },
   "featureExperimental": "この機能はまだ実験的で、予期しない結果をもたらす可能性があります。",
+  "features": {},
   "fullscreen": {
     "exit": "全画面表示を終了",
     "exitLabel": "✕",

@@ -16,7 +16,7 @@ It's not officially supported, but you may also be able to use it for
 certain _OGC API - Records_ and _OGC API - Features_ compliant servers.
 
 **Please note that STAC Browser is currently with limited funding for both maintenance, bug fixes and improvements. This means issues and PRs may be addressed very slowly.
-If you care about STAC Browser and have some funds to support the future of STAC Browser, please contact matthias@mohr.ws**
+If you care about STAC Browser and have some funds to support the future of STAC Browser, please contact <matthias@mohr.ws>**
 
 **Table of Contents:**
 
@@ -128,10 +128,12 @@ The following languages are currently supported:
 - Spanish `es`
 - English `en` (International `en`, US `en-US`, UK `en-GB`)
 - French `fr` (Canada `fr-CA`, France `fr`, Switzerland `fr-CH`)
+- Indonesian `id`
 - Italian `it` (Italy `it`, Switzerland `it-CH`)
 - Romanian `ro`
 - Japanese `ja`
 - Portuguese `pt` (Brazil `pt-BR`, Portugal `pt`)
+- Polish `pl`
 
 We manage the translations in Crowdin, please see <https://crowdin.com/project/stac-browser/> for details.
 
@@ -140,6 +142,8 @@ To add your own language, please follow the guide below: [Adding a new language]
 The following contributors kindly provide the translations:
 
 - [@jfbourgon](https://github.com/jfbourgon): `fr`, `fr-CA`
+- [@jtreska](https://github.com/jtreska): `pl`
+- [@amrirasyidi](https://github.com/amrirasyidi): `id`
 - [@mneagul](https://github.com/mneagul): `ro`
 - [@m-mohr](https://github.com/m-mohr): `de`, `en`, `en-GB`, `en-US`
 - [@p1d1d1](https://github.com/p1d1d1): `de-CH`, `fr-CH`, `it`, `it-CH`

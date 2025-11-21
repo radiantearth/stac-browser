@@ -19,6 +19,7 @@ The following ways to set config options are possible:
 - [Basic configuration](#basic-configuration)
   - [catalogUrl](#catalogurl)
   - [catalogTitle](#catalogtitle)
+  - [catalogImage](#catalogimage)
   - [apiCatalogPriority](#apicatalogpriority)
 - [Deployment](#deployment)
   - [historyMode](#historymode)
@@ -81,12 +82,12 @@ If `catalogUrl` is empty or set to `null` STAC Browser switches to a mode where 
 
 The default title shown if no title can be read from the root STAC catalog.
 
-## catalogImage
+### catalogImage
 
 URL to an image to use as a logo with the title.
 Should be an image that browsers can display, e.g. PNG, JPEG, WebP, or SVG.
 
-## apiCatalogPriority
+### apiCatalogPriority
 
 For STAC APIs there are two potential sources for catalogs and collections:
 
@@ -308,7 +309,7 @@ If set to `false`, doesn't store the locale across browser sessions.
 
 Depending on the browser settings, this may store in either:
 
-- `localeStorage`
+- `localStorage`
 - `sessionStorage`
 - cookies
 
@@ -459,7 +460,7 @@ The default sorting for lists of catalogs/collections or items. One of:
 
 - `"asc"`: ascending sort (default)
 - `"desc"`: descending sort
-- `null`: sorted as in the source files
+- `null`: sorted as in the source
 
 Doesn't apply when API search filters are applied.
 Also doesn't apply when pagination on the server-side is enabled.

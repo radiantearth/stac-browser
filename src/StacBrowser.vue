@@ -98,7 +98,8 @@ import getStore from "./store";
 import {
   AlertPlugin, BadgePlugin, BPopover,
   BIconArrow90degUp, BIconArrowLeft, BIconCaretDownFill,
-  BIconFolderSymlink, BIconInfoLg, BIconList, BIconSearch,
+  BIconFolderSymlink, BIconInfoLg, BIconList, BIconLock,
+  BIconSearch, BIconUnlock,
   ButtonGroupPlugin, ButtonPlugin, CardPlugin, LayoutPlugin, SpinnerPlugin,
   VBToggle, VBVisible } from "bootstrap-vue";
 import "bootstrap/dist/css/bootstrap.css";
@@ -180,7 +181,9 @@ export default {
     BIconFolderSymlink,
     BIconInfoLg,
     BIconList,
+    BIconLock,
     BIconSearch,
+    BIconUnlock,
     BPopover,
     ErrorAlert,
     LanguageChooser,
@@ -445,6 +448,10 @@ export default {
       if (to.path === from.path) {
         return;
       }
+
+      // Reset the callback for updating the data locale
+      // see https://github.com/radiantearth/stac-browser/issues/683
+      this.onDataLoaded = null;
 
       // Handle catalog change: https://github.com/radiantearth/stac-browser/issues/250
       let resetOp = 'resetPage';

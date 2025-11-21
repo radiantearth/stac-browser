@@ -119,7 +119,7 @@ export default {
         return {
           type: 'text',
           minlength: this.schema.minLength,
-          maxlength: this.schema.maxLenggth,
+          maxlength: this.schema.maxLength,
           required: this.schema.minLength > 0
         };
       }

@@ -100,11 +100,19 @@ export default {
     };
   },
   computed: {
-    ...mapState(['pathPrefix', 'requestHeaders']),
+    ...mapState(['pathPrefix', 'requestHeaders', 'buildTileUrlTemplate', 'useTileLayerAsFallback']),
     ...mapGetters(['getRequestUrl']),
     ...mapGetters('auth', ['isLoggedIn']),
     requiresAuth() {
       return !this.isLoggedIn && this.auth.length > 0;
+    },
+    tileRendererType() {
+      if (this.buildTileUrlTemplate && !this.useTileLayerAsFallback) {
+        return 'server';
+      }
+      else {
+        return 'client';
+      }
     },
     actions() {
       return Object.entries(this.isAsset ? AssetActions : LinkActions)
@@ -147,11 +155,11 @@ export default {
       }
       return {};
     },
-    filename() {
+    localFilename() {
       if (typeof this.data['file:local_path'] === 'string') {
         return URI(this.data['file:local_path']).filename();
       }
-      return this.parsedHref.filename();
+      return null;
     },
     downloadProps() {
       if (this.hasDownloadButton && !this.useAltDownloadMethod) {
@@ -160,7 +168,7 @@ export default {
           target: '_blank',
         };
         if (!this.browserCanOpenFile) {
-          props.download = this.filename;
+          props.download = this.localFilename || this.parsedHref.filename();
         }
         return props;
       }
@@ -170,7 +178,7 @@ export default {
       if (!this.isBrowserProtocol || !window.isSecureContext) {
         return false;
       }
-      else if (typeof this.data.method === 'string' && this.method.toUpperCase() !== 'GET') {
+      else if (typeof this.data.method === 'string' && this.data.method.toUpperCase() !== 'GET') {
         return true;
       }
       else if (Utils.size(this.data.headers) > 0 || Utils.size(this.requestHeaders) > 0) {
@@ -204,11 +212,7 @@ export default {
       if (typeof this.data.href !== 'string') {
         return null;
       }
-      try {
-        return this.getRequestUrl(this.data.getAbsoluteHref());
-      } catch (e) {
-        return this.data.href;
-      }
+      return this.getRequestUrl(this.data.getAbsoluteUrl());
     },
     parsedHref() {
       return URI(this.href);
@@ -276,6 +280,7 @@ export default {
         // Use fetch because stacRequest uses axios
         // and axios doesn't support responseType: 'stream'
         const res = await fetch(url, options);
+        // todo: use getErrorMessage / getErrorCode instead?
         if (res.status >= 400) {
           let msg;
           switch(res.status) {
@@ -298,13 +303,18 @@ export default {
           throw new Error(msg);
         }
 
-        let filename = this.filename;
-        const contentDisposition = res.headers.get('content-disposition');
-        if (typeof contentDisposition === 'string') {
-          const parts = contentDisposition.match(/filename=(?:"|)([^"]+)(?:"|)(?:;|$)/);
-          if (parts) {
-            filename = parts[1];
+        let filename = this.localFilename;
+        if (!this.localFilename) {
+          const contentDisposition = res.headers.get('content-disposition');
+          if (typeof contentDisposition === 'string') {
+            const parts = contentDisposition.match(/filename=(?:"|)([^"]+)(?:"|)(?:;|$)/);
+            if (parts) {
+              filename = parts[1];
+            }
           }
+        }
+        if (!filename) {
+          filename = this.parsedHref.filename();
         }
         const fileStream = StreamSaver.createWriteStream(filename);
 

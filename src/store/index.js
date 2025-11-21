@@ -391,18 +391,6 @@ function getStore(config, router) {
             case 'crossOriginMedia':
               state.crossOriginMedia = ['anonymous', 'use-credentials'].includes(value) ? value : null;
               break;
-            case 'cardViewSort':
-              switch(value) {
-                case 'asc':
-                  state.cardViewSort = 1;
-                  break;
-                case 'desc':
-                  state.cardViewSort = -1;
-                  break;
-                default:
-                  state.cardViewSort = 0;
-              }
-              break;
             default:
               state[key] = value;
           }

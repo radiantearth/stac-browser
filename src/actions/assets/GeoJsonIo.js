@@ -10,9 +10,10 @@ export default class GeoJsonIo extends AssetActionPlugin {
   }
 
   get uri() {
-    // Docs: https://github.com/Cenergy/geojson.io/blob/main/API.md
-    let uri = new URI("https://geojson.io");
-    uri.addQuery('data', `text/x-url,${this.component.href}`);
+    // Docs: https://github.com/mapbox/geojson.io/blob/main/API.md
+    const uri = new URI("https://geojson.io");
+    const encoded = encodeURIComponent(this.component.href);
+    uri.fragment(`data=data:text/x-url,${encoded}`);
     return uri;
   }
 

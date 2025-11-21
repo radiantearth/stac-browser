@@ -13,7 +13,7 @@
 import { BIconSortAlphaDown, BIconSortAlphaUp } from 'bootstrap-vue';
 
 export default {
-  id: "SortButtons",
+  name: "SortButtons",
   components: {
     BIconSortAlphaDown,
     BIconSortAlphaUp
