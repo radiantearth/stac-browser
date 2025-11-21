@@ -24,6 +24,7 @@
         :model-value="value?.value"
         @update:model-value="updateValue"
         :locale="uiLanguage"
+        :week-start="weekStartDay"
         :format-locale="datepickerLang"
         :format="queryable.isDateTime ? dateTimeFormat : dateFormat"
         :close-on-scroll="false"
