@@ -44,12 +44,12 @@ const configFile = path.resolve(argv.CONFIG ? argv.CONFIG : './config.js');
 const configFromFile = require(configFile);
 const mergedConfig = Object.assign(configFromFile, argv);
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
     // todo: check against docs
     base: mergedConfig.pathPrefix || '/',
     // todo: check against docs
     build: {
-        sourcemap: !mergedConfig.noSourceMaps,
+        sourcemap: mode !== 'minimal',
         rollupOptions: {
             external: ['fs/promises']
         }
@@ -142,6 +142,7 @@ export default defineConfig({
             filename: './dist/report.html',
             gzipSize: true,
             brotliSize: true,
+            open: mode === 'report',
         }),
     ],
     resolve: {
@@ -155,4 +156,4 @@ export default defineConfig({
     server: {
         port: 8080,
     }
-});
+}));
