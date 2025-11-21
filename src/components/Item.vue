@@ -19,7 +19,7 @@
         </small>
       </b-card-text>
     </b-card-body>
-    <ObjectActions :data="item" size="sm" />
+    <StacActions :data="item" footer vertical size="sm" />
   </b-card>
 </template>
 
@@ -27,7 +27,7 @@
 import { mapState, mapGetters } from 'vuex';
 import FileFormatsMixin from './FileFormatsMixin';
 import ThumbnailCardMixin from './ThumbnailCardMixin';
-import ObjectActions from './ObjectActions.vue';
+import StacActions from './StacActions.vue';
 import StacLink from './StacLink.vue';
 import { STAC } from 'stac-js';
 import { formatTemporalExtent, formatTimestamp, formatMediaType } from '@radiantearth/stac-fields/formatters';
@@ -40,7 +40,7 @@ export default {
   name: 'Item',
   components: {
     StacLink,
-    ObjectActions,
+    StacActions,
     Keywords: () => import('./Keywords.vue')
   },
   filters: {

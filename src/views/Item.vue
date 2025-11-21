@@ -14,7 +14,7 @@
             </b-tabs>
           </b-card>
         </section>
-        <ObjectActions :data="data" />
+        <StacActions :data="data" />
         <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="selectedReferences" @showAsset="showAsset" />
         <Links v-if="additionalLinks.length > 0" :title="$t('additionalResources')" :links="additionalLinks" :context="data" />
       </b-col>
@@ -39,7 +39,7 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
 import Description from '../components/Description.vue';
-import ObjectActions from '../components/ObjectActions.vue';
+import StacActions from '../components/StacActions.vue';
 import ReadMore from "vue-read-more-smooth";
 import ShowAssetLinkMixin from '../components/ShowAssetLinkMixin';
 import DeprecationMixin from '../components/DeprecationMixin';
@@ -55,7 +55,7 @@ export default {
     BTab,
     CollectionLink: () => import('../components/CollectionLink.vue'),
     Description,
-    ObjectActions,
+    StacActions,
     DeprecationNotice: () => import('../components/DeprecationNotice.vue'),
     Keywords: () => import('../components/Keywords.vue'),
     Links: () => import('../components/Links.vue'),

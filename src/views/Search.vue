@@ -35,13 +35,17 @@
             :count="totalCount" :apiFilters="collectionFilters"
           >
             <template #catalogFooter="slot">
-              <b-button-group v-if="itemSearch || canFilterItems(slot.data)" vertical size="sm">
+              <b-button-group v-if="itemSearch || canFilterItems(slot.data) || hasActions(slot.data)" vertical size="sm">
                 <b-button v-if="itemSearch" variant="outline-primary" :pressed="selectedCollections[slot.data.id]" @click="selectForItemSearch(slot.data)">
                   <b-icon-check-square v-if="selectedCollections[slot.data.id]" />
                   <b-icon-square v-else />
                   <span class="ml-2">{{ $t('search.selectForItemSearch') }}</span>
                 </b-button>
                 <StacLink :button="{variant: 'outline-primary', disabled: !canFilterItems(slot.data)}" :data="slot.data" :title="$t('search.filterCollection')" :state="{itemFilterOpen: 1}" />
+                <b-button v-for="action of actions(slot.data)" v-bind="action.btnOptions" :key="action.id" variant="outline-primary" @click="action.onClick">
+                  <component v-if="action.icon" :is="action.icon" class="mr-1" />
+                  {{ action.text }}
+                </b-button>
               </b-button-group>
             </template>
           </Catalogs>
@@ -68,14 +72,16 @@ import Utils from '../utils';
 import SearchFilter from '../components/SearchFilter.vue';
 import Loading from '../components/Loading.vue';
 import ErrorAlert from '../components/ErrorAlert.vue';
+import StacActions from '../../stacActions.config';
 import { getDisplayTitle, createSTAC, ItemCollection } from '../models/stac';
 import { STAC } from 'stac-js';
-import { BIconCheckSquare, BIconSquare, BTabs, BTab } from 'bootstrap-vue';
+import { BIconBoxArrowUpRight, BIconCheckSquare, BIconSquare, BTabs, BTab } from 'bootstrap-vue';
 import { getErrorCode, getErrorMessage, processSTAC, stacRequest } from '../store/utils';
 
 export default {
   name: "Search",
   components: {
+    BIconBoxArrowUpRight,
     BIconCheckSquare,
     BIconSquare,
     BTab,
@@ -241,6 +247,14 @@ export default {
         return Boolean(data.getApiItemsLink());
       }
       return false;
+    },
+    actions(data) {
+      return Object.entries(StacActions)
+        .map(([id, plugin]) => new plugin(data, this, id))
+        .filter(plugin => plugin.show);
+    },
+    hasActions(data) {
+      return this.actions(data).length > 0;
     },
     async loadResults(link) {
       this.error = null;

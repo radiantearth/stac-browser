@@ -1,8 +1,8 @@
-import ObjectActionPlugin from "../ObjectActionPlugin";
+import StacActionPlugin from "../StacActionPlugin";
 import URI from 'urijs';
 import i18n from "../../i18n";
 
-export default class StacMap extends ObjectActionPlugin {
+export default class StacMap extends StacActionPlugin {
 
   get show() {
     return this.object.isItem();
