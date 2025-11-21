@@ -140,7 +140,6 @@ export default defineConfig({
         }),
         visualizer({
             filename: './dist/report.html',
-            open: true,
             gzipSize: true,
             brotliSize: true,
         }),
