@@ -92,7 +92,7 @@ export async function executeCustomFunctions(locale) {
     return;
   }
   const p = customizeFiles.map(async (file) => {
-    const fn = (await import(`./locales/${locale}/${file}`)).default;
+    const fn = (await import(`./locales/${locale}/${file}.js`)).default;
     return await fn(locale);
   });
   return Promise.all(p);
