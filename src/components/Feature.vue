@@ -25,9 +25,11 @@ import DataTypes from '@radiantearth/stac-fields/datatypes';
 
 export default defineComponent({
   name: "Feature",
+  components: {
+    BCard
+  },
   props: {
     feature: {
-      BCard,
       type: Object,
       required: true
     }
