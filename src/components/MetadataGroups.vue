@@ -4,14 +4,15 @@
     <b-card-group columns :class="`count-${formattedData.length}`">
       <MetadataGroup
         v-for="group in formattedData"
-        v-bind="group"
         :key="group.extension"
+        v-bind="group"
       />
     </b-card-group>
   </section>
 </template>
 
 <script>
+import { BCardGroup } from 'bootstrap-vue-next';
 import {
   formatAsset,
   formatCatalog,
@@ -30,8 +31,9 @@ import { mapState } from "vuex";
 import __ from "../../fields.config";
 
 export default {
-  name: "Metadata",
+  name: "MetadataGroups",
   components: {
+    BCardGroup,
     MetadataGroup,
   },
   props: {
