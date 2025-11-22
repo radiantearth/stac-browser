@@ -10,7 +10,7 @@ import FullScreenControl from 'ol/control/FullScreen.js';
 import { stacRequest } from '../../store/utils';
 
 import configureBasemap from '../../../basemaps.config';
-import CONFIG from '../../../config';
+import CONFIG from '../../config';
 import proj4 from 'proj4';
 import {register} from 'ol/proj/proj4.js';
 // Register pre-defined CRS from config in proj4
@@ -172,9 +172,11 @@ export default {
               console.error('Failed to fetch WMTS capabilities', e);
             }
           }
-          const [{default: sourceCls}, {default: layerCls}] = await Promise.all([
-            sourceClassName ? import(`ol/source/${sourceClassName}.js`) : Promise.resolve({default: null}),
-            import(`ol/layer/${layerClassName}.js`)
+          const [{ default: sourceCls }, { default: layerCls }] = await Promise.all([
+            // We need to import relatively for vite, see
+            // https://github.com/rollup/plugins/tree/master/packages/dynamic-import-vars#imports-must-start-with--or-
+            sourceClassName ? import(`../../../node_modules/ol/source/${sourceClassName}.js`) : Promise.resolve({ default: null }),
+            import(`../../../node_modules/ol/layer/${layerClassName}.js`)
           ]);
           const source = sourceCls ? new sourceCls(options) : undefined;
           const layer = new layerCls({

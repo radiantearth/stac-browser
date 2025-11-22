@@ -541,8 +541,8 @@ export default defineComponent({
 
 <style lang="scss">
 @import "./theme/variables.scss";
-@import '~bootstrap/scss/bootstrap';
-@import '~bootstrap-vue-next/dist/bootstrap-vue-next.css';
+@import 'bootstrap/scss/bootstrap';
+@import 'bootstrap-vue-next/dist/bootstrap-vue-next.css';
 @import "./theme/page.scss";
 @import "./theme/custom.scss";
 </style>
