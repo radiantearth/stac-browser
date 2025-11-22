@@ -11,6 +11,11 @@
   --dp-hover-color: #{lighten($primary, 60%)};
 }
 
+.dp__calendar_header {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
 .dp__main {
   .dp__time_picker_inline_container {
     > .dp__flex {
