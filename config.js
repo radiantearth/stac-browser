@@ -24,7 +24,7 @@ module.exports = {
         "ro",
         "ja",
         "pt",
-//      "pt-BR"
+//      "pt-BR",
         "id",
         "pl"
     ],
