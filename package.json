@@ -38,7 +38,7 @@
   "dependencies": {
     "@apidevtools/json-schema-ref-parser": "^14.0.0",
     "@musement/iso-duration": "^1.0.0",
-    "@radiantearth/stac-fields": "~1.5.6",
+    "@radiantearth/stac-fields": "~1.5.7",
     "@radiantearth/stac-migrate": "~2.0.2",
     "@turf/mask": "^7.2.0",
     "ajv-i18n": "^4.2.0",
