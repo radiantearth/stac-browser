@@ -108,15 +108,10 @@
     "noExternalAccess": "Não é permitido acessar catálogos externos!",
     "notFound": "O recurso solicitado não existe. @:errors.contactProvider",
     "serverError": "O servidor encontrou um problema. @:errors.contactProvider",
-    "title": "",
     "unauthorized": "A solicitação não possui credenciais, por exemplo, um token de API. Forneça suas credenciais e tente novamente."
   },
   "featureExperimental": "Esta funcionalidade ainda é experimental e pode dar resultados inesperados!",
-  "features": {
-    "empty": "",
-    "noProperties": "",
-    "title": ""
-  },
+  "features": {},
   "fullscreen": {
     "exit": "Sair da tela cheia",
     "exitLabel": "✕",
@@ -140,7 +135,6 @@
   "in": "em {catalog}",
   "index": {
     "api": "API",
-    "catalog": "",
     "load": "Carregar",
     "selectStacIndex": "... ou selecione um de {stacIndex}:",
     "specifyCatalog": "Especifique um catálogo STAC ou API...",
