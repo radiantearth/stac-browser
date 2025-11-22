@@ -11,6 +11,7 @@ export default {
     const timeFormat = 'HH:mm:ss';
     return {
       datepickerLang: null,
+      weekStartDay: 1,
       dateFormat,
       timeFormat,
       dateTimeFormat: `${dateFormat} ${timeFormat}`,
@@ -30,11 +31,12 @@ export default {
 
         try {
           const options = (await import(`../locales/${locale}/datepicker.js`)).default;
-        
+
           this.datepickerLang = options.locale;
-          this.dateFormat = options.dateFormat || options.dateFormat;
+          this.dateFormat = options.dateFormat;
           this.timeFormat = options.timeFormat;
           this.dateTimeFormat = options.dateTimeFormat;
+          this.weekStartDay = options.locale.options.weekStartsOn;
         } catch (e) {
           console.error(`Could not load datepicker locale for ${locale}`, e);
           
