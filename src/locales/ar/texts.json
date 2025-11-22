@@ -108,13 +108,20 @@
     "noExternalAccess": "الوصول إلى الكتالوجات الخارجية غير مسموح!",
     "notFound": "المورد المطلوب غير موجود. @:errors.contactProvider",
     "serverError": "واجه الخادم مشكلة. @:errors.contactProvider",
+    "title": "",
     "unauthorized": "يفتقر الطلب إلى بيانات الاعتماد، مثل رمز API. يرجى تقديم بيانات الاعتماد والمحاولة مرة أخرى."
   },
   "featureExperimental": "هذه الميزة لا تزال تجريبية وقد تعطي نتائج غير متوقعة!",
-  "features": {},
+  "features": {
+    "empty": "",
+    "noProperties": "",
+    "title": ""
+  },
   "fullscreen": {
     "exit": "الخروج من وضع ملء الشاشة",
-    "show": "عرض بملء الشاشة"
+    "exitLabel": "",
+    "show": "عرض بملء الشاشة",
+    "showLabel": ""
   },
   "goBack": {
     "description": "العودة إلى {type}",
@@ -133,6 +140,7 @@
   "in": "في {catalog}",
   "index": {
     "api": "واجهة برمجة التطبيقات",
+    "catalog": "",
     "load": "تحميل",
     "selectStacIndex": "... أو اختر واحدًا من {stacIndex}:",
     "specifyCatalog": "يرجى تحديد كتالوج STAC أو API...",
@@ -150,13 +158,37 @@
   "loading": "جارٍ التحميل...",
   "map": "الخريطة",
   "mapping": {
-    "attribution": {},
-    "bboxSelect": {},
-    "layers": {},
-    "location": {},
+    "attribution": {
+      "label": "",
+      "description": "",
+      "collapseLabel": ""
+    },
+    "bboxSelect": {
+      "add": "",
+      "remove": ""
+    },
+    "close": "",
+    "fit": "",
+    "layers": {
+      "title": "",
+      "base": "",
+      "unnamed": "",
+      "footprint": ""
+    },
+    "location": {
+      "description": ""
+    },
+    "nobasemap": "",
+    "nodata": "",
     "zoom": {
-      "in": {},
-      "out": {}
+      "in": {
+        "description": "",
+        "label": ""
+      },
+      "out": {
+        "description": "",
+        "label": ""
+      }
     }
   },
   "messageForSchemaError": "{message}، للمخطط {schemaPath}",
