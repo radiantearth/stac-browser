@@ -21,13 +21,13 @@
     <b-alert v-if="hasSearchCritera && catalogView.length === 0" variant="warning" class="mt-2" show>{{ $t('catalogs.noMatches') }}</b-alert>
     <section class="list">
       <Loading v-if="loading" fill top />
-      <component :is="cardsComponent" v-bind="cardsComponentProps">
+      <div v-if="catalogView.length > 0" :class="cardsContainerClass">
         <Catalog v-for="catalog in catalogView" :catalog="catalog" :key="catalog.href">
           <template #footer="{data}">
             <slot name="catalogFooter" :data="data" />
           </template>
         </Catalog>
-      </component>
+      </div>
     </section>
     <Pagination v-if="showPagination" class="mb-3" :pagination="pagination" @paginate="paginate" />
     <b-button v-else-if="hasMore" @click="loadMore" variant="primary" v-b-visible.300="loadMore">{{ $t('catalogs.loadMore') }}</b-button>
@@ -194,22 +194,8 @@ export default {
       }
       return keywords.sort();
     },
-    cardsComponent() {
-      return (this.view === 'list') ? 'div' : 'b-card-group';
-    },
-    cardsComponentProps() {
-      if (this.view === 'list') {
-        return {
-          class: [
-            'card-list'
-          ]
-        };
-      }
-      else {
-        return {
-          columns: true
-        };
-      }
+    cardsContainerClass() {
+      return this.view === 'list' ? 'card-list' : 'card-grid';
     },
     view: {
       get() {
