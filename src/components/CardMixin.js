@@ -1,6 +1,9 @@
 import { mapState } from 'vuex';
+import { STAC } from 'stac-js';
+import Utils from '../utils';
 
 export default {
+  name: 'CardMixin',
   props: {
     showThumbnail: {
       type: Boolean,
@@ -43,6 +46,35 @@ export default {
         }
       }
       return null;
+    },
+    keywords() {
+      if (this.data) {
+        return this.data.getMetadata('keywords') || [];
+      }
+      return [];
+    },
+    isDeprecated() {
+      if (!(this.data instanceof STAC)) {
+        return false;
+      }
+      // Items have deprecated in properties, catalogs/collections have it at the root
+      const deprecated = this.data.isItem() ? this.data.properties?.deprecated : this.data.deprecated;
+      return Boolean(deprecated);
+    },
+    hasDescription() {
+      if (!(this.data instanceof STAC)) {
+        return false;
+      }
+      // Use getMetadata which handles both items and catalogs
+      const description = this.data.getMetadata('description');
+      return Utils.hasText(description);
+    },
+    summarizeDescription() {
+      if (!this.hasDescription) {
+        return '';
+      }
+      const description = this.data.getMetadata('description');
+      return Utils.summarizeMd(description, 300);
     }
   }
 };
