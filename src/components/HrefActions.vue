@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-button-group class="actions" :vertical="vertical" :size="size" v-if="hasButtons">
+    <b-button-group class="actions" :vertical="vertical" :size="size" v-if="href">
       <b-button variant="danger" v-if="requiresAuth" tag="a" tabindex="0" :id="`popover-href-${id}-btn`" @click="handleAuthButton">
         <b-icon-lock /> {{ $t('authentication.required') }}
       </b-button>
@@ -143,12 +143,6 @@ export default {
     },
     hasDownloadButton() {
       return this.isAsset && this.isBrowserProtocol;
-    },
-    hasButtons() {
-      return this.href && (this.requiresAuth
-                        || this.hasDownloadButton()
-                        || this.hasShowButton()
-                        || (this.actions && this.actions.length > 0));
     },
     downloadEvents() {
       if (this.hasDownloadButton && this.useAltDownloadMethod) {

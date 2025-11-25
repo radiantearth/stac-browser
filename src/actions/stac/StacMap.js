@@ -9,7 +9,7 @@ export default class StacMap extends StacActionPlugin {
   }
 
   get uri() {
-    return new URI(`https://developmentseed.org/stac-map/?href=${this.object.getAbsoluteUrl()}`);
+    return URI('https://developmentseed.org/stac-map/').addQuery('href', this.object.getAbsoluteUrl());
   }
 
   get text() {
