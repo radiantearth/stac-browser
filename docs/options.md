@@ -399,7 +399,7 @@ Corresponds to the ol-stac parameter `getSourceOptions`:
 
 > Optional function that can be used to configure the underlying sources. The function can do any additional work and return the completed options or a promise for the same. The function will be called with the current source options and the STAC Asset or Link. This can be useful for adding auth information such as an API token, either via query parameter or HTTP headers. Please be aware that sending HTTP headers may not be supported by all sources.
 
-The function that can be provided for getMapSourceOptions has the following signure:
+The function that can be provided for getMapSourceOptions has the following signature:
 
 ```js
 async getSourceOptions(type, options) => options

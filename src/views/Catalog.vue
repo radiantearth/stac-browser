@@ -225,7 +225,7 @@ export default {
       else {
         const items = this.items.filter(item => item.type === 'Feature');
         if (items.length > 0) {
-          data.items = new ItemCollection({
+          data.children = new ItemCollection({
             type: 'FeatureCollection',
             features: items
           });

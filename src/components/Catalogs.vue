@@ -3,10 +3,10 @@
     <header>
       <h2 class="title mr-2">{{ title }}</h2>
       <b-badge v-if="catalogCount !== null" pill variant="secondary" class="mr-4">{{ catalogCount }}</b-badge>
-      <ViewButtons class="mr-2" v-model="view" />
-      <SortButtons v-if="isComplete && catalogs.length > 1" v-model="sort" />
+      <ViewButtons v-if="!hideControls" class="mr-2" v-model="view" />
+      <SortButtons v-if="!hideControls && isComplete && catalogs.length > 1" v-model="sort" />
     </header>
-    <section v-if="isComplete && catalogs.length > 1" class="catalog-filter mb-2">
+    <section v-if="!hideControls && isComplete && catalogs.length > 1" class="catalog-filter mb-2">
       <SearchBox v-model="searchTerm" :placeholder="filterPlaceholder" />
       <multiselect
         v-if="allKeywords.length > 0" v-model="selectedKeywords" multiple :options="allKeywords"
@@ -62,6 +62,14 @@ export default {
     collectionsOnly: {
       type: Boolean,
       required: false
+    },
+    enforceCards: {
+      type: Boolean,
+      default: false
+    },
+    hideControls: {
+      type: Boolean,
+      default: false
     },
     loading: {
       type: Boolean,
@@ -205,9 +213,15 @@ export default {
     },
     view: {
       get() {
+        if (this.enforceCards) {
+          return 'cards';
+        }
         return this.$store.state.cardViewMode;
       },
       async set(cardViewMode) {
+        if (this.enforceCards) {
+          return;
+        }
         await this.$store.dispatch('config', { cardViewMode });
       }
     }
