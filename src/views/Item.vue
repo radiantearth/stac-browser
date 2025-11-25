@@ -118,10 +118,6 @@ export default {
     }
   }
 
-  .card-columns .thumbnail {
-    align-self: center;
-  }
-
   .metadata .card-columns {
     column-count: 1;
 
