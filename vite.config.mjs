@@ -10,6 +10,8 @@ import IconsResolver from 'unplugin-icons/resolver';
 import Components from 'unplugin-vue-components/vite';
 import { FileSystemIconLoader } from 'unplugin-icons/loaders';
 import { BootstrapVueNextResolver } from 'bootstrap-vue-next/resolvers';
+
+import { createHtmlPlugin } from 'vite-plugin-html';
 import { visualizer } from 'rollup-plugin-visualizer';
 
 const require = createRequire(import.meta.url);
@@ -45,9 +47,7 @@ const configFromFile = require(configFile);
 const mergedConfig = Object.assign(configFromFile, argv);
 
 export default defineConfig(({ mode }) => ({
-    // todo: check against docs
     base: mergedConfig.pathPrefix || '/',
-    // todo: check against docs
     build: {
         sourcemap: mode !== 'minimal',
         rollupOptions: {
@@ -62,7 +62,6 @@ export default defineConfig(({ mode }) => ({
             }
         }
     },
-    // todo: check against docs
     define: {
         STAC_BROWSER_VERSION: JSON.stringify(pkgFile.version),
         CONFIG: JSON.stringify(mergedConfig)
@@ -73,6 +72,17 @@ export default defineConfig(({ mode }) => ({
                 compilerOptions: {
                     // Preserve whitespace behavior from Vue 2
                     whitespace: 'preserve'
+                },
+            },
+        }),
+        createHtmlPlugin({
+            minify: mode === 'production',
+            template: 'public/index.html',
+            inject: {
+                data: {
+                    catalogTitle: mergedConfig.catalogTitle || 'STAC Browser',
+                    catalogUrl: mergedConfig.catalogUrl || '',
+                    ...mergedConfig,
                 },
             },
         }),
@@ -122,15 +132,6 @@ export default defineConfig(({ mode }) => ({
                 'share': FileSystemIconLoader('./src/media/'),
             },
         }),
-        // todo: check against docs
-        {
-            name: 'html-transform',
-            transformIndexHtml(html) {
-                return html
-                    .replace(/<title>.*?<\/title>/, `<title>${mergedConfig.catalogTitle || 'STAC Browser'}</title>`)
-                    .replace('<head>', `<head>\n    <meta property="og:url" content="${mergedConfig.catalogUrl || ''}" />`);
-            }
-        },
         nodePolyfills({
             include: ['buffer', 'path', 'process'],
             globals: {
@@ -148,9 +149,6 @@ export default defineConfig(({ mode }) => ({
     resolve: {
         alias: {
             '@': fileURLToPath(new URL('./src', import.meta.url)),
-            // todo: check against docs
-            'Buffer': 'buffer',
-            'path': 'path-browserify',
         }
     },
     server: {
