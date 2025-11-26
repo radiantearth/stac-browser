@@ -217,7 +217,7 @@ export default {
       margin-bottom: 0;
     }
     ul li {
-      list-style-type: "- ";
+      list-style-type: "• ";
     }
     dl {
       margin: 0;
