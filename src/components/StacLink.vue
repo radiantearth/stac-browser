@@ -114,7 +114,7 @@ export default defineComponent({
           rel: this.link.rel,
         };
         if (this.id) {
-          // Add tab index when an ID is given for popoversto make it clickable on MacOS (#655)
+          // Add tab index when an ID is given for popovers to make it clickable on MacOS (#655)
           obj.tabindex = 0;
         }
         return obj;

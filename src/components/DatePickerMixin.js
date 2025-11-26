@@ -39,7 +39,7 @@ export default {
           this.weekStartDay = options.locale.options.weekStartsOn;
         } catch (e) {
           console.error(`Could not load datepicker locale for ${locale}`, e);
-          
+
           this.datepickerLang = null;
         }
       }

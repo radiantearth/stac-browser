@@ -27,6 +27,7 @@ export default {
   components: {
     HrefActions,
     StacLink,
+    BPopover: defineAsyncComponent(() => import('bootstrap-vue-next').then(m => m.BPopover)),
     Description: defineAsyncComponent(() => import('./Description.vue')),
     MetadataGroups: defineAsyncComponent(() => import('./MetadataGroups.vue'))
   },

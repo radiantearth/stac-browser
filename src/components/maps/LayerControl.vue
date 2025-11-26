@@ -34,6 +34,7 @@ import MapUtils from './mapUtils';
 export default {
   name: 'LayerControl',
   components: {
+    BPopover: defineAsyncComponent(() => import('bootstrap-vue-next').then(m => m.BPopover)),
     LayerControlGroup: defineAsyncComponent(() => import('./LayerControlGroup.vue'))
   },
   mixins: [

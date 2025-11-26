@@ -1,5 +1,3 @@
-import Browse from "../views/Browse.vue";
-
 function catchAllString(route) {
   const pathMatch = route.params.pathMatch;
   return Array.isArray(pathMatch) ? pathMatch.join("/") : pathMatch;
@@ -62,7 +60,7 @@ function getRoutes(config) {
   routes.push({
     path: "/:pathMatch(.*)*",
     name: "browse",
-    component: Browse,
+    component: () => import("../views/Browse.vue"),
     props: route => getPath(route, config)
   });
 
