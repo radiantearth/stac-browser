@@ -6,7 +6,7 @@
   "scripts": {
     "start": "vite",
     "build": "vite build",
-    "serve": "vite preview",
+    "build:preview": "vite build && vite preview",
     "build:report": "vite build --mode report",
     "build:minimal": "vite build --mode minimal",
     "lint": "eslint --ext .js,.vue --ignore-path .gitignore --fix src",

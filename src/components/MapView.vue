@@ -42,6 +42,7 @@ let mapId = 0;
 export default {
   name: 'MapView',
   components: {
+    BPopover: defineAsyncComponent(() => import('bootstrap-vue-next').then(m => m.BPopover)),
     Features: defineAsyncComponent(() => import('../components/Features.vue')),
     Items: defineAsyncComponent(() => import('../components/Items.vue')),
     LayerControl,

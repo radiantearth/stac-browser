@@ -57,6 +57,7 @@ export default {
   name: 'HrefActions',
   components: {
     AuthSchemeItem: defineAsyncComponent(() => import('./AuthSchemeItem.vue')),
+    BPopover: defineAsyncComponent(() => import('bootstrap-vue-next').then(m => m.BPopover)),
     CopyButton: defineAsyncComponent(() => import('./CopyButton.vue')),
     Description,
   },

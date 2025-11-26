@@ -43,13 +43,12 @@
 
 <script>
 import { mapState } from 'vuex';
-import { BCardGroup, BCollapse } from 'bootstrap-vue-next';
+import { BCollapse } from 'bootstrap-vue-next';
 import { defineComponent, defineAsyncComponent } from 'vue';
 
 import Utils from '../utils';
 import Item from './Item.vue';
 import Loading from './Loading.vue';
-import Pagination from './Pagination.vue';
 import { getDisplayTitle } from '../models/stac';
 
 export default defineComponent({
@@ -58,8 +57,7 @@ export default defineComponent({
     Item,
     SearchFilter: defineAsyncComponent(() => import('./SearchFilter.vue')),
     Loading,
-    Pagination,
-    BCardGroup,
+    Pagination: defineAsyncComponent(() => import('./Pagination.vue')),
     BCollapse,
     SortButtons: defineAsyncComponent(() => import('./SortButtons.vue'))
   },

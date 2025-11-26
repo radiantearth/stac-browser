@@ -78,6 +78,8 @@
 <script>
 import { defineAsyncComponent } from 'vue';
 
+import { BDropdown, BDropdownItemButton } from 'bootstrap-vue-next';
+
 import DatePickerMixin from './DatePickerMixin';
 import Utils from '../utils';
 import CqlValue from '../models/cql2/value';
@@ -85,6 +87,8 @@ import CqlValue from '../models/cql2/value';
 export default {
   name: 'QueryableInput',
   components: {
+    BDropdown,
+    BDropdownItemButton,
     Description: defineAsyncComponent(() => import('./Description.vue'))
   },
   mixins: [
