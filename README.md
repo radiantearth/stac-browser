@@ -282,7 +282,8 @@ You can use the Docker to work with STAC Browser. Please read [Docker documentat
 We are happy to review and accept Pull Requests.
 STAC Browser is following the [STAC code of conduct](https://github.com/radiantearth/stac-spec/blob/master/CODE_OF_CONDUCT.md).
 
-STAC Browser uses [Vue](https://vuejs.org/) and [vue-cli](https://cli.vuejs.org/), so you need a recent version of [NodeJS and npm](https://nodejs.org/en/) installed.
+STAC Browser builds on top of [VueJS 3](https://vuejs.org/) and [Vite](https://vite.dev),
+so you need a recent version of [NodeJS and npm](https://nodejs.org/en/) installed.
 
 You can run the following commands (see also "[Get started](#get-started)" above):
 
