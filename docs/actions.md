@@ -19,9 +19,9 @@ The following actions are available:
 - `Cesium`: Allows to open OGC 3D Tiles (media type `application/3dtiles+json`) files through the Cesium Sandcastle at <https://sandcastle.cesium.com>.
 - `CopcViewer`: Allows to open Cloud-Optimized Point Cloud (COPC, media type `application/vnd.laszip+copc`) files through the Hobu COPC Viewer at <https://viewer.copc.io>.
 - `F3D`: Allows to open 3D models (media types `model/gltf-binary`, `model/gltf+json`, and `application/fbx`) files through the F3D Web App at <https://f3d.app/web>.
-- `Felt`: Allows to open GeoTIFF, GeoJON and KML/KMZ files through Felt at <https://felt.com/map/>.
+- `Felt`: Allows to open GeoTIFF, GeoJSON and KML/KMZ files through Felt at <https://felt.com/map/>.
 - `Geofox`: Allows to open OGC 3D Tiles  (media type `application/3dtiles+json`) files through the 3D Assets Viewer at <https://viewer.geofox.ai>.
-- `GeoJsonIo`: Allows to open GeoJON files through [geojson.io](https://geojson.io).
+- `GeoJsonIo`: Allows to open GeoJSON files through [geojson.io](https://geojson.io).
 - `Potree`: Allows to open Cloud-Optimized Point Cloud (COPC, media type `application/vnd.laszip+copc`) and Potree files (file names `cloud.js`, `metadata.json`, `ept.json`) files through the Potree Viewer at <https://3d.iconem.com/apps/load_potree_project_from_urlparam/>.
 - `Protomaps`: Allows to open PMTiles (media type `application/vnd.pmtiles`) files through PMTiles Viewer at <https://pmtiles.io>.
 
@@ -93,7 +93,7 @@ Similarly, actions for assets are stored in the folder links are stored in the f
 The interfaces for both look as follows:
 
 - `constructor(data: object, component: Vue, id: string)`
-  - `data`: The asset or link object, it is available in the class throuh `this.asset` (for assets) and `this.link` (for links).
+  - `data`: The asset or link object, it is available in the class through `this.asset` (for assets) and `this.link` (for links).
   - `component`: The parent Asset/Link Vue component (available in the class through `this.component`)
   - `id`: Internal ID of the asset or link, not meant to be used.
 - `get btnOptions() : object`
@@ -101,7 +101,7 @@ The interfaces for both look as follows:
 - `get onClick() : function(event: MouseEvent)`
   - Returns a function that accepts a [MouseEvent](https://developer.mozilla.org/de/docs/Web/API/MouseEvent). This is the action to execute in case no `href` is set.
 - `get uri() : string`
-  - Reurns the URL to use as `href` for the button/link. This should a valid URL that a browser can navigate to, including the asset or link URL as a query parameter or so.
+  - Returns the URL to use as `href` for the button/link. This should a valid URL that a browser can navigate to, including the asset or link URL as a query parameter or so.
 - `get show() : boolean`
   - Return `true` if the action should be shown for the given asset or link. Return `false` otherwise, default to `false`.
 - `get text() : string`
