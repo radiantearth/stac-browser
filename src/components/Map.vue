@@ -11,12 +11,13 @@
       v-if="popover && selection" show placement="auto" triggers="manual"
       :target="selection.target" :container="container" custom-class="map-popover"
     >
-      <section class="popover-items">
-        <Items v-if="selection.type === 'items'" :stac="stac" :items="selection.items" />
-        <Features v-else :features="selection.items" />
+      <section class="popover-children">
+        <Items v-if="selection.type === 'items'" :stac="stac" :items="selection.children" />
+        <Catalogs v-else-if="selection.type === 'collections'" collectionsOnly enforceCards hideControls :stac="stac" :catalogs="selection.children" />
+        <Features v-else :features="selection.children" />
       </section>
       <div class="text-center">
-        <b-button target="_blank" variant="danger" @click="resetSelection">{{ $t('mapping.close') }}</b-button>
+        <b-button variant="danger" @click="resetSelection">{{ $t('mapping.close') }}</b-button>
       </div>
     </b-popover>
   </div>
@@ -42,6 +43,7 @@ export default {
   name: 'Map',
   components: {
     BPopover,
+    Catalogs: () => import('../components/Catalogs.vue'),
     Features: () => import('../components/Features.vue'),
     Items: () => import('../components/Items.vue'),
     LayerControl,
@@ -59,7 +61,7 @@ export default {
       type: Array,
       default: null
     },
-    items: {
+    children: {
       type: Object,
       default: null
     },
@@ -107,12 +109,12 @@ export default {
       }
       await this.stacLayer.setAssets(this.assets);
     },
-    async items() {
+    async children() {
       if (!this.stacLayer) {
         return;
       }
       await this.stacLayer.setAssets(null, false);
-      await this.stacLayer.setChildren(this.items, this.childrenOptions, false);
+      await this.stacLayer.setChildren(this.children, this.childrenOptions, false);
       await this.stacLayer.updateLayers();
       this.fit();
     },
@@ -146,7 +148,7 @@ export default {
         // Don't set the URL here, as it is already set in the STAC object and is read-only.
         // url: this.stac.getAbsoluteUrl(),
         data: this.stac,
-        children: this.items,
+        children: this.children,
         assets: this.assets || null,
         displayWebMapLink: true,
         disableMigration: true,
@@ -169,7 +171,7 @@ export default {
           multi: true,
           style: selectStyle,
           layers: (layer) => {
-            if (this.items) {
+            if (this.children) {
               // For item selection
               return false;
             }
@@ -198,7 +200,7 @@ export default {
         this.map.on('singleclick', async (event) => {
           // For item selection
           this.selection = null;
-          if (this.items) {
+          if (this.children) {
             this.setTargetPosition(event);
             this.selector.getFeatures().clear();
             const features = this.selector.getFeatures();
@@ -207,8 +209,8 @@ export default {
             if (objects.length > 0) {
               this.selection = {
                 target: this.$refs.target,
-                type: 'items',
-                items: objects
+                type: this.children.isCollectionCollection() ? 'collections': 'items',
+                children: objects
               };
             }
           }
@@ -265,7 +267,7 @@ export default {
     left: -1px;
   }
   
-  .popover-items {
+  .popover-children {
     max-height: 500px;
     overflow: auto;
     margin-top: -0.5rem;
@@ -273,7 +275,7 @@ export default {
     margin-right: -0.75rem;
     padding: 0.5rem 0.75rem 0  0.75rem;
 
-    .items, .features {
+    .items, .features, .catalogs {
       margin-bottom: 0 !important;
     }
 
