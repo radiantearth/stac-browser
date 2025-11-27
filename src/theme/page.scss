@@ -113,7 +113,7 @@ body {
   .map {
     height: 350px;
     background-color: transparent;
-    @include border-radius($border-radius);
+    overflow: hidden;
     position: relative;
     z-index: 0;
   }
@@ -358,13 +358,6 @@ body {
       grid-row: span 1;
     }
   }
-
-  /* Limit to maximum 4 columns on large screens */
-  // @media (min-width: 1200px) {
-  //   .card-grid {
-  //     grid-template-columns: repeat(4, minmax(300px, 1fr)) !important;
-  //   }
-  // }
   
   .catalog-card,
   .item-card,
@@ -390,20 +383,15 @@ body {
     .card-img-wrapper {
       background-color: var(--bs-card-cap-bg);
       display: grid;
+      overflow: hidden;
 
       img {
         margin: auto;
+        border-radius: 0;
 
         &.card-img-top {
-          border-radius: $border-radius $border-radius 0 0;
           max-width: 100%;
           max-height: 250px;
-        }
-        &.card-img-end {
-          border-radius: 0 $border-radius $border-radius 0;
-        }
-        &.card-img-start {
-          border-radius: $border-radius 0 0 $border-radius;
         }
       }
     }
