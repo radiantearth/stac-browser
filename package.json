@@ -51,7 +51,7 @@
     "commonmark": "^0.31.2",
     "oidc-client-ts": "^3.0.1",
     "ol": "~10.6.0",
-    "ol-stac": "^1.0.5",
+    "ol-stac": "^1.1.0",
     "proj4": "^2.15.0",
     "remove-markdown": "^0.6.2",
     "stac-js": "~0.1.9",

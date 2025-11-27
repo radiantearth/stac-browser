@@ -26,8 +26,8 @@
         <b-alert v-else-if="results.length === 0 && noFurtherItems" variant="info" show>{{ $t('search.noFurtherItemsFound') }}</b-alert>
         <b-alert v-else-if="results.length === 0" variant="warning" show>{{ $t('search.noItemsFound') }}</b-alert>
         <template v-else>
-          <div id="search-map" v-if="itemCollection">
-            <MapView :stac="parent" :items="itemCollection" onfocusOnly popover />
+          <div id="search-map" v-if="resultCollection">
+            <MapView :stac="parent" :children="resultCollection" onfocusOnly popover />
           </div>
           <Catalogs
             v-if="isCollectionSearch" :catalogs="results" collectionsOnly
@@ -67,7 +67,7 @@ import Utils from '../utils';
 import SearchFilter from '../components/SearchFilter.vue';
 import Loading from '../components/Loading.vue';
 import ErrorAlert from '../components/ErrorAlert.vue';
-import { getDisplayTitle, createSTAC, ItemCollection } from '../models/stac';
+import { getDisplayTitle, createSTAC, CollectionCollection, ItemCollection } from '../models/stac';
 import { STAC } from 'stac-js';
 import { defineComponent, defineAsyncComponent } from 'vue';
 import { getErrorCode, getErrorMessage, processSTAC, stacRequest } from '../store/utils';
@@ -128,15 +128,20 @@ export default defineComponent({
     itemSearch() {
       return this.canSearchItems && this.parent && this.parent.getSearchLink();
     },
-    itemCollection() {
+    resultCollection() {
       if (this.isCollectionSearch) {
-        return null; // wait for stac-js to convert bboxes to geojson
+        return new CollectionCollection({
+          collections: this.results,
+          links: []
+        });
       }
-      return new ItemCollection({
-        type: 'FeatureCollection',
-        features: this.results,
-        links: []
-      });
+      else {
+        return new ItemCollection({
+          type: 'FeatureCollection',
+          features: this.results,
+          links: []
+        });
+      }
     },
     results() {
       if (Utils.size(this.data) === 0) {
@@ -305,6 +310,10 @@ export default defineComponent({
     border-top-left-radius: 0;
     border-top-right-radius: 0;
   }
+}
+
+#search-map {
+  margin-bottom: $block-margin;
 }
 
 #stac-browser .search {
