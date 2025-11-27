@@ -13,9 +13,9 @@
       :boundary-padding="10"
     >
       <section class="popover-children">
-        <Items v-if="selection && selection.type === 'items'" :stac="stac" :items="selection.children" />
-        <Catalogs v-if="selection && selection.type === 'collections'" collectionsOnly enforceCards hideControls :stac="stac" :catalogs="selection.children" />
-        <Features v-else-if="selection" :features="selection.children" />
+        <Items v-if="selection.type === 'items'" :stac="stac" :items="selection.children" />
+        <Catalogs v-else-if="selection.type === 'collections'" collectionsOnly enforceCards hideControls :stac="stac" :catalogs="selection.children" />
+        <Features v-else :features="selection.children" />
       </section>
       <div class="text-center">
         <b-button variant="danger" @click="resetSelection">{{ $t('mapping.close') }}</b-button>
