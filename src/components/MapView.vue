@@ -93,6 +93,11 @@ export default {
         return '#stac-browser';
       }
     },
+    childrenOptions() {
+      return {
+        displayPreview: this.children && this.children.isItemCollection()
+      };
+    }
   },
   watch: {
     async stac() {
@@ -109,7 +114,7 @@ export default {
         return;
       }
       await this.stacLayer.setAssets(null, false);
-      await this.stacLayer.setChildren(this.items, {displayPreview: true}, false);
+      await this.stacLayer.setChildren(this.items, this.childrenOptions, false);
       await this.stacLayer.updateLayers();
       this.fit();
     },
@@ -151,6 +156,7 @@ export default {
         assets: this.assets || null,
         displayWebMapLink: true,
         disableMigration: true,
+        childrenOptions: this.childrenOptions
       });
       this.stacLayer = new StacLayer(options);
       this.stacLayer.on('error', error => {
@@ -273,7 +279,7 @@ export default {
     margin-right: -0.75rem;
     padding: 0.5rem 0.75rem 0  0.75rem;
 
-    .items {
+    .items, .features {
       margin-bottom: 0 !important;
     }
 
