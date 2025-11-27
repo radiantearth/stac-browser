@@ -35,6 +35,7 @@
             </b-tabs>
           </b-card>
         </section>
+        <StacActions :data="data" />
         <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="selectedReferences" @showAsset="showAsset" />
         <Assets v-if="hasItemAssets && !hasItems" :assets="itemAssets" :context="data" :definition="true" />
         <Providers v-if="providers" :providers="providers" />
@@ -63,6 +64,7 @@
 import { mapState, mapGetters } from 'vuex';
 import Catalogs from '../components/Catalogs.vue';
 import Description from '../components/Description.vue';
+import StacActions from '../components/StacActions.vue';
 import Items from '../components/Items.vue';
 import ReadMore from "vue-read-more-smooth";
 import ShowAssetLinkMixin from '../components/ShowAssetLinkMixin';
@@ -85,6 +87,7 @@ export default {
     CollectionLink: () => import('../components/CollectionLink.vue'),
     DeprecationNotice: () => import('../components/DeprecationNotice.vue'),
     Description,
+    StacActions,
     Items,
     Keywords: () => import('../components/Keywords.vue'),
     Links: () => import('../components/Links.vue'),
@@ -437,6 +440,10 @@ export default {
         order: 3;
       }
     }
+  }
+
+  .obj-actions + .assets, .obj-actions + .providers, .obj-actions + .metadata {
+    margin-top: 1rem;
   }
 
   .metadata .card-columns {

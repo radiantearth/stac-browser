@@ -1,12 +1,13 @@
 # Actions <!-- omit in toc -->
 
-STAC Browser has a pluggable interface to share or open assets and links with other services, which we call "actions".
+STAC Browser has a pluggable interface to share or open assets, catalogs, collections, items and links with other services, which we call "actions".
 
-An action adds a button to an asset or link if certain requirements are met, which can then be executed by users.
+An action adds a button to an asset, catalog, collection, item or link if certain requirements are met, which can then be executed by users.
 For example, you could open COPC files in a dedicated COPC Viewer, which otherwise you could only download.
 
 - [User Guide](#user-guide)
   - [Assets](#assets)
+  - [Catalogs, Collections and Items](#catalogs-collections-and-items)
   - [Links](#links)
 - [Developer Guide](#developer-guide)
 
@@ -50,6 +51,37 @@ export default {
 
 Save the file and restart / rebuild STAC Browser.
 
+### Catalogs, Collections and Items
+
+The following actions are available:
+
+- `stac-map`: Allows to open items through stac-map at <https://developmentseed.org/stac-map/>.
+
+All actions for catalogs, collections and items are stored in the folder [`src/actions/stac`](../src/actions/stac) if you want to inspect them.
+
+The actions can be enabled by adding them to the [`stacActions.config.js`](../stacActions.config.js) file.
+Open the file and you'll see a number of imports and exports.
+Import the file for the action that you want to enable, e.g. for stac-map:
+
+```js
+import StacMap from './src/actions/stac/StacMap.js';
+```
+
+The path is fixed to `./src/actions/stac/`, the file extension is always `.js`.
+In-between add the file name from the list above.
+The import name should be the file name without extension (i.e. `StacMap` again).
+
+Lastly, add the import name to the list of exports, e.g.
+
+```js
+export default {
+  OtherAction,
+  StacMap
+};
+```
+
+Save the file and rebuild / restart STAC Browser.
+
 ### Links
 
 The following actions are available:
@@ -86,16 +118,22 @@ Save the file and rebuild / restart STAC Browser.
 
 ## Developer Guide
 
-Implementing actions for assets and links follows a very similar pattern.
-The main difference is that assets implement the [`AssetActionPlugin` interface](../src/actions/AssetActionPlugin.js) while links implement the [`LinkActionPlugin` interface](../src/actions/LinkActionPlugin.js).
-Similarly, actions for assets are stored in the folder links are stored in the folder [`src/actions/assets`](../src/actions/assets) while links are stored in the folder [`src/actions/links`](../src/actions/links).
+Implementing actions for assets, items and links follows a very similar pattern.
+The main difference is that each action implements its own interface:
+- assets implement the [`AssetActionPlugin` interface](../src/actions/AssetActionPlugin.js)
+- catalogs, collections and items implement the [`StacActionPlugin` interface](../src/actions/StacActionPlugin.js)
+- links implement the [`LinkActionPlugin` interface](../src/actions/LinkActionPlugin.js)
+Similarly, actions are stored in their own folder:
+- assets are stored in the folder [`src/actions/assets`](../src/actions/assets)
+- catalogs, collections and items are stored in the folder [`src/actions/stac`](../src/actions/stac)
+- links are stored in the folder [`src/actions/links`](../src/actions/links)
 
-The interfaces for both look as follows:
+All interfaces look as follows:
 
 - `constructor(data: object, component: Vue, id: string)`
-  - `data`: The asset or link object, it is available in the class through `this.asset` (for assets) and `this.link` (for links).
-  - `component`: The parent Asset/Link Vue component (available in the class through `this.component`)
-  - `id`: Internal ID of the asset or link, not meant to be used.
+  - `data`: The asset, catalog, collection, item or link object, it is available in the class through `this.asset` (for assets), `this.object` (for items) and `this.link` (for links).
+  - `component`: The parent Asset/Catalog/Collection/Item/Link Vue component (available in the class through `this.component`)
+  - `id`: Internal ID of the asset, catalog, collection, item or link, not meant to be used.
 - `get btnOptions() : object`
   - This should return an object of button options, see [VueBootstrap b-button](https://bootstrap-vue.org/docs/components/button/#component-reference) for details. Returns `href`, `rel` (only for links) and `target` (set to `_blank`) by default.
 - `get onClick() : function(event: MouseEvent)`
