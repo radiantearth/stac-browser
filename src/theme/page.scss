@@ -359,9 +359,7 @@ body {
       }
     }
 
-    .card-img-top,
-    .card-img-right,
-    .card-img-left {
+    .card-img {
       width: auto;
       height: auto;
       object-fit: contain;
@@ -371,15 +369,14 @@ body {
     .card-img-wrapper {
       background-color: rgba(0, 0, 0, 0.03);
       display: grid;
-      place-items: center;
 
       img {
-        border-radius: $border-radius $border-radius 0 0;
-        max-height: 250px;
-        max-width: 100%;
-        width: auto;
-        height: auto;
-        object-fit: contain;
+        margin: auto;
+
+        &.thumbnail.card-img {
+          max-width: 100%;
+          max-height: 250px;
+        }
       }
     }
 
