@@ -23,6 +23,7 @@ import {
   formatProvider,
   formatSummaries,
 } from "@radiantearth/stac-fields";
+import StacFieldsMixin from './StacFieldsMixin';
 import MetadataGroup from "./metadata/MetadataGroup.vue";
 import { isoDuration } from "@musement/iso-duration";
 import { mapState } from "vuex";
@@ -36,6 +37,9 @@ export default {
     BCardGroup,
     MetadataGroup,
   },
+  mixins: [
+    StacFieldsMixin({}),
+  ],
   props: {
     data: {
       type: Object,

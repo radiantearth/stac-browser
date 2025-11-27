@@ -9,7 +9,7 @@
       </b-card-title>
       <b-card-text v-if="fileFormats.length > 0 || hasDescription || isDeprecated" class="intro">
         <b-badge v-if="isDeprecated" variant="warning" class="me-1 mt-1 deprecated">{{ $t('deprecated') }}</b-badge>
-        <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="me-1 mt-1 fileformat">{{ formatMediaType(format) }}</b-badge>
+        <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="me-1 mt-1 fileformat">{{ format }}</b-badge>
         <template v-if="hasDescription">{{ summarizeDescription }}</template>
       </b-card-text>
       <Keywords v-if="showKeywordsInItemCards && keywords.length > 0" :keywords="keywords" variant="primary" />
@@ -26,12 +26,8 @@ import FileFormatsMixin from './FileFormatsMixin';
 import CardMixin from './CardMixin';
 import StacLink from './StacLink.vue';
 import { STAC } from 'stac-js';
-import { formatTemporalExtent, formatTimestamp, formatMediaType } from '@radiantearth/stac-fields/formatters';
-import Registry from '@radiantearth/stac-fields/registry';
+import { formatTemporalExtent, formatTimestamp } from '@radiantearth/stac-fields/formatters';
 import { BCard, BCardBody, BCardText, BCardTitle, BCardImg } from 'bootstrap-vue-next';
-import contentType from 'content-type';
-
-Registry.addDependency('content-type', contentType);
 
 export default defineComponent({
   name: 'Item',
@@ -87,9 +83,6 @@ export default defineComponent({
     },
   },
   methods: {
-    formatMediaType(value) {
-      return formatMediaType(value, null, {shorten: true});
-    },
     load(visible) {
       if (this.item instanceof STAC) {
         return;

@@ -9,7 +9,7 @@
       </b-card-title>
       <b-card-text v-if="fileFormats.length > 0 || hasDescription || isDeprecated" class="intro">
         <b-badge v-if="isDeprecated" variant="warning" class="me-1 mt-1 deprecated">{{ $t('deprecated') }}</b-badge>
-        <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="me-1 mt-1 fileformat">{{ formatMediaType(format) }}</b-badge>
+        <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="me-1 mt-1 fileformat">{{ format }}</b-badge>
         {{ summarizeDescription }}
       </b-card-text>
       <Keywords v-if="showKeywordsInCatalogCards && keywords.length > 0" :keywords="keywords" variant="primary" />
@@ -29,7 +29,7 @@ import StacFieldsMixin from './StacFieldsMixin';
 import CardMixin from './CardMixin';
 import StacLink from './StacLink.vue';
 import { STAC } from 'stac-js';
-import { formatMediaType, formatTemporalExtent } from '@radiantearth/stac-fields/formatters';
+import { formatTemporalExtent } from '@radiantearth/stac-fields/formatters';
 import { BCard, BCardBody, BCardFooter, BCardImg, BCardText, BCardTitle } from 'bootstrap-vue-next';
 
 export default {
@@ -93,9 +93,6 @@ export default {
         return;
       }
       this.$store.commit(visible ? 'queue' : 'unqueue', this.catalog.getAbsoluteUrl());
-    },
-    formatMediaType(value) {
-      return formatMediaType(value, null, {shorten: true});
     }
   }
 };
