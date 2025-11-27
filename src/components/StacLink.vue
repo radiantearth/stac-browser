@@ -8,6 +8,7 @@
 <script>
 import { defineComponent } from 'vue';
 import { mapState, mapGetters } from 'vuex';
+import { BButton } from 'bootstrap-vue-next';
 import { stacBrowserNavigatesTo } from "../rels";
 import Utils from '../utils';
 import { getDisplayTitle } from '../models/stac';
@@ -122,7 +123,7 @@ export default defineComponent({
     },
     component() {
       if (this.button) {
-        return 'b-button';
+        return BButton;
       }
       return this.isStacBrowserLink ? 'router-link' : 'a';
     },

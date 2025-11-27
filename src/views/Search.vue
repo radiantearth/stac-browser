@@ -5,13 +5,13 @@
     <b-row v-else>
       <b-col class="left">
         <b-tabs v-model="activeSearch">
-          <b-tab v-if="collectionSearch" :title="$t('search.tabs.collections')">
+          <b-tab v-if="collectionSearch" :title="$t('search.tabs.collections')" id="search-collections-tab">
             <SearchFilter
               :parent="parent" title="" :value="collectionFilters" type="Collections"
               @input="setFilters"
             />
           </b-tab>
-          <b-tab v-if="itemSearch" :title="$t('search.tabs.items')">
+          <b-tab v-if="itemSearch" :title="$t('search.tabs.items')" id="search-items-tab">
             <SearchFilter
               :parent="parent" title="" :value="itemFilters" type="Global"
               @input="setFilters"
@@ -77,7 +77,7 @@ import { BTab, BTabs } from 'bootstrap-vue-next';
 export default defineComponent({
   name: "Search",
   components: {
-    Catalogs: () => import('../components/Catalogs.vue'),
+    Catalogs: defineAsyncComponent(() => import('../components/Catalogs.vue')),
     BTabs,
     BTab,
     ErrorAlert,
@@ -103,7 +103,7 @@ export default defineComponent({
       data: null,
       itemFilters: {},
       collectionFilters: {},
-      activeSearch: 0,
+      activeSearch: undefined,
       selectedCollections: {}
     };
   },
@@ -176,7 +176,7 @@ export default defineComponent({
       return this.isCollectionSearch ? this.collectionFilters : this.itemFilters;
     },
     isCollectionSearch() {
-      return this.collectionSearch && this.activeSearch === 0;
+      return this.collectionSearch && this.activeSearch === 'search-collections-tab';
     },
     pageDescription() {
       let title = getDisplayTitle([this.collectionLink, this.parentLink, this.root], this.catalogTitle);
@@ -224,7 +224,7 @@ export default defineComponent({
   methods: {
     openItemSearch() {
       this.itemFilters.collections = Object.keys(this.selectedCollections);
-      this.activeSearch = 1;
+      this.activeSearch = 'search-items-tab';
       this.selectedCollections = {};
     },
     selectForItemSearch(collection) {
