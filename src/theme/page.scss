@@ -113,7 +113,7 @@ body {
   .map {
     height: 350px;
     background-color: transparent;
-    @include border-radius($border-radius);
+    overflow: hidden;
     position: relative;
     z-index: 0;
   }
@@ -369,9 +369,11 @@ body {
     .card-img-wrapper {
       background-color: rgba(0, 0, 0, 0.03);
       display: grid;
+      overflow: hidden;
 
       img {
         margin: auto;
+        border-radius: 0;
 
         &.thumbnail.card-img {
           max-width: 100%;
