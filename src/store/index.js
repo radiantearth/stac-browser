@@ -50,7 +50,7 @@ function getStore(config, router) {
   });
 
   return createStore({
-    strict: process.env.NODE_ENV !== 'production',
+    strict: import.meta.env.NODE_ENV !== 'production',
     modules: {
       auth: auth(router)
     },
@@ -341,18 +341,27 @@ function getStore(config, router) {
 
       acceptedLanguages: state => {
         const languages = {};
-        // Implement in ascending order:
-        languages['en'] = 0.1;
-        if (Array.isArray(state.supportedLocales)) {
-          state.supportedLocales.forEach(locale => languages[locale] = 0.2);
-        }
+        // Implement in ascending order so that the higher priority entries override previous ones
+        // Wildcard has the lowest priority
+        languages['*'] = 0.1;
+        // The fallback locale for STAC Browser
         if (Utils.hasText(state.fallbackLocale)) {
-          languages[state.fallbackLocale] = 0.5;
+          languages[state.fallbackLocale] = 0.2;
         }
+        // Locales defined by the browser in ascending order
+        // For example, if the browser has "de-CH,de,en" configured,
+        // the priority would be: de-CH (0.8), de (0.7), en (0.6)
+        // The priority never goes below 0.3
         if (Array.isArray(navigator.languages)) {
-          navigator.languages.forEach(locale => languages[locale] = 0.7);
+          navigator.languages.forEach((locale, i) => languages[locale] = 0.8 - Math.min((i * 0.1), 0.5));
         }
         if (Utils.hasText(state.locale)) {
+          // Add the more generic locale code as well.
+          // For example, 'de' in addition to 'de-CH'.
+          if (state.locale.includes('-')) {
+            languages[state.locale.substring(0, 2)] = 0.9;
+          }
+          // The currently selected locale has the highest priority
           languages[state.locale] = 1;
         }
         return Object.entries(languages)
@@ -365,7 +374,7 @@ function getStore(config, router) {
             }
             return 0;
           })
-          .map(([l, q]) => q >= 1 ? l : `${l};q=${q}`)
+          .map(([l, q]) => q >= 1 ? l : `${l};q=${q.toFixed(1)}`)
           .join(',');
       }
     },

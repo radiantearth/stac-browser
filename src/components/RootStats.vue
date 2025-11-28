@@ -144,7 +144,13 @@ export default {
 </script>
 
 <style lang="scss">
+@import "../theme/variables.scss";
+
 #stac-browser .root-stats {
+  h4 {
+    margin-top: $block-margin;
+  }
+
   .charts .chart {
     max-height: 300px;
   }

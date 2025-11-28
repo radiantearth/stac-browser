@@ -19,11 +19,17 @@
 import { STAC } from 'stac-js';
 import { getBest, prepareSupported } from 'stac-js/src/locales';
 
+import { BDropdown, BDropdownItem } from 'bootstrap-vue-next';
+
 import { getDataLanguages, STAC_LANGUAGE_EXT } from '../i18n';
 import Utils from '../utils';
 
 export default {
   name: 'LanguageChooser',
+  components: {
+    BDropdown,
+    BDropdownItem,
+  },
   props: {
     data: {
       type: Object,

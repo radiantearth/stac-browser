@@ -70,6 +70,7 @@ export default {
     Url,
     CopyButton,
     SocialSharing,
+    BPopover: defineAsyncComponent(() => import('bootstrap-vue-next').then(m => m.BPopover)),
     Validation: defineAsyncComponent(() => import('./Validation.vue'))
   },
   props: {

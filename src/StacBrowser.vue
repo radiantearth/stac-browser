@@ -102,7 +102,6 @@ import { API_LANGUAGE_CONFORMANCE } from './i18n';
 import { getBest, prepareSupported } from 'stac-js/src/locales';
 import BrowserStorage from "./browser-store";
 import Authentication from "./components/Authentication.vue";
-import LanguageChooser from "./components/LanguageChooser.vue";
 import { getDisplayTitle } from "./models/stac";
 
 // Pass Config through from props to vuex
@@ -129,8 +128,9 @@ export default defineComponent({
     Authentication,
     BIconLock,
     BIconUnlock,
+    BPopover: defineAsyncComponent(() => import('bootstrap-vue-next').then(m => m.BPopover)),
     ErrorAlert,
-    LanguageChooser,
+    LanguageChooser: defineAsyncComponent(() => import('./components/LanguageChooser.vue')),
     RootStats: defineAsyncComponent(() => import('./components/RootStats.vue')),
     Sidebar: defineAsyncComponent(() => import('./components/Sidebar.vue')),
     StacLink,
@@ -541,8 +541,8 @@ export default defineComponent({
 
 <style lang="scss">
 @import "./theme/variables.scss";
-@import '~bootstrap/scss/bootstrap';
-@import '~bootstrap-vue-next/dist/bootstrap-vue-next.css';
+@import 'bootstrap/scss/bootstrap';
+@import 'bootstrap-vue-next/dist/bootstrap-vue-next.css';
 @import "./theme/page.scss";
 @import "./theme/custom.scss";
 </style>

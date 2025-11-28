@@ -108,7 +108,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-@import '~bootstrap/scss/mixins';
+@import 'bootstrap/scss/mixins';
 @import "../theme/variables.scss";
 
 #stac-browser .item {
@@ -118,10 +118,6 @@ export default defineComponent({
       max-width: 100%;
       min-width: 100%;
     }
-  }
-
-  .card-columns .thumbnail {
-    align-self: center;
   }
 
   .metadata .card-columns {

@@ -12,9 +12,10 @@
       :target="selection.target" :teleport-to="container" class="map-popover"
       :boundary-padding="10"
     >
-      <section class="popover-items">
-        <Items v-if="selection && selection.type === 'items'" :stac="stac" :items="selection.items" />
-        <Features v-else-if="selection" :features="selection.items" />
+      <section class="popover-children">
+        <Items v-if="selection.type === 'items'" :stac="stac" :items="selection.children" />
+        <Catalogs v-else-if="selection.type === 'collections'" collectionsOnly enforceCards hideControls :stac="stac" :catalogs="selection.children" />
+        <Features v-else :features="selection.children" />
       </section>
       <div class="text-center">
         <b-button variant="danger" @click="resetSelection">{{ $t('mapping.close') }}</b-button>
@@ -42,7 +43,9 @@ let mapId = 0;
 export default {
   name: 'MapView',
   components: {
+    BPopover: defineAsyncComponent(() => import('bootstrap-vue-next').then(m => m.BPopover)),
     Features: defineAsyncComponent(() => import('../components/Features.vue')),
+    Catalogs: defineAsyncComponent(() => import('../components/Catalogs.vue')),
     Items: defineAsyncComponent(() => import('../components/Items.vue')),
     LayerControl,
     TextControl
@@ -59,7 +62,7 @@ export default {
       type: Array,
       default: null
     },
-    items: {
+    children: {
       type: Object,
       default: null
     },
@@ -92,6 +95,11 @@ export default {
         return '#stac-browser';
       }
     },
+    childrenOptions() {
+      return {
+        displayPreview: this.children && this.children.isItemCollection()
+      };
+    }
   },
   watch: {
     async stac() {
@@ -103,12 +111,12 @@ export default {
       }
       await this.stacLayer.setAssets(this.assets);
     },
-    async items() {
+    async children() {
       if (!this.stacLayer) {
         return;
       }
       await this.stacLayer.setAssets(null, false);
-      await this.stacLayer.setChildren(this.items, {displayPreview: true}, false);
+      await this.stacLayer.setChildren(this.children, this.childrenOptions, false);
       await this.stacLayer.updateLayers();
       this.fit();
     },
@@ -146,10 +154,11 @@ export default {
         // Don't set the URL here, as it is already set in the STAC object and is read-only.
         // url: this.stac.getAbsoluteUrl(),
         data: this.stac,
-        children: this.items,
+        children: this.children,
         assets: this.assets || null,
         displayWebMapLink: true,
         disableMigration: true,
+        childrenOptions: this.childrenOptions
       });
       this.stacLayer = new StacLayer(options);
       this.stacLayer.on('error', error => {
@@ -168,7 +177,7 @@ export default {
           multi: true,
           style: selectStyle,
           layers: (layer) => {
-            if (this.items) {
+            if (this.children) {
               // For item selection
               return false;
             }
@@ -197,7 +206,7 @@ export default {
         this.map.on('singleclick', async (event) => {
           // For item selection
           this.selection = null;
-          if (this.items) {
+          if (this.children) {
             this.setTargetPosition(event);
             this.selector.getFeatures().clear();
             const features = this.selector.getFeatures();
@@ -206,8 +215,8 @@ export default {
             if (objects.length > 0) {
               this.selection = {
                 target: this.$refs.target,
-                type: 'items',
-                items: objects
+                type: this.children.isCollectionCollection() ? 'collections': 'items',
+                children: objects
               };
             }
           }
@@ -264,7 +273,7 @@ export default {
     left: -1px;
   }
   
-  .popover-items {
+  .popover-children {
     max-height: 500px;
     overflow: auto;
     margin-top: -0.5rem;
@@ -272,7 +281,7 @@ export default {
     margin-right: -0.75rem;
     padding: 0.5rem 0.75rem 0  0.75rem;
 
-    .items {
+    .items, .features, .catalogs {
       margin-bottom: 0 !important;
     }
 

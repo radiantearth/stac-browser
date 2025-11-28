@@ -5,13 +5,13 @@
     <b-row v-else>
       <b-col class="left">
         <b-tabs v-model="activeSearch">
-          <b-tab v-if="collectionSearch" :title="$t('search.tabs.collections')">
+          <b-tab v-if="collectionSearch" :title="$t('search.tabs.collections')" id="search-collections-tab">
             <SearchFilter
               :parent="parent" title="" :value="collectionFilters" type="Collections"
               @input="setFilters"
             />
           </b-tab>
-          <b-tab v-if="itemSearch" :title="$t('search.tabs.items')">
+          <b-tab v-if="itemSearch" :title="$t('search.tabs.items')" id="search-items-tab">
             <SearchFilter
               :parent="parent" title="" :value="itemFilters" type="Global"
               @input="setFilters"
@@ -26,8 +26,8 @@
         <b-alert v-else-if="results.length === 0 && noFurtherItems" variant="info" show>{{ $t('search.noFurtherItemsFound') }}</b-alert>
         <b-alert v-else-if="results.length === 0" variant="warning" show>{{ $t('search.noItemsFound') }}</b-alert>
         <template v-else>
-          <div id="search-map" v-if="itemCollection">
-            <MapView :stac="parent" :items="itemCollection" onfocusOnly popover />
+          <div id="search-map" v-if="resultCollection">
+            <MapView :stac="parent" :children="resultCollection" onfocusOnly popover />
           </div>
           <Catalogs
             v-if="isCollectionSearch" :catalogs="results" collectionsOnly
@@ -67,7 +67,7 @@ import Utils from '../utils';
 import SearchFilter from '../components/SearchFilter.vue';
 import Loading from '../components/Loading.vue';
 import ErrorAlert from '../components/ErrorAlert.vue';
-import { getDisplayTitle, createSTAC, ItemCollection } from '../models/stac';
+import { getDisplayTitle, createSTAC, CollectionCollection, ItemCollection } from '../models/stac';
 import { STAC } from 'stac-js';
 import { defineComponent, defineAsyncComponent } from 'vue';
 import { getErrorCode, getErrorMessage, processSTAC, stacRequest } from '../store/utils';
@@ -77,7 +77,7 @@ import { BTab, BTabs } from 'bootstrap-vue-next';
 export default defineComponent({
   name: "Search",
   components: {
-    Catalogs: () => import('../components/Catalogs.vue'),
+    Catalogs: defineAsyncComponent(() => import('../components/Catalogs.vue')),
     BTabs,
     BTab,
     ErrorAlert,
@@ -103,7 +103,7 @@ export default defineComponent({
       data: null,
       itemFilters: {},
       collectionFilters: {},
-      activeSearch: 0,
+      activeSearch: undefined,
       selectedCollections: {}
     };
   },
@@ -128,15 +128,20 @@ export default defineComponent({
     itemSearch() {
       return this.canSearchItems && this.parent && this.parent.getSearchLink();
     },
-    itemCollection() {
+    resultCollection() {
       if (this.isCollectionSearch) {
-        return null; // wait for stac-js to convert bboxes to geojson
+        return new CollectionCollection({
+          collections: this.results,
+          links: []
+        });
       }
-      return new ItemCollection({
-        type: 'FeatureCollection',
-        features: this.results,
-        links: []
-      });
+      else {
+        return new ItemCollection({
+          type: 'FeatureCollection',
+          features: this.results,
+          links: []
+        });
+      }
     },
     results() {
       if (Utils.size(this.data) === 0) {
@@ -176,7 +181,7 @@ export default defineComponent({
       return this.isCollectionSearch ? this.collectionFilters : this.itemFilters;
     },
     isCollectionSearch() {
-      return this.collectionSearch && this.activeSearch === 0;
+      return this.collectionSearch && this.activeSearch === 'search-collections-tab';
     },
     pageDescription() {
       let title = getDisplayTitle([this.collectionLink, this.parentLink, this.root], this.catalogTitle);
@@ -224,7 +229,7 @@ export default defineComponent({
   methods: {
     openItemSearch() {
       this.itemFilters.collections = Object.keys(this.selectedCollections);
-      this.activeSearch = 1;
+      this.activeSearch = 'search-items-tab';
       this.selectedCollections = {};
     },
     selectForItemSearch(collection) {
@@ -296,7 +301,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-@import '~bootstrap/scss/mixins';
+@import 'bootstrap/scss/mixins';
 @import "../theme/variables.scss";
 
 #stac-browser {
@@ -305,6 +310,10 @@ export default defineComponent({
     border-top-left-radius: 0;
     border-top-right-radius: 0;
   }
+}
+
+#search-map {
+  margin-bottom: $block-margin;
 }
 
 #stac-browser .search {
@@ -325,28 +334,6 @@ export default defineComponent({
     min-width: 250px;
     flex-basis: 60%;
     position: relative !important;
-  }
-  .items, .catalogs {
-    .card-columns {
-      @include media-breakpoint-only(sm) {
-        column-count: 1;
-      }
-      @include media-breakpoint-only(md) {
-        column-count: 2;
-      }
-      @include media-breakpoint-only(lg) {
-        column-count: 2;
-      }
-      @include media-breakpoint-only(xl) {
-        column-count: 2;
-      }
-      @include media-breakpoint-only(xxl) {
-        column-count: 3;
-      }
-      @include media-breakpoint-up(xxxl) {
-        column-count: 4;
-      }
-    }
   }
 }
 </style>

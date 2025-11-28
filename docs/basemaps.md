@@ -27,7 +27,7 @@ The easiest way to add or change the maps for the Earth, is to update the `earth
 Each object in the arrays defines the [basemap options](#options).
 
 An alternative is to remove the `BASEMAPS` array and implement a custom version of the `configureBasemap` function.
-The function reveived the STAC object and the I18N object as inputs, which allows you to provide different basemaps per STAC entity if needed.
+The function received the STAC object and the I18N object as inputs, which allows you to provide different basemaps per STAC entity if needed.
 The function must return an array of objects, where each object provides the [basemap options](#options).
 
 ## Options
@@ -126,7 +126,7 @@ Example for the swisstopo WMS (don't forget to add the CRS to the `crs` in `conf
 - OpenLayers layer: `WebGLTile`
 
 Providing a OGC Web Map Tile Service (WMTS) can be done in various ways, usually
-either a URL template or a URL to the capabilties document is provided.
+either a URL template or a URL to the capabilities document is provided.
 For more details see the [`WMTS`](https://openlayers.org/en/latest/apidoc/module-ol_source_WMTS-WMTS.html) source documentation.
 
 Example for the swisstopo WMTS (don't forget to add the CRS to the `crs` in `config.js`):

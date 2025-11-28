@@ -27,9 +27,9 @@
 
     <section class="list">
       <Loading v-if="loading" fill top />
-      <b-card-group v-if="chunkedItems.length > 0" columns>
+      <div v-if="chunkedItems.length > 0" class="card-grid">
         <Item v-for="item in chunkedItems" :item="item" :key="item.href" />
-      </b-card-group>
+      </div>
       <b-alert v-else :variant="hasFilters ? 'warning' : 'info'" show>
         <template v-if="hasFilters">{{ $t('search.noItemsFound') }}</template>
         <template v-else>{{ $t('items.noneAvailableForCollection') }}</template>
@@ -43,13 +43,12 @@
 
 <script>
 import { mapState } from 'vuex';
-import { BCardGroup, BCollapse } from 'bootstrap-vue-next';
+import { BCollapse } from 'bootstrap-vue-next';
 import { defineComponent, defineAsyncComponent } from 'vue';
 
 import Utils from '../utils';
 import Item from './Item.vue';
 import Loading from './Loading.vue';
-import Pagination from './Pagination.vue';
 import { getDisplayTitle } from '../models/stac';
 
 export default defineComponent({
@@ -58,8 +57,7 @@ export default defineComponent({
     Item,
     SearchFilter: defineAsyncComponent(() => import('./SearchFilter.vue')),
     Loading,
-    Pagination,
-    BCardGroup,
+    Pagination: defineAsyncComponent(() => import('./Pagination.vue')),
     BCollapse,
     SortButtons: defineAsyncComponent(() => import('./SortButtons.vue'))
   },

@@ -1,5 +1,5 @@
 <template>
-  <div :class="{cc: true, [cssStacType]: true, mixed: hasCatalogs && hasItems, empty: !hasCatalogs && !hasItems}" :key="data.id">
+  <div :class="{cc: true, [cssStacType]: true, empty: !hasCatalogs && !hasItems}" :key="data.id">
     <b-row>
       <b-col class="meta">
         <section class="intro">
@@ -227,7 +227,7 @@ export default defineComponent({
       else {
         const items = this.items.filter(item => item.type === 'Feature');
         if (items.length > 0) {
-          data.items = new ItemCollection({
+          data.children = new ItemCollection({
             type: 'FeatureCollection',
             features: items
           });
@@ -286,111 +286,10 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-@import '~bootstrap/scss/mixins';
+@import 'bootstrap/scss/mixins';
 @import "../theme/variables.scss";
 
 #stac-browser .cc {
-  .items-container, .catalogs-container {
-    max-width: 50%;
-
-    .card-list {
-      flex-flow: column wrap;
-    }
-
-    .items, .catalogs {
-      .card-columns {
-        column-count: 1;
-
-        .thumbnail {
-          align-self: center;
-        }
-      }
-    }
-  }
-
-  &.catalog { // Catalog has items or catalogs
-    .items-container, .catalogs-container {
-      max-width: 100%;
-      
-      .items, .catalogs {
-        .card-columns {
-          @include media-breakpoint-up(sm) {
-            column-count: 2;
-          }
-          @include media-breakpoint-up(lg) {
-            column-count: 3;
-          }
-          @include media-breakpoint-up(xxl) {
-            column-count: 4;
-          }
-          @include media-breakpoint-up(xxxl) {
-            column-count: 6;
-          }
-        }
-      }
-    }
-  }
-
-  &.collection { // Collection has items or catalogs
-    .items-container, .catalogs-container {
-      .items, .catalogs {
-        .card-columns {
-          @include media-breakpoint-only(md) {
-            column-count: 2;
-          }
-          @include media-breakpoint-up(lg) {
-            column-count: 1;
-          }
-          @include media-breakpoint-up(xxl) {
-            column-count: 2;
-          }
-          @include media-breakpoint-up(xxxl) {
-            column-count: 3;
-          }
-        }
-      }
-    }
-  }
-
-  &.catalog.mixed { // Catalog has items and catalogs
-    .items-container, .catalogs-container {
-      .items, .catalogs {
-        .card-columns {
-          @include media-breakpoint-up(lg) {
-            column-count: 1;
-          }
-          @include media-breakpoint-up(xl) {
-            column-count: 2;
-          }
-          @include media-breakpoint-up(xxl) {
-            column-count: 3;
-          }
-        }
-      }
-    }
-  }
-
-  &.collection.mixed { // Collection has items and catalogs
-    .items-container, .catalogs-container {
-      max-width: 33%;
-
-      
-      .items, .catalogs {
-        .card-columns {
-          @include media-breakpoint-up(lg) {
-            column-count: 1;
-          }
-          @include media-breakpoint-up(xxl) {
-            column-count: 2;
-          }
-          @include media-breakpoint-up(xxxl) {
-            column-count: 3;
-          }
-        }
-      }
-    }
-  }
-
   .meta {
     min-width: 100%;
     margin-bottom: $block-margin;

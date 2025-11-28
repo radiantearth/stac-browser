@@ -30,6 +30,7 @@
             :locale="uiLanguage"
             :format-locale="datepickerLang"
             :format="dateTimeFormat"
+            :week-start="weekStartDay"
             :close-on-scroll="false"
             :placeholder="$t('search.selectDateRange')"
             enable-time-picker 
@@ -147,7 +148,8 @@
 <script>
 import { defineComponent, defineAsyncComponent } from 'vue';
 import { mapGetters, mapState } from "vuex";
-import { BCard, BCardBody, BCardFooter, BCardTitle } from 'bootstrap-vue-next';
+import { BCard, BCardBody, BCardFooter, BCardTitle, BDropdown, BDropdownItem } from 'bootstrap-vue-next';
+
 import refParser from '@apidevtools/json-schema-ref-parser';
 
 import Utils, { schemaMediaType } from '../utils';
@@ -202,6 +204,8 @@ export default defineComponent({
     BCardBody,
     BCardFooter,
     BCardTitle,
+    BDropdown,
+    BDropdownItem,
     QueryableInput: defineAsyncComponent(() => import('./QueryableInput.vue')),
     MapSelect: defineAsyncComponent(() => import('./maps/MapSelect.vue')),
     SortButtons: defineAsyncComponent(() => import('./SortButtons.vue')),
