@@ -80,14 +80,14 @@ export default {
         }
       }
       return null;
-    },
+    }
   },
   methods: {
     load(visible) {
       if (this.catalog instanceof STAC) {
         return;
       }
-      this.$store.commit(visible ? 'queue' : 'unqueue', this.catalog.href);
+      this.$store.commit(visible ? 'queue' : 'unqueue', this.catalog.getAbsoluteUrl());
     }
   }
 };

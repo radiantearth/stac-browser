@@ -1,5 +1,5 @@
 <template>
-  <div :class="{cc: true, [cssStacType]: true, mixed: hasCatalogs && hasItems, empty: !hasCatalogs && !hasItems}" :key="data.id">
+  <div :class="{cc: true, [cssStacType]: true, empty: !hasCatalogs && !hasItems}" :key="data.id">
     <b-row>
       <b-col class="meta">
         <section class="intro">
@@ -282,28 +282,6 @@ export default {
 @import "../theme/variables.scss";
 
 #stac-browser .cc {
-  .items-container,
-  .catalogs-container {
-    max-width: 50%;
-
-    .card-list {
-      flex-flow: column wrap;
-    }
-  }
-
-  &.catalog { // Catalog has items or catalogs
-    .items-container,
-    .catalogs-container {
-      max-width: 100%;
-    }
-  }
-
-  &.collection.mixed { // Collection has items and catalogs
-    .items-container, .catalogs-container {
-      max-width: 33%;
-    }
-  }
-
   .meta {
     min-width: 100%;
     margin-bottom: $block-margin;

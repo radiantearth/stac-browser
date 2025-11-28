@@ -82,7 +82,7 @@ export default {
       if (this.item instanceof STAC) {
         return;
       }
-      this.$store.commit(visible ? 'queue' : 'unqueue', this.item.href);
+      this.$store.commit(visible ? 'queue' : 'unqueue', this.item.getAbsoluteUrl());
     }
   }
 };
