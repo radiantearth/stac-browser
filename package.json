@@ -69,6 +69,7 @@
   },
   "devDependencies": {
     "@iconify-json/bi": "^1.2.6",
+    "@playwright/test": "^1.57.0",
     "@vitejs/plugin-vue": "^6.0.1",
     "@vue/compiler-sfc": "^3.5.22",
     "eslint": "^8.57.1",
