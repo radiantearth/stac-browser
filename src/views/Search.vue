@@ -336,27 +336,5 @@ export default {
     flex-basis: 60%;
     position: relative !important;
   }
-  .items, .catalogs {
-    .card-columns {
-      @include media-breakpoint-only(sm) {
-        column-count: 1;
-      }
-      @include media-breakpoint-only(md) {
-        column-count: 2;
-      }
-      @include media-breakpoint-only(lg) {
-        column-count: 2;
-      }
-      @include media-breakpoint-only(xl) {
-        column-count: 2;
-      }
-      @include media-breakpoint-only(xxl) {
-        column-count: 3;
-      }
-      @include media-breakpoint-up(xxxl) {
-        column-count: 4;
-      }
-    }
-  }
 }
 </style>
