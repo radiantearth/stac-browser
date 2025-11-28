@@ -1,6 +1,8 @@
 import { ar as locale } from 'date-fns/locale';
 
-const dateFormat = 'yyyy-MM-dd';
+// According to https://en.wikipedia.org/wiki/List_of_date_formats_by_country
+// many countries that use Arabic as their official language use the DD/MM/YYYY date format.
+const dateFormat = 'DD/MM/YYYY';
 const timeFormat = 'HH:mm:ss';
 const dateTimeFormat = `${dateFormat} ${timeFormat}`;
 
@@ -11,8 +13,5 @@ locale.localize.day = (dayIndex, options = {}) => {
   }
   return super_(dayIndex, options);
 };
-
-// Monday is the first day of the week in Arabic countries
-locale.options.weekStartsOn = 1;
 
 export default { dateFormat, timeFormat, dateTimeFormat, locale };

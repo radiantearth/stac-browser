@@ -6,13 +6,16 @@ The following options can be provided in various ways to STAC Browser, either wh
 The following ways to set config options are possible:
 
 - Customize the **[config file](../config.js)** (recommended)
-- Additionally, some options can be [provided through the **root catalog**](../README.md#customize-through-root-catalog) for consistency across multiple deployments (recommended)
-- Append them to the **CLI** command as parameter (see [Get Started](../README.md#get-started) for an example)
+- Additionally, some options can be [provided through the **root catalog**](../README.md#customize-through-root-catalog) for consistency across multiple deployments
 - Set **environment variables**, all options need a `SB_` prefix.
   So you could for example set the catalog URL via the environment variable `SB_catalogUrl`.
 - Optionally, you can also set options after the build, basically **at "runtime"**.
   Enable this by removing the `<!--` and `-->` around the `<script defer="defer" src="./config.js"></script>` in the [`public/index.html`](../public/index.html).
   Then run the build procedure and after completion, you can fill the `dist/config.js` with any options that you want to customize.
+
+> [!WARNING]  
+> Appending configuration options as CLI parameters to the CLI command (e.g. `npm run build -- --catalogUrl="https://example.com"`) is DEPRECATED and will be removed in STAC Browser v5.
+> Reason is that such parameters are [not suppored by Vite](https://github.com/vitejs/vite/issues/7065), which will be used in v5 instead of vue-cli.
 
 ## Table of Contents <!-- omit in toc -->
 
@@ -129,7 +132,7 @@ This also excludes hosting your STAC catalog in the STAC Browser (sub-)folders.
 #### `hash`
 
 If your host/server doesn't support URL rewriting or you experience other related problems, you can enable *hash mode*.
-Either set this option to `hash` in the config file or append `--historyMode=hash` when running or building.
+Either set this option to `hash` in the config file or as environment variable (`SB_historyMode`) when running or building.
 Known hosts that require hash mode are Amazon S3 and GitHub Pages.
 
 ### pathPrefix
@@ -137,11 +140,9 @@ Known hosts that require hash mode are Amazon S3 and GitHub Pages.
 ***build-only option***
 
 If you don't deploy the STAC Browser instance at the root path of your (sub) domain, then you need to set the path prefix
-when building (or running) STAC Browser.
+when building (or running) STAC Browser. Known hosts that require hash mode are Amazon S3 and GitHub Pages.
 
-```bash
-npm run build -- --pathPrefix="/browser/"
-```
+Either set this option to the respective path (e.g. `/browser/`) in the config file or as environment variable (`SB_pathPrefix`) when running or building.
 
 This will build STAC Browser in a way that it can be hosted at `https://example.com/browser` for example.
 Using this parameter for the dev server will make STAC Browser available at `http://localhost:8080/browser`.
