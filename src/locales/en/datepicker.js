@@ -4,10 +4,10 @@ const timeFormat = 'HH:mm:ss';
 const dateTimeFormat = `${dateFormat} ${timeFormat}`;
 
 // 2A. Either re-use settings and phrases from vue2-datepicker (and customize them)...
-const locale = import('vue2-datepicker/locale/en');
+const locale = require('vue2-datepicker/locale/en');
 
 // Usually not needed, but we customize the first day of the week for "international" users.
-(await locale).default.formatLocale.firstDayOfWeek = 1;
+locale.formatLocale.firstDayOfWeek = 1;
 
 // 2B. ... or define your own based on https://github.com/mengxiong10/vue2-datepicker
 /*

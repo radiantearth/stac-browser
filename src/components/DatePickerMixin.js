@@ -26,12 +26,7 @@ export default {
           return;
         }
         const options = (await import(`../locales/${locale}/datepicker.js`)).default;
-        if (options.locale instanceof Promise) {
-          this.datepickerLang = (await options.locale).default;
-        }
-        else {
-          this.datepickerLang = options.locale;
-        }
+        this.datepickerLang = options.locale;
         this.dateFormat = options.dateFormat;
         this.timeFormat = options.timeFormat;
         this.dateTimeFormat = options.dateTimeFormat;
