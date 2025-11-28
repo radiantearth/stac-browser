@@ -1,2 +1,0 @@
-"use strict";(self["webpackChunk_radiantearth_stac_browser"]=self["webpackChunk_radiantearth_stac_browser"]||[]).push([[5558],{95558:function(a,t,e){e.r(t);const r="M/D/YYYY",s="hh:mm:ss a",o=`${r} ${s}`,c=e.e(5876).then(e.t.bind(e,35876,23));c.formatLocale.firstDayOfWeek=0,t["default"]={dateFormat:r,timeFormat:s,dateTimeFormat:o,locale:c}}}]);
-//# sourceMappingURL=5558.1deb8433.js.map
