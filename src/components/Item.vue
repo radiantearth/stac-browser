@@ -1,7 +1,7 @@
 <template>
   <b-card no-body class="item-card" :class="classes" v-b-visible.400="load">
     <div v-if="hasImage" class="card-img-wrapper">
-      <b-card-img-lazy  class="thumbnail" offset="200" v-bind="thumbnail" />
+      <b-card-img-lazy class="thumbnail" offset="200" v-bind="thumbnail" />
     </div>
     <b-card-body>
       <b-card-title>
