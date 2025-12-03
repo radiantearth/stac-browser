@@ -149,6 +149,19 @@ export default function getStore(router) {
           }
         }
         cx.commit('resetActions');
+      },
+      async configureFromSchemes(cx, authSchemes) {
+        // Find first supported auth scheme from auth:schemes
+        // Priority order: openIdConnect, http (basic), apiKey
+        const schemeValues = Object.values(authSchemes);
+        const preferredScheme =
+          schemeValues.find(scheme => scheme.type === 'openIdConnect') ||
+          schemeValues.find(scheme => scheme.type === 'http' && scheme.scheme === 'basic') ||
+          schemeValues.find(scheme => scheme.type === 'apiKey');
+
+        if (preferredScheme && !Auth.equals(cx.getters.method, preferredScheme)) {
+          await cx.dispatch('config', { authConfig: preferredScheme }, { root: true });
+        }
       }
     }
   };
