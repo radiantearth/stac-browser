@@ -7,7 +7,9 @@
       <MetadataTable v-bind="$props" />
     </b-col>
     <b-col v-else md="9" class="value">
-      <div v-html="formatted" />
+      <Histogram v-if="field === 'histogram' && isObject" :data="value" />
+      <StorageSchemes v-else-if="field === 'storage:schemes' && isObject" :data="value" />
+      <div v-else v-html="formatted" />
     </b-col>
   </b-row>
 </template>
@@ -26,7 +28,9 @@ const FORCE_TABLE = [
 export default {
   name: "MetadataEntry",
   components: {
-    MetadataTable: () => import('./MetadataTable.vue')
+    Histogram: () => import('./Histogram.vue'),
+    MetadataTable: () => import('./MetadataTable.vue'),
+    StorageSchemes: () => import('./StorageSchemes.vue')
   },
   mixins: [
     EntryMixin
@@ -34,6 +38,9 @@ export default {
   computed: {
     showTable() {
       return FORCE_TABLE.includes(this.field) || this.itemOrder.length > 0 && Utils.size(this.value) >= 3;
+    },
+    isObject() {
+      return Utils.isObject(this.value);
     }
   }
 };
