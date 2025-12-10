@@ -37,7 +37,7 @@ export default class Cesium extends LinkActionPlugin {
   }
 
   get text() {
-    return i18n.t('actions.openIn', {service: 'Cesium Sandcastle'});
+    return i18n.global.t('actions.openIn', {service: 'Cesium Sandcastle'});
   }
 
 }

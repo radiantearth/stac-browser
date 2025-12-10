@@ -5,18 +5,21 @@
       <template v-else>{{ $t('metadata.general') }}</template>
     </b-card-title>
     <section class="border metadata-rows">
-      <MetadataEntry v-for="(entry, key) in properties" v-bind="entry" :field="key" :key="key" />
+      <MetadataEntry v-for="(entry, key) in properties" :field="key" :key="key" v-bind="entry" />
     </section>
   </b-card>
 </template>
 
 <script>
 import MetadataEntry from './MetadataEntry.vue';
+import { BCard, BCardTitle } from 'bootstrap-vue-next';
 
 export default {
   name: "MetadataGroup",
   components: {
-    MetadataEntry
+    MetadataEntry,
+    BCard,
+    BCardTitle
   },
   props: {
       label: {

@@ -1,8 +1,7 @@
 <template>
   <b-table
     class="metadata-table" :items="tblItems" :fields="tblFields" variant="light"
-    responsive small
-    sticky-header striped
+    responsive small sticky-header striped
     v-bind="tblTexts"
   >
     <template #head()="data">
@@ -16,17 +15,18 @@
 </template>
 
 <script>
-import { BTable } from 'bootstrap-vue';
 import EntryMixin from './EntryMixin';
 import StacFieldsMixin from '../StacFieldsMixin';
 import Utils from '../../utils';
 import { format } from '@radiantearth/stac-fields';
+import { defineAsyncComponent } from 'vue';
+import { BTable } from 'bootstrap-vue-next';
 
 export default {
   name: 'MetadataTable',
   components: {
-    BTable,
-    Histogram: () => import('./Histogram.vue')
+    Histogram: defineAsyncComponent(() => import('./Histogram.vue')),
+    BTable
   },
   mixins: [
     EntryMixin,

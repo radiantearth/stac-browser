@@ -1,6 +1,11 @@
 import Utils from '../utils';
+import { formatMediaType } from '@radiantearth/stac-fields/formatters';
+import StacFieldsMixin from './StacFieldsMixin';
 
 export default {
+  mixins: [
+    StacFieldsMixin({ formatMediaType })
+  ],
   computed: {
     fileFormats() {
       if (!this.data) {
@@ -15,7 +20,7 @@ export default {
       }
       return assets
         .filter(asset => Array.isArray(asset.roles) && asset.roles.includes('data') && typeof asset.type === 'string') // Look for data files
-        .map(asset => asset.type) // Array shall only contain media types
+        .map(asset => this.formatMediaType(asset.type, null, {shorten: true})) // Array shall only contain media types
         .filter((v, i, a) => a.indexOf(v) === i); // Unique values
     }
   }

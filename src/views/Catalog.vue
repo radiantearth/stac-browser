@@ -21,13 +21,13 @@
               <b-col md="8" class="value"><span v-html="temporalExtents" /></b-col>
             </b-row>
           </section>
-          <Links v-if="linkPosition === 'left'" :title="$t('additionalResources')" :links="additionalLinks" :context="data" />
+          <LinkList v-if="linkPosition === 'left'" :title="$t('additionalResources')" :links="additionalLinks" :context="data" />
         </section>
         <section v-if="isCollection || hasThumbnails" class="mb-4">
           <b-card no-body class="maps-preview">
             <b-tabs v-model="tab" ref="tabs" pills card vertical end>
               <b-tab v-if="isCollection" :title="$t('map')" no-body>
-                <Map :stac="data" v-bind="mapData" @changed="dataChanged" @empty="handleEmptyMap" onfocusOnly popover />
+                <MapView :stac="data" v-bind="mapData" @changed="dataChanged" @empty="handleEmptyMap" onfocusOnly popover />
               </b-tab>
               <b-tab v-if="hasThumbnails" :title="$t('thumbnails')" no-body>
                 <Thumbnails :thumbnails="thumbnails" />
@@ -35,14 +35,14 @@
             </b-tabs>
           </b-card>
         </section>
-        <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="selectedReferences" @showAsset="showAsset" />
+        <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="selectedReferences" @show-asset="showAsset" />
         <Assets v-if="hasItemAssets && !hasItems" :assets="itemAssets" :context="data" :definition="true" />
         <Providers v-if="providers" :providers="providers" />
-        <Metadata class="mb-4" :type="data.type" :data="data" :ignoreFields="ignoredMetadataFields" />
-        <Links v-if="linkPosition === 'right'" :title="$t('additionalResources')" :links="additionalLinks" :context="data" />
+        <MetadataGroups class="mb-4" :type="data.type" :data="data" :ignoreFields="ignoredMetadataFields" />
+        <LinkList v-if="linkPosition === 'right'" :title="$t('additionalResources')" :links="additionalLinks" :context="data" />
       </b-col>
       <b-col class="catalogs-container" v-if="hasCatalogs">
-        <Catalogs :catalogs="catalogs" :hasMore="!!nextCollectionsLink" @loadMore="loadMoreCollections" />
+        <Catalogs :catalogs="catalogs" :hasMore="!!nextCollectionsLink" @load-more="loadMoreCollections" />
       </b-col>
       <b-col class="items-container" v-if="hasItems || hasItemAssets">
         <Items
@@ -50,8 +50,8 @@
           :showFilters="showFilters" :apiFilters="filters"
           :pagination="itemPages" :loading="apiItemsLoading"
           :count="apiItemsNumberMatched"
-          @paginate="paginateItems" @filterItems="filterItems"
-          @filtersShown="filtersShown"
+          @paginate="paginateItems" @filter-items="filterItems"
+          @filters-shown="filtersShown"
         />
         <Assets v-if="hasItemAssets" :assets="itemAssets" :context="data" :definition="true" />
       </b-col>
@@ -60,39 +60,41 @@
 </template>
 
 <script>
+import { defineComponent, defineAsyncComponent } from 'vue';
 import { mapState, mapGetters } from 'vuex';
 import Catalogs from '../components/Catalogs.vue';
 import Description from '../components/Description.vue';
 import Items from '../components/Items.vue';
-import ReadMore from "vue-read-more-smooth";
+import ReadMore from "../components/ReadMore.vue";
 import ShowAssetLinkMixin from '../components/ShowAssetLinkMixin';
 import StacFieldsMixin from '../components/StacFieldsMixin';
 import { formatLicense, formatTemporalExtents } from '@radiantearth/stac-fields/formatters';
-import { BTabs, BTab } from 'bootstrap-vue';
 import Utils from '../utils';
 import { addSchemaToDocument, createCatalogSchema } from '../schema-org';
 import { ItemCollection } from '../models/stac.js';
 import DeprecationMixin from '../components/DeprecationMixin.js';
+import { BTab, BTabs, BCard } from 'bootstrap-vue-next';
 
-export default {
+export default defineComponent({
   name: "Catalog",
   components: {
-    AnonymizedNotice: () => import('../components/AnonymizedNotice.vue'),
-    Assets: () => import('../components/Assets.vue'),
-    BTabs,
     BTab,
+    BTabs,
+    BCard,
+    AnonymizedNotice: defineAsyncComponent(() => import('../components/AnonymizedNotice.vue')),
+    Assets: defineAsyncComponent(() => import('../components/Assets.vue')),
     Catalogs,
-    CollectionLink: () => import('../components/CollectionLink.vue'),
-    DeprecationNotice: () => import('../components/DeprecationNotice.vue'),
+    CollectionLink: defineAsyncComponent(() => import('../components/CollectionLink.vue')),
+    DeprecationNotice: defineAsyncComponent(() => import('../components/DeprecationNotice.vue')),
     Description,
     Items,
-    Keywords: () => import('../components/Keywords.vue'),
-    Links: () => import('../components/Links.vue'),
-    Map: () => import('../components/Map.vue'),
-    Metadata: () => import('../components/Metadata.vue'),
-    Providers: () => import('../components/Providers.vue'),
+    Keywords: defineAsyncComponent(() => import('../components/Keywords.vue')),
+    LinkList: defineAsyncComponent(() => import('../components/LinkList.vue')),
+    MapView: defineAsyncComponent(() => import('../components/MapView.vue')),
+    MetadataGroups: defineAsyncComponent(() => import('../components/MetadataGroups.vue')),
+    Providers: defineAsyncComponent(() => import('../components/Providers.vue')),
     ReadMore,
-    Thumbnails: () => import('../components/Thumbnails.vue')
+    Thumbnails: defineAsyncComponent(() => import('../components/Thumbnails.vue'))
   },
   mixins: [
     ShowAssetLinkMixin,
@@ -258,7 +260,10 @@ export default {
       try {
         await this.$store.dispatch('loadApiItems', {link, show: true, filters: this.filters});
       } catch (error) {
-        this.$root.$emit('error', error, this.$t('errors.loadItems'));
+        this.$store.commit('showGlobalError', {
+          error,
+          message: this.$t('errors.loadItems')
+        });
       }
     },
     async filterItems(filters, reset) {
@@ -270,15 +275,18 @@ export default {
         await this.$store.dispatch('loadApiItems', {link: this.data.getApiItemsLink(), show: true, filters});
       } catch (error) {
         let msg = reset ? this.$t('errors.loadItems') : this.$t('errors.loadFilteredItems');
-        this.$root.$emit('error', error, msg);
+        this.$store.commit('showGlobalError', {
+          error,
+          message: msg
+        });
       }
     }
   }
-};
+});
 </script>
 
 <style lang="scss">
-@import '~bootstrap/scss/mixins';
+@import 'bootstrap/scss/mixins';
 @import "../theme/variables.scss";
 
 #stac-browser .cc {
