@@ -12,7 +12,7 @@ Install and run `http-server` via the following command from the directory that
 npx http-server -p 8000 --cors
 ```
 
-You can then use the CLI option `--catalogUrl="http://localhost:8000/catalog.json"` when starting STAC Browser.
+You can then set the environment variable `SB_catalogUrl` to `"http://localhost:8000/catalog.json"` when starting STAC Browser.
 
 ## Using STAC Browser somewhere else
 

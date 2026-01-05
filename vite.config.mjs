@@ -14,21 +14,20 @@ import { BootstrapVueNextResolver } from "bootstrap-vue-next/resolvers";
 import { createHtmlPlugin } from "vite-plugin-html";
 import { visualizer } from "rollup-plugin-visualizer";
 
-const require = createRequire(import.meta.url);
-const yargs = require("yargs/yargs");
-const { hideBin } = require("yargs/helpers");
+import yargs from "yargs";
 
-const { properties } = require("./config.schema.json");
-const pkgFile = require("./package.json");
+const require = createRequire(import.meta.url);
+const configSchema = require("./config.schema.json");
+const package_ = require("./package.json");
 
 const optionsForType = (type) =>
-  Object.entries(properties)
+  Object.entries(configSchema.properties)
     .filter(
       ([, schema]) => Array.isArray(schema.type) && schema.type.includes(type)
     )
     .map(([key]) => key);
 
-const argv = yargs(hideBin(process.argv))
+const env = yargs()
   .parserConfiguration({ "camel-case-expansion": false })
   .env("SB")
   .boolean(optionsForType("boolean"))
@@ -40,16 +39,15 @@ const argv = yargs(hideBin(process.argv))
     )
   ).argv;
 
-// Clean-up arguments
-delete argv._;
-delete argv.$0;
+delete env._;
+delete env.$0;
 
-const configFile = path.resolve(argv.CONFIG ? argv.CONFIG : "./config.js");
-const configFromFile = require(configFile);
-const mergedConfig = Object.assign(configFromFile, argv);
+const configFilePath = path.resolve(env.CONFIG ? env.CONFIG : "./config.js");
+const configFromFile = require(configFilePath);
+const config = Object.assign(configFromFile, env);
 
 export default defineConfig(({ mode }) => ({
-  base: mergedConfig.pathPrefix || "/",
+  base: config.pathPrefix,
   build: {
     sourcemap: mode !== "minimal",
     rollupOptions: {
@@ -65,8 +63,8 @@ export default defineConfig(({ mode }) => ({
     },
   },
   define: {
-    STAC_BROWSER_VERSION: JSON.stringify(pkgFile.version),
-    CONFIG: JSON.stringify(mergedConfig),
+    STAC_BROWSER_VERSION: JSON.stringify(package_.version),
+    CONFIG: JSON.stringify(config),
   },
   plugins: [
     vue({
@@ -81,11 +79,7 @@ export default defineConfig(({ mode }) => ({
       minify: mode !== "development",
       template: "public/index.html",
       inject: {
-        data: {
-          catalogTitle: mergedConfig.catalogTitle || "STAC Browser",
-          catalogUrl: mergedConfig.catalogUrl || "",
-          ...mergedConfig,
-        },
+        data: config,
       },
     }),
     Components({
