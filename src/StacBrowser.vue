@@ -74,6 +74,12 @@
           <a href="https://github.com/radiantearth/stac-browser" target="_blank">STAC Browser</a> {{ browserVersion }}
         </template>
       </i18n>
+      <small v-if="footerLinksFromVueX && footerLinksFromVueX.length" class="footer-links text-muted">
+        <template v-for="(link, index) in footerLinksFromVueX">
+          <a :key="link.url" :href="link.url" target="_blank">{{ link.label }}</a>
+          <span v-if="index < footerLinksFromVueX.length - 1" :key="index"> | </span>
+        </template>
+      </small>
     </footer>
     <b-popover
       v-if="root" id="popover-root" custom-class="popover-large" target="popover-root-btn"
@@ -206,6 +212,7 @@ export default {
     ...mapState(['allowSelectCatalog', 'conformsTo', 'data', 'dataLanguage', 'globalError', 'loading', 'stateQueryParameters', 'uiLanguage', 'url']),
     ...mapState({
       catalogImageFromVueX: 'catalogImage',
+      footerLinksFromVueX: 'footerLinks',
       localeFromVueX: 'locale',
       detectLocaleFromBrowserFromVueX: 'detectLocaleFromBrowser',
       supportedLocalesFromVueX: 'supportedLocales',

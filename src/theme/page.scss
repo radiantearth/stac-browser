@@ -97,6 +97,10 @@ body {
   > footer {
     padding-bottom: $block-margin;
     text-align: center;
+
+    .footer-links {
+      display: block;
+    }
   }
 
   .popover-large {
@@ -323,7 +327,7 @@ body {
         min-height: 4rem;
       }
     }
-    
+
     .catalog-card,
     .item-card {
       grid-row: span 6;
@@ -339,7 +343,7 @@ body {
       grid-row: span 1;
     }
   }
-  
+
   .catalog-card,
   .item-card,
   .feature-card {
@@ -390,11 +394,11 @@ body {
     .card-footer:empty {
       display: none;
     }
-  
+
     .badge.deprecated {
       text-transform: uppercase;
     }
-    
+
     .intro {
       display: -webkit-box;
       -webkit-line-clamp: 3;
