@@ -69,7 +69,7 @@
     <!-- Content (Item / Catalog) -->
     <router-view />
     <footer>
-      <ul v-if="footerLinksFromVueX && footerLinksFromVueX.length" class="footer-links text-muted">
+      <ul v-if="Array.isArray(footerLinksFromVueX) && footerLinksFromVueX.length > 0" class="footer-links text-muted">
         <li v-for="link in footerLinksFromVueX" :key="link.url">
           <a :href="link.url" target="_blank">{{ $te(`footerLinks.${link.label}`) ? $t(`footerLinks.${link.label}`) : link.label }}</a>
         </li>
