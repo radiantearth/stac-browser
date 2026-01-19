@@ -93,7 +93,7 @@ Should be an image that browsers can display, e.g. PNG, JPEG, WebP, or SVG.
 
 ### footerLinks
 
-Array of links to display in the footer below the "Powered by STAC Browser" text. Each link requires a `label` and `url`.
+Array of links to display in the footer above the "Powered by STAC Browser" text. Each link requires a `label` and `url`.
 
 Example:
 ```js
