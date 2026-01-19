@@ -23,6 +23,7 @@ The following ways to set config options are possible:
   - [catalogUrl](#catalogurl)
   - [catalogTitle](#catalogtitle)
   - [catalogImage](#catalogimage)
+  - [footerLinks](#footerlinks)
   - [apiCatalogPriority](#apicatalogpriority)
 - [Deployment](#deployment)
   - [historyMode](#historymode)
@@ -89,6 +90,20 @@ The default title shown if no title can be read from the root STAC catalog.
 
 URL to an image to use as a logo with the title.
 Should be an image that browsers can display, e.g. PNG, JPEG, WebP, or SVG.
+
+### footerLinks
+
+Array of links to display in the footer above the "Powered by STAC Browser" text. Each link requires a `label` and `url`.
+
+Example:
+```js
+footerLinks: [
+  { label: "Imprint", url: "https://example.com/imprint" },
+  { label: "Terms of use", url: "https://example.com/terms" },
+  { label: "Accessibility", url: "https://example.com/accessibility" },
+  { label: "Privacy", url: "https://example.com/privacy" }
+]
+```
 
 ### apiCatalogPriority
 

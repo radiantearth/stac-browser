@@ -69,6 +69,11 @@
     <!-- Content (Item / Catalog) -->
     <router-view />
     <footer>
+      <ul v-if="Array.isArray(footerLinksFromVueX) && footerLinksFromVueX.length > 0" class="footer-links text-muted">
+        <li v-for="link in footerLinksFromVueX" :key="link.url">
+          <a :href="link.url" target="_blank">{{ $te(`footerLinks.${link.label}`) ? $t(`footerLinks.${link.label}`) : link.label }}</a>
+        </li>
+      </ul>
       <i18n tag="small" path="poweredBy" class="poweredby text-muted">
         <template #link>
           <a href="https://github.com/radiantearth/stac-browser" target="_blank">STAC Browser</a> {{ browserVersion }}
@@ -206,6 +211,7 @@ export default {
     ...mapState(['allowSelectCatalog', 'conformsTo', 'data', 'dataLanguage', 'globalError', 'loading', 'stateQueryParameters', 'uiLanguage', 'url']),
     ...mapState({
       catalogImageFromVueX: 'catalogImage',
+      footerLinksFromVueX: 'footerLinks',
       localeFromVueX: 'locale',
       detectLocaleFromBrowserFromVueX: 'detectLocaleFromBrowser',
       supportedLocalesFromVueX: 'supportedLocales',
