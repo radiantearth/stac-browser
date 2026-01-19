@@ -69,17 +69,16 @@
     <!-- Content (Item / Catalog) -->
     <router-view />
     <footer>
+      <ul v-if="footerLinksFromVueX && footerLinksFromVueX.length" class="footer-links text-muted">
+        <li v-for="link in footerLinksFromVueX" :key="link.url">
+          <a :href="link.url" target="_blank">{{ $te(`footerLinks.${link.label}`) ? $t(`footerLinks.${link.label}`) : link.label }}</a>
+        </li>
+      </ul>
       <i18n tag="small" path="poweredBy" class="poweredby text-muted">
         <template #link>
           <a href="https://github.com/radiantearth/stac-browser" target="_blank">STAC Browser</a> {{ browserVersion }}
         </template>
       </i18n>
-      <small v-if="footerLinksFromVueX && footerLinksFromVueX.length" class="footer-links text-muted">
-        <template v-for="(link, index) in footerLinksFromVueX">
-          <a :key="link.url" :href="link.url" target="_blank">{{ link.label }}</a>
-          <span v-if="index < footerLinksFromVueX.length - 1" :key="index"> | </span>
-        </template>
-      </small>
     </footer>
     <b-popover
       v-if="root" id="popover-root" custom-class="popover-large" target="popover-root-btn"
