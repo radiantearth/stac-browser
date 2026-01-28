@@ -1,0 +1,166 @@
+{
+  "type": "Feature",
+  "stac_version": "1.1.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/projection/v1.1.0/schema.json",
+    "https://stac-extensions.github.io/raster/v1.1.0/schema.json"
+  ],
+  "id": "Traffic",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -124.84011253925613,
+          46.57491966590308
+        ],
+        [
+          -120.64182961977865,
+          46.57491966590308
+        ],
+        [
+          -120.64182961977865,
+          49.02030965107601
+        ],
+        [
+          -124.84011253925613,
+          49.02030965107601
+        ],
+        [
+          -124.84011253925613,
+          46.57491966590308
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -124.84011253925613,
+    46.57491966590308,
+    -120.64182961977865,
+    49.02030965107601
+  ],
+  "properties": {
+    "proj:epsg": 3857,
+    "proj:geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            -13897137.75844496,
+            5872964.06496684
+          ],
+          [
+            -13429787.041642629,
+            5872964.06496684
+          ],
+          [
+            -13429787.041642629,
+            6278308.21974299
+          ],
+          [
+            -13897137.75844496,
+            6278308.21974299
+          ],
+          [
+            -13897137.75844496,
+            5872964.06496684
+          ]
+        ]
+      ]
+    },
+    "proj:bbox": [
+      -13897137.75844496,
+      5872964.06496684,
+      -13429787.041642629,
+      6278308.21974299
+    ],
+    "proj:shape": [
+      272284,
+      313936
+    ],
+    "proj:transform": [
+      1.4886815045178954,
+      0.0,
+      -13897137.75844496,
+      0.0,
+      -1.4886815045178954,
+      6278308.21974299,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "title": "Traffic",
+    "description": "Mean Annual Average Daily Trips",
+    "source": "The Nature Conservancy",
+    "units": "Average Annual Daily Trips",
+    "gsd": 10,
+    "datetime": "2023-01-01T00:00:00Z"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "collection",
+      "href": "../collection.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../collection.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "https://storage.googleapis.com/live_data_layers/rasters/Traffic.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "raster:bands": [
+        {
+          "data_type": "int32",
+          "scale": 1.0,
+          "offset": 0.0,
+          "sampling": "area",
+          "statistics": {
+            "mean": 36.158192140044996,
+            "minimum": 0,
+            "maximum": 43922,
+            "stddev": 584.8456299592469,
+            "valid_percent": 0.00010984955005624298
+          },
+          "histogram": {
+            "count": 11,
+            "min": 0.0,
+            "max": 43922.0,
+            "buckets": [
+              908915,
+              641,
+              286,
+              160,
+              150,
+              105,
+              51,
+              20,
+              7,
+              1
+            ]
+          }
+        }
+      ],
+      "roles": [
+        "data"
+      ]
+    },
+    "thumbnail": {
+      "href": "https://storage.googleapis.com/live_data_layers/thumbnails/Traffic.png",
+      "type": "image/png",
+      "title": "Thumbnail image",
+      "roles": [
+        "thumbnail"
+      ]
+    }
+  },
+  "collection": "input_data_layers"
+}

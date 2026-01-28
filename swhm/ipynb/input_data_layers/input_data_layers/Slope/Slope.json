@@ -1,0 +1,166 @@
+{
+  "type": "Feature",
+  "stac_version": "1.1.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/projection/v1.1.0/schema.json",
+    "https://stac-extensions.github.io/raster/v1.1.0/schema.json"
+  ],
+  "id": "Slope",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -124.90356445312499,
+          46.58906908309183
+        ],
+        [
+          -120.65185546875,
+          46.58906908309183
+        ],
+        [
+          -120.65185546875,
+          49.31796095602272
+        ],
+        [
+          -124.90356445312499,
+          49.31796095602272
+        ],
+        [
+          -124.90356445312499,
+          46.58906908309183
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -124.90356445312499,
+    46.58906908309183,
+    -120.65185546875,
+    49.31796095602272
+  ],
+  "properties": {
+    "proj:epsg": 3857,
+    "proj:geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            -13904201.1931867,
+            5875255.742111787
+          ],
+          [
+            -13430903.11404489,
+            5875255.742111787
+          ],
+          [
+            -13430903.11404489,
+            6328985.942012593
+          ],
+          [
+            -13904201.1931867,
+            6328985.942012593
+          ],
+          [
+            -13904201.1931867,
+            5875255.742111787
+          ]
+        ]
+      ]
+    },
+    "proj:bbox": [
+      -13904201.1931867,
+      5875255.742111787,
+      -13430903.11404489,
+      6328985.942012593
+    ],
+    "proj:shape": [
+      94976,
+      99072
+    ],
+    "proj:transform": [
+      4.777314267823516,
+      0.0,
+      -13904201.1931867,
+      0.0,
+      -4.777314267823516,
+      6328985.942012593,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "title": "Slope",
+    "description": "Continuous ground surface slope in degrees",
+    "source": "USGS National Elevation Dataset 1/3 Arc-Second",
+    "units": "Percent",
+    "gsd": 10,
+    "datetime": "2023-01-01T00:00:00Z"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "collection",
+      "href": "../collection.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../collection.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "https://storage.googleapis.com/live_data_layers/rasters/Slope.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "raster:bands": [
+        {
+          "data_type": "float32",
+          "scale": 1.0,
+          "offset": 0.0,
+          "sampling": "area",
+          "statistics": {
+            "mean": 13.222236321133305,
+            "minimum": 0.0,
+            "maximum": 71.67501831054688,
+            "stddev": 13.367933814004168,
+            "valid_percent": 48.19872947428717
+          },
+          "histogram": {
+            "count": 11,
+            "min": 0.0,
+            "max": 71.67501831054688,
+            "buckets": [
+              229978,
+              57449,
+              53894,
+              58216,
+              52833,
+              24736,
+              6249,
+              1180,
+              131,
+              5
+            ]
+          }
+        }
+      ],
+      "roles": [
+        "data"
+      ]
+    },
+    "thumbnail": {
+      "href": "https://storage.googleapis.com/live_data_layers/thumbnails/Slope.png",
+      "type": "image/png",
+      "title": "Thumbnail image",
+      "roles": [
+        "thumbnail"
+      ]
+    }
+  },
+  "collection": "input_data_layers"
+}

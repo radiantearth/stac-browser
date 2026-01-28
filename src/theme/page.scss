@@ -10,14 +10,17 @@ body {
 #stac-browser {
     display: flex;
     flex-direction: column;
-    max-width: 100%;
+    max-width: 900px;  // Changed from 100% to 900px
+    margin: 0 auto;    // Added to center the container
     height: 100%;
     min-height: 100%;
     gap: $block-margin;
+    padding: 0 1rem;   // Added padding for mobile spacing
 
-    @include media-breakpoint-only(xxxl) {
-        max-width: 75vw;
-    }
+    // Remove or comment out the xxxl breakpoint that widens it
+    // @include media-breakpoint-only(xxxl) {
+    //     max-width: 75vw;
+    // }
 
     > header {
         padding-top: $block-margin;
@@ -232,7 +235,6 @@ body {
             }
         }
     }
-
     
     .items, .catalogs {
         > .list {
@@ -253,6 +255,84 @@ body {
             .btn-group {
                 vertical-align: middle;
                 margin: 0.25rem 0;
+            }
+        }
+    }
+
+    // Collection page single column layout
+    .collection {
+        width: 100%;
+        
+        .left, .right {
+            max-width: 100%;
+            min-width: 100%;
+        }
+        
+        // Override any grid/multi-column layouts
+        .row {
+            flex-direction: column;
+        }
+        
+        .col,
+        .col-md-6,
+        .col-md-8,
+        .col-lg-4,
+        .col-lg-6,
+        .col-lg-8 {
+            max-width: 100%;
+            flex: 0 0 100%;
+        }
+
+        .card-columns .thumbnail {
+            align-self: center;
+        }
+
+        .metadata .card-columns {
+            column-count: 1;
+
+            &:not(.count-1) {
+                @include media-breakpoint-up(xxxl) {
+                    column-count: 2;
+                }
+            }
+        }
+    }
+
+    // Item page single column layout
+    .item {
+        width: 100%;
+        
+        .left, .right {
+            max-width: 100%;
+            min-width: 100%;
+        }
+        
+        // Override any grid/multi-column layouts
+        .row {
+            flex-direction: column;
+        }
+        
+        .col,
+        .col-md-6,
+        .col-md-8,
+        .col-lg-4,
+        .col-lg-6,
+        .col-lg-8 {
+            max-width: 100%;
+            flex: 0 0 100%;
+        }
+
+        .card-columns .thumbnail {
+            align-self: center;
+        }
+
+        .metadata .card-columns {
+            column-count: 1;
+
+            &:not(.count-1) {
+                @include media-breakpoint-up(xxxl) {
+                    column-count: 2;
+                }
             }
         }
     }

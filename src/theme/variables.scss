@@ -1,73 +1,295 @@
-// Default Theme for STAC Browser
+// ============================================================================
+// STAC Browser Theme Variables
+// ============================================================================
 
-// Most of the variables below are Bootstrap variables, see https://getbootstrap.com/docs/4.0/getting-started/theming/ for details.
-// For simplicity we just provide some common options as default, but you can override all Bootstrap Sass variables.
+// ----------------------------------------------------------------------------
+// Typography - Google Fonts
+// ----------------------------------------------------------------------------
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&family=Noto+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap');
 
-// Header / Logo, either image (see below), text (shows CATALOG_TITLE) or none
-$logo: 'none'; 
-// If 'image' has been chosen above
-$logo-image: 'https://raw.githubusercontent.com/radiantearth/stac-site/master/images/logo/stac-030-long.png';
-$logo-image-height: 100px;
+// Font families
+$font-family-sans-serif: 'Noto Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+$font-family-serif: 'Merriweather', Georgia, "Times New Roman", Times, serif;
+$font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+$font-family-base: $font-family-sans-serif;
+$headings-font-family: $font-family-serif;
 
-// Background and text default colors
-$body-bg: white;
-$body-color: black;
+// Font sizes
+$font-size-base: 1rem;
+$font-size-lg: 1.125rem;
+$font-size-sm: 0.875rem;
 
-// Colors
+// Font weights
+$font-weight-light: 300;
+$font-weight-normal: 400;
+$font-weight-bold: 700;
+$headings-font-weight: 400;
+
+// Line heights
+$line-height-base: 1.6;
+$headings-line-height: 1.2;
+
+// ----------------------------------------------------------------------------
+// Colors - Matching Reference Site
+// ----------------------------------------------------------------------------
+
+// Primary brand colors
+$primary: #3da237;
+$primary-dark: #2b7126;
+$primary-darker: #348a2f;
+$primary-light: #43b23d;
+$primary-lighter: #5bc555;
+
+// Secondary/neutral colors
+$secondary: #3c3c3c;
+$dark: #2b7126;
+$light: #f5f6f7;
+
+// Grayscale
+$white: #ffffff;
+$gray-100: #f8f9fa;
+$gray-200: #e9ecef;
+$gray-300: #dee2e6;
+$gray-400: #ced4da;
+$gray-500: #adb5bd;
+$gray-600: #6c757d;
+$gray-700: #495057;
+$gray-800: #343a40;
+$gray-900: #212529;
+$black: #000000;
+
+// Semantic colors
+$success: $primary;
+$info: #17a2b8;
+$warning: #ffc107;
+$danger: #dc3545;
+
+// Body
+$body-bg: $white;
+$body-color: $gray-900;
+
+// Links
+$link-color: $primary;
+$link-decoration: none;
+$link-hover-color: $primary-dark;
+$link-hover-decoration: underline;
+
+// ----------------------------------------------------------------------------
+// Bootstrap Theme Colors Map
+// ----------------------------------------------------------------------------
 $theme-colors: (
-  "primary":       #188191,
-  "secondary":     #6c757d,
-  "success":       #28a745,
-  "info":          #09B3AD,
-  "warning":       #ffc107,
-  "danger":        #dc3545,
-  "light":         #f8f9fa,
-  "dark":          #343a40
+  "primary": $primary,
+  "secondary": $secondary,
+  "success": $success,
+  "info": $info,
+  "warning": $warning,
+  "danger": $danger,
+  "light": $light,
+  "dark": $dark
 );
 
-// Breakpoints for responsive design
+// ----------------------------------------------------------------------------
+// Navigation/Header
+// ----------------------------------------------------------------------------
+$navbar-bg: #3c3c3c;
+$navbar-color: #f5f6f7;
+$navbar-link-color: #f5f6f7;
+$navbar-link-hover-color: rgba(255, 255, 255, 0.8);
+$navbar-brand-font-size: 0.9rem;
+$navbar-nav-link-font-size: 0.8rem;
+$navbar-nav-link-font-weight: bold;
+$navbar-padding-y: 0.5rem;
+$navbar-padding-x: 1rem;
+
+// Header margin (adjust based on your fixed header height)
+$header-margin: 4rem;
+
+// ----------------------------------------------------------------------------
+// Footer
+// ----------------------------------------------------------------------------
+$footer-bg: #3c3c3c;
+$footer-color: #f5f6f7;
+$footer-link-color: #f5f6f7;
+$footer-link-hover-color: rgba(255, 255, 255, 0.8);
+
+// ----------------------------------------------------------------------------
+// Spacing
+// ----------------------------------------------------------------------------
+$block-margin: 1.5rem;
+$spacer: 1rem;
+
+// Spacing map for Bootstrap utilities
+$spacers: (
+  0: 0,
+  1: ($spacer * 0.25),
+  2: ($spacer * 0.5),
+  3: $spacer,
+  4: ($spacer * 1.5),
+  5: ($spacer * 3)
+);
+
+// ----------------------------------------------------------------------------
+// Components
+// ----------------------------------------------------------------------------
+
+// Border radius
+$border-radius: 0.5rem;
+$border-radius-lg: 0.75rem;
+$border-radius-sm: 0.25rem;
+
+// Borders
+$border-width: 1px;
+$border-color: $gray-300;
+
+// Box shadows
+$box-shadow-sm: 0 0.125rem 0.25rem rgba($black, 0.075);
+$box-shadow: 0 0.25rem 0.5rem rgba($black, 0.1);
+$box-shadow-lg: 0 0.5rem 1rem rgba($black, 0.15);
+
+// Cards
+$card-spacer-y: 0.75rem;
+$card-spacer-x: 1rem;
+$card-border-width: 1px;
+$card-border-radius: $border-radius;
+$card-border-color: rgba($black, 0.1);
+$card-cap-bg: rgba($black, 0.03);
+$card-bg: transparent;
+
+// Buttons
+$btn-padding-y: 0.5rem;
+$btn-padding-x: 1rem;
+$btn-font-weight: $font-weight-normal;
+$btn-border-radius: $border-radius;
+$btn-border-width: $border-width;
+
+// Forms
+$input-padding-y: 0.5rem;
+$input-padding-x: 0.75rem;
+$input-border-color: #ccc;
+$input-border-radius: $border-radius;
+$input-focus-border-color: #48cce1;
+$input-focus-box-shadow: 0 0 0 0.2rem rgba(24, 129, 145, 0.25);
+
+// Badges
+$badge-font-size: 0.75rem;
+$badge-font-weight: $font-weight-bold;
+$badge-padding-y: 0.25rem;
+$badge-padding-x: 0.5rem;
+$badge-border-radius: 0.25rem;
+
+// ----------------------------------------------------------------------------
+// Tables
+// ----------------------------------------------------------------------------
+$table-cell-padding: 0.75rem;
+$table-border-color: $border-color;
+$table-striped-bg: rgba($black, 0.05);
+$table-hover-bg: rgba($black, 0.075);
+
+// ----------------------------------------------------------------------------
+// Transitions
+// ----------------------------------------------------------------------------
+$transition-base: all 0.2s ease-in-out;
+$transition-fade: opacity 0.15s linear;
+$transition-collapse: height 0.35s ease;
+
+// ----------------------------------------------------------------------------
+// Custom STAC Browser Variables
+// ----------------------------------------------------------------------------
+
+// Logo
+$logo: 'text'; // Options: 'text', 'image', 'none'
+$logo-image: '/img/logo.png';
+$logo-image-height: 3rem;
+
+// Icons
+$max-icon-size: 2rem;
+
+// Map
+$map-height: 350px;
+
+// Thumbnails
+$thumbnail-border-radius: $border-radius;
+$thumbnail-box-shadow: $box-shadow-sm;
+
+// List groups
+$list-group-border-color: rgba($black, 0.125);
+$list-group-hover-bg: $gray-100;
+$list-group-active-bg: $primary;
+$list-group-active-color: $white;
+
+// Modals
+$modal-backdrop-bg: $black;
+$modal-backdrop-opacity: 0.5;
+$modal-content-bg: $white;
+$modal-content-border-radius: $border-radius;
+
+// Z-index layers
+$zindex-dropdown: 1000;
+$zindex-sticky: 1020;
+$zindex-fixed: 1030;
+$zindex-modal-backdrop: 1040;
+$zindex-modal: 1050;
+$zindex-popover: 1060;
+$zindex-tooltip: 1070;
+
+// ----------------------------------------------------------------------------
+// Breakpoints (Bootstrap defaults)
+// ----------------------------------------------------------------------------
 $grid-breakpoints: (
   xs: 0,
   sm: 576px,
   md: 768px,
   lg: 992px,
-  xl: 1100px,
-  xxl: 1600px,
-  xxxl: 2500px
+  xl: 1200px,
+  xxl: 1400px,
+  xxxl: 1600px
 );
 
-// Font size
-$font-size-base: 1rem;
-// Fonts for normal text
-$font-family-sans-serif: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-// Fonts for headings
-$headings-font-family: $font-family-sans-serif;
-// Fonts for code
-$font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+// Container max widths
+$container-max-widths: (
+  sm: 540px,
+  md: 720px,
+  lg: 960px,
+  xl: 900px,  // Match your single column layout
+  xxl: 900px,
+  xxxl: 900px
+);
 
-// Heading sizes
-$h1-font-size: 2.2rem;
-$h2-font-size: 1.6rem;
-$h3-font-size: 1.4rem;
-$h4-font-size: 1.2rem;
+// ----------------------------------------------------------------------------
+// Additional UI Elements
+// ----------------------------------------------------------------------------
 
-// Heading color
-$headings-color: null;
+// Alerts
+$alert-padding-y: 0.75rem;
+$alert-padding-x: 1rem;
+$alert-border-radius: $border-radius;
 
-// Links
-$link-color: map-get($theme-colors, "primary");
-$link-decoration: none;
-$link-hover-color: darken($link-color, 15%);
-$link-hover-decoration: underline;
+// Popovers
+$popover-border-radius: $border-radius;
+$popover-box-shadow: $box-shadow-lg;
 
-// Margin between the main sections of the page (header, content, footer)
-$block-margin: 1rem;
+// Tooltips
+$tooltip-border-radius: $border-radius-sm;
+$tooltip-padding-y: 0.25rem;
+$tooltip-padding-x: 0.5rem;
 
-// Margin at the top of the page (for a custom header)
-$header-margin: 0px;
+// Dropdowns
+$dropdown-bg: $white;
+$dropdown-border-color: $border-color;
+$dropdown-border-radius: $border-radius;
+$dropdown-link-color: $body-color;
+$dropdown-link-hover-color: $primary;
+$dropdown-link-hover-bg: $gray-100;
 
-// Border radius
-$border-radius: 0.25rem;
+// ----------------------------------------------------------------------------
+// Custom Tagline/Banner
+// ----------------------------------------------------------------------------
+$tagline-bg: $primary-dark;
+$tagline-color: $light;
+$tagline-font-size: 0.8rem;
+$tagline-padding: 0.5rem 1rem;
 
-// Max. icon size
-$max-icon-size: 32px;
+// ============================================================================
+// End of Variables
+// ============================================================================

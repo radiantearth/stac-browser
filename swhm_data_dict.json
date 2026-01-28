@@ -1,0 +1,87 @@
+{
+  "catalog_info": {
+    "id": "stormwater-heatmap",
+    "title": "Stormwater Heatmap Data Layers",
+    "description": "Full-extent raster data for Puget Sound hydrology and pollutants, including land cover, runoff, and pollution concentrations.",
+    "spatial_extent": [[-124.9, 46.7, -121.2, 49.0]],
+    "temporal_extent": ["2023-01-01T00:00:00Z", null]
+  },
+  "layers": [
+    {
+      "id": "age-of-imperviousness",
+      "title": "Age of Imperviousness",
+      "description": "Provides multi-temporal information on the presence of built-up surfaces derived from global Landsat satellite data collected from 1975 to 2014. Used to estimate current stormwater treatment levels.",
+      "resolution": "30 meters (masked by 1-meter imperviousness data)",
+      "ee_layer_name": "Age of Imperviousness",
+      "download_url": "https://storage.googleapis.com/live_data_layers/rasters/Age_of_Imperviousness.tif",
+      "classification": [
+        { "label": "2000–2014 (stormwater likely treated)", "value": 3, "color": "#9e73" },
+        { "label": "1990–2000 (some stormwater treatment)", "value": 4, "color": "#F0E442" },
+        { "label": "Before 1990 (likely no stormwater treatment)", "value": 5, "color": "#CC6677" }
+      ]
+    },
+    {
+      "id": "flow-duration-index",
+      "title": "Flow Duration Index",
+      "description": "A dimensionless index indicating the level of flow control needed to match forest hydrology. It represents the magnitude of change to the flow-duration curve between flow thresholds.",
+      "ee_layer_name": "Flow Duration Index",
+      "download_url": "https://storage.googleapis.com/live_data_layers/rasters/Flow_Duration_Index.tif",
+      "stats": { "min": 1, "max": 10 }
+    },
+    {
+      "id": "hspf-land-cover",
+      "title": "HSPF Land Cover Type",
+      "description": "Land cover classified by categories used in the Western Washington Hydrology Model (WWHM). Derived from 1-meter resolution data.",
+      "download_url": "https://storage.googleapis.com/live_data_layers/rasters/HSPF_Land_Cover_Type.tif",
+      "class_mapping": {
+        "Fine/Medium Vegetation": "Grass",
+        "Coarse Vegetation": "Forest",
+        "Dirt/Barren": "Grass",
+        "Water": "Water",
+        "Impervious/Roofs": "Impervious",
+        "NLCD Cropland": "Pasture"
+      },
+      "classification": [
+        { "label": "Forest/Trees", "value": 0, "color": "#55775e" },
+        { "label": "Pasture", "value": 1, "color": "#dacd7f" },
+        { "label": "Grass", "value": 2, "color": "#7e9e87" },
+        { "label": "Water", "value": 3, "color": "#b3caff" },
+        { "label": "Impervious-roof", "value": 4, "color": "#844c8b" },
+        { "label": "Impervious-nonRoof", "value": 5, "color": "#ead1ff" }
+      ]
+    },
+    {
+      "id": "hydrologic-response-units",
+      "title": "Hydrologic Response Units",
+      "description": "Landscape units based on common soils, land cover, and slope characteristics. Used for computationally efficient pre-computing of hydrologic response. 101 = Type C soils, forested, moderate slope.",
+      "download_url": "https://storage.googleapis.com/live_data_layers/rasters/Hydrologic_Response_Units.tif",
+      "coding_convention": {
+        "digit_1": "Hydrologic Soil Group (0=A/B, 1=C, 2=Saturated)",
+        "digit_2": "Land cover (0=Forest, 1=Pasture, 2=Lawn, 5=Impervious)",
+        "digit_3": "Slope (0=Flat, 1=Mod, 2=Steep)"
+      }
+    },
+    {
+      "id": "pollutant-copper",
+      "title": "Total Copper Concentration",
+      "description": "Predicted pollutant concentrations derived from linear mixed-effects models using spatial covariates.",
+      "units": "mcg/L",
+      "download_url": "https://storage.googleapis.com/live_data_layers/rasters/Total_Copper_Concentration.tif"
+    },
+    {
+      "id": "pollutant-phosphorus",
+      "title": "Total Phosphorus Concentration",
+      "description": "Predicted pollutant concentrations derived from linear mixed-effects models using spatial covariates.",
+      "units": "mcg/L",
+      "download_url": "https://storage.googleapis.com/live_data_layers/rasters/Total_Phosphorus_Concentration.tif"
+    },
+    {
+      "id": "traffic",
+      "title": "Traffic ADT",
+      "description": "High-resolution raster dataset of Annual Daily Traffic (ADT) across road surface areas.",
+      "methodology": "Uses a distance decay function for local roads where $r = f(a) = a \times (11.03955 - 0.007743235a + 0.000001332168a^2)$.",
+      "download_url": "https://storage.googleapis.com/live_data_layers/rasters/Traffic.tif",
+      "stats": { "min": 0, "max": 100000 }
+    }
+  ]
+}

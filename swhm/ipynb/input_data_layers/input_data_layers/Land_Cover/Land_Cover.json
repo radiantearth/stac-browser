@@ -1,0 +1,209 @@
+{
+  "type": "Feature",
+  "stac_version": "1.1.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/projection/v1.1.0/schema.json",
+    "https://stac-extensions.github.io/raster/v1.1.0/schema.json",
+    "https://stac-extensions.github.io/classification/v1.1.0/schema.json"
+  ],
+  "id": "Land_Cover",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -124.90356445312499,
+          46.5928439974274
+        ],
+        [
+          -120.65185546875,
+          46.5928439974274
+        ],
+        [
+          -120.65185546875,
+          49.31438004800688
+        ],
+        [
+          -124.90356445312499,
+          49.31438004800688
+        ],
+        [
+          -124.90356445312499,
+          46.5928439974274
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -124.90356445312499,
+    46.5928439974274,
+    -120.65185546875,
+    49.31438004800688
+  ],
+  "properties": {
+    "proj:epsg": 3857,
+    "proj:geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            -13904201.1931867,
+            5875867.238338069
+          ],
+          [
+            -13430903.11404489,
+            5875867.238338069
+          ],
+          [
+            -13430903.11404489,
+            6328374.445786312
+          ],
+          [
+            -13904201.1931867,
+            6328374.445786312
+          ],
+          [
+            -13904201.1931867,
+            5875867.238338069
+          ]
+        ]
+      ]
+    },
+    "proj:bbox": [
+      -13904201.1931867,
+      5875867.238338069,
+      -13430903.11404489,
+      6328374.445786312
+    ],
+    "proj:shape": [
+      378880,
+      396288
+    ],
+    "proj:transform": [
+      1.194328566955879,
+      0.0,
+      -13904201.1931867,
+      0.0,
+      -1.194328566955879,
+      6328374.445786312,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "title": "Land Cover",
+    "description": "1-meter resolution land cover classification",
+    "source": "The Nature Conservancy",
+    "units": "Land Cover Type",
+    "gsd": 1,
+    "datetime": "2023-01-01T00:00:00Z"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "collection",
+      "href": "../collection.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../collection.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "https://storage.googleapis.com/live_data_layers/rasters/Land_Cover.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "raster:bands": [
+        {
+          "data_type": "uint8",
+          "scale": 1.0,
+          "offset": 0.0,
+          "sampling": "area",
+          "statistics": {
+            "mean": 1.3034139827806122,
+            "minimum": 0,
+            "maximum": 7,
+            "stddev": 1.782116885282306,
+            "valid_percent": 9.964923469387755e-05
+          },
+          "histogram": {
+            "count": 11,
+            "min": 0.0,
+            "max": 7.0,
+            "buckets": [
+              591782,
+              52306,
+              39902,
+              0,
+              219092,
+              3378,
+              0,
+              82183,
+              9950,
+              4927
+            ]
+          }
+        }
+      ],
+      "classification:classes": [
+        {
+          "value": 0,
+          "description": "No data",
+          "color_hint": "#000000"
+        },
+        {
+          "value": 1,
+          "description": "Grass/Low Vegetation",
+          "color_hint": "#000000"
+        },
+        {
+          "value": 2,
+          "description": "Shrub/Medium Vegetation",
+          "color_hint": "#000000"
+        },
+        {
+          "value": 3,
+          "description": "Trees/Forest",
+          "color_hint": "#000000"
+        },
+        {
+          "value": 4,
+          "description": "Bare soil",
+          "color_hint": "#000000"
+        },
+        {
+          "value": 5,
+          "description": "Water",
+          "color_hint": "#000000"
+        },
+        {
+          "value": 6,
+          "description": "Impervious",
+          "color_hint": "#000000"
+        },
+        {
+          "value": 7,
+          "description": "Impervious - Roofs ",
+          "color_hint": "#000000"
+        }
+      ],
+      "roles": [
+        "data"
+      ]
+    },
+    "thumbnail": {
+      "href": "https://storage.googleapis.com/live_data_layers/thumbnails/Land_Cover.png",
+      "type": "image/png",
+      "title": "Thumbnail image",
+      "roles": [
+        "thumbnail"
+      ]
+    }
+  },
+  "collection": "input_data_layers"
+}

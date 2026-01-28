@@ -1,0 +1,89 @@
+{
+  "type": "Collection",
+  "id": "input_data_layers",
+  "stac_version": "1.1.0",
+  "description": "Base data layers that are used to inform or develop other layers",
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./Age_of_Imperviousness/Age_of_Imperviousness.json",
+      "type": "application/geo+json"
+    },
+    {
+      "rel": "item",
+      "href": "./HSPF_Land_Cover_Type/HSPF_Land_Cover_Type.json",
+      "type": "application/geo+json"
+    },
+    {
+      "rel": "item",
+      "href": "./Imperviousness/Imperviousness.json",
+      "type": "application/geo+json"
+    },
+    {
+      "rel": "item",
+      "href": "./Land_Cover/Land_Cover.json",
+      "type": "application/geo+json"
+    },
+    {
+      "rel": "item",
+      "href": "./Land_Use/Land_Use.json",
+      "type": "application/geo+json"
+    },
+    {
+      "rel": "item",
+      "href": "./Population_Density/Population_Density.json",
+      "type": "application/geo+json"
+    },
+    {
+      "rel": "item",
+      "href": "./Slope/Slope.json",
+      "type": "application/geo+json"
+    },
+    {
+      "rel": "item",
+      "href": "./Slope_Categories/Slope_Categories.json",
+      "type": "application/geo+json"
+    },
+    {
+      "rel": "item",
+      "href": "./Soils/Soils.json",
+      "type": "application/geo+json"
+    },
+    {
+      "rel": "item",
+      "href": "./Traffic/Traffic.json",
+      "type": "application/geo+json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    }
+  ],
+  "extent": {
+    "spatial": {
+      "bbox": [
+        [
+          -124.90356445312499,
+          46.57491966590308,
+          -120.64182961977865,
+          49.31796095602272
+        ]
+      ]
+    },
+    "temporal": {
+      "interval": [
+        [
+          "2023-01-01T00:00:00Z",
+          "2023-01-01T00:00:00Z"
+        ]
+      ]
+    }
+  },
+  "license": "other"
+}

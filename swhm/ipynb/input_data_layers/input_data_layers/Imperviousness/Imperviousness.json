@@ -1,0 +1,166 @@
+{
+  "type": "Feature",
+  "stac_version": "1.1.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/projection/v1.1.0/schema.json",
+    "https://stac-extensions.github.io/raster/v1.1.0/schema.json"
+  ],
+  "id": "Imperviousness",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -124.90220799704598,
+          46.593055160526625
+        ],
+        [
+          -120.6545870581567,
+          46.593055160526625
+        ],
+        [
+          -120.6545870581567,
+          49.31339619823345
+        ],
+        [
+          -124.90220799704598,
+          49.31339619823345
+        ],
+        [
+          -124.90220799704598,
+          46.593055160526625
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -124.90220799704598,
+    46.593055160526625,
+    -120.6545870581567,
+    49.31339619823345
+  ],
+  "properties": {
+    "proj:epsg": 3857,
+    "proj:geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            -13904050.1931867,
+            5875901.445786312
+          ],
+          [
+            -13431207.1931867,
+            5875901.445786312
+          ],
+          [
+            -13431207.1931867,
+            6328206.445786312
+          ],
+          [
+            -13904050.1931867,
+            6328206.445786312
+          ],
+          [
+            -13904050.1931867,
+            5875901.445786312
+          ]
+        ]
+      ]
+    },
+    "proj:bbox": [
+      -13904050.1931867,
+      5875901.445786312,
+      -13431207.1931867,
+      6328206.445786312
+    ],
+    "proj:shape": [
+      452305,
+      472843
+    ],
+    "proj:transform": [
+      0.9999999999999999,
+      0.0,
+      -13904050.1931867,
+      0.0,
+      -0.9999999999999999,
+      6328206.445786312,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "title": "Imperviousness",
+    "description": "Percent impervious land cover",
+    "source": "The Nature Conservancy",
+    "units": "Percent",
+    "gsd": 1,
+    "datetime": "2023-01-01T00:00:00Z"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "collection",
+      "href": "../collection.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../collection.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "https://storage.googleapis.com/live_data_layers/rasters/Imperviousness.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "raster:bands": [
+        {
+          "data_type": "float64",
+          "scale": 1.0,
+          "offset": 0.0,
+          "sampling": "area",
+          "statistics": {
+            "mean": 2.7365448704820095,
+            "minimum": 0.0,
+            "maximum": 99.97945404052734,
+            "stddev": 9.007060671037413,
+            "valid_percent": 54.857401945153065
+          },
+          "histogram": {
+            "count": 11,
+            "min": 0.0,
+            "max": 99.97945404052734,
+            "buckets": [
+              510780,
+              15567,
+              7820,
+              6845,
+              4370,
+              2401,
+              1249,
+              802,
+              442,
+              229
+            ]
+          }
+        }
+      ],
+      "roles": [
+        "data"
+      ]
+    },
+    "thumbnail": {
+      "href": "https://storage.googleapis.com/live_data_layers/thumbnails/Imperviousness.png",
+      "type": "image/png",
+      "title": "Thumbnail image",
+      "roles": [
+        "thumbnail"
+      ]
+    }
+  },
+  "collection": "input_data_layers"
+}

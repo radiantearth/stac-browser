@@ -1,0 +1,21 @@
+{
+  "type": "Catalog",
+  "id": "stormwater-heatmap-catalog",
+  "stac_version": "1.1.0",
+  "description": "A STAC catalog containing hydrology, land cover, and pollution data for the Puget Sound.",
+  "links": [
+    {
+      "rel": "root",
+      "href": "./catalog.json",
+      "type": "application/json",
+      "title": "Stormwater Heatmap Data Catalog"
+    },
+    {
+      "rel": "child",
+      "href": "./stormwater-layers/collection.json",
+      "type": "application/json",
+      "title": "Stormwater Heatmap Layers"
+    }
+  ],
+  "title": "Stormwater Heatmap Data Catalog"
+}

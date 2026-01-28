@@ -1,0 +1,194 @@
+{
+  "type": "Feature",
+  "stac_version": "1.1.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/projection/v2.0.0/schema.json",
+    "https://stac-extensions.github.io/classification/v1.1.0/schema.json",
+    "https://stac-extensions.github.io/raster/v1.1.0/schema.json"
+  ],
+  "id": "age_of_imperviousness",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -124.90220934094849,
+          46.593025643946405
+        ],
+        [
+          -120.65457043575353,
+          46.593025643946405
+        ],
+        [
+          -120.65457043575353,
+          49.313397477497546
+        ],
+        [
+          -124.90220934094849,
+          49.313397477497546
+        ],
+        [
+          -124.90220934094849,
+          46.593025643946405
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -124.90220934094849,
+    46.593025643946405,
+    -120.65457043575353,
+    49.313397477497546
+  ],
+  "properties": {
+    "title": "Age of Imperviousness",
+    "providers": [
+      { "name": "The Nature Conservancy", "roles": ["producer", "licensor"] },
+      { "name": "Columbia University CIESIN", "roles": ["processor"] }
+    ],
+    "proj:geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            -13904050.342789244,
+            5875896.664228426
+          ],
+          [
+            -13431205.342789244,
+            5875896.664228426
+          ],
+          [
+            -13431205.342789244,
+            6328206.664228426
+          ],
+          [
+            -13904050.342789244,
+            6328206.664228426
+          ],
+          [
+            -13904050.342789244,
+            5875896.664228426
+          ]
+        ]
+      ]
+    },
+    "proj:bbox": [
+      -13904050.342789244,
+      5875896.664228426,
+      -13431205.342789244,
+      6328206.664228426
+    ],
+    "proj:shape": [
+      30154,
+      31523
+    ],
+    "proj:transform": [
+      15.0,
+      0.0,
+      -13904050.342789244,
+      0.0,
+      -15.0,
+      6328206.664228426,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "datetime": "2023-01-01T00:00:00Z",
+    "proj:code": "EPSG:3857",
+    "description": "\n*Impervious surface by estimated date of conversion. Used to estimate level of current stormwater treatment.*\n\n"
+  },
+  "links": [
+    {
+      "rel": "external",
+      "href": "https://www.stormwaterheatmap.org",
+      "type": "text/html",
+      "title": "Stormwater Heatmap Project Documentation"
+    },
+    {
+      "rel": "root",
+      "href": "https://storage.googleapis.com/swhm-stac-data/input_data_layers/catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "collection",
+      "href": "../collection.json",
+      "type": "application/json",
+      "title": "Input Data Layers"
+    },
+    {
+      "rel": "self",
+      "href": "/content/input_data_layers/age_of_imperviousness/age_of_imperviousness.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../collection.json",
+      "type": "application/json",
+      "title": "Input Data Layers"
+    }
+  ],
+  "assets": {
+    "data": {
+      "classification:classes": [
+        { "value": 3, "description": "2000–2014 (stormwater likely treated)", "color_hint": "9e7373" },
+        { "value": 4, "description": "1990–2000 (some stormwater treatment)", "color_hint": "F0E442" },
+        { "value": 5, "description": "Before 1990 (likely no stormwater treatment)", "color_hint": "CC6677" }
+      ],
+      "href": "https://storage.googleapis.com/live_data_layers/rasters/Age_of_Imperviousness.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "raster:bands": [
+        {
+          "data_type": "uint8",
+          "scale": 1.0,
+          "offset": 0.0,
+          "sampling": "area",
+          "statistics": {
+            "mean": 0.12556501116071428,
+            "minimum": 0,
+            "maximum": 5,
+            "stddev": 0.6330421128834515,
+            "valid_percent": 0.00009964923469387755
+          },
+          "histogram": {
+            "count": 11,
+            "min": 0.0,
+            "max": 5.0,
+            "buckets": [
+              951398,
+              0,
+              21324,
+              0,
+              9361,
+              0,
+              7149,
+              0,
+              6926,
+              7362
+            ]
+          }
+        }
+      ],
+      "roles": [
+        "data"
+      ]
+    },
+    "thumbnail": {
+      "href": "https://storage.googleapis.com/live_data_layers/thumbnails/Age_of_Imperviousness.png",
+      "type": "image/png",
+      "title": "Thumbnail image",
+      "roles": [
+        "thumbnail"
+      ]
+    }, 
+        "json-metadata": {
+      "href": "http://remotedata.io/catalog/20201211_223832_CS2/extended-metadata.json",
+      "title": "Extended Metadata",
+      "type": "application/json",
+      "roles": [
+        "metadata"
+      ]
+    }
+  },
+  "collection": "Input Data Layers"
+}

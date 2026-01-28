@@ -1,0 +1,77 @@
+{
+  "type": "Collection",
+  "id": "stormwater-layers",
+  "stac_version": "1.1.0",
+  "description": "Individual and grouped data layers from the Stormwater Heatmap project.",
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Stormwater Heatmap Data Catalog"
+    },
+    {
+      "rel": "item",
+      "href": "./age_of_imperviousness/age_of_imperviousness.json",
+      "type": "application/geo+json"
+    },
+    {
+      "rel": "item",
+      "href": "./flow_duration_index/flow_duration_index.json",
+      "type": "application/geo+json"
+    },
+    {
+      "rel": "item",
+      "href": "./hspf_land_cover_type/hspf_land_cover_type.json",
+      "type": "application/geo+json"
+    },
+    {
+      "rel": "item",
+      "href": "./hydrologic_response_units/hydrologic_response_units.json",
+      "type": "application/geo+json"
+    },
+    {
+      "rel": "item",
+      "href": "./total_copper_concentration/total_copper_concentration.json",
+      "type": "application/geo+json"
+    },
+    {
+      "rel": "item",
+      "href": "./total_phosphorus_concentration/total_phosphorus_concentration.json",
+      "type": "application/geo+json"
+    },
+    {
+      "rel": "item",
+      "href": "./traffic_adt/traffic_adt.json",
+      "type": "application/geo+json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Stormwater Heatmap Data Catalog"
+    }
+  ],
+  "title": "Stormwater Heatmap Layers",
+  "extent": {
+    "spatial": {
+      "bbox": [
+        [
+          -124.9,
+          46.7,
+          -121.2,
+          49.0
+        ]
+      ]
+    },
+    "temporal": {
+      "interval": [
+        [
+          "2023-01-01T00:00:00Z",
+          null
+        ]
+      ]
+    }
+  },
+  "license": "CC-BY-4.0"
+}

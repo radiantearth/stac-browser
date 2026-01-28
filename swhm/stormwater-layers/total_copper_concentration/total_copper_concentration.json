@@ -1,0 +1,158 @@
+{
+  "type": "Feature",
+  "stac_version": "1.1.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/projection/v1.1.0/schema.json",
+    "https://stac-extensions.github.io/raster/v1.1.0/schema.json"
+  ],
+  "id": "total_copper_concentration",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -124.81794428796992,
+          46.593023725608006
+        ],
+        [
+          -120.65453257506996,
+          46.593023725608006
+        ],
+        [
+          -120.65453257506996,
+          49.00246992802101
+        ],
+        [
+          -124.81794428796992,
+          49.00246992802101
+        ],
+        [
+          -124.81794428796992,
+          46.593023725608006
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -124.81794428796992,
+    46.593023725608006,
+    -120.65453257506996,
+    49.00246992802101
+  ],
+  "properties": {
+    "proj:epsg": 3857,
+    "proj:geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            -13894670.000000002,
+            5875896.353466022
+          ],
+          [
+            -13431201.128157228,
+            5875896.353466022
+          ],
+          [
+            -13431201.128157228,
+            6275280.499506599
+          ],
+          [
+            -13894670.000000002,
+            6275280.499506599
+          ],
+          [
+            -13894670.000000002,
+            5875896.353466022
+          ]
+        ]
+      ]
+    },
+    "proj:bbox": [
+      -13894670.000000002,
+      5875896.353466022,
+      -13431201.128157228,
+      6275280.499506599
+    ],
+    "proj:shape": [
+      34956,
+      40565
+    ],
+    "proj:transform": [
+      11.425338884328216,
+      0.0,
+      -13894670.000000002,
+      0.0,
+      -11.425338884328216,
+      6275280.499506599,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "title": "Total Copper Concentration",
+    "description": "Predicted pollutant concentrations derived from linear mixed-effects models using spatial covariates.",
+    "datetime": "2023-01-01T00:00:00Z"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../../catalog.json",
+      "type": "application/json",
+      "title": "Stormwater Heatmap Data Catalog"
+    },
+    {
+      "rel": "collection",
+      "href": "../collection.json",
+      "type": "application/json",
+      "title": "Stormwater Heatmap Layers"
+    },
+    {
+      "rel": "parent",
+      "href": "../collection.json",
+      "type": "application/json",
+      "title": "Stormwater Heatmap Layers"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "https://storage.googleapis.com/live_data_layers/rasters/Total_Copper_Concentration.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "raster:bands": [
+        {
+          "data_type": "float64",
+          "scale": 1.0,
+          "offset": 0.0,
+          "sampling": "area",
+          "statistics": {
+            "mean": 1.4021874415568591,
+            "minimum": 0.0,
+            "maximum": 58.75522232055664,
+            "stddev": 2.6570081565470556,
+            "valid_percent": 51.264775622876556
+          },
+          "histogram": {
+            "count": 11,
+            "min": 0.0,
+            "max": 58.75522232055664,
+            "buckets": [
+              447459,
+              8571,
+              4688,
+              1615,
+              583,
+              316,
+              163,
+              81,
+              38,
+              18
+            ]
+          }
+        }
+      ],
+      "roles": [
+        "data"
+      ]
+    }
+  },
+  "collection": "stormwater-layers"
+}

@@ -1,0 +1,159 @@
+{
+  "type": "Feature",
+  "stac_version": "1.1.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/projection/v1.1.0/schema.json",
+    "https://stac-extensions.github.io/raster/v1.1.0/schema.json"
+  ],
+  "id": "flow_duration_index",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -124.90220626162031,
+          46.5930305799689
+        ],
+        [
+          -120.65454183875653,
+          46.5930305799689
+        ],
+        [
+          -120.65454183875653,
+          49.31339481416045
+        ],
+        [
+          -124.90220626162031,
+          49.31339481416045
+        ],
+        [
+          -124.90220626162031,
+          46.5930305799689
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -124.90220626162031,
+    46.5930305799689,
+    -120.65454183875653,
+    49.31339481416045
+  ],
+  "properties": {
+    "proj:epsg": 3857,
+    "proj:geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            -13904050.0,
+            5875897.4638424665
+          ],
+          [
+            -13431202.159386098,
+            5875897.4638424665
+          ],
+          [
+            -13431202.159386098,
+            6328206.209447447
+          ],
+          [
+            -13904050.0,
+            6328206.209447447
+          ],
+          [
+            -13904050.0,
+            5875897.4638424665
+          ]
+        ]
+      ]
+    },
+    "proj:bbox": [
+      -13904050.0,
+      5875897.4638424665,
+      -13431202.159386098,
+      6328206.209447447
+    ],
+    "proj:shape": [
+      77627,
+      81152
+    ],
+    "proj:transform": [
+      5.826693619552227,
+      0.0,
+      -13904050.0,
+      0.0,
+      -5.826693619552227,
+      6328206.209447447,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "title": "Flow Duration Index",
+    "description": "A dimensionless index indicating the level of flow control needed to match forest hydrology. It represents the magnitude of change to the flow-duration curve between flow thresholds.",
+    "swhm:ee_layer_name": "Flow Duration Index",
+    "datetime": "2023-01-01T00:00:00Z"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../../catalog.json",
+      "type": "application/json",
+      "title": "Stormwater Heatmap Data Catalog"
+    },
+    {
+      "rel": "collection",
+      "href": "../collection.json",
+      "type": "application/json",
+      "title": "Stormwater Heatmap Layers"
+    },
+    {
+      "rel": "parent",
+      "href": "../collection.json",
+      "type": "application/json",
+      "title": "Stormwater Heatmap Layers"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "https://storage.googleapis.com/live_data_layers/rasters/Flow_Duration_Index.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "raster:bands": [
+        {
+          "data_type": "float64",
+          "scale": 1.0,
+          "offset": 0.0,
+          "sampling": "area",
+          "statistics": {
+            "mean": 1.5281284316424972,
+            "minimum": 0.0,
+            "maximum": 10.582371711730957,
+            "stddev": 0.8848661920946155,
+            "valid_percent": 30.089783960459183
+          },
+          "histogram": {
+            "count": 11,
+            "min": 0.0,
+            "max": 10.582371711730957,
+            "buckets": [
+              63830,
+              200585,
+              21042,
+              7854,
+              4800,
+              2527,
+              890,
+              325,
+              86,
+              18
+            ]
+          }
+        }
+      ],
+      "roles": [
+        "data"
+      ]
+    }
+  },
+  "collection": "stormwater-layers"
+}

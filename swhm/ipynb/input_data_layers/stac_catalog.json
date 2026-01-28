@@ -1,0 +1,18 @@
+{
+  "type": "Catalog",
+  "id": "Stormwater Heatmap Data Catalog",
+  "stac_version": "1.1.0",
+  "description": "The Puget Sound Stormwater Heatmap is an open-source mapping tool and data repository designed to improve understanding of stormwater pollution and support decisions that enhance water quality. Data layers used in the Stormwater Heatmap are stored as a SpatioTemporal Asset Catalog (STAC) to improve data accessibility and interoperability.",
+  "links": [
+    {
+      "rel": "root",
+      "href": "./catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "child",
+      "href": "./input_data_layers/collection.json",
+      "type": "application/json"
+    }
+  ]
+}

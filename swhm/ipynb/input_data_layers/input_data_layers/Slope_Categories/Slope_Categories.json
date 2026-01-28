@@ -1,0 +1,184 @@
+{
+  "type": "Feature",
+  "stac_version": "1.1.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/projection/v1.1.0/schema.json",
+    "https://stac-extensions.github.io/raster/v1.1.0/schema.json",
+    "https://stac-extensions.github.io/classification/v1.1.0/schema.json"
+  ],
+  "id": "Slope_Categories",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -124.90356445312499,
+          46.58906908309183
+        ],
+        [
+          -120.65185546875,
+          46.58906908309183
+        ],
+        [
+          -120.65185546875,
+          49.31796095602272
+        ],
+        [
+          -124.90356445312499,
+          49.31796095602272
+        ],
+        [
+          -124.90356445312499,
+          46.58906908309183
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -124.90356445312499,
+    46.58906908309183,
+    -120.65185546875,
+    49.31796095602272
+  ],
+  "properties": {
+    "proj:epsg": 3857,
+    "proj:geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            -13904201.1931867,
+            5875255.742111787
+          ],
+          [
+            -13430903.11404489,
+            5875255.742111787
+          ],
+          [
+            -13430903.11404489,
+            6328985.942012593
+          ],
+          [
+            -13904201.1931867,
+            6328985.942012593
+          ],
+          [
+            -13904201.1931867,
+            5875255.742111787
+          ]
+        ]
+      ]
+    },
+    "proj:bbox": [
+      -13904201.1931867,
+      5875255.742111787,
+      -13430903.11404489,
+      6328985.942012593
+    ],
+    "proj:shape": [
+      94976,
+      99072
+    ],
+    "proj:transform": [
+      4.777314267823516,
+      0.0,
+      -13904201.1931867,
+      0.0,
+      -4.777314267823516,
+      6328985.942012593,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "title": "Slope Categories",
+    "description": "Categorized ground surface slope",
+    "source": "The Nature Conservancy",
+    "units": "Category",
+    "gsd": 10,
+    "datetime": "2023-01-01T00:00:00Z"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "collection",
+      "href": "../collection.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../collection.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "https://storage.googleapis.com/live_data_layers/rasters/Slope_Categories.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "raster:bands": [
+        {
+          "data_type": "float32",
+          "scale": 1.0,
+          "offset": 0.0,
+          "sampling": "area",
+          "statistics": {
+            "mean": 0.46333011984825134,
+            "minimum": 0.0,
+            "maximum": 2.0,
+            "stddev": 0.7583747506141663,
+            "valid_percent": 9.944628309572301e-05
+          },
+          "histogram": {
+            "count": 11,
+            "min": 0.0,
+            "max": 2.0,
+            "buckets": [
+              693205,
+              21615,
+              18713,
+              17550,
+              19440,
+              20440,
+              17286,
+              19064,
+              25629,
+              152626
+            ]
+          }
+        }
+      ],
+      "classification:classes": [
+        {
+          "value": 0,
+          "description": "Flat",
+          "color_hint": "#000000"
+        },
+        {
+          "value": 1,
+          "description": "Moderate",
+          "color_hint": "#000000"
+        },
+        {
+          "value": 2,
+          "description": "Steep",
+          "color_hint": "#000000"
+        }
+      ],
+      "roles": [
+        "data"
+      ]
+    },
+    "thumbnail": {
+      "href": "https://storage.googleapis.com/live_data_layers/thumbnails/Slope_Categories.png",
+      "type": "image/png",
+      "title": "Thumbnail image",
+      "roles": [
+        "thumbnail"
+      ]
+    }
+  },
+  "collection": "input_data_layers"
+}

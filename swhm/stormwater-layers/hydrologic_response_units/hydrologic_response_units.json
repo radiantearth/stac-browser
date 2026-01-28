@@ -1,0 +1,163 @@
+{
+  "type": "Feature",
+  "stac_version": "1.1.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/projection/v1.1.0/schema.json",
+    "https://stac-extensions.github.io/raster/v1.1.0/schema.json"
+  ],
+  "id": "hydrologic_response_units",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -124.90356445312499,
+          46.5928439974274
+        ],
+        [
+          -120.65185546875,
+          46.5928439974274
+        ],
+        [
+          -120.65185546875,
+          49.31438004800688
+        ],
+        [
+          -124.90356445312499,
+          49.31438004800688
+        ],
+        [
+          -124.90356445312499,
+          46.5928439974274
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -124.90356445312499,
+    46.5928439974274,
+    -120.65185546875,
+    49.31438004800688
+  ],
+  "properties": {
+    "proj:epsg": 3857,
+    "proj:geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            -13904201.1931867,
+            5875867.238338069
+          ],
+          [
+            -13430903.11404489,
+            5875867.238338069
+          ],
+          [
+            -13430903.11404489,
+            6328374.445786312
+          ],
+          [
+            -13904201.1931867,
+            6328374.445786312
+          ],
+          [
+            -13904201.1931867,
+            5875867.238338069
+          ]
+        ]
+      ]
+    },
+    "proj:bbox": [
+      -13904201.1931867,
+      5875867.238338069,
+      -13430903.11404489,
+      6328374.445786312
+    ],
+    "proj:shape": [
+      189440,
+      198144
+    ],
+    "proj:transform": [
+      2.388657133911758,
+      0.0,
+      -13904201.1931867,
+      0.0,
+      -2.388657133911758,
+      6328374.445786312,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "title": "Hydrologic Response Units",
+    "description": "Landscape units based on common soils, land cover, and slope characteristics. Used for computationally efficient pre-computing of hydrologic response. 101 = Type C soils, forested, moderate slope.",
+    "swhm:coding_convention": {
+      "digit_1": "Hydrologic Soil Group (0=A/B, 1=C, 2=Saturated)",
+      "digit_2": "Land cover (0=Forest, 1=Pasture, 2=Lawn, 5=Impervious)",
+      "digit_3": "Slope (0=Flat, 1=Mod, 2=Steep)"
+    },
+    "datetime": "2023-01-01T00:00:00Z"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../../catalog.json",
+      "type": "application/json",
+      "title": "Stormwater Heatmap Data Catalog"
+    },
+    {
+      "rel": "collection",
+      "href": "../collection.json",
+      "type": "application/json",
+      "title": "Stormwater Heatmap Layers"
+    },
+    {
+      "rel": "parent",
+      "href": "../collection.json",
+      "type": "application/json",
+      "title": "Stormwater Heatmap Layers"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "https://storage.googleapis.com/live_data_layers/rasters/Hydrologic_Response_Units.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "raster:bands": [
+        {
+          "data_type": "uint8",
+          "scale": 1.0,
+          "offset": 0.0,
+          "sampling": "area",
+          "statistics": {
+            "mean": 21.28090222417092,
+            "minimum": 0,
+            "maximum": 252,
+            "stddev": 53.09231470496415,
+            "valid_percent": 0.00009964923469387755
+          },
+          "histogram": {
+            "count": 11,
+            "min": 0.0,
+            "max": 252.0,
+            "buckets": [
+              861628,
+              0,
+              0,
+              12242,
+              87218,
+              0,
+              0,
+              11663,
+              16270,
+              14499
+            ]
+          }
+        }
+      ],
+      "roles": [
+        "data"
+      ]
+    }
+  },
+  "collection": "stormwater-layers"
+}

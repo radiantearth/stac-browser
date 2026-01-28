@@ -1,0 +1,244 @@
+{
+  "type": "Feature",
+  "stac_version": "1.1.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/projection/v1.1.0/schema.json",
+    "https://stac-extensions.github.io/raster/v1.1.0/schema.json",
+    "https://stac-extensions.github.io/classification/v1.1.0/schema.json"
+  ],
+  "id": "Land_Use",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -124.90356445312499,
+          46.5928439974274
+        ],
+        [
+          -120.65185546875,
+          46.5928439974274
+        ],
+        [
+          -120.65185546875,
+          49.31438004800688
+        ],
+        [
+          -124.90356445312499,
+          49.31438004800688
+        ],
+        [
+          -124.90356445312499,
+          46.5928439974274
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -124.90356445312499,
+    46.5928439974274,
+    -120.65185546875,
+    49.31438004800688
+  ],
+  "properties": {
+    "proj:epsg": 3857,
+    "proj:geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            -13904201.1931867,
+            5875867.238338069
+          ],
+          [
+            -13430903.11404489,
+            5875867.238338069
+          ],
+          [
+            -13430903.11404489,
+            6328374.445786312
+          ],
+          [
+            -13904201.1931867,
+            6328374.445786312
+          ],
+          [
+            -13904201.1931867,
+            5875867.238338069
+          ]
+        ]
+      ]
+    },
+    "proj:bbox": [
+      -13904201.1931867,
+      5875867.238338069,
+      -13430903.11404489,
+      6328374.445786312
+    ],
+    "proj:shape": [
+      189440,
+      198144
+    ],
+    "proj:transform": [
+      2.388657133911758,
+      0.0,
+      -13904201.1931867,
+      0.0,
+      -2.388657133911758,
+      6328374.445786312,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "title": "Land Use",
+    "description": "Department of Commerce Master Land Use Category",
+    "source": "Puget Sound Mapping Project",
+    "units": "Land Use type",
+    "gsd": 5,
+    "datetime": "2023-01-01T00:00:00Z"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "collection",
+      "href": "../collection.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../collection.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "https://storage.googleapis.com/live_data_layers/rasters/Land_Use.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "raster:bands": [
+        {
+          "data_type": "uint8",
+          "scale": 1.0,
+          "offset": 0.0,
+          "sampling": "area",
+          "statistics": {
+            "mean": 2.1221888950892858,
+            "minimum": 0,
+            "maximum": 14,
+            "stddev": 2.8476541516839933,
+            "valid_percent": 9.964923469387755e-05
+          },
+          "histogram": {
+            "count": 11,
+            "min": 0.0,
+            "max": 14.0,
+            "buckets": [
+              581333,
+              2078,
+              191420,
+              61145,
+              83654,
+              56807,
+              16837,
+              4243,
+              1201,
+              4802
+            ]
+          }
+        }
+      ],
+      "classification:classes": [
+        {
+          "value": 0,
+          "description": "Undesignated",
+          "color_hint": "#000000"
+        },
+        {
+          "value": 1,
+          "description": "Agricultural",
+          "color_hint": "#000000"
+        },
+        {
+          "value": 2,
+          "description": "Tribal",
+          "color_hint": "#000000"
+        },
+        {
+          "value": 3,
+          "description": "Forest Lands",
+          "color_hint": "#000000"
+        },
+        {
+          "value": 4,
+          "description": "Intensive Urban",
+          "color_hint": "#000000"
+        },
+        {
+          "value": 5,
+          "description": "Rural Character Residential",
+          "color_hint": "#000000"
+        },
+        {
+          "value": 6,
+          "description": "Water",
+          "color_hint": "#000000"
+        },
+        {
+          "value": 7,
+          "description": "Right of Way",
+          "color_hint": "#000000"
+        },
+        {
+          "value": 8,
+          "description": "Active Open Space and Recreation",
+          "color_hint": "#000000"
+        },
+        {
+          "value": 9,
+          "description": "Urban Character Residential",
+          "color_hint": "#000000"
+        },
+        {
+          "value": 10,
+          "description": "Industrial",
+          "color_hint": "#000000"
+        },
+        {
+          "value": 11,
+          "description": "Public",
+          "color_hint": "#000000"
+        },
+        {
+          "value": 12,
+          "description": "Natural Preservation",
+          "color_hint": "#000000"
+        },
+        {
+          "value": 13,
+          "description": "Military",
+          "color_hint": "#000000"
+        },
+        {
+          "value": 14,
+          "description": "Mineral Resource Area",
+          "color_hint": "#000000"
+        }
+      ],
+      "roles": [
+        "data"
+      ]
+    },
+    "thumbnail": {
+      "href": "https://storage.googleapis.com/live_data_layers/thumbnails/Land_Use.png",
+      "type": "image/png",
+      "title": "Thumbnail image",
+      "roles": [
+        "thumbnail"
+      ]
+    }
+  },
+  "collection": "input_data_layers"
+}

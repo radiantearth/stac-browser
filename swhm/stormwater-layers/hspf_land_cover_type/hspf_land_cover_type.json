@@ -1,0 +1,166 @@
+{
+  "type": "Feature",
+  "stac_version": "1.1.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/projection/v1.1.0/schema.json",
+    "https://stac-extensions.github.io/raster/v1.1.0/schema.json"
+  ],
+  "id": "hspf_land_cover_type",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -124.90356445312499,
+          46.5928439974274
+        ],
+        [
+          -120.65185546875,
+          46.5928439974274
+        ],
+        [
+          -120.65185546875,
+          49.31438004800688
+        ],
+        [
+          -124.90356445312499,
+          49.31438004800688
+        ],
+        [
+          -124.90356445312499,
+          46.5928439974274
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -124.90356445312499,
+    46.5928439974274,
+    -120.65185546875,
+    49.31438004800688
+  ],
+  "properties": {
+    "proj:epsg": 3857,
+    "proj:geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            -13904201.1931867,
+            5875867.238338069
+          ],
+          [
+            -13430903.11404489,
+            5875867.238338069
+          ],
+          [
+            -13430903.11404489,
+            6328374.445786312
+          ],
+          [
+            -13904201.1931867,
+            6328374.445786312
+          ],
+          [
+            -13904201.1931867,
+            5875867.238338069
+          ]
+        ]
+      ]
+    },
+    "proj:bbox": [
+      -13904201.1931867,
+      5875867.238338069,
+      -13430903.11404489,
+      6328374.445786312
+    ],
+    "proj:shape": [
+      189440,
+      198144
+    ],
+    "proj:transform": [
+      2.388657133911758,
+      0.0,
+      -13904201.1931867,
+      0.0,
+      -2.388657133911758,
+      6328374.445786312,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "title": "HSPF Land Cover Type",
+    "description": "Land cover classified by categories used in the Western Washington Hydrology Model (WWHM). Derived from 1-meter resolution data.",
+    "swhm:class_mapping": {
+      "Fine/Medium Vegetation": "Grass",
+      "Coarse Vegetation": "Forest",
+      "Dirt/Barren": "Grass",
+      "Water": "Water",
+      "Impervious/Roofs": "Impervious",
+      "NLCD Cropland": "Pasture"
+    },
+    "datetime": "2023-01-01T00:00:00Z"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../../catalog.json",
+      "type": "application/json",
+      "title": "Stormwater Heatmap Data Catalog"
+    },
+    {
+      "rel": "collection",
+      "href": "../collection.json",
+      "type": "application/json",
+      "title": "Stormwater Heatmap Layers"
+    },
+    {
+      "rel": "parent",
+      "href": "../collection.json",
+      "type": "application/json",
+      "title": "Stormwater Heatmap Layers"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "https://storage.googleapis.com/live_data_layers/rasters/HSPF_Land_Cover_Type.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "raster:bands": [
+        {
+          "data_type": "uint8",
+          "scale": 1.0,
+          "offset": 0.0,
+          "sampling": "area",
+          "statistics": {
+            "mean": 0.2570003587372449,
+            "minimum": 0,
+            "maximum": 5,
+            "stddev": 0.8112292127988321,
+            "valid_percent": 0.00009964923469387755
+          },
+          "histogram": {
+            "count": 11,
+            "min": 0.0,
+            "max": 5.0,
+            "buckets": [
+              892450,
+              0,
+              8014,
+              0,
+              88463,
+              0,
+              0,
+              0,
+              0,
+              14593
+            ]
+          }
+        }
+      ],
+      "roles": [
+        "data"
+      ]
+    }
+  },
+  "collection": "stormwater-layers"
+}

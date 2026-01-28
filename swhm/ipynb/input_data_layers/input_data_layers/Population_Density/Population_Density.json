@@ -1,0 +1,166 @@
+{
+  "type": "Feature",
+  "stac_version": "1.1.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/projection/v1.1.0/schema.json",
+    "https://stac-extensions.github.io/raster/v1.1.0/schema.json"
+  ],
+  "id": "Population_Density",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -124.9026554192624,
+          46.59291884142723
+        ],
+        [
+          -120.65452244066118,
+          46.59291884142723
+        ],
+        [
+          -120.65452244066118,
+          49.313915837025256
+        ],
+        [
+          -124.9026554192624,
+          49.313915837025256
+        ],
+        [
+          -124.9026554192624,
+          46.59291884142723
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -124.9026554192624,
+    46.59291884142723,
+    -120.65452244066118,
+    49.313915837025256
+  ],
+  "properties": {
+    "proj:epsg": 4326,
+    "proj:geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            -124.9026554192624,
+            46.59291884142723
+          ],
+          [
+            -120.65452244066118,
+            46.59291884142723
+          ],
+          [
+            -120.65452244066118,
+            49.313915837025256
+          ],
+          [
+            -124.9026554192624,
+            49.313915837025256
+          ],
+          [
+            -124.9026554192624,
+            46.59291884142723
+          ]
+        ]
+      ]
+    },
+    "proj:bbox": [
+      -124.9026554192624,
+      46.59291884142723,
+      -120.65452244066118,
+      49.313915837025256
+    ],
+    "proj:shape": [
+      3029,
+      4729
+    ],
+    "proj:transform": [
+      0.0008983152841195215,
+      0.0,
+      -124.9026554192624,
+      0.0,
+      -0.0008983152841195215,
+      49.313915837025256,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "title": "Population Density",
+    "description": "2010 Census, population density",
+    "source": "2010 US Census Blocks",
+    "units": "Population per ha",
+    "gsd": 100,
+    "datetime": "2023-01-01T00:00:00Z"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "collection",
+      "href": "../collection.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../collection.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "https://storage.googleapis.com/live_data_layers/rasters/Population_Density.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "raster:bands": [
+        {
+          "data_type": "float64",
+          "scale": 1.0,
+          "offset": 0.0,
+          "sampling": "area",
+          "statistics": {
+            "mean": 0.4352478499015323,
+            "minimum": 0.0,
+            "maximum": 353.93707275390625,
+            "stddev": 3.274614536033278,
+            "valid_percent": 0.00014886623475609756
+          },
+          "histogram": {
+            "count": 11,
+            "min": 0.0,
+            "max": 353.93707275390625,
+            "buckets": [
+              670765,
+              813,
+              112,
+              35,
+              10,
+              5,
+              2,
+              1,
+              0,
+              1
+            ]
+          }
+        }
+      ],
+      "roles": [
+        "data"
+      ]
+    },
+    "thumbnail": {
+      "href": "https://storage.googleapis.com/live_data_layers/thumbnails/Population_Density.png",
+      "type": "image/png",
+      "title": "Thumbnail image",
+      "roles": [
+        "thumbnail"
+      ]
+    }
+  },
+  "collection": "input_data_layers"
+}

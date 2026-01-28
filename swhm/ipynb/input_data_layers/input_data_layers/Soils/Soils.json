@@ -1,0 +1,189 @@
+{
+  "type": "Feature",
+  "stac_version": "1.1.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/projection/v1.1.0/schema.json",
+    "https://stac-extensions.github.io/raster/v1.1.0/schema.json",
+    "https://stac-extensions.github.io/classification/v1.1.0/schema.json"
+  ],
+  "id": "Soils",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -124.9022156242032,
+          46.59304551654119
+        ],
+        [
+          -120.65457671900823,
+          46.59304551654119
+        ],
+        [
+          -120.65457671900823,
+          49.31340168978564
+        ],
+        [
+          -124.9022156242032,
+          49.31340168978564
+        ],
+        [
+          -124.9022156242032,
+          46.59304551654119
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -124.9022156242032,
+    46.59304551654119,
+    -120.65457671900823,
+    49.31340168978564
+  ],
+  "properties": {
+    "proj:epsg": 3857,
+    "proj:geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            -13904051.042237958,
+            5875899.883502243
+          ],
+          [
+            -13431206.042237958,
+            5875899.883502243
+          ],
+          [
+            -13431206.042237958,
+            6328207.383502243
+          ],
+          [
+            -13904051.042237958,
+            6328207.383502243
+          ],
+          [
+            -13904051.042237958,
+            5875899.883502243
+          ]
+        ]
+      ]
+    },
+    "proj:bbox": [
+      -13904051.042237958,
+      5875899.883502243,
+      -13431206.042237958,
+      6328207.383502243
+    ],
+    "proj:shape": [
+      180923,
+      189138
+    ],
+    "proj:transform": [
+      2.5,
+      0.0,
+      -13904051.042237958,
+      0.0,
+      -2.5,
+      6328207.383502243,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "title": "Soils",
+    "description": "Hydrologic Soil Group",
+    "source": "The Nature Conservancy",
+    "units": "Hydrologic Soil Group",
+    "gsd": 5,
+    "datetime": "2023-01-01T00:00:00Z"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "collection",
+      "href": "../collection.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../collection.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "https://storage.googleapis.com/live_data_layers/rasters/Soils.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "raster:bands": [
+        {
+          "data_type": "uint8",
+          "scale": 1.0,
+          "offset": 0.0,
+          "sampling": "area",
+          "statistics": {
+            "mean": 0.5635821906887755,
+            "minimum": 0,
+            "maximum": 4,
+            "stddev": 0.8498627512552211,
+            "valid_percent": 9.964923469387755e-05
+          },
+          "histogram": {
+            "count": 11,
+            "min": 0.0,
+            "max": 4.0,
+            "buckets": [
+              628528,
+              0,
+              227550,
+              0,
+              0,
+              109597,
+              0,
+              32558,
+              0,
+              5287
+            ]
+          }
+        }
+      ],
+      "classification:classes": [
+        {
+          "value": 1,
+          "description": "Outwash",
+          "color_hint": "#000000"
+        },
+        {
+          "value": 2,
+          "description": "Till",
+          "color_hint": "#000000"
+        },
+        {
+          "value": 3,
+          "description": "Saturated",
+          "color_hint": "#000000"
+        },
+        {
+          "value": 4,
+          "description": "Water",
+          "color_hint": "#000000"
+        }
+      ],
+      "roles": [
+        "data"
+      ]
+    },
+    "thumbnail": {
+      "href": "https://storage.googleapis.com/live_data_layers/thumbnails/Soils.png",
+      "type": "image/png",
+      "title": "Thumbnail image",
+      "roles": [
+        "thumbnail"
+      ]
+    }
+  },
+  "collection": "input_data_layers"
+}

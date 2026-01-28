@@ -107,7 +107,7 @@ export default {
 
 #stac-browser .item {
   .left, .right {
-    max-width: 50%;
+    max-width: 100%;
     @include media-breakpoint-down(sm) {
       max-width: 100%;
       min-width: 100%;

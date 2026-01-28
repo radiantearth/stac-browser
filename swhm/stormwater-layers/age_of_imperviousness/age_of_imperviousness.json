@@ -1,0 +1,160 @@
+{
+  "type": "Feature",
+  "stac_version": "1.1.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/projection/v1.1.0/schema.json",
+    "https://stac-extensions.github.io/raster/v1.1.0/schema.json"
+  ],
+  "id": "age_of_imperviousness",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -124.90220934094849,
+          46.593025643946405
+        ],
+        [
+          -120.65457043575353,
+          46.593025643946405
+        ],
+        [
+          -120.65457043575353,
+          49.313397477497546
+        ],
+        [
+          -124.90220934094849,
+          49.313397477497546
+        ],
+        [
+          -124.90220934094849,
+          46.593025643946405
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -124.90220934094849,
+    46.593025643946405,
+    -120.65457043575353,
+    49.313397477497546
+  ],
+  "properties": {
+    "proj:epsg": 3857,
+    "proj:geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            -13904050.342789244,
+            5875896.664228426
+          ],
+          [
+            -13431205.342789244,
+            5875896.664228426
+          ],
+          [
+            -13431205.342789244,
+            6328206.664228426
+          ],
+          [
+            -13904050.342789244,
+            6328206.664228426
+          ],
+          [
+            -13904050.342789244,
+            5875896.664228426
+          ]
+        ]
+      ]
+    },
+    "proj:bbox": [
+      -13904050.342789244,
+      5875896.664228426,
+      -13431205.342789244,
+      6328206.664228426
+    ],
+    "proj:shape": [
+      30154,
+      31523
+    ],
+    "proj:transform": [
+      15.0,
+      0.0,
+      -13904050.342789244,
+      0.0,
+      -15.0,
+      6328206.664228426,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "title": "Age of Imperviousness",
+    "description": "Provides multi-temporal information on the presence of built-up surfaces derived from global Landsat satellite data collected from 1975 to 2014. Used to estimate current stormwater treatment levels.",
+    "swhm:resolution": "30 meters (masked by 1-meter imperviousness data)",
+    "swhm:ee_layer_name": "Age of Imperviousness",
+    "datetime": "2023-01-01T00:00:00Z"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../../catalog.json",
+      "type": "application/json",
+      "title": "Stormwater Heatmap Data Catalog"
+    },
+    {
+      "rel": "collection",
+      "href": "../collection.json",
+      "type": "application/json",
+      "title": "Stormwater Heatmap Layers"
+    },
+    {
+      "rel": "parent",
+      "href": "../collection.json",
+      "type": "application/json",
+      "title": "Stormwater Heatmap Layers"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "https://storage.googleapis.com/live_data_layers/rasters/Age_of_Imperviousness.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "raster:bands": [
+        {
+          "data_type": "uint8",
+          "scale": 1.0,
+          "offset": 0.0,
+          "sampling": "area",
+          "statistics": {
+            "mean": 0.12556501116071428,
+            "minimum": 0,
+            "maximum": 5,
+            "stddev": 0.6330421128834515,
+            "valid_percent": 0.00009964923469387755
+          },
+          "histogram": {
+            "count": 11,
+            "min": 0.0,
+            "max": 5.0,
+            "buckets": [
+              951398,
+              0,
+              21324,
+              0,
+              9361,
+              0,
+              7149,
+              0,
+              6926,
+              7362
+            ]
+          }
+        }
+      ],
+      "roles": [
+        "data"
+      ]
+    }
+  },
+  "collection": "stormwater-layers"
+}
