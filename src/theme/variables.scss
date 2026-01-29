@@ -13,7 +13,7 @@ $font-family-sans-serif: 'Noto Sans', -apple-system, BlinkMacSystemFont, "Segoe 
 $font-family-serif: 'Merriweather', Georgia, "Times New Roman", Times, serif;
 $font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 $font-family-base: $font-family-sans-serif;
-$headings-font-family: $font-family-serif;
+$headings-font-family: $font-family-sans-serif;
 
 // Font sizes
 $font-size-base: 1rem;
@@ -66,7 +66,7 @@ $warning: #ffc107;
 $danger: #dc3545;
 
 // Body
-$body-bg: $white;
+$body-bg: #F6F7F9;
 $body-color: $gray-900;
 
 // Links
@@ -134,9 +134,9 @@ $spacers: (
 // ----------------------------------------------------------------------------
 
 // Border radius
-$border-radius: 0.5rem;
-$border-radius-lg: 0.75rem;
-$border-radius-sm: 0.25rem;
+$border-radius: 4px;
+$border-radius-lg: 4px;
+$border-radius-sm: 4px;
 
 // Borders
 $border-width: 1px;
@@ -154,7 +154,7 @@ $card-border-width: 1px;
 $card-border-radius: $border-radius;
 $card-border-color: rgba($black, 0.1);
 $card-cap-bg: rgba($black, 0.03);
-$card-bg: transparent;
+$card-bg: $white;
 
 // Buttons
 $btn-padding-y: 0.5rem;
@@ -176,7 +176,7 @@ $badge-font-size: 0.75rem;
 $badge-font-weight: $font-weight-bold;
 $badge-padding-y: 0.25rem;
 $badge-padding-x: 0.5rem;
-$badge-border-radius: 0.25rem;
+$badge-border-radius: 4px;
 
 // ----------------------------------------------------------------------------
 // Tables
@@ -241,7 +241,7 @@ $grid-breakpoints: (
   sm: 576px,
   md: 768px,
   lg: 992px,
-  xl: 1200px,
+  xl: 1080px,
   xxl: 1400px,
   xxxl: 1600px
 );
@@ -251,8 +251,8 @@ $container-max-widths: (
   sm: 540px,
   md: 720px,
   lg: 960px,
-  xl: 900px,  // Match your single column layout
-  xxl: 900px,
+  xl: 1080px,  // Match your single column layout
+  xxl: 1400px,
   xxxl: 900px
 );
 

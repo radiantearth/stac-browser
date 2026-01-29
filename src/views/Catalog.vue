@@ -1,60 +1,139 @@
 <template>
-  <div :class="{cc: true, [cssStacType]: true, mixed: hasCatalogs && hasItems, empty: !hasCatalogs && !hasItems}" :key="data.id">
-    <b-row>
-      <b-col class="meta">
-        <section class="intro">
-          <h2>{{ $t('description') }}</h2>
+  <div class="catalog" :key="data.id">
+    <!-- Main Header (for non-root catalogs) -->
+    <div class="main-header" v-if="!isRoot">
+      <div class="container">
+        <div class="breadcrumb-tech">
+          <span>CATALOG</span> / <span class="accent">{{ title }}</span>
+        </div>
+        <div class="d-md-flex justify-content-between align-items-end">
+          <div>
+            <h1 class="item-title">{{ title }}</h1>
+            <div class="d-flex align-items-center gap-2">
+              <span class="badge badge-tech badge-status">{{ data.type || 'CATALOG' }}</span>
+              <span class="text-muted small">ID: {{ data.id }}</span>
+            </div>
+          </div>
+          <div class="mt-3 mt-md-0">
+            <div class="btn-group shadow-sm">
+              <a class="btn btn-tech btn-tech-outline" :href="url" target="_blank">JSON Source</a>
+              <StacLink v-if="parentLink" :data="parentLink" class="btn btn-tech btn-tech-outline">Up</StacLink>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ground-layer">
+      <!-- Viewport Section: Description -->
+      <section class="viewport-section mb-4" v-if="data.description">
+        <div class="viewport-info w-100">
+          <h6 class="text-uppercase small font-weight-bold text-muted mb-3">Description</h6>
           <DeprecationNotice v-if="data.deprecated" :data="data" />
           <AnonymizedNotice v-if="data['anon:warning']" :warning="data['anon:warning']" />
-          <ReadMore v-if="data.description" :lines="10" :text="$t('read.more')" :text-less="$t('read.less')">
-            <Description :description="data.description" />
-          </ReadMore>
-          <Keywords v-if="Array.isArray(data.keywords) && data.keywords.length > 0" :keywords="data.keywords" class="mb-3" />
-          <section v-if="isCollection" class="metadata mb-4">
-            <b-row v-if="licenses">
-              <b-col md="4" class="label">{{ $t('catalog.license') }}</b-col>
-              <b-col md="8" class="value"><span v-html="licenses" /></b-col>
-            </b-row>
-            <b-row v-if="temporalExtents">
-              <b-col md="4" class="label">{{ $t('catalog.temporalExtent') }}</b-col>
-              <b-col md="8" class="value"><span v-html="temporalExtents" /></b-col>
-            </b-row>
-          </section>
-          <Links v-if="linkPosition === 'left'" :title="$t('additionalResources')" :links="additionalLinks" :context="data" />
-        </section>
-        <section v-if="isCollection || hasThumbnails" class="mb-4">
-          <b-card no-body class="maps-preview">
-            <b-tabs v-model="tab" ref="tabs" pills card vertical end>
-              <b-tab v-if="isCollection" :title="$t('map')" no-body>
-                <Map :stac="data" :stacLayerData="mapData" @dataChanged="dataChanged" fitBoundsOnce popover />
-              </b-tab>
-              <b-tab v-if="hasThumbnails" :title="$t('thumbnails')" no-body>
-                <Thumbnails :thumbnails="thumbnails" />
-              </b-tab>
-            </b-tabs>
-          </b-card>
-        </section>
-        <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="shownAssets" @showAsset="showAsset" />
-        <Assets v-if="hasItemAssets && !hasItems" :assets="data.item_assets" :context="data" :definition="true" />
-        <Providers v-if="providers" :providers="providers" />
-        <Metadata class="mb-4" :type="data.type" :data="data" :ignoreFields="ignoredMetadataFields" />
-        <CollectionLink v-if="collectionLink" :link="collectionLink" />
-        <Links v-if="linkPosition === 'right'" :title="$t('additionalResources')" :links="additionalLinks" :context="data" />
-      </b-col>
-      <b-col class="catalogs-container" v-if="hasCatalogs">
-        <Catalogs :catalogs="catalogs" :hasMore="!!nextCollectionsLink" @loadMore="loadMoreCollections" />
-      </b-col>
-      <b-col class="items-container" v-if="hasItems">
-        <Items
-          :stac="data" :items="items" :api="isApi"
-          :showFilters="showFilters" :apiFilters="filters"
-          :pagination="itemPages" :loading="apiItemsLoading"
-          @paginate="paginateItems" @filterItems="filterItems"
-          @filtersShown="filtersShown"
-        />
-        <Assets v-if="hasItemAssets" :assets="data.item_assets" :context="data" :definition="true" />
-      </b-col>
-    </b-row>
+          <div class="description-text text-muted">
+            <ReadMore :lines="5" :text="$t('read.more')" :text-less="$t('read.less')">
+              <Description :description="data.description" />
+            </ReadMore>
+          </div>
+        </div>
+      </section>
+
+      <!-- Map/Thumbnails Section for Collections -->
+      <section v-if="isCollection || hasThumbnails" class="mb-4">
+        <b-card no-body class="maps-preview">
+          <b-tabs v-model="tab" ref="tabs" pills card vertical end>
+            <b-tab v-if="isCollection" :title="$t('map')" no-body>
+              <Map :stac="data" :stacLayerData="mapData" @dataChanged="dataChanged" fitBoundsOnce popover />
+            </b-tab>
+            <b-tab v-if="hasThumbnails" :title="$t('thumbnails')" no-body>
+              <Thumbnails :thumbnails="thumbnails" />
+            </b-tab>
+          </b-tabs>
+        </b-card>
+      </section>
+
+      <b-row>
+        <!-- Left Column: Catalogs & Items -->
+        <b-col lg="8" class="left">
+          <div v-if="hasCatalogs" class="section-block">
+            <h5 class="text-uppercase small font-weight-bold text-muted mb-3">Sub-Catalogs</h5>
+            <Catalogs :catalogs="catalogs" :hasMore="!!nextCollectionsLink" @loadMore="loadMoreCollections" />
+          </div>
+
+          <div v-if="hasItems" class="section-block">
+            <h5 class="text-uppercase small font-weight-bold text-muted mb-3">Items</h5>
+            <Items
+              :stac="data" :items="items" :api="isApi"
+              :showFilters="showFilters" :apiFilters="filters"
+              :pagination="itemPages" :loading="apiItemsLoading"
+              @paginate="paginateItems" @filterItems="filterItems"
+              @filtersShown="filtersShown"
+            />
+          </div>
+
+          <div v-if="hasAssets" class="section-block">
+            <h5 class="text-uppercase small font-weight-bold text-muted mb-3">Assets</h5>
+            <Assets :assets="assets" :context="data" :shown="shownAssets" @showAsset="showAsset" />
+          </div>
+
+          <div v-if="hasItemAssets && !hasItems" class="section-block">
+            <h5 class="text-uppercase small font-weight-bold text-muted mb-3">Item Asset Definitions</h5>
+            <Assets :assets="data.item_assets" :context="data" :definition="true" />
+          </div>
+
+          <div v-if="additionalLinks.length > 0" class="section-block">
+            <Links :title="$t('additionalResources')" :links="additionalLinks" :context="data" />
+          </div>
+        </b-col>
+
+        <!-- Right Column: Metadata & Tech Cards -->
+        <b-col lg="4" class="right">
+          <!-- Tech Card: Keywords -->
+          <div class="tech-card" v-if="Array.isArray(data.keywords) && data.keywords.length > 0">
+            <div class="tech-card-header">
+              <h4>Keywords</h4>
+            </div>
+            <div class="p-3">
+              <Keywords :keywords="data.keywords" />
+            </div>
+          </div>
+
+          <!-- Tech Card: License & Temporal (for Collections) -->
+          <div class="tech-card" v-if="isCollection && (licenses || temporalExtents)">
+            <div class="tech-card-header">
+              <h4>Collection Info</h4>
+            </div>
+            <div class="data-grid">
+              <div class="data-row" v-if="licenses">
+                <span class="data-label">License</span>
+                <span class="data-value" v-html="licenses"></span>
+              </div>
+              <div class="data-row" v-if="temporalExtents">
+                <span class="data-label">Temporal Extent</span>
+                <span class="data-value" v-html="temporalExtents"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tech Card: Providers -->
+          <div class="tech-card" v-if="providers && providers.length">
+            <div class="tech-card-header">
+              <h4>Providers</h4>
+            </div>
+            <div class="p-3">
+              <Providers :providers="providers" />
+            </div>
+          </div>
+
+          <!-- Collection Link -->
+          <CollectionLink v-if="collectionLink" :link="collectionLink" class="mb-4" />
+
+          <!-- Additional Metadata -->
+          <Metadata :data="data" :type="data.type" :ignoreFields="ignoredMetadataFields" />
+        </b-col>
+      </b-row>
+    </div>
   </div>
 </template>
 
@@ -67,7 +146,7 @@ import ReadMore from "vue-read-more-smooth";
 import ShowAssetMixin from '../components/ShowAssetMixin';
 import StacFieldsMixin from '../components/StacFieldsMixin';
 import { formatLicense, formatTemporalExtents } from '@radiantearth/stac-fields/formatters';
-import { BTabs, BTab } from 'bootstrap-vue';
+import { BTabs, BTab, BRow, BCol } from 'bootstrap-vue';
 import Utils from '../utils';
 import { addSchemaToDocument, createCatalogSchema } from '../schema-org';
 
@@ -78,6 +157,8 @@ export default {
     Assets: () => import('../components/Assets.vue'),
     BTabs,
     BTab,
+    BRow,
+    BCol,
     Catalogs,
     CollectionLink: () => import('../components/CollectionLink.vue'),
     DeprecationNotice: () => import('../components/DeprecationNotice.vue'),
@@ -89,6 +170,7 @@ export default {
     Metadata: () => import('../components/Metadata.vue'),
     Providers: () => import('../components/Providers.vue'),
     ReadMore,
+    StacLink: () => import('../components/StacLink.vue'),
     Thumbnails: () => import('../components/Thumbnails.vue')
   },
   mixins: [
@@ -99,7 +181,6 @@ export default {
     return {
       filters: {},
       ignoredMetadataFields: [
-        // Catalog and Collection fields that are handled directly
         'stac_version',
         'stac_extensions',
         'id',
@@ -114,51 +195,30 @@ export default {
         'links',
         'assets',
         'item_assets',
-        // Don't show these complex lists of coordinates: https://github.com/radiantearth/stac-browser/issues/141
         'proj:bbox',
         'proj:geometry',
-        // API landing page, not very useful to display, but https://github.com/radiantearth/stac-browser/issues/136
         'conformsTo',
-        // Will be rendered with a custom rendered
         'deprecated',
-        // Special handling for the warning of the anonymized-location extension
         'anon:warning',
-        // Special handling for the stats extension
         'stats:catalogs',
         'stats:collections',
         'stats:items',
-        // Special handling for auth
         'auth:schemes',
-        // Special handling for the STAC Browser config
         'stac_browser'
       ]
     };
   },
   computed: {
     ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination', 'nextCollectionsLink', 'stateQueryParameters']),
-    ...mapGetters(['additionalLinks', 'catalogs', 'collectionLink', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
-    cssStacType() {
-      if (Utils.hasText(this.data?.type)) {
-        return this.data?.type.toLowerCase();
-      }
-      return null;
+    ...mapGetters(['additionalLinks', 'catalogs', 'collectionLink', 'isCollection', 'isRoot', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
+    title() {
+      return this.data.title || this.data.id;
     },
     showFilters() {
       return Boolean(this.stateQueryParameters['itemFilterOpen']);
     },
     hasThumbnails() {
       return this.thumbnails.length > 0;
-    },
-    linkPosition() {
-      if (this.additionalLinks.length === 0) {
-        return null;
-      }
-      if (this.isCollection || !this.hasThumbnails) {
-        return "right";
-      }
-      else {
-        return "left";
-      }
     },
     apiItemsLoading() {
       return this.getApiItemsLoading(this.data);
@@ -180,11 +240,10 @@ export default {
       return providers.length > 0 ? providers : null;
     },
     temporalExtents() {
-      if (this.isCollection && this.data.extent.temporal.interval.length > 0) {
+      if (this.isCollection && this.data.extent?.temporal?.interval?.length > 0) {
         let extents = this.data.extent.temporal.interval;
         if (extents.length > 1) {
-            // Remove union temporal extent in favor of more concrete extents
-            extents = extents.slice(1);
+          extents = extents.slice(1);
         }
         return this.formatTemporalExtents(extents);
       }
@@ -195,7 +254,6 @@ export default {
     },
     itemPages() {
       let pages = Object.assign({}, this.apiItemsPagination);
-      // If first link is not available, add the items link as first link
       if (!pages.first && this.data && this.apiItemsLink && this.apiItemsLink.rel !== 'items') {
         pages.first = Utils.addFiltersToLink(this.data.getApiItemsLink(), this.filters);
       }
@@ -237,7 +295,7 @@ export default {
   },
   methods: {
     filtersShown(show) {
-        this.$store.commit('updateState', {type: 'itemFilterOpen', value: show ? 1 : null});
+      this.$store.commit('updateState', {type: 'itemFilterOpen', value: show ? 1 : null});
     },
     loadMoreCollections() {
       this.$store.dispatch('loadNextApiCollections', {show: true});
@@ -269,172 +327,174 @@ export default {
 @import '~bootstrap/scss/mixins';
 @import "../theme/variables.scss";
 
-#stac-browser .cc {
-  .items-container, .catalogs-container {
-    max-width: 50%;
+#stac-browser .catalog {
+  // Main Header
+  .main-header {
+    background: $white;
+    border-bottom: 1px solid $border-color;
+    padding: 2rem 0;
+    margin-bottom: 1.5rem;
+    margin-left: -1.5rem;
+    margin-right: -1.5rem;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
 
-    .card-list {
-      flex-flow: column wrap;
+  .item-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: $body-color;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.75rem;
+  }
+
+  .breadcrumb-tech {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: $gray-500;
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.05em;
+
+    .accent {
+      color: $primary;
+    }
+  }
+
+  // Viewport Section
+  .viewport-section {
+    background: $white;
+    border: 1px solid $border-color;
+    border-radius: $border-radius;
+    overflow: hidden;
+
+    .viewport-info {
+      padding: 1.5rem;
+      background: #fafafa;
+    }
+  }
+
+  // Section blocks
+  .section-block {
+    margin-bottom: 2rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  // Tech Cards
+  .tech-card {
+    background: $white;
+    border: 1px solid $border-color;
+    border-radius: $border-radius;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+
+    .tech-card-header {
+      background: $gray-100;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid $border-color;
+
+      h4 {
+        font-family: $font-family-sans-serif;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin: 0;
+        color: $gray-600;
+        font-weight: 700;
+      }
     }
 
-    .items, .catalogs {
-      .card-columns {
-        column-count: 1;
+    .data-grid {
+      .data-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid $gray-100;
+        font-size: 0.85rem;
 
-        .thumbnail {
-          align-self: center;
+        &:last-child {
+          border-bottom: none;
+        }
+
+        .data-label {
+          color: $gray-500;
+          font-weight: 500;
+        }
+
+        .data-value {
+          color: $body-color;
+          font-weight: 500;
+          text-align: right;
         }
       }
     }
   }
 
-  &.catalog { // Catalog has items or catalogs
-    .items-container, .catalogs-container {
+  // Badge styles
+  .badge-tech {
+    font-family: $font-family-monospace;
+    font-size: 0.7rem;
+    padding: 0.3em 0.6em;
+    border-radius: 4px;
+    font-weight: 500;
+
+    &.badge-status {
+      background: lighten($success, 45%);
+      color: darken($success, 15%);
+      border: 1px solid lighten($success, 30%);
+    }
+  }
+
+  // Tech Buttons
+  .btn-tech {
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    padding: 0.5rem 1.25rem;
+    border-radius: $border-radius;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
+
+  .btn-tech-outline {
+    border: 1px solid $border-color;
+    background: white;
+    color: $secondary;
+
+    &:hover {
+      background: $gray-100;
+      color: $secondary;
+    }
+  }
+
+  // Map preview
+  .maps-preview {
+    border-radius: $border-radius;
+    overflow: hidden;
+
+    .map {
+      height: 350px;
+    }
+  }
+
+  // Layout columns
+  .left, .right {
+    @include media-breakpoint-down(md) {
       max-width: 100%;
-      
-      .items, .catalogs {
-        .card-columns {
-          @include media-breakpoint-up(sm) {
-            column-count: 2;
-          }
-          @include media-breakpoint-up(lg) {
-            column-count: 3;
-          }
-          @include media-breakpoint-up(xxl) {
-            column-count: 4;
-          }
-          @include media-breakpoint-up(xxxl) {
-            column-count: 6;
-          }
-        }
-      }
+      min-width: 100%;
     }
   }
 
-  &.collection { // Collection has items or catalogs
-    .items-container, .catalogs-container {
-      .items, .catalogs {
-        .card-columns {
-          @include media-breakpoint-only(md) {
-            column-count: 2;
-          }
-          @include media-breakpoint-up(lg) {
-            column-count: 1;
-          }
-          @include media-breakpoint-up(xxl) {
-            column-count: 2;
-          }
-          @include media-breakpoint-up(xxxl) {
-            column-count: 3;
-          }
-        }
-      }
-    }
-  }
-
-  &.catalog.mixed { // Catalog has items and catalogs
-    .items-container, .catalogs-container {
-      .items, .catalogs {
-        .card-columns {
-          @include media-breakpoint-up(lg) {
-            column-count: 1;
-          }
-          @include media-breakpoint-up(xl) {
-            column-count: 2;
-          }
-          @include media-breakpoint-up(xxl) {
-            column-count: 3;
-          }
-        }
-      }
-    }
-  }
-
-  &.collection.mixed { // Collection has items and catalogs
-    .items-container, .catalogs-container {
-      max-width: 33%;
-
-      
-      .items, .catalogs {
-        .card-columns {
-          @include media-breakpoint-up(lg) {
-            column-count: 1;
-          }
-          @include media-breakpoint-up(xxl) {
-            column-count: 2;
-          }
-          @include media-breakpoint-up(xxxl) {
-            column-count: 3;
-          }
-        }
-      }
-    }
-  }
-
-  .meta {
-    min-width: 100%;
-    margin-bottom: $block-margin;
-  }
-  &.collection .meta {
-    min-width: 33%;
-    margin-bottom: 0;
-  }
-
-  @include media-breakpoint-up(lg) {
-    &.collection.empty .meta {
-      column-count: 2;
-
-      > section {
-        break-inside: avoid;
-      }
-    }
-  }
-
-  @include media-breakpoint-up(xl) {
-    &.catalog .meta {
-      display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
-      gap: 30px;
-
-      > section {
-        flex-basis: 0;
-        flex-grow: 1;
-        max-width: 100%;
-        min-width: 40%;
-      }
-    }
-  }
-
-  @include media-breakpoint-down(md) {
-    > .row {
-      > .meta,
-      > .items-container,
-      > .catalogs-container {
-        min-width: 100%;
-      }
-
-      > .meta {
-        order: 1;
-        margin-bottom: $block-margin;
-      }
-      > .items-container {
-        order: 2;
-      }
-      > .catalogs-container {
-        order: 3;
-      }
-    }
-  }
-
-  .metadata .card-columns {
-    column-count: 1;
-
-    &:not(.count-1) {
-      @include media-breakpoint-up(xxxl) {
-        column-count: 2;
-      }
-    }
+  // Utility
+  .gap-2 {
+    gap: 0.5rem;
   }
 }
 </style>

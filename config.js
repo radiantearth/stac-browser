@@ -1,5 +1,5 @@
 module.exports = {
-    //catalogUrl: "https://storage.googleapis.com/swhm-stac-data/catalog.json",
+    catalogUrl: "https://storage.googleapis.com/swhm-stac-data/catalog.json",
     catalogTitle: "STAC Browser",
     allowExternalAccess: true, // Must be true if catalogUrl is not given
     allowedDomains: [],
@@ -35,9 +35,9 @@ module.exports = {
     historyMode: "history",
     cardViewMode: "list",
     // cardViewSort: null
-    showKeywordsInItemCards: false,
-    showKeywordsInCatalogCards: false,
-    showThumbnailsAsAssets: false,
+    showKeywordsInItemCards: true,
+    showKeywordsInCatalogCards: true,
+    showThumbnailsAsAssets: true,
     geoTiffResolution: 128,
     redirectLegacyUrls: false,
     itemsPerPage: 12,
@@ -47,7 +47,7 @@ module.exports = {
     crossOriginMedia: null,
     requestHeaders: {},
     requestQueryParameters: {},
-    socialSharing: ['email', 'bsky', 'mastodon', 'x'],
+    //socialSharing: ['email', 'bsky', 'mastodon', 'x'],
     preprocessSTAC: null,
     authConfig: null
 };

@@ -3,13 +3,16 @@
     <Authentication v-if="showLogin" />
     <ErrorAlert v-if="globalError" dismissible class="global-error" v-bind="globalError" @close="hideError" />
     <Sidebar v-if="sidebar" />
-    <!-- Header -->
-    <header>
-      <div class="logo">{{ displayCatalogTitle }}</div>
-      <StacHeader @enableSidebar="sidebar = true" />
-    </header>
-    <!-- Content (Item / Catalog) -->
-    <router-view />
+    <!-- L1 Ground Layer - contains header and content -->
+    <div class="ground-layer">
+      <!-- Header -->
+      <header>
+        <div class="logo">{{ displayCatalogTitle }}</div>
+        <StacHeader @enableSidebar="sidebar = true" />
+      </header>
+      <!-- Content (Item / Catalog) -->
+      <router-view />
+    </div>
     <footer>
       <i18n tag="small" path="poweredBy" class="poweredby text-muted">
         <template #link>

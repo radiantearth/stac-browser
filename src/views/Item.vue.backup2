@@ -1,0 +1,217 @@
+<template>
+  <div class="item" :key="data.id">
+    <!-- Header Section: Map (left) | Title + Description (right) -->
+    <section class="item-header mb-4">
+      <div class="header-map">
+        <b-card no-body class="maps-preview">
+          <b-tabs v-model="tab" ref="tabs" card pills vertical end>
+            <b-tab :title="$t('map')" no-body>
+              <Map :stac="data" :stacLayerData="selectedAsset" @dataChanged="dataChanged" scrollWheelZoom />
+            </b-tab>
+            <b-tab v-if="thumbnails.length > 0" :title="$t('thumbnails')" no-body>
+              <Thumbnails :thumbnails="thumbnails" />
+            </b-tab>
+          </b-tabs>
+        </b-card>
+      </div>
+      <div class="header-info">
+        <h1 class="item-title">{{ data | stacTitle }}</h1>
+        <Providers v-if="data.properties.providers" :providers="data.properties.providers" class="mb-3" />
+        <DeprecationNotice v-if="data.properties.deprecated" :data="data" />
+        <AnonymizedNotice v-if="data.properties['anon:warning']" :warning="data.properties['anon:warning']" />
+        <ReadMore v-if="data.properties.description" :lines="6" :text="$t('read.more')" :text-less="$t('read.less')">
+          <Description :description="data.properties.description" />
+        </ReadMore>
+        <Keywords v-if="Array.isArray(data.properties.keywords) && data.properties.keywords.length > 0" :keywords="data.properties.keywords" class="mt-3" />
+      </div>
+    </section>
+
+    <!-- Body Section: Assets + Collection (2/3) | Metadata (1/3) -->
+    <section class="item-body">
+      <div class="body-main">
+        <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="shownAssets" @showAsset="showAsset" />
+        <CollectionLink v-if="collectionLink" :link="collectionLink" class="mt-4" />
+        <Links v-if="additionalLinks.length > 0" :title="$t('additionalResources')" :links="additionalLinks" :context="data" class="mt-4" />
+      </div>
+      <div class="body-sidebar">
+        <Metadata :data="data" type="Item" :ignoreFields="ignoredMetadataFields" />
+      </div>
+    </section>
+  </div>
+</template>
+
+<script>
+import { mapState, mapGetters } from 'vuex';
+import Description from '../components/Description.vue';
+import ReadMore from "vue-read-more-smooth";
+import ShowAssetMixin from '../components/ShowAssetMixin';
+import { BTabs, BTab } from 'bootstrap-vue';
+import { addSchemaToDocument, createItemSchema } from '../schema-org';
+import STAC from '../models/stac';
+
+export default {
+  name: "Item",
+  components: {
+    AnonymizedNotice: () => import('../components/AnonymizedNotice.vue'),
+    Assets: () => import('../components/Assets.vue'),
+    BTabs,
+    BTab,
+    CollectionLink: () => import('../components/CollectionLink.vue'),
+    Description,
+    DeprecationNotice: () => import('../components/DeprecationNotice.vue'),
+    Keywords: () => import('../components/Keywords.vue'),
+    Links: () => import('../components/Links.vue'),
+    Map: () => import('../components/Map.vue'),
+    Metadata: () => import('../components/Metadata.vue'),
+    Providers: () => import('../components/Providers.vue'),
+    ReadMore,
+    Thumbnails: () => import('../components/Thumbnails.vue')
+  },
+  filters: {
+    stacTitle: data => STAC.getDisplayTitle(data)
+  },
+  mixins: [ShowAssetMixin],
+  data() {
+    return {
+      ignoredMetadataFields: [
+        'description',
+        'keywords',
+        'providers',
+        'title',
+        // Will be rendered with a custom rendered
+        'deprecated',
+        // Don't show these complex lists of coordinates: https://github.com/radiantearth/stac-browser/issues/141
+        'proj:bbox',
+        'proj:geometry',
+        // Special handling for auth
+        'auth:schemes',
+        // Special handling for the warning of the anonymized-location extension
+        'anon:warning'
+      ]
+    };
+  },
+  computed: {
+    ...mapState(['data', 'url']),
+    ...mapGetters(['additionalLinks', 'collectionLink', 'parentLink'])
+  },
+  watch: {
+    data: {
+      immediate: true,
+      handler(data) {
+        try {
+          let schema = createItemSchema(data, [this.collectionLink, this.parentLink], this.$store);
+          addSchemaToDocument(document, schema);
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    }
+  }
+};
+</script>
+
+<style lang="scss">
+@import '~bootstrap/scss/mixins';
+@import "../theme/variables.scss";
+
+#stac-browser .item {
+  // Header Section: Two-column layout
+  .item-header {
+    display: grid;
+    grid-template-columns: 2fr 3fr;
+    gap: 2rem;
+    align-items: start;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid $border-color;
+
+    @include media-breakpoint-down(md) {
+      grid-template-columns: 1fr;
+    }
+
+    // L2 (Raised): Map - white with soft shadow
+    .header-map {
+      background: $white;
+      border-radius: $border-radius;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+
+      .maps-preview {
+        height: 100%;
+        min-height: 300px;
+      }
+
+      .map {
+        height: 300px;
+      }
+    }
+
+    // L1 (Ground): Description - sits on ground layer
+    .header-info {
+      padding: 0.5rem;
+
+      .item-title {
+        margin-bottom: 1rem;
+        font-size: 1.75rem;
+        line-height: 1.3;
+      }
+    }
+  }
+
+  // Body Section: 2/3 and 1/3 split
+  .item-body {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+    align-items: start;
+
+    @include media-breakpoint-down(md) {
+      grid-template-columns: 1fr;
+    }
+
+    // L2 (Raised): Assets - white with soft shadow
+    .body-main {
+      min-width: 0; // Prevent grid blowout
+      background: $white;
+      border-radius: $border-radius;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+      padding: 1.5rem;
+    }
+
+    // L1 (Ground): Metadata - sits on ground layer
+    .body-sidebar {
+      min-width: 0; // Prevent grid blowout
+      padding: 0.5rem;
+
+      .metadata {
+        font-size: 14px;
+
+        .card-columns {
+          column-count: 1;
+        }
+
+        // Prevent word breaking mid-word in all metadata content
+        .label, .value, dt, dd, .card-title, h3, h4, h5 {
+          word-break: normal;
+          overflow-wrap: normal;
+          hyphens: none;
+          white-space: normal;
+        }
+
+        // Ensure table cells don't force word breaks
+        .row {
+          flex-wrap: nowrap;
+        }
+
+        .label {
+          min-width: fit-content;
+          white-space: nowrap;
+        }
+      }
+    }
+  }
+
+  .card-columns .thumbnail {
+    align-self: center;
+  }
+}
+</style>
