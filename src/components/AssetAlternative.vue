@@ -17,7 +17,7 @@ import HrefActions from './HrefActions.vue';
 import StacFieldsMixin from './StacFieldsMixin';
 import AuthUtils from './auth/utils';
 import Utils from '../utils';
-import { Asset, STAC } from 'stac-js';
+import { Asset, STACObject } from 'stac-js';
 
 export default {
   name: 'AssetAlternative',
@@ -75,9 +75,8 @@ export default {
     },
     resolvedAsset() {
       if (Array.isArray(this.asset['storage:refs'])) {
-        const storage = this.resolveStorage(this.asset, this.context);
         const asset = new Asset(this.asset, this.asset.getKey(), this.context);
-        asset['storage:schemes'] = storage;
+        asset['storage:schemes'] = this.resolveStorage(this.asset, this.context);
         return asset;
       }
       return this.asset;
@@ -102,18 +101,15 @@ export default {
   },
   methods: {
     resolveStorage(obj, context) {
-      if (context instanceof STAC && Utils.size(obj['storage:refs']) > 0) {
-        const scheme = context.getMetadata('storage:schemes');
-        if (Utils.size(scheme) > 0) {
-          const schemes = {};
-          for (const key in scheme) {
-            const value = scheme[key];
-            if (Utils.isObject(value)) {
-              schemes[key] = value;
-            }
+      if (context instanceof STACObject && Utils.size(obj['storage:refs']) > 0) {
+        const schemes = context.getMetadata('storage:schemes');
+        const filteredSchemes = {};
+        for (const ref of obj['storage:refs']) {
+          if (Utils.isObject(schemes[ref])) {
+            filteredSchemes[ref] = schemes[ref];
           }
-          return schemes;
         }
+        return filteredSchemes;
       }
       return [];
     },

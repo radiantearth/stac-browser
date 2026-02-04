@@ -169,7 +169,7 @@ export default class Utils {
       uri1.path(Utils.removeTrailingSlash(uri1.path()));
       uri2.path(Utils.removeTrailingSlash(uri2.path()));
       return uri1.equals(uri2);
-    } catch (error) {
+    } catch {
       return false;
     }
   }

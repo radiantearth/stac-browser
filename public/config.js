@@ -1,1 +1,1 @@
-window.STAC_BROWSER_CONFIG = {}
+window.STAC_BROWSER_CONFIG = {};

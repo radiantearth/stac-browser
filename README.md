@@ -24,6 +24,7 @@ If you care about STAC Browser and have some funds to support the future of STAC
   - [Examples](#examples)
   - [Get Started](#get-started)
     - [Private query parameters](#private-query-parameters)
+    - [Versions](#versions)
     - [Migrate from old versions](#migrate-from-old-versions)
   - [Customize](#customize)
     - [Options](#options)
@@ -108,9 +109,25 @@ So for example if your API requires to pass a token via the `API_KEY` query para
 Please note: If the server hosting STAC Browser should not get aware of private query parameters and you are having `historyMode` set to `"history"`, you can also append the private query parameters to the hash so that it doesn't get transmitted to the server hosting STAC Browser.
 In this case use for example `https://examples.com/stac-browser/#?~API_KEY=123` instead of `https://examples.com/stac-browser/?~API_KEY=123`.
 
+### Versions
+
+STAC Browser has gone recently through a number of major versions.
+The following table shows the major differences between versions and the upcoming plans:
+
+| Version   | Summary |
+| --------- | ------- |
+| 3.3.x     | The last version that uses Leaflet as mapping library. |
+| 4.0.x     | Uses OpenLayers as mapping library. The last version based on VueJS 2, vue-cli and Bootstrap 4. |
+| **5.x.x** | The upcoming version based on VueJS 3, Vite and Bootstrap 5. Target: Q1 2026 |
+| 6.x.x     | Planned version with a new layout, a pluggable interface, and better integration into existing sites. Target: Q4 2026 |
+
+For more details on our plans, please check our
+[milestones](https://github.com/radiantearth/stac-browser/milestones).
+
 ### Migrate from old versions
 
-Please read the [migration documentation](docs/migrate.md) for details.
+Please read the [release notes](https://github.com/radiantearth/stac-browser/releases).
+They contain notes on required changes for a smooth migration.
 
 ## Customize
 
@@ -328,7 +345,7 @@ You can also use one of the existing languages and provide an alternate version 
 The following sponsors have provided a substantial amount of funding for STAC Browser in the past:
 
 - [Radiant Earth](https://radiant.earth) (base funding for versions 1, 2 and 3)
-- [swisstopo](https://www.swisstopo.admin.ch/) (maintenance, base funding for version 3 and 4)
+- [swisstopo](https://www.swisstopo.admin.ch/) (maintenance, base funding for version 3, 4, 5 and 6)
 - [National Resources Canada](https://natural-resources.canada.ca/home) (multi-language support, maintenance)
 - [moreGeo GmbH](https://moregeo.it) (maintenance)
 - [Spacebel](https://spacebel.com) (collection search, mapping)

@@ -1,16 +1,20 @@
 export default {
   methods: {
     getTitle(layer) {
-      let title = layer.get('title') || this.$t('mapping.layers.unnamed', {id: layer.ol_uid});
+      const fallback = this.$t('mapping.layers.unnamed', {id: layer.ol_uid});
+      let title = layer.get('title') || fallback;
       if (layer.get('bounds')) {
         return this.$t('mapping.layers.footprint');
       }
       const stac = layer.get('stac');
       if (stac) {
-        if (stac.isAsset() || stac.isLink()) {
-          title = stac.getMetadata('title') || stac.getKey();
+        const stacTitle = stac.getMetadata('title');
+        if (stac.isAsset()) {
+          title = stacTitle || stac.getKey();
+        } else if (stac.isLink()) {
+          title = stacTitle || (stac.rel ? stac.rel.toUpperCase() : fallback);
         } else {
-          title = stac.getMetadata('title') || stac.id;
+          title = stacTitle || stac.id;
         }
       }
       return title;

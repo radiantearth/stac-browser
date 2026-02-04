@@ -1,4 +1,5 @@
 import { Collection } from './src/models/stac';
+import { STAC } from 'stac-js'
 
 // For documentation see https://github.com/radiantearth/stac-browser/blob/main/docs/basemaps.md
 
@@ -64,7 +65,7 @@ export default function configureBasemap(stac, i18n) {
   if (stac instanceof Collection) {
     targets = stac.getSummary('ssys:targets');
   }
-  if (!targets) {
+  if (stac instanceof STAC && !targets) {
     targets = stac.getMetadata('ssys:targets');
   }
   if (!targets) {

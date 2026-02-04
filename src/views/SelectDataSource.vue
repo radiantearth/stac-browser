@@ -86,8 +86,8 @@ export default defineComponent({
           return this.$t('index.urlMissingHost');
         }
         return null;
-      } catch (errot) {
-        return this.$t('index.urlInvalid');
+      } catch (error) {
+        return this.$t('index.urlInvalid:', { error: error.message });
       }
     }
   },

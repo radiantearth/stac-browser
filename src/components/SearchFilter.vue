@@ -27,19 +27,20 @@
             input-class="form-control mx-input"
             :id="ids.datetime" 
             v-model="datetime"
-            :locale="uiLanguage"
-            :format-locale="datepickerLang"
-            :format="dateTimeFormat"
+            :locale="datepickerLang"
+            :formats="{ input: dateTimeFormat }"
             :week-start="weekStartDay"
             :close-on-scroll="false"
             :placeholder="$t('search.selectDateRange')"
-            enable-time-picker 
-            enableSeconds
-            time-picker-inline
+            :time-config="{ 
+              enableTimePicker: true, 
+              seconds: true,
+              timePickerInline: true 
+            }"
+            :input-attrs="{ clearable: true }"
             auto-apply
-            clearable
             range
-            multi-calendars="2"
+            :multi-calendars="2"
           />
         </b-form-group>
 

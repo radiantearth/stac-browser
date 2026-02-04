@@ -19,7 +19,7 @@ export default class Felt extends LinkActionPlugin {
     // Docs: https://feltmaps.notion.site/Open-in-Felt-Button-22765a3427ff45e0a70218dca3f8acc0
     let uri = new URI("https://felt.com/map/new");
     let xyz = this.link.href;
-    if (xyz.includes('{s}' && Array.isArray(this.link['href:servers']) && this.link['href:servers'].length > 0)) {
+    if (xyz.includes('{s}') && Array.isArray(this.link['href:servers']) && this.link['href:servers'].length > 0) {
       xyz = xyz.replace('{s}', this.link['href:servers'][0]);
     }
     uri.addQuery('layer_urls[]', xyz);

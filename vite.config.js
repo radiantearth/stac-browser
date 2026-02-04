@@ -2,7 +2,7 @@ import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import { fileURLToPath, URL } from "node:url";
 import path from "path";
-import { createRequire } from "module";
+import { readFileSync } from "fs";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
 
 import Icons from "unplugin-icons/vite";
@@ -16,9 +16,13 @@ import { visualizer } from "rollup-plugin-visualizer";
 
 import yargs from "yargs";
 
-const require = createRequire(import.meta.url);
-const configSchema = require("./config.schema.json");
-const package_ = require("./package.json");
+// Read JSON files using fs instead of require
+const configSchema = JSON.parse(
+  readFileSync(new URL("./config.schema.json", import.meta.url), "utf-8")
+);
+const package_ = JSON.parse(
+  readFileSync(new URL("./package.json", import.meta.url), "utf-8")
+);
 
 const optionsForType = (type) =>
   Object.entries(configSchema.properties)
@@ -42,8 +46,20 @@ const env = yargs()
 delete env._;
 delete env.$0;
 
-const configFilePath = path.resolve(env.CONFIG ? env.CONFIG : "./config.js");
-const configFromFile = require(configFilePath);
+// For config.js, you need to use dynamic import
+const configFilePath = "file://" + path.resolve(env.CONFIG ? env.CONFIG : "./config.js");
+
+// Note: This makes the config async - you'll need to handle this
+let configFromFile;
+try {
+  // Dynamic import for the config file
+  const configModule = await import(configFilePath);
+  configFromFile = configModule.default || configModule;
+} catch (error) {
+  console.error(`Failed to load config from ${configFilePath}:`, error);
+  configFromFile = {};
+}
+
 const config = Object.assign(configFromFile, env);
 
 export default defineConfig(({ mode }) => ({

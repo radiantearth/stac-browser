@@ -1,6 +1,7 @@
 {
   "name": "@radiantearth/stac-browser",
   "version": "5.0.0-beta.1",
+  "type": "module",
   "description": "A full-fledged UI in Vue for browsing and searching static STAC catalogs and STAC APIs.",
   "main": "src/main.js",
   "scripts": {
@@ -9,7 +10,8 @@
     "build:preview": "vite build && vite preview",
     "build:report": "vite build --mode report",
     "build:minimal": "vite build --mode minimal",
-    "lint": "eslint --ext .js,.vue --ignore-path .gitignore --fix src",
+    "lint": "eslint --fix src",
+    "lint:check": "eslint src",
     "i18n:fields": "node helpers/fields_locales.js"
   },
   "bugs": {
@@ -37,20 +39,20 @@
   ],
   "license": "ISC",
   "dependencies": {
-    "@apidevtools/json-schema-ref-parser": "^14.0.0",
+    "@apidevtools/json-schema-ref-parser": "^15.2.2",
     "@musement/iso-duration": "^1.0.0",
     "@radiantearth/stac-fields": "~1.5.7",
     "@radiantearth/stac-migrate": "~2.0.2",
     "@turf/mask": "^7.2.0",
-    "@vuepic/vue-datepicker": "^11.0.2",
+    "@vuepic/vue-datepicker": "^12.1.0",
     "ajv-i18n": "^4.2.0",
     "axios": "^1.2.0",
     "bootstrap": "^5.3.8",
-    "bootstrap-vue-next": "^0.40.6",
+    "bootstrap-vue-next": "^0.42.0",
     "chart.js": "^4.3.0",
     "commonmark": "^0.31.2",
     "oidc-client-ts": "^3.0.1",
-    "ol": "~10.6.0",
+    "ol": "~10.7.0",
     "ol-stac": "^1.1.0",
     "proj4": "^2.15.0",
     "remove-markdown": "^0.6.2",
@@ -63,26 +65,28 @@
     "vue-chartjs": "^5.2.0",
     "vue-i18n": "^9.14.5",
     "vue-multiselect": "^3.3.1",
-    "vue-router": "^4.5.1",
+    "vue-router": "^5.0.1",
     "vuex": "^4.1.0",
     "yargs": "^18.0.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.2",
     "@iconify-json/bi": "^1.2.6",
     "@vitejs/plugin-vue": "^6.0.1",
     "@vue/compiler-sfc": "^3.5.22",
-    "eslint": "^8.57.1",
-    "eslint-plugin-vue": "^9.28.0",
+    "eslint": "^9.39.2",
+    "eslint-plugin-vue": "^10.7.0",
+    "globals": "^17.2.0",
     "rollup-plugin-visualizer": "^6.0.5",
     "sass": "^1.26.5",
-    "unplugin-icons": "^22.4.2",
-    "unplugin-vue-components": "^29.1.0",
+    "unplugin-icons": "^23.0.1",
+    "unplugin-vue-components": "^31.0.0",
     "vite": "^7.2.2",
     "vite-plugin-html": "^3.2.2",
-    "vite-plugin-node-polyfills": "^0.24.0"
+    "vite-plugin-node-polyfills": "^0.25.0"
   },
   "optionalDependencies": {
-    "ol-mapbox-style": "~13.0.1"
+    "ol-mapbox-style": "~13.2.0"
   },
   "browserslist": [
     "> 1%",
