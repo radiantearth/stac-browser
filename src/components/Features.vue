@@ -1,7 +1,7 @@
 <template>
   <section class="features">
     <header>
-      <h2 class="title me-2">{{ $tc('features.title', count ) }}</h2>
+      <h2 class="title me-2">{{ $t('features.title', count ) }}</h2>
       <b-badge pill variant="secondary" class="me-4">{{ count }}</b-badge>
     </header>
     <section class="list">

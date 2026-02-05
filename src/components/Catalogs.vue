@@ -122,10 +122,10 @@ export default defineComponent({
     },
     title() {
       if (this.collectionsOnly) {
-        return this.$tc('stacCollection', this.catalogs.length );
+        return this.$t('stacCollection', this.catalogs.length );
       }
       else {
-        return this.$tc('stacCatalog', this.catalogs.length );
+        return this.$t('stacCatalog', this.catalogs.length );
       }
     },
     isComplete() {

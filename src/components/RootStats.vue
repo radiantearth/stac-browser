@@ -80,9 +80,9 @@ export default {
         return null;
       }
       let stats = {
-        'stats:catalogs': { label: this.$tc('stacCatalog', 2) },
-        'stats:collections': { label: this.$tc('stacCollection', 2) },
-        'stats:items': { label: this.$tc('stacItem', 2) }
+        'stats:catalogs': { label: this.$t('stacCatalog', 2) },
+        'stats:collections': { label: this.$t('stacCollection', 2) },
+        'stats:items': { label: this.$t('stacItem', 2) }
       };
       for (let key in stats) {
         if (Utils.isObject(this.root[key])) {

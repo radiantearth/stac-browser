@@ -53,7 +53,7 @@ export default {
     displayTitle() {
       if (this.title === null) {
         let langKey = this.definition ? 'assets.inItems' : 'stacAssets';
-        return this.$tc(langKey, this.assets.length);
+        return this.$t(langKey, this.assets.length);
       }
       else {
         return this.title;

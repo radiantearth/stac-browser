@@ -49,7 +49,7 @@
           <MapSelect class="mb-4" v-if="provideBBox" v-model="query.bbox" :stac="stac" />
         </b-form-group>
 
-        <b-form-group v-if="conformances.CollectionIdFilter" class="filter-collection" :label="$tc('stacCollection', collections.length)" :label-for="ids.collections">
+        <b-form-group v-if="conformances.CollectionIdFilter" class="filter-collection" :label="$t('stacCollection', collections.length)" :label-for="ids.collections">
           <multiselect
             v-model="selectedCollections"
             v-bind="collectionSelectOptions"
