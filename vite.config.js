@@ -74,7 +74,8 @@ export default defineConfig(({ mode }) => ({
     preprocessorOptions: {
       scss: {
         api: "modern-compiler",
-        silenceDeprecations: ["color-functions", "global-builtin", "import"],
+        // todo: remove in STAC Browser V6 or if resolved by bootstrap-vue-next.
+        silenceDeprecations: ["color-functions", "global-builtin", "import", "if-function"],
       },
     },
   },
