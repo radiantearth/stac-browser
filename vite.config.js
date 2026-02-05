@@ -11,7 +11,7 @@ import Components from "unplugin-vue-components/vite";
 import { FileSystemIconLoader } from "unplugin-icons/loaders";
 import { BootstrapVueNextResolver } from "bootstrap-vue-next/resolvers";
 
-import { createHtmlPlugin } from "vite-plugin-html";
+import { ViteEjsPlugin } from "vite-plugin-ejs";
 import { visualizer } from "rollup-plugin-visualizer";
 
 import yargs from "yargs";
@@ -91,13 +91,7 @@ export default defineConfig(({ mode }) => ({
         },
       },
     }),
-    createHtmlPlugin({
-      minify: mode !== "development",
-      template: "public/index.html",
-      inject: {
-        data: config,
-      },
-    }),
+    ViteEjsPlugin(config),
     Components({
       dirs: [],
       globs: [],

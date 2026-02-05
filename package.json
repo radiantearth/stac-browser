@@ -82,7 +82,7 @@
     "unplugin-icons": "^23.0.1",
     "unplugin-vue-components": "^31.0.0",
     "vite": "^7.2.2",
-    "vite-plugin-html": "^3.2.2",
+    "vite-plugin-ejs": "^1.7.0",
     "vite-plugin-node-polyfills": "^0.25.0"
   },
   "optionalDependencies": {
