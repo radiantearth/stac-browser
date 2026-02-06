@@ -10,6 +10,7 @@
   "arrayFilterInput": {
     "andMoreErrors": "; and {count} more error(s)",
     "duplicate": "Duplicate value: {value}",
+    "duplicates": "Duplicate value(s): {values}",
     "helpText": "Enter values as a comma-separated list",
     "placeholder": "Enter {field} values...",
     "required": "Please enter at least one value"

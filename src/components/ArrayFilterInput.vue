@@ -44,6 +44,12 @@
         {{ validationFeedback }}
       </b-col>
     </b-row>
+
+    <b-row v-if="validationWarnings.length > 0" class="queryable-help text-warning small">
+      <b-col>
+         {{ warningFeedback }}
+      </b-col>
+    </b-row>
   </div>
 </template>
 
@@ -114,7 +120,11 @@ export default {
       /**
        * Current validation errors (empty = valid)
        */
-      validationErrors: []
+      validationErrors: [],
+      /**
+       * Current validation warnings (duplicates)
+       */
+      validationWarnings: []
     };
   },
   
@@ -181,6 +191,28 @@ export default {
       }
       
       return message;
+    },
+    
+    /**
+     * Warning feedback message
+     */
+    warningFeedback() {
+        if (this.validationWarnings.length === 0) {
+            return '';
+        }
+        
+        // Show first few warnings
+        const maxShow = 3;
+        const warnings = this.validationWarnings.slice(0, maxShow);
+        let message = warnings.join('; ');
+        
+        if (this.validationWarnings.length > maxShow) {
+            message += this.$t('arrayFilterInput.andMoreErrors', {
+                count: this.validationWarnings.length - maxShow
+            });
+        }
+        
+        return message;
     }
   },
   
@@ -248,12 +280,11 @@ export default {
      */
     validate(values) {
       const errors = [];
+      const warnings = [];
       
       // Check for empty array
       if (!values || values.length === 0) {
         errors.push(this.$t('arrayFilterInput.required'));
-        this.validationErrors = errors;
-        return;
       }
       
       // Check for duplicates
@@ -268,15 +299,24 @@ export default {
         }
       });
       
-      // Report duplicates (only once per duplicate)
+      // Report duplicates (consolidated)
       const uniqueDuplicates = [...new Set(duplicates)];
-      uniqueDuplicates.forEach(value => {
-        errors.push(
-          this.$t('arrayFilterInput.duplicate', { value: this.truncate(value) })
+      if (uniqueDuplicates.length > 0) {
+        const limit = 5;
+        const shown = uniqueDuplicates.slice(0, limit).map(v => this.truncate(v));
+        let valuesParam = shown.join(', ');
+        
+        if (uniqueDuplicates.length > limit) {
+           valuesParam += ', ...';
+        }
+        
+        warnings.push(
+          this.$t('arrayFilterInput.duplicates', { values: valuesParam })
         );
-      });
+      }
       
       this.validationErrors = errors;
+      this.validationWarnings = warnings;
     },
     
     /**
