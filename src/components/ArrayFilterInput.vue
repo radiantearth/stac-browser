@@ -47,7 +47,7 @@
 
     <b-row v-if="validationWarnings.length > 0" class="queryable-help text-warning small">
       <b-col>
-         {{ warningFeedback }}
+        {{ warningFeedback }}
       </b-col>
     </b-row>
   </div>
