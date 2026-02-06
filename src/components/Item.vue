@@ -9,7 +9,7 @@
       </b-card-title>
       <b-card-text v-if="fileFormats.length > 0 || hasDescription || isDeprecated" class="intro">
         <b-badge v-if="isDeprecated" variant="warning" class="mr-1 mt-1 deprecated">{{ $t('deprecated') }}</b-badge>
-        <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="mr-1 mt-1 fileformat">{{ format | formatMediaType }}</b-badge>
+        <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="mr-1 mt-1 fileformat">{{ format }}</b-badge>
         <template v-if="hasDescription">{{ summarizeDescription }}</template>
       </b-card-text>
       <Keywords v-if="showKeywordsInItemCards && keywords.length > 0" :keywords="keywords" variant="primary" center />
@@ -30,10 +30,7 @@ import FileFormatsMixin from './FileFormatsMixin';
 import CardMixin from './CardMixin';
 import StacLink from './StacLink.vue';
 import { STAC } from 'stac-js';
-import { formatTemporalExtent, formatTimestamp, formatMediaType } from '@radiantearth/stac-fields/formatters';
-import Registry from '@radiantearth/stac-fields/registry';
-
-Registry.addDependency('content-type', require('content-type'));
+import { formatTemporalExtent, formatTimestamp } from '@radiantearth/stac-fields/formatters';
 
 export default {
   name: 'Item',
@@ -42,7 +39,6 @@ export default {
     Keywords: () => import('./Keywords.vue')
   },
   filters: {
-    formatMediaType: value => formatMediaType(value, null, {shorten: true}),
     formatTemporalExtent,
     formatTimestamp
   },

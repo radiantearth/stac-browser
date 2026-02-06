@@ -9,7 +9,7 @@
       </b-card-title>
       <b-card-text v-if="fileFormats.length > 0 || hasDescription || isDeprecated" class="intro">
         <b-badge v-if="isDeprecated" variant="warning" class="mr-1 mt-1 deprecated">{{ $t('deprecated') }}</b-badge>
-        <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="mr-1 mt-1 fileformat">{{ format | formatMediaType }}</b-badge>
+        <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="mr-1 mt-1 fileformat">{{ format }}</b-badge>
         {{ summarizeDescription }}
       </b-card-text>
       <Keywords v-if="showKeywordsInCatalogCards && keywords.length > 0" :keywords="keywords" variant="primary" :center="!isList" />
@@ -28,16 +28,13 @@ import StacFieldsMixin from './StacFieldsMixin';
 import CardMixin from './CardMixin';
 import StacLink from './StacLink.vue';
 import { STAC } from 'stac-js';
-import { formatMediaType, formatTemporalExtent } from '@radiantearth/stac-fields/formatters';
+import { formatTemporalExtent } from '@radiantearth/stac-fields/formatters';
 
 export default {
   name: 'Catalog',
   components: {
     StacLink,
     Keywords: () => import('./Keywords.vue')
-  },
-  filters: {
-    formatMediaType: value => formatMediaType(value, null, {shorten: true})
   },
   mixins: [
     FileFormatsMixin,

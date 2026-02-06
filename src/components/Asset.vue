@@ -13,7 +13,7 @@
           </b-badge>
           <b-badge v-if="asset.deprecated" variant="warning" class="deprecated">{{ $t('deprecated') }}</b-badge>
           <template v-if="Array.isArray(asset.roles)">
-            <b-badge v-for="role in asset.roles" :key="role" :variant="role === 'data' ? 'primary' : 'secondary'" class="role">{{ displayRole(role) }}</b-badge>
+            <b-badge v-for="role in sortedRoles" :key="role" :variant="role === 'data' ? 'primary' : 'secondary'" class="role">{{ displayRole(role) }}</b-badge>
           </template>
           <b-badge v-if="shortFileFormat" variant="dark" class="format" :title="fileFormat"><span v-html="shortFileFormat" /></b-badge>
         </div>
@@ -123,6 +123,17 @@ export default {
     },
     hasAlternatives() {
       return Utils.size(this.alternatives) > 0;
+    },
+    sortedRoles() {
+      if (!Array.isArray(this.asset.roles)) {
+        return [];
+      }
+      // Sort roles with 'data' first, then alphabetically (case-insensitive)
+      return [...this.asset.roles].sort((a, b) => {
+        if (a === 'data') return -1;
+        if (b === 'data') return 1;
+        return a.toLowerCase().localeCompare(b.toLowerCase(), undefined, { sensitivity: 'base' });
+      });
     }
   },
   created() {
