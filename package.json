@@ -12,7 +12,12 @@
     "build:minimal": "vite build --mode minimal",
     "lint": "eslint --fix src",
     "lint:check": "eslint src",
-    "i18n:fields": "node helpers/fields_locales.js"
+    "i18n:fields": "node helpers/fields_locales.js",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:debug": "playwright test --debug",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:report": "playwright show-report"
   },
   "bugs": {
     "url": "https://github.com/radiantearth/stac-browser/issues"
@@ -72,6 +77,7 @@
   "devDependencies": {
     "@eslint/js": "^9.39.2",
     "@iconify-json/bi": "^1.2.6",
+    "@playwright/test": "^1.57.0",
     "@vitejs/plugin-vue": "^6.0.1",
     "@vue/compiler-sfc": "^3.5.22",
     "eslint": "^9.39.2",
