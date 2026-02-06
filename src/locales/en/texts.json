@@ -7,6 +7,13 @@
   "anonymized": {
     "title": "Anonymized"
   },
+  "arrayFilterInput": {
+    "andMoreErrors": "; and {count} more error(s)",
+    "duplicate": "Duplicate value: {value}",
+    "helpText": "Enter values as a comma-separated list",
+    "placeholder": "Enter {field} values...",
+    "required": "Please enter at least one value"
+  },
   "assets": {
     "alternate": {
       "main": "Preferred"
@@ -245,6 +252,22 @@
     "addItemIds": "Press enter to add an Item ID",
     "addSearchTerm": "Press enter to add a search term",
     "additionalFilters": "Additional filters",
+    "arrayContains": "Contains all",
+    "arrayContainsDescription": "Array contains all of the specified values",
+    "arrayContainedBy": "Is subset of",
+    "arrayContainedByDescription": "Array is a subset of the specified values",
+    "arrayEquals": "Exactly matches",
+    "arrayEqualsDescription": "Array exactly matches the specified values (same items, any order)",
+    "arrayOverlaps": "Contains any",
+    "arrayOverlapsDescription": "Array contains at least one of the specified values",
+    "notArrayOverlaps": "Does not contain any",
+    "notArrayOverlapsDescription": "Array does not contain any of the specified values",
+    "notArrayContains": "Does not contain all",
+    "notArrayContainsDescription": "Array does not contain all of the specified values",
+    "notArrayEquals": "Does not exactly match",
+    "notArrayEqualsDescription": "Array does not exactly match the specified values",
+    "notArrayContainedBy": "Is not a subset of",
+    "notArrayContainedByDescription": "Array is not a subset of the specified values",
     "dateDescription": "All times in Coordinated Universal Time (UTC).",
     "enterCollections": "Enter one or more Collection IDs...",
     "enterItemIds": "Enter one or more Item IDs...",
