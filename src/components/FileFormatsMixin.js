@@ -18,15 +18,12 @@ export default {
       if (this.data.isCollection() && Utils.isObject(this.data.item_assets)) {
         assets = assets.concat(Object.values(this.data.item_assets));
       }
-      const uniqueTypes = assets
-        .filter(asset => Array.isArray(asset.roles) && asset.roles.includes('data') && typeof asset.type === 'string') // Look for data files
-        .map(asset => asset.type) // Array shall only contain media types
-        .filter((v, i, a) => a.indexOf(v) === i); // Unique values
       
-      // Map to formatted names and sort alphabetically
-      return uniqueTypes
-        .map(type => formatMediaType(type, null, {shorten: true}))
-        .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
+      return assets
+        .filter(asset => Array.isArray(asset.roles) && asset.roles.includes('data') && typeof asset.type === 'string') // Look for data files
+        .map(asset => this.formatMediaType(asset.type, null, {shorten: true})) // Array shall only contain media types
+        .filter((v, i, a) => a.indexOf(v) === i) // Unique values
+        .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' })); // Sort alphabetically
     }
   }
 };
