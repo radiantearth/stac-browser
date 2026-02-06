@@ -23,7 +23,7 @@ export default {
   },
   computed: {
     sortedKeywords() {
-      return [...this.keywords].sort((a, b) => a.localeCompare(b));
+      return [...this.keywords].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
     }
   }
 };
