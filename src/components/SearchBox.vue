@@ -1,17 +1,18 @@
 <template>
   <div class="vue-component search-box">
-    <span class="icon">🔎</span>
+    <span class="icon"><b-icon-search /></span>
     <b-form-input type="search" v-model.trim="searchTerm" :placeholder="placeholder || $t('search.placeholder')" />
   </div>
 </template>
 
 <script>
-import { BFormInput } from 'bootstrap-vue';
+import { BFormInput, BIconSearch } from 'bootstrap-vue';
 
 export default {
   name: 'SearchBox',
   components: {
-    BFormInput
+    BFormInput,
+    BIconSearch
   },
   props: {
     value: {
