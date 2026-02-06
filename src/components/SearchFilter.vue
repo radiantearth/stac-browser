@@ -74,15 +74,27 @@
             </template>
           </b-dropdown>
 
-          <QueryableInput
-            v-for="(filter, index) in filters" :key="filter.id"
-            :value.sync="filter.value"
-            :operator.sync="filter.operator"
-            :queryable="filter.queryable"
-            :index="index"
-            :cql="cql"
-            @remove-queryable="removeQueryable(index)"
-          />
+          <template v-for="(filter, index) in filters">
+            <QueryableInput
+              v-if="!filter.queryable.isArray"
+              :key="filter.id"
+              :value.sync="filter.value"
+              :operator.sync="filter.operator"
+              :queryable="filter.queryable"
+              :index="index"
+              :cql="cql"
+              @remove-queryable="removeQueryable(index)"
+            />
+            <ArrayFilterInput
+              v-else
+              :key="'array-' + filter.id"
+              :value.sync="filter.value"
+              :operator.sync="filter.operator"
+              :operators="filter.queryable.getOperators(cql)"
+              :queryable="filter.queryable"
+              @remove-queryable="removeQueryable(index)"
+            />
+          </template>
         </b-form-group>
 
         <hr v-if="canFilterExtents || conformances.CollectionIdFilter || conformances.ItemIdFilter || showAdditionalFilters">
@@ -183,6 +195,7 @@ export default {
     BFormInput,
     BFormCheckbox,
     BFormRadioGroup,
+    ArrayFilterInput: () => import('./ArrayFilterInput.vue'),
     QueryableInput: () => import('./QueryableInput.vue'),
     Loading,
     MapSelect: () => import('./maps/MapSelect.vue'),
