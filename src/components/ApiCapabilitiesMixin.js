@@ -37,7 +37,7 @@ export const TYPES = {
     BasicFilters: ["https://api.stacspec.org/v1.*/item-search"],
     CollectionIdFilter: true,
     ItemIdFilter: true,
-    CqlFilters: ["https://api.stacspec.org/v1.*.*/item-search#filter"],
+    CqlFilters: ["https://api.stacspec.org/v1.*/item-search#filter"],
     Sort: ["https://api.stacspec.org/v1.*/item-search#sort"],
     FreeText: ["https://api.stacspec.org/v1.*/item-search#free-text"],
   },
