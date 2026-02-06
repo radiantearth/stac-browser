@@ -125,8 +125,12 @@ export default {
       }
       // Sort roles with 'data' first, then alphabetically (case-insensitive)
       return [...this.asset.roles].sort((a, b) => {
-        if (a === 'data') return -1;
-        if (b === 'data') return 1;
+        if (a === 'data') {
+          return -1;
+        }
+        if (b === 'data') {
+          return 1;
+        }
         return a.toLowerCase().localeCompare(b.toLowerCase(), undefined, { sensitivity: 'base' });
       });
     }
