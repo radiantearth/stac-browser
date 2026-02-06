@@ -132,7 +132,7 @@ export default {
       return [...this.asset.roles].sort((a, b) => {
         if (a === 'data') return -1;
         if (b === 'data') return 1;
-        return a.toLowerCase().localeCompare(b.toLowerCase());
+        return a.toLowerCase().localeCompare(b.toLowerCase(), undefined, { sensitivity: 'base' });
       });
     }
   },
