@@ -1,5 +1,8 @@
 import Utils from '../utils';
 import { formatMediaType } from '@radiantearth/stac-fields/formatters';
+import Registry from '@radiantearth/stac-fields/registry';
+
+Registry.addDependency('content-type', require('content-type'));
 
 export default {
   computed: {
@@ -19,14 +22,10 @@ export default {
         .map(asset => asset.type) // Array shall only contain media types
         .filter((v, i, a) => a.indexOf(v) === i); // Unique values
       
-      // Map to objects with formatted names, sort once, then extract original types
+      // Map to formatted names and sort alphabetically
       return uniqueTypes
-        .map(type => ({
-          original: type,
-          formatted: formatMediaType(type, null, {shorten: true})
-        }))
-        .sort((a, b) => a.formatted.localeCompare(b.formatted, undefined, { sensitivity: 'base' }))
-        .map(item => item.original);
+        .map(type => formatMediaType(type, null, {shorten: true}))
+        .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
     }
   }
 };
