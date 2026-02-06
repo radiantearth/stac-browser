@@ -1,12 +1,15 @@
 {
+  "actions": {
+    "openIn": "Apri in {service}"
+  },
+  "additionalActions": "Azioni aggiuntive",
   "additionalResources": "Altre risorse",
   "anonymized": {
     "title": "Anonimizzato"
   },
   "assets": {
-    "copyGdalVfsUrl": {
-      "generic": "Copia l'URL del VFS GDAL",
-      "withSource": "Copia l'URL del VFS GDAL per {source}"
+    "alternate": {
+      "main": "Preferito"
     },
     "copyUrl": {
       "generic": "Copia l'URL",
@@ -28,12 +31,28 @@
   },
   "authentication": {
     "button": {
-      "authenticate": "Accedi",
-      "authenticated": "Autenticato",
+      "login": "Login",
+      "logout": "Logout",
       "title": "Fornisci o aggiorna le tue credenziali"
     },
+    "chooseMethod": "Scegliere il metodo di autenticazione",
     "description": "La pagina richiesta è ad accesso controllato. Inserisci i tuoi dati di autenticazione nel campo di testo sottostante.",
-    "title": "Accesso"
+    "loggedOut": "Sei stato disconnesso con successo. Puoi chiudere questa finestra ora.",
+    "password": "Password",
+    "required": "Autenticazione richiesta",
+    "schemeTypes": {
+      "http": "HTTP {scheme}",
+      "s3": "S3",
+      "signedUrl": "URL firmato",
+      "oauth2": "OAuth 2",
+      "apiKey": "Chiave API",
+      "openIdConnect": "OpenID Connect"
+    },
+    "title": "Accesso",
+    "unauthorized": "Non hai i permessi per accedere a questi dati. Effettua il login.",
+    "unsupported": "Non supportato",
+    "unsupportedLong": "Il metodo di autenticazione {method} non è supportato dal browser STAC.",
+    "user": "Utente"
   },
   "browse": "Esplora",
   "cancel": "Annulla",
@@ -43,6 +62,7 @@
   },
   "catalogs": {
     "filterByTitle": "Filtra i cataloghi per titolo",
+    "filterByTitleAndMore": "Filtra i cataloghi per titolo, descrizione o parole chiave",
     "loadMore": "Carica di più...",
     "noMatches": "Nessun catalogo corrisponde ai criteri di ricerca indicati."
   },
@@ -88,12 +108,24 @@
     "noExternalAccess": "L'accesso a cataloghi esterni non è consentito!",
     "notFound": "La risorsa richiesta non esiste. @:errors.contactProvider",
     "serverError": "Il server ha riscontrato un problema. @:errors.contactProvider",
+    "title": "Errore",
     "unauthorized": "La richiesta necessita di credenziali, ad esempio un token API. Inserisci i tuoi dati di accesso e riprova."
   },
   "featureExperimental": "Questa funzione è ancora sperimentale e potrebbe dare risultati inaspettati!",
+  "features": {
+    "empty": "Nessuna feature disponibile",
+    "noProperties": "Nessuna proprietà fornita.",
+    "title": "Feature | Features"
+  },
   "fullscreen": {
     "exit": "Esci dalla modalità a schermo intero",
-    "show": "Mostra in modalità a schermo intero"
+    "exitLabel": "✕",
+    "show": "Mostra in modalità a schermo intero",
+    "showLabel": "⛶"
+  },
+  "goBack": {
+    "description": "Torna a {type}",
+    "label": "Indietro"
   },
   "goToCollection": {
     "description": "Vai alla Collezione associata",
@@ -108,7 +140,7 @@
   "in": "in {catalog}",
   "index": {
     "api": "API",
-    "catalog": "Catalogo",
+    "catalog": "Catalogo statico",
     "load": "Carica",
     "selectStacIndex": "... o selezionane uno da {stacIndex}:",
     "specifyCatalog": "Inserisci l'indirizzo di un Catalogo o di un'API STAC...",
@@ -117,16 +149,37 @@
     "urlMissingProtocol": "Protocollo mancante."
   },
   "items": {
-    "filter": "Filtro",
+    "filter": "Filtri",
+    "hideFilter": "Nascondi filtri",
     "noTime": "Nessuna data/ora indicata",
-    "noneAvailableForCollection": "Non ci sono Elementi disponibili per questa Collezione."
+    "noneAvailableForCollection": "Non ci sono Elementi disponibili per questa Collezione.",
+    "showFilter": "Mostra filtri"
   },
-  "leaflet": {
-    "close": "Chiudi",
-    "noFeatureProperties": "Non ci sono altri dati disponibili per questo Elemento.",
-    "stayLayer": {
-      "error": "Non è stato possibile aggiungere i dati alla mappa"
+  "loading": "Carico...",
+  "map": "Mappa",
+  "mapping": {
+    "attribution": {
+      "label": "i",
+      "description": "Crediti",
+      "collapseLabel": "✕"
     },
+    "bboxSelect": {
+      "add": "Cliccare sulla mappa per aggiungere un box di selezione.",
+      "remove": "Cliccare dentro il box per eliminarlo."
+    },
+    "close": "Chiudi",
+    "fit": "Adatta alla estensione",
+    "layers": {
+      "title": "Livelli",
+      "base": "Livelli di base",
+      "unnamed": "Senza Nome #{id}",
+      "footprint": "Impronta a terra"
+    },
+    "location": {
+      "description": "Vai alla tua posizione attuale"
+    },
+    "nobasemap": "Mappa base non disponibile.",
+    "nodata": "Informazione spaziale mancante nei metadati.",
     "zoom": {
       "in": {
         "description": "Zoom avanti",
@@ -134,12 +187,11 @@
       },
       "out": {
         "description": "Zoom indietro",
-        "label": "-"
+        "label": "–"
       }
     }
   },
-  "loading": "Carico...",
-  "map": "Mappa",
+  "messageForSchemaError": "{message} per lo schema {schemaPath}",
   "metadata": {
     "general": "Generale",
     "title": "Metadati"
@@ -147,6 +199,7 @@
   "multiselect": {
     "andMore": "e {count} in più",
     "deselectLabel": "Premi invio per rimuovere",
+    "keywordsPlaceholder": "Seleziona parole chiave",
     "placeholder": "Seleziona un'opzione",
     "selectLabel": "Premi invio per selezionare",
     "selectedLabel": "Selezionato"
@@ -165,7 +218,10 @@
     "ftp": "FTP",
     "gcs": "Google Cloud",
     "oss": "Alibaba Cloud",
-    "s3": "Amazon S3"
+    "s3": {
+      "amazonaws.com": "Amazon S3",
+      "default": "S3"
+    }
   },
   "providers": {
     "email": "Invia e-mail",
@@ -182,29 +238,38 @@
     "less": "Mostra di meno",
     "more": "Mostra di più"
   },
+  "reset": "Reimposta",
   "search": {
     "addCollections": "Premi invio per aggiungere una Collezione",
     "addFilter": "Aggiungi filtro",
     "addItemIds": "Premi invio per aggiungere l'ID di un Elemento",
+    "addSearchTerm": "Premi Invio per aggiungere un termine di ricerca",
     "additionalFilters": "Filtri aggiuntivi",
-    "buttons": {
-      "filter": "Filtra",
-      "reset": "Reimposta"
-    },
     "dateDescription": "Data/ora nel sistema UTC (tempo coordinato internazionale).",
     "enterCollections": "Inserire una o più Collezioni...",
     "enterItemIds": "Inserire uno o più ID di Elemento...",
+    "enterSearchTerms": "Inserisci uno o più termini di ricerca...",
     "equalTo": "uguale a",
     "filterBySpatialExtent": "Filtra per estensione spaziale",
+    "filterCollection": "Filtra Collezione",
+    "freeText": "Termini di ricerca",
+    "freeTextDescription": "Cerca almeno uno dei termini indicati in campi quali il titolo e la descrizione.",
     "greaterThan": "maggiore di",
+    "greaterThanEqual": "maggiore o uguale a",
     "itemIds": "ID di Elementi",
     "itemsPerPage": "Elementi per pagina",
     "itemsPerPageDescription": "Numero di Elementi richiesti per pagina, massimo {maxItems} Elementi.",
     "lessThan": "minore di",
+    "lessThanEqual": "minore o uguale a",
     "likeOperatorDescription": "Puoi usare i caratteri jolly. `_` corrisponde ad un singolo carattere, `%` corrisponde ad un numero qualsiasi di caratteri. Per cercare un carattere jolly in modo specifico, devi aggiungere `\\` davanti al carattere.",
+    "logical": {
+      "and": "Abbina tutti i filtri (e)",
+      "or": "Abbina qualcuno dei filtri (o)"
+    },
     "matches": "corrisponde a",
     "metaDescription": "Cerca tra i dati offerti da {title}.",
     "modifyCriteria": "Modifica i criteri di ricerca.",
+    "noFurtherItemsFound": "Nessun altro elemento disponibile.",
     "noItemsFound": "Nessun Elemento corrispondente ai criteri di ricerca impostati.",
     "noOptions": "Nessun valore inserito",
     "notEqualTo": "diverso da",
@@ -212,14 +277,15 @@
     "notSupported": "La ricerca di Elementi non è supportata dall'API.",
     "placeholder": "Cerca...",
     "selectCollections": "Selezionare una o più Collezioni...",
-    "sortOptions": {
-      "datetime": "Data e ora",
-      "id": "ID",
-      "title": "Titolo"
-    },
+    "selectForItemSearch": "Seleziona per Ricerca Elemento",
     "spatialExtent": "Estensione spaziale",
+    "tabs": {
+      "collections": "Cerca Collezioni",
+      "items": "Cerca Elementi"
+    },
     "temporalExtent": "Estensione temporale",
-    "title": "Ricerca"
+    "title": "Ricerca",
+    "useInItemSearch": "Apri la Collezione nella Ricerca Elemento. Apri {count} Collezioni nella Ricerca Elemento"
   },
   "showMore": "Mostra di più...",
   "sidebar": {
@@ -237,7 +303,12 @@
     "title": "Ordina"
   },
   "source": {
+    "conformanceClasses": "Classi di conformità",
     "detailsAboutSource": "Informazioni sulla fonte STAC",
+    "extension": "Estensione",
+    "fileFormat": "Formato file",
+    "id": "ID",
+    "invalid": "Non valido",
     "label": "Fonte",
     "language": {
       "label": "Lingua: {currentLanguage}",
@@ -247,19 +318,50 @@
     },
     "locatedAt": "Il file di metadati STAC si trova all'indirizzo:",
     "share": {
+      "bsky": "Bluesky",
       "email": "E-mail",
       "label": "Condividi",
+      "mastodon": "Mastodon.social",
       "message": "{title} è disponibile all'indirizzo {url}",
       "sharePageWithOthers": "Condividi l'URL di questa pagina dove vuoi:",
       "title": "Condivisione",
-      "twitter": "Twitter",
+      "x": "X (Twitter)",
       "withOthers": "Condividi questa pagina con altri"
     },
-    "stacVersion": "Versione STAC:",
+    "stacExtension": "Estensione STAC",
+    "stacVersion": "Versione STAC",
+    "statistics": "Statistiche",
     "title": "Fonte dati",
-    "valid": "Valido:",
+    "valid": "Valido",
     "validating": "In corso di validazione...",
-    "validationNA": "n/a"
+    "validationNA": "n/a",
+    "validationParams": {
+      "additionalProperty": "proprietà aggiuntiva",
+      "allowedValue": "valore consentito",
+      "allowedValues": "valori consentiti",
+      "comparison": "confronto",
+      "depsCount": "totale",
+      "exclusive": "escluso il confine",
+      "failingKeyword": "schema non conforme",
+      "format": "formato",
+      "i": "primo elemento",
+      "j": "secondo elemento",
+      "limit": "limite",
+      "maxContains": "contiene al massimo",
+      "minContains": "contiene almeno",
+      "missingProperty": "proprietà mancante",
+      "multipleOf": "multiplo di",
+      "passingSchemas": "schema conforme",
+      "pattern": "modello",
+      "property": "proprietà",
+      "propertyName": "nome della proprietà",
+      "type": "tipo"
+    },
+    "validationReport": {
+      "disclaimer": "Il rapporto di validazione è generato sulla base di schemi spesso non esaustivi, che non possono coprire tutti gli aspetti della specifica STAC e delle sue estensioni. Il rapporto di validazione non garantisce la completa conformità di un'entità STAC alla specifica e alle sue estensioni.",
+      "result": "Risultato",
+      "title": "Rapporto di validazione"
+    }
   },
   "stacAssets": "Risorsa | Risorse",
   "stacCatalog": "Catalogo | Cataloghi",

@@ -1,50 +1,128 @@
 <template>
   <b-container id="stac-browser">
-    <Authentication v-if="doAuth.length > 0" />
-    <ErrorAlert class="global-error" v-if="globalError" v-bind="globalError" @close="hideError" />
+    <Authentication v-if="showLogin" />
+    <ErrorAlert v-if="globalError" dismissible class="global-error" v-bind="globalError" @close="hideError" />
     <Sidebar v-if="sidebar" />
     <!-- Header -->
     <header>
-      <div class="logo">{{ displayCatalogTitle }}</div>
-      <StacHeader @enableSidebar="sidebar = true" />
+      <b-row class="site">
+        <b-col md="12">
+          <nav class="actions navigation">
+            <b-button-group v-if="canSearch || isServerSelector">
+              <b-button v-if="isServerSelector" variant="primary" size="sm" :title="$t('browse')" v-b-toggle.sidebar @click="sidebar = true">
+                <b-icon-list /><span class="button-label">{{ $t('browse') }}</span>
+              </b-button>
+              <b-button v-if="canSearch" variant="primary" size="sm" :to="searchBrowserLink" :title="$t('search.title')" :pressed="isSearchPage">
+                <b-icon-search /><span class="button-label">{{ $t('search.title') }}</span>
+              </b-button>
+            </b-button-group>
+          </nav>
+          <div class="title">
+            <img v-if="logo" :src="logo.getAbsoluteUrl()" :alt="logo.title" :title="logo.title" class="logo">
+            <span role="banner">
+              <StacLink v-if="root" :data="root" hideIcon />
+              <template v-else>{{ catalogTitle }}</template>
+            </span>
+            <b-button
+              v-if="root" size="sm" variant="outline-primary" id="popover-root-btn"
+              :title="serviceType" tag="a" tabindex="0"
+            >
+              <b-icon-caret-down-fill />
+            </b-button>
+          </div>
+          <nav class="actions user">
+            <b-button-group>
+              <b-button v-if="canAuthenticate" variant="primary" size="sm" @click="logInOut" :title="authTitle">
+                <component :is="authIcon" /><span class="button-label">{{ authLabel }}</span>
+              </b-button>
+              <LanguageChooser
+                :data="data" :currentLocale="localeFromVueX" :locales="supportedLocalesFromVueX"
+                @setLocale="locale => switchLocale({locale, userSelected: true})"
+              />
+            </b-button-group>
+          </nav>
+        </b-col>
+      </b-row>
+      <b-row class="page" v-if="!loading">
+        <b-col md="12">
+          <div class="title">
+            <img v-if="icon && !isRoot" :src="icon.getAbsoluteUrl()" :alt="icon.title" :title="icon.title" class="icon">
+            <h1>{{ title }}</h1>
+          </div>
+          <nav class="actions navigation">
+            <b-button-group>
+              <b-button v-if="back" :to="selfBrowserLink" :title="$t('goBack.description', {type})" variant="outline-primary" size="sm">
+                <b-icon-arrow-left /><span class="button-label">{{ $t('goBack.label') }}</span>
+              </b-button>
+              <b-button v-if="collectionLink" :to="toBrowserPath(collectionLink.href)" :title="collectionLinkTitle" variant="outline-primary" size="sm">
+                <b-icon-folder-symlink /><span class="button-label">{{ $t('goToCollection.label') }}</span>
+              </b-button>
+              <b-button v-if="parentLink" :to="toBrowserPath(parentLink.href)" :title="parentLinkTitle" variant="outline-primary" size="sm">
+                <b-icon-arrow-90deg-up /><span class="button-label">{{ $t('goToParent.label') }}</span>
+              </b-button>
+            </b-button-group>
+          </nav>
+          <Source class="actions" :title="title" :stacUrl="url" :stac="data" />
+        </b-col>
+      </b-row>
     </header>
     <!-- Content (Item / Catalog) -->
     <router-view />
     <footer>
+      <ul v-if="Array.isArray(footerLinksFromVueX) && footerLinksFromVueX.length > 0" class="footer-links text-muted">
+        <li v-for="link in footerLinksFromVueX" :key="link.url">
+          <a :href="link.url" target="_blank">{{ $te(`footerLinks.${link.label}`) ? $t(`footerLinks.${link.label}`) : link.label }}</a>
+        </li>
+      </ul>
       <i18n tag="small" path="poweredBy" class="poweredby text-muted">
         <template #link>
           <a href="https://github.com/radiantearth/stac-browser" target="_blank">STAC Browser</a> {{ browserVersion }}
         </template>
       </i18n>
     </footer>
+    <b-popover
+      v-if="root" id="popover-root" custom-class="popover-large" target="popover-root-btn"
+      triggers="focus" placement="bottom" container="stac-browser"
+    >
+      <template #title>
+        {{ serviceType }}
+      </template>
+      <RootStats />
+    </b-popover>
   </b-container>
 </template>
 
 <script>
 import Vue from "vue";
 import VueRouter from "vue-router";
-import Vuex, { mapActions, mapGetters, mapState } from 'vuex';
+import Vuex, { mapMutations, mapActions, mapGetters, mapState } from 'vuex';
 import CONFIG from './config';
 import getRoutes from "./router";
 import getStore from "./store";
 
 import {
-  AlertPlugin, BadgePlugin, ButtonGroupPlugin, ButtonPlugin,
-  CardPlugin, LayoutPlugin, SpinnerPlugin,
+  AlertPlugin, BadgePlugin, BPopover,
+  BIconArrow90degUp, BIconArrowLeft, BIconCaretDownFill,
+  BIconFolderSymlink, BIconInfoLg, BIconList, BIconLock,
+  BIconSearch, BIconUnlock,
+  ButtonGroupPlugin, ButtonPlugin, CardPlugin, LayoutPlugin, SpinnerPlugin,
   VBToggle, VBVisible } from "bootstrap-vue";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
 
 import ErrorAlert from './components/ErrorAlert.vue';
-import StacHeader from './components/StacHeader.vue';
+import StacLink from './components/StacLink.vue';
 
-import STAC from './models/stac';
+import { CatalogLike, STAC } from 'stac-js';
 import Utils from './utils';
 import URI from 'urijs';
 
-import I18N from '@radiantearth/stac-fields/I18N';
-import { translateFields, API_LANGUAGE_CONFORMANCE, loadMessages } from './i18n';
-import { getBest, prepareSupported } from './locale-id';
+import { API_LANGUAGE_CONFORMANCE } from './i18n';
+import { getBest, prepareSupported } from 'stac-js/src/locales';
+import BrowserStorage from "./browser-store";
+import Authentication from "./components/Authentication.vue";
+import LanguageChooser from "./components/LanguageChooser.vue";
+import { getDisplayTitle } from "./models/stac";
 
 Vue.use(AlertPlugin);
 Vue.use(ButtonGroupPlugin);
@@ -64,7 +142,15 @@ Vue.use(VueRouter);
 const router = new VueRouter({
   mode: CONFIG.historyMode,
   base: CONFIG.pathPrefix,
-  routes: getRoutes(CONFIG)
+  routes: getRoutes(CONFIG),
+  scrollBehavior: (to, from, savedPosition) => {
+    if (to.path !== from.path) {
+      return { x: 0, y: 0 };
+    }
+    else {
+      return savedPosition;
+    }
+  }
 });
 
 // Setup store
@@ -80,8 +166,8 @@ for(let key in CONFIG) {
   };
   Watchers[key] = {
     immediate: true,
-    handler: function(newValue) {
-      this.$store.commit('config', {
+    handler: async function(newValue) {
+      await this.$store.dispatch('config', {
         [key]: newValue
       });
     }
@@ -93,10 +179,23 @@ export default {
   router,
   store,
   components: {
-    Authentication: () => import('./components/Authentication.vue'),
+    Authentication,
+    BIconArrow90degUp,
+    BIconArrowLeft,
+    BIconCaretDownFill,
+    BIconFolderSymlink,
+    BIconInfoLg,
+    BIconList,
+    BIconLock,
+    BIconSearch,
+    BIconUnlock,
+    BPopover,
     ErrorAlert,
+    LanguageChooser,
+    RootStats: () => import('./components/RootStats.vue'),
     Sidebar: () => import('./components/Sidebar.vue'),
-    StacHeader
+    StacLink,
+    Source: () => import('./components/Source.vue')
   },
   props: {
     ...Props
@@ -109,15 +208,18 @@ export default {
     };
   },
   computed: {
-    ...mapState(['allowSelectCatalog', 'data', 'dataLanguage', 'description', 'doAuth', 'globalError', 'stateQueryParameters', 'title', 'uiLanguage', 'url']),
+    ...mapState(['allowSelectCatalog', 'conformsTo', 'data', 'dataLanguage', 'globalError', 'loading', 'stateQueryParameters', 'uiLanguage', 'url']),
     ...mapState({
-      catalogUrlFromVueX: 'catalogUrl',
+      catalogImageFromVueX: 'catalogImage',
+      footerLinksFromVueX: 'footerLinks',
+      localeFromVueX: 'locale',
       detectLocaleFromBrowserFromVueX: 'detectLocaleFromBrowser',
-      fallbackLocaleFromVueX: 'fallbackLocale',
       supportedLocalesFromVueX: 'supportedLocales',
       storeLocaleFromVueX: 'storeLocale'
     }),
-    ...mapGetters(['displayCatalogTitle', 'fromBrowserPath', 'isExternalUrl', 'root', 'supportsConformance', 'toBrowserPath']),
+    ...mapGetters(['canSearch', 'collectionLink', 'description', 'fromBrowserPath', 'isExternalUrl', 'isRoot', 'parentLink', 'root', 'rootLink', 'supportsConformance', 'title', 'toBrowserPath']),
+    ...mapGetters('auth', { authMethod: 'method' }),
+    ...mapGetters('auth', ['canAuthenticate', 'isLoggedIn', 'showLogin']),
     browserVersion() {
       if (typeof STAC_BROWSER_VERSION !== 'undefined') {
         return STAC_BROWSER_VERSION;
@@ -125,18 +227,112 @@ export default {
       else {
         return "";
       }
+    },
+    isSearchPage() {
+      return this.$route.name === 'search';
+    },
+    isServerSelector() {
+      return this.$route.name !== 'select';
+    },
+    authIcon() {
+      return this.isLoggedIn ? 'b-icon-unlock' : 'b-icon-lock';
+    },
+    authTitle() {
+      return this.authMethod.getButtonTitle();
+    },
+    authLabel() {
+      return this.isLoggedIn ? this.authMethod.getLogoutLabel() : this.authMethod.getLoginLabel();
+    },
+    searchBrowserLink() {
+      if (!this.canSearch) {
+        return null;
+      }
+      let searchLink;
+      if (this.data instanceof CatalogLike && !this.data.equals(this.root)) {
+        searchLink = this.data.getSearchLink();
+      }
+      if (searchLink) {
+        return `/search${this.data.getBrowserPath()}`;
+      }
+      else if (this.root && this.allowSelectCatalog) {
+        return `/search${this.root.getBrowserPath()}`;
+      }
+      return '/search';
+    },
+    isApi() {
+      // todo: This gives false results for a statically hosted OGC API - Records, which may include conformance classes
+      return Array.isArray(this.conformsTo) && this.conformsTo.length > 0;
+    },
+    serviceType() {
+      return this.isApi ? this.$t('index.api') : this.$t('index.catalog');
+    },
+    back() {
+      return this.$route.name === 'validation';
+    },
+    selfBrowserLink() {
+      return this.toBrowserPath(this.url);
+    },
+    type() {
+      if (this.data instanceof STAC) {
+        if (this.data.isItem()) {
+          return this.$tc('stacItem');
+        }
+        else if (this.data.isCollection()) {
+          return this.$tc(`stacCollection`);
+        }
+        else if (this.data.isCatalog()) {
+          return this.$tc(`stacCatalog`);
+        }
+        else if (Utils.hasText(this.data.type)) {
+          return this.data.type;
+        }
+      }
+      return null;
+    },
+    collectionLinkTitle() {
+      if (this.collectionLink && Utils.hasText(this.collectionLink.title)) {
+        return this.$t('goToCollection.descriptionWithTitle', this.collectionLink);
+      }
+      else {
+        return this.$t('goToCollection.description');
+      }
+    },
+    parentLinkTitle() {
+      if (this.parentLink && Utils.hasText(this.parentLink.title)) {
+        return this.$t('goToParent.descriptionWithTitle', this.parentLink);
+      }
+      else {
+        return this.$t('goToParent.description');
+      }
+    },
+    icon() {
+      return this.getIcon(this.data);
+    },
+    logo() {
+      if (this.catalogImageFromVueX) {
+        return Utils.createLink(this.catalogImageFromVueX, 'icon', this.rootLink?.title);
+      }
+      else {
+        return this.getIcon(this.root);
+      }
     }
   },
   watch: {
     ...Watchers,
     title(title) {
+      if (this.root) {
+        const rootTitle = getDisplayTitle(this.root);
+        if (rootTitle !== title) {
+          title += ` - ${rootTitle}`;
+        }
+      }
       document.title = title;
+      document.getElementById('og-title').setAttribute("content", title);
     },
     description(description) {
-      let element = document.getElementById('meta-description');
-      if (element) {
-        element.setAttribute("content", Utils.summarizeMd(description, 200));
-      }
+      const summary = Utils.summarizeMd(description, 200);
+      document.getElementById('meta-description').setAttribute("content", summary);
+      document.getElementById('og-description').setAttribute("content", summary);
     },
     uiLanguage: {
       immediate: true,
@@ -145,18 +341,14 @@ export default {
           return;
         }
 
-        // Update stac-fields
-        I18N.locales = [locale];
-        I18N.translate = translateFields;
-
-        // Load messages
-        await loadMessages(locale);
-
         // Set the locale for vue-i18n
         this.$root.$i18n.locale = locale;
 
         // Update the HTML lang tag
         document.documentElement.setAttribute("lang", locale);
+        document.getElementById('og-locale').setAttribute("content", locale);
+
+        this.$root.$emit('uiLanguageChanged', locale);
       }
     },
     dataLanguage: {
@@ -179,15 +371,9 @@ export default {
             // A better way would be to combine the language code and URL as the index in the browser database
             // This needs a database refactor though: https://github.com/radiantearth/stac-browser/issues/231
             this.$store.commit('resetCatalog', true);
-            await this.$store.dispatch("load", { url, loadApi: true, show: true });
+            await this.$store.dispatch("load", { url, show: true });
           }
         }
-      }
-    },
-    catalogUrlFromVueX(url) {
-      if (url) {
-        // Load the root catalog data if not available (e.g. after page refresh or external access)
-        this.$store.dispatch("load", { url, loadApi: true });
       }
     },
     stateQueryParameters: {
@@ -227,8 +413,7 @@ export default {
         'crossOriginMedia',
         'defaultThumbnailSize',
         'displayGeoTiffByDefault',
-        'showThumbnailsAsAssets',
-        'stacLint' // can only be disabled
+        'showThumbnailsAsAssets'
       ];
 
       let doReset = !root || (oldRoot && Utils.isObject(oldRoot['stac_browser']));
@@ -242,15 +427,11 @@ export default {
         if (doSet && typeof root['stac_browser'][key] !== 'undefined') {
           value = root['stac_browser'][key]; // Custom value from root
         }
-        
-        // Don't enable stacLint if it has been disabled by default
-        if (key === 'stacLint' && !CONFIG.stacLint) {
-          continue;
-        }
 
-        // Commit config
+        // Update config in store
         if (typeof value !== 'undefined') {
-          this.$store.commit('config', { [key]: value });
+          this.$store.dispatch('config', { [key]: value })
+            .catch(error => console.error(error));
         }
       }
     },
@@ -263,7 +444,7 @@ export default {
       }
     }
   },
-  created() {
+  async created() {
     this.$router.onReady(() => {
       this.detectLocale();
       this.parseQuery(this.$route);
@@ -273,6 +454,10 @@ export default {
       if (to.path === from.path) {
         return;
       }
+
+      // Reset the callback for updating the data locale
+      // see https://github.com/radiantearth/stac-browser/issues/683
+      this.onDataLoaded = null;
 
       // Handle catalog change: https://github.com/radiantearth/stac-browser/issues/250
       let resetOp = 'resetPage';
@@ -285,7 +470,16 @@ export default {
 
       this.$store.commit(resetOp);
       this.parseQuery(to);
+
+      document.getElementById('og-url').setAttribute("content", window.location.href);
     });
+
+    const storage = new BrowserStorage(true);
+    const authConfig = storage.get('authConfig');
+    if (authConfig) {
+      storage.remove('authConfig');
+      await this.$store.dispatch('config', { authConfig });
+    }
   },
   mounted() {
     this.$root.$on('error', this.showError);
@@ -293,14 +487,38 @@ export default {
   },
   methods: {
     ...mapActions(['switchLocale']),
+    ...mapMutations('auth', ['addAction']),
+    ...mapActions('auth', ['requestLogin', 'requestLogout']),
+    getIcon(data) {
+      if (data instanceof STAC) {
+        const icons = data.getIcons();
+        if (icons.length > 0) {
+          return icons[0];
+        }
+      }
+      return null;
+    },
+    async logInOut() {
+      if (this.url) {
+        this.addAction(() => this.$store.dispatch("load", {
+          url: this.url,
+          show: true,
+          force: true,
+          noRetry: true
+        }));
+      }
+      if (this.isLoggedIn) {
+        await this.requestLogout();
+      }
+      else {
+        await this.requestLogin();
+      }
+    },
     detectLocale() {
       let locale;
       if (this.storeLocaleFromVueX) {
-        try {
-          locale = window.localStorage.getItem('locale');
-        } catch(error) {
-          console.error(error);
-        }
+        const storage = new BrowserStorage();
+        locale = storage.get('locale');
       }
       if (!locale && this.detectLocaleFromBrowserFromVueX && Array.isArray(navigator.languages)) {
         // Detect the most suitable locale
@@ -393,3 +611,4 @@ export default {
 @import "./theme/page.scss";
 @import "./theme/custom.scss";
 </style>
+

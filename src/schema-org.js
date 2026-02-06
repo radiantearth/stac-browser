@@ -1,5 +1,6 @@
 import Utils from './utils';
-import STAC from './models/stac';
+import { getDisplayTitle } from './models/stac';
+import { STAC } from 'stac-js';
 import URI from 'urijs';
 import i18n from './i18n';
 
@@ -11,7 +12,7 @@ function toBrowserUrl(url, store) {
     uri.fragment(path);
   }
   else {
-    uri.path(store.state.pathPrefix.replace(/\/$/, '') + path);
+    uri.path(Utils.removeTrailingSlash(store.state.pathPrefix) + path);
   }
   return uri.toString();
 }
@@ -30,7 +31,7 @@ function addSpatialCoverage(schema, bbox) {
 
 function formatTemporalCoverage(dates) {
   if (Array.isArray(dates) && dates.length === 2 && (typeof dates[0] === 'string' || typeof dates[1] === 'string')) {
-    return dates.map(dt => dt ? dt : '..').join('/');
+    return dates.map(dt => dt || '..').join('/');
   }
   return null;
 }
@@ -51,7 +52,7 @@ function makeLinks(links, data, store, type = "DataCatalog") {
   return links.map(link => {
     let name, isBasedOn;
     if (link instanceof STAC) {
-      name = STAC.getDisplayTitle(link);
+      name = getDisplayTitle(link);
       isBasedOn = link.getAbsoluteUrl();
     }
     else {
@@ -100,17 +101,17 @@ function fallbackDescription(data, store) {
 }
 
 function createBaseSchema(data, type, store) {
-  let name = STAC.getDisplayTitle(data);
+  let name = getDisplayTitle(data);
   let stacUrl = data.getAbsoluteUrl();
   let url = toBrowserUrl(stacUrl, store);
   let inLanguage = data.getMetadata('language')?.code;
   let thumbnails = data.getThumbnails(true);
   let thumbnailUrl;
   if (thumbnails.length > 0) {
-    thumbnailUrl = Utils.toAbsolute(thumbnails[0].href, data.getAbsoluteUrl());
+    thumbnailUrl = thumbnails[0].getAbsoluteUrl();
   }
   let license = data.getMetadata('license');
-  if (license && license !== 'proprietary' && license !== 'various') {
+  if (license && license !== 'proprietary' && license !== 'various' && license !== 'other') {
     license = `https://spdx.org/licenses/${license}.html`;
   }
   else {

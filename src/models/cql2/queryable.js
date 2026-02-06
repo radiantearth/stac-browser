@@ -96,7 +96,15 @@ export default class Queryable {
   }
 
   getOperators(cql) {
-    let ops = [CqlEqual, CqlNotEqual];
+    let ops = [];
+    if (!this.isDateTime) {
+      // Although it is supported, comparing specific instances in time doesn't give predictable results.
+      // For example 2020-01-01T00:00:00Z is not equal to 2020-01-01T00:00:00.001Z and you don't know the granularity
+      // of the datetimes in the database. In the end you usually don't get what you are looking for.
+      // This may work better for dates only, so we only remove equality operators for dates with times.
+      ops.push(CqlEqual);
+      ops.push(CqlNotEqual);
+    }
     if (this.isNumeric || this.isTemporal) {
       ops.push(CqlLessThan);
       ops.push(CqlLessThanEqual);

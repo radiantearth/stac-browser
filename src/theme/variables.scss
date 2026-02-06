@@ -3,11 +3,7 @@
 // Most of the variables below are Bootstrap variables, see https://getbootstrap.com/docs/4.0/getting-started/theming/ for details.
 // For simplicity we just provide some common options as default, but you can override all Bootstrap Sass variables.
 
-// Header / Logo, either image (see below), text (shows CATALOG_TITLE) or none
-$logo: 'none'; 
-// If 'image' has been chosen above
-$logo-image: 'https://raw.githubusercontent.com/radiantearth/stac-site/master/images/logo/stac-030-long.png';
-$logo-image-height: 100px;
+$logo-image-height: 2rem;
 
 // Background and text default colors
 $body-bg: white;
@@ -62,6 +58,9 @@ $link-hover-decoration: underline;
 
 // Margin between the main sections of the page (header, content, footer)
 $block-margin: 1rem;
+
+// Margin at the top of the page (for a custom header)
+$header-margin: 0px;
 
 // Border radius
 $border-radius: 0.25rem;

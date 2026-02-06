@@ -1,4 +1,8 @@
 {
   "native": "English",
-  "global": "English"
+  "global": "English",
+  "transliteration": null,
+  "customize": [
+    "stac-fields.js"
+  ]
 }

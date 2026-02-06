@@ -1,0 +1,269 @@
+{
+  "$comment": "Defines a JSON Schema for the config file. Note that JS functions are specified as type 'null' with format 'function'.",
+  "type": [
+    "object"
+  ],
+  "properties": {
+    "catalogUrl": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uri"
+    },
+    "catalogTitle": {
+      "type": [
+        "string"
+      ]
+    },
+    "allowExternalAccess": {
+      "type": [
+        "boolean"
+      ]
+    },
+    "allowedDomains": {
+      "type": [
+        "array"
+      ],
+      "items": {
+        "type": [
+          "string"
+        ]
+      }
+    },
+    "detectLocaleFromBrowser": {
+      "type": [
+        "boolean"
+      ]
+    },
+    "storeLocale": {
+      "type": [
+        "boolean"
+      ]
+    },
+    "locale": {
+      "type": [
+        "string"
+      ]
+    },
+    "fallbackLocale": {
+      "type": [
+        "string"
+      ]
+    },
+    "supportedLocales": {
+      "type": [
+        "array"
+      ],
+      "items": {
+        "type": [
+          "string"
+        ]
+      }
+    },
+    "apiCatalogPriority": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "collections",
+        "childs",
+        null
+      ]
+    },
+    "useTileLayerAsFallback": {
+      "type": [
+        "boolean"
+      ]
+    },
+    "displayGeoTiffByDefault": {
+      "type": [
+        "boolean"
+      ]
+    },
+    "displayPreview": {
+      "type": [
+        "boolean"
+      ]
+    },
+    "displayOverview": {
+      "type": [
+        "boolean"
+      ]
+    },
+    "buildTileUrlTemplate": {
+      "type": [
+        "null"
+      ],
+      "format": "function",
+      "noCLI": true,
+      "noEnv": true
+    },
+    "getMapSourceOptions": {
+      "type": [
+        "null"
+      ],
+      "format": "function",
+      "noCLI": true,
+      "noEnv": true
+    },
+    "pathPrefix": {
+      "type": [
+        "string"
+      ],
+      "buildOnly": true
+    },
+    "historyMode": {
+      "type": [
+        "string"
+      ],
+      "enum": [
+        "history",
+        "hash"
+      ],
+      "buildOnly": true
+    },
+    "cardViewMode": {
+      "type": [
+        "string"
+      ],
+      "enum": [
+        "list",
+        "cards"
+      ]
+    },
+    "cardViewSort": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "asc",
+        "desc",
+        null
+      ]
+    },
+    "showThumbnailsAsAssets": {
+      "type": [
+        "boolean"
+      ]
+    },
+    "searchResultsPerPage": {
+      "type": [
+        "integer"
+      ],
+      "minimum": 1
+    },
+    "itemsPerPage": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "collectionsPerPage": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "maxEntriesPerPage": {
+      "type": [
+        "integer"
+      ],
+      "minimum": 1
+    },
+    "defaultThumbnailSize": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": [
+          "number"
+        ]
+      }
+    },
+    "crossOriginMedia": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "anonymous",
+        "use-credentials",
+        "",
+        null
+      ]
+    },
+    "requestHeaders": {
+      "type": [
+        "object"
+      ]
+    },
+    "requestQueryParameters": {
+      "type": [
+        "object"
+      ]
+    },
+    "socialSharing": {
+      "type": [
+        "array"
+      ],
+      "items": {
+        "type": [
+          "string"
+        ]
+      }
+    },
+    "preprocessSTAC": {
+      "type": [
+        "null"
+      ],
+      "format": "function",
+      "noCLI": true,
+      "noEnv": true
+    },
+    "authConfig": {
+      "type": [
+        "object"
+      ],
+      "allOf": [
+        {
+          "$ref": "https://stac-extensions.github.io/authentication/v1.1.0/schema.json"
+        }
+      ]
+    },
+    "crs": {
+      "type": [
+        "object"
+      ]
+    },
+    "footerLinks": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "required": [
+          "label",
+          "url"
+        ]
+      }
+    }
+  }
+}

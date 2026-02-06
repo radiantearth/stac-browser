@@ -1,19 +1,24 @@
 <template>
   <section class="items mb-4">
-    <h2>
-      <span class="title">{{ $tc('stacItem', items.length ) }}</span>
-      <b-badge v-if="!api && items.length > 0" pill variant="secondary ml-2">{{ items.length }}</b-badge>
-      <SortButtons v-if="!api && items.length > 1" class="ml-4" v-model="sort" />
-    </h2>
+    <header>
+      <h2 class="title mr-2">{{ $tc('stacItem', items.length ) }}</h2>
+      <b-badge v-if="itemCount !== null" pill variant="secondary" class="mr-4">{{ itemCount }}</b-badge>
+      <SortButtons v-if="!api && items.length > 1" v-model="sort" />
+    </header>
 
-    <Pagination ref="topPagination" v-if="showPagination" :pagination="pagination" placement="top" @paginate="paginate" />
+    <Pagination
+      v-if="showPagination" ref="topPagination" class="mb-3" :class="{'mr-3': allowFilter}"
+      :pagination="pagination" placement="top" @paginate="paginate"
+    />
     <template v-if="allowFilter">
-      <b-button v-if="api" v-b-toggle.itemFilter class="mb-4 mt-2" :class="{'ml-3': showPagination}" :pressed="filtersOpen" variant="outline-primary">
-        <b-icon-search /> {{ $t('items.filter') }}
+      <b-button v-if="api" class="mb-3" v-b-toggle.itemFilter :variant="hasFilters && !filtersOpen ? 'primary' : 'outline-primary'">
+        <b-icon-search />
+        {{ filtersOpen ? $t('items.hideFilter') : $t('items.showFilter') }}
+        <b-badge v-if="hasFilters && !filtersOpen" variant="dark">{{ filterCount }}</b-badge>
       </b-button>
       <b-collapse id="itemFilter" v-model="filtersOpen">
         <SearchFilter
-          v-if="filtersOpen" type="Items"
+          type="Items"
           :title="$t('items.filter')" :parent="stac"
           :value="apiFilters" @input="emitFilter"
         />
@@ -22,16 +27,16 @@
 
     <section class="list">
       <Loading v-if="loading" fill top />
-      <b-card-group v-if="chunkedItems.length > 0" columns>
+      <div v-if="chunkedItems.length > 0" class="card-grid">
         <Item v-for="item in chunkedItems" :item="item" :key="item.href" />
-      </b-card-group>
+      </div>
       <b-alert v-else :variant="hasFilters ? 'warning' : 'info'" show>
         <template v-if="hasFilters">{{ $t('search.noItemsFound') }}</template>
         <template v-else>{{ $t('items.noneAvailableForCollection') }}</template>
       </b-alert>
     </section>
 
-    <Pagination v-if="showPagination" :pagination="pagination" @paginate="paginate" />
+    <Pagination v-if="showPagination" class="mb-3" :pagination="pagination" @paginate="paginate" />
     <b-button v-else-if="hasMore" @click="showMore" variant="primary" v-b-visible.300="showMore">{{ $t('showMore') }}</b-button>
   </section>
 </template>
@@ -42,7 +47,7 @@ import Loading from './Loading.vue';
 import Pagination from './Pagination.vue';
 import { BCollapse, BIconSearch } from "bootstrap-vue";
 import Utils from '../utils';
-import STAC from '../models/stac';
+import { getDisplayTitle } from '../models/stac';
 import { mapState } from 'vuex';
 
 export default {
@@ -77,6 +82,10 @@ export default {
       type: Boolean,
       default: true
     },
+    showFilters: {
+      type: Boolean,
+      default: false
+    },
     apiFilters: {
       type: Object,
       default: () => ({})
@@ -88,27 +97,44 @@ export default {
     chunkSize: {
       type: Number,
       default: 90
+    },
+    count: {
+      type: Number,
+      default: null
     }
   },
   data() {
     return {
       shownItems: this.chunkSize,
-      filtersOpen: false,
+      filtersOpen: this.showFilters,
       sort: 0
     };
   },
   computed: {
     ...mapState(['cardViewSort', 'uiLanguage']),
+    itemCount() {
+      if (this.count !== null) {
+        return this.count;
+      }
+      else if (!this.api && this.items.length > 0) {
+        return this.items.length;
+      }
+      return null;
+    },
     hasMore() {
       return this.items.length > this.shownItems;
     },
+    filterCount() {
+      return Object.values(this.apiFilters).filter(filter => !(filter === null || Utils.size(filter) === 0)).length;
+    },
     hasFilters() {
-      return Object.values(this.apiFilters).filter(filter => !(filter === null || Utils.size(filter) === 0)).length > 1; // > 1 as the limit is always present
+      return this.filterCount > 0;
     },
     chunkedItems() {
       let items = this.items;
-      if (this.sort !== 0) {
-        items = items.slice(0).sort((a,b) => STAC.getDisplayTitle(a).localeCompare(STAC.getDisplayTitle(b), this.uiLanguage));
+      if (!this.apiFilters.sortby && this.sort !== 0) {
+        const collator = new Intl.Collator(this.uiLanguage);
+        items = items.slice(0).sort((a,b) => collator.compare(getDisplayTitle(a), getDisplayTitle(b)));
         if (this.sort === -1) {
           items = items.reverse();
         }
@@ -133,8 +159,21 @@ export default {
       return false;
     }
   },
+  watch: {
+    showFilters() {
+      this.filter = this.showFilters;
+    },
+    filtersOpen() {
+      this.$emit('filtersShown', this.filtersOpen);
+    }
+  },
   created() {
-    this.sort = this.cardViewSort;
+    this.sort = Utils.convertHumanizedSortOrder(this.cardViewSort);
+  },
+  mounted() {
+    if (this.showFilters) {
+      setTimeout(() => Utils.scrollTo(this.$el), 250);
+    }
   },
   methods: {
     emitFilter(value, reset) {
@@ -152,18 +191,3 @@ export default {
   }
 };
 </script>
-
-<style lang="scss" scoped>
-.items {
-
-  .list {
-    position: relative;
-  }
-
-  > h2 {
-    .title, .badge {
-      vertical-align: middle;
-    }
-  }
-}
-</style>

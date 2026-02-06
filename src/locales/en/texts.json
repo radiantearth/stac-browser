@@ -1,12 +1,15 @@
 {
+  "actions": {
+    "openIn": "Open in {service}"
+  },
+  "additionalActions": "Additional Actions",
   "additionalResources": "Additional Resources",
   "anonymized": {
     "title": "Anonymized"
   },
   "assets": {
-    "copyGdalVfsUrl": {
-      "generic": "Copy GDAL VFS URL",
-      "withSource": "Copy GDAL VFS URL for {source}"
+    "alternate": {
+      "main": "Preferred"
     },
     "copyUrl": {
       "generic": "Copy URL",
@@ -28,12 +31,28 @@
   },
   "authentication": {
     "button": {
-      "authenticate": "Authenticate",
-      "authenticated": "Authenticated",
+      "login": "Log in",
+      "logout": "Log out",
       "title": "Provide or update your credentials"
     },
+    "chooseMethod": "Choose authentication method",
     "description": "The requested page requires authentication. Please provide your authentication details in the text field below.",
-    "title": "Authentication"
+    "loggedOut": "You've been logged out successfully. You can close this window now.",
+    "password": "Password",
+    "required": "Authentication required",
+    "schemeTypes": {
+      "http": "HTTP {scheme}",
+      "s3": "S3",
+      "signedUrl": "Signed URL",
+      "oauth2": "OAuth 2",
+      "apiKey": "API key",
+      "openIdConnect": "OpenID Connect"
+    },
+    "title": "Authentication",
+    "unauthorized": "You don't have permission to access this data. Please log in.",
+    "unsupported": "Unsupported",
+    "unsupportedLong": "Sorry, the authentication method {method} is not supported by STAC Browser.",
+    "user": "User"
   },
   "browse": "Browse",
   "cancel": "Cancel",
@@ -43,6 +62,7 @@
   },
   "catalogs": {
     "filterByTitle": "Filter catalogs by title",
+    "filterByTitleAndMore": "Filter catalogs by title, description or keywords",
     "loadMore": "Load more...",
     "noMatches": "No catalogs match the given search criteria."
   },
@@ -88,12 +108,24 @@
     "noExternalAccess": "Accessing external catalogs is not allowed!",
     "notFound": "The requested resource does not exist. @:errors.contactProvider",
     "serverError": "The server encountered an issue. @:errors.contactProvider",
+    "title": "Error",
     "unauthorized": "The request lacks credentials, e.g. an API token. Please provide your credentials and try again."
   },
   "featureExperimental": "This feature is still experimental and may give unexpected results!",
+  "features": {
+    "empty": "No features available.",
+    "noProperties": "No properties provided.",
+    "title": "Feature | Features"
+  },
   "fullscreen": {
-    "exit": "Exit Fullscreen",
-    "show": "View Fullscreen"
+    "exit": "Exit fullscreen mode",
+    "exitLabel": "✕",
+    "show": "Open in fullscreen mode",
+    "showLabel": "⛶"
+  },
+  "goBack": {
+    "description": "Go back to the {type}",
+    "label": "Back"
   },
   "goToCollection": {
     "description": "Go to the associated collection",
@@ -108,7 +140,7 @@
   "in": "in {catalog}",
   "index": {
     "api": "API",
-    "catalog": "Catalog",
+    "catalog": "Static Catalog",
     "load": "Load",
     "selectStacIndex": "... or select one from {stacIndex}:",
     "specifyCatalog": "Please specify a STAC Catalog or API...",
@@ -117,16 +149,37 @@
     "urlMissingProtocol": "The URL is missing a protocol."
   },
   "items": {
-    "filter": "Filter",
+    "filter": "Filters",
+    "hideFilter": "Hide Filters",
     "noTime": "No time given",
-    "noneAvailableForCollection": "No items available for this collection."
+    "noneAvailableForCollection": "No items available for this collection.",
+    "showFilter": "Show Filters"
   },
-  "leaflet": {
-    "close": "Close",
-    "noFeatureProperties": "No additional data available for this feature.",
-    "stayLayer": {
-      "error": "Sorry, adding the data to the map failed."
+  "loading": "Loading...",
+  "map": "Map",
+  "mapping": {
+    "attribution": {
+      "label": "i",
+      "description": "Attributions",
+      "collapseLabel": "✕"
     },
+    "bboxSelect": {
+      "add": "Click on the map to add a bounding box.",
+      "remove": "Click inside the bounding box to remove it."
+    },
+    "close": "Close",
+    "fit": "Fit to extent",
+    "layers": {
+      "title": "Layers",
+      "base": "Base Layers",
+      "unnamed": "Unnamed #{id}",
+      "footprint": "Footprint"
+    },
+    "location": {
+      "description": "Go to your location"
+    },
+    "nobasemap": "No basemaps available.",
+    "nodata": "No spatial information available in the metadata.",
     "zoom": {
       "in": {
         "description": "Zoom in",
@@ -134,12 +187,11 @@
       },
       "out": {
         "description": "Zoom out",
-        "label": "-"
+        "label": "–"
       }
     }
   },
-  "loading": "Loading...",
-  "map": "Map",
+  "messageForSchemaError": "{message}, for schema {schemaPath}",
   "metadata": {
     "general": "General",
     "title": "Metadata"
@@ -147,6 +199,7 @@
   "multiselect": {
     "andMore": "and {count} more",
     "deselectLabel": "Press enter to remove",
+    "keywordsPlaceholder": "Select keywords",
     "placeholder": "Select option",
     "selectLabel": "Press enter to select",
     "selectedLabel": "Selected"
@@ -165,7 +218,10 @@
     "ftp": "FTP",
     "gcs": "Google Cloud",
     "oss": "Alibaba Cloud",
-    "s3": "Amazon S3"
+    "s3": {
+      "amazonaws.com": "Amazon S3",
+      "default": "S3"
+    }
   },
   "providers": {
     "email": "Send e-mail",
@@ -182,10 +238,12 @@
     "less": "Read less",
     "more": "Read more"
   },
+  "reset": "Reset",
   "search": {
     "addCollections": "Press enter to add a collection",
     "addFilter": "Add filter",
     "addItemIds": "Press enter to add an Item ID",
+    "addSearchTerm": "Press enter to add a search term",
     "additionalFilters": "Additional filters",
     "between": "between",
     "betweenOperatorDescription": "Tests whether a numeric field value lies within the given range. The given range is inclusive.",
@@ -196,10 +254,12 @@
     "dateDescription": "All times in Coordinated Universal Time (UTC).",
     "enterCollections": "Enter one or more Collection IDs...",
     "enterItemIds": "Enter one or more Item IDs...",
+    "enterSearchTerms": "Enter one or more search terms...",
     "equalTo": "equal to",
     "filterBySpatialExtent": "Filter by spatial extent",
+    "filterCollection": "Filter Collection",
     "freeText": "Search Terms",
-    "freeTextDescription": "Search for the given text in fields such as the title and the description.",
+    "freeTextDescription": "Search for at least one of the given terms in fields such as the title and the description.",
     "greaterThan": "greater than",
     "greaterThanEqual": "greater than or equal to",
     "in": "included in",
@@ -217,6 +277,7 @@
     "matches": "matches",
     "metaDescription": "Search through the data offering of {title}.",
     "modifyCriteria": "Please modify the search criteria.",
+    "noFurtherItemsFound": "No further items available.",
     "noItemsFound": "No items found for the given filters.",
     "noOptions": "Nothing entered yet",
     "notEqualTo": "not equal to",
@@ -224,18 +285,15 @@
     "notSupported": "Item Search is not supported by the API.",
     "placeholder": "Search...",
     "selectCollections": "Select one or multiple collections...",
-    "sortOptions": {
-      "datetime": "Date and Time",
-      "id": "ID",
-      "title": "Title"
-    },
+    "selectForItemSearch": "Select for Item Search",
     "spatialExtent": "Spatial Extent",
     "tabs": {
       "collections": "Search for Collections",
       "items": "Search for Items"
     },
     "temporalExtent": "Temporal Extent",
-    "title": "Search"
+    "title": "Search",
+    "useInItemSearch": "Open Collection in Item Search | Open {count} Collections in Item Search"
   },
   "showMore": "Show more...",
   "sidebar": {
@@ -244,7 +302,7 @@
   "sort": {
     "asc": {
       "label": "Ascending",
-      "title": "Sort in acending order (A-Z)"
+      "title": "Sort in ascending order (A-Z)"
     },
     "desc": {
       "label": "Descending",
@@ -253,7 +311,12 @@
     "title": "Sort"
   },
   "source": {
+    "conformanceClasses": "Conformance Classes",
     "detailsAboutSource": "Details about the STAC source",
+    "extension": "Extension",
+    "fileFormat": "File Format",
+    "id": "ID",
+    "invalid": "Invalid",
     "label": "Source",
     "language": {
       "label": "Language: {currentLanguage}",
@@ -263,19 +326,50 @@
     },
     "locatedAt": "The STAC metadata file is located at:",
     "share": {
+      "bsky": "Bluesky",
       "email": "E-mail",
       "label": "Share",
+      "mastodon": "Mastodon.social",
       "message": "{title} is available at {url}",
       "sharePageWithOthers": "Share the URL of this page anywhere you like:",
       "title": "Share",
-      "twitter": "Twitter",
+      "x": "X (Twitter)",
       "withOthers": "Share this page with others"
     },
-    "stacVersion": "STAC Version:",
+    "stacExtension": "STAC Extension",
+    "stacVersion": "STAC Version",
+    "statistics": "Statistics",
     "title": "Source Data",
-    "valid": "Valid:",
+    "valid": "Valid",
     "validating": "Validating...",
-    "validationNA": "n/a"
+    "validationNA": "n/a",
+    "validationParams": {
+      "additionalProperty": "additional property",
+      "allowedValue": "allowed value",
+      "allowedValues": "allowed values",
+      "comparison": "comparison",
+      "depsCount": "count",
+      "exclusive": "excluding the boundary",
+      "failingKeyword": "failing keyword",
+      "format": "format",
+      "i": "first item",
+      "j": "second item",
+      "limit": "limit",
+      "maxContains": "contains at most",
+      "minContains": "contains at least",
+      "missingProperty": "missing property",
+      "multipleOf": "multiple of",
+      "passingSchemas": "passing schemas",
+      "pattern": "pattern",
+      "property": "property",
+      "propertyName": "property name",
+      "type": "type"
+    },
+    "validationReport": {
+      "disclaimer": "The validation report is generated based on schemas, which often are not exhaustive. As such they may not cover all aspects of the STAC specification and its extensions. The validation report is not a guarantee that the STAC entity is fully compliant with the specification and its extensions.",
+      "result": "Result",
+      "title": "Validation Report"
+    }
   },
   "stacAssets": "Asset | Assets",
   "stacCatalog": "Catalog | Catalogs",

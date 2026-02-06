@@ -9,7 +9,8 @@
       <span v-html="data.label" />
     </template>
     <template #cell()="data">
-      <span v-html="data.value" />
+      <Histogram v-if="data.field.key === 'histogram' && isObject(data.unformatted)" :data="data.unformatted" />
+      <span v-else v-html="data.value" />
     </template>
   </b-table>
 </template>
@@ -24,7 +25,8 @@ import { format } from '@radiantearth/stac-fields';
 export default {
   name: 'MetadataTable',
   components: {
-    BTable
+    BTable,
+    Histogram: () => import('./Histogram.vue')
   },
   mixins: [
     EntryMixin,
@@ -78,6 +80,9 @@ export default {
     }
   },
   methods: {
+    isObject(value) {
+      return Utils.isObject(value);
+    },
     formatCell(value, key, item) {
       let spec = this.items[key];
       // ToDo: Set context (third param)?

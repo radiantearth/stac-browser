@@ -5,9 +5,14 @@ export default {
     DatePicker: () => import('vue2-datepicker')
   },
   data() {
+    const dateFormat = 'YYYY-MM-DD';
+    const timeFormat = 'HH:mm:ss';
     return {
       datepickerLang: null,
-      datepickerFormat: 'YYYY-MM-DD'
+      dateFormat,
+      timeFormat,
+      dateTimeFormat: `${dateFormat} ${timeFormat}`,
+      twelveHourClock: false
     };
   },
   computed: {
@@ -21,13 +26,10 @@ export default {
           return;
         }
         const options = (await import(`../locales/${locale}/datepicker.js`)).default;
-        if (options.locale instanceof Promise) {
-          this.datepickerLang = (await options.locale).default;
-        }
-        else {
-          this.datepickerLang = options.locale;
-        }
-        this.datepickerFormat = options.format;
+        this.datepickerLang = options.locale;
+        this.dateFormat = options.dateFormat;
+        this.timeFormat = options.timeFormat;
+        this.dateTimeFormat = options.dateTimeFormat;
       }
     }
   }

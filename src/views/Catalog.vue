@@ -1,15 +1,16 @@
 <template>
-  <div :class="{cc: true, [data.type.toLowerCase()]: true, mixed: hasCatalogs && hasItems, empty: !hasCatalogs && !hasItems}" :key="data.id">
+  <div :class="{cc: true, [cssStacType]: true, empty: !hasCatalogs && !hasItems}" :key="data.id">
     <b-row>
       <b-col class="meta">
         <section class="intro">
           <h2>{{ $t('description') }}</h2>
-          <DeprecationNotice v-if="data.deprecated" :data="data" />
+          <DeprecationNotice v-if="showDeprecation" :data="data" />
           <AnonymizedNotice v-if="data['anon:warning']" :warning="data['anon:warning']" />
           <ReadMore v-if="data.description" :lines="10" :text="$t('read.more')" :text-less="$t('read.less')">
             <Description :description="data.description" />
           </ReadMore>
-          <Keywords v-if="Array.isArray(data.keywords) && data.keywords.length > 0" :keywords="data.keywords" />
+          <Keywords v-if="Array.isArray(data.keywords) && data.keywords.length > 0" :keywords="data.keywords" class="mb-3" />
+          <CollectionLink v-if="collectionLink" :link="collectionLink" />
           <section v-if="isCollection" class="metadata mb-4">
             <b-row v-if="licenses">
               <b-col md="4" class="label">{{ $t('catalog.license') }}</b-col>
@@ -20,13 +21,13 @@
               <b-col md="8" class="value"><span v-html="temporalExtents" /></b-col>
             </b-row>
           </section>
-          <Links v-if="linkPosition === 'left'" :title="$t('additionalResources')" :links="additionalLinks" />
+          <Links v-if="linkPosition === 'left'" :title="$t('additionalResources')" :links="additionalLinks" :context="data" />
         </section>
         <section v-if="isCollection || hasThumbnails" class="mb-4">
           <b-card no-body class="maps-preview">
             <b-tabs v-model="tab" ref="tabs" pills card vertical end>
               <b-tab v-if="isCollection" :title="$t('map')" no-body>
-                <Map :stac="data" :stacLayerData="mapData" @dataChanged="dataChanged" popover />
+                <Map :stac="data" v-bind="mapData" @changed="dataChanged" @empty="handleEmptyMap" onfocusOnly popover />
               </b-tab>
               <b-tab v-if="hasThumbnails" :title="$t('thumbnails')" no-body>
                 <Thumbnails :thumbnails="thumbnails" />
@@ -34,23 +35,25 @@
             </b-tabs>
           </b-card>
         </section>
-        <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="shownAssets" @showAsset="showAsset" />
-        <Assets v-if="hasItemAssets && !hasItems" :assets="data.item_assets" :definition="true" />
+        <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="selectedReferences" @showAsset="showAsset" />
+        <Assets v-if="hasItemAssets && !hasItems" :assets="itemAssets" :context="data" :definition="true" />
         <Providers v-if="providers" :providers="providers" />
-        <Metadata :title="$t('metadata.title')" class="mb-4" :type="data.type" :data="data" :ignoreFields="ignoredMetadataFields" />
-        <CollectionLink v-if="collectionLink" :link="collectionLink" />
-        <Links v-if="linkPosition === 'right'" :title="$t('additionalResources')" :links="additionalLinks" />
+        <Metadata class="mb-4" :type="data.type" :data="data" :ignoreFields="ignoredMetadataFields" />
+        <Links v-if="linkPosition === 'right'" :title="$t('additionalResources')" :links="additionalLinks" :context="data" />
       </b-col>
       <b-col class="catalogs-container" v-if="hasCatalogs">
         <Catalogs :catalogs="catalogs" :hasMore="!!nextCollectionsLink" @loadMore="loadMoreCollections" />
       </b-col>
-      <b-col class="items-container" v-if="hasItems">
+      <b-col class="items-container" v-if="hasItems || hasItemAssets">
         <Items
-          :stac="data" :items="items" :api="isApi" :apiFilters="filters"
+          :stac="data" :items="items" :api="isApi"
+          :showFilters="showFilters" :apiFilters="filters"
           :pagination="itemPages" :loading="apiItemsLoading"
+          :count="apiItemsNumberMatched"
           @paginate="paginateItems" @filterItems="filterItems"
+          @filtersShown="filtersShown"
         />
-        <Assets v-if="hasItemAssets" :assets="data.item_assets" :definition="true" />
+        <Assets v-if="hasItemAssets" :assets="itemAssets" :context="data" :definition="true" />
       </b-col>
     </b-row>
   </div>
@@ -62,12 +65,14 @@ import Catalogs from '../components/Catalogs.vue';
 import Description from '../components/Description.vue';
 import Items from '../components/Items.vue';
 import ReadMore from "vue-read-more-smooth";
-import ShowAssetMixin from '../components/ShowAssetMixin';
+import ShowAssetLinkMixin from '../components/ShowAssetLinkMixin';
 import StacFieldsMixin from '../components/StacFieldsMixin';
 import { formatLicense, formatTemporalExtents } from '@radiantearth/stac-fields/formatters';
 import { BTabs, BTab } from 'bootstrap-vue';
 import Utils from '../utils';
 import { addSchemaToDocument, createCatalogSchema } from '../schema-org';
+import { ItemCollection } from '../models/stac.js';
+import DeprecationMixin from '../components/DeprecationMixin.js';
 
 export default {
   name: "Catalog",
@@ -90,8 +95,9 @@ export default {
     Thumbnails: () => import('../components/Thumbnails.vue')
   },
   mixins: [
-    ShowAssetMixin,
-    StacFieldsMixin({ formatLicense, formatTemporalExtents })
+    ShowAssetLinkMixin,
+    StacFieldsMixin({ formatLicense, formatTemporalExtents }),
+    DeprecationMixin
   ],
   data() {
     return {
@@ -121,16 +127,28 @@ export default {
         'deprecated',
         // Special handling for the warning of the anonymized-location extension
         'anon:warning',
+        // Special handling for the stats extension
+        'stats:catalogs',
+        'stats:collections',
+        'stats:items',
+        // Special handling for auth
+        'auth:schemes',
         // Special handling for the STAC Browser config
         'stac_browser'
       ]
     };
   },
   computed: {
-    ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination', 'nextCollectionsLink']),
-    ...mapGetters(['additionalLinks', 'catalogs', 'collectionLink', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
-    hasThumbnails() {
-      return this.thumbnails.length > 0;
+    ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination', 'apiItemsNumberMatched', 'nextCollectionsLink', 'stateQueryParameters']),
+    ...mapGetters(['catalogs', 'collectionLink', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
+    cssStacType() {
+      if (Utils.hasText(this.data?.type)) {
+        return this.data?.type.toLowerCase();
+      }
+      return null;
+    },
+    showFilters() {
+      return Boolean(this.stateQueryParameters['itemFilterOpen']);
     },
     linkPosition() {
       if (this.additionalLinks.length === 0) {
@@ -147,7 +165,7 @@ export default {
       return this.getApiItemsLoading(this.data);
     },
     licenses() {
-      if (this.isCollection && this.data.license) {
+      if (this.data.license) {
         return this.formatLicense(this.data.license, null, null, this.data);
       }
       return null;
@@ -174,7 +192,13 @@ export default {
       return null;
     },
     hasItemAssets() {
-      return Utils.size(this.data?.item_assets) > 0;
+      return this.itemAssets.length > 0;
+    },
+    itemAssets() {
+      if (!this.data || !Utils.isObject(this.data.item_assets)) {
+        return [];
+      }
+      return Object.values(this.data.item_assets);
     },
     itemPages() {
       let pages = Object.assign({}, this.apiItemsPagination);
@@ -194,15 +218,20 @@ export default {
       return this.catalogs.length > 0;
     },
     mapData() {
-      if (this.selectedAsset) {
-        return this.selectedAsset;
+      const data = {};
+      if (this.selectedAssets.length > 0) {
+        data.assets = this.selectedAssets;
       }
       else {
-        return {
-          type: 'FeatureCollection',
-          features: this.items
-        };
+        const items = this.items.filter(item => item.type === 'Feature');
+        if (items.length > 0) {
+          data.children = new ItemCollection({
+            type: 'FeatureCollection',
+            features: items
+          });
+        }
       }
+      return data;
     }
   },
   watch: {
@@ -219,6 +248,9 @@ export default {
     }
   },
   methods: {
+    filtersShown(show) {
+        this.$store.commit('updateState', {type: 'itemFilterOpen', value: show ? 1 : null});
+    },
     loadMoreCollections() {
       this.$store.dispatch('loadNextApiCollections', {show: true});
     },
@@ -235,7 +267,7 @@ export default {
         this.$store.commit('resetApiItems', this.data.getApiItemsLink());
       }
       try {
-        await this.$store.dispatch('loadApiItems', {link: this.apiItemsLink, show: true, filters});
+        await this.$store.dispatch('loadApiItems', {link: this.data.getApiItemsLink(), show: true, filters});
       } catch (error) {
         let msg = reset ? this.$t('errors.loadItems') : this.$t('errors.loadFilteredItems');
         this.$root.$emit('error', error, msg);
@@ -250,107 +282,6 @@ export default {
 @import "../theme/variables.scss";
 
 #stac-browser .cc {
-  .items-container, .catalogs-container {
-    max-width: 50%;
-
-    .card-list {
-      flex-flow: column wrap;
-    }
-
-    .items, .catalogs {
-      .card-columns {
-        column-count: 1;
-
-        .thumbnail {
-          align-self: center;
-        }
-      }
-    }
-  }
-
-  &.catalog { // Catalog has items or catalogs
-    .items-container, .catalogs-container {
-      max-width: 100%;
-      
-      .items, .catalogs {
-        .card-columns {
-          @include media-breakpoint-up(sm) {
-            column-count: 2;
-          }
-          @include media-breakpoint-up(lg) {
-            column-count: 3;
-          }
-          @include media-breakpoint-up(xxl) {
-            column-count: 4;
-          }
-          @include media-breakpoint-up(xxxl) {
-            column-count: 6;
-          }
-        }
-      }
-    }
-  }
-
-  &.collection { // Collection has items or catalogs
-    .items-container, .catalogs-container {
-      .items, .catalogs {
-        .card-columns {
-          @include media-breakpoint-only(md) {
-            column-count: 2;
-          }
-          @include media-breakpoint-up(lg) {
-            column-count: 1;
-          }
-          @include media-breakpoint-up(xxl) {
-            column-count: 2;
-          }
-          @include media-breakpoint-up(xxxl) {
-            column-count: 3;
-          }
-        }
-      }
-    }
-  }
-
-  &.catalog.mixed { // Catalog has items and catalogs
-    .items-container, .catalogs-container {
-      .items, .catalogs {
-        .card-columns {
-          @include media-breakpoint-up(lg) {
-            column-count: 1;
-          }
-          @include media-breakpoint-up(xl) {
-            column-count: 2;
-          }
-          @include media-breakpoint-up(xxl) {
-            column-count: 3;
-          }
-        }
-      }
-    }
-  }
-
-  &.collection.mixed { // Collection has items and catalogs
-    .items-container, .catalogs-container {
-      max-width: 33%;
-
-      
-      .items, .catalogs {
-        .card-columns {
-          @include media-breakpoint-up(lg) {
-            column-count: 1;
-          }
-          @include media-breakpoint-up(xxl) {
-            column-count: 2;
-          }
-          @include media-breakpoint-up(xxxl) {
-            column-count: 3;
-          }
-        }
-      }
-    }
-  }
-
   .meta {
     min-width: 100%;
     margin-bottom: $block-margin;

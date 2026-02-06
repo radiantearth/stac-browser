@@ -1,74 +1,84 @@
-import { CRS } from 'leaflet';
-import STAC from './src/models/stac';
-import Utils from './src/utils';
+import { Collection } from './src/models/stac';
+import { STAC } from 'stac-js'
 
-const USGS_ATTRIBUTION = 'USGS Astrogeology';
-const WMS = 'LWMSTileLayer';
-const XYZ = 'LTileLayer';
+// For documentation see https://github.com/radiantearth/stac-browser/blob/main/docs/basemaps.md
 
 const BASEMAPS = {
-  earth: {
-    url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    name: 'OpenStreetMap',
-    is: XYZ,
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors.'
-  },
-  europa: {
-    baseUrl: 'https://planetarymaps.usgs.gov/cgi-bin/mapserv?map=/maps/jupiter/europa_simp_cyl.map',
-    is: WMS,
-    name: 'USGS Europa',
-    attribution: USGS_ATTRIBUTION,
-    crs: CRS.EPSG4326,
-    format: 'image/png',
-    layers: 'GALILEO_VOYAGER'
-  },
-  mars: {
-    baseUrl: 'https://planetarymaps.usgs.gov/cgi-bin/mapserv?map=/maps/mars/mars_simp_cyl.map',
-    is: WMS,
-    name: 'USGS Mars',
-    attribution: USGS_ATTRIBUTION,
-    crs: CRS.EPSG4326,
-    format: 'image/png',
-    layers: 'MDIM21'
-  },
-  moon: {
-    baseUrl: 'https://planetarymaps.usgs.gov/cgi-bin/mapserv?map=/maps/earth/moon_simp_cyl.map',
-    is: WMS,
-    name: 'USGS Moon',
-    attribution: USGS_ATTRIBUTION,
-    crs: CRS.EPSG4326,
-    format: 'image/png',
-    layers: 'LROC_WAC'
-  }
+  earth: [
+    {
+      url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+      is: 'XYZ',
+      title: 'OpenStreetMap',
+      attributions: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors.',
+      projection: "EPSG:3857"
+    }
+  ],
+  europa: [
+    {
+      url: 'https://planetarymaps.usgs.gov/cgi-bin/mapserv?map=/maps/jupiter/europa_simp_cyl.map',
+      is: 'TileWMS',
+      title: 'USGS Europa',
+      attributions: 'USGS Astrogeology',
+      projection: 'EPSG:4326',
+      params: {
+        FORMAT: 'image/png',
+        LAYERS: 'GALILEO_VOYAGER'
+      }
+    },
+  ],
+  mars: [
+    {
+      url: 'https://planetarymaps.usgs.gov/cgi-bin/mapserv?map=/maps/mars/mars_simp_cyl.map',
+      is: 'TileWMS',
+      title: 'USGS Mars',
+      attributions: 'USGS Astrogeology',
+      projection: 'EPSG:4326',
+      params: {
+        FORMAT: 'image/png',
+        LAYERS: 'MDIM21'
+      }
+    }
+  ],
+  moon: [
+    {
+      url: 'https://planetarymaps.usgs.gov/cgi-bin/mapserv?map=/maps/earth/moon_simp_cyl.map',
+      is: 'TileWMS',
+      title: 'USGS Moon',
+      attributions: 'USGS Astrogeology',
+      projection: 'EPSG:4326',
+      params: {
+        FORMAT: 'image/png',
+        LAYERS: 'LROC_WAC'
+      }
+    }
+  ],
 };
-
-/**
- * @typedef BasemapOptions
- * @type {Object}
- * @property {string} is Component: LWMSTileLayer or LTileLayer
- * @see https://vue2-leaflet.netlify.app/components/
- */
 
 /**
  * 
  * @param {Object} stac The STAC object
- * @param {Object} map The Leaflet map object
  * @param {Object} i18n Vue I18N object
  * @returns {Array.<BasemapOptions>}
  */
-export default function configureBasemap(stac, map, i18n) {
-  let targets = ['earth'];
-  if (stac instanceof STAC) {
-    if (stac.isCollection() && Utils.isObject(stac.summaries) && Array.isArray(stac.summaries['ssys:targets'])) {
-      targets = stac.summaries['ssys:targets'];
-    }
-    else if (stac.isCollection() && Array.isArray(stac['ssys:targets'])) {
-      targets = stac['ssys:targets'];
-    }
-    else if (stac.isItem() && Array.isArray(stac.properties['ssys:targets'])) {
-      targets = stac.properties['ssys:targets'];
-    }
+export default function configureBasemap(stac, i18n) {
+  let targets;
+  if (stac instanceof Collection) {
+    targets = stac.getSummary('ssys:targets');
+  }
+  if (stac instanceof STAC && !targets) {
+    targets = stac.getMetadata('ssys:targets');
+  }
+  if (!targets) {
+    targets = ['earth'];
   }
 
-  return targets.map(target => BASEMAPS[target.toLowerCase()]);
+  let layers = [];
+  for (const target of targets) {
+    const maps = BASEMAPS[target.toLowerCase()];
+    if (!Array.isArray(maps)) {
+      continue;
+    }
+    layers = layers.concat(maps);
+  }
+  return layers;
 };

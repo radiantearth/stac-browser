@@ -6,51 +6,50 @@
 
         <b-card-title v-if="title" :title="title" />
 
-        <b-form-group v-if="canFilterFreeText" :label="$t('search.freeText')" :label-for="ids.q" :description="$t('search.freeTextDescription')">
-          <b-form-input :id="ids.q" :value="query.q" @change="setSearchTerms" />
-        </b-form-group>
-
-        <b-form-group v-if="canFilterExtents" :label="$t('search.temporalExtent')" :label-for="ids.datetime" :description="$t('search.dateDescription')">
-          <date-picker
-            range :id="ids.datetime" :lang="datepickerLang" :format="datepickerFormat"
-            :value="query.datetime" @input="setDateTime" input-class="form-control mx-input"
-          />
-        </b-form-group>
-
-        <b-form-group v-if="canFilterExtents" :label="$t('search.spatialExtent')" :label-for="ids.bbox">
-          <b-form-checkbox :id="ids.bbox" v-model="provideBBox" value="1" @change="setBBox()">{{ $t('search.filterBySpatialExtent') }}</b-form-checkbox>
-          <Map class="mb-4" v-if="provideBBox" :stac="stac" selectBounds @bounds="setBBox" scrollWheelZoom />
-        </b-form-group>
-
-        <b-form-group v-if="conformances.CollectionIdFilter" :label="$tc('stacCollection', collections.length)" :label-for="ids.collections">
+        <b-form-group v-if="canFilterFreeText" class="filter-freetext" :label="$t('search.freeText')" :label-for="ids.q" :description="$t('search.freeTextDescription')">
           <multiselect
-            v-if="collections.length > 0"
-            :id="ids.collections" :value="selectedCollections" @input="setCollections"
-            :placeholder="$t('search.selectCollections')"
-            :tagPlaceholder="$t('search.addCollections')"
-            :selectLabel="$t('multiselect.selectLabel')"
-            :selectedLabel="$t('multiselect.selectedLabel')"
-            :deselectLabel="$t('multiselect.deselectLabel')"
-            :limitText="limitText"
-            :options="collections" multiple track-by="value" label="text"
-          />
-          <multiselect
-            v-else
-            :id="ids.collections" :value="selectedCollections" @input="setCollections"
-            multiple taggable :options="query.collections"
-            :placeholder="$t('search.enterCollections')"
-            :tagPlaceholder="$t('search.addCollections')"
-            :selectLabel="$t('multiselect.selectLabel')"
-            :selectedLabel="$t('multiselect.selectedLabel')"
-            :deselectLabel="$t('multiselect.deselectLabel')"
-            :limitText="limitText"
-            @tag="addCollection"
+            :id="ids.q" :value="query.q" @input="setSearchTerms"
+            multiple taggable :options="query.ids"
+            :placeholder="$t('search.enterSearchTerms')"
+            :tagPlaceholder="$t('search.addSearchTerm')"
+            :noOptions="$t('search.addSearchTerm')"
+            @tag="addSearchTerm"
           >
             <template #noOptions>{{ $t('search.noOptions') }}</template>
           </multiselect>
         </b-form-group>
 
-        <b-form-group v-if="conformances.ItemIdFilter" :label="$t('search.itemIds')" :label-for="ids.ids">
+        <b-form-group v-if="canFilterExtents" class="filter-datetime" :label="$t('search.temporalExtent')" :label-for="ids.datetime" :description="$t('search.dateDescription')">
+          <date-picker
+            range type="datetime" v-model="datetime" input-class="form-control mx-input"
+            :id="ids.datetime" :lang="datepickerLang" :format="dateTimeFormat"
+          />
+        </b-form-group>
+
+        <b-form-group v-if="canFilterExtents" class="filter-bbox" :label="$t('search.spatialExtent')" :label-for="ids.bbox">
+          <b-form-checkbox :id="ids.bbox" v-model="provideBBox" value="1">{{ $t('search.filterBySpatialExtent') }}</b-form-checkbox>
+          <MapSelect class="mb-4" v-if="provideBBox" v-model="query.bbox" :stac="stac" />
+        </b-form-group>
+
+        <b-form-group v-if="conformances.CollectionIdFilter" class="filter-collection" :label="$tc('stacCollection', collections.length)" :label-for="ids.collections">
+          <multiselect
+            v-bind="collectionSelectOptions"
+            @input="setCollections"
+            @tag="addCollection"
+            @search-change="searchCollections"
+          >
+            <template #noOptions>{{ $t('search.noOptions') }}</template>
+            <template v-if="additionalCollectionCount > 0" #afterList>
+              <li>
+                <strong class="multiselect__option multiselect__option--disabled">
+                  {{ $t("multiselect.andMore", {count: additionalCollectionCount}) }}
+                </strong>
+              </li>
+            </template>
+          </multiselect>
+        </b-form-group>
+
+        <b-form-group v-if="conformances.ItemIdFilter" class="filter-item-id" :label="$t('search.itemIds')" :label-for="ids.ids">
           <multiselect
             :id="ids.ids" :value="query.ids" @input="setIds"
             multiple taggable :options="query.ids"
@@ -63,34 +62,32 @@
           </multiselect>
         </b-form-group>
 
-        <div class="additional-filters" v-if="showAdditionalFilters">
-          <b-form-group :label="$t('search.additionalFilters')">
-            <b-form-radio-group v-model="filtersAndOr" :options="andOrOptions" name="logical" size="sm" />
+        <b-form-group v-if="showAdditionalFilters" class="additional-filters" :label="$t('search.additionalFilters')">
+          <b-form-radio-group v-model="filtersAndOr" :options="andOrOptions" name="logical" size="sm" />
 
-            <b-dropdown size="sm" :text="$t('search.addFilter')" block variant="primary" class="queryables mt-2 mb-3" menu-class="w-100">
-              <template v-for="queryable in sortedQueryables">
-                <b-dropdown-item v-if="queryable.supported" :key="queryable.id" @click="additionalFieldSelected(queryable)">
-                  {{ queryable.title }}
-                  <b-badge variant="dark" class="ml-2">{{ queryable.id }}</b-badge>
-                </b-dropdown-item>
-              </template>
-            </b-dropdown>
+          <b-dropdown size="sm" :text="$t('search.addFilter')" block variant="primary" class="queryables mt-2 mb-3" menu-class="w-100">
+            <template v-for="queryable in sortedQueryables">
+              <b-dropdown-item v-if="queryable.supported" :key="queryable.id" @click="additionalFieldSelected(queryable)" link-class="d-flex justify-content-between align-items-center">
+                <span>{{ queryable.title }}</span>
+                <b-badge variant="dark" class="ml-2">{{ queryable.id }}</b-badge>
+              </b-dropdown-item>
+            </template>
+          </b-dropdown>
 
-            <QueryableInput
-              v-for="(filter, index) in filters" :key="filter.id"
-              :value.sync="filter.value"
-              :operator.sync="filter.operator"
-              :queryable="filter.queryable"
-              :index="index"
-              :cql="cql"
-              @remove-queryable="removeQueryable(index)"
-            />
-          </b-form-group>
-        </div>
+          <QueryableInput
+            v-for="(filter, index) in filters" :key="filter.id"
+            :value.sync="filter.value"
+            :operator.sync="filter.operator"
+            :queryable="filter.queryable"
+            :index="index"
+            :cql="cql"
+            @remove-queryable="removeQueryable(index)"
+          />
+        </b-form-group>
 
         <hr v-if="canFilterExtents || conformances.CollectionIdFilter || conformances.ItemIdFilter || showAdditionalFilters">
 
-        <b-form-group v-if="canSort" :label="$t('sort.title')" :label-for="ids.sort" :description="$t('search.notFullySupported')">
+        <b-form-group v-if="canSort" class="sort" :label="$t('sort.title')" :label-for="ids.sort" :description="$t('search.notFullySupported')">
           <multiselect
             :id="ids.sort" :value="sortTerm" @input="sortFieldSet"
             :options="sortOptions" track-by="value" label="text"
@@ -98,21 +95,28 @@
             :selectLabel="$t('multiselect.selectLabel')"
             :selectedLabel="$t('multiselect.selectedLabel')"
             :deselectLabel="$t('multiselect.deselectLabel')"
-          />
+          >
+            <template #option="{option}">
+              <span class="d-flex justify-content-between align-items-center">
+                <span>{{ option.text }}</span>
+                <b-badge v-if="option.value" variant="dark" class="ml-2">{{ option.value }}</b-badge>
+              </span>
+            </template>
+          </multiselect>
           <SortButtons v-if="sortTerm && sortTerm.value" class="mt-1" :value="sortOrder" enforce @input="sortDirectionSet" />
         </b-form-group>
 
-        <b-form-group :label="$t('search.itemsPerPage')" :label-for="ids.limit" :description="$t('search.itemsPerPageDescription', {maxItems})">
+        <b-form-group class="limit" :label="$t('search.itemsPerPage')" :label-for="ids.limit" :description="$t('search.itemsPerPageDescription', {maxItems})">
           <b-form-input
             :id="ids.limit" :value="query.limit" @change="setLimit" min="1"
             :max="maxItems" type="number"
-            :placeholder="$t('defaultWithValue', {value: itemsPerPage})"
+            :placeholder="limitPlaceholder"
           />
         </b-form-group>
       </b-card-body>
       <b-card-footer>
-        <b-button type="submit" variant="primary">{{ $t('search.buttons.filter') }}</b-button>
-        <b-button type="reset" variant="danger" class="ml-3">{{ $t('search.buttons.reset') }}</b-button>
+        <b-button type="submit" variant="primary">{{ $t('submit') }}</b-button>
+        <b-button type="reset" variant="danger" class="ml-3">{{ $t('reset') }}</b-button>
       </b-card-footer>
     </b-card>
   </b-form>
@@ -121,27 +125,27 @@
 <script>
 import { BBadge, BDropdown, BDropdownItem, BForm, BFormGroup, BFormInput, BFormCheckbox, BFormRadioGroup } from 'bootstrap-vue';
 import Multiselect from 'vue-multiselect';
-import { mapState } from "vuex";
+import { mapGetters, mapState } from "vuex";
 import refParser from '@apidevtools/json-schema-ref-parser';
 
 import Utils, { schemaMediaType } from '../utils';
 import { ogcQueryables } from "../rels";
 
-import ApiCapabilitiesMixin from './ApiCapabilitiesMixin';
+import ApiCapabilitiesMixin, { TYPES } from './ApiCapabilitiesMixin';
 import DatePickerMixin from './DatePickerMixin';
 import Loading from './Loading.vue';
 
-import STAC from '../models/stac';
+import { CatalogLike, STAC } from 'stac-js';
+import { createSTAC } from '../models/stac'; 
 import Cql from '../models/cql2/cql';
 import Queryable from '../models/cql2/queryable';
 import CqlValue from '../models/cql2/value';
 import CqlLogicalOperator from '../models/cql2/operators/logical';
-import { CqlEqual } from '../models/cql2/operators/comparison';
 import { stacRequest } from '../store/utils';
 
 function getQueryDefaults() {
   return {
-    q: null,
+    q: [],
     datetime: null,
     bbox: null,
     limit: null,
@@ -157,6 +161,8 @@ function getDefaults() {
     sortOrder: 1,
     sortTerm: null,
     provideBBox: false,
+    // Store previous bbox so that it survives when the map is temporarily hidden
+    bbox: null,
     query: getQueryDefaults(),
     filtersAndOr: 'and',
     filters: [],
@@ -179,7 +185,7 @@ export default {
     BFormRadioGroup,
     QueryableInput: () => import('./QueryableInput.vue'),
     Loading,
-    Map: () => import('./Map.vue'),
+    MapSelect: () => import('./maps/MapSelect.vue'),
     SortButtons: () => import('./SortButtons.vue'),
     Multiselect
   },
@@ -190,7 +196,7 @@ export default {
   props: {
     parent: {
       type: Object,
-      required: true
+      default: null
     },
     title: {
       type: String,
@@ -208,14 +214,45 @@ export default {
   data() {
     return Object.assign({
       results: null,
-      maxItems: 10000,
       loaded: false,
       queryables: null,
-      collections: []
+      hasAllCollections: false,
+      collections: [],
+      collectionsLoadingTimer: null,
+      additionalCollectionCount: 0
     }, getDefaults());
   },
   computed: {
-    ...mapState(['apiCollections', 'nextCollectionsLink', 'itemsPerPage', 'uiLanguage']),
+    ...mapState(['searchResultsPerPage', 'maxEntriesPerPage', 'uiLanguage']),
+    ...mapGetters(['canSearchCollections', 'supportsConformance']),
+    collectionSelectOptions() {
+      let taggable = !this.hasAllCollections;
+      let isResult = this.collections.length > 0 && !this.hasAllCollections;
+      return {
+        id: this.ids.collections,
+        value: this.selectedCollections,
+        multiple: true,
+        taggable,
+        options: this.collections, // query.collections
+        trackBy: "value",
+        label: "text",
+        placeholder: taggable ? this.$t('search.enterCollections') : this.$t('search.selectCollections'),
+        tagPlaceholder: this.$t('search.addCollections'),
+        selectLabel: this.$t('multiselect.selectLabel'),
+        selectedLabel: this.$t('multiselect.selectedLabel'),
+        deselectLabel: this.$t('multiselect.deselectLabel'),
+        limitText: count => this.$t("multiselect.andMore", {count}),
+        loading: this.collectionsLoadingTimer !== null,
+        showNoResults: false,
+        internalSearch: !isResult
+      };
+    },
+    collectionSearchLink() {
+      return this.parent instanceof CatalogLike && this.parent.getApiCollectionsLink();
+    },
+    canSearchCollectionsFreeText() {
+      return this.canSearchCollections && this.supportsConformance(TYPES.Collections.FreeText);
+    },
     ids() {
       let obj = {};
       ['q', 'datetime', 'bbox', 'collections', 'ids', 'sort', 'limit']
@@ -230,44 +267,99 @@ export default {
     },
     andOrOptions() {
       return [
-        { value: 'and', text: this.$i18n.t('search.logical.and') },
-        { value: 'or', text: this.$i18n.t('search.logical.or') },
+        { value: 'and', text: this.$t('search.logical.and') },
+        { value: 'or', text: this.$t('search.logical.or') },
       ];
     },
     showAdditionalFilters() {
       return this.cql && Array.isArray(this.queryables) && this.queryables.length > 0;
     },
     sortOptions() {
-      return [
-        { value: null, text: this.$t('default') },
-        { value: 'properties.datetime', text: this.$t('search.sortOptions.datetime') },
-        { value: 'id', text: this.$t('search.sortOptions.id') },
-        { value: 'properties.title', text: this.$t('search.sortOptions.title') }
+      // todo: this should use queryables when available
+      // nevertheless, let's try to provide some reasonable defaults
+      const criteria = [
+        { text: this.$t('default'), value: null },
+        { text: this.$t('fields.Identifier'), value: 'id' },
       ];
+      const prefix = this.type === 'Collections' ? '' : 'properties.';
+      criteria.push({ text: this.$t('fields.Title'), value: `${prefix}title` });
+      if (this.type !== 'Collections') {
+        criteria.push({ text: this.$t('fields.Time of Data'), value: 'properties.datetime' });
+      }
+      criteria.push({ text: this.$t('fields.Created'), value: `${prefix}created` });
+      criteria.push({ text: this.$t('fields.Updated'), value: `${prefix}updated` });
+      return criteria;
     },
     sortedQueryables() {
-      return this.queryables.slice(0).sort((a, b) => a.title.localeCompare(b.title));
+      if (!Array.isArray(this.queryables)) {
+        return [];
+      }
+      const collator = new Intl.Collator(this.uiLanguage);
+      return this.queryables.slice(0).sort((a, b) => collator.compare(a.title, b.title));
+    },
+    maxItems() {
+      return this.maxEntriesPerPage || 1000;
+    },
+    limitPlaceholder() {
+      if (this.searchResultsPerPage > 0) {
+        return this.$t('defaultWithValue', {value: this.searchResultsPerPage});
+      }
+      return this.$t('default');
+    },
+    datetime: {
+      get() {
+        return Array.isArray(this.query.datetime) ? this.query.datetime.map(d => Utils.dateFromUTC(d)) : null;
+      },
+      set(val) {
+        this.query.datetime = Array.isArray(val) ? val.map(d => Utils.dateToUTC(d)) : null;
+      }
     }
   },
   watch: {
-    apiCollections: {
+    parent: {
       immediate: true,
-      handler() {
-        if (!Array.isArray(this.apiCollections) || this.nextCollectionsLink || !this.conformances.CollectionIdFilter) {
-          this.collections = [];
-          return;
+      handler(newStac, oldStac) {
+        if (newStac instanceof STAC) {
+          newStac.setApiDataListener('searchfilter' + formId, () => this.updateApiCollections());
         }
-        this.collections = this.prepareCollections(this.apiCollections);
+        if (oldStac instanceof STAC) {
+          oldStac.setApiDataListener('searchfilter' + formId);
+        }
+        this.updateApiCollections();
       }
     },
     value: {
       immediate: true,
+      deep: true,
       handler(value) {
-        let query = Object.assign(getQueryDefaults(), value);
-        if (Array.isArray(query.datetime)) {
-          query.datetime = query.datetime.map(Utils.dateFromUTC);
+        this.query = Object.assign(getQueryDefaults(), value);
+        if (this.collections.length > 0 && this.hasAllCollections) {
+          this.selectedCollections = this.collections.filter(c => this.query.collections.includes(c.value));
         }
-        this.query = query;
+        else {
+          this.selectedCollections = this.query.collections.map(id => {
+            let collection = this.selectedCollections.find(c => c.value === id);
+            return collection ? collection : this.collectionToMultiSelect({id});
+          });
+        }
+      }
+    },
+    query: {
+      deep: true,
+      handler(query) {
+        if (query?.bbox) {
+          // Store the previously selected bbox so that it can be restored after the
+          // map had been hidden accidentally.
+          this.bbox = query.bbox;
+        }
+      }
+    },
+    provideBBox(shown) {
+      if (!shown) {
+        this.query.bbox = null;
+      }
+      else {
+        this.query.bbox = this.bbox;
       }
     }
   },
@@ -276,7 +368,7 @@ export default {
   },
   created() {
     let promises = [];
-    if (this.cql && this.stac) {
+    if (this.cql && this.stac && this.type !== 'Collections') {
       let queryableLink = this.findQueryableLink(this.stac.links);
       promises.push(
         this.loadQueryables(queryableLink)
@@ -288,6 +380,9 @@ export default {
         this.loadCollections(this.stac.getApiCollectionsLink())
           .then(({collections, queryableLink}) => {
             this.collections = collections;
+            if (this.collections.length > 0) {
+              this.hasAllCollections = true;
+            }
             return this.loadQueryables(queryableLink);
           })
           .catch(error => console.error(error))
@@ -296,6 +391,40 @@ export default {
     Promise.all(promises).finally(() => this.loaded = true);
   },
   methods: {
+    resetSearchCollection() {
+      clearTimeout(this.collectionsLoadingTimer);
+      this.collectionsLoadingTimer = null;
+    },
+    searchCollections(text) {
+      if (!this.canSearchCollectionsFreeText || this.hasAllCollections) {
+        return;
+      }
+      this.resetSearchCollection();
+      this.additionalCollectionCount = 0;
+      if (typeof text !== 'string' || text.trim().length < 2) {
+        this.collections = [];
+        return;
+      }
+      this.collectionsLoadingTimer = setTimeout(async () => {
+        try {
+          const link = Utils.addFiltersToLink(this.collectionSearchLink, {q: [text]});
+          const response = await stacRequest(this.$store, link);
+          // Only set collections if response is valid AND collectionsLoadingTimer has not been reset.
+          // If collectionsLoadingTimer has been reset, the result is not relevant anylonger.
+          if (this.collectionsLoadingTimer && Utils.isObject(response.data) && Array.isArray(response.data.collections)) {
+            this.collections = this.prepareCollections(response.data.collections);
+            if (typeof response.data.numberMatched === 'number') {
+              this.additionalCollectionCount = response.data.numberMatched - this.collections.length;
+            }
+          }
+        } catch (error) {
+          console.error(error);
+          this.collections = [];
+        } finally {
+          this.resetSearchCollection();
+        }
+      }, 250);
+    },
     async loadCollections(link) {
       let hasMore = false;
       let data = {
@@ -303,9 +432,9 @@ export default {
         queryableLink: null
       };
 
-      if (this.type === 'Global' && this.apiCollections) {
-        data.collections = this.apiCollections;
-        hasMore = Boolean(this.nextCollectionsLink);
+      if (this.type === 'Global' && this.collections) {
+        data.collections = this.collections;
+        hasMore = false;
       }
       else if (this.type === 'Global' || this.type === 'Collections') {
         let response = await stacRequest(this.$store, link);
@@ -319,21 +448,41 @@ export default {
           data.queryableLink = this.findQueryableLink(links) || null;
         }
 
+        // todo: use ItemCollection / CollectionCollection
         if (!hasMore && Array.isArray(response.data.collections)) {
           let collections = response.data.collections
-            .map(collection => new STAC(collection));
+            .map(collection => createSTAC(collection));
           data.collections = this.prepareCollections(collections);
         }
       }
       return data;
     },
+    updateApiCollections() {
+      if (!this.parent) {
+        return;
+      }
+      let apiCollections = this.parent.getChildren('collections');
+      let nextCollectionsLink = this.parent._apiChildren.next;
+      if (!Array.isArray(apiCollections) || nextCollectionsLink || !this.conformances.CollectionIdFilter) {
+        this.collections = [];
+        return;
+      }
+      this.collections = this.prepareCollections(apiCollections);
+      if (this.collections.length > 0) {
+        this.hasAllCollections = true;
+      }
+    },
+    collectionToMultiSelect(c) {
+      return {
+        value: c.id,
+        text: c.title || c.id
+      };
+    },
     prepareCollections(collections) {
+      const collator = new Intl.Collator(this.uiLanguage);
       return collections
-        .map(c => ({
-          value: c.id,
-          text: c.title || c.id
-        }))
-        .sort((a,b) => a.text.localeCompare(b.text, this.uiLanguage));
+        .map(this.collectionToMultiSelect)
+        .sort((a,b) => collator.compare(a.text, b.text));
     },
     findQueryableLink(links) {
       return Utils.getLinksWithRels(links, ogcQueryables)
@@ -365,9 +514,6 @@ export default {
           .map(([key, schema]) => new Queryable(key, schema));
       }
     },
-    limitText(count) {
-      return this.$t("multiselect.andMore", {count});
-    },
     sortFieldSet(value) {
       this.sortTerm = value;
     },
@@ -386,9 +532,10 @@ export default {
       this.filters.splice(queryableIndex, 1);
     },
     additionalFieldSelected(queryable) {
+      const operators = queryable.getOperators(this.cql);
       this.filters.push({
         value: CqlValue.create(queryable.defaultValue),
-        operator: CqlEqual,
+        operator: operators[0],
         queryable
       });
     },
@@ -409,48 +556,28 @@ export default {
       if (limit > this.maxItems) {
         limit = this.maxItems;
       }
-      else if (limit < 0) {
+      else if (typeof limit !== 'number' || isNaN(limit) || limit < 1) {
         limit = null;
       }
       this.$set(this.query, 'limit', limit);
     },
-    setSearchTerms(value) {
-      if (!Utils.hasText(value)) {
-        value = null;
+    addSearchTerm(term) {
+      if (!Utils.hasText(term)) {
+        return;
       }
-      this.$set(this.query, 'q', value);
+      this.query.q.push(term);
     },
-    setBBox(bounds) {
-      let bbox = null;
-      if (this.provideBBox) {
-        if (Utils.isObject(bounds) && typeof bounds.toBBoxString === 'function') {
-          // This is a Leaflet LatLngBounds Object
-          const Y = 85.06;
-          const X = 180;
-          bbox = [
-            Math.max(bounds.getWest(), -X),
-            Math.max(bounds.getSouth(), -Y),
-            Math.min(bounds.getEast(), X),
-            Math.min(bounds.getNorth(), Y)
-          ];
-        }
-        else if (Array.isArray(bounds) && bounds.length === 4) {
-          bbox = bounds;
-        }
-      }
-      this.$set(this.query, 'bbox', bbox);
-    },
-    setDateTime(datetime) {
-      if (datetime.find(dt => dt instanceof Date)) {
-        datetime = datetime.map(Utils.dateToUTC);
-      }
-      else {
-        datetime = null;
-      }
-      this.$set(this.query, 'datetime', datetime);
+    setSearchTerms(terms) {
+      this.$set(this.query, 'q', terms);
     },
     addCollection(collection) {
-      this.selectedCollections.push(collection);
+      if (!this.collectionSelectOptions.taggable) {
+        return;
+      }
+      this.resetSearchCollection();
+      let opt = this.collectionToMultiSelect({id: collection});
+      this.selectedCollections.push(opt);
+      this.collections.push(opt);
       this.query.collections.push(collection);
     },
     setCollections(collections) {
@@ -476,8 +603,6 @@ export default {
 };
 </script>
 
-<style src=""></style>
-
 <style lang="scss">
 @import '../theme/variables.scss';
 
@@ -487,55 +612,9 @@ $primary-color: map-get($theme-colors, "primary");
 
 @import '~vue2-datepicker/scss/index.scss';
 
-// Multiselect related style
-@import '~vue-multiselect/dist/vue-multiselect.min.css';
-#stac-browser {
-  .multiselect__tags:focus-within {
-    border-color: #48cce1;
-    outline: 0;
-    box-shadow: 0 0 0 0.2rem rgba(24, 129, 145, 0.25);
-  }
-
-  .multiselect__select:before {
-    color: #495057;
-    border-color: #495057 transparent transparent;
-  }
-  
-  .multiselect__tags,
-  .multiselect__single {
-    border-color: #ced4da;
-    padding-left: 0.75rem;
-    font-size: 16px;
-  }
-
-  .multiselect__input,
-  .multiselect__single {
-    padding: 4px 0 3px 0;
-  }
-
-  .multiselect__tag,
-  .multiselect__tag-icon:hover,
-  .multiselect__option--highlight,
-  .multiselect__option--highlight:after {
-    background-color: map-get($theme-colors, "primary");
-  }
-
-  .multiselect__option--selected.multiselect__option--highlight,
-  .multiselect__option--selected.multiselect__option--highlight:after {
-    background-color: map-get($theme-colors, "secondary");
-  }
-
-  .multiselect__placeholder {
-    color: #999;
-    font-size: 16px;
-  }
-}
-
-.queryables {
-  .dropdown-menu {
-    max-height: 90vh;
-    overflow: auto;
-  }
+.queryables .dropdown-menu {
+  max-height: 90vh;
+  overflow: auto;
 }
 
 // General item filter style

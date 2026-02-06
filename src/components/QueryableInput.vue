@@ -11,8 +11,9 @@
           :key="op.SYMBOL"
           :active="op === operator"
           @click="updateOperator(op)"
+          button-class="d-flex justify-content-between align-items-center"
         >
-          {{ op.longLabel }}
+          <span>{{ op.longLabel }}</span>
           <b-badge variant="dark" class="ml-2">{{ op.label }}</b-badge>
         </b-dropdown-item-button>
       </b-dropdown>
@@ -50,8 +51,6 @@
         v-else-if="queryable.isTemporal"
         type="date"
         class="value"
-        :lang="datepickerLang"
-        :format="datepickerFormat"
         :value="value.value"
         @input="updateValue($event)"
         v-bind="validation"
@@ -68,8 +67,6 @@
       />
       <b-form-input
         v-else-if="queryable.isText || queryable.isNumeric"
-        :number="queryable.isNumeric"
-        :type="queryable.isNumeric ? 'number' : 'text'"
         size="sm"
         class="value"
         :value="value.value"
@@ -143,34 +140,28 @@ export default {
   },
   computed: {
     validation() {
-      if (this.queryable.isText && !this.queryable.isTemporal) {
+      if (this.queryable.isTemporal) {
         return {
+          type: this.queryable.isDateTime ? 'datetime' : 'date',
+          lang: this.datepickerLang,
+          format: this.queryable.isDateTime ? this.dateTimeFormat : this.dateFormat
+        };
+      }
+      else if (this.queryable.isText) {
+        return {
+          type: 'text',
           minlength: this.schema.minLength,
-          maxlength: this.schema.maxLenggth,
+          maxlength: this.schema.maxLength,
           required: this.schema.minLength > 0
         };
       }
       else if (this.queryable.isNumeric) {
-        let step;
-        if (typeof this.schema.minimum === 'number' && typeof this.schema.maximum === 'number') {
-          let delta = (this.schema.maximum - this.schema.minimum);
-          if (delta <= 0.1) {
-            step = 0.01;
-          }
-          else if (delta <= 1) {
-            step = 0.1;
-          }
-          else if (delta <= 100) {
-            step = 1;
-          }
-          else {
-            step = 10;
-          }
-        }
         return {
+          type: 'number',
+          number: true,
           min: this.schema.minimum,
           max: this.schema.maximum,
-          step
+          step: this.schema.multipleOf || 'any'
         };
       }
       return {};

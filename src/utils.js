@@ -1,6 +1,7 @@
 import URI from 'urijs';
 import removeMd from 'remove-markdown';
 import { stacPagination } from "./rels";
+import Link from 'stac-js/src/link.js';
 
 export const commonFileNames = ['catalog', 'collection', 'item'];
 
@@ -23,18 +24,16 @@ export const browserImageTypes = [
   'image/webp'
 ];
 
-export const geotiffMediaTypes = [
-  "application/geotiff",
-  "image/tiff; application=geotiff",
+export const cogMediaTypes = [
   "image/tiff; application=geotiff; profile=cloud-optimized",
-  "image/vnd.stac.geotiff",
   "image/vnd.stac.geotiff; cloud-optimized=true"
 ];
 
-export const browserProtocols = [
-  'http',
-  'https'
-];
+export const geotiffMediaTypes = [
+  "application/geotiff",
+  "image/tiff; application=geotiff",
+  "image/vnd.stac.geotiff",
+].concat(cogMediaTypes);
 
 export const imageMediaTypes = browserImageTypes.concat(geotiffMediaTypes);
 export const mapMediaTypes = imageMediaTypes.concat([geojsonMediaType]);
@@ -114,8 +113,18 @@ export default class Utils {
     return (typeof string === 'string' && string.length > 0);
   }
 
-  static isGdalVfsUri(url) {
-    return typeof url === 'string' && url.startsWith('/vsi') && !url.startsWith('/vsicurl/');
+  static shortenTitle(fullStr, strLen, separator = '…') {
+    if (fullStr.length <= strLen) {
+      return fullStr;
+    }
+
+    let sepLen = separator.length;
+    let charsToShow = strLen - sepLen;
+    let frontChars = Math.ceil(charsToShow/2);
+    let backChars = Math.floor(charsToShow/2);
+    return fullStr.substr(0, frontChars) + 
+           separator + 
+           fullStr.substr(fullStr.length - backChars);
   }
 
   static toAbsolute(href, baseUrl, stringify = true) {
@@ -123,14 +132,9 @@ export default class Utils {
   }
 
   static normalizeUri(href, baseUrl = null, noParams = false, stringify = true) {
-    // Convert vsicurl URLs to normal URLs
-    if (typeof href === 'string' && href.startsWith('/vsicurl/')) {
-      href = href.replace(/^\/vsicurl\//, '');
-    }
     // Parse URL and make absolute, if required
     let uri = URI(href);
-    // Don't convert GDAL VFS URIs: https://github.com/radiantearth/stac-browser/issues/116
-    if (baseUrl && uri.is("relative") && !Utils.isGdalVfsUri(href)) {
+    if (baseUrl && uri.is("relative")) {
       uri = uri.absoluteTo(baseUrl);
     }
     uri.normalize();
@@ -153,13 +157,17 @@ export default class Utils {
     return Array.isArray(links) ? links.filter(link => Utils.isObject(link) && Utils.hasText(link.href) && !rels.includes(link.rel)) : [];
   }
 
+  static removeTrailingSlash(str) {
+    return str.replace(/\/$/, '');
+  }
+
   static equalUrl(a, b) {
     try {
       let uri1 = URI(a);
       let uri2 = URI(b);
       // Ignore trailing slash in URL paths
-      uri1.path(uri1.path().replace(/\/$/, ''));
-      uri2.path(uri2.path().replace(/\/$/, ''));
+      uri1.path(Utils.removeTrailingSlash(uri1.path()));
+      uri2.path(Utils.removeTrailingSlash(uri2.path()));
       return uri1.equals(uri2);
     } catch (error) {
       return false;
@@ -196,47 +204,70 @@ export default class Utils {
   // Convert from UTC to locale time (needed for vue2-datetimepicker)
   // see https://github.com/mengxiong10/vue2-datepicker/issues/388
   static dateFromUTC(dt) {
-    if (dt instanceof Date) {
+    if (dt) {
       const value = new Date(dt);
-      const offset = value.getTimezoneOffset();
-      dt = new Date(value.getTime() + offset * 60 * 1000);
+      dt = new Date(value.getTime() + value.getTimezoneOffset() * 60 * 1000);
     }
     return dt;
   }
 
   static dateToUTC(dt) {
     if (dt instanceof Date) {
-      const offset = new Date().getTimezoneOffset();
-      return new Date(dt.getTime() - offset * 60 * 1000);
+      dt = new Date(dt.getTime() - dt.getTimezoneOffset() * 60 * 1000);
     }
     return dt;
   }
 
   static formatDatetimeQuery(value) {
-    return value.map(dt => {
-      if (dt instanceof Date) {
-        return dt.toISOString();
-      }
-      else if (dt) {
-        return dt;
-      }
-      else {
-        return '..';
-      }
-    }).join('/');
+    if (Array.isArray(value) && value.length === 2 && (value[0] || value[1])) {
+      return value.map(dt => {
+        if (dt instanceof Date) {
+          return dt.toISOString();
+        }
+        else {
+          return dt || '..';
+        }
+      }).join('/');
+    }
+    return null;
+  }
+
+  static formatSortbyForPOST(value) {
+    // POST search requires sortby to be an array of objects containing a property name and sort direction.
+    // See spec here: https://api.stacspec.org/v1.0.0-rc.1/item-search/#tag/Item-Search/operation/postItemSearch
+    // This function converts the property name to the desired format.
+    const sortby = {
+      field: '',
+      direction: 'asc'
+    };
+  
+    // Check if the value starts with a minus sign ("-")
+    if (value.startsWith('-')) {
+      // sort by descending order
+      sortby.field = value.substring(1);
+      sortby.direction = 'desc';
+    } else {
+      //sort by ascending order
+      sortby.field = value;
+    }
+    
+    // Put the object in an array
+    return [sortby];
   }
 
   static getPaginationLinks(data) {
-    let pageLinks = Utils.getLinksWithRels(data.links, stacPagination);
     let pages = {};
-    for (let pageLink of pageLinks) {
-      let rel = pageLink.rel === 'previous' ? 'prev' : pageLink.rel;
-      pages[rel] = pageLink;
+    if (Utils.isObject(data)) {
+      let pageLinks = Utils.getLinksWithRels(data.links, stacPagination);
+      for (let pageLink of pageLinks) {
+        let rel = pageLink.rel === 'previous' ? 'prev' : pageLink.rel;
+        pages[rel] = pageLink;
+      }
     }
     return pages;
   }
 
-  static addFiltersToLink(link, filters = {}, itemsPerPage = null) {
+  static addFiltersToLink(link, filters = {}, defaultLimit = null) {
     let isEmpty = value => {
       return (value === null
       || (typeof value === 'number' && !Number.isFinite(value))
@@ -251,8 +282,8 @@ export default class Utils {
       filters = Object.assign({}, filters);
     }
 
-    if (typeof filters.limit !== 'number' && typeof itemsPerPage === 'number') {
-      filters.limit = itemsPerPage;
+    if (typeof filters.limit !== 'number' && typeof defaultLimit === 'number') {
+      filters.limit = defaultLimit;
     }
 
     if (Utils.hasText(link.method) && link.method.toUpperCase() === 'POST') {
@@ -265,8 +296,14 @@ export default class Utils {
           continue;
         }
 
-        if (key === 'datetime') {
+        if (key === 'sortby') {
+          value = Utils.formatSortbyForPOST(value);
+        }
+        else if (key === 'datetime') {
           value = Utils.formatDatetimeQuery(value);
+          if (!value) {
+            continue; // skip empty datetime
+          }
         }
         else if (key === 'filters') {
           Object.assign(body, value.toJSON());
@@ -294,7 +331,7 @@ export default class Utils {
         else if (key === 'bbox') {
           value = value.join(',');
         }
-        else if ((key === 'collections' || key === 'ids')) {
+        else if ((key === 'collections' || key === 'ids' || key === 'q')) {
           value = value.join(',');
         }
         else if (key === 'filters') {
@@ -335,29 +372,6 @@ export default class Utils {
     }
     else {
       return href;
-    }
-  }
-
-  static canBrowserDisplayImage(img) {
-    if (typeof img.href !== 'string') {
-      return false;
-    }
-    let uri = URI(img.href);
-    let protocol = uri.protocol().toLowerCase();
-    if (protocol && !browserProtocols.includes(protocol)) {
-      return false;
-    }
-    else if (browserImageTypes.includes(img.type)) {
-      return true;
-    }
-    else if (browserImageTypes.includes('image/' + uri.suffix().toLowerCase())) {
-      return true;
-    }
-    else if (img.type) {
-      return false;
-    }
-    else {
-      return true; // If no img.type is given, try to load it anyway: https://github.com/radiantearth/stac-browser/issues/147
     }
   }
 
@@ -406,16 +420,8 @@ export default class Utils {
     return searchterm[fn](term => target.includes(term));
   }
 
-  static createLink(href, rel) {
-    return { href, rel };
-  }
-
-  static supportsExtension(data, pattern) {
-    if (!Utils.isObject(data) || !Array.isArray(data['stac_extensions'])) {
-      return false;
-    }
-    let regexp = new RegExp('^' + pattern.replaceAll('*', '[^/]+') + '$');
-    return Boolean(data['stac_extensions'].find(uri => regexp.test(uri)));
+  static createLink(href, rel, title) {
+    return new Link({ href, rel, title });
   }
 
   /**
@@ -443,6 +449,17 @@ export default class Utils {
     }
 
     return Utils.mergeDeep(target, ...sources);
+  }
+
+  static convertHumanizedSortOrder(value) {
+    switch (value) {
+      case 'asc':
+        return 1;
+      case 'desc':
+        return -1;
+      default:
+        return 0;
+    }
   }
 
 }
