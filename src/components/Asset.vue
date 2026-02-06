@@ -33,9 +33,9 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
 import { formatMediaType } from '@radiantearth/stac-fields/formatters';
 import { mapState } from 'vuex';
-import AssetAlternative from './AssetAlternative.vue';
 import StacFieldsMixin from './StacFieldsMixin';
 import Utils from '../utils';
 import { Asset } from 'stac-js';
@@ -44,7 +44,7 @@ import { BTab, BTabs, BAccordionItem } from 'bootstrap-vue-next';
 export default {
   name: 'Asset',
   components: {
-    AssetAlternative,
+    AssetAlternative: defineAsyncComponent(() => import('./AssetAlternative.vue')),
     BTab,
     BTabs,
     BAccordionItem
