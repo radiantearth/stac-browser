@@ -88,7 +88,10 @@ export default {
       return {
         textMode,
         jsonMode,
-        advancedComparison: this.supportsConformance(CQL_ADV_COMPARISON)
+        advancedComparison: this.supportsConformance(CQL_ADV_COMPARISON),
+        // Set arrayOperators based on CQL_JSON support or CQL_TEXT support
+        // NOTE: pgstac supports them even if not advertised in conformance
+        arrayOperators: textMode || jsonMode,
       };
     },
   },
