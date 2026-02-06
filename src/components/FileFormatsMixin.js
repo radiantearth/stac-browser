@@ -1,6 +1,6 @@
 import Utils from '../utils';
-import { formatMediaType } from '@radiantearth/stac-fields/formatters';
 import StacFieldsMixin from './StacFieldsMixin';
+import { formatMediaType } from '@radiantearth/stac-fields/formatters';
 
 export default {
   mixins: [
@@ -18,10 +18,15 @@ export default {
       if (this.data.isCollection() && Utils.isObject(this.data.item_assets)) {
         assets = assets.concat(Object.values(this.data.item_assets));
       }
-      return assets
+      const uniqueTypes = assets
         .filter(asset => Array.isArray(asset.roles) && asset.roles.includes('data') && typeof asset.type === 'string') // Look for data files
-        .map(asset => this.formatMediaType(asset.type, null, {shorten: true})) // Array shall only contain media types
+        .map(asset => asset.type) // Array shall only contain media types
         .filter((v, i, a) => a.indexOf(v) === i); // Unique values
+      
+      // Map to formatted names and sort alphabetically
+      return uniqueTypes
+        .map(type => formatMediaType(type, null, {shorten: true}))
+        .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
     }
   }
 };
