@@ -245,6 +245,12 @@
     "addItemIds": "Press enter to add an Item ID",
     "addSearchTerm": "Press enter to add a search term",
     "additionalFilters": "Additional filters",
+    "between": "between",
+    "betweenOperatorDescription": "Tests whether a numeric field value lies within the given range. The given range is inclusive.",
+    "buttons": {
+      "filter": "Filter",
+      "reset": "Reset"
+    },
     "dateDescription": "All times in Coordinated Universal Time (UTC).",
     "enterCollections": "Enter one or more Collection IDs...",
     "enterItemIds": "Enter one or more Item IDs...",
@@ -256,6 +262,8 @@
     "freeTextDescription": "Search for at least one of the given terms in fields such as the title and the description.",
     "greaterThan": "greater than",
     "greaterThanEqual": "greater than or equal to",
+    "in": "included in",
+    "inOperatorDescription": "Checks whether the field value is any of the given values.",
     "itemIds": "Item IDs",
     "itemsPerPage": "Items per page",
     "itemsPerPageDescription": "Number of items requested per page, max. {maxItems} items.",
