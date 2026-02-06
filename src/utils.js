@@ -113,7 +113,7 @@ export default class Utils {
     return (typeof string === 'string' && string.length > 0);
   }
 
-  static shortenTitle(fullStr, strLen, separator = '...') {
+  static shortenTitle(fullStr, strLen, separator = '…') {
     if (fullStr.length <= strLen) {
       return fullStr;
     }
@@ -182,7 +182,7 @@ export default class Utils {
     // Likely not perfect, but seems good enough for most cases.
     text = removeMd(text).replaceAll(/[\r\n]+/g, ' ');
     if (maxLength > 0 && text.length > maxLength) {
-      text = text.substr(0, maxLength) + '...';
+      text = text.substr(0, maxLength) + '…';
     }
     return text;
   }
