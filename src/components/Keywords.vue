@@ -31,6 +31,7 @@ export default {
   flex-wrap: wrap;
   gap: 0.25rem;
   align-items: flex-start;
+  align-content: flex-start;
 
   .keyword {
     padding: 0.3em 0.4em;
