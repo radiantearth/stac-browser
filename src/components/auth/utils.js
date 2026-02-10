@@ -1,15 +1,16 @@
 import Utils from '../../utils.js';
-import { STAC } from 'stac-js';
+import { STACReference } from 'stac-js';
 import Auth from '../../auth/index.js';
 
 export default class AuthUtils {
 
-  static resolveAuth(obj, context) {
-    if (context instanceof STAC && Utils.size(obj['auth:refs']) > 0) {
-      const scheme = context.getMetadata('auth:schemes');
-      if (Utils.size(scheme) > 0) {
-        return obj['auth:refs']
-          .map(ref => scheme[ref])
+  static resolveAuth(obj) {
+    if (obj instanceof STACReference) {
+      const refs = obj.getMetadata('auth:refs');
+      const schemes = obj.getMetadata('auth:schemes');
+      if (Utils.size(refs) > 0 && Utils.size(schemes) > 0) {
+        return refs
+          .map(ref => schemes[ref])
           .filter(ref => Utils.isObject(ref));
       }
     }
