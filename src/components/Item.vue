@@ -62,8 +62,7 @@ export default {
       return {
         queued: !this.data,
         deprecated: this.isDeprecated,
-        description: this.hasDescription,
-        'has-extent': true
+        description: this.hasDescription
       };
     },
     extent() {

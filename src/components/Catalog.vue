@@ -61,9 +61,6 @@ export default {
       if (this.hasImage) {
         classes.push('has-thumbnail');
       }
-      if (this.temporalExtent) {
-        classes.push('has-extent');
-      }
       return classes;
     },
     data() {

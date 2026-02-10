@@ -395,11 +395,17 @@ body {
 
     .card-title {
       overflow-wrap: anywhere;
+      margin-bottom: 0.25rem;
     }
 
     .card-body,
     .card-footer {
       position: relative;
+      gap: 0.5rem;
+
+      > p {
+        margin: 0;
+      }
     }
     .card-footer {
       .btn-group-vertical {
@@ -426,12 +432,6 @@ body {
       max-height: 4.5em; /* 3 lines at 1.5em line-height */
     }
 
-    &.has-extent {
-      .intro {
-        margin-bottom: 0.5rem;
-      }
-    }
-
     .datetime {
       color: $secondary;
     }
@@ -449,24 +449,35 @@ body {
       overflow: hidden;
 
       .card-img-wrapper {
-        max-width: 33%;
-        max-height: 100%;
+        width: 33%;
+        position: relative;
+        overflow: hidden;
+
+        &:empty {
+          display: none;
+        }
 
         .card-img-right {
-          max-width: 100%;
-          max-height: 9rem;
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
           object-fit: scale-down;
           object-position: center;
         }
       }
 
       .card-body {
+        display: flex;
+        flex-direction: column;
         flex: 1;
+        gap: 0.25rem;
 
         .intro {
           -webkit-line-clamp: 2;
           line-clamp: 2;
-          height: 3rem;
+          max-height: 3rem;
         }
       }
 
