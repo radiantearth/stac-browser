@@ -89,7 +89,7 @@ export default {
       return null;
     },
     auth() {
-      return AuthUtils.resolveAuth(this.asset, this.context);
+      return AuthUtils.resolveAuth(this.asset);
     }
   },
   methods: {
