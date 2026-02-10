@@ -12,7 +12,7 @@
         <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="mr-1 mt-1 fileformat">{{ format }}</b-badge>
         {{ summarizeDescription }}
       </b-card-text>
-      <Keywords v-if="showKeywordsInCatalogCards && keywords.length > 0" :keywords="keywords" variant="primary" :center="!isList" />
+      <Keywords v-if="showKeywordsInCatalogCards && keywords.length > 0" :keywords="keywords" variant="primary" />
       <b-card-text v-if="temporalExtent" class="datetime"><small v-html="temporalExtent" /></b-card-text>
     </b-card-body>
     <b-card-footer>
@@ -60,9 +60,6 @@ export default {
       }
       if (this.hasImage) {
         classes.push('has-thumbnail');
-      }
-      if (this.temporalExtent) {
-        classes.push('has-extent');
       }
       return classes;
     },

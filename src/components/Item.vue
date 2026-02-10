@@ -12,7 +12,7 @@
         <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="mr-1 mt-1 fileformat">{{ format }}</b-badge>
         <template v-if="hasDescription">{{ summarizeDescription }}</template>
       </b-card-text>
-      <Keywords v-if="showKeywordsInItemCards && keywords.length > 0" :keywords="keywords" variant="primary" center />
+      <Keywords v-if="showKeywordsInItemCards && keywords.length > 0" :keywords="keywords" variant="primary" />
       <b-card-text>
         <small class="text-muted">
           <template v-if="extent">{{ extent | formatTemporalExtent }}</template>
@@ -62,8 +62,7 @@ export default {
       return {
         queued: !this.data,
         deprecated: this.isDeprecated,
-        description: this.hasDescription,
-        'has-extent': true
+        description: this.hasDescription
       };
     },
     extent() {
