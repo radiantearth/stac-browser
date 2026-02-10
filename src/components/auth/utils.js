@@ -7,10 +7,10 @@ export default class AuthUtils {
   static resolveAuth(obj) {
     if (obj instanceof STACReference) {
       const refs = obj.getMetadata('auth:refs');
-      const scheme = obj.getMetadata('auth:schemes');
-      if (Utils.size(refs) > 0 && Utils.size(scheme) > 0) {
+      const schemes = obj.getMetadata('auth:schemes');
+      if (Utils.size(refs) > 0 && Utils.size(schemes) > 0) {
         return refs
-          .map(ref => scheme[ref])
+          .map(ref => schemes[ref])
           .filter(ref => Utils.isObject(ref));
       }
     }
