@@ -351,10 +351,6 @@ body {
         display: grid;
         grid-template-rows: subgrid;
         grid-row: span 4;
-
-        > .keywords {
-          align-self: start;
-        }
       }
     }
 
