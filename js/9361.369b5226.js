@@ -1,2 +1,0 @@
-"use strict";(self["webpackChunk_radiantearth_stac_browser"]=self["webpackChunk_radiantearth_stac_browser"]||[]).push([[9361],{69361:function(r,e,t){t.r(e);const n={years(){return"tahun"},months(){return"bulan"},weeks(){return"minggu"},days(){return"hari"},hours(){return"jam"},minutes(){return"menit"},seconds(){return"detik"},decimal:","};e["default"]=n}}]);
-//# sourceMappingURL=9361.369b5226.js.map

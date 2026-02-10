@@ -1,1 +1,0 @@
-{"version":3,"file":"js/7843.bb7c684c.js","mappings":"+KACA,aAAeA,EAAM,E","sources":["webpack://@radiantearth/stac-browser/./src/locales/en-GB/duration.js"],"sourcesContent":["import { en as locale } from '@musement/iso-duration';\nexport default locale;\n"],"names":["locale"],"ignoreList":[],"sourceRoot":""}
