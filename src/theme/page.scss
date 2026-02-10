@@ -345,12 +345,16 @@ body {
 
     .catalog-card,
     .item-card {
-      grid-row: span 6;
+      grid-row: span 7;
 
       .card-body {
         display: grid;
         grid-template-rows: subgrid;
-        grid-row: span 3;
+        grid-row: span 4;
+
+        > .keywords {
+          align-self: start;
+        }
       }
     }
 
