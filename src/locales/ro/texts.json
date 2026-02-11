@@ -113,7 +113,9 @@
   },
   "featureExperimental": "Această funcție este încă experimentală și poate da rezultate neașteptate!",
   "features": {
-    "noProperties": "Nu au fost furnizate proprietăți."
+    "empty": "",
+    "noProperties": "Nu au fost furnizate proprietăți.",
+    "title": ""
   },
   "fullscreen": {
     "exit": "Ieși din modul ecran complet",
@@ -158,10 +160,15 @@
   "mapping": {
     "attribution": {
       "label": "i",
+      "description": "",
       "collapseLabel": "✕"
     },
-    "bboxSelect": {},
+    "bboxSelect": {
+      "add": "",
+      "remove": ""
+    },
     "close": "Închidere",
+    "fit": "",
     "layers": {
       "title": "Straturi",
       "base": "Straturi de bază",
@@ -171,6 +178,7 @@
     "location": {
       "description": "Mergi la locație"
     },
+    "nobasemap": "",
     "nodata": "Nu sunt informații spațiale disponibile în metadate.",
     "zoom": {
       "in": {
@@ -269,6 +277,7 @@
     "notSupported": "Căutarea articolelor nu este acceptată de API.",
     "placeholder": "Căutare...",
     "selectCollections": "Selectați una sau mai multe colecții...",
+    "selectDateRange": "",
     "selectForItemSearch": "Selectați pentru Căutare Articol",
     "spatialExtent": "Întinderea spațială",
     "tabs": {
