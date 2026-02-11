@@ -133,6 +133,7 @@
   "in": "في {catalog}",
   "index": {
     "api": "واجهة برمجة التطبيقات",
+    "catalog": "الكتالوج",
     "load": "تحميل",
     "selectStacIndex": "... أو اختر واحدًا من {stacIndex}:",
     "specifyCatalog": "يرجى تحديد كتالوج STAC أو API...",

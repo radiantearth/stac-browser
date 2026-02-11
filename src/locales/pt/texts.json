@@ -135,6 +135,7 @@
   "in": "em {catalog}",
   "index": {
     "api": "API",
+    "catalog": "Catálogo",
     "load": "Carregar",
     "selectStacIndex": "... ou selecione um de {stacIndex}:",
     "specifyCatalog": "Por favor especifique um catálogo STAC ou API...",
