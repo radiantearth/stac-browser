@@ -1,1 +1,0 @@
-"use strict";(self["webpackChunk_radiantearth_stac_browser"]=self["webpackChunk_radiantearth_stac_browser"]||[]).push([[1103],{31103:function(a){a.exports=JSON.parse('{"Normalised Radar Backscatter":"Normalized Radar Backscatter"}')}}]);

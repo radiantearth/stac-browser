@@ -1,1 +1,0 @@
-window.STAC_BROWSER_CONFIG = {}
