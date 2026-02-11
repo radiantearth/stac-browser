@@ -91,12 +91,12 @@ export default {
       if (!this.data) {
         return [];
       }
-      let domains = {
+      const domains = {
         // todo: move translations to texts.json and add InSAR / ML
         'eo': translateFields('Optical'),
         'forecast': translateFields('Forecast'),
-        'insar': 'InSAR',
-        'ml-model': 'ML',
+        'insar': translateFields('InSAR'),
+        'ml-model': translateFields('ML'),
         'pc': translateFields('Point Cloud'),
         'sar': translateFields('SAR')
       };
