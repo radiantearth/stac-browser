@@ -108,20 +108,13 @@
     "noExternalAccess": "Mengakses katalog eksternal tidak diizinkan!",
     "notFound": "Sumber daya yang diminta tidak ada. @:errors.contactProvider",
     "serverError": "Server mengalami masalah. @:errors.contactProvider",
-    "title": "",
     "unauthorized": "Permintaan tidak memiliki kredensial, misalnya token API. Silakan berikan kredensial Anda dan coba lagi."
   },
   "featureExperimental": "Fitur ini masih eksperimental dan mungkin memberikan hasil yang tidak terduga!",
-  "features": {
-    "empty": "",
-    "noProperties": "",
-    "title": ""
-  },
+  "features": {},
   "fullscreen": {
     "exit": "Keluar dari Layar Penuh",
-    "exitLabel": "",
-    "show": "Lihat Layar Penuh",
-    "showLabel": ""
+    "show": "Lihat Layar Penuh"
   },
   "goBack": {
     "description": "Kembali ke {type}",
@@ -158,37 +151,13 @@
   "loading": "Memuat...",
   "map": "Peta",
   "mapping": {
-    "attribution": {
-      "label": "",
-      "description": "",
-      "collapseLabel": ""
-    },
-    "bboxSelect": {
-      "add": "",
-      "remove": ""
-    },
-    "close": "",
-    "fit": "",
-    "layers": {
-      "title": "",
-      "base": "",
-      "unnamed": "",
-      "footprint": ""
-    },
-    "location": {
-      "description": ""
-    },
-    "nobasemap": "",
-    "nodata": "",
+    "attribution": {},
+    "bboxSelect": {},
+    "layers": {},
+    "location": {},
     "zoom": {
-      "in": {
-        "description": "",
-        "label": ""
-      },
-      "out": {
-        "description": "",
-        "label": ""
-      }
+      "in": {},
+      "out": {}
     }
   },
   "messageForSchemaError": "{message}, untuk skema {schemaPath}",
@@ -277,7 +246,6 @@
     "notSupported": "Pencarian Item tidak didukung oleh API.",
     "placeholder": "Cari...",
     "selectCollections": "Pilih satu atau beberapa koleksi...",
-    "selectDateRange": "",
     "selectForItemSearch": "Pilih untuk Pencarian Item",
     "spatialExtent": "Cakupan Spasial",
     "tabs": {

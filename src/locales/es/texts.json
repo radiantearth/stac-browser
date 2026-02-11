@@ -108,15 +108,10 @@
     "noExternalAccess": "¡El acceso a catálogos externos no está permitido!",
     "notFound": "El recurso solicitado no existe. @:errors.contactProvider",
     "serverError": "El servidor encontró un problema. @:errors.contactProvider",
-    "title": "",
     "unauthorized": "La petición no tiene credenciales, por ejemplo, un token de la API. Por favor introduzca sus credenciales y pruebe de nuevo."
   },
   "featureExperimental": "¡Esta funcionalidad es experimental y puede producir resultados inesperados!",
-  "features": {
-    "empty": "",
-    "noProperties": "",
-    "title": ""
-  },
+  "features": {},
   "fullscreen": {
     "exit": "Salir de pantalla completa",
     "exitLabel": "✕",
@@ -160,26 +155,12 @@
   "mapping": {
     "attribution": {
       "label": "i",
-      "description": "",
       "collapseLabel": "✕"
     },
-    "bboxSelect": {
-      "add": "",
-      "remove": ""
-    },
+    "bboxSelect": {},
     "close": "Cerrar",
-    "fit": "",
-    "layers": {
-      "title": "",
-      "base": "",
-      "unnamed": "",
-      "footprint": ""
-    },
-    "location": {
-      "description": ""
-    },
-    "nobasemap": "",
-    "nodata": "",
+    "layers": {},
+    "location": {},
     "zoom": {
       "in": {
         "description": "Acercar el zoom",
@@ -277,7 +258,6 @@
     "notSupported": "La API no soporta la Búsqueda por Elementos.",
     "placeholder": "Búsqueda...",
     "selectCollections": "Seleccione una o varias colecciones...",
-    "selectDateRange": "",
     "selectForItemSearch": "Seleccionar para Búsqueda de Elementos",
     "spatialExtent": "Extensión espacial",
     "tabs": {
