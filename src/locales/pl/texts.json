@@ -277,6 +277,7 @@
     "notSupported": "Wyszukiwanie elementów nie jest obsługiwane przez API.",
     "placeholder": "Wyszukaj...",
     "selectCollections": "Wybierz jedną lub więcej kolekcji...",
+    "selectDateRange": "",
     "selectForItemSearch": "Wybierz do wyszukiwania elementu",
     "spatialExtent": "Zasięg przestrzenny",
     "tabs": {
