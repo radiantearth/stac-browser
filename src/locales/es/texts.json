@@ -108,10 +108,15 @@
     "noExternalAccess": "¡El acceso a catálogos externos no está permitido!",
     "notFound": "El recurso solicitado no existe. @:errors.contactProvider",
     "serverError": "El servidor encontró un problema. @:errors.contactProvider",
+    "title": "Error",
     "unauthorized": "La petición no tiene credenciales, por ejemplo, un token de la API. Por favor introduzca sus credenciales y pruebe de nuevo."
   },
   "featureExperimental": "¡Esta funcionalidad es experimental y puede producir resultados inesperados!",
-  "features": {},
+  "features": {
+    "empty": "No hay elementos disponibles.",
+    "noProperties": "No se enviaron propiedades.",
+    "title": "Elemento | Elementos"
+  },
   "fullscreen": {
     "exit": "Salir de pantalla completa",
     "exitLabel": "✕",
@@ -155,12 +160,26 @@
   "mapping": {
     "attribution": {
       "label": "i",
+      "description": "Atribuciones",
       "collapseLabel": "✕"
     },
-    "bboxSelect": {},
+    "bboxSelect": {
+      "add": "Haz clic en el mapa para añadir un rectángulo delimitador.",
+      "remove": "Haz clic dentro del rectángulo para eliminarlo."
+    },
     "close": "Cerrar",
-    "layers": {},
-    "location": {},
+    "fit": "Encajar en la extensión",
+    "layers": {
+      "title": "Capas",
+      "base": "Capas base",
+      "unnamed": "Sin nombre #{id}",
+      "footprint": "Huella"
+    },
+    "location": {
+      "description": "Ve a tu ubicación"
+    },
+    "nobasemap": "No hay mapas base disponibles.",
+    "nodata": "No hay información espacial en los metadatos.",
     "zoom": {
       "in": {
         "description": "Acercar el zoom",
@@ -258,6 +277,7 @@
     "notSupported": "La API no soporta la Búsqueda por Elementos.",
     "placeholder": "Búsqueda...",
     "selectCollections": "Seleccione una o varias colecciones...",
+    "selectDateRange": "Seleccionar el rango de fechas",
     "selectForItemSearch": "Seleccionar para Búsqueda de Elementos",
     "spatialExtent": "Extensión espacial",
     "tabs": {
