@@ -5,9 +5,9 @@
         <p><strong>{{ scheme.title || id }}</strong> (<code>{{ id }}</code>)</p>
         <Description v-if="scheme.description" :description="scheme.description" />
         <dl>
-          <template v-for="(entry, key) in formatted[id]">
-            <dt :key="key">{{ entry.label }}</dt>
-            <dd :key="key" v-html="entry.value" />
+          <template v-for="(entry, key) in formatted[id]" :key="key">
+            <dt>{{ entry.label }}</dt>
+            <dd v-html="entry.value" />
           </template>
         </dl>
       </li>
