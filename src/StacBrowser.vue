@@ -12,9 +12,11 @@
         </div>
         <h2 class="maintenance-title">Service Temporarily Unavailable</h2>
         <p class="maintenance-message">
-          Unfortunately Wyvern's Open Data Program is currently down for maintenance and improvements.
+          Unfortunately Wyvern's Open Data Program is down for maintenance.
           We are currently targeting February 20th for relaunch, which will include improvements to how
-          we host the data, and access to L2A data. We are terribly sorry for the inconvenience.
+          we host the data, and access to L2A data. <br/><br/>
+          We are terribly sorry for the inconvenience. If you require immediate access to data, please
+          contact <a href="mailto:sales@wyvern.space">sales@wyvern.space</a>.
         </p>
       </div>
     </div>
