@@ -1,26 +1,37 @@
 <template>
   <main class="select-data-source">
-    <b-form @submit="go">
+    <b-form @submit.prevent="go">
       <b-form-group
         id="select" :label="$t('index.specifyCatalog')" label-for="url"
         :invalid-feedback="error" :state="valid"
+        class="mb-3"
       >
-        <b-form-input id="url" type="url" :value="url" @input="setUrl" placeholder="https://..." />
+        <b-form-input 
+          id="url" 
+          type="url" 
+          :model-value="url" 
+          @update:model-value="setUrl"
+          placeholder="https://..."
+        />
       </b-form-group>
       <b-button type="submit" variant="primary">{{ $t('index.load') }}</b-button>
     </b-form>
     <hr v-if="stacIndex.length > 0">
     <b-form-group v-if="stacIndex.length > 0" class="stac-index">
       <template #label>
-        <i18n path="index.selectStacIndex">
+        <i18n-t keypath="index.selectStacIndex" tag="span" scope="global">
           <template #stacIndex>
             <a href="https://stacindex.org" target="_blank">STAC Index</a>
           </template>
-        </i18n>
+        </i18n-t>
       </template>
-      <b-list-group>
-        <template v-for="catalog in stacIndex">
-          <b-list-group-item button v-if="show(catalog)" :key="catalog.id" :active="url === catalog.url" @click="open(catalog.url)">
+      <b-list-group> 
+        <template v-for="catalog in stacIndex" :key="catalog.id">
+          <b-list-group-item
+            v-if="show(catalog)" button
+            :active="url === catalog.url"
+            @click="open(catalog.url)"
+          >
             <div class="d-flex justify-content-between align-items-baseline mb-1">
               <strong>{{ catalog.title }}</strong>
               <b-badge v-if="catalog.isApi" variant="danger">{{ $t('index.api') }}</b-badge>
@@ -35,20 +46,15 @@
 </template>
 
 <script>
-import { BForm, BFormGroup, BFormInput, BListGroup, BListGroupItem } from 'bootstrap-vue';
 import { mapGetters } from "vuex";
+import { defineComponent } from 'vue';
 import Description from '../components/Description.vue';
 import Utils from '../utils';
 import axios from "axios";
 
-export default {
+export default defineComponent({
   name: "SelectDataSource",
   components: {
-    BForm,
-    BFormGroup,
-    BFormInput,
-    BListGroup,
-    BListGroupItem,
     Description
   },
   data() {
@@ -60,6 +66,9 @@ export default {
   computed: {
     ...mapGetters(['toBrowserPath']),
     valid() {
+      if (this.url.length === 0) {
+        return null;
+      }
       return !this.error;
     },
     error() {
@@ -75,8 +84,8 @@ export default {
           return this.$t('index.urlMissingHost');
         }
         return null;
-      } catch (errot) {
-        return this.$t('index.urlInvalid');
+      } catch (error) {
+        return this.$t('index.urlInvalid', { error: error.message });
       }
     }
   },
@@ -90,7 +99,7 @@ export default {
         this.stacIndex = response.data;
       }
     } catch (error) {
-      console.error(error);
+      console.error('Failed to load STAC Index:', error);
     }
   },
   methods: {
@@ -112,10 +121,12 @@ export default {
       this.go();
     },
     go() {
-      this.$router.push(this.toBrowserPath(this.url));
+      if (this.url) {
+        this.$router.push(this.toBrowserPath(this.url));  // Vue Router navigation
+      }
     }
   }
-};
+});
 </script>
 
 <style lang="scss">
@@ -143,7 +154,6 @@ export default {
       flex-direction: column;
       flex: 1;
       overflow: auto;
-      border: 1px solid rgba(0,0,0,.125);
       border-radius: $border-radius;
 
       .list-group {

@@ -1,14 +1,17 @@
 import { mapState } from "vuex";
+import { VueDatePicker } from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css';
 
 export default {
   components: {
-    DatePicker: () => import('vue2-datepicker')
+    VueDatePicker
   },
   data() {
-    const dateFormat = 'YYYY-MM-DD';
+    const dateFormat = 'yyyy-MM-dd';
     const timeFormat = 'HH:mm:ss';
     return {
       datepickerLang: null,
+      weekStartDay: 1,
       dateFormat,
       timeFormat,
       dateTimeFormat: `${dateFormat} ${timeFormat}`,
@@ -25,11 +28,18 @@ export default {
         if (!locale) {
           return;
         }
-        const options = (await import(`../locales/${locale}/datepicker.js`)).default;
-        this.datepickerLang = options.locale;
-        this.dateFormat = options.dateFormat;
-        this.timeFormat = options.timeFormat;
-        this.dateTimeFormat = options.dateTimeFormat;
+
+        try {
+          const options = (await import(`../locales/${locale}/datepicker.js`)).default;
+
+          this.datepickerLang = options.locale;
+          this.dateFormat = options.dateFormat;
+          this.timeFormat = options.timeFormat;
+          this.dateTimeFormat = options.dateTimeFormat;
+          this.weekStartDay = options.locale.options.weekStartsOn;
+        } catch (e) {
+          console.error(`Could not load datepicker locale for ${locale}`, e);
+        }
       }
     }
   }

@@ -43,7 +43,7 @@ export class CqlEqual extends CqlComparisonOperator {
   }
 
   static get longLabel() {
-    return i18n.t('search.equalTo');
+    return i18n.global.t('search.equalTo');
   }
 
 }
@@ -61,7 +61,7 @@ export class CqlNotEqual extends CqlComparisonOperator {
   }
 
   static get longLabel() {
-    return i18n.t('search.notEqualTo');
+    return i18n.global.t('search.notEqualTo');
   }
 
 }
@@ -75,7 +75,7 @@ export class CqlGreaterThan extends CqlComparisonOperator {
   }
 
   static get longLabel() {
-    return i18n.t('search.greaterThan');
+    return i18n.global.t('search.greaterThan');
   }
 
 }
@@ -93,7 +93,7 @@ export class CqlGreaterThanEqual extends CqlComparisonOperator {
   }
 
   static get longLabel() {
-    return i18n.t('search.greaterThanEqual');
+    return i18n.global.t('search.greaterThanEqual');
   }
 
 }
@@ -107,7 +107,7 @@ export class CqlLessThan extends CqlComparisonOperator {
   }
 
   static get longLabel() {
-    return i18n.t('search.lessThan');
+    return i18n.global.t('search.lessThan');
   }
 
 }
@@ -125,7 +125,7 @@ export class CqlLessThanEqual extends CqlComparisonOperator {
   }
 
   static get longLabel() {
-    return i18n.t('search.lessThanEqual');
+    return i18n.global.t('search.lessThanEqual');
   }
   
 }

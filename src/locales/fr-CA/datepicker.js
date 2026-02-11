@@ -1,5 +1,7 @@
-const dateFormat = 'YYYY-MM-DD';
+import { frCA as locale } from 'date-fns/locale';
+
+const dateFormat = 'yyyy-MM-dd';
 const timeFormat = 'H:mm:ss';
 const dateTimeFormat = `${dateFormat} ${timeFormat}`;
-const locale = require('vue2-datepicker/locale/fr');
+
 export default {dateFormat, timeFormat, dateTimeFormat, locale};

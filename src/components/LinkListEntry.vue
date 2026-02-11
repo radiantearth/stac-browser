@@ -1,32 +1,35 @@
 <template>
   <li class="link">
-    <StacLink :id="popoverId" :data="link" :fallbackTitle="fallbackTitle" class="pr-1" />
-    <b-popover :target="popoverId" triggers="hover" placement="right" container="#stac-browser" custom-class="link-more">
+    <StacLink :id="popoverId" :data="link" :fallbackTitle="fallbackTitle" class="pe-1" />
+    <b-popover
+      :target="popoverId" placement="auto" teleport-to="#stac-browser" class="link-more"
+      focus hover :boundary-padding="20"
+    >
       <Description v-if="link.description" :description="link.description" compact />
       <section class="link-actions">
         <h3 class="first">{{ $t('additionalActions') }}</h3>
         <HrefActions vertical :data="link" size="sm" />
       </section>
-      <Metadata :data="link" type="Link" headerTag="h3" :ignoreFields="ignore" />
+      <MetadataGroups :data="link" type="Link" headerTag="h3" :ignoreFields="ignore" />
     </b-popover>
   </li>
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
 import HrefActions from './HrefActions.vue';
 import StacLink from './StacLink.vue';
-import { BPopover } from 'bootstrap-vue';
 
 let linkId = 0;
 
 export default {
-  name: "Link",
+  name: "LinkListEntry",
   components: {
-    BPopover,
     HrefActions,
     StacLink,
-    Description: () => import('./Description.vue'),
-    Metadata: () => import('./Metadata.vue')
+    BPopover: defineAsyncComponent(() => import('bootstrap-vue-next').then(m => m.BPopover)),
+    Description: defineAsyncComponent(() => import('./Description.vue')),
+    MetadataGroups: defineAsyncComponent(() => import('./MetadataGroups.vue'))
   },
   props: {
     link: {

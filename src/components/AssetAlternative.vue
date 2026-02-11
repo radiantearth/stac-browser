@@ -1,15 +1,16 @@
 <template>
-  <component :is="component">
-    <b-card-title><span v-html="fileFormat" /></b-card-title>
+  <div>
+    <h4 class="mb-4" v-html="fileFormat" />
     <HrefActions isAsset :data="asset" :shown="shown" @show="show" :auth="auth" />
-    <b-card-text class="mt-4" v-if="asset.description">
+    <div class="mt-4" v-if="asset.description">
       <Description :description="asset.description" compact />
-    </b-card-text>
-    <Metadata class="mt-4" :data="resolvedAsset" :context="context" :ignoreFields="ignore" title="" type="Asset" />
-  </component>
+    </div>
+    <MetadataGroups class="mt-4" :data="resolvedAsset" :context="context" :ignoreFields="ignore" title="" type="Asset" />
+  </div>
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
 import { formatMediaType } from '@radiantearth/stac-fields/formatters';
 import Description from './Description.vue';
 import HrefActions from './HrefActions.vue';
@@ -23,7 +24,7 @@ export default {
   components: {
     Description,
     HrefActions,
-    Metadata: () => import('./Metadata.vue')
+    MetadataGroups: defineAsyncComponent(() => import('./MetadataGroups.vue'))
   },
   mixins: [
     StacFieldsMixin({ formatMediaType })
@@ -42,6 +43,7 @@ export default {
       default: false
     }
   },
+  emits: ['show'],
   data() {
     return {
       ignore: [
@@ -79,8 +81,13 @@ export default {
       }
       return this.asset;
     },
-    component() {
-      return this.hasAlternatives ? 'div' : 'b-card-body';
+    tileRendererType() {
+      if (this.buildTileUrlTemplate && !this.useTileLayerAsFallback) {
+        return 'server';
+      }
+      else {
+        return 'client';
+      }
     },
     fileFormat() {
       if (typeof this.asset.type === "string" && this.asset.type.length > 0) {

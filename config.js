@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     catalogUrl: null,
     catalogTitle: "STAC Browser",
     catalogImage: null,

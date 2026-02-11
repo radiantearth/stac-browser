@@ -13,9 +13,9 @@ The following ways to set config options are possible:
   Enable this by removing the `<!--` and `-->` around the `<script defer="defer" src="./config.js"></script>` in the [`public/index.html`](../public/index.html).
   Then run the build procedure and after completion, you can fill the `dist/config.js` with any options that you want to customize.
 
-> [!WARNING]  
-> Appending configuration options as CLI parameters to the CLI command (e.g. `npm run build -- --catalogUrl="https://example.com"`) is DEPRECATED and will be removed in STAC Browser v5.
-> Reason is that such parameters are [not suppored by Vite](https://github.com/vitejs/vite/issues/7065), which will be used in v5 instead of vue-cli.
+> [!CAUTION]  
+> Appending configuration options as CLI parameters to the CLI command (e.g. `npm run build -- --catalogUrl="https://example.com"`) has been removed in  STAC Browser v5.
+> The reason is that such parameters are [not suppored by Vite](https://github.com/vitejs/vite/issues/7065).
 
 ## Table of Contents <!-- omit in toc -->
 

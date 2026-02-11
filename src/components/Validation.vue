@@ -10,14 +10,9 @@
 <script>
 import { STAC } from 'stac-js';
 import validateSTAC from 'stac-node-validator';
-import { BIconCheck, BIconX } from 'bootstrap-vue';
 
 export default {
   name: "Validation",
-  components: {
-    BIconCheck,
-    BIconX
-  },
   props: {
     data: {
       type: Object,
@@ -66,6 +61,4 @@ export default {
 };
 </script>
 
-<style>
 
-</style>

@@ -18,7 +18,7 @@ export default class GeoJsonIo extends AssetActionPlugin {
   }
 
   get text() {
-    return i18n.t('actions.openIn', {service: 'geojson.io'});
+    return i18n.global.t('actions.openIn', {service: 'geojson.io'});
   }
 
 }
