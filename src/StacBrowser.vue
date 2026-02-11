@@ -1,5 +1,25 @@
 <template>
   <b-container id="stac-browser">
+    <!-- Maintenance Modal -->
+    <div class="maintenance-overlay">
+      <div class="maintenance-modal">
+        <div class="maintenance-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="48" height="48">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+        </div>
+        <h2 class="maintenance-title">Service Temporarily Unavailable</h2>
+        <p class="maintenance-message">
+          Unfortunately Wyvern's Open Data Program is down for maintenance.
+          We are currently targeting late February for relaunch, which will include improvements to how
+          we host the data, and access to L2A data. <br/><br/>
+          We are terribly sorry for the inconvenience. If you require immediate access to data, please
+          contact <a href="mailto:sales@wyvern.space">sales@wyvern.space</a>.
+        </p>
+      </div>
+    </div>
     <!-- New Top Bar -->
     <div class="top-bar">
       <!-- Left Section -->
@@ -607,5 +627,76 @@ export default {
 
 .is-hidden {
   display: none !important;
+}
+
+/* Maintenance Modal */
+.maintenance-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.maintenance-modal {
+  background: #fff;
+  border-radius: 16px;
+  max-width: 560px;
+  width: 100%;
+  padding: 40px 36px;
+  text-align: center;
+  box-shadow:
+    0 0 0 1px rgba(220, 53, 69, 0.25),
+    0 20px 60px rgba(0, 0, 0, 0.25);
+  border-top: 5px solid #dc3545;
+  animation: maintenance-fade-in 0.4s ease-out;
+}
+
+@keyframes maintenance-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.maintenance-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #fdf0f0;
+  color: #dc3545;
+  margin-bottom: 20px;
+}
+
+.maintenance-title {
+  font-family: "Roboto", sans-serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #dc3545;
+  margin-bottom: 16px;
+  letter-spacing: 0.3px;
+}
+
+.maintenance-message {
+  font-family: "Roboto", sans-serif;
+  font-size: 0.98rem;
+  line-height: 1.7;
+  color: #444;
+  margin: 0;
 }
 </style>
