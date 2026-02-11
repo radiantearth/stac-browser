@@ -93,7 +93,7 @@ export default {
       }
       let domains = {
         // todo: move translations to texts.json and add InSAR / ML
-        'eo': translateFields('Electro-Optical'),
+        'eo': translateFields('Optical'),
         'forecast': translateFields('Forecast'),
         'insar': 'InSAR',
         'ml-model': 'ML',
