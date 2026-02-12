@@ -619,7 +619,11 @@ function getStore(config, router) {
           }
           switch (key) {
             case 'authConfig':
-              await cx.dispatch('auth/updateMethod', value);
+              await cx.dispatch(
+                "auth/updateMethod",
+                // If authConfig is not set, try to restore it from the browser storage to prevent losing the authentication method on page reloads
+                value || new BrowserStorage(true).get("authConfig"),
+              );
               break;
           }
         }
