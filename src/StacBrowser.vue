@@ -12,10 +12,10 @@
           <nav class="actions navigation">
             <b-button-group v-if="canSearch || !isServerSelector || showFavoritesFromVueX">
               <b-button v-if="!isServerSelector" variant="header" :title="$t('browse')" @click="sidebar = !sidebar">
-                <b-icon-list />
+                <mdi-menu />
               </b-button>
               <b-button v-if="canSearch" variant="header" :to="searchBrowserLink" :title="$t('search.title')" :pressed="isSearchPage">
-                <b-icon-search /><span class="button-label">{{ $t('search.title') }}</span>
+                <mdi-magnify /><span class="button-label">{{ $t('search.title') }}</span>
               </b-button>
               <b-button v-if="showFavoritesFromVueX" variant="header" to="/favorites" :title="$t('favorites.title')" :pressed="isFavoritesPage">
                 <b-icon-star /><span class="button-label">{{ $t('favorites.title') }}</span>
