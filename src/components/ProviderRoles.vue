@@ -1,6 +1,6 @@
 <template>
   <div class="roles badges" v-if="Array.isArray(roles)">
-    <b-badge v-for="role in roles" :key="role" variant="secondary">
+    <b-badge v-for="role in sortedRoles" :key="role" variant="secondary">
       {{ displayRole(role) }}
     </b-badge>
   </div>
@@ -13,6 +13,14 @@ export default {
     roles: {
       type: Array,
       default: null
+    }
+  },
+  computed: {
+    sortedRoles() {
+      if (!Array.isArray(this.roles)) {
+        return [];
+      }
+      return [...this.roles].sort((a, b) => a.localeCompare(b));
     }
   },
   methods: {

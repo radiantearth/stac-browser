@@ -56,7 +56,7 @@
     </b-row>
     <b-alert v-if="selectedCollectionCount > 0" show variant="dark" class="selected-collections-action">
       <b-button @click="openItemSearch" variant="primary" size="lg">
-        {{ $tc('search.useInItemSearch', selectedCollectionCount, {count: selectedCollectionCount}) }}
+        {{ $t('search.useInItemSearch', selectedCollectionCount, {count: selectedCollectionCount}) }}
       </b-button>
     </b-alert>
   </main>

@@ -97,6 +97,25 @@ body {
   > footer {
     padding-bottom: $block-margin;
     text-align: center;
+
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      list-style: none;
+      padding: 0;
+      margin: 0 0 $block-margin 0;
+      font-size: 0.875rem;
+
+      li:not(:last-child)::after {
+        content: "|";
+        margin: 0 0.5em;
+      }
+    }
+
+    .poweredby {
+      display: block;
+    }
   }
 
   .popover-large {
@@ -315,7 +334,7 @@ body {
 
   .card-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
     grid-auto-rows: min-content;
     // The layout uses margin-bottom instead of row-gap (on .catalog-grid), because
     // the .card-img-wrapper is supposed to collapse to 0px height when there are no
@@ -339,15 +358,15 @@ body {
         min-height: 4rem;
       }
     }
-    
+
     .catalog-card,
     .item-card {
-      grid-row: span 6;
+      grid-row: span 7;
 
       .card-body {
         display: grid;
         grid-template-rows: subgrid;
-        grid-row: span 3;
+        grid-row: span 4;
       }
     }
 
@@ -355,7 +374,7 @@ body {
       grid-row: span 1;
     }
   }
-  
+
   .catalog-card,
   .item-card,
   .feature-card {
@@ -394,11 +413,17 @@ body {
 
     .card-title {
       overflow-wrap: anywhere;
+      margin-bottom: 0.25rem;
     }
 
     .card-body,
     .card-footer {
       position: relative;
+      gap: 0.5rem;
+
+      > p {
+        margin: 0;
+      }
     }
     .card-footer {
       .btn-group-vertical {
@@ -408,11 +433,11 @@ body {
     .card-footer:empty {
       display: none;
     }
-  
+
     .badge.deprecated {
       text-transform: uppercase;
     }
-    
+
     .intro {
       display: -webkit-box;
       -webkit-line-clamp: 3;
@@ -423,12 +448,6 @@ body {
       text-align: left;
       line-height: 1.5em;
       max-height: 4.5em; /* 3 lines at 1.5em line-height */
-    }
-
-    &.has-extent {
-      .intro {
-        margin-bottom: 0.5rem;
-      }
     }
 
     .datetime {
@@ -448,24 +467,35 @@ body {
       overflow: hidden;
 
       .card-img-wrapper {
-        max-width: 33%;
-        max-height: 100%;
+        width: 33%;
+        position: relative;
+        overflow: hidden;
+
+        &:empty {
+          display: none;
+        }
 
         .card-img-end {
-          max-width: 100%;
-          max-height: 9rem;
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
           object-fit: scale-down;
           object-position: center;
         }
       }
 
       .card-body {
+        display: flex;
+        flex-direction: column;
         flex: 1;
+        gap: 0.25rem;
 
         .intro {
           -webkit-line-clamp: 2;
           line-clamp: 2;
-          height: 3rem;
+          max-height: 3rem;
         }
       }
 

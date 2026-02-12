@@ -19,7 +19,7 @@
     <hr v-if="stacIndex.length > 0">
     <b-form-group v-if="stacIndex.length > 0" class="stac-index">
       <template #label>
-        <i18n-t keypath="index.selectStacIndex" tag="span">
+        <i18n-t keypath="index.selectStacIndex" tag="span" scope="global">
           <template #stacIndex>
             <a href="https://stacindex.org" target="_blank">STAC Index</a>
           </template>
@@ -51,13 +51,11 @@ import { defineComponent } from 'vue';
 import Description from '../components/Description.vue';
 import Utils from '../utils';
 import axios from "axios";
-import { Translation } from 'vue-i18n';
 
 export default defineComponent({
   name: "SelectDataSource",
   components: {
-    Description,
-    'i18n-t': Translation
+    Description
   },
   data() {
     return {
@@ -86,8 +84,8 @@ export default defineComponent({
           return this.$t('index.urlMissingHost');
         }
         return null;
-      } catch (errot) {
-        return this.$t('index.urlInvalid');
+      } catch (error) {
+        return this.$t('index.urlInvalid', { error: error.message });
       }
     }
   },

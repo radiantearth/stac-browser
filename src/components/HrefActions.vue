@@ -253,7 +253,7 @@ export default {
 
       try {
         this.loading = true;
-        const StreamSaver = require('streamsaver-js');
+        const StreamSaver = (await import('streamsaver-js')).default;
 
         const uri = URI(window.origin.toString());
         uri.path(Utils.removeTrailingSlash(this.pathPrefix) + '/mitm.html');
@@ -348,7 +348,7 @@ export default {
             if (this.$te(key)) {
               return this.$t(key);
             }
-          } catch (e) {
+          } catch {
             // Fall back to the default
           }
           return this.$t('protocol.s3.default');

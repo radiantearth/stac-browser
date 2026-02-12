@@ -66,13 +66,13 @@ export default {
     },
     type() {
       if (this.data.isItem()) {
-        return this.$tc('stacItem');
+        return this.$t('stacItem', 1);
       }
       else if (this.data.isCollection()) {
-        return this.$tc(`stacCollection`);
+        return this.$t(`stacCollection`, 1);
       }
       else if (this.data.isCatalog()) {
-        return this.$tc(`stacCatalog`);
+        return this.$t(`stacCatalog`, 1);
       }
       else {
         return '';

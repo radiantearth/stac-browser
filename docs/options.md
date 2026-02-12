@@ -13,9 +13,9 @@ The following ways to set config options are possible:
   Enable this by removing the `<!--` and `-->` around the `<script defer="defer" src="./config.js"></script>` in the [`public/index.html`](../public/index.html).
   Then run the build procedure and after completion, you can fill the `dist/config.js` with any options that you want to customize.
 
-> [!WARNING]  
-> Appending configuration options as CLI parameters to the CLI command (e.g. `npm run build -- --catalogUrl="https://example.com"`) is DEPRECATED and will be removed in STAC Browser v5.
-> Reason is that such parameters are [not suppored by Vite](https://github.com/vitejs/vite/issues/7065), which will be used in v5 instead of vue-cli.
+> [!CAUTION]  
+> Appending configuration options as CLI parameters to the CLI command (e.g. `npm run build -- --catalogUrl="https://example.com"`) has been removed in  STAC Browser v5.
+> The reason is that such parameters are [not suppored by Vite](https://github.com/vitejs/vite/issues/7065).
 
 ## Table of Contents <!-- omit in toc -->
 
@@ -23,6 +23,7 @@ The following ways to set config options are possible:
   - [catalogUrl](#catalogurl)
   - [catalogTitle](#catalogtitle)
   - [catalogImage](#catalogimage)
+  - [footerLinks](#footerlinks)
   - [apiCatalogPriority](#apicatalogpriority)
 - [Deployment](#deployment)
   - [historyMode](#historymode)
@@ -89,6 +90,20 @@ The default title shown if no title can be read from the root STAC catalog.
 
 URL to an image to use as a logo with the title.
 Should be an image that browsers can display, e.g. PNG, JPEG, WebP, or SVG.
+
+### footerLinks
+
+Array of links to display in the footer above the "Powered by STAC Browser" text. Each link requires a `label` and `url`.
+
+Example:
+```js
+footerLinks: [
+  { label: "Imprint", url: "https://example.com/imprint" },
+  { label: "Terms of use", url: "https://example.com/terms" },
+  { label: "Accessibility", url: "https://example.com/accessibility" },
+  { label: "Privacy", url: "https://example.com/privacy" }
+]
+```
 
 ### apiCatalogPriority
 

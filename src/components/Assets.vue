@@ -12,13 +12,13 @@
 </template>
 
 <script>
-import Asset from './Asset.vue';
+import { defineAsyncComponent } from 'vue';
 import { BAccordion } from 'bootstrap-vue-next';
 
 export default {
   name: 'Assets',
   components: {
-    Asset,
+    Asset: defineAsyncComponent(() => import('./Asset.vue')),
     BAccordion
   },
   props: {
@@ -53,7 +53,7 @@ export default {
     displayTitle() {
       if (this.title === null) {
         let langKey = this.definition ? 'assets.inItems' : 'stacAssets';
-        return this.$tc(langKey, this.assets.length);
+        return this.$t(langKey, this.assets.length);
       }
       else {
         return this.title;

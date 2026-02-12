@@ -23,16 +23,17 @@
         class="value"
         :model-value="value?.value"
         @update:model-value="updateValue"
-        :locale="uiLanguage"
+        :locale="datepickerLang"
         :week-start="weekStartDay"
-        :format-locale="datepickerLang"
-        :format="queryable.isDateTime ? dateTimeFormat : dateFormat"
+        :formats="{ input: queryable.isDateTime ? dateTimeFormat : dateFormat }"
         :close-on-scroll="false"
-        :enable-time-picker="queryable.isDateTime"
-        :enableSeconds="queryable.isDateTime"
-        time-picker-inline
+        :time-config="{ 
+          enableTimePicker: queryable.isDateTime,
+          seconds: queryable.isDateTime,
+          timePickerInline: true 
+        }"
+        :input-attrs="{ clearable: true }"
         auto-apply
-        clearable
       />
 
       <b-form-select

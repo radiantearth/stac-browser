@@ -2,7 +2,7 @@ import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import { fileURLToPath, URL } from "node:url";
 import path from "path";
-import { createRequire } from "module";
+import { readFileSync } from "fs";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
 
 import Icons from "unplugin-icons/vite";
@@ -11,24 +11,27 @@ import Components from "unplugin-vue-components/vite";
 import { FileSystemIconLoader } from "unplugin-icons/loaders";
 import { BootstrapVueNextResolver } from "bootstrap-vue-next/resolvers";
 
-import { createHtmlPlugin } from "vite-plugin-html";
+import { ViteEjsPlugin } from "vite-plugin-ejs";
 import { visualizer } from "rollup-plugin-visualizer";
 
-const require = createRequire(import.meta.url);
-const yargs = require("yargs/yargs");
-const { hideBin } = require("yargs/helpers");
+import yargs from "yargs";
 
-const { properties } = require("./config.schema.json");
-const pkgFile = require("./package.json");
+// Read JSON files using fs instead of require
+const configSchema = JSON.parse(
+  readFileSync(new URL("./config.schema.json", import.meta.url), "utf-8")
+);
+const package_ = JSON.parse(
+  readFileSync(new URL("./package.json", import.meta.url), "utf-8")
+);
 
 const optionsForType = (type) =>
-  Object.entries(properties)
+  Object.entries(configSchema.properties)
     .filter(
       ([, schema]) => Array.isArray(schema.type) && schema.type.includes(type)
     )
     .map(([key]) => key);
 
-const argv = yargs(hideBin(process.argv))
+const env = yargs()
   .parserConfiguration({ "camel-case-expansion": false })
   .env("SB")
   .boolean(optionsForType("boolean"))
@@ -40,16 +43,27 @@ const argv = yargs(hideBin(process.argv))
     )
   ).argv;
 
-// Clean-up arguments
-delete argv._;
-delete argv.$0;
+delete env._;
+delete env.$0;
 
-const configFile = path.resolve(argv.CONFIG ? argv.CONFIG : "./config.js");
-const configFromFile = require(configFile);
-const mergedConfig = Object.assign(configFromFile, argv);
+// For config.js, you need to use dynamic import
+const configFilePath = "file://" + path.resolve(env.CONFIG ? env.CONFIG : "./config.js");
+
+// Note: This makes the config async - you'll need to handle this
+let configFromFile;
+try {
+  // Dynamic import for the config file
+  const configModule = await import(configFilePath);
+  configFromFile = configModule.default || configModule;
+} catch (error) {
+  console.error(`Failed to load config from ${configFilePath}:`, error);
+  configFromFile = {};
+}
+
+const config = Object.assign(configFromFile, env);
 
 export default defineConfig(({ mode }) => ({
-  base: mergedConfig.pathPrefix || "/",
+  base: config.pathPrefix,
   build: {
     sourcemap: mode !== "minimal",
     rollupOptions: {
@@ -60,13 +74,14 @@ export default defineConfig(({ mode }) => ({
     preprocessorOptions: {
       scss: {
         api: "modern-compiler",
-        silenceDeprecations: ["color-functions", "global-builtin", "import"],
+        // todo: remove in STAC Browser V6 or if resolved by bootstrap-vue-next.
+        silenceDeprecations: ["color-functions", "global-builtin", "import", "if-function"],
       },
     },
   },
   define: {
-    STAC_BROWSER_VERSION: JSON.stringify(pkgFile.version),
-    CONFIG: JSON.stringify(mergedConfig),
+    STAC_BROWSER_VERSION: JSON.stringify(package_.version),
+    CONFIG: JSON.stringify(config),
   },
   plugins: [
     vue({
@@ -77,17 +92,7 @@ export default defineConfig(({ mode }) => ({
         },
       },
     }),
-    createHtmlPlugin({
-      minify: mode !== "development",
-      template: "public/index.html",
-      inject: {
-        data: {
-          catalogTitle: mergedConfig.catalogTitle || "STAC Browser",
-          catalogUrl: mergedConfig.catalogUrl || "",
-          ...mergedConfig,
-        },
-      },
-    }),
+    ViteEjsPlugin(config),
     Components({
       dirs: [],
       globs: [],

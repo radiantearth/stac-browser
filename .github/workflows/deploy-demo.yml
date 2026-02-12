@@ -6,13 +6,16 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      SB_pathPrefix: "/stac-browser"
+      SB_historyMode: "hash"
     steps:
       - uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
       - uses: actions/checkout@v4
       - run: npm ci
-      - run: npm run build -- --pathPrefix="/stac-browser" --historyMode=hash
+      - run: npm run build
       - uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}

@@ -1,7 +1,7 @@
 <template>
   <section class="items mb-4">
     <header>
-      <h2 class="title me-2">{{ $tc('stacItem', items.length ) }}</h2>
+      <h2 class="title me-2">{{ $t('stacItem', items.length ) }}</h2>
       <b-badge v-if="itemCount !== null" pill variant="secondary" class="me-4">{{ itemCount }}</b-badge>
       <SortButtons v-if="!api && items.length > 1" v-model="sort" />
     </header>

@@ -12,7 +12,7 @@
         </b-badge>
         <b-badge v-if="asset.deprecated" variant="warning" class="deprecated">{{ $t('deprecated') }}</b-badge>
         <template v-if="Array.isArray(asset.roles)">
-          <b-badge v-for="role in asset.roles" :key="role" :variant="role === 'data' ? 'primary' : 'secondary'" class="role">{{ displayRole(role) }}</b-badge>
+          <b-badge v-for="role in sortedRoles" :key="role" :variant="role === 'data' ? 'primary' : 'secondary'" class="role">{{ displayRole(role) }}</b-badge>
         </template>
         <b-badge v-if="shortFileFormat" variant="dark" class="format" :title="fileFormat"><span v-html="shortFileFormat" /></b-badge>
       </div>
@@ -33,9 +33,9 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
 import { formatMediaType } from '@radiantearth/stac-fields/formatters';
 import { mapState } from 'vuex';
-import AssetAlternative from './AssetAlternative.vue';
 import StacFieldsMixin from './StacFieldsMixin';
 import Utils from '../utils';
 import { Asset } from 'stac-js';
@@ -44,7 +44,7 @@ import { BTab, BTabs, BAccordionItem } from 'bootstrap-vue-next';
 export default {
   name: 'Asset',
   components: {
-    AssetAlternative,
+    AssetAlternative: defineAsyncComponent(() => import('./AssetAlternative.vue')),
     BTab,
     BTabs,
     BAccordionItem
@@ -118,6 +118,21 @@ export default {
     },
     hasAlternatives() {
       return Utils.size(this.alternatives) > 0;
+    },
+    sortedRoles() {
+      if (!Array.isArray(this.asset.roles)) {
+        return [];
+      }
+      // Sort roles with 'data' first, then alphabetically (case-insensitive)
+      return [...this.asset.roles].sort((a, b) => {
+        if (a === 'data') {
+          return -1;
+        }
+        if (b === 'data') {
+          return 1;
+        }
+        return a.toLowerCase().localeCompare(b.toLowerCase(), undefined, { sensitivity: 'base' });
+      });
     }
   },
   created() {

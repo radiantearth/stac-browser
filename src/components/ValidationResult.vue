@@ -78,11 +78,11 @@ export default {
     type() {
       switch(this.context.type) {
         case "Feature":
-          return this.$tc('stacItem');
+          return this.$t('stacItem', 1);
         case "Catalog":
-          return this.$tc(`stacCatalog`);
+          return this.$t(`stacCatalog`, 1);
         case "Collection":
-          return this.$tc(`stacCollection`);
+          return this.$t(`stacCollection`, 1);
         default:
           return this.context.type;
       }

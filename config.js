@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     catalogUrl: null,
     catalogTitle: "STAC Browser",
     catalogImage: null,
@@ -53,5 +53,6 @@ module.exports = {
     socialSharing: ['email', 'bsky', 'mastodon', 'x'],
     preprocessSTAC: null,
     authConfig: null,
-    crs: {}
+    crs: {},
+    footerLinks: null
 };

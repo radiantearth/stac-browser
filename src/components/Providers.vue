@@ -1,6 +1,6 @@
 <template>
   <section class="providers mb-4">
-    <h2>{{ $tc('providers.title', count) }}</h2>
+    <h2>{{ $t('providers.title', count) }}</h2>
     <b-list-group v-if="isSimple" class="mimic-accordion">
       <b-list-group-item
         v-for="(provider, key) in providers" :key="key" :href="provider.url" :disabled="!provider.url"
