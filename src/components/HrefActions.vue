@@ -45,7 +45,6 @@ import Utils, { imageMediaTypes, mapMediaTypes } from '../utils';
 import { mapGetters, mapState } from 'vuex';
 import AssetActions from '../../assetActions.config';
 import LinkActions from '../../linkActions.config';
-import { stacRequestOptions } from '../store/utils';
 import URI from 'urijs';
 import AuthUtils from './auth/utils';
 import { Asset } from 'stac-js';
@@ -90,14 +89,16 @@ export default {
   emits: ['show'],
   data() {
     return {
-      id: i++,
-      loading: false
+      id: i++
     };
   },
   computed: {
-    ...mapState(['pathPrefix', 'requestHeaders', 'buildTileUrlTemplate', 'useTileLayerAsFallback']),
+    ...mapState(['downloads', 'pathPrefix', 'requestHeaders', 'buildTileUrlTemplate', 'useTileLayerAsFallback']),
     ...mapGetters(['getRequestUrl']),
     ...mapGetters('auth', ['isLoggedIn']),
+    loading() {
+      return Boolean(this.downloads[this.href]);
+    },
     requiresAuth() {
       return !this.isLoggedIn && this.auth.length > 0;
     },
@@ -150,12 +151,6 @@ export default {
       }
       return {};
     },
-    localFilename() {
-      if (typeof this.data['file:local_path'] === 'string') {
-        return URI(this.data['file:local_path']).filename();
-      }
-      return null;
-    },
     downloadProps() {
       if (this.hasDownloadButton && !this.useAltDownloadMethod) {
         const props = {
@@ -163,7 +158,7 @@ export default {
           target: '_blank',
         };
         if (!this.browserCanOpenFile) {
-          props.download = this.localFilename || this.parsedHref.filename();
+          props.download = Utils.assetFilename(this.data);
         }
         return props;
       }
@@ -209,8 +204,12 @@ export default {
       }
       return this.getRequestUrl(this.data.getAbsoluteUrl());
     },
-    parsedHref() {
-      return URI(this.href);
+    assetWithHref() {
+      // Override asset href with absolute URL
+      // Clone asset so that we can change the href
+      const data = new Asset(this.data);
+      data.href = this.href;
+      return data;
     },
     from() {
       return this.protocolName(this.protocol);
@@ -249,93 +248,10 @@ export default {
     async altDownload() {
       if (!window.isSecureContext) {
         window.location.href = this.href;
+        return;
       }
 
-      try {
-        this.loading = true;
-        const StreamSaver = (await import('streamsaver-js')).default;
-
-        const uri = URI(window.origin.toString());
-        uri.path(Utils.removeTrailingSlash(this.pathPrefix) + '/mitm.html');
-        StreamSaver.mitm = uri.toString();
-
-        const link = Object.assign({}, this.data, {href: this.href});
-        const options = stacRequestOptions(this.$store, link);
-
-        // Convert from axios to fetch
-        const url = options.url;
-        delete options.url;
-        if (typeof options.data !== 'undefined') {
-          options.body = options.data;
-          delete options.data;
-        }
-
-        //options.credentials = 'include';
-
-        // Use fetch because stacRequest uses axios
-        // and axios doesn't support responseType: 'stream'
-        const res = await fetch(url, options);
-        // todo: use getErrorMessage / getErrorCode instead?
-        if (res.status >= 400) {
-          let msg;
-          switch(res.status) {
-            case 401:
-              msg = this.$t('errors.unauthorized');
-              break;
-            case 403:
-              msg = this.$t('errors.authFailed');
-              break;
-            case 404:
-              msg = this.$t('errors.notFound');
-              break;
-            case 500:
-              msg = this.$t('errors.serverError');
-              break;
-            default:
-              msg = this.$t('errors.networkError');
-              break;
-          }
-          throw new Error(msg);
-        }
-
-        let filename = this.localFilename;
-        if (!this.localFilename) {
-          const contentDisposition = res.headers.get('content-disposition');
-          if (typeof contentDisposition === 'string') {
-            const parts = contentDisposition.match(/filename=(?:"|)([^"]+)(?:"|)(?:;|$)/);
-            if (parts) {
-              filename = parts[1];
-            }
-          }
-        }
-        if (!filename) {
-          filename = this.parsedHref.filename();
-        }
-        const fileStream = StreamSaver.createWriteStream(filename);
-
-        // Prevent the user from leaving the page while the download is in progress
-        // As this is not a normal download a user need to stay on the page for the download to complete
-        window.addEventListener('unload', () => {
-          if (this.loading) {
-            fileStream.abort();
-          }
-        });
-        window.addEventListener('beforeunload', (evt) => {
-          if (this.loading) {
-            evt.preventDefault();
-          }
-        });
-
-        await res.body.pipeTo(fileStream);
-      } catch (error) {
-        if (error instanceof DOMException && error.name === 'AbortError') {
-          // When the download was aborted, we don't want to show an error
-          return;
-        }
-        this.$store.commit('showGlobalError', { error });
-      } finally {
-        this.loading = false;
-      }
+      await this.$store.dispatch('altDownload', this.assetWithHref);
     },
     protocolName(protocol) {
       if (typeof protocol !== 'string') {
@@ -344,7 +260,8 @@ export default {
       switch(protocol.toLowerCase()) {
         case 's3':
           try {
-            const key = `protocol.s3.${this.parsedHref.domain()}`;
+            const parsed = URI(this.href);
+            const key = `protocol.s3.${parsed.domain()}`;
             if (this.$te(key)) {
               return this.$t(key);
             }
@@ -367,12 +284,8 @@ export default {
       return '';
     },
     show() {
-      // Override asset href with absolute URL
-      // Clone asset so that we can change the href
-      const data = new Asset(this.data, this.data.getKey(), this.data.getContext());
-      data.href = this.href;
       // todo: can we use data.getAbsoluteUrl in all places where we handle the event in favor of the cloning/updating here?
-      this.$emit('show', data);
+      this.$emit('show', this.assetWithHref);
     },
     handleAuthButton() {
       if (this.auth.length === 1) {

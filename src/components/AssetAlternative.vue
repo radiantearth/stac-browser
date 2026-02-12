@@ -75,7 +75,7 @@ export default {
     },
     resolvedAsset() {
       if (Array.isArray(this.asset['storage:refs'])) {
-        const asset = new Asset(this.asset, this.asset.getKey(), this.context);
+        const asset = new Asset(this.asset);
         asset['storage:schemes'] = this.resolveStorage(this.asset);
         return asset;
       }
