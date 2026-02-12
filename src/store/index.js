@@ -626,7 +626,11 @@ function getStore(config, router) {
           }
           switch (key) {
             case 'authConfig':
-              await cx.dispatch('auth/updateMethod', value);
+              await cx.dispatch(
+                "auth/updateMethod",
+                // If authConfig is not set, try to restore it from the browser storage to prevent losing the authentication method on page reloads
+                value || new BrowserStorage(true).get("authConfig"),
+              );
               break;
           }
         }
@@ -780,13 +784,29 @@ function getStore(config, router) {
         const apiCollectionLink = data instanceof CatalogLike && data.getApiCollectionsLink();
         const apiItemLink = data instanceof CatalogLike && data.getApiItemsLink();
         if (!omitApi && apiCollectionLink) {
-          let args = { stac: data, show: loading.show };
-          try {
-            await cx.dispatch('loadNextApiCollections', args);
-          } catch (error) {
+          const hasAuthRefs = Utils.size(apiCollectionLink['auth:refs']) > 0;
+          const authSchemes = data.getMetadata('auth:schemes');
+
+          if (hasAuthRefs && Utils.size(authSchemes) > 0) {
+            await cx.dispatch('auth/configureFromSchemes', authSchemes);
+          }
+
+          const shouldLoadCollections = !hasAuthRefs || !Utils.size(authSchemes) || cx.rootGetters['auth/isLoggedIn'];
+
+          if (shouldLoadCollections) {
+            let args = { stac: data, show: loading.show };
+            try {
+              await cx.dispatch('loadNextApiCollections', args);
+            } catch (error) {
+              cx.commit('showGlobalError', {
+                message: i18n.global.t('errors.loadApiCollectionsFailed'),
+                error
+              });
+            }
+          } else {
+            // Auth required but user not logged in
             cx.commit('showGlobalError', {
-              message: i18n.global.t('errors.loadApiCollectionsFailed'),
-              error
+              message: i18n.global.t('authentication.unauthorized')
             });
           }
         }
