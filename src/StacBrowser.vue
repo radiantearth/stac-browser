@@ -152,7 +152,8 @@ export default defineComponent({
     return {
       sidebar: null,
       error: null,
-      onDataLoaded: null
+      onDataLoaded: null,
+      isNavigatingLocale: false
     };
   },
   computed: {
@@ -304,7 +305,18 @@ export default defineComponent({
           let link = this.data.getLocaleLink(locale);
           if (link) {
             let state = Object.assign({}, this.stateQueryParameters);
-            this.$router.push(this.toBrowserPath(link.href));
+            const targetPath = this.toBrowserPath(link.href);
+            const currentPath = this.$route.path;
+            if (targetPath !== currentPath) {
+              const query = Object.assign({}, this.$route.query);
+              this.isNavigatingLocale = true;
+              try {
+                await this.$router.push({ path: targetPath, query });
+              }
+              finally {
+                this.isNavigatingLocale = false;
+              }
+            }
             this.$store.commit('state', state);
           }
           else if (this.supportsConformance(API_LANGUAGE_CONFORMANCE)) {
@@ -322,6 +334,9 @@ export default defineComponent({
     stateQueryParameters: {
       deep: true,
       handler() {
+        if (this.isNavigatingLocale) {
+          return;
+        }
         let query = {};
         for (const [key, value] of Object.entries(this.$route.query)) {
           if (!key.startsWith('.')) {
@@ -340,7 +355,7 @@ export default defineComponent({
           }
         }
 
-        this.$router.replace({ query }).catch(error => {
+        this.$router.replace({ path: this.$route.path, query }).catch(error => {
           if (!isNavigationFailure(error, NavigationFailureType.duplicated)) {
             throw Error(error);
           }
@@ -537,7 +552,7 @@ export default defineComponent({
           }
         }
       }
-      if (params?.state?.language) {
+      if (params?.state?.language && params.state.language !== this.localeFromVueX) {
         this.switchLocale({locale: params.state.language});
       }
       if (Utils.size(params.private) > 0) {
