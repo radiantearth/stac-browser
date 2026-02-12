@@ -3,7 +3,7 @@
     <h2 v-if="displayTitle">{{ displayTitle }}</h2>
     <b-accordion>
       <Asset
-        v-for="asset in assets" :asset="asset" :expand="expand" :context="context"
+        v-for="asset in assets" :asset="asset" :expand="expand"
         :definition="definition" :shown="shownKeys.includes(asset.getKey())"
         :key="asset.getKey()" @show="show"
       />

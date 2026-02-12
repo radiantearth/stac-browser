@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="asset-alternative">
     <h4 class="mb-4" v-html="fileFormat" />
     <HrefActions isAsset :data="asset" :shown="shown" @show="show" :auth="auth" />
     <div class="mt-4" v-if="asset.description">
@@ -118,3 +118,9 @@ export default {
   }
 };
 </script>
+
+<style lang="scss" scoped>
+.asset-alternative {
+  padding: 1rem;
+}
+</style>
