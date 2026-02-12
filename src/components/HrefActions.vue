@@ -45,7 +45,6 @@ import Utils, { imageMediaTypes, mapMediaTypes } from '../utils';
 import { mapGetters, mapState } from 'vuex';
 import AssetActions from '../../assetActions.config';
 import LinkActions from '../../linkActions.config';
-import { stacRequestOptions } from '../store/utils';
 import URI from 'urijs';
 import AuthUtils from './auth/utils';
 import { Asset } from 'stac-js';
@@ -90,14 +89,16 @@ export default {
   emits: ['show'],
   data() {
     return {
-      id: i++,
-      loading: false
+      id: i++
     };
   },
   computed: {
-    ...mapState(['pathPrefix', 'requestHeaders', 'buildTileUrlTemplate', 'useTileLayerAsFallback']),
+    ...mapState(['downloads', 'pathPrefix', 'requestHeaders', 'buildTileUrlTemplate', 'useTileLayerAsFallback']),
     ...mapGetters(['getRequestUrl']),
     ...mapGetters('auth', ['isLoggedIn']),
+    loading() {
+      return Boolean(this.downloads[this.href]);
+    },
     requiresAuth() {
       return !this.isLoggedIn && this.auth.length > 0;
     },
@@ -248,94 +249,12 @@ export default {
   methods: {
     async altDownload() {
       if (!window.isSecureContext) {
-        window.location.href = this.href;
+        window.location.href = link.href;
+        return;
       }
 
-      try {
-        this.loading = true;
-        const StreamSaver = (await import('streamsaver-js')).default;
-
-        const uri = URI(window.origin.toString());
-        uri.path(Utils.removeTrailingSlash(this.pathPrefix) + '/mitm.html');
-        StreamSaver.mitm = uri.toString();
-
-        const link = Object.assign({}, this.data, {href: this.href});
-        const options = stacRequestOptions(this.$store, link);
-
-        // Convert from axios to fetch
-        const url = options.url;
-        delete options.url;
-        if (typeof options.data !== 'undefined') {
-          options.body = options.data;
-          delete options.data;
-        }
-
-        //options.credentials = 'include';
-
-        // Use fetch because stacRequest uses axios
-        // and axios doesn't support responseType: 'stream'
-        const res = await fetch(url, options);
-        // todo: use getErrorMessage / getErrorCode instead?
-        if (res.status >= 400) {
-          let msg;
-          switch(res.status) {
-            case 401:
-              msg = this.$t('errors.unauthorized');
-              break;
-            case 403:
-              msg = this.$t('errors.authFailed');
-              break;
-            case 404:
-              msg = this.$t('errors.notFound');
-              break;
-            case 500:
-              msg = this.$t('errors.serverError');
-              break;
-            default:
-              msg = this.$t('errors.networkError');
-              break;
-          }
-          throw new Error(msg);
-        }
-
-        let filename = this.localFilename;
-        if (!this.localFilename) {
-          const contentDisposition = res.headers.get('content-disposition');
-          if (typeof contentDisposition === 'string') {
-            const parts = contentDisposition.match(/filename=(?:"|)([^"]+)(?:"|)(?:;|$)/);
-            if (parts) {
-              filename = parts[1];
-            }
-          }
-        }
-        if (!filename) {
-          filename = this.parsedHref.filename();
-        }
-        const fileStream = StreamSaver.createWriteStream(filename);
-
-        // Prevent the user from leaving the page while the download is in progress
-        // As this is not a normal download a user need to stay on the page for the download to complete
-        window.addEventListener('unload', () => {
-          if (this.loading) {
-            fileStream.abort();
-          }
-        });
-        window.addEventListener('beforeunload', (evt) => {
-          if (this.loading) {
-            evt.preventDefault();
-          }
-        });
-
-        await res.body.pipeTo(fileStream);
-      } catch (error) {
-        if (error instanceof DOMException && error.name === 'AbortError') {
-          // When the download was aborted, we don't want to show an error
-          return;
-        }
-        this.$store.commit('showGlobalError', { error });
-      } finally {
-        this.loading = false;
-      }
+      const link = Object.assign({}, this.data, {href: this.href});
+      await this.$store.dispatch('altDownload', link);
     },
     protocolName(protocol) {
       if (typeof protocol !== 'string') {

@@ -156,7 +156,7 @@ export default defineComponent({
     };
   },
   computed: {
-    ...mapState(['allowSelectCatalog', 'conformsTo', 'data', 'dataLanguage', 'globalError', 'loading', 'stateQueryParameters', 'uiLanguage', 'url']),
+    ...mapState(['allowSelectCatalog', 'conformsTo', 'data', 'dataLanguage', 'downloads', 'globalError', 'loading', 'stateQueryParameters', 'uiLanguage', 'url']),
     ...mapState({
       catalogImageFromVueX: 'catalogImage',
       footerLinksFromVueX: 'footerLinks',
@@ -425,6 +425,20 @@ export default defineComponent({
   },
   mounted() {    
     setInterval(() => this.$store.dispatch('loadBackground', 3), 200);
+
+    // Prevent the user from leaving the page while the download is in progress
+    // As this is not a normal download a user need to stay on the page for the download to complete
+    window.addEventListener('unload', () => {
+      Object.values(this.downloads).forEach(stream => stream.abort());
+    });
+    window.addEventListener('beforeunload', (evt) => {
+      if (Utils.size(this.downloads) > 0) {
+        const confirm = window.confirm(this.$t('confirmDownloadAbort'));
+        if (!confirm) {
+          evt.preventDefault();
+        }
+      }
+    });
   },
   methods: {
     ...mapActions(['switchLocale']),

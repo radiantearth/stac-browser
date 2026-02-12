@@ -8,7 +8,7 @@ import { addMissingChildren, getDisplayTitle, createSTAC } from '../models/stac'
 import { CatalogLike, STAC } from 'stac-js';
 
 import auth from './auth.js';
-import { addQueryIfNotExists, hasAuthority, isAuthenticationError, Loading, processSTAC, stacRequest } from './utils';
+import { addQueryIfNotExists, hasAuthority, isAuthenticationError, Loading, processSTAC, stacRequest, stacRequestOptions } from './utils';
 import { getBest } from 'stac-js/src/locales';
 import fieldsI18n from '@radiantearth/stac-fields/I18N';
 import { TYPES } from "../components/ApiCapabilitiesMixin";
@@ -57,6 +57,7 @@ function getStore(config, router) {
     state: Object.assign({}, config, localDefaults(), catalogDefaults(), {
       // Global settings
       database: {}, // STAC object, Error object or Loading object or Promise (when loading)
+      downloads: {},
       allowSelectCatalog: !config.catalogUrl,
       globalRequestQueryParameters: config.requestQueryParameters,
       uiLanguage: config.locale
@@ -459,6 +460,12 @@ function getStore(config, router) {
         if (idx > -1) {
           state.stateQueryParameters[type].splice(idx, 1);
         }
+      },
+      startDownload(state, {href, fileStream}) {
+        state.downloads[href] = fileStream || null;
+      },
+      finishDownload(state, href) {
+        delete state.downloads[href];
       },
       updateLoading(state, { url, show }) {
         let data = state.database[url];
@@ -1004,7 +1011,78 @@ function getStore(config, router) {
             errorFn(error);
           }
         }
-      }
+      },
+      async altDownload(cx, link) {
+        try {
+          cx.commit('startDownload', {href: link.href});
+          const StreamSaver = (await import('streamsaver-js')).default;
+
+          const uri = URI(window.origin.toString());
+          uri.path(Utils.removeTrailingSlash(cx.state.pathPrefix) + '/mitm.html');
+          StreamSaver.mitm = uri.toString();
+
+          const options = stacRequestOptions(cx, link);
+
+          // Convert from axios to fetch
+          const url = options.url;
+          delete options.url;
+          if (typeof options.data !== 'undefined') {
+            options.body = options.data;
+            delete options.data;
+          }
+
+          // Use fetch because stacRequest uses axios
+          // and axios doesn't support responseType: 'stream'
+          const res = await fetch(url, options);
+          // todo: use getErrorMessage / getErrorCode instead?
+          if (res.status >= 400) {
+            let msg;
+            switch(res.status) {
+              case 401:
+                msg = i18n.global.t('errors.unauthorized');
+                break;
+              case 403:
+                msg = i18n.global.t('errors.authFailed');
+                break;
+              case 404:
+                msg = i18n.global.t('errors.notFound');
+                break;
+              case 500:
+                msg = i18n.global.t('errors.serverError');
+                break;
+              default:
+                msg = i18n.global.t('errors.networkError');
+                break;
+            }
+            throw new Error(msg);
+          }
+
+          let filename = this.localFilename;
+          if (!this.localFilename) {
+            const contentDisposition = res.headers.get('content-disposition');
+            if (typeof contentDisposition === 'string') {
+              const parts = contentDisposition.match(/filename=(?:"|)([^"]+)(?:"|)(?:;|$)/);
+              if (parts) {
+                filename = parts[1];
+              }
+            }
+          }
+          if (!filename) {
+            filename = URI(link.href).filename();
+          }
+          const fileStream = StreamSaver.createWriteStream(filename);
+          cx.commit('startDownload', {href: link.href, fileStream});
+          await res.body.pipeTo(fileStream);
+        } catch (error) {
+          if (error instanceof DOMException && error.name === 'AbortError') {
+            // When the download was aborted, we don't want to show an error
+            return;
+          }
+          cx.commit('showGlobalError', { error });
+        } finally {
+          cx.commit('finishDownload', link.href);
+        }
+      },
     },
   });
 }
