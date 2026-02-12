@@ -105,7 +105,8 @@ export default defineComponent({
       this.report = null;
       if (this.data instanceof STAC) {
         try {
-          this.report = await validateSTAC(this.data);
+          const stac = this.data._original || this.data.toJSON();
+          this.report = await validateSTAC(stac, {});
         } catch (error) {
           this.internalError = error;
         } finally {

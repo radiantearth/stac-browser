@@ -15,23 +15,29 @@ export function createSTAC(data, url, path, migrate = true, updateVersionNumber 
     // Uncomment this line if the old checksum: fields should be converted
     // This is usually not needed so it's not enabled by default to shrink the bundle size
     // Migrate.enableMultihash(require('multihashes'));
+    data._original = data;
     data = Migrate.stac(data, updateVersionNumber);
   }
+  let obj;
   if (data.type === 'Feature') {
-    return new Item(data, url, path);
+    obj = new Item(data, url, path);
   }
   else if (data.type === 'FeatureCollection') {
-    return new ItemCollection(data, url, path);
+    obj = new ItemCollection(data, url, path);
   }
   else if (data.type === 'Collection' || (!data.type && typeof data.extent !== 'undefined' && typeof data.license !== 'undefined')) {
-    return new Collection(data, url, path);
+    obj = new Collection(data, url, path);
   }
   else if (!data.type && Array.isArray(data.collections)) {
-    return new CollectionCollection(data, url, path);
+    obj = new CollectionCollection(data, url, path);
   }
   else {
-    return new Catalog(data, url, path);
+    obj = new Catalog(data, url, path);
   }
+  if (data._original) {
+    obj._privateKeys.push('_original');
+  }
+  return obj;
 }
 
 export function addMissingChildren(catalogs, stac) {
@@ -112,6 +118,7 @@ export class ItemCollection extends BaseItemCollection {
   constructor(data, url, path) {
     super(data, url);
     this._path = path;
+    this._privateKeys.push('_path');
   }
 
   getBrowserPath() {
@@ -125,6 +132,7 @@ export class CollectionCollection extends BaseCollectionCollection {
   constructor(data, url, path) {
     super(data, url);
     this._path = path;
+    this._privateKeys.push('_path');
   }
 
   getBrowserPath() {
@@ -145,6 +153,7 @@ export class Collection extends BaseCollection {
       prev: false,
       next: false
     };
+    this._privateKeys.push('_path', '_incomplete', '_apiChildrenListeners', '_apiChildren');
   }
 
   getBrowserPath() {
@@ -200,6 +209,7 @@ export class Catalog extends BaseCatalog {
       prev: false,
       next: false
     };
+    this._privateKeys.push('_path', '_incomplete', '_apiChildrenListeners', '_apiChildren');
   }
 
   getBrowserPath() {
@@ -249,6 +259,7 @@ export class Item extends BaseItem {
     super(data, url);
     this._path = path;
     this._incomplete = false;
+    this._privateKeys.push('_path', '_incomplete');
   }
 
   getBrowserPath() {
