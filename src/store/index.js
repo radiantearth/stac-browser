@@ -462,7 +462,7 @@ function getStore(config, router) {
         }
       },
       startDownload(state, {href, fileStream}) {
-        state.downloads[href] = fileStream || null;
+        state.downloads[href] = fileStream || true;
       },
       finishDownload(state, href) {
         delete state.downloads[href];
@@ -1057,19 +1057,7 @@ function getStore(config, router) {
             throw new Error(msg);
           }
 
-          let filename = this.localFilename;
-          if (!this.localFilename) {
-            const contentDisposition = res.headers.get('content-disposition');
-            if (typeof contentDisposition === 'string') {
-              const parts = contentDisposition.match(/filename=(?:"|)([^"]+)(?:"|)(?:;|$)/);
-              if (parts) {
-                filename = parts[1];
-              }
-            }
-          }
-          if (!filename) {
-            filename = URI(link.href).filename();
-          }
+          const filename = Utils.assetFilename(link, res);
           const fileStream = StreamSaver.createWriteStream(filename);
           cx.commit('startDownload', {href: link.href, fileStream});
           await res.body.pipeTo(fileStream);

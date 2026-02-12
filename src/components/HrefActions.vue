@@ -151,12 +151,6 @@ export default {
       }
       return {};
     },
-    localFilename() {
-      if (typeof this.data['file:local_path'] === 'string') {
-        return URI(this.data['file:local_path']).filename();
-      }
-      return null;
-    },
     downloadProps() {
       if (this.hasDownloadButton && !this.useAltDownloadMethod) {
         const props = {
@@ -164,7 +158,7 @@ export default {
           target: '_blank',
         };
         if (!this.browserCanOpenFile) {
-          props.download = this.localFilename || this.parsedHref.filename();
+          props.download = Utils.assetFilename(this.data);
         }
         return props;
       }
@@ -210,8 +204,12 @@ export default {
       }
       return this.getRequestUrl(this.data.getAbsoluteUrl());
     },
-    parsedHref() {
-      return URI(this.href);
+    assetWithHref() {
+      // Override asset href with absolute URL
+      // Clone asset so that we can change the href
+      const data = new Asset(this.data);
+      data.href = this.href;
+      return data;
     },
     from() {
       return this.protocolName(this.protocol);
@@ -249,12 +247,11 @@ export default {
   methods: {
     async altDownload() {
       if (!window.isSecureContext) {
-        window.location.href = link.href;
+        window.location.href = this.href;
         return;
       }
 
-      const link = Object.assign({}, this.data, {href: this.href});
-      await this.$store.dispatch('altDownload', link);
+      await this.$store.dispatch('altDownload', this.assetWithHref);
     },
     protocolName(protocol) {
       if (typeof protocol !== 'string') {
@@ -263,7 +260,8 @@ export default {
       switch(protocol.toLowerCase()) {
         case 's3':
           try {
-            const key = `protocol.s3.${this.parsedHref.domain()}`;
+            const parsed = URI(this.href);
+            const key = `protocol.s3.${parsed.domain()}`;
             if (this.$te(key)) {
               return this.$t(key);
             }
@@ -286,12 +284,8 @@ export default {
       return '';
     },
     show() {
-      // Override asset href with absolute URL
-      // Clone asset so that we can change the href
-      const data = new Asset(this.data, this.data.getKey(), this.data.getContext());
-      data.href = this.href;
       // todo: can we use data.getAbsoluteUrl in all places where we handle the event in favor of the cloning/updating here?
-      this.$emit('show', data);
+      this.$emit('show', this.assetWithHref);
     },
     handleAuthButton() {
       if (this.auth.length === 1) {

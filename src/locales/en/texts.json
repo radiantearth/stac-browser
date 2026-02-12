@@ -70,7 +70,6 @@
     "false": "no",
     "true": "yes"
   },
-  "confirmDownloadAbort": "A download is currently in progress. Are you sure you want to leave this page and abort the download?",
   "copy": "Copy",
   "default": "Default",
   "defaultWithValue": "Default ({value})",

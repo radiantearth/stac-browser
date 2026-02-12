@@ -70,7 +70,6 @@
     "false": "Nein",
     "true": "Ja"
   },
-  "confirmDownloadAbort": "Ein Download ist derzeit im Gange. Möchten Sie diese Seite wirklich verlassen und den Download abbrechen?",
   "copy": "Kopieren",
   "default": "Standardeinstellung",
   "defaultWithValue": "Standardeinstellung ({value})",
