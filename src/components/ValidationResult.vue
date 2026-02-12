@@ -66,8 +66,18 @@ export default {
       if (typeof this.locale !== 'function') {
         return this.errors;
       }
-      this.locale(this.errors);
-      return this.errors;
+      // Make a copy of the errors as the ajv-i18n package mutates the error objects
+      const errors = this.errors.map(error => Object.assign({}, error));
+      // Translate error messages
+      this.locale(errors);
+      // ajv-i18n overrides error messages from stac-node-validator that do not originate from ajv.
+      // Reset to the original message in those cases.
+      return errors.map((error, i) => {
+        if (typeof error.keyword === 'undefined') {
+          return this.errors[i];
+        }
+        return error;
+      });
     },
     hasWarnings() {
       return Array.isArray(this.warnings) && this.warnings.length > 0;
