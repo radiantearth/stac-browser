@@ -140,20 +140,6 @@ export default {
   
   computed: {
     /**
-     * Description of current operator
-     */
-    operatorDescription() {
-      return this.operator?.description || '';
-    },
-    
-    /**
-     * Display value (use raw input if user is typing, otherwise sync from prop)
-     */
-    displayValue() {
-      return this.rawInput;
-    },
-    
-    /**
      * Input placeholder text
      */
     placeholder() {
