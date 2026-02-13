@@ -1,18 +1,18 @@
 <template>
-  <b-card no-body :class="classes" v-b-visible.400="load" :img-right="isList">
+  <b-card no-body :class="classes" v-visible.400="load" :img-placement="isList ? 'end' : undefined">
     <div class="card-img-wrapper">
-      <b-card-img-lazy v-if="hasImage" class="thumbnail" offset="200" v-bind="thumbnail" />
+      <b-card-img v-if="hasImage" class="thumbnail" v-bind="thumbnail" lazy />
     </div>
     <b-card-body>
       <b-card-title>
         <StacLink :data="[data, catalog]" class="stretched-link" />
       </b-card-title>
       <b-card-text v-if="fileFormats.length > 0 || hasDescription || isDeprecated" class="intro">
-        <b-badge v-if="isDeprecated" variant="warning" class="mr-1 mt-1 deprecated">{{ $t('deprecated') }}</b-badge>
-        <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="mr-1 mt-1 fileformat">{{ format }}</b-badge>
+        <b-badge v-if="isDeprecated" variant="warning" class="me-1 mt-1 deprecated">{{ $t('deprecated') }}</b-badge>
+        <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="me-1 mt-1 fileformat">{{ format }}</b-badge>
         {{ summarizeDescription }}
       </b-card-text>
-      <Keywords v-if="showKeywordsInCatalogCards && keywords.length > 0" :keywords="keywords" variant="primary" :center="!isList" />
+      <Keywords v-if="showKeywordsInCatalogCards && keywords.length > 0" :keywords="keywords" variant="primary" />
       <b-card-text v-if="temporalExtent" class="datetime"><small v-html="temporalExtent" /></b-card-text>
     </b-card-body>
     <b-card-footer>
@@ -22,6 +22,7 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
 import { mapState, mapGetters } from 'vuex';
 import FileFormatsMixin from './FileFormatsMixin';
 import StacFieldsMixin from './StacFieldsMixin';
@@ -29,12 +30,19 @@ import CardMixin from './CardMixin';
 import StacLink from './StacLink.vue';
 import { STAC } from 'stac-js';
 import { formatTemporalExtent } from '@radiantearth/stac-fields/formatters';
+import { BCard, BCardBody, BCardFooter, BCardImg, BCardText, BCardTitle } from 'bootstrap-vue-next';
 
 export default {
   name: 'Catalog',
   components: {
+    BCard,
+    BCardBody,
+    BCardFooter,
+    BCardImg,
+    BCardText,
+    BCardTitle,
     StacLink,
-    Keywords: () => import('./Keywords.vue')
+    Keywords: defineAsyncComponent(() => import('./Keywords.vue'))
   },
   mixins: [
     FileFormatsMixin,
@@ -60,9 +68,6 @@ export default {
       }
       if (this.hasImage) {
         classes.push('has-thumbnail');
-      }
-      if (this.temporalExtent) {
-        classes.push('has-extent');
       }
       return classes;
     },

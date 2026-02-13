@@ -1,6 +1,6 @@
 <template>
-  <div class="keywords d-flex flex-wrap" :class="{'justify-content-center': center}">
-    <b-badge v-for="keyword in sortedKeywords" :key="keyword" :variant="variant" class="mr-1 mb-1">{{ keyword }}</b-badge>
+  <div class="keywords">
+    <b-badge v-for="keyword in sortedKeywords" :key="keyword" :variant="variant" class="keyword">{{ keyword }}</b-badge>
   </div>
 </template>
 
@@ -15,10 +15,6 @@ export default {
     variant: {
       type: String,
       default: 'secondary'
-    },
-    center: {
-      type: Boolean,
-      default: false
     }
   },
   computed: {
@@ -28,3 +24,17 @@ export default {
   }
 };
 </script>
+
+<style lang="scss" scoped>
+.keywords {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  align-items: flex-start;
+  align-content: flex-start;
+
+  .keyword {
+    padding: 0.3em 0.4em;
+  }
+}
+</style>

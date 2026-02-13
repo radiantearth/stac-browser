@@ -1,29 +1,30 @@
 <template>
-  <component :is="component">
-    <b-card-title><span v-html="fileFormat" /></b-card-title>
+  <div>
+    <h4 class="mb-4" v-html="fileFormat" />
     <HrefActions isAsset :data="asset" :shown="shown" @show="show" :auth="auth" />
-    <b-card-text class="mt-4" v-if="asset.description">
+    <div class="mt-4" v-if="asset.description">
       <Description :description="asset.description" compact />
-    </b-card-text>
-    <Metadata class="mt-4" :data="resolvedAsset" :context="context" :ignoreFields="ignore" title="" type="Asset" />
-  </component>
+    </div>
+    <MetadataGroups class="mt-4" :data="resolvedAsset" :context="context" :ignoreFields="ignore" title="" type="Asset" />
+  </div>
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
 import { formatMediaType } from '@radiantearth/stac-fields/formatters';
 import Description from './Description.vue';
 import HrefActions from './HrefActions.vue';
 import StacFieldsMixin from './StacFieldsMixin';
 import AuthUtils from './auth/utils';
 import Utils from '../utils';
-import { Asset, STACObject } from 'stac-js';
+import { Asset, STACReference } from 'stac-js';
 
 export default {
   name: 'AssetAlternative',
   components: {
     Description,
     HrefActions,
-    Metadata: () => import('./Metadata.vue')
+    MetadataGroups: defineAsyncComponent(() => import('./MetadataGroups.vue'))
   },
   mixins: [
     StacFieldsMixin({ formatMediaType })
@@ -42,6 +43,7 @@ export default {
       default: false
     }
   },
+  emits: ['show'],
   data() {
     return {
       ignore: [
@@ -74,13 +76,18 @@ export default {
     resolvedAsset() {
       if (Array.isArray(this.asset['storage:refs'])) {
         const asset = new Asset(this.asset, this.asset.getKey(), this.context);
-        asset['storage:schemes'] = this.resolveStorage(this.asset, this.context);
+        asset['storage:schemes'] = this.resolveStorage(this.asset);
         return asset;
       }
       return this.asset;
     },
-    component() {
-      return this.hasAlternatives ? 'div' : 'b-card-body';
+    tileRendererType() {
+      if (this.buildTileUrlTemplate && !this.useTileLayerAsFallback) {
+        return 'server';
+      }
+      else {
+        return 'client';
+      }
     },
     fileFormat() {
       if (typeof this.asset.type === "string" && this.asset.type.length > 0) {
@@ -89,20 +96,19 @@ export default {
       return null;
     },
     auth() {
-      return AuthUtils.resolveAuth(this.asset, this.context);
+      return AuthUtils.resolveAuth(this.asset);
     }
   },
   methods: {
-    resolveStorage(obj, context) {
-      if (context instanceof STACObject && Utils.size(obj['storage:refs']) > 0) {
-        const schemes = context.getMetadata('storage:schemes');
-        const filteredSchemes = {};
-        for (const ref of obj['storage:refs']) {
-          if (Utils.isObject(schemes[ref])) {
-            filteredSchemes[ref] = schemes[ref];
-          }
+    resolveStorage(obj) {
+      if (obj instanceof STACReference) {
+        const refs = obj.getMetadata('storage:refs');
+        const schemes = obj.getMetadata('storage:schemes');
+        if (Utils.size(refs) > 0 && Utils.size(schemes) > 0) {
+          return refs
+            .map(ref => schemes[ref])
+            .filter(ref => Utils.isObject(ref));
         }
-        return filteredSchemes;
       }
       return [];
     },

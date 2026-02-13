@@ -28,7 +28,7 @@ export default class Queryable {
 
   get description() {
     if (this.isTemporal) {
-      return i18n.t("search.dateDescription");
+      return i18n.global.t('search.dateDescription');
     }
     return "";
   }

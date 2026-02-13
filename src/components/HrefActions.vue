@@ -4,9 +4,9 @@
       <b-button variant="danger" v-if="requiresAuth" tag="a" tabindex="0" :id="`popover-href-${id}-btn`" @click="handleAuthButton">
         <b-icon-lock /> {{ $t('authentication.required') }}
       </b-button>
-      <b-button v-if="hasDownloadButton" :disabled="requiresAuth" v-bind="downloadProps" v-on="downloadEvents" variant="primary">
+      <b-button v-if="hasDownloadButton" :disabled="requiresAuth" variant="primary" v-bind="downloadProps" v-on="downloadEvents">
         <b-spinner v-if="loading" small variant="light" />
-        <b-icon-box-arrow-up-right v-else-if="browserCanOpenFile" /> 
+        <b-icon-box-arrow-up-right v-else-if="browserCanOpenFile" />
         <b-icon-download v-else />
         {{ buttonText }}
       </b-button>
@@ -14,20 +14,20 @@
         {{ copyButtonText }}
       </CopyButton>
       <b-button v-if="hasShowButton" @click="show" variant="primary">
-        <b-icon-eye class="mr-1" />
+        <b-icon-eye class="me-1" />
         <template v-if="isThumbnail">{{ $t('assets.showThumbnail') }}</template>
         <template v-else>{{ $t('assets.showOnMap') }}</template>
       </b-button>
-      <b-button v-for="action of actions" v-bind="action.btnOptions" :key="action.id" variant="primary" @click="action.onClick">
-        <component v-if="action.icon" :is="action.icon" class="mr-1" />
+      <b-button v-for="action of actions" :key="action.id" variant="primary" v-bind="action.btnOptions" @click="action.onClick">
+        <component v-if="action.icon" :is="action.icon" class="me-1" />
         {{ action.text }}
       </b-button>
     </b-button-group>
-    
+
     <b-popover
-      v-if="auth.length > 1"
-      :id="`popover-href-${id}`" custom-class="href-auth-methods" :target="`popover-href-${id}-btn`"
-      triggers="focus" container="stac-browser" :title="$t('authentication.chooseMethod')"
+      v-if="auth.length > 1" click focus
+      :id="`popover-href-${id}`" class="href-auth-methods" :target="`popover-href-${id}-btn`"
+      :title="$t('authentication.chooseMethod')" teleport-to="#stac-browser" :boundary-padding="10"
     >
       <b-list-group>
         <AuthSchemeItem v-for="(method, i) in auth" :key="i" :method="method" @authenticate="startAuth" />
@@ -38,7 +38,8 @@
 
 
 <script>
-import { BIconBoxArrowUpRight, BIconDownload, BIconEye, BIconLock, BListGroup, BPopover, BSpinner } from 'bootstrap-vue';
+import { defineAsyncComponent } from 'vue';
+
 import Description from './Description.vue';
 import Utils, { imageMediaTypes, mapMediaTypes } from '../utils';
 import { mapGetters, mapState } from 'vuex';
@@ -55,17 +56,10 @@ let i = 0;
 export default {
   name: 'HrefActions',
   components: {
-    AuthSchemeItem: () => import('./AuthSchemeItem.vue'),
-    BIconBoxArrowUpRight,
-    BIconDownload,
-    BIconEye,
-    BIconLock,
-    BListGroup,
-    BPopover,
-    BSpinner,
-    CopyButton: () => import('./CopyButton.vue'),
+    AuthSchemeItem: defineAsyncComponent(() => import('./AuthSchemeItem.vue')),
+    BPopover: defineAsyncComponent(() => import('bootstrap-vue-next').then(m => m.BPopover)),
+    CopyButton: defineAsyncComponent(() => import('./CopyButton.vue')),
     Description,
-    Metadata: () => import('./Metadata.vue')
   },
   props: {
     data: {
@@ -93,6 +87,7 @@ export default {
       default: () => ([])
     }
   },
+  emits: ['show'],
   data() {
     return {
       id: i++,
@@ -258,7 +253,7 @@ export default {
 
       try {
         this.loading = true;
-        const StreamSaver = require('streamsaver-js');
+        const StreamSaver = (await import('streamsaver-js')).default;
 
         const uri = URI(window.origin.toString());
         uri.path(Utils.removeTrailingSlash(this.pathPrefix) + '/mitm.html');
@@ -353,7 +348,7 @@ export default {
             if (this.$te(key)) {
               return this.$t(key);
             }
-          } catch (e) {
+          } catch {
             // Fall back to the default
           }
           return this.$t('protocol.s3.default');
@@ -392,7 +387,10 @@ export default {
       else {
         const name = this.$t(`authentication.schemeTypes.${method.type}`, method);
         const message = this.$t('authentication.unsupportedLong', {method: name});
-        this.$root.$emit('error', new Error(message), this.$t('authentication.unsupported'));
+        this.$store.commit('showGlobalError', {
+          error: new Error(message),
+          message: this.$t('authentication.unsupported')
+        });
       }
     }
   }

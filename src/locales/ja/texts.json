@@ -116,6 +116,7 @@
   "in": "{catalog} 内",
   "index": {
     "api": "API",
+    "catalog": "カタログ",
     "load": "読み込み",
     "selectStacIndex": "または {stacIndex} から選択:",
     "specifyCatalog": "STACカタログやSTAC APIのURLを指定:",

@@ -1,6 +1,6 @@
 # Docker
 
-Note: Docker might not be an ideal way to deploy STAC Browser in production. Consider using a web host, cloud storage, or a CDN. 
+Note: Docker might not be an ideal way to deploy STAC Browser in production. Consider using a web host, cloud storage, or a CDN.
 
 ## Create a custom image
 
@@ -51,7 +51,7 @@ STAC browser is now available at `http://localhost:8080/browser`
 
 Since version 3.1.1, you can add an existing image from [Packages](https://github.com/radiantearth/stac-browser/pkgs/container/stac-browser) to your docker-compose.yml:
 
-```
+```yaml
 services:
   stac-browser:
     image: ghcr.io/radiantearth/stac-browser:latest

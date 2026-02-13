@@ -1,47 +1,42 @@
 <template>
-  <b-card class="provider expandable-card" no-body>
-    <b-card-header header-tag="header" role="tab">
-      <b-button block v-b-toggle="id" variant="provider" squared>
-        <span class="chevron" aria-hidden="true">
-          <b-icon-chevron-down v-if="expanded" />
-          <b-icon-chevron-right v-else />
-        </span>
-        <span class="title">{{ provider.name }}</span>
-        <ProviderRoles :roles="provider.roles" />
-      </b-button>
-    </b-card-header>
-    <b-collapse :id="id" v-model="expanded" accordion="providers" role="tabpanel">
-      <b-card-body>
-        <b-button-group v-if="provider.url || provider.email || provider.mail">
-          <b-button :href="provider.url" target="_blank" variant="primary">
-            {{ $t('providers.homepage') }}
-          </b-button>
-          <b-button v-if="provider.email || provider.mail" :href="`mailto:${provider.email || provider.mail}`" target="_blank" variant="primary">
-            {{ $t('providers.email') }}
-          </b-button>
-        </b-button-group>
-        <b-card-text class="mt-4" v-if="provider.description">
-          <Description :description="provider.description" compact />
-        </b-card-text>
-        <Metadata class="mt-4" :data="provider" :ignoreFields="ignore" :title="false" type="Provider" />
-      </b-card-body>
-    </b-collapse>
-  </b-card>
+  <b-accordion-item v-model="expanded" :id="id" class="provider">
+    <template #title>
+      <span class="chevron" aria-hidden="true">
+        <b-icon-chevron-down v-if="expanded" />
+        <b-icon-chevron-right v-else />
+      </span>
+      <span class="title">{{ provider.name }}</span>
+      <ProviderRoles :roles="provider.roles" />
+    </template>
+    <div class="provider-details">
+      <b-button-group v-if="provider.url || provider.email || provider.mail">
+        <b-button :href="provider.url" target="_blank" variant="primary">
+          {{ $t('providers.homepage') }}
+        </b-button>
+        <b-button v-if="provider.email || provider.mail" :href="`mailto:${provider.email || provider.mail}`" target="_blank" variant="primary">
+          {{ $t('providers.email') }}
+        </b-button>
+      </b-button-group>
+      <div class="mt-4" v-if="provider.description">
+        <Description :description="provider.description" compact />
+      </div>
+      <MetadataGroups class="mt-4" :data="provider" :ignoreFields="ignore" :title="false" type="Provider" />
+    </div>
+  </b-accordion-item>
 </template>
 
 <script>
-import { BCollapse, BIconChevronRight, BIconChevronDown } from 'bootstrap-vue';
+import { defineAsyncComponent } from 'vue';
 import Description from './Description.vue';
 import ProviderRoles from './ProviderRoles.vue';
+import { BAccordionItem } from 'bootstrap-vue-next';
 
 export default {
   name: 'Provider',
   components: {
-    BCollapse,
-    BIconChevronDown,
-    BIconChevronRight,
     Description,
-    Metadata: () => import('./Metadata.vue'),
+    BAccordionItem,
+    MetadataGroups: defineAsyncComponent(() => import('./MetadataGroups.vue')),
     ProviderRoles
   },
   props: {

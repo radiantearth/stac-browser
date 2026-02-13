@@ -8,7 +8,7 @@ implemented as a single page application (SPA) for ease of development and to
 limit the overall number of catalog reads necessary when browsing (as catalogs
 may be nested and do not necessarily contain references to their parents).
 
-Version: **4.0.0** (supports all STAC versions between 0.6.0 and 1.1.0)
+Version: **5.0.0-dev** (supports all STAC versions between 0.6.0 and 1.1.0)
 
 This package has also been published to npm as [`@radiantearth/stac-browser`](https://www.npmjs.com/package/@radiantearth/stac-browser).
 
@@ -117,8 +117,8 @@ The following table shows the major differences between versions and the upcomin
 | Version   | Summary |
 | --------- | ------- |
 | 3.3.x     | The last version that uses Leaflet as mapping library. |
-| **4.0.x** | Current version. Uses OpenLayers as mapping library. The last version based on VueJS 2, vue-cli and Bootstrap 4. |
-| 5.x.x     | The upcoming version based on VueJS 3, Vite and Bootstrap 5. Target: Q1 2026 |
+| 4.0.x     | Uses OpenLayers as mapping library. The last version based on VueJS 2, vue-cli and Bootstrap 4. |
+| **5.x.x** | The upcoming version based on VueJS 3, Vite and Bootstrap 5. Target: Q1 2026 |
 | 6.x.x     | Planned version with a new layout, a pluggable interface, and better integration into existing sites. Target: Q4 2026 |
 
 For more details on our plans, please check our
@@ -304,7 +304,8 @@ You can use the Docker to work with STAC Browser. Please read [Docker documentat
 We are happy to review and accept Pull Requests.
 STAC Browser is following the [STAC code of conduct](https://github.com/radiantearth/stac-spec/blob/master/CODE_OF_CONDUCT.md).
 
-STAC Browser uses [Vue](https://vuejs.org/) and [vue-cli](https://cli.vuejs.org/), so you need a recent version of [NodeJS and npm](https://nodejs.org/en/) installed.
+STAC Browser builds on top of [VueJS 3](https://vuejs.org/) and [Vite](https://vite.dev),
+so you need a recent version of [NodeJS and npm](https://nodejs.org/en/) installed.
 
 You can run the following commands (see also "[Get started](#get-started)" above):
 

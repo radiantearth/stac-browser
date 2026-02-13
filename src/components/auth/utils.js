@@ -1,15 +1,16 @@
 import Utils from '../../utils.js';
-import { STAC } from 'stac-js';
+import { STACReference } from 'stac-js';
 import Auth from '../../auth/index.js';
 
 export default class AuthUtils {
 
-  static resolveAuth(obj, context) {
-    if (context instanceof STAC && Utils.size(obj['auth:refs']) > 0) {
-      const scheme = context.getMetadata('auth:schemes');
-      if (Utils.size(scheme) > 0) {
-        return obj['auth:refs']
-          .map(ref => scheme[ref])
+  static resolveAuth(obj) {
+    if (obj instanceof STACReference) {
+      const refs = obj.getMetadata('auth:refs');
+      const schemes = obj.getMetadata('auth:schemes');
+      if (Utils.size(refs) > 0 && Utils.size(schemes) > 0) {
+        return refs
+          .map(ref => schemes[ref])
           .filter(ref => Utils.isObject(ref));
       }
     }
@@ -29,26 +30,6 @@ export default class AuthUtils {
         return (config.historyMode === 'history');
       default:
         return false;
-    }
-  }
-
-  static convertLegacyAuthConfig(config) {
-    if (!Utils.isObject(config) || config.type === null) {
-      return null;
-    }
-    else if (config.type === 'query' || config.type === 'header') {
-      // It is the old format
-      return {
-        type: 'apiKey',
-        in: config.type,
-        name: config.key,
-        description: config.description,
-        formatter: config.formatter
-      };
-    }
-    else {
-      // Is the new format from the authentication extension
-      return config;
     }
   }
 

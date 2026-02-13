@@ -1,6 +1,7 @@
-const dateFormat = 'DD/MM/YYYY';
+import { enGB as locale } from 'date-fns/locale';
+
+const dateFormat = 'dd/MM/yyyy';
 const timeFormat = 'hh:mm:ss a';
 const dateTimeFormat = `${dateFormat} ${timeFormat}`;
-const locale = require('vue2-datepicker/locale/en');
-locale.formatLocale.firstDayOfWeek = 1;
+
 export default {dateFormat, timeFormat, dateTimeFormat, locale};
