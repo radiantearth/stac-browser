@@ -21,12 +21,10 @@
       <b-form-input
         size="sm"
         class="value"
-        :value="displayValue"
-        @input="onValueInput"
+        v-model="rawInput"
         @blur="onValueBlur"
         :placeholder="placeholder"
         :state="validationState"
-        trim
       />
 
       <b-button class="delete" size="sm" variant="danger" @click="$emit('remove-queryable')">
@@ -115,8 +113,20 @@ export default {
     }
   },
   
+  emits: [
+    'remove-queryable',
+    'update:value',
+    'update:operator'
+  ],
+  
   data() {
     return {
+      /**
+       * Raw input string for the text field.
+       * We store this separately so we can parse the comma-separated values
+       * to check for duplicates while preserving what the user actually typed.
+       */
+      rawInput: '',
       /**
        * Current validation errors (empty = valid)
        */
@@ -137,14 +147,10 @@ export default {
     },
     
     /**
-     * Display value (comma-separated string)
+     * Display value (use raw input if user is typing, otherwise sync from prop)
      */
     displayValue() {
-      const arr = this.value?.value || [];
-      if (!arr || arr.length === 0) {
-        return '';
-      }
-      return arr.join(', ');
+      return this.rawInput;
     },
     
     /**
@@ -222,6 +228,43 @@ export default {
     this.validate(arr);
   },
   
+  watch: {
+    /**
+     * Parse and emit when user types
+     */
+    rawInput(newInput) {
+      // Parse comma-separated input
+      const parsed = this.parseInput(newInput);
+      
+      // Validate
+      this.validate(parsed);
+      
+      // Emit update wrapped in CqlValue
+      this.$emit('update:value', CqlValue.create(parsed));
+    },
+    
+    /**
+     * Sync rawInput when value prop changes externally
+     */
+    value: {
+      handler(newValue) {
+        // Only update rawInput if it's different to avoid cursor jump during typing
+        const arr = newValue?.value || [];
+        const newDisplay = arr.length > 0 ? arr.join(', ') : '';
+        if (this.rawInput !== newDisplay && document.activeElement !== this.$refs.input) {
+          this.rawInput = newDisplay;
+        }
+      },
+      deep: true
+    }
+  },
+  
+  mounted() {
+    // Initialize rawInput from initial value prop
+    const arr = this.value?.value || [];
+    this.rawInput = arr.length > 0 ? arr.join(', ') : '';
+  },
+  
   methods: {
     /**
      * Iterate through operators (cycle to next on click)
@@ -242,7 +285,13 @@ export default {
     /**
      * Handle value input (real-time)
      */
-    onValueInput(inputString) {
+    onValueInput(evt) {
+      // Extract value from event object or use directly if already a value
+      const inputString = Utils.isObject(evt) && 'target' in evt ? evt.target.value : evt;
+      
+      // Store raw input to prevent sync issues
+      this.rawInput = inputString;
+      
       // Parse comma-separated input
       const parsed = this.parseInput(inputString);
       
