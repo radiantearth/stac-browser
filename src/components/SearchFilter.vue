@@ -96,35 +96,26 @@
           </b-dropdown>
 
           <template v-for="(filter, index) in filters">
+            <ArrayFilterInput
+              v-if="filter.queryable.isArray"
+              :key="'array-' + filter.id"
+              v-model:value="filter.value"
+              v-model:operator="filter.operator"
+              :operators="filter.queryable.getOperators(cql)"
+              :queryable="filter.queryable"
+              @remove-queryable="removeQueryable(index)"
+            />
             <QueryableInput
-              v-if="!filter.queryable.isArray"
+              v-else
               :key="filter.id"
-              :value.sync="filter.value"
-              :operator.sync="filter.operator"
+              v-model:value="filter.value"
+              v-model:operator="filter.operator"
               :queryable="filter.queryable"
               :index="index"
               :cql="cql"
               @remove-queryable="removeQueryable(index)"
             />
-            <ArrayFilterInput
-              v-else
-              :key="'array-' + filter.id"
-              :value.sync="filter.value"
-              :operator.sync="filter.operator"
-              :operators="filter.queryable.getOperators(cql)"
-              :queryable="filter.queryable"
-              @remove-queryable="removeQueryable(index)"
-            />
           </template>
-          <QueryableInput
-            v-for="(filter, index) in filters" :key="filter.id"
-            v-model:value="filter.value"
-            v-model:operator="filter.operator"
-            :queryable="filter.queryable"
-            :index="index"
-            :cql="cql"
-            @remove-queryable="removeQueryable(index)"
-          />
         </b-form-group>
 
         <hr v-if="canFilterExtents || conformances.CollectionIdFilter || conformances.ItemIdFilter || showAdditionalFilters">
@@ -171,6 +162,8 @@
 import { defineComponent, defineAsyncComponent } from 'vue';
 import { mapGetters, mapState } from "vuex";
 import { BCard, BCardBody, BCardFooter, BCardTitle, BDropdown, BDropdownItem } from 'bootstrap-vue-next';
+
+import ArrayFilterInput from './ArrayFilterInput.vue';
 
 import refParser from '@apidevtools/json-schema-ref-parser';
 
@@ -228,7 +221,7 @@ export default defineComponent({
     BCardTitle,
     BDropdown,
     BDropdownItem,
-    ArrayFilterInput: () => import('./ArrayFilterInput.vue'),
+    ArrayFilterInput,
     QueryableInput: defineAsyncComponent(() => import('./QueryableInput.vue')),
     MapSelect: defineAsyncComponent(() => import('./maps/MapSelect.vue')),
     SortButtons: defineAsyncComponent(() => import('./SortButtons.vue')),
