@@ -270,26 +270,6 @@ export default {
     },
     
     /**
-     * Handle value input (real-time)
-     */
-    onValueInput(evt) {
-      // Extract value from event object or use directly if already a value
-      const inputString = Utils.isObject(evt) && 'target' in evt ? evt.target.value : evt;
-      
-      // Store raw input to prevent sync issues
-      this.rawInput = inputString;
-      
-      // Parse comma-separated input
-      const parsed = this.parseInput(inputString);
-      
-      // Validate
-      this.validate(parsed);
-      
-      // Emit update wrapped in CqlValue (even if invalid, so parent can track state)
-      this.$emit('update:value', CqlValue.create(parsed));
-    },
-    
-    /**
      * Handle value blur (focus lost)
      */
     onValueBlur() {
