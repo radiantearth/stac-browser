@@ -2,16 +2,25 @@ import { formatKey } from "@radiantearth/stac-fields/helper";
 import i18n from '../../i18n.js';
 import { CqlEqual, CqlGreaterThan, CqlGreaterThanEqual, CqlLessThan, CqlLessThanEqual, CqlNotEqual } from "./operators/comparison";
 import { CqlLike } from "./operators/advanced";
+import {
+  CqlArrayOverlaps,
+  CqlArrayContains,
+  CqlArrayEquals,
+  CqlArrayContainedBy,
+  CqlNotArrayOverlaps,
+  CqlNotArrayContains,
+  CqlNotArrayEquals,
+  CqlNotArrayContainedBy,
+} from "./operators/array";
 
 export default class Queryable {
-
   constructor(id, schema) {
     this.id = id;
     this.schema = schema;
   }
 
   get title() {
-    if (typeof this.schema.title === 'string') {
+    if (typeof this.schema.title === "string") {
       return this.schema.title;
     }
     return formatKey(this.id);
@@ -25,7 +34,7 @@ export default class Queryable {
   }
 
   get supported() {
-    return this.isText || this.isNumeric || this.isBoolean;
+    return this.isText || this.isNumeric || this.isBoolean || this.isArray;
   }
 
   is(type) {
@@ -37,59 +46,59 @@ export default class Queryable {
   }
 
   get isText() {
-    return this.is('string');
+    return this.is("string");
   }
 
   get isBoolean() {
-    return this.is('boolean');
+    return this.is("boolean");
   }
 
   get isNumeric() {
-    return this.is('number') || this.is('integer');
+    return this.is("number") || this.is("integer");
   }
 
   get isDate() {
-    return this.isText && this.schema.format === 'date';
+    return this.isText && this.schema.format === "date";
   }
 
   get isDateTime() {
-    return this.isText && this.schema.format === 'date-time';
+    return this.isText && this.schema.format === "date-time";
   }
 
   get isTemporal() {
     return this.isDate || this.isDateTime;
   }
 
+  get isArray() {
+    return this.is("array");
+  }
+
   get defaultValue() {
-    if (typeof this.schema.default !== 'undefined') {
+    if (typeof this.schema.default !== "undefined") {
       return this.schema.default;
-    }
-    else if (this.isSelection) {
+    } else if (this.isSelection) {
       return this.schema.enum[0];
-    }
-    else if (this.isTemporal) {
+    } else if (this.isTemporal) {
       return new Date();
-    }
-    else if (this.isNumeric) {
-      if (typeof this.schema.minimum !== 'undefined') {
-       return this.schema.minimum;
+    } else if (this.isNumeric) {
+      if (typeof this.schema.minimum !== "undefined") {
+        return this.schema.minimum;
       }
       return 0;
-    }
-    else if (this.isText) {
-      return '';
-    }
-    else if (this.isBoolean) {
+    } else if (this.isText) {
+      return "";
+    } else if (this.isBoolean) {
       return false;
+    } else if (this.isArray) {
+      return [];
     }
     return null;
   }
 
   get types() {
-    if (typeof this.schema.type === 'string') {
+    if (typeof this.schema.type === "string") {
       return [this.schema.type];
-    }
-    else if (Array.isArray(this.schema.type)) {
+    } else if (Array.isArray(this.schema.type)) {
       return this.schema.type;
     }
     return [];
@@ -97,6 +106,20 @@ export default class Queryable {
 
   getOperators(cql) {
     let ops = [];
+
+    // Array operators for array-type queryables
+    if (this.isArray && cql.arrayOperators) {
+      ops.push(CqlArrayOverlaps);
+      ops.push(CqlArrayContains);
+      ops.push(CqlArrayEquals);
+      ops.push(CqlArrayContainedBy);
+      ops.push(CqlNotArrayOverlaps);
+      ops.push(CqlNotArrayContains);
+      ops.push(CqlNotArrayEquals);
+      ops.push(CqlNotArrayContainedBy);
+      return ops;
+    }
+
     if (!this.isDateTime) {
       // Although it is supported, comparing specific instances in time doesn't give predictable results.
       // For example 2020-01-01T00:00:00Z is not equal to 2020-01-01T00:00:00.001Z and you don't know the granularity
@@ -110,8 +133,7 @@ export default class Queryable {
       ops.push(CqlLessThanEqual);
       ops.push(CqlGreaterThan);
       ops.push(CqlGreaterThanEqual);
-    }
-    else if (this.isText && cql.advancedComparison) {
+    } else if (this.isText && cql.advancedComparison) {
       ops.push(CqlLike);
     }
     return ops;
@@ -124,5 +146,4 @@ export default class Queryable {
   toJSON() {
     return { property: this.id };
   }
-
 }
