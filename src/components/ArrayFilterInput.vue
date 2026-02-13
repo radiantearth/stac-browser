@@ -62,7 +62,6 @@
 import { BBadge, BButton, BCol, BDropdown, BDropdownItemButton, BFormInput, BRow } from 'bootstrap-vue-next';
 import Description from './Description.vue';
 import CqlValue from '../models/cql2/value';
-import Utils from '../utils';
 
 export default {
   name: 'ArrayFilterInput',
