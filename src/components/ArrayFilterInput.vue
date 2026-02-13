@@ -237,7 +237,8 @@ export default {
         // Only update rawInput if it's different to avoid cursor jump during typing
         const arr = newValue?.value || [];
         const newDisplay = arr.length > 0 ? arr.join(', ') : '';
-        if (this.rawInput !== newDisplay && document.activeElement !== this.$refs.input) {
+        const inputEl = this.$el && this.$el.querySelector ? this.$el.querySelector('input') : null;
+        if (this.rawInput !== newDisplay && (!inputEl || document.activeElement !== inputEl)) {
           this.rawInput = newDisplay;
         }
       },
