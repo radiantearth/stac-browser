@@ -189,22 +189,22 @@ export default {
      * Warning feedback message
      */
     warningFeedback() {
-        if (this.validationWarnings.length === 0) {
-            return '';
-        }
-        
-        // Show first few warnings
-        const maxShow = 3;
-        const warnings = this.validationWarnings.slice(0, maxShow);
-        let message = warnings.join('; ');
-        
-        if (this.validationWarnings.length > maxShow) {
-            message += this.$t('arrayFilterInput.andMoreErrors', {
-                count: this.validationWarnings.length - maxShow
-            });
-        }
-        
-        return message;
+      if (this.validationWarnings.length === 0) {
+        return '';
+      }
+      
+      // Show first few warnings
+      const maxShow = 3;
+      const warnings = this.validationWarnings.slice(0, maxShow);
+      let message = warnings.join('; ');
+      
+      if (this.validationWarnings.length > maxShow) {
+        message += this.$t('arrayFilterInput.andMoreErrors', {
+          count: this.validationWarnings.length - maxShow
+        });
+      }
+      
+      return message;
     }
   },
   
