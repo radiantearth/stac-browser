@@ -59,9 +59,10 @@
  * Supports comma-separated input and validates for duplicates and empty values.
  */
 
-import { BBadge, BButton, BCol, BDropdown, BDropdownItemButton, BFormInput, BIconXCircleFill, BRow } from 'bootstrap-vue';
+import { BBadge, BButton, BCol, BDropdown, BDropdownItemButton, BFormInput, BRow } from 'bootstrap-vue-next';
 import Description from './Description.vue';
 import CqlValue from '../models/cql2/value';
+import Utils from '../utils';
 
 export default {
   name: 'ArrayFilterInput',
@@ -73,7 +74,6 @@ export default {
     BDropdown,
     BDropdownItemButton,
     BFormInput,
-    BIconXCircleFill,
     BRow,
     Description
   },
@@ -382,7 +382,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import '~bootstrap/scss/mixins';
+@import 'bootstrap/scss/mixins';
 @import "../theme/variables.scss";
 
 .queryable-row {
@@ -391,18 +391,19 @@ export default {
   flex-direction: row;
   flex-wrap: nowrap;
   align-content: center;
+  display: flex;
 
+  .title, .value {
+    flex-grow: 4;
+    width: 7rem !important;
+  }
+  .op {
+    min-width: 4rem;
+    width: auto;
+  }
   .delete {
     width: auto;
   }
-  .title, .value {
-    flex-grow: 4;
-    width: 8rem !important;
-  }
-}
-
-.op {
-  min-width: 4rem;
 }
 
 .queryable-help {
