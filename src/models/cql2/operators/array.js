@@ -14,11 +14,11 @@ export class CqlArrayOverlaps extends CqlOperator {
   }
 
   static get longLabel() {
-    return i18n.t('search.arrayOverlaps');
+    return i18n.global.t('search.arrayOverlaps');
   }
 
   static get description() {
-    return i18n.t('search.arrayOverlapsDescription');
+    return i18n.global.t('search.arrayOverlapsDescription');
   }
 
 }
@@ -36,11 +36,11 @@ export class CqlArrayContains extends CqlOperator {
   }
 
   static get longLabel() {
-    return i18n.t('search.arrayContains');
+    return i18n.global.t('search.arrayContains');
   }
 
   static get description() {
-    return i18n.t('search.arrayContainsDescription');
+    return i18n.global.t('search.arrayContainsDescription');
   }
 
 }
@@ -58,11 +58,11 @@ export class CqlArrayEquals extends CqlOperator {
   }
 
   static get longLabel() {
-    return i18n.t('search.arrayEquals');
+    return i18n.global.t('search.arrayEquals');
   }
 
   static get description() {
-    return i18n.t('search.arrayEqualsDescription');
+    return i18n.global.t('search.arrayEqualsDescription');
   }
 
 }
@@ -80,11 +80,11 @@ export class CqlArrayContainedBy extends CqlOperator {
   }
 
   static get longLabel() {
-    return i18n.t('search.arrayContainedBy');
+    return i18n.global.t('search.arrayContainedBy');
   }
 
   static get description() {
-    return i18n.t('search.arrayContainedByDescription');
+    return i18n.global.t('search.arrayContainedByDescription');
   }
 
 }
@@ -104,11 +104,11 @@ export class CqlNotArrayOverlaps extends CqlOperator {
   }
 
   static get longLabel() {
-    return i18n.t('search.notArrayOverlaps');
+    return i18n.global.t('search.notArrayOverlaps');
   }
 
   static get description() {
-    return i18n.t('search.notArrayOverlapsDescription');
+    return i18n.global.t('search.notArrayOverlapsDescription');
   }
 
 }
@@ -126,11 +126,11 @@ export class CqlNotArrayContains extends CqlOperator {
   }
 
   static get longLabel() {
-    return i18n.t('search.notArrayContains');
+    return i18n.global.t('search.notArrayContains');
   }
 
   static get description() {
-    return i18n.t('search.notArrayContainsDescription');
+    return i18n.global.t('search.notArrayContainsDescription');
   }
 
 }
@@ -148,11 +148,11 @@ export class CqlNotArrayEquals extends CqlOperator {
   }
 
   static get longLabel() {
-    return i18n.t('search.notArrayEquals');
+    return i18n.global.t('search.notArrayEquals');
   }
 
   static get description() {
-    return i18n.t('search.notArrayEqualsDescription');
+    return i18n.global.t('search.notArrayEqualsDescription');
   }
 
 }
@@ -170,12 +170,11 @@ export class CqlNotArrayContainedBy extends CqlOperator {
   }
 
   static get longLabel() {
-    return i18n.t('search.notArrayContainedBy');
+    return i18n.global.t('search.notArrayContainedBy');
   }
 
   static get description() {
-    return i18n.t('search.notArrayContainedByDescription');
+    return i18n.global.t('search.notArrayContainedByDescription');
   }
 
 }
-
