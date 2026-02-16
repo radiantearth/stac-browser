@@ -53,6 +53,15 @@
         @update:model-value="updateValue($event)"
         v-bind="validation"
       />
+      <b-form-input
+        v-else-if="queryable.isArray"
+        size="sm"
+        class="value"
+        v-model="rawInput"
+        @blur="onValueBlur"
+        :placeholder="placeholder"
+        :state="validationState"
+      />
       <b-form-checkbox
         v-else-if="queryable.isBoolean"
         switch
@@ -73,6 +82,14 @@
       <Description v-if="operator.description" :description="operator.description" inline />
       <Description v-if="queryable.description" :description="queryable.description" inline />
     </div>
+
+    <div v-if="queryable.isArray && validationErrors.length > 0" class="queryable-help text-danger small">
+      {{ validationFeedback }}
+    </div>
+
+    <div v-if="queryable.isArray && validationWarnings.length > 0" class="queryable-help text-warning small">
+      {{ warningFeedback }}
+    </div>
   </div>
 </template>
 
@@ -80,6 +97,8 @@
 import { defineAsyncComponent } from 'vue';
 
 import { BDropdown, BDropdownItemButton } from 'bootstrap-vue-next';
+
+import ArrayInputMixin from './ArrayInputMixin';
 
 import DatePickerMixin from './DatePickerMixin';
 import Utils from '../utils';
@@ -93,7 +112,8 @@ export default {
     Description: defineAsyncComponent(() => import('./Description.vue'))
   },
   mixins: [
-    DatePickerMixin
+    DatePickerMixin,
+    ArrayInputMixin
   ],
   props: {
     // eslint-disable-next-line
