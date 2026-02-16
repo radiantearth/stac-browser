@@ -159,8 +159,17 @@ export default function getStore(router) {
           schemeValues.find(scheme => scheme.type === 'http' && scheme.scheme === 'basic') ||
           schemeValues.find(scheme => scheme.type === 'apiKey');
 
-        if (preferredScheme && !Auth.equals(cx.getters.method, preferredScheme)) {
-          await cx.dispatch('config', { authConfig: preferredScheme }, { root: true });
+        if (preferredScheme) {
+          await cx.dispatch(
+            "config",
+            { authConfig: preferredScheme },
+            { root: true },
+          );
+          await cx.dispatch("updateMethod", preferredScheme);
+          console.log(
+            "Authentication method configured from auth:schemes",
+            preferredScheme,
+          );
         }
       }
     }
