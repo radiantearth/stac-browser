@@ -305,13 +305,25 @@ export default defineComponent({
           let link = this.data.getLocaleLink(locale);
           if (link) {
             let state = Object.assign({}, this.stateQueryParameters);
-            const targetPath = this.toBrowserPath(link.href);
-            const currentPath = this.$route.path;
-            if (targetPath !== currentPath) {
-              const query = Object.assign({}, this.$route.query);
+            const targetRoute = this.$router.resolve(this.toBrowserPath(link.href));
+            // Guard against invalid routes; skip navigation if resolution fails
+            if (!targetRoute?.route) {
+              return;
+            }
+            const location = {
+              path: targetRoute.route.path,
+              query: { ...this.$route.query, ...targetRoute.route.query }
+            };
+            const targetFullPath = this.$router.resolve(location).fullPath;
+            if (targetFullPath !== this.$route.fullPath) {
               this.isNavigatingLocale = true;
               try {
-                await this.$router.push({ path: targetPath, query });
+                await this.$router.push(location);
+              }
+              catch (err) {
+                if (!isNavigationFailure(err, NavigationFailureType.duplicated)) {
+                  throw err;
+                }
               }
               finally {
                 this.isNavigatingLocale = false;
