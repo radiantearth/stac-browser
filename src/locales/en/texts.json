@@ -7,14 +7,7 @@
   "anonymized": {
     "title": "Anonymized"
   },
-  "arrayFilterInput": {
-    "andMoreErrors": "; and {count} more error(s)",
-    "duplicate": "Duplicate value: {value}",
-    "duplicates": "Duplicate value(s): {values}",
-    "helpText": "Enter values as a comma-separated list",
-    "placeholder": "Enter {field} values...",
-    "required": "Please enter at least one value"
-  },
+
   "assets": {
     "alternate": {
       "main": "Preferred"
@@ -253,6 +246,14 @@
     "addItemIds": "Press enter to add an Item ID",
     "addSearchTerm": "Press enter to add a search term",
     "additionalFilters": "Additional filters",
+    "arrayInput": {
+      "andMoreErrors": "; and {count} more error(s)",
+      "duplicate": "Duplicate value: {value}",
+      "duplicates": "Duplicate value(s): {values}",
+      "helpText": "Enter values as a comma-separated list",
+      "placeholder": "Enter {field} values...",
+      "required": "Please enter at least one value"
+    },
     "arrayContains": "Contains all",
     "arrayContainsDescription": "Array contains all of the specified values",
     "arrayContainedBy": "Is subset of",
