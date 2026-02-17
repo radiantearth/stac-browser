@@ -171,29 +171,6 @@ test.describe('STAC Browser Search page', () => {
     });
   });
 
-  test('Manual spatial extent shows invalid longitude error', async ({ page }) => {
-    await mockApiRootAndCollections(page);
-    await page.goto(SEARCH_PATH);
-
-    await test.step('Enter invalid longitude values', async () => {
-      await enableSpatialExtentInputs(page);
-
-      await fillBboxInputs(page, {
-        minLon: '-200', // invalid longitude
-        minLat: '44.3',
-        maxLon: '-104',
-        maxLat: '49'
-      });
-    });
-
-    await test.step('Verify error dialog appears with correct message', async () => {
-      page.once('dialog', async (dialog) => {
-        expect(dialog.message()).toBe('Longitude must be between -180 and 180');
-      });
-    });
-  });
-
-  // come back
   test('Manual spatial extent shows invalid latitude error', async ({ page }) => {
     await mockApiRootAndCollections(page);
     await page.goto(SEARCH_PATH);
@@ -214,27 +191,12 @@ test.describe('STAC Browser Search page', () => {
 
   });
 
-  test('Manual spatial extent shows order errors', async ({ page }) => {
+  test('Manual spatial extent shows latitude order error', async ({ page }) => {
     await mockApiRootAndCollections(page);
     await page.goto(SEARCH_PATH);
 
-    await test.step('Test min longitude > max longitude error', async () => {
-      await enableSpatialExtentInputs(page);
-
-      await fillBboxInputs(page, {
-        minLon: '-104',
-        minLat: '44.3',
-        maxLon: '-116.1',
-        maxLat: '49'
-      });
-
-      page.once('dialog', async (dialog) => {
-        expect(dialog.message()).toBe('Min Longitude must be less than Max Longitude');
-      });
-      
-    });
-
     await test.step('Test min latitude > max latitude error', async () => {
+      await enableSpatialExtentInputs(page);
       
       await fillBboxInputs(page, {
         minLon: '-116.1',

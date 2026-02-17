@@ -6,6 +6,57 @@
       <UserLocationControl :map="map" :maxZoom="maxZoom" />
       <LayerControl :map="map" :maxZoom="maxZoom" />
     </div>
+    <div class="bbox-controls">
+      <div class="bbox-inputs">
+        <div class="input-row">
+          <label>
+            {{ $t('mapping.bboxSelect.minLon') }}
+            <input 
+              v-model.number="bboxValues.minLon" 
+              type="number" 
+              step="0.0001"
+              class="coord-input"
+            >
+          </label>
+          <label>
+            {{ $t('mapping.bboxSelect.minLat') }}
+            <input 
+              v-model.number="bboxValues.minLat" 
+              type="number" 
+              step="0.0001"
+              min="-90"
+              max="90"
+              class="coord-input"
+            >
+          </label>
+        </div>
+        <div class="input-row">
+          <label>
+            {{ $t('mapping.bboxSelect.maxLon') }}
+            <input 
+              v-model.number="bboxValues.maxLon" 
+              type="number" 
+              step="0.0001"
+              class="coord-input"
+            >
+          </label>
+          <label>
+            {{ $t('mapping.bboxSelect.maxLat') }}
+            <input 
+              v-model.number="bboxValues.maxLat" 
+              type="number" 
+              step="0.0001"
+              min="-90"
+              max="90"
+              class="coord-input"
+            >
+          </label>
+        </div>
+        <button type="button" @click="applyManualBbox" class="apply-button">
+          {{ $t('mapping.bboxSelect.apply') }}
+        </button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -52,7 +103,14 @@ export default {
     return {
       crs: 'EPSG:4326',
       extent: this.modelValue,
-      dragging: false
+      dragging: false,
+      applyingManually: false,
+      bboxValues: {
+        minLon: null,
+        minLat: null,
+        maxLon: null,
+        maxLat: null
+      }
     };
   },
   computed: {
@@ -77,6 +135,7 @@ export default {
   },
   async mounted() {
     await this.initMap();
+    this.updateBboxValues();
   },
   methods: {
     async initMap() {
@@ -186,12 +245,95 @@ export default {
           this.fixX(this.extent[2]),
           this.fixY(this.extent[3])
         ];
-        this.$emit('update:modelValue', extent);
+        // Only emit to parent if not manually applying
+        // Manual apply just updates the visual representation
+        if (!this.applyingManually) {
+          this.$emit('update:modelValue', extent);
+        }
+        this.updateBboxValues();
       }
       else {
         this.extent = null;
-        this.$emit('update:modelValue', null);
+        if (!this.applyingManually) {
+          this.$emit('update:modelValue', null);
+        }
+        this.clearBboxValues();
       }
+    },
+    updateBboxValues() {
+      if (this.extent && Array.isArray(this.extent) && this.extent.length === 4) {
+        this.bboxValues = {
+          minLon: Math.round(this.extent[0] * 10000) / 10000,
+          minLat: Math.round(this.extent[1] * 10000) / 10000,
+          maxLon: Math.round(this.extent[2] * 10000) / 10000,
+          maxLat: Math.round(this.extent[3] * 10000) / 10000
+        };
+      }
+    },
+    clearBboxValues() {
+      this.bboxValues = {
+        minLon: null,
+        minLat: null,
+        maxLon: null,
+        maxLat: null
+      };
+    },
+    validateBbox() {
+      const { minLon, minLat, maxLon, maxLat } = this.bboxValues;
+      
+      // Check all values are present
+      if (minLon === null || minLat === null || maxLon === null || maxLat === null) {
+        return this.$t('mapping.bboxSelect.error.incomplete');
+      }
+      
+      // Check latitude values only (longitude can be extended for date line crossing)
+      if (minLat < -90 || minLat > 90 || maxLat < -90 || maxLat > 90) {
+        return this.$t('mapping.bboxSelect.error.invalidLat');
+      }
+      
+      // Check latitude order
+      if (minLat >= maxLat) {
+        return this.$t('mapping.bboxSelect.error.latOrder');
+      }
+      
+      return null;
+    },
+    applyManualBbox() {
+      const validationError = this.validateBbox();
+      if (validationError) {
+        alert(validationError);
+        return;
+      }
+      
+      if (!this.map || !this.interaction) {
+        return;
+      }
+      
+      const extent = [
+        this.bboxValues.minLon,
+        this.bboxValues.minLat,
+        this.bboxValues.maxLon,
+        this.bboxValues.maxLat
+      ];
+      
+      // Update local state and emit to parent directly
+      this.extent = extent;
+      this.$emit('update:modelValue', extent);
+      
+      // Update map to show the extent
+      const projectedExtent = transformExtent(extent, this.crs, this.map.getView().getProjection());
+      this.map.getView().fit(projectedExtent, { padding: [50,50,50,50], maxZoom: this.maxZoom });
+      
+      // Set flag to prevent duplicate emission from map interaction
+      this.applyingManually = true;
+      
+      // Update the interaction to show the extent on the map
+      this.interaction.setExtent(projectedExtent);
+      
+      // Reset flag after interaction completes
+      setTimeout(() => {
+        this.applyingManually = false;
+      }, 100);
     }
   }
 };
@@ -199,4 +341,76 @@ export default {
 
 <style lang="scss">
 @import "ol/ol.css";
+@import "../../theme/variables.scss";
+
+.map-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 400px;
+}
+
+.map {
+  flex: 1 1 auto;
+  position: relative;
+  width: 100%;
+  min-height: 400px;
+}
+
+.bbox-controls {
+  padding: $block-margin;
+  background-color: $light;
+  border-top: 1px solid darken($light, 10%);
+}
+
+.bbox-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: $block-margin;
+}
+
+.input-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $block-margin;
+}
+
+.input-row label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+}
+
+.coord-input {
+  padding: 0.5rem;
+  border: 1px solid darken($light, 20%);
+  border-radius: $border-radius;
+  font-size: $font-size-base;
+  
+  &:focus {
+    outline: none;
+    border-color: $primary;
+    box-shadow: 0 0 0 2px rgba($primary, 0.1);
+  }
+}
+
+.apply-button {
+  padding: 0.5rem 1rem;
+  background-color: $primary;
+  color: white;
+  border: none;
+  border-radius: $border-radius;
+  cursor: pointer;
+  font-size: $font-size-base;
+  font-weight: 500;
+  
+  &:hover {
+    background-color: darken($primary, 10%);
+  }
+  
+  &:active {
+    background-color: darken($primary, 15%);
+  }
+}
 </style>
