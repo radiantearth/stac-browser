@@ -76,20 +76,26 @@ export default class Queryable {
   get defaultValue() {
     if (typeof this.schema.default !== 'undefined') {
       return this.schema.default;
-    } else if (this.isSelection) {
+    } 
+    else if (this.isSelection) {
       return this.schema.enum[0];
-    } else if (this.isTemporal) {
+    }
+    else if (this.isTemporal) {
       return new Date();
-    } else if (this.isNumeric) {
+    }
+    else if (this.isNumeric) {
       if (typeof this.schema.minimum !== 'undefined') {
         return this.schema.minimum;
       }
       return 0;
-    } else if (this.isText) {
+    }
+    else if (this.isText) {
       return '';
-    } else if (this.isBoolean) {
+    }
+    else if (this.isBoolean) {
       return false;
-    } else if (this.isArray) {
+    }
+    else if (this.isArray) {
       return [];
     }
     return null;
@@ -98,7 +104,8 @@ export default class Queryable {
   get types() {
     if (typeof this.schema.type === 'string') {
       return [this.schema.type];
-    } else if (Array.isArray(this.schema.type)) {
+    }
+    else if (Array.isArray(this.schema.type)) {
       return this.schema.type;
     }
     return [];
@@ -133,7 +140,8 @@ export default class Queryable {
       ops.push(CqlLessThanEqual);
       ops.push(CqlGreaterThan);
       ops.push(CqlGreaterThanEqual);
-    } else if (this.isText && cql.advancedComparison) {
+    }
+    else if (this.isText && cql.advancedComparison) {
       ops.push(CqlLike);
     }
     return ops;
