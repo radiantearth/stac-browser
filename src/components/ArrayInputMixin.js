@@ -44,7 +44,7 @@ export default {
       const warnings = this.validationWarnings.slice(0, maxShow);
       let message = warnings.join('; ');
       if (this.validationWarnings.length > maxShow) {
-        message += this.$t('search.arrayInput.andMoreErrors', {
+        message += this.$t('search.arrayInput.andMoreWarnings', {
           count: this.validationWarnings.length - maxShow
         });
       }
