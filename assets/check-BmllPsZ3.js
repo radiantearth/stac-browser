@@ -1,2 +1,0 @@
-import{a4 as n,n as o,B as t,y as a}from"./index-B3F0456b.js";const r={viewBox:"0 0 16 16",width:"1.2em",height:"1.2em"};function l(s,e){return o(),t("svg",r,[...e[0]||(e[0]=[a("path",{fill:"currentColor",d:"M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093l3.473-4.425z"},null,-1)])])}const i=n({name:"bi-check",render:l});export{i as _};
-//# sourceMappingURL=check-BmllPsZ3.js.map

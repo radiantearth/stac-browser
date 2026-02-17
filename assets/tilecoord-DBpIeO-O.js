@@ -1,2 +1,0 @@
-import{g as r}from"./GeoJSON-BoRJWQIG.js";function h(n,t,e,u){return u!==void 0?(u[0]=n,u[1]=t,u[2]=e,u):[n,t,e]}function c(n,t,e){return n+"/"+t+"/"+e}function i(n){return c(n[0],n[1],n[2])}function Z(n,t,e,u,a){return`${r(n)},${t},${c(e,u,a)}`}function m(n){return f(n[0],n[1],n[2])}function f(n,t,e){return(t<<n)+e}function p(n,t){const e=n[0],u=n[1],a=n[2];if(t.getMinZoom()>e||e>t.getMaxZoom())return!1;const s=t.getFullTileRange(e);return s?s.containsXY(u,a):!0}export{i as a,f as b,h as c,c as d,Z as g,m as h,p as w};
-//# sourceMappingURL=tilecoord-DBpIeO-O.js.map
