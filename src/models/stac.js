@@ -146,14 +146,13 @@ export class Collection extends BaseCollection {
   constructor(data, url, path) {
     super(data, url);
     this._path = path;
-    this._incomplete = false;
     this._apiChildrenListeners = {};
     this._apiChildren = {
       list: [],
       prev: false,
       next: false
     };
-    this._privateKeys.push('_path', '_incomplete', '_apiChildrenListeners', '_apiChildren');
+    this._privateKeys.push('_path', '_apiChildrenListeners', '_apiChildren');
   }
 
   getBrowserPath() {
@@ -202,14 +201,13 @@ export class Catalog extends BaseCatalog {
   constructor(data, url, path) {
     super(data, url);
     this._path = path;
-    this._incomplete = false;
     this._apiChildrenListeners = {};
     this._apiChildren = {
       list: [],
       prev: false,
       next: false
     };
-    this._privateKeys.push('_path', '_incomplete', '_apiChildrenListeners', '_apiChildren');
+    this._privateKeys.push('_path', '_apiChildrenListeners', '_apiChildren');
   }
 
   getBrowserPath() {
@@ -258,8 +256,7 @@ export class Item extends BaseItem {
   constructor(data, url, path) {
     super(data, url);
     this._path = path;
-    this._incomplete = false;
-    this._privateKeys.push('_path', '_incomplete');
+    this._privateKeys.push('_path');
   }
 
   getBrowserPath() {

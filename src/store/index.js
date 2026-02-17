@@ -57,6 +57,8 @@ function getStore(config, router) {
     state: Object.assign({}, config, localDefaults(), catalogDefaults(), {
       // Global settings
       database: {}, // STAC object, Error object or Loading object or Promise (when loading)
+      incompleteUrls: new Set(),
+      missingApi: new Set(),
       downloads: {},
       allowSelectCatalog: !config.catalogUrl,
       globalRequestQueryParameters: config.requestQueryParameters,
@@ -482,6 +484,7 @@ function getStore(config, router) {
         state.database[url] = processSTAC(state, data);
       },
       clear(state, url) {
+        state.incompleteUrls.delete(url);
         delete state.database[url];
       },
       resetCatalog(state, clearAll) {
@@ -494,6 +497,7 @@ function getStore(config, router) {
           state.catalogUrl = config.catalogUrl;
           state.catalogTitle = config.catalogTitle;
           state.database = {};
+          state.incompleteUrls.clear();
         }
       },
       resetPage(state) {
@@ -532,6 +536,12 @@ function getStore(config, router) {
       },
       removeFromQueue(state, num) {
         state.queue.splice(0, num);
+      },
+      markIncomplete(state, url) {
+        state.incompleteUrls.add(url);
+      },
+      markComplete(state, url) {
+        state.incompleteUrls.delete(url);
       },
       setConformanceClasses(state, classes) {
         if (Array.isArray(classes)) {
@@ -734,7 +744,7 @@ function getStore(config, router) {
           return;
         }
 
-        const hasData = data instanceof STAC && !data._incomplete;
+        const hasData = data instanceof STAC && !cx.state.incompleteUrls.has(url);
         if (!hasData) {
           cx.commit('loading', { url, loading });
           try {
@@ -776,11 +786,14 @@ function getStore(config, router) {
           }
         }
 
-        // Load API Collections
         const apiCollectionLink = data instanceof CatalogLike && data.getApiCollectionsLink();
         const apiItemLink = data instanceof CatalogLike && data.getApiItemsLink();
-        if (!omitApi && apiCollectionLink) {
-          let args = { stac: data, show: loading.show };
+        if ((apiItemLink || apiCollectionLink) && omitApi) {
+          cx.commit('markIncomplete', url);
+        }
+        // Load API Collections
+        else if (apiCollectionLink) {
+          const args = { stac: data, show: loading.show };
           try {
             await cx.dispatch('loadNextApiCollections', args);
           } catch (error) {
@@ -791,8 +804,8 @@ function getStore(config, router) {
           }
         }
         // Load API Items
-        else if (!omitApi && apiItemLink) {
-          let args = { stac: data, show: loading.show };
+        else if (apiItemLink) {
+          const args = { stac: data, show: loading.show };
           try {
             await cx.dispatch('loadApiItems', args);
           } catch (error) {
@@ -891,8 +904,8 @@ function getStore(config, router) {
                 else {
                   let itemPath = cx.getters.toBrowserPath(url);
                   data = createSTAC(item, url, itemPath);
-                  data._incomplete = true;
                   cx.commit('loaded', { data, url });
+                  cx.commit('markIncomplete', url);
                   return data;
                 }
               } catch (error) {
@@ -971,8 +984,8 @@ function getStore(config, router) {
               else {
                 let collectionPath = cx.getters.toBrowserPath(url);
                 data = createSTAC(collection, url, collectionPath);
-                data._incomplete = true;
                 cx.commit('loaded', { data, url });
+                cx.commit('markIncomplete', url);
                 return data;
               }
             });

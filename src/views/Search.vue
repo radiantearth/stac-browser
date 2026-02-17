@@ -217,8 +217,8 @@ export default defineComponent({
     else {
       this.parent = this.root;
     }
+    await this.$store.dispatch('load', { url });
     if (!this.parent) {
-      await this.$store.dispatch('load', { url });
       if (!this.root) {
         await this.$store.dispatch("config", { catalogUrl: url });
       }
