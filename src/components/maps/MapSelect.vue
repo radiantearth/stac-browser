@@ -42,16 +42,16 @@ export default {
       type: Object,
       default: null
     },
-    value: {
+    modelValue: {
       type: Array,
       default: null
     }
   },
-  emits: ['input'],
+  emits: ['update:modelValue'],
   data() {
     return {
       crs: 'EPSG:4326',
-      extent: this.value,
+      extent: this.modelValue,
       dragging: false
     };
   },
@@ -73,7 +73,7 @@ export default {
     },
     uiLanguage() {
       
-    },
+    }
   },
   async mounted() {
     await this.initMap();
@@ -186,11 +186,11 @@ export default {
           this.fixX(this.extent[2]),
           this.fixY(this.extent[3])
         ];
-        this.$emit('input', extent);
+        this.$emit('update:modelValue', extent);
       }
       else {
         this.extent = null;
-        this.$emit('input', null);
+        this.$emit('update:modelValue', null);
       }
     }
   }
