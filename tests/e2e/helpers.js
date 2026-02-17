@@ -1,7 +1,7 @@
 import { expect } from '@playwright/test';
 
 export const HOME_PATH = process.env.CI ? '/stac-browser/' : '/';
-export const SEARCH_PATH = process.env.CI ? `${HOME_PATH}/search/external/earth-search.aws.test.com/v1?.language=en` : '/search/external/earth-search.aws.test.com/v1?.language=en';
+export const SEARCH_PATH = process.env.CI ? `${HOME_PATH}/#/external/earth-search.aws.test.com/v1?.language=en` : '/search/external/earth-search.aws.test.com/v1?.language=en';
 
 const SEARCH_API_URL = 'https://earth-search.aws.test.com/v1/search';
 
