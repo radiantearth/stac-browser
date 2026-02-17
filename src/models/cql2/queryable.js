@@ -20,7 +20,7 @@ export default class Queryable {
   }
 
   get title() {
-    if (typeof this.schema.title === "string") {
+    if (typeof this.schema.title === 'string') {
       return this.schema.title;
     }
     return formatKey(this.id);
@@ -46,23 +46,23 @@ export default class Queryable {
   }
 
   get isText() {
-    return this.is("string");
+    return this.is('string');
   }
 
   get isBoolean() {
-    return this.is("boolean");
+    return this.is('boolean');
   }
 
   get isNumeric() {
-    return this.is("number") || this.is("integer");
+    return this.is('number') || this.is('integer');
   }
 
   get isDate() {
-    return this.isText && this.schema.format === "date";
+    return this.isText && this.schema.format === 'date';
   }
 
   get isDateTime() {
-    return this.isText && this.schema.format === "date-time";
+    return this.isText && this.schema.format === 'date-time';
   }
 
   get isTemporal() {
@@ -70,23 +70,23 @@ export default class Queryable {
   }
 
   get isArray() {
-    return this.is("array");
+    return this.is('array');
   }
 
   get defaultValue() {
-    if (typeof this.schema.default !== "undefined") {
+    if (typeof this.schema.default !== 'undefined') {
       return this.schema.default;
     } else if (this.isSelection) {
       return this.schema.enum[0];
     } else if (this.isTemporal) {
       return new Date();
     } else if (this.isNumeric) {
-      if (typeof this.schema.minimum !== "undefined") {
+      if (typeof this.schema.minimum !== 'undefined') {
         return this.schema.minimum;
       }
       return 0;
     } else if (this.isText) {
-      return "";
+      return '';
     } else if (this.isBoolean) {
       return false;
     } else if (this.isArray) {
@@ -96,7 +96,7 @@ export default class Queryable {
   }
 
   get types() {
-    if (typeof this.schema.type === "string") {
+    if (typeof this.schema.type === 'string') {
       return [this.schema.type];
     } else if (Array.isArray(this.schema.type)) {
       return this.schema.type;
