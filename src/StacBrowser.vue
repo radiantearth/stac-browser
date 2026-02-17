@@ -306,8 +306,17 @@ export default defineComponent({
           if (link) {
             const state = Object.assign({}, this.stateQueryParameters);
             this.isNavigatingLocale = true;
-            await this.$router.push(this.toBrowserPath(link.href));
-            this.isNavigatingLocale = false;
+            try {
+              await this.$router.push(this.toBrowserPath(link.href));
+            }
+            catch (error) {
+              if (!isNavigationFailure(error, NavigationFailureType.duplicated)) {
+                throw error;
+              }
+            }
+            finally {
+              this.isNavigatingLocale = false;
+            }
             this.$store.commit('state', state);
           }
           else if (this.supportsConformance(API_LANGUAGE_CONFORMANCE)) {
