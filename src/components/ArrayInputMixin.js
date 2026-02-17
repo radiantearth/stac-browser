@@ -85,9 +85,6 @@ export default {
     }
   },
   methods: {
-    onValueBlur() {
-      // No-op or specific logic
-    },
     parseInput(inputString) {
       if (!inputString || inputString.trim() === '') {
         return [];

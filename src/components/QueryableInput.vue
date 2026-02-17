@@ -58,7 +58,6 @@
         size="sm"
         class="value"
         v-model="rawInput"
-        @blur="onValueBlur"
         :placeholder="placeholder"
         :state="validationState"
       />
