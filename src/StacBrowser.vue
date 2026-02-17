@@ -302,38 +302,17 @@ export default defineComponent({
           return;
         }
         if (this.data instanceof STAC) {
-          let link = this.data.getLocaleLink(locale);
+          const link = this.data.getLocaleLink(locale);
           if (link) {
-            let state = Object.assign({}, this.stateQueryParameters);
-            const targetRoute = this.$router.resolve(this.toBrowserPath(link.href));
-            // Guard against invalid routes; skip navigation if resolution fails
-            if (!targetRoute?.route) {
-              return;
-            }
-            const location = {
-              path: targetRoute.route.path,
-              query: { ...this.$route.query, ...targetRoute.route.query }
-            };
-            const targetFullPath = this.$router.resolve(location).fullPath;
-            if (targetFullPath !== this.$route.fullPath) {
-              this.isNavigatingLocale = true;
-              try {
-                await this.$router.push(location);
-              }
-              catch (err) {
-                if (!isNavigationFailure(err, NavigationFailureType.duplicated)) {
-                  throw err;
-                }
-              }
-              finally {
-                this.isNavigatingLocale = false;
-              }
-            }
+            const state = Object.assign({}, this.stateQueryParameters);
+            this.isNavigatingLocale = true;
+            await this.$router.push(this.toBrowserPath(link.href));
+            this.isNavigatingLocale = false;
             this.$store.commit('state', state);
           }
           else if (this.supportsConformance(API_LANGUAGE_CONFORMANCE)) {
             // this.url gets reset with resetCatalog so store the url for use in load
-            let url = this.url;
+            const url = this.url;
             // Todo: Resetting the catalogs is not ideal. 
             // A better way would be to combine the language code and URL as the index in the browser database
             // This needs a database refactor though: https://github.com/radiantearth/stac-browser/issues/231
@@ -367,7 +346,7 @@ export default defineComponent({
           }
         }
 
-        this.$router.replace({ path: this.$route.path, query }).catch(error => {
+        this.$router.replace({ query }).catch(error => {
           if (!isNavigationFailure(error, NavigationFailureType.duplicated)) {
             throw Error(error);
           }
@@ -564,7 +543,7 @@ export default defineComponent({
           }
         }
       }
-      if (params?.state?.language && params.state.language !== this.localeFromVueX) {
+      if (params?.state?.language) {
         this.switchLocale({locale: params.state.language});
       }
       if (Utils.size(params.private) > 0) {
