@@ -11,7 +11,7 @@ const CQL_JSON = [
 
 const CQL_ADV_COMPARISON = ['http://www.opengis.net/spec/cql2/1.*/conf/advanced-comparison-operators'];
 const CQL_ARRAY_OPERATORS = [
-  'https://api.stacspec.org/v1.*/item-search#filter',
+  // 'https://api.stacspec.org/v1.*/item-search#filter',
   'http://www.opengis.net/spec/cql2/1.*/conf/array-functions',
   'http://www.opengis.net/spec/ogcapi-features-3/1.*/*/features-filter'
 ];
