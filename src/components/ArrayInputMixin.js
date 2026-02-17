@@ -92,10 +92,45 @@ export default {
       if (!inputString || inputString.trim() === '') {
         return [];
       }
+      const itemType = this.queryable?.schema?.items?.type;
+
       return inputString
         .split(',')
         .map(item => item.trim())
-        .filter(item => item !== '');
+        .filter(item => item !== '')
+        .map(item => {
+          // Coerce item types based on schema.items.type, similar to QueryableInput.updateValue
+          if (itemType === 'integer') {
+            const parsed = parseInt(item, 10);
+            // Ensure full string is a valid integer representation
+            if (!Number.isNaN(parsed) && String(parsed) === item) {
+              return parsed;
+            }
+            return item;
+          }
+
+          if (itemType === 'number') {
+            const parsed = parseFloat(item);
+            if (Number.isFinite(parsed)) {
+              return parsed;
+            }
+            return item;
+          }
+
+          if (itemType === 'boolean') {
+            const lower = item.toLowerCase();
+            if (lower === 'true') {
+              return true;
+            }
+            if (lower === 'false') {
+              return false;
+            }
+            return item;
+          }
+
+          // Default: keep as string
+          return item;
+        });
     },
     validate(values) {
       const errors = [];
