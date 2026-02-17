@@ -152,7 +152,8 @@ export default defineComponent({
     return {
       sidebar: null,
       error: null,
-      onDataLoaded: null
+      onDataLoaded: null,
+      isNavigatingLocale: false
     };
   },
   computed: {
@@ -301,15 +302,26 @@ export default defineComponent({
           return;
         }
         if (this.data instanceof STAC) {
-          let link = this.data.getLocaleLink(locale);
+          const link = this.data.getLocaleLink(locale);
           if (link) {
-            let state = Object.assign({}, this.stateQueryParameters);
-            this.$router.push(this.toBrowserPath(link.href));
+            const state = Object.assign({}, this.stateQueryParameters);
+            this.isNavigatingLocale = true;
+            try {
+              await this.$router.push(this.toBrowserPath(link.href));
+            }
+            catch (error) {
+              if (!isNavigationFailure(error, NavigationFailureType.duplicated)) {
+                throw error;
+              }
+            }
+            finally {
+              this.isNavigatingLocale = false;
+            }
             this.$store.commit('state', state);
           }
           else if (this.supportsConformance(API_LANGUAGE_CONFORMANCE)) {
             // this.url gets reset with resetCatalog so store the url for use in load
-            let url = this.url;
+            const url = this.url;
             // Todo: Resetting the catalogs is not ideal. 
             // A better way would be to combine the language code and URL as the index in the browser database
             // This needs a database refactor though: https://github.com/radiantearth/stac-browser/issues/231
@@ -322,6 +334,9 @@ export default defineComponent({
     stateQueryParameters: {
       deep: true,
       handler() {
+        if (this.isNavigatingLocale) {
+          return;
+        }
         let query = {};
         for (const [key, value] of Object.entries(this.$route.query)) {
           if (!key.startsWith('.')) {
