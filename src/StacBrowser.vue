@@ -419,7 +419,6 @@ export default defineComponent({
     const storage = new BrowserStorage(true);
     const authConfig = storage.get('authConfig');
     if (authConfig) {
-      storage.remove('authConfig');
       await this.$store.dispatch('config', { authConfig });
     }
   },

@@ -720,6 +720,27 @@ function getStore(config, router) {
         // Make sure we have all authentication details
         await cx.dispatch("auth/waitForAuth");
 
+        // Proactively load root catalog to discover auth:schemes before sub-document fetch
+        if (!cx.getters.root && !isRoot) {
+          let catalogUrl = cx.state.catalogUrl;
+          if (!catalogUrl) {
+            // Infer root from OGC API URL patterns (STAC API may be served at a subpath)
+            const uri = URI(url);
+            const urlPath = uri.path();
+            const match = urlPath.match(/\/collections(\/|$)/);
+            if (match) {
+              uri.path(urlPath.substring(0, match.index) || '/');
+              uri.query('');
+              uri.fragment('');
+              catalogUrl = uri.toString();
+              await cx.dispatch('config', { catalogUrl });
+            }
+          }
+          if (catalogUrl) {
+            await cx.dispatch("load", { url: catalogUrl, omitApi: true, isRoot: true });
+          }
+        }
+
         if (force) {
           cx.commit('clear', url);
         }
@@ -773,18 +794,26 @@ function getStore(config, router) {
           }
         }
 
-        // Load API Collections
+        // Detect and configure auth from auth:schemes (runs regardless of omitApi)
         const apiCollectionLink = data instanceof CatalogLike && data.getApiCollectionsLink();
         const apiItemLink = data instanceof CatalogLike && data.getApiItemsLink();
+
+        const hasAuthRefs = apiCollectionLink && Utils.size(apiCollectionLink['auth:refs']) > 0;
+        const authSchemes = apiCollectionLink && data.getMetadata('auth:schemes');
+        if (hasAuthRefs && Utils.size(authSchemes) > 0) {
+          console.debug("Found auth:refs and auth:schemes on catalog, configuring authentication", apiCollectionLink['auth:refs'], authSchemes);
+          await cx.dispatch('auth/configureFromSchemes', authSchemes);
+        } else if (isRoot) {
+          // Clear auth if no auth:refs or auth:schemes are present to prevent stale auth 
+          // when navigating between catalogs with varying auth requirements
+          console.debug("No auth:refs or auth:schemes found on catalog, clearing authentication");
+          await cx.dispatch('auth/updateMethod', null);
+        }
+
+        // Load API Collections
         if (!omitApi && apiCollectionLink) {
-          const hasAuthRefs = Utils.size(apiCollectionLink['auth:refs']) > 0;
-          const authSchemes = data.getMetadata('auth:schemes');
-
-          if (hasAuthRefs && Utils.size(authSchemes) > 0) {
-            await cx.dispatch('auth/configureFromSchemes', authSchemes);
-          }
-
-          const shouldLoadCollections = !hasAuthRefs || !Utils.size(authSchemes) || cx.rootGetters['auth/isLoggedIn'];
+          const requiresAuth = hasAuthRefs && Utils.size(authSchemes) > 0;
+          const shouldLoadCollections = !requiresAuth || cx.rootGetters['auth/isLoggedIn'];
 
           if (shouldLoadCollections) {
             let args = { stac: data, show: loading.show };

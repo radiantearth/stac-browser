@@ -56,9 +56,18 @@ export default function getStore(router) {
     },
     actions: {
       async waitForAuth(cx) {
-        if (Auth.equals(cx.getters.method, cx.rootState.authConfig)) {
+        if (!cx.rootState.authConfig) {
+          console.debug('No auth config available, skipping authentication');
           return;
         }
+        if (
+          !cx.rootState.authConfig ||
+          Auth.equals(cx.getters.method, cx.rootState.authConfig)
+        ) {
+          console.debug('Auth method is up to date, no action needed');
+          return;
+        }
+        console.debug('Auth method change detected, updating method');
         await cx.dispatch('updateMethod', cx.rootState.authConfig);
       },
       async updateMethod(cx, config) {
