@@ -39,13 +39,15 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState } from 'pinia';
 import { defineComponent } from 'vue';
 import validateSTAC from 'stac-node-validator';
 import BrowseMixin from './BrowseMixin.js';
 import { STAC } from 'stac-js';
 import { BCardGroup } from 'bootstrap-vue-next';
 import ValidationResult from '../components/ValidationResult.vue';
+import { usePageStore } from '../store/page';
+import { useCatalogStore } from '../store/catalog';
 
 export default defineComponent({
   name: "Validation",
@@ -71,7 +73,8 @@ export default defineComponent({
     };
   },
   computed: {
-    ...mapState(["data", "uiLanguage"]),
+    ...mapState(usePageStore, ['data']),
+    ...mapState(useCatalogStore, ['uiLanguage']),
     variant() {
       return this.report && this.report.valid ? "success" : "danger";
     }

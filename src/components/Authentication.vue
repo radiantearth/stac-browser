@@ -3,7 +3,8 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapState } from 'pinia';
+import { useAuthStore } from '../store/auth';
 import { defineAsyncComponent } from 'vue';
 
 export default {
@@ -13,7 +14,7 @@ export default {
     Basic: defineAsyncComponent(() => import('./auth/Basic.vue'))
   },
   computed: {
-    ...mapGetters('auth', ['method', 'isLoggedIn']),
+    ...mapState(useAuthStore, ['method', 'isLoggedIn']),
     authComponent() {
       return this.method.getComponent();
     },
@@ -23,15 +24,15 @@ export default {
   },
   beforeCreate() {
     if (this.isLoggedIn) {
-      this.$store.dispatch('auth/finalizeLogout');
+      useAuthStore().finalizeLogout();
     }
   },
   methods: {
     async reset() {
-      await this.$store.dispatch('auth/abortLogin');
+      await useAuthStore().abortLogin();
     },
     async submit(credentials) {
-      await this.$store.dispatch('auth/finalizeLogin', credentials);
+      await useAuthStore().finalizeLogin(credentials);
     }
   }
 };

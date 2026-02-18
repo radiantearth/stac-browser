@@ -10,6 +10,7 @@
 import Point from 'ol/geom/Point';
 import ControlMixin from './ControlMixin';
 import { fromLonLat } from 'ol/proj';
+import { usePageStore } from '../../store/page';
 
 export default {
   name: 'UserLocationControl',
@@ -32,7 +33,7 @@ export default {
             const point = new Point(coords);
             view.fit(point, {maxZoom: this.maxZoom});
           },
-          error => this.$store.commit('showGlobalError', {
+          error => usePageStore().showGlobalError({
             error,
             message: error.message
           }),

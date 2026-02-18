@@ -46,11 +46,13 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapState } from 'pinia';
 import { defineComponent } from 'vue';
 import Description from '../components/Description.vue';
 import Utils from '../utils';
 import axios from "axios";
+import { usePageStore } from '../store/page';
+import { useCatalogStore } from '../store/catalog';
 
 export default defineComponent({
   name: "SelectDataSource",
@@ -64,7 +66,7 @@ export default defineComponent({
     };
   },
   computed: {
-    ...mapGetters(['toBrowserPath']),
+    ...mapState(usePageStore, ['toBrowserPath']),
     valid() {
       if (this.url.length === 0) {
         return null;
@@ -91,7 +93,7 @@ export default defineComponent({
   },
   async created() {
     // Reset loaded STAC catalog
-    this.$store.commit('resetCatalog', true);
+    useCatalogStore().resetCatalog(true);
     // Load entries from STAC Index
     try {
       let response = await axios.get('https://stacindex.org/api/catalogs');

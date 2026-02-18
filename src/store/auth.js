@@ -1,155 +1,164 @@
+import { defineStore } from 'pinia';
 import Auth from '../auth';
 import i18n from '../i18n';
 import AuthUtils from '../components/auth/utils';
 import BrowserStorage, { Cookies } from '../browser-store';
+import { useConfigStore } from './config';
+import { usePageStore } from './page';
 
-const handleAuthError = async (cx, error) => {
-  cx.commit('showGlobalError', {
-    error,
-    message: i18n.global.t('errors.authFailed')
-  }, { root: true });
-  await cx.dispatch('updateCredentials');
-};
+let _router = null;
 
-export default function getStore(router) {
-  return {
-    namespaced: true,
-    state: {
-      // Wrap in a function and use the getter instead of the state
-      // Unfortunately, some auth libraries have internal state, which vuex doesn't like
-      // and thus reports: "do not mutate vuex store state outside mutation handlers."
-      method: () => new Auth(router),
-      actions: [],
-      credentials: null,
-      inProgress: false
-    },
-    getters: {
-      method(state) {
-        return state.method();
-      },
-      canAuthenticate(state, getters, rootState) {
-        return AuthUtils.isSupported(getters.method, rootState);
-      },
-      isLoggedIn(state) {
-        return state.credentials !== null;
-      },
-      showLogin(state, getters) {
-        return !getters.isLoggedIn && state.inProgress;
-      }
-    },
-    mutations: {
-      setCredentials(state, credentials) {
-        state.credentials = credentials; // e.g. Username + Password or a Bearer Token
-      },
-      setMethod(state, method) {
-        state.method = () => method;
-      },
-      addAction(state, callback) {
-        state.actions.push(callback);
-      },
-      resetActions(state) {
-        state.actions = [];
-      },
-      setInProgress(state, inProgress = true) {
-        state.inProgress = inProgress;
-      }
-    },
-    actions: {
-      async waitForAuth(cx) {
-        if (Auth.equals(cx.getters.method, cx.rootState.authConfig)) {
-          return;
-        }
-        await cx.dispatch('updateMethod', cx.rootState.authConfig);
-      },
-      async updateMethod(cx, config) {
-        if (!Auth.equals(cx.getters.method, config)) {
-          await cx.getters.method.close();
-        }
-
-        const changeListener = async (isLoggedIn, credentials) => {
-          if (!isLoggedIn) {
-            credentials = null;
-          }
-          await cx.dispatch('updateCredentials', credentials);
-          if (isLoggedIn) {
-            await cx.dispatch('executeActions');
-          }
-          else {
-            cx.commit('resetActions');
-          }
-        };
-        
-        const storage = new BrowserStorage(true);
-        storage.set('authConfig', config);
-
-        const newAuth = await Auth.create(router, config, changeListener);
-        cx.commit('setMethod', newAuth);
-      },
-      async requestLogin(cx) {
-        if (cx.getters.isLoggedIn) {
-          return;
-        }
-        cx.commit('setInProgress');
-        try {
-          await cx.getters.method.login();
-        } catch(error) {
-          handleAuthError(cx, error);
-        }
-      },
-      async finalizeLogin(cx, credentials = null) {
-        cx.commit('setInProgress', false);
-        try {
-          await cx.getters.method.confirmLogin(credentials);
-        } catch(error) {
-          handleAuthError(cx, error);
-        }
-      },
-      async abortLogin(cx) {
-        cx.commit('setInProgress', false);
-      },
-      async requestLogout(cx) {
-        if (!cx.getters.isLoggedIn) {
-          return;
-        }
-        cx.commit('setInProgress');
-        await cx.getters.method.logout();
-      },
-      async finalizeLogout(cx) {
-        cx.commit('setInProgress', false);
-        try {
-          await cx.getters.method.confirmLogout();
-        } catch(error) {
-          handleAuthError(cx, error);
-        }
-      },
-      // Format the value and add it to query parameters or headers
-      async updateCredentials(cx, value = null) {
-        cx.commit('setCredentials', value);
-        const intent = cx.getters.method.updateStore(value);
-        if (intent.query) {
-          cx.commit('setQueryParameter', intent.query, { root: true });
-        }
-        else if (intent.header) {
-          cx.commit('setRequestHeader', intent.header, { root: true });
-        }
-        else if (intent.cookie) {
-          const cookie = new Cookies(true);
-          cookie.setItem(intent.cookie.key, intent.cookie.value);
-        }
-      },
-      async executeActions(cx) {
-        for (let callback of cx.state.actions) {
-          try {
-            const p = callback();
-            if (p instanceof Promise) {
-              p.catch(error => handleAuthError(cx, error));
-            }
-          } catch (error) {
-            handleAuthError(cx, error);
-          }
-        }
-        cx.commit('resetActions');
-      }
-    }
-  };
+export function setAuthRouter(router) {
+  _router = router;
 }
+
+export const useAuthStore = defineStore('auth', {
+  state: () => ({
+    /** @type {Function} Wrapped auth method (to avoid vuex/pinia reactivity issues) */
+    _method: () => new Auth(_router),
+    /** @type {Array<Function>} Retry action callbacks */
+    actions: [],
+    /** @type {*} Current credentials */
+    credentials: null,
+    /** @type {boolean} Whether auth flow is in progress */
+    inProgress: false
+  }),
+  getters: {
+    method(state) {
+      return state._method();
+    },
+    canAuthenticate() {
+      const config = useConfigStore();
+      return AuthUtils.isSupported(this.method, config.$state);
+    },
+    isLoggedIn(state) {
+      return state.credentials !== null;
+    },
+    showLogin(state) {
+      return !this.isLoggedIn && state.inProgress;
+    }
+  },
+  actions: {
+    addAction(callback) {
+      this.actions.push(callback);
+    },
+
+    resetActions() {
+      this.actions = [];
+    },
+
+    async waitForAuth() {
+      const config = useConfigStore();
+      if (Auth.equals(this.method, config.authConfig)) {
+        return;
+      }
+      await this.updateMethod(config.authConfig);
+    },
+
+    async updateMethod(authConfig) {
+      if (!Auth.equals(this.method, authConfig)) {
+        await this.method.close();
+      }
+
+      const changeListener = async (isLoggedIn, credentials) => {
+        if (!isLoggedIn) {
+          credentials = null;
+        }
+        await this.updateCredentials(credentials);
+        if (isLoggedIn) {
+          await this.executeActions();
+        }
+        else {
+          this.resetActions();
+        }
+      };
+
+      const storage = new BrowserStorage(true);
+      storage.set('authConfig', authConfig);
+
+      const newAuth = await Auth.create(_router, authConfig, changeListener);
+      this._method = () => newAuth;
+    },
+
+    async requestLogin() {
+      if (this.isLoggedIn) {
+        return;
+      }
+      this.inProgress = true;
+      try {
+        await this.method.login();
+      } catch (error) {
+        await this._handleAuthError(error);
+      }
+    },
+
+    async finalizeLogin(credentials = null) {
+      this.inProgress = false;
+      try {
+        await this.method.confirmLogin(credentials);
+      } catch (error) {
+        await this._handleAuthError(error);
+      }
+    },
+
+    async abortLogin() {
+      this.inProgress = false;
+    },
+
+    async requestLogout() {
+      if (!this.isLoggedIn) {
+        return;
+      }
+      this.inProgress = true;
+      await this.method.logout();
+    },
+
+    async finalizeLogout() {
+      this.inProgress = false;
+      try {
+        await this.method.confirmLogout();
+      } catch (error) {
+        await this._handleAuthError(error);
+      }
+    },
+
+    async updateCredentials(value = null) {
+      this.credentials = value;
+      const pageStore = usePageStore();
+      const intent = this.method.updateStore(value);
+      if (intent.query) {
+        pageStore.setQueryParameter(intent.query);
+      }
+      else if (intent.header) {
+        pageStore.setRequestHeader(intent.header);
+      }
+      else if (intent.cookie) {
+        const cookie = new Cookies(true);
+        cookie.setItem(intent.cookie.key, intent.cookie.value);
+      }
+    },
+
+    async executeActions() {
+      for (const callback of this.actions) {
+        try {
+          const p = callback();
+          if (p instanceof Promise) {
+            p.catch(error => this._handleAuthError(error));
+          }
+        } catch (error) {
+          this._handleAuthError(error);
+        }
+      }
+      this.resetActions();
+    },
+
+    async _handleAuthError(error) {
+      const pageStore = usePageStore();
+      pageStore.showGlobalError({
+        error,
+        message: i18n.global.t('errors.authFailed')
+      });
+      await this.updateCredentials();
+    }
+  }
+});

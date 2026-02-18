@@ -1,4 +1,5 @@
-import { mapState } from "vuex";
+import { mapState } from 'pinia';
+import { useCatalogStore } from '../store/catalog';
 import { VueDatePicker } from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 
@@ -19,7 +20,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['uiLanguage'])
+    ...mapState(useCatalogStore, ['uiLanguage'])
   },
   watch: {
     uiLanguage: {

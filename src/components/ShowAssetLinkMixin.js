@@ -1,6 +1,8 @@
 import { defineComponent } from 'vue';
 import Utils from '../utils';
-import { mapGetters, mapState } from 'vuex';
+import { mapState } from 'pinia';
+import { useConfigStore } from '../store/config';
+import { usePageStore } from '../store/page';
 import { stacBrowserSpecialHandling } from "../rels";
 
 export default defineComponent({
@@ -12,8 +14,8 @@ export default defineComponent({
     };
   },
   computed: {
-    ...mapState(['showThumbnailsAsAssets']),
-    ...mapGetters(['data']),
+    ...mapState(useConfigStore, ['showThumbnailsAsAssets']),
+    ...mapState(usePageStore, ['data']),
     // hasAssets in stac-js also checks whether the assets have a href and thus are not item asset definitions
     hasAssets() {
       return this.assets.length > 0;

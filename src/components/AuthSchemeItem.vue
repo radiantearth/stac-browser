@@ -9,6 +9,7 @@
 
 <script>
 import AuthUtils from './auth/utils';
+import { useConfigStore } from '../store/config';
 
 export default {
   name: 'AuthSchemeItem',
@@ -21,7 +22,7 @@ export default {
   emits: ['authenticate'],
   computed: {
     isSupported() {
-      return AuthUtils.isSupported(this.method, this.$store.state);
+      return AuthUtils.isSupported(this.method, useConfigStore().$state);
     }
   },
   methods: {

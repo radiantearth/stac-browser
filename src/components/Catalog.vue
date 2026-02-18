@@ -23,7 +23,10 @@
 
 <script>
 import { defineAsyncComponent } from 'vue';
-import { mapState, mapGetters } from 'vuex';
+import { mapState } from 'pinia';
+import { useConfigStore } from '../store/config';
+import { useDatabaseStore } from '../store/database';
+import { useCatalogStore } from '../store/catalog';
 import FileFormatsMixin from './FileFormatsMixin';
 import StacFieldsMixin from './StacFieldsMixin';
 import CardMixin from './CardMixin';
@@ -56,8 +59,8 @@ export default {
     }
   },
   computed: {
-    ...mapState(['showKeywordsInCatalogCards']),
-    ...mapGetters(['getStac']),
+    ...mapState(useConfigStore, ['showKeywordsInCatalogCards']),
+    ...mapState(useDatabaseStore, ['getStac']),
     classes() {
       let classes = ['catalog-card'];
       if (!this.data) {
@@ -89,7 +92,7 @@ export default {
       if (this.catalog instanceof STAC) {
         return;
       }
-      this.$store.commit(visible ? 'queue' : 'unqueue', this.catalog.getAbsoluteUrl());
+      useCatalogStore()[visible ? 'enqueue' : 'dequeue'](this.catalog.getAbsoluteUrl());
     }
   }
 };

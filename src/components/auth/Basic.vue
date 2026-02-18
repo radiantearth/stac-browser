@@ -24,7 +24,8 @@
 <script>
 import Description from '../Description.vue';
 import Utils from '../../utils';
-import { mapGetters } from 'vuex';
+import { mapState } from 'pinia';
+import { useAuthStore } from '../../store/auth';
 import { BCard, BCardBody, BCardFooter } from 'bootstrap-vue-next';
 
 export default {
@@ -55,7 +56,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters('auth', ['isLoggedIn']),
+    ...mapState(useAuthStore, ['isLoggedIn']),
     promptText() {
       if (this.description) {
         return this.description;

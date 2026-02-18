@@ -35,7 +35,9 @@
 
 <script>
 import { formatKey } from "@radiantearth/stac-fields/helper";
-import { mapGetters, mapState } from "vuex";
+import { mapState } from 'pinia';
+import { useCatalogStore } from '../store/catalog';
+import { usePageStore } from '../store/page';
 import Url from './Url.vue';
 import Utils from "../utils";
 import { defineAsyncComponent } from 'vue';
@@ -47,8 +49,8 @@ export default {
     Url
   },
   computed: {
-    ...mapState(['conformsTo']),
-    ...mapGetters(['root']),
+    ...mapState(useCatalogStore, ['conformsTo']),
+    ...mapState(usePageStore, ['root']),
     rootUrl() {
       return this.root ? this.root.getAbsoluteUrl() : null;
     },

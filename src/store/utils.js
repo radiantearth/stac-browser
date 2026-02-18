@@ -1,6 +1,8 @@
 import axios from "axios";
 import Utils from "../utils";
 import i18n from '../i18n';
+import { usePageStore } from './page';
+import { useConfigStore } from './config';
 
 export class Loading {
 
@@ -10,6 +12,13 @@ export class Loading {
 
 }
 
+/**
+ * Build request options for a STAC request.
+ * Accepts either a store-like context (for backward compat with schema-org, Search, etc.)
+ * or uses the Pinia stores directly.
+ * @param {Object|null} cx - legacy store context or null
+ * @param {string|Object} link - URL string or link object
+ */
 export function stacRequestOptions(cx, link) {
   // Convert a URL string to a Link Object
   if (typeof link === 'string') {
@@ -17,48 +26,52 @@ export function stacRequestOptions(cx, link) {
       href: link
     };
   }
-  // Return if the link is not an object or doesn't contain an href
   if (!Utils.isObject(link) || typeof link.href !== 'string') {
     return {};
   }
 
+  const pageStore = usePageStore();
+  const config = useConfigStore();
+
   // Generate URL including query strings
-  const url = cx.getters.getRequestUrl(link.href);
+  const url = pageStore.getRequestUrl(link.href);
 
   // Combine headers
   let headers = {
-    'Accept-Language': cx.getters.acceptedLanguages
+    'Accept-Language': pageStore.acceptedLanguages
   };
   if (Utils.hasText(link.type)) {
     headers.Accept = link.type;
   }
-  if (!cx.getters.isExternalUrl(url)) {
-    Object.assign(headers, cx.state.requestHeaders);
+  if (!pageStore.isExternalUrl(url)) {
+    Object.assign(headers, config.requestHeaders);
   }
   if (Utils.isObject(link.headers)) {
     Object.assign(headers, link.headers);
   }
 
-  // Combine all options for axios request
   return {
     method: typeof link.method === 'string' ? link.method.toLowerCase() : 'get',
     url,
     headers,
     data: link.body
-    // ToDo: Support for merge property from STAC API
   };
 }
 
+/**
+ * Execute a STAC HTTP request
+ * @param {Object|null} cx - legacy store context (unused, kept for backward compat)
+ * @param {string|Object} link - URL string or link object
+ * @param {Object} axiosOptions - additional axios options
+ */
 export async function stacRequest(cx, link, axiosOptions = {}) {
-  // Get options
   const options = stacRequestOptions(cx, link);
-  // Execute the request
   return await axios(Object.assign(options, axiosOptions));
 }
 
-export function processSTAC(state, stac) {
-  if (typeof state.preprocessSTAC === 'function') {
-    stac = state.preprocessSTAC(stac, state);
+export function processSTAC(config, stac) {
+  if (typeof config.preprocessSTAC === 'function') {
+    stac = config.preprocessSTAC(stac, config);
   }
   return Object.freeze(stac);
 }
@@ -85,7 +98,6 @@ export function getErrorMessage(error) {
     if (error.isAxiosError) {
       const res = error.response;
       if (error.response) {
-        // Get a error message for HTTP codes where it's clear what the issue is
         if (res.status === 401) {
           return i18n.global.t('errors.unauthorized');
         } else if (res.status === 403) {
@@ -93,16 +105,12 @@ export function getErrorMessage(error) {
         } else if (res.status === 404) {
           return i18n.global.t('errors.notFound');
         } else if (Utils.isObject(res.data) && Utils.hasText(res.data.description)) {
-          // Get the error message from the error object as defined for STAC API JSON responses
           return res.data.description;
         } else if (Utils.hasText(res.data)) {
-          // Get the error message from the plain text response
           return res.data;
         } else if (res.status >= 500 && res.status < 600) {
-          // Return a generic error message for server issues (HTTP 5xx)
           return i18n.global.t('errors.serverError');
         } else if (res.status >= 400 && res.status < 500) {
-          // Return a generic error message for issues that originate in the client request (HTTP 4xx)
           return i18n.global.t('errors.badRequest');
         }
       }
@@ -131,17 +139,6 @@ export function addQueryIfNotExists(uri, query) {
 
 /**
  * Checks whether a given URI is in the authority of a given pattern.
- * 
- * Pattern can be one of the following:
- * - A regular expression that will be tested against the normalized absolute URL.
- * - A domain (e.g. `example.com`) -> It will match example.com and any subdomains (case insensitive).
- * - A subdomain (e.g. stac.example.com) -> It will match stac.example.com and any subdomains (case insensitive).
- * 
- * Domain and subdomain patterns ignore schema, userinfo, port, path, query and fragment.
- * 
- * @param {RegExp|string} pattern The pattern to check against.
- * @param {URI} uri The absolute URI object.
- * @returns {boolean} true if the URI is in the authority of the pattern, false otherwise.
  */
 export function hasAuthority(pattern, uri) {
   if (pattern instanceof RegExp) {

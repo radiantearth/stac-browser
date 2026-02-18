@@ -57,7 +57,8 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState } from 'pinia';
+import { useConfigStore } from '../store/config';
 import { defineAsyncComponent } from 'vue';
 
 import Url from './Url.vue';
@@ -88,7 +89,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(['socialSharing', 'valid']),
+    ...mapState(useConfigStore, ['socialSharing', 'valid']),
     stacVersion() {
       return this.stac?.stac_version;
     },

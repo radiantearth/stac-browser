@@ -1,4 +1,5 @@
-import { mapState } from 'vuex';
+import { mapState } from 'pinia';
+import { useConfigStore } from '../store/config';
 import Utils from '../utils';
 import { STAC } from 'stac-js';
 
@@ -10,7 +11,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(['cardViewMode', 'crossOriginMedia', 'defaultThumbnailSize']),
+    ...mapState(useConfigStore, ['cardViewMode', 'crossOriginMedia', 'defaultThumbnailSize']),
     isList() {
       return this.data && !this.data.isItem() && this.cardViewMode === 'list';
     },

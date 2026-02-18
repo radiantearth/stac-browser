@@ -43,7 +43,8 @@
 <script>
 import { defineAsyncComponent } from 'vue';
 import { formatMediaType } from '@radiantearth/stac-fields/formatters';
-import { mapState } from 'vuex';
+import { mapState } from 'pinia';
+import { usePageStore } from '../store/page';
 import StacFieldsMixin from './StacFieldsMixin';
 import Utils from '../utils';
 import { Asset } from 'stac-js';
@@ -86,7 +87,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['stateQueryParameters']),
+    ...mapState(usePageStore, ['stateQueryParameters']),
     type() {
       return this.definition ? 'itemdef' : 'asset';
     },
@@ -167,7 +168,7 @@ export default {
     },
     collapseToggled(isVisible) {
       let event = isVisible ? 'openCollapsible' : 'closeCollapsible';
-      this.$store.commit(event, {type: this.type, uid: this.uid});
+      usePageStore()[event]({type: this.type, uid: this.uid});
     },
     show() {
       this.$emit('show', ...arguments);

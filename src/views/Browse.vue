@@ -10,9 +10,10 @@
 <script>
 import Item from './Item.vue';
 import Catalog from './Catalog.vue';
-import { mapGetters } from "vuex";
+import { mapState } from 'pinia';
 import { defineComponent } from 'vue';
 import BrowseMixin from './BrowseMixin';
+import { usePageStore } from '../store/page';
 
 export default defineComponent({
   name: "Browse",
@@ -24,7 +25,7 @@ export default defineComponent({
     BrowseMixin
   ],
   computed: {
-    ...mapGetters(["isItem"]),
+    ...mapState(usePageStore, ['isItem']),
     component() {
       if (this.isItem) {
         return 'Item';

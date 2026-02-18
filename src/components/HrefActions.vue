@@ -42,7 +42,10 @@ import { defineAsyncComponent } from 'vue';
 
 import Description from './Description.vue';
 import Utils, { imageMediaTypes, mapMediaTypes } from '../utils';
-import { mapGetters, mapState } from 'vuex';
+import { mapState } from 'pinia';
+import { useConfigStore } from '../store/config';
+import { usePageStore } from '../store/page';
+import { useAuthStore } from '../store/auth';
 import AssetActions from '../../assetActions.config';
 import LinkActions from '../../linkActions.config';
 import URI from 'urijs';
@@ -93,9 +96,9 @@ export default {
     };
   },
   computed: {
-    ...mapState(['downloads', 'pathPrefix', 'requestHeaders', 'buildTileUrlTemplate', 'useTileLayerAsFallback']),
-    ...mapGetters(['getRequestUrl']),
-    ...mapGetters('auth', ['isLoggedIn']),
+    ...mapState(useConfigStore, ['pathPrefix', 'requestHeaders', 'buildTileUrlTemplate', 'useTileLayerAsFallback']),
+    ...mapState(usePageStore, ['downloads', 'getRequestUrl']),
+    ...mapState(useAuthStore, ['isLoggedIn']),
     loading() {
       return Boolean(this.downloads[this.href]);
     },
@@ -251,7 +254,7 @@ export default {
         return;
       }
 
-      await this.$store.dispatch('altDownload', this.assetWithHref);
+      await usePageStore().altDownload(this.assetWithHref);
     },
     protocolName(protocol) {
       if (typeof protocol !== 'string') {
@@ -293,14 +296,14 @@ export default {
       }
     },
     async startAuth(method) {
-      if (AuthUtils.isSupported(method, this.$store.state)) {
-        await this.$store.dispatch('config', { authConfig: method });
-        await this.$store.dispatch('auth/requestLogin');
+      if (AuthUtils.isSupported(method, useConfigStore().$state)) {
+        await useConfigStore().updateConfig({ authConfig: method });
+        await useAuthStore().requestLogin();
       }
       else {
         const name = this.$t(`authentication.schemeTypes.${method.type}`, method);
         const message = this.$t('authentication.unsupportedLong', {method: name});
-        this.$store.commit('showGlobalError', {
+        usePageStore().showGlobalError({
           error: new Error(message),
           message: this.$t('authentication.unsupported')
         });

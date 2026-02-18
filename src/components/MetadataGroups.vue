@@ -26,7 +26,8 @@ import {
 import StacFieldsMixin from './StacFieldsMixin';
 import MetadataGroup from "./metadata/MetadataGroup.vue";
 import { isoDuration } from "@musement/iso-duration";
-import { mapState } from "vuex";
+import { mapState } from 'pinia';
+import { useCatalogStore } from '../store/catalog';
 // Register custom fields for the metadata rendering
  
 import "../../fields.config";
@@ -72,7 +73,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(["uiLanguage"]),
+    ...mapState(useCatalogStore, ['uiLanguage']),
     titleText() {
       if (typeof this.title === "string") {
         return this.title;

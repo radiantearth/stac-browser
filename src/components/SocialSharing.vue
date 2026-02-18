@@ -8,7 +8,8 @@
 
 
 <script>
-import { mapState } from 'vuex';
+import { mapState } from 'pinia';
+import { useConfigStore } from '../store/config';
 import IconBsky from '~icons/share/bsky';
 import IconEmail from '~icons/share/email';
 import IconMastodon from '~icons/share/mastodon';
@@ -47,7 +48,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['socialSharing']),
+    ...mapState(useConfigStore, ['socialSharing']),
     urls() {
       const uriText = encodeURIComponent(this.text);
       const uriTitle = encodeURIComponent(this.title);

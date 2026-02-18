@@ -59,6 +59,7 @@
     "oidc-client-ts": "^3.0.1",
     "ol": "~10.7.0",
     "ol-stac": "^1.1.0",
+    "pinia": "^3.0.4",
     "proj4": "^2.15.0",
     "remove-markdown": "^0.6.2",
     "stac-js": "~0.1.9",
@@ -71,7 +72,6 @@
     "vue-i18n": "^11.2.0",
     "vue-multiselect": "^3.3.1",
     "vue-router": "^5.0.1",
-    "vuex": "^4.1.0",
     "yargs": "^18.0.0"
   },
   "devDependencies": {

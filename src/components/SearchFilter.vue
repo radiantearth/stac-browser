@@ -148,7 +148,10 @@
 
 <script>
 import { defineComponent, defineAsyncComponent } from 'vue';
-import { mapGetters, mapState } from "vuex";
+import { mapState } from 'pinia';
+import { useConfigStore } from '../store/config';
+import { useCatalogStore } from '../store/catalog';
+import { useDatabaseStore } from '../store/database';
 import { BCard, BCardBody, BCardFooter, BCardTitle, BDropdown, BDropdownItem } from 'bootstrap-vue-next';
 
 import refParser from '@apidevtools/json-schema-ref-parser';
@@ -161,7 +164,7 @@ import DatePickerMixin from './DatePickerMixin';
 import Loading from './Loading.vue';
 
 import { STAC } from 'stac-js'; 
-import { createSTAC, Collection } from '../models/stac';
+import { createSTAC } from '../models/stac';
 import Cql from '../models/cql2/cql';
 import Queryable from '../models/cql2/queryable';
 import CqlValue from '../models/cql2/value';
@@ -247,8 +250,21 @@ export default defineComponent({
     }, getDefaults());
   },
   computed: {
-    ...mapState(['searchResultsPerPage', 'maxEntriesPerPage', 'uiLanguage']),
-    ...mapGetters(['canSearchCollections', 'supportsConformance']),
+    ...mapState(useConfigStore, ['searchResultsPerPage', 'maxEntriesPerPage']),
+    ...mapState(useCatalogStore, ['uiLanguage']),
+    ...mapState(useCatalogStore, ['canSearchCollections', 'supportsConformance']),
+    parentApiChildren() {
+      if (this.parent instanceof STAC) {
+        return useDatabaseStore().getResolvedChildren(this.parent.getAbsoluteUrl());
+      }
+      return [];
+    },
+    parentChildrenMissing() {
+      if (this.parent instanceof STAC) {
+        return useDatabaseStore().hasMoreChildren(this.parent.getAbsoluteUrl());
+      }
+      return false;
+    },
     collectionSelectOptions() {
       let taggable = !this.hasAllCollections;
       let isResult = this.collections.length > 0 && !this.hasAllCollections;
@@ -339,15 +355,9 @@ export default defineComponent({
     }
   },
   watch: {
-    parent: {
+    parentApiChildren: {
       immediate: true,
-      handler(newStac, oldStac) {
-        if (newStac instanceof Collection) {
-          newStac.setApiDataListener('searchfilter' + formId, () => this.updateApiCollections());
-        }
-        if (oldStac instanceof Collection) {
-          oldStac.setApiDataListener('searchfilter' + formId);
-        }
+      handler() {
         this.updateApiCollections();
       }
     },
@@ -437,7 +447,7 @@ export default defineComponent({
       this.collectionsLoadingTimer = setTimeout(async () => {
         try {
           const link = Utils.addFiltersToLink(this.collectionSearchLink, {q: [text]});
-          const response = await stacRequest(this.$store, link);
+          const response = await stacRequest(null, link);
           
           // Only set collections if response is valid AND collectionsLoadingTimer has not been reset.
           // If collectionsLoadingTimer has been reset, the result is not relevant anylonger.
@@ -467,7 +477,7 @@ export default defineComponent({
         hasMore = false;
       }
       else if (this.type === 'Global' || this.type === 'Collections') {
-        let response = await stacRequest(this.$store, link);
+        let response = await stacRequest(null, link);
         
         if (!Utils.isObject(response.data)) {
           return {};
@@ -492,9 +502,9 @@ export default defineComponent({
       if (!this.parent) {
         return;
       }
-      let apiCollections = this.parent.getChildren('collections');
-      let nextCollectionsLink = this.parent._apiChildren.next;
-      if (!Array.isArray(apiCollections) || nextCollectionsLink || !this.conformances.CollectionIdFilter) {
+      let apiCollections = useDatabaseStore().getMergedChildren(this.parent.getAbsoluteUrl(), 'collections');
+      let hasMore = this.parentChildrenMissing;
+      if (!Array.isArray(apiCollections) || hasMore || !this.conformances.CollectionIdFilter) {
         this.collections = [];
         return;
       }
@@ -526,7 +536,7 @@ export default defineComponent({
         return;
       }
 
-      let response = await stacRequest(this.$store, link);
+      let response = await stacRequest(null, link);
       if (!Utils.isObject(response.data)) {
         return;
       }

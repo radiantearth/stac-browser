@@ -37,7 +37,8 @@
 
 <script>
 import { defineComponent, defineAsyncComponent } from 'vue';
-import { mapState, mapGetters } from 'vuex';
+import { mapState } from 'pinia';
+import { usePageStore } from '../store/page';
 import { BTab, BTabs, BCard } from 'bootstrap-vue-next';
 import Description from '../components/Description.vue';
 import ReadMore from "../components/ReadMore.vue";
@@ -88,15 +89,15 @@ export default defineComponent({
     };
   },
   computed: {
-    ...mapState(['data', 'url']),
-    ...mapGetters(['collectionLink', 'parentLink'])
+    ...mapState(usePageStore, ['data', 'url']),
+    ...mapState(usePageStore, ['collectionLink', 'parentLink'])
   },
   watch: {
     data: {
       immediate: true,
       handler(data) {
         try {
-          let schema = createItemSchema(data, [this.collectionLink, this.parentLink], this.$store);
+          let schema = createItemSchema(data, [this.collectionLink, this.parentLink]);
           addSchemaToDocument(document, schema);
         } catch (error) {
           console.error(error);

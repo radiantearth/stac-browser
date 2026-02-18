@@ -93,7 +93,7 @@
 <script>
 import { defineComponent, defineAsyncComponent } from 'vue';
 import { isNavigationFailure, NavigationFailureType } from 'vue-router';
-import { mapMutations, mapActions, mapGetters, mapState } from 'vuex';
+import { mapState, mapActions } from 'pinia';
 import CONFIG from './config';
 
 // Import icons needed for dynamic component usage
@@ -113,23 +113,10 @@ import BrowserStorage from "./browser-store";
 import Authentication from "./components/Authentication.vue";
 import { getDisplayTitle } from "./models/stac";
 
-// Pass Config through from props to vuex
-let Props = {};
-let Watchers = {};
-for(let key in CONFIG) {
-  Props[key] = {
-    default: ['object', 'function'].includes(typeof CONFIG[key]) ? () => CONFIG[key] : CONFIG[key]
-  };
-  Watchers[key] = {
-    immediate: true,
-    deep: ['object', 'array'].includes(typeof CONFIG[key]),
-    handler: async function(newValue) {
-      await this.$store.dispatch('config', {
-        [key]: newValue
-      });
-    }
-  };
-}
+import { useConfigStore } from './store/config';
+import { usePageStore } from './store/page';
+import { useCatalogStore } from './store/catalog';
+import { useAuthStore } from './store/auth';
 
 export default defineComponent({
   name: 'StacBrowser',
@@ -145,9 +132,6 @@ export default defineComponent({
     StacLink,
     StacSource: defineAsyncComponent(() => import('./components/StacSource.vue'))
   },
-  props: {
-    ...Props
-  },
   data() {
     return {
       sidebar: null,
@@ -157,8 +141,8 @@ export default defineComponent({
     };
   },
   computed: {
-    ...mapState(['allowSelectCatalog', 'conformsTo', 'data', 'dataLanguage', 'downloads', 'globalError', 'loading', 'stateQueryParameters', 'uiLanguage', 'url']),
-    ...mapState({
+    ...mapState(useConfigStore, ['allowSelectCatalog', 'catalogTitle', 'historyMode']),
+    ...mapState(useConfigStore, {
       catalogImageFromVueX: 'catalogImage',
       footerLinksFromVueX: 'footerLinks',
       localeFromVueX: 'locale',
@@ -166,9 +150,12 @@ export default defineComponent({
       supportedLocalesFromVueX: 'supportedLocales',
       storeLocaleFromVueX: 'storeLocale'
     }),
-    ...mapGetters(['canSearch', 'collectionLink', 'description', 'fromBrowserPath', 'isExternalUrl', 'isRoot', 'parentLink', 'root', 'rootLink', 'supportsConformance', 'title', 'toBrowserPath']),
-    ...mapGetters('auth', { authMethod: 'method' }),
-    ...mapGetters('auth', ['canAuthenticate', 'isLoggedIn', 'showLogin']),
+    ...mapState(usePageStore, ['data', 'globalError', 'loading', 'stateQueryParameters', 'url']),
+    ...mapState(usePageStore, ['collectionLink', 'description', 'fromBrowserPath', 'isExternalUrl', 'isRoot', 'parentLink', 'root', 'rootLink', 'title', 'toBrowserPath']),
+    ...mapState(useCatalogStore, ['conformsTo', 'dataLanguage', 'uiLanguage']),
+    ...mapState(useCatalogStore, ['canSearch', 'supportsConformance']),
+    ...mapState(useAuthStore, { authMethod: 'method' }),
+    ...mapState(useAuthStore, ['canAuthenticate', 'isLoggedIn', 'showLogin']),
     browserVersion() {
       if (typeof STAC_BROWSER_VERSION !== 'undefined') {
         return STAC_BROWSER_VERSION;
@@ -201,10 +188,10 @@ export default defineComponent({
         searchLink = this.data.getSearchLink();
       }
       if (searchLink) {
-        return `/search${this.data.getBrowserPath()}`;
+        return `/search${this.toBrowserPath(this.data.getAbsoluteUrl())}`;
       }
       else if (this.root && this.allowSelectCatalog) {
-        return `/search${this.root.getBrowserPath()}`;
+        return `/search${this.toBrowserPath(this.root.getAbsoluteUrl())}`;
       }
       return '/search';
     },
@@ -267,7 +254,6 @@ export default defineComponent({
     }
   },
   watch: {
-    ...Watchers,
     title(title) {
       if (this.root) {
         const rootTitle = getDisplayTitle(this.root);
@@ -317,7 +303,7 @@ export default defineComponent({
             finally {
               this.isNavigatingLocale = false;
             }
-            this.$store.commit('state', state);
+            usePageStore().setState(state);
           }
           else if (this.supportsConformance(API_LANGUAGE_CONFORMANCE)) {
             // this.url gets reset with resetCatalog so store the url for use in load
@@ -325,8 +311,8 @@ export default defineComponent({
             // Todo: Resetting the catalogs is not ideal. 
             // A better way would be to combine the language code and URL as the index in the browser database
             // This needs a database refactor though: https://github.com/radiantearth/stac-browser/issues/231
-            this.$store.commit('resetCatalog', true);
-            await this.$store.dispatch("load", { url, show: true });
+            useCatalogStore().resetCatalog(true);
+            await useCatalogStore().load({ url, show: true });
           }
         }
       }
@@ -377,6 +363,7 @@ export default defineComponent({
       let doReset = !root || (oldRoot && Utils.isObject(oldRoot['stac_browser']));
       let doSet = root && Utils.isObject(root['stac_browser']);
 
+      const configStore = useConfigStore();
       for(let key of canChange) {
         let value;
         if (doReset) {
@@ -388,7 +375,7 @@ export default defineComponent({
 
         // Update config in store
         if (typeof value !== 'undefined') {
-          this.$store.dispatch('config', { [key]: value })
+          configStore.updateConfig({ [key]: value })
             .catch(error => console.error(error));
         }
       }
@@ -417,15 +404,20 @@ export default defineComponent({
       this.onDataLoaded = null;
 
       // Handle catalog change: https://github.com/radiantearth/stac-browser/issues/250
-      let resetOp = 'resetPage';
+      const pageStore = usePageStore();
       if (this.allowSelectCatalog && to.path) {
         let next = this.fromBrowserPath(to.path);
         if (this.isExternalUrl(next)) {
-          resetOp = 'resetCatalog';
+          useCatalogStore().resetCatalog();
+        }
+        else {
+          pageStore.resetPage();
         }
       }
+      else {
+        pageStore.resetPage();
+      }
 
-      this.$store.commit(resetOp);
       this.parseQuery(to);
 
       document.getElementById('og-url').setAttribute("content", window.location.href);
@@ -435,29 +427,30 @@ export default defineComponent({
     const authConfig = storage.get('authConfig');
     if (authConfig) {
       storage.remove('authConfig');
-      await this.$store.dispatch('config', { authConfig });
+      await useConfigStore().updateConfig({ authConfig });
     }
   },
   mounted() {    
-    setInterval(() => this.$store.dispatch('loadBackground', 3), 200);
+    setInterval(() => useCatalogStore().loadBackground(3), 200);
 
     // Prevent the user from leaving the page while the download is in progress
     // As this is not a normal download a user has to stay on the page for the download to complete
     window.addEventListener('unload', () => {
-      Object.values(this.downloads)
+      const pageStore = usePageStore();
+      Object.values(pageStore.downloads)
         .filter(stream => stream && typeof stream.abort === 'function')
         .forEach(stream => stream.abort());
     });
     window.addEventListener('beforeunload', (evt) => {
-      if (Utils.size(this.downloads) > 0) {
+      const pageStore = usePageStore();
+      if (Utils.size(pageStore.downloads) > 0) {
         evt.preventDefault();
       }
     });
   },
   methods: {
-    ...mapActions(['switchLocale']),
-    ...mapMutations('auth', ['addAction']),
-    ...mapActions('auth', ['requestLogin', 'requestLogout']),
+    ...mapActions(useCatalogStore, ['switchLocale']),
+    ...mapActions(useAuthStore, ['addAction', 'requestLogin', 'requestLogout']),
     getIcon(data) {
       if (data instanceof STAC) {
         const icons = data.getIcons();
@@ -469,7 +462,7 @@ export default defineComponent({
     },
     async logInOut() {
       if (this.url) {
-        this.addAction(() => this.$store.dispatch("load", {
+        this.addAction(() => useCatalogStore().load({
           url: this.url,
           show: true,
           force: true,
@@ -546,9 +539,10 @@ export default defineComponent({
         }
       }
       if (Utils.size(params) > 0) {
+        const pageStore = usePageStore();
         for (let type in params) {
           for (let key in params[type]) {
-            this.$store.commit('setQueryParameter', {type, key, value: params[type][key]});
+            pageStore.setQueryParameter({type, key, value: params[type][key]});
           }
         }
       }
@@ -561,13 +555,13 @@ export default defineComponent({
 
     },
     showError(error, message) {
-      this.$store.commit('showGlobalError', {
+      usePageStore().showGlobalError({
         error, 
         message
       });
     },
     hideError() {
-      this.$store.commit('showGlobalError', null);
+      usePageStore().showGlobalError(null);
     }
   }
 });

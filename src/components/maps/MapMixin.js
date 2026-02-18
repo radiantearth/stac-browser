@@ -1,6 +1,8 @@
 import Utils from '../../utils';
 import i18n from '../../i18n';
-import { mapState } from 'vuex';
+import { mapState } from 'pinia';
+import { useConfigStore } from '../../store/config';
+import { useCatalogStore } from '../../store/catalog';
 import Map from 'ol/Map.js';
 import View from 'ol/View.js';
 import { defaults } from 'ol/interaction/defaults';
@@ -23,7 +25,8 @@ register(proj4); // required to support source reprojection
 
 export default {
   computed: {
-    ...mapState(['buildTileUrlTemplate', 'crossOriginMedia', 'displayGeoTiffByDefault', 'displayPreview', 'displayOverview', 'getMapSourceOptions', 'useTileLayerAsFallback', 'uiLanguage']),
+    ...mapState(useConfigStore, ['buildTileUrlTemplate', 'crossOriginMedia', 'displayGeoTiffByDefault', 'displayPreview', 'displayOverview', 'getMapSourceOptions', 'useTileLayerAsFallback']),
+    ...mapState(useCatalogStore, ['uiLanguage']),
     stacLayerOptions() {
       return {
         buildTileUrlTemplate: this.buildTileUrlTemplate,
@@ -34,7 +37,7 @@ export default {
         useTileLayerAsFallback: this.useTileLayerAsFallback,
         getSourceOptions: this.getMapSourceOptions,
         httpRequestFn: async (url, responseType) => {
-          const response = await stacRequest(this.$store, url, {responseType});
+          const response = await stacRequest(null, url, {responseType});
           return response.data;
         },
       };

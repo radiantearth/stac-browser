@@ -10,7 +10,8 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState } from 'pinia';
+import { useCatalogStore } from '../../store/catalog';
 import MapMixin from './MapMixin.js';
 import LayerControl from './LayerControl.vue';
 import TextControl from './TextControl.vue';
@@ -56,7 +57,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['uiLanguage']),
+    ...mapState(useCatalogStore, ['uiLanguage']),
     projectedExtent() {
       if (this.extent) {
         return transformExtent(this.extent, this.crs, this.map.getView().getProjection());

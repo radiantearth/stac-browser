@@ -1,4 +1,5 @@
-import { mapState } from 'vuex';
+import { mapState } from 'pinia';
+import { useCatalogStore } from '../store/catalog';
 
 import Registry from '@radiantearth/stac-fields/registry';
 import contentType from 'content-type';
@@ -7,7 +8,7 @@ Registry.addDependency('content-type', contentType);
 export default functions => {
   let mixin = {
     computed: {
-      ...mapState(['uiLanguage'])
+      ...mapState(useCatalogStore, ['uiLanguage'])
     },
     methods: {}
   };

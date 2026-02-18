@@ -42,7 +42,9 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState } from 'pinia';
+import { useConfigStore } from '../store/config';
+import { useCatalogStore } from '../store/catalog';
 import { BCollapse } from 'bootstrap-vue-next';
 import { defineComponent, defineAsyncComponent } from 'vue';
 
@@ -112,7 +114,8 @@ export default defineComponent({
     };
   },
   computed: {
-    ...mapState(['cardViewSort', 'uiLanguage']),
+    ...mapState(useConfigStore, ['cardViewSort']),
+    ...mapState(useCatalogStore, ['uiLanguage']),
     itemCount() {
       if (this.count !== null) {
         return this.count;

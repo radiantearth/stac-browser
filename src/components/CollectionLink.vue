@@ -7,7 +7,9 @@
 
 <script>
 import Catalog from './Catalog.vue';
-import { mapGetters } from 'vuex';
+import { mapState } from 'pinia';
+import { useDatabaseStore } from '../store/database';
+import { useCatalogStore } from '../store/catalog';
 import Utils from '../utils';
 
 export default {
@@ -26,7 +28,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['getStac']),
+    ...mapState(useDatabaseStore, ['getStac']),
     collection() {
       return this.getStac(this.link);
     }
@@ -36,7 +38,7 @@ export default {
       immediate: true,
       handler(newLink) {
         if (Utils.isObject(newLink)) {
-          this.$store.dispatch("load", { url: newLink.href, omitApi: true });
+          useCatalogStore().load({ url: newLink.href, omitApi: true });
         }
       }
     }

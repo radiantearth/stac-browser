@@ -71,7 +71,11 @@ import { getDisplayTitle, createSTAC, CollectionCollection, ItemCollection } fro
 import { STAC } from 'stac-js';
 import { defineComponent, defineAsyncComponent } from 'vue';
 import { getErrorCode, getErrorMessage, processSTAC, stacRequest } from '../store/utils';
-import { mapGetters, mapState } from "vuex";
+import { mapState } from 'pinia';
+import { useConfigStore } from '../store/config';
+import { usePageStore } from '../store/page';
+import { useCatalogStore } from '../store/catalog';
+import { useDatabaseStore } from '../store/database';
 import { BTab, BTabs } from 'bootstrap-vue-next';
 
 export default defineComponent({
@@ -108,8 +112,9 @@ export default defineComponent({
     };
   },
   computed: {
-    ...mapState(['catalogUrl', 'catalogTitle', 'searchResultsPerPage', 'itemsPerPage', 'collectionsPerPage']),
-    ...mapGetters(['canSearchItems', 'canSearchCollections', 'getStac', 'root', 'collectionLink', 'parentLink', 'fromBrowserPath', 'toBrowserPath']),
+    ...mapState(useConfigStore, ['catalogUrl', 'catalogTitle', 'searchResultsPerPage', 'itemsPerPage', 'collectionsPerPage']),
+    ...mapState(useCatalogStore, ['canSearchItems', 'canSearchCollections']),
+    ...mapState(usePageStore, ['root', 'collectionLink', 'parentLink', 'fromBrowserPath', 'toBrowserPath']),
     selectedCollectionCount() {
       return Utils.size(this.selectedCollections);
     },
@@ -165,7 +170,7 @@ export default defineComponent({
               url = Utils.toAbsolute(selfLink.href, this.link.href);
             }
             let stac = createSTAC(obj, url, this.toBrowserPath(url));
-            stac = processSTAC(this.$store.state, stac);
+            stac = processSTAC(useConfigStore(), stac);
             return stac;
           } catch (error) {
             console.error(error);
@@ -212,17 +217,17 @@ export default defineComponent({
     let url = this.catalogUrl;
     if (this.loadParent) {
       url = this.fromBrowserPath(this.loadParent);
-      this.parent = this.getStac(url);
+      this.parent = useDatabaseStore().getStac(url);
     }
     else {
       this.parent = this.root;
     }
     if (!this.parent) {
-      await this.$store.dispatch('load', { url });
+      await useCatalogStore().load({ url });
       if (!this.root) {
-        await this.$store.dispatch("config", { catalogUrl: url });
+        await useConfigStore().updateConfig({ catalogUrl: url });
       }
-      this.parent = this.getStac(url);
+      this.parent = useDatabaseStore().getStac(url);
       this.showPage();
     }
   },
@@ -254,7 +259,7 @@ export default defineComponent({
         this.link = Utils.addFiltersToLink(link, this.filters, this.searchResultsPerPage);
 
         let key = this.isCollectionSearch ? 'collections' : 'features';
-        let response = await stacRequest(this.$store, this.link);
+        let response = await stacRequest(null, this.link);
         if (response) {
           this.showPage(response.config.url);
         }
@@ -288,7 +293,7 @@ export default defineComponent({
       }
     },
     showPage(url) {
-      this.$store.commit('showPage', {
+      usePageStore().showPage({
         url,
         page: () => ({
           title: this.$t('search.title'),

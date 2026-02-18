@@ -3,16 +3,20 @@ import { getDisplayTitle } from './models/stac';
 import { STAC } from 'stac-js';
 import URI from 'urijs';
 import i18n from './i18n';
+import { useConfigStore } from './store/config';
+import { usePageStore } from './store/page';
 
-function toBrowserUrl(url, store) {
-  let path = store.getters.toBrowserPath(url);
+function toBrowserUrl(url) {
+  const configStore = useConfigStore();
+  const pageStore = usePageStore();
+  let path = pageStore.toBrowserPath(url);
   let uri = URI(window.location.origin.toString());
-  if (store.state.historyMode === 'hash') {
-    uri.path(store.state.pathPrefix);
+  if (configStore.historyMode === 'hash') {
+    uri.path(configStore.pathPrefix);
     uri.fragment(path);
   }
   else {
-    uri.path(Utils.removeTrailingSlash(store.state.pathPrefix) + path);
+    uri.path(Utils.removeTrailingSlash(configStore.pathPrefix) + path);
   }
   return uri.toString();
 }
@@ -48,7 +52,7 @@ function makeAssets(data) {
   return [];
 }
 
-function makeLinks(links, data, store, type = "DataCatalog") {
+function makeLinks(links, data, type = "DataCatalog") {
   return links.map(link => {
     let name, isBasedOn;
     if (link instanceof STAC) {
@@ -62,11 +66,11 @@ function makeLinks(links, data, store, type = "DataCatalog") {
     let obj = {
       "@type": type,
       name,
-      url: toBrowserUrl(isBasedOn, store),
+      url: toBrowserUrl(isBasedOn),
       isBasedOn
     };
     if (type === 'Dataset') {
-      obj.description = fallbackDescription(link, store);
+      obj.description = fallbackDescription(link);
     }
     return obj;
   });
@@ -84,7 +88,8 @@ function makeProvider(providers, role) {
     }));
 }
 
-function fallbackDescription(data, store) {
+function fallbackDescription(data) {
+  const configStore = useConfigStore();
   let stacType, container;
   if (data instanceof STAC) {
     stacType = data.isItem() ? "Item" : data.type;
@@ -95,15 +100,15 @@ function fallbackDescription(data, store) {
   }
   if (stacType) {
     let type = i18n.global.t(`stac${stacType}`, 1);
-    let inX = i18n.global.t('in', {catalog: container || store.catalogTitle});
+    let inX = i18n.global.t('in', {catalog: container || configStore.catalogTitle});
     return `SpatioTemporal Asset Catalog (STAC)\n${type} - ${data.id} ${inX}`;
   }
 }
 
-function createBaseSchema(data, type, store) {
+function createBaseSchema(data, type) {
   let name = getDisplayTitle(data);
   let stacUrl = data.getAbsoluteUrl();
-  let url = toBrowserUrl(stacUrl, store);
+  let url = toBrowserUrl(stacUrl);
   let inLanguage = data.getMetadata('language')?.code;
   let thumbnails = data.getThumbnails(true);
   let thumbnailUrl;
@@ -137,7 +142,7 @@ function createBaseSchema(data, type, store) {
     "@context": "https://schema.org/",
     "@type": type,
     name,
-    description: data.getMetadata("description") || fallbackDescription(data, store),
+    description: data.getMetadata("description") || fallbackDescription(data),
     citation: data.getMetadata("sci:citation"),
     identifier: data.getMetadata("sci:doi") || data.id,
     keywords: data.getMetadata("keywords"),
@@ -159,10 +164,11 @@ function createBaseSchema(data, type, store) {
   };
 }
 
-export function createCatalogSchema(data, parents, store) {
+export function createCatalogSchema(data, parents) {
   if (!(data instanceof STAC)) {
     return null;
   }
+  const pageStore = usePageStore();
   // Remove invalid links
   parents = parents.filter(link => Utils.isObject(link));
   if (parents.length > 1) {
@@ -170,7 +176,7 @@ export function createCatalogSchema(data, parents, store) {
     parents = parents.filter((link, i) => parents.findIndex(p => p.isBasedOn === link.isBasedOn) !== i);
   }
 
-  let schema = createBaseSchema(data, 'DataCatalog', store);
+  let schema = createBaseSchema(data, 'DataCatalog');
 
   if (data.isCollection()) {
     if (data.extent?.temporal?.interval.length > 0) {
@@ -183,22 +189,22 @@ export function createCatalogSchema(data, parents, store) {
     schema.associatedMedia = makeAssets(data);
   }
 
-  schema.hasPart = makeLinks(store.getters.catalogs, data, store);
-  schema.dataset = makeLinks(store.getters.items, data, store, "Dataset");
-  schema.isPartOf = makeLinks(parents, data, store);
+  schema.hasPart = makeLinks(pageStore.catalogs, data);
+  schema.dataset = makeLinks(pageStore.items, data, "Dataset");
+  schema.isPartOf = makeLinks(parents, data);
 
   return schema;
 }
 
-export function createItemSchema(data, parents, store) {
+export function createItemSchema(data, parents) {
   if (!(data instanceof STAC)) {
     return null;
   }
   parents = parents.filter(link => Utils.isObject(link));
 
-  let schema = createBaseSchema(data, 'Dataset', store);
+  let schema = createBaseSchema(data, 'Dataset');
 
-  schema.includedInDataCatalog = makeLinks(parents, data, store);
+  schema.includedInDataCatalog = makeLinks(parents, data);
 
   let start = data.getMetadata('start_datetime');
   let end = data.getMetadata('end_datetime');

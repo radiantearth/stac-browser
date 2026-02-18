@@ -7,7 +7,10 @@
 
 <script>
 import { defineComponent } from 'vue';
-import { mapState, mapGetters } from 'vuex';
+import { mapState } from 'pinia';
+import { useConfigStore } from '../store/config';
+import { useCatalogStore } from '../store/catalog';
+import { usePageStore } from '../store/page';
 import { BButton } from 'bootstrap-vue-next';
 import { stacBrowserNavigatesTo } from "../rels";
 import Utils from '../utils';
@@ -52,8 +55,9 @@ export default defineComponent({
     }
   },
   computed: {
-    ...mapState(['allowExternalAccess', 'privateQueryParameters']),
-    ...mapGetters(['toBrowserPath', 'getRequestUrl', 'isExternalUrl']),
+    ...mapState(useConfigStore, ['allowExternalAccess']),
+    ...mapState(useCatalogStore, ['privateQueryParameters']),
+    ...mapState(usePageStore, ['toBrowserPath', 'getRequestUrl', 'isExternalUrl']),
     icon() {
       if (this.stac instanceof STAC) {
         const icons = this.stac.getIcons();
@@ -131,7 +135,7 @@ export default defineComponent({
       if (this.stac || this.isStacBrowserLink) {
         let href;
         if (this.stac instanceof STAC) {
-          href = this.stac.getBrowserPath();
+          href = this.toBrowserPath(this.stac.getAbsoluteUrl());
         }
         else {
           href = this.toBrowserPath(this.link.href);

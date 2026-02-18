@@ -3,7 +3,10 @@ import Loading from '../components/Loading.vue';
 import { getErrorCode, getErrorMessage } from '../store/utils';
 import URI from 'urijs';
 import { defineComponent } from 'vue';
-import { mapState, mapGetters } from 'vuex';
+import { mapState } from 'pinia';
+import { useConfigStore } from '../store/config';
+import { usePageStore } from '../store/page';
+import { useCatalogStore } from '../store/catalog';
 
 export default defineComponent({
   components: {
@@ -17,8 +20,8 @@ export default defineComponent({
     }
   },
   computed: {
-    ...mapState(["allowExternalAccess", "catalogUrl", "loading", "url"]),
-    ...mapGetters(["fromBrowserPath", "error"]),
+    ...mapState(useConfigStore, ['allowExternalAccess', 'catalogUrl']),
+    ...mapState(usePageStore, ['loading', 'url', 'fromBrowserPath', 'error']),
     errorId() {
       return getErrorCode(this.error);
     },
@@ -41,7 +44,7 @@ export default defineComponent({
         }
 
         let url = this.fromBrowserPath(path || '/');
-        this.$store.dispatch("load", { url, show: true });
+        useCatalogStore().load({ url, show: true });
       }
     }
   }

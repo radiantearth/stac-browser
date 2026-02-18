@@ -22,7 +22,8 @@ import { formatKey } from '@radiantearth/stac-fields/helper';
 import { ogcRelPrefix } from '../rels';
 import Utils from '../utils';
 import { translateFields } from '../i18n';
-import { mapState } from 'vuex';
+import { mapState } from 'pinia';
+import { useCatalogStore } from '../store/catalog';
 
 
 export default {
@@ -45,7 +46,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(['uiLanguage']),
+    ...mapState(useCatalogStore, ['uiLanguage']),
     groups() {
       let groups = this.links.reduce((summary, link) => {
         let rel = typeof link.rel === 'string' ? link.rel.toLowerCase() : "";

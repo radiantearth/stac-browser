@@ -4,7 +4,7 @@ import StacBrowser from "./StacBrowser.vue";
 import i18n, { loadDefaultMessages } from './i18n';
 import CONFIG from './config';
 import getRoutes from "./router";
-import getStore from "./store";
+import { setupStores, initStores } from "./store/index";
 
 import { createBootstrap } from 'bootstrap-vue-next/plugins/createBootstrap';
 import { vBToggle } from 'bootstrap-vue-next/directives/BToggle';
@@ -26,8 +26,8 @@ export default function init() {
       }
     });
 
-    // Setup store
-    const store = getStore(CONFIG, router);
+    // Setup Pinia stores
+    const pinia = setupStores(CONFIG, router);
 
     const app = createApp(StacBrowser);
     
@@ -37,10 +37,13 @@ export default function init() {
     app.directive('visible', visible);
     app.directive('b-toggle', vBToggle);
     
-    // Add router, store, and i18n
+    // Add router, pinia, and i18n
     app.use(i18n);
     app.use(router);
-    app.use(store);
+    app.use(pinia);
+
+    // Initialize store state after pinia is installed
+    initStores(CONFIG, router);
 
     return app.mount("body");
   });

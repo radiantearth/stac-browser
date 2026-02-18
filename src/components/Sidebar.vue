@@ -16,7 +16,10 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex';
+import { mapState } from 'pinia';
+import { useConfigStore } from '../store/config';
+import { usePageStore } from '../store/page';
+import { useCatalogStore } from '../store/catalog';
 import Loading from './Loading.vue';
 import Tree from './Tree.vue';
 import { BOffcanvas } from 'bootstrap-vue-next';
@@ -41,8 +44,9 @@ export default {
     };
   },
   computed: {
-    ...mapState(['allowSelectCatalog', 'parents']),
-    ...mapGetters(['root'])
+    ...mapState(useConfigStore, ['allowSelectCatalog']),
+    ...mapState(usePageStore, ['parents']),
+    ...mapState(usePageStore, ['root'])
   },
   watch: {
     modelValue: {
@@ -51,7 +55,7 @@ export default {
         if (visible) {
           try {
             this.loading = true;
-            await this.$store.dispatch('loadParents');
+            await useCatalogStore().loadParents();
           } finally {
             this.loading = false;
           }

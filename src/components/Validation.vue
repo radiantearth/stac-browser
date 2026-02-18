@@ -10,6 +10,8 @@
 <script>
 import { STAC } from 'stac-js';
 import validateSTAC from 'stac-node-validator';
+import { mapState } from 'pinia';
+import { usePageStore } from '../store/page';
 
 export default {
   name: "Validation",
@@ -30,9 +32,10 @@ export default {
     };
   },
   computed: {
+    ...mapState(usePageStore, ['toBrowserPath']),
     validationLink() {
       if (this.data instanceof STAC) {
-        return '/validation' + this.data.getBrowserPath();
+        return '/validation' + this.toBrowserPath(this.data.getAbsoluteUrl());
       }
       else {
         return null;

@@ -38,7 +38,10 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex';
+import { mapState } from 'pinia';
+import { useConfigStore } from '../store/config';
+import { useDatabaseStore } from '../store/database';
+import { useCatalogStore } from '../store/catalog';
 import { defineComponent, defineAsyncComponent } from 'vue';
 
 import Catalog from './Catalog.vue';
@@ -106,8 +109,9 @@ export default defineComponent({
     };
   },
   computed: {
-    ...mapState(['cardViewSort', 'uiLanguage']),
-    ...mapGetters(['getStac']),
+    ...mapState(useConfigStore, ['cardViewSort']),
+    ...mapState(useCatalogStore, ['uiLanguage']),
+    ...mapState(useDatabaseStore, ['getStac']),
     catalogCount() {
       if (this.catalogs.length !== this.catalogView.length) {
         return this.catalogView.length + '/' + this.catalogs.length;
@@ -205,13 +209,13 @@ export default defineComponent({
         if (this.enforceCards) {
           return 'cards';
         }
-        return this.$store.state.cardViewMode;
+        return useConfigStore().cardViewMode;
       },
       async set(cardViewMode) {
         if (this.enforceCards) {
           return;
         }
-        await this.$store.dispatch('config', { cardViewMode });
+        await useConfigStore().updateConfig({ cardViewMode });
       }
     }
   },

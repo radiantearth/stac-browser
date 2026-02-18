@@ -9,10 +9,12 @@
 <script>
 import { defineComponent } from 'vue';
 
+import { useAuthStore } from '../store/auth';
+
 export default defineComponent({
   name: "Logout",
   async created() {
-    await this.$store.dispatch("auth/finalizeLogout");
+    await useAuthStore().finalizeLogout();
   }
 });
 </script>

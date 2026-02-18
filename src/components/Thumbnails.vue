@@ -12,7 +12,8 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState } from 'pinia';
+import { useConfigStore } from '../store/config';
 import { defineAsyncComponent } from 'vue';
 
 export default {
@@ -27,7 +28,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(['crossOriginMedia'])
+    ...mapState(useConfigStore, ['crossOriginMedia'])
   }
 };
 </script>

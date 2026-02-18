@@ -39,9 +39,13 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex';
+import { mapState } from 'pinia';
+import { usePageStore } from '../store/page';
+import { useConfigStore } from '../store/config';
+import { useDatabaseStore } from '../store/database';
+import { useCatalogStore } from '../store/catalog';
 import Utils from '../utils';
-import { getDisplayTitle, Collection } from '../models/stac';
+import { getDisplayTitle } from '../models/stac';
 import { STAC } from 'stac-js';
 
 export default {
@@ -64,13 +68,13 @@ export default {
     return {
       expanded: false,
       loading: false,
-      chunk: 1,
-      childs: []
+      chunk: 1
     };
   },
   computed: {
-    ...mapState(['data', 'apiCatalogPriority']),
-    ...mapGetters(['getStac']),
+    ...mapState(usePageStore, ['data', 'toBrowserPath']),
+    ...mapState(useConfigStore, ['apiCatalogPriority']),
+    ...mapState(useDatabaseStore, ['getStac', 'getMergedChildren']),
     onClick() {
       if (!this.to && this.mayHaveChildren) {
         return this.toggle;
@@ -128,14 +132,14 @@ export default {
       }
       if (this.pagination) {
         if (this.parent && (!this.data || this.parent.getAbsoluteUrl() !== this.data.getAbsoluteUrl())) {
-          return this.parent.getBrowserPath();
+          return this.toBrowserPath(this.parent.getAbsoluteUrl());
         }
         else {
           return null;
         }
       }
       else if (this.stac instanceof STAC) {
-        return this.stac.getBrowserPath();
+        return this.toBrowserPath(this.stac.getAbsoluteUrl());
       }
       return null;
     },
@@ -162,6 +166,12 @@ export default {
     },
     pagination() {
       return ['next', 'prev', 'previous'].includes(this.item.rel);
+    },
+    childs() {
+      if (this.stac && this.stac.isCatalogLike()) {
+        return this.getMergedChildren(this.stac.getAbsoluteUrl(), this.apiCatalogPriority);
+      }
+      return [];
     }
   },
   watch: {
@@ -172,18 +182,6 @@ export default {
           this.expanded = true;
         }
       }
-    },
-    stac: {
-      immediate: true,
-      handler(newStac, oldStac) {
-        if (newStac instanceof Collection) {
-          newStac.setApiDataListener('tree', () => this.updateChilds());
-        }
-        if (oldStac instanceof Collection) {
-          oldStac.setApiDataListener('tree');
-        }
-        this.updateChilds();
-      }
     }
   },
   created() {
@@ -192,20 +190,12 @@ export default {
     }
   },
   methods: {
-    updateChilds() {
-      if (this.stac && this.stac.isCatalogLike()) {
-        this.childs = this.stac.getChildren(this.apiCatalogPriority);
-      }
-      else {
-        this.childs = [];
-      }
-    },
     showMore() {
       this.chunk++;
     },
     load(visible) {
       if (!this.stac && this.link && !this.pagination) {
-        this.$store.commit(visible ? 'queue' : 'unqueue', this.link);
+        useCatalogStore()[visible ? 'enqueue' : 'dequeue'](this.link);
       }
     },
     async toggle() {
@@ -213,7 +203,7 @@ export default {
       if (this.expanded && !this.pagination) {
         this.loading = true;
         let url = this.item instanceof STAC ? this.item.getAbsoluteUrl() : this.item.href;
-        await this.$store.dispatch("load", { url });
+        await useCatalogStore().load({ url });
         this.loading = false;
       }
     }

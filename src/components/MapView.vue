@@ -29,7 +29,8 @@ import { defineAsyncComponent } from 'vue';
 import MapMixin from './maps/MapMixin.js';
 import LayerControl from './maps/LayerControl.vue';
 import TextControl from './maps/TextControl.vue';
-import { mapGetters } from 'vuex';
+import { mapState } from 'pinia';
+import { useDatabaseStore } from '../store/database';
 import Select from 'ol/interaction/Select';
 import StacLayer from 'ol-stac';
 import { getStacObjectsForEvent, getStyle } from 'ol-stac/util.js';
@@ -86,7 +87,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['getStac']),
+    ...mapState(useDatabaseStore, ['getStac']),
     container() {
       if (this.isFullScreen) {
         return '#' + this.mapId;

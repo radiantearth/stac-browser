@@ -61,7 +61,10 @@
 
 <script>
 import { defineComponent, defineAsyncComponent } from 'vue';
-import { mapState, mapGetters } from 'vuex';
+import { mapState } from 'pinia';
+import { usePageStore } from '../store/page';
+import { useCatalogStore } from '../store/catalog';
+import { useDatabaseStore } from '../store/database';
 import Catalogs from '../components/Catalogs.vue';
 import Description from '../components/Description.vue';
 import Items from '../components/Items.vue';
@@ -141,8 +144,13 @@ export default defineComponent({
     };
   },
   computed: {
-    ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination', 'apiItemsNumberMatched', 'nextCollectionsLink', 'stateQueryParameters']),
-    ...mapGetters(['catalogs', 'collectionLink', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
+    ...mapState(usePageStore, ['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination', 'apiItemsNumberMatched', 'stateQueryParameters']),
+    ...mapState(usePageStore, ['catalogs', 'collectionLink', 'isCollection', 'items', 'parentLink', 'rootLink']),
+    ...mapState(useCatalogStore, ['getApiItemsLoading']),
+    nextCollectionsLink() {
+      const db = useDatabaseStore();
+      return db.hasMoreChildren(this.url);
+    },
     cssStacType() {
       if (Utils.hasText(this.data?.type)) {
         return this.data?.type.toLowerCase();
@@ -241,7 +249,7 @@ export default defineComponent({
       immediate: true,
       handler(data) {
         try {
-          let schema = createCatalogSchema(data, [this.parentLink, this.rootLink], this.$store);
+          let schema = createCatalogSchema(data, [this.parentLink, this.rootLink]);
           addSchemaToDocument(document, schema);
         } catch (error) {
           console.error(error);
@@ -251,16 +259,16 @@ export default defineComponent({
   },
   methods: {
     filtersShown(show) {
-        this.$store.commit('updateState', {type: 'itemFilterOpen', value: show ? 1 : null});
+        usePageStore().updateState({type: 'itemFilterOpen', value: show ? 1 : null});
     },
     loadMoreCollections() {
-      this.$store.dispatch('loadNextApiCollections', {show: true});
+      useCatalogStore().loadNextApiCollections({show: true});
     },
     async paginateItems(link) {
       try {
-        await this.$store.dispatch('loadApiItems', {link, show: true, filters: this.filters});
+        await useCatalogStore().loadApiItems({link, show: true, filters: this.filters});
       } catch (error) {
-        this.$store.commit('showGlobalError', {
+        usePageStore().showGlobalError({
           error,
           message: this.$t('errors.loadItems')
         });
@@ -269,13 +277,13 @@ export default defineComponent({
     async filterItems(filters, reset) {
       this.filters = filters;
       if (reset) {
-        this.$store.commit('resetApiItems', this.data.getApiItemsLink());
+        usePageStore().resetApiItems();
       }
       try {
-        await this.$store.dispatch('loadApiItems', {link: this.data.getApiItemsLink(), show: true, filters});
+        await useCatalogStore().loadApiItems({link: this.data.getApiItemsLink(), show: true, filters});
       } catch (error) {
         let msg = reset ? this.$t('errors.loadItems') : this.$t('errors.loadFilteredItems');
-        this.$store.commit('showGlobalError', {
+        usePageStore().showGlobalError({
           error,
           message: msg
         });

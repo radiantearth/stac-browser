@@ -9,7 +9,9 @@
 import ErrorAlert from '../components/ErrorAlert.vue';
 import Loading from '../components/Loading.vue';
 import { defineComponent } from 'vue';
-import { mapActions, mapGetters, mapState } from 'vuex';
+import { mapState, mapActions } from 'pinia';
+import { usePageStore } from '../store/page';
+import { useAuthStore } from '../store/auth';
 
 export default defineComponent({
   name: "LoginCallback",
@@ -23,8 +25,8 @@ export default defineComponent({
     };
   },
   computed: {
-    ...mapState(['globalError']),
-    ...mapGetters('auth', ['method'])
+    ...mapState(usePageStore, ['globalError']),
+    ...mapState(useAuthStore, ['method'])
   },
   watch: {
     globalError: {
@@ -32,7 +34,7 @@ export default defineComponent({
       handler(newValue) {
         if (newValue) {
           this.error = newValue;
-          this.$store.commit('showGlobalError', null);
+          usePageStore().showGlobalError(null);
         }
       }
     },
@@ -48,7 +50,7 @@ export default defineComponent({
     }
   },
   methods: {
-    ...mapActions('auth', ['finalizeLogin'])
+    ...mapActions(useAuthStore, ['finalizeLogin'])
   }
 });
 </script>
