@@ -58,7 +58,7 @@
         size="sm"
         class="value"
         v-model="rawInput"
-        :placeholder="placeholder"
+        :placeholder="$t('search.arrayInput.helpText')"
         :state="validationState"
       />
       <b-form-checkbox

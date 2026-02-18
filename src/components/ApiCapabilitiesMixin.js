@@ -10,11 +10,7 @@ const CQL_JSON = [
 ];
 
 const CQL_ADV_COMPARISON = ['http://www.opengis.net/spec/cql2/1.*/conf/advanced-comparison-operators'];
-const CQL_ARRAY_OPERATORS = [
-  // 'https://api.stacspec.org/v1.*/item-search#filter',
-  'http://www.opengis.net/spec/cql2/1.*/conf/array-functions',
-  'http://www.opengis.net/spec/ogcapi-features-3/1.*/*/features-filter'
-];
+const CQL_ARRAY_OPERATORS = ['http://www.opengis.net/spec/cql2/1.*/conf/array-functions'];
 
 import { mapGetters } from "vuex";
 
@@ -23,19 +19,17 @@ export const TYPES = {
   Items: {
     BasicFilters: [
       'https://api.stacspec.org/v1.*/ogcapi-features',
-      'http://www.opengis.net/spec/ogcapi-features-1/1.*/conf/core',
+      'http://www.opengis.net/spec/ogcapi-features-1/1.*/conf/core'
     ],
     CollectionIdFilter: false,
     ItemIdFilter: false,
     // It seems some conformance classes use conf (correct) and some req (deprecated?) after the version number
-    CqlFilters: [
-      'http://www.opengis.net/spec/ogcapi-features-3/1.*/*/features-filter',
-    ],
+    CqlFilters: ['http://www.opengis.net/spec/ogcapi-features-3/1.*/*/features-filter'],
     Sort: [
       'https://api.stacspec.org/v1.*/ogcapi-features#sort',
-      'http://www.opengis.net/spec/ogcapi-records-1/1.*/conf/sorting',
+      'http://www.opengis.net/spec/ogcapi-records-1/1.*/conf/sorting'
     ],
-    FreeText: ['https://api.stacspec.org/v1.*/ogcapi-features#free-text'],
+    FreeText: ['https://api.stacspec.org/v1.*/ogcapi-features#free-text']
   },
   // STAC API - Item Search
   Global: {
@@ -44,7 +38,7 @@ export const TYPES = {
     ItemIdFilter: true,
     CqlFilters: ['https://api.stacspec.org/v1.*/item-search#filter'],
     Sort: ['https://api.stacspec.org/v1.*/item-search#sort'],
-    FreeText: ['https://api.stacspec.org/v1.*/item-search#free-text'],
+    FreeText: ['https://api.stacspec.org/v1.*/item-search#free-text']
   },
   // OGC / STAC API - Collections
   Collections: {
@@ -53,16 +47,16 @@ export const TYPES = {
     ItemIdFilter: false,
     CqlFilters: ['https://api.stacspec.org/v1.*/collection-search#filter'],
     Sort: ['https://api.stacspec.org/v1.*/collection-search#sort'],
-    FreeText: ['https://api.stacspec.org/v1.*/collection-search#free-text'],
-  },
+    FreeText: ['https://api.stacspec.org/v1.*/collection-search#free-text']
+  }
 };
 
 export default {
   props: {
     type: {
       type: String,
-      required: true,
-    },
+      required: true
+    }
   },
   computed: {
     ...mapGetters(['supportsConformance']),
@@ -96,6 +90,6 @@ export default {
         advancedComparison: this.supportsConformance(CQL_ADV_COMPARISON),
         arrayOperators: this.supportsConformance(CQL_ARRAY_OPERATORS),
       };
-    },
-  },
+    }
+  }
 };

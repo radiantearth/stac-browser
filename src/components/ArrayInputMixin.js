@@ -9,9 +9,6 @@ export default {
     };
   },
   computed: {
-    placeholder() {
-      return this.$t('search.arrayInput.helpText');
-    },
     validationState() {
       const arr = this.value?.value || [];
       if (this.validationErrors.length > 0) {
@@ -30,7 +27,7 @@ export default {
       const errors = this.validationErrors.slice(0, maxShow);
       let message = errors.join('; ');
       if (this.validationErrors.length > maxShow) {
-        message += this.$t('search.arrayInput.andMoreErrors', {
+        message += this.$t('multiselect.andMore', {
           count: this.validationErrors.length - maxShow
         });
       }
@@ -44,7 +41,7 @@ export default {
       const warnings = this.validationWarnings.slice(0, maxShow);
       let message = warnings.join('; ');
       if (this.validationWarnings.length > maxShow) {
-        message += this.$t('search.arrayInput.andMoreWarnings', {
+        message += this.$t('multiselect.andMore', {
           count: this.validationWarnings.length - maxShow
         });
       }

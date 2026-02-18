@@ -95,16 +95,15 @@
             </template>
           </b-dropdown>
 
-          <template v-for="(filter, index) in filters" :key="filter.id">
-            <QueryableInput
-              v-model:value="filter.value"
-              v-model:operator="filter.operator"
-              :queryable="filter.queryable"
-              :index="index"
-              :cql="cql"
-              @remove-queryable="removeQueryable(index)"
-            />
-          </template>
+          <QueryableInput
+            v-for="(filter, index) in filters" :key="filter.id"
+            v-model:value="filter.value"
+            v-model:operator="filter.operator"
+            :queryable="filter.queryable"
+            :index="index"
+            :cql="cql"
+            @remove-queryable="removeQueryable(index)"
+          />
         </b-form-group>
 
         <hr v-if="canFilterExtents || conformances.CollectionIdFilter || conformances.ItemIdFilter || showAdditionalFilters">
@@ -151,7 +150,6 @@
 import { defineComponent, defineAsyncComponent } from 'vue';
 import { mapGetters, mapState } from "vuex";
 import { BCard, BCardBody, BCardFooter, BCardTitle, BDropdown, BDropdownItem } from 'bootstrap-vue-next';
-
 
 import refParser from '@apidevtools/json-schema-ref-parser';
 

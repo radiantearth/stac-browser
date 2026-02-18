@@ -114,19 +114,6 @@ export default class Queryable {
   getOperators(cql) {
     let ops = [];
 
-    // Array operators for array-type queryables
-    if (this.isArray && cql.arrayOperators) {
-      ops.push(CqlArrayOverlaps);
-      ops.push(CqlArrayContains);
-      ops.push(CqlArrayEquals);
-      ops.push(CqlArrayContainedBy);
-      ops.push(CqlNotArrayOverlaps);
-      ops.push(CqlNotArrayContains);
-      ops.push(CqlNotArrayEquals);
-      ops.push(CqlNotArrayContainedBy);
-      return ops;
-    }
-
     if (!this.isDateTime) {
       // Although it is supported, comparing specific instances in time doesn't give predictable results.
       // For example 2020-01-01T00:00:00Z is not equal to 2020-01-01T00:00:00.001Z and you don't know the granularity
@@ -144,6 +131,20 @@ export default class Queryable {
     else if (this.isText && cql.advancedComparison) {
       ops.push(CqlLike);
     }
+
+    // Array operators for array-type queryables
+    if (this.isArray && cql.arrayOperators) {
+      ops.push(CqlArrayOverlaps);
+      ops.push(CqlArrayContains);
+      ops.push(CqlArrayEquals);
+      ops.push(CqlArrayContainedBy);
+      ops.push(CqlNotArrayOverlaps);
+      ops.push(CqlNotArrayContains);
+      ops.push(CqlNotArrayEquals);
+      ops.push(CqlNotArrayContainedBy);
+      return ops;
+    }
+
     return ops;
   }
 

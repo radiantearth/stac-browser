@@ -7,7 +7,6 @@
   "anonymized": {
     "title": "Anonymized"
   },
-
   "assets": {
     "alternate": {
       "main": "Preferred"
@@ -247,8 +246,6 @@
     "addSearchTerm": "Press enter to add a search term",
     "additionalFilters": "Additional filters",
     "arrayInput": {
-      "andMoreErrors": "; and {count} more error(s)",
-      "andMoreWarnings": "; and {count} more warning(s)",
       "duplicate": "Duplicate value: {value}",
       "duplicates": "Duplicate value(s): {values}",
       "helpText": "Enter values as a comma-separated list",
