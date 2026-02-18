@@ -10,9 +10,9 @@ import {
 const enableSpatialExtentInputs = async (page) => {
   const enableSpatialCheckbox = page.getByRole('checkbox', { name: /filter by spatial extent/i });
   await enableSpatialCheckbox.check();
-  const applyButton = page.getByRole('button', { name: /apply/i });
-  await expect(applyButton).toBeVisible();
-  return applyButton;
+  const minLatInput = page.getByLabel(/min latitude/i);
+  await expect(minLatInput).toBeVisible();
+  return minLatInput;
 };
 
 const fillBboxInputs = async (page, values) => {
@@ -95,7 +95,6 @@ test.describe('STAC Browser Search page', () => {
       await mapViewport.click({ position: { x: 300, y: 200 } });
 
       await waitForBboxInputsPopulated(page);
-      await page.getByRole('button', { name: /apply/i }).click();
     });
 
     await test.step('Submit search and verify POST body contains a bbox', async () => {
@@ -128,7 +127,7 @@ test.describe('STAC Browser Search page', () => {
       await page.getByLabel(/min latitude/i).fill( '44.3' );
       await page.getByLabel(/max longitude/i).fill( '-104' );
       await page.getByLabel(/max latitude/i).fill( '49' );
-      await page.getByRole('button', { name: /apply/i }).click();
+      await page.getByLabel(/max latitude/i).blur();
     });
 
     await test.step('Submit search and verify POST body contains correct bbox', async () => { 
@@ -163,11 +162,12 @@ test.describe('STAC Browser Search page', () => {
       });
     })
 
-    await test.step('Verify error dialog appears with correct message', async () => {
-      page.once('dialog', async (dialog) => {
-        expect(dialog.message(), 'error dialog should be visible').toBe('Please fill in all coordinates');
-        await dialog.accept();
-      });
+    await test.step('Verify error message appears with correct text', async () => {
+      await page.getByLabel(/min latitude/i).blur();
+      
+      const errorFeedback = page.locator('.invalid-feedback');
+      await expect(errorFeedback).toBeVisible();
+      await expect(errorFeedback).toContainText('Please fill in all coordinates');
     });
   });
 
@@ -184,11 +184,10 @@ test.describe('STAC Browser Search page', () => {
       maxLat: '49'
     });
 
-    page.once('dialog', async (dialog) => {
-      expect(dialog.message()).toBe('Latitude must be between -90 and 90');
-      await dialog.accept();
-    });
-
+    await page.getByLabel(/min latitude/i).blur();
+    const errorFeedback = page.locator('.invalid-feedback');
+    await expect(errorFeedback).toBeVisible();
+    await expect(errorFeedback).toContainText('Latitude must be between -90 and 90');
   });
 
   test('Manual spatial extent shows latitude order error', async ({ page }) => {
@@ -205,12 +204,14 @@ test.describe('STAC Browser Search page', () => {
         maxLat: '44.3'
       });
 
-      page.once('dialog', async (dialog) => {
-        expect(dialog.message()).toBe('Min Latitude must be less than Max Latitude');
-      });
-
+      await page.getByLabel(/min latitude/i).blur();
+      
+      const errorFeedback = page.locator('.invalid-feedback');
+      await expect(errorFeedback).toBeVisible();
+      await expect(errorFeedback).toContainText('Min Latitude must be less than Max Latitude');
     });
   });
+
 
   test('Search with Collection ID should have valid POST body', async ({ page }) => {
     await mockApiRootAndCollections(page);

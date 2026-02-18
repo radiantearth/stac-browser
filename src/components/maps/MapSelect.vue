@@ -7,54 +7,98 @@
       <LayerControl :map="map" :maxZoom="maxZoom" />
     </div>
     <div class="bbox-controls">
-      <div class="bbox-inputs">
-        <div class="input-row">
-          <label>
-            {{ $t('mapping.bboxSelect.minLon') }}
-            <input 
-              v-model.number="bboxValues.minLon" 
-              type="number" 
-              step="0.0001"
-              class="coord-input"
-            >
-          </label>
-          <label>
-            {{ $t('mapping.bboxSelect.minLat') }}
-            <input 
-              v-model.number="bboxValues.minLat" 
-              type="number" 
-              step="0.0001"
-              min="-90"
-              max="90"
-              class="coord-input"
-            >
-          </label>
-        </div>
-        <div class="input-row">
-          <label>
-            {{ $t('mapping.bboxSelect.maxLon') }}
-            <input 
-              v-model.number="bboxValues.maxLon" 
-              type="number" 
-              step="0.0001"
-              class="coord-input"
-            >
-          </label>
-          <label>
-            {{ $t('mapping.bboxSelect.maxLat') }}
-            <input 
-              v-model.number="bboxValues.maxLat" 
-              type="number" 
-              step="0.0001"
-              min="-90"
-              max="90"
-              class="coord-input"
-            >
-          </label>
-        </div>
-        <button type="button" @click="applyManualBbox" class="apply-button">
-          {{ $t('mapping.bboxSelect.apply') }}
-        </button>
+      <div class="compass-grid">
+        <!-- Max Latitude (top center) -->
+        <b-form-group 
+          :label="$t('mapping.bboxSelect.maxLat')" 
+          label-for="maxLat" 
+          class="compass-input compass-top"
+          :state="validationErrors.maxLat ? false : null"
+        >
+          <b-form-input
+            id="maxLat"
+            v-model.number="bboxValues.maxLat"
+            type="number"
+            step="0.0001"
+            min="-90"
+            max="90"
+            :state="validationErrors.maxLat ? false : null"
+            @focus="validationErrors.maxLat = null"
+            @blur="applyManualBbox"
+            @keyup.enter.stop="applyManualBbox"
+          />
+          <b-form-invalid-feedback :state="validationErrors.maxLat ? false : null" class="text-danger">
+            {{ validationErrors.maxLat }}
+          </b-form-invalid-feedback>
+        </b-form-group>
+
+        <!-- Min Longitude (left center) -->
+        <b-form-group 
+          :label="$t('mapping.bboxSelect.minLon')" 
+          label-for="minLon" 
+          class="compass-input compass-left"
+          :state="validationErrors.minLon ? false : null"
+        >
+          <b-form-input
+            id="minLon"
+            v-model.number="bboxValues.minLon"
+            type="number"
+            step="0.0001"
+            :state="validationErrors.minLon ? false : null"
+            @focus="validationErrors.minLon = null"
+            @blur="applyManualBbox"
+            @keyup.enter.stop="applyManualBbox"
+          />
+          <b-form-invalid-feedback :state="validationErrors.minLon ? false : null" class="text-danger">
+            {{ validationErrors.minLon }}
+          </b-form-invalid-feedback>
+        </b-form-group>
+
+        <!-- Max Longitude (right center) -->
+        <b-form-group 
+          :label="$t('mapping.bboxSelect.maxLon')" 
+          label-for="maxLon" 
+          class="compass-input compass-right"
+          :state="validationErrors.maxLon ? false : null"
+        >
+          <b-form-input
+            id="maxLon"
+            v-model.number="bboxValues.maxLon"
+            type="number"
+            step="0.0001"
+            :state="validationErrors.maxLon ? false : null"
+            @focus="validationErrors.maxLon = null"
+            @blur="applyManualBbox"
+            @keyup.enter.stop="applyManualBbox"
+          />
+          <b-form-invalid-feedback :state="validationErrors.maxLon ? false : null" class="text-danger">
+            {{ validationErrors.maxLon }}
+          </b-form-invalid-feedback>
+        </b-form-group>
+
+        <!-- Min Latitude (bottom center) -->
+        <b-form-group 
+          :label="$t('mapping.bboxSelect.minLat')" 
+          label-for="minLat" 
+          class="compass-input compass-bottom"
+          :state="validationErrors.minLat ? false : null"
+        >
+          <b-form-input
+            id="minLat"
+            v-model.number="bboxValues.minLat"
+            type="number"
+            step="0.0001"
+            min="-90"
+            max="90"
+            :state="validationErrors.minLat ? false : null"
+            @focus="validationErrors.minLat = null"
+            @blur="applyManualBbox"
+            @keyup.enter.stop="applyManualBbox"
+          />
+          <b-form-invalid-feedback :state="validationErrors.minLat ? false : null" class="text-danger">
+            {{ validationErrors.minLat }}
+          </b-form-invalid-feedback>
+        </b-form-group>
       </div>
     </div>
   </div>
@@ -105,6 +149,12 @@ export default {
       extent: this.modelValue,
       dragging: false,
       applyingManually: false,
+      validationErrors: {
+        minLon: null,
+        minLat: null,
+        maxLon: null,
+        maxLat: null
+      },
       bboxValues: {
         minLon: null,
         minLat: null,
@@ -231,7 +281,11 @@ export default {
       this.map.addLayer(maskLayer);
     },
     fixX(x) {
-      return (x + 180) % 360 - 180;
+      // Normalize longitude to -180 to 180 range
+      // For antimeridian crossing, minLon can be > maxLon
+      while (x > 180) x -= 360;
+      while (x < -180) x += 360;
+      return x;
     },
     fixY(y) {
       return Math.max(-90, Math.min(90, y));
@@ -263,10 +317,10 @@ export default {
     updateBboxValues() {
       if (this.extent && Array.isArray(this.extent) && this.extent.length === 4) {
         this.bboxValues = {
-          minLon: Math.round(this.extent[0] * 10000) / 10000,
-          minLat: Math.round(this.extent[1] * 10000) / 10000,
-          maxLon: Math.round(this.extent[2] * 10000) / 10000,
-          maxLat: Math.round(this.extent[3] * 10000) / 10000
+          minLon: Math.round(this.fixX(this.extent[0]) * 10000) / 10000,
+          minLat: Math.round(this.fixY(this.extent[1]) * 10000) / 10000,
+          maxLon: Math.round(this.fixX(this.extent[2]) * 10000) / 10000,
+          maxLat: Math.round(this.fixY(this.extent[3]) * 10000) / 10000
         };
       }
     },
@@ -280,30 +334,76 @@ export default {
     },
     validateBbox() {
       const { minLon, minLat, maxLon, maxLat } = this.bboxValues;
+      const errors = {
+        minLon: null,
+        minLat: null,
+        maxLon: null,
+        maxLat: null
+      };
+      const incompleteMsg = this.$t('mapping.bboxSelect.error.incomplete');
       
-      // Check all values are present
-      if (minLon === null || minLat === null || maxLon === null || maxLat === null) {
-        return this.$t('mapping.bboxSelect.error.incomplete');
+      // Check all values are present - show error on fields that are empty
+      if (minLon === null) {
+        errors.minLon = incompleteMsg;
+      }
+      if (minLat === null) {
+        errors.minLat = incompleteMsg;
+      }
+      if (maxLon === null) {
+        errors.maxLon = incompleteMsg;
+      }
+      if (maxLat === null) {
+        errors.maxLat = incompleteMsg;
       }
       
-      // Check latitude values only (longitude can be extended for date line crossing)
-      if (minLat < -90 || minLat > 90 || maxLat < -90 || maxLat > 90) {
-        return this.$t('mapping.bboxSelect.error.invalidLat');
+      // If any incomplete, return early
+      if (Object.values(errors).some(err => err !== null)) {
+        return errors;
       }
       
-      // Check latitude order
+      // Check longitude values are in valid range (-180 to 180)
+      // Per STAC spec, minLon can be > maxLon for antimeridian crossing
+      if (minLon < -180 || minLon > 180) {
+        errors.minLon = this.$t('mapping.bboxSelect.error.invalidLon');
+      }
+      if (maxLon < -180 || maxLon > 180) {
+        errors.maxLon = this.$t('mapping.bboxSelect.error.invalidLon');
+      }
+      
+      // Check latitude values (must be between -90 and 90)
+      if (minLat < -90 || minLat > 90) {
+        errors.minLat = this.$t('mapping.bboxSelect.error.invalidLat');
+      }
+      if (maxLat < -90 || maxLat > 90) {
+        errors.maxLat = this.$t('mapping.bboxSelect.error.invalidLat');
+      }
+      
+      // Check latitude order (minLat must be < maxLat)
       if (minLat >= maxLat) {
-        return this.$t('mapping.bboxSelect.error.latOrder');
+        errors.minLat = this.$t('mapping.bboxSelect.error.latOrder');
+      }
+      
+      // Return errors object if any errors exist
+      if (Object.values(errors).some(err => err !== null)) {
+        return errors;
       }
       
       return null;
     },
     applyManualBbox() {
-      const validationError = this.validateBbox();
-      if (validationError) {
-        alert(validationError);
+      const errors = this.validateBbox();
+      if (errors) {
+        this.validationErrors = errors;
         return;
       }
+      
+      // Clear any previous errors
+      this.validationErrors = {
+        minLon: null,
+        minLat: null,
+        maxLon: null,
+        maxLat: null
+      };
       
       if (!this.map || !this.interaction) {
         return;
@@ -358,59 +458,84 @@ export default {
 }
 
 .bbox-controls {
-  padding: $block-margin;
+  padding: $block-margin 0;
   background-color: $light;
   border-top: 1px solid darken($light, 10%);
 }
 
 .bbox-inputs {
-  display: flex;
-  flex-direction: column;
-  gap: $block-margin;
+  margin-bottom: 0;
+}
+
+.compass-grid {
+  display: grid;
+  grid-template-columns: 160px 160px 160px;
+  grid-template-rows: auto auto auto auto;
+  gap: 0.25rem;
+  align-items: start;
+  justify-items: center;
+  width: fit-content;
+  margin: 0.25rem auto ;
+}
+
+.compass-input {
+  margin-bottom: 0;
+  width: 100%;
+  font-size: 0.875rem;
+
+  label {
+    margin-bottom: 0.125rem;
+    font-size: 0.75rem;
+  }
+
+  input {
+    font-size: 0.875rem;
+    padding: 0.25rem 0.5rem;
+    height: auto;
+  }
+
+  .invalid-feedback {
+    font-size: 0.7rem;
+    margin-top: 0.125rem;
+  }
+
+  &.compass-top {
+    grid-column: 2;
+    grid-row: 1;
+    margin-bottom: -1.2rem;
+  }
+
+  &.compass-left {
+    grid-column: 1;
+    grid-row: 2;
+    text-align: left;
+    justify-self: start;
+    margin-left: -0.25rem;
+  }
+
+  &.compass-right {
+    grid-column: 3;
+    grid-row: 2;
+    text-align: right;
+    justify-self: end;
+    margin-right: -0.25rem;
+  }
+
+  &.compass-bottom {
+    grid-column: 2;
+    grid-row: 3;
+    margin-top: -1.2rem;
+  }
 }
 
 .input-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: $block-margin;
-}
+  margin-bottom: $block-margin;
 
-.input-row label {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  font-size: 0.875rem;
-}
-
-.coord-input {
-  padding: 0.5rem;
-  border: 1px solid darken($light, 20%);
-  border-radius: $border-radius;
-  font-size: $font-size-base;
-  
-  &:focus {
-    outline: none;
-    border-color: $primary;
-    box-shadow: 0 0 0 2px rgba($primary, 0.1);
-  }
-}
-
-.apply-button {
-  padding: 0.5rem 1rem;
-  background-color: $primary;
-  color: white;
-  border: none;
-  border-radius: $border-radius;
-  cursor: pointer;
-  font-size: $font-size-base;
-  font-weight: 500;
-  
-  &:hover {
-    background-color: darken($primary, 10%);
-  }
-  
-  &:active {
-    background-color: darken($primary, 15%);
+  .input-col {
+    margin-bottom: 0;
   }
 }
 </style>
