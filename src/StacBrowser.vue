@@ -10,10 +10,10 @@
           <nav class="actions navigation">
             <b-button-group v-if="canSearch || !isServerSelector">
               <b-button v-if="!isServerSelector" variant="primary" size="sm" :title="$t('browse')" @click="sidebar = !sidebar">
-                <b-icon-list /><span class="button-label">{{ $t('browse') }}</span>
+                <mdi-menu /><span class="button-label">{{ $t('browse') }}</span>
               </b-button>
               <b-button v-if="canSearch" variant="primary" size="sm" :to="searchBrowserLink" :title="$t('search.title')" :pressed="isSearchPage">
-                <b-icon-search /><span class="button-label">{{ $t('search.title') }}</span>
+                <mdi-magnify /><span class="button-label">{{ $t('search.title') }}</span>
               </b-button>
             </b-button-group>
           </nav>
@@ -97,8 +97,8 @@ import { mapMutations, mapActions, mapGetters, mapState } from 'vuex';
 import CONFIG from './config';
 
 // Import icons needed for dynamic component usage
-import BIconLock from '~icons/bi/lock';
-import BIconUnlock from '~icons/bi/unlock';
+import MdiLock from '~icons/mdi/lock-outline';
+import MdiUnlock from '~icons/mdi/lock-open-variant-outline';
 
 import ErrorAlert from './components/ErrorAlert.vue';
 import StacLink from './components/StacLink.vue';
@@ -135,8 +135,8 @@ export default defineComponent({
   name: 'StacBrowser',
   components: {
     Authentication,
-    BIconLock,
-    BIconUnlock,
+    MdiLock,
+    MdiUnlock,
     BPopover: defineAsyncComponent(() => import('bootstrap-vue-next').then(m => m.BPopover)),
     ErrorAlert,
     LanguageChooser: defineAsyncComponent(() => import('./components/LanguageChooser.vue')),
@@ -184,7 +184,7 @@ export default defineComponent({
       return this.$route.name === 'select';
     },
     authIcon() {
-      return this.isLoggedIn ? BIconUnlock : BIconLock;
+      return this.isLoggedIn ? MdiUnlock : MdiLock;
     },
     authTitle() {
       return this.authMethod.getButtonTitle();
