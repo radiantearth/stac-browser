@@ -45,6 +45,15 @@ export default class OIDC extends Auth {
     return window.location.origin + path;
   }
 
+  async init() {
+    // Restore user from previous session if available
+    const user = await this.manager.getUser();
+    if (user && !user.expired) {
+      console.debug("Restored OIDC user from previous session");
+      await this.setUser(user);
+    }
+  }
+
   async close() {
     await this.manager.removeUser();
     await this.manager.clearStaleState();
