@@ -13,7 +13,7 @@ The following ways to set config options are possible:
   Enable this by removing the `<!--` and `-->` around the `<script defer="defer" src="./runtime-config.js"></script>` in the [`index.html`](../index.html).
   Then run the build procedure and after completion, you can fill the `dist/runtime-config.js` with any options that you want to customize.
 
-> [!CAUTION]  
+> [!CAUTION]
 > Appending configuration options as CLI parameters to the CLI command (e.g. `npm run build -- --catalogUrl="https://example.com"`) has been removed in  STAC Browser v5.
 > The reason is that such parameters are [not suppored by Vite](https://github.com/vitejs/vite/issues/7065).
 
@@ -161,6 +161,15 @@ Either set this option to the respective path (e.g. `/browser/`) in the config f
 
 This will build STAC Browser in a way that it can be hosted at `https://example.com/browser` for example.
 Using this parameter for the dev server will make STAC Browser available at `http://localhost:8080/browser`.
+
+### servePath
+
+***build-only option***
+
+When deploying with Docker, `servePath` controls the path where the web server serves files. This is separate from `pathPrefix` to support different reverse proxy configurations.
+
+- **Default:** Falls back to be same as `pathPrefix`.
+- **Path-stripping proxy:** Set this when your reverse proxy strips the path prefix before forwarding to the container. For example `pathPrefix="/browser/"` and `servePath="/"` when your ingress strips `/browser/` before forwarding to the container.
 
 ## Security
 

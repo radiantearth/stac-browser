@@ -1,4 +1,5 @@
 ARG pathPrefix="/"
+ARG servePath=""
 
 FROM node:lts-alpine3.18 AS build-step
 ARG DYNAMIC_CONFIG=true
@@ -17,6 +18,7 @@ RUN npm run build
 
 FROM nginxinc/nginx-unprivileged:1-alpine
 ARG pathPrefix
+ARG servePath
 
 USER root
 RUN apk add --no-cache jq pcre-tools
@@ -26,7 +28,8 @@ COPY --from=build-step /app/dist /usr/share/nginx/html
 COPY --from=build-step /app/docker/default.conf /etc/nginx/conf.d/default.conf
 ADD docker/docker-entrypoint.sh /docker-entrypoint.d/40-stac-browser-entrypoint.sh
 
-RUN sed -i "s|<pathPrefix>|${pathPrefix}|" /etc/nginx/conf.d/default.conf && \
+RUN SERVE_PATH="${servePath:-$pathPrefix}" && \
+    sed -i "s|<servePath>|${SERVE_PATH}|g" /etc/nginx/conf.d/default.conf && \
     chown -R nginx:nginx /usr/share/nginx/html && \
     chmod +x /docker-entrypoint.d/40-stac-browser-entrypoint.sh
 

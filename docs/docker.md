@@ -23,15 +23,21 @@ STAC Browser is now available at `http://localhost:8080`
 You can pass further options to STAC Browser to customize it to your needs.
 
 The build-only options
-[`pathPrefix`](docs/options.md#pathprefix) and [`historyMode`](docs/options.md#historymode)
-can be provided as a
-[build argument](https://docs.docker.com/engine/reference/commandline/build#set-build-time-variables---build-arg)
-when building the Dockerfile.
+- **[`pathPrefix`](docs/options.md#pathprefix)**: Base URL path (what users see in browser). Default: `/`
+- **[`servePath`](docs/options.md#servepath)**: Server path (what the web server receives after proxy). Default: same as `pathPrefix`
+- **[`historyMode`](docs/options.md#historymode)**: Router history mode
 
-For example:
+**Examples:**
 
 ```bash
-docker build -t stac-browser:v1 --build-arg pathPrefix="/browser/" --build-arg historyMode=hash .
+# Regular root deployment
+docker build -t stac-browser:v1 --build-arg historyMode=hash .
+
+# Direct exposure or non-stripping proxy: serve at /browser/, users see /browser/
+docker build -t stac-browser:v1 --build-arg pathPrefix="/browser/" .
+
+# Path-stripping proxy: proxy strips /browser/, server receives /, users see /browser/
+docker build -t stac-browser:v1 --build-arg pathPrefix="/browser/" --build-arg servePath="/" .
 ```
 
 All other options, except the ones that are explicitly excluded from CLI/ENV usage,
@@ -43,9 +49,6 @@ For example, to run the container with a pre-defined
 docker run -p 8080:8080 -e SB_catalogUrl="https://earth-search.aws.element84.com/v1/" -e SB_catalogTitle="Earth Search" stac-browser:v1
 ```
 
-If you want to pass all the other arguments to `npm run build` directly, you can modify to the Dockerfile as needed.
-
-STAC browser is now available at `http://localhost:8080/browser`
 
 ## Use an existing image
 
@@ -65,13 +68,13 @@ services:
 
 The docker image uses a multi stage build.
 The first stage is based on a node image and runs `npm build` to produce a `/dist` folder with static files (HTML, CSS, and JavaScript).
-The second stage is based on an nginx image that serves the folder with static files and deals with the build-only options such as  `pathPrefix`.
+The second stage is based on an nginx image that serves the static files at the configured `servePath`.
 So, essentially, in the end you get an nginx instance that serves static files.
 
 ## Essential parts
 
 1. [Dockerfile](../Dockerfile) - contains information on how to build the image.
-2. [docker/default.conf](../docker/default.conf) - nginx configuration template, where `<pathPrefix>` is replaced during build.
+2. [docker/default.conf](../docker/default.conf) - nginx configuration template, where `<servePath>` is replaced during build.
 3. [docker/docker-entrypoint.sh](../docker/docker-entrypoint.sh) - a start script to read the passed variables and produce the `runtime-config.js` file.
 
 ## FAQ
