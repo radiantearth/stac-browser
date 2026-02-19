@@ -7,7 +7,7 @@ test.describe('STAC Browser Catalog', () => {
 
         await expect(page.locator('section.intro')).toBeVisible();
 
-        const item_path = `${CATALOG_PATH}/collections/COPERNICUS_30`
-        await expect(page.locator(`a.stac-link[href*="${item_path}"]`)).toBeVisible();
+        const collection_path = `${CATALOG_PATH}/collection-only/collection.json`
+        await expect(page.locator(`a.stac-link[href*="${collection_path}"]`)).toBeVisible();
     });
 });
