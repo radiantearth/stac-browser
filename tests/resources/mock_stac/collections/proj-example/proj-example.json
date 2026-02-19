@@ -218,13 +218,13 @@
     },
     {
       "rel": "parent",
-      "href": "../collection.json",
+      "href": "../collection-with-extension.json",
       "type": "application/json",
       "title": "Collection of Extension Items"
     },
     {
       "rel": "collection",
-      "href": "../collection.json",
+      "href": "../collection-with-extension.json",
       "type": "application/json",
       "title": "Collection of Extension Items"
     }

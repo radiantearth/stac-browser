@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { HOME_PATH, CATALOG_PATH } from './helpers';
+import { CATALOG_PATH } from './helpers';
 
 test.describe('STAC Browser Catalog', () => {
     test('load catalog view', async ({ page }) => {

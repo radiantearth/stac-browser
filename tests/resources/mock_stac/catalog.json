@@ -12,19 +12,19 @@
     },
     {
       "rel": "child",
-      "href": "./extensions-collection/collection.json",
+      "href": "./collections/collection-with-extension.json",
       "type": "application/json",
       "title": "Collection Demonstrating STAC Extensions"
     },
     {
       "rel": "child",
-      "href": "./collection-only/collection.json",
+      "href": "./collections/collection.json",
       "type": "application/json",
       "title": "Collection with no items (standalone)"
     },
     {
       "rel": "child",
-      "href": "./collection-only/collection-with-schemas.json",
+      "href": "./collections/collection-with-schemas.json",
       "type": "application/json",
       "title": "Collection with no items (standalone with JSON Schemas)"
     },
