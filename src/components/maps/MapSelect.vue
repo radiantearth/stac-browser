@@ -25,6 +25,7 @@
             :state="validationErrors.northLat ? false : null"
             @focus="validationErrors.northLat = null"
             @blur="applyManualBbox"
+            @keydown.enter.prevent.stop
             @keyup.enter.stop="applyManualBbox"
           />
           <b-form-invalid-feedback :state="validationErrors.northLat ? false : null" class="text-danger">
@@ -47,6 +48,7 @@
             :state="validationErrors.westLon ? false : null"
             @focus="validationErrors.westLon = null"
             @blur="applyManualBbox"
+            @keydown.enter.prevent.stop
             @keyup.enter.stop="applyManualBbox"
           />
           <b-form-invalid-feedback :state="validationErrors.westLon ? false : null" class="text-danger">
@@ -69,6 +71,7 @@
             :state="validationErrors.eastLon ? false : null"
             @focus="validationErrors.eastLon = null"
             @blur="applyManualBbox"
+            @keydown.enter.prevent.stop
             @keyup.enter.stop="applyManualBbox"
           />
           <b-form-invalid-feedback :state="validationErrors.eastLon ? false : null" class="text-danger">
@@ -93,6 +96,7 @@
             :state="validationErrors.southLat ? false : null"
             @focus="validationErrors.southLat = null"
             @blur="applyManualBbox"
+            @keydown.enter.prevent.stop
             @keyup.enter.stop="applyManualBbox"
           />
           <b-form-invalid-feedback :state="validationErrors.southLat ? false : null" class="text-danger">
