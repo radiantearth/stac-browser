@@ -1,2 +1,3 @@
 export const HOME_PATH = '/';
-export const CDSE_PATH = '/external/openeo.dataspace.copernicus.eu/openeo/1.2'
+const catalog_path = "http://localhost:8000/catalog.json"
+export const CATALOG_PATH = `/external/${catalog_path}`
