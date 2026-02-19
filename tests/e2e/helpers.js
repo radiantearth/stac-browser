@@ -135,17 +135,17 @@ export const waitForMapReady = async (page) => {
 };
 
 export const waitForBboxInputsPopulated = async (page) => {
-	const minLonInput = page.getByLabel(/min longitude/i);
-	const minLatInput = page.getByLabel(/min latitude/i);
-	const maxLonInput = page.getByLabel(/max longitude/i);
-	const maxLatInput = page.getByLabel(/max latitude/i);
+	const westLonInput = page.getByLabel(/west longitude/i);
+	const southLatInput = page.getByLabel(/south latitude/i);
+	const eastLonInput = page.getByLabel(/east longitude/i);
+	const northLatInput = page.getByLabel(/north latitude/i);
 
-	await expect(minLonInput).not.toHaveValue('');
-	await expect(minLatInput).not.toHaveValue('');
-	await expect(maxLonInput).not.toHaveValue('');
-	await expect(maxLatInput).not.toHaveValue('');
+	await expect(westLonInput).not.toHaveValue('');
+	await expect(southLatInput).not.toHaveValue('');
+	await expect(eastLonInput).not.toHaveValue('');
+	await expect(northLatInput).not.toHaveValue('');
 
-	return { minLonInput, minLatInput, maxLonInput, maxLatInput };
+	return { westLonInput, southLatInput, eastLonInput, northLatInput };
 };
 
 export const waitForSearchPost = async (page, responseBody = null) => {

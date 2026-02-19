@@ -10,21 +10,21 @@ import {
 const enableSpatialExtentInputs = async (page) => {
   const enableSpatialCheckbox = page.getByRole('checkbox', { name: /filter by spatial extent/i });
   await enableSpatialCheckbox.check();
-  const minLatInput = page.getByLabel(/min latitude/i);
-  await expect(minLatInput).toBeVisible();
-  return minLatInput;
+  const southLatInput = page.getByLabel(/south latitude/i);
+  await expect(southLatInput).toBeVisible();
+  return southLatInput;
 };
 
 const fillBboxInputs = async (page, values) => {
-  const minLonInput = page.getByLabel(/min longitude/i);
-  const minLatInput = page.getByLabel(/min latitude/i);
-  const maxLonInput = page.getByLabel(/max longitude/i);
-  const maxLatInput = page.getByLabel(/max latitude/i);
+  const westLonInput = page.getByLabel(/west longitude/i);
+  const southLatInput = page.getByLabel(/south latitude/i);
+  const eastLonInput = page.getByLabel(/east longitude/i);
+  const northLatInput = page.getByLabel(/north latitude/i);
 
-  await minLonInput.fill(values.minLon);
-  await minLatInput.fill(values.minLat);
-  await maxLonInput.fill(values.maxLon);
-  await maxLatInput.fill(values.maxLat);
+  await westLonInput.fill(values.westLon);
+  await southLatInput.fill(values.southLat);
+  await eastLonInput.fill(values.eastLon);
+  await northLatInput.fill(values.northLat);
 };
 
 test.describe('STAC Browser Search page', () => {
@@ -123,11 +123,11 @@ test.describe('STAC Browser Search page', () => {
       await page.waitForLoadState('networkidle');
       
       // Fill in bounding box values
-      await page.getByLabel(/min longitude/i).fill( '-116.1' );
-      await page.getByLabel(/min latitude/i).fill( '44.3' );
-      await page.getByLabel(/max longitude/i).fill( '-104' );
-      await page.getByLabel(/max latitude/i).fill( '49' );
-      await page.getByLabel(/max latitude/i).blur();
+      await page.getByLabel(/west longitude/i).fill( '-116.1' );
+      await page.getByLabel(/south latitude/i).fill( '44.3' );
+      await page.getByLabel(/east longitude/i).fill( '-104' );
+      await page.getByLabel(/north latitude/i).fill( '49' );
+      await page.getByLabel(/north latitude/i).blur();
     });
 
     await test.step('Submit search and verify POST body contains correct bbox', async () => { 
@@ -155,19 +155,17 @@ test.describe('STAC Browser Search page', () => {
       await enableSpatialExtentInputs(page);
 
       await fillBboxInputs(page, {
-        minLon: '-116.1',
-        minLat: '44.3',
-        maxLon: '-104',
-        maxLat: ''
+        westLon: '-116.1',
+        southLat: '44.3',
+        eastLon: '-104',
+        northLat: ''
       });
     })
 
     await test.step('Verify error message appears with correct text', async () => {
-      await page.getByLabel(/min latitude/i).blur();
+      await page.getByLabel(/north latitude/i).blur();
       
-      const errorFeedback = page.locator('.invalid-feedback');
-      await expect(errorFeedback).toBeVisible();
-      await expect(errorFeedback).toContainText('Please fill in all coordinates');
+      await expect(page.getByText(/Please fill in all coordinates/i)).toBeVisible();
     });
   });
 
@@ -178,37 +176,74 @@ test.describe('STAC Browser Search page', () => {
     await enableSpatialExtentInputs(page);
 
     await fillBboxInputs(page, {
-      minLon: '-116.1',
-      minLat: '-100',
-      maxLon: '-104',
-      maxLat: '49'
+      westLon: '-116.1',
+      southLat: '-100',
+      eastLon: '-104',
+      northLat: '49'
     });
 
-    await page.getByLabel(/min latitude/i).blur();
-    const errorFeedback = page.locator('.invalid-feedback');
-    await expect(errorFeedback).toBeVisible();
-    await expect(errorFeedback).toContainText('Latitude must be between -90 and 90');
+    await page.getByLabel(/north latitude/i).blur();
+
+    await expect(page.getByText(/Latitude must be between -90 and 90/i)).toBeVisible();
   });
 
   test('Manual spatial extent shows latitude order error', async ({ page }) => {
     await mockApiRootAndCollections(page);
     await page.goto(SEARCH_PATH);
 
-    await test.step('Test min latitude > max latitude error', async () => {
+    await test.step('Test south latitude > north latitude error', async () => {
       await enableSpatialExtentInputs(page);
       
       await fillBboxInputs(page, {
-        minLon: '-116.1',
-        minLat: '49',
-        maxLon: '-104',
-        maxLat: '44.3'
+        westLon: '-116.1',
+        southLat: '49',
+        eastLon: '-104',
+        northLat: '44.3'
       });
 
-      await page.getByLabel(/min latitude/i).blur();
+      await page.getByLabel(/north latitude/i).blur();
       
-      const errorFeedback = page.locator('.invalid-feedback');
-      await expect(errorFeedback).toBeVisible();
-      await expect(errorFeedback).toContainText('Min Latitude must be less than Max Latitude');
+      await expect(page.getByText(/South Latitude must be less than North Latitude/i)).toBeVisible();
+    });
+  });
+
+  test('Manual spatial extent shows longitude order error for same hemisphere', async ({ page }) => {
+    await mockApiRootAndCollections(page);
+    await page.goto(SEARCH_PATH);
+
+    await test.step('Test west longitude > east longitude error', async () => {
+      await enableSpatialExtentInputs(page);
+
+      await fillBboxInputs(page, {
+        westLon: '-80',
+        southLat: '10',
+        eastLon: '-120',
+        northLat: '20'
+      });
+
+      await page.getByLabel(/north latitude/i).blur();
+
+      await expect(page.getByText(/West Longitude must be less than East Longitude/i)).toBeVisible();
+    });
+  });
+
+  test('Manual spatial extent allows antimeridian crossing', async ({ page }) => {
+    await mockApiRootAndCollections(page);
+    await page.goto(SEARCH_PATH);
+
+    await test.step('Allow west longitude > east longitude when crossing', async () => {
+      await enableSpatialExtentInputs(page);
+
+      await fillBboxInputs(page, {
+        westLon: '170',
+        southLat: '-10',
+        eastLon: '-170',
+        northLat: '10'
+      });
+
+      await page.getByLabel(/north latitude/i).blur();
+
+      await expect(page.getByText(/West Longitude must be less than East Longitude/i)).toBeHidden();
     });
   });
 

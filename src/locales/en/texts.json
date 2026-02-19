@@ -166,17 +166,18 @@
     "bboxSelect": {
       "add": "Click on the map to add a bounding box.",
       "remove": "Click inside the bounding box to remove it.",
-      "minLon": "Min Longitude",
-      "minLat": "Min Latitude",
-      "maxLon": "Max Longitude",
-      "maxLat": "Max Latitude",
+      "westLon": "West Longitude",
+      "southLat": "South Latitude",
+      "eastLon": "East Longitude",
+      "northLat": "North Latitude",
       "apply": "Apply",
       "filterBySpatialExtent": "Filter by spatial extent",
       "error": {
         "incomplete": "Please fill in all coordinates",
         "invalidLat": "Latitude must be between -90 and 90",
         "invalidLon": "Longitude must be between -180 and 180",
-        "latOrder": "Min Latitude must be less than Max Latitude"
+        "lonOrder": "West Longitude must be less than East Longitude",
+        "latOrder": "South Latitude must be less than North Latitude"
       }
     },
     "close": "Close",

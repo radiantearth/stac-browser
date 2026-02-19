@@ -8,95 +8,95 @@
     </div>
     <div class="bbox-controls">
       <div class="compass-grid">
-        <!-- Max Latitude (top center) -->
+        <!-- North Latitude (top center) -->
         <b-form-group 
-          :label="$t('mapping.bboxSelect.maxLat')" 
-          label-for="maxLat" 
+          :label="$t('mapping.bboxSelect.northLat')" 
+          label-for="northLat" 
           class="compass-input compass-top"
-          :state="validationErrors.maxLat ? false : null"
+          :state="validationErrors.northLat ? false : null"
         >
           <b-form-input
-            id="maxLat"
-            v-model.number="bboxValues.maxLat"
+            id="northLat"
+            v-model.number="bboxValues.northLat"
             type="number"
             step="0.0001"
             min="-90"
             max="90"
-            :state="validationErrors.maxLat ? false : null"
-            @focus="validationErrors.maxLat = null"
+            :state="validationErrors.northLat ? false : null"
+            @focus="validationErrors.northLat = null"
             @blur="applyManualBbox"
             @keyup.enter.stop="applyManualBbox"
           />
-          <b-form-invalid-feedback :state="validationErrors.maxLat ? false : null" class="text-danger">
-            {{ validationErrors.maxLat }}
+          <b-form-invalid-feedback :state="validationErrors.northLat ? false : null" class="text-danger">
+            {{ validationErrors.northLat }}
           </b-form-invalid-feedback>
         </b-form-group>
 
-        <!-- Min Longitude (left center) -->
+        <!-- West Longitude (left center) -->
         <b-form-group 
-          :label="$t('mapping.bboxSelect.minLon')" 
-          label-for="minLon" 
+          :label="$t('mapping.bboxSelect.westLon')" 
+          label-for="westLon" 
           class="compass-input compass-left"
-          :state="validationErrors.minLon ? false : null"
+          :state="validationErrors.westLon ? false : null"
         >
           <b-form-input
-            id="minLon"
-            v-model.number="bboxValues.minLon"
+            id="westLon"
+            v-model.number="bboxValues.westLon"
             type="number"
             step="0.0001"
-            :state="validationErrors.minLon ? false : null"
-            @focus="validationErrors.minLon = null"
+            :state="validationErrors.westLon ? false : null"
+            @focus="validationErrors.westLon = null"
             @blur="applyManualBbox"
             @keyup.enter.stop="applyManualBbox"
           />
-          <b-form-invalid-feedback :state="validationErrors.minLon ? false : null" class="text-danger">
-            {{ validationErrors.minLon }}
+          <b-form-invalid-feedback :state="validationErrors.westLon ? false : null" class="text-danger">
+            {{ validationErrors.westLon }}
           </b-form-invalid-feedback>
         </b-form-group>
 
-        <!-- Max Longitude (right center) -->
+        <!-- East Longitude (right center) -->
         <b-form-group 
-          :label="$t('mapping.bboxSelect.maxLon')" 
-          label-for="maxLon" 
+          :label="$t('mapping.bboxSelect.eastLon')" 
+          label-for="eastLon" 
           class="compass-input compass-right"
-          :state="validationErrors.maxLon ? false : null"
+          :state="validationErrors.eastLon ? false : null"
         >
           <b-form-input
-            id="maxLon"
-            v-model.number="bboxValues.maxLon"
+            id="eastLon"
+            v-model.number="bboxValues.eastLon"
             type="number"
             step="0.0001"
-            :state="validationErrors.maxLon ? false : null"
-            @focus="validationErrors.maxLon = null"
+            :state="validationErrors.eastLon ? false : null"
+            @focus="validationErrors.eastLon = null"
             @blur="applyManualBbox"
             @keyup.enter.stop="applyManualBbox"
           />
-          <b-form-invalid-feedback :state="validationErrors.maxLon ? false : null" class="text-danger">
-            {{ validationErrors.maxLon }}
+          <b-form-invalid-feedback :state="validationErrors.eastLon ? false : null" class="text-danger">
+            {{ validationErrors.eastLon }}
           </b-form-invalid-feedback>
         </b-form-group>
 
-        <!-- Min Latitude (bottom center) -->
+        <!-- South Latitude (bottom center) -->
         <b-form-group 
-          :label="$t('mapping.bboxSelect.minLat')" 
-          label-for="minLat" 
+          :label="$t('mapping.bboxSelect.southLat')" 
+          label-for="southLat" 
           class="compass-input compass-bottom"
-          :state="validationErrors.minLat ? false : null"
+          :state="validationErrors.southLat ? false : null"
         >
           <b-form-input
-            id="minLat"
-            v-model.number="bboxValues.minLat"
+            id="southLat"
+            v-model.number="bboxValues.southLat"
             type="number"
             step="0.0001"
             min="-90"
             max="90"
-            :state="validationErrors.minLat ? false : null"
-            @focus="validationErrors.minLat = null"
+            :state="validationErrors.southLat ? false : null"
+            @focus="validationErrors.southLat = null"
             @blur="applyManualBbox"
             @keyup.enter.stop="applyManualBbox"
           />
-          <b-form-invalid-feedback :state="validationErrors.minLat ? false : null" class="text-danger">
-            {{ validationErrors.minLat }}
+          <b-form-invalid-feedback :state="validationErrors.southLat ? false : null" class="text-danger">
+            {{ validationErrors.southLat }}
           </b-form-invalid-feedback>
         </b-form-group>
       </div>
@@ -150,16 +150,16 @@ export default {
       dragging: false,
       applyingManually: false,
       validationErrors: {
-        minLon: null,
-        minLat: null,
-        maxLon: null,
-        maxLat: null
+        westLon: null,
+        southLat: null,
+        eastLon: null,
+        northLat: null
       },
       bboxValues: {
-        minLon: null,
-        minLat: null,
-        maxLon: null,
-        maxLat: null
+        westLon: null,
+        southLat: null,
+        eastLon: null,
+        northLat: null
       }
     };
   },
@@ -282,7 +282,7 @@ export default {
     },
     fixX(x) {
       // Normalize longitude to -180 to 180 range
-      // For antimeridian crossing, minLon can be > maxLon
+      // For antimeridian crossing, westLon can be > eastLon
       while (x > 180) x -= 360;
       while (x < -180) x += 360;
       return x;
@@ -317,43 +317,43 @@ export default {
     updateBboxValues() {
       if (this.extent && Array.isArray(this.extent) && this.extent.length === 4) {
         this.bboxValues = {
-          minLon: Math.round(this.fixX(this.extent[0]) * 10000) / 10000,
-          minLat: Math.round(this.fixY(this.extent[1]) * 10000) / 10000,
-          maxLon: Math.round(this.fixX(this.extent[2]) * 10000) / 10000,
-          maxLat: Math.round(this.fixY(this.extent[3]) * 10000) / 10000
+          westLon: Math.round(this.fixX(this.extent[0]) * 10000) / 10000,
+          southLat: Math.round(this.fixY(this.extent[1]) * 10000) / 10000,
+          eastLon: Math.round(this.fixX(this.extent[2]) * 10000) / 10000,
+          northLat: Math.round(this.fixY(this.extent[3]) * 10000) / 10000
         };
       }
     },
     clearBboxValues() {
       this.bboxValues = {
-        minLon: null,
-        minLat: null,
-        maxLon: null,
-        maxLat: null
+        westLon: null,
+        southLat: null,
+        eastLon: null,
+        northLat: null
       };
     },
     validateBbox() {
-      const { minLon, minLat, maxLon, maxLat } = this.bboxValues;
+      const { westLon, southLat, eastLon, northLat } = this.bboxValues;
       const errors = {
-        minLon: null,
-        minLat: null,
-        maxLon: null,
-        maxLat: null
+        westLon: null,
+        southLat: null,
+        eastLon: null,
+        northLat: null
       };
       const incompleteMsg = this.$t('mapping.bboxSelect.error.incomplete');
       
       // Check all values are present - show error on fields that are empty
-      if (minLon === null) {
-        errors.minLon = incompleteMsg;
+      if (westLon === null) {
+        errors.westLon = incompleteMsg;
       }
-      if (minLat === null) {
-        errors.minLat = incompleteMsg;
+      if (southLat === null) {
+        errors.southLat = incompleteMsg;
       }
-      if (maxLon === null) {
-        errors.maxLon = incompleteMsg;
+      if (eastLon === null) {
+        errors.eastLon = incompleteMsg;
       }
-      if (maxLat === null) {
-        errors.maxLat = incompleteMsg;
+      if (northLat === null) {
+        errors.northLat = incompleteMsg;
       }
       
       // If any incomplete, return early
@@ -362,25 +362,31 @@ export default {
       }
       
       // Check longitude values are in valid range (-180 to 180)
-      // Per STAC spec, minLon can be > maxLon for antimeridian crossing
-      if (minLon < -180 || minLon > 180) {
-        errors.minLon = this.$t('mapping.bboxSelect.error.invalidLon');
+      // Per STAC spec, westLon can be > eastLon for antimeridian crossing
+      if (westLon < -180 || westLon > 180) {
+        errors.westLon = this.$t('mapping.bboxSelect.error.invalidLon');
       }
-      if (maxLon < -180 || maxLon > 180) {
-        errors.maxLon = this.$t('mapping.bboxSelect.error.invalidLon');
+      if (eastLon < -180 || eastLon > 180) {
+        errors.eastLon = this.$t('mapping.bboxSelect.error.invalidLon');
+      }
+
+      // If not crossing the antimeridian, westLon must be < eastLon
+      const sameHemisphere = (westLon >= 0 && eastLon >= 0) || (westLon <= 0 && eastLon <= 0);
+      if (!errors.westLon && !errors.eastLon && sameHemisphere && westLon > eastLon) {
+        errors.westLon = this.$t('mapping.bboxSelect.error.lonOrder');
       }
       
       // Check latitude values (must be between -90 and 90)
-      if (minLat < -90 || minLat > 90) {
-        errors.minLat = this.$t('mapping.bboxSelect.error.invalidLat');
+      if (southLat < -90 || southLat > 90) {
+        errors.southLat = this.$t('mapping.bboxSelect.error.invalidLat');
       }
-      if (maxLat < -90 || maxLat > 90) {
-        errors.maxLat = this.$t('mapping.bboxSelect.error.invalidLat');
+      if (northLat < -90 || northLat > 90) {
+        errors.northLat = this.$t('mapping.bboxSelect.error.invalidLat');
       }
       
-      // Check latitude order (minLat must be < maxLat)
-      if (minLat >= maxLat) {
-        errors.minLat = this.$t('mapping.bboxSelect.error.latOrder');
+      // Check latitude order (southLat must be < northLat)
+      if (southLat >= northLat) {
+        errors.southLat = this.$t('mapping.bboxSelect.error.latOrder');
       }
       
       // Return errors object if any errors exist
@@ -399,10 +405,10 @@ export default {
       
       // Clear any previous errors
       this.validationErrors = {
-        minLon: null,
-        minLat: null,
-        maxLon: null,
-        maxLat: null
+        westLon: null,
+        southLat: null,
+        eastLon: null,
+        northLat: null
       };
       
       if (!this.map || !this.interaction) {
@@ -410,10 +416,10 @@ export default {
       }
       
       const extent = [
-        this.bboxValues.minLon,
-        this.bboxValues.minLat,
-        this.bboxValues.maxLon,
-        this.bboxValues.maxLat
+        this.bboxValues.westLon,
+        this.bboxValues.southLat,
+        this.bboxValues.eastLon,
+        this.bboxValues.northLat
       ];
       
       // Update local state and emit to parent directly
