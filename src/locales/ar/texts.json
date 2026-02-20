@@ -86,7 +86,6 @@
   },
   "description": "الوصف",
   "errors": {
-    "apiListRequested": "",
     "authFailed": "حدث خطأ في الطلب، قد تكون بيانات المصادقة المقدمة غير صحيحة.",
     "badRequest": "الطلب غير صالح. قد يكون ذلك بسبب معلمات غير صحيحة، مثل طلب بحث غير صحيح، أو قد يكون خطأ في STAC Browser.",
     "contactProvider": "يرجى التواصل مع مشغل الخدمة لحل هذه المشكلة.",
@@ -109,20 +108,13 @@
     "noExternalAccess": "الوصول إلى الكتالوجات الخارجية غير مسموح!",
     "notFound": "المورد المطلوب غير موجود. @:errors.contactProvider",
     "serverError": "واجه الخادم مشكلة. @:errors.contactProvider",
-    "title": "",
     "unauthorized": "يفتقر الطلب إلى بيانات الاعتماد، مثل رمز API. يرجى تقديم بيانات الاعتماد والمحاولة مرة أخرى."
   },
   "featureExperimental": "هذه الميزة لا تزال تجريبية وقد تعطي نتائج غير متوقعة!",
-  "features": {
-    "empty": "",
-    "noProperties": "",
-    "title": ""
-  },
+  "features": {},
   "fullscreen": {
     "exit": "الخروج من وضع ملء الشاشة",
-    "exitLabel": "",
-    "show": "عرض بملء الشاشة",
-    "showLabel": ""
+    "show": "عرض بملء الشاشة"
   },
   "goBack": {
     "description": "العودة إلى {type}",
@@ -159,48 +151,15 @@
   "loading": "جارٍ التحميل...",
   "map": "الخريطة",
   "mapping": {
-    "attribution": {
-      "collapseLabel": "",
-      "description": "",
-      "label": ""
-    },
+    "attribution": {},
     "bboxSelect": {
-      "add": "",
-      "eastLon": "",
-      "error": {
-        "incomplete": "",
-        "invalidLat": "",
-        "invalidLon": "",
-        "latOrder": "",
-        "lonOrder": ""
-      },
-      "northLat": "",
-      "remove": "",
-      "southLat": "",
-      "westLon": ""
+      "error": {}
     },
-    "close": "",
-    "fit": "",
-    "layers": {
-      "base": "",
-      "footprint": "",
-      "title": "",
-      "unnamed": ""
-    },
-    "location": {
-      "description": ""
-    },
-    "nobasemap": "",
-    "nodata": "",
+    "layers": {},
+    "location": {},
     "zoom": {
-      "in": {
-        "description": "",
-        "label": ""
-      },
-      "out": {
-        "description": "",
-        "label": ""
-      }
+      "in": {},
+      "out": {}
     }
   },
   "messageForSchemaError": "{message}، للمخطط {schemaPath}",
@@ -289,7 +248,6 @@
     "notSupported": "بحث العناصر غير مدعوم من قبل API.",
     "placeholder": "بحث...",
     "selectCollections": "حدد مجموعة واحدة أو أكثر...",
-    "selectDateRange": "",
     "selectForItemSearch": "حدد للبحث عن عنصر",
     "spatialExtent": "النطاق المكاني",
     "tabs": {

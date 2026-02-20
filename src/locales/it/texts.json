@@ -86,7 +86,6 @@
   },
   "description": "Descrizione",
   "errors": {
-    "apiListRequested": "",
     "authFailed": "La richiesta ha restituito un errore. I dati di accesso forniti potrebbero essere errati.",
     "badRequest": "La richiesta non è valida. Questo potrebbe essere dovuto a parametri non validi, ad esempio in una richiesta di ricerca, oppure potrebbe essere un bug di STAC Browser.",
     "contactProvider": "Contatta il fornitore del servizio per risolvere il problema.",
@@ -166,18 +165,8 @@
     },
     "bboxSelect": {
       "add": "Cliccare sulla mappa per aggiungere un box di selezione.",
-      "eastLon": "",
-      "error": {
-        "incomplete": "",
-        "invalidLat": "",
-        "invalidLon": "",
-        "latOrder": "",
-        "lonOrder": ""
-      },
-      "northLat": "",
-      "remove": "Cliccare dentro il box per eliminarlo.",
-      "southLat": "",
-      "westLon": ""
+      "error": {},
+      "remove": "Cliccare dentro il box per eliminarlo."
     },
     "close": "Chiudi",
     "fit": "Adatta alla estensione",

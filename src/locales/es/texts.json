@@ -166,18 +166,8 @@
     },
     "bboxSelect": {
       "add": "Haz clic en el mapa para añadir un rectángulo delimitador.",
-      "eastLon": "",
-      "error": {
-        "incomplete": "",
-        "invalidLat": "",
-        "invalidLon": "",
-        "latOrder": "",
-        "lonOrder": ""
-      },
-      "northLat": "",
-      "remove": "Haz clic dentro del rectángulo para eliminarlo.",
-      "southLat": "",
-      "westLon": ""
+      "error": {},
+      "remove": "Haz clic dentro del rectángulo para eliminarlo."
     },
     "close": "Cerrar",
     "fit": "Encajar en la extensión",

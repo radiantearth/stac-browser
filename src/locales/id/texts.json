@@ -86,7 +86,6 @@
   },
   "description": "Deskripsi",
   "errors": {
-    "apiListRequested": "",
     "authFailed": "Permintaan mengalami kesalahan, rincian autentikasi yang diberikan mungkin salah.",
     "badRequest": "Permintaan tidak valid. Ini mungkin karena parameter yang tidak valid, misalnya dalam permintaan pencarian, atau bisa jadi bug di STAC Browser.",
     "contactProvider": "Silakan hubungi operator layanan untuk menyelesaikan masalah ini.",
@@ -109,20 +108,13 @@
     "noExternalAccess": "Mengakses katalog eksternal tidak diizinkan!",
     "notFound": "Sumber daya yang diminta tidak ada. @:errors.contactProvider",
     "serverError": "Server mengalami masalah. @:errors.contactProvider",
-    "title": "",
     "unauthorized": "Permintaan tidak memiliki kredensial, misalnya token API. Silakan berikan kredensial Anda dan coba lagi."
   },
   "featureExperimental": "Fitur ini masih eksperimental dan mungkin memberikan hasil yang tidak terduga!",
-  "features": {
-    "empty": "",
-    "noProperties": "",
-    "title": ""
-  },
+  "features": {},
   "fullscreen": {
     "exit": "Keluar dari Layar Penuh",
-    "exitLabel": "",
-    "show": "Lihat Layar Penuh",
-    "showLabel": ""
+    "show": "Lihat Layar Penuh"
   },
   "goBack": {
     "description": "Kembali ke {type}",
@@ -159,48 +151,15 @@
   "loading": "Memuat...",
   "map": "Peta",
   "mapping": {
-    "attribution": {
-      "collapseLabel": "",
-      "description": "",
-      "label": ""
-    },
+    "attribution": {},
     "bboxSelect": {
-      "add": "",
-      "eastLon": "",
-      "error": {
-        "incomplete": "",
-        "invalidLat": "",
-        "invalidLon": "",
-        "latOrder": "",
-        "lonOrder": ""
-      },
-      "northLat": "",
-      "remove": "",
-      "southLat": "",
-      "westLon": ""
+      "error": {}
     },
-    "close": "",
-    "fit": "",
-    "layers": {
-      "base": "",
-      "footprint": "",
-      "title": "",
-      "unnamed": ""
-    },
-    "location": {
-      "description": ""
-    },
-    "nobasemap": "",
-    "nodata": "",
+    "layers": {},
+    "location": {},
     "zoom": {
-      "in": {
-        "description": "",
-        "label": ""
-      },
-      "out": {
-        "description": "",
-        "label": ""
-      }
+      "in": {},
+      "out": {}
     }
   },
   "messageForSchemaError": "{message}, untuk skema {schemaPath}",
@@ -289,7 +248,6 @@
     "notSupported": "Pencarian Item tidak didukung oleh API.",
     "placeholder": "Cari...",
     "selectCollections": "Pilih satu atau beberapa koleksi...",
-    "selectDateRange": "",
     "selectForItemSearch": "Pilih untuk Pencarian Item",
     "spatialExtent": "Cakupan Spasial",
     "tabs": {
