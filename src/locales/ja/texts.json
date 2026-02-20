@@ -26,15 +26,33 @@
       "metadata": "メタデータ"
     },
     "showOnMap": "地図上に表示",
-    "showThumbnail": "サムネイルを表示"
+    "showThumbnail": "サムネイルを表示",
+    "shown": ""
   },
   "authentication": {
     "button": {
+      "login": "",
+      "logout": "",
       "title": "資格情報の入力または更新"
     },
+    "chooseMethod": "",
     "description": "要求されたページには認証が必要です。以下のテキストフィールドに認証情報を入力してください。",
-    "schemeTypes": {},
-    "title": "認証"
+    "loggedOut": "",
+    "password": "",
+    "required": "",
+    "schemeTypes": {
+      "apiKey": "",
+      "http": "",
+      "oauth2": "",
+      "openIdConnect": "",
+      "s3": "",
+      "signedUrl": ""
+    },
+    "title": "認証",
+    "unauthorized": "",
+    "unsupported": "",
+    "unsupportedLong": "",
+    "user": ""
   },
   "browse": "ブラウズ",
   "cancel": "キャンセル",
@@ -61,12 +79,14 @@
     "latestVersion": "最新バージョン:",
     "otherVersionsNotice": "この {type} は非推奨では *ありません* が、他のバージョンが利用可能です:",
     "otherVersionsTitle": "他のバージョンが利用可能です",
+    "outdatedTitle": "",
     "predecessorVersion": "前のバージョン",
     "successorVersion": "次のバージョン",
     "warning": "この {type} は非推奨であり、いつでも削除される可能性があります。 できるだけ早く移行すべきです。新しいプロジェクトで使用しないでください。"
   },
   "description": "説明",
   "errors": {
+    "apiListRequested": "",
     "authFailed": "リクエストがエラーになりました。認証情報が正しくない可能性があります。",
     "badRequest": "リクエストが無効です。パラメータが有効なものでない （例: 検索リクエスト） か、STACブラウザのバグである可能性があります。",
     "contactProvider": "この問題を解決するには、サービス担当者にお問い合わせください。",
@@ -89,10 +109,15 @@
     "noExternalAccess": "外部カタログへのアクセスは許可されていません",
     "notFound": "要求されたリソースは存在しません。@:errors.contactProvider",
     "serverError": "サーバーに問題が発生しました。@:errors.contactProvider",
+    "title": "",
     "unauthorized": "リクエストには認証情報がありません（例:APIトークン。）認証情報を入力して再度お試し下さい。"
   },
   "featureExperimental": "この機能はまだ実験的で、予期しない結果をもたらす可能性があります。",
-  "features": {},
+  "features": {
+    "empty": "",
+    "noProperties": "",
+    "title": ""
+  },
   "fullscreen": {
     "exit": "全画面表示を終了",
     "exitLabel": "✕",
@@ -127,17 +152,46 @@
   "items": {
     "filter": "フィルター",
     "hideFilter": "フィルターを非表示",
+    "noTime": "",
     "noneAvailableForCollection": "このコレクションに利用可能なアイテムはありません。",
     "showFilter": "フィルターを表示"
   },
   "loading": "読み込み中...",
   "map": "マップ",
   "mapping": {
-    "attribution": {},
-    "bboxSelect": {},
+    "attribution": {
+      "collapseLabel": "",
+      "description": "",
+      "label": ""
+    },
+    "bboxSelect": {
+      "add": "",
+      "eastLon": "",
+      "error": {
+        "incomplete": "",
+        "invalidLat": "",
+        "invalidLon": "",
+        "latOrder": "",
+        "lonOrder": ""
+      },
+      "northLat": "",
+      "remove": "",
+      "southLat": "",
+      "westLon": ""
+    },
     "close": "閉じる",
-    "layers": {},
-    "location": {},
+    "fit": "",
+    "layers": {
+      "base": "",
+      "footprint": "",
+      "title": "",
+      "unnamed": ""
+    },
+    "location": {
+      "description": ""
+    },
+    "nobasemap": "",
+    "nodata": "",
     "zoom": {
       "in": {
         "description": "拡大",
@@ -227,6 +281,7 @@
     "matches": "マッチ",
     "metaDescription": "{title} のデータを検索します。",
     "modifyCriteria": "検索条件を変更してください。",
+    "noFurtherItemsFound": "",
     "noItemsFound": "指定されたフィルターにアイテムが見つかりませんでした。",
     "noOptions": "まだ何も入力されていません",
     "notEqualTo": "等しくない",
@@ -234,6 +289,7 @@
     "notSupported": "アイテム検索はこのAPIではサポートされていません。",
     "placeholder": "検索...",
     "selectCollections": "1つ以上のコレクションを選択...",
+    "selectDateRange": "",
     "selectForItemSearch": "アイテム検索用に選択",
     "spatialExtent": "場所の範囲",
     "tabs": {
@@ -262,6 +318,7 @@
   "source": {
     "conformanceClasses": "準拠クラス",
     "detailsAboutSource": "STACソースの詳細",
+    "extension": "",
     "fileFormat": "ファイル形式",
     "id": "ID",
     "invalid": "無効",
@@ -281,14 +338,38 @@
       "message": "{title} はこちらのページで利用できます: {url}",
       "sharePageWithOthers": "このページのURLを共有しましょう:",
       "title": "共有",
-      "x": "X (Twitter)",
-      "withOthers": "このページを共有しましょう"
+      "withOthers": "このページを共有しましょう",
+      "x": "X (Twitter)"
     },
+    "stacExtension": "",
+    "stacVersion": "",
     "statistics": "統計",
     "title": "ソースデータ",
     "valid": "有効",
     "validating": "検証中...",
-    "validationParams": {},
+    "validationNA": "",
+    "validationParams": {
+      "additionalProperty": "",
+      "allowedValue": "",
+      "allowedValues": "",
+      "comparison": "",
+      "depsCount": "",
+      "exclusive": "",
+      "failingKeyword": "",
+      "format": "",
+      "i": "",
+      "j": "",
+      "limit": "",
+      "maxContains": "",
+      "minContains": "",
+      "missingProperty": "",
+      "multipleOf": "",
+      "passingSchemas": "",
+      "pattern": "",
+      "property": "",
+      "propertyName": "",
+      "type": ""
+    },
     "validationReport": {
       "disclaimer": "検証レポートはスキーマに基づいて生成されますが、網羅していないことがあります。 これらはSTAC仕様とその拡張のすべてをカバーするわけではありません。 この検証レポートは、STACエンティティが仕様およびその拡張に完全に準拠している保証ではありません。",
       "result": "結果",
@@ -311,7 +392,8 @@
   },
   "thumbnails": "サムネイル",
   "tree": {
-    "moreCollectionPagesAvailable": "さらに利用可能なページがあります"
+    "moreCollectionPagesAvailable": "さらに利用可能なページがあります",
+    "noChildren": ""
   },
   "view": {
     "list": {
