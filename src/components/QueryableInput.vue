@@ -53,6 +53,20 @@
         @update:model-value="updateValue($event)"
         v-bind="validation"
       />
+      <multiselect
+        v-else-if="queryable.isArray"
+        class="value"
+        v-model="arrayValues"
+        :multiple="true"
+        :taggable="true"
+        :options="arrayValues"
+        :placeholder="$t('search.arrayInput.helpText')"
+        :tag-placeholder="$t('search.arrayInput.addValue')"
+        @tag="addArrayValue"
+        @paste="onArrayPaste"
+      >
+        <template #noOptions>{{ $t('search.noOptions') }}</template>
+      </multiselect>
       <b-form-checkbox
         v-else-if="queryable.isBoolean"
         switch
@@ -90,7 +104,8 @@ export default {
   components: {
     BDropdown,
     BDropdownItemButton,
-    Description: defineAsyncComponent(() => import('./Description.vue'))
+    Description: defineAsyncComponent(() => import('./Description.vue')),
+    Multiselect: defineAsyncComponent(() => import('vue-multiselect'))
   },
   mixins: [
     DatePickerMixin
@@ -153,6 +168,16 @@ export default {
         }));
       }
       return [];
+    },
+    arrayValues: {
+      get() {
+        const arr = this.value?.value || [];
+        return arr.map(v => String(v));
+      },
+      set(newValues) {
+        const coerced = newValues.map(v => this.coerceArrayItem(v));
+        this.$emit('update:value', CqlValue.create(coerced));
+      }
     }
   },
   methods: {
@@ -173,6 +198,47 @@ export default {
     },
     updateOperator(op) {
       this.$emit('update:operator', op);
+    },
+    addArrayValue(tag) {
+      const coerced = this.coerceArrayItem(tag.trim());
+      const currentArr = this.value?.value || [];
+      this.$emit('update:value', CqlValue.create([...currentArr, coerced]));
+    },
+    onArrayPaste(event) {
+      const clipboardData = event.clipboardData || window.clipboardData;
+      if (!clipboardData) {
+        return;
+      }
+      const pasted = clipboardData.getData('text');
+      if (!pasted || !pasted.includes(',')) {
+        return;
+      }
+      event.preventDefault();
+      const items = pasted.split(',').map(s => s.trim()).filter(s => s !== '');
+      const currentArr = this.value?.value || [];
+      const currentSet = new Set(currentArr.map(String));
+      const newItems = items
+        .filter(item => !currentSet.has(item))
+        .map(item => this.coerceArrayItem(item));
+      if (newItems.length > 0) {
+        this.$emit('update:value', CqlValue.create([...currentArr, ...newItems]));
+      }
+    },
+    coerceArrayItem(item) {
+      const itemType = this.queryable?.schema?.items?.type;
+      if (itemType === 'integer') {
+        const parsed = parseInt(item, 10);
+        if (!Number.isNaN(parsed) && String(parsed) === item) {
+          return parsed;
+        }
+      }
+      else if (itemType === 'number') {
+        const parsed = parseFloat(item);
+        if (Number.isFinite(parsed)) {
+          return parsed;
+        }
+      }
+      return item;
     }
   }
 };

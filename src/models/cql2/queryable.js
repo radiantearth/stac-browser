@@ -2,9 +2,18 @@ import { formatKey } from "@radiantearth/stac-fields/helper";
 import i18n from '../../i18n.js';
 import { CqlEqual, CqlGreaterThan, CqlGreaterThanEqual, CqlLessThan, CqlLessThanEqual, CqlNotEqual } from "./operators/comparison";
 import { CqlLike } from "./operators/advanced";
+import {
+  CqlArrayOverlaps,
+  CqlArrayContains,
+  CqlArrayEquals,
+  CqlArrayContainedBy,
+  CqlNotArrayOverlaps,
+  CqlNotArrayContains,
+  CqlNotArrayEquals,
+  CqlNotArrayContainedBy,
+} from "./operators/array";
 
 export default class Queryable {
-
   constructor(id, schema) {
     this.id = id;
     this.schema = schema;
@@ -25,7 +34,7 @@ export default class Queryable {
   }
 
   get supported() {
-    return this.isText || this.isNumeric || this.isBoolean;
+    return this.isText || this.isNumeric || this.isBoolean || this.isArray;
   }
 
   is(type) {
@@ -60,10 +69,14 @@ export default class Queryable {
     return this.isDate || this.isDateTime;
   }
 
+  get isArray() {
+    return this.is('array');
+  }
+
   get defaultValue() {
     if (typeof this.schema.default !== 'undefined') {
       return this.schema.default;
-    }
+    } 
     else if (this.isSelection) {
       return this.schema.enum[0];
     }
@@ -72,7 +85,7 @@ export default class Queryable {
     }
     else if (this.isNumeric) {
       if (typeof this.schema.minimum !== 'undefined') {
-       return this.schema.minimum;
+        return this.schema.minimum;
       }
       return 0;
     }
@@ -81,6 +94,9 @@ export default class Queryable {
     }
     else if (this.isBoolean) {
       return false;
+    }
+    else if (this.isArray) {
+      return [];
     }
     return null;
   }
@@ -97,7 +113,8 @@ export default class Queryable {
 
   getOperators(cql) {
     let ops = [];
-    if (!this.isDateTime) {
+
+    if (!this.isDateTime && !this.isArray) {
       // Although it is supported, comparing specific instances in time doesn't give predictable results.
       // For example 2020-01-01T00:00:00Z is not equal to 2020-01-01T00:00:00.001Z and you don't know the granularity
       // of the datetimes in the database. In the end you usually don't get what you are looking for.
@@ -114,6 +131,20 @@ export default class Queryable {
     else if (this.isText && cql.advancedComparison) {
       ops.push(CqlLike);
     }
+
+    // Array operators for array-type queryables
+    if (this.isArray && cql.arrayOperators) {
+      ops.push(CqlArrayOverlaps);
+      ops.push(CqlArrayContains);
+      ops.push(CqlArrayEquals);
+      ops.push(CqlArrayContainedBy);
+      ops.push(CqlNotArrayOverlaps);
+      ops.push(CqlNotArrayContains);
+      ops.push(CqlNotArrayEquals);
+      ops.push(CqlNotArrayContainedBy);
+      return ops;
+    }
+
     return ops;
   }
 
@@ -124,5 +155,4 @@ export default class Queryable {
   toJSON() {
     return { property: this.id };
   }
-
 }
