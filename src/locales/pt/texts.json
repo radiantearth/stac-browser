@@ -41,12 +41,12 @@
     "password": "Password",
     "required": "Autenticação necessária",
     "schemeTypes": {
-      "http": "HTTP {scheme}",
-      "s3": "S3",
-      "signedUrl": "URL Assinado",
-      "oauth2": "OAuth 2",
       "apiKey": "Chave da API",
-      "openIdConnect": "OpenID Connect"
+      "http": "HTTP {scheme}",
+      "oauth2": "OAuth 2",
+      "openIdConnect": "OpenID Connect",
+      "s3": "S3",
+      "signedUrl": "URL Assinado"
     },
     "title": "Autenticação",
     "unauthorized": "Não tem autorização para aceder a estes dados. Por favor, faça login.",
@@ -86,6 +86,7 @@
   },
   "description": "Descrição",
   "errors": {
+    "apiListRequested": "",
     "authFailed": "O pedido resultou em erro. Os detalhes de autenticação fornecidos podem estar incorretos.",
     "badRequest": "O pedido é inválido. Isto pode ser devido a parâmetros inválidos, por exemplo num pedido de pesquisa, ou pode ser um bug no STAC Browser.",
     "contactProvider": "Por favor contacte o operador do serviço para resolver o problema.",
@@ -108,10 +109,15 @@
     "noExternalAccess": "Não é permitido aceder a catálogos externos!",
     "notFound": "O recurso pedido não existe. @:errors.contactProvider",
     "serverError": "O servidor encontrou um problema. @:errors.contactProvider",
+    "title": "",
     "unauthorized": "O pedido não possui credenciais, por exemplo um token da API. Forneça as suas credenciais e tente novamente."
   },
   "featureExperimental": "Esta funcionalidade ainda é experimental e pode dar resultados inesperados!",
-  "features": {},
+  "features": {
+    "empty": "",
+    "noProperties": "",
+    "title": ""
+  },
   "fullscreen": {
     "exit": "Sair do ecrã completo",
     "exitLabel": "✕",
@@ -154,13 +160,38 @@
   "map": "Mapa",
   "mapping": {
     "attribution": {
-      "label": "i",
-      "collapseLabel": "✕"
+      "collapseLabel": "✕",
+      "description": "",
+      "label": "i"
     },
-    "bboxSelect": {},
+    "bboxSelect": {
+      "add": "",
+      "eastLon": "",
+      "error": {
+        "incomplete": "",
+        "invalidLat": "",
+        "invalidLon": "",
+        "latOrder": "",
+        "lonOrder": ""
+      },
+      "northLat": "",
+      "remove": "",
+      "southLat": "",
+      "westLon": ""
+    },
     "close": "Fechar",
-    "layers": {},
-    "location": {},
+    "fit": "",
+    "layers": {
+      "base": "",
+      "footprint": "",
+      "title": "",
+      "unnamed": ""
+    },
+    "location": {
+      "description": ""
+    },
+    "nobasemap": "",
+    "nodata": "",
     "zoom": {
       "in": {
         "description": "Aumentar o zoom",
@@ -258,6 +289,7 @@
     "notSupported": "A pesquisa de itens não é suportada pela API.",
     "placeholder": "Pesquisar...",
     "selectCollections": "Selecione uma ou várias coleções...",
+    "selectDateRange": "",
     "selectForItemSearch": "Selecione para pesquisa de itens",
     "spatialExtent": "Extensão Espacial",
     "tabs": {
@@ -306,8 +338,8 @@
       "message": "{title} está disponível em {url}",
       "sharePageWithOthers": "Partilhe o URL desta página onde quiser:",
       "title": "Partilhar",
-      "x": "X (Twitter)",
-      "withOthers": "Partilhe esta página com outros"
+      "withOthers": "Partilhe esta página com outros",
+      "x": "X (Twitter)"
     },
     "stacExtension": "Extensão STAC",
     "stacVersion": "Versão STAC",
