@@ -41,12 +41,12 @@
     "password": "Hasło",
     "required": "Wymagane uwierzytelnienie",
     "schemeTypes": {
-      "http": "HTTP {scheme}",
-      "s3": "S3",
-      "signedUrl": "Podpisany URL",
-      "oauth2": "OAuth 2",
       "apiKey": "Klucz API",
-      "openIdConnect": "OpenID Connect"
+      "http": "HTTP {scheme}",
+      "oauth2": "OAuth 2",
+      "openIdConnect": "OpenID Connect",
+      "s3": "S3",
+      "signedUrl": "Podpisany URL"
     },
     "title": "Uwierzytelnienie",
     "unauthorized": "Nie masz uprawnień do dostępu do tych danych. Zaloguj się.",
@@ -86,6 +86,7 @@
   },
   "description": "Opis",
   "errors": {
+    "apiListRequested": "",
     "authFailed": "Wystąpił błąd żądania - podane dane uwierzytelniające mogą być niepoprawne.",
     "badRequest": "Żądanie jest nieprawidłowe. Może to być spowodowane nieprawidłowymi parametrami, np. w zapytaniu wyszukiwania, lub błędem w STAC Browser.",
     "contactProvider": "Skontaktuj się z administratorem, aby rozwiązaźć ten problem.",
@@ -159,21 +160,32 @@
   "map": "Mapa",
   "mapping": {
     "attribution": {
-      "label": "i",
+      "collapseLabel": "✕",
       "description": "Atrybuty",
-      "collapseLabel": "✕"
+      "label": "i"
     },
     "bboxSelect": {
       "add": "Kliknij na mapie, aby dodać ramkę (bbox).",
-      "remove": "Kliknij wewnątrz ramki, aby ją usunąć."
+      "eastLon": "",
+      "error": {
+        "incomplete": "",
+        "invalidLat": "",
+        "invalidLon": "",
+        "latOrder": "",
+        "lonOrder": ""
+      },
+      "northLat": "",
+      "remove": "Kliknij wewnątrz ramki, aby ją usunąć.",
+      "southLat": "",
+      "westLon": ""
     },
     "close": "Zamknij",
     "fit": "Dopasuj do zasięgu",
     "layers": {
-      "title": "Warstwy",
       "base": "Warstwy podstawowe",
-      "unnamed": "Bez nazwy #{id}",
-      "footprint": "Miniatura"
+      "footprint": "Miniatura",
+      "title": "Warstwy",
+      "unnamed": "Bez nazwy #{id}"
     },
     "location": {
       "description": "Przejdź do swojej lokalizacji"
@@ -277,6 +289,7 @@
     "notSupported": "Wyszukiwanie elementów nie jest obsługiwane przez API.",
     "placeholder": "Wyszukaj...",
     "selectCollections": "Wybierz jedną lub więcej kolekcji...",
+    "selectDateRange": "",
     "selectForItemSearch": "Wybierz do wyszukiwania elementu",
     "spatialExtent": "Zasięg przestrzenny",
     "tabs": {
@@ -325,8 +338,8 @@
       "message": "{title} jest dostępny pod adresem {url}",
       "sharePageWithOthers": "Podziel się adresem URL tej strony:",
       "title": "Udostępnij",
-      "x": "X (Twitter)",
-      "withOthers": "Udostępnij tę stronę innym"
+      "withOthers": "Udostępnij tę stronę innym",
+      "x": "X (Twitter)"
     },
     "stacExtension": "Rozszerzenie STAC",
     "stacVersion": "Wersja STAC",
