@@ -21,10 +21,10 @@ const fillBboxInputs = async (page, values) => {
   const eastLonInput = page.getByLabel(/east longitude/i);
   const northLatInput = page.getByLabel(/north latitude/i);
 
-  await westLonInput.fill(values.westLon);
-  await southLatInput.fill(values.southLat);
-  await eastLonInput.fill(values.eastLon);
-  await northLatInput.fill(values.northLat);
+  if (values.westLon != null) await westLonInput.fill(values.westLon);
+  if (values.southLat != null) await southLatInput.fill(values.southLat);
+  if (values.eastLon != null) await eastLonInput.fill(values.eastLon);
+  if (values.northLat != null) await northLatInput.fill(values.northLat);
 };
 
 test.describe('STAC Browser Search page', () => {
@@ -153,19 +153,23 @@ test.describe('STAC Browser Search page', () => {
 
     await test.step('Enter 3 of 4 bounding box values', async () => {
       await enableSpatialExtentInputs(page);
-
+      // Fill page with values
       await fillBboxInputs(page, {
         westLon: '-116.1',
         southLat: '44.3',
         eastLon: '-104',
-        northLat: ''
+        northLat: '60.0'
+      });
+      // Remove a value
+      await fillBboxInputs(page, {
+        southLat: ''
       });
     })
 
     await test.step('Verify error message appears with correct text', async () => {
-      await page.getByLabel(/north latitude/i).blur();
+      await page.getByLabel(/south latitude/i).blur();
       
-      await expect(page.getByText(/Please fill in all coordinates/i)).toBeVisible();
+      await expect(page.getByText(/Coordinate is missing/i)).toBeVisible();
     });
   });
 

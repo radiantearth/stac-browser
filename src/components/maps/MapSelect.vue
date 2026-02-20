@@ -7,7 +7,7 @@
       <LayerControl :map="map" :maxZoom="maxZoom" />
     </div>
     <div class="bbox-controls">
-      <div class="compass-grid">
+      <b-form class="compass-grid" @change="applyManualBbox" @submit.prevent="applyManualBbox">
         <!-- North Latitude (top center) -->
         <b-form-group 
           :label="$t('mapping.bboxSelect.northLat')" 
@@ -17,21 +17,13 @@
         >
           <b-form-input
             id="northLat"
-            v-model.number="bboxValues.northLat"
-            type="number"
-            step="0.0001"
-            min="-90"
-            max="90"
-            :state="validationErrors.northLat ? false : null"
-            @focus="validationErrors.northLat = null"
-            @blur="applyManualBbox"
-            @keydown.enter.prevent.stop
-            @keyup.enter.stop="applyManualBbox"
+            v-model.number="bboxValues.northLat" lazy
+            type="number" step="any" min="-90" max="90"
           />
-          <b-form-invalid-feedback :state="validationErrors.northLat ? false : null" class="text-danger">
-            {{ validationErrors.northLat }}
-          </b-form-invalid-feedback>
         </b-form-group>
+        <b-form-invalid-feedback :state="validationErrors.northLat ? false : null" class="validation error-top text-danger">
+          {{ validationErrors.northLat }}
+        </b-form-invalid-feedback>
 
         <!-- West Longitude (left center) -->
         <b-form-group 
@@ -42,19 +34,13 @@
         >
           <b-form-input
             id="westLon"
-            v-model.number="bboxValues.westLon"
-            type="number"
-            step="0.0001"
-            :state="validationErrors.westLon ? false : null"
-            @focus="validationErrors.westLon = null"
-            @blur="applyManualBbox"
-            @keydown.enter.prevent.stop
-            @keyup.enter.stop="applyManualBbox"
+            v-model.number="bboxValues.westLon" lazy
+            type="number" step="any"
           />
-          <b-form-invalid-feedback :state="validationErrors.westLon ? false : null" class="text-danger">
-            {{ validationErrors.westLon }}
-          </b-form-invalid-feedback>
         </b-form-group>
+        <b-form-invalid-feedback :state="validationErrors.westLon ? false : null" class="validation error-left text-danger">
+          {{ validationErrors.westLon }}
+        </b-form-invalid-feedback>
 
         <!-- East Longitude (right center) -->
         <b-form-group 
@@ -65,19 +51,13 @@
         >
           <b-form-input
             id="eastLon"
-            v-model.number="bboxValues.eastLon"
-            type="number"
-            step="0.0001"
-            :state="validationErrors.eastLon ? false : null"
-            @focus="validationErrors.eastLon = null"
-            @blur="applyManualBbox"
-            @keydown.enter.prevent.stop
-            @keyup.enter.stop="applyManualBbox"
+            v-model.number="bboxValues.eastLon" lazy
+            type="number" step="any"
           />
-          <b-form-invalid-feedback :state="validationErrors.eastLon ? false : null" class="text-danger">
-            {{ validationErrors.eastLon }}
-          </b-form-invalid-feedback>
         </b-form-group>
+        <b-form-invalid-feedback :state="validationErrors.eastLon ? false : null" class="validation error-right text-danger">
+          {{ validationErrors.eastLon }}
+        </b-form-invalid-feedback>
 
         <!-- South Latitude (bottom center) -->
         <b-form-group 
@@ -88,22 +68,14 @@
         >
           <b-form-input
             id="southLat"
-            v-model.number="bboxValues.southLat"
-            type="number"
-            step="0.0001"
-            min="-90"
-            max="90"
-            :state="validationErrors.southLat ? false : null"
-            @focus="validationErrors.southLat = null"
-            @blur="applyManualBbox"
-            @keydown.enter.prevent.stop
-            @keyup.enter.stop="applyManualBbox"
+            v-model.number="bboxValues.southLat" lazy
+            type="number" step="any" min="-90" max="90"
           />
-          <b-form-invalid-feedback :state="validationErrors.southLat ? false : null" class="text-danger">
-            {{ validationErrors.southLat }}
-          </b-form-invalid-feedback>
         </b-form-group>
-      </div>
+        <b-form-invalid-feedback :state="validationErrors.southLat ? false : null" class="validation error-bottom text-danger">
+          {{ validationErrors.southLat }}
+        </b-form-invalid-feedback>
+      </b-form>
     </div>
   </div>
 </template>
@@ -125,6 +97,15 @@ import Fill from 'ol/style/Fill';
 import VectorLayer from 'ol/layer/Vector';
 import { toGeoJSON } from 'stac-js/src/geo.js';
 import mask from '@turf/mask';
+
+function getBoxDefaults() {
+  return {
+    westLon: null,
+    southLat: null,
+    eastLon: null,
+    northLat: null
+  };
+}
 
 export default {
   name: 'MapSelect',
@@ -152,19 +133,8 @@ export default {
       crs: 'EPSG:4326',
       extent: this.modelValue,
       dragging: false,
-      applyingManually: false,
-      validationErrors: {
-        westLon: null,
-        southLat: null,
-        eastLon: null,
-        northLat: null
-      },
-      bboxValues: {
-        westLon: null,
-        southLat: null,
-        eastLon: null,
-        northLat: null
-      }
+      validationErrors: getBoxDefaults(),
+      bboxValues: getBoxDefaults()
     };
   },
   computed: {
@@ -182,9 +152,6 @@ export default {
   watch: {
     async stac() {
       await this.initMap();
-    },
-    uiLanguage() {
-      
     }
   },
   async mounted() {
@@ -303,65 +270,50 @@ export default {
           this.fixX(this.extent[2]),
           this.fixY(this.extent[3])
         ];
-        // Only emit to parent if not manually applying
-        // Manual apply just updates the visual representation
-        if (!this.applyingManually) {
-          this.$emit('update:modelValue', extent);
-        }
         this.updateBboxValues();
+        this.$emit('update:modelValue', extent);
       }
       else {
         this.extent = null;
-        if (!this.applyingManually) {
-          this.$emit('update:modelValue', null);
-        }
         this.clearBboxValues();
+        this.$emit('update:modelValue', null);
       }
     },
     updateBboxValues() {
       if (this.extent && Array.isArray(this.extent) && this.extent.length === 4) {
         this.bboxValues = {
-          westLon: Math.round(this.fixX(this.extent[0]) * 10000) / 10000,
-          southLat: Math.round(this.fixY(this.extent[1]) * 10000) / 10000,
-          eastLon: Math.round(this.fixX(this.extent[2]) * 10000) / 10000,
-          northLat: Math.round(this.fixY(this.extent[3]) * 10000) / 10000
+          westLon: Math.round(this.fixX(this.extent[0]) * 100000) / 100000,
+          southLat: Math.round(this.fixY(this.extent[1]) * 100000) / 100000,
+          eastLon: Math.round(this.fixX(this.extent[2]) * 100000) / 100000,
+          northLat: Math.round(this.fixY(this.extent[3]) * 100000) / 100000
         };
       }
     },
     clearBboxValues() {
-      this.bboxValues = {
-        westLon: null,
-        southLat: null,
-        eastLon: null,
-        northLat: null
-      };
+      this.bboxValues = getBoxDefaults();
     },
     validateBbox() {
       const { westLon, southLat, eastLon, northLat } = this.bboxValues;
-      const errors = {
-        westLon: null,
-        southLat: null,
-        eastLon: null,
-        northLat: null
-      };
+      const errors = getBoxDefaults();
       const incompleteMsg = this.$t('mapping.bboxSelect.error.incomplete');
       
       // Check all values are present - show error on fields that are empty
-      if (westLon === null) {
+      if (westLon === '') {
         errors.westLon = incompleteMsg;
       }
-      if (southLat === null) {
+      if (southLat === '') {
         errors.southLat = incompleteMsg;
       }
-      if (eastLon === null) {
+      if (eastLon === '') {
         errors.eastLon = incompleteMsg;
       }
-      if (northLat === null) {
+      if (northLat === '') {
         errors.northLat = incompleteMsg;
       }
       
-      // If any incomplete, return early
-      if (Object.values(errors).some(err => err !== null)) {
+      // If any value is empty, return early
+      // null = Field was never filled, '' = Field was touched but left empty
+      if (Object.values(this.bboxValues).some(value => value === '' || value === null)) {
         return errors;
       }
       
@@ -408,12 +360,7 @@ export default {
       }
       
       // Clear any previous errors
-      this.validationErrors = {
-        westLon: null,
-        southLat: null,
-        eastLon: null,
-        northLat: null
-      };
+      this.validationErrors = getBoxDefaults();
       
       if (!this.map || !this.interaction) {
         return;
@@ -433,17 +380,8 @@ export default {
       // Update map to show the extent
       const projectedExtent = transformExtent(extent, this.crs, this.map.getView().getProjection());
       this.map.getView().fit(projectedExtent, { padding: [50,50,50,50], maxZoom: this.maxZoom });
-      
-      // Set flag to prevent duplicate emission from map interaction
-      this.applyingManually = true;
-      
       // Update the interaction to show the extent on the map
       this.interaction.setExtent(projectedExtent);
-      
-      // Reset flag after interaction completes
-      setTimeout(() => {
-        this.applyingManually = false;
-      }, 100);
     }
   }
 };
@@ -451,8 +389,10 @@ export default {
 
 <style lang="scss">
 @import "ol/ol.css";
-@import "../../theme/variables.scss";
+</style>
 
+<style lang="scss" scoped>
+@import "../../theme/variables.scss";
 .map-container {
   display: flex;
   flex-direction: column;
@@ -468,84 +408,88 @@ export default {
 }
 
 .bbox-controls {
-  padding: $block-margin 0;
+  padding: 0.5rem;
   background-color: $light;
   border-top: 1px solid darken($light, 10%);
 }
 
-.bbox-inputs {
-  margin-bottom: 0;
-}
-
 .compass-grid {
   display: grid;
-  grid-template-columns: 160px 160px 160px;
+  grid-template-columns: repeat(3, minmax(80px, 1fr));
   grid-template-rows: auto auto auto auto;
   gap: 0.25rem;
   align-items: start;
   justify-items: center;
-  width: fit-content;
-  margin: 0.25rem auto ;
-}
-
-.compass-input {
-  margin-bottom: 0;
   width: 100%;
-  font-size: 0.875rem;
 
-  label {
-    margin-bottom: 0.125rem;
-    font-size: 0.75rem;
+  .compass-input {
+    margin: 0 auto;
+    padding: 0;
+    width: 90%;
+
+    :deep(label) {
+      margin: 0;
+      font-size: 0.75rem;
+      text-align: center;
+    }
+
+    :deep(input) {
+      font-size: 0.875rem;
+      padding: 0.25rem 0.5rem;
+    }
+
+    :deep(.invalid-feedback) {
+      font-size: 0.7rem;
+      margin-top: 0.125rem;
+    }
+
+    &.compass-top {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    &.compass-left {
+      margin-top: -1rem;
+      grid-column: 1;
+      grid-row: 2;
+      text-align: left;
+      justify-self: start;
+    }
+
+    &.compass-right {
+      margin-top: -1rem;
+      grid-column: 3;
+      grid-row: 2;
+      text-align: right;
+      justify-self: end;
+    }
+
+    &.compass-bottom {
+      margin-top: -0.5rem;
+      grid-column: 2;
+      grid-row: 3;
+    }
   }
+  .validation {
+    text-align: center;
+    margin-top: 0;
 
-  input {
-    font-size: 0.875rem;
-    padding: 0.25rem 0.5rem;
-    height: auto;
-  }
-
-  .invalid-feedback {
-    font-size: 0.7rem;
-    margin-top: 0.125rem;
-  }
-
-  &.compass-top {
-    grid-column: 2;
-    grid-row: 1;
-    margin-bottom: -1.2rem;
-  }
-
-  &.compass-left {
-    grid-column: 1;
-    grid-row: 2;
-    text-align: left;
-    justify-self: start;
-    margin-left: -0.25rem;
-  }
-
-  &.compass-right {
-    grid-column: 3;
-    grid-row: 2;
-    text-align: right;
-    justify-self: end;
-    margin-right: -0.25rem;
-  }
-
-  &.compass-bottom {
-    grid-column: 2;
-    grid-row: 3;
-    margin-top: -1.2rem;
-  }
-}
-
-.input-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: $block-margin;
-  margin-bottom: $block-margin;
-
-  .input-col {
-    margin-bottom: 0;
+    &.error-top {
+        grid-column: 2;
+        grid-row: 2;
+    }
+    &.error-bottom {
+        grid-column: 2;
+        grid-row: 4;
+    }
+    &.error-left {
+        grid-column: 1;
+        grid-row: 3;
+    }
+    &.error-right {
+        grid-column: 3;
+        grid-row: 3;
+    }
   }
 }
 </style>

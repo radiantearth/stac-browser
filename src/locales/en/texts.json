@@ -174,9 +174,9 @@
       "apply": "Apply",
       "filterBySpatialExtent": "Filter by spatial extent",
       "error": {
-        "incomplete": "Please fill in all coordinates",
-        "invalidLat": "Latitude must be between -90 and 90",
-        "invalidLon": "Longitude must be between -180 and 180",
+        "incomplete": "Coordinate is missing",
+        "invalidLat": "Must be between -90 and 90",
+        "invalidLon": "Must be between -180 and 180",
         "lonOrder": "West Longitude must be less than East Longitude",
         "latOrder": "South Latitude must be less than North Latitude"
       }
