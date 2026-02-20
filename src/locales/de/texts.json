@@ -86,6 +86,7 @@
   },
   "description": "Beschreibung",
   "errors": {
+    "apiListRequested": "Die Anfrage ist ungültig. Direkte Anfragen an die Endpunkte /collections und .../items werden derzeit nicht unterstützt.",
     "authFailed": "Die Anfrage ist fehlgeschlagen, die angegebenen Anmeldedaten sind möglicherweise fehlerhaft.",
     "badRequest": "Die Anfrage ist ungültig. Dies kann an ungültigen Parametern liegen, z.B. in einer Suchanfrage, oder ein Fehler im STAC Browser sein.",
     "contactProvider": "Bitte wenden Sie sich an den Dienstanbieter, um dieses Problem zu lösen.",
