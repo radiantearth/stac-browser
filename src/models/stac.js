@@ -8,7 +8,11 @@ import {
   STACReference
 } from 'stac-js';
 import Migrate from '@radiantearth/stac-migrate';
-import Utils, { geojsonMediaType } from "../utils";
+import Utils from "../utils";
+import { hasText } from 'stac-js/src/utils.js';
+import { toAbsolute } from 'stac-js/src/http.js';
+import { geojsonMediaType } from 'stac-js/src/mediatypes.js';
+
 
 export function createSTAC(data, url, path, migrate = true, updateVersionNumber = false) {
   if (migrate) {
@@ -23,12 +27,14 @@ export function createSTAC(data, url, path, migrate = true, updateVersionNumber 
     obj = new Item(data, url, path);
   }
   else if (data.type === 'FeatureCollection') {
+    // todo: convert inner collections to stac-js as well
     obj = new ItemCollection(data, url, path);
   }
   else if (data.type === 'Collection' || (!data.type && typeof data.extent !== 'undefined' && typeof data.license !== 'undefined')) {
     obj = new Collection(data, url, path);
   }
   else if (!data.type && Array.isArray(data.collections)) {
+    // todo: convert inner collections to stac-js as well
     obj = new CollectionCollection(data, url, path);
   }
   else {
@@ -44,7 +50,7 @@ export function addMissingChildren(catalogs, stac) {
   let links = stac.getStacLinksWithRel('child').filter(link => {
     // Don't add links that are already in collections: https://github.com/radiantearth/stac-browser/issues/103
     // ToDo: The runtime of this can probably be improved
-    let absoluteUrl = Utils.toAbsolute(link.href, stac.getAbsoluteUrl());
+    let absoluteUrl = toAbsolute(link.href, stac.getAbsoluteUrl());
     return !catalogs.find(collection => collection.getAbsoluteUrl() === absoluteUrl);
   });
   // place the children first to avoid conflicts with the paginated collections
@@ -63,14 +69,14 @@ export function getDisplayTitle(entities, fallbackTitle = "") {
     return fallbackTitle;
   }
   const title = entity.getMetadata("title");
-  if (Utils.hasText(title)) {
+  if (hasText(title)) {
     return title;
   }
   const id = entity.getMetadata("id");
-  if (Utils.hasText(id)) {
+  if (hasText(id)) {
     return id;
   }
-  if (Utils.hasText(fallbackTitle)) {
+  if (hasText(fallbackTitle)) {
     return fallbackTitle;
   }
   // Use file or directory name from STAC entity as title
@@ -107,9 +113,9 @@ function getSearchLink(stac) {
   // See https://github.com/opengeospatial/ogcapi-features/issues/832
   let links = Utils.getLinksWithRels(stac.links, ['search'])
     .filter(link => Utils.isMediaType(link.type, geojsonMediaType))
-    .map(link => Object.assign({}, link, {href: Utils.toAbsolute(link.href, stac.getAbsoluteUrl())}));
+    .map(link => Object.assign({}, link, {href: toAbsolute(link.href, stac.getAbsoluteUrl())}));
   // Prefer POST if present
-  let post = links.find(link => Utils.hasText(link.method) && link.method.toUpperCase() === 'POST');
+  let post = links.find(link => hasText(link.method) && link.method.toUpperCase() === 'POST');
   return post || links[0] || null;
 }
 

@@ -37,7 +37,7 @@
 import { formatKey } from "@radiantearth/stac-fields/helper";
 import { mapGetters, mapState } from "vuex";
 import Url from './Url.vue';
-import Utils from "../utils";
+import { isObject, size } from 'stac-js/src/utils.js';
 import { defineAsyncComponent } from 'vue';
 
 export default {
@@ -69,7 +69,7 @@ export default {
         obj[confClass.type][uri] = confClass;
       }
       for (let key in obj) {
-        if (Utils.size(obj[key]) === 0) {
+        if (size(obj[key]) === 0) {
           delete obj[key];
         }
       }
@@ -85,9 +85,9 @@ export default {
         'stats:items': { label: this.$t('stacItem', 2) }
       };
       for (let key in stats) {
-        if (Utils.isObject(this.root[key])) {
+        if (isObject(this.root[key])) {
           let entry = Object.assign(stats[key], this.root[key]);
-          if (Utils.size(entry['versions']) === 1) {
+          if (size(entry['versions']) === 1) {
             entry.version = Object.keys(entry['versions'])[0];
             delete entry.versions;
           }
@@ -96,7 +96,7 @@ export default {
           delete stats[key];
         }
       }
-      return Utils.size(stats) > 0 ? stats : null;
+      return size(stats) > 0 ? stats : null;
     }
   },
   methods: {

@@ -70,6 +70,7 @@ import ShowAssetLinkMixin from '../components/ShowAssetLinkMixin';
 import StacFieldsMixin from '../components/StacFieldsMixin';
 import { formatLicense, formatTemporalExtents } from '@radiantearth/stac-fields/formatters';
 import Utils from '../utils';
+import { hasText, isObject } from 'stac-js/src/utils.js';
 import { addSchemaToDocument, createCatalogSchema } from '../schema-org';
 import { ItemCollection } from '../models/stac.js';
 import DeprecationMixin from '../components/DeprecationMixin.js';
@@ -144,7 +145,7 @@ export default defineComponent({
     ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination', 'apiItemsNumberMatched', 'nextCollectionsLink', 'stateQueryParameters']),
     ...mapGetters(['catalogs', 'collectionLink', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
     cssStacType() {
-      if (Utils.hasText(this.data?.type)) {
+      if (hasText(this.data?.type)) {
         return this.data?.type.toLowerCase();
       }
       return null;
@@ -177,7 +178,7 @@ export default defineComponent({
       if (Array.isArray(this.data.providers) && this.data.providers.length > 0) {
         providers = this.data.providers;
       }
-      else if (this.isCollection && Utils.isObject(this.data.summaries) && Array.isArray(this.data.summaries.providers)) {
+      else if (this.isCollection && isObject(this.data.summaries) && Array.isArray(this.data.summaries.providers)) {
         providers = this.data.summaries.providers;
       }
       return providers.length > 0 ? providers : null;
@@ -197,7 +198,7 @@ export default defineComponent({
       return this.itemAssets.length > 0;
     },
     itemAssets() {
-      if (!this.data || !Utils.isObject(this.data.item_assets)) {
+      if (!this.data || !isObject(this.data.item_assets)) {
         return [];
       }
       return Object.values(this.data.item_assets);

@@ -10,7 +10,8 @@ import { defineComponent } from 'vue';
 import { mapState, mapGetters } from 'vuex';
 import { BButton } from 'bootstrap-vue-next';
 import { stacBrowserNavigatesTo } from "../rels";
-import Utils from '../utils';
+import { isObject, size } from 'stac-js/src/utils.js';
+import { isStacMediaType } from 'stac-js/src/mediatypes.js';
 import { getDisplayTitle } from '../models/stac';
 import { STAC } from 'stac-js';
 import URI from 'urijs';
@@ -89,7 +90,7 @@ export default defineComponent({
       if (this.stac) {
         return true;
       }
-      if (!Utils.isStacMediaType(this.link.type, true)) {
+      if (!isStacMediaType(this.link.type, true)) {
         return false;
       }
       if (!this.allowExternalAccess && this.isExternalUrl(this.link.href)) {
@@ -103,7 +104,7 @@ export default defineComponent({
           to: this.href,
           rel: this.link.rel
         };
-        if (Utils.isObject(this.button)) {
+        if (isObject(this.button)) {
           Object.assign(obj, this.button);
         }
         return obj;
@@ -142,7 +143,7 @@ export default defineComponent({
         }
 
         // Add private query parameters to links: https://github.com/radiantearth/stac-browser/issues/142
-        if (Utils.size(this.privateQueryParameters) > 0 || Utils.size(this.state) > 0) {
+        if (size(this.privateQueryParameters) > 0 || size(this.state) > 0) {
           let uri = URI(href);
           let addParameters = (obj, prefix) => {
             for(let key in obj) {
@@ -175,7 +176,7 @@ export default defineComponent({
   },
   methods: {
     isLink(o) {
-      return Utils.isObject(o) && !(o instanceof STAC);
+      return isObject(o) && !(o instanceof STAC);
     }
   }
 });

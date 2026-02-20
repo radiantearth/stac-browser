@@ -1,7 +1,7 @@
 import { createI18n } from 'vue-i18n';
 import CONFIG from './config';
 import { default as Fields } from '@radiantearth/stac-fields/I18N';
-import Utils from './utils';
+import { isObject, size } from 'stac-js/src/utils.js';
 
 export const API_LANGUAGE_CONFORMANCE = ['https://api.stacspec.org/v1.*/language'];
 export const STAC_LANGUAGE_EXT = 'https://stac-extensions.github.io/language/v1.*/schema.json';
@@ -79,7 +79,7 @@ export function loadDefaultMessages() {
 export async function loadMessages(locale) {
   // Check whether the language has already been loaded
   // Note that a languages key is already present thus check >1 and not >0
-  if (Utils.size(i18n.global.getLocaleMessage(locale)) > 1) {
+  if (size(i18n.global.getLocaleMessage(locale)) > 1) {
     return;
   }
   const messages = (await import(`./locales/${locale}/default.js`)).default;
@@ -88,7 +88,7 @@ export async function loadMessages(locale) {
 
 export async function executeCustomFunctions(locale) {
   const customizeFiles = LOCALE_CONFIG[locale].customize;
-  if (Utils.size(LOCALE_CONFIG[locale].customize) === 0) {
+  if (size(LOCALE_CONFIG[locale].customize) === 0) {
     return;
   }
   const p = customizeFiles.map(async (file) => {
@@ -128,5 +128,5 @@ export function getDataLanguages(data) {
       dataLanguages.unshift(data.getMetadata('language'));
     }
     // Filter out invalid languages
-    return dataLanguages.filter(lang => Utils.isObject(lang) && typeof lang.code === 'string');
+    return dataLanguages.filter(lang => isObject(lang) && typeof lang.code === 'string');
 }

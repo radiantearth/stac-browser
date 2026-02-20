@@ -1,5 +1,6 @@
 import axios from "axios";
-import Utils from "../utils";
+import { markRaw } from 'vue';
+import { hasText, isObject, size } from 'stac-js/src/utils.js';
 import i18n from '../i18n';
 
 export class Loading {
@@ -18,7 +19,7 @@ export function stacRequestOptions(cx, link) {
     };
   }
   // Return if the link is not an object or doesn't contain an href
-  if (!Utils.isObject(link) || typeof link.href !== 'string') {
+  if (!isObject(link) || typeof link.href !== 'string') {
     return {};
   }
 
@@ -29,13 +30,13 @@ export function stacRequestOptions(cx, link) {
   let headers = {
     'Accept-Language': cx.getters.acceptedLanguages
   };
-  if (Utils.hasText(link.type)) {
+  if (hasText(link.type)) {
     headers.Accept = link.type;
   }
   if (!cx.getters.isExternalUrl(url)) {
     Object.assign(headers, cx.state.requestHeaders);
   }
-  if (Utils.isObject(link.headers)) {
+  if (isObject(link.headers)) {
     Object.assign(headers, link.headers);
   }
 
@@ -60,7 +61,7 @@ export function processSTAC(state, stac) {
   if (typeof state.preprocessSTAC === 'function') {
     stac = state.preprocessSTAC(stac, state);
   }
-  return Object.freeze(stac);
+  return markRaw(stac);
 }
 
 export function isAuthenticationError(error) {
@@ -68,9 +69,9 @@ export function isAuthenticationError(error) {
 }
 
 export function getErrorCode(error) {
-  if (error instanceof Error && error.isAxiosError && Utils.isObject(error.response)) {
+  if (error instanceof Error && error.isAxiosError && isObject(error.response)) {
     const res = error.response;
-    if (Utils.isObject(res.data) && res.data.code) {
+    if (isObject(res.data) && res.data.code) {
       return res.data.code;
     }
     else {
@@ -92,10 +93,10 @@ export function getErrorMessage(error) {
           return i18n.global.t('errors.authFailed');
         } else if (res.status === 404) {
           return i18n.global.t('errors.notFound');
-        } else if (Utils.isObject(res.data) && Utils.hasText(res.data.description)) {
+        } else if (isObject(res.data) && hasText(res.data.description)) {
           // Get the error message from the error object as defined for STAC API JSON responses
           return res.data.description;
-        } else if (Utils.hasText(res.data)) {
+        } else if (hasText(res.data)) {
           // Get the error message from the plain text response
           return res.data;
         } else if (res.status >= 500 && res.status < 600) {
@@ -110,7 +111,7 @@ export function getErrorMessage(error) {
         return i18n.global.t('errors.networkError');
       }
     }
-    else if (Utils.hasText(error.message)) {
+    else if (hasText(error.message)) {
       return error.message;
     }
   }
@@ -118,7 +119,7 @@ export function getErrorMessage(error) {
 }
 
 export function addQueryIfNotExists(uri, query) {
-  if (Utils.size(query) == 0) {
+  if (size(query) == 0) {
     return uri;
   }
   for (let key in query) {

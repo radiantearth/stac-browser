@@ -1,4 +1,4 @@
-import Utils from '../../utils';
+import { isObject } from 'stac-js/src/utils.js';
 import i18n from '../../i18n';
 import { mapState } from 'vuex';
 import Map from 'ol/Map.js';
@@ -14,7 +14,7 @@ import CONFIG from '../../config';
 import proj4 from 'proj4';
 import {register} from 'ol/proj/proj4.js';
 // Register pre-defined CRS from config in proj4
-if (Utils.isObject(CONFIG.crs)) {
+if (isObject(CONFIG.crs)) {
   for (const code in CONFIG.crs) {
     proj4.defs(code, CONFIG.crs[code]);
   }
@@ -194,7 +194,7 @@ export default {
         }
       });
       (await Promise.all(promises))
-        .filter(layer => Utils.isObject(layer))
+        .filter(layer => isObject(layer))
         .forEach((layer, i) => {
           layer.setVisible(i === visibleLayer);
           this.map.addLayer(layer);

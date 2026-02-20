@@ -23,7 +23,7 @@
 
 <script>
 import Description from '../Description.vue';
-import Utils from '../../utils';
+import { hasText } from 'stac-js/src/utils.js';
 import { mapGetters } from 'vuex';
 import { BCard, BCardBody, BCardFooter } from 'bootstrap-vue-next';
 
@@ -67,7 +67,7 @@ export default {
     if (this.isLoggedIn) {
       this.$emit('submit', null);
     }
-    if (Utils.hasText(this.credentials) && this.credentials.includes(':')) {
+    if (hasText(this.credentials) && this.credentials.includes(':')) {
       let parts = this.credentials.split(':', 2);
       this.username = parts[0];
       this.password = parts[1];

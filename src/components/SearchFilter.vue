@@ -154,14 +154,14 @@ import { BCard, BCardBody, BCardFooter, BCardTitle, BDropdown, BDropdownItem } f
 
 import refParser from '@apidevtools/json-schema-ref-parser';
 
-import Utils, { schemaMediaType } from '../utils';
-import { ogcQueryables } from "../rels";
+import Utils from '../utils';
+import { hasText, isObject } from 'stac-js/src/utils.js';
 
 import ApiCapabilitiesMixin, { TYPES } from './ApiCapabilitiesMixin';
 import DatePickerMixin from './DatePickerMixin';
 import Loading from './Loading.vue';
 
-import { STAC } from 'stac-js'; 
+import { CollectionCollection, STAC } from 'stac-js'; 
 import { createSTAC, Collection } from '../models/stac';
 import Cql from '../models/cql2/cql';
 import Queryable from '../models/cql2/queryable';
@@ -399,7 +399,7 @@ export default defineComponent({
   created() {
     let promises = [];
     if (this.cql && this.stac && this.type !== 'Collections') {
-      let queryableLink = this.findQueryableLink(this.stac.links);
+      const queryableLink = this.stac.getQueryablesLink();
       promises.push(
         this.loadQueryables(queryableLink)
           .catch(error => console.error(error))
@@ -442,10 +442,11 @@ export default defineComponent({
           
           // Only set collections if response is valid AND collectionsLoadingTimer has not been reset.
           // If collectionsLoadingTimer has been reset, the result is not relevant anylonger.
-          if (this.collectionsLoadingTimer && Utils.isObject(response.data) && Array.isArray(response.data.collections)) {
-            this.collections = this.prepareCollections(response.data.collections);
-            if (typeof response.data.numberMatched === 'number') {
-              this.additionalCollectionCount = response.data.numberMatched - this.collections.length;
+          if (this.collectionsLoadingTimer && CollectionCollection.isResponse(response.data)) {
+            const stac = createSTAC(response.data);
+            this.collections = this.prepareCollections(stac.getAll());
+            if (typeof stac.numberMatched === 'number') {
+              this.additionalCollectionCount = stac.numberMatched - this.collections.length;
             }
           }
         } catch (error) {
@@ -457,34 +458,29 @@ export default defineComponent({
       }, 250);
     },
     async loadCollections(link) {
-      let hasMore = false;
-      let data = {
+      const data = {
         collections: [],
         queryableLink: null
       };
 
       if (this.type === 'Global' && this.collections) {
         data.collections = this.collections;
-        hasMore = false;
       }
       else if (this.type === 'Global' || this.type === 'Collections') {
         let response = await stacRequest(this.$store, link);
         
-        if (!Utils.isObject(response.data)) {
+        if (!isObject(response.data)) {
           return {};
         }
 
-        if (Array.isArray(response.data.links)) {
-          let links = response.data.links;
-          hasMore = Boolean(Utils.getLinkWithRel(links, 'next'));
-          data.queryableLink = this.findQueryableLink(links) || null;
+        const stac = createSTAC(response.data);
+        if (stac.getQueryablesLink) {
+          data.queryableLink = stac.getQueryablesLink();
         }
 
-        // todo: use ItemCollection / CollectionCollection
-        if (!hasMore && Array.isArray(response.data.collections)) {
-          let collections = response.data.collections
-            .map(collection => createSTAC(collection));
-          data.collections = this.prepareCollections(collections);
+        const paginationLinks = stac.getPaginationLinks();
+        if (!paginationLinks.next && stac instanceof CollectionCollection) {
+          data.collections = this.prepareCollections(stac.getAll());
         }
       }
       return data;
@@ -516,19 +512,15 @@ export default defineComponent({
         .map(this.collectionToMultiSelect)
         .sort((a,b) => collator.compare(a.text, b.text));
     },
-    findQueryableLink(links) {
-      return Utils.getLinksWithRels(links, ogcQueryables)
-          .find(link => Utils.isMediaType(link.type, schemaMediaType, true));
-    },
     async loadQueryables(link) {
       this.queryables = [];
 
-      if (!Utils.isObject(link)) {
+      if (!isObject(link)) {
         return;
       }
 
       let response = await stacRequest(this.$store, link);
-      if (!Utils.isObject(response.data)) {
+      if (!isObject(response.data)) {
         return;
       }
 
@@ -541,7 +533,7 @@ export default defineComponent({
         schemas = response.data;
       }
 
-      if (Utils.isObject(schemas) && Utils.isObject(schemas.properties)) {
+      if (isObject(schemas) && isObject(schemas.properties)) {
         this.queryables = Object.entries(schemas.properties)
           .map(([key, schema]) => new Queryable(key, schema));
       }
@@ -589,7 +581,7 @@ export default defineComponent({
       this.query.limit = limit;
     },
     addSearchTerm(term) {
-      if (!Utils.hasText(term)) {
+      if (!hasText(term)) {
         return;
       }
       this.query.q.push(term);

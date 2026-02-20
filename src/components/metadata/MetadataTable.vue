@@ -17,7 +17,7 @@
 <script>
 import EntryMixin from './EntryMixin';
 import StacFieldsMixin from '../StacFieldsMixin';
-import Utils from '../../utils';
+import { isObject } from 'stac-js/src/utils.js';
 import { format } from '@radiantearth/stac-fields';
 import { defineAsyncComponent } from 'vue';
 import { BTable } from 'bootstrap-vue-next';
@@ -43,7 +43,7 @@ export default {
       };
     },
     tblItems() {
-      if (Utils.isObject(this.value)) {
+      if (isObject(this.value)) {
         let items = [];
         for(let key in this.value) {
           items.push({
@@ -69,7 +69,7 @@ export default {
           default: col.default
         });
       }
-      if (Utils.isObject(this.value)) {
+      if (isObject(this.value)) {
         fields.unshift({
           key: '_id',
           sortable: true,
@@ -81,7 +81,7 @@ export default {
   },
   methods: {
     isObject(value) {
-      return Utils.isObject(value);
+      return isObject(value);
     },
     formatCell(value, key, item) {
       let spec = this.items[key];

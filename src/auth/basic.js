@@ -1,6 +1,6 @@
 import Auth from "./index";
 import i18n from '../i18n';
-import Utils from "../utils";
+import { hasText } from 'stac-js/src/utils.js';
 
 export default class BasicAuth extends Auth {
 
@@ -33,7 +33,7 @@ export default class BasicAuth extends Auth {
     if (typeof value === 'string' && value.length >= 3) {
       value = `Basic ${btoa(value)}`;
     }
-    if (!Utils.hasText(value)) {
+    if (!hasText(value)) {
       value = undefined;
     }
     return {
