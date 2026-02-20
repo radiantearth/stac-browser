@@ -41,12 +41,12 @@
     "password": "Mot de passe",
     "required": "Authentification requise",
     "schemeTypes": {
-      "http": "HTTP {scheme}",
-      "s3": "S3",
-      "signedUrl": "URL signée",
-      "oauth2": "OAuth 2",
       "apiKey": "Clé API",
-      "openIdConnect": "Connexion OpenID"
+      "http": "HTTP {scheme}",
+      "oauth2": "OAuth 2",
+      "openIdConnect": "Connexion OpenID",
+      "s3": "S3",
+      "signedUrl": "URL signée"
     },
     "title": "Authentification",
     "unauthorized": "Vous n'êtes pas autorisé à accéder à ces données. Veuillez vous connecter.",
@@ -86,6 +86,7 @@
   },
   "description": "Description",
   "errors": {
+    "apiListRequested": "",
     "authFailed": "La requête a échoué, les informations d'authentification fournies peuvent être incorrectes.",
     "badRequest": "La requête n'est pas valide. Cela peut être dû à des paramètres de recherche invalides ou à un bogue au niveau de STAC Browser",
     "contactProvider": "Veuillez contacter l'exploitant du service afin de résoudre ce problème.",
@@ -159,21 +160,32 @@
   "map": "Carte",
   "mapping": {
     "attribution": {
-      "label": "i",
+      "collapseLabel": "✕",
       "description": "Attributions",
-      "collapseLabel": "✕"
+      "label": "i"
     },
     "bboxSelect": {
       "add": "Cliquez sur la carte pour ajouter une boîte englobante.",
-      "remove": "Cliquez à l'intérieur de la boîte englobante pour la supprimer."
+      "eastLon": "",
+      "error": {
+        "incomplete": "",
+        "invalidLat": "",
+        "invalidLon": "",
+        "latOrder": "",
+        "lonOrder": ""
+      },
+      "northLat": "",
+      "remove": "Cliquez à l'intérieur de la boîte englobante pour la supprimer.",
+      "southLat": "",
+      "westLon": ""
     },
     "close": "Fermer",
     "fit": "Adapter à l'étendue",
     "layers": {
-      "title": "Couches",
       "base": "Couches de base",
-      "unnamed": "#{id} non nommé",
-      "footprint": "Empreinte"
+      "footprint": "Empreinte",
+      "title": "Couches",
+      "unnamed": "#{id} non nommé"
     },
     "location": {
       "description": "Aller à votre position"
@@ -277,6 +289,7 @@
     "notSupported": "La recherche d'éléments n'est pas pris en charge par l'API.",
     "placeholder": "Rechercher...",
     "selectCollections": "Sélectionnez une ou plusieurs collections...",
+    "selectDateRange": "",
     "selectForItemSearch": "Sélectionner pour la recherche d'élément",
     "spatialExtent": "Étendue spatiale",
     "tabs": {
@@ -325,8 +338,8 @@
       "message": "{title} est disponible à l'adresse {url}",
       "sharePageWithOthers": "Partagez l'URL de cette page:",
       "title": "Partager",
-      "x": "X (Twitter)",
-      "withOthers": "Partagez cette page"
+      "withOthers": "Partagez cette page",
+      "x": "X (Twitter)"
     },
     "stacExtension": "Extension du STAC",
     "stacVersion": "Version STAC",
