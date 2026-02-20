@@ -41,12 +41,12 @@
     "password": "Password",
     "required": "Authentication required",
     "schemeTypes": {
-      "http": "HTTP {scheme}",
-      "s3": "S3",
-      "signedUrl": "Signed URL",
-      "oauth2": "OAuth 2",
       "apiKey": "API key",
-      "openIdConnect": "OpenID Connect"
+      "http": "HTTP {scheme}",
+      "oauth2": "OAuth 2",
+      "openIdConnect": "OpenID Connect",
+      "s3": "S3",
+      "signedUrl": "Signed URL"
     },
     "title": "Authentication",
     "unauthorized": "You don't have permission to access this data. Please log in.",
@@ -160,34 +160,33 @@
   "map": "Map",
   "mapping": {
     "attribution": {
-      "label": "i",
+      "collapseLabel": "✕",
       "description": "Attributions",
-      "collapseLabel": "✕"
+      "label": "i"
     },
     "bboxSelect": {
       "add": "Click on the map to add a bounding box.",
-      "remove": "Click inside the bounding box to remove it.",
-      "westLon": "West Longitude",
-      "southLat": "South Latitude",
       "eastLon": "East Longitude",
-      "northLat": "North Latitude",
-      "apply": "Apply",
-      "filterBySpatialExtent": "Filter by spatial extent",
       "error": {
         "incomplete": "Coordinate is missing",
         "invalidLat": "Must be between -90 and 90",
         "invalidLon": "Must be between -180 and 180",
-        "lonOrder": "West Longitude must be less than East Longitude",
-        "latOrder": "South Latitude must be less than North Latitude"
-      }
+        "latOrder": "South Latitude must be less than North Latitude",
+        "lonOrder": "West Longitude must be less than East Longitude"
+      },
+      "filterBySpatialExtent": "Filter by spatial extent",
+      "northLat": "North Latitude",
+      "remove": "Click inside the bounding box to remove it.",
+      "southLat": "South Latitude",
+      "westLon": "West Longitude"
     },
     "close": "Close",
     "fit": "Fit to extent",
     "layers": {
-      "title": "Layers",
       "base": "Base Layers",
-      "unnamed": "Unnamed #{id}",
-      "footprint": "Footprint"
+      "footprint": "Footprint",
+      "title": "Layers",
+      "unnamed": "Unnamed #{id}"
     },
     "location": {
       "description": "Go to your location"
@@ -340,8 +339,8 @@
       "message": "{title} is available at {url}",
       "sharePageWithOthers": "Share the URL of this page anywhere you like:",
       "title": "Share",
-      "x": "X (Twitter)",
-      "withOthers": "Share this page with others"
+      "withOthers": "Share this page with others",
+      "x": "X (Twitter)"
     },
     "stacExtension": "STAC Extension",
     "stacVersion": "STAC Version",

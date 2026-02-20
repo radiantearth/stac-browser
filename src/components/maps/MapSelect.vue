@@ -278,6 +278,7 @@ export default {
         this.clearBboxValues();
         this.$emit('update:modelValue', null);
       }
+      this.validationErrors = getBoxDefaults();
     },
     updateBboxValues() {
       if (this.extent && Array.isArray(this.extent) && this.extent.length === 4) {
@@ -314,7 +315,8 @@ export default {
       // If any value is empty, return early
       // null = Field was never filled, '' = Field was touched but left empty
       if (Object.values(this.bboxValues).some(value => value === '' || value === null)) {
-        return errors;
+        this.validationErrors = errors;
+        return false;
       }
       
       // Check longitude values are in valid range (-180 to 180)
@@ -344,18 +346,13 @@ export default {
       if (southLat >= northLat) {
         errors.southLat = this.$t('mapping.bboxSelect.error.latOrder');
       }
-      
-      // Return errors object if any errors exist
-      if (Object.values(errors).some(err => err !== null)) {
-        return errors;
-      }
-      
-      return null;
+
+      this.validationErrors = errors;
+      return Object.values(errors).every(error => !error);
     },
     applyManualBbox() {
-      const errors = this.validateBbox();
-      if (errors) {
-        this.validationErrors = errors;
+      const valid = this.validateBbox();
+      if (!valid) {
         return;
       }
       
