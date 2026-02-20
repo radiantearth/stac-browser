@@ -246,11 +246,8 @@
     "addSearchTerm": "Press enter to add a search term",
     "additionalFilters": "Additional filters",
     "arrayInput": {
-      "duplicate": "Duplicate value: {value}",
-      "duplicates": "Duplicate value(s): {values}",
-      "helpText": "Enter values as a comma-separated list",
-      "placeholder": "Enter {field} values...",
-      "required": "Please enter at least one value"
+      "addValue": "Press enter to add a value",
+      "helpText": "Enter one or more values..."
     },
     "arrayContains": "Contains all",
     "arrayContainsDescription": "Array contains all of the specified values",
