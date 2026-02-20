@@ -166,8 +166,18 @@
     },
     "bboxSelect": {
       "add": "Haz clic en el mapa para añadir un rectángulo delimitador.",
-      "error": {},
-      "remove": "Haz clic dentro del rectángulo para eliminarlo."
+      "eastLon": "Longitud Este",
+      "error": {
+        "incomplete": "Coordenada faltante",
+        "invalidLat": "Debe estar entre -90 y 90",
+        "invalidLon": "Debe estar entre -180 y 180",
+        "latOrder": "Latitud Sur debe ser menor que Latitud Norte",
+        "lonOrder": "Longitud Oeste debe ser menor que Longitud Este"
+      },
+      "northLat": "Latitud Norte",
+      "remove": "Haz clic dentro del rectángulo para eliminarlo.",
+      "southLat": "Latitud Sur",
+      "westLon": "Longitud Oeste"
     },
     "close": "Cerrar",
     "fit": "Encajar en la extensión",
