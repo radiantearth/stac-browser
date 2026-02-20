@@ -743,6 +743,11 @@ function getStore(config, router) {
               throw new BrowserError(i18n.global.t('errors.invalidJsonObject'));
             }
             data = createSTAC(response.data, url, path);
+            if (!(data instanceof STAC)) {
+              // Might be a request to the /collections or .../items endpoints,
+              // which returns an APICollection, not a STAC object.
+              throw new BrowserError(i18n.t('errors.apiListRequested'));
+            }
             cx.commit('loaded', { url, data });
 
             if (show) {

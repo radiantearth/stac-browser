@@ -86,6 +86,7 @@
   },
   "description": "Description",
   "errors": {
+    "apiListRequested": "The request is invalid. Direct requests to /collections and .../items endpoints are currently not supported.",
     "authFailed": "The request errored, the provided authentication details may be incorrect.",
     "badRequest": "The request is invalid. This might be due to invalid parameters, e.g. in a search request, or could be a bug in STAC Browser.",
     "contactProvider": "Please contact the service operator to resolve this issue.",

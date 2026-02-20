@@ -1,6 +1,6 @@
 import { expect } from '@playwright/test';
 
-export const HOME_PATH = process.env.CI ? '/stac-browser/' : '/';
+export const HOME_PATH = '/';
 export const SEARCH_PATH = '/search/external/earth-search.aws.test.com/v1?.language=en'
 
 const SEARCH_API_URL = 'https://earth-search.aws.test.com/v1/search';
@@ -16,7 +16,6 @@ const API_ROOT_FIXTURE = {
 	conformsTo: [
 		'https://api.stacspec.org/v1.0.0/item-search',
     'https://api.stacspec.org/v1.0.0/item-search#sort',
-
 		'https://api.stacspec.org/v1.0.0/collection-search'
 	],
 	links: [
