@@ -86,7 +86,6 @@
   },
   "description": "Descriere",
   "errors": {
-    "apiListRequested": "",
     "authFailed": "Solicitarea a eșuat, credențialele furnizate ar putea fi incorecte.",
     "badRequest": "Solicitarea nu este validă. Acest lucru se poate datora unor parametri de căutare invalizi sau a unei erori în browserul STAC",
     "contactProvider": "Vă rugăm să contactați operatorul serviciului pentru a rezolva această problemă.",
@@ -114,9 +113,7 @@
   },
   "featureExperimental": "Această funcție este încă experimentală și poate da rezultate neașteptate!",
   "features": {
-    "empty": "",
-    "noProperties": "Nu au fost furnizate proprietăți.",
-    "title": ""
+    "noProperties": "Nu au fost furnizate proprietăți."
   },
   "fullscreen": {
     "exit": "Ieși din modul ecran complet",
@@ -161,15 +158,10 @@
   "mapping": {
     "attribution": {
       "label": "i",
-      "description": "",
       "collapseLabel": "✕"
     },
-    "bboxSelect": {
-      "add": "",
-      "remove": ""
-    },
+    "bboxSelect": {},
     "close": "Închidere",
-    "fit": "",
     "layers": {
       "title": "Straturi",
       "base": "Straturi de bază",
@@ -179,7 +171,6 @@
     "location": {
       "description": "Mergi la locație"
     },
-    "nobasemap": "",
     "nodata": "Nu sunt informații spațiale disponibile în metadate.",
     "zoom": {
       "in": {
@@ -278,7 +269,6 @@
     "notSupported": "Căutarea articolelor nu este acceptată de API.",
     "placeholder": "Căutare...",
     "selectCollections": "Selectați una sau mai multe colecții...",
-    "selectDateRange": "",
     "selectForItemSearch": "Selectați pentru Căutare Articol",
     "spatialExtent": "Întinderea spațială",
     "tabs": {

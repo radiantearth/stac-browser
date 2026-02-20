@@ -86,7 +86,6 @@
   },
   "description": "Descrição",
   "errors": {
-    "apiListRequested": "",
     "authFailed": "O pedido resultou em erro. Os detalhes de autenticação fornecidos podem estar incorretos.",
     "badRequest": "O pedido é inválido. Isto pode ser devido a parâmetros inválidos, por exemplo num pedido de pesquisa, ou pode ser um bug no STAC Browser.",
     "contactProvider": "Por favor contacte o operador do serviço para resolver o problema.",
@@ -109,15 +108,10 @@
     "noExternalAccess": "Não é permitido aceder a catálogos externos!",
     "notFound": "O recurso pedido não existe. @:errors.contactProvider",
     "serverError": "O servidor encontrou um problema. @:errors.contactProvider",
-    "title": "",
     "unauthorized": "O pedido não possui credenciais, por exemplo um token da API. Forneça as suas credenciais e tente novamente."
   },
   "featureExperimental": "Esta funcionalidade ainda é experimental e pode dar resultados inesperados!",
-  "features": {
-    "empty": "",
-    "noProperties": "",
-    "title": ""
-  },
+  "features": {},
   "fullscreen": {
     "exit": "Sair do ecrã completo",
     "exitLabel": "✕",
@@ -161,26 +155,12 @@
   "mapping": {
     "attribution": {
       "label": "i",
-      "description": "",
       "collapseLabel": "✕"
     },
-    "bboxSelect": {
-      "add": "",
-      "remove": ""
-    },
+    "bboxSelect": {},
     "close": "Fechar",
-    "fit": "",
-    "layers": {
-      "title": "",
-      "base": "",
-      "unnamed": "",
-      "footprint": ""
-    },
-    "location": {
-      "description": ""
-    },
-    "nobasemap": "",
-    "nodata": "",
+    "layers": {},
+    "location": {},
     "zoom": {
       "in": {
         "description": "Aumentar o zoom",
@@ -278,7 +258,6 @@
     "notSupported": "A pesquisa de itens não é suportada pela API.",
     "placeholder": "Pesquisar...",
     "selectCollections": "Selecione uma ou várias coleções...",
-    "selectDateRange": "",
     "selectForItemSearch": "Selecione para pesquisa de itens",
     "spatialExtent": "Extensão Espacial",
     "tabs": {

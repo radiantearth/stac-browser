@@ -86,7 +86,6 @@
   },
   "description": "Description",
   "errors": {
-    "apiListRequested": "",
     "authFailed": "La requête a échoué, les informations d'authentification fournies peuvent être incorrectes.",
     "badRequest": "La requête n'est pas valide. Cela peut être dû à des paramètres de recherche invalides ou à un bogue au niveau de STAC Browser",
     "contactProvider": "Veuillez contacter l'exploitant du service afin de résoudre ce problème.",
@@ -278,7 +277,6 @@
     "notSupported": "La recherche d'éléments n'est pas pris en charge par l'API.",
     "placeholder": "Rechercher...",
     "selectCollections": "Sélectionnez une ou plusieurs collections...",
-    "selectDateRange": "",
     "selectForItemSearch": "Sélectionner pour la recherche d'élément",
     "spatialExtent": "Étendue spatiale",
     "tabs": {
