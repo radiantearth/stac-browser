@@ -1,4 +1,4 @@
-import URI from 'urijs';
+import { URI } from 'stac-js/src/utils.js';
 import removeMd from 'remove-markdown';
 import { stacPagination } from "./rels";
 import { Link, Asset } from 'stac-js';

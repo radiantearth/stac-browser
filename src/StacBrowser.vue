@@ -105,7 +105,7 @@ import StacLink from './components/StacLink.vue';
 
 import { CatalogLike, STAC } from 'stac-js';
 import Utils from './utils';
-import URI from 'urijs';
+import { URI } from 'stac-js/src/utils.js';
 
 import { API_LANGUAGE_CONFORMANCE } from './i18n';
 import { getBest, prepareSupported } from 'stac-js/src/locales';

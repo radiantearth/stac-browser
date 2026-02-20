@@ -1,7 +1,7 @@
 import Utils from './utils';
 import { getDisplayTitle } from './models/stac';
 import { STAC } from 'stac-js';
-import URI from 'urijs';
+import { URI } from 'stac-js/src/utils.js';
 import i18n from './i18n';
 
 function toBrowserUrl(url, store) {

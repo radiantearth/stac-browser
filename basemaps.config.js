@@ -1,5 +1,5 @@
 import { Collection } from './src/models/stac';
-import { STAC } from 'stac-js'
+import { STAC } from 'stac-js';
 
 // For documentation see https://github.com/radiantearth/stac-browser/blob/main/docs/basemaps.md
 

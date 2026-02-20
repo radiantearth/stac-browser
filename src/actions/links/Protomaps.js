@@ -1,5 +1,5 @@
 import LinkActionPlugin from "../LinkActionPlugin";
-import URI from 'urijs';
+import { URI } from 'stac-js/src/utils.js';
 import i18n from "../../i18n";
 
 export default class Protomaps extends LinkActionPlugin {
@@ -10,7 +10,7 @@ export default class Protomaps extends LinkActionPlugin {
   }
 
   get uri() {
-    let uri = new URI("https://pmtiles.io/");
+    let uri = URI("https://pmtiles.io/");
     uri.addQuery("url", this.link.href); 
     return uri;
   }

@@ -1,5 +1,5 @@
 import AssetActionPlugin from "../AssetActionPlugin";
-import URI from 'urijs';
+import { URI } from 'stac-js/src/utils.js';
 import i18n from "../../i18n";
 
 const POTREE_SUPPORTED_TYPES = [
@@ -33,7 +33,7 @@ export default class Potree extends AssetActionPlugin {
     // Alternatives with single potree-supported tileset support and less param parsed
     // https://mpc-copc-viewer.netlify.app?c=rgba&r= Darren Wiens app, which works eg with IGN COPC: 
     // https://potree.org/potree/examples/copc.html?c=rgba&r= Potree copc app
-    let uri = new URI("https://3d.iconem.com/apps/load_potree_project_from_urlparam");
+    let uri = URI("https://3d.iconem.com/apps/load_potree_project_from_urlparam");
     const datasetUrl = this.component.href;
     uri.addQuery('fit', 'true');
     uri.addQuery('c', 'elevation'); // rgba, elevation, intensity etc

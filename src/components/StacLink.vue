@@ -13,7 +13,7 @@ import { stacBrowserNavigatesTo } from "../rels";
 import Utils from '../utils';
 import { getDisplayTitle } from '../models/stac';
 import { STAC } from 'stac-js';
-import URI from 'urijs';
+import { URI } from 'stac-js/src/utils.js';
 
 export default defineComponent({
   name: "StacLink",
