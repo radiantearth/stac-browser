@@ -41,12 +41,12 @@
     "password": "كلمة المرور",
     "required": "المصادقة مطلوبة",
     "schemeTypes": {
-      "http": "HTTP {scheme}",
-      "s3": "S3",
-      "signedUrl": "عنوان URL موقّع",
-      "oauth2": "OAuth 2",
       "apiKey": "مفتاح API",
-      "openIdConnect": "OpenID Connect"
+      "http": "HTTP {scheme}",
+      "oauth2": "OAuth 2",
+      "openIdConnect": "OpenID Connect",
+      "s3": "S3",
+      "signedUrl": "عنوان URL موقّع"
     },
     "title": "المصادقة",
     "unauthorized": "ليس لديك إذن للوصول إلى هذه البيانات. يرجى تسجيل الدخول.",
@@ -152,7 +152,9 @@
   "map": "الخريطة",
   "mapping": {
     "attribution": {},
-    "bboxSelect": {},
+    "bboxSelect": {
+      "error": {}
+    },
     "layers": {},
     "location": {},
     "zoom": {
@@ -294,8 +296,8 @@
       "message": "{title} متاح على {url}",
       "sharePageWithOthers": "مشاركة رابط هذه الصفحة في أي مكان تريده:",
       "title": "مشاركة",
-      "x": "إكس (تويتر)",
-      "withOthers": "مشاركة هذه الصفحة مع الآخرين"
+      "withOthers": "مشاركة هذه الصفحة مع الآخرين",
+      "x": "إكس (تويتر)"
     },
     "stacExtension": "امتداد STAC",
     "stacVersion": "إصدار STAC",

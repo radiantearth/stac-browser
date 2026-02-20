@@ -41,12 +41,12 @@
     "password": "Passwort",
     "required": "Anmeldung erforderlich",
     "schemeTypes": {
-      "http": "HTTP {scheme}",
-      "s3": "S3",
-      "signedUrl": "Signierte URL",
-      "oauth2": "OAuth 2",
       "apiKey": "API-Schlüssel",
-      "openIdConnect": "OpenID Connect"
+      "http": "HTTP {scheme}",
+      "oauth2": "OAuth 2",
+      "openIdConnect": "OpenID Connect",
+      "s3": "S3",
+      "signedUrl": "Signierte URL"
     },
     "title": "Anmelden",
     "unauthorized": "Sie haben keine Berechtigung um diese Daten abzurufen. Bitte melden Sie sich an.",
@@ -160,9 +160,9 @@
   "map": "Karte",
   "mapping": {
     "attribution": {
-      "label": "i",
+      "collapseLabel": "✕",
       "description": "Namensnennungen",
-      "collapseLabel": "✕"
+      "label": "i"
     },
     "bboxSelect": {
       "add": "Klicke auf die Karte, um eine Box für die räumliche Ausdehnung zu erstellen.",
@@ -182,10 +182,10 @@
     "close": "Schließen",
     "fit": "Ansicht an räumliche Ausdehnung anpassen",
     "layers": {
-      "title": "Kartenebenen",
       "base": "Grundkarten",
-      "unnamed": "Unbenannt #{id}",
-      "footprint": "Räumliche Ausdehnung"
+      "footprint": "Räumliche Ausdehnung",
+      "title": "Kartenebenen",
+      "unnamed": "Unbenannt #{id}"
     },
     "location": {
       "description": "Springe zu deiner Position"
@@ -338,8 +338,8 @@
       "message": "{title} ist verfügbar unter {url}",
       "sharePageWithOthers": "Teile die Adresse dieser Seite:",
       "title": "Teilen",
-      "x": "X (Twitter)",
-      "withOthers": "Teile diese Seite mit anderen"
+      "withOthers": "Teile diese Seite mit anderen",
+      "x": "X (Twitter)"
     },
     "stacExtension": "STAC-Erweiterung",
     "stacVersion": "STAC-Version",

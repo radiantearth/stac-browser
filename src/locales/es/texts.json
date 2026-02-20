@@ -41,12 +41,12 @@
     "password": "Contraseña",
     "required": "Se necesita autenticación",
     "schemeTypes": {
-      "http": "HTTP {scheme}",
-      "s3": "S3",
-      "signedUrl": "URL Firmada",
-      "oauth2": "OAuth 2",
       "apiKey": "Llave de API",
-      "openIdConnect": "OpenID Connect"
+      "http": "HTTP {scheme}",
+      "oauth2": "OAuth 2",
+      "openIdConnect": "OpenID Connect",
+      "s3": "S3",
+      "signedUrl": "URL Firmada"
     },
     "title": "Autenticación",
     "unauthorized": "No tiene permiso para acceder a estos datos. Por favor, inicie sesión.",
@@ -160,21 +160,22 @@
   "map": "Mapa",
   "mapping": {
     "attribution": {
-      "label": "i",
+      "collapseLabel": "✕",
       "description": "Atribuciones",
-      "collapseLabel": "✕"
+      "label": "i"
     },
     "bboxSelect": {
       "add": "Haz clic en el mapa para añadir un rectángulo delimitador.",
+      "error": {},
       "remove": "Haz clic dentro del rectángulo para eliminarlo."
     },
     "close": "Cerrar",
     "fit": "Encajar en la extensión",
     "layers": {
-      "title": "Capas",
       "base": "Capas base",
-      "unnamed": "Sin nombre #{id}",
-      "footprint": "Huella"
+      "footprint": "Huella",
+      "title": "Capas",
+      "unnamed": "Sin nombre #{id}"
     },
     "location": {
       "description": "Ve a tu ubicación"
@@ -327,8 +328,8 @@
       "message": "{title} está disponible en {url}",
       "sharePageWithOthers": "Comparta la URL de está página donde guste:",
       "title": "Compartir",
-      "x": "X (Twitter)",
-      "withOthers": "Comparta esta página con otros"
+      "withOthers": "Comparta esta página con otros",
+      "x": "X (Twitter)"
     },
     "stacExtension": "Extensión STAC",
     "stacVersion": "Versión STAC",
