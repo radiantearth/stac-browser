@@ -141,7 +141,7 @@ export default {
     ...mapState(['uiLanguage']),
     projectedExtent() {
       if (this.extent) {
-        return transformExtent(this.extent, this.crs, this.map.getView().getProjection());
+        return this.stacToOlExtent(this.extent);
       }
       return null;
     },
@@ -211,10 +211,7 @@ export default {
         extent = this.projectedExtent;
       }
       else if (this.stac) {
-        const bbox = this.stac.getBoundingBox();
-        if (bbox) {
-          extent = transformExtent(bbox, this.crs, this.map.getView().getProjection());
-        }
+        extent = this.stacToOlExtent(this.stac.getBoundingBox());
       }
       if (extent) {
         this.map.getView().fit(extent, { padding: [50,50,50,50], maxZoom: this.maxZoom });
@@ -377,19 +374,24 @@ export default {
       // Update local state and emit STAC-compliant bbox to parent
       this.extent = extent;
       this.$emit('update:modelValue', extent);
-      
-      // For map display, handle antimeridian crossing by making the extent
-      // continuous. OpenLayers can't render extents where left > right in
-      // projected coordinates, so we shift eastLon by +360 to unwrap it.
-      const crossesAntimeridian = extent[0] > 0 && extent[2] < 0;
-      const mapExtent = crossesAntimeridian
-        ? [extent[0], extent[1], extent[2] + 360, extent[3]]
-        : extent;
-      
-      const projectedExtent = transformExtent(mapExtent, this.crs, this.map.getView().getProjection());
+
+      // Update map to show the extent
+      const projectedExtent = this.stacToOlExtent(extent);
       this.map.getView().fit(projectedExtent, { padding: [50,50,50,50], maxZoom: this.maxZoom });
       // Update the interaction to show the extent on the map
       this.interaction.setExtent(projectedExtent);
+    },
+    stacToOlExtent(extent) {
+      if (!Array.isArray(extent) || extent.length !== 4) {
+        return null;
+      }
+      const mapExtent = [...extent];
+      // For antimeridian-crossing bboxes (westLon > eastLon), shift eastLon
+      // by +360 so OpenLayers gets a valid extent where minX < maxX.
+      if (mapExtent[0] > mapExtent[2]) {
+        mapExtent[2] += 360;
+      }
+      return transformExtent(mapExtent, this.crs, this.map.getView().getProjection());
     }
   }
 };
