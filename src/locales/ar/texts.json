@@ -86,6 +86,7 @@
   },
   "description": "الوصف",
   "errors": {
+    "apiListRequested": "",
     "authFailed": "حدث خطأ في الطلب، قد تكون بيانات المصادقة المقدمة غير صحيحة.",
     "badRequest": "الطلب غير صالح. قد يكون ذلك بسبب معلمات غير صحيحة، مثل طلب بحث غير صحيح، أو قد يكون خطأ في STAC Browser.",
     "contactProvider": "يرجى التواصل مع مشغل الخدمة لحل هذه المشكلة.",
@@ -108,13 +109,20 @@
     "noExternalAccess": "الوصول إلى الكتالوجات الخارجية غير مسموح!",
     "notFound": "المورد المطلوب غير موجود. @:errors.contactProvider",
     "serverError": "واجه الخادم مشكلة. @:errors.contactProvider",
+    "title": "",
     "unauthorized": "يفتقر الطلب إلى بيانات الاعتماد، مثل رمز API. يرجى تقديم بيانات الاعتماد والمحاولة مرة أخرى."
   },
   "featureExperimental": "هذه الميزة لا تزال تجريبية وقد تعطي نتائج غير متوقعة!",
-  "features": {},
+  "features": {
+    "empty": "",
+    "noProperties": "",
+    "title": ""
+  },
   "fullscreen": {
     "exit": "الخروج من وضع ملء الشاشة",
-    "show": "عرض بملء الشاشة"
+    "exitLabel": "",
+    "show": "عرض بملء الشاشة",
+    "showLabel": ""
   },
   "goBack": {
     "description": "العودة إلى {type}",
@@ -151,13 +159,37 @@
   "loading": "جارٍ التحميل...",
   "map": "الخريطة",
   "mapping": {
-    "attribution": {},
-    "bboxSelect": {},
-    "layers": {},
-    "location": {},
+    "attribution": {
+      "label": "",
+      "description": "",
+      "collapseLabel": ""
+    },
+    "bboxSelect": {
+      "add": "",
+      "remove": ""
+    },
+    "close": "",
+    "fit": "",
+    "layers": {
+      "title": "",
+      "base": "",
+      "unnamed": "",
+      "footprint": ""
+    },
+    "location": {
+      "description": ""
+    },
+    "nobasemap": "",
+    "nodata": "",
     "zoom": {
-      "in": {},
-      "out": {}
+      "in": {
+        "description": "",
+        "label": ""
+      },
+      "out": {
+        "description": "",
+        "label": ""
+      }
     }
   },
   "messageForSchemaError": "{message}، للمخطط {schemaPath}",
@@ -246,6 +278,7 @@
     "notSupported": "بحث العناصر غير مدعوم من قبل API.",
     "placeholder": "بحث...",
     "selectCollections": "حدد مجموعة واحدة أو أكثر...",
+    "selectDateRange": "",
     "selectForItemSearch": "حدد للبحث عن عنصر",
     "spatialExtent": "النطاق المكاني",
     "tabs": {
