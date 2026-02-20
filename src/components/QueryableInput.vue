@@ -87,8 +87,6 @@
       <Description v-if="operator.description" :description="operator.description" inline />
       <Description v-if="queryable.description" :description="queryable.description" inline />
     </div>
-
-
   </div>
 </template>
 
@@ -208,9 +206,13 @@ export default {
     },
     onArrayPaste(event) {
       const clipboardData = event.clipboardData || window.clipboardData;
-      if (!clipboardData) return;
+      if (!clipboardData) {
+        return;
+      }
       const pasted = clipboardData.getData('text');
-      if (!pasted || !pasted.includes(',')) return;
+      if (!pasted || !pasted.includes(',')) {
+        return;
+      }
       event.preventDefault();
       const items = pasted.split(',').map(s => s.trim()).filter(s => s !== '');
       const currentArr = this.value?.value || [];
