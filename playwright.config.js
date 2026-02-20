@@ -66,18 +66,28 @@ export default defineConfig({
   ],
 
   /* Run your local dev server before starting the tests */
-  webServer: process.env.CI 
+  webServer: [ process.env.CI 
     ? {
         // In CI: Build and serve the production build
         command: 'npm run build && npx vite preview --port 4173 --strictPort',
+        name: 'Frontend',
         url: 'http://localhost:4173',
         reuseExistingServer: false,
         timeout: 120 * 1000,
       }
     : {
         command: 'npm start',
+        name: 'Frontend',
         url: 'http://localhost:8080',
         reuseExistingServer: true,
         timeout: 120 * 1000,
       },
+    {
+      command: 'npm run mock-api',
+      name: 'Mock Stac-API',
+      url: 'http://localhost:8000',
+      reuseExistingServer: !process.env.CI,
+      timeout: 120 * 1000,
+    }
+  ]
 });
