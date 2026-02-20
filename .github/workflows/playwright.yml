@@ -43,7 +43,6 @@ jobs:
       run: npx playwright test
       env:
         CI: true
-        PLAYWRIGHT_BASE_URL: https://radiantearth.github.io
      
     - name: Upload test results
       uses: actions/upload-artifact@v4
