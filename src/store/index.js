@@ -4,6 +4,8 @@ import URI from "urijs";
 
 import i18n, { getDataLanguages, translateFields, executeCustomFunctions, loadMessages } from '../i18n';
 import Utils, { BrowserError } from '../utils';
+import { hasText, isObject } from 'stac-js/src/utils.js';
+import { toAbsolute } from 'stac-js/src/http.js';
 import { addMissingChildren, getDisplayTitle, createSTAC } from '../models/stac';
 import { CatalogLike, STAC } from 'stac-js';
 
@@ -65,7 +67,7 @@ function getStore(config, router) {
     getters: {
       isRoot: (state, getters) => {
         if (state.data instanceof STAC) {
-          return state.data.equals(getters.root);
+          return state.data.is(getters.root);
         }
         return false;
       },
@@ -91,7 +93,7 @@ function getStore(config, router) {
         else if (state.data instanceof STAC) {
           description = state.data.getMetadata('description');
         }
-        return Utils.hasText(description) ? description : "";
+        return hasText(description) ? description : "";
       },
       getApiItemsLoading: state => data => {
         let id = '';
@@ -111,13 +113,13 @@ function getStore(config, router) {
         if (source instanceof STAC) {
           return source;
         }
-        if (Utils.isObject(source) && Utils.hasText(source.href)) {
+        if (isObject(source) && hasText(source.href)) {
           source = source.href;
         }
-        if (!Utils.hasText(source)) {
+        if (!hasText(source)) {
           return null;
         }
-        let absoluteUrl = Utils.toAbsolute(source, state.url);
+        let absoluteUrl = toAbsolute(source, state.url);
         let data = state.database[absoluteUrl];
         if (data instanceof STAC || (returnErrorObject && data instanceof Error)) {
           return data;
@@ -249,11 +251,11 @@ function getStore(config, router) {
       },
 
       toBrowserPath: (state, getters) => url => {
-        if (!Utils.hasText(url)) {
+        if (!hasText(url)) {
           url = '/';
         }
 
-        let absolute = Utils.toAbsolute(url, state.url, false);
+        let absolute = toAbsolute(url, state.url, false);
         let relative;
         if (!state.allowSelectCatalog && state.catalogUrl) {
           relative = absolute.relativeTo(state.catalogUrl);
@@ -283,7 +285,7 @@ function getStore(config, router) {
       },
       fromBrowserPath: (state, getters) => url => {
         const externalRE = /^\/((search|validation)\/)?external\//;
-        if (!Utils.hasText(url) || url === '/') {
+        if (!hasText(url) || url === '/') {
           url = state.catalogUrl;
         }
         else if (url.match(externalRE)) {
@@ -298,7 +300,7 @@ function getStore(config, router) {
           url = `${protocol}//${parts.join('/')}`;
         }
         else if (!state.allowSelectCatalog && state.catalogUrl) {
-          url = Utils.toAbsolute(url, state.catalogUrl, false);
+          url = toAbsolute(url, state.catalogUrl, false);
         }
         return getters.getRequestUrl(url, null, true);
       },
@@ -326,7 +328,7 @@ function getStore(config, router) {
         return relativeStr.startsWith('//') || relativeStr.startsWith('../');
       },
       getRequestUrl: (state, getters) => (url, baseUrl = null, addLocalQueryParams = false) => {
-        let absoluteUrl = Utils.toAbsolute(url, baseUrl ? baseUrl : state.url, false);
+        let absoluteUrl = toAbsolute(url, baseUrl ? baseUrl : state.url, false);
         if (!getters.isExternalUrl(absoluteUrl)) {
           // Check whether private params are present and add them if the URL is part of the catalog
           addQueryIfNotExists(absoluteUrl, state.privateQueryParameters);
@@ -346,7 +348,7 @@ function getStore(config, router) {
         // Wildcard has the lowest priority
         languages['*'] = 0.1;
         // The fallback locale for STAC Browser
-        if (Utils.hasText(state.fallbackLocale)) {
+        if (hasText(state.fallbackLocale)) {
           languages[state.fallbackLocale] = 0.2;
         }
         // Locales defined by the browser in ascending order
@@ -356,7 +358,7 @@ function getStore(config, router) {
         if (Array.isArray(navigator.languages)) {
           navigator.languages.forEach((locale, i) => languages[locale] = 0.8 - Math.min((i * 0.1), 0.5));
         }
-        if (Utils.hasText(state.locale)) {
+        if (hasText(state.locale)) {
           // Add the more generic locale code as well.
           // For example, 'de' in addition to 'de-CH'.
           if (state.locale.includes('-')) {
@@ -550,7 +552,7 @@ function getStore(config, router) {
         }
       },
       setApiItems(state, { data, stac, show }) {
-        if (!Utils.isObject(data) || !Array.isArray(data.features)) {
+        if (!isObject(data) || !Array.isArray(data.features)) {
           return;
         }
         let apiItems = data.features.map(feature => processSTAC(state, feature));
@@ -580,10 +582,11 @@ function getStore(config, router) {
         }
       },
       addApiCollections(state, { data, stac, show }) {
-        if (!Utils.isObject(data) || !Array.isArray(data.collections)) {
+        if (!isObject(data) || !Array.isArray(data.collections)) {
           return;
         }
 
+        // todo: Convert to stac-js
         let collections = data.collections.map(collection => processSTAC(state, collection));
         let nextLink = Utils.getLinkWithRel(data.links, 'next');
         if (show) {
@@ -684,7 +687,7 @@ function getStore(config, router) {
           if (!parentLink) {
             break;
           }
-          let url = Utils.toAbsolute(parentLink.href, stac.getAbsoluteUrl());
+          let url = toAbsolute(parentLink.href, stac.getAbsoluteUrl());
           await cx.dispatch('load', { url, omitApi: true });
           let parentStac = cx.getters.getStac(url, true);
           if (parentStac instanceof Error) {
@@ -718,7 +721,7 @@ function getStore(config, router) {
         } = args;
 
         const path = cx.getters.toBrowserPath(url);
-        url = Utils.toAbsolute(url, cx.state.url);
+        url = toAbsolute(url, cx.state.url);
 
         // Make sure we have all authentication details
         await cx.dispatch("auth/waitForAuth");
@@ -739,7 +742,7 @@ function getStore(config, router) {
           cx.commit('loading', { url, loading });
           try {
             const response = await stacRequest(cx, url);
-            if (!Utils.isObject(response.data)) {
+            if (!isObject(response.data)) {
               throw new BrowserError(i18n.global.t('errors.invalidJsonObject'));
             }
             data = createSTAC(response.data, url, path);
@@ -814,7 +817,7 @@ function getStore(config, router) {
           if (!catalogUrl) {
             const root = data.getLinkWithRel('root');
             if (root) {
-              catalogUrl = Utils.toAbsolute(root.href, url);
+              catalogUrl = toAbsolute(root.href, url);
               await cx.dispatch('config', { catalogUrl });
             }
           }
@@ -846,20 +849,21 @@ function getStore(config, router) {
           link = Utils.addFiltersToLink(link, filters, cx.state.itemsPerPage);
 
           let response = await stacRequest(cx, link);
-          if (!Utils.isObject(response.data) || !Array.isArray(response.data.features)) {
+          if (!isObject(response.data) || !Array.isArray(response.data.features)) {
             throw new BrowserError(i18n.global.t('errors.invalidStacItems'));
           }
           else {
+            // todo: Convert data to stac-js
             response.data.features = response.data.features.map(item => {
               try {
-                if (!Utils.isObject(item) || item.type !== 'Feature') {
+                if (!isObject(item) || item.type !== 'Feature') {
                   return null;
                 }
                 // See https://github.com/radiantearth/stac-browser/issues/486
                 let selfLink = Utils.getLinkWithRel(item.links, 'self');
                 let url;
                 if (selfLink?.href) {
-                  url = Utils.toAbsolute(selfLink.href, baseUrl, false);
+                  url = toAbsolute(selfLink.href, baseUrl, false);
                 }
                 else if (typeof item.id !== 'undefined') {
                   let apiCollectionsLink = cx.getters.root?.getApiCollectionsLink()?.href;
@@ -867,19 +871,19 @@ function getStore(config, router) {
                     apiCollectionsLink = new URI(apiCollectionsLink);
                   }
                   if (baseUrl && baseUrl.path().endsWith('/')) {
-                    url = Utils.toAbsolute(`items/${item.id}`, baseUrl, false);
+                    url = toAbsolute(`items/${item.id}`, baseUrl, false);
                   }
                   else if (baseUrl) {
-                    url = Utils.toAbsolute(`${collectionId}/items/${item.id}`, baseUrl, false);
+                    url = toAbsolute(`${collectionId}/items/${item.id}`, baseUrl, false);
                   }
                   else if (apiCollectionsLink?.path().endsWith('/')) {
-                    url = Utils.toAbsolute(`${collectionId}/items/${item.id}`, apiCollectionsLink, false);
+                    url = toAbsolute(`${collectionId}/items/${item.id}`, apiCollectionsLink, false);
                   }
                   else if (apiCollectionsLink) {
-                    url = Utils.toAbsolute(`collections/${collectionId}/items/${item.id}`, apiCollectionsLink, false);
+                    url = toAbsolute(`collections/${collectionId}/items/${item.id}`, apiCollectionsLink, false);
                   }
                   else if (cx.state.catalogUrl) {
-                    url = Utils.toAbsolute(`collections/${collectionId}/items/${item.id}`, cx.state.catalogUrl, false);
+                    url = toAbsolute(`collections/${collectionId}/items/${item.id}`, cx.state.catalogUrl, false);
                   }
                   else {
                     return null;
@@ -944,15 +948,16 @@ function getStore(config, router) {
         }
         try {
           let response = await stacRequest(cx, link);
-          if (!Utils.isObject(response.data) || !Array.isArray(response.data.collections)) {
+          if (!isObject(response.data) || !Array.isArray(response.data.collections)) {
             throw new BrowserError(i18n.global.t('errors.invalidStacCollections'));
           }
           else {
+            // todo: Convert data to stac-js
             response.data.collections = response.data.collections.map(collection => {
               let selfLink = Utils.getLinkWithRel(collection.links, 'self');
               let url;
               if (selfLink?.href) {
-                url = Utils.toAbsolute(selfLink.href, cx.state.url || stac.getAbsoluteUrl(), false);
+                url = toAbsolute(selfLink.href, cx.state.url || stac.getAbsoluteUrl(), false);
               }
               else {
                 // see https://github.com/radiantearth/stac-browser/issues/486
@@ -962,7 +967,7 @@ function getStore(config, router) {
                   if (!baseUrl.path().endsWith('/')) {
                     baseUrl.path(baseUrl.path() + '/');
                   }
-                  url = Utils.toAbsolute(`collections/${collection.id}`, baseUrl, false);
+                  url = toAbsolute(`collections/${collection.id}`, baseUrl, false);
                 }
               }
               if (!url) {
@@ -996,7 +1001,7 @@ function getStore(config, router) {
       },
       async loadOgcApiConformance(cx, link) {
         let response = await stacRequest(cx, link);
-        if (Utils.isObject(response.data) && Array.isArray(response.data.conformsTo)) {
+        if (isObject(response.data) && Array.isArray(response.data.conformsTo)) {
           cx.commit('setConformanceClasses', response.data.conformsTo);
         }
       },
@@ -1019,7 +1024,8 @@ function getStore(config, router) {
       },
       async altDownload(cx, link) {
         try {
-          cx.commit('startDownload', {href: link.href});
+          const href = cx.getters.getRequestUrl(link.href);
+          cx.commit('startDownload', {href});
           const StreamSaver = (await import('streamsaver-js')).default;
 
           const uri = URI(window.origin.toString());

@@ -64,6 +64,8 @@
 
 <script>
 import Utils from '../utils';
+import { isObject, size } from 'stac-js/src/utils.js';
+import { toAbsolute } from 'stac-js/src/http.js';
 import SearchFilter from '../components/SearchFilter.vue';
 import Loading from '../components/Loading.vue';
 import ErrorAlert from '../components/ErrorAlert.vue';
@@ -75,7 +77,7 @@ import { mapGetters, mapState } from "vuex";
 import { BTab, BTabs } from 'bootstrap-vue-next';
 
 export default defineComponent({
-  name: "Search",
+  name: "ApiSearch",
   components: {
     Catalogs: defineAsyncComponent(() => import('../components/Catalogs.vue')),
     BTabs,
@@ -111,7 +113,7 @@ export default defineComponent({
     ...mapState(['catalogUrl', 'catalogTitle', 'searchResultsPerPage', 'itemsPerPage', 'collectionsPerPage']),
     ...mapGetters(['canSearchItems', 'canSearchCollections', 'getStac', 'root', 'collectionLink', 'parentLink', 'fromBrowserPath', 'toBrowserPath']),
     selectedCollectionCount() {
-      return Utils.size(this.selectedCollections);
+      return size(this.selectedCollections);
     },
     totalCount() {
       if (typeof this.data.numberMatched === 'number') {
@@ -144,38 +146,23 @@ export default defineComponent({
       }
     },
     results() {
-      if (Utils.size(this.data) === 0) {
+      if (!this.data) {
         return [];
       }
-      let list = this.isCollectionSearch ? this.data.collections : this.data.features;
-      let type = this.isCollectionSearch ? 'Collection' : 'Feature';
-      if (!Array.isArray(list)) {
-        return [];
-      }
-      // todo: use itemcollection class
-      return list
-        .map(obj => {
+      return this.data
+        .getAll()
+        .map(stac => {
           try {
-            if (!Utils.isObject(obj) || obj.type !== type) {
-              return null;
-            }
-            let selfLink = Utils.getLinkWithRel(obj.links, 'self');
-            let url;
-            if (selfLink?.href) {
-              url = Utils.toAbsolute(selfLink.href, this.link.href);
-            }
-            let stac = createSTAC(obj, url, this.toBrowserPath(url));
-            stac = processSTAC(this.$store.state, stac);
-            return stac;
+            stac.path = this.toBrowserPath(stac.getAbsoluteUrl());
+            return processSTAC(this.$store.state, stac);
           } catch (error) {
             console.error(error);
             return null;
           }
-        })
-        .filter(obj => obj instanceof STAC);
+        });
     },
     pagination() {
-      return Utils.getPaginationLinks(this.data);
+      return this.data?.getPaginationLinks() || {};
     },
     filters() {
       return this.isCollectionSearch ? this.collectionFilters : this.itemFilters;
@@ -258,15 +245,15 @@ export default defineComponent({
         if (response) {
           this.showPage(response.config.url);
         }
-        if (!Utils.isObject(response.data) || !Array.isArray(response.data[key])) {
-          this.data = {};
+        if (!isObject(response.data) || !Array.isArray(response.data[key])) {
+          this.data = null;
           this.error = this.$t(this.isCollectionSearch ? 'errors.invalidStacCollections' : 'errors.invalidStacItems');
         }
         else {
-          this.data = response.data;
+          this.data = createSTAC(response.data);
         }
       } catch (error) {
-        this.data = {};
+        this.data = null;
         this.error = getErrorMessage(error);
         this.errorId = getErrorCode(error);
       } finally {

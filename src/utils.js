@@ -1,41 +1,12 @@
 import URI from 'urijs';
 import removeMd from 'remove-markdown';
-import { stacPagination } from "./rels";
 import { Link, Asset } from 'stac-js';
+import { hasText, isObject, size } from 'stac-js/src/utils.js';
+import { geojsonMediaType, imageMediaTypes, stacMediaTypes } from 'stac-js/src/mediatypes.js';
+import { pagination } from "stac-js/src/relations.js";
 
 export const commonFileNames = ['catalog', 'collection', 'item'];
 
-export const geojsonMediaType = "application/geo+json";
-
-export const schemaMediaType = "application/schema+json";
-
-export const stacMediaTypes = [
-  'application/json',
-  geojsonMediaType,
-  'text/json'
-];
-
-export const browserImageTypes = [
-  'image/gif',
-  'image/jpg',
-  'image/jpeg',
-  'image/apng',
-  'image/png',
-  'image/webp'
-];
-
-export const cogMediaTypes = [
-  "image/tiff; application=geotiff; profile=cloud-optimized",
-  "image/vnd.stac.geotiff; cloud-optimized=true"
-];
-
-export const geotiffMediaTypes = [
-  "application/geotiff",
-  "image/tiff; application=geotiff",
-  "image/vnd.stac.geotiff",
-].concat(cogMediaTypes);
-
-export const imageMediaTypes = browserImageTypes.concat(geotiffMediaTypes);
 export const mapMediaTypes = imageMediaTypes.concat([geojsonMediaType]);
 
 export class BrowserError extends Error {
@@ -50,43 +21,6 @@ export class BrowserError extends Error {
  * @class
  */
 export default class Utils {
-
-  /**
-   * Checks whether a variable is a real object or not.
-   * 
-   * This is a more strict version of `typeof x === 'object'` as this example would also succeeds for arrays and `null`.
-   * This function only returns `true` for real objects and not for arrays, `null` or any other data types.
-   * 
-   * @param {*} obj - A variable to check.
-   * @returns {boolean} - `true` is the given variable is an object, `false` otherwise.
-   */
-  static isObject(obj) {
-    return (typeof obj === 'object' && obj === Object(obj) && !Array.isArray(obj));
-  }
-
-  /**
-   * Computes the size of an array (number of array elements) or object (number of key-value-pairs).
-   * 
-   * Returns 0 for all other data types.
-   * 
-   * @param {*} obj 
-   * @returns {integer}
-   */
-  static size(obj) {
-    if (typeof obj === 'object' && obj !== null) {
-      if (Array.isArray(obj)) {
-        return obj.length;
-      }
-      else {
-        return Object.keys(obj).length;
-      }
-    }
-    return 0;
-  }
-
-  static isStacMediaType(type, allowEmpty = false) {
-    return Utils.isMediaType(type, stacMediaTypes, allowEmpty);
-  }
 
   static isMediaType(type, types, allowEmpty = false) {
     if (!Array.isArray(types)) {
@@ -103,16 +37,6 @@ export default class Utils {
     }
   }
 
-  /**
-   * Checks whether a variable is a string and contains at least one character.
-   * 
-   * @param {*} string - A variable to check.
-   * @returns {boolean} - `true` is the given variable is an string with length > 0, `false` otherwise.
-   */
-  static hasText(string) {
-    return (typeof string === 'string' && string.length > 0);
-  }
-
   static shortenTitle(fullStr, strLen, separator = '…') {
     if (fullStr.length <= strLen) {
       return fullStr;
@@ -127,34 +51,12 @@ export default class Utils {
            fullStr.substr(fullStr.length - backChars);
   }
 
-  static toAbsolute(href, baseUrl, stringify = true) {
-    return Utils.normalizeUri(href, baseUrl, false, stringify);
-  }
-
-  static normalizeUri(href, baseUrl = null, noParams = false, stringify = true) {
-    // Parse URL and make absolute, if required
-    let uri = URI(href);
-    if (baseUrl && uri.is("relative")) {
-      uri = uri.absoluteTo(baseUrl);
-    }
-    uri.normalize();
-    if (noParams) {
-      uri.query("");
-      uri.fragment("");
-    }
-    return stringify ? uri.toString() : uri;
-  }
-
   static getLinkWithRel(links, rel) {
-    return Array.isArray(links) ? links.find(link => Utils.isObject(link) && Utils.hasText(link.href) && link.rel === rel) : null;
+    return Array.isArray(links) ? links.find(link => isObject(link) && hasText(link.href) && link.rel === rel) : null;
   }
 
   static getLinksWithRels(links, rels) {
-    return Array.isArray(links) ? links.filter(link => Utils.isObject(link) && Utils.hasText(link.href) && rels.includes(link.rel)) : [];
-  }
-
-  static getLinksWithOtherRels(links, rels) {
-    return Array.isArray(links) ? links.filter(link => Utils.isObject(link) && Utils.hasText(link.href) && !rels.includes(link.rel)) : [];
+    return Array.isArray(links) ? links.filter(link => isObject(link) && hasText(link.href) && rels.includes(link.rel)) : [];
   }
 
   static removeTrailingSlash(str) {
@@ -175,7 +77,7 @@ export default class Utils {
   }
 
   static summarizeMd(text, maxLength = null) {
-    if (!Utils.hasText(text)) {
+    if (!hasText(text)) {
       return '';
     }
     // Best-effort approach to remove some CommonMark (Markdown).
@@ -255,10 +157,11 @@ export default class Utils {
     return [sortby];
   }
 
+  // todo: remove when all usage is gone, replace with stac-js method
   static getPaginationLinks(data) {
     let pages = {};
-    if (Utils.isObject(data)) {
-      let pageLinks = Utils.getLinksWithRels(data.links, stacPagination);
+    if (isObject(data)) {
+      let pageLinks = Utils.getLinksWithRels(data.links, pagination);
       for (let pageLink of pageLinks) {
         let rel = pageLink.rel === 'previous' ? 'prev' : pageLink.rel;
         pages[rel] = pageLink;
@@ -272,10 +175,10 @@ export default class Utils {
       return (value === null
       || (typeof value === 'number' && !Number.isFinite(value))
       || (typeof value === 'string' && value.length === 0)
-      || (typeof value === 'object' && Utils.size(value) === 0));
+      || (typeof value === 'object' && size(value) === 0));
     };
 
-    if (!Utils.isObject(filters)) {
+    if (!isObject(filters)) {
       filters = {};
     }
     else {
@@ -286,7 +189,7 @@ export default class Utils {
       filters.limit = defaultLimit;
     }
 
-    if (Utils.hasText(link.method) && link.method.toUpperCase() === 'POST') {
+    if (hasText(link.method) && link.method.toUpperCase() === 'POST') {
       let body = Object.assign({}, link.body);
 
       for (let key in filters) {
@@ -392,7 +295,7 @@ export default class Utils {
     if (typeof searchterm !== 'string' || searchterm.length === 0) {
       return false;
     }
-    if (Utils.isObject(target)) {
+    if (isObject(target)) {
       target = Object.values(target);
     }
     else if (typeof target === 'string') {
@@ -435,9 +338,9 @@ export default class Utils {
     }
     const source = sources.shift();
 
-    if (Utils.isObject(target) && Utils.isObject(source)) {
+    if (isObject(target) && isObject(source)) {
       for (const key in source) {
-        if (Utils.isObject(source[key])) {
+        if (isObject(source[key])) {
           if (!target[key]) {
             Object.assign(target, { [key]: {} });
           }
@@ -479,7 +382,7 @@ export default class Utils {
       }
     }
     // Fallback to the filename from the href
-    if (Utils.isObject(asset) && typeof asset.href === 'string') {
+    if (isObject(asset) && typeof asset.href === 'string') {
       return URI(asset.href).filename();
     }
     // Fallback to a default filename

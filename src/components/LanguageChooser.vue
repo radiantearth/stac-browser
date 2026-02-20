@@ -22,7 +22,7 @@ import { getBest, prepareSupported } from 'stac-js/src/locales';
 import { BDropdown, BDropdownItem } from 'bootstrap-vue-next';
 
 import { getDataLanguages, STAC_LANGUAGE_EXT } from '../i18n';
-import Utils from '../utils';
+import { isObject } from 'stac-js/src/utils.js';
 
 export default {
   name: 'LanguageChooser',
@@ -59,7 +59,7 @@ export default {
         dataLanguages.unshift(this.data.getMetadata('language'));
       }
       // Filter out invalid languages
-      return dataLanguages.filter(lang => Utils.isObject(lang) && typeof lang.code === 'string');
+      return dataLanguages.filter(lang => isObject(lang) && typeof lang.code === 'string');
     },
     supportsLanguageExt() {
       return this.data instanceof STAC && this.data.supportsExtension(STAC_LANGUAGE_EXT);
@@ -91,7 +91,7 @@ export default {
       // Add missing data languages
       const dataLanguages = getDataLanguages(this.data);
       for(let lang of dataLanguages) {
-        if (!Utils.isObject(lang) || !lang.code || this.locales.includes(lang.code)) {
+        if (!isObject(lang) || !lang.code || this.locales.includes(lang.code)) {
           continue;
         }
         let newLang = {

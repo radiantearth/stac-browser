@@ -168,17 +168,17 @@ export default {
       const condition = (event) => {
         if (event.type === 'singleclick') {
           if (!this.extent) {
-            let pixelSize = this.map.getSize().map(xy => xy * 0.2);
-            let extent = this.map.getView().calculateExtent(pixelSize);
-            let size = [
+            const pixelSize = this.map.getSize().map(xy => xy * 0.2);
+            const extent = this.map.getView().calculateExtent(pixelSize);
+            const extentSize = [
               extent[2] - extent[0],
               extent[3] - extent[1]
             ];
-            let mouseExtent = [
-              event.coordinate[0] - size[0],
-              event.coordinate[1] - size[1],
-              event.coordinate[0] + size[0],
-              event.coordinate[1] + size[1],
+            const mouseExtent = [
+              event.coordinate[0] - extentSize[0],
+              event.coordinate[1] - extentSize[1],
+              event.coordinate[0] + extentSize[0],
+              event.coordinate[1] + extentSize[1],
             ];
             this.interaction.setExtent(mouseExtent);
             return false;
@@ -251,8 +251,8 @@ export default {
     fixX(x) {
       // Normalize longitude to -180 to 180 range
       // For antimeridian crossing, westLon can be > eastLon
-      while (x > 180) x -= 360;
-      while (x < -180) x += 360;
+      while (x > 180) {x -= 360;}
+      while (x < -180) {x += 360;}
       return x;
     },
     fixY(y) {

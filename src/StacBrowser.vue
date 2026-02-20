@@ -104,6 +104,7 @@ import ErrorAlert from './components/ErrorAlert.vue';
 import StacLink from './components/StacLink.vue';
 
 import { CatalogLike, STAC } from 'stac-js';
+import { hasText, isObject, size } from 'stac-js/src/utils.js';
 import Utils from './utils';
 import URI from 'urijs';
 
@@ -197,7 +198,7 @@ export default defineComponent({
         return null;
       }
       let searchLink;
-      if (this.data instanceof CatalogLike && !this.data.equals(this.root)) {
+      if (this.data instanceof CatalogLike && !this.data.is(this.root)) {
         searchLink = this.data.getSearchLink();
       }
       if (searchLink) {
@@ -232,14 +233,14 @@ export default defineComponent({
         else if (this.data.isCatalog()) {
           return this.$t(`stacCatalog`, 1);
         }
-        else if (Utils.hasText(this.data.type)) {
+        else if (hasText(this.data.type)) {
           return this.data.type;
         }
       }
       return null;
     },
     collectionLinkTitle() {
-      if (this.collectionLink && Utils.hasText(this.collectionLink.title)) {
+      if (this.collectionLink && hasText(this.collectionLink.title)) {
         return this.$t('goToCollection.descriptionWithTitle', this.collectionLink);
       }
       else {
@@ -247,7 +248,7 @@ export default defineComponent({
       }
     },
     parentLinkTitle() {
-      if (this.parentLink && Utils.hasText(this.parentLink.title)) {
+      if (this.parentLink && hasText(this.parentLink.title)) {
         return this.$t('goToParent.descriptionWithTitle', this.parentLink);
       }
       else {
@@ -374,8 +375,8 @@ export default defineComponent({
         'showThumbnailsAsAssets'
       ];
 
-      let doReset = !root || (oldRoot && Utils.isObject(oldRoot['stac_browser']));
-      let doSet = root && Utils.isObject(root['stac_browser']);
+      let doReset = !root || (oldRoot && isObject(oldRoot['stac_browser']));
+      let doSet = root && isObject(root['stac_browser']);
 
       for(let key of canChange) {
         let value;
@@ -449,7 +450,7 @@ export default defineComponent({
         .forEach(stream => stream.abort());
     });
     window.addEventListener('beforeunload', (evt) => {
-      if (Utils.size(this.downloads) > 0) {
+      if (size(this.downloads) > 0) {
         evt.preventDefault();
       }
     });
@@ -524,14 +525,14 @@ export default defineComponent({
         let value = query[key];
         // Store all private query parameters (start with ~) and replace them in the shown URI
         if (key.startsWith('~')) {
-          params.private = Utils.isObject(params.private) ? params.private : {};
+          params.private = isObject(params.private) ? params.private : {};
           params.private[key.substr(1)] = value;
           delete query[key];
         }
         // Store all state related parameters (start with .)
         else if (key.startsWith('.')) {
           let realKey = key.substr(1);
-          params.state = Utils.isObject(params.state) ? params.state : {};
+          params.state = isObject(params.state) ? params.state : {};
           if (Array.isArray(this.stateQueryParameters[realKey]) && !Array.isArray(value)) {
             value = value.split(',');
           }
@@ -539,13 +540,13 @@ export default defineComponent({
         }
         // All other parameters should be appended to the main STAC requests
         else {
-          if (!Utils.isObject(params.localRequest)) {
+          if (!isObject(params.localRequest)) {
             params.localRequest = {};
           }
           params.localRequest[key] = value;
         }
       }
-      if (Utils.size(params) > 0) {
+      if (size(params) > 0) {
         for (let type in params) {
           for (let key in params[type]) {
             this.$store.commit('setQueryParameter', {type, key, value: params[type][key]});
@@ -555,7 +556,7 @@ export default defineComponent({
       if (params?.state?.language) {
         this.switchLocale({locale: params.state.language});
       }
-      if (Utils.size(params.private) > 0) {
+      if (size(params.private) > 0) {
         this.$router.replace({ query });
       }
 
