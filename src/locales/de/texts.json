@@ -174,7 +174,6 @@
         "latOrder": "Südlicher Breitengrad muss kleiner als nördlicher Breitengrad sein",
         "lonOrder": "Westlicher Längengrad muss kleiner als östlicher Längengrad sein"
       },
-      "filterBySpatialExtent": "Nach räumlicher Ausdehnung filtern",
       "northLat": "Nördlicher Breitengrad",
       "remove": "Klicke in die Box, um sie zu entfernen.",
       "southLat": "Südlicher Breitengrad",

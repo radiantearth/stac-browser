@@ -174,7 +174,6 @@
         "latOrder": "South Latitude must be less than North Latitude",
         "lonOrder": "West Longitude must be less than East Longitude"
       },
-      "filterBySpatialExtent": "Filter by spatial extent",
       "northLat": "North Latitude",
       "remove": "Click inside the bounding box to remove it.",
       "southLat": "South Latitude",
