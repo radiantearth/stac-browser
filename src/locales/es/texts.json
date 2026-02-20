@@ -86,6 +86,7 @@
   },
   "description": "Descripción",
   "errors": {
+    "apiListRequested": "La petición es inválida. Actualmente no se soportan las peticiones directas a /collections o .../items.",
     "authFailed": "La petición falló, puede que los datos de autenticación sean incorrectos",
     "badRequest": "La petición es inválida. Esto puede deberse a parámetros incorrectos, por ejemplo, en la búsqueda, o puede ser un bug en STAC Browser.",
     "contactProvider": "Por favor contacte al proveedor de servicio para resolver este problema.",
