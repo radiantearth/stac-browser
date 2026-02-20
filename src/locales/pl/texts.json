@@ -86,6 +86,7 @@
   },
   "description": "Opis",
   "errors": {
+    "apiListRequested": "",
     "authFailed": "Wystąpił błąd żądania - podane dane uwierzytelniające mogą być niepoprawne.",
     "badRequest": "Żądanie jest nieprawidłowe. Może to być spowodowane nieprawidłowymi parametrami, np. w zapytaniu wyszukiwania, lub błędem w STAC Browser.",
     "contactProvider": "Skontaktuj się z administratorem, aby rozwiązaźć ten problem.",
@@ -277,6 +278,7 @@
     "notSupported": "Wyszukiwanie elementów nie jest obsługiwane przez API.",
     "placeholder": "Wyszukaj...",
     "selectCollections": "Wybierz jedną lub więcej kolekcji...",
+    "selectDateRange": "",
     "selectForItemSearch": "Wybierz do wyszukiwania elementu",
     "spatialExtent": "Zasięg przestrzenny",
     "tabs": {
