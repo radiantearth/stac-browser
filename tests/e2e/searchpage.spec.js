@@ -211,11 +211,11 @@ test.describe('STAC Browser Search page', () => {
     });
   });
 
-  test('Manual spatial extent shows longitude order error for same hemisphere', async ({ page }) => {
+  test('Manual spatial extent shows longitude order error when west is east of east', async ({ page }) => {
     await mockApiRootAndCollections(page);
     await page.goto(SEARCH_PATH);
 
-    await test.step('Test west longitude > east longitude error', async () => {
+    await test.step('Test west longitude > east longitude error (both negative)', async () => {
       await enableSpatialExtentInputs(page);
 
       await fillBboxInputs(page, {
@@ -231,11 +231,11 @@ test.describe('STAC Browser Search page', () => {
     });
   });
 
-  test('Manual spatial extent allows antimeridian crossing', async ({ page }) => {
+  test('Manual spatial extent allows antimeridian crossing (positive west, negative east)', async ({ page }) => {
     await mockApiRootAndCollections(page);
     await page.goto(SEARCH_PATH);
 
-    await test.step('Allow west longitude > east longitude when crossing', async () => {
+    await test.step('Allow west > east when crossing antimeridian', async () => {
       await enableSpatialExtentInputs(page);
 
       await fillBboxInputs(page, {
@@ -247,7 +247,7 @@ test.describe('STAC Browser Search page', () => {
 
       await page.getByLabel(/north latitude/i).blur();
 
-      await expect(page.getByText(/West Longitude must be less than East Longitude/i)).toBeHidden();
+      await expect(page.getByText(/West Longitude must be less than East Longitude/i)).toHaveCount(0);
     });
   });
 

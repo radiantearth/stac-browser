@@ -328,10 +328,14 @@ export default {
         errors.eastLon = this.$t('mapping.bboxSelect.error.invalidLon');
       }
 
-      // If not crossing the antimeridian, westLon must be < eastLon
-      const sameHemisphere = (westLon >= 0 && eastLon >= 0) || (westLon <= 0 && eastLon <= 0);
-      if (!errors.westLon && !errors.eastLon && sameHemisphere && westLon > eastLon) {
-        errors.westLon = this.$t('mapping.bboxSelect.error.lonOrder');
+      // Longitude order: westLon must be < eastLon unless crossing the antimeridian.
+      // Antimeridian crossing is when west is in positive longitudes and east is in
+      // negative longitudes (e.g., westLon=170, eastLon=-170 wraps across 180°).
+      if (!errors.westLon && !errors.eastLon) {
+        const crossesAntimeridian = westLon > 0 && eastLon < 0;
+        if (westLon >= eastLon && !crossesAntimeridian) {
+          errors.westLon = this.$t('mapping.bboxSelect.error.lonOrder');
+        }
       }
       
       // Check latitude values (must be between -90 and 90)
@@ -370,12 +374,19 @@ export default {
         this.bboxValues.northLat
       ];
       
-      // Update local state and emit to parent directly
+      // Update local state and emit STAC-compliant bbox to parent
       this.extent = extent;
       this.$emit('update:modelValue', extent);
       
-      // Update map to show the extent
-      const projectedExtent = transformExtent(extent, this.crs, this.map.getView().getProjection());
+      // For map display, handle antimeridian crossing by making the extent
+      // continuous. OpenLayers can't render extents where left > right in
+      // projected coordinates, so we shift eastLon by +360 to unwrap it.
+      const crossesAntimeridian = extent[0] > 0 && extent[2] < 0;
+      const mapExtent = crossesAntimeridian
+        ? [extent[0], extent[1], extent[2] + 360, extent[3]]
+        : extent;
+      
+      const projectedExtent = transformExtent(mapExtent, this.crs, this.map.getView().getProjection());
       this.map.getView().fit(projectedExtent, { padding: [50,50,50,50], maxZoom: this.maxZoom });
       // Update the interaction to show the extent on the map
       this.interaction.setExtent(projectedExtent);
