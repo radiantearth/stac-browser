@@ -41,12 +41,12 @@
     "password": "Parola",
     "required": "Autentificare necesară",
     "schemeTypes": {
-      "http": "HTTP {scheme}",
-      "s3": "S3",
-      "signedUrl": "URL Semnat",
-      "oauth2": "OAuth 2",
       "apiKey": "Cheie API",
-      "openIdConnect": "OpenID Connect"
+      "http": "HTTP {scheme}",
+      "oauth2": "OAuth 2",
+      "openIdConnect": "OpenID Connect",
+      "s3": "S3",
+      "signedUrl": "URL Semnat"
     },
     "title": "Autentificare",
     "unauthorized": "Nu aveți permisiuni să accesați aceste date. Autentificare necesară.",
@@ -86,6 +86,7 @@
   },
   "description": "Descriere",
   "errors": {
+    "apiListRequested": "",
     "authFailed": "Solicitarea a eșuat, credențialele furnizate ar putea fi incorecte.",
     "badRequest": "Solicitarea nu este validă. Acest lucru se poate datora unor parametri de căutare invalizi sau a unei erori în browserul STAC",
     "contactProvider": "Vă rugăm să contactați operatorul serviciului pentru a rezolva această problemă.",
@@ -113,7 +114,9 @@
   },
   "featureExperimental": "Această funcție este încă experimentală și poate da rezultate neașteptate!",
   "features": {
-    "noProperties": "Nu au fost furnizate proprietăți."
+    "empty": "",
+    "noProperties": "Nu au fost furnizate proprietăți.",
+    "title": ""
   },
   "fullscreen": {
     "exit": "Ieși din modul ecran complet",
@@ -157,20 +160,37 @@
   "map": "Hartă",
   "mapping": {
     "attribution": {
-      "label": "i",
-      "collapseLabel": "✕"
+      "collapseLabel": "✕",
+      "description": "",
+      "label": "i"
     },
-    "bboxSelect": {},
+    "bboxSelect": {
+      "add": "",
+      "eastLon": "",
+      "error": {
+        "incomplete": "",
+        "invalidLat": "",
+        "invalidLon": "",
+        "latOrder": "",
+        "lonOrder": ""
+      },
+      "northLat": "",
+      "remove": "",
+      "southLat": "",
+      "westLon": ""
+    },
     "close": "Închidere",
+    "fit": "",
     "layers": {
-      "title": "Straturi",
       "base": "Straturi de bază",
-      "unnamed": "Fără nume #{id}",
-      "footprint": "Amprentă la sol"
+      "footprint": "Amprentă la sol",
+      "title": "Straturi",
+      "unnamed": "Fără nume #{id}"
     },
     "location": {
       "description": "Mergi la locație"
     },
+    "nobasemap": "",
     "nodata": "Nu sunt informații spațiale disponibile în metadate.",
     "zoom": {
       "in": {
@@ -269,6 +289,7 @@
     "notSupported": "Căutarea articolelor nu este acceptată de API.",
     "placeholder": "Căutare...",
     "selectCollections": "Selectați una sau mai multe colecții...",
+    "selectDateRange": "",
     "selectForItemSearch": "Selectați pentru Căutare Articol",
     "spatialExtent": "Întinderea spațială",
     "tabs": {
@@ -317,8 +338,8 @@
       "message": "{title} este disponibil la adresa {url}",
       "sharePageWithOthers": "Partajați URL-ul acestei pagini cu alții:",
       "title": "Partajare",
-      "x": "X (Twitter)",
-      "withOthers": "Partajați această pagină"
+      "withOthers": "Partajați această pagină",
+      "x": "X (Twitter)"
     },
     "stacExtension": "Extensie STAC",
     "stacVersion": "Versiune STAC",
