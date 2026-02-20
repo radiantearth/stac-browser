@@ -83,6 +83,10 @@ export default defineConfig(({ mode }) => ({
     STAC_BROWSER_VERSION: JSON.stringify(package_.version),
     CONFIG: JSON.stringify(config),
   },
+  // See https://github.com/vitejs/vite/discussions/14801#discussioncomment-15550931 for details
+  optimizeDeps: {
+    include: ["bootstrap-vue-next/components/*"],
+  },
   plugins: [
     vue({
       template: {
