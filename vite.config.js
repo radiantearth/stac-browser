@@ -85,7 +85,15 @@ export default defineConfig(({ mode }) => ({
   },
   // See https://github.com/vitejs/vite/discussions/14801#discussioncomment-15550931 for details
   optimizeDeps: {
-    include: ["bootstrap-vue-next/components/*"],
+    include: [
+      "bootstrap-vue-next/components/*",
+      "commonmark",
+      "@radiantearth/stac-fields/*",
+      "v-clipboard",
+      "content-type",
+      "stac-node-validator",
+      "@musement/iso-duration"
+    ],
   },
   plugins: [
     vue({

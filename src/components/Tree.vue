@@ -40,7 +40,8 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex';
-import Utils from '../utils';
+import { isObject } from 'stac-js/src/utils.js';
+import { toAbsolute } from 'stac-js/src/http.js';
 import { getDisplayTitle, Collection } from '../models/stac';
 import { STAC } from 'stac-js';
 
@@ -103,9 +104,9 @@ export default {
           return null;
         }
       }
-      else if (Utils.isObject(this.item) && typeof this.item.href === 'string') {
+      else if (isObject(this.item) && typeof this.item.href === 'string') {
         if (this.parent) {
-          return Utils.toAbsolute(this.item.href, this.parent.getAbsoluteUrl());
+          return toAbsolute(this.item.href, this.parent.getAbsoluteUrl());
         }
         else {
           return this.item.href;

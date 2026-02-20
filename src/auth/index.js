@@ -1,5 +1,5 @@
 import i18n from '../i18n';
-import Utils from '../utils';
+import { hasText, isObject } from 'stac-js/src/utils.js';
 
 export default class Auth {
 
@@ -11,7 +11,7 @@ export default class Auth {
    * @param {Function} changeListener A change listener with two parameters: loggedIn (boolean) and credentials (string|null)
    */
   constructor(router, options = {}, changeListener = null) {
-    this.options = Utils.isObject(options) ? options : {};
+    this.options = isObject(options) ? options : {};
     this.changeListener = changeListener;
     this.router = router;
   }
@@ -95,7 +95,7 @@ export default class Auth {
         value = formatter(value);
       }
     }
-    if (!Utils.hasText(value)) {
+    if (!hasText(value)) {
       value = undefined;
     }
 
@@ -116,7 +116,7 @@ export default class Auth {
 
   static async create(router, config, changeListener) {
     let method = new Auth(router, config, changeListener);
-    if (Utils.isObject(config)) {
+    if (isObject(config)) {
       if (config.type === 'http' && config.scheme === 'basic') {
         const BasicAuth = (await import('./basic')).default;
         method = new BasicAuth(router, config, changeListener);

@@ -1,4 +1,4 @@
-import Utils from '../utils';
+import { isObject } from 'stac-js/src/utils.js';
 import StacFieldsMixin from './StacFieldsMixin';
 import { formatMediaType } from '@radiantearth/stac-fields/formatters';
 
@@ -12,10 +12,10 @@ export default {
         return [];
       }
       let assets = [];
-      if ((this.data.isItem() || this.data.isCollection()) && Utils.isObject(this.data.assets)) {
+      if ((this.data.isItem() || this.data.isCollection()) && isObject(this.data.assets)) {
         assets = assets.concat(Object.values(this.data.assets));
       }
-      if (this.data.isCollection() && Utils.isObject(this.data.item_assets)) {
+      if (this.data.isCollection() && isObject(this.data.item_assets)) {
         assets = assets.concat(Object.values(this.data.item_assets));
       }
       

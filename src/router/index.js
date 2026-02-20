@@ -23,7 +23,7 @@ function getRoutes(config) {
     routes.push({
       path: "/search/external/:pathMatch(.*)*",
       name: "search",
-      component: () => import("../views/Search.vue"),
+      component: () => import("../views/ApiSearch.vue"),
       props: route => {
         const path = catchAllString(route);
         return {
@@ -36,7 +36,7 @@ function getRoutes(config) {
     routes.push({
       path: "/search",
       name: "search",
-      component: () => import("../views/Search.vue")
+      component: () => import("../views/ApiSearch.vue")
     });
   }
 

@@ -41,7 +41,8 @@
 import { defineAsyncComponent } from 'vue';
 
 import Description from './Description.vue';
-import Utils, { imageMediaTypes, mapMediaTypes } from '../utils';
+import Utils, { mapMediaTypes } from '../utils';
+import { size } from 'stac-js/src/utils.js';
 import { mapGetters, mapState } from 'vuex';
 import AssetActions from '../../assetActions.config';
 import LinkActions from '../../linkActions.config';
@@ -49,6 +50,7 @@ import URI from 'urijs';
 import AuthUtils from './auth/utils';
 import { Asset } from 'stac-js';
 import { browserProtocols } from 'stac-js/src/http';
+import { imageMediaTypes } from 'stac-js/src/mediatypes';
 
 let i = 0;
 
@@ -171,7 +173,7 @@ export default {
       else if (typeof this.data.method === 'string' && this.data.method.toUpperCase() !== 'GET') {
         return true;
       }
-      else if (Utils.size(this.data.headers) > 0 || Utils.size(this.requestHeaders) > 0) {
+      else if (size(this.data.headers) > 0 || size(this.requestHeaders) > 0) {
         return true;
       }
       return false;
@@ -203,13 +205,6 @@ export default {
         return null;
       }
       return this.getRequestUrl(this.data.getAbsoluteUrl());
-    },
-    assetWithHref() {
-      // Override asset href with absolute URL
-      // Clone asset so that we can change the href
-      const data = new Asset(this.data);
-      data.href = this.href;
-      return data;
     },
     from() {
       return this.protocolName(this.protocol);
@@ -251,7 +246,7 @@ export default {
         return;
       }
 
-      await this.$store.dispatch('altDownload', this.assetWithHref);
+      await this.$store.dispatch('altDownload', this.data);
     },
     protocolName(protocol) {
       if (typeof protocol !== 'string') {
@@ -284,8 +279,12 @@ export default {
       return '';
     },
     show() {
-      // todo: can we use data.getAbsoluteUrl in all places where we handle the event in favor of the cloning/updating here?
-      this.$emit('show', this.assetWithHref);
+      // Clone asset so that we can change the href.
+      // The this.href may include query parameters for authentication due to getRequestUrl.
+      // Unless we make authentication data available to ol-stac in a different way, we have to add it here.
+      const data = new Asset(this.data);
+      data.href = this.href;
+      this.$emit('show', data);
     },
     handleAuthButton() {
       if (this.auth.length === 1) {
