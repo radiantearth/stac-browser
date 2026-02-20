@@ -2,8 +2,8 @@ import URI from 'urijs';
 import removeMd from 'remove-markdown';
 import { Link, Asset } from 'stac-js';
 import { hasText, isObject, size } from 'stac-js/src/utils.js';
-import { geojsonMediaType, imageMediaTypes, stacMediaTypes } from 'stac-js/src/mediatypes.js';
-import { pagination } from "stac-js/src/relations.js";
+import { geojsonMediaType, imageMediaTypes } from 'stac-js/src/mediatypes.js';
+import { pagination } from "stac-js/src/relationtypes.js";
 
 export const commonFileNames = ['catalog', 'collection', 'item'];
 

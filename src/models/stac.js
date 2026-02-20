@@ -27,12 +27,14 @@ export function createSTAC(data, url, path, migrate = true, updateVersionNumber 
     obj = new Item(data, url, path);
   }
   else if (data.type === 'FeatureCollection') {
+    // todo: convert inner collections to stac-js as well
     obj = new ItemCollection(data, url, path);
   }
   else if (data.type === 'Collection' || (!data.type && typeof data.extent !== 'undefined' && typeof data.license !== 'undefined')) {
     obj = new Collection(data, url, path);
   }
   else if (!data.type && Array.isArray(data.collections)) {
+    // todo: convert inner collections to stac-js as well
     obj = new CollectionCollection(data, url, path);
   }
   else {

@@ -1,4 +1,5 @@
 import axios from "axios";
+import { markRaw } from 'vue';
 import { hasText, isObject, size } from 'stac-js/src/utils.js';
 import i18n from '../i18n';
 
@@ -60,7 +61,7 @@ export function processSTAC(state, stac) {
   if (typeof state.preprocessSTAC === 'function') {
     stac = state.preprocessSTAC(stac, state);
   }
-  return Object.freeze(stac);
+  return markRaw(stac);
 }
 
 export function isAuthenticationError(error) {
