@@ -83,8 +83,8 @@ export default defineConfig({
         timeout: 120 * 1000,
       },
     {
-      command: 'npm run mock-server',
-      name: 'Mock Stac-Backend',
+      command: 'npm run mock-api',
+      name: 'Mock Stac-API',
       url: 'http://localhost:8000',
       reuseExistingServer: !process.env.CI,
       timeout: 120 * 1000,
