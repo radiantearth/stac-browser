@@ -113,6 +113,7 @@ export default defineConfig(({ mode }) => ({
             BForm: true,
             BFormGroup: true,
             BFormInput: true,
+            BFormInvalidFeedback: true,
             BFormSelect: true,
             BFormCheckbox: true,
             BFormRadio: true,

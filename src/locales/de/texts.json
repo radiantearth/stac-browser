@@ -166,7 +166,18 @@
     },
     "bboxSelect": {
       "add": "Klicke auf die Karte, um eine Box für die räumliche Ausdehnung zu erstellen.",
-      "remove": "Klicke in die Box, um sie zu entfernen."
+      "eastLon": "Östlicher Längengrad",
+      "error": {
+        "incomplete": "Koordinate fehlt",
+        "invalidLat": "Muss zwischen -90 und 90 liegen",
+        "invalidLon": "Muss zwischen -180 und 180 liegen",
+        "latOrder": "Südlicher Breitengrad muss kleiner als nördlicher Breitengrad sein",
+        "lonOrder": "Westlicher Längengrad muss kleiner als östlicher Längengrad sein"
+      },
+      "northLat": "Nördlicher Breitengrad",
+      "remove": "Klicke in die Box, um sie zu entfernen.",
+      "southLat": "Südlicher Breitengrad",
+      "westLon": "Westlicher Längengrad"
     },
     "close": "Schließen",
     "fit": "Ansicht an räumliche Ausdehnung anpassen",
