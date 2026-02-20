@@ -1,6 +1,6 @@
 import { createStore } from "vuex";
 
-import URI from "urijs";
+import { URI } from 'stac-js/src/utils.js';
 
 import i18n, { getDataLanguages, translateFields, executeCustomFunctions, loadMessages } from '../i18n';
 import Utils, { BrowserError } from '../utils';
@@ -840,7 +840,7 @@ function getStore(config, router) {
             baseUrl = stac.getAbsoluteUrl();
           }
           if (baseUrl) {
-            baseUrl = new URI(baseUrl);
+            baseUrl = URI(baseUrl);
           }
 
           link = Utils.addFiltersToLink(link, filters, cx.state.itemsPerPage);
@@ -864,7 +864,7 @@ function getStore(config, router) {
                 else if (typeof item.id !== 'undefined') {
                   let apiCollectionsLink = cx.getters.root?.getApiCollectionsLink()?.href;
                   if (apiCollectionsLink) {
-                    apiCollectionsLink = new URI(apiCollectionsLink);
+                    apiCollectionsLink = URI(apiCollectionsLink);
                   }
                   if (baseUrl && baseUrl.path().endsWith('/')) {
                     url = Utils.toAbsolute(`items/${item.id}`, baseUrl, false);
@@ -958,7 +958,7 @@ function getStore(config, router) {
                 // see https://github.com/radiantearth/stac-browser/issues/486
                 let baseUrl = cx.state.catalogUrl || stac.getAbsoluteUrl();
                 if (baseUrl) {
-                  baseUrl = new URI(baseUrl);
+                  baseUrl = URI(baseUrl);
                   if (!baseUrl.path().endsWith('/')) {
                     baseUrl.path(baseUrl.path() + '/');
                   }

@@ -1,5 +1,5 @@
 import AssetActionPlugin from "../AssetActionPlugin";
-import URI from 'urijs';
+import { URI } from 'stac-js/src/utils.js';
 import i18n from "../../i18n";
 
 // obj & ply files are usually with mime-type text/plain 
@@ -21,7 +21,7 @@ export default class ThreePipe extends AssetActionPlugin {
   }
 
   get uri() {
-    let uri = new URI("https://threepipe.org/examples/tweakpane-editor");
+    let uri = URI("https://threepipe.org/examples/tweakpane-editor");
     uri.addQuery("model", this.component.href); 
     return uri;
   }

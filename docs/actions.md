@@ -115,7 +115,14 @@ It is recommended to inspect the existing actions to get an impression of what i
 
 Some notes:
 
-- It is recommended to use [urijs](https://www.npmjs.com/package/urijs) for URL manipulations, it comes packages with STAC Browser anyway.
+- It is recommended to use [urijs](https://www.npmjs.com/package/urijs) through stac-js for URL manipulations,
+  it comes packaged with STAC Browser anyway. Example:
+
+  ```js
+  import { URI } from 'stac-js/src/utils.js';
+  const parsed = URI("https://my.example/stac?a=b");
+  ```
+
 - It can be helpful to use the Vue component that is available through `this.component`, for example:
   - `this.component.href` is the absolute asset URL (while `this.asset.href` could be relative or absolute)
   - `this.component.isBrowserProtocol` returns whether it's a http/https URL
