@@ -1,0 +1,2378 @@
+{
+  "collections": [
+    {
+      "id": "sentinel-2-l2a",
+      "type": "Collection",
+      "links": [
+        {
+          "rel": "items",
+          "type": "application/geo+json",
+          "href": "https://planetarycomputer.microsoft.com/api/stac/v1/collections/sentinel-2-l2a/items"
+        },
+        {
+          "rel": "parent",
+          "type": "application/json",
+          "href": "https://planetarycomputer.microsoft.com/api/stac/v1/"
+        },
+        {
+          "rel": "root",
+          "type": "application/json",
+          "href": "https://planetarycomputer.microsoft.com/api/stac/v1/"
+        },
+        {
+          "rel": "self",
+          "type": "application/json",
+          "href": "https://planetarycomputer.microsoft.com/api/stac/v1/collections/sentinel-2-l2a"
+        },
+        {
+          "rel": "license",
+          "href": "https://scihub.copernicus.eu/twiki/pub/SciHubWebPortal/TermsConditions/Sentinel_Data_Terms_and_Conditions.pdf",
+          "title": "Copernicus Sentinel data terms"
+        },
+        {
+          "rel": "http://www.opengis.net/def/rel/ogc/1.0/queryables",
+          "type": "application/schema+json",
+          "title": "Queryables",
+          "href": "https://planetarycomputer.microsoft.com/api/stac/v1/collections/sentinel-2-l2a/queryables"
+        },
+        {
+          "rel": "describedby",
+          "href": "https://planetarycomputer.microsoft.com/dataset/sentinel-2-l2a",
+          "title": "Human readable dataset overview and reference",
+          "type": "text/html"
+        }
+      ],
+      "title": "Sentinel-2 Level-2A",
+      "assets": {
+        "thumbnail": {
+          "href": "https://ai4edatasetspublicassets.blob.core.windows.net/assets/pc_thumbnails/sentinel-2.png",
+          "type": "image/png",
+          "roles": [
+            "thumbnail"
+          ],
+          "title": "Sentinel 2 L2A"
+        },
+        "geoparquet-items": {
+          "href": "abfs://items/sentinel-2-l2a.parquet",
+          "type": "application/x-parquet",
+          "roles": [
+            "stac-items"
+          ],
+          "title": "GeoParquet STAC items",
+          "description": "Snapshot of the collection's STAC items exported to GeoParquet format.",
+          "msft:partition_info": {
+            "is_partitioned": true,
+            "partition_frequency": "W-MON"
+          },
+          "table:storage_options": {
+            "account_name": "pcstacitems"
+          }
+        }
+      },
+      "extent": {
+        "spatial": {
+          "bbox": [
+            [
+              -180,
+              -90,
+              180,
+              90
+            ]
+          ]
+        },
+        "temporal": {
+          "interval": [
+            [
+              "2015-06-27T10:25:31Z",
+              null
+            ]
+          ]
+        }
+      },
+      "license": "proprietary",
+      "keywords": [
+        "Sentinel",
+        "Copernicus",
+        "ESA",
+        "Satellite",
+        "Global",
+        "Imagery",
+        "Reflectance"
+      ],
+      "providers": [
+        {
+          "url": "https://sentinel.esa.int/web/sentinel/missions/sentinel-2",
+          "name": "ESA",
+          "roles": [
+            "producer",
+            "licensor"
+          ]
+        },
+        {
+          "url": "https://www.esri.com/",
+          "name": "Esri",
+          "roles": [
+            "processor"
+          ]
+        },
+        {
+          "url": "https://planetarycomputer.microsoft.com",
+          "name": "Microsoft",
+          "roles": [
+            "host",
+            "processor"
+          ]
+        }
+      ],
+      "summaries": {
+        "gsd": [
+          10,
+          20,
+          60
+        ],
+        "eo:bands": [
+          {
+            "name": "AOT",
+            "description": "aerosol optical thickness"
+          },
+          {
+            "gsd": 60,
+            "name": "B01",
+            "common_name": "coastal",
+            "description": "coastal aerosol",
+            "center_wavelength": 0.443,
+            "full_width_half_max": 0.027
+          },
+          {
+            "gsd": 10,
+            "name": "B02",
+            "common_name": "blue",
+            "description": "visible blue",
+            "center_wavelength": 0.49,
+            "full_width_half_max": 0.098
+          },
+          {
+            "gsd": 10,
+            "name": "B03",
+            "common_name": "green",
+            "description": "visible green",
+            "center_wavelength": 0.56,
+            "full_width_half_max": 0.045
+          },
+          {
+            "gsd": 10,
+            "name": "B04",
+            "common_name": "red",
+            "description": "visible red",
+            "center_wavelength": 0.665,
+            "full_width_half_max": 0.038
+          },
+          {
+            "gsd": 20,
+            "name": "B05",
+            "common_name": "rededge",
+            "description": "vegetation classification red edge",
+            "center_wavelength": 0.704,
+            "full_width_half_max": 0.019
+          },
+          {
+            "gsd": 20,
+            "name": "B06",
+            "common_name": "rededge",
+            "description": "vegetation classification red edge",
+            "center_wavelength": 0.74,
+            "full_width_half_max": 0.018
+          },
+          {
+            "gsd": 20,
+            "name": "B07",
+            "common_name": "rededge",
+            "description": "vegetation classification red edge",
+            "center_wavelength": 0.783,
+            "full_width_half_max": 0.028
+          },
+          {
+            "gsd": 10,
+            "name": "B08",
+            "common_name": "nir",
+            "description": "near infrared",
+            "center_wavelength": 0.842,
+            "full_width_half_max": 0.145
+          },
+          {
+            "gsd": 20,
+            "name": "B8A",
+            "common_name": "rededge",
+            "description": "vegetation classification red edge",
+            "center_wavelength": 0.865,
+            "full_width_half_max": 0.033
+          },
+          {
+            "gsd": 60,
+            "name": "B09",
+            "description": "water vapor",
+            "center_wavelength": 0.945,
+            "full_width_half_max": 0.026
+          },
+          {
+            "gsd": 20,
+            "name": "B11",
+            "common_name": "swir16",
+            "description": "short-wave infrared, snow/ice/cloud classification",
+            "center_wavelength": 1.61,
+            "full_width_half_max": 0.143
+          },
+          {
+            "gsd": 20,
+            "name": "B12",
+            "common_name": "swir22",
+            "description": "short-wave infrared, snow/ice/cloud classification",
+            "center_wavelength": 2.19,
+            "full_width_half_max": 0.242
+          }
+        ],
+        "platform": [
+          "Sentinel-2A",
+          "Sentinel-2B"
+        ],
+        "instruments": [
+          "msi"
+        ],
+        "constellation": [
+          "sentinel-2"
+        ],
+        "view:off_nadir": [
+          0
+        ]
+      },
+      "description": "The [Sentinel-2](https://sentinel.esa.int/web/sentinel/missions/sentinel-2) program provides global imagery in thirteen spectral bands at 10m-60m resolution and a revisit time of approximately five days.  This dataset represents the global Sentinel-2 archive, from 2016 to the present, processed to L2A (bottom-of-atmosphere) using [Sen2Cor](https://step.esa.int/main/snap-supported-plugins/sen2cor/) and converted to [cloud-optimized GeoTIFF](https://www.cogeo.org/) format.",
+      "item_assets": {
+        "AOT": {
+          "gsd": 10.0,
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "roles": [
+            "data"
+          ],
+          "title": "Aerosol optical thickness (AOT)"
+        },
+        "B01": {
+          "gsd": 60.0,
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "roles": [
+            "data"
+          ],
+          "title": "Band 1 - Coastal aerosol - 60m",
+          "eo:bands": [
+            {
+              "name": "B01",
+              "common_name": "coastal",
+              "description": "Band 1 - Coastal aerosol",
+              "center_wavelength": 0.443,
+              "full_width_half_max": 0.027
+            }
+          ]
+        },
+        "B02": {
+          "gsd": 10.0,
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "roles": [
+            "data"
+          ],
+          "title": "Band 2 - Blue - 10m",
+          "eo:bands": [
+            {
+              "name": "B02",
+              "common_name": "blue",
+              "description": "Band 2 - Blue",
+              "center_wavelength": 0.49,
+              "full_width_half_max": 0.098
+            }
+          ]
+        },
+        "B03": {
+          "gsd": 10.0,
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "roles": [
+            "data"
+          ],
+          "title": "Band 3 - Green - 10m",
+          "eo:bands": [
+            {
+              "name": "B03",
+              "common_name": "green",
+              "description": "Band 3 - Green",
+              "center_wavelength": 0.56,
+              "full_width_half_max": 0.045
+            }
+          ]
+        },
+        "B04": {
+          "gsd": 10.0,
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "roles": [
+            "data"
+          ],
+          "title": "Band 4 - Red - 10m",
+          "eo:bands": [
+            {
+              "name": "B04",
+              "common_name": "red",
+              "description": "Band 4 - Red",
+              "center_wavelength": 0.665,
+              "full_width_half_max": 0.038
+            }
+          ]
+        },
+        "B05": {
+          "gsd": 20.0,
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "roles": [
+            "data"
+          ],
+          "title": "Band 5 - Vegetation red edge 1 - 20m",
+          "eo:bands": [
+            {
+              "name": "B05",
+              "common_name": "rededge",
+              "description": "Band 5 - Vegetation red edge 1",
+              "center_wavelength": 0.704,
+              "full_width_half_max": 0.019
+            }
+          ]
+        },
+        "B06": {
+          "gsd": 20.0,
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "roles": [
+            "data"
+          ],
+          "title": "Band 6 - Vegetation red edge 2 - 20m",
+          "eo:bands": [
+            {
+              "name": "B06",
+              "common_name": "rededge",
+              "description": "Band 6 - Vegetation red edge 2",
+              "center_wavelength": 0.74,
+              "full_width_half_max": 0.018
+            }
+          ]
+        },
+        "B07": {
+          "gsd": 20.0,
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "roles": [
+            "data"
+          ],
+          "title": "Band 7 - Vegetation red edge 3 - 20m",
+          "eo:bands": [
+            {
+              "name": "B07",
+              "common_name": "rededge",
+              "description": "Band 7 - Vegetation red edge 3",
+              "center_wavelength": 0.783,
+              "full_width_half_max": 0.028
+            }
+          ]
+        },
+        "B08": {
+          "gsd": 10.0,
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "roles": [
+            "data"
+          ],
+          "title": "Band 8 - NIR - 10m",
+          "eo:bands": [
+            {
+              "name": "B08",
+              "common_name": "nir",
+              "description": "Band 8 - NIR",
+              "center_wavelength": 0.842,
+              "full_width_half_max": 0.145
+            }
+          ]
+        },
+        "B09": {
+          "gsd": 60.0,
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "roles": [
+            "data"
+          ],
+          "title": "Band 9 - Water vapor - 60m",
+          "eo:bands": [
+            {
+              "name": "B09",
+              "description": "Band 9 - Water vapor",
+              "center_wavelength": 0.945,
+              "full_width_half_max": 0.026
+            }
+          ]
+        },
+        "B11": {
+          "gsd": 20.0,
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "roles": [
+            "data"
+          ],
+          "title": "Band 11 - SWIR (1.6) - 20m",
+          "eo:bands": [
+            {
+              "name": "B11",
+              "common_name": "swir16",
+              "description": "Band 11 - SWIR (1.6)",
+              "center_wavelength": 1.61,
+              "full_width_half_max": 0.143
+            }
+          ]
+        },
+        "B12": {
+          "gsd": 20.0,
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "roles": [
+            "data"
+          ],
+          "title": "Band 12 - SWIR (2.2) - 20m",
+          "eo:bands": [
+            {
+              "name": "B12",
+              "common_name": "swir22",
+              "description": "Band 12 - SWIR (2.2)",
+              "center_wavelength": 2.19,
+              "full_width_half_max": 0.242
+            }
+          ]
+        },
+        "B8A": {
+          "gsd": 20.0,
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "roles": [
+            "data"
+          ],
+          "title": "Band 8A - Vegetation red edge 4 - 20m",
+          "eo:bands": [
+            {
+              "name": "B8A",
+              "common_name": "rededge",
+              "description": "Band 8A - Vegetation red edge 4",
+              "center_wavelength": 0.865,
+              "full_width_half_max": 0.033
+            }
+          ]
+        },
+        "SCL": {
+          "gsd": 20.0,
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "roles": [
+            "data"
+          ],
+          "title": "Scene classfication map (SCL)"
+        },
+        "WVP": {
+          "gsd": 10.0,
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "roles": [
+            "data"
+          ],
+          "title": "Water vapour (WVP)"
+        },
+        "visual": {
+          "gsd": 10.0,
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "roles": [
+            "data"
+          ],
+          "title": "True color image",
+          "eo:bands": [
+            {
+              "name": "B04",
+              "common_name": "red",
+              "description": "Band 4 - Red",
+              "center_wavelength": 0.665,
+              "full_width_half_max": 0.038
+            },
+            {
+              "name": "B03",
+              "common_name": "green",
+              "description": "Band 3 - Green",
+              "center_wavelength": 0.56,
+              "full_width_half_max": 0.045
+            },
+            {
+              "name": "B02",
+              "common_name": "blue",
+              "description": "Band 2 - Blue",
+              "center_wavelength": 0.49,
+              "full_width_half_max": 0.098
+            }
+          ]
+        },
+        "preview": {
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "roles": [
+            "thumbnail"
+          ],
+          "title": "Thumbnail"
+        },
+        "safe-manifest": {
+          "type": "application/xml",
+          "roles": [
+            "metadata"
+          ],
+          "title": "SAFE manifest"
+        },
+        "granule-metadata": {
+          "type": "application/xml",
+          "roles": [
+            "metadata"
+          ],
+          "title": "Granule metadata"
+        },
+        "inspire-metadata": {
+          "type": "application/xml",
+          "roles": [
+            "metadata"
+          ],
+          "title": "INSPIRE metadata"
+        },
+        "product-metadata": {
+          "type": "application/xml",
+          "roles": [
+            "metadata"
+          ],
+          "title": "Product metadata"
+        },
+        "datastrip-metadata": {
+          "type": "application/xml",
+          "roles": [
+            "metadata"
+          ],
+          "title": "Datastrip metadata"
+        }
+      },
+      "stac_version": "1.0.0",
+      "msft:container": "sentinel2-l2",
+      "stac_extensions": [
+        "https://stac-extensions.github.io/item-assets/v1.0.0/schema.json",
+        "https://stac-extensions.github.io/table/v1.2.0/schema.json"
+      ],
+      "msft:storage_account": "sentinel2l2a01",
+      "msft:short_description": "The Sentinel-2 program provides global imagery in thirteen spectral bands at 10m-60m resolution and a revisit time of approximately five days.  This dataset contains the global Sentinel-2 archive, from 2016 to the present, processed to L2A (bottom-of-atmosphere).",
+      "msft:region": "westeurope"
+    },
+    {
+      "id": "modis-15A2H-061",
+      "type": "Collection",
+      "links": [
+        {
+          "rel": "items",
+          "type": "application/geo+json",
+          "href": "https://planetarycomputer.microsoft.com/api/stac/v1/collections/modis-15A2H-061/items"
+        },
+        {
+          "rel": "parent",
+          "type": "application/json",
+          "href": "https://planetarycomputer.microsoft.com/api/stac/v1/"
+        },
+        {
+          "rel": "root",
+          "type": "application/json",
+          "href": "https://planetarycomputer.microsoft.com/api/stac/v1/"
+        },
+        {
+          "rel": "self",
+          "type": "application/json",
+          "href": "https://planetarycomputer.microsoft.com/api/stac/v1/collections/modis-15A2H-061"
+        },
+        {
+          "rel": "help",
+          "href": "https://lpdaac.usgs.gov/documents/926/MOD15_User_Guide_V61.pdf",
+          "title": "MOD15 User Guide"
+        },
+        {
+          "rel": "describedby",
+          "href": "https://ladsweb.modaps.eosdis.nasa.gov/filespec/MODIS/61/MCD15A2H",
+          "title": "MCD15A2H file specification"
+        },
+        {
+          "rel": "describedby",
+          "href": "https://ladsweb.modaps.eosdis.nasa.gov/filespec/MODIS/61/MOD15A2H",
+          "title": "MOD15A2H file specification"
+        },
+        {
+          "rel": "describedby",
+          "href": "https://ladsweb.modaps.eosdis.nasa.gov/filespec/MODIS/61/MYD15A2H",
+          "title": "MYD15A2H file specification"
+        },
+        {
+          "rel": "cite-as",
+          "href": "https://doi.org/10.5067/MODIS/MCD15A2H.061",
+          "title": "LP DAAC - MCD15A2H"
+        },
+        {
+          "rel": "cite-as",
+          "href": "https://doi.org/10.5067/MODIS/MOD15A2H.061",
+          "title": "LP DAAC - MOD15A2H"
+        },
+        {
+          "rel": "cite-as",
+          "href": "https://doi.org/10.5067/MODIS/MYD15A2H.061",
+          "title": "LP DAAC - MYD15A2H"
+        },
+        {
+          "rel": "license",
+          "href": "https://lpdaac.usgs.gov/data/data-citation-and-policies/",
+          "title": "LP DAAC - Data Citation and Policies"
+        },
+        {
+          "rel": "http://www.opengis.net/def/rel/ogc/1.0/queryables",
+          "type": "application/schema+json",
+          "title": "Queryables",
+          "href": "https://planetarycomputer.microsoft.com/api/stac/v1/collections/modis-15A2H-061/queryables"
+        },
+        {
+          "rel": "describedby",
+          "href": "https://planetarycomputer.microsoft.com/dataset/modis-15A2H-061",
+          "title": "Human readable dataset overview and reference",
+          "type": "text/html"
+        }
+      ],
+      "title": "MODIS Leaf Area Index/FPAR 8-Day",
+      "assets": {
+        "thumbnail": {
+          "href": "https://ai4edatasetspublicassets.blob.core.windows.net/assets/pc_thumbnails/modis-15A2H-061.png",
+          "type": "image/png",
+          "roles": [
+            "thumbnail"
+          ],
+          "title": "MODIS Leaf Area Index/FPAR 8-Day thumbnail"
+        },
+        "geoparquet-items": {
+          "href": "abfs://items/modis-15A2H-061.parquet",
+          "type": "application/x-parquet",
+          "roles": [
+            "stac-items"
+          ],
+          "title": "GeoParquet STAC items",
+          "description": "Snapshot of the collection's STAC items exported to GeoParquet format.",
+          "msft:partition_info": {
+            "is_partitioned": true,
+            "partition_frequency": "MS"
+          },
+          "table:storage_options": {
+            "account_name": "pcstacitems"
+          }
+        }
+      },
+      "extent": {
+        "spatial": {
+          "bbox": [
+            [
+              -180,
+              -90,
+              180,
+              90
+            ]
+          ]
+        },
+        "temporal": {
+          "interval": [
+            [
+              "2002-07-04T00:00:00Z",
+              null
+            ]
+          ]
+        }
+      },
+      "license": "proprietary",
+      "keywords": [
+        "NASA",
+        "MODIS",
+        "Satellite",
+        "Global",
+        "Vegetation",
+        "MCD15A2H",
+        "MOD15A2H",
+        "MYD15A2H"
+      ],
+      "providers": [
+        {
+          "url": "https://lpdaac.usgs.gov/",
+          "name": "NASA LP DAAC at the USGS EROS Center",
+          "roles": [
+            "producer",
+            "licensor",
+            "processor"
+          ]
+        },
+        {
+          "url": "https://planetarycomputer.microsoft.com",
+          "name": "Microsoft",
+          "roles": [
+            "host",
+            "processor"
+          ]
+        }
+      ],
+      "summaries": {
+        "platform": [
+          "aqua",
+          "terra"
+        ],
+        "instruments": [
+          "modis"
+        ]
+      },
+      "description": "The Version 6.1 Moderate Resolution Imaging Spectroradiometer (MODIS) Level 4, Combined Fraction of Photosynthetically Active Radiation (FPAR), and Leaf Area Index (LAI) product is an 8-day composite dataset with 500 meter pixel size. The algorithm chooses the best pixel available from within the 8-day period. LAI is defined as the one-sided green leaf area per unit ground area in broadleaf canopies and as one-half the total needle surface area per unit ground area in coniferous canopies. FPAR is defined as the fraction of incident photosynthetically active radiation (400-700 nm) absorbed by the green elements of a vegetation canopy.",
+      "item_assets": {
+        "hdf": {
+          "type": "application/x-hdf",
+          "roles": [
+            "data"
+          ],
+          "title": "Source data containing all bands"
+        },
+        "Lai_500m": {
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "roles": [
+            "data"
+          ],
+          "title": "Leaf Area Index",
+          "description": "The one-sided green leaf area per unit ground area in broadleaf canopies and as one-half the total needle surface area per unit ground area in coniferous canopies",
+          "raster:bands": [
+            {
+              "unit": "m^2/m^2",
+              "scale": 0.1,
+              "data_type": "uint8",
+              "spatial_resolution": 500
+            }
+          ]
+        },
+        "metadata": {
+          "type": "application/xml",
+          "roles": [
+            "metadata"
+          ],
+          "title": "Federal Geographic Data Committee (FGDC) Metadata"
+        },
+        "Fpar_500m": {
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "roles": [
+            "data"
+          ],
+          "title": "Fraction of Photosynthetically Active Radiation",
+          "description": "The fraction of incident photosynthetically active radiation (400-700 nm) absorbed by the green elements of a vegetation canopy.",
+          "raster:bands": [
+            {
+              "unit": "Percent",
+              "scale": 0.01,
+              "data_type": "uint8",
+              "spatial_resolution": 500
+            }
+          ]
+        },
+        "FparLai_QC": {
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "roles": [
+            "data"
+          ],
+          "title": "Quality for FPAR and LAI",
+          "raster:bands": [
+            {
+              "data_type": "uint8",
+              "spatial_resolution": 500
+            }
+          ]
+        },
+        "FparExtra_QC": {
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "roles": [
+            "data"
+          ],
+          "title": "Extra detail Quality for FPAR and LAI",
+          "raster:bands": [
+            {
+              "data_type": "uint8",
+              "spatial_resolution": 500
+            }
+          ]
+        },
+        "LaiStdDev_500m": {
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "roles": [
+            "data"
+          ],
+          "title": "Standard deviation of LAI",
+          "raster:bands": [
+            {
+              "unit": "m^2/m^2",
+              "scale": 0.1,
+              "data_type": "uint8",
+              "spatial_resolution": 500
+            }
+          ]
+        },
+        "FparStdDev_500m": {
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "roles": [
+            "data"
+          ],
+          "title": "Standard deviation of FPAR",
+          "raster:bands": [
+            {
+              "unit": "Percent",
+              "scale": 0.01,
+              "data_type": "uint8",
+              "spatial_resolution": 500
+            }
+          ]
+        }
+      },
+      "stac_version": "1.0.0",
+      "msft:group_id": "modis",
+      "msft:container": "modis-061",
+      "stac_extensions": [
+        "https://stac-extensions.github.io/raster/v1.0.0/schema.json",
+        "https://stac-extensions.github.io/item-assets/v1.0.0/schema.json",
+        "https://stac-extensions.github.io/scientific/v1.0.0/schema.json",
+        "https://stac-extensions.github.io/table/v1.2.0/schema.json"
+      ],
+      "sci:publications": [
+        {
+          "doi": "10.5067/MODIS/MCD15A2H.061",
+          "citation": "Myneni, R., Knyazikhin, Y., &amp; Park, T. (2021). <i>MODIS/Terra+Aqua Leaf Area Index/FPAR 8-Day L4 Global 500m SIN Grid V061</i> [Data set]. NASA EOSDIS Land Processes DAAC. https://doi.org/10.5067/MODIS/MCD15A2H.061"
+        },
+        {
+          "doi": "10.5067/MODIS/MOD15A2H.061",
+          "citation": "Myneni, R., Knyazikhin, Y., &amp; Park, T. (2021). <i>MODIS/Terra Leaf Area Index/FPAR 8-Day L4 Global 500m SIN Grid V061</i> [Data set]. NASA EOSDIS Land Processes DAAC. https://doi.org/10.5067/MODIS/MOD15A2H.061"
+        },
+        {
+          "doi": "10.5067/MODIS/MYD15A2H.061",
+          "citation": "Myneni, R., Knyazikhin, Y., &amp; Park, T. (2021). <i>MODIS/Aqua Leaf Area Index/FPAR 8-Day L4 Global 500m SIN Grid V061</i> [Data set]. NASA EOSDIS Land Processes DAAC. https://doi.org/10.5067/MODIS/MYD15A2H.061"
+        }
+      ],
+      "msft:storage_account": "modiseuwest",
+      "msft:short_description": "MODIS Leaf Area Index/FPAR 8-Day",
+      "msft:region": "westeurope"
+    },
+    {
+      "id": "sentinel-3-olci-wfr-l2-netcdf",
+      "type": "Collection",
+      "links": [
+        {
+          "rel": "items",
+          "type": "application/geo+json",
+          "href": "https://planetarycomputer.microsoft.com/api/stac/v1/collections/sentinel-3-olci-wfr-l2-netcdf/items"
+        },
+        {
+          "rel": "parent",
+          "type": "application/json",
+          "href": "https://planetarycomputer.microsoft.com/api/stac/v1/"
+        },
+        {
+          "rel": "root",
+          "type": "application/json",
+          "href": "https://planetarycomputer.microsoft.com/api/stac/v1/"
+        },
+        {
+          "rel": "self",
+          "type": "application/json",
+          "href": "https://planetarycomputer.microsoft.com/api/stac/v1/collections/sentinel-3-olci-wfr-l2-netcdf"
+        },
+        {
+          "rel": "license",
+          "href": "https://sentinel.esa.int/documents/247904/690755/Sentinel_Data_Legal_Notice",
+          "type": "application/pdf",
+          "title": "Sentinel Data License"
+        },
+        {
+          "rel": "about",
+          "href": "https://sentinel.esa.int/web/sentinel/user-guides/sentinel-3-olci/product-types/level-2-water",
+          "type": "text/html",
+          "title": "Sentinel-3 Water (LRR and LFR) Product User Guide"
+        },
+        {
+          "rel": "http://www.opengis.net/def/rel/ogc/1.0/queryables",
+          "type": "application/schema+json",
+          "title": "Queryables",
+          "href": "https://planetarycomputer.microsoft.com/api/stac/v1/collections/sentinel-3-olci-wfr-l2-netcdf/queryables"
+        },
+        {
+          "rel": "describedby",
+          "href": "https://planetarycomputer.microsoft.com/dataset/sentinel-3-olci-wfr-l2-netcdf",
+          "title": "Human readable dataset overview and reference",
+          "type": "text/html"
+        }
+      ],
+      "title": "Sentinel-3 Water (Full Resolution)",
+      "assets": {
+        "thumbnail": {
+          "href": "https://ai4edatasetspublicassets.blob.core.windows.net/assets/pc_thumbnails/sentinel-3-olci-wfr-l2-netcdf-thumb.png",
+          "title": "Sentinel-3 OLCI WFR L2 NetCDF Thumbnail",
+          "media_type": "image/png"
+        },
+        "geoparquet-items": {
+          "href": "abfs://items/sentinel-3-olci-wfr-l2-netcdf.parquet",
+          "type": "application/x-parquet",
+          "roles": [
+            "stac-items"
+          ],
+          "title": "GeoParquet STAC Items",
+          "description": "Snapshot of the collection's STAC items exported to GeoParquet format.",
+          "msft:partition_info": {
+            "is_partitioned": true,
+            "partition_frequency": "MS"
+          },
+          "table:storage_options": {
+            "account_name": "pcstacitems"
+          }
+        }
+      },
+      "extent": {
+        "spatial": {
+          "bbox": [
+            [
+              -180,
+              -90,
+              180,
+              90
+            ]
+          ]
+        },
+        "temporal": {
+          "interval": [
+            [
+              "2017-11-01T00:07:01.738487Z",
+              null
+            ]
+          ]
+        }
+      },
+      "license": "proprietary",
+      "keywords": [
+        "ESA",
+        "Copernicus",
+        "Sentinel",
+        "Water",
+        "Ocean"
+      ],
+      "providers": [
+        {
+          "url": "https://earth.esa.int/web/guest/home",
+          "name": "ESA",
+          "roles": [
+            "producer",
+            "processor",
+            "licensor"
+          ]
+        },
+        {
+          "url": "https://planetarycomputer.microsoft.com",
+          "name": "Microsoft",
+          "roles": [
+            "host"
+          ]
+        }
+      ],
+      "summaries": {
+        "eo:bands": [
+          {
+            "name": "Oa01",
+            "description": "Band 1 - Aerosol correction, improved water constituent retrieval",
+            "center_wavelength": 0.4,
+            "full_width_half_max": 0.015
+          },
+          {
+            "name": "Oa02",
+            "description": "Band 2 - Yellow substance and detrital pigments (turbidity)",
+            "center_wavelength": 0.4125,
+            "full_width_half_max": 0.01
+          },
+          {
+            "name": "Oa03",
+            "description": "Band 3 - Chlorophyll absorption maximum, biogeochemistry, vegetation",
+            "center_wavelength": 0.4425,
+            "full_width_half_max": 0.01
+          },
+          {
+            "name": "Oa04",
+            "description": "Band 4 - Chlorophyll",
+            "center_wavelength": 0.49,
+            "full_width_half_max": 0.01
+          },
+          {
+            "name": "Oa05",
+            "description": "Band 5 - Chlorophyll, sediment, turbidity, red tide",
+            "center_wavelength": 0.51,
+            "full_width_half_max": 0.01
+          },
+          {
+            "name": "Oa06",
+            "description": "Band 6 - Chlorophyll reference (minimum)",
+            "center_wavelength": 0.56,
+            "full_width_half_max": 0.01
+          },
+          {
+            "name": "Oa07",
+            "description": "Band 7 - Sediment loading",
+            "center_wavelength": 0.62,
+            "full_width_half_max": 0.01
+          },
+          {
+            "name": "Oa08",
+            "description": "Band 8 - 2nd Chlorophyll absorption maximum, sediment, yellow substance / vegetation",
+            "center_wavelength": 0.665,
+            "full_width_half_max": 0.01
+          },
+          {
+            "name": "Oa09",
+            "description": "Band 9 - Improved fluorescence retrieval",
+            "center_wavelength": 0.67375,
+            "full_width_half_max": 0.0075
+          },
+          {
+            "name": "Oa10",
+            "description": "Band 10 - Chlorophyll fluorescence peak, red edge",
+            "center_wavelength": 0.68125,
+            "full_width_half_max": 0.0075
+          },
+          {
+            "name": "Oa11",
+            "description": "Band 11 - Chlorophyll fluorescence baseline, red edge transition",
+            "center_wavelength": 0.70875,
+            "full_width_half_max": 0.01
+          },
+          {
+            "name": "Oa12",
+            "description": "Band 12 - O2 absorption / clouds, vegetation",
+            "center_wavelength": 0.75375,
+            "full_width_half_max": 0.0075
+          },
+          {
+            "name": "Oa16",
+            "description": "Band 16 - Atmospheric / aerosol correction",
+            "center_wavelength": 0.77875,
+            "full_width_half_max": 0.015
+          },
+          {
+            "name": "Oa17",
+            "description": "Band 17 - Atmospheric / aerosol correction, clouds, pixel co-registration",
+            "center_wavelength": 0.865,
+            "full_width_half_max": 0.02
+          },
+          {
+            "name": "Oa18",
+            "description": "Band 18 - Water vapour absorption reference. Common reference band with SLSTR. Vegetation monitoring",
+            "center_wavelength": 0.885,
+            "full_width_half_max": 0.01
+          },
+          {
+            "name": "Oa19",
+            "description": "Band 19 - Water vapour absorption, vegetation monitoring (maximum REFLECTANCE)",
+            "center_wavelength": 0.9,
+            "full_width_half_max": 0.01
+          },
+          {
+            "name": "Oa21",
+            "description": "Band 21 - Water vapour absorption, atmospheric / aerosol correction",
+            "center_wavelength": 1.02,
+            "full_width_half_max": 0.04
+          }
+        ],
+        "platform": [
+          "Sentinel-3A",
+          "Sentinel-3B"
+        ],
+        "instruments": [
+          "OLCI"
+        ],
+        "constellation": [
+          "Sentinel-3"
+        ],
+        "s3:product_name": [
+          "olci-wfr"
+        ],
+        "s3:product_type": [
+          "OL_2_WFR___"
+        ],
+        "sat:orbit_state": [
+          "descending",
+          "ascending"
+        ],
+        "s3:processing_timeliness": [
+          "NT"
+        ],
+        "sat:platform_international_designator": [
+          "2016-011A",
+          "2018-039A"
+        ]
+      },
+      "description": "This Collection provides Sentinel-3 Full Resolution [OLCI Level-2 Water][olci-l2] products containing data on water-leaving reflectance, ocean color, and more.\n\n## Data files\n\nThis dataset includes data on:\n\n- Surface directional reflectance\n- Chlorophyll-a concentration\n- Suspended matter concentration\n- Energy flux\n- Aerosol load\n- Integrated water vapor column\n\nEach variable is contained within NetCDF files. Error estimates are available for each product.\n\n## Processing overview\n\nThe values in the data files have been converted from Top of Atmosphere radiance to reflectance, and include various corrections for gaseous absorption and pixel classification. More information about the product and data processing can be found in the [User Guide](https://sentinel.esa.int/web/sentinel/user-guides/sentinel-3-olci/product-types/level-2-water) and [Technical Guide](https://sentinel.esa.int/web/sentinel/technical-guides/sentinel-3-olci/level-2/processing).\n\nThis Collection contains Level-2 data in NetCDF files from November 2017 to present.\n\n[olci-l2]: https://sentinel.esa.int/web/sentinel/technical-guides/sentinel-3-olci/level-2/ocean-products\n",
+      "item_assets": {
+        "iwv": {
+          "type": "application/x-netcdf",
+          "roles": [
+            "data"
+          ],
+          "eo:bands": [
+            {
+              "name": "Oa18",
+              "description": "Band 18 - Water vapour absorption reference. Common reference band with SLSTR. Vegetation monitoring",
+              "center_wavelength": 0.885,
+              "full_width_half_max": 0.01
+            },
+            {
+              "name": "Oa19",
+              "description": "Band 19 - Water vapour absorption, vegetation monitoring (maximum REFLECTANCE)",
+              "center_wavelength": 0.9,
+              "full_width_half_max": 0.01
+            }
+          ],
+          "description": "Integrated water vapour column"
+        },
+        "par": {
+          "type": "application/x-netcdf",
+          "roles": [
+            "data"
+          ],
+          "description": "Photosynthetically active radiation"
+        },
+        "trsp": {
+          "type": "application/x-netcdf",
+          "roles": [
+            "data"
+          ],
+          "eo:bands": [
+            {
+              "name": "Oa04",
+              "description": "Band 4 - Chlorophyll",
+              "center_wavelength": 0.49,
+              "full_width_half_max": 0.01
+            },
+            {
+              "name": "Oa06",
+              "description": "Band 6 - Chlorophyll reference (minimum)",
+              "center_wavelength": 0.56,
+              "full_width_half_max": 0.01
+            }
+          ],
+          "description": "Transparency properties of water"
+        },
+        "wqsf": {
+          "type": "application/x-netcdf",
+          "roles": [
+            "data"
+          ],
+          "description": "Water quality and science flags"
+        },
+        "w-aer": {
+          "type": "application/x-netcdf",
+          "roles": [
+            "data"
+          ],
+          "eo:bands": [
+            {
+              "name": "Oa05",
+              "description": "Band 5 - Chlorophyll, sediment, turbidity, red tide",
+              "center_wavelength": 0.51,
+              "full_width_half_max": 0.01
+            },
+            {
+              "name": "Oa06",
+              "description": "Band 6 - Chlorophyll reference (minimum)",
+              "center_wavelength": 0.56,
+              "full_width_half_max": 0.01
+            },
+            {
+              "name": "Oa17",
+              "description": "Band 17 - Atmospheric / aerosol correction, clouds, pixel co-registration",
+              "center_wavelength": 0.865,
+              "full_width_half_max": 0.02
+            }
+          ],
+          "description": "Aerosol over water"
+        },
+        "chl-nn": {
+          "type": "application/x-netcdf",
+          "roles": [
+            "data"
+          ],
+          "eo:bands": [
+            {
+              "name": "Oa01",
+              "description": "Band 1 - Aerosol correction, improved water constituent retrieval",
+              "center_wavelength": 0.4,
+              "full_width_half_max": 0.015
+            },
+            {
+              "name": "Oa02",
+              "description": "Band 2 - Yellow substance and detrital pigments (turbidity)",
+              "center_wavelength": 0.4125,
+              "full_width_half_max": 0.01
+            },
+            {
+              "name": "Oa03",
+              "description": "Band 3 - Chlorophyll absorption maximum, biogeochemistry, vegetation",
+              "center_wavelength": 0.4425,
+              "full_width_half_max": 0.01
+            },
+            {
+              "name": "Oa04",
+              "description": "Band 4 - Chlorophyll",
+              "center_wavelength": 0.49,
+              "full_width_half_max": 0.01
+            },
+            {
+              "name": "Oa05",
+              "description": "Band 5 - Chlorophyll, sediment, turbidity, red tide",
+              "center_wavelength": 0.51,
+              "full_width_half_max": 0.01
+            },
+            {
+              "name": "Oa06",
+              "description": "Band 6 - Chlorophyll reference (minimum)",
+              "center_wavelength": 0.56,
+              "full_width_half_max": 0.01
+            },
+            {
+              "name": "Oa07",
+              "description": "Band 7 - Sediment loading",
+              "center_wavelength": 0.62,
+              "full_width_half_max": 0.01
+            },
+            {
+              "name": "Oa08",
+              "description": "Band 8 - 2nd Chlorophyll absorption maximum, sediment, yellow substance / vegetation",
+              "center_wavelength": 0.665,
+              "full_width_half_max": 0.01
+            },
+            {
+              "name": "Oa09",
+              "description": "Band 9 - Improved fluorescence retrieval",
+              "center_wavelength": 0.67375,
+              "full_width_half_max": 0.0075
+            },
+            {
+              "name": "Oa10",
+              "description": "Band 10 - Chlorophyll fluorescence peak, red edge",
+              "center_wavelength": 0.68125,
+              "full_width_half_max": 0.0075
+            },
+            {
+              "name": "Oa11",
+              "description": "Band 11 - Chlorophyll fluorescence baseline, red edge transition",
+              "center_wavelength": 0.70875,
+              "full_width_half_max": 0.01
+            },
+            {
+              "name": "Oa12",
+              "description": "Band 12 - O2 absorption / clouds, vegetation",
+              "center_wavelength": 0.75375,
+              "full_width_half_max": 0.0075
+            },
+            {
+              "name": "Oa16",
+              "description": "Band 16 - Atmospheric / aerosol correction",
+              "center_wavelength": 0.77875,
+              "full_width_half_max": 0.015
+            },
+            {
+              "name": "Oa17",
+              "description": "Band 17 - Atmospheric / aerosol correction, clouds, pixel co-registration",
+              "center_wavelength": 0.865,
+              "full_width_half_max": 0.02
+            },
+            {
+              "name": "Oa18",
+              "description": "Band 18 - Water vapour absorption reference. Common reference band with SLSTR. Vegetation monitoring",
+              "center_wavelength": 0.885,
+              "full_width_half_max": 0.01
+            },
+            {
+              "name": "Oa21",
+              "description": "Band 21 - Water vapour absorption, atmospheric / aerosol correction",
+              "center_wavelength": 1.02,
+              "full_width_half_max": 0.04
+            }
+          ],
+          "description": "Neural net chlorophyll concentration"
+        },
+        "iop-nn": {
+          "type": "application/x-netcdf",
+          "roles": [
+            "data"
+          ],
+          "eo:bands": [
+            {
+              "name": "Oa01",
+              "description": "Band 1 - Aerosol correction, improved water constituent retrieval",
+              "center_wavelength": 0.4,
+              "full_width_half_max": 0.015
+            },
+            {
+              "name": "Oa12",
+              "description": "Band 12 - O2 absorption / clouds, vegetation",
+              "center_wavelength": 0.75375,
+              "full_width_half_max": 0.0075
+            },
+            {
+              "name": "Oa16",
+              "description": "Band 16 - Atmospheric / aerosol correction",
+              "center_wavelength": 0.77875,
+              "full_width_half_max": 0.015
+            },
+            {
+              "name": "Oa17",
+              "description": "Band 17 - Atmospheric / aerosol correction, clouds, pixel co-registration",
+              "center_wavelength": 0.865,
+              "full_width_half_max": 0.02
+            },
+            {
+              "name": "Oa21",
+              "description": "Band 21 - Water vapour absorption, atmospheric / aerosol correction",
+              "center_wavelength": 1.02,
+              "full_width_half_max": 0.04
+            }
+          ],
+          "description": "Inherent optical properties of water"
+        },
+        "tsm-nn": {
+          "type": "application/x-netcdf",
+          "roles": [
+            "data"
+          ],
+          "eo:bands": [
+            {
+              "name": "Oa01",
+              "description": "Band 1 - Aerosol correction, improved water constituent retrieval",
+              "center_wavelength": 0.4,
+              "full_width_half_max": 0.015
+            },
+            {
+              "name": "Oa02",
+              "description": "Band 2 - Yellow substance and detrital pigments (turbidity)",
+              "center_wavelength": 0.4125,
+              "full_width_half_max": 0.01
+            },
+            {
+              "name": "Oa03",
+              "description": "Band 3 - Chlorophyll absorption maximum, biogeochemistry, vegetation",
+              "center_wavelength": 0.4425,
+              "full_width_half_max": 0.01
+            },
+            {
+              "name": "Oa04",
+              "description": "Band 4 - Chlorophyll",
+              "center_wavelength": 0.49,
+              "full_width_half_max": 0.01
+            },
+            {
+              "name": "Oa05",
+              "description": "Band 5 - Chlorophyll, sediment, turbidity, red tide",
+              "center_wavelength": 0.51,
+              "full_width_half_max": 0.01
+            },
+            {
+              "name": "Oa06",
+              "description": "Band 6 - Chlorophyll reference (minimum)",
+              "center_wavelength": 0.56,
+              "full_width_half_max": 0.01
+            },
+            {
+              "name": "Oa07",
+              "description": "Band 7 - Sediment loading",
+              "center_wavelength": 0.62,
+              "full_width_half_max": 0.01
+            },
+            {
+              "name": "Oa08",
+              "description": "Band 8 - 2nd Chlorophyll absorption maximum, sediment, yellow substance / vegetation",
+              "center_wavelength": 0.665,
+              "full_width_half_max": 0.01
+            },
+            {
+              "name": "Oa09",
+              "description": "Band 9 - Improved fluorescence retrieval",
+              "center_wavelength": 0.67375,
+              "full_width_half_max": 0.0075
+            },
+            {
+              "name": "Oa10",
+              "description": "Band 10 - Chlorophyll fluorescence peak, red edge",
+              "center_wavelength": 0.68125,
+              "full_width_half_max": 0.0075
+            },
+            {
+              "name": "Oa11",
+              "description": "Band 11 - Chlorophyll fluorescence baseline, red edge transition",
+              "center_wavelength": 0.70875,
+              "full_width_half_max": 0.01
+            },
+            {
+              "name": "Oa12",
+              "description": "Band 12 - O2 absorption / clouds, vegetation",
+              "center_wavelength": 0.75375,
+              "full_width_half_max": 0.0075
+            },
+            {
+              "name": "Oa16",
+              "description": "Band 16 - Atmospheric / aerosol correction",
+              "center_wavelength": 0.77875,
+              "full_width_half_max": 0.015
+            },
+            {
+              "name": "Oa17",
+              "description": "Band 17 - Atmospheric / aerosol correction, clouds, pixel co-registration",
+              "center_wavelength": 0.865,
+              "full_width_half_max": 0.02
+            },
+            {
+              "name": "Oa18",
+              "description": "Band 18 - Water vapour absorption reference. Common reference band with SLSTR. Vegetation monitoring",
+              "center_wavelength": 0.885,
+              "full_width_half_max": 0.01
+            },
+            {
+              "name": "Oa21",
+              "description": "Band 21 - Water vapour absorption, atmospheric / aerosol correction",
+              "center_wavelength": 1.02,
+              "full_width_half_max": 0.04
+            }
+          ],
+          "description": "Total suspended matter concentration"
+        },
+        "chl-oc4me": {
+          "type": "application/x-netcdf",
+          "roles": [
+            "data"
+          ],
+          "eo:bands": [
+            {
+              "name": "Oa03",
+              "description": "Band 3 - Chlorophyll absorption maximum, biogeochemistry, vegetation",
+              "center_wavelength": 0.4425,
+              "full_width_half_max": 0.01
+            },
+            {
+              "name": "Oa04",
+              "description": "Band 4 - Chlorophyll",
+              "center_wavelength": 0.49,
+              "full_width_half_max": 0.01
+            },
+            {
+              "name": "Oa05",
+              "description": "Band 5 - Chlorophyll, sediment, turbidity, red tide",
+              "center_wavelength": 0.51,
+              "full_width_half_max": 0.01
+            },
+            {
+              "name": "Oa06",
+              "description": "Band 6 - Chlorophyll reference (minimum)",
+              "center_wavelength": 0.56,
+              "full_width_half_max": 0.01
+            }
+          ],
+          "description": "OC4Me algorithm chlorophyll concentration"
+        },
+        "tie-meteo": {
+          "type": "application/x-netcdf",
+          "roles": [
+            "data"
+          ],
+          "description": "Tie-point meteo annotations"
+        },
+        "browse-jpg": {
+          "type": "image/jpeg",
+          "roles": [
+            "thumbnail"
+          ],
+          "description": "Preview image produced by the European Organisation for the Exploitation of Meteorological Satellites (EUMETSAT)"
+        },
+        "eop-metadata": {
+          "type": "application/xml",
+          "roles": [
+            "metadata"
+          ],
+          "description": "Metadata produced by the European Organisation for the Exploitation of Meteorological Satellites (EUMETSAT)"
+        },
+        "safe-manifest": {
+          "type": "application/xml",
+          "roles": [
+            "metadata"
+          ],
+          "description": "SAFE product manifest"
+        },
+        "tie-geometries": {
+          "type": "application/x-netcdf",
+          "roles": [
+            "data"
+          ],
+          "description": "Tie-point geometry annotations"
+        },
+        "geo-coordinates": {
+          "type": "application/x-netcdf",
+          "roles": [
+            "data"
+          ],
+          "description": "Geo coordinate annotations"
+        },
+        "instrument-data": {
+          "type": "application/x-netcdf",
+          "roles": [
+            "data"
+          ],
+          "description": "Instrument annotations"
+        },
+        "oa01-reflectance": {
+          "type": "application/x-netcdf",
+          "roles": [
+            "data"
+          ],
+          "eo:bands": [
+            {
+              "name": "Oa01",
+              "description": "Band 1 - Aerosol correction, improved water constituent retrieval",
+              "center_wavelength": 0.4,
+              "full_width_half_max": 0.015
+            }
+          ],
+          "description": "Reflectance for OLCI acquisition band Oa01"
+        },
+        "oa02-reflectance": {
+          "type": "application/x-netcdf",
+          "roles": [
+            "data"
+          ],
+          "eo:bands": [
+            {
+              "name": "Oa02",
+              "description": "Band 2 - Yellow substance and detrital pigments (turbidity)",
+              "center_wavelength": 0.4125,
+              "full_width_half_max": 0.01
+            }
+          ],
+          "description": "Reflectance for OLCI acquisition band Oa02"
+        },
+        "oa03-reflectance": {
+          "type": "application/x-netcdf",
+          "roles": [
+            "data"
+          ],
+          "eo:bands": [
+            {
+              "name": "Oa03",
+              "description": "Band 3 - Chlorophyll absorption maximum, biogeochemistry, vegetation",
+              "center_wavelength": 0.4425,
+              "full_width_half_max": 0.01
+            }
+          ],
+          "description": "Reflectance for OLCI acquisition band Oa03"
+        },
+        "oa04-reflectance": {
+          "type": "application/x-netcdf",
+          "roles": [
+            "data"
+          ],
+          "eo:bands": [
+            {
+              "name": "Oa04",
+              "description": "Band 4 - Chlorophyll",
+              "center_wavelength": 0.49,
+              "full_width_half_max": 0.01
+            }
+          ],
+          "description": "Reflectance for OLCI acquisition band Oa04"
+        },
+        "oa05-reflectance": {
+          "type": "application/x-netcdf",
+          "roles": [
+            "data"
+          ],
+          "eo:bands": [
+            {
+              "name": "Oa05",
+              "description": "Band 5 - Chlorophyll, sediment, turbidity, red tide",
+              "center_wavelength": 0.51,
+              "full_width_half_max": 0.01
+            }
+          ],
+          "description": "Reflectance for OLCI acquisition band Oa05"
+        },
+        "oa06-reflectance": {
+          "type": "application/x-netcdf",
+          "roles": [
+            "data"
+          ],
+          "eo:bands": [
+            {
+              "name": "Oa06",
+              "description": "Band 6 - Chlorophyll reference (minimum)",
+              "center_wavelength": 0.56,
+              "full_width_half_max": 0.01
+            }
+          ],
+          "description": "Reflectance for OLCI acquisition band Oa06"
+        },
+        "oa07-reflectance": {
+          "type": "application/x-netcdf",
+          "roles": [
+            "data"
+          ],
+          "eo:bands": [
+            {
+              "name": "Oa07",
+              "description": "Band 7 - Sediment loading",
+              "center_wavelength": 0.62,
+              "full_width_half_max": 0.01
+            }
+          ],
+          "description": "Reflectance for OLCI acquisition band Oa07"
+        },
+        "oa08-reflectance": {
+          "type": "application/x-netcdf",
+          "roles": [
+            "data"
+          ],
+          "eo:bands": [
+            {
+              "name": "Oa08",
+              "description": "Band 8 - 2nd Chlorophyll absorption maximum, sediment, yellow substance / vegetation",
+              "center_wavelength": 0.665,
+              "full_width_half_max": 0.01
+            }
+          ],
+          "description": "Reflectance for OLCI acquisition band Oa08"
+        },
+        "oa09-reflectance": {
+          "type": "application/x-netcdf",
+          "roles": [
+            "data"
+          ],
+          "eo:bands": [
+            {
+              "name": "Oa09",
+              "description": "Band 9 - Improved fluorescence retrieval",
+              "center_wavelength": 0.67375,
+              "full_width_half_max": 0.0075
+            }
+          ],
+          "description": "Reflectance for OLCI acquisition band Oa09"
+        },
+        "oa10-reflectance": {
+          "type": "application/x-netcdf",
+          "roles": [
+            "data"
+          ],
+          "eo:bands": [
+            {
+              "name": "Oa10",
+              "description": "Band 10 - Chlorophyll fluorescence peak, red edge",
+              "center_wavelength": 0.68125,
+              "full_width_half_max": 0.0075
+            }
+          ],
+          "description": "Reflectance for OLCI acquisition band Oa10"
+        },
+        "oa11-reflectance": {
+          "type": "application/x-netcdf",
+          "roles": [
+            "data"
+          ],
+          "eo:bands": [
+            {
+              "name": "Oa11",
+              "description": "Band 11 - Chlorophyll fluorescence baseline, red edge transition",
+              "center_wavelength": 0.70875,
+              "full_width_half_max": 0.01
+            }
+          ],
+          "description": "Reflectance for OLCI acquisition band Oa11"
+        },
+        "oa12-reflectance": {
+          "type": "application/x-netcdf",
+          "roles": [
+            "data"
+          ],
+          "eo:bands": [
+            {
+              "name": "Oa12",
+              "description": "Band 12 - O2 absorption / clouds, vegetation",
+              "center_wavelength": 0.75375,
+              "full_width_half_max": 0.0075
+            }
+          ],
+          "description": "Reflectance for OLCI acquisition band Oa12"
+        },
+        "oa16-reflectance": {
+          "type": "application/x-netcdf",
+          "roles": [
+            "data"
+          ],
+          "eo:bands": [
+            {
+              "name": "Oa16",
+              "description": "Band 16 - Atmospheric / aerosol correction",
+              "center_wavelength": 0.77875,
+              "full_width_half_max": 0.015
+            }
+          ],
+          "description": "Reflectance for OLCI acquisition band Oa16"
+        },
+        "oa17-reflectance": {
+          "type": "application/x-netcdf",
+          "roles": [
+            "data"
+          ],
+          "eo:bands": [
+            {
+              "name": "Oa17",
+              "description": "Band 17 - Atmospheric / aerosol correction, clouds, pixel co-registration",
+              "center_wavelength": 0.865,
+              "full_width_half_max": 0.02
+            }
+          ],
+          "description": "Reflectance for OLCI acquisition band Oa17"
+        },
+        "oa18-reflectance": {
+          "type": "application/x-netcdf",
+          "roles": [
+            "data"
+          ],
+          "eo:bands": [
+            {
+              "name": "Oa18",
+              "description": "Band 18 - Water vapour absorption reference. Common reference band with SLSTR. Vegetation monitoring",
+              "center_wavelength": 0.885,
+              "full_width_half_max": 0.01
+            }
+          ],
+          "description": "Reflectance for OLCI acquisition band Oa18"
+        },
+        "oa21-reflectance": {
+          "type": "application/x-netcdf",
+          "roles": [
+            "data"
+          ],
+          "eo:bands": [
+            {
+              "name": "Oa21",
+              "description": "Band 21 - Water vapour absorption, atmospheric / aerosol correction",
+              "center_wavelength": 1.02,
+              "full_width_half_max": 0.04
+            }
+          ],
+          "description": "Reflectance for OLCI acquisition band Oa21"
+        },
+        "time-coordinates": {
+          "type": "application/x-netcdf",
+          "roles": [
+            "data"
+          ],
+          "description": "Time coordinate annotations"
+        },
+        "tie-geo-coordinates": {
+          "type": "application/x-netcdf",
+          "roles": [
+            "data"
+          ],
+          "description": "Tie-point geo coordinate annotations"
+        }
+      },
+      "msft:region": "westeurope",
+      "stac_version": "1.0.0",
+      "msft:group_id": "sentinel-3",
+      "msft:container": "sentinel-3",
+      "stac_extensions": [
+        "https://stac-extensions.github.io/sat/v1.0.0/schema.json",
+        "https://stac-extensions.github.io/table/v1.2.0/schema.json",
+        "https://stac-extensions.github.io/item-assets/v1.0.0/schema.json",
+        "https://stac-extensions.github.io/eo/v1.1.0/schema.json"
+      ],
+      "msft:storage_account": "sentinel3euwest",
+      "msft:short_description": "Sentinel-3 Land Full Resolution water and atmospheric geophysical products (OLCI WFR)."
+    },
+    {
+      "id": "modis-10A1-061",
+      "type": "Collection",
+      "links": [
+        {
+          "rel": "items",
+          "type": "application/geo+json",
+          "href": "https://planetarycomputer.microsoft.com/api/stac/v1/collections/modis-10A1-061/items"
+        },
+        {
+          "rel": "parent",
+          "type": "application/json",
+          "href": "https://planetarycomputer.microsoft.com/api/stac/v1/"
+        },
+        {
+          "rel": "root",
+          "type": "application/json",
+          "href": "https://planetarycomputer.microsoft.com/api/stac/v1/"
+        },
+        {
+          "rel": "self",
+          "type": "application/json",
+          "href": "https://planetarycomputer.microsoft.com/api/stac/v1/collections/modis-10A1-061"
+        },
+        {
+          "rel": "cite-as",
+          "href": "https://doi.org/10.5067/MODIS/MOD10A1.061",
+          "title": "MODIS/Terra Snow Cover Daily L3 Global 500m SIN Grid, Version 61"
+        },
+        {
+          "rel": "cite-as",
+          "href": "https://doi.org/10.5067/MODIS/MYD10A1.061",
+          "title": "MODIS/Aqua Snow Cover Daily L3 Global 500m SIN Grid, Version 61"
+        },
+        {
+          "rel": "license",
+          "href": "https://nsidc.org/data/data-programs/nsidc-daac/citing-nsidc-daac",
+          "title": "Use and Copyright | National Snow and Ice Data Center"
+        },
+        {
+          "rel": "http://www.opengis.net/def/rel/ogc/1.0/queryables",
+          "type": "application/schema+json",
+          "title": "Queryables",
+          "href": "https://planetarycomputer.microsoft.com/api/stac/v1/collections/modis-10A1-061/queryables"
+        },
+        {
+          "rel": "describedby",
+          "href": "https://planetarycomputer.microsoft.com/dataset/modis-10A1-061",
+          "title": "Human readable dataset overview and reference",
+          "type": "text/html"
+        }
+      ],
+      "title": "MODIS Snow Cover Daily",
+      "assets": {
+        "thumbnail": {
+          "href": "https://ai4edatasetspublicassets.blob.core.windows.net/assets/pc_thumbnails/modis-10A1-061.png",
+          "type": "image/png",
+          "roles": [
+            "thumbnail"
+          ],
+          "title": "MODIS Snow Cover Daily thumbnail"
+        },
+        "geoparquet-items": {
+          "href": "abfs://items/modis-10A1-061.parquet",
+          "type": "application/x-parquet",
+          "roles": [
+            "stac-items"
+          ],
+          "title": "GeoParquet STAC items",
+          "description": "Snapshot of the collection's STAC items exported to GeoParquet format.",
+          "msft:partition_info": {
+            "is_partitioned": true,
+            "partition_frequency": "MS"
+          },
+          "table:storage_options": {
+            "account_name": "pcstacitems"
+          }
+        }
+      },
+      "extent": {
+        "spatial": {
+          "bbox": [
+            [
+              -180,
+              -90,
+              180,
+              90
+            ]
+          ]
+        },
+        "temporal": {
+          "interval": [
+            [
+              "2000-02-24T00:00:00Z",
+              null
+            ]
+          ]
+        }
+      },
+      "license": "proprietary",
+      "keywords": [
+        "NASA",
+        "MODIS",
+        "Satellite",
+        "Global",
+        "Snow",
+        "MOD10A1",
+        "MYD10A1"
+      ],
+      "providers": [
+        {
+          "url": "https://nsidc.org",
+          "name": "National Snow and Ice Data Center",
+          "roles": [
+            "producer",
+            "licensor",
+            "processor"
+          ]
+        },
+        {
+          "url": "https://planetarycomputer.microsoft.com",
+          "name": "Microsoft",
+          "roles": [
+            "host",
+            "processor"
+          ]
+        }
+      ],
+      "summaries": {
+        "platform": [
+          "aqua",
+          "terra"
+        ],
+        "instruments": [
+          "modis"
+        ]
+      },
+      "description": "This global Level-3 (L3) data set provides a daily composite of snow cover and albedo derived from the 'MODIS Snow Cover 5-Min L2 Swath 500m' data set. Each data granule is a 10degx10deg tile projected to a 500 m sinusoidal grid.",
+      "item_assets": {
+        "hdf": {
+          "type": "application/x-hdf",
+          "roles": [
+            "data"
+          ],
+          "title": "Source data containing all bands"
+        },
+        "NDSI": {
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "roles": [
+            "data"
+          ],
+          "title": "Raw NDSI values (i.e. prior to screening).",
+          "raster:bands": [
+            {
+              "scale": 0.0001,
+              "data_type": "int16",
+              "spatial_resolution": 500
+            }
+          ]
+        },
+        "metadata": {
+          "type": "application/xml",
+          "roles": [
+            "metadata"
+          ],
+          "title": "Federal Geographic Data Committee (FGDC) Metadata"
+        },
+        "orbit_pnt": {
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "roles": [
+            "data"
+          ],
+          "title": "Pointer to the orbit of the swath mapped into each grid cell.",
+          "raster:bands": [
+            {
+              "data_type": "uint8",
+              "spatial_resolution": 500
+            }
+          ]
+        },
+        "granule_pnt": {
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "roles": [
+            "data"
+          ],
+          "title": "Pointer for identifying the swath mapped into each grid cell.",
+          "raster:bands": [
+            {
+              "data_type": "uint8",
+              "spatial_resolution": 500
+            }
+          ]
+        },
+        "NDSI_Snow_Cover": {
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "roles": [
+            "data"
+          ],
+          "title": "Gridded NDSI snow cover and data flag values.",
+          "raster:bands": [
+            {
+              "data_type": "uint8",
+              "spatial_resolution": 500
+            }
+          ]
+        },
+        "Snow_Albedo_Daily_Tile": {
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "roles": [
+            "data"
+          ],
+          "title": "Daily snow albedo corresponding to the NDSI_Snow_Cover parameter.",
+          "raster:bands": [
+            {
+              "data_type": "uint8",
+              "spatial_resolution": 500
+            }
+          ]
+        },
+        "NDSI_Snow_Cover_Basic_QA": {
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "roles": [
+            "data"
+          ],
+          "title": "A general estimate of the quality of the algorithm result.",
+          "raster:bands": [
+            {
+              "data_type": "uint8",
+              "spatial_resolution": 500
+            }
+          ],
+          "classification:classes": [
+            {
+              "value": 0,
+              "description": "best"
+            },
+            {
+              "value": 1,
+              "description": "good"
+            },
+            {
+              "value": 2,
+              "description": "ok"
+            },
+            {
+              "value": 3,
+              "description": "poor (not used)"
+            },
+            {
+              "value": 4,
+              "description": "other (not used)"
+            }
+          ]
+        },
+        "NDSI_Snow_Cover_Algorithm_Flags_QA": {
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "roles": [
+            "data"
+          ],
+          "title": "Algorithm-specific bit flags set for data screens and for inland water.",
+          "raster:bands": [
+            {
+              "data_type": "uint8",
+              "spatial_resolution": 500
+            }
+          ]
+        }
+      },
+      "stac_version": "1.0.0",
+      "msft:group_id": "modis",
+      "msft:container": "modis-061",
+      "stac_extensions": [
+        "https://stac-extensions.github.io/classification/v1.0.0/schema.json",
+        "https://stac-extensions.github.io/raster/v1.0.0/schema.json",
+        "https://stac-extensions.github.io/item-assets/v1.0.0/schema.json",
+        "https://stac-extensions.github.io/scientific/v1.0.0/schema.json",
+        "https://stac-extensions.github.io/table/v1.2.0/schema.json"
+      ],
+      "sci:publications": [
+        {
+          "doi": "10.5067/MODIS/MOD10A1.061",
+          "citation": "Hall, D. K., &amp; Riggs, G. A. (2021). <i>MODIS/Aqua Snow Cover Daily L3 Global 500m Grid, Version 61</i> [Data set]. NASA National Snow and Ice Data Center DAAC. https://doi.org/10.5067/MODIS/MOD10A1.061"
+        },
+        {
+          "doi": "10.5067/MODIS/MYD10A1.061",
+          "citation": "Hall, D. K., &amp; Riggs, G. A. (2021). <i>MODIS/Aqua Snow Cover Daily L3 Global 500m Grid, Version 61</i> [Data set]. NASA National Snow and Ice Data Center DAAC. https://doi.org/10.5067/MODIS/MYD10A1.061"
+        }
+      ],
+      "msft:storage_account": "modiseuwest",
+      "msft:short_description": "MODIS Snow Cover Daily",
+      "msft:region": "westeurope"
+    },
+    {
+      "id": "sentinel-5p-l2-netcdf",
+      "type": "Collection",
+      "links": [
+        {
+          "rel": "items",
+          "type": "application/geo+json",
+          "href": "https://planetarycomputer.microsoft.com/api/stac/v1/collections/sentinel-5p-l2-netcdf/items"
+        },
+        {
+          "rel": "parent",
+          "type": "application/json",
+          "href": "https://planetarycomputer.microsoft.com/api/stac/v1/"
+        },
+        {
+          "rel": "root",
+          "type": "application/json",
+          "href": "https://planetarycomputer.microsoft.com/api/stac/v1/"
+        },
+        {
+          "rel": "self",
+          "type": "application/json",
+          "href": "https://planetarycomputer.microsoft.com/api/stac/v1/collections/sentinel-5p-l2-netcdf"
+        },
+        {
+          "rel": "license",
+          "href": "https://sentinel.esa.int/documents/247904/690755/Sentinel_Data_Legal_Notice",
+          "type": "application/pdf",
+          "title": "Sentinel Data License"
+        },
+        {
+          "rel": "about",
+          "href": "https://sentinel.esa.int/web/sentinel/missions/sentinel-5p",
+          "type": "text/html",
+          "title": "Sentinel-5 Precursor Mission"
+        },
+        {
+          "rel": "http://www.opengis.net/def/rel/ogc/1.0/queryables",
+          "type": "application/schema+json",
+          "title": "Queryables",
+          "href": "https://planetarycomputer.microsoft.com/api/stac/v1/collections/sentinel-5p-l2-netcdf/queryables"
+        },
+        {
+          "rel": "describedby",
+          "href": "https://planetarycomputer.microsoft.com/dataset/sentinel-5p-l2-netcdf",
+          "title": "Human readable dataset overview and reference",
+          "type": "text/html"
+        }
+      ],
+      "title": "Sentinel-5P Level-2",
+      "assets": {
+        "thumbnail": {
+          "href": "https://ai4edatasetspublicassets.blob.core.windows.net/assets/pc_thumbnails/sentinel-5p-l2-netcdf-thumb.png",
+          "title": "Sentinel-5P Level-2 NetCDF Thumbnail",
+          "media_type": "image/png"
+        },
+        "geoparquet-items": {
+          "href": "abfs://items/sentinel-5p-l2-netcdf.parquet",
+          "type": "application/x-parquet",
+          "roles": [
+            "stac-items"
+          ],
+          "title": "GeoParquet STAC Items",
+          "description": "Snapshot of the collection's STAC items exported to GeoParquet format.",
+          "msft:partition_info": {
+            "is_partitioned": true,
+            "partition_frequency": "MS"
+          },
+          "table:storage_options": {
+            "account_name": "pcstacitems"
+          }
+        }
+      },
+      "extent": {
+        "spatial": {
+          "bbox": [
+            [
+              -180,
+              -90,
+              180,
+              90
+            ]
+          ]
+        },
+        "temporal": {
+          "interval": [
+            [
+              "2018-04-30T00:18:50Z",
+              null
+            ]
+          ]
+        }
+      },
+      "license": "proprietary",
+      "keywords": [
+        "ESA",
+        "Copernicus",
+        "Sentinel",
+        "Air Quality",
+        "Climate Change",
+        "Forecasting"
+      ],
+      "providers": [
+        {
+          "url": "https://earth.esa.int/web/guest/home",
+          "name": "ESA",
+          "roles": [
+            "producer",
+            "processor",
+            "licensor"
+          ]
+        },
+        {
+          "url": "https://planetarycomputer.microsoft.com",
+          "name": "Microsoft",
+          "roles": [
+            "host"
+          ]
+        }
+      ],
+      "summaries": {
+        "platform": [
+          "Sentinel 5 Precursor"
+        ],
+        "instruments": [
+          "TROPOMI"
+        ],
+        "constellation": [
+          "Sentinel-5P"
+        ],
+        "s5p:product_name": [
+          "aer-ai",
+          "aer-lh",
+          "ch4",
+          "cloud",
+          "co",
+          "hcho",
+          "no2",
+          "np-bd3",
+          "np-bd6",
+          "np-bd7",
+          "o3-tcl",
+          "o3",
+          "so2"
+        ],
+        "s5p:product_type": [
+          "L2__AER_AI",
+          "L2__AER_LH",
+          "L2__CH4___",
+          "L2__CLOUD_",
+          "L2__CO____",
+          "L2__HCHO__",
+          "L2__NO2___",
+          "L2__NP_BD3",
+          "L2__NP_BD6",
+          "L2__NP_BD7",
+          "L2__O3_TCL",
+          "L2__O3____",
+          "L2__SO2___"
+        ],
+        "s5p:processing_mode": [
+          "NRTI",
+          "OFFL",
+          "RPRO"
+        ],
+        "s5p:collection_identifier": [
+          "01",
+          "02",
+          "03"
+        ],
+        "sat:platform_international_designator": [
+          "2017-064A"
+        ]
+      },
+      "description": "The Copernicus [Sentinel-5 Precursor](https://sentinels.copernicus.eu/web/sentinel/missions/sentinel-5p) mission provides high spatio-temporal resolution measurements of the Earth's atmosphere. The mission consists of one satellite carrying the [TROPOspheric Monitoring Instrument](http://www.tropomi.eu/) (TROPOMI). The satellite flies in loose formation with NASA's [Suomi NPP](https://www.nasa.gov/mission_pages/NPP/main/index.html) spacecraft, allowing utilization of co-located cloud mask data provided by the [Visible Infrared Imaging Radiometer Suite](https://www.nesdis.noaa.gov/current-satellite-missions/currently-flying/joint-polar-satellite-system/visible-infrared-imaging) (VIIRS) instrument onboard Suomi NPP during processing of the TROPOMI methane product.\n\nThe Sentinel-5 Precursor mission aims to reduce the global atmospheric data gap between the retired [ENVISAT](https://earth.esa.int/eogateway/missions/envisat) and [AURA](https://www.nasa.gov/mission_pages/aura/main/index.html) missions and the future [Sentinel-5](https://sentinels.copernicus.eu/web/sentinel/missions/sentinel-5) mission. Sentinel-5 Precursor [Level 2 data](http://www.tropomi.eu/data-products/level-2-products) provide total columns of ozone, sulfur dioxide, nitrogen dioxide, carbon monoxide and formaldehyde, tropospheric columns of ozone, vertical profiles of ozone and cloud & aerosol information. These measurements are used for improving air quality forecasts and monitoring the concentrations of atmospheric constituents.\n\nThis STAC Collection provides Sentinel-5 Precursor Level 2 data, in NetCDF format, since April 2018 for the following products:\n\n* [`L2__AER_AI`](http://www.tropomi.eu/data-products/uv-aerosol-index): Ultraviolet aerosol index\n* [`L2__AER_LH`](http://www.tropomi.eu/data-products/aerosol-layer-height): Aerosol layer height\n* [`L2__CH4___`](http://www.tropomi.eu/data-products/methane): Methane (CH<sub>4</sub>) total column\n* [`L2__CLOUD_`](http://www.tropomi.eu/data-products/cloud): Cloud fraction, albedo, and top pressure\n* [`L2__CO____`](http://www.tropomi.eu/data-products/carbon-monoxide): Carbon monoxide (CO) total column\n* [`L2__HCHO__`](http://www.tropomi.eu/data-products/formaldehyde): Formaldehyde (HCHO) total column\n* [`L2__NO2___`](http://www.tropomi.eu/data-products/nitrogen-dioxide): Nitrogen dioxide (NO<sub>2</sub>) total column\n* [`L2__O3____`](http://www.tropomi.eu/data-products/total-ozone-column): Ozone (O<sub>3</sub>) total column\n* [`L2__O3_TCL`](http://www.tropomi.eu/data-products/tropospheric-ozone-column): Ozone (O<sub>3</sub>) tropospheric column\n* [`L2__SO2___`](http://www.tropomi.eu/data-products/sulphur-dioxide): Sulfur dioxide (SO<sub>2</sub>) total column\n* [`L2__NP_BD3`](http://www.tropomi.eu/data-products/auxiliary): Cloud from the Suomi NPP mission, band 3\n* [`L2__NP_BD6`](http://www.tropomi.eu/data-products/auxiliary): Cloud from the Suomi NPP mission, band 6\n* [`L2__NP_BD7`](http://www.tropomi.eu/data-products/auxiliary): Cloud from the Suomi NPP mission, band 7\n",
+      "item_assets": {
+        "co": {
+          "type": "application/x-netcdf",
+          "roles": [
+            "data"
+          ],
+          "title": "Carbon Monoxide Total Column"
+        },
+        "o3": {
+          "type": "application/x-netcdf",
+          "roles": [
+            "data"
+          ],
+          "title": "Ozone Total Column"
+        },
+        "ch4": {
+          "type": "application/x-netcdf",
+          "roles": [
+            "data"
+          ],
+          "title": "Methane Total Column"
+        },
+        "no2": {
+          "type": "application/x-netcdf",
+          "roles": [
+            "data"
+          ],
+          "title": "Nitrogen Dioxide Total Column"
+        },
+        "so2": {
+          "type": "application/x-netcdf",
+          "roles": [
+            "data"
+          ],
+          "title": "Sulphur Dioxide Total Column"
+        },
+        "hcho": {
+          "type": "application/x-netcdf",
+          "roles": [
+            "data"
+          ],
+          "title": "Formaldehyde Total Column"
+        },
+        "cloud": {
+          "type": "application/x-netcdf",
+          "roles": [
+            "data"
+          ],
+          "title": "Cloud Fraction, Albedo, and Top Pressure"
+        },
+        "aer-ai": {
+          "type": "application/x-netcdf",
+          "roles": [
+            "data"
+          ],
+          "title": "Ultraviolet Aerosol Index"
+        },
+        "aer-lh": {
+          "type": "application/x-netcdf",
+          "roles": [
+            "data"
+          ],
+          "title": "Aerosol Layer Height"
+        },
+        "np-bd3": {
+          "type": "application/x-netcdf",
+          "roles": [
+            "data"
+          ],
+          "title": "VIIRS/NPP Band 3 Cloud Mask"
+        },
+        "np-bd6": {
+          "type": "application/x-netcdf",
+          "roles": [
+            "data"
+          ],
+          "title": "VIIRS/NPP Band 6 Cloud Mask"
+        },
+        "np-bd7": {
+          "type": "application/x-netcdf",
+          "roles": [
+            "data"
+          ],
+          "title": "VIIRS/NPP Band 7 Cloud Mask"
+        },
+        "o3-tcl": {
+          "type": "application/x-netcdf",
+          "roles": [
+            "data"
+          ],
+          "title": "Ozone Tropospheric Column"
+        }
+      },
+      "msft:region": "westeurope",
+      "stac_version": "1.0.0",
+      "msft:container": "sentinel-5p",
+      "stac_extensions": [
+        "https://stac-extensions.github.io/sat/v1.0.0/schema.json",
+        "https://stac-extensions.github.io/table/v1.2.0/schema.json",
+        "https://stac-extensions.github.io/item-assets/v1.0.0/schema.json"
+      ],
+      "msft:storage_account": "sentinel5euwest",
+      "msft:short_description": "Sentinel-5P Level 2 atmospheric monitoring products in NetCDF format"
+    }
+  ],
+  "links": [
+    {
+      "rel": "root",
+      "type": "application/json",
+      "href": "https://planetarycomputer.microsoft.com/api/stac/v1/"
+    },
+    {
+      "rel": "self",
+      "type": "application/json",
+      "href": "https://planetarycomputer.microsoft.com/api/stac/v1/collections"
+    }
+  ],
+  "numberMatched": 5,
+  "numberReturned": 5
+}
