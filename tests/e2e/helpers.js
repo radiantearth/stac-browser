@@ -1,181 +1,128 @@
-import { expect } from "@playwright/test";
+export const HOME_PATH = '/';
 
-export const HOME_PATH = "/";
-export const SEARCH_PATH = "/search/external/earth-search.aws.test.com/v1?.language=en";
+/**
+ * Mock a STAC resource by URL pattern
+ * @param {Page} page - Playwright page object
+ * @param {string|RegExp} urlPattern - URL pattern to match
+ * @param {Object} mockData - Mock STAC data to return
+ * @param {Object} options - Additional options (status, contentType)
+ */
+export async function mockStacResource(page, urlPattern, mockData, options = {}) {
+  const {
+    status = 200,
+    contentType = 'application/json',
+    delay = 0
+  } = options;
 
-const SEARCH_API_URL = "https://earth-search.aws.test.com/v1/search";
-
-const API_ROOT_URL = "https://earth-search.aws.test.com/v1";
-const API_COLLECTIONS_URL = "https://earth-search.aws.test.com/v1/collections";
-
-// todo: Move STAC documents to separate files
-const API_ROOT_FIXTURE = {
-  stac_version: "1.0.0",
-  id: "test-api",
-  title: "Test API",
-  description: "Test API root",
-  conformsTo: [
-    "https://api.stacspec.org/v1.0.0/item-search",
-    "https://api.stacspec.org/v1.0.0/item-search#sort",
-    "https://api.stacspec.org/v1.0.0/collection-search",
-  ],
-  links: [
-    {
-      rel: "self",
-      type: "application/json",
-      href: API_ROOT_URL,
-    },
-    {
-      rel: "search",
-      type: "application/geo+json",
-      href: SEARCH_API_URL,
-      method: "POST",
-    },
-    {
-      rel: "collections",
-      type: "application/json",
-      href: API_COLLECTIONS_URL,
-    },
-  ],
-};
-
-const API_COLLECTIONS_FIXTURE = {
-  collections: [
-    {
-      type: "Collection",
-      id: "test-collection-1",
-      title: "Test Collection 1",
-      description: "Test collection 1",
-      stac_version: "1.0.0",
-      extent: {
-        spatial: { bbox: [[-180, -90, 180, 90]] },
-        temporal: { interval: [["2020-01-01T00:00:00Z", null]] },
-      },
-      links: [
-        {
-          rel: "self",
-          type: "application/json",
-          href: `${API_COLLECTIONS_URL}/test-collection-1`,
-        },
-      ],
-    },
-    {
-      type: "Collection",
-      id: "test-collection-2",
-      title: "Test Collection 2",
-      description: "Test collection 2",
-      stac_version: "1.0.0",
-      extent: {
-        spatial: { bbox: [[-10, -10, 10, 10]] },
-        temporal: { interval: [["2021-01-01T00:00:00Z", null]] },
-      },
-      links: [
-        {
-          rel: "self",
-          type: "application/json",
-          href: `${API_COLLECTIONS_URL}/test-collection-2`,
-        },
-      ],
-    },
-  ],
-  links: [
-    {
-      rel: "self",
-      type: "application/json",
-      href: API_COLLECTIONS_URL,
-    },
-    {
-      rel: "root",
-      type: "application/json",
-      href: API_ROOT_URL,
-    },
-  ],
-  context: {
-    page: 1,
-    limit: 2,
-    matched: 2,
-    returned: 2,
-  },
-};
-
-export const mockApiRootAndCollections = async (page) => {
-  await page.route(API_ROOT_URL, async (route, request) => {
-    if (request.method() === "GET") {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify(API_ROOT_FIXTURE),
-      });
-      return;
+  await page.route(urlPattern, async (route) => {
+    if (delay > 0) {
+      await new Promise(resolve => setTimeout(resolve, delay));
     }
-    await route.continue();
+    await route.fulfill({
+      status,
+      contentType,
+      body: JSON.stringify(mockData)
+    });
   });
+}
 
-  await page.route(API_COLLECTIONS_URL, async (route, request) => {
-    if (request.method() === "GET") {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify(API_COLLECTIONS_FIXTURE),
-      });
-      return;
+/**
+ * Navigate to a catalog using mock data
+ * @param {Page} page - Playwright page object
+ * @param {Object} catalogData - Mock catalog data  
+ * @param {string} catalogUrl - URL of the catalog (defaults to example.com)
+ */
+export async function loadMockCatalog(page, catalogData, catalogUrl = 'https://example.com/catalog.json') {
+  // Set up route mock FIRST, before navigation
+  await mockStacResource(page, catalogUrl, catalogData);
+  
+  // Convert URL to browser path (e.g., /external/example.com/catalog.json)
+  const url = new URL(catalogUrl);
+  const protocol = url.protocol !== 'https:' ? url.protocol : '';
+  const protocolPart = protocol ? `/${protocol}` : '';
+  const browserPath = `/external${protocolPart}/${url.host}${url.pathname}${url.search}`;
+  
+  // Navigate to the browser path
+  await page.goto(browserPath);
+  
+  // Wait for the catalog to load
+  await waitForBrowserReady(page);
+}
+
+/**
+ * Wait for STAC Browser to finish loading
+ * @param {Page} page - Playwright page object
+ */
+export async function waitForBrowserReady(page) {
+  // Wait for loading to finish
+  await page.waitForSelector('.loading', { state: 'hidden', timeout: 10000 }).catch(() => {
+    // Loading indicator might not appear for fast loads
+  });
+  
+  // Wait for main content to be visible
+  await page.waitForSelector('main, .browse, .catalog, .item', { timeout: 10000 });
+}
+
+/**
+ * Mock an error response for a STAC resource
+ * @param {Page} page - Playwright page object
+ * @param {string|RegExp} urlPattern - URL pattern to match
+ * @param {number} status - HTTP status code
+ * @param {string} message - Error message
+ */
+export async function mockStacError(page, urlPattern, status = 404, message = 'Not Found') {
+  await page.route(urlPattern, async (route) => {
+    await route.fulfill({
+      status,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        code: status,
+        description: message
+      })
+    });
+  });
+}
+
+
+/**
+ * Mock a catalog and its collections/items based on a fixtures folder name.
+ * The URL's last path segment is used as the folder under tests/fixtures/catalogs
+ * e.g. catalogUrl 'https://example.com/microsoft-pc' -> fixtures/catalogs/microsoft-pc/*
+ */
+import path from 'path';
+import fs from 'fs';
+export async function mockCatalogByFolder(page, catalogUrl) {
+  const name = catalogUrl.replace(/.*\/([^/]+)$/, '$1');
+  // compute base path relative to this module using import.meta.url
+  const fixturesRoot = path.resolve(new URL('../fixtures/catalogs/', import.meta.url).pathname);
+  const base = path.join(fixturesRoot, name);
+
+  function loadJson(rel) {
+    const full = path.join(base, rel);
+    if (!fs.existsSync(full)) {
+      throw new Error(`fixture not found: ${full}`);
     }
-    await route.continue();
-  });
-};
+    return JSON.parse(fs.readFileSync(full, 'utf8'));
+  }
 
-export const waitForMapReady = async (page) => {
-  const mapViewport = page.locator(".map .ol-viewport");
-  await expect(mapViewport).toBeVisible();
+  const catalog = loadJson('info.json');
+  await mockStacResource(page, catalogUrl, catalog);
 
-  const mapCanvas = page.locator(".map .ol-viewport canvas.ol-layer");
-  await expect(mapCanvas).toBeVisible();
-
-  return mapViewport;
-};
-
-export const waitForBboxInputsPopulated = async (page) => {
-  const westLonInput = page.getByLabel(/west longitude/i);
-  const southLatInput = page.getByLabel(/south latitude/i);
-  const eastLonInput = page.getByLabel(/east longitude/i);
-  const northLatInput = page.getByLabel(/north latitude/i);
-
-  await expect(westLonInput).not.toHaveValue("");
-  await expect(southLatInput).not.toHaveValue("");
-  await expect(eastLonInput).not.toHaveValue("");
-  await expect(northLatInput).not.toHaveValue("");
-
-  return { westLonInput, southLatInput, eastLonInput, northLatInput };
-};
-
-export const waitForSearchPost = async (page, responseBody = null) => {
-  let handler;
-  const requestPromise = new Promise((resolve) => {
-    handler = async (route) => {
-      const request = route.request();
-      if (request.method() === "POST") {
-        resolve({
-          request,
-          body: request.postDataJSON(),
-        });
-        await route.fulfill({
-          status: 200,
-          contentType: "application/json",
-          body: JSON.stringify(
-            responseBody || {
-              type: "FeatureCollection",
-              features: [],
-              links: [],
-            },
-          ),
-        });
-        await page.unroute(SEARCH_API_URL, handler);
-        return;
+  // collections list if present
+  try {
+    const collList = loadJson('collections.json');
+    await mockStacResource(page, `${catalogUrl}/collections`, collList);
+    for (const c of collList.collections) {
+      const id = c.id;
+      const collUrl = new URL(c.links.find(l => l.rel==='self').href).href;
+      const relPath = `collections/${id}/info.json`;
+      await mockStacResource(page, collUrl, loadJson(relPath));
+      const itemsPath = `collections/${id}/items.json`;
+      if (fs.existsSync(path.join(base, itemsPath))) {
+        await mockStacResource(page, `${collUrl.replace(/\/[^/]+$/,'')}/items`, loadJson(itemsPath));
       }
-      await route.continue();
-    };
-  });
-
-  await page.route(SEARCH_API_URL, handler);
-  return requestPromise;
-};
+    }
+  } catch (err) {
+    // no collections.json – ignore
+  }
+}

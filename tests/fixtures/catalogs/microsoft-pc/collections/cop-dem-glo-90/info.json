@@ -1,0 +1,153 @@
+{
+  "id": "cop-dem-glo-90",
+  "type": "Collection",
+  "links": [
+    {
+      "rel": "items",
+      "type": "application/geo+json",
+      "href": "https://planetarycomputer.microsoft.com/api/stac/v1/collections/cop-dem-glo-90/items"
+    },
+    {
+      "rel": "parent",
+      "type": "application/json",
+      "href": "https://planetarycomputer.microsoft.com/api/stac/v1/"
+    },
+    {
+      "rel": "root",
+      "type": "application/json",
+      "href": "https://planetarycomputer.microsoft.com/api/stac/v1/"
+    },
+    {
+      "rel": "self",
+      "type": "application/json",
+      "href": "https://planetarycomputer.microsoft.com/api/stac/v1/collections/cop-dem-glo-90"
+    },
+    {
+      "rel": "license",
+      "href": "https://spacedata.copernicus.eu/documents/20126/0/CSCDA_ESA_Mission-specific+Annex.pdf",
+      "title": "Copernicus DEM License"
+    },
+    {
+      "rel": "http://www.opengis.net/def/rel/ogc/1.0/queryables",
+      "type": "application/schema+json",
+      "title": "Queryables",
+      "href": "https://planetarycomputer.microsoft.com/api/stac/v1/collections/cop-dem-glo-90/queryables"
+    },
+    {
+      "rel": "describedby",
+      "href": "https://planetarycomputer.microsoft.com/dataset/cop-dem-glo-90",
+      "title": "Human readable dataset overview and reference",
+      "type": "text/html"
+    }
+  ],
+  "title": "Copernicus DEM GLO-90",
+  "assets": {
+    "thumbnail": {
+      "href": "https://ai4edatasetspublicassets.blob.core.windows.net/assets/pc_thumbnails/cop-dem-glo-90.png",
+      "type": "image/png",
+      "roles": [
+        "thumbnail"
+      ],
+      "title": "COP DEM GLO-90"
+    },
+    "geoparquet-items": {
+      "href": "abfs://items/cop-dem-glo-90.parquet",
+      "type": "application/x-parquet",
+      "roles": [
+        "stac-items"
+      ],
+      "title": "GeoParquet STAC items",
+      "description": "Snapshot of the collection's STAC items exported to GeoParquet format.",
+      "msft:partition_info": {
+        "is_partitioned": false
+      },
+      "table:storage_options": {
+        "account_name": "pcstacitems"
+      }
+    }
+  },
+  "extent": {
+    "spatial": {
+      "bbox": [
+        [
+          -180,
+          -90,
+          180,
+          90
+        ]
+      ]
+    },
+    "temporal": {
+      "interval": [
+        [
+          "2021-04-22T00:00:00Z",
+          "2021-04-22T00:00:00Z"
+        ]
+      ]
+    }
+  },
+  "license": "proprietary",
+  "keywords": [
+    "Copernicus",
+    "DEM",
+    "Elevation"
+  ],
+  "providers": [
+    {
+      "url": "https://spacedata.copernicus.eu/documents/20126/0/CSCDA_ESA_Mission-specific+Annex.pdf",
+      "name": "European Space Agency",
+      "roles": [
+        "licensor"
+      ]
+    },
+    {
+      "url": "https://registry.opendata.aws/copernicus-dem/",
+      "name": "Sinergise",
+      "roles": [
+        "producer",
+        "processor"
+      ]
+    },
+    {
+      "url": "https://doi.org/10.5069/G9028PQB",
+      "name": "OpenTopography",
+      "roles": [
+        "host"
+      ]
+    },
+    {
+      "url": "https://planetarycomputer.microsoft.com",
+      "name": "Microsoft",
+      "roles": [
+        "host"
+      ]
+    }
+  ],
+  "summaries": {
+    "gsd": [
+      90
+    ],
+    "platform": [
+      "tandem-x"
+    ]
+  },
+  "description": "The Copernicus DEM is a digital surface model (DSM), which represents the surface of the Earth including buildings, infrastructure, and vegetation. This DSM is based on radar satellite data acquired during the TanDEM-X Mission, which was funded by a public-private partnership between the German Aerospace Centre (DLR) and Airbus Defence and Space.\n\nCopernicus DEM is available at both 30-meter and 90-meter resolution; this dataset has a horizontal resolution of approximately 90 meters.\n\nSee the [Product Handbook](https://object.cloud.sdsc.edu/v1/AUTH_opentopography/www/metadata/Copernicus_metadata.pdf) for more information.\n\nSee the dataset page on OpenTopography: <https://doi.org/10.5069/G9028PQB>\n\n",
+  "item_assets": {
+    "data": {
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "roles": [
+        "data"
+      ]
+    }
+  },
+  "stac_version": "1.0.0",
+  "msft:group_id": "copernicus-dem",
+  "msft:container": "copernicus-dem-stac",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/item-assets/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/table/v1.2.0/schema.json"
+  ],
+  "msft:storage_account": "elevationeuwest",
+  "msft:short_description": "Copernicus DEM 90 is a near-global digital surface model (DSM) with a horizontal resolution of approximately 90 meters, derived from radar satellite data acquired during the TanDEM-X mission.",
+  "msft:region": "westeurope"
+}

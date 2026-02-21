@@ -298,6 +298,20 @@ STAC Browser supports some non-standardized extensions to the STAC specification
 
 You can use the Docker to work with STAC Browser. Please read [Docker documentation](docs/docker.md) for more details.
 
+## Testing
+
+End-to-end tests are implemented with [Playwright](https://playwright.dev/) and live under `tests/e2e`.  Fixtures are stored in the top‑level `catalogs/` directory; the suite mocks STAC responses using the helpers in `tests/e2e/helpers.js`.  These tests cover the home page, catalog/collection/item browsing, validation views, language switching, filtering, pagination and numerous edge cases.
+
+To run the full suite locally:
+
+```bash
+npm run test:e2e          # headless
+npm run test:e2e:headed   # see the browser
+npm run test:e2e:ui       # interactive debug
+```
+
+See [tests/README.md](tests/README.md) for detailed documentation of fixtures and helper utilities.  The GitHub Actions workflow at `.github/workflows/playwright.yml` runs the tests with retries and publishes an HTML report.
+
 ## Contributing
 
 Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to contribute to STAC Browser.
