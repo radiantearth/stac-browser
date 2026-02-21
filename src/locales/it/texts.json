@@ -41,12 +41,12 @@
     "password": "Password",
     "required": "Autenticazione richiesta",
     "schemeTypes": {
-      "http": "HTTP {scheme}",
-      "s3": "S3",
-      "signedUrl": "URL firmato",
-      "oauth2": "OAuth 2",
       "apiKey": "Chiave API",
-      "openIdConnect": "OpenID Connect"
+      "http": "HTTP {scheme}",
+      "oauth2": "OAuth 2",
+      "openIdConnect": "OpenID Connect",
+      "s3": "S3",
+      "signedUrl": "URL firmato"
     },
     "title": "Accesso",
     "unauthorized": "Non hai i permessi per accedere a questi dati. Effettua il login.",
@@ -159,21 +159,22 @@
   "map": "Mappa",
   "mapping": {
     "attribution": {
-      "label": "i",
+      "collapseLabel": "✕",
       "description": "Crediti",
-      "collapseLabel": "✕"
+      "label": "i"
     },
     "bboxSelect": {
       "add": "Cliccare sulla mappa per aggiungere un box di selezione.",
+      "error": {},
       "remove": "Cliccare dentro il box per eliminarlo."
     },
     "close": "Chiudi",
     "fit": "Adatta alla estensione",
     "layers": {
-      "title": "Livelli",
       "base": "Livelli di base",
-      "unnamed": "Senza Nome #{id}",
-      "footprint": "Impronta a terra"
+      "footprint": "Impronta a terra",
+      "title": "Livelli",
+      "unnamed": "Senza Nome #{id}"
     },
     "location": {
       "description": "Vai alla tua posizione attuale"
@@ -326,8 +327,8 @@
       "message": "{title} è disponibile all'indirizzo {url}",
       "sharePageWithOthers": "Condividi l'URL di questa pagina dove vuoi:",
       "title": "Condivisione",
-      "x": "X (Twitter)",
-      "withOthers": "Condividi questa pagina con altri"
+      "withOthers": "Condividi questa pagina con altri",
+      "x": "X (Twitter)"
     },
     "stacExtension": "Estensione STAC",
     "stacVersion": "Versione STAC",

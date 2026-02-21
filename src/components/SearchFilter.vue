@@ -51,6 +51,7 @@
 
         <b-form-group v-if="conformances.CollectionIdFilter" class="filter-collection" :label="$t('stacCollection', collections.length)" :label-for="ids.collections">
           <multiselect
+            :id="ids.collections"
             v-model="selectedCollections"
             v-bind="collectionSelectOptions"
             @tag="addCollection"

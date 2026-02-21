@@ -41,12 +41,12 @@
     "password": "Password",
     "required": "Autenticação necessária",
     "schemeTypes": {
-      "http": "HTTP {scheme}",
-      "s3": "S3",
-      "signedUrl": "URL Assinado",
-      "oauth2": "OAuth 2",
       "apiKey": "Chave da API",
-      "openIdConnect": "OpenID Connect"
+      "http": "HTTP {scheme}",
+      "oauth2": "OAuth 2",
+      "openIdConnect": "OpenID Connect",
+      "s3": "S3",
+      "signedUrl": "URL Assinado"
     },
     "title": "Autenticação",
     "unauthorized": "Não tem autorização para aceder a estes dados. Por favor, faça login.",
@@ -154,10 +154,12 @@
   "map": "Mapa",
   "mapping": {
     "attribution": {
-      "label": "i",
-      "collapseLabel": "✕"
+      "collapseLabel": "✕",
+      "label": "i"
     },
-    "bboxSelect": {},
+    "bboxSelect": {
+      "error": {}
+    },
     "close": "Fechar",
     "layers": {},
     "location": {},
@@ -306,8 +308,8 @@
       "message": "{title} está disponível em {url}",
       "sharePageWithOthers": "Partilhe o URL desta página onde quiser:",
       "title": "Partilhar",
-      "x": "X (Twitter)",
-      "withOthers": "Partilhe esta página com outros"
+      "withOthers": "Partilhe esta página com outros",
+      "x": "X (Twitter)"
     },
     "stacExtension": "Extensão STAC",
     "stacVersion": "Versão STAC",
