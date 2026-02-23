@@ -172,12 +172,12 @@
         "invalidLat": "Deve essere compreso tra -90 e 90",
         "invalidLon": "Deve essere compreso tra -180 e 180",
         "latOrder": "La latitudine sud deve essere inferiore alla latitudine nord",
-        "lonOrder": ""
+        "lonOrder": "La longitudine ovest deve essere inferiore alla longitudine est"
       },
-      "northLat": "",
+      "northLat": "Latitudine nord",
       "remove": "Cliccare dentro il box per eliminarlo.",
-      "southLat": "",
-      "westLon": ""
+      "southLat": "Latitudine sud",
+      "westLon": "Longitudine ovest"
     },
     "close": "Chiudi",
     "fit": "Adatta alla estensione",
