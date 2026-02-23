@@ -821,7 +821,7 @@ function getStore(config, router) {
               await cx.dispatch('config', { catalogUrl });
             }
           }
-          if (catalogUrl) {
+          if (catalogUrl && url !== catalogUrl) {
             // todo: In principle we could set omitApi: true in many cases here,
             // but until we can reliably load the API data on demand, we fully load it.
             // https://github.com/radiantearth/stac-browser/issues/796
