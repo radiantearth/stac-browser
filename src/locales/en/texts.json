@@ -257,6 +257,18 @@
     "addItemIds": "Press enter to add an Item ID",
     "addSearchTerm": "Press enter to add a search term",
     "additionalFilters": "Additional filters",
+    "arrayInput": {
+      "addValue": "Press enter to add a value",
+      "helpText": "Enter value(s)"
+    },
+    "arrayContains": "Contains all",
+    "arrayContainsDescription": "Array contains all of the specified values",
+    "arrayContainedBy": "Is subset of",
+    "arrayContainedByDescription": "Array is a subset of the specified values",
+    "arrayEquals": "Exactly matches",
+    "arrayEqualsDescription": "Array exactly matches the specified values (same items, any order)",
+    "arrayOverlaps": "Contains any",
+    "arrayOverlapsDescription": "Array contains at least one of the specified values",
     "dateDescription": "All times in Coordinated Universal Time (UTC).",
     "enterCollections": "Enter one or more Collection IDs...",
     "enterItemIds": "Enter one or more Item IDs...",

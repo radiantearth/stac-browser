@@ -1,5 +1,5 @@
 import i18n from '../../../i18n.js';
-import CqlOperator from './operator';
+import CqlOperator from './operator.js';
 
 export default class CqlLogicalOperator extends CqlOperator {
 
