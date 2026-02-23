@@ -254,9 +254,9 @@
   "search": {
     "addCollections": "Press enter to add a collection",
     "addFilter": "Add filter",
+    "additionalFilters": "Additional filters",
     "addItemIds": "Press enter to add an Item ID",
     "addSearchTerm": "Press enter to add a search term",
-    "additionalFilters": "Additional filters",
     "arrayInput": {
       "addValue": "Press enter to add a value",
       "helpText": "Enter value(s)"
@@ -269,6 +269,8 @@
     "arrayEqualsDescription": "Array exactly matches the specified values (same items, any order)",
     "arrayOverlaps": "Contains any",
     "arrayOverlapsDescription": "Array contains at least one of the specified values",
+    "between": "between",
+    "betweenOperatorDescription": "Tests whether a numeric field value lies within the given range. The given range is inclusive.",
     "dateDescription": "All times in Coordinated Universal Time (UTC).",
     "enterCollections": "Enter one or more Collection IDs...",
     "enterItemIds": "Enter one or more Item IDs...",
@@ -280,6 +282,8 @@
     "freeTextDescription": "Search for at least one of the given terms in fields such as the title and the description.",
     "greaterThan": "greater than",
     "greaterThanEqual": "greater than or equal to",
+    "in": "included in",
+    "inOperatorDescription": "Checks whether the field value is any of the given values.",
     "itemIds": "Item IDs",
     "itemsPerPage": "Items per page",
     "itemsPerPageDescription": "Number of items requested per page, max. {maxItems} items.",

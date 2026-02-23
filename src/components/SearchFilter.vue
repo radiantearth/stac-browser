@@ -165,7 +165,6 @@ import { CollectionCollection, STAC } from 'stac-js';
 import { createSTAC, Collection } from '../models/stac';
 import Cql from '../models/cql2/cql';
 import Queryable from '../models/cql2/queryable';
-import CqlValue from '../models/cql2/value';
 import CqlLogicalOperator, { CqlNot } from '../models/cql2/operators/logical';
 import { stacRequest } from '../store/utils';
 
@@ -567,10 +566,11 @@ export default defineComponent({
         });
         return;
       }
+      const operator = operators[0];
       this.filters.push({
         id: `${queryable.id}-${Date.now()}-${Math.random()}`, // Unique ID
-        value: CqlValue.create(queryable.defaultValue),
-        operator: operators[0],
+        value: operator.getDefaultValue(queryable),
+        operator,
         queryable,
         negate: false
       });

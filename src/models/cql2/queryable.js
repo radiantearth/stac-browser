@@ -1,8 +1,7 @@
 import { formatKey } from "@radiantearth/stac-fields/helper";
 import i18n from '../../i18n.js';
-import { CqlEqual, CqlGreaterThan, CqlGreaterThanEqual, CqlLessThan, CqlLessThanEqual, CqlNotEqual } from "./operators/comparison";
-import { CqlLike } from "./operators/advanced";
-import { CqlArrayOverlaps, CqlArrayContains, CqlArrayEquals, CqlArrayContainedBy } from "./operators/array";
+import { CqlEqual, CqlGreaterThan, CqlGreaterThanEqual, CqlLessThan, CqlLessThanEqual, CqlNotEqual, CqlBetween, CqlLike } from "./operators/comparison";
+import { CqlIn, CqlArrayOverlaps, CqlArrayContains, CqlArrayEquals, CqlArrayContainedBy } from "./operators/array";
 import { isObject } from "stac-js/src/utils.js";
 
 export default class Queryable {
@@ -138,8 +137,13 @@ export default class Queryable {
       ops.push(CqlGreaterThan);
       ops.push(CqlGreaterThanEqual);
     }
-    else if (this.isText && cql.advancedComparison) {
+    if (this.isNumeric && cql.advancedComparison) {
+      ops.push(CqlBetween);
+      ops.push(CqlIn);
+    }
+    if (this.isText && cql.advancedComparison) {
       ops.push(CqlLike);
+      ops.push(CqlIn);
     }
 
     // Array operators for array-type queryables

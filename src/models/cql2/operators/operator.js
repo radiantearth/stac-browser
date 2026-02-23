@@ -1,3 +1,5 @@
+import CqlValue from "../value";
+
 export default class CqlOperator {
 
   constructor(operator, args = []) {
@@ -27,6 +29,14 @@ export default class CqlOperator {
 
   static get longLabel() {
     return this.label;
+  }
+
+  static valueType() {
+    return CqlValue;
+  }
+
+  static getDefaultValue(queryable) {
+    return CqlValue.create(queryable.defaultValue);
   }
 
 }

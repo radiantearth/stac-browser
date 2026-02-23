@@ -1,4 +1,5 @@
 import i18n from '../../../i18n.js';
+import CqlValue, { CqlArray } from '../value.js';
 import CqlOperator from './operator';
 
 export default class CqlArrayOperator extends CqlOperator {
@@ -8,7 +9,9 @@ export default class CqlArrayOperator extends CqlOperator {
   }
 
   static create(pred, op, obj) {
-    switch(op) {
+    switch(op.toLowerCase()) {
+      case 'in':
+        return new CqlIn(pred, obj);
       case 'a_overlaps':
         return new CqlArrayOverlaps(pred, obj);
       case 'a_contains':
@@ -18,6 +21,41 @@ export default class CqlArrayOperator extends CqlOperator {
       case 'a_contained_by':
         return new CqlArrayContainedBy(pred, obj);
     }
+  }
+
+  static valueType() {
+    return CqlArray;
+  }
+
+  static getDefaultValue() {
+    return CqlValue.create([]);
+  }
+
+}
+
+// Currently only implemented for strings and numbers, not for booleans and time instances
+export class CqlIn extends CqlArrayOperator {
+
+  static SYMBOL = "in";
+
+  constructor(pred = null, obj = []) {
+    super(CqlIn.SYMBOL, pred, obj);
+  }
+
+  static get label() {
+    return "∈";
+  }
+
+  static get longLabel() {
+    return i18n.global.t('search.in');
+  }
+
+  static get description() {
+    return i18n.global.t('search.inOperatorDescription');
+  }
+
+  toText() {
+    return `${this.args[0].toText()} IN ${this.args[1].toText()}`;
   }
 
 }
