@@ -14,7 +14,7 @@ import { isObject, size } from 'stac-js/src/utils.js';
 import { isStacMediaType } from 'stac-js/src/mediatypes.js';
 import { getDisplayTitle } from '../models/stac';
 import { STAC } from 'stac-js';
-import URI from 'urijs';
+import { URI } from 'stac-js/src/utils.js';
 
 export default defineComponent({
   name: "StacLink",

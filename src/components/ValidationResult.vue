@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import URI from 'urijs';
+import { URI } from 'stac-js/src/utils.js';
 import { isObject } from 'stac-js/src/utils.js';
 import { BCard, BCardHeader } from 'bootstrap-vue-next';
 

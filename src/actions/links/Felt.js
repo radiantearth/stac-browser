@@ -1,5 +1,5 @@
 import LinkActionPlugin from "../LinkActionPlugin";
-import URI from 'urijs';
+import { URI } from 'stac-js/src/utils.js';
 import i18n from "../../i18n";
 
 export default class Felt extends LinkActionPlugin {
@@ -17,7 +17,7 @@ export default class Felt extends LinkActionPlugin {
 
   get uri() {
     // Docs: https://feltmaps.notion.site/Open-in-Felt-Button-22765a3427ff45e0a70218dca3f8acc0
-    let uri = new URI("https://felt.com/map/new");
+    let uri = URI("https://felt.com/map/new");
     let xyz = this.link.href;
     if (xyz.includes('{s}') && Array.isArray(this.link['href:servers']) && this.link['href:servers'].length > 0) {
       xyz = xyz.replace('{s}', this.link['href:servers'][0]);

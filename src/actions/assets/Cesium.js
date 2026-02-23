@@ -1,5 +1,5 @@
 import AssetActionPlugin from "../AssetActionPlugin";
-import URI from 'urijs';
+import { URI } from 'stac-js/src/utils.js';
 import i18n from "../../i18n";
 
 // See mime types discussion for 3d-tiles here and there
@@ -17,7 +17,7 @@ export default class Cesium extends AssetActionPlugin {
 
   get uri() {
     // https://sandcastle.cesium.com/standalone.html vs https://sandcastle.cesium.com/index.html
-    let uri = new URI("https://sandcastle.cesium.com/standalone.html");
+    let uri = URI("https://sandcastle.cesium.com/standalone.html");
     const tileset_url = this.component.href;
     const code_payload = {
       html: `

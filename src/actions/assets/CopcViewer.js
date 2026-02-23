@@ -1,5 +1,5 @@
 import AssetActionPlugin from "../AssetActionPlugin";
-import URI from 'urijs';
+import { URI } from 'stac-js/src/utils.js';
 import i18n from "../../i18n";
 
 export default class CopcViewer extends AssetActionPlugin {
@@ -12,7 +12,7 @@ export default class CopcViewer extends AssetActionPlugin {
   }
 
   get uri() {
-    let uri = new URI("https://viewer.copc.io");
+    let uri = URI("https://viewer.copc.io");
     uri.addQuery('copc', this.component.href);
     return uri;
   }
