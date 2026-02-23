@@ -33,10 +33,43 @@
         </b-dropdown-item-button>
       </b-dropdown>
 
-      <VueDatePicker
-        v-if="queryable.isTemporal"
+      <div v-if="operator.SYMBOL === 'between'" class="value between">
+        <b-form-input
+          :number="queryable.isNumeric"
+          :type="queryable.isNumeric ? 'number' : 'text'"
+          size="sm"
+          :value="value[0].value"
+          @input="updateBetweenValue(0, $event)"
+          v-bind="validation"
+        />
+        <span class="sep">-</span>
+        <b-form-input
+          :number="queryable.isNumeric"
+          :type="queryable.isNumeric ? 'number' : 'text'"
+          size="sm"
+          :value="value[1].value"
+          @input="updateBetweenValue(1, $event)"
+          v-bind="validation"
+        />
+      </div>
+      <multiselect
+        v-else-if="queryable.isArray || operator.SYMBOL === 'in'"
         class="value"
-        :model-value="value?.value"
+        v-model="arrayValues"
+        multiple
+        :taggable="!queryable.isSelection"
+        :options="queryable.isSelection ? queryableOptions : arrayValues"
+        :placeholder="$t('search.arrayInput.helpText')"
+        :tag-placeholder="$t('search.arrayInput.addValue')"
+        @tag="addArrayValue"
+        @paste="onArrayPaste"
+      >
+        <template #noOptions>{{ $t('search.noOptions') }}</template>
+      </multiselect>
+      <VueDatePicker
+        v-else-if="queryable.isTemporal"
+        class="value"
+        :model-value="value.value"
         @update:model-value="updateValue"
         :locale="datepickerLang"
         :week-start="weekStartDay"
@@ -50,7 +83,6 @@
         :input-attrs="{ clearable: true }"
         auto-apply
       />
-
       <b-form-select
         v-else-if="queryable.isSelection"
         :options="queryableOptions"
@@ -58,7 +90,6 @@
         class="value"
         :model-value="value.value"
         @update:model-value="updateValue($event)"
-        v-bind="validation"
       />
       <b-form-input
         v-else-if="queryable.isText || queryable.isNumeric"
@@ -68,19 +99,6 @@
         @update:model-value="updateValue($event)"
         v-bind="validation"
       />
-      <multiselect
-        v-else-if="queryable.isArray"
-        class="value"
-        v-model="arrayValues"
-        multiple taggable
-        :options="arrayValues"
-        :placeholder="$t('search.arrayInput.helpText')"
-        :tag-placeholder="$t('search.arrayInput.addValue')"
-        @tag="addArrayValue"
-        @paste="onArrayPaste"
-      >
-        <template #noOptions>{{ $t('search.noOptions') }}</template>
-      </multiselect>
       <b-form-checkbox
         v-else-if="queryable.isBoolean"
         switch
@@ -189,10 +207,7 @@ export default {
     },
     queryableOptions() {
       if (this.queryable.isSelection) {
-        return this.schema.enum.map(option => ({
-          value: option,
-          text: option
-        }));
+        return this.schema.enum;
       }
       return [];
     },
@@ -213,16 +228,17 @@ export default {
       this.updateOperator(this.operators[nextIndex]);
     },
     updateValue(evt) {
-      let val = isObject(evt) && 'target' in evt ? evt.target.value : evt;
-      if (typeof val === "string" && this.queryable.is('integer')) {
-        val = parseInt(val, 10);
-      }
-      else if (typeof val === "string" && this.queryable.is('number')) {
-        val = parseFloat(val);
-      }
-      this.$emit('update:value', CqlValue.create(val));
+      let val = this.getEventValue(evt);
+      val = this.castValue(val);
+      this.emitValue(CqlValue.create(val));
+    },
+    emitValue(value) {
+      this.$emit('update:value', value);
     },
     updateOperator(op) {
+      if (this.operator.valueType !== op.valueType) {
+        this.emitValue(op.getDefaultValue(this.queryable));
+      }
       this.$emit('update:operator', op);
       this.operatorsOpen = false;
     },
@@ -258,17 +274,32 @@ export default {
         this.updateValue([...currentArr, ...items]);
       }
     },
+    castValue(value) {
+      if (typeof value !== "string") {
+        return value;
+      }
+      if (this.queryable.is('integer')) {
+        value = parseInt(value, 10);
+      }
+      else if (this.queryable.is('number')) {
+        value = parseFloat(value);
+      }
+      return value;
+    },
     castArrayItem(item) {
-      const itemTypes = this.queryable.arrayItems;
+      const itemTypes = this.queryable.isArray ? this.queryable.arrayItems : this.queryable.types;
       // We only support string, integer and number here
       // We do not support boolean, object and (sub)arrays.
+      if (typeof item !== 'string') {
+        return item;
+      }
       if (itemTypes.includes('string')) {
         if (itemTypes.includes('integer') || itemTypes.includes('number')) {
           // If strings are allowed, but also numbers, we only coerce to number if it looks like a number
           if (itemTypes.includes('integer') && /^-?\d+$/.test(item)) {
             return parseInt(item, 10);
           }
-          else if (itemTypes.includes('number') && /^-?\d+(\.\d+)?$/i.test(item)) {
+          else if (itemTypes.includes('number') && /^-?\d+(\.\d+)?$/.test(item)) {
             return parseFloat(item);
           }
         }
@@ -282,6 +313,15 @@ export default {
         return parseInt(item, 10);
       }
       return item;
+    },
+    updateBetweenValue(ix, evt) {
+      const value = this.getEventValue(evt);
+      const between = this.value.slice(0);
+      between[ix] = CqlValue.create(this.castValue(value));
+      this.emitValue(between);
+    },
+    getEventValue(event) {
+      return isObject(event) && 'target' in event ? event.target.value : event;
     }
   }
 };
@@ -303,6 +343,10 @@ export default {
   .title, .value {
     flex-grow: 4;
     width: 7rem !important;
+  }
+  .value.between {
+    display: flex;
+    gap: 0.2em;
   }
   .op {
     min-width: 4rem;
