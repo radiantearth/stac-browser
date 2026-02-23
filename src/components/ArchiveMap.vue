@@ -54,7 +54,7 @@ export default {
     },
     geojsonUrl: {
       type: String,
-      default: 'https://wyvern-prod-public-open-data-program.s3.ca-central-1.amazonaws.com/wyvern_open_data.geojson'
+      default: 'https://wyvern-odp.com/wyvern_open_data.geojson'
     }
   },
   data() {
