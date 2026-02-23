@@ -283,6 +283,7 @@
     "modifyCriteria": "Please modify the search criteria.",
     "noFurtherItemsFound": "No further items available.",
     "noItemsFound": "No items found for the given filters.",
+    "noOperatorsError": "STAC Browser does not support any operators for the filter {queryable}.",
     "noOptions": "Nothing entered yet",
     "notEqualTo": "not equal to",
     "notFullySupported": "Not all of the options may be supported.",
