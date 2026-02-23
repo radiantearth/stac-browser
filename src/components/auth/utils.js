@@ -1,4 +1,4 @@
-import Utils from '../../utils.js';
+import { isObject, size } from 'stac-js/src/utils.js';
 import { STACReference } from 'stac-js';
 import Auth from '../../auth/index.js';
 
@@ -8,10 +8,10 @@ export default class AuthUtils {
     if (obj instanceof STACReference) {
       const refs = obj.getMetadata('auth:refs');
       const schemes = obj.getMetadata('auth:schemes');
-      if (Utils.size(refs) > 0 && Utils.size(schemes) > 0) {
+      if (size(refs) > 0 && size(schemes) > 0) {
         return refs
           .map(ref => schemes[ref])
-          .filter(ref => Utils.isObject(ref));
+          .filter(ref => isObject(ref));
       }
     }
     return [];

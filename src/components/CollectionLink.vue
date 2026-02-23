@@ -8,7 +8,7 @@
 <script>
 import Catalog from './Catalog.vue';
 import { mapGetters } from 'vuex';
-import Utils from '../utils';
+import { isObject } from 'stac-js/src/utils.js';
 
 export default {
   name: "CollectionLink",
@@ -35,7 +35,7 @@ export default {
     link: {
       immediate: true,
       handler(newLink) {
-        if (Utils.isObject(newLink)) {
+        if (isObject(newLink)) {
           this.$store.dispatch("load", { url: newLink.href, omitApi: true });
         }
       }

@@ -25,7 +25,7 @@
 
 <script>
 import URI from 'urijs';
-import Utils from '../utils';
+import { isObject } from 'stac-js/src/utils.js';
 import { BCard, BCardHeader } from 'bootstrap-vue-next';
 
 const VERSION_REGEXP = /\/(v?\d+\.\d+[^/]+)(\/|$)/;
@@ -129,7 +129,7 @@ export default {
   methods: {
     makeAjvErrorMessage(error) {
       let message = error.message;
-      if (Utils.isObject(error.params) && Object.keys(error.params).length > 0) {
+      if (isObject(error.params) && Object.keys(error.params).length > 0) {
         let params = Object.entries(error.params)
           .map(([key, value]) => {
             let localizedLabel;
