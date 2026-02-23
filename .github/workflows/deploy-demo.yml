@@ -10,10 +10,10 @@ jobs:
       SB_pathPrefix: "/stac-browser"
       SB_historyMode: "hash"
     steps:
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 'lts/*'
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - run: npm ci
       - run: npm run build
       - uses: peaceiris/actions-gh-pages@v3
