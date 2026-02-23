@@ -96,7 +96,7 @@ export default class Queryable {
   }
 
   getOperators(cql) {
-    let ops = [];
+    const ops = [];
     if (!this.isDateTime) {
       // Although it is supported, comparing specific instances in time doesn't give predictable results.
       // For example 2020-01-01T00:00:00Z is not equal to 2020-01-01T00:00:00.001Z and you don't know the granularity

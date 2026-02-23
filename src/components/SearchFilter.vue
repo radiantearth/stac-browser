@@ -10,8 +10,7 @@
           <multiselect
             :id="ids.q"
             v-model="query.q"
-            :multiple="true"
-            :taggable="true"
+            multiple taggable
             :options="query.q"
             :placeholder="$t('search.enterSearchTerms')"
             :tag-placeholder="$t('search.addSearchTerm')"
@@ -72,8 +71,7 @@
           <multiselect
             :id="ids.ids"
             v-model="query.ids"
-            :multiple="true"
-            :taggable="true"
+            multiple taggable
             :options="query.ids"
             :placeholder="$t('search.enterItemIds')"
             :tag-placeholder="$t('search.addItemIds')"
@@ -551,6 +549,12 @@ export default defineComponent({
     },
     additionalFieldSelected(queryable) {
       const operators = queryable.getOperators(this.cql);
+      if (operators.length === 0) {
+        this.$store.commit('showGlobalError', {
+          message: this.$t('search.noOperatorsError', {queryable: queryable.id})
+        });
+        return;
+      }
       this.filters.push({
         id: `${queryable.id}-${Date.now()}-${Math.random()}`, // Unique ID
         value: CqlValue.create(queryable.defaultValue),
