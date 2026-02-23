@@ -276,7 +276,8 @@
     "likeOperatorDescription": "Platzhalterzeichen können verwendet werden. `_` entspricht einem einzelnen Zeichen, `%` entspricht einer beliebigen Anzahl an Zeichen. Um nach einem Platzhalterzeichen selber zu suchen, müssen ein `\\` vor das Zeichen gesetzt werden.",
     "logical": {
       "and": "Berücksichtige alle Filter (und)",
-      "or": "Berücksichtige mindestens einen der Filter (oder)"
+      "or": "Berücksichtige mindestens einen der Filter (oder)",
+      "not": "Negiere Filter"
     },
     "matches": "enthält etwa",
     "metaDescription": "Durchsuche die angebotenen Daten von {title}.",

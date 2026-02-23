@@ -276,7 +276,8 @@
     "likeOperatorDescription": "You can use wildcard characters. `_` matches a single character, `%` matches any number of characters. To search for a wildcard character specifically, you need to add a `\\` in front of the character.",
     "logical": {
       "and": "Match all filters (and)",
-      "or": "Match any filters (or)"
+      "or": "Match any filters (or)",
+      "not": "Negate filter"
     },
     "matches": "matches",
     "metaDescription": "Search through the data offering of {title}.",
