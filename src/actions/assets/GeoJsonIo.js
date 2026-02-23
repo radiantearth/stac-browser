@@ -1,5 +1,5 @@
 import AssetActionPlugin from "../AssetActionPlugin";
-import { geojsonMediaType } from "../../utils";
+import { geojsonMediaType } from "stac-js/src/mediatypes.js";
 import { URI } from 'stac-js/src/utils.js';
 import i18n from "../../i18n";
 

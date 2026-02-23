@@ -64,6 +64,8 @@
 
 <script>
 import Utils from '../utils';
+import { toAbsolute } from 'stac-js/src/http.js';
+import { isObject, size } from 'stac-js/src/utils.js';
 import SearchFilter from '../components/SearchFilter.vue';
 import Loading from '../components/Loading.vue';
 import ErrorAlert from '../components/ErrorAlert.vue';
@@ -75,7 +77,7 @@ import { mapGetters, mapState } from "vuex";
 import { BTab, BTabs } from 'bootstrap-vue-next';
 
 export default defineComponent({
-  name: "Search",
+  name: "ApiSearch",
   components: {
     Catalogs: defineAsyncComponent(() => import('../components/Catalogs.vue')),
     BTabs,
@@ -111,7 +113,7 @@ export default defineComponent({
     ...mapState(['catalogUrl', 'catalogTitle', 'searchResultsPerPage', 'itemsPerPage', 'collectionsPerPage']),
     ...mapGetters(['canSearchItems', 'canSearchCollections', 'getStac', 'root', 'collectionLink', 'parentLink', 'fromBrowserPath', 'toBrowserPath']),
     selectedCollectionCount() {
-      return Utils.size(this.selectedCollections);
+      return size(this.selectedCollections);
     },
     totalCount() {
       if (typeof this.data.numberMatched === 'number') {
@@ -144,7 +146,7 @@ export default defineComponent({
       }
     },
     results() {
-      if (Utils.size(this.data) === 0) {
+      if (size(this.data) === 0) {
         return [];
       }
       let list = this.isCollectionSearch ? this.data.collections : this.data.features;
@@ -156,13 +158,13 @@ export default defineComponent({
       return list
         .map(obj => {
           try {
-            if (!Utils.isObject(obj) || obj.type !== type) {
+            if (!isObject(obj) || obj.type !== type) {
               return null;
             }
             let selfLink = Utils.getLinkWithRel(obj.links, 'self');
             let url;
             if (selfLink?.href) {
-              url = Utils.toAbsolute(selfLink.href, this.link.href);
+              url = toAbsolute(selfLink.href, this.link.href);
             }
             let stac = createSTAC(obj, url, this.toBrowserPath(url));
             stac = processSTAC(this.$store.state, stac);
@@ -253,17 +255,18 @@ export default defineComponent({
       try {
         this.link = Utils.addFiltersToLink(link, this.filters, this.searchResultsPerPage);
 
-        let key = this.isCollectionSearch ? 'collections' : 'features';
-        let response = await stacRequest(this.$store, this.link);
+        const key = this.isCollectionSearch ? 'collections' : 'features';
+        const response = await stacRequest(this.$store, this.link);
         if (response) {
           this.showPage(response.config.url);
         }
-        if (!Utils.isObject(response.data) || !Array.isArray(response.data[key])) {
+        if (!isObject(response.data) || !Array.isArray(response.data[key])) {
           this.data = {};
           this.error = this.$t(this.isCollectionSearch ? 'errors.invalidStacCollections' : 'errors.invalidStacItems');
         }
         else {
-          this.data = response.data;
+          const url = this.link.getAbsoluteUrl();
+          this.data = createSTAC(response.data, url, this.toBrowserPath(url));
         }
       } catch (error) {
         this.data = {};

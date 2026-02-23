@@ -41,12 +41,12 @@
     "password": "Parola",
     "required": "Autentificare necesară",
     "schemeTypes": {
-      "http": "HTTP {scheme}",
-      "s3": "S3",
-      "signedUrl": "URL Semnat",
-      "oauth2": "OAuth 2",
       "apiKey": "Cheie API",
-      "openIdConnect": "OpenID Connect"
+      "http": "HTTP {scheme}",
+      "oauth2": "OAuth 2",
+      "openIdConnect": "OpenID Connect",
+      "s3": "S3",
+      "signedUrl": "URL Semnat"
     },
     "title": "Autentificare",
     "unauthorized": "Nu aveți permisiuni să accesați aceste date. Autentificare necesară.",
@@ -157,16 +157,18 @@
   "map": "Hartă",
   "mapping": {
     "attribution": {
-      "label": "i",
-      "collapseLabel": "✕"
+      "collapseLabel": "✕",
+      "label": "i"
     },
-    "bboxSelect": {},
+    "bboxSelect": {
+      "error": {}
+    },
     "close": "Închidere",
     "layers": {
-      "title": "Straturi",
       "base": "Straturi de bază",
-      "unnamed": "Fără nume #{id}",
-      "footprint": "Amprentă la sol"
+      "footprint": "Amprentă la sol",
+      "title": "Straturi",
+      "unnamed": "Fără nume #{id}"
     },
     "location": {
       "description": "Mergi la locație"
@@ -317,8 +319,8 @@
       "message": "{title} este disponibil la adresa {url}",
       "sharePageWithOthers": "Partajați URL-ul acestei pagini cu alții:",
       "title": "Partajare",
-      "x": "X (Twitter)",
-      "withOthers": "Partajați această pagină"
+      "withOthers": "Partajați această pagină",
+      "x": "X (Twitter)"
     },
     "stacExtension": "Extensie STAC",
     "stacVersion": "Versiune STAC",

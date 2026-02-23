@@ -41,12 +41,12 @@
     "password": "Kata Sandi",
     "required": "Autentikasi diperlukan",
     "schemeTypes": {
-      "http": "HTTP {scheme}",
-      "s3": "S3",
-      "signedUrl": "URL Tertanda",
-      "oauth2": "OAuth 2",
       "apiKey": "Kunci API",
-      "openIdConnect": "OpenID Connect"
+      "http": "HTTP {scheme}",
+      "oauth2": "OAuth 2",
+      "openIdConnect": "OpenID Connect",
+      "s3": "S3",
+      "signedUrl": "URL Tertanda"
     },
     "title": "Autentikasi",
     "unauthorized": "Anda tidak memiliki izin untuk mengakses data ini. Silakan masuk.",
@@ -152,7 +152,9 @@
   "map": "Peta",
   "mapping": {
     "attribution": {},
-    "bboxSelect": {},
+    "bboxSelect": {
+      "error": {}
+    },
     "layers": {},
     "location": {},
     "zoom": {
@@ -294,8 +296,8 @@
       "message": "{title} tersedia di {url}",
       "sharePageWithOthers": "Bagikan URL halaman ini di mana pun Anda suka:",
       "title": "Bagikan",
-      "x": "X (Twitter)",
-      "withOthers": "Bagikan halaman ini dengan orang lain"
+      "withOthers": "Bagikan halaman ini dengan orang lain",
+      "x": "X (Twitter)"
     },
     "stacExtension": "Ekstensi STAC",
     "stacVersion": "Versi STAC",

@@ -1,3 +1,5 @@
+import { isObject, size } from 'stac-js/src/utils.js';
+import { toAbsolute } from 'stac-js/src/http.js';
 import Utils from './utils';
 import { getDisplayTitle } from './models/stac';
 import { STAC } from 'stac-js';
@@ -37,10 +39,10 @@ function formatTemporalCoverage(dates) {
 }
 
 function makeAssets(data) {
-  if (Utils.size(data.assets) > 0) {
+  if (size(data.assets) > 0) {
     return Object.values(data.assets).map(a => ({
       "@type": "DataDownload",
-      contentUrl: Utils.toAbsolute(a.href, data.getAbsoluteUrl()),
+      contentUrl: toAbsolute(a.href, data.getAbsoluteUrl()),
       encodingFormat: a.type,
       name: a.title
     }));
@@ -57,7 +59,7 @@ function makeLinks(links, data, store, type = "DataCatalog") {
     }
     else {
       name = link.title;
-      isBasedOn = Utils.toAbsolute(link.href, data.getAbsoluteUrl());
+      isBasedOn = toAbsolute(link.href, data.getAbsoluteUrl());
     }
     let obj = {
       "@type": type,
@@ -74,7 +76,7 @@ function makeLinks(links, data, store, type = "DataCatalog") {
 
 function makeProvider(providers, role) {
   return providers
-    .filter(p => Utils.isObject(p) && Array.isArray(p.roles) && p.roles.includes(role))
+    .filter(p => isObject(p) && Array.isArray(p.roles) && p.roles.includes(role))
     .map(p => ({
       "@type": "Organization",
       "name": p.name,
@@ -90,7 +92,7 @@ function fallbackDescription(data, store) {
     stacType = data.isItem() ? "Item" : data.type;
     container = data.collection;
   }
-  else if (Utils.isObject(data) && data.rel === 'item') {
+  else if (isObject(data) && data.rel === 'item') {
     stacType = "Item";
   }
   if (stacType) {
@@ -118,7 +120,7 @@ function createBaseSchema(data, type, store) {
     license = data.getLinkWithRel('license')?.href;
   }
   if (license) {
-    license = Utils.toAbsolute(license, data.getAbsoluteUrl());
+    license = toAbsolute(license, data.getAbsoluteUrl());
   }
 
   let providers = data.getMetadata('providers');
@@ -126,7 +128,7 @@ function createBaseSchema(data, type, store) {
   let producer; // producer
   let provider; // host
   let creator; // processor
-  if (Utils.size(providers) > 0) {
+  if (size(providers) > 0) {
     copyrightHolder = makeProvider(providers, "licensor");
     producer = makeProvider(providers, "producer");
     provider = makeProvider(providers, "host");
@@ -164,7 +166,7 @@ export function createCatalogSchema(data, parents, store) {
     return null;
   }
   // Remove invalid links
-  parents = parents.filter(link => Utils.isObject(link));
+  parents = parents.filter(link => isObject(link));
   if (parents.length > 1) {
     // Remove duplicates
     parents = parents.filter((link, i) => parents.findIndex(p => p.isBasedOn === link.isBasedOn) !== i);
@@ -194,7 +196,7 @@ export function createItemSchema(data, parents, store) {
   if (!(data instanceof STAC)) {
     return null;
   }
-  parents = parents.filter(link => Utils.isObject(link));
+  parents = parents.filter(link => isObject(link));
 
   let schema = createBaseSchema(data, 'Dataset', store);
 

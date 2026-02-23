@@ -134,7 +134,9 @@
   "map": "マップ",
   "mapping": {
     "attribution": {},
-    "bboxSelect": {},
+    "bboxSelect": {
+      "error": {}
+    },
     "close": "閉じる",
     "layers": {},
     "location": {},
@@ -281,8 +283,8 @@
       "message": "{title} はこちらのページで利用できます: {url}",
       "sharePageWithOthers": "このページのURLを共有しましょう:",
       "title": "共有",
-      "x": "X (Twitter)",
-      "withOthers": "このページを共有しましょう"
+      "withOthers": "このページを共有しましょう",
+      "x": "X (Twitter)"
     },
     "statistics": "統計",
     "title": "ソースデータ",

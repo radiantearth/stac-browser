@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import Utils from '../utils';
+import { size } from 'stac-js/src/utils.js';
 import { defineComponent } from 'vue';
 import { BCard } from 'bootstrap-vue-next';
 import { formatKey } from '@radiantearth/stac-fields/helper';
@@ -54,7 +54,7 @@ export default defineComponent({
       return formatted;
     },
     hasProps() {
-      return Utils.size(this.feature.properties) > 0;
+      return size(this.feature.properties) > 0;
     }
   }
 });

@@ -82,7 +82,7 @@ import { defineAsyncComponent } from 'vue';
 import { BDropdown, BDropdownItemButton } from 'bootstrap-vue-next';
 
 import DatePickerMixin from './DatePickerMixin';
-import Utils from '../utils';
+import { isObject } from 'stac-js/src/utils.js';
 import CqlValue from '../models/cql2/value';
     
 export default {
@@ -162,7 +162,7 @@ export default {
       this.updateOperator(this.operators[nextIndex]);
     },
     updateValue(evt) {
-      let val = Utils.isObject(evt) && 'target' in evt ? evt.target.value : evt;
+      let val = isObject(evt) && 'target' in evt ? evt.target.value : evt;
       if (typeof val === "string" && this.queryable.is('integer')) {
         val = parseInt(val, 10);
       }
