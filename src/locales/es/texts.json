@@ -41,12 +41,12 @@
     "password": "Contraseña",
     "required": "Se necesita autenticación",
     "schemeTypes": {
-      "http": "HTTP {scheme}",
-      "s3": "S3",
-      "signedUrl": "URL Firmada",
-      "oauth2": "OAuth 2",
       "apiKey": "Llave de API",
-      "openIdConnect": "OpenID Connect"
+      "http": "HTTP {scheme}",
+      "oauth2": "OAuth 2",
+      "openIdConnect": "OpenID Connect",
+      "s3": "S3",
+      "signedUrl": "URL Firmada"
     },
     "title": "Autenticación",
     "unauthorized": "No tiene permiso para acceder a estos datos. Por favor, inicie sesión.",
@@ -86,6 +86,7 @@
   },
   "description": "Descripción",
   "errors": {
+    "apiListRequested": "La petición es inválida. Actualmente no se soportan las peticiones directas a /collections o .../items.",
     "authFailed": "La petición falló, puede que los datos de autenticación sean incorrectos",
     "badRequest": "La petición es inválida. Esto puede deberse a parámetros incorrectos, por ejemplo, en la búsqueda, o puede ser un bug en STAC Browser.",
     "contactProvider": "Por favor contacte al proveedor de servicio para resolver este problema.",
@@ -108,10 +109,15 @@
     "noExternalAccess": "¡El acceso a catálogos externos no está permitido!",
     "notFound": "El recurso solicitado no existe. @:errors.contactProvider",
     "serverError": "El servidor encontró un problema. @:errors.contactProvider",
+    "title": "Error",
     "unauthorized": "La petición no tiene credenciales, por ejemplo, un token de la API. Por favor introduzca sus credenciales y pruebe de nuevo."
   },
   "featureExperimental": "¡Esta funcionalidad es experimental y puede producir resultados inesperados!",
-  "features": {},
+  "features": {
+    "empty": "No hay elementos disponibles.",
+    "noProperties": "No se enviaron propiedades.",
+    "title": "Elemento | Elementos"
+  },
   "fullscreen": {
     "exit": "Salir de pantalla completa",
     "exitLabel": "✕",
@@ -154,13 +160,38 @@
   "map": "Mapa",
   "mapping": {
     "attribution": {
-      "label": "i",
-      "collapseLabel": "✕"
+      "collapseLabel": "✕",
+      "description": "Atribuciones",
+      "label": "i"
     },
-    "bboxSelect": {},
+    "bboxSelect": {
+      "add": "Haz clic en el mapa para añadir un rectángulo delimitador.",
+      "eastLon": "Longitud Este",
+      "error": {
+        "incomplete": "Coordenada faltante",
+        "invalidLat": "Debe estar entre -90 y 90",
+        "invalidLon": "Debe estar entre -180 y 180",
+        "latOrder": "Latitud Sur debe ser menor que Latitud Norte",
+        "lonOrder": "Longitud Oeste debe ser menor que Longitud Este"
+      },
+      "northLat": "Latitud Norte",
+      "remove": "Haz clic dentro del rectángulo para eliminarlo.",
+      "southLat": "Latitud Sur",
+      "westLon": "Longitud Oeste"
+    },
     "close": "Cerrar",
-    "layers": {},
-    "location": {},
+    "fit": "Encajar en la extensión",
+    "layers": {
+      "base": "Capas base",
+      "footprint": "Huella",
+      "title": "Capas",
+      "unnamed": "Sin nombre #{id}"
+    },
+    "location": {
+      "description": "Ve a tu ubicación"
+    },
+    "nobasemap": "No hay mapas base disponibles.",
+    "nodata": "No hay información espacial en los metadatos.",
     "zoom": {
       "in": {
         "description": "Acercar el zoom",
@@ -258,6 +289,7 @@
     "notSupported": "La API no soporta la Búsqueda por Elementos.",
     "placeholder": "Búsqueda...",
     "selectCollections": "Seleccione una o varias colecciones...",
+    "selectDateRange": "Seleccionar el rango de fechas",
     "selectForItemSearch": "Seleccionar para Búsqueda de Elementos",
     "spatialExtent": "Extensión espacial",
     "tabs": {
@@ -306,8 +338,8 @@
       "message": "{title} está disponible en {url}",
       "sharePageWithOthers": "Comparta la URL de está página donde guste:",
       "title": "Compartir",
-      "x": "X (Twitter)",
-      "withOthers": "Comparta esta página con otros"
+      "withOthers": "Comparta esta página con otros",
+      "x": "X (Twitter)"
     },
     "stacExtension": "Extensión STAC",
     "stacVersion": "Versión STAC",

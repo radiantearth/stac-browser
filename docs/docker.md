@@ -72,7 +72,7 @@ So, essentially, in the end you get an nginx instance that serves static files.
 
 1. [Dockerfile](../Dockerfile) - contains information on how to build the image.
 2. [docker/default.conf](../docker/default.conf) - nginx configuration template, where `<pathPrefix>` is replaced during build.
-3. [docker/docker-entrypoint.sh](../docker/docker-entrypoint.sh) - a start script to read the passed variables and produce the `config.js` file.
+3. [docker/docker-entrypoint.sh](../docker/docker-entrypoint.sh) - a start script to read the passed variables and produce the `runtime-config.js` file.
 
 ## FAQ
 
@@ -82,4 +82,4 @@ You can not. You need to build your own image because `pathPrefix` is a build-on
 
 > How do I specify `buildTileUrlTemplate` via docker env?
 
-You can not. Consider modifying the dockerfile and using a custom `config.js` file
+You can not. Consider modifying the dockerfile and using a custom `config.js` file (or `runtime-config.js` for runtime configuration)

@@ -10,8 +10,8 @@ The following ways to set config options are possible:
 - Set **environment variables**, all options need a `SB_` prefix.
   So you could for example set the catalog URL via the environment variable `SB_catalogUrl`.
 - Optionally, you can also set options after the build, basically **at "runtime"**.
-  Enable this by removing the `<!--` and `-->` around the `<script defer="defer" src="./config.js"></script>` in the [`public/index.html`](../public/index.html).
-  Then run the build procedure and after completion, you can fill the `dist/config.js` with any options that you want to customize.
+  Enable this by removing the `<!--` and `-->` around the `<script defer="defer" src="./runtime-config.js"></script>` in the [`index.html`](../index.html).
+  Then run the build procedure and after completion, you can fill the `dist/runtime-config.js` with any options that you want to customize.
 
 > [!CAUTION]  
 > Appending configuration options as CLI parameters to the CLI command (e.g. `npm run build -- --catalogUrl="https://example.com"`) has been removed in  STAC Browser v5.

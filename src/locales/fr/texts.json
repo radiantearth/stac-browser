@@ -41,12 +41,12 @@
     "password": "Mot de passe",
     "required": "Authentification requise",
     "schemeTypes": {
-      "http": "HTTP {scheme}",
-      "s3": "S3",
-      "signedUrl": "URL signée",
-      "oauth2": "OAuth 2",
       "apiKey": "Clé API",
-      "openIdConnect": "Connexion OpenID"
+      "http": "HTTP {scheme}",
+      "oauth2": "OAuth 2",
+      "openIdConnect": "Connexion OpenID",
+      "s3": "S3",
+      "signedUrl": "URL signée"
     },
     "title": "Authentification",
     "unauthorized": "Vous n'êtes pas autorisé à accéder à ces données. Veuillez vous connecter.",
@@ -159,21 +159,22 @@
   "map": "Carte",
   "mapping": {
     "attribution": {
-      "label": "i",
+      "collapseLabel": "✕",
       "description": "Attributions",
-      "collapseLabel": "✕"
+      "label": "i"
     },
     "bboxSelect": {
       "add": "Cliquez sur la carte pour ajouter une boîte englobante.",
+      "error": {},
       "remove": "Cliquez à l'intérieur de la boîte englobante pour la supprimer."
     },
     "close": "Fermer",
     "fit": "Adapter à l'étendue",
     "layers": {
-      "title": "Couches",
       "base": "Couches de base",
-      "unnamed": "#{id} non nommé",
-      "footprint": "Empreinte"
+      "footprint": "Empreinte",
+      "title": "Couches",
+      "unnamed": "#{id} non nommé"
     },
     "location": {
       "description": "Aller à votre position"
@@ -325,8 +326,8 @@
       "message": "{title} est disponible à l'adresse {url}",
       "sharePageWithOthers": "Partagez l'URL de cette page:",
       "title": "Partager",
-      "x": "X (Twitter)",
-      "withOthers": "Partagez cette page"
+      "withOthers": "Partagez cette page",
+      "x": "X (Twitter)"
     },
     "stacExtension": "Extension du STAC",
     "stacVersion": "Version STAC",

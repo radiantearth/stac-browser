@@ -1,4 +1,4 @@
-import URI from 'urijs';
+import { URI } from 'stac-js/src/utils.js';
 import i18n from "../i18n";
 import BIconBoxArrowUpRight from '~icons/bi/box-arrow-up-right';
 

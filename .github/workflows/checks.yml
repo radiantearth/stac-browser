@@ -10,10 +10,10 @@ jobs:
   locales:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 'lts/*'
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - run: npm ci
       - name: I18N messages for stac-fields are complete
         run: npm run i18n:fields
@@ -21,10 +21,10 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 'lts/*'
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - run: npm install
       - name: Linting
         run: npm run lint

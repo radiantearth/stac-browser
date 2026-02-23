@@ -41,12 +41,12 @@
     "password": "Senha",
     "required": "Autenticação requerida",
     "schemeTypes": {
-      "http": "HTTP {scheme}",
-      "s3": "S3",
-      "signedUrl": "URL Assinada",
-      "oauth2": "OAuth 2",
       "apiKey": "Chave da API",
-      "openIdConnect": "OpenID Connect"
+      "http": "HTTP {scheme}",
+      "oauth2": "OAuth 2",
+      "openIdConnect": "OpenID Connect",
+      "s3": "S3",
+      "signedUrl": "URL Assinada"
     },
     "title": "Autenticação",
     "unauthorized": "Você não tem permissão para acessar esses dados. Por favor, faça login.",
@@ -159,21 +159,22 @@
   "map": "Mapa",
   "mapping": {
     "attribution": {
-      "label": "i",
+      "collapseLabel": "✕",
       "description": "Créditos",
-      "collapseLabel": "✕"
+      "label": "i"
     },
     "bboxSelect": {
       "add": "Clique no mapa para adicionar um retângulo envolvente.",
+      "error": {},
       "remove": "Clique no retângulo envolvente para removê-lo."
     },
     "close": "Fechar",
     "fit": "Ajustar à extensão",
     "layers": {
-      "title": "Camadas",
       "base": "Mapas de Fundo",
-      "unnamed": "Sem nome #{id}",
-      "footprint": "Footprint"
+      "footprint": "Footprint",
+      "title": "Camadas",
+      "unnamed": "Sem nome #{id}"
     },
     "location": {
       "description": "Ir para sua localização"
@@ -325,8 +326,8 @@
       "message": "{title} está disponível em {url}",
       "sharePageWithOthers": "Compartilhe a URL desta página onde quiser:",
       "title": "Compartilhar",
-      "x": "X (Twitter)",
-      "withOthers": "Compartilhe esta página com outros"
+      "withOthers": "Compartilhe esta página com outros",
+      "x": "X (Twitter)"
     },
     "stacExtension": "Extensão STAC",
     "stacVersion": "Versão STAC",
