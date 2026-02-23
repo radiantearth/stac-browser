@@ -5,16 +5,31 @@
         {{ queryable.title }}
       </span>
 
-      <b-dropdown size="sm" class="op" variant="dark" split :text="operator.label" @split-click="iterateOps">
+      <b-dropdown
+        v-model="operatorsOpen"
+        split auto-close="outside"
+        size="sm" class="op" variant="dark" :text="operator.label"
+        @split-click="iterateOps"
+      >
         <b-dropdown-item-button
           v-for="op in operators"
           :key="op.SYMBOL"
           :active="op === operator"
           @click="updateOperator(op)"
-          button-class="d-flex justify-content-between align-items-center"
+          button-class="queryable-item"
         >
-          <span>{{ op.longLabel }}</span>
+          <span class="long-label">{{ op.longLabel }}</span>
           <b-badge variant="dark" class="ms-2">{{ op.label }}</b-badge>
+        </b-dropdown-item-button>
+        <b-dropdown-divider />
+        <b-dropdown-item-button
+          button-class="queryable-item"
+          :active="negate"
+          @click="updateNegate(!negate)"
+        >
+          <b-icon-check :class="{hide: !negate}" class="mt-1 me-2" />
+          <span class="long-label">{{ cqlNot.longLabel }}</span>
+          <b-badge variant="dark" class="ms-2">{{ cqlNot.label }}</b-badge>
         </b-dropdown-item-button>
       </b-dropdown>
 
@@ -79,15 +94,17 @@
 <script>
 import { defineAsyncComponent } from 'vue';
 
-import { BDropdown, BDropdownItemButton } from 'bootstrap-vue-next';
+import { BDropdownDivider, BDropdown, BDropdownItemButton } from 'bootstrap-vue-next';
 
 import DatePickerMixin from './DatePickerMixin';
 import { isObject } from 'stac-js/src/utils.js';
 import CqlValue from '../models/cql2/value';
+import { CqlNot } from '../models/cql2/operators/logical';
     
 export default {
   name: 'QueryableInput',
   components: {
+    BDropdownDivider,
     BDropdown,
     BDropdownItemButton,
     Description: defineAsyncComponent(() => import('./Description.vue'))
@@ -104,6 +121,10 @@ export default {
       type: Function,
       required: true
     },
+    negate: {
+      type: Boolean,
+      required: true
+    },
     queryable: {
       type: Object,
       required: true
@@ -116,8 +137,15 @@ export default {
   emits: [
     'remove-queryable',
     'update:value',
-    'update:operator'
+    'update:operator',
+    'update:negate'
   ],
+  data() {
+    return {
+      operatorsOpen: false,
+      cqlNot: CqlNot
+    };
+  },
   computed: {
     validation() {
       if (this.queryable.isText) {
@@ -173,6 +201,10 @@ export default {
     },
     updateOperator(op) {
       this.$emit('update:operator', op);
+      this.operatorsOpen = false;
+    },
+    updateNegate(negate) {
+      this.$emit('update:negate', negate);
     }
   }
 };
@@ -201,6 +233,22 @@ export default {
   }
   .delete {
     width: auto;
+  }
+}
+
+.queryable-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+
+  .long-label {
+    flex-grow: 1;
+    white-space: nowrap;
+  }
+
+  .hide {
+    opacity: 0;
   }
 }
 
