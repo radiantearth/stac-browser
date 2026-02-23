@@ -257,6 +257,18 @@
     "addItemIds": "Element-Identifikationsnummern hinzufügen mittels Enter-Taste",
     "addSearchTerm": "Suchbegriff hinzufügen mittels Enter-Taste",
     "additionalFilters": "Weitere Filter",
+    "arrayInput": {
+      "addValue": "Wert hinzufügen mittels Enter-Taste",
+      "helpText": "Wert(e) eingeben"
+    },
+    "arrayContains": "Enthält alle",
+    "arrayContainsDescription": "Liste enthält alle angegebenen Werte",
+    "arrayContainedBy": "Ist Teilmenge von",
+    "arrayContainedByDescription": "Liste enthält einen Teil der angegebenen Werte",
+    "arrayEquals": "Genau übereinstimmend",
+    "arrayEqualsDescription": "Liste stimmt genau mit den angegebenen Werten überein (gleiche Elemente, beliebige Reihenfolge)",
+    "arrayOverlaps": "Enthält mindestens einen",
+    "arrayOverlapsDescription": "Liste enthält mindestens einen der angegebenen Werte",
     "dateDescription": "Alle Zeiten in koordinierter Weltzeit (UTC).",
     "enterCollections": "Gebe Katalog-Identifikationsnummern ein...",
     "enterItemIds": "Gebe Element-Identifikationsnummern ein...",

@@ -68,6 +68,19 @@
         @update:model-value="updateValue($event)"
         v-bind="validation"
       />
+      <multiselect
+        v-else-if="queryable.isArray"
+        class="value"
+        v-model="arrayValues"
+        multiple taggable
+        :options="arrayValues"
+        :placeholder="$t('search.arrayInput.helpText')"
+        :tag-placeholder="$t('search.arrayInput.addValue')"
+        @tag="addArrayValue"
+        @paste="onArrayPaste"
+      >
+        <template #noOptions>{{ $t('search.noOptions') }}</template>
+      </multiselect>
       <b-form-checkbox
         v-else-if="queryable.isBoolean"
         switch
@@ -107,7 +120,8 @@ export default {
     BDropdownDivider,
     BDropdown,
     BDropdownItemButton,
-    Description: defineAsyncComponent(() => import('./Description.vue'))
+    Description: defineAsyncComponent(() => import('./Description.vue')),
+    Multiselect: defineAsyncComponent(() => import('vue-multiselect'))
   },
   mixins: [
     DatePickerMixin
@@ -181,6 +195,15 @@ export default {
         }));
       }
       return [];
+    },
+    arrayValues: {
+      get() {
+        const arr = this.value?.value || [];
+        return arr.map(v => String(v));
+      },
+      set(newValues) {
+        this.updateValue(newValues.map(v => this.castArrayItem(v)));
+      }
     }
   },
   methods: {
@@ -205,6 +228,60 @@ export default {
     },
     updateNegate(negate) {
       this.$emit('update:negate', negate);
+    },
+    addArrayValue(tag) {
+      tag = tag.trim();
+      if (tag === '') {
+        return;
+      }
+      const value = this.castArrayItem(tag);
+      const currentArr = this.value?.value || [];
+      this.updateValue([...currentArr, value]);
+    },
+    onArrayPaste(event) {
+      const clipboardData = event.clipboardData || window.clipboardData;
+      if (!clipboardData) {
+        return;
+      }
+      const pasted = clipboardData.getData('text');
+      if (!pasted || !pasted.includes(',')) {
+        return;
+      }
+      event.preventDefault();
+      const currentArr = this.value?.value || [];
+      const items = pasted.split(',')
+        .map(s => s.trim())
+        .filter(s => s !== '')
+        .map(s => this.castArrayItem(s))
+        .filter(item => !currentArr.includes(item));
+      if (items.length > 0) {
+        this.updateValue([...currentArr, ...items]);
+      }
+    },
+    castArrayItem(item) {
+      const itemTypes = this.queryable.arrayItems;
+      // We only support string, integer and number here
+      // We do not support boolean, object and (sub)arrays.
+      if (itemTypes.includes('string')) {
+        if (itemTypes.includes('integer') || itemTypes.includes('number')) {
+          // If strings are allowed, but also numbers, we only coerce to number if it looks like a number
+          if (itemTypes.includes('integer') && /^-?\d+$/.test(item)) {
+            return parseInt(item, 10);
+          }
+          else if (itemTypes.includes('number') && /^-?\d+(\.\d+)?$/i.test(item)) {
+            return parseFloat(item);
+          }
+        }
+        return item;
+      }
+      // Do number first to avoid casting floats to integers if both are allowed
+      else if (itemTypes.includes('number')) {
+         return parseFloat(item);
+      }
+      else if (itemTypes.includes('integer')) {
+        return parseInt(item, 10);
+      }
+      return item;
     }
   }
 };
