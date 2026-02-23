@@ -5,7 +5,7 @@
         {{ queryable.title }}
       </span>
 
-      <b-dropdown size="sm" class="op" variant="dark" split :text="operator.label" @click="iterateOps">
+      <b-dropdown size="sm" class="op" variant="dark" split :text="operator.label" @split-click="iterateOps">
         <b-dropdown-item-button
           v-for="op in operators"
           :key="op.SYMBOL"
