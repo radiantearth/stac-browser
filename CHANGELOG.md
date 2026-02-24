@@ -41,6 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Handle state of downloads better and confirm leaving the page when downloading
 - Better error on request to the /collections or .../items endpoints
 - Collection list on Global Item Search was empty in certain situations
+- Don't show an "unsupported" error when only Collection Search is supported by the API
 
 ## [4.0.1] - 2026-02-11
 
