@@ -142,15 +142,28 @@
       <b-card-footer>
         <b-button type="submit" variant="primary">{{ $t('submit') }}</b-button>
         <b-button type="reset" variant="danger" class="ms-3">{{ $t('reset') }}</b-button>
+        <b-button v-if="searchLink" type="button" variant="secondary" class="ms-3" @click="showCodeModal = true">{{ $t('exampleCode') }}</b-button>
       </b-card-footer>
     </b-card>
+    <b-modal v-model="showCodeModal" :title="$t('exampleCode')" size="lg">
+      <SearchCode
+        v-if="showCodeModal"
+        :catalogHref="searchLink.href"
+        :filters="query"
+        @update:activeCode="activeCode = $event"
+      />
+      <template #footer="{ close }">
+        <CopyButton v-if="activeCode" variant="outline-primary" :copyText="activeCode">{{ $t('copy') }}</CopyButton>
+        <b-button variant="secondary" @click="close()">{{ $t('close') }}</b-button>
+      </template>
+    </b-modal>
   </b-form>
 </template>
 
 <script>
 import { defineComponent, defineAsyncComponent } from 'vue';
 import { mapGetters, mapState } from "vuex";
-import { BCard, BCardBody, BCardFooter, BCardTitle, BDropdown, BDropdownItem } from 'bootstrap-vue-next';
+import { BCard, BCardBody, BCardFooter, BCardTitle, BDropdown, BDropdownItem, BModal } from 'bootstrap-vue-next';
 
 import refParser from '@apidevtools/json-schema-ref-parser';
 
@@ -208,10 +221,13 @@ export default defineComponent({
     BCardTitle,
     BDropdown,
     BDropdownItem,
+    BModal,
+    SearchCode: defineAsyncComponent(() => import('./SearchCode.vue')),
     QueryableInput: defineAsyncComponent(() => import('./QueryableInput.vue')),
     MapSelect: defineAsyncComponent(() => import('./maps/MapSelect.vue')),
     SortButtons: defineAsyncComponent(() => import('./SortButtons.vue')),
     Multiselect: defineAsyncComponent(() => import('vue-multiselect')),
+    CopyButton: defineAsyncComponent(() => import('./CopyButton.vue')),
   },
   mixins: [
     ApiCapabilitiesMixin,
@@ -233,6 +249,10 @@ export default defineComponent({
     value: {
       type: Object,
       default: () => ({})
+    },
+    searchLink: {
+      type: Object,
+      default: null
     }
   },
   emits: ['input'],
@@ -244,7 +264,9 @@ export default defineComponent({
       hasAllCollections: false,
       collections: [],
       collectionsLoadingTimer: null,
-      additionalCollectionCount: 0
+      additionalCollectionCount: 0,
+      showCodeModal: false,
+      activeCode: null
     }, getDefaults());
   },
   computed: {

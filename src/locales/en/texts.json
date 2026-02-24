@@ -70,6 +70,7 @@
     "false": "no",
     "true": "yes"
   },
+  "close": "Close",
   "copy": "Copy",
   "default": "Default",
   "defaultWithValue": "Default ({value})",
@@ -112,6 +113,7 @@
     "title": "Error",
     "unauthorized": "The request lacks credentials, e.g. an API token. Please provide your credentials and try again."
   },
+  "exampleCode": "Example Code",
   "featureExperimental": "This feature is still experimental and may give unexpected results!",
   "features": {
     "empty": "No features available.",

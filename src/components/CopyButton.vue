@@ -6,7 +6,6 @@
 </template>
 
 <script>
-import { Clipboard } from "v-clipboard";
 import BIconClipboard from '~icons/bi/clipboard';
 import BIconClipboardCheck from '~icons/bi/clipboard-check';
 import BIconClipboardX from '~icons/bi/clipboard-x';
@@ -66,14 +65,10 @@ export default {
     methods: {
         async copy() {
             try {
-                // We need to store the focus and restore it again as the clipboard 
-                // may steal the focus
-                let focus = document.activeElement;
-                await Clipboard.copy(this.copyText);
-                focus.focus();
+                await navigator.clipboard.writeText(this.copyText);
                 this.status = true;
             } catch(error) {
-                console.error(error);
+                console.error('Copy failed:', error);
                 this.status = false;
             }
             setTimeout(() => this.status = null, 2500);

@@ -8,12 +8,14 @@
           <b-tab v-if="collectionSearch" :title="$t('search.tabs.collections')" id="search-collections-tab">
             <SearchFilter
               :parent="parent" title="" :value="collectionFilters" type="Collections"
+              :searchLink="collectionSearch"
               @input="setFilters"
             />
           </b-tab>
           <b-tab v-if="itemSearch" :title="$t('search.tabs.items')" id="search-items-tab">
             <SearchFilter
               :parent="parent" title="" :value="itemFilters" type="Global"
+              :searchLink="itemSearch"
               @input="setFilters"
             />
           </b-tab>
