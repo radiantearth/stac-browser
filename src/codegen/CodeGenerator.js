@@ -45,20 +45,50 @@ export default class CodeGenerator {
     if (!filters || typeof filters !== 'object') {
       return {};
     }
-    const cleaned = {};
-    for (const [key, value] of Object.entries(filters)) {
-      if (value === null || value === undefined) {
-        continue;
+    const isEmpty = value => (
+      value === null ||
+      value === undefined ||
+      (Array.isArray(value) && value.length === 0) ||
+      (typeof value === 'object' && !Array.isArray(value) && Object.keys(value).length === 0)
+    );
+
+    return Object.entries(filters).reduce((cleaned, [key, value]) => {
+      if (isEmpty(value)) {
+        return cleaned;
       }
-      if (Array.isArray(value) && value.length === 0) {
-        continue;
+
+      if (key === 'datetime') {
+        const datetime = this.normalizeDatetime(value);
+        if (datetime) {
+          cleaned[key] = datetime;
+        }
+        return cleaned;
       }
-      if (typeof value === 'object' && !Array.isArray(value) && Object.keys(value).length === 0) {
-        continue;
-      }
+
       cleaned[key] = value;
+      return cleaned;
+    }, {});
+  }
+
+  normalizeDatetime(value) {
+    if (!value) {
+      return null;
     }
-    return cleaned;
+    const toIsoString = part => {
+      if (part === null || part === undefined || part === '') {
+        return null;
+      }
+      return part instanceof Date ? part.toISOString() : String(part);
+    };
+
+    if (!Array.isArray(value)) {
+      return toIsoString(value);
+    }
+
+    const [start, end] = value;
+    const startValue = toIsoString(start);
+    const endValue = toIsoString(end);
+    return startValue && endValue ? `${startValue}/${endValue}` : null;
   }
 
   /**

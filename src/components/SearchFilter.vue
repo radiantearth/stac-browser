@@ -413,6 +413,12 @@ export default defineComponent({
       else {
         this.query.bbox = this.bbox;
       }
+    },
+    sortTerm() {
+      this.query.sortby = this.formatSort();
+    },
+    sortOrder() {
+      this.query.sortby = this.formatSort();
     }
   },
   beforeCreate() {
