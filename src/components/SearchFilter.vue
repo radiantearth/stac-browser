@@ -150,7 +150,7 @@
         v-if="showCodeModal"
         :catalogHref="searchLink.href"
         :filters="query"
-        @update:activeCode="activeCode = $event"
+        @update:active-code="activeCode = $event"
       />
       <template #footer="{ close }">
         <CopyButton v-if="activeCode" variant="outline-primary" :copyText="activeCode">{{ $t('copy') }}</CopyButton>
