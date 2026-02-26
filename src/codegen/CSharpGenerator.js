@@ -14,7 +14,6 @@ export default class CSharpGenerator extends CodeGenerator {
     const lines = [
       'using System.Net.Http;',
       'using System.Text;',
-      'using System.Text.Json;',
       '',
       'var httpClient = new HttpClient();',
       ''
@@ -22,10 +21,14 @@ export default class CSharpGenerator extends CodeGenerator {
 
     if (this.hasFilters()) {
       lines.push('// Search parameters');
-      lines.push(`var searchParams = ${JSON.stringify(this.filters, null, 4)};`);
+      lines.push('var json = """');
+      const jsonLines = JSON.stringify(this.filters, null, 4).split('\n');
+      for (const jsonLine of jsonLines) {
+        lines.push(`    ${jsonLine}`);
+      }
+      lines.push('    """;');
       lines.push('');
       lines.push(`var searchUrl = "${searchUrl}";`);
-      lines.push('var json = JsonSerializer.Serialize(searchParams);');
       lines.push('var content = new StringContent(json, Encoding.UTF8, "application/json");');
     }
     else {
