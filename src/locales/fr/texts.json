@@ -86,7 +86,6 @@
   },
   "description": "Description",
   "errors": {
-    "apiListRequested": "",
     "authFailed": "La requête a échoué, les informations d'authentification fournies peuvent être incorrectes.",
     "badRequest": "La requête n'est pas valide. Cela peut être dû à des paramètres de recherche invalides ou à un bogue au niveau de STAC Browser",
     "contactProvider": "Veuillez contacter l'exploitant du service afin de résoudre ce problème.",
@@ -166,18 +165,8 @@
     },
     "bboxSelect": {
       "add": "Cliquez sur la carte pour ajouter une boîte englobante.",
-      "eastLon": "",
-      "error": {
-        "incomplete": "",
-        "invalidLat": "",
-        "invalidLon": "",
-        "latOrder": "",
-        "lonOrder": ""
-      },
-      "northLat": "",
-      "remove": "Cliquez à l'intérieur de la boîte englobante pour la supprimer.",
-      "southLat": "",
-      "westLon": ""
+      "error": {},
+      "remove": "Cliquez à l'intérieur de la boîte englobante pour la supprimer."
     },
     "close": "Fermer",
     "fit": "Adapter à l'étendue",
@@ -257,20 +246,7 @@
     "additionalFilters": "Filtres supplémentaires",
     "addItemIds": "Appuyer sur Entrée pour ajouter un ID Élément",
     "addSearchTerm": "Appuyez sur entrée pour ajouter un terme de recherche",
-    "arrayInput": {
-      "addValue": "",
-      "helpText": ""
-    },
-    "arrayContains": "",
-    "arrayContainsDescription": "",
-    "arrayContainedBy": "",
-    "arrayContainedByDescription": "",
-    "arrayEquals": "",
-    "arrayEqualsDescription": "",
-    "arrayOverlaps": "",
-    "arrayOverlapsDescription": "",
-    "between": "",
-    "betweenOperatorDescription": "",
+    "arrayInput": {},
     "dateDescription": "Toutes les heures sont en temps universel coordonné (UTC).",
     "enterCollections": "Saisissez une ou plusieurs collections...",
     "enterItemIds": "Saisissez un ou plusieurs identifiants d'éléments...",
@@ -282,8 +258,6 @@
     "freeTextDescription": "Rechercher au moins un des termes donnés dans des champs tels que le titre et la description.",
     "greaterThan": "supérieur à",
     "greaterThanEqual": "supérieur ou égal à",
-    "in": "",
-    "inOperatorDescription": "",
     "itemIds": "Identifiants des éléments",
     "itemsPerPage": "Éléments par page",
     "itemsPerPageDescription": "Nombre d'éléments demandés par page, max. {maxItems} éléments",
@@ -292,22 +266,19 @@
     "likeOperatorDescription": "Vous pouvez utiliser des caractères génériques. `_` correspond à un seul caractère, `%` correspond à un nombre quelconque de caractères. Pour rechercher spécifiquement un caractère générique, vous devez ajouter un `\\` devant le caractère.",
     "logical": {
       "and": "Correspond à tous les filtres (et)",
-      "or": "Correspond à n'importe quel filtre (ou)",
-      "not": ""
+      "or": "Correspond à n'importe quel filtre (ou)"
     },
     "matches": "correspond à",
     "metaDescription": "Rechercher parmi l'offre de données de {title}.",
     "modifyCriteria": "Veuillez modifier les critères de recherche.",
     "noFurtherItemsFound": "Aucun autre élément n'est disponible.",
     "noItemsFound": "Aucun élément trouvé pour les filtres sélectionnés.",
-    "noOperatorsError": "",
     "noOptions": "Aucune information saisie",
     "notEqualTo": "différent de",
     "notFullySupported": "Toutes les options ne sont pas forcément prises en charge",
     "notSupported": "La recherche d'éléments n'est pas pris en charge par l'API.",
     "placeholder": "Rechercher...",
     "selectCollections": "Sélectionnez une ou plusieurs collections...",
-    "selectDateRange": "",
     "selectForItemSearch": "Sélectionner pour la recherche d'élément",
     "spatialExtent": "Étendue spatiale",
     "tabs": {
