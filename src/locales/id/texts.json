@@ -86,6 +86,7 @@
   },
   "description": "Deskripsi",
   "errors": {
+    "apiListRequested": "",
     "authFailed": "Permintaan mengalami kesalahan, rincian autentikasi yang diberikan mungkin salah.",
     "badRequest": "Permintaan tidak valid. Ini mungkin karena parameter yang tidak valid, misalnya dalam permintaan pencarian, atau bisa jadi bug di STAC Browser.",
     "contactProvider": "Silakan hubungi operator layanan untuk menyelesaikan masalah ini.",
@@ -108,13 +109,20 @@
     "noExternalAccess": "Mengakses katalog eksternal tidak diizinkan!",
     "notFound": "Sumber daya yang diminta tidak ada. @:errors.contactProvider",
     "serverError": "Server mengalami masalah. @:errors.contactProvider",
+    "title": "",
     "unauthorized": "Permintaan tidak memiliki kredensial, misalnya token API. Silakan berikan kredensial Anda dan coba lagi."
   },
   "featureExperimental": "Fitur ini masih eksperimental dan mungkin memberikan hasil yang tidak terduga!",
-  "features": {},
+  "features": {
+    "empty": "",
+    "noProperties": "",
+    "title": ""
+  },
   "fullscreen": {
     "exit": "Keluar dari Layar Penuh",
-    "show": "Lihat Layar Penuh"
+    "exitLabel": "",
+    "show": "Lihat Layar Penuh",
+    "showLabel": ""
   },
   "goBack": {
     "description": "Kembali ke {type}",
@@ -151,15 +159,48 @@
   "loading": "Memuat...",
   "map": "Peta",
   "mapping": {
-    "attribution": {},
-    "bboxSelect": {
-      "error": {}
+    "attribution": {
+      "collapseLabel": "",
+      "description": "",
+      "label": ""
     },
-    "layers": {},
-    "location": {},
+    "bboxSelect": {
+      "add": "",
+      "eastLon": "",
+      "error": {
+        "incomplete": "",
+        "invalidLat": "",
+        "invalidLon": "",
+        "latOrder": "",
+        "lonOrder": ""
+      },
+      "northLat": "",
+      "remove": "",
+      "southLat": "",
+      "westLon": ""
+    },
+    "close": "",
+    "fit": "",
+    "layers": {
+      "base": "",
+      "footprint": "",
+      "title": "",
+      "unnamed": ""
+    },
+    "location": {
+      "description": ""
+    },
+    "nobasemap": "",
+    "nodata": "",
     "zoom": {
-      "in": {},
-      "out": {}
+      "in": {
+        "description": "",
+        "label": ""
+      },
+      "out": {
+        "description": "",
+        "label": ""
+      }
     }
   },
   "messageForSchemaError": "{message}, untuk skema {schemaPath}",
@@ -213,9 +254,23 @@
   "search": {
     "addCollections": "Tekan enter untuk menambahkan koleksi",
     "addFilter": "Tambah filter",
+    "additionalFilters": "Filter tambahan",
     "addItemIds": "Tekan enter untuk menambahkan ID Item",
     "addSearchTerm": "Tekan enter untuk menambahkan istilah pencarian",
-    "additionalFilters": "Filter tambahan",
+    "arrayInput": {
+      "addValue": "",
+      "helpText": ""
+    },
+    "arrayContains": "",
+    "arrayContainsDescription": "",
+    "arrayContainedBy": "",
+    "arrayContainedByDescription": "",
+    "arrayEquals": "",
+    "arrayEqualsDescription": "",
+    "arrayOverlaps": "",
+    "arrayOverlapsDescription": "",
+    "between": "",
+    "betweenOperatorDescription": "",
     "dateDescription": "Semua waktu dalam Coordinated Universal Time (UTC).",
     "enterCollections": "Masukkan satu atau lebih ID Koleksi...",
     "enterItemIds": "Masukkan satu atau lebih ID Item...",
@@ -227,6 +282,8 @@
     "freeTextDescription": "Cari setidaknya satu dari istilah yang diberikan di bidang seperti judul dan deskripsi.",
     "greaterThan": "lebih besar dari",
     "greaterThanEqual": "lebih besar dari atau sama dengan",
+    "in": "",
+    "inOperatorDescription": "",
     "itemIds": "ID Item",
     "itemsPerPage": "Item per halaman",
     "itemsPerPageDescription": "Jumlah item yang diminta per halaman, maks. {maxItems} item.",
@@ -235,19 +292,22 @@
     "likeOperatorDescription": "Anda dapat menggunakan karakter wildcard. `_` cocok dengan satu karakter, `%` cocok dengan sejumlah karakter. Untuk mencari karakter wildcard secara khusus, Anda perlu menambahkan `\\` di depan karakter.",
     "logical": {
       "and": "Cocokkan semua filter (dan)",
-      "or": "Cocokkan salah satu filter (atau)"
+      "or": "Cocokkan salah satu filter (atau)",
+      "not": ""
     },
     "matches": "cocok",
     "metaDescription": "Cari melalui penawaran data dari {title}.",
     "modifyCriteria": "Silakan ubah kriteria pencarian.",
     "noFurtherItemsFound": "Tidak ada item lebih lanjut yang tersedia.",
     "noItemsFound": "Tidak ada item yang ditemukan untuk filter yang diberikan.",
+    "noOperatorsError": "",
     "noOptions": "Belum ada yang dimasukkan",
     "notEqualTo": "tidak sama dengan",
     "notFullySupported": "Tidak semua opsi mungkin didukung.",
     "notSupported": "Pencarian Item tidak didukung oleh API.",
     "placeholder": "Cari...",
     "selectCollections": "Pilih satu atau beberapa koleksi...",
+    "selectDateRange": "",
     "selectForItemSearch": "Pilih untuk Pencarian Item",
     "spatialExtent": "Cakupan Spasial",
     "tabs": {
