@@ -86,6 +86,7 @@
   },
   "description": "Descrição",
   "errors": {
+    "apiListRequested": "",
     "authFailed": "O pedido resultou em erro. Os detalhes de autenticação fornecidos podem estar incorretos.",
     "badRequest": "O pedido é inválido. Isto pode ser devido a parâmetros inválidos, por exemplo num pedido de pesquisa, ou pode ser um bug no STAC Browser.",
     "contactProvider": "Por favor contacte o operador do serviço para resolver o problema.",
@@ -108,10 +109,15 @@
     "noExternalAccess": "Não é permitido aceder a catálogos externos!",
     "notFound": "O recurso pedido não existe. @:errors.contactProvider",
     "serverError": "O servidor encontrou um problema. @:errors.contactProvider",
+    "title": "",
     "unauthorized": "O pedido não possui credenciais, por exemplo um token da API. Forneça as suas credenciais e tente novamente."
   },
   "featureExperimental": "Esta funcionalidade ainda é experimental e pode dar resultados inesperados!",
-  "features": {},
+  "features": {
+    "empty": "",
+    "noProperties": "",
+    "title": ""
+  },
   "fullscreen": {
     "exit": "Sair do ecrã completo",
     "exitLabel": "✕",
@@ -155,14 +161,37 @@
   "mapping": {
     "attribution": {
       "collapseLabel": "✕",
+      "description": "",
       "label": "i"
     },
     "bboxSelect": {
-      "error": {}
+      "add": "",
+      "eastLon": "",
+      "error": {
+        "incomplete": "",
+        "invalidLat": "",
+        "invalidLon": "",
+        "latOrder": "",
+        "lonOrder": ""
+      },
+      "northLat": "",
+      "remove": "",
+      "southLat": "",
+      "westLon": ""
     },
     "close": "Fechar",
-    "layers": {},
-    "location": {},
+    "fit": "",
+    "layers": {
+      "base": "",
+      "footprint": "",
+      "title": "",
+      "unnamed": ""
+    },
+    "location": {
+      "description": ""
+    },
+    "nobasemap": "",
+    "nodata": "",
     "zoom": {
       "in": {
         "description": "Aumentar o zoom",
@@ -225,9 +254,23 @@
   "search": {
     "addCollections": "Pressione Enter para adicionar uma coleção",
     "addFilter": "Adicionar filtro",
+    "additionalFilters": "Filtros adicionais",
     "addItemIds": "Pressione Enter para adicionar o ID de um item",
     "addSearchTerm": "Pressione Enter para adicionar um termo de pesquisa",
-    "additionalFilters": "Filtros adicionais",
+    "arrayInput": {
+      "addValue": "",
+      "helpText": ""
+    },
+    "arrayContains": "",
+    "arrayContainsDescription": "",
+    "arrayContainedBy": "",
+    "arrayContainedByDescription": "",
+    "arrayEquals": "",
+    "arrayEqualsDescription": "",
+    "arrayOverlaps": "",
+    "arrayOverlapsDescription": "",
+    "between": "",
+    "betweenOperatorDescription": "",
     "dateDescription": "Todos os horários em UTC.",
     "enterCollections": "Insira um ou mais IDs de coleção...",
     "enterItemIds": "Insira um ou mais IDs de item...",
@@ -239,6 +282,8 @@
     "freeTextDescription": "Pesquise por pelo menos um dos termos fornecidos em campos como o título e a descrição.",
     "greaterThan": "maior de",
     "greaterThanEqual": "maior de ou igual a",
+    "in": "",
+    "inOperatorDescription": "",
     "itemIds": "IDs dos itens",
     "itemsPerPage": "Itens por página",
     "itemsPerPageDescription": "Número de itens pedidos por página, máx. {maxItems} items.",
@@ -247,19 +292,22 @@
     "likeOperatorDescription": "Pode usar wildcards. `_` corresponde a um único caractere, `%` corresponde a um qualquer número de caracteres. Para pesquisar por um caractere wildcard específico, tem de adicionar `\\` antes do caractere.",
     "logical": {
       "and": "Inclua resultados que respeitem todos os filtros (e)",
-      "or": "Inclua resultados que respeitem qualquer um dos filtros (ou)"
+      "or": "Inclua resultados que respeitem qualquer um dos filtros (ou)",
+      "not": ""
     },
     "matches": "resultados",
     "metaDescription": "Pesquise os dados de {title}.",
     "modifyCriteria": "Por favor, mude os critérios de pesquisa.",
     "noFurtherItemsFound": "Não há mais itens disponíveis.",
     "noItemsFound": "Nenhum item encontrado correspondente aos filtros especificados.",
+    "noOperatorsError": "",
     "noOptions": "Nada introduzido ainda",
     "notEqualTo": "não é igual a",
     "notFullySupported": "Algumas opções podem não ser suportadas.",
     "notSupported": "A pesquisa de itens não é suportada pela API.",
     "placeholder": "Pesquisar...",
     "selectCollections": "Selecione uma ou várias coleções...",
+    "selectDateRange": "",
     "selectForItemSearch": "Selecione para pesquisa de itens",
     "spatialExtent": "Extensão Espacial",
     "tabs": {
