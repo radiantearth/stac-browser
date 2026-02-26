@@ -1,8 +1,8 @@
 <template>
-  <b-button class="copy-button" @click.prevent.stop="copy" :variant="copyColor" :title="$t('copy')" v-bind="buttonProps">
-    <component :is="copyIcon" />
-    <slot />
-  </b-button>
+    <b-button class="copy-button" @click.prevent.stop="copy" :variant="copyColor" :title="buttonTitle" v-bind="resolvedButtonProps">
+        <component :is="copyIcon" />
+        <slot />
+    </b-button>
 </template>
 
 <script>
@@ -37,9 +37,24 @@ export default {
         };
     },
     computed: {
+        isClipboardSupported() {
+            return typeof window !== 'undefined' &&
+                window.isSecureContext === true &&
+                typeof navigator !== 'undefined' &&
+                typeof navigator.clipboard?.writeText === 'function';
+        },
+        resolvedButtonProps() {
+            return {
+                ...this.buttonProps,
+                disabled: Boolean(this.buttonProps?.disabled) || !this.isClipboardSupported
+            };
+        },
         copyColor() {
             let variant = this.variant;
-            if (this.status === true) {
+            if (!this.isClipboardSupported) {
+                variant = 'secondary';
+            }
+            else if (this.status === true) {
                 variant = 'success';
             }
             else if (this.status === false) {
@@ -51,27 +66,45 @@ export default {
             return variant;
         },
         copyIcon() {
+            if (!this.isClipboardSupported) {
+                return BIconClipboardX;
+            }
             if (this.status === true) {
                 return BIconClipboardCheck;
             }
             else if (this.status === false) {
                 return BIconClipboardX;
             }
-            else {
-                return BIconClipboard;
+            return BIconClipboard;
+        },
+        buttonTitle() {
+            if (!this.isClipboardSupported) {
+                return this.$t('copyErrors.unsupported');
             }
+            if (this.status === false) {
+                return this.$t('copyErrors.permission');
+            }
+            return this.$t('copy');
         }
     },
     methods: {
         async copy() {
+            const focusedElement = typeof document !== 'undefined' ? document.activeElement : null;
             try {
+                if (!this.isClipboardSupported) {
+                    throw new Error('Clipboard API unsupported');
+                }
                 await navigator.clipboard.writeText(this.copyText);
                 this.status = true;
             } catch(error) {
                 console.error('Copy failed:', error);
                 this.status = false;
             }
-            setTimeout(() => this.status = null, 2500);
+            finally {
+                if (focusedElement && typeof focusedElement.focus === 'function') {
+                    focusedElement.focus();
+                }
+            }
         }
     }
 };

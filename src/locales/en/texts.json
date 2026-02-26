@@ -72,6 +72,10 @@
   },
   "close": "Close",
   "copy": "Copy",
+  "copyErrors": {
+    "permission": "Unable to copy. Please check browser permissions.",
+    "unsupported": "Clipboard is not available in this browser."
+  },
   "default": "Default",
   "defaultWithValue": "Default ({value})",
   "deprecated": "Deprecated",
