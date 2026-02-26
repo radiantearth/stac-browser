@@ -86,6 +86,7 @@
   },
   "description": "Descrição",
   "errors": {
+    "apiListRequested": "",
     "authFailed": "A solicitação apresentou erro. Os detalhes de autenticação fornecidos podem estar incorretos.",
     "badRequest": "A solicitação é inválida. Isto pode ser devido a parâmetros inválidos, por exemplo, uma solicitação de pesquisa ou pode ser um bug no STAC Browser.",
     "contactProvider": "Entre em contato com o operador do serviço para resolver esse problema.",
@@ -165,8 +166,18 @@
     },
     "bboxSelect": {
       "add": "Clique no mapa para adicionar um retângulo envolvente.",
-      "error": {},
-      "remove": "Clique no retângulo envolvente para removê-lo."
+      "eastLon": "",
+      "error": {
+        "incomplete": "",
+        "invalidLat": "",
+        "invalidLon": "",
+        "latOrder": "",
+        "lonOrder": ""
+      },
+      "northLat": "",
+      "remove": "Clique no retângulo envolvente para removê-lo.",
+      "southLat": "",
+      "westLon": ""
     },
     "close": "Fechar",
     "fit": "Ajustar à extensão",
@@ -243,9 +254,23 @@
   "search": {
     "addCollections": "Pressione Enter para adicionar uma coleção",
     "addFilter": "Adicionar filtro",
+    "additionalFilters": "Filtros adicionais",
     "addItemIds": "Pressione Enter para adicionar um ID de item",
     "addSearchTerm": "Pressione Enter para adicionar um termo de pesquisa",
-    "additionalFilters": "Filtros adicionais",
+    "arrayInput": {
+      "addValue": "",
+      "helpText": ""
+    },
+    "arrayContains": "",
+    "arrayContainsDescription": "",
+    "arrayContainedBy": "",
+    "arrayContainedByDescription": "",
+    "arrayEquals": "",
+    "arrayEqualsDescription": "",
+    "arrayOverlaps": "",
+    "arrayOverlapsDescription": "",
+    "between": "",
+    "betweenOperatorDescription": "",
     "dateDescription": "Todos os horários em Tempo Universal Coordenado (UTC).",
     "enterCollections": "Insira um ou mais IDs de coleção...",
     "enterItemIds": "Insira um ou mais IDs de item...",
@@ -257,6 +282,8 @@
     "freeTextDescription": "Pesquise pelo menos um dos termos fornecidos em campos como título e descrição.",
     "greaterThan": "maior que",
     "greaterThanEqual": "maior que ou igual a",
+    "in": "",
+    "inOperatorDescription": "",
     "itemIds": "IDs dos itens",
     "itemsPerPage": "Itens por página",
     "itemsPerPageDescription": "Número de itens solicitados por página, máx. {maxItems} items.",
@@ -265,19 +292,22 @@
     "likeOperatorDescription": "Você pode usar caracteres curinga. `_` corresponde a um único caractere, `%` corresponde a qualquer número de caracteres. Para pesquisar especificamente um caractere curinga, você precisa adicionar `\\` na frente do caractere.",
     "logical": {
       "and": "Considere todos os filtros (e)",
-      "or": "Considere qualquer filtro (ou)"
+      "or": "Considere qualquer filtro (ou)",
+      "not": ""
     },
     "matches": "combinações",
     "metaDescription": "Pesquise os dados de {title}.",
     "modifyCriteria": "Por favor, modifique os critérios de pesquisa.",
     "noFurtherItemsFound": "Não há mais itens disponíveis.",
     "noItemsFound": "Nenhum item encontrado para os filtros fornecidos.",
+    "noOperatorsError": "",
     "noOptions": "Nenhuma entrada realizada",
     "notEqualTo": "não é igual a",
     "notFullySupported": "Nem todas as opções podem ser suportadas.",
     "notSupported": "A pesquisa de itens não é suportada pela API.",
     "placeholder": "Pesquisar...",
     "selectCollections": "Selecione uma ou várias coleções...",
+    "selectDateRange": "",
     "selectForItemSearch": "Selecione para pesquisa de itens",
     "spatialExtent": "Extensão Espacial",
     "tabs": {
