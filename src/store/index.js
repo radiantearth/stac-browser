@@ -749,7 +749,7 @@ function getStore(config, router) {
             if (!(data instanceof STAC)) {
               // Might be a request to the /collections or .../items endpoints,
               // which returns an APICollection, not a STAC object.
-              throw new BrowserError(i18n.t('errors.apiListRequested'));
+              throw new BrowserError(i18n.global.t('errors.apiListRequested'));
             }
             cx.commit('loaded', { url, data });
 

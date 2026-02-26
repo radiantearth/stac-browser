@@ -1,4 +1,5 @@
 import i18n from '../../../i18n.js';
+import CqlValue from '../value.js';
 import CqlOperator from './operator';
 
 export default class CqlComparisonOperator extends CqlOperator {
@@ -29,6 +30,12 @@ export default class CqlComparisonOperator extends CqlOperator {
     }
     else if (op === "<") {
       return new CqlLessThan(pred, obj);
+    }
+    else if (op.toLowerCase() === "like") {
+      return new CqlLike(pred, obj);
+    }
+    else if (op.toLowerCase() === "between") {
+      return new CqlBetween(pred, obj);
     }
   }
 
@@ -137,3 +144,63 @@ export class CqlLessThanEqual extends CqlComparisonOperator {
   }
 
 } */
+
+export class CqlLike extends CqlComparisonOperator {
+
+  static SYMBOL = "like";
+
+  constructor(pred = null, obj = null) {
+    super(CqlLike.SYMBOL, pred, obj);
+  }
+
+  static get label() {
+    return "~";
+  }
+
+  static get longLabel() {
+    return i18n.global.t('search.matches');
+  }
+
+  static get description() {
+    return i18n.global.t('search.likeOperatorDescription');
+  }
+
+}
+
+export class CqlBetween extends CqlComparisonOperator {
+
+  static SYMBOL = "between";
+
+  constructor(pred = null, obj = []) {
+    super(CqlBetween.SYMBOL, pred, obj);
+  }
+
+  static get label() {
+    return "≥ … ≤";
+  }
+
+  static get longLabel() {
+    return i18n.global.t('search.between');
+  }
+
+  static get description() {
+    return i18n.global.t('search.betweenOperatorDescription');
+  }
+
+  toText() {
+    const bounds = this.args[1];
+    return `${this.args[0].toText()} BETWEEN ${bounds[0].toText()} and ${bounds[1].toText()}`;
+  }
+
+  static valueType() {
+    return CqlBetween;
+  }
+
+  static getDefaultValue(queryable) {
+    return [
+      CqlValue.create(queryable.defaultValue),
+      CqlValue.create(queryable.defaultValue)
+    ];
+  }
+
+}
