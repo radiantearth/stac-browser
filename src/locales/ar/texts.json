@@ -86,6 +86,7 @@
   },
   "description": "الوصف",
   "errors": {
+    "apiListRequested": "",
     "authFailed": "حدث خطأ في الطلب، قد تكون بيانات المصادقة المقدمة غير صحيحة.",
     "badRequest": "الطلب غير صالح. قد يكون ذلك بسبب معلمات غير صحيحة، مثل طلب بحث غير صحيح، أو قد يكون خطأ في STAC Browser.",
     "contactProvider": "يرجى التواصل مع مشغل الخدمة لحل هذه المشكلة.",
@@ -108,13 +109,20 @@
     "noExternalAccess": "الوصول إلى الكتالوجات الخارجية غير مسموح!",
     "notFound": "المورد المطلوب غير موجود. @:errors.contactProvider",
     "serverError": "واجه الخادم مشكلة. @:errors.contactProvider",
+    "title": "",
     "unauthorized": "يفتقر الطلب إلى بيانات الاعتماد، مثل رمز API. يرجى تقديم بيانات الاعتماد والمحاولة مرة أخرى."
   },
   "featureExperimental": "هذه الميزة لا تزال تجريبية وقد تعطي نتائج غير متوقعة!",
-  "features": {},
+  "features": {
+    "empty": "",
+    "noProperties": "",
+    "title": ""
+  },
   "fullscreen": {
     "exit": "الخروج من وضع ملء الشاشة",
-    "show": "عرض بملء الشاشة"
+    "exitLabel": "",
+    "show": "عرض بملء الشاشة",
+    "showLabel": ""
   },
   "goBack": {
     "description": "العودة إلى {type}",
@@ -151,15 +159,48 @@
   "loading": "جارٍ التحميل...",
   "map": "الخريطة",
   "mapping": {
-    "attribution": {},
-    "bboxSelect": {
-      "error": {}
+    "attribution": {
+      "collapseLabel": "",
+      "description": "",
+      "label": ""
     },
-    "layers": {},
-    "location": {},
+    "bboxSelect": {
+      "add": "",
+      "eastLon": "",
+      "error": {
+        "incomplete": "",
+        "invalidLat": "",
+        "invalidLon": "",
+        "latOrder": "",
+        "lonOrder": ""
+      },
+      "northLat": "",
+      "remove": "",
+      "southLat": "",
+      "westLon": ""
+    },
+    "close": "",
+    "fit": "",
+    "layers": {
+      "base": "",
+      "footprint": "",
+      "title": "",
+      "unnamed": ""
+    },
+    "location": {
+      "description": ""
+    },
+    "nobasemap": "",
+    "nodata": "",
     "zoom": {
-      "in": {},
-      "out": {}
+      "in": {
+        "description": "",
+        "label": ""
+      },
+      "out": {
+        "description": "",
+        "label": ""
+      }
     }
   },
   "messageForSchemaError": "{message}، للمخطط {schemaPath}",
@@ -213,9 +254,23 @@
   "search": {
     "addCollections": "اضغط على Enter لإضافة مجموعة",
     "addFilter": "إضافة فلتر",
+    "additionalFilters": "فلاتر إضافية",
     "addItemIds": "اضغط على Enter لإضافة معرّف عنصر",
     "addSearchTerm": "اضغط على Enter لإضافة مصطلح بحث",
-    "additionalFilters": "فلاتر إضافية",
+    "arrayInput": {
+      "addValue": "",
+      "helpText": ""
+    },
+    "arrayContains": "",
+    "arrayContainsDescription": "",
+    "arrayContainedBy": "",
+    "arrayContainedByDescription": "",
+    "arrayEquals": "",
+    "arrayEqualsDescription": "",
+    "arrayOverlaps": "",
+    "arrayOverlapsDescription": "",
+    "between": "",
+    "betweenOperatorDescription": "",
     "dateDescription": "جميع الأوقات بتوقيت UTC (التوقيت العالمي المنسق).",
     "enterCollections": "أدخل معرّف مجموعة واحد أو أكثر...",
     "enterItemIds": "أدخل معرّف عنصر واحد أو أكثر...",
@@ -227,6 +282,8 @@
     "freeTextDescription": "ابحث عن واحد على الأقل من المصطلحات المحددة في الحقول مثل العنوان والوصف.",
     "greaterThan": "أكبر من",
     "greaterThanEqual": "أكبر من أو يساوي",
+    "in": "",
+    "inOperatorDescription": "",
     "itemIds": "معرّفات العناصر",
     "itemsPerPage": "عناصر لكل صفحة",
     "itemsPerPageDescription": "عدد العناصر المطلوبة لكل صفحة، الحد الأقصى {maxItems} عنصر.",
@@ -235,19 +292,22 @@
     "likeOperatorDescription": "يمكنك استخدام أحرف البدل. `_` يطابق حرفًا واحدًا، `%` يطابق أي عدد من الأحرف. للبحث عن حرف بدل محدد، تحتاج إلى إضافة `\\` قبله.",
     "logical": {
       "and": "مطابقة جميع الفلاتر (و)",
-      "or": "مطابقة أي فلتر (أو)"
+      "or": "مطابقة أي فلتر (أو)",
+      "not": ""
     },
     "matches": "يطابق",
     "metaDescription": "البحث في البيانات المتاحة في {title}.",
     "modifyCriteria": "يرجى تعديل معايير البحث.",
     "noFurtherItemsFound": "لا توجد عناصر إضافية متاحة.",
     "noItemsFound": "لم يتم العثور على عناصر للفلاتر المحددة.",
+    "noOperatorsError": "",
     "noOptions": "لم يتم إدخال أي شيء بعد",
     "notEqualTo": "لا يساوي",
     "notFullySupported": "قد لا تكون جميع الخيارات مدعومة.",
     "notSupported": "بحث العناصر غير مدعوم من قبل API.",
     "placeholder": "بحث...",
     "selectCollections": "حدد مجموعة واحدة أو أكثر...",
+    "selectDateRange": "",
     "selectForItemSearch": "حدد للبحث عن عنصر",
     "spatialExtent": "النطاق المكاني",
     "tabs": {
