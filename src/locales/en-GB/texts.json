@@ -58,6 +58,7 @@
   },
   "read": {},
   "search": {
+    "arrayInput": {},
     "logical": {},
     "tabs": {}
   },

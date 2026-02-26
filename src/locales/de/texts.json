@@ -254,9 +254,9 @@
   "search": {
     "addCollections": "Hinzufügen mittels Enter-Taste",
     "addFilter": "Filter hinzufügen",
+    "additionalFilters": "Weitere Filter",
     "addItemIds": "Element-Identifikationsnummern hinzufügen mittels Enter-Taste",
     "addSearchTerm": "Suchbegriff hinzufügen mittels Enter-Taste",
-    "additionalFilters": "Weitere Filter",
     "arrayInput": {
       "addValue": "Wert hinzufügen mittels Enter-Taste",
       "helpText": "Wert(e) eingeben"

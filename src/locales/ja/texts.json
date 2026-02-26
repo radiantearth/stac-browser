@@ -202,9 +202,10 @@
   "search": {
     "addCollections": "Enterキーを押してコレクションを追加",
     "addFilter": "フィルターを追加",
+    "additionalFilters": "追加のフィルター",
     "addItemIds": "Enterキーを押してアイテムIDを追加",
     "addSearchTerm": "Enter キーを押して検索語句を追加",
-    "additionalFilters": "追加のフィルター",
+    "arrayInput": {},
     "dateDescription": "すべての時刻はUTC (協定世界時) です",
     "enterCollections": "1つ以上のコレクションIDを入力してください...",
     "enterItemIds": "1つ以上のアイテムIDを入力してください...",

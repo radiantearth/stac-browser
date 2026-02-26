@@ -236,9 +236,10 @@
   "search": {
     "addCollections": "Apăsați Enter pentru a adăuga o colecție",
     "addFilter": "Adăugați un filtru",
+    "additionalFilters": "Filtre suplimentare",
     "addItemIds": "Apăsați Enter pentru a adăuga un ID de articol",
     "addSearchTerm": "Apăsați enter pentru a adăuga un termen de căutare",
-    "additionalFilters": "Filtre suplimentare",
+    "arrayInput": {},
     "dateDescription": "Toate orele sunt timp universal coordonat (UTC).",
     "enterCollections": "Introduceți una sau mai multe colecții...",
     "enterItemIds": "Introduceți unul sau mai multe ID-uri de articol...",
