@@ -1,4 +1,11 @@
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 import CodeGenerator from './CodeGenerator.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const template = readFileSync(join(__dirname, 'templates', 'javascript.mjs'), 'utf-8');
 
 export default class JavaScriptGenerator extends CodeGenerator {
   static get label() {
@@ -10,34 +17,9 @@ export default class JavaScriptGenerator extends CodeGenerator {
   }
 
   generate() {
-    const searchUrl = this.catalogHref.replace(/\/?$/, '/search');
-    const lines = [
-      `const searchUrl = "${searchUrl}";`,
-      ''
-    ];
-
-    if (this.hasFilters()) {
-      lines.push('// Search parameters');
-      lines.push(`const searchParams = ${this.filtersJson()};`);
-      lines.push('');
-      lines.push('const response = await fetch(searchUrl, {');
-      lines.push('  method: "POST",');
-      lines.push('  headers: { "Content-Type": "application/json" },');
-      lines.push('  body: JSON.stringify(searchParams)');
-      lines.push('});');
-    }
-    else {
-      lines.push('const response = await fetch(searchUrl, {');
-      lines.push('  method: "POST",');
-      lines.push('  headers: { "Content-Type": "application/json" },');
-      lines.push('  body: JSON.stringify({})');
-      lines.push('});');
-    }
-
-    lines.push('');
-    lines.push('const data = await response.json();');
-    lines.push('console.log(`Found ${data.features.length} items`);');
-
-    return lines.join('\n');
+    return this.renderTemplate(template, {
+      SEARCH_URL: this.catalogHref.replace(/\/?$/, '/search'),
+      FILTERS_JSON: this.filtersJson(),
+    });
   }
 }

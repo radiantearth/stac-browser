@@ -37,6 +37,24 @@ export default class CodeGenerator {
   }
 
   /**
+   * Render a template string by replacing {{KEY}} placeholders with values.
+   * Collapses excessive blank lines for clean output.
+   * @param {string} template - Template with {{KEY}} placeholders
+   * @param {Object<string, string>} vars - Map of placeholder names to values
+   * @returns {string}
+   */
+  renderTemplate(template, vars) {
+    // Replace each {{KEY}} with its value
+    let result = template;
+    for (const [key, value] of Object.entries(vars)) {
+      result = result.replaceAll(`{{${key}}}`, String(value));
+    }
+    // Collapse 3+ consecutive newlines into 2 (one blank line)
+    result = result.replace(/\n{3,}/g, '\n\n');
+    return result.trim();
+  }
+
+  /**
    * Remove null/empty values from filters to produce clean code.
    * @param {Object} filters
    * @returns {Object}

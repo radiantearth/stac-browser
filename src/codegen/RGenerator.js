@@ -1,4 +1,11 @@
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 import CodeGenerator from './CodeGenerator.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const template = readFileSync(join(__dirname, 'templates', 'r.R'), 'utf-8');
 
 export default class RGenerator extends CodeGenerator {
   static get label() {
@@ -10,52 +17,40 @@ export default class RGenerator extends CodeGenerator {
   }
 
   generate() {
-    const lines = [
-      'library(rstac)',
-      '',
-      '# Connect to STAC API',
-      `stac_obj <- stac("${this.catalogHref}")`,
-      ''
-    ];
+    return this.renderTemplate(template, {
+      SEARCH_URL: this.catalogHref.replace(/\/?$/, '/search'),
+      BODY_PROPS: this.buildBodyProps(),
+    });
+  }
 
-    lines.push('# Build and execute search');
-    lines.push('items <- stac_obj |>');
-    lines.push('  stac_search(');
-
-    const args = [];
+  buildBodyProps() {
+    const props = [];
 
     if (this.filters.collections && this.filters.collections.length > 0) {
       const collections = this.filters.collections.map(c => `"${c}"`).join(', ');
-      args.push(`    collections = c(${collections})`);
+      props.push(`  collections = I(c(${collections}))`);
     }
 
     if (this.filters.ids && this.filters.ids.length > 0) {
       const ids = this.filters.ids.map(id => `"${id}"`).join(', ');
-      args.push(`    ids = c(${ids})`);
+      props.push(`  ids = I(c(${ids}))`);
     }
 
     if (this.filters.bbox) {
-      args.push(`    bbox = c(${this.filters.bbox.join(', ')})`);
+      props.push(`  bbox = c(${this.filters.bbox.join(', ')})`);
     }
 
     if (this.filters.datetime) {
-      args.push(`    datetime = "${this.filters.datetime}"`);
+      props.push(`  datetime = "${this.filters.datetime}"`);
     }
 
     if (this.filters.limit) {
-      args.push(`    limit = ${this.filters.limit}`);
+      props.push(`  limit = ${this.filters.limit}`);
     }
 
-    if (args.length > 0) {
-      lines.push(args.join(',\n'));
+    if (props.length === 0) {
+      return '';
     }
-
-    lines.push('  ) |>');
-    lines.push('  get_request()');
-    lines.push('');
-    lines.push('# View results');
-    lines.push('items');
-
-    return lines.join('\n');
+    return '\n' + props.join(',\n') + '\n';
   }
 }

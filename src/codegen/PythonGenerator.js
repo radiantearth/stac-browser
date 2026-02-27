@@ -1,4 +1,11 @@
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 import CodeGenerator from './CodeGenerator.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const template = readFileSync(join(__dirname, 'templates', 'python.py'), 'utf-8');
 
 export default class PythonGenerator extends CodeGenerator {
   static get label() {
@@ -10,30 +17,10 @@ export default class PythonGenerator extends CodeGenerator {
   }
 
   generate() {
-    const lines = [
-      'from pystac_client import Client',
-      '',
-      '# Connect to STAC API',
-      `catalog = Client.open("${this.catalogHref}")`,
-      ''
-    ];
-
-    if (this.hasFilters()) {
-      lines.push('# Search parameters');
-      const args = this.buildSearchArgs();
-      lines.push(`results = catalog.search(${args})`);
-    }
-    else {
-      lines.push('# Search all items');
-      lines.push('results = catalog.search()');
-    }
-
-    lines.push('');
-    lines.push('# Iterate over results');
-    lines.push('for item in results.items():');
-    lines.push('    print(item.id)');
-
-    return lines.join('\n');
+    return this.renderTemplate(template, {
+      CATALOG_URL: this.catalogHref,
+      SEARCH_ARGS: this.hasFilters() ? this.buildSearchArgs() : '',
+    });
   }
 
   buildSearchArgs() {

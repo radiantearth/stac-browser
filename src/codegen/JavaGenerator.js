@@ -1,4 +1,11 @@
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 import CodeGenerator from './CodeGenerator.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const template = readFileSync(join(__dirname, 'templates', 'java.java'), 'utf-8');
 
 export default class JavaGenerator extends CodeGenerator {
   static get label() {
@@ -10,37 +17,17 @@ export default class JavaGenerator extends CodeGenerator {
   }
 
   generate() {
-    const searchUrl = this.catalogHref.replace(/\/?$/, '/search');
-    const lines = [
-      'import java.net.URI;',
-      'import java.net.http.HttpClient;',
-      'import java.net.http.HttpRequest;',
-      'import java.net.http.HttpResponse;',
-      '',
-      'HttpClient client = HttpClient.newHttpClient();',
-      ''
-    ];
+    return this.renderTemplate(template, {
+      SEARCH_URL: this.catalogHref.replace(/\/?$/, '/search'),
+      BODY_STRING: this.buildBodyString(),
+    });
+  }
 
-    let body = '"{}"';
-    if (this.hasFilters()) {
-      lines.push('// Search parameters');
-      // Escape the JSON for Java string
-      const jsonStr = JSON.stringify(this.filters).replace(/"/g, '\\"');
-      body = `"${jsonStr}"`;
+  buildBodyString() {
+    if (!this.hasFilters()) {
+      return '"{}"';
     }
-
-    lines.push('HttpRequest request = HttpRequest.newBuilder()');
-    lines.push(`    .uri(URI.create("${searchUrl}"))`);
-    lines.push('    .header("Content-Type", "application/json")');
-    lines.push(`    .POST(HttpRequest.BodyPublishers.ofString(${body}))`);
-    lines.push('    .build();');
-    lines.push('');
-    lines.push('HttpResponse<String> response = client.send(');
-    lines.push('    request, HttpResponse.BodyHandlers.ofString()');
-    lines.push(');');
-    lines.push('');
-    lines.push('System.out.println(response.body());');
-
-    return lines.join('\n');
+    const jsonStr = JSON.stringify(this.filters).replace(/"/g, '\\"');
+    return `"${jsonStr}"`;
   }
 }
