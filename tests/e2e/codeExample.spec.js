@@ -19,17 +19,7 @@ const copyCodeFromModal = async (page, modal) => {
   return expect.poll(async () => readClipboard(page)).not.toEqual('');
 };
 
-// const addTagToMultiselect = async (page, containerSelector, value) => {
-//   const multiselect = page.locator(`${containerSelector} .multiselect`);
-//   await multiselect.locator('.multiselect__tags').click();
-//   const input = multiselect.locator('input.multiselect__input');
-//   await expect(input).toBeVisible();
-//   await input.fill(value);
-//   await input.press('Enter');
-// };
-
 test.describe('STAC Browser code example modal', () => {
-  test.describe.configure({ mode: 'serial' });
 
   test('shows modal and copies default Python code when no filters are touched', async ({ page }) => {
     await mockApiRootAndCollections(page);

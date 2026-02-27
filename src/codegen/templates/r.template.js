@@ -1,4 +1,4 @@
-library(httr)
+const template = `library(httr)
 library(jsonlite)
 
 # Build search body
@@ -12,5 +12,8 @@ result <- content(response, as = "parsed", type = "application/json")
 
 # Print item IDs
 for (feature in result$features) {
-  cat(feature$id, "\n")
+  cat(feature$id, "\\n")
 }
+`;
+
+export default template;

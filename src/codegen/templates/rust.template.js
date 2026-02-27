@@ -1,4 +1,4 @@
-use reqwest;
+const template = `use reqwest;
 use serde_json::json;
 
 #[tokio::main]
@@ -23,3 +23,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     Ok(())
 }
+`;
+
+export default template;
