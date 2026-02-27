@@ -1,4 +1,4 @@
-const searchUrl = "{{SEARCH_URL}}";
+const template = `const searchUrl = "{{SEARCH_URL}}";
 const searchBody = {{FILTERS_JSON}};
 
 const response = await fetch(searchUrl, {
@@ -11,3 +11,6 @@ const data = await response.json();
 for (const feature of data.features) {
   console.log(feature.id);
 }
+`;
+
+export default template;

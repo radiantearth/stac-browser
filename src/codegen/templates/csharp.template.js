@@ -1,4 +1,4 @@
-using System;
+const template = `using System;
 using System.Net.Http;
 using System.Text;
 
@@ -17,3 +17,6 @@ foreach (var feature in doc.RootElement.GetProperty("features").EnumerateArray()
 {
     Console.WriteLine(feature.GetProperty("id").GetString());
 }
+`;
+
+export default template;

@@ -1,11 +1,5 @@
-import { readFileSync } from 'fs';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
 import CodeGenerator from './CodeGenerator.js';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-const template = readFileSync(join(__dirname, 'templates', 'r.R'), 'utf-8');
+import template from './templates/r.template.js';
 
 export default class RGenerator extends CodeGenerator {
   static get label() {

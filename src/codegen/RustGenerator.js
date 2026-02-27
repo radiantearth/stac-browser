@@ -1,4 +1,5 @@
 import CodeGenerator from './CodeGenerator.js';
+import template from './templates/rust.template.js';
 
 export default class RustGenerator extends CodeGenerator {
   static get label() {
@@ -10,41 +11,19 @@ export default class RustGenerator extends CodeGenerator {
   }
 
   generate() {
-    const searchUrl = this.catalogHref.replace(/\/?$/, '/search');
-    const lines = [
-      'use reqwest;',
-      'use serde_json::json;',
-      '',
-      '#[tokio::main]',
-      'async fn main() -> Result<(), Box<dyn std::error::Error>> {',
-      '    let client = reqwest::Client::new();',
-      ''
-    ];
+    return this.renderTemplate(template, {
+      SEARCH_URL: this.catalogHref.replace(/\/?$/, '/search'),
+      FILTERS_JSON: this.buildRustJson(),
+    });
+  }
 
-    if (this.hasFilters()) {
-      lines.push('    // Search parameters');
-      const jsonLines = JSON.stringify(this.filters, null, 4)
-        .split('\n')
-        .map((line, i) => i === 0 ? `    let params = json!(${line}` : `    ${line}`)
-        .join('\n');
-      lines.push(jsonLines + ');');
+  buildRustJson() {
+    if (!this.hasFilters()) {
+      return '{}';
     }
-    else {
-      lines.push('    let params = json!({});');
-    }
-
-    lines.push('');
-    lines.push(`    let response = client.post("${searchUrl}")`);
-    lines.push('        .json(&params)');
-    lines.push('        .send()');
-    lines.push('        .await?;');
-    lines.push('');
-    lines.push('    let body = response.text().await?;');
-    lines.push('    println!("{}", body);');
-    lines.push('');
-    lines.push('    Ok(())');
-    lines.push('}');
-
-    return lines.join('\n');
+    return JSON.stringify(this.filters, null, 4)
+      .split('\n')
+      .map((line, i) => i === 0 ? line : `    ${line}`)
+      .join('\n');
   }
 }

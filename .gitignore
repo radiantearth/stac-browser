@@ -32,3 +32,6 @@ pnpm-debug.log*
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# integration test outputs
+/tests/integration/generated/

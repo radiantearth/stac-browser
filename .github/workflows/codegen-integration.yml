@@ -1,0 +1,39 @@
+name: Integration Tests — Code Generators
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/codegen/**'
+      - 'tests/integration/**'
+  workflow_dispatch:
+
+jobs:
+  codegen-integration:
+    name: Run generated code (${{ matrix.language }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [python, javascript, r, csharp, java, rust]
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 'lts/*'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate code snippets
+        run: node tests/integration/generate-snippets.js
+
+      - name: Build ${{ matrix.language }} image
+        run: docker compose -f tests/integration/docker-compose.yml build ${{ matrix.language }}
+
+      - name: Run ${{ matrix.language }}
+        run: |
+          timeout 120 docker compose -f tests/integration/docker-compose.yml run --rm ${{ matrix.language }}
