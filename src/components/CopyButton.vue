@@ -1,8 +1,8 @@
 <template>
-    <b-button class="copy-button" @click.prevent.stop="copy" :variant="copyColor" :title="buttonTitle" v-bind="resolvedButtonProps">
-        <component :is="copyIcon" />
-        <slot />
-    </b-button>
+  <b-button class="copy-button" @click.prevent.stop="copy" :variant="copyColor" :title="buttonTitle" v-bind="resolvedButtonProps">
+    <component :is="copyIcon" />
+    <slot />
+  </b-button>
 </template>
 
 <script>
