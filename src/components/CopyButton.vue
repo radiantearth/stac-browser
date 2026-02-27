@@ -41,12 +41,12 @@ export default {
         const { copy, isSupported } = useClipboard();
         return {
             copyToClipboard: copy,
-            isClipboardSupported: isSupported
+            isClipboardSupportedState: isSupported
         };
     },
     computed: {
         isClipboardSupported() {
-            return Boolean(this.isClipboardSupported);
+            return Boolean(this.isClipboardSupportedState);
         },
         resolvedButtonProps() {
             return {
