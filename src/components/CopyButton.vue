@@ -6,6 +6,7 @@
 </template>
 
 <script>
+import { useClipboard } from '@vueuse/core';
 import BIconClipboard from '~icons/bi/clipboard';
 import BIconClipboardCheck from '~icons/bi/clipboard-check';
 import BIconClipboardX from '~icons/bi/clipboard-x';
@@ -36,12 +37,16 @@ export default {
             status: null
         };
     },
+    setup() {
+        const { copy, isSupported } = useClipboard();
+        return {
+            copyToClipboard: copy,
+            isClipboardSupported: isSupported
+        };
+    },
     computed: {
         isClipboardSupported() {
-            return typeof window !== 'undefined' &&
-                window.isSecureContext === true &&
-                typeof navigator !== 'undefined' &&
-                typeof navigator.clipboard?.writeText === 'function';
+            return Boolean(this.isClipboardSupported);
         },
         resolvedButtonProps() {
             return {
@@ -94,7 +99,7 @@ export default {
                 if (!this.isClipboardSupported) {
                     throw new Error('Clipboard API unsupported');
                 }
-                await navigator.clipboard.writeText(this.copyText);
+                await this.copyToClipboard(this.copyText);
                 this.status = true;
             } catch(error) {
                 console.error('Copy failed:', error);
