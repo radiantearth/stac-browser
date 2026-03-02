@@ -1,3 +1,11 @@
+/**
+ * Collection metadata & assets tests.
+ *
+ * Verifies rendering a STAC collection: metadata fields, spatial extent map,
+ * item listing, and detail controls.
+ *
+ * Fixtures: tests/fixtures/catalogs/test-catalog/eo-collection/
+ */
 import { test, expect } from '@playwright/test';
 import { mockCatalogByFolder, loadMockCatalog, loadFixture, waitForBrowserReady } from './helpers';
 

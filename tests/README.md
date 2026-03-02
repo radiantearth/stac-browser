@@ -14,28 +14,6 @@ npx playwright test catalog.spec.js          # single file
 npx playwright test --grep "map click"       # by name
 ```
 
-## Structure
-
-```
-tests/
-  fixtures/
-    catalogs.json                              # STAC Index mock (homepage)
-    catalogs/
-      test-catalog/
-        catalog.json                           # root static catalog
-        eo-collection/collection.json          # collection with items
-        eo-collection/item-2025-001.json
-        eo-collection/item-2025-002.json
-        climate-collection/collection.json     # second collection
-  e2e/
-    helpers.js             # mock registration & navigation utilities
-    homepage.spec.js       # homepage / catalog index
-    catalog.spec.js        # catalog browsing & navigation
-    collection.spec.js     # collection metadata & assets
-    item.spec.js           # item properties, geometry & assets
-    searchpage.spec.js     # STAC API search page
-```
-
 ## Helpers (`helpers.js`)
 
 HTTP mocking is driven by **handler objects** — plain descriptors registered via `registerHandlers(page, handlers)`. Convenience functions build handler arrays from fixtures or inline data.
@@ -56,4 +34,4 @@ HTTP mocking is driven by **handler objects** — plain descriptors registered v
 
 Static catalog fixtures live in `tests/fixtures/catalogs/<name>/`. Each JSON file must have a `self` link — `mockCatalogByFolder` uses these to register route handlers automatically.
 
-The search page tests use inline mock data (API root with `conformsTo`, collections, empty search results) built by `apiRootHandlers()` in `helpers.js`.
+Search page fixtures live in `tests/fixtures/api/` (root, collections, search responses) and are loaded by `apiRootHandlers()` in `helpers.js`.

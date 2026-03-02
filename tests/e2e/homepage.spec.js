@@ -1,3 +1,11 @@
+/**
+ * Homepage / catalog index tests.
+ *
+ * Verifies the STAC Browser landing page: catalog list rendering, search input,
+ * navigation to a catalog, and STAC Index entry clicks.
+ *
+ * Fixtures: tests/fixtures/catalogs.json (synthetic STAC Index entries)
+ */
 import { test, expect } from '@playwright/test';
 import { HOME_PATH, mockStacResource } from './helpers';
 
