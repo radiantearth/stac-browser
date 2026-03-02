@@ -16,39 +16,39 @@ export default class RGenerator extends CodeGenerator {
 
   generate() {
     return this.renderTemplate(template, {
-      SEARCH_URL: this.catalogHref.replace(/\/?$/, '/search'),
-      BODY_PROPS: this.buildBodyProps(),
+      CATALOG_URL: this.catalogHref,
+      SEARCH_ARGS: this.buildSearchArgs(),
     });
   }
 
-  buildBodyProps() {
+  buildSearchArgs() {
     const props = [];
 
     if (this.filters.collections && this.filters.collections.length > 0) {
       const collections = this.filters.collections.map(c => `"${c}"`).join(', ');
-      props.push(`  collections = I(c(${collections}))`);
+      props.push(`collections = c(${collections})`);
     }
 
     if (this.filters.ids && this.filters.ids.length > 0) {
       const ids = this.filters.ids.map(id => `"${id}"`).join(', ');
-      props.push(`  ids = I(c(${ids}))`);
+      props.push(`ids = c(${ids})`);
     }
 
     if (this.filters.bbox) {
-      props.push(`  bbox = c(${this.filters.bbox.join(', ')})`);
+      props.push(`bbox = c(${this.filters.bbox.join(', ')})`);
     }
 
     if (this.filters.datetime) {
-      props.push(`  datetime = "${this.filters.datetime}"`);
+      props.push(`datetime = "${this.filters.datetime}"`);
     }
 
     if (this.filters.limit) {
-      props.push(`  limit = ${this.filters.limit}`);
+      props.push(`limit = ${this.filters.limit}`);
     }
 
     if (props.length === 0) {
       return '';
     }
-    return '\n' + props.join(',\n') + '\n';
+    return ',\n  ' + props.join(',\n  ');
   }
 }

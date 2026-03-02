@@ -1,18 +1,17 @@
-const template = `library(httr)
-library(jsonlite)
+const template = `library(rstac)
 
-# Build search body
-body <- list({{BODY_PROPS}})
-
-# Execute search
-search_url <- "{{SEARCH_URL}}"
-response <- POST(search_url, body = body, encode = "json",
-                  content_type_json())
-result <- content(response, as = "parsed", type = "application/json")
+# Build and execute search
+catalog <- stac("{{CATALOG_URL}}")
+query <- stac_search(catalog{{SEARCH_ARGS}})
+result <- post_request(query)
 
 # Print item IDs
-for (feature in result$features) {
-  cat(feature$id, "\\n")
+if (!is.null(result$features) && length(result$features) > 0) {
+  for (feature in result$features) {
+    if (!is.null(feature$id)) {
+      cat(feature$id, "\\n")
+    }
+  }
 }
 `;
 
