@@ -213,9 +213,10 @@
   "search": {
     "addCollections": "Tekan enter untuk menambahkan koleksi",
     "addFilter": "Tambah filter",
+    "additionalFilters": "Filter tambahan",
     "addItemIds": "Tekan enter untuk menambahkan ID Item",
     "addSearchTerm": "Tekan enter untuk menambahkan istilah pencarian",
-    "additionalFilters": "Filter tambahan",
+    "arrayInput": {},
     "dateDescription": "Semua waktu dalam Coordinated Universal Time (UTC).",
     "enterCollections": "Masukkan satu atau lebih ID Koleksi...",
     "enterItemIds": "Masukkan satu atau lebih ID Item...",

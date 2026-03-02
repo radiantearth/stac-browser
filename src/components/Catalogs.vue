@@ -12,7 +12,7 @@
         v-if="allKeywords.length > 0"
         v-model="selectedKeywords"
         :options="allKeywords"
-        :multiple="true"
+        multiple
         :placeholder="$t('multiselect.keywordsPlaceholder')"
         :select-label="$t('multiselect.selectLabel')"
         :selected-label="$t('multiselect.selectedLabel')"

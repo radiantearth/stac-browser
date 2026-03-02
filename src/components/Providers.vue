@@ -19,7 +19,7 @@
 <script>
 import { defineAsyncComponent } from 'vue';
 import ProviderRoles from './ProviderRoles.vue';
-import Utils from '../utils';
+import { size } from 'stac-js/src/utils.js';
 import { BAccordion } from 'bootstrap-vue-next';
 
 export default {
@@ -37,7 +37,7 @@ export default {
   },
   computed: {
     count() {
-      return Utils.size(this.providers);
+      return size(this.providers);
     },
     isSimple() {
       // We can show the providers much simpler if there are no additional information

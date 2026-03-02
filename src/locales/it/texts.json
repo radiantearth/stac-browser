@@ -86,6 +86,7 @@
   },
   "description": "Descrizione",
   "errors": {
+    "apiListRequested": "La richiesta non è valida. Le richieste dirette agli endpoint /collections e .../items non sono attualmente supportate.",
     "authFailed": "La richiesta ha restituito un errore. I dati di accesso forniti potrebbero essere errati.",
     "badRequest": "La richiesta non è valida. Questo potrebbe essere dovuto a parametri non validi, ad esempio in una richiesta di ricerca, oppure potrebbe essere un bug di STAC Browser.",
     "contactProvider": "Contatta il fornitore del servizio per risolvere il problema.",
@@ -165,8 +166,18 @@
     },
     "bboxSelect": {
       "add": "Cliccare sulla mappa per aggiungere un box di selezione.",
-      "error": {},
-      "remove": "Cliccare dentro il box per eliminarlo."
+      "eastLon": "Longitudine est",
+      "error": {
+        "incomplete": "Coordinata mancante",
+        "invalidLat": "Deve essere compreso tra -90 e 90",
+        "invalidLon": "Deve essere compreso tra -180 e 180",
+        "latOrder": "La latitudine sud deve essere inferiore alla latitudine nord",
+        "lonOrder": "La longitudine ovest deve essere inferiore alla longitudine est"
+      },
+      "northLat": "Latitudine nord",
+      "remove": "Cliccare dentro il box per eliminarlo.",
+      "southLat": "Latitudine sud",
+      "westLon": "Longitudine ovest"
     },
     "close": "Chiudi",
     "fit": "Adatta alla estensione",
@@ -243,9 +254,10 @@
   "search": {
     "addCollections": "Premi invio per aggiungere una Collezione",
     "addFilter": "Aggiungi filtro",
+    "additionalFilters": "Filtri aggiuntivi",
     "addItemIds": "Premi invio per aggiungere l'ID di un Elemento",
     "addSearchTerm": "Premi Invio per aggiungere un termine di ricerca",
-    "additionalFilters": "Filtri aggiuntivi",
+    "arrayInput": {},
     "dateDescription": "Data/ora nel sistema UTC (tempo coordinato internazionale).",
     "enterCollections": "Inserire una o più Collezioni...",
     "enterItemIds": "Inserire uno o più ID di Elemento...",

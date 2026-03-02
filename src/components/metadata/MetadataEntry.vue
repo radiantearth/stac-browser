@@ -14,7 +14,7 @@
 
 <script>
 import EntryMixin from './EntryMixin';
-import Utils from '../../utils';
+import { size } from 'stac-js/src/utils.js';
 import { defineAsyncComponent } from 'vue';
 
 const FORCE_TABLE = [
@@ -34,7 +34,7 @@ export default {
   ],
   computed: {
     showTable() {
-      return FORCE_TABLE.includes(this.field) || this.itemOrder.length > 0 && Utils.size(this.value) >= 3;
+      return FORCE_TABLE.includes(this.field) || this.itemOrder.length > 0 && size(this.value) >= 3;
     }
   }
 };

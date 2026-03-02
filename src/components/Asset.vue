@@ -45,7 +45,7 @@ import { defineAsyncComponent } from 'vue';
 import { formatMediaType } from '@radiantearth/stac-fields/formatters';
 import { mapState } from 'vuex';
 import StacFieldsMixin from './StacFieldsMixin';
-import Utils from '../utils';
+import { isObject, size } from 'stac-js/src/utils.js';
 import { Asset } from 'stac-js';
 import { BCard, BTab, BTabs, BAccordionItem } from 'bootstrap-vue-next';
 
@@ -109,7 +109,7 @@ export default {
       return null;
     },
     alternatives() {
-      if (!Utils.isObject(this.asset.alternate)) {
+      if (!isObject(this.asset.alternate)) {
         return {};
       }
 
@@ -126,7 +126,7 @@ export default {
       return alternates;
     },
     hasAlternatives() {
-      return Utils.size(this.alternatives) > 0;
+      return size(this.alternatives) > 0;
     },
     sortedRoles() {
       if (!Array.isArray(this.asset.roles)) {

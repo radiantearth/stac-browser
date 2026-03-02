@@ -1,11 +1,11 @@
-import Utils from "./utils";
+import { isObject } from 'stac-js/src/utils.js';
 
 export default class BrowserStorage {
 
   static JSON_INDICATOR = "\n\r";
 
   static enabled(engine) {
-    if (!Utils.isObject(engine)) {
+    if (!isObject(engine)) {
       return false;
     }
     try {

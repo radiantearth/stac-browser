@@ -1,5 +1,5 @@
 import AssetActionPlugin from "../AssetActionPlugin";
-import URI from 'urijs';
+import { URI } from 'stac-js/src/utils.js';
 import i18n from "../../i18n";
 
 // obj & ply files are usually with mime-type text/plain 
@@ -24,7 +24,7 @@ export default class F3D extends AssetActionPlugin {
     // `https://f3d.app/web/#model=${modelUrl}` see PR merged for parsing model url and extension:
     // https://github.com/f3d-app/f3d/pull/1596
     // Could enforce extension to help f3d.app determine the mesh type and loader to use
-    let uri = new URI("https://f3d.app/viewer");
+    let uri = URI("https://f3d.app/viewer");
     uri.addQuery("model", this.component.href); 
     uri = uri.toString().replace('?', '#');
     return uri;

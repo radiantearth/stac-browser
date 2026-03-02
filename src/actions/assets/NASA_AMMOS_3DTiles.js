@@ -1,5 +1,5 @@
 import AssetActionPlugin from "../AssetActionPlugin";
-import URI from 'urijs';
+import { URI } from 'stac-js/src/utils.js';
 import i18n from "../../i18n";
 
 // See mime types discussion for 3d-tiles here and there
@@ -16,7 +16,7 @@ export default class NASA_AMMOS_3DTiles extends AssetActionPlugin {
   }
 
   get uri() {
-    let uri = new URI("https://nasa-ammos.github.io/3DTilesRendererJS/example/bundle/index.html");
+    let uri = URI("https://nasa-ammos.github.io/3DTilesRendererJS/example/bundle/index.html");
     uri.hash(this.link.href);
     return uri;
   }
