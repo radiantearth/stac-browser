@@ -1,0 +1,30 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "stac_version": "1.0.0",
+      "id": "api-item-3",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-100.0, 35.0]
+      },
+      "bbox": [-100.5, 34.5, -99.5, 35.5],
+      "properties": {
+        "title": "API Item Gamma",
+        "datetime": "2025-08-10T00:00:00Z"
+      },
+      "links": [
+        { "rel": "self", "href": "https://example.com/api/collections/test-collection-1/items/api-item-3", "type": "application/geo+json" },
+        { "rel": "collection", "href": "https://example.com/api/collections/test-collection-1", "type": "application/json" },
+        { "rel": "root", "href": "https://example.com/api", "type": "application/json" }
+      ],
+      "assets": {}
+    }
+  ],
+  "links": [
+    { "rel": "prev", "href": "https://example.com/api/collections/test-collection-1/items", "type": "application/geo+json" }
+  ],
+  "numberMatched": 3,
+  "numberReturned": 1
+}
