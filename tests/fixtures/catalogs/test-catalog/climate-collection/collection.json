@@ -1,0 +1,34 @@
+{
+  "type": "Collection",
+  "id": "climate-collection",
+  "title": "Global Climate Indicators",
+  "description": "Global climate monitoring data including temperature and precipitation indicators.",
+  "stac_version": "1.0.0",
+  "license": "CC-BY-4.0",
+  "keywords": ["Climate", "Temperature", "Global"],
+  "extent": {
+    "spatial": {
+      "bbox": [[-180, -90, 180, 90]]
+    },
+    "temporal": {
+      "interval": [["2015-01-01T00:00:00Z", null]]
+    }
+  },
+  "links": [
+    {
+      "rel": "self",
+      "href": "https://example.com/test-catalog/climate-collection",
+      "type": "application/json"
+    },
+    {
+      "rel": "root",
+      "href": "https://example.com/test-catalog",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "https://example.com/test-catalog",
+      "type": "application/json"
+    }
+  ]
+}

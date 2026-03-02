@@ -1,0 +1,17 @@
+{
+  "type": "Catalog",
+  "id": "test-api",
+  "title": "Test STAC API",
+  "description": "A mock STAC API for testing the search page.",
+  "stac_version": "1.0.0",
+  "conformsTo": [
+    "https://api.stacspec.org/v1.0.0/item-search",
+    "https://api.stacspec.org/v1.0.0/item-search#sort"
+  ],
+  "links": [
+    { "rel": "self", "href": "https://example.com/api", "type": "application/json" },
+    { "rel": "root", "href": "https://example.com/api", "type": "application/json" },
+    { "rel": "search", "href": "https://example.com/api/search", "type": "application/geo+json", "method": "POST" },
+    { "rel": "data", "href": "https://example.com/api/collections", "type": "application/json" }
+  ]
+}
