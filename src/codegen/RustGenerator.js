@@ -16,7 +16,7 @@ export default class RustGenerator extends CodeGenerator {
 
   generate() {
     return this.renderTemplate(template, {
-      SEARCH_URL: this.catalogHref.replace(/\/?$/, '/search'),
+      CATALOG_URL: this.catalogHref,
       FILTERS_JSON: this.buildRustJson(),
     });
   }

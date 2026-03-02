@@ -1,23 +1,17 @@
-const template = `use reqwest;
+const template = `use stac::api::Search;
 use serde_json::json;
+use stac_io::api;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let client = reqwest::Client::new();
-
     let params = json!({{FILTERS_JSON}});
+    let search: Search = serde_json::from_value(params)?;
+    let max_items = search.limit.and_then(|value| usize::try_from(value).ok());
+    let items = api::search("{{CATALOG_URL}}", search, max_items).await?;
 
-    let response = client.post("{{SEARCH_URL}}")
-        .json(&params)
-        .send()
-        .await?;
-
-    let body: serde_json::Value = response.json().await?;
-    if let Some(features) = body["features"].as_array() {
-        for feature in features {
-            if let Some(id) = feature["id"].as_str() {
-                println!("{}", id);
-            }
+    for item in items.items {
+        if let Some(id) = item.get("id").and_then(|value| value.as_str()) {
+            println!("{}", id);
         }
     }
 
