@@ -29,6 +29,14 @@ export default class CodeGenerator {
   }
 
   /**
+   * The output filename used when generating runnable snippets.
+   * @returns {string}
+   */
+  static get outputFile() {
+    throw new Error('Subclasses must implement outputFile');
+  }
+
+  /**
    * Generate the code string.
    * @returns {string}
    */

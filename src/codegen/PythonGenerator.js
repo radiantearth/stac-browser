@@ -10,6 +10,10 @@ export default class PythonGenerator extends CodeGenerator {
     return 'python';
   }
 
+  static get outputFile() {
+    return 'search.py';
+  }
+
   generate() {
     return this.renderTemplate(template, {
       CATALOG_URL: this.catalogHref,

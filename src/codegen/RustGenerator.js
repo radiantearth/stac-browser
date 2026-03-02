@@ -10,6 +10,10 @@ export default class RustGenerator extends CodeGenerator {
     return 'rust';
   }
 
+  static get outputFile() {
+    return 'main.rs';
+  }
+
   generate() {
     return this.renderTemplate(template, {
       SEARCH_URL: this.catalogHref.replace(/\/?$/, '/search'),

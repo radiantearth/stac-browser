@@ -10,6 +10,10 @@ export default class RGenerator extends CodeGenerator {
     return 'r';
   }
 
+  static get outputFile() {
+    return 'search.R';
+  }
+
   generate() {
     return this.renderTemplate(template, {
       SEARCH_URL: this.catalogHref.replace(/\/?$/, '/search'),

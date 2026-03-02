@@ -10,6 +10,10 @@ export default class CSharpGenerator extends CodeGenerator {
     return 'csharp';
   }
 
+  static get outputFile() {
+    return 'Program.cs';
+  }
+
   generate() {
     return this.renderTemplate(template, {
       SEARCH_URL: this.catalogHref.replace(/\/?$/, '/search'),

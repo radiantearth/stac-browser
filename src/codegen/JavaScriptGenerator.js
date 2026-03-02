@@ -10,6 +10,10 @@ export default class JavaScriptGenerator extends CodeGenerator {
     return 'javascript';
   }
 
+  static get outputFile() {
+    return 'search.mjs';
+  }
+
   generate() {
     return this.renderTemplate(template, {
       SEARCH_URL: this.catalogHref.replace(/\/?$/, '/search'),
