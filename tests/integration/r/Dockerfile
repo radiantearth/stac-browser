@@ -1,4 +1,4 @@
-FROM r-base:4.4.0
+FROM r-base:latest
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libcurl4-openssl-dev libssl-dev libxml2-dev \
   && rm -rf /var/lib/apt/lists/*
