@@ -1,8 +1,15 @@
+/**
+ * Item properties, geometry & assets tests.
+ *
+ * Exercises viewing an item in a static STAC catalog.
+ * Navigates: root catalog -> eo-collection -> first item (EO-2025-001).
+ * Verifies metadata rendering, geometry display, asset listing, and breadcrumb
+ * navigation.
+ *
+ * Fixtures: tests/fixtures/catalogs/test-catalog/eo-collection/item-2025-001.json
+ */
 import { test, expect } from '@playwright/test';
 import { mockCatalogByFolder, loadMockCatalog, loadFixture, waitForBrowserReady } from './helpers';
-
-// Exercises viewing an item in a static STAC catalog.
-// Navigates: root catalog -> eo-collection -> first item (EO-2025-001)
 
 test.describe('Item view using folder fixtures', () => {
   const folderName = 'test-catalog';

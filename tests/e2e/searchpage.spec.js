@@ -1,3 +1,13 @@
+/**
+ * STAC API search page tests.
+ *
+ * Verifies the global item search: filter inputs (datetime, bbox, collection ID,
+ * item ID, sort, limit), bbox validation, result rendering, empty-result state,
+ * and form reset.
+ *
+ * Fixtures: tests/fixtures/api/ (root.json, collections.json, search-empty.json,
+ *           search-results.json)
+ */
 import { test, expect } from '@playwright/test';
 import {
   SEARCH_PATH,

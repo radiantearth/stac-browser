@@ -1,3 +1,11 @@
+/**
+ * Catalog browsing & navigation tests.
+ *
+ * Verifies loading a static STAC catalog, rendering metadata and child
+ * collections, navigating into collections/items, source view, and validation.
+ *
+ * Fixtures: tests/fixtures/catalogs/test-catalog/
+ */
 import { test, expect } from '@playwright/test';
 import { mockCatalogByFolder, loadMockCatalog, loadFixture, waitForBrowserReady } from './helpers';
 
