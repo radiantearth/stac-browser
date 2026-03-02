@@ -26,6 +26,12 @@
       "href": "https://example.com/test-catalog/climate-collection",
       "type": "application/json",
       "title": "Global Climate Indicators"
+    },
+    {
+      "rel": "child",
+      "href": "https://example.com/test-catalog/invalid-collection",
+      "type": "application/json",
+      "title": "Invalid Collection"
     }
   ]
 }

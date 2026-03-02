@@ -6,7 +6,8 @@
   "stac_version": "1.0.0",
   "conformsTo": [
     "https://api.stacspec.org/v1.0.0/item-search",
-    "https://api.stacspec.org/v1.0.0/item-search#sort"
+    "https://api.stacspec.org/v1.0.0/item-search#sort",
+    "https://api.stacspec.org/v1.0.0/ogcapi-features"
   ],
   "links": [
     { "rel": "self", "href": "https://example.com/api", "type": "application/json" },

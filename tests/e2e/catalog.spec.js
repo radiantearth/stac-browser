@@ -7,7 +7,7 @@
  * Fixtures: tests/fixtures/catalogs/test-catalog/
  */
 import { test, expect } from '@playwright/test';
-import { mockCatalogByFolder, loadMockCatalog, loadFixture, waitForBrowserReady } from './helpers';
+import { mockCatalogByFolder, loadMockCatalog, mockStacResource, loadFixture, waitForBrowserReady } from './helpers';
 
 test.describe('Catalog view using folder fixtures', () => {
   const folderName = 'test-catalog';
@@ -60,7 +60,7 @@ test.describe('Catalog view using folder fixtures', () => {
 
     // clear filter for keyword test
     await filterInput.clear();
-    await expect(badge).toHaveText(/2/);
+    await expect(badge).toHaveText(/3/);
 
     // keyword selector: collections have keywords so the control must be present
     const multi = page.locator('.multiselect');
@@ -138,6 +138,42 @@ test.describe('Catalog view using folder fixtures', () => {
     const cards = page.locator('.results .card');
     const cardCount = await cards.count();
     expect(cardCount).toBeGreaterThan(0);
+  });
+
+  test('validation report shows errors for invalid STAC entity', async ({ page }) => {
+    const invalidCollection = loadFixture(folderName, 'invalid-collection', 'collection.json');
+    const invalidUrl = `${catalogUrl}/invalid-collection`;
+
+    // Load the invalid collection directly
+    await mockStacResource(page, invalidUrl, invalidCollection);
+    await page.goto(`/external/${new URL(invalidUrl).host}${new URL(invalidUrl).pathname}`);
+    await waitForBrowserReady(page);
+
+    // Open source popover – validation button should be red with "no" text
+    const sourceBtn = page.getByRole('button', { name: /source/i });
+    await expect(sourceBtn).toBeVisible();
+    await sourceBtn.click();
+
+    const sourcePop = page.locator('#popover-link');
+    // The "Valid" row label is always present; the Validation component button shows "no" for invalid
+    const validationBtn = sourcePop.locator('.stac-valid .btn-danger');
+    await expect(validationBtn).toBeVisible();
+    await expect(validationBtn).toContainText('no');
+
+    // Click the validation button to navigate to the report
+    await validationBtn.click();
+
+    await waitForBrowserReady(page);
+    await expect(page.getByRole('heading', { name: /validation report/i })).toBeVisible();
+
+    // Result row should show Invalid
+    const resultRow = page.locator('main').getByText('Result').locator('..');
+    await expect(resultRow.getByText(/Invalid/i)).toBeVisible();
+
+    // At least one card should have a danger (error) list item
+    const errorItems = page.locator('.results .list-group-item-danger');
+    const errorCount = await errorItems.count();
+    expect(errorCount).toBeGreaterThan(0);
   });
 
   test('navigating into a child collection uses its folder data', async ({ page }) => {

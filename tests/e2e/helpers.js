@@ -240,6 +240,63 @@ export async function mockApiRootAndCollections(page, { baseUrl = DEFAULT_API_UR
   await registerHandlers(page, handlers);
 }
 
+/**
+ * Load an API fixture file from tests/fixtures/api/.
+ *
+ * @param {string} filename – JSON file name inside fixtures/api/
+ * @returns {object} parsed JSON
+ */
+export function loadApiFixture(filename) {
+  const fixtureDir = path.resolve(
+    new URL('../fixtures/api/', import.meta.url).pathname,
+  );
+  return JSON.parse(fs.readFileSync(path.join(fixtureDir, filename), 'utf8'));
+}
+
+/**
+ * Register handlers for browsing an API-backed collection.
+ *
+ * Mocks the full API: root, /collections, /search, plus the individual
+ * collection endpoint and its /items endpoint.
+ *
+ * @param {import('@playwright/test').Page} page
+ * @param {object} [options]
+ * @param {string} [options.baseUrl] – API base URL
+ * @param {string} [options.collectionId] – collection ID to mock
+ * @param {string} [options.collectionFixture] – fixture filename for the collection
+ * @param {string} [options.itemsFixture] – fixture filename for the items response
+ * @param {string} [options.itemsPage2Fixture] – optional fixture for page 2
+ */
+export async function mockApiCollection(page, {
+  baseUrl = DEFAULT_API_URL,
+  collectionId = 'test-collection-1',
+  collectionFixture = 'collection-1.json',
+  itemsFixture = 'collection-1-items.json',
+  itemsPage2Fixture = null,
+} = {}) {
+  // Register root + collections + search
+  await mockApiRootAndCollections(page, { baseUrl });
+
+  const collection = loadApiFixture(collectionFixture);
+  const items = loadApiFixture(itemsFixture);
+
+  const handlers = [
+    { url: `${baseUrl}/collections/${collectionId}`, body: collection },
+    { url: `${baseUrl}/collections/${collectionId}/items`, body: items },
+  ];
+
+  // If a page 2 fixture is provided, register it at the cursor URL
+  if (itemsPage2Fixture) {
+    const page2 = loadApiFixture(itemsPage2Fixture);
+    handlers.push({
+      url: `${baseUrl}/collections/${collectionId}/items?cursor=page2`,
+      body: page2,
+    });
+  }
+
+  await registerHandlers(page, handlers);
+}
+
 // ─── Navigation helpers ─────────────────────────────────────────────────────
 
 /**
