@@ -1,0 +1,31 @@
+{
+  "type": "Catalog",
+  "id": "test-catalog",
+  "title": "Test Earth Observation Catalog",
+  "description": "A test catalog containing earth observation datasets for E2E testing.",
+  "stac_version": "1.0.0",
+  "links": [
+    {
+      "rel": "self",
+      "href": "https://example.com/test-catalog",
+      "type": "application/json"
+    },
+    {
+      "rel": "root",
+      "href": "https://example.com/test-catalog",
+      "type": "application/json"
+    },
+    {
+      "rel": "child",
+      "href": "https://example.com/test-catalog/eo-collection",
+      "type": "application/json",
+      "title": "Earth Observation L2A"
+    },
+    {
+      "rel": "child",
+      "href": "https://example.com/test-catalog/climate-collection",
+      "type": "application/json",
+      "title": "Global Climate Indicators"
+    }
+  ]
+}

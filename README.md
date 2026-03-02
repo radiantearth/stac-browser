@@ -306,6 +306,7 @@ To run the full suite locally:
 
 ```bash
 npm run test:e2e
+```
 ## Contributing
 
 Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to contribute to STAC Browser.

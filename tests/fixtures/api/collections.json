@@ -1,0 +1,37 @@
+{
+  "collections": [
+    {
+      "type": "Collection",
+      "id": "test-collection-1",
+      "title": "Test Collection 1",
+      "description": "First test collection.",
+      "stac_version": "1.0.0",
+      "license": "proprietary",
+      "extent": {
+        "spatial": { "bbox": [[-180, -90, 180, 90]] },
+        "temporal": { "interval": [["2020-01-01T00:00:00Z", null]] }
+      },
+      "links": [
+        { "rel": "self", "href": "https://example.com/api/collections/test-collection-1" },
+        { "rel": "root", "href": "https://example.com/api" }
+      ]
+    },
+    {
+      "type": "Collection",
+      "id": "test-collection-2",
+      "title": "Test Collection 2",
+      "description": "Second test collection.",
+      "stac_version": "1.0.0",
+      "license": "CC-BY-4.0",
+      "extent": {
+        "spatial": { "bbox": [[-180, -90, 180, 90]] },
+        "temporal": { "interval": [["2019-01-01T00:00:00Z", null]] }
+      },
+      "links": [
+        { "rel": "self", "href": "https://example.com/api/collections/test-collection-2" },
+        { "rel": "root", "href": "https://example.com/api" }
+      ]
+    }
+  ],
+  "links": []
+}

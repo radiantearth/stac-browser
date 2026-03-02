@@ -256,13 +256,14 @@ test.describe('STAC Browser Search page', () => {
     await mockApiRootAndCollections(page);
     await page.goto(SEARCH_PATH);
 
-    await test.step('Enter a collection ID', async () => {
+    await test.step('Select a collection from the dropdown', async () => {
       const collectionSelect = page.locator('.filter-collection .multiselect');
       await collectionSelect.click();
 
-      const collectionInput = collectionSelect.locator('input.multiselect__input');
-      await collectionInput.fill('test-collection-1');
-      await collectionInput.press('Enter');
+      // Wait for collection options to be loaded from the /collections endpoint
+      const option = collectionSelect.locator('.multiselect__option', { hasText: 'Test Collection 1' });
+      await option.waitFor({ state: 'visible', timeout: 10000 });
+      await option.click();
     });
 
     await test.step('Submit search and verify POST body contains collection ID', async () => {
@@ -344,6 +345,87 @@ test.describe('STAC Browser Search page', () => {
 
       const { body } = await requestPromise;
       expect(body.limit).toBe(99);
+    });
+  });
+
+  test('search results render item cards with correct titles', async ({ page }) => {
+    await mockApiRootAndCollections(page, { searchFixture: 'search-results.json' });
+    await page.goto(SEARCH_PATH);
+
+    await test.step('Submit search and wait for results', async () => {
+      const submitButton = page.getByRole('button', { name: /submit/i });
+      await submitButton.click();
+
+      // Wait for item cards to appear
+      await expect(page.locator('.item-card')).toHaveCount(3, { timeout: 10000 });
+    });
+
+    await test.step('Verify each result item title is displayed', async () => {
+      await expect(page.locator('.item-card').nth(0).locator('.stac-link .title')).toHaveText('Result Item Alpha');
+      await expect(page.locator('.item-card').nth(1).locator('.stac-link .title')).toHaveText('Result Item Beta');
+      await expect(page.locator('.item-card').nth(2).locator('.stac-link .title')).toHaveText('Result Item Gamma');
+    });
+  });
+
+  test('search results show "no items found" when response is empty', async ({ page }) => {
+    await mockApiRootAndCollections(page, { searchFixture: 'search-empty.json' });
+    await page.goto(SEARCH_PATH);
+
+    await test.step('Submit search with default filters', async () => {
+      const submitButton = page.getByRole('button', { name: /submit/i });
+      await submitButton.click();
+    });
+
+    await test.step('Verify "no items found" message appears', async () => {
+      await expect(page.getByText(/no items found for the given filters/i)).toBeVisible({ timeout: 10000 });
+    });
+
+    await test.step('Verify no item cards are rendered', async () => {
+      await expect(page.locator('.item-card')).toHaveCount(0);
+    });
+  });
+
+  test('search results display matched item count', async ({ page }) => {
+    await mockApiRootAndCollections(page, { searchFixture: 'search-results.json' });
+    await page.goto(SEARCH_PATH);
+
+    await test.step('Submit search and wait for results', async () => {
+      const submitButton = page.getByRole('button', { name: /submit/i });
+      await submitButton.click();
+
+      await expect(page.locator('.item-card')).toHaveCount(3, { timeout: 10000 });
+    });
+
+    await test.step('Verify items count badge is displayed', async () => {
+      // The Items section shows a count badge next to the heading
+      const itemsHeading = page.locator('.items header');
+      await expect(itemsHeading.locator('.badge')).toContainText('3');
+    });
+  });
+
+  test('Reset button clears all filters and re-submits with empty body', async ({ page }) => {
+    await mockApiRootAndCollections(page);
+    await page.goto(SEARCH_PATH);
+
+    await test.step('Fill in filters before resetting', async () => {
+      // Set a limit so the body is non-empty
+      const limitInput = page.getByLabel(/items per page/i);
+      await limitInput.fill('5');
+
+      // Submit to confirm the filters are applied
+      const requestPromise = waitForSearchPost(page);
+      await page.getByRole('button', { name: /submit/i }).click();
+      const { body } = await requestPromise;
+      expect(body.limit).toBe(5);
+    });
+
+    await test.step('Click Reset then re-submit and verify empty body', async () => {
+      await page.getByRole('button', { name: /reset/i }).click();
+
+      const requestPromise = waitForSearchPost(page);
+      await page.getByRole('button', { name: /submit/i }).click();
+      const { body } = await requestPromise;
+      expect(body).toEqual({});
     });
   });
 });

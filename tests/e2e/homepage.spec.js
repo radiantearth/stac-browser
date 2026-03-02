@@ -107,15 +107,22 @@ test.describe('STAC Browser Homepage', () => {
   });
 
   test('should navigate to catalog when valid URL is loaded', async ({ page }) => {
+    const catalogUrl = 'https://planetarycomputer.microsoft.com/api/stac/v1/';
+    await mockStacResource(page, catalogUrl, {
+      type: 'Catalog',
+      id: 'microsoft-pc',
+      title: 'Microsoft Planetary Computer STAC API',
+      description: 'Mock catalog for testing navigation.',
+      stac_version: '1.0.0',
+      links: [{ rel: 'self', href: catalogUrl, type: 'application/json' }],
+    });
+
     await page.goto(HOME_PATH);
     
     const input = page.getByRole('textbox', { name: /please specify a stac catalog or api/i });
     const loadButton = page.getByRole('button', { name: /^load$/i });
     
-    // Type the Planetary Computer STAC API URL
-    await input.fill('https://planetarycomputer.microsoft.com/api/stac/v1/');
-    
-    // Click the Load button
+    await input.fill(catalogUrl);
     await loadButton.click();
     
     // Wait for navigation and verify the catalog title appears as h1 heading
@@ -127,12 +134,21 @@ test.describe('STAC Browser Homepage', () => {
   });
 
   test('clicking a STAC index entry populates url and navigates', async ({ page }) => {
+    const expectedUrl = catalogs[0].url;
+    await mockStacResource(page, expectedUrl, {
+      type: 'Catalog',
+      id: 'stac-index-first',
+      title: catalogs[0].title,
+      description: 'Mock catalog for the first STAC index entry.',
+      stac_version: '1.0.0',
+      links: [{ rel: 'self', href: expectedUrl, type: 'application/json' }],
+    });
+
     await page.goto(HOME_PATH);
-    // click first entry button (ensure index container has loaded)
     await page.waitForSelector('.stac-index');
     const firstBtn = page.locator('.stac-index button').first();
-    const expectedUrl = catalogs[0].url;
     await firstBtn.click();
+
     // input should be filled
     const input = page.getByRole('textbox', { name: /please specify a stac catalog or api/i });
     await expect(input).toHaveValue(expectedUrl);
