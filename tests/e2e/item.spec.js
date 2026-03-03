@@ -2,7 +2,7 @@
  * Item properties, geometry & assets tests.
  *
  * Exercises viewing an item in a static STAC catalog.
- * Navigates: root catalog -> eo-collection -> first item (EO-2025-001).
+ * Navigates: root catalog -> eo-collection -> first item (item-2025-001).
  * Verifies metadata rendering, geometry display, asset listing, and breadcrumb
  * navigation.
  *

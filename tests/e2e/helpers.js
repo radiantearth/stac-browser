@@ -17,11 +17,12 @@
 import { expect } from '@playwright/test';
 import path from 'path';
 import fs from 'fs';
+import { fileURLToPath } from 'url';
 
 // ─── Fixture loading ─────────────────────────────────────────────────────────
 
 const FIXTURES_ROOT = path.resolve(
-  new URL('../fixtures/catalogs/', import.meta.url).pathname,
+  fileURLToPath(new URL('../fixtures/catalogs/', import.meta.url)),
 );
 
 /**
@@ -131,7 +132,7 @@ export async function mockStacError(page, urlPattern, status = 404, message = 'N
  */
 export function staticCatalogHandlers(folderName, catalogUrl) {
   const fixturesRoot = path.resolve(
-    new URL('../fixtures/catalogs/', import.meta.url).pathname,
+    fileURLToPath(new URL('../fixtures/catalogs/', import.meta.url)),
   );
   const base = path.join(fixturesRoot, folderName);
 
@@ -184,7 +185,7 @@ export async function mockCatalogByFolder(page, catalogUrl) {
  */
 export function stacIndexHandlers() {
   const file = path.resolve(
-    new URL('../fixtures/catalogs.json', import.meta.url).pathname,
+    fileURLToPath(new URL('../fixtures/catalogs.json', import.meta.url)),
   );
   const catalogs = JSON.parse(fs.readFileSync(file, 'utf8'));
   return [{ url: 'https://stacindex.org/api/catalogs', body: catalogs }];
@@ -206,7 +207,7 @@ export function stacIndexHandlers() {
  */
 export function apiRootHandlers({ baseUrl = DEFAULT_API_URL, searchFixture = 'search-empty.json' } = {}) {
   const fixtureDir = path.resolve(
-    new URL('../fixtures/api/', import.meta.url).pathname,
+    fileURLToPath(new URL('../fixtures/api/', import.meta.url)),
   );
   const root = JSON.parse(fs.readFileSync(path.join(fixtureDir, 'root.json'), 'utf8'));
   const collections = JSON.parse(fs.readFileSync(path.join(fixtureDir, 'collections.json'), 'utf8'));
@@ -220,7 +221,7 @@ export function apiRootHandlers({ baseUrl = DEFAULT_API_URL, searchFixture = 'se
     return [
       { url: baseUrl, body: rewrite(root) },
       { url: `${baseUrl}/collections`, body: rewrite(collections) },
-      { url: `${baseUrl}/search`, method: 'POST', body: searchResult },
+      { url: `${baseUrl}/search`, method: 'POST', body: rewrite(searchResult) },
     ];
   }
 
@@ -248,7 +249,7 @@ export async function mockApiRootAndCollections(page, { baseUrl = DEFAULT_API_UR
  */
 export function loadApiFixture(filename) {
   const fixtureDir = path.resolve(
-    new URL('../fixtures/api/', import.meta.url).pathname,
+    fileURLToPath(new URL('../fixtures/api/', import.meta.url)),
   );
   return JSON.parse(fs.readFileSync(path.join(fixtureDir, filename), 'utf8'));
 }
