@@ -1,4 +1,6 @@
-import { expect } from "@playwright/test";
+import { expect, test as testBase } from "@playwright/test";
+import { defineNetworkFixture } from '@msw/playwright'
+import { handlers } from '../mocks/handlers.js'
 
 export const HOME_PATH = "/";
 export const SEARCH_PATH = "/search/external/earth-search.aws.test.com/v1?.language=en";
@@ -7,6 +9,29 @@ const SEARCH_API_URL = "https://earth-search.aws.test.com/v1/search";
 
 const API_ROOT_URL = "https://earth-search.aws.test.com/v1";
 const API_COLLECTIONS_URL = "https://earth-search.aws.test.com/v1/collections";
+
+// this is where MWS is integrated into playwright.
+// if more granular changes are needed, a similar extension could be applied
+// on the given test.spec.js
+export const test = testBase.extend({
+  // Initial list of the network handlers.
+  handlers: [handlers, { option: true }],
+
+  // A fixture you use to control the network in your tests.
+  network: [
+    async ({ context, handlers }, use) => {
+      const network = defineNetworkFixture({
+        context,
+        handlers,
+      })
+
+      await network.enable()
+      await use(network)
+      await network.disable()
+    },
+    { auto: true },
+  ],
+})
 
 // todo: Move STAC documents to separate files
 const API_ROOT_FIXTURE = {

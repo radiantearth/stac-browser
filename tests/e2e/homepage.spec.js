@@ -1,5 +1,5 @@
-import { test, expect } from '@playwright/test';
-import { HOME_PATH } from './helpers';
+import { expect } from '@playwright/test';
+import { HOME_PATH, test } from './helpers';
 
 test.describe('STAC Browser Homepage', () => {
   test('should load the homepage successfully', async ({ page }) => {
@@ -67,10 +67,10 @@ test.describe('STAC Browser Homepage', () => {
     const input = page.getByRole('textbox', { name: /please specify a stac catalog or api/i });
     
     // Type a valid STAC API URL
-    await input.fill('https://planetarycomputer.microsoft.com/api/stac/v1/');
+    await input.fill('https://mock-catalog.api/api/stac/v1/');
     
     // Verify the value was entered
-    await expect(input).toHaveValue('https://planetarycomputer.microsoft.com/api/stac/v1/');
+    await expect(input).toHaveValue('https://mock-catalog.api/api/stac/v1/');
   });
 
   test('should show error message while typing invalid URL', async ({ page }) => {
@@ -93,16 +93,16 @@ test.describe('STAC Browser Homepage', () => {
     const loadButton = page.getByRole('button', { name: /^load$/i });
     
     // Type the Planetary Computer STAC API URL
-    await input.fill('https://planetarycomputer.microsoft.com/api/stac/v1/');
+    await input.fill('https://mock-catalog.api/api/stac/v1/');
     
     // Click the Load button
     await loadButton.click();
     
     // Wait for navigation and verify the catalog title appears as h1 heading
-    const catalogTitle = page.getByRole('heading', { name: /microsoft planetary computer stac api/i });
+    const catalogTitle = page.getByRole('heading', { name: /example catalog/i });
     await expect(catalogTitle).toBeVisible({ timeout: 10000 });
     
     // Verify the page title changed
-    await expect(page).toHaveTitle(/microsoft planetary computer stac api/i);
+    await expect(page).toHaveTitle(/example catalog/i);
   });
 });
