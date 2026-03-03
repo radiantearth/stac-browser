@@ -8,7 +8,7 @@
  *
  * Fixtures: tests/fixtures/catalogs/test-catalog/eo-collection/item-2025-001.json
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 import { mockCatalogByFolder, loadMockCatalog, loadFixture, waitForBrowserReady } from './helpers';
 
 test.describe('Item view using folder fixtures', () => {
@@ -19,22 +19,22 @@ test.describe('Item view using folder fixtures', () => {
   const collection = loadFixture(folderName, 'eo-collection', 'collection.json');
   const item = loadFixture(folderName, 'eo-collection', 'item-2025-001.json');
 
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async ({ worker }) => {
     // mockCatalogByFolder registers routes for every fixture file (catalog,
     // collections, items) via their self links - no extra stubs needed.
-    await mockCatalogByFolder(page, catalogUrl);
+    await mockCatalogByFolder(worker, folderName, catalogUrl);
   });
 
-  async function gotoItem(page) {
-    await loadMockCatalog(page, catalog, catalogUrl);
+  async function gotoItem(page, worker) {
+    await loadMockCatalog(page, worker, catalog, catalogUrl);
     await page.getByRole('link', { name: new RegExp(collection.title, 'i') }).click();
     await waitForBrowserReady(page);
     await page.getByRole('link', { name: new RegExp(item.id, 'i') }).click();
     await waitForBrowserReady(page);
   }
 
-  test('loads basic item metadata and navigation', async ({ page }) => {
-    await gotoItem(page);
+  test('loads basic item metadata and navigation', async ({ page, worker }) => {
+    await gotoItem(page, worker);
 
     // check heading shows item id
     await expect(page.getByRole('heading', { name: new RegExp(item.id, 'i') })).toBeVisible();
@@ -58,8 +58,8 @@ test.describe('Item view using folder fixtures', () => {
     await expect(page.getByRole('heading', { name: new RegExp(collection.title, 'i') })).toBeVisible();
   });
 
-  test('map & thumbnails behave correctly', async ({ page }) => {
-    await gotoItem(page);
+  test('map & thumbnails behave correctly', async ({ page, worker }) => {
+    await gotoItem(page, worker);
 
     await expect(page.locator('.maps-preview')).toBeVisible();
     const thumbTab = page.getByRole('tab', { name: /thumbnails/i });
@@ -75,8 +75,8 @@ test.describe('Item view using folder fixtures', () => {
     await expect(fullscreen).toBeEnabled();
   });
 
-  test('assets section and show-on-map action', async ({ page }) => {
-    await gotoItem(page);
+  test('assets section and show-on-map action', async ({ page, worker }) => {
+    await gotoItem(page, worker);
 
     const assetBtn = page.getByRole('button', { name: /Aerosol Optical Thickness/i }).first();
     await expect(assetBtn).toBeVisible();
@@ -85,16 +85,16 @@ test.describe('Item view using folder fixtures', () => {
     await expect(page.getByRole('button', { name: /Download/i })).toBeVisible({ timeout: 5000 });
   });
 
-  test('additional resources links are shown', async ({ page }) => {
-    await gotoItem(page);
+  test('additional resources links are shown', async ({ page, worker }) => {
+    await gotoItem(page, worker);
 
     // The item has "via" and "describedby" links which appear under
     // "Additional Resources" (or similar heading) on the item view.
     await expect(page.getByRole('heading', { name: /additional resources/i })).toBeVisible();
   });
 
-  test('metadata groups contain expected fields', async ({ page }) => {
-    await gotoItem(page);
+  test('metadata groups contain expected fields', async ({ page, worker }) => {
+    await gotoItem(page, worker);
 
     await expect(page.getByRole('heading', { name: /metadata/i }).first()).toBeVisible();
   });

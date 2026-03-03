@@ -7,7 +7,7 @@
  *
  * Uses the existing `mockStacError` helper — no additional fixtures needed.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 import { mockStacError, waitForBrowserReady } from './helpers';
 
 const MISSING_URL = 'https://example.com/does-not-exist';
@@ -18,8 +18,8 @@ const SERVER_ERROR_PATH = '/external/example.com/server-error';
 
 test.describe('Error handling', () => {
 
-  test('404 response shows "not found" error alert with URL', async ({ page }) => {
-    await mockStacError(page, MISSING_URL, 404, 'Not Found');
+  test('404 response shows "not found" error alert with URL', async ({ page, worker }) => {
+    await mockStacError(worker, MISSING_URL, 404, 'Not Found');
     await page.goto(MISSING_PATH);
     await waitForBrowserReady(page);
 
@@ -34,8 +34,8 @@ test.describe('Error handling', () => {
     await expect(alert.locator('.url code')).toContainText(MISSING_URL);
   });
 
-  test('500 response shows server error alert', async ({ page }) => {
-    await mockStacError(page, SERVER_ERROR_URL, 500, 'Internal Server Error');
+  test('500 response shows server error alert', async ({ page, worker }) => {
+    await mockStacError(worker, SERVER_ERROR_URL, 500, 'Internal Server Error');
     await page.goto(SERVER_ERROR_PATH);
     await waitForBrowserReady(page);
 
@@ -46,8 +46,8 @@ test.describe('Error handling', () => {
     await expect(alert).toContainText(/server/i);
   });
 
-  test('error alert displays the error code', async ({ page }) => {
-    await mockStacError(page, MISSING_URL, 404, 'Not Found');
+  test('error alert displays the error code', async ({ page, worker }) => {
+    await mockStacError(worker, MISSING_URL, 404, 'Not Found');
     await page.goto(MISSING_PATH);
     await waitForBrowserReady(page);
 
@@ -58,9 +58,9 @@ test.describe('Error handling', () => {
     await expect(alert.locator('.id code')).toContainText('404');
   });
 
-  test('STAC API error description is shown in the alert', async ({ page }) => {
+  test('STAC API error description is shown in the alert', async ({ page, worker }) => {
     const customMessage = 'Collection has been permanently removed';
-    await mockStacError(page, MISSING_URL, 410, customMessage);
+    await mockStacError(worker, MISSING_URL, 410, customMessage);
     await page.goto(MISSING_PATH);
     await waitForBrowserReady(page);
 

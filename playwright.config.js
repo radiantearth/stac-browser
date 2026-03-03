@@ -39,6 +39,10 @@ export default defineConfig({
     
     /* Video on failure */
     video: 'retain-on-failure',
+
+    /* Force English locale so tests are deterministic regardless of host/CI locale.
+       The app auto-detects language from navigator.languages when detectLocaleFromBrowser is true. */
+    locale: 'en-US',
   },
 
   /* Configure projects for major browsers */

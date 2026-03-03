@@ -6,7 +6,7 @@
  *
  * Fixtures: tests/fixtures/catalogs/test-catalog/eo-collection/
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 import { mockCatalogByFolder, loadMockCatalog, loadFixture, waitForBrowserReady } from './helpers';
 
 test.describe('Collection view using folder fixtures', () => {
@@ -16,12 +16,12 @@ test.describe('Collection view using folder fixtures', () => {
   const catalog = loadFixture(folderName, 'catalog.json');
   const collection = loadFixture(folderName, 'eo-collection', 'collection.json');
 
-  test.beforeEach(async ({ page }) => {
-    await mockCatalogByFolder(page, catalogUrl);
+  test.beforeEach(async ({ worker }) => {
+    await mockCatalogByFolder(worker, folderName, catalogUrl);
   });
 
-  test('displays collection metadata, map, items and controls', async ({ page }) => {
-    await loadMockCatalog(page, catalog, catalogUrl);
+  test('displays collection metadata, map, items and controls', async ({ page, worker }) => {
+    await loadMockCatalog(page, worker, catalog, catalogUrl);
 
     // navigate into the specific collection
     await page.getByRole('link', { name: new RegExp(collection.title, 'i') }).click();
@@ -86,8 +86,8 @@ test.describe('Collection view using folder fixtures', () => {
     await expect(itemLinks.first()).toBeVisible();
   });
 
-  test('items navigation from collection to item view', async ({ page }) => {
-    await loadMockCatalog(page, catalog, catalogUrl);
+  test('items navigation from collection to item view', async ({ page, worker }) => {
+    await loadMockCatalog(page, worker, catalog, catalogUrl);
     await page.getByRole('link', { name: new RegExp(collection.title, 'i') }).click();
     await waitForBrowserReady(page);
 

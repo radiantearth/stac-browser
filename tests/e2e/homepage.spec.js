@@ -6,15 +6,15 @@
  *
  * Fixtures: tests/fixtures/catalogs.json (synthetic STAC Index entries)
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 import { HOME_PATH, mockStacResource } from './helpers';
 
 import catalogs from '../fixtures/catalogs.json' with { type: 'json' };
 
 test.describe('STAC Browser Homepage', () => {
   // ensure every test uses the mocked STAC Index response
-  test.beforeEach(async ({ page }) => {
-    await mockStacResource(page, 'https://stacindex.org/api/catalogs', catalogs);
+  test.beforeEach(async ({ worker }) => {
+    await mockStacResource(worker, 'https://stacindex.org/api/catalogs', catalogs);
   });
   test('should load the homepage successfully', async ({ page }) => {
     // Navigate to the homepage (STAC Index already mocked in beforeEach)
@@ -114,9 +114,9 @@ test.describe('STAC Browser Homepage', () => {
     await expect(errorMessage).toBeVisible();
   });
 
-  test('should navigate to catalog when valid URL is loaded', async ({ page }) => {
+  test('should navigate to catalog when valid URL is loaded', async ({ page, worker }) => {
     const catalogUrl = 'https://planetarycomputer.microsoft.com/api/stac/v1/';
-    await mockStacResource(page, catalogUrl, {
+    await mockStacResource(worker, catalogUrl, {
       type: 'Catalog',
       id: 'microsoft-pc',
       title: 'Microsoft Planetary Computer STAC API',
@@ -141,9 +141,9 @@ test.describe('STAC Browser Homepage', () => {
     await expect(page).toHaveTitle(/microsoft planetary computer stac api/i);
   });
 
-  test('clicking a STAC index entry populates url and navigates', async ({ page }) => {
+  test('clicking a STAC index entry populates url and navigates', async ({ page, worker }) => {
     const expectedUrl = catalogs[0].url;
-    await mockStacResource(page, expectedUrl, {
+    await mockStacResource(worker, expectedUrl, {
       type: 'Catalog',
       id: 'stac-index-first',
       title: catalogs[0].title,

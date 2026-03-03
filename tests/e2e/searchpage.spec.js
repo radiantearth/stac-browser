@@ -8,7 +8,7 @@
  * Fixtures: tests/fixtures/api/ (root.json, collections.json, search-empty.json,
  *           search-results.json)
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 import {
   SEARCH_PATH,
   mockApiRootAndCollections,
@@ -38,8 +38,8 @@ const fillBboxInputs = async (page, values) => {
 };
 
 test.describe('STAC Browser Search page', () => {
-  test('Should load the Search page successfully', async ({ page }) => {
-    await mockApiRootAndCollections(page);
+  test('Should load the Search page successfully', async ({ page, worker }) => {
+    await mockApiRootAndCollections(worker);
     // Navigate to the search page
     await page.goto(SEARCH_PATH);
     
@@ -47,8 +47,8 @@ test.describe('STAC Browser Search page', () => {
     await expect(page.getByRole('heading', { name: 'Search' }), 'search heading should be visible').toBeVisible();
   });
 
-  test('Search with default selection should have empty POST body', async ({ page }) => {
-    await mockApiRootAndCollections(page);
+  test('Search with default selection should have empty POST body', async ({ page, worker }) => {
+    await mockApiRootAndCollections(worker);
     await page.goto(SEARCH_PATH);
     
     const requestPromise = waitForSearchPost(page);
@@ -67,8 +67,8 @@ test.describe('STAC Browser Search page', () => {
 
   });
 
-  test('Search with temporal extent selection should have valid POST body', async ({ page }) => {
-    await mockApiRootAndCollections(page);
+  test('Search with temporal extent selection should have valid POST body', async ({ page, worker }) => {
+    await mockApiRootAndCollections(worker);
     await page.goto(SEARCH_PATH);
 
     await test.step('Enter a temporal extent', async () => {
@@ -91,8 +91,8 @@ test.describe('STAC Browser Search page', () => {
     });
   });
 
-  test('Search with spatial extent via map click should have valid POST body', async ({ page }) => {
-    await mockApiRootAndCollections(page);
+  test('Search with spatial extent via map click should have valid POST body', async ({ page, worker }) => {
+    await mockApiRootAndCollections(worker);
     await page.goto(SEARCH_PATH);
 
     await test.step('Enable spatial extent selection and click on map to create bounding box', async () => {
@@ -120,8 +120,8 @@ test.describe('STAC Browser Search page', () => {
     });
   });
 
-  test('Search with spatial extent selection via manual input should have valid POST body', async ({ page }) => {
-    await mockApiRootAndCollections(page);
+  test('Search with spatial extent selection via manual input should have valid POST body', async ({ page, worker }) => {
+    await mockApiRootAndCollections(worker);
     await page.goto(SEARCH_PATH);
 
     await test.step('Enable spatial extent selection and fill in bounding box values', async () => {
@@ -157,8 +157,8 @@ test.describe('STAC Browser Search page', () => {
     });
   });
 
-  test('Manual spatial extent shows incomplete error', async ({ page }) => {
-    await mockApiRootAndCollections(page);
+  test('Manual spatial extent shows incomplete error', async ({ page, worker }) => {
+    await mockApiRootAndCollections(worker);
     await page.goto(SEARCH_PATH);
 
     await test.step('Enter 3 of 4 bounding box values', async () => {
@@ -183,8 +183,8 @@ test.describe('STAC Browser Search page', () => {
     });
   });
 
-  test('Manual spatial extent shows invalid latitude error', async ({ page }) => {
-    await mockApiRootAndCollections(page);
+  test('Manual spatial extent shows invalid latitude error', async ({ page, worker }) => {
+    await mockApiRootAndCollections(worker);
     await page.goto(SEARCH_PATH);
 
     await enableSpatialExtentInputs(page);
@@ -201,8 +201,8 @@ test.describe('STAC Browser Search page', () => {
     await expect(page.getByText(/Latitude must be between -90 and 90/i)).toBeVisible();
   });
 
-  test('Manual spatial extent shows latitude order error', async ({ page }) => {
-    await mockApiRootAndCollections(page);
+  test('Manual spatial extent shows latitude order error', async ({ page, worker }) => {
+    await mockApiRootAndCollections(worker);
     await page.goto(SEARCH_PATH);
 
     await test.step('Test south latitude > north latitude error', async () => {
@@ -221,8 +221,8 @@ test.describe('STAC Browser Search page', () => {
     });
   });
 
-  test('Manual spatial extent shows longitude order error when west is east of east', async ({ page }) => {
-    await mockApiRootAndCollections(page);
+  test('Manual spatial extent shows longitude order error when west is east of east', async ({ page, worker }) => {
+    await mockApiRootAndCollections(worker);
     await page.goto(SEARCH_PATH);
 
     await test.step('Test west longitude > east longitude error (both negative)', async () => {
@@ -241,8 +241,8 @@ test.describe('STAC Browser Search page', () => {
     });
   });
 
-  test('Manual spatial extent allows antimeridian crossing (positive west, negative east)', async ({ page }) => {
-    await mockApiRootAndCollections(page);
+  test('Manual spatial extent allows antimeridian crossing (positive west, negative east)', async ({ page, worker }) => {
+    await mockApiRootAndCollections(worker);
     await page.goto(SEARCH_PATH);
 
     await test.step('Allow west > east when crossing antimeridian', async () => {
@@ -262,8 +262,8 @@ test.describe('STAC Browser Search page', () => {
   });
 
 
-  test('Search with Collection ID should have valid POST body', async ({ page }) => {
-    await mockApiRootAndCollections(page);
+  test('Search with Collection ID should have valid POST body', async ({ page, worker }) => {
+    await mockApiRootAndCollections(worker);
     await page.goto(SEARCH_PATH);
 
     await test.step('Select a collection from the dropdown', async () => {
@@ -286,8 +286,8 @@ test.describe('STAC Browser Search page', () => {
     });
   });
 
-  test('search with Item ID should have valid POST body', async ({ page }) => {
-    await mockApiRootAndCollections(page);
+  test('search with Item ID should have valid POST body', async ({ page, worker }) => {
+    await mockApiRootAndCollections(worker);
     await page.goto(SEARCH_PATH);
     
     await test.step('Enter an item ID', async () => {
@@ -314,8 +314,8 @@ test.describe('STAC Browser Search page', () => {
     });
   });
 
-  test('search with Sort should have valid POST body', async ({ page }) => {
-    await mockApiRootAndCollections(page);
+  test('search with Sort should have valid POST body', async ({ page, worker }) => {
+    await mockApiRootAndCollections(worker);
     await page.goto(SEARCH_PATH);
 
     await test.step('Select to sort by title field', async () => {
@@ -339,8 +339,8 @@ test.describe('STAC Browser Search page', () => {
     });
   });
 
-  test('search with item limit should have valid POST body', async ({ page }) => {
-    await mockApiRootAndCollections(page);
+  test('search with item limit should have valid POST body', async ({ page, worker }) => {
+    await mockApiRootAndCollections(worker);
     await page.goto(SEARCH_PATH);
 
     await test.step('Set limit of 99 items per', async () => {
@@ -358,8 +358,8 @@ test.describe('STAC Browser Search page', () => {
     });
   });
 
-  test('search results render item cards with correct titles', async ({ page }) => {
-    await mockApiRootAndCollections(page, { searchFixture: 'search-results.json' });
+  test('search results render item cards with correct titles', async ({ page, worker }) => {
+    await mockApiRootAndCollections(worker, { searchFixture: 'search-results.json' });
     await page.goto(SEARCH_PATH);
 
     await test.step('Submit search and wait for results', async () => {
@@ -377,8 +377,8 @@ test.describe('STAC Browser Search page', () => {
     });
   });
 
-  test('search results show "no items found" when response is empty', async ({ page }) => {
-    await mockApiRootAndCollections(page, { searchFixture: 'search-empty.json' });
+  test('search results show "no items found" when response is empty', async ({ page, worker }) => {
+    await mockApiRootAndCollections(worker, { searchFixture: 'search-empty.json' });
     await page.goto(SEARCH_PATH);
 
     await test.step('Submit search with default filters', async () => {
@@ -395,8 +395,8 @@ test.describe('STAC Browser Search page', () => {
     });
   });
 
-  test('search results display matched item count', async ({ page }) => {
-    await mockApiRootAndCollections(page, { searchFixture: 'search-results.json' });
+  test('search results display matched item count', async ({ page, worker }) => {
+    await mockApiRootAndCollections(worker, { searchFixture: 'search-results.json' });
     await page.goto(SEARCH_PATH);
 
     await test.step('Submit search and wait for results', async () => {
@@ -413,8 +413,8 @@ test.describe('STAC Browser Search page', () => {
     });
   });
 
-  test('Reset button clears all filters and re-submits with empty body', async ({ page }) => {
-    await mockApiRootAndCollections(page);
+  test('Reset button clears all filters and re-submits with empty body', async ({ page, worker }) => {
+    await mockApiRootAndCollections(worker);
     await page.goto(SEARCH_PATH);
 
     await test.step('Fill in filters before resetting', async () => {
