@@ -6,8 +6,8 @@
  * and intended to be executed inside Docker containers against
  * a real STAC API.
  *
- * This script discovers generators via the `generators` array
- * in src/codegen/index.js — no changes needed here when a language
+ * This script discovers generators via codeGenerators.config.js
+ * in the project root — no changes needed here when a language
  * is added or removed.
  */
 
@@ -15,7 +15,8 @@ import { writeFileSync, mkdirSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
-import { generators, generateCode } from '../../src/codegen/index.js';
+import generators from '../../codeGenerators.config.js';
+import { generateCode } from '../../src/codegen/index.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const outDir = join(__dirname, 'generated');

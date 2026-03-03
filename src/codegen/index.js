@@ -1,22 +1,6 @@
-import PythonGenerator from './PythonGenerator.js';
-import JavaScriptGenerator from './JavaScriptGenerator.js';
-import RGenerator from './RGenerator.js';
-import CSharpGenerator from './CSharpGenerator.js';
-import JavaGenerator from './JavaGenerator.js';
-import RustGenerator from './RustGenerator.js';
+import generators from '../../codeGenerators.config.js';
 
-/**
- * All available code generators, ordered by display preference.
- * Python is first as the most common STAC client language.
- */
-export const generators = [
-  PythonGenerator,
-  JavaScriptGenerator,
-  RGenerator,
-  CSharpGenerator,
-  JavaGenerator,
-  RustGenerator
-];
+export { generators };
 
 /**
  * Generate code for a given language.
