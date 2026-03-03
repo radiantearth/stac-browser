@@ -12,6 +12,7 @@
 import { defineComponent, defineAsyncComponent } from 'vue';
 import { BTabs, BTab } from 'bootstrap-vue-next';
 import { generators, generateCode } from '../codegen/index.js';
+import BrowserStorage from '../browser-store';
 
 const STORAGE_KEY = 'stac-browser:codeLanguage';
 
@@ -36,8 +37,18 @@ export default defineComponent({
   data() {
     return {
       generators,
+      storage: new BrowserStorage(),
       internalTab: this.loadSelectedTab()
     };
+  },
+  computed: {
+    generatedCodes() {
+      const codes = {};
+      for (const GeneratorClass of this.generators) {
+        codes[GeneratorClass.language] = generateCode(GeneratorClass, this.catalogHref, this.filters);
+      }
+      return codes;
+    }
   },
   mounted() {
     this.emitActiveCode(this.internalTab);
@@ -59,7 +70,7 @@ export default defineComponent({
   },
   methods: {
     getCode(GeneratorClass) {
-      return generateCode(GeneratorClass, this.catalogHref, this.filters);
+      return this.generatedCodes[GeneratorClass.language] || '';
     },
     getTabIndex(value) {
       const index = Number.parseInt(value, 10);
@@ -77,7 +88,7 @@ export default defineComponent({
     },
     loadSelectedTab() {
       try {
-        const saved = localStorage.getItem(STORAGE_KEY);
+        const saved = this.storage.get(STORAGE_KEY);
         if (saved !== null) {
           const index = parseInt(saved, 10);
           if (index >= 0 && index < generators.length) {
@@ -93,7 +104,7 @@ export default defineComponent({
     saveSelectedTab(value) {
       const index = this.getTabIndex(value);
       try {
-        localStorage.setItem(STORAGE_KEY, String(index));
+        this.storage.set(STORAGE_KEY, String(index));
       }
       catch {
         // localStorage unavailable
