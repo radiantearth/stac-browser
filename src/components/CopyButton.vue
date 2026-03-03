@@ -97,7 +97,7 @@ export default {
             const focusedElement = typeof document !== 'undefined' ? document.activeElement : null;
             try {
                 if (!this.isClipboardSupported) {
-                    throw new Error('Clipboard API unsupported');
+                    throw new Error(this.$t('copyErrors.unsupported'));
                 }
                 await this.copyToClipboard(this.copyText);
                 this.status = true;
