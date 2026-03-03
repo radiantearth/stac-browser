@@ -1,6 +1,8 @@
 import { expect, test as testBase } from "@playwright/test";
-import { defineNetworkFixture } from '@msw/playwright'
-import { handlers } from '../mocks/handlers.js'
+import { defineNetworkFixture } from '@msw/playwright';
+import { handlers } from '../mocks/handlers.js';
+import fs from 'fs';
+import path from 'path';
 
 export const HOME_PATH = "/";
 export const SEARCH_PATH = "/search/external/earth-search.aws.test.com/v1?.language=en";
@@ -41,7 +43,7 @@ export const test = testBase.extend({
         try {
           const url = new URL(request.url());
           const subpath = url.pathname.replace('/api/stac/v1/', '') || 'catalog.json';
-          const filePath = path.resolve('./example_catalog/', subpath);
+          const filePath = path.resolve('./tests/mocks/example_catalog/', subpath);
           
           const fileBuffer = fs.readFileSync(filePath, 'utf-8');
           
