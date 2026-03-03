@@ -600,9 +600,7 @@ export default defineComponent({
       });
     },
     onSubmit() {
-      if (this.canSort && this.sortTerm && this.sortOrder) {
-        this.query.sortby = this.formatSort();
-      }
+      this.query.sortby = this.formatSort();
       let filters = this.buildFilter();
       this.query.filters = filters;
       this.$emit('input', this.query, false);
@@ -641,7 +639,7 @@ export default defineComponent({
       this.query.ids.push(id);
     },
     formatSort() {
-      if (this.sortTerm && this.sortTerm.value && this.sortOrder) {
+      if (this.canSort && this.sortTerm && this.sortTerm.value && this.sortOrder) {
         let order = this.sortOrder < 0 ? '-' : '';
         return `${order}${this.sortTerm.value}`;
       }
