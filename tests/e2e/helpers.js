@@ -25,12 +25,45 @@ export const test = testBase.extend({
         handlers,
       })
 
+      // Intercept everything on the fake domain globally
+      await context.route('https://mock-catalog.api/api/stac/v1/**', async (route) => {
+        const request = route.request();
+        
+        // 1. Handle CORS Preflights automatically
+        if (request.method() === 'OPTIONS') {
+          return route.fulfill({
+            status: 200,
+            headers: { 'Access-Control-Allow-Origin': '*' }
+          });
+        }
+
+        // 2. Serve the local JSON files automatically
+        try {
+          const url = new URL(request.url());
+          const subpath = url.pathname.replace('/api/stac/v1/', '') || 'catalog.json';
+          const filePath = path.resolve('./example_catalog/', subpath);
+          
+          const fileBuffer = fs.readFileSync(filePath, 'utf-8');
+          
+          await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            headers: { 'Access-Control-Allow-Origin': '*' },
+            body: fileBuffer
+          });
+        } catch (error) {
+          await route.fulfill({ status: 404, body: JSON.stringify({ error: 'Not found' }) });
+        }
+      });
+
       await network.enable()
       await use(network)
       await network.disable()
     },
     { auto: true },
   ],
+
+  // Create an auto-running fixture that intercepts network requests behind the scenes
 })
 
 // todo: Move STAC documents to separate files

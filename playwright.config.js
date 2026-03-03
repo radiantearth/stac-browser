@@ -39,6 +39,9 @@ export default defineConfig({
     
     /* Video on failure */
     video: 'retain-on-failure',
+
+    /* This forces Playwright to intercept traffic from Service Workers */
+    //serviceWorkers: 'allow',
   },
 
   /* Configure projects for major browsers */
