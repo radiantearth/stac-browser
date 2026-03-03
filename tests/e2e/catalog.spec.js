@@ -6,7 +6,7 @@
  *
  * Fixtures: tests/fixtures/catalogs/test-catalog/
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 import { mockCatalogByFolder, loadMockCatalog, mockStacResource, loadFixture, waitForBrowserReady } from './helpers';
 
 test.describe('Catalog view using folder fixtures', () => {
@@ -16,12 +16,12 @@ test.describe('Catalog view using folder fixtures', () => {
   const catalog = loadFixture(folderName, 'catalog.json');
   const collection = loadFixture(folderName, 'eo-collection', 'collection.json');
 
-  test.beforeEach(async ({ page }) => {
-    await mockCatalogByFolder(page, catalogUrl);
+  test.beforeEach(async ({ worker }) => {
+    await mockCatalogByFolder(worker, folderName, catalogUrl);
   });
 
-  test('loads catalog metadata and collections from folder', async ({ page }) => {
-    await loadMockCatalog(page, catalog, catalogUrl);
+  test('loads catalog metadata and collections from folder', async ({ page, worker }) => {
+    await loadMockCatalog(page, worker, catalog, catalogUrl);
 
     // title
     await expect(page.getByRole('heading', { name: new RegExp(catalog.title, 'i') })).toBeVisible();
@@ -43,8 +43,8 @@ test.describe('Catalog view using folder fixtures', () => {
     await expect(page.getByRole('link', { name: new RegExp(collection.title, 'i') })).toBeVisible();
   });
 
-  test('filter catalogs by text and keyword selector', async ({ page }) => {
-    await loadMockCatalog(page, catalog, catalogUrl);
+  test('filter catalogs by text and keyword selector', async ({ page, worker }) => {
+    await loadMockCatalog(page, worker, catalog, catalogUrl);
 
     // text filter: type "l2a" — only "Earth Observation L2A" matches
     const filterInput = page.getByPlaceholder(/Filter catalogs by title/i);
@@ -75,8 +75,8 @@ test.describe('Catalog view using folder fixtures', () => {
     await expect(page.locator('.multiselect__tag')).toContainText(new RegExp(text || '', 'i'));
   });
 
-  test('clicking a collection displays its items', async ({ page }) => {
-    await loadMockCatalog(page, catalog, catalogUrl);
+  test('clicking a collection displays its items', async ({ page, worker }) => {
+    await loadMockCatalog(page, worker, catalog, catalogUrl);
     await page.getByRole('link', { name: new RegExp(collection.title, 'i') }).click();
     await waitForBrowserReady(page);
 
@@ -89,8 +89,8 @@ test.describe('Catalog view using folder fixtures', () => {
     expect(await itemLinks.count()).toBeGreaterThan(0);
   });
 
-  test('source and share buttons open popovers with correct content', async ({ page }) => {
-    await loadMockCatalog(page, catalog, catalogUrl);
+  test('source and share buttons open popovers with correct content', async ({ page, worker }) => {
+    await loadMockCatalog(page, worker, catalog, catalogUrl);
 
     // click source button
     const sourceBtn = page.getByRole('button', { name: /source/i });
@@ -116,8 +116,8 @@ test.describe('Catalog view using folder fixtures', () => {
     expect(await socLinks.count()).toBeGreaterThan(0);
   });
 
-  test('validation button in source popover navigates to report', async ({ page }) => {
-    await loadMockCatalog(page, catalog, catalogUrl);
+  test('validation button in source popover navigates to report', async ({ page, worker }) => {
+    await loadMockCatalog(page, worker, catalog, catalogUrl);
 
     const sourceBtn = page.getByRole('button', { name: /source/i });
     await expect(sourceBtn).toBeVisible();
@@ -140,12 +140,12 @@ test.describe('Catalog view using folder fixtures', () => {
     expect(cardCount).toBeGreaterThan(0);
   });
 
-  test('validation report shows errors for invalid STAC entity', async ({ page }) => {
+  test('validation report shows errors for invalid STAC entity', async ({ page, worker }) => {
     const invalidCollection = loadFixture(folderName, 'invalid-collection', 'collection.json');
     const invalidUrl = `${catalogUrl}/invalid-collection`;
 
     // Load the invalid collection directly
-    await mockStacResource(page, invalidUrl, invalidCollection);
+    await mockStacResource(worker, invalidUrl, invalidCollection);
     await page.goto(`/external/${new URL(invalidUrl).host}${new URL(invalidUrl).pathname}`);
     await waitForBrowserReady(page);
 
@@ -176,8 +176,8 @@ test.describe('Catalog view using folder fixtures', () => {
     expect(errorCount).toBeGreaterThan(0);
   });
 
-  test('navigating into a child collection uses its folder data', async ({ page }) => {
-    await loadMockCatalog(page, catalog, catalogUrl);
+  test('navigating into a child collection uses its folder data', async ({ page, worker }) => {
+    await loadMockCatalog(page, worker, catalog, catalogUrl);
     await page.getByRole('link', { name: new RegExp(collection.title, 'i') }).click();
     await waitForBrowserReady(page);
 
@@ -185,8 +185,8 @@ test.describe('Catalog view using folder fixtures', () => {
     await expect(page.getByRole('heading', { name: new RegExp(collection.title, 'i') })).toBeVisible();
   });
 
-  test('back button returns to parent catalog', async ({ page }) => {
-    await loadMockCatalog(page, catalog, catalogUrl);
+  test('back button returns to parent catalog', async ({ page, worker }) => {
+    await loadMockCatalog(page, worker, catalog, catalogUrl);
     await page.getByRole('link', { name: new RegExp(collection.title, 'i') }).click();
     await waitForBrowserReady(page);
 

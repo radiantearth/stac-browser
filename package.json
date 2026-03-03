@@ -91,6 +91,8 @@
     "remark-preset-lint-consistent": "^6.0.1",
     "remark-preset-lint-recommended": "^7.0.1",
     "remark-validate-links": "^13.1.0",
+    "msw": "^2.12.10",
+    "playwright-msw": "^3.0.1",
     "rollup-plugin-visualizer": "^6.0.5",
     "sass": "^1.26.5",
     "unplugin-icons": "^23.0.1",
@@ -119,6 +121,11 @@
       ],
       "remark-lint-no-literal-urls",
       ["remark-lint-no-shortcut-reference-link", false]
+    ]
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
     ]
   }
 }
