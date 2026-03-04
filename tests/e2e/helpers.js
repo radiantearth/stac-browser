@@ -1,6 +1,5 @@
 import { expect, test as testBase } from "@playwright/test";
 import { defineNetworkFixture } from '@msw/playwright';
-import { handlers } from '../mocks/handlers.js';
 import fs from 'fs';
 import path from 'path';
 
@@ -17,7 +16,7 @@ const API_COLLECTIONS_URL = "https://earth-search.aws.test.com/v1/collections";
 // on the given test.spec.js
 export const test = testBase.extend({
   // Initial list of the network handlers.
-  handlers: [handlers, { option: true }],
+  handlers: [[], { option: true }],
 
   // A fixture you use to control the network in your tests.
   network: [
@@ -27,7 +26,7 @@ export const test = testBase.extend({
         handlers,
       })
 
-      // Intercept everything on the fake domain globally
+      // Intercept mock-catalog.api
       await context.route('https://mock-catalog.api/api/stac/v1/**', async (route) => {
         const request = route.request();
         
