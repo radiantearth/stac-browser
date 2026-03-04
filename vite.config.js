@@ -46,12 +46,8 @@ const env = yargs()
 
 delete env._;
 delete env.$0;
-// SB_CONFIG was used to specify a custom config file path, which is no longer
-// supported (static import from ./config.js is used instead). Remove the key so
-// it doesn't leak into the merged config object as a meaningless "CONFIG" property.
-delete env.CONFIG;
 
-const config = Object.assign(configFromFile, env);
+const config = Object.assign({}, configFromFile, env);
 
 export default defineConfig(({ mode }) => ({
   base: config.pathPrefix,
