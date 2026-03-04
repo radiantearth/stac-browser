@@ -7,18 +7,20 @@
     @update:model-value="collapseToggled"
   >
     <template #title>
-      <span class="chevron" aria-hidden="true">
-        <b-icon-chevron-down v-if="expanded" />
-        <b-icon-chevron-right v-else />
+      <span class="start">
+        <span class="chevron" aria-hidden="true">
+          <b-icon-chevron-down v-if="expanded" />
+          <b-icon-chevron-right v-else />
+        </span>
+        <span class="title" :title="title">{{ title }}</span>
       </span>
-      <span class="title">{{ title }}</span>
       <div class="badges ms-1">
         <b-badge v-if="shown" variant="success" class="shown" :title="$t('assets.currentlyShown')">
           <b-icon-check /> {{ $t('assets.shown') }}
         </b-badge>
         <b-badge v-if="asset.deprecated" variant="warning" class="deprecated">{{ $t('deprecated') }}</b-badge>
         <template v-if="Array.isArray(asset.roles)">
-          <b-badge v-for="role in sortedRoles" :key="role" :variant="role === 'data' ? 'primary' : 'secondary'" class="role">{{ displayRole(role) }}</b-badge>
+          <b-badge v-for="role in sortedRoles" :key="role" :variant="role === 'data' ? 'primary' : 'secondary'" class="role" :title="displayRole(role)">{{ displayRole(role) }}</b-badge>
         </template>
         <b-badge v-if="shortFileFormat" variant="dark" class="format" :title="fileFormat"><span v-html="shortFileFormat" /></b-badge>
       </div>
