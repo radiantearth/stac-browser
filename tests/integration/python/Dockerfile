@@ -1,4 +1,3 @@
 FROM python:slim
-RUN pip install --no-cache-dir pystac-client
 WORKDIR /code
-ENTRYPOINT ["python", "search.py"]
+ENTRYPOINT ["sh", "-c", "if [ -n \"$INSTALL_DEPS\" ]; then eval \"$INSTALL_DEPS\"; fi && python search.py"]

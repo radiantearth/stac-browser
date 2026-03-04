@@ -24,6 +24,8 @@ Code Examples are created to display example queries for multiple langguages. Th
 
 Integration tests for code generators are run with Docker so each language snippet executes in an isolated, reproducible runtime. The test script first generates fresh snippets into `tests/integration/generated/`, then builds the images/services defined in `tests/integration/docker-compose.yml`, and finally runs each language service against a real STAC API endpoint. This verifies both that snippet generation succeeds and that the generated code actually runs in its target language environment.
 
+If a generator implements `get installDependencies()`, the same command is shown in the Example Code UI and also executed by the integration test harness before running the snippet. This keeps user-facing install instructions and CI/runtime setup in sync.
+
 ## Generator Guidance
 
 - Create a dedicated template file in `src/codegen/templates/` for each new language.

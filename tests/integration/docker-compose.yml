@@ -20,7 +20,7 @@ services:
     working_dir: /code
     volumes:
       - ./generated:/code:ro
-    command: ["node", "search.mjs"]
+    command: ["sh", "-c", "if [ -n \"$$INSTALL_DEPS\" ]; then eval \"$$INSTALL_DEPS\"; fi && node search.mjs"]
     network_mode: host
 
   r:
@@ -42,7 +42,7 @@ services:
     working_dir: /code
     volumes:
       - ./generated:/code:ro
-    command: ["bash", "-c", "cp StacSearch.java /tmp/ && cd /tmp && javac StacSearch.java && java StacSearch"]
+    command: ["sh", "-c", "if [ -n \"$$INSTALL_DEPS\" ]; then eval \"$$INSTALL_DEPS\"; fi && cp StacSearch.java /tmp/ && cd /tmp && javac StacSearch.java && java StacSearch"]
     network_mode: host
 
   rust:

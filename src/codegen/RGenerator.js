@@ -18,6 +18,10 @@ export default class RGenerator extends CodeGenerator {
     return 4;
   }
 
+  get installDependencies() {
+    return "Rscript -e \"install.packages('rstac')\"";
+  }
+
   commaSeparatedStrings(values) {
     return values.map(v => JSON.stringify(v)).join(', ');
   }

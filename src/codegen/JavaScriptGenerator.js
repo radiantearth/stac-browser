@@ -18,4 +18,8 @@ export default class JavaScriptGenerator extends CodeGenerator {
     return 2;
   }
 
+  get installDependencies() {
+    return null;
+  }
+
 }

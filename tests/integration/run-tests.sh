@@ -45,7 +45,8 @@ FAILED=()
 
 for lang in "${LANGUAGES[@]}"; do
   echo "── Testing $lang ──"
-  if ${TIMEOUT_CMD+"${TIMEOUT_CMD[@]}"} docker compose -f "$COMPOSE_FILE" run --rm "$lang"; then
+  INSTALL_DEPS="$(node --import "$SCRIPT_DIR/node-loader-register.js" "$SCRIPT_DIR/get-install-dependencies.js" "$lang")"
+  if ${TIMEOUT_CMD+"${TIMEOUT_CMD[@]}"} docker compose -f "$COMPOSE_FILE" run --rm -e INSTALL_DEPS="$INSTALL_DEPS" "$lang"; then
     echo "✓ $lang passed"
     PASSED+=("$lang")
   else

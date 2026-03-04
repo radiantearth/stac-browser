@@ -18,6 +18,10 @@ export default class RustGenerator extends CodeGenerator {
     return 4;
   }
 
+  get installDependencies() {
+    return 'cargo add serde_json stac stac-io && cargo add tokio@1 --features full';
+  }
+
   formatFilters(filters) {
     const prefix = ' '.repeat(this.indent);
     return super.formatFilters(filters)

@@ -17,4 +17,8 @@ export default class CSharpGenerator extends CodeGenerator {
   get template() {
     return template;
   }
+
+  get installDependencies() {
+    return null;
+  }
 }
