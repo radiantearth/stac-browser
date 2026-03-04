@@ -10,8 +10,7 @@
           <multiselect
             :id="ids.q"
             v-model="query.q"
-            :multiple="true"
-            :taggable="true"
+            multiple taggable
             :options="query.q"
             :placeholder="$t('search.enterSearchTerms')"
             :tag-placeholder="$t('search.addSearchTerm')"
@@ -72,8 +71,7 @@
           <multiselect
             :id="ids.ids"
             v-model="query.ids"
-            :multiple="true"
-            :taggable="true"
+            multiple taggable
             :options="query.ids"
             :placeholder="$t('search.enterItemIds')"
             :tag-placeholder="$t('search.addItemIds')"
@@ -86,6 +84,7 @@
 
         <b-form-group v-if="showAdditionalFilters" class="additional-filters" :label="$t('search.additionalFilters')">
           <b-form-radio-group v-model="filtersAndOr" :options="andOrOptions" name="logical" size="sm" />
+          <b-form-checkbox v-model="filtersNegate" size="sm">{{ $t('search.logical.not') }}</b-form-checkbox>
 
           <b-dropdown size="sm" :text="$t('search.addFilter')" variant="primary" class="queryables mt-2 mb-3" menu-class="w-100" toggle-class="w-100">
             <template v-for="queryable in sortedQueryables" :key="queryable.id">
@@ -100,6 +99,7 @@
             v-for="(filter, index) in filters" :key="filter.id"
             v-model:value="filter.value"
             v-model:operator="filter.operator"
+            v-model:negate="filter.negate"
             :queryable="filter.queryable"
             :index="index"
             :cql="cql"
@@ -176,8 +176,7 @@ import { CollectionCollection, STAC } from 'stac-js';
 import { createSTAC, Collection } from '../models/stac';
 import Cql from '../models/cql2/cql';
 import Queryable from '../models/cql2/queryable';
-import CqlValue from '../models/cql2/value';
-import CqlLogicalOperator from '../models/cql2/operators/logical';
+import CqlLogicalOperator, { CqlNot } from '../models/cql2/operators/logical';
 import { stacRequest } from '../store/utils';
 
 function getQueryDefaults() {
@@ -202,6 +201,7 @@ function getDefaults() {
     bbox: null,
     query: getQueryDefaults(),
     filtersAndOr: 'and',
+    filtersNegate: false,
     filters: [],
     selectedCollections: []
   };
@@ -566,8 +566,17 @@ export default defineComponent({
       if (this.filters.length === 0) {
         return null;
       }
-      const args = this.filters.map(f => new f.operator(f.queryable, f.value));
-      const logical = CqlLogicalOperator.create(this.filtersAndOr, args);
+      const args = this.filters.map(f => {
+        let filter = new f.operator(f.queryable, f.value);
+        if (f.negate) {
+          filter = new CqlNot(filter);
+        }
+        return filter;
+      });
+      let logical = CqlLogicalOperator.create(this.filtersAndOr, args);
+      if (this.filtersNegate) {
+        logical = new CqlNot(logical);
+      }
       return new Cql(logical);
     },
     removeQueryable(queryableIndex) {
@@ -575,11 +584,19 @@ export default defineComponent({
     },
     additionalFieldSelected(queryable) {
       const operators = queryable.getOperators(this.cql);
+      if (operators.length === 0) {
+        this.$store.commit('showGlobalError', {
+          message: this.$t('search.noOperatorsError', {queryable: queryable.id})
+        });
+        return;
+      }
+      const operator = operators[0];
       this.filters.push({
         id: `${queryable.id}-${Date.now()}-${Math.random()}`, // Unique ID
-        value: CqlValue.create(queryable.defaultValue),
-        operator: operators[0],
-        queryable
+        value: operator.getDefaultValue(queryable),
+        operator,
+        queryable,
+        negate: false
       });
     },
     onSubmit() {

@@ -254,9 +254,10 @@
   "search": {
     "addCollections": "Premi invio per aggiungere una Collezione",
     "addFilter": "Aggiungi filtro",
+    "additionalFilters": "Filtri aggiuntivi",
     "addItemIds": "Premi invio per aggiungere l'ID di un Elemento",
     "addSearchTerm": "Premi Invio per aggiungere un termine di ricerca",
-    "additionalFilters": "Filtri aggiuntivi",
+    "arrayInput": {},
     "dateDescription": "Data/ora nel sistema UTC (tempo coordinato internazionale).",
     "enterCollections": "Inserire una o più Collezioni...",
     "enterItemIds": "Inserire uno o più ID di Elemento...",

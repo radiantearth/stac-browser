@@ -1,7 +1,7 @@
 <template>
   <main class="search d-flex flex-column">
     <Loading v-if="!parent" stretch />
-    <ErrorAlert v-else-if="!searchLink" :description="$t('search.notSupported')" />
+    <ErrorAlert v-else-if="!supportsSearch" :description="$t('search.notSupported')" />
     <b-row v-else>
       <b-col class="left">
         <b-tabs v-model="activeSearch">
@@ -121,6 +121,9 @@ export default defineComponent({
         return this.data.numberMatched;
       }
       return null;
+    },
+    supportsSearch() {
+      return this.canSearchCollections || this.canSearchItems;
     },
     searchLink() {
       return this.isCollectionSearch ? this.collectionSearch : this.itemSearch;

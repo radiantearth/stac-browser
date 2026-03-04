@@ -243,9 +243,10 @@
   "search": {
     "addCollections": "Pressione Enter para adicionar uma coleção",
     "addFilter": "Adicionar filtro",
+    "additionalFilters": "Filtros adicionais",
     "addItemIds": "Pressione Enter para adicionar um ID de item",
     "addSearchTerm": "Pressione Enter para adicionar um termo de pesquisa",
-    "additionalFilters": "Filtros adicionais",
+    "arrayInput": {},
     "dateDescription": "Todos os horários em Tempo Universal Coordenado (UTC).",
     "enterCollections": "Insira um ou mais IDs de coleção...",
     "enterItemIds": "Insira um ou mais IDs de item...",

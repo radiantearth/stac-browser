@@ -213,9 +213,10 @@
   "search": {
     "addCollections": "اضغط على Enter لإضافة مجموعة",
     "addFilter": "إضافة فلتر",
+    "additionalFilters": "فلاتر إضافية",
     "addItemIds": "اضغط على Enter لإضافة معرّف عنصر",
     "addSearchTerm": "اضغط على Enter لإضافة مصطلح بحث",
-    "additionalFilters": "فلاتر إضافية",
+    "arrayInput": {},
     "dateDescription": "جميع الأوقات بتوقيت UTC (التوقيت العالمي المنسق).",
     "enterCollections": "أدخل معرّف مجموعة واحد أو أكثر...",
     "enterItemIds": "أدخل معرّف عنصر واحد أو أكثر...",
