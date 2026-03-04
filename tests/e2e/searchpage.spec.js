@@ -1,11 +1,11 @@
-import { test, expect } from '@playwright/test';
+import { expect } from '@playwright/test';
 import {
-  SEARCH_PATH,
-  mockApiRootAndCollections,
+  test,
   waitForMapReady,
   waitForBboxInputsPopulated,
   waitForSearchPost
 } from './helpers';
+import { SEARCH_PATH } from '../mocks/constants';
 
 const enableSpatialExtentInputs = async (page) => {
   const enableSpatialCheckbox = page.getByRole('checkbox', { name: /filter by spatial extent/i });
@@ -29,7 +29,7 @@ const fillBboxInputs = async (page, values) => {
 
 test.describe('STAC Browser Search page', () => {
   test('Should load the Search page successfully', async ({ page }) => {
-    await mockApiRootAndCollections(page);
+    
     // Navigate to the search page
     await page.goto(SEARCH_PATH);
     
@@ -38,7 +38,7 @@ test.describe('STAC Browser Search page', () => {
   });
 
   test('Search with default selection should have empty POST body', async ({ page }) => {
-    await mockApiRootAndCollections(page);
+    
     await page.goto(SEARCH_PATH);
     
     const requestPromise = waitForSearchPost(page);
@@ -58,7 +58,7 @@ test.describe('STAC Browser Search page', () => {
   });
 
   test('Search with temporal extent selection should have valid POST body', async ({ page }) => {
-    await mockApiRootAndCollections(page);
+    
     await page.goto(SEARCH_PATH);
 
     await test.step('Enter a temporal extent', async () => {
@@ -66,7 +66,6 @@ test.describe('STAC Browser Search page', () => {
 
       await temporalInput.click();
       await temporalInput.fill('2025-01-01 - 2026-12-31');
-      
 
     })
 
@@ -81,8 +80,32 @@ test.describe('STAC Browser Search page', () => {
     });
   });
 
+  test('Search with temporal extent selection should return items within that temporal range', async ({ page }) => {
+    
+    await page.goto("/search/external/search.api?.language=en");
+
+    await test.step('Enter a temporal extent that only matches three items', async () => {
+      const temporalInput = page.getByPlaceholder(/select date range/i);
+
+      await temporalInput.click();
+      //should be 3
+      await temporalInput.fill('2020-01-04 - 2020-06-25');
+      // note: currently in playwright, after entering timestamps, the daytime will reset to the current time of your computer. so entering 00:01:00 will turn into whatever time it is at the time of executing the test
+    })
+
+    await test.step('Submit search and verify only matching items are returned', async () => {
+      const submitButton = page.getByRole('button', { name: /submit/i });;
+      await submitButton.click();
+
+      await waitForMapReady(page);
+
+      const resultList = await page.locator('.card-grid').locator('a.stac-link').count(1);
+      expect(resultList).toBe(3);
+    });
+  });
+
   test('Search with spatial extent via map click should have valid POST body', async ({ page }) => {
-    await mockApiRootAndCollections(page);
+    
     await page.goto(SEARCH_PATH);
 
     await test.step('Enable spatial extent selection and click on map to create bounding box', async () => {
@@ -111,7 +134,7 @@ test.describe('STAC Browser Search page', () => {
   });
 
   test('Search with spatial extent selection via manual input should have valid POST body', async ({ page }) => {
-    await mockApiRootAndCollections(page);
+    
     await page.goto(SEARCH_PATH);
 
     await test.step('Enable spatial extent selection and fill in bounding box values', async () => {
@@ -119,6 +142,8 @@ test.describe('STAC Browser Search page', () => {
 
       await enableSpatialCheckbox.check();
 
+      await waitForMapReady(page);
+      
       // Wait for network to be idle to ensure UI is ready
       await page.waitForLoadState('networkidle');
       
@@ -138,7 +163,6 @@ test.describe('STAC Browser Search page', () => {
       await submitButton.click();
 
       const { body } = await requestPromise;
-      
       // use toBeCloseTo for floating point comparisons
       expect(body.bbox[0]).toBeCloseTo(-116.1, 2);
       expect(body.bbox[1]).toBeCloseTo(44.3, 2);
@@ -148,7 +172,7 @@ test.describe('STAC Browser Search page', () => {
   });
 
   test('Manual spatial extent shows incomplete error', async ({ page }) => {
-    await mockApiRootAndCollections(page);
+    
     await page.goto(SEARCH_PATH);
 
     await test.step('Enter 3 of 4 bounding box values', async () => {
@@ -174,7 +198,7 @@ test.describe('STAC Browser Search page', () => {
   });
 
   test('Manual spatial extent shows invalid latitude error', async ({ page }) => {
-    await mockApiRootAndCollections(page);
+    
     await page.goto(SEARCH_PATH);
 
     await enableSpatialExtentInputs(page);
@@ -192,7 +216,7 @@ test.describe('STAC Browser Search page', () => {
   });
 
   test('Manual spatial extent shows latitude order error', async ({ page }) => {
-    await mockApiRootAndCollections(page);
+    
     await page.goto(SEARCH_PATH);
 
     await test.step('Test south latitude > north latitude error', async () => {
@@ -212,7 +236,7 @@ test.describe('STAC Browser Search page', () => {
   });
 
   test('Manual spatial extent shows longitude order error when west is east of east', async ({ page }) => {
-    await mockApiRootAndCollections(page);
+    
     await page.goto(SEARCH_PATH);
 
     await test.step('Test west longitude > east longitude error (both negative)', async () => {
@@ -232,7 +256,7 @@ test.describe('STAC Browser Search page', () => {
   });
 
   test('Manual spatial extent allows antimeridian crossing (positive west, negative east)', async ({ page }) => {
-    await mockApiRootAndCollections(page);
+    
     await page.goto(SEARCH_PATH);
 
     await test.step('Allow west > east when crossing antimeridian', async () => {
@@ -253,7 +277,7 @@ test.describe('STAC Browser Search page', () => {
 
 
   test('Search with Collection ID should have valid POST body', async ({ page }) => {
-    await mockApiRootAndCollections(page);
+    
     await page.goto(SEARCH_PATH);
 
     await test.step('Enter a collection ID', async () => {
@@ -276,7 +300,7 @@ test.describe('STAC Browser Search page', () => {
   });
 
   test('search with Item ID should have valid POST body', async ({ page }) => {
-    await mockApiRootAndCollections(page);
+    
     await page.goto(SEARCH_PATH);
     
     await test.step('Enter an item ID', async () => {
@@ -304,7 +328,7 @@ test.describe('STAC Browser Search page', () => {
   });
 
   test('search with Sort should have valid POST body', async ({ page }) => {
-    await mockApiRootAndCollections(page);
+    
     await page.goto(SEARCH_PATH);
 
     await test.step('Select to sort by title field', async () => {
@@ -329,7 +353,7 @@ test.describe('STAC Browser Search page', () => {
   });
 
   test('search with item limit should have valid POST body', async ({ page }) => {
-    await mockApiRootAndCollections(page);
+    
     await page.goto(SEARCH_PATH);
 
     await test.step('Set limit of 99 items per', async () => {
@@ -346,4 +370,25 @@ test.describe('STAC Browser Search page', () => {
       expect(body.limit).toBe(99);
     });
   });
+
+  test('search with item limit should return limited number of items', async ({ page }) => {
+    
+    await page.goto("/search/external/search.api?.language=en");
+
+    await test.step('Set limit of 2 items per', async () => {
+      const limitInput = page.getByLabel(/items per page/i);
+      await limitInput.fill('2');
+    });
+
+    await test.step('Submit search and verify the returned list is limited to 2 items', async () => {
+      const submitButton = page.getByRole('button', { name: /submit/i });;
+      await submitButton.click();
+
+      await waitForMapReady(page);
+
+      const resultList = await page.locator('.card-grid').locator('a.stac-link').count(2);
+      expect(resultList).toBe(2);
+    });
+  });
+
 });

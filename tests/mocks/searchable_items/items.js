@@ -1,0 +1,1824 @@
+export const SEARCHABLE_ITEMS = [
+  {
+    "id": "col-cluster-1-item-001",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "collection": "col-cluster-1",
+    "properties": {
+      "datetime": "2022-06-15T10:00:00Z",
+      "eo:cloud_cover": 12.5,
+      "platform": "MockSat-A1"
+    },
+    "geometry": { "type": "Point", "coordinates": [-122.4274, 37.7669] },
+    "bbox": [-122.4274, 37.7669, -122.4274, 37.7669],
+    "assets": {
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/col-cluster-1-item-001"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "collection",
+        "href": "https://example.com/collections/col-cluster-1"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/collections/col-cluster-1"
+      }
+    ]
+  },
+  {
+    "id": "col-cluster-1-item-002",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "collection": "col-cluster-1",
+    "properties": {
+      "datetime": "2022-06-15T10:00:00Z",
+      "eo:cloud_cover": 8.2,
+      "platform": "MockSat-A1"
+    },
+    "geometry": { "type": "Point", "coordinates": [-122.4140, 37.7790] },
+    "bbox": [-122.4140, 37.7790, -122.4140, 37.7790],
+    "assets": {
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/col-cluster-1-item-002"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "collection",
+        "href": "https://example.com/collections/col-cluster-1"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/collections/col-cluster-1"
+      }
+    ]
+  },
+  {
+    "id": "col-cluster-1-item-003",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "collection": "col-cluster-1",
+    "properties": {
+      "datetime": "2022-06-15T10:00:00Z",
+      "eo:cloud_cover": 20.1,
+      "platform": "MockSat-A1"
+    },
+    "geometry": { "type": "Point", "coordinates": [-122.4210, 37.7700] },
+    "bbox": [-122.4210, 37.7700, -122.4210, 37.7700],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/col-cluster-1-item-003.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/col-cluster-1-item-003"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "collection",
+        "href": "https://example.com/collections/col-cluster-1"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/collections/col-cluster-1"
+      }
+    ]
+  },
+  {
+    "id": "col-cluster-1-item-004",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "collection": "col-cluster-1",
+    "properties": {
+      "datetime": "2022-06-15T10:00:00Z",
+      "eo:cloud_cover": 5.6,
+      "platform": "MockSat-A1"
+    },
+    "geometry": { "type": "Point", "coordinates": [-122.4165, 37.7755] },
+    "bbox": [-122.4165, 37.7755, -122.4165, 37.7755],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/col-cluster-1-item-004.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/col-cluster-1-item-004"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "collection",
+        "href": "https://example.com/collections/col-cluster-1"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/collections/col-cluster-1"
+      }
+    ]
+  },
+  {
+    "id": "col-cluster-1-item-005",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "collection": "col-cluster-1",
+    "properties": {
+      "datetime": "2022-06-15T10:00:00Z",
+      "eo:cloud_cover": 16.0,
+      "platform": "MockSat-A1"
+    },
+    "geometry": { "type": "Point", "coordinates": [-122.4290, 37.7780] },
+    "bbox": [-122.4290, 37.7780, -122.4290, 37.7780],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/col-cluster-1-item-005.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/col-cluster-1-item-005"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "collection",
+        "href": "https://example.com/collections/col-cluster-1"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/collections/col-cluster-1"
+      }
+    ]
+  },
+  {
+    "id": "col-cluster-1-item-006",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "collection": "col-cluster-1",
+    "properties": {
+      "datetime": "2022-06-15T10:00:00Z",
+      "eo:cloud_cover": 3.3,
+      "platform": "MockSat-A1"
+    },
+    "geometry": { "type": "Point", "coordinates": [-122.4128, 37.7722] },
+    "bbox": [-122.4128, 37.7722, -122.4128, 37.7722],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/col-cluster-1-item-006.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/col-cluster-1-item-006"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "collection",
+        "href": "https://example.com/collections/col-cluster-1"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/collections/col-cluster-1"
+      }
+    ]
+  },
+  {
+    "id": "col-cluster-1-item-007",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "collection": "col-cluster-1",
+    "properties": {
+      "datetime": "2022-06-15T10:00:00Z",
+      "eo:cloud_cover": 9.9,
+      "platform": "MockSat-A1"
+    },
+    "geometry": { "type": "Point", "coordinates": [-122.4187, 37.7810] },
+    "bbox": [-122.4187, 37.7810, -122.4187, 37.7810],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/col-cluster-1-item-007.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/col-cluster-1-item-007"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "collection",
+        "href": "https://example.com/collections/col-cluster-1"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/collections/col-cluster-1"
+      }
+    ]
+  },
+  {
+    "id": "col-cluster-1-item-008",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "collection": "col-cluster-1",
+    "properties": {
+      "datetime": "2022-06-15T10:00:00Z",
+      "eo:cloud_cover": 14.4,
+      "platform": "MockSat-A1"
+    },
+    "geometry": { "type": "Point", "coordinates": [-122.4245, 37.7760] },
+    "bbox": [-122.4245, 37.7760, -122.4245, 37.7760],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/col-cluster-1-item-008.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/col-cluster-1-item-008"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "collection",
+        "href": "https://example.com/collections/col-cluster-1"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/collections/col-cluster-1"
+      }
+    ]
+  },
+  {
+    "id": "col-cluster-1-item-009",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "collection": "col-cluster-1",
+    "properties": {
+      "datetime": "2022-06-15T10:00:00Z",
+      "eo:cloud_cover": 6.7,
+      "platform": "MockSat-A1"
+    },
+    "geometry": { "type": "Point", "coordinates": [-122.4190, 37.7685] },
+    "bbox": [-122.4190, 37.7685, -122.4190, 37.7685],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/col-cluster-1-item-009.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/col-cluster-1-item-009"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "collection",
+        "href": "https://example.com/collections/col-cluster-1"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/collections/col-cluster-1"
+      }
+    ]
+  },
+  {
+    "id": "col-cluster-1-item-010",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "collection": "col-cluster-1",
+    "properties": {
+      "datetime": "2022-06-15T10:00:00Z",
+      "eo:cloud_cover": 11.0,
+      "platform": "MockSat-A1"
+    },
+    "geometry": { "type": "Point", "coordinates": [-122.4310, 37.7728] },
+    "bbox": [-122.4310, 37.7728, -122.4310, 37.7728],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/col-cluster-1-item-010.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/col-cluster-1-item-010"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "collection",
+        "href": "https://example.com/collections/col-cluster-1"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/collections/col-cluster-1"
+      }
+    ]
+  },
+  {
+    "id": "col-cluster-1-item-011",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "collection": "col-cluster-1",
+    "properties": {
+      "datetime": "2022-06-15T10:00:00Z",
+      "eo:cloud_cover": 7.4,
+      "platform": "MockSat-A1"
+    },
+    "geometry": { "type": "Point", "coordinates": [-122.4172, 37.7698] },
+    "bbox": [-122.4172, 37.7698, -122.4172, 37.7698],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/col-cluster-1-item-011.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/col-cluster-1-item-011"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "collection",
+        "href": "https://example.com/collections/col-cluster-1"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/collections/col-cluster-1"
+      }
+    ]
+  },
+  {
+    "id": "col-cluster-1-item-012",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "collection": "col-cluster-1",
+    "properties": {
+      "datetime": "2022-06-15T10:00:00Z",
+      "eo:cloud_cover": 18.8,
+      "platform": "MockSat-A1"
+    },
+    "geometry": { "type": "Point", "coordinates": [-122.4218, 37.7765] },
+    "bbox": [-122.4218, 37.7765, -122.4218, 37.7765],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/col-cluster-1-item-012.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/col-cluster-1-item-012"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "collection",
+        "href": "https://example.com/collections/col-cluster-1"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/collections/col-cluster-1"
+      }
+    ]
+  },
+  {
+    "id": "col-cluster-1-item-013",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "collection": "col-cluster-1",
+    "properties": {
+      "datetime": "2022-06-15T10:00:00Z",
+      "eo:cloud_cover": 2.1,
+      "platform": "MockSat-A1"
+    },
+    "geometry": { "type": "Point", "coordinates": [-122.4202, 37.7740] },
+    "bbox": [-122.4202, 37.7740, -122.4202, 37.7740],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/col-cluster-1-item-013.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/col-cluster-1-item-013"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "collection",
+        "href": "https://example.com/collections/col-cluster-1"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/collections/col-cluster-1"
+      }
+    ]
+  },
+  {
+    "id": "col-cluster-1-item-014",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "collection": "col-cluster-1",
+    "properties": {
+      "datetime": "2022-06-15T10:00:00Z",
+      "eo:cloud_cover": 13.0,
+      "platform": "MockSat-A1"
+    },
+    "geometry": { "type": "Point", "coordinates": [-122.4151, 37.7786] },
+    "bbox": [-122.4151, 37.7786, -122.4151, 37.7786],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/col-cluster-1-item-014.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/col-cluster-1-item-014"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "collection",
+        "href": "https://example.com/collections/col-cluster-1"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/collections/col-cluster-1"
+      }
+    ]
+  },
+  {
+    "id": "col-cluster-1-item-015",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "collection": "col-cluster-1",
+    "properties": {
+      "datetime": "2022-06-15T10:00:00Z",
+      "eo:cloud_cover": 4.7,
+      "platform": "MockSat-A1"
+    },
+    "geometry": { "type": "Point", "coordinates": [-122.4225, 37.7822] },
+    "bbox": [-122.4225, 37.7822, -122.4225, 37.7822],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/col-cluster-1-item-015.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/col-cluster-1-item-015"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "collection",
+        "href": "https://example.com/collections/col-cluster-1"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/collections/col-cluster-1"
+      }
+    ]
+  },
+  {
+    "id": "col-cluster-1-item-016",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "collection": "col-cluster-1",
+    "properties": {
+      "datetime": "2022-06-15T10:00:00Z",
+      "eo:cloud_cover": 10.2,
+      "platform": "MockSat-A1"
+    },
+    "geometry": { "type": "Point", "coordinates": [-122.4109, 37.7777] },
+    "bbox": [-122.4109, 37.7777, -122.4109, 37.7777],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/col-cluster-1-item-016.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/col-cluster-1-item-016"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "collection",
+        "href": "https://example.com/collections/col-cluster-1"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/collections/col-cluster-1"
+      }
+    ]
+  },
+  {
+    "id": "col-cluster-1-item-017",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "collection": "col-cluster-1",
+    "properties": {
+      "datetime": "2022-06-15T10:00:00Z",
+      "eo:cloud_cover": 15.5,
+      "platform": "MockSat-A1"
+    },
+    "geometry": { "type": "Point", "coordinates": [-122.4260, 37.7715] },
+    "bbox": [-122.4260, 37.7715, -122.4260, 37.7715],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/col-cluster-1-item-017.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/col-cluster-1-item-017"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "collection",
+        "href": "https://example.com/collections/col-cluster-1"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/collections/col-cluster-1"
+      }
+    ]
+  },
+  {
+    "id": "col-cluster-1-item-018",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "collection": "col-cluster-1",
+    "properties": {
+      "datetime": "2022-06-15T10:00:00Z",
+      "eo:cloud_cover": 6.0,
+      "platform": "MockSat-A1"
+    },
+    "geometry": { "type": "Point", "coordinates": [-122.4194, 37.7749] },
+    "bbox": [-122.4194, 37.7749, -122.4194, 37.7749],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/col-cluster-1-item-018.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/col-cluster-1-item-018"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "collection",
+        "href": "https://example.com/collections/col-cluster-1"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/collections/col-cluster-1"
+      }
+    ]
+  },
+  {
+    "id": "col-temp-2-item-001",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "collection": "col-temp-2",
+    "properties": {
+      "datetime": "2020-01-05T08:30:00Z",
+      "eo:cloud_cover": 5.0,
+      "platform": "TempSat-B"
+    },
+    "geometry": { "type": "Point", "coordinates": [13.4050, 52.5200] },
+    "bbox": [13.4050, 52.5200, 13.4050, 52.5200],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/col-temp-2-item-001.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/col-temp-2-item-001"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "collection",
+        "href": "https://example.com/collections/col-temp-2"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/collections/col-temp-2"
+      }
+    ]
+  },
+  {
+    "id": "col-temp-2-item-002",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "collection": "col-temp-2",
+    "properties": {
+      "datetime": "2020-03-12T08:30:00Z",
+      "eo:cloud_cover": 22.0,
+      "platform": "TempSat-B"
+    },
+    "geometry": { "type": "Point", "coordinates": [13.4050, 52.5200] },
+    "bbox": [13.4050, 52.5200, 13.4050, 52.5200],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/col-temp-2-item-002.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/col-temp-2-item-002"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "collection",
+        "href": "https://example.com/collections/col-temp-2"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/collections/col-temp-2"
+      }
+    ]
+  },
+  {
+    "id": "col-temp-2-item-003",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "collection": "col-temp-2",
+    "properties": {
+      "datetime": "2020-06-20T08:30:00Z",
+      "eo:cloud_cover": 12.3,
+      "platform": "TempSat-B"
+    },
+    "geometry": { "type": "Point", "coordinates": [13.4050, 52.5200] },
+    "bbox": [13.4050, 52.5200, 13.4050, 52.5200],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/col-temp-2-item-003.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/col-temp-2-item-003"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "collection",
+        "href": "https://example.com/collections/col-temp-2"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/collections/col-temp-2"
+      }
+    ]
+  },
+  {
+    "id": "col-temp-2-item-004",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "collection": "col-temp-2",
+    "properties": {
+      "datetime": "2020-09-02T08:30:00Z",
+      "eo:cloud_cover": 30.0,
+      "platform": "TempSat-B"
+    },
+    "geometry": { "type": "Point", "coordinates": [13.4050, 52.5200] },
+    "bbox": [13.4050, 52.5200, 13.4050, 52.5200],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/col-temp-2-item-004.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/col-temp-2-item-004"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "collection",
+        "href": "https://example.com/collections/col-temp-2"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/collections/col-temp-2"
+      }
+    ]
+  },
+  {
+    "id": "col-temp-2-item-005",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "collection": "col-temp-2",
+    "properties": {
+      "datetime": "2020-12-15T08:30:00Z",
+      "eo:cloud_cover": 1.8,
+      "platform": "TempSat-B"
+    },
+    "geometry": { "type": "Point", "coordinates": [13.4050, 52.5200] },
+    "bbox": [13.4050, 52.5200, 13.4050, 52.5200],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/col-temp-2-item-005.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/col-temp-2-item-005"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "collection",
+        "href": "https://example.com/collections/col-temp-2"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/collections/col-temp-2"
+      }
+    ]
+  },
+  {
+    "id": "col-temp-2-item-006",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "collection": "col-temp-2",
+    "properties": {
+      "datetime": "2021-02-22T08:30:00Z",
+      "eo:cloud_cover": 9.7,
+      "platform": "TempSat-B"
+    },
+    "geometry": { "type": "Point", "coordinates": [13.4050, 52.5200] },
+    "bbox": [13.4050, 52.5200, 13.4050, 52.5200],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/col-temp-2-item-006.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/col-temp-2-item-006"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "collection",
+        "href": "https://example.com/collections/col-temp-2"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/collections/col-temp-2"
+      }
+    ]
+  },
+  {
+    "id": "col-temp-2-item-007",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "collection": "col-temp-2",
+    "properties": {
+      "datetime": "2021-05-14T08:30:00Z",
+      "eo:cloud_cover": 18.2,
+      "platform": "TempSat-B"
+    },
+    "geometry": { "type": "Point", "coordinates": [13.4050, 52.5200] },
+    "bbox": [13.4050, 52.5200, 13.4050, 52.5200],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/col-temp-2-item-007.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/col-temp-2-item-007"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "collection",
+        "href": "https://example.com/collections/col-temp-2"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/collections/col-temp-2"
+      }
+    ]
+  },
+  {
+    "id": "col-temp-2-item-008",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "collection": "col-temp-2",
+    "properties": {
+      "datetime": "2021-07-30T08:30:00Z",
+      "eo:cloud_cover": 24.6,
+      "platform": "TempSat-B"
+    },
+    "geometry": { "type": "Point", "coordinates": [13.4050, 52.5200] },
+    "bbox": [13.4050, 52.5200, 13.4050, 52.5200],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/col-temp-2-item-008.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/col-temp-2-item-008"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "collection",
+        "href": "https://example.com/collections/col-temp-2"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/collections/col-temp-2"
+      }
+    ]
+  },
+  {
+    "id": "col-temp-2-item-009",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "collection": "col-temp-2",
+    "properties": {
+      "datetime": "2021-11-11T08:30:00Z",
+      "eo:cloud_cover": 7.7,
+      "platform": "TempSat-B"
+    },
+    "geometry": { "type": "Point", "coordinates": [13.4050, 52.5200] },
+    "bbox": [13.4050, 52.5200, 13.4050, 52.5200],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/col-temp-2-item-009.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/col-temp-2-item-009"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "collection",
+        "href": "https://example.com/collections/col-temp-2"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/collections/col-temp-2"
+      }
+    ]
+  },
+  {
+    "id": "col-temp-2-item-010",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "collection": "col-temp-2",
+    "properties": {
+      "datetime": "2022-01-20T08:30:00Z",
+      "eo:cloud_cover": 11.4,
+      "platform": "TempSat-B"
+    },
+    "geometry": { "type": "Point", "coordinates": [13.4050, 52.5200] },
+    "bbox": [13.4050, 52.5200, 13.4050, 52.5200],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/col-temp-2-item-010.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/col-temp-2-item-010"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "collection",
+        "href": "https://example.com/collections/col-temp-2"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/collections/col-temp-2"
+      }
+    ]
+  },
+  {
+    "id": "col-temp-2-item-011",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "collection": "col-temp-2",
+    "properties": {
+      "datetime": "2022-03-05T08:30:00Z",
+      "eo:cloud_cover": 2.9,
+      "platform": "TempSat-B"
+    },
+    "geometry": { "type": "Point", "coordinates": [13.4050, 52.5200] },
+    "bbox": [13.4050, 52.5200, 13.4050, 52.5200],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/col-temp-2-item-011.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/col-temp-2-item-011"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "collection",
+        "href": "https://example.com/collections/col-temp-2"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/collections/col-temp-2"
+      }
+    ]
+  },
+  {
+    "id": "col-temp-2-item-012",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "collection": "col-temp-2",
+    "properties": {
+      "datetime": "2022-04-18T08:30:00Z",
+      "eo:cloud_cover": 19.2,
+      "platform": "TempSat-B"
+    },
+    "geometry": { "type": "Point", "coordinates": [13.4050, 52.5200] },
+    "bbox": [13.4050, 52.5200, 13.4050, 52.5200],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/col-temp-2-item-012.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/col-temp-2-item-012"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "collection",
+        "href": "https://example.com/collections/col-temp-2"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/collections/col-temp-2"
+      }
+    ]
+  },
+  {
+    "id": "col-temp-2-item-013",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "collection": "col-temp-2",
+    "properties": {
+      "datetime": "2022-06-01T08:30:00Z",
+      "eo:cloud_cover": 0.5,
+      "platform": "TempSat-B"
+    },
+    "geometry": { "type": "Point", "coordinates": [13.4050, 52.5200] },
+    "bbox": [13.4050, 52.5200, 13.4050, 52.5200],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/col-temp-2-item-013.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/col-temp-2-item-013"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "collection",
+        "href": "https://example.com/collections/col-temp-2"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/collections/col-temp-2"
+      }
+    ]
+  },
+  {
+    "id": "col-temp-2-item-014",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "collection": "col-temp-2",
+    "properties": {
+      "datetime": "2022-08-09T08:30:00Z",
+      "eo:cloud_cover": 6.6,
+      "platform": "TempSat-B"
+    },
+    "geometry": { "type": "Point", "coordinates": [13.4050, 52.5200] },
+    "bbox": [13.4050, 52.5200, 13.4050, 52.5200],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/col-temp-2-item-014.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/col-temp-2-item-014"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "collection",
+        "href": "https://example.com/collections/col-temp-2"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/collections/col-temp-2"
+      }
+    ]
+  },
+  {
+    "id": "col-temp-2-item-015",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "collection": "col-temp-2",
+    "properties": {
+      "datetime": "2022-10-22T08:30:00Z",
+      "eo:cloud_cover": 14.8,
+      "platform": "TempSat-B"
+    },
+    "geometry": { "type": "Point", "coordinates": [13.4050, 52.5200] },
+    "bbox": [13.4050, 52.5200, 13.4050, 52.5200],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/col-temp-2-item-015.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/col-temp-2-item-015"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "collection",
+        "href": "https://example.com/collections/col-temp-2"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/collections/col-temp-2"
+      }
+    ]
+  },
+  {
+    "id": "col-temp-2-item-016",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "collection": "col-temp-2",
+    "properties": {
+      "datetime": "2023-01-03T08:30:00Z",
+      "eo:cloud_cover": 21.1,
+      "platform": "TempSat-B"
+    },
+    "geometry": { "type": "Point", "coordinates": [13.4050, 52.5200] },
+    "bbox": [13.4050, 52.5200, 13.4050, 52.5200],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/col-temp-2-item-016.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/col-temp-2-item-016"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "collection",
+        "href": "https://example.com/collections/col-temp-2"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/collections/col-temp-2"
+      }
+    ]
+  },
+  {
+    "id": "col-temp-2-item-017",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "collection": "col-temp-2",
+    "properties": {
+      "datetime": "2023-04-27T08:30:00Z",
+      "eo:cloud_cover": 4.4,
+      "platform": "TempSat-B"
+    },
+    "geometry": { "type": "Point", "coordinates": [13.4050, 52.5200] },
+    "bbox": [13.4050, 52.5200, 13.4050, 52.5200],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/col-temp-2-item-017.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/col-temp-2-item-017"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "collection",
+        "href": "https://example.com/collections/col-temp-2"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/collections/col-temp-2"
+      }
+    ]
+  },
+  {
+    "id": "col-temp-2-item-018",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "collection": "col-temp-2",
+    "properties": {
+      "datetime": "2023-09-10T08:30:00Z",
+      "eo:cloud_cover": 9.0,
+      "platform": "TempSat-B"
+    },
+    "geometry": { "type": "Point", "coordinates": [13.4050, 52.5200] },
+    "bbox": [13.4050, 52.5200, 13.4050, 52.5200],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/col-temp-2-item-018.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/col-temp-2-item-018"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "collection",
+        "href": "https://example.com/collections/col-temp-2"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/collections/col-temp-2"
+      }
+    ]
+  },
+  {
+    "id": "col-180-3-item-001",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "collection": "col-180-3",
+    "properties": {
+      "datetime": "2021-11-01T12:00:00Z",
+      "eo:cloud_cover": 3.0,
+      "platform": "MeridianSat-C"
+    },
+    "geometry": { "type": "Point", "coordinates": [179.6000, -16.1000] },
+    "bbox": [179.6000, -16.1000, 179.6000, -16.1000],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/col-180-3-item-001.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/col-180-3-item-001"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "collection",
+        "href": "https://example.com/collections/col-180-3"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/collections/col-180-3"
+      }
+    ]
+  },
+  {
+    "id": "col-180-3-item-002",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "collection": "col-180-3",
+    "properties": {
+      "datetime": "2021-11-02T12:10:00Z",
+      "eo:cloud_cover": 7.2,
+      "platform": "MeridianSat-C"
+    },
+    "geometry": { "type": "Point", "coordinates": [179.8000, -15.9800] },
+    "bbox": [179.8000, -15.9800, 179.8000, -15.9800],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/col-180-3-item-002.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/col-180-3-item-002"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "collection",
+        "href": "https://example.com/collections/col-180-3"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/collections/col-180-3"
+      }
+    ]
+  },
+  {
+    "id": "col-180-3-item-003",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "collection": "col-180-3",
+    "properties": {
+      "datetime": "2021-11-03T12:20:00Z",
+      "eo:cloud_cover": 15.5,
+      "platform": "MeridianSat-C"
+    },
+    "geometry": { "type": "Point", "coordinates": [-179.7000, -16.0500] },
+    "bbox": [-179.7000, -16.0500, -179.7000, -16.0500],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/col-180-3-item-003.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/col-180-3-item-003"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "collection",
+        "href": "https://example.com/collections/col-180-3"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/collections/col-180-3"
+      }
+    ]
+  },
+  {
+    "id": "col-180-3-item-004",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "collection": "col-180-3",
+    "properties": {
+      "datetime": "2021-11-04T12:30:00Z",
+      "eo:cloud_cover": 2.0,
+      "platform": "MeridianSat-C"
+    },
+    "geometry": { "type": "Point", "coordinates": [-179.9000, -15.9200] },
+    "bbox": [-179.9000, -15.9200, -179.9000, -15.9200],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/col-180-3-item-004.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/col-180-3-item-004"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "collection",
+        "href": "https://example.com/collections/col-180-3"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/collections/col-180-3"
+      }
+    ]
+  },
+  {
+    "id": "col-180-3-item-005",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "collection": "col-180-3",
+    "properties": {
+      "datetime": "2021-11-05T12:40:00Z",
+      "eo:cloud_cover": 11.1,
+      "platform": "MeridianSat-C"
+    },
+    "geometry": { "type": "Point", "coordinates": [179.9000, -16.0000] },
+    "bbox": [179.9000, -16.0000, 179.9000, -16.0000],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/col-180-3-item-005.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/col-180-3-item-005"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "collection",
+        "href": "https://example.com/collections/col-180-3"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/collections/col-180-3"
+      }
+    ]
+  },
+  {
+    "id": "col-180-3-item-006",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "collection": "col-180-3",
+    "properties": {
+      "datetime": "2021-11-06T12:50:00Z",
+      "eo:cloud_cover": 6.3,
+      "platform": "MeridianSat-C"
+    },
+    "geometry": { "type": "Point", "coordinates": [-179.6000, -16.1200] },
+    "bbox": [-179.6000, -16.1200, -179.6000, -16.1200],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/col-180-3-item-006.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/col-180-3-item-006"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "collection",
+        "href": "https://example.com/collections/col-180-3"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/collections/col-180-3"
+      }
+    ]
+  },
+  {
+    "id": "col-180-3-item-007",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "collection": "col-180-3",
+    "properties": {
+      "datetime": "2021-11-07T13:00:00Z",
+      "eo:cloud_cover": 9.9,
+      "platform": "MeridianSat-C"
+    },
+    "geometry": { "type": "Point", "coordinates": [179.7000, -15.8700] },
+    "bbox": [179.7000, -15.8700, 179.7000, -15.8700],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/col-180-3-item-007.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/col-180-3-item-007"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "collection",
+        "href": "https://example.com/collections/col-180-3"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/collections/col-180-3"
+      }
+    ]
+  },
+  {
+    "id": "col-180-3-item-008",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "collection": "col-180-3",
+    "properties": {
+      "datetime": "2021-11-08T13:10:00Z",
+      "eo:cloud_cover": 4.4,
+      "platform": "MeridianSat-C"
+    },
+    "geometry": { "type": "Point", "coordinates": [-179.8000, -15.9500] },
+    "bbox": [-179.8000, -15.9500, -179.8000, -15.9500],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/col-180-3-item-008.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/col-180-3-item-008"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "collection",
+        "href": "https://example.com/collections/col-180-3"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/collections/col-180-3"
+      }
+    ]
+  },
+  {
+    "id": "col-180-3-item-009",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "collection": "col-180-3",
+    "properties": {
+      "datetime": "2021-11-09T13:20:00Z",
+      "eo:cloud_cover": 17.0,
+      "platform": "MeridianSat-C"
+    },
+    "geometry": { "type": "Point", "coordinates": [179.8500, -15.9900] },
+    "bbox": [179.8500, -15.9900, 179.8500, -15.9900],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/col-180-3-item-009.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/col-180-3-item-009"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "collection",
+        "href": "https://example.com/collections/col-180-3"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/collections/col-180-3"
+      }
+    ]
+  },
+  {
+    "id": "col-180-3-item-010",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "collection": "col-180-3",
+    "properties": {
+      "datetime": "2021-11-10T13:30:00Z",
+      "eo:cloud_cover": 8.8,
+      "platform": "MeridianSat-C"
+    },
+    "geometry": { "type": "Point", "coordinates": [-179.8500, -16.0200] },
+    "bbox": [-179.8500, -16.0200, -179.8500, -16.0200],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/col-180-3-item-010.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/col-180-3-item-010"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "collection",
+        "href": "https://example.com/collections/col-180-3"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/collections/col-180-3"
+      }
+    ]
+  },
+  {
+    "id": "orphan-item-001",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "properties": {
+      "datetime": "2022-02-14T09:00:00Z",
+      "eo:cloud_cover": 45.0,
+      "platform": "OrphanSat-X"
+    },
+    "geometry": { "type": "Point", "coordinates": [2.3522, 48.8566] },
+    "bbox": [2.3522, 48.8566, 2.3522, 48.8566],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/orphan-item-001.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/orphan-item-001"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/catalog.json"
+      }
+    ]
+  },
+  {
+    "id": "orphan-item-002",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "properties": {
+      "datetime": "2021-07-08T10:15:00Z",
+      "eo:cloud_cover": 2.2,
+      "platform": "OrphanSat-Y"
+    },
+    "geometry": { "type": "Point", "coordinates": [-60.0250, -3.4653] },
+    "bbox": [-60.0250, -3.4653, -60.0250, -3.4653],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/orphan-item-002.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/orphan-item-002"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/catalog.json"
+      }
+    ]
+  },
+  {
+    "id": "orphan-item-003",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "properties": {
+      "datetime": "2020-10-18T05:45:00Z",
+      "eo:cloud_cover": 80.0,
+      "platform": "OrphanSat-Z"
+    },
+    "geometry": { "type": "Point", "coordinates": [18.4241, -33.9249] },
+    "bbox": [18.4241, -33.9249, 18.4241, -33.9249],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/orphan-item-003.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/orphan-item-003"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/catalog.json"
+      }
+    ]
+  },
+  {
+    "id": "orphan-item-004",
+    "type": "Feature",
+    "stac_version": "1.0.0",
+    "properties": {
+      "datetime": "2019-12-25T00:00:00Z",
+      "eo:cloud_cover": 0.0,
+      "platform": "OrphanSat-W"
+    },
+    "geometry": { "type": "Point", "coordinates": [151.2093, -33.8688] },
+    "bbox": [151.2093, -33.8688, 151.2093, -33.8688],
+    "assets": {
+      "image": {
+        "href": "https://example.com/imagery/orphan-item-004.tif",
+        "type": "image/tiff; application=geotiff"
+      }
+    },
+    "links": [
+      {
+        "rel": "self",
+        "href": "https://example.com/items/orphan-item-004"
+      },
+      {
+        "rel": "root",
+        "href": "https://example.com/catalog.json"
+      },
+      {
+        "rel": "parent",
+        "href": "https://example.com/catalog.json"
+      }
+    ]
+  }
+]

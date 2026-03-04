@@ -1,5 +1,6 @@
 import { expect } from '@playwright/test';
-import { HOME_PATH, test } from './helpers';
+import { test } from './helpers';
+import { HOME_PATH } from '../mocks/constants';
 
 test.describe('STAC Browser Homepage', () => {
   test('should load the homepage successfully', async ({ page }) => {

@@ -4,6 +4,11 @@
   "title": "Example Catalog",
   "stac_version": "1.1.0",
   "description": "This catalog is a simple demonstration of an example catalog that is used to organize a hierarchy of collections and their items.",
+  "conformsTo": [
+    "https://api.stacspec.org/v1.1.0/core",
+    "https://api.stacspec.org/v1.1.0/item-search",
+    "https://api.stacspec.org/v1.1.0/collections"
+  ],
   "links": [
     {
       "rel": "root",
@@ -38,6 +43,20 @@
       "rel": "self",
       "href": "https://raw.githubusercontent.com/radiantearth/stac-spec/v1.1.0/examples/catalog.json",
       "type": "application/json"
+    },
+    {
+      "rel": "search",
+      "href": "https://search.api/search",
+      "type": "application/geo+json",
+      "title": "Search endpoint for the catalog",
+      "method": "POST"
+    },
+    {
+      "rel": "search",
+      "href": "https://search.api/search",
+      "type": "application/geo+json",
+      "title": "Search endpoint for the catalog",
+      "method": "GET"
     }
   ]
 }
