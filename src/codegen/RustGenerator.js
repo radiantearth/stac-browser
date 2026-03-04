@@ -1,33 +1,28 @@
 import CodeGenerator from './CodeGenerator.js';
-import template from './templates/rust.template.js';
+import template from './templates/template.rs?raw';
 
 export default class RustGenerator extends CodeGenerator {
-  static get label() {
-    return 'Rust';
-  }
-
-  static get language() {
+  get language() {
     return 'rust';
   }
 
-  static get outputFile() {
+  get outputFile() {
     return 'main.rs';
   }
 
-  generate() {
-    return this.renderTemplate(template, {
-      CATALOG_URL: this.catalogHref,
-      FILTERS_JSON: this.buildRustJson(),
-    });
+  get template() {
+    return template;
   }
 
-  buildRustJson() {
-    if (!this.hasFilters()) {
-      return '{}';
-    }
-    return JSON.stringify(this.filters, null, 4)
+  get indent() {
+    return 4;
+  }
+
+  formatFilters(filters) {
+    const prefix = ' '.repeat(this.indent);
+    return super.formatFilters(filters)
       .split('\n')
-      .map((line, i) => i === 0 ? line : `    ${line}`)
+      .map((line, i) => i === 0 ? line : prefix + line)
       .join('\n');
   }
 }

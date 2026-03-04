@@ -1,54 +1,59 @@
 import CodeGenerator from './CodeGenerator.js';
-import template from './templates/r.template.js';
+import template from './templates/template.r?raw';
 
 export default class RGenerator extends CodeGenerator {
-  static get label() {
-    return 'R';
-  }
-
-  static get language() {
+  get language() {
     return 'r';
   }
 
-  static get outputFile() {
+  get outputFile() {
     return 'search.R';
   }
 
-  generate() {
-    return this.renderTemplate(template, {
-      CATALOG_URL: this.catalogHref,
-      SEARCH_ARGS: this.buildSearchArgs(),
-    });
+  get template() {
+    return template;
   }
 
-  buildSearchArgs() {
+  get indent() {
+    return 4;
+  }
+
+  commaSeparatedStrings(values) {
+    return values.map(v => JSON.stringify(v)).join(', ');
+  }
+
+  formatFilters(filters) {
     const props = [];
 
-    if (this.filters.collections && this.filters.collections.length > 0) {
-      const collections = this.filters.collections.map(c => `"${c}"`).join(', ');
+    if (filters.collections && filters.collections.length > 0) {
+      const collections = this.commaSeparatedStrings(filters.collections);
       props.push(`collections = c(${collections})`);
     }
 
-    if (this.filters.ids && this.filters.ids.length > 0) {
-      const ids = this.filters.ids.map(id => `"${id}"`).join(', ');
+    if (filters.ids && filters.ids.length > 0) {
+      const ids = this.commaSeparatedStrings(filters.ids);
       props.push(`ids = c(${ids})`);
     }
 
-    if (this.filters.bbox) {
-      props.push(`bbox = c(${this.filters.bbox.join(', ')})`);
+    if (filters.bbox) {
+      props.push(`bbox = c(${filters.bbox.join(', ')})`);
     }
 
-    if (this.filters.datetime) {
-      props.push(`datetime = "${this.filters.datetime}"`);
+    if (filters.datetime) {
+      props.push(`datetime = "${filters.datetime}"`);
     }
 
-    if (this.filters.limit) {
-      props.push(`limit = ${this.filters.limit}`);
+    // todo: q is not exposed
+
+    if (filters.limit) {
+      props.push(`limit = ${filters.limit}`);
     }
 
     if (props.length === 0) {
       return '';
     }
-    return ',\n  ' + props.join(',\n  ');
+
+    const prefix = ' '.repeat(this.indent);
+    return ',\n' + prefix + props.join(',\n' + prefix);
   }
 }

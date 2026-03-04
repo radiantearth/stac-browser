@@ -6,15 +6,21 @@ Code Examples are created to display example queries for multiple langguages. Th
 
 1. Create a generator class in `src/codegen/`, for example `LanguageGenerator.js`.
 2. Make it extend `CodeGenerator` and implement:
-   - `static get label()`
-   - `static get language()`
-   - `static get outputFile()`
-   - `generate()`
-3. Add the new generator import and class to the array in [codeGenerators.config.js](../codeGenerators.config.js).
-4. Add a template in `src/codegen/templates/` for the generator.
-5. Validate with integration tests:
+   - `get language()`
+   - `get outputFile()`
+   - `get template()`
+   - if dependencies are needed for running the code: `get installDependencies()`
+   - if JSON should be indented: `get indent()`
+   - if you need a custom format for the filters: `formatFilters()`
+3. Add the language to the `programming` group of the locals, using the value of `get language()` as the key.
+4. Add the new generator import and class to the array in [codeGenerators.config.js](../codeGenerators.config.js). You can use the following variables:
+   - `{{CATALOG_URL}}`: The URL of the landing page of the API
+   - `{{SEARCH_URL}}`: The URL of the search endpoint
+   - `{{FILTERS}}`: The formatted filters, will be JSON if not implemented differently in `formatFilters()`
+5. Add a template in `src/codegen/templates/` for the generator.
+6. Validate with integration tests:
    - `npm run test:integration`
-6. Add an integration runtime test in `tests/integration/` (for example Dockerfile and `docker-compose.yml`).
+7. Add an integration runtime test in `tests/integration/` (for example Dockerfile and `docker-compose.yml`).
 
 Integration tests for code generators are run with Docker so each language snippet executes in an isolated, reproducible runtime. The test script first generates fresh snippets into `tests/integration/generated/`, then builds the images/services defined in `tests/integration/docker-compose.yml`, and finally runs each language service against a real STAC API endpoint. This verifies both that snippet generation succeeds and that the generated code actually runs in its target language environment.
 

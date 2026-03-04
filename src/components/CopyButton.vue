@@ -1,5 +1,5 @@
 <template>
-  <b-button class="copy-button" @click.prevent.stop="copy" :variant="copyColor" :title="buttonTitle" v-bind="resolvedButtonProps">
+  <b-button class="copy-button" @click.prevent.stop="copy" v-bind="resolvedButtonProps">
     <component :is="copyIcon" />
     <slot />
   </b-button>
@@ -27,6 +27,10 @@ export default {
             type: String,
             default: "primary"
         },
+        size: {
+            type: String,
+            default: "md"
+        },
         buttonProps: {
             type: Object,
             default: () => ({})
@@ -51,7 +55,10 @@ export default {
         resolvedButtonProps() {
             return {
                 ...this.buttonProps,
-                disabled: Boolean(this.buttonProps?.disabled) || !this.isClipboardSupported
+                disabled: Boolean(this.buttonProps?.disabled) || !this.isClipboardSupported,
+                variant: this.copyColor,
+                size: this.size,
+                title: this.buttonTitle
             };
         },
         copyColor() {
@@ -109,6 +116,9 @@ export default {
                 if (focusedElement && typeof focusedElement.focus === 'function') {
                     focusedElement.focus();
                 }
+                setTimeout(() => {
+                    this.status = null;
+                }, 3000);
             }
         }
     }

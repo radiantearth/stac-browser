@@ -1,3 +1,5 @@
+import i18n from '../i18n.js';
+
 /**
  * Base class for search code generators.
  * Each subclass represents one programming language.
@@ -5,26 +7,27 @@
 export default class CodeGenerator {
   /**
    * @param {string} catalogHref - The STAC API endpoint URL
+   * @param {Link} searchLink - The STAC API search link object
    * @param {Object} filters - The search filter parameters
    */
-  constructor(catalogHref, filters) {
+  constructor(catalogHref, searchLink) {
     this.catalogHref = catalogHref;
-    this.filters = this.cleanFilters(filters);
+    this.searchLink = searchLink;
   }
 
   /**
    * The display name of the language (for tabs).
    * @returns {string}
    */
-  static get label() {
-    throw new Error('Subclasses must implement label');
+  get label() {
+    return i18n.global.t(`programming.${this.language}`);
   }
 
   /**
    * The syntax highlighter language identifier.
    * @returns {string}
    */
-  static get language() {
+  get language() {
     throw new Error('Subclasses must implement language');
   }
 
@@ -32,16 +35,49 @@ export default class CodeGenerator {
    * The output filename used when generating runnable snippets.
    * @returns {string}
    */
-  static get outputFile() {
+  get outputFile() {
     throw new Error('Subclasses must implement outputFile');
+  }
+
+  get indent() {
+    return 0;
+  }
+
+  get template() {
+    throw new Error('Subclasses must implement template');
+  }
+
+  get installDependencies() {
+    return null;
+  }
+
+  /**
+   * Serialize filters to a formatted JSON string.
+   * @returns {string}
+   */
+  getFiltersAsJson(filters) {
+    return JSON.stringify(filters, null, this.indent);
+  }
+
+  formatFilters(filters) {
+    return this.getFiltersAsJson(filters);
   }
 
   /**
    * Generate the code string.
    * @returns {string}
    */
-  generate() {
-    throw new Error('Subclasses must implement generate()');
+  generate(filters) {
+    const cleanedFilters = this.cleanFilters(filters);
+    return this.renderTemplate(this.template, this.getVariables(cleanedFilters));
+  }
+
+  getVariables(filters) {
+    return {
+      CATALOG_URL: this.catalogHref,
+      SEARCH_URL: this.searchLink.getAbsoluteUrl(),
+      FILTERS: this.formatFilters(filters),
+    };
   }
 
   /**
@@ -57,8 +93,6 @@ export default class CodeGenerator {
     for (const [key, value] of Object.entries(vars)) {
       result = result.replaceAll(`{{${key}}}`, String(value));
     }
-    // Collapse 3+ consecutive newlines into 2 (one blank line)
-    result = result.replace(/\n{3,}/g, '\n\n');
     return result.trim();
   }
 
@@ -115,22 +149,5 @@ export default class CodeGenerator {
     const startValue = toIsoString(start);
     const endValue = toIsoString(end);
     return startValue && endValue ? `${startValue}/${endValue}` : null;
-  }
-
-  /**
-   * Serialize filters to a formatted JSON string.
-   * @param {number} indent
-   * @returns {string}
-   */
-  filtersJson(indent = 2) {
-    return JSON.stringify(this.filters, null, indent);
-  }
-
-  /**
-   * Check whether there are any active filters.
-   * @returns {boolean}
-   */
-  hasFilters() {
-    return Object.keys(this.filters).length > 0;
   }
 }

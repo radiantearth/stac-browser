@@ -107,18 +107,6 @@ function getChildren(stac, priority = null) {
   return children;
 }
 
-
-function getSearchLink(stac) {
-  // The search link MUST be 'application/geo+json' as otherwise it's likely not STAC
-  // See https://github.com/opengeospatial/ogcapi-features/issues/832
-  let links = Utils.getLinksWithRels(stac.links, ['search'])
-    .filter(link => Utils.isMediaType(link.type, geojsonMediaType))
-    .map(link => Object.assign({}, link, {href: toAbsolute(link.href, stac.getAbsoluteUrl())}));
-  // Prefer POST if present
-  let post = links.find(link => hasText(link.method) && link.method.toUpperCase() === 'POST');
-  return post || links[0] || null;
-}
-
 export class ItemCollection extends BaseItemCollection {
 
   constructor(data, url, path) {
@@ -164,10 +152,6 @@ export class Collection extends BaseCollection {
 
   getBrowserPath() {
     return this._path;
-  }
-
-  getSearchLink() {
-    return getSearchLink(this);
   }
 
   getChildren(priority = null) {
@@ -220,10 +204,6 @@ export class Catalog extends BaseCatalog {
 
   getBrowserPath() {
     return this._path;
-  }
-
-  getSearchLink() {
-    return getSearchLink(this);
   }
 
   getChildren(priority = null) {

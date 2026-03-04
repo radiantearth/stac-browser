@@ -1,64 +1,74 @@
+import { size } from 'stac-js/src/utils.js';
 import CodeGenerator from './CodeGenerator.js';
-import template from './templates/python.template.js';
+import template from './templates/template.py?raw';
 
 export default class PythonGenerator extends CodeGenerator {
-  static get label() {
-    return 'Python';
-  }
-
-  static get language() {
+  get language() {
     return 'python';
   }
 
-  static get outputFile() {
+  get outputFile() {
     return 'search.py';
   }
 
-  generate() {
-    return this.renderTemplate(template, {
-      CATALOG_URL: this.catalogHref,
-      SEARCH_ARGS: this.hasFilters() ? this.buildSearchArgs() : '',
-    });
+  get template() {
+    return template;
   }
 
-  buildSearchArgs() {
+  get indent() {
+    return 4;
+  }
+
+  get installDependencies() {
+    return 'pip install pystac-client';
+  }
+
+  commaSeparatedStrings(values) {
+    return values.map(v => JSON.stringify(v)).join(', ');
+  }
+
+  formatFilters(filters) {
+    if (size(filters) === 0) {
+      return '';
+    }
     const args = [];
 
-    if (this.filters.collections && this.filters.collections.length > 0) {
-      const collections = this.filters.collections.map(c => `"${c}"`).join(', ');
+    if (size(filters.collections) > 0) {
+      const collections = this.commaSeparatedStrings(filters.collections);
       args.push(`collections=[${collections}]`);
     }
 
-    if (this.filters.ids && this.filters.ids.length > 0) {
-      const ids = this.filters.ids.map(id => `"${id}"`).join(', ');
+    if (size(filters.ids) > 0) {
+      const ids = this.commaSeparatedStrings(filters.ids);
       args.push(`ids=[${ids}]`);
     }
 
-    if (this.filters.bbox) {
-      args.push(`bbox=[${this.filters.bbox.join(', ')}]`);
+    if (filters.bbox) {
+      args.push(`bbox=[${filters.bbox.join(', ')}]`);
     }
 
-    if (this.filters.datetime) {
-      args.push(`datetime="${this.filters.datetime}"`);
+    if (filters.datetime) {
+      args.push(`datetime="${filters.datetime}"`);
     }
 
-    if (this.filters.q && this.filters.q.length > 0) {
-      const terms = this.filters.q.map(t => `"${t}"`).join(', ');
+    if (size(filters.q) > 0) {
+      const terms = this.commaSeparatedStrings(filters.q);
       args.push(`q=[${terms}]`);
     }
 
-    if (this.filters.limit) {
-      args.push(`max_items=${this.filters.limit}`);
+    if (filters.limit) {
+      args.push(`max_items=${filters.limit}`);
     }
 
-    if (this.filters.sortby) {
-      args.push(`sortby="${this.filters.sortby}"`);
+    if (filters.sortby) {
+      args.push(`sortby="${filters.sortby}"`);
+    }
+    
+    if (size(filters.filters?.filters) > 0) {
+      args.push(`filter=${JSON.stringify(filters.filters.filters)}`);
     }
 
-    if (this.filters.filter) {
-      args.push(`filter=${JSON.stringify(this.filters.filter)}`);
-    }
-
-    return '\n    ' + args.join(',\n    ') + '\n';
+    const prefix = ' '.repeat(this.indent);
+    return '\n' + prefix + args.join(',\n' + prefix) + '\n';
   }
 }

@@ -1,4 +1,4 @@
-const template = `import java.net.URI;
+import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -12,20 +12,17 @@ public class StacSearch {
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create("{{SEARCH_URL}}"))
             .header("Content-Type", "application/json")
-            .POST(HttpRequest.BodyPublishers.ofString({{BODY_STRING}}))
+            .POST(HttpRequest.BodyPublishers.ofString({{FILTERS}}))
             .build();
 
         HttpResponse<String> response = client.send(
             request, HttpResponse.BodyHandlers.ofString());
 
         // Print item IDs
-        Pattern pattern = Pattern.compile("\\"id\\"\\\\s*:\\\\s*\\"([^\\"]+)\\"");
+        Pattern pattern = Pattern.compile("\"id\"\\s*:\\s*\"([^\"]+)\"");
         Matcher matcher = pattern.matcher(response.body());
         while (matcher.find()) {
             System.out.println(matcher.group(1));
         }
     }
 }
-`;
-
-export default template;

@@ -16,13 +16,20 @@ import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
 import generators from '../../codeGenerators.config.js';
-import { generateCode } from '../../src/codegen/index.js';
+import { Link } from 'stac-js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const outDir = join(__dirname, 'generated');
 mkdirSync(outDir, { recursive: true });
 
 const CATALOG_URL = 'https://planetarycomputer.microsoft.com/api/stac/v1';
+const SEARCH_LINK = new Link({
+  href: `${CATALOG_URL}/search`,
+  rel: 'search',
+  method: 'POST',
+  type: 'application/geo+json'
+});
+
 
 const FILTERS = {
   collections: ['sentinel-2-l2a'],
@@ -30,10 +37,11 @@ const FILTERS = {
   limit: 5,
 };
 
-for (const Generator of generators) {
-  const code = generateCode(Generator, CATALOG_URL, FILTERS);
-  writeFileSync(join(outDir, Generator.outputFile), code + '\n');
-  console.log(`✓ generated ${Generator.label}`);
+for (const g of generators) {
+  const generator = new g(CATALOG_URL, SEARCH_LINK);
+  const code = generator.generate(FILTERS);
+  writeFileSync(join(outDir, generator.outputFile), code + '\n');
+  console.log(`✓ generated ${generator.label}`);
 }
 
 console.log(`\nAll snippets written to ${outDir}`);

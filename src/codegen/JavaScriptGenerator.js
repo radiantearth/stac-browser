@@ -1,23 +1,21 @@
 import CodeGenerator from './CodeGenerator.js';
-import template from './templates/javascript.template.js';
+import template from './templates/template.js?raw';
 
 export default class JavaScriptGenerator extends CodeGenerator {
-  static get label() {
-    return 'JavaScript';
-  }
-
-  static get language() {
+  get language() {
     return 'javascript';
   }
 
-  static get outputFile() {
+  get outputFile() {
     return 'search.mjs';
   }
 
-  generate() {
-    return this.renderTemplate(template, {
-      SEARCH_URL: this.catalogHref.replace(/\/?$/, '/search'),
-      FILTERS_JSON: this.filtersJson(),
-    });
+  get template() {
+    return template;
   }
+
+  get indent() {
+    return 2;
+  }
+
 }

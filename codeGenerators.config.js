@@ -10,10 +10,12 @@ import RustGenerator from './src/codegen/RustGenerator.js';
  * Python is first as the most common STAC client language.
  */
 export default [
-  PythonGenerator,
-  JavaScriptGenerator,
-  RGenerator,
   CSharpGenerator,
   JavaGenerator,
+  JavaScriptGenerator,
+  PythonGenerator,
+  RGenerator,
   RustGenerator
 ];
+
+export const defaultGenerator = PythonGenerator;

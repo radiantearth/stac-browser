@@ -1,8 +1,13 @@
 <template>
   <div class="search-code">
-    <b-tabs v-model:index="internalTab">
-      <b-tab v-for="gen in generators" :key="gen.language" :title="gen.label">
-        <CodeBox :code="getCode(gen)" :language="gen.language" />
+    <b-tabs v-model="selectedTab">
+      <b-tab
+        v-for="generator in generatorInstances"
+        :key="generator.language"
+        :title="generator.label"
+        :id="generator.language"
+      >
+        <CodeBox :generator="generator" :filters="filters" />
       </b-tab>
     </b-tabs>
   </div>
@@ -11,22 +16,22 @@
 <script>
 import { defineComponent, defineAsyncComponent } from 'vue';
 import { BTabs, BTab } from 'bootstrap-vue-next';
-import { generators, generateCode } from '../codegen/index.js';
+import generators, { defaultGenerator } from '../../codeGenerators.config.js';
 import BrowserStorage from '../browser-store';
+import { mapState } from 'vuex/dist/vuex.cjs.js';
 
-const STORAGE_KEY = 'stac-browser:codeLanguage';
+const STORAGE_KEY = 'codeLanguage';
 
 export default defineComponent({
   name: 'SearchCode',
-  emits: ['update:activeCode'],
   components: {
     BTabs,
     BTab,
     CodeBox: defineAsyncComponent(() => import('./CodeBox.vue'))
   },
   props: {
-    catalogHref: {
-      type: String,
+    searchLink: {
+      type: Object,
       required: true
     },
     filters: {
@@ -36,78 +41,44 @@ export default defineComponent({
   },
   data() {
     return {
-      generators,
       storage: new BrowserStorage(),
-      internalTab: this.loadSelectedTab()
+      selectedTab: null
     };
   },
   computed: {
-    generatedCodes() {
-      const codes = {};
-      for (const GeneratorClass of this.generators) {
-        codes[GeneratorClass.language] = generateCode(GeneratorClass, this.catalogHref, this.filters);
-      }
-      return codes;
+    ...mapState(['catalogUrl']),
+    generatorInstances() {
+      return generators.map(g => new g(this.catalogUrl, this.searchLink));
+    },
+    defaultLanguage() {
+      const defaultGen = new defaultGenerator(this.catalogUrl, this.searchLink);
+      const defGen = this.generatorInstances.find(g => g.language === defaultGen.language);
+      return defGen?.language;
     }
   },
-  mounted() {
-    this.emitActiveCode(this.internalTab);
+  created() {
+    this.loadSelectedTab();
+    console.log(this.selectedTab);
   },
   watch: {
-    internalTab(value) {
+    selectedTab(value) {
       this.saveSelectedTab(value);
-      this.emitActiveCode(value);
-    },
-    filters: {
-      deep: true,
-      handler() {
-        this.emitActiveCode(this.internalTab);
-      }
-    },
-    catalogHref() {
-      this.emitActiveCode(this.internalTab);
     }
   },
   methods: {
-    getCode(GeneratorClass) {
-      return this.generatedCodes[GeneratorClass.language] || '';
-    },
-    getTabIndex(value) {
-      const index = Number.parseInt(value, 10);
-      if (Number.isInteger(index) && index >= 0 && index < this.generators.length) {
-        return index;
-      }
-      return 0;
-    },
-    emitActiveCode(value) {
-      const index = this.getTabIndex(value);
-      const generator = this.generators[index] || this.generators[0];
-      if (generator) {
-        this.$emit('update:activeCode', this.getCode(generator));
-      }
-    },
     loadSelectedTab() {
-      try {
-        const saved = this.storage.get(STORAGE_KEY);
-        if (saved !== null) {
-          const index = parseInt(saved, 10);
-          if (index >= 0 && index < generators.length) {
-            return index;
-          }
-        }
+      const saved = this.storage.get(STORAGE_KEY);
+      if (this.generatorInstances.some(g => g.language === saved)) {
+        this.selectedTab = saved;
+        return;
       }
-      catch {
-        // localStorage unavailable
+      if (this.defaultLanguage) {
+        this.selectedTab = this.defaultLanguage;
       }
-      return 0; // Default to Python
     },
-    saveSelectedTab(value) {
-      const index = this.getTabIndex(value);
-      try {
-        this.storage.set(STORAGE_KEY, String(index));
-      }
-      catch {
-        // localStorage unavailable
+    saveSelectedTab(language) {
+      if (this.defaultLanguage !== language) {
+        this.storage.set(STORAGE_KEY, language);
       }
     }
   }

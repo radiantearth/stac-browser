@@ -1,23 +1,37 @@
 <template>
   <div class="codebox">
-    <div v-if="highlightedCode" v-html="highlightedCode" />
-    <pre v-else><code>{{ code }}</code></pre>
+    <p v-if="generator.installDependencies">
+      {{ $t('exampleCode.installDependencies') }}
+      <code>{{ generator.installDependencies }}</code>
+      <CopyButton :copyText="generator.installDependencies" size="sm" />
+    </p>
+    <p>
+      {{ $t('exampleCode.storeAs') }}
+      <code>{{ file }}</code>
+      <CopyButton :copyText="file" size="sm" />
+    </p>
+    <CodeHighlighted :code="code" :language="language" />
   </div>
 </template>
 
 <script>
 import { defineComponent } from 'vue';
-import { codeToHtml } from 'shiki';
+import CodeHighlighted from './CodeHighlighted.vue';
+import CopyButton from './CopyButton.vue';
 
 export default defineComponent({
   name: 'CodeBox',
+  components: {
+    CodeHighlighted,
+    CopyButton
+  },
   props: {
-    code: {
-      type: String,
+    generator: {
+      type: Object,
       required: true
     },
-    language: {
-      type: String,
+    filters: {
+      type: Object,
       required: true
     }
   },
@@ -26,47 +40,22 @@ export default defineComponent({
       highlightedCode: ''
     };
   },
-  watch: {
-    code: {
-      immediate: true,
-      handler() {
-        this.renderCode();
-      }
+  computed: {
+    code() {
+      return this.generator.generate(this.filters);
     },
     language() {
-      this.renderCode();
-    }
-  },
-  methods: {
-    async renderCode() {
-      try {
-        this.highlightedCode = await codeToHtml(this.code, {
-          lang: this.language,
-          theme: 'github-light'
-        });
-      }
-      catch {
-        this.highlightedCode = '';
-      }
+      return this.generator.language;
+    },
+    file() {
+      return this.generator.outputFile;
     }
   }
 });
 </script>
 
 <style scoped>
-.codebox {
-  border: 1px solid var(--bs-border-color);
-  padding: 1rem;
-  border-radius: 0.5rem;
-  background: var(--bs-light);
-}
-.codebox :deep(pre) {
-  margin: 0;
-  padding: 0 !important;
-  background: transparent !important;
-}
-.codebox :deep(code) {
-  padding: 0;
-  font-size: 0.875rem;
+p {
+  margin: 0 0 0.5rem;
 }
 </style>

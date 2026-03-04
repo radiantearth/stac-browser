@@ -139,21 +139,19 @@
           />
         </b-form-group>
       </b-card-body>
-      <b-card-footer>
+      <b-card-footer class="d-flex gap-3">
         <b-button type="submit" variant="primary">{{ $t('submit') }}</b-button>
-        <b-button type="reset" variant="danger" class="ms-3">{{ $t('reset') }}</b-button>
-        <b-button v-if="searchLink" type="button" variant="secondary" class="ms-3" @click="showCodeModal = true">{{ $t('exampleCode') }}</b-button>
+        <b-button type="reset" variant="danger">{{ $t('reset') }}</b-button>
+        <b-button v-if="type === 'Global'" type="button" variant="secondary" @click="showCodeModal = true">{{ $t('exampleCode.title') }}</b-button>
       </b-card-footer>
     </b-card>
-    <b-modal v-model="showCodeModal" :title="$t('exampleCode')" size="lg">
+    <b-modal v-if="type === 'Global'" v-model="showCodeModal" :title="$t('exampleCode.title')" size="lg">
       <SearchCode
         v-if="showCodeModal"
-        :catalogHref="searchLink.href"
+        :searchLink="searchLink"
         :filters="query"
-        @update:active-code="activeCode = $event"
       />
       <template #footer="{ close }">
-        <CopyButton v-if="activeCode" variant="outline-primary" :copyText="activeCode">{{ $t('copy') }}</CopyButton>
         <b-button variant="secondary" @click="close()">{{ $t('close') }}</b-button>
       </template>
     </b-modal>
@@ -227,7 +225,6 @@ export default defineComponent({
     MapSelect: defineAsyncComponent(() => import('./maps/MapSelect.vue')),
     SortButtons: defineAsyncComponent(() => import('./SortButtons.vue')),
     Multiselect: defineAsyncComponent(() => import('vue-multiselect')),
-    CopyButton: defineAsyncComponent(() => import('./CopyButton.vue')),
   },
   mixins: [
     ApiCapabilitiesMixin,
@@ -265,8 +262,7 @@ export default defineComponent({
       collections: [],
       collectionsLoadingTimer: null,
       additionalCollectionCount: 0,
-      showCodeModal: false,
-      activeCode: null
+      showCodeModal: false
     }, getDefaults());
   },
   computed: {

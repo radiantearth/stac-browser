@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - PlayWright tests
 - Allow manually entering bounding boxes for search
+- Generate code examples for Global Item Search
 
 ### Changed
 

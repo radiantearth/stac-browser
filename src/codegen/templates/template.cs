@@ -1,12 +1,12 @@
-const template = `using System;
+using System;
 using System.Net.Http;
 using System.Text;
 
 var httpClient = new HttpClient();
 var searchUrl = "{{SEARCH_URL}}";
 var json = """
-{{FILTERS_JSON_INDENTED}}
-    """;
+{{FILTERS}}
+""";
 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
 var response = await httpClient.PostAsync(searchUrl, content);
@@ -17,6 +17,3 @@ foreach (var feature in doc.RootElement.GetProperty("features").EnumerateArray()
 {
     Console.WriteLine(feature.GetProperty("id").GetString());
 }
-`;
-
-export default template;
