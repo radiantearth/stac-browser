@@ -41,7 +41,7 @@ for (const g of generators) {
   const generator = new g(CATALOG_URL, SEARCH_LINK);
   const code = generator.generate(FILTERS);
   writeFileSync(join(outDir, generator.outputFile), code + '\n');
-  console.log(`✓ generated ${generator.label}`);
+  console.log(`✓ generated ${generator.outputFile} (${generator.language})`);
 }
 
 console.log(`\nAll snippets written to ${outDir}`);

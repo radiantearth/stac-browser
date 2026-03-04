@@ -30,7 +30,7 @@ jobs:
         run: npm ci
 
       - name: Generate code snippets
-        run: node tests/integration/generate-snippets.js
+        run: node --import ./tests/integration/node-loader-register.js tests/integration/generate-snippets.js
 
       - name: Build ${{ matrix.language }} image
         run: docker compose -f tests/integration/docker-compose.yml build ${{ matrix.language }}

@@ -11,7 +11,6 @@ import Migrate from '@radiantearth/stac-migrate';
 import Utils from "../utils";
 import { hasText } from 'stac-js/src/utils.js';
 import { toAbsolute } from 'stac-js/src/http.js';
-import { geojsonMediaType } from 'stac-js/src/mediatypes.js';
 
 
 export function createSTAC(data, url, path, migrate = true, updateVersionNumber = false) {

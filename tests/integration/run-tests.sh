@@ -28,7 +28,7 @@ else
 fi
 
 echo "── Generating code snippets ──"
-node "$SCRIPT_DIR/generate-snippets.js"
+node --import "$SCRIPT_DIR/node-loader-register.js" "$SCRIPT_DIR/generate-snippets.js"
 echo ""
 
 echo "── Building Docker images ──"
