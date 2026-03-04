@@ -1,7 +1,6 @@
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import { fileURLToPath, URL } from "node:url";
-import path from "path";
 import { readFileSync } from "fs";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
 
@@ -47,6 +46,10 @@ const env = yargs()
 
 delete env._;
 delete env.$0;
+// SB_CONFIG was used to specify a custom config file path, which is no longer
+// supported (static import from ./config.js is used instead). Remove the key so
+// it doesn't leak into the merged config object as a meaningless "CONFIG" property.
+delete env.CONFIG;
 
 const config = Object.assign(configFromFile, env);
 
@@ -70,8 +73,8 @@ export default defineConfig(({ mode }) => ({
   define: {
     STAC_BROWSER_VERSION: JSON.stringify(package_.version),
     // JSON.stringify removes e.g. functions from the config,
-    // but from env we do not accept functiona anyway.
-    CONFIG_FROM_ENV: JSON.stringify(env.CONFIG),
+    // but from env we do not accept functions anyway.
+    CONFIG_FROM_ENV: JSON.stringify(env),
   },
   // See https://github.com/vitejs/vite/discussions/14801#discussioncomment-15550931 for details
   optimizeDeps: {
