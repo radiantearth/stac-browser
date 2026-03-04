@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PlayWright tests
 - Allow manually entering bounding boxes for search
 - Generate code examples for Global Item Search
+- Docker-based integration tests for generated code snippets
 - Support negating CQL2 filters (globally and per filter)
 - Support CQL2 Advanced Comparison Operators
 - Support CQL2 Array Functions
@@ -26,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The config.js file needs to be updated, replace `module.exports =` with `export default`.
 - The main HTML file (`public/index.html`) has moved to `index.html` and has various changes. Make sure to check any changes you made.
 - The runtime config file (`public/config.js`) has been renamed to `public/runtime-config.js`
+- Replaced `v-clipboard` with `@vueuse/core` clipboard support
 - All link and asset actions must be updated, similarly also check all the config files for changes:
   - `i18n.t` must be replaced with `i18n.global.t`
   - You may also have to update imports of `Utils` or other constants.
