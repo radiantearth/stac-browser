@@ -37,4 +37,5 @@ jobs:
 
       - name: Run ${{ matrix.language }}
         run: |
-          timeout 120 docker compose -f tests/integration/docker-compose.yml run --rm ${{ matrix.language }}
+          INSTALL_DEPS="$(node --import ./tests/integration/node-loader-register.js tests/integration/get-install-dependencies.js ${{ matrix.language }})"
+          timeout 120 docker compose -f tests/integration/docker-compose.yml run --rm -e INSTALL_DEPS="$INSTALL_DEPS" ${{ matrix.language }}
