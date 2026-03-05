@@ -1,10 +1,17 @@
 <template>
   <div class="code">
-    <CopyButton
-      class="copy"
-      :copyText="code"
-      :button-props="{ 'aria-label': $t('exampleCode.copyExampleCode') }"
-    />
+    <div class="actions">
+      <b-button
+        :title="$t('assets.download.generic')"
+        size="sm" variant="primary"
+        @click.prevent.stop="download">
+        <b-icon-download />
+      </b-button>
+      <CopyButton
+        :copyText="code" size="sm"
+        :button-props="{id: 'exampleCodeCopyExampleCode'}"
+      />
+    </div>
     <div v-if="highlightedCode" v-html="highlightedCode" />
     <pre v-else><code>{{ code }}</code></pre>
   </div>
@@ -28,6 +35,10 @@ export default defineComponent({
     language: {
       type: String,
       required: true
+    },
+    file: {
+      type: String,
+      default: null
     }
   },
   data() {
@@ -57,6 +68,17 @@ export default defineComponent({
       catch {
         this.highlightedCode = '';
       }
+    },
+    download() {
+      const blob = new Blob([this.code], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = this.file || `code.${this.language}`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     }
   }
 });
@@ -70,7 +92,7 @@ export default defineComponent({
   background: var(--bs-light);
   overflow: auto;
 }
-.copy {
+.actions {
   position: absolute;
   top: 1rem;
   right: 1rem;

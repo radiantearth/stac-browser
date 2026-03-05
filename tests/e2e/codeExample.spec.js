@@ -14,17 +14,17 @@ const openExampleCodeModal = async (page) => {
 
 const readClipboard = async (page) => page.evaluate(() => navigator.clipboard.readText());
 const copyCodeFromModal = async (page, panel) => {
-  await panel.getByRole('button', { name: 'Copy example code' }).click();
+  await panel.locator('[id="exampleCodeCopyExampleCode"]').click();
   return expect.poll(async () => readClipboard(page)).not.toEqual('');
 };
 
 const copyDependenciesFromModal = async (page, panel) => {
-  await panel.getByRole('button', { name: 'Copy dependencies' }).click();
+  await panel.locator('[id="exampleCodeCopyDependencies"]').click();
   return expect.poll(async () => readClipboard(page)).not.toEqual('');
 };
 
 const copyFilenameFromModal = async (page, panel) => {
-  await panel.getByRole('button', { name: 'Copy output filename' }).click();
+  await panel.locator('[id="exampleCodeCopyOutputFilename"]').click();
   return expect.poll(async () => readClipboard(page)).not.toEqual('');
 };
 

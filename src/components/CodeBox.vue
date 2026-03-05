@@ -8,7 +8,7 @@
       <CopyButton
         :copyText="generator.installDependencies"
         size="sm"
-        :button-props="{ 'aria-label': $t('exampleCode.copyDependencies') }"
+        :button-props="{id: 'exampleCodeCopyDependencies'}"
       />
     </div>
     <div class="meta-row">
@@ -19,10 +19,10 @@
       <CopyButton
         :copyText="file"
         size="sm"
-        :button-props="{ 'aria-label': $t('exampleCode.copyOutputFilename') }"
+        :button-props="{id: 'exampleCodeCopyOutputFilename'}"
       />
     </div>
-    <CodeHighlighted :code="code" :language="language" />
+    <CodeHighlighted :code="code" :language="language" :file="file" />
   </div>
 </template>
 

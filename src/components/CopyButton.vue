@@ -54,11 +54,12 @@ export default {
         },
         resolvedButtonProps() {
             return {
-                ...this.buttonProps,
                 disabled: Boolean(this.buttonProps?.disabled) || !this.isClipboardSupported,
                 variant: this.copyColor,
                 size: this.size,
-                title: this.buttonTitle
+                title: this.buttonTitle,
+                'aria-label': this.buttonTitle || this.$t('copy'),
+                ...this.buttonProps,
             };
         },
         copyColor() {

@@ -120,10 +120,7 @@
   "exampleCode": {
     "title": "Example Code",
     "storeAs": "Store code as:",
-    "installDependencies": "Install dependencies:",
-    "copyExampleCode": "Copy example code",
-    "copyDependencies": "Copy dependencies",
-    "copyOutputFilename": "Copy output filename"
+    "installDependencies": "Install dependencies:"
   },
   "featureExperimental": "This feature is still experimental and may give unexpected results!",
   "features": {
