@@ -13,7 +13,9 @@ import {
   SEARCH_PATH,
   mockApiRootAndCollections,
   mockApiRootAndPaginatedSearch,
+  mockApiRootAndSearch,
   waitForMapReady,
+  waitForPageReady,
   waitForBboxInputsPopulated,
   waitForSearchPost
 } from './helpers';
