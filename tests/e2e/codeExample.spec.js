@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { readFile } from 'node:fs/promises';
 import {
   SEARCH_PATH,
   mockApiRootAndCollections,
@@ -300,6 +301,40 @@ test.describe('STAC Browser code example modal', () => {
     });
     expect(copied, 'should contain max items').toContain('max_items=99');
     expect(copied, 'should contain sort by title').toContain('sortby="properties.title"');
+  });
+
+  test('downloads example code that matches the displayed snippet', async ({ page }) => {
+    await mockApiRootAndCollections(page);
+    await page.goto(SEARCH_PATH);
+
+    const modal = await openExampleCodeModal(page);
+
+    const pythonPanel = modal.getByRole('tabpanel', { name: 'Python' });
+
+    let expectedCode;
+    await test.step('copy current example code', async () => {
+      await copyCodeFromModal(page, pythonPanel);
+      expectedCode = await readClipboard(page);
+      expect(expectedCode).not.toEqual('');
+    });
+
+    let downloadedCode;
+    await test.step('download example code', async () => {
+      const [download] = await Promise.all([
+        page.waitForEvent('download'),
+        pythonPanel.getByRole('button', { name: /download/i }).click()
+      ]);
+
+      expect(download.suggestedFilename()).toBe('search.py');
+
+      const path = await download.path();
+      expect(path, 'download path should exist').not.toBeNull();
+      downloadedCode = await readFile(path, 'utf8');
+    });
+
+    await test.step('verify downloaded code matches displayed snippet', async () => {
+      expect(downloadedCode).toEqual(expectedCode);
+    });
   });
 
   test('closes modal when close button is clicked', async ({ page }) => {
