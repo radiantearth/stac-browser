@@ -36,6 +36,9 @@ export default defineConfig({
 
     /* Clipboard permissions for copy-related tests */
     permissions: ['clipboard-read', 'clipboard-write'],
+
+    /* Keep UI language deterministic for i18n-based selectors */
+    locale: 'en-US',
     
     /* Screenshot on failure */
     screenshot: 'only-on-failure',

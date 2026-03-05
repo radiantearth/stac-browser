@@ -1,6 +1,10 @@
 <template>
   <div class="code">
-    <CopyButton class="copy" :copyText="code" />
+    <CopyButton
+      class="copy"
+      :copyText="code"
+      :button-props="{ 'aria-label': $t('exampleCode.copyExampleCode') }"
+    />
     <div v-if="highlightedCode" v-html="highlightedCode" />
     <pre v-else><code>{{ code }}</code></pre>
   </div>

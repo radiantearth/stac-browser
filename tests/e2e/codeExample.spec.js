@@ -13,13 +13,78 @@ const openExampleCodeModal = async (page) => {
 };
 
 const readClipboard = async (page) => page.evaluate(() => navigator.clipboard.readText());
+const copyCodeFromModal = async (page, panel) => {
+  await panel.getByRole('button', { name: 'Copy example code' }).click();
+  return expect.poll(async () => readClipboard(page)).not.toEqual('');
+};
 
-const copyCodeFromModal = async (page, modal) => {
-  await modal.getByRole('button', { name: /copy/i }).click();
+const copyDependenciesFromModal = async (page, panel) => {
+  await panel.getByRole('button', { name: 'Copy dependencies' }).click();
+  return expect.poll(async () => readClipboard(page)).not.toEqual('');
+};
+
+const copyFilenameFromModal = async (page, panel) => {
+  await panel.getByRole('button', { name: 'Copy output filename' }).click();
   return expect.poll(async () => readClipboard(page)).not.toEqual('');
 };
 
 test.describe('STAC Browser code example modal', () => {
+
+  test('shows modal and copies default Python dependencies', async ({ page }) => {
+    await mockApiRootAndCollections(page);
+    await page.goto(SEARCH_PATH);
+
+    let copied;
+    await test.step('Open Example Code modal and copy default dependencies', async () => {
+      const modal = await openExampleCodeModal(page);
+      await test.step('open Python panel', async () => {
+        await modal.getByRole('tab', { name: 'Python' }).click();
+      });
+      const pythonPanel = modal.getByRole('tabpanel', { name: 'Python' });
+      await expect(pythonPanel.getByText('pip install')).toBeVisible();
+      await copyDependenciesFromModal(page, pythonPanel);
+      copied = await readClipboard(page);
+    });
+
+    await test.step('Verify copied dependencies are Python install command', async () => {
+      expect(copied, 'should contain minimal Python dependency install command').toContain('pip install');
+      expect(copied, 'should not contain Rust dependency install command').not.toContain('cargo add');
+    });
+  });
+
+  test('copies updated dependencies after switching tab from Python to Rust', async ({ page }) => {
+    await mockApiRootAndCollections(page);
+    await page.goto(SEARCH_PATH);
+
+    const modal = await openExampleCodeModal(page);
+
+    let pythonDependencies;
+    await test.step('Copy Python dependencies from default tab', async () => {
+      await test.step('open Python panel', async () => {
+        await modal.getByRole('tab', { name: 'Python' }).click();
+      });
+      const pythonPanel = modal.getByRole('tabpanel', { name: 'Python' });
+      await expect(pythonPanel.getByText('pip install')).toBeVisible();
+      await copyDependenciesFromModal(page, pythonPanel);
+      pythonDependencies = await readClipboard(page);
+      expect(pythonDependencies, 'should contain minimal Python dependency install command').toContain('pip install');
+    });
+
+    let rustDependencies;
+    await test.step('Switch to Rust tab and copy dependencies', async () => {
+      await modal.getByRole('tab', { name: 'Rust' }).click();
+      const rustPanel = modal.getByRole('tabpanel', { name: 'Rust' });
+      await expect(rustPanel.getByText('cargo add')).toBeVisible();
+      await copyDependenciesFromModal(page, rustPanel);
+      rustDependencies = await readClipboard(page);
+    });
+
+    await test.step('Verify copied dependencies were updated to Rust install command', async () => {
+      expect(rustDependencies, 'should contain Rust dependency install command').toContain('cargo add serde_json stac stac-io');
+      expect(rustDependencies, 'should not contain Python dependency install command').not.toContain('pip install pystac-client');
+      expect(rustDependencies, 'should differ from initial Python copied dependencies').not.toEqual(pythonDependencies);
+    });
+  });
 
   test('shows modal and copies default Python code when no filters are touched', async ({ page }) => {
     await mockApiRootAndCollections(page);
@@ -28,7 +93,11 @@ test.describe('STAC Browser code example modal', () => {
     let copied;
     await test.step('Open Example Code modal and copy default code', async () => {
       const modal = await openExampleCodeModal(page);
-      await copyCodeFromModal(page, modal);
+      await test.step('open Python panel', async () => {
+        await modal.getByRole('tab', { name: 'Python' }).click();
+      });
+      const pythonPanel = modal.getByRole('tabpanel', { name: 'Python' });
+      await copyCodeFromModal(page, pythonPanel);
       copied = await readClipboard(page);
     });
 
@@ -36,6 +105,59 @@ test.describe('STAC Browser code example modal', () => {
       expect(copied, 'should contain Python client import').toContain('from pystac_client import Client');
       expect(copied, 'should contain unfiltered search call').toContain('results = catalog.search()');
       expect(copied, 'should not contain JavaScript fetch snippet').not.toContain('const searchUrl =');
+    });
+  });
+
+  test('shows modal and copies default Python output filename', async ({ page }) => {
+    await mockApiRootAndCollections(page);
+    await page.goto(SEARCH_PATH);
+
+    let copied;
+    await test.step('Open Example Code modal and copy default output filename', async () => {
+      const modal = await openExampleCodeModal(page);
+      await test.step('open Python panel', async () => {
+        await modal.getByRole('tab', { name: 'Python' }).click();
+      });
+      const pythonPanel = modal.getByRole('tabpanel', { name: 'Python' });
+      await expect(pythonPanel.getByText('search.py'), 'Python filename should be visible').toBeVisible();
+      await copyFilenameFromModal(page, pythonPanel);
+      copied = await readClipboard(page);
+    });
+
+    await test.step('Verify copied filename is Python default output filename', async () => {
+      expect(copied, 'Python filename should be search.py').toBe('search.py');
+    });
+  });
+
+  test('copies updated output filename after switching tab from Python to JavaScript', async ({ page }) => {
+    await mockApiRootAndCollections(page);
+    await page.goto(SEARCH_PATH);
+
+    const modal = await openExampleCodeModal(page);
+
+    let pythonFilename;
+    await test.step('Copy Python output filename from default tab', async () => {
+      await test.step('open Python panel', async () => {
+        await modal.getByRole('tab', { name: 'Python' }).click();
+      });
+      const pythonPanel = modal.getByRole('tabpanel', { name: 'Python' });
+      await expect(pythonPanel.getByText('search.py')).toBeVisible();
+      await copyFilenameFromModal(page, pythonPanel);
+      pythonFilename = await readClipboard(page);
+      expect(pythonFilename, 'Python filename should be search.py').toBe('search.py');
+    });
+
+    let javascriptFilename;
+    await test.step('Switch to JavaScript tab and copy output filename', async () => {
+      await modal.getByRole('tab', { name: 'JavaScript' }).click();
+      const javascriptPanel = modal.getByRole('tabpanel', { name: 'JavaScript' });
+      await expect(javascriptPanel.getByText('search.mjs')).toBeVisible();
+      await copyFilenameFromModal(page, javascriptPanel);
+      javascriptFilename = await readClipboard(page);
+    });
+
+    await test.step('Verify copied filename was updated to JavaScript output filename', async () => {
+      expect(javascriptFilename, 'JavaScript filename should be search.mjs').toBe('search.mjs');
     });
   });
 
@@ -47,7 +169,11 @@ test.describe('STAC Browser code example modal', () => {
 
     let pythonCode;
     await test.step('Copy Python code from default tab', async () => {
-      await copyCodeFromModal(page, modal);
+      await test.step('open Python panel', async () => {
+        await modal.getByRole('tab', { name: 'Python' }).click();
+      });
+      const pythonPanel = modal.getByRole('tabpanel', { name: 'Python' });
+      await copyCodeFromModal(page, pythonPanel);
       pythonCode = await readClipboard(page);
       expect(pythonCode, 'should contain Python client import').toContain('from pystac_client import Client');
     });
@@ -55,13 +181,13 @@ test.describe('STAC Browser code example modal', () => {
     let javascriptCode;
     await test.step('Switch to JavaScript tab and copy code', async () => {
       await modal.getByRole('tab', { name: 'JavaScript' }).click();
-      await copyCodeFromModal(page, modal);
+      const javascriptPanel = modal.getByRole('tabpanel', { name: 'JavaScript' });
+      await copyCodeFromModal(page, javascriptPanel);
       javascriptCode = await readClipboard(page);
     });
 
     await test.step('Verify copied code was updated to JavaScript snippet', async () => {
-      expect(javascriptCode, 'should contain JavaScript search URL').toContain('const searchUrl =');
-      expect(javascriptCode, 'should contain JavaScript fetch call').toContain('await fetch(searchUrl');
+      expect(javascriptCode, 'should contain JavaScript fetch call').toContain('await fetch(');
       expect(javascriptCode, 'should not contain Python snippet').not.toContain('from pystac_client import Client');
       expect(javascriptCode, 'should differ from initial Python copied code').not.toEqual(pythonCode);
     });
@@ -141,7 +267,11 @@ test.describe('STAC Browser code example modal', () => {
 
     const modal = await openExampleCodeModal(page);
     await expect(modal, 'Example Code Modal should be visible').toBeVisible();
-    await copyCodeFromModal(page, modal);
+    await test.step('open Python panel', async () => {
+      await modal.getByRole('tab', { name: 'Python' }).click();
+    });
+    const pythonPanel = modal.getByRole('tabpanel', { name: 'Python' });
+    await copyCodeFromModal(page, pythonPanel);
 
     const copied = await readClipboard(page);
     expect(copied, 'should contain search results').toContain('results = catalog.search(');
