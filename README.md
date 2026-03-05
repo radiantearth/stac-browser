@@ -33,6 +33,7 @@ If you care about STAC Browser and have some funds to support the future of STAC
     - [Themes](#themes)
     - [Basemaps](#basemaps)
     - [Actions](#actions)
+    - [Code Generators](#code-generators)
     - [Additional metadata fields](#additional-metadata-fields)
       - [Example](#example)
       - [Translation](#translation)
@@ -214,6 +215,12 @@ More information about how to configure and customize the basemaps can be found 
 STAC Browser has a pluggable interface to share or open assets and links with other services, which we call "actions".
 
 More information about how to add or implement actions can be found in the **[Actions documentation](docs/actions.md)**.
+
+### Code Generators
+
+The list of supported code snippet languages is configured in [`codeGenerators.config.js`](codeGenerators.config.js).
+
+For step-by-step instructions on adding or removing a language, see the **[Code Generators documentation](docs/code-generators.md)**.
 
 ### Additional metadata fields
 

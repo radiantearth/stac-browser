@@ -126,10 +126,10 @@ export const mockApiRootAndCollections = async (page) => {
 
 export const waitForMapReady = async (page) => {
   const mapViewport = page.locator(".map .ol-viewport");
-  await expect(mapViewport).toBeVisible();
+  await expect(mapViewport, 'map viewport should be visible').toBeVisible();
 
   const mapCanvas = page.locator(".map .ol-viewport canvas.ol-layer");
-  await expect(mapCanvas).toBeVisible();
+  await expect(mapCanvas, 'map canvas should be visible').toBeVisible();
 
   return mapViewport;
 };
