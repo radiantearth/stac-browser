@@ -2,9 +2,3 @@
 name = "stac-search"
 version = "0.1.0"
 edition = "2024"
-
-[dependencies]
-serde_json = "*"
-stac = "*"
-stac-io = "*"
-tokio = { version = "*", features = ["full"] }
