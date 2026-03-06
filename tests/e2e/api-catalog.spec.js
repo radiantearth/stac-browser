@@ -193,4 +193,30 @@ test.describe('API-backed catalog with configured catalogUrl', () => {
     // Should navigate to root, not /external/...
     await expect(page).toHaveURL(/\/$/);
   });
+
+  test('paginated collections are fully loaded via auto-load', async ({ page, worker }) => {
+    await mockApiRootAndCollections(worker, { collectionsPage2Fixture: 'collections-page2.json' });
+    await page.goto('/');
+    await waitForBrowserReady(page);
+
+    // The "Load more" button auto-triggers via v-visible when visible in the viewport.
+    // With few collections all pages load automatically.
+    await expect(page.locator('.catalog-card')).toHaveCount(3, { timeout: 10000 });
+    await expect(page.getByRole('link', { name: /Test Collection 1/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Test Collection 2/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Test Collection 3/i })).toBeVisible();
+  });
+
+  test('load more button disappears after all pages are loaded', async ({ page, worker }) => {
+    await mockApiRootAndCollections(worker, { collectionsPage2Fixture: 'collections-page2.json' });
+    await page.goto('/');
+    await waitForBrowserReady(page);
+
+    // Wait for all pages to auto-load
+    await expect(page.locator('.catalog-card')).toHaveCount(3, { timeout: 10000 });
+
+    // The load more button should be gone after the last page
+    const loadMoreBtn = page.getByRole('button', { name: /load more/i });
+    await expect(loadMoreBtn).not.toBeVisible();
+  });
 });
