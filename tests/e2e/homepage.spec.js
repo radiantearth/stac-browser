@@ -1,9 +1,23 @@
-import { test, expect } from '@playwright/test';
-import { HOME_PATH } from './helpers';
+/**
+ * Homepage / catalog index tests.
+ *
+ * Verifies the STAC Browser landing page: catalog list rendering, search input,
+ * navigation to a catalog, and STAC Index entry clicks.
+ *
+ * Fixtures: tests/fixtures/catalogs.json (synthetic STAC Index entries)
+ */
+import { test, expect } from './fixtures';
+import { HOME_PATH, mockStacResource } from './helpers';
+
+import catalogs from '../fixtures/catalogs.json' with { type: 'json' };
 
 test.describe('STAC Browser Homepage', () => {
+  // ensure every test uses the mocked STAC Index response
+  test.beforeEach(async ({ worker }) => {
+    await mockStacResource(worker, 'https://stacindex.org/api/catalogs', catalogs);
+  });
   test('should load the homepage successfully', async ({ page }) => {
-    // Navigate to the homepage
+    // Navigate to the homepage (STAC Index already mocked in beforeEach)
     await page.goto(HOME_PATH);
     
     // Check if the page title is visible
@@ -11,6 +25,20 @@ test.describe('STAC Browser Homepage', () => {
     
     // Verify the page loads without errors
     await expect(page).toHaveTitle(/STAC Browser/);
+
+    // confirm that the STAC index container is present and contains at least one entry
+    await page.waitForSelector('.stac-index');
+    const indexButtons = page.locator('.stac-index button');
+    const count = await indexButtons.count();
+    expect(count).toBeGreaterThan(10);
+
+    // each entry should have a title and mention either API or Catalog
+    for (let i = 0; i < count; i++) {
+      const btn = indexButtons.nth(i);
+      await expect(btn.locator('strong')).toHaveCount(1);
+      // the button text should include 'API' or 'Catalog' indicating badge
+      await expect(btn).toContainText(/API|Catalog/i);
+    }
   });
 
   test('should render language dropdown with flag icon and correct defaults', async ({ page }) => {
@@ -86,16 +114,23 @@ test.describe('STAC Browser Homepage', () => {
     await expect(errorMessage).toBeVisible();
   });
 
-  test('should navigate to catalog when valid URL is loaded', async ({ page }) => {
+  test('should navigate to catalog when valid URL is loaded', async ({ page, worker }) => {
+    const catalogUrl = 'https://planetarycomputer.microsoft.com/api/stac/v1/';
+    await mockStacResource(worker, catalogUrl, {
+      type: 'Catalog',
+      id: 'microsoft-pc',
+      title: 'Microsoft Planetary Computer STAC API',
+      description: 'Mock catalog for testing navigation.',
+      stac_version: '1.0.0',
+      links: [{ rel: 'self', href: catalogUrl, type: 'application/json' }],
+    });
+
     await page.goto(HOME_PATH);
     
     const input = page.getByRole('textbox', { name: /please specify a stac catalog or api/i });
     const loadButton = page.getByRole('button', { name: /^load$/i });
     
-    // Type the Planetary Computer STAC API URL
-    await input.fill('https://planetarycomputer.microsoft.com/api/stac/v1/');
-    
-    // Click the Load button
+    await input.fill(catalogUrl);
     await loadButton.click();
     
     // Wait for navigation and verify the catalog title appears as h1 heading
@@ -104,5 +139,42 @@ test.describe('STAC Browser Homepage', () => {
     
     // Verify the page title changed
     await expect(page).toHaveTitle(/microsoft planetary computer stac api/i);
+  });
+
+  test('clicking a STAC index entry populates url and navigates', async ({ page, worker }) => {
+    const expectedUrl = catalogs[0].url;
+    await mockStacResource(worker, expectedUrl, {
+      type: 'Catalog',
+      id: 'stac-index-first',
+      title: catalogs[0].title,
+      description: 'Mock catalog for the first STAC index entry.',
+      stac_version: '1.0.0',
+      links: [{ rel: 'self', href: expectedUrl, type: 'application/json' }],
+    });
+
+    await page.goto(HOME_PATH);
+    await page.waitForSelector('.stac-index');
+    const firstBtn = page.locator('.stac-index button').first();
+    await firstBtn.click();
+
+    // input should be filled
+    const input = page.getByRole('textbox', { name: /please specify a stac catalog or api/i });
+    await expect(input).toHaveValue(expectedUrl);
+    // navigation should change URL to include host from expectedUrl
+    const urlObj = new URL(expectedUrl);
+    await expect(page).toHaveURL(new RegExp(`\/external\/${urlObj.host}`));
+  });
+
+  test('language switch persists across navigation', async ({ page }) => {
+    await page.goto(HOME_PATH);
+    const languageButton = page.getByRole('button', { name: /language/i });
+    await languageButton.click();
+    const spanish = page.getByText(/español/i);
+    await spanish.click();
+    // verify label changed (load button text in Spanish via translation key)
+    await expect(page.getByRole('button', { name: /cargar|cargar/i })).toBeVisible();
+    // navigate away and back
+    await page.goto(HOME_PATH);
+    await expect(page.getByRole('button', { name: /cargar|cargar/i })).toBeVisible();
   });
 });

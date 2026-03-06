@@ -1,181 +1,380 @@
-import { expect } from "@playwright/test";
+/**
+ * E2E test helpers for STAC Browser.
+ *
+ * All HTTP mocking is driven by **MSW (Mock Service Worker)** handlers.
+ * Handler-building functions return arrays of MSW `http.*` request handlers.
+ * Mocking helpers accept a `worker` fixture (from playwright-msw) and call
+ * `worker.use()` to install handlers for the current test.
+ *
+ * Navigation / assertion helpers still accept a Playwright `page` object.
+ */
 
-export const HOME_PATH = "/";
-export const SEARCH_PATH = "/search/external/earth-search.aws.test.com/v1?.language=en";
+import { expect } from '@playwright/test';
+import { http, HttpResponse } from 'msw';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
 
-const SEARCH_API_URL = "https://earth-search.aws.test.com/v1/search";
+// ─── Fixture loading ─────────────────────────────────────────────────────────
 
-const API_ROOT_URL = "https://earth-search.aws.test.com/v1";
-const API_COLLECTIONS_URL = "https://earth-search.aws.test.com/v1/collections";
+const FIXTURES_ROOT = path.resolve(
+  fileURLToPath(new URL('../fixtures/catalogs/', import.meta.url)),
+);
 
-// todo: Move STAC documents to separate files
-const API_ROOT_FIXTURE = {
-  stac_version: "1.0.0",
-  id: "test-api",
-  title: "Test API",
-  description: "Test API root",
-  conformsTo: [
-    "https://api.stacspec.org/v1.0.0/item-search",
-    "https://api.stacspec.org/v1.0.0/item-search#sort",
-    "https://api.stacspec.org/v1.0.0/collection-search",
-  ],
-  links: [
-    {
-      rel: "self",
-      type: "application/json",
-      href: API_ROOT_URL,
-    },
-    {
-      rel: "search",
-      type: "application/geo+json",
-      href: SEARCH_API_URL,
-      method: "POST",
-    },
-    {
-      rel: "collections",
-      type: "application/json",
-      href: API_COLLECTIONS_URL,
-    },
-  ],
-};
+/**
+ * Load and parse a JSON fixture file from tests/fixtures/catalogs/<folder>/...
+ *
+ * @param {string} folderName  – subfolder under fixtures/catalogs/
+ * @param {...string} fileParts – path segments within the folder (e.g. 'eo-collection', 'item-2025-001.json')
+ * @returns {object} parsed JSON
+ */
+export function loadFixture(folderName, ...fileParts) {
+  return JSON.parse(
+    fs.readFileSync(path.join(FIXTURES_ROOT, folderName, ...fileParts), 'utf8'),
+  );
+}
 
-const API_COLLECTIONS_FIXTURE = {
-  collections: [
-    {
-      type: "Collection",
-      id: "test-collection-1",
-      title: "Test Collection 1",
-      description: "Test collection 1",
-      stac_version: "1.0.0",
-      extent: {
-        spatial: { bbox: [[-180, -90, 180, 90]] },
-        temporal: { interval: [["2020-01-01T00:00:00Z", null]] },
-      },
-      links: [
-        {
-          rel: "self",
-          type: "application/json",
-          href: `${API_COLLECTIONS_URL}/test-collection-1`,
-        },
-      ],
-    },
-    {
-      type: "Collection",
-      id: "test-collection-2",
-      title: "Test Collection 2",
-      description: "Test collection 2",
-      stac_version: "1.0.0",
-      extent: {
-        spatial: { bbox: [[-10, -10, 10, 10]] },
-        temporal: { interval: [["2021-01-01T00:00:00Z", null]] },
-      },
-      links: [
-        {
-          rel: "self",
-          type: "application/json",
-          href: `${API_COLLECTIONS_URL}/test-collection-2`,
-        },
-      ],
-    },
-  ],
-  links: [
-    {
-      rel: "self",
-      type: "application/json",
-      href: API_COLLECTIONS_URL,
-    },
-    {
-      rel: "root",
-      type: "application/json",
-      href: API_ROOT_URL,
-    },
-  ],
-  context: {
-    page: 1,
-    limit: 2,
-    matched: 2,
-    returned: 2,
-  },
-};
+// ─── Constants ───────────────────────────────────────────────────────────────
 
-export const mockApiRootAndCollections = async (page) => {
-  await page.route(API_ROOT_URL, async (route, request) => {
-    if (request.method() === "GET") {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify(API_ROOT_FIXTURE),
-      });
-      return;
-    }
-    await route.continue();
-  });
+export const HOME_PATH = '/';
 
-  await page.route(API_COLLECTIONS_URL, async (route, request) => {
-    if (request.method() === "GET") {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify(API_COLLECTIONS_FIXTURE),
-      });
-      return;
-    }
-    await route.continue();
-  });
-};
+const DEFAULT_API_URL = 'https://example.com/api';
 
-export const waitForMapReady = async (page) => {
-  const mapViewport = page.locator(".map .ol-viewport");
-  await expect(mapViewport).toBeVisible();
+// Search page path when running without a configured catalogUrl (external mode).
+export const SEARCH_PATH = `/search/external/${new URL(DEFAULT_API_URL).host}${new URL(DEFAULT_API_URL).pathname}`;
 
-  const mapCanvas = page.locator(".map .ol-viewport canvas.ol-layer");
-  await expect(mapCanvas).toBeVisible();
+// ─── Convenience: single-resource helpers ───────────────────────────────────
 
-  return mapViewport;
-};
-
-export const waitForBboxInputsPopulated = async (page) => {
-  const westLonInput = page.getByLabel(/west longitude/i);
-  const southLatInput = page.getByLabel(/south latitude/i);
-  const eastLonInput = page.getByLabel(/east longitude/i);
-  const northLatInput = page.getByLabel(/north latitude/i);
-
-  await expect(westLonInput).not.toHaveValue("");
-  await expect(southLatInput).not.toHaveValue("");
-  await expect(eastLonInput).not.toHaveValue("");
-  await expect(northLatInput).not.toHaveValue("");
-
-  return { westLonInput, southLatInput, eastLonInput, northLatInput };
-};
-
-export const waitForSearchPost = async (page, responseBody = null) => {
-  let handler;
-  const requestPromise = new Promise((resolve) => {
-    handler = async (route) => {
-      const request = route.request();
-      if (request.method() === "POST") {
-        resolve({
-          request,
-          body: request.postDataJSON(),
-        });
-        await route.fulfill({
-          status: 200,
-          contentType: "application/json",
-          body: JSON.stringify(
-            responseBody || {
-              type: "FeatureCollection",
-              features: [],
-              links: [],
-            },
-          ),
-        });
-        await page.unroute(SEARCH_API_URL, handler);
-        return;
+/**
+ * Register a single mock resource via MSW.
+ *
+ * @param {import('playwright-msw').MockServiceWorker} worker
+ * @param {string} url – exact URL to intercept
+ * @param {object} mockData – JSON response body
+ * @param {object} [options]
+ */
+export async function mockStacResource(worker, url, mockData, options = {}) {
+  const status = options.status ?? 200;
+  const delay = options.delay ?? 0;
+  await worker.use(
+    http.all(url, async () => {
+      if (delay > 0) {
+        await new Promise(resolve => setTimeout(resolve, delay));
       }
-      await route.continue();
-    };
-  });
+      return HttpResponse.json(mockData, { status });
+    }),
+  );
+}
 
-  await page.route(SEARCH_API_URL, handler);
-  return requestPromise;
-};
+/**
+ * Register an error response for a URL via MSW.
+ *
+ * @param {import('playwright-msw').MockServiceWorker} worker
+ * @param {string} url – exact URL to intercept
+ * @param {number} [status=404]
+ * @param {string} [message='Not Found']
+ */
+export async function mockStacError(worker, url, status = 404, message = 'Not Found') {
+  await worker.use(
+    http.all(url, () => {
+      return HttpResponse.json(
+        { code: status, description: message },
+        { status },
+      );
+    }),
+  );
+}
+
+// ─── Static catalog handlers ────────────────────────────────────────────────
+
+/**
+ * Build MSW request handlers for every JSON file in a fixture folder.
+ *
+ * The folder is located under tests/fixtures/catalogs/<name>.
+ * Each JSON file's `self` link is used as the URL to intercept.
+ *
+ * @param {string} folderName  – subfolder under fixtures/catalogs/
+ * @param {string} catalogUrl  – the external URL the root catalog is served at
+ * @returns {Array<import('msw').RequestHandler>}
+ */
+export function staticCatalogHandlers(folderName, catalogUrl) {
+  const fixturesRoot = path.resolve(
+    fileURLToPath(new URL('../fixtures/catalogs/', import.meta.url)),
+  );
+  const base = path.join(fixturesRoot, folderName);
+
+  function findJsonFiles(dir) {
+    const results = [];
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        results.push(...findJsonFiles(full));
+      } else if (entry.name.endsWith('.json')) {
+        results.push(full);
+      }
+    }
+    return results;
+  }
+
+  const handlers = [];
+
+  // Root catalog handler (matched by catalogUrl)
+  const catalog = JSON.parse(fs.readFileSync(path.join(base, 'catalog.json'), 'utf8'));
+  handlers.push(http.get(catalogUrl, () => HttpResponse.json(catalog)));
+
+  // Every other fixture file matched by its self link
+  for (const file of findJsonFiles(base)) {
+    const data = JSON.parse(fs.readFileSync(file, 'utf8'));
+    const selfLink = (data.links || []).find(l => l.rel === 'self');
+    if (selfLink && selfLink.href !== catalogUrl) {
+      const href = selfLink.href;
+      const body = data;
+      handlers.push(http.get(href, () => HttpResponse.json(body)));
+    }
+  }
+
+  return handlers;
+}
+
+/**
+ * Register all static catalog handlers via MSW.
+ *
+ * @param {import('playwright-msw').MockServiceWorker} worker
+ * @param {string} folderName – subfolder under fixtures/catalogs/
+ * @param {string} catalogUrl – the external URL the root catalog is served at
+ */
+export async function mockCatalogByFolder(worker, folderName, catalogUrl) {
+  const handlers = staticCatalogHandlers(folderName, catalogUrl);
+  await worker.use(...handlers);
+}
+
+// ─── STAC Index handlers ────────────────────────────────────────────────────
+
+/**
+ * Build an MSW handler for the STAC Index API used on the homepage.
+ * Reads tests/fixtures/catalogs.json.
+ *
+ * @returns {Array<import('msw').RequestHandler>}
+ */
+export function stacIndexHandlers() {
+  const file = path.resolve(
+    fileURLToPath(new URL('../fixtures/catalogs.json', import.meta.url)),
+  );
+  const catalogs = JSON.parse(fs.readFileSync(file, 'utf8'));
+  return [http.get('https://stacindex.org/api/catalogs', () => HttpResponse.json(catalogs))];
+}
+
+// ─── STAC API root + collections handlers (for search page) ─────────────────
+
+/**
+ * Build MSW handlers for a STAC API root, collections, and search endpoints.
+ *
+ * Loads fixture data from tests/fixtures/api/ and wires each file to the
+ * correct URL.  The fixtures use DEFAULT_API_URL; if a different baseUrl is
+ * provided, all URLs in the fixtures are rewritten accordingly.
+ *
+ * @param {object} [options]
+ * @param {string} [options.baseUrl] – origin URL for the mock API
+ * @param {string} [options.searchFixture] – filename in fixtures/api/ for POST /search
+ * @returns {Array<import('msw').RequestHandler>}
+ */
+export function apiRootHandlers({
+  baseUrl = DEFAULT_API_URL, 
+  searchFixture = 'search-empty.json',
+  rootFixture = 'root.json',
+  collectionsFixture = 'collections.json',
+  collectionsPage2Fixture = null,
+} = {}) {
+  const fixtureDir = path.resolve(
+    fileURLToPath(new URL('../fixtures/api/', import.meta.url)),
+  );
+  const root = JSON.parse(fs.readFileSync(path.join(fixtureDir, rootFixture), 'utf8'));
+  const collections = JSON.parse(fs.readFileSync(path.join(fixtureDir, collectionsFixture), 'utf8'));
+  const searchResult = JSON.parse(fs.readFileSync(path.join(fixtureDir, searchFixture), 'utf8'));
+
+  // If a custom baseUrl is provided, rewrite all URLs in the fixtures
+  const rewrite = (obj) =>
+    baseUrl !== DEFAULT_API_URL
+      ? JSON.parse(JSON.stringify(obj).replaceAll(DEFAULT_API_URL, baseUrl))
+      : obj;
+
+  const handlers = [
+    http.get(baseUrl, () => HttpResponse.json(rewrite(root))),
+    http.post(`${baseUrl}/search`, () => HttpResponse.json(rewrite(searchResult))),
+  ];
+
+  if (collectionsPage2Fixture) {
+    const page2 = JSON.parse(fs.readFileSync(path.join(fixtureDir, collectionsPage2Fixture), 'utf8'));
+    // Dynamically inject a "next" link into the first-page response
+    const collectionsWithNext = JSON.parse(JSON.stringify(collections));
+    collectionsWithNext.links.push({
+      rel: 'next',
+      href: `${DEFAULT_API_URL}/collections?cursor=page2`,
+      type: 'application/json',
+    });
+    handlers.push(
+      http.get(`${baseUrl}/collections`, ({ request }) => {
+        const url = new URL(request.url);
+        if (url.searchParams.get('cursor') === 'page2') {
+          return HttpResponse.json(rewrite(page2));
+        }
+        return HttpResponse.json(rewrite(collectionsWithNext));
+      }),
+    );
+  } else {
+    handlers.push(
+      http.get(`${baseUrl}/collections`, () => HttpResponse.json(rewrite(collections))),
+    );
+  }
+
+  return handlers;
+}
+
+/**
+ * Register API root + collections + search handlers via MSW.
+ *
+ * @param {import('playwright-msw').MockServiceWorker} worker
+ * @param {object} [options]
+ */
+export async function mockApiRootAndCollections(worker, options = {}) {
+  const handlers = apiRootHandlers(options);
+  await worker.use(...handlers);
+}
+
+/**
+ * Load an API fixture file from tests/fixtures/api/.
+ *
+ * @param {string} filename – JSON file name inside fixtures/api/
+ * @returns {object} parsed JSON
+ */
+export function loadApiFixture(filename) {
+  const fixtureDir = path.resolve(
+    fileURLToPath(new URL('../fixtures/api/', import.meta.url)),
+  );
+  return JSON.parse(fs.readFileSync(path.join(fixtureDir, filename), 'utf8'));
+}
+
+/**
+ * Register handlers for browsing an API-backed collection.
+ *
+ * Mocks the full API: root, /collections, /search, plus the individual
+ * collection endpoint and its /items endpoint (with optional pagination).
+ *
+ * @param {import('playwright-msw').MockServiceWorker} worker
+ * @param {object} [options]
+ * @param {string} [options.baseUrl] – API base URL
+ * @param {string} [options.collectionId] – collection ID to mock
+ * @param {string} [options.collectionFixture] – fixture filename for the collection
+ * @param {string} [options.itemsFixture] – fixture filename for the items response
+ * @param {string} [options.itemsPage2Fixture] – optional fixture for page 2
+ */
+export async function mockApiCollection(worker, {
+  baseUrl = DEFAULT_API_URL,
+  collectionId = 'test-collection-1',
+  collectionFixture = 'collection-1.json',
+  itemsFixture = 'collection-1-items.json',
+  itemsPage2Fixture = null,
+} = {}) {
+  // Register root + collections + search
+  await mockApiRootAndCollections(worker, { baseUrl });
+
+  const collection = loadApiFixture(collectionFixture);
+  const items = loadApiFixture(itemsFixture);
+
+  const handlers = [
+    http.get(`${baseUrl}/collections/${collectionId}`, () => HttpResponse.json(collection)),
+  ];
+
+  // Items handler — checks query params for pagination
+  if (itemsPage2Fixture) {
+    const page2 = loadApiFixture(itemsPage2Fixture);
+    handlers.push(
+      http.get(`${baseUrl}/collections/${collectionId}/items`, ({ request }) => {
+        const url = new URL(request.url);
+        if (url.searchParams.get('cursor') === 'page2') {
+          return HttpResponse.json(page2);
+        }
+        return HttpResponse.json(items);
+      }),
+    );
+  } else {
+    handlers.push(
+      http.get(`${baseUrl}/collections/${collectionId}/items`, () => HttpResponse.json(items)),
+    );
+  }
+
+  await worker.use(...handlers);
+}
+
+// ─── Navigation helpers ─────────────────────────────────────────────────────
+
+/**
+ * Navigate to a catalog and wait for it to load.
+ *
+ * @param {import('@playwright/test').Page} page
+ * @param {import('playwright-msw').MockServiceWorker} worker
+ * @param {object} catalogData
+ * @param {string} [catalogUrl]
+ */
+export async function loadMockCatalog(page, worker, catalogData, catalogUrl = 'https://example.com/catalog.json') {
+  // Ensure the catalog URL is mocked
+  await mockStacResource(worker, catalogUrl, catalogData);
+
+  // Convert URL to browser path
+  const url = new URL(catalogUrl);
+  const protocol = url.protocol !== 'https:' ? url.protocol : '';
+  const protocolPart = protocol ? `/${protocol}` : '';
+  const browserPath = `/external${protocolPart}/${url.host}${url.pathname}${url.search}`;
+
+  await page.goto(browserPath);
+  await waitForBrowserReady(page);
+}
+
+/**
+ * Wait for STAC Browser to finish loading.
+ */
+export async function waitForBrowserReady(page) {
+  await page.waitForSelector('.loading', { state: 'hidden', timeout: 10000 }).catch(() => {
+    // Loading indicator might not appear for fast loads
+  });
+  await page.waitForSelector('main, .browse, .catalog, .item', { timeout: 10000 });
+}
+
+// ─── Search-page helpers ────────────────────────────────────────────────────
+
+/**
+ * Wait for the OpenLayers map to be interactive on the search page.
+ * Returns the map container locator for clicking.
+ */
+export async function waitForMapReady(page) {
+  const mapContainer = page.locator('.map-container .map');
+  await mapContainer.waitFor({ state: 'visible', timeout: 10000 });
+  await mapContainer.locator('.ol-viewport').waitFor({ state: 'attached', timeout: 10000 });
+  return mapContainer;
+}
+
+/**
+ * Wait until the bounding-box coordinate inputs have been auto-populated
+ * (i.e. all four fields are non-empty).
+ */
+export async function waitForBboxInputsPopulated(page) {
+  const labels = [/west longitude/i, /south latitude/i, /east longitude/i, /north latitude/i];
+  for (const label of labels) {
+    const input = page.getByLabel(label);
+    await expect(input).not.toHaveValue('', { timeout: 10000 });
+  }
+}
+
+/**
+ * Wait for the next POST /search request and return its parsed body.
+ * Call this *before* the action that triggers the search.
+ *
+ * Uses `page.waitForRequest` which fires at the CDP level — it sees the
+ * request even when MSW's service worker intercepts it before the network.
+ */
+export async function waitForSearchPost(page) {
+  const request = await page.waitForRequest(
+    req => req.method() === 'POST' && req.url().includes('/search'),
+  );
+  return { body: JSON.parse(request.postData() || '{}'), url: request.url() };
+}

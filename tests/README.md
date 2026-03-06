@@ -1,45 +1,37 @@
-# E2E Tests with Playwright
+# E2E Tests
 
-This directory contains end-to-end tests for STAC Browser using Playwright.
+End-to-end tests for STAC Browser using [Playwright](https://playwright.dev). All tests run against mock data — no real network calls.
 
-## Running Tests
+## Running
 
 ```bash
-# Run all tests
-npm test
-
-# Run UI tests in UI mode (interactive)
-npm run test:e2e:ui
-
-# Run UI tests in headed mode (see browser)
-npm run test:e2e:headed
-
-# Debug UI tests
-npm run test:e2e:debug
-
-# View UI test report
-npm run test:e2e:report
+npm run test:e2e            # all tests
+npm run test:e2e:ui         # interactive UI mode
+npm run test:e2e:headed     # headed browser
+npm run test:e2e:debug      # with Playwright Inspector
+npm run test:e2e:report     # view HTML report
+npx playwright test catalog.spec.js          # single file
+npx playwright test --grep "map click"       # by name
 ```
 
-## Writing Tests
+## Helpers (`helpers.js`)
 
-Tests are located in the `tests/e2e` directory and follow the naming convention `*.spec.js`.
+HTTP mocking is driven by **handler objects** — plain descriptors registered via `registerHandlers(page, handlers)`. Convenience functions build handler arrays from fixtures or inline data.
 
-Example test structure:
+| Function | Purpose |
+|---|---|
+| `registerHandlers(page, handlers)` | Install an array of `{ url, method?, status?, body }` route handlers |
+| `mockCatalogByFolder(page, catalogUrl)` | Mock all JSON files in a fixture folder (matched by `self` links) |
+| `mockApiRootAndCollections(page)` | Mock a STAC API root + `/collections` + `/search` (for search page tests) |
+| `loadMockCatalog(page, data, url)` | Navigate to a mocked catalog and wait for readiness |
+| `mockStacResource(page, url, data)` | Mock a single URL |
+| `mockStacError(page, url, status)` | Mock an error response |
+| `waitForBrowserReady(page)` | Wait for loading indicators to clear |
+| `waitForMapReady(page)` | Wait for the OpenLayers map to render |
+| `waitForSearchPost(page)` | Capture the next `POST /search` request body |
 
-```javascript
-import { test, expect } from '@playwright/test';
+## Fixtures
 
-test.describe('Feature Name', () => {
-  test('should do something', async ({ page }) => {
-    await page.goto('/');
-    // Add test assertions
-  });
-});
-```
+Static catalog fixtures live in `tests/fixtures/catalogs/<name>/`. Each JSON file must have a `self` link — `mockCatalogByFolder` uses these to register route handlers automatically.
 
-## Resources
-
-- [Playwright Documentation](https://playwright.dev/docs/intro)
-- [Best Practices](https://playwright.dev/docs/best-practices)
-- [Locators](https://playwright.dev/docs/locators)
+Search page fixtures live in `tests/fixtures/api/` (root, collections, search responses) and are loaded by `apiRootHandlers()` in `helpers.js`.
