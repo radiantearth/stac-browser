@@ -178,12 +178,18 @@ export function stacIndexHandlers() {
  * @param {string} [options.searchFixture] – filename in fixtures/api/ for POST /search
  * @returns {Array<import('msw').RequestHandler>}
  */
-export function apiRootHandlers({ baseUrl = DEFAULT_API_URL, searchFixture = 'search-empty.json' } = {}) {
+export function apiRootHandlers({
+  baseUrl = DEFAULT_API_URL, 
+  searchFixture = 'search-empty.json',
+  rootFixture = 'root.json',
+  collectionsFixture = 'collections.json',
+  collectionsPage2Fixture = null,
+} = {}) {
   const fixtureDir = path.resolve(
     fileURLToPath(new URL('../fixtures/api/', import.meta.url)),
   );
-  const root = JSON.parse(fs.readFileSync(path.join(fixtureDir, 'root.json'), 'utf8'));
-  const collections = JSON.parse(fs.readFileSync(path.join(fixtureDir, 'collections.json'), 'utf8'));
+  const root = JSON.parse(fs.readFileSync(path.join(fixtureDir, rootFixture), 'utf8'));
+  const collections = JSON.parse(fs.readFileSync(path.join(fixtureDir, collectionsFixture), 'utf8'));
   const searchResult = JSON.parse(fs.readFileSync(path.join(fixtureDir, searchFixture), 'utf8'));
 
   // If a custom baseUrl is provided, rewrite all URLs in the fixtures
@@ -192,11 +198,36 @@ export function apiRootHandlers({ baseUrl = DEFAULT_API_URL, searchFixture = 'se
       ? JSON.parse(JSON.stringify(obj).replaceAll(DEFAULT_API_URL, baseUrl))
       : obj;
 
-  return [
+  const handlers = [
     http.get(baseUrl, () => HttpResponse.json(rewrite(root))),
-    http.get(`${baseUrl}/collections`, () => HttpResponse.json(rewrite(collections))),
     http.post(`${baseUrl}/search`, () => HttpResponse.json(rewrite(searchResult))),
   ];
+
+  if (collectionsPage2Fixture) {
+    const page2 = JSON.parse(fs.readFileSync(path.join(fixtureDir, collectionsPage2Fixture), 'utf8'));
+    // Dynamically inject a "next" link into the first-page response
+    const collectionsWithNext = JSON.parse(JSON.stringify(collections));
+    collectionsWithNext.links.push({
+      rel: 'next',
+      href: `${DEFAULT_API_URL}/collections?cursor=page2`,
+      type: 'application/json',
+    });
+    handlers.push(
+      http.get(`${baseUrl}/collections`, ({ request }) => {
+        const url = new URL(request.url);
+        if (url.searchParams.get('cursor') === 'page2') {
+          return HttpResponse.json(rewrite(page2));
+        }
+        return HttpResponse.json(rewrite(collectionsWithNext));
+      }),
+    );
+  } else {
+    handlers.push(
+      http.get(`${baseUrl}/collections`, () => HttpResponse.json(rewrite(collections))),
+    );
+  }
+
+  return handlers;
 }
 
 /**
