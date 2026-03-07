@@ -12,7 +12,9 @@ import { test, expect } from './fixtures';
 import {
   SEARCH_PATH,
   mockApiRootAndCollections,
+  mockApiRootAndSearch,
   waitForMapReady,
+  waitForPageReady,
   waitForBboxInputsPopulated,
   waitForSearchPost
 } from './helpers';
@@ -31,10 +33,10 @@ const fillBboxInputs = async (page, values) => {
   const eastLonInput = page.getByLabel(/east longitude/i);
   const northLatInput = page.getByLabel(/north latitude/i);
 
-  if (values.westLon != null) await westLonInput.fill(values.westLon);
-  if (values.southLat != null) await southLatInput.fill(values.southLat);
-  if (values.eastLon != null) await eastLonInput.fill(values.eastLon);
-  if (values.northLat != null) await northLatInput.fill(values.northLat);
+  if (values.westLon != null) {await westLonInput.fill(values.westLon);}
+  if (values.southLat != null) {await southLatInput.fill(values.southLat);}
+  if (values.eastLon != null) {await eastLonInput.fill(values.eastLon);}
+  if (values.northLat != null) {await northLatInput.fill(values.northLat);}
 };
 
 test.describe('STAC Browser Search page', () => {
@@ -436,6 +438,77 @@ test.describe('STAC Browser Search page', () => {
       await page.getByRole('button', { name: /submit/i }).click();
       const { body } = await requestPromise;
       expect(body).toEqual({});
+    });
+  });
+
+  test('search with item limit should return pages with limited number of items', async ({ page, worker }) => {
+    await mockApiRootAndSearch(worker);
+    await page.goto(SEARCH_PATH);
+
+    await test.step('Set limit of 3 items per', async () => {
+      const limitInput = page.getByLabel(/items per page/i);
+      await limitInput.fill('3');
+    });
+
+    await test.step('Submit search and verify the returned list is limited to 3 items', async () => {
+      const submitButton = page.getByRole('button', { name: /submit/i });
+      await submitButton.click();
+
+      await waitForMapReady(page);
+
+      const resultList = await page.locator('.card-grid').locator('a.stac-link').count();
+      expect(resultList).toBe(3);
+    });
+
+    await test.step('Next-buttons should navigate to the next page', async () => {
+      const nextButton = page.getByRole('button').filter({ hasText: 'Next'}).first();
+      //get hrefs of existing items on page 1
+      const itemLinks = page.locator('.card-grid').locator('a.stac-link');
+      const firstPageHrefs = await itemLinks.evaluateAll(links => links.map(link => link.getAttribute('href')));
+      
+      await nextButton.click();
+
+      await waitForPageReady(page);
+
+      //get hrefs of items on page 2
+      const secondPageHrefs = await itemLinks.evaluateAll(links => links.map(link => link.getAttribute('href')));
+
+      //expect the hrefs on page 2 to be different than page 1
+      expect(secondPageHrefs).toHaveLength(3);
+      expect(secondPageHrefs[0]).not.toBe(firstPageHrefs[0]);
+      expect(secondPageHrefs[1]).not.toBe(firstPageHrefs[1]);
+      expect(secondPageHrefs[2]).not.toBe(firstPageHrefs[2]);
+    });
+  });
+
+  test('search with optional links should show the according buttons', async ({ page, worker }) => {
+    await mockApiRootAndSearch(worker, {limit:10, page:1, prev: true, first: true, last:true});
+    await page.goto(SEARCH_PATH);
+
+    const limitInput = page.getByLabel(/items per page/i);
+    await limitInput.fill('3');
+    
+    await test.step('Submit search and verify last button', async () => {
+      const submitButton = page.getByRole('button', { name: /submit/i });
+      await submitButton.click();
+
+      await waitForPageReady(page);
+
+      const lastButton = await page.getByRole('button').filter({ hasText: 'Last'}).first();
+      
+      expect(await lastButton.count()).toBe(1);
+    });
+
+    await test.step('Go to last and check previous, first', async () => {
+      const lastButton = await page.getByRole('button').filter({ hasText: 'Last'}).first();
+      await lastButton.click();
+      await waitForPageReady(page);
+
+      const prevButton = await page.getByRole('button').filter({ hasText: 'Previous'}).first();
+      const firstButton = await page.getByRole('button').filter({ hasText: 'First'}).first();
+
+      expect(await prevButton.isDisabled()).toBeFalsy();
+      expect(await firstButton.isDisabled()).toBeFalsy();
     });
   });
 });

@@ -1,0 +1,11 @@
+{
+    "type": "FeatureCollection",
+    "features": [],
+    "links": [
+        {
+            "rel": "root",
+            "href": "https://example.com/",
+            "type": "application/json"
+        }
+    ]
+}
