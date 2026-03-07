@@ -460,7 +460,8 @@ test.describe('STAC Browser Search page', () => {
   });
 
   test('Search results can be paginated with Next and Previous buttons', async ({ page, worker }) => {
-    await mockApiRootAndPaginatedSearch(worker);
+    //await mockApiRootAndSearch(worker, {limit:3, page:1, prev: true, first: true, last:true});
+    await mockApiRootAndPaginatedSearch(worker)
     await page.goto(SEARCH_PATH);
 
     const itemCards = page.locator('.item-card');
@@ -477,9 +478,9 @@ test.describe('STAC Browser Search page', () => {
       await expect(prevButton).toBeDisabled();
     });
 
-    await test.step('Click Next and verify second page shows 2 items', async () => {
+    await test.step('Click Next and verify second page shows 3 items', async () => {
       await nextButton.click();
-      await expect(itemCards).toHaveCount(2, { timeout: 10000 });
+      await expect(itemCards).toHaveCount(3, { timeout: 10000 });
     });
 
     await test.step('Both Next and Previous are enabled on middle page', async () => {
@@ -487,9 +488,9 @@ test.describe('STAC Browser Search page', () => {
       await expect(prevButton).toBeEnabled();
     });
 
-    await test.step('Click Next and verify third page shows 2 items', async () => {
+    await test.step('Click Next and verify third page shows 3 items', async () => {
       await nextButton.click();
-      await expect(itemCards).toHaveCount(2, { timeout: 10000 });
+      await expect(itemCards).toHaveCount(3, { timeout: 10000 });
     });
 
     await test.step('Previous is enabled, Next is disabled on last page', async () => {
@@ -576,21 +577,21 @@ test.describe('STAC Browser Search page', () => {
 
       await waitForPageReady(page);
 
-      const lastButton = await page.getByRole('button').filter({ hasText: 'Last'}).first()
+      const lastButton = await page.getByRole('button').filter({ hasText: 'Last'}).first();
       
-      expect(await lastButton.count()).toBe(1)
+      expect(await lastButton.count()).toBe(1);
     });
 
     await test.step('Go to last and check previous, first', async () => {
-      const lastButton = await page.getByRole('button').filter({ hasText: 'Last'}).first()
+      const lastButton = await page.getByRole('button').filter({ hasText: 'Last'}).first();
       await lastButton.click();
       await waitForPageReady(page);
 
-      const prevButton = await page.getByRole('button').filter({ hasText: 'Previous'}).first()
-      const firstButton = await page.getByRole('button').filter({ hasText: 'First'}).first()
+      const prevButton = await page.getByRole('button').filter({ hasText: 'Previous'}).first();
+      const firstButton = await page.getByRole('button').filter({ hasText: 'First'}).first();
 
-      expect(await prevButton.isDisabled()).toBeFalsy()
-      expect(await firstButton.isDisabled()).toBeFalsy()
+      expect(await prevButton.isDisabled()).toBeFalsy();
+      expect(await firstButton.isDisabled()).toBeFalsy();
     });
   });
 });
