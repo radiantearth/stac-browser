@@ -350,11 +350,11 @@ export function paginationRootHandlers(
   return [
     http.get(baseUrl, () => HttpResponse.json(rewrite(root))),
     http.get(`${baseUrl}/collections`, () => { 
-      const result = rewrite(collections)
-      return HttpResponse.json(result)
+      const result = rewrite(collections);
+      return HttpResponse.json(result);
     }),
     http.get(`${baseUrl}/search`, ({ request }) => {
-      const url = new URL(request.url)
+      const url = new URL(request.url);
 
       limit = parseInt(url.searchParams.get('limit')) || limit;
       page = parseInt(url.searchParams.get('page')) || page;
@@ -362,7 +362,7 @@ export function paginationRootHandlers(
       return HttpResponse.json(rewrite(searchResult));
     }),
     http.post(`${baseUrl}/search`, async ({ request }) => {
-      const post = await request.json()
+      const post = await request.json();
       limit = parseInt(post.limit) || limit;
       page = parseInt(post.page) || page;
       const searchResult = paginatedSearchHandler(baseUrl, limit, page, prev, first, last);
@@ -392,43 +392,43 @@ export function paginatedSearchHandler(
     fileURLToPath(new URL('../fixtures/api/', import.meta.url)),
   );
   // generate page
-  let items = JSON.parse(fs.readFileSync(path.join(fixtureDir, '/search-paginated/items.json'), 'utf8'))
-  const itemsLength = items.length
-  const currentIndex = (pageNumber-1) * limit
-  items = items.slice(currentIndex, currentIndex + limit)
+  let items = JSON.parse(fs.readFileSync(path.join(fixtureDir, '/search-paginated/items.json'), 'utf8'));
+  const itemsLength = items.length;
+  const currentIndex = (pageNumber-1) * limit;
+  items = items.slice(currentIndex, currentIndex + limit);
 
   // prepare fixture
-  let page = JSON.parse(fs.readFileSync(path.join(fixtureDir, '/search-paginated/page.json'), 'utf8'))
-  page.features = items
-  const linkFixture = JSON.parse(fs.readFileSync(path.join(fixtureDir, '/search-paginated/link.json'), 'utf8'))
+  let page = JSON.parse(fs.readFileSync(path.join(fixtureDir, '/search-paginated/page.json'), 'utf8'));
+  page.features = items;
+  const linkFixture = JSON.parse(fs.readFileSync(path.join(fixtureDir, '/search-paginated/link.json'), 'utf8'));
   
   //add links
   if((currentIndex + limit) < itemsLength){ //check if next pages exist
-    let nextLink = structuredClone(linkFixture)
-    nextLink.rel = 'next'
-    nextLink.href = `${baseUrl}/search?page=${pageNumber + 1}&limit=${limit}`
-    page.links.push(nextLink)
+    let nextLink = structuredClone(linkFixture);
+    nextLink.rel = 'next';
+    nextLink.href = `${baseUrl}/search?page=${pageNumber + 1}&limit=${limit}`;
+    page.links.push(nextLink);
   }
   if (prev && pageNumber > 1){
-    let prevLink = structuredClone(linkFixture)
-    prevLink.rel = 'prev'
-    prevLink.href = `${baseUrl}/search?page=${pageNumber - 1}&limit=${limit}`
-    page.links.push(prevLink)
+    let prevLink = structuredClone(linkFixture);
+    prevLink.rel = 'prev';
+    prevLink.href = `${baseUrl}/search?page=${pageNumber - 1}&limit=${limit}`;
+    page.links.push(prevLink);
   }
   if (first){
-    let firstLink = structuredClone(linkFixture)
-    firstLink.rel = 'first'
-    firstLink.href = `${baseUrl}/search?limit=${limit}`
-    page.links.push(firstLink)
+    let firstLink = structuredClone(linkFixture);
+    firstLink.rel = 'first';
+    firstLink.href = `${baseUrl}/search?limit=${limit}`;
+    page.links.push(firstLink);
   }
   if (last){
-    let lastLink = structuredClone(linkFixture)
-    lastLink.rel = 'last'
-    const lastPage = Math.ceil(itemsLength / limit)
-    lastLink.href = `${baseUrl}/search?page=${lastPage}limit=${limit}`
-    page.links.push(lastLink)
+    let lastLink = structuredClone(linkFixture);
+    lastLink.rel = 'last';
+    const lastPage = Math.ceil(itemsLength / limit);
+    lastLink.href = `${baseUrl}/search?page=${lastPage}limit=${limit}`;
+    page.links.push(lastLink);
   }
-  return page
+  return page;
 }
 
 // ─── Navigation helpers ─────────────────────────────────────────────────────

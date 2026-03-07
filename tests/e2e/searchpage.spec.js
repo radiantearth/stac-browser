@@ -33,10 +33,10 @@ const fillBboxInputs = async (page, values) => {
   const eastLonInput = page.getByLabel(/east longitude/i);
   const northLatInput = page.getByLabel(/north latitude/i);
 
-  if (values.westLon != null) await westLonInput.fill(values.westLon);
-  if (values.southLat != null) await southLatInput.fill(values.southLat);
-  if (values.eastLon != null) await eastLonInput.fill(values.eastLon);
-  if (values.northLat != null) await northLatInput.fill(values.northLat);
+  if (values.westLon != null) {await westLonInput.fill(values.westLon);}
+  if (values.southLat != null) {await southLatInput.fill(values.southLat);}
+  if (values.eastLon != null) {await eastLonInput.fill(values.eastLon);}
+  if (values.northLat != null) {await northLatInput.fill(values.northLat);}
 };
 
 test.describe('STAC Browser Search page', () => {
@@ -478,7 +478,7 @@ test.describe('STAC Browser Search page', () => {
       expect(secondPageHrefs[0]).not.toBe(firstPageHrefs[0]);
       expect(secondPageHrefs[1]).not.toBe(firstPageHrefs[1]);
       expect(secondPageHrefs[2]).not.toBe(firstPageHrefs[2]);
-    })
+    });
   });
 
   test('search with optional links should show the according buttons', async ({ page, worker }) => {
@@ -494,21 +494,21 @@ test.describe('STAC Browser Search page', () => {
 
       await waitForPageReady(page);
 
-      const lastButton = await page.getByRole('button').filter({ hasText: 'Last'}).first()
+      const lastButton = await page.getByRole('button').filter({ hasText: 'Last'}).first();
       
-      expect(await lastButton.count()).toBe(1)
+      expect(await lastButton.count()).toBe(1);
     });
 
     await test.step('Go to last and check previous, first', async () => {
-      const lastButton = await page.getByRole('button').filter({ hasText: 'Last'}).first()
+      const lastButton = await page.getByRole('button').filter({ hasText: 'Last'}).first();
       await lastButton.click();
       await waitForPageReady(page);
 
-      const prevButton = await page.getByRole('button').filter({ hasText: 'Previous'}).first()
-      const firstButton = await page.getByRole('button').filter({ hasText: 'First'}).first()
+      const prevButton = await page.getByRole('button').filter({ hasText: 'Previous'}).first();
+      const firstButton = await page.getByRole('button').filter({ hasText: 'First'}).first();
 
-      expect(await prevButton.isDisabled()).toBeFalsy()
-      expect(await firstButton.isDisabled()).toBeFalsy()
+      expect(await prevButton.isDisabled()).toBeFalsy();
+      expect(await firstButton.isDisabled()).toBeFalsy();
     });
   });
 });
