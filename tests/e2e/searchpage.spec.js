@@ -480,4 +480,35 @@ test.describe('STAC Browser Search page', () => {
       expect(secondPageHrefs[2]).not.toBe(firstPageHrefs[2]);
     })
   });
+
+  test('search with optional links should show the according buttons', async ({ page, worker }) => {
+    await mockApiRootAndSearch(worker, {limit:10, page:1, prev: true, first: true, last:true});
+    await page.goto(SEARCH_PATH);
+
+    const limitInput = page.getByLabel(/items per page/i);
+    await limitInput.fill('3');
+    
+    await test.step('Submit search and verify last button', async () => {
+      const submitButton = page.getByRole('button', { name: /submit/i });
+      await submitButton.click();
+
+      await waitForPageReady(page);
+
+      const lastButton = await page.getByRole('button').filter({ hasText: 'Last'}).first()
+      
+      expect(await lastButton.count()).toBe(1)
+    });
+
+    await test.step('Go to last and check previous, first', async () => {
+      const lastButton = await page.getByRole('button').filter({ hasText: 'Last'}).first()
+      await lastButton.click();
+      await waitForPageReady(page);
+
+      const prevButton = await page.getByRole('button').filter({ hasText: 'Previous'}).first()
+      const firstButton = await page.getByRole('button').filter({ hasText: 'First'}).first()
+
+      expect(await prevButton.isDisabled()).toBeFalsy()
+      expect(await firstButton.isDisabled()).toBeFalsy()
+    });
+  });
 });
