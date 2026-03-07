@@ -414,7 +414,7 @@ export function paginationRootHandlers(
       limit = parseInt(post.limit) || limit;
       page = parseInt(post.page) || page;
       const searchResult = paginatedSearchHandler(baseUrl, limit, page, prev, first, last);
-      return HttpResponse.json(rewrite(searchResult));
+      return HttpResponse.json(rewrite(searchResult));   
     })
   ];
 }
@@ -457,7 +457,7 @@ export function paginatedSearchHandler(
     nextLink.href = `${baseUrl}/search?page=${pageNumber + 1}&limit=${limit}`
     page.links.push(nextLink)
   }
-  if (prev && page > 1){
+  if (prev && pageNumber > 1){
     let prevLink = structuredClone(linkFixture)
     prevLink.rel = 'prev'
     prevLink.href = `${baseUrl}/search?page=${pageNumber - 1}&limit=${limit}`
@@ -472,7 +472,7 @@ export function paginatedSearchHandler(
   if (last){
     let lastLink = structuredClone(linkFixture)
     lastLink.rel = 'last'
-    const lastPage = Math.ceil(itemsLentgh / limit)
+    const lastPage = Math.ceil(itemsLength / limit)
     lastLink.href = `${baseUrl}/search?page=${lastPage}limit=${limit}`
     page.links.push(lastLink)
   }
