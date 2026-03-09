@@ -1,6 +1,7 @@
-import { size } from 'stac-js/src/utils.js';
 import CodeGenerator from './CodeGenerator.js';
-import template from './templates/template.py?raw';
+import templatePystac from './templates/template.py?raw';
+import templateQuery from './templates/template.python-query.py?raw';
+import templatePostCql from './templates/template.python-post-cql.py?raw';
 
 export default class PythonGenerator extends CodeGenerator {
   get language() {
@@ -12,7 +13,10 @@ export default class PythonGenerator extends CodeGenerator {
   }
 
   get template() {
-    return template;
+    if (this.isCollectionSearch) {
+      return this.method === 'GET' ? templateQuery : templatePostCql;
+    }
+    return templatePystac;
   }
 
   get indent() {
@@ -20,55 +24,90 @@ export default class PythonGenerator extends CodeGenerator {
   }
 
   get installDependencies() {
-    return 'pip install pystac-client';
+    return this.isCollectionSearch ? null : 'pip install pystac-client';
+  }
+
+  formatFilters(filters) {
+    return this.getFiltersAsJson(filters);
+  }
+
+  getVariables(filters) {
+    return {
+      ...super.getVariables(filters),
+      SEARCH_METHOD: this.method,
+      SEARCH_ARGS: this.formatPystacSearchArgs(filters)
+    };
   }
 
   commaSeparatedStrings(values) {
     return values.map(v => JSON.stringify(v)).join(', ');
   }
 
-  formatFilters(filters) {
-    if (size(filters) === 0) {
-      return '';
+  scopedCollections(filters) {
+    if (Array.isArray(filters.collections) && filters.collections.length > 0) {
+      return filters.collections;
     }
+    try {
+      const pathname = new URL(this.searchUrl).pathname;
+      const match = pathname.match(/\/collections\/([^/]+)\/items\/?$/);
+      if (match) {
+        return [decodeURIComponent(match[1])];
+      }
+    }
+    catch {
+      // ignore malformed URLs
+    }
+    return [];
+  }
+
+  formatPystacSearchArgs(filters) {
     const args = [];
 
-    if (size(filters.collections) > 0) {
-      const collections = this.commaSeparatedStrings(filters.collections);
-      args.push(`collections=[${collections}]`);
+    const collections = this.scopedCollections(filters);
+    if (collections.length > 0) {
+      const collectionsValue = this.commaSeparatedStrings(collections);
+      args.push(`collections=[${collectionsValue}]`);
     }
 
-    if (size(filters.ids) > 0) {
+    if (Array.isArray(filters.ids) && filters.ids.length > 0) {
       const ids = this.commaSeparatedStrings(filters.ids);
       args.push(`ids=[${ids}]`);
     }
 
-    if (filters.bbox) {
+    if (Array.isArray(filters.bbox) && filters.bbox.length > 0) {
       args.push(`bbox=[${filters.bbox.join(', ')}]`);
     }
 
     if (filters.datetime) {
-      args.push(`datetime="${filters.datetime}"`);
+      args.push(`datetime=${JSON.stringify(filters.datetime)}`);
     }
 
-    if (size(filters.q) > 0) {
+    if (Array.isArray(filters.q) && filters.q.length > 0) {
       const terms = this.commaSeparatedStrings(filters.q);
       args.push(`q=[${terms}]`);
     }
 
-    if (filters.limit) {
+    if (typeof filters.limit === 'number') {
       args.push(`max_items=${filters.limit}`);
     }
 
     if (filters.sortby) {
-      args.push(`sortby="${filters.sortby}"`);
-    }
-    
-    if (size(filters.filters?.filters) > 0) {
-      args.push(`filter=${JSON.stringify(filters.filters.filters)}`);
+      args.push(`sortby=${JSON.stringify(filters.sortby)}`);
     }
 
-    const prefix = ' '.repeat(this.indent);
-    return '\n' + prefix + args.join(',\n' + prefix) + '\n';
+    if (typeof filters.filter !== 'undefined') {
+      args.push(`filter=${JSON.stringify(filters.filter)}`);
+    }
+
+    if (filters['filter-lang']) {
+      args.push(`filter_lang=${JSON.stringify(filters['filter-lang'])}`);
+    }
+
+    if (this.method !== 'POST') {
+      args.push(`method=${JSON.stringify(this.method)}`);
+    }
+
+    return args.join(', ');
   }
+
 }

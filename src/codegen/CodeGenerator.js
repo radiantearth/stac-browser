@@ -51,6 +51,11 @@ export default class CodeGenerator {
     return null;
   }
 
+  get method() {
+    const method = this.searchLink?.method;
+    return typeof method === 'string' ? method.toUpperCase() : 'GET';
+  }
+
   /**
    * Serialize filters to a formatted JSON string.
    * @returns {string}
@@ -76,8 +81,28 @@ export default class CodeGenerator {
     return {
       CATALOG_URL: this.catalogHref,
       SEARCH_URL: this.searchLink.getAbsoluteUrl(),
+      SEARCH_METHOD: this.method,
+      RESULT_ARRAY_KEY: this.resultArrayKey,
       FILTERS: this.formatFilters(filters),
     };
+  }
+
+  get searchUrl() {
+    return this.searchLink.getAbsoluteUrl();
+  }
+
+  get isCollectionSearch() {
+    try {
+      const pathname = new URL(this.searchUrl).pathname.replace(/\/+$/, '');
+      return pathname.endsWith('/collections');
+    }
+    catch {
+      return false;
+    }
+  }
+
+  get resultArrayKey() {
+    return this.isCollectionSearch ? 'collections' : 'features';
   }
 
   /**
@@ -117,6 +142,15 @@ export default class CodeGenerator {
         return cleaned;
       }
 
+      if (key === 'filters') {
+        const serializedFilter = this.serializeCqlFilter(value);
+        if (isEmpty(serializedFilter)) {
+          return cleaned;
+        }
+        Object.assign(cleaned, serializedFilter);
+        return cleaned;
+      }
+
       if (key === 'datetime') {
         const datetime = this.normalizeDatetime(value);
         if (datetime) {
@@ -128,6 +162,19 @@ export default class CodeGenerator {
       cleaned[key] = value;
       return cleaned;
     }, {});
+  }
+
+  serializeCqlFilter(value) {
+    if (!value) {
+      return null;
+    }
+    if (typeof value.toPost === 'function') {
+      return value.toPost();
+    }
+    if (typeof value.toJSON === 'function') {
+      return value.toJSON();
+    }
+    return value;
   }
 
   normalizeDatetime(value) {

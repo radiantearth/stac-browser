@@ -142,14 +142,14 @@
       <b-card-footer class="d-flex gap-3">
         <b-button type="submit" variant="primary">{{ $t('submit') }}</b-button>
         <b-button type="reset" variant="danger">{{ $t('reset') }}</b-button>
-        <b-button v-if="type === 'Global'" type="button" variant="secondary" @click="showCodeModal = true">{{ $t('exampleCode.title') }}</b-button>
+        <b-button v-if="canShowExampleCode" type="button" variant="secondary" @click="showCodeModal = true">{{ $t('exampleCode.title') }}</b-button>
       </b-card-footer>
     </b-card>
-    <b-modal v-if="type === 'Global'" v-model="showCodeModal" :title="$t('exampleCode.title')" size="lg">
+    <b-modal v-if="canShowExampleCode" v-model="showCodeModal" :title="$t('exampleCode.title')" size="lg">
       <SearchCode
         v-if="showCodeModal"
-        :searchLink="searchLink"
-        :filters="query"
+        :searchLink="codeExampleSearchLink"
+        :filters="codeExampleQuery"
       />
       <template #footer="{ close }">
         <b-button variant="secondary" @click="close()">{{ $t('close') }}</b-button>
@@ -291,6 +291,28 @@ export default defineComponent({
     },
     collectionSearchLink() {
       return this.parent && this.parent.isCatalogLike() && this.parent.getApiCollectionsLink();
+    },
+    codeExampleSearchLink() {
+      if (this.type === 'Global') {
+        return this.searchLink;
+      }
+      if (this.type === 'Items') {
+        return this.searchLink;
+      }
+      if (this.type === 'Collections') {
+        return this.collectionSearchLink;
+      }
+      return null;
+    },
+    canShowExampleCode() {
+      return Boolean(this.codeExampleSearchLink);
+    },
+    codeExampleQuery() {
+      return {
+        ...this.query,
+        sortby: this.formatSort(),
+        filters: this.buildFilter()
+      };
     },
     canSearchCollectionsFreeText() {
       return this.canSearchCollections && this.supportsConformance(TYPES.Collections.FreeText);
@@ -577,7 +599,7 @@ export default defineComponent({
       if (this.filtersNegate) {
         logical = new CqlNot(logical);
       }
-      return new Cql(logical);
+      return new Cql(logical, this.cql);
     },
     removeQueryable(queryableIndex) {
       this.filters.splice(queryableIndex, 1);

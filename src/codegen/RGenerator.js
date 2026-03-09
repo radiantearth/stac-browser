@@ -1,5 +1,7 @@
 import CodeGenerator from './CodeGenerator.js';
-import template from './templates/template.r?raw';
+import templateItem from './templates/template.r?raw';
+import templateQuery from './templates/template.r-query.r?raw';
+import templatePostCql from './templates/template.r-post-cql.r?raw';
 
 export default class RGenerator extends CodeGenerator {
   get language() {
@@ -11,8 +13,25 @@ export default class RGenerator extends CodeGenerator {
   }
 
   get template() {
-    return template;
+    if (this.isCollectionSearch) {
+      return this.method === 'GET' ? templateQuery : templatePostCql;
+    }
+    if (this.isCqlJsonFilter) {
+      return templatePostCql;
+    }
+    return templateItem;
   }
+  get isCqlJsonFilter() {
+    return this.currentFilters?.['filter-lang'] === 'cql2-json';
+  }
+
+  generate(filters) {
+    this.currentFilters = this.cleanFilters(filters);
+    const output = this.renderTemplate(this.template, this.getVariables(this.currentFilters));
+    this.currentFilters = null;
+    return output;
+  }
+
 
   get indent() {
     return 4;
@@ -26,12 +45,30 @@ export default class RGenerator extends CodeGenerator {
     return values.map(v => JSON.stringify(v)).join(', ');
   }
 
+  scopedCollections(filters) {
+    if (Array.isArray(filters.collections) && filters.collections.length > 0) {
+      return filters.collections;
+    }
+    try {
+      const pathname = new URL(this.searchUrl).pathname;
+      const match = pathname.match(/\/collections\/([^/]+)\/items\/?$/);
+      if (match) {
+        return [decodeURIComponent(match[1])];
+      }
+    }
+    catch {
+      // ignore malformed URLs
+    }
+    return [];
+  }
+
   formatFilters(filters) {
     const props = [];
 
-    if (filters.collections && filters.collections.length > 0) {
-      const collections = this.commaSeparatedStrings(filters.collections);
-      props.push(`collections = c(${collections})`);
+    const collections = this.scopedCollections(filters);
+    if (collections.length > 0) {
+      const collectionsValue = this.commaSeparatedStrings(collections);
+      props.push(`collections = c(${collectionsValue})`);
     }
 
     if (filters.ids && filters.ids.length > 0) {
@@ -53,11 +90,56 @@ export default class RGenerator extends CodeGenerator {
       props.push(`limit = ${filters.limit}`);
     }
 
+    if (filters.Subject) {
+      props.push(`Subject = ${JSON.stringify(filters.Subject)}`);
+    }
+
+    if (filters.subject) {
+      props.push(`subject = ${JSON.stringify(filters.subject)}`);
+    }
+
     if (props.length === 0) {
       return '';
     }
 
     const prefix = ' '.repeat(this.indent);
     return ',\n' + prefix + props.join(',\n' + prefix);
+  }
+
+  getVariables(filters) {
+    return {
+      ...super.getVariables(filters),
+      FILTERS_OBJECT: this.formatJsonBody(filters),
+      FILTER_ARGS: this.formatFilters(filters),
+      EXT_FILTER: this.formatExtFilter(filters),
+      REQUEST_FUNCTION: this.method === 'GET' ? 'get_request' : 'post_request'
+    };
+  }
+
+  formatJsonBody(filters) {
+    const serialized = JSON.stringify(filters)
+      .replaceAll('\\', '\\\\')
+      .replaceAll('"', '\\"');
+    return `jsonlite::fromJSON("${serialized}", simplifyVector = FALSE)`;
+  }
+
+  formatExtFilter(filters) {
+    if (typeof filters.filter === 'undefined') {
+      return '';
+    }
+
+    let expr;
+    if (filters['filter-lang'] === 'cql2-json') {
+      const serialized = JSON.stringify(filters.filter)
+        .replaceAll('\\', '\\\\')
+        .replaceAll('"', '\\"');
+      expr = `jsonlite::fromJSON("${serialized}", simplifyVector = FALSE)`;
+    }
+    else {
+      expr = JSON.stringify(filters.filter);
+    }
+
+    const lang = filters['filter-lang'] ? `, lang = "${filters['filter-lang']}"` : '';
+    return `query <- ext_filter(query, expr = ${expr}${lang})`;
   }
 }

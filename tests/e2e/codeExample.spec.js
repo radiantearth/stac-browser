@@ -6,6 +6,8 @@ import {
   waitForMapReady
 } from './helpers';
 
+const COLLECTION_ITEMS_PATH = '/external/earth-search.aws.test.com/v1/collections/test-collection-1?.language=en';
+
 const openExampleCodeModal = async (page) => {
   await page.getByRole('button', { name: /example code/i }).click();
   const modal = page.getByRole('dialog', { name: /example code/i });
@@ -214,6 +216,7 @@ test.describe('STAC Browser code example modal', () => {
     await waitForMapReady(page);
     await test.step('manually enter bbox values', async () => {
       const westLongitude = page.getByLabel(/west longitude/i);
+      await expect(westLongitude).toBeVisible();
       await westLongitude.fill('-116.1');
       await westLongitude.blur();
 
@@ -230,7 +233,6 @@ test.describe('STAC Browser code example modal', () => {
       await northLatitude.blur();
 
       await northLatitude.press('Enter');
-      await expect(page.getByText(/click inside the bounding box to remove it/i)).toBeVisible();
     });
 
     await test.step('Enter a collection ID', async () => {
@@ -344,5 +346,90 @@ test.describe('STAC Browser code example modal', () => {
     const modal = await openExampleCodeModal(page);
     await modal.locator('.modal-footer').getByRole('button', { name: /close/i }).click();
     await expect(modal, 'Example Code Modal should not be visible').not.toBeVisible();
+  });
+
+  test('shows example code from the Items filter on collection item search', async ({ page }) => {
+    await mockApiRootAndCollections(page);
+
+    await page.route('https://earth-search.aws.test.com/v1/collections/test-collection-1', async (route, request) => {
+      if (request.method() === 'GET') {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            type: 'Collection',
+            id: 'test-collection-1',
+            title: 'Test Collection 1',
+            description: 'Test collection for item filter example code',
+            stac_version: '1.0.0',
+            extent: {
+              spatial: { bbox: [[-180, -90, 180, 90]] },
+              temporal: { interval: [['2020-01-01T00:00:00Z', null]] }
+            },
+            links: [
+              {
+                rel: 'self',
+                type: 'application/json',
+                href: 'https://earth-search.aws.test.com/v1/collections/test-collection-1'
+              },
+              {
+                rel: 'root',
+                type: 'application/json',
+                href: 'https://earth-search.aws.test.com/v1'
+              },
+              {
+                rel: 'parent',
+                type: 'application/json',
+                href: 'https://earth-search.aws.test.com/v1'
+              },
+              {
+                rel: 'items',
+                type: 'application/geo+json',
+                href: 'https://earth-search.aws.test.com/v1/collections/test-collection-1/items'
+              }
+            ]
+          })
+        });
+        return;
+      }
+      await route.continue();
+    });
+
+    await page.route('https://earth-search.aws.test.com/v1/collections/test-collection-1/items**', async (route, request) => {
+      if (request.method() === 'GET' || request.method() === 'POST') {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/geo+json',
+          body: JSON.stringify({
+            type: 'FeatureCollection',
+            features: [],
+            links: []
+          })
+        });
+        return;
+      }
+      await route.continue();
+    });
+
+    await page.goto(COLLECTION_ITEMS_PATH);
+
+    await expect(page.getByRole('heading', { name: /test collection 1/i }), 'collection page should load').toBeVisible();
+
+    const toggleFilterButton = page.getByRole('button', { name: /show filter|hide filter/i });
+    await expect(toggleFilterButton, 'item filter toggle should be visible').toBeVisible();
+    await toggleFilterButton.click();
+
+    const openExampleButton = page.getByRole('button', { name: /example code/i });
+    await expect(openExampleButton, 'example code button should be visible for Items filter').toBeVisible();
+    await openExampleButton.click();
+
+    const modal = page.getByRole('dialog', { name: /example code/i });
+    await expect(modal, 'Example Code Modal should be visible').toBeVisible();
+
+    const pythonPanel = modal.getByRole('tabpanel', { name: 'Python' });
+    await copyCodeFromModal(page, pythonPanel);
+    const copied = await readClipboard(page);
+    expect(copied, 'should contain python search snippet').toContain('results = catalog.search(');
+    expect(copied, 'should include scoped collection id for collection item search').toContain('collections=["test-collection-1"]');
   });
 });

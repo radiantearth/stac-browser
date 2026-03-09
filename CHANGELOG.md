@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - PlayWright tests
 - Allow manually entering bounding boxes for search
-- Generate code examples for Global Item Search
+- Generate code examples for Global Item Search, Collection Search, and collection-scoped Item Search
 - Docker-based integration tests for generated code snippets
 - Support negating CQL2 filters (globally and per filter)
 - Support CQL2 Advanced Comparison Operators

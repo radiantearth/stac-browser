@@ -1,17 +1,23 @@
 using System;
 using System.Net.Http;
+using System.Text;
 
 var httpClient = new HttpClient();
 var searchUrl = "{{SEARCH_URL}}";
-var queryString = "{{QUERY_STRING}}";
 
-var requestUrl = string.IsNullOrEmpty(queryString) ? searchUrl : $"{searchUrl}?" + queryString;
-var response = await httpClient.GetAsync(requestUrl);
+var json = """
+{{FILTERS}}
+""";
+var content = new StringContent(json, Encoding.UTF8, "application/json");
 
+var response = await httpClient.SendAsync(new HttpRequestMessage(new HttpMethod("{{SEARCH_METHOD}}"), searchUrl)
+{
+    Content = content
+});
 var responseBody = await response.Content.ReadAsStringAsync();
 
 using var doc = System.Text.Json.JsonDocument.Parse(responseBody);
-if (doc.RootElement.TryGetProperty("{{RESULT_ARRAY_KEY}}", out var entries))
+if (doc.RootElement.TryGetProperty("collections", out var entries))
 {
     foreach (var entry in entries.EnumerateArray())
     {

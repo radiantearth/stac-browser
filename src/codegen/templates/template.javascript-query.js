@@ -10,8 +10,7 @@ for (const [key, value] of Object.entries(searchFilters)) {
 
 const response = await fetch(searchUrl.toString());
 const data = await response.json();
-const entriesKey = '{{RESULT_ARRAY_KEY}}';
-const entries = Array.isArray(data[entriesKey]) ? data[entriesKey] : [];
+const entries = Array.isArray(data.collections) ? data.collections : [];
 for (const entry of entries) {
   console.log(entry.id);
 }

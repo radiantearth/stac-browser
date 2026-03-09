@@ -4,7 +4,7 @@ from pystac_client import Client
 catalog = Client.open("{{CATALOG_URL}}")
 
 # Search for items
-results = catalog.search({{FILTERS}})
+results = catalog.search({{SEARCH_ARGS}})
 
 # Iterate over results
 for item in results.items():

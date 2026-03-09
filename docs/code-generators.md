@@ -1,6 +1,6 @@
 # Code Generators
 
-Code Examples are created to display example queries for multiple langguages. The language list is in [codeGenerators.config.js](../codeGenerators.config.js). If you add or remove a language, update that file.
+Code Examples are created to display example queries for multiple languages. The language list is in [codeGenerators.config.js](../codeGenerators.config.js). If you add or remove a language, update that file.
 
 ## Add a New Language
 
@@ -16,7 +16,10 @@ Code Examples are created to display example queries for multiple langguages. Th
 4. Add the new generator import and class to the array in [codeGenerators.config.js](../codeGenerators.config.js). You can use the following variables:
    - `{{CATALOG_URL}}`: The URL of the landing page of the API
    - `{{SEARCH_URL}}`: The URL of the search endpoint
+   - `{{SEARCH_METHOD}}`: The HTTP method used for the endpoint (`GET`/`POST`)
+   - `{{RESULT_ARRAY_KEY}}`: Response array key for results (`features` for item search, `collections` for collection search)
    - `{{FILTERS}}`: The formatted filters, will be JSON if not implemented differently in `formatFilters()`
+   - Language-specific variables from `getVariables()` (for example Python `{{SEARCH_ARGS}}`, Java `{{QUERY_STRING}}` / `{{FILTERS_STRING}}`, R `{{FILTERS_OBJECT}}` / `{{FILTER_ARGS}}`)
 5. Add a template in `src/codegen/templates/` for the generator.
 6. Validate with integration tests:
    - `npm run test:integration`
@@ -26,9 +29,38 @@ Integration tests for code generators are run with Docker so each language snipp
 
 If a generator implements `get installDependencies()`, the same command is shown in the Example Code UI and also executed by the integration test harness before running the snippet. This keeps user-facing install instructions and CI/runtime setup in sync.
 
+## Search Scenarios and CQL Mode
+
+Code examples are generated for three practical UI scenarios:
+
+1. **Global item search** (API Item Search)
+2. **Collection search** (API Collection Search)
+3. **Item search scoped by selected collections**
+
+Generators should emit valid code for both item and collection endpoints. Use `{{RESULT_ARRAY_KEY}}` in templates instead of hard-coding `features`.
+
+CQL mode is selected from API conformance:
+
+- If the API supports **CQL2-JSON**, generated filters use `filter-lang: cql2-json` and JSON filter bodies.
+- If the API supports **CQL2-TEXT** only, generated filters use `filter-lang: cql2-text` and text expressions.
+
+## Template Naming and Selection
+
+Template files are selected in generator classes (not at runtime inside generated snippets).
+
+- Collection search templates follow transport naming:
+   - `*-query.*` for `GET` query-parameter requests
+   - `*-post-cql.*` for request-body (`POST`/write) CQL-oriented requests
+- Item search templates are language-specific:
+   - Languages that use raw HTTP typically have `item GET` and `item post-cql` variants.
+   - Python item search uses the pystac-client template (`template.py`) with computed `{{SEARCH_ARGS}}`.
+   - R item search uses `template.r`, with `template.r-post-cql.r` used for CQL2-JSON compatibility cases.
+
+Generated snippets should be minimal and concrete.
+
 ## Generator Guidance
 
-- Create a dedicated template file in `src/codegen/templates/` for each new language.
+- Create dedicated template files in `src/codegen/templates/` for each transport/search variant your language needs.
 - The template file defines placeholders  that the generator replaces with the query parameters selected in the UI, so the generated snippet reflects the user's current query.
 - Prefer an established STAC client library for that language when one is available or generic HTTP requests when no practical STAC client library exists.
 

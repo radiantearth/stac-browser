@@ -1,15 +1,16 @@
 library(rstac)
 
-# Build and execute search
 catalog <- stac("{{CATALOG_URL}}")
-query <- stac_search(catalog{{FILTERS}})
-result <- post_request(query)
+query <- stac_search(catalog{{FILTER_ARGS}})
+{{EXT_FILTER}}
+result <- {{REQUEST_FUNCTION}}(query)
 
 # Print item IDs
-if (!is.null(result$features) && length(result$features) > 0) {
-  for (feature in result$features) {
-    if (!is.null(feature$id)) {
-      cat(feature$id, "\\n")
+entries <- result[["{{RESULT_ARRAY_KEY}}"]]
+if (!is.null(entries) && length(entries) > 0) {
+  for (entry in entries) {
+    if (!is.null(entry$id)) {
+      cat(entry$id, "\\n")
     }
   }
 }

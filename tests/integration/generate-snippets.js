@@ -22,20 +22,65 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const outDir = join(__dirname, 'generated');
 mkdirSync(outDir, { recursive: true });
 
-const CATALOG_URL = 'https://planetarycomputer.microsoft.com/api/stac/v1';
+const DEFAULT_CATALOG_URL = 'https://earth-search.aws.element84.com/v1';
+const DEFAULT_SEARCH_METHOD = 'POST';
+
+const scenario = process.argv[2] || 'default';
+
+const SCENARIOS = {
+  default: {
+    catalogUrl: DEFAULT_CATALOG_URL,
+    searchMethod: DEFAULT_SEARCH_METHOD,
+    filters: {
+      collections: ['sentinel-2-l2a'],
+      bbox: [-122.5, 37.5, -122.0, 38.0],
+      limit: 5,
+    }
+  },
+  'cql-json': {
+    catalogUrl: DEFAULT_CATALOG_URL,
+    searchMethod: DEFAULT_SEARCH_METHOD,
+    filters: {
+      collections: ['sentinel-2-l2a'],
+      'filter-lang': 'cql2-json',
+      filter: {
+        op: 'lte',
+        args: [
+          { property: 'eo:cloud_cover' },
+          10
+        ]
+      },
+      limit: 5,
+    }
+  },
+  'cql-text': {
+    catalogUrl: 'https://earth-search.aws.element84.com/v1',
+    searchMethod: DEFAULT_SEARCH_METHOD,
+    filters: {
+      collections: ['sentinel-2-l2a'],
+      'filter-lang': 'cql2-text',
+      filter: 'eo:cloud_cover <= 10',
+      limit: 5,
+    }
+  }
+};
+
+if (!SCENARIOS[scenario]) {
+  console.error(`Unknown scenario: ${scenario}`);
+  process.exit(1);
+}
+
+const SCENARIO = SCENARIOS[scenario];
+const CATALOG_URL = SCENARIO.catalogUrl;
+const SEARCH_METHOD = SCENARIO.searchMethod;
+const FILTERS = SCENARIO.filters;
+
 const SEARCH_LINK = new Link({
   href: `${CATALOG_URL}/search`,
   rel: 'search',
-  method: 'POST',
+  method: SEARCH_METHOD,
   type: 'application/geo+json'
 });
-
-
-const FILTERS = {
-  collections: ['sentinel-2-l2a'],
-  bbox: [-122.5, 37.5, -122.0, 38.0],
-  limit: 5,
-};
 
 for (const g of generators) {
   const generator = new g(CATALOG_URL, SEARCH_LINK);
@@ -44,4 +89,5 @@ for (const g of generators) {
   console.log(`✓ generated ${generator.outputFile} (${generator.language})`);
 }
 
-console.log(`\nAll snippets written to ${outDir}`);
+console.log(`\nScenario: ${scenario}`);
+console.log(`All snippets written to ${outDir}`);

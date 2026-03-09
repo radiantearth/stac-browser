@@ -4,7 +4,8 @@
       <b-button
         :title="$t('assets.download.generic')"
         size="sm" variant="primary"
-        @click.prevent.stop="download">
+        @click.prevent.stop="download"
+      >
         <b-icon-download />
       </b-button>
       <CopyButton

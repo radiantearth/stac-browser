@@ -220,6 +220,8 @@ More information about how to add or implement actions can be found in the **[Ac
 
 The list of supported code snippet languages is configured in [`codeGenerators.config.js`](codeGenerators.config.js).
 
+Code generator templates are selected in generator classes based on endpoint and method (for example `query` for `GET`, `post-cql` for request-body paths), so generated snippets stay minimal and concrete for the currently selected search flow.
+
 For step-by-step instructions on adding or removing a language, see the **[Code Generators documentation](docs/code-generators.md)**.
 
 ### Additional metadata fields

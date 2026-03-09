@@ -1,5 +1,8 @@
 import CodeGenerator from './CodeGenerator.js';
-import template from './templates/template.rs?raw';
+import templateItemGet from './templates/template.rs?raw';
+import templateItemPostCql from './templates/template.rust-item-post-cql.rs?raw';
+import templateQuery from './templates/template.rust-query.rs?raw';
+import templatePostCql from './templates/template.rust-post-cql.rs?raw';
 
 export default class RustGenerator extends CodeGenerator {
   get language() {
@@ -11,7 +14,10 @@ export default class RustGenerator extends CodeGenerator {
   }
 
   get template() {
-    return template;
+    if (this.isCollectionSearch) {
+      return this.method === 'GET' ? templateQuery : templatePostCql;
+    }
+    return this.method === 'GET' ? templateItemGet : templateItemPostCql;
   }
 
   get indent() {
@@ -19,7 +25,7 @@ export default class RustGenerator extends CodeGenerator {
   }
 
   get installDependencies() {
-    return 'cargo add serde_json stac stac-io && cargo add tokio@1 --features full';
+    return 'cargo add serde_json stac stac-io reqwest && cargo add tokio@1 --features full';
   }
 
   formatFilters(filters) {
@@ -29,4 +35,5 @@ export default class RustGenerator extends CodeGenerator {
       .map((line, i) => i === 0 ? line : prefix + line)
       .join('\n');
   }
+
 }

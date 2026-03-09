@@ -29,13 +29,5 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Generate code snippets
-        run: node --import ./tests/integration/node-loader-register.js tests/integration/generate-snippets.js
-
-      - name: Build ${{ matrix.language }} image
-        run: docker compose -f tests/integration/docker-compose.yml build ${{ matrix.language }}
-
-      - name: Run ${{ matrix.language }}
-        run: |
-          INSTALL_DEPS="$(node --import ./tests/integration/node-loader-register.js tests/integration/get-install-dependencies.js ${{ matrix.language }})"
-          timeout 180 docker compose -f tests/integration/docker-compose.yml run --rm -e INSTALL_DEPS="$INSTALL_DEPS" ${{ matrix.language }}
+      - name: Run ${{ matrix.language }} integration
+        run: bash tests/integration/run-tests.sh ${{ matrix.language }}

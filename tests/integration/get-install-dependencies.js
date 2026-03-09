@@ -10,7 +10,7 @@ if (!language) {
   process.exit(1);
 }
 
-const CATALOG_URL = 'https://planetarycomputer.microsoft.com/api/stac/v1';
+const CATALOG_URL = 'https://earth-search.aws.element84.com/v1';
 const SEARCH_LINK = new Link({
   href: `${CATALOG_URL}/search`,
   rel: 'search',
