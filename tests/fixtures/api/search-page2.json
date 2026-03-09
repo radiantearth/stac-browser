@@ -1,0 +1,41 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "stac_version": "1.0.0",
+      "id": "page2-item-1",
+      "geometry": { "type": "Point", "coordinates": [-95.0, 38.0] },
+      "bbox": [-95.5, 37.5, -94.5, 38.5],
+      "properties": { "title": "Page 2 Item 1", "datetime": "2025-07-01T00:00:00Z" },
+      "links": [
+        { "rel": "self", "href": "https://example.com/api/collections/test-collection-1/items/page2-item-1", "type": "application/geo+json" },
+        { "rel": "collection", "href": "https://example.com/api/collections/test-collection-1", "type": "application/json" },
+        { "rel": "root", "href": "https://example.com/api", "type": "application/json" }
+      ],
+      "assets": {}
+    },
+    {
+      "type": "Feature",
+      "stac_version": "1.0.0",
+      "id": "page2-item-2",
+      "geometry": { "type": "Point", "coordinates": [-90.0, 42.0] },
+      "bbox": [-90.5, 41.5, -89.5, 42.5],
+      "properties": { "title": "Page 2 Item 2", "datetime": "2025-07-02T00:00:00Z" },
+      "links": [
+        { "rel": "self", "href": "https://example.com/api/collections/test-collection-2/items/page2-item-2", "type": "application/geo+json" },
+        { "rel": "collection", "href": "https://example.com/api/collections/test-collection-2", "type": "application/json" },
+        { "rel": "root", "href": "https://example.com/api", "type": "application/json" }
+      ],
+      "assets": {}
+    }
+  ],
+  "links": [
+    { "rel": "root", "href": "https://example.com/api", "type": "application/json" },
+    { "rel": "first", "href": "https://example.com/api/search", "type": "application/geo+json", "method": "GET" },
+    { "rel": "prev", "href": "https://example.com/api/search", "type": "application/geo+json", "method": "GET" },
+    { "rel": "next", "href": "https://example.com/api/search?cursor=page3", "type": "application/geo+json", "method": "GET" },
+    { "rel": "last", "href": "https://example.com/api/search?cursor=page3", "type": "application/geo+json", "method": "GET" }
+  ],
+  "numberMatched": 7
+}

@@ -242,6 +242,54 @@ export async function mockApiRootAndCollections(worker, options = {}) {
 }
 
 /**
+ * Register API root + collections with a paginated search endpoint (3 pages).
+ *
+ * POST /search returns the first page (search-page1.json) which includes
+ * `next` and `last` links.  GET /search?cursor=page2 returns the middle page
+ * (search-page2.json) with `first`, `prev`, `next`, and `last` links.
+ * GET /search?cursor=page3 returns the last page (search-page3.json) with
+ * `first` and `prev` links.
+ *
+ * @param {import('playwright-msw').MockServiceWorker} worker
+ * @param {object} [options]
+ * @param {string} [options.baseUrl] – API base URL
+ */
+export async function mockApiRootAndPaginatedSearch(worker, { baseUrl = DEFAULT_API_URL } = {}) {
+  const page1 = loadApiFixture('search-page1.json');
+  const page2 = loadApiFixture('search-page2.json');
+  const page3 = loadApiFixture('search-page3.json');
+
+  const rewrite = (obj) =>
+    baseUrl !== DEFAULT_API_URL
+      ? JSON.parse(JSON.stringify(obj).replaceAll(DEFAULT_API_URL, baseUrl))
+      : obj;
+
+  // Build root + collections handlers WITHOUT the search handler.
+  // apiRootHandlers includes a POST /search that returns empty results;
+  // we need to replace it with our own paginated version.
+  const baseHandlers = apiRootHandlers({ baseUrl });
+  const nonSearchHandlers = baseHandlers.filter(
+    h => h.info.path !== `${baseUrl}/search`,
+  );
+
+  await worker.use(
+    ...nonSearchHandlers,
+    http.post(`${baseUrl}/search`, () => HttpResponse.json(rewrite(page1))),
+    http.get(`${baseUrl}/search`, ({ request }) => {
+      const url = new URL(request.url);
+      const cursor = url.searchParams.get('cursor');
+      if (cursor === 'page3') {
+        return HttpResponse.json(rewrite(page3));
+      }
+      if (cursor === 'page2') {
+        return HttpResponse.json(rewrite(page2));
+      }
+      return HttpResponse.json(rewrite(page1));
+    }),
+  );
+}
+
+/**
  * Load an API fixture file from tests/fixtures/api/.
  *
  * @param {string} filename – JSON file name inside fixtures/api/

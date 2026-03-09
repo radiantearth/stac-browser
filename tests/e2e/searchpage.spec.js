@@ -12,6 +12,7 @@ import { test, expect } from './fixtures';
 import {
   SEARCH_PATH,
   mockApiRootAndCollections,
+  mockApiRootAndPaginatedSearch,
   waitForMapReady,
   waitForBboxInputsPopulated,
   waitForSearchPost
@@ -445,6 +446,110 @@ test.describe('STAC Browser Search page', () => {
       await page.getByRole('button', { name: /submit/i }).click();
       const { body } = await requestPromise;
       expect(body).toEqual({});
+    });
+  });
+
+  test('Search results can be paginated with Next and Previous buttons', async ({ page, worker }) => {
+    await mockApiRootAndPaginatedSearch(worker);
+    await page.goto(SEARCH_PATH);
+
+    const itemCards = page.locator('.item-card');
+    const nextButton = page.getByRole('button', { name: /next/i }).first();
+    const prevButton = page.getByRole('button', { name: /previous/i }).first();
+
+    await test.step('Submit search and verify first page shows 3 items', async () => {
+      await page.getByRole('button', { name: /submit/i }).click();
+      await expect(itemCards).toHaveCount(3, { timeout: 10000 });
+    });
+
+    await test.step('Next button is enabled, Previous is disabled on first page', async () => {
+      await expect(nextButton).toBeEnabled();
+      await expect(prevButton).toBeDisabled();
+    });
+
+    await test.step('Click Next and verify second page shows 2 items', async () => {
+      await nextButton.click();
+      await expect(itemCards).toHaveCount(2, { timeout: 10000 });
+    });
+
+    await test.step('Both Next and Previous are enabled on middle page', async () => {
+      await expect(nextButton).toBeEnabled();
+      await expect(prevButton).toBeEnabled();
+    });
+
+    await test.step('Click Next and verify third page shows 2 items', async () => {
+      await nextButton.click();
+      await expect(itemCards).toHaveCount(2, { timeout: 10000 });
+    });
+
+    await test.step('Previous is enabled, Next is disabled on last page', async () => {
+      await expect(prevButton).toBeEnabled();
+      await expect(nextButton).toBeDisabled();
+    });
+
+    await test.step('Click Previous and verify middle page items are restored', async () => {
+      await prevButton.click();
+      await expect(itemCards).toHaveCount(2, { timeout: 10000 });
+      await expect(nextButton).toBeEnabled();
+      await expect(prevButton).toBeEnabled();
+    });
+  });
+
+  test('Search results can be paginated with First and Last buttons', async ({ page, worker }) => {
+    await mockApiRootAndPaginatedSearch(worker);
+    await page.goto(SEARCH_PATH);
+
+    const itemCards = page.locator('.item-card');
+    const firstButton = page.getByRole('button', { name: /first/i }).first();
+    const lastButton = page.getByRole('button', { name: /last/i }).first();
+    const nextButton = page.getByRole('button', { name: /next/i }).first();
+    const prevButton = page.getByRole('button', { name: /previous/i }).first();
+
+    await test.step('Submit search and verify first page', async () => {
+      await page.getByRole('button', { name: /submit/i }).click();
+      await expect(itemCards).toHaveCount(3, { timeout: 10000 });
+    });
+
+    await test.step('First is disabled, Last is visible on first page', async () => {
+      await expect(firstButton).toBeDisabled();
+      await expect(lastButton).toBeEnabled();
+    });
+
+    await test.step('Click Last to jump to the last page', async () => {
+      await lastButton.click();
+      await expect(itemCards).toHaveCount(2, { timeout: 10000 });
+      await expect(nextButton).toBeDisabled();
+      await expect(prevButton).toBeEnabled();
+      await expect(firstButton).toBeEnabled();
+    });
+
+    await test.step('Click First to jump back to the first page', async () => {
+      await firstButton.click();
+      await expect(itemCards).toHaveCount(3, { timeout: 10000 });
+      await expect(nextButton).toBeEnabled();
+      await expect(prevButton).toBeDisabled();
+      await expect(firstButton).toBeDisabled();
+    });
+
+    await test.step('Navigate to middle page and verify First/Last both enabled', async () => {
+      await nextButton.click();
+      await expect(itemCards).toHaveCount(2, { timeout: 10000 });
+      await expect(firstButton).toBeEnabled();
+      await expect(lastButton).toBeEnabled();
+    });
+
+    await test.step('Click Last from middle page skips to last page', async () => {
+      await lastButton.click();
+      await expect(itemCards).toHaveCount(2, { timeout: 10000 });
+      await expect(nextButton).toBeDisabled();
+      await expect(firstButton).toBeEnabled();
+    });
+
+    await test.step('Click First from last page skips to first page', async () => {
+      await firstButton.click();
+      await expect(itemCards).toHaveCount(3, { timeout: 10000 });
+      await expect(prevButton).toBeDisabled();
+      await expect(firstButton).toBeDisabled();
     });
   });
 });
