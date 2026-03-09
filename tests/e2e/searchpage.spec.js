@@ -32,10 +32,18 @@ const fillBboxInputs = async (page, values) => {
   const eastLonInput = page.getByLabel(/east longitude/i);
   const northLatInput = page.getByLabel(/north latitude/i);
 
-  if (values.westLon != null) await westLonInput.fill(values.westLon);
-  if (values.southLat != null) await southLatInput.fill(values.southLat);
-  if (values.eastLon != null) await eastLonInput.fill(values.eastLon);
-  if (values.northLat != null) await northLatInput.fill(values.northLat);
+  if (values.westLon != null) {
+    await westLonInput.fill(values.westLon);
+  }
+  if (values.southLat != null) {
+    await southLatInput.fill(values.southLat);
+  }
+  if (values.eastLon != null) {
+    await eastLonInput.fill(values.eastLon);
+  }
+  if (values.northLat != null) {
+    await northLatInput.fill(values.northLat);
+  }
 };
 
 test.describe('STAC Browser Search page', () => {
