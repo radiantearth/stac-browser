@@ -100,9 +100,18 @@ test.describe('STAC Browser Search page', () => {
       await enableSpatialCheckbox.check();
 
       const mapViewport = await waitForMapReady(page);
-      
-      // Click on the map to create a bounding box
-      await mapViewport.click({ position: { x: 300, y: 200 } });
+
+      // The OL ExtentInteraction is registered asynchronously after the
+      // viewport appears (basemap module imports must complete first).
+      // Retry the click until the interaction picks it up.
+      const southLatInput = page.getByLabel(/south latitude/i);
+      await expect(async () => {
+        const val = await southLatInput.inputValue();
+        if (!val) {
+          await mapViewport.click({ position: { x: 300, y: 200 } });
+        }
+        await expect(southLatInput).not.toHaveValue('', { timeout: 1000 });
+      }).toPass({ timeout: 15000 });
 
       await waitForBboxInputsPopulated(page);
     });
