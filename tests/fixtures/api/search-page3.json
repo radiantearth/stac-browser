@@ -1,0 +1,39 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "stac_version": "1.0.0",
+      "id": "page3-item-1",
+      "geometry": { "type": "Point", "coordinates": [-85.0, 36.0] },
+      "bbox": [-85.5, 35.5, -84.5, 36.5],
+      "properties": { "title": "Page 3 Item 1", "datetime": "2025-08-01T00:00:00Z" },
+      "links": [
+        { "rel": "self", "href": "https://example.com/api/collections/test-collection-1/items/page3-item-1", "type": "application/geo+json" },
+        { "rel": "collection", "href": "https://example.com/api/collections/test-collection-1", "type": "application/json" },
+        { "rel": "root", "href": "https://example.com/api", "type": "application/json" }
+      ],
+      "assets": {}
+    },
+    {
+      "type": "Feature",
+      "stac_version": "1.0.0",
+      "id": "page3-item-2",
+      "geometry": { "type": "Point", "coordinates": [-80.0, 33.0] },
+      "bbox": [-80.5, 32.5, -79.5, 33.5],
+      "properties": { "title": "Page 3 Item 2", "datetime": "2025-08-02T00:00:00Z" },
+      "links": [
+        { "rel": "self", "href": "https://example.com/api/collections/test-collection-2/items/page3-item-2", "type": "application/geo+json" },
+        { "rel": "collection", "href": "https://example.com/api/collections/test-collection-2", "type": "application/json" },
+        { "rel": "root", "href": "https://example.com/api", "type": "application/json" }
+      ],
+      "assets": {}
+    }
+  ],
+  "links": [
+    { "rel": "root", "href": "https://example.com/api", "type": "application/json" },
+    { "rel": "first", "href": "https://example.com/api/search", "type": "application/geo+json", "method": "GET" },
+    { "rel": "prev", "href": "https://example.com/api/search?cursor=page2", "type": "application/geo+json", "method": "GET" }
+  ],
+  "numberMatched": 7
+}

@@ -1,0 +1,53 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "stac_version": "1.0.0",
+      "id": "page1-item-1",
+      "geometry": { "type": "Point", "coordinates": [-105.0, 40.0] },
+      "bbox": [-105.5, 39.5, -104.5, 40.5],
+      "properties": { "title": "Page 1 Item 1", "datetime": "2025-06-01T00:00:00Z" },
+      "links": [
+        { "rel": "self", "href": "https://example.com/api/collections/test-collection-1/items/page1-item-1", "type": "application/geo+json" },
+        { "rel": "collection", "href": "https://example.com/api/collections/test-collection-1", "type": "application/json" },
+        { "rel": "root", "href": "https://example.com/api", "type": "application/json" }
+      ],
+      "assets": {}
+    },
+    {
+      "type": "Feature",
+      "stac_version": "1.0.0",
+      "id": "page1-item-2",
+      "geometry": { "type": "Point", "coordinates": [-110.0, 45.0] },
+      "bbox": [-110.5, 44.5, -109.5, 45.5],
+      "properties": { "title": "Page 1 Item 2", "datetime": "2025-06-02T00:00:00Z" },
+      "links": [
+        { "rel": "self", "href": "https://example.com/api/collections/test-collection-1/items/page1-item-2", "type": "application/geo+json" },
+        { "rel": "collection", "href": "https://example.com/api/collections/test-collection-1", "type": "application/json" },
+        { "rel": "root", "href": "https://example.com/api", "type": "application/json" }
+      ],
+      "assets": {}
+    },
+    {
+      "type": "Feature",
+      "stac_version": "1.0.0",
+      "id": "page1-item-3",
+      "geometry": { "type": "Point", "coordinates": [-100.0, 35.0] },
+      "bbox": [-100.5, 34.5, -99.5, 35.5],
+      "properties": { "title": "Page 1 Item 3", "datetime": "2025-06-03T00:00:00Z" },
+      "links": [
+        { "rel": "self", "href": "https://example.com/api/collections/test-collection-2/items/page1-item-3", "type": "application/geo+json" },
+        { "rel": "collection", "href": "https://example.com/api/collections/test-collection-2", "type": "application/json" },
+        { "rel": "root", "href": "https://example.com/api", "type": "application/json" }
+      ],
+      "assets": {}
+    }
+  ],
+  "links": [
+    { "rel": "root", "href": "https://example.com/api", "type": "application/json" },
+    { "rel": "next", "href": "https://example.com/api/search?cursor=page2", "type": "application/geo+json", "method": "GET" },
+    { "rel": "last", "href": "https://example.com/api/search?cursor=page3", "type": "application/geo+json", "method": "GET" }
+  ],
+  "numberMatched": 7
+}
