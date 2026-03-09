@@ -454,7 +454,7 @@ test.describe('STAC Browser Search page', () => {
       const submitButton = page.getByRole('button', { name: /submit/i });
       await submitButton.click();
 
-      await waitForMapReady(page);
+      await waitForPageReady(page);
 
       const resultList = await page.locator('.card-grid').locator('a.stac-link').count();
       expect(resultList).toBe(3);
