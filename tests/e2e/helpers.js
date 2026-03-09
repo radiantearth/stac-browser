@@ -312,9 +312,9 @@ export function loadApiFixture(filename) {
  * @param {object} [options]
  * @param {string} [options.baseUrl] – API base URL
  * @param {string} [options.collectionId] – collection ID to mock
- * @param {string} [options.collectionFixture] – fixture filename for the collection
- * @param {string} [options.itemsFixture] – fixture filename for the items response
- * @param {string} [options.itemsPage2Fixture] – optional fixture for page 2
+ * @param {string|Object} [options.collectionFixture] – fixture filename or parsed fixture for the collection
+ * @param {string|Object} [options.itemsFixture] – fixture filename or parsed fixture for the items response
+ * @param {string|Object} [options.itemsPage2Fixture] – optional fixture filename or parsed fixture for page 2
  */
 export async function mockApiCollection(worker, {
   baseUrl = DEFAULT_API_URL,
@@ -326,8 +326,8 @@ export async function mockApiCollection(worker, {
   // Register root + collections + search
   await mockApiRootAndCollections(worker, { baseUrl });
 
-  const collection = loadApiFixture(collectionFixture);
-  const items = loadApiFixture(itemsFixture);
+  const collection = (typeof collectionFixture == 'object') ? collectionFixture : loadApiFixture(collectionFixture);;
+  const items = (typeof itemsFixture == 'object') ? itemsFixture : loadApiFixture(itemsFixture);
 
   const handlers = [
     http.get(`${baseUrl}/collections/${collectionId}`, () => HttpResponse.json(collection)),
@@ -335,7 +335,7 @@ export async function mockApiCollection(worker, {
 
   // Items handler — checks query params for pagination
   if (itemsPage2Fixture) {
-    const page2 = loadApiFixture(itemsPage2Fixture);
+    const page2 = (typeof itemsPage2Fixture == 'object') ? itemsFixture : loadApiFixture(itemsPage2Fixture);
     handlers.push(
       http.get(`${baseUrl}/collections/${collectionId}/items`, ({ request }) => {
         const url = new URL(request.url);
@@ -378,10 +378,17 @@ export async function mockApiRootAndSearch(worker, options = {}) {
  * @param {object} [options]
  * @param {string} [options.baseUrl] – origin URL for the mock API
  * @param {object} [paginationOptions]
- * @returns TODO
  */
 export function paginationRootHandlers(
-  { baseUrl = DEFAULT_API_URL, limit = 10, page=1, prev = false, first = false, last = false} = {}
+  { 
+    baseUrl = DEFAULT_API_URL, 
+    limit = 10, 
+    page=1, 
+    prev = false, 
+    first = false, 
+    last = false,
+    searchEndpoint = "search" ,
+  } = {}
 ) {
   const fixtureDir = path.resolve(
     fileURLToPath(new URL('../fixtures/api/', import.meta.url)),
@@ -401,19 +408,19 @@ export function paginationRootHandlers(
       const result = rewrite(collections);
       return HttpResponse.json(result);
     }),
-    http.get(`${baseUrl}/search`, ({ request }) => {
+    http.get(`${baseUrl}/${searchEndpoint}`, ({ request }) => {
       const url = new URL(request.url);
 
       limit = parseInt(url.searchParams.get('limit')) || limit;
       page = parseInt(url.searchParams.get('page')) || page;
-      const searchResult = paginatedSearchHandler(baseUrl, limit, page, prev, first, last);
+      const searchResult = paginatedSearchHandler(baseUrl, limit, page, prev, first, last, searchEndpoint);
       return HttpResponse.json(rewrite(searchResult));
     }),
-    http.post(`${baseUrl}/search`, async ({ request }) => {
+    http.post(`${baseUrl}/${searchEndpoint}`, async ({ request }) => {
       const post = await request.json();
       limit = parseInt(post.limit) || limit;
       page = parseInt(post.page) || page;
-      const searchResult = paginatedSearchHandler(baseUrl, limit, page, prev, first, last);
+      const searchResult = paginatedSearchHandler(baseUrl, limit, page, prev, first, last, searchEndpoint);
       return HttpResponse.json(rewrite(searchResult));   
     })
   ];
@@ -434,7 +441,8 @@ export function paginatedSearchHandler(
   pageNumber = 1, 
   prev = false, 
   first = false, 
-  last = false
+  last = false,
+  searchEndpoint = "search" 
 ){
   const fixtureDir = path.resolve(
     fileURLToPath(new URL('../fixtures/api/', import.meta.url)),
@@ -454,26 +462,26 @@ export function paginatedSearchHandler(
   if((currentIndex + limit) < itemsLength){ //check if next pages exist
     let nextLink = structuredClone(linkFixture);
     nextLink.rel = 'next';
-    nextLink.href = `${baseUrl}/search?page=${pageNumber + 1}&limit=${limit}`;
+    nextLink.href = `${baseUrl}/${searchEndpoint}?page=${pageNumber + 1}&limit=${limit}`;
     page.links.push(nextLink);
   }
   if (prev && pageNumber > 1){
     let prevLink = structuredClone(linkFixture);
     prevLink.rel = 'prev';
-    prevLink.href = `${baseUrl}/search?page=${pageNumber - 1}&limit=${limit}`;
+    prevLink.href = `${baseUrl}/${searchEndpoint}?page=${pageNumber - 1}&limit=${limit}`;
     page.links.push(prevLink);
   }
   if (first){
     let firstLink = structuredClone(linkFixture);
     firstLink.rel = 'first';
-    firstLink.href = `${baseUrl}/search?limit=${limit}`;
+    firstLink.href = `${baseUrl}/${searchEndpoint}?limit=${limit}`;
     page.links.push(firstLink);
   }
   if (last){
     let lastLink = structuredClone(linkFixture);
     lastLink.rel = 'last';
     const lastPage = Math.ceil(itemsLength / limit);
-    lastLink.href = `${baseUrl}/search?page=${lastPage}limit=${limit}`;
+    lastLink.href = `${baseUrl}/${searchEndpoint}?page=${lastPage}limit=${limit}`;
     page.links.push(lastLink);
   }
   return page;
@@ -511,6 +519,28 @@ export async function waitForBrowserReady(page) {
     // Loading indicator might not appear for fast loads
   });
   await page.waitForSelector('main, .browse, .catalog, .item', { timeout: 10000 });
+}
+
+/**
+ * Navigate to a collection and wait for it to load.
+ *e
+ * @param {import('@playwright/test').Page} page
+ * @param {import('playwright-msw').MockServiceWorker} worker
+ * @param {object} collectionData
+ * @param {string} [collectionUrl]
+ */
+export async function loadMockCollection(page, worker, collectionData, collectionUrl = 'https://example.com/catalog.json') {
+  // Ensure the catalog URL is mocked
+  await mockStacResource(worker, collectionUrl, collectionData);
+
+  // Convert URL to browser path
+  const url = new URL(collectionUrl);
+  const protocol = url.protocol !== 'https:' ? url.protocol : '';
+  const protocolPart = protocol ? `/${protocol}` : '';
+  const browserPath = `/external${protocolPart}/${url.host}${url.pathname}${url.search}`;
+
+  await page.goto(browserPath);
+  await waitForBrowserReady(page);
 }
 
 // ─── Search-page helpers ────────────────────────────────────────────────────

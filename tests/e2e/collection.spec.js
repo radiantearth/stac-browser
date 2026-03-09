@@ -7,7 +7,17 @@
  * Fixtures: tests/fixtures/catalogs/test-catalog/eo-collection/
  */
 import { test, expect } from './fixtures';
-import { mockCatalogByFolder, loadMockCatalog, loadFixture, waitForBrowserReady } from './helpers';
+import { 
+  mockCatalogByFolder, 
+  loadMockCatalog, 
+  loadFixture, 
+  waitForBrowserReady, 
+  loadMockCollection, 
+  mockApiCollection, 
+  paginatedSearchHandler,
+  mockApiRootAndSearch,
+} from './helpers';
+
 
 test.describe('Collection view using folder fixtures', () => {
   const folderName = 'test-catalog';
@@ -105,34 +115,66 @@ test.describe('Collection view using folder fixtures', () => {
 
 test.describe('Collection item search', () => {
   const folderName = 'test-catalog';
-  const collectionUrl = `https://example.com/${folderName}/collections/example`;
+  const collectionUrl = `https://example.com/${folderName}/eo-collection`;
+  const catalogUrl = `https://example.com/${folderName}`;
 
-  const items = loadFixture('api', 'catalog.json');
+  const items = paginatedSearchHandler();
   const collection = loadFixture(folderName, 'eo-collection', 'collection.json');
 
-  // add paginatable l
+  // add paginable items
+  collection.links.filter((link) => link.rel != "item");
+  collection.links.push({
+    'rel': 'items',
+    'href': `${collectionUrl}/items`,
+    'type': 'application/geo+json',
+  });
 
-  test.beforeEach(async ({ worker }) => {
+  test.beforeEach(async ({ page, worker }) => {
+    await mockApiCollection(worker, {
+      baseUrl : `https://example.com`,
+      collectionID: 'eo-collection',
+      collectionsFixture: collection,
+      itemsFixture: items,
+    });
     await mockCatalogByFolder(worker, folderName, catalogUrl);
+    await mockApiRootAndSearch(worker, {
+      baseUrl: `${collectionUrl}`,
+      limit: 10,
+      prev: true,
+      first: true,
+      last: true, 
+      searchEndpoint: "items"
+    });
+
+    // move to mock collection
+    await loadMockCollection(page, worker, collection, collectionUrl);
   });
 
   test('setting item limit in filter should return that amount of items', async ({page, worker}) => {
-      // move to mock collection
+      const filtersButton = await page.locator('button:has-text("Show Filters")');
+      await filtersButton.click();
 
-    
       // Set a limit
       const limitInput = page.locator("#limit1");
-      // test that non-valid inputs don't work
-      // await limitInput.fill('0');
-      // expect(limitInput.inputValue()).not.toBe('0')
-      // await limitInput.fill('-1');
-      // expect(limitInput.inputValue()).not.toBe('-1')
-      // await limitInput.fill('1001');
-      // expect(limitInput.inputValue()).not.toBe('1001')
-      // await limitInput.fill('meow');
-      // expect(limitInput.inputValue()).not.toBe('meow')
       
       await limitInput.fill('5');
-      expect(limitInput.inputValue()).toBe('5')
+      expect(await limitInput.inputValue()).toBe('5');
+      const submitButton = await page.locator('button:has-text("Submit")');
+      await submitButton.click();
+
+      const itemCards = await page.locator('div.card.item-card');
+      await expect(itemCards).toHaveCount(5, { timeout: 10000 });
+
+      await test.step('test button functionality', async () => {
+        const nextButton = page.getByRole('button', { name: /next/i }).first();
+        const prevButton = page.getByRole('button', { name: /previous/i }).first();
+        
+        await expect(nextButton).toBeEnabled();
+        await expect(prevButton).toBeDisabled();
+        await nextButton.click();
+      });
   });
+  // TODO: add additional filters
+  // test('check for additional filter options', async ({page, worker}) => {
+  // });
 });
