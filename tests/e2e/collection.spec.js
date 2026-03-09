@@ -100,4 +100,39 @@ test.describe('Collection view using folder fixtures', () => {
     // item heading should show the item id
     await expect(page.getByRole('heading', { name: /item-2025-001/i })).toBeVisible();
   });
+
+});
+
+test.describe('Collection item search', () => {
+  const folderName = 'test-catalog';
+  const collectionUrl = `https://example.com/${folderName}/collections/example`;
+
+  const items = loadFixture('api', 'catalog.json');
+  const collection = loadFixture(folderName, 'eo-collection', 'collection.json');
+
+  // add paginatable l
+
+  test.beforeEach(async ({ worker }) => {
+    await mockCatalogByFolder(worker, folderName, catalogUrl);
+  });
+
+  test('setting item limit in filter should return that amount of items', async ({page, worker}) => {
+      // move to mock collection
+
+    
+      // Set a limit
+      const limitInput = page.locator("#limit1");
+      // test that non-valid inputs don't work
+      // await limitInput.fill('0');
+      // expect(limitInput.inputValue()).not.toBe('0')
+      // await limitInput.fill('-1');
+      // expect(limitInput.inputValue()).not.toBe('-1')
+      // await limitInput.fill('1001');
+      // expect(limitInput.inputValue()).not.toBe('1001')
+      // await limitInput.fill('meow');
+      // expect(limitInput.inputValue()).not.toBe('meow')
+      
+      await limitInput.fill('5');
+      expect(limitInput.inputValue()).toBe('5')
+  });
 });
