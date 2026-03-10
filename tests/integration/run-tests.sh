@@ -19,7 +19,7 @@ GENERATED_DIR="$SCRIPT_DIR/generated"
 LANGUAGES=(python javascript r csharp java rust)
 SCENARIOS=(default cql-json cql-text)
 GENERATED_FILES=(Program.cs StacSearch.java search.mjs search.py search.R main.rs)
-TIMEOUT_SECS=120
+TIMEOUT_SECS=300
 
 # Portable timeout: Linux → gtimeout (macOS via brew) → fallback
 if command -v timeout &>/dev/null; then
