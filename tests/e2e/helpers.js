@@ -312,9 +312,9 @@ export function loadApiFixture(filename) {
  * @param {object} [options]
  * @param {string} [options.baseUrl] – API base URL
  * @param {string} [options.collectionId] – collection ID to mock
- * @param {string} [options.collectionFixture] – fixture filename for the collection
- * @param {string} [options.itemsFixture] – fixture filename for the items response
- * @param {string} [options.itemsPage2Fixture] – optional fixture for page 2
+ * @param {string|Object} [options.collectionFixture] – fixture filename or parsed fixture for the collection
+ * @param {string|Object} [options.itemsFixture] – fixture filename or parsed fixture for the items response
+ * @param {string|Object} [options.itemsPage2Fixture] – optional fixture filename or parsed fixture for page 2
  */
 export async function mockApiCollection(worker, {
   baseUrl = DEFAULT_API_URL,
@@ -326,8 +326,8 @@ export async function mockApiCollection(worker, {
   // Register root + collections + search
   await mockApiRootAndCollections(worker, { baseUrl });
 
-  const collection = loadApiFixture(collectionFixture);
-  const items = loadApiFixture(itemsFixture);
+  const collection = (typeof collectionFixture == 'object') ? collectionFixture : loadApiFixture(collectionFixture);;
+  const items = (typeof itemsFixture == 'object') ? itemsFixture : loadApiFixture(itemsFixture);
 
   const handlers = [
     http.get(`${baseUrl}/collections/${collectionId}`, () => HttpResponse.json(collection)),
@@ -335,7 +335,7 @@ export async function mockApiCollection(worker, {
 
   // Items handler — checks query params for pagination
   if (itemsPage2Fixture) {
-    const page2 = loadApiFixture(itemsPage2Fixture);
+    const page2 = (typeof itemsPage2Fixture == 'object') ? itemsFixture : loadApiFixture(itemsPage2Fixture);
     handlers.push(
       http.get(`${baseUrl}/collections/${collectionId}/items`, ({ request }) => {
         const url = new URL(request.url);
@@ -352,6 +352,139 @@ export async function mockApiCollection(worker, {
   }
 
   await worker.use(...handlers);
+}
+
+// ─── Pagination handlers (for search page) ──────────────────────────────────
+
+/**
+ * Register API root + pagination supporting search handler via MSW.
+ *
+ * @param {import('playwright-msw').MockServiceWorker} worker
+ * @param {object} [options]
+ */
+export async function mockApiRootAndSearch(worker, options = {}) {
+  const handlers = paginationRootHandlers(options);
+  await worker.use(...handlers);
+}
+
+/**
+ * Build MSW handlers for a barebones STAC API root, containing a search endpoint.
+ *
+ * The search endpoint uses a search handler that procides a paginated list of STAC-
+ * items as well as controls
+ * The fixtures use DEFAULT_API_URL; if a different baseUrl is
+ * provided, all URLs in the fixtures are rewritten accordingly.
+ *
+ * @param {object} [options]
+ * @param {string} [options.baseUrl] – origin URL for the mock API
+ * @param {object} [paginationOptions]
+ */
+export function paginationRootHandlers(
+  { 
+    baseUrl = DEFAULT_API_URL, 
+    limit = 10, 
+    page=1, 
+    prev = false, 
+    first = false, 
+    last = false,
+    searchEndpoint = "search" ,
+  } = {}
+) {
+  const fixtureDir = path.resolve(
+    fileURLToPath(new URL('../fixtures/api/', import.meta.url)),
+  );
+  const root = JSON.parse(fs.readFileSync(path.join(fixtureDir, 'root.json'), 'utf8'));
+  const collections = JSON.parse(fs.readFileSync(path.join(fixtureDir, 'collections.json'), 'utf8'));
+
+  // If a custom baseUrl is provided, rewrite all URLs in the fixtures
+  const rewrite = (obj) =>
+    baseUrl !== DEFAULT_API_URL
+      ? JSON.parse(JSON.stringify(obj).replaceAll(DEFAULT_API_URL, baseUrl))
+      : obj;
+
+  return [
+    http.get(baseUrl, () => HttpResponse.json(rewrite(root))),
+    http.get(`${baseUrl}/collections`, () => { 
+      const result = rewrite(collections);
+      return HttpResponse.json(result);
+    }),
+    http.get(`${baseUrl}/${searchEndpoint}`, ({ request }) => {
+      const url = new URL(request.url);
+
+      limit = parseInt(url.searchParams.get('limit')) || limit;
+      page = parseInt(url.searchParams.get('page')) || page;
+      const searchResult = paginatedSearchHandler(baseUrl, limit, page, prev, first, last, searchEndpoint);
+      return HttpResponse.json(rewrite(searchResult));
+    }),
+    http.post(`${baseUrl}/${searchEndpoint}`, async ({ request }) => {
+      const post = await request.json();
+      limit = parseInt(post.limit) || limit;
+      page = parseInt(post.page) || page;
+      const searchResult = paginatedSearchHandler(baseUrl, limit, page, prev, first, last, searchEndpoint);
+      return HttpResponse.json(rewrite(searchResult));   
+    })
+  ];
+}
+
+/**
+ * Search endpoint that returns a paginated collection of items.
+ *
+ * The search endpoint returns a paginated collection of items in JSON format
+ * to the 
+ *
+ * @param {object} [options]
+ * @returns TODO
+ */
+export function paginatedSearchHandler(
+  baseUrl = DEFAULT_API_URL,
+  limit = 10, 
+  pageNumber = 1, 
+  prev = false, 
+  first = false, 
+  last = false,
+  searchEndpoint = "search" 
+){
+  const fixtureDir = path.resolve(
+    fileURLToPath(new URL('../fixtures/api/', import.meta.url)),
+  );
+  // generate page
+  let items = JSON.parse(fs.readFileSync(path.join(fixtureDir, '/search-paginated/items.json'), 'utf8'));
+  const itemsLength = items.length;
+  const currentIndex = (pageNumber-1) * limit;
+  items = items.slice(currentIndex, currentIndex + limit);
+
+  // prepare fixture
+  let page = JSON.parse(fs.readFileSync(path.join(fixtureDir, '/search-paginated/page.json'), 'utf8'));
+  page.features = items;
+  const linkFixture = JSON.parse(fs.readFileSync(path.join(fixtureDir, '/search-paginated/link.json'), 'utf8'));
+  
+  //add links
+  if((currentIndex + limit) < itemsLength){ //check if next pages exist
+    let nextLink = structuredClone(linkFixture);
+    nextLink.rel = 'next';
+    nextLink.href = `${baseUrl}/${searchEndpoint}?page=${pageNumber + 1}&limit=${limit}`;
+    page.links.push(nextLink);
+  }
+  if (prev && pageNumber > 1){
+    let prevLink = structuredClone(linkFixture);
+    prevLink.rel = 'prev';
+    prevLink.href = `${baseUrl}/${searchEndpoint}?page=${pageNumber - 1}&limit=${limit}`;
+    page.links.push(prevLink);
+  }
+  if (first){
+    let firstLink = structuredClone(linkFixture);
+    firstLink.rel = 'first';
+    firstLink.href = `${baseUrl}/${searchEndpoint}?limit=${limit}`;
+    page.links.push(firstLink);
+  }
+  if (last){
+    let lastLink = structuredClone(linkFixture);
+    lastLink.rel = 'last';
+    const lastPage = Math.ceil(itemsLength / limit);
+    lastLink.href = `${baseUrl}/${searchEndpoint}?page=${lastPage}limit=${limit}`;
+    page.links.push(lastLink);
+  }
+  return page;
 }
 
 // ─── Navigation helpers ─────────────────────────────────────────────────────
@@ -386,6 +519,28 @@ export async function waitForBrowserReady(page) {
     // Loading indicator might not appear for fast loads
   });
   await page.waitForSelector('main, .browse, .catalog, .item', { timeout: 10000 });
+}
+
+/**
+ * Navigate to a collection and wait for it to load.
+ *e
+ * @param {import('@playwright/test').Page} page
+ * @param {import('playwright-msw').MockServiceWorker} worker
+ * @param {object} collectionData
+ * @param {string} [collectionUrl]
+ */
+export async function loadMockCollection(page, worker, collectionData, collectionUrl = 'https://example.com/catalog.json') {
+  // Ensure the catalog URL is mocked
+  await mockStacResource(worker, collectionUrl, collectionData);
+
+  // Convert URL to browser path
+  const url = new URL(collectionUrl);
+  const protocol = url.protocol !== 'https:' ? url.protocol : '';
+  const protocolPart = protocol ? `/${protocol}` : '';
+  const browserPath = `/external${protocolPart}/${url.host}${url.pathname}${url.search}`;
+
+  await page.goto(browserPath);
+  await waitForBrowserReady(page);
 }
 
 // ─── Search-page helpers ────────────────────────────────────────────────────
@@ -425,4 +580,15 @@ export async function waitForSearchPost(page) {
     req => req.method() === 'POST' && req.url().includes('/search'),
   );
   return { body: JSON.parse(request.postData() || '{}'), url: request.url() };
+}
+
+/**
+ * Wait for the Item list to be visible on the search page.
+ * Returns the container of the item list.
+ */
+export async function waitForPageReady(page) {
+  const linkContainer = page.locator('section.list');
+  await linkContainer.first().waitFor({ state: 'visible', timeout: 10000 });
+  await linkContainer.first().first().waitFor({ state: 'visible', timeout: 10000 });
+  return linkContainer;
 }
