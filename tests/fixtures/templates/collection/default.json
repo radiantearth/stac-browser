@@ -1,0 +1,90 @@
+{
+  "type": "Collection",
+  "stac_version": "1.1.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/eo/v2.0.0/schema.json",
+    "https://stac-extensions.github.io/file/v2.1.0/schema.json",
+    "https://stac-extensions.github.io/version/v1.2.0/schema.json"
+  ],
+  "id": "example-collection",
+  "title": "Example Collection",
+  "description": "An example STAC Collection.",
+  "keywords": ["example", "collection"],
+  "license": "CC-0",
+  "version": "2",
+  "providers": [
+    {
+      "name": "Example Provider",
+      "roles": ["producer", "licensor"],
+      "url": "https://example.com"
+    },
+    {
+      "name": "Processing Corp",
+      "roles": ["processor"],
+      "url": "https://another.com"
+    },
+    {
+      "name": "Hosting Service",
+      "roles": ["host"],
+      "url": "https://host.com"
+    }
+  ],
+  "extent": {
+    "spatial": {
+      "bbox": [[-180.0, -90.0, 180.0, 90.0]]
+    },
+    "temporal": {
+      "interval": [["2020-01-01T00:00:00Z", null]]
+    }
+  },
+  "summaries": {
+    "platform": ["Sentinel-2A", "Sentinel-2B"],
+    "instruments": ["MSI"],
+    "gsd": [10, 20, 60],
+    "eo:cloud_cover": {"minimum": 0, "maximum": 50}
+  },
+  "links": [
+    {
+      "rel": "about",
+      "type": "text/html",
+      "href": "https://stacspec.org",
+      "title": "STAC Specification"
+    }
+  ],
+  "assets": {
+    "thumbnail": {
+      "href": "https://moregeo.it/logo.png",
+      "type": "image/png",
+      "roles": ["thumbnail"],
+      "title": "Thumbnail Image",
+      "file:size": 12345
+    }
+  },
+  "item_assets": {
+    "data": {
+      "type": "image/tiff; application=geotiff",
+      "roles": ["data"],
+      "title": "Measurements",
+      "bands": [
+        {
+          "name": "B1",
+          "eo:common_name": "red"
+        },
+        
+        {
+          "name": "B2",
+          "eo:common_name": "green"
+        },
+        {
+          "name": "B3",
+          "eo:common_name": "blue"
+        }
+      ]
+    },
+    "metadata": {
+      "type": "application/json",
+      "roles": ["metadata"],
+      "title": "Metadata"
+    }
+  }
+}

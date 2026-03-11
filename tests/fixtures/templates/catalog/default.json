@@ -2,7 +2,7 @@
   "type": "Catalog",
   "stac_version": "1.1.0",
   "stac_extensions": [],
-  "id": "example",
+  "id": "example-catalog",
   "title": "Example Catalog",
   "description": "An example STAC Catalog with some **Markdown**.",
   "links": [
