@@ -1,0 +1,28 @@
+{
+  "type": "Feature",
+  "stac_version": "1.1.0",
+  "id": "example-item",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [-180.0, -90.0],
+        [180.0, -90.0],
+        [180.0, 90.0],
+        [-180.0, 90.0],
+        [-180.0, -90.0]
+      ]
+    ]
+  },
+  "bbox": [
+    -180.0,
+    -90.0,
+    180.0,
+    90.0
+  ],
+  "properties": {
+    "datetime": "2020-01-01T00:00:00Z"
+  },
+  "links": [],
+  "assets": {}
+}

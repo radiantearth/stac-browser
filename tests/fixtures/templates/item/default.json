@@ -1,0 +1,84 @@
+{
+  "type": "Feature",
+  "stac_version": "1.1.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/eo/v2.0.0/schema.json",
+    "https://stac-extensions.github.io/file/v2.1.0/schema.json",
+    "https://stac-extensions.github.io/projection/v2.0.0/schema.json"
+  ],
+  "id": "example-item",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [-18, -9],
+        [18, -9],
+        [18, 9],
+        [-18, 9],
+        [-18, -9]
+      ]
+    ]
+  },
+  "bbox": [-18, -9, 18, 9],
+  "properties": {
+    "datetime": null,
+    "start_datetime": "2020-01-01T12:00:55.768Z",
+    "end_datetime": "2020-01-01T12:01:12.543Z",
+    "created": "2020-01-01T12:05:34Z",
+    "updated": "2024-07-12T23:12:11Z",
+    "constellation": "Sentinel-2",
+    "platform": "Sentinel-2A",
+    "instruments": ["MSI"],
+    "gsd": 10,
+    "eo:cloud_cover": 20,
+    "proj:code": "EPSG:4326"
+  },
+  "links": [
+    {
+      "rel": "about",
+      "type": "text/html",
+      "href": "https://stacspec.org",
+      "title": "STAC Specification"
+    }
+  ],
+  "assets": {
+    "thumbnail": {
+      "href": "https://moregeo.it/logo.png",
+      "type": "image/png",
+      "roles": ["thumbnail"],
+      "title": "Thumbnail Image",
+      "file:size": 49634,
+      "proj:code": null,
+      "proj:shape": [200, 200]
+    },
+    "data": {
+      "href": "https://example.com/data.tif",
+      "type": "image/tiff; application=geotiff",
+      "roles": ["data"],
+      "title": "Measurements",
+      "file:size": 123456789,
+      "bands": [
+        {
+          "name": "B1",
+          "eo:common_name": "red"
+        },
+        
+        {
+          "name": "B2",
+          "eo:common_name": "green"
+        },
+        {
+          "name": "B3",
+          "eo:common_name": "blue"
+        }
+      ]
+    },
+    "metadata": {
+      "href": "https://example.com/metadata.json",
+      "type": "application/json",
+      "roles": ["metadata"],
+      "title": "Metadata",
+      "file:size": 54321
+    }
+  }
+}
