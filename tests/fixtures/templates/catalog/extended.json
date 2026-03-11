@@ -1,0 +1,46 @@
+{
+  "type": "Catalog",
+  "stac_version": "1.1.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/version/v1.2.0/schema.json",
+    "https://stac-extensions.github.io/timestamps/v1.1.0/schema.json",
+    "https://stac-extensions.github.io/themes/v1.0.0/schema.json"
+  ],
+  "id": "example",
+  "title": "Example Catalog",
+  "description": "An example STAC Catalog with some extensions.\nFor example:\n\n-Version\n-Timestamps\n-Themes",
+  "version": "2",
+  "created": "2024-01-01T00:00:00Z",
+  "updated": "2024-05-10T17:12:23Z",
+  "expires": "2050-12-31T23:59:59Z",
+  "providers": [
+    {
+      "name": "Example Provider",
+      "roles": ["producer", "licensor"],
+      "url": "https://example.com"
+    }
+  ],
+  "themes": [
+    {
+      "concepts": [
+        {"id": "theme-1", "title": "Theme 1", "url": "https://example.com/themes/theme-1"},
+        {"id": "theme-2", "title": "Theme 2", "url": "https://example.com/themes/theme-2"}
+      ],
+      "scheme": "https://example.com/themes"
+    }
+  ],
+  "links": [
+    {
+      "rel": "about",
+      "type": "text/html",
+      "href": "https://stacspec.org",
+      "title": "STAC Specification"
+    },
+    {
+      "rel": "about",
+      "type": "text/html",
+      "href": "https://example.com",
+      "title": "Our website"
+    }
+  ]
+}
