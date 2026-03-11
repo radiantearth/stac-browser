@@ -1,55 +1,10 @@
 import { Stac } from "./stac";
 
 export class CatalogLike extends Stac {
-  constructor(options = {}) {
-    super(options);
-    this.baseurl = options.baseurl;
-    this.data = options.data || {};
-  }
+  constructor(data) {
+    super(data);
 
-  addTitle(title) {
-    this.data.title = title;
-    return this;
-  }
-
-  removeTitle() {
-    delete this.data.title;
-    return this;
-  }
-
-  updateTitle(newTitle) {
-    this.data.title = newTitle;
-    return this;
-  }
-
-  addVersion(version) {
-    this.data.version = version;
-    return this;
-  }
-
-  removeVersion() {
-    delete this.data.version;
-    return this;
-  }
-
-  updateVersion(newVersion) {
-    this.data.version = newVersion;
-    return this;
-  }
-
-  addDescription(description) {
-    this.data.description = description;
-    return this;
-  }
-
-  removeDescription() {
-    delete this.data.description;
-    return this;
-  }
-
-  updateDescription(newDescription) {
-    this.data.description = newDescription;
-    return this;
+    this.data = data || {};
   }
 
   addSearchLink() {
@@ -64,28 +19,20 @@ export class CatalogLike extends Stac {
     return this.updateLink('search', newParameters);
   }
 
-  addChildLink(childCatalog) {
-    return this.addLink({ rel: 'child', href: childCatalog.baseurl, type: 'application/json', title: childCatalog.data.title });
-  }
+  addStacLink(stac) {
+    const absluteUrl = this.getAbsoluteUrl();
+    if (!absluteUrl) {
+      throw new Error('Cannot add stac link without absolute URL');
+    }
+    
+    if (stac.type === 'Item') {
+      return this.addLink({ rel: 'item', href: absluteUrl, type: 'application/geo+json', title: stac.title }); 
+    } else if (stac.type === 'Catalog' || stac.type === 'Collection') {
+      return this.addLink({ rel: 'child', href: absluteUrl, type: 'application/json', title: stac.title });
+    } else {
+      throw new Error('Unsupported STAC type for stac link: ' + stac.type);
+    }
 
-  removeChildLink(childCatalog) {
-    return this.removeLink('child', childCatalog.baseurl);
-  }
-
-  updateChildLink(oldChildCatalog, newChildCatalog) {
-    return this.updateLink('child', { href: newChildCatalog.baseurl, title: newChildCatalog.data.title }, { href: oldChildCatalog.baseurl });
-  }
-
-  addItemLink(item) {
-    return this.addLink({ rel: 'item', href: item.baseurl, type: 'application/geo+json', title: item.data.title });
-  }
-
-  removeItemLink(item) {
-    return this.removeLink('item', item.baseurl);
-  }
-
-  updateItemLink(oldItem, newItem) {
-    return this.updateLink('item', { href: newItem.baseurl, title: newItem.data.title }, { href: oldItem.baseurl });
   }
 
   build() {
