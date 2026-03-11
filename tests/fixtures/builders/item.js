@@ -12,6 +12,26 @@ export class Item extends Stac {
     return this;
   }
 
+  addProperty(key, value) {
+    this.data[key] = value;
+    return this;
+  }
+
+  removeProperty(key) {
+    delete this.data[key];
+    return this;
+  }
+
+  updateProperty(key, newValue) {
+    this.data[key] = newValue;
+    return this;
+  }
+
+  extendProperties(newProperties) {
+    this.data = { ...this.data, ...newProperties };
+    return this;
+  }
+
   build() {
     return this.data;
   }
