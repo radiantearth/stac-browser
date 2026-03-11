@@ -1,34 +1,36 @@
 import { Stac } from "./stac";
 
 export class Item extends Stac {
-  constructor(options = {}) {
-    super(options);
-    this.baseurl = options.baseurl;
-    this.data = options.data || {};
+  constructor(data) {
+    super(data);
+    this.data = data || {};
   }
 
-  addCollection(collection) {
-    this.data.collection = collection;
+  _getMetadataObject() {
+    return this.data.properties;
+  }
+
+  setMetadata(pairs) {
+    const metadata = this._getMetadataObject();
+    pairs.forEach(([key, value]) => {
+      metadata[key] = value;
+    });
     return this;
   }
 
-  addProperty(key, value) {
-    this.data[key] = value;
+  removeMetadata(keys) {
+    const metadata = this._getMetadataObject();
+    keys.forEach((key) => {
+      delete metadata[key];
+    });
     return this;
   }
 
-  removeProperty(key) {
-    delete this.data[key];
-    return this;
-  }
-
-  updateProperty(key, newValue) {
-    this.data[key] = newValue;
-    return this;
-  }
-
-  extendProperties(newProperties) {
-    this.data = { ...this.data, ...newProperties };
+  updateMetadata(updates) {
+    const metadata = this._getMetadataObject();
+    Object.entries(updates).forEach(([key, value]) => {
+      metadata[key] = value;
+    });
     return this;
   }
 

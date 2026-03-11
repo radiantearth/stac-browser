@@ -1,25 +1,38 @@
 export class STACObject {
-  constructor(data) {
+  constructor(data, absoluteUrl) {
     this.data = data || {};
+    this.absoluteUrl = absoluteUrl || null;
   }
 
-  addBoundingBox(bbox) {
-    this.data.bbox = bbox;
+  _getMetadataObject() {
     return this;
   }
 
-  removeBoundingBox() {
-    delete this.data.bbox;
+  getAbsoluteUrl() {
+    return this.absoluteUrl;
+  }
+  
+  setMetadata(pairs) {
+    const metadata = this._getMetadataObject();
+    pairs.forEach(([key, value]) => {
+      metadata[key] = value;
+    });
     return this;
   }
 
-  addBoundingBoxes(bboxes) {
-    this.data.bboxes = bboxes;
+  removeMetadata(keys) {
+    const metadata = this._getMetadataObject();
+    keys.forEach((key) => {
+      delete metadata[key];
+    });
     return this;
   }
 
-  removeBoundingBoxes() {
-    delete this.data.bboxes;
+  updateMetadata(updates) {
+    const metadata = this._getMetadataObject();
+    Object.entries(updates).forEach(([key, value]) => {
+      metadata[key] = value;
+    });
     return this;
   }
 

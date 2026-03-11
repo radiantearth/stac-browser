@@ -12,14 +12,14 @@ export class Catalog extends CatalogLike {
     return this;
   }
 
-  removeConformsTo(specUrl) {
+  removeFromConformsTo(specUrl) {
     if (this.data.conformsTo) {
       this.data.conformsTo = this.data.conformsTo.filter(url => url !== specUrl);
     }
     return this;
   }
 
-  excludeConformsTo() {
+  removeConformsTo() {
     delete this.data.conformsTo;
     return this;
   }

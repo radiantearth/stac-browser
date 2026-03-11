@@ -1,6 +1,10 @@
-export class STACHypermedia {
-  constructor(options = {}) {
-    this.data = options.data || {};
+import { STACObject } from '@stac/stac-js';
+
+export class STACHypermedia extends STACObject {
+  constructor(data) {
+    super(data);
+    this.data = data || {};
+    this.absoluteUrl = this.getAbsoluteUrl() || null;
   }
 
   addLink(parameters) {
@@ -24,7 +28,7 @@ export class STACHypermedia {
   }
 
   addRootLink() {
-    return this.addLink({ rel: 'root', href: this.baseurl, type: 'application/json' });
+    return this.addLink({ rel: 'root', href: this.absoluteUrl, type: 'application/json' });
   }
 
   removeRootLink() {
@@ -36,7 +40,7 @@ export class STACHypermedia {
   }
 
   addSelfLink() {
-    return this.addLink({ rel: 'self', href: this.baseurl, type: 'application/json' });
+    return this.addLink({ rel: 'self', href: this.absoluteUrl, type: 'application/json' });
   }
 
   removeSelfLink() {
