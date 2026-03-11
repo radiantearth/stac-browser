@@ -35,6 +35,35 @@ export class CatalogLike extends Stac {
 
   }
 
+  addProviders(providers) {
+    if (!Array.isArray(this.data.providers)) {
+      this.data.providers = [];
+    }
+    this.data.providers.push(...providers);
+    return this;
+  }
+
+  removeProviders() {
+    delete this.data.providers;
+    return this;
+  }
+
+  addToProviders(provider) {
+    if (!Array.isArray(this.data.providers)) {
+      this.data.providers = [];
+    }
+    this.data.providers.push(provider);
+    return this;
+  }
+
+  removeFromProviders(providerName) {
+    if (!Array.isArray(this.data.providers)) {
+      return this;
+    }
+    this.data.providers = this.data.providers.filter(p => p.name !== providerName);
+    return this;
+  }
+
   build() {
     return this.data;
   }
