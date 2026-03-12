@@ -6,6 +6,10 @@ import { stacBrowserSpecialHandling } from "../rels";
 export default defineComponent({
   data() {
     return {
+      tabIds: {
+        map: 'map',
+        thumbnails: 'thumbnails'
+      },
       tab: null,
       shownOnMap: [],
       selectedAssets: []
@@ -44,7 +48,7 @@ export default defineComponent({
         .filter(link => link.rel !== 'preview' || !link.canBrowserDisplayImage());
     },
     selectedReferences() {
-      if (this.tab === 0) {
+      if (this.tab === this.tabIds.map) {
         return this.shownOnMap;
       }
       else {
@@ -55,10 +59,10 @@ export default defineComponent({
   methods: {
     showAsset(asset) {
       if (this.thumbnails.find(t => t.is(asset))) {
-        this.tab = 1;
+        this.tab = this.tabIds.thumbnails;
       }
       else {
-        this.tab = 0;
+        this.tab = this.tabIds.map;
         this.selectedAssets = [asset];
       }
       if (this.$refs.tabs) {
@@ -75,7 +79,7 @@ export default defineComponent({
     },
     handleEmptyMap() {
       if (this.hasThumbnails) {
-        this.tab = 1;
+        this.tab = this.tabIds.thumbnails;
       }
     }
   }
