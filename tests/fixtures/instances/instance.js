@@ -9,6 +9,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default class Instance {
   constructor(options) {
+    this.root = null;
     this.options = options;
     this.endpoints = [];
     this.templateCache = {};
@@ -51,6 +52,9 @@ export default class Instance {
   }) {
     const data = this._loadTemplate(type, template); 
     const obj = new type(data, url);
+    if (!this.root) {
+      this.root = obj;
+    }
     this.endpoints.push(obj);
     return obj;
   }

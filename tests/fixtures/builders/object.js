@@ -1,7 +1,6 @@
 export default class STACObject {
-  constructor(data, absoluteUrl) {
-    this.data = data || {};
-    this.absoluteUrl = absoluteUrl || null;
+  constructor(data) {
+    this.data = data;
   }
 
   _getMetadataObject() {
@@ -9,7 +8,7 @@ export default class STACObject {
   }
 
   getAbsoluteUrl() {
-    return this.absoluteUrl;
+    return null;
   }
   
   setMetadata(pairs) {

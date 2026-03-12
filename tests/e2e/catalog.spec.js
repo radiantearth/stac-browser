@@ -11,12 +11,13 @@ import { waitForBrowserReady } from './helpers';
 import StaticCatalog from '../fixtures/instances/static.js';
 
 test.only('root page renders default catalog metadata', async ({ page, worker }) => {
-  const sc = new StaticCatalog({ baseurl:'/external/example.com/catalog.json' });
+  const sc = new StaticCatalog();
   // load the template without modifications
-  sc.addCatalog({ url: sc.baseurl, template: 'default' });
+  sc.addCatalog({ url: 'https://example.com/catalog.json' });
 
   await sc.createServer(worker);
-  await page.goto(sc.baseurl);
+  
+  await page.goto('external/example.com/catalog.json');
   await waitForBrowserReady(page);
 
   await expect(page.getByRole('heading', { name: /Example Catalog/i })).toBeVisible();
