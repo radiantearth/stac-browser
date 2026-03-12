@@ -1,6 +1,6 @@
-import { APICollection } from "./apicollection";
+import APICollection from "./apicollection";
 
-export class ItemCollection extends APICollection{
+export default class ItemCollection extends APICollection{
   constructor() {
     super();
     this.collection = {};

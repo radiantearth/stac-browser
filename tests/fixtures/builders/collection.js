@@ -1,9 +1,10 @@
-import { CatalogLike } from "./catalogLike";
+import CatalogLike from "./catalogLike";
 
-export class Collection extends CatalogLike {
-  constructor(data) {
+export default class Collection extends CatalogLike {
+  constructor(data, url) {
     super(data);
     this.data = data || {};
+    this.absoluteUrl = url;
   }
 
   addKeyword(keyword) {

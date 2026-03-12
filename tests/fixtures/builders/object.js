@@ -1,4 +1,4 @@
-export class STACObject {
+export default class STACObject {
   constructor(data, absoluteUrl) {
     this.data = data || {};
     this.absoluteUrl = absoluteUrl || null;

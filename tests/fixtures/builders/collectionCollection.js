@@ -1,9 +1,9 @@
-export class CollectionCollection {
+export default class CollectionCollection {
   constructor() {
     this.collection = {};
   }
 
-  addCollection(collection) {
+  addNewCollection(collection) {
     this.collection.collections = this.collection.collections || [];
     this.collection.collections.push(collection);
     return this;

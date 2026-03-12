@@ -1,9 +1,10 @@
-import { Stac } from "./stac";
+import Stac from "./stac";
 
-export class Item extends Stac {
-  constructor(data) {
+export default class Item extends Stac {
+  constructor(data, url) {
     super(data);
     this.data = data || {};
+    this.absoluteUrl = url;
   }
 
   _getMetadataObject() {
