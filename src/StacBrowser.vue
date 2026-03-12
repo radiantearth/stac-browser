@@ -1,5 +1,6 @@
 <template>
   <b-container id="stac-browser">
+    <WidgetHook id="root-start" />
     <Authentication v-if="showLogin" />
     <ErrorAlert v-if="globalError" dismissible class="global-error" v-bind="globalError" @close="hideError" />
     <Sidebar v-if="sidebar !== null" v-model="sidebar" />
@@ -66,9 +67,12 @@
         </b-col>
       </b-row>
     </header>
-    <!-- Content (Item / Catalog) -->
+    <!-- Content -->
+    <WidgetHook id="root-before-content" />
     <router-view />
+    <!-- Footer -->
     <footer>
+      <WidgetHook id="footer-start" />
       <ul v-if="Array.isArray(footerLinksFromVueX) && footerLinksFromVueX.length > 0" class="footer-links text-muted">
         <li v-for="link in footerLinksFromVueX" :key="link.url">
           <a :href="link.url" target="_blank">{{ $te(`footerLinks.${link.label}`) ? $t(`footerLinks.${link.label}`) : link.label }}</a>
@@ -87,6 +91,7 @@
     >
       <RootStats />
     </b-popover>
+    <WidgetHook id="root-end" />
   </b-container>
 </template>
 

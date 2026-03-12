@@ -2,6 +2,7 @@
   <div class="item" :key="data.id">
     <b-row>
       <b-col class="left">
+        <WidgetHook id="view-item-primary-start" />
         <section class="mb-4">
           <b-card no-body class="maps-preview">
             <b-tabs v-model="tab" ref="tabs" card pills vertical end>
@@ -16,8 +17,10 @@
         </section>
         <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="selectedReferences" @show-asset="showAsset" />
         <LinkList v-if="additionalLinks.length > 0" :title="$t('additionalResources')" :links="additionalLinks" :context="data" />
+        <WidgetHook id="view-item-primary-end" />
       </b-col>
       <b-col class="right">
+        <WidgetHook id="view-item-secondary-start" />
         <section class="intro">
           <h2 v-if="data.properties.description">{{ $t('description') }}</h2>
           <DeprecationNotice v-if="showDeprecation" :data="data" />
@@ -30,6 +33,7 @@
         <CollectionLink v-if="collectionLink" :link="collectionLink" />
         <Providers v-if="data.properties.providers" :providers="data.properties.providers" />
         <MetadataGroups :data="data" type="Item" :ignoreFields="ignoredMetadataFields" />
+        <WidgetHook id="view-item-secondary-end" />
       </b-col>
     </b-row>
   </div>

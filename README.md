@@ -27,6 +27,7 @@ If you care about STAC Browser and have some funds to support the future of STAC
     - [Themes](#themes)
     - [Basemaps](#basemaps)
     - [Actions](#actions)
+    - [Widgets](#widgets)
     - [Additional metadata fields](#additional-metadata-fields)
       - [Example](#example)
       - [Translation](#translation)
@@ -208,6 +209,12 @@ More information about how to configure and customize the basemaps can be found 
 STAC Browser has a pluggable interface to share or open assets and links with other services, which we call "actions".
 
 More information about how to add or implement actions can be found in the **[Actions documentation](docs/actions.md)**.
+
+### Widgets
+
+STAC Browser has a pluggable interface and allows to add additional content to the pages, which we call "widgets".
+
+More information about how to add or implement widgets can be found in the **[Widgets documentation](docs/widgets.md)**.
 
 ### Additional metadata fields
 

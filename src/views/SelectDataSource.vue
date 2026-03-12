@@ -1,5 +1,6 @@
 <template>
   <main class="select-data-source">
+    <WidgetHook id="view-select-data-source-start" />
     <b-form @submit.prevent="go">
       <b-form-group
         id="select" :label="$t('index.specifyCatalog')" label-for="url"
