@@ -8,7 +8,6 @@
 </template>
 
 <script>
-import { STAC } from 'stac-js';
 import validateSTAC from 'stac-node-validator';
 
 export default {
@@ -31,7 +30,7 @@ export default {
   },
   computed: {
     validationLink() {
-      if (this.data instanceof STAC) {
+      if (this.data?.isSTAC()) {
         return '/validation' + this.data.getBrowserPath();
       }
       else {
@@ -47,7 +46,7 @@ export default {
       this.working = true;
       this.valid = null;
       try {
-        if (this.data instanceof STAC) {
+        if (this.data?.isSTAC()) {
           const stac = this.data._original || this.data.toJSON();
           const report = await validateSTAC(stac, {});
           this.valid = report.valid;

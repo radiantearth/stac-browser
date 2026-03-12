@@ -33,7 +33,6 @@ import { mapGetters } from 'vuex';
 import Select from 'ol/interaction/Select';
 import StacLayer from 'ol-stac';
 import { getStacObjectsForEvent, getStyle } from 'ol-stac/util.js';
-import { STACReference } from 'stac-js';
 import MapUtils from './maps/mapUtils.js';
 import GeoJSON from 'ol/format/GeoJSON.js';
 
@@ -250,7 +249,7 @@ export default {
       return this.stacLayer.getLayers().getArray()
         .filter(layer => MapUtils.isLayerVisible(layer))
         .map(layer => layer.get('stac'))
-        .filter(stac => stac instanceof STACReference);
+        .filter(stac => stac?.isReference());
     }
   }
 };

@@ -2,7 +2,6 @@ import { isObject, size } from 'stac-js/src/utils.js';
 import { toAbsolute } from 'stac-js/src/http.js';
 import Utils from './utils';
 import { getDisplayTitle } from './models/stac';
-import { STAC } from 'stac-js';
 import { URI } from 'stac-js/src/utils.js';
 import i18n from './i18n';
 
@@ -53,7 +52,7 @@ function makeAssets(data) {
 function makeLinks(links, data, store, type = "DataCatalog") {
   return links.map(link => {
     let name, isBasedOn;
-    if (link instanceof STAC) {
+    if (link?.isSTAC()) {
       name = getDisplayTitle(link);
       isBasedOn = link.getAbsoluteUrl();
     }
@@ -88,7 +87,7 @@ function makeProvider(providers, role) {
 
 function fallbackDescription(data, store) {
   let stacType, container;
-  if (data instanceof STAC) {
+  if (data?.isSTAC()) {
     stacType = data.isItem() ? "Item" : data.type;
     container = data.collection;
   }
@@ -162,7 +161,7 @@ function createBaseSchema(data, type, store) {
 }
 
 export function createCatalogSchema(data, parents, store) {
-  if (!(data instanceof STAC)) {
+  if (!data?.isSTAC()) {
     return null;
   }
   // Remove invalid links
@@ -193,7 +192,7 @@ export function createCatalogSchema(data, parents, store) {
 }
 
 export function createItemSchema(data, parents, store) {
-  if (!(data instanceof STAC)) {
+  if (!data?.isSTAC()) {
     return null;
   }
   parents = parents.filter(link => isObject(link));

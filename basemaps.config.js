@@ -1,6 +1,3 @@
-import { Collection } from './src/models/stac';
-import { STAC } from 'stac-js';
-
 // For documentation see https://github.com/radiantearth/stac-browser/blob/main/docs/basemaps.md
 
 const BASEMAPS = {
@@ -62,10 +59,10 @@ const BASEMAPS = {
  */
 export default function configureBasemap(stac, i18n) {
   let targets;
-  if (stac instanceof Collection) {
+  if (stac?.isCollection()) {
     targets = stac.getSummary('ssys:targets');
   }
-  if (stac instanceof STAC && !targets) {
+  if (stac?.isSTAC() && !targets) {
     targets = stac.getMetadata('ssys:targets');
   }
   if (!targets) {

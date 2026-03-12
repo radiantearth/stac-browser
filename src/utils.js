@@ -1,6 +1,6 @@
 import { URI } from 'stac-js/src/utils.js';
 import removeMd from 'remove-markdown';
-import { Link, Asset } from 'stac-js';
+import { Link } from 'stac-js';
 import { hasText, isObject, size } from 'stac-js/src/utils.js';
 import { geojsonMediaType, imageMediaTypes } from 'stac-js/src/mediatypes.js';
 import { pagination } from "stac-js/src/relationtypes.js";
@@ -371,7 +371,7 @@ export default class Utils {
 
   static assetFilename(asset, response = null) {
     // Get the preferred filename from the file:local_path property
-    if (asset instanceof Asset) {
+    if (asset?.isAsset()) {
       const localPath = asset.getMetadata('file:local_path');
       if (typeof localPath === 'string') {
         return URI(localPath).filename();

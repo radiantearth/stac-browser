@@ -1,7 +1,6 @@
 import { mapState } from 'vuex';
 import Utils from '../utils';
 import { hasText } from 'stac-js/src/utils.js';
-import { STAC } from 'stac-js';
 
 export default {
   props: {
@@ -50,10 +49,10 @@ export default {
       return [];
     },
     isDeprecated() {
-      return this.data instanceof STAC && Boolean(this.data.getMetadata('deprecated'));
+      return this.data?.isSTAC() && Boolean(this.data.getMetadata('deprecated'));
     },
     hasDescription() {
-      return this.data instanceof STAC && hasText(this.data.getMetadata('description'));
+      return this.data?.isSTAC() && hasText(this.data.getMetadata('description'));
     },
     summarizeDescription() {
       return this.hasDescription ? Utils.summarizeMd(this.data.getMetadata('description'), 300) : '';

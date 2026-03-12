@@ -17,7 +17,7 @@ import HrefActions from './HrefActions.vue';
 import StacFieldsMixin from './StacFieldsMixin';
 import AuthUtils from './auth/utils';
 import { isObject, size } from 'stac-js/src/utils.js';
-import { Asset, STACReference } from 'stac-js';
+import { Asset } from 'stac-js';
 
 export default {
   name: 'AssetAlternative',
@@ -101,7 +101,7 @@ export default {
   },
   methods: {
     resolveStorage(obj) {
-      if (obj instanceof STACReference) {
+      if (obj?.isReference()) {
         const refs = obj.getMetadata('storage:refs');
         const schemes = obj.getMetadata('storage:schemes');
         if (size(refs) > 0 && size(schemes) > 0) {

@@ -28,7 +28,6 @@ import FileFormatsMixin from './FileFormatsMixin';
 import StacFieldsMixin from './StacFieldsMixin';
 import CardMixin from './CardMixin';
 import StacLink from './StacLink.vue';
-import { STAC } from 'stac-js';
 import { formatTemporalExtent } from '@radiantearth/stac-fields/formatters';
 import { BCard, BCardBody, BCardFooter, BCardImg, BCardText, BCardTitle } from 'bootstrap-vue-next';
 
@@ -86,7 +85,7 @@ export default {
   },
   methods: {
     load(visible) {
-      if (this.catalog instanceof STAC) {
+      if (this.catalog?.isSTAC()) {
         return;
       }
       this.$store.commit(visible ? 'queue' : 'unqueue', this.catalog.getAbsoluteUrl());

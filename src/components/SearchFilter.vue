@@ -161,8 +161,8 @@ import ApiCapabilitiesMixin, { TYPES } from './ApiCapabilitiesMixin';
 import DatePickerMixin from './DatePickerMixin';
 import Loading from './Loading.vue';
 
-import { CollectionCollection, STAC } from 'stac-js'; 
-import { createSTAC, Collection } from '../models/stac';
+import { CollectionCollection } from 'stac-js'; 
+import { createSTAC } from '../models/stac';
 import Cql from '../models/cql2/cql';
 import Queryable from '../models/cql2/queryable';
 import CqlLogicalOperator, { CqlNot } from '../models/cql2/operators/logical';
@@ -284,7 +284,7 @@ export default defineComponent({
       return obj;
     },
     stac() {
-      if (this.parent instanceof STAC) {
+      if (this.parent?.isSTAC()) {
         return this.parent;
       }
       return null;
@@ -343,10 +343,10 @@ export default defineComponent({
     parent: {
       immediate: true,
       handler(newStac, oldStac) {
-        if (newStac instanceof Collection) {
+        if (newStac?.isCollection()) {
           newStac.setApiDataListener('searchfilter' + formId, () => this.updateApiCollections());
         }
-        if (oldStac instanceof Collection) {
+        if (oldStac?.isCollection()) {
           oldStac.setApiDataListener('searchfilter' + formId);
         }
         this.updateApiCollections();
@@ -479,7 +479,7 @@ export default defineComponent({
         }
 
         const paginationLinks = stac.getPaginationLinks();
-        if (!paginationLinks.next && stac instanceof CollectionCollection) {
+        if (!paginationLinks.next && stac?.isCollectionCollection()) {
           data.collections = this.prepareCollections(stac.getAll());
         }
       }

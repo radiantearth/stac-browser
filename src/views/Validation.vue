@@ -43,7 +43,6 @@ import { mapState } from 'vuex';
 import { defineComponent } from 'vue';
 import validateSTAC from 'stac-node-validator';
 import BrowseMixin from './BrowseMixin.js';
-import { STAC } from 'stac-js';
 import { BCardGroup } from 'bootstrap-vue-next';
 import ValidationResult from '../components/ValidationResult.vue';
 
@@ -103,7 +102,7 @@ export default defineComponent({
     async validate() {
       this.working = true;
       this.report = null;
-      if (this.data instanceof STAC) {
+      if (this.data?.isSTAC()) {
         try {
           const stac = this.data._original || this.data.toJSON();
           this.report = await validateSTAC(stac, {});

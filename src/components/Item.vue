@@ -25,7 +25,6 @@ import { mapState, mapGetters } from 'vuex';
 import FileFormatsMixin from './FileFormatsMixin';
 import CardMixin from './CardMixin';
 import StacLink from './StacLink.vue';
-import { STAC } from 'stac-js';
 import { formatTemporalExtent, formatTimestamp } from '@radiantearth/stac-fields/formatters';
 import { BCard, BCardBody, BCardText, BCardTitle, BCardImg } from 'bootstrap-vue-next';
 
@@ -83,7 +82,7 @@ export default defineComponent({
   },
   methods: {
     load(visible) {
-      if (this.item instanceof STAC) {
+      if (this.item?.isSTAC()) {
         return;
       }
       this.$store.commit(visible ? 'queue' : 'unqueue', this.item.getAbsoluteUrl());

@@ -44,7 +44,6 @@ import { defineComponent, defineAsyncComponent } from 'vue';
 import Catalog from './Catalog.vue';
 import Loading from './Loading.vue';
 import { getDisplayTitle } from '../models/stac';
-import { STAC } from 'stac-js';
 import ViewButtons from './ViewButtons.vue';
 import Utils from '../utils';
 
@@ -155,7 +154,7 @@ export default defineComponent({
       let catalogs = this.allCatalogs;
       if (this.hasSearchCritera) {
         catalogs = catalogs.filter(catalog => {
-          if (this.selectedKeywords.length > 0 && catalog instanceof STAC && Array.isArray(catalog.keywords)) {
+          if (this.selectedKeywords.length > 0 && catalog?.isSTAC() && Array.isArray(catalog.keywords)) {
             let hasKeywords = this.selectedKeywords.every(keyword => catalog.keywords.includes(keyword));
             if (!hasKeywords) {
               return false;
@@ -163,7 +162,7 @@ export default defineComponent({
           }
           if (this.searchTerm) {
             let haystack = [ catalog.title ];
-            if (catalog instanceof STAC && this.isComplete) {
+            if (catalog?.isSTAC() && this.isComplete) {
               haystack.push(catalog.id);
               if (Array.isArray(catalog.keywords)) {
                 haystack = haystack.concat(catalog.keywords);
@@ -190,7 +189,7 @@ export default defineComponent({
       }
       let keywords = [];
       for(let catalog of this.allCatalogs) {
-        if (catalog instanceof STAC && Array.isArray(catalog.keywords)) {
+        if (catalog?.isSTAC() && Array.isArray(catalog.keywords)) {
           for(let keyword of catalog.keywords) {
             if (!keywords.includes(keyword)) {
               keywords.push(keyword);

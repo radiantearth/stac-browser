@@ -42,8 +42,7 @@
 import { mapGetters, mapState } from 'vuex';
 import { isObject } from 'stac-js/src/utils.js';
 import { toAbsolute } from 'stac-js/src/http.js';
-import { getDisplayTitle, Collection } from '../models/stac';
-import { STAC } from 'stac-js';
+import { getDisplayTitle } from '../models/stac';
 
 export default {
   name: 'Tree',
@@ -82,7 +81,7 @@ export default {
       if (this.pagination) {
         return null;
       }
-      else if (this.item instanceof STAC) {
+      else if (this.item?.isSTAC()) {
         let stac = this.getStac(this.item.getAbsoluteUrl());
         if (!this.loading && stac) {
           return stac;
@@ -115,7 +114,7 @@ export default {
       return null;
     },
     mayHaveChildren() {
-      if (this.item instanceof STAC) {
+      if (this.item?.isSTAC()) {
         return this.item.isCatalogLike();
       }
       else if (this.link) {
@@ -135,7 +134,7 @@ export default {
           return null;
         }
       }
-      else if (this.stac instanceof STAC) {
+      else if (this.stac?.isSTAC()) {
         return this.stac.getBrowserPath();
       }
       return null;
@@ -177,10 +176,10 @@ export default {
     stac: {
       immediate: true,
       handler(newStac, oldStac) {
-        if (newStac instanceof Collection) {
+        if (newStac?.isCollection()) {
           newStac.setApiDataListener('tree', () => this.updateChilds());
         }
-        if (oldStac instanceof Collection) {
+        if (oldStac?.isCollection()) {
           oldStac.setApiDataListener('tree');
         }
         this.updateChilds();
@@ -213,7 +212,7 @@ export default {
       this.expanded = !this.expanded;
       if (this.expanded && !this.pagination) {
         this.loading = true;
-        let url = this.item instanceof STAC ? this.item.getAbsoluteUrl() : this.item.href;
+        let url = this.item?.isSTAC() ? this.item.getAbsoluteUrl() : this.item.href;
         await this.$store.dispatch("load", { url });
         this.loading = false;
       }

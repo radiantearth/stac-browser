@@ -4,8 +4,6 @@ import {
   Item as BaseItem,
   ItemCollection as BaseItemCollection,
   CollectionCollection as BaseCollectionCollection,
-  STAC,
-  STACReference
 } from 'stac-js';
 import Migrate from '@radiantearth/stac-migrate';
 import Utils from "../utils";
@@ -62,8 +60,8 @@ export function getDisplayTitle(entities, fallbackTitle = "") {
   if (!Array.isArray(entities)) {
     entities = [entities];
   }
-  const stac = entities.find(o => o instanceof STAC);
-  const ref = entities.find(o => o instanceof STACReference);
+  const stac = entities.find(o => o?.isSTAC());
+  const ref = entities.find(o => o?.isReference());
   const entity = stac || ref;
   if (!entity) {
     return fallbackTitle;

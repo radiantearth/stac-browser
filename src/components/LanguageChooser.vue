@@ -15,8 +15,6 @@
 </template>
 
 <script>
-
-import { STAC } from 'stac-js';
 import { getBest, prepareSupported } from 'stac-js/src/locales';
 
 import { BDropdown, BDropdownItem } from 'bootstrap-vue-next';
@@ -48,7 +46,7 @@ export default {
   computed: {
     dataLanguages() {
       let dataLanguages = [];
-      if (this.data instanceof STAC) {
+      if (this.data?.isSTAC()) {
         const languages = this.data.getMetadata('languages');
         // Ensure the other languages are always an array
         if (Array.isArray(languages) && languages.length > 0) {
@@ -62,7 +60,7 @@ export default {
       return dataLanguages.filter(lang => isObject(lang) && typeof lang.code === 'string');
     },
     supportsLanguageExt() {
-      return this.data instanceof STAC && this.data.supportsExtension(STAC_LANGUAGE_EXT);
+      return this.data?.isSTAC() && this.data.supportsExtension(STAC_LANGUAGE_EXT);
     },
     currentLanguage() {
       let lang = this.languages.find(l => l.code === this.currentLocale);

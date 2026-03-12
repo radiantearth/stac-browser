@@ -13,7 +13,6 @@ import { stacBrowserNavigatesTo } from "../rels";
 import { isObject, size } from 'stac-js/src/utils.js';
 import { isStacMediaType } from 'stac-js/src/mediatypes.js';
 import { getDisplayTitle } from '../models/stac';
-import { STAC } from 'stac-js';
 import { URI } from 'stac-js/src/utils.js';
 
 export default defineComponent({
@@ -56,7 +55,7 @@ export default defineComponent({
     ...mapState(['allowExternalAccess', 'privateQueryParameters']),
     ...mapGetters(['toBrowserPath', 'getRequestUrl', 'isExternalUrl']),
     icon() {
-      if (this.stac instanceof STAC) {
+      if (this.stac?.isSTAC()) {
         const icons = this.stac.getIcons();
         if (icons.length > 0) {
           return icons[0];
@@ -65,11 +64,11 @@ export default defineComponent({
       return null;
     },
     stac() {
-      if (this.data instanceof STAC) {
+      if (this.data?.isSTAC()) {
         return this.data;
       }
       else if (Array.isArray(this.data)) {
-        return this.data.find(o => o instanceof STAC);
+        return this.data.find(o => o?.isSTAC());
       }
       else {
         return null;
@@ -131,7 +130,7 @@ export default defineComponent({
     href() {
       if (this.stac || this.isStacBrowserLink) {
         let href;
-        if (this.stac instanceof STAC) {
+        if (this.stac?.isSTAC()) {
           href = this.stac.getBrowserPath();
         }
         else {
@@ -176,7 +175,7 @@ export default defineComponent({
   },
   methods: {
     isLink(o) {
-      return isObject(o) && !(o instanceof STAC);
+      return isObject(o) && !(o?.isSTAC());
     }
   }
 });

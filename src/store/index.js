@@ -7,7 +7,6 @@ import Utils, { BrowserError } from '../utils';
 import { hasText, isObject } from 'stac-js/src/utils.js';
 import { toAbsolute } from 'stac-js/src/http.js';
 import { addMissingChildren, getDisplayTitle, createSTAC } from '../models/stac';
-import { CatalogLike, STAC } from 'stac-js';
 
 import auth from './auth.js';
 import { addQueryIfNotExists, hasAuthority, isAuthenticationError, Loading, processSTAC, stacRequest, stacRequestOptions } from './utils';
@@ -66,7 +65,7 @@ function getStore(config, router) {
     }),
     getters: {
       isRoot: (state, getters) => {
-        if (state.data instanceof STAC) {
+        if (state.data?.isSTAC()) {
           return state.data.is(getters.root);
         }
         return false;
@@ -76,7 +75,7 @@ function getStore(config, router) {
           const meta = state.page();
           return meta.title;
         }
-        else if (state.data instanceof STAC) {
+        else if (state.data?.isSTAC()) {
           const fallback = getters.isRoot ? state.catalogTitle : '';
           return getDisplayTitle(state.data, fallback);
         }
@@ -90,7 +89,7 @@ function getStore(config, router) {
           const meta = state.page();
           description = meta.description;
         }
-        else if (state.data instanceof STAC) {
+        else if (state.data?.isSTAC()) {
           description = state.data.getMetadata('description');
         }
         return hasText(description) ? description : "";
@@ -100,7 +99,7 @@ function getStore(config, router) {
         if (data instanceof Loading) {
           return true;
         }
-        else if (data instanceof STAC) {
+        else if (data?.isSTAC()) {
           id = data.id;
         }
         else if (typeof data === 'string') {
@@ -110,7 +109,7 @@ function getStore(config, router) {
       },
       error: state => state.database[state.url] instanceof Error ? state.database[state.url] : null,
       getStac: state => (source, returnErrorObject = false) => {
-        if (source instanceof STAC) {
+        if (source?.isSTAC()) {
           return source;
         }
         if (isObject(source) && hasText(source.href)) {
@@ -121,7 +120,7 @@ function getStore(config, router) {
         }
         let absoluteUrl = toAbsolute(source, state.url);
         let data = state.database[absoluteUrl];
-        if (data instanceof STAC || (returnErrorObject && data instanceof Error)) {
+        if (data?.isSTAC() || (returnErrorObject && data instanceof Error)) {
           return data;
         }
         else {
@@ -144,7 +143,7 @@ function getStore(config, router) {
         if (link) {
           return link;
         }
-        else if (state.url && state.data instanceof STAC && state.data.getLinksWithRels(['conformance', 'service-desc', 'service-doc', 'data', 'search']).length > 0) {
+        else if (state.url && state.data?.isSTAC() && state.data.getLinksWithRels(['conformance', 'service-desc', 'service-doc', 'data', 'search']).length > 0) {
           return Utils.createLink(state.url, 'root', getDisplayTitle(state.data, state.catalogTitle));
         }
         else if (state.url) {
@@ -164,7 +163,7 @@ function getStore(config, router) {
         return null;
       },
       parentLink: state => {
-        if (state.data instanceof STAC) {
+        if (state.data?.isSTAC()) {
           let link = state.data.getStacLinkWithRel('parent');
           if (link) {
             return link;
@@ -185,7 +184,7 @@ function getStore(config, router) {
         return null;
       },
       collectionLink: state => {
-        if (state.data instanceof STAC) {
+        if (state.data?.isSTAC()) {
           let link = state.data?.getStacLinkWithRel('collection');
           if (link) {
             return link;
@@ -236,8 +235,8 @@ function getStore(config, router) {
         return [];
       },
       catalogs: state => {
-        let hasCollections = Boolean(state.data instanceof CatalogLike && state.data.getApiCollectionsLink() && state.apiCollections.length > 0);
-        let hasChilds = Boolean(state.data instanceof CatalogLike);
+        let hasCollections = Boolean(state.data?.isCatalogLike() && state.data.getApiCollectionsLink() && state.apiCollections.length > 0);
+        let hasChilds = state.data?.isCatalogLike();
         let showCollections = !state.apiCatalogPriority || state.apiCatalogPriority === 'collections';
         let showChilds = !state.apiCatalogPriority || state.apiCatalogPriority === 'childs';
         let catalogs = [];
@@ -506,7 +505,7 @@ function getStore(config, router) {
           stac = state.database[url] || null;
         }
         state.url = url || null;
-        state.data = stac instanceof STAC ? stac : null;
+        state.data = stac?.isSTAC() ? stac : null;
         state.page = page;
         state.loading = false;
       },
@@ -576,7 +575,7 @@ function getStore(config, router) {
           }
         }
 
-        if (stac instanceof STAC) {
+        if (stac?.isSTAC()) {
           // ToDo: Prev link only required when state.apiItems is not cached(?) -> cache apiItems?
           stac.setApiData(apiItems, pages.next, pages.prev);
         }
@@ -593,7 +592,7 @@ function getStore(config, router) {
           state.nextCollectionsLink = nextLink;
           state.apiCollections = state.apiCollections.concat(collections);
         }
-        if (stac instanceof STAC) {
+        if (stac?.isSTAC()) {
           stac.setApiData(collections, nextLink);
         }
       },
@@ -675,7 +674,7 @@ function getStore(config, router) {
         }
       },
       async loadParents(cx) {
-        if (!(cx.state.data instanceof STAC)) {
+        if (!cx.state.data?.isSTAC()) {
           cx.commit('parents', []);
           return;
         }
@@ -737,7 +736,7 @@ function getStore(config, router) {
           return;
         }
 
-        const hasData = data instanceof STAC && !data._incomplete;
+        const hasData = data?.isSTAC() && !data._incomplete;
         if (!hasData) {
           cx.commit('loading', { url, loading });
           try {
@@ -746,7 +745,7 @@ function getStore(config, router) {
               throw new BrowserError(i18n.global.t('errors.invalidJsonObject'));
             }
             data = createSTAC(response.data, url, path);
-            if (!(data instanceof STAC)) {
+            if (data.isApiCollection()) {
               // Might be a request to the /collections or .../items endpoints,
               // which returns an APICollection, not a STAC object.
               throw new BrowserError(i18n.global.t('errors.apiListRequested'));
@@ -785,8 +784,8 @@ function getStore(config, router) {
         }
 
         // Load API Collections
-        const apiCollectionLink = data instanceof CatalogLike && data.getApiCollectionsLink();
-        const apiItemLink = data instanceof CatalogLike && data.getApiItemsLink();
+        const apiCollectionLink = data?.isCatalogLike() && data.getApiCollectionsLink();
+        const apiItemLink = data?.isCatalogLike() && data.getApiItemsLink();
         if (!omitApi && apiCollectionLink) {
           let args = { stac: data, show: loading.show };
           try {
@@ -836,12 +835,12 @@ function getStore(config, router) {
       },
       async loadApiItems(cx, args) {
         let { link, stac, show, filters, noRetry } = args;
-        let collectionId = stac instanceof STAC ? stac.id : '';
+        let collectionId = stac?.isSTAC() ? stac.id : '';
         cx.commit('toggleApiItemsLoading', collectionId);
 
         try {
           let baseUrl = cx.state.url;
-          if (stac instanceof STAC) {
+          if (stac?.isSTAC()) {
             link = stac.getApiItemsLink();
             baseUrl = stac.getAbsoluteUrl();
           }
@@ -911,7 +910,7 @@ function getStore(config, router) {
                 console.error(error);
                 return null;
               }
-            }).filter(item => item instanceof STAC);
+            }).filter(item => item?.isSTAC());
             if (show) {
               cx.commit('setApiItemsLink', link);
             }

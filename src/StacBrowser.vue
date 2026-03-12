@@ -103,7 +103,6 @@ import BIconUnlock from '~icons/bi/unlock';
 import ErrorAlert from './components/ErrorAlert.vue';
 import StacLink from './components/StacLink.vue';
 
-import { CatalogLike, STAC } from 'stac-js';
 import { hasText, isObject, size } from 'stac-js/src/utils.js';
 import Utils from './utils';
 import { URI } from 'stac-js/src/utils.js';
@@ -198,7 +197,7 @@ export default defineComponent({
         return null;
       }
       let searchLink;
-      if (this.data instanceof CatalogLike && !this.data.is(this.root)) {
+      if (this.data?.isCatalogLike() && !this.data.is(this.root)) {
         searchLink = this.data.getSearchLink();
       }
       if (searchLink) {
@@ -223,19 +222,17 @@ export default defineComponent({
       return this.toBrowserPath(this.url);
     },
     type() {
-      if (this.data instanceof STAC) {
-        if (this.data.isItem()) {
-          return this.$t('stacItem', 1);
-        }
-        else if (this.data.isCollection()) {
-          return this.$t(`stacCollection`, 1);
-        }
-        else if (this.data.isCatalog()) {
-          return this.$t(`stacCatalog`, 1);
-        }
-        else if (hasText(this.data.type)) {
-          return this.data.type;
-        }
+      if (this.data?.isItem()) {
+        return this.$t('stacItem', 1);
+      }
+      else if (this.data?.isCollection()) {
+        return this.$t(`stacCollection`, 1);
+      }
+      else if (this.data?.isCatalog()) {
+        return this.$t(`stacCatalog`, 1);
+      }
+      else if (hasText(this.data?.type)) {
+        return this.data.type;
       }
       return null;
     },
@@ -302,7 +299,7 @@ export default defineComponent({
         if (!locale) {
           return;
         }
-        if (this.data instanceof STAC) {
+        if (this.data?.isSTAC()) {
           const link = this.data.getLocaleLink(locale);
           if (link) {
             const state = Object.assign({}, this.stateQueryParameters);
@@ -398,7 +395,7 @@ export default defineComponent({
       if (!this.onDataLoaded) {
         return;
       }
-      if (data instanceof STAC) {
+      if (data?.isSTAC()) {
         this.onDataLoaded();
       }
     }
@@ -460,7 +457,7 @@ export default defineComponent({
     ...mapMutations('auth', ['addAction']),
     ...mapActions('auth', ['requestLogin', 'requestLogout']),
     getIcon(data) {
-      if (data instanceof STAC) {
+      if (data?.isSTAC()) {
         const icons = data.getIcons();
         if (icons.length > 0) {
           return icons[0];

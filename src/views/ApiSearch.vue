@@ -70,7 +70,6 @@ import SearchFilter from '../components/SearchFilter.vue';
 import Loading from '../components/Loading.vue';
 import ErrorAlert from '../components/ErrorAlert.vue';
 import { getDisplayTitle, createSTAC, CollectionCollection, ItemCollection } from '../models/stac';
-import { STAC } from 'stac-js';
 import { defineComponent, defineAsyncComponent } from 'vue';
 import { getErrorCode, getErrorMessage, processSTAC, stacRequest } from '../store/utils';
 import { mapGetters, mapState } from "vuex";
@@ -177,7 +176,7 @@ export default defineComponent({
             return null;
           }
         })
-        .filter(obj => obj instanceof STAC);
+        .filter(obj => obj?.isSTAC());
     },
     pagination() {
       return Utils.getPaginationLinks(this.data);
@@ -246,7 +245,7 @@ export default defineComponent({
       }
     },
     canFilterItems(data) {
-      if (data instanceof STAC) {
+      if (data?.isSTAC()) {
         return Boolean(data.getApiItemsLink());
       }
       return false;
