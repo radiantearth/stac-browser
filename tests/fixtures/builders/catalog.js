@@ -1,9 +1,10 @@
-import { CatalogLike } from './catalogLike.js';
+import CatalogLike from './catalogLike.js';
 
-export class Catalog extends CatalogLike {
-  constructor(data) {
-    super(data);
+export default class Catalog extends CatalogLike {
+  constructor(data, url) {
+    super(data, url);
     this.data = data || {};
+    this.absoluteUrl = url;
   }
 
   addConformsTo(specUrl) {

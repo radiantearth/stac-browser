@@ -1,20 +1,23 @@
 import path from 'path';
 import fs from 'fs';
+import { fileURLToPath } from 'url';
 import Catalog from '../builders/catalog.js';
 import Collection from '../builders/collection.js';
 import Item from '../builders/item.js';
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 export default class Instance {
   constructor(options) {
     this.options = options;
-    this.endpoints = {};
+    this.endpoints = [];
     this.templateCache = {};
   }
 
   _loadTemplate(type, name = 'default') {
     if (typeof type === 'function') {
       // Convert the class names of the builders to match the template folder names
-      type = type.constructor.name;
+      type = type.name;
       type = type.charAt(0).toLowerCase() + type.slice(1);
     }
     const templatePath = path.resolve(__dirname, `../templates/${type}/${name}.json`);
@@ -48,6 +51,7 @@ export default class Instance {
   }) {
     const data = this._loadTemplate(type, template); 
     const obj = new type(data, url);
+    this.endpoints.push(obj);
     return obj;
   }
 

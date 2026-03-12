@@ -1,6 +1,6 @@
-import { STACObject } from '@stac/stac-js';
+import STACObject from './object.js';
 
-export class STACHypermedia extends STACObject {
+export default class STACHypermedia extends STACObject {
   constructor(data) {
     super(data);
     this.data = data || {};

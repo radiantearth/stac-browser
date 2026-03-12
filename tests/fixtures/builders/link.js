@@ -1,6 +1,6 @@
-import { STACReference } from './reference.js';
+import STACReference from './reference.js';
 
-export class Link extends STACReference {
+export default class Link extends STACReference {
   constructor(data) {
     super(data);
   }

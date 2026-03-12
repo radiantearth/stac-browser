@@ -1,6 +1,6 @@
-import { STACHypermedia } from './hypermedia.js';
+import STACHypermedia from './hypermedia.js';
 
-export class Stac extends STACHypermedia {
+export default class Stac extends STACHypermedia {
   constructor(options = {}) {
     super(options);
     this.baseurl = options.baseurl;

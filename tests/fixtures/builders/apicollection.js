@@ -1,4 +1,4 @@
-export class APICollection {
+export default class APICollection {
   constructor() {
     this.collection = {};
   }
