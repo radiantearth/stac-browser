@@ -1,0 +1,51 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "id": "item-2025-002",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [[[12.0, 44.0], [13.0, 44.0], [13.0, 45.0], [12.0, 45.0], [12.0, 44.0]]]
+  },
+  "bbox": [12.0, 44.0, 13.0, 45.0],
+  "properties": {
+    "datetime": "2025-02-01T11:00:00Z",
+    "created": "2025-02-02T00:00:00Z"
+  },
+  "collection": "eo-collection",
+  "assets": {
+    "thumbnail": {
+      "href": "https://example.com/test-catalog/eo-collection/EO-2025-002/thumbnail.png",
+      "type": "image/png",
+      "title": "Thumbnail",
+      "roles": ["thumbnail"]
+    },
+    "visual": {
+      "href": "https://example.com/test-catalog/eo-collection/EO-2025-002/visual.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "title": "Visual Composite",
+      "roles": ["visual"]
+    }
+  },
+  "links": [
+    {
+      "rel": "self",
+      "href": "https://example.com/test-catalog/eo-collection/item-2025-002",
+      "type": "application/geo+json"
+    },
+    {
+      "rel": "root",
+      "href": "https://example.com/test-catalog",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "https://example.com/test-catalog/eo-collection",
+      "type": "application/json"
+    },
+    {
+      "rel": "collection",
+      "href": "https://example.com/test-catalog/eo-collection",
+      "type": "application/json"
+    }
+  ]
+}

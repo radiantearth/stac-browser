@@ -1,0 +1,152 @@
+[
+  {
+    "id": 1,
+    "url": "https://example.com/stac/catalog.json",
+    "slug": "alpha-earth-catalog",
+    "title": "Alpha Earth Observation Catalog",
+    "summary": "A catalog of earth observation datasets covering land cover and vegetation indices.",
+    "access": "public",
+    "isPrivate": false,
+    "isApi": false
+  },
+  {
+    "id": 2,
+    "url": "https://example.com/api/stac/v1",
+    "slug": "beta-geospatial-api",
+    "title": "Beta Geospatial API",
+    "summary": "STAC API serving satellite imagery and derived analytics products.",
+    "access": "public",
+    "isPrivate": false,
+    "isApi": true
+  },
+  {
+    "id": 3,
+    "url": "https://example.com/climate/catalog.json",
+    "slug": "climate-data-catalog",
+    "title": "Climate Data Catalog",
+    "summary": "Historical and projected climate variables at global scale.",
+    "access": "public",
+    "isPrivate": false,
+    "isApi": false
+  },
+  {
+    "id": 4,
+    "url": "https://example.com/elevation/api",
+    "slug": "dem-elevation-api",
+    "title": "DEM Elevation API",
+    "summary": "Digital elevation models and terrain derivatives accessible via STAC API.",
+    "access": "public",
+    "isPrivate": false,
+    "isApi": true
+  },
+  {
+    "id": 5,
+    "url": "https://example.com/euro-sat/catalog.json",
+    "slug": "eurosat-catalog",
+    "title": "EuroSat Catalog",
+    "summary": "European satellite imagery catalog with Sentinel-2 based land use classification.",
+    "access": "public",
+    "isPrivate": false,
+    "isApi": false
+  },
+  {
+    "id": 6,
+    "url": "https://example.com/flood/api",
+    "slug": "flood-monitoring-api",
+    "title": "Flood Monitoring API",
+    "summary": "Near-real-time flood extent mapping from SAR imagery.",
+    "access": "public",
+    "isPrivate": false,
+    "isApi": true
+  },
+  {
+    "id": 7,
+    "url": "https://example.com/geo-archive/catalog.json",
+    "slug": "geo-archive-catalog",
+    "title": "Geo Archive Catalog",
+    "summary": "Long-term geospatial data archive spanning multiple decades.",
+    "access": "public",
+    "isPrivate": false,
+    "isApi": false
+  },
+  {
+    "id": 8,
+    "url": "https://example.com/hydro/api",
+    "slug": "hydro-api",
+    "title": "Hydrology STAC API",
+    "summary": "Hydrological datasets including river discharge and water body extent.",
+    "access": "public",
+    "isPrivate": false,
+    "isApi": true
+  },
+  {
+    "id": 9,
+    "url": "https://example.com/icesat/catalog.json",
+    "slug": "icesat-catalog",
+    "title": "ICESat Altimetry Catalog",
+    "summary": "ICESat-2 laser altimetry products for ice sheet and vegetation height.",
+    "access": "public",
+    "isPrivate": false,
+    "isApi": false
+  },
+  {
+    "id": 10,
+    "url": "https://example.com/imagery/api",
+    "slug": "imagery-search-api",
+    "title": "Imagery Search API",
+    "summary": "Multi-source optical and radar imagery search and discovery.",
+    "access": "public",
+    "isPrivate": false,
+    "isApi": true
+  },
+  {
+    "id": 11,
+    "url": "https://example.com/japan-dem/catalog.json",
+    "slug": "japan-dem-catalog",
+    "title": "Japan DEM Catalog",
+    "summary": "High-resolution digital elevation models for the Japanese archipelago.",
+    "access": "public",
+    "isPrivate": false,
+    "isApi": false
+  },
+  {
+    "id": 12,
+    "url": "https://example.com/kelp/api",
+    "slug": "kelp-forest-api",
+    "title": "Kelp Forest Monitoring API",
+    "summary": "Kelp canopy area and biomass estimates derived from Landsat imagery.",
+    "access": "public",
+    "isPrivate": false,
+    "isApi": true
+  },
+  {
+    "id": 13,
+    "url": "https://example.com/landsat/catalog.json",
+    "slug": "landsat-catalog",
+    "title": "Landsat Collection Catalog",
+    "summary": "USGS Landsat Collection 2 Level-2 surface reflectance products.",
+    "access": "public",
+    "isPrivate": false,
+    "isApi": false
+  },
+  {
+    "id": 14,
+    "url": "https://example.com/marine/api",
+    "slug": "marine-api",
+    "title": "Marine Observation API",
+    "summary": "Ocean colour, sea surface temperature, and marine habitat datasets.",
+    "access": "public",
+    "isPrivate": false,
+    "isApi": true
+  },
+  {
+    "id": 15,
+    "url": "https://example.com/ndvi/catalog.json",
+    "slug": "ndvi-timeseries-catalog",
+    "title": "NDVI Time Series Catalog",
+    "summary": "Global NDVI composites from MODIS and VIIRS sensors.",
+    "access": "public",
+    "isPrivate": false,
+    "isApi": false
+  }
+]

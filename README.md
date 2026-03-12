@@ -292,6 +292,15 @@ STAC Browser supports some non-standardized extensions to the STAC specification
 
 You can use the Docker to work with STAC Browser. Please read [Docker documentation](docs/docker.md) for more details.
 
+## Testing
+
+End-to-end tests are implemented with [Playwright](https://playwright.dev/) and live under `tests/e2e`.
+
+To run the full suite locally:
+
+```bash
+npm run test:e2e
+```
 ## Contributing
 
 Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to contribute to STAC Browser.

@@ -82,6 +82,8 @@
     "eslint": "^9.39.2",
     "eslint-plugin-vue": "^10.7.0",
     "globals": "^17.2.0",
+    "msw": "^2.12.10",
+    "playwright-msw": "^3.0.1",
     "rollup-plugin-visualizer": "^6.0.5",
     "sass": "^1.26.5",
     "unplugin-icons": "^23.0.1",
@@ -97,5 +99,10 @@
     "> 1%",
     "last 2 versions",
     "not dead"
-  ]
+  ],
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
+  }
 }
