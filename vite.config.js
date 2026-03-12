@@ -1,7 +1,6 @@
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import { fileURLToPath, URL } from "node:url";
-import path from "path";
 import { readFileSync } from "fs";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
 
@@ -15,6 +14,8 @@ import { ViteEjsPlugin } from "vite-plugin-ejs";
 import { visualizer } from "rollup-plugin-visualizer";
 
 import yargs from "yargs";
+
+import configFromFile from "./config.js";
 
 // Read JSON files using fs instead of require
 const configSchema = JSON.parse(
@@ -46,21 +47,7 @@ const env = yargs()
 delete env._;
 delete env.$0;
 
-// For config.js, you need to use dynamic import
-const configFilePath = "file://" + path.resolve(env.CONFIG ? env.CONFIG : "./config.js");
-
-// Note: This makes the config async - you'll need to handle this
-let configFromFile;
-try {
-  // Dynamic import for the config file
-  const configModule = await import(configFilePath);
-  configFromFile = configModule.default || configModule;
-} catch (error) {
-  console.error(`Failed to load config from ${configFilePath}:`, error);
-  configFromFile = {};
-}
-
-const config = Object.assign(configFromFile, env);
+const config = Object.assign({}, configFromFile, env);
 
 export default defineConfig(({ mode }) => ({
   base: config.pathPrefix,
@@ -81,7 +68,9 @@ export default defineConfig(({ mode }) => ({
   },
   define: {
     STAC_BROWSER_VERSION: JSON.stringify(package_.version),
-    CONFIG: JSON.stringify(config),
+    // JSON.stringify removes e.g. functions from the config,
+    // but from env we do not accept functions anyway.
+    CONFIG_FROM_ENV: JSON.stringify(env),
   },
   // See https://github.com/vitejs/vite/discussions/14801#discussioncomment-15550931 for details
   optimizeDeps: {

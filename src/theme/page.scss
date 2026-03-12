@@ -292,22 +292,45 @@ body {
     gap: 0.25rem;
     padding: 0.5rem;
     background-color: rgba(0, 0, 0, 0.03);
+    overflow: hidden;
 
     &::after {
       display: none;
     }
 
-    > .title {
-      text-align: left;
-      flex-grow: 9;
+    > .start {
+      display: flex;
+      flex: 1 1 auto;
+      gap: 0.25rem;
+      align-items: center;
+      overflow: hidden;
+      min-width: 50%;
+
+      > .title {
+        text-align: left;
+        min-width: 0;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
     }
+
     > .badges {
-      flex-grow: 1;
-      text-align: right;
+      flex: 0 1 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      min-width: 0;
+      overflow: hidden;
 
       .badge {
         margin: 0.125rem;
         text-transform: uppercase;
+        flex: 0 1 auto;
+        min-width: 0;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
       }
     }
   }

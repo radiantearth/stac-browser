@@ -13,9 +13,7 @@ export default [
         ...globals.browser,
         // Your custom globals
         STAC_BROWSER_VERSION: 'readonly',
-        CONFIG_PATH: 'readonly',
-        CONFIG_CLI: 'readonly',
-        CONFIG: 'readonly'
+        CONFIG_FROM_ENV: 'readonly',
       }
     }
   },

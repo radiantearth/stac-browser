@@ -42,7 +42,7 @@
         <LinkList v-if="linkPosition === 'right'" :title="$t('additionalResources')" :links="additionalLinks" :context="data" />
       </b-col>
       <b-col class="catalogs-container" v-if="hasCatalogs">
-        <Catalogs :catalogs="catalogs" :hasMore="!!nextCollectionsLink" @load-more="loadMoreCollections" />
+        <Catalogs :catalogs="catalogs" :hasMore="hasMore" @load-more="loadMoreCollections" />
       </b-col>
       <b-col class="items-container" v-if="hasItems || hasItemAssets">
         <Items
@@ -142,7 +142,7 @@ export default defineComponent({
     };
   },
   computed: {
-    ...mapState(['data', 'url', 'apiItems', 'apiItemsLink', 'apiItemsPagination', 'apiItemsNumberMatched', 'nextCollectionsLink', 'stateQueryParameters']),
+    ...mapState(['data', 'url', 'apiCatalogPriority',  'apiItems', 'apiItemsLink', 'apiItemsPagination', 'apiItemsNumberMatched', 'nextCollectionsLink', 'stateQueryParameters']),
     ...mapGetters(['catalogs', 'collectionLink', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
     cssStacType() {
       if (hasText(this.data?.type)) {
@@ -166,6 +166,9 @@ export default defineComponent({
     },
     apiItemsLoading() {
       return this.getApiItemsLoading(this.data);
+    },
+    hasMore() {
+      return this.apiCatalogPriority !== 'childs' && Boolean(this.nextCollectionsLink);
     },
     licenses() {
       if (this.data.license) {
