@@ -4,7 +4,6 @@ export default class Catalog extends CatalogLike {
   constructor(data, url) {
     super(data, url);
     this.data = data || {};
-    this.absoluteUrl = url;
   }
 
   addConformsTo(specUrl) {

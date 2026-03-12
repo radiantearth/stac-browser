@@ -2,10 +2,7 @@ import Stac from "./stac.js";
 
 export default class CatalogLike extends Stac {
   constructor(data, url) {
-    super(data);
-
-    this.data = data || {};
-    this.baseurl = url;
+    super(data, url);
   }
 
   addSearchLink() {

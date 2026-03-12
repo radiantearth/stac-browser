@@ -1,10 +1,23 @@
 import STACObject from './object.js';
 
 export default class STACHypermedia extends STACObject {
-  constructor(data) {
+  constructor(data, url) {
     super(data);
-    this.data = data || {};
-    this.absoluteUrl = this.getAbsoluteUrl() || null;
+    this.url = url;
+  }
+
+  getAbsoluteUrl() {
+    return this.url;
+  }
+
+  getBrowserPath() {
+  const url = new URL(this.url);
+  const protocol = url.protocol !== 'https:' ? url.protocol : '';
+  
+  const protocolPart = protocol ? `/${protocol}` : '';
+  const browserPath = `/external${protocolPart}/${url.host}${url.pathname}${url.search}`;
+
+  return browserPath;
   }
 
   addLink(parameters) {

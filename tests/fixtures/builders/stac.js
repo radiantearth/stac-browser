@@ -1,10 +1,8 @@
 import STACHypermedia from './hypermedia.js';
 
 export default class Stac extends STACHypermedia {
-  constructor(options = {}) {
-    super(options);
-    this.baseurl = options.baseurl;
-    this.data = options.data || {};
+  constructor(data, url) {
+    super(data, url);
   }
 
   addExtensions(extensions) {
