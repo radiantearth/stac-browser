@@ -4,20 +4,26 @@
     <ErrorAlert v-else-if="!supportsSearch" :description="$t('search.notSupported')" />
     <b-row v-else>
       <b-col class="left">
+        <WidgetHook id="view-search-filters-start" />
         <b-tabs v-model="activeSearch">
           <b-tab v-if="collectionSearch" :title="$t('search.tabs.collections')" id="search-collections-tab">
+            <WidgetHook id="view-search-filters-collections-start" />
             <SearchFilter
               :parent="parent" title="" :value="collectionFilters" type="Collections"
               @input="setFilters"
             />
+            <WidgetHook id="view-search-filters-collections-end" />
           </b-tab>
           <b-tab v-if="itemSearch" :title="$t('search.tabs.items')" id="search-items-tab">
+            <WidgetHook id="view-search-filters-items-start" />
             <SearchFilter
               :parent="parent" title="" :value="itemFilters" type="Global"
               @input="setFilters"
             />
+            <WidgetHook id="view-search-filters-items-end" />
           </b-tab>
         </b-tabs>
+        <WidgetHook id="view-search-filters-end" />
       </b-col>
       <b-col class="right">
         <Loading v-if="loading" fill top />
@@ -26,6 +32,7 @@
         <b-alert v-else-if="results.length === 0 && noFurtherItems" variant="info" show>{{ $t('search.noFurtherItemsFound') }}</b-alert>
         <b-alert v-else-if="results.length === 0" variant="warning" show>{{ $t('search.noItemsFound') }}</b-alert>
         <template v-else>
+          <WidgetHook id="view-search-results-start" />
           <div id="search-map" v-if="resultCollection">
             <MapView :stac="parent" :children="resultCollection" onfocusOnly popover />
           </div>
@@ -51,6 +58,7 @@
             :pagination="pagination" :loading="loading" @paginate="loadResults"
             :count="totalCount" :apiFilters="itemFilters"
           />
+          <WidgetHook id="view-search-results-end" />
         </template>
       </b-col>
     </b-row>

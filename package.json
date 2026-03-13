@@ -12,6 +12,7 @@
     "build:minimal": "vite build --mode minimal",
     "lint": "eslint --fix src",
     "i18n:fields": "node helpers/fields_locales.js",
+    "docs:hooks": "node helpers/widget-hooks.js",
     "test": "npm run test:e2e",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
