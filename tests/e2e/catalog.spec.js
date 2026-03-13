@@ -8,6 +8,7 @@
  */
 import { test, expect } from './fixtures';
 import { waitForBrowserReady } from './helpers';
+import API from '../fixtures/instances/api.js';
 import StaticCatalog from '../fixtures/instances/static.js';
 
 test.describe('Static catalog Metadata', () => {

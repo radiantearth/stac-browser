@@ -1,3 +1,4 @@
+import { http, HttpResponse } from 'msw';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
@@ -33,21 +34,21 @@ export default class Instance {
   createCatalog({
     url,
     template = 'default'
-  }) {
+  } = {}) {
     return this.createStac({ url, type: Catalog, template });
   }
 
   createCollection({
     url,
     template = 'default'
-  }) {
+  } = {}) {
     return this.createStac({ url, type: Collection, template });
   }
 
   createItem({
     url,
     template = 'default'
-  }) {
+  } = {}) {
     return this.createStac({ url, type: Item, template });
   }
 
@@ -55,7 +56,7 @@ export default class Instance {
     url,
     type = Catalog,
     template = 'default'
-  }) {
+  } = {}) {
     if (!url) {
       throw new Error('url is required');
     }
@@ -65,7 +66,17 @@ export default class Instance {
     return obj;
   }
 
-  createServer() {
-    throw new Error('Not implemented');
+  async createServer(worker) {
+    const handlers = [];
+
+    for (const endpoint of this.endpoints) {
+      const obj = endpoint.build();
+      const url = endpoint.url;
+
+      handlers.push(http.get(url, () => HttpResponse.json(obj)));
+    }
+
+    await worker.resetHandlers();
+    await worker.use(...handlers);
   }
 }
