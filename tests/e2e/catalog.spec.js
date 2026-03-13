@@ -8,9 +8,10 @@
  */
 import { test, expect } from './fixtures';
 import { waitForBrowserReady } from './helpers';
+import API from '../fixtures/instances/api.js';
 import StaticCatalog from '../fixtures/instances/static.js';
 
-test.only('root page renders default catalog metadata', async ({ page, worker }) => {
+test.only('root page renders default static catalog metadata', async ({ page, worker }) => {
   const sc = (new StaticCatalog({url: 'https://example.com/catalog.json'}))
     .setMetadata({ title: "Custom Example Catalog", description: "An example STAC Catalog with some"});
     
@@ -20,6 +21,21 @@ test.only('root page renders default catalog metadata', async ({ page, worker })
   await sc.createServer(worker);
   
   await page.goto(sc.root.getBrowserPath());
+  await waitForBrowserReady(page);
+
+  await expect(page.getByRole('heading', { name: /Custom Example Catalog/i })).toBeVisible();
+  await expect(page.getByText(/An example STAC Catalog with some/i)).toBeVisible();
+  await expect(page.getByRole('link', { name: /STAC Specification/i })).toBeVisible();
+});
+
+test.only('root page renders API', async ({ page, worker }) => {
+  const api = API.defaultApi();
+  const collection = api.addCollection('my-collection', {});
+  api.addItem(collection, 'my-item', {});
+
+  await api.createServer(worker);
+  
+  await page.goto(api.root.getBrowserPath());
   await waitForBrowserReady(page);
 
   await expect(page.getByRole('heading', { name: /Custom Example Catalog/i })).toBeVisible();
