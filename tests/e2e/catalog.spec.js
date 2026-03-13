@@ -12,15 +12,18 @@ import StaticCatalog from '../fixtures/instances/static.js';
 
 test.only('root page renders default catalog metadata', async ({ page, worker }) => {
   const sc = new StaticCatalog();
-  // load the template without modifications
-  sc.addCatalog({ url: 'https://example.com/catalog.json' });
+
+  sc.addCatalog({ url: 'https://example.com/catalog.json' })
+    .addRootLink()
+    .addSelfLink()
+    .setMetadata({ title: "Custom Example Catalog", description: "An example STAC Catalog with some"});
 
   await sc.createServer(worker);
   
   await page.goto(sc.root.getBrowserPath());
   await waitForBrowserReady(page);
 
-  await expect(page.getByRole('heading', { name: /Example Catalog/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Custom Example Catalog/i })).toBeVisible();
   await expect(page.getByText(/An example STAC Catalog with some/i)).toBeVisible();
   await expect(page.getByRole('link', { name: /STAC Specification/i })).toBeVisible();
 });

@@ -6,7 +6,7 @@ export default class CatalogLike extends Stac {
   }
 
   addSearchLink() {
-    return this.addLink({ rel: 'search', href: this.baseurl + '/search', type: 'application/geo+json' });
+    return this.addLink({ rel: 'search', href: this.getAbsoluteUrl() + '/search', type: 'application/geo+json' });
   }
 
   removeSearchLink() {
@@ -18,15 +18,15 @@ export default class CatalogLike extends Stac {
   }
 
   addStacLink(stac) {
-    const absluteUrl = this.getAbsoluteUrl();
-    if (!absluteUrl) {
+    const absoluteUrl = this.getAbsoluteUrl();
+    if (!absoluteUrl) {
       throw new Error('Cannot add stac link without absolute URL');
     }
     
     if (stac.type === 'Item') {
-      return this.addLink({ rel: 'item', href: absluteUrl, type: 'application/geo+json', title: stac.title }); 
+      return this.addLink({ rel: 'item', href: absoluteUrl, type: 'application/geo+json', title: stac.title }); 
     } else if (stac.type === 'Catalog' || stac.type === 'Collection') {
-      return this.addLink({ rel: 'child', href: absluteUrl, type: 'application/json', title: stac.title });
+      return this.addLink({ rel: 'child', href: absoluteUrl, type: 'application/json', title: stac.title });
     } else {
       throw new Error('Unsupported STAC type for stac link: ' + stac.type);
     }
