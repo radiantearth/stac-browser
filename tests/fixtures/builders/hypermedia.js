@@ -11,13 +11,13 @@ export default class STACHypermedia extends STACObject {
   }
 
   getBrowserPath() {
-  const url = new URL(this.url);
-  const protocol = url.protocol !== 'https:' ? url.protocol : '';
-  
-  const protocolPart = protocol ? `/${protocol}` : '';
-  const browserPath = `/external${protocolPart}/${url.host}${url.pathname}${url.search}`;
+    const url = new URL(this.url);
+    const protocol = url.protocol !== 'https:' ? url.protocol : '';
+    
+    const protocolPart = protocol ? `/${protocol}` : '';
+    const browserPath = `/external${protocolPart}/${url.host}${url.pathname}${url.search}`;
 
-  return browserPath;
+    return browserPath;
   }
 
   addLink(parameters) {
