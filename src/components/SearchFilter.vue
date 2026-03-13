@@ -272,7 +272,7 @@ export default defineComponent({
       };
     },
     collectionSearchLink() {
-      return this.parent && this.parent.isCatalogLike() && this.parent.getApiCollectionsLink();
+      return this.parent && this.parent.isCatalogLike && this.parent.getApiCollectionsLink();
     },
     canSearchCollectionsFreeText() {
       return this.canSearchCollections && this.supportsConformance(TYPES.Collections.FreeText);

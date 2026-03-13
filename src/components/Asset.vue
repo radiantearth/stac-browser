@@ -48,7 +48,6 @@ import { formatMediaType } from '@radiantearth/stac-fields/formatters';
 import { mapState } from 'vuex';
 import StacFieldsMixin from './StacFieldsMixin';
 import { isObject, size } from 'stac-js/src/utils.js';
-import { Asset } from 'stac-js';
 import { BCard, BTab, BTabs, BAccordionItem } from 'bootstrap-vue-next';
 
 export default {
@@ -115,14 +114,9 @@ export default {
         return {};
       }
 
-      const inherit = this.asset.toJSON();
-      delete inherit.alternate;
-
       const alternates = {};
       for (const key in this.asset.alternate) {
-        const alternate = this.asset.alternate[key];
-        const merged = Object.assign({}, inherit, alternate.toJSON());
-        alternates[key] = new Asset(merged, key, alternate.getContext());
+        alternates[key] = this.asset.alternate[key].fillAlternate();
       }
       
       return alternates;

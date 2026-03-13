@@ -38,7 +38,7 @@ export default defineComponent({
       if (!this.data) {
         return [];
       }
-      return this.data.getThumbnails();
+      return this.data.getThumbnails(true, null, true);
     },
     additionalLinks() {
       if (!this.data) {

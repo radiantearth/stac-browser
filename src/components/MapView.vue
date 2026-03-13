@@ -97,7 +97,7 @@ export default {
     },
     childrenOptions() {
       return {
-        displayPreview: this.children && this.children.isItemCollection()
+        displayPreview: this.children && this.children.isItemCollection
       };
     }
   },
@@ -184,7 +184,7 @@ export default {
             else {
               // For feature selection
               const stac = layer.get('stac');
-              return stac && stac.isAsset();
+              return stac && stac.isAsset;
             }
           }
         });
@@ -215,7 +215,7 @@ export default {
             if (objects.length > 0) {
               this.selection = {
                 target: this.$refs.target,
-                type: this.children.isCollectionCollection() ? 'collections': 'items',
+                type: this.children.isCollectionCollection ? 'collections': 'items',
                 children: objects
               };
             }
