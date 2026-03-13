@@ -13,8 +13,8 @@ export default class STACHypermedia extends STACObject {
   getBrowserPath() {
     const url = new URL(this.url);
     const protocol = url.protocol !== 'https:' ? url.protocol : '';
-    
-    const protocolPart = protocol ? `/${protocol}` : '';
+
+    const protocolPart = protocol ? `/${url.protocol.replace(':', '')}` : '';
     const browserPath = `/external${protocolPart}/${url.host}${url.pathname}${url.search}`;
 
     return browserPath;
@@ -41,7 +41,7 @@ export default class STACHypermedia extends STACObject {
   }
 
   addRootLink() {
-    return this.addLink({ rel: 'root', href: this.absoluteUrl, type: 'application/json' });
+    return this.addLink({ rel: 'root', href: this.getAbsoluteUrl(), type: 'application/json' });
   }
 
   removeRootLink() {
@@ -53,7 +53,7 @@ export default class STACHypermedia extends STACObject {
   }
 
   addSelfLink() {
-    return this.addLink({ rel: 'self', href: this.absoluteUrl, type: 'application/json' });
+    return this.addLink({ rel: 'self', href: this.getAbsoluteUrl(), type: 'application/json' });
   }
 
   removeSelfLink() {
