@@ -17,6 +17,10 @@ export default class STACObject {
     return this;
   }
 
+  getMetadata() {
+    return this._getMetadataObject();
+  }
+
   removeMetadata(keys) {
     const metadata = this._getMetadataObject();
     keys.forEach((key) => delete metadata[key]);
