@@ -12,6 +12,10 @@ export default class Item extends Stac {
     return this;
   }
 
+  getMetadata() {
+    return this._getMetadataObject();
+  }
+
   removeMetadata(keys) {
     const metadata = this._getMetadataObject();
     keys.forEach((key) => delete metadata[key]);
