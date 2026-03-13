@@ -1,11 +1,6 @@
 import CatalogLike from "./catalogLike";
 
 export default class Collection extends CatalogLike {
-  constructor(data, url) {
-    super(data);
-    this.data = data || {};
-    this.absoluteUrl = url;
-  }
 
   addKeyword(keyword) {
     this.data.keywords = this.data.keywords || [];
@@ -25,9 +20,5 @@ export default class Collection extends CatalogLike {
       this.data.keywords = this.data.keywords.map(k => k === oldKeyword ? newKeyword : k);
     }
     return this;
-  }
-
-  build() {
-    return this.data;
   }
 }

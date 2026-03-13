@@ -1,10 +1,6 @@
 import Stac from "./stac";
 
 export default class Item extends Stac {
-  constructor(data, url) {
-    super(data, url);
-    this.data = data || {};
-  }
 
   _getMetadataObject() {
     return this.data.properties;
@@ -24,9 +20,5 @@ export default class Item extends Stac {
 
   updateMetadata(fields) {
     return this.setMetadata(fields);
-  }
-
-  build() {
-    return this.data;
   }
 }

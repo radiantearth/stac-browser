@@ -1,10 +1,6 @@
 import CatalogLike from './catalogLike.js';
 
 export default class Catalog extends CatalogLike {
-  constructor(data, url) {
-    super(data, url);
-    this.data = data || {};
-  }
 
   addConformsTo(specUrl) {
     this.data.conformsTo = this.data.conformsTo || [];
@@ -22,9 +18,5 @@ export default class Catalog extends CatalogLike {
   removeConformsTo() {
     delete this.data.conformsTo;
     return this;
-  }
-
-  build() {
-    return this.data;
   }
 }
