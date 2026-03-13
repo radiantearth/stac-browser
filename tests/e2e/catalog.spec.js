@@ -17,7 +17,7 @@ test.only('root page renders default catalog metadata', async ({ page, worker })
 
   await sc.createServer(worker);
   
-  await page.goto('external/example.com/catalog.json');
+  await page.goto('/external/example.com/catalog.json');
   await waitForBrowserReady(page);
 
   await expect(page.getByRole('heading', { name: /Example Catalog/i })).toBeVisible();

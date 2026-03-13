@@ -16,6 +16,7 @@ export default class StaticCatalog extends Instance {
       handlers.push(http.get(url, () => HttpResponse.json(obj)));
     }
 
+    await worker.resetHandlers();
     await worker.use(...handlers);
   }
 }

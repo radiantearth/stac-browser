@@ -24,8 +24,8 @@ export default class Instance {
     const templatePath = path.resolve(__dirname, `../templates/${type}/${name}.json`);
     let template = this.templateCache[templatePath];
     if (!template) {
-      template = fs.readFileSync(templatePath, 'utf-8');
-      this.templateCache[templatePath] = JSON.parse(template);
+      template = JSON.parse(fs.readFileSync(templatePath, 'utf-8'));
+      this.templateCache[templatePath] = template;
     }
     return structuredClone(template);
   }
