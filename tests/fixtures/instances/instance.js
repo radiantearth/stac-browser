@@ -30,31 +30,37 @@ export default class Instance {
     return structuredClone(template);
   }
 
-  addCollection(options) {
-    options.type = Collection;
-    return this.addStac(options);
-  }
-
-  addCatalog(options) {
-    options.type = Catalog;
-    return this.addStac(options);
-  }
-
-  addItem(options) {
-    options.type = Item;
-    return this.addStac(options);
-  }
-
-  addStac({
+  createCatalog({
     url,
-    type,
     template = 'default'
   }) {
-    const data = this._loadTemplate(type, template); 
-    const obj = new type(data, url);
-    if (!this.root) {
-      this.root = obj;
+    return this.createStac({ url, type: Catalog, template });
+  }
+
+  createCollection({
+    url,
+    template = 'default'
+  }) {
+    return this.createStac({ url, type: Collection, template });
+  }
+
+  createItem({
+    url,
+    template = 'default'
+  }) {
+    return this.createStac({ url, type: Item, template });
+  }
+
+  createStac({
+    url,
+    type = Catalog,
+    template = 'default'
+  }) {
+    if (!url) {
+      throw new Error('url is required');
     }
+    const data = this._loadTemplate(type, template); 
+    const obj = new type(this, data, url);
     this.endpoints.push(obj);
     return obj;
   }

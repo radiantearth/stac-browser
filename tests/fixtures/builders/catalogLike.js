@@ -1,9 +1,6 @@
 import Stac from "./stac.js";
 
 export default class CatalogLike extends Stac {
-  constructor(data, url) {
-    super(data, url);
-  }
 
   addSearchLink() {
     return this.addLink({ rel: 'search', href: this.getAbsoluteUrl() + '/search', type: 'application/geo+json' });
@@ -17,20 +14,12 @@ export default class CatalogLike extends Stac {
     return this.updateLink('search', newParameters);
   }
 
-  addStacLink(stac) {
-    const absoluteUrl = this.getAbsoluteUrl();
-    if (!absoluteUrl) {
-      throw new Error('Cannot add stac link without absolute URL');
-    }
-    
-    if (stac.type === 'Item') {
-      return this.addLink({ rel: 'item', href: absoluteUrl, type: 'application/geo+json', title: stac.title }); 
-    } else if (stac.type === 'Catalog' || stac.type === 'Collection') {
-      return this.addLink({ rel: 'child', href: absoluteUrl, type: 'application/json', title: stac.title });
-    } else {
-      throw new Error('Unsupported STAC type for stac link: ' + stac.type);
-    }
+  addChildLink(child) {
+    return this.addLink({ rel: 'child', href: child.getAbsoluteUrl(), type: 'application/json', title: child.title });
+  }
 
+  addItemLink(item) {
+    return this.addLink({ rel: 'item', href: item.getAbsoluteUrl(), type: 'application/geo+json', title: item.title });
   }
 
   addProviders(providers) {
@@ -60,9 +49,5 @@ export default class CatalogLike extends Stac {
     }
     this.data.providers = this.data.providers.filter(p => p.name !== providerName);
     return this;
-  }
-
-  build() {
-    return this.data;
   }
 }
