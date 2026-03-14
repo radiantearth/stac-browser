@@ -75,7 +75,7 @@ export default {
       return this.getStac(this.catalog);
     },
     temporalExtent() {
-      if (this.data?.isCollection() && this.data.extent?.temporal?.interval.length > 0) {
+      if (this.data?.isCollection && this.data.extent?.temporal?.interval.length > 0) {
         let extent = this.data.extent.temporal.interval[0];
         if (Array.isArray(extent) && (typeof extent[0] === 'string' || typeof extent[1] === 'string')) {
           return this.formatTemporalExtent(this.data.extent.temporal.interval[0], true);
