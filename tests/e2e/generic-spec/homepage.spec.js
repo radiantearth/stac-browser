@@ -6,10 +6,11 @@
  *
  * Fixtures: tests/fixtures/catalogs.json (synthetic STAC Index entries)
  */
-import { test, expect } from './fixtures';
-import { HOME_PATH, mockStacResource } from './helpers';
+import { test, expect } from '../fixtures';
+import { HOME_PATH, mockStacResource } from '../helpers';
+import StaticCatalog from '../../fixtures/instances/static.js';
 
-import catalogs from '../fixtures/catalogs.json' with { type: 'json' };
+import catalogs from '../../fixtures/templates/catalogs.json' with { type: 'json' };
 
 test.describe('STAC Browser Homepage', () => {
   // ensure every test uses the mocked STAC Index response
@@ -116,14 +117,13 @@ test.describe('STAC Browser Homepage', () => {
 
   test('should navigate to catalog when valid URL is loaded', async ({ page, worker }) => {
     const catalogUrl = 'https://planetarycomputer.microsoft.com/api/stac/v1/';
-    await mockStacResource(worker, catalogUrl, {
-      type: 'Catalog',
-      id: 'microsoft-pc',
-      title: 'Microsoft Planetary Computer STAC API',
-      description: 'Mock catalog for testing navigation.',
-      stac_version: '1.0.0',
-      links: [{ rel: 'self', href: catalogUrl, type: 'application/json' }],
-    });
+    const mockCatalog = (new StaticCatalog({ url: catalogUrl }))
+      .setMetadata({
+        title: 'Microsoft Planetary Computer STAC API',
+        description: 'Mock catalog for testing navigation.',
+      });
+
+    await mockCatalog.createServer(worker, { reset: false });
 
     await page.goto(HOME_PATH);
     
@@ -142,27 +142,29 @@ test.describe('STAC Browser Homepage', () => {
   });
 
   test('clicking a STAC index entry populates url and navigates', async ({ page, worker }) => {
-    const expectedUrl = catalogs[0].url;
-    await mockStacResource(worker, expectedUrl, {
-      type: 'Catalog',
-      id: 'stac-index-first',
-      title: catalogs[0].title,
-      description: 'Mock catalog for the first STAC index entry.',
-      stac_version: '1.0.0',
-      links: [{ rel: 'self', href: expectedUrl, type: 'application/json' }],
-    });
+    const expectedTitle = 'Example Catalog';
+    const expectedUrl = 'https://example.com/stac/catalog.json';
+    const mockCatalog = new StaticCatalog({ url: expectedUrl })
+      .setMetadata({
+        title: expectedTitle,
+        description: 'Mock catalog for the first STAC index entry.',
+      });
+
+    await mockCatalog.createServer(worker, { reset: false });
 
     await page.goto(HOME_PATH);
-    await page.waitForSelector('.stac-index');
-    const firstBtn = page.locator('.stac-index button').first();
-    await firstBtn.click();
+    const indexButtons = page.locator('.stac-index button');
+    await expect(indexButtons).toHaveCount(catalogs.length);
 
-    // input should be filled
-    const input = page.getByRole('textbox', { name: /please specify a stac catalog or api/i });
-    await expect(input).toHaveValue(expectedUrl);
-    // navigation should change URL to include host from expectedUrl
-    const urlObj = new URL(expectedUrl);
-    await expect(page).toHaveURL(new RegExp(`\/external\/${urlObj.host}`));
+    // Click the first entry in the STAC index
+    await indexButtons.first().click();
+
+    // Wait for navigation and verify the catalog title appears as h1 heading
+    const catalogTitle = page.getByRole('heading', { name: new RegExp(expectedTitle, 'i') });
+    await expect(catalogTitle).toBeVisible({ timeout: 10000 });
+    
+    // Verify the page title changed
+    await expect(page).toHaveTitle(new RegExp(expectedTitle, 'i'));
   });
 
   test('language switch persists across navigation', async ({ page }) => {

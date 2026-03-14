@@ -66,7 +66,7 @@ export default class Instance {
     return obj;
   }
 
-  async createServer(worker) {
+  async createServer(worker, options = { reset: true }) {
     const handlers = [];
 
     for (const endpoint of this.endpoints) {
@@ -76,7 +76,10 @@ export default class Instance {
       handlers.push(http.get(url, () => HttpResponse.json(obj)));
     }
 
-    await worker.resetHandlers();
+    if (options.reset) {
+      await worker.resetHandlers();
+    }
+
     await worker.use(...handlers);
   }
 }

@@ -6,9 +6,9 @@
  *
  * Fixtures: tests/fixtures/catalogs/test-catalog/
  */
-import { test, expect } from './fixtures';
-import { waitForBrowserReady } from './helpers';
-import StaticCatalog from '../fixtures/instances/static.js';
+import { test, expect } from '../fixtures.js';
+import { waitForBrowserReady } from '../helpers.js';
+import StaticCatalog from '../../fixtures/instances/static.js';
 
 test.describe('Static catalog Metadata', () => {
 
