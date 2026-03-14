@@ -113,6 +113,7 @@ test.describe('Static Catalog - toolBar', () => {
       await page.goto(catalog.root.getBrowserPath());
       await waitForBrowserReady(page);
 
+      await expect(page.locator('.catalogs .card-grid > *')).toHaveCount(1);
       await expect(page.getByRole('link', { name: new RegExp(collection.getMetadata().title) })).toBeVisible();
     });
 

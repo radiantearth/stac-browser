@@ -10,7 +10,7 @@ import { test, expect } from '../fixtures';
 import { waitForBrowserReady } from '../helpers';
 import StaticCatalog from '../../fixtures/instances/static.js';
 
-test.describe('Static Collection Metadata', () => {
+test.describe('Static Collection - Metadata', () => {
   test('should load and display collection metadata', async ({ page, worker }) => {
     const title = "Example EO Collection";
     const description = "An example STAC Collection with EO extension.";
@@ -20,10 +20,7 @@ test.describe('Static Collection Metadata', () => {
 
      await catalog.createServer(worker);
     
-    await page.goto(catalog.root.getBrowserPath());
-    await waitForBrowserReady(page);
-
-    await page.getByRole('link', { name: new RegExp(title, 'i') }).click();
+    await page.goto(collection.getBrowserPath());
     await waitForBrowserReady(page);
 
     // Collection metadata should be displayed
@@ -43,5 +40,71 @@ test.describe('Static Collection Metadata', () => {
     const start = collection.getMetadata().extent.temporal.interval[0][0].split('T')[0];
     await expect(page.getByText(new RegExp(start))).toBeVisible();
   });
+});
 
+test.describe('Static Catalog - toolBar', () => {
+  test('should have a working source view button', async ({ page, worker }) => {
+    const catalog = (new StaticCatalog({url: 'https://example.com/catalog.json'}));
+    const collection = catalog.addCollection({ url: 'https://example.com/collection.json' });
+
+    await catalog.createServer(worker);
+    
+    await page.goto(collection.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    const sourceButton = page.getByRole('button', { name: /source/i });
+    await expect(sourceButton).toBeVisible();
+    await sourceButton.click();
+
+    // Confirm the source popover shows the STAC version label and value
+    await expect(page.getByText(/STAC Version/i)).toBeVisible();
+    await expect(page.getByText(/1\.1\.0/)).toBeVisible();
+  });
+
+  test('source view closes on outside click', async ({ page, worker }) => {
+    const catalog = (new StaticCatalog({url: 'https://example.com/catalog.json'}));
+    const collection = catalog.addCollection({ url: 'https://example.com/collection.json' });
+
+    await catalog.createServer(worker);
+    
+    await page.goto(collection.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    const sourceButton = page.getByRole('button', { name: /source/i });
+    await expect(sourceButton).toBeVisible();
+    await sourceButton.click();
+
+    await expect(page.getByText(/STAC Version/i)).toBeVisible();
+    // Click outside the popover to close it
+    await page.locator('body').click({ position: { x: 0, y: 0 } });
+    await expect(page.getByText(/STAC Version/i)).not.toBeVisible();
+   });
+
+  test('share button is visible', async ({ page, worker }) => {
+    const catalog = (new StaticCatalog({url: 'https://example.com/catalog.json'}));
+    const collection = catalog.addCollection({ url: 'https://example.com/collection.json' });
+
+     await catalog.createServer(worker);
+    
+    await page.goto(collection.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    const shareButton = page.getByRole('button', { name: /share/i });
+    await expect(shareButton).toBeVisible();
+  });
+});
+
+test.describe('Static Collection - Items', () => {
+  test('should render a single child item as a link', async ({ page, worker }) => {
+    const catalog = (new StaticCatalog({url: 'https://example.com/catalog.json'}));
+    const collection = catalog.addCollection({ url: 'https://example.com/collection.json' });
+    collection.addItem({ url: 'https://example.com/item.json' });
+
+     await catalog.createServer(worker);
+    
+    await page.goto(collection.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    await expect(page.locator('.items .card-grid > *')).toHaveCount(1);
+  });
 });

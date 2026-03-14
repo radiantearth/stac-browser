@@ -17,15 +17,11 @@ test.describe('Item view - Metadata', () => {
     const catalog = new StaticCatalog({ url: 'https://example.com/catalog.json' });
     const collection = catalog.addCollection({ url: 'https://example.com/collection.json' });
     
-    collection.addItem({ url: 'https://example.com/item.json' });
+    const item = collection.addItem({ url: 'https://example.com/item.json' });
 
     await catalog.createServer(worker);
     
-    await page.goto(catalog.root.getBrowserPath());
-    await waitForBrowserReady(page);
-
-    await page.getByRole('link', { name: new RegExp(collection.getMetadata().title, 'i') }).click();
+    await page.goto(item.getBrowserPath());
     await waitForBrowserReady(page);
   });
-  
 });
