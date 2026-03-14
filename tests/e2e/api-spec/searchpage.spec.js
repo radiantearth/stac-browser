@@ -8,7 +8,7 @@
  * Fixtures: tests/fixtures/api/ (root.json, collections.json, search-empty.json,
  *           search-results.json)
  */
-import { test, expect } from './fixtures';
+import { test, expect } from '../fixtures';
 import {
   SEARCH_PATH,
   mockApiRootAndCollections,
@@ -16,7 +16,7 @@ import {
   waitForMapReady,
   waitForBboxInputsPopulated,
   waitForSearchPost
-} from './helpers';
+} from '../helpers';
 
 const enableSpatialExtentInputs = async (page) => {
   const enableSpatialCheckbox = page.getByRole('checkbox', { name: /filter by spatial extent/i });

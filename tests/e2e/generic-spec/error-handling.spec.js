@@ -7,8 +7,8 @@
  *
  * Uses the existing `mockStacError` helper — no additional fixtures needed.
  */
-import { test, expect } from './fixtures';
-import { mockStacError, waitForBrowserReady } from './helpers';
+import { test, expect } from '../fixtures';
+import { mockStacError, waitForBrowserReady } from '../helpers';
 
 const MISSING_URL = 'https://example.com/does-not-exist';
 const MISSING_PATH = '/external/example.com/does-not-exist';
