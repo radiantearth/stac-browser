@@ -7,18 +7,20 @@
     @update:model-value="collapseToggled"
   >
     <template #title>
-      <span class="chevron" aria-hidden="true">
-        <b-icon-chevron-down v-if="expanded" />
-        <b-icon-chevron-right v-else />
+      <span class="start">
+        <span class="chevron" aria-hidden="true">
+          <b-icon-chevron-down v-if="expanded" />
+          <b-icon-chevron-right v-else />
+        </span>
+        <span class="title" :title="title">{{ title }}</span>
       </span>
-      <span class="title">{{ title }}</span>
       <div class="badges ms-1">
         <b-badge v-if="shown" variant="success" class="shown" :title="$t('assets.currentlyShown')">
           <b-icon-check /> {{ $t('assets.shown') }}
         </b-badge>
         <b-badge v-if="asset.deprecated" variant="warning" class="deprecated">{{ $t('deprecated') }}</b-badge>
         <template v-if="Array.isArray(asset.roles)">
-          <b-badge v-for="role in sortedRoles" :key="role" :variant="role === 'data' ? 'primary' : 'secondary'" class="role">{{ displayRole(role) }}</b-badge>
+          <b-badge v-for="role in sortedRoles" :key="role" :variant="role === 'data' ? 'primary' : 'secondary'" class="role" :title="displayRole(role)">{{ displayRole(role) }}</b-badge>
         </template>
         <b-badge v-if="shortFileFormat" variant="dark" class="format" :title="fileFormat"><span v-html="shortFileFormat" /></b-badge>
       </div>
@@ -46,7 +48,6 @@ import { formatMediaType } from '@radiantearth/stac-fields/formatters';
 import { mapState } from 'vuex';
 import StacFieldsMixin from './StacFieldsMixin';
 import { isObject, size } from 'stac-js/src/utils.js';
-import { Asset } from 'stac-js';
 import { BCard, BTab, BTabs, BAccordionItem } from 'bootstrap-vue-next';
 
 export default {
@@ -113,14 +114,9 @@ export default {
         return {};
       }
 
-      const inherit = this.asset.toJSON();
-      delete inherit.alternate;
-
       const alternates = {};
       for (const key in this.asset.alternate) {
-        const alternate = this.asset.alternate[key];
-        const merged = Object.assign({}, inherit, alternate.toJSON());
-        alternates[key] = new Asset(merged, key, alternate.getContext());
+        alternates[key] = this.asset.alternate[key].fillAlternate();
       }
       
       return alternates;

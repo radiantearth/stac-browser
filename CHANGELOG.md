@@ -9,13 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- PlayWright tests
 - Allow manually entering bounding boxes for search
 - Generate code examples for Global Item Search, Collection Search, and collection-scoped Item Search
-- Docker-based integration tests for generated code snippets
-- Support negating CQL2 filters (globally and per filter)
+- Allow negating CQL2 filters (globally and per filter)
 - Support CQL2 Advanced Comparison Operators
 - Support CQL2 Array Functions
+- Support Sortables
+- PlayWright tests
 
 ### Changed
 
@@ -45,7 +45,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Handle state of downloads better and confirm leaving the page when downloading
-- Better error on request to the /collections or .../items endpoints
+- Better error on request to the `/collections` or `.../items` endpoints
 - Collection list on Global Item Search was empty in certain situations
 - Show an error message when no operator is supported for a queryable
 - Don't show an "unsupported" error when only Collection Search is supported by the API

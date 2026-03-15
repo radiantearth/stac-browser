@@ -18,8 +18,9 @@
         v-if="stacUrl" id="popover-link" class="popover-large" target="popover-link-btn"
         placement="bottom" :title="$t('source.title')" teleport-to="#stac-browser"
         click focus :boundary-padding="10"
+        v-model="popoverLinkVisible"
       >
-        <template v-if="stac">
+        <template #default v-if="stac">
           <b-row v-if="stacId" class="stac-id">
             <b-col cols="4">{{ $t('source.id') }}</b-col>
             <b-col>
@@ -34,7 +35,7 @@
           <b-row class="stac-valid">
             <b-col cols="4">{{ $t('source.valid') }}</b-col>
             <b-col>
-              <Validation :data="stac" />
+              <Validation v-if="popoverLinkVisible !== null" :data="stac" />
             </b-col>
           </b-row>
           <hr>
@@ -86,6 +87,11 @@ export default {
       type: Object,
       default: null
     }
+  },
+  data() {
+    return {
+      popoverLinkVisible: null // null = not yet opened, true = open, false = closed
+    };
   },
   computed: {
     ...mapState(['socialSharing', 'valid']),

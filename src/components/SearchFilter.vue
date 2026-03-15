@@ -117,9 +117,8 @@
             track-by="value"
             label="text"
             :placeholder="$t('default')"
-            :select-label="$t('multiselect.selectLabel')"
-            :selected-label="$t('multiselect.selectedLabel')"
-            :deselect-label="$t('multiselect.deselectLabel')"
+            :allow-empty="false"
+            :show-labels="false"
           >
             <template #option="{option}">
               <span class="d-flex justify-content-between align-items-center">
@@ -178,6 +177,8 @@ import Cql from '../models/cql2/cql';
 import Queryable from '../models/cql2/queryable';
 import CqlLogicalOperator, { CqlNot } from '../models/cql2/operators/logical';
 import { stacRequest } from '../store/utils';
+import { formatKey } from '@radiantearth/stac-fields/helper';
+
 
 function getQueryDefaults() {
   return {
@@ -258,6 +259,7 @@ export default defineComponent({
       results: null,
       loaded: false,
       queryables: null,
+      sortables: null,
       hasAllCollections: false,
       collections: [],
       collectionsLoadingTimer: null,
@@ -290,7 +292,7 @@ export default defineComponent({
       };
     },
     collectionSearchLink() {
-      return this.parent && this.parent.isCatalogLike() && this.parent.getApiCollectionsLink();
+      return this.parent && this.parent.isCatalogLike && this.parent.getApiCollectionsLink();
     },
     codeExampleSearchLink() {
       if (this.type === 'Global') {
@@ -339,8 +341,14 @@ export default defineComponent({
       return this.cql && Array.isArray(this.queryables) && this.queryables.length > 0;
     },
     sortOptions() {
-      // todo: this should use queryables when available
-      // nevertheless, let's try to provide some reasonable defaults
+      // Use sortables from API if available
+      if (Array.isArray(this.sortables) && this.sortables.length > 0) {
+        return [
+          { text: this.$t('default'), value: null },
+          ...this.sortables
+        ];
+      }
+      // Fallback: provide reasonable defaults when sortables are not available
       const criteria = [
         { text: this.$t('default'), value: null },
         { text: this.$t('fields.Identifier'), value: 'id' },
@@ -444,22 +452,36 @@ export default defineComponent({
   },
   created() {
     let promises = [];
-    if (this.cql && this.stac && this.type !== 'Collections') {
-      const queryableLink = this.stac.getQueryablesLink();
-      promises.push(
-        this.loadQueryables(queryableLink)
-          .catch(error => console.error(error))
-      );
+    if (this.stac && this.type !== 'Collections') {
+      if (this.cql) {
+        const queryableLink = this.stac.getQueryablesLink();
+        promises.push(
+          this.loadQueryables(queryableLink)
+            .catch(error => console.error(error))
+        );
+      }
+      if (this.canSort) {
+        const sortableLink = this.stac.getSortablesLink();
+        promises.push(
+          this.loadSortables(sortableLink)
+            .catch(error => console.error(error))
+        );
+      }
     }
     if ((this.type === 'Collections' || this.conformances.CollectionIdFilter) && this.stac) {
       promises.push(
         this.loadCollections(this.stac.getApiCollectionsLink())
-          .then(({collections, queryableLink}) => {
+          .then(({collections, queryableLink, sortableLink}) => {
             this.collections = collections;
             if (this.collections.length > 0) {
               this.hasAllCollections = true;
             }
-            return this.loadQueryables(queryableLink);
+            let subPromises = [];
+            subPromises.push(this.loadQueryables(queryableLink));
+            if (this.canSort) {
+              subPromises.push(this.loadSortables(sortableLink));
+            }
+            return Promise.all(subPromises);
           })
           .catch(error => console.error(error))
       );
@@ -506,7 +528,8 @@ export default defineComponent({
     async loadCollections(link) {
       const data = {
         collections: [],
-        queryableLink: null
+        queryableLink: null,
+        sortableLink: null
       };
 
       if (this.type === 'Global' && this.collections) {
@@ -520,8 +543,11 @@ export default defineComponent({
         }
 
         const stac = createSTAC(response.data);
-        if (stac.getQueryablesLink) {
+        if (typeof stac.getQueryablesLink === 'function') {
           data.queryableLink = stac.getQueryablesLink();
+        }
+        if (typeof stac.getSortablesLink === 'function') {
+          data.sortableLink = stac.getSortablesLink();
         }
 
         const paginationLinks = stac.getPaginationLinks();
@@ -558,13 +584,7 @@ export default defineComponent({
         .map(this.collectionToMultiSelect)
         .sort((a,b) => collator.compare(a.text, b.text));
     },
-    async loadQueryables(link) {
-      this.queryables = [];
-
-      if (!isObject(link)) {
-        return;
-      }
-
+    async loadSchemas(link) {
       let response = await stacRequest(this.$store, link);
       if (!isObject(response.data)) {
         return;
@@ -580,9 +600,32 @@ export default defineComponent({
       }
 
       if (isObject(schemas) && isObject(schemas.properties)) {
-        this.queryables = Object.entries(schemas.properties)
-          .map(([key, schema]) => new Queryable(key, schema));
+        return Object.entries(schemas.properties);
       }
+      return [];
+    },
+    async loadQueryables(link) {
+      if (!isObject(link)) {
+        return;
+      }
+      this.queryables = [];
+      const queryables = await this.loadSchemas(link);
+      this.queryables = queryables
+        .map(([key, schema]) => new Queryable(key, schema));
+    },
+    async loadSortables(link) {
+      if (!isObject(link)) {
+        return;
+      }
+      this.sortables = [];
+      const sortables = await this.loadSchemas(link);
+      const collator = new Intl.Collator(this.uiLanguage);
+      this.sortables = sortables
+        .map(([key, schema]) => ({
+          value: key,
+          text: schema.title || formatKey(key)
+        }))
+        .sort((a, b) => collator.compare(a.text, b.text));
     },
     buildFilter() {
       if (this.filters.length === 0) {

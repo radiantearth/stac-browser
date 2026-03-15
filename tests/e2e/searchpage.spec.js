@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import {
   SEARCH_PATH,
   mockApiRootAndCollections,
+  mockApiRootAndCollectionsWithSortables,
   waitForMapReady,
   waitForBboxInputsPopulated,
   waitForSearchPost
@@ -344,6 +345,41 @@ test.describe('STAC Browser Search page', () => {
 
       const { body } = await requestPromise;
       expect(body.limit).toBe(99);
+    });
+  });
+
+  test('search sort dropdown shows sortables from API when available', async ({ page }) => {
+    await mockApiRootAndCollectionsWithSortables(page);
+    await page.goto(SEARCH_PATH);
+
+    // Wait for the page to fully load including async sortables fetch
+    await page.waitForLoadState('networkidle');
+
+    await test.step('Sort dropdown should show sortable fields from API', async () => {
+      const sortSelect = page.locator('.sort .multiselect');
+      await sortSelect.locator('.multiselect__select').click();
+
+      // The sortables endpoint returns: Feature ID (id), Date and Time (datetime), My Custom Field (properties.custom_field)
+      await expect(sortSelect.locator('.multiselect__content')).toContainText('Feature ID');
+      await expect(sortSelect.locator('.multiselect__content')).toContainText('Date and Time');
+      await expect(sortSelect.locator('.multiselect__content')).toContainText('My Custom Field');
+    });
+
+    await test.step('Selecting a sortable field and submitting uses the correct field value', async () => {
+      const sortSelect = page.locator('.sort .multiselect');
+
+      const sortInput = sortSelect.locator('input.multiselect__input');
+      await sortInput.fill('Feature ID');
+      await sortInput.press('Enter');
+
+      const submitButton = page.getByRole('button', { name: /submit/i });
+      const requestPromise = waitForSearchPost(page);
+      await submitButton.click();
+
+      const { body } = await requestPromise;
+      expect(body.sortby).toHaveLength(1);
+      expect(body.sortby[0].field).toBe('id');
+      expect(body.sortby[0].direction).toBe('asc');
     });
   });
 });

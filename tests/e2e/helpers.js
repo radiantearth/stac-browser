@@ -7,6 +7,7 @@ const SEARCH_API_URL = "https://earth-search.aws.test.com/v1/search";
 
 const API_ROOT_URL = "https://earth-search.aws.test.com/v1";
 const API_COLLECTIONS_URL = "https://earth-search.aws.test.com/v1/collections";
+const API_SORTABLES_URL = "https://earth-search.aws.test.com/v1/sortables";
 
 // todo: Move STAC documents to separate files
 const API_ROOT_FIXTURE = {
@@ -37,6 +38,29 @@ const API_ROOT_FIXTURE = {
       href: API_COLLECTIONS_URL,
     },
   ],
+};
+
+const API_ROOT_WITH_SORTABLES_FIXTURE = {
+  ...API_ROOT_FIXTURE,
+  links: [
+    ...API_ROOT_FIXTURE.links,
+    {
+      rel: "http://www.opengis.net/def/rel/ogc/1.0/sortables",
+      type: "application/schema+json",
+      href: API_SORTABLES_URL,
+    },
+  ],
+};
+
+const API_SORTABLES_FIXTURE = {
+  $schema: "https://json-schema.org/draft/2019-09/schema",
+  type: "object",
+  title: "Sortables",
+  properties: {
+    id: { type: "string", title: "Feature ID" },
+    datetime: { type: "string", format: "date-time", title: "Date and Time" },
+    "properties.custom_field": { type: "number", title: "My Custom Field" },
+  },
 };
 
 const API_COLLECTIONS_FIXTURE = {
@@ -117,6 +141,44 @@ export const mockApiRootAndCollections = async (page) => {
         status: 200,
         contentType: "application/json",
         body: JSON.stringify(API_COLLECTIONS_FIXTURE),
+      });
+      return;
+    }
+    await route.continue();
+  });
+};
+
+export const mockApiRootAndCollectionsWithSortables = async (page) => {
+  await page.route(API_ROOT_URL, async (route, request) => {
+    if (request.method() === "GET") {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(API_ROOT_WITH_SORTABLES_FIXTURE),
+      });
+      return;
+    }
+    await route.continue();
+  });
+
+  await page.route(API_COLLECTIONS_URL, async (route, request) => {
+    if (request.method() === "GET") {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(API_COLLECTIONS_FIXTURE),
+      });
+      return;
+    }
+    await route.continue();
+  });
+
+  await page.route(API_SORTABLES_URL, async (route, request) => {
+    if (request.method() === "GET") {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/schema+json",
+        body: JSON.stringify(API_SORTABLES_FIXTURE),
       });
       return;
     }

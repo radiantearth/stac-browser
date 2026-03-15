@@ -129,10 +129,10 @@ function getStore(config, router) {
         }
       },
 
-      isCollection: state => state.data?.isCollection() || false,
-      isCatalog: state => state.data?.isCatalog() || false,
-      isCatalogLike: state => state.data?.isCatalogLike() || false,
-      isItem: state => state.data?.isItem() || false,
+      isCollection: state => state.data?.isCollection || false,
+      isCatalog: state => state.data?.isCatalog || false,
+      isCatalogLike: state => state.data?.isCatalogLike || false,
+      isItem: state => state.data?.isItem || false,
 
       root: (_, getters) => getters.getStac(getters.rootLink),
 

@@ -47,7 +47,7 @@ export default {
   computed: {
     shownKeys() {
       return this.shown
-        .filter(asset => asset.isAsset())
+        .filter(asset => asset.isAsset)
         .map(asset => asset.getKey());
     },
     displayTitle() {
@@ -63,7 +63,7 @@ export default {
       if (this.definition) {
         return false; // Don't expand assets for Item Asset Definitions
       }
-      else if (this.assets.length === 1 && this.context && this.context.isItem()) {
+      else if (this.assets.length === 1 && this.context && this.context.isItem) {
         return true; // Expand asset if it's the only asset available and it is in an Item
       }
       return null; // Let asset decide (e.g. depending on roles)

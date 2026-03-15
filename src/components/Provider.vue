@@ -1,11 +1,13 @@
 <template>
   <b-accordion-item v-model="expanded" :id="id" class="provider">
     <template #title>
-      <span class="chevron" aria-hidden="true">
-        <b-icon-chevron-down v-if="expanded" />
-        <b-icon-chevron-right v-else />
+      <span class="start">
+        <span class="chevron" aria-hidden="true">
+          <b-icon-chevron-down v-if="expanded" />
+          <b-icon-chevron-right v-else />
+        </span>
+        <span class="title" :title="provider.name">{{ provider.name }}</span>
       </span>
-      <span class="title">{{ provider.name }}</span>
       <ProviderRoles :roles="provider.roles" />
     </template>
     <div class="provider-details">

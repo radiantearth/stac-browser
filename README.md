@@ -1,12 +1,6 @@
 # STAC Browser
 
-This is a [Spatio-Temporal Asset Catalog (STAC)](https://github.com/radiantearth/stac-spec) browser for static catalogs.
-Minimal support for APIs is implemented, but it not the focus of the Browser and may lead to issues.
-It attempts to surface all included data in a user-centric way (an approach
-which can inform how data is represented in the evolving spec). It is
-implemented as a single page application (SPA) for ease of development and to
-limit the overall number of catalog reads necessary when browsing (as catalogs
-may be nested and do not necessarily contain references to their parents).
+This is a full-fledged [Spatio-Temporal Asset Catalog (STAC)](https://github.com/radiantearth/stac-spec) browser for STAC APIs and static STAC catalogs.
 
 Version: **5.0.0-dev** (supports all STAC versions between 0.6.0 and 1.1.0)
 
@@ -16,7 +10,7 @@ It's not officially supported, but you may also be able to use it for
 certain _OGC API - Records_ and _OGC API - Features_ compliant servers.
 
 **Please note that STAC Browser is currently with limited funding for both maintenance, bug fixes and improvements. This means issues and PRs may be addressed very slowly.
-If you care about STAC Browser and have some funds to support the future of STAC Browser, please contact <matthias@mohr.ws>**
+If you care about STAC Browser and have some funds to support the future of STAC Browser, please contact <mail@moregeo.it>.**
 
 **Table of Contents:**
 

@@ -194,7 +194,7 @@ export default {
     },
     isThumbnail() {
       if (this.isAsset) {
-        return this.data.isPreview() && this.data.canBrowserDisplayImage();
+        return this.data.isPreview && this.data.canBrowserDisplayImage();
       }
       else {
         return this.data.rel === 'preview' && this.data.canBrowserDisplayImage();
