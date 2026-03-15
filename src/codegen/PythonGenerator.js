@@ -1,7 +1,5 @@
 import CodeGenerator from './CodeGenerator.js';
-import templateItem from './templates/python-item.py?raw';
-import templateGet from './templates/python-get.py?raw';
-import templatePost from './templates/python-post.py?raw';
+import template from './templates/python.py?raw';
 
 export default class PythonGenerator extends CodeGenerator {
   get language() {
@@ -13,10 +11,7 @@ export default class PythonGenerator extends CodeGenerator {
   }
 
   get template() {
-    if (!this.isCollectionSearch) {
-      return templateItem;
-    }
-    return this.method === 'GET' ? templateGet : templatePost;
+    return template;
   }
 
   get indent() {
@@ -24,7 +19,7 @@ export default class PythonGenerator extends CodeGenerator {
   }
 
   get installDependencies() {
-    return this.isCollectionSearch ? null : 'pip install pystac-client';
+    return 'pip install pystac-client';
   }
 
   formatFilters(filters) {
@@ -34,6 +29,7 @@ export default class PythonGenerator extends CodeGenerator {
   getVariables(filters) {
     return {
       ...super.getVariables(filters),
+      SEARCH_FUNCTION: this.isCollectionSearch ? 'collection_search' : 'search',
       SEARCH_ARGS: this.formatPystacSearchArgs(filters)
     };
   }
@@ -62,15 +58,17 @@ export default class PythonGenerator extends CodeGenerator {
   formatPystacSearchArgs(filters) {
     const args = [];
 
-    const collections = this.scopedCollections(filters);
-    if (collections.length > 0) {
-      const collectionsValue = this.commaSeparatedStrings(collections);
-      args.push(`collections=[${collectionsValue}]`);
-    }
+    if (!this.isCollectionSearch) {
+      const collections = this.scopedCollections(filters);
+      if (collections.length > 0) {
+        const collectionsValue = this.commaSeparatedStrings(collections);
+        args.push(`collections=[${collectionsValue}]`);
+      }
 
-    if (Array.isArray(filters.ids) && filters.ids.length > 0) {
-      const ids = this.commaSeparatedStrings(filters.ids);
-      args.push(`ids=[${ids}]`);
+      if (Array.isArray(filters.ids) && filters.ids.length > 0) {
+        const ids = this.commaSeparatedStrings(filters.ids);
+        args.push(`ids=[${ids}]`);
+      }
     }
 
     if (Array.isArray(filters.bbox) && filters.bbox.length > 0) {
