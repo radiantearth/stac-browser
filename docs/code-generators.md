@@ -9,20 +9,14 @@ Code Examples are created to display example queries for multiple languages. The
    - `get language()`
    - `get outputFile()`
    - `get template()`
+   - if the language doesn't use `#`-style comments: `get commentChars()`
    - if dependencies are needed for running the code: `get installDependencies()`
    - if JSON should be indented: `get indent()`
-   - if you need a custom format for the filters: `formatFilters()`
+   - if you need extra template variables: `getVariables(filters, cqlSerialized)`
+   - if you have separate templates for native/HTTP: `getTemplate(filters, cqlSerialized)`
 3. Add the language to the `programming` group of the locals, using the value of `get language()` as the key.
-4. Add the new generator import and class to the array in [codeGenerators.config.js](../codeGenerators.config.js). You can use the following variables:
-   - `__CATALOG_URL__`: The URL of the landing page of the API
-   - `__SEARCH_URL__`: The URL of the search endpoint
-   - `__SEARCH_METHOD__`: The HTTP method used for the endpoint (`GET`/`POST`)
-   - `__RESULT_ARRAY_KEY__`: Response array key for results (`features` for item search, `collections` for collection search)
-   - `__FILTERS__`: The formatted filters, will be JSON if not implemented differently in `formatFilters()`
-   - `__REQUEST_URL__`: The fully-built request URL (with query parameters for GET), constructed by `Utils.addFiltersToLink()`
-   - `__REQUEST_BODY__`: The serialized JSON body (for POST), constructed by `Utils.addFiltersToLink()`
-   - Language-specific variables from `getVariables()` (for example Python `__SEARCH_ARGS__`, Java `__FILTERS_STRING__`, R `__FILTERS_OBJECT__` / `__FILTER_ARGS__`)
-5. Add a template in `src/codegen/templates/` for the generator.
+4. Add the new generator import and class to the array in [codeGenerators.config.js](../codeGenerators.config.js).
+5. Add template file(s) in `src/codegen/templates/` — one per language, or a native + HTTP pair if the STAC client library doesn't cover all scenarios.
 6. Validate with integration tests:
    - `npm run test:integration`
 7. Add an integration runtime test in `tests/integration/` (for example Dockerfile and `docker-compose.yml`).
@@ -30,6 +24,46 @@ Code Examples are created to display example queries for multiple languages. The
 Integration tests for code generators are run with Docker so each language snippet executes in an isolated, reproducible runtime. The test script first generates fresh snippets into `tests/integration/generated/`, then builds the images/services defined in `tests/integration/docker-compose.yml`, and finally runs each language service against a real STAC API endpoint. This verifies both that snippet generation succeeds and that the generated code actually runs in its target language environment.
 
 If a generator implements `get installDependencies()`, the same command is shown in the Example Code UI and also executed by the integration test harness before running the snippet. This keeps user-facing install instructions and CI/runtime setup in sync.
+
+## Template Syntax
+
+Templates use `__KEY__` placeholders (double-underscore delimited) that are replaced at generation time. The following built-in variables are available in every template:
+
+| Variable             | Description |
+|----------------------|-------------|
+| `__CATALOG_URL__`    | The URL of the landing page of the API |
+| `__SEARCH_URL__`     | The URL of the search endpoint |
+| `__SEARCH_METHOD__`  | The HTTP method used for the endpoint (`GET`/`POST`) |
+| `__RESULT_ARRAY_KEY__`| Response array key for results (`features` for item search, `collections` for collection search) |
+| `__FILTERS__`        | The formatted filters as JSON (without CQL wrapper objects) |
+| `__REQUEST_URL__`    | The fully-built request URL (with query parameters for GET), constructed by `Utils.addFiltersToLink()` |
+| `__REQUEST_BODY__`   | The serialized JSON body (for POST), constructed by `Utils.addFiltersToLink()` |
+| `__IS_GET__`         | Boolean — true when search method is GET |
+| `__IS_POST__`        | Boolean — true when search method is POST |
+
+Generators can add language-specific variables by overriding `getVariables(filters, cqlSerialized)`.
+
+### Conditionals
+
+Templates support conditional blocks using comment syntax, so templates remain valid in their language. The comment characters are configured via the `commentChars` getter (default `##` for `#`-comment languages, `///` for `//`-comment languages):
+
+```python
+## if IS_POST ##
+# POST-specific code
+## else ##
+# GET-specific code
+## endif ##
+```
+
+```javascript
+/// if IS_POST ///
+// POST-specific code
+/// else ///
+// GET-specific code
+/// endif ///
+```
+
+A block with no `else` is omitted entirely when the variable is falsy. The `if`, `else`, and `endif` tags should each be on their own line — the tag line itself is consumed and does not produce blank lines in the output.
 
 ## Search Scenarios and CQL Mode
 
@@ -41,28 +75,40 @@ Code examples are generated for three practical UI scenarios:
 
 Generators should emit valid code for both item and collection endpoints. Use `__RESULT_ARRAY_KEY__` in templates instead of hard-coding `features`.
 
-CQL mode is selected from API conformance:
+CQL mode is determined automatically from API conformance via the `Cql` class's `serialize()` method:
 
 - If the API supports **CQL2-JSON**, generated filters use `filter-lang: cql2-json` and JSON filter bodies.
 - If the API supports **CQL2-TEXT** only, generated filters use `filter-lang: cql2-text` and text expressions.
+- For **GET** requests, text format is preferred when available; JSON is used as fallback.
+- For **POST** requests, JSON format is preferred when available; text is used as fallback.
 
-## Template Naming and Selection
+Request preparation (query parameter encoding for GET, body construction for POST, CQL serialization) is handled by `Utils.addFiltersToLink()` — the same method STAC Browser uses for its own requests.
 
-Template files live in `src/codegen/templates/` and follow the naming convention `$language-$method.$extension` (e.g. `javascript-get.js`, `csharp-post.cs`). The base `CodeGenerator` calls `Utils.addFiltersToLink()` — the same method STAC Browser uses for its own requests — and exposes the result as `__REQUEST_URL__` (full URL with query parameters for GET) and `__REQUEST_BODY__` (JSON body for POST). This means GET templates don't need any query-parameter encoding logic, and a single template serves both item and collection search.
+## Template Organization
 
-Template files are selected in generator classes (not at runtime inside generated snippets).
+Most languages have **one template file** in `src/codegen/templates/`, using comment-based conditionals to handle GET/POST differences. This replaces the earlier convention of separate `get`/`post`/`item` templates per language.
 
-- Languages that use raw HTTP have two templates: `get` and `post`.
-- Languages with a dedicated STAC client library (Python/pystac-client, R/rstac, Rust/stac-io) additionally have a `$language-item` template for item search. The raw HTTP templates are used for collection search.
-- R also uses its `post` template for CQL2-JSON compatibility cases.
+- Languages that use raw HTTP (JavaScript, C#, Java) use `if IS_POST` conditionals to switch between POST and GET code paths.
+- Languages with a dedicated STAC client library (R/rstac, Rust/stac-rs) use **separate template files** for the native client path and the raw HTTP fallback (e.g. `r.r` + `r-http.r`, `rust.rs` + `rust-http.rs`). The generator selects the appropriate template at generation time based on search context (collection search, CQL filters, etc.).
+- Python uses pystac-client in a single template since the library covers all search scenarios.
+
+### Template Selection
+
+When a language needs context-dependent template selection, the generator can:
+
+1. Override `get template()` if the decision depends only on properties available on the generator instance (e.g. `this.isCollectionSearch`). See `RGenerator` for an example.
+2. Override `getTemplate(filters, cqlSerialized)` if the decision also depends on the filter/CQL context passed during generation. See `RustGenerator` for an example.
+
+The base `getTemplate()` method returns `this.template` by default.
 
 Generated snippets should be minimal and concrete.
 
 ## Generator Guidance
 
-- Create a `get` and `post` template in `src/codegen/templates/` for your language. Use `__REQUEST_URL__` in the GET template and `__REQUEST_BODY__` (or `__FILTERS__`) in the POST template — the base class handles query-parameter encoding and body construction via `Utils.addFiltersToLink()`.
-- If a STAC client library exists for your language, add a separate `$language-item` template that uses the library for item search.
-- The template file defines placeholders that the generator replaces with the query parameters selected in the UI, so the generated snippet reflects the user's current query.
+- Create a template in `src/codegen/templates/` for your language. Use comment-based conditionals (`CC if IS_POST CC` where `CC` is your `commentChars`) to differentiate GET and POST code paths.
+- Override `get commentChars()` to return the appropriate comment prefix for your language (`'##'` for `#`-based comments, `'///'` for `//`-based comments).
+- Use `__REQUEST_URL__` in the GET branch and `__REQUEST_BODY__` in the POST branch — the base class handles query-parameter encoding and body construction via `Utils.addFiltersToLink()`.
+- If a STAC client library exists for your language but doesn't cover all scenarios (e.g. collection search, CQL), create **separate template files** — one for the native client and one for raw HTTP — and override `get template()` or `getTemplate(filters, cqlSerialized)` to select the right one.
 - Prefer an established STAC client library for that language when one is available or generic HTTP requests when no practical STAC client library exists.
 
 ## Remove a Language

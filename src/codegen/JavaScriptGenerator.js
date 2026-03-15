@@ -1,6 +1,5 @@
 import CodeGenerator from './CodeGenerator.js';
-import templateGet from './templates/javascript-get.js?raw';
-import templatePost from './templates/javascript-post.js?raw';
+import template from './templates/javascript.js?raw';
 
 export default class JavaScriptGenerator extends CodeGenerator {
   get language() {
@@ -12,11 +11,15 @@ export default class JavaScriptGenerator extends CodeGenerator {
   }
 
   get template() {
-    return this.method === 'GET' ? templateGet : templatePost;
+    return template;
   }
 
   get indent() {
     return 2;
+  }
+
+  get commentChars() {
+    return '///';
   }
 
 }

@@ -1,6 +1,5 @@
 import CodeGenerator from './CodeGenerator.js';
-import templateGet from './templates/csharp-get.cs?raw';
-import templatePost from './templates/csharp-post.cs?raw';
+import template from './templates/csharp.cs?raw';
 
 export default class CSharpGenerator extends CodeGenerator {
   get language() {
@@ -16,6 +15,10 @@ export default class CSharpGenerator extends CodeGenerator {
   }
 
   get template() {
-    return this.method === 'GET' ? templateGet : templatePost;
+    return template;
+  }
+
+  get commentChars() {
+    return '///';
   }
 }

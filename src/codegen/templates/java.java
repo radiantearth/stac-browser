@@ -10,13 +10,25 @@ import com.google.gson.JsonParser;
 
 public class StacSearch {
     public static void main(String[] args) throws Exception {
+/// if IS_POST ///
         String url = "__SEARCH_URL__";
+        String json = """
+__REQUEST_BODY__
+""";
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create(url))
             .header("Content-Type", "application/json")
-            .method("__SEARCH_METHOD__", HttpRequest.BodyPublishers.ofString(__FILTERS_STRING__))
+            .method("__SEARCH_METHOD__", HttpRequest.BodyPublishers.ofString(json))
             .build();
+/// else ///
+        String url = "__REQUEST_URL__";
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create(url))
+            .GET()
+            .build();
+/// endif ///
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         JsonObject result = JsonParser.parseString(response.body()).getAsJsonObject();

@@ -4,7 +4,7 @@ use stac_io::api;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let params = json!(__FILTERS__);
+    let params = json!(__SEARCH_PARAMS__);
     let search: Search = serde_json::from_value(params)?;
     let max_items = search.limit.and_then(|value| usize::try_from(value).ok());
     let items = api::search("__CATALOG_URL__", search, max_items).await?;

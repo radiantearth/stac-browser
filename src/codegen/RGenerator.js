@@ -1,7 +1,6 @@
 import CodeGenerator from './CodeGenerator.js';
-import templateItem from './templates/r-item.r?raw';
-import templateGet from './templates/r-get.r?raw';
-import templatePost from './templates/r-post.r?raw';
+import nativeTemplate from './templates/r.r?raw';
+import httpTemplate from './templates/r-http.r?raw';
 
 export default class RGenerator extends CodeGenerator {
   get language() {
@@ -12,13 +11,16 @@ export default class RGenerator extends CodeGenerator {
     return 'search.R';
   }
 
-  getTemplate(cleanedFilters) {
-    if (!this.isCollectionSearch && cleanedFilters?.['filter-lang'] !== 'cql2-json') {
-      return templateItem;
-    }
-    return this.method === 'GET' ? templateGet : templatePost;
+  get template() {
+    return nativeTemplate;
   }
 
+  getTemplate(filters, cqlSerialized) {
+    if (this.isCollectionSearch || cqlSerialized) {
+      return httpTemplate;
+    }
+    return nativeTemplate;
+  }
 
   get indent() {
     return 4;
@@ -49,7 +51,7 @@ export default class RGenerator extends CodeGenerator {
     return [];
   }
 
-  formatFilters(filters) {
+  formatRstacArgs(filters) {
     const props = [];
 
     const collections = this.scopedCollections(filters);
@@ -71,18 +73,8 @@ export default class RGenerator extends CodeGenerator {
       props.push(`datetime = "${filters.datetime}"`);
     }
 
-    // todo: q is not exposed
-
     if (filters.limit) {
       props.push(`limit = ${filters.limit}`);
-    }
-
-    if (filters.Subject) {
-      props.push(`Subject = ${JSON.stringify(filters.Subject)}`);
-    }
-
-    if (filters.subject) {
-      props.push(`subject = ${JSON.stringify(filters.subject)}`);
     }
 
     if (props.length === 0) {
@@ -93,12 +85,16 @@ export default class RGenerator extends CodeGenerator {
     return ',\n' + prefix + props.join(',\n' + prefix);
   }
 
-  getVariables(filters) {
+  getVariables(filters, cqlSerialized) {
+    const bodyObj = this.getCleanFilters(filters);
+    if (cqlSerialized) {
+      Object.assign(bodyObj, cqlSerialized);
+    }
     return {
-      ...super.getVariables(filters),
-      FILTERS_OBJECT: this.formatJsonBody(filters),
-      FILTER_ARGS: this.formatFilters(filters),
-      EXT_FILTER: this.formatExtFilter(filters),
+      ...super.getVariables(filters, cqlSerialized),
+      FILTERS_OBJECT: this.formatJsonBody(bodyObj),
+      FILTER_ARGS: this.formatRstacArgs(filters),
+      EXT_FILTER: this.formatExtFilter(cqlSerialized),
       REQUEST_FUNCTION: this.method === 'GET' ? 'get_request' : 'post_request'
     };
   }
@@ -110,23 +106,23 @@ export default class RGenerator extends CodeGenerator {
     return `jsonlite::fromJSON("${serialized}", simplifyVector = FALSE)`;
   }
 
-  formatExtFilter(filters) {
-    if (typeof filters.filter === 'undefined') {
+  formatExtFilter(cqlSerialized) {
+    if (!cqlSerialized?.filter) {
       return '';
     }
 
     let expr;
-    if (filters['filter-lang'] === 'cql2-json') {
-      const serialized = JSON.stringify(filters.filter)
+    if (cqlSerialized['filter-lang'] === 'cql2-json') {
+      const serialized = JSON.stringify(cqlSerialized.filter)
         .replaceAll('\\', '\\\\')
         .replaceAll('"', '\\"');
       expr = `jsonlite::fromJSON("${serialized}", simplifyVector = FALSE)`;
     }
     else {
-      expr = JSON.stringify(filters.filter);
+      expr = JSON.stringify(cqlSerialized.filter);
     }
 
-    const lang = filters['filter-lang'] ? `, lang = "${filters['filter-lang']}"` : '';
+    const lang = cqlSerialized['filter-lang'] ? `, lang = "${cqlSerialized['filter-lang']}"` : '';
     return `query <- ext_filter(query, expr = ${expr}${lang})`;
   }
 }

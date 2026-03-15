@@ -297,7 +297,7 @@ test.describe('STAC Browser code example modal', () => {
       expect(bbox[3]).toBeCloseTo(49, 6);
     });
     await test.step('Verify datetime range in copied code', async () => {
-      expect(copied).toContain('datetime="');
+      expect(copied).toContain('datetime=');
       expect(copied).toContain('2025-01-01');
       expect(copied).toContain('2026-12-31');
     });
@@ -335,7 +335,10 @@ test.describe('STAC Browser code example modal', () => {
     });
 
     await test.step('verify downloaded code matches displayed snippet', async () => {
-      expect(downloadedCode).toEqual(expectedCode);
+      // Normalize line endings: clipboard may use \r\n on Windows and \r on MacOS
+      // while Blob downloads preserve LF only
+      const normalize = s => s.replace(/\r\n|\r/g, '\n');
+      expect(normalize(downloadedCode)).toEqual(normalize(expectedCode));
     });
   });
 

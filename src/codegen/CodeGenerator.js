@@ -9,7 +9,6 @@ export default class CodeGenerator {
   /**
    * @param {string} catalogHref - The STAC API endpoint URL
    * @param {Link} searchLink - The STAC API search link object
-   * @param {Object} filters - The search filter parameters
    */
   constructor(catalogHref, searchLink) {
     this.catalogHref = catalogHref;
@@ -61,31 +60,107 @@ export default class CodeGenerator {
    * Serialize filters to a formatted JSON string.
    * @returns {string}
    */
-  getFiltersAsJson(filters) {
-    return JSON.stringify(filters, null, this.indent);
-  }
-
-  formatFilters(filters) {
-    return this.getFiltersAsJson(filters);
+  getFiltersAsJson(obj) {
+    return JSON.stringify(obj, null, this.indent);
   }
 
   /**
-   * Generate the code string.
-   * @returns {string}
+   * Return a clean filters object suitable for JSON serialization.
+   * Strips the internal 'filters' key (Cql object / wrapper) which
+   * is not JSON-serializable.
    */
-  generate(filters) {
-    const cleanedFilters = this.cleanFilters(filters);
-    const preparedLink = Utils.addFiltersToLink(this.searchLink, filters);
-    const template = this.getTemplate(cleanedFilters);
-    const variables = {
-      ...this.getVariables(cleanedFilters),
-      REQUEST_URL: preparedLink?.href ?? this.searchUrl,
-      REQUEST_BODY: preparedLink?.body ? JSON.stringify(preparedLink.body, null, this.indent) : '',
-    };
-    return this.renderTemplate(template, variables);
+  getCleanFilters(filters) {
+    const clean = {};
+    for (const [key, value] of Object.entries(filters)) {
+      if (key === 'filters' || value === null || value === undefined) {
+        continue;
+      }
+      clean[key] = value;
+    }
+    return clean;
   }
 
-  getTemplate(_cleanedFilters) {
+  formatFilters(filters) {
+    return this.getFiltersAsJson(this.getCleanFilters(filters));
+  }
+
+  /**
+   * Normalize filters so that flat CQL keys (filter, filter-lang) are
+   * wrapped into a .filters object with a serialize() method, matching
+   * the format used by the UI (Cql object).
+   * @param {Object} rawFilters
+   * @returns {{ filters: Object, cqlSerialized: Object|null }}
+   */
+  normalizeFilters(rawFilters) {
+    const filters = Object.assign({}, rawFilters);
+    const cql = filters.filters;
+
+    // UI path: filters.filters is a Cql object with serialize()
+    if (cql && typeof cql.serialize === 'function') {
+      return { filters, cqlSerialized: cql.serialize(this.method) };
+    }
+
+    // Flat path (integration tests): filter-lang and filter are top-level keys
+    if (filters['filter-lang'] || filters.filter !== undefined) {
+      const filterLang = filters['filter-lang'];
+      const filterValue = filters.filter;
+      delete filters['filter-lang'];
+      delete filters.filter;
+      const serialized = {};
+      if (filterLang) {
+        serialized['filter-lang'] = filterLang;
+      }
+      if (filterValue !== undefined) {
+        serialized.filter = filterValue;
+      }
+      filters.filters = { serialize: () => serialized };
+      return { filters, cqlSerialized: serialized };
+    }
+
+    return { filters, cqlSerialized: null };
+  }
+
+  /**
+   * Generate the code string using the same request preparation as STAC Browser.
+   * @param {Object} rawFilters - Filter params from the UI or integration tests
+   * @returns {string}
+   */
+  generate(rawFilters) {
+    const { filters, cqlSerialized } = this.normalizeFilters(rawFilters);
+    const isPost = this.method === 'POST';
+
+    // Use Utils.addFiltersToLink for all cases — it handles CQL serialization,
+    // query-param encoding (GET), and body construction (POST).
+    const preparedLink = Utils.addFiltersToLink(this.searchLink, filters);
+
+    let requestUrl, requestBody;
+    if (isPost) {
+      requestUrl = this.searchUrl;
+      requestBody = JSON.stringify(preparedLink?.body ?? {}, null, this.indent);
+    }
+    else {
+      requestUrl = preparedLink?.href ?? this.searchUrl;
+      requestBody = '';
+    }
+
+    const variables = {
+      ...this.getVariables(filters, cqlSerialized),
+      REQUEST_URL: requestUrl,
+      REQUEST_BODY: requestBody,
+      IS_GET: !isPost,
+      IS_POST: isPost,
+    };
+    return this.renderTemplate(this.getTemplate(filters, cqlSerialized), variables);
+  }
+
+  /**
+   * Select the template to use for generation.
+   * Override in subclasses to pick a different template based on context.
+   * @param {Object} filters
+   * @param {Object|null} cqlSerialized
+   * @returns {string}
+   */
+  getTemplate(/*filters, cqlSerialized*/) {
     return this.template;
   }
 
@@ -118,54 +193,63 @@ export default class CodeGenerator {
   }
 
   /**
-   * Render a template string by replacing __KEY__ placeholders with values.
-   * Collapses excessive blank lines for clean output.
-   * @param {string} template - Template with __KEY__ placeholders
-   * @param {Object<string, string>} vars - Map of placeholder names to values
+   * The comment characters used for conditional directives in templates.
+   * Override in subclasses to match the language's comment syntax.
    * @returns {string}
    */
-  renderTemplate(template, vars) {
-    let result = template;
-    for (const [key, value] of Object.entries(vars)) {
-      result = result.replaceAll(`__${key}__`, String(value));
-    }
-    return result.trim();
+  get commentChars() {
+    return '##';
   }
 
   /**
-   * Remove null/empty values and normalize special keys for clean code output.
-   * @param {Object} filters
-   * @returns {Object}
+   * Render a template string with __VARIABLE__ substitution and
+   * comment-based conditionals (e.g. `## if VAR ##`).
+   * Processes innermost conditionals first to support nesting.
+   * @param {string} template - Template with __KEY__ placeholders
+   * @param {Object<string, *>} vars - Map of placeholder names to values
+   * @returns {string}
    */
-  cleanFilters(filters) {
-    if (!filters || typeof filters !== 'object') {
-      return {};
+  renderTemplate(template, vars) {
+    let result = this.processConditionals(template, vars);
+    for (const [key, value] of Object.entries(vars)) {
+      result = result.replaceAll(`__${key}__`, String(value ?? ''));
     }
-    const isEmpty = value => (
-      value === null ||
-      value === undefined ||
-      (Array.isArray(value) && value.length === 0) ||
-      (typeof value === 'object' && !Array.isArray(value) && Object.keys(value).length === 0)
-    );
+    return result.replace(/\n{3,}/g, '\n\n').trim();
+  }
 
-    const cleaned = {};
-    for (const [key, value] of Object.entries(filters)) {
-      if (isEmpty(value)) {
-        continue;
-      }
-      if (key === 'filters') {
-        Object.assign(cleaned, value.serialize(this.method));
-        continue;
-      }
-      if (key === 'datetime') {
-        const datetime = Utils.formatDatetimeQuery(value);
-        if (datetime) {
-          cleaned[key] = datetime;
+  /**
+   * Process comment-based conditional blocks.
+   * E.g. `## if VAR ##` ... `## else ##` ... `## endif ##`
+   * Handles nesting by processing innermost blocks first.
+   * @param {string} template
+   * @param {Object<string, *>} vars
+   * @returns {string}
+   */
+  processConditionals(template, vars) {
+    let result = template;
+    // todo: use RegExp.escape in the future when supported in all browsers
+    const cc = this.commentChars.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(
+      `${cc}\\s+if\\s+(\\w+)\\s+${cc}\\n?` +
+      `((?:(?!${cc}\\s+if\\s)[\\s\\S])*?)` +
+      `${cc}\\s+endif\\s+${cc}\\n?`
+    );
+    const elseRe = new RegExp(`${cc}\\s+else\\s+${cc}\\n?`);
+    let safety = 0;
+    while (regex.test(result) && safety++ < 100) {
+      result = result.replace(regex, (match, varName, content) => {
+        const isTruthy = !!vars[varName];
+        const elseMatch = content.match(elseRe);
+        if (!elseMatch) {
+          return isTruthy ? content : '';
         }
-        continue;
-      }
-      cleaned[key] = value;
+        const elseStart = elseMatch.index;
+        const elseEnd = elseStart + elseMatch[0].length;
+        return isTruthy
+          ? content.substring(0, elseStart)
+          : content.substring(elseEnd);
+      });
     }
-    return cleaned;
+    return result;
   }
 }

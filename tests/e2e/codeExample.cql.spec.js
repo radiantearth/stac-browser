@@ -237,14 +237,12 @@ test.describe('STAC Browser code example CQL modal', () => {
       return readClipboard(page);
     });
 
-    await test.step('Verify GET snippet keeps cql2-json filter as object', async () => {
-      expect(javascriptCode).toContain('const url = "');
-      expect(javascriptCode).toContain('await fetch(url)');
-      expect(javascriptCode).toContain('"filter-lang": "cql2-json"');
-      expect(javascriptCode).toContain('"filter": {');
-      expect(javascriptCode).toContain('"property": "id"');
-      expect(javascriptCode).toContain('"clouds"');
-      expect(javascriptCode).not.toContain('"filter": "{');
+    await test.step('Verify GET snippet has cql2-json filter in URL', async () => {
+      expect(javascriptCode).toContain('const url = "https://earth-search.aws.test.com/v1/search?');
+      expect(javascriptCode).toContain('filter-lang=cql2-json');
+      expect(javascriptCode).toContain('filter=');
+      expect(javascriptCode).toContain('await fetch(url);');
+      expect(javascriptCode).not.toContain('method: "POST"');
     });
   });
 });

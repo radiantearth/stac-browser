@@ -1,9 +1,25 @@
 using System;
 using System.Net.Http;
+/// if IS_POST ///
+using System.Text;
+/// endif ///
 
-var url = "__REQUEST_URL__";
 var httpClient = new HttpClient();
+/// if IS_POST ///
+var url = "__SEARCH_URL__";
+var json = """
+__REQUEST_BODY__
+""";
+var content = new StringContent(json, Encoding.UTF8, "application/json");
+var method = new HttpMethod("__SEARCH_METHOD__");
+var response = await httpClient.SendAsync(new HttpRequestMessage(method, url)
+{
+    Content = content
+});
+/// else ///
+var url = "__REQUEST_URL__";
 var response = await httpClient.GetAsync(url);
+/// endif ///
 var responseBody = await response.Content.ReadAsStringAsync();
 
 using var doc = System.Text.Json.JsonDocument.Parse(responseBody);

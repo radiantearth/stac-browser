@@ -26,12 +26,12 @@ export default class PythonGenerator extends CodeGenerator {
     return this.getFiltersAsJson(filters);
   }
 
-  getVariables(filters) {
+  getVariables(filters, cqlSerialized) {
     return {
-      ...super.getVariables(filters),
+      ...super.getVariables(filters, cqlSerialized),
       ITERATOR_NAME: this.isCollectionSearch ? 'collections' : 'items',
       SEARCH_FUNCTION: this.isCollectionSearch ? 'collection_search' : 'search',
-      SEARCH_ARGS: this.formatPystacSearchArgs(filters)
+      SEARCH_ARGS: this.formatPystacSearchArgs(filters, cqlSerialized)
     };
   }
 
@@ -56,7 +56,7 @@ export default class PythonGenerator extends CodeGenerator {
     return [];
   }
 
-  formatPystacSearchArgs(filters) {
+  formatPystacSearchArgs(filters, cqlSerialized) {
     const args = [];
 
     if (!this.isCollectionSearch) {
@@ -93,12 +93,12 @@ export default class PythonGenerator extends CodeGenerator {
       args.push(`sortby=${JSON.stringify(filters.sortby)}`);
     }
 
-    if (typeof filters.filter !== 'undefined') {
-      args.push(`filter=${JSON.stringify(filters.filter)}`);
+    if (cqlSerialized?.filter !== undefined) {
+      args.push(`filter=${JSON.stringify(cqlSerialized.filter)}`);
     }
 
-    if (filters['filter-lang']) {
-      args.push(`filter_lang=${JSON.stringify(filters['filter-lang'])}`);
+    if (cqlSerialized?.['filter-lang']) {
+      args.push(`filter_lang=${JSON.stringify(cqlSerialized['filter-lang'])}`);
     }
 
     if (this.method !== 'POST') {

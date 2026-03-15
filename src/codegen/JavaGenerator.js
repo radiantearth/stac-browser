@@ -1,6 +1,5 @@
 import CodeGenerator from './CodeGenerator.js';
-import templateGet from './templates/java-get.java?raw';
-import templatePost from './templates/java-post.java?raw';
+import template from './templates/java.java?raw';
 
 export default class JavaGenerator extends CodeGenerator {
   get language() {
@@ -12,17 +11,20 @@ export default class JavaGenerator extends CodeGenerator {
   }
 
   get template() {
-    return this.method === 'GET' ? templateGet : templatePost;
+    return template;
+  }
+
+  get indent() {
+    return 4;
   }
 
   get installDependencies() {
-    return 'curl -sLO https://repo1.maven.org/maven2/com/google/code/gson/gson/2.13.2/gson-2.13.2.jar';
+    // todo: curl works on Unix but not Windows, so we may want to provide an alternative command for Windows users in the future
+    return 'curl -sLO https://repo1.maven.org/maven2/com/google/code/gson/gson/2.13.2/gson-2.13.2.jar # Linux/MacOS only';
   }
 
-  getVariables(filters) {
-    return {
-      ...super.getVariables(filters),
-      FILTERS_STRING: JSON.stringify(super.formatFilters(filters))
-    };
+  get commentChars() {
+    return '///';
   }
+
 }
