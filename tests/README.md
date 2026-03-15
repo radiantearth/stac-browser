@@ -1,4 +1,4 @@
-# E2E Tests with Playwright
+# Testing
 
 This directory contains end-to-end tests for STAC Browser using Playwright.
 
@@ -8,7 +8,13 @@ This directory contains end-to-end tests for STAC Browser using Playwright.
 # Run all tests
 npm test
 
-# Run UI tests in UI mode (interactive)
+# Run integration tests only
+npm run test:integration
+
+# Run e2e tests only
+npm run test:e2e
+
+# Run e2e tests in UI mode (interactive)
 npm run test:e2e:ui
 
 # Run UI tests in headed mode (see browser)

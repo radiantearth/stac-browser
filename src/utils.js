@@ -209,7 +209,9 @@ export default class Utils {
           }
         }
         else if (key === 'filters') {
-          Object.assign(body, value.toJSON());
+          if (typeof value.serialize === 'function') {
+            Object.assign(body, value.serialize(link.method));
+          }
           continue;
         }
 
@@ -240,8 +242,14 @@ export default class Utils {
           value = value.join(',');
         }
         else if (key === 'filters') {
-          let params = value.toText();
-          url.setQuery(params);
+          if (typeof value.serialize === 'function') {
+            let params = value.serialize('GET');
+            // JSON filter objects must be stringified for query params
+            if (typeof params.filter === 'object') {
+              params = { ...params, filter: JSON.stringify(params.filter) };
+            }
+            url.setQuery(params);
+          }
           continue;
         }
 

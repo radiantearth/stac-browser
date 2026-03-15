@@ -138,18 +138,29 @@
           />
         </b-form-group>
       </b-card-body>
-      <b-card-footer>
+      <b-card-footer class="d-flex gap-3">
         <b-button type="submit" variant="primary">{{ $t('submit') }}</b-button>
-        <b-button type="reset" variant="danger" class="ms-3">{{ $t('reset') }}</b-button>
+        <b-button type="reset" variant="danger">{{ $t('reset') }}</b-button>
+        <b-button v-if="canShowExampleCode" type="button" variant="secondary" @click="showCodeModal = true">{{ $t('exampleCode.title') }}</b-button>
       </b-card-footer>
     </b-card>
+    <b-modal v-if="canShowExampleCode" v-model="showCodeModal" :title="$t('exampleCode.title')" size="xl">
+      <SearchCode
+        v-if="showCodeModal"
+        :searchLinks="codeExampleSearchLinks"
+        :filters="codeExampleQuery"
+      />
+      <template #footer="{ close }">
+        <b-button variant="secondary" @click="close()">{{ $t('close') }}</b-button>
+      </template>
+    </b-modal>
   </b-form>
 </template>
 
 <script>
 import { defineComponent, defineAsyncComponent } from 'vue';
 import { mapGetters, mapState } from "vuex";
-import { BCard, BCardBody, BCardFooter, BCardTitle, BDropdown, BDropdownItem } from 'bootstrap-vue-next';
+import { BCard, BCardBody, BCardFooter, BCardTitle, BDropdown, BDropdownItem, BModal } from 'bootstrap-vue-next';
 
 import refParser from '@apidevtools/json-schema-ref-parser';
 
@@ -209,6 +220,8 @@ export default defineComponent({
     BCardTitle,
     BDropdown,
     BDropdownItem,
+    BModal,
+    SearchCode: defineAsyncComponent(() => import('./SearchCode.vue')),
     QueryableInput: defineAsyncComponent(() => import('./QueryableInput.vue')),
     MapSelect: defineAsyncComponent(() => import('./maps/MapSelect.vue')),
     SortButtons: defineAsyncComponent(() => import('./SortButtons.vue')),
@@ -234,6 +247,10 @@ export default defineComponent({
     value: {
       type: Object,
       default: () => ({})
+    },
+    searchLink: {
+      type: Object,
+      default: null
     }
   },
   emits: ['input'],
@@ -246,7 +263,8 @@ export default defineComponent({
       hasAllCollections: false,
       collections: [],
       collectionsLoadingTimer: null,
-      additionalCollectionCount: 0
+      additionalCollectionCount: 0,
+      showCodeModal: false
     }, getDefaults());
   },
   computed: {
@@ -275,6 +293,43 @@ export default defineComponent({
     },
     collectionSearchLink() {
       return this.parent && this.parent.isCatalogLike && this.parent.getApiCollectionsLink();
+    },
+    codeExampleSearchLinks() {
+      const toMethodMap = (link) => {
+        if (!link) {
+          return {};
+        }
+        return { [(link.method || 'GET').toUpperCase()]: link };
+      };
+      if (this.type === 'Collections') {
+        return toMethodMap(this.collectionSearchLink);
+      }
+      // For search endpoints, check if both GET and POST are available
+      if (this.searchLink?.rel === 'search' && this.parent?.getSearchLink) {
+        const get = this.parent.getSearchLink('GET');
+        const post = this.parent.getSearchLink('POST');
+        if (get || post) {
+          const links = {};
+          if (get) {
+            links.GET = get;
+          }
+          if (post) {
+            links.POST = post;
+          }
+          return links;
+        }
+      }
+      return toMethodMap(this.searchLink);
+    },
+    canShowExampleCode() {
+      return Object.keys(this.codeExampleSearchLinks).length > 0;
+    },
+    codeExampleQuery() {
+      return {
+        ...this.query,
+        sortby: this.formatSort(),
+        filters: this.buildFilter()
+      };
     },
     canSearchCollectionsFreeText() {
       return this.canSearchCollections && this.supportsConformance(TYPES.Collections.FreeText);
@@ -399,6 +454,12 @@ export default defineComponent({
       else {
         this.query.bbox = this.bbox;
       }
+    },
+    sortTerm() {
+      this.query.sortby = this.formatSort();
+    },
+    sortOrder() {
+      this.query.sortby = this.formatSort();
     }
   },
   beforeCreate() {
@@ -596,7 +657,7 @@ export default defineComponent({
       if (this.filtersNegate) {
         logical = new CqlNot(logical);
       }
-      return new Cql(logical);
+      return new Cql(logical, this.cql);
     },
     removeQueryable(queryableIndex) {
       this.filters.splice(queryableIndex, 1);
@@ -619,9 +680,7 @@ export default defineComponent({
       });
     },
     onSubmit() {
-      if (this.canSort && this.sortTerm && this.sortOrder) {
-        this.query.sortby = this.formatSort();
-      }
+      this.query.sortby = this.formatSort();
       let filters = this.buildFilter();
       this.query.filters = filters;
       this.$emit('input', this.query, false);
@@ -660,7 +719,7 @@ export default defineComponent({
       this.query.ids.push(id);
     },
     formatSort() {
-      if (this.sortTerm && this.sortTerm.value && this.sortOrder) {
+      if (this.canSort && this.sortTerm && this.sortTerm.value && this.sortOrder) {
         let order = this.sortOrder < 0 ? '-' : '';
         return `${order}${this.sortTerm.value}`;
       }

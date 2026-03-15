@@ -70,7 +70,12 @@
     "false": "no",
     "true": "yes"
   },
+  "close": "Close",
   "copy": "Copy",
+  "copyErrors": {
+    "permission": "Unable to copy. Please check browser permissions.",
+    "unsupported": "Clipboard is not available in this browser."
+  },
   "default": "Default",
   "defaultWithValue": "Default ({value})",
   "deprecated": "Deprecated",
@@ -111,6 +116,11 @@
     "serverError": "The server encountered an issue. @:errors.contactProvider",
     "title": "Error",
     "unauthorized": "The request lacks credentials, e.g. an API token. Please provide your credentials and try again."
+  },
+  "exampleCode": {
+    "title": "Example Code",
+    "storeAs": "Store code as:",
+    "installDependencies": "Install dependencies:"
   },
   "featureExperimental": "This feature is still experimental and may give unexpected results!",
   "features": {
@@ -224,6 +234,14 @@
     "previous": "‹ Previous"
   },
   "poweredBy": "Powered by {link}",
+  "programming": {
+    "csharp": "C#",
+    "java": "Java",
+    "javascript": "JavaScript",
+    "python": "Python",
+    "r": "R",
+    "rust": "Rust"
+  },
   "protocol": {
     "azure": "Microsoft Azure",
     "file": "file system (local)",

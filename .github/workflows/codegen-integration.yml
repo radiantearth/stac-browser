@@ -1,0 +1,33 @@
+name: Integration Tests — Code Generators
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/codegen/**'
+      - 'tests/integration/**'
+  schedule:
+    - cron: "0 0 1 * *"
+
+jobs:
+  codegen-integration:
+    name: Run generated code (${{ matrix.language }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [python, javascript, r, csharp, java, rust]
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 'lts/*'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ${{ matrix.language }} integration
+        run: bash tests/integration/run-tests.sh ${{ matrix.language }}

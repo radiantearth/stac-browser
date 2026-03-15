@@ -14,6 +14,7 @@
           <b-tab v-if="itemSearch" :title="$t('search.tabs.items')" id="search-items-tab">
             <SearchFilter
               :parent="parent" title="" :value="itemFilters" type="Global"
+              :searchLink="itemSearch"
               @input="setFilters"
             />
           </b-tab>
