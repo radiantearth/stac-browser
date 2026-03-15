@@ -1,5 +1,5 @@
 import CodeGenerator from './CodeGenerator.js';
-import templateItem from './templates/rust-item-post.rs?raw';
+import templateItem from './templates/rust-item.rs?raw';
 import templateGet from './templates/rust-get.rs?raw';
 import templatePost from './templates/rust-post.rs?raw';
 

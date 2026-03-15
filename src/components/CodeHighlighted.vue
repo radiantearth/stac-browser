@@ -13,8 +13,10 @@
         :button-props="{id: 'exampleCodeCopyExampleCode'}"
       />
     </div>
-    <div v-if="highlightedCode" v-html="highlightedCode" />
-    <pre v-else><code>{{ code }}</code></pre>
+    <div class="code-scroll">
+      <div class="code-inner" v-if="highlightedCode" v-html="highlightedCode" />
+      <pre class="code-inner" v-else><code>{{ code }}</code></pre>
+    </div>
   </div>
 </template>
 
@@ -85,27 +87,43 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .code {
   position: relative;
-  padding: 1rem;
   border: 1px solid var(--bs-border-color);
   background: var(--bs-light);
-  overflow: auto;
-}
-.actions {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-}
-.code :deep(pre) {
-  margin: 0;
-  padding: 0 !important;
-  background: transparent !important;
-  overflow: visible !important;
-}
-.code :deep(code) {
-  padding: 0;
-  font-size: 0.875rem;
+
+  :deep(pre) {
+    margin: 0;
+    padding: 0 !important;
+    background: transparent !important;
+    overflow: visible !important;
+  }
+  :deep(code) {
+    padding: 0;
+    font-size: 0.875rem;
+  }
+
+  .code-scroll {
+    padding: 1rem;
+    overflow: auto;
+
+    // Make sure we can scroll the full code into view, even if the action buttons may block it
+    > * {
+      display: inline-block;
+      min-width: 100%;
+      padding-right: 3rem;
+      box-sizing: border-box;
+    }
+  }
+
+  .actions {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    display: flex;
+    gap: 0.5rem;
+    flex-direction: column;
+  }
 }
 </style>
