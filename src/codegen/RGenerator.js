@@ -12,14 +12,11 @@ export default class RGenerator extends CodeGenerator {
     return 'search.R';
   }
 
-  get template() {
-    if (!this.isCollectionSearch && !this.isCqlJsonFilter) {
+  getTemplate(cleanedFilters) {
+    if (!this.isCollectionSearch && cleanedFilters?.['filter-lang'] !== 'cql2-json') {
       return templateItem;
     }
     return this.method === 'GET' ? templateGet : templatePost;
-  }
-  get isCqlJsonFilter() {
-    return this.cleanedFilters?.['filter-lang'] === 'cql2-json';
   }
 
 

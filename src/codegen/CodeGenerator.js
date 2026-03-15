@@ -74,40 +74,19 @@ export default class CodeGenerator {
    * @returns {string}
    */
   generate(filters) {
-    this.cleanedFilters = this.cleanFilters(filters);
-
-    // Build link filters with pre-serialized CQL so addFiltersToLink
-    // doesn't override the format chosen by serializeCqlFilter
-    const linkFilters = { ...filters };
-    if (linkFilters.filters) {
-      delete linkFilters.filters;
-      if (this.cleanedFilters.filter !== undefined) {
-        // For GET query params, a JSON filter object must be stringified
-        linkFilters.filter = (this.method === 'GET' && typeof this.cleanedFilters.filter === 'object')
-          ? JSON.stringify(this.cleanedFilters.filter)
-          : this.cleanedFilters.filter;
-      }
-      if (this.cleanedFilters['filter-lang']) {
-        linkFilters['filter-lang'] = this.cleanedFilters['filter-lang'];
-      }
-    }
-    this.preparedLink = Utils.addFiltersToLink(this.searchLink, linkFilters);
-
-    const result = this.renderTemplate(this.template, this.getVariables(this.cleanedFilters));
-    this.preparedLink = null;
-    this.cleanedFilters = null;
-    return result;
+    const cleanedFilters = this.cleanFilters(filters);
+    const preparedLink = Utils.addFiltersToLink(this.searchLink, filters);
+    const template = this.getTemplate(cleanedFilters);
+    const variables = {
+      ...this.getVariables(cleanedFilters),
+      REQUEST_URL: preparedLink?.href ?? this.searchUrl,
+      REQUEST_BODY: preparedLink?.body ? JSON.stringify(preparedLink.body, null, this.indent) : '',
+    };
+    return this.renderTemplate(template, variables);
   }
 
-  get requestUrl() {
-    return this.preparedLink?.href ?? this.searchUrl;
-  }
-
-  get requestBody() {
-    if (this.preparedLink?.body) {
-      return JSON.stringify(this.preparedLink.body, null, this.indent);
-    }
-    return '';
+  getTemplate(_cleanedFilters) {
+    return this.template;
   }
 
   getVariables(filters) {
@@ -117,8 +96,6 @@ export default class CodeGenerator {
       SEARCH_METHOD: this.method,
       RESULT_ARRAY_KEY: this.resultArrayKey,
       FILTERS: this.formatFilters(filters),
-      REQUEST_URL: this.requestUrl,
-      REQUEST_BODY: this.requestBody,
     };
   }
 
@@ -156,7 +133,7 @@ export default class CodeGenerator {
   }
 
   /**
-   * Remove null/empty values from filters to produce clean code.
+   * Remove null/empty values and normalize special keys for clean code output.
    * @param {Object} filters
    * @returns {Object}
    */
@@ -171,76 +148,24 @@ export default class CodeGenerator {
       (typeof value === 'object' && !Array.isArray(value) && Object.keys(value).length === 0)
     );
 
-    return Object.entries(filters).reduce((cleaned, [key, value]) => {
+    const cleaned = {};
+    for (const [key, value] of Object.entries(filters)) {
       if (isEmpty(value)) {
-        return cleaned;
+        continue;
       }
-
       if (key === 'filters') {
-        const serializedFilter = this.serializeCqlFilter(value);
-        if (isEmpty(serializedFilter)) {
-          return cleaned;
-        }
-        Object.assign(cleaned, serializedFilter);
-        return cleaned;
+        Object.assign(cleaned, value.serialize(this.method));
+        continue;
       }
-
       if (key === 'datetime') {
-        const datetime = this.normalizeDatetime(value);
+        const datetime = Utils.formatDatetimeQuery(value);
         if (datetime) {
           cleaned[key] = datetime;
         }
-        return cleaned;
+        continue;
       }
-
       cleaned[key] = value;
-      return cleaned;
-    }, {});
-  }
-
-  serializeCqlFilter(value) {
-    if (!value) {
-      return null;
     }
-    if (this.method === 'GET') {
-      // GET: prefer CQL2 Text (natural for query params), fall back to JSON
-      if (value.mode?.textMode) {
-        return value.toText();
-      }
-      if (value.mode?.jsonMode) {
-        return value.toJSON();
-      }
-    }
-    else {
-      // POST/QUERY/others: prefer JSON
-      if (value.mode?.jsonMode) {
-        return value.toJSON();
-      }
-      if (value.mode?.textMode) {
-        return value.toText();
-      }
-    }
-    return value;
-  }
-
-  normalizeDatetime(value) {
-    if (!value) {
-      return null;
-    }
-    const toIsoString = part => {
-      if (part === null || part === undefined || part === '') {
-        return null;
-      }
-      return part instanceof Date ? part.toISOString() : String(part);
-    };
-
-    if (!Array.isArray(value)) {
-      return toIsoString(value);
-    }
-
-    const [start, end] = value;
-    const startValue = toIsoString(start);
-    const endValue = toIsoString(end);
-    return startValue && endValue ? `${startValue}/${endValue}` : null;
+    return cleaned;
   }
 }

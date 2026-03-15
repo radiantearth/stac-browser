@@ -21,4 +21,30 @@ export default class Cql {
     };
   }
 
+  /**
+   * Serialize CQL based on API capabilities and HTTP method.
+   * GET prefers Text (natural for query params), POST prefers JSON.
+   * @param {string} method - HTTP method (GET, POST, etc.)
+   * @returns {Object} - { "filter-lang": string, filter: string|Object }
+   */
+  serialize(method) {
+    const preferText = typeof method === 'string' && method.toUpperCase() === 'GET';
+    if (preferText) {
+      if (this.mode?.textMode) {
+        return this.toText();
+      }
+      if (this.mode?.jsonMode) {
+        return this.toJSON();
+      }
+      return this.toText();
+    }
+    if (this.mode?.jsonMode) {
+      return this.toJSON();
+    }
+    if (this.mode?.textMode) {
+      return this.toText();
+    }
+    return this.toJSON();
+  }
+
 }
