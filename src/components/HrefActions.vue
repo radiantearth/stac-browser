@@ -4,7 +4,7 @@
       <b-button variant="danger" v-if="requiresAuth" tag="a" tabindex="0" :id="`popover-href-${id}-btn`" @click="handleAuthButton">
         <b-icon-lock /> {{ $t('authentication.required') }}
       </b-button>
-      <b-button v-if="hasDownloadButton" :disabled="requiresAuth" variant="primary" v-bind="downloadProps" v-on="downloadEvents">
+      <b-button v-if="canDownload" :disabled="requiresAuth" variant="primary" v-bind="downloadProps" v-on="downloadEvents">
         <b-spinner v-if="loading" small variant="light" />
         <b-icon-box-arrow-up-right v-else-if="browserCanOpenFile" />
         <b-icon-download v-else />
@@ -50,7 +50,9 @@ import { URI } from 'stac-js/src/utils.js';
 import AuthUtils from './auth/utils';
 import { Asset } from 'stac-js';
 import { browserProtocols } from 'stac-js/src/http';
-import { imageMediaTypes } from 'stac-js/src/mediatypes';
+import { imageMediaTypes, zarrMediaTypes } from 'stac-js/src/mediatypes';
+
+const disableDownloadTypes = [...zarrMediaTypes];
 
 let i = 0;
 
@@ -139,11 +141,11 @@ export default {
     hasShowButton() {
       return this.isAsset && this.canShow && !this.shown;
     },
-    hasDownloadButton() {
-      return this.isAsset && this.isBrowserProtocol;
+    canDownload() {
+      return this.isAsset && this.isBrowserProtocol && !disableDownloadTypes.includes(this.data?.type);
     },
     downloadEvents() {
-      if (this.hasDownloadButton && this.useAltDownloadMethod) {
+      if (this.canDownload && this.useAltDownloadMethod) {
         return {
           click: async (event) => {
             event.preventDefault();
@@ -154,7 +156,7 @@ export default {
       return {};
     },
     downloadProps() {
-      if (this.hasDownloadButton && !this.useAltDownloadMethod) {
+      if (this.canDownload && !this.useAltDownloadMethod) {
         const props = {
           href: this.href,
           target: '_blank',
