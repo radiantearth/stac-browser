@@ -56,9 +56,18 @@ export default function getStore(router) {
     },
     actions: {
       async waitForAuth(cx) {
-        if (Auth.equals(cx.getters.method, cx.rootState.authConfig)) {
+        if (!cx.rootState.authConfig) {
+          console.debug('No auth config available, skipping authentication');
           return;
         }
+        if (
+          !cx.rootState.authConfig ||
+          Auth.equals(cx.getters.method, cx.rootState.authConfig)
+        ) {
+          console.debug('Auth method is up to date, no action needed');
+          return;
+        }
+        console.debug('Auth method change detected, updating method');
         await cx.dispatch('updateMethod', cx.rootState.authConfig);
       },
       async updateMethod(cx, config) {
@@ -149,6 +158,28 @@ export default function getStore(router) {
           }
         }
         cx.commit('resetActions');
+      },
+      async configureFromSchemes(cx, authSchemes) {
+        // Find first supported auth scheme from auth:schemes
+        // Priority order: openIdConnect, http (basic), apiKey
+        const schemeValues = Object.values(authSchemes);
+        const preferredScheme =
+          schemeValues.find(scheme => scheme.type === 'openIdConnect') ||
+          schemeValues.find(scheme => scheme.type === 'http' && scheme.scheme === 'basic') ||
+          schemeValues.find(scheme => scheme.type === 'apiKey');
+
+        if (preferredScheme) {
+          await cx.dispatch(
+            "config",
+            { authConfig: preferredScheme },
+            { root: true },
+          );
+          await cx.dispatch("updateMethod", preferredScheme);
+          console.log(
+            "Authentication method configured from auth:schemes",
+            preferredScheme,
+          );
+        }
       }
     }
   };
