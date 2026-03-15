@@ -2,25 +2,32 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 public class StacSearch {
     public static void main(String[] args) throws Exception {
+        String url = "__SEARCH_URL__";
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create("__SEARCH_URL__"))
+            .uri(URI.create(url))
             .header("Content-Type", "application/json")
             .method("__SEARCH_METHOD__", HttpRequest.BodyPublishers.ofString(__FILTERS_STRING__))
             .build();
 
-        HttpResponse<String> response = client.send(
-            request, HttpResponse.BodyHandlers.ofString());
-
-        Pattern pattern = Pattern.compile("\"id\"\\s*:\\s*\"([^\"]+)\"");
-        Matcher matcher = pattern.matcher(response.body());
-        while (matcher.find()) {
-            System.out.println(matcher.group(1));
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        JsonObject result = JsonParser.parseString(response.body()).getAsJsonObject();
+        JsonArray entries = result.getAsJsonArray("__RESULT_ARRAY_KEY__");
+        if (entries != null) {
+            for (JsonElement entry : entries) {
+                JsonElement id = entry.getAsJsonObject().get("id");
+                if (id != null) {
+                    System.out.println(id.getAsString());
+                }
+            }
         }
     }
 }

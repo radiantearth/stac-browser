@@ -13,13 +13,10 @@ export default class RGenerator extends CodeGenerator {
   }
 
   get template() {
-    if (this.isCollectionSearch) {
-      return this.method === 'GET' ? templateGet : templatePost;
+    if (!this.isCollectionSearch && !this.isCqlJsonFilter) {
+      return templateItem;
     }
-    if (this.isCqlJsonFilter) {
-      return templatePost;
-    }
-    return templateItem;
+    return this.method === 'GET' ? templateGet : templatePost;
   }
   get isCqlJsonFilter() {
     return this.cleanedFilters?.['filter-lang'] === 'cql2-json';

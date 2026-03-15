@@ -1,7 +1,8 @@
 from pystac_client import Client
 
-catalog = Client.open("__CATALOG_URL__")
+url = "__CATALOG_URL__"
+catalog = Client.open(url)
 results = catalog.__SEARCH_FUNCTION__(__SEARCH_ARGS__)
 
-for entry in results.__RESULT_ARRAY_KEY__():
+for entry in results.__ITERATOR_NAME__():
     print(entry.id)

@@ -92,13 +92,13 @@ EOF
       ;;
     java)
       cat <<'EOF'
-if [ -n "$INSTALL_DEPS" ]; then eval "$INSTALL_DEPS"; fi
+cd /tmp && if [ -n "$INSTALL_DEPS" ]; then eval "$INSTALL_DEPS"; fi
 cp /code/default/StacSearch.java /tmp/StacSearch.java
-cd /tmp && javac StacSearch.java && java StacSearch
+cd /tmp && javac -cp '.:*' StacSearch.java && java -cp '.:*' StacSearch
     cp /code/cql-json/StacSearch.java /tmp/StacSearch.java
-    cd /tmp && javac StacSearch.java && java StacSearch
+    cd /tmp && javac -cp '.:*' StacSearch.java && java -cp '.:*' StacSearch
     cp /code/cql-text/StacSearch.java /tmp/StacSearch.java
-cd /tmp && javac StacSearch.java && java StacSearch
+cd /tmp && javac -cp '.:*' StacSearch.java && java -cp '.:*' StacSearch
 EOF
       ;;
     rust)

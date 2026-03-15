@@ -2,12 +2,14 @@ using System;
 using System.Net.Http;
 using System.Text;
 
-var httpClient = new HttpClient();
+var url = "__SEARCH_URL__";
 var json = """
 __REQUEST_BODY__
 """;
 var content = new StringContent(json, Encoding.UTF8, "application/json");
-var response = await httpClient.SendAsync(new HttpRequestMessage(new HttpMethod("__SEARCH_METHOD__"), "__SEARCH_URL__")
+var httpClient = new HttpClient();
+var method = new HttpMethod("__SEARCH_METHOD__");
+var response = await httpClient.SendAsync(new HttpRequestMessage(method, url)
 {
     Content = content
 });

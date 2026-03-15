@@ -21,14 +21,4 @@ export default class Cql {
     };
   }
 
-  toPost() {
-    if (this.mode?.jsonMode) {
-      return this.toJSON();
-    }
-    if (this.mode?.textMode) {
-      return this.toText();
-    }
-    return this.toJSON();
-  }
-
 }

@@ -54,7 +54,6 @@ export default defineComponent({
   },
   computed: {
     code() {
-      console.log('Generating code');
       return this.generator.generate(this.filters);
     },
     language() {

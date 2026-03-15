@@ -1,8 +1,9 @@
 using System;
 using System.Net.Http;
 
+var url = "__REQUEST_URL__";
 var httpClient = new HttpClient();
-var response = await httpClient.GetAsync("__REQUEST_URL__");
+var response = await httpClient.GetAsync(url);
 var responseBody = await response.Content.ReadAsStringAsync();
 
 using var doc = System.Text.Json.JsonDocument.Parse(responseBody);

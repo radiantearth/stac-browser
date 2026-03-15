@@ -74,8 +74,25 @@ export default class CodeGenerator {
    * @returns {string}
    */
   generate(filters) {
-    this.preparedLink = Utils.addFiltersToLink(this.searchLink, filters);
     this.cleanedFilters = this.cleanFilters(filters);
+
+    // Build link filters with pre-serialized CQL so addFiltersToLink
+    // doesn't override the format chosen by serializeCqlFilter
+    const linkFilters = { ...filters };
+    if (linkFilters.filters) {
+      delete linkFilters.filters;
+      if (this.cleanedFilters.filter !== undefined) {
+        // For GET query params, a JSON filter object must be stringified
+        linkFilters.filter = (this.method === 'GET' && typeof this.cleanedFilters.filter === 'object')
+          ? JSON.stringify(this.cleanedFilters.filter)
+          : this.cleanedFilters.filter;
+      }
+      if (this.cleanedFilters['filter-lang']) {
+        linkFilters['filter-lang'] = this.cleanedFilters['filter-lang'];
+      }
+    }
+    this.preparedLink = Utils.addFiltersToLink(this.searchLink, linkFilters);
+
     const result = this.renderTemplate(this.template, this.getVariables(this.cleanedFilters));
     this.preparedLink = null;
     this.cleanedFilters = null;
@@ -185,11 +202,23 @@ export default class CodeGenerator {
     if (!value) {
       return null;
     }
-    if (typeof value.toPost === 'function') {
-      return value.toPost();
+    if (this.method === 'GET') {
+      // GET: prefer CQL2 Text (natural for query params), fall back to JSON
+      if (value.mode?.textMode) {
+        return value.toText();
+      }
+      if (value.mode?.jsonMode) {
+        return value.toJSON();
+      }
     }
-    if (typeof value.toJSON === 'function') {
-      return value.toJSON();
+    else {
+      // POST/QUERY/others: prefer JSON
+      if (value.mode?.jsonMode) {
+        return value.toJSON();
+      }
+      if (value.mode?.textMode) {
+        return value.toText();
+      }
     }
     return value;
   }

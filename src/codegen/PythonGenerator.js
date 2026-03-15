@@ -29,6 +29,7 @@ export default class PythonGenerator extends CodeGenerator {
   getVariables(filters) {
     return {
       ...super.getVariables(filters),
+      ITERATOR_NAME: this.isCollectionSearch ? 'collections' : 'items',
       SEARCH_FUNCTION: this.isCollectionSearch ? 'collection_search' : 'search',
       SEARCH_ARGS: this.formatPystacSearchArgs(filters)
     };

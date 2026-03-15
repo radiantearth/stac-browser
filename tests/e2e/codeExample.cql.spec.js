@@ -238,8 +238,8 @@ test.describe('STAC Browser code example CQL modal', () => {
     });
 
     await test.step('Verify GET snippet keeps cql2-json filter as object', async () => {
-      expect(javascriptCode).toContain('const searchUrl = new URL(');
-      expect(javascriptCode).toContain('await fetch(searchUrl.toString())');
+      expect(javascriptCode).toContain('const url = "');
+      expect(javascriptCode).toContain('await fetch(url)');
       expect(javascriptCode).toContain('"filter-lang": "cql2-json"');
       expect(javascriptCode).toContain('"filter": {');
       expect(javascriptCode).toContain('"property": "id"');

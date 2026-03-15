@@ -15,6 +15,10 @@ export default class JavaGenerator extends CodeGenerator {
     return this.method === 'GET' ? templateGet : templatePost;
   }
 
+  get installDependencies() {
+    return 'curl -sLO https://repo1.maven.org/maven2/com/google/code/gson/gson/2.13.2/gson-2.13.2.jar';
+  }
+
   getVariables(filters) {
     return {
       ...super.getVariables(filters),

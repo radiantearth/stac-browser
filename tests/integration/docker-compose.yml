@@ -42,7 +42,7 @@ services:
     working_dir: /code
     volumes:
       - ./generated:/code:ro
-    command: ["sh", "-c", "if [ -n \"$$INSTALL_DEPS\" ]; then eval \"$$INSTALL_DEPS\"; fi && cp StacSearch.java /tmp/ && cd /tmp && javac StacSearch.java && java StacSearch"]
+    command: ["sh", "-c", "cp StacSearch.java /tmp/ && cd /tmp && if [ -n \"$$INSTALL_DEPS\" ]; then eval \"$$INSTALL_DEPS\"; fi && javac -cp '.:*' StacSearch.java && java -cp '.:*' StacSearch"]
     network_mode: host
 
   rust:
