@@ -1,7 +1,7 @@
 import CodeGenerator from './CodeGenerator.js';
 import templateItem from './templates/r-item.r?raw';
-import templateCollectionGet from './templates/r-collection-get.r?raw';
-import templateCollectionPost from './templates/r-collection-post.r?raw';
+import templateGet from './templates/r-get.r?raw';
+import templatePost from './templates/r-post.r?raw';
 
 export default class RGenerator extends CodeGenerator {
   get language() {
@@ -14,22 +14,15 @@ export default class RGenerator extends CodeGenerator {
 
   get template() {
     if (this.isCollectionSearch) {
-      return this.method === 'GET' ? templateCollectionGet : templateCollectionPost;
+      return this.method === 'GET' ? templateGet : templatePost;
     }
     if (this.isCqlJsonFilter) {
-      return templateCollectionPost;
+      return templatePost;
     }
     return templateItem;
   }
   get isCqlJsonFilter() {
-    return this.currentFilters?.['filter-lang'] === 'cql2-json';
-  }
-
-  generate(filters) {
-    this.currentFilters = this.cleanFilters(filters);
-    const output = this.renderTemplate(this.template, this.getVariables(this.currentFilters));
-    this.currentFilters = null;
-    return output;
+    return this.cleanedFilters?.['filter-lang'] === 'cql2-json';
   }
 
 

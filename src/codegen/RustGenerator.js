@@ -1,8 +1,7 @@
 import CodeGenerator from './CodeGenerator.js';
-import templateItemGet from './templates/rust-item-get.rs?raw';
-import templateItemPost from './templates/rust-item-post.rs?raw';
-import templateCollectionGet from './templates/rust-collection-get.rs?raw';
-import templateCollectionPost from './templates/rust-collection-post.rs?raw';
+import templateItem from './templates/rust-item-post.rs?raw';
+import templateGet from './templates/rust-get.rs?raw';
+import templatePost from './templates/rust-post.rs?raw';
 
 export default class RustGenerator extends CodeGenerator {
   get language() {
@@ -14,10 +13,10 @@ export default class RustGenerator extends CodeGenerator {
   }
 
   get template() {
-    if (this.isCollectionSearch) {
-      return this.method === 'GET' ? templateCollectionGet : templateCollectionPost;
+    if (!this.isCollectionSearch) {
+      return templateItem;
     }
-    return this.method === 'GET' ? templateItemGet : templateItemPost;
+    return this.method === 'GET' ? templateGet : templatePost;
   }
 
   get indent() {

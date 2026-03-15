@@ -1,4 +1,5 @@
 import i18n from '../i18n.js';
+import Utils from '../utils.js';
 
 /**
  * Base class for search code generators.
@@ -73,8 +74,23 @@ export default class CodeGenerator {
    * @returns {string}
    */
   generate(filters) {
-    const cleanedFilters = this.cleanFilters(filters);
-    return this.renderTemplate(this.template, this.getVariables(cleanedFilters));
+    this.preparedLink = Utils.addFiltersToLink(this.searchLink, filters);
+    this.cleanedFilters = this.cleanFilters(filters);
+    const result = this.renderTemplate(this.template, this.getVariables(this.cleanedFilters));
+    this.preparedLink = null;
+    this.cleanedFilters = null;
+    return result;
+  }
+
+  get requestUrl() {
+    return this.preparedLink?.href ?? this.searchUrl;
+  }
+
+  get requestBody() {
+    if (this.preparedLink?.body) {
+      return JSON.stringify(this.preparedLink.body, null, this.indent);
+    }
+    return '';
   }
 
   getVariables(filters) {
@@ -84,6 +100,8 @@ export default class CodeGenerator {
       SEARCH_METHOD: this.method,
       RESULT_ARRAY_KEY: this.resultArrayKey,
       FILTERS: this.formatFilters(filters),
+      REQUEST_URL: this.requestUrl,
+      REQUEST_BODY: this.requestBody,
     };
   }
 
@@ -106,17 +124,16 @@ export default class CodeGenerator {
   }
 
   /**
-   * Render a template string by replacing {{KEY}} placeholders with values.
+   * Render a template string by replacing __KEY__ placeholders with values.
    * Collapses excessive blank lines for clean output.
-   * @param {string} template - Template with {{KEY}} placeholders
+   * @param {string} template - Template with __KEY__ placeholders
    * @param {Object<string, string>} vars - Map of placeholder names to values
    * @returns {string}
    */
   renderTemplate(template, vars) {
-    // Replace each {{KEY}} with its value
     let result = template;
     for (const [key, value] of Object.entries(vars)) {
-      result = result.replaceAll(`{{${key}}}`, String(value));
+      result = result.replaceAll(`__${key}__`, String(value));
     }
     return result.trim();
   }

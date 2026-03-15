@@ -7,9 +7,22 @@
         :title="generator.label"
         :id="generator.language"
       >
-        <CodeBox :generator="generator" :filters="filters" />
+        <CodeBox
+          v-if="selectedTab === generator.language"
+          :generator="generator"
+          :filters="filters"
+        />
       </b-tab>
     </b-tabs>
+    <b-form-radio-group
+      v-if="availableMethods.length > 1"
+      v-model="selectedMethod"
+      :options="availableMethods"
+      button-variant="outline-primary"
+      size="sm"
+      buttons
+      class="mt-2"
+    />
   </div>
 </template>
 
@@ -20,7 +33,8 @@ import generators, { defaultGenerator } from '../../codeGenerators.config.js';
 import BrowserStorage from '../browser-store';
 import { mapState } from 'vuex/dist/vuex.cjs.js';
 
-const STORAGE_KEY = 'codeLanguage';
+const TAB_STORAGE_KEY = 'codeLanguage';
+const METHOD_STORAGE_KEY = 'codeMethod';
 
 export default defineComponent({
   name: 'SearchCode',
@@ -30,7 +44,7 @@ export default defineComponent({
     CodeBox: defineAsyncComponent(() => import('./CodeBox.vue'))
   },
   props: {
-    searchLink: {
+    searchLinks: {
       type: Object,
       required: true
     },
@@ -42,32 +56,51 @@ export default defineComponent({
   data() {
     return {
       storage: new BrowserStorage(),
-      selectedTab: null
+      selectedTab: null,
+      selectedMethod: null
     };
   },
   computed: {
     ...mapState(['catalogUrl']),
+    availableMethods() {
+      return Object.keys(this.searchLinks);
+    },
+    activeSearchLink() {
+      return this.searchLinks[this.selectedMethod] || Object.values(this.searchLinks)[0];
+    },
     generatorInstances() {
-      return generators.map(g => new g(this.catalogUrl, this.searchLink));
+      return generators.map(g => new g(this.catalogUrl, this.activeSearchLink));
     },
     defaultLanguage() {
-      const defaultGen = new defaultGenerator(this.catalogUrl, this.searchLink);
+      const defaultGen = new defaultGenerator(this.catalogUrl, this.activeSearchLink);
       const defGen = this.generatorInstances.find(g => g.language === defaultGen.language);
       return defGen?.language;
     }
   },
   created() {
+    this.loadSelectedMethod();
     this.loadSelectedTab();
-    console.log(this.selectedTab);
   },
   watch: {
     selectedTab(value) {
       this.saveSelectedTab(value);
+    },
+    selectedMethod(value) {
+      this.storage.set(METHOD_STORAGE_KEY, value);
     }
   },
   methods: {
+    loadSelectedMethod() {
+      const saved = this.storage.get(METHOD_STORAGE_KEY);
+      if (this.availableMethods.includes(saved)) {
+        this.selectedMethod = saved;
+      }
+      else {
+        this.selectedMethod = this.availableMethods[0];
+      }
+    },
     loadSelectedTab() {
-      const saved = this.storage.get(STORAGE_KEY);
+      const saved = this.storage.get(TAB_STORAGE_KEY);
       if (this.generatorInstances.some(g => g.language === saved)) {
         this.selectedTab = saved;
         return;
@@ -78,7 +111,7 @@ export default defineComponent({
     },
     saveSelectedTab(language) {
       if (this.defaultLanguage !== language) {
-        this.storage.set(STORAGE_KEY, language);
+        this.storage.set(TAB_STORAGE_KEY, language);
       }
     }
   }

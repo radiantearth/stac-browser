@@ -147,7 +147,7 @@
     <b-modal v-if="canShowExampleCode" v-model="showCodeModal" :title="$t('exampleCode.title')" size="lg">
       <SearchCode
         v-if="showCodeModal"
-        :searchLink="codeExampleSearchLink"
+        :searchLinks="codeExampleSearchLinks"
         :filters="codeExampleQuery"
       />
       <template #footer="{ close }">
@@ -294,20 +294,35 @@ export default defineComponent({
     collectionSearchLink() {
       return this.parent && this.parent.isCatalogLike && this.parent.getApiCollectionsLink();
     },
-    codeExampleSearchLink() {
-      if (this.type === 'Global') {
-        return this.searchLink;
-      }
-      if (this.type === 'Items') {
-        return this.searchLink;
-      }
+    codeExampleSearchLinks() {
+      const toMethodMap = (link) => {
+        if (!link) {
+          return {};
+        }
+        return { [(link.method || 'GET').toUpperCase()]: link };
+      };
       if (this.type === 'Collections') {
-        return this.collectionSearchLink;
+        return toMethodMap(this.collectionSearchLink);
       }
-      return null;
+      // For search endpoints, check if both GET and POST are available
+      if (this.searchLink?.rel === 'search' && this.parent?.getSearchLink) {
+        const get = this.parent.getSearchLink('GET');
+        const post = this.parent.getSearchLink('POST');
+        if (get || post) {
+          const links = {};
+          if (get) {
+            links.GET = get;
+          }
+          if (post) {
+            links.POST = post;
+          }
+          return links;
+        }
+      }
+      return toMethodMap(this.searchLink);
     },
     canShowExampleCode() {
-      return Boolean(this.codeExampleSearchLink);
+      return Object.keys(this.codeExampleSearchLinks).length > 0;
     },
     codeExampleQuery() {
       return {

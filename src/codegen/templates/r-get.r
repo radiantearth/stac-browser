@@ -1,15 +1,14 @@
 library(httr)
 library(jsonlite)
 
-search_filters <- {{FILTERS_OBJECT}}
-resp <- VERB("{{SEARCH_METHOD}}", "{{SEARCH_URL}}", body = search_filters, encode = "json")
+resp <- GET("__REQUEST_URL__")
 result <- fromJSON(content(resp, as = "text", encoding = "UTF-8"), simplifyVector = FALSE)
 
-entries <- result[["{{RESULT_ARRAY_KEY}}"]]
+entries <- result[["__RESULT_ARRAY_KEY__"]]
 if (!is.null(entries) && length(entries) > 0) {
   for (entry in entries) {
     if (!is.null(entry$id)) {
-      cat(entry$id, "\\n")
+      cat(entry$id, "\n")
     }
   }
 }

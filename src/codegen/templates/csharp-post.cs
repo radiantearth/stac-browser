@@ -3,21 +3,18 @@ using System.Net.Http;
 using System.Text;
 
 var httpClient = new HttpClient();
-var searchUrl = "{{SEARCH_URL}}";
-
 var json = """
-{{FILTERS}}
+__REQUEST_BODY__
 """;
 var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-var response = await httpClient.SendAsync(new HttpRequestMessage(new HttpMethod("{{SEARCH_METHOD}}"), searchUrl)
+var response = await httpClient.SendAsync(new HttpRequestMessage(new HttpMethod("__SEARCH_METHOD__"), "__SEARCH_URL__")
 {
     Content = content
 });
 var responseBody = await response.Content.ReadAsStringAsync();
 
 using var doc = System.Text.Json.JsonDocument.Parse(responseBody);
-if (doc.RootElement.TryGetProperty("collections", out var entries))
+if (doc.RootElement.TryGetProperty("__RESULT_ARRAY_KEY__", out var entries))
 {
     foreach (var entry in entries.EnumerateArray())
     {
