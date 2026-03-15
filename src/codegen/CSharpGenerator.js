@@ -1,8 +1,8 @@
 import CodeGenerator from './CodeGenerator.js';
-import templateItemGet from './templates/template.cs?raw';
-import templateItemPostCql from './templates/template.csharp-item-post-cql.cs?raw';
-import templateQuery from './templates/template.csharp-query.cs?raw';
-import templatePostCql from './templates/template.csharp-post-cql.cs?raw';
+import templateItemGet from './templates/csharp-item-get.cs?raw';
+import templateItemPost from './templates/csharp-item-post.cs?raw';
+import templateCollectionGet from './templates/csharp-collection-get.cs?raw';
+import templateCollectionPost from './templates/csharp-collection-post.cs?raw';
 
 export default class CSharpGenerator extends CodeGenerator {
   get language() {
@@ -19,13 +19,9 @@ export default class CSharpGenerator extends CodeGenerator {
 
   get template() {
     if (this.isCollectionSearch) {
-      return this.method === 'GET' ? templateQuery : templatePostCql;
+      return this.method === 'GET' ? templateCollectionGet : templateCollectionPost;
     }
-    return this.method === 'GET' ? templateItemGet : templateItemPostCql;
-  }
-
-  get installDependencies() {
-    return null;
+    return this.method === 'GET' ? templateItemGet : templateItemPost;
   }
 
   toQueryParams(filters) {

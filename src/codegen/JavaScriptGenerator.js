@@ -1,8 +1,8 @@
 import CodeGenerator from './CodeGenerator.js';
-import templateItemGet from './templates/template.js?raw';
-import templateItemPostCql from './templates/template.javascript-item-post-cql.js?raw';
-import templateQuery from './templates/template.javascript-query.js?raw';
-import templatePostCql from './templates/template.javascript-post-cql.js?raw';
+import templateItemGet from './templates/javascript-item-get.js?raw';
+import templateItemPost from './templates/javascript-item-post.js?raw';
+import templateCollectionGet from './templates/javascript-collection-get.js?raw';
+import templateCollectionPost from './templates/javascript-collection-post.js?raw';
 
 export default class JavaScriptGenerator extends CodeGenerator {
   get language() {
@@ -15,17 +15,13 @@ export default class JavaScriptGenerator extends CodeGenerator {
 
   get template() {
     if (this.isCollectionSearch) {
-      return this.method === 'GET' ? templateQuery : templatePostCql;
+      return this.method === 'GET' ? templateCollectionGet : templateCollectionPost;
     }
-    return this.method === 'GET' ? templateItemGet : templateItemPostCql;
+    return this.method === 'GET' ? templateItemGet : templateItemPost;
   }
 
   get indent() {
     return 2;
-  }
-
-  get installDependencies() {
-    return null;
   }
 
   formatFilters(filters) {

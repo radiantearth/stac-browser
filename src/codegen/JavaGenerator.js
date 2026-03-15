@@ -1,8 +1,8 @@
 import CodeGenerator from './CodeGenerator.js';
-import templateItemGet from './templates/template.java?raw';
-import templateItemPostCql from './templates/template.java-item-post-cql.java?raw';
-import templateQuery from './templates/template.java-query.java?raw';
-import templatePostCql from './templates/template.java-post-cql.java?raw';
+import templateItemGet from './templates/java-item-get.java?raw';
+import templateItemPost from './templates/java-item-post.java?raw';
+import templateCollectionGet from './templates/java-collection-get.java?raw';
+import templateCollectionPost from './templates/java-collection-post.java?raw';
 
 export default class JavaGenerator extends CodeGenerator {
   get language() {
@@ -15,13 +15,9 @@ export default class JavaGenerator extends CodeGenerator {
 
   get template() {
     if (this.isCollectionSearch) {
-      return this.method === 'GET' ? templateQuery : templatePostCql;
+      return this.method === 'GET' ? templateCollectionGet : templateCollectionPost;
     }
-    return this.method === 'GET' ? templateItemGet : templateItemPostCql;
-  }
-
-  get installDependencies() {
-    return null;
+    return this.method === 'GET' ? templateItemGet : templateItemPost;
   }
 
   toQueryParams(filters) {

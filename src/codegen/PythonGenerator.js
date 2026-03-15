@@ -1,7 +1,7 @@
 import CodeGenerator from './CodeGenerator.js';
-import templatePystac from './templates/template.py?raw';
-import templateQuery from './templates/template.python-query.py?raw';
-import templatePostCql from './templates/template.python-post-cql.py?raw';
+import templateItem from './templates/python-item.py?raw';
+import templateCollectionGet from './templates/python-collection-get.py?raw';
+import templateCollectionPost from './templates/python-collection-post.py?raw';
 
 export default class PythonGenerator extends CodeGenerator {
   get language() {
@@ -14,9 +14,9 @@ export default class PythonGenerator extends CodeGenerator {
 
   get template() {
     if (this.isCollectionSearch) {
-      return this.method === 'GET' ? templateQuery : templatePostCql;
+      return this.method === 'GET' ? templateCollectionGet : templateCollectionPost;
     }
-    return templatePystac;
+    return templateItem;
   }
 
   get indent() {

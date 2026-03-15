@@ -46,15 +46,13 @@ CQL mode is selected from API conformance:
 
 ## Template Naming and Selection
 
+Template files live in `src/codegen/templates/` and follow the naming convention `$language-$type-$method.$extension` (e.g. `rust-item-get.rs`, `python-collection-post.py`). The `$method` part is omitted when the language uses a single template for both methods.
+
 Template files are selected in generator classes (not at runtime inside generated snippets).
 
-- Collection search templates follow transport naming:
-   - `*-query.*` for `GET` query-parameter requests
-   - `*-post-cql.*` for request-body (`POST`/write) CQL-oriented requests
-- Item search templates are language-specific:
-   - Languages that use raw HTTP typically have `item GET` and `item post-cql` variants.
-   - Python item search uses the pystac-client template (`template.py`) with computed `{{SEARCH_ARGS}}`.
-   - R item search uses `template.r`, with `template.r-post-cql.r` used for CQL2-JSON compatibility cases.
+- Languages that use raw HTTP typically have four templates: `item-get`, `item-post`, `collection-get`, `collection-post`.
+- Python item search uses a single `python-item.py` template (pystac-client) with computed `{{SEARCH_ARGS}}`.
+- R item search uses `r-item.r`, with `r-collection-post.r` also used for CQL2-JSON compatibility cases.
 
 Generated snippets should be minimal and concrete.
 
