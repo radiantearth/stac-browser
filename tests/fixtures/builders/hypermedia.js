@@ -6,7 +6,9 @@ export default class STACHypermedia extends STACObject {
     this.url = url;
     this.instance = instance;
     this.addSelfLink();
-    this.addRootLink();
+    if (this.instance.root) { // skip if this is the root object itself
+      this.addRootLink();
+    }
   }
 
   getAbsoluteUrl() {
@@ -44,9 +46,7 @@ export default class STACHypermedia extends STACObject {
   }
 
   addRootLink() {
-    if (this.instance?.root) { // skip if this is the root object itself
       return this.addLink({ rel: 'root', href: this.instance.root.getAbsoluteUrl(), type: 'application/json' });
-    }
   }
 
   removeRootLink() {
