@@ -98,7 +98,7 @@ export default class API extends Instance {
     this.root.addLink({ href: '/collections', rel: 'data', type: 'application/json' }); // Todo: how to define the href? absolute? relative? ...
 
     // GET /collections
-    this.collections = this.instance.createStac('/collections', CollectionCollection);
+    this.collections = this.createStac({url: '/collections', type: CollectionCollection});
     this.collections.addManyCollections(10, this.root);
 
     // todo: pagination

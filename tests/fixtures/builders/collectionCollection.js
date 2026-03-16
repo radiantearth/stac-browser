@@ -22,7 +22,7 @@ export default class CollectionCollection extends APICollection {
     for (let i = 0; i < count; i++) {
       const id = `example-${i}`;
       const title = `Example Collection ${i}`;
-      const collection = this.instance.createStac(`/collections/${id}`, Collection);
+      const collection = this.instance.createStac({url: `/collections/${id}`, type: Collection});
       collection.setMetadata({ id, title });
       this.addNewCollection(collection);
       if (parent !== null) {

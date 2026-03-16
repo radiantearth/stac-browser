@@ -44,7 +44,9 @@ export default class STACHypermedia extends STACObject {
   }
 
   addRootLink() {
-    return this.addLink({ rel: 'root', href: this.instance.root.getAbsoluteUrl(), type: 'application/json' });
+    if (this.instance?.root) { // skip if this is the root object itself
+      return this.addLink({ rel: 'root', href: this.instance.root.getAbsoluteUrl(), type: 'application/json' });
+    }
   }
 
   removeRootLink() {
@@ -65,7 +67,7 @@ export default class STACHypermedia extends STACObject {
 
   updateSelfLink(newParameters) {
     return this.updateLink('self', newParameters);
-  }
+  } 
 
   build() {
     return this.data;
