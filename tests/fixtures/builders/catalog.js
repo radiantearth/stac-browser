@@ -4,7 +4,9 @@ export default class Catalog extends CatalogLike {
 
   addConformsTo(specUrl) {
     this.data.conformsTo = this.data.conformsTo || [];
-    this.data.conformsTo.push(specUrl);
+    if (!this.data.conformsTo.includes(specUrl)) {
+      this.data.conformsTo.push(specUrl);
+    }
     return this;
   }
 

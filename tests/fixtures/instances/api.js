@@ -1,5 +1,6 @@
 import Instance from './instance.js';
 import CollectionCollection from '../builders/collectionCollection.js';
+import Conformance from '../builders/conformance.js';
 import ItemCollection from '../builders/itemCollection.js';
 import URI from 'urijs';
 
@@ -71,6 +72,16 @@ export default class API extends Instance {
   addOpenApi({
     excludeServiceDesc = false
   } = {}) {
+    this.root.addConformsTo('http://www.opengis.net/spec/ogcapi-features-1/1.0/conf/oas30');
+    return this;
+  }
+
+  addConformanceEndoint() {
+    // GET /
+    this.root.addLink({ href: '/conformance', rel: 'conformance', type: 'application/json' }); // Todo: how to define the href? absolute? relative? ...
+
+    // GET /conformance
+    this.endpoints.push(new Conformance(this.instance));
 
     return this;
   }
@@ -81,8 +92,17 @@ export default class API extends Instance {
     if (this.collections) {
       return this;
     }
-    this.collections = new CollectionCollection();
-    // todo...
+    // GET /
+    this.addConformanceEndoint();
+    this.root.addConformsTo('https://api.stacspec.org/v1.0.0/collections');
+    this.root.addLink({ href: '/collections', rel: 'data', type: 'application/json' }); // Todo: how to define the href? absolute? relative? ...
+
+    // GET /collections
+    this.collections = this.instance.createStac('/collections', CollectionCollection);
+    this.collections.addManyCollections(10, this.root);
+
+    // todo: pagination
+
     return this;
   }
 
@@ -92,6 +112,10 @@ export default class API extends Instance {
     if (this.items) {
       return this;
     }
+    this.root.addConformsTo('http://www.opengis.net/spec/ogcapi-features-1/1.0/conf/core');
+    this.root.addConformsTo('http://www.opengis.net/spec/ogcapi-features-1/1.0/conf/geojson');
+    this.root.addConformsTo('https://api.stacspec.org/v1.0.0/ogcapi-features');
+
     this.items = {}; // keys = collection ID, values = ItemCollection objects
     // todo...
     return this;

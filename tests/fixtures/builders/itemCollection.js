@@ -1,32 +1,27 @@
 import APICollection from "./apicollection";
 
-export default class ItemCollection extends APICollection{
-  constructor() {
-    super();
-    this.collection = {};
+export default class ItemCollection extends APICollection {
+  constructor(instance, data, url) {
+    super(instance, data, url);
   }
 
   addItem(item) {
-    this.collection.features = this.collection.features || [];
-    this.collection.features.push(item);
+    this.data.features = this.data.features || [];
+    this.data.features.push(item);
     return this;
   }
 
   removeItemById(id) {
-    if (this.collection.features) {
-      this.collection.features = this.collection.features.filter(feature => feature.id !== id);
+    if (this.data.features) {
+      this.data.features = this.data.features.filter(feature => feature.id !== id);
     }
     return this;
   }
 
   updateItemById(id, newItem) {
-    if (this.collection.features) {
-      this.collection.features = this.collection.features.map(feature => feature.id === id ? newItem : feature);
+    if (this.data.features) {
+      this.data.features = this.data.features.map(feature => feature.id === id ? newItem : feature);
     }
     return this;
-  }
-
-  build() {
-    return this.collection;
   }
 }

@@ -1,11 +1,6 @@
 import STACHypermedia from './hypermedia.js';
 
 export default class Stac extends STACHypermedia {
-  constructor(instance, data, url) {
-    super(data, url);
-    this.instance = instance;
-    this.addSelfLink();
-  }
 
   addParentLink(parent) {
     return this.addLink({ rel: 'parent', href: parent.getAbsoluteUrl(), type: 'application/json', title: parent.title });

@@ -1,9 +1,12 @@
 import STACObject from './object.js';
 
 export default class STACHypermedia extends STACObject {
-  constructor(data, url) {
+  constructor(instance, data, url) {
     super(data);
     this.url = url;
+    this.instance = instance;
+    this.addSelfLink();
+    this.addRootLink();
   }
 
   getAbsoluteUrl() {
@@ -20,9 +23,9 @@ export default class STACHypermedia extends STACObject {
     return browserPath;
   }
 
-  addLink(parameters) {
+  addLink(link) {
     this.data.links = this.data.links || [];
-    this.data.links.push(parameters);
+    this.data.links.push(link);
     return this;
   }
 
@@ -41,7 +44,7 @@ export default class STACHypermedia extends STACObject {
   }
 
   addRootLink() {
-    return this.addLink({ rel: 'root', href: this.getAbsoluteUrl(), type: 'application/json' });
+    return this.addLink({ rel: 'root', href: this.instance.root.getAbsoluteUrl(), type: 'application/json' });
   }
 
   removeRootLink() {
