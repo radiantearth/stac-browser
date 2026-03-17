@@ -31,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - You may also have to update imports of `Utils` or other constants.
     Most imports have moved to stac-js.
     For example, `Utils.isObject` is now `isObject` and can be imported from `stac-js/src/utils.js`.
+- It is not needed any longer to update the path to the `runtime-config.js`, the `pathPrefix` is added automatically in the build process.
 
 ### Deprecated
 

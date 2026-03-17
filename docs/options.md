@@ -10,7 +10,7 @@ The following ways to set config options are possible:
 - Set **environment variables**, all options need a `SB_` prefix.
   So you could for example set the catalog URL via the environment variable `SB_catalogUrl`.
 - Optionally, you can also set options after the build, basically **at "runtime"**.
-  Enable this by removing the `<!--` and `-->` around the `<script defer="defer" src="./runtime-config.js"></script>` in the [`index.html`](../index.html).
+  Enable this by removing the `<!--RC` and `RC-->` around the `script` tag that loads the `runtime-config.js` in the [`index.html`](../index.html).
   Then run the build procedure and after completion, you can fill the `dist/runtime-config.js` with any options that you want to customize.
 
 > [!CAUTION]  
