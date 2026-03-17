@@ -8,7 +8,7 @@ export default class Conformance extends STACObject {
   }
 
   getAbsoluteUrl() {
-    return this.url;
+    return `${this.instance.root.getAbsoluteUrl()}${this.url}/`;
   }
 
   build() {

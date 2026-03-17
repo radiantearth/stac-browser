@@ -20,7 +20,8 @@ import { waitForBrowserReady } from '../helpers.js';
 test.describe('API catalog browsing', () => {
 
   test.only('root page renders API', async ({ page, worker }) => {
-    const api = API.defaultApi();
+    // temporarily used different root URL to prevent 404s from the real example.com
+    const api = API.defaultApi({url: "https://api.local/api"});
     const collection = api.addCollection('my-collection', {});
     api.addItem(collection, 'my-item', {});
 
@@ -29,8 +30,8 @@ test.describe('API catalog browsing', () => {
     await page.goto(api.root.getBrowserPath());
     await waitForBrowserReady(page);
 
-    await expect(page.getByRole('heading', { name: /Custom Example Catalog/i })).toBeVisible();
-    await expect(page.getByText(/An example STAC Catalog with some/i)).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Example API/i })).toBeVisible();
+    await expect(page.getByText(/An example STAC API with some/i)).toBeVisible();
     await expect(page.getByRole('link', { name: /STAC Specification/i })).toBeVisible();
   });
 });

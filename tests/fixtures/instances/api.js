@@ -86,10 +86,11 @@ export default class API extends Instance {
     }
 
     // GET /
-    this.root.addLink({ href: '/conformance', rel: 'conformance', type: 'application/json' }); // Todo: how to define the href? absolute? relative? ...
+    this.root.addLink({ href: 'api/conformance', rel: 'conformance', type: 'application/json' }); // Todo: how to define the href? absolute? relative? ...
 
     // GET /conformance
-    this.endpoints.push(new Conformance(this));
+    const conformance = new Conformance(this);
+    this.endpoints.push(conformance);
 
     return this;
   }
@@ -97,18 +98,20 @@ export default class API extends Instance {
   addCollectionsExtension({
 
   } = {}) {
+    if (this.endpoints.some(ep => ep instanceof CollectionCollection)) {
+      return this;
+    }
     if (this.collections) {
       return this;
     }
     // GET /
     this.addConformanceEndpoint();
     this.root.addConformsTo('https://api.stacspec.org/v1.0.0/collections');
-    this.root.addLink({ href: '/collections', rel: 'data', type: 'application/json' }); // Todo: how to define the href? absolute? relative? ...
+    this.root.addLink({ href: 'api/collections/', rel: 'data', type: 'application/json' }); // Todo: how to define the href? absolute? relative? ...
 
     // GET /collections
-    this.collections = this.createStac({url: '/collections', type: CollectionCollection});
+    this.collections = this.createStac({url: `/collections`, type: CollectionCollection});
 
-    this.endpoints.push(this.collections);
     // todo: pagination
 
     return this;

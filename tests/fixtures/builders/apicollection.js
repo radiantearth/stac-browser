@@ -11,6 +11,10 @@ export default class APICollection extends STACHypermedia {
     return this;
   }
 
+  getAbsoluteUrl() {
+    return `${this.instance.root.getAbsoluteUrl()}${this.url}/`;
+  }
+
   updatePaginationLink(rel, newHref) {
     if (this.data.links) {
       this.data.links = this.data.links.map(link => link.rel === rel ? { ...link, href: newHref } : link);

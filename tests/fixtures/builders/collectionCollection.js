@@ -22,7 +22,7 @@ export default class CollectionCollection extends APICollection {
     for (let i = 0; i < count; i++) {
       const id = `example-${i}`;
       const title = `Example Collection ${i}`;
-      const collection = this.instance.createStac({url: `/collections/${id}`, type: Collection});
+      const collection = this.instance.createStac({url: `/collections/${id}`, type:Collection});
       collection.setMetadata({ id, title });
       this.addNewCollection(collection);
       if (parent !== null) {
@@ -44,5 +44,11 @@ export default class CollectionCollection extends APICollection {
       this.data.collections = this.data.collections.map(col => col.id === id ? newCollection : col);
     }
     return this;
+  }
+
+  build() {
+    const data = super.build();
+    data.collections = data.collections.map(c => c.build());
+    return data;
   }
 }

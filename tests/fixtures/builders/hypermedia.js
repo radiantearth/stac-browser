@@ -1,4 +1,5 @@
 import STACObject from './object.js';
+import { toAbsolute } from 'stac-js/src/http.js';
 
 export default class STACHypermedia extends STACObject {
   constructor(instance, data, url) {
@@ -12,7 +13,12 @@ export default class STACHypermedia extends STACObject {
   }
 
   getAbsoluteUrl() {
-    return this.url;
+    if (URL.canParse(this.url)) {
+      return this.url;
+    } else {
+      const url = URL.parse(this.url, this.instance.root.getAbsoluteUrl());
+      return url.toString();
+    }
   }
 
   getBrowserPath() {
@@ -69,7 +75,4 @@ export default class STACHypermedia extends STACObject {
     return this.updateLink('self', newParameters);
   } 
 
-  build() {
-    return this.data;
-  }
 }

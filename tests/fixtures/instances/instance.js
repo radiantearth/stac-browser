@@ -70,10 +70,20 @@ export default class Instance {
     const handlers = [];
 
     for (const endpoint of this.endpoints) {
+      try {
       const obj = endpoint.build();
-      const url = endpoint.url;
+      const url = endpoint.getAbsoluteUrl();
 
-      handlers.push(http.get(url, () => HttpResponse.json(obj)));
+        handlers.push(http.get(url, ({request}) => {
+          try {
+            return HttpResponse.json(obj)
+          } catch (e) {
+            console.log(e)
+          }
+        }));
+      } catch (e) {
+        console.log(`failed to add handler for ${endpoint.getAbsoluteUrl()}`, e)
+      }
     }
 
     if (options.reset) {
