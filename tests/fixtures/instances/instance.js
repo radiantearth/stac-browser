@@ -71,8 +71,9 @@ export default class Instance {
 
     for (const endpoint of this.endpoints) {
       try {
-      const obj = endpoint.build();
-      const url = endpoint.getAbsoluteUrl();
+        const obj = endpoint.build();
+        const url = endpoint.getAbsoluteUrl();
+        console.log(`Adding endpoint ${url}`)
 
         handlers.push(http.get(url, ({request}) => {
           try {

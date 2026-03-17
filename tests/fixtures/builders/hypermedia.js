@@ -13,12 +13,12 @@ export default class STACHypermedia extends STACObject {
   }
 
   getAbsoluteUrl() {
-    if (URL.canParse(this.url)) {
-      return this.url;
-    } else {
-      const url = URL.parse(this.url, this.instance.root.getAbsoluteUrl());
-      return url.toString();
-    }
+      if (URL.canParse(this.url)) {
+        return this.url;
+      } else {
+        const url = URL.parse(this.url, this.instance.root.getAbsoluteUrl());
+        return url.toString();
+      }
   }
 
   getBrowserPath() {

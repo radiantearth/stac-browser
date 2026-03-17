@@ -21,7 +21,7 @@ test.describe('API catalog browsing', () => {
 
   test.only('root page renders API', async ({ page, worker }) => {
     // temporarily used different root URL to prevent 404s from the real example.com
-    const api = API.defaultApi({url: "https://api.local/api"});
+    const api = API.defaultApi({url: "https://api.local/api/"});
     const collection = api.addCollection('my-collection', {});
     api.addItem(collection, 'my-item', {});
 

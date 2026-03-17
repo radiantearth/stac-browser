@@ -3,12 +3,13 @@ import STACObject from "./object.js";
 export default class Conformance extends STACObject {
   constructor(instance) {
     super();
-    this.url = '/conformance';
+    this.url = 'conformance';
     this.instance = instance;
   }
 
   getAbsoluteUrl() {
-    return `${this.instance.root.getAbsoluteUrl()}${this.url}/`;
+    const url = URL.parse(this.url, this.instance.root.getAbsoluteUrl());
+    return url.toString();
   }
 
   build() {

@@ -3,6 +3,8 @@ import CollectionCollection from '../builders/collectionCollection.js';
 import Conformance from '../builders/conformance.js';
 import ItemCollection from '../builders/itemCollection.js';
 import URI from 'urijs';
+import Item from '../builders/item.js';
+import path from 'path';
 
 function joinUrl(base, path) {
   const uri = URI(base);
@@ -37,7 +39,7 @@ export default class API extends Instance {
   
   addCollection(id, options) {
     this.addCollectionsExtension();
-    options.url = options.url || joinUrl(this.root.url, `/collections/${id}`);
+    options.url = `collections/${id}`;
     const collection = this.createCollection(options).setMetadata({id});
   
     this.collections.addNewCollection(collection);
@@ -47,13 +49,25 @@ export default class API extends Instance {
 
   addItem(collection, id, options) {
     this.addItemsExtension();
-    const cid = collection.id;
-    if (!this.itemCollections[cid]) {
-      this.itemCollections[cid] = new ItemCollection(this, { id: cid }, joinUrl(this.root.url, `/collections/${cid}/items`));
+    const cid = collection.data.id;
+    options.url = options.url || `collections/${cid}/items/${id}`;
+    if (!this.itemCollections[cid]) { 
+      const url = path.dirname(options.url)
+      const itemCollection = this.createStac({
+        url, 
+        type: ItemCollection
+      });
+      this.itemCollections[cid] = itemCollection;
+      collection.addLink({href: itemCollection.getAbsoluteUrl(), rel: 'items', type: 'application/geo+json'});
     }
     const items = this.itemCollections[cid];
-    options.url = options.url || joinUrl(this.root.url, `/collections/${cid}/items/${id}`);
-    const item = items.addItem(options);
+    const item = this.createStac({
+      url: options.url,
+      type: Item
+    })
+    
+    items.addItem(item.build());
+
     // todo...
     
 
@@ -86,7 +100,7 @@ export default class API extends Instance {
     }
 
     // GET /
-    this.root.addLink({ href: 'api/conformance', rel: 'conformance', type: 'application/json' }); // Todo: how to define the href? absolute? relative? ...
+    this.root.addLink({ href: 'conformance', rel: 'conformance', type: 'application/json' }); // Todo: how to define the href? absolute? relative? ...
 
     // GET /conformance
     const conformance = new Conformance(this);
@@ -104,13 +118,14 @@ export default class API extends Instance {
     if (this.collections) {
       return this;
     }
+
+    // GET /collections
+    this.collections = this.createStac({url: `collections`, type: CollectionCollection});
+
     // GET /
     this.addConformanceEndpoint();
     this.root.addConformsTo('https://api.stacspec.org/v1.0.0/collections');
-    this.root.addLink({ href: 'api/collections/', rel: 'data', type: 'application/json' }); // Todo: how to define the href? absolute? relative? ...
-
-    // GET /collections
-    this.collections = this.createStac({url: `/collections`, type: CollectionCollection});
+    this.root.addLink({ href: this.collections.getAbsoluteUrl(), rel: 'data', type: 'application/json' }); // Todo: how to define the href? absolute? relative? ...
 
     // todo: pagination
 
@@ -130,7 +145,6 @@ export default class API extends Instance {
     this.root.addConformsTo('https://api.stacspec.org/v1.0.0/ogcapi-features');
 
     this.itemCollections = {}; // keys = collection ID, values = ItemCollection objects
-    // todo...
     
     return this;
   }
