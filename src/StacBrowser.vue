@@ -229,13 +229,13 @@ export default defineComponent({
     },
     type() {
       if (this.data instanceof STAC) {
-        if (this.data.isItem()) {
+        if (this.data.isItem) {
           return this.$t('stacItem', 1);
         }
-        else if (this.data.isCollection()) {
+        else if (this.data.isCollection) {
           return this.$t(`stacCollection`, 1);
         }
-        else if (this.data.isCatalog()) {
+        else if (this.data.isCatalog) {
           return this.$t(`stacCatalog`, 1);
         }
         else if (hasText(this.data.type)) {
@@ -332,7 +332,7 @@ export default defineComponent({
             // A better way would be to combine the language code and URL as the index in the browser database
             // This needs a database refactor though: https://github.com/radiantearth/stac-browser/issues/231
             this.$store.commit('resetCatalog', true);
-            await this.$store.dispatch("load", { url, show: true });
+            await this.$store.dispatch('load', { url, show: true });
           }
         }
       }
@@ -475,7 +475,7 @@ export default defineComponent({
     },
     async logInOut() {
       if (this.url) {
-        this.addAction(() => this.$store.dispatch("load", {
+        this.addAction(() => this.$store.dispatch('load', {
           url: this.url,
           show: true,
           force: true,

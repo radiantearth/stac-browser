@@ -49,10 +49,6 @@ export default {
       type: String,
       required: true,
     },
-    context: {
-      type: Object,
-      default: null,
-    },
     ignoreFields: {
       type: Array,
       default: () => [],
@@ -81,6 +77,11 @@ export default {
     },
   },
   watch: {
+    // We need to run this.formatData() once at the beginning.
+    // We use the uiLanguage watcher for this and enable it through immediate: true,
+    // because this ensures that the duration.js from the locales is loaded properly.
+    // We don't set immediate: true for the data watcher,
+    // because this would cause formatting to run twice at the beginning.
     uiLanguage: {
       immediate: true,
       async handler(locale) {
@@ -96,6 +97,9 @@ export default {
         this.formattedData = this.formatData();
       },
     },
+    data() {
+      this.formattedData = this.formatData();
+    },
   },
   methods: {
     formatData() {
@@ -103,20 +107,24 @@ export default {
       // ignore fields starting with an underscore which is likely originating from the STAC class
       let filter = (key) =>
         !key.startsWith("_") && !this.ignoreFields.includes(key);
+
+      const data = typeof this.data?.toJSON === "function" ? this.data.toJSON() : this.data;
+      const context = typeof this.data?.getContext === "function" ? this.data.getContext() : null;
+
       switch (this.type) {
         case "Asset":
-          return formatAsset(this.data.toJSON(), this.context, filter);
+          return formatAsset(data, context, filter);
         case "Link":
-          return formatLink(this.data, this.context, filter);
+          return formatLink(data, context, filter);
         case "Provider":
-          return formatProvider(this.data, this.context, filter);
+          return formatProvider(data, context, filter);
         case "Item":
-          return formatItemProperties(this.data, filter);
+          return formatItemProperties(data, filter);
         case "Catalog":
-          return formatCatalog(this.data, filter);
+          return formatCatalog(data, filter);
         case "Collection": {
-          let core = formatCollection(this.data, filter);
-          let summaries = formatSummaries(this.data, filter);
+          const core = formatCollection(data, filter);
+          const summaries = formatSummaries(data, filter);
           // Merge summaries into collection metadata
           summaries.forEach((summaryGroup) => {
             let index = core.findIndex(
@@ -134,7 +142,7 @@ export default {
         case "FeatureCollection":
           return {};
         default:
-          return formatGrouped(this.context, this.data, this.type, filter);
+          return formatGrouped(context, data, this.type, filter);
       }
     },
   },

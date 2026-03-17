@@ -116,7 +116,7 @@ export default {
     },
     mayHaveChildren() {
       if (this.item instanceof STAC) {
-        return this.item.isCatalogLike();
+        return this.item.isCatalogLike;
       }
       else if (this.link) {
         return this.item.rel !== 'item';
@@ -194,7 +194,7 @@ export default {
   },
   methods: {
     updateChilds() {
-      if (this.stac && this.stac.isCatalogLike()) {
+      if (this.stac && this.stac.isCatalogLike) {
         this.childs = this.stac.getChildren(this.apiCatalogPriority);
       }
       else {
@@ -214,7 +214,7 @@ export default {
       if (this.expanded && !this.pagination) {
         this.loading = true;
         let url = this.item instanceof STAC ? this.item.getAbsoluteUrl() : this.item.href;
-        await this.$store.dispatch("load", { url });
+        await this.$store.dispatch('load', { url });
         this.loading = false;
       }
     }

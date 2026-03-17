@@ -22,25 +22,25 @@
               <b-col md="8" class="value"><span v-html="temporalExtents" /></b-col>
             </b-row>
           </section>
-          <LinkList v-if="linkPosition === 'left'" :title="$t('additionalResources')" :links="additionalLinks" :context="data" />
+          <LinkList v-if="linkPosition === 'left'" :title="$t('additionalResources')" :links="additionalLinks" />
         </section>
         <section v-if="isCollection || hasThumbnails" class="mb-4">
           <b-card no-body class="maps-preview">
             <b-tabs v-model="tab" ref="tabs" pills card vertical end>
-              <b-tab v-if="isCollection" :title="$t('map')" no-body>
+              <b-tab v-if="isCollection" :id="tabIds.map" :title="$t('map')" no-body>
                 <MapView :stac="data" v-bind="mapData" @changed="dataChanged" @empty="handleEmptyMap" onfocusOnly popover />
               </b-tab>
-              <b-tab v-if="hasThumbnails" :title="$t('thumbnails')" no-body>
+              <b-tab v-if="hasThumbnails" :id="tabIds.thumbnails" :title="$t('thumbnails')" no-body>
                 <Thumbnails :thumbnails="thumbnails" />
               </b-tab>
             </b-tabs>
           </b-card>
         </section>
-        <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="selectedReferences" @show-asset="showAsset" />
-        <Assets v-if="hasItemAssets && !hasItems" :assets="itemAssets" :context="data" :definition="true" />
+        <Assets v-if="hasAssets" :assets="assets" :shown="selectedReferences" @show-asset="showAsset" />
+        <Assets v-if="hasItemAssets && !hasItems" :assets="itemAssets" :definition="true" />
         <Providers v-if="providers" :providers="providers" />
         <MetadataGroups class="mb-4" :type="data.type" :data="data" :ignoreFields="ignoredMetadataFields" />
-        <LinkList v-if="linkPosition === 'right'" :title="$t('additionalResources')" :links="additionalLinks" :context="data" />
+        <LinkList v-if="linkPosition === 'right'" :title="$t('additionalResources')" :links="additionalLinks" />
         <WidgetHook id="view-catalog-meta-end" />
       </b-col>
       <b-col class="catalogs-container" v-if="hasCatalogs">
@@ -58,7 +58,7 @@
           @paginate="paginateItems" @filter-items="filterItems"
           @filters-shown="filtersShown"
         />
-        <Assets v-if="hasItemAssets" :assets="itemAssets" :context="data" :definition="true" />
+        <Assets v-if="hasItemAssets" :assets="itemAssets" :definition="true" />
         <WidgetHook id="view-catalog-items-end" />
       </b-col>
     </b-row>

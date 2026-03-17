@@ -12,10 +12,10 @@ export default {
         return [];
       }
       let assets = [];
-      if ((this.data.isItem() || this.data.isCollection()) && isObject(this.data.assets)) {
+      if ((this.data.isItem || this.data.isCollection) && isObject(this.data.assets)) {
         assets = assets.concat(Object.values(this.data.assets));
       }
-      if (this.data.isCollection() && isObject(this.data.item_assets)) {
+      if (this.data.isCollection && isObject(this.data.item_assets)) {
         assets = assets.concat(Object.values(this.data.item_assets));
       }
       

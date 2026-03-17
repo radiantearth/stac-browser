@@ -9,12 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Inputs to enter bounding boxes for search manually
+- Plugin system for widgets
+- Support for Sortables
+- CQL2 / Queryables:
+  - Allow negating CQL2 filters (globally and per filter)
+  - Support CQL2 Advanced Comparison Operators
+  - Support CQL2 Array Functions
 - PlayWright tests
-- Allow manually entering bounding boxes for search
-- Support negating CQL2 filters (globally and per filter)
-- Support CQL2 Advanced Comparison Operators
-- Support CQL2 Array Functions
-- Add a plugin system for widgets
 
 ### Changed
 
@@ -31,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - You may also have to update imports of `Utils` or other constants.
     Most imports have moved to stac-js.
     For example, `Utils.isObject` is now `isObject` and can be imported from `stac-js/src/utils.js`.
+- It is not needed any longer to update the path to the `runtime-config.js`, the `pathPrefix` is added automatically in the build process.
 
 ### Deprecated
 
@@ -43,7 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Handle state of downloads better and confirm leaving the page when downloading
-- Better error on request to the /collections or .../items endpoints
+- Better error on request to the `/collections` or `.../items` endpoints
 - Collection list on Global Item Search was empty in certain situations
 - Show an error message when no operator is supported for a queryable
 - Don't show an "unsupported" error when only Collection Search is supported by the API

@@ -89,7 +89,7 @@ function makeProvider(providers, role) {
 function fallbackDescription(data, store) {
   let stacType, container;
   if (data instanceof STAC) {
-    stacType = data.isItem() ? "Item" : data.type;
+    stacType = data.isItem ? "Item" : data.type;
     container = data.collection;
   }
   else if (isObject(data) && data.rel === 'item') {
@@ -174,7 +174,7 @@ export function createCatalogSchema(data, parents, store) {
 
   let schema = createBaseSchema(data, 'DataCatalog', store);
 
-  if (data.isCollection()) {
+  if (data.isCollection) {
     if (data.extent?.temporal?.interval.length > 0) {
       schema.temporalCoverage = formatTemporalCoverage(data.extent.temporal.interval[0]);
     }

@@ -9,9 +9,9 @@ export default {
       const stac = layer.get('stac');
       if (stac) {
         const stacTitle = stac.getMetadata('title');
-        if (stac.isAsset()) {
+        if (stac.isAsset) {
           title = stacTitle || stac.getKey();
-        } else if (stac.isLink()) {
+        } else if (stac.isLink) {
           title = stacTitle || (stac.rel ? stac.rel.toUpperCase() : fallback);
         } else {
           title = stacTitle || stac.id;

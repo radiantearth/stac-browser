@@ -13,14 +13,14 @@ export default {
   computed: {
     ...mapState(['cardViewMode', 'crossOriginMedia', 'defaultThumbnailSize']),
     isList() {
-      return this.data && !this.data.isItem() && this.cardViewMode === 'list';
+      return this.data && !this.data.isItem && this.cardViewMode === 'list';
     },
     hasImage() {
       return this.showThumbnail && this.thumbnail;
     },
     thumbnail() {
       if (this.data) {
-        let thumbnails = this.data.getThumbnails(true, 'thumbnail');
+        let thumbnails = this.data.getThumbnails(true, 'thumbnail', true);
         if (thumbnails.length > 0) {
           let t = thumbnails[0];
           let width, height;

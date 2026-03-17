@@ -84,7 +84,7 @@ export function getDisplayTitle(entities, fallbackTitle = "") {
 }
 
 function getChildren(stac, priority = null) {
-  if (!stac.isCatalogLike()) {
+  if (!stac.isCatalogLike) {
     return [];
   }
 
