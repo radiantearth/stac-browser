@@ -88,7 +88,7 @@ an additional configuration file for URL rewriting.
 Please see the [`historyMode`](docs/options.md#historymode) option for details.
 
 You can customize STAC Browser, too. See the options and theming details below.
-If not stated otherwise, all options can either be specified via CLI, ENV variables or in the [config file](config.js).
+If not stated otherwise, all options can either be specified via ENV variables or in the [config file](config.js).
 You can also provide configuration options "at runtime" (after the build).
 
 ### Private query parameters
