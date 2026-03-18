@@ -149,7 +149,7 @@ export default class API extends Instance {
   addSearchExtension({
 
   } = {}) {
-    this.root.addSearchLink
+    this.root.addSearchLink();
     this.root.addConformsTo("https://api.stacspec.org/v1.0.0/item-search")
     this.root.addConformsTo("https://api.stacspec.org/v1.0.0/item-search#fields")
     this.root.addConformsTo("https://api.stacspec.org/v1.0.0/item-search#query")

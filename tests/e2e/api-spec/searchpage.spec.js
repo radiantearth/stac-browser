@@ -45,24 +45,19 @@ test.describe('STAC Browser Search page', () => {
   let SEARCH_PATH;
 
   test.beforeEach(async ({ worker }) => {
-    try {
     api = API.defaultApi({url: "https://api.local/api/"});
-    const collection = api.addCollection('my-collection', {});
-    collection.setMetadata({ title: 'Test Collection' });
-    const item = api.addItem(collection, 'my-item', {});
+    const collection = api.addCollection('my-collection', {})
+      .setMetadata({ title: 'Test Collection' });
+    api.addItem(collection, 'my-item', {});
     
     await api.createServer(worker, { verbose: true });
-    SEARCH_PATH = api.root.getSearchPath()
-    } catch (e) {
-      print(e)
-    }
-
+    SEARCH_PATH = api.root.getSearchPath();
   });
 
-  test('Should load the Search page successfully', async ({ page, worker }) => {
+  test('Should load the Search page successfully', async ({ page }) => {
     // Navigate to the search page
     await page.goto(SEARCH_PATH);
-    await waitForBrowserReady();
+    await waitForBrowserReady(page);
 
     // Verify the page loads without errors
     await expect(page.getByRole('heading', { name: 'Search' }), 'search heading should be visible').toBeVisible();
