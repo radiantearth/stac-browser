@@ -5,7 +5,8 @@ export default class CatalogLike extends Stac {
   addSearchLink() {
     //ensure that search link does not exist before adding
     this.removeSearchLink();
-    return this.addLink({ rel: 'search', href: this.getAbsoluteUrl() + '/search', type: 'application/geo+json' });
+    return this.addLink({ rel: 'search', href: this.getAbsoluteUrl() + '/search', type: 'application/geo+json', method: 'POST'})
+      .addLink({ rel: 'search', href: this.getAbsoluteUrl() + '/search', type: 'application/geo+json', method: 'GET'});
   }
 
   removeSearchLink() {

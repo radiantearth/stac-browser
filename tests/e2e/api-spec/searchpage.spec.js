@@ -10,7 +10,7 @@
  */
 import { test, expect } from '../fixtures';
 import API from '../../fixtures/instances/api.js';
-import { waitForBrowserReady, waitForSearchPost } from '../helpers.js';
+import { waitForBrowserReady, waitForSearchPost, waitForMapReady, waitForBboxInputsPopulated } from '../helpers.js';
 
 const enableSpatialExtentInputs = async (page) => {
   const enableSpatialCheckbox = page.getByRole('checkbox', { name: /filter by spatial extent/i });
@@ -45,12 +45,25 @@ test.describe('STAC Browser Search page', () => {
   let SEARCH_PATH;
 
   test.beforeEach(async ({ worker }) => {
-    api = API.defaultApi({url: "https://api.local/api/"});
-    const collection = api.addCollection('my-collection', {})
-      .setMetadata({ title: 'Test Collection' });
-    api.addItem(collection, 'my-item', {});
+    api = API.minimalApi(
+      {url: "https://api.local/api/"},
+      {
+        defaultLimit: 5,
+        prevLinkEnabled: true,
+        firstLinkEnabled: true,
+        lastLinkEnabled: true
+      });
+    let collection1 = api.addCollection('collection1', {})
+      .setMetadata({ title: 'Test Collection 1' });
+    let collection2 = api.addCollection('collection2', {})
+      .setMetadata({ title: 'Test Collection 2' });
+    api.addManyItems(collection1, 50);
+    api.addManyItems(collection2, 10);
+    api.addCollectionsExtension()
+      .addItemsExtension()
+      .addSearchExtension();
     
-    await api.createServer(worker, { verbose: true });
+    await api.createServer(worker, {verbose: false});
     SEARCH_PATH = api.root.getSearchPath();
   });
 
@@ -65,16 +78,15 @@ test.describe('STAC Browser Search page', () => {
 
   test('Search with default selection should have empty POST body', async ({ page, worker }) => {
     await page.goto(SEARCH_PATH);
-    await waitForBrowserReady();
-
+    
     const requestPromise = waitForSearchPost(page);
 
     await test.step('Submit search with default selection', async () => {
       const submitButton = page.getByRole('button', { name: /submit/i });
 
-      // Submit search with default selection
+      // Submit search with default seflection
       await submitButton.click();
-    })
+    });
 
     await test.step('Verify POST body is empty', async () => {
       const { body } = await requestPromise;
@@ -85,7 +97,7 @@ test.describe('STAC Browser Search page', () => {
 
   test('Search with temporal extent selection should have valid POST body', async ({ page, worker }) => {
     await page.goto(SEARCH_PATH);
-    await waitForBrowserReady();
+    await waitForBrowserReady(page);
 
     await test.step('Enter a temporal extent', async () => {
       const temporalInput = page.getByPlaceholder(/select date range/i);
@@ -94,7 +106,7 @@ test.describe('STAC Browser Search page', () => {
       await temporalInput.fill('2025-01-01 - 2026-12-31');
       
 
-    })
+    });
 
     await test.step('Submit search and verify POST body contains correct datetime', async () => {
       const requestPromise = waitForSearchPost(page);
@@ -145,7 +157,7 @@ test.describe('STAC Browser Search page', () => {
   });
 
   test('Search with spatial extent selection via manual input should have valid POST body', async ({ page, worker }) => {
-
+    //TODO: flaky test. looks like a timing issue
     await page.goto(SEARCH_PATH);
 
     await test.step('Enable spatial extent selection and fill in bounding box values', async () => {
@@ -198,7 +210,7 @@ test.describe('STAC Browser Search page', () => {
       await fillBboxInputs(page, {
         southLat: ''
       });
-    })
+    });
 
     await test.step('Verify error message appears with correct text', async () => {
       await page.getByLabel(/south latitude/i).blur();
@@ -306,7 +318,7 @@ test.describe('STAC Browser Search page', () => {
       await submitButton.click();
 
       const { body } = await requestPromise;
-      expect(body.collections).toContain('test-collection-1');
+      expect(body.collections).toContain('collection1');
     });
   });
 
@@ -383,7 +395,6 @@ test.describe('STAC Browser Search page', () => {
   });
 
   test('search results render item cards with correct titles', async ({ page, worker }) => {
-    await mockApiRootAndCollections(worker, { searchFixture: 'search-results.json' });
     await page.goto(SEARCH_PATH);
 
     await test.step('Submit search and wait for results', async () => {
@@ -391,18 +402,27 @@ test.describe('STAC Browser Search page', () => {
       await submitButton.click();
 
       // Wait for item cards to appear
-      await expect(page.locator('.item-card')).toHaveCount(3, { timeout: 10000 });
+      await expect(page.locator('.item-card')).toHaveCount(5, { timeout: 10000 });
     });
 
     await test.step('Verify each result item title is displayed', async () => {
-      await expect(page.locator('.item-card').nth(0).locator('.stac-link .title')).toHaveText('Result Item Alpha');
-      await expect(page.locator('.item-card').nth(1).locator('.stac-link .title')).toHaveText('Result Item Beta');
-      await expect(page.locator('.item-card').nth(2).locator('.stac-link .title')).toHaveText('Result Item Gamma');
+      await expect(page.locator('.item-card').nth(0).locator('.stac-link .title')).toHaveText('example-item-0');
+      await expect(page.locator('.item-card').nth(1).locator('.stac-link .title')).toHaveText('example-item-1');
+      await expect(page.locator('.item-card').nth(2).locator('.stac-link .title')).toHaveText('example-item-2');
+      await expect(page.locator('.item-card').nth(4).locator('.stac-link .title')).toHaveText('example-item-4');
     });
   });
 
   test('search results show "no items found" when response is empty', async ({ page, worker }) => {
-    await mockApiRootAndCollections(worker, { searchFixture: 'search-empty.json' });
+    // override setup
+    api = API.minimalApi({url: "https://api.local/api/"});
+    api.addCollection('collection', {})
+      .setMetadata({ title: 'Empty Collection' });
+    api.addCollectionsExtension()
+      .addItemsExtension()
+      .addSearchExtension();
+    
+    await api.createServer(worker, {verbose: false});
     await page.goto(SEARCH_PATH);
 
     await test.step('Submit search with default filters', async () => {
@@ -420,20 +440,35 @@ test.describe('STAC Browser Search page', () => {
   });
 
   test('search results display matched item count', async ({ page, worker }) => {
-    await mockApiRootAndCollections(worker, { searchFixture: 'search-results.json' });
+    // override setup
+    api = API.minimalApi({url: "https://api.local/api/"}, {
+        defaultLimit: 100,
+        prevLinkEnabled: true,
+        firstLinkEnabled: true,
+        lastLinkEnabled: true
+      });
+    const collection1 = api.addCollection('collection1', {})
+      .setMetadata({ title: 'Test Collection 1' });
+    api.addManyItems(collection1, 9);
+    api.addCollectionsExtension()
+      .addItemsExtension()
+      .addSearchExtension();
+    
+    await api.createServer(worker, {verbose: false});
+
     await page.goto(SEARCH_PATH);
 
     await test.step('Submit search and wait for results', async () => {
       const submitButton = page.getByRole('button', { name: /submit/i });
       await submitButton.click();
 
-      await expect(page.locator('.item-card')).toHaveCount(3, { timeout: 10000 });
+      await expect(page.locator('.item-card')).toHaveCount(9, { timeout: 10000 });
     });
 
     await test.step('Verify items count badge is displayed', async () => {
       // The Items section shows a count badge next to the heading
       const itemsHeading = page.locator('.items header');
-      await expect(itemsHeading.locator('.badge')).toContainText('3');
+      await expect(itemsHeading.locator('.badge')).toContainText('9');
     });
   });
 
@@ -464,16 +499,33 @@ test.describe('STAC Browser Search page', () => {
   });
 
   test('Search results can be paginated with Next and Previous buttons', async ({ page, worker }) => {
-    await mockApiRootAndPaginatedSearch(worker);
+    //override default api
+    api = API.minimalApi(
+      {url: "https://api.local/api/"},
+      {
+        defaultLimit: 5,
+        prevLinkEnabled: true,
+        firstLinkEnabled: true,
+        lastLinkEnabled: true
+      });
+    let collection = api.addCollection('collection', {})
+      .setMetadata({ title: 'Test Collection 1' });
+    api.addManyItems(collection, 13);
+    api.addCollectionsExtension()
+      .addItemsExtension()
+      .addSearchExtension();
+
+    await api.createServer(worker, {verbose: false});
+    
     await page.goto(SEARCH_PATH);
 
     const itemCards = page.locator('.item-card');
     const nextButton = page.getByRole('button', { name: /next/i }).first();
     const prevButton = page.getByRole('button', { name: /previous/i }).first();
 
-    await test.step('Submit search and verify first page shows 3 items', async () => {
+    await test.step('Submit search and verify first page shows 5 items', async () => {
       await page.getByRole('button', { name: /submit/i }).click();
-      await expect(itemCards).toHaveCount(3, { timeout: 10000 });
+      await expect(itemCards).toHaveCount(5, { timeout: 10000 });
     });
 
     await test.step('Next button is enabled, Previous is disabled on first page', async () => {
@@ -481,9 +533,9 @@ test.describe('STAC Browser Search page', () => {
       await expect(prevButton).toBeDisabled();
     });
 
-    await test.step('Click Next and verify second page shows 2 items', async () => {
+    await test.step('Click Next and verify second page shows 5 items', async () => {
       await nextButton.click();
-      await expect(itemCards).toHaveCount(2, { timeout: 10000 });
+      await expect(itemCards).toHaveCount(5, { timeout: 10000 });
     });
 
     await test.step('Both Next and Previous are enabled on middle page', async () => {
@@ -491,9 +543,9 @@ test.describe('STAC Browser Search page', () => {
       await expect(prevButton).toBeEnabled();
     });
 
-    await test.step('Click Next and verify third page shows 2 items', async () => {
+    await test.step('Click Next and verify third page shows 3 items', async () => {
       await nextButton.click();
-      await expect(itemCards).toHaveCount(2, { timeout: 10000 });
+      await expect(itemCards).toHaveCount(3, { timeout: 10000 });
     });
 
     await test.step('Previous is enabled, Next is disabled on last page', async () => {
@@ -503,14 +555,33 @@ test.describe('STAC Browser Search page', () => {
 
     await test.step('Click Previous and verify middle page items are restored', async () => {
       await prevButton.click();
-      await expect(itemCards).toHaveCount(2, { timeout: 10000 });
+      await expect(itemCards).toHaveCount(5, { timeout: 10000 });
       await expect(nextButton).toBeEnabled();
       await expect(prevButton).toBeEnabled();
     });
   });
 
   test('Search results can be paginated with First and Last buttons', async ({ page, worker }) => {
-    await mockApiRootAndPaginatedSearch(worker);
+    //override default api
+    api = API.minimalApi(
+      {url: "https://api.local/api/"},
+      {
+        defaultLimit: 5,
+        prevLinkEnabled: true,
+        firstLinkEnabled: true,
+        lastLinkEnabled: true
+      }
+    );
+    let collection = api.addCollection('collection', {})
+      .setMetadata({ title: 'Test Collection 1' });
+    api.addManyItems(collection, 13);
+    api.addCollectionsExtension()
+      .addItemsExtension()
+      .addSearchExtension();
+
+    await api.createServer(worker, {verbose: false});
+    
+    
     await page.goto(SEARCH_PATH);
 
     const itemCards = page.locator('.item-card');
@@ -521,7 +592,7 @@ test.describe('STAC Browser Search page', () => {
 
     await test.step('Submit search and verify first page', async () => {
       await page.getByRole('button', { name: /submit/i }).click();
-      await expect(itemCards).toHaveCount(3, { timeout: 10000 });
+      await expect(itemCards).toHaveCount(5, { timeout: 10000 });
     });
 
     await test.step('First is disabled, Last is visible on first page', async () => {
@@ -531,7 +602,7 @@ test.describe('STAC Browser Search page', () => {
 
     await test.step('Click Last to jump to the last page', async () => {
       await lastButton.click();
-      await expect(itemCards).toHaveCount(2, { timeout: 10000 });
+      await expect(itemCards).toHaveCount(3, { timeout: 10000 });
       await expect(nextButton).toBeDisabled();
       await expect(prevButton).toBeEnabled();
       await expect(firstButton).toBeEnabled();
@@ -539,7 +610,7 @@ test.describe('STAC Browser Search page', () => {
 
     await test.step('Click First to jump back to the first page', async () => {
       await firstButton.click();
-      await expect(itemCards).toHaveCount(3, { timeout: 10000 });
+      await expect(itemCards).toHaveCount(5, { timeout: 10000 });
       await expect(nextButton).toBeEnabled();
       await expect(prevButton).toBeDisabled();
       await expect(firstButton).toBeDisabled();
@@ -547,21 +618,21 @@ test.describe('STAC Browser Search page', () => {
 
     await test.step('Navigate to middle page and verify First/Last both enabled', async () => {
       await nextButton.click();
-      await expect(itemCards).toHaveCount(2, { timeout: 10000 });
+      await expect(itemCards).toHaveCount(5, { timeout: 10000 });
       await expect(firstButton).toBeEnabled();
       await expect(lastButton).toBeEnabled();
     });
 
     await test.step('Click Last from middle page skips to last page', async () => {
       await lastButton.click();
-      await expect(itemCards).toHaveCount(2, { timeout: 10000 });
+      await expect(itemCards).toHaveCount(3, { timeout: 10000 });
       await expect(nextButton).toBeDisabled();
       await expect(firstButton).toBeEnabled();
     });
 
     await test.step('Click First from last page skips to first page', async () => {
       await firstButton.click();
-      await expect(itemCards).toHaveCount(3, { timeout: 10000 });
+      await expect(itemCards).toHaveCount(5, { timeout: 10000 });
       await expect(prevButton).toBeDisabled();
       await expect(firstButton).toBeDisabled();
     });

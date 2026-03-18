@@ -11,6 +11,19 @@ export default class STACObject {
     return null;
   }
   
+  getMethod() {
+    if(!this.method){
+      return null
+    }
+
+    return this.method.toUpperCase() || 'GET'
+  }
+
+  setMethod(method) {
+    this.method = method.toUpperCase();
+    return this;
+  }
+
   setMetadata(fields) {
     const metadata = this._getMetadataObject();
     Object.assign(metadata, fields);

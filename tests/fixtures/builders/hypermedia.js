@@ -1,10 +1,22 @@
 import STACObject from './object.js';
-import { toAbsolute } from 'stac-js/src/http.js';
 
 export default class STACHypermedia extends STACObject {
-  constructor(instance, data, url) {
+  constructor(instance, data, link) {
     super(data);
-    this.url = url;
+
+    //check whether link is url or link object
+    if (typeof link === 'object' && link.href) {
+      this.url = link.href;
+      this.method = link.method || 'GET';
+      this.headers = link.headers || undefined;
+      this.body = link.body || undefined;
+    } else {
+      this.url = link;
+      this.method = 'GET';
+      this.headers = undefined;
+      this.body = undefined;
+    }
+
     this.instance = instance;
     this.addSelfLink();
     if (this.instance.root) { // skip if this is the root object itself
@@ -13,12 +25,12 @@ export default class STACHypermedia extends STACObject {
   }
 
   getAbsoluteUrl() {
-      if (URL.canParse(this.url)) {
-        return this.url;
-      } else {
-        const url = URL.parse(this.url, this.instance.root.getAbsoluteUrl());
-        return url.toString();
-      }
+    if (URL.canParse(this.url)) {
+      return this.url;
+    } else {
+      const url = URL.parse(this.url, this.instance.root.getAbsoluteUrl());
+      return url.toString();
+    }
   }
 
   getBrowserPath() {
@@ -31,8 +43,8 @@ export default class STACHypermedia extends STACObject {
 
     return browserPath;
     } catch (e) { 
-      console.log(e)
-      console.log(this.url)
+      console.log(e);
+      console.log(this.url);
     }
   }
 
@@ -46,8 +58,8 @@ export default class STACHypermedia extends STACObject {
 
     return searchPath;
     } catch (e) { 
-      console.log(e)
-      console.log(this.url)
+      console.log(e);
+      console.log(this.url);
     }
   }
 

@@ -5,6 +5,7 @@ export default class Conformance extends STACObject {
     super();
     this.url = 'conformance';
     this.instance = instance;
+    this.method = 'GET'
   }
 
   getAbsoluteUrl() {

@@ -71,6 +71,32 @@ export default class API extends Instance {
     return item;
   }
 
+  addManyItems(collection, count){
+    this.addItemsExtension();
+    const cid = collection.data.id;
+
+    for (let i = 0; i < count; i++) {
+      const id = `example-item-${i}`;
+      const title = `Example Item ${i}`;
+      const itemOptions = { url: `/collections/${cid}/items/${id}`};
+      const item = this.createStac({url: itemOptions.url, type: Item});
+      item.setMetadata({ id, title });
+      this.addItem(collection, id, itemOptions);
+      if (collection !== null) {
+        item.addParentLink(collection);
+      }
+    }
+
+  }
+
+  getItems(options) {
+    const items = []
+    for (let cid in this.itemCollections){
+      items.push(...this.itemCollections[cid].getItems());
+    }
+    return items;
+  }
+
   addStaticCatalog(options) {
     return this.root.addCatalog(options);
   }
@@ -102,6 +128,24 @@ export default class API extends Instance {
     // GET /conformance
     const conformance = new Conformance(this);
     this.endpoints.push(conformance);
+
+    return this;
+  }
+
+  addSearchEndpoint() {
+    // TODO: check if search endpoint already exists
+
+    this.root.addSearchLink();
+    const searchGET = this.createStac({
+      url: 'search',
+      type: ItemCollection
+    });
+    const searchPOST = this.createStac({
+      url: 'search',
+      type: ItemCollection
+    }).setMethod('POST');
+    
+    this.endpoints.push(searchPOST, searchGET);
 
     return this;
   }
@@ -146,10 +190,8 @@ export default class API extends Instance {
     return this;
   }
 
-  addSearchExtension({
-
-  } = {}) {
-    this.root.addSearchLink();
+  addSearchExtension(options = {}) {
+    this.addSearchEndpoint(options)
     this.root.addConformsTo("https://api.stacspec.org/v1.0.0/item-search")
     this.root.addConformsTo("https://api.stacspec.org/v1.0.0/item-search#fields")
     this.root.addConformsTo("https://api.stacspec.org/v1.0.0/item-search#query")

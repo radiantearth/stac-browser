@@ -20,10 +20,6 @@ HTTP mocking is driven by **handler objects** — plain descriptors registered v
 
 | Function | Purpose |
 |---|---|
-| `registerHandlers(page, handlers)` | Install an array of `{ url, method?, status?, body }` route handlers |
-| `mockCatalogByFolder(page, catalogUrl)` | Mock all JSON files in a fixture folder (matched by `self` links) |
-| `mockApiRootAndCollections(page)` | Mock a STAC API root + `/collections` + `/search` (for search page tests) |
-| `loadMockCatalog(page, data, url)` | Navigate to a mocked catalog and wait for readiness |
 | `mockStacResource(page, url, data)` | Mock a single URL |
 | `mockStacError(page, url, status)` | Mock an error response |
 | `waitForBrowserReady(page)` | Wait for loading indicators to clear |

@@ -66,26 +66,49 @@ export default class Instance {
     return obj;
   }
 
-  async createServer(worker, options = { reset: true }) {
+  async createServer(worker, options = { reset: true}) {
     const handlers = [];
 
     for (const endpoint of this.endpoints) {
       try {
-        const obj = endpoint.build();
         const url = endpoint.getAbsoluteUrl();
+        const method = endpoint.getMethod();
         if (options.verbose) {
-          console.log(`Adding endpoint ${url}`)
+          console.log(`Adding endpoint ${method} ${url}`);
         }
 
-        handlers.push(http.get(url, ({request}) => {
-          try {
-            return HttpResponse.json(obj)
-          } catch (e) {
-            console.log(e)
-          }
-        }));
+        //GET
+        if(method === 'GET'){
+          handlers.push(http.get(url, ({request}) => {
+            try {
+              const url = new URL(request.url);
+              const params = Object.fromEntries(url.searchParams); //quick patch. breaks with multiple arguments of the same key
+              const obj = endpoint.build(params);
+              return HttpResponse.json(obj);
+            } catch (e) {
+              console.log(e);
+            }
+          }));
+        }
+        //POST
+        else if(method === 'POST'){
+          handlers.push(http.post(url, async ({request}) => {
+            try {
+              const req = await request.clone().json();
+              const obj = endpoint.build(req);
+              return HttpResponse.json(obj);
+            } catch (e) {
+              console.log(e);
+            }
+          }));
+        } 
+        //TODO: more methods as needed
+        else {
+          throw "Invalid Method";
+        }
+        
       } catch (e) {
-        console.log(`failed to add handler for ${endpoint.getAbsoluteUrl()}`, e)
+        console.log(`failed to add handler for ${endpoint.getAbsoluteUrl()}. Reason:`, e);
       }
     }
 
@@ -94,13 +117,13 @@ export default class Instance {
     }
 
     if (options.verbose) {
-      console.log(`Endpoints added. starting worker`)
+      console.log(`Endpoints added. Passing handlers to worker`);
     }
 
     try {
     await worker.use(...handlers);
     } catch (e) {
-      console.log(`failed to start worker`, e)
+      console.log(`Worker failed to use handlers:`, e);
     }
   }
 }

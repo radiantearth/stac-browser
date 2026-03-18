@@ -1,4 +1,5 @@
 import APICollection from "./apicollection";
+import Item from "./item";
 
 export default class ItemCollection extends APICollection {
   constructor(instance, data, url) {
@@ -30,6 +31,10 @@ export default class ItemCollection extends APICollection {
     }
     return this;
   }
+
+  getItems(){
+    return this.data.features;
+  } 
   
   removeItemById(id) {
     if (this.data.features) {
@@ -43,5 +48,14 @@ export default class ItemCollection extends APICollection {
       this.data.features = this.data.features.map(feature => feature.id === id ? newItem : feature);
     }
     return this;
+  }
+
+  build(searchParams = { limit: 10, page: 1 }) {
+    const data = super.build();
+
+    data.features = this.instance.getItems();
+    this.paginateData('features', searchParams);
+    
+    return data;
   }
 }
