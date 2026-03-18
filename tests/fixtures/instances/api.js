@@ -68,9 +68,6 @@ export default class API extends Instance {
     
     items.addItem(item.build());
 
-    // todo...
-    
-
     return item;
   }
 
@@ -152,7 +149,11 @@ export default class API extends Instance {
   addSearchExtension({
 
   } = {}) {
-
+    this.root.addSearchLink
+    this.root.addConformsTo("https://api.stacspec.org/v1.0.0/item-search")
+    this.root.addConformsTo("https://api.stacspec.org/v1.0.0/item-search#fields")
+    this.root.addConformsTo("https://api.stacspec.org/v1.0.0/item-search#query")
+    this.root.addConformsTo("https://api.stacspec.org/v1.0.0/item-search#sort");
     return this;
   }
 

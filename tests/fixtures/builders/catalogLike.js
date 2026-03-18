@@ -3,6 +3,8 @@ import Stac from "./stac.js";
 export default class CatalogLike extends Stac {
 
   addSearchLink() {
+    //ensure that search link does not exist before adding
+    this.removeSearchLink();
     return this.addLink({ rel: 'search', href: this.getAbsoluteUrl() + '/search', type: 'application/geo+json' });
   }
 

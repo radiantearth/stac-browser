@@ -93,6 +93,14 @@ export default class Instance {
       await worker.resetHandlers();
     }
 
+    if (options.verbose) {
+      console.log(`Endpoints added. starting worker`)
+    }
+
+    try {
     await worker.use(...handlers);
+    } catch (e) {
+      console.log(`failed to start worker`, e)
+    }
   }
 }
