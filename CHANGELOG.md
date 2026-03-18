@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Inputs to enter bounding boxes for search manually
 - Plugin system for widgets
 - Support for Sortables
+- Support `SB_config` for loading a custom config module
+- Support Vite `loadEnv` for `.env` config overrides
 - CQL2 / Queryables:
   - Allow negating CQL2 filters (globally and per filter)
   - Support CQL2 Advanced Comparison Operators
@@ -41,7 +43,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 - CLI parameters for npm commands (e.g. `npm run build -- --catalogUrl="https://example.com"`) as they are not supported by Vite. Make sure to check your CI scripts and Docker files.
-- Passing a STAC Browser config file via CLI (`--config`) or env (`SB_CONFIG`) is not supported by Vite. Use the `config.js` shipped with STAC Browser, the `public/runtime-config.js` or environment variables instead.
 
 ### Fixed
 
