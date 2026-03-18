@@ -24,7 +24,7 @@ const ignoredFields = {
     // API landing page, not very useful to display,
     // but https://github.com/radiantearth/stac-browser/issues/136
     'conformsTo',
-    // Will be rendered with a custom rendered
+    // Will be rendered with a custom renderer
     'deprecated',
     // Special handling for the warning of the anonymized-location extension
     'anon:warning',
@@ -42,7 +42,7 @@ const ignoredFields = {
     'keywords',
     'providers',
     'title',
-    // Will be rendered with a custom rendered
+    // Will be rendered with a custom renderer
     'deprecated',
     // Don't show these complex lists of coordinates: https://github.com/radiantearth/stac-browser/issues/141
     'proj:bbox',
@@ -102,5 +102,6 @@ export function getIgnoredFields(object, type = null) {
   if (typeof ignoreMetadata !== 'function') {
     return ignored;
   }
-  return ignoreMetadata(object, ignored.slice(0));
+  const result = ignoreMetadata(object, ignored.slice(0), type);
+  return Array.isArray(result) ? result : ignored;
 }

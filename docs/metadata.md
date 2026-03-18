@@ -76,7 +76,7 @@ you can implement a function that updates the list.
 The function receives three parameters:
 
 - `object` (stac-js `StacObject` or `Object`): The entity for which the metadata is rendered.
-- `fields` (`Array.<string>`): The fields ignored by default, an .
+- `fields` (`Array.<string>`): The fields ignored by default.
 - `type` (`string`): The type of the entity, e.g. `CatalogLike`, `Item`, `Asset`, `Link`, `Provider`.
 
 The function has to return the (updated) fields to ignore in the metadata rendering as a `Array.<string>`.
@@ -87,7 +87,7 @@ The function has to return the (updated) fields to ignore in the metadata render
 const ignoreMetadata = (object, fields, type) => {
   if (object.isCollection) {
     // Show the proj:bbox and proj:geometry fields for Collections (these are ignored by default)
-    fields = fields.filter(field => ['proj:bbox', 'proj:geometry'].includes(field));
+    fields = fields.filter(field => !['proj:bbox', 'proj:geometry'].includes(field));
   }
   else if (type === 'Provider' && object.name === 'moreGeo GmbH') {
     // Don't show the email field for the provider with name 'moreGeo GmbH'
@@ -95,7 +95,7 @@ const ignoreMetadata = (object, fields, type) => {
   }
   if (object.isSTAC) {
     // For all STAC entities (Item, Catalog, Collection) show the STAC version
-    fields = fields.filter(field => field === 'stac_version');
+    fields = fields.filter(field => field !== 'stac_version');
   }
   return fields;
 }
