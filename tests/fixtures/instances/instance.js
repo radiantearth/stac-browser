@@ -73,7 +73,9 @@ export default class Instance {
       try {
         const obj = endpoint.build();
         const url = endpoint.getAbsoluteUrl();
-        console.log(`Adding endpoint ${url}`)
+        if (options.verbose) {
+          console.log(`Adding endpoint ${url}`)
+        }
 
         handlers.push(http.get(url, ({request}) => {
           try {

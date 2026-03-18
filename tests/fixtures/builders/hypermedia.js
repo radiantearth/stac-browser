@@ -22,13 +22,18 @@ export default class STACHypermedia extends STACObject {
   }
 
   getBrowserPath() {
-    const url = new URL(this.url);
+    try{
+    const url = new URL(this.getAbsoluteUrl());
     const protocol = url.protocol !== 'https:' ? url.protocol : '';
 
     const protocolPart = protocol ? `/${url.protocol.replace(':', '')}` : '';
     const browserPath = `/external${protocolPart}/${url.host}${url.pathname}${url.search}`;
 
     return browserPath;
+    } catch (e) { 
+      console.log(e)
+      console.log(this.url)
+    }
   }
 
   addLink(link) {
