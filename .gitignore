@@ -9,6 +9,9 @@ node_modules
 .env.local
 .env.*.local
 
+# configuration overrides
+config.local.js
+
 # lock files
 /yarn.lock
 
