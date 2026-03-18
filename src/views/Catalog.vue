@@ -81,6 +81,7 @@ import { addSchemaToDocument, createCatalogSchema } from '../schema-org';
 import { ItemCollection } from '../models/stac.js';
 import DeprecationMixin from '../components/DeprecationMixin.js';
 import { BTab, BTabs, BCard } from 'bootstrap-vue-next';
+import { getIgnoredFields } from '../ignored-metadata.js';
 
 export default defineComponent({
   name: "Catalog",
@@ -110,46 +111,15 @@ export default defineComponent({
   ],
   data() {
     return {
-      filters: {},
-      ignoredMetadataFields: [
-        // Catalog and Collection fields that are handled directly
-        'stac_version',
-        'stac_extensions',
-        'id',
-        'type',
-        'title',
-        'description',
-        'keywords',
-        'providers',
-        'license',
-        'extent',
-        'summaries',
-        'links',
-        'assets',
-        'item_assets',
-        // Don't show these complex lists of coordinates: https://github.com/radiantearth/stac-browser/issues/141
-        'proj:bbox',
-        'proj:geometry',
-        // API landing page, not very useful to display, but https://github.com/radiantearth/stac-browser/issues/136
-        'conformsTo',
-        // Will be rendered with a custom rendered
-        'deprecated',
-        // Special handling for the warning of the anonymized-location extension
-        'anon:warning',
-        // Special handling for the stats extension
-        'stats:catalogs',
-        'stats:collections',
-        'stats:items',
-        // Special handling for auth
-        'auth:schemes',
-        // Special handling for the STAC Browser config
-        'stac_browser'
-      ]
+      filters: {}
     };
   },
   computed: {
     ...mapState(['data', 'url', 'apiCatalogPriority',  'apiItems', 'apiItemsLink', 'apiItemsPagination', 'apiItemsNumberMatched', 'nextCollectionsLink', 'stateQueryParameters']),
     ...mapGetters(['catalogs', 'collectionLink', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
+    ignoredMetadataFields() {
+      return getIgnoredFields(this.data, 'CatalogLike');
+    },
     cssStacType() {
       if (hasText(this.data?.type)) {
         return this.data?.type.toLowerCase();

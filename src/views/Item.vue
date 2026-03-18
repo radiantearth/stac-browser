@@ -48,6 +48,7 @@ import ReadMore from "../components/ReadMore.vue";
 import ShowAssetLinkMixin from '../components/ShowAssetLinkMixin';
 import DeprecationMixin from '../components/DeprecationMixin';
 import { addSchemaToDocument, createItemSchema } from '../schema-org';
+import { getIgnoredFields } from '../ignored-metadata.js';
 
 export default defineComponent({
   name: "Item",
@@ -72,28 +73,12 @@ export default defineComponent({
     ShowAssetLinkMixin,
     DeprecationMixin
   ],
-  data() {
-    return {
-      ignoredMetadataFields: [
-        'description',
-        'keywords',
-        'providers',
-        'title',
-        // Will be rendered with a custom rendered
-        'deprecated',
-        // Don't show these complex lists of coordinates: https://github.com/radiantearth/stac-browser/issues/141
-        'proj:bbox',
-        'proj:geometry',
-        // Special handling for auth
-        'auth:schemes',
-        // Special handling for the warning of the anonymized-location extension
-        'anon:warning'
-      ]
-    };
-  },
   computed: {
     ...mapState(['data', 'url']),
-    ...mapGetters(['collectionLink', 'parentLink'])
+    ...mapGetters(['collectionLink', 'parentLink']),
+    ignoredMetadataFields() {
+      return getIgnoredFields(this.data);
+    }
   },
   watch: {
     data: {
