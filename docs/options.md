@@ -6,7 +6,7 @@ The following options can be provided in various ways to STAC Browser, either wh
 The following ways to set config options are possible:
 
 - Customize the **[config file](../config.js)** (recommended)
-- Load an **external config file** via `SB_config`, e.g. `SB_config=./config.local.js`
+- Load an **external config file** via `SB_config`
 - Additionally, some options can be [provided through the **root catalog**](../README.md#customization-through-root-catalog) for consistency across multiple deployments
 - Set **environment variables**, all options need a `SB_` prefix.
   So you could for example set the catalog URL via the environment variable `SB_catalogUrl`.
@@ -15,9 +15,26 @@ The following ways to set config options are possible:
   Enable this by removing the `<!--RC` and `RC-->` around the `script` tag that loads the `runtime-config.js` in the [`index.html`](../index.html).
   Then run the build procedure and after completion, you can fill the `dist/runtime-config.js` with any options that you want to customize.
 
-The override order is:
+> [!TIP]  
+> To enable the usage of a local configuration file, follow these steps:
+>
+> 1. Create a `.env` file with the following content:
+>
+>    ```bash
+>    SB_config=config.local.js
+>    ```
+>
+> 2. Create a `config.local.js` and add options from the `config.js` as needed, for example:
+>
+>    ```js
+>    export default {
+>      catalogUrl: 'https://stac.example.com'
+>    }
+>    ```
 
-`config.js` -> config from `SB_config` -> `SB_*` env vars -> `runtime-config.js`
+The override order for the configuration is:
+
+`config.js` (lowest priority) -> config from `SB_config` -> `SB_*` env vars -> `runtime-config.js` (highest priority)
 
 > [!CAUTION]  
 > Appending configuration options as CLI parameters to the CLI command (e.g. `npm run build -- --catalogUrl="https://example.com"`) has been removed in  STAC Browser v5.
