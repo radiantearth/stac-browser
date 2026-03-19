@@ -70,12 +70,20 @@ export default defineConfig({
     ? {
         // In CI: Build and serve the production build
         command: 'npm run build && npx vite preview --port 4173 --strictPort',
+        env: {
+          ...process.env,
+          SB_CONFIG: '',
+        },
         url: 'http://localhost:4173',
         reuseExistingServer: false,
         timeout: 120 * 1000,
       }
     : {
         command: 'npm start',
+        env: {
+          ...process.env,
+          SB_CONFIG: '',
+        },
         url: 'http://localhost:8080',
         reuseExistingServer: true,
         timeout: 120 * 1000,
