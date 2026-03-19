@@ -1,8 +1,8 @@
-import { defineConfig, loadEnv } from "vite";
+import { defineConfig, loadEnv, searchForWorkspaceRoot } from "vite";
 import vue from "@vitejs/plugin-vue";
 import { fileURLToPath, pathToFileURL, URL } from "node:url";
 import { accessSync, readFileSync } from "fs";
-import { dirname, resolve } from "node:path";
+import { resolve } from "node:path";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
 
 import Icons from "unplugin-icons/vite";
@@ -193,7 +193,10 @@ export default defineConfig(async ({ mode }) => {
     },
     server: {
       fs: {
-        allow: [externalConfigPath],
+        allow: [
+          searchForWorkspaceRoot(process.cwd()),
+          externalConfigPath
+        ],
       },
       port: 8080,
     },
