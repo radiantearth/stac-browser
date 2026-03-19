@@ -188,7 +188,7 @@ export default defineConfig(async ({ mode }) => {
     resolve: {
       alias: {
         "@": fileURLToPath(new URL("./src", import.meta.url)),
-        "@stac-browser-config": externalConfigPath,
+        "@stac-browser-external-config": externalConfigPath,
       },
     },
     server: {

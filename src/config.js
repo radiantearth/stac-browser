@@ -1,5 +1,5 @@
 import defaultConfig from "../config.js";
-import externalConfig from "@stac-browser-config";
+import externalConfig from "@stac-browser-external-config";
 
 export default Object.assign(
   {},
