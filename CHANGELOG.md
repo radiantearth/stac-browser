@@ -124,7 +124,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 For releases prior to v4.0.0, please refer to the
 [release notes in the GitHub Releases](https://github.com/radiantearth/stac-browser/releases).
 
-[unreleased]: https://github.com/radiantearth/stac-browser/compare/v4.0.1...HEAD
+[Unreleased]: https://github.com/radiantearth/stac-browser/compare/v4.0.1...HEAD
 [4.0.1]: https://github.com/radiantearth/stac-browser/compare/v4.0.0...v4.0.1
 [4.0.0]: https://github.com/radiantearth/stac-browser/compare/v3.3.5...v4.0.0
 [3.3.5]: https://github.com/radiantearth/stac-browser/releases/tag/v3.3.5

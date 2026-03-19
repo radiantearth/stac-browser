@@ -23,15 +23,12 @@ If you care about STAC Browser and have some funds to support the future of STAC
   - [Customize](#customize)
     - [Options](#options)
     - [Languages](#languages)
-      - [Custom phrases](#custom-phrases)
     - [Themes](#themes)
     - [Basemaps](#basemaps)
     - [Actions](#actions)
     - [Widgets](#widgets)
-    - [Additional metadata fields](#additional-metadata-fields)
-      - [Example](#example)
-      - [Translation](#translation)
-    - [Customize through root catalog](#customize-through-root-catalog)
+    - [Metadata fields](#metadata-fields)
+    - [Customization through root catalog](#customization-through-root-catalog)
     - [Custom extensions](#custom-extensions)
   - [Docker](#docker)
   - [Contributing](#contributing)
@@ -88,9 +85,9 @@ an additional configuration file for URL rewriting.
 Please see the [`historyMode`](docs/options.md#historymode) option for details.
 
 You can customize STAC Browser, too. See the options and theming details below.
-If not stated otherwise, all options can be specified in the [config file](config.js), in an external config file via `SB_config`, via `SB_*` environment variables, or at runtime.
+If not stated otherwise, all options can be specified in the [config file](config.js), in an external config file via `SB_config`, via `SB_*` environment variables, or in the runtime config file..
 Vite also loads `.env`, `.env.local`, `.env.[mode]` and `.env.[mode].local`, so you can keep local overrides in e.g. `.env.local`.
-For example, `SB_config=./config.local.js npm start` loads `config.local.js` on top of `config.js`.
+For example, `SB_config=./config.local.js npm start` loads `config.local.js` (\*nix-based systems) on top of `config.js`.
 You can also provide configuration options "at runtime" (after the build).
 
 ### Private query parameters
@@ -136,57 +133,9 @@ Please read the **[documentation for the options](docs/options.md)**.
 ### Languages
 
 STAC Browser can be translated into other languages and can localize number formats, date formats etc.
+Currently, we support more than 10 different languages plus a variety of local dialects and other localizations.
 
-You need to change the [`locale`](docs/options.md#locale) and [`supportedLocales`](docs/options.md#supportedlocales) settings to select the default language and the languages available to users.
-
-The following languages are currently supported:
-
-- Arabic `ar`
-- German `de` (Germany `de`, Switzerland `de-CH`)
-- Spanish `es`
-- English `en` (International `en`, US `en-US`, UK `en-GB`)
-- French `fr` (Canada `fr-CA`, France `fr`, Switzerland `fr-CH`)
-- Indonesian `id`
-- Italian `it` (Italy `it`, Switzerland `it-CH`)
-- Romanian `ro`
-- Japanese `ja`
-- Portuguese `pt` (Brazil `pt-BR`, Portugal `pt`)
-- Polish `pl`
-
-We manage the translations in Crowdin, please see <https://crowdin.com/project/stac-browser/> for details.
-
-To add your own language, please follow the guide below: [Adding a new language](#adding-a-new-language)
-
-The following contributors kindly provide the translations:
-
-- [@jfbourgon](https://github.com/jfbourgon): `fr`, `fr-CA`
-- [@jtreska](https://github.com/jtreska): `pl`
-- [@amrirasyidi](https://github.com/amrirasyidi): `id`
-- [@mneagul](https://github.com/mneagul): `ro`
-- [@m-mohr](https://github.com/m-mohr): `de`, `en`, `en-GB`, `en-US`
-- [@p1d1d1](https://github.com/p1d1d1): `de-CH`, `fr-CH`, `it`, `it-CH`
-- [@psacra](https://github.com/psacra): `pt`
-- [@randa-11295](https://github.com/randa-11295): `ar`
-- [@rnanclares](https://github.com/rnanclares): `es`
-- [@uba](https://github.com/uba): `pt-BR`
-
-#### Custom phrases
-
-You can define custom phrases in the `custom.json`.
-This is especially useful for phrases that are coming from non-standadized metadata fields (see the chapter "[Additional metadata fields](#additional-metadata-fields)").
-If you've found metadata labels (e.g. "Price" and "Generation Time") that are not translated,
-you can add it to the `custom.json`. For metadata fields you need to add it to a the object `fields`
-as it is the group for the metadata-related phrases.
-There you can add as many phrases as you like. For example:
-
-```json
-{
-  "fields": {
-    "Price": "Preis",
-    "Generation Time": "Generierungszeit"
-  }
-}
-```
+Please read the **[localization documentation](docs/localization.md)** for more details.
 
 ### Themes
 
@@ -218,62 +167,13 @@ STAC Browser has a pluggable interface and allows to add additional content to t
 
 More information about how to add or implement widgets can be found in the **[Widgets documentation](docs/widgets.md)**.
 
-### Additional metadata fields
+### Metadata fields
 
-The metadata that STAC Browser renders is rendered primarily through the library [`stac-fields`](https://www.npmjs.com/package/@radiantearth/stac-fields).
-It contains a lot of rules for rendering [many existing STAC extensions](https://github.com/stac-utils/stac-fields/blob/main/fields.json) nicely.
-Nevertheless, if you use custom extensions to the STAC specification you may want to register your own rendering rules for the new fields.
-This can be accomplished by customizing the file [`fields.config.js`](./fields.config.js).
-It uses the [Registry](https://github.com/stac-utils/stac-fields/blob/main/README.md#registry) defined in stac-fields to add more extensions and fields to stac-fields and STAC Browser.
+STAC Browsers offers several ways to customize and extend its metadata rendering.
 
-To add your own fields, please consult the documentation for the [Registry](https://github.com/stac-utils/stac-fields/blob/main/README.md#registry).
+More information can be found in the **[Metadata documentation](docs/metadata.md)**.
 
-#### Example
-
-If you have a custom extension with the title "Radiant Earth" that uses the prefix `radiant:` you can add the extension as such:
-
-```js
-Registry.addExtension("radiant", "Radiant Earth");
-```
-
-If this extension has a boolean field `radiant:public_access` that describes whether an entity can be accessed publicly or not, this could be described as follows:
-
-```js
-Registry.addMetadataField("radiant:public_access", {
-  label: "Data Access",
-  formatter: (value) => (value ? "Public" : "Private"),
-});
-```
-
-This displays the field (with a value of `true`) in STAC Browser as follows: `Data Access: Public`.
-
-The first parameter is the field name, the second parameter describes the field using a ["field specification"](https://github.com/stac-utils/stac-fields/blob/main/README.md#fieldsjson).
-Please check the field specification for available options.
-
-#### Translation
-
-STAC Browser supports [multiple languages](#languages).
-If you use more than one language, you likely want to also translate the phrases that you've added above (in the example `Data Access`, `Public` and `Private`, assuming that `Radiant Earth` is a name and doesn't need to be translated).
-All new phrases should be added to the [active languages](docs/options.md#supportedlocales).
-To add the phrases mentioned above you need to go through the folders in `src/locales` and in the folders of the active languages update the file `custom.json` as described in the section that describes [adding custom phrases](#custom-phrases).
-All new phrases must be added to the property `fields`.
-
-Below you can find an example of an updated `custom.json` for the German language (folder `de`). It also includes the `authConfig`, which is contained in the file by default for [other purposes](docs/options.md#authconfig).
-
-```json
-{
-  "authConfig": {
-    "description": ""
-  },
-  "fields": {
-    "Data Access": "Zugriff auf die Daten",
-    "Public": "Öffentlich",
-    "Private": "Privat"
-  }
-}
-```
-
-### Customize through root catalog
+### Customization through root catalog
 
 You can also provide a couple of the config options through the root catalog.
 You need to provide a field `stac_browser` and then you can set any of the following options:
@@ -309,8 +209,8 @@ Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to contribute t
 
 The following sponsors have provided a substantial amount of funding for STAC Browser in the past:
 
-- [Radiant Earth](https://radiant.earth) (base funding for versions 1, 2 and 3)
 - [swisstopo](https://www.swisstopo.admin.ch/) (maintenance, base funding for version 3, 4, 5 and 6)
+- [Radiant Earth](https://radiant.earth) (base funding for versions 1, 2 and 3)
 - [National Resources Canada](https://natural-resources.canada.ca/home) (multi-language support, maintenance)
 - [moreGeo GmbH](https://moregeo.it) (maintenance)
 - [Spacebel](https://spacebel.com) (collection search, mapping)

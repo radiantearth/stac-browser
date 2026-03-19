@@ -26,5 +26,8 @@ jobs:
           node-version: 'lts/*'
       - uses: actions/checkout@v6
       - run: npm install
-      - name: Linting
+      - name: Lint Source Code
         run: npm run lint
+      - name: Lint Documentation
+        run: npm run docs:lint
+

@@ -1,4 +1,12 @@
-# Contributing
+# Contributing <!-- omit in toc -->
+
+- [Development](#development)
+- [Tests](#tests)
+- [Running Tests](#running-tests)
+- [AI Use Policy](#ai-use-policy)
+  - [Guidelines](#guidelines)
+  - [Disclosure](#disclosure)
+  - [Unacceptable Submissions](#unacceptable-submissions)
 
 We are happy to review and accept Pull Requests.
 STAC Browser is following the [STAC code of conduct](https://github.com/radiantearth/stac-spec/blob/master/CODE_OF_CONDUCT.md).
@@ -10,36 +18,42 @@ so you need a recent version of [NodeJS and npm](https://nodejs.org/en/) install
 
 You can run the following commands (see also "[Get started](README.md#get-started)" in the README):
 
-- `npm run install`: Install the dependencies, this is required once at the beginning.
-- `npm start`: Start the development server
-- `npm run lint`: Lint the source code files
-- `npm run build`: Compile the source code into deployable files for the web. The resulting files can be found in the folder `dist` and you can then deploy STAC Browser on a web host. There are two other variants:
+- Getting Started
+  - `npm run install`: Install the dependencies, this is required once at the beginning.
+  - `npm start`: Start the development server
+- Linting
+  - `npm run lint`: Lint the source code files
+  - `npm run docs:lint`: Lint the documentation files
+- Build step
+  - `npm run build`: Compile the source code into deployable files for the web. The resulting files can be found in the folder `dist` and you can then deploy STAC Browser on a web host. There are two other variants:
   - `npm run build:report`: Same as above, but also generates a bundle size report (see `dist/report.html`), which should not be deployed.
   - `npm run build:minimal`: Same as above, but tries to generate a minimal version without bundle size report and without source maps.
-- `npm run i18n:fields`: Generates an updated version of the locales from the stac-fields package.
+- Update files
+  - `npm run i18n:fields`: Generates an updated version of the locales from the stac-fields package.
+  - `npm run docs:hooks`: Update the list of hooks in the documentation
+- Tests: For [test commands](#tests), please see below.
 
 The [release process is documented separately](docs/release.md).
 
-## Adding a new language
+## Tests
 
-You can translate STAC Browser into other languages.
-You can also use one of the existing languages and provide an alternate version for a specifc country, e.g. a Australian English (en-AU) version of the US-English language pack (en).
+This directory contains end-to-end tests for STAC Browser using Playwright.
 
-**Please follow this guide:**
+Tests are located in the `tests/e2e` directory and follow the naming convention `*.spec.js`.
 
-- Copy the `en` folder (or any other language without a country code that you want to base the translation on).
-  - Note: If you start with the `en` folder, you have to remove the leading `//` from the line `// { fields: require('./fields.json') }` in the file `default.js`.
-- Name the new folder according to [RFC5646](https://www.rfc-editor.org/rfc/rfc5646).
-- Add the language to the list of supported locales ([`supportedLocales`](docs/options.md#supportedlocales)) in the `config.js` file.
-- Add the language to the [list of languages in this README file](README.md#languages).
-- Add yourself to the list of code owners (`.github/CODEOWNERS`) for this language (we'll invite you to this repository after you've opened a PR). **Persons contributing languages are expected to maintain them long-term! If you are not able to maintain the language pack, please indicate so in the PR and we'll release it separately.**
-- Translate the `.json` files, most importantly `config.json`, `fields.json` and `texts.json`.
-  - Please note that you never need to translate any object keys!
-  - If you base your language on another existing language (e.g. create `en-IN` based on `en`) you can delete individual files and import existing files from other languages in `default.js`.
-- Adapt the `datepicker.js`, `duration.js` and `validation.js` files to import the existing definitions from their corresponding external packages, but you could also define the specifics yourself.
-- Check that your translation works by running the development server (`npm start`) and navigating to the STAC Browser instance in your browser (usually `http://localhost:8080`).
-- Once completed, please open a pull request and we'll get back to you as soon as possible.
-- After merging the PR for the first time, we'll add you to our translation management tool Crowdin: <https://crowdin.com/project/stac-browser/>. Please get in touch to get your invite!
+**Additional resources:**
+
+- [Playwright Documentation](https://playwright.dev/docs/intro)
+- [Best Practices](https://playwright.dev/docs/best-practices)
+- [Locators](https://playwright.dev/docs/locators)
+
+## Running Tests
+
+- `npm test`: Run all tests
+- `npm run test:e2e:ui`: Run UI tests in UI mode (interactive)
+- `npm run test:e2e:headed`: Run UI tests in headed mode (see browser)
+- `npm run test:e2e:debug`: Debug UI tests
+- `npm run test:e2e:report`: View UI test report
 
 ## AI Use Policy
 
