@@ -193,7 +193,7 @@ export default defineConfig(async ({ mode }) => {
     },
     server: {
       fs: {
-        allow: [dirname(externalConfigPath)],
+        allow: [externalConfigPath],
       },
       port: 8080,
     },
