@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Allow negating CQL2 filters (globally and per filter)
   - Support CQL2 Advanced Comparison Operators
   - Support CQL2 Array Functions
+- Ignored metadata fields can be configured in `fields.config.js`
 - PlayWright tests
 
 ### Changed
