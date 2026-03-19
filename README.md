@@ -87,7 +87,7 @@ Please see the [`historyMode`](docs/options.md#historymode) option for details.
 You can customize STAC Browser, too. See the options and theming details below.
 If not stated otherwise, all options can be specified in the [config file](config.js), in an external config file via `SB_config`, via `SB_*` environment variables, or in the runtime config file..
 Vite also loads `.env`, `.env.local`, `.env.[mode]` and `.env.[mode].local`, so you can keep local overrides in e.g. `.env.local`.
-For example, `SB_config=./config.local.js npm start` loads `config.local.js` (\*nix-based systems) on top of `config.js`.
+For example, `SB_config=./config.local.mjs npm start` loads `config.local.mjs` (\*nix-based systems) on top of `config.js`.
 You can also provide configuration options "at runtime" (after the build).
 
 ### Private query parameters

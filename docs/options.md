@@ -21,10 +21,10 @@ The following ways to set config options are possible:
 > 1. Create a `.env` file with the following content:
 >
 >    ```bash
->    SB_config=config.local.js
+>    SB_config=config.local.mjs
 >    ```
 >
-> 2. Create a `config.local.js` and add options from the `config.js` as needed, for example:
+> 2. Create a `config.local.mjs` and add options from the `config.js` as needed, for example:
 >
 >    ```js
 >    export default {
