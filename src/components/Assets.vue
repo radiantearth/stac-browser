@@ -30,10 +30,6 @@ export default {
       type: Array,
       default: () => ([])
     },
-    context: {
-      type: Object,
-      default: null
-    },
     definition: {
       type: Boolean,
       default: false
@@ -41,6 +37,10 @@ export default {
     title: {
       type: String,
       default: null
+    },
+    autoExpand: {
+      type: Boolean,
+      default: false
     }
   },
   emits: ['showAsset'],
@@ -63,7 +63,7 @@ export default {
       if (this.definition) {
         return false; // Don't expand assets for Item Asset Definitions
       }
-      else if (this.assets.length === 1 && this.context && this.context.isItem) {
+      else if (this.assets.length === 1 && this.autoExpand) {
         return true; // Expand asset if it's the only asset available and it is in an Item
       }
       return null; // Let asset decide (e.g. depending on roles)

@@ -39,8 +39,8 @@
             </b-col>
           </b-row>
           <hr>
+          <Url id="stacUrl" :url="stacUrl" :label="$t('source.locatedAt')" />
         </template>
-        <Url id="stacUrl" :url="stacUrl" :label="$t('source.locatedAt')" />
       </b-popover>
       <b-popover
         id="popover-share" class="popover-large" target="popover-share-btn"

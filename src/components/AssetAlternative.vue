@@ -5,7 +5,7 @@
     <div class="mt-4" v-if="asset.description">
       <Description :description="asset.description" compact />
     </div>
-    <MetadataGroups class="mt-4" :data="resolvedAsset" :context="context" :ignoreFields="ignore" title="" type="Asset" />
+    <MetadataGroups class="mt-4" :data="resolvedAsset" :ignoreFields="ignore" title="" type="Asset" />
   </div>
 </template>
 
@@ -70,9 +70,6 @@ export default {
     };
   },
   computed: {
-    context() {
-      return this.asset.getContext();
-    },
     resolvedAsset() {
       if (Array.isArray(this.asset['storage:refs'])) {
         const asset = new Asset(this.asset);

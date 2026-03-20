@@ -1,4 +1,8 @@
-# Using Local Files
+# Using Local Files <!-- omit in toc -->
+
+- [Using STAC Browser from source](#using-stac-browser-from-source)
+- [Using STAC Browser somewhere else](#using-stac-browser-somewhere-else)
+- [stactools](#stactools)
 
 Web browser security settings prevent web pages from accessing local files using the normal request model. The solution is to serve the files from a local webserver. The following examples show `catalog.json` as the name of the local catalog you wish to browse - substitute the name of your catalog file if it is different.
 
@@ -16,7 +20,7 @@ You can then set the environment variable `SB_catalogUrl` to `"http://localhost:
 
 ## Using STAC Browser somewhere else
 
-If you are using a hosted version of STAC Browser, such as the [STAC Browser Demo by Radiant Earth](https://radiantearth.github.io/stac-browser/),  and your STAC files use relative URIs, you can run a local webserver. One possibility is to use the Node package described above. Another is to use this Python 3 script:
+If you are using a hosted version of STAC Browser, such as the [STAC Browser Demo by Radiant Earth](https://radiantearth.github.io/stac-browser/), and your STAC files use relative URIs, you can run a local webserver. One possibility is to use the Node package described above. Another is to use this Python 3 script:
 
 ```python
 #!/usr/bin/env python3
@@ -40,10 +44,15 @@ If the above options don't work for you, you can run a fully-featured implementa
 
 - STAC Browser running locally,
 - a local webserver that serves your files to STAC Browser, and
-- a local tile server that can serve web map tiles of images in your item assets. 
+- a local tile server that can serve web map tiles of images in your item assets.
 
 `stactools-browse` requires Docker to run.
 
 Installation using pip: `pip install stactools stactools-browse`
 
 Then run: `stac browse catalog.json`
+
+> [!IMPORTANT]  
+> The stactools-browse package is not actively maintained by the STAC Browser team.
+> As such it might be outdated or run an old version of STAC Browser.
+> If in doubt, please use one of the other options above.

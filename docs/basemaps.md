@@ -1,4 +1,15 @@
-# Basemaps
+# Basemaps <!-- omit in toc -->
+
+- [Overview](#overview)
+- [Options](#options)
+  - [layerCreated](#layercreated)
+  - [Sources](#sources)
+    - [Vector Tiles (Mapbox)](#vector-tiles-mapbox)
+    - [WMS](#wms)
+    - [WMTS](#wmts)
+    - [XYZ](#xyz)
+
+## Overview
 
 STAC Browser supports various types of basemaps in different projections.
 

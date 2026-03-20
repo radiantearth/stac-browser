@@ -2,6 +2,7 @@
   <div :class="{cc: true, [cssStacType]: true, empty: !hasCatalogs && !hasItems}" :key="data.id">
     <b-row>
       <b-col class="meta">
+        <WidgetHook id="view-catalog-meta-start" />
         <section class="intro">
           <h2>{{ $t('description') }}</h2>
           <DeprecationNotice v-if="showDeprecation" :data="data" />
@@ -21,7 +22,7 @@
               <b-col md="8" class="value"><span v-html="temporalExtents" /></b-col>
             </b-row>
           </section>
-          <LinkList v-if="linkPosition === 'left'" :title="$t('additionalResources')" :links="additionalLinks" :context="data" />
+          <LinkList v-if="linkPosition === 'left'" :title="$t('additionalResources')" :links="additionalLinks" />
         </section>
         <section v-if="isCollection || hasThumbnails" class="mb-4">
           <b-card no-body class="maps-preview">
@@ -35,16 +36,20 @@
             </b-tabs>
           </b-card>
         </section>
-        <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="selectedReferences" @show-asset="showAsset" />
-        <Assets v-if="hasItemAssets && !hasItems" :assets="itemAssets" :context="data" :definition="true" />
+        <Assets v-if="hasAssets" :assets="assets" :shown="selectedReferences" @show-asset="showAsset" />
+        <Assets v-if="hasItemAssets && !hasItems" :assets="itemAssets" :definition="true" />
         <Providers v-if="providers" :providers="providers" />
         <MetadataGroups class="mb-4" :type="data.type" :data="data" :ignoreFields="ignoredMetadataFields" />
-        <LinkList v-if="linkPosition === 'right'" :title="$t('additionalResources')" :links="additionalLinks" :context="data" />
+        <LinkList v-if="linkPosition === 'right'" :title="$t('additionalResources')" :links="additionalLinks" />
+        <WidgetHook id="view-catalog-meta-end" />
       </b-col>
       <b-col class="catalogs-container" v-if="hasCatalogs">
+        <WidgetHook id="view-catalog-catalogs-start" />
         <Catalogs :catalogs="catalogs" :hasMore="hasMore" @load-more="loadMoreCollections" />
+        <WidgetHook id="view-catalog-catalogs-end" />
       </b-col>
       <b-col class="items-container" v-if="hasItems || hasItemAssets">
+        <WidgetHook id="view-catalog-items-start" />
         <Items
           :stac="data" :items="items" :api="isApi"
           :showFilters="showFilters" :apiFilters="filters"
@@ -53,7 +58,8 @@
           @paginate="paginateItems" @filter-items="filterItems"
           @filters-shown="filtersShown"
         />
-        <Assets v-if="hasItemAssets" :assets="itemAssets" :context="data" :definition="true" />
+        <Assets v-if="hasItemAssets" :assets="itemAssets" :definition="true" />
+        <WidgetHook id="view-catalog-items-end" />
       </b-col>
     </b-row>
   </div>

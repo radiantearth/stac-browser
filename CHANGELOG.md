@@ -11,10 +11,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Allow manually entering bounding boxes for search
 - Generate code examples for Global Item Search, Collection Search, and collection-scoped Item Search
-- Allow negating CQL2 filters (globally and per filter)
-- Support CQL2 Advanced Comparison Operators
-- Support CQL2 Array Functions
-- Support Sortables
+- Inputs to enter bounding boxes for search manually
+- Plugin system for widgets
+- Support for Sortables
+- Support `SB_CONFIG` for loading a custom config module
+- Support Vite `loadEnv` for `.env` config overrides
+- CQL2 / Queryables:
+  - Allow negating CQL2 filters (globally and per filter)
+  - Support CQL2 Advanced Comparison Operators
+  - Support CQL2 Array Functions
 - PlayWright tests
 
 ### Changed
@@ -33,6 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - You may also have to update imports of `Utils` or other constants.
     Most imports have moved to stac-js.
     For example, `Utils.isObject` is now `isObject` and can be imported from `stac-js/src/utils.js`.
+- It is not needed any longer to update the path to the `runtime-config.js`, the `pathPrefix` is added automatically in the build process.
 
 ### Deprecated
 
@@ -40,7 +46,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 - CLI parameters for npm commands (e.g. `npm run build -- --catalogUrl="https://example.com"`) as they are not supported by Vite. Make sure to check your CI scripts and Docker files.
-- Passing a STAC Browser config file via CLI (`--config`) or env (`SB_CONFIG`) is not supported by Vite. Use the `config.js` shipped with STAC Browser, the `public/runtime-config.js` or environment variables instead.
 
 ### Fixed
 
@@ -122,7 +127,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 For releases prior to v4.0.0, please refer to the
 [release notes in the GitHub Releases](https://github.com/radiantearth/stac-browser/releases).
 
-[unreleased]: https://github.com/radiantearth/stac-browser/compare/v4.0.1...HEAD
+[Unreleased]: https://github.com/radiantearth/stac-browser/compare/v4.0.1...HEAD
 [4.0.1]: https://github.com/radiantearth/stac-browser/compare/v4.0.0...v4.0.1
 [4.0.0]: https://github.com/radiantearth/stac-browser/compare/v3.3.5...v4.0.0
 [3.3.5]: https://github.com/radiantearth/stac-browser/releases/tag/v3.3.5

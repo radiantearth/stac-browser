@@ -39,10 +39,6 @@ export default {
     fallbackTitle: {
       type: Function,
       required: true
-    },
-    context: {
-      type: Object,
-      default: null
     }
   },
   data() {

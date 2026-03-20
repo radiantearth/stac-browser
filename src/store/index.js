@@ -815,7 +815,7 @@ function getStore(config, router) {
         if (!cx.getters.root && !isRoot) {
           let catalogUrl = cx.state.catalogUrl;
           if (!catalogUrl) {
-            const root = data.getLinkWithRel('root');
+            const root = data.getRootLink();
             if (root) {
               catalogUrl = toAbsolute(root.href, url);
               await cx.dispatch('config', { catalogUrl });
@@ -825,7 +825,7 @@ function getStore(config, router) {
             // todo: In principle we could set omitApi: true in many cases here,
             // but until we can reliably load the API data on demand, we fully load it.
             // https://github.com/radiantearth/stac-browser/issues/796
-            await cx.dispatch("load", { url: catalogUrl, isRoot: true });
+            await cx.dispatch('load', { url: catalogUrl, isRoot: true });
           }
         }
 
@@ -938,7 +938,9 @@ function getStore(config, router) {
           // If we load from new collections, reset list of collections.
           // Otherwise we may append to collections from a parent entity.
           // https://github.com/radiantearth/stac-browser/issues/617
-          cx.commit('resetApiCollections');
+          if (show) {
+            cx.commit('resetApiCollections');
+          }
           link = stac.getLinkWithRel('data');
           link = Utils.addFiltersToLink(link, {}, cx.state.collectionsPerPage);
         }
