@@ -29,8 +29,6 @@ If you care about STAC Browser and have some funds to support the future of STAC
     - [Code Generators](#code-generators)
     - [Additional metadata fields](#additional-metadata-fields)
       - [Example](#example)
-      - [Translation](#translation)
-    - [Customize through root catalog](#customize-through-root-catalog)
     - [Custom extensions](#custom-extensions)
   - [Docker](#docker)
   - [Contributing](#contributing)

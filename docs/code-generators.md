@@ -29,17 +29,17 @@ If a generator implements `get installDependencies()`, the same command is shown
 
 Templates use `__KEY__` placeholders (double-underscore delimited) that are replaced at generation time. The following built-in variables are available in every template:
 
-| Variable             | Description |
-|----------------------|-------------|
-| `__CATALOG_URL__`    | The URL of the landing page of the API |
-| `__SEARCH_URL__`     | The URL of the search endpoint |
-| `__SEARCH_METHOD__`  | The HTTP method used for the endpoint (`GET`/`POST`) |
-| `__RESULT_ARRAY_KEY__`| Response array key for results (`features` for item search, `collections` for collection search) |
-| `__FILTERS__`        | The formatted filters as JSON (without CQL wrapper objects) |
-| `__REQUEST_URL__`    | The fully-built request URL (with query parameters for GET), constructed by `Utils.addFiltersToLink()` |
-| `__REQUEST_BODY__`   | The serialized JSON body (for POST), constructed by `Utils.addFiltersToLink()` |
-| `__IS_GET__`         | Boolean — true when search method is GET |
-| `__IS_POST__`        | Boolean — true when search method is POST |
+| Variable | Description |
+| --- | --- |
+| `__CATALOG_URL__` | The URL of the landing page of the API |
+| `__SEARCH_URL__` | The URL of the search endpoint |
+| `__SEARCH_METHOD__` | The HTTP method used for the endpoint (`GET`/`POST`) |
+| `__RESULT_ARRAY_KEY__` | Response array key for results (`features` for item search, `collections` for collection search) |
+| `__FILTERS__` | The formatted filters as JSON (without CQL wrapper objects) |
+| `__REQUEST_URL__` | The fully-built request URL (with query parameters for GET), constructed by `Utils.addFiltersToLink()` |
+| `__REQUEST_BODY__` | The serialized JSON body (for POST), constructed by `Utils.addFiltersToLink()` |
+| `__IS_GET__` | Boolean — true when search method is GET |
+| `__IS_POST__` | Boolean — true when search method is POST |
 
 Generators can add language-specific variables by overriding `getVariables(filters, cqlSerialized)`.
 
