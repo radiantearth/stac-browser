@@ -1,6 +1,6 @@
 # Code Generators
 
-Code Examples are created to display example queries for multiple languages. The language list is in [codeGenerators.config.js](../codeGenerators.config.js). If you add or remove a language, update that file.
+Code Examples are created to display example queries for multiple languages. The language list is in [codeGenerators.config.js](../codeGenerators.config.js). If you add or remove a language, update that file as well as the `LANGUAGES` array in [tests/integration/run-tests.sh](../tests/integration/run-tests.sh) and the `matrix.language` list in [.github/workflows/codegen-integration.yml](../.github/workflows/codegen-integration.yml).
 
 ## Add a New Language
 
@@ -19,7 +19,7 @@ Code Examples are created to display example queries for multiple languages. The
 5. Add template file(s) in `src/codegen/templates/` — one per language, or a native + HTTP pair if the STAC client library doesn't cover all scenarios.
 6. Validate with integration tests:
    - `npm run test:integration`
-7. Add an integration runtime test in `tests/integration/` (for example Dockerfile and `docker-compose.yml`).
+7. Add an integration runtime test in `tests/integration/` (for example Dockerfile and `docker-compose.yml`), add the language name to the `LANGUAGES` array in [tests/integration/run-tests.sh](../tests/integration/run-tests.sh) and to the `matrix.language` list in [.github/workflows/codegen-integration.yml](../.github/workflows/codegen-integration.yml).
 
 Integration tests for code generators are run with Docker so each language snippet executes in an isolated, reproducible runtime. The test script first generates fresh snippets into `tests/integration/generated/`, then builds the images/services defined in `tests/integration/docker-compose.yml`, and finally runs each language service against a real STAC API endpoint. This verifies both that snippet generation succeeds and that the generated code actually runs in its target language environment.
 
