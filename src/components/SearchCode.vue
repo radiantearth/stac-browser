@@ -122,4 +122,8 @@ export default defineComponent({
 .search-code :deep(.tab-pane) {
   padding-top: 1rem;
 }
+
+.search-code :deep(.code-scroll) {
+  height: 400px;
+}
 </style>
