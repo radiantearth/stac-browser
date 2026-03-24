@@ -20,7 +20,7 @@ body {
   min-height: 100%;
   gap: var(--sb-block-margin);
 
-  @media (max-width: var(--sb-breakpoint-xxxl)) {
+  @include media-breakpoint-only(xxxl) {
     max-width: 75vw;
   }
 
@@ -70,12 +70,12 @@ body {
             align-items: center;
             font-size: 2.2rem;
           }
-          @media (max-width: var(--sb-breakpoint-xl)) {
+          @include media-breakpoint-down(xl) {
             h1 {
               font-size: 2rem;
             }
           }
-          @media (max-width: var(--sb-breakpoint-md)) {
+          @include media-breakpoint-down(md) {
             h1 {
               font-size: 1.75rem;
             }
@@ -240,15 +240,18 @@ body {
   .btn-group-vertical {
     .btn-primary,
     .btn-secondary {
-      border-color: var(--sb-primary-15);
+      border-color: darken($primary, 15%);
       &:hover {
-        border-color: var(--sb-primary-30);
+        border-color: darken($primary, 30%);
       }
     }
     .btn-secondary {
-      background-color: var(--sb-primary-light);
+      background-color: lighten(
+        desaturate($primary, 50%),
+        20%
+      );
       &:hover {
-        background-color: var(--sb-primary-dark);
+        background-color: darken($primary, 5%);
       }
     }
   }
@@ -269,8 +272,7 @@ body {
   .button-label {
     display: none;
   }
-
-  @media (max-width: var(--sb-breakpoint-lg)) {
+  @include media-breakpoint-up(lg) {
     .button-label {
       display: inline-block;
       margin-left: 0.25rem;
@@ -477,7 +479,7 @@ body {
     }
 
     .datetime {
-      color: var(--sb-secondary);
+      color: $secondary;
     }
   }
 
@@ -565,12 +567,12 @@ body {
   .multiselect__tag-icon:hover,
   .multiselect__option--highlight,
   .multiselect__option--highlight:after {
-    background-color: var(--sb-primary);
+    background-color: $primary;
   }
 
   .multiselect__option--selected.multiselect__option--highlight,
   .multiselect__option--selected.multiselect__option--highlight:after {
-    background-color: var(--sb-secondary);
+    background-color: $secondary;
   }
 
   .multiselect__placeholder {
@@ -595,7 +597,7 @@ body {
   > form {
     min-width: 200px;
     width: 50vw;
-    border-radius: var(--sb-border-radius);
+    border-radius: $border-radius;
 
     .b-form-group {
       margin-bottom: 0.5rem;

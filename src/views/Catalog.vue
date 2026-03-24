@@ -302,14 +302,14 @@ export default defineComponent({
 #stac-browser .cc {
   .meta {
     min-width: 100%;
-    margin-bottom: $block-margin;
+    margin-bottom: var(--sb-block-margin);
   }
   &.collection .meta {
     min-width: 33%;
     margin-bottom: 0;
   }
 
-  @include media-breakpoint-up(lg) {
+  @media (min-width: var(--sb-breakpoint-lg)) {
     &.collection.empty .meta {
       column-count: 2;
 
@@ -319,7 +319,7 @@ export default defineComponent({
     }
   }
 
-  @include media-breakpoint-up(xl) {
+  @media (min-width: var(--sb-breakpoint-xl)) {
     &.catalog .meta {
       display: flex;
       flex-direction: row;
@@ -335,7 +335,7 @@ export default defineComponent({
     }
   }
 
-  @include media-breakpoint-down(md) {
+  @media (max-width: var(--sb-breakpoint-md)) {
     > .row {
       > .meta,
       > .items-container,
@@ -345,7 +345,7 @@ export default defineComponent({
 
       > .meta {
         order: 1;
-        margin-bottom: $block-margin;
+        margin-bottom: var(--sb-block-margin);
       }
       > .items-container {
         order: 2;
@@ -360,7 +360,7 @@ export default defineComponent({
     column-count: 1;
 
     &:not(.count-1) {
-      @include media-breakpoint-up(xxxl) {
+      @media (min-width: var(--sb-breakpoint-xxxl)) {
         column-count: 2;
       }
     }

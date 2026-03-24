@@ -3,8 +3,138 @@
 
 // This file exports the default theme variables used by all styles.
 // Override these values with CSS at deploy time (e.g. in src/theme/custom.scss or host-defined CSS).
+$grid-breakpoints: (
+  xs: 0,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1100px,
+  xxl: 1600px,
+  xxxl: 2500px
+);
 
+$prefix: 'sb-'; //
 :root {
+  // Bootstrap color variables
+  --sb-blue: #0d6efd;
+  --sb-indigo: #6610f2;
+  --sb-purple: #6f42c1;
+  --sb-pink: #d63384;
+  --sb-red: #dc3545;
+  --sb-orange: #fd7e14;
+  --sb-yellow: #ffc107;
+  --sb-green: #198754;
+  --sb-teal: #20c997;
+  --sb-cyan: #0dcaf0;
+  --sb-black: #000;
+  --sb-white: #fff;
+  --sb-gray: #6c757d;
+  --sb-gray-dark: #343a40;
+  --sb-gray-100: #f8f9fa;
+  --sb-gray-200: #e9ecef;
+  --sb-gray-300: #dee2e6;
+  --sb-gray-400: #ced4da;
+  --sb-gray-500: #adb5bd;
+  --sb-gray-600: #6c757d;
+  --sb-gray-700: #495057;
+  --sb-gray-800: #343a40;
+  --sb-gray-900: #212529;
+  --sb-primary: #0d6efd;
+  --sb-secondary: #6c757d;
+  --sb-success: #198754;
+  --sb-info: #0dcaf0;
+  --sb-warning: #ffc107;
+  --sb-danger: #dc3545;
+  --sb-light: #f8f9fa;
+  --sb-dark: #212529;
+
+  --sb-primary-rgb: 13, 110, 253;
+  --sb-secondary-rgb: 108, 117, 125;
+  --sb-success-rgb: 25, 135, 84;
+  --sb-info-rgb: 13, 202, 240;
+  --sb-warning-rgb: 255, 193, 7;
+  --sb-danger-rgb: 220, 53, 69;
+  --sb-light-rgb: 248, 249, 250;
+  --sb-dark-rgb: 33, 37, 41;
+  --sb-primary-text-emphasis: #052c65;
+  --sb-secondary-text-emphasis: #2b2f32;
+  --sb-success-text-emphasis: #0a3622;
+  --sb-info-text-emphasis: #055160;
+  --sb-warning-text-emphasis: #664d03;
+  --sb-danger-text-emphasis: #58151c;
+  --sb-light-text-emphasis: #495057;
+  --sb-dark-text-emphasis: #495057;
+  --sb-primary-bg-subtle: #cfe2ff;
+  --sb-secondary-bg-subtle: #e2e3e5;
+  --sb-success-bg-subtle: #d1e7dd;
+  --sb-info-bg-subtle: #cff4fc;
+  --sb-warning-bg-subtle: #fff3cd;
+  --sb-danger-bg-subtle: #f8d7da;
+  --sb-light-bg-subtle: #fcfcfd;
+  --sb-dark-bg-subtle: #ced4da;
+  --sb-primary-border-subtle: #9ec5fe;
+  --sb-secondary-border-subtle: #c4c8cb;
+  --sb-success-border-subtle: #a3cfbb;
+  --sb-info-border-subtle: #9eeaf9;
+  --sb-warning-border-subtle: #ffe69c;
+  --sb-danger-border-subtle: #f1aeb5;
+  --sb-light-border-subtle: #e9ecef;
+  --sb-dark-border-subtle: #adb5bd;
+  --sb-white-rgb: 255, 255, 255;
+  --sb-black-rgb: 0, 0, 0;
+  --sb-font-sans-serif: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --sb-font-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --sb-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0));
+  --sb-body-font-family: var(--sb-font-sans-serif);
+  --sb-body-font-size: 1rem;
+  --sb-body-font-weight: 400;
+  --sb-body-line-height: 1.5;
+  --sb-body-color: #212529;
+  --sb-body-color-rgb: 33, 37, 41;
+  --sb-body-bg: #fff;
+  --sb-body-bg-rgb: 255, 255, 255;
+  --sb-emphasis-color: #000;
+  --sb-emphasis-color-rgb: 0, 0, 0;
+  --sb-secondary-color: rgba(33, 37, 41, 0.75);
+  --sb-secondary-color-rgb: 33, 37, 41;
+  --sb-secondary-bg: #e9ecef;
+  --sb-secondary-bg-rgb: 233, 236, 239;
+  --sb-tertiary-color: rgba(33, 37, 41, 0.5);
+  --sb-tertiary-color-rgb: 33, 37, 41;
+  --sb-tertiary-bg: #f8f9fa;
+  --sb-tertiary-bg-rgb: 248, 249, 250;
+  --sb-heading-color: inherit;
+  --sb-link-color: #0d6efd;
+  --sb-link-color-rgb: 13, 110, 253;
+  --sb-link-decoration: underline;
+  --sb-link-hover-color: #0a58ca;
+  --sb-link-hover-color-rgb: 10, 88, 202;
+  --sb-code-color: #d63384;
+  --sb-highlight-color: #212529;
+  --sb-highlight-bg: #fff3cd;
+  --sb-border-width: 1px;
+  --sb-border-style: solid;
+  --sb-border-color: #dee2e6;
+  --sb-border-color-translucent: rgba(0, 0, 0, 0.175);
+  --sb-border-radius: 0.375rem;
+  --sb-border-radius-sm: 0.25rem;
+  --sb-border-radius-lg: 0.5rem;
+  --sb-border-radius-xl: 1rem;
+  --sb-border-radius-xxl: 2rem;
+  --sb-border-radius-2xl: var(--sb-border-radius-xxl);
+  --sb-border-radius-pill: 50rem;
+  --sb-box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  --sb-box-shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  --sb-box-shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+  --sb-box-shadow-inset: inset 0 1px 2px rgba(0, 0, 0, 0.075);
+  --sb-focus-ring-width: 0.25rem;
+  --sb-focus-ring-opacity: 0.25;
+  --sb-focus-ring-color: rgba(13, 110, 253, 0.25);
+  --sb-form-valid-color: #198754;
+  --sb-form-valid-border-color: #198754;
+  --sb-form-invalid-color: #dc3545;
+  --sb-form-invalid-border-color: #dc3545;
+
   --sb-logo-image-height: 2rem;
 
   --sb-body-bg: white;
@@ -19,24 +149,7 @@
   --sb-light: #f8f9fa;
   --sb-dark: #343a40;
 
-  --bs-primary: var(--sb-primary);
-  --bs-secondary: var(--sb-secondary);
-  --bs-success: var(--sb-success);
-  --bs-info: var(--sb-info);
-  --bs-warning: var(--sb-warning);
-  --bs-danger: var(--sb-danger);
-  --bs-light: var(--sb-light);
-  --bs-dark: var(--sb-dark);
-
   --sb-min-contrast-ratio: 3;
-
-  --sb-breakpoint-xs: 0;
-  --sb-breakpoint-sm: 576px;
-  --sb-breakpoint-md: 768px;
-  --sb-breakpoint-lg: 992px;
-  --sb-breakpoint-xl: 1100px;
-  --sb-breakpoint-xxl: 1600px;
-  --sb-breakpoint-xxxl: 2500px;
 
   --sb-font-size-base: 1rem;
   --sb-font-family-sans-serif: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
@@ -54,17 +167,15 @@
   --sb-link-decoration: none;
   --sb-link-hover-color: #14646e;
   --sb-link-hover-decoration: underline;
+  --sb-link-color-rgb: 24, 129, 145; // RGB equivalent of --sb-primary for use in custom components that require RGB values
+  --sb-link-hover-color-rgb: 3, 71, 79; // RGB equivalent of --sb-link-hover-color for use in custom components that require RGB values
 
   --sb-block-margin: 1rem;
   --sb-header-margin: 0px;
 
   --sb-border-radius: 0.375rem;
 
-  --sb-primary-15: #146e78;
-  --sb-primary-30: #0f5d69;
   --sb-primary-light: #3ea3b9;
-  --sb-primary-dark: #116f77;
-  --sb-text-link-hover-color: #137a8d;
 
   --sb-max-icon-size: 32px;
 }
