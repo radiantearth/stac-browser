@@ -1,68 +1,71 @@
 // Default Theme for STAC Browser
+// All theme values are now provided via runtime CSS vars instead of SCSS vars.
 
-// Most of the variables below are Bootstrap variables, see https://getbootstrap.com/docs/5.0/customize/color/ for details.
-// For simplicity we just provide some common options as default, but you can override all Bootstrap Sass variables.
+// This file exports the default theme variables used by all styles.
+// Override these values with CSS at deploy time (e.g. in src/theme/custom.scss or host-defined CSS).
 
-$logo-image-height: 2rem;
+:root {
+  --sb-logo-image-height: 2rem;
 
-// Background and text default colors
-$body-bg: white;
-$body-color: black;
+  --sb-body-bg: white;
+  --sb-body-color: black;
 
-$primary:       #188191;
-$secondary:     #6c757d;
-$success:       #28a745;
-$info:          #09B3AD;
-$warning:       #ffc107;
-$danger:        #dc3545;
-$light:         #f8f9fa;
-$dark:          #343a40;
+  --sb-primary: #188191;
+  --sb-secondary: #6c757d;
+  --sb-success: #28a745;
+  --sb-info: #09B3AD;
+  --sb-warning: #ffc107;
+  --sb-danger: #dc3545;
+  --sb-light: #f8f9fa;
+  --sb-dark: #343a40;
 
-$min-contrast-ratio:   3;
+  --bs-primary: var(--sb-primary);
+  --bs-secondary: var(--sb-secondary);
+  --bs-success: var(--sb-success);
+  --bs-info: var(--sb-info);
+  --bs-warning: var(--sb-warning);
+  --bs-danger: var(--sb-danger);
+  --bs-light: var(--sb-light);
+  --bs-dark: var(--sb-dark);
 
-// Breakpoints for responsive design
-$grid-breakpoints: (
-  xs: 0,
-  sm: 576px,
-  md: 768px,
-  lg: 992px,
-  xl: 1100px,
-  xxl: 1600px,
-  xxxl: 2500px
-);
+  --sb-min-contrast-ratio: 3;
 
-// Font size
-$font-size-base: 1rem;
-// Fonts for normal text
-$font-family-sans-serif: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-// Fonts for headings
-$headings-font-family: $font-family-sans-serif;
-// Fonts for code
-$font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --sb-breakpoint-xs: 0;
+  --sb-breakpoint-sm: 576px;
+  --sb-breakpoint-md: 768px;
+  --sb-breakpoint-lg: 992px;
+  --sb-breakpoint-xl: 1100px;
+  --sb-breakpoint-xxl: 1600px;
+  --sb-breakpoint-xxxl: 2500px;
 
-// Heading sizes
-$h1-font-size: 2.2rem;
-$h2-font-size: 1.6rem;
-$h3-font-size: 1.4rem;
-$h4-font-size: 1.2rem;
+  --sb-font-size-base: 1rem;
+  --sb-font-family-sans-serif: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --sb-headings-font-family: var(--sb-font-family-sans-serif);
+  --sb-font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
-// Heading color
-$headings-color: inherit;
+  --sb-h1-font-size: 2.2rem;
+  --sb-h2-font-size: 1.6rem;
+  --sb-h3-font-size: 1.4rem;
+  --sb-h4-font-size: 1.2rem;
 
-// Links
-$link-color: $primary;
-$link-decoration: none;
-$link-hover-color: darken($link-color, 15%);
-$link-hover-decoration: underline;
+  --sb-headings-color: inherit;
 
-// Margin between the main sections of the page (header, content, footer)
-$block-margin: 1rem;
+  --sb-link-color: var(--sb-primary);
+  --sb-link-decoration: none;
+  --sb-link-hover-color: #14646e;
+  --sb-link-hover-decoration: underline;
 
-// Margin at the top of the page (for a custom header)
-$header-margin: 0px;
+  --sb-block-margin: 1rem;
+  --sb-header-margin: 0px;
 
-// Border radius
-$border-radius: .375rem;
+  --sb-border-radius: 0.375rem;
 
-// Max. icon size
-$max-icon-size: 32px;
+  --sb-primary-15: #146e78;
+  --sb-primary-30: #0f5d69;
+  --sb-primary-light: #3ea3b9;
+  --sb-primary-dark: #116f77;
+  --sb-text-link-hover-color: #137a8d;
+
+  --sb-max-icon-size: 32px;
+}
+

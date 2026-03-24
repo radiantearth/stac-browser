@@ -48,7 +48,7 @@ export default {
   line-height: 1.4em;
 
   h1, h2, h3, h4, h5, h6 {
-    color: $secondary;
+    color: var(--sb-secondary);
     font-weight: 600;
   }
   h1 {

@@ -155,7 +155,7 @@ export default defineComponent({
       flex-direction: column;
       flex: 1;
       overflow: auto;
-      border-radius: $border-radius;
+      border-radius: var(--sb-border-radius);
 
       .list-group {
         width: 100%;

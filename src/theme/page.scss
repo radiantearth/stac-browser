@@ -5,7 +5,7 @@ body {
 }
 
 body {
-  margin-top: $header-margin;
+  margin-top: var(--sb-header-margin);
 }
 
 #popover-root-btn {
@@ -18,15 +18,15 @@ body {
   max-width: 100%;
   height: 100%;
   min-height: 100%;
-  gap: $block-margin;
+  gap: var(--sb-block-margin);
 
-  @include media-breakpoint-only(xxxl) {
+  @media (max-width: var(--sb-breakpoint-xxxl)) {
     max-width: 75vw;
   }
 
   > header {
     .site {
-      border-bottom: 3px solid $primary;
+      border-bottom: 3px solid var(--sb-primary);
 
       > .col-md-12 {
         > .title {
@@ -37,13 +37,13 @@ body {
         }
 
         .logo {
-          max-height: $logo-image-height;
+          max-height: var(--sb-logo-image-height);
         }
       }
     }
     .site,
     .page {
-      padding: $block-margin 0;
+      padding: var(--sb-block-margin) 0;
 
       > .col-md-12 {
         display: flex;
@@ -70,12 +70,12 @@ body {
             align-items: center;
             font-size: 2.2rem;
           }
-          @include media-breakpoint-down(xl) {
+          @media (max-width: var(--sb-breakpoint-xl)) {
             h1 {
               font-size: 2rem;
             }
           }
-          @include media-breakpoint-down(md) {
+          @media (max-width: var(--sb-breakpoint-md)) {
             h1 {
               font-size: 1.75rem;
             }
@@ -95,7 +95,7 @@ body {
     flex: 1;
   }
   > footer {
-    padding-bottom: $block-margin;
+    padding-bottom: var(--sb-block-margin);
     text-align: center;
 
     .footer-links {
@@ -104,7 +104,7 @@ body {
       justify-content: center;
       list-style: none;
       padding: 0;
-      margin: 0 0 $block-margin 0;
+      margin: 0 0 var(--sb-block-margin) 0;
       font-size: 0.875rem;
 
       li:not(:last-child)::after {
@@ -138,7 +138,7 @@ body {
   }
 
   h2 {
-    color: $secondary;
+    color: var(--sb-secondary);
     font-weight: 600;
   }
 
@@ -198,8 +198,8 @@ body {
   }
 
   .icon {
-    max-width: $max-icon-size;
-    max-height: $max-icon-size;
+    max-width: var(--sb-max-icon-size);
+    max-height: var(--sb-max-icon-size);
   }
   h1 > .icon {
     max-width: 1.2em;
@@ -219,7 +219,7 @@ body {
   abbr[title],
   abbr[data-original-title] {
     text-decoration: none;
-    border-bottom: 1px dotted $body-color;
+    border-bottom: 1px dotted var(--sb-body-color);
   }
 
   .card {
@@ -227,12 +227,12 @@ body {
   }
 
   a.list-group-item {
-    color: $link-color;
-    text-decoration: $link-decoration;
+    color: var(--sb-link-color);
+    text-decoration: var(--sb-link-decoration);
 
     &:hover {
-      color: $link-hover-color;
-      text-decoration: $link-hover-decoration;
+      color: var(--sb-link-hover-color);
+      text-decoration: var(--sb-link-hover-decoration);
     }
   }
 
@@ -240,18 +240,15 @@ body {
   .btn-group-vertical {
     .btn-primary,
     .btn-secondary {
-      border-color: darken($primary, 15%);
+      border-color: var(--sb-primary-15);
       &:hover {
-        border-color: darken($primary, 30%);
+        border-color: var(--sb-primary-30);
       }
     }
     .btn-secondary {
-      background-color: lighten(
-        desaturate($primary, 50%),
-        20%
-      );
+      background-color: var(--sb-primary-light);
       &:hover {
-        background-color: darken($primary, 5%);
+        background-color: var(--sb-primary-dark);
       }
     }
   }
@@ -272,7 +269,8 @@ body {
   .button-label {
     display: none;
   }
-  @include media-breakpoint-up(lg) {
+
+  @media (max-width: var(--sb-breakpoint-lg)) {
     .button-label {
       display: inline-block;
       margin-left: 0.25rem;
@@ -479,7 +477,7 @@ body {
     }
 
     .datetime {
-      color: $secondary;
+      color: var(--sb-secondary);
     }
   }
 
@@ -567,12 +565,12 @@ body {
   .multiselect__tag-icon:hover,
   .multiselect__option--highlight,
   .multiselect__option--highlight:after {
-    background-color: $primary;
+    background-color: var(--sb-primary);
   }
 
   .multiselect__option--selected.multiselect__option--highlight,
   .multiselect__option--selected.multiselect__option--highlight:after {
-    background-color: $secondary;
+    background-color: var(--sb-secondary);
   }
 
   .multiselect__placeholder {
@@ -597,7 +595,7 @@ body {
   > form {
     min-width: 200px;
     width: 50vw;
-    border-radius: $border-radius;
+    border-radius: var(--sb-border-radius);
 
     .b-form-group {
       margin-bottom: 0.5rem;

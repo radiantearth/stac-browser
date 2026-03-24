@@ -3,12 +3,12 @@
 
 // VueDatePicker theming using CSS variables
 .dp__theme_light {
-  --dp-primary-color: #{$primary};
-  --dp-primary-text-color: #{$body-bg};
-  --dp-secondary-color: #{$secondary};
-  --dp-background-color: #{$body-bg};
-  --dp-text-color: #{$body-color};
-  --dp-hover-color: #{lighten($primary, 60%)};
+  --dp-primary-color: var(--sb-primary);
+  --dp-primary-text-color: var(--sb-body-bg);
+  --dp-secondary-color: var(--sb-secondary);
+  --dp-background-color: var(--sb-body-bg);
+  --dp-text-color: var(--sb-body-color);
+  --dp-hover-color: var(--sb-primary-light);
 }
 
 .dp__calendar_header {
