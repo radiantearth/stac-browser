@@ -86,10 +86,10 @@ export default {
   width: 50%;
   min-width: 400px;
   max-width: 600px;
-  padding-top: $header-margin;
-  background-color: $light;
+  padding-top: var(--sb-header-margin);
+  background-color: var(--sb-light);
 
-  @include media-breakpoint-down(sm) {
+  @media (max-width: var(--sb-breakpoint-sm)) {
     width: 100%;
     min-width: 100px;
     max-width: 100%;

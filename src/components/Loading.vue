@@ -67,7 +67,7 @@ export default defineComponent({
     height: 100%;
     top: 0;
     left: 0;
-    border-radius: $border-radius;
+    border-radius: var(--sb-border-radius);
     display: flex;
     justify-content: center;
     align-items: center;

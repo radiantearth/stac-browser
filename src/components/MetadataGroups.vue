@@ -156,12 +156,12 @@ export default {
   .metadata {
     .card {
       border: 0;
-      margin-top: $block-margin;
-      margin-bottom: $block-margin;
+      margin-top: var(--sb-block-margin);
+      margin-bottom: var(--sb-block-margin);
       text-align: left;
 
       .metadata-rows {
-        border-radius: $border-radius;
+        border-radius: var(--sb-border-radius);
       }
 
       .row {

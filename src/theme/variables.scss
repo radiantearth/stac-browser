@@ -54,6 +54,15 @@
   --sb-link-decoration: none;
   --sb-link-hover-color: #14646e;
   --sb-link-hover-decoration: underline;
+  --sb-link-color-rgb: 24, 129, 145; // RGB equivalent of --sb-primary for use in custom components that require RGB values
+  --sb-link-hover-color-rgb: 3, 71, 79; // RGB equivalent of --sb-link-hover-color for use in custom components that require RGB values
+  
+  --bs-link-color: var(--sb-link-color);
+  --bs-link-color-rgb: var(--sb-link-color-rgb);
+  --bs-link-decoration: var(--sb-link-decoration);
+  --bs-link-hover-color: var(--sb-link-hover-color);
+  --bs-link-hover-decoration: var(--sb-link-hover-decoration);
+  --bs-link-hover-color-rgb: var(--sb-link-hover-color-rgb);
 
   --sb-block-margin: 1rem;
   --sb-header-margin: 0px;

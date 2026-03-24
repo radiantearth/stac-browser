@@ -240,16 +240,16 @@ body {
   .btn-group-vertical {
     .btn-primary,
     .btn-secondary {
-      border-color: var(--sb-primary-15);
-      &:hover {
-        border-color: var(--sb-primary-30);
-      }
+      --bs-btn-bg: var(--sb-primary);
+      --bs-btn-border-color: var(--sb-primary-15);
+      --bs-btn-hover-bg: var(--sb-primary-30);
     }
     .btn-secondary {
       background-color: var(--sb-primary-light);
-      &:hover {
-        background-color: var(--sb-primary-dark);
-      }
+      --bs-btn-bg: var(--sb-primary-light);
+      --bs-btn-border-color: var(--sb-primary-light);
+      --bs-btn-hover-bg: var(--sb-primary-dark);
+      --bs-btn-hover-border-color: var(--sb-primary-dark);
     }
   }
   .btn-group-vertical.actions {
@@ -259,6 +259,10 @@ body {
   }
 
   .btn {
+    --bs-btn-bg: var(--sb-primary);
+    --bs-btn-border-color: var(--sb-primary);
+    --bs-btn-hover-bg: var(--sb-primary-15);
+    --bs-btn-hover-border-color: var(--sb-primary-15);
     &.disabled,
     &:disabled {
       cursor: not-allowed;
