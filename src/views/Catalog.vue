@@ -309,7 +309,7 @@ export default defineComponent({
     margin-bottom: 0;
   }
 
-  @media (min-width: var(--sb-breakpoint-lg)) {
+  @include media-breakpoint-up(lg) {
     &.collection.empty .meta {
       column-count: 2;
 
@@ -319,7 +319,7 @@ export default defineComponent({
     }
   }
 
-  @media (min-width: var(--sb-breakpoint-xl)) {
+  @include media-breakpoint-up(xl) {
     &.catalog .meta {
       display: flex;
       flex-direction: row;
@@ -335,7 +335,7 @@ export default defineComponent({
     }
   }
 
-  @media (max-width: var(--sb-breakpoint-md)) {
+  @include media-breakpoint-down(md) {
     > .row {
       > .meta,
       > .items-container,
@@ -360,7 +360,7 @@ export default defineComponent({
     column-count: 1;
 
     &:not(.count-1) {
-      @media (min-width: var(--sb-breakpoint-xxxl)) {
+      @include media-breakpoint-up(xxxl) {
         column-count: 2;
       }
     }

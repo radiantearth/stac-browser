@@ -89,7 +89,7 @@ export default {
   padding-top: var(--sb-header-margin);
   background-color: var(--sb-light);
 
-  @media (max-width: var(--sb-breakpoint-sm)) {
+  @include media-breakpoint-down(sm) {
     width: 100%;
     min-width: 100px;
     max-width: 100%;

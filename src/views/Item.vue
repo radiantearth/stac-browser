@@ -118,7 +118,7 @@ export default defineComponent({
 #stac-browser .item {
   .left, .right {
     max-width: 50%;
-    @media (max-width: var(--sb-breakpoint-sm)) {
+    @include media-breakpoint-down(sm) {
       max-width: 100%;
       min-width: 100%;
     }
@@ -128,7 +128,7 @@ export default defineComponent({
     column-count: 1;
 
     &:not(.count-1) {
-      @media (min-width: var(--sb-breakpoint-xxxl)) {
+      @include media-breakpoint-up(xxxl) {
         column-count: 2;
       }
     }
