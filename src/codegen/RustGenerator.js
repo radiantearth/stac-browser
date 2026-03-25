@@ -16,7 +16,7 @@ export default class RustGenerator extends CodeGenerator {
   }
 
   getTemplate(filters, cqlSerialized) {
-    if (this.isCollectionSearch || cqlSerialized) {
+    if (this.method === 'POST' || this.isCollectionSearch || cqlSerialized) {
       return httpTemplate;
     }
     return nativeTemplate;
