@@ -355,15 +355,5 @@ export default defineComponent({
       }
     }
   }
-
-  .metadata .card-columns {
-    column-count: 1;
-
-    &:not(.count-1) {
-      @include media-breakpoint-up(xxxl) {
-        column-count: 2;
-      }
-    }
-  }
 }
 </style>

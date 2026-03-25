@@ -157,8 +157,5 @@ export default {
   .metadata .card {
     margin-top: 0;
   }
-  .metadata .card-columns {
-    column-count: 1;
-  }
 }
 </style>

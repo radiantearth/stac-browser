@@ -179,9 +179,6 @@ export default {
   }
 
   .metadata {
-    .card-columns {
-      column-count: 1;
-    }
     .card {
       border: 0;
     }

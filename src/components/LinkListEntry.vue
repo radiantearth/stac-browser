@@ -89,9 +89,6 @@ export default {
       margin-bottom: 0.5rem;
     }
 
-    .card-columns {
-      column-count: 1;
-    }
     .card {
       border: 0;
       margin-top: 0;
