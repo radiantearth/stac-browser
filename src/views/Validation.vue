@@ -128,10 +128,3 @@ export default defineComponent({
   font-weight: bold;
 }
 </style>
-
-<style lang="scss">
-@import 'bootstrap/scss/mixins';
-@import "../theme/variables.scss";
-
-
-</style>

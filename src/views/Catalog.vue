@@ -360,7 +360,7 @@ export default defineComponent({
     column-count: 1;
 
     &:not(.count-1) {
-      @include media-breakpoint-up(xxxl) {
+      @include media-breakpoint-up(xl) {
         column-count: 2;
       }
     }
