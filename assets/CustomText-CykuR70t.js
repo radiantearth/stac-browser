@@ -1,0 +1,2 @@
+import{bk as a,n,B as r,y as o,H as s,G as c}from"./index-CS_UCeLX.js";import"./utils-BBJ8PHg9.js";import"./_commonjsHelpers-CE1G-McA.js";import"./I18N-DlIXJTel.js";const i={name:"CustomText",props:{title:{type:String,default:""},text:{type:String,default:""}}},l={class:"custom-text"};function p(d,t,e,m,u,_){return n(),r("div",l,[o("h3",null,s(e.title),1),t[0]||(t[0]=c()),o("p",null,s(e.text),1)])}const g=a(i,[["render",p],["__scopeId","data-v-59f2184c"]]);export{g as default};
+//# sourceMappingURL=CustomText-CykuR70t.js.map
