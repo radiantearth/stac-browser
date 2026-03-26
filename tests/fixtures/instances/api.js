@@ -74,6 +74,7 @@ export default class API extends Instance {
   addManyItems(collection, count){
     this.addItemsExtension();
     const cid = collection.data.id;
+    const items = [];
 
     for (let i = 0; i < count; i++) {
       const id = `example-item-${i}`;
@@ -81,12 +82,12 @@ export default class API extends Instance {
       const itemOptions = { url: `/collections/${cid}/items/${id}`};
       const item = this.createStac({url: itemOptions.url, type: Item});
       item.setMetadata({ id, title });
-      this.addItem(collection, id, itemOptions);
+      items.push(this.addItem(collection, id, itemOptions));
       if (collection !== null) {
         item.addParentLink(collection);
       }
     }
-
+    return items;
   }
 
   getItems(options) {

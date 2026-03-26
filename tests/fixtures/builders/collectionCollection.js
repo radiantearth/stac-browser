@@ -48,7 +48,13 @@ export default class CollectionCollection extends APICollection {
 
   build() {
     const data = super.build();
-    data.collections = data.collections.map(c => c.build());
+    try {
+      data.collections = data.collections.map(c => c.build());
+    } catch (e) {
+      console.error("Error building collections:", e);
+      //console.error("Current collections data:", data.collections);
+      //continue in case build already happened for some collections
+    }
     return data;
   }
 }
