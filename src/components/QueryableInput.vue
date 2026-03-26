@@ -67,7 +67,7 @@
         <template #noOptions>{{ $t('search.noOptions') }}</template>
       </multiselect>
       <VueDatePicker
-        v-else-if="queryable.isTemporal"
+        v-else-if="queryable.isTemporal && (operator.SYMBOL !== 'like' && operator.SYMBOL !== 'in')"
         class="value"
         :model-value="value.value"
         @update:model-value="updateValue"
