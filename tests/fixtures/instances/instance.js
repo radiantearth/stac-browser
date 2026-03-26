@@ -66,22 +66,21 @@ export default class Instance {
     return obj;
   }
 
-  async createServer(worker, options = { reset: true}) {
+  async createServer(worker, options = { reset: true, verbose: false }) {
     const handlers = [];
 
     for (const endpoint of this.endpoints) {
       try {
         const url = endpoint.getAbsoluteUrl();
         const method = endpoint.getMethod();
-        if (options.verbose) {
-          console.log(`Adding endpoint ${method} ${url}`);
-        }
+        options.verbose && console.log(`Adding endpoint ${method} ${url}`);
 
         //GET
         if(method === 'GET'){
           handlers.push(http.get(url, ({request}) => {
-            try {
+            try { 
               const url = new URL(request.url);
+              options.verbose && console.log(`GET ${url}`);
               const params = Object.fromEntries(url.searchParams); //quick patch. breaks with multiple arguments of the same key
               const obj = endpoint.build(params);
               return HttpResponse.json(obj);
@@ -95,6 +94,7 @@ export default class Instance {
           handlers.push(http.post(url, async ({request}) => {
             try {
               const req = await request.clone().json();
+              options.verbose && console.log(`POST ${url}`);
               const obj = endpoint.build(req);
               return HttpResponse.json(obj);
             } catch (e) {
@@ -116,13 +116,10 @@ export default class Instance {
       await worker.resetHandlers();
     }
 
-    if (options.verbose) {
-      console.log(`Endpoints added. Passing handlers to worker`);
-    }
-
     try {
     await worker.use(...handlers);
     } catch (e) {
+      options.verbose && console.log(`Endpoints added. Passing handlers to worker`);
       console.log(`Worker failed to use handlers:`, e);
     }
   }
