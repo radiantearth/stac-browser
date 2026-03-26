@@ -335,7 +335,7 @@ export default defineComponent({
     }
   }
 
-  @include media-breakpoint-down(md) {
+  @include media-breakpoint-down(lg) {
     > .row {
       > .meta,
       > .items-container,
