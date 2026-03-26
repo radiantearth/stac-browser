@@ -1,18 +1,18 @@
 <template>
-  <section v-if="formattedData.length > 0" class="metadata row row-cols-1 row-cols-xxxl-2 g-3">
+  <section v-if="formattedData.length > 0" class="metadata">
     <component :is="headerTag" v-if="title">{{ titleText }}</component>
-    <div :class="`count-${formattedData.length}`">
+    <b-card-group columns :class="`count-${formattedData.length}`">
       <MetadataGroup
         v-for="group in formattedData"
         :key="group.extension"
         v-bind="group"
-        class="col"
       />
-    </div>
+    </b-card-group>
   </section>
 </template>
 
 <script>
+import { BCardGroup } from 'bootstrap-vue-next';
 import {
   formatAsset,
   formatCatalog,
@@ -34,6 +34,7 @@ import "../../fields.config";
 export default {
   name: "MetadataGroups",
   components: {
+    BCardGroup,
     MetadataGroup,
   },
   mixins: [

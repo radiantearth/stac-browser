@@ -64,6 +64,9 @@ export default {
 #stac-browser {
   .provider {
     .metadata {
+      .card-columns {
+        column-count: 1;
+      }
       .card-body {
         padding: 0;
       }
