@@ -76,7 +76,7 @@ test.describe('STAC Browser Search page', () => {
     await expect(page.getByRole('heading', { name: 'Search' }), 'search heading should be visible').toBeVisible();
   });
 
-  test('Search with default selection should have empty POST body', async ({ page, worker }) => {
+  test('Search with default selection should have empty POST body', async ({ page }) => {
     await page.goto(SEARCH_PATH);
     
     const requestPromise = waitForSearchPost(page);
@@ -95,7 +95,7 @@ test.describe('STAC Browser Search page', () => {
 
   });
 
-  test('Search with temporal extent selection should have valid POST body', async ({ page, worker }) => {
+  test('Search with temporal extent selection should have valid POST body', async ({ page }) => {
     await page.goto(SEARCH_PATH);
     await waitForBrowserReady(page);
 
@@ -119,7 +119,7 @@ test.describe('STAC Browser Search page', () => {
     });
   });
 
-  test('Search with spatial extent via map click should have valid POST body', async ({ page, worker }) => {
+  test('Search with spatial extent via map click should have valid POST body', async ({ page }) => {
     await page.goto(SEARCH_PATH);
 
     await test.step('Enable spatial extent selection and click on map to create bounding box', async () => {
@@ -156,8 +156,8 @@ test.describe('STAC Browser Search page', () => {
     });
   });
 
-  test('Search with spatial extent selection via manual input should have valid POST body', async ({ page, worker }) => {
-    //TODO: flaky test. looks like a timing issue
+  test('Search with spatial extent selection via manual input should have valid POST body', async ({ page }) => {
+    //note: test was flaky due to timing issues. fix was attempted. if problem persists fix this or mark as fixme
     await page.goto(SEARCH_PATH);
 
     await test.step('Enable spatial extent selection and fill in bounding box values', async () => {
@@ -165,25 +165,39 @@ test.describe('STAC Browser Search page', () => {
 
       await enableSpatialCheckbox.check();
 
-      // Wait for network to be idle to ensure UI is ready
+      // Wait for network to be idle, map ready, and input fields to ensure UI is ready
       await page.waitForLoadState('networkidle');
+      await waitForMapReady(page);
+      
+      // Get all input fields and wait for them to be attached
+      const westLonInput = page.getByLabel(/west longitude/i);
+      const southLatInput = page.getByLabel(/south latitude/i);
+      const eastLonInput = page.getByLabel(/east longitude/i);
+      const northLatInput = page.getByLabel(/north latitude/i);
+      
+      await westLonInput.waitFor({ state: 'attached', timeout: 10000 });
+      await southLatInput.waitFor({ state: 'attached', timeout: 10000 });
+      await eastLonInput.waitFor({ state: 'attached', timeout: 10000 });
+      await northLatInput.waitFor({ state: 'attached', timeout: 10000 });
       
       // Fill in bounding box values
-      await page.getByLabel(/west longitude/i).fill( '-116.1' );
-      await page.getByLabel(/south latitude/i).fill( '44.3' );
-      await page.getByLabel(/east longitude/i).fill( '-104' );
-      await page.getByLabel(/north latitude/i).fill( '49' );
-      await page.getByLabel(/north latitude/i).blur();
+      await westLonInput.fill('-116.1');
+      await southLatInput.fill('44.3');
+      await eastLonInput.fill('-104');
+      await northLatInput.fill('49');
+      await northLatInput.blur();
+      
+      // Wait for all inputs to be populated
+      await waitForBboxInputsPopulated(page);
     });
 
-    await test.step('Submit search and verify POST body contains correct bbox', async () => { 
-      const submitButton = page.getByRole('button', { name: /submit/i });
-      
+    await test.step('Submit search and verify POST body contains correct bbox', async () => {       
       const requestPromise = waitForSearchPost(page);
-
+      const submitButton = page.getByRole('button', { name: /submit/i });
       await submitButton.click();
 
       const { body } = await requestPromise;
+      console.log(body)
       
       // use toBeCloseTo for floating point comparisons
       expect(body.bbox[0]).toBeCloseTo(-116.1, 2);
@@ -193,7 +207,7 @@ test.describe('STAC Browser Search page', () => {
     });
   });
 
-  test('Manual spatial extent shows incomplete error', async ({ page, worker }) => {
+  test('Manual spatial extent shows incomplete error', async ({ page }) => {
 
     await page.goto(SEARCH_PATH);
 
@@ -219,7 +233,7 @@ test.describe('STAC Browser Search page', () => {
     });
   });
 
-  test('Manual spatial extent shows invalid latitude error', async ({ page, worker }) => {
+  test('Manual spatial extent shows invalid latitude error', async ({ page }) => {
 
     await page.goto(SEARCH_PATH);
 
@@ -237,7 +251,7 @@ test.describe('STAC Browser Search page', () => {
     await expect(page.getByText(/Latitude must be between -90 and 90/i)).toBeVisible();
   });
 
-  test('Manual spatial extent shows latitude order error', async ({ page, worker }) => {
+  test('Manual spatial extent shows latitude order error', async ({ page }) => {
 
     await page.goto(SEARCH_PATH);
 
@@ -257,7 +271,7 @@ test.describe('STAC Browser Search page', () => {
     });
   });
 
-  test('Manual spatial extent shows longitude order error when west is east of east', async ({ page, worker }) => {
+  test('Manual spatial extent shows longitude order error when west is east of east', async ({ page }) => {
 
     await page.goto(SEARCH_PATH);
 
@@ -277,7 +291,7 @@ test.describe('STAC Browser Search page', () => {
     });
   });
 
-  test('Manual spatial extent allows antimeridian crossing (positive west, negative east)', async ({ page, worker }) => {
+  test('Manual spatial extent allows antimeridian crossing (positive west, negative east)', async ({ page }) => {
 
     await page.goto(SEARCH_PATH);
 
@@ -298,7 +312,7 @@ test.describe('STAC Browser Search page', () => {
   });
 
 
-  test('Search with Collection ID should have valid POST body', async ({ page, worker }) => {
+  test('Search with Collection ID should have valid POST body', async ({ page }) => {
 
     await page.goto(SEARCH_PATH);
 
@@ -322,7 +336,7 @@ test.describe('STAC Browser Search page', () => {
     });
   });
 
-  test('search with Item ID should have valid POST body', async ({ page, worker }) => {
+  test('search with Item ID should have valid POST body', async ({ page }) => {
 
     await page.goto(SEARCH_PATH);
     
@@ -350,7 +364,7 @@ test.describe('STAC Browser Search page', () => {
     });
   });
 
-  test('search with Sort should have valid POST body', async ({ page, worker }) => {
+  test('search with Sort should have valid POST body', async ({ page }) => {
 
     await page.goto(SEARCH_PATH);
 
@@ -375,7 +389,7 @@ test.describe('STAC Browser Search page', () => {
     });
   });
 
-  test('search with item limit should have valid POST body', async ({ page, worker }) => {
+  test('search with item limit should have valid POST body', async ({ page }) => {
 
     await page.goto(SEARCH_PATH);
 
@@ -394,7 +408,7 @@ test.describe('STAC Browser Search page', () => {
     });
   });
 
-  test('search results render item cards with correct titles', async ({ page, worker }) => {
+  test('search results render item cards with correct titles', async ({ page }) => {
     await page.goto(SEARCH_PATH);
 
     await test.step('Submit search and wait for results', async () => {
@@ -472,7 +486,7 @@ test.describe('STAC Browser Search page', () => {
     });
   });
 
-  test('Reset button clears all filters and re-submits with empty body', async ({ page, worker }) => {
+  test('Reset button clears all filters and re-submits with empty body', async ({ page }) => {
 
     await page.goto(SEARCH_PATH);
 

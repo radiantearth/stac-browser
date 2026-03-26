@@ -90,13 +90,12 @@ test.describe('API Catalog - toolBar', () => {
 test.describe('API Catalog - Children', () => {
   let api;
   let collection;
-  let item;
   
-  test.beforeEach(async ({ worker }) => {
+  test.beforeEach(async () => {
     api = API.defaultApi({url: "https://api.local/api/"});
     collection = api.addCollection('my-collection', {});
     collection.setMetadata({ title: 'Test Collection' });
-    item = api.addItem(collection, 'my-item', {});
+    api.addItem(collection, 'my-item', {});
   });
 
   test('renders child collection as link', async ({ page, worker }) => {
@@ -124,7 +123,7 @@ test.describe('API Catalog - Children', () => {
   });
   
   test('renders no children message when catalog has no child links', async ({ page, worker }) => {
-    api = API.defaultApi({url: "https://api.local/api/"})
+    api = API.defaultApi({url: "https://api.local/api/"});
     
     await api.createServer(worker);
     
