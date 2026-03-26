@@ -1,7 +1,7 @@
 import { isObject } from 'stac-js/src/utils.js';
 import i18n from '../../i18n';
 import { mapState } from 'vuex';
-import Map from 'ol/Map.js';
+import OlMap from 'ol/Map.js';
 import View from 'ol/View.js';
 import { defaults } from 'ol/interaction/defaults';
 import ZoomControl from 'ol/control/Zoom.js';
@@ -13,6 +13,7 @@ import configureBasemap from '../../../basemaps.config';
 import CONFIG from '../../config';
 import proj4 from 'proj4';
 import {register} from 'ol/proj/proj4.js';
+import { markRaw } from 'vue';
 // Register pre-defined CRS from config in proj4
 if (isObject(CONFIG.crs)) {
   for (const code in CONFIG.crs) {
@@ -78,7 +79,7 @@ export default {
       }
 
       // Create map instance
-      this.map = new Map({
+      this.map = markRaw(new OlMap({
         target: element,
         controls: [],
         interactions: defaults({
@@ -92,7 +93,7 @@ export default {
           showFullExtent: true,
           projection,
         }),
-      });
+      }));
 
       // Add controls
       this.createControls();
