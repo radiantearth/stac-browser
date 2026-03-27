@@ -197,7 +197,6 @@ test.describe('STAC Browser Search page', () => {
       await submitButton.click();
 
       const { body } = await requestPromise;
-      console.log(body)
       
       // use toBeCloseTo for floating point comparisons
       expect(body.bbox[0]).toBeCloseTo(-116.1, 2);
