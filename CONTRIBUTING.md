@@ -43,24 +43,20 @@ For work on testing fixtures, test fixture documentation can be found [here](tes
 
 Tests are located in the `tests/e2e` directory and follow the naming convention `*.spec.js`.
 
+## Running Tests
+
+- `npm test`: Run all tests
+- `npm run test:e2e:ui`: Run UI tests in UI mode (interactive)
+- `npm run test:e2e:headed`: Run UI tests in headed mode (see browser)
+- `npm run test:e2e:debug`: Debug UI tests
+- `npm run test:e2e:report`: View UI test report
+
 **Additional resources:**
 
 - [Test Fixture Documentation](tests/TESTING_DOCS.md)
 - [Playwright Documentation](https://playwright.dev/docs/intro)
 - [Best Practices](https://playwright.dev/docs/best-practices)
 - [Locators](https://playwright.dev/docs/locators)
-
-### Running
-
-```bash
-npm run test:e2e            # all tests
-npm run test:e2e:ui         # interactive UI mode
-npm run test:e2e:headed     # headed browser
-npm run test:e2e:debug      # with Playwright Inspector
-npm run test:e2e:report     # view HTML report
-npx playwright test catalog.spec.js          # single file
-npx playwright test --grep "map click"       # by name
-```
 
 ## AI Use Policy
 

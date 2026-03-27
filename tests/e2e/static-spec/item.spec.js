@@ -28,12 +28,14 @@ test.describe('Item view - Metadata', () => {
     await page.getByRole('link', { name: new RegExp(collection.getMetadata().title, 'i') }).click();
     await waitForBrowserReady(page);
 
-    await page.getByRole('heading', { name: new RegExp(collection.getMetadata().title, 'i') }).textContent();
+    const collectionTitle = await page.getByRole('heading', { name: new RegExp(collection.getMetadata().title, 'i') });
+    await expect(collectionTitle).toBeVisible();
 
     await page.getByRole('link', { name: new RegExp(item.getMetadata().title, 'i') }).click();
     await waitForBrowserReady(page);
 
-    await page.getByRole('heading', { name: new RegExp(item.getMetadata().title, 'i') }).textContent();
+    const itemTitle = await page.getByRole('heading', { name: new RegExp(item.getMetadata().title, 'i') });
+    await expect(itemTitle).toBeVisible();
   });
 });
 
