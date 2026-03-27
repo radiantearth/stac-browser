@@ -43,6 +43,8 @@ export default defineConfig({
     /* Force English locale so tests are deterministic regardless of host/CI locale.
        The app auto-detects language from navigator.languages when detectLocaleFromBrowser is true. */
     locale: 'en-US',
+
+    permissions: ['clipboard-read', 'clipboard-write'],
   },
 
   /* Configure projects for major browsers */
