@@ -78,7 +78,7 @@ test.describe('Static Catalog - toolBar', () => {
   });
 
   test('share button copies URL to clipboard', async ({ page, worker }) => {
-    const catalog = (new StaticCatalog({url: 'https://example.com/catalog.json'}));
+    const catalog = (new StaticCatalog({url: 'https://stac.example/catalog.json'}));
 
     await catalog.createServer(worker);
 
@@ -102,9 +102,9 @@ test.describe('Static Catalog - toolBar', () => {
 
 test.describe('Static Catalog - Children', () => {
   test('renders child collection as link', async ({ page, worker }) => {
-    const catalog = (new StaticCatalog({url: 'https://example.com/catalog.json'}));
+    const catalog = (new StaticCatalog({url: 'https://stac.example/catalog.json'}));
 
-    const collection = catalog.addCollection({url: 'https://example.com/collection.json'});
+    const collection = catalog.addCollection({url: 'https://stac.example/collection.json'});
 
     collection.setMetadata({ title: 'Test Collection' });
 
@@ -117,10 +117,10 @@ test.describe('Static Catalog - Children', () => {
   });
 
   test('renders multiple child collections', async ({ page, worker }) => {
-    const catalog = (new StaticCatalog({url: 'https://example.com/catalog.json'}));
+    const catalog = (new StaticCatalog({url: 'https://stac.example/catalog.json'}));
 
-    const collection1 = catalog.addCollection({url: 'https://example.com/collection-1.json'}).setMetadata({ title: 'Test Collection 1' });
-    const collection2 = catalog.addCollection({url: 'https://example.com/collection-2.json'}).setMetadata({ title: 'Test Collection 2' });
+    const collection1 = catalog.addCollection({url: 'https://stac.example/collection-1.json'}).setMetadata({ title: 'Test Collection 1' });
+    const collection2 = catalog.addCollection({url: 'https://stac.example/collection-2.json'}).setMetadata({ title: 'Test Collection 2' });
 
     await catalog.createServer(worker);
 
@@ -133,7 +133,7 @@ test.describe('Static Catalog - Children', () => {
   });
 
   test('renders no children message when catalog has no child links', async ({ page, worker }) => {
-    const catalog = (new StaticCatalog({url: 'https://example.com/catalog.json'}))
+    const catalog = (new StaticCatalog({url: 'https://stac.example/catalog.json'}))
       .setMetadata({ title: "Empty Catalog" });
 
     await catalog.createServer(worker);
@@ -145,9 +145,9 @@ test.describe('Static Catalog - Children', () => {
   });
 
   test('navigates into a child collection on click', async ({ page, worker }) => {
-    const catalog = (new StaticCatalog({url: 'https://example.com/catalog.json'}));
+    const catalog = (new StaticCatalog({url: 'https://stac.example/catalog.json'}));
 
-    const collection = catalog.addCollection({url: 'https://example.com/collection.json'});
+    const collection = catalog.addCollection({url: 'https://stac.example/collection.json'});
 
     collection.setMetadata({ title: 'Test Collection' });
 

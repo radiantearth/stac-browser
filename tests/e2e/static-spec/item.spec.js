@@ -17,7 +17,7 @@ test.describe('Item view - Metadata', () => {
     const catalog = new StaticCatalog({ url: 'https://stac.example/catalog.json' });
     const collection = catalog.addCollection({ url: 'https://stac.example/collection.json' });
     
-    const item = collection.addItem({ url: 'https://example.com/item.json' })
+    const item = collection.addItem({ url: 'https://stac.example/item.json' })
       .setMetadata({ title: 'Test Item 2025-001', datetime: '2025-01-01T00:00:00Z' });
 
     await catalog.createServer(worker);
@@ -41,9 +41,9 @@ test.describe('Item view - Assets', () => {
   let catalog, collection, item;
 
   test.beforeEach('should load collection page', async () => {
-    catalog = (new StaticCatalog({url: 'https://example.com/catalog.json'}));
-    collection = catalog.addCollection({ url: 'https://example.com/collection.json' });
-    item = collection.addItem({ url: 'https://example.com/item.json' });
+    catalog = (new StaticCatalog({url: 'https://stac.example/catalog.json'}));
+    collection = catalog.addCollection({ url: 'https://stac.example/collection.json' });
+    item = collection.addItem({ url: 'https://stac.example/item.json' });
   });
 
   test('should list item assets', async ({ page, worker }) => {
@@ -80,9 +80,9 @@ test.describe('Item view - Geometry', () => {
   let catalog, collection, item;
 
   test.beforeEach('should load collection page', async () => {
-    catalog = (new StaticCatalog({url: 'https://example.com/catalog.json'}));
-    collection = catalog.addCollection({ url: 'https://example.com/collection.json' });
-    item = collection.addItem({ url: 'https://example.com/item.json' });
+    catalog = (new StaticCatalog({url: 'https://stac.example/catalog.json'}));
+    collection = catalog.addCollection({ url: 'https://stac.example/collection.json' });
+    item = collection.addItem({ url: 'https://stac.example/item.json' });
   });
 
   test('renders a map with item geometry', async ({ page, worker }) => {

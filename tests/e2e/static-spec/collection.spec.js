@@ -14,8 +14,8 @@ test.describe('Static Collection Metadata', () => {
   let catalog, collection;
 
   test.beforeEach('should load collection page', async () => {
-    catalog = (new StaticCatalog({url: 'https://example.com/catalog.json'}));
-    collection = catalog.addCollection({ url: 'https://example.com/collection.json' });
+    catalog = (new StaticCatalog({url: 'https://stac.example/catalog.json'}));
+    collection = catalog.addCollection({ url: 'https://stac.example/collection.json' });
   });
   test('should load and display collection metadata', async ({ page, worker }) => {
     const title = "Example EO Collection";
@@ -50,8 +50,8 @@ test.describe('Static Collection - toolBar', () => {
   let catalog, collection;
 
   test.beforeEach('should load collection page', async () => {
-    catalog = (new StaticCatalog({url: 'https://example.com/catalog.json'}));
-    collection = catalog.addCollection({ url: 'https://example.com/collection.json' });
+    catalog = (new StaticCatalog({url: 'https://stac.example/catalog.json'}));
+    collection = catalog.addCollection({ url: 'https://stac.example/collection.json' });
   });
     
   test('should have a working source view button, show STAC Version', async ({ page, worker }) => {
@@ -134,12 +134,12 @@ test.describe('Static Collection - Items', () => {
   let catalog, collection;
 
   test.beforeEach('should load collection page', async () => {
-    catalog = (new StaticCatalog({url: 'https://example.com/catalog.json'}));
-    collection = catalog.addCollection({ url: 'https://example.com/collection.json' });
+    catalog = (new StaticCatalog({url: 'https://stac.example/catalog.json'}));
+    collection = catalog.addCollection({ url: 'https://stac.example/collection.json' });
   });
 
   test('renders a single child item as a link', async ({ page, worker }) => {
-    const item = collection.addItem({ url: 'https://example.com/item.json' }).setMetadata({ title: 'Example Item' });
+    const item = collection.addItem({ url: 'https://stac.example/item.json' }).setMetadata({ title: 'Example Item' });
 
     await catalog.createServer(worker);
     
@@ -152,8 +152,8 @@ test.describe('Static Collection - Items', () => {
   });
 
   test('renders multiple child items', async ({ page, worker }) => {
-    const item1 = collection.addItem({ url: 'https://example.com/item1.json' }).setMetadata({ title: 'Example Item 1' });
-    const item2 = collection.addItem({ url: 'https://example.com/item2.json' }).setMetadata({ title: 'Example Item 2' });
+    const item1 = collection.addItem({ url: 'https://stac.example/item1.json' }).setMetadata({ title: 'Example Item 1' });
+    const item2 = collection.addItem({ url: 'https://stac.example/item2.json' }).setMetadata({ title: 'Example Item 2' });
 
     await catalog.createServer(worker);
     
@@ -179,7 +179,7 @@ test.describe('Static Collection - Items', () => {
   });
 
   test('navigates into an item on click → URL matches item.getBrowserPath()', async ({ page, worker }) => {
-    const item = collection.addItem({ url: 'https://example.com/item.json' }).setMetadata({ title: 'Example Item' });
+    const item = collection.addItem({ url: 'https://stac.example/item.json' }).setMetadata({ title: 'Example Item' });
 
     await catalog.createServer(worker);
     
