@@ -70,7 +70,12 @@
     "false": "no",
     "true": "si"
   },
+  "close": "",
   "copy": "Copia",
+  "copyErrors": {
+    "permission": "",
+    "unsupported": ""
+  },
   "default": "Predeterminado",
   "defaultWithValue": "Predeterminado ({value})",
   "deprecated": "Obsoleto",
@@ -111,6 +116,11 @@
     "serverError": "El servidor encontró un problema. @:errors.contactProvider",
     "title": "Error",
     "unauthorized": "La petición no tiene credenciales, por ejemplo, un token de la API. Por favor introduzca sus credenciales y pruebe de nuevo."
+  },
+  "exampleCode": {
+    "title": "",
+    "storeAs": "",
+    "installDependencies": ""
   },
   "featureExperimental": "¡Esta funcionalidad es experimental y puede producir resultados inesperados!",
   "features": {
@@ -224,6 +234,14 @@
     "previous": "‹ Anterior"
   },
   "poweredBy": "Ofrecido por {link}",
+  "programming": {
+    "csharp": "",
+    "java": "",
+    "javascript": "",
+    "python": "",
+    "r": "",
+    "rust": ""
+  },
   "protocol": {
     "azure": "Microsoft Azure",
     "file": "sistema de archivos (local)",
