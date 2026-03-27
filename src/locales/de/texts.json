@@ -70,7 +70,12 @@
     "false": "Nein",
     "true": "Ja"
   },
+  "close": "",
   "copy": "Kopieren",
+  "copyErrors": {
+    "permission": "",
+    "unsupported": ""
+  },
   "default": "Standardeinstellung",
   "defaultWithValue": "Standardeinstellung ({value})",
   "deprecated": "Abgekündigt",
@@ -111,6 +116,11 @@
     "serverError": "Auf dem Server ist ein Problem aufgetreten. @:errors.contactProvider",
     "title": "Fehler",
     "unauthorized": "Der Anfrage fehlen die Anmeldedaten, bspw. ein API-Schlüssel. Bitte geben Sie Ihre Anmeldedaten an und versuchen Sie es erneut."
+  },
+  "exampleCode": {
+    "title": "",
+    "storeAs": "",
+    "installDependencies": ""
   },
   "featureExperimental": "Diese Funktion ist noch experimentell und kann unerwartete Ergebnisse verursachen!",
   "features": {
@@ -224,6 +234,14 @@
     "previous": "‹ Vorherige"
   },
   "poweredBy": "Generiert von {link}",
+  "programming": {
+    "csharp": "",
+    "java": "",
+    "javascript": "",
+    "python": "",
+    "r": "",
+    "rust": ""
+  },
   "protocol": {
     "azure": "Microsoft Azure",
     "file": "Dateisystem (lokal)",
