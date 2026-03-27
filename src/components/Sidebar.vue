@@ -89,7 +89,7 @@ export default {
   padding-top: $header-margin;
   background-color: $light;
 
-  @include media-breakpoint-down(sm) {
+  @include media-breakpoint-down(md) {
     width: 100%;
     min-width: 100px;
     max-width: 100%;

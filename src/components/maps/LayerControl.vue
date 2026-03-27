@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import { defineAsyncComponent } from 'vue';
+import { defineAsyncComponent, markRaw } from 'vue';
 import ControlMixin from './ControlMixin';
 import LayerControlMixin from './LayerControlMixin';
 import Group from 'ol/layer/Group';
@@ -90,19 +90,19 @@ export default {
   },
   methods: {
     update() {
-      this.layerGroup = this.map.getLayerGroup();
+      this.layerGroup = markRaw(this.map.getLayerGroup());
       this.baseLayers = [];
       for (const layer of this.layerGroup.getLayers().getArray()) {
         if (!layer.get('base')) {
           continue;
         }
         const data = {
-          layer,
+          layer: markRaw(layer),
           id: layer.ol_uid,
           title: this.getTitle(layer)
         };
         this.baseLayers.push(data);
-        if (MapUtils.isLayerVisible(layer)) {
+        if (MapUtils.isLayerVisible(this.map, layer)) {
           this.visibleBaseLayer = data.id;
         }
       }

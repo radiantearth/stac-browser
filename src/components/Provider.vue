@@ -22,7 +22,7 @@
       <div class="mt-4" v-if="provider.description">
         <Description :description="provider.description" compact />
       </div>
-      <MetadataGroups class="mt-4" :data="provider" :ignoreFields="ignore" :title="false" type="Provider" />
+      <MetadataGroups class="mt-4" :data="provider" :ignoreFields="ignoredMetadataFields" :title="false" type="Provider" />
     </div>
   </b-accordion-item>
 </template>
@@ -32,6 +32,7 @@ import { defineAsyncComponent } from 'vue';
 import Description from './Description.vue';
 import ProviderRoles from './ProviderRoles.vue';
 import { BAccordionItem } from 'bootstrap-vue-next';
+import { getIgnoredFields } from '../ignored-metadata.js';
 
 export default {
   name: 'Provider',
@@ -54,8 +55,12 @@ export default {
   data() {
     return {
       expanded: false,
-      ignore: ['url', 'name', 'description', 'roles']
     };
+  },
+  computed: {
+    ignoredMetadataFields() {
+      return getIgnoredFields(this.provider, 'Provider');
+    }
   }
 };
 </script>

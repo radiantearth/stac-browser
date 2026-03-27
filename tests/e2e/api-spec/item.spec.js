@@ -18,7 +18,7 @@ test.describe('Item view - Metadata', () => {
 		const description = "An example STAC Collection with EO extension.";
 	
 		test.beforeEach(async () => {
-			api = API.minimalApi({url: "https://api.local/api/"});
+			api = API.minimalApi();
 			collection = api.addCollection('collection', {})
 				.setMetadata({ title, description });
 			items = api.addManyItems(collection, 3);

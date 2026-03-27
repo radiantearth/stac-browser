@@ -248,7 +248,7 @@ export default {
         return null;
       }
       return this.stacLayer.getLayers().getArray()
-        .filter(layer => MapUtils.isLayerVisible(layer))
+        .filter(layer => MapUtils.isLayerVisible(this.map, layer))
         .map(layer => layer.get('stac'))
         .filter(stac => stac instanceof STACReference);
     }

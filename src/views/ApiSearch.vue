@@ -18,6 +18,7 @@
             <WidgetHook id="view-search-filters-items-start" />
             <SearchFilter
               :parent="parent" title="" :value="itemFilters" type="Global"
+              :searchLink="itemSearch"
               @input="setFilters"
             />
             <WidgetHook id="view-search-filters-items-end" />

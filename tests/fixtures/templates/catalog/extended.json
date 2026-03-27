@@ -17,16 +17,16 @@
     {
       "name": "Example Provider",
       "roles": ["producer", "licensor"],
-      "url": "https://example.com"
+      "url": "https://stac.example"
     }
   ],
   "themes": [
     {
       "concepts": [
-        {"id": "theme-1", "title": "Theme 1", "url": "https://example.com/themes/theme-1"},
-        {"id": "theme-2", "title": "Theme 2", "url": "https://example.com/themes/theme-2"}
+        {"id": "theme-1", "title": "Theme 1", "url": "https://stac.example/themes/theme-1"},
+        {"id": "theme-2", "title": "Theme 2", "url": "https://stac.example/themes/theme-2"}
       ],
-      "scheme": "https://example.com/themes"
+      "scheme": "https://stac.example/themes"
     }
   ],
   "links": [
@@ -39,7 +39,7 @@
     {
       "rel": "about",
       "type": "text/html",
-      "href": "https://example.com",
+      "href": "https://stac.example",
       "title": "Our website"
     }
   ]

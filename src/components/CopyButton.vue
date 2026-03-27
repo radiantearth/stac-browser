@@ -1,12 +1,12 @@
 <template>
-  <b-button class="copy-button" @click.prevent.stop="copy" :variant="copyColor" :title="$t('copy')" v-bind="buttonProps">
+  <b-button class="copy-button" @click.prevent.stop="copy" v-bind="resolvedButtonProps">
     <component :is="copyIcon" />
     <slot />
   </b-button>
 </template>
 
 <script>
-import { Clipboard } from "v-clipboard";
+import { useClipboard } from '@vueuse/core';
 import BIconClipboard from '~icons/bi/clipboard';
 import BIconClipboardCheck from '~icons/bi/clipboard-check';
 import BIconClipboardX from '~icons/bi/clipboard-x';
@@ -27,6 +27,10 @@ export default {
             type: String,
             default: "primary"
         },
+        size: {
+            type: String,
+            default: "md"
+        },
         buttonProps: {
             type: Object,
             default: () => ({})
@@ -37,10 +41,33 @@ export default {
             status: null
         };
     },
+    setup() {
+        const { copy, isSupported } = useClipboard();
+        return {
+            copyToClipboard: copy,
+            isClipboardSupportedState: isSupported
+        };
+    },
     computed: {
+        isClipboardSupported() {
+            return Boolean(this.isClipboardSupportedState);
+        },
+        resolvedButtonProps() {
+            return {
+                disabled: Boolean(this.buttonProps?.disabled) || !this.isClipboardSupported,
+                variant: this.copyColor,
+                size: this.size,
+                title: this.buttonTitle,
+                'aria-label': this.buttonTitle || this.$t('copy'),
+                ...this.buttonProps,
+            };
+        },
         copyColor() {
             let variant = this.variant;
-            if (this.status === true) {
+            if (!this.isClipboardSupported) {
+                variant = 'secondary';
+            }
+            else if (this.status === true) {
                 variant = 'success';
             }
             else if (this.status === false) {
@@ -52,31 +79,48 @@ export default {
             return variant;
         },
         copyIcon() {
+            if (!this.isClipboardSupported) {
+                return BIconClipboardX;
+            }
             if (this.status === true) {
                 return BIconClipboardCheck;
             }
             else if (this.status === false) {
                 return BIconClipboardX;
             }
-            else {
-                return BIconClipboard;
+            return BIconClipboard;
+        },
+        buttonTitle() {
+            if (!this.isClipboardSupported) {
+                return this.$t('copyErrors.unsupported');
             }
+            if (this.status === false) {
+                return this.$t('copyErrors.permission');
+            }
+            return this.$t('copy');
         }
     },
     methods: {
         async copy() {
+            const focusedElement = typeof document !== 'undefined' ? document.activeElement : null;
             try {
-                // We need to store the focus and restore it again as the clipboard 
-                // may steal the focus
-                let focus = document.activeElement;
-                await Clipboard.copy(this.copyText);
-                focus.focus();
+                if (!this.isClipboardSupported) {
+                    throw new Error(this.$t('copyErrors.unsupported'));
+                }
+                await this.copyToClipboard(this.copyText);
                 this.status = true;
             } catch(error) {
-                console.error(error);
+                console.error('Copy failed:', error);
                 this.status = false;
             }
-            setTimeout(() => this.status = null, 2500);
+            finally {
+                if (focusedElement && typeof focusedElement.focus === 'function') {
+                    focusedElement.focus();
+                }
+                setTimeout(() => {
+                    this.status = null;
+                }, 3000);
+            }
         }
     }
 };

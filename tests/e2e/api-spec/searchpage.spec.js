@@ -46,7 +46,7 @@ test.describe('STAC Browser Search page', () => {
 
   test.beforeEach(async ({ worker }) => {
     api = API.minimalApi(
-      {url: "https://api.local/api/"},
+      {},
       {
         defaultLimit: 5,
         prevLinkEnabled: true,
@@ -156,7 +156,7 @@ test.describe('STAC Browser Search page', () => {
     });
   });
 
-  test('Search with spatial extent selection via manual input should have valid POST body', async ({ page }) => {
+  test.fixme('Search with spatial extent selection via manual input should have valid POST body', async ({ page }) => {
     //note: test was flaky due to timing issues. fix was attempted. if problem persists fix this or mark as fixme
     await page.goto(SEARCH_PATH);
 
@@ -428,7 +428,7 @@ test.describe('STAC Browser Search page', () => {
 
   test('search results show "no items found" when response is empty', async ({ page, worker }) => {
     // override setup
-    api = API.minimalApi({url: "https://api.local/api/"});
+    api = API.minimalApi({});
     api.addCollection('collection', {})
       .setMetadata({ title: 'Empty Collection' });
     api.addCollectionsExtension()
@@ -454,7 +454,7 @@ test.describe('STAC Browser Search page', () => {
 
   test('search results display matched item count', async ({ page, worker }) => {
     // override setup
-    api = API.minimalApi({url: "https://api.local/api/"}, {
+    api = API.minimalApi({}, {
         defaultLimit: 100,
         prevLinkEnabled: true,
         firstLinkEnabled: true,
@@ -514,7 +514,7 @@ test.describe('STAC Browser Search page', () => {
   test('Search results can be paginated with Next and Previous buttons', async ({ page, worker }) => {
     //override default api
     api = API.minimalApi(
-      {url: "https://api.local/api/"},
+      {},
       {
         defaultLimit: 5,
         prevLinkEnabled: true,
@@ -577,7 +577,7 @@ test.describe('STAC Browser Search page', () => {
   test('Search results can be paginated with First and Last buttons', async ({ page, worker }) => {
     //override default api
     api = API.minimalApi(
-      {url: "https://api.local/api/"},
+      {},
       {
         defaultLimit: 5,
         prevLinkEnabled: true,

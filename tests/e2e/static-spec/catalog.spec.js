@@ -15,7 +15,7 @@ test.describe('Static catalog Metadata', () => {
   test('should load and display catalog metadata', async ({ page, worker }) => {
     const title = "Example Catalog";
     const description = "An example STAC Catalog with some";
-    const catalog = (new StaticCatalog({url: 'https://example.com/catalog.json'}))
+    const catalog = (new StaticCatalog({url: 'https://stac.example/catalog.json'}))
       .setMetadata({ title, description });
 
     await catalog.createServer(worker);
@@ -31,7 +31,7 @@ test.describe('Static catalog Metadata', () => {
 
 test.describe('Static Catalog - toolBar', () => {
   test('should have a working source view button', async ({ page, worker }) => {
-    const catalog = (new StaticCatalog({url: 'https://example.com/catalog.json'}));
+    const catalog = (new StaticCatalog({url: 'https://stac.example/catalog.json'}));
 
     await catalog.createServer(worker);
     
@@ -48,7 +48,7 @@ test.describe('Static Catalog - toolBar', () => {
   });
 
   test('source view closes on outside click', async ({ page, worker }) => {
-    const catalog = (new StaticCatalog({url: 'https://example.com/catalog.json'}));
+    const catalog = (new StaticCatalog({url: 'https://stac.example/catalog.json'}));
 
     await catalog.createServer(worker);
     
@@ -66,7 +66,7 @@ test.describe('Static Catalog - toolBar', () => {
   });
 
   test('share button is visible', async ({ page, worker }) => {
-    const catalog = (new StaticCatalog({url: 'https://example.com/catalog.json'}));
+    const catalog = (new StaticCatalog({url: 'https://stac.example/catalog.json'}));
 
     await catalog.createServer(worker);
     

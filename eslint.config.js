@@ -92,6 +92,7 @@ export default [
       '**/stac-fields/**',
       '**/stac-migrate/**',
       '**/stac-layer/**',
+      'src/codegen/templates/**',
       'config.js',
       '*.config.js',
       'dist/**',

@@ -1,0 +1,53 @@
+# Code Generator Integration Tests
+#
+# Runs each generated code snippet in its own container
+#
+# Usage:
+#   node tests/integration/generate-snippets.js
+#   docker compose -f tests/integration/docker-compose.yml build
+#   docker compose -f tests/integration/docker-compose.yml run --rm <service>
+
+services:
+  python:
+    build:
+      context: ./python
+    volumes:
+      - ./generated:/code:ro
+    network_mode: host
+
+  javascript:
+    image: node:22-slim
+    working_dir: /code
+    volumes:
+      - ./generated:/code:ro
+    command: ["sh", "-c", "if [ -n \"$$INSTALL_DEPS\" ]; then eval \"$$INSTALL_DEPS\"; fi && node search.mjs"]
+    network_mode: host
+
+  r:
+    build:
+      context: ./r
+    volumes:
+      - ./generated:/code:ro
+    network_mode: host
+
+  csharp:
+    build:
+      context: ./csharp
+    volumes:
+      - ./generated:/code:ro
+    network_mode: host
+
+  java:
+    image: eclipse-temurin:21-jdk
+    working_dir: /code
+    volumes:
+      - ./generated:/code:ro
+    command: ["sh", "-c", "cp StacSearch.java /tmp/ && cd /tmp && if [ -n \"$$INSTALL_DEPS\" ]; then eval \"$$INSTALL_DEPS\"; fi && javac -cp '.:*' StacSearch.java && java -cp '.:*' StacSearch"]
+    network_mode: host
+
+  rust:
+    build:
+      context: ./rust
+    volumes:
+      - ./generated:/code:ro
+    network_mode: host
