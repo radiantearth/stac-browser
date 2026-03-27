@@ -62,7 +62,7 @@ test.describe('Item view - Assets', () => {
     
     await page.goto(item.getBrowserPath());
     await waitForBrowserReady(page);
-
+    // ignore the first asset which is a thumbnail.
     const assetKey = Object.keys(item.data.assets)[1];
     const asset = item.data.assets[assetKey];
 

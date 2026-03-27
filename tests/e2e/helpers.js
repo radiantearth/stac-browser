@@ -96,3 +96,18 @@ export async function waitForSearchPost(page) {
   );
   return { body: JSON.parse(request.postData() || '{}'), url: request.url() };
 }
+
+/**
+ * Click the Source toolbar button and wait for the panel to appear.
+ * Returns the panel locator so callers can run further assertions on it.
+ */
+export async function openSourcePanel(page) {
+  const sourceButton = page.getByRole('button', { name: /source/i });
+  await expect(sourceButton).toBeVisible();
+  await sourceButton.click();
+
+  // The source panel/popover should appear after the click.
+  const sourcePanel = page.locator('#popover-link');
+  await expect(sourcePanel).toBeVisible();
+  return sourcePanel;
+}
