@@ -1,0 +1,2 @@
+import{a5 as o,C as t,N as a,G as n}from"./index-DFUv_p8j.js";const r={viewBox:"0 0 16 16",width:"1.2em",height:"1.2em"};function l(s,e){return t(),a("svg",r,[...e[0]||(e[0]=[n("path",{fill:"currentColor",d:"M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093l3.473-4.425z"},null,-1)])])}const i=o({name:"bi-check",render:l});export{i as _};
+//# sourceMappingURL=check-BIbwcFjd.js.map
