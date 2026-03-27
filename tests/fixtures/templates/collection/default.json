@@ -16,7 +16,7 @@
     {
       "name": "Example Provider",
       "roles": ["producer", "licensor"],
-      "url": "https://example.com"
+      "url": "https://stac.example"
     },
     {
       "name": "Processing Corp",

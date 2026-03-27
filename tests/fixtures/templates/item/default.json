@@ -52,7 +52,7 @@
       "proj:shape": [200, 200]
     },
     "data": {
-      "href": "https://example.com/data.tif",
+      "href": "https://stac.example/data.tif",
       "type": "image/tiff; application=geotiff",
       "roles": ["data"],
       "title": "Measurements",
@@ -74,7 +74,7 @@
       ]
     },
     "metadata": {
-      "href": "https://example.com/metadata.json",
+      "href": "https://stac.example/metadata.json",
       "type": "application/json",
       "roles": ["metadata"],
       "title": "Metadata",

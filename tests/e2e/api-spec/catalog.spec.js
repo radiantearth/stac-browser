@@ -7,7 +7,7 @@
 * filter toggle.
 *
 * Two modes are tested:
-* 1. External mode (no catalogUrl) – paths are /external/example.com/api/...
+* 1. External mode (no catalogUrl) – paths are /external/stac.example/api/...
 * 2. Configured mode (catalogUrl set) – paths are relative: /, /collections/...
 *
 * Fixtures: tests/fixtures/api/ (root.json, collections.json, collection-1.json,
@@ -20,8 +20,7 @@ import { waitForBrowserReady } from '../helpers.js';
 test.describe('API catalog browsing', () => {
   
   test('root page renders API', async ({ page, worker }) => {
-    // temporarily used different root URL to prevent 404s from the real example.com
-    const api = API.defaultApi({url: "https://api.local/api/"});
+    const api = API.defaultApi({});
     const collection = api.addCollection('my-collection', {});
     api.addItem(collection, 'my-item', {});
     
@@ -41,7 +40,7 @@ test.describe('API Catalog - toolBar', () => {
   let api;
   
   test.beforeEach(async ({ worker }) => {
-    api = API.defaultApi({url: "https://api.local/api/"});
+    api = API.defaultApi({});
     await api.createServer(worker);
   });
   
@@ -92,7 +91,7 @@ test.describe('API Catalog - Children', () => {
   let collection;
   
   test.beforeEach(async () => {
-    api = API.defaultApi({url: "https://api.local/api/"});
+    api = API.defaultApi({});
     collection = api.addCollection('my-collection', {});
     collection.setMetadata({ title: 'Test Collection' });
     api.addItem(collection, 'my-item', {});
@@ -108,9 +107,9 @@ test.describe('API Catalog - Children', () => {
   });
   
   test('renders multiple child collections', async ({ page, worker }) => {
-    api = API.defaultApi({url: "https://api.local/api/"});
-    const collection1 = api.addCollection('collection-1', {url: 'https://example.com/collection-1.json'}).setMetadata({ title: 'Test Collection 1' });
-    const collection2 = api.addCollection('collection-2', {url: 'https://example.com/collection-2.json'}).setMetadata({ title: 'Test Collection 2' });
+    api = API.defaultApi({});
+    const collection1 = api.addCollection('collection-1', {url: 'https://stac.example/api/collections/collection-1'}).setMetadata({ title: 'Test Collection 1' });
+    const collection2 = api.addCollection('collection-2', {url: 'https://stac.example/api/collections/collection-2'}).setMetadata({ title: 'Test Collection 2' });
     
     await api.createServer(worker);
     
@@ -123,7 +122,7 @@ test.describe('API Catalog - Children', () => {
   });
   
   test('renders no children message when catalog has no child links', async ({ page, worker }) => {
-    api = API.defaultApi({url: "https://api.local/api/"});
+    api = API.defaultApi({});
     
     await api.createServer(worker);
     

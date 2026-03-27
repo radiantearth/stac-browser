@@ -143,7 +143,7 @@ test.describe('STAC Browser Homepage', () => {
 
   test('clicking a STAC index entry populates url and navigates', async ({ page, worker }) => {
     const expectedTitle = 'Example Catalog';
-    const expectedUrl = 'https://example.com/stac/catalog.json';
+    const expectedUrl = 'https://stac.example/stac/catalog.json';
     const mockCatalog = new StaticCatalog({ url: expectedUrl })
       .setMetadata({
         title: expectedTitle,

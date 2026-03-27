@@ -15,7 +15,7 @@ function joinUrl(base, path) {
 export default class API extends Instance {
   constructor(rootOptions = {}, options = {}) {
     super(options);
-    rootOptions.url = rootOptions.url || 'https://example.com/api';
+    rootOptions.url = rootOptions.url || 'https://stac.example/api/';
     rootOptions.template = rootOptions.template || 'api-root';
     this.root = this.createStac(rootOptions);
   }
@@ -52,7 +52,7 @@ export default class API extends Instance {
     const cid = collection.data.id;
     options.url = options.url || `collections/${cid}/items/${id}`;
     if (!this.itemCollections[cid]) { 
-      const url = path.dirname(options.url)
+      const url = path.dirname(options.url);
       const itemCollection = this.createStac({
         url, 
         type: ItemCollection
@@ -64,7 +64,7 @@ export default class API extends Instance {
     const item = this.createStac({
       url: options.url,
       type: Item
-    })
+    });
     
     items.addItem(item.build());
 
@@ -91,7 +91,7 @@ export default class API extends Instance {
   }
 
   getItems(options) {
-    const items = []
+    const items = [];
     for (let cid in this.itemCollections){
       items.push(...this.itemCollections[cid].getItems());
     }
@@ -192,10 +192,10 @@ export default class API extends Instance {
   }
 
   addSearchExtension(options = {}) {
-    this.addSearchEndpoint(options)
-    this.root.addConformsTo("https://api.stacspec.org/v1.0.0/item-search")
-    this.root.addConformsTo("https://api.stacspec.org/v1.0.0/item-search#fields")
-    this.root.addConformsTo("https://api.stacspec.org/v1.0.0/item-search#query")
+    this.addSearchEndpoint(options);
+    this.root.addConformsTo("https://api.stacspec.org/v1.0.0/item-search");
+    this.root.addConformsTo("https://api.stacspec.org/v1.0.0/item-search#fields");
+    this.root.addConformsTo("https://api.stacspec.org/v1.0.0/item-search#query");
     this.root.addConformsTo("https://api.stacspec.org/v1.0.0/item-search#sort");
     return this;
   }

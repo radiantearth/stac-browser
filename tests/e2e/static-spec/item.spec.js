@@ -14,10 +14,10 @@ import StaticCatalog from '../../fixtures/instances/static.js';
 
 test.describe('Item view - Metadata', () => {
   test('should display item metadata', async ({ page, worker }) => {
-    const catalog = new StaticCatalog({ url: 'https://example.com/catalog.json' });
-    const collection = catalog.addCollection({ url: 'https://example.com/collection.json' });
+    const catalog = new StaticCatalog({ url: 'https://stac.example/catalog.json' });
+    const collection = catalog.addCollection({ url: 'https://stac.example/collection.json' });
     
-    collection.addItem({ url: 'https://example.com/item.json' });
+    collection.addItem({ url: 'https://stac.example/item.json' });
 
     await catalog.createServer(worker);
     

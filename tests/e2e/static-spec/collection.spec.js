@@ -14,8 +14,8 @@ test.describe('Static Collection Metadata', () => {
   test('should load and display collection metadata', async ({ page, worker }) => {
     const title = "Example EO Collection";
     const description = "An example STAC Collection with EO extension.";
-    const catalog = (new StaticCatalog({url: 'https://example.com/catalog.json'}));
-    const collection = catalog.addCollection({ url: 'https://example.com/collection.json' })
+    const catalog = (new StaticCatalog({url: 'https://stac.example/catalog.json'}));
+    const collection = catalog.addCollection({ url: 'https://stac.example/collection.json' })
       .setMetadata({ title, description });
 
      await catalog.createServer(worker);
