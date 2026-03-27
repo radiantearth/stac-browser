@@ -108,8 +108,8 @@ test.describe('API Catalog - Children', () => {
   
   test('renders multiple child collections', async ({ page, worker }) => {
     api = API.defaultApi({});
-    const collection1 = api.addCollection('collection-1', {url: 'https://stac.example/api/collections/collection-1'}).setMetadata({ title: 'Test Collection 1' });
-    const collection2 = api.addCollection('collection-2', {url: 'https://stac.example/api/collections/collection-2'}).setMetadata({ title: 'Test Collection 2' });
+    const collection1 = api.addCollection('collection-1', {url: 'collections/collection-1'}).setMetadata({ title: 'Test Collection 1' });
+    const collection2 = api.addCollection('collection-2', {url: 'collections/collection-2'}).setMetadata({ title: 'Test Collection 2' });
     
     await api.createServer(worker);
     
