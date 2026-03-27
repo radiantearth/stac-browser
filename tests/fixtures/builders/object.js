@@ -13,10 +13,10 @@ export default class STACObject {
   
   getMethod() {
     if(!this.method){
-      return null
+      return null;
     }
 
-    return this.method.toUpperCase() || 'GET'
+    return this.method.toUpperCase() || 'GET';
   }
 
   setMethod(method) {
