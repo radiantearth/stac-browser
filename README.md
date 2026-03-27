@@ -26,9 +26,9 @@ If you care about STAC Browser and have some funds to support the future of STAC
     - [Themes](#themes)
     - [Basemaps](#basemaps)
     - [Actions](#actions)
-    - [Widgets](#widgets)
-    - [Metadata fields](#metadata-fields)
-    - [Customization through root catalog](#customization-through-root-catalog)
+    - [Code Generators](#code-generators)
+    - [Additional metadata fields](#additional-metadata-fields)
+      - [Example](#example)
     - [Custom extensions](#custom-extensions)
   - [Docker](#docker)
   - [Contributing](#contributing)
@@ -160,6 +160,40 @@ More information about how to configure and customize the basemaps can be found 
 STAC Browser has a pluggable interface to share or open assets and links with other services, which we call "actions".
 
 More information about how to add or implement actions can be found in the **[Actions documentation](docs/actions.md)**.
+### Code Generators
+
+The list of supported code snippet languages is configured in [`codeGenerators.config.js`](codeGenerators.config.js).
+
+Code generator templates are selected in generator classes based on endpoint and method (for example `query` for `GET`, `post-cql` for request-body paths), so generated snippets stay minimal and concrete for the currently selected search flow.
+
+For step-by-step instructions on adding or removing a language, see the **[Code Generators documentation](docs/code-generators.md)**.
+
+### Additional metadata fields
+
+The metadata that STAC Browser renders is rendered primarily through the library [`stac-fields`](https://www.npmjs.com/package/@radiantearth/stac-fields).
+It contains a lot of rules for rendering [many existing STAC extensions](https://github.com/stac-utils/stac-fields/blob/main/fields.json) nicely.
+Nevertheless, if you use custom extensions to the STAC specification you may want to register your own rendering rules for the new fields.
+This can be accomplished by customizing the file [`fields.config.js`](./fields.config.js).
+It uses the [Registry](https://github.com/stac-utils/stac-fields/blob/main/README.md#registry) defined in stac-fields to add more extensions and fields to stac-fields and STAC Browser.
+
+To add your own fields, please consult the documentation for the [Registry](https://github.com/stac-utils/stac-fields/blob/main/README.md#registry).
+
+#### Example
+
+If you have a custom extension with the title "Radiant Earth" that uses the prefix `radiant:` you can add the extension as such:
+
+```js
+Registry.addExtension("radiant", "Radiant Earth");
+```
+
+If this extension has a boolean field `radiant:public_access` that describes whether an entity can be accessed publicly or not, this could be described as follows:
+
+```js
+Registry.addMetadataField("radiant:public_access", {
+  label: "Data Access",
+  formatter: (value) => (value ? "Public" : "Private"),
+});
+```
 
 ### Widgets
 

@@ -20,6 +20,7 @@
         <SearchFilter
           type="Items"
           :title="$t('items.filter')" :parent="stac"
+          :searchLink="itemSearchLink"
           :value="apiFilters" @input="emitFilter"
         />
       </b-collapse>
@@ -159,6 +160,9 @@ export default defineComponent({
         }
       }
       return false;
+    },
+    itemSearchLink() {
+      return this.stac && typeof this.stac.getApiItemsLink === 'function' ? this.stac.getApiItemsLink() : null;
     }
   },
   watch: {

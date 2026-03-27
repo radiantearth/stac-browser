@@ -111,7 +111,6 @@ export default defineConfig(async ({ mode }) => {
         "bootstrap-vue-next/components/*",
         "commonmark",
         "@radiantearth/stac-fields/*",
-        "v-clipboard",
         "content-type",
         "stac-node-validator",
         "@musement/iso-duration"

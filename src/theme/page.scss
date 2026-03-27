@@ -70,12 +70,12 @@ body {
             align-items: center;
             font-size: 2.2rem;
           }
-          @include media-breakpoint-down(xl) {
+          @include media-breakpoint-down(xxl) {
             h1 {
               font-size: 2rem;
             }
           }
-          @include media-breakpoint-down(md) {
+          @include media-breakpoint-down(lg) {
             h1 {
               font-size: 1.75rem;
             }

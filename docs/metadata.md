@@ -3,6 +3,8 @@
 - [Adding custom fields](#adding-custom-fields)
   - [Example](#example)
   - [Translation](#translation)
+- [Hiding fields](#hiding-fields)
+  - [Example](#example-1)
 
 The metadata that STAC Browser renders is rendered primarily through the library [`stac-fields`](https://www.npmjs.com/package/@radiantearth/stac-fields).
 It contains a lot of rules for rendering [many existing STAC extensions](https://github.com/stac-utils/stac-fields/blob/main/fields.json) in a human-friendly way.
@@ -57,5 +59,44 @@ Below you can find an example of an updated `custom.json` for the German languag
     "Public": "Öffentlich",
     "Private": "Privat"
   }
+}
+```
+
+## Hiding fields
+
+If you have fields in your STAC metadata that you don't want to show in STAC Browser,
+you can customize this in the file [`fields.config.js`](../fields.config.js) as well.
+
+Some fields are hidden by default, you can check the source code for details:
+[ignored-metadata.js](../src/ignored-metadata.js).
+
+If you want to add or remove fields from the list of ignored fields,
+you can implement a function that updates the list.
+
+The function receives three parameters:
+
+- `object` (stac-js `StacObject` or `Object`): The entity for which the metadata is rendered.
+- `fields` (`Array.<string>`): The fields ignored by default.
+- `type` (`string`): The type of the entity, e.g. `CatalogLike`, `Item`, `Asset`, `Link`, `Provider`.
+
+The function has to return the (updated) fields to ignore in the metadata rendering as a `Array.<string>`.
+
+### Example
+
+```js
+const ignoreMetadata = (object, fields, type) => {
+  if (object.isCollection) {
+    // Show the proj:bbox and proj:geometry fields for Collections (these are ignored by default)
+    fields = fields.filter(field => !['proj:bbox', 'proj:geometry'].includes(field));
+  }
+  else if (type === 'Provider' && object.name === 'moreGeo GmbH') {
+    // Don't show the email field for the provider with name 'moreGeo GmbH'
+    fields.push('email');
+  }
+  if (object.isSTAC) {
+    // For all STAC entities (Item, Catalog, Collection) show the STAC version
+    fields = fields.filter(field => field !== 'stac_version');
+  }
+  return fields;
 }
 ```
