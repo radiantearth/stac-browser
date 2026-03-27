@@ -19,9 +19,7 @@ Dynamic API:
 import API from '../fixtures/instances/api.js';
 
 // 1. Create an API instance (loads api-root.json template)
-const api = API.defaultApi({
-  url: 'https://stac.example/'
-});
+const api = API.defaultApi();
 
 // 2. Add collections and items using builders
 const collection = api.addCollection('sentinel-2', {
@@ -42,6 +40,8 @@ await api.createServer(worker);
 ```
 
 After `createServer(worker)`, all registered endpoints respond with built JSON. Use `createServer(worker, {verbose: true})` to view registered endpoints in the console during testing. `createServer(worker)` needs to be executed within the scope of a test to be functional - with recurring setups, use `test.beforeEach()` to prevent duplication.
+
+The default root-uri of the API is set to be `https://stac.example/`. it can be overridden by passing `{ url: 'https://other-stac.example/' }` as options to the constructor.
 
 Static catalogs are created similarly:
 

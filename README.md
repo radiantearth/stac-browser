@@ -205,10 +205,11 @@ You can use the Docker to work with STAC Browser. Please read [Docker documentat
 To run the testing suite locally:
 
 ```bash
-npm run test:e2e
+npm test
 ```
 
 For more information on testing, see [CONTRIBUTING.md](CONTRIBUTING.md#Tests)
+
 ## Contributing
 
 Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to contribute to STAC Browser.
