@@ -58,6 +58,7 @@ Tests are located in the `tests/e2e` directory and follow the naming convention 
 - [Best Practices](https://playwright.dev/docs/best-practices)
 - [Locators](https://playwright.dev/docs/locators)
 
+
 ## AI Use Policy
 
 AI tools are part of modern development workflows and contributors may use them. However, all contributions must meet STAC Browser quality standards regardless of how they were created.

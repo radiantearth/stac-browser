@@ -5,6 +5,7 @@ import ItemCollection from '../builders/itemCollection.js';
 import URI from 'urijs';
 import Item from '../builders/item.js';
 import path from 'path';
+import { get } from 'http';
 
 function joinUrl(base, path) {
   const uri = URI(base);
@@ -133,22 +134,71 @@ export default class API extends Instance {
     return this;
   }
 
-  addSearchEndpoint() {
+  addSearchEndpoint({methods = ['GET', 'POST']} = {}) {
     // TODO: check if search endpoint already exists
-
-    this.root.addSearchLink();
-    const searchGET = this.createStac({
-      url: 'search',
-      type: ItemCollection
-    });
-    const searchPOST = this.createStac({
-      url: 'search',
-      type: ItemCollection
-    }).setMethod('POST');
+    this.root.addSearchLink(methods);
     
-    this.endpoints.push(searchPOST, searchGET);
+    if (methods.includes('GET')) {
+      const searchGET = this.createStac({
+      url: 'search',
+      type: ItemCollection
+      });
+      this.endpoints.push(searchGET);
+    }
+    
+    if (methods.includes('POST')) {
+      const searchPOST = this.createStac({
+        url: 'search',
+        type: ItemCollection
+      }).setMethod('POST');
+      this.endpoints.push(searchPOST);
+    }
+    
 
     return this;
+  }
+
+  addQueryablesEndpoint() {
+    //barebones queryables fixture
+
+    //check if queryables endpoint already exists
+    if (this.endpoints.some(ep => ep.url === 'queryables')) {
+      return this;
+    }
+
+    // GET /queryables
+    this.root.addLink(
+      { 
+        rel: 'queryables', 
+        href: joinUrl(this.root.getAbsoluteUrl(), 'queryables'), 
+        type: 'application/schema+json' 
+      }
+    );
+
+    const queryables = {
+      api: this,
+      getMethod() {
+        return 'GET';
+      },
+      url: 'queryables',
+      getAbsoluteUrl() {
+        return joinUrl(this.api.root.getAbsoluteUrl(), this.url);
+      },
+      build: () => {
+        return {
+          $schema: 'https://json-schema.org/draft/2020-12/schema',
+          type: 'object',
+          properties: {
+            id: {
+              type: 'string',
+              title: 'Identifier'
+            }
+          }
+        };
+      }
+    }
+    this.endpoints.push(queryables);
+    
   }
 
   addCollectionsExtension({
@@ -197,6 +247,14 @@ export default class API extends Instance {
     this.root.addConformsTo("https://api.stacspec.org/v1.0.0/item-search#fields");
     this.root.addConformsTo("https://api.stacspec.org/v1.0.0/item-search#query");
     this.root.addConformsTo("https://api.stacspec.org/v1.0.0/item-search#sort");
+    return this;
+  }
+
+  addFilterExtension(options = {}) {
+    this.addSearchExtension(options);
+    this.addQueryablesEndpoint();
+    this.root.addConformsTo("http://www.opengis.net/spec/ogcapi-features-3/1.0/conf/filter");
+    this.root.addConformsTo("https://api.stacspec.org/v1.0.0/item-search#filter");
     return this;
   }
 
