@@ -16,6 +16,29 @@ import fieldsI18n from '@radiantearth/stac-fields/I18N';
 import { TYPES } from "../components/ApiCapabilitiesMixin";
 import BrowserStorage from "../browser-store.js";
 
+/**
+ * Preserves the port from a reference URL when the resolved URL has the same
+ * hostname and protocol but is missing the port. This handles the case where
+ * a server behind a reverse proxy returns absolute URLs without the port.
+ * See https://github.com/radiantearth/stac-browser/issues/857
+ *
+ * @param {URI} absoluteUrl - The resolved absolute URI object.
+ * @param {string|URI|null} refUrl - The reference URL to inherit the port from.
+ * @returns {URI} The URI with the port preserved if applicable.
+ */
+function preservePort(absoluteUrl, refUrl) {
+  if (refUrl) {
+    let refUri = refUrl instanceof URI ? refUrl : URI(refUrl);
+    let port = refUri.port();
+    if (port && !absoluteUrl.port()
+        && absoluteUrl.hostname() === refUri.hostname()
+        && absoluteUrl.protocol() === refUri.protocol()) {
+      absoluteUrl.port(port);
+    }
+  }
+  return absoluteUrl;
+}
+
 function getStore(config, router) {
   // Local settings (e.g. for currently loaded STAC entity)
   const localDefaults = () => ({
@@ -120,6 +143,7 @@ function getStore(config, router) {
           return null;
         }
         let absoluteUrl = toAbsolute(source, state.url);
+        absoluteUrl = preservePort(URI(absoluteUrl), state.url).toString();
         let data = state.database[absoluteUrl];
         if (data instanceof STAC || (returnErrorObject && data instanceof Error)) {
           return data;
@@ -329,6 +353,7 @@ function getStore(config, router) {
       },
       getRequestUrl: (state, getters) => (url, baseUrl = null, addLocalQueryParams = false) => {
         let absoluteUrl = toAbsolute(url, baseUrl ? baseUrl : state.url, false);
+        preservePort(absoluteUrl, baseUrl ? baseUrl : state.url);
         if (!getters.isExternalUrl(absoluteUrl)) {
           // Check whether private params are present and add them if the URL is part of the catalog
           addQueryIfNotExists(absoluteUrl, state.privateQueryParameters);
@@ -687,7 +712,7 @@ function getStore(config, router) {
           if (!parentLink) {
             break;
           }
-          let url = toAbsolute(parentLink.href, stac.getAbsoluteUrl());
+          let url = preservePort(toAbsolute(parentLink.href, stac.getAbsoluteUrl(), false), stac.getAbsoluteUrl()).toString();
           await cx.dispatch('load', { url, omitApi: true });
           let parentStac = cx.getters.getStac(url, true);
           if (parentStac instanceof Error) {
@@ -721,7 +746,7 @@ function getStore(config, router) {
         } = args;
 
         const path = cx.getters.toBrowserPath(url);
-        url = toAbsolute(url, cx.state.url);
+        url = preservePort(toAbsolute(url, cx.state.url, false), cx.state.url).toString();
 
         // Make sure we have all authentication details
         await cx.dispatch("auth/waitForAuth");
@@ -817,7 +842,7 @@ function getStore(config, router) {
           if (!catalogUrl) {
             const root = data.getRootLink();
             if (root) {
-              catalogUrl = toAbsolute(root.href, url);
+              catalogUrl = preservePort(toAbsolute(root.href, url, false), url).toString();
               await cx.dispatch('config', { catalogUrl });
             }
           }
@@ -867,6 +892,7 @@ function getStore(config, router) {
                 let url;
                 if (selfLink?.href) {
                   url = toAbsolute(selfLink.href, baseUrl, false);
+                  preservePort(url, baseUrl);
                 }
                 else if (typeof item.id !== 'undefined') {
                   let apiCollectionsLink = cx.getters.root?.getApiCollectionsLink()?.href;
@@ -963,6 +989,7 @@ function getStore(config, router) {
               let url;
               if (selfLink?.href) {
                 url = toAbsolute(selfLink.href, cx.state.url || stac.getAbsoluteUrl(), false);
+                preservePort(url, cx.state.url || stac.getAbsoluteUrl());
               }
               else {
                 // see https://github.com/radiantearth/stac-browser/issues/486
