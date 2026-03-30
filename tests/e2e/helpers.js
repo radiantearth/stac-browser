@@ -61,13 +61,21 @@ export async function waitForBrowserReady(page) {
 // ─── Search-page helpers ────────────────────────────────────────────────────
 
 /**
- * Wait for the OpenLayers map to be interactive on the search page.
+ * Wait for the OpenLayers map to be interactive and fully initialized on the search page.
+ * This ensures the map has not only attached but also rendered its base layers,
+ * controls, and extent interaction.
  * Returns the map container locator for clicking.
  */
 export async function waitForMapReady(page) {
   const mapContainer = page.locator('.map-container .map');
   await mapContainer.waitFor({ state: 'visible', timeout: 10000 });
+  
+  // Wait for the viewport to be attached
   await mapContainer.locator('.ol-viewport').waitFor({ state: 'attached', timeout: 10000 });
+  
+  // Wait for OpenLayers to have rendered at least one layer (base layer)
+  await page.locator('.ol-layer').first().waitFor({ state: 'visible', timeout: 10000 });
+  
   return mapContainer;
 }
 

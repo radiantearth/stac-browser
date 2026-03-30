@@ -156,7 +156,7 @@ test.describe('STAC Browser Search page', () => {
     });
   });
 
-  test.fixme('Search with spatial extent selection via manual input should have valid POST body', async ({ page }) => {
+  test('Search with spatial extent selection via manual input should have valid POST body', async ({ page }) => {
     //note: test was flaky due to timing issues. fix was attempted. if problem persists fix this or mark as fixme
     await page.goto(SEARCH_PATH);
 
@@ -169,16 +169,10 @@ test.describe('STAC Browser Search page', () => {
       await page.waitForLoadState('networkidle');
       await waitForMapReady(page);
       
-      // Get all input fields and wait for them to be attached
       const westLonInput = page.getByLabel(/west longitude/i);
       const southLatInput = page.getByLabel(/south latitude/i);
       const eastLonInput = page.getByLabel(/east longitude/i);
       const northLatInput = page.getByLabel(/north latitude/i);
-      
-      await westLonInput.waitFor({ state: 'attached', timeout: 10000 });
-      await southLatInput.waitFor({ state: 'attached', timeout: 10000 });
-      await eastLonInput.waitFor({ state: 'attached', timeout: 10000 });
-      await northLatInput.waitFor({ state: 'attached', timeout: 10000 });
       
       // Fill in bounding box values
       await westLonInput.fill('-116.1');
