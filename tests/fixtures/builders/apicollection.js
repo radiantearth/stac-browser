@@ -4,17 +4,19 @@ export default class APICollection extends STACHypermedia {
   constructor(instance, data, url) {
     super(instance, data, url);
 
-    this.method = this.instance.options.method || 'GET';
+    this.method = this.instance.options.method in ['GET', 'POST', 'PUT', 'DELETE'] 
+      ? this.instance.options.method : 'GET';
     
     //default to false if not set
-    this.prevEnabled = this.instance.options.prevLinkEnabled || false;
-    this.firstEnabled = this.instance.options.firstLinkEnabled  || false;
-    this.lastEnabled = this.instance.options.lastLinkEnabled   || false;
-    this.defaultLimit = this.instance.options.defaultLimit || 10;  
-
+    this.prevEnabled = typeof this.instance.options.prevLinkEnabled === 'boolean' 
+      ? this.instance.options.prevLinkEnabled : false;
+    this.firstEnabled = typeof this.instance.options.firstLinkEnabled === 'boolean'
+      ? this.instance.options.firstLinkEnabled : false;
+    this.lastEnabled = typeof this.instance.options.lastLinkEnabled === 'boolean'
+      ? this.instance.options.lastLinkEnabled : false;
+    this.defaultLimit = typeof this.instance.options.defaultLimit === 'number'
+      ? this.instance.options.defaultLimit : 10;  
   };
-
-  //this.instance.options
 
   addPaginationLink(rel, href) {
     this.data.links = this.data.links || [];

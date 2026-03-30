@@ -72,8 +72,6 @@ test.describe('Item view - Metadata', () => {
     await expect(fullscreen).toBeEnabled();
   });
 
-  //TODO: Assets. not currently in mock API
-
   test('additional resources links are shown', async ({ page, worker }) => {
 		await api.createServer(worker);
     const item = items[0];
