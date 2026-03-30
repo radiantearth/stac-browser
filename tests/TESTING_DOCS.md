@@ -46,7 +46,7 @@ The default root-uri of the API is set to be `https://stac.example/`. it can be 
 Static catalogs are created similarly:
 
 ```javascript
-import Catalog from '../fixtures/instances/catalog.js';
+import StaticCatalog from '../fixtures/instances/static.js';
 const catalog = new StaticCatalog({ url: 'https://stac.example/catalog.json' });
 const collection = catalog.addCollection({ url: 'https://stac.example/collection.json' });
     
