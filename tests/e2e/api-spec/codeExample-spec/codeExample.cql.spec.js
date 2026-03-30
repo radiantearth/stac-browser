@@ -1,20 +1,10 @@
 import { test, expect } from '../../fixtures.js';
 import API from '../../../fixtures/instances/api.js';
-
-const readClipboard = async (page) => page.evaluate(() => navigator.clipboard.readText());
-const clearClipboard = async (page) => page.evaluate(() => navigator.clipboard.writeText(''));
-const copyCodeFromModal = async (page, panel) => {
-  await clearClipboard(page);
-  await panel.locator('[id="exampleCodeCopyExampleCode"]').click();
-  return expect.poll(async () => readClipboard(page)).not.toEqual('');
-};
-
-const openExampleCodeModal = async (page) => {
-  await page.getByRole('button', { name: /example code/i }).click();
-  const modal = page.getByRole('dialog', { name: /example code/i });
-  await expect(modal, 'Example Code Modal should be visible').toBeVisible();
-  return modal;
-};
+import {
+  openExampleCodeModal,
+  readClipboard,
+  copyCodeFromModal,
+} from '../../helpers.js';
 
 test.describe('STAC Browser code example CQL modal', () => {
   let api;
@@ -23,7 +13,8 @@ test.describe('STAC Browser code example CQL modal', () => {
     api = API.minimalApi({})
       .addCollectionsExtension()
       .addItemsExtension()
-      .addFilterExtension({ methods: ['POST']});
+      .addSearchExtension({ methods: ['POST']})
+      .addFilterExtension();
     api.addQueryablesEndpoint();
     api.root.addConformsTo('http://www.opengis.net/spec/cql2/1.0/conf/cql2-text');
     api.addCollection('test-collection-1', {});
@@ -61,7 +52,8 @@ test.describe('STAC Browser code example CQL modal', () => {
     api = API.minimalApi({})
       .addCollectionsExtension()
       .addItemsExtension()
-      .addFilterExtension({ methods: ['GET']});
+      .addSearchExtension({ methods: ['GET']})
+      .addFilterExtension();
     api.addQueryablesEndpoint();
     api.root.addConformsTo('http://www.opengis.net/spec/cql2/1.0/conf/cql2-json');
     api.addCollection('test-collection-1', {});

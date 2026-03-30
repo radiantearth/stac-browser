@@ -1,34 +1,14 @@
 import { test, expect } from '../../fixtures.js';
 import { readFile } from 'node:fs/promises';
 import API from '../../../fixtures/instances/api.js';
-import { waitForMapReady } from '../../helpers.js';
-
-const openExampleCodeModal = async (page) => {
-  await page.getByRole('button', { name: /example code/i }).click();
-  const modal = page.getByRole('dialog', { name: /example code/i });
-  await expect(modal, 'Example Code Modal should be visible').toBeVisible();
-  return modal;
-};
-
-const readClipboard = async (page) => page.evaluate(() => navigator.clipboard.readText());
-const clearClipboard = async (page) => page.evaluate(() => navigator.clipboard.writeText(''));
-const copyCodeFromModal = async (page, panel) => {
-  await clearClipboard(page);
-  await panel.locator('[id="exampleCodeCopyExampleCode"]').click();
-  return expect.poll(async () => readClipboard(page)).not.toEqual('');
-};
-
-const copyDependenciesFromModal = async (page, panel) => {
-  await clearClipboard(page);
-  await panel.locator('[id="exampleCodeCopyDependencies"]').click();
-  return expect.poll(async () => readClipboard(page)).not.toEqual('');
-};
-
-const copyFilenameFromModal = async (page, panel) => {
-  await clearClipboard(page);
-  await panel.locator('[id="exampleCodeCopyOutputFilename"]').click();
-  return expect.poll(async () => readClipboard(page)).not.toEqual('');
-};
+import {
+  waitForMapReady,
+  openExampleCodeModal,
+  readClipboard,
+  copyCodeFromModal,
+  copyDependenciesFromModal,
+  copyFilenameFromModal,
+} from '../../helpers.js';
 
 test.describe('STAC Browser code example modal', () => {
   let api;

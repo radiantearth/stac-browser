@@ -5,7 +5,6 @@ import ItemCollection from '../builders/itemCollection.js';
 import URI from 'urijs';
 import Item from '../builders/item.js';
 import path from 'path';
-import { get } from 'http';
 
 function joinUrl(base, path) {
   const uri = URI(base);
@@ -91,7 +90,7 @@ export default class API extends Instance {
     return items;
   }
 
-  getItems(options) {
+  getItems() {
     const items = [];
     for (let cid in this.itemCollections){
       items.push(...this.itemCollections[cid].getItems());
@@ -111,9 +110,7 @@ export default class API extends Instance {
     return this.root.addItem(options);
   }
   
-  addOpenApi({
-    excludeServiceDesc = false
-  } = {}) {
+  addOpenApi() {
     this.root.addConformsTo('http://www.opengis.net/spec/ogcapi-features-1/1.0/conf/oas30');
     return this;
   }
@@ -196,14 +193,12 @@ export default class API extends Instance {
           }
         };
       }
-    }
+    };
     this.endpoints.push(queryables);
     
   }
 
-  addCollectionsExtension({
-
-  } = {}) {
+  addCollectionsExtension() {
     if (this.endpoints.some(ep => ep instanceof CollectionCollection)) {
       return this;
     }
@@ -224,9 +219,7 @@ export default class API extends Instance {
     return this;
   }
 
-  addItemsExtension({
-
-  } = {}) {
+  addItemsExtension() {
     if (this.itemCollections) {
       return this;
     }
@@ -244,24 +237,16 @@ export default class API extends Instance {
   addSearchExtension(options = {}) {
     this.addSearchEndpoint(options);
     this.root.addConformsTo("https://api.stacspec.org/v1.0.0/item-search");
+    this.root.addConformsTo("https://api.stacspec.org/v1.0.0/item-search#filter");
     this.root.addConformsTo("https://api.stacspec.org/v1.0.0/item-search#fields");
     this.root.addConformsTo("https://api.stacspec.org/v1.0.0/item-search#query");
     this.root.addConformsTo("https://api.stacspec.org/v1.0.0/item-search#sort");
     return this;
   }
 
-  addFilterExtension(options = {}) {
-    this.addSearchExtension(options);
+  addFilterExtension() {
     this.addQueryablesEndpoint();
     this.root.addConformsTo("http://www.opengis.net/spec/ogcapi-features-3/1.0/conf/filter");
-    this.root.addConformsTo("https://api.stacspec.org/v1.0.0/item-search#filter");
-    return this;
-  }
-
-  addCollectionSearchExtension({
-
-  } = {}) {
-
     return this;
   }
 }

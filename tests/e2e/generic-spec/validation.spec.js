@@ -27,10 +27,10 @@ test.describe('Validation - button visibility', () => {
   let catalog, collection, item;
 
   test.beforeEach(async ({worker }) => {
-    catalog = new StaticCatalog({ url: 'https://stac.example.com/catalog.json' });
-    collection = catalog.addCollection({ url: 'https://stac.example.com/collection.json' })
+    catalog = new StaticCatalog({ url: 'https://stac.example/catalog.json' });
+    collection = catalog.addCollection({ url: 'https://stac.example/collection.json' })
     .setMetadata({ title: 'Validation Test Collection' });
-    item = collection.addItem({ url: 'https://stac.example.com/item.json' })
+    item = collection.addItem({ url: 'https://stac.example/item.json' })
     .setMetadata({ title: 'Validation Test Item' });
 
     await catalog.createServer(worker);
@@ -66,7 +66,7 @@ test.describe('Validation - catalog', () => {
   let catalog;
 
   test.beforeEach(async () => {
-    catalog = new StaticCatalog({ url: 'https://example.com/catalog.json' })
+    catalog = new StaticCatalog({ url: 'https://stac.example/catalog.json' })
       .setMetadata({ title: 'Test Catalog' });
   });
 

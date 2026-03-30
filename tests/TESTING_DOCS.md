@@ -74,12 +74,14 @@ Builders maintain internal JSON (`data`). Calling `.build()` on a STAC object wi
 
 Reusable JSON skeletons stored in `tests/fixtures/templates/`. Each builder type loads a default template:
 
-- `catalog/default.json` – STAC Catalog skeleton
-- `collection/default.json` – STAC Collection skeleton  
-- `item/default.json` – STAC Item skeleton
-- `collectionCollection/default.json` – Collection list response
-- `itemCollection/default.json` – Item collection response
+- `catalog/` – STAC Catalog skeleton
+- `collection/` – STAC Collection skeleton  
+- `item/` – STAC Item skeleton
+- `collectionCollection/` – Collection list response
+- `itemCollection/` – Item collection response
+- `catalogs.json` – STAC index mock for homepage testing
 
+`minimal.json` templates contain only required fields, while `default.json` templates may include additional common optional fields and example data. 
 Templates are loaded once and cloned for each builder instance.
 
 ## Helpers (`helpers.js`)
@@ -93,3 +95,9 @@ HTTP mocking is driven by [playwright-msw](https://github.com/valendres/playwrig
 | `waitForBrowserReady(page)` | Wait for loading indicators to clear |
 | `waitForMapReady(page)` | Wait for the OpenLayers map to render |
 | `waitForSearchPost(page)` | Capture the next `POST /search` request body |
+| `readClipboard(page)` | Read text from system clipboard |
+| `clearClipboard(page)` | Clear the system clipboard |
+| `openExampleCodeModal(page)` | Click "Example Code" button and wait for modal |
+| `copyCodeFromModal(page, panel)` | Copy code snippet from modal panel |
+| `copyDependenciesFromModal(page, panel)` | Copy dependencies from modal panel |
+| `copyFilenameFromModal(page, panel)` | Copy output filename from modal panel |
