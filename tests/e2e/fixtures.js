@@ -6,7 +6,7 @@
  * `worker.use(handler)`.
  *
  * Usage in spec files:
- *   import { test, expect } from './fixtures';
+ *   import { test, expect } from './fixtures.js';
  *   test('...', async ({ page, worker }) => { ... });
  */
 import { test as base, expect } from '@playwright/test';

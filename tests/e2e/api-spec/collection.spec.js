@@ -4,8 +4,8 @@
  * Verifies rendering a STAC collection: metadata fields, spatial extent map,
  * item listing, and detail controls.
  */
-import { test, expect } from '../fixtures';
-import { waitForBrowserReady } from '../helpers';
+import { test, expect } from '../fixtures.js';
+import { waitForBrowserReady } from '../helpers.js';
 import API from '../../fixtures/instances/api.js';
 
 test.describe('Static Collection Metadata', () => {

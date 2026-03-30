@@ -1,4 +1,4 @@
-import STACHypermedia from "./hypermedia";
+import STACHypermedia from "./hypermedia.js";
 
 export default class APICollection extends STACHypermedia {
   constructor(instance, data, url) {

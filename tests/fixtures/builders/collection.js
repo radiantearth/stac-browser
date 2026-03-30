@@ -1,4 +1,4 @@
-import CatalogLike from "./catalogLike";
+import CatalogLike from "./catalogLike.js";
 
 export default class Collection extends CatalogLike {
 

@@ -6,8 +6,8 @@
  *
  * Fixtures: tests/fixtures/catalogs/test-catalog/eo-collection/
  */
-import { test, expect } from '../fixtures';
-import { waitForBrowserReady } from '../helpers';
+import { test, expect } from '../fixtures.js';
+import { waitForBrowserReady } from '../helpers.js';
 import StaticCatalog from '../../fixtures/instances/static.js';
 
 test.describe('Static Collection Metadata', () => {

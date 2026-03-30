@@ -6,8 +6,8 @@
  * Verifies metadata rendering, geometry display, asset listing, and breadcrumb
  * navigation.
  */
-import { test, expect } from '../fixtures';
-import { waitForBrowserReady } from '../helpers';
+import { test, expect } from '../fixtures.js';
+import { waitForBrowserReady } from '../helpers.js';
 import API from '../../fixtures/instances/api.js';
 
 test.describe('Item view - Metadata', () => {

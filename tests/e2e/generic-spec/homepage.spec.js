@@ -6,8 +6,8 @@
  *
  * Fixtures: tests/fixtures/catalogs.json (synthetic STAC Index entries)
  */
-import { test, expect } from '../fixtures';
-import { HOME_PATH, mockStacResource } from '../helpers';
+import { test, expect } from '../fixtures.js';
+import { HOME_PATH, mockStacResource } from '../helpers.js';
 import StaticCatalog from '../../fixtures/instances/static.js';
 
 import catalogs from '../../fixtures/templates/catalogs.json' with { type: 'json' };

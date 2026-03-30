@@ -1,4 +1,4 @@
-import Stac from "./stac";
+import Stac from "./stac.js";
 
 export default class Item extends Stac {
 

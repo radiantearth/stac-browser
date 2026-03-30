@@ -1,5 +1,5 @@
-import APICollection from "./apicollection";
-import Collection from "./collection";
+import APICollection from "./apicollection.js";
+import Collection from "./collection.js";
 
 export default class CollectionCollection extends APICollection {
   constructor(instance, data, url) {

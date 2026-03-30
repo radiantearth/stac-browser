@@ -8,7 +8,7 @@
  * Fixtures: tests/fixtures/api/ (root.json, collections.json, search-empty.json,
  *           search-results.json)
  */
-import { test, expect } from '../fixtures';
+import { test, expect } from '../fixtures.js';
 import API from '../../fixtures/instances/api.js';
 import { waitForBrowserReady, waitForSearchPost, waitForMapReady, waitForBboxInputsPopulated } from '../helpers.js';
 

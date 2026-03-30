@@ -8,8 +8,8 @@
  *
  * Fixtures: tests/fixtures/catalogs/test-catalog/eo-collection/item-2025-001.json
  */
-import { test, expect } from '../fixtures';
-import { waitForBrowserReady } from '../helpers';
+import { test, expect } from '../fixtures.js';
+import { waitForBrowserReady } from '../helpers.js';
 import StaticCatalog from '../../fixtures/instances/static.js';
 
 test.describe('Item view - Metadata', () => {
