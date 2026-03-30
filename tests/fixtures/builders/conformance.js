@@ -1,4 +1,5 @@
 import STACObject from "./object.js";
+import URI from 'urijs';
 
 export default class Conformance extends STACObject {
   constructor(instance) {
@@ -9,8 +10,8 @@ export default class Conformance extends STACObject {
   }
 
   getAbsoluteUrl() {
-    const url = URL.parse(this.url, this.instance.root.getAbsoluteUrl());
-    return url.toString();
+    const absoluteUrl = URI(this.url, this.instance.root.getAbsoluteUrl());
+    return absoluteUrl.toString();
   }
 
   build() {

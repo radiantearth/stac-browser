@@ -106,7 +106,7 @@ test.describe('Item view - Geometry', () => {
 
     const thumbTab = page.getByRole('tab', { name: /thumbnails/i });
     await thumbTab.click();
-    waitForBrowserReady(page);
+    await waitForBrowserReady(page);
 
     await expect(page.getByRole('tabpanel', { name: /thumbnails/i })).toBeVisible();
 

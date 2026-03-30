@@ -21,10 +21,10 @@ export default class Stac extends STACHypermedia {
   }
 
   addItem(options) {
-    const catalog = this.instance.createItem(options);
-    catalog.addParentLink(this);
-    this.addItemLink(catalog);
-    return catalog;
+    const item = this.instance.createItem(options);
+    item.addParentLink(this);
+    this.addItemLink(item);
+    return item;
   }
 
   addExtensions(extensions) {

@@ -22,7 +22,7 @@ export default class ItemCollection extends APICollection {
     for (let i = 0; i < count; i++) {
       const id = `example-item-${i}`;
       const title = `Example Item ${i}`;
-      const item = this.instance.createStac({url: `/collections/${parent.id}/items/${id}`, type: Item});
+      const item = this.instance.createStac({url: `/collections/${parent.data.id}/items/${id}`, type: Item});
       item.setMetadata({ id, title });
       this.addItem(item);
       if (parent !== null) {

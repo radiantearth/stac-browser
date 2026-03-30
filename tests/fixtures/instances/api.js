@@ -78,14 +78,10 @@ export default class API extends Instance {
 
     for (let i = 0; i < count; i++) {
       const id = `example-item-${i}`;
-      const title = `Example Item ${i}`;
       const itemOptions = { url: `/collections/${cid}/items/${id}`};
-      const item = this.createStac({url: itemOptions.url, type: Item});
-      item.setMetadata({ id, title });
-      items.push(this.addItem(collection, id, itemOptions));
-      if (collection !== null) {
-        item.addParentLink(collection);
-      }
+      const item = this.addItem(collection, id, itemOptions);
+      item.addParentLink(collection);
+      items.push(item);
     }
     return items;
   }
@@ -135,22 +131,12 @@ export default class API extends Instance {
     // TODO: check if search endpoint already exists
     this.root.addSearchLink(methods);
     
-    if (methods.includes('GET')) {
-      const searchGET = this.createStac({
-      url: 'search',
-      type: ItemCollection
-      });
-      this.endpoints.push(searchGET);
-    }
-    
-    if (methods.includes('POST')) {
-      const searchPOST = this.createStac({
+    for (const method of methods) {
+      this.createStac({
         url: 'search',
         type: ItemCollection
-      }).setMethod('POST');
-      this.endpoints.push(searchPOST);
+      }).setMethod(method);
     }
-    
 
     return this;
   }
@@ -195,7 +181,8 @@ export default class API extends Instance {
       }
     };
     this.endpoints.push(queryables);
-    
+
+    return this;
   }
 
   addCollectionsExtension() {

@@ -86,6 +86,7 @@ export default class Instance {
               return HttpResponse.json(obj);
             } catch (e) {
               console.log(e);
+              return HttpResponse.json({ error: 'Failed to build response' }, { status: 500 });
             }
           }));
         }
@@ -99,12 +100,13 @@ export default class Instance {
               return HttpResponse.json(obj);
             } catch (e) {
               console.log(e);
+              return HttpResponse.json({ error: 'Failed to build response' }, { status: 500 });
             }
           }));
         } 
         //TODO: more methods as needed
         else {
-          throw "Invalid Method";
+          throw new Error(`Unsupported method ${method} for endpoint ${url}`);
         }
         
       } catch (e) {

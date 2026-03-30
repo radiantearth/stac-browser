@@ -4,8 +4,12 @@ export default class APICollection extends STACHypermedia {
   constructor(instance, data, url) {
     super(instance, data, url);
 
-    this.method = this.instance.options.method in ['GET', 'POST', 'PUT', 'DELETE'] 
-      ? this.instance.options.method : 'GET';
+    const configuredMethod = typeof this.instance.options.method === 'string'
+      ? this.instance.options.method.toUpperCase()
+      : 'GET';
+    this.method = ['GET', 'POST', 'PUT', 'DELETE'].includes(configuredMethod)
+      ? configuredMethod
+      : 'GET';
     
     //default to false if not set
     this.prevEnabled = typeof this.instance.options.prevLinkEnabled === 'boolean' 

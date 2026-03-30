@@ -90,7 +90,7 @@ HTTP mocking is driven by [playwright-msw](https://github.com/valendres/playwrig
 
 | Function | Purpose |
 |---|---|
-| `mockStacResource(page, url, data)` | Mock a single URL |
+| `mockStacResource(worker, url, mockData, options)` | Mock a single URL |
 | `mockStacError(page, url, status)` | Mock an error response |
 | `waitForBrowserReady(page)` | Wait for loading indicators to clear |
 | `waitForMapReady(page)` | Wait for the OpenLayers map to render |
