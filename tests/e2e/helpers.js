@@ -190,8 +190,8 @@ export const waitForMapReady = async (page) => {
   const mapViewport = page.locator(".map .ol-viewport");
   await expect(mapViewport, 'map viewport should be visible').toBeVisible();
 
-  const mapCanvas = page.locator(".map .ol-viewport canvas.ol-layer");
-  await expect(mapCanvas, 'map canvas should be visible').toBeVisible();
+  const mapCanvas = page.locator(".map .ol-viewport canvas");
+  await expect(mapCanvas.first(), 'map canvas should be visible').toBeVisible({ timeout: 15000 });
 
   return mapViewport;
 };

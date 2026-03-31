@@ -1,5 +1,6 @@
 import i18n from '../i18n';
 import { hasText, isObject } from 'stac-js/src/utils.js';
+import { AUTH_TYPE_VRIFY_JWT } from './constants.js';
 
 export default class Auth {
 
@@ -128,6 +129,10 @@ export default class Auth {
       else if (config.type === 'openIdConnect') {
         const OIDC = (await import('./oidc')).default;
         method = new OIDC(router, config, changeListener);
+      }
+      else if (config.type === AUTH_TYPE_VRIFY_JWT) {
+        const VrifyJWT = (await import('./vrifyJwt')).default;
+        method = new VrifyJWT(router, config, changeListener);
       }
     }
     await method.init();

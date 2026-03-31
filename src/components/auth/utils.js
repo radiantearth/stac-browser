@@ -1,6 +1,7 @@
 import { isObject, size } from 'stac-js/src/utils.js';
 import { STACReference } from 'stac-js';
 import Auth from '../../auth/index.js';
+import { AUTH_TYPE_VRIFY_JWT } from '../../auth/constants.js';
 
 export default class AuthUtils {
 
@@ -27,6 +28,7 @@ export default class AuthUtils {
       case 'apiKey':
         return (method.in === 'header' || method.in === 'query');
       case 'openIdConnect':
+      case AUTH_TYPE_VRIFY_JWT:
         return (config.historyMode === 'history');
       default:
         return false;

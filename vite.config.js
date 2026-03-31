@@ -3,6 +3,7 @@ import vue from "@vitejs/plugin-vue";
 import { fileURLToPath, pathToFileURL, URL } from "node:url";
 import { accessSync, readFileSync } from "fs";
 import { resolve } from "node:path";
+import { AUTH_TYPE_VRIFY_JWT, VRIFY_AUTH_PATH, VRIFY_AUTH_REFRESH_PATH } from "./src/auth/constants.js";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
 
 import Icons from "unplugin-icons/vite";
@@ -71,11 +72,30 @@ const resolveExternalConfigPath = (configFile) => {
   return configPath;
 };
 
+/**
+ * Derives SB_authConfig from API_ENDPOINT so env files don't need a JSON blob.
+ * Only applies when API_ENDPOINT is set and SB_authConfig is not already defined.
+ */
+const synthesizeAuthConfig = (rawEnv) => {
+  if (!rawEnv.API_ENDPOINT || rawEnv.SB_authConfig) return;
+  
+  const base = rawEnv.API_ENDPOINT.replace(/\/$/, '');
+  rawEnv.SB_authConfig = JSON.stringify({
+    type: AUTH_TYPE_VRIFY_JWT,
+    loginUrl: `${base}${VRIFY_AUTH_PATH}`,
+    refreshUrl: `${base}${VRIFY_AUTH_REFRESH_PATH}`,
+  });
+};
+
 export default defineConfig(async ({ mode }) => {
   const rawEnv = {
-    ...loadEnv(mode, process.cwd(), ""),
-    ...process.env,
+    ...loadEnv(mode, resolve(process.cwd(), '.envs'), ""), // .envs/.env.{mode}
+    ...loadEnv(mode, process.cwd(), ""),                   // .env.{mode} overrides
+    ...process.env,                                         // CI/CD env vars win
   };
+
+  synthesizeAuthConfig(rawEnv);
+
   const env = parseEnvConfig(rawEnv);
   const externalConfigPath = resolveExternalConfigPath(rawEnv.SB_CONFIG);
   const defaultConfig = (await import(pathToFileURL(defaultConfigPath).href)).default ?? {};
