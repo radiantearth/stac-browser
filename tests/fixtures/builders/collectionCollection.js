@@ -48,10 +48,10 @@ export default class CollectionCollection extends APICollection {
   
   build() {
     const data = super.build();
-    try {
-      data.collections = data.collections.map(c => c.build());
-    } catch {
-      //continue in case collections are already built
+    for(let collection in data.collections){
+      if(data.collections[collection] instanceof Collection){
+        data.collections[collection] = data.collections[collection].build();
+      }
     }
     return data;
   }
