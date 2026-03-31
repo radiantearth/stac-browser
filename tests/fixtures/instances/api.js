@@ -1,16 +1,10 @@
 import Instance from './instance.js';
 import CollectionCollection from '../builders/collectionCollection.js';
 import Conformance from '../builders/conformance.js';
+import Queryables from '../builders/queryables.js';
 import ItemCollection from '../builders/itemCollection.js';
-import URI from 'urijs';
 import Item from '../builders/item.js';
 import path from 'path';
-
-function joinUrl(base, path) {
-  const uri = URI(base);
-  uri.pathname(URI.joinPaths(uri.pathname(), path));
-  return uri.toString();
-}
 
 export default class API extends Instance {
   constructor(rootOptions = {}, options = {}) {
@@ -142,45 +136,22 @@ export default class API extends Instance {
   }
   
   addQueryablesEndpoint() {
-    //barebones queryables fixture
-    
     //check if queryables endpoint already exists
-    if (this.endpoints.some(ep => ep.url === 'queryables')) {
+    if (this.endpoints.some(ep => ep instanceof Queryables)) {
       return this;
     }
     
     // GET /queryables
+    const queryables = new Queryables(this);
+    this.endpoints.push(queryables);
+    
     this.root.addLink(
       { 
         rel: 'queryables', 
-        href: joinUrl(this.root.getAbsoluteUrl(), 'queryables'), 
+        href: queryables.getAbsoluteUrl(), 
         type: 'application/schema+json' 
       }
     );
-    
-    const queryables = {
-      api: this,
-      getMethod() {
-        return 'GET';
-      },
-      url: 'queryables',
-      getAbsoluteUrl() {
-        return joinUrl(this.api.root.getAbsoluteUrl(), this.url);
-      },
-      build: () => {
-        return {
-          $schema: 'https://json-schema.org/draft/2020-12/schema',
-          type: 'object',
-          properties: {
-            id: {
-              type: 'string',
-              title: 'Identifier'
-            }
-          }
-        };
-      }
-    };
-    this.endpoints.push(queryables);
     
     return this;
   }
