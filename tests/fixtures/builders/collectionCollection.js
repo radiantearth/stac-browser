@@ -5,7 +5,7 @@ export default class CollectionCollection extends APICollection {
   constructor(instance, data, url) {
     super(instance, data, url);
   }
-
+  
   addNewCollection(collection) {
     this.data.collections = this.data.collections || [];
     this.data.collections.push(collection);
@@ -17,7 +17,7 @@ export default class CollectionCollection extends APICollection {
     }
     return this;
   }
-
+  
   addManyCollections(count, parent = null) {
     for (let i = 0; i < count; i++) {
       const id = `example-${i}`;
@@ -31,21 +31,21 @@ export default class CollectionCollection extends APICollection {
     }
     return this;
   }
-
+  
   removeCollectionById(id) {
     if (this.data.collections) {
       this.data.collections = this.data.collections.filter(col => col.id !== id);
     }
     return this;
   }
-
+  
   updateCollectionById(id, newCollection) {
     if (this.data.collections) {
       this.data.collections = this.data.collections.map(col => col.id === id ? newCollection : col);
     }
     return this;
   }
-
+  
   build() {
     const data = super.build();
     try {

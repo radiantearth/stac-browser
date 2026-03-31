@@ -5,7 +5,7 @@ export default class ItemCollection extends APICollection {
   constructor(instance, data, url) {
     super(instance, data, url);
   }
-
+  
   addItem(item) {
     this.data.features = this.data.features || [];
     this.data.features.push(item);
@@ -17,7 +17,7 @@ export default class ItemCollection extends APICollection {
     }
     return this;
   }
-
+  
   addManyItems(count, parent = null) {
     for (let i = 0; i < count; i++) {
       const id = `example-item-${i}`;
@@ -31,7 +31,7 @@ export default class ItemCollection extends APICollection {
     }
     return this;
   }
-
+  
   getItems(){
     return this.data.features;
   } 
@@ -42,17 +42,17 @@ export default class ItemCollection extends APICollection {
     }
     return this;
   }
-
+  
   updateItemById(id, newItem) {
     if (this.data.features) {
       this.data.features = this.data.features.map(feature => feature.id === id ? newItem : feature);
     }
     return this;
   }
-
+  
   build(searchParams = { limit: 10, page: 1 }) {
     const data = super.build();
-
+    
     data.features = this.instance.getItems();
     this.paginateData('features', searchParams);
     

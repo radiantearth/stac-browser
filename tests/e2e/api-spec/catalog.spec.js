@@ -96,7 +96,7 @@ test.describe('API Catalog - Children', () => {
     collection.setMetadata({ title: 'Test Collection' });
     api.addItem(collection, 'my-item');
   });
-
+  
   test('renders child collection as link', async ({ page, worker }) => {
     await api.createServer(worker);
     

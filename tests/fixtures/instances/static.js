@@ -5,19 +5,19 @@ export default class StaticCatalog extends Instance {
     super(options);
     this.root = this.createStac(rootOptions);
   }
-
+  
   addCatalog(options) {
     return this.root.addCatalog(options);
   }
-
+  
   addCollection(options) {
     return this.root.addCollection(options);
   }
-
+  
   addItem(options) {
     return this.root.addItem(options);
   }
-
+  
   setMetadata(metadata) {
     this.root.setMetadata(metadata);
     return this;

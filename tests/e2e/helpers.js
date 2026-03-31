@@ -1,13 +1,13 @@
 /**
- * E2E test helpers for STAC Browser.
- *
- * All HTTP mocking is driven by **MSW (Mock Service Worker)** handlers.
- * Handler-building functions return arrays of MSW `http.*` request handlers.
- * Mocking helpers accept a `worker` fixture (from playwright-msw) and call
- * `worker.use()` to install handlers for the current test.
- *
- * Navigation / assertion helpers still accept a Playwright `page` object.
- */
+* E2E test helpers for STAC Browser.
+*
+* All HTTP mocking is driven by **MSW (Mock Service Worker)** handlers.
+* Handler-building functions return arrays of MSW `http.*` request handlers.
+* Mocking helpers accept a `worker` fixture (from playwright-msw) and call
+* `worker.use()` to install handlers for the current test.
+*
+* Navigation / assertion helpers still accept a Playwright `page` object.
+*/
 
 import { expect } from '@playwright/test';
 import { http, HttpResponse } from 'msw';
@@ -17,17 +17,17 @@ import { http, HttpResponse } from 'msw';
 export const HOME_PATH = '/';
 
 /**
- * Register a mock STAC resource response via MSW.
- * Mocks a successful JSON response with the provided data.
- * Used for homepage.spec.js tests to mock the STAC Index.
- * 
- * @param {import('playwright-msw').MockServiceWorker} worker
- * @param {string} url – exact URL to intercept
- * @param {object} mockData – the JSON data to return in the response
- * @param {object} [options] – additional options for the mock response
- * @param {number} [options.status=200] – HTTP status code for the response
- * @param {number} [options.delay=0] – artificial delay in milliseconds before responding
- */
+* Register a mock STAC resource response via MSW.
+* Mocks a successful JSON response with the provided data.
+* Used for homepage.spec.js tests to mock the STAC Index.
+* 
+* @param {import('playwright-msw').MockServiceWorker} worker
+* @param {string} url – exact URL to intercept
+* @param {object} mockData – the JSON data to return in the response
+* @param {object} [options] – additional options for the mock response
+* @param {number} [options.status=200] – HTTP status code for the response
+* @param {number} [options.delay=0] – artificial delay in milliseconds before responding
+*/
 export async function mockStacResource(worker, url, mockData, options = {}) {
   const status = options.status ?? 200;
   const delay = options.delay ?? 0;
@@ -42,13 +42,13 @@ export async function mockStacResource(worker, url, mockData, options = {}) {
 }
 
 /**
- * Register an error response for a URL via MSW.
- *
- * @param {import('playwright-msw').MockServiceWorker} worker
- * @param {string} url – exact URL to intercept
- * @param {number} [status=404]
- * @param {string} [message='Not Found']
- */
+* Register an error response for a URL via MSW.
+*
+* @param {import('playwright-msw').MockServiceWorker} worker
+* @param {string} url – exact URL to intercept
+* @param {number} [status=404]
+* @param {string} [message='Not Found']
+*/
 export async function mockStacError(worker, url, status = 404, message = 'Not Found') {
   await worker.use(
     http.all(url, () => {
@@ -63,10 +63,10 @@ export async function mockStacError(worker, url, status = 404, message = 'Not Fo
 // ─── Page interaction Helpers ──────────────────────────────────────────────
 
 /**
- * Wait for STAC Browser to finish loading.
- * 
- * @param {import('@playwright/test').Page} page
- */
+* Wait for STAC Browser to finish loading.
+* 
+* @param {import('@playwright/test').Page} page
+*/
 export async function waitForBrowserReady(page) {
   await page.waitForSelector('.loading', { state: 'hidden', timeout: 10000 }).catch(() => {
     // Loading indicator might not appear for fast loads
@@ -75,14 +75,14 @@ export async function waitForBrowserReady(page) {
 }
 
 /**
- * Wait for the OpenLayers map to be interactive and fully initialized on the search page.
- * This ensures the map has not only attached but also rendered its base layers,
- * controls, and extent interaction.
- * Returns the map container locator for clicking.
- * 
- * @param {import('@playwright/test').Page} page
- * @returns {import('@playwright/test').Locator} mapContainer – Locator for the map container element
- */
+* Wait for the OpenLayers map to be interactive and fully initialized on the search page.
+* This ensures the map has not only attached but also rendered its base layers,
+* controls, and extent interaction.
+* Returns the map container locator for clicking.
+* 
+* @param {import('@playwright/test').Page} page
+* @returns {import('@playwright/test').Locator} mapContainer – Locator for the map container element
+*/
 export async function waitForMapReady(page) {
   const mapContainer = page.locator('.map-container .map');
   await mapContainer.waitFor({ state: 'visible', timeout: 10000 });
@@ -97,11 +97,11 @@ export async function waitForMapReady(page) {
 }
 
 /**
- * Wait until the bounding-box coordinate inputs have been auto-populated
- * (i.e. all four fields are non-empty).
- * 
- * @param {import('@playwright/test').Page} page
- */
+* Wait until the bounding-box coordinate inputs have been auto-populated
+* (i.e. all four fields are non-empty).
+* 
+* @param {import('@playwright/test').Page} page
+*/
 export async function waitForBboxInputsPopulated(page) {
   const labels = [/west longitude/i, /south latitude/i, /east longitude/i, /north latitude/i];
   for (const label of labels) {
@@ -111,16 +111,16 @@ export async function waitForBboxInputsPopulated(page) {
 }
 
 /**
- * Wait for the next POST /search request and return its parsed body.
- * Call this *before* the action that triggers the search.
- *
- * Uses `page.waitForRequest` which fires at the CDP level — it sees the
- * request even when MSW's service worker intercepts it before the network.
- * @see https://playwright.dev/docs/network#wait-for-network-requests
- * 
- * @param {import('@playwright/test').Page} page
- * @returns {Promise<{ body: object, url: string }>} The parsed request body and URL
- */
+* Wait for the next POST /search request and return its parsed body.
+* Call this *before* the action that triggers the search.
+*
+* Uses `page.waitForRequest` which fires at the CDP level — it sees the
+* request even when MSW's service worker intercepts it before the network.
+* @see https://playwright.dev/docs/network#wait-for-network-requests
+* 
+* @param {import('@playwright/test').Page} page
+* @returns {Promise<{ body: object, url: string }>} The parsed request body and URL
+*/
 export async function waitForSearchPost(page) {
   const request = await page.waitForRequest(
     req => req.method() === 'POST' && req.url().includes('/search'),
@@ -129,17 +129,17 @@ export async function waitForSearchPost(page) {
 }
 
 /**
- * Click the Source toolbar button and wait for the panel to appear.
- * Returns the panel locator so callers can run further assertions on it.
- * 
- * @param {import('@playwright/test').Page} page
- * @returns {import('@playwright/test').Locator} sourcePanel – Locator for the source panel element
- */
+* Click the Source toolbar button and wait for the panel to appear.
+* Returns the panel locator so callers can run further assertions on it.
+* 
+* @param {import('@playwright/test').Page} page
+* @returns {import('@playwright/test').Locator} sourcePanel – Locator for the source panel element
+*/
 export async function openSourcePanel(page) {
   const sourceButton = page.getByRole('button', { name: /source/i });
   await expect(sourceButton).toBeVisible();
   await sourceButton.click();
-
+  
   // The source panel/popover should appear after the click.
   const sourcePanel = page.locator('#popover-link');
   await expect(sourcePanel).toBeVisible();
@@ -149,28 +149,28 @@ export async function openSourcePanel(page) {
 // ─── Example Code Modal Helpers ──────────────────────────────────────────────
 
 /**
- * Read text from system clipboard.
- *
- * @param {import('@playwright/test').Page} page
- * @returns {Promise<string>} clipboard content
- */
+* Read text from system clipboard.
+*
+* @param {import('@playwright/test').Page} page
+* @returns {Promise<string>} clipboard content
+*/
 export const readClipboard = async (page) => page.evaluate(() => navigator.clipboard.readText());
 
 /**
- * Clear system clipboard.
- *
- * @param {import('@playwright/test').Page} page
- * @returns {Promise<void>}
- */
+* Clear system clipboard.
+*
+* @param {import('@playwright/test').Page} page
+* @returns {Promise<void>}
+*/
 export const clearClipboard = async (page) => page.evaluate(() => navigator.clipboard.writeText(''));
 
 /**
- * Click the "Example Code" button and wait for the modal to appear.
- * Returns the modal locator for subsequent interactions.
- *
- * @param {import('@playwright/test').Page} page
- * @returns {Promise<import('@playwright/test').Locator>} modal – Locator for the Example Code modal
- */
+* Click the "Example Code" button and wait for the modal to appear.
+* Returns the modal locator for subsequent interactions.
+*
+* @param {import('@playwright/test').Page} page
+* @returns {Promise<import('@playwright/test').Locator>} modal – Locator for the Example Code modal
+*/
 export const openExampleCodeModal = async (page) => {
   await page.getByRole('button', { name: /example code/i }).click();
   const modal = page.getByRole('dialog', { name: /example code/i });
@@ -179,13 +179,13 @@ export const openExampleCodeModal = async (page) => {
 };
 
 /**
- * Copy code from an Example Code modal panel.
- * Clears clipboard, clicks the copy button, and polls until clipboard is populated.
- *
- * @param {import('@playwright/test').Page} page
- * @param {import('@playwright/test').Locator} panel – The tabpanel locator (e.g. Python, JavaScript)
- * @returns {Promise<string>} clipboard content after copy
- */
+* Copy code from an Example Code modal panel.
+* Clears clipboard, clicks the copy button, and polls until clipboard is populated.
+*
+* @param {import('@playwright/test').Page} page
+* @param {import('@playwright/test').Locator} panel – The tabpanel locator (e.g. Python, JavaScript)
+* @returns {Promise<string>} clipboard content after copy
+*/
 export const copyCodeFromModal = async (page, panel) => {
   await clearClipboard(page);
   await panel.locator('[id="exampleCodeCopyExampleCode"]').click();
@@ -193,13 +193,13 @@ export const copyCodeFromModal = async (page, panel) => {
 };
 
 /**
- * Copy dependencies from an Example Code modal panel.
- * Clears clipboard, clicks the copy button, and polls until clipboard is populated.
- *
- * @param {import('@playwright/test').Page} page
- * @param {import('@playwright/test').Locator} panel – The tabpanel locator (e.g. Python, JavaScript)
- * @returns {Promise<string>} clipboard content after copy
- */
+* Copy dependencies from an Example Code modal panel.
+* Clears clipboard, clicks the copy button, and polls until clipboard is populated.
+*
+* @param {import('@playwright/test').Page} page
+* @param {import('@playwright/test').Locator} panel – The tabpanel locator (e.g. Python, JavaScript)
+* @returns {Promise<string>} clipboard content after copy
+*/
 export const copyDependenciesFromModal = async (page, panel) => {
   await clearClipboard(page);
   await panel.locator('[id="exampleCodeCopyDependencies"]').click();
@@ -207,13 +207,13 @@ export const copyDependenciesFromModal = async (page, panel) => {
 };
 
 /**
- * Copy output filename from an Example Code modal panel.
- * Clears clipboard, clicks the copy button, and polls until clipboard is populated.
- *
- * @param {import('@playwright/test').Page} page
- * @param {import('@playwright/test').Locator} panel – The tabpanel locator (e.g. Python, JavaScript)
- * @returns {Promise<string>} clipboard content after copy
- */
+* Copy output filename from an Example Code modal panel.
+* Clears clipboard, clicks the copy button, and polls until clipboard is populated.
+*
+* @param {import('@playwright/test').Page} page
+* @param {import('@playwright/test').Locator} panel – The tabpanel locator (e.g. Python, JavaScript)
+* @returns {Promise<string>} clipboard content after copy
+*/
 export const copyFilenameFromModal = async (page, panel) => {
   await clearClipboard(page);
   await panel.locator('[id="exampleCodeCopyOutputFilename"]').click();

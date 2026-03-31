@@ -15,7 +15,7 @@ export default class Instance {
     this.endpoints = [];
     this.templateCache = {};
   }
-
+  
   _loadTemplate(type, name = 'default') {
     if (typeof type === 'function') {
       // Convert the class names of the builders to match the template folder names
@@ -30,28 +30,28 @@ export default class Instance {
     }
     return structuredClone(template);
   }
-
+  
   createCatalog({
     url,
     template = 'default'
   } = {}) {
     return this.createStac({ url, type: Catalog, template });
   }
-
+  
   createCollection({
     url,
     template = 'default'
   } = {}) {
     return this.createStac({ url, type: Collection, template });
   }
-
+  
   createItem({
     url,
     template = 'default'
   } = {}) {
     return this.createStac({ url, type: Item, template });
   }
-
+  
   createStac({
     url,
     type = Catalog,
@@ -65,16 +65,16 @@ export default class Instance {
     this.endpoints.push(obj);
     return obj;
   }
-
+  
   async createServer(worker, options = { reset: true, verbose: false }) {
     const handlers = [];
-
+    
     for (const endpoint of this.endpoints) {
       try {
         const url = endpoint.getAbsoluteUrl();
         const method = endpoint.getMethod();
         options.verbose && console.log(`Adding endpoint ${method} ${url}`);
-
+        
         //GET
         if(method === 'GET'){
           handlers.push(http.get(url, ({request}) => {
@@ -113,13 +113,13 @@ export default class Instance {
         console.log(`failed to add handler for ${endpoint.getAbsoluteUrl()}. Reason:`, e);
       }
     }
-
+    
     if (options.reset) {
       await worker.resetHandlers();
     }
-
+    
     try {
-    await worker.use(...handlers);
+      await worker.use(...handlers);
     } catch (e) {
       options.verbose && console.log(`Endpoints added. Passing handlers to worker`);
       console.log(`Worker failed to use handlers:`, e);

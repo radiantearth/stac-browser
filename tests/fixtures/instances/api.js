@@ -19,19 +19,19 @@ export default class API extends Instance {
     rootOptions.template = rootOptions.template || 'api-root';
     this.root = this.createStac(rootOptions);
   }
-
+  
   static minimalApi(rootOptions, options) {
     return (new API(rootOptions, options))
       .addOpenApi();
   }
-
+  
   static defaultApi(rootOptions = {}, options = {}) {
     return API.minimalApi(rootOptions, options)
       .addCollectionsExtension()
       .addItemsExtension()
       .addSearchExtension();
   }
-
+  
   static fullApi(rootOptions = {}, options = {}) {
     return API.defaultApi(rootOptions, options)
       .addCollectionSearchExtension();
@@ -41,12 +41,12 @@ export default class API extends Instance {
     this.addCollectionsExtension();
     options.url = `collections/${id}`;
     const collection = this.createCollection(options).setMetadata({id});
-  
+    
     this.collections.addNewCollection(collection);
-
+    
     return collection;
   }
-
+  
   addItem(collection, id, options = {}) {
     this.addItemsExtension();
     const cid = collection.data.id;
@@ -67,15 +67,15 @@ export default class API extends Instance {
     });
     
     items.addItem(item.build());
-
+    
     return item;
   }
-
+  
   addManyItems(collection, count){
     this.addItemsExtension();
     const cid = collection.data.id;
     const items = [];
-
+    
     for (let i = 0; i < count; i++) {
       const id = `example-item-${i}`;
       const itemOptions = { url: `/collections/${cid}/items/${id}`};
@@ -85,7 +85,7 @@ export default class API extends Instance {
     }
     return items;
   }
-
+  
   getItems() {
     const items = [];
     for (let cid in this.itemCollections){
@@ -93,15 +93,15 @@ export default class API extends Instance {
     }
     return items;
   }
-
+  
   addStaticCatalog(options = {}) {
     return this.root.addCatalog(options);
   }
-
+  
   addStaticCollection(options = {}) {
     return this.root.addCollection(options);
   }
-
+  
   addStaticItem(options) {
     return this.root.addItem(options);
   }
@@ -110,23 +110,23 @@ export default class API extends Instance {
     this.root.addConformsTo('http://www.opengis.net/spec/ogcapi-features-1/1.0/conf/oas30');
     return this;
   }
-
+  
   addConformanceEndpoint() {
     // check if conformance endpoint already exists    
     if (this.endpoints.some(ep => ep instanceof Conformance)) {
       return this;
     }
-
+    
     // GET /
     this.root.addLink({ href: 'conformance', rel: 'conformance', type: 'application/json' }); // Todo: how to define the href? absolute? relative? ...
-
+    
     // GET /conformance
     const conformance = new Conformance(this);
     this.endpoints.push(conformance);
-
+    
     return this;
   }
-
+  
   addSearchEndpoint({methods = ['GET', 'POST']} = {}) {
     // TODO: check if search endpoint already exists
     this.root.addSearchLink(methods);
@@ -137,18 +137,18 @@ export default class API extends Instance {
         type: ItemCollection
       }).setMethod(method);
     }
-
+    
     return this;
   }
-
+  
   addQueryablesEndpoint() {
     //barebones queryables fixture
-
+    
     //check if queryables endpoint already exists
     if (this.endpoints.some(ep => ep.url === 'queryables')) {
       return this;
     }
-
+    
     // GET /queryables
     this.root.addLink(
       { 
@@ -157,7 +157,7 @@ export default class API extends Instance {
         type: 'application/schema+json' 
       }
     );
-
+    
     const queryables = {
       api: this,
       getMethod() {
@@ -181,10 +181,10 @@ export default class API extends Instance {
       }
     };
     this.endpoints.push(queryables);
-
+    
     return this;
   }
-
+  
   addCollectionsExtension() {
     if (this.endpoints.some(ep => ep instanceof CollectionCollection)) {
       return this;
@@ -192,20 +192,20 @@ export default class API extends Instance {
     if (this.collections) {
       return this;
     }
-
+    
     // GET /collections
     this.collections = this.createStac({url: `collections`, type: CollectionCollection});
-
+    
     // GET /
     this.addConformanceEndpoint();
     this.root.addConformsTo('https://api.stacspec.org/v1.0.0/collections');
     this.root.addLink({ href: this.collections.getAbsoluteUrl(), rel: 'data', type: 'application/json' }); // Todo: how to define the href? absolute? relative? ...
-
+    
     // todo: pagination
-
+    
     return this;
   }
-
+  
   addItemsExtension() {
     if (this.itemCollections) {
       return this;
@@ -215,12 +215,12 @@ export default class API extends Instance {
     this.root.addConformsTo('http://www.opengis.net/spec/ogcapi-features-1/1.0/conf/core');
     this.root.addConformsTo('http://www.opengis.net/spec/ogcapi-features-1/1.0/conf/geojson');
     this.root.addConformsTo('https://api.stacspec.org/v1.0.0/ogcapi-features');
-
+    
     this.itemCollections = {}; // keys = collection ID, values = ItemCollection objects
     
     return this;
   }
-
+  
   addSearchExtension(options = {}) {
     this.addSearchEndpoint(options);
     this.root.addConformsTo("https://api.stacspec.org/v1.0.0/item-search");
@@ -230,7 +230,7 @@ export default class API extends Instance {
     this.root.addConformsTo("https://api.stacspec.org/v1.0.0/item-search#sort");
     return this;
   }
-
+  
   addFilterExtension() {
     this.addQueryablesEndpoint();
     this.root.addConformsTo("http://www.opengis.net/spec/ogcapi-features-3/1.0/conf/filter");
