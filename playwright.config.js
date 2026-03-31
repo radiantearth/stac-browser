@@ -48,7 +48,7 @@ export default defineConfig({
     permissions: ['clipboard-read', 'clipboard-write'],
 
     /* Keep UI language deterministic for i18n-based selectors */
-    locale: 'en-US',
+    locale: 'en',
     
     /* Screenshot on failure */
     screenshot: 'only-on-failure',

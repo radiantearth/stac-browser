@@ -16,7 +16,7 @@ test.describe('Static Collection Metadata', () => {
 
   test.beforeEach(async () => {
     api = API.minimalApi();
-    collection = api.addCollection('collection', {})
+    collection = api.addCollection('collection')
       .setMetadata({ title, description });
     api.addManyItems(collection, 3);
   });
@@ -104,7 +104,7 @@ test.describe('STAC Collection item search', () => {
         firstLinkEnabled: true,
         lastLinkEnabled: true
       });
-    collection = api.addCollection('collection1', {})
+    collection = api.addCollection('collection1')
       .setMetadata({ title: 'Test Collection' });
     api.addManyItems(collection, 10);
     api.addCollectionsExtension()

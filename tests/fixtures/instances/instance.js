@@ -9,7 +9,7 @@ import Item from '../builders/item.js';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default class Instance {
-  constructor(options) {
+  constructor(options = {}) {
     this.root = null;
     this.options = options;
     this.endpoints = [];

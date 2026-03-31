@@ -25,19 +25,19 @@ export default class API extends Instance {
       .addOpenApi();
   }
 
-  static defaultApi(rootOptions, options) {
+  static defaultApi(rootOptions = {}, options = {}) {
     return API.minimalApi(rootOptions, options)
       .addCollectionsExtension()
       .addItemsExtension()
       .addSearchExtension();
   }
 
-  static fullApi(rootOptions, options) {
+  static fullApi(rootOptions = {}, options = {}) {
     return API.defaultApi(rootOptions, options)
       .addCollectionSearchExtension();
   }
   
-  addCollection(id, options) {
+  addCollection(id, options = {}) {
     this.addCollectionsExtension();
     options.url = `collections/${id}`;
     const collection = this.createCollection(options).setMetadata({id});
@@ -47,7 +47,7 @@ export default class API extends Instance {
     return collection;
   }
 
-  addItem(collection, id, options) {
+  addItem(collection, id, options = {}) {
     this.addItemsExtension();
     const cid = collection.data.id;
     options.url = options.url || `collections/${cid}/items/${id}`;
@@ -94,11 +94,11 @@ export default class API extends Instance {
     return items;
   }
 
-  addStaticCatalog(options) {
+  addStaticCatalog(options = {}) {
     return this.root.addCatalog(options);
   }
 
-  addStaticCollection(options) {
+  addStaticCollection(options = {}) {
     return this.root.addCollection(options);
   }
 

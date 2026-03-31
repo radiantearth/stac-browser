@@ -20,9 +20,9 @@ import { waitForBrowserReady } from '../helpers.js';
 test.describe('API catalog browsing', () => {
   
   test('root page renders API', async ({ page, worker }) => {
-    const api = API.defaultApi({});
-    const collection = api.addCollection('my-collection', {});
-    api.addItem(collection, 'my-item', {});
+    const api = API.defaultApi();
+    const collection = api.addCollection('my-collection');
+    api.addItem(collection, 'my-item');
     
     await api.createServer(worker);
     
@@ -40,7 +40,7 @@ test.describe('API Catalog - toolBar', () => {
   let api;
   
   test.beforeEach(async ({ worker }) => {
-    api = API.defaultApi({});
+    api = API.defaultApi();
     await api.createServer(worker);
   });
   
@@ -91,10 +91,10 @@ test.describe('API Catalog - Children', () => {
   let collection;
   
   test.beforeEach(async () => {
-    api = API.defaultApi({});
-    collection = api.addCollection('my-collection', {});
+    api = API.defaultApi();
+    collection = api.addCollection('my-collection');
     collection.setMetadata({ title: 'Test Collection' });
-    api.addItem(collection, 'my-item', {});
+    api.addItem(collection, 'my-item');
   });
 
   test('renders child collection as link', async ({ page, worker }) => {
@@ -107,7 +107,7 @@ test.describe('API Catalog - Children', () => {
   });
   
   test('renders multiple child collections', async ({ page, worker }) => {
-    api = API.defaultApi({});
+    api = API.defaultApi();
     const collection1 = api.addCollection('collection-1', {url: 'collections/collection-1'}).setMetadata({ title: 'Test Collection 1' });
     const collection2 = api.addCollection('collection-2', {url: 'collections/collection-2'}).setMetadata({ title: 'Test Collection 2' });
     
@@ -122,7 +122,7 @@ test.describe('API Catalog - Children', () => {
   });
   
   test('renders no children message when catalog has no child links', async ({ page, worker }) => {
-    api = API.defaultApi({});
+    api = API.defaultApi();
     
     await api.createServer(worker);
     

@@ -53,9 +53,9 @@ test.describe('STAC Browser Search page', () => {
         firstLinkEnabled: true,
         lastLinkEnabled: true
       });
-    let collection1 = api.addCollection('collection1', {})
+    let collection1 = api.addCollection('collection1')
       .setMetadata({ title: 'Test Collection 1' });
-    let collection2 = api.addCollection('collection2', {})
+    let collection2 = api.addCollection('collection2')
       .setMetadata({ title: 'Test Collection 2' });
     api.addManyItems(collection1, 50);
     api.addManyItems(collection2, 10);
@@ -63,7 +63,7 @@ test.describe('STAC Browser Search page', () => {
       .addItemsExtension()
       .addSearchExtension();
     
-    await api.createServer(worker, {verbose: false});
+    await api.createServer(worker);
     SEARCH_PATH = api.root.getSearchPath();
   });
 
@@ -422,14 +422,14 @@ test.describe('STAC Browser Search page', () => {
 
   test('search results show "no items found" when response is empty', async ({ page, worker }) => {
     // override setup
-    api = API.minimalApi({});
-    api.addCollection('collection', {})
+    api = API.minimalApi();
+    api.addCollection('collection')
       .setMetadata({ title: 'Empty Collection' });
     api.addCollectionsExtension()
       .addItemsExtension()
       .addSearchExtension();
     
-    await api.createServer(worker, {verbose: false});
+    await api.createServer(worker);
     await page.goto(SEARCH_PATH);
 
     await test.step('Submit search with default filters', async () => {
@@ -454,14 +454,14 @@ test.describe('STAC Browser Search page', () => {
         firstLinkEnabled: true,
         lastLinkEnabled: true
       });
-    const collection1 = api.addCollection('collection1', {})
+    const collection1 = api.addCollection('collection1')
       .setMetadata({ title: 'Test Collection 1' });
     api.addManyItems(collection1, 9);
     api.addCollectionsExtension()
       .addItemsExtension()
       .addSearchExtension();
     
-    await api.createServer(worker, {verbose: false});
+    await api.createServer(worker);
 
     await page.goto(SEARCH_PATH);
 
@@ -515,14 +515,14 @@ test.describe('STAC Browser Search page', () => {
         firstLinkEnabled: true,
         lastLinkEnabled: true
       });
-    let collection = api.addCollection('collection', {})
+    let collection = api.addCollection('collection')
       .setMetadata({ title: 'Test Collection 1' });
     api.addManyItems(collection, 13);
     api.addCollectionsExtension()
       .addItemsExtension()
       .addSearchExtension();
 
-    await api.createServer(worker, {verbose: false});
+    await api.createServer(worker);
     
     await page.goto(SEARCH_PATH);
 
@@ -579,14 +579,14 @@ test.describe('STAC Browser Search page', () => {
         lastLinkEnabled: true
       }
     );
-    let collection = api.addCollection('collection', {})
+    let collection = api.addCollection('collection')
       .setMetadata({ title: 'Test Collection 1' });
     api.addManyItems(collection, 13);
     api.addCollectionsExtension()
       .addItemsExtension()
       .addSearchExtension();
 
-    await api.createServer(worker, {verbose: false});
+    await api.createServer(worker);
     
     
     await page.goto(SEARCH_PATH);

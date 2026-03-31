@@ -19,7 +19,7 @@ test.describe('Item view - Metadata', () => {
 
 	test.beforeEach(async () => {
 		api = API.minimalApi();
-		collection = api.addCollection('collection', {})
+		collection = api.addCollection('collection')
 			.setMetadata({ title, description });
 		items = api.addManyItems(collection, 3);
 	});
