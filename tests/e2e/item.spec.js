@@ -61,9 +61,9 @@ test.describe('Item view - Metadata', () => {
     //expand and view measurements
     await page.getByRole('button', { name: /measurements/i }).click();
     // bands are listed
-    await expect(page.getByText(/B1/i)).toBeVisible();
-    await expect(page.getByText(/B2/i)).toBeVisible();
-    await expect(page.getByText(/B3/i)).toBeVisible();
+    await expect(page.locator('.row:has-text("Bands")').getByText(/B1/i)).toBeVisible();
+    await expect(page.locator('.row:has-text("Bands")').getByText(/B2/i)).toBeVisible();
+    await expect(page.locator('.row:has-text("Bands")').getByText(/B3/i)).toBeVisible();
   });
 });
 
@@ -90,9 +90,8 @@ test.describe('Item view - Assets', () => {
     
     await page.goto(item.getBrowserPath());
     await waitForBrowserReady(page);
-    // ignore the first asset which is a thumbnail.
-    const assetKey = Object.keys(item.data.assets)[1];
-    const asset = item.data.assets[assetKey];
+    // target the data-asset for this test
+    const asset = item.data.assets.data;
     
     const assetBtn = page.getByRole('button', { name: new RegExp(asset.title, 'i') }).first();
     

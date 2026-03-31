@@ -7,7 +7,7 @@ export default class APICollection extends STACHypermedia {
     const configuredMethod = typeof this.instance.options.method === 'string'
       ? this.instance.options.method.toUpperCase()
       : 'GET';
-    this.method = ['GET', 'POST', 'PUT', 'DELETE'].includes(configuredMethod)
+    this.method = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'].includes(configuredMethod)
       ? configuredMethod
       : 'GET';
     
@@ -24,7 +24,7 @@ export default class APICollection extends STACHypermedia {
   
   addPaginationLink(rel, href) {
     this.data.links = this.data.links || [];
-    this.data.links.push({ rel, href, type: 'application/json', method: 'GET' });
+    this.data.links.push({ rel, href, type: 'application/json'});
     return this;
   }
   
@@ -38,16 +38,16 @@ export default class APICollection extends STACHypermedia {
   addPaginationLinks({ nextHref, prevHref, firstHref, lastHref }) {
     this.data.links = this.data.links || [];
     if (nextHref) {
-      this.data.links.push({ rel: 'next', href: nextHref, type: 'application/json', method: 'GET' });
+      this.data.links.push({ rel: 'next', href: nextHref, type: 'application/json'});
     }
     if (prevHref) {
-      this.data.links.push({ rel: 'prev', href: prevHref, type: 'application/json', method: 'GET' });
+      this.data.links.push({ rel: 'prev', href: prevHref, type: 'application/json'});
     }
     if (firstHref) {
-      this.data.links.push({ rel: 'first', href: firstHref, type: 'application/json', method: 'GET' });
+      this.data.links.push({ rel: 'first', href: firstHref, type: 'application/json'});
     }
     if (lastHref) {
-      this.data.links.push({ rel: 'last', href: lastHref, type: 'application/json', method: 'GET' });
+      this.data.links.push({ rel: 'last', href: lastHref, type: 'application/json'});
     }
     return this;
   }
