@@ -1,6 +1,6 @@
-import { test, expect } from '../../fixtures.js';
+import { test, expect } from './fixtures.js';
 import { readFile } from 'node:fs/promises';
-import API from '../../../fixtures/instances/api.js';
+import API from '../fixtures/instances/api.js';
 import {
   waitForMapReady,
   openExampleCodeModal,
@@ -8,7 +8,7 @@ import {
   copyCodeFromModal,
   copyDependenciesFromModal,
   copyFilenameFromModal,
-} from '../../helpers.js';
+} from './helpers.js';
 
 test.describe('STAC Browser code example modal', () => {
   let api;

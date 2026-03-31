@@ -1,17 +1,15 @@
 /**
-* Catalog browsing & navigation tests.
-*
-* Verifies loading a static STAC catalog, rendering metadata and child
-* collections, navigating into collections/items, source view, and validation.
-*
-* Fixtures: tests/fixtures/catalogs/test-catalog/
-*/
-import { test, expect } from '../fixtures.js';
-import { waitForBrowserReady } from '../helpers.js';
-import StaticCatalog from '../../fixtures/instances/static.js';
+ * Catalog browsing & navigation tests.
+ *
+ * Verifies loading a STAC catalog, rendering metadata and child collections,
+ * navigating into collections/items, source view, and share functionality.
+ */
+import { test, expect } from './fixtures.js';
+import { waitForBrowserReady } from './helpers.js';
+import StaticCatalog from '../fixtures/instances/static.js';
+import API from '../fixtures/instances/api.js';
 
-test.describe('Static catalog Metadata', () => {
-  
+test.describe('Catalog Metadata', () => {
   test('should load and display catalog metadata', async ({ page, worker }) => {
     const title = "Example Catalog";
     const description = "An example STAC Catalog with some";
@@ -29,7 +27,7 @@ test.describe('Static catalog Metadata', () => {
   });
 });
 
-test.describe('Static Catalog - toolBar', () => {
+test.describe('Catalog - toolBar', () => {
   test('should have a working source view button', async ({ page, worker }) => {
     const catalog = (new StaticCatalog({url: 'https://stac.example/catalog.json'}));
     
@@ -100,7 +98,7 @@ test.describe('Static Catalog - toolBar', () => {
   });
 });
 
-test.describe('Static Catalog - Children', () => {
+test.describe('Catalog - Children', () => {
   test('renders child collection as link', async ({ page, worker }) => {
     const catalog = (new StaticCatalog({url: 'https://stac.example/catalog.json'}));
     
@@ -163,5 +161,22 @@ test.describe('Static Catalog - Children', () => {
     
     // URL should update to the collection URL
     await expect(page).toHaveURL(new RegExp(collection.getBrowserPath()));
+  });
+});
+
+test.describe('API Catalog browsing', () => {
+  test('root page renders API', async ({ page, worker }) => {
+    const api = API.defaultApi();
+    const collection = api.addCollection('my-collection');
+    api.addItem(collection, 'my-item');
+    
+    await api.createServer(worker);
+    
+    await page.goto(api.root.getBrowserPath());
+    await waitForBrowserReady(page);
+    
+    await expect(page.getByRole('heading', { name: /Example API/i })).toBeVisible();
+    await expect(page.getByText(/An example STAC API with some/i)).toBeVisible();
+    await expect(page.getByRole('link', { name: /STAC Specification/i })).toBeVisible();
   });
 });

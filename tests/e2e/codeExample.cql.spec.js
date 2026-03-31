@@ -1,10 +1,10 @@
-import { test, expect } from '../../fixtures.js';
-import API from '../../../fixtures/instances/api.js';
+import { test, expect } from './fixtures.js';
+import API from '../fixtures/instances/api.js';
 import {
   openExampleCodeModal,
   readClipboard,
   copyCodeFromModal,
-} from '../../helpers.js';
+} from './helpers.js';
 
 test.describe('STAC Browser code example CQL modal', () => {
   let api;

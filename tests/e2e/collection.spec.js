@@ -1,16 +1,15 @@
 /**
-* Collection metadata & assets tests.
-*
-* Verifies rendering a STAC collection: metadata fields, spatial extent map,
-* item listing, and detail controls.
-*
-* Fixtures: tests/fixtures/catalogs/test-catalog/eo-collection/
-*/
-import { test, expect } from '../fixtures.js';
-import { waitForBrowserReady } from '../helpers.js';
-import StaticCatalog from '../../fixtures/instances/static.js';
+ * Collection metadata & assets tests.
+ *
+ * Verifies rendering a STAC collection: metadata fields, spatial extent map,
+ * item listing, and detail controls.
+ */
+import { test, expect } from './fixtures.js';
+import { waitForBrowserReady } from './helpers.js';
+import StaticCatalog from '../fixtures/instances/static.js';
+import API from '../fixtures/instances/api.js';
 
-test.describe('Static Collection Metadata', () => {
+test.describe('Collection Metadata', () => {
   let catalog, collection;
   
   test.beforeEach('should load collection page', async () => {
@@ -46,7 +45,7 @@ test.describe('Static Collection Metadata', () => {
   });
 });
 
-test.describe('Static Collection - toolBar', () => {
+test.describe('Collection - toolBar', () => {
   let catalog, collection;
   
   test.beforeEach('should load collection page', async () => {
@@ -130,7 +129,7 @@ test.describe('Static Collection - toolBar', () => {
   });
 });
 
-test.describe('Static Collection - Items', () => {
+test.describe('Collection - Items', () => {
   let catalog, collection;
   
   test.beforeEach('should load collection page', async () => {
@@ -192,5 +191,127 @@ test.describe('Static Collection - Items', () => {
     
     // Should navigate to the item's getBrowserPath()
     await expect(page.getByRole('heading', { name: new RegExp(item.getMetadata().title, 'i') })).toBeVisible();
+  });
+});
+
+test.describe('STAC Collection item search', () => {
+  let api;
+  let COLLECTION_PATH;
+  let collection;
+  
+  test.beforeEach(async () => {
+    api = API.minimalApi(
+      {url: "https://stac.example/api/"},
+      {
+        defaultLimit: 5,
+        prevLinkEnabled: true,
+        firstLinkEnabled: true,
+        lastLinkEnabled: true
+      });
+    collection = api.addCollection('collection1')
+      .setMetadata({ title: 'Test Collection' });
+    api.addManyItems(collection, 10);
+    api.addCollectionsExtension()
+      .addItemsExtension()
+      .addSearchExtension();
+      
+    COLLECTION_PATH = collection.getBrowserPath();
+  });
+    
+  test('Collection view should show item search options', async ({ page, worker }) => {
+    await api.createServer(worker);
+    await page.goto(COLLECTION_PATH);
+    await expect(page.getByRole('heading', { name: collection.getMetadata().title })).toBeVisible();
+      
+    // show filter button should be visible and open the search form
+    const showFilterButton = page.getByRole('button', { name: /show filters/i });
+    await expect(showFilterButton).toBeVisible();
+    await showFilterButton.click();
+      
+    await expect(await page.getByLabel(/items per page/i)).toBeVisible();
+    await expect(await page.getByLabel(/spatial extent/i)).toBeVisible();
+    await expect(await page.getByPlaceholder(/select date range/i)).toBeVisible();
+  });
+    
+  test('changing limit should result in the according number of items rendered', async ({ page, worker }) => {
+    await api.createServer(worker);
+    await page.goto(COLLECTION_PATH);
+      
+    // open filters and set limit to 5
+    const showFilterButton = page.getByRole('button', { name: /show filters/i });
+    await showFilterButton.click();
+    const limitInput = page.getByLabel(/items per page/i);
+    await limitInput.fill('5');
+      
+    // submit search and verify 5 items are rendered
+    const submitButton = page.getByRole('button', { name: /submit/i });
+    await submitButton.click();
+    const itemCards = page.locator('.item-card');
+    await expect(itemCards).toHaveCount(5, { timeout: 10000 });
+  });
+    
+  test('item search can be paginated with Next and Previous buttons', async ({ page, worker }) => {
+    await api.createServer(worker);
+    await page.goto(COLLECTION_PATH);
+      
+    // open filters and submit search with default limit of 5
+    const showFilterButton = page.getByRole('button', { name: /show filters/i });
+    await showFilterButton.click();
+    const submitButton = page.getByRole('button', { name: /submit/i });
+    await submitButton.click();
+      
+    const itemCards = page.locator('.item-card');
+    const nextButton = page.getByRole('button', { name: /next/i }).first();
+    const prevButton = page.getByRole('button', { name: /previous/i }).first();
+      
+    // verify first page shows 5 items, Next enabled, Previous disabled
+    await expect(itemCards).toHaveCount(5, { timeout: 10000 });
+    await expect(nextButton).toBeEnabled();
+    await expect(prevButton).toBeDisabled();
+      
+    // click Next and verify second page shows 5 items, Next disabled, Previous enabled
+    await nextButton.click();
+    await expect(itemCards).toHaveCount(5, { timeout: 10000 });
+    await expect(nextButton).toBeDisabled();
+    await expect(prevButton).toBeEnabled();
+      
+    // click Previous and verify first page is shown again with 5 items, Next enabled, Previous disabled
+    await prevButton.click();
+    await expect(itemCards).toHaveCount(5, { timeout: 10000 });
+    await expect(nextButton).toBeEnabled();
+    await expect(prevButton).toBeDisabled(); 
+  });
+    
+  test('item search can be paginated with First and Last buttons', async ({ page, worker }) => {
+    await api.createServer(worker);
+    await page.goto(COLLECTION_PATH);
+      
+    // open filters and submit search with default limit of 5
+    const showFilterButton = page.getByRole('button', { name: /show filters/i });
+    await showFilterButton.click();
+    const submitButton = page.getByRole('button', { name: /submit/i });
+    await submitButton.click();
+      
+    const itemCards = page.locator('.item-card');
+    const firstButton = page.getByRole('button', { name: /first/i }).first();
+    const lastButton = page.getByRole('button', { name: /last/i }).first();
+    const nextButton = page.getByRole('button', { name: /next/i }).first();
+    const prevButton = page.getByRole('button', { name: /previous/i }).first();
+      
+    // verify first page shows 5 items, First disabled, Last enabled
+    await expect(itemCards).toHaveCount(5, { timeout: 10000 });
+    await expect(firstButton).toBeDisabled();
+    await expect(lastButton).toBeEnabled();
+      
+    // click Last to jump to the last page and verify it shows 5 items, Next disabled, First enabled
+    await lastButton.click();
+    await expect(itemCards).toHaveCount(5, { timeout: 10000 });
+    await expect(nextButton).toBeDisabled();
+    await expect(firstButton).toBeEnabled();
+      
+    // click First and verify first page is shown again
+    await firstButton.click();
+    await expect(itemCards).toHaveCount(5, { timeout: 10000 });
+    await expect(prevButton).toBeDisabled();
   });
 });

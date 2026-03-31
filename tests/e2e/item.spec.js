@@ -1,16 +1,13 @@
 /**
-* Item properties, geometry & assets tests.
-*
-* Exercises viewing an item in a static STAC catalog.
-* Navigates: root catalog -> eo-collection -> first item (item-2025-001).
-* Verifies metadata rendering, geometry display, asset listing, and breadcrumb
-* navigation.
-*
-* Fixtures: tests/fixtures/catalogs/test-catalog/eo-collection/item-2025-001.json
-*/
-import { test, expect } from '../fixtures.js';
-import { waitForBrowserReady } from '../helpers.js';
-import StaticCatalog from '../../fixtures/instances/static.js';
+ * Item properties, geometry & assets tests.
+ *
+ * Exercises viewing an item in a STAC catalog.
+ * Verifies metadata rendering, geometry display, asset listing, and breadcrumb navigation.
+ */
+import { test, expect } from './fixtures.js';
+import { waitForBrowserReady } from './helpers.js';
+import StaticCatalog from '../fixtures/instances/static.js';
+import API from '../fixtures/instances/api.js';
 
 test.describe('Item view - Metadata', () => {
   test('should display item metadata', async ({ page, worker }) => {
@@ -36,6 +33,37 @@ test.describe('Item view - Metadata', () => {
     
     const itemTitle = await page.getByRole('heading', { name: new RegExp(item.getMetadata().title, 'i') });
     await expect(itemTitle).toBeVisible();
+  });
+
+  test('should display rich item properties from EO collection', async ({ page, worker }) => {
+    const api = API.minimalApi();
+    const collection = api.addCollection('collection')
+      .setMetadata({ title: "Example EO Collection", description: "An example STAC Collection with EO extension." });
+    const items = api.addManyItems(collection, 3);
+    
+    await api.createServer(worker);
+    
+    const item = items[0];
+    await page.goto(item.getBrowserPath());
+    await waitForBrowserReady(page);
+    
+    // check heading shows item id
+    await expect(page.getByRole('heading', { name: new RegExp(item.data.id, 'i') })).toBeVisible();
+    
+    await expect(page.getByText(/cloud cover/i)).toBeVisible();
+    await expect(page.getByText(/constellation/i)).toBeVisible();
+    await expect(page.getByText(/time of data begins/i)).toBeVisible();
+    
+    //expand and view metadata
+    await page.getByRole('button', { name: /metadata/i }).click();
+    await expect(page.getByRole('button', { name: /download/i })).toBeVisible();
+    
+    //expand and view measurements
+    await page.getByRole('button', { name: /measurements/i }).click();
+    // bands are listed
+    await expect(page.getByText(/B1/i)).toBeVisible();
+    await expect(page.getByText(/B2/i)).toBeVisible();
+    await expect(page.getByText(/B3/i)).toBeVisible();
   });
 });
 

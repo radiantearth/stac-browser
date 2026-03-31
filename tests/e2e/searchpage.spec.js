@@ -1,16 +1,13 @@
 /**
-* STAC API search page tests.
-*
-* Verifies the global item search: filter inputs (datetime, bbox, collection ID,
-* item ID, sort, limit), bbox validation, result rendering, empty-result state,
-* and form reset.
-*
-* Fixtures: tests/fixtures/api/ (root.json, collections.json, search-empty.json,
-*           search-results.json)
-*/
-import { test, expect } from '../fixtures.js';
-import API from '../../fixtures/instances/api.js';
-import { waitForBrowserReady, waitForSearchPost, waitForMapReady, waitForBboxInputsPopulated } from '../helpers.js';
+ * STAC API search page tests.
+ *
+ * Verifies the global item search: filter inputs (datetime, bbox, collection ID,
+ * item ID, sort, limit), bbox validation, result rendering, empty-result state,
+ * and form reset.
+ */
+import { test, expect } from './fixtures.js';
+import API from '../fixtures/instances/api.js';
+import { waitForBrowserReady, waitForSearchPost, waitForMapReady, waitForBboxInputsPopulated } from './helpers.js';
 
 const enableSpatialExtentInputs = async (page) => {
   const enableSpatialCheckbox = page.getByRole('checkbox', { name: /filter by spatial extent/i });
@@ -504,7 +501,7 @@ test.describe('STAC Browser Search page', () => {
       expect(body).toEqual({});
     });
   });
-    
+
   test('Search results can be paginated with Next and Previous buttons', async ({ page, worker }) => {
     //override default api
     api = API.minimalApi(
@@ -644,6 +641,4 @@ test.describe('STAC Browser Search page', () => {
       await expect(firstButton).toBeDisabled();
     });
   });
-      
 });
-    
