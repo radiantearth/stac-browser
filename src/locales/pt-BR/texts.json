@@ -120,7 +120,7 @@
   "exampleCode": {
     "title": "Exemplo de código",
     "storeAs": "Armazenar código como:",
-    "installDependencies": ""
+    "installDependencies": "Instalação de dependências:"
   },
   "featureExperimental": "Esta funcionalidade ainda é experimental e pode dar resultados inesperados!",
   "features": {
@@ -176,18 +176,18 @@
     },
     "bboxSelect": {
       "add": "Clique no mapa para adicionar um retângulo envolvente.",
-      "eastLon": "",
+      "eastLon": "Longitude Leste",
       "error": {
-        "incomplete": "",
-        "invalidLat": "",
-        "invalidLon": "",
-        "latOrder": "",
-        "lonOrder": ""
+        "incomplete": "Coordenada não definida",
+        "invalidLat": "Deve estar entre -90 e 90",
+        "invalidLon": "Deve estar entre -180 e 180",
+        "latOrder": "Latitude Sul deve ser menor que Latitude Norte",
+        "lonOrder": "Latitude Oeste deve ser menor que Latitude Leste"
       },
-      "northLat": "",
+      "northLat": "Latitude Norte",
       "remove": "Clique no retângulo envolvente para removê-lo.",
-      "southLat": "",
-      "westLon": ""
+      "southLat": "Latitude Sul",
+      "westLon": "Longitude Oeste"
     },
     "close": "Fechar",
     "fit": "Ajustar à extensão",
@@ -235,12 +235,12 @@
   },
   "poweredBy": "Distribuído por {link}",
   "programming": {
-    "csharp": "",
-    "java": "",
-    "javascript": "",
-    "python": "",
-    "r": "",
-    "rust": ""
+    "csharp": "C#",
+    "java": "Java",
+    "javascript": "JavaScript",
+    "python": "Python",
+    "r": "R",
+    "rust": "Rust"
   },
   "protocol": {
     "azure": "Microsoft Azure",
@@ -276,19 +276,19 @@
     "addItemIds": "Pressione Enter para adicionar um ID de item",
     "addSearchTerm": "Pressione Enter para adicionar um termo de pesquisa",
     "arrayInput": {
-      "addValue": "",
-      "helpText": ""
+      "addValue": "Pressione Enter para adicionar um valor",
+      "helpText": "Digite o(s) valor(es)"
     },
-    "arrayContains": "",
-    "arrayContainsDescription": "",
-    "arrayContainedBy": "",
-    "arrayContainedByDescription": "",
-    "arrayEquals": "",
-    "arrayEqualsDescription": "",
-    "arrayOverlaps": "",
-    "arrayOverlapsDescription": "",
-    "between": "",
-    "betweenOperatorDescription": "",
+    "arrayContains": "Contém todos",
+    "arrayContainsDescription": "O array contém todos os valores especificados",
+    "arrayContainedBy": "É subconjunto de",
+    "arrayContainedByDescription": "Array é um subconjunto dos valores especificados",
+    "arrayEquals": "Corresponde exatamente",
+    "arrayEqualsDescription": "Array corresponde exatamente aos valores especificados (mesmos itens, qualquer ordem)",
+    "arrayOverlaps": "Contém algum",
+    "arrayOverlapsDescription": "Array contém pelo menos um dos valores especificados",
+    "between": "entre",
+    "betweenOperatorDescription": "Testa se o valor de um campo numérico está no intervalo fornecido. O intervalo fornecido é inclusivo.",
     "dateDescription": "Todos os horários em Tempo Universal Coordenado (UTC).",
     "enterCollections": "Insira um ou mais IDs de coleção...",
     "enterItemIds": "Insira um ou mais IDs de item...",
@@ -300,8 +300,8 @@
     "freeTextDescription": "Pesquise pelo menos um dos termos fornecidos em campos como título e descrição.",
     "greaterThan": "maior que",
     "greaterThanEqual": "maior que ou igual a",
-    "in": "",
-    "inOperatorDescription": "",
+    "in": "incluído em",
+    "inOperatorDescription": "Verifica se o valor do campo corresponde a qualquer um dos valores fornecidos.",
     "itemIds": "IDs dos itens",
     "itemsPerPage": "Itens por página",
     "itemsPerPageDescription": "Número de itens solicitados por página, máx. {maxItems} items.",
@@ -311,21 +311,21 @@
     "logical": {
       "and": "Considere todos os filtros (e)",
       "or": "Considere qualquer filtro (ou)",
-      "not": ""
+      "not": "Inverte a condição"
     },
     "matches": "combinações",
     "metaDescription": "Pesquise os dados de {title}.",
     "modifyCriteria": "Por favor, modifique os critérios de pesquisa.",
     "noFurtherItemsFound": "Não há mais itens disponíveis.",
     "noItemsFound": "Nenhum item encontrado para os filtros fornecidos.",
-    "noOperatorsError": "",
+    "noOperatorsError": "O STAC Browser não oferece suporte a nenhum operador para o filtro {queryable}.",
     "noOptions": "Nenhuma entrada realizada",
     "notEqualTo": "não é igual a",
     "notFullySupported": "Nem todas as opções podem ser suportadas.",
     "notSupported": "A pesquisa de itens não é suportada pela API.",
     "placeholder": "Pesquisar...",
     "selectCollections": "Selecione uma ou várias coleções...",
-    "selectDateRange": "",
+    "selectDateRange": "Selecione o intervalo de datas",
     "selectForItemSearch": "Selecione para pesquisa de itens",
     "spatialExtent": "Extensão Espacial",
     "tabs": {
