@@ -70,11 +70,11 @@
     "false": "não",
     "true": "sim"
   },
-  "close": "",
+  "close": "Fechar",
   "copy": "Cópia",
   "copyErrors": {
-    "permission": "",
-    "unsupported": ""
+    "permission": "Não foi possível copiar. Verifique as permissões do navegador.",
+    "unsupported": "A área de transferência não está disponível neste navegador."
   },
   "default": "Padrão",
   "defaultWithValue": "Valor padrão ({value})",
@@ -91,7 +91,7 @@
   },
   "description": "Descrição",
   "errors": {
-    "apiListRequested": "",
+    "apiListRequested": "A solicitação é inválida. Solicitações diretas para as rotas /collections e .../items não são suportados atualmente.",
     "authFailed": "A solicitação apresentou erro. Os detalhes de autenticação fornecidos podem estar incorretos.",
     "badRequest": "A solicitação é inválida. Isto pode ser devido a parâmetros inválidos, por exemplo, uma solicitação de pesquisa ou pode ser um bug no STAC Browser.",
     "contactProvider": "Entre em contato com o operador do serviço para resolver esse problema.",
@@ -118,8 +118,8 @@
     "unauthorized": "A solicitação não possui credenciais, por exemplo, um token de API. Forneça suas credenciais e tente novamente."
   },
   "exampleCode": {
-    "title": "",
-    "storeAs": "",
+    "title": "Exemplo de código",
+    "storeAs": "Armazenar código como:",
     "installDependencies": ""
   },
   "featureExperimental": "Esta funcionalidade ainda é experimental e pode dar resultados inesperados!",
