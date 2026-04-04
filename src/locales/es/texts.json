@@ -70,11 +70,11 @@
     "false": "no",
     "true": "si"
   },
-  "close": "",
+  "close": "Cerrar",
   "copy": "Copia",
   "copyErrors": {
-    "permission": "",
-    "unsupported": ""
+    "permission": "No se puede copiar. Por favor, comprueba los permisos del navegador.",
+    "unsupported": "El portapapeles no está disponible en este navegador."
   },
   "default": "Predeterminado",
   "defaultWithValue": "Predeterminado ({value})",
@@ -118,9 +118,9 @@
     "unauthorized": "La petición no tiene credenciales, por ejemplo, un token de la API. Por favor introduzca sus credenciales y pruebe de nuevo."
   },
   "exampleCode": {
-    "title": "",
-    "storeAs": "",
-    "installDependencies": ""
+    "title": "Código de Ejemplo",
+    "storeAs": "Guardar código como:",
+    "installDependencies": "Instala las dependencias:"
   },
   "featureExperimental": "¡Esta funcionalidad es experimental y puede producir resultados inesperados!",
   "features": {
@@ -235,12 +235,12 @@
   },
   "poweredBy": "Ofrecido por {link}",
   "programming": {
-    "csharp": "",
-    "java": "",
-    "javascript": "",
-    "python": "",
-    "r": "",
-    "rust": ""
+    "csharp": "C#",
+    "java": "Java",
+    "javascript": "JavaScript",
+    "python": "Python",
+    "r": "R",
+    "rust": "Rust"
   },
   "protocol": {
     "azure": "Microsoft Azure",
