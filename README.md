@@ -242,7 +242,7 @@ To run the testing suite locally:
 npm test
 ```
 
-For more information on testing, see [CONTRIBUTING.md](CONTRIBUTING.md#Tests)
+For more information on testing, see [CONTRIBUTING.md](CONTRIBUTING.md#tests)
 
 ## Contributing
 
