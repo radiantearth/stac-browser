@@ -66,7 +66,8 @@ export default class Instance {
     return obj;
   }
   
-  async createServer(worker, options = { reset: true, verbose: false }) {
+  async createServer(worker, options) {
+    options = { reset: true, verbose: false, ...options };
     const handlers = [];
     
     for (const endpoint of this.endpoints) {

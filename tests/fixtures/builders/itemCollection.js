@@ -22,7 +22,14 @@ export default class ItemCollection extends APICollection {
     for (let i = 0; i < count; i++) {
       const id = `example-item-${i}`;
       const title = `Example Item ${i}`;
-      const item = this.instance.createStac({url: `/collections/${parent.data.id}/items/${id}`, type: Item});
+      const itemUrl = parent !== null ? 
+        `/collections/${parent.data.id}/items/${id}` :
+        `/items/${id}`;
+      const item = this.instance.createStac(
+        {
+          url: itemUrl, 
+          type: Item
+        });
       item.setMetadata({ id, title });
       this.addItem(item);
       if (parent !== null) {
@@ -33,7 +40,7 @@ export default class ItemCollection extends APICollection {
   }
   
   getItems(){
-    return this.data.features;
+    return this.data.features || [];
   } 
   
   removeItemById(id) {

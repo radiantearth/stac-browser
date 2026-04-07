@@ -26,14 +26,9 @@ export default class API extends Instance {
       .addSearchExtension();
   }
   
-  static fullApi(rootOptions = {}, options = {}) {
-    return API.defaultApi(rootOptions, options)
-      .addCollectionSearchExtension();
-  }
-  
   addCollection(id, options = {}) {
     this.addCollectionsExtension();
-    options.url = `collections/${id}`;
+    options.url = options.url || `collections/${id}`;
     const collection = this.createCollection(options).setMetadata({id});
     
     this.collections.addNewCollection(collection);
@@ -72,7 +67,7 @@ export default class API extends Instance {
     
     for (let i = 0; i < count; i++) {
       const id = `example-item-${i}`;
-      const itemOptions = { url: `/collections/${cid}/items/${id}`};
+      const itemOptions = { url: `collections/${cid}/items/${id}`};
       const item = this.addItem(collection, id, itemOptions);
       item.addParentLink(collection);
       items.push(item);

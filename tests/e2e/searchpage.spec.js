@@ -81,7 +81,7 @@ test.describe('STAC Browser Search page', () => {
     await test.step('Submit search with default selection', async () => {
       const submitButton = page.getByRole('button', { name: /submit/i });
         
-      // Submit search with default seflection
+      // Submit search with default selection
       await submitButton.click();
     });
       

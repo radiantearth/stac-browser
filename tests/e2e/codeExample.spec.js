@@ -16,7 +16,6 @@ test.describe('STAC Browser code example modal', () => {
   
   test.beforeEach(async ({ worker }) => {
     api = API.defaultApi({});
-    api.addSearchExtension();
     collection = api.addCollection('test-collection-1', {});
     await api.createServer(worker);
   });
