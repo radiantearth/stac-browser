@@ -70,12 +70,8 @@
     "false": "Nein",
     "true": "Ja"
   },
-  "close": "",
   "copy": "Kopieren",
-  "copyErrors": {
-    "permission": "",
-    "unsupported": ""
-  },
+  "copyErrors": {},
   "default": "Standardeinstellung",
   "defaultWithValue": "Standardeinstellung ({value})",
   "deprecated": "Abgekündigt",
@@ -117,11 +113,7 @@
     "title": "Fehler",
     "unauthorized": "Der Anfrage fehlen die Anmeldedaten, bspw. ein API-Schlüssel. Bitte geben Sie Ihre Anmeldedaten an und versuchen Sie es erneut."
   },
-  "exampleCode": {
-    "title": "",
-    "storeAs": "",
-    "installDependencies": ""
-  },
+  "exampleCode": {},
   "featureExperimental": "Diese Funktion ist noch experimentell und kann unerwartete Ergebnisse verursachen!",
   "features": {
     "empty": "Keine Features verfügbar.",
@@ -234,14 +226,7 @@
     "previous": "‹ Vorherige"
   },
   "poweredBy": "Generiert von {link}",
-  "programming": {
-    "csharp": "",
-    "java": "",
-    "javascript": "",
-    "python": "",
-    "r": "",
-    "rust": ""
-  },
+  "programming": {},
   "protocol": {
     "azure": "Microsoft Azure",
     "file": "Dateisystem (lokal)",
