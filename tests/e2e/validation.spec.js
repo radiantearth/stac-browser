@@ -15,9 +15,9 @@
 *  - Validation panel closes on outside click
 *  - Validation is re-triggered on demand (clicking Validate a second time)
 */
-import { test, expect } from '../fixtures.js';
-import StaticCatalog from '../../fixtures/instances/static.js';
-import { waitForBrowserReady, openSourcePanel } from '../helpers.js';
+import { test, expect } from './fixtures.js';
+import StaticCatalog from '../fixtures/instances/static.js';
+import { waitForBrowserReady, openSourcePanel } from './helpers.js';
 
 // ---------------------------------------------------------------------------
 // Validate button presence

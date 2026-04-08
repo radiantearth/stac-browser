@@ -6,14 +6,14 @@
 *
 * Fixtures: tests/fixtures/catalogs.json (synthetic STAC Index entries)
 */
-import { test, expect } from '../fixtures.js';
-import { HOME_PATH, mockStacResource } from '../helpers.js';
-import StaticCatalog from '../../fixtures/instances/static.js';
+import { test, expect } from './fixtures.js';
+import { HOME_PATH, mockStacResource } from './helpers.js';
+import StaticCatalog from '../fixtures/instances/static.js';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import fs from 'fs';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const catalogs = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../../fixtures/templates/catalogs.json')));
+const catalogs = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../fixtures/templates/catalogs.json')));
 
 test.describe('STAC Browser Homepage', () => {
   // ensure every test uses the mocked STAC Index response
