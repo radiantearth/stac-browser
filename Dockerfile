@@ -4,8 +4,10 @@ FROM node:lts-alpine AS build-step
 ARG DYNAMIC_CONFIG=true
 ARG historyMode="history"
 ARG pathPrefix
+ARG SB_CONFIG=""
 ENV SB_historyMode="${historyMode}"
 ENV SB_pathPrefix="${pathPrefix}"
+ENV SB_CONFIG="${SB_CONFIG}"
 
 WORKDIR /app
 COPY package*.json ./
