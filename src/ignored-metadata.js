@@ -35,7 +35,7 @@ const ignoredFields = {
     // Special handling for auth
     'auth:schemes',
     // Special handling for the STAC Browser config
-    'stac_browser'
+    'stac_browser',
   ],
   Item: [
     'description',
@@ -50,7 +50,7 @@ const ignoredFields = {
     // Special handling for auth
     'auth:schemes',
     // Special handling for the warning of the anonymized-location extension
-    'anon:warning'
+    'anon:warning',
   ],
   Asset: [
     // Core Asset fields that are handled directly
@@ -88,7 +88,7 @@ const ignoredFields = {
     'name',
     'description',
     'roles',
-  ]
+  ],
 };
 
 export function getIgnoredFields(object, type = null) {

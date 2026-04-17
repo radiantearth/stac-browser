@@ -1,22 +1,21 @@
-import LinkActionPlugin from "../LinkActionPlugin";
+import LinkActionPlugin from '../LinkActionPlugin';
 import { URI } from 'stac-js/src/utils.js';
-import i18n from "../../i18n";
+import i18n from '../../i18n';
 
 export default class Cesium extends LinkActionPlugin {
-
   get show() {
     return this.link.rel === '3d-tiles';
   }
 
   get uri() {
     // https://sandcastle.cesium.com/standalone.html vs https://sandcastle.cesium.com/index.html
-    let uri = URI("https://sandcastle.cesium.com/standalone.html");
+    let uri = URI('https://sandcastle.cesium.com/standalone.html');
     const tileset_url = this.link.href;
     const code_payload = {
       html: `
         <style> @import url(../templates/bucket.css); </style>
         <div id="cesiumContainer" class="fullSize"></div> 
-      `, 
+      `,
       code: `
         const viewer = new Cesium.Viewer("cesiumContainer", {
           terrain: Cesium.Terrain.fromWorldTerrain(),
@@ -29,7 +28,7 @@ export default class Cesium extends LinkActionPlugin {
         } catch (error) {
           console.log('Error loading tileset');
         } 
-      `.replaceAll('        ', '')
+      `.replaceAll('        ', ''),
     };
     const code_str = btoa(JSON.stringify(code_payload));
     uri.addQuery('code', code_str);
@@ -37,7 +36,6 @@ export default class Cesium extends LinkActionPlugin {
   }
 
   get text() {
-    return i18n.global.t('actions.openIn', {service: 'Cesium Sandcastle'});
+    return i18n.global.t('actions.openIn', { service: 'Cesium Sandcastle' });
   }
-
 }

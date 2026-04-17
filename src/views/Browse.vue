@@ -10,29 +10,26 @@
 <script>
 import Item from './Item.vue';
 import Catalog from './Catalog.vue';
-import { mapGetters } from "vuex";
+import { mapGetters } from 'vuex';
 import { defineComponent } from 'vue';
 import BrowseMixin from './BrowseMixin';
 
 export default defineComponent({
-  name: "Browse",
+  name: 'Browse',
   components: {
     Catalog,
-    Item
+    Item,
   },
-  mixins: [
-    BrowseMixin
-  ],
+  mixins: [BrowseMixin],
   computed: {
-    ...mapGetters(["isItem"]),
+    ...mapGetters(['isItem']),
     component() {
       if (this.isItem) {
         return 'Item';
-      }
-      else {
+      } else {
         return 'Catalog';
       }
-    }
-  }
+    },
+  },
 });
 </script>

@@ -25,22 +25,20 @@ export default {
   components: {
     LayerControlGroup: defineAsyncComponent(() => import('./LayerControlGroup.vue')),
   },
-  mixins: [
-    LayerControlMixin
-  ],
+  mixins: [LayerControlMixin],
   props: {
     map: {
       type: Object,
-      required: true
+      required: true,
     },
     group: {
       type: Object,
-      required: true
+      required: true,
     },
     maxZoom: {
       type: Number,
-      default: undefined
-    }
+      default: undefined,
+    },
   },
   computed: {
     layers() {
@@ -57,7 +55,7 @@ export default {
           layer,
           id: layer.ol_uid,
           visible: layer.getVisible(),
-          title: this.getTitle(layer)
+          title: this.getTitle(layer),
         };
         layers.push(data);
       }
@@ -65,9 +63,7 @@ export default {
     },
     visibleLayers: {
       get() {
-        return this.layers
-          .filter(data => data.layer.getVisible())
-          .map(data => data.id);
+        return this.layers.filter(data => data.layer.getVisible()).map(data => data.id);
       },
       set(visibleLayers) {
         for (const data of this.layers) {
@@ -77,8 +73,8 @@ export default {
             data.layer.setVisible(expected);
           }
         }
-      }
-    }
+      },
+    },
   },
   methods: {
     setVisibility(data, visible) {
@@ -104,10 +100,10 @@ export default {
         }
       }
       if (extent) {
-        this.map.getView().fit(extent, { padding: [10,10,10,10], maxZoom: this.maxZoom });
+        this.map.getView().fit(extent, { padding: [10, 10, 10, 10], maxZoom: this.maxZoom });
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -124,7 +120,7 @@ export default {
   margin-top: -0.5rem;
   margin-left: -0.75rem;
   margin-right: -0.75rem;
-  padding: 0.5rem 0.75rem 0  0.75rem;
+  padding: 0.5rem 0.75rem 0 0.75rem;
 
   .title {
     line-break: anywhere;

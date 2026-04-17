@@ -21,5 +21,4 @@ export default class JavaScriptGenerator extends CodeGenerator {
   get commentChars() {
     return '///';
   }
-
 }

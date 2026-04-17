@@ -1,8 +1,11 @@
 <template>
   <b-button
-    v-if="isSupported" @click.prevent="toggleFullscreen"
-    ref="button" variant="dark" class="fullscreen-button" :title="title"
-  >
+    v-if="isSupported"
+    @click.prevent="toggleFullscreen"
+    ref="button"
+    variant="dark"
+    class="fullscreen-button"
+    :title="title">
     <span v-show="isFullscreen">{{ $t('fullscreen.exitLabel') }}</span>
     <span v-show="!isFullscreen">{{ $t('fullscreen.showLabel') }}</span>
   </b-button>
@@ -14,8 +17,8 @@ export default {
   props: {
     element: {
       type: [Function, String, Object],
-      required: true
-    }
+      required: true,
+    },
   },
   emits: ['changed'],
   data() {
@@ -23,7 +26,7 @@ export default {
       isFullscreen: false,
       doc: document,
       node: null,
-      listener: this.onChange.bind(this)
+      listener: this.onChange.bind(this),
     };
   },
   computed: {
@@ -32,26 +35,25 @@ export default {
     },
     isSupported() {
       return Boolean(this.node && this.doc.body.requestFullscreen && this.doc.fullscreenEnabled);
-    }
+    },
   },
   watch: {
     element: {
       immediate: true,
       handler() {
         this.update();
-      }
+      },
     },
     isFullscreen(active) {
       if (active) {
         this.doc.addEventListener('fullscreenchange', this.listener);
-      }
-      else {
+      } else {
         this.doc.removeEventListener('fullscreenchange', this.listener);
       }
       this.node.classList.toggle('fullscreen', active);
       this.$refs.button.$el.blur();
       this.$emit('changed', active);
-    }
+    },
   },
   mounted() {
     this.update();
@@ -75,11 +77,9 @@ export default {
     getElement() {
       if (typeof this.element === 'string') {
         return document.querySelector(this.element);
-      }
-      else if (typeof this.element === 'function') {
+      } else if (typeof this.element === 'function') {
         return this.element();
-      }
-      else {
+      } else {
         return this.element;
       }
     },
@@ -93,14 +93,12 @@ export default {
         return;
       }
       if (this.isFullscreen) {
-        this.doc.exitFullscreen()
-          .then(() => this.isFullscreen = false);
+        this.doc.exitFullscreen().then(() => (this.isFullscreen = false));
       } else {
-        this.node.requestFullscreen()
-          .then(() => this.isFullscreen = true);
+        this.node.requestFullscreen().then(() => (this.isFullscreen = true));
       }
     },
-  }
+  },
 };
 </script>
 

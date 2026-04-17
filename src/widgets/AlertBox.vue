@@ -1,7 +1,8 @@
 <template>
   <b-alert class="alert-box" :variant="variant" :dismissible="dismissible" show>
     <template v-if="title">
-      <strong>{{ title }}</strong>&nbsp;
+      <strong>{{ title }}</strong
+      >&nbsp;
       <small>{{ text }}</small>
     </template>
     <template v-else>{{ text }}</template>
@@ -10,30 +11,30 @@
 
 <script>
 export default {
-  name: "AlertBox",
+  name: 'AlertBox',
   props: {
     title: {
       type: String,
-      default: ''
+      default: '',
     },
     text: {
       type: String,
-      default: ''
+      default: '',
     },
     variant: {
       type: String,
-      default: 'warning'
+      default: 'warning',
     },
     dismissible: {
       type: Boolean,
-      default: false
+      default: false,
     },
   },
 };
 </script>
 
 <style lang="scss" scoped>
-@import "../theme/variables.scss";
+@import '../theme/variables.scss';
 
 .alert-box {
   margin-bottom: $block-margin;

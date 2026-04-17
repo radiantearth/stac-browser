@@ -1,7 +1,7 @@
 export default {
   methods: {
     getTitle(layer) {
-      const fallback = this.$t('mapping.layers.unnamed', {id: layer.ol_uid});
+      const fallback = this.$t('mapping.layers.unnamed', { id: layer.ol_uid });
       let title = layer.get('title') || fallback;
       if (layer.get('bounds')) {
         return this.$t('mapping.layers.footprint');
@@ -18,6 +18,6 @@ export default {
         }
       }
       return title;
-    }
-  }
+    },
+  },
 };

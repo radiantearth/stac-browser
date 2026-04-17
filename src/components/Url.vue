@@ -4,7 +4,9 @@
       <b-form-input :id="id" ref="input" :model-value="url" readonly />
       <template #append>
         <CopyButton :copyText="url" variant="primary" />
-        <b-button v-if="open" :href="url" target="_blank" variant="primary" :title="$t('open')"><b-icon-arrow-up-right-square /></b-button>
+        <b-button v-if="open" :href="url" target="_blank" variant="primary" :title="$t('open')"
+          ><b-icon-arrow-up-right-square
+        /></b-button>
       </template>
     </b-input-group>
   </b-form-group>
@@ -14,27 +16,27 @@
 import { defineAsyncComponent } from 'vue';
 
 export default {
-  name: "Url",
+  name: 'Url',
   components: {
-    CopyButton: defineAsyncComponent(() => import('./CopyButton.vue'))
+    CopyButton: defineAsyncComponent(() => import('./CopyButton.vue')),
   },
   props: {
     id: {
       type: String,
-      required: true
+      required: true,
     },
     url: {
       type: String,
-      required: true
+      required: true,
     },
     label: {
       type: String,
-      required: true
+      required: true,
     },
     open: {
       type: Boolean,
-      default: true
-    }
-  }
+      default: true,
+    },
+  },
 };
 </script>

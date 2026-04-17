@@ -12,8 +12,7 @@ function toBrowserUrl(url, store) {
   if (store.state.historyMode === 'hash') {
     uri.path(store.state.pathPrefix);
     uri.fragment(path);
-  }
-  else {
+  } else {
     uri.path(Utils.removeTrailingSlash(store.state.pathPrefix) + path);
   }
   return uri.toString();
@@ -22,11 +21,11 @@ function toBrowserUrl(url, store) {
 function addSpatialCoverage(schema, bbox) {
   if (Array.isArray(bbox) && bbox.length >= 4) {
     schema.spatialCoverage = {
-      "@type": "Place",
+      '@type': 'Place',
       geo: {
-        "@type": "GeoShape",
-        box: (bbox || []).join(" ")
-      }
+        '@type': 'GeoShape',
+        box: (bbox || []).join(' '),
+      },
     };
   }
 }
@@ -41,31 +40,30 @@ function formatTemporalCoverage(dates) {
 function makeAssets(data) {
   if (size(data.assets) > 0) {
     return Object.values(data.assets).map(a => ({
-      "@type": "DataDownload",
+      '@type': 'DataDownload',
       contentUrl: toAbsolute(a.href, data.getAbsoluteUrl()),
       encodingFormat: a.type,
-      name: a.title
+      name: a.title,
     }));
   }
   return [];
 }
 
-function makeLinks(links, data, store, type = "DataCatalog") {
+function makeLinks(links, data, store, type = 'DataCatalog') {
   return links.map(link => {
     let name, isBasedOn;
     if (link instanceof STAC) {
       name = getDisplayTitle(link);
       isBasedOn = link.getAbsoluteUrl();
-    }
-    else {
+    } else {
       name = link.title;
       isBasedOn = toAbsolute(link.href, data.getAbsoluteUrl());
     }
     let obj = {
-      "@type": type,
+      '@type': type,
       name,
       url: toBrowserUrl(isBasedOn, store),
-      isBasedOn
+      isBasedOn,
     };
     if (type === 'Dataset') {
       obj.description = fallbackDescription(link, store);
@@ -78,26 +76,25 @@ function makeProvider(providers, role) {
   return providers
     .filter(p => isObject(p) && Array.isArray(p.roles) && p.roles.includes(role))
     .map(p => ({
-      "@type": "Organization",
-      "name": p.name,
-      "description": p.description,
-      "url": p.url,
-      "email": p.email || p.mail,
+      '@type': 'Organization',
+      name: p.name,
+      description: p.description,
+      url: p.url,
+      email: p.email || p.mail,
     }));
 }
 
 function fallbackDescription(data, store) {
   let stacType, container;
   if (data instanceof STAC) {
-    stacType = data.isItem ? "Item" : data.type;
+    stacType = data.isItem ? 'Item' : data.type;
     container = data.collection;
-  }
-  else if (isObject(data) && data.rel === 'item') {
-    stacType = "Item";
+  } else if (isObject(data) && data.rel === 'item') {
+    stacType = 'Item';
   }
   if (stacType) {
     let type = i18n.global.t(`stac${stacType}`, 1);
-    let inX = i18n.global.t('in', {catalog: container || store.catalogTitle});
+    let inX = i18n.global.t('in', { catalog: container || store.catalogTitle });
     return `SpatioTemporal Asset Catalog (STAC)\n${type} - ${data.id} ${inX}`;
   }
 }
@@ -115,8 +112,7 @@ function createBaseSchema(data, type, store) {
   let license = data.getMetadata('license');
   if (license && license !== 'proprietary' && license !== 'various' && license !== 'other') {
     license = `https://spdx.org/licenses/${license}.html`;
-  }
-  else {
+  } else {
     license = data.getLinkWithRel('license')?.href;
   }
   if (license) {
@@ -129,20 +125,20 @@ function createBaseSchema(data, type, store) {
   let provider; // host
   let creator; // processor
   if (size(providers) > 0) {
-    copyrightHolder = makeProvider(providers, "licensor");
-    producer = makeProvider(providers, "producer");
-    provider = makeProvider(providers, "host");
-    creator = makeProvider(providers, "processor");
+    copyrightHolder = makeProvider(providers, 'licensor');
+    producer = makeProvider(providers, 'producer');
+    provider = makeProvider(providers, 'host');
+    creator = makeProvider(providers, 'processor');
   }
 
   return {
-    "@context": "https://schema.org/",
-    "@type": type,
+    '@context': 'https://schema.org/',
+    '@type': type,
     name,
-    description: data.getMetadata("description") || fallbackDescription(data, store),
-    citation: data.getMetadata("sci:citation"),
-    identifier: data.getMetadata("sci:doi") || data.id,
-    keywords: data.getMetadata("keywords"),
+    description: data.getMetadata('description') || fallbackDescription(data, store),
+    citation: data.getMetadata('sci:citation'),
+    identifier: data.getMetadata('sci:doi') || data.id,
+    keywords: data.getMetadata('keywords'),
     license,
     url,
     isBasedOn: stacUrl,
@@ -157,7 +153,7 @@ function createBaseSchema(data, type, store) {
     copyrightHolder,
     producer,
     provider,
-    creator
+    creator,
   };
 }
 
@@ -186,7 +182,7 @@ export function createCatalogSchema(data, parents, store) {
   }
 
   schema.hasPart = makeLinks(store.getters.catalogs, data, store);
-  schema.dataset = makeLinks(store.getters.items, data, store, "Dataset");
+  schema.dataset = makeLinks(store.getters.items, data, store, 'Dataset');
   schema.isPartOf = makeLinks(parents, data, store);
 
   return schema;
@@ -206,8 +202,7 @@ export function createItemSchema(data, parents, store) {
   let end = data.getMetadata('end_datetime');
   if (start || end) {
     schema.temporalCoverage = formatTemporalCoverage([start, end]);
-  }
-  else {
+  } else {
     schema.temporalCoverage = data.getMetadata('datetime');
   }
 

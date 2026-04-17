@@ -1,4 +1,4 @@
-import { hierarchical, pagination, queryables } from "stac-js/src/relationtypes.js";
+import { hierarchical, pagination, queryables } from 'stac-js/src/relationtypes.js';
 
 // STAC relation types
 
@@ -11,8 +11,10 @@ export const stacBrowserNavigatesTo = [
   'predecessor-version',
   'successor-version',
   'source', // label extension,
-  'alternate' // language extension
-].concat(hierarchical).concat(pagination);
+  'alternate', // language extension
+]
+  .concat(hierarchical)
+  .concat(pagination);
 
 // Rels that are handled in a special way and should not be shown in the link list
 export const stacBrowserSpecialHandling = [
@@ -22,7 +24,10 @@ export const stacBrowserSpecialHandling = [
   'search',
   'icon', // Other v
   'license',
-].concat(hierarchical).concat(pagination).concat(queryables);
+]
+  .concat(hierarchical)
+  .concat(pagination)
+  .concat(queryables);
 
 // OGC APIs
 export const ogcRelPrefix = 'http://www.opengis.net/def/rel/ogc/1.0/';

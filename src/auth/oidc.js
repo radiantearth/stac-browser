@@ -1,11 +1,10 @@
-import BrowserStorage from "../browser-store";
-import Auth from "./index";
+import BrowserStorage from '../browser-store';
+import Auth from './index';
 import { hasText } from 'stac-js/src/utils.js';
 
 import { UserManager } from 'oidc-client-ts';
 
 export default class OIDC extends Auth {
-
   constructor(router, options, changeListener) {
     super(router, options, changeListener);
 
@@ -14,7 +13,7 @@ export default class OIDC extends Auth {
       client_id: 'stac-browser',
       post_logout_redirect_uri: this.getRedirectUri('/auth/logout'),
       redirect_uri: this.getRedirectUri('/auth'),
-      automaticSilentRenew: true
+      automaticSilentRenew: true,
     };
     this.user = null;
     this.manager = new UserManager(Object.assign(oidcConfig, options.oidcConfig));
@@ -75,8 +74,7 @@ export default class OIDC extends Auth {
     this.user = user;
     if (user) {
       await this.changeListener(true, user.access_token);
-    }
-    else {
+    } else {
       await this.changeListener(false);
     }
   }
@@ -84,5 +82,4 @@ export default class OIDC extends Auth {
   updateStore(value) {
     return this._updateStore(value, 'Authorization', 'header', 'Bearer');
   }
-
 }

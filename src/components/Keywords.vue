@@ -10,18 +10,18 @@ export default {
   props: {
     keywords: {
       type: Array,
-      required: true
+      required: true,
     },
     variant: {
       type: String,
-      default: 'secondary'
-    }
+      default: 'secondary',
+    },
   },
   computed: {
     sortedKeywords() {
       return [...this.keywords].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
-    }
-  }
+    },
+  },
 };
 </script>
 

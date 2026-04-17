@@ -6,32 +6,24 @@
 
 <script>
 import { Bar } from 'vue-chartjs';
-import {
-  Chart as ChartJS,
-  Colors,
-  Title,
-  Tooltip,
-  BarElement,
-  CategoryScale,
-  LinearScale
-} from 'chart.js';
+import { Chart as ChartJS, Colors, Title, Tooltip, BarElement, CategoryScale, LinearScale } from 'chart.js';
 
 ChartJS.register(Title, Tooltip, Colors, BarElement, CategoryScale, LinearScale);
 
 export default {
-  name: "Histogram",
+  name: 'Histogram',
   components: {
-    Bar
+    Bar,
   },
   props: {
     data: {
       type: Object,
-      required: true
+      required: true,
     },
     options: {
       type: Object,
-      default: () => ({})
-    }
+      default: () => ({}),
+    },
   },
   computed: {
     allOptions() {
@@ -41,15 +33,15 @@ export default {
         scales: {
           x: {
             ticks: {
-              display: false
-            }
-          }
+              display: false,
+            },
+          },
         },
         plugins: {
           legend: {
             display: false,
-          }
-        }
+          },
+        },
       };
       return Object.assign(options, this.options);
     },
@@ -58,9 +50,9 @@ export default {
       let labels = [];
       let width = (this.data.max - this.data.min) / this.data.count;
       let last = this.data.min;
-      for(let i = 0; i < this.data.count; i++) {
+      for (let i = 0; i < this.data.count; i++) {
         let min = Math.round(last * 100) / 100;
-        let max = Math.round((last+width) * 100) / 100;
+        let max = Math.round((last + width) * 100) / 100;
         labels.push(`${min} - ${max}`);
         last += width;
 
@@ -74,11 +66,11 @@ export default {
             data: values,
             barPercentage: 1,
             categoryPercentage: 1,
-          }
-        ]
+          },
+        ],
       };
-    }
-  }
+    },
+  },
 };
 </script>
 

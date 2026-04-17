@@ -1,7 +1,8 @@
 import js from '@eslint/js';
 import pluginVue from 'eslint-plugin-vue';
-import globals from 'globals'; // Import globals package
-  
+import eslintConfigPrettier from 'eslint-config-prettier';
+import globals from 'globals';
+
 export default [
   // Apply to JavaScript and Vue files
   {
@@ -14,55 +15,57 @@ export default [
         // Your custom globals
         STAC_BROWSER_VERSION: 'readonly',
         CONFIG_FROM_ENV: 'readonly',
-      }
-    }
+      },
+    },
   },
-  
+
   // ESLint recommended rules
   js.configs.recommended,
-  
+
   // Vue 3 strongly recommended rules
   ...pluginVue.configs['flat/strongly-recommended'],
-  
+
   // Custom rules
   {
     rules: {
-      // Indentation
-      'indent': ['error', 2, { 'SwitchCase': 1 }],
-      'vue/html-indent': ['error', 2],
-      'vue/script-indent': ['error', 2, { 'baseIndent': 0, 'switchCase': 1 }],
-
       // General JavaScript rules
-      'curly': [1, 'all'],
-      'semi': [1, 'always'],
-      
+      curly: ['warn', 'all'],
+      'no-unused-vars': ['warn', { args: 'none', caughtErrors: 'none' }],
+      'no-unused-expressions': 'off',
+
       // Vue component naming
       'vue/multi-word-component-names': 'off',
       'vue/singleline-html-element-content-newline': 'off',
       'vue/attribute-hyphenation': 'off',
-      
+
       // Vue formatting
-      'vue/max-attributes-per-line': ['error', {
-        'singleline': {
-          'max': 6
-        },      
-        'multiline': {
-          'max': 4
-        }
-      }],
-      
+      'vue/max-attributes-per-line': [
+        'error',
+        {
+          singleline: {
+            max: 6,
+          },
+          multiline: {
+            max: 4,
+          },
+        },
+      ],
+
       // Component structure
-      'vue/block-order': ['error', {
-        'order': ['template', 'script', 'style']
-      }],
+      'vue/block-order': [
+        'error',
+        {
+          order: ['template', 'script', 'style'],
+        },
+      ],
       'vue/this-in-template': 'error',
-      
+
       // Vue 3 specific
       'vue/no-v-model-argument': 'off',
       'vue/require-explicit-emits': 'warn',
       'vue/v-on-event-hyphenation': 'warn',
       'vue/prefer-import-from-vue': 'error',
-      
+
       // Vue 2 to Vue 3 migration warnings (no longer deprecated)
       'vue/no-deprecated-v-on-native-modifier': 'error',
       'vue/no-deprecated-v-bind-sync': 'error',
@@ -80,28 +83,24 @@ export default [
       'vue/no-deprecated-slot-scope-attribute': 'error',
       'vue/no-deprecated-v-is': 'error',
       'vue/no-deprecated-vue-config-keycodes': 'error',
-      
-      // Code quality  
+
+      // Code quality
       'vue/no-unused-vars': 'warn',
       'vue/no-unused-components': 'warn',
       'vue/require-default-prop': 'warn',
       'vue/no-undef-properties': 'off',
       'vue/no-empty-component-block': 'warn',
-      'vue/no-reserved-component-names': 'warn'
-    }
+      'vue/no-reserved-component-names': 'warn',
+    },
   },
-  
-  // Ignore patterns
+
+  // Disable formatting rules that conflict with Prettier (must be last rule config)
+  eslintConfigPrettier,
+
+  // Ignore patterns (ESLint only targets src/ via the lint script)
   {
     ignores: [
-      '**/stac-fields/**',
-      '**/stac-migrate/**',
-      '**/stac-layer/**',
       'src/codegen/templates/**',
-      'config.js',
-      '*.config.js',
-      'dist/**',
-      'node_modules/**'
-    ]
-  }
+    ],
+  },
 ];

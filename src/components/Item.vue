@@ -9,7 +9,9 @@
       </b-card-title>
       <b-card-text v-if="fileFormats.length > 0 || hasDescription || isDeprecated" class="intro">
         <b-badge v-if="isDeprecated" variant="warning" class="me-1 mt-1 deprecated">{{ $t('deprecated') }}</b-badge>
-        <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="me-1 mt-1 fileformat">{{ format }}</b-badge>
+        <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="me-1 mt-1 fileformat">{{
+          format
+        }}</b-badge>
         <template v-if="hasDescription">{{ summarizeDescription }}</template>
       </b-card-text>
       <Keywords v-if="showKeywordsInItemCards && keywords.length > 0" :keywords="keywords" variant="primary" />
@@ -38,17 +40,14 @@ export default defineComponent({
     BCardBody,
     BCardText,
     BCardTitle,
-    Keywords: defineAsyncComponent(() => import('./Keywords.vue'))
+    Keywords: defineAsyncComponent(() => import('./Keywords.vue')),
   },
-  mixins: [
-    FileFormatsMixin,
-    CardMixin
-  ],
+  mixins: [FileFormatsMixin, CardMixin],
   props: {
     item: {
       type: Object,
-      required: true
-    }
+      required: true,
+    },
   },
   computed: {
     ...mapState(['showKeywordsInItemCards']),
@@ -60,7 +59,7 @@ export default defineComponent({
       return {
         queued: !this.data,
         deprecated: this.isDeprecated,
-        description: this.hasDescription
+        description: this.hasDescription,
       };
     },
     extent() {
@@ -72,11 +71,9 @@ export default defineComponent({
     displayTime() {
       if (this.extent) {
         return formatTemporalExtent(this.extent);
-      }
-      else if (this.data && this.data.properties.datetime) {
+      } else if (this.data && this.data.properties.datetime) {
         return formatTimestamp(this.data.properties.datetime);
-      }
-      else {
+      } else {
         return this.$t('items.noTime');
       }
     },
@@ -87,7 +84,7 @@ export default defineComponent({
         return;
       }
       this.$store.commit(visible ? 'queue' : 'unqueue', this.item.getAbsoluteUrl());
-    }
-  }
+    },
+  },
 });
 </script>

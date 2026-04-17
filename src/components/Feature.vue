@@ -24,19 +24,21 @@ import { formatKey } from '@radiantearth/stac-fields/helper';
 import DataTypes from '@radiantearth/stac-fields/datatypes';
 
 export default defineComponent({
-  name: "Feature",
+  name: 'Feature',
   components: {
-    BCard
+    BCard,
   },
   props: {
     feature: {
       type: Object,
-      required: true
-    }
+      required: true,
+    },
   },
   computed: {
     title() {
-      return this.feature.properties?.title || this.feature.id || this.feature.properties?.id || this.feature.geometry?.type;
+      return (
+        this.feature.properties?.title || this.feature.id || this.feature.properties?.id || this.feature.geometry?.type
+      );
     },
     formatted() {
       const formatted = [];
@@ -47,7 +49,7 @@ export default defineComponent({
             field: key,
             label: formatKey(key),
             value,
-            formatted: DataTypes.format(value)
+            formatted: DataTypes.format(value),
           });
         }
       }
@@ -55,7 +57,7 @@ export default defineComponent({
     },
     hasProps() {
       return size(this.feature.properties) > 0;
-    }
-  }
+    },
+  },
 });
 </script>

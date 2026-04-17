@@ -7,27 +7,25 @@
 
       <b-dropdown
         v-model="operatorsOpen"
-        split auto-close="outside"
-        size="sm" class="op" variant="dark" :text="operator.label"
-        @split-click="iterateOps"
-      >
+        split
+        auto-close="outside"
+        size="sm"
+        class="op"
+        variant="dark"
+        :text="operator.label"
+        @split-click="iterateOps">
         <b-dropdown-item-button
           v-for="op in operators"
           :key="op.SYMBOL"
           :active="op === operator"
           @click="updateOperator(op)"
-          button-class="queryable-item"
-        >
+          button-class="queryable-item">
           <span class="long-label">{{ op.longLabel }}</span>
           <b-badge variant="dark" class="ms-2">{{ op.label }}</b-badge>
         </b-dropdown-item-button>
         <b-dropdown-divider />
-        <b-dropdown-item-button
-          button-class="queryable-item"
-          :active="negate"
-          @click="updateNegate(!negate)"
-        >
-          <b-icon-check :class="{hide: !negate}" class="mt-1 me-2" />
+        <b-dropdown-item-button button-class="queryable-item" :active="negate" @click="updateNegate(!negate)">
+          <b-icon-check :class="{ hide: !negate }" class="mt-1 me-2" />
           <span class="long-label">{{ cqlNot.longLabel }}</span>
           <b-badge variant="dark" class="ms-2">{{ cqlNot.label }}</b-badge>
         </b-dropdown-item-button>
@@ -40,8 +38,7 @@
           size="sm"
           :value="value[0].value"
           @input="updateBetweenValue(0, $event)"
-          v-bind="validation"
-        />
+          v-bind="validation" />
         <span class="sep">-</span>
         <b-form-input
           :number="queryable.isNumeric"
@@ -49,8 +46,7 @@
           size="sm"
           :value="value[1].value"
           @input="updateBetweenValue(1, $event)"
-          v-bind="validation"
-        />
+          v-bind="validation" />
       </div>
       <multiselect
         v-else-if="queryable.isArray || operator.SYMBOL === 'in'"
@@ -62,12 +58,11 @@
         :placeholder="$t('search.arrayInput.helpText')"
         :tag-placeholder="$t('search.arrayInput.addValue')"
         @tag="addArrayValue"
-        @paste="onArrayPaste"
-      >
+        @paste="onArrayPaste">
         <template #noOptions>{{ $t('search.noOptions') }}</template>
       </multiselect>
       <VueDatePicker
-        v-else-if="queryable.isTemporal && (operator.SYMBOL !== 'like' && operator.SYMBOL !== 'in')"
+        v-else-if="queryable.isTemporal && operator.SYMBOL !== 'like' && operator.SYMBOL !== 'in'"
         class="value"
         :model-value="value.value"
         @update:model-value="updateValue"
@@ -75,38 +70,34 @@
         :week-start="weekStartDay"
         :formats="{ input: queryable.isDateTime ? dateTimeFormat : dateFormat }"
         :close-on-scroll="false"
-        :time-config="{ 
+        :time-config="{
           enableTimePicker: queryable.isDateTime,
           seconds: queryable.isDateTime,
-          timePickerInline: true 
+          timePickerInline: true,
         }"
         :input-attrs="{ clearable: true }"
-        auto-apply
-      />
+        auto-apply />
       <b-form-select
         v-else-if="queryable.isSelection"
         :options="queryableOptions"
         size="sm"
         class="value"
         :model-value="value.value"
-        @update:model-value="updateValue($event)"
-      />
+        @update:model-value="updateValue($event)" />
       <b-form-input
         v-else-if="queryable.isText || queryable.isNumeric"
         size="sm"
         class="value"
         :model-value="value.value"
         @update:model-value="updateValue($event)"
-        v-bind="validation"
-      />
+        v-bind="validation" />
       <b-form-checkbox
         v-else-if="queryable.isBoolean"
         switch
         class="value"
         :model-value="value.value"
         @update:model-value="updateValue($event)"
-        v-bind="validation"
-      >
+        v-bind="validation">
         {{ $t(`checkbox.${value.value}`) }}
       </b-form-checkbox>
 
@@ -131,7 +122,7 @@ import DatePickerMixin from './DatePickerMixin';
 import { isObject } from 'stac-js/src/utils.js';
 import CqlValue from '../models/cql2/value';
 import { CqlNot } from '../models/cql2/operators/logical';
-    
+
 export default {
   name: 'QueryableInput',
   components: {
@@ -139,11 +130,9 @@ export default {
     BDropdown,
     BDropdownItemButton,
     Description: defineAsyncComponent(() => import('./Description.vue')),
-    Multiselect: defineAsyncComponent(() => import('vue-multiselect'))
+    Multiselect: defineAsyncComponent(() => import('vue-multiselect')),
   },
-  mixins: [
-    DatePickerMixin
-  ],
+  mixins: [DatePickerMixin],
   props: {
     // eslint-disable-next-line
     value: {
@@ -151,31 +140,26 @@ export default {
     },
     operator: {
       type: Function,
-      required: true
+      required: true,
     },
     negate: {
       type: Boolean,
-      required: true
+      required: true,
     },
     queryable: {
       type: Object,
-      required: true
+      required: true,
     },
     cql: {
       type: Object,
-      required: true
-    }
+      required: true,
+    },
   },
-  emits: [
-    'remove-queryable',
-    'update:value',
-    'update:operator',
-    'update:negate'
-  ],
+  emits: ['remove-queryable', 'update:value', 'update:operator', 'update:negate'],
   data() {
     return {
       operatorsOpen: false,
-      cqlNot: CqlNot
+      cqlNot: CqlNot,
     };
   },
   computed: {
@@ -185,16 +169,15 @@ export default {
           type: 'text',
           minlength: this.schema.minLength,
           maxlength: this.schema.maxLength,
-          required: this.schema.minLength > 0
+          required: this.schema.minLength > 0,
         };
-      }
-      else if (this.queryable.isNumeric) {
+      } else if (this.queryable.isNumeric) {
         return {
           type: 'number',
           number: true,
           min: this.schema.minimum,
           max: this.schema.maximum,
-          step: this.schema.multipleOf || 'any'
+          step: this.schema.multipleOf || 'any',
         };
       }
       return {};
@@ -218,8 +201,8 @@ export default {
       },
       set(newValues) {
         this.updateValue(newValues.map(v => this.castArrayItem(v)));
-      }
-    }
+      },
+    },
   },
   methods: {
     iterateOps() {
@@ -265,7 +248,8 @@ export default {
       }
       event.preventDefault();
       const currentArr = this.value?.value || [];
-      const items = pasted.split(',')
+      const items = pasted
+        .split(',')
         .map(s => s.trim())
         .filter(s => s !== '')
         .map(s => this.castArrayItem(s))
@@ -275,13 +259,12 @@ export default {
       }
     },
     castValue(value) {
-      if (typeof value !== "string") {
+      if (typeof value !== 'string') {
         return value;
       }
       if (this.queryable.is('integer')) {
         value = parseInt(value, 10);
-      }
-      else if (this.queryable.is('number')) {
+      } else if (this.queryable.is('number')) {
         value = parseFloat(value);
       }
       return value;
@@ -298,8 +281,7 @@ export default {
           // If strings are allowed, but also numbers, we only coerce to number if it looks like a number
           if (itemTypes.includes('integer') && /^-?\d+$/.test(item)) {
             return parseInt(item, 10);
-          }
-          else if (itemTypes.includes('number') && /^-?\d+(\.\d+)?$/.test(item)) {
+          } else if (itemTypes.includes('number') && /^-?\d+(\.\d+)?$/.test(item)) {
             return parseFloat(item);
           }
         }
@@ -307,9 +289,8 @@ export default {
       }
       // Do number first to avoid casting floats to integers if both are allowed
       else if (itemTypes.includes('number')) {
-         return parseFloat(item);
-      }
-      else if (itemTypes.includes('integer')) {
+        return parseFloat(item);
+      } else if (itemTypes.includes('integer')) {
         return parseInt(item, 10);
       }
       return item;
@@ -322,14 +303,14 @@ export default {
     },
     getEventValue(event) {
       return isObject(event) && 'target' in event ? event.target.value : event;
-    }
-  }
+    },
+  },
 };
 </script>
 
 <style lang="scss">
 @import 'bootstrap/scss/mixins';
-@import "../theme/variables.scss";
+@import '../theme/variables.scss';
 @import '../theme/datepicker.scss';
 
 .queryable-row {
@@ -340,7 +321,8 @@ export default {
   align-content: center;
   display: flex;
 
-  .title, .value {
+  .title,
+  .value {
     flex-grow: 4;
     width: 7rem !important;
   }

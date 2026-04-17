@@ -15,25 +15,25 @@ import MetadataEntry from './MetadataEntry.vue';
 import { BCard, BCardTitle } from 'bootstrap-vue-next';
 
 export default {
-  name: "MetadataGroup",
+  name: 'MetadataGroup',
   components: {
     MetadataEntry,
     BCard,
-    BCardTitle
+    BCardTitle,
   },
   props: {
-      label: {
-        type: String,
-        default: ''
-      },
-      extension: {
-        type: String,
-        default: ''
-      },
-      properties: {
-        type: Object,
-        required: true
-      }
-  }
+    label: {
+      type: String,
+      default: '',
+    },
+    extension: {
+      type: String,
+      default: '',
+    },
+    properties: {
+      type: Object,
+      required: true,
+    },
+  },
 };
 </script>

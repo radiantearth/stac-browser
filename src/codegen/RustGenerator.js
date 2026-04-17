@@ -56,12 +56,11 @@ export default class RustGenerator extends CodeGenerator {
     const prefix = ' '.repeat(this.indent);
     return JSON.stringify(obj, null, this.indent)
       .split('\n')
-      .map((line, i) => i === 0 ? line : prefix + line)
+      .map((line, i) => (i === 0 ? line : prefix + line))
       .join('\n');
   }
 
   formatFilters(filters) {
     return this.formatJson(this.getCleanFilters(filters));
   }
-
 }

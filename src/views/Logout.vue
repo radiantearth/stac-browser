@@ -10,10 +10,10 @@
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-  name: "Logout",
+  name: 'Logout',
   async created() {
-    await this.$store.dispatch("auth/finalizeLogout");
-  }
+    await this.$store.dispatch('auth/finalizeLogout');
+  },
 });
 </script>
 

@@ -5,13 +5,12 @@ import {
   ItemCollection as BaseItemCollection,
   CollectionCollection as BaseCollectionCollection,
   STAC,
-  STACReference
+  STACReference,
 } from 'stac-js';
 import Migrate from '@radiantearth/stac-migrate';
-import Utils from "../utils";
+import Utils from '../utils';
 import { hasText } from 'stac-js/src/utils.js';
 import { toAbsolute } from 'stac-js/src/http.js';
-
 
 export function createSTAC(data, url, path, migrate = true, updateVersionNumber = false) {
   if (migrate) {
@@ -24,19 +23,18 @@ export function createSTAC(data, url, path, migrate = true, updateVersionNumber 
   let obj;
   if (data.type === 'Feature') {
     obj = new Item(data, url, path);
-  }
-  else if (data.type === 'FeatureCollection') {
+  } else if (data.type === 'FeatureCollection') {
     // todo: convert inner collections to stac-js as well
     obj = new ItemCollection(data, url, path);
-  }
-  else if (data.type === 'Collection' || (!data.type && typeof data.extent !== 'undefined' && typeof data.license !== 'undefined')) {
+  } else if (
+    data.type === 'Collection' ||
+    (!data.type && typeof data.extent !== 'undefined' && typeof data.license !== 'undefined')
+  ) {
     obj = new Collection(data, url, path);
-  }
-  else if (!data.type && Array.isArray(data.collections)) {
+  } else if (!data.type && Array.isArray(data.collections)) {
     // todo: convert inner collections to stac-js as well
     obj = new CollectionCollection(data, url, path);
-  }
-  else {
+  } else {
     obj = new Catalog(data, url, path);
   }
   if (data._original) {
@@ -57,7 +55,7 @@ export function addMissingChildren(catalogs, stac) {
   return links.concat(catalogs);
 }
 
-export function getDisplayTitle(entities, fallbackTitle = "") {
+export function getDisplayTitle(entities, fallbackTitle = '') {
   if (!Array.isArray(entities)) {
     entities = [entities];
   }
@@ -67,11 +65,11 @@ export function getDisplayTitle(entities, fallbackTitle = "") {
   if (!entity) {
     return fallbackTitle;
   }
-  const title = entity.getMetadata("title");
+  const title = entity.getMetadata('title');
   if (hasText(title)) {
     return title;
   }
-  const id = entity.getMetadata("id");
+  const id = entity.getMetadata('id');
   if (hasText(id)) {
     return id;
   }
@@ -107,7 +105,6 @@ function getChildren(stac, priority = null) {
 }
 
 export class ItemCollection extends BaseItemCollection {
-
   constructor(data, url, path) {
     super(data, url);
     this._path = path;
@@ -117,11 +114,9 @@ export class ItemCollection extends BaseItemCollection {
   getBrowserPath() {
     return this._path;
   }
-
 }
 
 export class CollectionCollection extends BaseCollectionCollection {
-
   constructor(data, url, path) {
     super(data, url);
     this._path = path;
@@ -131,11 +126,9 @@ export class CollectionCollection extends BaseCollectionCollection {
   getBrowserPath() {
     return this._path;
   }
-
 }
 
 export class Collection extends BaseCollection {
-
   constructor(data, url, path) {
     super(data, url);
     this._path = path;
@@ -144,7 +137,7 @@ export class Collection extends BaseCollection {
     this._apiChildren = {
       list: [],
       prev: false,
-      next: false
+      next: false,
     };
     this._privateKeys.push('_path', '_incomplete', '_apiChildrenListeners', '_apiChildren');
   }
@@ -160,8 +153,7 @@ export class Collection extends BaseCollection {
   setApiDataListener(id, listener = null) {
     if (typeof listener === 'function') {
       this._apiChildrenListeners[id] = listener;
-    }
-    else {
+    } else {
       delete this._apiChildrenListeners[id];
     }
   }
@@ -183,11 +175,9 @@ export class Collection extends BaseCollection {
       }
     }
   }
-
 }
 
 export class Catalog extends BaseCatalog {
-
   constructor(data, url, path) {
     super(data, url);
     this._path = path;
@@ -196,7 +186,7 @@ export class Catalog extends BaseCatalog {
     this._apiChildren = {
       list: [],
       prev: false,
-      next: false
+      next: false,
     };
     this._privateKeys.push('_path', '_incomplete', '_apiChildrenListeners', '_apiChildren');
   }
@@ -212,8 +202,7 @@ export class Catalog extends BaseCatalog {
   setApiDataListener(id, listener = null) {
     if (typeof listener === 'function') {
       this._apiChildrenListeners[id] = listener;
-    }
-    else {
+    } else {
       delete this._apiChildrenListeners[id];
     }
   }
@@ -235,11 +224,9 @@ export class Catalog extends BaseCatalog {
       }
     }
   }
-
 }
 
 export class Item extends BaseItem {
-
   constructor(data, url, path) {
     super(data, url);
     this._path = path;
@@ -250,5 +237,4 @@ export class Item extends BaseItem {
   getBrowserPath() {
     return this._path;
   }
-
 }

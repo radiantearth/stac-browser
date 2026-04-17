@@ -26,5 +26,4 @@ export default class JavaGenerator extends CodeGenerator {
   get commentChars() {
     return '///';
   }
-
 }

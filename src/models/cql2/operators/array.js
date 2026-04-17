@@ -3,13 +3,12 @@ import CqlValue, { CqlArray } from '../value.js';
 import CqlOperator from './operator';
 
 export default class CqlArrayOperator extends CqlOperator {
-
   constructor(operator, pred = null, obj = null) {
     super(operator, [pred, obj]);
   }
 
   static create(pred, op, obj) {
-    switch(op.toLowerCase()) {
+    switch (op.toLowerCase()) {
       case 'in':
         return new CqlIn(pred, obj);
       case 'a_overlaps':
@@ -30,20 +29,18 @@ export default class CqlArrayOperator extends CqlOperator {
   static getDefaultValue() {
     return CqlValue.create([]);
   }
-
 }
 
 // Currently only implemented for strings and numbers, not for booleans and time instances
 export class CqlIn extends CqlArrayOperator {
-
-  static SYMBOL = "in";
+  static SYMBOL = 'in';
 
   constructor(pred = null, obj = []) {
     super(CqlIn.SYMBOL, pred, obj);
   }
 
   static get label() {
-    return "∈";
+    return '∈';
   }
 
   static get longLabel() {
@@ -57,11 +54,9 @@ export class CqlIn extends CqlArrayOperator {
   toText() {
     return `${this.args[0].toText()} IN ${this.args[1].toText()}`;
   }
-
 }
 
 export class CqlArrayOverlaps extends CqlArrayOperator {
-
   static SYMBOL = 'a_overlaps';
 
   constructor(pred = null, obj = null) {
@@ -79,11 +74,9 @@ export class CqlArrayOverlaps extends CqlArrayOperator {
   static get description() {
     return i18n.global.t('search.arrayOverlapsDescription');
   }
-
 }
 
 export class CqlArrayContains extends CqlArrayOperator {
-
   static SYMBOL = 'a_contains';
 
   constructor(pred = null, obj = null) {
@@ -101,11 +94,9 @@ export class CqlArrayContains extends CqlArrayOperator {
   static get description() {
     return i18n.global.t('search.arrayContainsDescription');
   }
-
 }
 
 export class CqlArrayEquals extends CqlArrayOperator {
-
   static SYMBOL = 'a_equals';
 
   constructor(pred = null, obj = null) {
@@ -123,11 +114,9 @@ export class CqlArrayEquals extends CqlArrayOperator {
   static get description() {
     return i18n.global.t('search.arrayEqualsDescription');
   }
-
 }
 
 export class CqlArrayContainedBy extends CqlArrayOperator {
-
   static SYMBOL = 'a_contained_by';
 
   constructor(pred = null, obj = null) {
@@ -145,5 +134,4 @@ export class CqlArrayContainedBy extends CqlArrayOperator {
   static get description() {
     return i18n.global.t('search.arrayContainedByDescription');
   }
-
 }

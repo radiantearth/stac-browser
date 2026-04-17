@@ -5,7 +5,11 @@
       <div class="group" v-for="group in groups" :key="group.rel">
         <h4 v-if="group.rel">{{ group.label }}</h4>
         <ul>
-          <LinkListEntry v-for="(link, key) in group.links" :key="key" :link="link" :fallbackTitle="() => fallbackTitle(link)" />
+          <LinkListEntry
+            v-for="(link, key) in group.links"
+            :key="key"
+            :link="link"
+            :fallbackTitle="() => fallbackTitle(link)" />
         </ul>
       </div>
     </template>
@@ -24,35 +28,33 @@ import Utils from '../utils';
 import { translateFields } from '../i18n';
 import { mapState } from 'vuex';
 
-
 export default {
-  name: "LinkList",
+  name: 'LinkList',
   components: {
-    LinkListEntry
+    LinkListEntry,
   },
   props: {
     title: {
       type: String,
-      default: null
+      default: null,
     },
     links: {
       type: Array,
-      default: () => ([])
-    }
+      default: () => [],
+    },
   },
   computed: {
     ...mapState(['uiLanguage']),
     groups() {
       let groups = this.links.reduce((summary, link) => {
-        let rel = typeof link.rel === 'string' ? link.rel.toLowerCase() : "";
+        let rel = typeof link.rel === 'string' ? link.rel.toLowerCase() : '';
         if (rel in summary) {
           summary[rel].links.push(link);
-        }
-        else {
+        } else {
           summary[rel] = {
             rel: rel,
             label: this.formatRel(rel),
-            links: [link]
+            links: [link],
           };
         }
         return summary;
@@ -62,15 +64,14 @@ export default {
     },
     hasGroups() {
       return this.groups.some(group => group.rel.length > 0 && group.links.length >= 2);
-    }
+    },
   },
   methods: {
     formatRel(rel) {
-      let lc = typeof rel === 'string' ? rel.toLowerCase() : "";
+      let lc = typeof rel === 'string' ? rel.toLowerCase() : '';
       if (lc in Fields.links.rel.mapping) {
         return translateFields(Fields.links.rel.mapping[lc]);
-      }
-      else {
+      } else {
         if (rel.startsWith(ogcRelPrefix)) {
           rel = rel.substr(ogcRelPrefix.length);
         }
@@ -81,13 +82,12 @@ export default {
       let title = Utils.titleForHref(link.href);
       if (this.hasGroups) {
         return title;
-      }
-      else {
+      } else {
         let rel = this.formatRel(link.rel);
         return `${rel}: ${title}`;
       }
-    }
-  }
+    },
+  },
 };
 </script>
 

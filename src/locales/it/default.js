@@ -8,5 +8,5 @@ export default Utils.mergeDeep(
     fields,
   },
   text,
-  custom
+  custom,
 );

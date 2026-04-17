@@ -1,8 +1,17 @@
-import { formatKey } from "@radiantearth/stac-fields/helper";
+import { formatKey } from '@radiantearth/stac-fields/helper';
 import i18n from '../../i18n.js';
-import { CqlEqual, CqlGreaterThan, CqlGreaterThanEqual, CqlLessThan, CqlLessThanEqual, CqlNotEqual, CqlBetween, CqlLike } from "./operators/comparison";
-import { CqlIn, CqlArrayOverlaps, CqlArrayContains, CqlArrayEquals, CqlArrayContainedBy } from "./operators/array";
-import { isObject } from "stac-js/src/utils.js";
+import {
+  CqlEqual,
+  CqlGreaterThan,
+  CqlGreaterThanEqual,
+  CqlLessThan,
+  CqlLessThanEqual,
+  CqlNotEqual,
+  CqlBetween,
+  CqlLike,
+} from './operators/comparison';
+import { CqlIn, CqlArrayOverlaps, CqlArrayContains, CqlArrayEquals, CqlArrayContainedBy } from './operators/array';
+import { isObject } from 'stac-js/src/utils.js';
 
 export default class Queryable {
   constructor(id, schema) {
@@ -21,7 +30,7 @@ export default class Queryable {
     if (this.isTemporal) {
       return i18n.global.t('search.dateDescription');
     }
-    return "";
+    return '';
   }
 
   get supported() {
@@ -73,8 +82,7 @@ export default class Queryable {
     if (this.isArray && isObject(this.schema.items)) {
       if (typeof this.schema.items.type === 'string') {
         return [this.schema.items.type];
-      }
-      else if (Array.isArray(this.schema.items.type)) {
+      } else if (Array.isArray(this.schema.items.type)) {
         return this.schema.items.type;
       }
     }
@@ -84,26 +92,20 @@ export default class Queryable {
   get defaultValue() {
     if (typeof this.schema.default !== 'undefined') {
       return this.schema.default;
-    }
-    else if (this.isSelection) {
+    } else if (this.isSelection) {
       return this.schema.enum[0];
-    }
-    else if (this.isTemporal) {
+    } else if (this.isTemporal) {
       return new Date();
-    }
-    else if (this.isNumeric) {
+    } else if (this.isNumeric) {
       if (typeof this.schema.minimum !== 'undefined') {
         return this.schema.minimum;
       }
       return 0;
-    }
-    else if (this.isText) {
+    } else if (this.isText) {
       return '';
-    }
-    else if (this.isBoolean) {
+    } else if (this.isBoolean) {
       return false;
-    }
-    else if (this.isArray) {
+    } else if (this.isArray) {
       return [];
     }
     return null;
@@ -112,8 +114,7 @@ export default class Queryable {
   get types() {
     if (typeof this.schema.type === 'string') {
       return [this.schema.type];
-    }
-    else if (Array.isArray(this.schema.type)) {
+    } else if (Array.isArray(this.schema.type)) {
       return this.schema.type;
     }
     return [];

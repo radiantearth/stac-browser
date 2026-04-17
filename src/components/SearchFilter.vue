@@ -6,78 +6,100 @@
 
         <b-card-title v-if="title" :title="title" />
 
-        <b-form-group v-if="canFilterFreeText" class="filter-freetext" :label="$t('search.freeText')" :label-for="ids.q" :description="$t('search.freeTextDescription')">
+        <b-form-group
+          v-if="canFilterFreeText"
+          class="filter-freetext"
+          :label="$t('search.freeText')"
+          :label-for="ids.q"
+          :description="$t('search.freeTextDescription')">
           <multiselect
             :id="ids.q"
             v-model="query.q"
-            multiple taggable
+            multiple
+            taggable
             :options="query.q"
             :placeholder="$t('search.enterSearchTerms')"
             :tag-placeholder="$t('search.addSearchTerm')"
             :no-options="$t('search.addSearchTerm')"
-            @tag="addSearchTerm"
-          >
+            @tag="addSearchTerm">
             <template #noOptions>{{ $t('search.noOptions') }}</template>
           </multiselect>
         </b-form-group>
 
-        <b-form-group v-if="canFilterExtents" class="filter-datetime" :label="$t('search.temporalExtent')" :label-for="ids.datetime" :description="$t('search.dateDescription')">
+        <b-form-group
+          v-if="canFilterExtents"
+          class="filter-datetime"
+          :label="$t('search.temporalExtent')"
+          :label-for="ids.datetime"
+          :description="$t('search.dateDescription')">
           <VueDatePicker
             input-class="form-control mx-input"
-            :id="ids.datetime" 
+            :id="ids.datetime"
             v-model="datetime"
             :locale="datepickerLang"
             :formats="{ input: dateTimeFormat }"
             :week-start="weekStartDay"
             :close-on-scroll="false"
             :placeholder="$t('search.selectDateRange')"
-            :time-config="{ 
-              enableTimePicker: true, 
+            :time-config="{
+              enableTimePicker: true,
               seconds: true,
-              timePickerInline: true 
+              timePickerInline: true,
             }"
             :input-attrs="{ clearable: true }"
             auto-apply
             range
-            :multi-calendars="2"
-          />
+            :multi-calendars="2" />
         </b-form-group>
 
-        <b-form-group v-if="canFilterExtents" class="filter-bbox" :label="$t('search.spatialExtent')" :label-for="ids.bbox">
-          <b-form-checkbox :id="ids.bbox" v-model="provideBBox" value="1">{{ $t('search.filterBySpatialExtent') }}</b-form-checkbox>
+        <b-form-group
+          v-if="canFilterExtents"
+          class="filter-bbox"
+          :label="$t('search.spatialExtent')"
+          :label-for="ids.bbox">
+          <b-form-checkbox :id="ids.bbox" v-model="provideBBox" value="1">{{
+            $t('search.filterBySpatialExtent')
+          }}</b-form-checkbox>
           <MapSelect class="mb-4" v-if="provideBBox" v-model="query.bbox" :stac="stac" />
         </b-form-group>
 
-        <b-form-group v-if="conformances.CollectionIdFilter" class="filter-collection" :label="$t('stacCollection', collections.length)" :label-for="ids.collections">
+        <b-form-group
+          v-if="conformances.CollectionIdFilter"
+          class="filter-collection"
+          :label="$t('stacCollection', collections.length)"
+          :label-for="ids.collections">
           <multiselect
             :id="ids.collections"
             v-model="selectedCollections"
             v-bind="collectionSelectOptions"
             @tag="addCollection"
-            @search-change="searchCollections"
-          >
+            @search-change="searchCollections">
             <template #noOptions>{{ $t('search.noOptions') }}</template>
             <template v-if="additionalCollectionCount > 0" #afterList>
               <li>
                 <strong class="multiselect__option multiselect__option--disabled">
-                  {{ $t("multiselect.andMore", {count: additionalCollectionCount}) }}
+                  {{ $t('multiselect.andMore', { count: additionalCollectionCount }) }}
                 </strong>
               </li>
             </template>
           </multiselect>
         </b-form-group>
 
-        <b-form-group v-if="conformances.ItemIdFilter" class="filter-item-id" :label="$t('search.itemIds')" :label-for="ids.ids">
+        <b-form-group
+          v-if="conformances.ItemIdFilter"
+          class="filter-item-id"
+          :label="$t('search.itemIds')"
+          :label-for="ids.ids">
           <multiselect
             :id="ids.ids"
             v-model="query.ids"
-            multiple taggable
+            multiple
+            taggable
             :options="query.ids"
             :placeholder="$t('search.enterItemIds')"
             :tag-placeholder="$t('search.addItemIds')"
             :no-options="$t('search.addItemIds')"
-            @tag="addId"
-          >
+            @tag="addId">
             <template #noOptions>{{ $t('search.noOptions') }}</template>
           </multiselect>
         </b-form-group>
@@ -86,9 +108,18 @@
           <b-form-radio-group v-model="filtersAndOr" :options="andOrOptions" name="logical" size="sm" />
           <b-form-checkbox v-model="filtersNegate" size="sm">{{ $t('search.logical.not') }}</b-form-checkbox>
 
-          <b-dropdown size="sm" :text="$t('search.addFilter')" variant="primary" class="queryables mt-2 mb-3" menu-class="w-100" toggle-class="w-100">
+          <b-dropdown
+            size="sm"
+            :text="$t('search.addFilter')"
+            variant="primary"
+            class="queryables mt-2 mb-3"
+            menu-class="w-100"
+            toggle-class="w-100">
             <template v-for="queryable in sortedQueryables" :key="queryable.id">
-              <b-dropdown-item v-if="queryable.supported" @click="additionalFieldSelected(queryable)" link-class="d-flex justify-content-between align-items-center">
+              <b-dropdown-item
+                v-if="queryable.supported"
+                @click="additionalFieldSelected(queryable)"
+                link-class="d-flex justify-content-between align-items-center">
                 <span>{{ queryable.title }}</span>
                 <b-badge variant="dark" class="ms-2">{{ queryable.id }}</b-badge>
               </b-dropdown-item>
@@ -96,20 +127,28 @@
           </b-dropdown>
 
           <QueryableInput
-            v-for="(filter, index) in filters" :key="filter.id"
+            v-for="(filter, index) in filters"
+            :key="filter.id"
             v-model:value="filter.value"
             v-model:operator="filter.operator"
             v-model:negate="filter.negate"
             :queryable="filter.queryable"
             :index="index"
             :cql="cql"
-            @remove-queryable="removeQueryable(index)"
-          />
+            @remove-queryable="removeQueryable(index)" />
         </b-form-group>
 
-        <hr v-if="canFilterExtents || conformances.CollectionIdFilter || conformances.ItemIdFilter || showAdditionalFilters">
+        <hr
+          v-if="
+            canFilterExtents || conformances.CollectionIdFilter || conformances.ItemIdFilter || showAdditionalFilters
+          " />
 
-        <b-form-group v-if="canSort" class="sort" :label="$t('sort.title')" :label-for="ids.sort" :description="$t('search.notFullySupported')">
+        <b-form-group
+          v-if="canSort"
+          class="sort"
+          :label="$t('sort.title')"
+          :label-for="ids.sort"
+          :description="$t('search.notFullySupported')">
           <multiselect
             :id="ids.sort"
             v-model="sortTerm"
@@ -118,9 +157,8 @@
             label="text"
             :placeholder="$t('default')"
             :allow-empty="false"
-            :show-labels="false"
-          >
-            <template #option="{option}">
+            :show-labels="false">
+            <template #option="{ option }">
               <span class="d-flex justify-content-between align-items-center">
                 <span>{{ option.text }}</span>
                 <b-badge v-if="option.value" variant="dark" class="ms-2">{{ option.value }}</b-badge>
@@ -130,26 +168,31 @@
           <SortButtons v-if="sortTerm && sortTerm.value" class="mt-1" v-model="sortOrder" :enforce="true" />
         </b-form-group>
 
-        <b-form-group class="limit" :label="$t('search.itemsPerPage')" :label-for="ids.limit" :description="$t('search.itemsPerPageDescription', {maxItems})">
+        <b-form-group
+          class="limit"
+          :label="$t('search.itemsPerPage')"
+          :label-for="ids.limit"
+          :description="$t('search.itemsPerPageDescription', { maxItems })">
           <b-form-input
-            :id="ids.limit" :model-value="query.limit" @update:model-value="setLimit" min="1"
-            :max="maxItems" type="number"
-            :placeholder="limitPlaceholder"
-          />
+            :id="ids.limit"
+            :model-value="query.limit"
+            @update:model-value="setLimit"
+            min="1"
+            :max="maxItems"
+            type="number"
+            :placeholder="limitPlaceholder" />
         </b-form-group>
       </b-card-body>
       <b-card-footer class="d-flex gap-3">
         <b-button type="submit" variant="primary">{{ $t('submit') }}</b-button>
         <b-button type="reset" variant="danger">{{ $t('reset') }}</b-button>
-        <b-button v-if="canShowExampleCode" type="button" variant="secondary" @click="showCodeModal = true">{{ $t('exampleCode.title') }}</b-button>
+        <b-button v-if="canShowExampleCode" type="button" variant="secondary" @click="showCodeModal = true">{{
+          $t('exampleCode.title')
+        }}</b-button>
       </b-card-footer>
     </b-card>
     <b-modal v-if="canShowExampleCode" v-model="showCodeModal" :title="$t('exampleCode.title')" size="xl">
-      <SearchCode
-        v-if="showCodeModal"
-        :searchLinks="codeExampleSearchLinks"
-        :filters="codeExampleQuery"
-      />
+      <SearchCode v-if="showCodeModal" :searchLinks="codeExampleSearchLinks" :filters="codeExampleQuery" />
       <template #footer="{ close }">
         <b-button variant="secondary" @click="close()">{{ $t('close') }}</b-button>
       </template>
@@ -159,7 +202,7 @@
 
 <script>
 import { defineComponent, defineAsyncComponent } from 'vue';
-import { mapGetters, mapState } from "vuex";
+import { mapGetters, mapState } from 'vuex';
 import { BCard, BCardBody, BCardFooter, BCardTitle, BDropdown, BDropdownItem, BModal } from 'bootstrap-vue-next';
 
 import refParser from '@apidevtools/json-schema-ref-parser';
@@ -171,14 +214,13 @@ import ApiCapabilitiesMixin, { TYPES } from './ApiCapabilitiesMixin';
 import DatePickerMixin from './DatePickerMixin';
 import Loading from './Loading.vue';
 
-import { CollectionCollection, STAC } from 'stac-js'; 
+import { CollectionCollection, STAC } from 'stac-js';
 import { createSTAC, Collection } from '../models/stac';
 import Cql from '../models/cql2/cql';
 import Queryable from '../models/cql2/queryable';
 import CqlLogicalOperator, { CqlNot } from '../models/cql2/operators/logical';
 import { stacRequest } from '../store/utils';
 import { formatKey } from '@radiantearth/stac-fields/helper';
-
 
 function getQueryDefaults() {
   return {
@@ -189,7 +231,7 @@ function getQueryDefaults() {
     ids: [],
     collections: [],
     sortby: null,
-    filters: null
+    filters: null,
   };
 }
 
@@ -204,7 +246,7 @@ function getDefaults() {
     filtersAndOr: 'and',
     filtersNegate: false,
     filters: [],
-    selectedCollections: []
+    selectedCollections: [],
   };
 }
 
@@ -227,45 +269,46 @@ export default defineComponent({
     SortButtons: defineAsyncComponent(() => import('./SortButtons.vue')),
     Multiselect: defineAsyncComponent(() => import('vue-multiselect')),
   },
-  mixins: [
-    ApiCapabilitiesMixin,
-    DatePickerMixin
-  ],
+  mixins: [ApiCapabilitiesMixin, DatePickerMixin],
   props: {
     parent: {
       type: Object,
-      default: null
+      default: null,
     },
     title: {
       type: String,
-      required: true
+      required: true,
     },
-    type: { // Collections or Global or Items
+    type: {
+      // Collections or Global or Items
       type: String,
-      required: true
+      required: true,
     },
     value: {
       type: Object,
-      default: () => ({})
+      default: () => ({}),
     },
     searchLink: {
       type: Object,
-      default: null
-    }
+      default: null,
+    },
   },
   emits: ['input'],
   data() {
-    return Object.assign({
-      results: null,
-      loaded: false,
-      queryables: null,
-      sortables: null,
-      hasAllCollections: false,
-      collections: [],
-      collectionsLoadingTimer: null,
-      additionalCollectionCount: 0,
-      showCodeModal: false
-    }, getDefaults());
+    return Object.assign(
+      {
+        results: null,
+        loaded: false,
+        queryables: null,
+        sortables: null,
+        hasAllCollections: false,
+        collections: [],
+        collectionsLoadingTimer: null,
+        additionalCollectionCount: 0,
+        showCodeModal: false,
+      },
+      getDefaults(),
+    );
   },
   computed: {
     ...mapState(['searchResultsPerPage', 'maxEntriesPerPage', 'uiLanguage']),
@@ -278,24 +321,24 @@ export default defineComponent({
         multiple: true,
         taggable,
         options: this.collections, // query.collections
-        trackBy: "value",
-        label: "text",
+        trackBy: 'value',
+        label: 'text',
         placeholder: taggable ? this.$t('search.enterCollections') : this.$t('search.selectCollections'),
         tagPlaceholder: this.$t('search.addCollections'),
         selectLabel: this.$t('multiselect.selectLabel'),
         selectedLabel: this.$t('multiselect.selectedLabel'),
         deselectLabel: this.$t('multiselect.deselectLabel'),
-        limitText: count => this.$t("multiselect.andMore", {count}),
+        limitText: count => this.$t('multiselect.andMore', { count }),
         loading: this.collectionsLoadingTimer !== null,
         showNoResults: false,
-        internalSearch: !isResult
+        internalSearch: !isResult,
       };
     },
     collectionSearchLink() {
       return this.parent && this.parent.isCatalogLike && this.parent.getApiCollectionsLink();
     },
     codeExampleSearchLinks() {
-      const toMethodMap = (link) => {
+      const toMethodMap = link => {
         if (!link) {
           return {};
         }
@@ -328,7 +371,7 @@ export default defineComponent({
       return {
         ...this.query,
         sortby: this.formatSort(),
-        filters: this.buildFilter()
+        filters: this.buildFilter(),
       };
     },
     canSearchCollectionsFreeText() {
@@ -336,8 +379,7 @@ export default defineComponent({
     },
     ids() {
       let obj = {};
-      ['q', 'datetime', 'bbox', 'collections', 'ids', 'sort', 'limit']
-        .forEach(field => obj[field] = field + formId);
+      ['q', 'datetime', 'bbox', 'collections', 'ids', 'sort', 'limit'].forEach(field => (obj[field] = field + formId));
       return obj;
     },
     stac() {
@@ -358,10 +400,7 @@ export default defineComponent({
     sortOptions() {
       // Use sortables from API if available
       if (Array.isArray(this.sortables) && this.sortables.length > 0) {
-        return [
-          { text: this.$t('default'), value: null },
-          ...this.sortables
-        ];
+        return [{ text: this.$t('default'), value: null }, ...this.sortables];
       }
       // Fallback: provide reasonable defaults when sortables are not available
       const criteria = [
@@ -389,7 +428,7 @@ export default defineComponent({
     },
     limitPlaceholder() {
       if (this.searchResultsPerPage > 0) {
-        return this.$t('defaultWithValue', {value: this.searchResultsPerPage});
+        return this.$t('defaultWithValue', { value: this.searchResultsPerPage });
       }
       return this.$t('default');
     },
@@ -399,8 +438,8 @@ export default defineComponent({
       },
       set(val) {
         this.query.datetime = Array.isArray(val) ? val.map(d => Utils.dateToUTC(d)) : null;
-      }
-    }
+      },
+    },
   },
   watch: {
     parent: {
@@ -413,7 +452,7 @@ export default defineComponent({
           oldStac.setApiDataListener('searchfilter' + formId);
         }
         this.updateApiCollections();
-      }
+      },
     },
     value: {
       immediate: true,
@@ -422,14 +461,13 @@ export default defineComponent({
         this.query = Object.assign(getQueryDefaults(), value);
         if (this.collections.length > 0 && this.hasAllCollections) {
           this.selectedCollections = this.collections.filter(c => this.query.collections.includes(c.value));
-        }
-        else {
+        } else {
           this.selectedCollections = this.query.collections.map(id => {
             let collection = this.selectedCollections.find(c => c.value === id);
-            return collection ? collection : this.collectionToMultiSelect({id});
+            return collection ? collection : this.collectionToMultiSelect({ id });
           });
         }
-      }
+      },
     },
     query: {
       deep: true,
@@ -439,19 +477,18 @@ export default defineComponent({
           // map had been hidden accidentally.
           this.bbox = query.bbox;
         }
-      }
+      },
     },
     selectedCollections: {
       deep: 1,
       handler(collections) {
         this.query.collections = collections.map(c => c.value);
-      }
+      },
     },
     provideBBox(shown) {
       if (!shown) {
         this.query.bbox = null;
-      }
-      else {
+      } else {
         this.query.bbox = this.bbox;
       }
     },
@@ -460,7 +497,7 @@ export default defineComponent({
     },
     sortOrder() {
       this.query.sortby = this.formatSort();
-    }
+    },
   },
   beforeCreate() {
     formId++;
@@ -470,23 +507,17 @@ export default defineComponent({
     if (this.stac && this.type !== 'Collections') {
       if (this.cql) {
         const queryableLink = this.stac.getQueryablesLink();
-        promises.push(
-          this.loadQueryables(queryableLink)
-            .catch(error => console.error(error))
-        );
+        promises.push(this.loadQueryables(queryableLink).catch(error => console.error(error)));
       }
       if (this.canSort) {
         const sortableLink = this.stac.getSortablesLink();
-        promises.push(
-          this.loadSortables(sortableLink)
-            .catch(error => console.error(error))
-        );
+        promises.push(this.loadSortables(sortableLink).catch(error => console.error(error)));
       }
     }
     if ((this.type === 'Collections' || this.conformances.CollectionIdFilter) && this.stac) {
       promises.push(
         this.loadCollections(this.stac.getApiCollectionsLink())
-          .then(({collections, queryableLink, sortableLink}) => {
+          .then(({ collections, queryableLink, sortableLink }) => {
             this.collections = collections;
             if (this.collections.length > 0) {
               this.hasAllCollections = true;
@@ -498,10 +529,10 @@ export default defineComponent({
             }
             return Promise.all(subPromises);
           })
-          .catch(error => console.error(error))
+          .catch(error => console.error(error)),
       );
     }
-    Promise.all(promises).finally(() => this.loaded = true);
+    Promise.all(promises).finally(() => (this.loaded = true));
   },
   methods: {
     resetSearchCollection() {
@@ -520,9 +551,9 @@ export default defineComponent({
       }
       this.collectionsLoadingTimer = setTimeout(async () => {
         try {
-          const link = Utils.addFiltersToLink(this.collectionSearchLink, {q: [text]});
+          const link = Utils.addFiltersToLink(this.collectionSearchLink, { q: [text] });
           const response = await stacRequest(this.$store, link);
-          
+
           // Only set collections if response is valid AND collectionsLoadingTimer has not been reset.
           // If collectionsLoadingTimer has been reset, the result is not relevant anylonger.
           if (this.collectionsLoadingTimer && CollectionCollection.isResponse(response.data)) {
@@ -544,15 +575,14 @@ export default defineComponent({
       const data = {
         collections: [],
         queryableLink: null,
-        sortableLink: null
+        sortableLink: null,
       };
 
       if (this.type === 'Global' && this.collections) {
         data.collections = this.collections;
-      }
-      else if (this.type === 'Global' || this.type === 'Collections') {
+      } else if (this.type === 'Global' || this.type === 'Collections') {
         let response = await stacRequest(this.$store, link);
-        
+
         if (!isObject(response.data)) {
           return {};
         }
@@ -590,14 +620,12 @@ export default defineComponent({
     collectionToMultiSelect(c) {
       return {
         value: c.id,
-        text: c.title || c.id
+        text: c.title || c.id,
       };
     },
     prepareCollections(collections) {
       const collator = new Intl.Collator(this.uiLanguage);
-      return collections
-        .map(this.collectionToMultiSelect)
-        .sort((a,b) => collator.compare(a.text, b.text));
+      return collections.map(this.collectionToMultiSelect).sort((a, b) => collator.compare(a.text, b.text));
     },
     async loadSchemas(link) {
       let response = await stacRequest(this.$store, link);
@@ -625,8 +653,7 @@ export default defineComponent({
       }
       this.queryables = [];
       const queryables = await this.loadSchemas(link);
-      this.queryables = queryables
-        .map(([key, schema]) => new Queryable(key, schema));
+      this.queryables = queryables.map(([key, schema]) => new Queryable(key, schema));
     },
     async loadSortables(link) {
       if (!isObject(link)) {
@@ -638,7 +665,7 @@ export default defineComponent({
       this.sortables = sortables
         .map(([key, schema]) => ({
           value: key,
-          text: schema.title || formatKey(key)
+          text: schema.title || formatKey(key),
         }))
         .sort((a, b) => collator.compare(a.text, b.text));
     },
@@ -666,7 +693,7 @@ export default defineComponent({
       const operators = queryable.getOperators(this.cql);
       if (operators.length === 0) {
         this.$store.commit('showGlobalError', {
-          message: this.$t('search.noOperatorsError', {queryable: queryable.id})
+          message: this.$t('search.noOperatorsError', { queryable: queryable.id }),
         });
         return;
       }
@@ -676,7 +703,7 @@ export default defineComponent({
         value: operator.getDefaultValue(queryable),
         operator,
         queryable,
-        negate: false
+        negate: false,
       });
     },
     onSubmit() {
@@ -693,8 +720,7 @@ export default defineComponent({
       limit = Number.parseInt(limit, 10);
       if (limit > this.maxItems) {
         limit = this.maxItems;
-      }
-      else if (typeof limit !== 'number' || isNaN(limit) || limit < 1) {
+      } else if (typeof limit !== 'number' || isNaN(limit) || limit < 1) {
         limit = null;
       }
       this.query.limit = limit;
@@ -710,7 +736,7 @@ export default defineComponent({
         return;
       }
       this.resetSearchCollection();
-      let opt = this.collectionToMultiSelect({id: collection});
+      let opt = this.collectionToMultiSelect({ id: collection });
       this.selectedCollections.push(opt);
       this.collections.push(opt);
       this.query.collections.push(collection);
@@ -722,12 +748,11 @@ export default defineComponent({
       if (this.canSort && this.sortTerm && this.sortTerm.value && this.sortOrder) {
         let order = this.sortOrder < 0 ? '-' : '';
         return `${order}${this.sortTerm.value}`;
-      }
-      else {
+      } else {
         return null;
       }
-    }
-  }
+    },
+  },
 });
 </script>
 

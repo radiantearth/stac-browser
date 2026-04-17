@@ -12,8 +12,8 @@ export default {
   props: {
     roles: {
       type: Array,
-      default: null
-    }
+      default: null,
+    },
   },
   computed: {
     sortedRoles() {
@@ -21,7 +21,7 @@ export default {
         return [];
       }
       return [...this.roles].sort((a, b) => a.localeCompare(b));
-    }
+    },
   },
   methods: {
     displayRole(role) {
@@ -30,8 +30,8 @@ export default {
         return this.$t(key);
       }
       return role;
-    }
-  }
+    },
+  },
 };
 </script>
 

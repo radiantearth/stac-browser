@@ -7,8 +7,8 @@ export default {
   props: {
     showThumbnail: {
       type: Boolean,
-      default: true
-    }
+      default: true,
+    },
   },
   computed: {
     ...mapState(['cardViewMode', 'crossOriginMedia', 'defaultThumbnailSize']),
@@ -27,8 +27,7 @@ export default {
           const shape = t.getMetadata('proj:shape');
           if (Array.isArray(shape) && shape.length === 2) {
             [height, width] = shape;
-          }
-          else if (Array.isArray(this.defaultThumbnailSize) && this.defaultThumbnailSize.length === 2) {
+          } else if (Array.isArray(this.defaultThumbnailSize) && this.defaultThumbnailSize.length === 2) {
             [height, width] = this.defaultThumbnailSize;
           }
           return {
@@ -37,7 +36,7 @@ export default {
             crossorigin: this.crossOriginMedia,
             width,
             height,
-            placement: this.isList ? 'end' : 'top'
+            placement: this.isList ? 'end' : 'top',
           };
         }
       }
@@ -57,6 +56,6 @@ export default {
     },
     summarizeDescription() {
       return this.hasDescription ? Utils.summarizeMd(this.data.getMetadata('description'), 300) : '';
-    }
-  }
+    },
+  },
 };

@@ -3,7 +3,6 @@ import CqlValue from '../value.js';
 import CqlOperator from './operator';
 
 export default class CqlComparisonOperator extends CqlOperator {
-
   constructor(operator, pred = null, obj = null) {
     super(operator, [pred, obj]);
   }
@@ -13,37 +12,28 @@ export default class CqlComparisonOperator extends CqlOperator {
   }
 
   static create(pred, op, obj) {
-    if (["=", "==", "==="].includes(op)) {
+    if (['=', '==', '==='].includes(op)) {
       return new CqlEqual(pred, obj);
-    }
-    else if (["<>", "!=", "!==", "≠"].includes(op)) {
+    } else if (['<>', '!=', '!==', '≠'].includes(op)) {
       return new CqlNotEqual(pred, obj);
-    }
-    else if ([">=", "≥"].includes(op)) {
+    } else if (['>=', '≥'].includes(op)) {
       return new CqlGreaterThanEqual(pred, obj);
-    }
-    else if (op === ">") {
+    } else if (op === '>') {
       return new CqlGreaterThan(pred, obj);
-    }
-    else if (["<=", "≤"].includes(op)) {
+    } else if (['<=', '≤'].includes(op)) {
       return new CqlLessThanEqual(pred, obj);
-    }
-    else if (op === "<") {
+    } else if (op === '<') {
       return new CqlLessThan(pred, obj);
-    }
-    else if (op.toLowerCase() === "like") {
+    } else if (op.toLowerCase() === 'like') {
       return new CqlLike(pred, obj);
-    }
-    else if (op.toLowerCase() === "between") {
+    } else if (op.toLowerCase() === 'between') {
       return new CqlBetween(pred, obj);
     }
   }
-
 }
 
 export class CqlEqual extends CqlComparisonOperator {
-
-  static SYMBOL = "=";
+  static SYMBOL = '=';
 
   constructor(pred = null, obj = null) {
     super(CqlEqual.SYMBOL, pred, obj);
@@ -52,30 +42,26 @@ export class CqlEqual extends CqlComparisonOperator {
   static get longLabel() {
     return i18n.global.t('search.equalTo');
   }
-
 }
 
 export class CqlNotEqual extends CqlComparisonOperator {
-
-  static SYMBOL = "<>";
+  static SYMBOL = '<>';
 
   constructor(pred = null, obj = null) {
     super(CqlNotEqual.SYMBOL, pred, obj);
   }
 
   static get label() {
-    return "≠";
+    return '≠';
   }
 
   static get longLabel() {
     return i18n.global.t('search.notEqualTo');
   }
-
 }
 
 export class CqlGreaterThan extends CqlComparisonOperator {
-
-  static SYMBOL = ">";
+  static SYMBOL = '>';
 
   constructor(pred = null, obj = null) {
     super(CqlGreaterThan.SYMBOL, pred, obj);
@@ -84,30 +70,26 @@ export class CqlGreaterThan extends CqlComparisonOperator {
   static get longLabel() {
     return i18n.global.t('search.greaterThan');
   }
-
 }
 
 export class CqlGreaterThanEqual extends CqlComparisonOperator {
-
-  static SYMBOL = ">=";
+  static SYMBOL = '>=';
 
   constructor(pred = null, obj = null) {
     super(CqlGreaterThanEqual.SYMBOL, pred, obj);
   }
 
   static get label() {
-    return "≥";
+    return '≥';
   }
 
   static get longLabel() {
     return i18n.global.t('search.greaterThanEqual');
   }
-
 }
 
 export class CqlLessThan extends CqlComparisonOperator {
-
-  static SYMBOL = "<";
+  static SYMBOL = '<';
 
   constructor(pred = null, obj = null) {
     super(CqlLessThan.SYMBOL, pred, obj);
@@ -116,25 +98,22 @@ export class CqlLessThan extends CqlComparisonOperator {
   static get longLabel() {
     return i18n.global.t('search.lessThan');
   }
-
 }
 
 export class CqlLessThanEqual extends CqlComparisonOperator {
-
-  static SYMBOL = "<=";
+  static SYMBOL = '<=';
 
   constructor(pred = null, obj = null) {
     super(CqlLessThanEqual.SYMBOL, pred, obj);
   }
 
   static get label() {
-    return "≤";
+    return '≤';
   }
 
   static get longLabel() {
     return i18n.global.t('search.lessThanEqual');
   }
-  
 }
 
 /* export class CqlIsNull extends CqlComparisonOperator {
@@ -146,15 +125,14 @@ export class CqlLessThanEqual extends CqlComparisonOperator {
 } */
 
 export class CqlLike extends CqlComparisonOperator {
-
-  static SYMBOL = "like";
+  static SYMBOL = 'like';
 
   constructor(pred = null, obj = null) {
     super(CqlLike.SYMBOL, pred, obj);
   }
 
   static get label() {
-    return "~";
+    return '~';
   }
 
   static get longLabel() {
@@ -164,19 +142,17 @@ export class CqlLike extends CqlComparisonOperator {
   static get description() {
     return i18n.global.t('search.likeOperatorDescription');
   }
-
 }
 
 export class CqlBetween extends CqlComparisonOperator {
-
-  static SYMBOL = "between";
+  static SYMBOL = 'between';
 
   constructor(pred = null, obj = []) {
     super(CqlBetween.SYMBOL, pred, obj);
   }
 
   static get label() {
-    return "≥ … ≤";
+    return '≥ … ≤';
   }
 
   static get longLabel() {
@@ -197,10 +173,6 @@ export class CqlBetween extends CqlComparisonOperator {
   }
 
   static getDefaultValue(queryable) {
-    return [
-      CqlValue.create(queryable.defaultValue),
-      CqlValue.create(queryable.defaultValue)
-    ];
+    return [CqlValue.create(queryable.defaultValue), CqlValue.create(queryable.defaultValue)];
   }
-
 }

@@ -4,8 +4,7 @@
     v-model="expanded"
     class="asset"
     body-class="asset-body"
-    @update:model-value="collapseToggled"
-  >
+    @update:model-value="collapseToggled">
     <template #title>
       <span class="start">
         <span class="chevron" aria-hidden="true">
@@ -20,12 +19,21 @@
         </b-badge>
         <b-badge v-if="asset.deprecated" variant="warning" class="deprecated">{{ $t('deprecated') }}</b-badge>
         <template v-if="Array.isArray(asset.roles)">
-          <b-badge v-for="role in sortedRoles" :key="role" :variant="role === 'data' ? 'primary' : 'secondary'" class="role" :title="displayRole(role)">{{ displayRole(role) }}</b-badge>
+          <b-badge
+            v-for="role in sortedRoles"
+            :key="role"
+            :variant="role === 'data' ? 'primary' : 'secondary'"
+            class="role"
+            :title="displayRole(role)"
+            >{{ displayRole(role) }}</b-badge
+          >
         </template>
-        <b-badge v-if="shortFileFormat" variant="dark" class="format" :title="fileFormat"><span v-html="shortFileFormat" /></b-badge>
+        <b-badge v-if="shortFileFormat" variant="dark" class="format" :title="fileFormat"
+          ><span v-html="shortFileFormat"
+        /></b-badge>
       </div>
     </template>
-   
+
     <template v-if="hasAlternatives">
       <b-card no-body class="border-0 rounded-0">
         <b-tabs lazy card>
@@ -57,33 +65,31 @@ export default {
     BCard,
     BTab,
     BTabs,
-    BAccordionItem
+    BAccordionItem,
   },
-  mixins: [
-    StacFieldsMixin({ formatMediaType })
-  ],
+  mixins: [StacFieldsMixin({ formatMediaType })],
   props: {
     asset: {
       type: Object,
-      required: true
+      required: true,
     },
     definition: {
       type: Boolean,
-      default: false
+      default: false,
     },
     expand: {
       type: Boolean,
-      default: null
+      default: null,
     },
     shown: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   emits: ['show'],
   data() {
     return {
-      expanded: false
+      expanded: false,
     };
   },
   computed: {
@@ -98,14 +104,14 @@ export default {
       return this.asset.title || this.asset.getKey();
     },
     fileFormat() {
-      if (typeof this.asset.type === "string" && this.asset.type.length > 0) {
+      if (typeof this.asset.type === 'string' && this.asset.type.length > 0) {
         return this.formatMediaType(this.asset.type);
       }
       return null;
     },
     shortFileFormat() {
-      if (typeof this.asset.type === "string" && this.asset.type.length > 0) {
-        return this.formatMediaType(this.asset.type, null, {shorten: true});
+      if (typeof this.asset.type === 'string' && this.asset.type.length > 0) {
+        return this.formatMediaType(this.asset.type, null, { shorten: true });
       }
       return null;
     },
@@ -118,7 +124,7 @@ export default {
       for (const key in this.asset.alternate) {
         alternates[key] = this.asset.alternate[key].fillAlternate();
       }
-      
+
       return alternates;
     },
     hasAlternatives() {
@@ -138,7 +144,7 @@ export default {
         }
         return a.toLowerCase().localeCompare(b.toLowerCase(), undefined, { sensitivity: 'base' });
       });
-    }
+    },
   },
   created() {
     if (this.stateQueryParameters[this.type].indexOf(this.uid) > -1) {
@@ -148,8 +154,7 @@ export default {
 
     if (typeof this.expand === 'boolean') {
       this.expanded = this.expand;
-    }
-    else {
+    } else {
       this.expanded = false;
     }
   },
@@ -163,12 +168,12 @@ export default {
     },
     collapseToggled(isVisible) {
       let event = isVisible ? 'openCollapsible' : 'closeCollapsible';
-      this.$store.commit(event, {type: this.type, uid: this.uid});
+      this.$store.commit(event, { type: this.type, uid: this.uid });
     },
     show() {
       this.$emit('show', ...arguments);
-    }
-  }
+    },
+  },
 };
 </script>
 

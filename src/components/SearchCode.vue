@@ -5,13 +5,8 @@
         v-for="generator in generatorInstances"
         :key="generator.language"
         :title="generator.label"
-        :id="generator.language"
-      >
-        <CodeBox
-          v-if="selectedTab === generator.language"
-          :generator="generator"
-          :filters="filters"
-        />
+        :id="generator.language">
+        <CodeBox v-if="selectedTab === generator.language" :generator="generator" :filters="filters" />
       </b-tab>
     </b-tabs>
     <b-form-radio-group
@@ -21,8 +16,7 @@
       button-variant="outline-primary"
       size="sm"
       buttons
-      class="mt-2"
-    />
+      class="mt-2" />
   </div>
 </template>
 
@@ -41,23 +35,23 @@ export default defineComponent({
   components: {
     BTabs,
     BTab,
-    CodeBox: defineAsyncComponent(() => import('./CodeBox.vue'))
+    CodeBox: defineAsyncComponent(() => import('./CodeBox.vue')),
   },
   props: {
     searchLinks: {
       type: Object,
-      required: true
+      required: true,
     },
     filters: {
       type: Object,
-      default: () => ({})
-    }
+      default: () => ({}),
+    },
   },
   data() {
     return {
       storage: new BrowserStorage(),
       selectedTab: null,
-      selectedMethod: null
+      selectedMethod: null,
     };
   },
   computed: {
@@ -75,7 +69,7 @@ export default defineComponent({
       const defaultGen = new defaultGenerator(this.catalogUrl, this.activeSearchLink);
       const defGen = this.generatorInstances.find(g => g.language === defaultGen.language);
       return defGen?.language;
-    }
+    },
   },
   created() {
     this.loadSelectedMethod();
@@ -87,15 +81,14 @@ export default defineComponent({
     },
     selectedMethod(value) {
       this.storage.set(METHOD_STORAGE_KEY, value);
-    }
+    },
   },
   methods: {
     loadSelectedMethod() {
       const saved = this.storage.get(METHOD_STORAGE_KEY);
       if (this.availableMethods.includes(saved)) {
         this.selectedMethod = saved;
-      }
-      else {
+      } else {
         this.selectedMethod = this.availableMethods[0];
       }
     },
@@ -113,8 +106,8 @@ export default defineComponent({
       if (this.defaultLanguage !== language) {
         this.storage.set(TAB_STORAGE_KEY, language);
       }
-    }
-  }
+    },
+  },
 });
 </script>
 

@@ -12,19 +12,19 @@ import { defineComponent } from 'vue';
 import { mapActions, mapGetters, mapState } from 'vuex';
 
 export default defineComponent({
-  name: "LoginCallback",
+  name: 'LoginCallback',
   components: {
     ErrorAlert,
-    Loading
+    Loading,
   },
   data() {
     return {
-      error: null
+      error: null,
     };
   },
   computed: {
     ...mapState(['globalError']),
-    ...mapGetters('auth', ['method'])
+    ...mapGetters('auth', ['method']),
   },
   watch: {
     globalError: {
@@ -34,7 +34,7 @@ export default defineComponent({
           this.error = newValue;
           this.$store.commit('showGlobalError', null);
         }
-      }
+      },
     },
     method: {
       immediate: true,
@@ -44,11 +44,11 @@ export default defineComponent({
         } catch (error) {
           this.error = error;
         }
-      }
-    }
+      },
+    },
   },
   methods: {
-    ...mapActions('auth', ['finalizeLogin'])
-  }
+    ...mapActions('auth', ['finalizeLogin']),
+  },
 });
 </script>

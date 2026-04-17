@@ -1,12 +1,12 @@
 /**
  * v-visible directive - replacement for v-b-visible from Bootstrap Vue 2
- * 
+ *
  * Usage:
  * - v-visible="callback" - triggers when element becomes visible
  * - v-visible.once="callback" - triggers only once when element becomes visible
  * - v-visible.100="callback" - triggers when the element is within 100px of the viewport (100px root margin)
  * - v-visible.0.5="callback" - triggers when 50% of the element is visible (intersection ratio threshold)
- * 
+ *
  * The callback receives two parameters:
  *   - isVisible (boolean): true if the element is visible/intersecting
  *   - entry (IntersectionObserverEntry): the observer entry object
@@ -43,13 +43,13 @@ function createObserver(el, binding) {
   const options = {
     root: null, // viewport
     rootMargin,
-    threshold
+    threshold,
   };
 
-  const observer = new IntersectionObserver((entries) => {
+  const observer = new IntersectionObserver(entries => {
     entries.forEach(entry => {
       const isVisible = entry.isIntersecting;
-      
+
       if (typeof binding.value === 'function') {
         binding.value(isVisible, entry);
       }
@@ -100,5 +100,5 @@ export default {
       observer.unobserve(el);
       observerMap.delete(el);
     }
-  }
+  },
 };

@@ -8,19 +8,14 @@
       <CopyButton
         :copyText="generator.installDependencies"
         size="sm"
-        :button-props="{id: 'exampleCodeCopyDependencies'}"
-      />
+        :button-props="{ id: 'exampleCodeCopyDependencies' }" />
     </div>
     <div class="meta-row">
       <p class="meta-text">
         {{ $t('exampleCode.storeAs') }}
         <code class="meta-code">{{ file }}</code>
       </p>
-      <CopyButton
-        :copyText="file"
-        size="sm"
-        :button-props="{id: 'exampleCodeCopyOutputFilename'}"
-      />
+      <CopyButton :copyText="file" size="sm" :button-props="{ id: 'exampleCodeCopyOutputFilename' }" />
     </div>
     <CodeHighlighted :code="code" :language="language" :file="file" />
   </div>
@@ -35,21 +30,21 @@ export default defineComponent({
   name: 'CodeBox',
   components: {
     CodeHighlighted,
-    CopyButton
+    CopyButton,
   },
   props: {
     generator: {
       type: Object,
-      required: true
+      required: true,
     },
     filters: {
       type: Object,
-      required: true
-    }
+      required: true,
+    },
   },
   data() {
     return {
-      highlightedCode: ''
+      highlightedCode: '',
     };
   },
   computed: {
@@ -61,8 +56,8 @@ export default defineComponent({
     },
     file() {
       return this.generator.outputFile;
-    }
-  }
+    },
+  },
 });
 </script>
 

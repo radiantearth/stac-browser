@@ -7,22 +7,22 @@
 
 <script>
 export default {
-  name: "CustomText",
+  name: 'CustomText',
   props: {
     title: {
       type: String,
-      default: ''
+      default: '',
     },
     text: {
       type: String,
-      default: ''
-    }
-  }
+      default: '',
+    },
+  },
 };
 </script>
 
 <style lang="scss" scoped>
-@import "../theme/variables.scss";
+@import '../theme/variables.scss';
 
 .custom-text {
   margin-bottom: $block-margin;

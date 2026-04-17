@@ -6,23 +6,22 @@
 </template>
 
 <script>
-
 export default {
   name: 'SearchBox',
   props: {
     modelValue: {
       type: String,
-      default: ''
+      default: '',
     },
     placeholder: {
       type: String,
-      default: null
-    }
+      default: null,
+    },
   },
   emits: ['update:modelValue'],
   data() {
     return {
-      searchTerm: this.modelValue
+      searchTerm: this.modelValue,
     };
   },
   watch: {
@@ -31,8 +30,8 @@ export default {
     },
     searchTerm(newValue) {
       this.$emit('update:modelValue', newValue);
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -41,7 +40,8 @@ export default {
   position: relative;
   box-sizing: border-box;
 
-  input, .icon {
+  input,
+  .icon {
     font-size: 1em;
     margin: 0;
   }

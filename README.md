@@ -107,11 +107,11 @@ In this case use for example `https://examples.com/stac-browser/#?~API_KEY=123` 
 STAC Browser has gone recently through a number of major versions.
 The following table shows the major differences between versions and the upcoming plans:
 
-| Version   | Summary |
-| --------- | ------- |
-| 3.3.x     | The last version that uses Leaflet as mapping library. |
-| 4.0.x     | Uses OpenLayers as mapping library. The last version based on VueJS 2, vue-cli and Bootstrap 4. |
-| **5.x.x** | The upcoming version based on VueJS 3, Vite and Bootstrap 5. Target: Q1 2026 |
+| Version   | Summary                                                                                                               |
+| --------- | --------------------------------------------------------------------------------------------------------------------- |
+| 3.3.x     | The last version that uses Leaflet as mapping library.                                                                |
+| 4.0.x     | Uses OpenLayers as mapping library. The last version based on VueJS 2, vue-cli and Bootstrap 4.                       |
+| **5.x.x** | The upcoming version based on VueJS 3, Vite and Bootstrap 5. Target: Q1 2026                                          |
 | 6.x.x     | Planned version with a new layout, a pluggable interface, and better integration into existing sites. Target: Q4 2026 |
 
 For more details on our plans, please check our
@@ -160,6 +160,7 @@ More information about how to configure and customize the basemaps can be found 
 STAC Browser has a pluggable interface to share or open assets and links with other services, which we call "actions".
 
 More information about how to add or implement actions can be found in the **[Actions documentation](docs/actions.md)**.
+
 ### Code Generators
 
 The list of supported code snippet languages is configured in [`codeGenerators.config.js`](codeGenerators.config.js).
@@ -183,15 +184,15 @@ To add your own fields, please consult the documentation for the [Registry](http
 If you have a custom extension with the title "Radiant Earth" that uses the prefix `radiant:` you can add the extension as such:
 
 ```js
-Registry.addExtension("radiant", "Radiant Earth");
+Registry.addExtension('radiant', 'Radiant Earth');
 ```
 
 If this extension has a boolean field `radiant:public_access` that describes whether an entity can be accessed publicly or not, this could be described as follows:
 
 ```js
-Registry.addMetadataField("radiant:public_access", {
-  label: "Data Access",
-  formatter: (value) => (value ? "Public" : "Private"),
+Registry.addMetadataField('radiant:public_access', {
+  label: 'Data Access',
+  formatter: value => (value ? 'Public' : 'Private'),
 });
 ```
 
@@ -236,6 +237,7 @@ STAC Browser supports some non-standardized extensions to the STAC specification
 You can use the Docker to work with STAC Browser. Please read [Docker documentation](docs/docker.md) for more details.
 
 ## Testing
+
 To run the testing suite locally:
 
 ```bash

@@ -3,21 +3,17 @@
     <WidgetHook id="view-select-data-source-start" />
     <b-form @submit.prevent="go">
       <b-form-group
-        id="select" :label="$t('index.specifyCatalog')" label-for="url"
-        :invalid-feedback="error" :state="valid"
-        class="mb-3"
-      >
-        <b-form-input 
-          id="url" 
-          type="url" 
-          :model-value="url" 
-          @update:model-value="setUrl"
-          placeholder="https://..."
-        />
+        id="select"
+        :label="$t('index.specifyCatalog')"
+        label-for="url"
+        :invalid-feedback="error"
+        :state="valid"
+        class="mb-3">
+        <b-form-input id="url" type="url" :model-value="url" @update:model-value="setUrl" placeholder="https://..." />
       </b-form-group>
       <b-button type="submit" variant="primary">{{ $t('index.load') }}</b-button>
     </b-form>
-    <hr v-if="stacIndex.length > 0">
+    <hr v-if="stacIndex.length > 0" />
     <b-form-group v-if="stacIndex.length > 0" class="stac-index">
       <template #label>
         <i18n-t keypath="index.selectStacIndex" tag="span" scope="global">
@@ -26,13 +22,9 @@
           </template>
         </i18n-t>
       </template>
-      <b-list-group> 
+      <b-list-group>
         <template v-for="catalog in stacIndex" :key="catalog.id">
-          <b-list-group-item
-            v-if="show(catalog)" button
-            :active="url === catalog.url"
-            @click="open(catalog.url)"
-          >
+          <b-list-group-item v-if="show(catalog)" button :active="url === catalog.url" @click="open(catalog.url)">
             <div class="d-flex justify-content-between align-items-baseline mb-1">
               <strong>{{ catalog.title }}</strong>
               <b-badge v-if="catalog.isApi" variant="danger">{{ $t('index.api') }}</b-badge>
@@ -47,21 +39,21 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters } from 'vuex';
 import { defineComponent } from 'vue';
 import Description from '../components/Description.vue';
 import Utils from '../utils';
-import axios from "axios";
+import axios from 'axios';
 
 export default defineComponent({
-  name: "SelectDataSource",
+  name: 'SelectDataSource',
   components: {
-    Description
+    Description,
   },
   data() {
     return {
       url: '',
-      stacIndex: []
+      stacIndex: [],
     };
   },
   computed: {
@@ -80,15 +72,14 @@ export default defineComponent({
         let url = new URL(this.url);
         if (!url.protocol) {
           return this.$t('index.urlMissingProtocol');
-        }
-        else if (!url.host) {
+        } else if (!url.host) {
           return this.$t('index.urlMissingHost');
         }
         return null;
       } catch (error) {
         return this.$t('index.urlInvalid', { error: error.message });
       }
-    }
+    },
   },
   async created() {
     // Reset loaded STAC catalog
@@ -96,7 +87,7 @@ export default defineComponent({
     // Load entries from STAC Index
     try {
       let response = await axios.get('https://stacindex.org/api/catalogs');
-      if(Array.isArray(response.data)) {
+      if (Array.isArray(response.data)) {
         this.stacIndex = response.data;
       }
     } catch (error) {
@@ -107,8 +98,7 @@ export default defineComponent({
     show(catalog) {
       if (catalog.access === 'private') {
         return false;
-      }
-      else if(!this.url) {
+      } else if (!this.url) {
         return true;
       }
 
@@ -123,10 +113,10 @@ export default defineComponent({
     },
     go() {
       if (this.url) {
-        this.$router.push(this.toBrowserPath(this.url));  // Vue Router navigation
+        this.$router.push(this.toBrowserPath(this.url)); // Vue Router navigation
       }
-    }
-  }
+    },
+  },
 });
 </script>
 
@@ -162,7 +152,7 @@ export default defineComponent({
 
         .list-group-item {
           border: 0;
-          border-bottom: 1px solid rgba(0,0,0,.125);
+          border-bottom: 1px solid rgba(0, 0, 0, 0.125);
         }
 
         .active .styled-description a {

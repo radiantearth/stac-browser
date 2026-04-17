@@ -20,6 +20,6 @@ export default {
     predecessorLink() {
       // Show prev. link only if not deprecated
       return !this.isDeprecated && this.data.getStacLinkWithRel('predecessor-version');
-    }
-  }
+    },
+  },
 };

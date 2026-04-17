@@ -15,14 +15,23 @@
         <b-button :href="provider.url" target="_blank" variant="primary">
           {{ $t('providers.homepage') }}
         </b-button>
-        <b-button v-if="provider.email || provider.mail" :href="`mailto:${provider.email || provider.mail}`" target="_blank" variant="primary">
+        <b-button
+          v-if="provider.email || provider.mail"
+          :href="`mailto:${provider.email || provider.mail}`"
+          target="_blank"
+          variant="primary">
           {{ $t('providers.email') }}
         </b-button>
       </b-button-group>
       <div class="mt-4" v-if="provider.description">
         <Description :description="provider.description" compact />
       </div>
-      <MetadataGroups class="mt-4" :data="provider" :ignoreFields="ignoredMetadataFields" :title="false" type="Provider" />
+      <MetadataGroups
+        class="mt-4"
+        :data="provider"
+        :ignoreFields="ignoredMetadataFields"
+        :title="false"
+        type="Provider" />
     </div>
   </b-accordion-item>
 </template>
@@ -40,17 +49,17 @@ export default {
     Description,
     BAccordionItem,
     MetadataGroups: defineAsyncComponent(() => import('./MetadataGroups.vue')),
-    ProviderRoles
+    ProviderRoles,
   },
   props: {
     provider: {
       type: Object,
-      required: true
+      required: true,
     },
     id: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
   data() {
     return {
@@ -60,8 +69,8 @@ export default {
   computed: {
     ignoredMetadataFields() {
       return getIgnoredFields(this.provider, 'Provider');
-    }
-  }
+    },
+  },
 };
 </script>
 

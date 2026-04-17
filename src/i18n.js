@@ -18,7 +18,7 @@ async function loadLocaleConfig() {
   // Add language names all other languages
   for (let locale in LOCALE_CONFIG) {
     messages[locale] = {
-      languages: LOCALE_CONFIG
+      languages: LOCALE_CONFIG,
     };
   }
   return messages;
@@ -49,31 +49,27 @@ const i18n = createI18n({
   // showing empty texts in the UI.
   // See https://github.com/kazupon/vue-i18n/issues/563 for details.
   postTranslation: (value, path) => {
-    if (value === "") {
+    if (value === '') {
       const parts = path.split('.');
       // Access messages in a mode-agnostic way
       let message = i18n.global.getLocaleMessage(CONFIG.fallbackLocale);
       for (const key of parts) {
         if (key in message) {
           message = message[key];
-        }
-        else {
+        } else {
           return value;
         }
       }
       return message;
     }
     return value;
-  }
+  },
 });
 
 export default i18n;
 
 export function loadDefaultMessages() {
-  return Promise.all([
-    loadMessages(CONFIG.locale),
-    loadMessages(CONFIG.fallbackLocale)
-  ]);
+  return Promise.all([loadMessages(CONFIG.locale), loadMessages(CONFIG.fallbackLocale)]);
 }
 
 export async function loadMessages(locale) {
@@ -91,7 +87,7 @@ export async function executeCustomFunctions(locale) {
   if (size(LOCALE_CONFIG[locale].customize) === 0) {
     return;
   }
-  const p = customizeFiles.map(async (file) => {
+  const p = customizeFiles.map(async file => {
     const fn = (await import(`./locales/${locale}/${file}.js`)).default;
     return await fn(locale);
   });
@@ -111,22 +107,22 @@ export function translateFields(value, vars = null) {
 
 /**
  * Get the languages available for the given STAC entity.
- * 
+ *
  * @param {STAC} data The STAC entity.
  * @returns {Array.<object>} An array of language objects, each with a `code` property.
  */
 export function getDataLanguages(data) {
-    let dataLanguages = [];
-    if (data) {
-      const languages = data.getMetadata('languages');
-      // Ensure the other languages are always an array
-      if (Array.isArray(languages) && languages.length > 0) {
-        dataLanguages = languages.slice();
-      }
-      // Add the current language of the data to the list of languages
-      // No need to check the language as checks will be done in the filter below
-      dataLanguages.unshift(data.getMetadata('language'));
+  let dataLanguages = [];
+  if (data) {
+    const languages = data.getMetadata('languages');
+    // Ensure the other languages are always an array
+    if (Array.isArray(languages) && languages.length > 0) {
+      dataLanguages = languages.slice();
     }
-    // Filter out invalid languages
-    return dataLanguages.filter(lang => isObject(lang) && typeof lang.code === 'string');
+    // Add the current language of the data to the list of languages
+    // No need to check the language as checks will be done in the filter below
+    dataLanguages.unshift(data.getMetadata('language'));
+  }
+  // Filter out invalid languages
+  return dataLanguages.filter(lang => isObject(lang) && typeof lang.code === 'string');
 }

@@ -1,4 +1,4 @@
-import { createStore } from "vuex";
+import { createStore } from 'vuex';
 
 import { URI } from 'stac-js/src/utils.js';
 
@@ -10,11 +10,19 @@ import { addMissingChildren, getDisplayTitle, createSTAC } from '../models/stac'
 import { CatalogLike, STAC } from 'stac-js';
 
 import auth from './auth.js';
-import { addQueryIfNotExists, hasAuthority, isAuthenticationError, Loading, processSTAC, stacRequest, stacRequestOptions } from './utils';
+import {
+  addQueryIfNotExists,
+  hasAuthority,
+  isAuthenticationError,
+  Loading,
+  processSTAC,
+  stacRequest,
+  stacRequestOptions,
+} from './utils';
 import { getBest } from 'stac-js/src/locales';
 import fieldsI18n from '@radiantearth/stac-fields/I18N';
-import { TYPES } from "../components/ApiCapabilitiesMixin";
-import BrowserStorage from "../browser-store.js";
+import { TYPES } from '../components/ApiCapabilitiesMixin';
+import BrowserStorage from '../browser-store.js';
 
 function getStore(config, router) {
   // Local settings (e.g. for currently loaded STAC entity)
@@ -30,7 +38,7 @@ function getStore(config, router) {
     stateQueryParameters: {
       language: null,
       asset: [],
-      itemdef: []
+      itemdef: [],
     },
 
     apiItems: [],
@@ -48,13 +56,13 @@ function getStore(config, router) {
 
     apiCollections: [],
     apiItemsLoading: {},
-    nextCollectionsLink: null
+    nextCollectionsLink: null,
   });
 
   return createStore({
     strict: import.meta.env.NODE_ENV !== 'production',
     modules: {
-      auth: auth(router)
+      auth: auth(router),
     },
     state: Object.assign({}, config, localDefaults(), catalogDefaults(), {
       // Global settings
@@ -62,7 +70,7 @@ function getStore(config, router) {
       downloads: {},
       allowSelectCatalog: !config.catalogUrl,
       globalRequestQueryParameters: config.requestQueryParameters,
-      uiLanguage: config.locale
+      uiLanguage: config.locale,
     }),
     getters: {
       isRoot: (state, getters) => {
@@ -75,13 +83,11 @@ function getStore(config, router) {
         if (state.page) {
           const meta = state.page();
           return meta.title;
-        }
-        else if (state.data instanceof STAC) {
+        } else if (state.data instanceof STAC) {
           const fallback = getters.isRoot ? state.catalogTitle : '';
           return getDisplayTitle(state.data, fallback);
-        }
-        else {
-          return "";
+        } else {
+          return '';
         }
       },
       description: state => {
@@ -89,45 +95,43 @@ function getStore(config, router) {
         if (state.page) {
           const meta = state.page();
           description = meta.description;
-        }
-        else if (state.data instanceof STAC) {
+        } else if (state.data instanceof STAC) {
           description = state.data.getMetadata('description');
         }
-        return hasText(description) ? description : "";
+        return hasText(description) ? description : '';
       },
       getApiItemsLoading: state => data => {
         let id = '';
         if (data instanceof Loading) {
           return true;
-        }
-        else if (data instanceof STAC) {
+        } else if (data instanceof STAC) {
           id = data.id;
-        }
-        else if (typeof data === 'string') {
+        } else if (typeof data === 'string') {
           id = data;
         }
         return state.apiItemsLoading[id] || false;
       },
-      error: state => state.database[state.url] instanceof Error ? state.database[state.url] : null,
-      getStac: state => (source, returnErrorObject = false) => {
-        if (source instanceof STAC) {
-          return source;
-        }
-        if (isObject(source) && hasText(source.href)) {
-          source = source.href;
-        }
-        if (!hasText(source)) {
-          return null;
-        }
-        let absoluteUrl = toAbsolute(source, state.url);
-        let data = state.database[absoluteUrl];
-        if (data instanceof STAC || (returnErrorObject && data instanceof Error)) {
-          return data;
-        }
-        else {
-          return null;
-        }
-      },
+      error: state => (state.database[state.url] instanceof Error ? state.database[state.url] : null),
+      getStac:
+        state =>
+        (source, returnErrorObject = false) => {
+          if (source instanceof STAC) {
+            return source;
+          }
+          if (isObject(source) && hasText(source.href)) {
+            source = source.href;
+          }
+          if (!hasText(source)) {
+            return null;
+          }
+          let absoluteUrl = toAbsolute(source, state.url);
+          let data = state.database[absoluteUrl];
+          if (data instanceof STAC || (returnErrorObject && data instanceof Error)) {
+            return data;
+          } else {
+            return null;
+          }
+        },
 
       isCollection: state => state.data?.isCollection || false,
       isCatalog: state => state.data?.isCatalog || false,
@@ -143,20 +147,22 @@ function getStore(config, router) {
         const link = state.data?.getStacLinkWithRel('root');
         if (link) {
           return link;
-        }
-        else if (state.url && state.data instanceof STAC && state.data.getLinksWithRels(['conformance', 'service-desc', 'service-doc', 'data', 'search']).length > 0) {
+        } else if (
+          state.url &&
+          state.data instanceof STAC &&
+          state.data.getLinksWithRels(['conformance', 'service-desc', 'service-doc', 'data', 'search']).length > 0
+        ) {
           return Utils.createLink(state.url, 'root', getDisplayTitle(state.data, state.catalogTitle));
-        }
-        else if (state.url) {
+        } else if (state.url) {
           // Fallback: If we detect OGC API like paths, try to guess the paths
           const uri = URI(state.url);
           const path = uri.segment(-2);
           if (['collections', 'items'].includes(path)) {
-            uri.segment(-1, "");
-            uri.segment(-1, "");
+            uri.segment(-1, '');
+            uri.segment(-1, '');
             if (path === 'items') {
-              uri.segment(-1, "");
-              uri.segment(-1, "");
+              uri.segment(-1, '');
+              uri.segment(-1, '');
             }
             return Utils.createLink(uri.toString(), 'root', state.catalogTitle);
           }
@@ -176,8 +182,8 @@ function getStore(config, router) {
           let uri = URI(state.url);
           let path = uri.segment(-2);
           if (['collections', 'items'].includes(path)) {
-            uri.segment(-1, "");
-            uri.segment(-1, "");
+            uri.segment(-1, '');
+            uri.segment(-1, '');
             return Utils.createLink(uri.toString(), 'parent');
           }
         }
@@ -197,8 +203,8 @@ function getStore(config, router) {
           let uri = URI(state.url);
           let path = uri.segment(-2);
           if (path == 'items') {
-            uri.segment(-1, "");
-            uri.segment(-1, "");
+            uri.segment(-1, '');
+            uri.segment(-1, '');
             return Utils.createLink(uri.toString(), 'collection');
           }
         }
@@ -206,12 +212,10 @@ function getStore(config, router) {
         return null;
       },
       supportsConformance: state => classes => {
-        if(!Array.isArray(classes)) {
+        if (!Array.isArray(classes)) {
           return classes;
         }
-        let classRegexp = classes
-          .map(c => c.replaceAll('*', '[^/]+').replace(/\/?#/, '/?#'))
-          .join('|');
+        let classRegexp = classes.map(c => c.replaceAll('*', '[^/]+').replace(/\/?#/, '/?#')).join('|');
         let regexp = new RegExp('^(' + classRegexp + ')$');
         return Boolean(state.conformsTo.find(uri => uri.match(regexp)));
       },
@@ -229,14 +233,15 @@ function getStore(config, router) {
       items: state => {
         if (state.apiItems.length > 0) {
           return state.apiItems;
-        }
-        else if (state.data) {
+        } else if (state.data) {
           return state.data.getStacLinksWithRel('item');
         }
         return [];
       },
       catalogs: state => {
-        let hasCollections = Boolean(state.data instanceof CatalogLike && state.data.getApiCollectionsLink() && state.apiCollections.length > 0);
+        let hasCollections = Boolean(
+          state.data instanceof CatalogLike && state.data.getApiCollectionsLink() && state.apiCollections.length > 0,
+        );
         let hasChilds = Boolean(state.data instanceof CatalogLike);
         let showCollections = !state.apiCatalogPriority || state.apiCatalogPriority === 'collections';
         let showChilds = !state.apiCatalogPriority || state.apiCatalogPriority === 'childs';
@@ -278,8 +283,7 @@ function getStore(config, router) {
             path += `?${q}`;
           }
           return path;
-        }
-        else {
+        } else {
           return '/' + relative.toString();
         }
       },
@@ -287,60 +291,64 @@ function getStore(config, router) {
         const externalRE = /^\/((search|validation)\/)?external\//;
         if (!hasText(url) || url === '/') {
           url = state.catalogUrl;
-        }
-        else if (url.match(externalRE)) {
+        } else if (url.match(externalRE)) {
           let parts = url.replace(externalRE, '').split('/');
           let protocol;
           if (!parts[0].endsWith(':')) {
             protocol = 'https:';
-          }
-          else {
+          } else {
             protocol = parts.shift();
           }
           url = `${protocol}//${parts.join('/')}`;
-        }
-        else if (!state.allowSelectCatalog && state.catalogUrl) {
+        } else if (!state.allowSelectCatalog && state.catalogUrl) {
           url = toAbsolute(url, state.catalogUrl, false);
         }
         return getters.getRequestUrl(url, null, true);
       },
-      isExternalUrl: state => (absoluteUrl, whitelist = true) => {
-        if (!state.catalogUrl) {
-          return false;
-        }
-        if (!(absoluteUrl instanceof URI)) {
-          absoluteUrl = URI(absoluteUrl);
-        }
-        if (whitelist && Array.isArray(state.allowedDomains) && state.allowedDomains.some(d => hasAuthority(d, absoluteUrl))) {
-          return false;
-        }
-        let relative;
-        if (absoluteUrl.is("relative")) {
-          relative = absoluteUrl;
-        }
-        else {
-          relative = absoluteUrl.relativeTo(state.catalogUrl);
-          if (relative.equals(absoluteUrl)) {
-            return true;
+      isExternalUrl:
+        state =>
+        (absoluteUrl, whitelist = true) => {
+          if (!state.catalogUrl) {
+            return false;
           }
-        }
-        let relativeStr = relative.toString();
-        return relativeStr.startsWith('//') || relativeStr.startsWith('../');
-      },
-      getRequestUrl: (state, getters) => (url, baseUrl = null, addLocalQueryParams = false) => {
-        let absoluteUrl = toAbsolute(url, baseUrl ? baseUrl : state.url, false);
-        if (!getters.isExternalUrl(absoluteUrl)) {
-          // Check whether private params are present and add them if the URL is part of the catalog
-          addQueryIfNotExists(absoluteUrl, state.privateQueryParameters);
-          // Check if we need to add global request params
-          addQueryIfNotExists(absoluteUrl, state.globalRequestQueryParameters);
-          if (addLocalQueryParams) {
-            // Check if we need to add local request params
-            addQueryIfNotExists(absoluteUrl, state.localRequestQueryParameters);
+          if (!(absoluteUrl instanceof URI)) {
+            absoluteUrl = URI(absoluteUrl);
           }
-        }
-        return absoluteUrl.toString();
-      },
+          if (
+            whitelist &&
+            Array.isArray(state.allowedDomains) &&
+            state.allowedDomains.some(d => hasAuthority(d, absoluteUrl))
+          ) {
+            return false;
+          }
+          let relative;
+          if (absoluteUrl.is('relative')) {
+            relative = absoluteUrl;
+          } else {
+            relative = absoluteUrl.relativeTo(state.catalogUrl);
+            if (relative.equals(absoluteUrl)) {
+              return true;
+            }
+          }
+          let relativeStr = relative.toString();
+          return relativeStr.startsWith('//') || relativeStr.startsWith('../');
+        },
+      getRequestUrl:
+        (state, getters) =>
+        (url, baseUrl = null, addLocalQueryParams = false) => {
+          let absoluteUrl = toAbsolute(url, baseUrl ? baseUrl : state.url, false);
+          if (!getters.isExternalUrl(absoluteUrl)) {
+            // Check whether private params are present and add them if the URL is part of the catalog
+            addQueryIfNotExists(absoluteUrl, state.privateQueryParameters);
+            // Check if we need to add global request params
+            addQueryIfNotExists(absoluteUrl, state.globalRequestQueryParameters);
+            if (addLocalQueryParams) {
+              // Check if we need to add local request params
+              addQueryIfNotExists(absoluteUrl, state.localRequestQueryParameters);
+            }
+          }
+          return absoluteUrl.toString();
+        },
 
       acceptedLanguages: state => {
         const languages = {};
@@ -356,7 +364,7 @@ function getStore(config, router) {
         // the priority would be: de-CH (0.8), de (0.7), en (0.6)
         // The priority never goes below 0.3
         if (Array.isArray(navigator.languages)) {
-          navigator.languages.forEach((locale, i) => languages[locale] = 0.8 - Math.min((i * 0.1), 0.5));
+          navigator.languages.forEach((locale, i) => (languages[locale] = 0.8 - Math.min(i * 0.1, 0.5)));
         }
         if (hasText(state.locale)) {
           // Add the more generic locale code as well.
@@ -368,18 +376,17 @@ function getStore(config, router) {
           languages[state.locale] = 1;
         }
         return Object.entries(languages)
-          .sort((a,b) => {
+          .sort((a, b) => {
             if (a[1] > b[1]) {
               return -1;
-            }
-            else if (a[1] < b[1]) {
+            } else if (a[1] < b[1]) {
               return 1;
             }
             return 0;
           })
-          .map(([l, q]) => q >= 1 ? l : `${l};q=${q.toFixed(1)}`)
+          .map(([l, q]) => (q >= 1 ? l : `${l};q=${q.toFixed(1)}`))
           .join(',');
-      }
+      },
     },
     mutations: {
       config(state, config) {
@@ -393,8 +400,7 @@ function getStore(config, router) {
             case 'catalogUrl':
               if (typeof value === 'function') {
                 state.catalogUrl = value();
-              }
-              else if (typeof value === 'string') {
+              } else if (typeof value === 'string') {
                 state.catalogUrl = value;
               }
               break;
@@ -406,7 +412,7 @@ function getStore(config, router) {
           }
         }
       },
-      languages(state, {uiLanguage, dataLanguage}) {
+      languages(state, { uiLanguage, dataLanguage }) {
         i18n.global.locale = uiLanguage;
         state.dataLanguage = dataLanguage || null;
         state.uiLanguage = uiLanguage || null;
@@ -415,24 +421,21 @@ function getStore(config, router) {
         type = `${type}QueryParameters`;
         if (typeof value === 'undefined') {
           delete state[type][key];
-        }
-        else {
+        } else {
           state[type][key] = value;
         }
       },
       setRequestHeader(state, { key, value }) {
         if (typeof value === 'undefined') {
           delete state.requestHeaders[key];
-        }
-        else {
+        } else {
           state.requestHeaders[key] = value;
         }
       },
       requestAuth(state, callback) {
         if (typeof callback === 'function') {
           state.doAuth.push(callback);
-        }
-        else {
+        } else {
           state.doAuth = [];
         }
       },
@@ -442,11 +445,10 @@ function getStore(config, router) {
       state(state, newState) {
         state.stateQueryParameters = newState;
       },
-      updateState(state, {type, value}) {
+      updateState(state, { type, value }) {
         if (value === null || typeof value === 'undefined') {
           delete state.stateQueryParameters[type];
-        }
-        else {
+        } else {
           state.stateQueryParameters[type] = value;
         }
       },
@@ -463,7 +465,7 @@ function getStore(config, router) {
           state.stateQueryParameters[type].splice(idx, 1);
         }
       },
-      startDownload(state, {href, fileStream}) {
+      startDownload(state, { href, fileStream }) {
         state.downloads[href] = fileStream || true;
       },
       finishDownload(state, href) {
@@ -515,7 +517,7 @@ function getStore(config, router) {
         if (status instanceof Loading && status.show) {
           state.loading = false;
           state.page = () => ({
-            title: i18n.global.t('errors.title')
+            title: i18n.global.t('errors.title'),
           });
         }
         if (!(error instanceof Error)) {
@@ -546,8 +548,7 @@ function getStore(config, router) {
       toggleApiItemsLoading(state, collectionId = '') {
         if (state.apiItemsLoading[collectionId]) {
           delete state.apiItemsLoading[collectionId];
-        }
-        else {
+        } else {
           state.apiItemsLoading[collectionId] = true;
         }
       },
@@ -611,11 +612,11 @@ function getStore(config, router) {
         state.parents = parents;
       },
       showGlobalError(state, error) {
-        if(error) {
+        if (error) {
           console.trace(error);
         }
         state.globalError = error;
-      }
+      },
     },
     actions: {
       async config(cx, config) {
@@ -634,8 +635,8 @@ function getStore(config, router) {
           }
         }
       },
-      async switchLocale(cx, {locale, userSelected}) {
-        await cx.dispatch('config', {locale});
+      async switchLocale(cx, { locale, userSelected }) {
+        await cx.dispatch('config', { locale });
 
         if (cx.state.storeLocale && userSelected) {
           const storage = new BrowserStorage();
@@ -660,7 +661,7 @@ function getStore(config, router) {
         // Execute other custom functions required to localize
         await executeCustomFunctions(uiLanguage);
 
-        cx.commit('languages', {dataLanguage, uiLanguage});
+        cx.commit('languages', { dataLanguage, uiLanguage });
         cx.commit('setQueryParameter', { type: 'state', key: 'language', value: locale });
       },
       async loadBackground(cx, count) {
@@ -702,7 +703,7 @@ function getStore(config, router) {
         }
         cx.commit('parents', parents);
       },
-      async tryLogin(cx, {url, action}) {
+      async tryLogin(cx, { url, action }) {
         cx.commit('clear', url);
         cx.commit('errored', { url, error: new BrowserError(i18n.global.t('authentication.unauthorized')) });
         if (action) {
@@ -717,14 +718,14 @@ function getStore(config, router) {
           force, // Force reloading the data, omit the cache
           noRetry, // Don't retry on authentication errors
           omitApi, // Don't load API collections or API items yet
-          isRoot // Is a request for the root catalog initiated by this function, avoiding endless loops in some mis-configured instances (see https://github.com/radiantearth/stac-browser/issues/580)
+          isRoot, // Is a request for the root catalog initiated by this function, avoiding endless loops in some mis-configured instances (see https://github.com/radiantearth/stac-browser/issues/580)
         } = args;
 
         const path = cx.getters.toBrowserPath(url);
         url = toAbsolute(url, cx.state.url);
 
         // Make sure we have all authentication details
-        await cx.dispatch("auth/waitForAuth");
+        await cx.dispatch('auth/waitForAuth');
 
         if (force) {
           cx.commit('clear', url);
@@ -766,15 +767,14 @@ function getStore(config, router) {
             let conformanceLink = data.getStacLinkWithRel('conformance');
             if (Array.isArray(data.conformsTo) && data.conformsTo.length > 0) {
               cx.commit('setConformanceClasses', data.conformsTo);
-            }
-            else if (conformanceLink) {
+            } else if (conformanceLink) {
               await cx.dispatch('loadOgcApiConformance', conformanceLink);
             }
           } catch (error) {
             if (!noRetry && cx.state.authConfig && isAuthenticationError(error)) {
               await cx.dispatch('tryLogin', {
                 url,
-                action: () => cx.dispatch('load', Object.assign({noRetry: true, force: true, show: true}, args))
+                action: () => cx.dispatch('load', Object.assign({ noRetry: true, force: true, show: true }, args)),
               });
               return;
             }
@@ -794,7 +794,7 @@ function getStore(config, router) {
           } catch (error) {
             cx.commit('showGlobalError', {
               message: i18n.global.t('errors.loadApiCollectionsFailed'),
-              error
+              error,
             });
           }
         }
@@ -806,7 +806,7 @@ function getStore(config, router) {
           } catch (error) {
             cx.commit('showGlobalError', {
               message: i18n.global.t('errors.loadApiItemsFailed'),
-              error
+              error,
             });
           }
         }
@@ -854,64 +854,57 @@ function getStore(config, router) {
           let response = await stacRequest(cx, link);
           if (!isObject(response.data) || !Array.isArray(response.data.features)) {
             throw new BrowserError(i18n.global.t('errors.invalidStacItems'));
-          }
-          else {
+          } else {
             // todo: Convert data to stac-js
-            response.data.features = response.data.features.map(item => {
-              try {
-                if (!isObject(item) || item.type !== 'Feature') {
-                  return null;
-                }
-                // See https://github.com/radiantearth/stac-browser/issues/486
-                let selfLink = Utils.getLinkWithRel(item.links, 'self');
-                let url;
-                if (selfLink?.href) {
-                  url = toAbsolute(selfLink.href, baseUrl, false);
-                }
-                else if (typeof item.id !== 'undefined') {
-                  let apiCollectionsLink = cx.getters.root?.getApiCollectionsLink()?.href;
-                  if (apiCollectionsLink) {
-                    apiCollectionsLink = URI(apiCollectionsLink);
-                  }
-                  if (baseUrl && baseUrl.path().endsWith('/')) {
-                    url = toAbsolute(`items/${item.id}`, baseUrl, false);
-                  }
-                  else if (baseUrl) {
-                    url = toAbsolute(`${collectionId}/items/${item.id}`, baseUrl, false);
-                  }
-                  else if (apiCollectionsLink?.path().endsWith('/')) {
-                    url = toAbsolute(`${collectionId}/items/${item.id}`, apiCollectionsLink, false);
-                  }
-                  else if (apiCollectionsLink) {
-                    url = toAbsolute(`collections/${collectionId}/items/${item.id}`, apiCollectionsLink, false);
-                  }
-                  else if (cx.state.catalogUrl) {
-                    url = toAbsolute(`collections/${collectionId}/items/${item.id}`, cx.state.catalogUrl, false);
-                  }
-                  else {
+            response.data.features = response.data.features
+              .map(item => {
+                try {
+                  if (!isObject(item) || item.type !== 'Feature') {
                     return null;
                   }
-                }
-                else {
+                  // See https://github.com/radiantearth/stac-browser/issues/486
+                  let selfLink = Utils.getLinkWithRel(item.links, 'self');
+                  let url;
+                  if (selfLink?.href) {
+                    url = toAbsolute(selfLink.href, baseUrl, false);
+                  } else if (typeof item.id !== 'undefined') {
+                    let apiCollectionsLink = cx.getters.root?.getApiCollectionsLink()?.href;
+                    if (apiCollectionsLink) {
+                      apiCollectionsLink = URI(apiCollectionsLink);
+                    }
+                    if (baseUrl && baseUrl.path().endsWith('/')) {
+                      url = toAbsolute(`items/${item.id}`, baseUrl, false);
+                    } else if (baseUrl) {
+                      url = toAbsolute(`${collectionId}/items/${item.id}`, baseUrl, false);
+                    } else if (apiCollectionsLink?.path().endsWith('/')) {
+                      url = toAbsolute(`${collectionId}/items/${item.id}`, apiCollectionsLink, false);
+                    } else if (apiCollectionsLink) {
+                      url = toAbsolute(`collections/${collectionId}/items/${item.id}`, apiCollectionsLink, false);
+                    } else if (cx.state.catalogUrl) {
+                      url = toAbsolute(`collections/${collectionId}/items/${item.id}`, cx.state.catalogUrl, false);
+                    } else {
+                      return null;
+                    }
+                  } else {
+                    return null;
+                  }
+                  url = url.toString();
+                  let data = cx.getters.getStac(url);
+                  if (data) {
+                    return data;
+                  } else {
+                    let itemPath = cx.getters.toBrowserPath(url);
+                    data = createSTAC(item, url, itemPath);
+                    data._incomplete = true;
+                    cx.commit('loaded', { data, url });
+                    return data;
+                  }
+                } catch (error) {
+                  console.error(error);
                   return null;
                 }
-                url = url.toString();
-                let data = cx.getters.getStac(url);
-                if (data) {
-                  return data;
-                }
-                else {
-                  let itemPath = cx.getters.toBrowserPath(url);
-                  data = createSTAC(item, url, itemPath);
-                  data._incomplete = true;
-                  cx.commit('loaded', { data, url });
-                  return data;
-                }
-              } catch (error) {
-                console.error(error);
-                return null;
-              }
-            }).filter(item => item instanceof STAC);
+              })
+              .filter(item => item instanceof STAC);
             if (show) {
               cx.commit('setApiItemsLink', link);
             }
@@ -924,7 +917,7 @@ function getStore(config, router) {
           if (!noRetry && cx.state.authConfig && isAuthenticationError(error)) {
             await cx.dispatch('tryLogin', {
               url: link.href,
-              action: () => cx.dispatch('loadApiItems', Object.assign({noRetry: true, force: true}, args))
+              action: () => cx.dispatch('loadApiItems', Object.assign({ noRetry: true, force: true }, args)),
             });
             return;
           }
@@ -934,7 +927,8 @@ function getStore(config, router) {
       async loadNextApiCollections(cx, args) {
         let { stac, show, noRetry } = args;
         let link;
-        if (stac) { // First page
+        if (stac) {
+          // First page
           // If we load from new collections, reset list of collections.
           // Otherwise we may append to collections from a parent entity.
           // https://github.com/radiantearth/stac-browser/issues/617
@@ -943,8 +937,8 @@ function getStore(config, router) {
           }
           link = stac.getLinkWithRel('data');
           link = Utils.addFiltersToLink(link, {}, cx.state.collectionsPerPage);
-        }
-        else { // Second page and after
+        } else {
+          // Second page and after
           stac = cx.state.data;
           link = cx.state.nextCollectionsLink;
         }
@@ -955,16 +949,14 @@ function getStore(config, router) {
           let response = await stacRequest(cx, link);
           if (!isObject(response.data) || !Array.isArray(response.data.collections)) {
             throw new BrowserError(i18n.global.t('errors.invalidStacCollections'));
-          }
-          else {
+          } else {
             // todo: Convert data to stac-js
             response.data.collections = response.data.collections.map(collection => {
               let selfLink = Utils.getLinkWithRel(collection.links, 'self');
               let url;
               if (selfLink?.href) {
                 url = toAbsolute(selfLink.href, cx.state.url || stac.getAbsoluteUrl(), false);
-              }
-              else {
+              } else {
                 // see https://github.com/radiantearth/stac-browser/issues/486
                 let baseUrl = cx.state.catalogUrl || stac.getAbsoluteUrl();
                 if (baseUrl) {
@@ -982,8 +974,7 @@ function getStore(config, router) {
               let data = cx.getters.getStac(url);
               if (data) {
                 return data;
-              }
-              else {
+              } else {
                 let collectionPath = cx.getters.toBrowserPath(url);
                 data = createSTAC(collection, url, collectionPath);
                 data._incomplete = true;
@@ -997,7 +988,7 @@ function getStore(config, router) {
           if (!noRetry && cx.state.authConfig && isAuthenticationError(error)) {
             await cx.dispatch('tryLogin', {
               url: link.href,
-              action: () => cx.dispatch('loadNextApiCollections', Object.assign({noRetry: true, force: true}, args))
+              action: () => cx.dispatch('loadNextApiCollections', Object.assign({ noRetry: true, force: true }, args)),
             });
             return;
           }
@@ -1011,10 +1002,11 @@ function getStore(config, router) {
         }
       },
       async retryAfterAuth(cx) {
-        let errorFn = error => cx.commit('showGlobalError', {
-          error,
-          message: i18n.global.t('errors.authFailed')
-        });
+        let errorFn = error =>
+          cx.commit('showGlobalError', {
+            error,
+            message: i18n.global.t('errors.authFailed'),
+          });
 
         for (let callback of cx.state.doAuth) {
           try {
@@ -1031,7 +1023,7 @@ function getStore(config, router) {
         const options = stacRequestOptions(cx, link);
         try {
           // Enable the loading indicator
-          cx.commit('startDownload', {href: options.url});
+          cx.commit('startDownload', { href: options.url });
           const StreamSaver = (await import('streamsaver-js')).default;
 
           const uri = URI(window.origin.toString());
@@ -1052,7 +1044,7 @@ function getStore(config, router) {
           // todo: use getErrorMessage / getErrorCode instead?
           if (res.status >= 400) {
             let msg;
-            switch(res.status) {
+            switch (res.status) {
               case 401:
                 msg = i18n.global.t('errors.unauthorized');
                 break;
@@ -1074,7 +1066,7 @@ function getStore(config, router) {
 
           const filename = Utils.assetFilename(link, res);
           const fileStream = StreamSaver.createWriteStream(filename);
-          cx.commit('startDownload', {href: options.url, fileStream});
+          cx.commit('startDownload', { href: options.url, fileStream });
           await res.body.pipeTo(fileStream);
         } catch (error) {
           if (error instanceof DOMException && error.name === 'AbortError') {

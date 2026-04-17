@@ -2,9 +2,13 @@
   <li class="link">
     <StacLink :id="popoverId" :data="link" :fallbackTitle="fallbackTitle" class="pe-1" />
     <b-popover
-      :target="popoverId" placement="auto" teleport-to="#stac-browser" class="link-more"
-      focus hover :boundary-padding="20"
-    >
+      :target="popoverId"
+      placement="auto"
+      teleport-to="#stac-browser"
+      class="link-more"
+      focus
+      hover
+      :boundary-padding="20">
       <Description v-if="link.description" :description="link.description" compact />
       <section class="link-actions">
         <h3 class="first">{{ $t('additionalActions') }}</h3>
@@ -24,35 +28,35 @@ import { getIgnoredFields } from '../ignored-metadata.js';
 let linkId = 0;
 
 export default {
-  name: "LinkListEntry",
+  name: 'LinkListEntry',
   components: {
     HrefActions,
     StacLink,
     BPopover: defineAsyncComponent(() => import('bootstrap-vue-next').then(m => m.BPopover)),
     Description: defineAsyncComponent(() => import('./Description.vue')),
-    MetadataGroups: defineAsyncComponent(() => import('./MetadataGroups.vue'))
+    MetadataGroups: defineAsyncComponent(() => import('./MetadataGroups.vue')),
   },
   props: {
     link: {
       type: Object,
-      required: true
+      required: true,
     },
     fallbackTitle: {
       type: Function,
-      required: true
-    }
+      required: true,
+    },
   },
   computed: {
     ignoredMetadataFields() {
       return getIgnoredFields(this.link, 'Link');
     },
     popoverId() {
-      return "popover-link-" + linkId;
-    }
+      return 'popover-link-' + linkId;
+    },
   },
   beforeCreate() {
     linkId++;
-  }
+  },
 };
 </script>
 
@@ -77,7 +81,7 @@ export default {
       margin-top: 0;
     }
   }
-  
+
   .metadata {
     min-width: 400px;
 

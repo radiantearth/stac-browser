@@ -1,7 +1,6 @@
-import Utils from "../../utils";
+import Utils from '../../utils';
 
 export default class CqlValue {
-
   constructor(value) {
     this.value = value;
   }
@@ -9,17 +8,13 @@ export default class CqlValue {
   static create(value) {
     if (value instanceof CqlValue) {
       return value;
-    }
-    else if (Array.isArray(value)) {
+    } else if (Array.isArray(value)) {
       return new CqlArray(value);
-    }
-    else if (value instanceof Date) {
+    } else if (value instanceof Date) {
       return new CqlTimestamp(value);
-    }
-    else if (typeof value === 'string') {
+    } else if (typeof value === 'string') {
       return new CqlString(value);
-    }
-    else {
+    } else {
       return new CqlValue(value);
     }
   }
@@ -31,11 +26,9 @@ export default class CqlValue {
   toText() {
     return this.value;
   }
-
 }
 
 export class CqlTimestamp extends CqlValue {
-
   constructor(value) {
     super(value);
   }
@@ -51,11 +44,9 @@ export class CqlTimestamp extends CqlValue {
   toTimestamp() {
     return Utils.dateToUTC(this.value).toISOString();
   }
-
 }
 
 export class CqlString extends CqlValue {
-
   constructor(value) {
     super(value);
   }
@@ -67,11 +58,9 @@ export class CqlString extends CqlValue {
   toText() {
     return `'${this.value.replace("'", "''")}'`;
   }
-
 }
 
 export class CqlArray extends CqlValue {
-
   constructor(value) {
     super(value);
   }
@@ -87,5 +76,4 @@ export class CqlArray extends CqlValue {
     });
     return `(${csv.join(',')})`;
   }
-
 }

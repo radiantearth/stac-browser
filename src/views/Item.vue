@@ -28,7 +28,10 @@
           <ReadMore v-if="data.properties.description" :lines="10" :text="$t('read.more')" :text-less="$t('read.less')">
             <Description :description="data.properties.description" />
           </ReadMore>
-          <Keywords v-if="Array.isArray(data.properties.keywords) && data.properties.keywords.length > 0" :keywords="data.properties.keywords" class="mb-3" />
+          <Keywords
+            v-if="Array.isArray(data.properties.keywords) && data.properties.keywords.length > 0"
+            :keywords="data.properties.keywords"
+            class="mb-3" />
         </section>
         <CollectionLink v-if="collectionLink" :link="collectionLink" />
         <Providers v-if="data.properties.providers" :providers="data.properties.providers" />
@@ -44,14 +47,14 @@ import { defineComponent, defineAsyncComponent } from 'vue';
 import { mapState, mapGetters } from 'vuex';
 import { BTab, BTabs, BCard } from 'bootstrap-vue-next';
 import Description from '../components/Description.vue';
-import ReadMore from "../components/ReadMore.vue";
+import ReadMore from '../components/ReadMore.vue';
 import ShowAssetLinkMixin from '../components/ShowAssetLinkMixin';
 import DeprecationMixin from '../components/DeprecationMixin';
 import { addSchemaToDocument, createItemSchema } from '../schema-org';
 import { getIgnoredFields } from '../ignored-metadata.js';
 
 export default defineComponent({
-  name: "Item",
+  name: 'Item',
   components: {
     BTab,
     BTabs,
@@ -67,18 +70,15 @@ export default defineComponent({
     MetadataGroups: defineAsyncComponent(() => import('../components/MetadataGroups.vue')),
     Providers: defineAsyncComponent(() => import('../components/Providers.vue')),
     ReadMore,
-    Thumbnails: defineAsyncComponent(() => import('../components/Thumbnails.vue'))
+    Thumbnails: defineAsyncComponent(() => import('../components/Thumbnails.vue')),
   },
-  mixins: [
-    ShowAssetLinkMixin,
-    DeprecationMixin
-  ],
+  mixins: [ShowAssetLinkMixin, DeprecationMixin],
   computed: {
     ...mapState(['data', 'url']),
     ...mapGetters(['collectionLink', 'parentLink']),
     ignoredMetadataFields() {
       return getIgnoredFields(this.data);
-    }
+    },
   },
   watch: {
     data: {
@@ -90,18 +90,19 @@ export default defineComponent({
         } catch (error) {
           console.error(error);
         }
-      }
-    }
-  }
+      },
+    },
+  },
 });
 </script>
 
 <style lang="scss">
 @import 'bootstrap/scss/mixins';
-@import "../theme/variables.scss";
+@import '../theme/variables.scss';
 
 #stac-browser .item {
-  .left, .right {
+  .left,
+  .right {
     max-width: 50%;
     @include media-breakpoint-down(md) {
       max-width: 100%;

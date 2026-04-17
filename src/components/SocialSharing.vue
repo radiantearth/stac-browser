@@ -1,11 +1,16 @@
 <template>
   <section>
-    <b-button v-for="href, service in urls" :key="service" class="service me-1" :class="service" :href="href" target="_blank">
+    <b-button
+      v-for="(href, service) in urls"
+      :key="service"
+      class="service me-1"
+      :class="service"
+      :href="href"
+      target="_blank">
       <component :is="`icon-${service}`" /> {{ $t(`source.share.${service}`) }}
     </b-button>
   </section>
 </template>
-
 
 <script>
 import { mapState } from 'vuex';
@@ -15,26 +20,26 @@ import IconMastodon from '~icons/share/mastodon';
 import IconX from '~icons/share/x';
 
 export default {
-  name: "SocialSharing",
+  name: 'SocialSharing',
   components: {
     IconBsky,
     IconEmail,
     IconMastodon,
-    IconX
+    IconX,
   },
   props: {
     text: {
       type: String,
-      required: true
+      required: true,
     },
     title: {
       type: String,
-      required: true
+      required: true,
     },
     url: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
   data() {
     return {
@@ -42,8 +47,8 @@ export default {
         email: 'mailto:?subject={title}&body={text}',
         bsky: 'https://bsky.app/intent/compose?text={text}',
         mastodon: 'https://mastodon.social/share?text={text}',
-        x: 'https://x.com/intent/tweet?text={text}'
-      }
+        x: 'https://x.com/intent/tweet?text={text}',
+      },
     };
   },
   computed: {
@@ -58,13 +63,10 @@ export default {
           continue;
         }
         const url = this.urlTemplates[id];
-        urls[id] = url
-          .replace('{text}', uriText)
-          .replace('{title}', uriTitle)
-          .replace('{url}', uriUrl);
+        urls[id] = url.replace('{text}', uriText).replace('{title}', uriTitle).replace('{url}', uriUrl);
       }
       return urls;
-    }
-  }
+    },
+  },
 };
 </script>

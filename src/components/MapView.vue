@@ -8,13 +8,23 @@
     </div>
     <div ref="target" class="popover-target" />
     <b-popover
-      v-if="popover && selection" show manual placement="auto"
-      :target="selection.target" :teleport-to="container" class="map-popover"
-      :boundary-padding="10"
-    >
+      v-if="popover && selection"
+      show
+      manual
+      placement="auto"
+      :target="selection.target"
+      :teleport-to="container"
+      class="map-popover"
+      :boundary-padding="10">
       <section class="popover-children">
         <Items v-if="selection.type === 'items'" :stac="stac" :items="selection.children" />
-        <Catalogs v-else-if="selection.type === 'collections'" collectionsOnly enforceCards hideControls :stac="stac" :catalogs="selection.children" />
+        <Catalogs
+          v-else-if="selection.type === 'collections'"
+          collectionsOnly
+          enforceCards
+          hideControls
+          :stac="stac"
+          :catalogs="selection.children" />
         <Features v-else :features="selection.children" />
       </section>
       <div class="text-center">
@@ -48,32 +58,30 @@ export default {
     Catalogs: defineAsyncComponent(() => import('../components/Catalogs.vue')),
     Items: defineAsyncComponent(() => import('../components/Items.vue')),
     LayerControl,
-    TextControl
+    TextControl,
   },
-  mixins: [
-    MapMixin
-  ],
+  mixins: [MapMixin],
   props: {
     stac: {
       type: Object,
-      default: null
+      default: null,
     },
     assets: {
       type: Array,
-      default: null
+      default: null,
     },
     children: {
       type: Object,
-      default: null
+      default: null,
     },
     onfocusOnly: {
       type: Boolean,
-      default: false
+      default: false,
     },
     popover: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   emits: ['empty', 'changed'],
   data() {
@@ -91,8 +99,7 @@ export default {
     container() {
       if (this.isFullScreen) {
         return '#' + this.mapId;
-      }
-      else {
+      } else {
         return '#stac-browser';
       }
     },
@@ -100,9 +107,9 @@ export default {
       const showItems = this.children && this.children.isItemCollection;
       return {
         displayPreview: showItems,
-        displayOverview: showItems && this.displayOverviewsForChildren
+        displayOverview: showItems && this.displayOverviewsForChildren,
       };
-    }
+    },
   },
   watch: {
     async stac() {
@@ -132,7 +139,7 @@ export default {
       if (!selection && this.selector) {
         this.selector.getFeatures().clear();
       }
-    }
+    },
   },
   created() {
     // This is created here and not in data() to avoid it being reactive
@@ -161,7 +168,7 @@ export default {
         assets: this.assets || null,
         displayWebMapLink: true,
         disableMigration: true,
-        childrenOptions: this.childrenOptions
+        childrenOptions: this.childrenOptions,
       });
       this.stacLayer = new StacLayer(options);
       this.stacLayer.on('error', error => {
@@ -179,19 +186,18 @@ export default {
         this.selector = new Select({
           multi: true,
           style: selectStyle,
-          layers: (layer) => {
+          layers: layer => {
             if (this.children) {
               // For item selection
               return false;
-            }
-            else {
+            } else {
               // For feature selection
               const stac = layer.get('stac');
               return stac && stac.isAsset;
             }
-          }
+          },
         });
-        this.selector.on('select', (event) => {
+        this.selector.on('select', event => {
           // For feature selection
           this.selection = null;
           this.setTargetPosition(event.mapBrowserEvent);
@@ -201,12 +207,12 @@ export default {
             this.selection = {
               target: this.$refs.target,
               type: 'features',
-              items: features.getArray().map(f => writer.writeFeatureObject(f))
+              items: features.getArray().map(f => writer.writeFeatureObject(f)),
             };
           }
         });
         this.map.addInteraction(this.selector);
-        this.map.on('singleclick', async (event) => {
+        this.map.on('singleclick', async event => {
           // For item selection
           this.selection = null;
           if (this.children) {
@@ -218,14 +224,14 @@ export default {
             if (objects.length > 0) {
               this.selection = {
                 target: this.$refs.target,
-                type: this.children.isCollectionCollection ? 'collections': 'items',
-                children: objects
+                type: this.children.isCollectionCollection ? 'collections' : 'items',
+                children: objects,
               };
             }
           }
         });
-        this.map.on('change', () => this.selection = null);
-        this.map.on('movestart', () => this.selection = null);
+        this.map.on('change', () => (this.selection = null));
+        this.map.on('movestart', () => (this.selection = null));
       }
     },
     setTargetPosition(event) {
@@ -240,7 +246,7 @@ export default {
       if (extent) {
         // Update the sizes, otherwise the fit will not work properly and compute a wrong zoom level
         this.map.updateSize();
-        this.map.getView().fit(extent, { padding: [50,50,50,50], maxZoom: this.maxZoom });
+        this.map.getView().fit(extent, { padding: [50, 50, 50, 50], maxZoom: this.maxZoom });
       }
     },
     resetSelection() {
@@ -250,17 +256,19 @@ export default {
       if (!this.stacLayer) {
         return null;
       }
-      return this.stacLayer.getLayers().getArray()
+      return this.stacLayer
+        .getLayers()
+        .getArray()
         .filter(layer => MapUtils.isLayerVisible(this.map, layer))
         .map(layer => layer.get('stac'))
         .filter(stac => stac instanceof STACReference);
-    }
-  }
+    },
+  },
 };
 </script>
 
 <style lang="scss">
-@import "ol/ol.css";
+@import 'ol/ol.css';
 
 #stac-browser {
   .map-popover {
@@ -275,16 +283,18 @@ export default {
     top: -1px;
     left: -1px;
   }
-  
+
   .popover-children {
     max-height: 500px;
     overflow: auto;
     margin-top: -0.5rem;
     margin-left: -0.75rem;
     margin-right: -0.75rem;
-    padding: 0.5rem 0.75rem 0  0.75rem;
+    padding: 0.5rem 0.75rem 0 0.75rem;
 
-    .items, .features, .catalogs {
+    .items,
+    .features,
+    .catalogs {
       margin-bottom: 0 !important;
     }
 

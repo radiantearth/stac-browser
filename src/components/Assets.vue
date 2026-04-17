@@ -3,10 +3,13 @@
     <h2 v-if="displayTitle">{{ displayTitle }}</h2>
     <b-accordion>
       <Asset
-        v-for="asset in assets" :asset="asset" :expand="expand"
-        :definition="definition" :shown="shownKeys.includes(asset.getKey())"
-        :key="asset.getKey()" @show="show"
-      />
+        v-for="asset in assets"
+        :asset="asset"
+        :expand="expand"
+        :definition="definition"
+        :shown="shownKeys.includes(asset.getKey())"
+        :key="asset.getKey()"
+        @show="show" />
     </b-accordion>
   </section>
 </template>
@@ -19,60 +22,56 @@ export default {
   name: 'Assets',
   components: {
     Asset: defineAsyncComponent(() => import('./Asset.vue')),
-    BAccordion
+    BAccordion,
   },
   props: {
     assets: {
       type: Array,
-      required: true
+      required: true,
     },
     shown: {
       type: Array,
-      default: () => ([])
+      default: () => [],
     },
     definition: {
       type: Boolean,
-      default: false
+      default: false,
     },
     title: {
       type: String,
-      default: null
+      default: null,
     },
     autoExpand: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   emits: ['showAsset'],
   computed: {
     shownKeys() {
-      return this.shown
-        .filter(asset => asset.isAsset)
-        .map(asset => asset.getKey());
+      return this.shown.filter(asset => asset.isAsset).map(asset => asset.getKey());
     },
     displayTitle() {
       if (this.title === null) {
         let langKey = this.definition ? 'assets.inItems' : 'stacAssets';
         return this.$t(langKey, this.assets.length);
-      }
-      else {
+      } else {
         return this.title;
       }
     },
     expand() {
       if (this.definition) {
         return false; // Don't expand assets for Item Asset Definitions
-      }
-      else if (this.assets.length === 1 && this.autoExpand) {
+      } else if (this.assets.length === 1 && this.autoExpand) {
         return true; // Expand asset if it's the only asset available and it is in an Item
       }
       return null; // Let asset decide (e.g. depending on roles)
-    }
+    },
   },
   methods: {
     show() {
       this.$emit('showAsset', ...arguments);
-    }
-  }
+    },
+  },
 };
 </script>

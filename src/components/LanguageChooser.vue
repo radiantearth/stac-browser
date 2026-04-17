@@ -1,21 +1,25 @@
 <template>
   <b-dropdown size="sm" variant="primary" right :title="$t('source.language.switch')">
     <template #button-content>
-      <b-icon-flag /><span class="button-label">{{ $t('source.language.label', {currentLanguage}) }}</span>
+      <b-icon-flag /><span class="button-label">{{ $t('source.language.label', { currentLanguage }) }}</span>
     </template>
     <b-dropdown-item v-for="l of languages" :key="l.code" class="lang-item" @click="setLocale(l.code)">
-      <b-icon-check :class="{hide: currentLocale !== l.code}" />
+      <b-icon-check :class="{ hide: currentLocale !== l.code }" />
       <span class="title">
         <span :lang="l.code">{{ l.native }}</span>
-        <template v-if="l.global && l.global !== l.native"> / <span lang="en">{{ l.global }}</span></template>
+        <template v-if="l.global && l.global !== l.native">
+          / <span lang="en">{{ l.global }}</span></template
+        >
       </span>
-      <b-icon-exclamation-triangle v-if="supportsLanguageExt && (!l.ui || !l.data)" :title="l.ui ? $t('source.language.onlyUI') : $t('source.language.onlyData')" class="ms-2" />
+      <b-icon-exclamation-triangle
+        v-if="supportsLanguageExt && (!l.ui || !l.data)"
+        :title="l.ui ? $t('source.language.onlyUI') : $t('source.language.onlyData')"
+        class="ms-2" />
     </b-dropdown-item>
   </b-dropdown>
 </template>
 
 <script>
-
 import { STAC } from 'stac-js';
 import { getBest, prepareSupported } from 'stac-js/src/locales';
 
@@ -33,16 +37,16 @@ export default {
   props: {
     data: {
       type: Object,
-      default: null
+      default: null,
     },
     locales: {
       type: Array,
-      default: () => []
+      default: () => [],
     },
     currentLocale: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
   emits: ['setLocale'],
   computed: {
@@ -68,8 +72,7 @@ export default {
       let lang = this.languages.find(l => l.code === this.currentLocale);
       if (lang) {
         return lang.native;
-      }
-      else {
+      } else {
         return '-';
       }
     },
@@ -77,25 +80,25 @@ export default {
       let languages = [];
 
       // Add all UI languages
-      for(let code of this.locales) {
+      for (let code of this.locales) {
         const t_key = `languages.${code}.transliteration`;
         languages.push({
           code,
           native: this.$t(`languages.${code}.native`),
           global: this.$t(`languages.${code}.global`),
           transliteration: this.$te(t_key) ? this.$t(t_key) : null,
-          ui: true
+          ui: true,
         });
       }
 
       // Add missing data languages
       const dataLanguages = getDataLanguages(this.data);
-      for(let lang of dataLanguages) {
+      for (let lang of dataLanguages) {
         if (!isObject(lang) || !lang.code || this.locales.includes(lang.code)) {
           continue;
         }
         let newLang = {
-          code: lang.code
+          code: lang.code,
         };
         newLang.native = lang.name || lang.alternate || lang.code;
         newLang.global = lang.alternate || lang.name || lang.code;
@@ -107,7 +110,7 @@ export default {
         // Determine which languages are complete
         const uiSupported = prepareSupported(this.locales);
         const dataSupported = prepareSupported(dataLanguages.map(l => l.code));
-        for(let l of languages) {
+        for (let l of languages) {
           if (!l.ui) {
             l.ui = Boolean(getBest(uiSupported, l.code, null));
           }
@@ -116,21 +119,18 @@ export default {
           }
         }
       }
-      
+
       const collator = new Intl.Collator('en', { sensitivity: 'base' });
-      return languages.sort((a,b) => {
-        return collator.compare(
-          a.transliteration || a.native,
-          b.transliteration || b.native
-        );
+      return languages.sort((a, b) => {
+        return collator.compare(a.transliteration || a.native, b.transliteration || b.native);
       });
     },
   },
   methods: {
     setLocale(locale) {
       this.$emit('setLocale', locale);
-    }
-  }  
+    },
+  },
 };
 </script>
 

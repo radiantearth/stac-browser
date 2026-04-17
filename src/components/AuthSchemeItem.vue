@@ -2,7 +2,7 @@
   <b-list-group-item button class="auth-method-item flex-column align-items-start" @click="authenticate">
     <div class="d-flex w-100 justify-content-between align-items-center">
       <strong class="me-2">{{ $t(`authentication.schemeTypes.${method.type}`, method) }}</strong>
-      <b-badge v-if="!isSupported" variant="danger">{{ $t("authentication.unsupported") }}</b-badge>
+      <b-badge v-if="!isSupported" variant="danger">{{ $t('authentication.unsupported') }}</b-badge>
     </div>
   </b-list-group-item>
 </template>
@@ -15,20 +15,20 @@ export default {
   props: {
     method: {
       type: Object,
-      required: true
-    }
+      required: true,
+    },
   },
   emits: ['authenticate'],
   computed: {
     isSupported() {
       return AuthUtils.isSupported(this.method, this.$store.state);
-    }
+    },
   },
   methods: {
     authenticate() {
       this.$emit('authenticate', this.method);
-    }
-  }
+    },
+  },
 };
 </script>
 

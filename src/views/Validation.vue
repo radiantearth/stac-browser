@@ -21,23 +21,19 @@
         </b-col>
       </b-row>
 
-      <hr class="my-4">
+      <hr class="my-4" />
 
       <div class="results row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xxxl-4 g-3">
         <div class="col">
           <ValidationResult
-            id="core" :errors="report.results.core" :warnings="report.messages"
-            :locale="locale" :context="report"
-          />
+            id="core"
+            :errors="report.results.core"
+            :warnings="report.messages"
+            :locale="locale"
+            :context="report" />
         </div>
-        <div
-          class="col"
-          v-for="(errors, key) in report.results.extensions"
-          :key="key"
-        >
-          <ValidationResult
-            :id="key" :errors="errors" :locale="locale" :context="report"
-          />
+        <div class="col" v-for="(errors, key) in report.results.extensions" :key="key">
+          <ValidationResult :id="key" :errors="errors" :locale="locale" :context="report" />
         </div>
       </div>
     </section>
@@ -54,39 +50,37 @@ import { STAC } from 'stac-js';
 import ValidationResult from '../components/ValidationResult.vue';
 
 export default defineComponent({
-  name: "Validation",
+  name: 'Validation',
   components: {
-    ValidationResult
+    ValidationResult,
   },
-  mixins: [
-    BrowseMixin
-  ],
+  mixins: [BrowseMixin],
   props: {
     path: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
   data() {
     return {
       working: true,
       report: null,
       internalError: null,
-      locale: null
+      locale: null,
     };
   },
   computed: {
-    ...mapState(["data", "uiLanguage"]),
+    ...mapState(['data', 'uiLanguage']),
     variant() {
-      return this.report && this.report.valid ? "success" : "danger";
-    }
+      return this.report && this.report.valid ? 'success' : 'danger';
+    },
   },
   watch: {
     data: {
       immediate: true,
       async handler() {
         await this.validate();
-      }
+      },
     },
     uiLanguage: {
       immediate: true,
@@ -97,12 +91,11 @@ export default defineComponent({
         const i18nFn = (await import(`../locales/${locale}/validation.js`)).default;
         if (i18nFn instanceof Promise) {
           this.locale = (await i18nFn).default;
-        }
-        else {
+        } else {
           this.locale = i18nFn;
         }
-      }
-    }
+      },
+    },
   },
   methods: {
     async validate() {
@@ -118,8 +111,8 @@ export default defineComponent({
           this.working = false;
         }
       }
-    }
-  }
+    },
+  },
 });
 </script>
 

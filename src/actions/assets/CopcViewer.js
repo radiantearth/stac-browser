@@ -1,24 +1,22 @@
-import AssetActionPlugin from "../AssetActionPlugin";
+import AssetActionPlugin from '../AssetActionPlugin';
 import { URI } from 'stac-js/src/utils.js';
-import i18n from "../../i18n";
+import i18n from '../../i18n';
 
 export default class CopcViewer extends AssetActionPlugin {
-
   get show() {
-    return this.component.isBrowserProtocol && (
-      this.asset.type === 'application/vnd.laszip+copc'
-      ||  URI(this.asset.href).filename() == 'ept.json'
+    return (
+      this.component.isBrowserProtocol &&
+      (this.asset.type === 'application/vnd.laszip+copc' || URI(this.asset.href).filename() == 'ept.json')
     );
   }
 
   get uri() {
-    let uri = URI("https://viewer.copc.io");
+    let uri = URI('https://viewer.copc.io');
     uri.addQuery('copc', this.component.href);
     return uri;
   }
 
   get text() {
-    return i18n.global.t('actions.openIn', {service: 'copc.io'});
+    return i18n.global.t('actions.openIn', { service: 'copc.io' });
   }
-
 }
