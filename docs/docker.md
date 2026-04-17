@@ -31,7 +31,8 @@ STAC Browser is now available at `http://localhost:8080`
 You can pass further options to STAC Browser to customize it to your needs.
 
 The build-only options
-[`pathPrefix`](./options.md#pathprefix) and [`historyMode`](./options.md#historymode)
+[`pathPrefix`](./options.md#pathprefix), [`historyMode`](./options.md#historymode),
+and `SB_CONFIG` (for loading an [external config file](./options.md))
 can be provided as a
 [build argument](https://docs.docker.com/engine/reference/commandline/build#set-build-time-variables---build-arg)
 when building the Dockerfile.
@@ -40,6 +41,14 @@ For example:
 
 ```bash
 docker build -t stac-browser:v1 --build-arg pathPrefix="/browser/" --build-arg historyMode=hash .
+```
+
+`SB_CONFIG` lets you overlay a custom config module (e.g. for options like
+[`preprocessSTAC`](./options.md#preprocessstac) that can only be set in a config file)
+without modifying the Dockerfile:
+
+```bash
+docker build -t stac-browser:v1 --build-arg SB_CONFIG=./config.custom.mjs .
 ```
 
 All other options, except the ones that are explicitly excluded from CLI/ENV usage,

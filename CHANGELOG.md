@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Plugin system for widgets
 - Support for Sortables
 - Support `SB_CONFIG` for loading a custom config module
+  - Expose `SB_CONFIG` as a Docker build argument
 - Support Vite `loadEnv` for `.env` config overrides
 - CQL2 / Queryables:
   - Allow negating CQL2 filters (globally and per filter)
