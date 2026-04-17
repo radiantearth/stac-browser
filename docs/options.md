@@ -72,6 +72,7 @@ The override order for the configuration is:
   - [useTileLayerAsFallback](#usetilelayerasfallback)
   - [displayPreview](#displaypreview)
   - [displayOverview](#displayoverview)
+  - [displayOverviewsForChildren](#displayoverviewsforchildren)
   - [displayGeoTiffByDefault](#displaygeotiffbydefault)
   - [crs](#crs)
   - [getMapSourceOptions](#getmapsourceoptions)
@@ -407,6 +408,13 @@ If both `displayPreview` and `displayOverview` (see below) are enabled, STAC Bro
 ### displayOverview
 
 If set to `true` (default), allows to display COGs and, if `displayGeoTiffByDefault` is enabled, GeoTiffs on the map as default visualization, usually from an asset with role `overview` or `visual`.
+
+### displayOverviewsForChildren
+
+Similar to `displayOverview` (see above), but defaults to `false`.
+Applies only to maps that show multiple STAC entitieies, i.e. lists of items for a Collection or Search.
+Displaying a large number of COGs or Zarrs at the same time on a map, can be slow.
+Thus, this is disabled by default.
 
 ### displayGeoTiffByDefault
 

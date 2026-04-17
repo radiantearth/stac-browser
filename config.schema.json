@@ -5,233 +5,138 @@
   ],
   "properties": {
     "catalogUrl": {
-      "type": [
-        "string",
-        "null"
-      ],
+      "type": ["string", "null"],
       "format": "uri"
     },
     "catalogTitle": {
-      "type": [
-        "string"
-      ]
+      "type": ["string"]
     },
     "allowExternalAccess": {
-      "type": [
-        "boolean"
-      ]
+      "type": ["boolean"]
     },
     "allowedDomains": {
-      "type": [
-        "array"
-      ],
+      "type": ["array"],
       "items": {
-        "type": [
-          "string"
-        ]
+        "type": ["string"]
       }
     },
     "detectLocaleFromBrowser": {
-      "type": [
-        "boolean"
-      ]
+      "type": ["boolean"]
     },
     "storeLocale": {
-      "type": [
-        "boolean"
-      ]
+      "type": ["boolean"]
     },
     "locale": {
-      "type": [
-        "string"
-      ]
+      "type": ["string"]
     },
     "fallbackLocale": {
-      "type": [
-        "string"
-      ]
+      "type": ["string"]
     },
     "supportedLocales": {
-      "type": [
-        "array"
-      ],
+      "type": ["array"],
       "items": {
-        "type": [
-          "string"
-        ]
+        "type": ["string"]
       }
     },
     "apiCatalogPriority": {
-      "type": [
-        "string",
-        "null"
-      ],
-      "enum": [
-        "collections",
-        "childs",
-        null
-      ]
+      "type": ["string", "null"],
+      "enum": ["collections", "childs", null]
     },
     "useTileLayerAsFallback": {
-      "type": [
-        "boolean"
-      ]
+      "type": ["boolean"]
     },
     "displayGeoTiffByDefault": {
-      "type": [
-        "boolean"
-      ]
+      "type": ["boolean"]
     },
     "displayPreview": {
-      "type": [
-        "boolean"
-      ]
+      "type": ["boolean"]
     },
     "displayOverview": {
-      "type": [
-        "boolean"
-      ]
+      "type": ["boolean"]
+    },
+    "displayOverviewsForChildren": {
+      "type": ["boolean"]
     },
     "buildTileUrlTemplate": {
-      "type": [
-        "null"
-      ],
+      "type": ["null"],
       "format": "function",
       "noCLI": true,
       "noEnv": true
     },
     "getMapSourceOptions": {
-      "type": [
-        "null"
-      ],
+      "type": ["null"],
       "format": "function",
       "noCLI": true,
       "noEnv": true
     },
     "pathPrefix": {
-      "type": [
-        "string"
-      ],
+      "type": ["string"],
       "buildOnly": true
     },
     "historyMode": {
-      "type": [
-        "string"
-      ],
-      "enum": [
-        "history",
-        "hash"
-      ],
+      "type": ["string"],
+      "enum": ["history", "hash"],
       "buildOnly": true
     },
     "cardViewMode": {
-      "type": [
-        "string"
-      ],
-      "enum": [
-        "list",
-        "cards"
-      ]
+      "type": ["string"],
+      "enum": ["list", "cards"]
     },
     "cardViewSort": {
-      "type": [
-        "string",
-        "null"
-      ],
-      "enum": [
-        "asc",
-        "desc",
-        null
-      ]
+      "type": ["string", "null"],
+      "enum": ["asc", "desc", null]
     },
     "showThumbnailsAsAssets": {
-      "type": [
-        "boolean"
-      ]
+      "type": ["boolean"]
     },
     "searchResultsPerPage": {
-      "type": [
-        "integer"
-      ],
+      "type": ["integer"],
       "minimum": 1
     },
     "itemsPerPage": {
-      "type": [
-        "integer",
-        "null"
-      ],
+      "type": ["integer", "null"],
       "minimum": 1
     },
     "collectionsPerPage": {
-      "type": [
-        "integer",
-        "null"
-      ],
+      "type": ["integer", "null"],
       "minimum": 1
     },
     "maxEntriesPerPage": {
-      "type": [
-        "integer"
-      ],
+      "type": ["integer"],
       "minimum": 1
     },
     "defaultThumbnailSize": {
-      "type": [
-        "array",
-        "null"
-      ],
+      "type": ["array", "null"],
       "minItems": 2,
       "maxItems": 2,
       "items": {
-        "type": [
-          "number"
-        ]
+        "type": ["number"]
       }
     },
     "crossOriginMedia": {
-      "type": [
-        "string",
-        "null"
-      ],
-      "enum": [
-        "anonymous",
-        "use-credentials",
-        "",
-        null
-      ]
+      "type": ["string", "null"],
+      "enum": ["anonymous", "use-credentials", "", null]
     },
     "requestHeaders": {
-      "type": [
-        "object"
-      ]
+      "type": ["object"]
     },
     "requestQueryParameters": {
-      "type": [
-        "object"
-      ]
+      "type": ["object"]
     },
     "socialSharing": {
-      "type": [
-        "array"
-      ],
+      "type": ["array"],
       "items": {
-        "type": [
-          "string"
-        ]
+        "type": ["string"]
       }
     },
     "preprocessSTAC": {
-      "type": [
-        "null"
-      ],
+      "type": ["null"],
       "format": "function",
       "noCLI": true,
       "noEnv": true
     },
     "authConfig": {
-      "type": [
-        "object"
-      ],
+      "type": ["object"],
       "allOf": [
         {
           "$ref": "https://stac-extensions.github.io/authentication/v1.1.0/schema.json"
@@ -239,15 +144,10 @@
       ]
     },
     "crs": {
-      "type": [
-        "object"
-      ]
+      "type": ["object"]
     },
     "footerLinks": {
-      "type": [
-        "array",
-        "null"
-      ],
+      "type": ["array", "null"],
       "items": {
         "type": "object",
         "properties": {
@@ -259,10 +159,7 @@
             "format": "uri"
           }
         },
-        "required": [
-          "label",
-          "url"
-        ]
+        "required": ["label", "url"]
       }
     }
   }

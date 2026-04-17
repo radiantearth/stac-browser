@@ -49,7 +49,7 @@
   "dependencies": {
     "@apidevtools/json-schema-ref-parser": "^15.2.2",
     "@musement/iso-duration": "^1.0.0",
-    "@radiantearth/stac-fields": "~1.5.8",
+    "@radiantearth/stac-fields": "~1.5.9",
     "@radiantearth/stac-migrate": "~2.0.2",
     "@turf/mask": "^7.2.0",
     "@vuepic/vue-datepicker": "^12.1.0",

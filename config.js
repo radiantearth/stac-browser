@@ -33,6 +33,7 @@ export default {
     displayGeoTiffByDefault: false,
     displayPreview: true,
     displayOverview: true,
+    displayOverviewsForChildren: false,
     buildTileUrlTemplate: null,
     getMapSourceOptions: null,
     pathPrefix: "/",
