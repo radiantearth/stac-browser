@@ -5,6 +5,6 @@
 ## Checklist
 
 - [ ] Added [changelog entry](CHANGELOG.md)
-- [ ] Added translations for new or changed UI strings
-- [ ] Executed linter (`npm run lint`)
+- [ ] Added translations for new or changed texts in the UI
+- [ ] Linted & Formatted code (`npm run fix`)
 - [ ] Added and executed tests (`npm test`)
