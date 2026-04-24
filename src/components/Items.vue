@@ -1,17 +1,25 @@
 <template>
   <section class="items mb-4">
     <header>
-      <h2 class="title me-2">{{ $t('stacItem', items.length ) }}</h2>
+      <h2 class="title me-2">{{ $t('stacItem', items.length) }}</h2>
       <b-badge v-if="itemCount !== null" pill variant="secondary" class="me-4">{{ itemCount }}</b-badge>
       <SortButtons v-if="!api && items.length > 1" v-model="sort" />
     </header>
 
     <Pagination
-      v-if="showPagination" ref="topPagination" class="mb-3" :class="{'me-3': allowFilter}"
-      :pagination="pagination" placement="top" @paginate="paginate"
-    />
+      v-if="showPagination"
+      ref="topPagination"
+      class="mb-3"
+      :class="{ 'me-3': allowFilter }"
+      :pagination="pagination"
+      placement="top"
+      @paginate="paginate" />
     <template v-if="allowFilter">
-      <b-button v-if="api" class="mb-3" v-b-toggle.itemFilter :variant="hasFilters && !filtersOpen ? 'primary' : 'outline-primary'">
+      <b-button
+        v-if="api"
+        class="mb-3"
+        v-b-toggle.itemFilter
+        :variant="hasFilters && !filtersOpen ? 'primary' : 'outline-primary'">
         <b-icon-filter />
         {{ filtersOpen ? $t('items.hideFilter') : $t('items.showFilter') }}
         <b-badge v-if="hasFilters && !filtersOpen" variant="dark">{{ filterCount }}</b-badge>
@@ -19,10 +27,11 @@
       <b-collapse id="itemFilter" v-model="filtersOpen">
         <SearchFilter
           type="Items"
-          :title="$t('items.filter')" :parent="stac"
+          :title="$t('items.filter')"
+          :parent="stac"
           :searchLink="itemSearchLink"
-          :value="apiFilters" @input="emitFilter"
-        />
+          :value="apiFilters"
+          @input="emitFilter" />
       </b-collapse>
     </template>
 
@@ -38,7 +47,9 @@
     </section>
 
     <Pagination v-if="showPagination" class="mb-3" :pagination="pagination" @paginate="paginate" />
-    <b-button v-else-if="hasMore" @click="showMore" variant="primary" v-visible.300="showMore">{{ $t('showMore') }}</b-button>
+    <b-button v-else-if="hasMore" @click="showMore" variant="primary" v-visible.300="showMore">{{
+      $t('showMore')
+    }}</b-button>
   </section>
 </template>
 
@@ -54,63 +65,63 @@ import Loading from './Loading.vue';
 import { getDisplayTitle } from '../models/stac';
 
 export default defineComponent({
-  name: "Items",
+  name: 'Items',
   components: {
     Item,
     SearchFilter: defineAsyncComponent(() => import('./SearchFilter.vue')),
     Loading,
     Pagination: defineAsyncComponent(() => import('./Pagination.vue')),
     BCollapse,
-    SortButtons: defineAsyncComponent(() => import('./SortButtons.vue'))
+    SortButtons: defineAsyncComponent(() => import('./SortButtons.vue')),
   },
   props: {
     items: {
       type: Array,
-      required: true
+      required: true,
     },
     loading: {
       type: Boolean,
-      default: false
+      default: false,
     },
     stac: {
       type: Object,
-      required: true
+      required: true,
     },
     api: {
       type: Boolean,
-      default: false
+      default: false,
     },
     allowFilter: {
       type: Boolean,
-      default: true
+      default: true,
     },
     showFilters: {
       type: Boolean,
-      default: false
+      default: false,
     },
     apiFilters: {
       type: Object,
-      default: () => ({})
+      default: () => ({}),
     },
     pagination: {
       type: Object,
-      default: () => ({})
+      default: () => ({}),
     },
     chunkSize: {
       type: Number,
-      default: 90
+      default: 90,
     },
     count: {
       type: Number,
-      default: null
-    }
+      default: null,
+    },
   },
   emits: ['filtersShown', 'filterItems', 'paginate'],
   data() {
     return {
       shownItems: this.chunkSize,
       filtersOpen: this.showFilters,
-      sort: 0
+      sort: 0,
     };
   },
   computed: {
@@ -118,8 +129,7 @@ export default defineComponent({
     itemCount() {
       if (this.count !== null) {
         return this.count;
-      }
-      else if (!this.api && this.items.length > 0) {
+      } else if (!this.api && this.items.length > 0) {
         return this.items.length;
       }
       return null;
@@ -137,15 +147,14 @@ export default defineComponent({
       let items = this.items;
       if (!this.apiFilters.sortby && this.sort !== 0) {
         const collator = new Intl.Collator(this.uiLanguage);
-        items = items.slice(0).sort((a,b) => collator.compare(getDisplayTitle(a), getDisplayTitle(b)));
+        items = items.slice(0).sort((a, b) => collator.compare(getDisplayTitle(a), getDisplayTitle(b)));
         if (this.sort === -1) {
           items = items.reverse();
         }
       }
       if (!this.api && this.items.length > this.chunkSize) {
         return items.slice(0, this.shownItems);
-      }
-      else {
+      } else {
         return items;
       }
     },
@@ -153,8 +162,7 @@ export default defineComponent({
       if (this.api) {
         if (this.hasFilters) {
           return true;
-        }
-        else if (this.items.length > 0) {
+        } else if (this.items.length > 0) {
           // Check whether any pagination links are available
           return Object.values(this.pagination).some(link => !!link);
         }
@@ -163,7 +171,7 @@ export default defineComponent({
     },
     itemSearchLink() {
       return this.stac && typeof this.stac.getApiItemsLink === 'function' ? this.stac.getApiItemsLink() : null;
-    }
+    },
   },
   watch: {
     showFilters() {
@@ -171,7 +179,7 @@ export default defineComponent({
     },
     filtersOpen() {
       this.$emit('filtersShown', this.filtersOpen);
-    }
+    },
   },
   created() {
     this.sort = Utils.convertHumanizedSortOrder(this.cardViewSort);
@@ -193,7 +201,7 @@ export default defineComponent({
         Utils.scrollTo(this.$refs.topPagination.$el);
       }
       this.$emit('paginate', link);
-    }
-  }
+    },
+  },
 });
 </script>

@@ -2,24 +2,37 @@
   <nav class="share">
     <b-button-group>
       <b-button
-        v-if="stacUrl" size="sm" variant="outline-primary" id="popover-link-btn"
-        :title="$t('source.detailsAboutSource')" tag="a" tabindex="0"
-      >
+        v-if="stacUrl"
+        size="sm"
+        variant="outline-primary"
+        id="popover-link-btn"
+        :title="$t('source.detailsAboutSource')"
+        tag="a"
+        tabindex="0">
         <b-icon-info-lg /><span class="button-label">{{ $t('source.label') }}</span>
       </b-button>
       <b-button
-        size="sm" variant="outline-primary" id="popover-share-btn"
-        :title="$t('source.share.withOthers')" tag="a" tabindex="0"
-      >
+        size="sm"
+        variant="outline-primary"
+        id="popover-share-btn"
+        :title="$t('source.share.withOthers')"
+        tag="a"
+        tabindex="0">
         <b-icon-share /><span class="button-label">{{ $t('source.share.title') }}</span>
       </b-button>
 
       <b-popover
-        v-if="stacUrl" id="popover-link" class="popover-large" target="popover-link-btn"
-        placement="bottom" :title="$t('source.title')" teleport-to="#stac-browser"
-        click focus :boundary-padding="10"
-        v-model="popoverLinkVisible"
-      >
+        v-if="stacUrl"
+        id="popover-link"
+        class="popover-large"
+        target="popover-link-btn"
+        placement="bottom"
+        :title="$t('source.title')"
+        teleport-to="#stac-browser"
+        click
+        focus
+        :boundary-padding="10"
+        v-model="popoverLinkVisible">
         <template #default v-if="stac">
           <b-row v-if="stacId" class="stac-id">
             <b-col cols="4">{{ $t('source.id') }}</b-col>
@@ -38,18 +51,23 @@
               <Validation v-if="popoverLinkVisible !== null" :data="stac" />
             </b-col>
           </b-row>
-          <hr>
+          <hr />
           <Url id="stacUrl" :url="stacUrl" :label="$t('source.locatedAt')" />
         </template>
       </b-popover>
       <b-popover
-        id="popover-share" class="popover-large" target="popover-share-btn"
-        placement="bottom" :title="$t('source.share.title')" teleport-to="#stac-browser"
-        click focus :boundary-padding="10"
-      >
+        id="popover-share"
+        class="popover-large"
+        target="popover-share-btn"
+        placement="bottom"
+        :title="$t('source.share.title')"
+        teleport-to="#stac-browser"
+        click
+        focus
+        :boundary-padding="10">
         <Url id="browserUrl" :url="browserUrl()" :label="$t('source.share.sharePageWithOthers')" :open="false" />
         <template v-if="enableSocialSharing">
-          <hr>
+          <hr />
           <SocialSharing :text="sharingMessage" :title="title" :url="browserUrl()" />
         </template>
       </b-popover>
@@ -66,31 +84,31 @@ import CopyButton from './CopyButton.vue';
 import SocialSharing from './SocialSharing.vue';
 
 export default {
-  name: "StacSource",
+  name: 'StacSource',
   components: {
     Url,
     CopyButton,
     SocialSharing,
     BPopover: defineAsyncComponent(() => import('bootstrap-vue-next').then(m => m.BPopover)),
-    Validation: defineAsyncComponent(() => import('./Validation.vue'))
+    Validation: defineAsyncComponent(() => import('./Validation.vue')),
   },
   props: {
     title: {
       type: String,
-      required: true
+      required: true,
     },
     stacUrl: {
       type: String,
-      default: null
+      default: null,
     },
     stac: {
       type: Object,
-      default: null
-    }
+      default: null,
+    },
   },
   data() {
     return {
-      popoverLinkVisible: null // null = not yet opened, true = open, false = closed
+      popoverLinkVisible: null, // null = not yet opened, true = open, false = closed
     };
   },
   computed: {
@@ -106,14 +124,14 @@ export default {
     },
     sharingMessage() {
       const url = window.location.toString();
-      return this.$t('source.share.message', {title: this.title, url: url});
-    }
+      return this.$t('source.share.message', { title: this.title, url: url });
+    },
   },
   methods: {
     browserUrl() {
       return window.location.toString();
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -126,8 +144,8 @@ export default {
 <style lang="scss">
 #popover-link .stac-id .btn-sm,
 #popover-link .stac-valid .btn-sm {
-    padding-top: 0.1rem;
-    padding-bottom: 0.1rem;
-    font-size: 0.7rem;
+  padding-top: 0.1rem;
+  padding-bottom: 0.1rem;
+  font-size: 0.7rem;
 }
 </style>

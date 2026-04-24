@@ -2,10 +2,9 @@ import i18n from '../i18n';
 import { hasText, isObject } from 'stac-js/src/utils.js';
 
 export default class Auth {
-
   /**
    * Constructs the authentication method.
-   * 
+   *
    * @param {Router} router The Vue router instance
    * @param {Object.<string, *>} options  Any potential options the authentication method needs
    * @param {Function} changeListener A change listener with two parameters: loggedIn (boolean) and credentials (string|null)
@@ -18,7 +17,7 @@ export default class Auth {
 
   /**
    * A tooltip title for the authentication button.
-   * 
+   *
    * @returns {string}
    */
   getButtonTitle() {
@@ -27,20 +26,20 @@ export default class Auth {
 
   /**
    * A label for the button that is shown when unauthorized (logged out).
-   * 
+   *
    * @returns {string}
    */
   getLoginLabel() {
-  return i18n.global.t('authentication.button.login');
+    return i18n.global.t('authentication.button.login');
   }
 
   /**
    * A label for the button that is shown when authorized (logged in).
-   * 
+   *
    * @returns {string}
    */
   getLogoutLabel() {
-  return i18n.global.t('authentication.button.logout');
+    return i18n.global.t('authentication.button.logout');
   }
 
   getComponent() {
@@ -55,8 +54,7 @@ export default class Auth {
     return;
   }
 
-  async login() {
-  }
+  async login() {}
 
   async confirmLogin(credentials) {
     if (this.changeListener) {
@@ -64,8 +62,7 @@ export default class Auth {
     }
   }
 
-  async logout(/*credentials*/) {
-  }
+  async logout(/*credentials*/) {}
 
   async confirmLogout() {
     if (this.changeListener) {
@@ -90,8 +87,7 @@ export default class Auth {
     if (value) {
       if (formatter === 'Bearer') {
         value = `Bearer ${value}`;
-      }
-      else if (typeof formatter === 'function') {
+      } else if (typeof formatter === 'function') {
         value = formatter(value);
       }
     }
@@ -102,14 +98,11 @@ export default class Auth {
     // Set cookie, query or request parameters
     if (in_ === 'query') {
       return { query: { type: 'private', key, value } };
-    }
-    else if (in_ === 'cookie') {
+    } else if (in_ === 'cookie') {
       return { cookie: { key, value } };
-    }
-    else if (in_ === 'header') {
+    } else if (in_ === 'header') {
       return { header: { key, value } };
-    }
-    else {
+    } else {
       return {};
     }
   }
@@ -120,12 +113,10 @@ export default class Auth {
       if (config.type === 'http' && config.scheme === 'basic') {
         const BasicAuth = (await import('./basic')).default;
         method = new BasicAuth(router, config, changeListener);
-      }
-      else if (config.type === 'apiKey') {
+      } else if (config.type === 'apiKey') {
         const ApIKey = (await import('./apiKey')).default;
         method = new ApIKey(router, config, changeListener);
-      }
-      else if (config.type === 'openIdConnect') {
+      } else if (config.type === 'openIdConnect') {
         const OIDC = (await import('./oidc')).default;
         method = new OIDC(router, config, changeListener);
       }
@@ -137,5 +128,4 @@ export default class Auth {
   static equals(method, config) {
     return JSON.stringify(method.options) === JSON.stringify(config);
   }
-
 }

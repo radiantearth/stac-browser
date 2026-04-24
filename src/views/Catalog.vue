@@ -1,5 +1,5 @@
 <template>
-  <div :class="{cc: true, [cssStacType]: true, empty: !hasCatalogs && !hasItems}" :key="data.id">
+  <div :class="{ cc: true, [cssStacType]: true, empty: !hasCatalogs && !hasItems }" :key="data.id">
     <b-row>
       <b-col class="meta">
         <WidgetHook id="view-catalog-meta-start" />
@@ -10,7 +10,10 @@
           <ReadMore v-if="data.description" :lines="10" :text="$t('read.more')" :text-less="$t('read.less')">
             <Description :description="data.description" />
           </ReadMore>
-          <Keywords v-if="Array.isArray(data.keywords) && data.keywords.length > 0" :keywords="data.keywords" class="mb-3" />
+          <Keywords
+            v-if="Array.isArray(data.keywords) && data.keywords.length > 0"
+            :keywords="data.keywords"
+            class="mb-3" />
           <CollectionLink v-if="collectionLink" :link="collectionLink" />
           <section v-if="isCollection" class="metadata mb-4">
             <b-row v-if="licenses">
@@ -28,7 +31,13 @@
           <b-card no-body class="maps-preview">
             <b-tabs v-model="tab" ref="tabs" pills card vertical end>
               <b-tab v-if="isCollection" :id="tabIds.map" :title="$t('map')" no-body>
-                <MapView :stac="data" v-bind="mapData" @changed="dataChanged" @empty="handleEmptyMap" onfocusOnly popover />
+                <MapView
+                  :stac="data"
+                  v-bind="mapData"
+                  @changed="dataChanged"
+                  @empty="handleEmptyMap"
+                  onfocusOnly
+                  popover />
               </b-tab>
               <b-tab v-if="hasThumbnails" :id="tabIds.thumbnails" :title="$t('thumbnails')" no-body>
                 <Thumbnails :thumbnails="thumbnails" />
@@ -51,13 +60,17 @@
       <b-col class="items-container" v-if="hasItems || hasItemAssets">
         <WidgetHook id="view-catalog-items-start" />
         <Items
-          :stac="data" :items="items" :api="isApi"
-          :showFilters="showFilters" :apiFilters="filters"
-          :pagination="itemPages" :loading="apiItemsLoading"
+          :stac="data"
+          :items="items"
+          :api="isApi"
+          :showFilters="showFilters"
+          :apiFilters="filters"
+          :pagination="itemPages"
+          :loading="apiItemsLoading"
           :count="apiItemsNumberMatched"
-          @paginate="paginateItems" @filter-items="filterItems"
-          @filters-shown="filtersShown"
-        />
+          @paginate="paginateItems"
+          @filter-items="filterItems"
+          @filters-shown="filtersShown" />
         <Assets v-if="hasItemAssets" :assets="itemAssets" :definition="true" />
         <WidgetHook id="view-catalog-items-end" />
       </b-col>
@@ -71,7 +84,7 @@ import { mapState, mapGetters } from 'vuex';
 import Catalogs from '../components/Catalogs.vue';
 import Description from '../components/Description.vue';
 import Items from '../components/Items.vue';
-import ReadMore from "../components/ReadMore.vue";
+import ReadMore from '../components/ReadMore.vue';
 import ShowAssetLinkMixin from '../components/ShowAssetLinkMixin';
 import StacFieldsMixin from '../components/StacFieldsMixin';
 import { formatLicense, formatTemporalExtents } from '@radiantearth/stac-fields/formatters';
@@ -84,7 +97,7 @@ import { BTab, BTabs, BCard } from 'bootstrap-vue-next';
 import { getIgnoredFields } from '../ignored-metadata.js';
 
 export default defineComponent({
-  name: "Catalog",
+  name: 'Catalog',
   components: {
     BTab,
     BTabs,
@@ -102,21 +115,35 @@ export default defineComponent({
     MetadataGroups: defineAsyncComponent(() => import('../components/MetadataGroups.vue')),
     Providers: defineAsyncComponent(() => import('../components/Providers.vue')),
     ReadMore,
-    Thumbnails: defineAsyncComponent(() => import('../components/Thumbnails.vue'))
+    Thumbnails: defineAsyncComponent(() => import('../components/Thumbnails.vue')),
   },
-  mixins: [
-    ShowAssetLinkMixin,
-    StacFieldsMixin({ formatLicense, formatTemporalExtents }),
-    DeprecationMixin
-  ],
+  mixins: [ShowAssetLinkMixin, StacFieldsMixin({ formatLicense, formatTemporalExtents }), DeprecationMixin],
   data() {
     return {
-      filters: {}
+      filters: {},
     };
   },
   computed: {
-    ...mapState(['data', 'url', 'apiCatalogPriority',  'apiItems', 'apiItemsLink', 'apiItemsPagination', 'apiItemsNumberMatched', 'nextCollectionsLink', 'stateQueryParameters']),
-    ...mapGetters(['catalogs', 'collectionLink', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
+    ...mapState([
+      'data',
+      'url',
+      'apiCatalogPriority',
+      'apiItems',
+      'apiItemsLink',
+      'apiItemsPagination',
+      'apiItemsNumberMatched',
+      'nextCollectionsLink',
+      'stateQueryParameters',
+    ]),
+    ...mapGetters([
+      'catalogs',
+      'collectionLink',
+      'isCollection',
+      'items',
+      'getApiItemsLoading',
+      'parentLink',
+      'rootLink',
+    ]),
     ignoredMetadataFields() {
       return getIgnoredFields(this.data, 'CatalogLike');
     },
@@ -134,10 +161,9 @@ export default defineComponent({
         return null;
       }
       if (this.isCollection || !this.hasThumbnails) {
-        return "right";
-      }
-      else {
-        return "left";
+        return 'right';
+      } else {
+        return 'left';
       }
     },
     apiItemsLoading() {
@@ -156,8 +182,7 @@ export default defineComponent({
       let providers = [];
       if (Array.isArray(this.data.providers) && this.data.providers.length > 0) {
         providers = this.data.providers;
-      }
-      else if (this.isCollection && isObject(this.data.summaries) && Array.isArray(this.data.summaries.providers)) {
+      } else if (this.isCollection && isObject(this.data.summaries) && Array.isArray(this.data.summaries.providers)) {
         providers = this.data.summaries.providers;
       }
       return providers.length > 0 ? providers : null;
@@ -166,8 +191,8 @@ export default defineComponent({
       if (this.isCollection && this.data.extent.temporal.interval.length > 0) {
         let extents = this.data.extent.temporal.interval;
         if (extents.length > 1) {
-            // Remove union temporal extent in favor of more concrete extents
-            extents = extents.slice(1);
+          // Remove union temporal extent in favor of more concrete extents
+          extents = extents.slice(1);
         }
         return this.formatTemporalExtents(extents);
       }
@@ -203,18 +228,17 @@ export default defineComponent({
       const data = {};
       if (this.selectedAssets.length > 0) {
         data.assets = this.selectedAssets;
-      }
-      else {
+      } else {
         const items = this.items.filter(item => item.type === 'Feature');
         if (items.length > 0) {
           data.children = new ItemCollection({
             type: 'FeatureCollection',
-            features: items
+            features: items,
           });
         }
       }
       return data;
-    }
+    },
   },
   watch: {
     data: {
@@ -226,23 +250,23 @@ export default defineComponent({
         } catch (error) {
           console.error(error);
         }
-      }
-    }
+      },
+    },
   },
   methods: {
     filtersShown(show) {
-        this.$store.commit('updateState', {type: 'itemFilterOpen', value: show ? 1 : null});
+      this.$store.commit('updateState', { type: 'itemFilterOpen', value: show ? 1 : null });
     },
     loadMoreCollections() {
-      this.$store.dispatch('loadNextApiCollections', {show: true});
+      this.$store.dispatch('loadNextApiCollections', { show: true });
     },
     async paginateItems(link) {
       try {
-        await this.$store.dispatch('loadApiItems', {link, show: true, filters: this.filters});
+        await this.$store.dispatch('loadApiItems', { link, show: true, filters: this.filters });
       } catch (error) {
         this.$store.commit('showGlobalError', {
           error,
-          message: this.$t('errors.loadItems')
+          message: this.$t('errors.loadItems'),
         });
       }
     },
@@ -252,22 +276,22 @@ export default defineComponent({
         this.$store.commit('resetApiItems', this.data.getApiItemsLink());
       }
       try {
-        await this.$store.dispatch('loadApiItems', {link: this.data.getApiItemsLink(), show: true, filters});
+        await this.$store.dispatch('loadApiItems', { link: this.data.getApiItemsLink(), show: true, filters });
       } catch (error) {
         let msg = reset ? this.$t('errors.loadItems') : this.$t('errors.loadFilteredItems');
         this.$store.commit('showGlobalError', {
           error,
-          message: msg
+          message: msg,
         });
       }
-    }
-  }
+    },
+  },
 });
 </script>
 
 <style lang="scss">
 @import 'bootstrap/scss/mixins';
-@import "../theme/variables.scss";
+@import '../theme/variables.scss';
 
 #stac-browser .cc {
   .meta {

@@ -11,5 +11,5 @@ export default Utils.mergeDeep(
   // (or alternatively you can remove the '//' from the next line and edit the field.json directly).
   // { fields: require('./fields.json') },
   texts,
-  custom
+  custom,
 );

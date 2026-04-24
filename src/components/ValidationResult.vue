@@ -31,36 +31,36 @@ import { BCard, BCardHeader } from 'bootstrap-vue-next';
 const VERSION_REGEXP = /\/(v?\d+\.\d+[^/]+)(\/|$)/;
 
 export default {
-  name: "ValidationResult",
+  name: 'ValidationResult',
   components: {
     BCard,
-    BCardHeader
+    BCardHeader,
   },
   props: {
     id: {
       type: String,
-      required: true
+      required: true,
     },
     errors: {
       type: Array,
-      required: true
+      required: true,
     },
     warnings: {
       type: Array,
-      default: null
+      default: null,
     },
     locale: {
       type: Function,
-      default: null
+      default: null,
     },
     context: {
       type: Object,
-      required: true
-    }
+      required: true,
+    },
   },
   computed: {
     titleComponent() {
-      return this.isCore ? 'span': 'code';
+      return this.isCore ? 'span' : 'code';
     },
     localizedErrors() {
       if (typeof this.locale !== 'function') {
@@ -86,12 +86,12 @@ export default {
       return this.id === 'core';
     },
     type() {
-      switch(this.context.type) {
-        case "Feature":
+      switch (this.context.type) {
+        case 'Feature':
           return this.$t('stacItem', 1);
-        case "Catalog":
+        case 'Catalog':
           return this.$t(`stacCatalog`, 1);
-        case "Collection":
+        case 'Collection':
           return this.$t(`stacCollection`, 1);
         default:
           return this.context.type;
@@ -100,13 +100,8 @@ export default {
     name() {
       if (this.isCore) {
         return this.type;
-      }
-      else if (this.id.startsWith('https://stac-extensions.github.io/')) {
-        return URI(this.id)
-          .directory()
-          .replace(VERSION_REGEXP, '/')
-          .replace(/\//g, ' ')
-          .trim();
+      } else if (this.id.startsWith('https://stac-extensions.github.io/')) {
+        return URI(this.id).directory().replace(VERSION_REGEXP, '/').replace(/\//g, ' ').trim();
       }
       return this.id
         .replace(/^\w+:\/\//, '')
@@ -124,7 +119,7 @@ export default {
         return v[1];
       }
       return null;
-    }
+    },
   },
   methods: {
     makeAjvErrorMessage(error) {
@@ -136,9 +131,8 @@ export default {
             const labelKey = `source.validationParams.${key}`;
             if (this.$te(labelKey)) {
               localizedLabel = this.$t(labelKey);
-            }
-            else {
-              localizedLabel = key.replace(/([^A-Z]+)([A-Z])/g, "$1 $2").toLowerCase();
+            } else {
+              localizedLabel = key.replace(/([^A-Z]+)([A-Z])/g, '$1 $2').toLowerCase();
             }
 
             return `${localizedLabel}: ${value}`;
@@ -148,17 +142,14 @@ export default {
       }
       if (error.instancePath) {
         return `${error.instancePath} ${message}`;
-      }
-      else if (error.schemaPath) {
-        return this.$t('messageForSchemaError', {message, schemaPath: error.schemaPath});
-      }
-      else if (message) {
+      } else if (error.schemaPath) {
+        return this.$t('messageForSchemaError', { message, schemaPath: error.schemaPath });
+      } else if (message) {
         return message;
-      }
-      else {
+      } else {
         return String(error);
       }
-    }
-  }
+    },
+  },
 };
 </script>

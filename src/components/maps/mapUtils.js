@@ -4,12 +4,13 @@ import Vector from 'ol/source/Vector';
 import Group from 'ol/layer/Group';
 
 const MapUtils = {
-
   isLayerVisible(map, layer) {
     if (layer instanceof Group) {
-      return layer.getLayers().getArray().some(l => this.isLayerVisible(map, l));
-    }
-    else {
+      return layer
+        .getLayers()
+        .getArray()
+        .some(l => this.isLayerVisible(map, l));
+    } else {
       // See https://github.com/radiantearth/stac-browser/issues/852
       const view = map.getView();
       return layer.isVisible(view.getViewStateAndExtent());
@@ -20,12 +21,14 @@ const MapUtils = {
     const view = map.getView();
     const currentProjection = view.getProjection();
     if (currentProjection !== projection) {
-      map.setView(new View({
-        showFullExtent: true,
-        projection,
-        zoom: view.getZoom(),
-        center: transformWithProjections(view.getCenter(), currentProjection, projection)
-      }));
+      map.setView(
+        new View({
+          showFullExtent: true,
+          projection,
+          zoom: view.getZoom(),
+          center: transformWithProjections(view.getCenter(), currentProjection, projection),
+        }),
+      );
       this.reprojectLayers(map.getLayers(), currentProjection, projection);
     }
   },
@@ -51,12 +54,11 @@ const MapUtils = {
           }
         }
         source.refresh();
-      }
-      else {
+      } else {
         // else: todo: Handle other layer types if needed
       }
     }
-  }
+  },
 };
 
 export default MapUtils;

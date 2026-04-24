@@ -1,8 +1,12 @@
 <template>
   <div class="valid">
     <b-spinner v-if="working" :label="$t('source.validating')" small />
-    <b-button v-else-if="valid === true" variant="success" :size="size" :to="validationLink"><b-icon-check /> {{ $t('checkbox.true') }}</b-button>
-    <b-button v-else-if="valid === false" variant="danger" :size="size" :to="validationLink"><b-icon-x /> {{ $t('checkbox.false') }}</b-button>
+    <b-button v-else-if="valid === true" variant="success" :size="size" :to="validationLink"
+      ><b-icon-check /> {{ $t('checkbox.true') }}</b-button
+    >
+    <b-button v-else-if="valid === false" variant="danger" :size="size" :to="validationLink"
+      ><b-icon-x /> {{ $t('checkbox.false') }}</b-button
+    >
     <template v-else>{{ $t('source.validationNA') }}</template>
   </div>
 </template>
@@ -12,32 +16,31 @@ import { STAC } from 'stac-js';
 import validateSTAC from 'stac-node-validator';
 
 export default {
-  name: "Validation",
+  name: 'Validation',
   props: {
     data: {
       type: Object,
-      default: null
+      default: null,
     },
     size: {
       type: String,
-      default: "sm"
-    }
+      default: 'sm',
+    },
   },
   data() {
     return {
       working: true,
-      valid: null
+      valid: null,
     };
   },
   computed: {
     validationLink() {
       if (this.data instanceof STAC) {
         return '/validation' + this.data.getBrowserPath();
-      }
-      else {
+      } else {
         return null;
       }
-    }
+    },
   },
   async created() {
     await this.validate();
@@ -57,9 +60,7 @@ export default {
       } finally {
         this.working = false;
       }
-    }
-  }
+    },
+  },
 };
 </script>
-
-

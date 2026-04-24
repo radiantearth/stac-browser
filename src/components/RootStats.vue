@@ -26,7 +26,11 @@
         <dd class="charts">
           <StatsChart v-if="group.extensions" type="extensions" :data="group.extensions" :count="group.count" />
           <StatsChart v-if="group.assets" type="assets" :data="group.assets" :count="group.count" />
-          <StatsChart v-if="!group.version && group.versions" type="versions" :data="group.versions" :count="group.count" />
+          <StatsChart
+            v-if="!group.version && group.versions"
+            type="versions"
+            :data="group.versions"
+            :count="group.count" />
         </dd>
       </dl>
     </template>
@@ -34,17 +38,17 @@
 </template>
 
 <script>
-import { formatKey } from "@radiantearth/stac-fields/helper";
-import { mapGetters, mapState } from "vuex";
+import { formatKey } from '@radiantearth/stac-fields/helper';
+import { mapGetters, mapState } from 'vuex';
 import Url from './Url.vue';
 import { isObject, size } from 'stac-js/src/utils.js';
 import { defineAsyncComponent } from 'vue';
 
 export default {
-  name: "RootStats",
+  name: 'RootStats',
   components: {
     StatsChart: defineAsyncComponent(() => import('./metadata/StatsChart.vue')),
-    Url
+    Url,
   },
   computed: {
     ...mapState(['conformsTo']),
@@ -62,10 +66,10 @@ export default {
       let obj = {
         OGC: {},
         STAC: {},
-        Other: {} 
+        Other: {},
       };
-      for(let uri of this.conformsTo) {
-        let confClass =  this.parseConformance(uri);
+      for (let uri of this.conformsTo) {
+        let confClass = this.parseConformance(uri);
         obj[confClass.type][uri] = confClass;
       }
       for (let key in obj) {
@@ -82,7 +86,7 @@ export default {
       let stats = {
         'stats:catalogs': { label: this.$t('stacCatalog', 2) },
         'stats:collections': { label: this.$t('stacCollection', 2) },
-        'stats:items': { label: this.$t('stacItem', 2) }
+        'stats:items': { label: this.$t('stacItem', 2) },
       };
       for (let key in stats) {
         if (isObject(this.root[key])) {
@@ -91,13 +95,12 @@ export default {
             entry.version = Object.keys(entry['versions'])[0];
             delete entry.versions;
           }
-        }
-        else {
+        } else {
           delete stats[key];
         }
       }
       return size(stats) > 0 ? stats : null;
-    }
+    },
   },
   methods: {
     parseConformance(uri) {
@@ -113,18 +116,15 @@ export default {
           let specs = spec.split('-');
           if (specs.length === 3 && specs[0] === 'ogcapi') {
             spec = `OGC API - ${formatKey(specs[1])} - Part ${specs[2]}`;
-          }
-          else if (spec === 'cql2') {
+          } else if (spec === 'cql2') {
             spec = 'CQL2';
-          }
-          else {
+          } else {
             spec = formatKey(spec);
           }
           confClass = formatKey(confClass);
           title = `${spec} - ${confClass}`;
         }
-      }
-      else if (uri.startsWith('https://api.stacspec.org/')) {
+      } else if (uri.startsWith('https://api.stacspec.org/')) {
         type = 'STAC';
 
         let match = uri.match(/^https?:\/\/api\.stacspec\.org\/([^/]+)\/([^/#]+)(?:#(.+))?$/);
@@ -138,13 +138,13 @@ export default {
       }
 
       return { type, title, version };
-    }
-  }
+    },
+  },
 };
 </script>
 
 <style lang="scss">
-@import "../theme/variables.scss";
+@import '../theme/variables.scss';
 
 #stac-browser .root-stats {
   h4 {

@@ -11,11 +11,15 @@
     </dl>
     <dl class="id" v-if="id">
       <dt>{{ $t('errors.labels.code') }}</dt>
-      <dd><code>{{ id }}</code></dd>
+      <dd>
+        <code>{{ id }}</code>
+      </dd>
     </dl>
     <dl class="url" v-if="url">
       <dt>{{ $t('errors.labels.requestURL') }}</dt>
-      <dd><code>{{ url }}</code></dd>
+      <dd>
+        <code>{{ url }}</code>
+      </dd>
     </dl>
   </b-alert>
 </template>
@@ -28,30 +32,30 @@ export default defineComponent({
   props: {
     message: {
       type: String,
-      default: null
+      default: null,
     },
     description: {
       type: String,
-      default: ''
+      default: '',
     },
     error: {
       type: [Object, Error],
-      default: null
+      default: null,
     },
     id: {
       type: [String, Number],
-      default: null
+      default: null,
     },
     url: {
       type: String,
-      default: ''
+      default: '',
     },
     dismissible: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
-  emits: ['close']
+  emits: ['close'],
 });
 </script>
 

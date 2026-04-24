@@ -12,7 +12,7 @@ import { stacRequest } from '../../store/utils';
 import configureBasemap from '../../../basemaps.config';
 import CONFIG from '../../config';
 import proj4 from 'proj4';
-import {register} from 'ol/proj/proj4.js';
+import { register } from 'ol/proj/proj4.js';
 import { markRaw } from 'vue';
 // Register pre-defined CRS from config in proj4
 if (isObject(CONFIG.crs)) {
@@ -24,7 +24,16 @@ register(proj4); // required to support source reprojection
 
 export default {
   computed: {
-    ...mapState(['buildTileUrlTemplate', 'crossOriginMedia', 'displayGeoTiffByDefault', 'displayPreview', 'displayOverview', 'getMapSourceOptions', 'useTileLayerAsFallback', 'uiLanguage']),
+    ...mapState([
+      'buildTileUrlTemplate',
+      'crossOriginMedia',
+      'displayGeoTiffByDefault',
+      'displayPreview',
+      'displayOverview',
+      'getMapSourceOptions',
+      'useTileLayerAsFallback',
+      'uiLanguage',
+    ]),
     stacLayerOptions() {
       return {
         buildTileUrlTemplate: this.buildTileUrlTemplate,
@@ -35,14 +44,14 @@ export default {
         useTileLayerAsFallback: this.useTileLayerAsFallback,
         getSourceOptions: this.getMapSourceOptions,
         httpRequestFn: async (url, responseType) => {
-          const response = await stacRequest(this.$store, url, {responseType});
+          const response = await stacRequest(this.$store, url, { responseType });
           return response.data;
         },
       };
     },
     hasBasemap() {
       return this.basemaps.length > 0;
-    }
+    },
   },
   data() {
     return {
@@ -58,7 +67,7 @@ export default {
   watch: {
     uiLanguage() {
       this.createControls();
-    }
+    },
   },
   methods: {
     async createMap(element, stac, onfocusOnly = false) {
@@ -79,21 +88,23 @@ export default {
       }
 
       // Create map instance
-      this.map = markRaw(new OlMap({
-        target: element,
-        controls: [],
-        interactions: defaults({
-          altShiftDragRotate: false,
-          pinchRotate: false,
-          onfocusOnly
+      this.map = markRaw(
+        new OlMap({
+          target: element,
+          controls: [],
+          interactions: defaults({
+            altShiftDragRotate: false,
+            pinchRotate: false,
+            onfocusOnly,
+          }),
+          view: new View({
+            center: [0, 0],
+            zoom: 0,
+            showFullExtent: true,
+            projection,
+          }),
         }),
-        view: new View({
-          center: [0, 0],
-          zoom: 0,
-          showFullExtent: true,
-          projection,
-        }),
-      }));
+      );
 
       // Add controls
       this.createControls();
@@ -114,7 +125,7 @@ export default {
         zoomInLabel: i18n.global.t('mapping.zoom.in.label'),
         zoomOutLabel: i18n.global.t('mapping.zoom.out.label'),
         zoomInTipLabel: i18n.global.t('mapping.zoom.in.description'),
-        zoomOutTipLabel: i18n.global.t('mapping.zoom.out.description')
+        zoomOutTipLabel: i18n.global.t('mapping.zoom.out.description'),
       });
       this.map.addControl(this.zoomControl);
 
@@ -141,14 +152,14 @@ export default {
       this.map.addControl(this.fullScreenControl);
     },
     async addBasemaps(basemaps, visibleLayer = 0) {
-      const promises = basemaps.map(async (options) => {
+      const promises = basemaps.map(async options => {
         try {
           let layerClassName = 'WebGLTile';
           let sourceClassName = options.is;
           if (options.is === 'VectorTileStyle') {
             layerClassName = 'Group';
             sourceClassName = null;
-            const {apply} = await import('ol-mapbox-style');
+            const { apply } = await import('ol-mapbox-style');
             const callback = options.layerCreated;
             options.layerCreated = async (layer, source, map) => {
               layer = await apply(layer, options.url, options);
@@ -157,15 +168,14 @@ export default {
               }
               return layer;
             };
-          }
-          else if (options.is === 'WMTS' && !options.url.includes('{') && !options.url.includes('}')) {
+          } else if (options.is === 'WMTS' && !options.url.includes('{') && !options.url.includes('}')) {
             // Request capabilities if URL does not seem to be a URL template
-            const [{optionsFromCapabilities}, {default: WMTSCapabilities}] = await Promise.all([
+            const [{ optionsFromCapabilities }, { default: WMTSCapabilities }] = await Promise.all([
               import('ol/source/WMTS.js'),
-              import('ol/format/WMTSCapabilities.js')
+              import('ol/format/WMTSCapabilities.js'),
             ]);
             try {
-              const response = await fetch(options.url, {method: 'GET'});
+              const response = await fetch(options.url, { method: 'GET' });
               const capabilities = new WMTSCapabilities().read(await response.text());
               const wmtsOptions = optionsFromCapabilities(capabilities, options);
               Object.assign(options, wmtsOptions);
@@ -176,14 +186,16 @@ export default {
           const [{ default: sourceCls }, { default: layerCls }] = await Promise.all([
             // We need to import relatively for vite, see
             // https://github.com/rollup/plugins/tree/master/packages/dynamic-import-vars#imports-must-start-with--or-
-            sourceClassName ? import(`../../../node_modules/ol/source/${sourceClassName}.js`) : Promise.resolve({ default: null }),
-            import(`../../../node_modules/ol/layer/${layerClassName}.js`)
+            sourceClassName
+              ? import(`../../../node_modules/ol/source/${sourceClassName}.js`)
+              : Promise.resolve({ default: null }),
+            import(`../../../node_modules/ol/layer/${layerClassName}.js`),
           ]);
           const source = sourceCls ? new sourceCls(options) : undefined;
           const layer = new layerCls({
             source,
             title: options.title,
-            base: true
+            base: true,
           });
           if (options.layerCreated) {
             return await options.layerCreated(layer, source, this.map);
@@ -200,6 +212,6 @@ export default {
           layer.setVisible(i === visibleLayer);
           this.map.addLayer(layer);
         });
-    }
-  }
+    },
+  },
 };

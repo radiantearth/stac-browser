@@ -2,24 +2,24 @@
 // https://github.com/stac-utils/stac-fastapi/issues/539
 const CQL_TEXT = [
   'https://api.stacspec.org/v1.*/item-search#filter:cql-text', // deprecated
-  'http://www.opengis.net/spec/cql2/1.*/conf/cql2-text'
+  'http://www.opengis.net/spec/cql2/1.*/conf/cql2-text',
 ];
 const CQL_JSON = [
   'https://api.stacspec.org/v1.*/item-search#filter:cql-json', // deprecated
-  'http://www.opengis.net/spec/cql2/1.*/conf/cql2-json'
+  'http://www.opengis.net/spec/cql2/1.*/conf/cql2-json',
 ];
 
 const CQL_ADV_COMPARISON = ['http://www.opengis.net/spec/cql2/1.*/conf/advanced-comparison-operators'];
 const CQL_ARRAY_OPERATORS = ['http://www.opengis.net/spec/cql2/1.*/conf/array-functions'];
 
-import { mapGetters } from "vuex";
+import { mapGetters } from 'vuex';
 
 export const TYPES = {
   // OGC / STAC API - Features
   Items: {
     BasicFilters: [
       'https://api.stacspec.org/v1.*/ogcapi-features',
-      'http://www.opengis.net/spec/ogcapi-features-1/1.*/conf/core'
+      'http://www.opengis.net/spec/ogcapi-features-1/1.*/conf/core',
     ],
     CollectionIdFilter: false,
     ItemIdFilter: false,
@@ -27,9 +27,9 @@ export const TYPES = {
     CqlFilters: ['http://www.opengis.net/spec/ogcapi-features-3/1.*/*/features-filter'],
     Sort: [
       'https://api.stacspec.org/v1.*/ogcapi-features#sort',
-      'http://www.opengis.net/spec/ogcapi-records-1/1.*/conf/sorting'
+      'http://www.opengis.net/spec/ogcapi-records-1/1.*/conf/sorting',
     ],
-    FreeText: ['https://api.stacspec.org/v1.*/ogcapi-features#free-text']
+    FreeText: ['https://api.stacspec.org/v1.*/ogcapi-features#free-text'],
   },
   // STAC API - Item Search
   Global: {
@@ -38,7 +38,7 @@ export const TYPES = {
     ItemIdFilter: true,
     CqlFilters: ['https://api.stacspec.org/v1.*/item-search#filter'],
     Sort: ['https://api.stacspec.org/v1.*/item-search#sort'],
-    FreeText: ['https://api.stacspec.org/v1.*/item-search#free-text']
+    FreeText: ['https://api.stacspec.org/v1.*/item-search#free-text'],
   },
   // OGC / STAC API - Collections
   Collections: {
@@ -47,16 +47,16 @@ export const TYPES = {
     ItemIdFilter: false,
     CqlFilters: ['https://api.stacspec.org/v1.*/collection-search#filter'],
     Sort: ['https://api.stacspec.org/v1.*/collection-search#sort'],
-    FreeText: ['https://api.stacspec.org/v1.*/collection-search#free-text']
-  }
+    FreeText: ['https://api.stacspec.org/v1.*/collection-search#free-text'],
+  },
 };
 
 export default {
   props: {
     type: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
   computed: {
     ...mapGetters(['supportsConformance']),
@@ -90,6 +90,6 @@ export default {
         advancedComparison: this.supportsConformance(CQL_ADV_COMPARISON),
         arrayOperators: this.supportsConformance(CQL_ARRAY_OPERATORS),
       };
-    }
-  }
+    },
+  },
 };

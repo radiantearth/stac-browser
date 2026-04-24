@@ -1,53 +1,44 @@
-import { defineConfig, loadEnv, searchForWorkspaceRoot } from "vite";
-import vue from "@vitejs/plugin-vue";
-import { fileURLToPath, pathToFileURL, URL } from "node:url";
-import { accessSync, readFileSync } from "fs";
-import { resolve } from "node:path";
-import { nodePolyfills } from "vite-plugin-node-polyfills";
+import { defineConfig, loadEnv, searchForWorkspaceRoot } from 'vite';
+import vue from '@vitejs/plugin-vue';
+import { fileURLToPath, pathToFileURL, URL } from 'node:url';
+import { accessSync, readFileSync } from 'fs';
+import { resolve } from 'node:path';
+import { nodePolyfills } from 'vite-plugin-node-polyfills';
 
-import Icons from "unplugin-icons/vite";
-import IconsResolver from "unplugin-icons/resolver";
-import Components from "unplugin-vue-components/vite";
-import { FileSystemIconLoader } from "unplugin-icons/loaders";
-import { BootstrapVueNextResolver } from "bootstrap-vue-next/resolvers";
+import Icons from 'unplugin-icons/vite';
+import IconsResolver from 'unplugin-icons/resolver';
+import Components from 'unplugin-vue-components/vite';
+import { FileSystemIconLoader } from 'unplugin-icons/loaders';
+import { BootstrapVueNextResolver } from 'bootstrap-vue-next/resolvers';
 
-import { ViteEjsPlugin } from "vite-plugin-ejs";
-import { visualizer } from "rollup-plugin-visualizer";
+import { ViteEjsPlugin } from 'vite-plugin-ejs';
+import { visualizer } from 'rollup-plugin-visualizer';
+import eslint from 'vite-plugin-eslint2';
 
-import yargs from "yargs";
+import yargs from 'yargs';
 
 // Read JSON files using fs instead of require
-const configSchema = JSON.parse(
-  readFileSync(new URL("./config.schema.json", import.meta.url), "utf-8")
-);
-const package_ = JSON.parse(
-  readFileSync(new URL("./package.json", import.meta.url), "utf-8")
-);
+const configSchema = JSON.parse(readFileSync(new URL('./config.schema.json', import.meta.url), 'utf-8'));
+const package_ = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf-8'));
 
-const optionsForType = (type) =>
+const optionsForType = type =>
   Object.entries(configSchema.properties)
-    .filter(
-      ([, schema]) => Array.isArray(schema.type) && schema.type.includes(type)
-    )
+    .filter(([, schema]) => Array.isArray(schema.type) && schema.type.includes(type))
     .map(([key]) => key);
 
-const defaultConfigPath = fileURLToPath(new URL("./config.js", import.meta.url));
+const defaultConfigPath = fileURLToPath(new URL('./config.js', import.meta.url));
 
-const parseEnvConfig = (rawEnv) => {
+const parseEnvConfig = rawEnv => {
   const envArgs = Object.entries(rawEnv)
-    .filter(([key]) => key.startsWith("SB_") && key !== "SB_CONFIG")
+    .filter(([key]) => key.startsWith('SB_') && key !== 'SB_CONFIG')
     .flatMap(([key, value]) => [`--${key.slice(3)}`, value]);
 
   const env = yargs(envArgs)
-    .parserConfiguration({ "camel-case-expansion": false })
-    .boolean(optionsForType("boolean"))
-    .number(optionsForType("number").concat(optionsForType("integer")))
-    .array(optionsForType("array"))
-    .option(
-      Object.fromEntries(
-        optionsForType("object").map((k) => [k, { coerce: JSON.parse }])
-      )
-    ).argv;
+    .parserConfiguration({ 'camel-case-expansion': false })
+    .boolean(optionsForType('boolean'))
+    .number(optionsForType('number').concat(optionsForType('integer')))
+    .array(optionsForType('array'))
+    .option(Object.fromEntries(optionsForType('object').map(k => [k, { coerce: JSON.parse }]))).argv;
 
   delete env._;
   delete env.$0;
@@ -55,7 +46,7 @@ const parseEnvConfig = (rawEnv) => {
   return env;
 };
 
-const resolveExternalConfigPath = (configFile) => {
+const resolveExternalConfigPath = configFile => {
   if (!configFile) {
     return defaultConfigPath;
   }
@@ -73,7 +64,7 @@ const resolveExternalConfigPath = (configFile) => {
 
 export default defineConfig(async ({ mode }) => {
   const rawEnv = {
-    ...loadEnv(mode, process.cwd(), ""),
+    ...loadEnv(mode, process.cwd(), ''),
     ...process.env,
   };
   const env = parseEnvConfig(rawEnv);
@@ -82,20 +73,20 @@ export default defineConfig(async ({ mode }) => {
   const externalConfig = (await import(pathToFileURL(externalConfigPath).href)).default ?? {};
   const config = Object.assign({}, defaultConfig, externalConfig, env);
 
-  return ({
+  return {
     base: config.pathPrefix,
     build: {
-      sourcemap: mode !== "minimal",
+      sourcemap: mode !== 'minimal',
       rollupOptions: {
-        external: ["fs/promises"],
+        external: ['fs/promises'],
       },
     },
     css: {
       preprocessorOptions: {
         scss: {
-          api: "modern-compiler",
+          api: 'modern-compiler',
           // todo: remove in STAC Browser V6 or if resolved by bootstrap-vue-next.
-          silenceDeprecations: ["color-functions", "global-builtin", "import", "if-function"],
+          silenceDeprecations: ['color-functions', 'global-builtin', 'import', 'if-function'],
         },
       },
     },
@@ -108,20 +99,23 @@ export default defineConfig(async ({ mode }) => {
     // See https://github.com/vitejs/vite/discussions/14801#discussioncomment-15550931 for details
     optimizeDeps: {
       include: [
-        "bootstrap-vue-next/components/*",
-        "commonmark",
-        "@radiantearth/stac-fields/*",
-        "content-type",
-        "stac-node-validator",
-        "@musement/iso-duration"
+        'bootstrap-vue-next/components/*',
+        'commonmark',
+        '@radiantearth/stac-fields/*',
+        'content-type',
+        'stac-node-validator',
+        '@musement/iso-duration',
       ],
     },
     plugins: [
+      eslint({
+        lintOnStart: true,
+      }),
       vue({
         template: {
           compilerOptions: {
             // Preserve whitespace behavior from Vue 2
-            whitespace: "preserve",
+            whitespace: 'preserve',
           },
         },
       }),
@@ -155,30 +149,30 @@ export default defineConfig(async ({ mode }) => {
           }), // Auto-register Bootstrap components
           IconsResolver({
             prefix: false,
-            enabledCollections: ["bi"],
+            enabledCollections: ['bi'],
             alias: {
-              "b-icon": "bi",
+              'b-icon': 'bi',
             },
-            customCollections: ["share"],
+            customCollections: ['share'],
           }),
         ],
       }),
       Icons({
-        compiler: "vue3",
+        compiler: 'vue3',
         customCollections: {
-          share: FileSystemIconLoader("./src/media/"),
+          share: FileSystemIconLoader('./src/media/'),
         },
       }),
       nodePolyfills({
-        include: ["buffer", "path", "process"],
+        include: ['buffer', 'path', 'process'],
         globals: {
           Buffer: true,
           process: true,
         },
       }),
-      mode === "report" &&
+      mode === 'report' &&
         visualizer({
-          filename: "./dist/report.html",
+          filename: './dist/report.html',
           gzipSize: true,
           brotliSize: true,
           open: true,
@@ -186,18 +180,15 @@ export default defineConfig(async ({ mode }) => {
     ],
     resolve: {
       alias: {
-        "@": fileURLToPath(new URL("./src", import.meta.url)),
-        "@stac-browser-external-config": externalConfigPath,
+        '@': fileURLToPath(new URL('./src', import.meta.url)),
+        '@stac-browser-external-config': externalConfigPath,
       },
     },
     server: {
       fs: {
-        allow: [
-          searchForWorkspaceRoot(process.cwd()),
-          externalConfigPath
-        ],
+        allow: [searchForWorkspaceRoot(process.cwd()), externalConfigPath],
       },
       port: 8080,
     },
-  });
+  };
 });

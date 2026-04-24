@@ -27,7 +27,7 @@ export default class RGenerator extends CodeGenerator {
   }
 
   get installDependencies() {
-    return "Rscript -e \"install.packages('rstac')\"";
+    return 'Rscript -e "install.packages(\'rstac\')"';
   }
 
   commaSeparatedStrings(values) {
@@ -44,8 +44,7 @@ export default class RGenerator extends CodeGenerator {
       if (match) {
         return [decodeURIComponent(match[1])];
       }
-    }
-    catch {
+    } catch {
       // ignore malformed URLs
     }
     return [];
@@ -95,14 +94,12 @@ export default class RGenerator extends CodeGenerator {
       FILTERS_OBJECT: this.formatJsonBody(bodyObj),
       FILTER_ARGS: this.formatRstacArgs(filters),
       EXT_FILTER: this.formatExtFilter(cqlSerialized),
-      REQUEST_FUNCTION: this.method === 'GET' ? 'get_request' : 'post_request'
+      REQUEST_FUNCTION: this.method === 'GET' ? 'get_request' : 'post_request',
     };
   }
 
   formatJsonBody(filters) {
-    const serialized = JSON.stringify(filters)
-      .replaceAll('\\', '\\\\')
-      .replaceAll('"', '\\"');
+    const serialized = JSON.stringify(filters).replaceAll('\\', '\\\\').replaceAll('"', '\\"');
     return `jsonlite::fromJSON("${serialized}", simplifyVector = FALSE)`;
   }
 
@@ -113,12 +110,9 @@ export default class RGenerator extends CodeGenerator {
 
     let expr;
     if (cqlSerialized['filter-lang'] === 'cql2-json') {
-      const serialized = JSON.stringify(cqlSerialized.filter)
-        .replaceAll('\\', '\\\\')
-        .replaceAll('"', '\\"');
+      const serialized = JSON.stringify(cqlSerialized.filter).replaceAll('\\', '\\\\').replaceAll('"', '\\"');
       expr = `jsonlite::fromJSON("${serialized}", simplifyVector = FALSE)`;
-    }
-    else {
+    } else {
       expr = JSON.stringify(cqlSerialized.filter);
     }
 

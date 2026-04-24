@@ -137,8 +137,7 @@ export default class CodeGenerator {
     if (isPost) {
       requestUrl = this.searchUrl;
       requestBody = JSON.stringify(preparedLink?.body ?? {}, null, this.indent);
-    }
-    else {
+    } else {
       requestUrl = preparedLink?.href ?? this.searchUrl;
       requestBody = '';
     }
@@ -182,8 +181,7 @@ export default class CodeGenerator {
     try {
       const pathname = new URL(this.searchUrl).pathname.replace(/\/+$/, '');
       return pathname.endsWith('/collections');
-    }
-    catch {
+    } catch {
       return false;
     }
   }
@@ -230,9 +228,7 @@ export default class CodeGenerator {
     // todo: use RegExp.escape in the future when supported in all browsers
     const cc = this.commentChars.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const regex = new RegExp(
-      `${cc}\\s+if\\s+(\\w+)\\s+${cc}\\n?` +
-      `((?:(?!${cc}\\s+if\\s)[\\s\\S])*?)` +
-      `${cc}\\s+endif\\s+${cc}\\n?`
+      `${cc}\\s+if\\s+(\\w+)\\s+${cc}\\n?` + `((?:(?!${cc}\\s+if\\s)[\\s\\S])*?)` + `${cc}\\s+endif\\s+${cc}\\n?`,
     );
     const elseRe = new RegExp(`${cc}\\s+else\\s+${cc}\\n?`);
     let safety = 0;
@@ -245,9 +241,7 @@ export default class CodeGenerator {
         }
         const elseStart = elseMatch.index;
         const elseEnd = elseStart + elseMatch[0].length;
-        return isTruthy
-          ? content.substring(0, elseStart)
-          : content.substring(elseEnd);
+        return isTruthy ? content.substring(0, elseStart) : content.substring(elseEnd);
       });
     }
     return result;

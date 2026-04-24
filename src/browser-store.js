@@ -1,8 +1,7 @@
 import { isObject } from 'stac-js/src/utils.js';
 
 export default class BrowserStorage {
-
-  static JSON_INDICATOR = "\n\r";
+  static JSON_INDICATOR = '\n\r';
 
   static enabled(engine) {
     if (!isObject(engine)) {
@@ -14,7 +13,7 @@ export default class BrowserStorage {
         engine.removeItem('test');
         return true;
       }
-    } catch(error) {
+    } catch (error) {
       console.error(error);
     }
     return false;
@@ -24,22 +23,17 @@ export default class BrowserStorage {
     if (session) {
       if (BrowserStorage.enabled(window.sessionStorage)) {
         this.engine = window.sessionStorage;
-      }
-      else if (navigator.cookieEnabled) {
+      } else if (navigator.cookieEnabled) {
         this.engine = new Cookies(true);
-      }
-      else {
+      } else {
         this.engine = new NoOp();
       }
-    }
-    else {
+    } else {
       if (BrowserStorage.enabled(window.localStorage)) {
         this.engine = window.localStorage;
-      }
-      else if (navigator.cookieEnabled) {
+      } else if (navigator.cookieEnabled) {
         this.engine = new Cookies();
-      }
-      else {
+      } else {
         this.engine = new NoOp();
       }
     }
@@ -52,7 +46,7 @@ export default class BrowserStorage {
         data = JSON.parse(data.slice(BrowserStorage.JSON_INDICATOR.length));
       }
       return data;
-    } catch(error) {
+    } catch (error) {
       console.error(error);
       return null;
     }
@@ -64,7 +58,7 @@ export default class BrowserStorage {
         value = BrowserStorage.JSON_INDICATOR + JSON.stringify(value);
       }
       this.engine.setItem(name, value);
-    } catch(error) {
+    } catch (error) {
       console.error(error);
     }
   }
@@ -72,7 +66,7 @@ export default class BrowserStorage {
   remove(name) {
     try {
       this.engine.removeItem(name);
-    } catch(error) {
+    } catch (error) {
       console.error(error);
     }
   }
@@ -80,11 +74,9 @@ export default class BrowserStorage {
   clear() {
     this.engine.clear();
   }
-
 }
 
 export class Cookies {
-
   constructor(session = false) {
     this.session = session;
   }
@@ -93,8 +85,7 @@ export class Cookies {
     if (minutes === null) {
       if (this.session) {
         minutes = 60; // 60 minutes
-      }
-      else {
+      } else {
         minutes = 1000 * 24 * 60; // 1000 days
       }
     }
@@ -110,7 +101,7 @@ export class Cookies {
   }
 
   getItem(name) {
-    const prefix = name + "=";
+    const prefix = name + '=';
     const parts = document.cookie.split(';');
     for (let c of parts) {
       c = c.trim();
@@ -123,23 +114,20 @@ export class Cookies {
   }
 
   removeItem(name) {
-    this.set(name, "", -1);
+    this.set(name, '', -1);
   }
 
   clear() {
     document.cookie = '';
   }
-
 }
 
-
 class NoOp {
-
   constructor(session = false) {
     this.session = session;
   }
 
-  setItem(name/*, value*/) {
+  setItem(name /*, value*/) {
     console.warn(`Browser storage disabled, can't store ${name}`);
   }
 
@@ -147,10 +135,7 @@ class NoOp {
     return null;
   }
 
-  removeItem(/*name*/) {
-  }
+  removeItem(/*name*/) {}
 
-  clear() {
-  }
-
+  clear() {}
 }

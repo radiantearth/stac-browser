@@ -9,7 +9,9 @@
       </b-card-title>
       <b-card-text v-if="fileFormats.length > 0 || hasDescription || isDeprecated" class="intro">
         <b-badge v-if="isDeprecated" variant="warning" class="me-1 mt-1 deprecated">{{ $t('deprecated') }}</b-badge>
-        <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="me-1 mt-1 fileformat">{{ format }}</b-badge>
+        <b-badge v-for="format in fileFormats" :key="format" variant="secondary" class="me-1 mt-1 fileformat">{{
+          format
+        }}</b-badge>
         {{ summarizeDescription }}
       </b-card-text>
       <Keywords v-if="showKeywordsInCatalogCards && keywords.length > 0" :keywords="keywords" variant="primary" />
@@ -42,18 +44,14 @@ export default {
     BCardText,
     BCardTitle,
     StacLink,
-    Keywords: defineAsyncComponent(() => import('./Keywords.vue'))
+    Keywords: defineAsyncComponent(() => import('./Keywords.vue')),
   },
-  mixins: [
-    FileFormatsMixin,
-    CardMixin,
-    StacFieldsMixin({ formatTemporalExtent })
-  ],
+  mixins: [FileFormatsMixin, CardMixin, StacFieldsMixin({ formatTemporalExtent })],
   props: {
     catalog: {
       type: Object,
-      required: true
-    }
+      required: true,
+    },
   },
   computed: {
     ...mapState(['showKeywordsInCatalogCards']),
@@ -82,7 +80,7 @@ export default {
         }
       }
       return null;
-    }
+    },
   },
   methods: {
     load(visible) {
@@ -90,7 +88,7 @@ export default {
         return;
       }
       this.$store.commit(visible ? 'queue' : 'unqueue', this.catalog.getAbsoluteUrl());
-    }
-  }
+    },
+  },
 };
 </script>

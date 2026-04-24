@@ -25,24 +25,22 @@ export default {
   components: {
     Description,
     HrefActions,
-    MetadataGroups: defineAsyncComponent(() => import('./MetadataGroups.vue'))
+    MetadataGroups: defineAsyncComponent(() => import('./MetadataGroups.vue')),
   },
-  mixins: [
-    StacFieldsMixin({ formatMediaType })
-  ],
+  mixins: [StacFieldsMixin({ formatMediaType })],
   props: {
     asset: {
       type: Object,
-      required: true
+      required: true,
     },
     hasAlternatives: {
       type: Boolean,
-      default: false
+      default: false,
     },
     shown: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   emits: ['show'],
   computed: {
@@ -60,20 +58,19 @@ export default {
     tileRendererType() {
       if (this.buildTileUrlTemplate && !this.useTileLayerAsFallback) {
         return 'server';
-      }
-      else {
+      } else {
         return 'client';
       }
     },
     fileFormat() {
-      if (typeof this.asset.type === "string" && this.asset.type.length > 0) {
+      if (typeof this.asset.type === 'string' && this.asset.type.length > 0) {
         return this.formatMediaType(this.asset.type);
       }
       return null;
     },
     auth() {
       return AuthUtils.resolveAuth(this.asset);
-    }
+    },
   },
   methods: {
     resolveStorage(obj) {
@@ -81,17 +78,15 @@ export default {
         const refs = obj.getMetadata('storage:refs');
         const schemes = obj.getMetadata('storage:schemes');
         if (size(refs) > 0 && size(schemes) > 0) {
-          return refs
-            .map(ref => schemes[ref])
-            .filter(ref => isObject(ref));
+          return refs.map(ref => schemes[ref]).filter(ref => isObject(ref));
         }
       }
       return [];
     },
     show() {
       this.$emit('show', ...arguments);
-    }
-  }
+    },
+  },
 };
 </script>
 

@@ -3,7 +3,7 @@ import removeMd from 'remove-markdown';
 import { Link, Asset } from 'stac-js';
 import { hasText, isObject, size } from 'stac-js/src/utils.js';
 import { geojsonMediaType, imageMediaTypes } from 'stac-js/src/mediatypes.js';
-import { pagination } from "stac-js/src/relationtypes.js";
+import { pagination } from 'stac-js/src/relationtypes.js';
 
 export const commonFileNames = ['catalog', 'collection', 'item'];
 
@@ -17,22 +17,19 @@ export class BrowserError extends Error {
 
 /**
  * General utilities
- * 
+ *
  * @class
  */
 export default class Utils {
-
   static isMediaType(type, types, allowEmpty = false) {
     if (!Array.isArray(types)) {
       types = [types];
     }
     if (allowEmpty && !type) {
       return true;
-    }
-    else if (typeof type !== 'string') {
+    } else if (typeof type !== 'string') {
       return false;
-    }
-    else {
+    } else {
       return types.includes(type.toLowerCase());
     }
   }
@@ -44,11 +41,9 @@ export default class Utils {
 
     let sepLen = separator.length;
     let charsToShow = strLen - sepLen;
-    let frontChars = Math.ceil(charsToShow/2);
-    let backChars = Math.floor(charsToShow/2);
-    return fullStr.substr(0, frontChars) + 
-           separator + 
-           fullStr.substr(fullStr.length - backChars);
+    let frontChars = Math.ceil(charsToShow / 2);
+    let backChars = Math.floor(charsToShow / 2);
+    return fullStr.substr(0, frontChars) + separator + fullStr.substr(fullStr.length - backChars);
   }
 
   static getLinkWithRel(links, rel) {
@@ -56,7 +51,9 @@ export default class Utils {
   }
 
   static getLinksWithRels(links, rels) {
-    return Array.isArray(links) ? links.filter(link => isObject(link) && hasText(link.href) && rels.includes(link.rel)) : [];
+    return Array.isArray(links)
+      ? links.filter(link => isObject(link) && hasText(link.href) && rels.includes(link.rel))
+      : [];
   }
 
   static removeTrailingSlash(str) {
@@ -97,8 +94,8 @@ export default class Utils {
     var isVisible = rect.top < window.innerHeight && rect.bottom >= 0;
     if (!isVisible) {
       el.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
+        behavior: 'smooth',
+        block: 'start',
       });
     }
   }
@@ -122,14 +119,15 @@ export default class Utils {
 
   static formatDatetimeQuery(value) {
     if (Array.isArray(value) && value.length === 2 && (value[0] || value[1])) {
-      return value.map(dt => {
-        if (dt instanceof Date) {
-          return dt.toISOString();
-        }
-        else {
-          return dt || '..';
-        }
-      }).join('/');
+      return value
+        .map(dt => {
+          if (dt instanceof Date) {
+            return dt.toISOString();
+          } else {
+            return dt || '..';
+          }
+        })
+        .join('/');
     }
     return null;
   }
@@ -140,9 +138,9 @@ export default class Utils {
     // This function converts the property name to the desired format.
     const sortby = {
       field: '',
-      direction: 'asc'
+      direction: 'asc',
     };
-  
+
     // Check if the value starts with a minus sign ("-")
     if (value.startsWith('-')) {
       // sort by descending order
@@ -152,7 +150,7 @@ export default class Utils {
       //sort by ascending order
       sortby.field = value;
     }
-    
+
     // Put the object in an array
     return [sortby];
   }
@@ -172,16 +170,17 @@ export default class Utils {
 
   static addFiltersToLink(link, filters = {}, defaultLimit = null) {
     let isEmpty = value => {
-      return (value === null
-      || (typeof value === 'number' && !Number.isFinite(value))
-      || (typeof value === 'string' && value.length === 0)
-      || (typeof value === 'object' && size(value) === 0));
+      return (
+        value === null ||
+        (typeof value === 'number' && !Number.isFinite(value)) ||
+        (typeof value === 'string' && value.length === 0) ||
+        (typeof value === 'object' && size(value) === 0)
+      );
     };
 
     if (!isObject(filters)) {
       filters = {};
-    }
-    else {
+    } else {
       filters = Object.assign({}, filters);
     }
 
@@ -201,14 +200,12 @@ export default class Utils {
 
         if (key === 'sortby') {
           value = Utils.formatSortbyForPOST(value);
-        }
-        else if (key === 'datetime') {
+        } else if (key === 'datetime') {
           value = Utils.formatDatetimeQuery(value);
           if (!value) {
             continue; // skip empty datetime
           }
-        }
-        else if (key === 'filters') {
+        } else if (key === 'filters') {
           if (typeof value.serialize === 'function') {
             Object.assign(body, value.serialize(link.method));
           }
@@ -220,8 +217,8 @@ export default class Utils {
       const newLink = new Link(link);
       newLink.body = body;
       return newLink;
-    }
-    else { // GET
+    } else {
+      // GET
       // Construct new link with search params
       const url = URI(link.href);
 
@@ -234,14 +231,11 @@ export default class Utils {
 
         if (key === 'datetime') {
           value = Utils.formatDatetimeQuery(value);
-        }
-        else if (key === 'bbox') {
+        } else if (key === 'bbox') {
           value = value.join(',');
-        }
-        else if ((key === 'collections' || key === 'ids' || key === 'q')) {
+        } else if (key === 'collections' || key === 'ids' || key === 'q') {
           value = value.join(',');
-        }
-        else if (key === 'filters') {
+        } else if (key === 'filters') {
           if (typeof value.serialize === 'function') {
             let params = value.serialize('GET');
             // JSON filter objects must be stringified for query params
@@ -271,21 +265,16 @@ export default class Utils {
       let path = uri.path().replace(/^\//, '');
       if (auth === 'doi.org' && path.startsWith('10.')) {
         return `DOI ${path}`;
-      }
-      else {
+      } else {
         return `${file} (${auth})`;
       }
-    }
-    else if (file && !commonFileNames.includes(file)) {
+    } else if (file && !commonFileNames.includes(file)) {
       return file;
-    }
-    else if (auth) {
+    } else if (auth) {
       return auth;
-    }
-    else if (dir) {
+    } else if (dir) {
       return dir;
-    }
-    else {
+    } else {
       return href;
     }
   }
@@ -309,8 +298,7 @@ export default class Utils {
     }
     if (isObject(target)) {
       target = Object.values(target);
-    }
-    else if (typeof target === 'string') {
+    } else if (typeof target === 'string') {
       target = [target];
     }
 
@@ -400,5 +388,4 @@ export default class Utils {
     // Fallback to a default filename
     return 'download';
   }
-
 }

@@ -1,7 +1,7 @@
-import { geojsonMediaType, geotiffMediaTypes } from "stac-js/src/mediatypes.js";
-import AssetActionPlugin from "../AssetActionPlugin";
+import { geojsonMediaType, geotiffMediaTypes } from 'stac-js/src/mediatypes.js';
+import AssetActionPlugin from '../AssetActionPlugin';
 import { URI } from 'stac-js/src/utils.js';
-import i18n from "../../i18n";
+import i18n from '../../i18n';
 
 // For more options see https://feltmaps.notion.site/Upload-Anything-b26d739e80184127872faa923b55d232
 const FELT_SUPPORTED_TYPES = geotiffMediaTypes.concat([
@@ -11,14 +11,13 @@ const FELT_SUPPORTED_TYPES = geotiffMediaTypes.concat([
 ]);
 
 export default class Felt extends AssetActionPlugin {
-
   get show() {
     return this.component.isBrowserProtocol && FELT_SUPPORTED_TYPES.includes(this.asset.type);
   }
 
   get uri() {
     // Docs: https://feltmaps.notion.site/Open-in-Felt-Button-22765a3427ff45e0a70218dca3f8acc0
-    let uri = URI("https://felt.com/map/new");
+    let uri = URI('https://felt.com/map/new');
     uri.addQuery('layer_urls[]', this.component.href);
     // todo: add title from STAC entity
     // todo: add lat/lon from item/collection: lat=57.14926&lon=-2.09348
@@ -26,7 +25,6 @@ export default class Felt extends AssetActionPlugin {
   }
 
   get text() {
-    return i18n.global.t('actions.openIn', {service: 'Felt'});
+    return i18n.global.t('actions.openIn', { service: 'Felt' });
   }
-
 }

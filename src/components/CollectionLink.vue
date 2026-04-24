@@ -11,25 +11,25 @@ import { mapGetters } from 'vuex';
 import { isObject } from 'stac-js/src/utils.js';
 
 export default {
-  name: "CollectionLink",
+  name: 'CollectionLink',
   components: {
-    Catalog
+    Catalog,
   },
   props: {
     link: {
       type: Object,
-      required: true
+      required: true,
     },
     showThumbnail: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   computed: {
     ...mapGetters(['getStac']),
     collection() {
       return this.getStac(this.link);
-    }
+    },
   },
   watch: {
     link: {
@@ -38,8 +38,8 @@ export default {
         if (isObject(newLink)) {
           this.$store.dispatch('load', { url: newLink.href, omitApi: true });
         }
-      }
-    }
-  }
+      },
+    },
+  },
 };
 </script>

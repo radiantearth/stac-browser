@@ -11,6 +11,11 @@
     "build:report": "vite build --mode report",
     "build:minimal": "vite build --mode minimal",
     "lint": "eslint --fix src",
+    "lint:check": "eslint src",
+    "format": "prettier --write src",
+    "format:check": "prettier --check src",
+    "check": "npm run lint:check && npm run format:check && npm run docs:lint",
+    "fix": "npm run lint && npm run format && npm run docs:lint && npm run docs:hooks && npm run i18n:fields",
     "i18n:fields": "node helpers/fields_locales.js",
     "docs:hooks": "node helpers/widget-hooks.js",
     "docs:lint": "remark --frail *.md docs/*.md",
@@ -84,8 +89,12 @@
     "@vitejs/plugin-vue": "^6.0.1",
     "@vue/compiler-sfc": "^3.5.22",
     "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-vue": "^10.7.0",
     "globals": "^17.2.0",
+    "msw": "^2.12.10",
+    "playwright-msw": "^3.0.1",
+    "prettier": "^3.8.1",
     "remark-cli": "^12.0.1",
     "remark-gfm": "^4.0.1",
     "remark-lint-no-literal-urls": "^4.0.1",
@@ -93,14 +102,13 @@
     "remark-preset-lint-consistent": "^6.0.1",
     "remark-preset-lint-recommended": "^7.0.1",
     "remark-validate-links": "^13.1.0",
-    "msw": "^2.12.10",
-    "playwright-msw": "^3.0.1",
     "rollup-plugin-visualizer": "^6.0.5",
     "sass": "^1.26.5",
     "unplugin-icons": "^23.0.1",
     "unplugin-vue-components": "^31.0.0",
     "vite": "^7.2.2",
     "vite-plugin-ejs": "^1.7.0",
+    "vite-plugin-eslint2": "^5.1.0",
     "vite-plugin-node-polyfills": "^0.25.0"
   },
   "optionalDependencies": {
@@ -119,10 +127,21 @@
       "remark-preset-lint-recommended",
       [
         "remark-lint-no-undefined-references",
-        { "allow": ["!WARNING","!NOTE","!IMPORTANT","!CAUTION","!TIP"] }
+        {
+          "allow": [
+            "!WARNING",
+            "!NOTE",
+            "!IMPORTANT",
+            "!CAUTION",
+            "!TIP"
+          ]
+        }
       ],
       "remark-lint-no-literal-urls",
-      ["remark-lint-no-shortcut-reference-link", false]
+      [
+        "remark-lint-no-shortcut-reference-link",
+        false
+      ]
     ]
   },
   "msw": {

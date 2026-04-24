@@ -1,9 +1,8 @@
-import Auth from "./index";
+import Auth from './index';
 import i18n from '../i18n';
 import { hasText } from 'stac-js/src/utils.js';
 
 export default class BasicAuth extends Auth {
-
   constructor(router, options, changeListener) {
     super(router, options, changeListener);
   }
@@ -14,12 +13,12 @@ export default class BasicAuth extends Auth {
 
   getComponentProps() {
     return {
-      description: this.options.description
+      description: this.options.description,
     };
   }
 
   getButtonTitle() {
-  return i18n.global.t('authentication.button.title');
+    return i18n.global.t('authentication.button.title');
   }
 
   async logout(/*credentials*/) {
@@ -37,8 +36,7 @@ export default class BasicAuth extends Auth {
       value = undefined;
     }
     return {
-      header: { key: 'Authorization', value }
+      header: { key: 'Authorization', value },
     };
   }
-
 }

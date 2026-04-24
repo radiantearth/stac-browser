@@ -4,8 +4,13 @@
       <FullscreenButton :element="() => $refs.previews" />
     </div>
     <div class="content">
-      <a v-for="thumbnail in thumbnails" :key="thumbnail.href" :href="thumbnail.getAbsoluteUrl()" target="_blank" download>
-        <img class="thumbnail" :src="thumbnail.getAbsoluteUrl()" :crossorigin="crossOriginMedia">
+      <a
+        v-for="thumbnail in thumbnails"
+        :key="thumbnail.href"
+        :href="thumbnail.getAbsoluteUrl()"
+        target="_blank"
+        download>
+        <img class="thumbnail" :src="thumbnail.getAbsoluteUrl()" :crossorigin="crossOriginMedia" />
       </a>
     </div>
   </div>
@@ -18,17 +23,17 @@ import { defineAsyncComponent } from 'vue';
 export default {
   name: 'Thumbnails',
   components: {
-    FullscreenButton: defineAsyncComponent(() => import('./FullscreenButton.vue'))
+    FullscreenButton: defineAsyncComponent(() => import('./FullscreenButton.vue')),
   },
   props: {
     thumbnails: {
       type: Array,
-      required: true
-    }
+      required: true,
+    },
   },
   computed: {
-    ...mapState(['crossOriginMedia'])
-  }
+    ...mapState(['crossOriginMedia']),
+  },
 };
 </script>
 

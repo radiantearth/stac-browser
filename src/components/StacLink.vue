@@ -1,6 +1,11 @@
 <template>
   <component :is="component" class="stac-link" :id="id" :title="tooltip" v-bind="attributes">
-    <img v-if="icon && !hideIcon" :src="icon.getAbsoluteUrl()" :alt="icon.title" :title="icon.title" class="icon me-2">
+    <img
+      v-if="icon && !hideIcon"
+      :src="icon.getAbsoluteUrl()"
+      :alt="icon.title"
+      :title="icon.title"
+      class="icon me-2" />
     <span class="title">{{ displayTitle }}</span>
   </component>
 </template>
@@ -9,7 +14,7 @@
 import { defineComponent } from 'vue';
 import { mapState, mapGetters } from 'vuex';
 import { BButton } from 'bootstrap-vue-next';
-import { stacBrowserNavigatesTo } from "../rels";
+import { stacBrowserNavigatesTo } from '../rels';
 import { isObject, size } from 'stac-js/src/utils.js';
 import { isStacMediaType } from 'stac-js/src/mediatypes.js';
 import { getDisplayTitle } from '../models/stac';
@@ -17,40 +22,40 @@ import { STAC } from 'stac-js';
 import { URI } from 'stac-js/src/utils.js';
 
 export default defineComponent({
-  name: "StacLink",
+  name: 'StacLink',
   props: {
     data: {
       type: [Object, Array],
-      default: null
+      default: null,
     },
     title: {
       type: String,
-      default: null
+      default: null,
     },
     fallbackTitle: {
       type: [String, Function],
-      default: ""
+      default: '',
     },
     tooltip: {
       type: String,
-      default: null
+      default: null,
     },
     button: {
       type: [Boolean, Object],
-      default: false
+      default: false,
     },
     state: {
       type: Object,
-      default: null
+      default: null,
     },
     hideIcon: {
       type: Boolean,
-      default: false
+      default: false,
     },
     id: {
       type: String,
-      default: null
-    }
+      default: null,
+    },
   },
   computed: {
     ...mapState(['allowExternalAccess', 'privateQueryParameters']),
@@ -67,22 +72,18 @@ export default defineComponent({
     stac() {
       if (this.data instanceof STAC) {
         return this.data;
-      }
-      else if (Array.isArray(this.data)) {
+      } else if (Array.isArray(this.data)) {
         return this.data.find(o => o instanceof STAC);
-      }
-      else {
+      } else {
         return null;
       }
     },
     link() {
       if (this.isLink(this.data)) {
         return this.data;
-      }
-      else if (Array.isArray(this.data)) {
+      } else if (Array.isArray(this.data)) {
         return this.data.find(o => this.isLink(o)) || {};
-      }
-      else {
+      } else {
         return {};
       }
     },
@@ -102,14 +103,13 @@ export default defineComponent({
       if (this.isStacBrowserLink || this.button) {
         let obj = {
           to: this.href,
-          rel: this.link.rel
+          rel: this.link.rel,
         };
         if (isObject(this.button)) {
           Object.assign(obj, this.button);
         }
         return obj;
-      }
-      else {
+      } else {
         const obj = {
           href: this.href,
           target: '_blank',
@@ -133,8 +133,7 @@ export default defineComponent({
         let href;
         if (this.stac instanceof STAC) {
           href = this.stac.getBrowserPath();
-        }
-        else {
+        } else {
           href = this.toBrowserPath(this.link.href);
         }
         // Normalize to start with a slash for router-link navigation
@@ -146,7 +145,7 @@ export default defineComponent({
         if (size(this.privateQueryParameters) > 0 || size(this.state) > 0) {
           let uri = URI(href);
           let addParameters = (obj, prefix) => {
-            for(let key in obj) {
+            for (let key in obj) {
               let queryKey = `${prefix}${key}`;
               if (!uri.hasQuery(queryKey)) {
                 uri.addQuery(queryKey, obj[key]);
@@ -159,11 +158,9 @@ export default defineComponent({
         }
 
         return href;
-      }
-      else {
+      } else {
         return this.getRequestUrl(this.link.href);
       }
-
     },
     displayTitle() {
       if (this.title) {
@@ -172,12 +169,12 @@ export default defineComponent({
 
       let fallback = typeof this.fallbackTitle === 'function' ? this.fallbackTitle() : this.fallbackTitle;
       return getDisplayTitle(this.data, fallback);
-    }
+    },
   },
   methods: {
     isLink(o) {
       return isObject(o) && !(o instanceof STAC);
-    }
-  }
+    },
+  },
 });
 </script>

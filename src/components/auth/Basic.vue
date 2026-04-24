@@ -33,17 +33,17 @@ export default {
     BCard,
     BCardBody,
     BCardFooter,
-    Description
+    Description,
   },
   props: {
     description: {
       type: String,
-      default: null
+      default: null,
     },
     credentials: {
       type: String,
-      default: null
-    }
+      default: null,
+    },
   },
   emits: ['submit', 'reset'],
   data() {
@@ -51,7 +51,7 @@ export default {
       username: '',
       password: '',
       required: true,
-      validate: false
+      validate: false,
     };
   },
   computed: {
@@ -61,7 +61,7 @@ export default {
         return this.description;
       }
       return this.$t('authConfig.description');
-    }
+    },
   },
   created() {
     if (this.isLoggedIn) {
@@ -81,7 +81,7 @@ export default {
     async submit() {
       this.validate = true;
       this.$emit('submit', `${this.username}:${this.password}`);
-    }
-  }
+    },
+  },
 };
 </script>

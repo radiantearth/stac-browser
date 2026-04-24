@@ -1,9 +1,14 @@
 <template>
   <b-table
-    class="metadata-table" :items="tblItems" :fields="tblFields" variant="light"
-    responsive small sticky-header striped
-    v-bind="tblTexts"
-  >
+    class="metadata-table"
+    :items="tblItems"
+    :fields="tblFields"
+    variant="light"
+    responsive
+    small
+    sticky-header
+    striped
+    v-bind="tblTexts">
     <template #head()="data">
       <span v-html="data.label" />
     </template>
@@ -26,12 +31,9 @@ export default {
   name: 'MetadataTable',
   components: {
     Histogram: defineAsyncComponent(() => import('./Histogram.vue')),
-    BTable
+    BTable,
   },
-  mixins: [
-    EntryMixin,
-    StacFieldsMixin({ format })
-  ],
+  mixins: [EntryMixin, StacFieldsMixin({ format })],
   computed: {
     tblTexts() {
       return {
@@ -39,45 +41,44 @@ export default {
         'empty-text': this.$t('table.emptyText'),
         'label-sort-asc': this.$t('table.sort.asc'),
         'label-sort-desc': this.$t('table.sort.desc'),
-        'label-sort-clear': this.$t('table.sort.clear')
+        'label-sort-clear': this.$t('table.sort.clear'),
       };
     },
     tblItems() {
       if (isObject(this.value)) {
         let items = [];
-        for(let key in this.value) {
+        for (let key in this.value) {
           items.push({
             _id: key,
-            ...this.value[key]
+            ...this.value[key],
           });
         }
         return items;
-      }
-      else {
+      } else {
         return this.value;
       }
     },
     tblFields() {
       let fields = [];
-      for(let key of this.itemOrder) {
+      for (let key of this.itemOrder) {
         let col = this.items[key];
         fields.push({
           key,
           label: col.label,
           sortable: col.sortable,
           formatter: this.formatCell.bind(this),
-          default: col.default
+          default: col.default,
         });
       }
       if (isObject(this.value)) {
         fields.unshift({
           key: '_id',
           sortable: true,
-          isRowHeader: true
+          isRowHeader: true,
         });
       }
       return fields;
-    }
+    },
   },
   methods: {
     isObject(value) {
@@ -90,8 +91,8 @@ export default {
         value = spec.default;
       }
       return this.format(value, key, NaN, item, spec);
-    }
-  }
+    },
+  },
 };
 </script>
 

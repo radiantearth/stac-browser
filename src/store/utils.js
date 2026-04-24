@@ -1,21 +1,19 @@
-import axios from "axios";
+import axios from 'axios';
 import { markRaw } from 'vue';
 import { hasText, isObject, size } from 'stac-js/src/utils.js';
 import i18n from '../i18n';
 
 export class Loading {
-
   constructor(show = false) {
     this.show = Boolean(show);
   }
-
 }
 
 export function stacRequestOptions(cx, link) {
   // Convert a URL string to a Link Object
   if (typeof link === 'string') {
     link = {
-      href: link
+      href: link,
     };
   }
   // Return if the link is not an object or doesn't contain an href
@@ -28,7 +26,7 @@ export function stacRequestOptions(cx, link) {
 
   // Combine headers
   let headers = {
-    'Accept-Language': cx.getters.acceptedLanguages
+    'Accept-Language': cx.getters.acceptedLanguages,
   };
   if (hasText(link.type)) {
     headers.Accept = link.type;
@@ -45,7 +43,7 @@ export function stacRequestOptions(cx, link) {
     method: typeof link.method === 'string' ? link.method.toLowerCase() : 'get',
     url,
     headers,
-    data: link.body
+    data: link.body,
     // ToDo: Support for merge property from STAC API
   };
 }
@@ -73,8 +71,7 @@ export function getErrorCode(error) {
     const res = error.response;
     if (isObject(res.data) && res.data.code) {
       return res.data.code;
-    }
-    else {
+    } else {
       return res.code || res.status;
     }
   }
@@ -106,12 +103,10 @@ export function getErrorMessage(error) {
           // Return a generic error message for issues that originate in the client request (HTTP 4xx)
           return i18n.global.t('errors.badRequest');
         }
-      }
-      else if (error.code === 'ERR_NETWORK') {
+      } else if (error.code === 'ERR_NETWORK') {
         return i18n.global.t('errors.networkError');
       }
-    }
-    else if (hasText(error.message)) {
+    } else if (hasText(error.message)) {
       return error.message;
     }
   }
@@ -132,14 +127,14 @@ export function addQueryIfNotExists(uri, query) {
 
 /**
  * Checks whether a given URI is in the authority of a given pattern.
- * 
+ *
  * Pattern can be one of the following:
  * - A regular expression that will be tested against the normalized absolute URL.
  * - A domain (e.g. `example.com`) -> It will match example.com and any subdomains (case insensitive).
  * - A subdomain (e.g. stac.example.com) -> It will match stac.example.com and any subdomains (case insensitive).
- * 
+ *
  * Domain and subdomain patterns ignore schema, userinfo, port, path, query and fragment.
- * 
+ *
  * @param {RegExp|string} pattern The pattern to check against.
  * @param {URI} uri The absolute URI object.
  * @returns {boolean} true if the URI is in the authority of the pattern, false otherwise.
@@ -147,14 +142,11 @@ export function addQueryIfNotExists(uri, query) {
 export function hasAuthority(pattern, uri) {
   if (pattern instanceof RegExp) {
     return pattern.test(uri.normalize().toString());
-  }
-  else if (typeof pattern !== 'string') {
+  } else if (typeof pattern !== 'string') {
     return false;
-  }
-  else if (uri.domain().toLowerCase() === pattern.toLowerCase()) {
+  } else if (uri.domain().toLowerCase() === pattern.toLowerCase()) {
     return true;
-  }
-  else {
+  } else {
     pattern = new RegExp('(^|\\.)' + RegExp.escape(pattern) + '$', 'i');
     return pattern.test(uri.hostname());
   }

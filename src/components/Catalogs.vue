@@ -17,23 +17,32 @@
         :select-label="$t('multiselect.selectLabel')"
         :selected-label="$t('multiselect.selectedLabel')"
         :deselect-label="$t('multiselect.deselectLabel')"
-        :limit-text="limitText"
-      />
+        :limit-text="limitText" />
     </section>
-    <Pagination v-if="showPagination" ref="topPagination" class="mb-3" :pagination="pagination" placement="top" @paginate="paginate" />
-    <b-alert v-if="hasSearchCritera && catalogView.length === 0" variant="warning" class="mt-2" show>{{ $t('catalogs.noMatches') }}</b-alert>
+    <Pagination
+      v-if="showPagination"
+      ref="topPagination"
+      class="mb-3"
+      :pagination="pagination"
+      placement="top"
+      @paginate="paginate" />
+    <b-alert v-if="hasSearchCritera && catalogView.length === 0" variant="warning" class="mt-2" show>{{
+      $t('catalogs.noMatches')
+    }}</b-alert>
     <section class="list">
       <Loading v-if="loading" fill top />
       <div :class="view === 'list' ? 'card-list' : 'card-grid'">
         <Catalog v-for="catalog in catalogView" :catalog="catalog" :key="catalog.href">
-          <template #footer="{data}">
+          <template #footer="{ data }">
             <slot name="catalogFooter" :data="data" />
           </template>
         </Catalog>
       </div>
     </section>
     <Pagination v-if="showPagination" class="mb-3" :pagination="pagination" @paginate="paginate" />
-    <b-button v-else-if="hasMore" @click="loadMore" variant="primary" v-visible.300="loadMore">{{ $t('catalogs.loadMore') }}</b-button>
+    <b-button v-else-if="hasMore" @click="loadMore" variant="primary" v-visible.300="loadMore">{{
+      $t('catalogs.loadMore')
+    }}</b-button>
   </section>
 </template>
 
@@ -49,7 +58,7 @@ import ViewButtons from './ViewButtons.vue';
 import Utils from '../utils';
 
 export default defineComponent({
-  name: "Catalogs",
+  name: 'Catalogs',
   components: {
     Catalog,
     Loading,
@@ -57,52 +66,52 @@ export default defineComponent({
     Pagination: defineAsyncComponent(() => import('./Pagination.vue')),
     SearchBox: defineAsyncComponent(() => import('./SearchBox.vue')),
     SortButtons: defineAsyncComponent(() => import('./SortButtons.vue')),
-    ViewButtons
+    ViewButtons,
   },
   props: {
     catalogs: {
       type: Array,
-      required: true
+      required: true,
     },
     collectionsOnly: {
       type: Boolean,
-      required: false
+      required: false,
     },
     enforceCards: {
       type: Boolean,
-      default: false
+      default: false,
     },
     hideControls: {
       type: Boolean,
-      default: false
+      default: false,
     },
     loading: {
       type: Boolean,
-      default: false
+      default: false,
     },
     hasMore: {
       type: Boolean,
-      default: false
+      default: false,
     },
     apiFilters: {
       type: Object,
-      default: () => ({})
+      default: () => ({}),
     },
     pagination: {
       type: Object,
-      default: () => ({})
+      default: () => ({}),
     },
     count: {
       type: Number,
-      default: null
-    }
+      default: null,
+    },
   },
   emits: ['loadMore', 'paginate'],
   data() {
     return {
       searchTerm: '',
       sort: 0,
-      selectedKeywords: []
+      selectedKeywords: [],
     };
   },
   computed: {
@@ -111,21 +120,18 @@ export default defineComponent({
     catalogCount() {
       if (this.catalogs.length !== this.catalogView.length) {
         return this.catalogView.length + '/' + this.catalogs.length;
-      }
-      else if (this.count !== null) {
+      } else if (this.count !== null) {
         return this.count;
-      }
-      else if (this.isComplete) {
+      } else if (this.isComplete) {
         return this.catalogs.length;
       }
       return null;
     },
     title() {
       if (this.collectionsOnly) {
-        return this.$t('stacCollection', this.catalogs.length );
-      }
-      else {
-        return this.$t('stacCatalog', this.catalogs.length );
+        return this.$t('stacCollection', this.catalogs.length);
+      } else {
+        return this.$t('stacCatalog', this.catalogs.length);
       }
     },
     isComplete() {
@@ -140,8 +146,8 @@ export default defineComponent({
     },
     allCatalogs() {
       return this.catalogs.map(catalog => {
-          let stac = this.getStac(catalog);
-          return stac ? stac : catalog;
+        let stac = this.getStac(catalog);
+        return stac ? stac : catalog;
       });
     },
     hasSearchCritera() {
@@ -162,7 +168,7 @@ export default defineComponent({
             }
           }
           if (this.searchTerm) {
-            let haystack = [ catalog.title ];
+            let haystack = [catalog.title];
             if (catalog instanceof STAC && this.isComplete) {
               haystack.push(catalog.id);
               if (Array.isArray(catalog.keywords)) {
@@ -177,7 +183,7 @@ export default defineComponent({
       // Sort
       if (!this.hasMore && !this.apiFilters.sortby && this.sort !== 0) {
         const collator = new Intl.Collator(this.uiLanguage);
-        catalogs = catalogs.slice(0).sort((a,b) => collator.compare(getDisplayTitle(a), getDisplayTitle(b)));
+        catalogs = catalogs.slice(0).sort((a, b) => collator.compare(getDisplayTitle(a), getDisplayTitle(b)));
         if (this.sort === -1) {
           catalogs = catalogs.reverse();
         }
@@ -189,9 +195,9 @@ export default defineComponent({
         return [];
       }
       let keywords = [];
-      for(let catalog of this.allCatalogs) {
+      for (let catalog of this.allCatalogs) {
         if (catalog instanceof STAC && Array.isArray(catalog.keywords)) {
-          for(let keyword of catalog.keywords) {
+          for (let keyword of catalog.keywords) {
             if (!keywords.includes(keyword)) {
               keywords.push(keyword);
             }
@@ -212,8 +218,8 @@ export default defineComponent({
           return;
         }
         await this.$store.dispatch('config', { cardViewMode });
-      }
-    }
+      },
+    },
   },
   created() {
     this.sort = Utils.convertHumanizedSortOrder(this.cardViewSort);
@@ -234,9 +240,9 @@ export default defineComponent({
       this.$emit('paginate', link);
     },
     limitText(count) {
-      return this.$t("multiselect.andMore", {count});
-    }
-  }
+      return this.$t('multiselect.andMore', { count });
+    },
+  },
 });
 </script>
 

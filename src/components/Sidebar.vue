@@ -1,8 +1,12 @@
 <template>
   <b-offcanvas
-    initial-animation id="sidebar" :model-value="modelValue" @update:model-value="emit"
-    :title="$t('browse')" teleport-to="#stac-browser" footer-class="offcanvas-footer"
-  >
+    initial-animation
+    id="sidebar"
+    :model-value="modelValue"
+    @update:model-value="emit"
+    :title="$t('browse')"
+    teleport-to="#stac-browser"
+    footer-class="offcanvas-footer">
     <template #default>
       <Loading v-if="loading" />
       <Tree v-else-if="root" :item="root" :path="parents" />
@@ -26,23 +30,23 @@ export default {
   components: {
     Loading,
     Tree,
-    BOffcanvas
+    BOffcanvas,
   },
   props: {
     modelValue: {
       type: Boolean,
-      required: true
-    }
+      required: true,
+    },
   },
   emits: ['update:modelValue'],
   data() {
     return {
-      loading: true
+      loading: true,
     };
   },
   computed: {
     ...mapState(['allowSelectCatalog', 'parents']),
-    ...mapGetters(['root'])
+    ...mapGetters(['root']),
   },
   watch: {
     modelValue: {
@@ -58,29 +62,28 @@ export default {
         }
 
         if (visible) {
-          document.body.classList.add("sidebar");
+          document.body.classList.add('sidebar');
+        } else {
+          document.body.classList.remove('sidebar');
         }
-        else {
-          document.body.classList.remove("sidebar");
-        }
-      }
+      },
     },
     $route() {
       // Close sidebar when route changes
       this.emit(false);
-    }
+    },
   },
   methods: {
     emit(value) {
       this.$emit('update:modelValue', value);
-    }
-  }
+    },
+  },
 };
 </script>
 
 <style lang="scss">
 @import 'bootstrap/scss/mixins';
-@import "../theme/variables.scss";
+@import '../theme/variables.scss';
 
 #stac-browser #sidebar {
   width: 50%;
@@ -115,12 +118,11 @@ export default {
   }
 
   .offcanvas-footer {
-    border-top: 1px solid rgba(0,0,0,.125);
+    border-top: 1px solid rgba(0, 0, 0, 0.125);
 
     .switch-catalog {
       width: 100%;
     }
   }
 }
-
 </style>

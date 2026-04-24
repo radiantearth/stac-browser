@@ -12,36 +12,35 @@ export default defineComponent({
   props: {
     fill: {
       type: Boolean,
-      default: false
+      default: false,
     },
     stretch: {
       type: Boolean,
-      default: false
+      default: false,
     },
     small: {
       type: Boolean,
-      default: false
+      default: false,
     },
     top: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   computed: {
     classes() {
       let classes = ['loading'];
       if (this.fill) {
         classes.push('loading-fill');
-      }
-      else if (this.stretch) {
+      } else if (this.stretch) {
         classes.push('loading-stretch');
       }
       if (this.top) {
         classes.push('top');
       }
       return classes;
-    }
-  }
+    },
+  },
 });
 </script>
 
@@ -62,7 +61,7 @@ export default defineComponent({
   &.loading-fill {
     z-index: 2000;
     position: absolute;
-    background-color: rgba(255,255,255, 0.75);
+    background-color: rgba(255, 255, 255, 0.75);
     width: 100%;
     height: 100%;
     top: 0;

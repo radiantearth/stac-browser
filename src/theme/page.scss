@@ -108,7 +108,7 @@ body {
       font-size: 0.875rem;
 
       li:not(:last-child)::after {
-        content: "|";
+        content: '|';
         margin: 0 0.5em;
       }
     }
@@ -246,10 +246,7 @@ body {
       }
     }
     .btn-secondary {
-      background-color: lighten(
-        desaturate($primary, 50%),
-        20%
-      );
+      background-color: lighten(desaturate($primary, 50%), 20%);
       &:hover {
         background-color: darken($primary, 5%);
       }
@@ -413,7 +410,7 @@ body {
         opacity: 1;
       }
     }
-    
+
     .card-img-top,
     .card-img-end,
     .card-img-start {
@@ -535,7 +532,7 @@ body {
   }
 }
 
-@import "vue-multiselect/dist/vue-multiselect.min.css";
+@import 'vue-multiselect/dist/vue-multiselect.min.css';
 
 // Multiselect related style
 #stac-browser {

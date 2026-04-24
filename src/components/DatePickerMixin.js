@@ -1,10 +1,10 @@
-import { mapState } from "vuex";
+import { mapState } from 'vuex';
 import { VueDatePicker } from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 
 export default {
   components: {
-    VueDatePicker
+    VueDatePicker,
   },
   data() {
     const dateFormat = 'yyyy-MM-dd';
@@ -15,11 +15,11 @@ export default {
       dateFormat,
       timeFormat,
       dateTimeFormat: `${dateFormat} ${timeFormat}`,
-      twelveHourClock: false
+      twelveHourClock: false,
     };
   },
   computed: {
-    ...mapState(['uiLanguage'])
+    ...mapState(['uiLanguage']),
   },
   watch: {
     uiLanguage: {
@@ -40,7 +40,7 @@ export default {
         } catch (e) {
           console.error(`Could not load datepicker locale for ${locale}`, e);
         }
-      }
-    }
-  }
+      },
+    },
+  },
 };

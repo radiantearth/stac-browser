@@ -1,10 +1,14 @@
 <template>
-  <div class="ol-layercontrol ol-unselectable ol-control" style="pointer-events: auto;">
+  <div class="ol-layercontrol ol-unselectable ol-control" style="pointer-events: auto">
     <button v-if="id" :id="id"><b-icon-layers-fill /></button>
     <b-popover
-      v-if="id" click placement="top" @show="update"
-      :target="id" teleport-to="#stac-browser" :boundary-padding="10"
-    >
+      v-if="id"
+      click
+      placement="top"
+      @show="update"
+      :target="id"
+      teleport-to="#stac-browser"
+      :boundary-padding="10">
       <div class="layercontrol">
         <section>
           <h5>{{ $t('mapping.layers.base') }}</h5>
@@ -35,30 +39,27 @@ export default {
   name: 'LayerControl',
   components: {
     BPopover: defineAsyncComponent(() => import('bootstrap-vue-next').then(m => m.BPopover)),
-    LayerControlGroup: defineAsyncComponent(() => import('./LayerControlGroup.vue'))
+    LayerControlGroup: defineAsyncComponent(() => import('./LayerControlGroup.vue')),
   },
-  mixins: [
-    ControlMixin,
-    LayerControlMixin
-  ],
+  mixins: [ControlMixin, LayerControlMixin],
   props: {
     maxZoom: {
       type: Number,
-      default: undefined
-    }
+      default: undefined,
+    },
   },
   data() {
     return {
       id: null,
       baseLayers: [],
       visibleBaseLayer: null,
-      layerGroup: null
+      layerGroup: null,
     };
   },
   computed: {
     hasLayers() {
-      return this.layerGroup && (this.layerGroup.getLayers().getLength() - this.baseLayers.length) > 0;
-    }
+      return this.layerGroup && this.layerGroup.getLayers().getLength() - this.baseLayers.length > 0;
+    },
   },
   watch: {
     map(map) {
@@ -73,12 +74,13 @@ export default {
         data.layer.setVisible(data.id === newId);
         if (data.id === newId) {
           if (data.layer instanceof Group) {
-            const layerWithProjection = data.layer.getLayers().getArray()
+            const layerWithProjection = data.layer
+              .getLayers()
+              .getArray()
               .map(layer => layer.getSource().getProjection())
               .filter(projection => Boolean(projection));
             projection = layerWithProjection.length > 0 ? layerWithProjection[0] : null;
-          }
-          else {
+          } else {
             projection = data.layer.getSource().getProjection();
           }
         }
@@ -86,7 +88,7 @@ export default {
       if (projection) {
         MapUtils.reproject(this.map, projection);
       }
-    }
+    },
   },
   methods: {
     update() {
@@ -99,15 +101,15 @@ export default {
         const data = {
           layer: markRaw(layer),
           id: layer.ol_uid,
-          title: this.getTitle(layer)
+          title: this.getTitle(layer),
         };
         this.baseLayers.push(data);
         if (MapUtils.isLayerVisible(this.map, layer)) {
           this.visibleBaseLayer = data.id;
         }
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -124,7 +126,7 @@ export default {
   margin-top: -0.5rem;
   margin-left: -0.75rem;
   margin-right: -0.75rem;
-  padding: 0.5rem 0.75rem 0  0.75rem;
+  padding: 0.5rem 0.75rem 0 0.75rem;
 
   ul {
     list-style: none;

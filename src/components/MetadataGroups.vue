@@ -2,11 +2,7 @@
   <section v-if="formattedData.length > 0" class="metadata">
     <component :is="headerTag" v-if="title">{{ titleText }}</component>
     <b-card-group columns :class="`count-${formattedData.length}`">
-      <MetadataGroup
-        v-for="group in formattedData"
-        :key="group.extension"
-        v-bind="group"
-      />
+      <MetadataGroup v-for="group in formattedData" :key="group.extension" v-bind="group" />
     </b-card-group>
   </section>
 </template>
@@ -22,24 +18,22 @@ import {
   formatLink,
   formatProvider,
   formatSummaries,
-} from "@radiantearth/stac-fields";
+} from '@radiantearth/stac-fields';
 import StacFieldsMixin from './StacFieldsMixin';
-import MetadataGroup from "./metadata/MetadataGroup.vue";
-import { isoDuration } from "@musement/iso-duration";
-import { mapState } from "vuex";
+import MetadataGroup from './metadata/MetadataGroup.vue';
+import { isoDuration } from '@musement/iso-duration';
+import { mapState } from 'vuex';
 // Register custom fields for the metadata rendering
- 
-import "../../fields.config";
+
+import '../../fields.config';
 
 export default {
-  name: "MetadataGroups",
+  name: 'MetadataGroups',
   components: {
     BCardGroup,
     MetadataGroup,
   },
-  mixins: [
-    StacFieldsMixin({}),
-  ],
+  mixins: [StacFieldsMixin({})],
   props: {
     data: {
       type: Object,
@@ -59,7 +53,7 @@ export default {
     },
     headerTag: {
       type: String,
-      default: "h2",
+      default: 'h2',
     },
   },
   data() {
@@ -68,12 +62,12 @@ export default {
     };
   },
   computed: {
-    ...mapState(["uiLanguage"]),
+    ...mapState(['uiLanguage']),
     titleText() {
-      if (typeof this.title === "string") {
+      if (typeof this.title === 'string') {
         return this.title;
       }
-      return this.$t("metadata.title");
+      return this.$t('metadata.title');
     },
   },
   watch: {
@@ -105,31 +99,28 @@ export default {
     formatData() {
       // Filter all fields as given in ignoreFields and also
       // ignore fields starting with an underscore which is likely originating from the STAC class
-      let filter = (key) =>
-        !key.startsWith("_") && !this.ignoreFields.includes(key);
+      let filter = key => !key.startsWith('_') && !this.ignoreFields.includes(key);
 
-      const data = typeof this.data?.toJSON === "function" ? this.data.toJSON() : this.data;
-      const context = typeof this.data?.getContext === "function" ? this.data.getContext() : null;
+      const data = typeof this.data?.toJSON === 'function' ? this.data.toJSON() : this.data;
+      const context = typeof this.data?.getContext === 'function' ? this.data.getContext() : null;
 
       switch (this.type) {
-        case "Asset":
+        case 'Asset':
           return formatAsset(data, context, filter);
-        case "Link":
+        case 'Link':
           return formatLink(data, context, filter);
-        case "Provider":
+        case 'Provider':
           return formatProvider(data, context, filter);
-        case "Item":
+        case 'Item':
           return formatItemProperties(data, filter);
-        case "Catalog":
+        case 'Catalog':
           return formatCatalog(data, filter);
-        case "Collection": {
+        case 'Collection': {
           const core = formatCollection(data, filter);
           const summaries = formatSummaries(data, filter);
           // Merge summaries into collection metadata
-          summaries.forEach((summaryGroup) => {
-            let index = core.findIndex(
-              (coreGroup) => summaryGroup.extension === coreGroup.extension
-            );
+          summaries.forEach(summaryGroup => {
+            let index = core.findIndex(coreGroup => summaryGroup.extension === coreGroup.extension);
             if (index !== -1) {
               Object.assign(core[index].properties, summaryGroup.properties);
             } else {
@@ -139,7 +130,7 @@ export default {
           const collator = new Intl.Collator(this.uiLanguage);
           return core.sort((a, b) => collator.compare(a.label, b.label));
         }
-        case "FeatureCollection":
+        case 'FeatureCollection':
           return {};
         default:
           return formatGrouped(context, data, this.type, filter);
@@ -150,7 +141,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import "../theme/variables.scss";
+@import '../theme/variables.scss';
 
 #stac-browser {
   .metadata {
@@ -229,7 +220,7 @@ export default {
       margin-bottom: 0;
     }
     ul li {
-      list-style-type: "• ";
+      list-style-type: '• ';
     }
     dl {
       margin: 0;
@@ -252,7 +243,7 @@ export default {
       display: inline;
     }
     dt:after {
-      content: ": ";
+      content: ': ';
     }
     dd {
       display: inline;
@@ -261,12 +252,12 @@ export default {
         margin-bottom: -1em;
       }
       &:after {
-        content: "\A";
+        content: '\A';
         white-space: pre;
         line-height: 1px;
       }
       &:last-of-type:after {
-        content: "";
+        content: '';
         white-space: normal;
       }
       .description {

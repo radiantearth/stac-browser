@@ -16,33 +16,33 @@
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-  name: "ReadMore",
+  name: 'ReadMore',
   props: {
     lines: {
       type: Number,
-      default: 3
+      default: 3,
     },
     text: {
       type: String,
-      default: "Read more"
+      default: 'Read more',
     },
     textLess: {
       type: String,
-      default: "Read less"
-    }
+      default: 'Read less',
+    },
   },
   data() {
     return {
       readmore: false,
       expanded: false,
-      inMaxRange: false
+      inMaxRange: false,
     };
   },
   mounted() {
     const lh = this.getLineHeight(this.$refs.to);
 
     if (this.lines) {
-      this.$refs.to.style.setProperty("--nlines", this.lines);
+      this.$refs.to.style.setProperty('--nlines', this.lines);
     }
     let gLines = 2;
     if (this.lines > 12) {
@@ -51,7 +51,7 @@ export default defineComponent({
       gLines = 3;
     }
 
-    this.$refs.ht.style.setProperty("--nlines", gLines);
+    this.$refs.ht.style.setProperty('--nlines', gLines);
 
     setTimeout(() => {
       if (!this.$refs.to || !this.$refs.ht) {
@@ -64,40 +64,37 @@ export default defineComponent({
         this.inMaxRange = true;
       }
 
-      this.$refs.to.style.setProperty("--lineHeight", lh + "px");
-      this.$refs.ht.style.setProperty("--lineHeight", lh + "px");
+      this.$refs.to.style.setProperty('--lineHeight', lh + 'px');
+      this.$refs.ht.style.setProperty('--lineHeight', lh + 'px');
     });
   },
   methods: {
     toggle() {
       if (this.expanded) {
-        this.$refs.to.style.removeProperty("max-height");
+        this.$refs.to.style.removeProperty('max-height');
         this.expanded = false;
       } else {
         this.expanded = true;
-        this.$refs.to.style.setProperty(
-          "max-height",
-          this.$refs.to.scrollHeight + "px"
-        );
+        this.$refs.to.style.setProperty('max-height', this.$refs.to.scrollHeight + 'px');
       }
     },
     getLineHeight(element) {
       let temp = document.createElement(element.children[0].nodeName);
       const cpStyle = getComputedStyle(element.children[0]);
       temp.setAttribute(
-        "style",
-        "position:absolute;left:-999em;margin:0px;padding:0px;font-family:" +
+        'style',
+        'position:absolute;left:-999em;margin:0px;padding:0px;font-family:' +
           cpStyle.fontFamily +
-          ";font-size:" +
-          cpStyle.fontSize
+          ';font-size:' +
+          cpStyle.fontSize,
       );
-      temp.innerHTML = "test";
+      temp.innerHTML = 'test';
       temp = document.body.appendChild(temp);
       const ret = temp.clientHeight;
       temp.parentNode.removeChild(temp);
       return ret;
-    }
-  }
+    },
+  },
 });
 </script>
 
@@ -164,7 +161,9 @@ export default defineComponent({
 
 .hide-text,
 .read-more-button {
-  transition: opacity 0.3s ease, margin 0.3s ease;
+  transition:
+    opacity 0.3s ease,
+    margin 0.3s ease;
   opacity: 1;
 }
 

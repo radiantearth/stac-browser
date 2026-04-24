@@ -1,18 +1,18 @@
 import { defineComponent } from 'vue';
 import Utils from '../utils';
 import { mapGetters, mapState } from 'vuex';
-import { stacBrowserSpecialHandling } from "../rels";
+import { stacBrowserSpecialHandling } from '../rels';
 
 export default defineComponent({
   data() {
     return {
       tabIds: {
         map: 'map',
-        thumbnails: 'thumbnails'
+        thumbnails: 'thumbnails',
       },
       tab: null,
       shownOnMap: [],
-      selectedAssets: []
+      selectedAssets: [],
     };
   },
   computed: {
@@ -44,24 +44,23 @@ export default defineComponent({
       if (!this.data) {
         return [];
       }
-      return this.data.getLinksWithOtherRels(stacBrowserSpecialHandling)
+      return this.data
+        .getLinksWithOtherRels(stacBrowserSpecialHandling)
         .filter(link => link.rel !== 'preview' || !link.canBrowserDisplayImage());
     },
     selectedReferences() {
       if (this.tab === this.tabIds.map) {
         return this.shownOnMap;
-      }
-      else {
+      } else {
         return this.thumbnails;
       }
-    }
+    },
   },
   methods: {
     showAsset(asset) {
       if (this.thumbnails.find(t => t.is(asset))) {
         this.tab = this.tabIds.thumbnails;
-      }
-      else {
+      } else {
         this.tab = this.tabIds.map;
         this.selectedAssets = [asset];
       }
@@ -72,8 +71,7 @@ export default defineComponent({
     dataChanged(data) {
       if (Array.isArray(data)) {
         this.shownOnMap = data;
-      }
-      else {
+      } else {
         this.shownOnMap = [];
       }
     },
@@ -81,6 +79,6 @@ export default defineComponent({
       if (this.hasThumbnails) {
         this.tab = this.tabIds.thumbnails;
       }
-    }
-  }
+    },
+  },
 });

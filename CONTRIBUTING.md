@@ -19,18 +19,22 @@ so you need a recent version of [NodeJS and npm](https://nodejs.org/en/) install
 You can run the following commands (see also "[Get started](README.md#get-started)" in the README):
 
 - Getting Started
-  - `npm run install`: Install the dependencies, this is required once at the beginning.
+  - `npm install`: Install the dependencies, this is required once at the beginning.
   - `npm start`: Start the development server
-- Linting
-  - `npm run lint`: Lint the source code files
+  - `npm run fix`: After making changes to the source code, this command updates, lints and formats all files
+- Linting & Formatting
+  - `npm run check`: Run all checks below (lint, format, docs lint) but without changing the files
+  - `npm run lint`: Lint and auto-fix the source code files
+  - `npm run format`: Format the source code files
   - `npm run docs:lint`: Lint the documentation files
-- Build step
-  - `npm run build`: Compile the source code into deployable files for the web. The resulting files can be found in the folder `dist` and you can then deploy STAC Browser on a web host. There are two other variants:
-  - `npm run build:report`: Same as above, but also generates a bundle size report (see `dist/report.html`), which should not be deployed.
-  - `npm run build:minimal`: Same as above, but tries to generate a minimal version without bundle size report and without source maps.
 - Update files
   - `npm run i18n:fields`: Generates an updated version of the locales from the stac-fields package.
   - `npm run docs:hooks`: Update the list of hooks in the documentation
+- Build step
+  - `npm run build`: Compile the source code into deployable files for the web. The resulting files can be found in the folder `dist` and you can then deploy STAC Browser on a web host. There are three other variants:
+  - `npm run build:preview`: Same as above, but also starts a local preview server.
+  - `npm run build:report`: Same as above, but also generates a bundle size report (see `dist/report.html`), which should not be deployed.
+  - `npm run build:minimal`: Same as above, but tries to generate a minimal version without bundle size report and without source maps.
 - Tests: For [test commands](#tests), please see below.
 
 The [release process is documented separately](docs/release.md).
@@ -45,11 +49,13 @@ Tests are located in the `tests/e2e` directory and follow the naming convention 
 
 ## Running Tests
 
-- `npm test`: Run all tests
-- `npm run test:e2e:ui`: Run UI tests in UI mode (interactive)
-- `npm run test:e2e:headed`: Run UI tests in headed mode (see browser)
-- `npm run test:e2e:debug`: Debug UI tests
-- `npm run test:e2e:report`: View UI test report
+- `npm test`: Run all tests (integration + end-to-end)
+- `npm run test:integration`: Run integration tests
+- `npm run test:e2e`: Run end-to-end tests
+- `npm run test:e2e:ui`: Run end-to-end tests in UI mode (interactive)
+- `npm run test:e2e:headed`: Run end-to-end tests in headed mode (see browser)
+- `npm run test:e2e:debug`: Debug end-to-end tests
+- `npm run test:e2e:report`: View end-to-end test report
 
 **Additional resources:**
 

@@ -1,10 +1,21 @@
 <template>
   <div>
     <b-button-group class="actions" :vertical="vertical" :size="size" v-if="href">
-      <b-button variant="danger" v-if="requiresAuth" tag="a" tabindex="0" :id="`popover-href-${id}-btn`" @click="handleAuthButton">
+      <b-button
+        variant="danger"
+        v-if="requiresAuth"
+        tag="a"
+        tabindex="0"
+        :id="`popover-href-${id}-btn`"
+        @click="handleAuthButton">
         <b-icon-lock /> {{ $t('authentication.required') }}
       </b-button>
-      <b-button v-if="canDownload" :disabled="requiresAuth" variant="primary" v-bind="downloadProps" v-on="downloadEvents">
+      <b-button
+        v-if="canDownload"
+        :disabled="requiresAuth"
+        variant="primary"
+        v-bind="downloadProps"
+        v-on="downloadEvents">
         <b-spinner v-if="loading" small variant="light" />
         <b-icon-box-arrow-up-right v-else-if="browserCanOpenFile" />
         <b-icon-download v-else />
@@ -18,24 +29,33 @@
         <template v-if="isThumbnail">{{ $t('assets.showThumbnail') }}</template>
         <template v-else>{{ $t('assets.showOnMap') }}</template>
       </b-button>
-      <b-button v-for="action of actions" :key="action.id" variant="primary" v-bind="action.btnOptions" @click="action.onClick">
+      <b-button
+        v-for="action of actions"
+        :key="action.id"
+        variant="primary"
+        v-bind="action.btnOptions"
+        @click="action.onClick">
         <component v-if="action.icon" :is="action.icon" class="me-1" />
         {{ action.text }}
       </b-button>
     </b-button-group>
 
     <b-popover
-      v-if="auth.length > 1" click focus
-      :id="`popover-href-${id}`" class="href-auth-methods" :target="`popover-href-${id}-btn`"
-      :title="$t('authentication.chooseMethod')" teleport-to="#stac-browser" :boundary-padding="10"
-    >
+      v-if="auth.length > 1"
+      click
+      focus
+      :id="`popover-href-${id}`"
+      class="href-auth-methods"
+      :target="`popover-href-${id}-btn`"
+      :title="$t('authentication.chooseMethod')"
+      teleport-to="#stac-browser"
+      :boundary-padding="10">
       <b-list-group>
         <AuthSchemeItem v-for="(method, i) in auth" :key="i" :method="method" @authenticate="startAuth" />
       </b-list-group>
     </b-popover>
   </div>
 </template>
-
 
 <script>
 import { defineAsyncComponent } from 'vue';
@@ -67,33 +87,33 @@ export default {
   props: {
     data: {
       type: Object,
-      required: true
+      required: true,
     },
     isAsset: {
       type: Boolean,
-      default: false
+      default: false,
     },
     vertical: {
       type: Boolean,
-      default: false
+      default: false,
     },
     size: {
       type: String,
-      default: 'md'
+      default: 'md',
     },
     shown: {
       type: Boolean,
-      default: false
+      default: false,
     },
     auth: {
       type: Array,
-      default: () => ([])
-    }
+      default: () => [],
+    },
   },
   emits: ['show'],
   data() {
     return {
-      id: i++
+      id: i++,
     };
   },
   computed: {
@@ -109,8 +129,7 @@ export default {
     tileRendererType() {
       if (this.buildTileUrlTemplate && !this.useTileLayerAsFallback) {
         return 'server';
-      }
-      else {
+      } else {
         return 'client';
       }
     },
@@ -147,10 +166,10 @@ export default {
     downloadEvents() {
       if (this.canDownload && this.useAltDownloadMethod) {
         return {
-          click: async (event) => {
+          click: async event => {
             event.preventDefault();
             this.altDownload();
-          }
+          },
         };
       }
       return {};
@@ -171,11 +190,9 @@ export default {
     useAltDownloadMethod() {
       if (!this.isBrowserProtocol || !window.isSecureContext) {
         return false;
-      }
-      else if (typeof this.data.method === 'string' && this.data.method.toUpperCase() !== 'GET') {
+      } else if (typeof this.data.method === 'string' && this.data.method.toUpperCase() !== 'GET') {
         return true;
-      }
-      else if (size(this.data.headers) > 0 || size(this.requestHeaders) > 0) {
+      } else if (size(this.data.headers) > 0 || size(this.requestHeaders) > 0) {
         return true;
       }
       return false;
@@ -197,8 +214,7 @@ export default {
     isThumbnail() {
       if (this.isAsset) {
         return this.data.isPreview && this.data.canBrowserDisplayImage();
-      }
-      else {
+      } else {
         return this.data.rel === 'preview' && this.data.canBrowserDisplayImage();
       }
     },
@@ -212,14 +228,13 @@ export default {
       return this.protocolName(this.protocol);
     },
     browserCanOpenFile() {
-      if (this.useAltDownloadMethod)  {
+      if (this.useAltDownloadMethod) {
         return false;
       }
       if (this.data.canBrowserDisplayImage()) {
         return true;
-      }
-      else if (typeof this.data?.type === 'string') {
-        switch(this.data.type.toLowerCase()) {
+      } else if (typeof this.data?.type === 'string') {
+        switch (this.data.type.toLowerCase()) {
           case 'text/html':
           case 'application/xhtml+xml':
           case 'text/plain':
@@ -233,13 +248,13 @@ export default {
       if (this.browserCanOpenFile && this.isBrowserProtocol) {
         return this.$t('open');
       }
-      let where = (!this.isBrowserProtocol && this.from) ? 'withSource' : 'generic';
-      return this.$t(`assets.download.${where}`, {source: this.from});
+      let where = !this.isBrowserProtocol && this.from ? 'withSource' : 'generic';
+      return this.$t(`assets.download.${where}`, { source: this.from });
     },
     copyButtonText() {
-      let where = (!this.isBrowserProtocol && this.from) ? 'withSource' : 'generic';
-      return this.$t(`assets.copyUrl.${where}`, {source: this.from});
-    }
+      let where = !this.isBrowserProtocol && this.from ? 'withSource' : 'generic';
+      return this.$t(`assets.copyUrl.${where}`, { source: this.from });
+    },
   },
   methods: {
     async altDownload() {
@@ -254,7 +269,7 @@ export default {
       if (typeof protocol !== 'string') {
         return '';
       }
-      switch(protocol.toLowerCase()) {
+      switch (protocol.toLowerCase()) {
         case 's3':
           try {
             const parsed = URI(this.href);
@@ -297,17 +312,16 @@ export default {
       if (AuthUtils.isSupported(method, this.$store.state)) {
         await this.$store.dispatch('config', { authConfig: method });
         await this.$store.dispatch('auth/requestLogin');
-      }
-      else {
+      } else {
         const name = this.$t(`authentication.schemeTypes.${method.type}`, method);
-        const message = this.$t('authentication.unsupportedLong', {method: name});
+        const message = this.$t('authentication.unsupportedLong', { method: name });
         this.$store.commit('showGlobalError', {
           error: new Error(message),
-          message: this.$t('authentication.unsupported')
+          message: this.$t('authentication.unsupported'),
         });
       }
-    }
-  }
+    },
+  },
 };
 </script>
 

@@ -4,10 +4,14 @@ import AuthUtils from '../components/auth/utils';
 import BrowserStorage, { Cookies } from '../browser-store';
 
 const handleAuthError = async (cx, error) => {
-  cx.commit('showGlobalError', {
-    error,
-    message: i18n.global.t('errors.authFailed')
-  }, { root: true });
+  cx.commit(
+    'showGlobalError',
+    {
+      error,
+      message: i18n.global.t('errors.authFailed'),
+    },
+    { root: true },
+  );
   await cx.dispatch('updateCredentials');
 };
 
@@ -21,7 +25,7 @@ export default function getStore(router) {
       method: () => new Auth(router),
       actions: [],
       credentials: null,
-      inProgress: false
+      inProgress: false,
     },
     getters: {
       method(state) {
@@ -35,7 +39,7 @@ export default function getStore(router) {
       },
       showLogin(state, getters) {
         return !getters.isLoggedIn && state.inProgress;
-      }
+      },
     },
     mutations: {
       setCredentials(state, credentials) {
@@ -52,7 +56,7 @@ export default function getStore(router) {
       },
       setInProgress(state, inProgress = true) {
         state.inProgress = inProgress;
-      }
+      },
     },
     actions: {
       async waitForAuth(cx) {
@@ -73,12 +77,11 @@ export default function getStore(router) {
           await cx.dispatch('updateCredentials', credentials);
           if (isLoggedIn) {
             await cx.dispatch('executeActions');
-          }
-          else {
+          } else {
             cx.commit('resetActions');
           }
         };
-        
+
         const storage = new BrowserStorage(true);
         storage.set('authConfig', config);
 
@@ -92,7 +95,7 @@ export default function getStore(router) {
         cx.commit('setInProgress');
         try {
           await cx.getters.method.login();
-        } catch(error) {
+        } catch (error) {
           handleAuthError(cx, error);
         }
       },
@@ -100,7 +103,7 @@ export default function getStore(router) {
         cx.commit('setInProgress', false);
         try {
           await cx.getters.method.confirmLogin(credentials);
-        } catch(error) {
+        } catch (error) {
           handleAuthError(cx, error);
         }
       },
@@ -118,7 +121,7 @@ export default function getStore(router) {
         cx.commit('setInProgress', false);
         try {
           await cx.getters.method.confirmLogout();
-        } catch(error) {
+        } catch (error) {
           handleAuthError(cx, error);
         }
       },
@@ -128,11 +131,9 @@ export default function getStore(router) {
         const intent = cx.getters.method.updateStore(value);
         if (intent.query) {
           cx.commit('setQueryParameter', intent.query, { root: true });
-        }
-        else if (intent.header) {
+        } else if (intent.header) {
           cx.commit('setRequestHeader', intent.header, { root: true });
-        }
-        else if (intent.cookie) {
+        } else if (intent.cookie) {
           const cookie = new Cookies(true);
           cookie.setItem(intent.cookie.key, intent.cookie.value);
         }
@@ -149,7 +150,7 @@ export default function getStore(router) {
           }
         }
         cx.commit('resetActions');
-      }
-    }
+      },
+    },
   };
 }

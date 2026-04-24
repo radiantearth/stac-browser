@@ -1,17 +1,10 @@
 <template>
   <div class="code">
     <div class="actions">
-      <b-button
-        :title="$t('assets.download.generic')"
-        size="sm" variant="primary"
-        @click.prevent.stop="download"
-      >
+      <b-button :title="$t('assets.download.generic')" size="sm" variant="primary" @click.prevent.stop="download">
         <b-icon-download />
       </b-button>
-      <CopyButton
-        :copyText="code" size="sm"
-        :button-props="{id: 'exampleCodeCopyExampleCode'}"
-      />
+      <CopyButton :copyText="code" size="sm" :button-props="{ id: 'exampleCodeCopyExampleCode' }" />
     </div>
     <div class="code-scroll">
       <div class="code-inner" v-if="highlightedCode" v-html="highlightedCode" />
@@ -28,25 +21,25 @@ import CopyButton from './CopyButton.vue';
 export default defineComponent({
   name: 'CodeHighlighted',
   components: {
-    CopyButton
+    CopyButton,
   },
   props: {
     code: {
       type: String,
-      required: true
+      required: true,
     },
     language: {
       type: String,
-      required: true
+      required: true,
     },
     file: {
       type: String,
-      default: null
-    }
+      default: null,
+    },
   },
   data() {
     return {
-      highlightedCode: ''
+      highlightedCode: '',
     };
   },
   watch: {
@@ -54,21 +47,20 @@ export default defineComponent({
       immediate: true,
       handler() {
         this.renderCode();
-      }
+      },
     },
     language() {
       this.renderCode();
-    }
+    },
   },
   methods: {
     async renderCode() {
       try {
         this.highlightedCode = await codeToHtml(this.code, {
           lang: this.language,
-          theme: 'github-light'
+          theme: 'github-light',
         });
-      }
-      catch {
+      } catch {
         this.highlightedCode = '';
       }
     },
@@ -82,8 +74,8 @@ export default defineComponent({
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-    }
-  }
+    },
+  },
 });
 </script>
 

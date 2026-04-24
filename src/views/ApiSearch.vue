@@ -8,19 +8,18 @@
         <b-tabs v-model="activeSearch">
           <b-tab v-if="collectionSearch" :title="$t('search.tabs.collections')" id="search-collections-tab">
             <WidgetHook id="view-search-filters-collections-start" />
-            <SearchFilter
-              :parent="parent" title="" :value="collectionFilters" type="Collections"
-              @input="setFilters"
-            />
+            <SearchFilter :parent="parent" title="" :value="collectionFilters" type="Collections" @input="setFilters" />
             <WidgetHook id="view-search-filters-collections-end" />
           </b-tab>
           <b-tab v-if="itemSearch" :title="$t('search.tabs.items')" id="search-items-tab">
             <WidgetHook id="view-search-filters-items-start" />
             <SearchFilter
-              :parent="parent" title="" :value="itemFilters" type="Global"
+              :parent="parent"
+              title=""
+              :value="itemFilters"
+              type="Global"
               :searchLink="itemSearch"
-              @input="setFilters"
-            />
+              @input="setFilters" />
             <WidgetHook id="view-search-filters-items-end" />
           </b-tab>
         </b-tabs>
@@ -30,7 +29,9 @@
         <Loading v-if="loading" fill top />
         <ErrorAlert v-else-if="error" :description="error" :id="errorId" />
         <b-alert v-else-if="data === null" variant="info" show>{{ $t('search.modifyCriteria') }}</b-alert>
-        <b-alert v-else-if="results.length === 0 && noFurtherItems" variant="info" show>{{ $t('search.noFurtherItemsFound') }}</b-alert>
+        <b-alert v-else-if="results.length === 0 && noFurtherItems" variant="info" show>{{
+          $t('search.noFurtherItemsFound')
+        }}</b-alert>
         <b-alert v-else-if="results.length === 0" variant="warning" show>{{ $t('search.noItemsFound') }}</b-alert>
         <template v-else>
           <WidgetHook id="view-search-results-start" />
@@ -38,34 +39,51 @@
             <MapView :stac="parent" :children="resultCollection" onfocusOnly popover />
           </div>
           <Catalogs
-            v-if="isCollectionSearch" :catalogs="results" collectionsOnly
-            :pagination="pagination" :loading="loading" @paginate="loadResults"
-            :count="totalCount" :apiFilters="collectionFilters"
-          >
+            v-if="isCollectionSearch"
+            :catalogs="results"
+            collectionsOnly
+            :pagination="pagination"
+            :loading="loading"
+            @paginate="loadResults"
+            :count="totalCount"
+            :apiFilters="collectionFilters">
             <template #catalogFooter="slot">
               <b-button-group v-if="itemSearch || canFilterItems(slot.data)" vertical size="sm">
-                <b-button v-if="itemSearch" variant="outline-primary" :pressed="selectedCollections[slot.data.id]" @click="selectForItemSearch(slot.data)">
+                <b-button
+                  v-if="itemSearch"
+                  variant="outline-primary"
+                  :pressed="selectedCollections[slot.data.id]"
+                  @click="selectForItemSearch(slot.data)">
                   <b-icon-check-square v-if="selectedCollections[slot.data.id]" />
                   <b-icon-square v-else />
                   <span class="ms-2">{{ $t('search.selectForItemSearch') }}</span>
                 </b-button>
-                <StacLink :button="{variant: 'outline-primary', disabled: !canFilterItems(slot.data)}" :data="slot.data" :title="$t('search.filterCollection')" :state="{itemFilterOpen: 1}" />
+                <StacLink
+                  :button="{ variant: 'outline-primary', disabled: !canFilterItems(slot.data) }"
+                  :data="slot.data"
+                  :title="$t('search.filterCollection')"
+                  :state="{ itemFilterOpen: 1 }" />
               </b-button-group>
             </template>
           </Catalogs>
           <Items
             v-else
-            :stac="parent" :items="results" :api="true" :allowFilter="false"
-            :pagination="pagination" :loading="loading" @paginate="loadResults"
-            :count="totalCount" :apiFilters="itemFilters"
-          />
+            :stac="parent"
+            :items="results"
+            :api="true"
+            :allowFilter="false"
+            :pagination="pagination"
+            :loading="loading"
+            @paginate="loadResults"
+            :count="totalCount"
+            :apiFilters="itemFilters" />
           <WidgetHook id="view-search-results-end" />
         </template>
       </b-col>
     </b-row>
     <b-alert v-if="selectedCollectionCount > 0" show variant="dark" class="selected-collections-action">
       <b-button @click="openItemSearch" variant="primary" size="lg">
-        {{ $t('search.useInItemSearch', selectedCollectionCount, {count: selectedCollectionCount}) }}
+        {{ $t('search.useInItemSearch', selectedCollectionCount, { count: selectedCollectionCount }) }}
       </b-button>
     </b-alert>
   </main>
@@ -82,11 +100,11 @@ import { getDisplayTitle, createSTAC, CollectionCollection, ItemCollection } fro
 import { STAC } from 'stac-js';
 import { defineComponent, defineAsyncComponent } from 'vue';
 import { getErrorCode, getErrorMessage, processSTAC, stacRequest } from '../store/utils';
-import { mapGetters, mapState } from "vuex";
+import { mapGetters, mapState } from 'vuex';
 import { BTab, BTabs } from 'bootstrap-vue-next';
 
 export default defineComponent({
-  name: "ApiSearch",
+  name: 'ApiSearch',
   components: {
     Catalogs: defineAsyncComponent(() => import('../components/Catalogs.vue')),
     BTabs,
@@ -96,13 +114,13 @@ export default defineComponent({
     SearchFilter,
     Items: defineAsyncComponent(() => import('../components/Items.vue')),
     MapView: defineAsyncComponent(() => import('../components/MapView.vue')),
-    StacLink: defineAsyncComponent(() => import('../components/StacLink.vue'))
+    StacLink: defineAsyncComponent(() => import('../components/StacLink.vue')),
   },
   props: {
     loadParent: {
       type: String,
-      default: null
-    }
+      default: null,
+    },
   },
   data() {
     return {
@@ -115,12 +133,21 @@ export default defineComponent({
       itemFilters: {},
       collectionFilters: {},
       activeSearch: undefined,
-      selectedCollections: {}
+      selectedCollections: {},
     };
   },
   computed: {
     ...mapState(['catalogUrl', 'catalogTitle', 'searchResultsPerPage', 'itemsPerPage', 'collectionsPerPage']),
-    ...mapGetters(['canSearchItems', 'canSearchCollections', 'getStac', 'root', 'collectionLink', 'parentLink', 'fromBrowserPath', 'toBrowserPath']),
+    ...mapGetters([
+      'canSearchItems',
+      'canSearchCollections',
+      'getStac',
+      'root',
+      'collectionLink',
+      'parentLink',
+      'fromBrowserPath',
+      'toBrowserPath',
+    ]),
     selectedCollectionCount() {
       return size(this.selectedCollections);
     },
@@ -146,14 +173,13 @@ export default defineComponent({
       if (this.isCollectionSearch) {
         return new CollectionCollection({
           collections: this.results,
-          links: []
+          links: [],
         });
-      }
-      else {
+      } else {
         return new ItemCollection({
           type: 'FeatureCollection',
           features: this.results,
-          links: []
+          links: [],
         });
       }
     },
@@ -199,7 +225,7 @@ export default defineComponent({
     },
     pageDescription() {
       let title = getDisplayTitle([this.collectionLink, this.parentLink, this.root], this.catalogTitle);
-      return this.$t('search.metaDescription', {title});
+      return this.$t('search.metaDescription', { title });
     },
     noFurtherItems() {
       // Ideally this would be dertmined by the prev link, but it's not required
@@ -207,9 +233,9 @@ export default defineComponent({
       // that it's a subsequent page. On the first pages the link rel type would be
       // "search" (or "prev" or "first"). This only works for forward navigation.
       return this.link && this.link.rel === 'next';
-    }
+    },
   },
-  watch:{
+  watch: {
     activeSearch() {
       this.data = null;
     },
@@ -219,22 +245,21 @@ export default defineComponent({
         if (this.searchLink) {
           this.showPage();
         }
-      }
-    }
+      },
+    },
   },
   async created() {
     let url = this.catalogUrl;
     if (this.loadParent) {
       url = this.fromBrowserPath(this.loadParent);
       this.parent = this.getStac(url);
-    }
-    else {
+    } else {
       this.parent = this.root;
     }
     if (!this.parent) {
       await this.$store.dispatch('load', { url });
       if (!this.root) {
-        await this.$store.dispatch("config", { catalogUrl: url });
+        await this.$store.dispatch('config', { catalogUrl: url });
       }
       this.parent = this.getStac(url);
       this.showPage();
@@ -249,8 +274,7 @@ export default defineComponent({
     selectForItemSearch(collection) {
       if (this.selectedCollections[collection.id]) {
         delete this.selectedCollections[collection.id];
-      }
-      else {
+      } else {
         this.selectedCollections[collection.id] = true;
       }
     },
@@ -275,8 +299,7 @@ export default defineComponent({
         if (!isObject(response.data) || !Array.isArray(response.data[key])) {
           this.data = {};
           this.error = this.$t(this.isCollectionSearch ? 'errors.invalidStacCollections' : 'errors.invalidStacItems');
-        }
-        else {
+        } else {
           const url = this.link.getAbsoluteUrl();
           this.data = createSTAC(response.data, url, this.toBrowserPath(url));
         }
@@ -291,14 +314,12 @@ export default defineComponent({
     async setFilters(filters, reset = false) {
       if (this.isCollectionSearch) {
         this.collectionFilters = filters;
-      }
-      else {
+      } else {
         this.itemFilters = filters;
       }
       if (reset) {
         this.data = null;
-      }
-      else {
+      } else {
         await this.loadResults(this.searchLink);
       }
     },
@@ -308,16 +329,16 @@ export default defineComponent({
         page: () => ({
           title: this.$t('search.title'),
           description: this.pageDescription,
-        })
+        }),
       });
-    }
-  }
+    },
+  },
 });
 </script>
 
 <style lang="scss">
 @import 'bootstrap/scss/mixins';
-@import "../theme/variables.scss";
+@import '../theme/variables.scss';
 
 #stac-browser {
   .search .left .tabs .tab-content .filter .card {

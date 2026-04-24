@@ -31,7 +31,7 @@ export default class PythonGenerator extends CodeGenerator {
       ...super.getVariables(filters, cqlSerialized),
       ITERATOR_NAME: this.isCollectionSearch ? 'collections' : 'items',
       SEARCH_FUNCTION: this.isCollectionSearch ? 'collection_search' : 'search',
-      SEARCH_ARGS: this.formatPystacSearchArgs(filters, cqlSerialized)
+      SEARCH_ARGS: this.formatPystacSearchArgs(filters, cqlSerialized),
     };
   }
 
@@ -49,8 +49,7 @@ export default class PythonGenerator extends CodeGenerator {
       if (match) {
         return [decodeURIComponent(match[1])];
       }
-    }
-    catch {
+    } catch {
       // ignore malformed URLs
     }
     return [];
@@ -107,5 +106,4 @@ export default class PythonGenerator extends CodeGenerator {
 
     return args.join(', ');
   }
-
 }

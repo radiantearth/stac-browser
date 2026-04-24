@@ -5,56 +5,45 @@
 </template>
 
 <script>
-import { formatKey } from "@radiantearth/stac-fields/helper";
-import { extension } from "@radiantearth/stac-fields/interface";
-import { formatMediaType } from "@radiantearth/stac-fields/formatters";
-import StacFieldsMixin from "../StacFieldsMixin";
-import Utils from "../../utils";
+import { formatKey } from '@radiantearth/stac-fields/helper';
+import { extension } from '@radiantearth/stac-fields/interface';
+import { formatMediaType } from '@radiantearth/stac-fields/formatters';
+import StacFieldsMixin from '../StacFieldsMixin';
+import Utils from '../../utils';
 
 import { Bar, Pie } from 'vue-chartjs';
-import {
-  Chart as ChartJS,
-  Colors,
-  Title,
-  Tooltip,
-  BarElement,
-  ArcElement,
-  CategoryScale,
-  LinearScale
-} from 'chart.js';
+import { Chart as ChartJS, Colors, Title, Tooltip, BarElement, ArcElement, CategoryScale, LinearScale } from 'chart.js';
 
 ChartJS.register(Title, Tooltip, Colors, ArcElement, BarElement, CategoryScale, LinearScale);
 
 export default {
-  name: "StatsChart",
+  name: 'StatsChart',
   components: {
     Bar,
-    Pie
+    Pie,
   },
-  mixins: [
-    StacFieldsMixin({ formatMediaType })
-  ],
+  mixins: [StacFieldsMixin({ formatMediaType })],
   props: {
     data: {
       type: Object,
-      required: true
+      required: true,
     },
     type: {
       type: String,
-      required: true
+      required: true,
     },
     count: {
       type: Number,
-      required: true
+      required: true,
     },
     options: {
       type: Object,
-      default: () => ({})
-    }
+      default: () => ({}),
+    },
   },
   computed: {
     component() {
-      switch(this.type) {
+      switch (this.type) {
         case 'versions':
           return 'Pie';
         default:
@@ -62,7 +51,7 @@ export default {
       }
     },
     title() {
-      switch(this.type) {
+      switch (this.type) {
         case 'versions':
           return this.$t('source.stacVersion');
         case 'extensions':
@@ -79,7 +68,7 @@ export default {
         plugins: {
           title: {
             display: true,
-            text: this.title
+            text: this.title,
           },
         },
         scales: {
@@ -87,10 +76,10 @@ export default {
             min: 0,
             max: this.count,
             title: {
-              display: false
-            }
-          }
-        }
+              display: false,
+            },
+          },
+        },
       };
       return Object.assign(options, this.options);
     },
@@ -102,7 +91,7 @@ export default {
         values.push(count);
 
         let label;
-        switch(this.type) {
+        switch (this.type) {
           case 'extensions': {
             let ext = this.parseExtension(id);
             label = `${ext.title}`;
@@ -123,11 +112,11 @@ export default {
         labels,
         datasets: [
           {
-            data: values
-          }
-        ]
+            data: values,
+          },
+        ],
       };
-    }
+    },
   },
   methods: {
     parseExtension(uri) {
@@ -140,13 +129,12 @@ export default {
         if (match[3]) {
           title += ' - ' + formatKey(match[3]);
         }
-      }
-      else {
+      } else {
         title = uri.replace(/^https?:\/\/(www.)?/, '').replace(/\/schema(\.json)?$/, '');
         title = Utils.shortenTitle(title, 30);
       }
       return { title, version };
-    }
-  }
+    },
+  },
 };
 </script>

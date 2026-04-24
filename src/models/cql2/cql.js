@@ -1,7 +1,6 @@
 // https://docs.ogc.org/DRAFTS/21-065.html
 
 export default class Cql {
-
   constructor(filters, mode = {}) {
     this.filters = filters;
     this.mode = mode;
@@ -9,15 +8,15 @@ export default class Cql {
 
   toJSON() {
     return {
-      "filter-lang": "cql2-json",
-      filter: this.filters.toJSON()
+      'filter-lang': 'cql2-json',
+      filter: this.filters.toJSON(),
     };
   }
 
   toText() {
     return {
-      "filter-lang": "cql2-text",
-      filter: this.filters.toText()
+      'filter-lang': 'cql2-text',
+      filter: this.filters.toText(),
     };
   }
 
@@ -46,5 +45,4 @@ export default class Cql {
     }
     return this.toJSON();
   }
-
 }

@@ -28,25 +28,21 @@ export default {
   name: 'DeprecationNotice',
   components: {
     StacLink: defineAsyncComponent(() => import('./StacLink.vue')),
-    Description
+    Description,
   },
-  mixins: [
-    DeprecationMixin
-  ],
+  mixins: [DeprecationMixin],
   props: {
     data: {
       type: Object,
-      default: null
-    }
+      default: null,
+    },
   },
   computed: {
     message() {
-      let vars = {type: this.type};
+      let vars = { type: this.type };
       if (this.isDeprecated) {
         return this.$t('deprecation.warning', vars);
-
-      }
-      else {
+      } else {
         return this.$t('deprecation.otherVersionsNotice', vars);
       }
     },
@@ -56,29 +52,24 @@ export default {
     title() {
       if (this.isDeprecated) {
         return this.$t('deprecated');
-      }
-      else if (this.latestLink || this.successorLink) {
+      } else if (this.latestLink || this.successorLink) {
         return this.$t('deprecation.outdatedTitle');
-      }
-      else {
+      } else {
         return this.$t('deprecation.otherVersionsTitle');
       }
     },
     type() {
       if (this.data.isItem) {
         return this.$t('stacItem', 1);
-      }
-      else if (this.data.isCollection) {
+      } else if (this.data.isCollection) {
         return this.$t(`stacCollection`, 1);
-      }
-      else if (this.data.isCatalog) {
+      } else if (this.data.isCatalog) {
         return this.$t(`stacCatalog`, 1);
-      }
-      else {
+      } else {
         return '';
       }
-    }
-  }
+    },
+  },
 };
 </script>
 

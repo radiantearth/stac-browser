@@ -1,5 +1,5 @@
 <template>
-  <div class="styled-description" :class="{compact, inline}" v-html="markup(description)" />
+  <div class="styled-description" :class="{ compact, inline }" v-html="markup(description)" />
 </template>
 
 <script>
@@ -10,20 +10,20 @@ export default {
   props: {
     description: {
       type: String,
-      default: ''
+      default: '',
     },
     compact: {
       type: Boolean,
-      default: false
+      default: false,
     },
     inline: {
       type: Boolean,
-      default: false
+      default: false,
     },
     allowHTML: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   methods: {
     markup(text) {
@@ -33,11 +33,11 @@ export default {
 
       // Parse CommonMark
       var reader = new commonmark.Parser();
-      var writer = new commonmark.HtmlRenderer({safe: !this.allowHTML, smart: true});
+      var writer = new commonmark.HtmlRenderer({ safe: !this.allowHTML, smart: true });
       var parsed = reader.parse(text);
       return writer.render(parsed);
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -47,7 +47,12 @@ export default {
 #stac-browser .styled-description {
   line-height: 1.4em;
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     color: $secondary;
     font-weight: 600;
   }
@@ -67,7 +72,7 @@ export default {
     font-size: 1.1rem;
   }
   h6 {
-    font-size: 1.0rem;
+    font-size: 1rem;
   }
   pre {
     background-color: #eee;
@@ -77,7 +82,7 @@ export default {
     overflow-y: auto;
   }
   pre code {
-    background-color: transparent; 
+    background-color: transparent;
     display: block;
     margin: 0.5em;
   }
@@ -88,7 +93,12 @@ export default {
   }
 
   &.compact {
-    h1, h2, h3, h4, h5, h6 {
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
       font-weight: bold;
       font-size: 1.1em;
       margin: 0.5em 0;
@@ -111,7 +121,15 @@ export default {
 
   &.inline {
     display: inline;
-    p, pre, code, h1, h2, h3, h4, h5, h6 {
+    p,
+    pre,
+    code,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
       display: inline;
     }
   }

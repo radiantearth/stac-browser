@@ -1,7 +1,7 @@
 <template>
   <section class="features">
     <header>
-      <h2 class="title me-2">{{ $t('features.title', count ) }}</h2>
+      <h2 class="title me-2">{{ $t('features.title', count) }}</h2>
       <b-badge pill variant="secondary" class="me-4">{{ count }}</b-badge>
     </header>
     <section class="list">
@@ -19,20 +19,20 @@
 import Feature from './Feature.vue';
 
 export default {
-  name: "Features",
+  name: 'Features',
   components: {
-    Feature
+    Feature,
   },
   props: {
     features: {
       type: Array,
-      required: true
-    }
+      required: true,
+    },
   },
   computed: {
     count() {
       return this.features.length;
-    }
-  }
+    },
+  },
 };
 </script>

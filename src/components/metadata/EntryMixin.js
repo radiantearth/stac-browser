@@ -2,21 +2,21 @@ export default {
   props: {
     field: {
       type: String,
-      required: true
+      required: true,
     },
     label: {
       type: String,
-      required: true
+      required: true,
     },
     value: {},
     formatted: {
-      type: String
+      type: String,
     },
     spec: {
       type: Object,
-      required: true
+      required: true,
     },
     itemOrder: {},
-    items: {}
-  }
+    items: {},
+  },
 };

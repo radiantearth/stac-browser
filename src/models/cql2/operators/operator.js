@@ -1,7 +1,6 @@
-import CqlValue from "../value";
+import CqlValue from '../value';
 
 export default class CqlOperator {
-
   constructor(operator, args = []) {
     this.operator = operator;
     this.args = args;
@@ -15,12 +14,12 @@ export default class CqlOperator {
   toJSON() {
     return {
       op: this.operator,
-      args: this.args.map(arg => arg.toJSON())
+      args: this.args.map(arg => arg.toJSON()),
     };
   }
 
   static get description() {
-    return "";
+    return '';
   }
 
   static get label() {
@@ -38,5 +37,4 @@ export default class CqlOperator {
   static getDefaultValue(queryable) {
     return CqlValue.create(queryable.defaultValue);
   }
-
 }

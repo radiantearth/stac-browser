@@ -17,25 +17,18 @@ import EntryMixin from './EntryMixin';
 import { size } from 'stac-js/src/utils.js';
 import { defineAsyncComponent } from 'vue';
 
-const FORCE_TABLE = [
-  'languages',
-  'eo:bands',
-  'raster:bands',
-  'bands'
-];
+const FORCE_TABLE = ['languages', 'eo:bands', 'raster:bands', 'bands'];
 
 export default {
-  name: "MetadataEntry",
+  name: 'MetadataEntry',
   components: {
-    MetadataTable: defineAsyncComponent(() => import('./MetadataTable.vue'))
+    MetadataTable: defineAsyncComponent(() => import('./MetadataTable.vue')),
   },
-  mixins: [
-    EntryMixin
-  ],
+  mixins: [EntryMixin],
   computed: {
     showTable() {
-      return FORCE_TABLE.includes(this.field) || this.itemOrder.length > 0 && size(this.value) >= 3;
-    }
-  }
+      return FORCE_TABLE.includes(this.field) || (this.itemOrder.length > 0 && size(this.value) >= 3);
+    },
+  },
 };
 </script>

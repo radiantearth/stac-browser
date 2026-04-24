@@ -8,17 +8,17 @@ import { mapState, mapGetters } from 'vuex';
 export default defineComponent({
   components: {
     ErrorAlert,
-    Loading
+    Loading,
   },
   props: {
     path: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
   computed: {
-    ...mapState(["allowExternalAccess", "catalogUrl", "loading", "url"]),
-    ...mapGetters(["fromBrowserPath", "error"]),
+    ...mapState(['allowExternalAccess', 'catalogUrl', 'loading', 'url']),
+    ...mapGetters(['fromBrowserPath', 'error']),
     errorId() {
       return getErrorCode(this.error);
     },
@@ -26,8 +26,8 @@ export default defineComponent({
       return getErrorMessage(this.error);
     },
     isExternal() {
-      return URI(this.path).is("absolute");
-    }
+      return URI(this.path).is('absolute');
+    },
   },
   watch: {
     path: {
@@ -35,8 +35,7 @@ export default defineComponent({
       async handler(path, oldPath) {
         if (path === oldPath) {
           return;
-        }
-        else if (!this.allowExternalAccess && this.isExternal) {
+        } else if (!this.allowExternalAccess && this.isExternal) {
           return;
         }
 
@@ -48,7 +47,7 @@ export default defineComponent({
         await this.$router.isReady();
         const url = this.fromBrowserPath(path || '/');
         await this.$store.dispatch('load', { url, show: true });
-      }
-    }
-  }
+      },
+    },
+  },
 });

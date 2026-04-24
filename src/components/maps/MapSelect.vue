@@ -9,70 +9,72 @@
     <div class="bbox-controls">
       <b-form class="compass-grid" @change="applyManualBbox" @submit.prevent="applyManualBbox">
         <!-- North Latitude (top center) -->
-        <b-form-group 
-          :label="$t('mapping.bboxSelect.northLat')" 
-          label-for="northLat" 
+        <b-form-group
+          :label="$t('mapping.bboxSelect.northLat')"
+          label-for="northLat"
           class="compass-input compass-top"
-          :state="validationErrors.northLat ? false : null"
-        >
+          :state="validationErrors.northLat ? false : null">
           <b-form-input
             id="northLat"
-            v-model.number="bboxValues.northLat" lazy
-            type="number" step="any" min="-90" max="90"
-          />
+            v-model.number="bboxValues.northLat"
+            lazy
+            type="number"
+            step="any"
+            min="-90"
+            max="90" />
         </b-form-group>
-        <b-form-invalid-feedback :state="validationErrors.northLat ? false : null" class="validation error-top text-danger">
+        <b-form-invalid-feedback
+          :state="validationErrors.northLat ? false : null"
+          class="validation error-top text-danger">
           {{ validationErrors.northLat }}
         </b-form-invalid-feedback>
 
         <!-- West Longitude (left center) -->
-        <b-form-group 
-          :label="$t('mapping.bboxSelect.westLon')" 
-          label-for="westLon" 
+        <b-form-group
+          :label="$t('mapping.bboxSelect.westLon')"
+          label-for="westLon"
           class="compass-input compass-left"
-          :state="validationErrors.westLon ? false : null"
-        >
-          <b-form-input
-            id="westLon"
-            v-model.number="bboxValues.westLon" lazy
-            type="number" step="any"
-          />
+          :state="validationErrors.westLon ? false : null">
+          <b-form-input id="westLon" v-model.number="bboxValues.westLon" lazy type="number" step="any" />
         </b-form-group>
-        <b-form-invalid-feedback :state="validationErrors.westLon ? false : null" class="validation error-left text-danger">
+        <b-form-invalid-feedback
+          :state="validationErrors.westLon ? false : null"
+          class="validation error-left text-danger">
           {{ validationErrors.westLon }}
         </b-form-invalid-feedback>
 
         <!-- East Longitude (right center) -->
-        <b-form-group 
-          :label="$t('mapping.bboxSelect.eastLon')" 
-          label-for="eastLon" 
+        <b-form-group
+          :label="$t('mapping.bboxSelect.eastLon')"
+          label-for="eastLon"
           class="compass-input compass-right"
-          :state="validationErrors.eastLon ? false : null"
-        >
-          <b-form-input
-            id="eastLon"
-            v-model.number="bboxValues.eastLon" lazy
-            type="number" step="any"
-          />
+          :state="validationErrors.eastLon ? false : null">
+          <b-form-input id="eastLon" v-model.number="bboxValues.eastLon" lazy type="number" step="any" />
         </b-form-group>
-        <b-form-invalid-feedback :state="validationErrors.eastLon ? false : null" class="validation error-right text-danger">
+        <b-form-invalid-feedback
+          :state="validationErrors.eastLon ? false : null"
+          class="validation error-right text-danger">
           {{ validationErrors.eastLon }}
         </b-form-invalid-feedback>
 
         <!-- South Latitude (bottom center) -->
-        <b-form-group 
-          :label="$t('mapping.bboxSelect.southLat')" 
-          label-for="southLat" 
+        <b-form-group
+          :label="$t('mapping.bboxSelect.southLat')"
+          label-for="southLat"
           class="compass-input compass-bottom"
-          :state="validationErrors.southLat ? false : null"
-        >
+          :state="validationErrors.southLat ? false : null">
           <b-form-input
             id="southLat"
-            v-model.number="bboxValues.southLat" lazy
-            type="number" step="any" min="-90" max="90"
-          />
+            v-model.number="bboxValues.southLat"
+            lazy
+            type="number"
+            step="any"
+            min="-90"
+            max="90" />
         </b-form-group>
-        <b-form-invalid-feedback :state="validationErrors.southLat ? false : null" class="validation error-bottom text-danger">
+        <b-form-invalid-feedback
+          :state="validationErrors.southLat ? false : null"
+          class="validation error-bottom text-danger">
           {{ validationErrors.southLat }}
         </b-form-invalid-feedback>
       </b-form>
@@ -86,7 +88,7 @@ import MapMixin from './MapMixin.js';
 import LayerControl from './LayerControl.vue';
 import TextControl from './TextControl.vue';
 import UserLocationControl from './UserLocationControl.vue';
-import {shiftKeyOnly} from 'ol/events/condition.js';
+import { shiftKeyOnly } from 'ol/events/condition.js';
 import ExtentInteraction from 'ol/interaction/Extent';
 import { containsXY } from 'ol/extent';
 import { transformExtent } from 'ol/proj';
@@ -103,7 +105,7 @@ function getBoxDefaults() {
     westLon: null,
     southLat: null,
     eastLon: null,
-    northLat: null
+    northLat: null,
   };
 }
 
@@ -112,20 +114,18 @@ export default {
   components: {
     LayerControl,
     TextControl,
-    UserLocationControl
+    UserLocationControl,
   },
-  mixins: [
-    MapMixin
-  ],
+  mixins: [MapMixin],
   props: {
     stac: {
       type: Object,
-      default: null
+      default: null,
     },
     modelValue: {
       type: Array,
-      default: null
-    }
+      default: null,
+    },
   },
   emits: ['update:modelValue'],
   data() {
@@ -134,7 +134,7 @@ export default {
       extent: this.modelValue,
       dragging: false,
       validationErrors: getBoxDefaults(),
-      bboxValues: getBoxDefaults()
+      bboxValues: getBoxDefaults(),
     };
   },
   computed: {
@@ -147,12 +147,12 @@ export default {
     },
     help() {
       return this.extent ? this.$t('mapping.bboxSelect.remove') : this.$t('mapping.bboxSelect.add');
-    }
+    },
   },
   watch: {
     async stac() {
       await this.initMap();
-    }
+    },
   },
   async mounted() {
     await this.initMap();
@@ -165,15 +165,12 @@ export default {
       await this.createMap(this.$refs.map, this.stac, true);
 
       // Add extent interaction for bbox selection
-      const condition = (event) => {
+      const condition = event => {
         if (event.type === 'singleclick') {
           if (!this.extent) {
             const pixelSize = this.map.getSize().map(xy => xy * 0.2);
             const extent = this.map.getView().calculateExtent(pixelSize);
-            const extentSize = [
-              extent[2] - extent[0],
-              extent[3] - extent[1]
-            ];
+            const extentSize = [extent[2] - extent[0], extent[3] - extent[1]];
             const mouseExtent = [
               event.coordinate[0] - extentSize[0],
               event.coordinate[1] - extentSize[1],
@@ -182,14 +179,12 @@ export default {
             ];
             this.interaction.setExtent(mouseExtent);
             return false;
-          }
-          else if (containsXY(this.projectedExtent, ...event.coordinate)) {
+          } else if (containsXY(this.projectedExtent, ...event.coordinate)) {
             this.interaction.setExtent(null);
             this.interaction.vertexOverlay_.getSource().clear();
             this.interaction.vertexFeature_ = null;
           }
-        }
-        else if (this.interaction.handlingDownUpSequence || this.interaction.snapToVertex_(event.pixel, event.map)) {
+        } else if (this.interaction.handlingDownUpSequence || this.interaction.snapToVertex_(event.pixel, event.map)) {
           return true;
         }
         return shiftKeyOnly(event);
@@ -197,11 +192,11 @@ export default {
       this.interaction = new ExtentInteraction({
         extent: this.projectedExtent,
         condition,
-        boxStyle: createDefaultStyle()
+        boxStyle: createDefaultStyle(),
       });
       this.interaction.on('extentchanged', this.update);
       this.map.addInteraction(this.interaction);
-  
+
       if (this.stac) {
         this.addMask(this.stac);
       }
@@ -209,12 +204,11 @@ export default {
       let extent;
       if (this.projectedExtent) {
         extent = this.projectedExtent;
-      }
-      else if (this.stac) {
+      } else if (this.stac) {
         extent = this.stacToOlExtent(this.stac.getBoundingBox());
       }
       if (extent) {
-        this.map.getView().fit(extent, { padding: [50,50,50,50], maxZoom: this.maxZoom });
+        this.map.getView().fit(extent, { padding: [50, 50, 50, 50], maxZoom: this.maxZoom });
       }
     },
     addMask(stac) {
@@ -251,8 +245,12 @@ export default {
     fixX(x) {
       // Normalize longitude to -180 to 180 range
       // For antimeridian crossing, westLon can be > eastLon
-      while (x > 180) {x -= 360;}
-      while (x < -180) {x += 360;}
+      while (x > 180) {
+        x -= 360;
+      }
+      while (x < -180) {
+        x += 360;
+      }
       return x;
     },
     fixY(y) {
@@ -265,12 +263,11 @@ export default {
           this.fixX(this.extent[0]),
           this.fixY(this.extent[1]),
           this.fixX(this.extent[2]),
-          this.fixY(this.extent[3])
+          this.fixY(this.extent[3]),
         ];
         this.updateBboxValues();
         this.$emit('update:modelValue', extent);
-      }
-      else {
+      } else {
         this.extent = null;
         this.clearBboxValues();
         this.$emit('update:modelValue', null);
@@ -283,7 +280,7 @@ export default {
           westLon: Math.round(this.fixX(this.extent[0]) * 100000) / 100000,
           southLat: Math.round(this.fixY(this.extent[1]) * 100000) / 100000,
           eastLon: Math.round(this.fixX(this.extent[2]) * 100000) / 100000,
-          northLat: Math.round(this.fixY(this.extent[3]) * 100000) / 100000
+          northLat: Math.round(this.fixY(this.extent[3]) * 100000) / 100000,
         };
       }
     },
@@ -294,7 +291,7 @@ export default {
       const { westLon, southLat, eastLon, northLat } = this.bboxValues;
       const errors = getBoxDefaults();
       const incompleteMsg = this.$t('mapping.bboxSelect.error.incomplete');
-      
+
       // Check all values are present - show error on fields that are empty
       if (westLon === '') {
         errors.westLon = incompleteMsg;
@@ -308,14 +305,14 @@ export default {
       if (northLat === '') {
         errors.northLat = incompleteMsg;
       }
-      
+
       // If any value is empty, return early
       // null = Field was never filled, '' = Field was touched but left empty
       if (Object.values(this.bboxValues).some(value => value === '' || value === null)) {
         this.validationErrors = errors;
         return false;
       }
-      
+
       // Check longitude values are in valid range (-180 to 180)
       // Per STAC spec, westLon can be > eastLon for antimeridian crossing
       if (westLon < -180 || westLon > 180) {
@@ -334,7 +331,7 @@ export default {
           errors.westLon = this.$t('mapping.bboxSelect.error.lonOrder');
         }
       }
-      
+
       // Check latitude values (must be between -90 and 90)
       if (southLat < -90 || southLat > 90) {
         errors.southLat = this.$t('mapping.bboxSelect.error.invalidLat');
@@ -342,7 +339,7 @@ export default {
       if (northLat < -90 || northLat > 90) {
         errors.northLat = this.$t('mapping.bboxSelect.error.invalidLat');
       }
-      
+
       // Check latitude order (southLat must be < northLat)
       if (southLat >= northLat) {
         errors.southLat = this.$t('mapping.bboxSelect.error.latOrder');
@@ -356,28 +353,28 @@ export default {
       if (!valid) {
         return;
       }
-      
+
       // Clear any previous errors
       this.validationErrors = getBoxDefaults();
-      
+
       if (!this.map || !this.interaction) {
         return;
       }
-      
+
       const extent = [
         this.bboxValues.westLon,
         this.bboxValues.southLat,
         this.bboxValues.eastLon,
-        this.bboxValues.northLat
+        this.bboxValues.northLat,
       ];
-      
+
       // Update local state and emit STAC-compliant bbox to parent
       this.extent = extent;
       this.$emit('update:modelValue', extent);
 
       // Update map to show the extent
       const projectedExtent = this.stacToOlExtent(extent);
-      this.map.getView().fit(projectedExtent, { padding: [50,50,50,50], maxZoom: this.maxZoom });
+      this.map.getView().fit(projectedExtent, { padding: [50, 50, 50, 50], maxZoom: this.maxZoom });
       // Update the interaction to show the extent on the map
       this.interaction.setExtent(projectedExtent);
     },
@@ -392,17 +389,17 @@ export default {
         mapExtent[2] += 360;
       }
       return transformExtent(mapExtent, this.crs, this.map.getView().getProjection());
-    }
-  }
+    },
+  },
 };
 </script>
 
 <style lang="scss">
-@import "ol/ol.css";
+@import 'ol/ol.css';
 </style>
 
 <style lang="scss" scoped>
-@import "../../theme/variables.scss";
+@import '../../theme/variables.scss';
 .map-container {
   display: flex;
   flex-direction: column;
@@ -485,20 +482,20 @@ export default {
     margin-top: 0;
 
     &.error-top {
-        grid-column: 2;
-        grid-row: 2;
+      grid-column: 2;
+      grid-row: 2;
     }
     &.error-bottom {
-        grid-column: 2;
-        grid-row: 4;
+      grid-column: 2;
+      grid-row: 4;
     }
     &.error-left {
-        grid-column: 1;
-        grid-row: 3;
+      grid-column: 1;
+      grid-row: 3;
     }
     &.error-right {
-        grid-column: 3;
-        grid-row: 3;
+      grid-column: 3;
+      grid-row: 3;
     }
   }
 }

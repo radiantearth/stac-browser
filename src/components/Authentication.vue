@@ -10,7 +10,7 @@ export default {
   name: 'Authentication',
   components: {
     ApiKey: defineAsyncComponent(() => import('./auth/ApiKey.vue')),
-    Basic: defineAsyncComponent(() => import('./auth/Basic.vue'))
+    Basic: defineAsyncComponent(() => import('./auth/Basic.vue')),
   },
   computed: {
     ...mapGetters('auth', ['method', 'isLoggedIn']),
@@ -19,7 +19,7 @@ export default {
     },
     authComponentProps() {
       return this.method.getComponentProps();
-    }
+    },
   },
   beforeCreate() {
     if (this.isLoggedIn) {
@@ -32,7 +32,7 @@ export default {
     },
     async submit(credentials) {
       await this.$store.dispatch('auth/finalizeLogin', credentials);
-    }
-  }
+    },
+  },
 };
 </script>

@@ -3,17 +3,17 @@ import Control from 'ol/control/Control.js';
 export default {
   props: {
     map: {
-      type: Object
-    }
+      type: Object,
+    },
   },
   data() {
     return {
-      control: null
+      control: null,
     };
   },
   mounted() {
     this.control = new Control({
-      element: this.$el
+      element: this.$el,
     });
   },
   watch: {
@@ -21,11 +21,11 @@ export default {
       if (newMap) {
         this.map.addControl(this.control);
       }
-    }
+    },
   },
   methods: {
     getControl() {
       return this.control;
-    }
-  }
+    },
+  },
 };

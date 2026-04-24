@@ -3,9 +3,13 @@
     <h2>{{ $t('providers.title', count) }}</h2>
     <b-list-group v-if="isSimple" class="mimic-accordion">
       <b-list-group-item
-        v-for="(provider, key) in providers" :key="key" :href="provider.url" :disabled="!provider.url"
-        target="_blank" variant="provider" class="provider"
-      >
+        v-for="(provider, key) in providers"
+        :key="key"
+        :href="provider.url"
+        :disabled="!provider.url"
+        target="_blank"
+        variant="provider"
+        class="provider">
         <span class="title">{{ provider.name }}</span>
         <ProviderRoles :roles="provider.roles" />
       </b-list-group-item>
@@ -27,13 +31,13 @@ export default {
   components: {
     Provider: defineAsyncComponent(() => import('./Provider.vue')),
     BAccordion,
-    ProviderRoles
+    ProviderRoles,
   },
   props: {
     providers: {
       type: Array,
-      required: true
-    }
+      required: true,
+    },
   },
   computed: {
     count() {
@@ -45,7 +49,7 @@ export default {
         const keys = ['url', 'name', 'roles'];
         return Object.keys(provider).filter(key => !keys.includes(key)).length > 0;
       });
-    }
-  }
+    },
+  },
 };
 </script>

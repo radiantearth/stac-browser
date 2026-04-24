@@ -4,4 +4,4 @@ const dateFormat = 'MM/dd/yyyy';
 const timeFormat = 'hh:mm:ss a';
 const dateTimeFormat = `${dateFormat} ${timeFormat}`;
 
-export default {dateFormat, timeFormat, dateTimeFormat, locale};
+export default { dateFormat, timeFormat, dateTimeFormat, locale };
