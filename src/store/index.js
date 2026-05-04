@@ -1,6 +1,7 @@
 import { createStore } from "vuex";
 
 import { URI } from 'stac-js/src/utils.js';
+import urijs from 'urijs';
 
 import i18n, { getDataLanguages, translateFields, executeCustomFunctions, loadMessages } from '../i18n';
 import Utils, { BrowserError } from '../utils';
@@ -308,7 +309,7 @@ function getStore(config, router) {
         if (!state.catalogUrl) {
           return false;
         }
-        if (!(absoluteUrl instanceof URI)) {
+        if (!(absoluteUrl instanceof urijs)) {
           absoluteUrl = URI(absoluteUrl);
         }
         if (whitelist && Array.isArray(state.allowedDomains) && state.allowedDomains.some(d => hasAuthority(d, absoluteUrl))) {

@@ -1,5 +1,5 @@
 import STACObject from "./object.js";
-import URI from 'urijs';
+import { URI } from 'stac-js/src/utils.js';
 
 export default class Queryables extends STACObject {
   constructor(instance) {
