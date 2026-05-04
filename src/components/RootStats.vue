@@ -127,10 +127,18 @@ export default {
       else if (uri.startsWith('https://api.stacspec.org/')) {
         type = 'STAC';
 
-        let match = uri.match(/^https?:\/\/api\.stacspec\.org\/([^/]+)\/([^/#]+)(?:#(.+))?$/);
+        // Handles the following extension URI formats:
+        // https://api.stacspec.org/VERSION/TYPE/extensions/SUBTYPE 
+        // https://api.stacspec.org/VERSION/TYPE#SUBTYPE
+        const match = uri.match(/^https?:\/\/api\.stacspec\.org\/([^/]+)\/([^/#]+)(?:(?:#|\/extensions\/)(.+))?$/);
         if (match) {
           version = match[1];
-          title = formatKey(match[2]);
+          if (match[2] === 'ogcapi-features') {
+            title = 'STAC / OGC API - Features';
+          }
+          else {
+            title = formatKey(match[2]);
+          }
           if (match[3]) {
             title += ' - ' + formatKey(match[3]);
           }
