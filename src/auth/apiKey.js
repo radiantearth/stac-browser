@@ -8,7 +8,7 @@ export default class ApiKey extends Auth {
   }
 
   getButtonTitle() {
-  return i18n.global.t('authentication.button.title');
+    return i18n.global.t('authentication.button.title');
   }
 
   getComponent() {
@@ -21,7 +21,8 @@ export default class ApiKey extends Auth {
     };
   }
 
-  async logout(/*credentials*/) {
+  async logout(credentials) {
+    await super.logout(credentials);
     if (this.router.currentRoute.value.name !== 'logout') {
       this.router.push('/auth/logout');
     }

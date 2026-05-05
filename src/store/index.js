@@ -625,7 +625,7 @@ function getStore(config, router) {
         // React on config changes
         for (let key in config) {
           let value = cx.state[key];
-          if (value !== oldConfig[key]) {
+          if (value === oldConfig[key]) {
             continue;
           }
           switch (key) {

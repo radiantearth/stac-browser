@@ -60,6 +60,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Show an error message when no operator is supported for a queryable
 - Don't show an "unsupported" error when only Collection Search is supported by the API
 - Remove download button for ZARR assets
+- Fixed authentication for assets when authentication methods is not configured in STAC Browser
 
 ## [4.0.1] - 2026-02-11
 

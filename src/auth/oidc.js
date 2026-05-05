@@ -1,6 +1,4 @@
-import BrowserStorage from "../browser-store";
 import Auth from "./index";
-import { hasText } from 'stac-js/src/utils.js';
 
 import { UserManager } from 'oidc-client-ts';
 
@@ -21,35 +19,20 @@ export default class OIDC extends Auth {
     this.manager.events.addUserLoaded(async () => this.setUser(await this.manager.getUser()));
     this.manager.events.addAccessTokenExpired(() => this.setUser(null));
     this.manager.events.addUserUnloaded(() => this.setUser(null));
-    this.browserStorage = new BrowserStorage();
   }
 
   async resume() {
+    await super.resume();
     let user = await this.manager.getUser();
     if (user && user.expired && user.refresh_token) {
       user = await this.manager.signinSilent();
     }
 
     if (user && !user.expired) {
-      this.setUser(user);
+      await this.setUser(user);
       return true;
     }
     return false;
-  }
-
-  setOriginalUri() {
-    this.browserStorage.set('oidc-original-uri', this.router.currentRoute.value.fullPath);
-  }
-
-  restoreOriginalUri() {
-    let originalUri = this.browserStorage.get('oidc-original-uri');
-    if (this.router && hasText(originalUri)) {
-      if (originalUri.startsWith('/auth/logout')) {
-        originalUri = '/';
-      }
-      this.router.replace(originalUri);
-    }
-    this.browserStorage.remove('oidc-original-uri');
   }
 
   getRedirectUri(appPath) {
@@ -63,7 +46,7 @@ export default class OIDC extends Auth {
   }
 
   async login() {
-    this.setOriginalUri();
+    await super.login();
     await this.manager.signinRedirect();
     return null;
   }
@@ -74,7 +57,8 @@ export default class OIDC extends Auth {
     this.restoreOriginalUri();
   }
 
-  async logout() {
+  async logout(credentials) {
+    await super.logout(credentials);
     await this.manager.signoutRedirect();
   }
 

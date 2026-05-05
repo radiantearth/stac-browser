@@ -118,6 +118,7 @@ import { getBest, prepareSupported } from 'stac-js/src/locales';
 import BrowserStorage from "./browser-store";
 import Authentication from "./components/Authentication.vue";
 import { getDisplayTitle } from "./models/stac";
+import Auth from './auth';
 
 // Pass Config through from props to vuex
 let Props = {};
@@ -436,10 +437,8 @@ export default defineComponent({
       document.getElementById('og-url').setAttribute("content", window.location.href);
     });
 
-    const storage = new BrowserStorage(true);
-    const authConfig = storage.get('authConfig');
+    const authConfig = Auth.restoreLastMethod();
     if (authConfig) {
-      storage.remove('authConfig');
       await this.$store.dispatch('config', { authConfig });
     }
   },
