@@ -29,8 +29,12 @@ If you care about STAC Browser and have some funds to support the future of STAC
     - [Code Generators](#code-generators)
     - [Additional metadata fields](#additional-metadata-fields)
       - [Example](#example)
+    - [Widgets](#widgets)
+    - [Metadata fields](#metadata-fields)
+    - [Customization through root catalog](#customization-through-root-catalog)
     - [Custom extensions](#custom-extensions)
   - [Docker](#docker)
+  - [Testing](#testing)
   - [Contributing](#contributing)
   - [Sponsors](#sponsors)
 
@@ -213,7 +217,6 @@ You can also provide a couple of the config options through the root catalog.
 You need to provide a field `stac_browser` and then you can set any of the following options:
 
 - `apiCatalogPriority`
-- `authConfig` (except for the `formatter` as function)
 - `cardViewMode`
 - `cardViewSort`
 - `crossOriginMedia`
