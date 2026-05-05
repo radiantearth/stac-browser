@@ -140,8 +140,8 @@ export default defineComponent({
     },
     allCatalogs() {
       return this.catalogs.map(catalog => {
-          let stac = this.getStac(catalog);
-          return stac ? stac : catalog;
+        let stac = this.getStac(catalog);
+        return stac ? stac : catalog;
       });
     },
     hasSearchCritera() {

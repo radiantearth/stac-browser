@@ -22,18 +22,18 @@ export default {
     BCardTitle
   },
   props: {
-      label: {
-        type: String,
-        default: ''
-      },
-      extension: {
-        type: String,
-        default: ''
-      },
-      properties: {
-        type: Object,
-        required: true
-      }
+    label: {
+      type: String,
+      default: ''
+    },
+    extension: {
+      type: String,
+      default: ''
+    },
+    properties: {
+      type: Object,
+      required: true
+    }
   }
 };
 </script>

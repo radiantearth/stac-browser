@@ -358,7 +358,7 @@ export default defineComponent({
             }
           }
           else if (value !== null) {
-              query[name] = value;
+            query[name] = value;
           }
         }
 

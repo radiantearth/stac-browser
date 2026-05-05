@@ -166,8 +166,8 @@ export default defineComponent({
       if (this.isCollection && this.data.extent.temporal.interval.length > 0) {
         let extents = this.data.extent.temporal.interval;
         if (extents.length > 1) {
-            // Remove union temporal extent in favor of more concrete extents
-            extents = extents.slice(1);
+          // Remove union temporal extent in favor of more concrete extents
+          extents = extents.slice(1);
         }
         return this.formatTemporalExtents(extents);
       }
@@ -231,7 +231,7 @@ export default defineComponent({
   },
   methods: {
     filtersShown(show) {
-        this.$store.commit('updateState', {type: 'itemFilterOpen', value: show ? 1 : null});
+      this.$store.commit('updateState', {type: 'itemFilterOpen', value: show ? 1 : null});
     },
     loadMoreCollections() {
       this.$store.dispatch('loadNextApiCollections', {show: true});

@@ -8,8 +8,8 @@ const POTREE_SUPPORTED_TYPES = [
 
 // this.component.filename.endsWith or this.asset.href.includes
 const POTREE_SUPPORTED_FILEEXTS = [
- 'cloud.js', 'metadata.json', 'ept.json'
- // potree v1, potree v2, EPT Entwine Point Tiles
+  'cloud.js', 'metadata.json', 'ept.json'
+  // potree v1, potree v2, EPT Entwine Point Tiles
 ];
   
 export default class Potree extends AssetActionPlugin {
@@ -22,7 +22,7 @@ export default class Potree extends AssetActionPlugin {
       || POTREE_SUPPORTED_FILEEXTS.map(
         f => URI(this.asset.href).filename().endsWith(f)
       ).some(e => e)
-  );
+    );
   }
 
   get uri() {

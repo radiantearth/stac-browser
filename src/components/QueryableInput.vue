@@ -307,7 +307,7 @@ export default {
       }
       // Do number first to avoid casting floats to integers if both are allowed
       else if (itemTypes.includes('number')) {
-         return parseFloat(item);
+        return parseFloat(item);
       }
       else if (itemTypes.includes('integer')) {
         return parseInt(item, 10);

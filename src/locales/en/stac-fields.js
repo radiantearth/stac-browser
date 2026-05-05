@@ -11,13 +11,13 @@ export default function run(/*locale*/) {
   // See also: https://stackoverflow.com/questions/25050034/get-iso-8601-using-intl-datetimeformat
   I18N.dateFormatter = new Intl.DateTimeFormat("sv-SE", defaults.dateFormatterOptions);
   I18N.dateTimeFormatter = new Intl.DateTimeFormat("sv-SE", {
-		day: 'numeric',
-		month: 'numeric',
-		year: 'numeric',
-		hour: 'numeric',
-		minute: 'numeric',
-		second: 'numeric',
-		timeZone: "UTC",
-		timeZoneName: "short"
-	});
+    day: 'numeric',
+    month: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric',
+    timeZone: "UTC",
+    timeZoneName: "short"
+  });
 }
