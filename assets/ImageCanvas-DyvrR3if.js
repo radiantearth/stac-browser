@@ -1,0 +1,2 @@
+import{ap as n,aD as t}from"./GeoJSON-DCt1cdj0.js";class l extends n{constructor(s,a,r,i,e){const h=e!==void 0?t.IDLE:t.LOADED;super(s,a,r,h),this.loader_=e!==void 0?e:null,this.canvas_=i,this.error_=null}getError(){return this.error_}handleLoad_(s){s?(this.error_=s,this.state=t.ERROR):this.state=t.LOADED,this.changed()}load(){this.state==t.IDLE&&(this.state=t.LOADING,this.changed(),this.loader_(this.handleLoad_.bind(this)))}getImage(){return this.canvas_}}export{l as I};
+//# sourceMappingURL=ImageCanvas-DyvrR3if.js.map
