@@ -31,7 +31,7 @@ export default class Auth {
    * @returns {string}
    */
   getLoginLabel() {
-  return i18n.global.t('authentication.button.login');
+    return i18n.global.t('authentication.button.login');
   }
 
   /**
@@ -40,7 +40,7 @@ export default class Auth {
    * @returns {string}
    */
   getLogoutLabel() {
-  return i18n.global.t('authentication.button.logout');
+    return i18n.global.t('authentication.button.logout');
   }
 
   getComponent() {
@@ -52,7 +52,6 @@ export default class Auth {
   }
 
   async init() {
-    return;
   }
 
   async login() {
@@ -65,6 +64,12 @@ export default class Auth {
   }
 
   async logout(/*credentials*/) {
+  }
+
+  // Tries to resume a user session after e.g. page reload.
+  // Returns true if a session could be resumed, false otherwise.
+  async resume() {
+    return false;
   }
 
   async confirmLogout() {

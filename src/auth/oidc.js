@@ -18,11 +18,23 @@ export default class OIDC extends Auth {
     };
     this.user = null;
     this.manager = new UserManager(Object.assign(oidcConfig, options.oidcConfig));
-    const callback = this.setUser.bind(this);
-    this.manager.events.addAccessTokenExpired(callback);
-    this.manager.events.addUserLoaded(callback);
-    this.manager.events.addUserUnloaded(callback);
+    this.manager.events.addUserLoaded(async () => this.setUser(await this.manager.getUser()));
+    this.manager.events.addAccessTokenExpired(() => this.setUser(null));
+    this.manager.events.addUserUnloaded(() => this.setUser(null));
     this.browserStorage = new BrowserStorage();
+  }
+
+  async resume() {
+    let user = await this.manager.getUser();
+    if (user && user.expired && user.refresh_token) {
+      user = await this.manager.signinSilent();
+    }
+
+    if (user && !user.expired) {
+      this.setUser(user);
+      return true;
+    }
+    return false;
   }
 
   setOriginalUri() {

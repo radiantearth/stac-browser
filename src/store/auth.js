@@ -84,6 +84,7 @@ export default function getStore(router) {
 
         const newAuth = await Auth.create(router, config, changeListener);
         cx.commit('setMethod', newAuth);
+        await newAuth.resume();
       },
       async requestLogin(cx) {
         if (cx.getters.isLoggedIn) {
