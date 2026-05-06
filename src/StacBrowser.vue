@@ -579,6 +579,7 @@ export default defineComponent({
 @import 'bootstrap/scss/bootstrap';
 @import 'bootstrap-vue-next/dist/bootstrap-vue-next.css';
 @import "./theme/page.scss";
+@import "./theme/runtime-helpers.scss";
 @import "./theme/custom.scss";
 </style>
 

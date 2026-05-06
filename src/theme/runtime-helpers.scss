@@ -1,0 +1,123 @@
+// Re-wire Bootstrap's baked component colors to root CSS vars.
+// Bootstrap compiles $primary into hardcoded hex values inside
+// component selectors (.btn-primary etc.) and :root / [data-bs-theme="light"].
+// By overriding them here to reference var(--bs-primary), any
+// runtime CSS that sets --bs-primary will automatically propagate.
+
+// Root-level vars — must match Bootstrap's own specificity by including both
+// :root and [data-bs-theme] attribute selectors.
+:root,
+[data-bs-theme="light"],
+[data-bs-theme="dark"] {
+  --bs-link-color: var(--bs-primary);
+  --bs-link-color-rgb: var(--bs-primary-rgb);
+  --bs-link-hover-color: color-mix(in srgb, var(--bs-primary) 50%, black);
+  --bs-focus-ring-color: rgba(var(--bs-primary-rgb), 0.25);
+}
+
+.btn-primary {
+  --bs-btn-bg: var(--bs-primary);
+  --bs-btn-border-color: var(--bs-primary);
+  --bs-btn-hover-bg: color-mix(in srgb, var(--bs-primary) 85%, black);
+  --bs-btn-hover-border-color: color-mix(in srgb, var(--bs-primary) 80%, black);
+  --bs-btn-focus-shadow-rgb: var(--bs-primary-rgb);
+  --bs-btn-active-bg: color-mix(in srgb, var(--bs-primary) 80%, black);
+  --bs-btn-active-border-color: color-mix(in srgb, var(--bs-primary) 75%, black);
+  --bs-btn-disabled-bg: var(--bs-primary);
+  --bs-btn-disabled-border-color: var(--bs-primary);
+}
+
+.btn-outline-primary {
+  --bs-btn-color: var(--bs-primary);
+  --bs-btn-border-color: var(--bs-primary);
+  --bs-btn-hover-bg: var(--bs-primary);
+  --bs-btn-hover-border-color: var(--bs-primary);
+  --bs-btn-active-bg: var(--bs-primary);
+  --bs-btn-active-border-color: var(--bs-primary);
+  --bs-btn-disabled-color: var(--bs-primary);
+}
+
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+  --bs-nav-pills-link-active-bg: var(--bs-primary);
+}
+
+.dropdown-item.active,
+.dropdown-item:active {
+  --bs-dropdown-link-active-bg: var(--bs-primary);
+}
+
+.accordion {
+  --bs-accordion-btn-focus-box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
+.pagination {
+  --bs-pagination-focus-box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+  --bs-pagination-active-bg: var(--bs-primary);
+  --bs-pagination-active-border-color: var(--bs-primary);
+}
+
+.progress {
+  --bs-progress-bar-bg: var(--bs-primary);
+}
+
+// List-group active/selected state
+.list-group-item.active {
+  --bs-list-group-active-bg: var(--bs-primary);
+  --bs-list-group-active-border-color: var(--bs-primary);
+}
+
+// Form controls — focus ring and checked state
+.form-control:focus,
+.form-select:focus {
+  border-color: color-mix(in srgb, var(--bs-primary) 50%, white);
+  box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
+.form-check-input:checked,
+.form-check-input:indeterminate {
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
+}
+
+
+// Expose STAC Browser custom vars as CSS custom properties.
+// Non-color parts are baked from Sass (build-time theming);
+// color parts reference var(--bs-primary) so they stay live
+// and can be overridden at runtime in runtime-style.css.
+:root {
+  // Sizing & spacing
+  --sb-header-margin: #{$header-margin};
+  --sb-block-gap: #{$block-gap};
+  --sb-code-padding: #{$code-padding};
+  --sb-logo-max-height: #{$logo-image-height};
+  --sb-max-icon-size: #{$max-icon-size};
+
+  // Typography
+  --sb-header-font-size: #{$header-font-size};
+  --sb-header-font-weight: #{$header-font-weight};
+
+  // Colors (light mode; dark mode overrides below)
+  --sb-h1-color: #{$h1-color};
+  --sb-subheadings-color: #{$subheadings-color};
+
+  // Main/top header of the website
+  --sb-header: #{$header};
+  --sb-header-background: linear-gradient(to bottom,
+    color-mix(in srgb, var(--sb-header) 85%, #fff),
+    var(--sb-header),
+    color-mix(in srgb, var(--sb-header) 85%, #000)
+  );
+  --sb-header-color: #{$header-color};
+  --sb-header-hover-color: #{$header-hover-color};
+  --sb-header-button-background: #{$header-button-background};
+  --sb-header-button-border-color: #{$header-button-border-color};
+  --sb-header-button-hover-background: #{$header-button-hover-background};
+  --sb-header-button-active-background: #{$header-button-active-background};
+  --sb-header-hover-button-border-color: #{$header-hover-button-border-color};
+}
+
+[data-bs-theme="dark"] {
+  --sb-h1-color: #{$h1-color-dark};
+  --sb-subheadings-color: #{$subheadings-color-dark};
+}
