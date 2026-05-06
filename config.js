@@ -1,7 +1,7 @@
 export default {
     catalogUrl: null,
-    catalogTitle: "STAC Browser",
-    catalogImage: null,
+    catalogTitle: "Portolan Browser",
+    catalogImage: "/portolan-logo.svg",
     allowExternalAccess: true, // Must be true if catalogUrl is not given
     allowedDomains: [],
     detectLocaleFromBrowser: true,

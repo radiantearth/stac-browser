@@ -154,7 +154,8 @@
     "catalog": "Static Catalog",
     "load": "Load",
     "selectStacIndex": "... or select one from {stacIndex}:",
-    "specifyCatalog": "Please specify a STAC Catalog or API...",
+    "selectPortolan": "... or select a Portolan catalog:",
+    "specifyCatalog": "Please enter a Portolan catalog.json file",
     "urlInvalid": "The URL is invalid.",
     "urlMissingHost": "The URL is missing a host.",
     "urlMissingProtocol": "The URL is missing a protocol."

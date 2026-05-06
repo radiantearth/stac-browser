@@ -1,0 +1,18 @@
+[
+  {
+    "id": "portolan-nl",
+    "title": "Portolan Netherlands",
+    "summary": "Dutch geospatial data from the Portolan SDI project, including administrative boundaries, buildings, and infrastructure for the Netherlands.",
+    "url": "https://data.source.coop/cholmes/portolan-nl/catalog.json",
+    "access": "public",
+    "isApi": false
+  },
+  {
+    "id": "belgium-buildings",
+    "title": "Belgium Buildings",
+    "summary": "Building footprints for Belgium, derived from open government data sources.",
+    "url": "https://data.source.coop/nlebovits/belgium-buildings/catalog.json",
+    "access": "public",
+    "isApi": false
+  }
+]

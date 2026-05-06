@@ -20,11 +20,7 @@
     <hr v-if="stacIndex.length > 0">
     <b-form-group v-if="stacIndex.length > 0" class="stac-index">
       <template #label>
-        <i18n-t keypath="index.selectStacIndex" tag="span" scope="global">
-          <template #stacIndex>
-            <a href="https://stacindex.org" target="_blank">STAC Index</a>
-          </template>
-        </i18n-t>
+        {{ $t('index.selectPortolan') }}
       </template>
       <b-list-group> 
         <template v-for="catalog in stacIndex" :key="catalog.id">
@@ -93,14 +89,14 @@ export default defineComponent({
   async created() {
     // Reset loaded STAC catalog
     this.$store.commit('resetCatalog', true);
-    // Load entries from STAC Index
+    // Load entries from local catalogs list
     try {
-      let response = await axios.get('https://stacindex.org/api/catalogs');
+      let response = await axios.get(import.meta.env.BASE_URL + 'catalogs.json');
       if(Array.isArray(response.data)) {
         this.stacIndex = response.data;
       }
     } catch (error) {
-      console.error('Failed to load STAC Index:', error);
+      console.error('Failed to load catalogs:', error);
     }
   },
   methods: {

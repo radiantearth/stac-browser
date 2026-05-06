@@ -266,7 +266,12 @@ export default defineComponent({
     },
     logo() {
       if (this.catalogImageFromVueX) {
-        return Utils.createLink(this.catalogImageFromVueX, 'icon', this.rootLink?.title);
+        let link = Utils.createLink(this.catalogImageFromVueX, 'icon', this.rootLink?.title);
+        if (!link.getAbsoluteUrl()) {
+          let url = import.meta.env.BASE_URL + this.catalogImageFromVueX.replace(/^\//, '');
+          return { getAbsoluteUrl: () => url, title: this.rootLink?.title || this.catalogTitle };
+        }
+        return link;
       }
       else {
         return this.getIcon(this.root);
