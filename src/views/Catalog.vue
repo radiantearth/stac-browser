@@ -27,14 +27,15 @@
           </section>
           <LinkList v-if="linkPosition === 'left'" :title="$t('additionalResources')" :links="additionalLinks" />
         </section>
-        <section v-if="hasThumbnails" class="mb-4">
-          <b-card no-body class="maps-preview">
-            <b-tabs v-model="tab" ref="tabs" pills card vertical end>
-              <b-tab v-if="hasThumbnails" :id="tabIds.thumbnails" :title="$t('thumbnails')" no-body>
-                <Thumbnails :thumbnails="thumbnails" />
-              </b-tab>
-            </b-tabs>
-          </b-card>
+        <section v-if="hasThumbnails" class="mb-4 thumbnail-section">
+          <div class="thumbnail-header" @click="thumbnailOpen = !thumbnailOpen">
+            <h3 class="mb-0">{{ $t('thumbnails') }}</h3>
+            <BIconChevronDown v-if="!thumbnailOpen" />
+            <BIconChevronUp v-else />
+          </div>
+          <b-collapse v-model="thumbnailOpen">
+            <Thumbnails :thumbnails="thumbnails" class="mt-2" />
+          </b-collapse>
         </section>
         <Assets v-if="hasAssets" :assets="assets" :shown="selectedReferences" @show-asset="showAsset" />
         <Assets v-if="hasItemAssets && !hasItems" :assets="itemAssets" :definition="true" />
@@ -75,22 +76,24 @@ import ReadMore from "../components/ReadMore.vue";
 import ShowAssetLinkMixin from '../components/ShowAssetLinkMixin';
 import StacFieldsMixin from '../components/StacFieldsMixin';
 import { formatLicense, formatTemporalExtents } from '@radiantearth/stac-fields/formatters';
+import BIconChevronDown from '~icons/bi/chevron-down';
+import BIconChevronUp from '~icons/bi/chevron-up';
 import Utils from '../utils';
 import { hasText, isObject } from 'stac-js/src/utils.js';
 import { addSchemaToDocument, createCatalogSchema } from '../schema-org';
 import { ItemCollection } from '../models/stac.js';
 import DeprecationMixin from '../components/DeprecationMixin.js';
-import { BTab, BTabs, BCard } from 'bootstrap-vue-next';
+import { BCollapse } from 'bootstrap-vue-next';
 import { getIgnoredFields } from '../ignored-metadata.js';
 
 export default defineComponent({
   name: "Catalog",
   components: {
-    BTab,
-    BTabs,
-    BCard,
     AnonymizedNotice: defineAsyncComponent(() => import('../components/AnonymizedNotice.vue')),
     Assets: defineAsyncComponent(() => import('../components/Assets.vue')),
+    BCollapse,
+    BIconChevronDown,
+    BIconChevronUp,
     Catalogs,
     CollectionLink: defineAsyncComponent(() => import('../components/CollectionLink.vue')),
     DeprecationNotice: defineAsyncComponent(() => import('../components/DeprecationNotice.vue')),
@@ -111,6 +114,7 @@ export default defineComponent({
   ],
   data() {
     return {
+      thumbnailOpen: true,
       filters: {}
     };
   },
@@ -331,6 +335,33 @@ export default defineComponent({
       }
       > .catalogs-container {
         order: 3;
+      }
+    }
+  }
+
+  .thumbnail-section {
+    .thumbnail-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #e8ecef;
+
+      h3 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #4a5c6e;
+      }
+
+      svg {
+        color: #4a5c6e;
+      }
+
+      &:hover {
+        h3, svg {
+          color: #1e3a5f;
+        }
       }
     }
   }
