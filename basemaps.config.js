@@ -6,11 +6,32 @@ import { STAC } from 'stac-js';
 const BASEMAPS = {
   earth: [
     {
-      url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+      url: 'https://tiles.openfreemap.org/styles/positron',
+      is: 'VectorTileStyle',
+      title: 'Positron',
+      attributions: '<a href="https://openfreemap.org" target="_blank">OpenFreeMap</a> <a href="https://www.openmaptiles.org/" target="_blank">&copy; OpenMapTiles</a> Data from <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>',
+      projection: 'EPSG:3857'
+    },
+    {
+      url: 'https://tiles.openfreemap.org/styles/liberty',
+      is: 'VectorTileStyle',
+      title: 'Liberty',
+      attributions: '<a href="https://openfreemap.org" target="_blank">OpenFreeMap</a> <a href="https://www.openmaptiles.org/" target="_blank">&copy; OpenMapTiles</a> Data from <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>',
+      projection: 'EPSG:3857'
+    },
+    {
+      url: 'https://tiles.openfreemap.org/styles/dark',
+      is: 'VectorTileStyle',
+      title: 'Dark',
+      attributions: '<a href="https://openfreemap.org" target="_blank">OpenFreeMap</a> <a href="https://www.openmaptiles.org/" target="_blank">&copy; OpenMapTiles</a> Data from <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>',
+      projection: 'EPSG:3857'
+    },
+    {
+      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
       is: 'XYZ',
-      title: 'OpenStreetMap',
-      attributions: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors.',
-      projection: "EPSG:3857"
+      title: 'Satellite',
+      attributions: '&copy; <a href="https://www.esri.com" target="_blank">Esri</a>, Maxar, Earthstar Geographics, and the GIS User Community',
+      projection: 'EPSG:3857'
     }
   ],
   europa: [
