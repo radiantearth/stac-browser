@@ -1,7 +1,7 @@
 <template>
   <div :class="{cc: true, [cssStacType]: true, empty: !hasCatalogs && !hasItems}" :key="data.id">
     <section v-if="isCollection" class="hero-map">
-      <MapView :stac="data" v-bind="mapData" @changed="dataChanged" @empty="handleEmptyMap" popover />
+      <MapView :stac="data" v-bind="mapData" @changed="dataChanged" @empty="handleEmptyMap" popover hideFootprint />
     </section>
     <b-row>
       <b-col class="meta">
@@ -114,7 +114,7 @@ export default defineComponent({
   ],
   data() {
     return {
-      thumbnailOpen: true,
+      thumbnailOpen: false,
       filters: {}
     };
   },

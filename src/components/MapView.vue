@@ -73,6 +73,10 @@ export default {
     popover: {
       type: Boolean,
       default: false
+    },
+    hideFootprint: {
+      type: Boolean,
+      default: false
     }
   },
   emits: ['empty', 'changed'],
@@ -171,6 +175,13 @@ export default {
       this.stacLayer.on('sourceready', this.fit);
       this.stacLayer.on('layersready', () => {
         this.empty = this.stacLayer.isEmpty();
+        if (this.hideFootprint) {
+          for (const layer of this.stacLayer.getLayers().getArray()) {
+            if (layer.get('bounds')) {
+              layer.setVisible(false);
+            }
+          }
+        }
         this.$emit('changed', this.getShownData());
       });
       this.map.addLayer(this.stacLayer);
