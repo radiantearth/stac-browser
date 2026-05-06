@@ -10,7 +10,7 @@ jobs:
     permissions:
       contents: write
     env:
-      SB_pathPrefix: "/stac-browser"
+      SB_pathPrefix: "/portolan-browser"
       SB_historyMode: "hash"
     steps:
       - uses: actions/checkout@v6

@@ -36,7 +36,7 @@ export default {
     displayOverviewsForChildren: false,
     buildTileUrlTemplate: null,
     getMapSourceOptions: null,
-    pathPrefix: "/stac-browser/",
+    pathPrefix: "/portolan-browser/",
     historyMode: "hash",
     cardViewMode: "cards",
     cardViewSort: "asc",
