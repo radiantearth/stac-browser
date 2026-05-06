@@ -11,7 +11,33 @@ import { vBToggle } from 'bootstrap-vue-next/directives/BToggle';
 import visible from './directives/visible';
 import WidgetHook from "./plugins/WidgetHook.vue";
 
-export default function init() {
+// The URLs are relative so they resolve against the document base URI, i.e. the
+// <base id="stac-browser-base"> tag. In runtime mode pathPrefix is not baked into
+// the build; the base tag (set at startup, e.g. by the Docker entrypoint) carries it.
+async function loadRuntimeConfig() {
+  await new Promise((resolve) => {
+    const script = document.createElement('script');
+    script.src = 'runtime-config.js';
+    script.onload = resolve;
+    script.onerror = resolve; // file absent — ignore silently
+    document.head.appendChild(script);
+  });
+  if (window.STAC_BROWSER_CONFIG) {
+    Object.assign(CONFIG, window.STAC_BROWSER_CONFIG);
+  }
+}
+
+function injectRuntimeStyle() {
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = 'runtime-style.css';
+  document.head.appendChild(link);
+}
+
+export default async function init() {
+  if (CONFIG.RUNTIME) {
+    await loadRuntimeConfig();
+  }
   return loadDefaultMessages().then(() => {
     // Setup router
     const router = createRouter({
@@ -46,6 +72,10 @@ export default function init() {
     app.use(router);
     app.use(store);
 
-    return app.mount("body");
+    const instance = app.mount("body");
+    if (CONFIG.RUNTIME) {
+      injectRuntimeStyle();
+    }
+    return instance;
   });
 }
