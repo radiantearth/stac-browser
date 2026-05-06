@@ -1,0 +1,66 @@
+@import "variables";
+
+#stac-browser {
+  > header .site {
+    border-bottom-width: 2px;
+    background-color: #fafbfc;
+  }
+
+  > header .page {
+    padding-top: 0.75rem;
+    padding-bottom: 0.5rem;
+  }
+
+  h2 {
+    color: #3a4a54;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  .card {
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 0.5rem;
+    transition: box-shadow 0.15s ease, border-color 0.15s ease;
+
+    &:hover {
+      border-color: rgba(0, 0, 0, 0.15);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+  }
+
+  .catalog-card .card-title {
+    font-family: "DM Sans", "Inter", sans-serif;
+    font-weight: 600;
+    font-size: 1.05rem;
+  }
+
+  .catalog-card .intro {
+    color: #4a5568;
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
+
+  .btn-primary {
+    font-weight: 500;
+  }
+
+  .btn-outline-primary {
+    font-weight: 500;
+  }
+
+  > footer {
+    border-top: 1px solid #e8ecef;
+    padding-top: 1rem;
+    margin-top: 1rem;
+  }
+
+  .description {
+    color: #374151;
+    line-height: 1.7;
+  }
+
+  .badge {
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+}
