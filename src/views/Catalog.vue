@@ -1,5 +1,8 @@
 <template>
   <div :class="{cc: true, [cssStacType]: true, empty: !hasCatalogs && !hasItems}" :key="data.id">
+    <section v-if="isCollection" class="hero-map">
+      <MapView :stac="data" v-bind="mapData" @changed="dataChanged" @empty="handleEmptyMap" popover />
+    </section>
     <b-row>
       <b-col class="meta">
         <WidgetHook id="view-catalog-meta-start" />
@@ -24,12 +27,9 @@
           </section>
           <LinkList v-if="linkPosition === 'left'" :title="$t('additionalResources')" :links="additionalLinks" />
         </section>
-        <section v-if="isCollection || hasThumbnails" class="mb-4">
+        <section v-if="hasThumbnails" class="mb-4">
           <b-card no-body class="maps-preview">
             <b-tabs v-model="tab" ref="tabs" pills card vertical end>
-              <b-tab v-if="isCollection" :id="tabIds.map" :title="$t('map')" no-body>
-                <MapView :stac="data" v-bind="mapData" @changed="dataChanged" @empty="handleEmptyMap" onfocusOnly popover />
-              </b-tab>
               <b-tab v-if="hasThumbnails" :id="tabIds.thumbnails" :title="$t('thumbnails')" no-body>
                 <Thumbnails :thumbnails="thumbnails" />
               </b-tab>
@@ -270,6 +270,15 @@ export default defineComponent({
 @import "../theme/variables.scss";
 
 #stac-browser .cc {
+  .hero-map {
+    margin: 0 (-$block-margin);
+    margin-bottom: $block-margin;
+
+    .map {
+      height: 400px;
+    }
+  }
+
   .meta {
     min-width: 100%;
     margin-bottom: $block-margin;
