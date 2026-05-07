@@ -357,10 +357,9 @@ export default {
 }
 
 .parquet-row-selected {
-  background-color: rgba($primary, 0.12) !important;
-
   td {
-    border-color: rgba($primary, 0.2);
+    background-color: rgba(255, 200, 0, 0.3) !important;
+    border-color: rgba(200, 150, 0, 0.4);
   }
 }
 

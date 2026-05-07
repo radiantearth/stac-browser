@@ -41,7 +41,9 @@ import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import Feature from 'ol/Feature';
 import { fromExtent } from 'ol/geom/Polygon';
-import { Stroke, Style } from 'ol/style';
+import Point from 'ol/geom/Point';
+import { getCenter, getWidth, getHeight } from 'ol/extent';
+import { Stroke, Style, Fill, Circle as CircleStyle } from 'ol/style';
 import proj4 from 'proj4';
 import { register } from 'ol/proj/proj4.js';
 
@@ -304,30 +306,50 @@ export default {
     },
     pulseExtent(extent) {
       if (!this.map) {return;}
-      const feature = new Feature(fromExtent(extent));
+
+      const mapRes = this.map.getView().getResolution() || 1;
+      const extentWidth = getWidth(extent);
+      const extentHeight = getHeight(extent);
+      const tooSmall = extentWidth < mapRes * 20 && extentHeight < mapRes * 20;
+
+      const feature = tooSmall
+        ? new Feature(new Point(getCenter(extent)))
+        : new Feature(fromExtent(extent));
+
       const source = new VectorSource({ features: [feature], attributions: [] });
       const layer = new VectorLayer({ source });
-      layer.setStyle(new Style({
-        stroke: new Stroke({ color: 'rgba(65, 99, 204, 0.9)', width: 3 }),
-      }));
       this.map.addLayer(layer);
 
-      let opacity = 0.9;
+      const duration = 8000;
+      const start = Date.now();
       const map = this.map;
       const interval = setInterval(() => {
-        opacity -= 0.0075;
-        if (opacity <= 0 || !map) {
+        const elapsed = Date.now() - start;
+        if (elapsed >= duration || !map) {
           clearInterval(interval);
           try { map?.removeLayer(layer); } catch { /* ignore */ }
           return;
         }
+        const phase = (elapsed / 800) * Math.PI;
+        const pulse = 0.4 + 0.5 * Math.abs(Math.sin(phase));
         try {
-          layer.setStyle(new Style({
-            stroke: new Stroke({
-              color: `rgba(65, 99, 204, ${opacity})`,
-              width: 3 * (opacity / 0.9),
-            }),
-          }));
+          if (tooSmall) {
+            layer.setStyle(new Style({
+              image: new CircleStyle({
+                radius: 8 + 4 * Math.abs(Math.sin(phase)),
+                fill: new Fill({ color: `rgba(255, 200, 0, ${pulse})` }),
+                stroke: new Stroke({ color: `rgba(200, 150, 0, ${pulse})`, width: 2 }),
+              }),
+            }));
+          } else {
+            layer.setStyle(new Style({
+              stroke: new Stroke({
+                color: `rgba(255, 200, 0, ${pulse})`,
+                width: 2 + 2 * Math.abs(Math.sin(phase)),
+              }),
+              fill: new Fill({ color: `rgba(255, 200, 0, ${pulse * 0.15})` }),
+            }));
+          }
         } catch { /* ignore */ }
       }, 50);
     },
