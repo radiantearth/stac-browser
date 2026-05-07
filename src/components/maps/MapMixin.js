@@ -1,43 +1,24 @@
-import { isObject } from 'stac-js/src/utils.js';
-import i18n from '../../i18n';
 import { mapState } from 'vuex';
-import OlMap from 'ol/Map.js';
-import View from 'ol/View.js';
-import { defaults } from 'ol/interaction/defaults';
-import ZoomControl from 'ol/control/Zoom.js';
-import AttributionControl from 'ol/control/Attribution.js';
-import FullScreenControl from 'ol/control/FullScreen.js';
-import { stacRequest } from '../../store/utils';
-
-import configureBasemap from '../../../basemaps.config';
-import CONFIG from '../../config';
-import proj4 from 'proj4';
-import {register} from 'ol/proj/proj4.js';
+import maplibregl from 'maplibre-gl';
+import { Protocol } from 'pmtiles';
 import { markRaw } from 'vue';
-// Register pre-defined CRS from config in proj4
-if (isObject(CONFIG.crs)) {
-  for (const code in CONFIG.crs) {
-    proj4.defs(code, CONFIG.crs[code]);
-  }
-}
-register(proj4); // required to support source reprojection
+import configureBasemap from '../../../basemaps.config';
+
+const protocol = new Protocol({ metadata: true });
+maplibregl.addProtocol('pmtiles', protocol.tile);
+
+const MAPTERHORN_SOURCE_ID = 'mapterhorn-terrain';
+const MAPTERHORN_HILLSHADE_ID = 'mapterhorn-hillshade';
 
 export default {
   computed: {
     ...mapState(['buildTileUrlTemplate', 'crossOriginMedia', 'displayGeoTiffByDefault', 'displayPreview', 'displayOverview', 'getMapSourceOptions', 'useTileLayerAsFallback', 'uiLanguage']),
     stacLayerOptions() {
       return {
-        buildTileUrlTemplate: this.buildTileUrlTemplate,
-        crossOriginMedia: this.crossOriginMedia,
         displayPreview: this.displayPreview,
         displayOverview: this.displayOverview,
         displayGeoTiffByDefault: this.displayGeoTiffByDefault,
-        useTileLayerAsFallback: this.useTileLayerAsFallback,
-        getSourceOptions: this.getMapSourceOptions,
-        httpRequestFn: async (url, responseType) => {
-          const response = await stacRequest(this.$store, url, {responseType});
-          return response.data;
-        },
+        crossOriginMedia: this.crossOriginMedia,
       };
     },
     hasBasemap() {
@@ -48,158 +29,174 @@ export default {
     return {
       map: null,
       maxZoom: 16,
-      zoomControl: null,
-      attributionControl: null,
-      fullScreenControl: null,
       basemaps: [],
+      activeBasemapIndex: 0,
       isFullScreen: false,
+      is3D: false,
     };
-  },
-  watch: {
-    uiLanguage() {
-      this.createControls();
-    }
   },
   methods: {
     async createMap(element, stac, onfocusOnly = false) {
-      let projection = 'EPSG:3857';
-      let visibleLayer = 0;
+      this.basemaps = configureBasemap(stac);
 
-      // Get basemaps
-      this.basemaps = configureBasemap(stac, this.$i18n);
-      if (this.basemaps.length > 0) {
-        const ix = this.basemaps.findIndex(basemap => basemap.visible);
-        if (ix >= 0) {
-          visibleLayer = ix;
-        }
-        const currentBasemap = this.basemaps[visibleLayer];
-        if (currentBasemap?.projection) {
-          projection = currentBasemap?.projection;
-        }
-      }
-
-      // Create map instance
-      this.map = markRaw(new OlMap({
-        target: element,
-        controls: [],
-        interactions: defaults({
-          altShiftDragRotate: false,
-          pinchRotate: false,
-          onfocusOnly
-        }),
-        view: new View({
-          center: [0, 0],
-          zoom: 0,
-          showFullExtent: true,
-          projection,
-        }),
+      this.map = markRaw(new maplibregl.Map({
+        container: element,
+        style: { version: 8, sources: {}, layers: [] },
+        center: [0, 0],
+        zoom: 1,
+        attributionControl: false,
+        interactive: !onfocusOnly,
       }));
 
-      // Add controls
-      this.createControls();
+      this.map.addControl(new maplibregl.NavigationControl({ showCompass: true }), 'top-right');
+      this.map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-right');
+      this.map.addControl(new maplibregl.FullscreenControl(), 'top-right');
 
-      // Add basemaps
-      await this.addBasemaps(this.basemaps, visibleLayer);
-    },
-    createControls() {
-      ['zoom', 'attribution', 'fullScreen'].forEach(type => {
-        const key = type + 'Control';
-        if (this[key]) {
-          this.map.removeControl(this[key]);
-          this[key] = null;
+      this.map.on('fullscreenchange', () => {
+        this.isFullScreen = document.fullscreenElement != null;
+      });
+
+      await new Promise(resolve => {
+        if (this.map.isStyleLoaded()) {
+          resolve();
+        } else {
+          this.map.once('style.load', resolve);
         }
       });
 
-      this.zoomControl = new ZoomControl({
-        zoomInLabel: i18n.global.t('mapping.zoom.in.label'),
-        zoomOutLabel: i18n.global.t('mapping.zoom.out.label'),
-        zoomInTipLabel: i18n.global.t('mapping.zoom.in.description'),
-        zoomOutTipLabel: i18n.global.t('mapping.zoom.out.description')
-      });
-      this.map.addControl(this.zoomControl);
-
-      this.attributionControl = new AttributionControl({
-        tipLabel: i18n.global.t('mapping.attribution.description'),
-        label: i18n.global.t('mapping.attribution.label'),
-        collapseLabel: i18n.global.t('mapping.attribution.collapseLabel'),
-      });
-      this.map.addControl(this.attributionControl);
-
-      this.fullScreenControl = new FullScreenControl({
-        label: i18n.global.t('fullscreen.showLabel'),
-        labelActive: i18n.global.t('fullscreen.exitLabel'),
-        tipLabel: i18n.global.t('fullscreen.show'),
-      });
-      this.fullScreenControl.on('enterfullscreen', () => {
-        this.fullScreenControl.button_.title = i18n.global.t('fullscreen.exit');
-        this.isFullScreen = true;
-      });
-      this.fullScreenControl.on('leavefullscreen', () => {
-        this.fullScreenControl.button_.title = i18n.global.t('fullscreen.show');
-        this.isFullScreen = false;
-      });
-      this.map.addControl(this.fullScreenControl);
+      if (this.basemaps.length > 0) {
+        this._loadBasemapAsync(this.basemaps[0]);
+      }
     },
-    async addBasemaps(basemaps, visibleLayer = 0) {
-      const promises = basemaps.map(async (options) => {
-        try {
-          let layerClassName = 'WebGLTile';
-          let sourceClassName = options.is;
-          if (options.is === 'VectorTileStyle') {
-            layerClassName = 'Group';
-            sourceClassName = null;
-            const {apply} = await import('ol-mapbox-style');
-            const callback = options.layerCreated;
-            options.layerCreated = async (layer, source, map) => {
-              layer = await apply(layer, options.url, options);
-              if (callback) {
-                layer = await callback(layer, source, map);
-              }
-              return layer;
-            };
-          }
-          else if (options.is === 'WMTS' && !options.url.includes('{') && !options.url.includes('}')) {
-            // Request capabilities if URL does not seem to be a URL template
-            const [{optionsFromCapabilities}, {default: WMTSCapabilities}] = await Promise.all([
-              import('ol/source/WMTS.js'),
-              import('ol/format/WMTSCapabilities.js')
-            ]);
-            try {
-              const response = await fetch(options.url, {method: 'GET'});
-              const capabilities = new WMTSCapabilities().read(await response.text());
-              const wmtsOptions = optionsFromCapabilities(capabilities, options);
-              Object.assign(options, wmtsOptions);
-            } catch (e) {
-              console.error('Failed to fetch WMTS capabilities', e);
-            }
-          }
-          const [{ default: sourceCls }, { default: layerCls }] = await Promise.all([
-            // We need to import relatively for vite, see
-            // https://github.com/rollup/plugins/tree/master/packages/dynamic-import-vars#imports-must-start-with--or-
-            sourceClassName ? import(`../../../node_modules/ol/source/${sourceClassName}.js`) : Promise.resolve({ default: null }),
-            import(`../../../node_modules/ol/layer/${layerClassName}.js`)
-          ]);
-          const source = sourceCls ? new sourceCls(options) : undefined;
-          const layer = new layerCls({
-            source,
-            title: options.title,
-            base: true
-          });
-          if (options.layerCreated) {
-            return await options.layerCreated(layer, source, this.map);
-          }
-          return layer;
-        } catch (error) {
-          console.error(`Failed to load basemap source for ${options.is}`, error);
-          return null;
+
+    _loadBasemapAsync(basemap) {
+      const style = basemap.raster ? this.buildRasterStyle(basemap) : basemap.url;
+      if (!style) return;
+
+      this.map.once('style.load', () => {
+        if (this.is3D) {
+          this.enable3D();
+        }
+        if (typeof this.onBasemapChanged === 'function') {
+          this.onBasemapChanged();
         }
       });
-      (await Promise.all(promises))
-        .filter(layer => isObject(layer))
-        .forEach((layer, i) => {
-          layer.setVisible(i === visibleLayer);
-          this.map.addLayer(layer);
+      this.map.setStyle(style);
+    },
+
+    buildRasterStyle(basemap) {
+      return {
+        version: 8,
+        sources: {
+          'raster-basemap': {
+            type: 'raster',
+            tiles: basemap.tiles,
+            tileSize: 256,
+            attribution: basemap.attribution || '',
+          }
+        },
+        layers: [{
+          id: 'raster-basemap-layer',
+          type: 'raster',
+          source: 'raster-basemap',
+        }],
+      };
+    },
+
+    async switchBasemap(index) {
+      if (index === this.activeBasemapIndex || !this.map) return;
+      this.activeBasemapIndex = index;
+      const basemap = this.basemaps[index];
+      if (!basemap) return;
+
+      const was3D = this.is3D;
+
+      const style = basemap.raster ? this.buildRasterStyle(basemap) : basemap.url;
+      this.map.setStyle(style);
+
+      await new Promise(resolve => this.map.once('style.load', resolve));
+
+      if (was3D) {
+        this.enable3D();
+      }
+
+      if (typeof this.onBasemapChanged === 'function') {
+        this.onBasemapChanged();
+      }
+    },
+
+    toggle3D() {
+      if (this.is3D) {
+        this.disable3D();
+      } else {
+        this.enable3D();
+      }
+    },
+
+    enable3D() {
+      if (!this.map) return;
+
+      if (!this.map.getSource(MAPTERHORN_SOURCE_ID)) {
+        this.map.addSource(MAPTERHORN_SOURCE_ID, {
+          type: 'raster-dem',
+          url: 'https://tiles.mapterhorn.com/tilejson.json',
         });
-    }
+      }
+
+      this.map.setTerrain({ source: MAPTERHORN_SOURCE_ID, exaggeration: 1 });
+      this.map.setProjection({ type: 'globe' });
+
+      if (!this.map.getSource(MAPTERHORN_HILLSHADE_ID)) {
+        this.map.addSource(MAPTERHORN_HILLSHADE_ID, {
+          type: 'raster-dem',
+          url: 'https://tiles.mapterhorn.com/tilejson.json',
+        });
+      }
+      if (!this.map.getLayer('hillshade-layer')) {
+        this.map.addLayer({
+          id: 'hillshade-layer',
+          type: 'hillshade',
+          source: MAPTERHORN_HILLSHADE_ID,
+          layout: { visibility: 'visible' },
+          paint: { 'hillshade-shadow-color': '#473B24' },
+        }, this.getFirstSymbolLayerId());
+      }
+
+      this.map.setSky({
+        'atmosphere-blend': ['interpolate', ['linear'], ['zoom'], 0, 1, 5, 1, 7, 0],
+      });
+
+      this.is3D = true;
+    },
+
+    disable3D() {
+      if (!this.map) return;
+
+      this.map.setTerrain(null);
+      this.map.setProjection({ type: 'mercator' });
+      this.map.setSky(null);
+
+      if (this.map.getLayer('hillshade-layer')) {
+        this.map.removeLayer('hillshade-layer');
+      }
+      if (this.map.getSource(MAPTERHORN_HILLSHADE_ID)) {
+        this.map.removeSource(MAPTERHORN_HILLSHADE_ID);
+      }
+      if (this.map.getSource(MAPTERHORN_SOURCE_ID)) {
+        this.map.removeSource(MAPTERHORN_SOURCE_ID);
+      }
+
+      this.is3D = false;
+    },
+
+    getFirstSymbolLayerId() {
+      if (!this.map) return undefined;
+      const layers = this.map.getStyle()?.layers;
+      if (!layers) return undefined;
+      for (const layer of layers) {
+        if (layer.type === 'symbol') return layer.id;
+      }
+      return undefined;
+    },
   }
 };
