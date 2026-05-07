@@ -36,6 +36,16 @@ import { getStacObjectsForEvent, getStyle } from 'ol-stac/util.js';
 import { STACReference } from 'stac-js';
 import MapUtils from './maps/mapUtils.js';
 import GeoJSON from 'ol/format/GeoJSON.js';
+import { transformExtent } from 'ol/proj';
+import VectorLayer from 'ol/layer/Vector';
+import VectorSource from 'ol/source/Vector';
+import Feature from 'ol/Feature';
+import { fromExtent } from 'ol/geom/Polygon';
+import Point from 'ol/geom/Point';
+import { getCenter, getWidth, getHeight } from 'ol/extent';
+import { Stroke, Style, Fill, Circle as CircleStyle } from 'ol/style';
+import proj4 from 'proj4';
+import { register } from 'ol/proj/proj4.js';
 
 const selectStyle = getStyle('#ff0000', 2, null);
 let mapId = 0;
@@ -265,6 +275,105 @@ export default {
         .filter(layer => MapUtils.isLayerVisible(this.map, layer))
         .map(layer => layer.get('stac'))
         .filter(stac => stac instanceof STACReference);
+    },
+    async resolveExtent(bbox, sourceCrs) {
+      if (!this.map || !bbox || bbox.length !== 4) {return null;}
+
+      const fromCrs = sourceCrs || 'EPSG:4326';
+      if (fromCrs !== 'EPSG:4326' && fromCrs !== 'EPSG:3857' && !proj4.defs(fromCrs)) {
+        const match = fromCrs.match(/^EPSG:(\d+)$/);
+        if (match) {
+          try {
+            const resp = await fetch(`https://epsg.io/${match[1]}.proj4`);
+            if (resp.ok) {
+              const proj4def = await resp.text();
+              proj4.defs(fromCrs, proj4def.trim());
+              register(proj4);
+            }
+          } catch (e) {
+            console.warn('Failed to fetch CRS definition for', fromCrs, e);
+          }
+        }
+      }
+
+      const mapProjection = this.map.getView().getProjection().getCode();
+      try {
+        return transformExtent(bbox, fromCrs, mapProjection);
+      } catch (e) {
+        console.warn('CRS transform failed', e);
+        return null;
+      }
+    },
+    pulseExtent(extent) {
+      if (!this.map) {return;}
+
+      const mapRes = this.map.getView().getResolution() || 1;
+      const extentWidth = getWidth(extent);
+      const extentHeight = getHeight(extent);
+      const tooSmall = extentWidth < mapRes * 20 && extentHeight < mapRes * 20;
+
+      const feature = tooSmall
+        ? new Feature(new Point(getCenter(extent)))
+        : new Feature(fromExtent(extent));
+
+      const source = new VectorSource({ features: [feature], attributions: [] });
+      const layer = new VectorLayer({ source });
+      this.map.addLayer(layer);
+
+      const duration = 8000;
+      const start = Date.now();
+      const map = this.map;
+      const interval = setInterval(() => {
+        const elapsed = Date.now() - start;
+        if (elapsed >= duration || !map) {
+          clearInterval(interval);
+          try { map?.removeLayer(layer); } catch { /* ignore */ }
+          return;
+        }
+        const phase = (elapsed / 800) * Math.PI;
+        const pulse = 0.4 + 0.5 * Math.abs(Math.sin(phase));
+        try {
+          if (tooSmall) {
+            layer.setStyle(new Style({
+              image: new CircleStyle({
+                radius: 6 + 3 * Math.abs(Math.sin(phase)),
+                fill: new Fill({ color: `rgba(255, 200, 0, ${pulse})` }),
+                stroke: new Stroke({ color: `rgba(200, 150, 0, ${pulse})`, width: 2 }),
+              }),
+            }));
+          } else {
+            layer.setStyle(new Style({
+              stroke: new Stroke({
+                color: `rgba(255, 200, 0, ${pulse})`,
+                width: 2 + 2 * Math.abs(Math.sin(phase)),
+              }),
+              fill: new Fill({ color: `rgba(255, 200, 0, ${pulse * 0.15})` }),
+            }));
+          }
+        } catch { /* ignore */ }
+      }, 50);
+    },
+    async zoomToBbox(bbox, sourceCrs) {
+      if (!this.map) {return;}
+      const extent = await this.resolveExtent(bbox, sourceCrs);
+      if (!extent) {return;}
+
+      try {
+        this.map.getView().fit(extent, {
+          padding: [50, 50, 50, 50],
+          maxZoom: 18,
+        });
+      } catch (e) {
+        console.warn('Map fit failed', e);
+        return;
+      }
+
+      this.pulseExtent(extent);
+    },
+    async highlightBbox(bbox, sourceCrs) {
+      const extent = await this.resolveExtent(bbox, sourceCrs);
+      if (!extent) {return;}
+      this.pulseExtent(extent);
     }
   }
 };
