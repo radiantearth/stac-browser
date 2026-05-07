@@ -336,7 +336,7 @@ export default {
           if (tooSmall) {
             layer.setStyle(new Style({
               image: new CircleStyle({
-                radius: 8 + 4 * Math.abs(Math.sin(phase)),
+                radius: 6 + 3 * Math.abs(Math.sin(phase)),
                 fill: new Fill({ color: `rgba(255, 200, 0, ${pulse})` }),
                 stroke: new Stroke({ color: `rgba(200, 150, 0, ${pulse})`, width: 2 }),
               }),
