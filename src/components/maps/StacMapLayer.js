@@ -24,8 +24,6 @@ const PMTILES_MIME_TYPES = [
   'application/vnd.pmtiles',
 ];
 
-let deckOverlay = null;
-
 export default class StacMapLayer {
   constructor(map, options = {}) {
     this.map = map;
@@ -36,6 +34,7 @@ export default class StacMapLayer {
     this.layerIds = [];
     this.sourceIds = [];
     this._cogLayers = [];
+    this._deckOverlay = null;
     this._pmtilesLayerIds = [];
     this._pmtilesSourceIds = [];
   }
@@ -321,12 +320,12 @@ export default class StacMapLayer {
         });
       });
 
-      if (deckOverlay) {
-        this.map.removeControl(deckOverlay);
+      if (this._deckOverlay) {
+        this.map.removeControl(this._deckOverlay);
       }
 
-      deckOverlay = new MapboxOverlay({ layers });
-      this.map.addControl(deckOverlay);
+      this._deckOverlay = new MapboxOverlay({ layers });
+      this.map.addControl(this._deckOverlay);
       this._cogLayers = layers;
     } catch (err) {
       console.warn('Failed to load COG layers via deck.gl', err);
@@ -387,7 +386,7 @@ export default class StacMapLayer {
     this._removePmtilesLayers();
   }
 
-  readdAfterStyleChange() {
+  async readdAfterStyleChange() {
     const { stac, children, assets } = this;
     this.layerIds = [];
     this.sourceIds = [];
@@ -395,7 +394,7 @@ export default class StacMapLayer {
     this._pmtilesSourceIds = [];
     if (stac) this.setStac(stac);
     if (children) this.setChildren(children);
-    if (assets) this.setAssets(assets);
+    if (assets) await this.setAssets(assets);
   }
 
   _addSource(id, spec) {
@@ -454,9 +453,9 @@ export default class StacMapLayer {
   }
 
   _removeCogLayers() {
-    if (deckOverlay && this.map) {
-      try { this.map.removeControl(deckOverlay); } catch { /* already removed */ }
-      deckOverlay = null;
+    if (this._deckOverlay && this.map) {
+      try { this.map.removeControl(this._deckOverlay); } catch { /* already removed */ }
+      this._deckOverlay = null;
     }
     this._cogLayers = [];
   }
