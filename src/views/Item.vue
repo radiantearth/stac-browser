@@ -7,7 +7,7 @@
           <b-card no-body class="maps-preview">
             <b-tabs v-model="tab" ref="tabs" card pills vertical end>
               <b-tab :title="$t('map')" :id="tabIds.map" no-body>
-                <MapView :stac="data" :assets="selectedAssets" @changed="dataChanged" @empty="handleEmptyMap" />
+                <MapView ref="mapView" :stac="data" :assets="selectedAssets" @changed="dataChanged" @empty="handleEmptyMap" />
               </b-tab>
               <b-tab v-if="hasThumbnails" :id="tabIds.thumbnails" :title="$t('thumbnails')" no-body>
                 <Thumbnails :thumbnails="thumbnails" />
@@ -16,6 +16,7 @@
           </b-card>
         </section>
         <Assets v-if="hasAssets" :assets="assets" :shown="selectedReferences" @show-asset="showAsset" autoExpand />
+        <ParquetViewer v-if="hasAssets" :assets="assets" @zoom-to-bbox="zoomToBbox" />
         <LinkList v-if="additionalLinks.length > 0" :title="$t('additionalResources')" :links="additionalLinks" />
         <WidgetHook id="view-item-primary-end" />
       </b-col>
@@ -67,7 +68,8 @@ export default defineComponent({
     MetadataGroups: defineAsyncComponent(() => import('../components/MetadataGroups.vue')),
     Providers: defineAsyncComponent(() => import('../components/Providers.vue')),
     ReadMore,
-    Thumbnails: defineAsyncComponent(() => import('../components/Thumbnails.vue'))
+    Thumbnails: defineAsyncComponent(() => import('../components/Thumbnails.vue')),
+    ParquetViewer: defineAsyncComponent(() => import('../components/ParquetViewer.vue'))
   },
   mixins: [
     ShowAssetLinkMixin,
@@ -78,6 +80,13 @@ export default defineComponent({
     ...mapGetters(['collectionLink', 'parentLink']),
     ignoredMetadataFields() {
       return getIgnoredFields(this.data);
+    }
+  },
+  methods: {
+    zoomToBbox(bbox) {
+      if (this.$refs.mapView?.zoomToBbox) {
+        this.$refs.mapView.zoomToBbox(bbox);
+      }
     }
   },
   watch: {
