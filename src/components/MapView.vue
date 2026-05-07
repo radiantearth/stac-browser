@@ -275,7 +275,7 @@ export default {
         .filter(stac => stac instanceof STACReference);
     },
     async zoomToBbox(bbox, sourceCrs) {
-      if (!this.map || !bbox || bbox.length !== 4) return;
+      if (!this.map || !bbox || bbox.length !== 4) {return;}
 
       const fromCrs = sourceCrs || 'EPSG:4326';
       if (fromCrs !== 'EPSG:4326' && fromCrs !== 'EPSG:3857' && !proj4.defs(fromCrs)) {
@@ -328,7 +328,7 @@ export default {
         opacity -= 0.0075;
         if (opacity <= 0 || !map) {
           clearInterval(interval);
-          try { map?.removeLayer(layer); } catch {}
+          try { map?.removeLayer(layer); } catch { /* ignore */ }
           return;
         }
         layer.setStyle(new Style({

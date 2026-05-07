@@ -6,7 +6,7 @@
         type="text"
         class="form-control form-control-sm parquet-filter-input"
         :placeholder="$t('parquet.filterPlaceholder', 'Filter rows...')"
-      />
+      >
       <select v-model="filterColumn" class="form-select form-select-sm parquet-filter-column">
         <option value="">{{ $t('parquet.allColumns', 'All columns') }}</option>
         <option v-for="col in displayColumns" :key="col" :value="col">{{ col }}</option>
@@ -37,7 +37,7 @@
               <span v-if="sortColumn === col" class="parquet-sort-indicator">
                 {{ sortDirection === 'asc' ? '↑' : '↓' }}
               </span>
-              <span v-else class="parquet-sort-indicator parquet-sort-inactive">{{'↕'}}</span>
+              <span v-else class="parquet-sort-indicator parquet-sort-inactive">{{ '↕' }}</span>
             </th>
             <th v-if="geometryColumn" class="parquet-header-cell parquet-geom-col">
               {{ geometryColumn }}
@@ -45,7 +45,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(row, idx) in visibleRows" :key="row._origIndex">
+          <tr v-for="row in visibleRows" :key="row._origIndex">
             <td v-for="col in displayColumns" :key="col" class="parquet-data-cell">
               <a v-if="isUrl(row[col])" :href="row[col]" target="_blank" rel="noopener">{{ formatCellValue(row[col]) }}</a>
               <template v-else>{{ formatCellValue(row[col]) }}</template>
@@ -57,8 +57,8 @@
                 @click="zoomToRow(row)"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
-                  <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85zm-5.242.656a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z"/>
-                  <path d="M6.5 3a.5.5 0 0 1 .5.5V6h2.5a.5.5 0 0 1 0 1H7v2.5a.5.5 0 0 1-1 0V7H3.5a.5.5 0 0 1 0-1H6V3.5a.5.5 0 0 1 .5-.5z"/>
+                  <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85zm-5.242.656a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z" />
+                  <path d="M6.5 3a.5.5 0 0 1 .5.5V6h2.5a.5.5 0 0 1 0 1H7v2.5a.5.5 0 0 1-1 0V7H3.5a.5.5 0 0 1 0-1H6V3.5a.5.5 0 0 1 .5-.5z" />
                 </svg>
               </button>
             </td>
@@ -114,13 +114,13 @@ export default {
   computed: {
     hiddenColumns() {
       const hidden = new Set();
-      if (this.geometryColumn) hidden.add(this.geometryColumn);
+      if (this.geometryColumn) {hidden.add(this.geometryColumn);}
       if (this.bboxMapping) {
         Object.values(this.bboxMapping).forEach(col => {
           if (col) {
             hidden.add(col);
             const parent = col.split('.')[0];
-            if (parent !== col) hidden.add(parent);
+            if (parent !== col) {hidden.add(parent);}
           }
         });
       }
@@ -170,9 +170,9 @@ export default {
       return [...this.filteredRows].sort((a, b) => {
         const va = a[col];
         const vb = b[col];
-        if (va == null && vb == null) return 0;
-        if (va == null) return 1;
-        if (vb == null) return -1;
+        if (va == null && vb == null) {return 0;}
+        if (va == null) {return 1;}
+        if (vb == null) {return -1;}
         if (typeof va === 'number' && typeof vb === 'number') {
           return (va - vb) * dir;
         }
@@ -201,8 +201,8 @@ export default {
       return typeof val === 'string' && (val.startsWith('http://') || val.startsWith('https://'));
     },
     formatCellValue(val) {
-      if (val == null) return '';
-      if (val instanceof Uint8Array || val instanceof ArrayBuffer) return '[binary]';
+      if (val == null) {return '';}
+      if (val instanceof Uint8Array || val instanceof ArrayBuffer) {return '[binary]';}
       if (typeof val === 'object') {
         try {
           return JSON.stringify(val);
@@ -210,16 +210,16 @@ export default {
           return String(val);
         }
       }
-      if (typeof val === 'bigint') return val.toString();
+      if (typeof val === 'bigint') {return val.toString();}
       return val;
     },
     getNestedValue(row, path) {
-      if (!path) return undefined;
-      if (row[path] !== undefined) return row[path];
+      if (!path) {return undefined;}
+      if (row[path] !== undefined) {return row[path];}
       const parts = path.split('.');
       let val = row;
       for (const part of parts) {
-        if (val == null) return undefined;
+        if (val == null) {return undefined;}
         val = val[part];
       }
       return val;
