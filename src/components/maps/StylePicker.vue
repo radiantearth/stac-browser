@@ -5,6 +5,17 @@
         {{ style.title }}
       </option>
     </select>
+    <div v-if="legend.length > 0" class="legend-panel">
+      <button class="legend-toggle" @click="legendOpen = !legendOpen">
+        {{ legendOpen ? '▾' : '▸' }} Legend
+      </button>
+      <ul v-if="legendOpen" class="legend-items">
+        <li v-for="(item, i) in legend" :key="i">
+          <span class="legend-swatch" :style="{ backgroundColor: item.color }" />
+          {{ item.label }}
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
@@ -14,10 +25,14 @@ export default {
   props: {
     styles: { type: Array, default: () => [] },
     activeIndex: { type: Number, default: 0 },
+    legend: { type: Array, default: () => [] },
   },
   emits: ['change'],
   data() {
-    return { selected: this.activeIndex };
+    return {
+      selected: this.activeIndex,
+      legendOpen: true,
+    };
   },
   watch: {
     activeIndex(val) { this.selected = val; },
@@ -31,7 +46,7 @@ export default {
   position: absolute;
   z-index: 2;
   left: 10px;
-  bottom: 30px;
+  bottom: 70px;
 
   select {
     font-size: 0.85rem;
@@ -42,5 +57,49 @@ export default {
     cursor: pointer;
     max-width: 200px;
   }
+}
+
+.legend-panel {
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  margin-top: 4px;
+  max-width: 200px;
+}
+
+.legend-toggle {
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  font-size: 0.8rem;
+  padding: 2px 6px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.legend-items {
+  list-style: none;
+  margin: 0;
+  padding: 0 6px 4px;
+  max-height: 200px;
+  overflow-y: auto;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    line-height: 1.6;
+  }
+}
+
+.legend-swatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
 }
 </style>

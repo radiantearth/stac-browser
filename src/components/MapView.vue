@@ -6,6 +6,7 @@
       <StylePicker
         :styles="availableStyles"
         :activeIndex="activeStyleIndex"
+        :legend="activeLegend"
         @change="applyStyleAtIndex"
       />
       <TextControl v-if="empty" :text="$t('mapping.nodata')" />
@@ -91,6 +92,7 @@ export default {
       mapId: `map-${++mapId}`,
       availableStyles: [],
       activeStyleIndex: 0,
+      activeLegend: [],
     };
   },
   computed: {
@@ -146,6 +148,7 @@ export default {
       try {
         this.availableStyles = [];
         this.activeStyleIndex = 0;
+        this.activeLegend = [];
         if (this.stacLayer) {
           this.stacLayer.remove();
           this.stacLayer = null;
@@ -213,8 +216,10 @@ export default {
           const { loadStyleJson: loadJson } = await import('../utils/portolanStyles.js');
           styleEntry._cached = await loadJson(styleEntry.href);
         }
+        const { extractLegend } = await import('../utils/portolanStyles.js');
         this.stacLayer.applyGlStyle(styleEntry._cached);
         this.activeStyleIndex = index;
+        this.activeLegend = extractLegend(styleEntry._cached);
       } catch (err) {
         console.warn('Failed to apply style:', styleEntry.name, err);
       }
