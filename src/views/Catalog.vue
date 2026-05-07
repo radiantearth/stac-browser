@@ -1,7 +1,7 @@
 <template>
   <div :class="{cc: true, [cssStacType]: true, empty: !hasCatalogs && !hasItems}" :key="data.id">
     <section v-if="isCollection" class="hero-map">
-      <MapView :stac="data" v-bind="mapData" @changed="dataChanged" @empty="handleEmptyMap" popover hideFootprint />
+      <MapView ref="mapView" :stac="data" v-bind="mapData" @changed="dataChanged" @empty="handleEmptyMap" popover hideFootprint />
     </section>
     <b-row>
       <b-col class="meta">
@@ -39,6 +39,7 @@
         </section>
         <Assets v-if="hasAssets" :assets="assets" :shown="selectedReferences" @show-asset="showAsset" />
         <Assets v-if="hasItemAssets && !hasItems" :assets="itemAssets" :definition="true" />
+        <ParquetViewer v-if="hasAssets" :assets="assets" @zoom-to-bbox="zoomToBbox" />
         <Providers v-if="providers" :providers="providers" />
         <MetadataGroups class="mb-4" :type="data.type" :data="data" :ignoreFields="ignoredMetadataFields" />
         <LinkList v-if="linkPosition === 'right'" :title="$t('additionalResources')" :links="additionalLinks" />
@@ -105,7 +106,8 @@ export default defineComponent({
     MetadataGroups: defineAsyncComponent(() => import('../components/MetadataGroups.vue')),
     Providers: defineAsyncComponent(() => import('../components/Providers.vue')),
     ReadMore,
-    Thumbnails: defineAsyncComponent(() => import('../components/Thumbnails.vue'))
+    Thumbnails: defineAsyncComponent(() => import('../components/Thumbnails.vue')),
+    ParquetViewer: defineAsyncComponent(() => import('../components/ParquetViewer.vue'))
   },
   mixins: [
     ShowAssetLinkMixin,
@@ -248,6 +250,11 @@ export default defineComponent({
           error,
           message: this.$t('errors.loadItems')
         });
+      }
+    },
+    zoomToBbox(bbox) {
+      if (this.$refs.mapView?.zoomToBbox) {
+        this.$refs.mapView.zoomToBbox(bbox);
       }
     },
     async filterItems(filters, reset) {
