@@ -203,6 +203,9 @@
     },
     "nobasemap": "No basemaps available.",
     "nodata": "No spatial information available in the metadata.",
+    "styles": {
+      "select": "Select map style"
+    },
     "zoom": {
       "in": {
         "description": "Zoom in",
