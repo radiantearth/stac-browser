@@ -1,5 +1,8 @@
 import { STACReference } from 'stac-js';
-import { PMTiles } from 'pmtiles';
+import { PMTiles, SharedPromiseCache } from 'pmtiles';
+import { pmtilesProtocol } from './MapMixin.js';
+
+const sharedCache = new SharedPromiseCache(300);
 
 const STAC_SOURCE = 'stac-footprint';
 const STAC_FILL_LAYER = 'stac-footprint-fill';
@@ -191,7 +194,8 @@ export default class StacMapLayer {
       const sourceId = `stac-pmtiles-${i}`;
 
       try {
-        const pm = new PMTiles(url);
+        const pm = new PMTiles(url, sharedCache);
+        pmtilesProtocol.add(pm);
         const header = await pm.getHeader();
 
         if (header.tileType === 1) {

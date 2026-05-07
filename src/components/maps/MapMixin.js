@@ -4,8 +4,8 @@ import { Protocol } from 'pmtiles';
 import { markRaw } from 'vue';
 import configureBasemap from '../../../basemaps.config';
 
-const protocol = new Protocol({ metadata: true });
-maplibregl.addProtocol('pmtiles', protocol.tile);
+export const pmtilesProtocol = new Protocol({ metadata: true });
+maplibregl.addProtocol('pmtiles', pmtilesProtocol.tile);
 
 const MAPTERHORN_SOURCE_ID = 'mapterhorn-terrain';
 const MAPTERHORN_HILLSHADE_ID = 'mapterhorn-hillshade';
@@ -46,6 +46,7 @@ export default {
         zoom: 1,
         attributionControl: false,
         interactive: !onfocusOnly,
+        maxTileCacheSize: 300,
       }));
 
       this.map.addControl(new maplibregl.NavigationControl({ showCompass: true }), 'top-right');
