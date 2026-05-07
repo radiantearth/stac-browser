@@ -119,6 +119,16 @@ export default {
   async mounted() {
     await this.showStacLayer();
   },
+  beforeUnmount() {
+    if (this.stacLayer) {
+      this.stacLayer.remove();
+      this.stacLayer = null;
+    }
+    if (this.map) {
+      this.map.remove();
+      this.map = null;
+    }
+  },
   methods: {
     async showStacLayer() {
       if (this._showingStacLayer) return;

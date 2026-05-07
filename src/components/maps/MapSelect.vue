@@ -141,6 +141,16 @@ export default {
     await this.initMap();
     this.updateBboxValues();
   },
+  beforeUnmount() {
+    if (this.bboxDraw) {
+      this.bboxDraw.destroy();
+      this.bboxDraw = null;
+    }
+    if (this.map) {
+      this.map.remove();
+      this.map = null;
+    }
+  },
   methods: {
     async initMap() {
       this.map = null;
