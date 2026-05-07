@@ -61,6 +61,7 @@
     "chart.js": "^4.3.0",
     "commonmark": "^0.31.2",
     "hyparquet": "^1.25.6",
+    "hyparquet-compressors": "^1.1.1",
     "oidc-client-ts": "^3.0.1",
     "ol": "^10.9.0",
     "ol-stac": "^1.4.0",

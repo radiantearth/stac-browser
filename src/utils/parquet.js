@@ -1,11 +1,12 @@
 import { asyncBufferFromUrl, parquetMetadataAsync, parquetRead, parquetSchema } from 'hyparquet';
+import { compressors } from 'hyparquet-compressors';
 
 const PARQUET_MEDIA_TYPES = [
   'application/vnd.apache.parquet',
   'application/x-parquet'
 ];
 
-const MAX_ROWS = 50000;
+const MAX_ROWS = 10000;
 
 const WKB_TYPES = {
   0: 'Unknown',
@@ -61,15 +62,30 @@ function detectGeometryInfo(metadata, columnNames) {
       }
     }
 
+    let crs = 'EPSG:4326';
+    let crsDefinition = null;
+    if (columnMeta?.crs) {
+      const projjson = columnMeta.crs;
+      const auth = projjson.id?.authority;
+      const code = projjson.id?.code;
+      if (auth && code) {
+        crs = `${auth}:${code}`;
+      }
+      if (crs !== 'EPSG:4326' && crs !== 'EPSG:3857') {
+        crsDefinition = projjson;
+      }
+    }
+
     return {
       geometryColumn: primaryColumn,
       bboxMapping,
-      crs: columnMeta?.crs?.id?.code === 4326 || !columnMeta?.crs ? 'EPSG:4326' : null,
+      crs,
+      crsDefinition,
     };
   }
 
   const geomCol = columnNames.find(n => n === 'geometry' || n === 'geom');
-  return geomCol ? { geometryColumn: geomCol, bboxMapping: null, crs: 'EPSG:4326' } : null;
+  return geomCol ? { geometryColumn: geomCol, bboxMapping: null, crs: 'EPSG:4326', crsDefinition: null } : null;
 }
 
 function detectBboxColumns(columnNames) {
@@ -217,6 +233,7 @@ export async function loadParquetMetadata(url) {
     geometryColumn: geoInfo?.geometryColumn || null,
     bboxMapping: standaloneBbox,
     crs: geoInfo?.crs || null,
+    crsDefinition: geoInfo?.crsDefinition || null,
   };
 }
 
@@ -229,6 +246,7 @@ export async function loadParquetRows(file, metadata, columnNames, geometryColum
     parquetRead({
       file,
       metadata,
+      compressors,
       columns: columnsToRead,
       rowStart: 0,
       rowEnd,
@@ -248,6 +266,7 @@ export async function loadGeometryTypesForRows(file, metadata, geometryColumn, r
     parquetRead({
       file,
       metadata,
+      compressors,
       columns: [geometryColumn],
       rowStart: 0,
       rowEnd,
@@ -270,6 +289,7 @@ export async function getBboxForRow(file, metadata, geometryColumn, rowIndex) {
     parquetRead({
       file,
       metadata,
+      compressors,
       columns: [geometryColumn],
       rowStart: rowIndex,
       rowEnd: rowIndex + 1,

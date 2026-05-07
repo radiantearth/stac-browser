@@ -42,6 +42,8 @@ import VectorSource from 'ol/source/Vector';
 import Feature from 'ol/Feature';
 import { fromExtent } from 'ol/geom/Polygon';
 import { Stroke, Style } from 'ol/style';
+import proj4 from 'proj4';
+import { register } from 'ol/proj/proj4.js';
 
 const selectStyle = getStyle('#ff0000', 2, null);
 let mapId = 0;
@@ -272,35 +274,61 @@ export default {
         .map(layer => layer.get('stac'))
         .filter(stac => stac instanceof STACReference);
     },
-    zoomToBbox(bbox) {
+    async zoomToBbox(bbox, sourceCrs) {
       if (!this.map || !bbox || bbox.length !== 4) return;
 
+      const fromCrs = sourceCrs || 'EPSG:4326';
+      if (fromCrs !== 'EPSG:4326' && fromCrs !== 'EPSG:3857' && !proj4.defs(fromCrs)) {
+        const match = fromCrs.match(/^EPSG:(\d+)$/);
+        if (match) {
+          try {
+            const resp = await fetch(`https://epsg.io/${match[1]}.proj4`);
+            if (resp.ok) {
+              const proj4def = await resp.text();
+              proj4.defs(fromCrs, proj4def.trim());
+              register(proj4);
+            }
+          } catch (e) {
+            console.warn('Failed to fetch CRS definition for', fromCrs, e);
+          }
+        }
+      }
+
       const mapProjection = this.map.getView().getProjection().getCode();
-      const extent = transformExtent(bbox, 'EPSG:4326', mapProjection);
+      let extent;
+      try {
+        extent = transformExtent(bbox, fromCrs, mapProjection);
+      } catch (e) {
+        console.warn('CRS transform failed', e);
+        return;
+      }
 
-      this.map.getView().fit(extent, {
-        padding: [50, 50, 50, 50],
-        maxZoom: 18,
-        duration: 500,
-      });
+      try {
+        this.map.getView().fit(extent, {
+          padding: [50, 50, 50, 50],
+          maxZoom: 18,
+          duration: 500,
+        });
+      } catch (e) {
+        console.warn('Map fit failed', e);
+        return;
+      }
 
-      // Pulse highlight
       const feature = new Feature(fromExtent(extent));
-      const source = new VectorSource({ features: [feature] });
-      const layer = new VectorLayer({
-        source,
-        style: new Style({
-          stroke: new Stroke({ color: 'rgba(65, 99, 204, 0.9)', width: 3 }),
-        }),
-      });
+      const source = new VectorSource({ features: [feature], attributions: [] });
+      const layer = new VectorLayer({ source });
+      layer.setStyle(new Style({
+        stroke: new Stroke({ color: 'rgba(65, 99, 204, 0.9)', width: 3 }),
+      }));
       this.map.addLayer(layer);
 
       let opacity = 0.9;
+      const map = this.map;
       const interval = setInterval(() => {
-        opacity -= 0.045;
-        if (opacity <= 0) {
+        opacity -= 0.0075;
+        if (opacity <= 0 || !map) {
           clearInterval(interval);
-          this.map.removeLayer(layer);
+          try { map?.removeLayer(layer); } catch {}
           return;
         }
         layer.setStyle(new Style({

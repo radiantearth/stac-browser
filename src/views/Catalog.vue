@@ -252,9 +252,9 @@ export default defineComponent({
         });
       }
     },
-    zoomToBbox(bbox) {
+    zoomToBbox({ bbox, crs }) {
       if (this.$refs.mapView?.zoomToBbox) {
-        this.$refs.mapView.zoomToBbox(bbox);
+        this.$refs.mapView.zoomToBbox(bbox, crs);
       }
     },
     async filterItems(filters, reset) {

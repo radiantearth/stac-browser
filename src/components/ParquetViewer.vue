@@ -1,5 +1,5 @@
 <template>
-  <section v-if="parquetAssets.length > 0" class="parquet-viewer mb-4" :class="{ 'parquet-expanded': expanded }">
+  <section v-if="parquetAssets.length > 0" class="parquet-viewer mb-4">
     <div class="parquet-header" @click="open = !open">
       <span class="parquet-header-left">
         <BIconChevronDown v-if="open" />
@@ -19,18 +19,6 @@
           </option>
         </select>
         <span v-if="rowInfo" class="parquet-meta-info">{{ rowInfo }}</span>
-        <button
-          v-if="open"
-          class="btn btn-sm parquet-expand-btn"
-          :class="expanded ? 'btn-primary' : 'btn-outline-primary'"
-          :title="expanded ? $t('parquet.collapse', 'Collapse') : $t('parquet.expand', 'Expand')"
-          @click.stop="expanded = !expanded"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
-            <path v-if="!expanded" d="M5.828 10.172a.5.5 0 0 0-.707 0l-4.096 4.096V11.5a.5.5 0 0 0-1 0v3.975a.5.5 0 0 0 .5.5H4.5a.5.5 0 0 0 0-1H1.732l4.096-4.096a.5.5 0 0 0 0-.707zm4.344-4.344a.5.5 0 0 0 .707 0l4.096-4.096V4.5a.5.5 0 1 0 1 0V.525a.5.5 0 0 0-.5-.5H11.5a.5.5 0 0 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 0 .707z"/>
-            <path v-else d="M.172 15.828a.5.5 0 0 0 .707 0l4.096-4.096V14.5a.5.5 0 1 0 1 0v-3.975a.5.5 0 0 0-.5-.5H1.5a.5.5 0 0 0 0 1h2.768L.172 15.121a.5.5 0 0 0 0 .707zM15.828.172a.5.5 0 0 0-.707 0L11.025 4.268V1.5a.5.5 0 1 0-1 0v3.975a.5.5 0 0 0 .5.5H14.5a.5.5 0 0 0 0-1h-2.768L15.828.879a.5.5 0 0 0 0-.707z"/>
-          </svg>
-        </button>
       </span>
     </div>
     <b-collapse v-model="open">
@@ -70,6 +58,7 @@ import {
   loadParquetRows,
   loadGeometryTypesForRows,
   getBboxForRow,
+  MAX_ROWS,
 } from '../utils/parquet';
 
 export default {
@@ -91,7 +80,6 @@ export default {
   data() {
     return {
       open: true,
-      expanded: false,
       loading: false,
       loadingMessage: '',
       error: null,
@@ -99,7 +87,7 @@ export default {
       parquetFile: null,
       parquetMetadata: null,
       tableData: null,
-      geoInfo: { geometryColumn: null, bboxMapping: null, crs: null },
+      geoInfo: { geometryColumn: null, bboxMapping: null, crs: null, crsDefinition: null },
       geometryTypes: [],
     };
   },
@@ -152,9 +140,10 @@ export default {
           geometryColumn: meta.geometryColumn,
           bboxMapping: meta.bboxMapping,
           crs: meta.crs,
+          crsDefinition: meta.crsDefinition,
         };
 
-        this.loadingMessage = `Loading rows (${Math.min(meta.totalRows, 50000).toLocaleString()})...`;
+        this.loadingMessage = `Loading rows (${Math.min(meta.totalRows, MAX_ROWS).toLocaleString()})...`;
         const data = await loadParquetRows(
           meta.file, meta.metadata, meta.columnNames, meta.geometryColumn
         );
@@ -178,9 +167,17 @@ export default {
         this.loadingMessage = '';
       }
     },
+    scrollToMap() {
+      const mapEl = document.querySelector('.hero-map, .maps-preview');
+      if (mapEl) {
+        mapEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    },
     async onZoomToFeature({ origIndex, bbox }) {
+      const crs = this.geoInfo.crs || 'EPSG:4326';
       if (bbox) {
-        this.$emit('zoom-to-bbox', bbox);
+        this.$emit('zoom-to-bbox', { bbox, crs });
+        this.scrollToMap();
         return;
       }
       if (this.geoInfo.geometryColumn && this.parquetFile && this.parquetMetadata) {
@@ -190,7 +187,8 @@ export default {
             this.geoInfo.geometryColumn, origIndex
           );
           if (parsedBbox) {
-            this.$emit('zoom-to-bbox', parsedBbox);
+            this.$emit('zoom-to-bbox', { bbox: parsedBbox, crs });
+            this.scrollToMap();
           }
         } catch (err) {
           console.warn('Failed to parse geometry for zoom', err);
@@ -263,11 +261,6 @@ export default {
   white-space: nowrap;
 }
 
-.parquet-expand-btn {
-  padding: 0.15rem 0.4rem;
-  line-height: 1;
-}
-
 .parquet-loading {
   display: flex;
   align-items: center;
@@ -280,14 +273,4 @@ export default {
   font-size: 0.9rem;
 }
 
-.parquet-expanded {
-  margin-left: calc(-1 * #{$block-margin});
-  margin-right: calc(-1 * #{$block-margin});
-  padding-left: $block-margin;
-  padding-right: $block-margin;
-
-  .parquet-scroll-container {
-    max-height: 600px;
-  }
-}
 </style>

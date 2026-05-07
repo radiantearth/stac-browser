@@ -27,7 +27,6 @@
       <table class="table table-sm table-striped parquet-data-table">
         <thead>
           <tr>
-            <th v-if="hasGeometry" class="parquet-zoom-col"></th>
             <th
               v-for="col in displayColumns"
               :key="col"
@@ -47,24 +46,21 @@
         </thead>
         <tbody>
           <tr v-for="(row, idx) in visibleRows" :key="row._origIndex">
-            <td v-if="hasGeometry" class="parquet-zoom-col">
+            <td v-for="col in displayColumns" :key="col" class="parquet-data-cell">
+              <a v-if="isUrl(row[col])" :href="row[col]" target="_blank" rel="noopener">{{ formatCellValue(row[col]) }}</a>
+              <template v-else>{{ formatCellValue(row[col]) }}</template>
+            </td>
+            <td v-if="geometryColumn" class="parquet-data-cell parquet-geom-col">
               <button
-                v-if="canZoomRow(row)"
                 class="btn btn-link btn-sm parquet-zoom-btn p-0"
                 :title="$t('parquet.zoomToFeature', 'Zoom to feature')"
                 @click="zoomToRow(row)"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
                   <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85zm-5.242.656a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z"/>
                   <path d="M6.5 3a.5.5 0 0 1 .5.5V6h2.5a.5.5 0 0 1 0 1H7v2.5a.5.5 0 0 1-1 0V7H3.5a.5.5 0 0 1 0-1H6V3.5a.5.5 0 0 1 .5-.5z"/>
                 </svg>
               </button>
-            </td>
-            <td v-for="col in displayColumns" :key="col" class="parquet-data-cell">
-              {{ formatCellValue(row[col]) }}
-            </td>
-            <td v-if="geometryColumn" class="parquet-data-cell parquet-geom-col">
-              {{ row._geomType || '' }}
             </td>
           </tr>
         </tbody>
@@ -116,11 +112,28 @@ export default {
     };
   },
   computed: {
-    hasGeometry() {
-      return Boolean(this.geometryColumn);
+    hiddenColumns() {
+      const hidden = new Set();
+      if (this.geometryColumn) hidden.add(this.geometryColumn);
+      if (this.bboxMapping) {
+        Object.values(this.bboxMapping).forEach(col => {
+          if (col) {
+            hidden.add(col);
+            const parent = col.split('.')[0];
+            if (parent !== col) hidden.add(parent);
+          }
+        });
+      }
+      for (const col of this.columns) {
+        const lower = col.toLowerCase();
+        if (lower.includes('bbox') || lower === 'xmin' || lower === 'ymin' || lower === 'xmax' || lower === 'ymax') {
+          hidden.add(col);
+        }
+      }
+      return hidden;
     },
     displayColumns() {
-      return this.columns.filter(c => c !== this.geometryColumn);
+      return this.columns.filter(c => !this.hiddenColumns.has(c));
     },
     indexedRows() {
       return this.rows.map((row, i) => {
@@ -184,6 +197,9 @@ export default {
         this.sortDirection = 'asc';
       }
     },
+    isUrl(val) {
+      return typeof val === 'string' && (val.startsWith('http://') || val.startsWith('https://'));
+    },
     formatCellValue(val) {
       if (val == null) return '';
       if (val instanceof Uint8Array || val instanceof ArrayBuffer) return '[binary]';
@@ -197,20 +213,25 @@ export default {
       if (typeof val === 'bigint') return val.toString();
       return val;
     },
-    canZoomRow(row) {
-      if (this.bboxMapping) {
-        return row[this.bboxMapping.xmin] != null;
+    getNestedValue(row, path) {
+      if (!path) return undefined;
+      if (row[path] !== undefined) return row[path];
+      const parts = path.split('.');
+      let val = row;
+      for (const part of parts) {
+        if (val == null) return undefined;
+        val = val[part];
       }
-      return Boolean(this.geometryColumn);
+      return val;
     },
     zoomToRow(row) {
       let bbox = null;
       if (this.bboxMapping) {
         bbox = [
-          row[this.bboxMapping.xmin],
-          row[this.bboxMapping.ymin],
-          row[this.bboxMapping.xmax],
-          row[this.bboxMapping.ymax],
+          this.getNestedValue(row, this.bboxMapping.xmin),
+          this.getNestedValue(row, this.bboxMapping.ymin),
+          this.getNestedValue(row, this.bboxMapping.xmax),
+          this.getNestedValue(row, this.bboxMapping.ymax),
         ];
         if (bbox.some(v => v == null)) {
           bbox = null;
@@ -300,12 +321,6 @@ export default {
   text-overflow: ellipsis;
 }
 
-.parquet-zoom-col {
-  width: 32px;
-  text-align: center;
-  padding: 0.25rem !important;
-}
-
 .parquet-zoom-btn {
   color: $primary;
   line-height: 1;
@@ -319,7 +334,4 @@ export default {
   font-style: italic;
 }
 
-.parquet-expanded .parquet-scroll-container {
-  max-height: 600px;
-}
 </style>

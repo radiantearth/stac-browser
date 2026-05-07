@@ -83,9 +83,9 @@ export default defineComponent({
     }
   },
   methods: {
-    zoomToBbox(bbox) {
+    zoomToBbox({ bbox, crs }) {
       if (this.$refs.mapView?.zoomToBbox) {
-        this.$refs.mapView.zoomToBbox(bbox);
+        this.$refs.mapView.zoomToBbox(bbox, crs);
       }
     }
   },
