@@ -1,17 +1,16 @@
 <template>
   <div class="map-container">
     <div ref="map" class="map">
-      <!-- this will be filled by OpenLayers -->
-      <TextControl :text="help" :map="map" />
+      <TextControl :text="help" />
       <UserLocationControl :map="map" :maxZoom="maxZoom" />
-      <LayerControl :map="map" :maxZoom="maxZoom" />
+      <LayerControl :map="map" :basemaps="basemaps" :activeBasemapIndex="activeBasemapIndex" @switch-basemap="switchBasemap" />
+      <TerrainControl :is3D="is3D" @toggle="toggle3D" />
     </div>
     <div class="bbox-controls">
       <b-form class="compass-grid" @change="applyManualBbox" @submit.prevent="applyManualBbox">
-        <!-- North Latitude (top center) -->
-        <b-form-group 
-          :label="$t('mapping.bboxSelect.northLat')" 
-          label-for="northLat" 
+        <b-form-group
+          :label="$t('mapping.bboxSelect.northLat')"
+          label-for="northLat"
           class="compass-input compass-top"
           :state="validationErrors.northLat ? false : null"
         >
@@ -25,10 +24,9 @@
           {{ validationErrors.northLat }}
         </b-form-invalid-feedback>
 
-        <!-- West Longitude (left center) -->
-        <b-form-group 
-          :label="$t('mapping.bboxSelect.westLon')" 
-          label-for="westLon" 
+        <b-form-group
+          :label="$t('mapping.bboxSelect.westLon')"
+          label-for="westLon"
           class="compass-input compass-left"
           :state="validationErrors.westLon ? false : null"
         >
@@ -42,10 +40,9 @@
           {{ validationErrors.westLon }}
         </b-form-invalid-feedback>
 
-        <!-- East Longitude (right center) -->
-        <b-form-group 
-          :label="$t('mapping.bboxSelect.eastLon')" 
-          label-for="eastLon" 
+        <b-form-group
+          :label="$t('mapping.bboxSelect.eastLon')"
+          label-for="eastLon"
           class="compass-input compass-right"
           :state="validationErrors.eastLon ? false : null"
         >
@@ -59,10 +56,9 @@
           {{ validationErrors.eastLon }}
         </b-form-invalid-feedback>
 
-        <!-- South Latitude (bottom center) -->
-        <b-form-group 
-          :label="$t('mapping.bboxSelect.southLat')" 
-          label-for="southLat" 
+        <b-form-group
+          :label="$t('mapping.bboxSelect.southLat')"
+          label-for="southLat"
           class="compass-input compass-bottom"
           :state="validationErrors.southLat ? false : null"
         >
@@ -85,16 +81,9 @@ import { mapState } from 'vuex';
 import MapMixin from './MapMixin.js';
 import LayerControl from './LayerControl.vue';
 import TextControl from './TextControl.vue';
+import TerrainControl from './TerrainControl.vue';
 import UserLocationControl from './UserLocationControl.vue';
-import {shiftKeyOnly} from 'ol/events/condition.js';
-import ExtentInteraction from 'ol/interaction/Extent';
-import { containsXY } from 'ol/extent';
-import { transformExtent } from 'ol/proj';
-import Style, { createDefaultStyle } from 'ol/style/Style';
-import VectorSource from 'ol/source/Vector';
-import GeoJSON from 'ol/format/GeoJSON';
-import Fill from 'ol/style/Fill';
-import VectorLayer from 'ol/layer/Vector';
+import BboxDrawInteraction from './BboxDrawInteraction.js';
 import { toGeoJSON } from 'stac-js/src/geo.js';
 import mask from '@turf/mask';
 
@@ -112,7 +101,8 @@ export default {
   components: {
     LayerControl,
     TextControl,
-    UserLocationControl
+    TerrainControl,
+    UserLocationControl,
   },
   mixins: [
     MapMixin
@@ -130,21 +120,14 @@ export default {
   emits: ['update:modelValue'],
   data() {
     return {
-      crs: 'EPSG:4326',
       extent: this.modelValue,
-      dragging: false,
       validationErrors: getBoxDefaults(),
-      bboxValues: getBoxDefaults()
+      bboxValues: getBoxDefaults(),
+      bboxDraw: null,
     };
   },
   computed: {
     ...mapState(['uiLanguage']),
-    projectedExtent() {
-      if (this.extent) {
-        return this.stacToOlExtent(this.extent);
-      }
-      return null;
-    },
     help() {
       return this.extent ? this.$t('mapping.bboxSelect.remove') : this.$t('mapping.bboxSelect.add');
     }
@@ -158,124 +141,98 @@ export default {
     await this.initMap();
     this.updateBboxValues();
   },
+  beforeUnmount() {
+    if (this.bboxDraw) {
+      this.bboxDraw.destroy();
+      this.bboxDraw = null;
+    }
+    if (this.map) {
+      this.map.remove();
+      this.map = null;
+    }
+  },
   methods: {
     async initMap() {
       this.map = null;
 
       await this.createMap(this.$refs.map, this.stac, true);
 
-      // Add extent interaction for bbox selection
-      const condition = (event) => {
-        if (event.type === 'singleclick') {
-          if (!this.extent) {
-            const pixelSize = this.map.getSize().map(xy => xy * 0.2);
-            const extent = this.map.getView().calculateExtent(pixelSize);
-            const extentSize = [
-              extent[2] - extent[0],
-              extent[3] - extent[1]
-            ];
-            const mouseExtent = [
-              event.coordinate[0] - extentSize[0],
-              event.coordinate[1] - extentSize[1],
-              event.coordinate[0] + extentSize[0],
-              event.coordinate[1] + extentSize[1],
-            ];
-            this.interaction.setExtent(mouseExtent);
-            return false;
-          }
-          else if (containsXY(this.projectedExtent, ...event.coordinate)) {
-            this.interaction.setExtent(null);
-            this.interaction.vertexOverlay_.getSource().clear();
-            this.interaction.vertexFeature_ = null;
-          }
-        }
-        else if (this.interaction.handlingDownUpSequence || this.interaction.snapToVertex_(event.pixel, event.map)) {
-          return true;
-        }
-        return shiftKeyOnly(event);
-      };
-      this.interaction = new ExtentInteraction({
-        extent: this.projectedExtent,
-        condition,
-        boxStyle: createDefaultStyle()
+      this.bboxDraw = new BboxDrawInteraction(this.map, (extent) => {
+        this.extent = extent;
+        this.updateBboxValues();
+        this.$emit('update:modelValue', extent);
+        this.validationErrors = getBoxDefaults();
       });
-      this.interaction.on('extentchanged', this.update);
-      this.map.addInteraction(this.interaction);
-  
+
+      if (this.extent) {
+        this.bboxDraw.setExtent(this.extent);
+      }
+
+      this.map.on('click', (e) => {
+        if (this.extent) {
+          const bounds = [[this.extent[0], this.extent[1]], [this.extent[2], this.extent[3]]];
+          const lngLat = e.lngLat;
+          if (lngLat.lng >= bounds[0][0] && lngLat.lng <= bounds[1][0] &&
+              lngLat.lat >= bounds[0][1] && lngLat.lat <= bounds[1][1]) {
+            this.extent = null;
+            this.clearBboxValues();
+            this.$emit('update:modelValue', null);
+            this.bboxDraw.setExtent(null);
+            this.validationErrors = getBoxDefaults();
+          }
+        }
+      });
+
       if (this.stac) {
         this.addMask(this.stac);
       }
 
-      let extent;
-      if (this.projectedExtent) {
-        extent = this.projectedExtent;
-      }
-      else if (this.stac) {
-        extent = this.stacToOlExtent(this.stac.getBoundingBox());
-      }
-      if (extent) {
-        this.map.getView().fit(extent, { padding: [50,50,50,50], maxZoom: this.maxZoom });
+      if (this.extent) {
+        this.map.fitBounds(
+          [[this.extent[0], this.extent[1]], [this.extent[2], this.extent[3]]],
+          { padding: 50, maxZoom: this.maxZoom }
+        );
+      } else if (this.stac) {
+        const bbox = this.stac.getBoundingBox();
+        if (bbox) {
+          this.map.fitBounds(
+            [[bbox[0], bbox[1]], [bbox[2], bbox[3]]],
+            { padding: 50, maxZoom: this.maxZoom }
+          );
+        }
       }
     },
+
     addMask(stac) {
-      // Darken areas outside of the available area
-      if (!stac || typeof stac.toGeoJSON !== 'function') {
-        return;
-      }
+      if (!stac || typeof stac.toGeoJSON !== 'function') return;
 
       const geojson = stac.toGeoJSON();
-      if (!geojson) {
-        return;
-      }
+      if (!geojson) return;
 
-      // Create a mask for the available area
       const world = toGeoJSON([-180, -90, 180, 90]);
       const masked = mask(geojson, world);
 
-      // Parse the GeoJSON
-      const features = new GeoJSON().readFeatures(masked, {
-        featureProjection: this.map.getView().getProjection(),
+      this.map.addSource('stac-mask', {
+        type: 'geojson',
+        data: masked,
       });
-
-      /// Add the mask layer, make it half-transparent
-      const maskLayer = new VectorLayer({
-        source: new VectorSource({ features }),
-        style: new Style({
-          fill: new Fill({
-            color: 'rgba(0, 0, 0, 0.5)',
-          }),
-        }),
+      this.map.addLayer({
+        id: 'stac-mask-layer',
+        type: 'fill',
+        source: 'stac-mask',
+        paint: {
+          'fill-color': 'rgba(0, 0, 0, 0.5)',
+        },
       });
-      this.map.addLayer(maskLayer);
     },
+
     fixX(x) {
-      // Normalize longitude to -180 to 180 range
-      // For antimeridian crossing, westLon can be > eastLon
-      while (x > 180) {x -= 360;}
-      while (x < -180) {x += 360;}
+      while (x > 180) { x -= 360; }
+      while (x < -180) { x += 360; }
       return x;
     },
     fixY(y) {
       return Math.max(-90, Math.min(90, y));
-    },
-    update(event) {
-      if (event.extent) {
-        this.extent = transformExtent(event.extent, this.map.getView().getProjection(), this.crs);
-        const extent = [
-          this.fixX(this.extent[0]),
-          this.fixY(this.extent[1]),
-          this.fixX(this.extent[2]),
-          this.fixY(this.extent[3])
-        ];
-        this.updateBboxValues();
-        this.$emit('update:modelValue', extent);
-      }
-      else {
-        this.extent = null;
-        this.clearBboxValues();
-        this.$emit('update:modelValue', null);
-      }
-      this.validationErrors = getBoxDefaults();
     },
     updateBboxValues() {
       if (this.extent && Array.isArray(this.extent) && this.extent.length === 4) {
@@ -294,30 +251,17 @@ export default {
       const { westLon, southLat, eastLon, northLat } = this.bboxValues;
       const errors = getBoxDefaults();
       const incompleteMsg = this.$t('mapping.bboxSelect.error.incomplete');
-      
-      // Check all values are present - show error on fields that are empty
-      if (westLon === '') {
-        errors.westLon = incompleteMsg;
-      }
-      if (southLat === '') {
-        errors.southLat = incompleteMsg;
-      }
-      if (eastLon === '') {
-        errors.eastLon = incompleteMsg;
-      }
-      if (northLat === '') {
-        errors.northLat = incompleteMsg;
-      }
-      
-      // If any value is empty, return early
-      // null = Field was never filled, '' = Field was touched but left empty
+
+      if (westLon === '') { errors.westLon = incompleteMsg; }
+      if (southLat === '') { errors.southLat = incompleteMsg; }
+      if (eastLon === '') { errors.eastLon = incompleteMsg; }
+      if (northLat === '') { errors.northLat = incompleteMsg; }
+
       if (Object.values(this.bboxValues).some(value => value === '' || value === null)) {
         this.validationErrors = errors;
         return false;
       }
-      
-      // Check longitude values are in valid range (-180 to 180)
-      // Per STAC spec, westLon can be > eastLon for antimeridian crossing
+
       if (westLon < -180 || westLon > 180) {
         errors.westLon = this.$t('mapping.bboxSelect.error.invalidLon');
       }
@@ -325,25 +269,20 @@ export default {
         errors.eastLon = this.$t('mapping.bboxSelect.error.invalidLon');
       }
 
-      // Longitude order: westLon must be < eastLon unless crossing the antimeridian.
-      // Antimeridian crossing is when west is in positive longitudes and east is in
-      // negative longitudes (e.g., westLon=170, eastLon=-170 wraps across 180°).
       if (!errors.westLon && !errors.eastLon) {
         const crossesAntimeridian = westLon > 0 && eastLon < 0;
         if (westLon >= eastLon && !crossesAntimeridian) {
           errors.westLon = this.$t('mapping.bboxSelect.error.lonOrder');
         }
       }
-      
-      // Check latitude values (must be between -90 and 90)
+
       if (southLat < -90 || southLat > 90) {
         errors.southLat = this.$t('mapping.bboxSelect.error.invalidLat');
       }
       if (northLat < -90 || northLat > 90) {
         errors.northLat = this.$t('mapping.bboxSelect.error.invalidLat');
       }
-      
-      // Check latitude order (southLat must be < northLat)
+
       if (southLat >= northLat) {
         errors.southLat = this.$t('mapping.bboxSelect.error.latOrder');
       }
@@ -353,52 +292,37 @@ export default {
     },
     applyManualBbox() {
       const valid = this.validateBbox();
-      if (!valid) {
-        return;
-      }
-      
-      // Clear any previous errors
+      if (!valid) return;
+
       this.validationErrors = getBoxDefaults();
-      
-      if (!this.map || !this.interaction) {
-        return;
-      }
-      
+
+      if (!this.map) return;
+
       const extent = [
         this.bboxValues.westLon,
         this.bboxValues.southLat,
         this.bboxValues.eastLon,
         this.bboxValues.northLat
       ];
-      
-      // Update local state and emit STAC-compliant bbox to parent
+
       this.extent = extent;
       this.$emit('update:modelValue', extent);
 
-      // Update map to show the extent
-      const projectedExtent = this.stacToOlExtent(extent);
-      this.map.getView().fit(projectedExtent, { padding: [50,50,50,50], maxZoom: this.maxZoom });
-      // Update the interaction to show the extent on the map
-      this.interaction.setExtent(projectedExtent);
+      this.map.fitBounds(
+        [[extent[0], extent[1]], [extent[2], extent[3]]],
+        { padding: 50, maxZoom: this.maxZoom }
+      );
+
+      if (this.bboxDraw) {
+        this.bboxDraw.setExtent(extent);
+      }
     },
-    stacToOlExtent(extent) {
-      if (!Array.isArray(extent) || extent.length !== 4) {
-        return null;
-      }
-      const mapExtent = [...extent];
-      // For antimeridian-crossing bboxes (westLon > eastLon), shift eastLon
-      // by +360 so OpenLayers gets a valid extent where minX < maxX.
-      if (mapExtent[0] > mapExtent[2]) {
-        mapExtent[2] += 360;
-      }
-      return transformExtent(mapExtent, this.crs, this.map.getView().getProjection());
-    }
   }
 };
 </script>
 
 <style lang="scss">
-@import "ol/ol.css";
+@import "maplibre-gl/dist/maplibre-gl.css";
 </style>
 
 <style lang="scss" scoped>

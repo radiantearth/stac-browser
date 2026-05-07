@@ -48,6 +48,10 @@
   "license": "ISC",
   "dependencies": {
     "@apidevtools/json-schema-ref-parser": "^15.2.2",
+    "@deck.gl/core": "^9.1.0",
+    "@deck.gl/layers": "^9.1.0",
+    "@deck.gl/mapbox": "^9.1.0",
+    "@developmentseed/deck.gl-geotiff": "^0.1.0",
     "@musement/iso-duration": "^1.0.0",
     "@radiantearth/stac-fields": "~1.5.9",
     "@radiantearth/stac-migrate": "~2.0.2",
@@ -62,9 +66,9 @@
     "commonmark": "^0.31.2",
     "hyparquet": "^1.25.6",
     "hyparquet-compressors": "^1.1.1",
+    "maplibre-gl": "^5.1.0",
     "oidc-client-ts": "^3.0.1",
-    "ol": "^10.9.0",
-    "ol-stac": "^1.4.0",
+    "pmtiles": "^4.0.0",
     "proj4": "^2.16.1",
     "remove-markdown": "^0.6.2",
     "shiki": "^3.22.0",
@@ -104,9 +108,6 @@
     "vite": "^7.2.2",
     "vite-plugin-ejs": "^1.7.0",
     "vite-plugin-node-polyfills": "^0.25.0"
-  },
-  "optionalDependencies": {
-    "ol-mapbox-style": "~13.2.0"
   },
   "browserslist": [
     "> 1%",

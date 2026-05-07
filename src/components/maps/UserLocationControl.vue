@@ -1,55 +1,66 @@
 <template>
-  <div class="ol-location ol-unselectable ol-control" style="pointer-events: auto;">
-    <button @click.prevent.stop="request" :title="$t('mapping.location.description')">
+  <div class="map-location-control">
+    <button
+      class="maplibregl-ctrl maplibregl-ctrl-group location-btn"
+      @click.prevent.stop="request"
+      :title="$t('mapping.location.description')"
+    >
       <b-icon-pin-map-fill />
     </button>
   </div>
 </template>
 
 <script>
-import Point from 'ol/geom/Point';
-import ControlMixin from './ControlMixin';
-import { fromLonLat } from 'ol/proj';
-
 export default {
   name: 'UserLocationControl',
-  mixins: [
-    ControlMixin
-  ],
   props: {
+    map: {
+      type: Object,
+      default: null,
+    },
     maxZoom: {
       type: Number,
-      default: undefined
+      default: 16
     }
   },
   methods: {
     request() {
-      if ("geolocation" in navigator) {
-        navigator.geolocation.getCurrentPosition(
-          position => {
-            const view = this.map.getView();
-            const coords = fromLonLat([position.coords.longitude, position.coords.latitude], view.getProjection());
-            const point = new Point(coords);
-            view.fit(point, {maxZoom: this.maxZoom});
-          },
-          error => this.$store.commit('showGlobalError', {
-            error,
-            message: error.message
-          }),
-          {
-            maximumAge: Infinity
-          }
-        );
-      }
+      if (!this.map || !("geolocation" in navigator)) return;
+      navigator.geolocation.getCurrentPosition(
+        position => {
+          this.map.flyTo({
+            center: [position.coords.longitude, position.coords.latitude],
+            zoom: this.maxZoom,
+          });
+        },
+        error => this.$store.commit('showGlobalError', {
+          error,
+          message: error.message
+        }),
+        { maximumAge: Infinity }
+      );
     },
   }
 };
 </script>
 
 <style lang="scss" scoped>
-.ol-location {
-  z-index: 1;
-  left: 0.5em;
-  top: calc(3.75em + 6px);
+.map-location-control {
+  position: absolute;
+  z-index: 2;
+  left: 10px;
+  top: 80px;
+}
+
+.location-btn {
+  cursor: pointer;
+  width: 29px;
+  height: 29px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border: none;
+  padding: 0;
 }
 </style>

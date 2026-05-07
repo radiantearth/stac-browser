@@ -1,23 +1,33 @@
 <template>
-  <div class="ol-layercontrol ol-unselectable ol-control" style="pointer-events: auto;">
-    <button v-if="id" :id="id"><b-icon-layers-fill /></button>
+  <div v-if="basemaps && basemaps.length > 1" class="map-layercontrol">
+    <button :id="buttonId" class="maplibregl-ctrl maplibregl-ctrl-group layer-btn">
+      <b-icon-layers-fill />
+    </button>
     <b-popover
-      v-if="id" click placement="top" @show="update"
-      :target="id" teleport-to="#stac-browser" :boundary-padding="10"
+      v-if="buttonId" click placement="top" @show="update"
+      :target="buttonId" teleport-to="#stac-browser" :boundary-padding="10"
     >
       <div class="layercontrol">
         <section>
           <h5>{{ $t('mapping.layers.base') }}</h5>
-          <span v-if="baseLayers.length === 0">{{ $t('mapping.nobasemap') }}</span>
-          <b-form-radio-group v-else v-model="visibleBaseLayer">
-            <b-form-radio v-for="layer in baseLayers" :key="layer.id" :value="layer.id">
-              {{ layer.title }}
+          <b-form-radio-group v-model="selectedIndex">
+            <b-form-radio v-for="(bm, i) in basemaps" :key="i" :value="i">
+              {{ bm.title }}
             </b-form-radio>
           </b-form-radio-group>
         </section>
-        <section v-if="hasLayers">
+        <section v-if="overlayLayers.length > 0">
           <h5>{{ $t('mapping.layers.title') }}</h5>
-          <LayerControlGroup :map="map" :group="layerGroup" />
+          <ul>
+            <li v-for="layer in overlayLayers" :key="layer.id">
+              <b-form-checkbox
+                :model-value="layer.visible"
+                @update:model-value="toggleOverlay(layer, $event)"
+              >
+                {{ layer.title }}
+              </b-form-checkbox>
+            </li>
+          </ul>
         </section>
       </div>
     </b-popover>
@@ -25,98 +35,116 @@
 </template>
 
 <script>
-import { defineAsyncComponent, markRaw } from 'vue';
-import ControlMixin from './ControlMixin';
-import LayerControlMixin from './LayerControlMixin';
-import Group from 'ol/layer/Group';
-import MapUtils from './mapUtils';
+import { defineAsyncComponent } from 'vue';
 
 export default {
   name: 'LayerControl',
   components: {
     BPopover: defineAsyncComponent(() => import('bootstrap-vue-next').then(m => m.BPopover)),
-    LayerControlGroup: defineAsyncComponent(() => import('./LayerControlGroup.vue'))
   },
-  mixins: [
-    ControlMixin,
-    LayerControlMixin
-  ],
   props: {
-    maxZoom: {
+    map: {
+      type: Object,
+      default: null,
+    },
+    basemaps: {
+      type: Array,
+      default: () => [],
+    },
+    activeBasemapIndex: {
       type: Number,
-      default: undefined
-    }
+      default: 0,
+    },
+    stacLayer: {
+      type: Object,
+      default: null,
+    },
   },
+  emits: ['switch-basemap'],
   data() {
     return {
-      id: null,
-      baseLayers: [],
-      visibleBaseLayer: null,
-      layerGroup: null
+      buttonId: null,
+      selectedIndex: this.activeBasemapIndex,
+      overlayLayers: [],
     };
-  },
-  computed: {
-    hasLayers() {
-      return this.layerGroup && (this.layerGroup.getLayers().getLength() - this.baseLayers.length) > 0;
-    }
   },
   watch: {
     map(map) {
-      this.id = map.ol_uid;
+      if (map) {
+        this.buttonId = 'layer-ctrl-' + Date.now();
+      }
     },
-    visibleBaseLayer(newId, oldId) {
-      if (oldId === null || oldId === newId) {
-        return;
+    activeBasemapIndex(val) {
+      this.selectedIndex = val;
+    },
+    selectedIndex(newVal, oldVal) {
+      if (oldVal !== null && newVal !== oldVal) {
+        this.$emit('switch-basemap', newVal);
       }
-      let projection;
-      for (const data of this.baseLayers) {
-        data.layer.setVisible(data.id === newId);
-        if (data.id === newId) {
-          if (data.layer instanceof Group) {
-            const layerWithProjection = data.layer.getLayers().getArray()
-              .map(layer => layer.getSource().getProjection())
-              .filter(projection => Boolean(projection));
-            projection = layerWithProjection.length > 0 ? layerWithProjection[0] : null;
-          }
-          else {
-            projection = data.layer.getSource().getProjection();
-          }
-        }
-      }
-      if (projection) {
-        MapUtils.reproject(this.map, projection);
-      }
-    }
+    },
   },
   methods: {
     update() {
-      this.layerGroup = markRaw(this.map.getLayerGroup());
-      this.baseLayers = [];
-      for (const layer of this.layerGroup.getLayers().getArray()) {
-        if (!layer.get('base')) {
-          continue;
-        }
-        const data = {
-          layer: markRaw(layer),
-          id: layer.ol_uid,
-          title: this.getTitle(layer)
-        };
-        this.baseLayers.push(data);
-        if (MapUtils.isLayerVisible(this.map, layer)) {
-          this.visibleBaseLayer = data.id;
+      if (!this.stacLayer) {
+        this.overlayLayers = [];
+        return;
+      }
+      const footprintIds = this.stacLayer.getFootprintLayerIds();
+      const childrenIds = this.stacLayer.getChildrenLayerIds();
+      const layers = [];
+      if (footprintIds.length > 0) {
+        const vis = this.map?.getLayoutProperty(footprintIds[0], 'visibility');
+        layers.push({
+          id: 'footprint',
+          title: this.$t('mapping.layers.footprint'),
+          visible: vis !== 'none',
+          layerIds: footprintIds,
+        });
+      }
+      if (childrenIds.length > 0) {
+        const vis = this.map?.getLayoutProperty(childrenIds[0], 'visibility');
+        layers.push({
+          id: 'children',
+          title: this.$t('mapping.layers.title'),
+          visible: vis !== 'none',
+          layerIds: childrenIds,
+        });
+      }
+      this.overlayLayers = layers;
+    },
+    toggleOverlay(layer, visible) {
+      const val = visible ? 'visible' : 'none';
+      for (const id of layer.layerIds) {
+        if (this.map?.getLayer(id)) {
+          this.map.setLayoutProperty(id, 'visibility', val);
         }
       }
-    }
-  }
+      layer.visible = visible;
+    },
+  },
 };
 </script>
 
 <style lang="scss" scoped>
-.ol-layercontrol {
-  z-index: 1;
-  left: 0.5em;
-  bottom: 0.5em;
+.map-layercontrol {
+  position: absolute;
+  z-index: 2;
+  left: 10px;
+  bottom: 30px;
 }
+
+.layer-btn {
+  cursor: pointer;
+  width: 29px;
+  height: 29px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border: none;
+  padding: 0;
+}
+
 .layercontrol {
   max-width: 300px;
   max-height: 500px;
@@ -124,7 +152,7 @@ export default {
   margin-top: -0.5rem;
   margin-left: -0.75rem;
   margin-right: -0.75rem;
-  padding: 0.5rem 0.75rem 0  0.75rem;
+  padding: 0.5rem 0.75rem 0 0.75rem;
 
   ul {
     list-style: none;
@@ -136,6 +164,7 @@ export default {
     }
   }
 }
+
 h5 {
   font-weight: bold;
   font-size: 1em;
