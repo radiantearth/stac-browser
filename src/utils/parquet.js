@@ -136,16 +136,16 @@ export function bboxFromWkb(buffer) {
       const x = view.getFloat64(offset, littleEndian);
       const y = view.getFloat64(offset + 8, littleEndian);
       offset += coordSize;
-      if (x < xmin) xmin = x;
-      if (x > xmax) xmax = x;
-      if (y < ymin) ymin = y;
-      if (y > ymax) ymax = y;
+      if (x < xmin) {xmin = x;}
+      if (x > xmax) {xmax = x;}
+      if (y < ymin) {ymin = y;}
+      if (y > ymax) {ymax = y;}
     }
 
     function readLinearRing() {
       const numPoints = view.getUint32(offset, littleEndian);
       offset += 4;
-      for (let i = 0; i < numPoints; i++) readCoord();
+      for (let i = 0; i < numPoints; i++) {readCoord();}
     }
 
     if (typeId === 1) {
@@ -155,7 +155,7 @@ export function bboxFromWkb(buffer) {
     } else if (typeId === 3) {
       const numRings = view.getUint32(offset, littleEndian);
       offset += 4;
-      for (let i = 0; i < numRings; i++) readLinearRing();
+      for (let i = 0; i < numRings; i++) {readLinearRing();}
     } else if (typeId === 4 || typeId === 5 || typeId === 6) {
       const numGeoms = view.getUint32(offset, littleEndian);
       offset += 4;
@@ -171,10 +171,10 @@ export function bboxFromWkb(buffer) {
           const x = view.getFloat64(offset, subLe);
           const y = view.getFloat64(offset + 8, subLe);
           offset += subCoordSize;
-          if (x < xmin) xmin = x;
-          if (x > xmax) xmax = x;
-          if (y < ymin) ymin = y;
-          if (y > ymax) ymax = y;
+          if (x < xmin) {xmin = x;}
+          if (x > xmax) {xmax = x;}
+          if (y < ymin) {ymin = y;}
+          if (y > ymax) {ymax = y;}
         } else if (subType === 2) {
           const n = view.getUint32(offset, subLe);
           offset += 4;
@@ -182,10 +182,10 @@ export function bboxFromWkb(buffer) {
             const x = view.getFloat64(offset, subLe);
             const y = view.getFloat64(offset + 8, subLe);
             offset += subCoordSize;
-            if (x < xmin) xmin = x;
-            if (x > xmax) xmax = x;
-            if (y < ymin) ymin = y;
-            if (y > ymax) ymax = y;
+            if (x < xmin) {xmin = x;}
+            if (x > xmax) {xmax = x;}
+            if (y < ymin) {ymin = y;}
+            if (y > ymax) {ymax = y;}
           }
         } else if (subType === 3) {
           const numRings = view.getUint32(offset, subLe);
@@ -197,10 +197,10 @@ export function bboxFromWkb(buffer) {
               const x = view.getFloat64(offset, subLe);
               const y = view.getFloat64(offset + 8, subLe);
               offset += subCoordSize;
-              if (x < xmin) xmin = x;
-              if (x > xmax) xmax = x;
-              if (y < ymin) ymin = y;
-              if (y > ymax) ymax = y;
+              if (x < xmin) {xmin = x;}
+              if (x > xmax) {xmax = x;}
+              if (y < ymin) {ymin = y;}
+              if (y > ymax) {ymax = y;}
             }
           }
         }
@@ -209,7 +209,7 @@ export function bboxFromWkb(buffer) {
       return null;
     }
 
-    if (xmin === Infinity) return null;
+    if (xmin === Infinity) {return null;}
     return [xmin, ymin, xmax, ymax];
   } catch {
     return null;
@@ -261,7 +261,7 @@ export async function loadParquetRows(file, metadata, columnNames, geometryColum
 }
 
 export async function loadGeometryTypesForRows(file, metadata, geometryColumn, rowEnd) {
-  if (!geometryColumn) return [];
+  if (!geometryColumn) {return [];}
   return new Promise((resolve, reject) => {
     parquetRead({
       file,

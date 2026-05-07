@@ -274,8 +274,8 @@ export default {
         .map(layer => layer.get('stac'))
         .filter(stac => stac instanceof STACReference);
     },
-    async zoomToBbox(bbox, sourceCrs) {
-      if (!this.map || !bbox || bbox.length !== 4) {return;}
+    async resolveExtent(bbox, sourceCrs) {
+      if (!this.map || !bbox || bbox.length !== 4) {return null;}
 
       const fromCrs = sourceCrs || 'EPSG:4326';
       if (fromCrs !== 'EPSG:4326' && fromCrs !== 'EPSG:3857' && !proj4.defs(fromCrs)) {
@@ -295,25 +295,15 @@ export default {
       }
 
       const mapProjection = this.map.getView().getProjection().getCode();
-      let extent;
       try {
-        extent = transformExtent(bbox, fromCrs, mapProjection);
+        return transformExtent(bbox, fromCrs, mapProjection);
       } catch (e) {
         console.warn('CRS transform failed', e);
-        return;
+        return null;
       }
-
-      try {
-        this.map.getView().fit(extent, {
-          padding: [50, 50, 50, 50],
-          maxZoom: 18,
-          duration: 500,
-        });
-      } catch (e) {
-        console.warn('Map fit failed', e);
-        return;
-      }
-
+    },
+    pulseExtent(extent) {
+      if (!this.map) {return;}
       const feature = new Feature(fromExtent(extent));
       const source = new VectorSource({ features: [feature], attributions: [] });
       const layer = new VectorLayer({ source });
@@ -331,13 +321,37 @@ export default {
           try { map?.removeLayer(layer); } catch { /* ignore */ }
           return;
         }
-        layer.setStyle(new Style({
-          stroke: new Stroke({
-            color: `rgba(65, 99, 204, ${opacity})`,
-            width: 3 * (opacity / 0.9),
-          }),
-        }));
+        try {
+          layer.setStyle(new Style({
+            stroke: new Stroke({
+              color: `rgba(65, 99, 204, ${opacity})`,
+              width: 3 * (opacity / 0.9),
+            }),
+          }));
+        } catch { /* ignore */ }
       }, 50);
+    },
+    async zoomToBbox(bbox, sourceCrs) {
+      if (!this.map) {return;}
+      const extent = await this.resolveExtent(bbox, sourceCrs);
+      if (!extent) {return;}
+
+      try {
+        this.map.getView().fit(extent, {
+          padding: [50, 50, 50, 50],
+          maxZoom: 18,
+        });
+      } catch (e) {
+        console.warn('Map fit failed', e);
+        return;
+      }
+
+      this.pulseExtent(extent);
+    },
+    async highlightBbox(bbox, sourceCrs) {
+      const extent = await this.resolveExtent(bbox, sourceCrs);
+      if (!extent) {return;}
+      this.pulseExtent(extent);
     }
   }
 };

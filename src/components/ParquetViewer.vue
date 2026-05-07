@@ -42,6 +42,7 @@
         :geometryTypes="geometryTypes"
         :bboxMapping="geoInfo.bboxMapping"
         @zoom-to-feature="onZoomToFeature"
+        @select-row="onSelectRow"
       />
     </b-collapse>
   </section>
@@ -76,7 +77,7 @@ export default {
       required: true
     }
   },
-  emits: ['zoom-to-bbox'],
+  emits: ['zoom-to-bbox', 'highlight-bbox'],
   data() {
     return {
       open: true,
@@ -96,15 +97,15 @@ export default {
       return findParquetAssets(this.assets);
     },
     selectedAsset() {
-      if (!this.selectedAssetKey) return this.parquetAssets[0] || null;
+      if (!this.selectedAssetKey) {return this.parquetAssets[0] || null;}
       return this.parquetAssets.find(a => a.getKey() === this.selectedAssetKey) || this.parquetAssets[0];
     },
     selectedAssetTitle() {
-      if (!this.selectedAsset) return '';
+      if (!this.selectedAsset) {return '';}
       return this.selectedAsset.title || this.selectedAsset.getKey();
     },
     rowInfo() {
-      if (!this.tableData) return null;
+      if (!this.tableData) {return null;}
       if (this.tableData.loadedRows < this.tableData.totalRows) {
         return `${this.tableData.loadedRows.toLocaleString()} / ${this.tableData.totalRows.toLocaleString()} rows`;
       }
@@ -123,7 +124,7 @@ export default {
   },
   methods: {
     async loadData() {
-      if (!this.selectedAsset) return;
+      if (!this.selectedAsset) {return;}
 
       this.loading = true;
       this.error = null;
@@ -171,6 +172,26 @@ export default {
       const mapEl = document.querySelector('.hero-map, .maps-preview');
       if (mapEl) {
         mapEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    },
+    async onSelectRow({ origIndex, bbox }) {
+      const crs = this.geoInfo.crs || 'EPSG:4326';
+      if (bbox) {
+        this.$emit('highlight-bbox', { bbox, crs });
+        return;
+      }
+      if (this.geoInfo.geometryColumn && this.parquetFile && this.parquetMetadata) {
+        try {
+          const parsedBbox = await getBboxForRow(
+            this.parquetFile, this.parquetMetadata,
+            this.geoInfo.geometryColumn, origIndex
+          );
+          if (parsedBbox) {
+            this.$emit('highlight-bbox', { bbox: parsedBbox, crs });
+          }
+        } catch (err) {
+          console.warn('Failed to parse geometry for highlight', err);
+        }
       }
     },
     async onZoomToFeature({ origIndex, bbox }) {

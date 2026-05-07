@@ -27,6 +27,9 @@
       <table class="table table-sm table-striped parquet-data-table">
         <thead>
           <tr>
+            <th v-if="geometryColumn" class="parquet-header-cell parquet-geom-col">
+              {{ geometryColumn }}
+            </th>
             <th
               v-for="col in displayColumns"
               :key="col"
@@ -39,28 +42,37 @@
               </span>
               <span v-else class="parquet-sort-indicator parquet-sort-inactive">{{ '↕' }}</span>
             </th>
-            <th v-if="geometryColumn" class="parquet-header-cell parquet-geom-col">
-              {{ geometryColumn }}
-            </th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="row in visibleRows" :key="row._origIndex">
-            <td v-for="col in displayColumns" :key="col" class="parquet-data-cell">
-              <a v-if="isUrl(row[col])" :href="row[col]" target="_blank" rel="noopener">{{ formatCellValue(row[col]) }}</a>
-              <template v-else>{{ formatCellValue(row[col]) }}</template>
-            </td>
+          <tr
+            v-for="row in visibleRows" :key="row._origIndex"
+            :class="{ 'parquet-row-selected': selectedIndex === row._origIndex }"
+            @click="selectRow(row)"
+          >
             <td v-if="geometryColumn" class="parquet-data-cell parquet-geom-col">
               <button
                 class="btn btn-link btn-sm parquet-zoom-btn p-0"
                 :title="$t('parquet.zoomToFeature', 'Zoom to feature')"
-                @click="zoomToRow(row)"
+                @click.stop="zoomToRow(row)"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
-                  <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85zm-5.242.656a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z" />
-                  <path d="M6.5 3a.5.5 0 0 1 .5.5V6h2.5a.5.5 0 0 1 0 1H7v2.5a.5.5 0 0 1-1 0V7H3.5a.5.5 0 0 1 0-1H6V3.5a.5.5 0 0 1 .5-.5z" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none"
+                  stroke="currentColor" stroke-width="1.5"
+                  viewBox="0 0 16 16"
+                >
+                  <circle cx="8" cy="8" r="6" />
+                  <circle cx="8" cy="8" r="2.5" />
+                  <line x1="8" y1="0.5" x2="8" y2="3" />
+                  <line x1="8" y1="13" x2="8" y2="15.5" />
+                  <line x1="0.5" y1="8" x2="3" y2="8" />
+                  <line x1="13" y1="8" x2="15.5" y2="8" />
                 </svg>
               </button>
+            </td>
+            <td v-for="col in displayColumns" :key="col" class="parquet-data-cell">
+              <a v-if="isUrl(row[col])" :href="row[col]" target="_blank" rel="noopener">{{ formatCellValue(row[col]) }}</a>
+              <template v-else>{{ formatCellValue(row[col]) }}</template>
             </td>
           </tr>
         </tbody>
@@ -102,13 +114,14 @@ export default {
       default: null
     }
   },
-  emits: ['zoom-to-feature'],
+  emits: ['zoom-to-feature', 'select-row'],
   data() {
     return {
       filterText: '',
       filterColumn: '',
       sortColumn: null,
       sortDirection: null,
+      selectedIndex: null,
     };
   },
   computed: {
@@ -224,6 +237,24 @@ export default {
       }
       return val;
     },
+    selectRow(row) {
+      this.selectedIndex = this.selectedIndex === row._origIndex ? null : row._origIndex;
+      if (this.selectedIndex !== null) {
+        let bbox = null;
+        if (this.bboxMapping) {
+          bbox = [
+            this.getNestedValue(row, this.bboxMapping.xmin),
+            this.getNestedValue(row, this.bboxMapping.ymin),
+            this.getNestedValue(row, this.bboxMapping.xmax),
+            this.getNestedValue(row, this.bboxMapping.ymax),
+          ];
+          if (bbox.some(v => v == null)) {
+            bbox = null;
+          }
+        }
+        this.$emit('select-row', { origIndex: row._origIndex, bbox });
+      }
+    },
     zoomToRow(row) {
       let bbox = null;
       if (this.bboxMapping) {
@@ -293,6 +324,10 @@ export default {
     z-index: 1;
     background: white;
   }
+
+  tbody tr {
+    cursor: pointer;
+  }
 }
 
 .parquet-header-cell {
@@ -319,6 +354,14 @@ export default {
   max-width: 300px;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.parquet-row-selected {
+  background-color: rgba($primary, 0.12) !important;
+
+  td {
+    border-color: rgba($primary, 0.2);
+  }
 }
 
 .parquet-zoom-btn {

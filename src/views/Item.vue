@@ -16,7 +16,7 @@
           </b-card>
         </section>
         <Assets v-if="hasAssets" :assets="assets" :shown="selectedReferences" @show-asset="showAsset" autoExpand />
-        <ParquetViewer v-if="hasAssets" :assets="assets" @zoom-to-bbox="zoomToBbox" />
+        <ParquetViewer v-if="hasAssets" :assets="assets" @zoom-to-bbox="zoomToBbox" @highlight-bbox="highlightBbox" />
         <LinkList v-if="additionalLinks.length > 0" :title="$t('additionalResources')" :links="additionalLinks" />
         <WidgetHook id="view-item-primary-end" />
       </b-col>
@@ -86,6 +86,11 @@ export default defineComponent({
     zoomToBbox({ bbox, crs }) {
       if (this.$refs.mapView?.zoomToBbox) {
         this.$refs.mapView.zoomToBbox(bbox, crs);
+      }
+    },
+    highlightBbox({ bbox, crs }) {
+      if (this.$refs.mapView?.highlightBbox) {
+        this.$refs.mapView.highlightBbox(bbox, crs);
       }
     }
   },
