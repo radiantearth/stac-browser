@@ -36,6 +36,12 @@ import { getStacObjectsForEvent, getStyle } from 'ol-stac/util.js';
 import { STACReference } from 'stac-js';
 import MapUtils from './maps/mapUtils.js';
 import GeoJSON from 'ol/format/GeoJSON.js';
+import { transformExtent } from 'ol/proj';
+import VectorLayer from 'ol/layer/Vector';
+import VectorSource from 'ol/source/Vector';
+import Feature from 'ol/Feature';
+import { fromExtent } from 'ol/geom/Polygon';
+import { Stroke, Style } from 'ol/style';
 
 const selectStyle = getStyle('#ff0000', 2, null);
 let mapId = 0;
@@ -265,6 +271,45 @@ export default {
         .filter(layer => MapUtils.isLayerVisible(this.map, layer))
         .map(layer => layer.get('stac'))
         .filter(stac => stac instanceof STACReference);
+    },
+    zoomToBbox(bbox) {
+      if (!this.map || !bbox || bbox.length !== 4) return;
+
+      const mapProjection = this.map.getView().getProjection().getCode();
+      const extent = transformExtent(bbox, 'EPSG:4326', mapProjection);
+
+      this.map.getView().fit(extent, {
+        padding: [50, 50, 50, 50],
+        maxZoom: 18,
+        duration: 500,
+      });
+
+      // Pulse highlight
+      const feature = new Feature(fromExtent(extent));
+      const source = new VectorSource({ features: [feature] });
+      const layer = new VectorLayer({
+        source,
+        style: new Style({
+          stroke: new Stroke({ color: 'rgba(65, 99, 204, 0.9)', width: 3 }),
+        }),
+      });
+      this.map.addLayer(layer);
+
+      let opacity = 0.9;
+      const interval = setInterval(() => {
+        opacity -= 0.045;
+        if (opacity <= 0) {
+          clearInterval(interval);
+          this.map.removeLayer(layer);
+          return;
+        }
+        layer.setStyle(new Style({
+          stroke: new Stroke({
+            color: `rgba(65, 99, 204, ${opacity})`,
+            width: 3 * (opacity / 0.9),
+          }),
+        }));
+      }, 50);
     }
   }
 };
