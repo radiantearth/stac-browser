@@ -11,22 +11,6 @@
       />
       <TextControl v-if="empty" :text="$t('mapping.nodata')" />
       <TextControl v-else-if="!hasBasemap" :text="$t('mapping.nobasemap')" />
-      <div class="expand-control">
-        <button
-          type="button"
-          :title="isExpanded ? 'Collapse map' : 'Expand map'"
-          @click="toggleExpand"
-        >
-          <svg v-if="!isExpanded" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="15 3 21 3 21 9" /><polyline points="9 21 3 21 3 15" />
-            <line x1="21" y1="3" x2="14" y2="10" /><line x1="3" y1="21" x2="10" y2="14" />
-          </svg>
-          <svg v-else viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="4 14 10 14 10 20" /><polyline points="20 10 14 10 14 4" />
-            <line x1="14" y1="10" x2="21" y2="3" /><line x1="3" y1="21" x2="10" y2="14" />
-          </svg>
-        </button>
-      </div>
     </div>
     <div ref="target" class="popover-target" />
     <b-popover
@@ -179,6 +163,7 @@ export default {
         if (!this.$refs.map) return;
 
         await this.createMap(this.$refs.map, this.stac, this.onfocusOnly);
+        this._addExpandControl();
 
         if (this.stac) {
           await this.addStacLayer();
@@ -298,8 +283,37 @@ export default {
       });
     },
 
-    toggleExpand() {
+    _addExpandControl() {
+      if (!this.map) return;
+      const vm = this;
+      const ctrl = {
+        onAdd() {
+          const container = document.createElement('div');
+          container.className = 'maplibregl-ctrl maplibregl-ctrl-group';
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.title = 'Expand map';
+          btn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>';
+          btn.style.display = 'flex';
+          btn.style.alignItems = 'center';
+          btn.style.justifyContent = 'center';
+          btn.addEventListener('click', () => vm.toggleExpand(btn));
+          container.appendChild(btn);
+          return container;
+        },
+        onRemove() {}
+      };
+      this.map.addControl(ctrl, 'top-right');
+    },
+
+    toggleExpand(btn) {
       this.isExpanded = !this.isExpanded;
+      if (btn) {
+        btn.title = this.isExpanded ? 'Collapse map' : 'Expand map';
+        btn.innerHTML = this.isExpanded
+          ? '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/></svg>'
+          : '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>';
+      }
       this.$nextTick(() => {
         if (this.map) {
           this.map.resize();
@@ -490,32 +504,6 @@ export default {
 #stac-browser {
   .map-container.expanded .map {
     height: 90vh !important;
-  }
-
-  .expand-control {
-    position: absolute;
-    z-index: 3;
-    top: 80px;
-    right: 10px;
-
-    button {
-      width: 29px;
-      height: 29px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      background: white;
-      border: none;
-      border-radius: 4px;
-      padding: 0;
-      box-shadow: 0 0 0 2px rgba(0,0,0,0.1);
-      color: #333;
-
-      &:hover {
-        background-color: #f0f0f0;
-      }
-    }
   }
 
   .map-popover {

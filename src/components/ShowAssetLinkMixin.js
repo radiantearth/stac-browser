@@ -3,6 +3,14 @@ import Utils from '../utils';
 import { mapGetters, mapState } from 'vuex';
 import { stacBrowserSpecialHandling } from "../rels";
 
+const COG_MIME_TYPES = [
+  'image/tiff',
+  'image/tiff; application=geotiff',
+  'image/tiff; application=geotiff; profile=cloud-optimized',
+  'image/vnd.stac.geotiff',
+  'application/x-geotiff',
+];
+
 export default defineComponent({
   data() {
     return {
@@ -12,8 +20,18 @@ export default defineComponent({
       },
       tab: null,
       shownOnMap: [],
-      selectedAssets: []
+      selectedAssets: [],
+      _hasAutoSelected: false
     };
+  },
+  watch: {
+    assets: {
+      immediate: true,
+      handler(assets) {
+        if (this._hasAutoSelected || !assets || assets.length === 0) return;
+        this._autoSelectCogAsset(assets);
+      }
+    }
   },
   computed: {
     ...mapState(['showThumbnailsAsAssets']),
@@ -81,6 +99,19 @@ export default defineComponent({
       if (this.hasThumbnails) {
         this.tab = this.tabIds.thumbnails;
       }
+    },
+    _autoSelectCogAsset(assets) {
+      const cogAssets = assets.filter(asset => {
+        const type = asset.type || '';
+        return COG_MIME_TYPES.some(mt => type.includes(mt));
+      });
+      if (cogAssets.length === 0) return;
+
+      const visual = cogAssets.find(a =>
+        Array.isArray(a.roles) && a.roles.includes('visual')
+      );
+      this.selectedAssets = [visual || cogAssets[0]];
+      this._hasAutoSelected = true;
     }
   }
 });

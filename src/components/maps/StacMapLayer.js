@@ -34,9 +34,11 @@ export default class StacMapLayer {
     this.layerIds = [];
     this.sourceIds = [];
     this._cogLayers = [];
+    this._cogAssetMeta = [];
     this._deckOverlay = null;
     this._pmtilesLayerIds = [];
     this._pmtilesSourceIds = [];
+    this._pmtilesAssetMeta = [];
     this._activeGlStyle = null;
   }
 
@@ -193,6 +195,11 @@ export default class StacMapLayer {
       const url = asset.getAbsoluteUrl?.() || asset.href;
       const sourceId = `stac-pmtiles-${i}`;
 
+      this._pmtilesAssetMeta.push({
+        title: asset.title || asset.key || `PMTiles ${i + 1}`,
+        sourceId,
+      });
+
       try {
         const pm = new PMTiles(url, sharedCache);
         pmtilesProtocol.add(pm);
@@ -313,6 +320,10 @@ export default class StacMapLayer {
         import('@developmentseed/deck.gl-geotiff'),
       ]);
 
+      this._cogAssetMeta = cogAssets.map((asset, i) => ({
+        title: asset.title || asset.key || `COG ${i + 1}`,
+      }));
+
       const layers = cogAssets.map((asset, i) => {
         const url = asset.getAbsoluteUrl?.() || asset.href;
         return new COGLayer({
@@ -361,6 +372,41 @@ export default class StacMapLayer {
 
   getAllOverlayLayerIds() {
     return [...this.getFootprintLayerIds(), ...this.getChildrenLayerIds(), ...this._pmtilesLayerIds];
+  }
+
+  getAssetOverlays() {
+    const overlays = [];
+    for (let i = 0; i < this._pmtilesAssetMeta.length; i++) {
+      const meta = this._pmtilesAssetMeta[i];
+      const layerIds = this._pmtilesLayerIds.filter(id => id.startsWith(meta.sourceId));
+      if (layerIds.length > 0) {
+        const vis = this.map?.getLayoutProperty(layerIds[0], 'visibility');
+        overlays.push({
+          id: meta.sourceId,
+          title: meta.title,
+          type: 'maplibre',
+          visible: vis !== 'none',
+          layerIds,
+        });
+      }
+    }
+    for (let i = 0; i < this._cogLayers.length; i++) {
+      const meta = this._cogAssetMeta[i] || {};
+      overlays.push({
+        id: `cog-${i}`,
+        title: meta.title || `COG ${i + 1}`,
+        type: 'deckgl',
+        visible: this._cogLayers[i]?.props?.visible !== false,
+        deckIndex: i,
+      });
+    }
+    return overlays;
+  }
+
+  setCogVisible(index, visible) {
+    if (!this._deckOverlay || index >= this._cogLayers.length) return;
+    this._cogLayers[index] = this._cogLayers[index].clone({ visible });
+    this._deckOverlay.setProps({ layers: [...this._cogLayers] });
   }
 
   setFootprintVisible(visible) {
@@ -460,6 +506,7 @@ export default class StacMapLayer {
       this._deckOverlay = null;
     }
     this._cogLayers = [];
+    this._cogAssetMeta = [];
   }
 
   _removePmtilesLayers() {
@@ -468,6 +515,7 @@ export default class StacMapLayer {
       try { if (this.map.getSource(id)) this.map.removeSource(id); } catch { /* ignore */ }
     }
     this._pmtilesSourceIds = [];
+    this._pmtilesAssetMeta = [];
   }
 
   _clearPmtilesLayers() {

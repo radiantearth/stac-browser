@@ -1,5 +1,5 @@
 <template>
-  <div v-if="basemaps && basemaps.length > 1" class="map-layercontrol">
+  <div v-if="showControl" class="map-layercontrol">
     <button :id="buttonId" class="maplibregl-ctrl maplibregl-ctrl-group layer-btn">
       <b-icon-layers-fill />
     </button>
@@ -8,7 +8,7 @@
       :target="buttonId" teleport-to="#stac-browser" :boundary-padding="10"
     >
       <div class="layercontrol">
-        <section>
+        <section v-if="basemaps && basemaps.length > 1">
           <h5>{{ $t('mapping.layers.base') }}</h5>
           <b-form-radio-group v-model="selectedIndex">
             <b-form-radio v-for="(bm, i) in basemaps" :key="i" :value="i">
@@ -61,6 +61,11 @@ export default {
     },
   },
   emits: ['switch-basemap'],
+  computed: {
+    showControl() {
+      return (this.basemaps && this.basemaps.length > 1) || this.stacLayer;
+    },
+  },
   data() {
     return {
       buttonId: null,
@@ -97,6 +102,7 @@ export default {
         layers.push({
           id: 'footprint',
           title: this.$t('mapping.layers.footprint'),
+          type: 'maplibre',
           visible: vis !== 'none',
           layerIds: footprintIds,
         });
@@ -106,17 +112,24 @@ export default {
         layers.push({
           id: 'children',
           title: this.$t('mapping.layers.title'),
+          type: 'maplibre',
           visible: vis !== 'none',
           layerIds: childrenIds,
         });
       }
+      const assetOverlays = this.stacLayer.getAssetOverlays();
+      layers.push(...assetOverlays);
       this.overlayLayers = layers;
     },
     toggleOverlay(layer, visible) {
-      const val = visible ? 'visible' : 'none';
-      for (const id of layer.layerIds) {
-        if (this.map?.getLayer(id)) {
-          this.map.setLayoutProperty(id, 'visibility', val);
+      if (layer.type === 'deckgl') {
+        this.stacLayer.setCogVisible(layer.deckIndex, visible);
+      } else {
+        const val = visible ? 'visible' : 'none';
+        for (const id of layer.layerIds) {
+          if (this.map?.getLayer(id)) {
+            this.map.setLayoutProperty(id, 'visibility', val);
+          }
         }
       }
       layer.visible = visible;
