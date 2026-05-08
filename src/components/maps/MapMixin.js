@@ -51,11 +51,6 @@ export default {
 
       this.map.addControl(new maplibregl.NavigationControl({ showCompass: true }), 'top-right');
       this.map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-right');
-      this.map.addControl(new maplibregl.FullscreenControl(), 'top-right');
-
-      this.map.on('fullscreenchange', () => {
-        this.isFullScreen = document.fullscreenElement != null;
-      });
 
       await new Promise(resolve => {
         if (this.map.isStyleLoaded()) {
