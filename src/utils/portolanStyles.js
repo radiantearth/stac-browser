@@ -9,7 +9,7 @@ export function resolveStyles(stac) {
 
   const baseUrl = stac.getAbsoluteUrl?.() || '';
 
-  return styleEntries
+  const styles = styleEntries
     .map(entry => {
       if (typeof entry === 'string') {
         const asset = stac.assets?.[entry];
@@ -33,6 +33,34 @@ export function resolveStyles(stac) {
       return null;
     })
     .filter(Boolean);
+
+  if (styles.length > 1) {
+    const titles = styles.map(s => s.title);
+    const prefix = commonPrefix(titles);
+    if (prefix.length > 0) {
+      for (const s of styles) {
+        s.title = s.title.slice(prefix.length);
+      }
+    }
+  }
+
+  return styles;
+}
+
+function commonPrefix(strings) {
+  if (strings.length === 0) return '';
+  let prefix = strings[0];
+  for (let i = 1; i < strings.length; i++) {
+    while (!strings[i].startsWith(prefix)) {
+      prefix = prefix.slice(0, -1);
+      if (prefix.length === 0) return '';
+    }
+  }
+  // Trim to last separator (space, dash, colon) so we don't cut mid-word
+  const lastSep = Math.max(prefix.lastIndexOf(' '), prefix.lastIndexOf('—'), prefix.lastIndexOf('-'), prefix.lastIndexOf(':'));
+  if (lastSep > 0) prefix = prefix.slice(0, lastSep + 1);
+  else prefix = '';
+  return prefix;
 }
 
 export function extractLegend(glStyle) {
@@ -79,7 +107,14 @@ export function extractLegend(glStyle) {
 }
 
 export async function loadStyleJson(href) {
-  const response = await fetch(href);
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10000);
+  let response;
+  try {
+    response = await fetch(href, { signal: controller.signal });
+  } finally {
+    clearTimeout(timeout);
+  }
   if (!response.ok) {
     throw new Error(`Failed to fetch style: ${response.status} ${href}`);
   }

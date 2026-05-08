@@ -38,6 +38,7 @@ import TextControl from './maps/TextControl.vue';
 import TerrainControl from './maps/TerrainControl.vue';
 import StylePicker from './maps/StylePicker.vue';
 import StacMapLayer from './maps/StacMapLayer.js';
+import { resolveStyles, loadStyleJson, extractLegend } from '../utils/portolanStyles.js';
 import { mapGetters } from 'vuex';
 import proj4 from 'proj4';
 
@@ -201,7 +202,6 @@ export default {
 
     async resolveAndApplyStyles() {
       if (!this.stac) return;
-      const { resolveStyles } = await import('../utils/portolanStyles.js');
       const styles = resolveStyles(this.stac);
       if (styles.length === 0) return;
       this.availableStyles = styles;
@@ -213,10 +213,8 @@ export default {
       if (!styleEntry || !this.stacLayer) return;
       try {
         if (!styleEntry._cached) {
-          const { loadStyleJson: loadJson } = await import('../utils/portolanStyles.js');
-          styleEntry._cached = await loadJson(styleEntry.href);
+          styleEntry._cached = await loadStyleJson(styleEntry.href);
         }
-        const { extractLegend } = await import('../utils/portolanStyles.js');
         this.stacLayer.applyGlStyle(styleEntry._cached);
         this.activeStyleIndex = index;
         this.activeLegend = extractLegend(styleEntry._cached);

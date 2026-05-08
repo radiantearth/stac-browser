@@ -463,13 +463,10 @@ export default class StacMapLayer {
   }
 
   _removePmtilesLayers() {
-    for (const id of [...this._pmtilesLayerIds]) {
-      try { if (this.map.getLayer(id)) this.map.removeLayer(id); } catch { /* ignore */ }
-    }
+    this._clearPmtilesLayers();
     for (const id of [...this._pmtilesSourceIds]) {
       try { if (this.map.getSource(id)) this.map.removeSource(id); } catch { /* ignore */ }
     }
-    this._pmtilesLayerIds = [];
     this._pmtilesSourceIds = [];
   }
 
@@ -486,6 +483,9 @@ export default class StacMapLayer {
     this._clearPmtilesLayers();
 
     const styleSourceNames = Object.keys(glStyle.sources || {});
+    if (styleSourceNames.length !== this._pmtilesSourceIds.length) {
+      console.warn(`Style defines ${styleSourceNames.length} source(s) but ${this._pmtilesSourceIds.length} PMTiles source(s) are loaded — mapping by position`);
+    }
     const sourceMapping = {};
     for (let i = 0; i < styleSourceNames.length; i++) {
       if (i < this._pmtilesSourceIds.length) {
@@ -508,7 +508,4 @@ export default class StacMapLayer {
     this._activeGlStyle = glStyle;
   }
 
-  clearGlStyle() {
-    this._activeGlStyle = null;
-  }
 }

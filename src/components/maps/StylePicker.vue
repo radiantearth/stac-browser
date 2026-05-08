@@ -7,7 +7,7 @@
     </select>
     <div v-if="legend.length > 0" class="legend-panel">
       <button class="legend-toggle" @click="legendOpen = !legendOpen">
-        {{ legendOpen ? '▾' : '▸' }} Legend
+        {{ legendOpen ? '▾' : '▸' }} {{ $t('mapping.styles.legend') }}
       </button>
       <ul v-if="legendOpen" class="legend-items">
         <li v-for="(item, i) in legend" :key="i">
@@ -36,7 +36,7 @@ export default {
   },
   watch: {
     activeIndex(val) { this.selected = val; },
-    selected(val) { this.$emit('change', val); },
+    selected(val, oldVal) { if (val !== oldVal) this.$emit('change', val); },
   },
 };
 </script>
