@@ -37,6 +37,7 @@ export default class StacMapLayer {
     this._deckOverlay = null;
     this._pmtilesLayerIds = [];
     this._pmtilesSourceIds = [];
+    this._activeGlStyle = null;
   }
 
   setStac(stac) {
@@ -387,7 +388,7 @@ export default class StacMapLayer {
   }
 
   async readdAfterStyleChange() {
-    const { stac, children, assets } = this;
+    const { stac, children, assets, _activeGlStyle } = this;
     this.layerIds = [];
     this.sourceIds = [];
     this._pmtilesLayerIds = [];
@@ -395,6 +396,7 @@ export default class StacMapLayer {
     if (stac) this.setStac(stac);
     if (children) this.setChildren(children);
     if (assets) await this.setAssets(assets);
+    if (_activeGlStyle) this.applyGlStyle(_activeGlStyle);
   }
 
   _addSource(id, spec) {
@@ -461,13 +463,49 @@ export default class StacMapLayer {
   }
 
   _removePmtilesLayers() {
-    for (const id of [...this._pmtilesLayerIds]) {
-      try { if (this.map.getLayer(id)) this.map.removeLayer(id); } catch { /* ignore */ }
-    }
+    this._clearPmtilesLayers();
     for (const id of [...this._pmtilesSourceIds]) {
       try { if (this.map.getSource(id)) this.map.removeSource(id); } catch { /* ignore */ }
     }
-    this._pmtilesLayerIds = [];
     this._pmtilesSourceIds = [];
   }
+
+  _clearPmtilesLayers() {
+    for (const id of [...this._pmtilesLayerIds]) {
+      try { if (this.map.getLayer(id)) this.map.removeLayer(id); } catch { /* ignore */ }
+    }
+    this._pmtilesLayerIds = [];
+  }
+
+  applyGlStyle(glStyle) {
+    if (!glStyle || !glStyle.layers || this._pmtilesSourceIds.length === 0) return;
+
+    this._clearPmtilesLayers();
+
+    const styleSourceNames = Object.keys(glStyle.sources || {});
+    if (styleSourceNames.length !== this._pmtilesSourceIds.length) {
+      console.warn(`Style defines ${styleSourceNames.length} source(s) but ${this._pmtilesSourceIds.length} PMTiles source(s) are loaded — mapping by position`);
+    }
+    const sourceMapping = {};
+    for (let i = 0; i < styleSourceNames.length; i++) {
+      if (i < this._pmtilesSourceIds.length) {
+        sourceMapping[styleSourceNames[i]] = this._pmtilesSourceIds[i];
+      }
+    }
+
+    for (const layer of glStyle.layers) {
+      const mappedSource = sourceMapping[layer.source];
+      if (!mappedSource) continue;
+
+      const layerSpec = { ...layer, source: mappedSource };
+      if (this.map.getLayer(layerSpec.id)) {
+        this.map.removeLayer(layerSpec.id);
+      }
+      this.map.addLayer(layerSpec);
+      this._pmtilesLayerIds.push(layerSpec.id);
+    }
+
+    this._activeGlStyle = glStyle;
+  }
+
 }

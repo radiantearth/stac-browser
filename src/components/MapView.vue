@@ -3,6 +3,12 @@
     <div ref="map" class="map" :id="mapId">
       <LayerControl :map="map" :basemaps="basemaps" :activeBasemapIndex="activeBasemapIndex" :stacLayer="stacLayer" @switch-basemap="switchBasemap" />
       <TerrainControl :is3D="is3D" @toggle="toggle3D" />
+      <StylePicker
+        :styles="availableStyles"
+        :activeIndex="activeStyleIndex"
+        :legend="activeLegend"
+        @change="applyStyleAtIndex"
+      />
       <TextControl v-if="empty" :text="$t('mapping.nodata')" />
       <TextControl v-else-if="!hasBasemap" :text="$t('mapping.nobasemap')" />
     </div>
@@ -30,7 +36,9 @@ import MapMixin from './maps/MapMixin.js';
 import LayerControl from './maps/LayerControl.vue';
 import TextControl from './maps/TextControl.vue';
 import TerrainControl from './maps/TerrainControl.vue';
+import StylePicker from './maps/StylePicker.vue';
 import StacMapLayer from './maps/StacMapLayer.js';
+import { resolveStyles, loadStyleJson, extractLegend } from '../utils/portolanStyles.js';
 import { mapGetters } from 'vuex';
 import proj4 from 'proj4';
 
@@ -46,6 +54,7 @@ export default {
     LayerControl,
     TextControl,
     TerrainControl,
+    StylePicker,
   },
   mixins: [
     MapMixin
@@ -82,6 +91,9 @@ export default {
       selection: null,
       empty: false,
       mapId: `map-${++mapId}`,
+      availableStyles: [],
+      activeStyleIndex: 0,
+      activeLegend: [],
     };
   },
   computed: {
@@ -135,6 +147,9 @@ export default {
       this._showingStacLayer = true;
 
       try {
+        this.availableStyles = [];
+        this.activeStyleIndex = 0;
+        this.activeLegend = [];
         if (this.stacLayer) {
           this.stacLayer.remove();
           this.stacLayer = null;
@@ -181,11 +196,36 @@ export default {
       if (this.popover) {
         this._setupClickInteraction();
       }
+
+      await this.resolveAndApplyStyles();
     },
 
-    onBasemapChanged() {
+    async resolveAndApplyStyles() {
+      if (!this.stac) return;
+      const styles = resolveStyles(this.stac);
+      if (styles.length === 0) return;
+      this.availableStyles = styles;
+      await this.applyStyleAtIndex(0);
+    },
+
+    async applyStyleAtIndex(index) {
+      const styleEntry = this.availableStyles[index];
+      if (!styleEntry || !this.stacLayer) return;
+      try {
+        if (!styleEntry._cached) {
+          styleEntry._cached = await loadStyleJson(styleEntry.href);
+        }
+        this.stacLayer.applyGlStyle(styleEntry._cached);
+        this.activeStyleIndex = index;
+        this.activeLegend = extractLegend(styleEntry._cached);
+      } catch (err) {
+        console.warn('Failed to apply style:', styleEntry.name, err);
+      }
+    },
+
+    async onBasemapChanged() {
       if (this.stacLayer) {
-        this.stacLayer.readdAfterStyleChange();
+        await this.stacLayer.readdAfterStyleChange();
       }
     },
 
