@@ -1,8 +1,8 @@
 <template>
   <b-table
-    class="metadata-table" :items="tblItems" :fields="tblFields" variant="light"
+    class="metadata-table" :items="tblItems" :fields="tblFields"
     responsive small sticky-header striped
-    v-bind="tblTexts"
+    bordered show-empty v-bind="tblTexts"
   >
     <template #head()="data">
       <span v-html="data.label" />

@@ -36,6 +36,6 @@ export default {
 @import "../theme/variables.scss";
 
 .alert-box {
-  margin-bottom: $block-margin;
+  margin-bottom: var(--sb-block-gap);
 }
 </style>

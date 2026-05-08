@@ -156,7 +156,7 @@ export default {
 
 #stac-browser .root-stats {
   h4 {
-    margin-top: $block-margin;
+    margin-top: var(--sb-block-gap);
   }
 
   .charts .chart {

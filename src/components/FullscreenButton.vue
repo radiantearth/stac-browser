@@ -105,10 +105,20 @@ export default {
 </script>
 
 <style lang="scss">
+@import '../theme/variables.scss';
+
 #stac-browser {
   .fullscreen {
-    background-color: white;
+    background-color: $body-bg;
     overflow: auto;
+  }
+}
+
+[data-bs-theme="dark"] {
+  #stac-browser {
+    .fullscreen {
+      background-color: $body-bg-dark;
+    }
   }
 }
 </style>

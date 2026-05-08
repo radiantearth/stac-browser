@@ -8,6 +8,7 @@ export default {
     storeLocale: true,
     locale: "en",
     fallbackLocale: "en",
+    enforcedColorMode: "auto",
     supportedLocales: [
         "de",
         "ar",

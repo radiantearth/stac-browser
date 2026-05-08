@@ -8,7 +8,7 @@
       <div v-if="count > 0" class="card-grid">
         <Feature v-for="(feature, i) in features" :key="feature.id || i" :feature="feature" />
       </div>
-      <b-alert v-else variant="info" show>
+      <b-alert v-else variant="secondary" show>
         {{ $t('features.empty') }}
       </b-alert>
     </section>

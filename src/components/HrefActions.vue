@@ -5,7 +5,7 @@
         <b-icon-lock /> {{ $t('authentication.required') }}
       </b-button>
       <b-button v-if="canDownload && !requiresAuth" variant="primary" v-bind="downloadProps" v-on="downloadEvents">
-        <b-spinner v-if="loading" small variant="light" />
+        <b-spinner v-if="loading" small />
         <b-icon-box-arrow-up-right v-else-if="browserCanOpenFile" />
         <b-icon-download v-else />
         {{ buttonText }}

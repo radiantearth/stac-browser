@@ -25,6 +25,6 @@ export default {
 @import "../theme/variables.scss";
 
 .custom-text {
-  margin-bottom: $block-margin;
+  margin-bottom: var(--sb-block-gap);
 }
 </style>

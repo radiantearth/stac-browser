@@ -24,6 +24,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ignored metadata fields can be configured in `fields.config.js`
 - PlayWright tests
 - Add config option `displayOverviewsForChildren` to toggle visualizing overviews for maps showing many STAC Items
+- Color modes:
+  - Support for dark mode (defaults to auto-detection based on system settings of the user)
+  - Added `enforcedColorMode` config option to enforce a specific color mode (e.g. always show "light" mode)
+  - Added a color mode switch in the header (next to the language chooser)
+- Added more documentation around styling
 
 ### Changed
 
@@ -43,6 +48,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     For example, `Utils.isObject` is now `isObject` and can be imported from `stac-js/src/utils.js`.
 - It is not needed any longer to update the path to the `runtime-config.js`, the `pathPrefix` is added automatically in the build process.
 - User stay logged in across sessions (for OpenID Connect only)
+- CSS declarations have been updates to reuse existing variables in favor of hardcoding certain colors etc.
 
 ### Deprecated
 
@@ -51,6 +57,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - CLI parameters for npm commands (e.g. `npm run build -- --catalogUrl="https://example.com"`) as they are not supported by Vite. Make sure to check your CI scripts and Docker files.
 - Support for customizing `authConfig` through the root catalog has been removed. Use the STAC Authentication extension instead.
+- Removed the `DYNAMIC_CONFIG` Docker build argument and `<!--RC RC-->` comment-based mechanism to use runtime config options. Use `SB_RUNTIME` instead.
 
 ### Fixed
 

@@ -10,6 +10,7 @@
     "build:preview": "vite build && vite preview",
     "build:report": "vite build --mode report",
     "build:minimal": "vite build --mode minimal",
+    "preview": "vite preview",
     "lint": "eslint --fix src",
     "i18n:fields": "node helpers/fields_locales.js",
     "docs:hooks": "node helpers/widget-hooks.js",
@@ -119,10 +120,21 @@
       "remark-preset-lint-recommended",
       [
         "remark-lint-no-undefined-references",
-        { "allow": ["!WARNING","!NOTE","!IMPORTANT","!CAUTION","!TIP"] }
+        {
+          "allow": [
+            "!WARNING",
+            "!NOTE",
+            "!IMPORTANT",
+            "!CAUTION",
+            "!TIP"
+          ]
+        }
       ],
       "remark-lint-no-literal-urls",
-      ["remark-lint-no-shortcut-reference-link", false]
+      [
+        "remark-lint-no-shortcut-reference-link",
+        false
+      ]
     ]
   },
   "msw": {

@@ -49,7 +49,7 @@ export default {
       border-radius: $border-radius;
 
       &:hover {
-        border-color: $primary;
+        border-color: $dark;
       }
     }
 
@@ -74,7 +74,7 @@ export default {
       z-index: 1;
 
       .fullscreen-button {
-        margin: 5px;
+        margin: 10px;
       }
     }
 
@@ -82,6 +82,20 @@ export default {
       .thumbnail {
         max-height: none;
         border-radius: 0;
+      }
+    }
+  }
+}
+
+[data-bs-theme="dark"] {
+  #stac-browser {
+    .previews {
+      a {
+        border: 1px solid $body-bg-dark;
+    
+        &:hover {
+          border-color: $light;
+        }
       }
     }
   }

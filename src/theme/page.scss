@@ -5,7 +5,7 @@ body {
 }
 
 body {
-  margin-top: $header-margin;
+  margin-top: var(--sb-header-margin);
 }
 
 #popover-root-btn {
@@ -18,7 +18,7 @@ body {
   max-width: 100%;
   height: 100%;
   min-height: 100%;
-  gap: $block-margin;
+  gap: var(--sb-block-gap);
 
   @include media-breakpoint-only(xxxl) {
     max-width: 75vw;
@@ -26,28 +26,28 @@ body {
 
   > header {
     .site {
-      border-bottom: 3px solid $primary;
+      border-bottom: var(--sb-header-border);
 
       > .col-md-12 {
         > .title {
           > span {
-            font-size: 1.5rem;
-            font-weight: 600;
+            font-size: var(--sb-header-font-size);
+            font-weight: var(--sb-header-font-weight);
           }
         }
 
         .logo {
-          max-height: $logo-image-height;
+          max-height: var(--sb-logo-max-height);
         }
       }
     }
     .site,
     .page {
-      padding: $block-margin 0;
+      padding: var(--sb-block-gap) 0;
 
       > .col-md-12 {
         display: flex;
-        gap: 1rem;
+        gap: var(--sb-block-gap);
         align-items: center;
 
         > .title {
@@ -57,7 +57,7 @@ body {
           margin: 0;
           padding: 0;
           align-items: center;
-          gap: 1rem;
+          gap: var(--sb-block-gap);
 
           h1,
           h2 {
@@ -66,18 +66,19 @@ body {
           }
 
           h1 {
-            font-weight: 700;
+            color: var(--sb-h1-color);
+            font-weight: $h1-font-weight;
             align-items: center;
-            font-size: 2.2rem;
+            font-size: $h1-font-size;
           }
           @include media-breakpoint-down(xxl) {
             h1 {
-              font-size: 2rem;
+              font-size: $h1-font-size - 0.3rem;
             }
           }
           @include media-breakpoint-down(lg) {
             h1 {
-              font-size: 1.75rem;
+              font-size: $h1-font-size - 0.5rem;
             }
           }
         }
@@ -95,7 +96,7 @@ body {
     flex: 1;
   }
   > footer {
-    padding-bottom: $block-margin;
+    padding-bottom: var(--sb-block-gap);
     text-align: center;
 
     .footer-links {
@@ -104,8 +105,8 @@ body {
       justify-content: center;
       list-style: none;
       padding: 0;
-      margin: 0 0 $block-margin 0;
-      font-size: 0.875rem;
+      margin: 0 0 var(--sb-block-gap) 0;
+      font-size: $font-size-sm;
 
       li:not(:last-child)::after {
         content: "|";
@@ -138,8 +139,23 @@ body {
   }
 
   h2 {
-    color: $secondary;
-    font-weight: 600;
+    font-weight: $h2-font-weight;
+    color: var(--sb-subheadings-color);
+  }
+
+  pre {
+    width: fit-content;
+    max-width: 100%;
+    background: var(--bs-body-secondary-bg);
+    color: var(--bs-body-secondary-color);
+    border: var(--bs-border-width) var(--bs-border-style) var(--bs-border-color);
+    border-radius: var(--bs-border-radius);
+    max-height: 20rem;
+    padding: var(--sb-code-padding);
+    overflow: auto;
+  }
+  pre code {
+    font-size: $font-size-sm;
   }
 
   .maps-preview {
@@ -198,8 +214,8 @@ body {
   }
 
   .icon {
-    max-width: $max-icon-size;
-    max-height: $max-icon-size;
+    max-width: var(--sb-max-icon-size);
+    max-height: var(--sb-max-icon-size);
   }
   h1 > .icon {
     max-width: 1.2em;
@@ -219,7 +235,7 @@ body {
   abbr[title],
   abbr[data-original-title] {
     text-decoration: none;
-    border-bottom: 1px dotted $body-color;
+    border-bottom: 1px dotted var(--bs-body-color);
   }
 
   .card {
@@ -227,31 +243,29 @@ body {
   }
 
   a.list-group-item {
-    color: $link-color;
+    color: var(--bs-link-color);
     text-decoration: $link-decoration;
 
     &:hover {
-      color: $link-hover-color;
+      color: var(--bs-link-hover-color);
       text-decoration: $link-hover-decoration;
     }
+
   }
 
   .btn-group,
   .btn-group-vertical {
     .btn-primary,
     .btn-secondary {
-      border-color: darken($primary, 15%);
+      border-color: color-mix(in srgb, var(--bs-primary) 85%, black);
       &:hover {
-        border-color: darken($primary, 30%);
+        border-color: color-mix(in srgb, var(--bs-primary) 70%, black);
       }
     }
     .btn-secondary {
-      background-color: lighten(
-        desaturate($primary, 50%),
-        20%
-      );
+      background-color: color-mix(in srgb, var(--bs-primary) 30%, white);
       &:hover {
-        background-color: darken($primary, 5%);
+        background-color: color-mix(in srgb, var(--bs-primary) 95%, black);
       }
     }
   }
@@ -537,47 +551,89 @@ body {
 
 @import "vue-multiselect/dist/vue-multiselect.min.css";
 
-// Multiselect related style
+// Multiselect related style — uses CSS custom properties so dark mode is automatic.
 #stac-browser {
+  .multiselect__tags {
+    transition: $btn-transition;
+    background: var(--bs-body-bg);
+    border-color: var(--bs-border-color);
+    color: var(--bs-body-color);
+  }
+
   .multiselect__tags:focus-within {
-    border-color: #48cce1;
+    border-color: #{$input-focus-border-color};
     outline: 0;
-    box-shadow: 0 0 0 0.2rem rgba(24, 129, 145, 0.25);
+    // Matches Bootstrap's input focus ring, adapts to dark mode --bs-primary-rgb override
+    box-shadow: var(--bs-box-shadow-inset), 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
   }
 
   .multiselect__select:before {
-    color: #495057;
-    border-color: #495057 transparent transparent;
+    color: var(--bs-body-color);
+    border-color: var(--bs-body-color) transparent transparent;
   }
 
   .multiselect__tags,
   .multiselect__single {
-    border-color: #ccc;
-    padding-left: 0.75rem;
-    font-size: 16px;
-    height: 100%;
+    border-color: var(--bs-border-color);
+    padding-left: $input-padding-x;
+    font-size: $font-size-base;
   }
 
   .multiselect__input,
   .multiselect__single {
+    background: transparent;
+    color: var(--bs-body-color);
     padding: 4px 0 3px 0;
+  }
+
+  // Dropdown list
+  .multiselect__content-wrapper {
+    background: var(--bs-body-bg);
+    border-color: var(--bs-border-color);
+  }
+
+  .multiselect__option {
+    background: var(--bs-body-bg);
+    color: var(--bs-body-color);
+
+    &:after {
+      background: var(--bs-body-bg);
+      color: var(--bs-secondary-color);
+    }
+  }
+
+  .multiselect__tag {
+    margin-top: 3px;
+    margin-bottom: 3px;
   }
 
   .multiselect__tag,
   .multiselect__tag-icon:hover,
   .multiselect__option--highlight,
   .multiselect__option--highlight:after {
-    background-color: $primary;
+    background-color: var(--bs-primary);
+    color: var(--bs-white);
   }
 
   .multiselect__option--selected.multiselect__option--highlight,
   .multiselect__option--selected.multiselect__option--highlight:after {
-    background-color: $secondary;
+    background-color: var(--bs-secondary);
+    color: var(--bs-white);
   }
 
   .multiselect__placeholder {
-    color: #999;
-    font-size: 16px;
+    color: var(--bs-secondary-color);
+    font-size: $font-size-base;
+  }
+
+  // Keep placeholder color stable when the field is open/focused
+  .multiselect--active .multiselect__placeholder {
+    color: var(--bs-secondary-color);
+  }
+
+  .multiselect__input::placeholder {
+    color: var(--bs-secondary-color);
+    opacity: 1;
   }
 }
 
@@ -607,7 +663,85 @@ body {
     }
 
     > .card {
-      background-color: #fff;
+      background-color: $body-bg;
+
+      [data-bs-theme="dark"] & {
+        background-color: $body-bg-dark;
+      }
     }
   }
+}
+
+[data-bs-theme="dark"] {
+  --bs-light: #{$dark};
+  --bs-light-rgb: #{red($dark)}, #{green($dark)}, #{blue($dark)};
+  --bs-dark: #{$light};
+  --bs-dark-rgb: #{red($light)}, #{green($light)}, #{blue($light)};
+
+  .btn-outline-primary {
+    --bs-btn-color: var(--bs-link-color);
+  }
+
+  .btn-light {
+    --bs-btn-color: #{$white};
+    --bs-btn-bg: #{$dark};
+    --bs-btn-border-color: #{$dark};
+    --bs-btn-hover-color: #{$white};
+    --bs-btn-hover-bg: #{shade-color($dark, 15%)};
+    --bs-btn-hover-border-color: #{shade-color($dark, 20%)};
+    --bs-btn-active-color: #{$white};
+    --bs-btn-active-bg: #{shade-color($dark, 20%)};
+    --bs-btn-active-border-color: #{shade-color($dark, 25%)};
+    --bs-btn-disabled-color: #{$white};
+    --bs-btn-disabled-bg: #{$dark};
+    --bs-btn-disabled-border-color: #{$dark};
+  }
+
+  .btn-dark, .badge-dark {
+    --bs-btn-color: #{$dark};
+    --bs-btn-bg: #{$light};
+    --bs-btn-border-color: #{$light};
+    --bs-btn-hover-color: #{$dark};
+    --bs-btn-hover-bg: #{shade-color($light, 15%)};
+    --bs-btn-hover-border-color: #{shade-color($light, 20%)};
+    --bs-btn-active-color: #{$dark};
+    --bs-btn-active-bg: #{shade-color($light, 20%)};
+    --bs-btn-active-border-color: #{shade-color($light, 25%)};
+    --bs-btn-disabled-color: #{$dark};
+    --bs-btn-disabled-bg: #{$light};
+    --bs-btn-disabled-border-color: #{$light};
+  }
+
+  .text-bg-dark {
+    color: #{$dark} !important;
+  }
+}
+
+// Expose STAC Browser custom vars as CSS custom properties.
+// Non-color parts are baked from Sass (build-time theming);
+// color parts reference var(--bs-primary) so they stay live
+// and can be overridden at runtime in runtime-style.css.
+:root {
+  // Sizing & spacing
+  --sb-header-margin: #{$header-margin};
+  --sb-block-gap: #{$block-gap};
+  --sb-code-padding: #{$code-padding};
+  --sb-logo-max-height: #{$logo-image-height};
+  --sb-max-icon-size: #{$max-icon-size};
+
+  // Typography
+  --sb-header-font-size: #{$header-font-size};
+  --sb-header-font-weight: #{$header-font-weight};
+
+  // Colors (light mode; dark mode overrides below)
+  --sb-h1-color: #{$h1-color};
+  --sb-subheadings-color: #{$subheadings-color};
+
+  // Header border (color part stays live via var(--bs-primary))
+  --sb-header-border: #{$header-border-width} #{$header-border-style} var(--bs-primary);
+}
+
+[data-bs-theme="dark"] {
+  --sb-h1-color: #{$h1-color-dark};
+  --sb-subheadings-color: #{$subheadings-color-dark};
 }

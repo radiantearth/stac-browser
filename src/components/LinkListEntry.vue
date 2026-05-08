@@ -57,17 +57,19 @@ export default {
 </script>
 
 <style lang="scss">
+@import '../theme/variables.scss';
+
 #stac-browser .link-more {
   width: auto;
   max-width: 600px;
 
   .styled-description {
-    margin-bottom: 1rem;
+    margin-bottom: var(--sb-block-gap);
   }
 
   h3 {
-    font-size: 0.85rem;
-    color: #6c757d;
+    font-size: $font-size-sm;
+    color: $secondary;
     text-align: center;
     padding: 0;
     font-weight: 600;
@@ -82,7 +84,7 @@ export default {
     min-width: 400px;
 
     h4 {
-      font-size: 0.85rem;
+      font-size: $font-size-sm;
       font-weight: normal;
       margin-top: 0;
       margin-bottom: 0.5rem;

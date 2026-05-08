@@ -272,7 +272,7 @@ export default defineComponent({
 #stac-browser .cc {
   .meta {
     min-width: 100%;
-    margin-bottom: $block-margin;
+    margin-bottom: var(--sb-block-gap);
   }
   &.collection .meta {
     min-width: 33%;
@@ -315,7 +315,7 @@ export default defineComponent({
 
       > .meta {
         order: 1;
-        margin-bottom: $block-margin;
+        margin-bottom: var(--sb-block-gap);
       }
       > .items-container {
         order: 2;
