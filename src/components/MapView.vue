@@ -503,7 +503,7 @@ export default {
 
 #stac-browser {
   .map-container.expanded .map {
-    height: 90vh !important;
+    height: calc(100vh - 160px) !important;
   }
 
   .map-popover {
