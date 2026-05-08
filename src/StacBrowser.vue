@@ -45,8 +45,8 @@
                 variant="primary"
                 @click="toggleColorMode"
               >
-                <b-icon-sun v-if="colorMode === 'light'" title="Switch to dark mode" />
-                <b-icon-moon-stars v-else title="Switch to light mode" />
+                <b-icon-sun v-if="colorMode === 'light'" :title="$t('switchToDarkMode')" />
+                <b-icon-moon-stars v-else :title="$t('switchToLightMode')" />
               </b-button>
             </b-button-group>
           </nav>
