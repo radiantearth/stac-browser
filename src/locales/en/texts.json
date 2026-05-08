@@ -220,6 +220,7 @@
   },
   "messageForSchemaError": "{message}, for schema {schemaPath}",
   "metadata": {
+    "additional": "Additional Metadata",
     "general": "General",
     "title": "Metadata"
   },
