@@ -1,20 +1,20 @@
 <template>
   <div class="item" :key="data.id">
+    <section class="hero-map">
+      <b-card no-body class="maps-preview">
+        <b-tabs v-model="tab" ref="tabs" card pills vertical end>
+          <b-tab :title="$t('map')" :id="tabIds.map" no-body>
+            <MapView ref="mapView" :stac="data" :assets="selectedAssets" @changed="dataChanged" @empty="handleEmptyMap" />
+          </b-tab>
+          <b-tab v-if="hasThumbnails" :id="tabIds.thumbnails" :title="$t('thumbnails')" no-body>
+            <Thumbnails :thumbnails="thumbnails" />
+          </b-tab>
+        </b-tabs>
+      </b-card>
+    </section>
     <b-row>
       <b-col class="left">
         <WidgetHook id="view-item-primary-start" />
-        <section class="mb-4">
-          <b-card no-body class="maps-preview">
-            <b-tabs v-model="tab" ref="tabs" card pills vertical end>
-              <b-tab :title="$t('map')" :id="tabIds.map" no-body>
-                <MapView ref="mapView" :stac="data" :assets="selectedAssets" @changed="dataChanged" @empty="handleEmptyMap" />
-              </b-tab>
-              <b-tab v-if="hasThumbnails" :id="tabIds.thumbnails" :title="$t('thumbnails')" no-body>
-                <Thumbnails :thumbnails="thumbnails" />
-              </b-tab>
-            </b-tabs>
-          </b-card>
-        </section>
         <Assets v-if="hasAssets" :assets="assets" :shown="selectedReferences" @show-asset="showAsset" autoExpand />
         <ParquetViewer v-if="hasAssets" :assets="assets" @zoom-to-bbox="zoomToBbox" @highlight-bbox="highlightBbox" />
         <LinkList v-if="additionalLinks.length > 0" :title="$t('additionalResources')" :links="additionalLinks" />
@@ -115,6 +115,15 @@ export default defineComponent({
 @import "../theme/variables.scss";
 
 #stac-browser .item {
+  .hero-map {
+    margin: 0 (-$block-margin);
+    margin-bottom: $block-margin;
+
+    .map {
+      height: 400px;
+    }
+  }
+
   .left, .right {
     max-width: 50%;
     @include media-breakpoint-down(md) {
