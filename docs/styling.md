@@ -1,6 +1,6 @@
 # Styling & Theming <!-- omit in toc -->
 
-STAC Browser supports **build-time** styling  only. You can edit Sass variables before running `npm run build`. Full control over every aspect of the theme, including fonts, spacing, breakpoints, and colors.
+STAC Browser supports **build-time** styling only. You can edit Sass variables before running `npm run build`. Full control over every aspect of the theme, including fonts, spacing, breakpoints, and colors.
 
 Both light and dark mode are supported. The dark-mode toggle is shown in the header unless you enforce a specific mode via the [`enforcedColorMode`](./options.md) config option.
 

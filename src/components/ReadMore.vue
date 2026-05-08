@@ -158,9 +158,9 @@ export default defineComponent({
   --lineHeight: #{$line-height-base};
   background-image: linear-gradient(
     to bottom,
-    rgba($body-bg, 0) 0%,
-    rgba($body-bg, 1) 90%,
-    rgba($body-bg, 1) 100%
+    rgba(var(--bs-body-bg-rgb), 0) 0%,
+    rgba(var(--bs-body-bg-rgb), 1) 90%,
+    rgba(var(--bs-body-bg-rgb), 1) 100%
   );
   width: 100%;
   height: calc(var(--nlines) * var(--lineHeight));

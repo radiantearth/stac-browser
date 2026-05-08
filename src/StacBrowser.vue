@@ -43,9 +43,10 @@
               <b-button
                 v-if="!enforcedColorModeFromVueX || enforcedColorModeFromVueX === 'auto'"
                 variant="primary"
+                @click="toggleColorMode"
               >
-                <b-icon-sun v-if="colorMode === 'light'" @click="setColorMode('dark')" title="Switch to dark mode" />
-                <b-icon-moon-stars v-else @click="setColorMode('light')" title="Switch to light mode" />
+                <b-icon-sun v-if="colorMode === 'light'" title="Switch to dark mode" />
+                <b-icon-moon-stars v-else title="Switch to light mode" />
               </b-button>
             </b-button-group>
           </nav>
@@ -494,8 +495,8 @@ export default defineComponent({
     ...mapActions(['switchLocale']),
     ...mapMutations('auth', ['addAction']),
     ...mapActions('auth', ['requestLogin', 'requestLogout']),
-    setColorMode(mode) {
-      this.colorMode = mode;
+    toggleColorMode() {
+      this.colorMode = this.colorMode === 'light' ? 'dark' : 'light';
     },
     getIcon(data) {
       if (data instanceof STAC) {
