@@ -184,6 +184,8 @@ export default {
 
       if (this.assets) {
         await this.stacLayer.setAssets(this.assets);
+      } else {
+        await this.stacLayer.autoLoadVisualAssets(this.stac);
       }
 
       if (this.hideFootprint) {
@@ -503,7 +505,7 @@ export default {
 
 #stac-browser {
   .map-container.expanded .map {
-    height: calc(100vh - 185px) !important;
+    height: calc(100vh - 30px) !important;
   }
 
   .map-popover {

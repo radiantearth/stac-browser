@@ -291,11 +291,14 @@ export default defineComponent({
 
 #stac-browser .cc {
   .hero-map {
-    margin: 0 (-$block-margin);
-    margin-bottom: $block-margin;
+    margin: -155px (-$block-margin) $block-margin;
 
     .map {
-      height: 400px;
+      height: 555px;
+    }
+
+    .maplibregl-ctrl-top-right {
+      top: 150px;
     }
   }
 

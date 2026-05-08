@@ -25,6 +25,18 @@ body {
   }
 
   > header {
+    position: relative;
+    z-index: 10;
+    margin-left: (-$block-margin);
+    margin-right: (-$block-margin);
+    padding-left: $block-margin;
+    padding-right: $block-margin;
+    background: rgba(255, 255, 255, 0.25);
+
+    .btn-outline-primary {
+      background-color: white;
+    }
+
     .site {
       border-bottom: 3px solid $primary;
 

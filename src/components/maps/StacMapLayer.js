@@ -85,10 +85,9 @@ export default class StacMapLayer {
       },
     });
 
-    this._autoLoadVisualAssets(stac);
   }
 
-  _autoLoadVisualAssets(stac) {
+  async autoLoadVisualAssets(stac) {
     if (!stac || typeof stac.getAssets !== 'function') return;
     const assets = stac.getAssets();
     const visualAssets = assets.filter(asset => {
@@ -98,7 +97,7 @@ export default class StacMapLayer {
       return false;
     });
     if (visualAssets.length > 0) {
-      this.setAssets(visualAssets);
+      await this.setAssets(visualAssets);
     }
   }
 
@@ -344,7 +343,7 @@ export default class StacMapLayer {
     }
   }
 
-  fit(padding = 50) {
+  fit(padding = { top: 160, bottom: 50, left: 50, right: 50 }) {
     if (!this.stac || !this.map) return;
     const bbox = this.stac.getBoundingBox();
     if (!bbox || bbox.length < 4) return;
@@ -441,7 +440,11 @@ export default class StacMapLayer {
     this._pmtilesSourceIds = [];
     if (stac) this.setStac(stac);
     if (children) this.setChildren(children);
-    if (assets) await this.setAssets(assets);
+    if (assets) {
+      await this.setAssets(assets);
+    } else if (stac) {
+      await this.autoLoadVisualAssets(stac);
+    }
     if (_activeGlStyle) this.applyGlStyle(_activeGlStyle);
   }
 
