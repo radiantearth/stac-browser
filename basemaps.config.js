@@ -4,16 +4,16 @@ import { STAC } from 'stac-js';
 const BASEMAPS = {
   earth: [
     {
-      url: 'https://cholmes.github.io/overture-pmtiles-styles/style-positron.json',
+      url: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+      title: 'Voyager',
+    },
+    {
+      url: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
       title: 'Positron',
     },
     {
-      url: 'https://cholmes.github.io/overture-pmtiles-styles/style.json',
-      title: 'Overture',
-    },
-    {
-      url: 'https://cholmes.github.io/overture-pmtiles-styles/style-dark.json',
-      title: 'Dark',
+      url: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+      title: 'Dark Matter',
     },
     {
       url: 'https://cholmes.github.io/overture-pmtiles-styles/style-satellite.json',
