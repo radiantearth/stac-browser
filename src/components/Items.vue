@@ -128,7 +128,7 @@ export default defineComponent({
       return this.items.length > this.shownItems;
     },
     filterCount() {
-      return Object.values(this.apiFilters).filter(filter => !(filter === null || size(filter) === 0)).length;
+      return Object.values(this.apiFilters).filter(filter => filter !== null && size(filter) > 0).length;
     },
     hasFilters() {
       return this.filterCount > 0;

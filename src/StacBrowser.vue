@@ -10,10 +10,10 @@
         <b-col md="12">
           <nav class="actions navigation">
             <b-button-group v-if="canSearch || !isServerSelector">
-              <b-button v-if="!isServerSelector" variant="primary" size="sm" :title="$t('browse')" @click="sidebar = !sidebar">
+              <b-button v-if="!isServerSelector" variant="primary" :title="$t('browse')" @click="sidebar = !sidebar">
                 <b-icon-list /><span class="button-label">{{ $t('browse') }}</span>
               </b-button>
-              <b-button v-if="canSearch" variant="primary" size="sm" :to="searchBrowserLink" :title="$t('search.title')" :pressed="isSearchPage">
+              <b-button v-if="canSearch" variant="primary" :to="searchBrowserLink" :title="$t('search.title')" :pressed="isSearchPage">
                 <b-icon-search /><span class="button-label">{{ $t('search.title') }}</span>
               </b-button>
             </b-button-group>
@@ -33,13 +33,21 @@
           </div>
           <nav class="actions user">
             <b-button-group>
-              <b-button v-if="canAuthenticate" variant="primary" size="sm" @click="logInOut" :title="authTitle">
+              <b-button v-if="canAuthenticate" variant="primary" @click="logInOut" :title="authTitle">
                 <component :is="authIcon" /><span class="button-label">{{ authLabel }}</span>
               </b-button>
               <LanguageChooser
                 :data="data" :currentLocale="localeFromVueX" :locales="supportedLocalesFromVueX"
                 @set-locale="locale => switchLocale({locale, userSelected: true})"
               />
+              <b-button
+                v-if="!enforcedColorModeFromVueX || enforcedColorModeFromVueX === 'auto'"
+                variant="primary"
+                @click="toggleColorMode"
+              >
+                <b-icon-sun v-if="colorMode === 'light'" :title="$t('switchToDarkMode')" />
+                <b-icon-moon-stars v-else :title="$t('switchToLightMode')" />
+              </b-button>
             </b-button-group>
           </nav>
         </b-col>
@@ -99,6 +107,7 @@
 import { defineComponent, defineAsyncComponent } from 'vue';
 import { isNavigationFailure, NavigationFailureType } from 'vue-router';
 import { mapMutations, mapActions, mapGetters, mapState } from 'vuex';
+import { useColorMode } from 'bootstrap-vue-next';
 import CONFIG from './config';
 
 // Import icons needed for dynamic component usage
@@ -157,6 +166,7 @@ export default defineComponent({
   },
   data() {
     return {
+      colorMode: null,
       sidebar: null,
       error: null,
       onDataLoaded: null,
@@ -171,7 +181,9 @@ export default defineComponent({
       localeFromVueX: 'locale',
       detectLocaleFromBrowserFromVueX: 'detectLocaleFromBrowser',
       supportedLocalesFromVueX: 'supportedLocales',
-      storeLocaleFromVueX: 'storeLocale'
+      storeLocaleFromVueX: 'storeLocale',
+      enforcedColorModeFromVueX: 'enforcedColorMode',
+      colorModeFromVueX: 'colorMode'
     }),
     ...mapGetters(['canSearch', 'collectionLink', 'description', 'fromBrowserPath', 'isExternalUrl', 'isRoot', 'parentLink', 'root', 'rootLink', 'supportsConformance', 'title', 'toBrowserPath']),
     ...mapGetters('auth', { authMethod: 'method' }),
@@ -406,9 +418,30 @@ export default defineComponent({
       if (data instanceof STAC) {
         this.onDataLoaded();
       }
+    },
+    enforcedColorModeFromVueX: {
+      immediate: true,
+      handler(value) {
+        if (value && value !== 'auto') {
+          this.colorMode = value;
+        }
+      }
+    },
+    colorModeFromVueX(value) {
+      if (value && value !== this.colorMode) {
+        this.colorMode = value;
+      }
+    },
+    colorMode(value) {
+      this.$store.commit('setColorMode', value);
     }
   },
   async created() {
+    this.colorMode = useColorMode({
+      selector: 'body',
+      initialValue: this.enforcedColorModeFromVueX
+    });
+
     await this.$router.isReady();
     this.detectLocale();
     this.parseQuery(this.$route);
@@ -462,6 +495,9 @@ export default defineComponent({
     ...mapActions(['switchLocale']),
     ...mapMutations('auth', ['addAction']),
     ...mapActions('auth', ['requestLogin', 'requestLogout']),
+    toggleColorMode() {
+      this.colorMode = this.colorMode === 'light' ? 'dark' : 'light';
+    },
     getIcon(data) {
       if (data instanceof STAC) {
         const icons = data.getIcons();

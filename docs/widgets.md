@@ -179,7 +179,7 @@ A widget is a standard Vue single-file component (`.vue` file). To create one:
    @import "../theme/variables.scss";
 
    .banner-image {
-     margin-bottom: $block-margin;
+     margin-bottom: $block-gap;
 
      img {
        max-width: 100%;
@@ -208,7 +208,7 @@ A widget is a standard Vue single-file component (`.vue` file). To create one:
 
 **Tips:**
 
-- Use `@import "../theme/variables.scss"` to access shared SCSS variables like `$block-margin`.
+- Use `@import "../theme/variables.scss"` to access shared SCSS variables like `$block-gap`.
 - Widgets only receive the `props` defined in `widgets.config.js` — they do not
   automatically receive page data such as the STAC object or items.
   You can import them from the Vuex store.

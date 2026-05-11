@@ -1,19 +1,80 @@
 @import 'variables.scss';
 @import '@vuepic/vue-datepicker/dist/main.css';
 
-// VueDatePicker theming using CSS variables
+// VueDatePicker theming
 .dp__theme_light {
-  --dp-primary-color: #{$primary};
-  --dp-primary-text-color: #{$body-bg};
-  --dp-secondary-color: #{$secondary};
-  --dp-background-color: #{$body-bg};
-  --dp-text-color: #{$body-color};
-  --dp-hover-color: #{lighten($primary, 60%)};
+  // Font & shape — follow Bootstrap form controls
+  --dp-font-family: var(--bs-font-sans-serif);
+  --dp-border-radius: var(--bs-border-radius);
+  --dp-cell-border-radius: var(--bs-border-radius);
+
+  // Background & text
+  --dp-background-color: var(--bs-body-bg);
+  --dp-text-color: var(--bs-body-color);
+
+  // Hover states
+  --dp-hover-color: var(--bs-tertiary-bg);
+  --dp-hover-text-color: var(--bs-body-color);
+  --dp-hover-icon-color: var(--bs-secondary-color);
+
+  // Primary (selected dates, active states)
+  --dp-primary-color: var(--bs-primary);
+  --dp-primary-disabled-color: rgba(var(--bs-primary-rgb), 0.5);
+  --dp-primary-text-color: var(--bs-white);
+
+  // Secondary (offset/disabled cell text)
+  --dp-secondary-color: var(--bs-border-color);
+
+  // Borders — match Bootstrap form inputs
+  --dp-border-color: var(--bs-border-color);
+  --dp-menu-border-color: var(--bs-border-color);
+  --dp-border-color-hover: var(--bs-secondary-color);
+  --dp-border-color-focus: #{$input-focus-border-color};
+
+  // Disabled states
+  --dp-disabled-color: var(--bs-secondary-bg);
+  --dp-disabled-color-text: var(--bs-secondary-color);
+
+  // Scrollbar
+  --dp-scroll-bar-background: var(--bs-tertiary-bg);
+  --dp-scroll-bar-color: var(--bs-secondary-color);
+
+  // Validation
+  --dp-success-color: var(--bs-success);
+  --dp-success-color-disabled: rgba(var(--bs-success-rgb), 0.5);
+  --dp-danger-color: var(--bs-danger);
+
+  // Icons & markers
+  --dp-icon-color: var(--bs-secondary-color);
+  --dp-marker-color: var(--bs-danger);
+
+  // Tooltip background
+  --dp-tooltip-color: var(--bs-tertiary-bg);
+
+  // Highlight & date-range fill
+  --dp-highlight-color: rgba(var(--bs-primary-rgb), 0.1);
+  --dp-range-between-dates-background-color: var(--bs-tertiary-bg);
+  --dp-range-between-dates-text-color: var(--bs-body-color);
+  --dp-range-between-border-color: var(--bs-tertiary-bg);
+
+  // Spinner
+  --dp-loader: 5px solid var(--bs-primary);
 }
 
 .dp__calendar_header {
   font-weight: 600;
   font-size: 0.95rem;
+}
+
+// Match Bootstrap's placeholder color convention
+.dp__input::placeholder {
+  color: var(--bs-secondary-color);
+  opacity: 1;
+}
+
+// Match Bootstrap's focus ring
+.dp__input_focus {
+  box-shadow: var(--bs-box-shadow-inset), 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
 }
 
 .dp__main {

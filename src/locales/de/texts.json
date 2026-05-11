@@ -402,6 +402,8 @@
   "stacCollection": "Katalog | Kataloge",
   "stacItem": "Element | Elemente",
   "submit": "Absenden",
+  "switchToDarkMode": "Wechsle in die dunkle Ansicht",
+  "switchToLightMode": "Wechsle in die helle Ansicht",
   "table": {
     "emptyFilteredText": "Es gibt keine Einträge die dem Filter entsprechen",
     "emptyText": "Keine Einträge verfügbar",

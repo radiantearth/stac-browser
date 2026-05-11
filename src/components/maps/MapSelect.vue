@@ -423,6 +423,13 @@ export default {
   border-top: 1px solid darken($light, 10%);
 }
 
+[data-bs-theme="dark"] {
+  .bbox-controls {
+    background-color: $dark;
+    border-top: 1px solid lighten($dark, 10%);
+  }
+}
+
 .compass-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(80px, 1fr));

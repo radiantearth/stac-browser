@@ -37,30 +37,34 @@ export default {
 </script>
 
 <style lang="scss">
+@import '../theme/variables.scss';
+
 #stac-browser .search-box {
   position: relative;
   box-sizing: border-box;
 
   input, .icon {
-    font-size: 1em;
+    font-size: $font-size-base;
     margin: 0;
   }
   input {
-    min-height: 2.75em;
-    padding: 0.75em 0.75em;
-    padding-left: 2.75em;
+    min-height: $input-height;
+    padding: $input-padding-y $input-padding-x;
+    padding-left: calc($input-padding-x * 2 + $font-size-base);
     z-index: 1;
     display: inline-block;
-    border: 1px solid #ccc;
+    border: $input-border-width $border-style $input-border-color;
+    border-radius: $input-border-radius;
     box-sizing: border-box;
-    background-color: #fff;
+    background-color: $input-bg;
     width: 100%;
+    height: 100%;
   }
   .icon {
-    height: 1em;
+    height: $font-size-base;
     user-select: none;
-    margin-left: 0.75em;
-    width: 1em;
+    margin-left: $input-padding-x;
+    width: $font-size-base;
     z-index: 2;
     position: absolute;
     top: 50%;

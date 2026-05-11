@@ -5,7 +5,7 @@
         <b-form-checkbox inline :name="l.id" :model-value="l.visible" @update:model-value="setVisibility(l, $event)">
           <span class="title">{{ l.title }}</span>
         </b-form-checkbox>
-        <b-button variant="light" size="sm" :title="$t('mapping.fit')" @click.prevent.stop="fitToExtent(l)">
+        <b-button variant="primary" size="sm" :title="$t('mapping.fit')" @click.prevent.stop="fitToExtent(l)">
           <b-icon-zoom-in />
         </b-button>
       </div>

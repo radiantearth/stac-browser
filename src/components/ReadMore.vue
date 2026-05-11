@@ -102,9 +102,11 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
+@import '../theme/variables.scss';
+
 .text-overflow-content {
   --nlines: 3;
-  --lineHeight: 1.5;
+  --lineHeight: #{$line-height-base};
   max-height: calc(var(--nlines) * var(--lineHeight));
   overflow: hidden;
   transition: max-height 0.3s ease;
@@ -129,31 +131,36 @@ export default defineComponent({
   cursor: pointer;
   display: block;
   position: relative;
-  border-top: 1px solid #dbdbdb;
-  height: 0.1em;
-  margin: 0.5em auto 1.5em auto;
+  border-top: $hr-border-width solid $gray-500;
+  height: 0;
+  margin: 0.5em auto calc(var(--sb-block-gap) + 0.5em) auto;
   width: 95%;
   text-align: center;
 
   span {
-    background: #fff;
-    color: #b5b5b5;
+    background: var(--bs-body-bg);
+    color: var(--bs-gray-500);
     display: inline-block;
-    font-size: 0.75em;
-    padding: 0.4em 0.8em;
+    font-size: $font-size-sm;
+    padding: 0 0.75rem;
     transform: translateY(-1.1em);
     text-align: center;
+  }
+}
+.read-more-button:hover {
+  span {
+    color: var(--bs-body-color);
   }
 }
 
 .hide-text {
   --nlines: 6;
-  --lineHeight: 1.5;
+  --lineHeight: #{$line-height-base};
   background-image: linear-gradient(
     to bottom,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 1) 90%,
-    rgba(255, 255, 255, 1) 100%
+    rgba(var(--bs-body-bg-rgb), 0) 0%,
+    rgba(var(--bs-body-bg-rgb), 1) 90%,
+    rgba(var(--bs-body-bg-rgb), 1) 100%
   );
   width: 100%;
   height: calc(var(--nlines) * var(--lineHeight));

@@ -228,6 +228,10 @@ export default {
   margin: 0;
   padding: 0;
 
+  :deep(.btn.disabled) {
+    filter: none !important;
+  }
+
   > li {
     white-space: nowrap;
   }

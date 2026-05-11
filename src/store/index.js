@@ -63,7 +63,8 @@ function getStore(config, router) {
       downloads: {},
       allowSelectCatalog: !config.catalogUrl,
       globalRequestQueryParameters: config.requestQueryParameters,
-      uiLanguage: config.locale
+      uiLanguage: config.locale,
+      colorMode: (config.enforcedColorMode && config.enforcedColorMode !== 'auto') ? config.enforcedColorMode : 'light',
     }),
     getters: {
       isRoot: (state, getters) => {
@@ -383,6 +384,9 @@ function getStore(config, router) {
       }
     },
     mutations: {
+      setColorMode(state, mode) {
+        state.colorMode = mode;
+      },
       config(state, config) {
         // This should only be called from the config action
         for (let key in config) {

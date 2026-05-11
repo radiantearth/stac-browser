@@ -6,7 +6,7 @@
     <Loading v-else-if="loading || working" stretch />
     <section v-else-if="report">
       <h2>{{ $t('source.validationReport.title') }}</h2>
-      <b-alert variant="info" show>{{ $t('source.validationReport.disclaimer') }}</b-alert>
+      <b-alert variant="warning" show>{{ $t('source.validationReport.disclaimer') }}</b-alert>
       <b-row class="stac-id">
         <b-col cols="4">{{ $t('source.id') }}</b-col>
         <b-col>

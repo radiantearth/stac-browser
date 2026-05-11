@@ -86,8 +86,12 @@ export default {
   width: 50%;
   min-width: 400px;
   max-width: 600px;
-  padding-top: $header-margin;
+  padding-top: var(--sb-header-margin);
   background-color: $light;
+  
+  [data-bs-theme="dark"] & {
+    background-color: $dark;
+  }
 
   @include media-breakpoint-down(md) {
     width: 100%;
@@ -115,12 +119,12 @@ export default {
   }
 
   .offcanvas-footer {
-    border-top: 1px solid rgba(0,0,0,.125);
+    border-top: var(--bs-border-width) var(--bs-border-style) var(--bs-border-color);
 
     .switch-catalog {
       width: 100%;
+      border-radius: 0;
     }
   }
 }
-
 </style>

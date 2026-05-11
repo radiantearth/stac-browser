@@ -24,6 +24,7 @@
 import { defineComponent } from 'vue';
 import { codeToHtml } from 'shiki';
 import CopyButton from './CopyButton.vue';
+import { mapState } from 'vuex/dist/vuex.cjs.js';
 
 export default defineComponent({
   name: 'CodeHighlighted',
@@ -49,6 +50,9 @@ export default defineComponent({
       highlightedCode: ''
     };
   },
+  computed: {
+    ...mapState(['colorMode']),
+  },
   watch: {
     code: {
       immediate: true,
@@ -65,7 +69,7 @@ export default defineComponent({
       try {
         this.highlightedCode = await codeToHtml(this.code, {
           lang: this.language,
-          theme: 'github-light'
+          theme: 'github-' + this.colorMode
         });
       }
       catch {
@@ -88,9 +92,12 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+@import '../theme/variables.scss';
+
 .code {
   position: relative;
-  border: 1px solid var(--bs-border-color);
+  border: var(--bs-border-width) var(--bs-border-style) var(--bs-border-color);
+  border-radius: var(--bs-border-radius);
   background: var(--bs-light);
 
   :deep(pre) {
@@ -101,11 +108,11 @@ export default defineComponent({
   }
   :deep(code) {
     padding: 0;
-    font-size: 0.875rem;
+    font-size: $font-size-sm;
   }
 
   .code-scroll {
-    padding: 1rem;
+    padding: var(--sb-code-padding);
     overflow: auto;
 
     // Make sure we can scroll the full code into view, even if the action buttons may block it
@@ -119,10 +126,10 @@ export default defineComponent({
 
   .actions {
     position: absolute;
-    top: 1rem;
-    right: 1rem;
+    top: var(--sb-code-padding);
+    right: var(--sb-code-padding);
     display: flex;
-    gap: 0.5rem;
+    gap: calc(var(--sb-code-padding) / 2);
     flex-direction: column;
   }
 }
