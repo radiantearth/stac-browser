@@ -21,14 +21,14 @@ export default defineComponent({
       tab: null,
       shownOnMap: [],
       selectedAssets: [],
-      _hasAutoSelected: false
+      hasAutoSelected: false
     };
   },
   watch: {
     assets: {
       immediate: true,
       handler(assets) {
-        if (this._hasAutoSelected || !assets || assets.length === 0) return;
+        if (this.hasAutoSelected || !assets || assets.length === 0) {return;}
         this._autoSelectCogAsset(assets);
       }
     }
@@ -105,13 +105,13 @@ export default defineComponent({
         const type = asset.type || '';
         return COG_MIME_TYPES.some(mt => type.includes(mt));
       });
-      if (cogAssets.length === 0) return;
+      if (cogAssets.length === 0) {return;}
 
       const visual = cogAssets.find(a =>
         Array.isArray(a.roles) && a.roles.includes('visual')
       );
       this.selectedAssets = [visual || cogAssets[0]];
-      this._hasAutoSelected = true;
+      this.hasAutoSelected = true;
     }
   }
 });
