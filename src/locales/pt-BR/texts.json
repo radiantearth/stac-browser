@@ -417,6 +417,8 @@
   "stacCollection": "Coleção | Coleções",
   "stacItem": "Item | Items",
   "submit": "Enviar",
+  "switchToDarkMode": "",
+  "switchToLightMode": "",
   "table": {
     "emptyFilteredText": "Não há registros que correspondem à sua solicitação",
     "emptyText": "Não há registros para mostrar",
