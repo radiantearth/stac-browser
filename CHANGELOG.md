@@ -49,6 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - It is not needed any longer to update the path to the `runtime-config.js`, the `pathPrefix` is added automatically in the build process.
 - User stay logged in across sessions (for OpenID Connect only)
 - CSS declarations have been updated to reuse existing variables in favor of hardcoding certain colors etc.
+- `configureBasemap` accepts an additional parameter, the VueX Store (e.g. for different basemaps depending on the color mode).
 
 ### Deprecated
 

@@ -8,3 +8,5 @@
 - [Metadata rendering](./metadata.md)
 - [Options](./options.md)
 - [Release process](./release.md)
+- [Styling & Theming](./styling.md)
+- [Widgets](./widgets.md)

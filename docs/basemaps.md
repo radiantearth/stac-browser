@@ -29,6 +29,7 @@ There are two ways to provide the basemap configuration:
 
 A default implementation for `configureBasemap` is provided, which makes use of the `BASEMAPS` object.
 It supports providing different basemaps per celestial body (e.g. Earth, Moon, Mars, etc.).
+
 The default basemaps are:
 
 - For the Earth it is OpenStreetMaps as XYZ in EPSG:3857
@@ -37,9 +38,13 @@ The default basemaps are:
 The easiest way to add or change the maps for the Earth, is to update the `earth` array in the `BASEMAPS` object.
 Each object in the arrays defines the [basemap options](#options).
 
+In addition, you can add a dark mode variant of each basemap in `BASEMAPS` object. Just append `-dark` to the celestial body, e.g. `Earth-dark`. The default version of `configureBasemap` detects and uses the dark basemaps automatically if provided in the `BASEMAPS` object.
+
 An alternative is to remove the `BASEMAPS` array and implement a custom version of the `configureBasemap` function.
 The function received the STAC object and the I18N object as inputs, which allows you to provide different basemaps per STAC entity if needed.
 The function must return an array of objects, where each object provides the [basemap options](#options).
+
+
 
 ## Options
 

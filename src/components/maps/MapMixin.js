@@ -24,7 +24,7 @@ register(proj4); // required to support source reprojection
 
 export default {
   computed: {
-    ...mapState(['buildTileUrlTemplate', 'crossOriginMedia', 'displayGeoTiffByDefault', 'displayPreview', 'displayOverview', 'getMapSourceOptions', 'useTileLayerAsFallback', 'uiLanguage']),
+    ...mapState(['buildTileUrlTemplate', 'colorMode', 'crossOriginMedia', 'displayGeoTiffByDefault', 'displayPreview', 'displayOverview', 'getMapSourceOptions', 'useTileLayerAsFallback', 'uiLanguage']),
     stacLayerOptions() {
       return {
         buildTileUrlTemplate: this.buildTileUrlTemplate,
@@ -58,15 +58,18 @@ export default {
   watch: {
     uiLanguage() {
       this.createControls();
+    },
+    async colorMode() {
+      await this.updateBasemaps();
     }
   },
   methods: {
-    async createMap(element, stac, onfocusOnly = false) {
+    async createMap(element, onfocusOnly = false) {
       let projection = 'EPSG:3857';
       let visibleLayer = 0;
 
       // Get basemaps
-      this.basemaps = configureBasemap(stac, this.$i18n);
+      this.basemaps = configureBasemap(this.stac, this.$i18n, this.$store);
       if (this.basemaps.length > 0) {
         const ix = this.basemaps.findIndex(basemap => basemap.visible);
         if (ix >= 0) {
@@ -100,6 +103,39 @@ export default {
 
       // Add basemaps
       await this.addBasemaps(this.basemaps, visibleLayer);
+    },
+    async updateBasemaps() {
+      if (!this.map) {
+        return;
+      }
+
+      // Get new basemaps
+      const newBasemaps = configureBasemap(this.stac, this.$i18n, this.$store);
+
+      // Only update when the basemaps are different to before based on URLs
+      const sameBasemaps = (
+        this.basemaps.length == newBasemaps.length
+        && this.basemaps.every((b, i) => b.url === newBasemaps[i].url)
+      );
+      if (sameBasemaps) {
+        return;
+      }
+
+      // Remove existing basemap layers, but keep their position and visibility for the new layers
+      const allLayers = this.map.getLayers().getArray();
+      const basemapLayers = allLayers.filter(l => l.get('base'));
+      const insertAt = allLayers.findIndex(l => l.get('base'));
+      const visibleIndex = basemapLayers.findIndex(l => l.getVisible());
+      basemapLayers.forEach(l => this.map.removeLayer(l));
+
+      // Assign new basemaps
+      this.basemaps = newBasemaps;
+
+      // Restore visibility of the previously visible layer
+      const newVisibleIndex = visibleIndex >= 0 && visibleIndex < this.basemaps.length ? visibleIndex : 0;
+
+      // Add new basemap layers at the same position as the previous ones
+      await this.addBasemaps(this.basemaps, newVisibleIndex, insertAt >= 0 ? insertAt : 0);
     },
     createControls() {
       ['zoom', 'attribution', 'fullScreen'].forEach(type => {
@@ -140,7 +176,7 @@ export default {
       });
       this.map.addControl(this.fullScreenControl);
     },
-    async addBasemaps(basemaps, visibleLayer = 0) {
+    async addBasemaps(basemaps, visibleLayer = 0, insertAt = null) {
       const promises = basemaps.map(async (options) => {
         try {
           let layerClassName = 'WebGLTile';
@@ -198,7 +234,11 @@ export default {
         .filter(layer => isObject(layer))
         .forEach((layer, i) => {
           layer.setVisible(i === visibleLayer);
-          this.map.addLayer(layer);
+          if (insertAt !== null) {
+            this.map.getLayers().insertAt(insertAt + i, layer);
+          } else {
+            this.map.addLayer(layer);
+          }
         });
     }
   }

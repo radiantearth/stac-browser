@@ -13,6 +13,15 @@ const BASEMAPS = {
       projection: "EPSG:3857"
     }
   ],
+//'earth-dark': [
+//  {
+//    url: 'https://cartodb-basemaps-{a-d}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png',
+//    is: 'XYZ',
+//    title: 'Carto Dark',
+//    attributions: 'Map tiles by Carto, under CC BY 3.0. Data by OpenStreetMap, under ODbL.',
+//    projection: "EPSG:3857"
+//  }
+//],
   europa: [
     {
       url: 'https://planetarymaps.usgs.gov/cgi-bin/mapserv?map=/maps/jupiter/europa_simp_cyl.map',
@@ -58,9 +67,10 @@ const BASEMAPS = {
  * 
  * @param {Object} stac The STAC object
  * @param {Object} i18n Vue I18N object
+ * @param {String} store Vuex store instance
  * @returns {Array.<BasemapOptions>}
  */
-export default function configureBasemap(stac, i18n) {
+export default function configureBasemap(stac, i18n, store) {
   let targets;
   if (stac instanceof Collection) {
     targets = stac.getSummary('ssys:targets');
@@ -70,6 +80,13 @@ export default function configureBasemap(stac, i18n) {
   }
   if (!targets) {
     targets = ['earth'];
+  }
+
+  if (store.state.colorMode === 'dark') {
+    targets = targets.map(t => {
+      const darkVariant = `${t}-dark`;
+      return Array.isArray(BASEMAPS[darkVariant]) ? darkVariant : t;
+    });
   }
 
   let layers = [];
