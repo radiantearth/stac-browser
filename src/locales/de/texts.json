@@ -70,8 +70,12 @@
     "false": "Nein",
     "true": "Ja"
   },
+  "close": "",
   "copy": "Kopieren",
-  "copyErrors": {},
+  "copyErrors": {
+    "permission": "",
+    "unsupported": ""
+  },
   "default": "Standardeinstellung",
   "defaultWithValue": "Standardeinstellung ({value})",
   "deprecated": "Abgekündigt",
@@ -113,7 +117,11 @@
     "title": "Fehler",
     "unauthorized": "Der Anfrage fehlen die Anmeldedaten, bspw. ein API-Schlüssel. Bitte geben Sie Ihre Anmeldedaten an und versuchen Sie es erneut."
   },
-  "exampleCode": {},
+  "exampleCode": {
+    "title": "",
+    "storeAs": "",
+    "installDependencies": ""
+  },
   "featureExperimental": "Diese Funktion ist noch experimentell und kann unerwartete Ergebnisse verursachen!",
   "features": {
     "empty": "Keine Features verfügbar.",
@@ -226,7 +234,14 @@
     "previous": "‹ Vorherige"
   },
   "poweredBy": "Generiert von {link}",
-  "programming": {},
+  "programming": {
+    "csharp": "",
+    "java": "",
+    "javascript": "",
+    "python": "",
+    "r": "",
+    "rust": ""
+  },
   "protocol": {
     "azure": "Microsoft Azure",
     "file": "Dateisystem (lokal)",
@@ -402,6 +417,8 @@
   "stacCollection": "Katalog | Kataloge",
   "stacItem": "Element | Elemente",
   "submit": "Absenden",
+  "switchToDarkMode": "Wechsle in die dunkle Ansicht",
+  "switchToLightMode": "Wechsle in die helle Ansicht",
   "table": {
     "emptyFilteredText": "Es gibt keine Einträge die dem Filter entsprechen",
     "emptyText": "Keine Einträge verfügbar",
