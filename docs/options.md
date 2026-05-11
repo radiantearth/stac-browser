@@ -77,6 +77,7 @@ The override order for the configuration is:
   - [crs](#crs)
   - [getMapSourceOptions](#getmapsourceoptions)
 - [User Interface](#user-interface)
+  - [enforcedColorMode](#enforcedcolormode)
   - [searchResultsPerPage](#searchresultsperpage)
   - [itemsPerPage](#itemsperpage)
   - [collectionsPerPage](#collectionsperpage)
@@ -120,6 +121,7 @@ Should be an image that browsers can display, e.g. PNG, JPEG, WebP, or SVG.
 Array of links to display in the footer above the "Powered by STAC Browser" text. Each link requires a `label` and `url`.
 
 Example:
+
 ```js
 footerLinks: [
   { label: "Imprint", url: "https://example.com/imprint" },
@@ -464,6 +466,12 @@ getSourceOptions: async (type, options) => {
 ```
 
 ## User Interface
+
+### enforcedColorMode
+
+STAC Browser supports light and dark modes since v5.0.0.
+By default, this value is set to `auto`, which detects the user preference based on the system settings.
+This config option allows to enforce a specific color mode, either `light` (default before v5.0.0) or `dark`.
 
 ### searchResultsPerPage
 
