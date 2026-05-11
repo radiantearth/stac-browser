@@ -14,5 +14,13 @@
     "url": "https://data.source.coop/nlebovits/belgium-buildings/catalog.json",
     "access": "public",
     "isApi": false
+  },
+  {
+    "id": "pergamino-ide",
+    "title": "Pergamino IDE",
+    "summary": "187 open geospatial datasets from the Municipality of Pergamino, Argentina — cadastral, infrastructure, transit, agriculture, census, and more.",
+    "url": "https://data.source.coop/nlebovits/pergamino-ide/catalog.json",
+    "access": "public",
+    "isApi": false
   }
 ]
