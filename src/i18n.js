@@ -1,5 +1,5 @@
 import { createI18n } from 'vue-i18n';
-import CONFIG from './config';
+import CONFIG from './merged-config';
 import { default as Fields } from '@radiantearth/stac-fields/I18N';
 import { isObject, size } from 'stac-js/src/utils.js';
 

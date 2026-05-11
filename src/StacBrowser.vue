@@ -108,7 +108,7 @@ import { defineComponent, defineAsyncComponent } from 'vue';
 import { isNavigationFailure, NavigationFailureType } from 'vue-router';
 import { mapMutations, mapActions, mapGetters, mapState } from 'vuex';
 import { useColorMode } from 'bootstrap-vue-next';
-import CONFIG from './config';
+import CONFIG from './merged-config';
 
 // Import icons needed for dynamic component usage
 import BIconLock from '~icons/bi/lock';

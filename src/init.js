@@ -2,7 +2,7 @@ import { createApp } from "vue";
 import { createRouter, createWebHistory, createWebHashHistory } from "vue-router";
 import StacBrowser from "./StacBrowser.vue";
 import i18n, { loadDefaultMessages } from './i18n';
-import CONFIG from './config';
+import CONFIG from './merged-config';
 import getRoutes from "./router";
 import getStore from "./store";
 
