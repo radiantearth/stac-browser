@@ -718,7 +718,7 @@ export default defineComponent({
     async onReset() {
       Object.assign(this, getDefaults());
       this.preselectSingleDateExtent();
-      this.$emit('input', {}, true);
+      this.$emit('input', this.query, true);
     },
     preselectSingleDateExtent() {
       if (this.isSingleDateExtent && !Array.isArray(this.query.datetime)) {
