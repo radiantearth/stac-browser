@@ -37,6 +37,9 @@
               timePickerInline: true 
             }"
             :input-attrs="{ clearable: true }"
+            :min-date="temporalExtentMinDate"
+            :max-date="temporalExtentMaxDate"
+            :prevent-min-max-navigation="hasTemporalExtentBounds"
             auto-apply
             range
             :multi-calendars="2"
@@ -400,6 +403,32 @@ export default defineComponent({
       set(val) {
         this.query.datetime = Array.isArray(val) ? val.map(d => Utils.dateToUTC(d)) : null;
       }
+    },
+    temporalExtentMinDate() {
+      if (this.type === 'Items' && this.stac && typeof this.stac.getTemporalExtent === 'function') {
+        const extent = this.stac.getTemporalExtent();
+        if (Array.isArray(extent) && extent[0] instanceof Date) {
+          return extent[0];
+        }
+      }
+      return undefined;
+    },
+    temporalExtentMaxDate() {
+      if (this.type === 'Items' && this.stac && typeof this.stac.getTemporalExtent === 'function') {
+        const extent = this.stac.getTemporalExtent();
+        if (Array.isArray(extent) && extent[1] instanceof Date) {
+          return extent[1];
+        }
+      }
+      return undefined;
+    },
+    hasTemporalExtentBounds() {
+      return this.temporalExtentMinDate !== undefined || this.temporalExtentMaxDate !== undefined;
+    },
+    isSingleDateExtent() {
+      return this.temporalExtentMinDate instanceof Date
+        && this.temporalExtentMaxDate instanceof Date
+        && this.temporalExtentMinDate.getTime() === this.temporalExtentMaxDate.getTime();
     }
   },
   watch: {
@@ -502,6 +531,7 @@ export default defineComponent({
       );
     }
     Promise.all(promises).finally(() => this.loaded = true);
+    this.preselectSingleDateExtent();
   },
   methods: {
     resetSearchCollection() {
@@ -687,7 +717,14 @@ export default defineComponent({
     },
     async onReset() {
       Object.assign(this, getDefaults());
+      this.preselectSingleDateExtent();
       this.$emit('input', {}, true);
+    },
+    preselectSingleDateExtent() {
+      if (this.isSingleDateExtent && !Array.isArray(this.query.datetime)) {
+        const date = this.temporalExtentMinDate;
+        this.query.datetime = [date.toISOString(), date.toISOString()];
+      }
     },
     setLimit(limit) {
       limit = Number.parseInt(limit, 10);
