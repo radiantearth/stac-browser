@@ -23,6 +23,13 @@ export default class CqlArrayOperator extends CqlOperator {
     }
   }
 
+  toText() {
+    if (this.operator === 'in') {
+      return `${this.args[0].toText()} in ${this.args[1].toText()}`;
+    }
+    return `${this.operator}(${this.args.map(arg => arg.toText()).join(', ')})`;
+  }
+
   static valueType() {
     return CqlArray;
   }
