@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- CQL2 text representation of array operators (`a_overlaps`, `a_contains`, `a_equals`, `a_contained_by`) now uses function-call syntax as defined by the CQL2 text grammar
+
 ## [5.0.0-beta.1] - 2026-05-12
 
 **THIS IS A BREAKING RELEASE - MAKE SURE TO UPDATE ALL YOUR CONFIG FILES!**
