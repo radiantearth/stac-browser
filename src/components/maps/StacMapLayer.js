@@ -24,6 +24,50 @@ const PMTILES_MIME_TYPES = [
   'application/vnd.pmtiles',
 ];
 
+const MVT_MIME_TYPES = [
+  'application/vnd.mapbox-vector-tile',
+  'application/x-protobuf',
+];
+
+function assetHref(asset) {
+  return asset.getAbsoluteUrl?.() || asset.href || '';
+}
+
+function isPmtilesAsset(asset) {
+  const type = asset.type || '';
+  const href = assetHref(asset);
+  return PMTILES_MIME_TYPES.some(mt => type.includes(mt)) || href.endsWith('.pmtiles');
+}
+
+function isXyzVectorAsset(asset) {
+  const type = asset.type || '';
+  const href = assetHref(asset);
+  if (!href.includes('{z}') || !href.includes('{x}') || !href.includes('{y}')) return false;
+  return MVT_MIME_TYPES.some(mt => type.includes(mt));
+}
+
+function isTileJsonAsset(asset) {
+  const type = asset.type || '';
+  const roles = Array.isArray(asset.roles) ? asset.roles : [];
+  if (!type.startsWith('application/json')) return false;
+  return roles.includes('tiles');
+}
+
+function isTileAsset(asset) {
+  return isTileJsonAsset(asset) || isXyzVectorAsset(asset) || isPmtilesAsset(asset);
+}
+
+// Prefer TileJSON > XYZ > PMTiles. If a server-rendered tile endpoint exists,
+// drop the PMTiles asset so we only load one set of tiles.
+function preferredTileAssets(assets) {
+  const tilejson = assets.filter(isTileJsonAsset);
+  const xyz = assets.filter(isXyzVectorAsset);
+  if (tilejson.length > 0 || xyz.length > 0) {
+    return [...tilejson, ...xyz];
+  }
+  return assets.filter(isPmtilesAsset);
+}
+
 export default class StacMapLayer {
   constructor(map, options = {}) {
     this.map = map;
@@ -89,13 +133,7 @@ export default class StacMapLayer {
 
   async autoLoadVisualAssets(stac) {
     if (!stac || typeof stac.getAssets !== 'function') return;
-    const assets = stac.getAssets();
-    const visualAssets = assets.filter(asset => {
-      const type = asset.type || '';
-      const href = asset.href || asset.getAbsoluteUrl?.() || '';
-      if (PMTILES_MIME_TYPES.some(mt => type.includes(mt)) || href.endsWith('.pmtiles')) return true;
-      return false;
-    });
+    const visualAssets = stac.getAssets().filter(isTileAsset);
     if (visualAssets.length > 0) {
       await this.setAssets(visualAssets);
     }
@@ -178,41 +216,71 @@ export default class StacMapLayer {
 
     if (!assets || assets.length === 0) return;
 
-    await this._addPmtilesAssets(assets);
+    await this._addTileAssets(preferredTileAssets(assets));
     await this._addCogAssets(assets);
   }
 
-  async _addPmtilesAssets(assets) {
-    const pmtilesAssets = assets.filter(asset => {
-      const type = asset.type || '';
-      const href = asset.href || asset.getAbsoluteUrl?.() || '';
-      return PMTILES_MIME_TYPES.some(mt => type.includes(mt)) || href.endsWith('.pmtiles');
-    });
-
-    for (let i = 0; i < pmtilesAssets.length; i++) {
-      const asset = pmtilesAssets[i];
-      const url = asset.getAbsoluteUrl?.() || asset.href;
-      const sourceId = `stac-pmtiles-${i}`;
+  async _addTileAssets(assets) {
+    for (let i = 0; i < assets.length; i++) {
+      const asset = assets[i];
+      const url = assetHref(asset);
+      const sourceId = `stac-tile-${i}`;
 
       this._pmtilesAssetMeta.push({
-        title: asset.title || asset.key || `PMTiles ${i + 1}`,
+        title: asset.title || asset.key || `Tiles ${i + 1}`,
         sourceId,
       });
 
       try {
-        const pm = new PMTiles(url, sharedCache);
-        pmtilesProtocol.add(pm);
-        const header = await pm.getHeader();
+        if (isTileJsonAsset(asset)) {
+          await this._addTileJsonSource(url, sourceId);
+        } else if (isXyzVectorAsset(asset)) {
+          this._addXyzVectorSource(url, sourceId, asset);
+        } else if (isPmtilesAsset(asset)) {
+          const pm = new PMTiles(url, sharedCache);
+          pmtilesProtocol.add(pm);
+          const header = await pm.getHeader();
 
-        if (header.tileType === 1) {
-          await this._addVectorPmtiles(pm, url, sourceId);
-        } else {
-          this._addRasterPmtiles(url, sourceId);
+          if (header.tileType === 1) {
+            await this._addVectorPmtiles(pm, url, sourceId);
+          } else {
+            this._addRasterPmtiles(url, sourceId);
+          }
         }
       } catch (err) {
-        console.warn(`Failed to add PMTiles asset ${url}`, err);
+        console.warn(`Failed to add tile asset ${url}`, err);
       }
     }
+  }
+
+  async _addTileJsonSource(url, sourceId) {
+    this.map.addSource(sourceId, { type: 'vector', url });
+    this._pmtilesSourceIds.push(sourceId);
+
+    let layerNames = [];
+    try {
+      const resp = await fetch(url);
+      if (resp.ok) {
+        const tj = await resp.json();
+        if (Array.isArray(tj.vector_layers)) {
+          layerNames = tj.vector_layers.map(l => l.id);
+        }
+      }
+    } catch {
+      /* TileJSON metadata may be unavailable; fall back to default layer */
+    }
+
+    this._addDefaultVectorLayers(sourceId, layerNames);
+  }
+
+  _addXyzVectorSource(url, sourceId, asset) {
+    const spec = { type: 'vector', tiles: [url] };
+    if (typeof asset.minzoom === 'number') spec.minzoom = asset.minzoom;
+    if (typeof asset.maxzoom === 'number') spec.maxzoom = asset.maxzoom;
+    this.map.addSource(sourceId, spec);
+    this._pmtilesSourceIds.push(sourceId);
+
+    this._addDefaultVectorLayers(sourceId, []);
   }
 
   async _addVectorPmtiles(pm, url, sourceId) {
@@ -232,14 +300,15 @@ export default class StacMapLayer {
       /* metadata may not be available */
     }
 
-    if (layerNames.length === 0) {
-      layerNames = ['default'];
-    }
+    this._addDefaultVectorLayers(sourceId, layerNames);
+  }
 
+  _addDefaultVectorLayers(sourceId, layerNames) {
+    const names = layerNames.length > 0 ? layerNames : ['default'];
     const colors = ['#4163cc', '#cc6341', '#41cc63', '#cc41a8', '#ccb341'];
 
-    for (let j = 0; j < layerNames.length; j++) {
-      const sourceLayer = layerNames[j];
+    for (let j = 0; j < names.length; j++) {
+      const sourceLayer = names[j];
       const color = colors[j % colors.length];
       const fillLayerId = `${sourceId}-${sourceLayer}-fill`;
       const lineLayerId = `${sourceId}-${sourceLayer}-line`;
