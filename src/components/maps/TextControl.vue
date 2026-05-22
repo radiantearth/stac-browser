@@ -54,6 +54,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "../../theme/variables.scss";
+
 .ol-textcontrol {
   position: absolute;
   top: 0.5em;
@@ -66,6 +68,10 @@ export default {
   padding: 0.2em;
   text-align: center;
   z-index: 1;
+
+  [data-bs-theme="dark"] & {
+    background-color: $dark;
+  }
 }
 .pointer {
   cursor: pointer;
