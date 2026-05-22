@@ -1,3 +1,5 @@
+@use 'sass:math';
+
 html,
 body {
   height: 100%;
@@ -6,6 +8,14 @@ body {
 
 body {
   margin-top: var(--sb-header-margin);
+}
+
+.list-group-item.active a {
+  color: $link-color-on-primary;
+
+  &:hover {
+    color: $link-hover-color-on-primary;
+  }
 }
 
 #popover-root-btn {
