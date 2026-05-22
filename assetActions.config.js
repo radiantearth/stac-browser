@@ -8,6 +8,7 @@ import GeoJsonIo from './src/actions/assets/GeoJsonIo.js';
 import GeoParquetInfo from './src/actions/assets/GeoParquetInfo.js';
 // import Potree from './src/actions/assets/Potree.js';
 import Protomaps from './src/actions/assets/Protomaps.js';
+import Gridlook from './src/actions/assets/Gridlook.js';
 
 export default {
   //Felt
@@ -19,4 +20,5 @@ export default {
   GeoParquetInfo,
   // Potree,
   Protomaps,
+  Gridlook,
 };
