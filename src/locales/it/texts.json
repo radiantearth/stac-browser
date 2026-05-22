@@ -290,6 +290,7 @@
     "between": "tra",
     "betweenOperatorDescription": "Verifica se un valore di campo numerico si trova all'interno dell'intervallo specificato. L'intervallo dato è inclusivo.",
     "dateDescription": "Data/ora nel sistema UTC (tempo coordinato internazionale).",
+    "disabledDueToSingleDate": "",
     "enterCollections": "Inserire una o più Collezioni...",
     "enterItemIds": "Inserire uno o più ID di Elemento...",
     "enterSearchTerms": "Inserisci uno o più termini di ricerca...",
@@ -417,6 +418,8 @@
   "stacCollection": "Collezione | Collezioni",
   "stacItem": "Elemento | Elementi",
   "submit": "Invia",
+  "switchToDarkMode": "",
+  "switchToLightMode": "",
   "table": {
     "emptyFilteredText": "Non ci sono record corrispondenti alla tua richiesta",
     "emptyText": "Non ci sono record da mostrare",
