@@ -219,6 +219,9 @@ You need to provide a field `stac_browser` and then you can set any of the follo
 - `displayGeoTiffByDefault`
 - `showThumbnailsAsAssets`
 
+Additionally, you can add an `extent` object **outside** of the `stac_browser` field to
+indicate the bounding box and temporal extent of the API/catalog (see also below).
+
 ### Custom extensions
 
 STAC Browser supports some non-standardized extensions to the STAC specification that you can use to improve the user-experience.
@@ -228,6 +231,7 @@ STAC Browser supports some non-standardized extensions to the STAC specification
 2. [Alternative Assets Object](https://github.com/stac-extensions/alternate-assets?tab=readme-ov-file#alternate-asset-object):
    Add a `name` field and it will be used as title in the tab header, the same applies for the core Asset Object.
 3. A link with relation type `icon` and a Browser-supported media type in any STAC entity will show an icon in the header and the lists of Catalogs, Collections and Items.
+4. Add an `extent` property defining an Extent Object as defined in the [Collection specification](https://github.com/radiantearth/stac-spec/blob/master/collection-spec/collection-spec.md#extent-object) to the root catalog to indicate the bounding box and temporal extent of the API/catalog. This will for example restrict the bounding box and temporal extent selection in Collection Search and Global Item Search. If you can't add this to the root catalog itself, you can also add it dynamically through [`preprocessSTAC`](./docs/options.md#preprocessstac).
 
 ## Docker
 
