@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Only show language chooser when more than one locale is available
+- Retrict items search date picker to collection's temporal extend.
 
 ## [5.0.0-beta.1] - 2026-05-12
 
