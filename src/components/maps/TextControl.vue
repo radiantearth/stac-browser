@@ -1,5 +1,5 @@
 <template>
-  <div v-if="texts.length > 0" class="ol-textcontrol ol-unselectable" @click="toggle" :class="{pointer: texts.length > 1}">{{ current }}</div>
+  <div v-if="texts.length > 0" class="ol-control ol-unselectable ol-textcontrol" @click="toggle" :class="{pointer: texts.length > 1}">{{ current }}</div>
 </template>
 
 <script>
