@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Link color on data source list selection improved
+- Improve the background color for dark mode on the map text controls.
 
 ## [5.0.0-beta.1] - 2026-05-12
 
