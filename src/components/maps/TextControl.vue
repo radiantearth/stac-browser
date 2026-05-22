@@ -54,7 +54,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "../../theme/variables.scss";
 .ol-textcontrol {
   position: absolute;
   top: 0.5em;
