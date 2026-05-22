@@ -275,6 +275,7 @@
     "between": "zwischen",
     "betweenOperatorDescription": "Prüft, ob ein numerischer Wert innerhalb des angegebenen Bereichs liegt. Die angegebenen Grenzen werden eingeschlossen.",
     "dateDescription": "Alle Zeiten in koordinierter Weltzeit (UTC).",
+    "disabledDueToSingleDate": "Dieser Filter ist deaktiviert, da die Sammlung einen einzelnen Zeitpunkt als zeitliche Ausdehnung hat.",
     "enterCollections": "Gebe Katalog-Identifikationsnummern ein...",
     "enterItemIds": "Gebe Element-Identifikationsnummern ein...",
     "enterSearchTerms": "Gebe Suchbegriffe ein...",

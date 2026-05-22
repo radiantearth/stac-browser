@@ -21,7 +21,7 @@
           </multiselect>
         </b-form-group>
 
-        <b-form-group v-if="canFilterExtents" class="filter-datetime" :label="$t('search.temporalExtent')" :label-for="ids.datetime" :description="$t('search.dateDescription')">
+        <b-form-group v-if="canFilterExtents" class="filter-datetime" :label="$t('search.temporalExtent')" :label-for="ids.datetime" :description="isSingleDateExtent ? $t('search.disabledDueToSingleDate') : $t('search.dateDescription')">
           <VueDatePicker
             input-class="form-control mx-input"
             :id="ids.datetime" 
@@ -37,9 +37,14 @@
               timePickerInline: true 
             }"
             :input-attrs="{ clearable: true }"
+            :min-date="temporalExtent?.[0]"
+            :max-date="temporalExtent?.[1]"
+            :start-date="temporalExtent?.[1]"
+            :prevent-min-max-navigation="Boolean(temporalExtent)"
             auto-apply
             range
             :multi-calendars="2"
+            :disabled="isSingleDateExtent"
           />
         </b-form-group>
 
@@ -400,6 +405,22 @@ export default defineComponent({
       set(val) {
         this.query.datetime = Array.isArray(val) ? val.map(d => Utils.dateToUTC(d)) : null;
       }
+    },
+    temporalExtent() {
+      if (this.type === 'Items' && this.stac && typeof this.stac.getTemporalExtent === 'function') {
+        const extent = this.stac.getTemporalExtent();
+        if (Array.isArray(extent)) {
+          const [min, max] = extent;
+          if (min instanceof Date || max instanceof Date) {
+            return [min instanceof Date ? min : undefined, max instanceof Date ? max : undefined];
+          }
+        }
+      }
+      return null;
+    },
+    isSingleDateExtent() {
+      const [min, max] = this.temporalExtent || [];
+      return min instanceof Date && max instanceof Date && min.getTime() === max.getTime();
     }
   },
   watch: {
@@ -687,7 +708,7 @@ export default defineComponent({
     },
     async onReset() {
       Object.assign(this, getDefaults());
-      this.$emit('input', {}, true);
+      this.$emit('input', this.query, true);
     },
     setLimit(limit) {
       limit = Number.parseInt(limit, 10);
