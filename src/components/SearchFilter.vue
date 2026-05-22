@@ -39,7 +39,7 @@
             :input-attrs="{ clearable: true }"
             :min-date="temporalExtent?.[0]"
             :max-date="temporalExtent?.[1]"
-            :prevent-min-max-navigation="!!temporalExtent"
+            :prevent-min-max-navigation="Boolean(temporalExtent)"
             auto-apply
             range
             :multi-calendars="2"
