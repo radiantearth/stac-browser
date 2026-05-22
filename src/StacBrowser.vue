@@ -37,6 +37,7 @@
                 <component :is="authIcon" /><span class="button-label">{{ authLabel }}</span>
               </b-button>
               <LanguageChooser
+                v-if="supportedLocalesFromVueX.length > 1"
                 :data="data" :currentLocale="localeFromVueX" :locales="supportedLocalesFromVueX"
                 @set-locale="locale => switchLocale({locale, userSelected: true})"
               />
