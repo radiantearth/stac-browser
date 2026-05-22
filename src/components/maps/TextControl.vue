@@ -1,5 +1,5 @@
 <template>
-  <div v-if="texts.length > 0" class="ol-textcontrol ol-unselectable ol-control" @click="toggle" :class="{pointer: texts.length > 1}">{{ current }}</div>
+  <div v-if="texts.length > 0" class="ol-textcontrol ol-unselectable" @click="toggle" :class="{pointer: texts.length > 1}">{{ current }}</div>
 </template>
 
 <script>
@@ -54,7 +54,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "../../theme/map.scss";
+@import "../../theme/variables.scss";
 .ol-textcontrol {
   position: absolute;
   top: 0.5em;
@@ -69,6 +69,7 @@ export default {
   text-align: center;
   z-index: 1;
 }
+
 .pointer {
   cursor: pointer;
 }

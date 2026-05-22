@@ -397,8 +397,12 @@ export default {
 };
 </script>
 
+<style lang="scss">
+@import "ol/ol.css";
+</style>
+
 <style lang="scss" scoped>
-@import "../../theme/map.scss";
+@import "../../theme/variables.scss";
 .map-container {
   display: flex;
   flex-direction: column;
