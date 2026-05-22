@@ -21,7 +21,7 @@
           </multiselect>
         </b-form-group>
 
-        <b-form-group v-if="canFilterExtents" class="filter-datetime" :label="$t('search.temporalExtent')" :label-for="ids.datetime" :description="$t('search.dateDescription')">
+        <b-form-group v-if="canFilterExtents" class="filter-datetime" :label="$t('search.temporalExtent')" :label-for="ids.datetime" :description="isSingleDateExtent ? $t('search.disabledDueToSingleDate') : $t('search.dateDescription')">
           <VueDatePicker
             input-class="form-control mx-input"
             :id="ids.datetime" 
@@ -39,10 +39,12 @@
             :input-attrs="{ clearable: true }"
             :min-date="temporalExtent?.[0]"
             :max-date="temporalExtent?.[1]"
+            :start-date="temporalExtent?.[1]"
             :prevent-min-max-navigation="Boolean(temporalExtent)"
             auto-apply
             range
             :multi-calendars="2"
+            :disabled="isSingleDateExtent"
           />
         </b-form-group>
 
@@ -521,7 +523,6 @@ export default defineComponent({
       );
     }
     Promise.all(promises).finally(() => this.loaded = true);
-    this.preselectSingleDateExtent();
   },
   methods: {
     resetSearchCollection() {
@@ -707,14 +708,7 @@ export default defineComponent({
     },
     async onReset() {
       Object.assign(this, getDefaults());
-      this.preselectSingleDateExtent();
       this.$emit('input', this.query, true);
-    },
-    preselectSingleDateExtent() {
-      if (this.isSingleDateExtent && !Array.isArray(this.query.datetime)) {
-        const date = this.temporalExtent[0];
-        this.query.datetime = [date.toISOString(), date.toISOString()];
-      }
     },
     setLimit(limit) {
       limit = Number.parseInt(limit, 10);
