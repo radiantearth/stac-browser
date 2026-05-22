@@ -54,24 +54,20 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "../../theme/variables.scss";
-
+@import "../../theme/map.scss";
 .ol-textcontrol {
   position: absolute;
   top: 0.5em;
   left: calc(2.375em + 6px);
   max-width: calc(100% - 2*(2.375em + 6px));
   box-sizing: border-box;
-  background-color: rgba(255,255,255,0.6);
+  color: var(--ol-foreground-color);
+  background-color: var(--ol-partial-background-color);
   white-space: pre-wrap;
   font-size: 0.9em;
   padding: 0.2em;
   text-align: center;
   z-index: 1;
-
-  [data-bs-theme="dark"] & {
-    background-color: $dark;
-  }
 }
 .pointer {
   cursor: pointer;

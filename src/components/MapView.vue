@@ -260,7 +260,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import "ol/ol.css";
+@import "../theme/map.scss";
 
 #stac-browser {
   .map-popover {
