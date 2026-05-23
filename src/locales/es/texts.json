@@ -18,16 +18,16 @@
     "currentlyShown": "Este es el recurso que actualmente se muestra.",
     "download": {
       "generic": "Descargar",
-      "withSource": "Descargar {source}"
+      "withSource": "Descargar desde {source}"
     },
-    "inItems": "Recursos en elementos | Recursos en elementos",
+    "inItems": "Recurso en elementos | Recursos en elementos",
     "role": {
       "data": "Datos",
       "metadata": "Metadatos"
     },
     "showOnMap": "Mostrar en el mapa",
-    "showThumbnail": "Mostrar miniatura",
-    "shown": "Mostrado"
+    "showThumbnail": "Mostrar vista previa",
+    "shown": "mostrado"
   },
   "authentication": {
     "button": {
@@ -35,9 +35,9 @@
       "logout": "Salir",
       "title": "Proporciona o actualiza tus credenciales"
     },
-    "chooseMethod": "Elija el método de autenticación",
+    "chooseMethod": "Elije el método de autenticación",
     "description": "La página solicitada requiere autenticación. Por favor proporcione sus datos de autenticación en el campo de texto que aparece a continuación.",
-    "loggedOut": "Ha cerrado la sesión con éxito. Ahora puede cerrar esta ventana.",
+    "loggedOut": "Has cerrado la sesión con éxito. Ahora puedes cerrar esta ventana.",
     "password": "Contraseña",
     "required": "Se necesita autenticación",
     "schemeTypes": {
@@ -49,22 +49,22 @@
       "signedUrl": "URL Firmada"
     },
     "title": "Autenticación",
-    "unauthorized": "No tiene permiso para acceder a estos datos. Por favor, inicie sesión.",
-    "unsupported": "No compatible",
-    "unsupportedLong": "Lo sentimos, el método de autenticación {method} no es compatible con STAC Browser.",
+    "unauthorized": "No tienes permiso para acceder a estos datos. Por favor, inicie sesión.",
+    "unsupported": "No soportado",
+    "unsupportedLong": "Lo sentimos, el método de autenticación {method} no es soportado por STAC Browser.",
     "user": "Usuario"
   },
   "browse": "Explorar",
   "cancel": "Cancelar",
   "catalog": {
     "license": "Licencia",
-    "temporalExtent": "Alcance temporal"
+    "temporalExtent": "Extensión temporal"
   },
   "catalogs": {
     "filterByTitle": "Filtrar catálogos por título",
     "filterByTitleAndMore": "Filtrar catálogo por título, descripción o palabras clave",
     "loadMore": "Cargar más...",
-    "noMatches": "Ningún catálogo concuerda con los criterios de búsqueda"
+    "noMatches": "Ningún catálogo concuerda con los criterios de búsqueda."
   },
   "checkbox": {
     "false": "no",
@@ -87,16 +87,16 @@
     "outdatedTitle": "Desactualizado",
     "predecessorVersion": "Versión anterior:",
     "successorVersion": "Siguiente versión:",
-    "warning": "Por favor tenga en cuenta que este {type} está obsoleto por lo que puede ser eliminado en cualquier momento. Debería dejar de usarse lo antes posible. Abstenerse de usarlo en nuevos proyectos."
+    "warning": "Por favor ten en cuenta que este {type} está obsoleto por lo que puede ser eliminado en cualquier momento. Debería dejar de usarse lo antes posible. Abstenerse de usarlo en nuevos proyectos."
   },
   "description": "Descripción",
   "errors": {
     "apiListRequested": "La petición es inválida. Actualmente no se soportan las peticiones directas a /collections o .../items.",
-    "authFailed": "La petición falló, puede que los datos de autenticación sean incorrectos",
+    "authFailed": "La petición falló, puede que los datos de autenticación sean incorrectos.",
     "badRequest": "La petición es inválida. Esto puede deberse a parámetros incorrectos, por ejemplo, en la búsqueda, o puede ser un bug en STAC Browser.",
     "contactProvider": "Por favor contacte al proveedor de servicio para resolver este problema.",
     "default": "La página solicitada no se pudo cargar.",
-    "forbidden": "Las credenciales especificadas en esta solicitud son inválidos, por ejemplo, un token de la API caducado o inválido. Por favor proporcione otras credenciales y pruebe de nuevo.",
+    "forbidden": "Las credenciales especificadas en esta solicitud son inválidas, por ejemplo, un token de la API caducado o inválido. Por favor proporcione otras credenciales y pruebe de nuevo.",
     "invalidJsonObject": "La respuesta no es un objeto JSON válido.",
     "invalidStacCollections": "La respuesta de la API no es una lista válida de Colecciones STAC.",
     "invalidStacItems": "La respuesta de la API no es una lista válida de Elementos STAC.",
@@ -151,11 +151,11 @@
   "in": "en {catalog}",
   "index": {
     "api": "API",
-    "catalog": "Catálogo",
+    "catalog": "Catálogo Estático",
     "load": "Cargar",
-    "selectStacIndex": "... o seleccione uno de {stacIndex}:",
+    "selectStacIndex": "... o selecciona uno de {stacIndex}:",
     "specifyCatalog": "Por favor especifique un catálogo o una API STAC...",
-    "urlInvalid": "La URL es inválida.",
+    "urlInvalid": "La URL no es válida.",
     "urlMissingHost": "La URL no tiene host.",
     "urlMissingProtocol": "La URL no tiene protocolo."
   },
@@ -219,7 +219,7 @@
     "title": "Metadatos"
   },
   "multiselect": {
-    "andMore": "y {count} mas",
+    "andMore": "y {count} más",
     "deselectLabel": "Presione enter para quitar",
     "keywordsPlaceholder": "Seleccionar palabras clave",
     "placeholder": "Seleccionar opción",
@@ -290,7 +290,7 @@
     "between": "entre",
     "betweenOperatorDescription": "Prueba si el valor de un campo numérico está dentro del rango indicado. El rango es inclusivo.",
     "dateDescription": "Todas las horas en Coordinated Universal Time (UTC).",
-    "disabledDueToSingleDate": "",
+    "disabledDueToSingleDate": "El filtro está desactivado porque la colección tiene una única fecha y hora como extensión temporal.",
     "enterCollections": "Introduzca una o varias colecciones...",
     "enterItemIds": "Introduzca una o varias IDs de Elemento...",
     "enterSearchTerms": "Introduzca uno o más términos de búsqueda...",
