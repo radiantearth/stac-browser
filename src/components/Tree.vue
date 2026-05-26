@@ -1,6 +1,6 @@
 <template>
   <ul class="tree" v-visible="load">
-    <li>
+    <li>    
       <b-button v-if="pagination" size="sm" variant="light" disabled>
         <b-icon-three-dots />
       </b-button>
@@ -14,7 +14,7 @@
         <b-icon-file-earmark-richtext />
       </b-button><!--
       
-      --><b-button size="sm" variant="light" :class="{path: onPath || active}" :disabled="!to && !active" :to="to" @click="onClick">
+      --><b-button size="sm" variant="light" :class="{path: onPath || active}" :disabled="!to && !active" :to="to" @click="onClick" :title="tooltip">
         {{ title }}
       </b-button>
 
@@ -30,7 +30,7 @@
           </li>
         </ul>
         <template v-else>
-          <Tree v-for="(child, i) in shownChilds" :key="i" :item="child" :parent="stac" :path="path" />
+          <Tree v-for="(child, i) in shownChilds" :key="i" :item="child" :parent="stac" :path="path" :searchTerm="searchTerm" :selectedKeywords="selectedKeywords" />
           <b-button class="show-more" v-if="hasMore" variant="light" @click="showMore" v-visible.300="showMore">{{ $t('showMore') }}</b-button>
         </template>
       </template>
@@ -44,6 +44,7 @@ import { isObject } from 'stac-js/src/utils.js';
 import { toAbsolute } from 'stac-js/src/http.js';
 import { getDisplayTitle, Collection } from '../models/stac';
 import { STAC } from 'stac-js';
+import Utils from '../utils';
 
 export default {
   name: 'Tree',
@@ -59,8 +60,17 @@ export default {
     path: {
       type: Array,
       default: () => ([])
+    },
+    searchTerm: {
+      type: String,
+      default: ''
+    },
+    selectedKeywords: {
+      type: Array,
+      default: () => []
     }
   },
+  emits: ['update:keywords'],
   data() {
     return {
       expanded: false,
@@ -146,11 +156,57 @@ export default {
       }
       return getDisplayTitle([this.item, this.stac]);
     },
+    tooltip() {
+      const keywords = this.stac?.keywords;
+      if (Array.isArray(keywords) && keywords.length > 0) {
+        return keywords.join(', ');
+      }
+      return null;
+    },
+    allKeywords() {
+      if (this.parent) {
+        return [];
+      }
+      const keywords = [];
+      for (const child of this.childs) {
+        const childStac = this.resolveChildStac(child);
+        if (childStac && Array.isArray(childStac.keywords)) {
+          for (const kw of childStac.keywords) {
+            if (!keywords.includes(kw)) {
+              keywords.push(kw);
+            }
+          }
+        }
+      }
+      return keywords.sort();
+    },
+    filteredChilds() {
+      if (!this.searchTerm && !this.selectedKeywords.length) {
+        return this.childs;
+      }
+      return this.childs.filter(child => {
+        const childStac = this.resolveChildStac(child);
+        if (this.selectedKeywords.length > 0) {
+          if (!childStac || !Array.isArray(childStac.keywords)) {
+            return false;
+          }
+          if (!this.selectedKeywords.every(kw => childStac.keywords.includes(kw))) {
+            return false;
+          }
+        }
+        if (this.searchTerm) {
+          const title = getDisplayTitle([child, childStac]);
+          const keywords = childStac?.keywords || [];
+          return Utils.search(this.searchTerm, [title, ...keywords]);
+        }
+        return true;
+      });
+    },
     hasMore() {
-      return this.childs.length > this.shownChilds.length;
+      return this.filteredChilds.length > this.shownChilds.length;
     },
     shownChilds() {
-      return this.childs.slice(0, this.chunk * 50);
+      return this.filteredChilds.slice(0, this.chunk * 50);
     },
     onPath() {
       if (!Array.isArray(this.path) || !this.stac) {
@@ -166,6 +222,21 @@ export default {
     }
   },
   watch: {
+    searchTerm(newTerm) {
+      if (newTerm && !this.parent && this.stac) {
+        for (const child of this.childs) {
+          if (typeof child.href === 'string') {
+            const absUrl = toAbsolute(child.href, this.stac.getAbsoluteUrl());
+            if (!this.getStac(absUrl)) {
+              this.$store.commit('queue', absUrl);
+            }
+          }
+        }
+      }
+    },
+    allKeywords(keywords) {
+      this.$emit('update:keywords', keywords);
+    },
     onPath: {
       immediate: true,
       handler() {
@@ -193,6 +264,15 @@ export default {
     }
   },
   methods: {
+    resolveChildStac(child) {
+      if (child instanceof STAC) {
+        return child;
+      }
+      if (this.stac && typeof child.href === 'string') {
+        return this.getStac(toAbsolute(child.href, this.stac.getAbsoluteUrl()));
+      }
+      return null;
+    },
     updateChilds() {
       if (this.stac && this.stac.isCatalogLike) {
         this.childs = this.stac.getChildren(this.apiCatalogPriority);

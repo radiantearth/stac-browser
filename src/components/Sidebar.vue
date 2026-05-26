@@ -5,7 +5,21 @@
   >
     <template #default>
       <Loading v-if="loading" />
-      <Tree v-else-if="root" :item="root" :path="parents" />
+      <template v-else-if="root">
+        <multiselect
+          v-if="allKeywords.length > 0"
+          v-model="selectedKeywords"
+          :options="allKeywords"
+          multiple
+          class="mb-2"
+          :placeholder="$t('multiselect.keywordsPlaceholder')"
+          :select-label="$t('multiselect.selectLabel')"
+          :selected-label="$t('multiselect.selectedLabel')"
+          :deselect-label="$t('multiselect.deselectLabel')"
+          :limit-text="count => $t('multiselect.andMore', { count })"
+        />
+        <Tree :item="root" :path="parents" :selectedKeywords="selectedKeywords" @update:keywords="allKeywords = $event" />
+      </template>
     </template>
     <template v-if="allowSelectCatalog" #footer>
       <b-button class="switch-catalog" variant="light">
@@ -17,6 +31,7 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex';
+import { defineAsyncComponent } from 'vue';
 import Loading from './Loading.vue';
 import Tree from './Tree.vue';
 import { BOffcanvas } from 'bootstrap-vue-next';
@@ -26,7 +41,8 @@ export default {
   components: {
     Loading,
     Tree,
-    BOffcanvas
+    BOffcanvas,
+    Multiselect: defineAsyncComponent(() => import('vue-multiselect'))
   },
   props: {
     modelValue: {
@@ -37,7 +53,9 @@ export default {
   emits: ['update:modelValue'],
   data() {
     return {
-      loading: true
+      loading: true,
+      selectedKeywords: [],
+      allKeywords: []
     };
   },
   computed: {
