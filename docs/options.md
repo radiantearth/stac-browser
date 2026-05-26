@@ -293,7 +293,7 @@ HTTP Basic is supported according to [RFC 7617](https://datatracker.ietf.org/doc
 **IMPORTANT: OpenID Connect is only supported if `historyMode` is set to `history`!**
 
 For OpenID Connect some additional options must be provided, which currently follow the
-[oidc-client-ts Configuration options](https://github.com/okta/okta-auth-js?tab=readme-ov-file#configuration-options).
+[oidc-client-ts `UserManagerSettings`](https://authts.github.io/oidc-client-ts/interfaces/UserManagerSettings.html).
 These options (except for `issuer`) must be provided in the property `oidcConfig`.
 The `client_id` option defaults to `stac-browser`.
 
