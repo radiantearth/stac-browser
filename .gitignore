@@ -37,3 +37,10 @@ pnpm-debug.log*
 
 # integration test outputs
 /tests/integration/generated/
+
+# Visual Studio
+.vs/
+
+# C# build artifacts
+/tests/integration/csharp/obj/
+/tests/integration/csharp/bin/
