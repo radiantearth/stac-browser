@@ -1,11 +1,11 @@
 name: Fix CrowdIn commits
 on:
-  pull_request:
+  pull_request_target:
     types:
       - unlabeled
 jobs:
   deploy:
-    if: ${{ github.event.label.name == 'CI run required' }}
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'l10n_main2' && github.event.pull_request.base.ref == 'main' && github.event.label.name == 'CI run required' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/setup-node@v6
