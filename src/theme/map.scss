@@ -2,7 +2,6 @@
 @import './variables.scss';
 
 @mixin ol-theme-vars {
-  --ol-color: var(--bs-body-color);
   --ol-brand-color: var(--bs-primary);
   --ol-background-color: var(--bs-body-bg);
   --ol-foreground-color: var(--bs-body-color);
