@@ -1,13 +1,21 @@
 @import 'ol/ol.css';
 @import './variables.scss';
 
+@mixin ol-theme-vars {
+  --ol-color: var(--bs-body-color);
+  --ol-brand-color: var(--bs-primary);
+  --ol-background-color: var(--bs-body-bg);
+  --ol-foreground-color: var(--bs-body-color);
+  --ol-subtle-foreground-color: var(--bs-body-color);
+  --ol-subtle-background-color: rgba(var(--bs-secondary-rgb), 0.25);
+  --ol-partial-background-color: rgba(var(--bs-body-bg-rgb), 0.75);
+}
+
 :root,
 :host {
-   [data-bs-theme="dark"] {
-    --ol-background-color: var(--bs-body-bg);
-    --ol-color: var(--bs-body-color);
-    --ol-foreground-color: var(--bs-body-color);
-    --ol-subtle-foreground-color: var(--bs-body-color);
-    --ol-partial-background-color: rgba(var(--bs-body-bg-rgb), 0.8);
-   }
+  @include ol-theme-vars;
+
+  [data-bs-theme="dark"] {
+    @include ol-theme-vars;
+  }
 }
