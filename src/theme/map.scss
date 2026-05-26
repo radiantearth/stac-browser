@@ -2,19 +2,21 @@
 @import './variables.scss';
 
 @mixin ol-theme-vars {
-  --ol-brand-color: var(--bs-primary);
   --ol-background-color: var(--bs-body-bg);
-  --ol-foreground-color: var(--bs-body-color);
-  --ol-subtle-foreground-color: var(--bs-body-color);
-  --ol-subtle-background-color: rgba(var(--bs-secondary-rgb), 0.25);
+  --ol-subtle-background-color: rgba(var(--bs-body-bg-rgb), 0.25);
   --ol-partial-background-color: rgba(var(--bs-body-bg-rgb), 0.75);
+  --ol-foreground-color: var(--bs-body-color);
+  --ol-subtle-foreground-color: hsl(from var(--bs-body-color) h s calc(l + var(--ol-subtle-foreground-lightness-change-percentage)));
+  --ol-brand-color: var(--bs-primary);
 }
 
 :root,
 :host {
+  --ol-subtle-foreground-lightness-change-percentage: 40;
   @include ol-theme-vars;
 
   [data-bs-theme="dark"] {
+    --ol-subtle-foreground-lightness-change-percentage: -20;
     @include ol-theme-vars;
   }
 }
