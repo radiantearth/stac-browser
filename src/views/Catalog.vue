@@ -160,6 +160,7 @@ export default defineComponent({
       else if (this.isCollection && isObject(this.data.summaries) && Array.isArray(this.data.summaries.providers)) {
         providers = this.data.summaries.providers;
       }
+      console.log(providers)
       return providers.length > 0 ? providers : null;
     },
     temporalExtents() {

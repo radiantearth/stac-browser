@@ -27,7 +27,8 @@ export default {
         "pt",
 //      "pt-BR",
         "id",
-        "pl"
+        "pl",
+        "sv"
     ],
     apiCatalogPriority: null,
     useTileLayerAsFallback: false,
