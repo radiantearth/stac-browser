@@ -46,6 +46,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added a color mode switch in the header (next to the language chooser)
 - Added more documentation around styling
 
+- Swedish (Svenska) locale
+- Keyword filter in the sidebar for filtering collections by keyword
+- Show keywords as tooltip on hover in the sidebar tree
+
 ### Changed
 
 - Migrated from Vue.js 2 to 3 (incl. vue-router, vuex, vue-i18n, etc.)
