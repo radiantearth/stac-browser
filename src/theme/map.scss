@@ -1,0 +1,13 @@
+@import 'ol/ol.css';
+@import './variables.scss';
+
+:root,
+:host {
+   [data-bs-theme="dark"] {
+    --ol-background-color: var(--bs-body-bg);
+    --ol-color: var(--bs-body-color);
+    --ol-foreground-color: var(--bs-body-color);
+    --ol-subtle-foreground-color: var(--bs-body-color);
+    --ol-partial-background-color: rgba(var(--bs-body-bg-rgb), 0.8);
+   }
+}
