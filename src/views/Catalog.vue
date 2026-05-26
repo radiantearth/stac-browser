@@ -22,30 +22,31 @@
             </b-row>
           </section>
         </section>
-        <section v-if="isCollection" class="mb-4">
-          <b-card no-body class="maps-preview">
-            <b-tabs v-model="tab" ref="tabs" pills card vertical end>
-              <b-tab v-if="isCollection" :title="$t('map')" no-body>
-                <Map :stac="data" v-bind="mapData" @changed="dataChanged" @empty="handleEmptyMap" onfocusOnly popover />
-              </b-tab>
-            </b-tabs>
-          </b-card>
-        </section>
+        <CollectionOverview v-if="isCollection" :stac="data" />
         <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="selectedReferences" @showAsset="showAsset" />
         <Assets v-if="hasItemAssets && !hasItems" :assets="itemAssets" :context="data" :definition="true" />
         <Providers v-if="providers" :providers="providers" />
-        <Metadata class="mb-4" :type="data.type" :data="data" :ignoreFields="ignoredMetadataFields" />
 
       </b-col>
       <b-col class="catalogs-container" v-if="hasCatalogs">
         <Catalogs :catalogs="catalogs" :hasMore="!!nextCollectionsLink" @loadMore="loadMoreCollections" />
       </b-col>
       <b-col class="items-container" v-if="hasItems || hasItemAssets">
+        <section v-if="isCollection" class="mb-4">
+          <b-card no-body class="maps-preview">
+            <b-tabs v-model="tab" ref="tabs" pills card vertical end>
+              <b-tab :title="$t('map')" no-body>
+                <Map :stac="data" v-bind="mapData" @changed="dataChanged" @empty="handleEmptyMap" onfocusOnly popover />
+              </b-tab>
+            </b-tabs>
+          </b-card>
+        </section>
         <Items
           :stac="data" :items="items" :api="isApi"
           :showFilters="showFilters" :apiFilters="filters"
           :pagination="itemPages" :loading="apiItemsLoading"
           :count="apiItemsNumberMatched"
+          :tableView="isCollection"
           @paginate="paginateItems" @filterItems="filterItems"
           @filtersShown="filtersShown"
         />
@@ -58,6 +59,7 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
 import Catalogs from '../components/Catalogs.vue';
+import CollectionOverview from '../components/CollectionOverview.vue';
 import Description from '../components/Description.vue';
 import Items from '../components/Items.vue';
 import ReadMore from "vue-read-more-smooth";
@@ -78,6 +80,7 @@ export default {
     BTabs,
     BTab,
     Catalogs,
+    CollectionOverview,
     CollectionLink: () => import('../components/CollectionLink.vue'),
     DeprecationNotice: () => import('../components/DeprecationNotice.vue'),
     Description,
@@ -132,7 +135,9 @@ export default {
         // Special handling for the STAC Browser config
         'stac_browser',
         // pgSTAC returns a 'features' field; not useful to display
-        'features'
+        'features',
+        // Rendered by CollectionOverview
+        'caladapt:variable_labels'
       ]
     };
   },

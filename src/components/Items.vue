@@ -27,17 +27,31 @@
 
     <section class="list">
       <Loading v-if="loading" fill top />
-      <div v-if="chunkedItems.length > 0" class="card-grid">
-        <Item v-for="item in chunkedItems" :item="item" :key="item.href" />
-      </div>
+      <template v-if="chunkedItems.length > 0">
+        <b-table
+          v-if="tableView"
+          :items="tableRows"
+          :fields="tableColumns"
+          small
+          bordered
+          responsive
+          hover
+        >
+          <template #cell(title)="{ item }">
+            <StacLink :data="chunkedItems[item.rowIndex]" />
+          </template>
+        </b-table>
+        <div v-else class="card-grid">
+          <Item v-for="item in chunkedItems" :item="item" :key="item.href" />
+        </div>
+      </template>
       <b-alert v-else :variant="hasFilters ? 'warning' : 'info'" show>
         <template v-if="hasFilters">{{ $t('search.noItemsFound') }}</template>
         <template v-else>{{ $t('items.noneAvailableForCollection') }}</template>
       </b-alert>
     </section>
 
-    <Pagination v-if="showPagination" class="mb-3" :pagination="pagination" @paginate="paginate" />
-    <b-button v-else-if="hasMore" @click="showMore" variant="primary" v-b-visible.300="showMore">{{ $t('showMore') }}</b-button>
+    <b-button v-if="hasMore && !showPagination" @click="showMore" variant="primary" v-b-visible.300="showMore">{{ $t('showMore') }}</b-button>
   </section>
 </template>
 
@@ -45,7 +59,8 @@
 import Item from './Item.vue';
 import Loading from './Loading.vue';
 import Pagination from './Pagination.vue';
-import { BCollapse, BIconSearch } from "bootstrap-vue";
+import StacLink from './StacLink.vue';
+import { BCollapse, BIconSearch, BTable } from "bootstrap-vue";
 import Utils from '../utils';
 import { getDisplayTitle } from '../models/stac';
 import { mapState } from 'vuex';
@@ -55,10 +70,12 @@ export default {
   components: {
     BCollapse,
     BIconSearch,
+    BTable,
     Item,
     SearchFilter: () => import('./SearchFilter.vue'),
     Loading,
     Pagination,
+    StacLink,
     SortButtons: () => import('./SortButtons.vue')
   },
   props: {
@@ -101,6 +118,10 @@ export default {
     count: {
       type: Number,
       default: null
+    },
+    tableView: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -112,6 +133,15 @@ export default {
   },
   computed: {
     ...mapState(['cardViewSort', 'uiLanguage']),
+    tableColumns: () => [
+      { key: 'title', label: 'Name' }
+    ],
+    tableRows() {
+      return this.chunkedItems.map((item, rowIndex) => ({
+        rowIndex,
+        title: getDisplayTitle(item)
+      }));
+    },
     itemCount() {
       if (this.count !== null) {
         return this.count;

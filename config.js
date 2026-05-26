@@ -46,7 +46,7 @@ module.exports = {
     showKeywordsInCatalogCards: true,
     showThumbnailsAsAssets: false,
     searchResultsPerPage: null,
-    itemsPerPage: 6,
+    itemsPerPage: 10,
     collectionsPerPage: 1000,
     maxEntriesPerPage: 1000,
     defaultThumbnailSize: null,
