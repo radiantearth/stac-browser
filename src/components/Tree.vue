@@ -14,7 +14,11 @@
         <b-icon-file-earmark-richtext />
       </b-button><!--
       
-      --><b-button size="sm" variant="light" :class="{path: onPath || active}" :disabled="!to && !active" :to="to" @click="onClick" :title="tooltip">
+      --><b-button
+size="sm" variant="light" :class="{path: onPath || active}" :disabled="!to && !active"
+:to="to" @click="onClick"
+:title="tooltip"
+>
         {{ title }}
       </b-button>
 
@@ -30,7 +34,11 @@
           </li>
         </ul>
         <template v-else>
-          <Tree v-for="(child, i) in shownChilds" :key="i" :item="child" :parent="stac" :path="path" :searchTerm="searchTerm" :selectedKeywords="selectedKeywords" />
+          <Tree
+            v-for="(child, i) in shownChilds" :key="i" :item="child" :parent="stac"
+            :path="path" :searchTerm="searchTerm"
+            :selectedKeywords="selectedKeywords"
+          />
           <b-button class="show-more" v-if="hasMore" variant="light" @click="showMore" v-visible.300="showMore">{{ $t('showMore') }}</b-button>
         </template>
       </template>
