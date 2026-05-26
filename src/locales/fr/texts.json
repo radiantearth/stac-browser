@@ -70,11 +70,11 @@
     "false": "Non",
     "true": "Oui"
   },
-  "close": "",
+  "close": "Fermer",
   "copy": "Copier",
   "copyErrors": {
-    "permission": "",
-    "unsupported": ""
+    "permission": "Copie impossible. Veuillez vérifier les permissions du navigateur.",
+    "unsupported": "Le presse-papier n'est pas disponible dans ce navigateur."
   },
   "default": "Défault",
   "defaultWithValue": "Défault ({value})",
@@ -91,7 +91,7 @@
   },
   "description": "Description",
   "errors": {
-    "apiListRequested": "",
+    "apiListRequested": "La requête n'est pas valide. Les requêtes directes vers /collections et .../items ne sont actuellement pas prises en charge.",
     "authFailed": "La requête a échoué, les informations d'authentification fournies peuvent être incorrectes.",
     "badRequest": "La requête n'est pas valide. Cela peut être dû à des paramètres de recherche invalides ou à un bogue au niveau de STAC Browser",
     "contactProvider": "Veuillez contacter l'exploitant du service afin de résoudre ce problème.",
@@ -118,9 +118,9 @@
     "unauthorized": "La requête requiert des informations d'authentification, comme par exemple un jeton API. Veuillez fournir vos informations d'authentification et réessayer"
   },
   "exampleCode": {
-    "title": "",
-    "storeAs": "",
-    "installDependencies": ""
+    "title": "Exemple de code",
+    "storeAs": "Enregistrer le code en tant que :",
+    "installDependencies": "Installer les dépendances :"
   },
   "featureExperimental": "Cette fonctionnalité est encore expérimentale et peut donner des résultats inattendus!",
   "features": {
@@ -176,18 +176,18 @@
     },
     "bboxSelect": {
       "add": "Cliquez sur la carte pour ajouter une boîte englobante.",
-      "eastLon": "",
+      "eastLon": "Longitude Est",
       "error": {
-        "incomplete": "",
-        "invalidLat": "",
-        "invalidLon": "",
-        "latOrder": "",
-        "lonOrder": ""
+        "incomplete": "La coordonnée est manquante",
+        "invalidLat": "Doit être comprise entre -90 et 90",
+        "invalidLon": "Doit être comprise entre -180 et 180",
+        "latOrder": "La latitude Sud doit être inférieure à la latitude Nord",
+        "lonOrder": "La longitude Ouest doit être inférieure à la longitude Est"
       },
-      "northLat": "",
+      "northLat": "Latitude Nord",
       "remove": "Cliquez à l'intérieur de la boîte englobante pour la supprimer.",
-      "southLat": "",
-      "westLon": ""
+      "southLat": "Latitude Sud",
+      "westLon": "Longitude Ouest"
     },
     "close": "Fermer",
     "fit": "Adapter à l'étendue",
@@ -235,12 +235,12 @@
   },
   "poweredBy": "Propulsé par {link}",
   "programming": {
-    "csharp": "",
-    "java": "",
-    "javascript": "",
-    "python": "",
-    "r": "",
-    "rust": ""
+    "csharp": "C#",
+    "java": "Java",
+    "javascript": "JavaScript",
+    "python": "Python",
+    "r": "R",
+    "rust": "Rust"
   },
   "protocol": {
     "azure": "Microsoft Azure",
@@ -276,21 +276,21 @@
     "addItemIds": "Appuyer sur Entrée pour ajouter un ID Élément",
     "addSearchTerm": "Appuyez sur entrée pour ajouter un terme de recherche",
     "arrayInput": {
-      "addValue": "",
-      "helpText": ""
+      "addValue": "Appuyez sur entrée pour ajouter une valeur",
+      "helpText": "Entrez des valeurs"
     },
-    "arrayContains": "",
-    "arrayContainsDescription": "",
-    "arrayContainedBy": "",
-    "arrayContainedByDescription": "",
-    "arrayEquals": "",
-    "arrayEqualsDescription": "",
-    "arrayOverlaps": "",
-    "arrayOverlapsDescription": "",
-    "between": "",
-    "betweenOperatorDescription": "",
+    "arrayContains": "Contient tout",
+    "arrayContainsDescription": "Le tableau contient toutes les valeurs spécifiées",
+    "arrayContainedBy": "Est un sous-ensemble de",
+    "arrayContainedByDescription": "Le tableau est un sous-ensemble des valeurs spécifiées",
+    "arrayEquals": "Correspond exactement",
+    "arrayEqualsDescription": "Le tableau correspond exactement aux valeurs spécifiées (mêmes éléments, n'importe quel ordre)",
+    "arrayOverlaps": "Contient n'importe quel",
+    "arrayOverlapsDescription": "Le tableau contient au moins une des valeurs spécifiées",
+    "between": "entre",
+    "betweenOperatorDescription": "Teste si une valeur de champ numérique se situe dans la plage donnée. La plage donnée est inclusive.",
     "dateDescription": "Toutes les heures sont en temps universel coordonné (UTC).",
-    "disabledDueToSingleDate": "",
+    "disabledDueToSingleDate": "Ce filtre est désactivé parce que la collection a une date et heure unique comme étendue temporelle.",
     "enterCollections": "Saisissez une ou plusieurs collections...",
     "enterItemIds": "Saisissez un ou plusieurs identifiants d'éléments...",
     "enterSearchTerms": "Saisissez un ou plusieurs termes de recherche...",
@@ -301,8 +301,8 @@
     "freeTextDescription": "Rechercher au moins un des termes donnés dans des champs tels que le titre et la description.",
     "greaterThan": "supérieur à",
     "greaterThanEqual": "supérieur ou égal à",
-    "in": "",
-    "inOperatorDescription": "",
+    "in": "inclus dans ",
+    "inOperatorDescription": "Vérifie si la valeur du champ est une des valeurs indiquées.",
     "itemIds": "Identifiants des éléments",
     "itemsPerPage": "Éléments par page",
     "itemsPerPageDescription": "Nombre d'éléments demandés par page, max. {maxItems} éléments",
@@ -312,21 +312,21 @@
     "logical": {
       "and": "Correspond à tous les filtres (et)",
       "or": "Correspond à n'importe quel filtre (ou)",
-      "not": ""
+      "not": "Filtre négatif"
     },
     "matches": "correspond à",
     "metaDescription": "Rechercher parmi l'offre de données de {title}.",
     "modifyCriteria": "Veuillez modifier les critères de recherche.",
     "noFurtherItemsFound": "Aucun autre élément n'est disponible.",
     "noItemsFound": "Aucun élément trouvé pour les filtres sélectionnés.",
-    "noOperatorsError": "",
+    "noOperatorsError": "Le navigateur STAC ne supporte aucun opérateur pour le filtre {queryable}.",
     "noOptions": "Aucune information saisie",
     "notEqualTo": "différent de",
     "notFullySupported": "Toutes les options ne sont pas forcément prises en charge",
     "notSupported": "La recherche d'éléments n'est pas pris en charge par l'API.",
     "placeholder": "Rechercher...",
     "selectCollections": "Sélectionnez une ou plusieurs collections...",
-    "selectDateRange": "",
+    "selectDateRange": "Sélectionner une plage de dates",
     "selectForItemSearch": "Sélectionner pour la recherche d'élément",
     "spatialExtent": "Étendue spatiale",
     "tabs": {
@@ -418,8 +418,8 @@
   "stacCollection": "Collection | Collections",
   "stacItem": "Élément | Éléments",
   "submit": "Soumettre",
-  "switchToDarkMode": "",
-  "switchToLightMode": "",
+  "switchToDarkMode": "Basculer en mode sombre",
+  "switchToLightMode": "Basculer en mode clair",
   "table": {
     "emptyFilteredText": "Il n'y a aucun enregistrement correspondant à votre requête",
     "emptyText": "Il n'y a aucun enregistrement à afficher",
