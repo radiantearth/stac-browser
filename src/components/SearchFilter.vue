@@ -407,7 +407,7 @@ export default defineComponent({
       }
     },
     temporalExtent() {
-      if (this.type === 'Items' && this.stac && typeof this.stac.getTemporalExtent === 'function') {
+      if (this.stac && typeof this.stac.getTemporalExtent === 'function') {
         const extent = this.stac.getTemporalExtent();
         if (Array.isArray(extent)) {
           const [min, max] = extent;

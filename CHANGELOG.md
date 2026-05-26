@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Adding `extent`s to the root catalog will restrict the Search filters
+
 ### Changed
 
 - Only show language chooser when more than one locale is available
