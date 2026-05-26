@@ -1,0 +1,2 @@
+import{f as e}from"./I18N-DdicHqsX.js";import"./_commonjsHelpers-DsqdWQfm.js";function m(){const t=e.getDefaults();e.numberFormatter=new Intl.NumberFormat("en-001",Object.assign(t.numberFormatterOptions,{useGrouping:!1})),e.dateFormatter=new Intl.DateTimeFormat("sv-SE",t.dateFormatterOptions),e.dateTimeFormatter=new Intl.DateTimeFormat("sv-SE",{day:"numeric",month:"numeric",year:"numeric",hour:"numeric",minute:"numeric",second:"numeric",timeZone:"UTC",timeZoneName:"short"})}export{m as default};
+//# sourceMappingURL=stac-fields-DvDKWM8N.js.map
