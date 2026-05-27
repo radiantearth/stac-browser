@@ -23,6 +23,7 @@ The following languages are currently supported:
 - Japanese `ja`
 - Portuguese `pt` (Brazil `pt-BR`, Portugal `pt`)
 - Polish `pl`
+- Swedish `sv`
 
 We manage the translations in Crowdin, please see <https://crowdin.com/project/stac-browser/> for details.
 
@@ -40,11 +41,16 @@ The following contributors kindly provide the translations:
 - [@randa-11295](https://github.com/randa-11295): `ar`
 - [@rnanclares](https://github.com/rnanclares): `es`
 - [@uba](https://github.com/uba): `pt-BR`
+- [@lovisasandgren](https://github.com/lovisasandgren): `sv`
 
 ## Adding a new language
 
 You can translate STAC Browser into other languages.
 You can also use one of the existing languages and provide an alternate version for a specifc country, e.g. a Australian English (en-AU) version of the US-English language pack (en).
+
+> [!IMPORTANT]  
+> Persons contributing languages are expected to maintain them long-term!
+> If you are not able to maintain the language pack, please indicate so in the PR.
 
 The following guide helps you to get started:
 
@@ -53,11 +59,10 @@ The following guide helps you to get started:
 - Name the new folder according to [RFC5646](https://www.rfc-editor.org/rfc/rfc5646).
 - Add the language to the list of supported locales ([`supportedLocales`](./options.md#supportedLocales)) in the `config.js` file.
 - Add the language to the [list of languages in this file](#overview).
-- Add yourself to the list of code owners (`.github/CODEOWNERS`) for this language (we'll invite you to this repository after you've opened a PR). **Persons contributing languages are expected to maintain them long-term! If you are not able to maintain the language pack, please indicate so in the PR and we'll release it separately.**
 - Translate the `.json` files, most importantly `config.json`, `fields.json` and `texts.json`.
   - Please note that you never need to translate any object keys!
   - If you base your language on another existing language (e.g. create `en-IN` based on `en`) you can delete individual files and import existing files from other languages in `default.js`.
-- Adapt the `datepicker.js`, `duration.js` and `validation.js` files to import the existing definitions from their corresponding external packages, but you could also define the specifics yourself.
+- Adapt the `datepicker.js`, `duration.js` and `validation.js` files to import the existing definitions from their corresponding external packages, but you could also define the specifics yourself. Ensure the imported files actually exist in the packages.
 - Check that your translation works by running the development server (`npm start`) and navigating to the STAC Browser instance in your browser (usually `http://localhost:8080`).
 - Once completed, please open a pull request and we'll get back to you as soon as possible.
 - After merging the PR for the first time, we'll add you to our translation management tool Crowdin: <https://crowdin.com/project/stac-browser/>. Please get in touch to get your invite!
