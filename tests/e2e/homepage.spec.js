@@ -9,11 +9,12 @@
 import { test, expect } from './fixtures.js';
 import { HOME_PATH, mockStacResource } from './helpers.js';
 import StaticCatalog from '../fixtures/instances/static.js';
-import { fileURLToPath } from 'url';
 import path from 'path';
 import fs from 'fs';
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const catalogs = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../fixtures/templates/catalogs.json')));
+const catalogs = JSON.parse(fs.readFileSync(path.resolve(
+  import.meta.dirname, '../fixtures/templates/catalogs.json'
+)));
+import CONFIG from '../../config.js';
 
 test.describe('STAC Browser Homepage', () => {
   // ensure every test uses the mocked STAC Index response
@@ -64,9 +65,9 @@ test.describe('STAC Browser Homepage', () => {
     const dropdownMenu = page.locator('.dropdown-menu');
     await expect(dropdownMenu).toBeVisible();
     
-    // Count the number of language options (should be 11)
+    // Count the number of language options (should be as defined in the config)
     const languageOptions = dropdownMenu.locator('.dropdown-item');
-    await expect(languageOptions).toHaveCount(11);
+    await expect(languageOptions).toHaveCount(CONFIG.supportedLocales.length);
     
     // Verify English is visible in the list
     const englishOption = dropdownMenu.getByText(/english/i);
