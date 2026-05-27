@@ -3,7 +3,7 @@ import { createStore } from "vuex";
 import { URI } from 'stac-js/src/utils.js';
 import urijs from 'urijs';
 
-import i18n, { getDataLanguages, translateFields, executeCustomFunctions, loadMessages } from '../i18n';
+import i18n, { loadMessages, detectDataLanguage, updateExternals } from '../i18n';
 import Utils, { BrowserError } from '../utils';
 import { hasText, isObject } from 'stac-js/src/utils.js';
 import { toAbsolute } from 'stac-js/src/http.js';
@@ -13,7 +13,6 @@ import { CatalogLike, STAC } from 'stac-js';
 import auth from './auth.js';
 import { addQueryIfNotExists, hasAuthority, isAuthenticationError, Loading, processSTAC, stacRequest, stacRequestOptions } from './utils';
 import { getBest } from 'stac-js/src/locales';
-import fieldsI18n from '@radiantearth/stac-fields/I18N';
 import { TYPES } from "../components/ApiCapabilitiesMixin";
 import BrowserStorage from "../browser-store.js";
 
@@ -65,6 +64,7 @@ function getStore(config, router) {
       globalRequestQueryParameters: config.requestQueryParameters,
       uiLanguage: config.locale,
       colorMode: (config.enforcedColorMode && config.enforcedColorMode !== 'auto') ? config.enforcedColorMode : 'light',
+      browserReady: false,
     }),
     getters: {
       isRoot: (state, getters) => {
@@ -384,6 +384,9 @@ function getStore(config, router) {
       }
     },
     mutations: {
+      browserReady(state) {
+        state.browserReady = true;
+      },
       setColorMode(state, mode) {
         state.colorMode = mode;
       },
@@ -412,9 +415,13 @@ function getStore(config, router) {
         }
       },
       languages(state, {uiLanguage, dataLanguage}) {
-        i18n.global.locale = uiLanguage;
-        state.dataLanguage = dataLanguage || null;
-        state.uiLanguage = uiLanguage || null;
+        if (typeof uiLanguage !== 'undefined') {
+          i18n.global.locale = uiLanguage;
+          state.uiLanguage = uiLanguage || null;
+        }
+        if (typeof dataLanguage !== 'undefined') {
+          state.dataLanguage = dataLanguage || null;
+        }
       },
       setQueryParameter(state, { type, key, value }) {
         type = `${type}QueryParameters`;
@@ -640,33 +647,34 @@ function getStore(config, router) {
         }
       },
       async switchLocale(cx, {locale, userSelected}) {
+        if (locale === cx.state.locale) {
+          return;
+        }
         await cx.dispatch('config', {locale});
 
+        // Persist the user selected locale in local storage if configured to do so
         if (cx.state.storeLocale && userSelected) {
           const storage = new BrowserStorage();
           storage.set('locale', locale);
         }
 
-        // Locale for UI
+        // Detect Locale for UI and data
         const uiLanguage = getBest(cx.state.supportedLocales, locale, cx.state.fallbackLocale);
-        // Locale for data
-        const dataLanguages = getDataLanguages(cx.state.data);
-        const dataLanguageCodes = dataLanguages.map(l => l.code);
-        const dataLanguageFallback = dataLanguages.length > 0 ? dataLanguages[0].code : uiLanguage;
-        const dataLanguage = getBest(dataLanguageCodes, locale, dataLanguageFallback);
+        const dataLanguage = detectDataLanguage(cx.state.data, locale, uiLanguage);
 
         // Load messages
         await loadMessages(uiLanguage);
 
-        // Update stac-fields
-        fieldsI18n.setLocales([uiLanguage, cx.state.fallbackLocale]);
-        fieldsI18n.setTranslator(translateFields);
+        // Update dependencies that require the locale to be set (e.g. stac-fields)
+        await updateExternals(uiLanguage, cx.state.fallbackLocale);
 
-        // Execute other custom functions required to localize
-        await executeCustomFunctions(uiLanguage);
-
-        cx.commit('languages', {dataLanguage, uiLanguage});
+        // Update store and URL
+        cx.commit('languages', { dataLanguage, uiLanguage });
         cx.commit('setQueryParameter', { type: 'state', key: 'language', value: locale });
+      },
+      async switchDataLocale(cx, { locale }) {
+        const dataLanguage = detectDataLanguage(cx.state.data, locale, cx.state.uiLanguage);
+        cx.commit('languages', { dataLanguage });
       },
       async loadBackground(cx, count) {
         let urls = cx.state.queue.slice(0, count);

@@ -5,7 +5,7 @@
  * item listing, and detail controls.
  */
 import { test, expect } from './fixtures.js';
-import { waitForBrowserReady } from './helpers.js';
+import { clearClipboard, readClipboard, waitForBrowserReady } from './helpers.js';
 import StaticCatalog from '../fixtures/instances/static.js';
 import API from '../fixtures/instances/api.js';
 
@@ -152,28 +152,31 @@ test.describe('Collection - toolBar', () => {
     await page.goto(collection.getBrowserPath());
     await waitForBrowserReady(page);
     
-    const shareButton = page.getByRole('button', { name: /share/i });
+    const shareButton = page.locator('#popover-share-btn');
     await expect(shareButton).toBeVisible();
   });
   
-  test('share button copies collection\'s getBrowserPath() to clipboard', async ({ page, worker }) => {
+  test('share button copies collection\'s URL to clipboard', async ({ page, worker, context }) => {
     const { catalog, collection } = createStaticCatalog();
+    await context.grantPermissions(['clipboard-write', 'clipboard-read']);
     await catalog.createServer(worker);
     
     await page.goto(collection.getBrowserPath());
     await waitForBrowserReady(page);
     
-    const shareButton = page.getByRole('button', { name: /share/i });
+    const shareButton = page.locator('#popover-share-btn');
     await expect(shareButton).toBeVisible();
     await shareButton.click();
     
     // The share popover contains a copy button; click it to copy the current page URL
     const copyButton = page.getByRole('button', { name: /copy/i });
     await expect(copyButton).toBeVisible();
+    await clearClipboard(page);
     await copyButton.click();
     
-    // The URL copied to clipboard should match the collection's getBrowserPath()
-    const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
+    // The URL copied to clipboard should match the collection's URL
+    await expect.poll(async () => readClipboard(page)).not.toEqual('');
+    const clipboardText = await readClipboard(page);
     expect(clipboardText).toBe(page.url());
   });
   
