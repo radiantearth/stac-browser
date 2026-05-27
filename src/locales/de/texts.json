@@ -70,8 +70,12 @@
     "false": "Nein",
     "true": "Ja"
   },
+  "close": "Schließen",
   "copy": "Kopieren",
-  "copyErrors": {},
+  "copyErrors": {
+    "permission": "Kopieren nicht möglich. Bitte überprüfen Sie die Berechtigungen des Browsers.",
+    "unsupported": "Die Zwischenablage ist in diesem Browser nicht verfügbar."
+  },
   "default": "Standardeinstellung",
   "defaultWithValue": "Standardeinstellung ({value})",
   "deprecated": "Abgekündigt",
@@ -113,7 +117,11 @@
     "title": "Fehler",
     "unauthorized": "Der Anfrage fehlen die Anmeldedaten, bspw. ein API-Schlüssel. Bitte geben Sie Ihre Anmeldedaten an und versuchen Sie es erneut."
   },
-  "exampleCode": {},
+  "exampleCode": {
+    "title": "Quelltext-Beispiele",
+    "storeAs": "Quelltext speichern als:",
+    "installDependencies": "Installieren der Abhängigkeiten:"
+  },
   "featureExperimental": "Diese Funktion ist noch experimentell und kann unerwartete Ergebnisse verursachen!",
   "features": {
     "empty": "Keine Features verfügbar.",
@@ -226,7 +234,14 @@
     "previous": "‹ Vorherige"
   },
   "poweredBy": "Generiert von {link}",
-  "programming": {},
+  "programming": {
+    "csharp": "C#",
+    "java": "Java",
+    "javascript": "JavaScript",
+    "python": "Python",
+    "r": "R",
+    "rust": "Rust"
+  },
   "protocol": {
     "azure": "Microsoft Azure",
     "file": "Dateisystem (lokal)",

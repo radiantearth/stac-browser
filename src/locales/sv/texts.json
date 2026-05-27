@@ -113,6 +113,7 @@
     "title": "Fel",
     "unauthorized": "Begäran saknar inloggningsuppgifter, t.ex. en API-nyckel. Ange dina uppgifter och försök igen."
   },
+  "exampleCode": {},
   "featureExperimental": "Denna funktion är fortfarande experimentell och kan ge oväntade resultat!",
   "features": {
     "empty": "Inga funktioner tillgängliga.",
@@ -159,10 +160,23 @@
   },
   "loading": "Laddar...",
   "map": "Karta",
+  "mapping": {
+    "attribution": {},
+    "bboxSelect": {
+      "error": {}
+    },
+    "layers": {},
+    "location": {},
+    "zoom": {
+      "in": {},
+      "out": {}
+    }
+  },
   "metadata": {
     "general": "Allmänt",
     "title": "Metadata"
   },
+  "multiselect": {},
   "open": "Öppna",
   "pagination": {
     "first": "« Första",
@@ -171,6 +185,10 @@
     "previous": "‹ Föregående"
   },
   "poweredBy": "Genererad av {link}",
+  "programming": {},
+  "protocol": {
+    "s3": {}
+  },
   "providers": {
     "email": "Skicka e-post",
     "homepage": "Gå till webbplats",
@@ -193,6 +211,7 @@
     "additionalFilters": "Ytterligare filter",
     "addItemIds": "Lägg till objekt-ID med Enter-tangenten",
     "addSearchTerm": "Lägg till sökterm med Enter-tangenten",
+    "arrayInput": {},
     "between": "mellan",
     "dateDescription": "Alla tider i UTC.",
     "enterCollections": "Ange katalog-ID...",
@@ -252,16 +271,23 @@
     "id": "Identifierare",
     "invalid": "Inte kompatibel",
     "label": "Datakälla",
+    "language": {},
     "locatedAt": "STAC-metadatafilen finns på:",
+    "share": {},
     "statistics": "Statistik",
     "title": "Datakälla",
     "valid": "Kompatibel",
     "validating": "Validerar...",
-    "validationNA": "inte tillgänglig"
+    "validationNA": "inte tillgänglig",
+    "validationParams": {},
+    "validationReport": {}
   },
   "submit": "Skicka",
   "switchToDarkMode": "Byt till mörkt läge",
   "switchToLightMode": "Byt till ljust läge",
+  "table": {
+    "sort": {}
+  },
   "thumbnails": "Miniatyrbilder",
   "tree": {
     "moreCollectionPagesAvailable": "Fler katalogsidor tillgängliga",
