@@ -112,7 +112,11 @@ export default {
     },
     async assets() {
       if (!this.stacLayer) return;
-      await this.stacLayer.setAssets(this.assets);
+      if (this.assets && this.assets.length > 0) {
+        await this.stacLayer.setAssets(this.assets);
+      } else {
+        await this.stacLayer.autoLoadVisualAssets(this.stac);
+      }
     },
     async children() {
       if (!this.stacLayer) return;
@@ -182,7 +186,7 @@ export default {
         this.stacLayer.setChildren(this.children);
       }
 
-      if (this.assets) {
+      if (this.assets && this.assets.length > 0) {
         await this.stacLayer.setAssets(this.assets);
       } else {
         await this.stacLayer.autoLoadVisualAssets(this.stac);
