@@ -23,6 +23,10 @@ export default class CqlArrayOperator extends CqlOperator {
     }
   }
 
+  toText() {
+    return `${this.operator}(${this.args.map(arg => arg.toText()).join(', ')})`;
+  }
+
   static valueType() {
     return CqlArray;
   }
