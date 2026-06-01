@@ -83,6 +83,8 @@ export default class StacMapLayer {
     this._pmtilesLayerIds = [];
     this._pmtilesSourceIds = [];
     this._pmtilesAssetMeta = [];
+    this._glStyleLayerIds = [];
+    this._glStyleSourceIds = [];
     this._activeGlStyle = null;
   }
 
@@ -507,6 +509,8 @@ export default class StacMapLayer {
     this.sourceIds = [];
     this._pmtilesLayerIds = [];
     this._pmtilesSourceIds = [];
+    this._glStyleLayerIds = [];
+    this._glStyleSourceIds = [];
     if (stac) this.setStac(stac);
     if (children) this.setChildren(children);
     if (assets) {
@@ -595,34 +599,76 @@ export default class StacMapLayer {
       try { if (this.map.getLayer(id)) this.map.removeLayer(id); } catch { /* ignore */ }
     }
     this._pmtilesLayerIds = [];
+    this._clearGlStyleExtras();
+  }
+
+  _clearGlStyleExtras() {
+    for (const id of [...this._glStyleLayerIds]) {
+      try { if (this.map.getLayer(id)) this.map.removeLayer(id); } catch { /* ignore */ }
+    }
+    this._glStyleLayerIds = [];
+    for (const id of [...this._glStyleSourceIds]) {
+      try { if (this.map.getSource(id)) this.map.removeSource(id); } catch { /* ignore */ }
+    }
+    this._glStyleSourceIds = [];
   }
 
   applyGlStyle(glStyle) {
-    if (!glStyle || !glStyle.layers || this._pmtilesSourceIds.length === 0) return;
+    if (!glStyle || !glStyle.layers) return;
 
     this._clearPmtilesLayers();
 
-    const styleSourceNames = Object.keys(glStyle.sources || {});
-    if (styleSourceNames.length !== this._pmtilesSourceIds.length) {
-      console.warn(`Style defines ${styleSourceNames.length} source(s) but ${this._pmtilesSourceIds.length} PMTiles source(s) are loaded — mapping by position`);
+    const sources = glStyle.sources || {};
+    const styleSourceNames = Object.keys(sources);
+
+    // Add non-PMTiles sources (currently geojson) directly. PMTiles sources
+    // in the style are matched positionally to the loaded PMTiles sources.
+    const directSourceIds = new Set();
+    const pmtilesStyleSourceNames = [];
+    for (const name of styleSourceNames) {
+      const src = sources[name];
+      if (src && src.type === 'geojson') {
+        try {
+          this.map.addSource(name, src);
+          this._glStyleSourceIds.push(name);
+          directSourceIds.add(name);
+        } catch (err) {
+          console.warn(`Failed to add geojson source "${name}" from style`, err);
+        }
+      } else {
+        pmtilesStyleSourceNames.push(name);
+      }
+    }
+
+    if (pmtilesStyleSourceNames.length > 0 && pmtilesStyleSourceNames.length !== this._pmtilesSourceIds.length) {
+      console.warn(`Style defines ${pmtilesStyleSourceNames.length} PMTiles-style source(s) but ${this._pmtilesSourceIds.length} PMTiles source(s) are loaded — mapping by position`);
     }
     const sourceMapping = {};
-    for (let i = 0; i < styleSourceNames.length; i++) {
+    for (let i = 0; i < pmtilesStyleSourceNames.length; i++) {
       if (i < this._pmtilesSourceIds.length) {
-        sourceMapping[styleSourceNames[i]] = this._pmtilesSourceIds[i];
+        sourceMapping[pmtilesStyleSourceNames[i]] = this._pmtilesSourceIds[i];
       }
     }
 
     for (const layer of glStyle.layers) {
-      const mappedSource = sourceMapping[layer.source];
-      if (!mappedSource) continue;
+      let layerSpec;
+      if (directSourceIds.has(layer.source)) {
+        layerSpec = { ...layer };
+      } else {
+        const mappedSource = sourceMapping[layer.source];
+        if (!mappedSource) continue;
+        layerSpec = { ...layer, source: mappedSource };
+      }
 
-      const layerSpec = { ...layer, source: mappedSource };
       if (this.map.getLayer(layerSpec.id)) {
         this.map.removeLayer(layerSpec.id);
       }
       this.map.addLayer(layerSpec);
-      this._pmtilesLayerIds.push(layerSpec.id);
+      if (directSourceIds.has(layer.source)) {
+        this._glStyleLayerIds.push(layerSpec.id);
+      } else {
+        this._pmtilesLayerIds.push(layerSpec.id);
+      }
     }
 
     this._activeGlStyle = glStyle;
