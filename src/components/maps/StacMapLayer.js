@@ -33,6 +33,20 @@ function assetHref(asset) {
   return asset.getAbsoluteUrl?.() || asset.href || '';
 }
 
+// Normalize a PMTiles source URL for comparison. Strips the `pmtiles://`
+// prefix and resolves relative URLs to absolute so that a style source URL
+// can be matched against a loaded source's URL regardless of form.
+function normalizePmtilesUrl(url) {
+  if (typeof url !== 'string' || url === '') return null;
+  let u = url.startsWith('pmtiles://') ? url.slice('pmtiles://'.length) : url;
+  try {
+    u = new URL(u, typeof window !== 'undefined' ? window.location.href : undefined).href;
+  } catch {
+    /* leave as-is if it can't be resolved */
+  }
+  return u;
+}
+
 function isPmtilesAsset(asset) {
   const type = asset.type || '';
   const href = assetHref(asset);
@@ -643,10 +657,37 @@ export default class StacMapLayer {
     if (pmtilesStyleSourceNames.length > 0 && pmtilesStyleSourceNames.length !== this._pmtilesSourceIds.length) {
       console.warn(`Style defines ${pmtilesStyleSourceNames.length} PMTiles-style source(s) but ${this._pmtilesSourceIds.length} PMTiles source(s) are loaded — mapping by position`);
     }
+
+    // Build a lookup from each loaded PMTiles source's underlying URL to its
+    // source ID, so style sources can be matched by URL when they specify one.
+    const loadedUrlToSourceId = {};
+    for (const sourceId of this._pmtilesSourceIds) {
+      const loaded = this.map.getSource(sourceId);
+      const norm = normalizePmtilesUrl(loaded && loaded.url);
+      if (norm) loadedUrlToSourceId[norm] = sourceId;
+    }
+
+    // Match style sources to loaded sources by URL first, falling back to
+    // positional mapping for sources that don't carry a matching URL. This
+    // matters when an item has multiple PMTiles assets and a style references
+    // a specific one by its pmtiles:// URL.
     const sourceMapping = {};
-    for (let i = 0; i < pmtilesStyleSourceNames.length; i++) {
-      if (i < this._pmtilesSourceIds.length) {
-        sourceMapping[pmtilesStyleSourceNames[i]] = this._pmtilesSourceIds[i];
+    const usedSourceIds = new Set();
+    const unmatchedStyleNames = [];
+    for (const name of pmtilesStyleSourceNames) {
+      const norm = normalizePmtilesUrl(sources[name] && sources[name].url);
+      const matched = norm ? loadedUrlToSourceId[norm] : undefined;
+      if (matched) {
+        sourceMapping[name] = matched;
+        usedSourceIds.add(matched);
+      } else {
+        unmatchedStyleNames.push(name);
+      }
+    }
+    const remainingSourceIds = this._pmtilesSourceIds.filter(id => !usedSourceIds.has(id));
+    for (let i = 0; i < unmatchedStyleNames.length; i++) {
+      if (i < remainingSourceIds.length) {
+        sourceMapping[unmatchedStyleNames[i]] = remainingSourceIds[i];
       }
     }
 
