@@ -7,8 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Adding `extent`s to the root catalog will restrict the Search filters
+- Added Swedish locale
+
+### Changed
+
+- Only show language chooser when more than one locale is available
+- Restrict Collection item search date picker to collection's temporal extent
+- Focus temporal extent filter for Collection item search on end of temporal extent
+- Disable temporal extent filter when a single date/time is provided as temporal extent in the Collection metadata
+
 ### Fixed
 
+- Link color on data source list selection improved
+- Improve the background color for dark mode on the map text controls.
+- Improve the map control background colors on dark mode.
 - CQL2 text representation of array operators (`a_overlaps`, `a_contains`, `a_equals`, `a_contained_by`) now uses function-call syntax as defined by the CQL2 text grammar
 
 ## [5.0.0-beta.1] - 2026-05-12

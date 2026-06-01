@@ -1,5 +1,6 @@
 <template>
-  <b-container id="stac-browser">
+  <Loading v-if="!browserReady" fill />
+  <b-container v-else id="stac-browser">
     <WidgetHook id="root-start" />
     <Authentication v-if="showLogin" />
     <ErrorAlert v-if="globalError" dismissible class="global-error" v-bind="globalError" @close="hideError" />
@@ -37,6 +38,7 @@
                 <component :is="authIcon" /><span class="button-label">{{ authLabel }}</span>
               </b-button>
               <LanguageChooser
+                v-if="supportedLocalesFromVueX.length > 1"
                 :data="data" :currentLocale="localeFromVueX" :locales="supportedLocalesFromVueX"
                 @set-locale="locale => switchLocale({locale, userSelected: true})"
               />
@@ -115,6 +117,7 @@ import BIconLock from '~icons/bi/lock';
 import BIconUnlock from '~icons/bi/unlock';
 
 import ErrorAlert from './components/ErrorAlert.vue';
+import Loading from './components/Loading.vue';
 import StacLink from './components/StacLink.vue';
 
 import { CatalogLike, STAC } from 'stac-js';
@@ -122,7 +125,7 @@ import { hasText, isObject, size } from 'stac-js/src/utils.js';
 import Utils from './utils';
 import { URI } from 'stac-js/src/utils.js';
 
-import { API_LANGUAGE_CONFORMANCE } from './i18n';
+import { API_LANGUAGE_CONFORMANCE, updateExternals } from './i18n';
 import { getBest, prepareSupported } from 'stac-js/src/locales';
 import BrowserStorage from "./browser-store";
 import Authentication from "./components/Authentication.vue";
@@ -156,6 +159,7 @@ export default defineComponent({
     BPopover: defineAsyncComponent(() => import('bootstrap-vue-next').then(m => m.BPopover)),
     ErrorAlert,
     LanguageChooser: defineAsyncComponent(() => import('./components/LanguageChooser.vue')),
+    Loading,
     RootStats: defineAsyncComponent(() => import('./components/RootStats.vue')),
     Sidebar: defineAsyncComponent(() => import('./components/Sidebar.vue')),
     StacLink,
@@ -174,11 +178,12 @@ export default defineComponent({
     };
   },
   computed: {
-    ...mapState(['allowSelectCatalog', 'conformsTo', 'data', 'dataLanguage', 'downloads', 'globalError', 'loading', 'stateQueryParameters', 'uiLanguage', 'url']),
+    ...mapState(['allowSelectCatalog', 'browserReady', 'conformsTo', 'data', 'dataLanguage', 'downloads', 'globalError', 'loading', 'stateQueryParameters', 'uiLanguage', 'url']),
     ...mapState({
       catalogImageFromVueX: 'catalogImage',
       footerLinksFromVueX: 'footerLinks',
       localeFromVueX: 'locale',
+      fallbackLocaleFromVueX: 'fallbackLocale',
       detectLocaleFromBrowserFromVueX: 'detectLocaleFromBrowser',
       supportedLocalesFromVueX: 'supportedLocales',
       storeLocaleFromVueX: 'storeLocale',
@@ -442,9 +447,10 @@ export default defineComponent({
       initialValue: this.enforcedColorModeFromVueX
     });
 
+    await updateExternals(this.localeFromVueX, this.fallbackLocaleFromVueX);
     await this.$router.isReady();
-    this.detectLocale();
-    this.parseQuery(this.$route);
+    await this.detectLocale();
+    await this.parseQuery(this.$route);
 
     this.$router.afterEach((to, from) => {
       if (to.path === from.path) {
@@ -474,8 +480,10 @@ export default defineComponent({
     if (authConfig) {
       await this.$store.dispatch('config', { authConfig });
     }
+
+    this.$store.commit('browserReady');
   },
-  mounted() {    
+  mounted() {
     setInterval(() => this.$store.dispatch('loadBackground', 3), 200);
 
     // Prevent the user from leaving the page while the download is in progress
@@ -492,7 +500,7 @@ export default defineComponent({
     });
   },
   methods: {
-    ...mapActions(['switchLocale']),
+    ...mapActions(['switchLocale', 'switchDataLocale']),
     ...mapMutations('auth', ['addAction']),
     ...mapActions('auth', ['requestLogin', 'requestLogout']),
     toggleColorMode() {
@@ -546,7 +554,7 @@ export default defineComponent({
         if (!this.data) {
           // Thus try switching the (data) language again once the data is loaded.
           this.onDataLoaded = () => {
-            this.switchLocale({locale});
+            this.switchDataLocale({locale});
             this.onDataLoaded = null;
           };
         }

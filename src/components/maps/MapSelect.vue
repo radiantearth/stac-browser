@@ -398,7 +398,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import "ol/ol.css";
+@import "../../theme/map.scss";
 </style>
 
 <style lang="scss" scoped>

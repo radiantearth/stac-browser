@@ -2,6 +2,7 @@ import { createI18n } from 'vue-i18n';
 import CONFIG from './merged-config';
 import { default as Fields } from '@radiantearth/stac-fields/I18N';
 import { isObject, size } from 'stac-js/src/utils.js';
+import { getBest } from 'stac-js/src/locales';
 
 export const API_LANGUAGE_CONFORMANCE = ['https://api.stacspec.org/v1.*/language'];
 export const STAC_LANGUAGE_EXT = 'https://stac-extensions.github.io/language/v1.*/schema.json';
@@ -86,7 +87,7 @@ export async function loadMessages(locale) {
   i18n.global.mergeLocaleMessage(locale, messages);
 }
 
-export async function executeCustomFunctions(locale) {
+async function executeCustomFunctions(locale) {
   const customizeFiles = LOCALE_CONFIG[locale].customize;
   if (size(LOCALE_CONFIG[locale].customize) === 0) {
     return;
@@ -129,4 +130,22 @@ export function getDataLanguages(data) {
   }
   // Filter out invalid languages
   return dataLanguages.filter(lang => isObject(lang) && typeof lang.code === 'string');
+}
+
+export function detectDataLanguage(data, locale, fallback) {
+  // Locale for data
+  const dataLanguages = getDataLanguages(data);
+  const dataLanguageCodes = dataLanguages.map(l => l.code);
+  const dataLanguageFallback = dataLanguages.length > 0 ? dataLanguages[0].code : fallback;
+  return getBest(dataLanguageCodes, locale, dataLanguageFallback);
+}
+
+// Initializes and updates any external dependencies that also need to be localized, e.g. stac-fields.
+export async function updateExternals(uiLanguage, fallbackLocale) {
+  // Update stac-fields
+  Fields.setLocales([uiLanguage, fallbackLocale]);
+  Fields.setTranslator(translateFields);
+
+  // Execute other custom functions required to localize
+  await executeCustomFunctions(uiLanguage);
 }

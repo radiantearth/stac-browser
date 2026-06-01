@@ -5,7 +5,7 @@
  * navigating into collections/items, source view, and share functionality.
  */
 import { test, expect } from './fixtures.js';
-import { waitForBrowserReady } from './helpers.js';
+import { clearClipboard, readClipboard, waitForBrowserReady } from './helpers.js';
 import StaticCatalog from '../fixtures/instances/static.js';
 import API from '../fixtures/instances/api.js';
 
@@ -107,29 +107,32 @@ test.describe('Catalog - toolBar', () => {
     await page.goto(catalog.root.getBrowserPath());
     await waitForBrowserReady(page);
     
-    const shareButton = page.getByRole('button', { name: /share/i });
+    const shareButton = page.locator('#popover-share-btn');
     await expect(shareButton).toBeVisible();
   });
   
-  test('Catalog - share button copies URL to clipboard', async ({ page, worker }) => {
+  test('Catalog - share button copies URL to clipboard', async ({ page, worker, context }) => {
     const { catalog } = createStaticCatalog();
     
+    await context.grantPermissions(['clipboard-write', 'clipboard-read']);
     await catalog.createServer(worker);
     
     await page.goto(catalog.root.getBrowserPath());
     await waitForBrowserReady(page);
     
-    const shareButton = page.getByRole('button', { name: /share/i });
+    const shareButton = page.locator('#popover-share-btn');
     await expect(shareButton).toBeVisible();
     await shareButton.click();
     
     // The share popover contains a copy button; click it to copy the current page URL
     const copyButton = page.getByRole('button', { name: /copy/i });
     await expect(copyButton).toBeVisible();
+    await clearClipboard(page);
     await copyButton.click();
     
     // Verify the URL was copied to the clipboard
-    const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
+    await expect.poll(async () => readClipboard(page)).not.toEqual('');
+    const clipboardText = await readClipboard(page);
     await expect(clipboardText).toContain(catalog.root.getBrowserPath());
   });
 
@@ -159,7 +162,7 @@ test.describe('Catalog - toolBar', () => {
     await page.goto(api.root.getBrowserPath());
     await waitForBrowserReady(page);
     
-    const shareButton = page.getByRole('button', { name: /share/i });
+    const shareButton = page.locator('#popover-share-btn');
     await expect(shareButton).toBeVisible();
   });
   
@@ -172,17 +175,19 @@ test.describe('Catalog - toolBar', () => {
     await page.goto(api.root.getBrowserPath());
     await waitForBrowserReady(page);
     
-    const shareButton = page.getByRole('button', { name: /share/i });
+    const shareButton = page.locator('#popover-share-btn');
     await expect(shareButton).toBeVisible();
     await shareButton.click();
     
     // The share popover contains a copy button; click it to copy the current page URL
     const copyButton = page.getByRole('button', { name: /copy/i });
     await expect(copyButton).toBeVisible();
+    await clearClipboard(page);
     await copyButton.click();
     
     // Verify the URL was copied to the clipboard
-    const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
+    await expect.poll(async () => readClipboard(page)).not.toEqual('');
+    const clipboardText = await readClipboard(page);
     await expect(clipboardText).toContain(api.root.getBrowserPath());
   });
 });

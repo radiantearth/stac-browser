@@ -8,6 +8,26 @@ body {
   margin-top: var(--sb-header-margin);
 }
 
+img,
+svg {
+  // Use center instead of middle to keep the buttons better aligned with the text
+  vertical-align: center;
+}
+
+.btn svg {
+  // Fix an issue where in some cases icons were slightly too large and were only partially shown in buttons
+  height: round(down, 1.2em, 1px);
+  width: round(down, 1.2em, 1px);
+}
+
+.list-group-item.active a {
+  color: $link-color-on-primary;
+
+  &:hover {
+    color: $link-hover-color-on-primary;
+  }
+}
+
 #popover-root-btn {
   border: 0;
 }

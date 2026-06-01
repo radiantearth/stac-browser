@@ -1,0 +1,307 @@
+{
+  "actions": {
+    "openIn": "Öppna i {service}"
+  },
+  "additionalActions": "Ytterligare åtgärder",
+  "additionalResources": "Ytterligare resurser",
+  "anonymized": {
+    "title": "Anonymiserad"
+  },
+  "assets": {
+    "alternate": {
+      "main": "Föredragen"
+    },
+    "copyUrl": {
+      "generic": "Kopiera adress",
+      "withSource": "Kopiera adress för {source}"
+    },
+    "currentlyShown": "Denna resurs visas för närvarande.",
+    "download": {
+      "generic": "Ladda ner",
+      "withSource": "Ladda ner från {source}"
+    },
+    "inItems": "Fil i underobjekt | Filer i underobjekt",
+    "role": {
+      "data": "Data",
+      "metadata": "Metadata"
+    },
+    "showOnMap": "Visa på karta",
+    "showThumbnail": "Visa miniatyrbild",
+    "shown": "visad"
+  },
+  "authentication": {
+    "button": {
+      "login": "Logga in",
+      "logout": "Logga ut",
+      "title": "Ange eller uppdatera inloggningsuppgifter"
+    },
+    "chooseMethod": "Välj inloggningsmetod",
+    "description": "Den begärda sidan kräver inloggning. Ange inloggningsuppgifterna nedan.",
+    "loggedOut": "Du har loggats ut. Du kan nu stänga fönstret.",
+    "password": "Lösenord",
+    "required": "Inloggning krävs",
+    "schemeTypes": {
+      "apiKey": "API-nyckel",
+      "http": "HTTP {scheme}",
+      "oauth2": "OAuth 2",
+      "openIdConnect": "OpenID Connect",
+      "s3": "S3",
+      "signedUrl": "Signerad URL"
+    },
+    "title": "Logga in",
+    "unauthorized": "Du har inte behörighet att hämta dessa data. Logga in.",
+    "unsupported": "Stöds inte",
+    "unsupportedLong": "Inloggningsmetoden {method} stöds tyvärr inte av STAC Browser.",
+    "user": "Användare"
+  },
+  "browse": "Utforska",
+  "cancel": "Avbryt",
+  "catalog": {
+    "license": "Licens",
+    "temporalExtent": "Tidsmässig utsträckning"
+  },
+  "catalogs": {
+    "filterByTitle": "Filtrera kataloger efter titel",
+    "filterByTitleAndMore": "Filtrera kataloger efter titel, beskrivning eller nyckelord",
+    "loadMore": "Ladda fler...",
+    "noMatches": "Inga kataloger matchar sökkriterierna."
+  },
+  "checkbox": {
+    "false": "Nej",
+    "true": "Ja"
+  },
+  "copy": "Kopiera",
+  "copyErrors": {},
+  "default": "Standard",
+  "defaultWithValue": "Standard ({value})",
+  "deprecated": "Föråldrad",
+  "deprecation": {
+    "fallbackTitle": "Visa",
+    "latestVersion": "Senaste version:",
+    "otherVersionsNotice": "Denna {type}-version är *inte* föråldrad, men andra versioner finns tillgängliga:",
+    "otherVersionsTitle": "Andra versioner tillgängliga",
+    "outdatedTitle": "Föråldrad",
+    "predecessorVersion": "Föregående version:",
+    "successorVersion": "Nästa version:",
+    "warning": "Observera att detta är föråldrat och kan tas bort när som helst. Användningen bör upphöra så snart som möjligt. Undvik att använda detta i nya projekt."
+  },
+  "description": "Beskrivning",
+  "errors": {
+    "apiListRequested": "Begäran är ogiltig. Direkta anrop till ändpunkterna /collections och .../items stöds för närvarande inte.",
+    "authFailed": "Begäran misslyckades, de angivna inloggningsuppgifterna kan vara felaktiga.",
+    "badRequest": "Begäran är ogiltig. Detta kan bero på ogiltiga parametrar, t.ex. i en sökfråga, eller ett fel i STAC Browser.",
+    "contactProvider": "Kontakta tjänsteleverantören för att lösa problemet.",
+    "default": "Den begärda sidan kunde inte laddas.",
+    "forbidden": "De angivna inloggningsuppgifterna är ogiltiga, t.ex. en utgången eller felaktig API-nyckel. Ange andra uppgifter och försök igen.",
+    "invalidJsonObject": "Svaret från tjänsteleverantören är inte ett giltigt JSON-objekt.",
+    "invalidStacCollections": "Svaret från tjänsteleverantören är inte en giltig lista över kataloger.",
+    "invalidStacItems": "Svaret från tjänsteleverantören är inte en giltig lista över objekt.",
+    "labels": {
+      "cause": "Orsak:",
+      "code": "Felkod:",
+      "reason": "Anledning:",
+      "requestURL": "Begäransadress:"
+    },
+    "loadApiCollectionsFailed": "Katalogerna från tjänsteleverantören kunde inte laddas.",
+    "loadApiItemsFailed": "Objekten från tjänsteleverantören kunde inte laddas.",
+    "loadFilteredItems": "Det gick tyvärr inte att ladda den filtrerade listan över objekt.",
+    "loadItems": "Det gick tyvärr inte att ladda listan över objekt.",
+    "networkError": "Detta problem kan uppstå om servern inte tillåter extern åtkomst via webbläsare (t.ex. om CORS-rubriker saknas). @:errors.contactProvider",
+    "noExternalAccess": "Åtkomst till externa kataloger är inte tillåten!",
+    "notFound": "Den begärda sidan finns inte. @:errors.contactProvider",
+    "serverError": "Ett problem uppstod på servern. @:errors.contactProvider",
+    "title": "Fel",
+    "unauthorized": "Begäran saknar inloggningsuppgifter, t.ex. en API-nyckel. Ange dina uppgifter och försök igen."
+  },
+  "exampleCode": {},
+  "featureExperimental": "Denna funktion är fortfarande experimentell och kan ge oväntade resultat!",
+  "features": {
+    "empty": "Inga funktioner tillgängliga.",
+    "noProperties": "Inga egenskaper tillgängliga.",
+    "title": "Funktion | Funktioner"
+  },
+  "fullscreen": {
+    "exit": "Lämna helskärmsläge",
+    "exitLabel": "✕",
+    "show": "Öppna i helskärmsläge",
+    "showLabel": "⛶"
+  },
+  "goBack": {
+    "description": "Gå tillbaka till: {type}",
+    "label": "Tillbaka"
+  },
+  "goToCollection": {
+    "description": "Gå till tillhörande katalog",
+    "descriptionWithTitle": "@:goToCollection.description: {title}",
+    "label": "Katalog"
+  },
+  "goToParent": {
+    "description": "Gå upp en nivå",
+    "descriptionWithTitle": "@:goToParent.description: {title}",
+    "label": "Upp"
+  },
+  "in": "i {catalog}",
+  "index": {
+    "api": "API",
+    "catalog": "Katalog",
+    "load": "Ladda",
+    "selectStacIndex": "... eller välj från {stacIndex}:",
+    "specifyCatalog": "Ange en STAC-katalog eller ett STAC-API...",
+    "urlInvalid": "Adressen är ogiltig.",
+    "urlMissingHost": "Adressen saknar värd.",
+    "urlMissingProtocol": "Adressen saknar protokoll."
+  },
+  "items": {
+    "filter": "Filter",
+    "hideFilter": "Dölj filter",
+    "noTime": "Ingen tid angiven",
+    "noneAvailableForCollection": "Inga objekt tillgängliga för denna katalog.",
+    "showFilter": "Visa filter"
+  },
+  "loading": "Laddar...",
+  "map": "Karta",
+  "mapping": {
+    "attribution": {},
+    "bboxSelect": {
+      "error": {}
+    },
+    "layers": {},
+    "location": {},
+    "zoom": {
+      "in": {},
+      "out": {}
+    }
+  },
+  "metadata": {
+    "general": "Allmänt",
+    "title": "Metadata"
+  },
+  "multiselect": {},
+  "open": "Öppna",
+  "pagination": {
+    "first": "« Första",
+    "last": "Sista »",
+    "next": "Nästa ›",
+    "previous": "‹ Föregående"
+  },
+  "poweredBy": "Genererad av {link}",
+  "programming": {},
+  "protocol": {
+    "s3": {}
+  },
+  "providers": {
+    "email": "Skicka e-post",
+    "homepage": "Gå till webbplats",
+    "role": {
+      "host": "Leverantör",
+      "licensor": "Licensgivare",
+      "processor": "Bearbetare",
+      "producer": "Producent"
+    },
+    "title": "Leverantörer"
+  },
+  "read": {
+    "less": "Visa mindre",
+    "more": "Visa mer"
+  },
+  "reset": "Återställ",
+  "search": {
+    "addCollections": "Lägg till med Enter-tangenten",
+    "addFilter": "Lägg till filter",
+    "additionalFilters": "Ytterligare filter",
+    "addItemIds": "Lägg till objekt-ID med Enter-tangenten",
+    "addSearchTerm": "Lägg till sökterm med Enter-tangenten",
+    "arrayInput": {},
+    "between": "mellan",
+    "dateDescription": "Alla tider i UTC.",
+    "enterCollections": "Ange katalog-ID...",
+    "enterItemIds": "Ange objekt-ID...",
+    "enterSearchTerms": "Ange söktermer...",
+    "equalTo": "är lika med",
+    "filterBySpatialExtent": "Filtrera efter geografisk utsträckning",
+    "filterCollection": "Filtrera i katalog",
+    "freeText": "Söktermer",
+    "greaterThan": "större än",
+    "greaterThanEqual": "större än eller lika med",
+    "itemIds": "Objekt-ID",
+    "itemsPerPage": "Objekt per sida",
+    "lessThan": "mindre än",
+    "lessThanEqual": "mindre än eller lika med",
+    "logical": {
+      "and": "Matcha alla filter (och)",
+      "or": "Matcha minst ett filter (eller)",
+      "not": "Negera filter"
+    },
+    "matches": "innehåller ungefär",
+    "metaDescription": "Sök i tillgängliga data från {title}.",
+    "modifyCriteria": "Ändra sökkriterierna.",
+    "noFurtherItemsFound": "Inga fler objekt tillgängliga.",
+    "noItemsFound": "Inga objekt hittades för de angivna filtren.",
+    "notEqualTo": "är inte lika med",
+    "notSupported": "Sökning stöds inte av tjänsteleverantören.",
+    "placeholder": "Sök...",
+    "selectCollections": "Välj kataloger...",
+    "selectDateRange": "Välj datumintervall...",
+    "spatialExtent": "Geografisk utsträckning",
+    "tabs": {
+      "collections": "Sök kataloger",
+      "items": "Sök objekt"
+    },
+    "temporalExtent": "Tidsmässig utsträckning",
+    "title": "Sök"
+  },
+  "showMore": "Visa mer...",
+  "sidebar": {
+    "switchCatalog": "Byt katalog"
+  },
+  "sort": {
+    "asc": {
+      "label": "Stigande",
+      "title": "Sortera i stigande ordning (A–Ö)"
+    },
+    "desc": {
+      "label": "Fallande",
+      "title": "Sortera i fallande ordning (Ö–A)"
+    },
+    "title": "Sortering"
+  },
+  "source": {
+    "detailsAboutSource": "Detaljer om STAC-datakällan",
+    "fileFormat": "Filformat",
+    "id": "Identifierare",
+    "invalid": "Inte kompatibel",
+    "label": "Datakälla",
+    "language": {},
+    "locatedAt": "STAC-metadatafilen finns på:",
+    "share": {},
+    "statistics": "Statistik",
+    "title": "Datakälla",
+    "valid": "Kompatibel",
+    "validating": "Validerar...",
+    "validationNA": "inte tillgänglig",
+    "validationParams": {},
+    "validationReport": {}
+  },
+  "submit": "Skicka",
+  "switchToDarkMode": "Byt till mörkt läge",
+  "switchToLightMode": "Byt till ljust läge",
+  "table": {
+    "sort": {}
+  },
+  "thumbnails": "Miniatyrbilder",
+  "tree": {
+    "moreCollectionPagesAvailable": "Fler katalogsidor tillgängliga",
+    "noChildren": "Inga underobjekt tillgängliga."
+  },
+  "view": {
+    "list": {
+      "label": "Lista",
+      "title": "Visa som lista"
+    },
+    "tiles": {
+      "label": "Rutor",
+      "title": "Visa som rutor"
+    },
+    "title": "Visningsalternativ"
+  }
+}

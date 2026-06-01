@@ -290,6 +290,7 @@
     "between": "tra",
     "betweenOperatorDescription": "Verifica se un valore di campo numerico si trova all'interno dell'intervallo specificato. L'intervallo dato è inclusivo.",
     "dateDescription": "Data/ora nel sistema UTC (tempo coordinato internazionale).",
+    "disabledDueToSingleDate": "Questo filtro è disabilitato perché la collezione ha una singola data e ora come estensione temporale.",
     "enterCollections": "Inserire una o più Collezioni...",
     "enterItemIds": "Inserire uno o più ID di Elemento...",
     "enterSearchTerms": "Inserisci uno o più termini di ricerca...",
