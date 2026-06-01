@@ -33,6 +33,20 @@ function assetHref(asset) {
   return asset.getAbsoluteUrl?.() || asset.href || '';
 }
 
+// Normalize a PMTiles source URL for comparison. Strips the `pmtiles://`
+// prefix and resolves relative URLs to absolute so that a style source URL
+// can be matched against a loaded source's URL regardless of form.
+function normalizePmtilesUrl(url) {
+  if (typeof url !== 'string' || url === '') return null;
+  let u = url.startsWith('pmtiles://') ? url.slice('pmtiles://'.length) : url;
+  try {
+    u = new URL(u, typeof window !== 'undefined' ? window.location.href : undefined).href;
+  } catch {
+    /* leave as-is if it can't be resolved */
+  }
+  return u;
+}
+
 function isPmtilesAsset(asset) {
   const type = asset.type || '';
   const href = assetHref(asset);
@@ -83,6 +97,8 @@ export default class StacMapLayer {
     this._pmtilesLayerIds = [];
     this._pmtilesSourceIds = [];
     this._pmtilesAssetMeta = [];
+    this._glStyleLayerIds = [];
+    this._glStyleSourceIds = [];
     this._activeGlStyle = null;
   }
 
@@ -507,6 +523,8 @@ export default class StacMapLayer {
     this.sourceIds = [];
     this._pmtilesLayerIds = [];
     this._pmtilesSourceIds = [];
+    this._glStyleLayerIds = [];
+    this._glStyleSourceIds = [];
     if (stac) this.setStac(stac);
     if (children) this.setChildren(children);
     if (assets) {
@@ -595,34 +613,103 @@ export default class StacMapLayer {
       try { if (this.map.getLayer(id)) this.map.removeLayer(id); } catch { /* ignore */ }
     }
     this._pmtilesLayerIds = [];
+    this._clearGlStyleExtras();
+  }
+
+  _clearGlStyleExtras() {
+    for (const id of [...this._glStyleLayerIds]) {
+      try { if (this.map.getLayer(id)) this.map.removeLayer(id); } catch { /* ignore */ }
+    }
+    this._glStyleLayerIds = [];
+    for (const id of [...this._glStyleSourceIds]) {
+      try { if (this.map.getSource(id)) this.map.removeSource(id); } catch { /* ignore */ }
+    }
+    this._glStyleSourceIds = [];
   }
 
   applyGlStyle(glStyle) {
-    if (!glStyle || !glStyle.layers || this._pmtilesSourceIds.length === 0) return;
+    if (!glStyle || !glStyle.layers) return;
 
     this._clearPmtilesLayers();
 
-    const styleSourceNames = Object.keys(glStyle.sources || {});
-    if (styleSourceNames.length !== this._pmtilesSourceIds.length) {
-      console.warn(`Style defines ${styleSourceNames.length} source(s) but ${this._pmtilesSourceIds.length} PMTiles source(s) are loaded — mapping by position`);
+    const sources = glStyle.sources || {};
+    const styleSourceNames = Object.keys(sources);
+
+    // Add non-PMTiles sources (currently geojson) directly. PMTiles sources
+    // in the style are matched positionally to the loaded PMTiles sources.
+    const directSourceIds = new Set();
+    const pmtilesStyleSourceNames = [];
+    for (const name of styleSourceNames) {
+      const src = sources[name];
+      if (src && src.type === 'geojson') {
+        try {
+          this.map.addSource(name, src);
+          this._glStyleSourceIds.push(name);
+          directSourceIds.add(name);
+        } catch (err) {
+          console.warn(`Failed to add geojson source "${name}" from style`, err);
+        }
+      } else {
+        pmtilesStyleSourceNames.push(name);
+      }
     }
+
+    if (pmtilesStyleSourceNames.length > 0 && pmtilesStyleSourceNames.length !== this._pmtilesSourceIds.length) {
+      console.warn(`Style defines ${pmtilesStyleSourceNames.length} PMTiles-style source(s) but ${this._pmtilesSourceIds.length} PMTiles source(s) are loaded — mapping by position`);
+    }
+
+    // Build a lookup from each loaded PMTiles source's underlying URL to its
+    // source ID, so style sources can be matched by URL when they specify one.
+    const loadedUrlToSourceId = {};
+    for (const sourceId of this._pmtilesSourceIds) {
+      const loaded = this.map.getSource(sourceId);
+      const norm = normalizePmtilesUrl(loaded && loaded.url);
+      if (norm) loadedUrlToSourceId[norm] = sourceId;
+    }
+
+    // Match style sources to loaded sources by URL first, falling back to
+    // positional mapping for sources that don't carry a matching URL. This
+    // matters when an item has multiple PMTiles assets and a style references
+    // a specific one by its pmtiles:// URL.
     const sourceMapping = {};
-    for (let i = 0; i < styleSourceNames.length; i++) {
-      if (i < this._pmtilesSourceIds.length) {
-        sourceMapping[styleSourceNames[i]] = this._pmtilesSourceIds[i];
+    const usedSourceIds = new Set();
+    const unmatchedStyleNames = [];
+    for (const name of pmtilesStyleSourceNames) {
+      const norm = normalizePmtilesUrl(sources[name] && sources[name].url);
+      const matched = norm ? loadedUrlToSourceId[norm] : undefined;
+      if (matched) {
+        sourceMapping[name] = matched;
+        usedSourceIds.add(matched);
+      } else {
+        unmatchedStyleNames.push(name);
+      }
+    }
+    const remainingSourceIds = this._pmtilesSourceIds.filter(id => !usedSourceIds.has(id));
+    for (let i = 0; i < unmatchedStyleNames.length; i++) {
+      if (i < remainingSourceIds.length) {
+        sourceMapping[unmatchedStyleNames[i]] = remainingSourceIds[i];
       }
     }
 
     for (const layer of glStyle.layers) {
-      const mappedSource = sourceMapping[layer.source];
-      if (!mappedSource) continue;
+      let layerSpec;
+      if (directSourceIds.has(layer.source)) {
+        layerSpec = { ...layer };
+      } else {
+        const mappedSource = sourceMapping[layer.source];
+        if (!mappedSource) continue;
+        layerSpec = { ...layer, source: mappedSource };
+      }
 
-      const layerSpec = { ...layer, source: mappedSource };
       if (this.map.getLayer(layerSpec.id)) {
         this.map.removeLayer(layerSpec.id);
       }
       this.map.addLayer(layerSpec);
-      this._pmtilesLayerIds.push(layerSpec.id);
+      if (directSourceIds.has(layer.source)) {
+        this._glStyleLayerIds.push(layerSpec.id);
+      } else {
+        this._pmtilesLayerIds.push(layerSpec.id);
+      }
     }
 
     this._activeGlStyle = glStyle;
