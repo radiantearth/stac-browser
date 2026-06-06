@@ -1,1 +1,448 @@
-{}
+{
+  "actions": {
+    "openIn": "Открыть в {service}"
+  },
+  "additionalActions": "Дополнительные действия",
+  "additionalResources": "Дополнительные ресурсы",
+  "anonymized": {
+    "title": "Анонимизировано"
+  },
+  "assets": {
+    "alternate": {
+      "main": "Предпочтительный"
+    },
+    "copyUrl": {
+      "generic": "Копировать URL",
+      "withSource": "Копировать URL для {source}"
+    },
+    "currentlyShown": "Этот ресурс отображается в данный момент.",
+    "download": {
+      "generic": "Скачать",
+      "withSource": "Скачать из {source}"
+    },
+    "inItems": "Ресурс в элементах | Ресурсы в элементах",
+    "role": {
+      "data": "Данные",
+      "metadata": "Метаданные"
+    },
+    "showOnMap": "Показать на карте",
+    "showThumbnail": "Показать миниатюру",
+    "shown": "отображено"
+  },
+  "authentication": {
+    "button": {
+      "login": "Войти",
+      "logout": "Выйти",
+      "title": "Предоставить или обновить учетные данные"
+    },
+    "chooseMethod": "Выберите метод аутентификации",
+    "description": "Запрошенная страница требует аутентификации. Пожалуйста, введите учетные данные в текстовое поле ниже.",
+    "loggedOut": "Вы успешно вышли из системы. Теперь вы можете закрыть это окно.",
+    "password": "Пароль",
+    "required": "Требуется аутентификация",
+    "schemeTypes": {
+      "apiKey": "Ключ API",
+      "http": "HTTP {scheme}",
+      "oauth2": "OAuth 2",
+      "openIdConnect": "OpenID Connect",
+      "s3": "S3",
+      "signedUrl": "Подписанный URL (Signed URL)"
+    },
+    "title": "Аутентификация",
+    "unauthorized": "У вас нет прав для доступа к этим данным. Пожалуйста, войдите в систему.",
+    "unsupported": "Не поддерживается",
+    "unsupportedLong": "К сожалению, метод аутентификации {method} не поддерживается в STAC Browser.",
+    "user": "Пользователь"
+  },
+  "browse": "Просмотр",
+  "cancel": "Отмена",
+  "catalog": {
+    "license": "Лицензия",
+    "temporalExtent": "Временной охват"
+  },
+  "catalogs": {
+    "filterByTitle": "Фильтровать каталоги по названию",
+    "filterByTitleAndMore": "Фильтровать каталоги по названию, описанию или ключевым словам",
+    "loadMore": "Загрузить еще...",
+    "noMatches": "Нет каталогов, соответствующих заданным критериям поиска."
+  },
+  "checkbox": {
+    "false": "нет",
+    "true": "да"
+  },
+  "close": "Закрыть",
+  "copy": "Копировать",
+  "copyErrors": {
+    "permission": "Не удалось скопировать. Пожалуйста, проверьте разрешения браузера.",
+    "unsupported": "Буфер обмена недоступен в этом браузере."
+  },
+  "default": "По умолчанию",
+  "defaultWithValue": "По умолчанию ({value})",
+  "deprecated": "Устарело",
+  "deprecation": {
+    "fallbackTitle": "Показать",
+    "latestVersion": "Последняя версия:",
+    "otherVersionsNotice": "Этот {type} *не* является устаревшим, но доступны другие версии:",
+    "otherVersionsTitle": "Доступны другие версии",
+    "outdatedTitle": "Устаревший",
+    "predecessorVersion": "Предыдущая версия:",
+    "successorVersion": "Следующая версия:",
+    "warning": "Обратите внимание, что этот {type} устарел и может быть удален в любое время. Рекомендуется как можно скорее прекратить его использование и не применять в новых проектах."
+  },
+  "description": "Описание",
+  "errors": {
+    "apiListRequested": "Некорректный запрос. Прямые запросы к конечным точкам /collections и .../items в данный момент не поддерживаются.",
+    "authFailed": "Ошибка выполнения запроса, предоставленные учетные данные могут быть неверными.",
+    "badRequest": "Некорректный запрос. Это может быть связано с неверными параметрами (например, в поисковом запросе) или ошибкой в STAC Browser.",
+    "contactProvider": "Пожалуйста, свяжитесь с оператором сервиса для решения этой проблемы.",
+    "default": "Не удалось загрузить запрошенную страницу.",
+    "forbidden": "Указанные для этого запроса учетные данные недействительны (например, истек срок действия токена API). Пожалуйста, укажите другие данные и повторите попытку.",
+    "invalidJsonObject": "Ответ не является валидным объектом JSON.",
+    "invalidStacCollections": "Ответ API не является валидным списком коллекций STAC (STAC Collections).",
+    "invalidStacItems": "Ответ API не является валидным списком элементов STAC (STAC Items).",
+    "labels": {
+      "cause": "Причина (техническая):",
+      "code": "Код ошибки:",
+      "reason": "Причина:",
+      "requestURL": "URL запроса:"
+    },
+    "loadApiCollectionsFailed": "Не удалось загрузить коллекции API.",
+    "loadApiItemsFailed": "Не удалось загрузить объекты API.",
+    "loadFilteredItems": "К сожалению, не удалось загрузить отфильтрованный список элементов.",
+    "loadItems": "К сожалению, не удалось загрузить список элементов STAC.",
+    "networkError": "Эта проблема может возникать, если серверы не разрешают внешний доступ через веб-браузеры (например, отсутствуют заголовки CORS). @:errors.contactProvider",
+    "noExternalAccess": "Доступ к внешним каталогам запрещен!",
+    "notFound": "Запрошенный ресурс не существует. @:errors.contactProvider",
+    "serverError": "На сервере произошла ошибка. @:errors.contactProvider",
+    "title": "Ошибка",
+    "unauthorized": "В запросе отсутствуют учетные данные (например, токен API). Пожалуйста, предоставьте учетные данные и повторите попытку."
+  },
+  "exampleCode": {
+    "title": "Пример кода",
+    "storeAs": "Сохранить код как:",
+    "installDependencies": "Установить зависимости:"
+  },
+  "featureExperimental": "Эта функция экспериментальная и может давать неожиданные результаты!",
+  "features": {
+    "empty": "Объекты отсутствуют.",
+    "noProperties": "Свойства не предоставлены.",
+    "title": "Объект | Объекты"
+  },
+  "fullscreen": {
+    "exit": "Выйти из полноэкранного режима",
+    "exitLabel": "✕",
+    "show": "Открыть в полноэкранном режиме",
+    "showLabel": "⛶"
+  },
+  "goBack": {
+    "description": "Вернуться к {type}",
+    "label": "Назад"
+  },
+  "goToCollection": {
+    "description": "Перейти к связанной коллекции",
+    "descriptionWithTitle": "@:goToCollection.description: {title}",
+    "label": "Коллекция"
+  },
+  "goToParent": {
+    "description": "Перейти на уровень выше",
+    "descriptionWithTitle": "@:goToParent.description: {title}",
+    "label": "Вверх"
+  },
+  "in": "в {catalog}",
+  "index": {
+    "api": "API",
+    "catalog": "Статический каталог",
+    "load": "Загрузить",
+    "selectStacIndex": "... или выберите из {stacIndex}:",
+    "specifyCatalog": "Пожалуйста, укажите каталог STAC или API...",
+    "urlInvalid": "Некорректный URL.",
+    "urlMissingHost": "В URL отсутствует хост.",
+    "urlMissingProtocol": "В URL отсутствует протокол."
+  },
+  "items": {
+    "filter": "Фильтры",
+    "hideFilter": "Скрыть фильтры",
+    "noTime": "Время не указано",
+    "noneAvailableForCollection": "Для этой коллекции нет доступных элементов.",
+    "showFilter": "Показать фильтры"
+  },
+  "loading": "Загрузка...",
+  "map": "Карта",
+  "mapping": {
+    "attribution": {
+      "collapseLabel": "✕",
+      "description": "Права авторов / Источники данных",
+      "label": "i"
+    },
+    "bboxSelect": {
+      "add": "Кликните на карте, чтобы добавить ограничивающий прямоугольник (bounding box).",
+      "eastLon": "Восточная долгота",
+      "error": {
+        "incomplete": "Координата отсутствует",
+        "invalidLat": "Должна быть в диапазоне от -90 до 90",
+        "invalidLon": "Должна быть в диапазоне от -180 до 180",
+        "latOrder": "Южная широта должна быть меньше Северной широты",
+        "lonOrder": "Западная долгота должна быть меньше Восточной долготы"
+      },
+      "northLat": "Северная широта",
+      "remove": "Кликните внутри ограничивающего прямоугольника, чтобы удалить его.",
+      "southLat": "Южная широта",
+      "westLon": "Западная долгота"
+    },
+    "close": "Закрыть",
+    "fit": "Вписать в границы охвата",
+    "layers": {
+      "base": "Базовые слои",
+      "footprint": "Контур покрытия",
+      "title": "Слои",
+      "unnamed": "Без названия #{id}"
+    },
+    "location": {
+      "description": "Перейти к моему местоположению"
+    },
+    "nobasemap": "Нет доступных базовых карт.",
+    "nodata": "В метаданных отсутствует пространственная информация.",
+    "zoom": {
+      "in": {
+        "description": "Приблизить",
+        "label": "+"
+      },
+      "out": {
+        "description": "Отдалить",
+        "label": "–"
+      }
+    }
+  },
+  "messageForSchemaError": "{message}, для схемы {schemaPath}",
+  "metadata": {
+    "general": "Общие",
+    "title": "Метаданные"
+  },
+  "multiselect": {
+    "andMore": "и еще {count}",
+    "deselectLabel": "Нажмите Enter для удаления",
+    "keywordsPlaceholder": "Выберите ключевые слова",
+    "placeholder": "Выберите вариант",
+    "selectLabel": "Нажмите Enter для выбора",
+    "selectedLabel": "Выбрано"
+  },
+  "open": "Открыть",
+  "pagination": {
+    "first": "« Первая",
+    "last": "Последняя »",
+    "next": "Следующая ›",
+    "previous": "‹ Предыдущая"
+  },
+  "poweredBy": "Работает на {link}",
+  "programming": {
+    "csharp": "C#",
+    "java": "Java",
+    "javascript": "JavaScript",
+    "python": "Python",
+    "r": "R",
+    "rust": "Rust"
+  },
+  "protocol": {
+    "azure": "Microsoft Azure",
+    "file": "файловая система (локальная)",
+    "ftp": "FTP",
+    "gcs": "Google Cloud",
+    "oss": "Alibaba Cloud",
+    "s3": {
+      "amazonaws.com": "Amazon S3",
+      "default": "S3"
+    }
+  },
+  "providers": {
+    "email": "Отправить эл. письмо",
+    "homepage": "Перейти на страницу",
+    "role": {
+      "host": "Хранение",
+      "licensor": "Правообладатель",
+      "processor": "Обработка",
+      "producer": "Производство"
+    },
+    "title": "Поставщик | Поставщики"
+  },
+  "read": {
+    "less": "Свернуть",
+    "more": "Подробнее"
+  },
+  "reset": "Сбросить",
+  "search": {
+    "addCollections": "Нажмите Enter, чтобы добавить коллекцию",
+    "addFilter": "Добавить фильтр",
+    "additionalFilters": "Дополнительные фильтры",
+    "addItemIds": "Нажмите Enter, чтобы добавить ID элемента",
+    "addSearchTerm": "Нажмите Enter, чтобы добавить поисковый запрос",
+    "arrayInput": {
+      "addValue": "Нажмите Enter, чтобы добавить значение",
+      "helpText": "Введите значение(я)"
+    },
+    "arrayContains": "Содержит все",
+    "arrayContainsDescription": "Массив содержит все указанные значения",
+    "arrayContainedBy": "Является подмножеством",
+    "arrayContainedByDescription": "Массив является подмножеством указанных значений",
+    "arrayEquals": "Точное совпадение",
+    "arrayEqualsDescription": "Массив точно совпадает с указанными значениями (те же элементы, в любом порядке)",
+    "arrayOverlaps": "Содержит любое из",
+    "arrayOverlapsDescription": "Массив содержит хотя бы одно из указанных значений",
+    "between": "между",
+    "betweenOperatorDescription": "Проверяет, попадает ли числовое значение поля в заданный диапазон. Границы диапазона включаются.",
+    "dateDescription": "Время указывается во Всемирном координированном времени (UTC).",
+    "disabledDueToSingleDate": "Этот фильтр отключен, так как временной охват коллекции ограничен одной датой и временем.",
+    "enterCollections": "Введите один или несколько ID коллекций...",
+    "enterItemIds": "Введите один или несколько ID элементов...",
+    "enterSearchTerms": "Введите поисковые запросы...",
+    "equalTo": "равно",
+    "filterBySpatialExtent": "Фильтровать по пространственному охвату",
+    "filterCollection": "Фильтровать коллекцию",
+    "freeText": "Поисковые запросы",
+    "freeTextDescription": "Поиск как минимум одного из указанных терминов в таких полях, как название и описание.",
+    "greaterThan": "больше чем",
+    "greaterThanEqual": "больше или равно",
+    "in": "включено в",
+    "inOperatorDescription": "Проверяет, совпадает ли значение поля с любым из указанных значений.",
+    "itemIds": "ID элементов",
+    "itemsPerPage": "Элементов на странице",
+    "itemsPerPageDescription": "Количество запрашиваемых элементов на страницу, макс. {maxItems}.",
+    "lessThan": "меньше чем",
+    "lessThanEqual": "меньше или равно",
+    "likeOperatorDescription": "Можно использовать подстановочные знаки. `_` соответствует одному символу, `%` — любому количеству символов. Для поиска самого символа подстановочного знака добавьте перед ним `\\`.",
+    "logical": {
+      "and": "Соответствие всем фильтрам (и)",
+      "or": "Соответствие любому из фильтров (или)",
+      "not": "Отрицание фильтра"
+    },
+    "matches": "совпадает с",
+    "metaDescription": "Поиск по доступным данным для {title}.",
+    "modifyCriteria": "Пожалуйста, измените критерии поиска.",
+    "noFurtherItemsFound": "Больше элементов не найдено.",
+    "noItemsFound": "Объекты по заданным фильтрам не найдены.",
+    "noOperatorsError": "STAC Browser не поддерживает операторы для фильтра {queryable}.",
+    "noOptions": "Ничего не введено",
+    "notEqualTo": "не равно",
+    "notFullySupported": "Некоторые параметры могут не поддерживаться.",
+    "notSupported": "Поиск по элементам (Item Search) не поддерживается этим API.",
+    "placeholder": "Поиск...",
+    "selectCollections": "Выберите одну или несколько коллекций...",
+    "selectDateRange": "Выберите временной диапазон",
+    "selectForItemSearch": "Выбрать для поиска по элементам",
+    "spatialExtent": "Пространственный охват",
+    "tabs": {
+      "collections": "Поиск коллекций",
+      "items": "Поиск элементов"
+    },
+    "temporalExtent": "Временной охват",
+    "title": "Поиск",
+    "useInItemSearch": "Открыть коллекцию в поиске по элементам | Открыть {count} колл. в поиске по элементам"
+  },
+  "showMore": "Показать еще...",
+  "sidebar": {
+    "switchCatalog": "Переключить каталог"
+  },
+  "sort": {
+    "asc": {
+      "label": "По возрастанию",
+      "title": "Сортировать по возрастанию (А-Я)"
+    },
+    "desc": {
+      "label": "По убыванию",
+      "title": "Сортировать по убыванию (Я-А)"
+    },
+    "title": "Сортировка"
+  },
+  "source": {
+    "conformanceClasses": "Классы соответствия (Conformance Classes)",
+    "detailsAboutSource": "Подробная информация об источнике STAC",
+    "extension": "Расширение",
+    "fileFormat": "Формат файла",
+    "id": "ID",
+    "invalid": "Невалидный",
+    "label": "Источник",
+    "language": {
+      "label": "Язык: {currentLanguage}",
+      "onlyData": "На этом языке доступны только данные!",
+      "onlyUI": "На этом языке доступен только интерфейс пользователя!",
+      "switch": "Переключить язык"
+    },
+    "locatedAt": "Файл метаданных STAC находится по адресу:",
+    "share": {
+      "bsky": "Bluesky",
+      "email": "Эл. почта",
+      "label": "Поделиться",
+      "mastodon": "Mastodon.social",
+      "message": "{title} доступен по адресу {url}",
+      "sharePageWithOthers": "Поделитесь URL этой страницы где вам удобно:",
+      "title": "Поделиться",
+      "withOthers": "Поделиться страницей",
+      "x": "X (Twitter)"
+    },
+    "stacExtension": "Расширение STAC",
+    "stacVersion": "Версия STAC",
+    "statistics": "Статистика",
+    "title": "Исходные данные",
+    "valid": "Валидный",
+    "validating": "Проверка...",
+    "validationNA": "н/д",
+    "validationParams": {
+      "additionalProperty": "дополнительное свойство",
+      "allowedValue": "допустимое значение",
+      "allowedValues": "допустимые значения",
+      "comparison": "сравнение",
+      "depsCount": "количество",
+      "exclusive": "исключая границу",
+      "failingKeyword": "ошибочное ключевое слово",
+      "format": "формат",
+      "i": "первый элемент",
+      "j": "второй элемент",
+      "limit": "лимит",
+      "maxContains": "содержит максимум",
+      "minContains": "содержит минимум",
+      "missingProperty": "отсутствующее свойство",
+      "multipleOf": "кратно",
+      "passingSchemas": "прошедшие проверку схемы",
+      "pattern": "шаблон (pattern)",
+      "property": "свойство",
+      "propertyName": "имя свойства",
+      "type": "тип"
+    },
+    "validationReport": {
+      "disclaimer": "Отчет о валидации генерируется на основе схем, которые часто не являются исчерпывающими. Таким образом, они могут не охватывать все аспекты спецификации STAC и её расширений. Отчет о валидации не является полной гарантией того, что сущность STAC абсолютно во всем соответствует спецификации.",
+      "result": "Результат",
+      "title": "Отчет о валидации"
+    }
+  },
+  "stacAssets": "Ресурс | Ресурсы",
+  "stacCatalog": "Каталог | Каталоги",
+  "stacCollection": "Коллекция | Коллекции",
+  "stacItem": "Объект | Объекты",
+  "submit": "Отправить",
+  "switchToDarkMode": "Переключить на темную тему",
+  "switchToLightMode": "Переключить на светлую тему",
+  "table": {
+    "emptyFilteredText": "Нет записей, соответствующих вашему запросу",
+    "emptyText": "Нет записей для отображения",
+    "sort": {
+      "asc": "Кликните для сортировки по возрастанию",
+      "clear": "Кликните для сброса сортировки",
+      "desc": "Кликните для сортировки по убыванию"
+    }
+  },
+  "thumbnails": "Миниатюры",
+  "tree": {
+    "moreCollectionPagesAvailable": "доступны дополнительные страницы для коллекции",
+    "noChildren": "Дочерние объекты отсутствуют."
+  },
+  "view": {
+    "list": {
+      "label": "Список",
+      "title": "Показать в виде списка"
+    },
+    "tiles": {
+      "label": "Плитка",
+      "title": "Показать в виде плитки"
+    },
+    "title": "Параметры отображения"
+  }
+}

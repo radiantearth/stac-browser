@@ -1,7 +1,7 @@
-import { enUS as locale } from 'date-fns/locale';
+import { ru as locale } from 'date-fns/locale';
 
-const dateFormat = 'MM/dd/yyyy';
-const timeFormat = 'hh:mm:ss a';
+const dateFormat = 'd.M.yyyy';
+const timeFormat = 'H:mm:ss';
 const dateTimeFormat = `${dateFormat} ${timeFormat}`;
 
-export default {dateFormat, timeFormat, dateTimeFormat, locale};
+export default { dateFormat, timeFormat, dateTimeFormat, locale };
