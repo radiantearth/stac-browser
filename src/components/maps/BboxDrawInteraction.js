@@ -17,7 +17,7 @@ export default class BboxDrawInteraction {
   }
 
   _addSource() {
-    if (this.map.getSource(this._sourceId)) return;
+    if (this.map.getSource(this._sourceId)) {return;}
     this.map.addSource(this._sourceId, {
       type: 'geojson',
       data: { type: 'FeatureCollection', features: [] },
@@ -44,7 +44,7 @@ export default class BboxDrawInteraction {
   }
 
   _onMouseDown(e) {
-    if (!e.shiftKey) return;
+    if (!e.shiftKey) {return;}
     e.preventDefault();
     this._drawing = true;
     this._startPoint = { x: e.offsetX, y: e.offsetY };
@@ -52,13 +52,13 @@ export default class BboxDrawInteraction {
   }
 
   _onMouseMove(e) {
-    if (!this._drawing || !this._startPoint) return;
+    if (!this._drawing || !this._startPoint) {return;}
     const current = { x: e.offsetX, y: e.offsetY };
     this._updateRect(this._startPoint, current);
   }
 
   _onMouseUp(e) {
-    if (!this._drawing || !this._startPoint) return;
+    if (!this._drawing || !this._startPoint) {return;}
     this._drawing = false;
     const end = { x: e.offsetX, y: e.offsetY };
     this.map.dragPan.enable();
@@ -105,7 +105,7 @@ export default class BboxDrawInteraction {
 
   setExtent(extent) {
     const source = this.map.getSource(this._sourceId);
-    if (!source) return;
+    if (!source) {return;}
 
     if (!extent) {
       source.setData({ type: 'FeatureCollection', features: [] });
@@ -129,8 +129,8 @@ export default class BboxDrawInteraction {
     canvas.removeEventListener('mousemove', this._onMouseMove);
     canvas.removeEventListener('mouseup', this._onMouseUp);
 
-    if (this.map.getLayer(this._lineLayerId)) this.map.removeLayer(this._lineLayerId);
-    if (this.map.getLayer(this._fillLayerId)) this.map.removeLayer(this._fillLayerId);
-    if (this.map.getSource(this._sourceId)) this.map.removeSource(this._sourceId);
+    if (this.map.getLayer(this._lineLayerId)) {this.map.removeLayer(this._lineLayerId);}
+    if (this.map.getLayer(this._fillLayerId)) {this.map.removeLayer(this._fillLayerId);}
+    if (this.map.getSource(this._sourceId)) {this.map.removeSource(this._sourceId);}
   }
 }

@@ -29,7 +29,7 @@ export default {
   },
   computed: {
     layers() {
-      if (!this.map || !this.layerIds.length) return [];
+      if (!this.map || !this.layerIds.length) {return [];}
       return this.layerIds.map(id => {
         const vis = this.map.getLayoutProperty(id, 'visibility');
         return {

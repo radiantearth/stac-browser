@@ -111,7 +111,7 @@ export default {
       await this.showStacLayer();
     },
     async assets() {
-      if (!this.stacLayer) return;
+      if (!this.stacLayer) {return;}
       if (this.assets && this.assets.length > 0) {
         await this.stacLayer.setAssets(this.assets);
       } else {
@@ -119,7 +119,7 @@ export default {
       }
     },
     async children() {
-      if (!this.stacLayer) return;
+      if (!this.stacLayer) {return;}
       this.stacLayer.setChildren(this.children);
       this.stacLayer.fit();
     },
@@ -148,7 +148,7 @@ export default {
   },
   methods: {
     async showStacLayer() {
-      if (this._showingStacLayer) return;
+      if (this._showingStacLayer) {return;}
       this._showingStacLayer = true;
 
       try {
@@ -164,7 +164,7 @@ export default {
         }
         this.map = null;
 
-        if (!this.$refs.map) return;
+        if (!this.$refs.map) {return;}
 
         await this.createMap(this.$refs.map, this.stac, this.onfocusOnly);
         this._addExpandControl();
@@ -209,16 +209,16 @@ export default {
     },
 
     async resolveAndApplyStyles() {
-      if (!this.stac) return;
+      if (!this.stac) {return;}
       const styles = resolveStyles(this.stac);
-      if (styles.length === 0) return;
+      if (styles.length === 0) {return;}
       this.availableStyles = styles;
       await this.applyStyleAtIndex(0);
     },
 
     async applyStyleAtIndex(index) {
       const styleEntry = this.availableStyles[index];
-      if (!styleEntry || !this.stacLayer) return;
+      if (!styleEntry || !this.stacLayer) {return;}
       try {
         if (!styleEntry._cached) {
           styleEntry._cached = await loadStyleJson(styleEntry.href);
@@ -239,7 +239,7 @@ export default {
 
     _setupClickInteraction() {
       const childrenLayerIds = this.stacLayer.getChildrenLayerIds();
-      if (childrenLayerIds.length === 0) return;
+      if (childrenLayerIds.length === 0) {return;}
 
       for (const layerId of childrenLayerIds) {
         this.map.on('mouseenter', layerId, () => {
@@ -257,7 +257,7 @@ export default {
           layers: childrenLayerIds,
         });
 
-        if (features.length === 0) return;
+        if (features.length === 0) {return;}
 
         this.$refs.target.style.left = e.point.x + 'px';
         this.$refs.target.style.top = e.point.y + 'px';
@@ -266,7 +266,7 @@ export default {
           ? this.children.features
           : this.children?.collections;
 
-        if (!items) return;
+        if (!items) {return;}
 
         const seen = new Set();
         const matched = [];
@@ -275,7 +275,7 @@ export default {
           if (idx != null && !seen.has(idx) && items[idx]) {
             seen.add(idx);
             matched.push(items[idx]);
-            if (matched.length >= 5) break;
+            if (matched.length >= 5) {break;}
           }
         }
 
@@ -290,7 +290,7 @@ export default {
     },
 
     _addExpandControl() {
-      if (!this.map) return;
+      if (!this.map) {return;}
       const vm = this;
       const ctrl = {
         onAdd() {
@@ -338,12 +338,12 @@ export default {
     },
 
     getShownData() {
-      if (!this.stacLayer) return null;
+      if (!this.stacLayer) {return null;}
       return this.stacLayer.getVisibleStacReferences();
     },
 
     async resolveExtent(bbox, sourceCrs) {
-      if (!this.map || !bbox || bbox.length !== 4) return null;
+      if (!this.map || !bbox || bbox.length !== 4) {return null;}
 
       const fromCrs = sourceCrs || 'EPSG:4326';
 
@@ -377,7 +377,7 @@ export default {
     },
 
     pulseExtent(bounds) {
-      if (!this.map || !bounds) return;
+      if (!this.map || !bounds) {return;}
 
       const sourceId = 'pulse-extent-' + Date.now();
       const fillLayerId = sourceId + '-fill';
@@ -459,9 +459,9 @@ export default {
         if (elapsed >= duration || !map) {
           clearInterval(interval);
           try {
-            if (map.getLayer(fillLayerId)) map.removeLayer(fillLayerId);
-            if (map.getLayer(lineLayerId)) map.removeLayer(lineLayerId);
-            if (map.getSource(sourceId)) map.removeSource(sourceId);
+            if (map.getLayer(fillLayerId)) {map.removeLayer(fillLayerId);}
+            if (map.getLayer(lineLayerId)) {map.removeLayer(lineLayerId);}
+            if (map.getSource(sourceId)) {map.removeSource(sourceId);}
           } catch { /* map may be gone */ }
           return;
         }
@@ -481,9 +481,9 @@ export default {
     },
 
     async zoomToBbox(bbox, sourceCrs) {
-      if (!this.map) return;
+      if (!this.map) {return;}
       const bounds = await this.resolveExtent(bbox, sourceCrs);
-      if (!bounds) return;
+      if (!bounds) {return;}
 
       try {
         this.map.fitBounds(bounds, { padding: 50, maxZoom: 18 });
@@ -497,7 +497,7 @@ export default {
 
     async highlightBbox(bbox, sourceCrs) {
       const bounds = await this.resolveExtent(bbox, sourceCrs);
-      if (!bounds) return;
+      if (!bounds) {return;}
       this.pulseExtent(bounds);
     },
   }

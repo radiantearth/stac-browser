@@ -27,7 +27,7 @@ export default {
       return [];
     },
     current() {
-      if (this.texts.length === 0) return "";
+      if (this.texts.length === 0) {return "";}
       return this.texts[this.i % this.texts.length];
     }
   },

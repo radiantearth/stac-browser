@@ -67,7 +67,7 @@ export default {
 
     _loadBasemapAsync(basemap) {
       const style = basemap.raster ? this.buildRasterStyle(basemap) : basemap.url;
-      if (!style) return;
+      if (!style) {return;}
 
       this.map.once('style.load', () => {
         if (this.is3D) {
@@ -100,10 +100,10 @@ export default {
     },
 
     async switchBasemap(index) {
-      if (index === this.activeBasemapIndex || !this.map) return;
+      if (index === this.activeBasemapIndex || !this.map) {return;}
       this.activeBasemapIndex = index;
       const basemap = this.basemaps[index];
-      if (!basemap) return;
+      if (!basemap) {return;}
 
       const was3D = this.is3D;
 
@@ -130,7 +130,7 @@ export default {
     },
 
     enable3D() {
-      if (!this.map) return;
+      if (!this.map) {return;}
 
       if (!this.map.getSource(MAPTERHORN_SOURCE_ID)) {
         this.map.addSource(MAPTERHORN_SOURCE_ID, {
@@ -166,7 +166,7 @@ export default {
     },
 
     disable3D() {
-      if (!this.map) return;
+      if (!this.map) {return;}
 
       this.map.setTerrain(null);
       this.map.setProjection({ type: 'mercator' });
@@ -186,11 +186,11 @@ export default {
     },
 
     getFirstSymbolLayerId() {
-      if (!this.map) return undefined;
+      if (!this.map) {return undefined;}
       const layers = this.map.getStyle()?.layers;
-      if (!layers) return undefined;
+      if (!layers) {return undefined;}
       for (const layer of layers) {
-        if (layer.type === 'symbol') return layer.id;
+        if (layer.type === 'symbol') {return layer.id;}
       }
       return undefined;
     },
