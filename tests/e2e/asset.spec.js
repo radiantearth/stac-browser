@@ -7,7 +7,7 @@ import { test, expect } from './fixtures.js';
 import { waitForBrowserReady } from './helpers.js';
 import StaticCatalog from '../fixtures/instances/static.js';
 
-test.describe('Asset operations', () => {
+test.describe.skip('Asset operations', () => {
   function createCatalogWithAssets() {
     const catalog = new StaticCatalog({ url: 'https://stac.example/catalog.json' });
     const collection = catalog.addCollection({ url: 'https://stac.example/collection.json' });

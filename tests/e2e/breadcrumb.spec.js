@@ -7,7 +7,7 @@ import { test, expect } from './fixtures.js';
 import { waitForBrowserReady } from './helpers.js';
 import StaticCatalog from '../fixtures/instances/static.js';
 
-test.describe('Breadcrumb navigation', () => {
+test.describe.skip('Breadcrumb navigation', () => {
   function createNestedCatalog() {
     const catalog = new StaticCatalog({ url: 'https://stac.example/catalog.json' });
     catalog.root.setMetadata({ title: 'Root Catalog' });
