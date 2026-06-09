@@ -263,31 +263,21 @@ export default class Utils {
   }
 
   static titleForHref(href, preferFileName = false) {
-    let uri = URI(href);
-    let auth = uri.authority();
-    let file = uri.filename().replace(/^(.{1,})\.\w+$/, '$1');
-    let dir = uri.directory().replace(/^\//, '');
+    const uri = URI(href);
+    const auth = uri.authority();
+    const file = uri.filename().replace(/^(.{1,})\.\w+$/, '$1');
     if (auth && file && !preferFileName) {
-      let path = uri.path().replace(/^\//, '');
+      const path = uri.path().replace(/^\//, '');
       if (auth === 'doi.org' && path.startsWith('10.')) {
         return `DOI ${path}`;
       }
-      else {
-        return `${file} (${auth})`;
-      }
+      return `${file} (${auth})`;
     }
-    else if (file && !commonFileNames.includes(file)) {
+    if (file && !commonFileNames.includes(file)) {
       return file;
     }
-    else if (auth) {
-      return auth;
-    }
-    else if (dir) {
-      return dir;
-    }
-    else {
-      return href;
-    }
+    const dir = uri.segmentCoded(-2);
+    return dir || auth || href;
   }
 
   // Gets the value at path of object.
