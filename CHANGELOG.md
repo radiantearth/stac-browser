@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Focus temporal extent filter for Collection item search on end of temporal extent
 - Disable temporal extent filter when a single date/time is provided as temporal extent in the Collection metadata
 - Better default STAC title detection within not fully loaded lists where only a URL is available
+- No search / sort functionality available when a static catalog has only a subset of children loaded
 
 ### Fixed
 

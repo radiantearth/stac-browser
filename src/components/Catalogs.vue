@@ -129,7 +129,10 @@ export default defineComponent({
       }
     },
     isComplete() {
-      return !this.hasMore && !this.showPagination;
+      if (this.hasMore || this.showPagination) {
+        return false;
+      }
+      return this.allCatalogs.every(obj => obj.isSTAC);
     },
     filterPlaceholder() {
       return this.isComplete ? this.$t('catalogs.filterByTitleAndMore') : this.$t('catalogs.filterByTitle');
@@ -140,7 +143,7 @@ export default defineComponent({
     },
     allCatalogs() {
       return this.catalogs.map(catalog => {
-        let stac = this.getStac(catalog);
+        const stac = this.getStac(catalog);
         return stac ? stac : catalog;
       });
     },
@@ -150,6 +153,9 @@ export default defineComponent({
     catalogView() {
       if (this.hasMore) {
         return this.catalogs;
+      }
+      if (!this.isComplete) {
+        return this.allCatalogs;
       }
       // Filter
       let catalogs = this.allCatalogs;
