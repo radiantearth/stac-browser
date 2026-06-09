@@ -1,5 +1,5 @@
 function catchAllString(route) {
-  const pathMatch = route.params.pathMatch;
+  const pathMatch = route.params.pathMatch || '';
   return Array.isArray(pathMatch) ? pathMatch.join("/") : pathMatch;
 }
 
