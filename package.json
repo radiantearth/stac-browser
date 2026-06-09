@@ -14,13 +14,16 @@
     "i18n:fields": "node helpers/fields_locales.js",
     "docs:hooks": "node helpers/widget-hooks.js",
     "docs:lint": "remark --frail *.md docs/*.md",
-    "test": "npm run test:integration && npm run test:e2e",
+    "test": "npm run test:unit && npm run test:integration && npm run test:e2e",
+    "test:unit": "vitest run",
+    "test:unit:watch": "vitest",
     "test:integration": "bash tests/integration/run-tests.sh",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:debug": "playwright test --debug",
     "test:e2e:headed": "playwright test --headed",
-    "test:e2e:report": "playwright show-report"
+    "test:e2e:report": "playwright show-report",
+    "prepare": "husky"
   },
   "bugs": {
     "url": "https://github.com/radiantearth/stac-browser/issues"
@@ -64,6 +67,8 @@
     "bootstrap-vue-next": "^0.42.0",
     "chart.js": "^4.3.0",
     "commonmark": "^0.31.2",
+    "content-type": "^2.0.0",
+    "date-fns": "^4.4.0",
     "hyparquet": "^1.25.6",
     "hyparquet-compressors": "^1.1.1",
     "maplibre-gl": "^5.1.0",
@@ -75,6 +80,7 @@
     "stac-js": "~0.4.2",
     "stac-node-validator": "2.0.0-rc.3",
     "streamsaver-js": "^2.0.7",
+    "urijs": "^1.19.11",
     "vue": "^3.5.22",
     "vue-chartjs": "^5.2.0",
     "vue-i18n": "^11.2.0",
@@ -89,9 +95,13 @@
     "@playwright/test": "^1.57.0",
     "@vitejs/plugin-vue": "^6.0.1",
     "@vue/compiler-sfc": "^3.5.22",
+    "@vue/test-utils": "^2.4.11",
     "eslint": "^9.39.2",
     "eslint-plugin-vue": "^10.7.0",
     "globals": "^17.2.0",
+    "happy-dom": "^20.10.2",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.7",
     "msw": "^2.12.10",
     "playwright-msw": "^3.0.1",
     "remark-cli": "^12.0.1",
@@ -107,7 +117,8 @@
     "unplugin-vue-components": "^31.0.0",
     "vite": "^7.2.2",
     "vite-plugin-ejs": "^1.7.0",
-    "vite-plugin-node-polyfills": "^0.25.0"
+    "vite-plugin-node-polyfills": "^0.25.0",
+    "vitest": "^4.1.8"
   },
   "browserslist": [
     "> 1%",
@@ -142,6 +153,14 @@
   "msw": {
     "workerDirectory": [
       "public"
+    ]
+  },
+  "lint-staged": {
+    "src/**/*.{js,vue}": [
+      "eslint --fix"
+    ],
+    "*.md": [
+      "remark --frail"
     ]
   }
 }
