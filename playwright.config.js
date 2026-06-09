@@ -85,17 +85,17 @@ export default defineConfig({
   ],
 
   /* Run your local dev server before starting the tests */
-  webServer: process.env.CI 
+  webServer: process.env.CI
     ? {
         // In CI: Build and serve the production build
-        command: 'npm run build && npx vite preview --port 4173 --strictPort',
+        command: 'pnpm run build && pnpm exec vite preview --port 4173 --strictPort',
         env: getEnvWithoutSB(),
         url: 'http://localhost:4173',
         reuseExistingServer: false,
         timeout: 120 * 1000,
       }
     : {
-        command: 'npm start',
+        command: 'pnpm start',
         url: 'http://localhost:8080',
         reuseExistingServer: true,
         timeout: 120 * 1000,
