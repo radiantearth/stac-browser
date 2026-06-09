@@ -232,12 +232,15 @@ test.describe('Catalog - Children', () => {
   test('Catalog - renders no children message when catalog has no child links', async ({ page, worker }) => {
     const { catalog } = createStaticCatalog();
     catalog.setMetadata({ title: "Empty Catalog" });
-    
+
     await catalog.createServer(worker);
-    
+
     await page.goto(catalog.root.getBrowserPath());
     await waitForBrowserReady(page);
-    
+
+    // Verify we're on the catalog page, not the homepage
+    await expect(page.getByRole('heading', { name: /Empty Catalog/i })).toBeVisible();
+
     await expect(page.locator('.catalogs .card-grid > *')).toHaveCount(0);
   });
   
@@ -293,12 +296,15 @@ test.describe('Catalog - Children', () => {
   
   test('API - renders no children message when catalog has no child links', async ({ page, worker }) => {
     const { api } = createAPI();
-    
+
     await api.createServer(worker);
-    
+
     await page.goto(api.root.getBrowserPath());
     await waitForBrowserReady(page);
-    
+
+    // Verify we're on the API page, not the homepage
+    await expect(page.getByRole('heading', { name: /Example API/i })).toBeVisible();
+
     await expect(page.locator('.catalogs .card-grid > *')).toHaveCount(0);
   });
   

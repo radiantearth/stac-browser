@@ -14,7 +14,7 @@ import { http, HttpResponse } from 'msw';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
-export const HOME_PATH = '/';
+export const HOME_PATH = '/#/';
 
 /**
 * Register a mock STAC resource response via MSW.

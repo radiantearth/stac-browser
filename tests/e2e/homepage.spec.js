@@ -18,7 +18,8 @@ const catalogs = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../fixtures
 test.describe('STAC Browser Homepage', () => {
   // ensure every test uses the mocked STAC Index response
   test.beforeEach(async ({ worker }) => {
-    await mockStacResource(worker, 'https://stacindex.org/api/catalogs', catalogs);
+    // App loads catalogs from /catalogs.json (relative to BASE_URL)
+    await mockStacResource(worker, '**/catalogs.json', catalogs);
   });
   test('should load the homepage successfully', async ({ page }) => {
     // Navigate to the homepage (STAC Index already mocked in beforeEach)
@@ -28,7 +29,7 @@ test.describe('STAC Browser Homepage', () => {
     await expect(page.locator('header [role="banner"]')).toBeVisible();
     
     // Verify the page loads without errors
-    await expect(page).toHaveTitle(/STAC Browser/);
+    await expect(page).toHaveTitle(/Portolan Browser/);
     
     // confirm that the STAC index container is present and contains at least one entry
     await page.waitForSelector('.stac-index');
