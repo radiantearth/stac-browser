@@ -263,12 +263,12 @@ export default class Utils {
   }
 
   static titleForHref(href, preferFileName = false) {
-    let uri = URI(href);
-    let auth = uri.authority();
-    let file = uri.filename().replace(/^(.{1,})\.\w+$/, '$1');
-    let dir = uri.directory().replace(/^\//, '');
+    const uri = URI(href);
+    const auth = uri.authority();
+    const file = uri.filename().replace(/^(.{1,})\.\w+$/, '$1');
+    const dir = uri.segmentCoded(-2);
     if (auth && file && !preferFileName) {
-      let path = uri.path().replace(/^\//, '');
+      const path = uri.path().replace(/^\//, '');
       if (auth === 'doi.org' && path.startsWith('10.')) {
         return `DOI ${path}`;
       }
@@ -279,11 +279,11 @@ export default class Utils {
     else if (file && !commonFileNames.includes(file)) {
       return file;
     }
-    else if (auth) {
-      return auth;
-    }
     else if (dir) {
       return dir;
+    }
+    else if (auth) {
+      return auth;
     }
     else {
       return href;
