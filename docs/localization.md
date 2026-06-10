@@ -43,6 +43,7 @@ The following contributors kindly provide the translations:
 - [@rnanclares](https://github.com/rnanclares): `es`
 - [@uba](https://github.com/uba): `pt-BR`
 - [@lovisasandgren](https://github.com/lovisasandgren): `sv`
+- [@gtitov](https://github.com/gtitov): `ru`
 
 ## Adding a new language
 
