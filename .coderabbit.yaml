@@ -1,0 +1,38 @@
+language: en-US
+
+tone_instructions: |
+  Be extremely concise. Only flag major bugs, security issues, or critical
+  performance problems. Skip style nits, minor suggestions, and anything
+  that doesn't meaningfully impact correctness or maintainability.
+
+reviews:
+  profile: chill
+  high_level_summary: true
+  high_level_summary_in_walkthrough: false
+  poem: false
+  sequence_diagrams: false
+  collapse_walkthrough: true
+  changed_files_summary: false
+  estimate_code_review_effort: false
+  related_issues: false
+  related_prs: false
+  suggested_labels: false
+  suggested_reviewers: false
+  in_progress_fortune: false
+  review_details: false
+
+  auto_review:
+    enabled: true
+    drafts: false
+
+  tools:
+    ruff:
+      enabled: false
+    flake8:
+      enabled: false
+    pylint:
+      enabled: false
+
+chat:
+  art: false
+  auto_reply: true

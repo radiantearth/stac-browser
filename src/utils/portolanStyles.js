@@ -5,7 +5,7 @@ export function resolveStyles(stac) {
     || stac['portolan:styles']
     || [];
 
-  if (!Array.isArray(styleEntries) || styleEntries.length === 0) return [];
+  if (!Array.isArray(styleEntries) || styleEntries.length === 0) {return [];}
 
   const baseUrl = stac.getAbsoluteUrl?.() || '';
 
@@ -13,7 +13,7 @@ export function resolveStyles(stac) {
     .map(entry => {
       if (typeof entry === 'string') {
         const asset = stac.assets?.[entry];
-        if (!asset) return null;
+        if (!asset) {return null;}
         return {
           name: entry,
           title: asset.title || entry.replace('styles/', ''),
@@ -48,30 +48,30 @@ export function resolveStyles(stac) {
 }
 
 function commonPrefix(strings) {
-  if (strings.length === 0) return '';
+  if (strings.length === 0) {return '';}
   let prefix = strings[0];
   for (let i = 1; i < strings.length; i++) {
     while (!strings[i].startsWith(prefix)) {
       prefix = prefix.slice(0, -1);
-      if (prefix.length === 0) return '';
+      if (prefix.length === 0) {return '';}
     }
   }
   // Trim to last separator (space, dash, colon) so we don't cut mid-word
   const lastSep = Math.max(prefix.lastIndexOf(' '), prefix.lastIndexOf('—'), prefix.lastIndexOf('-'), prefix.lastIndexOf(':'));
-  if (lastSep > 0) prefix = prefix.slice(0, lastSep + 1);
-  else prefix = '';
+  if (lastSep > 0) {prefix = prefix.slice(0, lastSep + 1);}
+  else {prefix = '';}
   return prefix;
 }
 
 export function extractLegend(glStyle) {
-  if (!glStyle?.layers) return [];
+  if (!glStyle?.layers) {return [];}
 
   const fillLayer = glStyle.layers.find(l => l.type === 'fill');
-  if (!fillLayer) return [];
+  if (!fillLayer) {return [];}
 
   const fillColor = fillLayer.paint?.['fill-color'];
-  if (!fillColor || typeof fillColor === 'string') return [];
-  if (!Array.isArray(fillColor)) return [];
+  if (!fillColor || typeof fillColor === 'string') {return [];}
+  if (!Array.isArray(fillColor)) {return [];}
 
   const type = fillColor[0];
 

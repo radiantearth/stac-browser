@@ -6,28 +6,52 @@ on:
   pull_request:
     branches:
       - main
+
 jobs:
-  locales:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 'lts/*'
-      - uses: actions/checkout@v6
-      - run: npm ci
-      - name: I18N messages for stac-fields are complete
-        run: npm run i18n:fields
-      - uses: infotroph/tree-is-clean@v1
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-node@v6
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
-      - uses: actions/checkout@v6
-      - run: npm install
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
       - name: Lint Source Code
-        run: npm run lint
+        run: pnpm run lint
       - name: Lint Documentation
-        run: npm run docs:lint
+        run: pnpm run docs:lint
 
+  locales:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - name: I18N messages for stac-fields are complete
+        run: pnpm run i18n:fields
+      - uses: infotroph/tree-is-clean@v1
+
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - name: Run unit tests
+        run: pnpm run test:unit

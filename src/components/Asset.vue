@@ -23,6 +23,9 @@
           <b-badge v-for="role in sortedRoles" :key="role" :variant="role === 'data' ? 'primary' : 'secondary'" class="role" :title="displayRole(role)">{{ displayRole(role) }}</b-badge>
         </template>
         <b-badge v-if="shortFileFormat" variant="dark" class="format" :title="fileFormat"><span v-html="shortFileFormat" /></b-badge>
+        <a v-if="formatHelpLink" :href="formatHelpLink" target="_blank" rel="noopener" class="format-help ms-1" :title="$t('assets.formatHelp')">
+          <b-icon-info-circle />
+        </a>
       </div>
     </template>
    
@@ -138,6 +141,16 @@ export default {
         }
         return a.toLowerCase().localeCompare(b.toLowerCase(), undefined, { sensitivity: 'base' });
       });
+    },
+    formatHelpLink() {
+      const type = this.asset.type?.toLowerCase() || '';
+      if (type.includes('geoparquet') || type.includes('parquet')) {
+        return 'https://github.com/portolan-sdi/geoparquet-io';
+      }
+      if (type.includes('cloud-optimized') || type === 'image/tiff; application=geotiff; profile=cloud-optimized') {
+        return 'https://github.com/cogeotiff/rio-cogeo';
+      }
+      return null;
     }
   },
   created() {
@@ -184,6 +197,16 @@ export default {
     }
     .card {
       border: 0;
+    }
+  }
+
+  .format-help {
+    color: var(--bs-secondary);
+    font-size: 0.75em;
+    opacity: 0.7;
+    text-decoration: none;
+    &:hover {
+      opacity: 1;
     }
   }
 }

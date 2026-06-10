@@ -7,7 +7,7 @@
  */
 import { test, expect } from './fixtures.js';
 import API from '../fixtures/instances/api.js';
-import { waitForBrowserReady, waitForSearchPost, waitForMapReady, waitForBboxInputsPopulated } from './helpers.js';
+import { waitForBrowserReady, waitForSearchPost, waitForMapReady, waitForBboxInputsPopulated, drawBboxOnMap } from './helpers.js';
 
 const enableSpatialExtentInputs = async (page) => {
   const enableSpatialCheckbox = page.getByRole('checkbox', { name: /filter by spatial extent/i });
@@ -116,27 +116,26 @@ test.describe('STAC Browser Search page', () => {
     });
   });
     
-  test('Search with spatial extent via map click should have valid POST body', async ({ page }) => {
+  test('Search with spatial extent via map drawing should have valid POST body', async ({ page }) => {
     await page.goto(SEARCH_PATH);
-      
-    await test.step('Enable spatial extent selection and click on map to create bounding box', async () => {
+
+    await test.step('Enable spatial extent selection and shift-drag on map to create bounding box', async () => {
       const enableSpatialCheckbox = page.getByRole('checkbox', { name: /filter by spatial extent/i });
       await enableSpatialCheckbox.check();
-        
-      const mapViewport = await waitForMapReady(page);
-        
-      // The OL ExtentInteraction is registered asynchronously after the
-      // viewport appears (basemap module imports must complete first).
-      // Retry the click until the interaction picks it up.
+
+      const mapContainer = await waitForMapReady(page);
+
+      // The BboxDrawInteraction is registered asynchronously after the
+      // canvas appears. Retry the shift+drag until the interaction picks it up.
       const southLatInput = page.getByLabel(/south latitude/i);
       await expect(async () => {
         const val = await southLatInput.inputValue();
         if (!val) {
-          await mapViewport.click({ position: { x: 300, y: 200 } });
+          await drawBboxOnMap(page, mapContainer);
         }
         await expect(southLatInput).not.toHaveValue('', { timeout: 1000 });
       }).toPass({ timeout: 15000 });
-        
+
       await waitForBboxInputsPopulated(page);
     });
       

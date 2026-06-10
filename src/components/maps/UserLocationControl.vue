@@ -25,7 +25,7 @@ export default {
   },
   methods: {
     request() {
-      if (!this.map || !("geolocation" in navigator)) return;
+      if (!this.map || !("geolocation" in navigator)) {return;}
       navigator.geolocation.getCurrentPosition(
         position => {
           this.map.flyTo({

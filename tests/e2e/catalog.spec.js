@@ -128,9 +128,11 @@ test.describe('Catalog - toolBar', () => {
     await expect(copyButton).toBeVisible();
     await copyButton.click();
     
-    // Verify the URL was copied to the clipboard
-    const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
-    await expect(clipboardText).toContain(catalog.root.getBrowserPath());
+    // Verify the URL was copied to the clipboard.
+    // Poll because the clipboard write completes asynchronously after the click.
+    await expect
+      .poll(() => page.evaluate(() => navigator.clipboard.readText()))
+      .toContain(catalog.root.getBrowserPath());
   });
 
   // API tests
@@ -181,9 +183,11 @@ test.describe('Catalog - toolBar', () => {
     await expect(copyButton).toBeVisible();
     await copyButton.click();
     
-    // Verify the URL was copied to the clipboard
-    const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
-    await expect(clipboardText).toContain(api.root.getBrowserPath());
+    // Verify the URL was copied to the clipboard.
+    // Poll because the clipboard write completes asynchronously after the click.
+    await expect
+      .poll(() => page.evaluate(() => navigator.clipboard.readText()))
+      .toContain(api.root.getBrowserPath());
   });
 });
 
@@ -232,12 +236,15 @@ test.describe('Catalog - Children', () => {
   test('Catalog - renders no children message when catalog has no child links', async ({ page, worker }) => {
     const { catalog } = createStaticCatalog();
     catalog.setMetadata({ title: "Empty Catalog" });
-    
+
     await catalog.createServer(worker);
-    
+
     await page.goto(catalog.root.getBrowserPath());
     await waitForBrowserReady(page);
-    
+
+    // Verify we're on the catalog page, not the homepage
+    await expect(page.getByRole('heading', { name: /Empty Catalog/i })).toBeVisible();
+
     await expect(page.locator('.catalogs .card-grid > *')).toHaveCount(0);
   });
   
@@ -293,12 +300,15 @@ test.describe('Catalog - Children', () => {
   
   test('API - renders no children message when catalog has no child links', async ({ page, worker }) => {
     const { api } = createAPI();
-    
+
     await api.createServer(worker);
-    
+
     await page.goto(api.root.getBrowserPath());
     await waitForBrowserReady(page);
-    
+
+    // Verify we're on the API page, not the homepage
+    await expect(page.getByRole('heading', { name: /Example API/i })).toBeVisible();
+
     await expect(page.locator('.catalogs .card-grid > *')).toHaveCount(0);
   });
   

@@ -14,7 +14,7 @@ import { http, HttpResponse } from 'msw';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
-export const HOME_PATH = '/';
+export const HOME_PATH = '/#/';
 
 /**
 * Register a mock STAC resource response via MSW.
@@ -75,25 +75,47 @@ export async function waitForBrowserReady(page) {
 }
 
 /**
-* Wait for the OpenLayers map to be interactive and fully initialized on the search page.
-* This ensures the map has not only attached but also rendered its base layers,
-* controls, and extent interaction.
-* Returns the map container locator for clicking.
-* 
+* Wait for the MapLibre GL map to be interactive and fully initialized.
+* This ensures the map container is visible and the GL canvas has rendered.
+* Returns the map container locator for interactions.
+*
 * @param {import('@playwright/test').Page} page
 * @returns {import('@playwright/test').Locator} mapContainer – Locator for the map container element
 */
 export async function waitForMapReady(page) {
   const mapContainer = page.locator('.map-container .map');
   await mapContainer.waitFor({ state: 'visible', timeout: 10000 });
-  
-  // Wait for the viewport to be attached
-  await mapContainer.locator('.ol-viewport').waitFor({ state: 'attached', timeout: 10000 });
-  
-  // Wait for OpenLayers to have rendered at least one layer (base layer)
-  await page.locator('.ol-layer').first().waitFor({ state: 'visible', timeout: 10000 });
-  
+
+  // Wait for the MapLibre GL canvas to be rendered
+  await mapContainer.locator('.maplibregl-canvas').waitFor({ state: 'visible', timeout: 10000 });
+
+  // Wait for the navigation controls (zoom buttons) to confirm full initialization
+  await mapContainer.locator('.maplibregl-ctrl-zoom-in').waitFor({ state: 'visible', timeout: 10000 });
+
   return mapContainer;
+}
+
+/**
+* Draw a bounding box on a MapLibre map via shift+drag.
+* The app's BboxDrawInteraction starts drawing on shift+mousedown and
+* commits the extent on mouseup (drags smaller than 5px are ignored).
+*
+* @param {import('@playwright/test').Page} page
+* @param {import('@playwright/test').Locator} mapContainer – Locator returned by waitForMapReady
+*/
+export async function drawBboxOnMap(page, mapContainer) {
+  const box = await mapContainer.boundingBox();
+  const x1 = box.x + box.width * 0.35;
+  const y1 = box.y + box.height * 0.35;
+  const x2 = box.x + box.width * 0.65;
+  const y2 = box.y + box.height * 0.65;
+
+  await page.keyboard.down('Shift');
+  await page.mouse.move(x1, y1);
+  await page.mouse.down();
+  await page.mouse.move(x2, y2, { steps: 10 });
+  await page.mouse.up();
+  await page.keyboard.up('Shift');
 }
 
 /**

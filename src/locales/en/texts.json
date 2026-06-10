@@ -27,7 +27,8 @@
     },
     "showOnMap": "Show on map",
     "showThumbnail": "Show thumbnail",
-    "shown": "shown"
+    "shown": "shown",
+    "formatHelp": "Learn about format conversion"
   },
   "authentication": {
     "button": {

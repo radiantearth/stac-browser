@@ -39,7 +39,7 @@ export default class STACHypermedia extends STACObject {
       const protocol = url.protocol !== 'https:' ? url.protocol : '';
       
       const protocolPart = protocol ? `/${url.protocol.replace(':', '')}` : '';
-      const browserPath = `/external${protocolPart}/${url.host}${url.pathname}${url.search}`;
+      const browserPath = `/#/external${protocolPart}/${url.host}${url.pathname}${url.search}`;
       
       return browserPath;
     } catch (e) { 
@@ -54,7 +54,7 @@ export default class STACHypermedia extends STACObject {
       const protocol = url.protocol !== 'https:' ? url.protocol : '';
       
       const protocolPart = protocol ? `/${url.protocol.replace(':', '')}` : '';
-      const searchPath = `/search/external${protocolPart}/${url.host}${url.pathname}${url.search}`;
+      const searchPath = `/#/search/external${protocolPart}/${url.host}${url.pathname}${url.search}`;
       
       return searchPath;
     } catch (e) { 

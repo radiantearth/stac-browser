@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [Unreleased][]
 
 ### Added
 
@@ -62,7 +62,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove download button for ZARR assets
 - Fixed authentication for assets when authentication methods is not configured in STAC Browser
 
-## [4.0.1] - 2026-02-11
+## [4.0.1][] - 2026-02-11
 
 - Added a config option `footerLinks` to add links to the footer (e.g. imprint, privacy policy, etc.)
 - Alphabetical sorting of badges
@@ -75,7 +75,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Small UI improvements (e.g. icons, spacing)
 - Updated dependencies and translations
 
-## [4.0.0] - 2025-12-15
+## [4.0.0][] - 2025-12-15
 
 **THIS IS A BREAKING RELEASE - MAKE SURE TO UPDATE ALL YOUR CONFIG FILES!**
 
@@ -129,7 +129,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Fix the default basemap config
   - Show only storage schemes that actually apply
 
-## [3.3.5] - 2025-07-05
+## [3.3.5][] - 2025-07-05
 
 For releases prior to v4.0.0, please refer to the
 [release notes in the GitHub Releases](https://github.com/radiantearth/stac-browser/releases).

@@ -125,6 +125,14 @@ export default defineComponent({
     .maplibregl-ctrl-top-right {
       top: 150px;
     }
+
+    // The hero map is pulled up underneath the site header (z-index 10),
+    // which would otherwise cover the map/thumbnails tab pills and block
+    // clicks on them. Push the pills below the header, mirroring the
+    // offset applied to the MapLibre controls above.
+    .tabs .card-header {
+      padding-top: 150px;
+    }
   }
 
   .left, .right {

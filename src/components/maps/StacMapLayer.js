@@ -37,7 +37,7 @@ function assetHref(asset) {
 // prefix and resolves relative URLs to absolute so that a style source URL
 // can be matched against a loaded source's URL regardless of form.
 function normalizePmtilesUrl(url) {
-  if (typeof url !== 'string' || url === '') return null;
+  if (typeof url !== 'string' || url === '') {return null;}
   let u = url.startsWith('pmtiles://') ? url.slice('pmtiles://'.length) : url;
   try {
     u = new URL(u, typeof window !== 'undefined' ? window.location.href : undefined).href;
@@ -56,14 +56,14 @@ function isPmtilesAsset(asset) {
 function isXyzVectorAsset(asset) {
   const type = asset.type || '';
   const href = assetHref(asset);
-  if (!href.includes('{z}') || !href.includes('{x}') || !href.includes('{y}')) return false;
+  if (!href.includes('{z}') || !href.includes('{x}') || !href.includes('{y}')) {return false;}
   return MVT_MIME_TYPES.some(mt => type.includes(mt));
 }
 
 function isTileJsonAsset(asset) {
   const type = asset.type || '';
   const roles = Array.isArray(asset.roles) ? asset.roles : [];
-  if (!type.startsWith('application/json')) return false;
+  if (!type.startsWith('application/json')) {return false;}
   return roles.includes('tiles');
 }
 
@@ -106,10 +106,10 @@ export default class StacMapLayer {
     this.stac = stac;
     this._clearLayers();
 
-    if (!stac) return;
+    if (!stac) {return;}
 
     const geojson = stac.toGeoJSON();
-    if (!geojson) return;
+    if (!geojson) {return;}
 
     let featureCollection;
     if (geojson.type === 'FeatureCollection') {
@@ -121,7 +121,7 @@ export default class StacMapLayer {
     }
 
     featureCollection.features = featureCollection.features.filter(f => f.geometry);
-    if (featureCollection.features.length === 0) return;
+    if (featureCollection.features.length === 0) {return;}
 
     this._addSource(STAC_SOURCE, { type: 'geojson', data: featureCollection });
 
@@ -148,7 +148,7 @@ export default class StacMapLayer {
   }
 
   async autoLoadVisualAssets(stac) {
-    if (!stac || typeof stac.getAssets !== 'function') return;
+    if (!stac || typeof stac.getAssets !== 'function') {return;}
     const visualAssets = stac.getAssets().filter(isTileAsset);
     if (visualAssets.length > 0) {
       await this.setAssets(visualAssets);
@@ -160,10 +160,10 @@ export default class StacMapLayer {
     this._removeLayersById([CHILDREN_FILL_LAYER, CHILDREN_LINE_LAYER, CHILDREN_POINT_LAYER]);
     this._removeSourceById(CHILDREN_SOURCE);
 
-    if (!children) return;
+    if (!children) {return;}
 
     const geojson = children.toGeoJSON();
-    if (!geojson) return;
+    if (!geojson) {return;}
 
     const featureCollection = geojson.type === 'FeatureCollection'
       ? geojson
@@ -175,7 +175,7 @@ export default class StacMapLayer {
 
     for (let i = 0; i < featureCollection.features.length; i++) {
       const feature = featureCollection.features[i];
-      if (!feature.properties) feature.properties = {};
+      if (!feature.properties) {feature.properties = {};}
       feature.properties._stacIndex = i;
       const item = items?.[i];
       if (item) {
@@ -185,7 +185,7 @@ export default class StacMapLayer {
     }
 
     featureCollection.features = featureCollection.features.filter(f => f.geometry);
-    if (featureCollection.features.length === 0) return;
+    if (featureCollection.features.length === 0) {return;}
 
     this._addSource(CHILDREN_SOURCE, { type: 'geojson', data: featureCollection });
 
@@ -230,7 +230,7 @@ export default class StacMapLayer {
     this._removeCogLayers();
     this._removePmtilesLayers();
 
-    if (!assets || assets.length === 0) return;
+    if (!assets || assets.length === 0) {return;}
 
     await this._addTileAssets(preferredTileAssets(assets));
     await this._addCogAssets(assets);
@@ -291,8 +291,8 @@ export default class StacMapLayer {
 
   _addXyzVectorSource(url, sourceId, asset) {
     const spec = { type: 'vector', tiles: [url] };
-    if (typeof asset.minzoom === 'number') spec.minzoom = asset.minzoom;
-    if (typeof asset.maxzoom === 'number') spec.maxzoom = asset.maxzoom;
+    if (typeof asset.minzoom === 'number') {spec.minzoom = asset.minzoom;}
+    if (typeof asset.maxzoom === 'number') {spec.maxzoom = asset.maxzoom;}
     this.map.addSource(sourceId, spec);
     this._pmtilesSourceIds.push(sourceId);
 
@@ -396,7 +396,7 @@ export default class StacMapLayer {
       return COG_MIME_TYPES.some(mt => type.includes(mt));
     });
 
-    if (cogAssets.length === 0) return;
+    if (cogAssets.length === 0) {return;}
 
     try {
       const [{ MapboxOverlay }, { COGLayer }] = await Promise.all([
@@ -429,9 +429,9 @@ export default class StacMapLayer {
   }
 
   fit(padding = { top: 160, bottom: 50, left: 50, right: 50 }) {
-    if (!this.stac || !this.map) return;
+    if (!this.stac || !this.map) {return;}
     const bbox = this.stac.getBoundingBox();
-    if (!bbox || bbox.length < 4) return;
+    if (!bbox || bbox.length < 4) {return;}
     this.map.fitBounds(
       [[bbox[0], bbox[1]], [bbox[2], bbox[3]]],
       { padding, maxZoom: 16 }
@@ -488,7 +488,7 @@ export default class StacMapLayer {
   }
 
   setCogVisible(index, visible) {
-    if (!this._deckOverlay || index >= this._cogLayers.length) return;
+    if (!this._deckOverlay || index >= this._cogLayers.length) {return;}
     this._cogLayers[index] = this._cogLayers[index].clone({ visible });
     this._deckOverlay.setProps({ layers: [...this._cogLayers] });
   }
@@ -503,11 +503,11 @@ export default class StacMapLayer {
   }
 
   getVisibleStacReferences() {
-    if (!this.children) return [];
+    if (!this.children) {return [];}
     const items = this.children.isItemCollection
       ? this.children.features
       : this.children.collections;
-    if (!items) return [];
+    if (!items) {return [];}
     return items.filter(item => item instanceof STACReference);
   }
 
@@ -525,14 +525,14 @@ export default class StacMapLayer {
     this._pmtilesSourceIds = [];
     this._glStyleLayerIds = [];
     this._glStyleSourceIds = [];
-    if (stac) this.setStac(stac);
-    if (children) this.setChildren(children);
+    if (stac) {this.setStac(stac);}
+    if (children) {this.setChildren(children);}
     if (assets) {
       await this.setAssets(assets);
     } else if (stac) {
       await this.autoLoadVisualAssets(stac);
     }
-    if (_activeGlStyle) this.applyGlStyle(_activeGlStyle);
+    if (_activeGlStyle) {this.applyGlStyle(_activeGlStyle);}
   }
 
   _addSource(id, spec) {
@@ -548,7 +548,7 @@ export default class StacMapLayer {
       this.map.removeSource(id);
     }
     this.map.addSource(id, spec);
-    if (!this.sourceIds.includes(id)) this.sourceIds.push(id);
+    if (!this.sourceIds.includes(id)) {this.sourceIds.push(id);}
   }
 
   _addLayer(spec) {
@@ -556,7 +556,7 @@ export default class StacMapLayer {
       this.map.removeLayer(spec.id);
     }
     this.map.addLayer(spec);
-    if (!this.layerIds.includes(spec.id)) this.layerIds.push(spec.id);
+    if (!this.layerIds.includes(spec.id)) {this.layerIds.push(spec.id);}
   }
 
   _removeLayersById(ids) {
@@ -602,7 +602,7 @@ export default class StacMapLayer {
   _removePmtilesLayers() {
     this._clearPmtilesLayers();
     for (const id of [...this._pmtilesSourceIds]) {
-      try { if (this.map.getSource(id)) this.map.removeSource(id); } catch { /* ignore */ }
+      try { if (this.map.getSource(id)) {this.map.removeSource(id);} } catch { /* ignore */ }
     }
     this._pmtilesSourceIds = [];
     this._pmtilesAssetMeta = [];
@@ -610,7 +610,7 @@ export default class StacMapLayer {
 
   _clearPmtilesLayers() {
     for (const id of [...this._pmtilesLayerIds]) {
-      try { if (this.map.getLayer(id)) this.map.removeLayer(id); } catch { /* ignore */ }
+      try { if (this.map.getLayer(id)) {this.map.removeLayer(id);} } catch { /* ignore */ }
     }
     this._pmtilesLayerIds = [];
     this._clearGlStyleExtras();
@@ -618,17 +618,17 @@ export default class StacMapLayer {
 
   _clearGlStyleExtras() {
     for (const id of [...this._glStyleLayerIds]) {
-      try { if (this.map.getLayer(id)) this.map.removeLayer(id); } catch { /* ignore */ }
+      try { if (this.map.getLayer(id)) {this.map.removeLayer(id);} } catch { /* ignore */ }
     }
     this._glStyleLayerIds = [];
     for (const id of [...this._glStyleSourceIds]) {
-      try { if (this.map.getSource(id)) this.map.removeSource(id); } catch { /* ignore */ }
+      try { if (this.map.getSource(id)) {this.map.removeSource(id);} } catch { /* ignore */ }
     }
     this._glStyleSourceIds = [];
   }
 
   applyGlStyle(glStyle) {
-    if (!glStyle || !glStyle.layers) return;
+    if (!glStyle || !glStyle.layers) {return;}
 
     this._clearPmtilesLayers();
 
@@ -664,7 +664,7 @@ export default class StacMapLayer {
     for (const sourceId of this._pmtilesSourceIds) {
       const loaded = this.map.getSource(sourceId);
       const norm = normalizePmtilesUrl(loaded && loaded.url);
-      if (norm) loadedUrlToSourceId[norm] = sourceId;
+      if (norm) {loadedUrlToSourceId[norm] = sourceId;}
     }
 
     // Match style sources to loaded sources by URL first, falling back to
@@ -697,7 +697,7 @@ export default class StacMapLayer {
         layerSpec = { ...layer };
       } else {
         const mappedSource = sourceMapping[layer.source];
-        if (!mappedSource) continue;
+        if (!mappedSource) {continue;}
         layerSpec = { ...layer, source: mappedSource };
       }
 

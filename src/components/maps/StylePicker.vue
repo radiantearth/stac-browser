@@ -36,7 +36,7 @@ export default {
   },
   watch: {
     activeIndex(val) { this.selected = val; },
-    selected(val, oldVal) { if (val !== oldVal) this.$emit('change', val); },
+    selected(val, oldVal) { if (val !== oldVal) {this.$emit('change', val);} },
   },
 };
 </script>

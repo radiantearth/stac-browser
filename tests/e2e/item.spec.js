@@ -114,12 +114,13 @@ test.describe('Item view - Metadata', () => {
     await expect(page.getByRole('tabpanel', { name: /thumbnails/i })).toBeVisible();
     const mapTab = page.getByRole('tab', { name: /map/i });
     await mapTab.click();
-    const zoomIn = page.locator('.maps-preview button', { hasText: '+' }).first();
-    const zoomOut = page.locator('.maps-preview button').filter({ hasText: /[-\u2013\u2212]/ }).first();
-    const fullscreen = page.locator('.maps-preview button', { hasText: /\u26F6|fullscreen/i }).first();
+    // MapLibre navigation controls and the custom expand button (icon-only)
+    const zoomIn = page.locator('.maps-preview .maplibregl-ctrl-zoom-in');
+    const zoomOut = page.locator('.maps-preview .maplibregl-ctrl-zoom-out');
+    const expand = page.locator('.maps-preview button[title="Expand map"]');
     await expect(zoomIn).toBeEnabled();
     await expect(zoomOut).toHaveCount(1);
-    await expect(fullscreen).toBeEnabled();
+    await expect(expand).toBeEnabled();
   });
 
   test('additional resources links are shown', async ({ page, worker }) => {
@@ -261,13 +262,14 @@ test.describe('Item view - Geometry', () => {
     const mapTab = page.getByRole('tab', { name: /map/i });
     await mapTab.click();
     await waitForBrowserReady(page);
-    
-    const zoomIn = page.locator('.maps-preview button', { hasText: '+' }).first();
-    const zoomOut = page.locator('.maps-preview button').filter({ hasText: /[-\u2013\u2212]/ }).first();
-    const fullscreen = page.locator('.maps-preview button', { hasText: /\u26F6|fullscreen/i }).first();
+
+    // MapLibre navigation controls and the custom expand button (icon-only)
+    const zoomIn = page.locator('.maps-preview .maplibregl-ctrl-zoom-in');
+    const zoomOut = page.locator('.maps-preview .maplibregl-ctrl-zoom-out');
+    const expand = page.locator('.maps-preview button[title="Expand map"]');
     await expect(zoomIn).toBeEnabled();
     await expect(zoomOut).toHaveCount(1);
-    await expect(fullscreen).toBeEnabled();
+    await expect(expand).toBeEnabled();
   });
 
   // API tests
@@ -299,12 +301,13 @@ test.describe('Item view - Geometry', () => {
     const mapTab = page.getByRole('tab', { name: /map/i });
     await mapTab.click();
     await waitForBrowserReady(page);
-    
-    const zoomIn = page.locator('.maps-preview button', { hasText: '+' }).first();
-    const zoomOut = page.locator('.maps-preview button').filter({ hasText: /[-\u2013\u2212]/ }).first();
-    const fullscreen = page.locator('.maps-preview button', { hasText: /\u26F6|fullscreen/i }).first();
+
+    // MapLibre navigation controls and the custom expand button (icon-only)
+    const zoomIn = page.locator('.maps-preview .maplibregl-ctrl-zoom-in');
+    const zoomOut = page.locator('.maps-preview .maplibregl-ctrl-zoom-out');
+    const expand = page.locator('.maps-preview button[title="Expand map"]');
     await expect(zoomIn).toBeEnabled();
     await expect(zoomOut).toHaveCount(1);
-    await expect(fullscreen).toBeEnabled();
+    await expect(expand).toBeEnabled();
   });
 });

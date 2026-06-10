@@ -84,19 +84,15 @@ test.describe('Collection Metadata', () => {
     const start = collection.getMetadata().extent.temporal.interval[0][0].split('T')[0];
     await expect(page.locator('span', { hasText: new RegExp(start) }).first()).toBeVisible();  
     
-    // map/thumbnail tabs
-    await expect(page.locator('.maps-preview')).toBeVisible();
-    const thumbTab = page.getByRole('tab', { name: /thumbnails/i });
-    await thumbTab.click();
-    await expect(page.getByRole('tabpanel', { name: /thumbnails/i })).toBeVisible();
-    const mapTab = page.getByRole('tab', { name: /map/i });
-    await mapTab.click();
-    const zoomIn = page.locator('.maps-preview button', { hasText: '+' }).first();
-    const zoomOut = page.locator('.maps-preview button').filter({ hasText: /[-\u2013\u2212]/ }).first();
-    const fullscreen = page.locator('.maps-preview button', { hasText: /\u26F6|fullscreen/i }).first();
+    // Collections render a hero map (MapLibre) with the spatial extent;
+    // thumbnails moved to a collapsible section below the map.
+    await expect(page.locator('.hero-map .map')).toBeVisible();
+    const zoomIn = page.locator('.hero-map .maplibregl-ctrl-zoom-in');
+    const zoomOut = page.locator('.hero-map .maplibregl-ctrl-zoom-out');
+    const expand = page.locator('.hero-map button[title="Expand map"]');
     await expect(zoomIn).toBeEnabled();
     await expect(zoomOut).toHaveCount(1);
-    await expect(fullscreen).toBeEnabled();
+    await expect(expand).toBeEnabled();
     
     // metadata, assets, providers sections should render
     await expect(page.locator('section.metadata.mb-4').first()).toBeVisible();
@@ -172,9 +168,11 @@ test.describe('Collection - toolBar', () => {
     await expect(copyButton).toBeVisible();
     await copyButton.click();
     
-    // The URL copied to clipboard should match the collection's getBrowserPath()
-    const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
-    expect(clipboardText).toBe(page.url());
+    // The URL copied to clipboard should match the collection's getBrowserPath().
+    // Poll because the clipboard write completes asynchronously after the click.
+    await expect
+      .poll(() => page.evaluate(() => navigator.clipboard.readText()))
+      .toBe(page.url());
   });
   
   test('should have a working back to catalog button', async ({ page, worker }) => {

@@ -173,7 +173,7 @@ export default {
           const bounds = [[this.extent[0], this.extent[1]], [this.extent[2], this.extent[3]]];
           const lngLat = e.lngLat;
           if (lngLat.lng >= bounds[0][0] && lngLat.lng <= bounds[1][0] &&
-              lngLat.lat >= bounds[0][1] && lngLat.lat <= bounds[1][1]) {
+            lngLat.lat >= bounds[0][1] && lngLat.lat <= bounds[1][1]) {
             this.extent = null;
             this.clearBboxValues();
             this.$emit('update:modelValue', null);
@@ -204,10 +204,10 @@ export default {
     },
 
     addMask(stac) {
-      if (!stac || typeof stac.toGeoJSON !== 'function') return;
+      if (!stac || typeof stac.toGeoJSON !== 'function') {return;}
 
       const geojson = stac.toGeoJSON();
-      if (!geojson) return;
+      if (!geojson) {return;}
 
       const world = toGeoJSON([-180, -90, 180, 90]);
       const masked = mask(geojson, world);
@@ -292,11 +292,11 @@ export default {
     },
     applyManualBbox() {
       const valid = this.validateBbox();
-      if (!valid) return;
+      if (!valid) {return;}
 
       this.validationErrors = getBoxDefaults();
 
-      if (!this.map) return;
+      if (!this.map) {return;}
 
       const extent = [
         this.bboxValues.westLon,
