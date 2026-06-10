@@ -270,8 +270,7 @@ export default class StacMapLayer {
   }
 
   async _addTileJsonSource(url, sourceId) {
-    this.map.addSource(sourceId, { type: 'vector', url });
-    this._pmtilesSourceIds.push(sourceId);
+    this._addPmtilesSource(sourceId, { type: 'vector', url });
 
     let layerNames = [];
     try {
@@ -293,18 +292,16 @@ export default class StacMapLayer {
     const spec = { type: 'vector', tiles: [url] };
     if (typeof asset.minzoom === 'number') {spec.minzoom = asset.minzoom;}
     if (typeof asset.maxzoom === 'number') {spec.maxzoom = asset.maxzoom;}
-    this.map.addSource(sourceId, spec);
-    this._pmtilesSourceIds.push(sourceId);
+    this._addPmtilesSource(sourceId, spec);
 
     this._addDefaultVectorLayers(sourceId, []);
   }
 
   async _addVectorPmtiles(pm, url, sourceId) {
-    this.map.addSource(sourceId, {
+    this._addPmtilesSource(sourceId, {
       type: 'vector',
       url: `pmtiles://${url}`,
     });
-    this._pmtilesSourceIds.push(sourceId);
 
     let layerNames = [];
     try {
@@ -374,12 +371,11 @@ export default class StacMapLayer {
   }
 
   _addRasterPmtiles(url, sourceId) {
-    this.map.addSource(sourceId, {
+    this._addPmtilesSource(sourceId, {
       type: 'raster',
       url: `pmtiles://${url}`,
       tileSize: 256,
     });
-    this._pmtilesSourceIds.push(sourceId);
 
     const layerId = `${sourceId}-raster`;
     this.map.addLayer({
@@ -519,12 +515,16 @@ export default class StacMapLayer {
 
   async readdAfterStyleChange() {
     const { stac, children, assets, _activeGlStyle } = this;
-    this.layerIds = [];
-    this.sourceIds = [];
-    this._pmtilesLayerIds = [];
-    this._pmtilesSourceIds = [];
-    this._glStyleLayerIds = [];
-    this._glStyleSourceIds = [];
+    // A basemap/style change may leave some of our sources and layers behind
+    // (MapLibre's setStyle does not always wipe imperatively-added sources).
+    // Tear them down through the removal helpers, which both delete the map
+    // objects and reset the id-tracking arrays. We must NOT zero those arrays
+    // first: the helpers iterate them to know what to remove, so clearing them
+    // early leaks the sources and makes the re-add throw "source already
+    // exists" (e.g. stac-tile-0 for PMTiles assets).
+    this._clearLayers();
+    this._removeCogLayers();
+    this._removePmtilesLayers();
     if (stac) {this.setStac(stac);}
     if (children) {this.setChildren(children);}
     if (assets) {
@@ -557,6 +557,26 @@ export default class StacMapLayer {
     }
     this.map.addLayer(spec);
     if (!this.layerIds.includes(spec.id)) {this.layerIds.push(spec.id);}
+  }
+
+  // Guarded add for tile (PMTiles/TileJSON/XYZ/raster) sources. Like
+  // _addSource, but tracks into _pmtilesSourceIds. Removing any pre-existing
+  // source (and its layers) first means a re-add after a style change can
+  // never throw "source already exists".
+  _addPmtilesSource(id, spec) {
+    if (this.map.getSource(id)) {
+      const style = this.map.getStyle();
+      if (style?.layers) {
+        for (const layer of style.layers) {
+          if (layer.source === id) {
+            try { this.map.removeLayer(layer.id); } catch { /* ignore */ }
+          }
+        }
+      }
+      try { this.map.removeSource(id); } catch { /* ignore */ }
+    }
+    this.map.addSource(id, spec);
+    if (!this._pmtilesSourceIds.includes(id)) {this._pmtilesSourceIds.push(id);}
   }
 
   _removeLayersById(ids) {
