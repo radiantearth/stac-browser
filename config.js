@@ -23,6 +23,7 @@ export default {
     "it",
 //  "it-CH",
     "ro",
+    "ru",
     "ja",
     "pt",
 //  "pt-BR",
