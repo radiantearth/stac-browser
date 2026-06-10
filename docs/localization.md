@@ -24,6 +24,7 @@ The following languages are currently supported:
 - Portuguese `pt` (Brazil `pt-BR`, Portugal `pt`)
 - Polish `pl`
 - Swedish `sv`
+- Russian `ru`
 
 We manage the translations in Crowdin, please see <https://crowdin.com/project/stac-browser/> for details.
 
@@ -42,6 +43,7 @@ The following contributors kindly provide the translations:
 - [@rnanclares](https://github.com/rnanclares): `es`
 - [@uba](https://github.com/uba): `pt-BR`
 - [@lovisasandgren](https://github.com/lovisasandgren): `sv`
+- [@gtitov](https://github.com/gtitov): `ru`
 
 ## Adding a new language
 
