@@ -54,7 +54,7 @@
     "unsupportedLong": "К сожалению, метод аутентификации {method} не поддерживается в STAC Browser.",
     "user": "Пользователь"
   },
-  "browse": "Просмотр",
+  "browse": "Проводник",
   "cancel": "Отмена",
   "catalog": {
     "license": "Лицензия",
