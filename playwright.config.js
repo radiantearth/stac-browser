@@ -25,8 +25,9 @@ export default defineConfig({
   /* Retry on CI only */
   retries: process.env.CI ? 1 : 0,
   
-  /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : undefined,
+  /* GitHub ubuntu-latest runners have 4 vCPUs; the suite is fully parallel
+     (per-test MSW mocks, no shared state) and runs ~10x faster than serial. */
+  workers: process.env.CI ? 4 : undefined,
   
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
@@ -37,9 +38,9 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: process.env.CI 
+    baseURL: process.env.CI
       ? 'http://localhost:4173'  // Vite preview server port
-      : 'http://localhost:8080',
+      : 'http://localhost:8181', // Dedicated test port; 8080 may be occupied by unrelated local services
     
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
@@ -56,8 +57,6 @@ export default defineConfig({
     /* Force English locale so tests are deterministic regardless of host/CI locale.
        The app auto-detects language from navigator.languages when detectLocaleFromBrowser is true. */
     locale: 'en',
-
-    permissions: ['clipboard-read', 'clipboard-write'],
   },
 
   /* Configure projects for major browsers */
@@ -95,8 +94,10 @@ export default defineConfig({
         timeout: 120 * 1000,
       }
     : {
-        command: 'pnpm start',
-        url: 'http://localhost:8080',
+        // Dedicated port + strictPort so the tests never silently reuse an
+        // unrelated service that happens to listen on the default dev port.
+        command: 'pnpm start --port 8181 --strictPort',
+        url: 'http://localhost:8181',
         reuseExistingServer: true,
         timeout: 120 * 1000,
       },

@@ -128,9 +128,11 @@ test.describe('Catalog - toolBar', () => {
     await expect(copyButton).toBeVisible();
     await copyButton.click();
     
-    // Verify the URL was copied to the clipboard
-    const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
-    await expect(clipboardText).toContain(catalog.root.getBrowserPath());
+    // Verify the URL was copied to the clipboard.
+    // Poll because the clipboard write completes asynchronously after the click.
+    await expect
+      .poll(() => page.evaluate(() => navigator.clipboard.readText()))
+      .toContain(catalog.root.getBrowserPath());
   });
 
   // API tests
@@ -181,9 +183,11 @@ test.describe('Catalog - toolBar', () => {
     await expect(copyButton).toBeVisible();
     await copyButton.click();
     
-    // Verify the URL was copied to the clipboard
-    const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
-    await expect(clipboardText).toContain(api.root.getBrowserPath());
+    // Verify the URL was copied to the clipboard.
+    // Poll because the clipboard write completes asynchronously after the click.
+    await expect
+      .poll(() => page.evaluate(() => navigator.clipboard.readText()))
+      .toContain(api.root.getBrowserPath());
   });
 });
 

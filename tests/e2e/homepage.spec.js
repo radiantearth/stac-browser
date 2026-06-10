@@ -78,11 +78,11 @@ test.describe('STAC Browser Homepage', () => {
     await page.goto(HOME_PATH);
     
     // Check if the label/heading is visible
-    const label = page.getByText(/please specify a stac catalog or api/i);
+    const label = page.getByText(/please enter a portolan catalog/i);
     await expect(label).toBeVisible();
     
     // Find the input textbox
-    const input = page.getByRole('textbox', { name: /please specify a stac catalog or api/i });
+    const input = page.getByRole('textbox', { name: /please enter a portolan catalog/i });
     await expect(input).toBeVisible();
     
     // Verify the placeholder
@@ -97,7 +97,7 @@ test.describe('STAC Browser Homepage', () => {
   test('should allow typing in the catalog URL input', async ({ page }) => {
     await page.goto(HOME_PATH);
     
-    const input = page.getByRole('textbox', { name: /please specify a stac catalog or api/i });
+    const input = page.getByRole('textbox', { name: /please enter a portolan catalog/i });
     
     // Type a valid STAC API URL
     await input.fill('https://planetarycomputer.microsoft.com/api/stac/v1/');
@@ -109,7 +109,7 @@ test.describe('STAC Browser Homepage', () => {
   test('should show error message while typing invalid URL', async ({ page }) => {
     await page.goto(HOME_PATH);
     
-    const input = page.getByRole('textbox', { name: /please specify a stac catalog or api/i });
+    const input = page.getByRole('textbox', { name: /please enter a portolan catalog/i });
     
     // Type an invalid URL
     await input.fill('not-a-valid-url');
@@ -131,7 +131,7 @@ test.describe('STAC Browser Homepage', () => {
     
     await page.goto(HOME_PATH);
     
-    const input = page.getByRole('textbox', { name: /please specify a stac catalog or api/i });
+    const input = page.getByRole('textbox', { name: /please enter a portolan catalog/i });
     const loadButton = page.getByRole('button', { name: /^load$/i });
     
     await input.fill(catalogUrl);

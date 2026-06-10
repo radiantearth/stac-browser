@@ -11,10 +11,10 @@ import { test, expect } from './fixtures.js';
 import { mockStacError, waitForBrowserReady } from './helpers.js';
 
 const MISSING_URL = 'https://example.com/does-not-exist';
-const MISSING_PATH = '/external/example.com/does-not-exist';
+const MISSING_PATH = '/#/external/example.com/does-not-exist';
 
 const SERVER_ERROR_URL = 'https://example.com/server-error';
-const SERVER_ERROR_PATH = '/external/example.com/server-error';
+const SERVER_ERROR_PATH = '/#/external/example.com/server-error';
 
 test.describe('Error handling', () => {
   
