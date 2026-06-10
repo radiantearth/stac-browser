@@ -290,7 +290,6 @@
     "between": "entre",
     "betweenOperatorDescription": "Testa se o valor de um campo numérico está no intervalo fornecido. O intervalo fornecido é inclusivo.",
     "dateDescription": "Todos os horários em Tempo Universal Coordenado (UTC).",
-    "disabledDueToSingleDate": "",
     "enterCollections": "Insira um ou mais IDs de coleção...",
     "enterItemIds": "Insira um ou mais IDs de item...",
     "enterSearchTerms": "Insira um ou mais termos de pesquisa...",
