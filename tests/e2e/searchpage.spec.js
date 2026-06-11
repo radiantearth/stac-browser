@@ -899,4 +899,46 @@ test.describe('STAC Browser Search page', () => {
   //     await expect(limitInput).toHaveValue('3');
   //   });
   // });
+  // test('Filters are preserved when navigating away from a Global Item search and back', async ({ page, worker }) => {
+  //   api = API.minimalApi();
+  //   const collection = api.addCollection('collection1').setMetadata({ title: 'Test Collection' });
+  //   api.addManyItems(collection, 5);
+  //   api.addCollectionsExtension().addItemsExtension().addSearchExtension();
+  //   await api.createServer(worker);
+    
+  //   await page.goto(SEARCH_PATH);
+  //   await waitForBrowserReady(page);
+
+  //   await test.step('Apply a limit filter to the Global Items search', async () => {
+  //     const limitInput = page.getByLabel(/items per page/i);
+  //     await limitInput.fill('6');
+      
+  //     const searchPromise = waitForSearchPost(page);
+  //     await page.getByRole('button', { name: /submit/i }).click();
+  //     await searchPromise;
+  //   });
+
+  //   await test.step('Click an item, then go back, and verify filter is preserved', async () => {
+  //     const itemCard = page.locator('.item-card').first();
+  //     await itemCard.click();
+  //     await waitForBrowserReady(page);
+
+  //     const returnItemsRequestPromise = page.waitForRequest(req => 
+  //       req.url().includes('/search') && (req.method() === 'GET' || req.method() === 'POST')
+  //     );
+
+  //     await page.goBack();
+
+  //     const itemsRequest = await returnItemsRequestPromise;
+  //     if (itemsRequest.method() === 'POST') {
+  //       const body = JSON.parse(itemsRequest.postData() || '{}');
+  //       expect(body.limit).toBe(6);
+  //     } else {
+  //       expect(itemsRequest.url()).toContain('limit=6');
+  //     }
+      
+  //     const limitInput = page.getByLabel(/items per page/i);
+  //     await expect(limitInput).toHaveValue('6');
+  //   });
+  // });
 });
