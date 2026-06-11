@@ -1,22 +1,20 @@
-// src/store/modules/search.js
-
 export const SEARCH_MODULE_KEY = 'search';
 
 // URL prefix for search state params (e.g. "s.datetime")
 export const URL_PREFIX = 's.';
 
 const defaultShared = () => ({
-  datetime: null,   // string | null — ISO8601 interval "start/end" or instant
-  bbox: null,       // [west, south, east, north] | null
-  limit: null,      // number | null — null means "use server default"
+  datetime: null,   
+  bbox: null,       
+  limit: null,      
 });
 
 const defaultFilterSet = () => ({
   q: null,
   ids: [],
   sortby: null,
-  queryableFilters: [],  // [{ id, operator, value }] — structured, UI-bound
-  cql2: null,            // serialized Cql object | null — handed to API
+  queryableFilters: [],  
+  cql2: null,            
 });
 
 export default {
@@ -26,8 +24,8 @@ export default {
     shared: defaultShared(),
     collectionFilters: defaultFilterSet(),
     itemFilters: defaultFilterSet(),
-    queryablesCache: {},  // { [href]: Queryable[] }
-    droppedFilters: [],   // [{ field, reason }] — feeds the toast in Phase 4
+    queryablesCache: {},  
+    droppedFilters: [],   
   }),
 
   getters: {
@@ -90,22 +88,18 @@ export default {
   },
 
   actions: {
-    // Convenience: update shared fields (datetime, bbox, limit)
     updateShared({ commit }, patch) {
       commit('setShared', patch);
     },
 
-    // Convenience: replace the full item filter set
     updateItemFilters({ commit }, filters) {
       commit('setItemFilters', filters);
     },
 
-    // Convenience: replace the full collection filter set
     updateCollectionFilters({ commit }, filters) {
       commit('setCollectionFilters', filters);
     },
 
-    // Clear everything — called on catalog reset
     reset({ commit }) {
       commit('resetAll');
     },
