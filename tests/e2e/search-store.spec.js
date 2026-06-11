@@ -47,7 +47,7 @@ async function getSearchState(page) {
   });
 }
 
-test.describe('Vuex search module — Phase 1', () => {
+test.describe('Vuex search module', () => {
   test.beforeEach(async ({ worker, page }) => {
     const api = API.minimalApi({}, { defaultLimit: 5 });
     const collection = api.addCollection('collection1').setMetadata({ title: 'Test Collection 1' });
