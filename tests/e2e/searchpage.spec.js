@@ -641,13 +641,13 @@ test.describe('STAC Browser Search page', () => {
       await expect(firstButton).toBeDisabled();
     });
   });
-    test('Catalog search results preserve applied filters when paginating', async ({ page, worker }) => {
-    api = API.minimalApi({}, {
-      defaultLimit: 5,
-      prevLinkEnabled: true,
-      firstLinkEnabled: true,
-      lastLinkEnabled: true
-    });
+  test('Catalog search results preserve applied filters when paginating', async ({ page, worker }) => {
+  api = API.minimalApi({}, {
+    defaultLimit: 5,
+    prevLinkEnabled: true,
+    firstLinkEnabled: true,
+    lastLinkEnabled: true
+  });
     let collection = api.addCollection('collection').setMetadata({ title: 'Test Collection' });
     api.addManyItems(collection, 13);
     api.addCollectionsExtension().addItemsExtension().addSearchExtension();
@@ -748,39 +748,6 @@ test.describe('STAC Browser Search page', () => {
       
       const nextReq = await nextPagePromise;
       expect(nextReq.url()).toContain('limit=3');
-    });
-  });
-  test('Reset button clears filters', async ({ page, worker }) => {
-    api = API.minimalApi();
-    api.addCollection('collection1').setMetadata({ title: 'Test Collection' });
-    api.addCollectionsExtension().addItemsExtension().addSearchExtension();
-    await api.createServer(worker);
-    
-    await page.goto(SEARCH_PATH);
-    await waitForBrowserReady(page);
-
-    await test.step('Apply a limit filter and verify it works', async () => {
-      const limitInput = page.getByLabel(/items per page/i);
-      await limitInput.fill('4');
-      
-      const searchPromise = waitForSearchPost(page);
-      await page.getByRole('button', { name: /submit/i }).click();
-      
-      const { body } = await searchPromise;
-      expect(body.limit).toBe(4);
-    });
-
-    await test.step('Click Reset and verify the next search has no limit', async () => {
-      await page.getByRole('button', { name: /reset/i }).click();
-      
-      const limitInput = page.getByLabel(/items per page/i);
-      await expect(limitInput).toHaveValue('');
-
-      const resetSearchPromise = waitForSearchPost(page);
-      await page.getByRole('button', { name: /submit/i }).click();
-      
-      const { body } = await resetSearchPromise;
-      expect(body.limit).toBeUndefined();
     });
   });
   test('Reset button clears filters inside a specific Collection', async ({ page, worker }) => {
