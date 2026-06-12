@@ -699,8 +699,7 @@ test.describe('STAC Browser Search page', () => {
     api.addCollectionsExtension().addItemsExtension().addSearchExtension();
     await api.createServer(worker);
     
-    const CATALOG_PATH = SEARCH_PATH.replace(/^\/search/, ''); 
-    await page.goto(CATALOG_PATH);
+    await page.goto(api.root.getBrowserPath());
     await waitForBrowserReady(page);
 
     const collectionLink = page.getByText('Test Collection 1', { exact: false }).first();
