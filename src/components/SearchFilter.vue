@@ -495,7 +495,7 @@ export default defineComponent({
       }
     },
     selectedCollections: {
-      deep: true,
+      deep: 1,
       handler(collections) {
         this.commitToVuex('collections', collections.map(c => c.value));
       }
