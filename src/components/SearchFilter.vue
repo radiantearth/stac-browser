@@ -184,20 +184,6 @@ import CqlLogicalOperator, { CqlNot } from '../models/cql2/operators/logical';
 import { stacRequest } from '../store/utils';
 import { formatKey } from '@radiantearth/stac-fields/helper';
 
-
-function getQueryDefaults() {
-  return {
-    q: [],
-    datetime: null,
-    bbox: null,
-    limit: null,
-    ids: [],
-    collections: [],
-    sortby: null,
-    filters: null
-  };
-}
-
 function getDefaults() {
   return {
     sortOrder: 1,
@@ -434,7 +420,8 @@ export default defineComponent({
     },
     searchQ: {
       get() {
-        return this.activeParams.q || [];
+        const q = this.activeParams.q;
+        return Array.isArray(q) ? [...q] : [];
       },
       set(value) {
         this.commitToVuex('q', value);
@@ -456,11 +443,14 @@ export default defineComponent({
       }
     },
     searchBBox: {
-      get() { return this.activeParams.bbox; },
+      get() { return Array.isArray(this.activeParams.bbox) ? [...this.activeParams.bbox] : null; },
       set(val) { this.commitToVuex('bbox', val); }
     },
     searchIds: {
-      get() { return this.activeParams.ids || []; },
+      get() { 
+        const ids = this.activeParams.ids;
+        return Array.isArray(ids) ? [...ids] : [];
+      },
       set(value) { this.commitToVuex('ids', value); }
     },
   },
