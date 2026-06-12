@@ -39,7 +39,7 @@ export default function getStore(router) {
     },
     mutations: {
       setCredentials(state, credentials) {
-        state.credentials = credentials;
+        state.credentials = credentials; // e.g. Username + Password or a Bearer Token
       },
       setMethod(state, method) {
         state.method = () => method;
