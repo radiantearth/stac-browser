@@ -829,7 +829,6 @@ test.describe('STAC Browser Search page', () => {
       await page.getByRole('button', { name: /submit/i }).click();
       
       const resetReq = await resetSearchPromise;
-      expect(resetReq.url()).not.toContain('limit=6');
-    });
+      expect(resetReq.url()).not.toMatch(/[?&]limit=/);
   });
 });
