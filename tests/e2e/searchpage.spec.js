@@ -668,8 +668,9 @@ test.describe('STAC Browser Search page', () => {
     await test.step('Click Next and verify the filter is still applied', async () => {
       const nextButton = page.getByRole('button', { name: /next/i }).first();
       
-      const nextRequestPromise = page.waitForRequest(req => 
-        req.url().includes('/search') && req.url() !== SEARCH_PATH
+      const nextRequestPromise = page.waitForRequest(req =>
+        (req.resourceType() === 'xhr' || req.resourceType() === 'fetch') &&
+        req.url().includes('/search')
       );
       
       await nextButton.click();
