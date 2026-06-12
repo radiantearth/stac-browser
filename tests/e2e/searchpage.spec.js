@@ -715,9 +715,15 @@ test.describe('STAC Browser Search page', () => {
         await filterToggle.click();
       }
 
-      const firstSearchPromise = page.waitForRequest(req => 
-        (req.url().includes('/items') || req.url().includes('/search')) && req.url().includes('limit=3')
-      );
+      const firstSearchPromise = page.waitForRequest(req => {
+         if (!(req.resourceType() === 'xhr' || req.resourceType() === 'fetch')) return false;
+         if (!(req.url().includes('/items') || req.url().includes('/search'))) return false;
+         if (req.url().includes('limit=3')) return true;
+         if (req.method() === 'POST' && req.postData()) {
+           try { return JSON.parse(req.postData()).limit === 3; } catch { return false; }
+         }
+         return false;
+       });
       
       const limitInput = page.getByLabel(/items per page/i);
       await limitInput.fill('3');
@@ -727,9 +733,15 @@ test.describe('STAC Browser Search page', () => {
     });
 
     await test.step('Click Next page and verify limit filter is preserved', async () => {
-      const nextPagePromise = page.waitForRequest(req => 
-        (req.url().includes('/items') || req.url().includes('/search')) && req.url().includes('limit=3')
-      );
+      const nextPagePromise = page.waitForRequest(req => {
+         if (!(req.resourceType() === 'xhr' || req.resourceType() === 'fetch')) return false;
+         if (!(req.url().includes('/items') || req.url().includes('/search'))) return false;
+         if (req.url().includes('limit=3')) return true;
+         if (req.method() === 'POST' && req.postData()) {
+           try { return JSON.parse(req.postData()).limit === 3; } catch { return false; }
+         }
+         return false;
+       });
       
       const nextButton = page.getByRole('button', { name: /next/i }).first();
       await nextButton.click();
@@ -778,8 +790,7 @@ test.describe('STAC Browser Search page', () => {
     api.addCollectionsExtension().addItemsExtension().addSearchExtension();
     await api.createServer(worker);
     
-    const CATALOG_PATH = api.root.getSearchPath().replace(/^\/search/, ''); 
-    await page.goto(CATALOG_PATH);
+    await page.goto(api.root.getBrowserPath());
     await waitForBrowserReady(page);
     
     const collectionLink = page.getByText('Test Collection 1', { exact: false }).first();
@@ -796,7 +807,14 @@ test.describe('STAC Browser Search page', () => {
       const limitInput = page.getByLabel(/items per page/i);
       await limitInput.fill('6');
       
-      const searchPromise = page.waitForRequest(req => req.url().includes('limit=6'));
+      const searchPromise = page.waitForRequest(req => {
+         if (!(req.resourceType() === 'xhr' || req.resourceType() === 'fetch')) return false;
+         if (req.url().includes('limit=6')) return true;
+         if (req.method() === 'POST' && req.url().includes('/search') && req.postData()) {
+           try { return JSON.parse(req.postData()).limit === 6; } catch { return false; }
+         }
+         return false;
+       });
       await page.getByRole('button', { name: /submit/i }).click();
       await searchPromise;
     });
