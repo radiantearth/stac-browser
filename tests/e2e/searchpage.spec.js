@@ -764,7 +764,6 @@ test.describe('STAC Browser Search page', () => {
     await expect(collectionLink).toBeVisible();
     await collectionLink.click();
     await waitForBrowserReady(page);
-
     await test.step('Apply a filter to the collection items', async () => {
       const filterToggle = page.getByRole('button', { name: /show filters/i });
       if (await filterToggle.isVisible()) {
