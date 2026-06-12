@@ -7,6 +7,7 @@ const defaultShared = () => ({
 const defaultFilterSet = () => ({
   q: null,
   ids: [],
+  collections: [],
   sortby: null,
   queryableFilters: [],  
   cql2: null,            

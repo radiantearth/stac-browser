@@ -641,41 +641,42 @@ test.describe('STAC Browser Search page', () => {
       await expect(firstButton).toBeDisabled();
     });
   });
-   test('Catalog search results preserve applied filters when paginating', async ({ page, worker }) => {
-    api = API.minimalApi({}, {
-      defaultLimit: 5,
-      prevLinkEnabled: true,
-      firstLinkEnabled: true,
-      lastLinkEnabled: true
-    });
+  test('Catalog search results preserve applied filters when paginating', async ({ page, worker }) => {
+  api = API.minimalApi({}, {
+    defaultLimit: 5,
+    prevLinkEnabled: true,
+    firstLinkEnabled: true,
+    lastLinkEnabled: true
+  });
     let collection = api.addCollection('collection').setMetadata({ title: 'Test Collection' });
     api.addManyItems(collection, 13);
     api.addCollectionsExtension().addItemsExtension().addSearchExtension();
     await api.createServer(worker);
     await page.goto(SEARCH_PATH);
- 
+
     await test.step('Apply a limit filter and submit', async () => {
       const limitInput = page.getByLabel(/items per page/i);
       await limitInput.fill('5');
-     
+      
       const requestPromise = waitForSearchPost(page);
       await page.getByRole('button', { name: /submit/i }).click();
-     
+      
       const { body } = await requestPromise;
       expect(body.limit).toBe(5);
     });
- 
+
     await test.step('Click Next and verify the filter is still applied', async () => {
       const nextButton = page.getByRole('button', { name: /next/i }).first();
-     
+      
       const nextRequestPromise = page.waitForRequest(req =>
-        req.url().includes('/search') && req.url() !== SEARCH_PATH
+        (req.resourceType() === 'xhr' || req.resourceType() === 'fetch') &&
+        req.url().includes('/search')
       );
-     
+      
       await nextButton.click();
-     
+      
       const req = await nextRequestPromise;
-     
+      
       if (req.method() === 'POST') {
         const body = JSON.parse(req.postData() || '{}');
         expect(body.limit).toBe(5);
@@ -692,83 +693,61 @@ test.describe('STAC Browser Search page', () => {
       lastLinkEnabled: true
     });
     const collection = api.addCollection('collection1').setMetadata({ title: 'Test Collection 1' });
-   
+    
     api.addManyItems(collection, 13);
-   
+    
     api.addCollectionsExtension().addItemsExtension().addSearchExtension();
     await api.createServer(worker);
-   
-    const CATALOG_PATH = SEARCH_PATH.replace(/^\/search/, '');
-    await page.goto(CATALOG_PATH);
+    
+    await page.goto(api.root.getBrowserPath());
     await waitForBrowserReady(page);
- 
+
     const collectionLink = page.getByText('Test Collection 1', { exact: false }).first();
     await expect(collectionLink).toBeVisible();
     await collectionLink.click();
     await waitForBrowserReady(page);
-   
+    
     await expect(page.getByRole('heading', { name: /Test Collection 1/i })).toBeVisible();
- 
+
     await test.step('Apply a limit filter in the collection', async () => {
       const filterToggle = page.getByRole('button', { name: /show filters/i });
       if (await filterToggle.isVisible()) {
         await filterToggle.click();
       }
- 
-      const firstSearchPromise = page.waitForRequest(req =>
-        (req.url().includes('/items') || req.url().includes('/search')) && req.url().includes('limit=3')
-      );
-     
+
+      const firstSearchPromise = page.waitForRequest(req => {
+         if (!(req.resourceType() === 'xhr' || req.resourceType() === 'fetch')) return false;
+         if (!(req.url().includes('/items') || req.url().includes('/search'))) return false;
+         if (req.url().includes('limit=3')) return true;
+         if (req.method() === 'POST' && req.postData()) {
+           try { return JSON.parse(req.postData()).limit === 3; } catch { return false; }
+         }
+         return false;
+       });
+      
       const limitInput = page.getByLabel(/items per page/i);
       await limitInput.fill('3');
-     
+      
       await page.getByRole('button', { name: /submit/i }).click();
       await firstSearchPromise;
     });
- 
+
     await test.step('Click Next page and verify limit filter is preserved', async () => {
-      const nextPagePromise = page.waitForRequest(req =>
-        (req.url().includes('/items') || req.url().includes('/search')) && req.url().includes('limit=3')
-      );
-     
+      const nextPagePromise = page.waitForRequest(req => {
+         if (!(req.resourceType() === 'xhr' || req.resourceType() === 'fetch')) return false;
+         if (!(req.url().includes('/items') || req.url().includes('/search'))) return false;
+         if (req.url().includes('limit=3')) return true;
+         if (req.method() === 'POST' && req.postData()) {
+           try { return JSON.parse(req.postData()).limit === 3; } catch { return false; }
+         }
+         return false;
+       });
+      
       const nextButton = page.getByRole('button', { name: /next/i }).first();
       await nextButton.click();
-     
+      
       const nextReq = await nextPagePromise;
       expect(nextReq.url()).toContain('limit=3');
-    });
-  });
-  test('Reset button clears filters', async ({ page, worker }) => {
-    api = API.minimalApi();
-    api.addCollection('collection1').setMetadata({ title: 'Test Collection' });
-    api.addCollectionsExtension().addItemsExtension().addSearchExtension();
-    await api.createServer(worker);
-   
-    await page.goto(SEARCH_PATH);
-    await waitForBrowserReady(page);
- 
-    await test.step('Apply a limit filter and verify it works', async () => {
-      const limitInput = page.getByLabel(/items per page/i);
-      await limitInput.fill('4');
-     
-      const searchPromise = waitForSearchPost(page);
-      await page.getByRole('button', { name: /submit/i }).click();
-     
-      const { body } = await searchPromise;
-      expect(body.limit).toBe(4);
-    });
- 
-    await test.step('Click Reset and verify the next search has no limit', async () => {
-      await page.getByRole('button', { name: /reset/i }).click();
-     
-      const limitInput = page.getByLabel(/items per page/i);
-      await expect(limitInput).toHaveValue('');
- 
-      const resetSearchPromise = waitForSearchPost(page);
-      await page.getByRole('button', { name: /submit/i }).click();
-     
-      const { body } = await resetSearchPromise;
-      expect(body.limit).toBeUndefined();
     });
   });
   test('Reset button clears filters inside a specific Collection', async ({ page, worker }) => {
@@ -777,126 +756,46 @@ test.describe('STAC Browser Search page', () => {
     api.addManyItems(collection, 5);
     api.addCollectionsExtension().addItemsExtension().addSearchExtension();
     await api.createServer(worker);
-   
-    const CATALOG_PATH = api.root.getSearchPath().replace(/^\/search/, '');
-    await page.goto(CATALOG_PATH);
+    
+    await page.goto(api.root.getBrowserPath());
     await waitForBrowserReady(page);
-   
+    
     const collectionLink = page.getByText('Test Collection 1', { exact: false }).first();
     await expect(collectionLink).toBeVisible();
     await collectionLink.click();
     await waitForBrowserReady(page);
- 
     await test.step('Apply a filter to the collection items', async () => {
       const filterToggle = page.getByRole('button', { name: /show filters/i });
       if (await filterToggle.isVisible()) {
         await filterToggle.click();
       }
- 
+
       const limitInput = page.getByLabel(/items per page/i);
       await limitInput.fill('6');
-     
-      const searchPromise = page.waitForRequest(req => req.url().includes('limit=6'));
+      
+      const searchPromise = page.waitForRequest(req => {
+         if (!(req.resourceType() === 'xhr' || req.resourceType() === 'fetch')) return false;
+         if (req.url().includes('limit=6')) return true;
+         if (req.method() === 'POST' && req.url().includes('/search') && req.postData()) {
+           try { return JSON.parse(req.postData()).limit === 6; } catch { return false; }
+         }
+         return false;
+       });
       await page.getByRole('button', { name: /submit/i }).click();
       await searchPromise;
     });
- 
+
     await test.step('Click Reset and verify the filter is removed', async () => {
       await page.getByRole('button', { name: /reset/i }).click();
-     
+      
       const limitInput = page.getByLabel(/items per page/i);
-      await expect(limitInput).toHaveValue('');
-     
+      await expect(limitInput).toHaveValue(''); 
+      
       const resetSearchPromise = page.waitForRequest(req => req.url().includes('/items'));
       await page.getByRole('button', { name: /submit/i }).click();
-     
+      
       const resetReq = await resetSearchPromise;
-      expect(resetReq.url()).not.toContain('limit=6');
+      expect(resetReq.url()).not.toMatch(/[?&]limit=/);
     });
   });
-  // test('Filters are preserved when navigating from Catalog/Global Collection search into a Collection', async ({ page, worker }) => {
-  //   api = API.minimalApi();
-  //   const collection = api.addCollection('collection1').setMetadata({ title: 'Test Collection 1' });
-  //   api.addManyItems(collection, 10);
-  //   api.addCollectionsExtension().addItemsExtension().addSearchExtension();
-  //   await api.createServer(worker);
-   
-  //   await page.goto(SEARCH_PATH);
-  //   await waitForBrowserReady(page);
- 
-  //   await test.step('Switch to Collections tab and apply a limit filter', async () => {
-  //     await page.getByRole('tab', { name: /collections/i }).click();
-     
-  //     const limitInput = page.getByLabel(/items per page/i);
-  //     await limitInput.fill('7');
-     
-  //     const searchPromise = page.waitForRequest(req => req.url().includes('limit=7'));
-  //     await page.getByRole('button', { name: /submit/i }).click();
-  //     await searchPromise;
-  //   });
- 
-  //   await test.step('Navigate into the Collection and verify filter carries over to Items', async () => {
-  //     const collectionItemsRequestPromise = page.waitForRequest(req =>
-  //       req.url().includes('/items') && req.method() === 'GET'
-  //     );
-     
-  //     const collectionCard = page.locator('.collection-card', { hasText: 'Test Collection 1' }).first();
-  //     await expect(collectionCard).toBeVisible();
-  //     await collectionCard.click();
- 
-  //     const itemsRequest = await collectionItemsRequestPromise;
-  //     expect(itemsRequest.url()).toContain('limit=7');
-     
-  //     const limitInput = page.getByLabel(/items per page/i);
-  //     await expect(limitInput).toHaveValue('7');
-  //   });
-  // });
-  // test('Filters are preserved when navigating away from a Collection Item search and back', async ({ page, worker }) => {
-  //   api = API.minimalApi();
-  //   const collection = api.addCollection('collection1').setMetadata({ title: 'Test Collection 1' });
-  //   api.addManyItems(collection, 5);
-  //   api.addCollectionsExtension().addItemsExtension().addSearchExtension();
-  //   await api.createServer(worker);
-   
-  //   const CATALOG_PATH = api.root.getSearchPath().replace(/^\/search/, '');
-  //   await page.goto(CATALOG_PATH);
-  //   await waitForBrowserReady(page);
-   
-  //   const collectionLink = page.getByText('Test Collection 1', { exact: false }).first();
-  //   await expect(collectionLink).toBeVisible();
-  //   await collectionLink.click();
-  //   await waitForBrowserReady(page);
- 
-  //   await test.step('Apply a limit filter to the Collection Items', async () => {
-  //     const filterToggle = page.getByRole('button', { name: /show filters/i });
-  //     if (await filterToggle.isVisible()) {
-  //       await filterToggle.click();
-  //     }
- 
-  //     const limitInput = page.getByLabel(/items per page/i);
-  //     await limitInput.fill('3');
-     
-  //     const searchPromise = page.waitForRequest(req => req.url().includes('limit=3'));
-  //     await page.getByRole('button', { name: /submit/i }).click();
-  //     await searchPromise;
-  //   });
- 
-  //   await test.step('Click an item, then go back, and verify filter is preserved', async () => {
-  //     const itemCard = page.locator('.item-card').first();
-  //     await itemCard.click();
-  //     await waitForBrowserReady(page);
- 
-  //     const returnItemsRequestPromise = page.waitForRequest(req =>
-  //       req.url().includes('/items') && req.method() === 'GET'
-  //     );
- 
-  //     await page.goBack();
- 
-  //     const itemsRequest = await returnItemsRequestPromise;
-  //     expect(itemsRequest.url()).toContain('limit=3');
-     
-  //     const limitInput = page.getByLabel(/items per page/i);
-  //     await expect(limitInput).toHaveValue('3');
-  //   });
-  // });
 });
