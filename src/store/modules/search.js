@@ -1,8 +1,3 @@
-export const SEARCH_MODULE_KEY = 'search';
-
-// URL prefix for search state params (e.g. "s.datetime")
-export const URL_PREFIX = 's.';
-
 const defaultShared = () => ({
   datetime: null,   
   bbox: null,       

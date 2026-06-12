@@ -10,8 +10,13 @@ import API from '../fixtures/instances/api.js';
 async function commitToStore(page, mutation, payload) {
   await page.waitForFunction(
     ({ mutation, payload }) => {
+
+    // Vue attaches the app instance to the DOM root element ([data-v-app]) at mount time.
+    // We access the Vuex store through it because Playwright runs in the browser context,
+    // not in the Vue app context, so we can't use inject() to access the store.
       const store = document.querySelector('[data-v-app]')
         ?.__vue_app__?.config?.globalProperties?.$store;
+
       if (!store?.state?.search || !store.state.browserReady) return false;
       store.commit(mutation, payload);
       return true;
@@ -20,6 +25,7 @@ async function commitToStore(page, mutation, payload) {
     { timeout: 10000 }
   );
 }
+
 
 async function getSearchState(page) {
   await page.waitForFunction(() => {
