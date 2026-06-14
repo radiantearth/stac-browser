@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import { defineAsyncComponent } from 'vue';
+import { defineAsyncComponent, markRaw } from 'vue';
 import MapMixin from './maps/MapMixin.js';
 import LayerControl from './maps/LayerControl.vue';
 import TextControl from './maps/TextControl.vue';
@@ -89,6 +89,7 @@ export default {
   data() {
     return {
       selection: null,
+      stacLayer: null,
       empty: false,
       isExpanded: false,
       mapId: `map-${++mapId}`,
@@ -178,7 +179,7 @@ export default {
     },
 
     async addStacLayer() {
-      this.stacLayer = new StacMapLayer(this.map, this.stacLayerOptions);
+      this.stacLayer = markRaw(new StacMapLayer(this.map, this.stacLayerOptions));
 
       this.stacLayer.setStac(this.stac);
 

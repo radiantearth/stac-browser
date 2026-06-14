@@ -1,8 +1,39 @@
 import { STACReference } from 'stac-js';
 import { PMTiles, SharedPromiseCache } from 'pmtiles';
 import { pmtilesProtocol } from './MapMixin.js';
+import { resolveRenders, makeRenderTileLoader } from '../../utils/renders.js';
+// Import the @developmentseed/geotiff decode worker via Vite's `?worker` suffix
+// (not a side-effect `import`): the library declares `sideEffects: false`, so a
+// bare re-export gets tree-shaken to an empty worker in production builds. The
+// `?worker` form makes the library's worker module the bundle entry, preserving
+// its top-level `self.addEventListener` handler. Vite emits it as a separate
+// chunk loaded only when a Worker is constructed. See getDecoderPool / vite.config.
+import CogDecoderWorker from '@developmentseed/geotiff/pool/worker?worker';
 
 const sharedCache = new SharedPromiseCache(300);
+
+// A single DecoderPool shared across COGLayers. We decode tiles off the main
+// thread via the bundled CogDecoderWorker so codec decompression doesn't block
+// the UI. The library's own `defaultDecoderPool()` can't be used because its
+// `new Worker(new URL('./worker.js', import.meta.url))` lives inside the dep and
+// Vite can't bundle it (the tiles then hang). If the Worker can't be constructed
+// (e.g. no `Worker` global, SSR, older browser) we fall back to a worker-less
+// pool that decodes on the main thread.
+const DECODER_POOL_SIZE = 4;
+let _decoderPool = null;
+function getDecoderPool(DecoderPool) {
+  if (_decoderPool) {return _decoderPool;}
+  try {
+    _decoderPool = new DecoderPool({
+      size: DECODER_POOL_SIZE,
+      createWorker: () => new CogDecoderWorker(),
+    });
+  } catch (err) {
+    console.warn('COG decoder worker unavailable; decoding on the main thread', err);
+    _decoderPool = new DecoderPool({});
+  }
+  return _decoderPool;
+}
 
 const STAC_SOURCE = 'stac-footprint';
 const STAC_FILL_LAYER = 'stac-footprint-fill';
@@ -32,6 +63,48 @@ const MVT_MIME_TYPES = [
 function assetHref(asset) {
   return asset.getAbsoluteUrl?.() || asset.href || '';
 }
+
+// Pick the cheapest COG asset to display. Prefers display-optimized assets:
+// the `visual`/`overview` role, Web Mercator (EPSG:3857 → no client reprojection),
+// and an 8-bit data type (cheap decode). Higher score wins; ties keep input order.
+function pickDisplayAsset(cogAssets) {
+  const score = (a) => {
+    let s = 0;
+    const roles = a.roles || [];
+    if (roles.includes('visual')) {s += 8;}
+    if (roles.includes('overview')) {s += 4;}
+    const code = a['proj:code'] || a.proj_code;
+    if (code === 'EPSG:3857') {s += 2;}
+    const dtype = (a.bands || [])[0]?.data_type;
+    if (dtype === 'uint8') {s += 1;}
+    return s;
+  };
+  return [...cogAssets].sort((a, b) => score(b) - score(a))[0];
+}
+
+// A near-global dataset spans most of the world's longitude. At the zoom that
+// fits such bounds the web-mercator map repeats horizontally and the full
+// latitude range fits the viewport, which locks vertical panning. We detect
+// this from the bbox alone (driven by longitude span) so fit() can start a
+// couple of zoom levels in instead.
+export function isGlobalBbox(bbox) {
+  if (!Array.isArray(bbox) || bbox.length < 4) {return false;}
+  const lonSpan = Math.abs(bbox[2] - bbox[0]);
+  return lonSpan >= 300;
+}
+
+function isCogAsset(asset) {
+  const type = asset.type || '';
+  return COG_MIME_TYPES.some(mt => type.includes(mt));
+}
+
+function cogKey(asset) {
+  return asset.getKey?.() ?? asset.key;
+}
+
+// The layer picker lists at most this many COG overlays. "Show on map" for a
+// COG beyond the cap swaps it in, evicting the last (non-active) listed entry.
+const COG_LAYER_CAP = 8;
 
 // Normalize a PMTiles source URL for comparison. Strips the `pmtiles://`
 // prefix and resolves relative URLs to absolute so that a style source URL
@@ -91,8 +164,9 @@ export default class StacMapLayer {
     this.assets = null;
     this.layerIds = [];
     this.sourceIds = [];
-    this._cogLayers = [];
-    this._cogAssetMeta = [];
+    this._cogList = [];
+    this._cogLayerCache = new Map();
+    this._assetsSig = null;
     this._deckOverlay = null;
     this._pmtilesLayerIds = [];
     this._pmtilesSourceIds = [];
@@ -226,9 +300,18 @@ export default class StacMapLayer {
   }
 
   async setAssets(assets) {
+    // Idempotent: MapView calls this from both addStacLayer() and the `assets`
+    // watcher, which would otherwise tear down and recreate the deck overlay and
+    // abort in-flight COG tiles. Skip when the asset set is unchanged.
+    const sig = (assets || []).map(a => assetHref(a)).sort().join('|');
+    if (sig && sig === this._assetsSig) {return;}
+
     this.assets = assets;
+    // Teardown resets `_assetsSig` (see _removeCogLayers), so record the new
+    // signature *after* tearing down — otherwise the reset would clobber it.
     this._removeCogLayers();
     this._removePmtilesLayers();
+    this._assetsSig = sig;
 
     if (!assets || assets.length === 0) {return;}
 
@@ -386,56 +469,222 @@ export default class StacMapLayer {
     this._pmtilesLayerIds.push(layerId);
   }
 
-  async _addCogAssets(assets) {
-    const cogAssets = assets.filter(asset => {
-      const type = asset.type || '';
-      return COG_MIME_TYPES.some(mt => type.includes(mt));
-    });
+  // All COG assets of the current item — the full set the layer picker draws
+  // from, independent of which one is selected/active.
+  _collectCogAssets() {
+    const all = typeof this.stac?.getAssets === 'function'
+      ? this.stac.getAssets()
+      : (this.assets || []);
+    return all.filter(isCogAsset);
+  }
 
-    if (cogAssets.length === 0) {return;}
+  async _addCogAssets(assets) {
+    const allCogs = this._collectCogAssets();
+    if (allCogs.length === 0) {
+      this._cogList = [];
+      await this._syncCogLayers();
+      return;
+    }
+
+    // STAC render extension: each render names a colormap/rescale + the asset(s)
+    // it applies to. Renders are used only for the colormap. `assets` carries the
+    // selection ("show on map"); when none is a COG we default to the
+    // display-optimized asset.
+    const renders = resolveRenders(this.stac);
+    const activeCogs = (assets || []).filter(isCogAsset);
+    const active = activeCogs.length ? activeCogs : [pickDisplayAsset(allCogs)];
+
+    this._cogList = this._buildCogList(allCogs, active, renders);
+    await this._syncCogLayers();
+  }
+
+  // Build the capped, ordered list of COG descriptors. Item order is preserved;
+  // active assets are always kept; remaining slots fill with other COGs in order
+  // until COG_LAYER_CAP, dropping trailing ("last") entries. `visible` mirrors
+  // the active set, so re-selecting a single asset solos it.
+  _buildCogList(allCogs, activeAssets, renders) {
+    const activeKeys = new Set(activeAssets.map(cogKey));
+    const kept = [];
+    let othersBudget = COG_LAYER_CAP - activeKeys.size;
+    for (const asset of allCogs) {
+      if (kept.length >= COG_LAYER_CAP) {break;}
+      if (activeKeys.has(cogKey(asset))) {
+        kept.push(asset);
+      } else if (othersBudget > 0) {
+        kept.push(asset);
+        othersBudget--;
+      }
+    }
+    return kept.map(asset => {
+      const key = cogKey(asset);
+      const resolved = this._resolveCogRender(asset, renders);
+      return {
+        id: key,
+        asset,
+        title: resolved.title || asset.title || key,
+        render: resolved.render,
+        visible: activeKeys.has(key),
+      };
+    });
+  }
+
+  /**
+   * Resolve which render (colormap/rescale) to apply to a display asset. Uses a
+   * render that explicitly targets the asset; otherwise synthesises one from the
+   * item's first render, stretched to the asset's own band statistics so an 8-bit
+   * `visual` asset matches the colours of its full-resolution source.
+   *
+   * "First render" means the first in the render extension's declaration order
+   * (`renders` is a JSON object whose key order is preserved through parsing).
+   * This is deterministic for a given document; multi-render items where no
+   * render targets the display asset fall back to that first declared render.
+   */
+  _resolveCogRender(asset, renders) {
+    const key = cogKey(asset);
+    const entries = Object.entries(renders);
+    const direct = entries.find(([, r]) => (r.assets || []).includes(key));
+    if (direct) {
+      return { id: direct[0], asset, render: direct[1], title: direct[1].title || direct[0] };
+    }
+    const first = entries[0]?.[1];
+    if (first) {
+      const band0 = (asset.bands || [])[0] || {};
+      const min = band0.statistics?.minimum ?? 0;
+      const max = band0.statistics?.maximum ?? 255;
+      // Drop both the source render's "empty" sentinel (e.g. 0) and the display
+      // asset's own physical no-data, so a rescaled 8-bit visual matches the
+      // full-res render (otherwise empty cells colour as the ramp's low end).
+      const nodata = [...new Set([first.nodata, band0.nodata].flat().filter(v => v != null))];
+      const render = {
+        colormap_name: first.colormap_name,
+        colormap: first.colormap,
+        rescale: [[min, max]],
+        nodata,
+        bidx: [1],
+      };
+      return { id: null, asset, render, title: asset.title || key };
+    }
+    return { id: null, asset, render: null, title: asset.title || key };
+  }
+
+  // Lazily load the deck.gl backend (overlay + COG layer + decoder pool). Split
+  // out as an overridable seam so unit tests can inject a test double and
+  // exercise the reconciliation below without WebGL.
+  async _loadDeckDeps() {
+    const [{ MapboxOverlay }, { COGLayer }, { DecoderPool }] = await Promise.all([
+      import('@deck.gl/mapbox'),
+      import('@developmentseed/deck.gl-geotiff'),
+      import('@developmentseed/geotiff'),
+    ]);
+    return { MapboxOverlay, COGLayer, DecoderPool };
+  }
+
+  // Reconcile the deck.gl overlay with `_cogList`: one COGLayer per visible
+  // descriptor, reusing cached instances so toggling one COG doesn't abort
+  // another's in-flight tiles. Off descriptors stay in the picker but aren't
+  // rendered (lazy), so listing 8 COGs only decodes the ones turned on.
+  async _syncCogLayers() {
+    // A deck overlay needs a map that can host a control. Tests exercise the
+    // reconciliation by supplying such a map plus an injected `_loadDeckDeps`.
+    if (!this.map || typeof this.map.addControl !== 'function') {return;}
+
+    const visible = this._cogList.filter(d => d.visible);
+    if (visible.length === 0) {
+      if (this._deckOverlay) {
+        try { this.map.removeControl(this._deckOverlay); } catch { /* already removed */ }
+        this._deckOverlay = null;
+      }
+      this._cogLayerCache.clear();
+      return;
+    }
 
     try {
-      const [{ MapboxOverlay }, { COGLayer }] = await Promise.all([
-        import('@deck.gl/mapbox'),
-        import('@developmentseed/deck.gl-geotiff'),
-      ]);
+      const { MapboxOverlay, COGLayer, DecoderPool } = await this._loadDeckDeps();
 
-      this._cogAssetMeta = cogAssets.map((asset, i) => ({
-        title: asset.title || asset.key || `COG ${i + 1}`,
-      }));
+      // Drop cached layers no longer listed (e.g. evicted by the cap).
+      const liveIds = new Set(this._cogList.map(d => d.id));
+      for (const id of [...this._cogLayerCache.keys()]) {
+        if (!liveIds.has(id)) {this._cogLayerCache.delete(id);}
+      }
 
-      const layers = cogAssets.map((asset, i) => {
-        const url = asset.getAbsoluteUrl?.() || asset.href;
-        return new COGLayer({
-          id: `stac-cog-${i}`,
-          geotiff: url,
-        });
+      const layers = visible.map(d => {
+        let layer = this._cogLayerCache.get(d.id);
+        if (!layer) {
+          layer = this._makeCogLayer(d, COGLayer, DecoderPool);
+          this._cogLayerCache.set(d.id, layer);
+        }
+        return layer;
       });
 
       if (this._deckOverlay) {
-        this.map.removeControl(this._deckOverlay);
+        this._deckOverlay.setProps({ layers });
+      } else {
+        this._deckOverlay = new MapboxOverlay({ interleaved: false, layers });
+        this.map.addControl(this._deckOverlay);
       }
-
-      this._deckOverlay = new MapboxOverlay({ layers });
-      this.map.addControl(this._deckOverlay);
-      this._cogLayers = layers;
     } catch (err) {
-      console.warn('Failed to load COG layers via deck.gl', err);
+      console.warn('Failed to load COG layer via deck.gl', err);
     }
+  }
+
+  _makeCogLayer(descriptor, COGLayer, DecoderPool) {
+    const { asset, render } = descriptor;
+    const url = asset.getAbsoluteUrl?.() || asset.href;
+    const props = {
+      id: `stac-cog-${descriptor.id}`,
+      geotiff: url,
+      // Off-main-thread codec decode via a first-party worker pool (see
+      // getDecoderPool). The CPU colormap loop in makeRenderTileLoader still runs
+      // on the main thread, so it stays bounded there (see renders.js).
+      pool: getDecoderPool(DecoderPool),
+      opacity: 0.9,
+      // Keep the best-available coarser tiles visible until the finer level has
+      // decoded, rather than blanking the area while decode is in flight.
+      refinementStrategy: 'best-available',
+      // Bound tile-fetch concurrency per layer so a viewport change across
+      // several visible COGs doesn't flood the decoder pool.
+      maxRequests: 4,
+      // Bound cache by bytes, not tile count: a few large-tile COGs would blow a
+      // count-based budget. ~64 MB of decoded RGBA per layer.
+      maxCacheByteSize: 64 * 1024 * 1024,
+    };
+    if (render) {
+      const { getTileData, renderTile } = makeRenderTileLoader(render);
+      props.getTileData = getTileData;
+      props.renderTile = renderTile;
+    }
+    return new COGLayer(props);
   }
 
   fit(padding = { top: 160, bottom: 50, left: 50, right: 50 }) {
     if (!this.stac || !this.map) {return;}
     const bbox = this.stac.getBoundingBox();
     if (!bbox || bbox.length < 4) {return;}
-    this.map.fitBounds(
-      [[bbox[0], bbox[1]], [bbox[2], bbox[3]]],
-      { padding, maxZoom: 16 }
-    );
+    const bounds = [[bbox[0], bbox[1]], [bbox[2], bbox[3]]];
+
+    // For global/near-global data, fitBounds lands at z0–1 where the world
+    // repeats and vertical panning is locked. Start 2 levels in: compute the
+    // fit camera and jump there with a higher zoom.
+    if (isGlobalBbox(bbox) && typeof this.map.cameraForBounds === 'function') {
+      const cam = this.map.cameraForBounds(bounds, { padding });
+      if (cam && cam.center) {
+        // Center on the geographic midpoint of the bbox. cameraForBounds'
+        // own center sits far north because web-mercator stretches high
+        // latitudes, which leaves the view looking too northern.
+        const center = [(bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2];
+        this.map.jumpTo({
+          center,
+          zoom: Math.min((cam.zoom ?? 0) + 2, 16),
+        });
+        return;
+      }
+    }
+
+    this.map.fitBounds(bounds, { padding, maxZoom: 16 });
   }
 
   isEmpty() {
-    return this.layerIds.length === 0 && this._cogLayers.length === 0 && this._pmtilesLayerIds.length === 0;
+    return this.layerIds.length === 0 && this._cogList.length === 0 && this._pmtilesLayerIds.length === 0;
   }
 
   getChildrenLayerIds() {
@@ -470,23 +719,22 @@ export default class StacMapLayer {
         });
       }
     }
-    for (let i = 0; i < this._cogLayers.length; i++) {
-      const meta = this._cogAssetMeta[i] || {};
+    for (const d of this._cogList) {
       overlays.push({
-        id: `cog-${i}`,
-        title: meta.title || `COG ${i + 1}`,
+        id: d.id,
+        title: d.title || d.id,
         type: 'deckgl',
-        visible: this._cogLayers[i]?.props?.visible !== false,
-        deckIndex: i,
+        visible: d.visible,
       });
     }
     return overlays;
   }
 
-  setCogVisible(index, visible) {
-    if (!this._deckOverlay || index >= this._cogLayers.length) {return;}
-    this._cogLayers[index] = this._cogLayers[index].clone({ visible });
-    this._deckOverlay.setProps({ layers: [...this._cogLayers] });
+  setCogVisible(id, visible) {
+    const descriptor = this._cogList.find(d => d.id === id);
+    if (!descriptor || descriptor.visible === visible) {return;}
+    descriptor.visible = visible;
+    return this._syncCogLayers();
   }
 
   setFootprintVisible(visible) {
@@ -522,6 +770,9 @@ export default class StacMapLayer {
     // first: the helpers iterate them to know what to remove, so clearing them
     // early leaks the sources and makes the re-add throw "source already
     // exists" (e.g. stac-tile-0 for PMTiles assets).
+    // _removeCogLayers() clears the setAssets idempotency signature, so the
+    // upcoming setAssets() rebuilds from scratch rather than no-opping on the
+    // unchanged asset set (which would leave layers gone — issue #13 regression).
     this._clearLayers();
     this._removeCogLayers();
     this._removePmtilesLayers();
@@ -615,8 +866,12 @@ export default class StacMapLayer {
       try { this.map.removeControl(this._deckOverlay); } catch { /* already removed */ }
       this._deckOverlay = null;
     }
-    this._cogLayers = [];
-    this._cogAssetMeta = [];
+    this._cogList = [];
+    this._cogLayerCache.clear();
+    // Invalidate the setAssets idempotency signature here so every teardown path
+    // (setAssets, remove, readdAfterStyleChange) forces the next setAssets to
+    // rebuild. setAssets re-records the signature *after* calling this.
+    this._assetsSig = null;
   }
 
   _removePmtilesLayers() {

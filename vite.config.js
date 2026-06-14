@@ -90,6 +90,13 @@ export default defineConfig(async ({ mode }) => {
         external: ["fs/promises"],
       },
     },
+    // @developmentseed/geotiff's decoder pool ships a code-split worker, which
+    // the production build can't bundle with Vite's default IIFE worker format
+    // ("UMD and IIFE output formats are not supported for code-splitting
+    // builds"). ES-format workers support code splitting.
+    worker: {
+      format: "es",
+    },
     css: {
       preprocessorOptions: {
         scss: {

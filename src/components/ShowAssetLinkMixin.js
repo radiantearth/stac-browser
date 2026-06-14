@@ -76,7 +76,10 @@ export default defineComponent({
   },
   methods: {
     showAsset(asset) {
-      if (this.thumbnails.find(t => t.is(asset))) {
+      // Compare by absolute URL: thumbnails/assets are stac-js Asset/Link
+      // instances (no `is()` method — that only exists on STAC entities), so
+      // `t.is(asset)` throws. See https://github.com/moregeo-it/stac-js/issues/12
+      if (this.thumbnails.find(t => t.getAbsoluteUrl() === asset.getAbsoluteUrl())) {
         this.tab = this.tabIds.thumbnails;
       }
       else {
