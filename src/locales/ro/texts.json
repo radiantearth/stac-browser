@@ -70,8 +70,12 @@
     "false": "Nu",
     "true": "Doar"
   },
+  "close": "Închidere",
   "copy": "Copiază",
-  "copyErrors": {},
+  "copyErrors": {
+    "permission": "Nu pot copia. Verificați permisiunile browserului.",
+    "unsupported": "Clipboard-ul nu este disponibil în acest browser."
+  },
   "default": "Implicit",
   "defaultWithValue": "Implicit ({value})",
   "deprecated": "Învechit",
@@ -87,6 +91,7 @@
   },
   "description": "Descriere",
   "errors": {
+    "apiListRequested": "",
     "authFailed": "Solicitarea a eșuat, credențialele furnizate ar putea fi incorecte.",
     "badRequest": "Solicitarea nu este validă. Acest lucru se poate datora unor parametri de căutare invalizi sau a unei erori în browserul STAC",
     "contactProvider": "Vă rugăm să contactați operatorul serviciului pentru a rezolva această problemă.",
@@ -112,10 +117,16 @@
     "title": "Eroare",
     "unauthorized": "Solicitarea necesită informații de autentificare, cum ar fi un token API. Vă rugăm să furnizați acreditările și să încercați din nou"
   },
-  "exampleCode": {},
+  "exampleCode": {
+    "title": "Cod de exemplu",
+    "storeAs": "Salvează codul ca:",
+    "installDependencies": "Instalează dependințele:"
+  },
   "featureExperimental": "Această funcție este încă experimentală și poate da rezultate neașteptate!",
   "features": {
-    "noProperties": "Nu au fost furnizate proprietăți."
+    "empty": "",
+    "noProperties": "Nu au fost furnizate proprietăți.",
+    "title": ""
   },
   "fullscreen": {
     "exit": "Ieși din modul ecran complet",
@@ -160,12 +171,26 @@
   "mapping": {
     "attribution": {
       "collapseLabel": "✕",
+      "description": "Atribuții",
       "label": "i"
     },
     "bboxSelect": {
-      "error": {}
+      "add": "",
+      "eastLon": "Longitudine estică",
+      "error": {
+        "incomplete": "Coordonate lipsă",
+        "invalidLat": "Trebuie să fie între -90 și 90",
+        "invalidLon": "Trebuie să fie între -180 și 180",
+        "latOrder": "Latitudinea sudică trebuie să fie mai mică decât cea nordică",
+        "lonOrder": "Longitudinea vestică trebuie să fie mai mică decât longitudinea estică"
+      },
+      "northLat": "Latitudine nordică",
+      "remove": "",
+      "southLat": "Latitudine sudică",
+      "westLon": "Longitudine vestică"
     },
     "close": "Închidere",
+    "fit": "",
     "layers": {
       "base": "Straturi de bază",
       "footprint": "Amprentă la sol",
@@ -175,6 +200,7 @@
     "location": {
       "description": "Mergi la locație"
     },
+    "nobasemap": "Nici o hartă de bază disponibilă.",
     "nodata": "Nu sunt informații spațiale disponibile în metadate.",
     "zoom": {
       "in": {
@@ -208,7 +234,14 @@
     "previous": "‹ Precedent"
   },
   "poweredBy": "Cu sprijinul {link}",
-  "programming": {},
+  "programming": {
+    "csharp": "C#",
+    "java": "Java",
+    "javascript": "JavaScript",
+    "python": "Python",
+    "r": "R",
+    "rust": "Rust"
+  },
   "protocol": {
     "azure": "Microsoft Azure",
     "file": "Sistem de fișiere (local)",
@@ -242,8 +275,22 @@
     "additionalFilters": "Filtre suplimentare",
     "addItemIds": "Apăsați Enter pentru a adăuga un ID de articol",
     "addSearchTerm": "Apăsați enter pentru a adăuga un termen de căutare",
-    "arrayInput": {},
+    "arrayInput": {
+      "addValue": "Apăsați „enter” pentru a adăuga o valoare",
+      "helpText": "Introduceți valoarea(valorile)"
+    },
+    "arrayContains": "Conține tot",
+    "arrayContainsDescription": "",
+    "arrayContainedBy": "Este subset al",
+    "arrayContainedByDescription": "",
+    "arrayEquals": "",
+    "arrayEqualsDescription": "",
+    "arrayOverlaps": "",
+    "arrayOverlapsDescription": "",
+    "between": "",
+    "betweenOperatorDescription": "",
     "dateDescription": "Toate orele sunt timp universal coordonat (UTC).",
+    "disabledDueToSingleDate": "",
     "enterCollections": "Introduceți una sau mai multe colecții...",
     "enterItemIds": "Introduceți unul sau mai multe ID-uri de articol...",
     "enterSearchTerms": "Introduceți unul sau mai mulți termeni de căutare...",
@@ -254,6 +301,8 @@
     "freeTextDescription": "Căutați cel puțin unul dintre termenii specificați în câmpuri precum titlul și descrierea.",
     "greaterThan": "mai mare decât",
     "greaterThanEqual": "mai mare sau egal cu",
+    "in": "",
+    "inOperatorDescription": "",
     "itemIds": "Identificatori de elemente",
     "itemsPerPage": "Elemente per pagină",
     "itemsPerPageDescription": "Număr de elemente solicitate pe pagină, max. {maxItems} elemente",
@@ -262,19 +311,22 @@
     "likeOperatorDescription": "Puteți folosi metacaracterele. `_` se potrivește cu un singur caracter, `%` se potrivește cu orice număr de caractere. Pentru a căuta în mod specific un wildcard, trebuie să adăugați un `\\` în fața caracterului.",
     "logical": {
       "and": "Potrivește toate filtrele (și)",
-      "or": "Potrivește orice filtru (or)"
+      "or": "Potrivește orice filtru (or)",
+      "not": ""
     },
     "matches": "corespunde cu",
     "metaDescription": "Căutați în oferta de date a {title}.",
     "modifyCriteria": "Vă rugăm să modificați criteriile de căutare.",
     "noFurtherItemsFound": "Nici un alt articol disponibil.",
     "noItemsFound": "Nu s-au găsit articole pentru filtrele selectate.",
+    "noOperatorsError": "",
     "noOptions": "Nimic introdus încă",
     "notEqualTo": "diferit de",
     "notFullySupported": "Este posibil să nu fie acceptate toate opțiunile",
     "notSupported": "Căutarea articolelor nu este acceptată de API.",
     "placeholder": "Căutare...",
     "selectCollections": "Selectați una sau mai multe colecții...",
+    "selectDateRange": "",
     "selectForItemSearch": "Selectați pentru Căutare Articol",
     "spatialExtent": "Întinderea spațială",
     "tabs": {
@@ -366,6 +418,8 @@
   "stacCollection": "Colecție | Colecții",
   "stacItem": "Element | Elemente",
   "submit": "Trimitere",
+  "switchToDarkMode": "",
+  "switchToLightMode": "",
   "table": {
     "emptyFilteredText": "Nu există înregistrări care să corespundă interogării dvs",
     "emptyText": "Nu există înregistrări de afișat",
