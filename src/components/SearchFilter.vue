@@ -323,9 +323,10 @@ export default defineComponent({
       };
     },
     activeParams() {
-      return this.type === 'Collections' 
+      const params = this.type === 'Collections' 
         ? this.collectionSearchParams 
         : this.itemSearchParams;
+      return params || {};
     },
     canSearchCollectionsFreeText() {
       return this.canSearchCollections && this.supportsConformance(TYPES.Collections.FreeText);
@@ -417,7 +418,7 @@ export default defineComponent({
     },
     searchQ: {
       get() {
-        const q = this.activeParams.q;
+        const q = this.activeParams?.q;
         return Array.isArray(q) ? [...q] : [];
       },
       set(value) {
@@ -440,12 +441,12 @@ export default defineComponent({
       }
     },
     searchBBox: {
-      get() { return Array.isArray(this.activeParams.bbox) ? [...this.activeParams.bbox] : null; },
+      get() { return Array.isArray(this.activeParams?.bbox) ? [...this.activeParams.bbox] : null; },
       set(val) { this.commitToVuex('bbox', val); }
     },
     searchIds: {
       get() { 
-        const ids = this.activeParams.ids;
+        const ids = this.activeParams?.ids;
         return Array.isArray(ids) ? [...ids] : [];
       },
       set(value) { this.commitToVuex('ids', value); }
@@ -469,7 +470,12 @@ export default defineComponent({
       deep: true,
       handler(vuexCollections) {
         const activeCollections = vuexCollections || [];
-        
+
+        const currentSelectedIds = (this.selectedCollections || []).map(c => c.value);
+        if (JSON.stringify(activeCollections) === JSON.stringify(currentSelectedIds)) {
+          return;
+        }
+
         if (this.collections.length > 0 && this.hasAllCollections) {
           this.selectedCollections = this.collections.filter(c => activeCollections.includes(c.value));
         }
@@ -481,15 +487,14 @@ export default defineComponent({
         }
       }
     },
-    searchBBox: {
-      deep: true,
-      handler(bbox) {
-        if (bbox) {
-          // Store the previously selected bbox so that it can be restored after the
-          // map had been hidden accidentally.
-          this.bbox = bbox;
+    'activeParams.bbox': {
+      immediate: true,
+      handler(newBbox) {
+        if (newBbox && newBbox.length > 0) {
+          this.provideBBox = '1';
+          this.bbox = newBbox; 
         }
-      }
+      } 
     },
     selectedCollections: {
       deep: 1,
@@ -501,7 +506,7 @@ export default defineComponent({
       if (!shown) {
         this.commitToVuex('bbox', null);
       }
-      else {
+      else if (this.bbox && this.bbox.length > 0) {
         this.commitToVuex('bbox', this.bbox);
       }
     },
