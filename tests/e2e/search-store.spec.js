@@ -6,52 +6,8 @@
  */
 import { test, expect } from './fixtures.js';
 import API from '../fixtures/instances/api.js';
+import { commitToStore, getSearchState } from '../helpers/store.js';
 
-async function commitToStore(page, mutation, payload) {
-  await page.waitForFunction(
-    ({ mutation, payload }) => {
-
-    // Vue attaches the app instance to the DOM root element ([data-v-app]) at mount time.
-    // We access the Vuex store through it because Playwright runs in the browser context,
-    // not in the Vue app context, so we can't use inject() to access the store.
-      const store = document.querySelector('[data-v-app]')
-        ?.__vue_app__?.config?.globalProperties?.$store;
-
-      if (!store?.state?.search || !store.state.browserReady) return false;
-      store.commit(mutation, payload);
-      return true;
-    },
-    { mutation, payload },
-    { timeout: 10000 }
-  );
-}
-
-
-async function getSearchState(page) {
-  await page.waitForFunction(() => {
-    const store = document.querySelector('[data-v-app]')
-      ?.__vue_app__?.config?.globalProperties?.$store;
-    return store?.state?.search !== undefined && store.state.browserReady;
-  }, { timeout: 10000 });
-  return page.evaluate(() => {
-    const store = document.querySelector('[data-v-app]')
-      ?.__vue_app__?.config?.globalProperties?.$store;
-    const s = store?.state?.search;
-    if (!s) return null;
-    return {
-      shared: { ...s.shared },
-      collectionFilters: { ...s.collectionFilters },
-      itemFilters: { ...s.itemFilters },
-      droppedFilters: [...s.droppedFilters],
-      getters: {
-        hasActiveFilters: store.getters['search/hasActiveFilters'],
-        hasDroppedFilters: store.getters['search/hasDroppedFilters'],
-        itemSearchParams: { ...store.getters['search/itemSearchParams'] },
-        collectionSearchParams: { ...store.getters['search/collectionSearchParams'] },
-      }
-    };
-  });
-}
 
 test.describe('Vuex search module', () => {
   test.beforeEach(async ({ worker, page }) => {
