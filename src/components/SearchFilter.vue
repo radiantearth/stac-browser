@@ -260,6 +260,7 @@ export default defineComponent({
   computed: {
     ...mapState(['searchResultsPerPage', 'maxEntriesPerPage', 'uiLanguage']),
     ...mapGetters(['canSearchCollections', 'supportsConformance']),
+    ...mapGetters('search', ['collectionSearchParams', 'itemSearchParams']),
     collectionSelectOptions() {
       let taggable = !this.hasAllCollections;
       let isResult = this.collections.length > 0 && !this.hasAllCollections;
@@ -315,20 +316,16 @@ export default defineComponent({
       return Object.keys(this.codeExampleSearchLinks).length > 0;
     },
     codeExampleQuery() {
-      const activeFilters = this.type === 'Collections' 
-        ? this.$store.getters['search/collectionSearchParams']
-        : this.$store.getters['search/itemSearchParams'];
-
       return {
-        ...activeFilters,
+        ...this.activeParams,
         sortby: this.formatSort(),
         filters: this.buildFilter()
       };
     },
     activeParams() {
       return this.type === 'Collections' 
-        ? this.$store.getters['search/collectionSearchParams']
-        : this.$store.getters['search/itemSearchParams'];
+        ? this.collectionSearchParams 
+        : this.itemSearchParams;
     },
     canSearchCollectionsFreeText() {
       return this.canSearchCollections && this.supportsConformance(TYPES.Collections.FreeText);
@@ -467,7 +464,7 @@ export default defineComponent({
         this.updateApiCollections();
       }
     },
-    '$store.state.search.collections': {
+    'activeParams.collections': {
       immediate: true,
       deep: true,
       handler(vuexCollections) {
@@ -484,7 +481,7 @@ export default defineComponent({
         }
       }
     },
-    '$store.state.search.bbox': {
+    searchBBox: {
       deep: true,
       handler(bbox) {
         if (bbox) {
