@@ -5,17 +5,15 @@ const defaultShared = () => ({
 });
 
 const defaultFilterSet = () => ({
-  q: null,
+  q: [],
   ids: [],
   collections: [],
   sortby: null,
-  queryableFilters: [],  
-  cql2: null,            
+  filters: null,
 });
 
 export default {
   namespaced: true,
-
   state: () => ({
     shared: defaultShared(),
     collectionFilters: defaultFilterSet(),
@@ -37,13 +35,16 @@ export default {
 
     hasActiveFilters: (state) => {
       const s = state.shared;
-      const f = state.itemFilters;
-      return !!(s.datetime || s.bbox || s.limit || f.q ||
-        f.ids.length || f.sortby || f.queryableFilters.length || f.cql2);
+      const isActive = (f) => (
+        (Array.isArray(f.q) && f.q.length > 0) ||
+        (Array.isArray(f.ids) && f.ids.length > 0) ||
+        (Array.isArray(f.collections) && f.collections.length > 0) ||
+        !!f.sortby ||
+        !!f.filters
+      );
+      return !!(s.datetime || s.bbox || s.limit) || isActive(state.itemFilters) || isActive(state.collectionFilters);
     },
-
     hasDroppedFilters: (state) => state.droppedFilters.length > 0,
-
     cachedQueryables: (state) => (href) => state.queryablesCache[href] || null,
   },
 
