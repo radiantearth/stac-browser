@@ -24,8 +24,8 @@ test.describe('Vuex search module', () => {
     expect(state.shared.datetime).toBeNull();
     expect(state.shared.bbox).toBeNull();
     expect(state.shared.limit).toBeNull();
-    expect(state.itemFilters.queryableFilters).toEqual([]);
-    expect(state.collectionFilters.queryableFilters).toEqual([]);
+    expect(state.itemFilters.filters).toBeNull();
+    expect(state.collectionFilters.filters).toBeNull();
     expect(state.droppedFilters).toEqual([]);
     expect(state.getters.hasActiveFilters).toBe(false);
     expect(state.getters.hasDroppedFilters).toBe(false);
@@ -36,16 +36,16 @@ test.describe('Vuex search module', () => {
     const state = await getSearchState(page);
     expect(state.shared.datetime).toBe('2025-05-01T00:00:00.000Z/2025-05-29T00:00:00.000Z');
     expect(state.shared.limit).toBe(10);
-    expect(state.itemFilters.q).toBeNull();
-    expect(state.collectionFilters.q).toBeNull();
+    expect(state.itemFilters.q).toEqual([]);
+    expect(state.collectionFilters.q).toEqual([]);
   });
 
   test('itemFilters and collectionFilters are independent', async ({ page }) => {
-    await commitToStore(page, 'search/setItemFilters', { q: 'sentinel' });
-    await commitToStore(page, 'search/setCollectionFilters', { q: 'landsat' });
+    await commitToStore(page, 'search/setItemFilters', { q: ['sentinel'] });
+    await commitToStore(page, 'search/setCollectionFilters', { q: ['landsat'] });
     const state = await getSearchState(page);
-    expect(state.itemFilters.q).toBe('sentinel');
-    expect(state.collectionFilters.q).toBe('landsat');
+    expect(state.itemFilters.q).toEqual(['sentinel']);
+    expect(state.collectionFilters.q).toEqual(['landsat']);
   });
 
   test('resetAll clears all state', async ({ page }) => {
@@ -54,18 +54,18 @@ test.describe('Vuex search module', () => {
     await commitToStore(page, 'search/resetAll');
     const state = await getSearchState(page);
     expect(state.shared.datetime).toBeNull();
-    expect(state.itemFilters.q).toBeNull();
-    expect(state.collectionFilters.q).toBeNull();
+    expect(state.itemFilters.q).toEqual([]);
+    expect(state.collectionFilters.q).toEqual([]);
   });
 
   test('getters reflect current state correctly', async ({ page }) => {
     await commitToStore(page, 'search/setShared', { limit: 20 });
-    await commitToStore(page, 'search/setItemFilters', { q: 'sentinel' });
-    await commitToStore(page, 'search/setCollectionFilters', { q: 'landsat' });
+    await commitToStore(page, 'search/setItemFilters', { q: ['sentinel'] });
+    await commitToStore(page, 'search/setCollectionFilters', { q: ['landsat'] });
     const state = await getSearchState(page);
     expect(state.getters.hasActiveFilters).toBe(true);
     expect(state.getters.itemSearchParams.limit).toBe(20);
-    expect(state.getters.itemSearchParams.q).toBe('sentinel');
-    expect(state.getters.collectionSearchParams.q).toBe('landsat');
+    expect(state.getters.itemSearchParams.q).toEqual(['sentinel']);
+    expect(state.getters.collectionSearchParams.q).toEqual(['landsat']);
   });
 });
