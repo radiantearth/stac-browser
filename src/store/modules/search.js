@@ -83,22 +83,4 @@ export default {
       state.droppedFilters = [];
     },
   },
-
-  actions: {
-    updateShared({ commit }, patch) {
-      commit('setShared', patch);
-    },
-
-    updateItemFilters({ commit }, filters) {
-      commit('setItemFilters', filters);
-    },
-
-    updateCollectionFilters({ commit }, filters) {
-      commit('setCollectionFilters', filters);
-    },
-
-    reset({ commit }) {
-      commit('resetAll');
-    },
-  },
 };

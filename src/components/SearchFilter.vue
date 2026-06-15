@@ -739,9 +739,9 @@ export default defineComponent({
       this.commitToVuex('filters', this.buildFilter()); 
       this.$emit('input', this.activeParams, false);
     },
-    async onReset() { 
+    async onReset() {
       Object.assign(this, getDefaults());
-      await this.$store.dispatch('search/reset'); 
+      await this.$store.commit('search/resetAll');
       this.$emit('input', this.activeParams, true);
     },
     addSearchTerm(term) {
@@ -777,13 +777,13 @@ export default defineComponent({
     },
     commitToVuex(field, value) {
       if (['datetime', 'bbox', 'limit'].includes(field)) {
-        this.$store.dispatch('search/updateShared', { [field]: value });
+        this.$store.commit('search/setShared', { [field]: value });
       } 
       else if (this.type === 'Collections') {
-        this.$store.dispatch('search/updateCollectionFilters', { [field]: value });
+        this.$store.commit('search/setCollectionFilters', { [field]: value });
       } 
       else {
-        this.$store.dispatch('search/updateItemFilters', { [field]: value });
+        this.$store.commit('search/setItemFilters', { [field]: value });
       }
     },
   }
