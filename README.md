@@ -1,4 +1,4 @@
-# STAC Browser
+# STAC Browser (for CREODIAS)
 
 This is a full-fledged [Spatio-Temporal Asset Catalog (STAC)](https://github.com/radiantearth/stac-spec) browser for STAC APIs and static STAC catalogs.
 
@@ -14,7 +14,7 @@ If you care about STAC Browser and have some funds to support the future of STAC
 
 **Table of Contents:**
 
-- [STAC Browser](#stac-browser)
+- [STAC Browser (for CREODIAS)](#stac-browser-for-creodias)
   - [Examples](#examples)
   - [Get Started](#get-started)
     - [Private query parameters](#private-query-parameters)

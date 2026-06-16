@@ -44,7 +44,7 @@ $grid-breakpoints: (
 // Font size
 $font-size-base: 1rem;
 // Fonts for normal text
-$font-family-sans-serif: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+$font-family-sans-serif: Poppins, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 // Fonts for headings
 $headings-font-family: $font-family-sans-serif;
 // Fonts for code
@@ -80,14 +80,14 @@ $body-bg: white;
 $body-color: black;
 
 // Theme colors
-$primary:   #188191;
-$secondary: #6c757d;
+$primary:   #fd822c;
+$secondary: #abb8c3;
 $success:   #28a745;
 $info:      $secondary; // unused
 $warning:   #ffc107;
-$danger:    #dc3545;
-$light:     #f8f9fa; // light means muted
-$dark:      #343a40; // dark means highlighted
+$danger:    #d9000d;
+$light:     #fafafa; // light means muted
+$dark:      #081b3b; // dark means highlighted
 
 // Heading colors
 $h1-color: inherit;
@@ -95,8 +95,8 @@ $subheadings-color: #6c757d; // h2 only
 $headings-color: inherit; // h3, h4, h5, h6
 
 // Link colors
-$link-color: #188191;
-$link-hover-color: darken($link-color, 20%);
+$link-color: #fd822c;
+$link-hover-color: #fd5e2c;
 
 $link-color-on-primary: tint-color($primary, 60%);
 $link-hover-color-on-primary: $body-bg;
@@ -111,8 +111,8 @@ $link-hover-color-on-primary: $body-bg;
 // Override what you need from the Bootstrap variables (see above).
 // ─────────────────────────────────────────────────────────
 
-$body-bg-dark: #212529;
-$body-color-dark: #dee2e6;
+$body-bg-dark: #08122B;
+$body-color-dark: #fff;
 
 $h1-color-dark: inherit;
 $subheadings-color-dark: lighten($secondary, 10%);

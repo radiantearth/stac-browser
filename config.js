@@ -1,11 +1,14 @@
+const TITLE = "CREODIAS STAC API";
 export default {
-  catalogUrl: null,
-  catalogTitle: null,
-  catalogTitleAfterImage: null,
-  catalogImage: null,
-  allowExternalAccess: true, // Must be true if catalogUrl is not given
-  allowedDomains: [],
-  enforcedColorMode: "auto",
+  catalogUrl: "https://stac.creodias.eu",
+  catalogTitle: TITLE,
+  catalogTitleAfterImage: "STAC API",
+  catalogImage: "https://creodias.eu/wp-content/themes/creodias/img/logo.svg",
+  allowExternalAccess: false, // Must be true if catalogUrl is not given
+  allowedDomains: [
+    "creodias.eu",
+  ],
+  enforcedColorMode: "dark",
   detectLocaleFromBrowser: true,
   storeLocale: true,
   locale: "en",
@@ -43,7 +46,7 @@ export default {
   pathPrefix: "/",
   historyMode: "history",
   cardViewMode: "cards",
-  defaultCollectionSort: "title",
+  defaultCollectionSort: null, // should probably be title, but errors currently (HTTP 400 from API)
   defaultItemSort: null,
   showKeywordsInItemCards: false,
   showKeywordsInCatalogCards: false,
@@ -58,8 +61,17 @@ export default {
   requestHeaders: {},
   requestQueryParameters: {},
   socialSharing: ['email', 'bsky', 'mastodon', 'x'],
-  preprocessSTAC: null,
-  authConfig: null,
+  preprocessSTAC: stac => {
+    if (stac.getBrowserPath() === '/') {
+      stac.title = TITLE;
+      stac.description = "Access all EO data offered by CREODIAS through their STAC API.";
+    }
+    return stac;
+  },
+  authConfig: {
+    type: "openIdConnect",
+    openIdConnectUrl: "https://identity.cloudferro.com/auth/realms/creodias-new/.well-known/openid-configuration"
+  },
   crs: {},
   footerLinks: null
 };
