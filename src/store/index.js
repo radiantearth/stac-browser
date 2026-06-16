@@ -477,9 +477,14 @@ function getStore(config, router) {
           let parsedValue = value;
           
           if (typeof value === 'string') {
-            const decodedValue = decodeURIComponent(value);
+            let decodedValue = value;
+            try {
+              decodedValue = decodeURIComponent(value);
+            } catch {
+              decodedValue = value;
+            }
             if (['q', 'collections', 'ids'].includes(field)) {
-              parsedValue = value.split(',');
+              parsedValue = decodedValue.split(',');
             } else if (field === 'bbox') {
               parsedValue = value.split(',').map(Number);
             } else if (field === 'datetime') {

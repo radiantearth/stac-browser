@@ -420,16 +420,8 @@ export default defineComponent({
       return min instanceof Date && max instanceof Date && min.getTime() === max.getTime();
     },
     searchQ: {
-      get() {
-        const storeQ = this.activeParams?.q;
-        if (JSON.stringify(storeQ) !== JSON.stringify(this._cachedQ)) {
-          this._cachedQ = Array.isArray(storeQ) ? [...storeQ] : [];
-        }
-        return this._cachedQ;
-      },
-      set(value) {
-        this.commitToVuex('q', value);
-      }
+      get() { return this.activeParams?.q || []; },
+      set(val) { this.commitToVuex('q', val); }
     },
     searchLimit: {
       get() {
@@ -451,19 +443,8 @@ export default defineComponent({
       set(val) { this.commitToVuex('bbox', val); }
     },
     searchIds: {
-      get() { 
-        const storeIds = this.activeParams?.ids;
-        if (JSON.stringify(storeIds) !== JSON.stringify(this._cachedIds)) {
-          this._cachedIds = Array.isArray(storeIds) ? [...storeIds] : [];
-        }
-        return this._cachedIds;
-      },
-      set(value) {
-        if (Array.isArray(value) && value.length === 0 && this._cachedIds && this._cachedIds.length > 0) {
-          return; 
-        }
-        this.commitToVuex('ids', value);
-      }
+      get() { return this.activeParams?.ids || []; },
+      set(val) { this.commitToVuex('ids', val); }
     },
   },
   watch: {
@@ -766,9 +747,8 @@ export default defineComponent({
       if (!hasText(term)) {
         return;
       }
-      const currentQ = [...this.searchQ]; 
-      currentQ.push(term);
-      this.searchQ = currentQ;
+      const currentQ = this.activeParams?.q || [];
+      this.commitToVuex('q', [...currentQ, term]);
     },
     addCollection(collection) {
       if (!this.collectionSelectOptions.taggable) {
@@ -780,9 +760,8 @@ export default defineComponent({
       this.collections.push(opt);
     },
     addId(id) {
-      const currentIds = [...this.searchIds];
-      currentIds.push(id);
-      this.searchIds = currentIds; 
+      const currentIds = this.activeParams?.ids || [];
+      this.commitToVuex('ids', [...currentIds, id]);
     },
     formatSort() {
       if (this.canSort && this.sortTerm && this.sortTerm.value && this.sortOrder) {
