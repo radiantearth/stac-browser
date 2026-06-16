@@ -557,6 +557,21 @@ export default defineComponent({
     }
     Promise.all(promises).finally(() => this.loaded = true);
   },
+   mounted() {
+    const p = this.activeParams || {};
+    const hasFilters = Object.values(p).some(val => {
+      if (Array.isArray(val)) {
+        return val.length > 0;
+      }
+      return val !== null && val !== undefined && val !== '';
+    });
+
+    if (hasFilters) {
+      this.$nextTick(() => {
+        this.onSubmit();
+      });
+    }
+  },
   methods: {
     resetSearchCollection() {
       clearTimeout(this.collectionsLoadingTimer);
