@@ -557,7 +557,7 @@ export default defineComponent({
     }
     Promise.all(promises).finally(() => this.loaded = true);
   },
-   mounted() {
+  mounted() {
     const p = this.activeParams || {};
     const hasFilters = Object.values(p).some(val => {
       if (Array.isArray(val)) {
