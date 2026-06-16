@@ -396,7 +396,10 @@ export default defineComponent({
         return Array.isArray(dt) ? dt.map(d => Utils.dateFromUTC(d)) : null;
       },
       set(val) {
-        const dt = Array.isArray(val) ? val.map(d => Utils.dateToUTC(d)) : null;
+        const dt = Array.isArray(val) ? val.map(d => {
+          const utc = Utils.dateToUTC(d);
+          return utc instanceof Date ? utc.toISOString() : utc;
+        }) : null;
         this.commitToVuex('datetime', dt);
       }
     },
@@ -418,8 +421,11 @@ export default defineComponent({
     },
     searchQ: {
       get() {
-        const q = this.activeParams?.q;
-        return Array.isArray(q) ? [...q] : [];
+        const storeQ = this.activeParams?.q;
+        if (JSON.stringify(storeQ) !== JSON.stringify(this._cachedQ)) {
+          this._cachedQ = Array.isArray(storeQ) ? [...storeQ] : [];
+        }
+        return this._cachedQ;
       },
       set(value) {
         this.commitToVuex('q', value);
@@ -446,10 +452,18 @@ export default defineComponent({
     },
     searchIds: {
       get() { 
-        const ids = this.activeParams?.ids;
-        return Array.isArray(ids) ? [...ids] : [];
+        const storeIds = this.activeParams?.ids;
+        if (JSON.stringify(storeIds) !== JSON.stringify(this._cachedIds)) {
+          this._cachedIds = Array.isArray(storeIds) ? [...storeIds] : [];
+        }
+        return this._cachedIds;
       },
-      set(value) { this.commitToVuex('ids', value); }
+      set(value) {
+        if (Array.isArray(value) && value.length === 0 && this._cachedIds && this._cachedIds.length > 0) {
+          return; 
+        }
+        this.commitToVuex('ids', value);
+      }
     },
   },
   watch: {
@@ -490,9 +504,11 @@ export default defineComponent({
     'activeParams.bbox': {
       immediate: true,
       handler(newBbox) {
-        if (newBbox && newBbox.length > 0) {
-          this.provideBBox = '1';
-          this.bbox = newBbox; 
+        if (newBbox && Array.isArray(newBbox) && newBbox.length > 0) {
+          this.bbox = newBbox;
+          this.$nextTick(() => {
+            this.provideBBox = '1';
+          });
         }
       } 
     },
@@ -521,6 +537,8 @@ export default defineComponent({
     formId++;
   },
   created() {
+    this.rebuildFromUrl();
+    this.syncVuexToUrl();
     let promises = [];
     if (this.stac && this.type !== 'Collections') {
       if (this.cql) {
@@ -784,6 +802,59 @@ export default defineComponent({
       } 
       else {
         this.$store.commit('search/setItemFilters', { [field]: value });
+      }
+
+      let urlValue = value;
+      if (Array.isArray(value)) {
+        if (field === 'datetime') {
+          urlValue = value.map(d => d instanceof Date ? d.toISOString() : d).join('/');
+        } else {
+          urlValue = value.join(',');
+        }
+      }
+      
+      this.$store.commit('updateState', { 
+        type: `s.${field}`, 
+        value: (urlValue === '' || urlValue === null) ? undefined : urlValue 
+      });
+    },
+    rebuildFromUrl() {
+      const sqp = this.$store.state.stateQueryParameters;
+      
+      for (const [key, value] of Object.entries(sqp)) {
+        if (key.startsWith('s.') && value !== null && value !== undefined) {
+          const field = key.replace('s.', '');
+          let parsedValue = value;
+          
+          if (typeof value === 'string') {
+            const decodedValue = decodeURIComponent(value);
+            
+            if (['q', 'collections', 'ids'].includes(field)) {
+              parsedValue = decodedValue.split(',');
+            } else if (field === 'bbox') {
+              parsedValue = decodedValue.split(',').map(Number);
+            } else if (field === 'datetime') {
+              parsedValue = decodedValue.includes('/') ? decodedValue.split('/') : decodedValue.split(',');
+            } else if (field === 'limit') {
+              parsedValue = Number.parseInt(decodedValue, 10);
+            }
+          }
+          
+          this.commitToVuex(field, parsedValue);
+        }
+      }
+    },
+    syncVuexToUrl() {
+      const params = this.activeParams || {};
+      
+      for (const [field, value] of Object.entries(params)) {
+        let urlValue = value;
+        if (Array.isArray(value)) {urlValue = value.join(',');}
+        
+        this.$store.commit('updateState', { 
+          type: `s.${field}`, 
+          value: (urlValue === '' || urlValue === null || urlValue === undefined) ? undefined : urlValue 
+        });
       }
     },
   }

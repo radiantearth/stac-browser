@@ -31,7 +31,15 @@ function getStore(config, router) {
     stateQueryParameters: {
       language: null,
       asset: [],
-      itemdef: []
+      itemdef: [],
+      's.q': [],
+      's.datetime': null,
+      's.bbox': null,
+      's.limit': null,
+      's.collections': [],
+      's.ids': [],
+      's.sortby': null,
+      's.filters': null
     },
 
     apiItems: [],
@@ -462,6 +470,31 @@ function getStore(config, router) {
         }
         else {
           state.stateQueryParameters[type] = value;
+        }
+
+        if (type.startsWith('s.') && value) {
+          const field = type.replace('s.', '');
+          let parsedValue = value;
+          
+          if (typeof value === 'string') {
+            const decodedValue = decodeURIComponent(value);
+            if (['q', 'collections', 'ids'].includes(field)) {
+              parsedValue = value.split(',');
+            } else if (field === 'bbox') {
+              parsedValue = value.split(',').map(Number);
+            } else if (field === 'datetime') {
+              parsedValue = value.includes('/') ? value.split('/') : value.split(',');
+            } else if (field === 'limit') {
+              parsedValue = Number.parseInt(value, 10);
+            }
+          }
+
+          if (['datetime', 'bbox', 'limit'].includes(field)) {
+            state.search.shared[field] = parsedValue;
+          } else {
+            state.search.collectionFilters[field] = parsedValue;
+            state.search.itemFilters[field] = parsedValue;
+          }
         }
       },
       openCollapsible(state, { type, uid }) {
