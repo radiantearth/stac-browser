@@ -69,3 +69,24 @@ export async function getSearchState(page) {
     };
   });
 }
+
+/**
+ * Waits for the Vuex store to be ready, then dispatches an action.
+ *
+ * @param {import('@playwright/test').Page} page
+ * @param {string} action - Fully-namespaced action name (e.g. 'search/resetForCollection').
+ * @param {*} [payload] - Optional action payload. Must be JSON-serializable.
+ */
+export async function dispatchToStore(page, action, payload) {
+  await page.waitForFunction(
+    async ({ action, payload }) => {
+      const store = document.querySelector('[data-v-app]')
+        ?.__vue_app__?.config?.globalProperties?.$store;
+      if (!store?.state?.search || !store.state.browserReady) return false;
+      await store.dispatch(action, payload);
+      return true;
+    },
+    { action, payload },
+    { timeout: 10000 }
+  );
+}

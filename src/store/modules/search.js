@@ -1,3 +1,6 @@
+import Cql from '../../models/cql2/cql';
+import CqlLogicalOperator, { CqlNot } from '../../models/cql2/operators/logical';
+
 const defaultShared = () => ({
   datetime: null,   
   bbox: null,       
@@ -10,6 +13,8 @@ const defaultFilterSet = () => ({
   collections: [],
   sortby: null,
   filters: null,
+  rawFilters: [],
+  filterLogic: { andOr: 'and', negate: false },
 });
 
 export default {
@@ -24,15 +29,20 @@ export default {
 
   getters: {
     // Full merged filter objects ready to hand to Utils.addFiltersToLink
-    collectionSearchParams: (state) => ({
-      ...state.shared,
-      ...state.collectionFilters,
-    }),
-    itemSearchParams: (state) => ({
-      ...state.shared,
-      ...state.itemFilters,
-    }),
-
+    collectionSearchParams: (state) => {
+      const { rawFilters, filterLogic, ...apiFilters } = state.collectionFilters;
+      return {
+        ...state.shared,
+        ...apiFilters,
+      };
+    },
+    itemSearchParams: (state) => {
+      const { rawFilters, filterLogic, ...apiFilters } = state.itemFilters;
+      return {
+        ...state.shared,
+        ...apiFilters,
+      };
+    },
     hasActiveFilters: (state) => {
       const s = state.shared;
       const isActive = (f) => (
@@ -83,4 +93,48 @@ export default {
       state.droppedFilters = [];
     },
   },
+    actions: {
+    async resetForCollection({ commit, state }, { collection, fetchQueryables }) {
+      const raw = state.itemFilters.rawFilters;
+
+      if (!Array.isArray(raw) || raw.length === 0) {
+        commit('resetAll');
+        return;
+      }
+
+      let queryables = [];
+      try {
+        queryables = await fetchQueryables(collection);
+      } catch (e) {
+        console.error('failed to fetch queryables for reconciliation', e);
+        commit('resetAll');
+        return;
+      }
+
+      const supportedIds = new Set(queryables.map(q => q.id));
+      const compatible = raw.filter(f => supportedIds.has(f.queryable.id));
+      const dropped = raw.filter(f => !supportedIds.has(f.queryable.id));
+      const { andOr, negate } = state.itemFilters.filterLogic;
+
+      let rebuiltCql = null;
+      if (compatible.length > 0 && compatible.every(f => f.operator)) {
+        const args = compatible.map(f => {
+          let filter = new f.operator(f.queryable, f.value);
+          return f.negate ? new CqlNot(filter) : filter;
+        });
+        let logical = CqlLogicalOperator.create(andOr, args);
+        if (negate) logical = new CqlNot(logical);
+        rebuiltCql = new Cql(logical, null);
+      }
+
+      commit('resetShared');
+      commit('resetCollectionFilters');
+      commit('setDroppedFilters', dropped);
+      commit('setItemFilters', {
+        filters: rebuiltCql,
+        rawFilters: compatible,
+        filterLogic: { andOr, negate },
+      });
+    }
+  }
 };

@@ -48,6 +48,15 @@
         <Catalogs :catalogs="catalogs" :hasMore="hasMore" @load-more="loadMoreCollections" />
         <WidgetHook id="view-catalog-catalogs-end" />
       </b-col>
+      <b-alert
+        v-if="hasDroppedFilters"
+        variant="warning"
+        dismissible
+        class="mb-3"
+        @dismissed="$store.commit('search/clearDroppedFilters')"
+      >
+        {{ $t('search.droppedFilters', { count: droppedFilterCount }) }}
+      </b-alert>
       <b-col class="items-container" v-if="hasItems || hasItemAssets">
         <WidgetHook id="view-catalog-items-start" />
         <Items
@@ -80,8 +89,11 @@ import { hasText, isObject } from 'stac-js/src/utils.js';
 import { addSchemaToDocument, createCatalogSchema } from '../schema-org';
 import { ItemCollection } from '../models/stac.js';
 import DeprecationMixin from '../components/DeprecationMixin.js';
-import { BTab, BTabs, BCard } from 'bootstrap-vue-next';
+import { BTab, BTabs, BCard, BAlert } from 'bootstrap-vue-next';
 import { getIgnoredFields } from '../ignored-metadata.js';
+import refParser from '@apidevtools/json-schema-ref-parser';
+import { stacRequest } from '../store/utils';
+import Queryable from '../models/cql2/queryable';
 
 export default defineComponent({
   name: "Catalog",
@@ -89,6 +101,7 @@ export default defineComponent({
     BTab,
     BTabs,
     BCard,
+    BAlert,
     AnonymizedNotice: defineAsyncComponent(() => import('../components/AnonymizedNotice.vue')),
     Assets: defineAsyncComponent(() => import('../components/Assets.vue')),
     Catalogs,
@@ -117,6 +130,10 @@ export default defineComponent({
   computed: {
     ...mapState(['data', 'url', 'apiCatalogPriority',  'apiItems', 'apiItemsLink', 'apiItemsPagination', 'apiItemsNumberMatched', 'nextCollectionsLink', 'stateQueryParameters']),
     ...mapGetters(['catalogs', 'collectionLink', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
+    ...mapGetters('search', ['hasDroppedFilters']),
+    droppedFilterCount() {
+      return this.$store.state.search.droppedFilters.length;
+    },
     ignoredMetadataFields() {
       return getIgnoredFields(this.data, 'CatalogLike');
     },
@@ -219,13 +236,38 @@ export default defineComponent({
   watch: {
     data: {
       immediate: true,
-      handler(data) {
+      async handler(newData, oldData) {
         try {
-          let schema = createCatalogSchema(data, [this.parentLink, this.rootLink], this.$store);
+          let schema = createCatalogSchema(newData, [this.parentLink, this.rootLink], this.$store);
           addSchemaToDocument(document, schema);
         } catch (error) {
           console.error(error);
         }
+
+        if (!oldData) return;
+        if (!newData?.isCollection) return;
+        if (!this.$store.getters['search/hasActiveFilters']) return;
+        if (oldData?.id === newData?.id) return;
+
+        await this.$store.dispatch('search/resetForCollection', {
+          collection: newData,
+          fetchQueryables: async (collection) => {
+            const link = collection.getQueryablesLink?.();
+            if (!isObject(link)) return [];
+            const response = await stacRequest(this.$store, link);
+            if (!isObject(response.data)) return [];
+            let schemas;
+            try {
+              schemas = await refParser.dereference(response.data);
+            } catch (e) {
+              console.error(e);
+              schemas = response.data;
+            }
+            if (!isObject(schemas?.properties)) return [];
+            return Object.entries(schemas.properties)
+              .map(([key, schema]) => new Queryable(key, schema));
+          }
+        });
       }
     }
   },
