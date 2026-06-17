@@ -1,0 +1,89 @@
+// ============================================================================
+// Project overrides + accessibility layer
+// ----------------------------------------------------------------------------
+// Loaded last (after variables, bootstrap, tokens and page.scss) so it can
+// refine the compiled theme. SCSS variables from variables.scss and the CSS
+// custom properties from tokens.scss are both in scope here.
+// ============================================================================
+
+// ----------------------------------------------------------------------------
+// Skip link — lets keyboard / screen-reader users jump past the header chrome
+// straight to the main content. Hidden off-screen until focused.
+// ----------------------------------------------------------------------------
+.skip-link {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: $zindex-fixed + 10;
+  padding: 0.5rem 1rem;
+  background: var(--ifm-color-primary, #{$primary});
+  color: #fff;
+  font-weight: 600;
+  border-radius: 0 0 $border-radius 0;
+  transform: translateY(-110%);
+  transition: transform 0.15s ease-in-out;
+
+  &:focus,
+  &:focus-visible {
+    transform: translateY(0);
+    color: #fff;
+    text-decoration: none;
+    outline: 2px solid #fff;
+    outline-offset: -4px;
+  }
+}
+
+// ----------------------------------------------------------------------------
+// Keyboard focus visibility
+// ----------------------------------------------------------------------------
+// Bootstrap suppresses the native outline on several interactive elements in
+// favour of a box-shadow ring that only shows on `:focus`. That ring is easy
+// to lose against busy backgrounds and fires on mouse clicks too. Give keyboard
+// users (`:focus-visible`) a consistent, high-contrast outline instead.
+#stac-browser {
+  a:focus-visible,
+  button:focus-visible,
+  .btn:focus-visible,
+  .list-group-item:focus-visible,
+  .nav-link:focus-visible,
+  [tabindex]:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  summary:focus-visible {
+    outline: 2px solid var(--ifm-color-primary, #{$primary});
+    outline-offset: 2px;
+    box-shadow: none;
+  }
+
+  // The wrapper that the skip link targets should not draw a ring of its own
+  // when it receives programmatic focus.
+  #main-content:focus,
+  #main-content:focus-visible {
+    outline: none;
+  }
+}
+
+// ----------------------------------------------------------------------------
+// Footer contrast — the muted "powered by" text on the light footer fell below
+// the WCAG AA 4.5:1 threshold. Lift it to the secondary-text token.
+// ----------------------------------------------------------------------------
+#stac-browser > footer {
+  .text-muted {
+    color: $footer-link-color !important;
+  }
+}
+
+// ----------------------------------------------------------------------------
+// Respect users who ask for reduced motion.
+// ----------------------------------------------------------------------------
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

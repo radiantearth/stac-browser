@@ -417,9 +417,9 @@ $primary-color: map-get($theme-colors, "primary");
 #stac-browser {
 
   .multiselect__tags:focus-within {
-    border-color: #48cce1;
+    border-color: $input-focus-border-color;
     outline: 0;
-    box-shadow: 0 0 0 0.2rem rgba(24, 129, 145, 0.25);
+    box-shadow: $input-focus-box-shadow;
   }
 
   .multiselect__select:before {
@@ -429,7 +429,7 @@ $primary-color: map-get($theme-colors, "primary");
 
   .multiselect__tags,
   .multiselect__single {
-    border-color: #ccc;
+    border-color: $input-border-color;
     padding-left: 0.75rem;
     font-size: 16px;
     height: 100%;
@@ -453,7 +453,7 @@ $primary-color: map-get($theme-colors, "primary");
   }
 
   .multiselect__placeholder {
-    color: #999;
+    color: $gray-600;
     font-size: 16px;
   }
 }

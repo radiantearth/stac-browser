@@ -107,11 +107,11 @@
             <div class="data-grid">
               <div class="data-row" v-if="licenses">
                 <span class="data-label">License</span>
-                <span class="data-value" v-html="licenses"></span>
+                <span class="data-value" v-html="licenses" />
               </div>
               <div class="data-row" v-if="temporalExtents">
                 <span class="data-label">Temporal Extent</span>
-                <span class="data-value" v-html="temporalExtents"></span>
+                <span class="data-value" v-html="temporalExtents" />
               </div>
             </div>
           </div>

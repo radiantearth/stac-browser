@@ -1,5 +1,6 @@
 .DS_Store
 .cache/
+.claude
 node_modules
 /dist
 
@@ -8,6 +9,8 @@ node_modules
 .env
 .env.local
 .env.*.local
+.venv
+
 
 # lock files
 /yarn.lock

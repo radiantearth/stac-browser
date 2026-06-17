@@ -1,6 +1,5 @@
 <template>
   <div class="item" :key="data.id">
-    
     <!-- Viewport Section: Map + Primary Info -->
     <section class="viewport-section mb-4">
       <div class="map-wrapper">
@@ -35,19 +34,18 @@
         <Assets v-if="hasAssets" :assets="assets" :context="data" :shown="shownAssets" @showAsset="showAsset" />
         
         <div v-if="additionalLinks.length > 0" class="mt-4">
-           <Links :title="$t('additionalResources')" :links="additionalLinks" :context="data" />
+          <Links :title="$t('additionalResources')" :links="additionalLinks" :context="data" />
         </div>
         
         <!-- Collection Hierarchy Link -->
         <div v-if="collectionLink" class="mt-4">
-           <h5 class="text-uppercase small font-weight-bold text-muted mb-3">Hierarchy</h5>
-           <CollectionLink :link="collectionLink" />
+          <h5 class="text-uppercase small font-weight-bold text-muted mb-3">Hierarchy</h5>
+          <CollectionLink :link="collectionLink" />
         </div>
       </b-col>
 
       <!-- Right Column: Technical Specs & Metadata -->
       <b-col lg="4" class="right">
-        
         <!-- Tech Card: Geospatial Scope -->
         <div class="tech-card">
           <div class="tech-card-header">
@@ -62,7 +60,7 @@
               <span class="data-label">Bounding Box</span>
               <span class="data-value">
                 [{{ formatCoord(data.bbox[0]) }}, {{ formatCoord(data.bbox[1]) }}, 
-                 {{ formatCoord(data.bbox[2]) }}, {{ formatCoord(data.bbox[3]) }}]
+                {{ formatCoord(data.bbox[2]) }}, {{ formatCoord(data.bbox[3]) }}]
               </span>
             </div>
             <div class="data-row" v-if="data.id">
@@ -132,15 +130,6 @@ export default {
     ...mapState(['data', 'url']),
     ...mapGetters(['additionalLinks', 'collectionLink', 'parentLink'])
   },
-  methods: {
-    formatCoord(num) {
-      return typeof num === 'number' ? num.toFixed(4) : num;
-    },
-    formatTime(str) {
-      if (!str) return 'N/A';
-      return str.replace('T', ' ').replace('Z', '');
-    }
-  },
   watch: {
     data: {
       immediate: true,
@@ -152,6 +141,15 @@ export default {
           console.error(error);
         }
       }
+    }
+  },
+  methods: {
+    formatCoord(num) {
+      return typeof num === 'number' ? num.toFixed(4) : num;
+    },
+    formatTime(str) {
+      if (!str) {return 'N/A';}
+      return str.replace('T', ' ').replace('Z', '');
     }
   }
 };

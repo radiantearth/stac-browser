@@ -1,0 +1,72 @@
+// ============================================================================
+// Design tokens — Stormwater Heatmap design system
+// ----------------------------------------------------------------------------
+// CSS custom properties consumed by the new chrome (navbar, toolbar, sidebar,
+// asset cards, drawer). These switch at runtime via [data-theme="dark"] on
+// <html>. Bootstrap-vue widgets stay on their SCSS-compiled light palette;
+// see variables.scss for the compile-time overrides that keep the two in sync.
+// ============================================================================
+
+:root {
+  --ifm-color-primary: #2e8555;
+  --ifm-color-primary-dark: #29784c;
+  --ifm-color-primary-darker: #277148;
+  --ifm-color-primary-darkest: #205d3b;
+  --ifm-color-primary-light: #33925d;
+  --ifm-color-primary-lighter: #359962;
+  --ifm-color-primary-lightest: #3cad6e;
+
+  --ifm-navbar-background-color: #24292e;
+  --ifm-global-radius: 4px;
+  --ifm-navbar-height: 60px;
+
+  // Surfaces + neutrals
+  --bg: #ffffff;
+  --bg-subtle: #f5f6f7;
+  --bg-sunken: #eef0f1;
+  --border: #e1e4e8;
+  --border-strong: #d0d4d9;
+  --text: #1b1b1d;
+  --text-secondary: #57606a;
+  --text-muted: #8b949e;
+
+  // Asset-type accents
+  --vector-blue: #3388ff;
+  --vector-tint-bg: #e7f0fb;
+  --vector-tint-text: #1c5fb0;
+  --raster-tint-bg: #e9f3ec;
+  --raster-tint-text: #277148;
+
+  // Layout
+  --toolbar-height: 56px;
+  --max-width: 1140px;
+  --sidebar-width: 248px;
+
+  // Type
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, Cantarell, sans-serif;
+  --font-mono: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+[data-theme="dark"] {
+  --ifm-color-primary: #35d058;
+  --ifm-color-primary-dark: #2cbf4d;
+  --ifm-color-primary-darker: #2ab449;
+  --ifm-color-primary-darkest: #22943c;
+  --ifm-color-primary-light: #4ad569;
+  --ifm-color-primary-lighter: #55d772;
+  --ifm-color-primary-lightest: #75df8d;
+
+  --bg: #1b1b1d;
+  --bg-subtle: #242528;
+  --bg-sunken: #1f2022;
+  --border: #34363a;
+  --border-strong: #43464c;
+  --text: #eeeeee;
+  --text-secondary: #b8bcc4;
+  --text-muted: #80858f;
+
+  --vector-tint-bg: #16304d;
+  --vector-tint-text: #6fa8ff;
+  --raster-tint-bg: #1d3a2a;
+  --raster-tint-text: #4ad569;
+}

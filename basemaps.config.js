@@ -7,12 +7,12 @@ const WMS = 'LWMSTileLayer';
 const XYZ = 'LTileLayer';
 
 const BASEMAPS = {
-  earth: {
-    url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-    name: 'OpenStreetMap',
-    is: XYZ,
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors.'
-  },
+earth: {
+  url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+  name: 'CARTO Positron',
+  is: XYZ,
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions" target="_blank">CARTO</a>.'
+},
   europa: {
     baseUrl: 'https://planetarymaps.usgs.gov/cgi-bin/mapserv?map=/maps/jupiter/europa_simp_cyl.map',
     is: WMS,

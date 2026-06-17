@@ -1,10 +1,10 @@
 <template>
   <b-row>
-    <b-col md="12">
+    <b-col md="10">
       <Source class="float-right" :title="title" :stacUrl="url" :stac="data" />
       <h1>
         <template v-if="icon">
-          <img :src="icon.href" :alt="icon.title" :title="icon.title" class="icon mr-2">
+          <img :src="icon.href" :alt="icon.title || title" :title="icon.title" class="icon mr-2">
         </template>
         <span class="title">{{ title }}</span>
       </h1>

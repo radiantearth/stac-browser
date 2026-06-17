@@ -1,5 +1,6 @@
 <template>
   <b-container id="stac-browser">
+    <a class="skip-link" href="#main-content">{{ $t('skipToContent') }}</a>
     <Authentication v-if="showLogin" />
     <ErrorAlert v-if="globalError" dismissible class="global-error" v-bind="globalError" @close="hideError" />
     <Sidebar v-if="sidebar" />
@@ -11,7 +12,9 @@
         <StacHeader @enableSidebar="sidebar = true" />
       </header>
       <!-- Content (Item / Catalog) -->
-      <router-view />
+      <div id="main-content" tabindex="-1">
+        <router-view />
+      </div>
     </div>
     <footer>
       <i18n tag="small" path="poweredBy" class="poweredby text-muted">
@@ -392,6 +395,7 @@ export default {
 @import "./theme/variables.scss";
 @import '~bootstrap/scss/bootstrap.scss';
 @import '~bootstrap-vue/src/index.scss';
+@import "./theme/tokens.scss";
 @import "./theme/page.scss";
 @import "./theme/custom.scss";
 </style>

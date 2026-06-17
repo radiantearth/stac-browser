@@ -8,8 +8,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&family=Noto+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap');
 
-// Font families
-$font-family-sans-serif: 'Noto Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+// Font families — kept in sync with --font-sans / --font-mono in tokens.scss.
+$font-family-sans-serif: system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, sans-serif;
 $font-family-serif: 'Merriweather', Georgia, "Times New Roman", Times, serif;
 $font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 $font-family-base: $font-family-sans-serif;
@@ -34,16 +34,20 @@ $headings-line-height: 1.2;
 // Colors - Matching Reference Site
 // ----------------------------------------------------------------------------
 
-// Primary brand colors
-$primary: #3da237;
-$primary-dark: #2b7126;
-$primary-darker: #348a2f;
-$primary-light: #43b23d;
-$primary-lighter: #5bc555;
+// Primary brand colors — kept in sync with --ifm-color-primary* in tokens.scss
+// (light palette). Bootstrap is SCSS-compile-time, so these must mirror the
+// CSS-variable values rather than reference them.
+$primary: #2e8555;
+$primary-dark: #29784c;
+$primary-darker: #277148;
+$primary-darkest: #205d3b;
+$primary-light: #33925d;
+$primary-lighter: #359962;
+$primary-lightest: #3cad6e;
 
 // Secondary/neutral colors
-$secondary: #3c3c3c;
-$dark: #2b7126;
+$secondary: #57606a;
+$dark: #24292e;
 $light: #f5f6f7;
 
 // Grayscale
@@ -65,9 +69,9 @@ $info: #17a2b8;
 $warning: #ffc107;
 $danger: #dc3545;
 
-// Body
-$body-bg: #F6F7F9;
-$body-color: $gray-900;
+// Body — mirrors --bg / --text from tokens.scss (light)
+$body-bg: #ffffff;
+$body-color: #1b1b1d;
 
 // Links
 $link-color: $primary;
@@ -90,28 +94,32 @@ $theme-colors: (
 );
 
 // ----------------------------------------------------------------------------
-// Navigation/Header
-// ----------------------------------------------------------------------------
-$navbar-bg: #3c3c3c;
+// Navigation/Header — mirrors --ifm-navbar-* tokens.
+// $navbar-height matches --ifm-navbar-height (60px) and --toolbar-height (56px)
+// is added on top for the sticky toolbar row.
+$navbar-bg: #24292e;
 $navbar-color: #f5f6f7;
-$navbar-link-color: #f5f6f7;
-$navbar-link-hover-color: rgba(255, 255, 255, 0.8);
+$navbar-link-color: #c4c8cd;
+$navbar-link-hover-color: #ffffff;
 $navbar-brand-font-size: 0.9rem;
-$navbar-nav-link-font-size: 0.8rem;
-$navbar-nav-link-font-weight: bold;
+$navbar-nav-link-font-size: 0.875rem;
+$navbar-nav-link-font-weight: 500;
 $navbar-padding-y: 0.5rem;
-$navbar-padding-x: 1rem;
+$navbar-padding-x: 1.5rem;
+$navbar-height: 60px;
+$toolbar-height: 56px;
 
-// Header margin (adjust based on your fixed header height)
+// Existing layout body offset. Phase 2 will swap this to $navbar-height +
+// $toolbar-height when the new chrome lands.
 $header-margin: 4rem;
 
 // ----------------------------------------------------------------------------
 // Footer
 // ----------------------------------------------------------------------------
-$footer-bg: #3c3c3c;
-$footer-color: #f5f6f7;
-$footer-link-color: #f5f6f7;
-$footer-link-hover-color: rgba(255, 255, 255, 0.8);
+$footer-bg: #f5f6f7;
+$footer-color: #8b949e;
+$footer-link-color: #57606a;
+$footer-link-hover-color: #1b1b1d;
 
 // ----------------------------------------------------------------------------
 // Spacing
@@ -138,9 +146,10 @@ $border-radius: 4px;
 $border-radius-lg: 4px;
 $border-radius-sm: 4px;
 
-// Borders
+// Borders — mirrors --border from tokens.scss (light)
 $border-width: 1px;
-$border-color: $gray-300;
+$border-color: #e1e4e8;
+$border-color-strong: #d0d4d9;
 
 // Box shadows
 $box-shadow-sm: 0 0.125rem 0.25rem rgba($black, 0.075);
@@ -163,13 +172,13 @@ $btn-font-weight: $font-weight-normal;
 $btn-border-radius: $border-radius;
 $btn-border-width: $border-width;
 
-// Forms
+// Forms — focus ring matches the mockup's primary-tinted glow
 $input-padding-y: 0.5rem;
 $input-padding-x: 0.75rem;
-$input-border-color: #ccc;
+$input-border-color: $border-color;
 $input-border-radius: $border-radius;
-$input-focus-border-color: #48cce1;
-$input-focus-box-shadow: 0 0 0 0.2rem rgba(24, 129, 145, 0.25);
+$input-focus-border-color: $primary-light;
+$input-focus-box-shadow: 0 0 0 0.2rem rgba(46, 133, 85, 0.18);
 
 // Badges
 $badge-font-size: 0.75rem;
