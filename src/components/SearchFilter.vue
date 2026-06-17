@@ -328,6 +328,12 @@ export default defineComponent({
         : this.itemSearchParams;
       return params || {};
     },
+    activeFilterLogic() {
+      const filters = this.type === 'Collections'
+        ? this.$store.state.search.collectionFilters
+        : this.$store.state.search.itemFilters;
+      return filters?.filterLogic || null;
+    },
     canSearchCollectionsFreeText() {
       return this.canSearchCollections && this.supportsConformance(TYPES.Collections.FreeText);
     },
@@ -465,6 +471,18 @@ export default defineComponent({
         this.updateApiCollections();
       }
     },
+    value: {
+      immediate: true,
+      deep: true,
+      handler(newVal) {
+        if (!newVal || Object.keys(newVal).length === 0) {return;}
+        for (const [key, val] of Object.entries(newVal)) {
+          if (val !== undefined && val !== null && val !== '') {
+            this.commitToVuex(key, val);
+          }
+        }
+      }
+    },
     'activeParams.collections': {
       immediate: true,
       deep: true,
@@ -494,10 +512,14 @@ export default defineComponent({
           this.provideBBox = '1';
           this.bbox = newBbox; 
         }
+        else {
+          this.provideBBox = false;
+        }
       } 
     },
-    'activeParams.filterLogic': {
+    activeFilterLogic: {
       immediate: true,
+      deep: true,
       handler(logic) {
         if (!logic) {return;}
         this.filtersAndOr = logic.andOr ?? 'and';
@@ -745,17 +767,20 @@ export default defineComponent({
     onSubmit() {
       this.commitToVuex('sortby', this.formatSort());
       this.commitToVuex('filters', this.buildFilter()); 
-      this.$emit('input', this.activeParams, false);
       this.commitToVuex('filterLogic', {
         andOr: this.filtersAndOr,
         negate: this.filtersNegate,
       });
       this.$emit('input', this.activeParams, false);
-
     },
     async onReset() {
-      Object.assign(this, getDefaults());
-      await this.$store.commit('search/resetAll');
+      Object.assign(this, getDefaults());      
+      this.$store.commit('search/resetShared');      
+      if (this.type === 'Collections') {
+        this.$store.commit('search/resetCollectionFilters');
+      } else {
+        this.$store.commit('search/resetItemFilters');
+      }
       this.$emit('input', this.activeParams, true);
     },
     addSearchTerm(term) {

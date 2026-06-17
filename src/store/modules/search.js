@@ -30,24 +30,16 @@ export default {
   getters: {
     // Full merged filter objects ready to hand to Utils.addFiltersToLink
     collectionSearchParams: (state) => {
-      return {
-        ...state.shared,
-        q: state.collectionFilters.q,
-        ids: state.collectionFilters.ids,
-        collections: state.collectionFilters.collections,
-        sortby: state.collectionFilters.sortby,
-        filters: state.collectionFilters.filters,
-      };
+      const rest = { ...state.collectionFilters };
+      delete rest.rawFilters;
+      delete rest.filterLogic;
+      return { ...state.shared, ...rest };
     },
     itemSearchParams: (state) => {
-      return {
-        ...state.shared,
-        q: state.itemFilters.q,
-        ids: state.itemFilters.ids,
-        collections: state.itemFilters.collections,
-        sortby: state.itemFilters.sortby,
-        filters: state.itemFilters.filters,
-      };
+      const rest = { ...state.itemFilters };
+      delete rest.rawFilters;
+      delete rest.filterLogic;
+      return { ...state.shared, ...rest };
     },
     hasActiveFilters: (state) => {
       const s = state.shared;
