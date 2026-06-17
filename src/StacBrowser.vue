@@ -351,11 +351,12 @@ export default defineComponent({
       const canChange = [
         'apiCatalogPriority',
         'cardViewMode',
+        'crossOriginMedia',
         'defaultCollectionSort',
         'defaultItemSort',
-        'crossOriginMedia',
         'defaultThumbnailSize',
         'displayGeoTiffByDefault',
+        'preferredAssets',
         'showThumbnailsAsAssets'
       ];
 
