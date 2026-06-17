@@ -45,6 +45,7 @@ The override order for the configuration is:
 - [Basic configuration](#basic-configuration)
   - [catalogUrl](#catalogurl)
   - [catalogTitle](#catalogtitle)
+  - [catalogTitleAfterImage](#catalogtitleafterimage)
   - [catalogImage](#catalogimage)
   - [footerLinks](#footerlinks)
   - [apiCatalogPriority](#apicatalogpriority)
@@ -83,7 +84,8 @@ The override order for the configuration is:
   - [collectionsPerPage](#collectionsperpage)
   - [maxEntriesPerPage](#maxentriesperpage)
   - [cardViewMode](#cardviewmode)
-  - [cardViewSort](#cardviewsort)
+  - [defaultCollectionSort](#defaultcollectionsort)
+  - [defaultItemSort](#defaultitemsort)
   - [showKeywordsInItemCards](#showkeywordsinitemcards)
   - [showKeywordsInCatalogCards](#showkeywordsincatalogcards)
   - [showThumbnailsAsAssets](#showthumbnailsasassets)
@@ -110,6 +112,16 @@ If `catalogUrl` is empty or set to `null` STAC Browser switches to a mode where 
 ### catalogTitle
 
 The default title shown if no title can be read from the root STAC catalog.
+
+### catalogTitleAfterImage
+
+A title to use in the header after the `catalogImage`.
+This can be useful in the following cases:
+
+- The image already contains the name and we do not want to show it twice
+- Removing the title in favor of the image - set this value to an empty string then.
+
+Only applies when `catalogImage` is not `null`.
 
 ### catalogImage
 
@@ -509,16 +521,39 @@ The maximum number of items per page that a user can request through the `limit`
 
 The default view mode for lists of catalogs/collections. Either `"list"` or `"cards"` (default).
 
-### cardViewSort
+### defaultCollectionSort
 
-The default sorting for lists of catalogs/collections or items. One of:
+The default sorting for lists of catalogs/collections.
 
-- `"asc"`: ascending sort (default)
-- `"desc"`: descending sort
+This value must conform to the textual representation of `sortby` in STAC APIs.
+
+So if your property for sorting is "title" you have to use:
+
+- `"title"`: ascending sort (default)
+- `"-title"`: descending sort
 - `null`: sorted as in the source
 
-Doesn't apply when API search filters are applied.
-Also doesn't apply when pagination on the server-side is enabled.
+Doesn't apply when the catalog is static and not all information is loaded yet.
+
+### defaultItemSort
+
+The default sorting for lists of items.
+
+This value must conform to the textual representation of `sortby` in STAC APIs.
+
+So if your property for sorting is "datetime" you have to use:
+
+- `"properties.datetime"`: ascending sort
+- `"-properties.datetime"`: descending sort
+
+So if your property for sorting is "id" you have to use:
+
+- `"id"`: ascending sort
+- `"-id"`: descending sort
+
+Alternatively, you can use `null` to keep it sorted as in the source (default).
+
+Doesn't apply when the catalog is static and not all information is loaded yet.
 
 ### showKeywordsInItemCards
 

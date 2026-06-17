@@ -258,7 +258,7 @@ export default defineComponent({
     }, getDefaults());
   },
   computed: {
-    ...mapState(['searchResultsPerPage', 'maxEntriesPerPage', 'uiLanguage']),
+    ...mapState(['defaultCollectionSort', 'defaultItemSort', 'searchResultsPerPage', 'maxEntriesPerPage', 'uiLanguage']),
     ...mapGetters(['canSearchCollections', 'supportsConformance']),
     ...mapGetters('search', ['collectionSearchParams', 'itemSearchParams']),
     collectionSelectOptions() {
@@ -586,7 +586,10 @@ export default defineComponent({
           .catch(error => console.error(error))
       );
     }
-    Promise.all(promises).finally(() => this.loaded = true);
+    Promise.all(promises).finally(() => {
+      this.resetSort();
+      this.loaded = true;
+    });
   },
   methods: {
     resetSearchCollection() {
@@ -825,6 +828,20 @@ export default defineComponent({
         this.$store.commit('search/setItemFilters', { [field]: value });
       }
     },
+    resetSort() {
+      if (!this.canSort) {
+        return;
+      }
+      const defaults = this.type === 'Collections' ? this.defaultCollectionSort : this.defaultItemSort;
+      const sort = Utils.parseApiSortParameter(defaults);
+      if (sort.field) {
+        const sortOption = this.sortOptions.find(option => option.value === sort.field);
+        if (sortOption) {
+          this.sortTerm = sortOption;
+          this.sortOrder = sort.direction;
+        }
+      }
+    }
   }
 });
 </script>

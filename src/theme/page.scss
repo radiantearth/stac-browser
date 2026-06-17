@@ -28,10 +28,6 @@ svg {
   }
 }
 
-#popover-root-btn {
-  border: 0;
-}
-
 #stac-browser {
   display: flex;
   flex-direction: column;
@@ -47,17 +43,37 @@ svg {
   > header {
     .site {
       border-bottom: var(--sb-header-border);
+      
+      @include media-breakpoint-up(lg) {
+        .actions {
+          min-width: 300px;
+        }
+      }
+
+      .user {
+        text-align: right;
+      }
 
       > .col-md-12 {
         > .title {
-          > span {
-            font-size: var(--sb-header-font-size);
-            font-weight: var(--sb-header-font-weight);
-          }
-        }
+          display: flex;
+          align-items: center;
+          gap: var(--sb-header-font-size);
+          
+          .header-title {
+            display: flex;
+            align-items: center;
+            gap: var(--sb-header-font-size);
 
-        .logo {
-          max-height: var(--sb-logo-max-height);
+            .logo {
+              max-height: var(--sb-logo-max-height);
+            }
+
+            span[role="banner"] {
+              font-size: var(--sb-header-font-size);
+              font-weight: var(--sb-header-font-weight);
+            }
+          }
         }
       }
     }
@@ -309,7 +325,8 @@ svg {
   @include media-breakpoint-up(lg) {
     .button-label {
       display: inline-block;
-      margin-left: 0.25rem;
+      margin-left: 0.33rem;
+      margin-right: 0.1rem;
       white-space: nowrap;
     }
   }

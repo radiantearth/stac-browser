@@ -13,15 +13,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - New locales:
   - Swedish
   - Russian
+- New config option `catalogTitleAfterImage` to set a different title in the header after a logo
 
 ### Changed
 
+- Replaced `cardViewSort` with new options `defaultCollectionSort` and `defaultItemSort`
 - Only show language chooser when more than one locale is available
 - Restrict Collection item search date picker to collection's temporal extent
 - Focus temporal extent filter for Collection item search on end of temporal extent
 - Disable temporal extent filter when a single date/time is provided as temporal extent in the Collection metadata
 - Better default STAC title detection within not fully loaded lists where only a URL is available
 - No search / sort functionality available when a static catalog has only a subset of children loaded
+- The default value for `catalogTitle` is `null` instead of `STAC Browser`.
+- Improved how the title is handled
 
 ### Fixed
 
@@ -30,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improve the map control background colors on dark mode.
 - CQL2 text representation of array operators (`a_overlaps`, `a_contains`, `a_equals`, `a_contained_by`) now uses function-call syntax as defined by the CQL2 text grammar
 - Fix loading the root route when a `catalogUrl` is set
+- Fix that in some cases the `catalogUrl` is lost
 
 ## [5.0.0-beta.1] - 2026-05-12
 

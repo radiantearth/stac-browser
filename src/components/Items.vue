@@ -3,7 +3,7 @@
     <header>
       <h2 class="title me-2">{{ $t('stacItem', items.length ) }}</h2>
       <b-badge v-if="itemCount !== null" pill variant="secondary" class="me-4">{{ itemCount }}</b-badge>
-      <SortButtons v-if="!api && items.length > 1" v-model="sort" />
+      <SortButtons v-if="!api && items.length > 1" v-model="sort.direction" />
     </header>
 
     <Pagination
@@ -51,7 +51,7 @@ import Utils from '../utils';
 import { size } from 'stac-js/src/utils.js';
 import Item from './Item.vue';
 import Loading from './Loading.vue';
-import { getDisplayTitle } from '../models/stac';
+import { sortStac } from '../models/stac';
 
 export default defineComponent({
   name: "Items",
@@ -110,11 +110,11 @@ export default defineComponent({
     return {
       shownItems: this.chunkSize,
       filtersOpen: this.showFilters,
-      sort: 0
+      sort: Utils.parseApiSortParameter() // get empty sort object
     };
   },
   computed: {
-    ...mapState(['cardViewSort', 'uiLanguage']),
+    ...mapState(['defaultItemSort', 'uiLanguage']),
     itemCount() {
       if (this.count !== null) {
         return this.count;
@@ -135,12 +135,8 @@ export default defineComponent({
     },
     chunkedItems() {
       let items = this.items;
-      if (!this.apiFilters.sortby && this.sort !== 0) {
-        const collator = new Intl.Collator(this.uiLanguage);
-        items = items.slice(0).sort((a,b) => collator.compare(getDisplayTitle(a), getDisplayTitle(b)));
-        if (this.sort === -1) {
-          items = items.reverse();
-        }
+      if (!this.apiFilters.sortby && this.sort.direction !== 0) {
+        items = sortStac(items, this.sort, this.uiLanguage);
       }
       if (!this.api && this.items.length > this.chunkSize) {
         return items.slice(0, this.shownItems);
@@ -174,7 +170,7 @@ export default defineComponent({
     }
   },
   created() {
-    this.sort = Utils.convertHumanizedSortOrder(this.cardViewSort);
+    this.sort = Utils.parseApiSortParameter(this.defaultItemSort); // get empty sort object
   },
   mounted() {
     if (this.showFilters) {

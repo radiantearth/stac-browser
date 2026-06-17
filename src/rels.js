@@ -20,6 +20,9 @@ export const stacBrowserSpecialHandling = [
   'data',
   'items',
   'search',
+  'aggregate', // (Irrelevant) Extensions v
+  'aggregations',
+  'collections-search',
   'icon', // Other v
   'license',
 ].concat(hierarchical).concat(pagination).concat(queryables);

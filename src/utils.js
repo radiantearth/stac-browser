@@ -1,6 +1,6 @@
 import { URI } from 'stac-js/src/utils.js';
 import removeMd from 'remove-markdown';
-import { Link, Asset } from 'stac-js';
+import { Link } from 'stac-js';
 import { hasText, isObject, size } from 'stac-js/src/utils.js';
 import { geojsonMediaType, imageMediaTypes } from 'stac-js/src/mediatypes.js';
 import { pagination } from "stac-js/src/relationtypes.js";
@@ -170,7 +170,7 @@ export default class Utils {
     return pages;
   }
 
-  static addFiltersToLink(link, filters = {}, defaultLimit = null) {
+  static addFiltersToLink(link, filters = {}, defaultLimit = null, defaultSort = null) {
     let isEmpty = value => {
       return (value === null
       || (typeof value === 'number' && !Number.isFinite(value))
@@ -187,6 +187,9 @@ export default class Utils {
 
     if (typeof filters.limit !== 'number' && typeof defaultLimit === 'number') {
       filters.limit = defaultLimit;
+    }
+    if (typeof filters.sortby !== 'string' && typeof defaultSort === 'string') {
+      filters.sortby = defaultSort;
     }
 
     if (hasText(link.method) && link.method.toUpperCase() === 'POST') {
@@ -260,6 +263,16 @@ export default class Utils {
       newLink.href = url.toString();
       return newLink;
     }
+  }
+
+  static getIcon(data) {
+    if (data?.isSTAC) {
+      const icons = data.getIcons();
+      if (icons.length > 0) {
+        return icons[0];
+      }
+    }
+    return null;
   }
 
   static titleForHref(href, preferFileName = false) {
@@ -356,20 +369,24 @@ export default class Utils {
     return Utils.mergeDeep(target, ...sources);
   }
 
-  static convertHumanizedSortOrder(value) {
-    switch (value) {
-      case 'asc':
-        return 1;
-      case 'desc':
-        return -1;
-      default:
-        return 0;
+  static parseApiSortParameter(value) {
+    if (typeof value !== 'string') {
+      return { field: null, direction: 0 };
+    }
+    if (value.startsWith('-')) {
+      return { field: value.substring(1), direction: -1 };
+    }
+    else {
+      if (value.startsWith('+')) {
+        value = value.substring(1);
+      }
+      return { field: value, direction: 1 };
     }
   }
 
   static assetFilename(asset, response = null) {
     // Get the preferred filename from the file:local_path property
-    if (asset instanceof Asset) {
+    if (asset?.isAsset) {
       const localPath = asset.getMetadata('file:local_path');
       if (typeof localPath === 'string') {
         return URI(localPath).filename();

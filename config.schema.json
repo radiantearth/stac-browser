@@ -9,7 +9,14 @@
       "format": "uri"
     },
     "catalogTitle": {
-      "type": ["string"]
+      "type": ["string", "null"]
+    },
+    "catalogTitleAfterImage": {
+      "type": ["string", "null"]
+    },
+    "catalogImage": {
+      "type": ["string", "null"],
+      "format": "uri"
     },
     "allowExternalAccess": {
       "type": ["boolean"]
@@ -86,9 +93,11 @@
       "type": ["string"],
       "enum": ["list", "cards"]
     },
-    "cardViewSort": {
-      "type": ["string", "null"],
-      "enum": ["asc", "desc", null]
+    "defaultItemSort": {
+      "type": ["string", "null"]
+    },
+    "defaultCollectionSort": {
+      "type": ["string", "null"]
     },
     "showThumbnailsAsAssets": {
       "type": ["boolean"]

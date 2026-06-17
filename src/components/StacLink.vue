@@ -1,7 +1,9 @@
 <template>
   <component :is="component" class="stac-link" :id="id" :title="tooltip" v-bind="attributes">
-    <img v-if="icon && !hideIcon" :src="icon.getAbsoluteUrl()" :alt="icon.title" :title="icon.title" class="icon me-2">
-    <span class="title">{{ displayTitle }}</span>
+    <slot>
+      <img v-if="icon && !hideIcon" :src="icon.getAbsoluteUrl()" :alt="icon.title" :title="icon.title" class="icon me-2">
+      <span class="title">{{ displayTitle }}</span>
+    </slot>
   </component>
 </template>
 
@@ -163,7 +165,6 @@ export default defineComponent({
       else {
         return this.getRequestUrl(this.link.href);
       }
-
     },
     displayTitle() {
       if (this.title) {

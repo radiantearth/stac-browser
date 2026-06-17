@@ -332,18 +332,23 @@ function getStore(config, router) {
         return relativeStr.startsWith('//') || relativeStr.startsWith('../');
       },
       getRequestUrl: (state, getters) => (url, baseUrl = null, addLocalQueryParams = false) => {
-        let absoluteUrl = toAbsolute(url, baseUrl ? baseUrl : state.url, false);
-        if (!getters.isExternalUrl(absoluteUrl)) {
-          // Check whether private params are present and add them if the URL is part of the catalog
-          addQueryIfNotExists(absoluteUrl, state.privateQueryParameters);
-          // Check if we need to add global request params
-          addQueryIfNotExists(absoluteUrl, state.globalRequestQueryParameters);
-          if (addLocalQueryParams) {
-            // Check if we need to add local request params
-            addQueryIfNotExists(absoluteUrl, state.localRequestQueryParameters);
+        try {
+          let absoluteUrl = toAbsolute(url, baseUrl ? baseUrl : state.url, false);
+          if (!getters.isExternalUrl(absoluteUrl)) {
+            // Check whether private params are present and add them if the URL is part of the catalog
+            addQueryIfNotExists(absoluteUrl, state.privateQueryParameters);
+            // Check if we need to add global request params
+            addQueryIfNotExists(absoluteUrl, state.globalRequestQueryParameters);
+            if (addLocalQueryParams) {
+              // Check if we need to add local request params
+              addQueryIfNotExists(absoluteUrl, state.localRequestQueryParameters);
+            }
           }
+          return absoluteUrl.toString();
+        } catch (e) {
+          console.warn(e);
+          return url;
         }
-        return absoluteUrl.toString();
       },
 
       acceptedLanguages: state => {
@@ -847,6 +852,11 @@ function getStore(config, router) {
         // All tasks finished, show the page if requested
         if (loading.show) {
           cx.commit('showPage', { url });
+          // If we don't have a catalogUrl but have a page to show,
+          // we should assume this URL is the root catalog for now.
+          if (!cx.state.catalogUrl) {
+            await cx.dispatch('config', { catalogUrl: url });
+          }
         }
       },
       async loadApiItems(cx, args) {
@@ -864,7 +874,11 @@ function getStore(config, router) {
             baseUrl = URI(baseUrl);
           }
 
-          link = Utils.addFiltersToLink(link, filters, cx.state.itemsPerPage);
+          let sort = null;
+          if (cx.getters.supportsConformance(TYPES.Items.Sort)) {
+            sort = cx.state.defaultItemSort;
+          }
+          link = Utils.addFiltersToLink(link, filters, cx.state.itemsPerPage, sort);
 
           let response = await stacRequest(cx, link);
           if (!isObject(response.data) || !Array.isArray(response.data.features)) {
@@ -957,7 +971,11 @@ function getStore(config, router) {
             cx.commit('resetApiCollections');
           }
           link = stac.getLinkWithRel('data');
-          link = Utils.addFiltersToLink(link, {}, cx.state.collectionsPerPage);
+          let sort = null;
+          if (cx.getters.supportsConformance(TYPES.Collections.Sort)) {
+            sort = cx.state.defaultCollectionSort;
+          }
+          link = Utils.addFiltersToLink(link, {}, cx.state.collectionsPerPage, sort);
         }
         else { // Second page and after
           stac = cx.state.data;

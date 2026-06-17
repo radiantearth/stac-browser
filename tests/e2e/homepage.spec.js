@@ -16,18 +16,18 @@ const catalogs = JSON.parse(fs.readFileSync(path.resolve(
 )));
 import CONFIG from '../../config.js';
 
-test.describe('STAC Browser Homepage', () => {
+test.describe('STAC Browser Data Source Selection', () => {
   // ensure every test uses the mocked STAC Index response
   test.beforeEach(async ({ worker }) => {
     await mockStacResource(worker, 'https://stacindex.org/api/catalogs', catalogs);
   });
-  test('should load the homepage successfully', async ({ page }) => {
-    // Navigate to the homepage (STAC Index already mocked in beforeEach)
+  test('should load the data source selection successfully', async ({ page }) => {
+    // Navigate to the data source selection (STAC Index already mocked in beforeEach)
     await page.goto(HOME_PATH);
     
     // Check if the page title is visible
     await expect(page.locator('header [role="banner"]')).toBeVisible();
-    
+
     // Verify the page loads without errors
     await expect(page).toHaveTitle(/STAC Browser/);
     
