@@ -330,18 +330,23 @@ function getStore(config, router) {
         return relativeStr.startsWith('//') || relativeStr.startsWith('../');
       },
       getRequestUrl: (state, getters) => (url, baseUrl = null, addLocalQueryParams = false) => {
-        let absoluteUrl = toAbsolute(url, baseUrl ? baseUrl : state.url, false);
-        if (!getters.isExternalUrl(absoluteUrl)) {
-          // Check whether private params are present and add them if the URL is part of the catalog
-          addQueryIfNotExists(absoluteUrl, state.privateQueryParameters);
-          // Check if we need to add global request params
-          addQueryIfNotExists(absoluteUrl, state.globalRequestQueryParameters);
-          if (addLocalQueryParams) {
-            // Check if we need to add local request params
-            addQueryIfNotExists(absoluteUrl, state.localRequestQueryParameters);
+        try {
+          let absoluteUrl = toAbsolute(url, baseUrl ? baseUrl : state.url, false);
+          if (!getters.isExternalUrl(absoluteUrl)) {
+            // Check whether private params are present and add them if the URL is part of the catalog
+            addQueryIfNotExists(absoluteUrl, state.privateQueryParameters);
+            // Check if we need to add global request params
+            addQueryIfNotExists(absoluteUrl, state.globalRequestQueryParameters);
+            if (addLocalQueryParams) {
+              // Check if we need to add local request params
+              addQueryIfNotExists(absoluteUrl, state.localRequestQueryParameters);
+            }
           }
+          return absoluteUrl.toString();
+        } catch (e) {
+          console.warn(e);
+          return url;
         }
-        return absoluteUrl.toString();
       },
 
       acceptedLanguages: state => {
