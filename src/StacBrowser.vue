@@ -17,20 +17,16 @@
               <b-button v-if="canSearch" variant="primary" :to="searchBrowserLink" :title="$t('search.title')" :pressed="isSearchPage">
                 <b-icon-search /><span class="button-label">{{ $t('search.title') }}</span>
               </b-button>
+              <b-button v-if="root" variant="primary" id="popover-root-btn" tabindex="0">
+                <b-icon-database /><span class="button-label">{{ serviceType }}</span>
+              </b-button>
             </b-button-group>
           </nav>
           <div class="title">
-            <img v-if="logo" :src="logo.getAbsoluteUrl()" :alt="logo.title" :title="logo.title" class="logo">
-            <span role="banner">
-              <StacLink v-if="root" :data="root" hideIcon />
-              <template v-else>{{ catalogTitle }}</template>
-            </span>
-            <b-button
-              v-if="root" size="sm" variant="outline-primary" id="popover-root-btn"
-              :title="serviceType" tag="a" tabindex="0"
-            >
-              <b-icon-caret-down-fill />
-            </b-button>
+            <StacLink v-if="root" :data="root">
+              <HeaderTitle />
+            </StacLink>
+            <HeaderTitle v-else />
           </div>
           <nav class="actions user">
             <b-button-group>
@@ -117,6 +113,7 @@ import BIconLock from '~icons/bi/lock';
 import BIconUnlock from '~icons/bi/unlock';
 
 import ErrorAlert from './components/ErrorAlert.vue';
+import HeaderTitle from './components/HeaderTitle.vue';
 import Loading from './components/Loading.vue';
 import StacLink from './components/StacLink.vue';
 
@@ -158,6 +155,7 @@ export default defineComponent({
     BIconUnlock,
     BPopover: defineAsyncComponent(() => import('bootstrap-vue-next').then(m => m.BPopover)),
     ErrorAlert,
+    HeaderTitle,
     LanguageChooser: defineAsyncComponent(() => import('./components/LanguageChooser.vue')),
     Loading,
     RootStats: defineAsyncComponent(() => import('./components/RootStats.vue')),
@@ -180,7 +178,6 @@ export default defineComponent({
   computed: {
     ...mapState(['allowSelectCatalog', 'browserReady', 'conformsTo', 'data', 'dataLanguage', 'downloads', 'globalError', 'loading', 'stateQueryParameters', 'uiLanguage', 'url']),
     ...mapState({
-      catalogImageFromVueX: 'catalogImage',
       footerLinksFromVueX: 'footerLinks',
       localeFromVueX: 'locale',
       fallbackLocaleFromVueX: 'fallbackLocale',
@@ -190,7 +187,7 @@ export default defineComponent({
       enforcedColorModeFromVueX: 'enforcedColorMode',
       colorModeFromVueX: 'colorMode'
     }),
-    ...mapGetters(['canSearch', 'collectionLink', 'description', 'fromBrowserPath', 'isExternalUrl', 'isRoot', 'parentLink', 'root', 'rootLink', 'supportsConformance', 'title', 'toBrowserPath']),
+    ...mapGetters(['canSearch', 'collectionLink', 'description', 'fromBrowserPath', 'isExternalUrl', 'isRoot', 'parentLink', 'root','supportsConformance', 'title', 'toBrowserPath']),
     ...mapGetters('auth', { authMethod: 'method' }),
     ...mapGetters('auth', ['canAuthenticate', 'isLoggedIn', 'showLogin']),
     browserVersion() {
@@ -279,15 +276,7 @@ export default defineComponent({
       }
     },
     icon() {
-      return this.getIcon(this.data);
-    },
-    logo() {
-      if (this.catalogImageFromVueX) {
-        return Utils.createLink(this.catalogImageFromVueX, 'icon', this.rootLink?.title);
-      }
-      else {
-        return this.getIcon(this.root);
-      }
+      return Utils.getIcon(this.data);
     }
   },
   watch: {
@@ -505,15 +494,6 @@ export default defineComponent({
     ...mapActions('auth', ['requestLogin', 'requestLogout']),
     toggleColorMode() {
       this.colorMode = this.colorMode === 'light' ? 'dark' : 'light';
-    },
-    getIcon(data) {
-      if (data instanceof STAC) {
-        const icons = data.getIcons();
-        if (icons.length > 0) {
-          return icons[0];
-        }
-      }
-      return null;
     },
     async logInOut() {
       if (this.url) {

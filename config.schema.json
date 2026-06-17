@@ -9,7 +9,14 @@
       "format": "uri"
     },
     "catalogTitle": {
-      "type": ["string"]
+      "type": ["string", "null"]
+    },
+    "catalogTitleAfterImage": {
+      "type": ["string", "null"]
+    },
+    "catalogImage": {
+      "type": ["string", "null"],
+      "format": "uri"
     },
     "allowExternalAccess": {
       "type": ["boolean"]
