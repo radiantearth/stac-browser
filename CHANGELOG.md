@@ -13,11 +13,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - New locales:
   - Swedish
   - Russian
-- New config option `catalogTitleAfterImage` to set a different title in the header after a logo
+- New config options:
+  - `catalogTitleAfterImage`: Set a different title in the header after a logo.
+  - `defaultCollectionSort`: Default sort order for Collections (replaces `cardViewSort`). The new default is different from the old default behaviour.
+  - `defaultItemSort`: Default sort order for Items (replaces `cardViewSort`). The new default is different from the old default behaviour.
+  - `preferredAssets`: Configure which (alternate) asset is shown by default. Defaults to preferring HTTP(S) alternates; set to `false` to revert back to the previous behaviour.
 
 ### Changed
 
-- Replaced `cardViewSort` with new options `defaultCollectionSort` and `defaultItemSort`
 - Only show language chooser when more than one locale is available
 - Restrict Collection item search date picker to collection's temporal extent
 - Focus temporal extent filter for Collection item search on end of temporal extent
@@ -26,6 +29,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - No search / sort functionality available when a static catalog has only a subset of children loaded
 - The default value for `catalogTitle` is `null` instead of `STAC Browser`.
 - Improved how the title is handled
+
+### Removed
+
+- Removed `cardViewSort` config option in favor of `defaultCollectionSort` and `defaultItemSort`
 
 ### Fixed
 
