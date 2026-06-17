@@ -777,7 +777,8 @@ export default defineComponent({
       this.$emit('input', this.activeParams, false);
     },
     async onReset() {
-      Object.assign(this, getDefaults());      
+      Object.assign(this, getDefaults());   
+      this.resetSort();   
       this.$store.commit('search/resetShared');      
       if (this.type === 'Collections') {
         this.$store.commit('search/resetCollectionFilters');
