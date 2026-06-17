@@ -244,18 +244,18 @@ export default defineComponent({
           console.error(error);
         }
 
-        if (!oldData) return;
-        if (!newData?.isCollection) return;
-        if (!this.$store.getters['search/hasActiveFilters']) return;
-        if (oldData?.id === newData?.id) return;
+        if (!oldData) {return;}
+        if (!newData?.isCollection) {return;}
+        if (!this.$store.getters['search/hasActiveFilters']) {return;}
+        if (oldData?.id === newData?.id) {return;}
 
         await this.$store.dispatch('search/resetForCollection', {
           collection: newData,
           fetchQueryables: async (collection) => {
             const link = collection.getQueryablesLink?.();
-            if (!isObject(link)) return [];
+            if (!isObject(link)) {return [];}
             const response = await stacRequest(this.$store, link);
-            if (!isObject(response.data)) return [];
+            if (!isObject(response.data)) {return [];}
             let schemas;
             try {
               schemas = await refParser.dereference(response.data);
@@ -263,7 +263,7 @@ export default defineComponent({
               console.error(e);
               schemas = response.data;
             }
-            if (!isObject(schemas?.properties)) return [];
+            if (!isObject(schemas?.properties)) {return [];}
             return Object.entries(schemas.properties)
               .map(([key, schema]) => new Queryable(key, schema));
           }

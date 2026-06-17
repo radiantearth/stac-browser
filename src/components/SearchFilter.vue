@@ -499,7 +499,7 @@ export default defineComponent({
     'activeParams.filterLogic': {
       immediate: true,
       handler(logic) {
-        if (!logic) return;
+        if (!logic) {return;}
         this.filtersAndOr = logic.andOr ?? 'and';
         this.filtersNegate = logic.negate ?? false;
       }
@@ -747,10 +747,10 @@ export default defineComponent({
       this.commitToVuex('filters', this.buildFilter()); 
       this.$emit('input', this.activeParams, false);
       this.commitToVuex('filterLogic', {
-      andOr: this.filtersAndOr,
-      negate: this.filtersNegate,
-    });
-    this.$emit('input', this.activeParams, false);
+        andOr: this.filtersAndOr,
+        negate: this.filtersNegate,
+      });
+      this.$emit('input', this.activeParams, false);
 
     },
     async onReset() {

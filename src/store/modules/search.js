@@ -30,17 +30,23 @@ export default {
   getters: {
     // Full merged filter objects ready to hand to Utils.addFiltersToLink
     collectionSearchParams: (state) => {
-      const { rawFilters, filterLogic, ...apiFilters } = state.collectionFilters;
       return {
         ...state.shared,
-        ...apiFilters,
+        q: state.collectionFilters.q,
+        ids: state.collectionFilters.ids,
+        collections: state.collectionFilters.collections,
+        sortby: state.collectionFilters.sortby,
+        filters: state.collectionFilters.filters,
       };
     },
     itemSearchParams: (state) => {
-      const { rawFilters, filterLogic, ...apiFilters } = state.itemFilters;
       return {
         ...state.shared,
-        ...apiFilters,
+        q: state.itemFilters.q,
+        ids: state.itemFilters.ids,
+        collections: state.itemFilters.collections,
+        sortby: state.itemFilters.sortby,
+        filters: state.itemFilters.filters,
       };
     },
     hasActiveFilters: (state) => {
@@ -93,7 +99,7 @@ export default {
       state.droppedFilters = [];
     },
   },
-    actions: {
+  actions: {
     async resetForCollection({ commit, state }, { collection, fetchQueryables }) {
       const raw = state.itemFilters.rawFilters;
 
@@ -123,7 +129,7 @@ export default {
           return f.negate ? new CqlNot(filter) : filter;
         });
         let logical = CqlLogicalOperator.create(andOr, args);
-        if (negate) logical = new CqlNot(logical);
+        if (negate) {logical = new CqlNot(logical);}
         rebuiltCql = new Cql(logical, null);
       }
 
