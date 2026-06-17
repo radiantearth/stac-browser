@@ -4,7 +4,7 @@
       <h2 class="title me-2">{{ title }}</h2>
       <b-badge v-if="catalogCount !== null" pill variant="secondary" class="me-4">{{ catalogCount }}</b-badge>
       <ViewButtons v-if="!hideControls" class="me-2" v-model="view" />
-      <SortButtons v-if="!hideControls && isComplete && catalogs.length > 1" v-model="sort" />
+      <SortButtons v-if="!hideControls && isComplete && catalogs.length > 1" v-model="sort.direction" />
     </header>
     <section v-if="!hideControls && isComplete && catalogs.length > 1" class="catalog-filter mb-2">
       <SearchBox v-model="searchTerm" :placeholder="filterPlaceholder" />
@@ -43,10 +43,10 @@ import { defineComponent, defineAsyncComponent } from 'vue';
 
 import Catalog from './Catalog.vue';
 import Loading from './Loading.vue';
-import { getDisplayTitle } from '../models/stac';
 import { STAC } from 'stac-js';
 import ViewButtons from './ViewButtons.vue';
 import Utils from '../utils';
+import { sortStac } from '../models/stac';
 
 export default defineComponent({
   name: "Catalogs",
@@ -101,12 +101,13 @@ export default defineComponent({
   data() {
     return {
       searchTerm: '',
-      sort: 0,
+      sort: Utils.parseApiSortParameter(), // get empty sort object
       selectedKeywords: []
     };
   },
   computed: {
-    ...mapState(['cardViewSort', 'uiLanguage']),
+    ...mapState(['defaultCollectionSort', 'uiLanguage']),
+    ...mapGetters(['supportsConformance']),
     ...mapGetters(['getStac']),
     catalogCount() {
       if (this.catalogs.length !== this.catalogView.length) {
@@ -181,12 +182,8 @@ export default defineComponent({
         });
       }
       // Sort
-      if (!this.hasMore && !this.apiFilters.sortby && this.sort !== 0) {
-        const collator = new Intl.Collator(this.uiLanguage);
-        catalogs = catalogs.slice(0).sort((a,b) => collator.compare(getDisplayTitle(a), getDisplayTitle(b)));
-        if (this.sort === -1) {
-          catalogs = catalogs.reverse();
-        }
+      if (!this.hasMore && !this.apiFilters.sortby && this.sort.direction !== 0) {
+        catalogs = sortStac(catalogs, this.sort, this.uiLanguage);
       }
       return catalogs;
     },
@@ -222,14 +219,11 @@ export default defineComponent({
     }
   },
   created() {
-    this.sort = Utils.convertHumanizedSortOrder(this.cardViewSort);
+    this.sort = Utils.parseApiSortParameter(this.defaultCollectionSort);
   },
   methods: {
     loadMore(visible = true) {
       if (visible) {
-        // Disable sorting if pagination is/was active as otherwise the order of elements
-        // may change unexpectedly after the last page has been loaded.
-        this.sort = 0;
         this.$emit('loadMore');
       }
     },

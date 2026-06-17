@@ -867,7 +867,11 @@ function getStore(config, router) {
             baseUrl = URI(baseUrl);
           }
 
-          link = Utils.addFiltersToLink(link, filters, cx.state.itemsPerPage);
+          let sort = null;
+          if (cx.getters.supportsConformance(TYPES.Items.Sort)) {
+            sort = cx.state.defaultItemSort;
+          }
+          link = Utils.addFiltersToLink(link, filters, cx.state.itemsPerPage, sort);
 
           let response = await stacRequest(cx, link);
           if (!isObject(response.data) || !Array.isArray(response.data.features)) {
@@ -960,7 +964,11 @@ function getStore(config, router) {
             cx.commit('resetApiCollections');
           }
           link = stac.getLinkWithRel('data');
-          link = Utils.addFiltersToLink(link, {}, cx.state.collectionsPerPage);
+          let sort = null;
+          if (cx.getters.supportsConformance(TYPES.Collections.Sort)) {
+            sort = cx.state.defaultCollectionSort;
+          }
+          link = Utils.addFiltersToLink(link, {}, cx.state.collectionsPerPage, sort);
         }
         else { // Second page and after
           stac = cx.state.data;

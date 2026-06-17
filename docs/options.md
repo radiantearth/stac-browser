@@ -83,7 +83,8 @@ The override order for the configuration is:
   - [collectionsPerPage](#collectionsperpage)
   - [maxEntriesPerPage](#maxentriesperpage)
   - [cardViewMode](#cardviewmode)
-  - [cardViewSort](#cardviewsort)
+  - [defaultCollectionSort](#defaultcollectionsort)
+  - [defaultItemSort](#defaultitemsort)
   - [showKeywordsInItemCards](#showkeywordsinitemcards)
   - [showKeywordsInCatalogCards](#showkeywordsincatalogcards)
   - [showThumbnailsAsAssets](#showthumbnailsasassets)
@@ -509,16 +510,39 @@ The maximum number of items per page that a user can request through the `limit`
 
 The default view mode for lists of catalogs/collections. Either `"list"` or `"cards"` (default).
 
-### cardViewSort
+### defaultCollectionSort
 
-The default sorting for lists of catalogs/collections or items. One of:
+The default sorting for lists of catalogs/collections.
 
-- `"asc"`: ascending sort (default)
-- `"desc"`: descending sort
+This value must conform to the textual representation of `sortby` in STAC APIs.
+
+So if your property for sorting is "title" you have to use:
+
+- `"title"`: ascending sort (default)
+- `"-title"`: descending sort
 - `null`: sorted as in the source
 
-Doesn't apply when API search filters are applied.
-Also doesn't apply when pagination on the server-side is enabled.
+Doesn't apply when the catalog is static and not all information is loaded yet.
+
+### defaultItemSort
+
+The default sorting for lists of items.
+
+This value must conform to the textual representation of `sortby` in STAC APIs.
+
+So if your property for sorting is "datetime" you have to use:
+
+- `"properties.datetime"`: ascending sort
+- `"-properties.datetime"`: descending sort
+
+So if your property for sorting is "id" you have to use:
+
+- `"id"`: ascending sort
+- `"-id"`: descending sort
+
+Alternatively, you can use `null` to keep it sorted as in the source (default).
+
+Doesn't apply when the catalog is static and not all information is loaded yet.
 
 ### showKeywordsInItemCards
 
