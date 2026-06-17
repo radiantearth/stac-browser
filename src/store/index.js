@@ -853,7 +853,7 @@ function getStore(config, router) {
           // If we don't have a catalogUrl but have a page to show,
           // we should assume this URL is the root catalog for now.
           if (!cx.state.catalogUrl) {
-            cx.commit('config', { catalogUrl: url });
+            await cx.dispatch('config', { catalogUrl: url });
           }
         }
       },

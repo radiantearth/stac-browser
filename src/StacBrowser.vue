@@ -24,9 +24,9 @@
           </nav>
           <div class="title">
             <StacLink v-if="root" :data="root">
-              <HeaderTitle />
+              <HeaderTitle ref="header" />
             </StacLink>
-            <HeaderTitle v-else />
+            <HeaderTitle v-else ref="header" />
           </div>
           <nav class="actions user">
             <b-button-group>
@@ -126,7 +126,6 @@ import { API_LANGUAGE_CONFORMANCE, updateExternals } from './i18n';
 import { getBest, prepareSupported } from 'stac-js/src/locales';
 import BrowserStorage from "./browser-store";
 import Authentication from "./components/Authentication.vue";
-import { getDisplayTitle } from "./models/stac";
 import Auth from './auth';
 
 // Pass Config through from props to vuex
@@ -187,7 +186,7 @@ export default defineComponent({
       enforcedColorModeFromVueX: 'enforcedColorMode',
       colorModeFromVueX: 'colorMode'
     }),
-    ...mapGetters(['canSearch', 'collectionLink', 'description', 'fromBrowserPath', 'isExternalUrl', 'isRoot', 'parentLink', 'root','supportsConformance', 'title', 'toBrowserPath']),
+    ...mapGetters(['canSearch', 'collectionLink', 'fromBrowserPath', 'isExternalUrl', 'isRoot', 'parentLink', 'root','supportsConformance', 'title', 'toBrowserPath']),
     ...mapGetters('auth', { authMethod: 'method' }),
     ...mapGetters('auth', ['canAuthenticate', 'isLoggedIn', 'showLogin']),
     browserVersion() {
@@ -281,36 +280,6 @@ export default defineComponent({
   },
   watch: {
     ...Watchers,
-    title(title) {
-      if (this.root) {
-        const rootTitle = getDisplayTitle(this.root);
-        if (rootTitle !== title) {
-          if (title) {
-            title += ' - ';
-          }
-          title += rootTitle;
-        }
-      }
-      document.title = title;
-      document.getElementById('og-title').setAttribute("content", title);
-    },
-    description(description) {
-      const summary = Utils.summarizeMd(description, 200);
-      document.getElementById('meta-description').setAttribute("content", summary);
-      document.getElementById('og-description').setAttribute("content", summary);
-    },
-    uiLanguage: {
-      immediate: true,
-      async handler(locale) {
-        if (!locale) {
-          return;
-        }
-
-        // Update the HTML lang tag
-        document.documentElement.setAttribute("lang", locale);
-        document.getElementById('og-locale').setAttribute("content", locale);
-      }
-    },
     dataLanguage: {
       immediate: true,
       async handler(locale) {
@@ -465,7 +434,9 @@ export default defineComponent({
       this.$store.commit(resetOp);
       this.parseQuery(to);
 
-      document.getElementById('og-url').setAttribute("content", window.location.href);
+      if (this.$refs.header) {
+        this.$refs.header.updateUrl();
+      }
     });
 
     const authConfig = Auth.restoreLastMethod();

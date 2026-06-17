@@ -379,7 +379,7 @@ export default class Utils {
 
   static assetFilename(asset, response = null) {
     // Get the preferred filename from the file:local_path property
-    if (asset.isAsset) {
+    if (asset?.isAsset) {
       const localPath = asset.getMetadata('file:local_path');
       if (typeof localPath === 'string') {
         return URI(localPath).filename();
