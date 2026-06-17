@@ -1,0 +1,2 @@
+import{a1 as s,ca as r,aH as n,aD as a,cQ as o,aN as c}from"./index-CxeERRMc.js";import"./utils-Ckl_K2Hx.js";import"./_commonjsHelpers-DsqdWQfm.js";import"./I18N-C7J34sak.js";const i={name:"CustomText",props:{title:{type:String,default:""},text:{type:String,default:""}}},l={class:"custom-text"};function p(d,t,e,m,u,_){return r(),n("div",l,[a("h3",null,o(e.title),1),t[0]||(t[0]=c()),a("p",null,o(e.text),1)])}const B=s(i,[["render",p],["__scopeId","data-v-556afce1"]]);export{B as default};
+//# sourceMappingURL=CustomText-SnvPw0xL.js.map
