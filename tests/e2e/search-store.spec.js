@@ -142,15 +142,15 @@ test.describe('Filter reconciliation on collection navigation', () => {
     expect(state.getters.hasDroppedFilters).toBe(true);
   });
 
-  test('no rawFilters — plain resetAll, shared and itemFilters cleared', async ({ page }) => {
+  test('no rawFilters — basic filters are left untouched', async ({ page }) => {
     await commitToStore(page, 'search/setShared', { limit: 20 });
     await commitToStore(page, 'search/setItemFilters', { q: ['sentinel'] });
 
     await dispatchResetForCollection(page, ['eo:cloud_cover']);
 
     const state = await getSearchState(page);
-    expect(state.shared.limit).toBeNull();
-    expect(state.itemFilters.q).toEqual([]);
+    expect(state.shared.limit).toBe(20);
+    expect(state.itemFilters.q).toEqual(['sentinel']);
     expect(state.droppedFilters).toHaveLength(0);
   });
 

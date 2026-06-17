@@ -48,15 +48,17 @@
         <Catalogs :catalogs="catalogs" :hasMore="hasMore" @load-more="loadMoreCollections" />
         <WidgetHook id="view-catalog-catalogs-end" />
       </b-col>
-      <b-alert
-        v-if="hasDroppedFilters"
-        variant="warning"
-        dismissible
-        class="mb-3"
-        @dismissed="$store.commit('search/clearDroppedFilters')"
-      >
-        {{ $t('search.droppedFilters', { count: droppedFilterCount }) }}
-      </b-alert>
+      <b-col v-if="hasDroppedFilters" cols="12">
+        <b-alert
+          variant="warning"
+          dismissible
+          class="mb-3"
+          :model-value="hasDroppedFilters"
+          @dismissed="$store.commit('search/clearDroppedFilters')"
+        >
+          {{ $tc('search.droppedFilters', droppedFilterCount, { count: droppedFilterCount }) }}
+        </b-alert>
+      </b-col>
       <b-col class="items-container" v-if="hasItems || hasItemAssets">
         <WidgetHook id="view-catalog-items-start" />
         <Items
@@ -268,6 +270,8 @@ export default defineComponent({
               .map(([key, schema]) => new Queryable(key, schema));
           }
         });
+        
+        this.filters = this.$store.getters['search/itemSearchParams'];
       }
     }
   },

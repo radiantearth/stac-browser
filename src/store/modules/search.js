@@ -93,10 +93,11 @@ export default {
   },
   actions: {
     async resetForCollection({ commit, state }, { collection, fetchQueryables }) {
+      commit('clearDroppedFilters');
+
       const raw = state.itemFilters.rawFilters;
 
       if (!Array.isArray(raw) || raw.length === 0) {
-        commit('resetAll');
         return;
       }
 

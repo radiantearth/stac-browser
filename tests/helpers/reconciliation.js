@@ -5,14 +5,20 @@
  * @param {string[]} supportedIds - Queryable IDs the destination collection supports.
  */
 export async function dispatchResetForCollection(page, supportedIds) {
-  await page.evaluate(async (supportedIds) => {
-    const store = document.querySelector('[data-v-app]')
-      ?.__vue_app__?.config?.globalProperties?.$store;
-    await store.dispatch('search/resetForCollection', {
-      collection: {},
-      fetchQueryables: async () => supportedIds.map(id => ({ id })),
-    });
-  }, supportedIds);
+  await page.waitForFunction(
+    async (supportedIds) => {
+      const store = document.querySelector('[data-v-app]')
+        ?.__vue_app__?.config?.globalProperties?.$store;
+      if (!store?.state?.search || !store.state.browserReady) return false;
+      await store.dispatch('search/resetForCollection', {
+        collection: {},
+        fetchQueryables: async () => supportedIds.map(id => ({ id })),
+      });
+      return true;
+    },
+    supportedIds,
+    { timeout: 10000 }
+  );
 }
 /**
  * Creates a minimal raw filter row that survives JSON serialization across the page boundary. 
