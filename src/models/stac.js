@@ -9,7 +9,7 @@ import {
 } from 'stac-js';
 import Migrate from '@radiantearth/stac-migrate';
 import Utils from "../utils";
-import { hasText } from 'stac-js/src/utils.js';
+import { hasText, isObject } from 'stac-js/src/utils.js';
 import { toAbsolute } from 'stac-js/src/http.js';
 
 
@@ -80,6 +80,49 @@ export function getDisplayTitle(entities, fallbackTitle = "") {
   }
   // Use file or directory name from STAC entity as title
   return Utils.titleForHref(entity.getAbsoluteUrl(), true);
+}
+
+export function sortStac(entities, sort, uiLanguage) {
+  const collator = new Intl.Collator(uiLanguage);
+  const field = typeof sort.field === 'string' && sort.field.length > 0 ? sort.field.split(".") : null;
+  const getFieldValue = (entity) => {
+    if (!field) {
+      return getDisplayTitle(entity);
+    }
+    let value = entity;
+    for (let part of field) {
+      if (!isObject(value)) {
+        return null;
+      }
+      value = value[part];
+      if (typeof value === 'undefined') {
+        return null;
+      }
+    }
+    return value;
+  };
+
+  const sorted = entities.slice(0).sort((a, b) => {
+    const aValue = getFieldValue(a);
+    const bValue = getFieldValue(b);
+    if (aValue == null && bValue == null) {
+      return 0;
+    }
+    if (aValue == null) {
+      return 1;
+    }
+    if (bValue == null) {
+      return -1;
+    }
+    if (typeof aValue === 'number' && typeof bValue === 'number') {
+      return aValue - bValue;
+    }
+    return collator.compare(String(aValue), String(bValue));
+  });
+  if (sort.direction === -1) {
+    return sorted.reverse();
+  }
+  return sorted;
 }
 
 function getChildren(stac, priority = null) {

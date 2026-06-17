@@ -213,8 +213,9 @@ You need to provide a field `stac_browser` and then you can set any of the follo
 
 - `apiCatalogPriority`
 - `cardViewMode`
-- `cardViewSort`
 - `crossOriginMedia`
+- `defaultCollectionSort`
+- `defaultItemSort`
 - `defaultThumbnailSize`
 - `displayGeoTiffByDefault`
 - `showThumbnailsAsAssets`

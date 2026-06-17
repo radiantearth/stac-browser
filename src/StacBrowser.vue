@@ -390,7 +390,8 @@ export default defineComponent({
       const canChange = [
         'apiCatalogPriority',
         'cardViewMode',
-        'cardViewSort',
+        'defaultCollectionSort',
+        'defaultItemSort',
         'crossOriginMedia',
         'defaultThumbnailSize',
         'displayGeoTiffByDefault',

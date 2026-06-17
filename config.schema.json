@@ -86,9 +86,11 @@
       "type": ["string"],
       "enum": ["list", "cards"]
     },
-    "cardViewSort": {
-      "type": ["string", "null"],
-      "enum": ["asc", "desc", null]
+    "defaultItemSort": {
+      "type": ["string", "null"]
+    },
+    "defaultCollectionSort": {
+      "type": ["string", "null"]
     },
     "showThumbnailsAsAssets": {
       "type": ["boolean"]
