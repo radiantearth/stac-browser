@@ -285,7 +285,10 @@ export default defineComponent({
       if (this.root) {
         const rootTitle = getDisplayTitle(this.root);
         if (rootTitle !== title) {
-          title += ` - ${rootTitle}`;
+          if (title) {
+            title += ' - ';
+          }
+          title += rootTitle;
         }
       }
       document.title = title;

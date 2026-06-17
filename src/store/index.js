@@ -850,6 +850,11 @@ function getStore(config, router) {
         // All tasks finished, show the page if requested
         if (loading.show) {
           cx.commit('showPage', { url });
+          // If we don't have a catalogUrl but have a page to show,
+          // we should assume this URL is the root catalog for now.
+          if (!cx.state.catalogUrl) {
+            cx.commit('config', { catalogUrl: url });
+          }
         }
       },
       async loadApiItems(cx, args) {
