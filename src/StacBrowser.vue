@@ -17,20 +17,16 @@
               <b-button v-if="canSearch" variant="primary" :to="searchBrowserLink" :title="$t('search.title')" :pressed="isSearchPage">
                 <b-icon-search /><span class="button-label">{{ $t('search.title') }}</span>
               </b-button>
+              <b-button v-if="root" variant="primary" id="popover-root-btn" tabindex="0">
+                <b-icon-database /><span class="button-label">{{ serviceType }}</span>
+              </b-button>
             </b-button-group>
           </nav>
           <div class="title">
-            <img v-if="logo" :src="logo.getAbsoluteUrl()" :alt="logo.title" :title="logo.title" class="logo">
-            <span role="banner">
-              <StacLink v-if="root" :data="root" hideIcon />
-              <template v-else>{{ catalogTitle }}</template>
-            </span>
-            <b-button
-              v-if="root" size="sm" variant="outline-primary" id="popover-root-btn"
-              :title="serviceType" tag="a" tabindex="0"
-            >
-              <b-icon-caret-down-fill />
-            </b-button>
+            <StacLink v-if="root" :data="root">
+              <HeaderTitle ref="header" />
+            </StacLink>
+            <HeaderTitle v-else ref="header" />
           </div>
           <nav class="actions user">
             <b-button-group>
@@ -117,6 +113,7 @@ import BIconLock from '~icons/bi/lock';
 import BIconUnlock from '~icons/bi/unlock';
 
 import ErrorAlert from './components/ErrorAlert.vue';
+import HeaderTitle from './components/HeaderTitle.vue';
 import Loading from './components/Loading.vue';
 import StacLink from './components/StacLink.vue';
 
@@ -129,7 +126,6 @@ import { API_LANGUAGE_CONFORMANCE, updateExternals } from './i18n';
 import { getBest, prepareSupported } from 'stac-js/src/locales';
 import BrowserStorage from "./browser-store";
 import Authentication from "./components/Authentication.vue";
-import { getDisplayTitle } from "./models/stac";
 import Auth from './auth';
 
 // Pass Config through from props to vuex
@@ -158,6 +154,7 @@ export default defineComponent({
     BIconUnlock,
     BPopover: defineAsyncComponent(() => import('bootstrap-vue-next').then(m => m.BPopover)),
     ErrorAlert,
+    HeaderTitle,
     LanguageChooser: defineAsyncComponent(() => import('./components/LanguageChooser.vue')),
     Loading,
     RootStats: defineAsyncComponent(() => import('./components/RootStats.vue')),
@@ -180,7 +177,6 @@ export default defineComponent({
   computed: {
     ...mapState(['allowSelectCatalog', 'browserReady', 'conformsTo', 'data', 'dataLanguage', 'downloads', 'globalError', 'loading', 'stateQueryParameters', 'uiLanguage', 'url']),
     ...mapState({
-      catalogImageFromVueX: 'catalogImage',
       footerLinksFromVueX: 'footerLinks',
       localeFromVueX: 'locale',
       fallbackLocaleFromVueX: 'fallbackLocale',
@@ -190,7 +186,7 @@ export default defineComponent({
       enforcedColorModeFromVueX: 'enforcedColorMode',
       colorModeFromVueX: 'colorMode'
     }),
-    ...mapGetters(['canSearch', 'collectionLink', 'description', 'fromBrowserPath', 'isExternalUrl', 'isRoot', 'parentLink', 'root', 'rootLink', 'supportsConformance', 'title', 'toBrowserPath']),
+    ...mapGetters(['canSearch', 'collectionLink', 'fromBrowserPath', 'isExternalUrl', 'isRoot', 'parentLink', 'root','supportsConformance', 'title', 'toBrowserPath']),
     ...mapGetters('auth', { authMethod: 'method' }),
     ...mapGetters('auth', ['canAuthenticate', 'isLoggedIn', 'showLogin']),
     browserVersion() {
@@ -279,46 +275,11 @@ export default defineComponent({
       }
     },
     icon() {
-      return this.getIcon(this.data);
-    },
-    logo() {
-      if (this.catalogImageFromVueX) {
-        return Utils.createLink(this.catalogImageFromVueX, 'icon', this.rootLink?.title);
-      }
-      else {
-        return this.getIcon(this.root);
-      }
+      return Utils.getIcon(this.data);
     }
   },
   watch: {
     ...Watchers,
-    title(title) {
-      if (this.root) {
-        const rootTitle = getDisplayTitle(this.root);
-        if (rootTitle !== title) {
-          title += ` - ${rootTitle}`;
-        }
-      }
-      document.title = title;
-      document.getElementById('og-title').setAttribute("content", title);
-    },
-    description(description) {
-      const summary = Utils.summarizeMd(description, 200);
-      document.getElementById('meta-description').setAttribute("content", summary);
-      document.getElementById('og-description').setAttribute("content", summary);
-    },
-    uiLanguage: {
-      immediate: true,
-      async handler(locale) {
-        if (!locale) {
-          return;
-        }
-
-        // Update the HTML lang tag
-        document.documentElement.setAttribute("lang", locale);
-        document.getElementById('og-locale').setAttribute("content", locale);
-      }
-    },
     dataLanguage: {
       immediate: true,
       async handler(locale) {
@@ -474,7 +435,9 @@ export default defineComponent({
       this.$store.commit(resetOp);
       this.parseQuery(to);
 
-      document.getElementById('og-url').setAttribute("content", window.location.href);
+      if (this.$refs.header) {
+        this.$refs.header.updateUrl();
+      }
     });
 
     const authConfig = Auth.restoreLastMethod();
@@ -506,15 +469,6 @@ export default defineComponent({
     ...mapActions('auth', ['requestLogin', 'requestLogout']),
     toggleColorMode() {
       this.colorMode = this.colorMode === 'light' ? 'dark' : 'light';
-    },
-    getIcon(data) {
-      if (data instanceof STAC) {
-        const icons = data.getIcons();
-        if (icons.length > 0) {
-          return icons[0];
-        }
-      }
-      return null;
     },
     async logInOut() {
       if (this.url) {

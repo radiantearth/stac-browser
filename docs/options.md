@@ -45,6 +45,7 @@ The override order for the configuration is:
 - [Basic configuration](#basic-configuration)
   - [catalogUrl](#catalogurl)
   - [catalogTitle](#catalogtitle)
+  - [catalogTitleAfterImage](#catalogtitleafterimage)
   - [catalogImage](#catalogimage)
   - [footerLinks](#footerlinks)
   - [apiCatalogPriority](#apicatalogpriority)
@@ -111,6 +112,16 @@ If `catalogUrl` is empty or set to `null` STAC Browser switches to a mode where 
 ### catalogTitle
 
 The default title shown if no title can be read from the root STAC catalog.
+
+### catalogTitleAfterImage
+
+A title to use in the header after the `catalogImage`.
+This can be useful in the following cases:
+
+- The image already contains the name and we do not want to show it twice
+- Removing the title in favor of the image - set this value to an empty string then.
+
+Only applies when `catalogImage` is not `null`.
 
 ### catalogImage
 

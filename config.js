@@ -1,6 +1,7 @@
 export default {
   catalogUrl: null,
-  catalogTitle: "STAC Browser",
+  catalogTitle: null,
+  catalogTitleAfterImage: null,
   catalogImage: null,
   allowExternalAccess: true, // Must be true if catalogUrl is not given
   allowedDomains: [],
