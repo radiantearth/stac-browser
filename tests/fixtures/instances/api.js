@@ -69,6 +69,7 @@ export default class API extends Instance {
       const id = `example-item-${i}`;
       const itemOptions = { url: `collections/${cid}/items/${id}`};
       const item = this.addItem(collection, id, itemOptions);
+      item.data.id = id;
       item.addParentLink(collection);
       items.push(item);
     }

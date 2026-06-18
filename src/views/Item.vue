@@ -91,7 +91,8 @@ export default defineComponent({
       return getIgnoredFields(this.data);
     },
     currentItemIndex() {
-      if (!this.crossNavigationItems || !this.data) {return -1;}
+      console.log('data.id:', this.data?.id);
+      console.log('crossNavItems ids:', this.crossNavigationItems?.map(i => i.id));
       return this.crossNavigationItems.findIndex(item => item.id === this.data.id);
     },
     prevItem() {
