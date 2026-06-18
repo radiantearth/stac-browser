@@ -43,12 +43,11 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import { BCollapse } from 'bootstrap-vue-next';
 import { defineComponent, defineAsyncComponent } from 'vue';
 
 import Utils from '../utils';
-import { size } from 'stac-js/src/utils.js';
 import Item from './Item.vue';
 import Loading from './Loading.vue';
 import { sortStac } from '../models/stac';
@@ -115,6 +114,7 @@ export default defineComponent({
   },
   computed: {
     ...mapState(['defaultItemSort', 'uiLanguage']),
+    ...mapGetters('search', ['itemSearchParams']),
     itemCount() {
       if (this.count !== null) {
         return this.count;
@@ -128,7 +128,18 @@ export default defineComponent({
       return this.items.length > this.shownItems;
     },
     filterCount() {
-      return Object.values(this.apiFilters).filter(filter => filter !== null && size(filter) > 0).length;
+      const params = this.itemSearchParams;
+      if (!params) {return 0;}
+      
+      let count = 0;
+      for (const val of Object.values(params)) {
+        if (Array.isArray(val)) {
+          if (val.length > 0) {count++;}
+        } else if (val !== null && val !== undefined && val !== '') {
+          count++;
+        }
+      }
+      return count;
     },
     hasFilters() {
       return this.filterCount > 0;

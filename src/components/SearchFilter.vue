@@ -146,6 +146,9 @@
       <b-card-footer class="d-flex gap-3">
         <b-button type="submit" variant="primary">{{ $t('submit') }}</b-button>
         <b-button type="reset" variant="danger">{{ $t('reset') }}</b-button>
+        <b-button v-if="type === 'Items' && stac && stac.type === 'Collection'" type="button" variant="info" @click="goToGlobalSearch">
+          Search All Collections
+        </b-button>
         <b-button v-if="canShowExampleCode" type="button" variant="secondary" @click="showCodeModal = true">{{ $t('exampleCode.title') }}</b-button>
       </b-card-footer>
     </b-card>
@@ -907,7 +910,34 @@ export default defineComponent({
           this.sortOrder = sort.direction;
         }
       }
-    }
+    },
+    goToGlobalSearch() {
+      const currentPath = this.$route.path;
+
+      const collectionsIndex = currentPath.indexOf('/collections');
+      const rootPath = collectionsIndex > -1 ? currentPath.substring(0, collectionsIndex) : currentPath;
+
+      const queryParams = {};
+      const params = this.activeParams || {};
+      for (const [field, value] of Object.entries(params)) {
+        let urlValue = value;
+        if (Array.isArray(value)) {
+          if (field === 'datetime') {
+            urlValue = value.map(d => d instanceof Date ? d.toISOString() : d).join('/');
+          } else {
+            urlValue = value.join(',');
+          }
+        }
+        if (urlValue !== '' && urlValue !== null && urlValue !== undefined) {
+          queryParams[`s.${field}`] = urlValue;
+        }
+      }
+
+      this.$router.push({ 
+        path: `/search${rootPath}`, 
+        query: queryParams 
+      });
+    },
   }
 });
 </script>

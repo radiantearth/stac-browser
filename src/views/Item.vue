@@ -1,5 +1,16 @@
 <template>
   <div class="item" :key="data.id">
+    <div class="d-flex justify-content-left gap-3 mb-3" v-if="crossNavigationItems && crossNavigationItems.length > 0">
+      <b-button variant="secondary" size="sm" @click="backToResults">
+        Back to Results
+      </b-button>
+      <b-button :disabled="!prevItem" variant="outline-primary" size="sm" @click="prevItem && goToItem(prevItem)">
+        &laquo; {{ $t('previous') }} Item
+      </b-button>
+      <b-button :disabled="!nextItem" variant="outline-primary" size="sm" @click="nextItem && goToItem(nextItem)">
+        {{ $t('next') }} Item &raquo;
+      </b-button>
+    </div>
     <b-row>
       <b-col class="left">
         <WidgetHook id="view-item-primary-start" />
@@ -74,10 +85,33 @@ export default defineComponent({
     DeprecationMixin
   ],
   computed: {
-    ...mapState(['data', 'url']),
+    ...mapState(['data', 'url', 'crossNavigationItems']),
     ...mapGetters(['collectionLink', 'parentLink']),
     ignoredMetadataFields() {
       return getIgnoredFields(this.data);
+    },
+    currentItemIndex() {
+      if (!this.crossNavigationItems || !this.data) {return -1;}
+      return this.crossNavigationItems.findIndex(item => item.id === this.data.id);
+    },
+    prevItem() {
+      if (this.currentItemIndex > 0) {return this.crossNavigationItems[this.currentItemIndex - 1];}
+      return null;
+    },
+    nextItem() {
+      if (this.currentItemIndex > -1 && this.currentItemIndex < this.crossNavigationItems.length - 1) {
+        return this.crossNavigationItems[this.currentItemIndex + 1];
+      }
+      return null;
+    }
+  },
+  methods: {
+    goToItem(item) {
+      const path = this.$store.getters.toBrowserPath(item.getAbsoluteUrl());
+      this.$router.replace(path);
+    },
+    backToResults() {
+      this.$router.go(-1);
     }
   },
   watch: {

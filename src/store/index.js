@@ -57,7 +57,8 @@ function getStore(config, router) {
 
     apiCollections: [],
     apiItemsLoading: {},
-    nextCollectionsLink: null
+    nextCollectionsLink: null,
+    crossNavigationItems: []
   });
 
   return createStore({
@@ -616,6 +617,7 @@ function getStore(config, router) {
 
         if (show) {
           state.apiItems = apiItems;
+          state.crossNavigationItems = apiItems; 
         }
 
         // Handle pagination links
