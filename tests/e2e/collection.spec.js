@@ -423,4 +423,143 @@ test.describe('STAC Collection item search', () => {
     await expect(itemCards).toHaveCount(5, { timeout: 10000 });
     await expect(prevButton).toBeDisabled();
   });
+test.describe('UI Enhancements (Item Navigation & Badges)', () => {
+    let api;
+    let CATALOG_PATH;
+  
+    test.beforeEach(async ({ worker }) => {
+      api = API.minimalApi({}, {
+        defaultLimit: 5,
+        prevLinkEnabled: true,
+        firstLinkEnabled: true,
+        lastLinkEnabled: true,
+      });
+      const collection = api.addCollection('collection1').setMetadata({ title: 'Test Collection 1' });
+      api.addManyItems(collection, 5);
+      api.addCollectionsExtension().addItemsExtension().addSearchExtension();
+      await api.createServer(worker);
+      
+      CATALOG_PATH = api.root.getSearchPath().replace(/^\/search/, '');
+    });
+
+    test('Item view displays working Next and Previous navigation buttons', async ({ page }) => {
+      await page.goto(CATALOG_PATH);
+      await waitForBrowserReady(page);
+      
+      await page.getByText('Test Collection 1', { exact: false }).first().click();
+      await waitForBrowserReady(page);
+
+      const filterToggle = page.locator('button', { hasText: /(Show|Hide) Filters/i });
+      if (await filterToggle.isVisible()) await filterToggle.click();
+      
+      const searchReq = page.waitForRequest(req => req.url().includes('/items') || req.url().includes('/search'));
+      await page.getByRole('button', { name: /submit/i }).click();
+      await searchReq;
+      await waitForBrowserReady(page);
+
+      // Click the very first item so we KNOW we are at the start of the array
+      await page.locator('.item-card .stretched-link').first().click();
+      await waitForBrowserReady(page);
+      await expect(page.locator('.item')).toBeVisible({ timeout: 10000 });
+
+      const nextButton = page.getByRole('button', { name: /next/i });
+      const prevButton = page.getByRole('button', { name: /previous/i });
+      
+      const firstItemUrl = page.url();
+
+      await expect(nextButton).toBeVisible();
+      await expect(prevButton).toBeDisabled();
+
+      await nextButton.click();
+      
+      await expect.poll(() => page.url(), { timeout: 10000 }).not.toBe(firstItemUrl);
+      await waitForBrowserReady(page);
+
+      await expect(prevButton).toBeEnabled({ timeout: 10000 });
+      
+      await prevButton.click();
+      
+      await expect.poll(() => page.url(), { timeout: 10000 }).toBe(firstItemUrl);
+      await waitForBrowserReady(page);
+      
+      await expect(prevButton).toBeDisabled({ timeout: 10000 });
+    });
+
+    test('Item view Back to Results button preserves search filters', async ({ page }) => {
+      await page.goto(CATALOG_PATH);
+      await waitForBrowserReady(page);
+      
+      await page.getByText('Test Collection 1', { exact: false }).first().click();
+      await waitForBrowserReady(page);
+
+      const filterToggle = page.locator('button', { hasText: /(Show|Hide) Filters/i });
+      if (await filterToggle.isVisible()) await filterToggle.click();
+      
+      await page.getByLabel(/items per page/i).fill('4');
+      const searchReq = page.waitForRequest(req => req.url().includes('/items') || req.url().includes('/search'));
+      await page.getByRole('button', { name: /submit/i }).click();
+      await searchReq;
+      await waitForBrowserReady(page);
+
+      await page.locator('.item-card .stretched-link').first().click();
+      await waitForBrowserReady(page);
+      await expect(page.locator('.item')).toBeVisible({ timeout: 10000 });
+
+      const backButton = page.getByRole('button', { name: /back to results/i });
+      await expect(backButton).toBeVisible();
+      await backButton.click();
+      
+      const filterToggleReturn = page.locator('button', { hasText: /(Show|Hide) Filters/i });
+      await filterToggleReturn.waitFor({ state: 'visible', timeout: 15000 });
+
+      expect(page.url()).toContain('s.limit=4');
+    });
+
+    test('Filter toggle button displays a badge with the correct active filter count', async ({ page }) => {
+      await page.goto(CATALOG_PATH);
+      await waitForBrowserReady(page);
+      
+      await page.getByText('Test Collection 1', { exact: false }).first().click();
+      await waitForBrowserReady(page);
+
+      const filterToggle = page.locator('button', { hasText: /(Show|Hide) Filters/i });
+      if (await filterToggle.isVisible()) await filterToggle.click();
+
+      await page.getByLabel(/items per page/i).fill('3');
+      
+      const searchReq = page.waitForRequest(req => req.url().includes('/items') || req.url().includes('/search'));
+      await page.getByRole('button', { name: /submit/i }).click();
+      await searchReq;
+
+      await expect(filterToggle).toContainText('1');
+
+      const resetReq = page.waitForRequest(req => req.url().includes('/items') || req.url().includes('/search'));
+      await page.getByRole('button', { name: /reset/i }).click();
+      await resetReq;
+
+      await expect(filterToggle).not.toContainText('1');
+    });
+
+    test('Search All Collections button redirects to global search with filters', async ({ page }) => {
+      await page.goto(CATALOG_PATH);
+      await waitForBrowserReady(page);
+      
+      await page.getByText('Test Collection 1', { exact: false }).first().click();
+      await waitForBrowserReady(page);
+
+      const filterToggle = page.locator('button', { hasText: /(Show|Hide) Filters/i });
+      if (await filterToggle.isVisible()) await filterToggle.click();
+      
+      await page.getByLabel(/items per page/i).fill('2');
+
+      const globalSearchButton = page.getByRole('button', { name: /search all collections/i });
+      await expect(globalSearchButton).toBeVisible();
+      
+      await globalSearchButton.click();
+      await waitForBrowserReady(page);
+
+      await expect.poll(() => page.url(), { timeout: 10000 }).toContain('/search');
+      expect(page.url()).toContain('s.limit=2');
+    });
+  });
 });

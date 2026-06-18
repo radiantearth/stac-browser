@@ -14,7 +14,7 @@
       <b-button v-if="api" class="mb-3" v-b-toggle.itemFilter :variant="hasFilters && !filtersOpen ? 'primary' : 'outline-primary'">
         <b-icon-filter />
         {{ filtersOpen ? $t('items.hideFilter') : $t('items.showFilter') }}
-        <b-badge v-if="hasFilters && !filtersOpen" variant="dark">{{ filterCount }}</b-badge>
+        <b-badge v-if="hasFilters" variant="dark">{{ filterCount }}</b-badge>
       </b-button>
       <b-collapse id="itemFilter" v-model="filtersOpen">
         <SearchFilter
@@ -128,8 +128,7 @@ export default defineComponent({
       return this.items.length > this.shownItems;
     },
     filterCount() {
-      const params = this.itemSearchParams;
-      if (!params) {return 0;}
+      const params = this.apiFilters || {};
       
       let count = 0;
       for (const val of Object.values(params)) {
@@ -174,10 +173,18 @@ export default defineComponent({
   },
   watch: {
     showFilters() {
-      this.filter = this.showFilters;
+      this.filtersOpen = this.showFilters;
     },
     filtersOpen() {
       this.$emit('filtersShown', this.filtersOpen);
+    },
+    chunkedItems: {
+      immediate: true,
+      handler(items) {
+        if (this.api) {
+          this.$store.commit('setCrossNavigationItems', items);
+        }
+      }
     }
   },
   created() {
