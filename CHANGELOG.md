@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-
+- Added Vuex `search` module to centralize search filter state (`shared`, `collectionFilters`, `itemFilters`)
 - Adding `extent`s to the root catalog will restrict the Search filters
 - New locales:
   - Swedish
