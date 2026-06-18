@@ -8,8 +8,6 @@ import { test, expect } from './fixtures.js';
 import API from '../fixtures/instances/api.js';
 import { commitToStore, getSearchState } from '../helpers/store.js';
 import { dispatchResetForCollection, makeRawFilter } from '../helpers/reconciliation.js';
-import { waitForBrowserReady } from './helpers.js';
-
 
 test.describe('Vuex search module', () => {
   test.beforeEach(async ({ worker, page }) => {
@@ -34,7 +32,6 @@ test.describe('Vuex search module', () => {
   });
 
   test('setShared updates shared state without affecting filters', async ({ page }) => {
-    await waitForBrowserReady(page);
     await commitToStore(page, 'search/setShared', { datetime: '2025-05-01T00:00:00.000Z/2025-05-29T00:00:00.000Z', limit: 10 });
     const state = await getSearchState(page);
     expect(state.shared.datetime).toBe('2025-05-01T00:00:00.000Z/2025-05-29T00:00:00.000Z');
@@ -44,7 +41,6 @@ test.describe('Vuex search module', () => {
   });
 
   test('itemFilters and collectionFilters are independent', async ({ page }) => {
-    await waitForBrowserReady(page);
     await commitToStore(page, 'search/setItemFilters', { q: ['sentinel'] });
     await commitToStore(page, 'search/setCollectionFilters', { q: ['landsat'] });
     const state = await getSearchState(page);
