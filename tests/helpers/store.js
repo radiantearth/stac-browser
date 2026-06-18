@@ -11,18 +11,24 @@
  * @param {*} [payload] - Optional mutation payload.
  */
 export async function commitToStore(page, mutation, payload) {
-  await page.waitForFunction(
-    ({ mutation, payload }) => {
-      const store = document.querySelector('[data-v-app]')
-        ?.__vue_app__?.config?.globalProperties?.$store;
+  await page.waitForFunction(() => {
+    const store = document.querySelector('[data-v-app]')
+      ?.__vue_app__?.config?.globalProperties?.$store;
+    return !!(store?.state?.search && store.state.browserReady);
+  }, { timeout: 10000 });
 
-      if (!store?.state?.search || !store.state.browserReady) return false;
-      store.commit(mutation, payload);
-      return true;
-    },
-    { mutation, payload },
-    { timeout: 10000 }
-  );
+  await page.evaluate(async ({ mutation, payload }) => {
+    const appEl = document.querySelector('[data-v-app]');
+    const app = appEl ? appEl.__vue_app__ : null;
+    const store = app?.config?.globalProperties?.$store;
+    
+    if (!store) return false;
+    
+    store.commit(mutation, payload);
+    
+    await new Promise(resolve => setTimeout(resolve, 20));
+    return true;
+  }, { mutation, payload });
 }
 
 /**
