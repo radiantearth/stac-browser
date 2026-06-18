@@ -14,7 +14,7 @@
       <b-button v-if="api" class="mb-3" v-b-toggle.itemFilter :variant="hasFilters && !filtersOpen ? 'primary' : 'outline-primary'">
         <b-icon-filter />
         {{ filtersOpen ? $t('items.hideFilter') : $t('items.showFilter') }}
-        <b-badge v-if="hasFilters && !filtersOpen" variant="dark">{{ filterCount }}</b-badge>
+        <b-badge v-if="hasFilters" variant="dark">{{ filterCount }}</b-badge>
       </b-button>
       <b-collapse id="itemFilter" v-model="filtersOpen">
         <SearchFilter
@@ -43,12 +43,11 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import { BCollapse } from 'bootstrap-vue-next';
 import { defineComponent, defineAsyncComponent } from 'vue';
 
 import Utils from '../utils';
-import { size } from 'stac-js/src/utils.js';
 import Item from './Item.vue';
 import Loading from './Loading.vue';
 import { sortStac } from '../models/stac';
@@ -115,6 +114,7 @@ export default defineComponent({
   },
   computed: {
     ...mapState(['defaultItemSort', 'uiLanguage']),
+    ...mapGetters('search', ['itemSearchParams']),
     itemCount() {
       if (this.count !== null) {
         return this.count;
@@ -128,7 +128,17 @@ export default defineComponent({
       return this.items.length > this.shownItems;
     },
     filterCount() {
-      return Object.values(this.apiFilters).filter(filter => filter !== null && size(filter) > 0).length;
+      const params = this.apiFilters || {};
+      
+      let count = 0;
+      for (const val of Object.values(params)) {
+        if (Array.isArray(val)) {
+          if (val.length > 0) {count++;}
+        } else if (val !== null && val !== undefined && val !== '') {
+          count++;
+        }
+      }
+      return count;
     },
     hasFilters() {
       return this.filterCount > 0;
@@ -163,10 +173,18 @@ export default defineComponent({
   },
   watch: {
     showFilters() {
-      this.filter = this.showFilters;
+      this.filtersOpen = this.showFilters;
     },
     filtersOpen() {
       this.$emit('filtersShown', this.filtersOpen);
+    },
+    chunkedItems: {
+      immediate: true,
+      handler(items) {
+        if (this.api) {
+          this.$store.commit('setCrossNavigationItems', items);
+        }
+      }
     }
   },
   created() {
