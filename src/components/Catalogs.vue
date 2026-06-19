@@ -6,10 +6,17 @@
       <ViewButtons v-if="!hideControls" class="me-2" v-model="view" />
       <SortButtons v-if="!hideControls && isComplete && catalogs.length > 1" v-model="sort.direction" />
     </header>
-    <section v-if="!hideControls && isComplete && catalogs.length > 1" class="catalog-filter mb-2">
-      <SearchBox v-model="searchTerm" :placeholder="filterPlaceholder" />
+    <section v-if="!hideControls && ((isComplete && catalogs.length > 1) || canSearchFreeText)" class="catalog-filter mb-2">
       <multiselect
-        v-if="allKeywords.length > 0"
+        v-if="canSearchFreeText" multiple taggable @tag="addSearchTerm"
+        :id="selectedSearchTerms" v-model="selectedSearchTerms" :options="selectedSearchTerms"
+        :placeholder="$t('search.enterSearchTerms')" :tag-placeholder="$t('search.addSearchTerm')" :no-options="$t('search.addSearchTerm')"
+      >
+        <template #noOptions>{{ $t('search.noOptions') }}</template>
+      </multiselect>
+      <SearchBox v-else v-model="searchTerm" :placeholder="filterPlaceholder" />
+      <multiselect
+        v-if="isComplete && allKeywords.length > 0"
         v-model="selectedKeywords"
         :options="allKeywords"
         multiple
@@ -23,7 +30,7 @@
     <Pagination v-if="showPagination" ref="topPagination" class="mb-3" :pagination="pagination" placement="top" @paginate="paginate" />
     <b-alert v-if="hasSearchCritera && catalogView.length === 0" variant="warning" class="mt-2" show>{{ $t('catalogs.noMatches') }}</b-alert>
     <section class="list">
-      <Loading v-if="loading" fill top />
+      <Loading v-if="loading && !loadingMore" fill top />
       <div :class="view === 'list' ? 'card-list' : 'card-grid'">
         <Catalog v-for="catalog in catalogView" :catalog="catalog" :key="catalog.href">
           <template #footer="{data}">
@@ -33,7 +40,10 @@
       </div>
     </section>
     <Pagination v-if="showPagination" class="mb-3" :pagination="pagination" @paginate="paginate" />
-    <b-button v-else-if="hasMore" @click="loadMore" variant="primary" v-visible.300="loadMore">{{ $t('catalogs.loadMore') }}</b-button>
+    <b-button v-else-if="hasMore" @click="loadMore" variant="primary" v-visible.300="loadMore">
+      <b-spinner v-if="loading && loadingMore" small />
+      {{ $t('catalogs.loadMore') }}
+    </b-button>
   </section>
 </template>
 
@@ -47,6 +57,8 @@ import { STAC } from 'stac-js';
 import ViewButtons from './ViewButtons.vue';
 import Utils from '../utils';
 import { sortStac } from '../models/stac';
+import { TYPES } from './ApiCapabilitiesMixin.js';
+import { hasText } from 'stac-js/src/utils.js';
 
 export default defineComponent({
   name: "Catalogs",
@@ -80,6 +92,10 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
+    loadingMore: {
+      type: Boolean,
+      default: false
+    },
     hasMore: {
       type: Boolean,
       default: false
@@ -87,6 +103,10 @@ export default defineComponent({
     apiFilters: {
       type: Object,
       default: () => ({})
+    },
+    apiSearch: {
+      type: Boolean,
+      default: false
     },
     pagination: {
       type: Object,
@@ -97,18 +117,22 @@ export default defineComponent({
       default: null
     }
   },
-  emits: ['loadMore', 'paginate'],
+  emits: ['loadMore', 'paginate', 'search'],
   data() {
     return {
       searchTerm: '',
       sort: Utils.parseApiSortParameter(), // get empty sort object
-      selectedKeywords: []
+      selectedKeywords: [],
+      selectedSearchTerms: [],
     };
   },
   computed: {
     ...mapState(['defaultCollectionSort', 'uiLanguage']),
     ...mapGetters(['supportsConformance']),
     ...mapGetters(['getStac']),
+    canSearchFreeText() {
+      return this.apiSearch && this.supportsConformance(TYPES.Collections.FreeText);
+    },
     catalogCount() {
       if (this.catalogs.length !== this.catalogView.length) {
         return this.catalogView.length + '/' + this.catalogs.length;
@@ -149,7 +173,7 @@ export default defineComponent({
       });
     },
     hasSearchCritera() {
-      return this.searchTerm || this.selectedKeywords.length > 0;
+      return this.searchTerm || this.selectedKeywords.length > 0 || this.selectedSearchTerms.length > 0;
     },
     catalogView() {
       if (this.hasMore) {
@@ -221,7 +245,21 @@ export default defineComponent({
   created() {
     this.sort = Utils.parseApiSortParameter(this.defaultCollectionSort);
   },
+  watch: {
+    selectedSearchTerms: {
+      handler(searchTerms) {
+        this.$emit('search', searchTerms);
+      },
+      deep: 1
+    }
+  },
   methods: {
+    addSearchTerm(term) {
+      if (!hasText(term)) {
+        return;
+      }
+      this.selectedSearchTerms.push(term);
+    },
     loadMore(visible = true) {
       if (visible) {
         this.$emit('loadMore');

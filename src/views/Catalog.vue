@@ -45,7 +45,11 @@
       </b-col>
       <b-col class="catalogs-container" v-if="hasCatalogs">
         <WidgetHook id="view-catalog-catalogs-start" />
-        <Catalogs :catalogs="catalogs" :hasMore="hasMore" @load-more="loadMoreCollections" />
+        <Catalogs
+          apiSearch :catalogs="catalogs" :hasMore="hasMore"
+          @load-more="loadMoreCollections" @search="searchCollections"
+          :loading="Boolean(loadingCollections)" :loadingMore="loadingCollections === 'more'"
+        />
         <WidgetHook id="view-catalog-catalogs-end" />
       </b-col>
       <b-col class="items-container" v-if="hasItems || hasItemAssets">
@@ -76,7 +80,7 @@ import ShowAssetLinkMixin from '../components/ShowAssetLinkMixin';
 import StacFieldsMixin from '../components/StacFieldsMixin';
 import { formatLicense, formatTemporalExtents } from '@radiantearth/stac-fields/formatters';
 import Utils from '../utils';
-import { hasText, isObject } from 'stac-js/src/utils.js';
+import { hasText, isObject, size } from 'stac-js/src/utils.js';
 import { addSchemaToDocument, createCatalogSchema } from '../schema-org';
 import { ItemCollection } from '../models/stac.js';
 import DeprecationMixin from '../components/DeprecationMixin.js';
@@ -111,7 +115,9 @@ export default defineComponent({
   ],
   data() {
     return {
-      filters: {}
+      filters: {},
+      loadingCollections: null,
+      isSearchingCollections: false,
     };
   },
   computed: {
@@ -197,7 +203,7 @@ export default defineComponent({
       return this.items.length > 0 || this.isApi;
     },
     hasCatalogs() {
-      return this.catalogs.length > 0;
+      return this.catalogs.length > 0 || this.isSearchingCollections;
     },
     mapData() {
       const data = {};
@@ -233,8 +239,26 @@ export default defineComponent({
     filtersShown(show) {
       this.$store.commit('updateState', {type: 'itemFilterOpen', value: show ? 1 : null});
     },
-    loadMoreCollections() {
-      this.$store.dispatch('loadNextApiCollections', {show: true});
+    async loadMoreCollections() {
+      this.loadingCollections = "more";
+      try {
+        await this.$store.dispatch('loadNextApiCollections', {show: true});
+      } catch(error) {
+        console.error(error);
+      } finally {
+        this.loadingCollections = null;
+      }
+    },
+    async searchCollections(searchTerms) {
+      this.loadingCollections = "all";
+      this.isSearchingCollections = size(searchTerms) > 0;
+      try {
+        await this.$store.dispatch('loadNextApiCollections', {stac: this.data, show: true, q: searchTerms});
+      } catch (error) {
+        console.error(error);
+      } finally {
+        this.loadingCollections = null;
+      }
     },
     async paginateItems(link) {
       try {
