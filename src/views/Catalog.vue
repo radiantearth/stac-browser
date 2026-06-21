@@ -55,7 +55,7 @@
       <b-col class="items-container" v-if="hasItems || hasItemAssets">
         <WidgetHook id="view-catalog-items-start" />
         <Items
-          :stac="data" :items="items" :api="isApi"
+          :stac="data" :items="items" :api="hasApiItems"
           :showFilters="showFilters" :apiFilters="filters"
           :pagination="itemPages" :loading="apiItemsLoading"
           :count="apiItemsNumberMatched"
@@ -196,14 +196,17 @@ export default defineComponent({
       }
       return pages;
     },
-    isApi() {
+    hasApiItems() {
       return Boolean(this.apiItemsLink);
     },
+    hasApiCollections() {
+      return Boolean(this.data.getApiCollectionsLink());
+    },
     hasItems() {
-      return this.items.length > 0 || this.isApi;
+      return this.items.length > 0 || this.hasApiItems;
     },
     hasCatalogs() {
-      return this.catalogs.length > 0 || this.isSearchingCollections;
+      return this.catalogs.length > 0 || this.hasApiCollections || this.isSearchingCollections;
     },
     mapData() {
       const data = {};

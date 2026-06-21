@@ -968,7 +968,7 @@ function getStore(config, router) {
             // If we load from new collections, reset list of collections.
             // Otherwise we may append to collections from a parent entity.
             // https://github.com/radiantearth/stac-browser/issues/617
-            // Also, only reset after the call to ensure
+            // Also, only reset after the call to ensure the previous list remains visible if the request fails.
             reset = true;
           }
           link = stac.getLinkWithRel('data');
