@@ -242,7 +242,9 @@ export default defineComponent({
     async loadMoreCollections() {
       this.loadingCollections = "more";
       try {
-        await this.$store.dispatch('loadNextApiCollections', {show: true});
+        await this.$store.dispatch('loadNextApiCollections', {
+          show: true, searching: this.isSearchingCollections
+        });
       } catch(error) {
         console.error(error);
       } finally {
@@ -253,7 +255,9 @@ export default defineComponent({
       this.loadingCollections = "all";
       this.isSearchingCollections = size(searchTerms) > 0;
       try {
-        await this.$store.dispatch('loadNextApiCollections', {stac: this.data, show: true, q: searchTerms});
+        await this.$store.dispatch('loadNextApiCollections', {
+          stac: this.data, show: true, q: searchTerms, searching: this.isSearchingCollections
+        });
       } catch (error) {
         console.error(error);
       } finally {

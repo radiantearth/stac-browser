@@ -960,7 +960,7 @@ function getStore(config, router) {
         }
       },
       async loadNextApiCollections(cx, args) {
-        let { stac, show, noRetry, q } = args;
+        let { stac, show, noRetry, q, searching = false } = args;
         let link;
         let reset = false;
         if (stac) { // First page
@@ -969,6 +969,7 @@ function getStore(config, router) {
             // Otherwise we may append to collections from a parent entity.
             // https://github.com/radiantearth/stac-browser/issues/617
             // Also, only reset after the call to ensure
+            reset = true;
           }
           link = stac.getLinkWithRel('data');
           let sort = null;
@@ -976,7 +977,7 @@ function getStore(config, router) {
             sort = cx.state.defaultCollectionSort;
           }
           const filters = {};
-          if (cx.getters.supportsConformance(TYPES.Collections.FreeText) && size(q) > 0) {
+          if (cx.getters.supportsConformance(TYPES.Collections.FreeText) && searching && size(q) > 0) {
             filters.q = q;
           }
           link = Utils.addFiltersToLink(link, filters, cx.state.collectionsPerPage, sort);
@@ -1028,7 +1029,9 @@ function getStore(config, router) {
                 return data;
               }
             });
-            cx.commit('addApiCollections', { data: response.data, stac, show, reset, setApiData: !size(q) });
+            cx.commit('addApiCollections', {
+              data: response.data, stac, show, reset, setApiData: !searching
+            });
           }
         } catch (error) {
           if (!noRetry && cx.state.authConfig && isAuthenticationError(error)) {
