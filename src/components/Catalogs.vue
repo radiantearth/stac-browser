@@ -9,7 +9,7 @@
     <section v-if="!hideControls && ((isComplete && catalogs.length > 1) || canSearchFreeText)" class="catalog-filter mb-2">
       <multiselect
         v-if="canSearchFreeText" multiple taggable @tag="addSearchTerm"
-        :id="selectedSearchTerms" v-model="selectedSearchTerms" :options="selectedSearchTerms"
+        id="catalogFreeText" v-model="selectedSearchTerms" :options="selectedSearchTerms"
         :placeholder="$t('search.enterSearchTerms')" :tag-placeholder="$t('search.addSearchTerm')" :no-options="$t('search.addSearchTerm')"
       >
         <template #noOptions>{{ $t('search.noOptions') }}</template>

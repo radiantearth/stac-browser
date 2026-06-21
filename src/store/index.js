@@ -968,8 +968,7 @@ function getStore(config, router) {
             // If we load from new collections, reset list of collections.
             // Otherwise we may append to collections from a parent entity.
             // https://github.com/radiantearth/stac-browser/issues/617
-            // Also, only reset after the call to ennsure
-            reset = true;
+            // Also, only reset after the call to ensure
           }
           link = stac.getLinkWithRel('data');
           let sort = null;
@@ -995,9 +994,6 @@ function getStore(config, router) {
             throw new BrowserError(i18n.global.t('errors.invalidStacCollections'));
           }
           else {
-            if (reset) {
-              cx.commit('resetApiCollections');
-            }
             // todo: Convert data to stac-js
             response.data.collections = response.data.collections.map(collection => {
               let selfLink = Utils.getLinkWithRel(collection.links, 'self');
@@ -1032,7 +1028,7 @@ function getStore(config, router) {
                 return data;
               }
             });
-            cx.commit('addApiCollections', { data: response.data, stac, show, reset, setApiData: size(q) > 0 });
+            cx.commit('addApiCollections', { data: response.data, stac, show, reset, setApiData: !size(q) });
           }
         } catch (error) {
           if (!noRetry && cx.state.authConfig && isAuthenticationError(error)) {
