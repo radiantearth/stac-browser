@@ -118,6 +118,7 @@ export default defineComponent({
       filters: {},
       loadingCollections: null,
       isSearchingCollections: false,
+      currentSearchRequestId: 0,
     };
   },
   computed: {
@@ -243,10 +244,18 @@ export default defineComponent({
       this.$store.commit('updateState', {type: 'itemFilterOpen', value: show ? 1 : null});
     },
     async loadMoreCollections() {
+      const requestId = this.currentSearchRequestId;
       this.loadingCollections = "more";
       try {
+        const params = {
+          show: true,
+          searching: this.isSearchingCollections
+        };
+        if (this.isSearchingCollections) {
+          params.searchRequestId = requestId;
+        }
         await this.$store.dispatch('loadNextApiCollections', {
-          show: true, searching: this.isSearchingCollections
+          ...params
         });
       } catch (error) {
         this.$store.commit('showGlobalError', {
@@ -254,15 +263,19 @@ export default defineComponent({
           message: this.$t('errors.loadApiCollectionsFailed')
         });
       } finally {
-        this.loadingCollections = null;
+        if (requestId === this.currentSearchRequestId && this.loadingCollections === 'more') {
+          this.loadingCollections = null;
+        }
       }
     },
     async searchCollections(searchTerms) {
       this.loadingCollections = "all";
       this.isSearchingCollections = size(searchTerms) > 0;
+      // Increment request ID to invalidate any in-flight requests from previous searches
+      const requestId = ++this.currentSearchRequestId;
       try {
         await this.$store.dispatch('loadNextApiCollections', {
-          stac: this.data, show: true, q: searchTerms, searching: this.isSearchingCollections
+          stac: this.data, show: true, q: searchTerms, searching: this.isSearchingCollections, searchRequestId: requestId
         });
       } catch (error) {
         this.$store.commit('showGlobalError', {
@@ -270,7 +283,9 @@ export default defineComponent({
           message: this.$t('errors.loadApiCollectionsFailed')
         });
       } finally {
-        this.loadingCollections = null;
+        if (requestId === this.currentSearchRequestId && this.loadingCollections === 'all') {
+          this.loadingCollections = null;
+        }
       }
     },
     async paginateItems(link) {

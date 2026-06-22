@@ -48,7 +48,8 @@ function getStore(config, router) {
 
     apiCollections: [],
     apiItemsLoading: {},
-    nextCollectionsLink: null
+    nextCollectionsLink: null,
+    currentApiCollectionsSearchId: null
   });
 
   return createStore({
@@ -619,6 +620,9 @@ function getStore(config, router) {
         state.apiItemsLoading = {};
         state.nextCollectionsLink = null;
       },
+      setCurrentApiCollectionsSearchId(state, searchId) {
+        state.currentApiCollectionsSearchId = searchId;
+      },
       resetApiItems(state, link) {
         state.apiItems = [];
         state.apiItemsLink = link;
@@ -959,11 +963,14 @@ function getStore(config, router) {
         }
       },
       async loadNextApiCollections(cx, args) {
-        let { stac, show, noRetry, q, searching = false } = args;
+        let { stac, show, noRetry, q, searching = false, searchRequestId } = args;
         let link;
         let reset = false;
         if (stac) { // First page
           if (show) {
+            // Track request IDs for both searching and non-searching reloads
+            // so stale responses can be discarded consistently.
+            cx.commit('setCurrentApiCollectionsSearchId', searchRequestId ?? null);
             // If we load from new collections, reset list of collections.
             // Otherwise we may append to collections from a parent entity.
             // https://github.com/radiantearth/stac-browser/issues/617
@@ -995,6 +1002,11 @@ function getStore(config, router) {
         }
         try {
           let response = await stacRequest(cx, link);
+          // Check if this response is still relevant (not superseded by a newer search request)
+          if (searchRequestId !== undefined && searchRequestId !== cx.state.currentApiCollectionsSearchId) {
+            // Discard results from stale search requests
+            return;
+          }
           if (!isObject(response.data) || !Array.isArray(response.data.collections)) {
             throw new BrowserError(i18n.global.t('errors.invalidStacCollections'));
           }
