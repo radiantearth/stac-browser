@@ -46,7 +46,7 @@
       <b-col class="catalogs-container" v-if="hasCatalogs">
         <WidgetHook id="view-catalog-catalogs-start" />
         <Catalogs
-          apiSearch :catalogs="catalogs" :hasMore="hasMore"
+          :apiSearch="hasApiCollections" :catalogs="catalogs" :hasMore="hasMore"
           @load-more="loadMoreCollections" @search="searchCollections"
           :loading="Boolean(loadingCollections)" :loadingMore="loadingCollections === 'more'"
         />
@@ -200,7 +200,7 @@ export default defineComponent({
       return Boolean(this.apiItemsLink);
     },
     hasApiCollections() {
-      return Boolean(this.data.getApiCollectionsLink());
+      return Boolean(this.data.getApiCollectionsLink()) && this.apiCatalogPriority !== 'childs';
     },
     hasItems() {
       return this.items.length > 0 || this.hasApiItems;

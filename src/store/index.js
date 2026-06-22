@@ -598,15 +598,9 @@ function getStore(config, router) {
           stac.setApiData(apiItems, pages.next, pages.prev);
         }
       },
-      addApiCollections(state, { data, stac, show, reset = false, setApiData = true }) {
+      addApiCollections(state, { data, stac, show, searching = false }) {
         if (!isObject(data) || !Array.isArray(data.collections)) {
           return;
-        }
-
-        if (reset) {
-          state.apiCollections = [];
-          state.apiItemsLoading = {};
-          state.nextCollectionsLink = null;
         }
 
         // todo: Convert to stac-js
@@ -616,9 +610,14 @@ function getStore(config, router) {
           state.nextCollectionsLink = nextLink;
           state.apiCollections = state.apiCollections.concat(collections);
         }
-        if (stac instanceof STAC && setApiData) {
+        if (stac instanceof STAC && !searching) {
           stac.setApiData(collections, nextLink);
         }
+      },
+      resetApiCollections(state) {
+        state.apiCollections = [];
+        state.apiItemsLoading = {};
+        state.nextCollectionsLink = null;
       },
       resetApiItems(state, link) {
         state.apiItems = [];
@@ -968,8 +967,13 @@ function getStore(config, router) {
             // If we load from new collections, reset list of collections.
             // Otherwise we may append to collections from a parent entity.
             // https://github.com/radiantearth/stac-browser/issues/617
-            // Also, only reset after the call to ensure the previous list remains visible if the request fails.
-            reset = true;
+            if (searching) {
+              // When searching, only reset after the request to ensure the previous list remains visible if the request fails.
+              reset = true;
+            } else {
+              // For non-searching requests, reset immediately to avoid showing collections from a previous request.
+              cx.commit('resetApiCollections');
+            }
           }
           link = stac.getLinkWithRel('data');
           let sort = null;
@@ -1029,8 +1033,11 @@ function getStore(config, router) {
                 return data;
               }
             });
+            if (reset) {
+              cx.commit('resetApiCollections');
+            }
             cx.commit('addApiCollections', {
-              data: response.data, stac, show, reset, setApiData: !searching
+              data: response.data, stac, show, searching
             });
           }
         } catch (error) {
