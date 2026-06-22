@@ -134,7 +134,8 @@ export default {
       extent: this.modelValue,
       dragging: false,
       validationErrors: getBoxDefaults(),
-      bboxValues: getBoxDefaults()
+      bboxValues: getBoxDefaults(),
+      isInitialLoad: true
     };
   },
   computed: {
@@ -152,7 +153,7 @@ export default {
   watch: {
     async stac() {
       await this.initMap();
-    }
+    },
   },
   async mounted() {
     await this.initMap();
@@ -214,7 +215,34 @@ export default {
         extent = this.stacToOlExtent(this.stac.getBoundingBox());
       }
       if (extent) {
-        this.map.getView().fit(extent, { padding: [50,50,50,50], maxZoom: this.maxZoom });
+        const size = this.map.getSize();
+        if (!size || size[0] === 0 || size[1] === 0) {
+          
+          const observer = new ResizeObserver(() => {
+            const newSize = this.map.getSize();
+            
+            if (newSize && newSize[0] > 0 && newSize[1] > 0) {
+              this.map.updateSize(); 
+              
+              this.map.getView().fit(extent, {
+                padding: [50, 50, 50, 50],
+                maxZoom: 10,
+                duration: 250
+              });
+              
+              observer.disconnect(); 
+            }
+          });
+          
+          observer.observe(this.map.getTargetElement());
+          return; 
+        }
+
+        this.map.getView().fit(extent, {
+          padding: [50, 50, 50, 50],
+          maxZoom: 10,
+          duration: 250
+        });
       }
     },
     addMask(stac) {

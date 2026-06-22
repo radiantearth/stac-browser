@@ -50,7 +50,7 @@
 
         <b-form-group v-if="canFilterExtents" class="filter-bbox" :label="$t('search.spatialExtent')" :label-for="ids.bbox">
           <b-form-checkbox :id="ids.bbox" v-model="provideBBox" value="1">{{ $t('search.filterBySpatialExtent') }}</b-form-checkbox>
-          <MapSelect class="mb-4" v-if="provideBBox" v-model="searchBBox" :stac="stac" />
+          <MapSelect ref="mapSelect" class="mb-4" v-if="provideBBox" v-model="searchBBox" :stac="stac" />
         </b-form-group>
 
         <b-form-group v-if="conformances.CollectionIdFilter" class="filter-collection" :label="$t('stacCollection', collections.length)" :label-for="ids.collections">
@@ -512,7 +512,7 @@ export default defineComponent({
           this.provideBBox = '1';
           this.bbox = newBbox; 
         }
-        else {
+        else if (!this.loaded) {
           this.provideBBox = false;
         }
       } 
@@ -533,11 +533,24 @@ export default defineComponent({
       }
     },  
     provideBBox(shown) {
-      if (!shown) {
+      // 1. Guard against wiping out URL data during the initial page load
+      if (!this.loaded) {return;}
+
+      const isChecked = shown === '1' || shown === true;
+
+      if (!isChecked) {
         this.commitToVuex('bbox', null);
       }
-      else if (this.bbox && this.bbox.length > 0) {
-        this.commitToVuex('bbox', this.bbox);
+      else {
+        if (this.bbox && this.bbox.length > 0) {
+          this.commitToVuex('bbox', this.bbox);
+        }
+        
+        setTimeout(() => {
+          if (this.$refs.mapSelect && typeof this.$refs.mapSelect.updateMap === 'function') {
+            this.$refs.mapSelect.updateMap();
+          }
+        }, 300);
       }
     },
     sortTerm() {
