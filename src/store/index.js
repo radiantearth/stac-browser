@@ -970,7 +970,11 @@ function getStore(config, router) {
           if (show) {
             // Track request IDs for both searching and non-searching reloads
             // so stale responses can be discarded consistently.
-            cx.commit('setCurrentApiCollectionsSearchId', searchRequestId ?? null);
+            if (searchRequestId === undefined) {
+              // Ensure non-search requests also get an ID so stale responses can be discarded.
+              searchRequestId = Date.now();
+            }
+            cx.commit('setCurrentApiCollectionsSearchId', searchRequestId);
             // If we load from new collections, reset list of collections.
             // Otherwise we may append to collections from a parent entity.
             // https://github.com/radiantearth/stac-browser/issues/617
