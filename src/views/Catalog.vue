@@ -248,8 +248,11 @@ export default defineComponent({
         await this.$store.dispatch('loadNextApiCollections', {
           show: true, searching: this.isSearchingCollections
         });
-      } catch(error) {
-        console.error(error);
+      } catch (error) {
+        this.$store.commit('showGlobalError', {
+          error,
+          message: this.$t('errors.loadApiCollectionsFailed')
+        });
       } finally {
         this.loadingCollections = null;
       }
@@ -262,7 +265,10 @@ export default defineComponent({
           stac: this.data, show: true, q: searchTerms, searching: this.isSearchingCollections
         });
       } catch (error) {
-        console.error(error);
+        this.$store.commit('showGlobalError', {
+          error,
+          message: this.$t('errors.loadApiCollectionsFailed')
+        });
       } finally {
         this.loadingCollections = null;
       }
