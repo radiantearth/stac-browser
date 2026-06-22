@@ -45,13 +45,17 @@
       </b-col>
       <b-col class="catalogs-container" v-if="hasCatalogs">
         <WidgetHook id="view-catalog-catalogs-start" />
-        <Catalogs :catalogs="catalogs" :hasMore="hasMore" @load-more="loadMoreCollections" />
+        <Catalogs
+          :apiSearch="hasApiCollections" :catalogs="catalogs" :hasMore="hasMore"
+          @load-more="loadMoreCollections" @search="searchCollections"
+          :loading="Boolean(loadingCollections)" :loadingMore="loadingCollections === 'more'"
+        />
         <WidgetHook id="view-catalog-catalogs-end" />
       </b-col>
       <b-col class="items-container" v-if="hasItems || hasItemAssets">
         <WidgetHook id="view-catalog-items-start" />
         <Items
-          :stac="data" :items="items" :api="isApi"
+          :stac="data" :items="items" :api="hasApiItems"
           :showFilters="showFilters" :apiFilters="filters"
           :pagination="itemPages" :loading="apiItemsLoading"
           :count="apiItemsNumberMatched"
@@ -76,7 +80,7 @@ import ShowAssetLinkMixin from '../components/ShowAssetLinkMixin';
 import StacFieldsMixin from '../components/StacFieldsMixin';
 import { formatLicense, formatTemporalExtents } from '@radiantearth/stac-fields/formatters';
 import Utils from '../utils';
-import { hasText, isObject } from 'stac-js/src/utils.js';
+import { hasText, isObject, size } from 'stac-js/src/utils.js';
 import { addSchemaToDocument, createCatalogSchema } from '../schema-org';
 import { ItemCollection } from '../models/stac.js';
 import DeprecationMixin from '../components/DeprecationMixin.js';
@@ -111,7 +115,10 @@ export default defineComponent({
   ],
   data() {
     return {
-      filters: {}
+      filters: {},
+      loadingCollections: null,
+      isSearchingCollections: false,
+      currentSearchRequestId: 0,
     };
   },
   computed: {
@@ -190,14 +197,17 @@ export default defineComponent({
       }
       return pages;
     },
-    isApi() {
+    hasApiItems() {
       return Boolean(this.apiItemsLink);
     },
+    hasApiCollections() {
+      return Boolean(this.data.getApiCollectionsLink()) && this.apiCatalogPriority !== 'childs';
+    },
     hasItems() {
-      return this.items.length > 0 || this.isApi;
+      return this.items.length > 0 || this.hasApiItems;
     },
     hasCatalogs() {
-      return this.catalogs.length > 0;
+      return this.catalogs.length > 0 || this.hasApiCollections || this.isSearchingCollections;
     },
     mapData() {
       const data = {};
@@ -233,8 +243,50 @@ export default defineComponent({
     filtersShown(show) {
       this.$store.commit('updateState', {type: 'itemFilterOpen', value: show ? 1 : null});
     },
-    loadMoreCollections() {
-      this.$store.dispatch('loadNextApiCollections', {show: true});
+    async loadMoreCollections() {
+      const requestId = this.currentSearchRequestId;
+      this.loadingCollections = "more";
+      try {
+        const params = {
+          show: true,
+          searching: this.isSearchingCollections
+        };
+        if (this.isSearchingCollections) {
+          params.searchRequestId = requestId;
+        }
+        await this.$store.dispatch('loadNextApiCollections', {
+          ...params
+        });
+      } catch (error) {
+        this.$store.commit('showGlobalError', {
+          error,
+          message: this.$t('errors.loadApiCollectionsFailed')
+        });
+      } finally {
+        if (requestId === this.currentSearchRequestId && this.loadingCollections === 'more') {
+          this.loadingCollections = null;
+        }
+      }
+    },
+    async searchCollections(searchTerms) {
+      this.loadingCollections = "all";
+      this.isSearchingCollections = size(searchTerms) > 0;
+      // Increment request ID to invalidate any in-flight requests from previous searches
+      const requestId = ++this.currentSearchRequestId;
+      try {
+        await this.$store.dispatch('loadNextApiCollections', {
+          stac: this.data, show: true, q: searchTerms, searching: this.isSearchingCollections, searchRequestId: requestId
+        });
+      } catch (error) {
+        this.$store.commit('showGlobalError', {
+          error,
+          message: this.$t('errors.loadApiCollectionsFailed')
+        });
+      } finally {
+        if (requestId === this.currentSearchRequestId && this.loadingCollections === 'all') {
+          this.loadingCollections = null;
+        }
+      }
     },
     async paginateItems(link) {
       try {

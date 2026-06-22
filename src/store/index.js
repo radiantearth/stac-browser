@@ -1,6 +1,6 @@
 import { createStore } from "vuex";
 
-import { URI } from 'stac-js/src/utils.js';
+import { size, URI } from 'stac-js/src/utils.js';
 import urijs from 'urijs';
 
 import i18n, { loadMessages, detectDataLanguage, updateExternals } from '../i18n';
@@ -48,7 +48,8 @@ function getStore(config, router) {
 
     apiCollections: [],
     apiItemsLoading: {},
-    nextCollectionsLink: null
+    nextCollectionsLink: null,
+    currentApiCollectionsSearchId: null
   });
 
   return createStore({
@@ -598,7 +599,7 @@ function getStore(config, router) {
           stac.setApiData(apiItems, pages.next, pages.prev);
         }
       },
-      addApiCollections(state, { data, stac, show }) {
+      addApiCollections(state, { data, stac, show, searching = false }) {
         if (!isObject(data) || !Array.isArray(data.collections)) {
           return;
         }
@@ -610,7 +611,7 @@ function getStore(config, router) {
           state.nextCollectionsLink = nextLink;
           state.apiCollections = state.apiCollections.concat(collections);
         }
-        if (stac instanceof STAC) {
+        if (stac instanceof STAC && !searching) {
           stac.setApiData(collections, nextLink);
         }
       },
@@ -618,6 +619,9 @@ function getStore(config, router) {
         state.apiCollections = [];
         state.apiItemsLoading = {};
         state.nextCollectionsLink = null;
+      },
+      setCurrentApiCollectionsSearchId(state, searchId) {
+        state.currentApiCollectionsSearchId = searchId;
       },
       resetApiItems(state, link) {
         state.apiItems = [];
@@ -959,21 +963,39 @@ function getStore(config, router) {
         }
       },
       async loadNextApiCollections(cx, args) {
-        let { stac, show, noRetry } = args;
+        let { stac, show, noRetry, q, searching = false, searchRequestId } = args;
         let link;
+        let reset = false;
         if (stac) { // First page
-          // If we load from new collections, reset list of collections.
-          // Otherwise we may append to collections from a parent entity.
-          // https://github.com/radiantearth/stac-browser/issues/617
           if (show) {
-            cx.commit('resetApiCollections');
+            // Track request IDs for both searching and non-searching reloads
+            // so stale responses can be discarded consistently.
+            if (searchRequestId === undefined) {
+              // Ensure non-search requests also get an ID so stale responses can be discarded.
+              searchRequestId = Date.now();
+            }
+            cx.commit('setCurrentApiCollectionsSearchId', searchRequestId);
+            // If we load from new collections, reset list of collections.
+            // Otherwise we may append to collections from a parent entity.
+            // https://github.com/radiantearth/stac-browser/issues/617
+            if (searching) {
+              // When searching, only reset after the request to ensure the previous list remains visible if the request fails.
+              reset = true;
+            } else {
+              // For non-searching requests, reset immediately to avoid showing collections from a previous request.
+              cx.commit('resetApiCollections');
+            }
           }
           link = stac.getLinkWithRel('data');
           let sort = null;
           if (cx.getters.supportsConformance(TYPES.Collections.Sort)) {
             sort = cx.state.defaultCollectionSort;
           }
-          link = Utils.addFiltersToLink(link, {}, cx.state.collectionsPerPage, sort);
+          const filters = {};
+          if (cx.getters.supportsConformance(TYPES.Collections.FreeText) && searching && size(q) > 0) {
+            filters.q = q;
+          }
+          link = Utils.addFiltersToLink(link, filters, cx.state.collectionsPerPage, sort);
         }
         else { // Second page and after
           stac = cx.state.data;
@@ -984,6 +1006,11 @@ function getStore(config, router) {
         }
         try {
           let response = await stacRequest(cx, link);
+          // Check if this response is still relevant (not superseded by a newer search request)
+          if (searchRequestId !== undefined && searchRequestId !== cx.state.currentApiCollectionsSearchId) {
+            // Discard results from stale search requests
+            return;
+          }
           if (!isObject(response.data) || !Array.isArray(response.data.collections)) {
             throw new BrowserError(i18n.global.t('errors.invalidStacCollections'));
           }
@@ -1022,7 +1049,12 @@ function getStore(config, router) {
                 return data;
               }
             });
-            cx.commit('addApiCollections', { data: response.data, stac, show });
+            if (reset) {
+              cx.commit('resetApiCollections');
+            }
+            cx.commit('addApiCollections', {
+              data: response.data, stac, show, searching
+            });
           }
         } catch (error) {
           if (!noRetry && cx.state.authConfig && isAuthenticationError(error)) {
