@@ -292,6 +292,7 @@
     "dateDescription": "All times in Coordinated Universal Time (UTC).",
     "disabledDueToSingleDate": "This filter is disabled because the collection has a single date and time as temporal extent.",
     "droppedFilters": "1 filter was removed — not supported by this collection. | {count} filters were removed — not supported by this collection.",
+    "droppedFreeText": "Your search terms ({terms}) were removed — free-text search is not supported for item search in this collection.",
     "enterCollections": "Enter one or more Collection IDs...",
     "enterItemIds": "Enter one or more Item IDs...",
     "enterSearchTerms": "Enter one or more search terms...",

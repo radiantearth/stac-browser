@@ -1,6 +1,28 @@
 <template>
   <div :class="{cc: true, [cssStacType]: true, empty: !hasCatalogs && !hasItems}" :key="data.id">
     <b-row>
+      <b-col v-if="hasVisibleDroppedFilters" cols="12">
+        <b-alert
+          v-if="droppedFreeText"
+          variant="warning"
+          dismissible
+          :model-value="true"
+          class="mb-3"
+          @dismissed="$store.commit('search/clearDroppedFiltersByType', 'freeText')"
+        >
+          {{ $t('search.droppedFreeText', { terms: droppedFreeText.join(', ') }) }}
+        </b-alert>
+        <b-alert
+          v-if="droppedCql.length > 0"
+          variant="warning"
+          dismissible
+          :model-value="true"
+          class="mb-3"
+          @dismissed="$store.commit('search/clearDroppedFiltersByType', 'cql2')"
+        >
+          {{ $tc('search.droppedFilters', droppedCql.length, { count: droppedCql.length }) }}
+        </b-alert>
+      </b-col>
       <b-col class="meta">
         <WidgetHook id="view-catalog-meta-start" />
         <section class="intro">
@@ -47,17 +69,6 @@
         <WidgetHook id="view-catalog-catalogs-start" />
         <Catalogs :catalogs="catalogs" :hasMore="hasMore" @load-more="loadMoreCollections" />
         <WidgetHook id="view-catalog-catalogs-end" />
-      </b-col>
-      <b-col v-if="hasDroppedFilters" cols="12">
-        <b-alert
-          variant="warning"
-          dismissible
-          class="mb-3"
-          :model-value="hasDroppedFilters"
-          @dismissed="$store.commit('search/clearDroppedFilters')"
-        >
-          {{ $tc('search.droppedFilters', droppedFilterCount, { count: droppedFilterCount }) }}
-        </b-alert>
       </b-col>
       <b-col class="items-container" v-if="hasItems || hasItemAssets">
         <WidgetHook id="view-catalog-items-start" />
@@ -132,9 +143,15 @@ export default defineComponent({
   computed: {
     ...mapState(['data', 'url', 'apiCatalogPriority',  'apiItems', 'apiItemsLink', 'apiItemsPagination', 'apiItemsNumberMatched', 'nextCollectionsLink', 'stateQueryParameters']),
     ...mapGetters(['catalogs', 'collectionLink', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
-    ...mapGetters('search', ['hasDroppedFilters']),
-    droppedFilterCount() {
-      return this.$store.state.search.droppedFilters.length;
+    droppedCql() {
+      return this.$store.state.search.droppedFilters.filter(f => f.type === 'cql2');
+    },
+    droppedFreeText() {
+      const ft = this.$store.state.search.droppedFilters.find(f => f.type === 'freeText');
+      return ft ? ft.terms : null; // string[] | null
+    },
+    hasVisibleDroppedFilters() {
+      return this.droppedCql.length > 0 || !!this.droppedFreeText;
     },
     ignoredMetadataFields() {
       return getIgnoredFields(this.data, 'CatalogLike');
@@ -246,10 +263,9 @@ export default defineComponent({
           console.error(error);
         }
 
-        if (!oldData) {return;}
-        if (!newData?.isCollection) {return;}
-        if (!this.$store.getters['search/hasActiveFilters']) {return;}
-        if (oldData?.id === newData?.id) {return;}
+        if (!newData?.isCollection) { return; }
+        if (!this.$store.getters['search/hasActiveFilters']) { return; }
+        if (oldData?.id === newData?.id) { return; }
 
         await this.$store.dispatch('search/resetForCollection', {
           collection: newData,
@@ -269,8 +285,8 @@ export default defineComponent({
             return Object.entries(schemas.properties)
               .map(([key, schema]) => new Queryable(key, schema));
           }
-        });
-        
+        }); 
+
         this.filters = this.$store.getters['search/itemSearchParams'];
       }
     }

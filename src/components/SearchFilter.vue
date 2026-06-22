@@ -781,12 +781,15 @@ export default defineComponent({
       });
     },
     onSubmit() {
+    
       this.commitToVuex('sortby', this.formatSort());
-      this.commitToVuex('filters', this.buildFilter()); 
+      this.commitToVuex('filters', this.buildFilter());
+      this.commitToVuex('rawFilters', [...this.filters]);  
       this.commitToVuex('filterLogic', {
         andOr: this.filtersAndOr,
         negate: this.filtersNegate,
       });
+
       this.$emit('input', this.activeParams, false);
     },
     async onReset() {
