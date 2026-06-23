@@ -103,6 +103,32 @@ test.describe('Collection Metadata', () => {
     await expect(page.locator('.providers')).toBeVisible();
     await expect(page.locator('.assets').first()).toBeVisible();
   });
+
+  test('API - should keep the collections free-text search after browser back navigation', async ({ page, worker }) => {
+    const api = API.minimalApi({}, { defaultLimit: 1 });
+    api.root.addConformsTo('https://api.stacspec.org/v1.0.0/collection-search');
+    api.root.addConformsTo('https://api.stacspec.org/v1.0.0/collection-search#free-text');
+    const firstCollection = api.addCollection('collection-1').setMetadata({ title: 'Example Collection 1' });
+    api.addCollection('collection-2').setMetadata({ title: 'Example Collection 2' });
+
+    await api.createServer(worker);
+
+    await page.goto(api.root.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    const collectionSearchInput = page.locator('.catalog-filter .multiselect').first();
+    await expect(collectionSearchInput).toBeVisible();
+
+    await page.getByRole('link', { name: new RegExp(firstCollection.getMetadata().title, 'i') }).click();
+    await waitForBrowserReady(page);
+    await expect(page.getByRole('heading', { name: /Example Collection 1/i })).toBeVisible();
+
+    await page.goBack();
+    await waitForBrowserReady(page);
+
+    await expect(page.getByRole('link', { name: /Example Collection 1/i })).toBeVisible();
+    await expect(collectionSearchInput).toBeVisible();
+  });
 });
 
 test.describe('Collection - toolBar', () => {

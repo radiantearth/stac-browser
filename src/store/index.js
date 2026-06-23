@@ -784,14 +784,6 @@ function getStore(config, router) {
               }
             }
 
-            // Handle conformance classes
-            let conformanceLink = data.getStacLinkWithRel('conformance');
-            if (Array.isArray(data.conformsTo) && data.conformsTo.length > 0) {
-              cx.commit('setConformanceClasses', data.conformsTo);
-            }
-            else if (conformanceLink) {
-              await cx.dispatch('loadOgcApiConformance', conformanceLink);
-            }
           } catch (error) {
             if (!noRetry && cx.state.authConfig && isAuthenticationError(error)) {
               await cx.dispatch('tryLogin', {
@@ -804,6 +796,15 @@ function getStore(config, router) {
             cx.commit('errored', { url, error });
             return;
           }
+        }
+
+        // Restore conformance classes for cached pages, too.
+        let conformanceLink = data.getStacLinkWithRel('conformance');
+        if (Array.isArray(data.conformsTo) && data.conformsTo.length > 0) {
+          cx.commit('setConformanceClasses', data.conformsTo);
+        }
+        else if (conformanceLink) {
+          await cx.dispatch('loadOgcApiConformance', conformanceLink);
         }
 
         // Load API Collections
