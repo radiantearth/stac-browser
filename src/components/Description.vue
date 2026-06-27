@@ -1,5 +1,5 @@
 <template>
-  <div class="styled-description" :class="{compact, inline}" v-html="markup(description)" />
+  <div class="styled-description" :class="{compact, inline}" v-html="formatted" />
 </template>
 
 <script>
@@ -23,6 +23,11 @@ export default {
     allowHTML: {
       type: Boolean,
       default: false
+    }
+  },
+  computed: {
+    formatted: function() {
+      return this.markup(this.description);
     }
   },
   methods: {
