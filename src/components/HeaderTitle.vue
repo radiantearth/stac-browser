@@ -39,16 +39,14 @@ export default {
       else if (this.root) {
         return getDisplayTitle(this.root);
       }
+      else if (this.url && this.loading) {
+        // If the page is still loading, we don't show a title to not have a quick flash
+        // of the default title before the actual title is loaded.
+        return '';
+      }
       else {
-        if (this.url && this.loading) {
-          // If the page is still loading, we don't show a title to not have a quick flash
-          // of the default title before the actual title is loaded.
-          return '';
-        }
-        else {
-          // To change this default title, add "STAC Browser": "Your Title" to the custom.json locale file
-          return this.fallbackTitle;
-        }
+        // To change this default title, add "STAC Browser": "Your Title" to the custom.json locale file
+        return this.fallbackTitle;
       }
     },
     documentTitle() {

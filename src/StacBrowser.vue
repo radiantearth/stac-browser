@@ -334,16 +334,16 @@ export default defineComponent({
         'showThumbnailsAsAssets'
       ];
 
-      let doReset = !root || (oldRoot && isObject(oldRoot['stac_browser']));
-      let doSet = root && isObject(root['stac_browser']);
+      let doReset = !root || (oldRoot && isObject(oldRoot.stac_browser));
+      let doSet = root && isObject(root.stac_browser);
 
       for(let key of canChange) {
         let value;
         if (doReset) {
           value = CONFIG[key]; // Original value
         }
-        if (doSet && typeof root['stac_browser'][key] !== 'undefined') {
-          value = root['stac_browser'][key]; // Custom value from root
+        if (doSet && typeof root.stac_browser[key] !== 'undefined') {
+          value = root.stac_browser[key]; // Custom value from root
         }
 
         // Update config in store

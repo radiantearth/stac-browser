@@ -36,16 +36,16 @@ export default {
       default: () => ({})
     }
   },
-  data() {
-    return {
-      status: null
-    };
-  },
   setup() {
     const { copy, isSupported } = useClipboard();
     return {
       copyToClipboard: copy,
       isClipboardSupportedState: isSupported
+    };
+  },
+  data() {
+    return {
+      status: null
     };
   },
   computed: {

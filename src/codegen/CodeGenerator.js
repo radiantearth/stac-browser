@@ -238,7 +238,7 @@ export default class CodeGenerator {
     let safety = 0;
     while (regex.test(result) && safety++ < 100) {
       result = result.replace(regex, (match, varName, content) => {
-        const isTruthy = !!vars[varName];
+        const isTruthy = Boolean(vars[varName]);
         const elseMatch = content.match(elseRe);
         if (!elseMatch) {
           return isTruthy ? content : '';

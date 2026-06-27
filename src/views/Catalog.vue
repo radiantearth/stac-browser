@@ -134,7 +134,7 @@ export default defineComponent({
       return null;
     },
     showFilters() {
-      return Boolean(this.stateQueryParameters['itemFilterOpen']);
+      return Boolean(this.stateQueryParameters.itemFilterOpen);
     },
     linkPosition() {
       if (this.additionalLinks.length === 0) {

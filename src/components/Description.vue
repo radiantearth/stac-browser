@@ -32,9 +32,9 @@ export default {
       }
 
       // Parse CommonMark
-      var reader = new commonmark.Parser();
-      var writer = new commonmark.HtmlRenderer({safe: !this.allowHTML, smart: true});
-      var parsed = reader.parse(text);
+      let reader = new commonmark.Parser();
+      let writer = new commonmark.HtmlRenderer({safe: !this.allowHTML, smart: true});
+      let parsed = reader.parse(text);
       return writer.render(parsed);
     }
   }
