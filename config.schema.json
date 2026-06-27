@@ -142,6 +142,10 @@
         "type": ["string"]
       }
     },
+    "preferredAssets": {
+      "type": ["boolean", "string"],
+      "description": "Preferred asset selection strategy: false (show main asset), true (prefer HTTP/S), or asset key name (string)"
+    },
     "preprocessSTAC": {
       "type": ["null"],
       "format": "function",

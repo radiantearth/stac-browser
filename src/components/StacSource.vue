@@ -94,7 +94,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['socialSharing', 'valid']),
+    ...mapState(['socialSharing']),
     stacVersion() {
       return this.stac?.stac_version;
     },
@@ -123,6 +123,7 @@ export default {
   gap: 0.25rem;
 }
 </style>
+
 <style lang="scss">
 #popover-link .stac-id .btn-sm,
 #popover-link .stac-valid .btn-sm {

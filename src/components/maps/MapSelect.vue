@@ -81,7 +81,6 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
 import MapMixin from './MapMixin.js';
 import LayerControl from './LayerControl.vue';
 import TextControl from './TextControl.vue';
@@ -139,7 +138,6 @@ export default {
     };
   },
   computed: {
-    ...mapState(['uiLanguage']),
     projectedExtent() {
       if (this.extent) {
         return this.stacToOlExtent(this.extent);

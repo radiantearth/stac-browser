@@ -4,7 +4,7 @@
     <b-list-group v-if="isSimple" class="mimic-accordion">
       <b-list-group-item
         v-for="(provider, key) in providers" :key="key" :href="provider.url" :disabled="!provider.url"
-        target="_blank" variant="provider" class="provider"
+        target="_blank" rel="noopener noreferrer" variant="provider" class="provider"
       >
         <span class="title">{{ provider.name }}</span>
         <ProviderRoles :roles="provider.roles" />

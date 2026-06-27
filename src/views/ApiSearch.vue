@@ -6,7 +6,7 @@
       <b-col class="left">
         <WidgetHook id="view-search-filters-start" />
         <b-tabs v-model="activeSearch">
-          <b-tab v-if="collectionSearch" :title="$t('search.tabs.collections')" id="search-collections-tab">
+          <b-tab v-if="collectionSearch" :title="$t('search.tabs.collections')" :id="tabIds.collections">
             <WidgetHook id="view-search-filters-collections-start" />
             <SearchFilter
               :parent="parent" title="" :value="collectionFilters" type="Collections"
@@ -14,7 +14,7 @@
             />
             <WidgetHook id="view-search-filters-collections-end" />
           </b-tab>
-          <b-tab v-if="itemSearch" :title="$t('search.tabs.items')" id="search-items-tab">
+          <b-tab v-if="itemSearch" :title="$t('search.tabs.items')" :id="tabIds.items">
             <WidgetHook id="view-search-filters-items-start" />
             <SearchFilter
               :parent="parent" title="" :value="itemFilters" type="Global"
@@ -116,11 +116,15 @@ export default defineComponent({
       itemFilters: {},
       collectionFilters: {},
       activeSearch: undefined,
-      selectedCollections: {}
+      selectedCollections: {},
+      tabIds: {
+        collections: 'search-collections-tab',
+        items: 'search-items-tab'
+      }
     };
   },
   computed: {
-    ...mapState(['catalogUrl', 'catalogTitle', 'searchResultsPerPage', 'itemsPerPage', 'collectionsPerPage']),
+    ...mapState(['catalogUrl', 'catalogTitle', 'searchResultsPerPage', 'stateQueryParameters']),
     ...mapGetters(['canSearchItems', 'canSearchCollections', 'getStac', 'root', 'collectionLink', 'parentLink', 'fromBrowserPath', 'toBrowserPath']),
     selectedCollectionCount() {
       return size(this.selectedCollections);
@@ -211,8 +215,27 @@ export default defineComponent({
     }
   },
   watch:{
-    activeSearch() {
+    'stateQueryParameters.searchtype': {
+      immediate: true,
+      handler(searchType) {
+        if (searchType && this.tabIds[searchType]) {
+          this.activeSearch = this.tabIds[searchType];
+        }
+      }
+    },
+    'stateQueryParameters.q': {
+      handler(q) {
+        this.updateFreeText(q, true);
+      }
+    },
+    activeSearch(tab) {
+      // Reset search results when switching tabs
       this.data = null;
+      // Update the search type (collections/items) in the URL
+      const tabId = Object.entries(this.tabIds).find(([, value]) => value === tab);
+      if (tabId) {
+        this.$store.commit('updateState', {type: 'searchtype', value: tabId[0]});
+      }
     },
     searchLink: {
       immediate: true,
@@ -240,11 +263,20 @@ export default defineComponent({
       this.parent = this.getStac(url);
       this.showPage();
     }
+
+    // We had this initially in a watcher with immediate: true, but this was executed too early.
+    // Thus we only apply it once when creating the component and then on any subsequent change.
+    this.updateFreeText(this.stateQueryParameters.q);
   },
   methods: {
+    updateFreeText(q, force = false) {
+      if (Array.isArray(q) && (force || size(q) > 0)) {
+        this.setFilters({ q });
+      }
+    },
     openItemSearch() {
       this.itemFilters.collections = Object.keys(this.selectedCollections);
-      this.activeSearch = 'search-items-tab';
+      this.activeSearch = this.tabIds.items;
       this.selectedCollections = {};
     },
     selectForItemSearch(collection) {
@@ -299,7 +331,7 @@ export default defineComponent({
       if (reset) {
         this.data = null;
       }
-      else {
+      else if (this.searchLink) {
         await this.loadResults(this.searchLink);
       }
     },

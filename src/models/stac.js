@@ -105,13 +105,13 @@ export function sortStac(entities, sort, uiLanguage) {
   const sorted = entities.slice(0).sort((a, b) => {
     const aValue = getFieldValue(a);
     const bValue = getFieldValue(b);
-    if (aValue == null && bValue == null) {
+    if (aValue === null && bValue === null) {
       return 0;
     }
-    if (aValue == null) {
+    if (aValue === null) {
       return 1;
     }
-    if (bValue == null) {
+    if (bValue === null) {
       return -1;
     }
     if (typeof aValue === 'number' && typeof bValue === 'number') {

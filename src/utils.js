@@ -1,7 +1,6 @@
-import { URI } from 'stac-js/src/utils.js';
 import removeMd from 'remove-markdown';
 import { Link } from 'stac-js';
-import { hasText, isObject, size } from 'stac-js/src/utils.js';
+import { hasText, isObject, size, URI } from 'stac-js/src/utils.js';
 import { geojsonMediaType, imageMediaTypes } from 'stac-js/src/mediatypes.js';
 import { pagination } from "stac-js/src/relationtypes.js";
 
@@ -93,8 +92,8 @@ export default class Utils {
     if (!el) {
       return;
     }
-    var rect = el.getBoundingClientRect();
-    var isVisible = rect.top < window.innerHeight && rect.bottom >= 0;
+    let rect = el.getBoundingClientRect();
+    let isVisible = rect.top < window.innerHeight && rect.bottom >= 0;
     if (!isVisible) {
       el.scrollIntoView({
         behavior: "smooth",
@@ -155,6 +154,21 @@ export default class Utils {
     
     // Put the object in an array
     return [sortby];
+  }
+
+  static stateQueryParametersToObject(state, query = {}) {
+    for (const [key, value] of Object.entries(state)) {
+      let name = `.${key}`;
+      if (Array.isArray(value)) {
+        if (value.length > 0) {
+          query[name] = value.join(',');
+        }
+      }
+      else if (value !== null) {
+        query[name] = value;
+      }
+    }
+    return query;
   }
 
   // todo: remove when all usage is gone, replace with stac-js method

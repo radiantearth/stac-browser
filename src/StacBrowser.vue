@@ -81,12 +81,12 @@
       <WidgetHook id="footer-start" />
       <ul v-if="Array.isArray(footerLinksFromVueX) && footerLinksFromVueX.length > 0" class="footer-links text-body-secondary">
         <li v-for="link in footerLinksFromVueX" :key="link.url">
-          <a :href="link.url" target="_blank">{{ $te(`footerLinks.${link.label}`) ? $t(`footerLinks.${link.label}`) : link.label }}</a>
+          <a :href="link.url" target="_blank" rel="noopener noreferrer">{{ $te(`footerLinks.${link.label}`) ? $t(`footerLinks.${link.label}`) : link.label }}</a>
         </li>
       </ul>
       <i18n-t tag="small" keypath="poweredBy" class="poweredby text-body-secondary" scope="global">
         <template #link>
-          <a href="https://github.com/radiantearth/stac-browser" target="_blank">STAC Browser</a> {{ browserVersion }}
+          <a href="https://github.com/radiantearth/stac-browser" target="_blank" rel="noopener noreferrer">STAC Browser</a> {{ browserVersion }}
         </template>
       </i18n-t>
     </footer>
@@ -117,10 +117,9 @@ import HeaderTitle from './components/HeaderTitle.vue';
 import Loading from './components/Loading.vue';
 import StacLink from './components/StacLink.vue';
 
-import { CatalogLike, STAC } from 'stac-js';
-import { hasText, isObject, size } from 'stac-js/src/utils.js';
+import { STAC } from 'stac-js';
+import { hasText, isObject, size, URI } from 'stac-js/src/utils.js';
 import Utils from './utils';
-import { URI } from 'stac-js/src/utils.js';
 
 import { API_LANGUAGE_CONFORMANCE, updateExternals } from './i18n';
 import { getBest, prepareSupported } from 'stac-js/src/locales';
@@ -175,7 +174,7 @@ export default defineComponent({
     };
   },
   computed: {
-    ...mapState(['allowSelectCatalog', 'browserReady', 'conformsTo', 'data', 'dataLanguage', 'downloads', 'globalError', 'loading', 'stateQueryParameters', 'uiLanguage', 'url']),
+    ...mapState(['allowSelectCatalog', 'browserReady', 'conformsTo', 'data', 'dataLanguage', 'downloads', 'globalError', 'loading', 'stateQueryParameters', 'url']),
     ...mapState({
       footerLinksFromVueX: 'footerLinks',
       localeFromVueX: 'locale',
@@ -186,7 +185,7 @@ export default defineComponent({
       enforcedColorModeFromVueX: 'enforcedColorMode',
       colorModeFromVueX: 'colorMode'
     }),
-    ...mapGetters(['canSearch', 'collectionLink', 'fromBrowserPath', 'isExternalUrl', 'isRoot', 'parentLink', 'root','supportsConformance', 'title', 'toBrowserPath']),
+    ...mapGetters(['canSearch', 'collectionLink', 'fromBrowserPath', 'isExternalUrl', 'isRoot', 'parentLink', 'root', 'searchBrowserLink', 'supportsConformance', 'title', 'toBrowserPath']),
     ...mapGetters('auth', { authMethod: 'method' }),
     ...mapGetters('auth', ['canAuthenticate', 'isLoggedIn', 'showLogin']),
     browserVersion() {
@@ -211,22 +210,6 @@ export default defineComponent({
     },
     authLabel() {
       return this.isLoggedIn ? this.authMethod.getLogoutLabel() : this.authMethod.getLoginLabel();
-    },
-    searchBrowserLink() {
-      if (!this.canSearch) {
-        return null;
-      }
-      let searchLink;
-      if (this.data instanceof CatalogLike && !this.data.is(this.root)) {
-        searchLink = this.data.getSearchLink();
-      }
-      if (searchLink) {
-        return `/search${this.data.getBrowserPath()}`;
-      }
-      else if (this.root && this.allowSelectCatalog) {
-        return `/search${this.root.getBrowserPath()}`;
-      }
-      return '/search';
     },
     isApi() {
       // todo: This gives false results for a statically hosted OGC API - Records, which may include conformance classes
@@ -328,17 +311,7 @@ export default defineComponent({
             query[key] = value;
           }
         }
-        for (const [key, value] of Object.entries(this.stateQueryParameters)) {
-          let name = `.${key}`;
-          if (Array.isArray(value)) {
-            if (value.length > 0) {
-              query[name] = value.join(',');
-            }
-          }
-          else if (value !== null) {
-            query[name] = value;
-          }
-        }
+        query = Utils.stateQueryParametersToObject(this.stateQueryParameters, query);
 
         this.$router.replace({ query }).catch(error => {
           if (!isNavigationFailure(error, NavigationFailureType.duplicated)) {
@@ -351,24 +324,25 @@ export default defineComponent({
       const canChange = [
         'apiCatalogPriority',
         'cardViewMode',
+        'crossOriginMedia',
         'defaultCollectionSort',
         'defaultItemSort',
-        'crossOriginMedia',
         'defaultThumbnailSize',
         'displayGeoTiffByDefault',
+        'preferredAssets',
         'showThumbnailsAsAssets'
       ];
 
-      let doReset = !root || (oldRoot && isObject(oldRoot['stac_browser']));
-      let doSet = root && isObject(root['stac_browser']);
+      let doReset = !root || (oldRoot && isObject(oldRoot.stac_browser));
+      let doSet = root && isObject(root.stac_browser);
 
       for(let key of canChange) {
         let value;
         if (doReset) {
           value = CONFIG[key]; // Original value
         }
-        if (doSet && typeof root['stac_browser'][key] !== 'undefined') {
-          value = root['stac_browser'][key]; // Custom value from root
+        if (doSet && typeof root.stac_browser[key] !== 'undefined') {
+          value = root.stac_browser[key]; // Custom value from root
         }
 
         // Update config in store

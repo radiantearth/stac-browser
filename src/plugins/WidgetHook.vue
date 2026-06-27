@@ -11,16 +11,16 @@ import widgetConfig from '../../widgets.config';
 export default {
   name: 'WidgetHook',
   components: {},
-  data() {
-    return {
-      widgets: [],
-    };
-  },
   props: {
     id: {
       type: String,
       required: true,
     }
+  },
+  data() {
+    return {
+      widgets: [],
+    };
   },
   created() {
     const widgets = widgetConfig[this.id];

@@ -792,7 +792,7 @@ export default defineComponent({
 
       this.$emit('input', this.activeParams, false);
     },
-    async onReset() {
+    onReset() {
       Object.assign(this, getDefaults());   
       this.resetSort();   
       this.$store.commit('search/resetShared');      

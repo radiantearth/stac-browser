@@ -7,17 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.0.0-rc.1] - 2026-06-27
+
 ### Added
 - Added Vuex `search` module to centralize search filter state (`shared`, `collectionFilters`, `itemFilters`)
 - Adding `extent`s to the root catalog will restrict the Search filters
+- Support free-text search for Collections in list of collections
+- Add a link to Collection Search from the Collections overview page for advanced filters
 - New locales:
   - Swedish
   - Russian
-- New config option `catalogTitleAfterImage` to set a different title in the header after a logo
+- New config options:
+  - `catalogTitleAfterImage`: Set a different title in the header after a logo.
+  - `defaultCollectionSort`: Default sort order for Collections (replaces `cardViewSort`). The new default is different from the old default behaviour.
+  - `defaultItemSort`: Default sort order for Items (replaces `cardViewSort`). The new default is different from the old default behaviour.
+  - `preferredAssets`: Configure which (alternate) asset is shown by default. Defaults to preferring HTTP(S) alternates; set to `false` to revert back to the previous behaviour.
 
 ### Changed
 
-- Replaced `cardViewSort` with new options `defaultCollectionSort` and `defaultItemSort`
 - Only show language chooser when more than one locale is available
 - Restrict Collection item search date picker to collection's temporal extent
 - Focus temporal extent filter for Collection item search on end of temporal extent
@@ -26,6 +33,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - No search / sort functionality available when a static catalog has only a subset of children loaded
 - The default value for `catalogTitle` is `null` instead of `STAC Browser`.
 - Improved how the title is handled
+
+### Removed
+
+- Removed `cardViewSort` config option in favor of `defaultCollectionSort` and `defaultItemSort`
 
 ### Fixed
 
@@ -172,7 +183,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 For releases prior to v4.0.0, please refer to the
 [release notes in the GitHub Releases](https://github.com/radiantearth/stac-browser/releases).
 
-[Unreleased]: https://github.com/radiantearth/stac-browser/compare/v5.0.0-beta.1...HEAD
+[Unreleased]: https://github.com/radiantearth/stac-browser/compare/v5.0.0-rc.1...HEAD
+[5.0.0-rc.1]: https://github.com/radiantearth/stac-browser/compare/v5.0.0-beta.1...v5.0.0-rc.1
 [5.0.0-beta.1]: https://github.com/radiantearth/stac-browser/compare/v4.0.1...v5.0.0-beta.1
 [4.0.1]: https://github.com/radiantearth/stac-browser/compare/v4.0.0...v4.0.1
 [4.0.0]: https://github.com/radiantearth/stac-browser/compare/v3.3.5...v4.0.0

@@ -152,7 +152,7 @@ export default defineComponent({
         }
         else if (this.items.length > 0) {
           // Check whether any pagination links are available
-          return Object.values(this.pagination).some(link => !!link);
+          return Object.values(this.pagination).some(link => Boolean(link));
         }
       }
       return false;

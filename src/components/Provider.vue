@@ -12,10 +12,10 @@
     </template>
     <div class="provider-details">
       <b-button-group v-if="provider.url || provider.email || provider.mail">
-        <b-button :href="provider.url" target="_blank" variant="primary">
+        <b-button :href="provider.url" target="_blank" rel="noopener noreferrer" variant="primary">
           {{ $t('providers.homepage') }}
         </b-button>
-        <b-button v-if="provider.email || provider.mail" :href="`mailto:${provider.email || provider.mail}`" target="_blank" variant="primary">
+        <b-button v-if="provider.email || provider.mail" :href="`mailto:${provider.email || provider.mail}`" target="_blank" rel="noopener noreferrer" variant="primary">
           {{ $t('providers.email') }}
         </b-button>
       </b-button-group>

@@ -1,5 +1,5 @@
 <template>
-  <div class="styled-description" :class="{compact, inline}" v-html="markup(description)" />
+  <div class="styled-description" :class="{compact, inline}" v-html="formatted" />
 </template>
 
 <script>
@@ -25,6 +25,11 @@ export default {
       default: false
     }
   },
+  computed: {
+    formatted: function() {
+      return this.markup(this.description);
+    }
+  },
   methods: {
     markup(text) {
       if (typeof text !== 'string') {
@@ -32,9 +37,9 @@ export default {
       }
 
       // Parse CommonMark
-      var reader = new commonmark.Parser();
-      var writer = new commonmark.HtmlRenderer({safe: !this.allowHTML, smart: true});
-      var parsed = reader.parse(text);
+      let reader = new commonmark.Parser();
+      let writer = new commonmark.HtmlRenderer({safe: !this.allowHTML, smart: true});
+      let parsed = reader.parse(text);
       return writer.render(parsed);
     }
   }

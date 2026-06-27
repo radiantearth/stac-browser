@@ -70,7 +70,7 @@ export default {
     reset() {
       this.$emit('reset');
     },
-    async submit() {
+    submit() {
       this.$emit('submit', this.token);
     }
   }
