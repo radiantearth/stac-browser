@@ -28,9 +28,15 @@ function getStore(config, router) {
 
     localRequestQueryParameters: {},
     stateQueryParameters: {
+      // The currently selected language
       language: null,
+      // Expanded Asset and Item Assets
       asset: [],
-      itemdef: []
+      itemdef: [],
+      // Determine which search tab is active in the API Search view
+      searchtype: null,
+      // Used for free-text search
+      q: []
     },
 
     apiItems: [],
@@ -227,6 +233,22 @@ function getStore(config, router) {
       },
       canSearchCollections: (state, getters) => {
         return getters.supportsConformance(TYPES.Collections.BasicFilters);
+      },
+      searchBrowserLink: (state, getters) => {
+        if (!getters.canSearch) {
+          return null;
+        }
+        let searchLink;
+        if (state.data?.isCatalogLike && !state.data.is(state.root)) {
+          searchLink = state.data.getSearchLink();
+        }
+        if (searchLink) {
+          return `/search${state.data.getBrowserPath()}`;
+        }
+        else if (state.root && state.allowSelectCatalog) {
+          return `/search${state.root.getBrowserPath()}`;
+        }
+        return '/search';
       },
 
       items: state => {

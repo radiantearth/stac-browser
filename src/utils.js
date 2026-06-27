@@ -157,6 +157,21 @@ export default class Utils {
     return [sortby];
   }
 
+  static stateQueryParametersToObject(state, query = {}) {
+    for (const [key, value] of Object.entries(state)) {
+      let name = `.${key}`;
+      if (Array.isArray(value)) {
+        if (value.length > 0) {
+          query[name] = value.join(',');
+        }
+      }
+      else if (value !== null) {
+        query[name] = value;
+      }
+    }
+    return query;
+  }
+
   // todo: remove when all usage is gone, replace with stac-js method
   static getPaginationLinks(data) {
     let pages = {};

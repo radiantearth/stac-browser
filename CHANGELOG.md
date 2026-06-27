@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Adding `extent`s to the root catalog will restrict the Search filters
 - Support free-text search for Collections in list of collections
+- Add a link to Collection Search from the Collections overview page for advanced filters
 - New locales:
   - Swedish
   - Russian
