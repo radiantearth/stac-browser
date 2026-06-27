@@ -61,12 +61,6 @@ export default defineComponent({
   mixins: [
     BrowseMixin
   ],
-  props: {
-    path: {
-      type: String,
-      required: true
-    }
-  },
   data() {
     return {
       working: true,

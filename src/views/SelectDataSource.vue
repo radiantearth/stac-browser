@@ -22,7 +22,7 @@
       <template #label>
         <i18n-t keypath="index.selectStacIndex" tag="span" scope="global">
           <template #stacIndex>
-            <a href="https://stacindex.org" target="_blank">STAC Index</a>
+            <a href="https://stacindex.org" target="_blank" rel="noopener noreferrer">STAC Index</a>
           </template>
         </i18n-t>
       </template>

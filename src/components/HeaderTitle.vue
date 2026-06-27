@@ -13,7 +13,7 @@ import { getDisplayTitle } from "../models/stac";
 export default {
   name: "HeaderTitle",
   computed: {
-    ...mapState(['catalogUrl', 'catalogImage', 'catalogTitle', 'catalogTitleAfterImage', 'description', 'loading', 'url', 'uiLanguage']),
+    ...mapState(['catalogImage', 'catalogTitle', 'catalogTitleAfterImage', 'description', 'loading', 'url', 'uiLanguage']),
     ...mapGetters(['description', 'root', 'rootLink', 'title']),
     logo() {
       if (this.catalogImage) {
@@ -39,16 +39,14 @@ export default {
       else if (this.root) {
         return getDisplayTitle(this.root);
       }
+      else if (this.url && this.loading) {
+        // If the page is still loading, we don't show a title to not have a quick flash
+        // of the default title before the actual title is loaded.
+        return '';
+      }
       else {
-        if (this.url && this.loading) {
-          // If the page is still loading, we don't show a title to not have a quick flash
-          // of the default title before the actual title is loaded.
-          return '';
-        }
-        else {
-          // To change this default title, add "STAC Browser": "Your Title" to the custom.json locale file
-          return this.fallbackTitle;
-        }
+        // To change this default title, add "STAC Browser": "Your Title" to the custom.json locale file
+        return this.fallbackTitle;
       }
     },
     documentTitle() {
@@ -84,7 +82,7 @@ export default {
     },
     uiLanguage: {
       immediate: true,
-      async handler(locale) {
+      handler(locale) {
         if (!locale) {
           return;
         }

@@ -29,7 +29,7 @@ import { defineAsyncComponent } from 'vue';
 import MapMixin from './maps/MapMixin.js';
 import LayerControl from './maps/LayerControl.vue';
 import TextControl from './maps/TextControl.vue';
-import { mapGetters, mapState } from 'vuex';
+import { mapState } from 'vuex';
 import Select from 'ol/interaction/Select';
 import StacLayer from 'ol-stac';
 import { getStacObjectsForEvent, getStyle } from 'ol-stac/util.js';
@@ -87,7 +87,6 @@ export default {
   },
   computed: {
     ...mapState(['displayOverviewsForChildren']),
-    ...mapGetters(['getStac']),
     container() {
       if (this.isFullScreen) {
         return '#' + this.mapId;
@@ -149,10 +148,10 @@ export default {
       await this.createMap(this.$refs.map, this.stac, this.onfocusOnly);
 
       if (this.stac) {
-        await this.addStacLayer();
+        this.addStacLayer();
       }
     },
-    async addStacLayer() {
+    addStacLayer() {
       let options = Object.assign({}, this.stacLayerOptions, {
         // Don't set the URL here, as it is already set in the STAC object and is read-only.
         // url: this.stac.getAbsoluteUrl(),

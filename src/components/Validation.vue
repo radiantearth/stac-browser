@@ -50,6 +50,9 @@ export default {
         if (this.data instanceof STAC) {
           const stac = this.data._original || this.data.toJSON();
           const report = await validateSTAC(stac, {});
+          if (report.valid === null) {
+            console.warn(report.messages);
+          }
           this.valid = report.valid;
         }
       } catch (error) {

@@ -709,7 +709,7 @@ export default defineComponent({
       this.query.filters = filters;
       this.$emit('input', this.query, false);
     },
-    async onReset() {
+    onReset() {
       Object.assign(this, getDefaults());
       this.resetSort();
       this.$emit('input', this.query, true);

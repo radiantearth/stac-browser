@@ -181,7 +181,7 @@ export default defineComponent({
     },
     showPagination() {
       // Check whether any pagination links are available
-      return Object.values(this.pagination).some(link => !!link);
+      return Object.values(this.pagination).some(link => Boolean(link));
     },
     allCatalogs() {
       return this.catalogs.map(catalog => {
@@ -259,9 +259,6 @@ export default defineComponent({
       }
     }
   },
-  created() {
-    this.sort = Utils.parseApiSortParameter(this.defaultCollectionSort);
-  },
   watch: {
     selectedSearchTerms: {
       handler(searchTerms) {
@@ -269,6 +266,9 @@ export default defineComponent({
       },
       deep: 1
     }
+  },
+  created() {
+    this.sort = Utils.parseApiSortParameter(this.defaultCollectionSort);
   },
   methods: {
     addSearchTerm(term) {

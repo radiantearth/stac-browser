@@ -42,11 +42,10 @@ import { defineAsyncComponent } from 'vue';
 
 import Description from './Description.vue';
 import Utils, { mapMediaTypes } from '../utils';
-import { size } from 'stac-js/src/utils.js';
+import { size, URI } from 'stac-js/src/utils.js';
 import { mapGetters, mapState } from 'vuex';
 import AssetActions from '../../assetActions.config';
 import LinkActions from '../../linkActions.config';
-import { URI } from 'stac-js/src/utils.js';
 import AuthUtils from './auth/utils';
 import { Asset } from 'stac-js';
 import { browserProtocols } from 'stac-js/src/http';
@@ -97,7 +96,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['downloads', 'pathPrefix', 'requestHeaders', 'buildTileUrlTemplate', 'useTileLayerAsFallback']),
+    ...mapState(['downloads', 'requestHeaders', 'buildTileUrlTemplate', 'useTileLayerAsFallback']),
     ...mapGetters(['getRequestUrl']),
     ...mapGetters('auth', ['isLoggedIn']),
     loading() {
@@ -147,7 +146,7 @@ export default {
     downloadEvents() {
       if (this.canDownload && this.useAltDownloadMethod) {
         return {
-          click: async (event) => {
+          click: (event) => {
             event.preventDefault();
             this.altDownload();
           }
