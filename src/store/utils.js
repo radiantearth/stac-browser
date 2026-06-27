@@ -119,7 +119,7 @@ export function getErrorMessage(error) {
 }
 
 export function addQueryIfNotExists(uri, query) {
-  if (size(query) == 0) {
+  if (size(query) === 0) {
     return uri;
   }
   for (let key in query) {

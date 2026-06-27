@@ -124,7 +124,7 @@ export default defineComponent({
     };
   },
   computed: {
-    ...mapState(['catalogUrl', 'catalogTitle', 'searchResultsPerPage', 'itemsPerPage', 'collectionsPerPage', 'stateQueryParameters']),
+    ...mapState(['catalogUrl', 'catalogTitle', 'searchResultsPerPage', 'stateQueryParameters']),
     ...mapGetters(['canSearchItems', 'canSearchCollections', 'getStac', 'root', 'collectionLink', 'parentLink', 'fromBrowserPath', 'toBrowserPath']),
     selectedCollectionCount() {
       return size(this.selectedCollections);

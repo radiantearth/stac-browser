@@ -1,7 +1,6 @@
-import { URI } from 'stac-js/src/utils.js';
 import removeMd from 'remove-markdown';
 import { Link } from 'stac-js';
-import { hasText, isObject, size } from 'stac-js/src/utils.js';
+import { hasText, isObject, size, URI } from 'stac-js/src/utils.js';
 import { geojsonMediaType, imageMediaTypes } from 'stac-js/src/mediatypes.js';
 import { pagination } from "stac-js/src/relationtypes.js";
 

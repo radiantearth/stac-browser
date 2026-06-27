@@ -36,7 +36,7 @@ export default {
       default: () => ({})
     }
   },
-  setup() {
+  setup() { // eslint-disable-line
     const { copy, isSupported } = useClipboard();
     return {
       copyToClipboard: copy,

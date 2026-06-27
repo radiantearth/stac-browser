@@ -94,7 +94,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['socialSharing', 'valid']),
+    ...mapState(['socialSharing']),
     stacVersion() {
       return this.stac?.stac_version;
     },

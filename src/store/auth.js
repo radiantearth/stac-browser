@@ -102,7 +102,7 @@ export default function getStore(router) {
           handleAuthError(cx, error);
         }
       },
-      async abortLogin(cx) {
+      async abortLogin(cx) { // eslint-disable-line require-await
         cx.commit('setInProgress', false);
       },
       async requestLogout(cx) {
@@ -121,7 +121,7 @@ export default function getStore(router) {
         }
       },
       // Format the value and add it to query parameters or headers
-      async updateCredentials(cx, value = null) {
+      async updateCredentials(cx, value = null) { // eslint-disable-line require-await
         cx.commit('setCredentials', value);
         const intent = cx.getters.method.updateStore(value);
         if (intent.query) {
@@ -135,7 +135,7 @@ export default function getStore(router) {
           cookie.setItem(intent.cookie.key, intent.cookie.value);
         }
       },
-      async executeActions(cx) {
+      async executeActions(cx) { // eslint-disable-line require-await
         for (let callback of cx.state.actions) {
           try {
             const p = callback();

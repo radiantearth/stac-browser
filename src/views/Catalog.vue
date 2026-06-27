@@ -26,7 +26,7 @@
         </section>
         <section v-if="isCollection || hasThumbnails" class="mb-4">
           <b-card no-body class="maps-preview">
-            <b-tabs v-model="tab" ref="tabs" pills card vertical end>
+            <b-tabs v-model="tab" pills card vertical end>
               <b-tab v-if="isCollection" :id="tabIds.map" :title="$t('map')" no-body>
                 <MapView :stac="data" v-bind="mapData" @changed="dataChanged" @empty="handleEmptyMap" onfocusOnly popover />
               </b-tab>
@@ -122,7 +122,7 @@ export default defineComponent({
     };
   },
   computed: {
-    ...mapState(['data', 'url', 'apiCatalogPriority',  'apiItems', 'apiItemsLink', 'apiItemsPagination', 'apiItemsNumberMatched', 'nextCollectionsLink', 'stateQueryParameters']),
+    ...mapState(['data', 'apiCatalogPriority', 'apiItemsLink', 'apiItemsPagination', 'apiItemsNumberMatched', 'nextCollectionsLink', 'stateQueryParameters']),
     ...mapGetters(['catalogs', 'collectionLink', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
     ignoredMetadataFields() {
       return getIgnoredFields(this.data, 'CatalogLike');

@@ -35,10 +35,6 @@ export default {
       type: Object,
       required: true
     },
-    hasAlternatives: {
-      type: Boolean,
-      default: false
-    },
     shown: {
       type: Boolean,
       default: false

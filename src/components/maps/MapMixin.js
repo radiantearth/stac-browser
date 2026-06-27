@@ -114,7 +114,7 @@ export default {
 
       // Only update when the basemaps are different to before based on URLs
       const sameBasemaps = (
-        this.basemaps.length == newBasemaps.length
+        this.basemaps.length === newBasemaps.length
         && this.basemaps.every((b, i) => b.url === newBasemaps[i].url)
       );
       if (sameBasemaps) {

@@ -13,7 +13,7 @@ import { getDisplayTitle } from "../models/stac";
 export default {
   name: "HeaderTitle",
   computed: {
-    ...mapState(['catalogUrl', 'catalogImage', 'catalogTitle', 'catalogTitleAfterImage', 'description', 'loading', 'url', 'uiLanguage']),
+    ...mapState(['catalogImage', 'catalogTitle', 'catalogTitleAfterImage', 'description', 'loading', 'url', 'uiLanguage']),
     ...mapGetters(['description', 'root', 'rootLink', 'title']),
     logo() {
       if (this.catalogImage) {
@@ -82,7 +82,7 @@ export default {
     },
     uiLanguage: {
       immediate: true,
-      async handler(locale) {
+      handler(locale) {
         if (!locale) {
           return;
         }

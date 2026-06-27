@@ -1,5 +1,5 @@
 <template>
-  <div class="ol-layercontrol ol-unselectable ol-control" style="pointer-events: auto;">
+  <div class="ol-layercontrol ol-unselectable ol-control">
     <button v-if="id" :id="id"><b-icon-layers-fill /></button>
     <b-popover
       v-if="id" click placement="top" @show="update"
@@ -17,7 +17,7 @@
         </section>
         <section v-if="hasLayers">
           <h5>{{ $t('mapping.layers.title') }}</h5>
-          <LayerControlGroup :map="map" :group="layerGroup" />
+          <LayerControlGroup :map="map" :max="maxZoom" :group="layerGroup" />
         </section>
       </div>
     </b-popover>
@@ -75,7 +75,7 @@ export default {
           if (data.layer instanceof Group) {
             const layerWithProjection = data.layer.getLayers().getArray()
               .map(layer => layer.getSource().getProjection())
-              .filter(projection => Boolean(projection));
+              .filter(proj => Boolean(proj));
             projection = layerWithProjection.length > 0 ? layerWithProjection[0] : null;
           }
           else {
@@ -113,6 +113,7 @@ export default {
 
 <style lang="scss" scoped>
 .ol-layercontrol {
+  pointer-events: auto;
   z-index: 1;
   left: 0.5em;
   bottom: 0.5em;
