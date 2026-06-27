@@ -36,7 +36,7 @@ export default {
       default: () => ({})
     }
   },
-  setup() { // eslint-disable-line
+  setup() { // eslint-disable-line vue/component-api-style
     const { copy, isSupported } = useClipboard();
     return {
       copyToClipboard: copy,

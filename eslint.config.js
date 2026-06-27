@@ -122,9 +122,6 @@ export default [
         "classes": false,
         "variables": true,
         "allowNamedExports": true,
-        "enums": true,
-        "typedefs": true,
-        "ignoreTypeReferences": true
       }],
       'vue/no-unused-vars': 'error',
       'vue/no-unused-components': 'error',
