@@ -47,10 +47,10 @@ export default {
         (Array.isArray(f.q) && f.q.length > 0) ||
         (Array.isArray(f.ids) && f.ids.length > 0) ||
         (Array.isArray(f.collections) && f.collections.length > 0) ||
-        !!f.sortby ||
-        !!f.filters
+        Boolean(f.sortby) ||
+        Boolean(f.filters)
       );
-      return !!(s.datetime || s.bbox || s.limit) || isActive(state.itemFilters) || isActive(state.collectionFilters);
+      return Boolean(s.datetime || s.bbox || s.limit) || isActive(state.itemFilters) || isActive(state.collectionFilters);
     },
     hasDroppedFilters: (state) => state.droppedFilters.length > 0,
     cachedQueryables: (state) => (href) => state.queryablesCache[href] || null,
@@ -104,7 +104,7 @@ export default {
       
       const hasCql = Array.isArray(raw) && raw.length > 0;
       const hasFreeText = Array.isArray(q) && q.length > 0;
-      const hasSort = !!sortby;
+      const hasSort = Boolean(sortby);
 
       if (!hasCql && !hasFreeText && !hasSort) {
         return;
@@ -130,7 +130,7 @@ export default {
           return;
         }
 
-        const supportedIds = new Set(queryables.map(q => q.id));
+        const supportedIds = new Set(queryables.map(queryable => queryable.id));
         const compatible = raw.filter(f => supportedIds.has(f.queryable.id));
         const cqlDropped = raw.filter(f => !supportedIds.has(f.queryable.id));
 

@@ -158,7 +158,7 @@ export default defineComponent({
       return ft ? ft.terms : null; // string[] | null
     },
     hasVisibleDroppedFilters() {
-      return this.droppedCql.length > 0 || !!this.droppedFreeText;
+      return this.droppedCql.length > 0 || Boolean(this.droppedFreeText);
     },
     ignoredMetadataFields() {
       return getIgnoredFields(this.data, 'CatalogLike');
