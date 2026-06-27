@@ -11,7 +11,30 @@ import { vBToggle } from 'bootstrap-vue-next/directives/BToggle';
 import visible from './directives/visible';
 import WidgetHook from "./plugins/WidgetHook.vue";
 
-export default function init() {
+async function loadRuntimeConfig() {
+  await new Promise((resolve) => {
+    const script = document.createElement('script');
+    script.src = CONFIG.pathPrefix + 'runtime-config.js';
+    script.onload = resolve;
+    script.onerror = resolve; // file absent — ignore silently
+    document.head.appendChild(script);
+  });
+  if (window.STAC_BROWSER_CONFIG) {
+    Object.assign(CONFIG, window.STAC_BROWSER_CONFIG);
+  }
+}
+
+function injectRuntimeStyle() {
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = CONFIG.pathPrefix + 'runtime-style.css';
+  document.head.appendChild(link);
+}
+
+export default async function init() {
+  if (CONFIG.RUNTIME) {
+    await loadRuntimeConfig();
+  }
   return loadDefaultMessages().then(() => {
     // Setup router
     const router = createRouter({
@@ -46,6 +69,10 @@ export default function init() {
     app.use(router);
     app.use(store);
 
-    return app.mount("body");
+    const instance = app.mount("body");
+    if (CONFIG.RUNTIME) {
+      injectRuntimeStyle();
+    }
+    return instance;
   });
 }

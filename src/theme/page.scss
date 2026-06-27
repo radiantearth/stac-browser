@@ -753,32 +753,3 @@ svg {
     color: #{$dark} !important;
   }
 }
-
-// Expose STAC Browser custom vars as CSS custom properties.
-// Non-color parts are baked from Sass (build-time theming);
-// color parts reference var(--bs-primary) so they stay live
-// and can be overridden at runtime in runtime-style.css.
-:root {
-  // Sizing & spacing
-  --sb-header-margin: #{$header-margin};
-  --sb-block-gap: #{$block-gap};
-  --sb-code-padding: #{$code-padding};
-  --sb-logo-max-height: #{$logo-image-height};
-  --sb-max-icon-size: #{$max-icon-size};
-
-  // Typography
-  --sb-header-font-size: #{$header-font-size};
-  --sb-header-font-weight: #{$header-font-weight};
-
-  // Colors (light mode; dark mode overrides below)
-  --sb-h1-color: #{$h1-color};
-  --sb-subheadings-color: #{$subheadings-color};
-
-  // Header border (color part stays live via var(--bs-primary))
-  --sb-header-border: #{$header-border-width} #{$header-border-style} var(--bs-primary);
-}
-
-[data-bs-theme="dark"] {
-  --sb-h1-color: #{$h1-color-dark};
-  --sb-subheadings-color: #{$subheadings-color-dark};
-}
