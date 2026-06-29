@@ -2,8 +2,18 @@
   <b-form class="filter mb-4" @submit.stop.prevent="onSubmit" @reset="onReset">
     <b-card no-body :title="title">
       <b-card-body>
+      <template v-if="droppedFilterNames.length > 0">
+        <b-alert
+          variant="warning"
+          dismissible
+          :model-value="true"
+          class="mb-3"
+          @dismissed="$store.commit('search/clearDroppedFilters')"
+        >
+          {{ $t('search.droppedFilters', { filters: droppedFilterNames.join(', ') }) }}
+        </b-alert>
+      </template>
         <Loading v-if="!loaded" fill />
-
         <b-card-title v-if="title" :title="title" />
 
         <b-form-group v-if="canFilterFreeText" class="filter-freetext" :label="$t('search.freeText')" :label-for="ids.q" :description="$t('search.freeTextDescription')">
@@ -165,7 +175,7 @@
 <script>
 import { defineComponent, defineAsyncComponent } from 'vue';
 import { mapGetters, mapState } from "vuex";
-import { BCard, BCardBody, BCardFooter, BCardTitle, BDropdown, BDropdownItem, BModal } from 'bootstrap-vue-next';
+import { BAlert, BCard, BCardBody, BCardFooter, BCardTitle, BDropdown, BDropdownItem, BModal } from 'bootstrap-vue-next';
 
 import refParser from '@apidevtools/json-schema-ref-parser';
 
@@ -261,6 +271,14 @@ export default defineComponent({
     ...mapState(['defaultCollectionSort', 'defaultItemSort', 'searchResultsPerPage', 'maxEntriesPerPage', 'uiLanguage']),
     ...mapGetters(['canSearchCollections', 'supportsConformance']),
     ...mapGetters('search', ['collectionSearchParams', 'itemSearchParams']),
+    droppedFilterNames() {
+      const names = [];
+      const ft = this.$store.state.search.droppedFilters.find(f => f.type === 'freeText');
+      if (ft) ft.terms.forEach(t => names.push(t));
+      const cql = this.$store.state.search.droppedFilters.filter(f => f.type === 'cql2');
+      cql.forEach(f => names.push(f.queryable?.title || f.queryable?.id || f.id));
+      return names;
+    },
     collectionSelectOptions() {
       let taggable = !this.hasAllCollections;
       let isResult = this.collections.length > 0 && !this.hasAllCollections;

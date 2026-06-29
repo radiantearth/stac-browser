@@ -1,28 +1,6 @@
 <template>
   <div :class="{cc: true, [cssStacType]: true, empty: !hasCatalogs && !hasItems}" :key="data.id">
     <b-row>
-      <b-col v-if="hasVisibleDroppedFilters" cols="12">
-        <b-alert
-          v-if="droppedFreeText"
-          variant="warning"
-          dismissible
-          :model-value="true"
-          class="mb-3"
-          @dismissed="$store.commit('search/clearDroppedFiltersByType', 'freeText')"
-        >
-          {{ $t('search.droppedFreeText', { terms: droppedFreeText.join(', ') }) }}
-        </b-alert>
-        <b-alert
-          v-if="droppedCql.length > 0"
-          variant="warning"
-          dismissible
-          :model-value="true"
-          class="mb-3"
-          @dismissed="$store.commit('search/clearDroppedFiltersByType', 'cql2')"
-        >
-          {{ $tc('search.droppedFilters', droppedCql.length, { count: droppedCql.length }) }}
-        </b-alert>
-      </b-col>
       <b-col class="meta">
         <WidgetHook id="view-catalog-meta-start" />
         <section class="intro">
@@ -106,7 +84,7 @@ import { hasText, isObject, size } from 'stac-js/src/utils.js';
 import { addSchemaToDocument, createCatalogSchema } from '../schema-org';
 import { ItemCollection } from '../models/stac.js';
 import DeprecationMixin from '../components/DeprecationMixin.js';
-import { BTab, BTabs, BCard, BAlert } from 'bootstrap-vue-next';
+import { BTab, BTabs, BCard} from 'bootstrap-vue-next';
 import { getIgnoredFields } from '../ignored-metadata.js';
 import refParser from '@apidevtools/json-schema-ref-parser';
 import { stacRequest } from '../store/utils';
@@ -118,7 +96,6 @@ export default defineComponent({
     BTab,
     BTabs,
     BCard,
-    BAlert,
     AnonymizedNotice: defineAsyncComponent(() => import('../components/AnonymizedNotice.vue')),
     Assets: defineAsyncComponent(() => import('../components/Assets.vue')),
     Catalogs,
@@ -150,16 +127,6 @@ export default defineComponent({
   computed: {
     ...mapState(['data', 'apiCatalogPriority', 'apiItemsLink', 'apiItemsPagination', 'apiItemsNumberMatched', 'nextCollectionsLink', 'stateQueryParameters']),
     ...mapGetters(['catalogs', 'collectionLink', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
-    droppedCql() {
-      return this.$store.state.search.droppedFilters.filter(f => f.type === 'cql2');
-    },
-    droppedFreeText() {
-      const ft = this.$store.state.search.droppedFilters.find(f => f.type === 'freeText');
-      return ft ? ft.terms : null; // string[] | null
-    },
-    hasVisibleDroppedFilters() {
-      return this.droppedCql.length > 0 || Boolean(this.droppedFreeText);
-    },
     ignoredMetadataFields() {
       return getIgnoredFields(this.data, 'CatalogLike');
     },
