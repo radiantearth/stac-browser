@@ -133,8 +133,7 @@ export default {
       extent: this.modelValue,
       dragging: false,
       validationErrors: getBoxDefaults(),
-      bboxValues: getBoxDefaults(),
-      isInitialLoad: true
+      bboxValues: getBoxDefaults()
     };
   },
   computed: {
@@ -151,7 +150,7 @@ export default {
   watch: {
     async stac() {
       await this.initMap();
-    },
+    }
   },
   async mounted() {
     await this.initMap();

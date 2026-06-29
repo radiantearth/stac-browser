@@ -488,9 +488,10 @@ export default defineComponent({
       deep: true,
       handler(vuexCollections) {
         const activeCollections = vuexCollections || [];
-
+        
         const currentSelectedIds = (this.selectedCollections || []).map(c => c.value);
-        if (JSON.stringify(activeCollections) === JSON.stringify(currentSelectedIds)) {
+        
+        if (activeCollections.length === currentSelectedIds.length && activeCollections.every((val, index) => val === currentSelectedIds[index])){
           return;
         }
 
@@ -533,7 +534,6 @@ export default defineComponent({
       }
     },  
     provideBBox(shown) {
-      // 1. Guard against wiping out URL data during the initial page load
       if (!this.loaded) {return;}
 
       const isChecked = shown === '1' || shown === true;
