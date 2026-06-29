@@ -150,7 +150,6 @@ export default {
           rebuiltCql = new Cql(logical, null);
         }
 
-        commit('resetShared');
         commit('resetCollectionFilters');
         commit('setDroppedFilters', dropped);
         commit('setItemFilters', {
@@ -160,7 +159,6 @@ export default {
         });
       } else {
         // only free-text was active, no CQL2 to reconcile
-        commit('resetShared');
         commit('resetCollectionFilters');
         commit('setDroppedFilters', dropped);
       }
