@@ -213,6 +213,10 @@ export default {
       }
       if (extent) {
         const size = this.map.getSize();
+        // When MapSelect is rendered inside a conditionally-shown panel,
+        // the container may have zero dimensions at mount time because the browser
+        // hasn't laid it out yet. view.fit() cannot calculate correct zoom without
+        // valid dimensions, so we wait for the container to be sized.
         if (!size || size[0] === 0 || size[1] === 0) {
           
           const observer = new ResizeObserver(() => {
