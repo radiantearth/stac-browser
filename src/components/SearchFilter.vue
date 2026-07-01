@@ -2,17 +2,17 @@
   <b-form class="filter mb-4" @submit.stop.prevent="onSubmit" @reset="onReset">
     <b-card no-body :title="title">
       <b-card-body>
-      <template v-if="droppedFilterNames.length > 0">
-        <b-alert
-          variant="warning"
-          dismissible
-          :model-value="true"
-          class="mb-3"
-          @dismissed="$store.commit('search/clearDroppedFilters')"
-        >
-          {{ $t('search.droppedFilters', { filters: droppedFilterNames.join(', ') }) }}
-        </b-alert>
-      </template>
+        <template v-if="droppedFilterNames.length > 0">
+          <b-alert
+            variant="warning"
+            dismissible
+            :model-value="true"
+            class="mb-3"
+            @dismissed="$store.commit('search/clearDroppedFilters')"
+          >
+            {{ $t('search.droppedFilters', { filters: droppedFilterNames.join(', ') }) }}
+          </b-alert>
+        </template>
         <Loading v-if="!loaded" fill />
         <b-card-title v-if="title" :title="title" />
 
@@ -175,7 +175,7 @@
 <script>
 import { defineComponent, defineAsyncComponent } from 'vue';
 import { mapGetters, mapState } from "vuex";
-import { BAlert, BCard, BCardBody, BCardFooter, BCardTitle, BDropdown, BDropdownItem, BModal } from 'bootstrap-vue-next';
+import { BCard, BCardBody, BCardFooter, BCardTitle, BDropdown, BDropdownItem, BModal } from 'bootstrap-vue-next';
 
 import refParser from '@apidevtools/json-schema-ref-parser';
 
@@ -189,9 +189,8 @@ import Loading from './Loading.vue';
 import { CollectionCollection, STAC } from 'stac-js'; 
 import { createSTAC, Collection } from '../models/stac';
 import Cql from '../models/cql2/cql';
-import Queryable from '../models/cql2/queryable';
 import CqlLogicalOperator, { CqlNot } from '../models/cql2/operators/logical';
-import { stacRequest } from '../store/utils';
+import { fetchQueryablesForLink, stacRequest } from '../store/utils';
 import { formatKey } from '@radiantearth/stac-fields/helper';
 
 function getDefaults() {
@@ -274,7 +273,7 @@ export default defineComponent({
     droppedFilterNames() {
       const names = [];
       const ft = this.$store.state.search.droppedFilters.find(f => f.type === 'freeText');
-      if (ft) ft.terms.forEach(t => names.push(t));
+      if (ft) {ft.terms.forEach(t => names.push(t));}
       const cql = this.$store.state.search.droppedFilters.filter(f => f.type === 'cql2');
       cql.forEach(f => names.push(f.queryable?.title || f.queryable?.id || f.id));
       return names;
@@ -739,13 +738,7 @@ export default defineComponent({
       return [];
     },
     async loadQueryables(link) {
-      if (!isObject(link)) {
-        return;
-      }
-      this.queryables = [];
-      const queryables = await this.loadSchemas(link);
-      this.queryables = queryables
-        .map(([key, schema]) => new Queryable(key, schema));
+      this.queryables = await fetchQueryablesForLink(this.$store, link);
     },
     async loadSortables(link) {
       if (!isObject(link)) {
@@ -853,15 +846,8 @@ export default defineComponent({
       }
     },
     commitToVuex(field, value) {
-      if (['datetime', 'bbox', 'limit'].includes(field)) {
-        this.$store.commit('search/setShared', { [field]: value });
-      } 
-      else if (this.type === 'Collections') {
-        this.$store.commit('search/setCollectionFilters', { [field]: value });
-      } 
-      else {
-        this.$store.commit('search/setItemFilters', { [field]: value });
-      }
+      const mutation = this.type === 'Collections' ? 'search/setCollectionFilters' : 'search/setItemFilters';
+      this.$store.commit(mutation, { [field]: value });
     },
     resetSort() {
       if (!this.canSort) {

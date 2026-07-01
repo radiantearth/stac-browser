@@ -1,6 +1,8 @@
 import Cql from '../../models/cql2/cql';
 import CqlLogicalOperator, { CqlNot } from '../../models/cql2/operators/logical';
 
+const SHARED_FIELDS = ['datetime', 'bbox', 'limit'];
+
 const defaultShared = () => ({
   datetime: null,   
   bbox: null,       
@@ -16,6 +18,19 @@ const defaultFilterSet = () => ({
   rawFilters: [],
   filterLogic: { andOr: 'and', negate: false },
 });
+
+function splitShared(patch) {
+  const shared = {};
+  const rest = {};
+  for (const [key, value] of Object.entries(patch)) {
+    if (SHARED_FIELDS.includes(key)) {
+      shared[key] = value;
+    } else {
+      rest[key] = value;
+    }
+  }
+  return { shared, rest };
+}
 
 export default {
   namespaced: true,
@@ -61,10 +76,14 @@ export default {
       state.shared = { ...state.shared, ...patch };
     },
     setCollectionFilters(state, patch) {
-      state.collectionFilters = { ...state.collectionFilters, ...patch };
+      const { shared, rest } = splitShared(patch);
+      state.shared = { ...state.shared, ...shared };
+      state.collectionFilters = { ...state.collectionFilters, ...rest };
     },
     setItemFilters(state, patch) {
-      state.itemFilters = { ...state.itemFilters, ...patch };
+      const { shared, rest } = splitShared(patch);
+      state.shared = { ...state.shared, ...shared };
+      state.itemFilters = { ...state.itemFilters, ...rest };
     },
     resetShared(state) {
       state.shared = defaultShared();

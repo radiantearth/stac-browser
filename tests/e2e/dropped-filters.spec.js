@@ -3,7 +3,7 @@
  *
  * Verifies that when a user searches collections with free-text or sort filters
  * and then navigates into a specific collection, unsupported filters are
- * tracked and surfaced via a dismissible warning banner at the top of the page.
+ * tracked and surfaced via a dismissible warning banner inside the item filter panel.
  *
  */
 import { test, expect } from './fixtures.js';
@@ -34,6 +34,12 @@ const goToCollectionSearchTab = async (page, browserPath) => {
   await waitForBrowserReady(page);
 };
 
+// Helper: open the item filter panel on a collection page (banner lives inside it)
+const openItemFilterPanel = async (page) => {
+  await page.getByRole('button', { name: /show filters|hide filters/i }).click();
+  await waitForBrowserReady(page);
+};
+
 test.describe('Dropped filter banner — collection search to collection navigation', () => {
   let api;
   let BROWSER_PATH;
@@ -41,21 +47,24 @@ test.describe('Dropped filter banner — collection search to collection navigat
   test.beforeEach(async ({ worker }) => {
     api = API.minimalApi({}, { defaultLimit: 10 });
 
-    api.addCollection('sentinel-2-l2a')
-      .setMetadata({ title: 'Sentinel-2 L2A' });
-    api.addCollection('landsat-8')
-      .setMetadata({ title: 'Landsat 8' });
+    const sentinel = api.addCollection('sentinel-2-l2a')
+        .setMetadata({ title: 'Sentinel-2 L2A' });
+    const landsat = api.addCollection('landsat-8')
+        .setMetadata({ title: 'Landsat 8' });
 
     api.addCollectionsExtension()
-      .addItemsExtension()
-      .addSearchExtension();
+    .addItemsExtension()
+    .addSearchExtension();
+
+    api.addManyItems(sentinel, 3);
+    api.addManyItems(landsat, 3);
 
     api.root.addConformsTo('https://api.stacspec.org/v1.0.0/collection-search');
     api.root.addConformsTo(FREE_TEXT_CONFORMANCE);
 
     await api.createServer(worker);
     BROWSER_PATH = api.root.getBrowserPath();
-  });
+ });
 
   test('Free-text banner appears when navigating from collection search into a collection', async ({ page }) => {
     await test.step('Navigate to collection search tab', async () => {
@@ -77,6 +86,10 @@ test.describe('Dropped filter banner — collection search to collection navigat
       await expect(collectionLink).toBeVisible({ timeout: 10000 });
       await collectionLink.click();
       await waitForBrowserReady(page);
+    });
+
+    await test.step('Open item filter panel', async () => {
+      await openItemFilterPanel(page);
     });
 
     await test.step('Verify free-text banner appears', async () => {
@@ -104,6 +117,10 @@ test.describe('Dropped filter banner — collection search to collection navigat
       await waitForBrowserReady(page);
     });
 
+    await test.step('Open item filter panel', async () => {
+      await openItemFilterPanel(page);
+    });
+
     await test.step('Verify banner lists all dropped terms', async () => {
       const banner = page.locator('.alert-warning').first();
       await expect(banner).toBeVisible({ timeout: 10000 });
@@ -112,7 +129,7 @@ test.describe('Dropped filter banner — collection search to collection navigat
     });
   });
 
-  test('Free-text banner appears at the top of the page before collection content', async ({ page }) => {
+  test('Free-text banner appears at the top of the item filter panel', async ({ page }) => {
     await goToCollectionSearchTab(page, BROWSER_PATH);
 
     await test.step('Add free-text term and submit', async () => {
@@ -128,17 +145,21 @@ test.describe('Dropped filter banner — collection search to collection navigat
       await waitForBrowserReady(page);
     });
 
-    await test.step('Verify banner renders above the description heading', async () => {
-      const banner = page.locator('.alert-warning').first();
-      const description = page.locator('h2').filter({ hasText: /description/i }).first();
-
-      await expect(banner).toBeVisible({ timeout: 10000 });
-      await expect(description).toBeVisible();
-
-      const bannerBox = await banner.boundingBox();
-      const descriptionBox = await description.boundingBox();
-      expect(bannerBox.y).toBeLessThan(descriptionBox.y);
+    await test.step('Open item filter panel', async () => {
+      await openItemFilterPanel(page);
     });
+
+    await test.step('Verify banner renders above the filter form fields', async () => {
+        const banner = page.locator('.alert-warning').first();
+        const limitGroup = page.locator('.limit').first();
+
+        await expect(banner).toBeVisible({ timeout: 10000 });
+        await expect(limitGroup).toBeVisible();
+
+        const bannerBox = await banner.boundingBox();
+        const limitBox = await limitGroup.boundingBox();
+        expect(bannerBox.y).toBeLessThan(limitBox.y);
+        });
   });
 
   test('Free-text banner can be dismissed independently and disappears', async ({ page }) => {
@@ -154,6 +175,10 @@ test.describe('Dropped filter banner — collection search to collection navigat
       await waitForBrowserReady(page);
     });
 
+    await test.step('Open item filter panel', async () => {
+      await openItemFilterPanel(page);
+    });
+
     await test.step('Dismiss the free-text banner', async () => {
       const banner = page.locator('.alert-warning').first();
       await expect(banner).toBeVisible({ timeout: 10000 });
@@ -165,19 +190,23 @@ test.describe('Dropped filter banner — collection search to collection navigat
 
   test('Sort-only drop does not trigger the banner', async ({ page }) => {
     await test.step('Navigate directly to a collection without any search or free-text', async () => {
-        await page.goto(BROWSER_PATH);
-        await waitForBrowserReady(page);
-        const collectionLink = page.getByText('Sentinel-2 L2A', { exact: false }).first();
-        await expect(collectionLink).toBeVisible({ timeout: 10000 });
-        await collectionLink.click();
-        await waitForBrowserReady(page);
+      await page.goto(BROWSER_PATH);
+      await waitForBrowserReady(page);
+      const collectionLink = page.getByText('Sentinel-2 L2A', { exact: false }).first();
+      await expect(collectionLink).toBeVisible({ timeout: 10000 });
+      await collectionLink.click();
+      await waitForBrowserReady(page);
+    });
+
+    await test.step('Open item filter panel', async () => {
+      await openItemFilterPanel(page);
     });
 
     await test.step('Verify no banner appears', async () => {
-        await page.waitForTimeout(500);
-        await expect(page.locator('.alert-warning')).toHaveCount(0);
+      await page.waitForTimeout(500);
+      await expect(page.locator('.alert-warning')).toHaveCount(0);
     });
- });
+  });
 
   test('Banner fires on first-ever collection navigation with no prior collection visited', async ({ page }) => {
     await goToCollectionSearchTab(page, BROWSER_PATH);
@@ -193,6 +222,10 @@ test.describe('Dropped filter banner — collection search to collection navigat
       await expect(collectionLink).toBeVisible({ timeout: 10000 });
       await collectionLink.click();
       await waitForBrowserReady(page);
+    });
+
+    await test.step('Open item filter panel', async () => {
+      await openItemFilterPanel(page);
     });
 
     await test.step('Banner appears even though no previous collection was loaded', async () => {
@@ -215,6 +248,10 @@ test.describe('Dropped filter banner — collection search to collection navigat
       await waitForBrowserReady(page);
     });
 
+    await test.step('Open item filter panel', async () => {
+      await openItemFilterPanel(page);
+    });
+
     await test.step('Verify no banner appears', async () => {
       await page.waitForTimeout(500);
       await expect(page.locator('.alert-warning')).toHaveCount(0);
@@ -234,6 +271,10 @@ test.describe('Dropped filter banner — collection search to collection navigat
       await waitForBrowserReady(page);
     });
 
+    await test.step('Open item filter panel', async () => {
+      await openItemFilterPanel(page);
+    });
+
     await test.step('Dismiss the banner', async () => {
       const banner = page.locator('.alert-warning').first();
       await expect(banner).toBeVisible({ timeout: 10000 });
@@ -248,6 +289,10 @@ test.describe('Dropped filter banner — collection search to collection navigat
       await expect(secondLink).toBeVisible({ timeout: 10000 });
       await secondLink.click();
       await waitForBrowserReady(page);
+    });
+
+    await test.step('Open item filter panel for second collection', async () => {
+      await openItemFilterPanel(page);
     });
 
     await test.step('Verify banner does not reappear', async () => {

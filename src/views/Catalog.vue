@@ -86,9 +86,7 @@ import { ItemCollection } from '../models/stac.js';
 import DeprecationMixin from '../components/DeprecationMixin.js';
 import { BTab, BTabs, BCard} from 'bootstrap-vue-next';
 import { getIgnoredFields } from '../ignored-metadata.js';
-import refParser from '@apidevtools/json-schema-ref-parser';
-import { stacRequest } from '../store/utils';
-import Queryable from '../models/cql2/queryable';
+import { fetchQueryablesForLink } from '../store/utils';
 
 export default defineComponent({
   name: "Catalog",
@@ -246,22 +244,7 @@ export default defineComponent({
 
         await this.$store.dispatch('search/resetForCollection', {
           collection: newData,
-          fetchQueryables: async (collection) => {
-            const link = collection.getQueryablesLink?.();
-            if (!isObject(link)) {return [];}
-            const response = await stacRequest(this.$store, link);
-            if (!isObject(response.data)) {return [];}
-            let schemas;
-            try {
-              schemas = await refParser.dereference(response.data);
-            } catch (e) {
-              console.error(e);
-              schemas = response.data;
-            }
-            if (!isObject(schemas?.properties)) {return [];}
-            return Object.entries(schemas.properties)
-              .map(([key, schema]) => new Queryable(key, schema));
-          }
+          fetchQueryables: (collection) => fetchQueryablesForLink(this.$store, collection.getQueryablesLink?.()),
         }); 
 
         this.filters = this.$store.getters['search/itemSearchParams'];
