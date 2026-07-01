@@ -7,7 +7,7 @@
 import { test, expect } from './fixtures.js';
 import API from '../fixtures/instances/api.js';
 import { commitToStore, getSearchState } from '../helpers/store.js';
-import { dispatchResetForCollection, makeRawFilter } from '../helpers/reconciliation.js';
+import { dispatchMigrateFiltersToCollection, makeRawFilter } from '../helpers/reconciliation.js';
 
 test.describe('Vuex search module', () => {
   test.beforeEach(async ({ worker, page }) => {
@@ -90,7 +90,7 @@ test.describe('Filter reconciliation on collection navigation', () => {
       filterLogic: { andOr: 'and', negate: false },
     });
 
-    await dispatchResetForCollection(page, ['eo:cloud_cover', 'platform']);
+    await dispatchMigrateFiltersToCollection(page, ['eo:cloud_cover', 'platform']);
 
     const state = await getSearchState(page);
     expect(state.itemFilters.rawFilters).toHaveLength(2);
@@ -111,7 +111,7 @@ test.describe('Filter reconciliation on collection navigation', () => {
       filterLogic: { andOr: 'and', negate: false },
     });
 
-    await dispatchResetForCollection(page, ['eo:cloud_cover', 'platform']);
+    await dispatchMigrateFiltersToCollection(page, ['eo:cloud_cover', 'platform']);
 
     const state = await getSearchState(page);
     expect(state.itemFilters.rawFilters).toHaveLength(2);
@@ -133,7 +133,7 @@ test.describe('Filter reconciliation on collection navigation', () => {
       filterLogic: { andOr: 'and', negate: false },
     });
 
-    await dispatchResetForCollection(page, ['gsd', 'datetime']);
+    await dispatchMigrateFiltersToCollection(page, ['gsd', 'datetime']);
 
     const state = await getSearchState(page);
     expect(state.itemFilters.rawFilters).toHaveLength(0);
@@ -146,7 +146,7 @@ test.describe('Filter reconciliation on collection navigation', () => {
     await commitToStore(page, 'search/setShared', { limit: 20 });
     await commitToStore(page, 'search/setItemFilters', { q: ['sentinel'] });
 
-    await dispatchResetForCollection(page, ['eo:cloud_cover']);
+    await dispatchMigrateFiltersToCollection(page, ['eo:cloud_cover']);
 
     const state = await getSearchState(page);
     expect(state.shared.limit).toBe(20);
