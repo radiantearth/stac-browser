@@ -212,7 +212,38 @@ export default {
         extent = this.stacToOlExtent(this.stac.getBoundingBox());
       }
       if (extent) {
-        this.map.getView().fit(extent, { padding: [50,50,50,50], maxZoom: this.maxZoom });
+        const size = this.map.getSize();
+        // When MapSelect is rendered inside a conditionally-shown panel,
+        // the container may have zero dimensions at mount time because the browser
+        // hasn't laid it out yet. view.fit() cannot calculate correct zoom without
+        // valid dimensions, so we wait for the container to be sized.
+        if (!size || size[0] === 0 || size[1] === 0) {
+          
+          const observer = new ResizeObserver(() => {
+            const newSize = this.map.getSize();
+            
+            if (newSize && newSize[0] > 0 && newSize[1] > 0) {
+              this.map.updateSize(); 
+              
+              this.map.getView().fit(extent, {
+                padding: [50, 50, 50, 50],
+                maxZoom: 10,
+                duration: 250
+              });
+              
+              observer.disconnect(); 
+            }
+          });
+          
+          observer.observe(this.map.getTargetElement());
+          return; 
+        }
+
+        this.map.getView().fit(extent, {
+          padding: [50, 50, 50, 50],
+          maxZoom: 10,
+          duration: 250
+        });
       }
     },
     addMask(stac) {

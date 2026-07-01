@@ -291,6 +291,7 @@
     "betweenOperatorDescription": "Tests whether a numeric field value lies within the given range. The given range is inclusive.",
     "dateDescription": "All times in Coordinated Universal Time (UTC).",
     "disabledDueToSingleDate": "This filter is disabled because the collection has a single date and time as temporal extent.",
+    "droppedFilters": "Some filters were removed: {filters} not supported here.",
     "enterCollections": "Enter one or more Collection IDs...",
     "enterItemIds": "Enter one or more Item IDs...",
     "enterSearchTerms": "Enter one or more search terms...",

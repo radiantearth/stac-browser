@@ -84,8 +84,9 @@ import { hasText, isObject, size } from 'stac-js/src/utils.js';
 import { addSchemaToDocument, createCatalogSchema } from '../schema-org';
 import { ItemCollection } from '../models/stac.js';
 import DeprecationMixin from '../components/DeprecationMixin.js';
-import { BTab, BTabs, BCard } from 'bootstrap-vue-next';
+import { BTab, BTabs, BCard} from 'bootstrap-vue-next';
 import { getIgnoredFields } from '../ignored-metadata.js';
+import { fetchQueryablesForLink } from '../store/utils';
 
 export default defineComponent({
   name: "Catalog",
@@ -229,13 +230,24 @@ export default defineComponent({
   watch: {
     data: {
       immediate: true,
-      handler(data) {
+      async handler(newData, oldData) {
         try {
-          let schema = createCatalogSchema(data, [this.parentLink, this.rootLink], this.$store);
+          let schema = createCatalogSchema(newData, [this.parentLink, this.rootLink], this.$store);
           addSchemaToDocument(document, schema);
         } catch (error) {
           console.error(error);
         }
+
+        if (!newData?.isCollection) { return; }
+        if (!this.$store.getters['search/hasActiveFilters']) { return; }
+        if (oldData?.id === newData?.id) { return; }
+
+        await this.$store.dispatch('search/migrateFiltersToCollection', {
+          collection: newData,
+          fetchQueryables: (collection) => fetchQueryablesForLink(this.$store, collection.getQueryablesLink?.()),
+        }); 
+
+        this.filters = this.$store.getters['search/itemSearchParams'];
       }
     }
   },

@@ -14,6 +14,7 @@ import { addQueryIfNotExists, hasAuthority, isAuthenticationError, Loading, proc
 import { getBest } from 'stac-js/src/locales';
 import { TYPES } from "../components/ApiCapabilitiesMixin";
 import BrowserStorage from "../browser-store.js";
+import search from './modules/search.js';
 
 function getStore(config, router) {
   // Local settings (e.g. for currently loaded STAC entity)
@@ -60,7 +61,8 @@ function getStore(config, router) {
   return createStore({
     strict: import.meta.env.NODE_ENV !== 'production',
     modules: {
-      auth: auth(router)
+      auth: auth(router),
+      search,
     },
     state: Object.assign({}, config, localDefaults(), catalogDefaults(), {
       // Global settings
