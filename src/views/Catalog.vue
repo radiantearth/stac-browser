@@ -242,7 +242,7 @@ export default defineComponent({
         if (!this.$store.getters['search/hasActiveFilters']) { return; }
         if (oldData?.id === newData?.id) { return; }
 
-        await this.$store.dispatch('search/resetForCollection', {
+        await this.$store.dispatch('search/migrateFiltersToCollection', {
           collection: newData,
           fetchQueryables: (collection) => fetchQueryablesForLink(this.$store, collection.getQueryablesLink?.()),
         }); 

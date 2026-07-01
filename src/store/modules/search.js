@@ -113,8 +113,21 @@ export default {
       state.droppedFilters = state.droppedFilters.filter(f => f.type !== type);
     },
   },
+  /**
+ * Called when the user navigates from collection search into a specific collection.
+ *
+ * Collection search filters don't all carry over to item search. Free-text terms
+ * and sort are dropped since item search on most APIs doesn't support them. 
+ * The unsupported filters are dropped, compatible ones are rebuilt and applied to itemFilters.
+ *
+ * All dropped filters are recorded in `droppedFilters` so the UI can notify the
+ * user via a warning banner when they open the item filter panel.
+ *
+ * @param {Object} collection - The STAC collection being navigated into
+ * @param {Function} fetchQueryables - Async function that fetches the collection's queryables
+ */
   actions: {
-    async resetForCollection({ commit, state }, { collection, fetchQueryables }) {
+    async migrateFiltersToCollection({ commit, state }, { collection, fetchQueryables }) {
       commit('clearDroppedFilters');
 
       const raw = state.itemFilters.rawFilters;
