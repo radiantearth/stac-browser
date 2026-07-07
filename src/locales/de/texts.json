@@ -97,6 +97,7 @@
     "contactProvider": "Bitte wenden Sie sich an den Dienstanbieter, um dieses Problem zu lösen.",
     "default": "Die angeforderte Seite konnte nicht geladen werden.",
     "forbidden": "Die für diese Anfrage angegebenen Anmeldedaten sind ungültig, bspw. ein abgelaufener oder ungültiger API-Schlüssel. Bitte geben Sie andere Anmeldedaten an und versuchen Sie es erneut.",
+    "missingPermissions": "Die für diese Anfrage angegebenen Anmeldedaten haben nicht die erforderlichen Berechtigungen.",
     "invalidJsonObject": "Die Antwort des Dienstanbieters ist kein gültiges JSON-Objeckt.",
     "invalidStacCollections": "Die Antwort des Dienstanbieters ist keine gültige Liste mit Katalogen.",
     "invalidStacItems": "Die Antwort des Dienstanbieters ist keine gültige Liste mit Elementen.",
@@ -167,6 +168,17 @@
     "showFilter": "Zeige Filter"
   },
   "loading": "Lade...",
+  "manage": {
+    "addCollection": "Katalog hinzufügen",
+    "addItem": "Element hinzufügen",
+    "confirmDeleteTitle": "Löschen bestätigen",
+    "confirmDeleteMessage": "Sind Sie sicher, dass Sie diese STAC-Ressource löschen möchten?",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "save": "Speichern",
+    "noUndo": "Diese Aktion kann nicht rückgängig gemacht werden.",
+    "validate": "Validieren"
+  },
   "map": "Karte",
   "mapping": {
     "attribution": {
@@ -367,6 +379,7 @@
       "switch": "Ändern der Sprache"
     },
     "locatedAt": "Die Datei mit den STAC-Metadaten befindet sich unter:",
+    "manage": "Verwalten",
     "share": {
       "bsky": "Bluesky",
       "email": "E-Mail",
