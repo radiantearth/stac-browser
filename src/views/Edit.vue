@@ -6,9 +6,6 @@
       <div class="header">
         <h2>{{ title }}</h2>
         <div class="actions">
-          <b-button variant="secondary" disabled>
-            {{ $t('manage.validate') }}
-          </b-button>
           <b-button variant="primary" :disabled="isSaveDisabled" @click="onSaveRequested">
             {{ $t('manage.save') }}
           </b-button>
@@ -29,8 +26,6 @@
 <script>
 import { defineComponent } from 'vue';
 import { mapGetters, mapState } from 'vuex';
-import axios from 'axios';
-//import validateSTAC from 'stac-node-validator';
 import BrowseMixin from './BrowseMixin.js';
 import JsonEditor from '../components/management/JsonEditor.vue';
 import { getErrorMessage } from '../store/utils';
@@ -164,7 +159,10 @@ export default defineComponent({
       if (!this.data || typeof this.data.toJSON !== 'function') {
         return;
       }
-      const content = JSON.stringify(this.data.toJSON(), null, 2);
+      // Prefer the original (pre-migration) document so editing doesn't silently
+      // upgrade the resource to the latest STAC version on save.
+      const source = this.data._original || this.data.toJSON();
+      const content = JSON.stringify(source, null, 2);
       this.sourceContent = content;
       this.jsonContent = content;
       this.editorError = null;
@@ -215,34 +213,31 @@ export default defineComponent({
       }
       return null;
     },
-    getRequestHeaders(requestUrl) {
-      const headers = {
-        Accept: 'application/json',
-        'Accept-Language': this.$store.getters.acceptedLanguages,
-        'Content-Type': 'application/json'
-      };
-      if (!this.$store.getters.isExternalUrl(requestUrl)) {
-        Object.assign(headers, this.$store.state.requestHeaders);
-      }
-      return headers;
-    },
     getFallbackNavigationPath() {
       return this.path || '/';
+    },
+    createLink(method, href, body) {
+      return {
+        href,
+        method,
+        type: 'application/json',
+        headers: { 'Content-Type': 'application/json' },
+        body
+      };
     },
     async save(body) {
       this.saving = true;
       this.editorError = null;
       try {
-        // todo: verify and use stacRequest
         if (this.mode === 'edit') {
-          await axios.put(this.url, body, {
-            headers: this.getRequestHeaders(this.url)
+          await this.$store.dispatch('request', {
+            link: this.createLink('PUT', this.url, body)
           });
           await this.$store.dispatch('load', { url: this.url, show: true, force: true });
         }
         else {
-          const response = await axios.post(this.createUrl, body, {
-            headers: this.getRequestHeaders(this.createUrl)
+          const response = await this.$store.dispatch('request', {
+            link: this.createLink('POST', this.createUrl, body)
           });
           const location = response?.headers?.location;
           const targetPath = location ? this.toBrowserPath(location) : this.getFallbackNavigationPath();

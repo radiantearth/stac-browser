@@ -625,8 +625,11 @@ This only works in STAC Browser if the server is also configured this way.
 ### transactionsRequirePreflight
 
 By default (option set to `true`), STAC Browser will check whether a user has permissions to make transactional requests through an `OPTIONS` HTTP request to the same resource that it checks the permissions for.
+STAC Browser reads the permitted methods from the `Allow` response header.
 See [ogcapi-features issue 1005](https://github.com/opengeospatial/ogcapi-features/issues/1005) for details.
 You can disable this check by setting this option to `false` and allow any authenticated user to make transactional requests.
+
+For APIs served from a different origin, the server must also expose the `Allow` header to the browser via CORS (i.e. send `Access-Control-Expose-Headers: Allow`), otherwise the browser hides it from STAC Browser and no management actions will be offered.
 
 Disabling this is usually only reasonable for testing purposes or internal STAC APIs.
 This only works in STAC Browser if the server is also configured this way.

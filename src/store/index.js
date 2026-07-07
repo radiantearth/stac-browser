@@ -1003,6 +1003,16 @@ function getStore(config, router) {
           }
         }
 
+        // Check management permissions for editable resources (items/collections).
+        // The list endpoints are preflighted when their listings are loaded, but the
+        // detail resources (where edit/delete live) need an explicit check. This runs
+        // after the root catalog is loaded so the conformance classes are known;
+        // checkPermissions is a no-op unless transactions + preflight are enabled and
+        // the server advertises transaction support.
+        if (data?.isItem || data?.isCollection) {
+          cx.dispatch('manager/checkPermissions', stacRequestOptions(cx, url));
+        }
+
         // All tasks finished, show the page if requested
         if (loading.show) {
           cx.commit('showPage', { url });
