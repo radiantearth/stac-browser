@@ -46,11 +46,11 @@ export function createSTAC(data, url, path, migrate = true, updateVersionNumber 
 }
 
 export function addMissingChildren(catalogs, stac) {
+  const catalogUrls = new Set(catalogs.map(collection => collection.getAbsoluteUrl()));
   let links = stac.getStacLinksWithRel('child').filter(link => {
     // Don't add links that are already in collections: https://github.com/radiantearth/stac-browser/issues/103
-    // ToDo: The runtime of this can probably be improved
-    let absoluteUrl = toAbsolute(link.href, stac.getAbsoluteUrl());
-    return !catalogs.find(collection => collection.getAbsoluteUrl() === absoluteUrl);
+    const absoluteUrl = toAbsolute(link.href, stac.getAbsoluteUrl());
+    return !catalogUrls.has(absoluteUrl);
   });
   // place the children first to avoid conflicts with the paginated collections
   // where the children are always at the end and can never be reached due to infinite scrolling
