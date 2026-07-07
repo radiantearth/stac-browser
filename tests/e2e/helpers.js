@@ -62,6 +62,118 @@ export async function mockStacError(worker, url, status = 404, message = 'Not Fo
   );
 }
 
+// ─── Management / Transaction Helpers ───────────────────────────────────────
+
+/**
+* Inject STAC Browser config overrides before the app boots.
+*
+* Merged-config reads `window.STAC_BROWSER_CONFIG` at module load, so this must
+* run before any navigation. Use it to toggle the transaction options that
+* otherwise default to `true` (requiring login and an OPTIONS preflight).
+*
+* @param {import('@playwright/test').Page} page
+* @param {object} [overrides] – config keys to override (e.g. transactionsRequireLogin)
+*/
+export async function configureBrowser(page, overrides = {}) {
+  await page.addInitScript((config) => {
+    window.STAC_BROWSER_CONFIG = Object.assign({}, window.STAC_BROWSER_CONFIG, config);
+  }, overrides);
+}
+
+/**
+* Enable the management UI without login or preflight so the transaction
+* controls are reachable in a test. Callers still need a server that advertises
+* the relevant transaction conformance classes.
+*
+* @param {import('@playwright/test').Page} page
+* @param {object} [overrides] – extra config overrides merged on top
+*/
+export async function enableTransactions(page, overrides = {}) {
+  await configureBrowser(page, {
+    transactions: true,
+    transactionsRequireLogin: false,
+    transactionsRequirePreflight: false,
+    ...overrides
+  });
+}
+
+/**
+* Mock an OPTIONS preflight response that advertises the allowed HTTP methods
+* via the `Allow` header (comma-separated, as real servers send it).
+*
+* @param {import('playwright-msw').MockServiceWorker} worker
+* @param {string} url – exact URL to intercept
+* @param {string[]} [methods=[]] – allowed methods, e.g. ['GET', 'PUT', 'DELETE']
+*/
+export async function mockOptions(worker, url, methods = []) {
+  await worker.use(
+    http.options(url, () =>
+      // Use 200 with a (empty) body rather than 204: MSW's service worker drops
+      // response headers on a null-body 204, which would hide the Allow header.
+      // `Allow` is not a CORS-safelisted response header, so a cross-origin server
+      // must also expose it explicitly for the browser to let JS read it.
+      HttpResponse.json({}, {
+        status: 200,
+        headers: {
+          Allow: methods.join(', '),
+          'Access-Control-Expose-Headers': 'Allow'
+        }
+      })
+    )
+  );
+}
+
+/**
+* Mock a transactional write (PUT/POST/DELETE) response for a URL.
+*
+* @param {import('playwright-msw').MockServiceWorker} worker
+* @param {'put'|'post'|'delete'} method
+* @param {string} url – exact URL to intercept
+* @param {object} [options]
+* @param {number} [options.status] – response status (defaults per method)
+* @param {string} [options.location] – Location header (for POST create)
+* @param {object|null} [options.body] – JSON body to return (null → empty body)
+*/
+export async function mockTransaction(worker, method, url, options = {}) {
+  let status = options.status;
+  if (status === undefined) {
+    if (method === 'post') {
+      status = 201;
+    } else if (method === 'delete') {
+      status = 204;
+    } else {
+      status = 200;
+    }
+  }
+  const headers = {};
+  if (options.location) {
+    headers.Location = options.location;
+  }
+  await worker.use(
+    http[method](url, () => {
+      if (options.body === null || status === 204) {
+        return new HttpResponse(null, { status, headers });
+      }
+      return HttpResponse.json(options.body ?? {}, { status, headers });
+    })
+  );
+}
+
+/**
+* Open the "Manage" dropdown in the source toolbar and return its locator.
+*
+* @param {import('@playwright/test').Page} page
+* @returns {Promise<import('@playwright/test').Locator>} the open dropdown menu
+*/
+export async function openManageMenu(page) {
+  const button = page.getByRole('button', { name: /manage/i });
+  await expect(button).toBeVisible();
+  await button.click();
+  const menu = page.locator('.dropdown-menu.show');
+  await expect(menu).toBeVisible();
+  return menu;
+}
+
 // ─── Page interaction Helpers ──────────────────────────────────────────────
 
 /**

@@ -99,7 +99,7 @@ import { BDropdown, BDropdownItem } from 'bootstrap-vue-next';
 import Url from './Url.vue';
 import CopyButton from './CopyButton.vue';
 import SocialSharing from './SocialSharing.vue';
-import { getErrorMessage, stacRequest } from '../store/utils.js';
+import { getErrorMessage } from '../store/utils.js';
 
 export default {
   name: "StacSource",
@@ -155,7 +155,7 @@ export default {
         method: 'DELETE'
       };
       try {
-        await stacRequest(this.$store, link);
+        await this.$store.dispatch('request', { link });
         const redirect = this.collectionLink || this.parentLink || this.rootLink;
         const path = this.toBrowserPath(redirect?.getAbsoluteUrl() || '/');
         this.$router.push(path);

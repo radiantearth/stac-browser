@@ -7,6 +7,21 @@ export const TRANSACTION_COLLECTION_CONFORMANCE = [
   'https://api.stacspec.org/v1.*/collections/extensions/transaction'
 ];
 
+// Permissions are keyed by the resource URL without query string or fragment.
+// The requests that trigger a preflight check (e.g. a collections listing) often
+// carry query params like `?limit=…`, but permissions apply to the resource itself,
+// so we normalize both when storing and when looking permissions up.
+function permissionKey(url) {
+  try {
+    const normalized = new URL(url);
+    normalized.search = '';
+    normalized.hash = '';
+    return normalized.toString();
+  } catch (error) {
+    return url;
+  }
+}
+
 export default function getStore(config) {
   return {
     namespaced: true,
@@ -33,7 +48,7 @@ export default function getStore(config) {
         if (!rootState.data?.isSTAC) {
           return links;
         }
-        const browserPath = rootState.data?.getBrowserPath();
+        const browserPath = rootGetters.toBrowserPath(rootState.data);
         links.edit = '/management/edit' + browserPath;
         if (rootState.data?.isCatalogLike) {
           const collectionsLink = rootState.data.getApiCollectionsLink();
@@ -55,7 +70,7 @@ export default function getStore(config) {
           return false;
         }
         if (rootState.transactionsRequirePreflight) {
-          const permissions = state.permissions[url];
+          const permissions = state.permissions[permissionKey(url)];
           return Array.isArray(permissions) && permissions.includes(method.toLowerCase());
         }
         return true;
@@ -106,17 +121,22 @@ export default function getStore(config) {
     },
     actions: {
       async checkPermissions(cx, options) {
+        const url = options.url ? permissionKey(options.url) : null;
         if (
-          !options.url ||
+          !url ||
           !cx.rootState.transactions ||
           !cx.rootState.transactionsRequirePreflight ||
-          Array.isArray(cx.state.permissions[options.url])) {
+          // Don't preflight against servers that don't advertise any transaction
+          // support - it would just produce pointless OPTIONS requests.
+          (!cx.getters.supportsItemTransactions && !cx.getters.supportsCollectionTransactions) ||
+          Array.isArray(cx.state.permissions[url])) {
           return;
         }
-        
+
         let methods = [];
         try {
-          options = Object.assign({}, options);
+          options = structuredClone(options);
+          options.url = url;
           options.method = 'options';
           options.headers.Accept = '*/*';
           const response = await axios(options);
@@ -130,10 +150,10 @@ export default function getStore(config) {
             methods = allow.map(method => method.trim().toLowerCase()).filter(Boolean);
           }
         } catch (error) {
-          console.error(`Failed to check permissions for ${options.url}`, error);
+          console.error(`Failed to check permissions for ${url}`, error);
         }
         cx.commit('setPermissions', {
-          url: options.url,
+          url,
           permissions: methods
         });
       },
