@@ -10,6 +10,7 @@ import { addMissingChildren, getDisplayTitle, createSTAC } from '../models/stac'
 import { STAC } from 'stac-js';
 
 import auth from './auth.js';
+import manager from './manager.js';
 import { addQueryIfNotExists, hasAuthority, isAuthenticationError, Loading, stacRequest, stacRequestOptions } from './utils';
 import { getBest } from 'stac-js/src/locales';
 import { TYPES } from "../components/ApiCapabilitiesMixin";
@@ -136,7 +137,8 @@ function getStore(config, router) {
   return createStore({
     strict: import.meta.env.NODE_ENV !== 'production',
     modules: {
-      auth: auth(router)
+      auth: auth(router),
+      manager: manager(config)
     },
     state: Object.assign({}, config, localDefaults(), catalogDefaults(), {
       // Global settings
@@ -779,7 +781,6 @@ function getStore(config, router) {
       }
     },
     actions: {
-
       async config(cx, options) {
         const oldConfig = Object.assign({}, cx.state);
         cx.commit('config', options);
@@ -875,16 +876,16 @@ function getStore(config, router) {
       // and settles with the result of the retried request after the login.
       // If the user aborts the login or logs out, fails with the original error.
       async request(cx, args) {
-        const { link, axiosOptions, noRetry } = (isObject(args) && args.link) ? args : { link: args };
+        const { link, axiosOptions, checkPermissions = false, noRetry } = (isObject(args) && args.link) ? args : { link: args };
         try {
-          return await stacRequest(cx, link, axiosOptions);
+          return await stacRequest(cx, link, checkPermissions, axiosOptions);
         } catch (error) {
           if (noRetry || !cx.state.authConfig || cx.getters['auth/isLoggedIn'] || !isAuthenticationError(error)) {
             throw error;
           }
           return await new Promise((resolve, reject) => {
             cx.commit('auth/addAction', {
-              run: () => cx.dispatch('request', { link, axiosOptions, noRetry: true }).then(resolve, reject),
+              run: () => cx.dispatch('request', { link, axiosOptions, checkPermissions, noRetry: true }).then(resolve, reject),
               cancel: () => reject(error)
             });
             cx.dispatch('auth/requestLogin').catch(reject);
@@ -917,10 +918,11 @@ function getStore(config, router) {
         }
 
         const hasData = data instanceof STAC && !data._incomplete;
+        const isApiRequest = data instanceof STAC && data._incomplete;
         if (!hasData) {
           cx.commit('loading', { url, loading });
           try {
-            const response = await cx.dispatch('request', { link: url });
+            const response = await cx.dispatch('request', { link: url, checkPermissions: isApiRequest });
             if (!isObject(response.data)) {
               throw new BrowserError(i18n.global.t('errors.invalidJsonObject'));
             }
@@ -1031,7 +1033,7 @@ function getStore(config, router) {
           }
           link = Utils.addFiltersToLink(link, filters, cx.state.itemsPerPage, sort);
 
-          let response = await cx.dispatch('request', { link });
+          let response = await cx.dispatch('request', { link, checkPermissions: true });
           if (!isObject(response.data) || !Array.isArray(response.data.features)) {
             throw new BrowserError(i18n.global.t('errors.invalidStacItems'));
           }
@@ -1095,6 +1097,7 @@ function getStore(config, router) {
         let { stac, show, q, searching = false, searchRequestId, next = false } = args;
         let link;
         let reset = false;
+        let checkPermissions = false;
         const firstPage = Boolean(stac) && !next;
         if (firstPage) {
           if (show) {
@@ -1120,6 +1123,7 @@ function getStore(config, router) {
               // If we load from new collections, reset list of collections.
               // Otherwise we may append to collections from a parent entity.
               // https://github.com/radiantearth/stac-browser/issues/617
+              checkPermissions = true;
               cx.commit('resetApiCollections');
             }
           }
@@ -1169,7 +1173,7 @@ function getStore(config, router) {
           cx.commit('loadingApiChildren', { stac, loading: new Loading(show) });
         }
         try {
-          let response = await cx.dispatch('request', { link });
+          let response = await cx.dispatch('request', { link, checkPermissions });
           // Check if this response is still relevant (not superseded by a newer search request)
           if (searchRequestId !== undefined && searchRequestId !== cx.state.currentApiCollectionsSearchId) {
             // Discard results from stale search requests

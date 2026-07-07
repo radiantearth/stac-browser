@@ -97,6 +97,10 @@ The override order for the configuration is:
 - [Assets](#assets)
   - [preferredAssets](#preferredassets)
   - [showThumbnailsAsAssets](#showthumbnailsasassets)
+- [Transactions](#transactions)
+  - [transactions](#transactions-1)
+  - [transactionsRequireLogin](#transactionsrequirelogin)
+  - [transactionsRequirePreflight](#transactionsrequirepreflight)
 - [Service Integration](#service-integration)
   - [socialSharing](#socialsharing)
 - [Advanced](#advanced)
@@ -600,6 +604,32 @@ This is useful when you want to automatically display a specific asset variant (
 ### showThumbnailsAsAssets
 
 Defines whether thumbnails are shown in the lists of assets (`true`) or not (`false`, default).
+
+## Transactions
+
+These options configure how the management of STAC entities via a STAC API (transaction extensions)
+should work in STAC Browser.
+
+### transactions
+
+Enables (`true`, default) or disables (`false`) the management capabilities globally in STAC Browser.
+
+### transactionsRequireLogin
+
+By default (option set to `true`), management capabilities will not be shown to unauthenticated users.
+You can disable this check by setting this option to `false` and allow anyone to make transactional requests.
+
+Disabling this is usually only reasonable for testing purposes or internal STAC APIs.
+This only works in STAC Browser if the server is also configured this way.
+
+### transactionsRequirePreflight
+
+By default (option set to `true`), STAC Browser will check whether a user has permissions to make transactional requests through an `OPTIONS` HTTP request to the same resource that it checks the permissions for.
+See [ogcapi-features issue 1005](https://github.com/opengeospatial/ogcapi-features/issues/1005) for details.
+You can disable this check by setting this option to `false` and allow any authenticated user to make transactional requests.
+
+Disabling this is usually only reasonable for testing purposes or internal STAC APIs.
+This only works in STAC Browser if the server is also configured this way.
 
 ## Service Integration
 

@@ -49,11 +49,18 @@ export function stacRequestOptions(cx, link) {
   };
 }
 
-export async function stacRequest(cx, link, axiosOptions = {}) {
+export async function stacRequest(cx, link, checkPermissions = false, axiosOptions = {}) {
   // Get options
   const options = stacRequestOptions(cx, link);
   // Execute the request
-  return await axios(Object.assign(options, axiosOptions));
+  const response = await axios(Object.assign(options, axiosOptions));
+  // Check permissions via OPTIONS if requested
+  if (checkPermissions) {
+    // Don't await this dispatch, we don't want to block the request for permissions check
+    // STAC Browser will react on the permissions check through the reactivity
+    cx.dispatch('manager/checkPermissions', options);
+  }
+  return response;
 }
 
 export function isAuthenticationError(error) {
@@ -73,7 +80,7 @@ export function getErrorCode(error) {
   return null;
 }
 
-export function getErrorMessage(error) {
+export function getErrorMessage(error, requiresPermissions = false) {
   if (error instanceof Error) {
     if (error.isAxiosError) {
       const res = error.response;
@@ -82,7 +89,7 @@ export function getErrorMessage(error) {
         if (res.status === 401) {
           return i18n.global.t('errors.unauthorized');
         } else if (res.status === 403) {
-          return i18n.global.t('errors.authFailed');
+          return i18n.global.t(requiresPermissions ? 'errors.missingPermissions' : 'errors.authFailed');
         } else if (res.status === 404) {
           return i18n.global.t('errors.notFound');
         } else if (isObject(res.data) && hasText(res.data.description)) {

@@ -69,7 +69,7 @@
               </b-button>
             </b-button-group>
           </nav>
-          <StacSource class="actions" :title="title" :stacUrl="url" :stac="data" />
+          <StacSource class="actions" :title="title" />
         </b-col>
       </b-row>
     </header>
@@ -221,7 +221,7 @@ export default defineComponent({
       return this.isApi ? this.$t('index.api') : this.$t('index.catalog');
     },
     back() {
-      return this.$route.name === 'validation';
+      return this.$route.name === 'validation' || Boolean(this.$route.name?.startsWith('management'));
     },
     selfBrowserLink() {
       return this.toBrowserPath(this.url);
