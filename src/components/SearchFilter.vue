@@ -177,7 +177,7 @@ import DatePickerMixin from './DatePickerMixin';
 import Loading from './Loading.vue';
 
 import { CollectionCollection, STAC } from 'stac-js'; 
-import { createSTAC, getApiChildrenState, getChildren, setApiDataListener } from '../models/stac';
+import { createSTAC } from '../models/stac';
 import Cql from '../models/cql2/cql';
 import Queryable from '../models/cql2/queryable';
 import CqlLogicalOperator, { CqlNot } from '../models/cql2/operators/logical';
@@ -274,7 +274,7 @@ export default defineComponent({
   },
   computed: {
     ...mapState(['defaultCollectionSort', 'defaultItemSort', 'searchResultsPerPage', 'maxEntriesPerPage', 'uiLanguage']),
-    ...mapGetters(['canSearchCollections', 'supportsConformance']),
+    ...mapGetters(['canSearchCollections', 'getApiChildrenState', 'supportsConformance']),
     collectionSelectOptions() {
       let taggable = !this.hasAllCollections;
       let isResult = this.collections.length > 0 && !this.hasAllCollections;
@@ -421,20 +421,36 @@ export default defineComponent({
     isSingleDateExtent() {
       const [min, max] = this.temporalExtent || [];
       return min instanceof Date && max instanceof Date && min.getTime() === max.getTime();
+    },
+    apiCollectionsState() {
+      if (!this.parent?.isCatalogLike) {
+        return null;
+      }
+      return this.getApiChildrenState(this.parent);
+    },
+    apiCollectionsFromStore() {
+      const list = this.apiCollectionsState?.list;
+      if (!Array.isArray(list)) {
+        return [];
+      }
+      return list.filter(collection => collection instanceof STAC && collection.isCollection);
+    },
+    apiCollectionsPaginated() {
+      return Boolean(this.apiCollectionsState?.next || this.apiCollectionsState?.prev);
     }
   },
   watch: {
     parent: {
       immediate: true,
-      handler(newStac, oldStac) {
-        if (newStac?.isCatalogLike) {
-          setApiDataListener(newStac, 'searchfilter' + formId, () => this.updateApiCollections());
-        }
-        if (oldStac?.isCatalogLike) {
-          setApiDataListener(oldStac, 'searchfilter' + formId);
-        }
+      handler() {
         this.updateApiCollections();
       }
+    },
+    apiCollectionsFromStore() {
+      this.updateApiCollections();
+    },
+    apiCollectionsPaginated() {
+      this.updateApiCollections();
     },
     value: {
       immediate: true,
@@ -600,9 +616,8 @@ export default defineComponent({
       if (!this.parent) {
         return;
       }
-      let apiCollections = getChildren(this.parent, 'collections');
-      let nextCollectionsLink = getApiChildrenState(this.parent)?.next;
-      if (!Array.isArray(apiCollections) || nextCollectionsLink || !this.conformances.CollectionIdFilter) {
+      let apiCollections = this.apiCollectionsFromStore;
+      if (!Array.isArray(apiCollections) || this.apiCollectionsPaginated || !this.conformances.CollectionIdFilter) {
         this.collections = [];
         return;
       }

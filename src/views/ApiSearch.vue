@@ -254,9 +254,9 @@ export default defineComponent({
       this.errorId = null;
       this.loading = true;
 
-      this.link = Utils.addFiltersToLink(link, this.filters, this.searchResultsPerPage);
-
       try {
+        this.link = Utils.addFiltersToLink(link, this.filters, this.searchResultsPerPage);
+      
         const response = await stacRequest(this.$store, this.link);
         if (response) {
           this.showPage(response.config.url);

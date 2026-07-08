@@ -42,7 +42,7 @@
 import { mapGetters, mapState } from 'vuex';
 import { isObject } from 'stac-js/src/utils.js';
 import { toAbsolute } from 'stac-js/src/http.js';
-import { getChildren, getDisplayTitle, setApiDataListener } from '../models/stac';
+import { getDisplayTitle } from '../models/stac';
 import { STAC } from 'stac-js';
 
 export default {
@@ -65,13 +65,12 @@ export default {
     return {
       expanded: false,
       loading: false,
-      chunk: 1,
-      childs: []
+      chunk: 1
     };
   },
   computed: {
     ...mapState(['data', 'apiCatalogPriority']),
-    ...mapGetters(['getStac', 'toBrowserPath']),
+    ...mapGetters(['getChildren', 'getStac', 'toBrowserPath']),
     onClick() {
       if (!this.to && this.mayHaveChildren) {
         return this.toggle;
@@ -149,6 +148,12 @@ export default {
     hasMore() {
       return this.childs.length > this.shownChilds.length;
     },
+    childs() {
+      if (this.stac?.isCatalogLike) {
+        return this.getChildren(this.stac, this.apiCatalogPriority);
+      }
+      return [];
+    },
     shownChilds() {
       return this.childs.slice(0, this.chunk * 50);
     },
@@ -173,18 +178,6 @@ export default {
           this.expanded = true;
         }
       }
-    },
-    stac: {
-      immediate: true,
-      handler(newStac, oldStac) {
-        if (newStac?.isCatalogLike) {
-          setApiDataListener(newStac, 'tree', () => this.updateChilds());
-        }
-        if (oldStac?.isCatalogLike) {
-          setApiDataListener(oldStac, 'tree');
-        }
-        this.updateChilds();
-      }
     }
   },
   created() {
@@ -193,14 +186,6 @@ export default {
     }
   },
   methods: {
-    updateChilds() {
-      if (this.stac?.isCatalogLike) {
-        this.childs = getChildren(this.stac, this.apiCatalogPriority);
-      }
-      else {
-        this.childs = [];
-      }
-    },
     showMore() {
       this.chunk++;
     },

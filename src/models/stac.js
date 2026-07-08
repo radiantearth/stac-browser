@@ -4,44 +4,19 @@ import Utils from '../utils';
 import { hasText, isObject } from 'stac-js/src/utils.js';
 import { toAbsolute } from 'stac-js/src/http.js';
 
-const apiChildrenState = new WeakMap();
-const apiChildrenListeners = new WeakMap();
-
-function ensureApiChildren(stac) {
-  let state = apiChildrenState.get(stac);
-  if (!state) {
-    state = {
-      list: [],
-      prev: false,
-      next: false
-    };
-    apiChildrenState.set(stac, state);
-  }
-  return state;
-}
-
-function ensureApiChildrenListeners(stac) {
-  let listeners = apiChildrenListeners.get(stac);
-  if (!listeners) {
-    listeners = {};
-    apiChildrenListeners.set(stac, listeners);
-  }
-  return listeners;
-}
-
 function setInternal(stac, key, value) {
   const internalKey = '_' + key;
   stac[internalKey] = value;
   stac._privateKeys.push(internalKey);
 }
 
-export function createSTAC(data, url = null, preprocess = null) {
+export function createSTAC(data, url = null) {
   // Uncomment this line if the old checksum: fields should be converted
   // This is usually not needed so it's not enabled by default to shrink the bundle size
   // Migrate.enableMultihash(require('multihashes'));
 
   // Migrate STAC to latest version
-  let original = JSON.parse(JSON.stringify(data)); // todo: use structuredClone()
+  let original = data._original ?? structuredClone(data);
   data = Migrate.stac(data, false);
 
   // Create stac-js object based on STAC type
@@ -66,19 +41,8 @@ export function createSTAC(data, url = null, preprocess = null) {
   if (obj.isApiCollection) {
     obj.getAll().forEach(child => setInternal(child, 'incomplete', true));
   }
-  setInternal(obj, 'original', original);
   // todo: Should we set original for API children?
-
-  // Preprocess the STAC object if a preprocess function is provided
-  if (preprocess) {
-    if (obj.isSTAC) {
-      obj = preprocess(obj);
-    }
-    else if (obj.isApiCollection) {
-      const key = obj.isCollectionCollection ? 'collections' : 'features';
-      obj[key] = obj[key].map(child => preprocess(child));
-    }
-  }
+  setInternal(obj, 'original', original);
   return obj;
 }
 
@@ -160,76 +124,4 @@ export function sortStac(entities, sort, uiLanguage) {
     return sorted.reverse();
   }
   return sorted;
-}
-
-export function getChildren(stac, priority = null) {
-  if (!stac.isCatalogLike) {
-    return [];
-  }
-
-  const apiChildren = ensureApiChildren(stac);
-
-  let showCollections = !priority || priority === 'collections';
-  let showChilds = !priority || priority === 'childs';
-
-  let children = [];
-  if (showCollections && apiChildren.prev) {
-    children.push(apiChildren.prev);
-  }
-  if (showCollections && apiChildren.list.length > 0) {
-    children = apiChildren.list.slice(0);
-  }
-  if (showChilds) {
-    children = addMissingChildren(children, stac).concat(stac.getLinksWithRels(['item']));
-  }
-  if (showCollections && apiChildren.next) {
-    children.push(apiChildren.next);
-  }
-  return children;
-}
-
-export function getApiChildrenState(stac) {
-  if (!stac.isCatalogLike) {
-    return null;
-  }
-  return ensureApiChildren(stac);
-}
-
-export function setApiDataListener(stac, id, listener = null) {
-  if (!stac.isCatalogLike || typeof id !== 'string' || id.length === 0) {
-    return;
-  }
-
-  const listeners = ensureApiChildrenListeners(stac);
-  if (typeof listener === 'function') {
-    listeners[id] = listener;
-  }
-  else {
-    delete listeners[id];
-  }
-}
-
-export function setApiData(stac, list, next = null, prev = null) {
-  if (!stac.isCatalogLike) {
-    return;
-  }
-
-  const apiChildren = ensureApiChildren(stac);
-  if (prev) {
-    apiChildren.prev = prev;
-  }
-  if (next) {
-    apiChildren.next = next;
-  }
-  apiChildren.list = Array.isArray(list) ? list : [];
-
-  const listeners = ensureApiChildrenListeners(stac);
-  for (let id in listeners) {
-    try {
-      listeners[id](apiChildren);
-    }
-    catch (error) {
-      console.error(error);
-    }
-  }
 }

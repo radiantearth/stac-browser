@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `getBrowserPath` for STAC Objects is not available any longer, use `toBrowserPath` or other URL comparison mechanisms instead.
   **Note:** This is commonly used in `preprocessSTAC` config option, ensure to update your `config.js`.
+- Internal rewrite of how API children are maintained
 
 ### Fixed
 

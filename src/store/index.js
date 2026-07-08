@@ -6,7 +6,7 @@ import urijs from 'urijs';
 import i18n, { loadMessages, detectDataLanguage, updateExternals } from '../i18n';
 import Utils, { BrowserError } from '../utils';
 import { toAbsolute } from 'stac-js/src/http.js';
-import { addMissingChildren, getDisplayTitle, createSTAC, setApiData } from '../models/stac';
+import { addMissingChildren, getDisplayTitle, createSTAC } from '../models/stac';
 import { CatalogLike, STAC } from 'stac-js';
 
 import auth from './auth.js';
@@ -15,12 +15,25 @@ import { getBest } from 'stac-js/src/locales';
 import { TYPES } from "../components/ApiCapabilitiesMixin";
 import BrowserStorage from "../browser-store.js";
 
+function updateApiChildrenState(state, stac, list, next = false, prev = false) {
+  if (!(stac instanceof STAC) || !stac.isCatalogLike) {
+    return;
+  }
+  const key = stac.getAbsoluteUrl();
+  state.apiChildren[key] = {
+    list: Array.isArray(list) ? list : [],
+    prev: prev || false,
+    next: next || false
+  };
+}
+
 function getStore(config, router) {
   // Local settings (e.g. for currently loaded STAC entity)
   const localDefaults = () => ({
     url: '',
     page: null, // Function that returns title and optionally description of the current page as object
     data: null,
+    apiChildren: {},
     loading: true,
     parents: null,
     globalError: null,
@@ -273,13 +286,48 @@ function getStore(config, router) {
         }
         return catalogs;
       },
+      getApiChildrenState: state => stac => {
+        if (!(stac instanceof STAC) || !stac.isCatalogLike) {
+          return null;
+        }
+        return state.apiChildren[stac.getAbsoluteUrl()] || {
+          list: [],
+          prev: false,
+          next: false
+        };
+      },
+      getChildren: (state, getters) => (stac, priority = null) => {
+        if (!(stac instanceof STAC) || !stac.isCatalogLike) {
+          return [];
+        }
+
+        const apiChildren = getters.getApiChildrenState(stac);
+        const showCollections = !priority || priority === 'collections';
+        const showChilds = !priority || priority === 'childs';
+
+        let catalogEntries = [];
+        if (showCollections && apiChildren.list.length > 0) {
+          catalogEntries = apiChildren.list.slice(0);
+        }
+        let children = catalogEntries;
+        if (showChilds) {
+          children = addMissingChildren(catalogEntries, stac).concat(stac.getLinksWithRels(['item']));
+        }
+        if (showCollections && apiChildren.prev) {
+          children = [apiChildren.prev].concat(children);
+        }
+        if (showCollections && apiChildren.next) {
+          children.push(apiChildren.next);
+        }
+        return children;
+      },
 
       toBrowserPath: (state, getters) => ref => {
         let url = ref;
         if (isObject(ref)) {
           if (typeof ref.getAbsoluteUrl === 'function') { // stac-js object
             url = ref.getAbsoluteUrl();
-          } else if (typeof ref.toString === 'function') { // urijs object
+          } else if (ref instanceof urijs) { // urijs object
             url = ref.toString();
           } else if (ref.href) { // plain STAC Link object
             url = ref.href;
@@ -602,6 +650,9 @@ function getStore(config, router) {
           state.apiItemsLoading[collectionId] = true;
         }
       },
+      setApiChildrenData(state, { stac, list, next = null, prev = null }) {
+        updateApiChildrenState(state, stac, list, next, prev);
+      },
       setApiItems(state, { data, stac, show }) {
         if (!isObject(data) || !Array.isArray(data.features)) {
           return;
@@ -629,7 +680,7 @@ function getStore(config, router) {
 
         if (stac instanceof STAC) {
           // ToDo: Prev link only required when state.apiItems is not cached(?) -> cache apiItems?
-          setApiData(stac, apiItems, pages.next, pages.prev);
+          updateApiChildrenState(state, stac, apiItems, pages.next, pages.prev);
         }
       },
       addApiCollections(state, { data, stac, show, searching = false }) {
@@ -645,7 +696,7 @@ function getStore(config, router) {
           state.apiCollections = state.apiCollections.concat(collections);
         }
         if (stac instanceof STAC && !searching) {
-          setApiData(stac, collections, nextLink);
+          updateApiChildrenState(state, stac, collections, nextLink);
         }
       },
       resetApiCollections(state) {
