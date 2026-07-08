@@ -238,14 +238,14 @@ function getStore(config, router) {
           return null;
         }
         let searchLink;
-        if (state.data?.isCatalogLike && !state.data.is(state.root)) {
+        if (state.data?.isCatalogLike && !state.data.is(getters.root)) {
           searchLink = state.data.getSearchLink();
         }
         if (searchLink) {
           return `/search${state.data.getBrowserPath()}`;
         }
-        else if (state.root && state.allowSelectCatalog) {
-          return `/search${state.root.getBrowserPath()}`;
+        else if (getters.root && state.allowSelectCatalog) {
+          return `/search${getters.root.getBrowserPath()}`;
         }
         return '/search';
       },
