@@ -1,53 +1,83 @@
-import {
-  Catalog as BaseCatalog,
-  Collection as BaseCollection,
-  Item,
-  ItemCollection,
-  CollectionCollection,
-  STAC,
-  STACReference
-} from 'stac-js';
+import { Catalog, Collection, Item, ItemCollection, CollectionCollection, STAC, STACReference } from 'stac-js';
 import Migrate from '@radiantearth/stac-migrate';
-import Utils from "../utils";
+import Utils from '../utils';
 import { hasText, isObject } from 'stac-js/src/utils.js';
 import { toAbsolute } from 'stac-js/src/http.js';
 
+const apiChildrenState = new WeakMap();
+const apiChildrenListeners = new WeakMap();
 
-export function createSTAC(data, url, incomplete = false, migrate = true, updateVersionNumber = false) {
-  // Migrate STAC to latest version
-  if (migrate) {
-    // Uncomment this line if the old checksum: fields should be converted
-    // This is usually not needed so it's not enabled by default to shrink the bundle size
-    // Migrate.enableMultihash(require('multihashes'));
-    data._original = data;
-    data = Migrate.stac(data, updateVersionNumber);
+function ensureApiChildren(stac) {
+  let state = apiChildrenState.get(stac);
+  if (!state) {
+    state = {
+      list: [],
+      prev: false,
+      next: false
+    };
+    apiChildrenState.set(stac, state);
   }
+  return state;
+}
+
+function ensureApiChildrenListeners(stac) {
+  let listeners = apiChildrenListeners.get(stac);
+  if (!listeners) {
+    listeners = {};
+    apiChildrenListeners.set(stac, listeners);
+  }
+  return listeners;
+}
+
+function setInternal(stac, key, value) {
+  const internalKey = '_' + key;
+  stac[internalKey] = value;
+  stac._privateKeys.push(internalKey);
+}
+
+export function createSTAC(data, url = null, preprocess = null) {
+  // Uncomment this line if the old checksum: fields should be converted
+  // This is usually not needed so it's not enabled by default to shrink the bundle size
+  // Migrate.enableMultihash(require('multihashes'));
+
+  // Migrate STAC to latest version
+  let original = JSON.parse(JSON.stringify(data)); // todo: use structuredClone()
+  data = Migrate.stac(data, false);
+
   // Create stac-js object based on STAC type
   let obj;
   if (data.type === 'Feature') {
     obj = new Item(data, url);
   }
   else if (data.type === 'FeatureCollection') {
-    // todo: convert inner collections to stac-js as well
     obj = new ItemCollection(data, url);
   }
   else if (data.type === 'Collection' || (!data.type && typeof data.extent !== 'undefined' && typeof data.license !== 'undefined')) {
     obj = new Collection(data, url);
   }
   else if (!data.type && Array.isArray(data.collections)) {
-    // todo: convert inner collections to stac-js as well
     obj = new CollectionCollection(data, url);
   }
   else {
     obj = new Catalog(data, url);
   }
-  // Flag the _original property as private for internal stac-js purposes
-  if (data._original) {
-    obj._privateKeys.push('_original');
+
+  // Set stac-browser internal properties
+  if (obj.isApiCollection) {
+    obj.getAll().forEach(child => setInternal(child, 'incomplete', true));
   }
-  if (incomplete) {
-    obj._incomplete = true;
-    obj._privateKeys.push('_incomplete');
+  setInternal(obj, 'original', original);
+  // todo: Should we set original for API children?
+
+  // Preprocess the STAC object if a preprocess function is provided
+  if (preprocess) {
+    if (obj.isSTAC) {
+      obj = preprocess(obj);
+    }
+    else if (obj.isApiCollection) {
+      const key = obj.isCollectionCollection ? 'collections' : 'features';
+      obj[key] = obj[key].map(child => preprocess(child));
+    }
   }
   return obj;
 }
@@ -132,120 +162,74 @@ export function sortStac(entities, sort, uiLanguage) {
   return sorted;
 }
 
-function getChildren(stac, priority = null) {
+export function getChildren(stac, priority = null) {
   if (!stac.isCatalogLike) {
     return [];
   }
+
+  const apiChildren = ensureApiChildren(stac);
 
   let showCollections = !priority || priority === 'collections';
   let showChilds = !priority || priority === 'childs';
 
   let children = [];
-  if (showCollections && stac._apiChildren.prev) {
-    children.push(stac._apiChildren.prev);
+  if (showCollections && apiChildren.prev) {
+    children.push(apiChildren.prev);
   }
-  if (showCollections && stac._apiChildren.list.length > 0) {
-    children = stac._apiChildren.list.slice(0);
+  if (showCollections && apiChildren.list.length > 0) {
+    children = apiChildren.list.slice(0);
   }
   if (showChilds) {
     children = addMissingChildren(children, stac).concat(stac.getLinksWithRels(['item']));
   }
-  if (showCollections && stac._apiChildren.next) {
-    children.push(stac._apiChildren.next);
+  if (showCollections && apiChildren.next) {
+    children.push(apiChildren.next);
   }
   return children;
 }
 
-export class Collection extends BaseCollection {
-
-  constructor(data, url) {
-    super(data, url);
-    this._apiChildrenListeners = {};
-    this._apiChildren = {
-      list: [],
-      prev: false,
-      next: false
-    };
-    this._privateKeys.push('_apiChildrenListeners', '_apiChildren');
+export function getApiChildrenState(stac) {
+  if (!stac.isCatalogLike) {
+    return null;
   }
-
-  getChildren(priority = null) {
-    return getChildren(this, priority);
-  }
-
-  setApiDataListener(id, listener = null) {
-    if (typeof listener === 'function') {
-      this._apiChildrenListeners[id] = listener;
-    }
-    else {
-      delete this._apiChildrenListeners[id];
-    }
-  }
-
-  setApiData(list, next = null, prev = null) {
-    if (prev) {
-      this._apiChildren.prev = prev;
-    }
-    if (next) {
-      this._apiChildren.next = next;
-    }
-    this._apiChildren.list = list;
-
-    for (let id in this._apiChildrenListeners) {
-      try {
-        this._apiChildrenListeners[id](this._apiChildren);
-      } catch (error) {
-        console.error(error);
-      }
-    }
-  }
-
+  return ensureApiChildren(stac);
 }
 
-export class Catalog extends BaseCatalog {
-
-  constructor(data, url) {
-    super(data, url);
-    this._apiChildrenListeners = {};
-    this._apiChildren = {
-      list: [],
-      prev: false,
-      next: false
-    };
-    this._privateKeys.push('_apiChildrenListeners', '_apiChildren');
+export function setApiDataListener(stac, id, listener = null) {
+  if (!stac.isCatalogLike || typeof id !== 'string' || id.length === 0) {
+    return;
   }
 
-  getChildren(priority = null) {
-    return getChildren(this, priority);
+  const listeners = ensureApiChildrenListeners(stac);
+  if (typeof listener === 'function') {
+    listeners[id] = listener;
   }
-
-  setApiDataListener(id, listener = null) {
-    if (typeof listener === 'function') {
-      this._apiChildrenListeners[id] = listener;
-    }
-    else {
-      delete this._apiChildrenListeners[id];
-    }
+  else {
+    delete listeners[id];
   }
-
-  setApiData(list, next = null, prev = null) {
-    if (prev) {
-      this._apiChildren.prev = prev;
-    }
-    if (next) {
-      this._apiChildren.next = next;
-    }
-    this._apiChildren.list = list;
-
-    for (let id in this._apiChildrenListeners) {
-      try {
-        this._apiChildrenListeners[id](this._apiChildren);
-      } catch (error) {
-        console.error(error);
-      }
-    }
-  }
-
 }
 
-export { CollectionCollection, Item, ItemCollection };
+export function setApiData(stac, list, next = null, prev = null) {
+  if (!stac.isCatalogLike) {
+    return;
+  }
+
+  const apiChildren = ensureApiChildren(stac);
+  if (prev) {
+    apiChildren.prev = prev;
+  }
+  if (next) {
+    apiChildren.next = next;
+  }
+  apiChildren.list = Array.isArray(list) ? list : [];
+
+  const listeners = ensureApiChildrenListeners(stac);
+  for (let id in listeners) {
+    try {
+      listeners[id](apiChildren);
+    }
+    catch (error) {
+      console.error(error);
+    }
+  }
+}

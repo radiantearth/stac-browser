@@ -42,7 +42,7 @@
 import { mapGetters, mapState } from 'vuex';
 import { isObject } from 'stac-js/src/utils.js';
 import { toAbsolute } from 'stac-js/src/http.js';
-import { getDisplayTitle, Collection } from '../models/stac';
+import { getChildren, getDisplayTitle, setApiDataListener } from '../models/stac';
 import { STAC } from 'stac-js';
 
 export default {
@@ -82,7 +82,7 @@ export default {
       if (this.pagination) {
         return null;
       }
-      else if (this.item instanceof STAC) {
+      else if (this.item.isSTAC) {
         let stac = this.getStac(this.item.getAbsoluteUrl());
         if (!this.loading && stac) {
           return stac;
@@ -177,11 +177,11 @@ export default {
     stac: {
       immediate: true,
       handler(newStac, oldStac) {
-        if (newStac instanceof Collection) {
-          newStac.setApiDataListener('tree', () => this.updateChilds());
+        if (newStac?.isCatalogLike) {
+          setApiDataListener(newStac, 'tree', () => this.updateChilds());
         }
-        if (oldStac instanceof Collection) {
-          oldStac.setApiDataListener('tree');
+        if (oldStac?.isCatalogLike) {
+          setApiDataListener(oldStac, 'tree');
         }
         this.updateChilds();
       }
@@ -194,8 +194,8 @@ export default {
   },
   methods: {
     updateChilds() {
-      if (this.stac && this.stac.isCatalogLike) {
-        this.childs = this.stac.getChildren(this.apiCatalogPriority);
+      if (this.stac?.isCatalogLike) {
+        this.childs = getChildren(this.stac, this.apiCatalogPriority);
       }
       else {
         this.childs = [];

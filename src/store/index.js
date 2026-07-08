@@ -6,7 +6,7 @@ import urijs from 'urijs';
 import i18n, { loadMessages, detectDataLanguage, updateExternals } from '../i18n';
 import Utils, { BrowserError } from '../utils';
 import { toAbsolute } from 'stac-js/src/http.js';
-import { addMissingChildren, getDisplayTitle, createSTAC } from '../models/stac';
+import { addMissingChildren, getDisplayTitle, createSTAC, setApiData } from '../models/stac';
 import { CatalogLike, STAC } from 'stac-js';
 
 import auth from './auth.js';
@@ -277,11 +277,14 @@ function getStore(config, router) {
       toBrowserPath: (state, getters) => ref => {
         let url = ref;
         if (isObject(ref)) {
-          if (typeof ref.getAbsoluteUrl === 'function') {
+          if (typeof ref.getAbsoluteUrl === 'function') { // stac-js object
             url = ref.getAbsoluteUrl();
-          }
-          else {
+          } else if (typeof ref.toString === 'function') { // urijs object
+            url = ref.toString();
+          } else if (ref.href) { // plain STAC Link object
             url = ref.href;
+          }	else {
+            throw new Error('Invalid reference provided to toBrowserPath. Must be a stac-js object, URI object or string URL.');
           }
         }
         if (!hasText(url)) {
@@ -626,7 +629,7 @@ function getStore(config, router) {
 
         if (stac instanceof STAC) {
           // ToDo: Prev link only required when state.apiItems is not cached(?) -> cache apiItems?
-          stac.setApiData(apiItems, pages.next, pages.prev);
+          setApiData(stac, apiItems, pages.next, pages.prev);
         }
       },
       addApiCollections(state, { data, stac, show, searching = false }) {
@@ -642,7 +645,7 @@ function getStore(config, router) {
           state.apiCollections = state.apiCollections.concat(collections);
         }
         if (stac instanceof STAC && !searching) {
-          stac.setApiData(collections, nextLink);
+          setApiData(stac, collections, nextLink);
         }
       },
       resetApiCollections(state) {
@@ -966,7 +969,7 @@ function getStore(config, router) {
                   return data;
                 }
                 else {
-                  data = createSTAC(item, url, true);
+                  data = createSTAC(item, url);
                   cx.commit('loaded', { data, url });
                   return data;
                 }
@@ -1074,7 +1077,7 @@ function getStore(config, router) {
                 return data;
               }
               else {
-                data = createSTAC(collection, url, true);
+                data = createSTAC(collection, url);
                 cx.commit('loaded', { data, url });
                 return data;
               }

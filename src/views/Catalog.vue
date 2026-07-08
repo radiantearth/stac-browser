@@ -82,7 +82,7 @@ import { formatLicense, formatTemporalExtents } from '@radiantearth/stac-fields/
 import Utils from '../utils';
 import { hasText, isObject, size } from 'stac-js/src/utils.js';
 import { addSchemaToDocument, createCatalogSchema } from '../schema-org';
-import { ItemCollection } from '../models/stac.js';
+import { ItemCollection } from 'stac-js';
 import DeprecationMixin from '../components/DeprecationMixin.js';
 import { BTab, BTabs, BCard } from 'bootstrap-vue-next';
 import { getIgnoredFields } from '../ignored-metadata.js';
