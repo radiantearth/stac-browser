@@ -71,7 +71,7 @@ export default {
   },
   computed: {
     ...mapState(['data', 'apiCatalogPriority']),
-    ...mapGetters(['getStac']),
+    ...mapGetters(['getStac', 'toBrowserPath']),
     onClick() {
       if (!this.to && this.mayHaveChildren) {
         return this.toggle;
@@ -129,14 +129,14 @@ export default {
       }
       if (this.pagination) {
         if (this.parent && (!this.data || this.parent.getAbsoluteUrl() !== this.data.getAbsoluteUrl())) {
-          return this.parent.getBrowserPath();
+          return this.toBrowserPath(this.parent);
         }
         else {
           return null;
         }
       }
       else if (this.stac instanceof STAC) {
-        return this.stac.getBrowserPath();
+        return this.toBrowserPath(this.stac);
       }
       return null;
     },

@@ -242,10 +242,10 @@ function getStore(config, router) {
           searchLink = state.data.getSearchLink();
         }
         if (searchLink) {
-          return `/search${state.data.getBrowserPath()}`;
+          return `/search${getters.toBrowserPath(state.data)}`;
         }
         else if (getters.root && state.allowSelectCatalog) {
-          return `/search${getters.root.getBrowserPath()}`;
+          return `/search${getters.toBrowserPath(getters.root)}`;
         }
         return '/search';
       },
@@ -274,7 +274,16 @@ function getStore(config, router) {
         return catalogs;
       },
 
-      toBrowserPath: (state, getters) => url => {
+      toBrowserPath: (state, getters) => ref => {
+        let url = ref;
+        if (isObject(ref)) {
+          if (typeof ref.getAbsoluteUrl === 'function') {
+            url = ref.getAbsoluteUrl();
+          }
+          else {
+            url = ref.href;
+          }
+        }
         if (!hasText(url)) {
           url = '/';
         }
@@ -768,7 +777,6 @@ function getStore(config, router) {
           isRoot // Is a request for the root catalog initiated by this function, avoiding endless loops in some mis-configured instances (see https://github.com/radiantearth/stac-browser/issues/580)
         } = args;
 
-        const path = cx.getters.toBrowserPath(url);
         url = toAbsolute(url, cx.state.url);
 
         // Make sure we have all authentication details
@@ -793,7 +801,7 @@ function getStore(config, router) {
             if (!isObject(response.data)) {
               throw new BrowserError(i18n.global.t('errors.invalidJsonObject'));
             }
-            data = createSTAC(response.data, url, path);
+            data = createSTAC(response.data, url);
             if (!(data instanceof STAC)) {
               // Might be a request to the /collections or .../items endpoints,
               // which returns an APICollection, not a STAC object.
@@ -805,7 +813,7 @@ function getStore(config, router) {
               // If we prefer another language abort redirect to the new language
               let localeLink = data.getLocaleLink(cx.state.dataLanguage);
               if (localeLink) {
-                router.replace(cx.getters.toBrowserPath(localeLink.href));
+                router.replace(cx.getters.toBrowserPath(localeLink));
                 return;
               }
             }
@@ -958,8 +966,7 @@ function getStore(config, router) {
                   return data;
                 }
                 else {
-                  let itemPath = cx.getters.toBrowserPath(url);
-                  data = createSTAC(item, url, itemPath);
+                  data = createSTAC(item, url);
                   data._incomplete = true;
                   cx.commit('loaded', { data, url });
                   return data;
@@ -1068,8 +1075,7 @@ function getStore(config, router) {
                 return data;
               }
               else {
-                let collectionPath = cx.getters.toBrowserPath(url);
-                data = createSTAC(collection, url, collectionPath);
+                data = createSTAC(collection, url);
                 data._incomplete = true;
                 cx.commit('loaded', { data, url });
                 return data;

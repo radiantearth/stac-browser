@@ -80,9 +80,9 @@ export default class Instance {
         if(method === 'GET'){
           handlers.push(http.get(url, ({request}) => {
             try { 
-              const url = new URL(request.url);
-              options.verbose && console.log(`GET ${url}`);
-              const params = Object.fromEntries(url.searchParams); //quick patch. breaks with multiple arguments of the same key
+              const parsedUrl = new URL(request.url);
+              options.verbose && console.log(`GET ${parsedUrl}`);
+              const params = Object.fromEntries(parsedUrl.searchParams); //quick patch. breaks with multiple arguments of the same key
               const obj = endpoint.build(params);
               return HttpResponse.json(obj);
             } catch (e) {

@@ -13,7 +13,8 @@ import { hasText, isObject } from 'stac-js/src/utils.js';
 import { toAbsolute } from 'stac-js/src/http.js';
 
 
-export function createSTAC(data, url, path, migrate = true, updateVersionNumber = false) {
+export function createSTAC(data, url, migrate = true, updateVersionNumber = false) {
+  // Migrate STAC to latest version
   if (migrate) {
     // Uncomment this line if the old checksum: fields should be converted
     // This is usually not needed so it's not enabled by default to shrink the bundle size
@@ -21,24 +22,26 @@ export function createSTAC(data, url, path, migrate = true, updateVersionNumber 
     data._original = data;
     data = Migrate.stac(data, updateVersionNumber);
   }
+  // Create stac-js object based on STAC type
   let obj;
   if (data.type === 'Feature') {
-    obj = new Item(data, url, path);
+    obj = new Item(data, url);
   }
   else if (data.type === 'FeatureCollection') {
     // todo: convert inner collections to stac-js as well
-    obj = new ItemCollection(data, url, path);
+    obj = new ItemCollection(data, url);
   }
   else if (data.type === 'Collection' || (!data.type && typeof data.extent !== 'undefined' && typeof data.license !== 'undefined')) {
-    obj = new Collection(data, url, path);
+    obj = new Collection(data, url);
   }
   else if (!data.type && Array.isArray(data.collections)) {
     // todo: convert inner collections to stac-js as well
-    obj = new CollectionCollection(data, url, path);
+    obj = new CollectionCollection(data, url);
   }
   else {
-    obj = new Catalog(data, url, path);
+    obj = new Catalog(data, url);
   }
+  // Flag the _original property as private for internal stac-js purposes
   if (data._original) {
     obj._privateKeys.push('_original');
   }
@@ -149,39 +152,14 @@ function getChildren(stac, priority = null) {
   return children;
 }
 
-export class ItemCollection extends BaseItemCollection {
+export class ItemCollection extends BaseItemCollection {}
 
-  constructor(data, url, path) {
-    super(data, url);
-    this._path = path;
-    this._privateKeys.push('_path');
-  }
-
-  getBrowserPath() {
-    return this._path;
-  }
-
-}
-
-export class CollectionCollection extends BaseCollectionCollection {
-
-  constructor(data, url, path) {
-    super(data, url);
-    this._path = path;
-    this._privateKeys.push('_path');
-  }
-
-  getBrowserPath() {
-    return this._path;
-  }
-
-}
+export class CollectionCollection extends BaseCollectionCollection {}
 
 export class Collection extends BaseCollection {
 
-  constructor(data, url, path) {
+  constructor(data, url) {
     super(data, url);
-    this._path = path;
     this._incomplete = false;
     this._apiChildrenListeners = {};
     this._apiChildren = {
@@ -189,11 +167,7 @@ export class Collection extends BaseCollection {
       prev: false,
       next: false
     };
-    this._privateKeys.push('_path', '_incomplete', '_apiChildrenListeners', '_apiChildren');
-  }
-
-  getBrowserPath() {
-    return this._path;
+    this._privateKeys.push('_incomplete', '_apiChildrenListeners', '_apiChildren');
   }
 
   getChildren(priority = null) {
@@ -231,9 +205,8 @@ export class Collection extends BaseCollection {
 
 export class Catalog extends BaseCatalog {
 
-  constructor(data, url, path) {
+  constructor(data, url) {
     super(data, url);
-    this._path = path;
     this._incomplete = false;
     this._apiChildrenListeners = {};
     this._apiChildren = {
@@ -241,11 +214,7 @@ export class Catalog extends BaseCatalog {
       prev: false,
       next: false
     };
-    this._privateKeys.push('_path', '_incomplete', '_apiChildrenListeners', '_apiChildren');
-  }
-
-  getBrowserPath() {
-    return this._path;
+    this._privateKeys.push('_incomplete', '_apiChildrenListeners', '_apiChildren');
   }
 
   getChildren(priority = null) {
@@ -283,15 +252,10 @@ export class Catalog extends BaseCatalog {
 
 export class Item extends BaseItem {
 
-  constructor(data, url, path) {
+  constructor(data, url) {
     super(data, url);
-    this._path = path;
     this._incomplete = false;
-    this._privateKeys.push('_path', '_incomplete');
-  }
-
-  getBrowserPath() {
-    return this._path;
+    this._privateKeys.push('_incomplete');
   }
 
 }

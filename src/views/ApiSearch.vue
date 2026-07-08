@@ -125,7 +125,7 @@ export default defineComponent({
   },
   computed: {
     ...mapState(['catalogUrl', 'catalogTitle', 'searchResultsPerPage', 'stateQueryParameters']),
-    ...mapGetters(['canSearchItems', 'canSearchCollections', 'getStac', 'root', 'collectionLink', 'parentLink', 'fromBrowserPath', 'toBrowserPath']),
+    ...mapGetters(['canSearchItems', 'canSearchCollections', 'getStac', 'root', 'collectionLink', 'parentLink', 'fromBrowserPath']),
     selectedCollectionCount() {
       return size(this.selectedCollections);
     },
@@ -183,7 +183,7 @@ export default defineComponent({
             if (selfLink?.href) {
               url = toAbsolute(selfLink.href, this.link.href);
             }
-            let stac = createSTAC(obj, url, this.toBrowserPath(url));
+            let stac = createSTAC(obj, url);
             stac = processSTAC(this.$store.state, stac);
             return stac;
           } catch (error) {
@@ -311,7 +311,7 @@ export default defineComponent({
         }
         else {
           const url = this.link.getAbsoluteUrl();
-          this.data = createSTAC(response.data, url, this.toBrowserPath(url));
+          this.data = createSTAC(response.data, url);
         }
       } catch (error) {
         this.data = {};

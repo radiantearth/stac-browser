@@ -643,7 +643,7 @@ Of course, ideally you'd want to update the root catalog itself, but until then 
 
 ```js
 preprocessSTAC: (stac, state) => {
-    if (stac.getBrowserPath() === '/') {
+    if (stac.getAbsoluteUrl() === state.catalogUrl) {
         stac.title = state.catalogTitle;
         stac.description = 'This is a **much** more useful description for this catalog!';
     }

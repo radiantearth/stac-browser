@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- `getBrowserPath` for STAC Objects is not available any longer, use `toBrowserPath` or other URL comparison mechanisms instead.
+  **Note:** This is commonly used in `preprocessSTAC` config option, ensure to update your `config.js`.
+
 ### Fixed
 
 - Fix global error handling in certain edge-cases
