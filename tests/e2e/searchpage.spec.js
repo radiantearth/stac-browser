@@ -23,16 +23,16 @@ const fillBboxInputs = async (page, values) => {
   const eastLonInput = page.getByLabel(/east longitude/i);
   const northLatInput = page.getByLabel(/north latitude/i);
   
-  if (values.westLon != null) {
+  if (values.westLon !== null && values.westLon !== undefined) {
     await westLonInput.fill(values.westLon);
   }
-  if (values.southLat != null) {
+  if (values.southLat !== null && values.southLat !== undefined) {
     await southLatInput.fill(values.southLat);
   }
-  if (values.eastLon != null) {
+  if (values.eastLon !== null && values.eastLon !== undefined) {
     await eastLonInput.fill(values.eastLon);
   }
-  if (values.northLat != null) {
+  if (values.northLat !== null && values.northLat !== undefined) {
     await northLatInput.fill(values.northLat);
   }
 };
@@ -642,12 +642,12 @@ test.describe('STAC Browser Search page', () => {
     });
   });
   test('Catalog search results preserve applied filters when paginating', async ({ page, worker }) => {
-  api = API.minimalApi({}, {
-    defaultLimit: 5,
-    prevLinkEnabled: true,
-    firstLinkEnabled: true,
-    lastLinkEnabled: true
-  });
+    api = API.minimalApi({}, {
+      defaultLimit: 5,
+      prevLinkEnabled: true,
+      firstLinkEnabled: true,
+      lastLinkEnabled: true
+    });
     let collection = api.addCollection('collection').setMetadata({ title: 'Test Collection' });
     api.addManyItems(collection, 13);
     api.addCollectionsExtension().addItemsExtension().addSearchExtension();
@@ -716,14 +716,24 @@ test.describe('STAC Browser Search page', () => {
       }
 
       const firstSearchPromise = page.waitForRequest(req => {
-         if (!(req.resourceType() === 'xhr' || req.resourceType() === 'fetch')) return false;
-         if (!(req.url().includes('/items') || req.url().includes('/search'))) return false;
-         if (req.url().includes('limit=3')) return true;
-         if (req.method() === 'POST' && req.postData()) {
-           try { return JSON.parse(req.postData()).limit === 3; } catch { return false; }
-         }
-         return false;
-       });
+        if (!(req.resourceType() === 'xhr' || req.resourceType() === 'fetch')) {
+          return false;
+        }
+        if (!(req.url().includes('/items') || req.url().includes('/search'))) {
+          return false;
+        }
+        if (req.url().includes('limit=3')) {
+          return true;
+        }
+        if (req.method() === 'POST' && req.postData()) {
+          try {
+            return JSON.parse(req.postData()).limit === 3;
+          } catch {
+            return false;
+          }
+        }
+        return false;
+      });
       
       const limitInput = page.getByLabel(/items per page/i);
       await limitInput.fill('3');
@@ -734,14 +744,24 @@ test.describe('STAC Browser Search page', () => {
 
     await test.step('Click Next page and verify limit filter is preserved', async () => {
       const nextPagePromise = page.waitForRequest(req => {
-         if (!(req.resourceType() === 'xhr' || req.resourceType() === 'fetch')) return false;
-         if (!(req.url().includes('/items') || req.url().includes('/search'))) return false;
-         if (req.url().includes('limit=3')) return true;
-         if (req.method() === 'POST' && req.postData()) {
-           try { return JSON.parse(req.postData()).limit === 3; } catch { return false; }
-         }
-         return false;
-       });
+        if (!(req.resourceType() === 'xhr' || req.resourceType() === 'fetch')) {
+          return false;
+        }
+        if (!(req.url().includes('/items') || req.url().includes('/search'))) {
+          return false;
+        }
+        if (req.url().includes('limit=3')) {
+          return true;
+        }
+        if (req.method() === 'POST' && req.postData()) {
+          try {
+            return JSON.parse(req.postData()).limit === 3;
+          } catch {
+            return false;
+          }
+        }
+        return false;
+      });
       
       const nextButton = page.getByRole('button', { name: /next/i }).first();
       await nextButton.click();
@@ -775,13 +795,21 @@ test.describe('STAC Browser Search page', () => {
       await limitInput.fill('6');
       
       const searchPromise = page.waitForRequest(req => {
-         if (!(req.resourceType() === 'xhr' || req.resourceType() === 'fetch')) return false;
-         if (req.url().includes('limit=6')) return true;
-         if (req.method() === 'POST' && req.url().includes('/search') && req.postData()) {
-           try { return JSON.parse(req.postData()).limit === 6; } catch { return false; }
-         }
-         return false;
-       });
+        if (!(req.resourceType() === 'xhr' || req.resourceType() === 'fetch')) {
+          return false;
+        }
+        if (req.url().includes('limit=6')) {
+          return true;
+        }
+        if (req.method() === 'POST' && req.url().includes('/search') && req.postData()) {
+          try {
+            return JSON.parse(req.postData()).limit === 6;
+          } catch {
+            return false;
+          }
+        }
+        return false;
+      });
       await page.getByRole('button', { name: /submit/i }).click();
       await searchPromise;
     });

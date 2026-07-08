@@ -38,12 +38,14 @@ test.describe('STAC Browser Data Source Selection', () => {
     expect(count).toBeGreaterThan(10);
     
     // each entry should have a title and mention either API or Catalog
-    for (let i = 0; i < count; i++) {
+    await Promise.all(Array.from({ length: count }, (_, i) => {
       const btn = indexButtons.nth(i);
-      await expect(btn.locator('strong')).toHaveCount(1);
-      // the button text should include 'API' or 'Catalog' indicating badge
-      await expect(btn).toContainText(/API|Catalog/i);
-    }
+      return Promise.all([
+        expect(btn.locator('strong')).toHaveCount(1),
+        // the button text should include 'API' or 'Catalog' indicating badge
+        expect(btn).toContainText(/API|Catalog/i)
+      ]);
+    }));
   });
   
   test('should render language dropdown with flag icon and correct defaults', async ({ page }) => {

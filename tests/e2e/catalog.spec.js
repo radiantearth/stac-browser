@@ -131,7 +131,7 @@ test.describe('Catalog - toolBar', () => {
     await copyButton.click();
     
     // Verify the URL was copied to the clipboard
-    await expect.poll(async () => readClipboard(page)).not.toEqual('');
+    await expect.poll(() => readClipboard(page)).not.toEqual('');
     const clipboardText = await readClipboard(page);
     await expect(clipboardText).toContain(catalog.root.getBrowserPath());
   });
@@ -186,7 +186,7 @@ test.describe('Catalog - toolBar', () => {
     await copyButton.click();
     
     // Verify the URL was copied to the clipboard
-    await expect.poll(async () => readClipboard(page)).not.toEqual('');
+    await expect.poll(() => readClipboard(page)).not.toEqual('');
     const clipboardText = await readClipboard(page);
     await expect(clipboardText).toContain(api.root.getBrowserPath());
   });

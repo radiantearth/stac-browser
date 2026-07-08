@@ -36,7 +36,7 @@ test.describe('STAC Browser code example modal', () => {
       copied = await readClipboard(page);
     });
     
-    await test.step('Verify copied dependencies are Python install command', async () => {
+    await test.step('Verify copied dependencies are Python install command', () => {
       expect(copied, 'should contain minimal Python dependency install command').toContain('pip install');
       expect(copied, 'should not contain Rust dependency install command').not.toContain('cargo add');
     });
@@ -68,7 +68,7 @@ test.describe('STAC Browser code example modal', () => {
       rustDependencies = await readClipboard(page);
     });
     
-    await test.step('Verify copied dependencies were updated to Rust install command', async () => {
+    await test.step('Verify copied dependencies were updated to Rust install command', () => {
       expect(rustDependencies, 'should contain Rust dependency install command').toContain('cargo add serde_json stac stac-io');
       expect(rustDependencies, 'should not contain Python dependency install command').not.toContain('pip install pystac-client');
       expect(rustDependencies, 'should differ from initial Python copied dependencies').not.toEqual(pythonDependencies);
@@ -89,7 +89,7 @@ test.describe('STAC Browser code example modal', () => {
       copied = await readClipboard(page);
     });
     
-    await test.step('Verify copied code is Python default snippet', async () => {
+    await test.step('Verify copied code is Python default snippet', () => {
       expect(copied, 'should contain Python client import').toContain('from pystac_client import Client');
       expect(copied, 'should contain unfiltered search call').toContain('results = catalog.search(');
       expect(copied, 'should not contain JavaScript fetch snippet').not.toContain('const searchUrl =');
@@ -111,7 +111,7 @@ test.describe('STAC Browser code example modal', () => {
       copied = await readClipboard(page);
     });
     
-    await test.step('Verify copied filename is Python default output filename', async () => {
+    await test.step('Verify copied filename is Python default output filename', () => {
       expect(copied, 'Python filename should be search.py').toBe('search.py');
     });
   });
@@ -142,7 +142,7 @@ test.describe('STAC Browser code example modal', () => {
       javascriptFilename = await readClipboard(page);
     });
     
-    await test.step('Verify copied filename was updated to JavaScript output filename', async () => {
+    await test.step('Verify copied filename was updated to JavaScript output filename', () => {
       expect(javascriptFilename, 'JavaScript filename should be search.mjs').toBe('search.mjs');
     });
   });
@@ -171,7 +171,7 @@ test.describe('STAC Browser code example modal', () => {
       javascriptCode = await readClipboard(page);
     });
     
-    await test.step('Verify copied code was updated to JavaScript snippet', async () => {
+    await test.step('Verify copied code was updated to JavaScript snippet', () => {
       expect(javascriptCode, 'should contain JavaScript fetch call').toContain('await fetch(');
       expect(javascriptCode, 'should not contain Python snippet').not.toContain('from pystac_client import Client');
       expect(javascriptCode, 'should differ from initial Python copied code').not.toEqual(pythonCode);
@@ -267,7 +267,7 @@ test.describe('STAC Browser code example modal', () => {
     expect(copied, 'should contain bbox').toContain('bbox');
     const bboxMatch = copied.match(/bbox\s*=\s*\[([^\]]+)\]/);
     expect(bboxMatch).not.toBeNull();
-    await test.step('Verify bbox values in copied code', async () => {
+    await test.step('Verify bbox values in copied code', () => {
       // work around floating point precision issues by allowing for closeTo rather than exact equality
       const bbox = bboxMatch[1].split(',').map(v => Number(v.trim()));
       expect(bbox).toHaveLength(4);
@@ -276,7 +276,7 @@ test.describe('STAC Browser code example modal', () => {
       expect(bbox[2]).toBeCloseTo(-104, 6);
       expect(bbox[3]).toBeCloseTo(49, 6);
     });
-    await test.step('Verify datetime range in copied code', async () => {
+    await test.step('Verify datetime range in copied code', () => {
       expect(copied).toContain('datetime=');
       expect(copied).toContain('2025-01-01');
       expect(copied).toContain('2026-12-31');
@@ -313,7 +313,7 @@ test.describe('STAC Browser code example modal', () => {
       downloadedCode = await readFile(path, 'utf8');
     });
     
-    await test.step('verify downloaded code matches displayed snippet', async () => {
+    await test.step('verify downloaded code matches displayed snippet', () => {
       // Normalize line endings: clipboard may use \r\n on Windows and \r on MacOS
       // while Blob downloads preserve LF only
       const normalize = s => s.replace(/\r\n|\r/g, '\n');
