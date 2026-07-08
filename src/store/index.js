@@ -966,8 +966,7 @@ function getStore(config, router) {
                   return data;
                 }
                 else {
-                  data = createSTAC(item, url);
-                  data._incomplete = true;
+                  data = createSTAC(item, url, true);
                   cx.commit('loaded', { data, url });
                   return data;
                 }
@@ -1075,8 +1074,7 @@ function getStore(config, router) {
                 return data;
               }
               else {
-                data = createSTAC(collection, url);
-                data._incomplete = true;
+                data = createSTAC(collection, url, true);
                 cx.commit('loaded', { data, url });
                 return data;
               }

@@ -1,9 +1,9 @@
 import {
   Catalog as BaseCatalog,
   Collection as BaseCollection,
-  Item as BaseItem,
-  ItemCollection as BaseItemCollection,
-  CollectionCollection as BaseCollectionCollection,
+  Item,
+  ItemCollection,
+  CollectionCollection,
   STAC,
   STACReference
 } from 'stac-js';
@@ -13,7 +13,7 @@ import { hasText, isObject } from 'stac-js/src/utils.js';
 import { toAbsolute } from 'stac-js/src/http.js';
 
 
-export function createSTAC(data, url, migrate = true, updateVersionNumber = false) {
+export function createSTAC(data, url, incomplete = false, migrate = true, updateVersionNumber = false) {
   // Migrate STAC to latest version
   if (migrate) {
     // Uncomment this line if the old checksum: fields should be converted
@@ -44,6 +44,10 @@ export function createSTAC(data, url, migrate = true, updateVersionNumber = fals
   // Flag the _original property as private for internal stac-js purposes
   if (data._original) {
     obj._privateKeys.push('_original');
+  }
+  if (incomplete) {
+    obj._incomplete = true;
+    obj._privateKeys.push('_incomplete');
   }
   return obj;
 }
@@ -152,22 +156,17 @@ function getChildren(stac, priority = null) {
   return children;
 }
 
-export class ItemCollection extends BaseItemCollection {}
-
-export class CollectionCollection extends BaseCollectionCollection {}
-
 export class Collection extends BaseCollection {
 
   constructor(data, url) {
     super(data, url);
-    this._incomplete = false;
     this._apiChildrenListeners = {};
     this._apiChildren = {
       list: [],
       prev: false,
       next: false
     };
-    this._privateKeys.push('_incomplete', '_apiChildrenListeners', '_apiChildren');
+    this._privateKeys.push('_apiChildrenListeners', '_apiChildren');
   }
 
   getChildren(priority = null) {
@@ -207,14 +206,13 @@ export class Catalog extends BaseCatalog {
 
   constructor(data, url) {
     super(data, url);
-    this._incomplete = false;
     this._apiChildrenListeners = {};
     this._apiChildren = {
       list: [],
       prev: false,
       next: false
     };
-    this._privateKeys.push('_incomplete', '_apiChildrenListeners', '_apiChildren');
+    this._privateKeys.push('_apiChildrenListeners', '_apiChildren');
   }
 
   getChildren(priority = null) {
@@ -250,12 +248,4 @@ export class Catalog extends BaseCatalog {
 
 }
 
-export class Item extends BaseItem {
-
-  constructor(data, url) {
-    super(data, url);
-    this._incomplete = false;
-    this._privateKeys.push('_incomplete');
-  }
-
-}
+export { CollectionCollection, Item, ItemCollection };
