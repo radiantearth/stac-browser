@@ -33,7 +33,6 @@ function getStore(config, router) {
     url: '',
     page: null, // Function that returns title and optionally description of the current page as object
     data: null,
-    apiChildren: {},
     loading: true,
     parents: null,
     globalError: null,
@@ -78,6 +77,7 @@ function getStore(config, router) {
     state: Object.assign({}, config, localDefaults(), catalogDefaults(), {
       // Global settings
       database: {}, // STAC object, Error object or Loading object or Promise (when loading)
+      apiChildren: {},
       downloads: {},
       allowSelectCatalog: !config.catalogUrl,
       globalRequestQueryParameters: config.requestQueryParameters,
@@ -584,6 +584,7 @@ function getStore(config, router) {
       },
       clear(state, url) {
         delete state.database[url];
+        delete state.apiChildren[url];
       },
       resetCatalog(state, clearAll) {
         Object.assign(state, catalogDefaults());
@@ -1130,7 +1131,7 @@ function getStore(config, router) {
                 cx.commit('loaded', { url, data });
                 return data;
               }
-            });
+            }).filter(Boolean);
             if (reset) {
               cx.commit('resetApiCollections');
             }
