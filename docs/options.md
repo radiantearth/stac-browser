@@ -642,8 +642,8 @@ Thus, it may make sense to change the root catalog to provide more useful inform
 Of course, ideally you'd want to update the root catalog itself, but until then you can use this.
 
 ```js
-preprocessSTAC: (stac, state) => {
-    if (stac.getBrowserPath() === '/') {
+preprocessSTAC: (stac, state, getters) => {
+    if (getters.toBrowserPath(stac.getAbsoluteUrl()) === '/') {
         stac.title = state.catalogTitle;
         stac.description = 'This is a **much** more useful description for this catalog!';
     }

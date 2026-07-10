@@ -48,7 +48,7 @@
         <Catalogs
           :apiSearch="hasApiCollections" :catalogs="catalogs" :hasMore="hasMore"
           @load-more="loadMoreCollections" @search="searchCollections"
-          :loading="Boolean(loadingCollections)" :loadingMore="loadingCollections === 'more'"
+          :loading="Boolean(loadingCollections) || loadingNextCollectionsPage" :loadingMore="loadingCollections === 'more' || loadingNextCollectionsPage"
         />
         <WidgetHook id="view-catalog-catalogs-end" />
       </b-col>
@@ -82,7 +82,7 @@ import { formatLicense, formatTemporalExtents } from '@radiantearth/stac-fields/
 import Utils from '../utils';
 import { hasText, isObject, size } from 'stac-js/src/utils.js';
 import { addSchemaToDocument, createCatalogSchema } from '../schema-org';
-import { ItemCollection } from '../models/stac.js';
+import { ItemCollection } from 'stac-js';
 import DeprecationMixin from '../components/DeprecationMixin.js';
 import { BTab, BTabs, BCard } from 'bootstrap-vue-next';
 import { getIgnoredFields } from '../ignored-metadata.js';
@@ -123,7 +123,7 @@ export default defineComponent({
   },
   computed: {
     ...mapState(['data', 'apiCatalogPriority', 'apiItemsLink', 'apiItemsPagination', 'apiItemsNumberMatched', 'nextCollectionsLink', 'stateQueryParameters']),
-    ...mapGetters(['catalogs', 'collectionLink', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
+    ...mapGetters(['catalogs', 'collectionLink', 'isApiChildrenLoading', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
     ignoredMetadataFields() {
       return getIgnoredFields(this.data, 'CatalogLike');
     },
@@ -152,6 +152,10 @@ export default defineComponent({
     },
     hasMore() {
       return this.apiCatalogPriority !== 'childs' && Boolean(this.nextCollectionsLink);
+    },
+    loadingNextCollectionsPage() {
+      // Pages may also be loading through other components, e.g. the tree
+      return this.isApiChildrenLoading(this.data);
     },
     licenses() {
       if (this.data.license) {

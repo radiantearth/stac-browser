@@ -7,7 +7,6 @@ import { defaults } from 'ol/interaction/defaults';
 import ZoomControl from 'ol/control/Zoom.js';
 import AttributionControl from 'ol/control/Attribution.js';
 import FullScreenControl from 'ol/control/FullScreen.js';
-import { stacRequest } from '../../store/utils';
 
 import configureBasemap from '../../../basemaps.config';
 import CONFIG from '../../merged-config';
@@ -35,7 +34,7 @@ export default {
         useTileLayerAsFallback: this.useTileLayerAsFallback,
         getSourceOptions: this.getMapSourceOptions,
         httpRequestFn: async (url, responseType) => {
-          const response = await stacRequest(this.$store, url, {responseType});
+          const response = await this.$store.dispatch('request', { link: url, axiosOptions: { responseType } });
           return response.data;
         },
       };
