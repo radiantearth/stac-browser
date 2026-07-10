@@ -31,7 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - are specifically STAC and should be used to navigate to and display in STAC Browser
   - should be hidden
 - Added basic support for the STAC API extensions Transactions (for Items) and Collection Transactions
-  - Adds three new config options: `transactions`, `transactionsRequireLogin` and `transactionsRequirePreflight
+  - Adds three new config options: `transactions`, `transactionsRequireLogin` and `transactionsRequirePreflight`
 
 ### Changed
 

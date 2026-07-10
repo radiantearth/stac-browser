@@ -1,4 +1,5 @@
 import axios from "axios";
+import { Loading } from './utils';
 
 export const TRANSACTION_ITEM_CONFORMANCE = [
   'https://api.stacspec.org/v1.*/ogcapi-features/extensions/transaction'
@@ -62,6 +63,9 @@ export default function getStore(config) {
         }
         return links;
       },
+      isCheckingPermissions: state => url => {
+        return Boolean(url) && state.permissions[permissionKey(url)] instanceof Loading;
+      },
       canManageByUrl: (state, getters, rootState, rootGetters) => (url, method) => {
         if (!url || !rootState.transactions) {
           return false;
@@ -115,8 +119,20 @@ export default function getStore(config) {
       }
     },
     mutations: {
-      setPermissions(state, { url, permissions }) {
-        state.permissions[url] = permissions;
+      // permissions is either an array of allowed HTTP methods,
+      // a Loading object while the check is running, or not set to remove the entry.
+      setPermissions(state, { url, permissions = null }) {
+        if (permissions) {
+          state.permissions[url] = permissions;
+        }
+        else {
+          delete state.permissions[url];
+        }
+      },
+      // Permissions may change with the credentials or the catalog,
+      // remove all of them so that they are checked again when needed.
+      resetPermissions(state) {
+        state.permissions = {};
       }
     },
     actions: {
@@ -129,11 +145,12 @@ export default function getStore(config) {
           // Don't preflight against servers that don't advertise any transaction
           // support - it would just produce pointless OPTIONS requests.
           (!cx.getters.supportsItemTransactions && !cx.getters.supportsCollectionTransactions) ||
-          Array.isArray(cx.state.permissions[url])) {
+          // Skip if the permissions have been retrieved or are being retrieved already
+          typeof cx.state.permissions[url] !== 'undefined') {
           return;
         }
 
-        let methods = [];
+        cx.commit('setPermissions', { url, permissions: new Loading() });
         try {
           options = structuredClone(options);
           options.url = url;
@@ -146,16 +163,17 @@ export default function getStore(config) {
           if (typeof allow === 'string') {
             allow = allow.split(',');
           }
+          let methods = [];
           if (Array.isArray(allow)) {
             methods = allow.map(method => method.trim().toLowerCase()).filter(Boolean);
           }
+          cx.commit('setPermissions', { url, permissions: methods });
         } catch (error) {
           console.error(`Failed to check permissions for ${url}`, error);
+          // Don't keep anything in the store for failed requests (e.g. network errors)
+          // so that the permissions check can be retried later.
+          cx.commit('setPermissions', { url });
         }
-        cx.commit('setPermissions', {
-          url,
-          permissions: methods
-        });
       },
     }
   };

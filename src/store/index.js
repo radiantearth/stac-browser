@@ -181,7 +181,7 @@ function getStore(config, router) {
     strict: import.meta.env.NODE_ENV !== 'production',
     modules: {
       auth: auth(router),
-      manager: manager(config)
+      manager: manager(config),
       search,
     },
     state: Object.assign({}, config, localDefaults(), catalogDefaults(), {
@@ -451,7 +451,7 @@ function getStore(config, router) {
         }
       },
       fromBrowserPath: (state, getters) => url => {
-        const externalRE = /^\/((search|validation)\/)?external\//;
+        const externalRE = /^\/((search|validation|management\/[\w-]+)\/)?external\//;
         if (!hasText(url) || url === '/') {
           url = state.catalogUrl;
         }
@@ -671,6 +671,7 @@ function getStore(config, router) {
           state.catalogTitle = config.catalogTitle;
           state.database = {};
           state.apiChildren = {};
+          state.manager.permissions = {};
           // Don't leak search filters (incl. CQL built against the previous
           // API's queryables) into the next catalog
           if (state.search) {
@@ -1013,6 +1014,13 @@ function getStore(config, router) {
             cx.commit('errored', { url, error });
             return;
           }
+        }
+
+        if (loading.show) {
+          // Check the transaction permissions for the shown entity (e.g. for the management UI),
+          // also when it was loaded from the cache (e.g. in-app navigation or full page loads).
+          // Don't await this dispatch, the UI reacts on the permissions through the reactivity.
+          cx.dispatch('manager/checkPermissions', stacRequestOptions(cx, url));
         }
 
         // Load API Collections
