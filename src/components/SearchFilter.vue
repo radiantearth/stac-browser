@@ -181,7 +181,6 @@ import { createSTAC } from '../models/stac';
 import Cql from '../models/cql2/cql';
 import Queryable from '../models/cql2/queryable';
 import CqlLogicalOperator, { CqlNot } from '../models/cql2/operators/logical';
-import { stacRequest } from '../store/utils';
 import { formatKey } from '@radiantearth/stac-fields/helper';
 
 
@@ -274,7 +273,7 @@ export default defineComponent({
   },
   computed: {
     ...mapState(['defaultCollectionSort', 'defaultItemSort', 'searchResultsPerPage', 'maxEntriesPerPage', 'uiLanguage']),
-    ...mapGetters(['canSearchCollections', 'getApiChildrenState', 'supportsConformance']),
+    ...mapGetters(['canSearchCollections', 'getApiChildren', 'supportsConformance']),
     collectionSelectOptions() {
       let taggable = !this.hasAllCollections;
       let isResult = this.collections.length > 0 && !this.hasAllCollections;
@@ -297,7 +296,7 @@ export default defineComponent({
       };
     },
     collectionSearchLink() {
-      return this.parent && this.parent.isCatalogLike && this.parent.getApiCollectionsLink();
+      return this.parent?.isCatalogLike && this.parent.getApiCollectionsLink();
     },
     codeExampleSearchLinks() {
       const toMethodMap = (link) => {
@@ -423,10 +422,7 @@ export default defineComponent({
       return min instanceof Date && max instanceof Date && min.getTime() === max.getTime();
     },
     apiCollectionsState() {
-      if (!this.parent?.isCatalogLike) {
-        return null;
-      }
-      return this.getApiChildrenState(this.parent);
+      return this.getApiChildren(this.parent);
     },
     apiCollectionsFromStore() {
       const list = this.apiCollectionsState?.list;
@@ -561,7 +557,7 @@ export default defineComponent({
       this.collectionsLoadingTimer = setTimeout(async () => {
         try {
           const link = Utils.addFiltersToLink(this.collectionSearchLink, {q: [text]});
-          const response = await stacRequest(this.$store, link);
+          const response = await this.$store.dispatch('request', { link });
           
           // Only set collections if response is valid AND collectionsLoadingTimer has not been reset.
           // If collectionsLoadingTimer has been reset, the result is not relevant anylonger.
@@ -591,7 +587,7 @@ export default defineComponent({
         data.collections = this.collections;
       }
       else if (this.type === 'Global' || this.type === 'Collections') {
-        let response = await stacRequest(this.$store, link);
+        let response = await this.$store.dispatch('request', { link });
         
         if (!isObject(response.data)) {
           return {};
@@ -639,7 +635,7 @@ export default defineComponent({
         .sort((a,b) => collator.compare(a.text, b.text));
     },
     async loadSchemas(link) {
-      let response = await stacRequest(this.$store, link);
+      let response = await this.$store.dispatch('request', { link });
       if (!isObject(response.data)) {
         return;
       }

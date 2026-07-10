@@ -47,11 +47,15 @@ export function createSTAC(data, url = null, store = null) {
 
   // Set stac-browser internal properties
   if (obj.isApiCollection) {
-    obj.getAll().forEach(child => setInternal(child, 'incomplete', true));
+    const originals = obj.isCollectionCollection ? original.collections : original.features;
+    obj.getAll().forEach((child, i) => {
+      setInternal(child, 'incomplete', true);
+      setInternal(child, 'original', originals[i]);
+    });
   }
-  // todo: Should we set original for API children?
   setInternal(obj, 'original', original);
 
+  // Preprocess STAC objects
   if (store && obj.isItemCollection) {
     obj.features = obj.features.map(item => processSTAC(item, store));
   }

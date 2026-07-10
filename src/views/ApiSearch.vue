@@ -81,7 +81,7 @@ import ErrorAlert from '../components/ErrorAlert.vue';
 import { getDisplayTitle, createSTAC } from '../models/stac';
 import { STAC } from 'stac-js';
 import { defineComponent, defineAsyncComponent } from 'vue';
-import { getErrorCode, getErrorMessage, stacRequest } from '../store/utils';
+import { getErrorCode, getErrorMessage } from '../store/utils';
 import { mapGetters, mapState } from "vuex";
 import { BTab, BTabs } from 'bootstrap-vue-next';
 
@@ -257,7 +257,7 @@ export default defineComponent({
       try {
         this.link = Utils.addFiltersToLink(link, this.filters, this.searchResultsPerPage);
       
-        const response = await stacRequest(this.$store, this.link);
+        const response = await this.$store.dispatch('request', { link: this.link });
         if (response) {
           this.showPage(response.config.url);
         }

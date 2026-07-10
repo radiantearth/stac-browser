@@ -1,7 +1,11 @@
 <template>
   <ul class="tree" v-visible="load">
     <li>
-      <b-button v-if="pagination" size="sm" variant="light" disabled>
+      <b-button v-if="canLoadMore" size="sm" variant="light" v-visible.300="loadNextPage" @click="loadNextPage()">
+        <b-spinner v-if="loadingMore" small :label="$t('loading')" />
+        <b-icon-three-dots v-else />
+      </b-button>
+      <b-button v-else-if="pagination" size="sm" variant="light" disabled>
         <b-icon-three-dots />
       </b-button>
       <template v-else-if="mayHaveChildren">
@@ -71,7 +75,7 @@ export default {
   },
   computed: {
     ...mapState(['data', 'apiCatalogPriority', 'defaultCollectionSort', 'defaultItemSort', 'uiLanguage']),
-    ...mapGetters(['getChildren', 'getStac', 'toBrowserPath']),
+    ...mapGetters(['getApiChildren', 'getChildren', 'getStac', 'isApiChildrenLoading', 'toBrowserPath']),
     onClick() {
       if (!this.to && this.mayHaveChildren) {
         return this.toggle;
@@ -142,7 +146,7 @@ export default {
     },
     title() {
       if (this.pagination) {
-        return this.$t('tree.moreCollectionPagesAvailable');
+        return this.canLoadMore ? this.$t('catalogs.loadMore') : this.$t('tree.moreCollectionPagesAvailable');
       }
       return getDisplayTitle([this.item, this.stac]);
     },
@@ -199,6 +203,12 @@ export default {
     },
     pagination() {
       return ['next', 'prev', 'previous'].includes(this.item.rel);
+    },
+    canLoadMore() {
+      return this.item.rel === 'next' && this.getApiChildren(this.parent)?.type === 'collections';
+    },
+    loadingMore() {
+      return this.isApiChildrenLoading(this.parent);
     }
   },
   watch: {
@@ -219,6 +229,19 @@ export default {
   methods: {
     showMore() {
       this.chunk++;
+    },
+    async loadNextPage(visible = true) {
+      if (!visible || this.loadingMore) {
+        return;
+      }
+      try {
+        await this.$store.dispatch('loadNextApiCollections', { stac: this.parent, next: true });
+      } catch (error) {
+        this.$store.commit('showGlobalError', {
+          error,
+          message: this.$t('errors.loadApiCollectionsFailed')
+        });
+      }
     },
     load(visible) {
       if (!this.stac && this.link && !this.pagination) {

@@ -449,8 +449,7 @@ export default defineComponent({
         this.addAction(() => this.$store.dispatch('load', {
           url: this.url,
           show: true,
-          force: true,
-          noRetry: true
+          force: true
         }));
       }
       if (this.isLoggedIn) {
