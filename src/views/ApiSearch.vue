@@ -81,7 +81,7 @@ import ErrorAlert from '../components/ErrorAlert.vue';
 import { getDisplayTitle, createSTAC } from '../models/stac';
 import { STAC } from 'stac-js';
 import { defineComponent, defineAsyncComponent } from 'vue';
-import { getErrorCode, getErrorMessage, processSTAC, stacRequest } from '../store/utils';
+import { getErrorCode, getErrorMessage, stacRequest } from '../store/utils';
 import { mapGetters, mapState } from "vuex";
 import { BTab, BTabs } from 'bootstrap-vue-next';
 
@@ -269,8 +269,7 @@ export default defineComponent({
         }
         else {
           const url = this.link.getAbsoluteUrl();
-          const data = createSTAC(response.data, url);
-          data[key] = data[key].map(stac => processSTAC(this.$store.state, stac));
+          const data = createSTAC(response.data, url, this.$store);
           this.data = data;
         }
       } catch (error) {

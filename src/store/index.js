@@ -10,7 +10,7 @@ import { addMissingChildren, getDisplayTitle, createSTAC } from '../models/stac'
 import { CatalogLike, STAC } from 'stac-js';
 
 import auth from './auth.js';
-import { addQueryIfNotExists, hasAuthority, isAuthenticationError, Loading, processSTAC, stacRequest, stacRequestOptions } from './utils';
+import { addQueryIfNotExists, hasAuthority, isAuthenticationError, Loading, stacRequest, stacRequestOptions } from './utils';
 import { getBest } from 'stac-js/src/locales';
 import { TYPES } from "../components/ApiCapabilitiesMixin";
 import BrowserStorage from "../browser-store.js";
@@ -329,9 +329,9 @@ function getStore(config, router) {
             url = ref.getAbsoluteUrl();
           } else if (ref instanceof urijs) { // urijs object
             url = ref.toString();
-          } else if (ref.href) { // plain STAC Link object
+          } else if (hasText(ref.href)) { // plain STAC Link object
             url = ref.href;
-          }	else {
+          } else {
             throw new Error('Invalid reference provided to toBrowserPath. Must be a stac-js object, URI object or string URL.');
           }
         }
@@ -580,7 +580,7 @@ function getStore(config, router) {
         }
       },
       loaded(state, { url, data }) {
-        state.database[url] = processSTAC(state, data);
+        state.database[url] = data;
       },
       clear(state, url) {
         delete state.database[url];
@@ -657,10 +657,9 @@ function getStore(config, router) {
         if (!isObject(data) || !Array.isArray(data.features)) {
           return;
         }
-        let apiItems = data.features.map(feature => processSTAC(state, feature));
 
         if (show) {
-          state.apiItems = apiItems;
+          state.apiItems = data.features;
         }
 
         // Handle pagination links
@@ -680,7 +679,7 @@ function getStore(config, router) {
 
         if (stac instanceof STAC) {
           // ToDo: Prev link only required when state.apiItems is not cached(?) -> cache apiItems?
-          updateApiChildrenState(state, stac, apiItems, pages.next, pages.prev);
+          updateApiChildrenState(state, stac, data.features, pages.next, pages.prev);
         }
       },
       addApiCollections(state, { data, stac, show, searching = false }) {
@@ -689,14 +688,13 @@ function getStore(config, router) {
         }
 
         // todo: Convert to stac-js
-        let collections = data.collections.map(collection => processSTAC(state, collection));
         let nextLink = Utils.getLinkWithRel(data.links, 'next');
         if (show) {
           state.nextCollectionsLink = nextLink;
-          state.apiCollections = state.apiCollections.concat(collections);
+          state.apiCollections = state.apiCollections.concat(data.collections);
         }
         if (stac instanceof STAC && !searching) {
-          updateApiChildrenState(state, stac, collections, nextLink);
+          updateApiChildrenState(state, stac, data.collections, nextLink);
         }
       },
       resetApiCollections(state) {
@@ -855,7 +853,7 @@ function getStore(config, router) {
             if (!isObject(response.data)) {
               throw new BrowserError(i18n.global.t('errors.invalidJsonObject'));
             }
-            data = createSTAC(response.data, url);
+            data = createSTAC(response.data, url, cx);
             if (!(data instanceof STAC)) {
               // Might be a request to the /collections or .../items endpoints,
               // which returns an APICollection, not a STAC object.
@@ -1020,8 +1018,8 @@ function getStore(config, router) {
                   return data;
                 }
                 else {
-                  data = createSTAC(item, url);
-                  cx.commit('loaded', { data, url });
+                  data = createSTAC(item, url, cx);
+                  cx.commit('loaded', { url, data });
                   return data;
                 }
               } catch (error) {
@@ -1128,8 +1126,8 @@ function getStore(config, router) {
                 return data;
               }
               else {
-                data = createSTAC(collection, url);
-                cx.commit('loaded', { data, url });
+                data = createSTAC(collection, url, cx);
+                cx.commit('loaded', { url, data });
                 return data;
               }
             });

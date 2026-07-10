@@ -3,6 +3,7 @@ import Migrate from '@radiantearth/stac-migrate';
 import Utils from '../utils';
 import { hasText, isObject } from 'stac-js/src/utils.js';
 import { toAbsolute } from 'stac-js/src/http.js';
+import { markRaw } from 'vue';
 
 function setInternal(stac, key, value) {
   const internalKey = '_' + key;
@@ -10,7 +11,14 @@ function setInternal(stac, key, value) {
   stac._privateKeys.push(internalKey);
 }
 
-export function createSTAC(data, url = null) {
+export function processSTAC(stac, store) {
+  if (typeof store.state.preprocessSTAC === 'function') {
+    stac = store.state.preprocessSTAC(stac, store.state, store.getters);
+  }
+  return markRaw(stac);
+}
+
+export function createSTAC(data, url = null, store = null) {
   // Uncomment this line if the old checksum: fields should be converted
   // This is usually not needed so it's not enabled by default to shrink the bundle size
   // Migrate.enableMultihash(require('multihashes'));
@@ -43,6 +51,17 @@ export function createSTAC(data, url = null) {
   }
   // todo: Should we set original for API children?
   setInternal(obj, 'original', original);
+
+  if (store && obj.isItemCollection) {
+    obj.features = obj.features.map(item => processSTAC(item, store));
+  }
+  else if (store && obj.isCollectionCollection) {
+    obj.collections = obj.collections.map(collection => processSTAC(collection, store));
+  }
+  else if (store) {
+    obj = processSTAC(obj, store);
+  }
+
   return obj;
 }
 
