@@ -71,6 +71,9 @@ export default function getStore(router) {
             credentials = null;
           }
           await cx.dispatch('updateCredentials', credentials);
+          // The transaction permissions may change with the credentials,
+          // remove them so that they are checked again when needed.
+          cx.commit('manager/resetPermissions', null, { root: true });
           if (isLoggedIn) {
             await cx.dispatch('executeActions');
           }

@@ -13,6 +13,7 @@
       </div>
 
       <ErrorAlert v-if="editorError" dismissible :url="editorUrl" :description="editorError" @close="editorError = null" />
+      <b-alert v-else-if="showPermissionWarning" variant="warning" show>{{ $t('errors.missingPermissions') }}</b-alert>
 
       <JsonEditor
         v-model="jsonContent"
@@ -29,6 +30,7 @@ import { mapGetters, mapState } from 'vuex';
 import BrowseMixin from './BrowseMixin.js';
 import JsonEditor from '../components/management/JsonEditor.vue';
 import { getErrorMessage } from '../store/utils';
+import { toAbsolute } from 'stac-js/src/http.js';
 
 export default defineComponent({
   name: "Edit",
@@ -54,8 +56,8 @@ export default defineComponent({
   },
   computed: {
     ...mapState(['data']),
-    ...mapGetters(['toBrowserPath']),
-    ...mapGetters('manager', ['canEdit', 'canAddCollections', 'canAddItems']),
+    ...mapGetters(['collectionLink', 'parentLink', 'toBrowserPath']),
+    ...mapGetters('manager', ['canEdit', 'canAddCollections', 'canAddItems', 'isCheckingPermissions']),
     isCreateCollection() {
       return this.mode === 'create-collection';
     },
@@ -89,6 +91,13 @@ export default defineComponent({
       }
       return !this.canEdit;
     },
+    showPermissionWarning() {
+      if (this.saving || this.loading) {
+        return false;
+      }
+      // Don't warn while the permissions are still being checked
+      return this.isSaveDisabled && !this.isCheckingPermissions(this.editorUrl);
+    },
     title() {
       if (this.mode === 'edit') {
         return this.$t('manage.edit');
@@ -103,36 +112,32 @@ export default defineComponent({
     }
   },
   watch: {
-    data: {
-      immediate: true,
-      handler() {
-        if (this.mode === 'edit') {
-          this.syncFromStore();
-        }
-        else {
-          this.resetTemplate();
-        }
-      }
+    data() {
+      this.initEditor();
     },
     mode: {
       immediate: true,
-      handler() {
-        if (this.mode === 'edit') {
-          this.syncFromStore();
+      handler(mode, oldMode) {
+        if (oldMode) {
+          // When switching between management pages of the same entity (e.g. Edit
+          // to Add Item), the view and path stay the same so that the path watcher
+          // (see BrowseMixin) doesn't trigger a load, but the page state has been
+          // reset by the route change. Thus load the entity again here.
+          this.browse(this.path);
         }
-        else {
-          this.resetTemplate();
-        }
+        this.initEditor();
       }
     }
   },
-  created() {
-    // if (!this.canEdit) {
-    //   const pathMatch = (this.path || '/').replace(/^\/+/, '');
-    //   this.$router.push({ name: 'browse', params: { pathMatch } });
-    // }
-  },
   methods: {
+    initEditor() {
+      if (this.mode === 'edit') {
+        this.syncFromStore();
+      }
+      else {
+        this.resetTemplate();
+      }
+    },
     parseJson() {
       let data;
       try {
@@ -233,14 +238,24 @@ export default defineComponent({
           await this.$store.dispatch('request', {
             link: this.createLink('PUT', this.url, body)
           });
+          // Remove the parent from the cache so that its cached list of
+          // children reflects the update (e.g. an updated title)
+          const parent = this.collectionLink || this.parentLink;
+          if (parent) {
+            this.$store.commit('clear', parent.getAbsoluteUrl());
+          }
           await this.$store.dispatch('load', { url: this.url, show: true, force: true });
         }
         else {
           const response = await this.$store.dispatch('request', {
             link: this.createLink('POST', this.createUrl, body)
           });
+          // Remove the parent from the cache so that its cached list of
+          // children includes the newly created resource
+          this.$store.commit('clear', this.url);
           const location = response?.headers?.location;
-          const targetPath = location ? this.toBrowserPath(location) : this.getFallbackNavigationPath();
+          // The Location header may be relative to the request URL
+          const targetPath = location ? this.toBrowserPath(toAbsolute(location, this.createUrl)) : this.getFallbackNavigationPath();
           const pathMatch = targetPath.replace(/^\/+/, '');
           await this.$router.push({ name: 'browse', params: { pathMatch } });
         }

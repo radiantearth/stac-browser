@@ -76,7 +76,7 @@
       <p>{{ $t('manage.confirmDeleteMessage') }}</p>
       <p>{{ $t('manage.noUndo') }}</p>
       <template #footer="{ close }">
-        <b-button variant="danger" @click="deleteThis">
+        <b-button variant="danger" :disabled="deleting" @click="deleteThis">
           <b-spinner v-if="deleting" small />
           {{ $t('manage.delete') }}
         </b-button>
@@ -153,8 +153,17 @@ export default {
       };
       try {
         await this.$store.dispatch('request', { link });
+        // Remove the deleted entity from the cache
+        this.$store.commit('clear', this.url);
         const redirect = this.collectionLink || this.parentLink || this.rootLink;
-        const path = this.toBrowserPath(redirect?.getAbsoluteUrl() || '/');
+        let path = '/';
+        if (redirect) {
+          const redirectUrl = redirect.getAbsoluteUrl();
+          // Remove the parent entity from the cache so that its
+          // children are loaded again without the deleted entity
+          this.$store.commit('clear', redirectUrl);
+          path = this.toBrowserPath(redirectUrl);
+        }
         this.$router.push(path);
       } catch (error) {
         const message = getErrorMessage(error, true);

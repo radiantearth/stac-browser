@@ -35,19 +35,24 @@ export default {
         if (path === oldPath) {
           return;
         }
-        else if (!this.allowExternalAccess && this.isExternal) {
-          return;
-        }
-
-        // This has to run after the created() method in StacBrowser.vue.
-        // Thus we have to wait here for the router to be ready so that
-        // we can ensure parseQuery in StacBrowser.vue has been called
-        // and the query parameters for the request are set in the store.
-        // https://github.com/radiantearth/stac-browser/issues/822#issuecomment-4068820575
-        await this.$router.isReady();
-        const url = this.fromBrowserPath(path || '/');
-        await this.$store.dispatch('load', { url, show: true });
+        await this.browse(path);
       }
+    }
+  },
+  methods: {
+    async browse(path) {
+      if (!this.allowExternalAccess && this.isExternal) {
+        return;
+      }
+
+      // This has to run after the created() method in StacBrowser.vue.
+      // Thus we have to wait here for the router to be ready so that
+      // we can ensure parseQuery in StacBrowser.vue has been called
+      // and the query parameters for the request are set in the store.
+      // https://github.com/radiantearth/stac-browser/issues/822#issuecomment-4068820575
+      await this.$router.isReady();
+      const url = this.fromBrowserPath(path || '/');
+      await this.$store.dispatch('load', { url, show: true });
     }
   }
 };

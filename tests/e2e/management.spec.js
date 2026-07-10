@@ -72,6 +72,85 @@ test.describe('Management - capability gating', () => {
     await expect(page.getByRole('menuitem', { name: 'Edit' })).toBeVisible();
     await expect(page.getByRole('menuitem', { name: 'Delete' })).toBeVisible();
   });
+
+  test('Manage stays available when navigating to a management page and back', async ({ page, worker }) => {
+    const { api, collection } = createCollectionApi();
+    await api.createServer(worker);
+    await enableTransactions(page);
+
+    await page.goto(api.root.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    // Navigate to the "Add Collection" page and back (in-app navigation)
+    let menu = await openManageMenu(page);
+    await menu.getByRole('menuitem', { name: 'Add Collection' }).click();
+    await expect(page.getByRole('heading', { name: /add collection/i })).toBeVisible();
+    await page.goBack();
+    await waitForBrowserReady(page);
+
+    // The Manage button must still be available on the root page ...
+    menu = await openManageMenu(page);
+    await expect(menu.getByRole('menuitem', { name: 'Add Collection' })).toBeVisible();
+    await page.keyboard.press('Escape');
+
+    // ... and on a collection page that is visited afterwards
+    await page.getByRole('link', { name: new RegExp(collection.getMetadata().title) }).first().click();
+    await waitForBrowserReady(page);
+    menu = await openManageMenu(page);
+    await expect(menu.getByRole('menuitem', { name: 'Edit' })).toBeVisible();
+    await expect(menu.getByRole('menuitem', { name: 'Delete' })).toBeVisible();
+  });
+
+  test('switching between management pages of the same entity loads the page', async ({ page, worker }) => {
+    const api = API.minimalApi().addItemTransactionsExtension().addCollectionTransactionsExtension();
+    const collection = api.addCollection('collection').setMetadata({ title: 'Test Collection' });
+    api.addManyItems(collection, 1);
+    await api.createServer(worker);
+    await enableTransactions(page);
+
+    await page.goto('/management/edit' + collection.getBrowserPath());
+    await waitForBrowserReady(page);
+    await expect(page.getByRole('heading', { name: /^edit/i })).toBeVisible();
+
+    // Switch from Edit to Add Item: same view and path, only the mode changes
+    const menu = await openManageMenu(page);
+    await menu.getByRole('menuitem', { name: 'Add Item' }).click();
+    await expect(page.getByRole('heading', { name: /add item/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Save' })).toBeVisible();
+  });
+
+  test('switching from Edit to Add Item works on a slow network with preflight', async ({ page, worker }) => {
+    const api = API.minimalApi().addItemTransactionsExtension().addCollectionTransactionsExtension();
+    const collection = api.addCollection('collection').setMetadata({ title: 'Test Collection' });
+    api.addManyItems(collection, 1);
+    await api.createServer(worker);
+    await mockOptions(worker, collection.getAbsoluteUrl(), ['GET', 'PUT', 'DELETE', 'POST']);
+    await mockOptions(worker, collection.getAbsoluteUrl() + '/items', ['GET', 'POST']);
+    await enableTransactions(page, { transactionsRequirePreflight: true });
+
+    // Simulate a slow network for all API responses
+    await page.route('**/stac.example/**', async route => {
+      await new Promise(resolve => setTimeout(resolve, 400));
+      await route.fallback();
+    });
+
+    await page.goto(collection.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    let menu = await openManageMenu(page);
+    await menu.getByRole('menuitem', { name: 'Edit' }).click();
+    await expect(page.getByRole('heading', { name: /^edit/i })).toBeVisible();
+    await expect(page.locator('.cm-content')).toContainText('"type": "Collection"');
+
+    menu = await openManageMenu(page);
+    await menu.getByRole('menuitem', { name: 'Add Item' }).click();
+
+    // Let the async loads settle to ensure the page doesn't fall back into a broken state
+    await page.waitForTimeout(2500);
+    await expect(page.getByRole('heading', { name: /add item/i })).toBeVisible();
+    await expect(page.locator('.cm-content')).toContainText('"type": "Feature"');
+    await expect(page.getByRole('button', { name: /manage/i })).toBeVisible();
+  });
 });
 
 test.describe('Management - CRUD flows', () => {
