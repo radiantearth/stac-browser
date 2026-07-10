@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix global error handling in certain edge-cases
 - Improve speed of catalog/collection duplicate detection
 - Fix search link detection
+- The configured default collection and item sort is also applied to the Browse menu
 
 ## [5.0.0-rc.1] - 2026-06-27
 

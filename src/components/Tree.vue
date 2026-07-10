@@ -42,7 +42,8 @@
 import { mapGetters, mapState } from 'vuex';
 import { isObject } from 'stac-js/src/utils.js';
 import { toAbsolute } from 'stac-js/src/http.js';
-import { getDisplayTitle } from '../models/stac';
+import Utils from '../utils';
+import { getDisplayTitle, sortStac } from '../models/stac';
 import { STAC } from 'stac-js';
 
 export default {
@@ -69,7 +70,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['data', 'apiCatalogPriority']),
+    ...mapState(['data', 'apiCatalogPriority', 'defaultCollectionSort', 'defaultItemSort', 'uiLanguage']),
     ...mapGetters(['getChildren', 'getStac', 'toBrowserPath']),
     onClick() {
       if (!this.to && this.mayHaveChildren) {
@@ -150,7 +151,37 @@ export default {
     },
     childs() {
       if (this.stac?.isCatalogLike) {
-        return this.getChildren(this.stac, this.apiCatalogPriority);
+        const children = this.getChildren(this.stac, this.apiCatalogPriority);
+        if (children.length < 2) {
+          return children;
+        }
+
+        const collectionSort = Utils.parseApiSortParameter(this.defaultCollectionSort);
+        const itemSort = Utils.parseApiSortParameter(this.defaultItemSort);
+
+        const prev = [];
+        const next = [];
+        const items = [];
+        const catalogs = [];
+        for (const child of children) {
+          if (['prev', 'previous'].includes(child?.rel)) {
+            prev.push(child);
+          }
+          else if (child?.rel === 'next') {
+            next.push(child);
+          }
+          else if (child?.rel === 'item' || child?.isItem) {
+            items.push(child);
+          }
+          else {
+            catalogs.push(child);
+          }
+        }
+
+        const sortedCatalogs = collectionSort.direction === 0 ? catalogs : sortStac(catalogs, collectionSort, this.uiLanguage);
+        const sortedItems = itemSort.direction === 0 ? items : sortStac(items, itemSort, this.uiLanguage);
+
+        return prev.concat(sortedCatalogs, sortedItems, next);
       }
       return [];
     },
