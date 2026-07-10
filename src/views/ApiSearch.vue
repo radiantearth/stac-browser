@@ -264,7 +264,7 @@ export default defineComponent({
 
         const key = this.isCollectionSearch ? 'collections' : 'features';
         if (!isObject(response.data) || !Array.isArray(response.data[key])) {
-          this.data = {};
+          this.data = null;
           this.error = this.$t(this.isCollectionSearch ? 'errors.invalidStacCollections' : 'errors.invalidStacItems');
         }
         else {
@@ -273,7 +273,7 @@ export default defineComponent({
           this.data = data;
         }
       } catch (error) {
-        this.data = {};
+        this.data = null;
         this.error = getErrorMessage(error);
         this.errorId = getErrorCode(error);
       } finally {
