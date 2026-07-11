@@ -168,10 +168,22 @@ light mode and in a `[data-bs-theme="dark"]` block for dark mode.
 | `--sb-on-secondary` | Text color used *on* secondary-colored backgrounds. |
 | `--bs-body-bg` + `--bs-body-bg-rgb` | Page background color. |
 | `--bs-body-color` + `--bs-body-color-rgb` | Default text color. |
+| `--bs-secondary-bg` + `--bs-secondary-bg-rgb` | Muted surface backgrounds, e.g. popover headers, progress bar tracks, disabled form fields. |
+| `--bs-tertiary-bg` + `--bs-tertiary-bg-rgb` | Subtle surface backgrounds, e.g. hover states. |
+| `--bs-secondary-color` + `--bs-secondary-color-rgb` | Muted text, e.g. placeholders and help texts. |
+| `--bs-emphasis-color` + `--bs-emphasis-color-rgb` | Highest-contrast text; also the tooltip background. |
+| `--bs-border-color` | Borders of form fields, tabs, accordions, pagination, list items, etc. |
+| `--bs-border-color-translucent` | Semi-transparent borders, e.g. of cards, dropdowns, and popovers. |
 | `--bs-link-color` + `--bs-link-color-rgb` | Link color (defaults to the primary color). |
 | `--bs-link-hover-color` | Link hover color (derived from the link color by default). |
 | `--sb-h1-color` | Color of the page title (h1). |
 | `--sb-subheadings-color` | Color of second-level headings (h2). |
+
+> [!WARNING]  
+> Don't confuse `--bs-secondary-bg` / `--bs-secondary-color` with the `--bs-secondary`
+> theme color: despite the similar names, the former are Bootstrap's neutral surface
+> and muted text colors, which are unrelated to the secondary theme color used for
+> buttons and badges.
 
 Derived shades — button hover/active states, subtle backgrounds (e.g. in alerts),
 text emphasis colors, and focus rings — are computed automatically from these
@@ -185,7 +197,12 @@ variables via [`color-mix()`](https://developer.mozilla.org/en-US/docs/Web/CSS/c
 
 #### Sizing and typography
 
-These are independent of the color mode and can be set in a single `:root` block.
+These are independent of the color mode and can be set in a single `:root, [data-bs-theme]` block.
+
+> [!IMPORTANT]  
+> Don't drop the `[data-bs-theme]` part of the selector:
+> Bootstrap re-declares some of these variables per color mode,
+> which would override a value that is set for `:root` only.
 
 | Variable | Purpose |
 | -------- | ------- |
@@ -215,7 +232,8 @@ These are independent of the color mode and can be set in a single `:root` block
   --sb-on-primary: black;
 }
 
-:root {
+:root,
+[data-bs-theme] {
   --bs-body-font-family: Georgia, "Times New Roman", serif;
   --sb-header-border: 3px solid var(--bs-primary);
 }
