@@ -53,7 +53,7 @@ export default {
   line-height: $line-height-base;
 
   h1, h2, h3, h4, h5, h6 {
-    color: $secondary;
+    color: var(--bs-secondary);
     font-weight: 600;
   }
   h1 {

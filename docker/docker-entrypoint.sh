@@ -40,7 +40,9 @@ array() {
             *)
                 case "$2" in
                     string)
-                        encoded_value="$(jq -cn --arg value "$1" '$value | split(",")')"
+                        # Split on commas and trim surrounding whitespace from each
+                        # element, mirroring parseArrayEnv() in vite.config.js.
+                        encoded_value="$(jq -cn --arg value "$1" '$value | split(",") | map(gsub("^\\s+|\\s+$";""))')"
                         printf '%s' "$encoded_value"
                         ;;
                     *)
