@@ -1,3 +1,23 @@
+/*
+  Runtime styling for STAC Browser.
+
+  Uncomment and adjust the blocks below to change the styling without
+  rebuilding. See docs/styling.md for the full list of supported
+  CSS variables and their limitations.
+
+  Rules of thumb:
+  - `--bs-*` variables come from Bootstrap and STAC Browser reuses them;
+    `--sb-*` variables are STAC Browser-specific additions.
+  - Every `--bs-*` color needs its `--bs-*-rgb` twin (as "R, G, B"),
+    otherwise semi-transparent usages keep the old color.
+    `--sb-*` variables never need an `-rgb` twin.
+  - `--sb-on-primary` / `--sb-on-secondary` are the text colors used ON
+    primary/secondary backgrounds (buttons, badges, active items). Set them
+    to white or black depending on the brightness of your color.
+  - Derived shades (hover states, subtle backgrounds in alerts, focus
+    rings) are computed automatically from the variables below.
+*/
+
 /* ─────────────────────────────────────────────────────────
    LIGHT MODE (and fallback when no theme is set)
    ───────────────────────────────────────────────────────── */
@@ -5,8 +25,23 @@
 /*
 :root,
 [data-bs-theme="light"] {
-  --bs-primary: #000000;
-  --bs-primary-rgb: 0, 0, 0;
+  --bs-primary: #7a2048;
+  --bs-primary-rgb: 122, 32, 72;
+  --sb-on-primary: white;
+
+  --bs-secondary: #6c757d;
+  --bs-secondary-rgb: 108, 117, 125;
+  --sb-on-secondary: white;
+
+  --bs-body-bg: #ffffff;
+  --bs-body-bg-rgb: 255, 255, 255;
+  --bs-body-color: #212529;
+  --bs-body-color-rgb: 33, 37, 41;
+
+  --bs-body-font-family: Georgia, "Times New Roman", serif;
+
+  --sb-h1-color: inherit;
+  --sb-subheadings-color: #6c757d;
 }
 */
 
@@ -16,7 +51,30 @@
 
 /*
 [data-bs-theme="dark"] {
-  --bs-primary: #4db8c4;
-  --bs-primary-rgb: 77, 184, 196;
+  --bs-primary: #d16a94;
+  --bs-primary-rgb: 209, 106, 148;
+  --sb-on-primary: black;
+
+  --bs-body-bg: #212529;
+  --bs-body-bg-rgb: 33, 37, 41;
+  --bs-body-color: #dee2e6;
+  --bs-body-color-rgb: 222, 226, 230;
+
+  --sb-h1-color: inherit;
+  --sb-subheadings-color: #838a91;
+}
+*/
+
+/* ─────────────────────────────────────────────────────────
+   SIZING & TYPOGRAPHY (mode-independent)
+   ───────────────────────────────────────────────────────── */
+
+/*
+:root {
+  --sb-logo-max-height: 2rem;
+  --sb-block-gap: 1rem;
+  --sb-header-font-size: 1.5rem;
+  --sb-header-font-weight: 600;
+  --sb-header-border: 3px solid var(--bs-primary);
 }
 */
