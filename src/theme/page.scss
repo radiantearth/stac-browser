@@ -21,10 +21,11 @@ svg {
 }
 
 .list-group-item.active a {
-  color: $link-color-on-primary;
+  // Derive from --bs-primary at runtime so the tint follows runtime styling
+  color: color-mix(in srgb, var(--bs-primary) 40%, white);
 
   &:hover {
-    color: $link-hover-color-on-primary;
+    color: var(--sb-on-primary);
   }
 }
 
