@@ -38,7 +38,7 @@ const defaultConfigPath = fileURLToPath(new URL("./config.js", import.meta.url))
 const parseArrayValue = (value) => {
   if (Array.isArray(value) && value.length === 1 && typeof value[0] === "string") {
     const str = value[0].trim();
-    return str.startsWith("[") ? JSON.parse(str) : str.split(",");
+    return str.startsWith("[") ? JSON.parse(str) : str.split(",").map((s) => s.trim());
   }
   return value;
 };

@@ -44,12 +44,12 @@ export default {
     a {
       display: inline-block;
       padding: 1px;
-      border: 1px solid $body-bg;
+      border: 1px solid var(--bs-body-bg);
       margin: 5px;
       border-radius: $border-radius;
 
       &:hover {
-        border-color: $dark;
+        border-color: var(--bs-dark);
       }
     }
 
@@ -82,20 +82,6 @@ export default {
       .thumbnail {
         max-height: none;
         border-radius: 0;
-      }
-    }
-  }
-}
-
-[data-bs-theme="dark"] {
-  #stac-browser {
-    .previews {
-      a {
-        border: 1px solid $body-bg-dark;
-    
-        &:hover {
-          border-color: $light;
-        }
       }
     }
   }

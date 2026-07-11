@@ -39,7 +39,7 @@ array() {
             *)
                 case "$2" in
                     string)
-                        echo -n "['$(echo "$1" | sed "s/,/', '/g")']"
+                        echo -n "['$(echo "$1" | sed "s/^[[:space:]]*//; s/[[:space:]]*\$//; s/[[:space:]]*,[[:space:]]*/', '/g")']"
                         ;;
                     *)
                         echo -n "[$1]"

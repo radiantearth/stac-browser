@@ -531,7 +531,7 @@ svg {
     }
 
     .datetime {
-      color: $secondary;
+      color: var(--bs-secondary);
     }
   }
 
@@ -701,11 +701,7 @@ svg {
     }
 
     > .card {
-      background-color: $body-bg;
-
-      [data-bs-theme="dark"] & {
-        background-color: $body-bg-dark;
-      }
+      background-color: var(--bs-body-bg);
     }
   }
 }

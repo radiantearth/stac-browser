@@ -109,16 +109,8 @@ export default {
 
 #stac-browser {
   .fullscreen {
-    background-color: $body-bg;
+    background-color: var(--bs-body-bg);
     overflow: auto;
-  }
-}
-
-[data-bs-theme="dark"] {
-  #stac-browser {
-    .fullscreen {
-      background-color: $body-bg-dark;
-    }
   }
 }
 </style>
