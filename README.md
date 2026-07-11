@@ -20,6 +20,7 @@ If you care about STAC Browser and have some funds to support the future of STAC
     - [Private query parameters](#private-query-parameters)
     - [Versions](#versions)
     - [Migrate from old versions](#migrate-from-old-versions)
+  - [Docker](#docker)
   - [Customize](#customize)
     - [Options](#options)
     - [Languages](#languages)
@@ -33,7 +34,6 @@ If you care about STAC Browser and have some funds to support the future of STAC
     - [Metadata fields](#metadata-fields)
     - [Customization through root catalog](#customization-through-root-catalog)
     - [Custom extensions](#custom-extensions)
-  - [Docker](#docker)
   - [Testing](#testing)
   - [Contributing](#contributing)
   - [Sponsors](#sponsors)
@@ -126,7 +126,40 @@ For more details on our plans, please check our
 Please read the [release notes](https://github.com/radiantearth/stac-browser/releases).
 They contain notes on required changes for a smooth migration.
 
+## Docker
+
+You can use the Docker to work with STAC Browser. Please read [Docker documentation](docs/docker.md) for more details.
+
 ## Customize
+
+Some customizations can be applied to a pre-built STAC Browser (e.g. the Docker image) through runtime
+configuration and stylesheets, while others require building from source. In detail, the following two options exist:
+
+1. Using the **pre-built** assets, e.g. the [Docker image](docs/docker.md) —
+   quick to set up, customizable through configuration.
+2. **Building from source** (`npm run build`, optionally via a custom `docker build`) —
+   the path for everything that requires code or a fully customized theme.
+
+As a rule of thumb:
+
+- **Configuration and light branding** (your catalog with your logo, title, and brand colors):
+  the pre-built assets are enough. Set [config options](docs/options.md) and
+  drop in a [runtime stylesheet](docs/styling.md#runtime-customizations).
+- **Deep customization** (STAC Browser should look and behave like your product):
+  build from source. This unlocks full [Sass theming](docs/styling.md), the more advanced config options, and plugins ([widgets](docs/widgets.md), [actions](docs/actions.md), [languages](docs/localization.md), ...).
+
+What needs which deployment:
+
+| Customization | Pre-built | Build from source |
+| ------------- | ----------------------------- | ----------------- |
+| [Config options](docs/options.md) (catalog URL, title, logo, locale, …) | ✅ env vars / `runtime-config.js` | ✅ |
+| [Runtime styling](docs/styling.md#runtime-customizations) (colors, fonts, …) | ✅ `runtime-style.css` | ✅ |
+| Full theme (all colors, spacing, breakpoints, …) | ❌ | ✅ [Styling & Theming](docs/styling.md) |
+| [Basemaps](docs/basemaps.md) | ✅ [`basemaps` option](docs/options.md#basemaps) (JSON only) | ✅ incl. code hooks |
+| `pathPrefix` / `historyMode` | ❌ | ✅ [build-only options](docs/options.md#deployment) |
+| Function-valued options (`preprocessSTAC`, `buildTileUrlTemplate`, …) | ❌ | ✅ config file |
+| [Actions](docs/actions.md), [widgets](docs/widgets.md), [code generators](docs/code-generators.md), [metadata rules](docs/metadata.md) | ❌ | ✅ |
+| Additional [languages](docs/localization.md) | ❌ (choosing among built-in ones: ✅) | ✅ |
 
 ### Options
 
@@ -234,10 +267,6 @@ STAC Browser supports some non-standardized extensions to the STAC specification
    Add a `name` field and it will be used as title in the tab header, the same applies for the core Asset Object.
 3. A link with relation type `icon` and a Browser-supported media type in any STAC entity will show an icon in the header and the lists of Catalogs, Collections and Items.
 4. Add an `extent` property defining an Extent Object as defined in the [Collection specification](https://github.com/radiantearth/stac-spec/blob/master/collection-spec/collection-spec.md#extent-object) to the root catalog to indicate the bounding box and temporal extent of the API/catalog. This will for example restrict the bounding box and temporal extent selection in Collection Search and Global Item Search. If you can't add this to the root catalog itself, you can also add it dynamically through [`preprocessSTAC`](./docs/options.md#preprocessstac).
-
-## Docker
-
-You can use the Docker to work with STAC Browser. Please read [Docker documentation](docs/docker.md) for more details.
 
 ## Testing
 

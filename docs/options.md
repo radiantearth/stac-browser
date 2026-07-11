@@ -29,10 +29,14 @@ The following ways to set config options are possible:
 - Set **environment variables**, all options need a `SB_` prefix.
   So you could for example set the catalog URL via the environment variable `SB_catalogUrl`.
   Vite loads `.env`, `.env.local`, `.env.[mode]` and `.env.[mode].local` automatically, so `SB_*` variables can be stored there.
-  Options that expect an array or an object must be provided as a JSON string, e.g.
-  `SB_footerLinks='[{"label":"Imprint","url":"https://example.com/imprint"}]'` or
-  `SB_requestHeaders='{"Authorization":"Bearer …"}'`.
-  For convenience, array options that only contain strings may also be given as a comma-separated list, e.g. `SB_supportedLocales=en,de,fr`.
+
+  > [!NOTE]  
+  > Environment variables can only carry text.
+  > Strings, numbers, and booleans can be given as-is, e.g. `SB_catalogTitle="My Catalog"`.
+  > Options that expect an object or a more complex array (e.g. `requestHeaders`, `basemaps`, `footerLinks`)
+  > must be JSON-encoded, e.g. `SB_requestHeaders='{"Authorization": "Bearer example"}'`.
+  > Lists of simple strings can alternatively be given comma-separated, e.g. `SB_supportedLocales=de,en`.
+
 - Optionally, you can also set options after the build, basically **at "runtime"**.
   This requires the `SB_RUNTIME` environment variable to be set.
   After building, fill `dist/runtime-config.js` with any options you want to customize.
@@ -48,6 +52,13 @@ The following ways to set config options are possible:
 The override order for the configuration is:
 
 `config.js` (lowest priority) -> config from `SB_CONFIG` -> `SB_*` env vars -> `runtime-config.js` (highest priority)
+
+The following can **not** be changed at runtime (i.e. via `runtime-config.js`):
+
+- The build-only options [`pathPrefix`](#pathprefix) and [`historyMode`](#historymode)
+- Function-valued options such as [`preprocessSTAC`](#preprocessstac), [`buildTileUrlTemplate`](#buildtileurltemplate), and [`getMapSourceOptions`](#getmapsourceoptions)
+- Anything defined in code: [widgets](./widgets.md), [actions](./actions.md), [code generators](./code-generators.md), [metadata field rules](./metadata.md), custom [`configureBasemap` implementations](./basemaps.md), and additional [languages](./localization.md)
+- The Sass-based parts of the theme, see [Styling & Theming](./styling.md) for what is runtime-capable
 
 > [!CAUTION]  
 > Appending configuration options as CLI parameters to the CLI command (e.g. `npm run build -- --catalogUrl="https://example.com"`) has been removed in  STAC Browser v5.
@@ -82,6 +93,7 @@ The override order for the configuration is:
   - [detectLocaleFromBrowser](#detectlocalefrombrowser)
   - [storeLocale](#storelocale)
 - [Mapping](#mapping)
+  - [basemaps](#basemaps)
   - [buildTileUrlTemplate](#buildtileurltemplate)
   - [useTileLayerAsFallback](#usetilelayerasfallback)
   - [displayPreview](#displaypreview)
@@ -397,6 +409,39 @@ If you want to avoid this, disable this setting.
 All the mapping-related options are passed through to [ol-stac](https://m-mohr.github.io/ol-stac/).
 More information on these configuration options may be found in the [ol-stac documentation](https://m-mohr.github.io/ol-stac/en/latest/apidoc/module-ol_layer_STAC-STACLayer.html).
 
+### basemaps
+
+Shows your own basemaps instead of the default ones (e.g. OpenStreetMap).
+This also works without rebuilding STAC Browser, for example for the Docker image
+via the `SB_basemaps` environment variable or via `runtime-config.js`.
+
+The value is an object:
+
+- Each key is the celestial body the basemaps are shown for — usually `earth`.
+  Append `-dark` (e.g. `earth-dark`) to provide a variant that is used in dark mode.
+- Each value is a list of basemaps.
+  See the [basemaps documentation](./basemaps.md) for the supported map services and their options.
+
+Example:
+
+```json
+{
+  "earth": [
+    {
+      "is": "XYZ",
+      "url": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+      "title": "OpenStreetMap",
+      "attributions": "&copy; OpenStreetMap contributors.",
+      "projection": "EPSG:3857"
+    }
+  ]
+}
+```
+
+If you build STAC Browser yourself, you can instead edit
+[`basemaps.config.js`](../basemaps.config.js), which contains the default basemaps
+and supports some advanced features that this option can't offer.
+
 ### buildTileUrlTemplate
 
 This can be used to enable the usage of a tile server.
@@ -622,6 +667,7 @@ The following services are supported:
 - `bsky` (Bluesky)
 - `mastodon` (Mastodon.social)
 - `x` (X, formerly Twitter)
+
 ## Advanced
 
 ### preprocessSTAC

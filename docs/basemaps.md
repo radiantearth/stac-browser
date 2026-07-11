@@ -22,10 +22,22 @@ The following types (sources) of basemaps are officially supported:
 
 The file [`basemaps.config.js`](../basemaps.config.js) contains the configuration for the basemaps.
 
-There are two ways to provide the basemap configuration:
+There are three ways to provide the basemap configuration:
 
-1. Simply update either the `BASEMAPS` object
-2. Write a custom `configureBasemap` function that returns the desired options for OpenLayers
+1. Set the [`basemaps` config option](./options.md#basemaps) -
+   choose this if you use STAC Browser pre-built (e.g. the Docker image),
+   as it works without building STAC Browser yourself.
+2. Update the `BASEMAPS` object in `basemaps.config.js` -
+   the same structure as the config option, but it requires building STAC Browser yourself.
+3. Write a custom `configureBasemap` function in `basemaps.config.js` -
+   for advanced use cases, e.g. different basemaps per STAC entity or localized titles;
+   also requires building STAC Browser yourself.
+
+> [!NOTE]
+> The `basemaps` config option replaces all default basemaps and,
+> like all config options, can only contain data.
+> If you need the [`layerCreated`](#layercreated) hook or other functions,
+> use one of the other two ways.
 
 A default implementation for `configureBasemap` is provided, which makes use of the `BASEMAPS` object.
 It supports providing different basemaps per celestial body (e.g. Earth, Moon, Mars, etc.).
@@ -43,8 +55,6 @@ In addition, you can add a dark mode variant of each basemap in `BASEMAPS` objec
 An alternative is to remove the `BASEMAPS` array and implement a custom version of the `configureBasemap` function.
 The function received the STAC object and the I18N object as inputs, which allows you to provide different basemaps per STAC entity if needed.
 The function must return an array of objects, where each object provides the [basemap options](#options).
-
-
 
 ## Options
 

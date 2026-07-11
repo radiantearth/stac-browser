@@ -159,6 +159,10 @@
         }
       ]
     },
+    "basemaps": {
+      "type": ["object", "null"],
+      "description": "Show your own basemaps instead of the default ones and configure them via runtime/env. This option is here only to allow handling via runtime/env, it's not part of config.js but in basemap.config.js. See docs/basemaps.md for details."
+    },
     "crs": {
       "type": ["object"]
     },
