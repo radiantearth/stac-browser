@@ -36,7 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix logo size calculation, avoiding the site title wrapping into multiple lines
 - Share button correctly shows with rounded borders on the right side
 - Array-typed options provided via `SB_*` environment variables are handled consistently at build time and in the Docker container:
-  both accept a JSON-encoded array or a comma-separated list of strings
+  both accept a JSON-encoded array or a comma-separated list of strings; whitespace around the values is trimmed
 - Docker:
   - The `SB_CONFIG` and `SB_RUNTIME` environment variables no longer leak into the generated `runtime-config.js`
   - Fixed the environment variable detection in the entrypoint script (`cut` ran before the NUL separators were converted to newlines)

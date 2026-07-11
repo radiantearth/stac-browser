@@ -88,6 +88,11 @@
       "enum": ["history", "hash"],
       "buildOnly": true
     },
+    "RUNTIME": {
+      "type": ["boolean"],
+      "buildOnly": true,
+      "description": "Whether runtime-config.js and runtime-style.css are loaded. Set via the SB_RUNTIME env var at build time, not part of config.js."
+    },
     "cardViewMode": {
       "type": ["string"],
       "enum": ["list", "cards"]
@@ -161,7 +166,7 @@
     },
     "basemaps": {
       "type": ["object", "null"],
-      "description": "Show your own basemaps instead of the default ones and configure them via runtime/env. This option is here only to allow handling via runtime/env, it's not part of config.js but in basemap.config.js. See docs/basemaps.md for details."
+      "description": "Show your own basemaps instead of the default ones and configure them via runtime/env. This option is here only to allow handling via runtime/env, it's not part of config.js but in basemaps.config.js. See docs/basemaps.md for details."
     },
     "crs": {
       "type": ["object"]
