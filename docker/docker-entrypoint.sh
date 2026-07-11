@@ -24,7 +24,7 @@ bool() {
     esac
 }
 
-# handle array values
+# handle array values: JSON-encoded or a comma-separated list
 array() {
     # $1 = value
     # $2 = arraytype
@@ -96,8 +96,10 @@ config_schema=$(cat /etc/nginx/conf.d/config.schema.json)
 runtime_config_tmp=/usr/share/nginx/html/runtime-config.js.tmp
 runtime_config=/usr/share/nginx/html/runtime-config.js
 
-# Iterate over environment variables with "SB_" prefix
-env -0 | tr '\0' '\n' | cut -f1 -d= | grep "^SB_" | {
+# Iterate over environment variables with "SB_" prefix.
+# SB_CONFIG and SB_RUNTIME are build-time only and must not
+# end up in the runtime config.
+env -0 | tr '\0' '\n' | cut -f1 -d= | grep "^SB_" | grep -v -e "^SB_CONFIG$" -e "^SB_RUNTIME$" | {
     echo "window.STAC_BROWSER_CONFIG = {"
     while IFS='=' read -r name; do
         # Strip the prefix
