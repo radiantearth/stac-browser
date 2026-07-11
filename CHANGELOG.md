@@ -7,13 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- New config option `basemaps` to customize the basemaps via JSON without code changes,
+  e.g. at runtime through the `SB_basemaps` environment variable of the Docker image or `runtime-config.js`
+- Runtime styling (`runtime-style.css`) can be used to customize the most significant but not all parts of the UI:
+  the secondary color, body background/text colors, link colors, heading colors, and fonts
+  can be changed at runtime, and derived shades (hover states, subtle backgrounds, focus rings)
+  follow the runtime colors automatically
+
+### Fixed
+
+- Array-typed options provided via `SB_*` environment variables are handled consistently at build time and in the Docker container:
+  both accept a JSON-encoded array or a comma-separated list of strings
+- Docker:
+  - The `SB_CONFIG` and `SB_RUNTIME` environment variables no longer leak into the generated `runtime-config.js`
+  - Fixed the environment variable detection in the entrypoint script (`cut` ran before the NUL separators were converted to newlines)
+
 ## [5.0.0-rc.2] - 2026-06-23
 
 ### Added
 
 - The Browse menu also loads additional Collections on demand
 - Minimal Docker build test and CI workflow.
-- Docker: `pathPrefix` can be set at container startup via `SB_pathPrefix` when `DYNAMIC_CONFIG` is enabled (default)
+- Docker: `pathPrefix` can be set at container startup via `SB_pathPrefix` when `SB_RUNTIME` is enabled (default)
 
 ### Changed
 

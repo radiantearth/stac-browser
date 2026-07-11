@@ -70,6 +70,9 @@ const BASEMAPS = {
  * @returns {Array.<BasemapOptions>}
  */
 export default function configureBasemap(stac, i18n, store) {
+  // The `basemaps` config option (e.g. set at runtime) replaces the defaults
+  const basemaps = store.state.basemaps || BASEMAPS;
+
   let targets;
   if (stac instanceof Collection) {
     targets = stac.getSummary('ssys:targets');
@@ -84,13 +87,13 @@ export default function configureBasemap(stac, i18n, store) {
   if (store.state.colorMode === 'dark') {
     targets = targets.map(t => {
       const darkVariant = `${t}-dark`;
-      return Array.isArray(BASEMAPS[darkVariant]) ? darkVariant : t;
+      return Array.isArray(basemaps[darkVariant]) ? darkVariant : t;
     });
   }
 
   let layers = [];
   for (const target of targets) {
-    const maps = BASEMAPS[target.toLowerCase()];
+    const maps = basemaps[target.toLowerCase()];
     if (!Array.isArray(maps)) {
       continue;
     }
