@@ -637,7 +637,7 @@ svg {
     }
 
     .datetime {
-      color: $secondary;
+      color: var(--bs-secondary);
     }
   }
 
