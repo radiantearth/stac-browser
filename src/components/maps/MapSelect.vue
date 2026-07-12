@@ -221,7 +221,9 @@ export default {
         return;
       }
 
-      const geojson = stac.toGeoJSON();
+      // Use non-great-circle GeoJSON output to avoid antimeridian wrap issues,
+      // ensuring the mask covers the correct areas.
+      const geojson = stac.toGeoJSON({ greatCircle: false });
       if (!geojson) {
         return;
       }

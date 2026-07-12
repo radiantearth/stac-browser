@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Geometries that cross the antimeridian are split into multi-geometries so that footprints render correctly on the map
 - Fix global error handling in certain edge-cases
 - Improve speed of catalog/collection duplicate detection
 - Fix search link detection
