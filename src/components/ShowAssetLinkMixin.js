@@ -26,7 +26,7 @@ export default {
       }
       let assets = this.data.getAssets();
       if (!this.showThumbnailsAsAssets) {
-        assets = assets.filter(asset => !this.thumbnails.includes(asset));
+        assets = assets.filter(asset => !this.isThumbnail(asset));
       }
       return assets;
     },
@@ -56,8 +56,11 @@ export default {
     }
   },
   methods: {
+    isThumbnail(asset) {
+      return this.thumbnails.some(t => t.is(asset) || (t.isAlternate && t.getContext()?.is(asset)));
+    },
     showAsset(asset) {
-      if (this.thumbnails.find(t => t.is(asset))) {
+      if (this.isThumbnail(asset)) {
         this.tab = this.tabIds.thumbnails;
       }
       else {
