@@ -1,3 +1,6 @@
+#!/bin/sh
+# shellcheck disable=SC3037,SC3060
+# Runs under busybox ash in the nginx image; not strict POSIX sh.
 # echo a string, handling different types
 safe_echo() {
     # $1 = value
