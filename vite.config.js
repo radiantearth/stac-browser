@@ -37,6 +37,7 @@ const defaultConfigPath = fileURLToPath(new URL("./config.js", import.meta.url))
 // A full JSON array (e.g. '[{"label":"a","url":"b"}]') is used as-is, which
 // allows arrays of objects. For convenience, a plain comma-separated list
 // (e.g. 'en,de,fr') is also accepted and split into an array of strings.
+// An empty value yields an empty array (the filter drops the empty split).
 const parseArrayEnv = (value) => {
   const raw = Array.isArray(value) ? value.join(" ") : String(value);
   const trimmed = raw.trim();
