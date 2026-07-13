@@ -1,7 +1,11 @@
 <template>
   <ul class="tree" v-visible="load">
     <li>
-      <b-button v-if="pagination" size="sm" variant="light" disabled>
+      <b-button v-if="canLoadMore" size="sm" variant="light" v-visible.300="loadNextPage" @click="loadNextPage()">
+        <b-spinner v-if="loadingMore" small :label="$t('loading')" />
+        <b-icon-three-dots v-else />
+      </b-button>
+      <b-button v-else-if="pagination" size="sm" variant="light" disabled>
         <b-icon-three-dots />
       </b-button>
       <template v-else-if="mayHaveChildren">
@@ -42,7 +46,8 @@
 import { mapGetters, mapState } from 'vuex';
 import { isObject } from 'stac-js/src/utils.js';
 import { toAbsolute } from 'stac-js/src/http.js';
-import { getDisplayTitle, Collection } from '../models/stac';
+import Utils from '../utils';
+import { getDisplayTitle, sortStac } from '../models/stac';
 import { STAC } from 'stac-js';
 
 export default {
@@ -65,13 +70,12 @@ export default {
     return {
       expanded: false,
       loading: false,
-      chunk: 1,
-      childs: []
+      chunk: 1
     };
   },
   computed: {
-    ...mapState(['data', 'apiCatalogPriority']),
-    ...mapGetters(['getStac']),
+    ...mapState(['data', 'apiCatalogPriority', 'defaultCollectionSort', 'defaultItemSort', 'uiLanguage']),
+    ...mapGetters(['getApiChildren', 'getChildren', 'getStac', 'isApiChildrenLoading', 'toBrowserPath']),
     onClick() {
       if (!this.to && this.mayHaveChildren) {
         return this.toggle;
@@ -82,7 +86,7 @@ export default {
       if (this.pagination) {
         return null;
       }
-      else if (this.item instanceof STAC) {
+      else if (this.item.isSTAC) {
         let stac = this.getStac(this.item.getAbsoluteUrl());
         if (!this.loading && stac) {
           return stac;
@@ -129,25 +133,61 @@ export default {
       }
       if (this.pagination) {
         if (this.parent && (!this.data || this.parent.getAbsoluteUrl() !== this.data.getAbsoluteUrl())) {
-          return this.parent.getBrowserPath();
+          return this.toBrowserPath(this.parent);
         }
         else {
           return null;
         }
       }
       else if (this.stac instanceof STAC) {
-        return this.stac.getBrowserPath();
+        return this.toBrowserPath(this.stac);
       }
       return null;
     },
     title() {
       if (this.pagination) {
-        return this.$t('tree.moreCollectionPagesAvailable');
+        return this.canLoadMore ? this.$t('catalogs.loadMore') : this.$t('tree.moreCollectionPagesAvailable');
       }
       return getDisplayTitle([this.item, this.stac]);
     },
     hasMore() {
       return this.childs.length > this.shownChilds.length;
+    },
+    childs() {
+      if (this.stac?.isCatalogLike) {
+        const children = this.getChildren(this.stac, this.apiCatalogPriority);
+        if (children.length < 2) {
+          return children;
+        }
+
+        const collectionSort = Utils.parseApiSortParameter(this.defaultCollectionSort);
+        const itemSort = Utils.parseApiSortParameter(this.defaultItemSort);
+
+        const prev = [];
+        const next = [];
+        const items = [];
+        const catalogs = [];
+        for (const child of children) {
+          if (['prev', 'previous'].includes(child?.rel)) {
+            prev.push(child);
+          }
+          else if (child?.rel === 'next') {
+            next.push(child);
+          }
+          else if (child?.rel === 'item' || child?.isItem) {
+            items.push(child);
+          }
+          else {
+            catalogs.push(child);
+          }
+        }
+
+        const sortedCatalogs = collectionSort.direction === 0 ? catalogs : sortStac(catalogs, collectionSort, this.uiLanguage);
+        const sortedItems = itemSort.direction === 0 ? items : sortStac(items, itemSort, this.uiLanguage);
+
+        return prev.concat(sortedCatalogs, sortedItems, next);
+      }
+      return [];
     },
     shownChilds() {
       return this.childs.slice(0, this.chunk * 50);
@@ -163,6 +203,12 @@ export default {
     },
     pagination() {
       return ['next', 'prev', 'previous'].includes(this.item.rel);
+    },
+    canLoadMore() {
+      return this.item.rel === 'next' && this.getApiChildren(this.parent)?.type === 'collections';
+    },
+    loadingMore() {
+      return this.isApiChildrenLoading(this.parent);
     }
   },
   watch: {
@@ -173,18 +219,6 @@ export default {
           this.expanded = true;
         }
       }
-    },
-    stac: {
-      immediate: true,
-      handler(newStac, oldStac) {
-        if (newStac instanceof Collection) {
-          newStac.setApiDataListener('tree', () => this.updateChilds());
-        }
-        if (oldStac instanceof Collection) {
-          oldStac.setApiDataListener('tree');
-        }
-        this.updateChilds();
-      }
     }
   },
   created() {
@@ -193,16 +227,21 @@ export default {
     }
   },
   methods: {
-    updateChilds() {
-      if (this.stac && this.stac.isCatalogLike) {
-        this.childs = this.stac.getChildren(this.apiCatalogPriority);
-      }
-      else {
-        this.childs = [];
-      }
-    },
     showMore() {
       this.chunk++;
+    },
+    async loadNextPage(visible = true) {
+      if (!visible || this.loadingMore) {
+        return;
+      }
+      try {
+        await this.$store.dispatch('loadNextApiCollections', { stac: this.parent, next: true });
+      } catch (error) {
+        this.$store.commit('showGlobalError', {
+          error,
+          message: this.$t('errors.loadApiCollectionsFailed')
+        });
+      }
     },
     load(visible) {
       if (!this.stac && this.link && !this.pagination) {

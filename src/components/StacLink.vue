@@ -133,10 +133,10 @@ export default defineComponent({
       if (this.stac || this.isStacBrowserLink) {
         let href;
         if (this.stac instanceof STAC) {
-          href = this.stac.getBrowserPath();
+          href = this.toBrowserPath(this.stac);
         }
         else {
-          href = this.toBrowserPath(this.link.href);
+          href = this.toBrowserPath(this.link);
         }
         // Normalize to start with a slash for router-link navigation
         if (!href.startsWith('/')) {

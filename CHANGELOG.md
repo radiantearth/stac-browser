@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.0.0] - Unreleased
+
+### Added
+
+- The Browse menu also loads additional Collections on demand
+
+### Changed
+
+- `getBrowserPath` for STAC Objects is not available any longer, use `toBrowserPath` or other URL comparison mechanisms instead.
+  **Note:** This is commonly used in `preprocessSTAC` config option, ensure to update your `config.js`.
+- Internal rewrite of how API children are maintained
+- Loaded collections are cached and no longer re-fetched when returning to a page
+
+### Fixed
+
+- Fix global error handling in certain edge-cases
+- Improve speed of catalog/collection duplicate detection
+- Fix search link detection
+- The configured default collection and item sort is also applied to the Browse menu
+- More requests that fail due to missing authentication are retried after login (incl. searches and downloads)
+- A failed background load no longer switches the page after login
+
 ## [5.0.0-rc.1] - 2026-06-27
 
 ### Added
@@ -183,7 +205,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 For releases prior to v4.0.0, please refer to the
 [release notes in the GitHub Releases](https://github.com/radiantearth/stac-browser/releases).
 
-[Unreleased]: https://github.com/radiantearth/stac-browser/compare/v5.0.0-rc.1...HEAD
+[Unreleased]: https://github.com/radiantearth/stac-browser/compare/v5.0.0...HEAD
+[5.0.0]: https://github.com/radiantearth/stac-browser/compare/v5.0.0-rc.1...v5.0.0
 [5.0.0-rc.1]: https://github.com/radiantearth/stac-browser/compare/v5.0.0-beta.1...v5.0.0-rc.1
 [5.0.0-beta.1]: https://github.com/radiantearth/stac-browser/compare/v4.0.1...v5.0.0-beta.1
 [4.0.1]: https://github.com/radiantearth/stac-browser/compare/v4.0.0...v4.0.1

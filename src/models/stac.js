@@ -1,56 +1,80 @@
-import {
-  Catalog as BaseCatalog,
-  Collection as BaseCollection,
-  Item as BaseItem,
-  ItemCollection as BaseItemCollection,
-  CollectionCollection as BaseCollectionCollection,
-  STAC,
-  STACReference
-} from 'stac-js';
+import { Catalog, Collection, Item, ItemCollection, CollectionCollection, STAC, STACReference } from 'stac-js';
 import Migrate from '@radiantearth/stac-migrate';
-import Utils from "../utils";
+import Utils from '../utils';
 import { hasText, isObject } from 'stac-js/src/utils.js';
 import { toAbsolute } from 'stac-js/src/http.js';
+import { markRaw } from 'vue';
 
+function setInternal(stac, key, value) {
+  const internalKey = '_' + key;
+  stac[internalKey] = value;
+  stac._privateKeys.push(internalKey);
+}
 
-export function createSTAC(data, url, path, migrate = true, updateVersionNumber = false) {
-  if (migrate) {
-    // Uncomment this line if the old checksum: fields should be converted
-    // This is usually not needed so it's not enabled by default to shrink the bundle size
-    // Migrate.enableMultihash(require('multihashes'));
-    data._original = data;
-    data = Migrate.stac(data, updateVersionNumber);
+export function processSTAC(stac, store) {
+  if (typeof store.state.preprocessSTAC === 'function') {
+    stac = store.state.preprocessSTAC(stac, store.state, store.getters);
   }
+  return markRaw(stac);
+}
+
+export function createSTAC(data, url = null, store = null) {
+  // Uncomment this line if the old checksum: fields should be converted
+  // This is usually not needed so it's not enabled by default to shrink the bundle size
+  // Migrate.enableMultihash(require('multihashes'));
+
+  // Migrate STAC to latest version
+  let original = data._original ?? structuredClone(data);
+  data = Migrate.stac(data, false);
+
+  // Create stac-js object based on STAC type
   let obj;
   if (data.type === 'Feature') {
-    obj = new Item(data, url, path);
+    obj = new Item(data, url);
   }
   else if (data.type === 'FeatureCollection') {
-    // todo: convert inner collections to stac-js as well
-    obj = new ItemCollection(data, url, path);
+    obj = new ItemCollection(data, url);
   }
   else if (data.type === 'Collection' || (!data.type && typeof data.extent !== 'undefined' && typeof data.license !== 'undefined')) {
-    obj = new Collection(data, url, path);
+    obj = new Collection(data, url);
   }
   else if (!data.type && Array.isArray(data.collections)) {
-    // todo: convert inner collections to stac-js as well
-    obj = new CollectionCollection(data, url, path);
+    obj = new CollectionCollection(data, url);
   }
   else {
-    obj = new Catalog(data, url, path);
+    obj = new Catalog(data, url);
   }
-  if (data._original) {
-    obj._privateKeys.push('_original');
+
+  // Set stac-browser internal properties
+  if (obj.isApiCollection) {
+    const originals = obj.isCollectionCollection ? original.collections : original.features;
+    obj.getAll().forEach((child, i) => {
+      setInternal(child, 'incomplete', true);
+      setInternal(child, 'original', originals[i]);
+    });
   }
+  setInternal(obj, 'original', original);
+
+  // Preprocess STAC objects
+  if (store && obj.isItemCollection) {
+    obj.features = obj.features.map(item => processSTAC(item, store));
+  }
+  else if (store && obj.isCollectionCollection) {
+    obj.collections = obj.collections.map(collection => processSTAC(collection, store));
+  }
+  else if (store) {
+    obj = processSTAC(obj, store);
+  }
+
   return obj;
 }
 
 export function addMissingChildren(catalogs, stac) {
+  const catalogUrls = new Set(catalogs.map(collection => collection.getAbsoluteUrl()));
   let links = stac.getStacLinksWithRel('child').filter(link => {
     // Don't add links that are already in collections: https://github.com/radiantearth/stac-browser/issues/103
-    // ToDo: The runtime of this can probably be improved
-    let absoluteUrl = toAbsolute(link.href, stac.getAbsoluteUrl());
-    return !catalogs.find(collection => collection.getAbsoluteUrl() === absoluteUrl);
+    const absoluteUrl = toAbsolute(link.href, stac.getAbsoluteUrl());
+    return !catalogUrls.has(absoluteUrl);
   });
   // place the children first to avoid conflicts with the paginated collections
   // where the children are always at the end and can never be reached due to infinite scrolling
@@ -123,175 +147,4 @@ export function sortStac(entities, sort, uiLanguage) {
     return sorted.reverse();
   }
   return sorted;
-}
-
-function getChildren(stac, priority = null) {
-  if (!stac.isCatalogLike) {
-    return [];
-  }
-
-  let showCollections = !priority || priority === 'collections';
-  let showChilds = !priority || priority === 'childs';
-
-  let children = [];
-  if (showCollections && stac._apiChildren.prev) {
-    children.push(stac._apiChildren.prev);
-  }
-  if (showCollections && stac._apiChildren.list.length > 0) {
-    children = stac._apiChildren.list.slice(0);
-  }
-  if (showChilds) {
-    children = addMissingChildren(children, stac).concat(stac.getLinksWithRels(['item']));
-  }
-  if (showCollections && stac._apiChildren.next) {
-    children.push(stac._apiChildren.next);
-  }
-  return children;
-}
-
-export class ItemCollection extends BaseItemCollection {
-
-  constructor(data, url, path) {
-    super(data, url);
-    this._path = path;
-    this._privateKeys.push('_path');
-  }
-
-  getBrowserPath() {
-    return this._path;
-  }
-
-}
-
-export class CollectionCollection extends BaseCollectionCollection {
-
-  constructor(data, url, path) {
-    super(data, url);
-    this._path = path;
-    this._privateKeys.push('_path');
-  }
-
-  getBrowserPath() {
-    return this._path;
-  }
-
-}
-
-export class Collection extends BaseCollection {
-
-  constructor(data, url, path) {
-    super(data, url);
-    this._path = path;
-    this._incomplete = false;
-    this._apiChildrenListeners = {};
-    this._apiChildren = {
-      list: [],
-      prev: false,
-      next: false
-    };
-    this._privateKeys.push('_path', '_incomplete', '_apiChildrenListeners', '_apiChildren');
-  }
-
-  getBrowserPath() {
-    return this._path;
-  }
-
-  getChildren(priority = null) {
-    return getChildren(this, priority);
-  }
-
-  setApiDataListener(id, listener = null) {
-    if (typeof listener === 'function') {
-      this._apiChildrenListeners[id] = listener;
-    }
-    else {
-      delete this._apiChildrenListeners[id];
-    }
-  }
-
-  setApiData(list, next = null, prev = null) {
-    if (prev) {
-      this._apiChildren.prev = prev;
-    }
-    if (next) {
-      this._apiChildren.next = next;
-    }
-    this._apiChildren.list = list;
-
-    for (let id in this._apiChildrenListeners) {
-      try {
-        this._apiChildrenListeners[id](this._apiChildren);
-      } catch (error) {
-        console.error(error);
-      }
-    }
-  }
-
-}
-
-export class Catalog extends BaseCatalog {
-
-  constructor(data, url, path) {
-    super(data, url);
-    this._path = path;
-    this._incomplete = false;
-    this._apiChildrenListeners = {};
-    this._apiChildren = {
-      list: [],
-      prev: false,
-      next: false
-    };
-    this._privateKeys.push('_path', '_incomplete', '_apiChildrenListeners', '_apiChildren');
-  }
-
-  getBrowserPath() {
-    return this._path;
-  }
-
-  getChildren(priority = null) {
-    return getChildren(this, priority);
-  }
-
-  setApiDataListener(id, listener = null) {
-    if (typeof listener === 'function') {
-      this._apiChildrenListeners[id] = listener;
-    }
-    else {
-      delete this._apiChildrenListeners[id];
-    }
-  }
-
-  setApiData(list, next = null, prev = null) {
-    if (prev) {
-      this._apiChildren.prev = prev;
-    }
-    if (next) {
-      this._apiChildren.next = next;
-    }
-    this._apiChildren.list = list;
-
-    for (let id in this._apiChildrenListeners) {
-      try {
-        this._apiChildrenListeners[id](this._apiChildren);
-      } catch (error) {
-        console.error(error);
-      }
-    }
-  }
-
-}
-
-export class Item extends BaseItem {
-
-  constructor(data, url, path) {
-    super(data, url);
-    this._path = path;
-    this._incomplete = false;
-    this._privateKeys.push('_path', '_incomplete');
-  }
-
-  getBrowserPath() {
-    return this._path;
-  }
-
 }

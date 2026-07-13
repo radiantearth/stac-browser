@@ -34,7 +34,9 @@ export async function mockStacResource(worker, url, mockData, options = {}) {
   await worker.use(
     http.all(url, async () => {
       if (delay > 0) {
-        await new Promise(resolve => setTimeout(resolve, delay));
+        await new Promise(resolve => {
+          setTimeout(resolve, delay);
+        });
       }
       return HttpResponse.json(mockData, { status });
     }),
@@ -104,10 +106,10 @@ export async function waitForMapReady(page) {
 */
 export async function waitForBboxInputsPopulated(page) {
   const labels = [/west longitude/i, /south latitude/i, /east longitude/i, /north latitude/i];
-  for (const label of labels) {
+  await Promise.all(labels.map(label => {
     const input = page.getByLabel(label);
-    await expect(input).not.toHaveValue('', { timeout: 10000 });
-  }
+    return expect(input).not.toHaveValue('', { timeout: 10000 });
+  }));
 }
 
 /**
@@ -154,7 +156,7 @@ export async function openSourcePanel(page) {
 * @param {import('@playwright/test').Page} page
 * @returns {Promise<string>} clipboard content
 */
-export const readClipboard = async (page) => page.evaluate(() => navigator.clipboard.readText());
+export const readClipboard = (page) => page.evaluate(() => navigator.clipboard.readText());
 
 /**
 * Clear system clipboard.
@@ -162,7 +164,7 @@ export const readClipboard = async (page) => page.evaluate(() => navigator.clipb
 * @param {import('@playwright/test').Page} page
 * @returns {Promise<void>}
 */
-export const clearClipboard = async (page) => page.evaluate(() => navigator.clipboard.writeText(''));
+export const clearClipboard = (page) => page.evaluate(() => navigator.clipboard.writeText(''));
 
 /**
 * Click the "Example Code" button and wait for the modal to appear.
@@ -189,7 +191,7 @@ export const openExampleCodeModal = async (page) => {
 export const copyCodeFromModal = async (page, panel) => {
   await clearClipboard(page);
   await panel.locator('[id="exampleCodeCopyExampleCode"]').click();
-  return expect.poll(async () => readClipboard(page)).not.toEqual('');
+  return expect.poll(() => readClipboard(page)).not.toEqual('');
 };
 
 /**
@@ -203,7 +205,7 @@ export const copyCodeFromModal = async (page, panel) => {
 export const copyDependenciesFromModal = async (page, panel) => {
   await clearClipboard(page);
   await panel.locator('[id="exampleCodeCopyDependencies"]').click();
-  return expect.poll(async () => readClipboard(page)).not.toEqual('');
+  return expect.poll(() => readClipboard(page)).not.toEqual('');
 };
 
 /**
@@ -217,5 +219,5 @@ export const copyDependenciesFromModal = async (page, panel) => {
 export const copyFilenameFromModal = async (page, panel) => {
   await clearClipboard(page);
   await panel.locator('[id="exampleCodeCopyOutputFilename"]').click();
-  return expect.poll(async () => readClipboard(page)).not.toEqual('');
+  return expect.poll(() => readClipboard(page)).not.toEqual('');
 };
