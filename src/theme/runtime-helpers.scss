@@ -1,0 +1,206 @@
+// Re-wire Bootstrap's baked component colors to root CSS vars.
+// Bootstrap compiles $primary etc. into hardcoded hex values inside
+// component selectors (.btn-primary etc.) and :root / [data-bs-theme="light"].
+// By overriding them here to reference var(--bs-primary), any
+// runtime CSS that sets --bs-primary will automatically propagate.
+//
+// Derived shades are computed with color-mix(), mirroring Bootstrap's
+// tint-color()/shade-color() percentages. Supported by all evergreen
+// browsers (Chrome 111+, Firefox 113+, Safari 16.2+); older browsers
+// drop these declarations and fall back to the compiled colors.
+
+// Root-level vars — must match Bootstrap's own specificity by including both
+// :root and the [data-bs-theme] attribute selectors.
+:root,
+[data-bs-theme="light"] {
+  --bs-link-color: var(--bs-primary);
+  --bs-link-color-rgb: var(--bs-primary-rgb);
+  --bs-link-hover-color: color-mix(in srgb, var(--bs-link-color) 60%, black);
+  --bs-focus-ring-color: rgba(var(--bs-primary-rgb), 0.25);
+
+  // Subtle/emphasis derivatives, consumed by .alert-*, .text-bg-*-subtle etc.
+  // Percentages mirror Bootstrap's tint-color()/shade-color() defaults.
+  --bs-primary-bg-subtle: color-mix(in srgb, var(--bs-primary) 20%, white);
+  --bs-primary-border-subtle: color-mix(in srgb, var(--bs-primary) 40%, white);
+  --bs-primary-text-emphasis: color-mix(in srgb, var(--bs-primary) 40%, black);
+  --bs-secondary-bg-subtle: color-mix(in srgb, var(--bs-secondary) 20%, white);
+  --bs-secondary-border-subtle: color-mix(in srgb, var(--bs-secondary) 40%, white);
+  --bs-secondary-text-emphasis: color-mix(in srgb, var(--bs-secondary) 40%, black);
+}
+
+[data-bs-theme="dark"] {
+  --bs-link-color: var(--bs-primary);
+  --bs-link-color-rgb: var(--bs-primary-rgb);
+  --bs-link-hover-color: var(--bs-body-color);
+  --bs-focus-ring-color: rgba(var(--bs-primary-rgb), 0.25);
+
+  --bs-primary-bg-subtle: color-mix(in srgb, var(--bs-primary) 20%, black);
+  --bs-primary-border-subtle: color-mix(in srgb, var(--bs-primary) 60%, black);
+  --bs-primary-text-emphasis: color-mix(in srgb, var(--bs-primary) 60%, white);
+  --bs-secondary-bg-subtle: color-mix(in srgb, var(--bs-secondary) 20%, black);
+  --bs-secondary-border-subtle: color-mix(in srgb, var(--bs-secondary) 60%, black);
+  --bs-secondary-text-emphasis: color-mix(in srgb, var(--bs-secondary) 60%, white);
+}
+
+// Contrast ("on") colors for text placed on primary/secondary backgrounds.
+// CSS has no runtime equivalent of Bootstrap's color-contrast() yet, so the
+// build-time result is baked as a default and must be overridden manually in
+// runtime-style.css when the runtime color needs a different contrast color.
+:root {
+  --sb-on-primary: #{color-contrast($primary)};
+  --sb-on-secondary: #{color-contrast($secondary)};
+}
+
+// Bootstrap's reboot colors plain links via rgba(var(--bs-link-color-rgb), ...)
+// and swaps in a *compile-time* hover triplet on :hover. That baked triplet
+// can't follow runtime overrides, so consume the non-rgb hover var instead.
+a:hover {
+  color: var(--bs-link-hover-color);
+}
+
+.btn-primary {
+  --bs-btn-color: var(--sb-on-primary);
+  --bs-btn-bg: var(--bs-primary);
+  --bs-btn-border-color: var(--bs-primary);
+  --bs-btn-hover-color: var(--sb-on-primary);
+  --bs-btn-hover-bg: color-mix(in srgb, var(--bs-primary) 85%, black);
+  --bs-btn-hover-border-color: color-mix(in srgb, var(--bs-primary) 80%, black);
+  --bs-btn-focus-shadow-rgb: var(--bs-primary-rgb);
+  --bs-btn-active-color: var(--sb-on-primary);
+  --bs-btn-active-bg: color-mix(in srgb, var(--bs-primary) 80%, black);
+  --bs-btn-active-border-color: color-mix(in srgb, var(--bs-primary) 75%, black);
+  --bs-btn-disabled-color: var(--sb-on-primary);
+  --bs-btn-disabled-bg: var(--bs-primary);
+  --bs-btn-disabled-border-color: var(--bs-primary);
+}
+
+.btn-outline-primary {
+  --bs-btn-color: var(--bs-primary);
+  --bs-btn-border-color: var(--bs-primary);
+  --bs-btn-hover-color: var(--sb-on-primary);
+  --bs-btn-hover-bg: var(--bs-primary);
+  --bs-btn-hover-border-color: var(--bs-primary);
+  --bs-btn-focus-shadow-rgb: var(--bs-primary-rgb);
+  --bs-btn-active-color: var(--sb-on-primary);
+  --bs-btn-active-bg: var(--bs-primary);
+  --bs-btn-active-border-color: var(--bs-primary);
+  --bs-btn-disabled-color: var(--bs-primary);
+}
+
+.btn-secondary {
+  --bs-btn-color: var(--sb-on-secondary);
+  --bs-btn-bg: var(--bs-secondary);
+  --bs-btn-border-color: var(--bs-secondary);
+  --bs-btn-hover-color: var(--sb-on-secondary);
+  --bs-btn-hover-bg: color-mix(in srgb, var(--bs-secondary) 85%, black);
+  --bs-btn-hover-border-color: color-mix(in srgb, var(--bs-secondary) 80%, black);
+  --bs-btn-focus-shadow-rgb: var(--bs-secondary-rgb);
+  --bs-btn-active-color: var(--sb-on-secondary);
+  --bs-btn-active-bg: color-mix(in srgb, var(--bs-secondary) 80%, black);
+  --bs-btn-active-border-color: color-mix(in srgb, var(--bs-secondary) 75%, black);
+  --bs-btn-disabled-color: var(--sb-on-secondary);
+  --bs-btn-disabled-bg: var(--bs-secondary);
+  --bs-btn-disabled-border-color: var(--bs-secondary);
+}
+
+.btn-outline-secondary {
+  --bs-btn-color: var(--bs-secondary);
+  --bs-btn-border-color: var(--bs-secondary);
+  --bs-btn-hover-color: var(--sb-on-secondary);
+  --bs-btn-hover-bg: var(--bs-secondary);
+  --bs-btn-hover-border-color: var(--bs-secondary);
+  --bs-btn-focus-shadow-rgb: var(--bs-secondary-rgb);
+  --bs-btn-active-color: var(--sb-on-secondary);
+  --bs-btn-active-bg: var(--bs-secondary);
+  --bs-btn-active-border-color: var(--bs-secondary);
+  --bs-btn-disabled-color: var(--bs-secondary);
+}
+
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+  --bs-nav-pills-link-active-color: var(--sb-on-primary);
+  --bs-nav-pills-link-active-bg: var(--bs-primary);
+}
+
+.dropdown-item.active,
+.dropdown-item:active {
+  --bs-dropdown-link-active-color: var(--sb-on-primary);
+  --bs-dropdown-link-active-bg: var(--bs-primary);
+}
+
+.accordion {
+  --bs-accordion-btn-focus-box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
+.pagination {
+  --bs-pagination-focus-box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+  --bs-pagination-active-color: var(--sb-on-primary);
+  --bs-pagination-active-bg: var(--bs-primary);
+  --bs-pagination-active-border-color: var(--bs-primary);
+}
+
+.progress,
+.progress-stacked {
+  --bs-progress-bar-color: var(--sb-on-primary);
+  --bs-progress-bar-bg: var(--bs-primary);
+}
+
+// List-group active/selected state
+.list-group-item.active {
+  --bs-list-group-active-color: var(--sb-on-primary);
+  --bs-list-group-active-bg: var(--bs-primary);
+  --bs-list-group-active-border-color: var(--bs-primary);
+}
+
+// Badges and other "colored background" utilities bake their text color
+// with !important, so the override needs !important as well.
+.text-bg-primary {
+  color: var(--sb-on-primary) !important;
+}
+
+.text-bg-secondary {
+  color: var(--sb-on-secondary) !important;
+}
+
+// Form controls — focus ring and checked state
+.form-control:focus,
+.form-select:focus {
+  border-color: color-mix(in srgb, var(--bs-primary) 50%, white);
+  box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
+.form-check-input:checked,
+.form-check-input:indeterminate {
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
+}
+
+
+// Expose STAC Browser custom vars as CSS custom properties.
+// Non-color parts are baked from Sass (build-time theming);
+// color parts reference var(--bs-primary) so they stay live
+// and can be overridden at runtime in runtime-style.css.
+:root {
+  // Sizing & spacing
+  --sb-header-margin: #{$header-margin};
+  --sb-block-gap: #{$block-gap};
+  --sb-code-padding: #{$code-padding};
+  --sb-logo-max-height: #{$logo-image-height};
+  --sb-max-icon-size: #{$max-icon-size};
+
+  // Typography
+  --sb-header-font-size: #{$header-font-size};
+  --sb-header-font-weight: #{$header-font-weight};
+
+  // Colors (light mode; dark mode overrides below)
+  --sb-h1-color: #{$h1-color};
+  --sb-subheadings-color: #{$subheadings-color};
+
+  // Header border (color part stays live via var(--bs-primary))
+  --sb-header-border: #{$header-border-width} #{$header-border-style} var(--bs-primary);
+}
+
+[data-bs-theme="dark"] {
+  --sb-h1-color: #{$h1-color-dark};
+  --sb-subheadings-color: #{$subheadings-color-dark};
+}

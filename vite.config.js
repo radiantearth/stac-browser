@@ -33,6 +33,19 @@ const optionsForType = (type) =>
 
 const defaultConfigPath = fileURLToPath(new URL("./config.js", import.meta.url));
 
+// Env vars can only carry strings, so array values are either
+// JSON-encoded or a comma-separated list of strings.
+const parseArrayValue = (value) => {
+  if (Array.isArray(value) && value.length === 1 && typeof value[0] === "string") {
+    const str = value[0].trim();
+    if (str === "") {
+      return [];
+    }
+    return str.startsWith("[") ? JSON.parse(str) : str.split(",").map((s) => s.trim());
+  }
+  return value;
+};
+
 const parseEnvConfig = (rawEnv) => {
   const envArgs = Object.entries(rawEnv)
     .filter(([key]) => key.startsWith("SB_") && key !== "SB_CONFIG")
@@ -46,6 +59,11 @@ const parseEnvConfig = (rawEnv) => {
     .option(
       Object.fromEntries(
         optionsForType("object").map((k) => [k, { coerce: JSON.parse }])
+      )
+    )
+    .option(
+      Object.fromEntries(
+        optionsForType("array").map((k) => [k, { coerce: parseArrayValue }])
       )
     ).argv;
 

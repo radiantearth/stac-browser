@@ -5,6 +5,6 @@ export default Object.assign(
   {},
   defaultConfig,
   externalConfig,
-  CONFIG_FROM_ENV,
-  window.STAC_BROWSER_CONFIG
+  CONFIG_FROM_ENV
+  // window.STAC_BROWSER_CONFIG is merged dynamically in init.js after runtime-config.js loads
 );

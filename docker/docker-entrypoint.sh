@@ -24,19 +24,27 @@ bool() {
     esac
 }
 
-# handle array values
+# handle array values: JSON-encoded or a comma-separated list
 array() {
     # $1 = value
     # $2 = arraytype
     if [ -z "$1" ]; then
         echo -n "[]"
     else
-        case "$2" in
-            string)
-                echo -n "['$(echo "$1" | sed "s/,/', '/g")']"
+        case "$1" in
+            \[*)
+                # already JSON-encoded
+                echo -n "$1"
                 ;;
             *)
-                echo -n "[$1]"
+                case "$2" in
+                    string)
+                        echo -n "['$(echo "$1" | sed "s/^[[:space:]]*//; s/[[:space:]]*\$//; s/[[:space:]]*,[[:space:]]*/', '/g")']"
+                        ;;
+                    *)
+                        echo -n "[$1]"
+                        ;;
+                esac
                 ;;
         esac
     fi
@@ -54,8 +62,10 @@ object() {
 
 config_schema=$(cat /etc/nginx/conf.d/config.schema.json)
 
-# Iterate over environment variables with "SB_" prefix
-env -0 | cut -f1 -d= | tr '\0' '\n' | grep "^SB_" | {
+# Iterate over environment variables with "SB_" prefix.
+# SB_CONFIG and SB_RUNTIME are build-time only and must not
+# end up in the runtime config.
+env -0 | tr '\0' '\n' | cut -f1 -d= | grep "^SB_" | grep -v -e "^SB_CONFIG$" -e "^SB_RUNTIME$" | {
     echo "window.STAC_BROWSER_CONFIG = {"
     while IFS='=' read -r name; do
         # Strip the prefix
