@@ -62,7 +62,8 @@ docker run -p 8080:8080 -e SB_catalogUrl="https://earth-search.aws.element84.com
 
 If you want to pass all the other arguments to `npm run build` directly, you can modify to the Dockerfile as needed.
 
-STAC browser is now available at `http://localhost:8080/browser`
+STAC Browser is now available at `http://localhost:8080/browser/`.
+Requests to `http://localhost:8080/browser` (no trailing slash) are redirected there.
 
 ## Use an existing image
 
@@ -88,7 +89,7 @@ So, essentially, in the end you get an nginx instance that serves static files.
 ## Essential parts
 
 1. [Dockerfile](../Dockerfile) - contains information on how to build the image.
-2. [docker/default.conf](../docker/default.conf) - nginx configuration template, where `<pathPrefix>` is replaced during build.
+2. [docker/default.conf](../docker/default.conf) - nginx configuration template. During build, `<pathPrefix>` is replaced and a bare-prefix redirect is added when `pathPrefix` is not `/`.
 3. [docker/docker-entrypoint.sh](../docker/docker-entrypoint.sh) - a start script to read the passed variables and produce the `runtime-config.js` file.
 
 ## FAQ

@@ -28,7 +28,13 @@ COPY --from=build-step /app/dist /usr/share/nginx/html
 COPY --from=build-step /app/docker/default.conf /etc/nginx/conf.d/default.conf
 ADD docker/docker-entrypoint.sh /docker-entrypoint.d/40-stac-browser-entrypoint.sh
 
-RUN sed -i "s|<pathPrefix>|${pathPrefix}|" /etc/nginx/conf.d/default.conf && \
+RUN barePrefix=$(printf '%s' "${pathPrefix}" | sed 's|/*$||') && \
+    if [ -n "${barePrefix}" ]; then \
+      sed -i "s|<prefixRedirect>|location = ${barePrefix} { return 301 ${barePrefix}/\$is_args\$args; }|" /etc/nginx/conf.d/default.conf; \
+    else \
+      sed -i '/<prefixRedirect>/d' /etc/nginx/conf.d/default.conf; \
+    fi && \
+    sed -i "s|<pathPrefix>|${pathPrefix}|" /etc/nginx/conf.d/default.conf && \
     chown -R nginx:nginx /usr/share/nginx/html && \
     chmod +x /docker-entrypoint.d/40-stac-browser-entrypoint.sh
 
