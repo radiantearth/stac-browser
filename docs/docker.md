@@ -89,7 +89,7 @@ So, essentially, in the end you get an nginx instance that serves static files.
 ## Essential parts
 
 1. [Dockerfile](../Dockerfile) - contains information on how to build the image.
-2. [docker/default.conf](../docker/default.conf) - nginx configuration template, where `<pathPrefix>` and an optional bare-prefix redirect are generated during build.
+2. [docker/default.conf](../docker/default.conf) - nginx configuration template. During build, `<pathPrefix>` is replaced and a bare-prefix redirect is added when `pathPrefix` is not `/`.
 3. [docker/docker-entrypoint.sh](../docker/docker-entrypoint.sh) - a start script to read the passed variables and produce the `runtime-config.js` file.
 
 ## FAQ

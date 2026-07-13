@@ -30,7 +30,7 @@ ADD docker/docker-entrypoint.sh /docker-entrypoint.d/40-stac-browser-entrypoint.
 
 RUN barePrefix=$(printf '%s' "${pathPrefix}" | sed 's|/*$||') && \
     if [ -n "${barePrefix}" ]; then \
-      sed -i "s|<prefixRedirect>|location = ${barePrefix} { return 301 ${barePrefix}/; }|" /etc/nginx/conf.d/default.conf; \
+    sed -i "s|<prefixRedirect>|location = ${barePrefix} { return 301 ${barePrefix}/\$is_args\$args; }|" /etc/nginx/conf.d/default.conf; \
     else \
       sed -i '/<prefixRedirect>/d' /etc/nginx/conf.d/default.conf; \
     fi && \
