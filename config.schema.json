@@ -81,7 +81,10 @@
       "noEnv": true
     },
     "pathPrefix": {
-      "type": ["string"],
+      "type": ["string"]
+    },
+    "runtimeConfig": {
+      "type": ["boolean"],
       "buildOnly": true
     },
     "historyMode": {

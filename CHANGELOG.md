@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - The Browse menu also loads additional Collections on demand
+- `runtimeConfig` build option (`SB_runtimeConfig`) for post-build configuration.
 
 ### Changed
 

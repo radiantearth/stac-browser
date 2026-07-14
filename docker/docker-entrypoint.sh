@@ -61,10 +61,40 @@ object() {
     fi
 }
 
+STAC_PATH_PREFIX=$(printf '%s' "${SB_pathPrefix:-/}" | sed -e 's|^/*|/|' -e 's|/*$|/|')
+
+# Reject characters that could inject nginx directives or break the sed/envsubst substitutions below.
+if printf '%s' "$STAC_PATH_PREFIX" | grep -Eq '[&|;{}"'"'"'[:space:]\\]'; then
+    echo "Err: SB_pathPrefix contains unsupported characters: ${SB_pathPrefix}" >&2
+    exit 1
+fi
+
+export SB_pathPrefix="$STAC_PATH_PREFIX"
+export STAC_PATH_PREFIX
+
+barePrefix=$(printf '%s' "$STAC_PATH_PREFIX" | sed 's|/*$||')
+if [ -n "$barePrefix" ] && [ "$barePrefix" != "/" ]; then
+    STAC_PREFIX_REDIRECT="location = ${barePrefix} { return 301 ${STAC_PATH_PREFIX}\$is_args\$args; }"
+else
+    STAC_PREFIX_REDIRECT=""
+fi
+export STAC_PREFIX_REDIRECT
+
+envsubst '$STAC_PATH_PREFIX $STAC_PREFIX_REDIRECT' \
+    < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf
+
+# Rewrite the <base> tag so relative asset URLs (Vite `base: "./"`) resolve
+# against the path prefix instead of the current document URL, otherwise deep
+# links (e.g. /browser/collections/x) would try to load assets from the wrong path.
+if [ -f /usr/share/nginx/html/index.html ]; then
+    sed -i "s|<base href=\"[^\"]*\" id=\"stac-browser-base\">|<base href=\"${STAC_PATH_PREFIX}\" id=\"stac-browser-base\">|" \
+        /usr/share/nginx/html/index.html
+fi
+
 config_schema=$(cat /etc/nginx/conf.d/config.schema.json)
 
 # Iterate over environment variables with "SB_" prefix
-env -0 | cut -f1 -d= | tr '\0' '\n' | grep "^SB_" | {
+env -0 | tr '\0' '\n' | cut -f1 -d= | grep "^SB_" | {
     echo "window.STAC_BROWSER_CONFIG = {"
     while IFS='=' read -r name; do
         # Strip the prefix
