@@ -1,8 +1,8 @@
 import StacActionPlugin from '../StacActionPlugin';
 import { STAC } from 'stac-js';
 import i18n from '../../i18n';
-import BIconStar from '~icons/bi/star';
-import BIconStarFill from '~icons/bi/star-fill';
+import MdiStarOutline from '~icons/mdi/star-outline';
+import MdiStar from '~icons/mdi/star';
 
 // Built-in action to add/remove a STAC entity to/from the favorites, shown in
 // the header. To also offer it in cards/lists, enable FavoriteCard (which
@@ -30,7 +30,7 @@ export default class Favorite extends StacActionPlugin {
   }
 
   get icon() {
-    return this.isFavorite ? BIconStarFill : BIconStar;
+    return this.isFavorite ? MdiStar : MdiStarOutline;
   }
 
   get text() {

@@ -7,16 +7,16 @@
 
 <script>
 import { useClipboard } from '@vueuse/core';
-import BIconClipboard from '~icons/bi/clipboard';
-import BIconClipboardCheck from '~icons/bi/clipboard-check';
-import BIconClipboardX from '~icons/bi/clipboard-x';
+import MdiClipboard from '~icons/mdi/clipboard-outline';
+import MdiClipboardCheck from '~icons/mdi/clipboard-check-outline';
+import MdiClipboardRemove from '~icons/mdi/clipboard-remove-outline';
 
 export default {
   name: "CopyButton",
   components: {
-    BIconClipboard,
-    BIconClipboardCheck,
-    BIconClipboardX
+    MdiClipboard,
+    MdiClipboardCheck,
+    MdiClipboardRemove
   },
   props: {
     copyText: {
@@ -81,15 +81,15 @@ export default {
     },
     copyIcon() {
       if (!this.isClipboardSupported) {
-        return BIconClipboardX;
+        return MdiClipboardRemove;
       }
       if (this.status === true) {
-        return BIconClipboardCheck;
+        return MdiClipboardCheck;
       }
       else if (this.status === false) {
-        return BIconClipboardX;
+        return MdiClipboardRemove;
       }
-      return BIconClipboard;
+      return MdiClipboard;
     },
     buttonTitle() {
       if (!this.isClipboardSupported) {

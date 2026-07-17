@@ -1,7 +1,7 @@
 <template>
   <div class="ol-location ol-unselectable ol-control">
     <button @click.prevent.stop="request" :title="$t('mapping.location.description')">
-      <b-icon-pin-map-fill />
+      <mdi-map-marker />
     </button>
   </div>
 </template>

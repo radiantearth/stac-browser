@@ -9,14 +9,14 @@
     <template #title>
       <span class="start">
         <span class="chevron" aria-hidden="true">
-          <b-icon-chevron-down v-if="expanded" />
-          <b-icon-chevron-right v-else />
+          <mdi-chevron-up v-if="expanded" />
+          <mdi-chevron-down v-else />
         </span>
         <span class="title" :title="title">{{ title }}</span>
       </span>
       <div class="badges ms-1">
         <b-badge v-if="shown" variant="success" class="shown" :title="$t('assets.currentlyShown')">
-          <b-icon-check /> {{ $t('assets.shown') }}
+          <mdi-check /> {{ $t('assets.shown') }}
         </b-badge>
         <b-badge v-if="asset.deprecated" variant="warning" class="deprecated">{{ $t('deprecated') }}</b-badge>
         <template v-if="Array.isArray(asset.roles)">

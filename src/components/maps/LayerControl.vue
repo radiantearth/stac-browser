@@ -1,6 +1,6 @@
 <template>
   <div class="ol-layercontrol ol-unselectable ol-control">
-    <button v-if="id" :id="id"><b-icon-layers-fill /></button>
+    <button v-if="id" :id="id"><mdi-layers-outline /></button>
     <b-popover
       v-if="id" click placement="top" @show="update"
       :target="id" teleport-to="#stac-browser" :boundary-padding="10"
