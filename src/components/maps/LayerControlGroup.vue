@@ -6,7 +6,7 @@
           <span class="title">{{ l.title }}</span>
         </b-form-checkbox>
         <b-button variant="primary" size="sm" :title="$t('mapping.fit')" @click.prevent.stop="fitToExtent(l)">
-          <b-icon-zoom-in />
+          <mdi-magnify-plus-outline />
         </b-button>
       </div>
       <LayerControlGroup v-if="l.group > 1" :map="map" :group="l.layer" :maxZoom="maxZoom" />

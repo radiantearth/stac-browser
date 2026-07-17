@@ -1,8 +1,8 @@
 <template>
   <div class="valid">
     <b-spinner v-if="working" :label="$t('source.validating')" small />
-    <b-button v-else-if="valid === true" variant="success" :size="size" :to="validationLink"><b-icon-check /> {{ $t('checkbox.true') }}</b-button>
-    <b-button v-else-if="valid === false" variant="danger" :size="size" :to="validationLink"><b-icon-x /> {{ $t('checkbox.false') }}</b-button>
+    <b-button v-else-if="valid === true" variant="success" :size="size" :to="validationLink"><mdi-check-circle-outline /> {{ $t('checkbox.true') }}</b-button>
+    <b-button v-else-if="valid === false" variant="danger" :size="size" :to="validationLink"><mdi-close-octagon-outline /> {{ $t('checkbox.false') }}</b-button>
     <template v-else>{{ $t('source.validationNA') }}</template>
   </div>
 </template>

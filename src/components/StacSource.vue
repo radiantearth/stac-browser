@@ -6,44 +6,44 @@
         v-if="canManage" size="sm" variant="outline-primary" tabindex="0"
       >
         <template #button-content>
-          <b-icon-gear-fill /><span class="button-label">{{ $t('source.manage') }}</span>
+          <mdi-cog /><span class="button-label">{{ $t('source.manage') }}</span>
         </template>
         <b-dropdown-item v-if="canAddCollections" :to="browserPaths.addCollection">
-          <b-icon-folder-plus /> {{ $t('manage.addCollection') }}
+          <mdi-folder-plus-outline /> {{ $t('manage.addCollection') }}
         </b-dropdown-item>
         <b-dropdown-item v-if="canAddItems" :to="browserPaths.addItem">
-          <b-icon-file-plus /> {{ $t('manage.addItem') }}
+          <mdi-file-plus-outline /> {{ $t('manage.addItem') }}
         </b-dropdown-item>
         <b-dropdown-item
           v-if="externalCreateLink" :href="externalCreateLink.getAbsoluteUrl()"
           target="_blank" rel="noopener noreferrer"
         >
-          <b-icon-file-plus /> {{ externalCreateLink.title || $t('manage.create') }}
+          <mdi-file-plus-outline /> {{ externalCreateLink.title || $t('manage.create') }}
         </b-dropdown-item>
         <b-dropdown-item v-if="canEdit" :to="browserPaths.edit">
-          <b-icon-pencil /> {{ $t('manage.edit') }}
+          <mdi-pencil-outline /> {{ $t('manage.edit') }}
         </b-dropdown-item>
         <b-dropdown-item
           v-if="externalEditLink" :href="externalEditLink.getAbsoluteUrl()"
           target="_blank" rel="noopener noreferrer"
         >
-          <b-icon-pencil /> {{ externalEditLink.title || $t('manage.edit') }}
+          <mdi-pencil-outline /> {{ externalEditLink.title || $t('manage.edit') }}
         </b-dropdown-item>
         <b-dropdown-item v-if="canDelete" @click="confirmDelete = true">
-          <b-icon-trash /> {{ $t('manage.delete') }}
+          <mdi-delete-outline /> {{ $t('manage.delete') }}
         </b-dropdown-item>
       </b-dropdown>
       <b-button
         v-if="url" size="sm" variant="outline-primary" id="popover-link-btn"
         :title="$t('source.detailsAboutSource')" tag="a" tabindex="0"
       >
-        <b-icon-info-lg /><span class="button-label">{{ $t('source.label') }}</span>
+        <mdi-information-outline /><span class="button-label">{{ $t('source.label') }}</span>
       </b-button>
       <b-button
         size="sm" variant="outline-primary" id="popover-share-btn"
         :title="$t('source.share.withOthers')" tag="a" tabindex="0"
       >
-        <b-icon-share /><span class="button-label">{{ $t('source.share.title') }}</span>
+        <mdi-share-variant-outline /><span class="button-label">{{ $t('source.share.title') }}</span>
       </b-button>
     </b-button-group>
 

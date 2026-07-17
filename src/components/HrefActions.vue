@@ -2,19 +2,19 @@
   <div>
     <b-button-group class="actions" :vertical="vertical" :size="size" v-if="href">
       <b-button variant="danger" v-if="requiresAuth" tag="a" tabindex="0" :id="`popover-href-${id}-btn`" @click="handleAuthButton">
-        <b-icon-lock /> {{ $t('authentication.required') }}
+        <mdi-lock-outline /> {{ $t('authentication.required') }}
       </b-button>
       <b-button v-if="canDownload && !requiresAuth" variant="primary" v-bind="downloadProps" v-on="downloadEvents">
         <b-spinner v-if="loading" small />
-        <b-icon-box-arrow-up-right v-else-if="browserCanOpenFile" />
-        <b-icon-download v-else />
+        <mdi-open-in-new v-else-if="browserCanOpenFile" />
+        <mdi-download v-else />
         {{ buttonText }}
       </b-button>
       <CopyButton variant="primary" :copyText="href" :title="href">
         {{ copyButtonText }}
       </CopyButton>
       <b-button v-if="hasShowButton && !requiresAuth" @click="show" variant="primary">
-        <b-icon-eye class="me-1" />
+        <mdi-eye-outline class="me-1" />
         <template v-if="isThumbnail">{{ $t('assets.showThumbnail') }}</template>
         <template v-else>{{ $t('assets.showOnMap') }}</template>
       </b-button>

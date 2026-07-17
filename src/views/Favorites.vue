@@ -5,11 +5,11 @@
       <div class="mt-2">
         <b-button-group size="sm">
           <b-button variant="warning" :title="$t('favorites.importDescription')" @click="openImportDialog">
-            <b-icon-box-arrow-in-down /> {{ $t('favorites.import') }}
+            <mdi-tray-arrow-down /> {{ $t('favorites.import') }}
           </b-button>
           <b-dropdown size="sm" variant="warning" :title="$t('favorites.exportDescription')" :disabled="favorites.length === 0">
             <template #button-content>
-              <b-icon-box-arrow-up /> {{ $t('favorites.export') }}
+              <mdi-tray-arrow-up /> {{ $t('favorites.export') }}
             </template>
             <b-dropdown-item v-for="format in ['json', 'csv', 'excel', 'stac']" :key="format" @click="exportFavorites(format)">
               {{ $t(`favorites.exportFormats.${format}`) }}
@@ -29,7 +29,7 @@
         <Catalogs :catalogs="catalogs" enforceView="cards">
           <template #footer="{source}">
             <b-button size="sm" variant="outline-danger" :title="$t('favorites.remove')" @click="remove(source)">
-              <b-icon-star-fill /> {{ $t('favorites.remove') }}
+              <mdi-star /> {{ $t('favorites.remove') }}
             </b-button>
           </template>
         </Catalogs>
@@ -38,7 +38,7 @@
         <Items v-if="items.length > 0" :items="items" enforceView="cards">
           <template #footer="{source}">
             <b-button size="sm" variant="outline-danger" :title="$t('favorites.remove')" @click="remove(source)">
-              <b-icon-star-fill /> {{ $t('favorites.remove') }}
+              <mdi-star /> {{ $t('favorites.remove') }}
             </b-button>
           </template>
         </Items>
