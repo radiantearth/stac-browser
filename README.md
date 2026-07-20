@@ -40,7 +40,7 @@ If you care about STAC Browser and have some funds to support the future of STAC
 
 ## Examples
 
-A demo instance is running at <https://radiantearth.github.io/stac-browser/>.
+A demo instance is running at <https://stac-browser.moregeo.it>.
 
 The catalog section of [STAC Index](https://stacindex.org) is also built on top of STAC Browser (currently v2).
 
