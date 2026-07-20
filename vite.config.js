@@ -185,6 +185,11 @@ export default defineConfig(async ({ mode }) => {
         }),
     ],
     resolve: {
+      // Ensure a single instance of OpenLayers (and stac-js) is used even when
+      // ol-stac is symlinked (npm link) during development. Otherwise ol-stac
+      // resolves its own copy of `ol`, and adding its LayerGroup to the app's
+      // Map breaks OpenLayers' internal map wiring (the layer never gets a map).
+      dedupe: ["ol", "stac-js"],
       alias: {
         "@": fileURLToPath(new URL("./src", import.meta.url)),
         "@stac-browser-external-config": externalConfigPath,
