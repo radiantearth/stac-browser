@@ -418,6 +418,8 @@
   "stacCollection": "Collezione | Collezioni",
   "stacItem": "Elemento | Elementi",
   "submit": "Invia",
+  "switchToDarkMode": "Passa alla modalità scura",
+  "switchToLightMode": "Passa alla modalità chiara",
   "table": {
     "emptyFilteredText": "Non ci sono record corrispondenti alla tua richiesta",
     "emptyText": "Non ci sono record da mostrare",

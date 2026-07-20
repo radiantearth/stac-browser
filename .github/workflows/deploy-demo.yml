@@ -7,7 +7,6 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
-      SB_pathPrefix: "/stac-browser"
       SB_historyMode: "hash"
     steps:
       - uses: actions/setup-node@v6
