@@ -18,8 +18,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Options set at runtime (via `runtime-config.js`) are no longer overwritten with build-time defaults
+  for options with non-null primitive defaults (e.g. `detectLocaleFromBrowser`, `cardViewMode`)
+- Dark-mode basemap variants (e.g. `earth-dark`) are now found when `ssys:targets` uses different casing (e.g. `Earth`)
 - Array-typed options provided via `SB_*` environment variables are handled consistently at build time and in the Docker container:
-  both accept a JSON-encoded array or a comma-separated list of strings; whitespace around the values is trimmed
+  both accept a JSON-encoded array or a comma-separated list of strings; whitespace around the values is trimmed.
+  An empty value results in an empty array.
 - Docker:
   - The `SB_CONFIG` and `SB_RUNTIME` environment variables no longer leak into the generated `runtime-config.js`
   - Fixed the environment variable detection in the entrypoint script (`cut` ran before the NUL separators were converted to newlines)

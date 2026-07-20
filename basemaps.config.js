@@ -83,6 +83,7 @@ export default function configureBasemap(stac, i18n, store) {
   if (!targets) {
     targets = ['earth'];
   }
+  targets = targets.map(t => String(t).toLowerCase());
 
   if (store.state.colorMode === 'dark') {
     targets = targets.map(t => {
@@ -93,7 +94,7 @@ export default function configureBasemap(stac, i18n, store) {
 
   let layers = [];
   for (const target of targets) {
-    const maps = basemaps[target.toLowerCase()];
+    const maps = basemaps[target];
     if (!Array.isArray(maps)) {
       continue;
     }
