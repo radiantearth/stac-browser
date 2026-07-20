@@ -95,6 +95,7 @@ import GeoJSON from 'ol/format/GeoJSON';
 import Fill from 'ol/style/Fill';
 import VectorLayer from 'ol/layer/Vector';
 import { toGeoJSON } from 'stac-js/src/geo.js';
+import { toOlExtent } from 'ol-stac/util.js';
 import mask from '@turf/mask';
 
 function getBoxDefaults() {
@@ -129,7 +130,6 @@ export default {
   emits: ['update:modelValue'],
   data() {
     return {
-      crs: 'EPSG:4326',
       extent: this.modelValue,
       dragging: false,
       validationErrors: getBoxDefaults(),
@@ -221,7 +221,9 @@ export default {
         return;
       }
 
-      const geojson = stac.toGeoJSON();
+      // Use non-great-circle GeoJSON output to avoid antimeridian wrap issues,
+      // ensuring the mask covers the correct areas.
+      const geojson = stac.toGeoJSON({ greatCircle: false });
       if (!geojson) {
         return;
       }
@@ -258,7 +260,7 @@ export default {
     },
     update(event) {
       if (event.extent) {
-        this.extent = transformExtent(event.extent, this.map.getView().getProjection(), this.crs);
+        this.extent = transformExtent(event.extent, this.map.getView().getProjection(), 'EPSG:4326');
         const extent = [
           this.fixX(this.extent[0]),
           this.fixY(this.extent[1]),
@@ -383,13 +385,9 @@ export default {
       if (!Array.isArray(extent) || extent.length !== 4) {
         return null;
       }
-      const mapExtent = [...extent];
-      // For antimeridian-crossing bboxes (westLon > eastLon), shift eastLon
-      // by +360 so OpenLayers gets a valid extent where minX < maxX.
-      if (mapExtent[0] > mapExtent[2]) {
-        mapExtent[2] += 360;
-      }
-      return transformExtent(mapExtent, this.crs, this.map.getView().getProjection());
+      // Handles antimeridian-crossing bboxes (westLon > eastLon), shifting
+      // eastLon by +360 so OpenLayers gets a valid extent where minX < maxX.
+      return toOlExtent(extent, this.map.getView().getProjection());
     }
   }
 };
