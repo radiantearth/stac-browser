@@ -99,23 +99,37 @@ export async function waitForMapReady(page) {
 }
 
 /**
-* Read the OpenLayers view state (zoom + center in lon/lat) of the STAC Browser
-* map. Reaches into the MapView Vue component to obtain the underlying OL map,
-* as the view state isn't otherwise exposed to the DOM. Assumes the map uses
-* Web Mercator (EPSG:3857), which is the STAC Browser default.
+* Read the STAC Browser map state: the OpenLayers view (zoom + center in lon/lat)
+* and the rendered footprint geometry. The OL map isn't exposed to the DOM, so we
+* locate it via the MapView component instance, walking up from the map element
+* through Vue's `__vueParentComponent`. This works in dev builds and in the e2e
+* production build (which enables `__VUE_PROD_DEVTOOLS__` via STAC_BROWSER_E2E);
+* real production builds are unaffected, so no test hook is needed in the
+* application code. Assumes the map uses Web Mercator (EPSG:3857), the STAC
+* Browser default. `lon`/`lat` are `null` when the view has no center yet.
 *
 * @param {import('@playwright/test').Page} page
-* @returns {Promise<{zoom: number, lon: number, lat: number}|null>} view state, or null if no map found
+* @returns {Promise<{zoom: number, lon: number|null, lat: number|null, footprintType: string|null, footprintPolygons: number}|null>} map state, or null if no map found
 */
-export function getMapViewState(page) {
+export function getMapState(page) {
   return page.evaluate(() => {
+    // Locate the OpenLayers map via the MapView component instance, walking up
+    // from the map element through Vue's `__vueParentComponent`. This is available
+    // in dev builds and in the e2e production build (which sets
+    // __VUE_PROD_DEVTOOLS__ via STAC_BROWSER_E2E); real production builds are
+    // unaffected, so no test hook is needed in the application code.
     let el = document.querySelector('.map-container .map') || document.querySelector('.map');
     let map = null;
     while (el) {
-      const comp = el.__vueParentComponent;
-      const inst = comp?.ctx ?? comp?.proxy;
-      if (inst?.map && typeof inst.map.getView === 'function') {
-        map = inst.map;
+      const inst = el.__vueParentComponent;
+      let candidate;
+      try {
+        candidate = inst?.proxy?.map ?? inst?.ctx?.map;
+      } catch {
+        candidate = null;
+      }
+      if (candidate && typeof candidate.getView === 'function') {
+        map = candidate;
         break;
       }
       el = el.parentElement;
@@ -123,17 +137,33 @@ export function getMapViewState(page) {
     if (!map) {
       return null;
     }
+
     const view = map.getView();
     const center = view.getCenter();
     const zoom = view.getZoom();
-    if (!center) {
-      return { zoom, lon: null, lat: null };
+
+    // Rendered footprint: ol-stac splits an antimeridian-crossing footprint into a
+    // MultiPolygon, so report the number of polygons.
+    const bounds = map.getAllLayers().find(l => l.get && l.get('bounds'));
+    const features = (bounds?.getSource?.().getFeatures?.()) ?? [];
+    const geom = features[0]?.getGeometry?.();
+    const footprintType = geom?.getType?.() ?? null;
+    let footprintPolygons = 0;
+    if (footprintType === 'MultiPolygon') {
+      footprintPolygons = geom.getPolygons().length;
+    } else if (footprintType === 'Polygon') {
+      footprintPolygons = 1;
     }
-    // Inverse spherical Mercator (EPSG:3857 -> EPSG:4326).
-    const R = 20037508.342789244;
-    const lon = (center[0] / R) * 180;
-    const lat = (180 / Math.PI) * (2 * Math.atan(Math.exp((center[1] / R) * Math.PI)) - Math.PI / 2);
-    return { zoom, lon, lat };
+
+    let lon = null;
+    let lat = null;
+    if (center) {
+      // Inverse spherical Mercator (EPSG:3857 -> EPSG:4326).
+      const R = 20037508.342789244;
+      lon = (center[0] / R) * 180;
+      lat = (180 / Math.PI) * (2 * Math.atan(Math.exp((center[1] / R) * Math.PI)) - Math.PI / 2);
+    }
+    return { zoom, lon, lat, footprintType, footprintPolygons };
   });
 }
 

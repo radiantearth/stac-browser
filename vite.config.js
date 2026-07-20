@@ -104,6 +104,10 @@ export default defineConfig(async ({ mode }) => {
       // JSON.stringify removes e.g. functions from the config,
       // but from env we do not accept functions anyway.
       CONFIG_FROM_ENV: JSON.stringify(env),
+      // Expose Vue component internals in the e2e build so end-to-end tests can
+      // reach the OpenLayers map (see tests/e2e/helpers.js). Only enabled when the
+      // e2e web server sets STAC_BROWSER_E2E; real production builds are unaffected.
+      __VUE_PROD_DEVTOOLS__: process.env.STAC_BROWSER_E2E === "true",
     },
     // See https://github.com/vitejs/vite/discussions/14801#discussioncomment-15550931 for details
     optimizeDeps: {

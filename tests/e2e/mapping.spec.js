@@ -6,7 +6,7 @@
  * to a world view. See https://github.com/radiantearth/stac-browser/issues/736
  */
 import { test, expect } from './fixtures.js';
-import { waitForBrowserReady, waitForMapReady, getMapViewState } from './helpers.js';
+import { waitForBrowserReady, waitForMapReady, getMapState } from './helpers.js';
 import StaticCatalog from '../fixtures/instances/static.js';
 
 /**
@@ -48,10 +48,10 @@ test.describe('Antimeridian-crossing item', () => {
     // The map fits to the item extent instead of staying at the world view.
     // Poll because the fit happens asynchronously once the layer is ready.
     await expect
-      .poll(async () => (await getMapViewState(page))?.zoom ?? 0, { timeout: 15000 })
+      .poll(async () => (await getMapState(page))?.zoom ?? 0, { timeout: 15000 })
       .toBeGreaterThan(4);
 
-    const view = await getMapViewState(page);
+    const view = await getMapState(page);
 
     // Zoomed to the antimeridian: center longitude is near ±180°, not ~0° (world view).
     expect(Math.abs(view.lon), `center longitude ${view.lon} should be near the antimeridian`)
@@ -72,23 +72,7 @@ test.describe('Antimeridian-crossing item', () => {
     // ol-stac splits an antimeridian-crossing footprint into a MultiPolygon so it
     // renders on both sides of 180°. Verify the rendered footprint has two parts.
     await expect
-      .poll(() => page.evaluate(() => {
-        let el = document.querySelector('.map-container .map') || document.querySelector('.map');
-        let sl = null;
-        while (el) {
-          const inst = el.__vueParentComponent?.ctx ?? el.__vueParentComponent?.proxy;
-          if (inst?.stacLayer) {
-            sl = inst.stacLayer;
-            break;
-          }
-          el = el.parentElement;
-        }
-        const bounds = sl?.getLayers?.().getArray?.().find(l => l.get && l.get('bounds'));
-        const features = bounds?.getSource?.().getFeatures?.() ?? [];
-        const geom = features[0]?.getGeometry?.();
-        // MultiPolygon => two polygons after the antimeridian split.
-        return geom?.getType?.() === 'MultiPolygon' ? geom.getPolygons().length : 0;
-      }), { timeout: 15000 })
+      .poll(async () => (await getMapState(page))?.footprintPolygons ?? 0, { timeout: 15000 })
       .toBeGreaterThanOrEqual(2);
   });
 });
