@@ -99,6 +99,45 @@ export async function waitForMapReady(page) {
 }
 
 /**
+* Read the OpenLayers view state (zoom + center in lon/lat) of the STAC Browser
+* map. Reaches into the MapView Vue component to obtain the underlying OL map,
+* as the view state isn't otherwise exposed to the DOM. Assumes the map uses
+* Web Mercator (EPSG:3857), which is the STAC Browser default.
+*
+* @param {import('@playwright/test').Page} page
+* @returns {Promise<{zoom: number, lon: number, lat: number}|null>} view state, or null if no map found
+*/
+export function getMapViewState(page) {
+  return page.evaluate(() => {
+    let el = document.querySelector('.map-container .map') || document.querySelector('.map');
+    let map = null;
+    while (el) {
+      const comp = el.__vueParentComponent;
+      const inst = comp?.ctx ?? comp?.proxy;
+      if (inst?.map && typeof inst.map.getView === 'function') {
+        map = inst.map;
+        break;
+      }
+      el = el.parentElement;
+    }
+    if (!map) {
+      return null;
+    }
+    const view = map.getView();
+    const center = view.getCenter();
+    const zoom = view.getZoom();
+    if (!center) {
+      return { zoom, lon: null, lat: null };
+    }
+    // Inverse spherical Mercator (EPSG:3857 -> EPSG:4326).
+    const R = 20037508.342789244;
+    const lon = (center[0] / R) * 180;
+    const lat = (180 / Math.PI) * (2 * Math.atan(Math.exp((center[1] / R) * Math.PI)) - Math.PI / 2);
+    return { zoom, lon, lat };
+  });
+}
+
+/**
 * Wait until the bounding-box coordinate inputs have been auto-populated
 * (i.e. all four fields are non-empty).
 * 
