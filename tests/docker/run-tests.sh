@@ -14,7 +14,7 @@ source "$SCRIPT_DIR/common.sh"
 container_id=""
 cleanup() {
   if [[ -n "$container_id" ]]; then
-    docker rm --force "$container_id" > /dev/null
+    docker rm --force "$container_id" > /dev/null 2>&1 || true
   fi
 }
 trap cleanup EXIT
