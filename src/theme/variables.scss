@@ -61,8 +61,13 @@ $h4-font-size: 1.2rem;
 // Page header
 $header-font-size: 1.5rem;
 $header-font-weight: 600;
-$header-border-width: 3px;
-$header-border-style: solid;
+$header-position: sticky; // sticky or static
+$header-background: linear-gradient(to bottom, 
+  color-mix(in srgb, var(--bs-primary) 85%, #fff), 
+  var(--bs-primary), 
+  color-mix(in srgb, var(--bs-primary) 85%, #000)
+);
+$header-z-index: 1020;
 
 // Link decoration (non-color)
 $link-decoration: none;
@@ -98,7 +103,7 @@ $headings-color: inherit; // h3, h4, h5, h6
 $link-color: #188191;
 $link-hover-color: darken($link-color, 20%);
 
-$link-color-on-primary: tint-color($primary, 60%);
+$link-color-on-primary: tint-color($primary, 80%);
 $link-hover-color-on-primary: $body-bg;
 
 @import 'bootstrap/scss/_variables';

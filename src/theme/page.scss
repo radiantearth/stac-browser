@@ -32,7 +32,10 @@ svg {
   display: flex;
   flex-direction: column;
   max-width: 100%;
-  height: 100%;
+  // Only min-height, not height: a fixed height: 100% would cap this element's
+  // box at the viewport height, which in turn caps the sticky header's
+  // containing block and makes it scroll away past the first viewport. With
+  // min-height the container grows with its content and the header stays pinned.
   min-height: 100%;
   gap: var(--sb-block-gap);
 
@@ -41,9 +44,27 @@ svg {
   }
 
   > header {
+    position: $header-position;
+    margin-inline: calc(var(--bs-gutter-x, 1.5rem) * -0.5);
+    padding-inline: calc(var(--bs-gutter-x, 1.5rem) * 0.5);
+
+    @if $header-position == sticky {
+      top: var(--sb-header-margin);
+      z-index: $header-z-index;
+      box-shadow: none;
+      transition: box-shadow 0.2s ease-in-out;
+      background-color: var(--bs-body-bg);
+      border-bottom: 1px solid transparent;
+
+      &.scrolled {
+        border-bottom-color: var(--bs-border-color);
+        box-shadow: var(--bs-box-shadow-inset), 0 0.125rem 0.25rem rgba(0, 0, 0, 0.15);
+      }
+    }
+
     .site {
-      border-bottom: var(--sb-header-border);
-      
+      background: $header-background;
+
       @include media-breakpoint-up(lg) {
         .actions {
           min-width: 300px;
@@ -59,6 +80,16 @@ svg {
           display: flex;
           align-items: center;
           gap: var(--sb-header-font-size);
+          color: $link-color-on-primary;
+          text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+
+          a {
+            color: $link-color-on-primary;
+
+            &:hover {
+              color: $link-hover-color-on-primary;
+            }
+          }
           
           .header-title {
             display: flex;
@@ -239,7 +270,7 @@ svg {
 
   .service {
     &.bsky {
-      @include button-variant(#1185fe, #1185fe);
+      @include button-variant(#01A5FF, #01A5FF);
     }
     &.mastodon {
       @include button-variant(#6364ff, #6364ff);
@@ -342,7 +373,7 @@ svg {
     align-items: center;
     gap: 0.25rem;
     padding: 0.5rem;
-    background-color: rgba(0, 0, 0, 0.03);
+    background-color: rgba($body-color, 0.03);
     overflow: hidden;
 
     &::after {
@@ -600,7 +631,6 @@ svg {
   .multiselect__tags:focus-within {
     border-color: #{$input-focus-border-color};
     outline: 0;
-    // Matches Bootstrap's input focus ring, adapts to dark mode --bs-primary-rgb override
     box-shadow: var(--bs-box-shadow-inset), 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
   }
 
@@ -680,7 +710,7 @@ svg {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba($body-color, 0.5);
   margin: auto;
   display: flex;
   justify-content: center;
@@ -700,13 +730,17 @@ svg {
     }
 
     > .card {
-      background-color: $body-bg;
-
-      [data-bs-theme="dark"] & {
-        background-color: $body-bg-dark;
-      }
+      background-color: var(--bs-body-bg);
     }
   }
+}
+
+.btn-light {
+  --bs-btn-border-color: #{shade-color($light, 20%)};
+}
+
+.btn-dark, .badge-dark {
+  --bs-btn-border-color: #{shade-color($dark, 20%)};
 }
 
 [data-bs-theme="dark"] {
@@ -722,7 +756,7 @@ svg {
   .btn-light {
     --bs-btn-color: #{$white};
     --bs-btn-bg: #{$dark};
-    --bs-btn-border-color: #{$dark};
+    --bs-btn-border-color: #{shade-color($dark, 20%)};
     --bs-btn-hover-color: #{$white};
     --bs-btn-hover-bg: #{shade-color($dark, 15%)};
     --bs-btn-hover-border-color: #{shade-color($dark, 20%)};
@@ -737,7 +771,7 @@ svg {
   .btn-dark, .badge-dark {
     --bs-btn-color: #{$dark};
     --bs-btn-bg: #{$light};
-    --bs-btn-border-color: #{$light};
+    --bs-btn-border-color: #{shade-color($light, 15%)};
     --bs-btn-hover-color: #{$dark};
     --bs-btn-hover-bg: #{shade-color($light, 15%)};
     --bs-btn-hover-border-color: #{shade-color($light, 20%)};
@@ -773,9 +807,6 @@ svg {
   // Colors (light mode; dark mode overrides below)
   --sb-h1-color: #{$h1-color};
   --sb-subheadings-color: #{$subheadings-color};
-
-  // Header border (color part stays live via var(--bs-primary))
-  --sb-header-border: #{$header-border-width} #{$header-border-style} var(--bs-primary);
 }
 
 [data-bs-theme="dark"] {

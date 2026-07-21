@@ -6,18 +6,18 @@
     <ErrorAlert v-if="globalError" dismissible class="global-error" v-bind="globalError" @close="hideError" />
     <Sidebar v-if="sidebar !== null" v-model="sidebar" />
     <!-- Header -->
-    <header>
+    <header :class="{ scrolled }">
       <b-row class="site">
         <b-col md="12">
           <nav class="actions navigation">
             <b-button-group v-if="canSearch || !isServerSelector">
-              <b-button v-if="!isServerSelector" variant="primary" :title="$t('browse')" @click="sidebar = !sidebar">
+              <b-button v-if="!isServerSelector" variant="light" :title="$t('browse')" @click="sidebar = !sidebar">
                 <b-icon-list /><span class="button-label">{{ $t('browse') }}</span>
               </b-button>
-              <b-button v-if="canSearch" variant="primary" :to="searchBrowserLink" :title="$t('search.title')" :pressed="isSearchPage">
+              <b-button v-if="canSearch" variant="light" :to="searchBrowserLink" :title="$t('search.title')" :pressed="isSearchPage">
                 <b-icon-search /><span class="button-label">{{ $t('search.title') }}</span>
               </b-button>
-              <b-button v-if="root" variant="primary" id="popover-root-btn" tabindex="0">
+              <b-button v-if="root" variant="light" id="popover-root-btn" tabindex="0">
                 <b-icon-database /><span class="button-label">{{ serviceType }}</span>
               </b-button>
             </b-button-group>
@@ -30,7 +30,7 @@
           </div>
           <nav class="actions user">
             <b-button-group>
-              <b-button v-if="canAuthenticate" variant="primary" @click="logInOut" :title="authTitle">
+              <b-button v-if="canAuthenticate" variant="light" @click="logInOut" :title="authTitle">
                 <component :is="authIcon" /><span class="button-label">{{ authLabel }}</span>
               </b-button>
               <LanguageChooser
@@ -40,7 +40,7 @@
               />
               <b-button
                 v-if="!enforcedColorModeFromVueX || enforcedColorModeFromVueX === 'auto'"
-                variant="primary"
+                variant="light"
                 @click="toggleColorMode"
               >
                 <b-icon-sun v-if="colorMode === 'light'" :title="$t('switchToDarkMode')" />
@@ -170,7 +170,9 @@ export default defineComponent({
       sidebar: null,
       error: null,
       onDataLoaded: null,
-      isNavigatingLocale: false
+      isNavigatingLocale: false,
+      scrolled: false,
+      scrollListener: null
     };
   },
   computed: {
@@ -436,6 +438,19 @@ export default defineComponent({
         evt.preventDefault();
       }
     });
+
+    // Add scroll listener to show header shadow only when scrolled (and header is sticky)
+    this.scrollListener = () => {
+      const header = this.$el.querySelector('header');
+      const isSticky = header && window.getComputedStyle(header).position === 'sticky';
+      this.scrolled = isSticky && window.scrollY > 0;
+    };
+    window.addEventListener('scroll', this.scrollListener, { passive: true });
+  },
+  beforeUnmount() {
+    if (this.scrollListener) {
+      window.removeEventListener('scroll', this.scrollListener);
+    }
   },
   methods: {
     ...mapActions(['switchLocale', 'switchDataLocale']),
