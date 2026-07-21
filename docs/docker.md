@@ -31,7 +31,7 @@ STAC Browser is now available at `http://localhost:8080`
 You can pass further options to STAC Browser to customize it to your needs.
 
 The build-only options
-[`runtimeConfig`](./options.md#runtimeconfig), [`historyMode`](./options.md#historymode),
+[`historyMode`](./options.md#historymode)
 and `SB_CONFIG` (for loading an [external config file](./options.md))
 can be provided as a
 [build argument](https://docs.docker.com/engine/reference/commandline/build#set-build-time-variables---build-arg)
@@ -60,7 +60,7 @@ For example, to run the container with a pre-defined
 docker run -p 8080:8080 -e SB_catalogUrl="https://earth-search.aws.element84.com/v1/" -e SB_catalogTitle="Earth Search" stac-browser:v1
 ```
 
-[`pathPrefix`](./options.md#pathprefix) can also be set at container startup via `SB_pathPrefix` (no rebuild required when [`runtimeConfig`](./options.md#runtimeconfig) is enabled, as in the Docker image):
+[`pathPrefix`](./options.md#pathprefix) can also be set at container startup via `SB_pathPrefix` (when `DYNAMIC_CONFIG` is enabled, the default):
 
 ```bash
 docker run -p 8080:8080 -e SB_pathPrefix="/browser/" -e SB_catalogUrl="https://earth-search.aws.element84.com/v1/" stac-browser:v1
@@ -68,7 +68,7 @@ docker run -p 8080:8080 -e SB_pathPrefix="/browser/" -e SB_catalogUrl="https://e
 
 If you want to pass all the other arguments to `npm run build` directly, you can modify to the Dockerfile as needed.
 
-STAC Browser is then available at `http://localhost:8080/browser/`.
+STAC Browser is now available at `http://localhost:8080/browser/`.
 Requests to `http://localhost:8080/browser` (no trailing slash) are redirected there.
 
 ## Use an existing image
@@ -89,13 +89,13 @@ services:
 
 The docker image uses a multi stage build.
 The first stage is based on a node image and runs `npm build` to produce a `/dist` folder with static files (HTML, CSS, and JavaScript).
-The second stage is based on an nginx image that serves the folder with static files. At startup, the entrypoint renders the nginx path prefix from `SB_pathPrefix` and generates `runtime-config.js` from `SB_*` environment variables.
+The second stage is based on an nginx image that serves the folder with static files. At startup, the entrypoint applies `SB_pathPrefix` to nginx and generates `runtime-config.js`.
 So, essentially, in the end you get an nginx instance that serves static files.
 
 ## Essential parts
 
 1. [Dockerfile](../Dockerfile) - contains information on how to build the image.
-2. [docker/default.conf](../docker/default.conf) - nginx configuration template. `${STAC_PATH_PREFIX}` and a bare-prefix redirect are substituted at startup when `pathPrefix` is not `/`.
+2. [docker/default.conf](../docker/default.conf) - nginx configuration template; `${STAC_PATH_PREFIX}` is substituted at startup.
 3. [docker/docker-entrypoint.sh](../docker/docker-entrypoint.sh) - a start script to read the passed variables, render the nginx config, and produce the `runtime-config.js` file.
 
 ## FAQ

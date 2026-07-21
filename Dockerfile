@@ -1,8 +1,8 @@
 FROM node:lts-alpine AS build-step
-ARG runtimeConfig=true
+ARG DYNAMIC_CONFIG=true
 ARG historyMode="history"
 ARG SB_CONFIG=""
-ENV SB_runtimeConfig="${runtimeConfig}"
+ENV DYNAMIC_CONFIG="${DYNAMIC_CONFIG}"
 ENV SB_historyMode="${historyMode}"
 ENV SB_CONFIG="${SB_CONFIG}"
 
@@ -10,6 +10,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
+RUN \[ "${DYNAMIC_CONFIG}" == "true" \] && sed -i 's/<!--RC//;s/RC-->//' index.html
 RUN npm run build
 
 
@@ -24,9 +25,7 @@ COPY --from=build-step /app/dist /usr/share/nginx/html
 COPY --from=build-step /app/docker/default.conf /etc/nginx/conf.d/default.conf.template
 ADD docker/docker-entrypoint.sh /docker-entrypoint.d/40-stac-browser-entrypoint.sh
 
-# Remove the base image's default server config so nginx fails loudly if the
-# entrypoint (which renders default.conf.template) is bypassed, instead of
-# silently serving the stock nginx welcome page.
+# Remove default.conf so a skipped entrypoint fails loudly instead of serving nginx's welcome page.
 RUN rm -f /etc/nginx/conf.d/default.conf && \
     chown -R nginx:nginx /usr/share/nginx/html && \
     chmod +x /docker-entrypoint.d/40-stac-browser-entrypoint.sh

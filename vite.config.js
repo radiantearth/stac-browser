@@ -97,13 +97,15 @@ export default defineConfig(async ({ mode }) => {
   const defaultConfig = (await import(pathToFileURL(defaultConfigPath).href)).default ?? {};
   const externalConfig = (await import(pathToFileURL(externalConfigPath).href)).default ?? {};
   const config = Object.assign({}, defaultConfig, externalConfig, env);
-  const runtimeConfig = Boolean(config.runtimeConfig);
-  const configFromEnv = runtimeConfig
-    ? Object.fromEntries(Object.entries(env).filter(([key]) => key !== "pathPrefix"))
+  const dynamicConfig = ["true", "1", "yes"].includes(
+    String(rawEnv.DYNAMIC_CONFIG || "").toLowerCase()
+  );
+  const configFromEnv = dynamicConfig
+    ? Object.fromEntries(Object.entries(env).filter(([k]) => k !== "pathPrefix"))
     : env;
 
   return ({
-    base: runtimeConfig ? "./" : config.pathPrefix,
+    base: dynamicConfig ? "./" : config.pathPrefix,
     build: {
       sourcemap: mode !== "minimal",
       rollupOptions: {

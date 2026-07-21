@@ -83,9 +83,7 @@ export STAC_PREFIX_REDIRECT
 envsubst '$STAC_PATH_PREFIX $STAC_PREFIX_REDIRECT' \
     < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf
 
-# Rewrite the <base> tag so relative asset URLs (Vite `base: "./"`) resolve
-# against the path prefix instead of the current document URL, otherwise deep
-# links (e.g. /browser/collections/x) would try to load assets from the wrong path.
+# Point <base> at the runtime path prefix (Vite builds with base "./").
 if [ -f /usr/share/nginx/html/index.html ]; then
     sed -i "s|<base href=\"[^\"]*\" id=\"stac-browser-base\">|<base href=\"${STAC_PATH_PREFIX}\" id=\"stac-browser-base\">|" \
         /usr/share/nginx/html/index.html

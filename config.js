@@ -41,7 +41,6 @@ export default {
   buildTileUrlTemplate: null,
   getMapSourceOptions: null,
   pathPrefix: "/",
-  runtimeConfig: false,
   historyMode: "history",
   cardViewMode: "cards",
   defaultCollectionSort: "title",

@@ -16,9 +16,8 @@ The following ways to set config options are possible:
   `SB_requestHeaders='{"Authorization":"Bearer …"}'`.
   For convenience, array options that only contain strings may also be given as a comma-separated list, e.g. `SB_supportedLocales=en,de,fr`.
 - Optionally, you can also set options after the build, basically **at "runtime"**.
-  Enable this by setting [`runtimeConfig`](#runtimeconfig) to `true` (`SB_runtimeConfig` when building), which injects a `runtime-config.js` script tag.
-  Then fill `runtime-config.js` with any options you want to customize at deploy or startup — including [`pathPrefix`](#pathprefix).
-  The [Docker image](./docker.md) does this automatically from `SB_*` environment variables.
+  Enable this by removing the `<!--RC` and `RC-->` around the tags that load the `runtime-config.js` (and the `<base>` tag) in the [`index.html`](../index.html).
+  Then run the build procedure and after completion, you can fill the `dist/runtime-config.js` with any options that you want to customize.
 
 > [!TIP]  
 > To enable the usage of a local configuration file, follow these steps:
@@ -55,7 +54,6 @@ The override order for the configuration is:
   - [footerLinks](#footerlinks)
   - [apiCatalogPriority](#apicatalogpriority)
 - [Deployment](#deployment)
-  - [runtimeConfig](#runtimeconfig)
   - [historyMode](#historymode)
     - [`history`](#history)
     - [`hash`](#hash)
@@ -175,14 +173,6 @@ The following options are available:
 
 ## Deployment
 
-### runtimeConfig
-
-***build-only option***
-
-When `true`, the build injects a `runtime-config.js` script tag and uses relative asset URLs so one build supports different deploy settings (notably [`pathPrefix`](#pathprefix)).
-
-Set in [`config.js`](../config.js) or via `SB_runtimeConfig`. The [Docker image](./docker.md) defaults to `true`.
-
 ### historyMode
 
 ***build-only option***
@@ -213,11 +203,12 @@ Known hosts that require hash mode are Amazon S3 and GitHub Pages.
 
 ### pathPrefix
 
-If you don't deploy the STAC Browser instance at the root path of your (sub) domain, then you need to set the path prefix.
+If you don't deploy the STAC Browser instance at the root path of your (sub) domain, then you need to set the path prefix
+when building (or running) STAC Browser.
 
-Either set this option to the respective path (e.g. `/browser/`) in the config file or as environment variable (`SB_pathPrefix`) when building or running.
+Either set this option to the respective path (e.g. `/browser/`) in the config file or as environment variable (`SB_pathPrefix`) when running or building.
 
-When [`runtimeConfig`](#runtimeconfig) is enabled, `pathPrefix` can be set at deploy or startup via `runtime-config.js` or `SB_pathPrefix` instead of at build time. The build uses relative asset URLs plus a `<base>` tag in `index.html` for this, so outside of the [Docker image](./docker.md) (which rewrites it automatically) you also need to update the `href` of the `<base id="stac-browser-base">` tag in `dist/index.html` to match.
+With `DYNAMIC_CONFIG` (default in the [Docker image](./docker.md)), `pathPrefix` can instead be set at startup via `SB_pathPrefix` / `runtime-config.js`. Outside Docker, also set the `href` of `<base id="stac-browser-base">` in `dist/index.html` to match.
 
 This will build STAC Browser in a way that it can be hosted at `https://example.com/browser` for example.
 Using this parameter for the dev server will make STAC Browser available at `http://localhost:8080/browser`.

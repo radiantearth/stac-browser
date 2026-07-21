@@ -83,10 +83,6 @@
     "pathPrefix": {
       "type": ["string"]
     },
-    "runtimeConfig": {
-      "type": ["boolean"],
-      "buildOnly": true
-    },
     "historyMode": {
       "type": ["string"],
       "enum": ["history", "hash"],
