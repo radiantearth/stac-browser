@@ -8,6 +8,16 @@ const PARQUET_MEDIA_TYPES = [
 
 const MAX_ROWS = 10000;
 
+// Feature-count cap for rendering a GeoParquet directly on the map. Beyond
+// this the whole-file download and main-thread decode get expensive; MapLibre
+// handles the rendering itself fine (geojson-vt tiles client-side). Aligned
+// with MAX_ROWS so the table preview and map share one limit.
+export const MAX_MAP_FEATURES = 10000;
+
+// Coordinate reference systems we can put on the map without reprojection.
+// GeoParquet's default (absent `crs`) is OGC:CRS84, i.e. lon/lat like EPSG:4326.
+const MAP_RENDERABLE_CRS = [null, 'EPSG:4326', 'OGC:CRS84'];
+
 const WKB_TYPES = {
   0: 'Unknown',
   1: 'Point',
@@ -114,6 +124,29 @@ export function parseWkbType(buffer) {
   let typeId = view.getUint32(1, littleEndian);
   typeId = typeId % 1000;
   return WKB_TYPES[typeId] || 'Unknown';
+}
+
+export function bboxFromGeoJson(geometry) {
+  if (!geometry || !geometry.coordinates) {return null;}
+  let xmin = Infinity, ymin = Infinity, xmax = -Infinity, ymax = -Infinity;
+  const visit = (coords) => {
+    if (typeof coords[0] === 'number') {
+      const [x, y] = coords;
+      if (x < xmin) {xmin = x;}
+      if (x > xmax) {xmax = x;}
+      if (y < ymin) {ymin = y;}
+      if (y > ymax) {ymax = y;}
+      return;
+    }
+    for (const c of coords) {visit(c);}
+  };
+  try {
+    visit(geometry.coordinates);
+  } catch {
+    return null;
+  }
+  if (xmin === Infinity) {return null;}
+  return [xmin, ymin, xmax, ymax];
 }
 
 export function bboxFromWkb(buffer) {
@@ -237,6 +270,75 @@ export async function loadParquetMetadata(url) {
   };
 }
 
+// GeoJSON round-trips through JSON inside MapLibre, which throws on BigInt
+// (int64 columns). Downcast to Number when safe, else String.
+function sanitizePropertyValue(value) {
+  if (typeof value === 'bigint') {
+    return value >= Number.MIN_SAFE_INTEGER && value <= Number.MAX_SAFE_INTEGER
+      ? Number(value)
+      : value.toString();
+  }
+  return value;
+}
+
+/**
+ * Load a GeoParquet file as a GeoJSON FeatureCollection for map display.
+ *
+ * Relies on hyparquet decoding WKB geometry columns to GeoJSON objects, which
+ * it does for columns marked by the file's GeoParquet `geo` metadata (or a
+ * GEOMETRY/GEOGRAPHY logical type). Returns `{ exceeded: true, totalRows }`
+ * without reading any data when the row count is over `maxFeatures`. Throws
+ * when the file has no geometry column, a CRS the map can't display, raw
+ * (undecoded) geometry bytes, or on fetch/parse errors.
+ */
+export async function loadGeoJsonFromParquet(url, { maxFeatures = MAX_MAP_FEATURES } = {}) {
+  const { file, metadata, totalRows, geometryColumn, crs } = await loadParquetMetadata(url);
+
+  if (!geometryColumn) {
+    throw new Error('Parquet file has no geometry column');
+  }
+  if (!MAP_RENDERABLE_CRS.includes(crs)) {
+    throw new Error(`GeoParquet CRS ${crs} is not supported for map display`);
+  }
+  if (totalRows > maxFeatures) {
+    return { exceeded: true, totalRows };
+  }
+
+  const rows = await new Promise((resolve, reject) => {
+    parquetRead({
+      file,
+      metadata,
+      compressors,
+      rowFormat: 'object',
+      onComplete: resolve,
+    }).catch(reject);
+  });
+
+  const features = [];
+  for (const row of rows) {
+    const geometry = row[geometryColumn];
+    if (geometry === null || geometry === undefined) {continue;}
+    if (geometry instanceof Uint8Array || geometry instanceof ArrayBuffer) {
+      // hyparquet only leaves raw WKB when the column wasn't marked as a
+      // geometry column, i.e. the file lacks GeoParquet `geo` metadata.
+      throw new Error('Geometry column was not decoded (missing GeoParquet metadata)');
+    }
+    const properties = {};
+    for (const [key, value] of Object.entries(row)) {
+      if (key !== geometryColumn) {
+        properties[key] = sanitizePropertyValue(value);
+      }
+    }
+    features.push({ type: 'Feature', geometry, properties });
+  }
+
+  return {
+    exceeded: false,
+    featureCollection: { type: 'FeatureCollection', features },
+    totalRows,
+  };
+}
+
 export async function loadParquetRows(file, metadata, columnNames, geometryColumn) {
   const totalRows = Number(metadata.num_rows);
   const rowEnd = Math.min(totalRows, MAX_ROWS);
@@ -276,6 +378,10 @@ export async function loadGeometryTypesForRows(file, metadata, geometryColumn, r
           if (geomValue instanceof Uint8Array || geomValue instanceof ArrayBuffer) {
             return parseWkbType(geomValue);
           }
+          // hyparquet >= 1.25 decodes marked geometry columns to GeoJSON objects
+          if (geomValue && typeof geomValue.type === 'string') {
+            return geomValue.type;
+          }
           return 'Unknown';
         });
         resolve(types);
@@ -301,6 +407,9 @@ export async function getBboxForRow(file, metadata, geometryColumn, rowIndex) {
         const geomValue = rows[0][0];
         if (geomValue instanceof Uint8Array || geomValue instanceof ArrayBuffer) {
           resolve(bboxFromWkb(geomValue));
+        } else if (geomValue && geomValue.coordinates) {
+          // hyparquet >= 1.25 decodes marked geometry columns to GeoJSON objects
+          resolve(bboxFromGeoJson(geomValue));
         } else {
           resolve(null);
         }

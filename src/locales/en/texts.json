@@ -204,6 +204,10 @@
     },
     "nobasemap": "No basemaps available.",
     "nodata": "No spatial information available in the metadata.",
+    "parquet": {
+      "loadError": "Could not load the GeoParquet data for display.",
+      "tooLarge": "GeoParquet data has {count} features — too many to show on the map directly (limit: {max})."
+    },
     "styles": {
       "legend": "Legend",
       "select": "Select map style"

@@ -60,6 +60,19 @@ const MVT_MIME_TYPES = [
   'application/x-protobuf',
 ];
 
+// Kept in sync with PARQUET_MEDIA_TYPES in utils/parquet.js. Duplicated here
+// so the predicate doesn't statically import that module, which would pull
+// hyparquet into the map bundle (it's lazy-loaded via _loadParquetDeps).
+const PARQUET_MIME_TYPES = [
+  'application/vnd.apache.parquet',
+  'application/x-parquet',
+];
+
+// Secondary guard for rendering GeoParquet directly: files this large are too
+// expensive to download and decode on the main thread even if their declared
+// row count passes MAX_MAP_FEATURES (few rows, huge geometries).
+const MAX_MAP_PARQUET_BYTES = 50 * 1024 * 1024;
+
 function assetHref(asset) {
   return asset.getAbsoluteUrl?.() || asset.href || '';
 }
@@ -144,6 +157,26 @@ function isTileAsset(asset) {
   return isTileJsonAsset(asset) || isXyzVectorAsset(asset) || isPmtilesAsset(asset);
 }
 
+function isParquetAsset(asset) {
+  return PARQUET_MIME_TYPES.includes(asset.type);
+}
+
+// Feature count declared in STAC metadata (asset first, then its collection/
+// item via stac-js getMetadata fallback). Lets the size gate run without
+// touching the parquet file at all. Null when nothing is declared.
+function declaredFeatureCount(asset) {
+  const count = asset['geoparquet:feature_count']
+    ?? asset['table:row_count']
+    ?? asset.getMetadata?.('geoparquet:feature_count')
+    ?? asset.getMetadata?.('table:row_count');
+  return typeof count === 'number' ? count : null;
+}
+
+function declaredFileSize(asset) {
+  const size = asset['file:size'] ?? asset.getMetadata?.('file:size');
+  return typeof size === 'number' ? size : null;
+}
+
 // Prefer TileJSON > XYZ > PMTiles. If a server-rendered tile endpoint exists,
 // drop the PMTiles asset so we only load one set of tiles.
 function preferredTileAssets(assets) {
@@ -171,6 +204,7 @@ export default class StacMapLayer {
     this._pmtilesLayerIds = [];
     this._pmtilesSourceIds = [];
     this._pmtilesAssetMeta = [];
+    this._overlayEpoch = 0;
     this._glStyleLayerIds = [];
     this._glStyleSourceIds = [];
     this._activeGlStyle = null;
@@ -223,7 +257,12 @@ export default class StacMapLayer {
 
   async autoLoadVisualAssets(stac) {
     if (!stac || typeof stac.getAssets !== 'function') {return;}
-    const visualAssets = stac.getAssets().filter(isTileAsset);
+    const allAssets = stac.getAssets();
+    let visualAssets = allAssets.filter(isTileAsset);
+    if (visualAssets.length === 0) {
+      // No tile asset — fall back to rendering a (small) GeoParquet directly.
+      visualAssets = allAssets.filter(isParquetAsset);
+    }
     if (visualAssets.length > 0) {
       await this.setAssets(visualAssets);
     }
@@ -315,8 +354,90 @@ export default class StacMapLayer {
 
     if (!assets || assets.length === 0) {return;}
 
-    await this._addTileAssets(preferredTileAssets(assets));
+    // Captured synchronously, right after this call's own teardown bumped it:
+    // any later setAssets teardown bumps it again, marking this run stale.
+    const epoch = this._overlayEpoch;
+    const tileAssets = preferredTileAssets(assets);
+    await this._addTileAssets(tileAssets);
+    if (tileAssets.length === 0) {
+      // Tiles always win; GeoParquet is only rendered when no tile asset exists.
+      await this._addParquetAssets(assets.filter(isParquetAsset), epoch);
+    }
     await this._addCogAssets(assets);
+  }
+
+  // Lazily load the parquet utilities (hyparquet behind them). Split out as an
+  // overridable seam so unit tests can inject a test double, mirroring
+  // _loadDeckDeps, and so hyparquet stays out of the map bundle.
+  async _loadParquetDeps() {
+    return import('../../utils/parquet.js');
+  }
+
+  // Render GeoParquet assets as a MapLibre geojson source with the default
+  // vector styling. Gates cheapest-first: STAC-declared feature count and file
+  // size (no fetch), then the parquet footer's row count (ranged read), before
+  // downloading the whole file. Over-cap or failed assets surface a notice via
+  // options.onParquetNotice instead of rendering.
+  // Concurrent setAssets calls can interleave across the parquet download
+  // (e.g. autoLoadVisualAssets racing the `assets` watcher in MapView). The
+  // caller passes the epoch it captured before its first await; the teardown
+  // in a newer call bumps the epoch, and when this run sees a stale epoch
+  // after an await it must stop touching the map.
+  async _addParquetAssets(parquetAssets, epoch = this._overlayEpoch) {
+    if (parquetAssets.length === 0) {return;}
+
+    // Prefer assets with the `data` role, keeping input order otherwise.
+    const sorted = [...parquetAssets].sort((a, b) =>
+      Number(b.roles?.includes('data') ?? false) - Number(a.roles?.includes('data') ?? false)
+    );
+
+    let rendered = 0;
+    let firstNotice = null;
+    const notice = (n) => { if (!firstNotice) {firstNotice = n;} };
+
+    for (let i = 0; i < sorted.length; i++) {
+      const asset = sorted[i];
+      const url = assetHref(asset);
+      const sourceId = `stac-parquet-${i}`;
+
+      try {
+        const deps = await this._loadParquetDeps();
+        const max = deps.MAX_MAP_FEATURES;
+
+        const count = declaredFeatureCount(asset);
+        if (count !== null && count > max) {
+          notice({ reason: 'tooLarge', totalRows: count, max });
+          continue;
+        }
+        const size = declaredFileSize(asset);
+        if (size !== null && size > MAX_MAP_PARQUET_BYTES) {
+          notice({ reason: 'tooLarge', totalRows: count, max });
+          continue;
+        }
+
+        const result = await deps.loadGeoJsonFromParquet(url);
+        if (epoch !== this._overlayEpoch) {return;}
+        if (result.exceeded) {
+          notice({ reason: 'tooLarge', totalRows: result.totalRows, max });
+          continue;
+        }
+
+        this._pmtilesAssetMeta.push({
+          title: asset.title || asset.getKey?.() || asset.key || `GeoParquet ${i + 1}`,
+          sourceId,
+        });
+        this._addPmtilesSource(sourceId, { type: 'geojson', data: result.featureCollection });
+        this._addDefaultVectorLayers(sourceId, [], { useSourceLayer: false });
+        rendered++;
+      } catch (err) {
+        console.warn('Failed to render GeoParquet asset', url, err);
+        notice({ reason: 'error' });
+      }
+    }
+
+    if (rendered === 0 && firstNotice && epoch === this._overlayEpoch) {
+      this.options.onParquetNotice?.(firstNotice);
+    }
   }
 
   async _addTileAssets(assets) {
@@ -399,7 +520,9 @@ export default class StacMapLayer {
     this._addDefaultVectorLayers(sourceId, layerNames);
   }
 
-  _addDefaultVectorLayers(sourceId, layerNames) {
+  // `useSourceLayer: false` is for geojson sources, which have no source
+  // layers — MapLibre rejects a `source-layer` key on them.
+  _addDefaultVectorLayers(sourceId, layerNames, { useSourceLayer = true } = {}) {
     const names = layerNames.length > 0 ? layerNames : ['default'];
     const colors = ['#4163cc', '#cc6341', '#41cc63', '#cc41a8', '#ccb341'];
 
@@ -409,12 +532,13 @@ export default class StacMapLayer {
       const fillLayerId = `${sourceId}-${sourceLayer}-fill`;
       const lineLayerId = `${sourceId}-${sourceLayer}-line`;
       const pointLayerId = `${sourceId}-${sourceLayer}-point`;
+      const sourceLayerSpec = useSourceLayer ? { 'source-layer': sourceLayer } : {};
 
       this.map.addLayer({
         id: fillLayerId,
         type: 'fill',
         source: sourceId,
-        'source-layer': sourceLayer,
+        ...sourceLayerSpec,
         filter: ['==', '$type', 'Polygon'],
         paint: {
           'fill-color': color,
@@ -427,7 +551,7 @@ export default class StacMapLayer {
         id: lineLayerId,
         type: 'line',
         source: sourceId,
-        'source-layer': sourceLayer,
+        ...sourceLayerSpec,
         filter: ['any', ['==', '$type', 'LineString'], ['==', '$type', 'Polygon']],
         paint: {
           'line-color': color,
@@ -440,7 +564,7 @@ export default class StacMapLayer {
         id: pointLayerId,
         type: 'circle',
         source: sourceId,
-        'source-layer': sourceLayer,
+        ...sourceLayerSpec,
         filter: ['==', '$type', 'Point'],
         paint: {
           'circle-radius': 3,
@@ -875,6 +999,10 @@ export default class StacMapLayer {
   }
 
   _removePmtilesLayers() {
+    // Invalidate in-flight async adds (e.g. a GeoParquet download): they check
+    // the epoch after each await and bail if a newer setAssets has taken over,
+    // instead of pushing duplicate meta/layers on top of the new state.
+    this._overlayEpoch++;
     this._clearPmtilesLayers();
     for (const id of [...this._pmtilesSourceIds]) {
       try { if (this.map.getSource(id)) {this.map.removeSource(id);} } catch { /* ignore */ }

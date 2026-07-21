@@ -392,4 +392,162 @@ describe('StacMapLayer', () => {
       expect(dlayer._cogList[0].render.colormap_name).toBe('viridis')
     })
   })
+
+  // Exercises the GeoParquet fallback (_addParquetAssets) by injecting a
+  // parquet backend test double via the `_loadParquetDeps` seam — no network
+  // and no hyparquet involvement.
+  describe('GeoParquet fallback', () => {
+    const FEATURE_COLLECTION = {
+      type: 'FeatureCollection',
+      features: [{
+        type: 'Feature',
+        geometry: { type: 'Polygon', coordinates: [[[0, 0], [1, 0], [1, 1], [0, 0]]] },
+        properties: { name: 'park' },
+      }],
+    }
+
+    function parquetAsset(extra = {}) {
+      return {
+        href: 'https://example.com/data.parquet',
+        type: 'application/vnd.apache.parquet',
+        roles: ['data'],
+        title: 'Test parquet',
+        ...extra,
+      }
+    }
+
+    function injectParquetDeps(l, impl) {
+      const calls = []
+      l._loadParquetDeps = async () => ({
+        MAX_MAP_FEATURES: 10000,
+        loadGeoJsonFromParquet: async (url) => {
+          calls.push(url)
+          return impl(url)
+        },
+      })
+      return calls
+    }
+
+    let notices
+
+    beforeEach(() => {
+      notices = []
+      layer = new StacMapLayer(map, { onParquetNotice: n => notices.push(n) })
+    })
+
+    it('renders a parquet asset as a geojson source with default layers', async () => {
+      injectParquetDeps(layer, () => ({ exceeded: false, featureCollection: FEATURE_COLLECTION, totalRows: 1 }))
+      await layer.setAssets([parquetAsset()])
+
+      expect(map.sources.get('stac-parquet-0')).toEqual({ type: 'geojson', data: FEATURE_COLLECTION })
+      const layerIds = layer._pmtilesLayerIds
+      expect(layerIds).toHaveLength(3)
+      for (const id of layerIds) {
+        expect(map.layers.get(id)['source-layer']).toBeUndefined()
+        expect(map.layers.get(id).source).toBe('stac-parquet-0')
+      }
+      expect(notices).toHaveLength(0)
+    })
+
+    it('lists the rendered parquet in the layer picker as a maplibre overlay', async () => {
+      injectParquetDeps(layer, () => ({ exceeded: false, featureCollection: FEATURE_COLLECTION, totalRows: 1 }))
+      await layer.setAssets([parquetAsset()])
+
+      const overlays = layer.getAssetOverlays()
+      expect(overlays).toHaveLength(1)
+      expect(overlays[0]).toMatchObject({ id: 'stac-parquet-0', title: 'Test parquet', type: 'maplibre', visible: true })
+    })
+
+    it('never touches parquet when a tile asset is present', async () => {
+      const calls = injectParquetDeps(layer, () => ({ exceeded: false, featureCollection: FEATURE_COLLECTION, totalRows: 1 }))
+      await layer.setAssets([xyzVectorAsset(), parquetAsset()])
+
+      expect(calls).toHaveLength(0)
+      expect(map.sources.has('stac-tile-0')).toBe(true)
+      expect(map.sources.has('stac-parquet-0')).toBe(false)
+    })
+
+    it('skips loading entirely when STAC metadata declares too many features', async () => {
+      const calls = injectParquetDeps(layer, () => ({ exceeded: false, featureCollection: FEATURE_COLLECTION, totalRows: 1 }))
+      await layer.setAssets([parquetAsset({ 'geoparquet:feature_count': 20000 })])
+
+      expect(calls).toHaveLength(0)
+      expect(map.sources.has('stac-parquet-0')).toBe(false)
+      expect(notices).toEqual([{ reason: 'tooLarge', totalRows: 20000, max: 10000 }])
+    })
+
+    it('skips loading when the declared file size is over the byte guard', async () => {
+      const calls = injectParquetDeps(layer, () => ({ exceeded: false, featureCollection: FEATURE_COLLECTION, totalRows: 1 }))
+      await layer.setAssets([parquetAsset({ 'file:size': 200 * 1024 * 1024 })])
+
+      expect(calls).toHaveLength(0)
+      expect(notices).toEqual([{ reason: 'tooLarge', totalRows: null, max: 10000 }])
+    })
+
+    it('notifies when the parquet footer row count exceeds the cap', async () => {
+      injectParquetDeps(layer, () => ({ exceeded: true, totalRows: 123456 }))
+      await layer.setAssets([parquetAsset()])
+
+      expect(map.sources.has('stac-parquet-0')).toBe(false)
+      expect(notices).toEqual([{ reason: 'tooLarge', totalRows: 123456, max: 10000 }])
+    })
+
+    it('notifies with an error and does not crash when loading fails', async () => {
+      injectParquetDeps(layer, () => { throw new Error('boom') })
+      await expect(layer.setAssets([parquetAsset()])).resolves.not.toThrow()
+
+      expect(map.sources.has('stac-parquet-0')).toBe(false)
+      expect(notices).toEqual([{ reason: 'error' }])
+    })
+
+    it('survives a basemap change without duplicating the source', async () => {
+      injectParquetDeps(layer, () => ({ exceeded: false, featureCollection: FEATURE_COLLECTION, totalRows: 1 }))
+      await layer.setAssets([parquetAsset()])
+      const before = layer._pmtilesLayerIds.length
+
+      await expect(layer.readdAfterStyleChange()).resolves.not.toThrow()
+
+      const parquetSources = [...map.sources.keys()].filter(id => id.startsWith('stac-parquet-'))
+      expect(parquetSources).toEqual(['stac-parquet-0'])
+      expect(layer._pmtilesLayerIds.length).toBe(before)
+    })
+
+    it('does not duplicate meta/layers when two setAssets calls race across the load', async () => {
+      // Two calls with different asset hrefs both pass the signature guard;
+      // the slow first load must not add its results on top of the second's.
+      let release
+      const gate = new Promise(resolve => { release = resolve })
+      layer._loadParquetDeps = async () => ({
+        MAX_MAP_FEATURES: 10000,
+        loadGeoJsonFromParquet: async (url) => {
+          if (url.includes('slow')) { await gate }
+          return { exceeded: false, featureCollection: FEATURE_COLLECTION, totalRows: 1 }
+        },
+      })
+
+      const first = layer.setAssets([parquetAsset({ href: 'https://example.com/slow.parquet' })])
+      const second = layer.setAssets([parquetAsset({ href: 'https://example.com/fast.parquet' })])
+      await second
+      release()
+      await first
+
+      expect(layer._pmtilesAssetMeta).toHaveLength(1)
+      expect(layer._pmtilesLayerIds).toHaveLength(3)
+    })
+
+    it('autoLoadVisualAssets falls back to parquet only when no tile asset exists', async () => {
+      injectParquetDeps(layer, () => ({ exceeded: false, featureCollection: FEATURE_COLLECTION, totalRows: 1 }))
+      layer.setStac(fakeStac([parquetAsset()]))
+      await layer.autoLoadVisualAssets(layer.stac)
+      expect(map.sources.has('stac-parquet-0')).toBe(true)
+
+      const map2 = createFakeMap()
+      const layer2 = new StacMapLayer(map2)
+      const calls = injectParquetDeps(layer2, () => ({ exceeded: false, featureCollection: FEATURE_COLLECTION, totalRows: 1 }))
+      layer2.setStac(fakeStac([xyzVectorAsset(), parquetAsset()]))
+      await layer2.autoLoadVisualAssets(layer2.stac)
+      expect(calls).toHaveLength(0)
+      expect(map2.sources.has('stac-tile-0')).toBe(true)
+    })
+  })
 })

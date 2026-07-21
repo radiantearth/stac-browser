@@ -11,6 +11,7 @@
       />
       <TextControl v-if="empty" :text="$t('mapping.nodata')" />
       <TextControl v-else-if="!hasBasemap" :text="$t('mapping.nobasemap')" />
+      <TextControl v-else-if="parquetNoticeText" :text="parquetNoticeText" />
     </div>
     <div ref="target" class="popover-target" />
     <b-popover
@@ -96,6 +97,7 @@ export default {
       availableStyles: [],
       activeStyleIndex: 0,
       activeLegend: [],
+      parquetNotice: null,
     };
   },
   computed: {
@@ -105,6 +107,16 @@ export default {
         return '#' + this.mapId;
       }
       return '#stac-browser';
+    },
+    parquetNoticeText() {
+      if (!this.parquetNotice) {return null;}
+      if (this.parquetNotice.reason === 'tooLarge') {
+        return this.$t('mapping.parquet.tooLarge', {
+          count: this.parquetNotice.totalRows ?? '?',
+          max: this.parquetNotice.max,
+        });
+      }
+      return this.$t('mapping.parquet.loadError');
     },
   },
   watch: {
@@ -156,6 +168,7 @@ export default {
         this.availableStyles = [];
         this.activeStyleIndex = 0;
         this.activeLegend = [];
+        this.parquetNotice = null;
         if (this.stacLayer) {
           this.stacLayer.remove();
           this.stacLayer = null;
@@ -179,7 +192,10 @@ export default {
     },
 
     async addStacLayer() {
-      this.stacLayer = markRaw(new StacMapLayer(this.map, this.stacLayerOptions));
+      this.stacLayer = markRaw(new StacMapLayer(this.map, {
+        ...this.stacLayerOptions,
+        onParquetNotice: (notice) => { this.parquetNotice = notice; },
+      }));
 
       this.stacLayer.setStac(this.stac);
 
