@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Redirecting…</title>
+  <script>
+    var TARGET_BASE = "https://browser.moregeo.it";
+    var base = TARGET_BASE.replace(/\/+$/, "");
+    var hash = window.location.hash;
+    var route = hash.indexOf("#/") === 0 ? hash.slice(1) : "/";
+    window.location.replace(base + route);
+  </script>
+</head>
+<body>
+  <p>
+    Redirecting to the new location…
+    If you are not redirected automatically, please
+    <a id="fallback" href="https://browser.moregeo.it/">continue here</a>.
+  </p>
+  <noscript>
+    <p>
+      JavaScript is required to redirect old links automatically.
+      Please <a href="https://browser.moregeo.it/">open the new site</a> and navigate manually.
+    </p>
+  </noscript>
+  <script>
+    // Keep the visible fallback link in sync with the configured target so it
+    // works even if the automatic redirect above is disabled or blocked.
+    (function () {
+      var link = document.getElementById("fallback");
+      if (link) {
+        link.href = TARGET_BASE.replace(/\/+$/, "") + "/";
+      }
+    })();
+  </script>
+</body>
+</html>
