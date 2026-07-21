@@ -33,6 +33,22 @@ const optionsForType = (type) =>
 
 const defaultConfigPath = fileURLToPath(new URL("./config.js", import.meta.url));
 
+// Parse an array-typed option from a single environment variable value.
+// A full JSON array (e.g. '[{"label":"a","url":"b"}]') is used as-is, which
+// allows arrays of objects. For convenience, a plain comma-separated list
+// (e.g. 'en,de,fr') is also accepted and split into an array of strings.
+const parseArrayEnv = (value) => {
+  const raw = Array.isArray(value) ? value.join(" ") : String(value);
+  const trimmed = raw.trim();
+  if (trimmed.startsWith("[")) {
+    return JSON.parse(trimmed);
+  }
+  return trimmed
+    .split(",")
+    .map((v) => v.trim())
+    .filter((v) => v.length > 0);
+};
+
 const parseEnvConfig = (rawEnv) => {
   const envArgs = Object.entries(rawEnv)
     .filter(([key]) => key.startsWith("SB_") && key !== "SB_CONFIG")
@@ -42,11 +58,11 @@ const parseEnvConfig = (rawEnv) => {
     .parserConfiguration({ "camel-case-expansion": false })
     .boolean(optionsForType("boolean"))
     .number(optionsForType("number").concat(optionsForType("integer")))
-    .array(optionsForType("array"))
     .option(
-      Object.fromEntries(
-        optionsForType("object").map((k) => [k, { coerce: JSON.parse }])
-      )
+      Object.fromEntries([
+        ...optionsForType("array").map((k) => [k, { coerce: parseArrayEnv }]),
+        ...optionsForType("object").map((k) => [k, { coerce: JSON.parse }]),
+      ])
     ).argv;
 
   delete env._;

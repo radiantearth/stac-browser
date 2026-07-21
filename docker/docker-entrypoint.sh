@@ -31,12 +31,21 @@ array() {
     if [ -z "$1" ]; then
         echo -n "[]"
     else
-        case "$2" in
-            string)
-                echo -n "['$(echo "$1" | sed "s/,/', '/g")']"
+        # A full JSON array (e.g. '[{"label":"a","url":"b"}]') is used as-is,
+        # which allows arrays of objects.
+        case "$(printf '%s' "$1" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')" in
+            \[*\])
+                echo -n "$1"
                 ;;
             *)
-                echo -n "[$1]"
+                case "$2" in
+                    string)
+                        echo -n "['$(echo "$1" | sed "s/,/', '/g")']"
+                        ;;
+                    *)
+                        echo -n "[$1]"
+                        ;;
+                esac
                 ;;
         esac
     fi
