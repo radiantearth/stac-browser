@@ -88,7 +88,7 @@ services:
 ## How it works
 
 The docker image uses a multi stage build.
-The first stage is based on a node image and runs `npm build` to produce a `/dist` folder with static files (HTML, CSS, and JavaScript).
+The first stage is based on a node image and runs `npm run build` to produce a `/dist` folder with static files (HTML, CSS, and JavaScript).
 The second stage is based on an nginx image that serves the folder with static files. At startup, the entrypoint applies `SB_pathPrefix` to nginx and generates `runtime-config.js`.
 So, essentially, in the end you get an nginx instance that serves static files.
 
