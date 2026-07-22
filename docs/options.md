@@ -55,7 +55,7 @@ The override order for the configuration is:
 
 The following can **not** be changed at runtime (i.e. via `runtime-config.js`):
 
-- The build-only options [`pathPrefix`](#pathprefix) and [`historyMode`](#historymode)
+- The build-only option [`historyMode`](#historymode) (and [`pathPrefix`](#pathprefix) when `SB_RUNTIME` is disabled)
 - Function-valued options such as [`preprocessSTAC`](#preprocessstac), [`buildTileUrlTemplate`](#buildtileurltemplate), and [`getMapSourceOptions`](#getmapsourceoptions)
 - Anything defined in code: [widgets](./widgets.md), [actions](./actions.md), [code generators](./code-generators.md), [metadata field rules](./metadata.md), custom [`configureBasemap` implementations](./basemaps.md), and additional [languages](./localization.md)
 - The Sass-based parts of the theme, see [Styling & Theming](./styling.md) for what is runtime-capable
