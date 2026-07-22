@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   **Note:** This is commonly used in `preprocessSTAC` config option, ensure to update your `config.js`.
 - Internal rewrite of how API children are maintained
 - Loaded collections are cached and no longer re-fetched when returning to a page
+- Header stays at the top by default and has a different design. You can disable the sticky header in the `variables.scss` by setting `$header-position` to `static`.
 
 ### Fixed
 
