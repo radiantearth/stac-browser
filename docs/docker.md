@@ -21,13 +21,12 @@ There are three ways to deploy STAC Browser with Docker, with increasing flexibi
    [colors, fonts and a few other styles](./styling.md#runtime-customizations)
    through a mounted CSS file — all without building anything.
    Choose this to evaluate STAC Browser or when configuration plus a lightly branded look is enough.
-   *Limitations:* must be served from the domain root (no `pathPrefix`), and nothing that
-   requires code — no function-valued options, custom widgets/actions, new languages,
-   or full theming.
+   *Limitations:* nothing that requires code — no function-valued options, custom widgets/actions,
+   new languages, or full theming. [`historyMode`](./options.md#historymode) still needs a custom build.
 
 2. **[Build a custom image](#create-a-custom-image)** from an (unmodified) copy of this repository —
-   a single `docker build` command. This additionally unlocks the build-only options
-   (`pathPrefix`, `historyMode`), an external config file with function-valued options via
+   a single `docker build` command. This additionally unlocks the build-only option
+   [`historyMode`](./options.md#historymode), an external config file with function-valued options via
    `SB_CONFIG`, and full theming via the Sass files in [`src/theme/`](../src/theme/).
    Additionally, it allows for custom [widgets](./widgets.md), [actions](./actions.md),
    [code generators](./code-generators.md), [metadata field rules](./metadata.md),
@@ -59,7 +58,7 @@ STAC Browser is now available at `http://localhost:8080`
 
 You can pass further options to STAC Browser to customize it to your needs.
 
-The build-only options
+The build-only option
 [`historyMode`](./options.md#historymode)
 and `SB_CONFIG` (for loading an [external config file](./options.md))
 can be provided as a
@@ -69,7 +68,7 @@ when building the Dockerfile.
 Another build argument is `SB_RUNTIME` (default: `true`).
 When enabled, the built image loads two optional files at startup:
 
-- `runtime-config.js` — lets you set options (like `catalogUrl`) without rebuilding the image (see [Options](./options.md)).
+- `runtime-config.js` — lets you set options (like `catalogUrl` and [`pathPrefix`](./options.md#pathprefix)) without rebuilding the image (see [Options](./options.md)).
 - `runtime-style.css` — lets you drop in a CSS file to adjust the look and feel without rebuilding the image (see [Styling & Theming](./styling.md#runtime-customizations)).
 
 If you set `SB_RUNTIME=false` at build time, the runtime files are not loaded and everything must be configured at build time instead.
@@ -126,7 +125,7 @@ services:
 With the pre-built image you can customize, without rebuilding:
 
 - **All non-build-only options** via `SB_*` environment variables (see [Options](./options.md)),
-  including [custom basemaps](./basemaps.md) via `SB_basemaps`.
+  including [`pathPrefix`](./options.md#pathprefix) via `SB_pathPrefix` and [custom basemaps](./basemaps.md) via `SB_basemaps`.
 - **The styling** (colors, fonts, and more) by mounting your own `runtime-style.css`
   (see [Styling & Theming](./styling.md#runtime-customizations)):
 
@@ -138,6 +137,7 @@ services:
       - 8080:8080
     environment:
       SB_catalogUrl: "https://localhost:7188"
+      SB_pathPrefix: "/browser/"
     volumes:
       - ./my-style.css:/usr/share/nginx/html/runtime-style.css:ro
 ```
