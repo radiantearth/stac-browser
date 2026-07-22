@@ -156,7 +156,8 @@ What needs which deployment:
 | [Runtime styling](docs/styling.md#runtime-customizations) (colors, fonts, …) | ✅ `runtime-style.css` | ✅ |
 | Full theme (all colors, spacing, breakpoints, …) | ❌ | ✅ [Styling & Theming](docs/styling.md) |
 | [Basemaps](docs/basemaps.md) | ✅ [`basemaps` option](docs/options.md#basemaps) (JSON only) | ✅ incl. code hooks |
-| `pathPrefix` / `historyMode` | ❌ | ✅ [build-only options](docs/options.md#deployment) |
+| `pathPrefix` | ✅ `SB_pathPrefix` / `runtime-config.js` (when `SB_RUNTIME`) | ✅ |
+| `historyMode` | ❌ | ✅ [build-only](docs/options.md#historymode) |
 | Function-valued options (`preprocessSTAC`, `buildTileUrlTemplate`, …) | ❌ | ✅ config file |
 | [Actions](docs/actions.md), [widgets](docs/widgets.md), [code generators](docs/code-generators.md), [metadata rules](docs/metadata.md) | ❌ | ✅ |
 | Additional [languages](docs/localization.md) | ❌ (choosing among built-in ones: ✅) | ✅ |
