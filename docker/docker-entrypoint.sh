@@ -64,8 +64,8 @@ object() {
 
 STAC_PATH_PREFIX=$(printf '%s' "${SB_pathPrefix:-/}" | sed -e 's|^/*|/|' -e 's|/*$|/|')
 
-# Reject characters that could inject nginx directives or break the sed/envsubst substitutions below.
-if printf '%s' "$STAC_PATH_PREFIX" | grep -Eq '[&|;{}"'"'"'[:space:]\\]'; then
+# Allow only URL path-safe characters so values cannot break nginx/sed/envsubst.
+if ! printf '%s' "$STAC_PATH_PREFIX" | grep -Eq '^[A-Za-z0-9/_.~-]+$'; then
     echo "Err: SB_pathPrefix contains unsupported characters: ${SB_pathPrefix}" >&2
     exit 1
 fi
@@ -81,6 +81,8 @@ else
 fi
 export STAC_PREFIX_REDIRECT
 
+# Single-quoted so the shell does not expand; envsubst expands these names.
+# shellcheck disable=SC2016
 envsubst '$STAC_PATH_PREFIX $STAC_PREFIX_REDIRECT' \
     < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf
 
@@ -91,6 +93,8 @@ if [ -f /usr/share/nginx/html/index.html ]; then
 fi
 
 config_schema=$(cat /etc/nginx/conf.d/config.schema.json)
+runtime_config_tmp=/usr/share/nginx/html/runtime-config.js.tmp
+runtime_config=/usr/share/nginx/html/runtime-config.js
 
 # Iterate over environment variables with "SB_" prefix
 env -0 | tr '\0' '\n' | cut -f1 -d= | grep "^SB_" | {
@@ -127,4 +131,5 @@ env -0 | tr '\0' '\n' | cut -f1 -d= | grep "^SB_" | {
         echo ","
     done
     echo "}"
-} > /usr/share/nginx/html/runtime-config.js
+} > "$runtime_config_tmp"
+mv -f "$runtime_config_tmp" "$runtime_config"
