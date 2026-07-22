@@ -97,9 +97,15 @@ export default defineConfig(async ({ mode }) => {
   const defaultConfig = (await import(pathToFileURL(defaultConfigPath).href)).default ?? {};
   const externalConfig = (await import(pathToFileURL(externalConfigPath).href)).default ?? {};
   const config = Object.assign({}, defaultConfig, externalConfig, env);
+  const dynamicConfig = ["true", "1", "yes"].includes(
+    String(rawEnv.DYNAMIC_CONFIG || "").toLowerCase()
+  );
+  const configFromEnv = dynamicConfig
+    ? Object.fromEntries(Object.entries(env).filter(([k]) => k !== "pathPrefix"))
+    : env;
 
   return ({
-    base: config.pathPrefix,
+    base: dynamicConfig ? "./" : config.pathPrefix,
     build: {
       sourcemap: mode !== "minimal",
       rollupOptions: {
@@ -119,7 +125,7 @@ export default defineConfig(async ({ mode }) => {
       STAC_BROWSER_VERSION: JSON.stringify(package_.version),
       // JSON.stringify removes e.g. functions from the config,
       // but from env we do not accept functions anyway.
-      CONFIG_FROM_ENV: JSON.stringify(env),
+      CONFIG_FROM_ENV: JSON.stringify(configFromEnv),
       // Expose Vue component internals in the e2e build so end-to-end tests can
       // reach the OpenLayers map (see tests/e2e/helpers.js). Only enabled when the
       // e2e web server sets STAC_BROWSER_E2E; real production builds are unaffected.

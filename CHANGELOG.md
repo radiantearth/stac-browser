@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - The Browse menu also loads additional Collections on demand
 - Minimal Docker build test and CI workflow.
+- Docker: `pathPrefix` can be set at container startup via `SB_pathPrefix` when `DYNAMIC_CONFIG` is enabled (default)
 
 ### Changed
 
