@@ -26,7 +26,7 @@ export default {
       }
       let assets = this.data.getAssets();
       if (!this.showThumbnailsAsAssets) {
-        assets = assets.filter(asset => !this.thumbnails.includes(asset));
+        assets = assets.filter(asset => !this.isThumbnail(asset));
       }
       return assets;
     },
@@ -56,8 +56,29 @@ export default {
     }
   },
   methods: {
+    isAssetEqual(a, b) {
+      if (!a?.isAsset || !b?.isAsset) {
+        return false;
+      }
+      if (a === b) {
+        return true;
+      }
+      if (a.getAbsoluteUrl() === b.getAbsoluteUrl()) {
+        return true;
+      }
+      if (a.isAlternate) {
+        return this.isAssetEqual(a.getContext(), b);
+      }
+      if (b.isAlternate) {
+        return this.isAssetEqual(a, b.getContext());
+      }
+      return false;
+    },
+    isThumbnail(asset) {
+      return this.thumbnails.some(t => this.isAssetEqual(t, asset));
+    },
     showAsset(asset) {
-      if (this.thumbnails.find(t => t.is(asset))) {
+      if (this.isThumbnail(asset)) {
         this.tab = this.tabIds.thumbnails;
       }
       else {

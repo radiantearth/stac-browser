@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Alternate assets are considered as thumbnail and preview candidates if the original asset can't be shown in a browser
 - Redirect bare `pathPrefix` URLs to their trailing-slash form in the Docker/nginx image (e.g. `/browser` → `/browser/`)
 - Geometries that cross the antimeridian are split into multi-geometries so that footprints render correctly on the map
 - Fix global error handling in certain edge-cases
