@@ -1,12 +1,12 @@
+#!/bin/sh
 # echo a string, handling different types
 safe_echo() {
     # $1 = value
     if [ -z "$1" ]; then
-        echo -n "null"
-    elif printf '%s\n' "$1" | grep -qE '\n.+\n$'; then
-        echo -n "\`$1\`"
+        printf 'null'
     else
-        echo -n "'$1'"
+        encoded_value="$(jq -cn --arg value "$1" '$value')"
+        printf '%s' "$encoded_value"
     fi
 }
 
@@ -15,11 +15,11 @@ bool() {
     # $1 = value
     case "$1" in
         true | TRUE | yes | t | True)
-            echo -n true ;;
+            printf 'true' ;;
         false | FALSE | no | n | False)
-            echo -n false ;;
+            printf 'false' ;;
         *)
-            echo "Err: Unknown boolean value \"$1\"" >&2
+            printf 'Err: Unknown boolean value "%s"\n' "$1" >&2
             exit 1 ;;
     esac
 }
@@ -29,21 +29,22 @@ array() {
     # $1 = value
     # $2 = arraytype
     if [ -z "$1" ]; then
-        echo -n "[]"
+        printf '[]'
     else
         # A full JSON array (e.g. '[{"label":"a","url":"b"}]') is used as-is,
         # which allows arrays of objects.
         case "$(printf '%s' "$1" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')" in
             \[*\])
-                echo -n "$1"
+                printf '%s' "$1"
                 ;;
             *)
                 case "$2" in
                     string)
-                        echo -n "['$(echo "$1" | sed "s/,/', '/g")']"
+                        encoded_value="$(jq -cn --arg value "$1" '$value | split(",")')"
+                        printf '%s' "$encoded_value"
                         ;;
                     *)
-                        echo -n "[$1]"
+                        printf '[%s]' "$1"
                         ;;
                 esac
                 ;;
@@ -55,9 +56,9 @@ array() {
 object() {
     # $1 = value
     if [ -z "$1" ]; then
-        echo -n "null"
+        printf 'null'
     else
-        echo -n "$1"
+        printf '%s' "$1"
     fi
 }
 
@@ -70,14 +71,14 @@ env -0 | cut -f1 -d= | tr '\0' '\n' | grep "^SB_" | {
         # Strip the prefix
         argname="${name#SB_}"
         # Read the variable's value
-        value="$(eval "echo \"\$$name\"")"
+        value="$(printenv "$name")"
 
         # Get the argument type from the schema
-        argtype="$(echo "$config_schema" | jq -r ".properties.$argname.type[0]")"
-        arraytype="$(echo "$config_schema" | jq -r ".properties.$argname.items.type[0]")"
+        argtype="$(printf '%s\n' "$config_schema" | jq -r ".properties.$argname.type[0]")"
+        arraytype="$(printf '%s\n' "$config_schema" | jq -r ".properties.$argname.items.type[0]")"
 
         # Encode key/value
-        echo -n "  $argname: "
+        printf '  %s: ' "$argname"
         case "$argtype" in
             string)
                 safe_echo "$value"

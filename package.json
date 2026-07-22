@@ -15,6 +15,7 @@
     "i18n:fields": "node helpers/fields_locales.js",
     "docs:hooks": "node helpers/widget-hooks.js",
     "docs:lint": "remark --frail *.md docs/*.md",
+    "test:docker": "bash tests/docker/run-tests.sh",
     "test": "npm run test:integration && npm run test:e2e",
     "test:integration": "bash tests/integration/run-tests.sh",
     "test:e2e": "playwright test",
