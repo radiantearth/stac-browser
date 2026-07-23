@@ -11,9 +11,7 @@ import { vBToggle } from 'bootstrap-vue-next/directives/BToggle';
 import visible from './directives/visible';
 import WidgetHook from "./plugins/WidgetHook.vue";
 
-// The URLs are relative so they resolve against the document base URI, i.e. the
-// <base id="stac-browser-base"> tag. In runtime mode pathPrefix is not baked into
-// the build; the base tag (set at startup, e.g. by the Docker entrypoint) carries it.
+// Relative URL so it resolves against the <base id="stac-browser-base"> tag, which carries the path prefix.
 async function loadRuntimeConfig() {
   await new Promise((resolve) => {
     const script = document.createElement('script');
