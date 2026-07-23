@@ -111,7 +111,7 @@ svg {
           align-items: center;
           gap: var(--sb-header-font-size);
           color: var(--sb-header-color);
-          text-shadow: $header-text-shadow;
+          text-shadow: var(--sb-header-text-shadow);
 
           a {
             color: var(--sb-header-color);
@@ -164,18 +164,18 @@ svg {
 
           h1 {
             color: var(--sb-h1-color);
-            font-weight: $h1-font-weight;
+            font-weight: var(--sb-h1-font-weight);
             align-items: center;
-            font-size: $h1-font-size;
+            font-size: var(--sb-h1-font-size);
           }
           @include media-breakpoint-down(xxl) {
             h1 {
-              font-size: $h1-font-size - 0.2rem;
+              font-size: calc(var(--sb-h1-font-size) - 0.2rem);
             }
           }
           @include media-breakpoint-down(lg) {
             h1 {
-              font-size: $h1-font-size - 0.4rem;
+              font-size: calc(var(--sb-h1-font-size) - 0.4rem);
             }
           }
         }

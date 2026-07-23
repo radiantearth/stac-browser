@@ -229,7 +229,7 @@ when building (or running) STAC Browser.
 
 Either set this option to the respective path (e.g. `/browser/`) in the config file or as environment variable (`SB_pathPrefix`) when running or building.
 
-With `SB_RUNTIME` (default in the [Docker image](./docker.md)), `pathPrefix` can instead be set at startup via `SB_pathPrefix` / `runtime-config.js`. Outside Docker, also set the `href` of `<base id="stac-browser-base">` in `dist/index.html` to match.
+With `SB_RUNTIME` (default in the [Docker image](./docker.md)), `pathPrefix` can instead be set at startup via `SB_pathPrefix` / `runtime-config.js`; the Docker entrypoint injects a matching `<base id="stac-browser-base">` tag into the served `index.html`. Outside Docker, add a `<base href="/your/prefix/" id="stac-browser-base">` tag to the `<head>` of `dist/index.html` yourself so relative asset URLs resolve.
 
 This will build STAC Browser in a way that it can be hosted at `https://example.com/browser` for example.
 Using this parameter for the dev server will make STAC Browser available at `http://localhost:8080/browser`.

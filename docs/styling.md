@@ -107,7 +107,7 @@ Runtime overrides use CSS custom properties. Because the runtime stylesheet is l
 > [!IMPORTANT]  
 > Runtime styling is experimental and is limited in its abilities to override the build-time CSS.
 > It covers the primary and secondary colors (including buttons, links, badges, alerts,
-> pagination, form controls, focus rings, and the header border), body background/text colors,
+> pagination, form controls, focus rings, and the page header), body background/text colors,
 > fonts, and a small set of STAC Browser-specific variables — see the list below.
 > Everything else (e.g. breakpoints, heading sizes, the success/warning/danger colors)
 > requires build-time customization.
@@ -162,8 +162,10 @@ light mode and in a `[data-bs-theme="dark"]` block for dark mode.
 
 | Variable | Purpose |
 | -------- | ------- |
-| `--bs-primary` + `--bs-primary-rgb` | The primary (brand) color, used for buttons, links, active states, focus rings, the header border, etc. |
+| `--bs-primary` + `--bs-primary-rgb` | The primary (brand) color, used for buttons, links, active states, focus rings, the page header, etc. |
 | `--sb-on-primary` | Text color used *on* primary-colored backgrounds (buttons, badges, active items). Usually `white` or `black`. |
+| `--sb-header` | Base color of the page header. Defaults to `var(--bs-primary)` so the header follows the primary color; set it explicitly to give the header its own color. The header background, title, and button colors are derived from it via `color-mix()`. |
+| `--sb-header-contrast` | Text/icon color used *on* the header background. Usually `white` or `black`; set it to match the brightness of `--sb-header`. |
 | `--bs-secondary` + `--bs-secondary-rgb` | The secondary color, used for secondary buttons and badges. |
 | `--sb-on-secondary` | Text color used *on* secondary-colored backgrounds. |
 | `--bs-body-bg` + `--bs-body-bg-rgb` | Page background color. |
@@ -212,7 +214,8 @@ These are independent of the color mode and can be set in a single `:root, [data
 | `--sb-block-gap` | Gap between the main sections of the page (header, content, footer). |
 | `--sb-header-margin` | Margin at the top of the page (e.g. for a custom header). |
 | `--sb-header-font-size` / `--sb-header-font-weight` | Font size and weight of the catalog title in the header. |
-| `--sb-header-border` | The border below the page header (CSS `border` shorthand). |
+| `--sb-header-text-shadow` | Text shadow of the catalog title in the header (CSS `text-shadow`; set to `none` to disable). |
+| `--sb-h1-font-size` / `--sb-h1-font-weight` | Font size and weight of the page title (h1). Smaller breakpoints derive from the font size via `calc()`. |
 | `--sb-code-padding` | Padding of code blocks. |
 | `--sb-max-icon-size` | Maximum size of icons. |
 
@@ -224,18 +227,19 @@ These are independent of the color mode and can be set in a single `:root, [data
   --bs-primary: #7a2048;
   --bs-primary-rgb: 122, 32, 72;
   --sb-on-primary: white;
+  --sb-header-contrast: white;
 }
 
 [data-bs-theme="dark"] {
   --bs-primary: #d16a94;
   --bs-primary-rgb: 209, 106, 148;
   --sb-on-primary: black;
+  --sb-header-contrast: black;
 }
 
 :root,
 [data-bs-theme] {
   --bs-body-font-family: Georgia, "Times New Roman", serif;
-  --sb-header-border: 3px solid var(--bs-primary);
 }
 ```
 

@@ -189,25 +189,32 @@ a:hover {
   // Typography
   --sb-header-font-size: #{$header-font-size};
   --sb-header-font-weight: #{$header-font-weight};
+  --sb-header-text-shadow: #{$header-text-shadow};
+  --sb-h1-font-size: #{$h1-font-size};
+  --sb-h1-font-weight: #{$h1-font-weight};
 
   // Colors (light mode; dark mode overrides below)
   --sb-h1-color: #{$h1-color};
   --sb-subheadings-color: #{$subheadings-color};
 
-  // Main/top header of the website
-  --sb-header: #{$header};
+  // Main/top header of the website. --sb-header defaults to the primary color
+  // so it follows a runtime --bs-primary override; the other colors derive from
+  // it via color-mix(). --sb-header-contrast (the "on-header" text color) is
+  // baked, like --sb-on-primary, as CSS has no runtime color-contrast().
+  --sb-header: var(--bs-primary);
+  --sb-header-contrast: #{$header-contrast};
   --sb-header-background: linear-gradient(to bottom,
     color-mix(in srgb, var(--sb-header) 85%, #fff),
     var(--sb-header),
     color-mix(in srgb, var(--sb-header) 85%, #000)
   );
-  --sb-header-color: #{$header-color};
-  --sb-header-hover-color: #{$header-hover-color};
-  --sb-header-button-background: #{$header-button-background};
-  --sb-header-button-border-color: #{$header-button-border-color};
-  --sb-header-button-hover-background: #{$header-button-hover-background};
-  --sb-header-button-active-background: #{$header-button-active-background};
-  --sb-header-hover-button-border-color: #{$header-hover-button-border-color};
+  --sb-header-color: color-mix(in srgb, var(--sb-header) 20%, white);
+  --sb-header-hover-color: var(--sb-header-contrast);
+  --sb-header-button-background: transparent;
+  --sb-header-button-border-color: var(--sb-header-color);
+  --sb-header-button-hover-background: color-mix(in srgb, var(--sb-header-contrast) 15%, transparent);
+  --sb-header-button-active-background: color-mix(in srgb, var(--sb-header-contrast) 25%, transparent);
+  --sb-header-hover-button-border-color: var(--sb-header-hover-color);
 }
 
 [data-bs-theme="dark"] {
