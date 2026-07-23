@@ -40,8 +40,7 @@ array() {
             *)
                 case "$2" in
                     string)
-                        # Split on commas and trim surrounding whitespace from each
-                        # element, mirroring parseArrayEnv() in vite.config.js.
+                        # Split on commas and trim each element, like parseArrayEnv() in vite.config.js.
                         encoded_value="$(jq -cn --arg value "$1" '$value | split(",") | map(gsub("^\\s+|\\s+$";""))')"
                         printf '%s' "$encoded_value"
                         ;;
@@ -88,10 +87,10 @@ export STAC_PREFIX_REDIRECT
 envsubst '$STAC_PATH_PREFIX $STAC_PREFIX_REDIRECT' \
     < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf
 
-# Point <base> at the runtime path prefix (Vite builds with base "./").
-if [ -f /usr/share/nginx/html/index.html ]; then
-    sed -i "s|<base href=\"[^\"]*\" id=\"stac-browser-base\">|<base href=\"${STAC_PATH_PREFIX}\" id=\"stac-browser-base\">|" \
-        /usr/share/nginx/html/index.html
+# Inject the <base> tag so relative asset URLs resolve against the path prefix (Vite builds with base "./").
+index_html=/usr/share/nginx/html/index.html
+if [ -f "$index_html" ]; then
+    sed -i "s|<head>|<head><base href=\"${STAC_PATH_PREFIX}\" id=\"stac-browser-base\">|" "$index_html"
 fi
 
 config_schema=$(cat /etc/nginx/conf.d/config.schema.json)
