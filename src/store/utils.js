@@ -1,6 +1,8 @@
 import axios from "axios";
 import { hasText, isObject, size } from 'stac-js/src/utils.js';
 import i18n from '../i18n';
+import refParser from '@apidevtools/json-schema-ref-parser';
+import Queryable from '../models/cql2/queryable';
 
 export class Loading {
 
@@ -150,4 +152,20 @@ export function hasAuthority(pattern, uri) {
     pattern = new RegExp('(^|\\.)' + RegExp.escape(pattern) + '$', 'i');
     return pattern.test(uri.hostname());
   }
+}
+
+export async function fetchQueryablesForLink(store, link) {
+  if (!isObject(link)) {return [];}
+  const response = await stacRequest(store, link);
+  if (!isObject(response.data)) {return [];}
+  let schemas;
+  try {
+    schemas = await refParser.dereference(response.data);
+  } catch (e) {
+    console.error(e);
+    schemas = response.data;
+  }
+  if (!isObject(schemas?.properties)) {return [];}
+  return Object.entries(schemas.properties)
+    .map(([key, schema]) => new Queryable(key, schema));
 }
