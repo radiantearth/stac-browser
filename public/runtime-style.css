@@ -28,6 +28,7 @@
   --bs-primary: #7a2048;
   --bs-primary-rgb: 122, 32, 72;
   --sb-on-primary: white;
+  --sb-header-contrast: white;
 
   --bs-secondary: #6c757d;
   --bs-secondary-rgb: 108, 117, 125;
@@ -95,6 +96,5 @@
   --sb-block-gap: 1rem;
   --sb-header-font-size: 1.5rem;
   --sb-header-font-weight: 600;
-  --sb-header-border: 3px solid var(--bs-primary);
 }
 */
