@@ -110,6 +110,7 @@
     "loadApiItemsFailed": "The API Items could not be loaded.",
     "loadFilteredItems": "Sorry, loading a filtered list of Items failed.",
     "loadItems": "Sorry, loading the list of STAC Items failed.",
+    "missingPermissions": "The credentials specified for this request do not have the required permissions.",
     "networkError": "This issue may occur when servers don't allow external access via web browsers (e.g., when CORS headers are not present). @:errors.contactProvider",
     "noExternalAccess": "Accessing external catalogs is not allowed!",
     "notFound": "The requested resource does not exist. @:errors.contactProvider",
@@ -167,6 +168,17 @@
     "showFilter": "Show Filters"
   },
   "loading": "Loading...",
+  "manage": {
+    "addCollection": "Add Collection",
+    "addItem": "Add Item",
+    "confirmDeleteTitle": "Confirm Deletion",
+    "confirmDeleteMessage": "Are you sure you want to delete this STAC resource?",
+    "delete": "Delete",
+    "edit": "Edit",
+    "save": "Save",
+    "noUndo": "This action cannot be undone.",
+    "validate": "Validate"
+  },
   "map": "Map",
   "mapping": {
     "attribution": {
@@ -367,6 +379,7 @@
       "switch": "Switch the language"
     },
     "locatedAt": "The STAC metadata file is located at:",
+    "manage": "Manage",
     "share": {
       "bsky": "Bluesky",
       "email": "E-mail",
