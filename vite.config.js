@@ -33,6 +33,22 @@ const optionsForType = (type) =>
 
 const defaultConfigPath = fileURLToPath(new URL("./config.js", import.meta.url));
 
+// Parse an array-typed option from a single environment variable value.
+// A full JSON array (e.g. '[{"label":"a","url":"b"}]') is used as-is, which
+// allows arrays of objects. For convenience, a plain comma-separated list
+// (e.g. 'en,de,fr') is also accepted and split into an array of strings.
+const parseArrayEnv = (value) => {
+  const raw = Array.isArray(value) ? value.join(" ") : String(value);
+  const trimmed = raw.trim();
+  if (trimmed.startsWith("[")) {
+    return JSON.parse(trimmed);
+  }
+  return trimmed
+    .split(",")
+    .map((v) => v.trim())
+    .filter((v) => v.length > 0);
+};
+
 const parseEnvConfig = (rawEnv) => {
   const envArgs = Object.entries(rawEnv)
     .filter(([key]) => key.startsWith("SB_") && key !== "SB_CONFIG")
@@ -42,11 +58,11 @@ const parseEnvConfig = (rawEnv) => {
     .parserConfiguration({ "camel-case-expansion": false })
     .boolean(optionsForType("boolean"))
     .number(optionsForType("number").concat(optionsForType("integer")))
-    .array(optionsForType("array"))
     .option(
-      Object.fromEntries(
-        optionsForType("object").map((k) => [k, { coerce: JSON.parse }])
-      )
+      Object.fromEntries([
+        ...optionsForType("array").map((k) => [k, { coerce: parseArrayEnv }]),
+        ...optionsForType("object").map((k) => [k, { coerce: JSON.parse }]),
+      ])
     ).argv;
 
   delete env._;
@@ -81,9 +97,15 @@ export default defineConfig(async ({ mode }) => {
   const defaultConfig = (await import(pathToFileURL(defaultConfigPath).href)).default ?? {};
   const externalConfig = (await import(pathToFileURL(externalConfigPath).href)).default ?? {};
   const config = Object.assign({}, defaultConfig, externalConfig, env);
+  const dynamicConfig = ["true", "1", "yes"].includes(
+    String(rawEnv.DYNAMIC_CONFIG || "").toLowerCase()
+  );
+  const configFromEnv = dynamicConfig
+    ? Object.fromEntries(Object.entries(env).filter(([k]) => k !== "pathPrefix"))
+    : env;
 
   return ({
-    base: config.pathPrefix,
+    base: dynamicConfig ? "./" : config.pathPrefix,
     build: {
       sourcemap: mode !== "minimal",
       rollupOptions: {
@@ -103,7 +125,11 @@ export default defineConfig(async ({ mode }) => {
       STAC_BROWSER_VERSION: JSON.stringify(package_.version),
       // JSON.stringify removes e.g. functions from the config,
       // but from env we do not accept functions anyway.
-      CONFIG_FROM_ENV: JSON.stringify(env),
+      CONFIG_FROM_ENV: JSON.stringify(configFromEnv),
+      // Expose Vue component internals in the e2e build so end-to-end tests can
+      // reach the OpenLayers map (see tests/e2e/helpers.js). Only enabled when the
+      // e2e web server sets STAC_BROWSER_E2E; real production builds are unaffected.
+      __VUE_PROD_DEVTOOLS__: process.env.STAC_BROWSER_E2E === "true",
     },
     // See https://github.com/vitejs/vite/discussions/14801#discussioncomment-15550931 for details
     optimizeDeps: {
@@ -185,6 +211,11 @@ export default defineConfig(async ({ mode }) => {
         }),
     ],
     resolve: {
+      // Ensure a single instance of OpenLayers (and stac-js) is used even when
+      // ol-stac is symlinked (npm link) during development. Otherwise ol-stac
+      // resolves its own copy of `ol`, and adding its LayerGroup to the app's
+      // Map breaks OpenLayers' internal map wiring (the layer never gets a map).
+      dedupe: ["ol", "stac-js"],
       alias: {
         "@": fileURLToPath(new URL("./src", import.meta.url)),
         "@stac-browser-external-config": externalConfigPath,

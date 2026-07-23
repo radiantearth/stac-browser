@@ -20,7 +20,7 @@ You can then set the environment variable `SB_catalogUrl` to `"http://localhost:
 
 ## Using STAC Browser somewhere else
 
-If you are using a hosted version of STAC Browser, such as the [STAC Browser Demo by Radiant Earth](https://radiantearth.github.io/stac-browser/), and your STAC files use relative URIs, you can run a local webserver. One possibility is to use the Node package described above. Another is to use this Python 3 script:
+If you are using a hosted version of STAC Browser, such as the [STAC Browser Demo](https://browser.moregeo.it) by moreGeo, and your STAC files use relative URIs, you can run a local webserver. One possibility is to use the Node package described above. Another is to use this Python 3 script:
 
 ```python
 #!/usr/bin/env python3

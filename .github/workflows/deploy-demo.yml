@@ -1,4 +1,4 @@
-name: Deploy Demo
+name: Deployment
 on:
   push:
     branches:
@@ -7,19 +7,48 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
-      SB_pathPrefix: "/stac-browser"
-      SB_historyMode: "hash"
+      SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      SSH_HOST: ${{ secrets.SSH_HOST }}
+      SSH_USER: ${{ secrets.SSH_USER }}
+      DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
     steps:
       - uses: actions/setup-node@v6
         with:
           node-version: 'lts/*'
       - uses: actions/checkout@v6
-      - run: npm ci
-      - run: npm run build
-      - uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: dist
-          exclude_assets: 'report.html'
-          user_name: 'STAC Browser CI'
-          user_email: matthias.mohr@radiant.earth
+      - name: Install dependencies
+        run: npm ci
+      - name: Build
+        run: npm run build
+        env:
+          SB_footerLinks: '[{"label":"Made with ♥️ by moreGeo","url":"https://moregeo.it"},{"label":"Imprint","url":"https://moregeo.it/imprint"},{"label":"Privacy Policy","url":"https://moregeo.it/privacy"}]'
+      - name: Package build
+        run: tar -czf dist.tar.gz -C dist --exclude=./report.html .
+      - name: Prepare SSH key
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+      - name: Pin host key
+        # Verified out-of-band against the ED25519 fingerprint SHA256:ghTu3CHaBXpbKtgWwU6UeStqfPWOp1GIDumLITf2a3Y. Do not replace this with ssh-keyscan, which would trust whatever key is presented.
+        run: |
+          echo "w021d7df.kasserver.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIkUm8SumTo1C5UYLV/lCLM8mI/njv7+YnXc7JPqmHT1" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+      - name: Upload build
+        run: scp -i ~/.ssh/id_deploy -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes dist.tar.gz "$SSH_USER@$SSH_HOST:$DEPLOY_PATH/dist.tar.gz"
+      - name: Deploy on server (clean, near-zero downtime)
+        run: |
+          ssh -i ~/.ssh/id_deploy -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes "$SSH_USER@$SSH_HOST" bash -s <<REMOTE
+          set -eu
+          cd "$DEPLOY_PATH"
+          # Extract the new build into a staging dir first; the live site is untouched so far (no downtime yet).
+          rm -rf .deploy-new .deploy-old
+          mkdir .deploy-new
+          tar -xzf dist.tar.gz -C .deploy-new
+          # Swap: move the current site aside and the new site in. These are metadata-only renames, so the downtime window is just these two commands (milliseconds).
+          mkdir .deploy-old
+          find . -mindepth 1 -maxdepth 1 ! -name .deploy-new ! -name .deploy-old ! -name dist.tar.gz -exec mv -t .deploy-old {} +
+          find .deploy-new -mindepth 1 -maxdepth 1 -exec mv -t . {} +
+          # Site is live again on the new build; now clean up the old release and the archive.
+          rm -rf .deploy-old .deploy-new dist.tar.gz
+          REMOTE

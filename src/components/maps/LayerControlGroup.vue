@@ -18,7 +18,7 @@
 import { defineAsyncComponent } from 'vue';
 import LayerControlMixin from './LayerControlMixin';
 import LayerGroup from 'ol/layer/Group';
-import { transformExtent } from 'ol/proj';
+import { toOlExtent } from 'ol-stac/util.js';
 
 export default {
   name: 'LayerControlGroup',
@@ -100,7 +100,7 @@ export default {
           }
         }
         if (bbox) {
-          extent = transformExtent(bbox, 'EPSG:4326', this.map.getView().getProjection());
+          extent = toOlExtent(bbox, this.map.getView().getProjection());
         }
       }
       if (extent) {

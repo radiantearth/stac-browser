@@ -7,11 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [5.0.0] - Unreleased
+## [5.0.0-rc.2] - 2026-06-23
 
 ### Added
 
 - The Browse menu also loads additional Collections on demand
+- Minimal Docker build test and CI workflow.
+- Docker: `pathPrefix` can be set at container startup via `SB_pathPrefix` when `DYNAMIC_CONFIG` is enabled (default)
 
 ### Changed
 
@@ -19,9 +21,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   **Note:** This is commonly used in `preprocessSTAC` config option, ensure to update your `config.js`.
 - Internal rewrite of how API children are maintained
 - Loaded collections are cached and no longer re-fetched when returning to a page
+- Header stays at the top by default and has a different design. You can disable the sticky header in the `variables.scss` by setting `$header-position` to `static`.
 
 ### Fixed
 
+- Alternate assets are considered as thumbnail and preview candidates if the original asset can't be shown in a browser
+- Redirect bare `pathPrefix` URLs to their trailing-slash form in the Docker/nginx image (e.g. `/browser` → `/browser/`)
+- Geometries that cross the antimeridian are split into multi-geometries so that footprints render correctly on the map
 - Fix global error handling in certain edge-cases
 - Improve speed of catalog/collection duplicate detection
 - Fix search link detection
@@ -121,7 +127,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - CLI parameters for npm commands (e.g. `npm run build -- --catalogUrl="https://example.com"`) as they are not supported by Vite. Make sure to check your CI scripts and Docker files.
 - Support for customizing `authConfig` through the root catalog has been removed. Use the STAC Authentication extension instead.
-- Removed the `DYNAMIC_CONFIG` Docker build argument and `<!--RC RC-->` comment-based mechanism to use runtime config options. Use `SB_RUNTIME` instead.
 
 ### Fixed
 
@@ -205,8 +210,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 For releases prior to v4.0.0, please refer to the
 [release notes in the GitHub Releases](https://github.com/radiantearth/stac-browser/releases).
 
-[Unreleased]: https://github.com/radiantearth/stac-browser/compare/v5.0.0...HEAD
-[5.0.0]: https://github.com/radiantearth/stac-browser/compare/v5.0.0-rc.1...v5.0.0
+[Unreleased]: https://github.com/radiantearth/stac-browser/compare/v5.0.0-rc.2...HEAD
+[5.0.0-rc.2]: https://github.com/radiantearth/stac-browser/compare/v5.0.0-rc.1...v5.0.0-rc.2
 [5.0.0-rc.1]: https://github.com/radiantearth/stac-browser/compare/v5.0.0-beta.1...v5.0.0-rc.1
 [5.0.0-beta.1]: https://github.com/radiantearth/stac-browser/compare/v4.0.1...v5.0.0-beta.1
 [4.0.1]: https://github.com/radiantearth/stac-browser/compare/v4.0.0...v4.0.1
