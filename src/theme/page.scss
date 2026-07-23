@@ -20,12 +20,15 @@ svg {
   width: round(down, 1.2em, 1px);
 }
 
-.list-group-item.active a {
-  color: $link-color-on-primary;
-
-  &:hover {
-    color: $link-hover-color-on-primary;
-  }
+.list-group-item.active {
+  // Mark the selected item with Bootstrap's "subtle primary" tokens instead of
+  // a solid primary fill — the same treatment Bootstrap uses for an active
+  // accordion button. This keeps the text and any nested links readable with
+  // the normal colors (no on-primary special-casing) and is tuned for light
+  // and dark mode by Bootstrap.
+  --bs-list-group-active-color: var(--bs-primary-text-emphasis);
+  --bs-list-group-active-bg: var(--bs-primary-bg-subtle);
+  --bs-list-group-active-border-color: var(--bs-primary-border-subtle);
 }
 
 #stac-browser {
@@ -50,7 +53,7 @@ svg {
 
     @if $header-position == sticky {
       top: var(--sb-header-margin);
-      z-index: $header-z-index;
+      z-index: 1020;
       box-shadow: none;
       transition: box-shadow 0.2s ease-in-out;
       background-color: var(--bs-body-bg);
@@ -62,8 +65,35 @@ svg {
       }
     }
 
+    .btn-header {
+      @include button-variant(
+        $background: $header-button-background,
+        $border: $header-button-border-color,
+        $color: $header-color,
+        $hover-background: $header-button-hover-background,
+        $hover-border: $header-hover-button-border-color,
+        $hover-color: $header-hover-color,
+        $active-background: $header-button-active-background,
+        $active-border: $header-hover-button-border-color,
+        $active-color: $header-hover-color,
+        $disabled-background: transparent,
+        $disabled-border: transparent,
+        $disabled-color: rgba($header-color, 0.65)
+      );
+      --bs-btn-color: var(--sb-header-color);
+      --bs-btn-bg: var(--sb-header-button-background);
+      --bs-btn-border-color: var(--sb-header-button-border-color);
+      --bs-btn-hover-color: var(--sb-header-hover-color);
+      --bs-btn-hover-bg: var(--sb-header-button-hover-background);
+      --bs-btn-hover-border-color: var(--sb-header-hover-button-border-color);
+      --bs-btn-active-color: var(--sb-header-hover-color);
+      --bs-btn-active-bg: var(--sb-header-button-active-background);
+      --bs-btn-active-border-color: var(--sb-header-hover-button-border-color);
+      --bs-btn-disabled-color: color-mix(in srgb, var(--sb-header-color) 65%, transparent);
+    }
+
     .site {
-      background: $header-background;
+      background: var(--sb-header-background);
 
       @include media-breakpoint-up(lg) {
         .actions {
@@ -80,14 +110,14 @@ svg {
           display: flex;
           align-items: center;
           gap: var(--sb-header-font-size);
-          color: $link-color-on-primary;
-          text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+          color: var(--sb-header-color);
+          text-shadow: $header-text-shadow;
 
           a {
-            color: $link-color-on-primary;
+            color: var(--sb-header-color);
 
             &:hover {
-              color: $link-hover-color-on-primary;
+              color: var(--sb-header-hover-color);
             }
           }
           
@@ -140,12 +170,12 @@ svg {
           }
           @include media-breakpoint-down(xxl) {
             h1 {
-              font-size: $h1-font-size - 0.3rem;
+              font-size: $h1-font-size - 0.2rem;
             }
           }
           @include media-breakpoint-down(lg) {
             h1 {
-              font-size: $h1-font-size - 0.5rem;
+              font-size: $h1-font-size - 0.4rem;
             }
           }
         }
@@ -765,7 +795,7 @@ svg {
     --bs-btn-active-border-color: #{shade-color($dark, 25%)};
     --bs-btn-disabled-color: #{$white};
     --bs-btn-disabled-bg: #{$dark};
-    --bs-btn-disabled-border-color: #{$dark};
+    --bs-btn-disabled-border-color: #{shade-color($dark, 20%)};
   }
 
   .btn-dark, .badge-dark {
@@ -780,7 +810,7 @@ svg {
     --bs-btn-active-border-color: #{shade-color($light, 25%)};
     --bs-btn-disabled-color: #{$dark};
     --bs-btn-disabled-bg: #{$light};
-    --bs-btn-disabled-border-color: #{$light};
+    --bs-btn-disabled-border-color: #{shade-color($light, 15%)};
   }
 
   .text-bg-dark {
@@ -807,6 +837,21 @@ svg {
   // Colors (light mode; dark mode overrides below)
   --sb-h1-color: #{$h1-color};
   --sb-subheadings-color: #{$subheadings-color};
+
+  // Main/top header of the website
+  --sb-header: #{$header};
+  --sb-header-background: linear-gradient(to bottom,
+    color-mix(in srgb, var(--sb-header) 85%, #fff),
+    var(--sb-header),
+    color-mix(in srgb, var(--sb-header) 85%, #000)
+  );
+  --sb-header-color: #{$header-color};
+  --sb-header-hover-color: #{$header-hover-color};
+  --sb-header-button-background: #{$header-button-background};
+  --sb-header-button-border-color: #{$header-button-border-color};
+  --sb-header-button-hover-background: #{$header-button-hover-background};
+  --sb-header-button-active-background: #{$header-button-active-background};
+  --sb-header-hover-button-border-color: #{$header-hover-button-border-color};
 }
 
 [data-bs-theme="dark"] {

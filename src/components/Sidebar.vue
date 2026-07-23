@@ -94,22 +94,19 @@ export default {
   }
 
   .btn-light {
-    --bs-btn-border-color: $light;
+    --bs-btn-border-color: #{$light};
+
+    [data-bs-theme="dark"] & {
+      --bs-btn-border-color: #{$dark};
+    }
   }
 
   .btn-dark,
   .badge-dark {
-    --bs-btn-border-color: $dark;
-  }
+    --bs-btn-border-color: #{$dark};
 
-  [data-bs-theme="dark"] {
-    .btn-light {
-      --bs-btn-border-color: $dark;
-    }
-
-    .btn-dark,
-    .badge-dark {
-      --bs-btn-border-color: $light;
+    [data-bs-theme="dark"] & {
+      --bs-btn-border-color: #{$light};
     }
   }
 
