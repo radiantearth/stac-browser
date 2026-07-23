@@ -51,18 +51,12 @@ $headings-font-family: $font-family-sans-serif;
 $font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
 // Heading sizes
-$h1-font-size: 2.2rem;
-$h1-font-weight: 700;
+$h1-font-size: 2rem;
+$h1-font-weight: 600;
 $h2-font-size: 1.6rem;
 $h2-font-weight: 600;
 $h3-font-size: 1.4rem;
 $h4-font-size: 1.2rem;
-
-// Page header
-$header-font-size: 1.5rem;
-$header-font-weight: 600;
-$header-border-width: 3px;
-$header-border-style: solid;
 
 // Link decoration (non-color)
 $link-decoration: none;
@@ -92,16 +86,29 @@ $dark:      #343a40; // dark means highlighted
 // Heading colors
 $h1-color: inherit;
 $subheadings-color: #6c757d; // h2 only
-$headings-color: inherit; // h3, h4, h5, h6
 
 // Link colors
 $link-color: #188191;
 $link-hover-color: darken($link-color, 20%);
 
-$link-color-on-primary: tint-color($primary, 60%);
-$link-hover-color-on-primary: $body-bg;
-
 @import 'bootstrap/scss/_variables';
+
+// Main/top header of the website
+$header: $primary;
+$header-position: sticky; // sticky or static
+$header-font-size: 1.5rem;
+$header-font-weight: 600;
+$header-text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+
+$header-contrast: color-contrast($header);
+$header-color: tint-color($header, 80%); // Use shade-color if your header has a bright color
+$header-hover-color: $header-contrast;
+
+$header-button-background: transparent;
+$header-button-border-color: $header-color;
+$header-hover-button-border-color: $header-hover-color;
+$header-button-hover-background: rgba($header-contrast, 0.15);
+$header-button-active-background: rgba($header-contrast, 0.25);
 
 // ─────────────────────────────────────────────────────────
 // DARK MODE
@@ -116,7 +123,6 @@ $body-color-dark: #dee2e6;
 
 $h1-color-dark: inherit;
 $subheadings-color-dark: lighten($secondary, 10%);
-$headings-color-dark: inherit;
 
 $link-hover-color-dark: $body-color-dark;
 

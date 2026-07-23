@@ -93,6 +93,23 @@ export default {
     background-color: $dark;
   }
 
+  .btn-light {
+    --bs-btn-border-color: #{$light};
+
+    [data-bs-theme="dark"] & {
+      --bs-btn-border-color: #{$dark};
+    }
+  }
+
+  .btn-dark,
+  .badge-dark {
+    --bs-btn-border-color: #{$dark};
+
+    [data-bs-theme="dark"] & {
+      --bs-btn-border-color: #{$light};
+    }
+  }
+
   @include media-breakpoint-down(md) {
     width: 100%;
     min-width: 100px;
