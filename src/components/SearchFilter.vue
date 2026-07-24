@@ -60,7 +60,7 @@
 
         <b-form-group v-if="canFilterExtents" class="filter-bbox" :label="$t('search.spatialExtent')" :label-for="ids.bbox">
           <b-form-checkbox :id="ids.bbox" v-model="provideBBox">{{ $t('search.filterBySpatialExtent') }}</b-form-checkbox>
-          <mapSelect class="mb-4" v-if="provideBBox" v-model="searchBBox" :stac="stac" />
+          <MapSelect class="mb-4" v-if="provideBBox" v-model="searchBBox" :stac="stac" />
         </b-form-group>
 
         <b-form-group v-if="conformances.CollectionIdFilter" class="filter-collection" :label="$t('stacCollection', collections.length)" :label-for="ids.collections">
