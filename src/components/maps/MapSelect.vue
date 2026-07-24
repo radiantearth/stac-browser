@@ -410,7 +410,9 @@ export default {
       this.interaction.setExtent(projectedExtent);
     },
     stacToOlExtent(extent) {
-      if (!extent || extent.length !== 4) {return extent;}
+      if (!Array.isArray(extent) || extent.length !== 4) {
+        return null;
+      }
     
       // Handles antimeridian-crossing bboxes (westLon > eastLon), shifting
       // eastLon by +360 so OpenLayers gets a valid extent where minX < maxX.
