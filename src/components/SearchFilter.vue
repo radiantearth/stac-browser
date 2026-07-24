@@ -6,7 +6,7 @@
           <b-alert
             variant="warning"
             dismissible
-            :model-value="true"
+            show
             class="mb-3"
             @dismissed="$store.commit('search/clearDroppedFilters')"
           >
@@ -59,8 +59,8 @@
         </b-form-group>
 
         <b-form-group v-if="canFilterExtents" class="filter-bbox" :label="$t('search.spatialExtent')" :label-for="ids.bbox">
-          <b-form-checkbox :id="ids.bbox" v-model="provideBBox" value="1">{{ $t('search.filterBySpatialExtent') }}</b-form-checkbox>
-          <MapSelect ref="mapSelect" class="mb-4" v-if="provideBBox" v-model="searchBBox" :stac="stac" />
+          <b-form-checkbox :id="ids.bbox" v-model="provideBBox">{{ $t('search.filterBySpatialExtent') }}</b-form-checkbox>
+          <mapSelect class="mb-4" v-if="provideBBox" v-model="searchBBox" :stac="stac" />
         </b-form-group>
 
         <b-form-group v-if="conformances.CollectionIdFilter" class="filter-collection" :label="$t('stacCollection', collections.length)" :label-for="ids.collections">
@@ -180,7 +180,7 @@ import { BCard, BCardBody, BCardFooter, BCardTitle, BDropdown, BDropdownItem, BM
 import refParser from '@apidevtools/json-schema-ref-parser';
 
 import Utils from '../utils';
-import { hasText, isObject } from 'stac-js/src/utils.js';
+import { hasText, isObject, size } from 'stac-js/src/utils.js';
 
 import ApiCapabilitiesMixin, { TYPES } from './ApiCapabilitiesMixin';
 import DatePickerMixin from './DatePickerMixin';
@@ -190,7 +190,7 @@ import { CollectionCollection, STAC } from 'stac-js';
 import { createSTAC } from '../models/stac';
 import Cql from '../models/cql2/cql';
 import CqlLogicalOperator, { CqlNot } from '../models/cql2/operators/logical';
-import { fetchQueryablesForLink, stacRequest } from '../store/utils';
+import { fetchQueryablesForLink } from '../store/utils';
 import { formatKey } from '@radiantearth/stac-fields/helper';
 
 function getDefaults() {
@@ -268,13 +268,16 @@ export default defineComponent({
   },
   computed: {
     ...mapState(['defaultCollectionSort', 'defaultItemSort', 'searchResultsPerPage', 'maxEntriesPerPage', 'uiLanguage']),
+    ...mapState('search', ['droppedFilters']), 
     ...mapGetters(['canSearchCollections', 'getApiChildren', 'supportsConformance']),
     ...mapGetters('search', ['collectionSearchParams', 'itemSearchParams']),
     droppedFilterNames() {
       const names = [];
-      const ft = this.$store.state.search.droppedFilters.find(f => f.type === 'freeText');
-      if (ft) {ft.terms.forEach(t => names.push(t));}
-      const cql = this.$store.state.search.droppedFilters.filter(f => f.type === 'cql2');
+      const ft = this.droppedFilters.find(f => f.type === 'freeText');
+      if (ft) {
+        names.push(this.$t('search.freeText')); 
+      }
+      const cql = this.droppedFilters.filter(f => f.type === 'cql2');
       cql.forEach(f => names.push(f.queryable?.title || f.queryable?.id || f.id));
       return names;
     },
@@ -464,8 +467,12 @@ export default defineComponent({
       }
     },
     searchBBox: {
-      get() { return Array.isArray(this.activeParams?.bbox) ? [...this.activeParams.bbox] : null; },
-      set(val) { this.commitToVuex('bbox', val); }
+      get() {
+        return Array.isArray(this.activeParams?.bbox) ? [...this.activeParams.bbox] : null;
+      },
+      set(val) {
+        this.commitToVuex('bbox', val);
+      }
     },
     searchIds: {
       get() { 
@@ -505,9 +512,9 @@ export default defineComponent({
       immediate: true,
       deep: true,
       handler(newVal) {
-        if (!newVal || Object.keys(newVal).length === 0) {return;}
+        if (!newVal || size(newVal) === 0) {return;}
         for (const [key, val] of Object.entries(newVal)) {
-          if (val !== undefined && val !== null && val !== '') {
+          if (val !== undefined && val !== null && val !== '' && (!Array.isArray(val) || val.length > 0)) {
             this.commitToVuex(key, val);
           }
         }
@@ -540,7 +547,7 @@ export default defineComponent({
       immediate: true,
       handler(newBbox) {
         if (newBbox && newBbox.length > 0) {
-          this.provideBBox = '1';
+          this.provideBBox = true;
           this.bbox = newBbox; 
         }
         else if (!this.loaded) {
@@ -562,25 +569,15 @@ export default defineComponent({
       handler(collections) {
         this.commitToVuex('collections', collections.map(c => c.value));
       }
-    },  
+    },
     provideBBox(shown) {
       if (!this.loaded) {return;}
 
-      const isChecked = shown === '1' || shown === true;
-
-      if (!isChecked) {
+      if (shown !== true) {
         this.commitToVuex('bbox', null);
       }
-      else {
-        if (this.bbox && this.bbox.length > 0) {
-          this.commitToVuex('bbox', this.bbox);
-        }
-        
-        setTimeout(() => {
-          if (this.$refs.mapSelect && typeof this.$refs.mapSelect.updateMap === 'function') {
-            this.$refs.mapSelect.updateMap();
-          }
-        }, 300);
+      else if (this.bbox && this.bbox.length > 0) {
+        this.commitToVuex('bbox', this.bbox);
       }
     },
     sortTerm() {
@@ -813,7 +810,7 @@ export default defineComponent({
         negate: this.filtersNegate,
       });
 
-      this.$emit('input', this.activeParams, false);
+      this.$emit('input', this.activeParams);
     },
     onReset() {
       Object.assign(this, getDefaults());   

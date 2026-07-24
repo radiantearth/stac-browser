@@ -248,7 +248,7 @@ export default defineComponent({
 
         await this.$store.dispatch('search/migrateFiltersToCollection', {
           collection: newData,
-          fetchQueryables: (collection) => fetchQueryablesForLink(this.$store, collection.getQueryablesLink?.()),
+          fetchQueryables: async (collection) => await fetchQueryablesForLink(this.$store, collection.getQueryablesLink?.()),
         }); 
 
         this.filters = this.$store.getters['search/itemSearchParams'];

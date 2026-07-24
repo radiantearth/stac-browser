@@ -95,7 +95,6 @@ import GeoJSON from 'ol/format/GeoJSON';
 import Fill from 'ol/style/Fill';
 import VectorLayer from 'ol/layer/Vector';
 import { toGeoJSON } from 'stac-js/src/geo.js';
-import { toOlExtent } from 'ol-stac/util.js';
 import mask from '@turf/mask';
 
 function getBoxDefaults() {
@@ -227,8 +226,7 @@ export default {
               
               this.map.getView().fit(extent, {
                 padding: [50, 50, 50, 50],
-                maxZoom: 10,
-                duration: 250
+                maxZoom: this.maxZoom,
               });
               
               observer.disconnect(); 
@@ -241,8 +239,7 @@ export default {
 
         this.map.getView().fit(extent, {
           padding: [50, 50, 50, 50],
-          maxZoom: 10,
-          duration: 250
+          maxZoom: this.maxZoom,
         });
       }
     },
@@ -413,12 +410,11 @@ export default {
       this.interaction.setExtent(projectedExtent);
     },
     stacToOlExtent(extent) {
-      if (!Array.isArray(extent) || extent.length !== 4) {
-        return null;
-      }
+      if (!extent || extent.length !== 4) {return extent;}
+    
       // Handles antimeridian-crossing bboxes (westLon > eastLon), shifting
       // eastLon by +360 so OpenLayers gets a valid extent where minX < maxX.
-      return toOlExtent(extent, this.map.getView().getProjection());
+      return transformExtent(extent, 'EPSG:4326', this.map.getView().getProjection());
     }
   }
 };

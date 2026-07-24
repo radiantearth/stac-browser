@@ -95,7 +95,7 @@ test.describe('Dropped filter banner — collection search to collection navigat
     await test.step('Verify free-text banner appears', async () => {
       const banner = page.locator('.alert-warning').first();
       await expect(banner).toBeVisible({ timeout: 10000 });
-      await expect(banner).toContainText('sentinel');
+      await expect(banner).toContainText(/Search Terms/i);
       await expect(banner).toContainText(/removed/i);
     });
   });
@@ -124,8 +124,7 @@ test.describe('Dropped filter banner — collection search to collection navigat
     await test.step('Verify banner lists all dropped terms', async () => {
       const banner = page.locator('.alert-warning').first();
       await expect(banner).toBeVisible({ timeout: 10000 });
-      await expect(banner).toContainText('sentinel');
-      await expect(banner).toContainText('radar');
+      await expect(banner).toContainText(/Search Terms/i);
     });
   });
 
@@ -231,7 +230,7 @@ test.describe('Dropped filter banner — collection search to collection navigat
     await test.step('Banner appears even though no previous collection was loaded', async () => {
       const banner = page.locator('.alert-warning').first();
       await expect(banner).toBeVisible({ timeout: 10000 });
-      await expect(banner).toContainText('sentinel');
+      await expect(banner).toContainText(/Search Terms/i);
     });
   });
 

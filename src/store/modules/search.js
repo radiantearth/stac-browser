@@ -19,6 +19,13 @@ const defaultFilterSet = () => ({
   filterLogic: { andOr: 'and', negate: false },
 });
 
+const buildSearchParams = (sharedState, specificFilters) => {
+  const rest = { ...specificFilters };
+  delete rest.rawFilters;
+  delete rest.filterLogic;
+  return { ...sharedState, ...rest };
+};
+
 function splitShared(patch) {
   const shared = {};
   const rest = {};
@@ -44,18 +51,8 @@ export default {
 
   getters: {
     // Full merged filter objects ready to hand to Utils.addFiltersToLink
-    collectionSearchParams: (state) => {
-      const rest = { ...state.collectionFilters };
-      delete rest.rawFilters;
-      delete rest.filterLogic;
-      return { ...state.shared, ...rest };
-    },
-    itemSearchParams: (state) => {
-      const rest = { ...state.itemFilters };
-      delete rest.rawFilters;
-      delete rest.filterLogic;
-      return { ...state.shared, ...rest };
-    },
+    collectionSearchParams: (state) => buildSearchParams(state.shared, state.collectionFilters),
+    itemSearchParams: (state) => buildSearchParams(state.shared, state.itemFilters),
     hasActiveFilters: (state) => {
       const s = state.shared;
       const isActive = (f) => (
@@ -116,9 +113,8 @@ export default {
   /**
  * Called when the user navigates from collection search into a specific collection.
  *
- * Collection search filters don't all carry over to item search. Free-text terms
- * and sort are dropped since item search on most APIs doesn't support them. 
- * The unsupported filters are dropped, compatible ones are rebuilt and applied to itemFilters.
+ * Free-text terms don't carry over to item search.
+ * Unsupported filters are dropped, compatible ones are rebuilt and applied to itemFilters.
  *
  * All dropped filters are recorded in `droppedFilters` so the UI can notify the
  * user via a warning banner when they open the item filter panel.
