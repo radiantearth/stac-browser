@@ -242,9 +242,15 @@ export default defineComponent({
           console.error(error);
         }
 
-        if (!newData?.isCollection) { return; }
-        if (!this.$store.getters['search/hasActiveFilters']) { return; }
-        if (oldData?.id === newData?.id) { return; }
+        if (!newData?.isCollection) {
+          return;
+        }
+        if (!this.$store.getters['search/hasActiveFilters']) {
+          return;
+        }
+        if (oldData?.id === newData?.id) {
+          return;
+        }
 
         await this.$store.dispatch('search/migrateFiltersToCollection', {
           collection: newData,

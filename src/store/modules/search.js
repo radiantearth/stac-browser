@@ -174,7 +174,9 @@ export default {
             return f.negate ? new CqlNot(filter) : filter;
           });
           let logical = CqlLogicalOperator.create(andOr, args);
-          if (negate) { logical = new CqlNot(logical); }
+          if (negate) {
+            logical = new CqlNot(logical);
+          }
           rebuiltCql = new Cql(logical, null);
         }
 

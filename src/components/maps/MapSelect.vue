@@ -96,6 +96,7 @@ import Fill from 'ol/style/Fill';
 import VectorLayer from 'ol/layer/Vector';
 import { toGeoJSON } from 'stac-js/src/geo.js';
 import mask from '@turf/mask';
+import { toOlExtent } from 'ol-stac/util.js';
 
 function getBoxDefaults() {
   return {
@@ -279,8 +280,12 @@ export default {
     fixX(x) {
       // Normalize longitude to -180 to 180 range
       // For antimeridian crossing, westLon can be > eastLon
-      while (x > 180) {x -= 360;}
-      while (x < -180) {x += 360;}
+      while (x > 180) {
+        x -= 360;
+      }
+      while (x < -180) {
+        x += 360;
+      }
       return x;
     },
     fixY(y) {
@@ -416,7 +421,7 @@ export default {
     
       // Handles antimeridian-crossing bboxes (westLon > eastLon), shifting
       // eastLon by +360 so OpenLayers gets a valid extent where minX < maxX.
-      return transformExtent(extent, 'EPSG:4326', this.map.getView().getProjection());
+      return toOlExtent(extent, this.map.getView().getProjection());
     }
   }
 };

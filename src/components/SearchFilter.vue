@@ -479,7 +479,9 @@ export default defineComponent({
         const ids = this.activeParams?.ids;
         return Array.isArray(ids) ? [...ids] : [];
       },
-      set(value) { this.commitToVuex('ids', value); }
+      set(value) {
+        this.commitToVuex('ids', value);
+      }
     },
     apiCollectionsState() {
       return this.getApiChildren(this.parent);
@@ -512,7 +514,9 @@ export default defineComponent({
       immediate: true,
       deep: true,
       handler(newVal) {
-        if (!newVal || size(newVal) === 0) {return;}
+        if (!newVal || size(newVal) === 0) {
+          return;
+        }
         for (const [key, val] of Object.entries(newVal)) {
           if (val !== undefined && val !== null && val !== '' && (!Array.isArray(val) || val.length > 0)) {
             this.commitToVuex(key, val);
@@ -559,7 +563,9 @@ export default defineComponent({
       immediate: true,
       deep: true,
       handler(logic) {
-        if (!logic) {return;}
+        if (!logic) {
+          return;
+        }
         this.filtersAndOr = logic.andOr ?? 'and';
         this.filtersNegate = logic.negate ?? false;
       }
@@ -571,7 +577,9 @@ export default defineComponent({
       }
     },
     provideBBox(shown) {
-      if (!this.loaded) {return;}
+      if (!this.loaded) {
+        return;
+      }
 
       if (shown !== true) {
         this.commitToVuex('bbox', null);
