@@ -95,8 +95,8 @@ import GeoJSON from 'ol/format/GeoJSON';
 import Fill from 'ol/style/Fill';
 import VectorLayer from 'ol/layer/Vector';
 import { toGeoJSON } from 'stac-js/src/geo.js';
-import mask from '@turf/mask';
 import { toOlExtent } from 'ol-stac/util.js';
+import mask from '@turf/mask';
 
 function getBoxDefaults() {
   return {
