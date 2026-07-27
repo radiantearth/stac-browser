@@ -444,5 +444,8 @@
       "title": "Show as tiles"
     },
     "title": "Display Options"
+  },
+  "widgets": {
+    "featured": "Featured"
   }
 }
