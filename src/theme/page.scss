@@ -80,20 +80,6 @@ svg {
     }
 
     .btn-header {
-      @include button-variant(
-        $background: $header-button-background,
-        $border: $header-button-border-color,
-        $color: $header-color,
-        $hover-background: $header-button-hover-background,
-        $hover-border: $header-hover-button-border-color,
-        $hover-color: $header-hover-color,
-        $active-background: $header-button-active-background,
-        $active-border: $header-hover-button-border-color,
-        $active-color: $header-hover-color,
-        $disabled-background: transparent,
-        $disabled-border: transparent,
-        $disabled-color: rgba($header-color, 0.65)
-      );
       --bs-btn-color: var(--sb-header-color);
       --bs-btn-bg: var(--sb-header-button-background);
       --bs-btn-border-color: var(--sb-header-button-border-color);
@@ -104,6 +90,9 @@ svg {
       --bs-btn-active-bg: var(--sb-header-button-active-background);
       --bs-btn-active-border-color: var(--sb-header-hover-button-border-color);
       --bs-btn-disabled-color: color-mix(in srgb, var(--sb-header-color) 65%, transparent);
+      --bs-btn-disabled-bg: transparent;
+      --bs-btn-disabled-border-color: transparent;
+      --bs-btn-focus-shadow-rgb: #{to-rgb($header-contrast)};
     }
 
     .site {

@@ -88,7 +88,7 @@ If you need a completely different palette in dark mode, override Bootstrap's CS
 ```
 
 > [!IMPORTANT]  
-> Whenever you set `--bs-*`, always update the matching `--bs-*-rgb` as well.
+> Whenever you set a `--bs-*` color that has a matching `--bs-*-rgb` twin, always update the twin as well.
 > Bootstrap uses the RGB form for `rgba()` opacity variants internally.
 > Use any hex-to-RGB converter, e.g. <https://www.rapidtables.com/convert/color/hex-to-rgb.html>
 
@@ -192,10 +192,10 @@ text emphasis colors, and focus rings — are computed automatically from these
 variables via [`color-mix()`](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/color-mix).
 
 > [!IMPORTANT]  
-> Whenever you set a `--bs-*` color, always set the matching `--bs-*-rgb` variable
-> to the same color as `R, G, B` values. Bootstrap uses the RGB form for `rgba()`
-> opacity variants internally.
-> The `--sb-*` variables don't need an RGB twin.
+> Whenever you set a `--bs-*` color that has a matching `--bs-*-rgb` twin (see the
+> table above), always set the twin to the same color as `R, G, B` values. Bootstrap
+> uses the RGB form for `rgba()` opacity variants internally. Not all colors have a
+> twin (e.g. `--bs-border-color` doesn't), and the `--sb-*` variables never need one.
 
 #### Sizing and typography
 
@@ -210,7 +210,7 @@ These are independent of the color mode and can be set in a single `:root, [data
 | -------- | ------- |
 | `--bs-body-font-family` | Font family for normal text. |
 | `--bs-font-monospace` | Font family for code. |
-| `--sb-logo-max-height` | Maximum height of the logo (`catalogImage`). |
+| `--sb-logo-height` | Height of the logo (`catalogImage`); the width scales proportionally. |
 | `--sb-block-gap` | Gap between the main sections of the page (header, content, footer). |
 | `--sb-header-margin` | Margin at the top of the page (e.g. for a custom header). |
 | `--sb-header-font-size` / `--sb-header-font-weight` | Font size and weight of the catalog title in the header. |
