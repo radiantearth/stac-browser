@@ -8,6 +8,7 @@ content you need - using either the pre-defined widgets or your own Vue componen
   - [Configuration File](#configuration-file)
   - [Using Pre-defined Widgets](#using-pre-defined-widgets)
   - [Using Custom Components](#using-custom-components)
+  - [Conditional Widgets](#conditional-widgets)
 - [Pre-defined Widgets](#pre-defined-widgets)
   - [AlertBox](#alertbox)
   - [CustomText](#customtext)
@@ -68,6 +69,32 @@ Make sure the beginning of the config file includes:
 
 ```js
 import { defineAsyncComponent } from 'vue';
+```
+
+### Conditional Widgets
+
+By default, a widget renders whenever its hook renders. To limit a widget to
+specific situations, add a `condition` function to the widget definition.
+The widget is only shown when the function returns `true`. It receives an
+object with the currently shown STAC entity (`data`) and the Vuex store
+`state` and `getters`.
+
+For example, to show a widget only on the landing page:
+
+```js
+{
+  id: 'AlertBox',
+  condition: ({ data, getters }) => Boolean(data && getters.root && data.is(getters.root)),
+  props: {
+    text: 'Welcome!'
+  }
+}
+```
+
+Or only for collections:
+
+```js
+condition: ({ data }) => Boolean(data?.isCollection)
 ```
 
 ## Pre-defined Widgets

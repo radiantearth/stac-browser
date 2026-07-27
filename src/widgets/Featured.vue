@@ -40,15 +40,8 @@ export default defineComponent({
     ...mapState(['data', 'apiCollections']),
     ...mapGetters(['getStac', 'root']),
     heading() {
-      if (this.title === null) {
-        return this.$t('widgets.featured');
-      }
-      // Allow the title to be given as a key for a phrase from the locales (e.g. custom.json)
-      const fallback = this.$i18n.fallbackLocale;
-      if (this.$te(this.title) || (typeof fallback === 'string' && this.$te(this.title, fallback))) {
-        return this.$t(this.title);
-      }
-      return this.title;
+      // Plain text passes through unchanged, locale keys get translated
+      return this.$t(this.title || 'widgets.featured');
     },
     isLandingPage() {
       return this.data instanceof STAC

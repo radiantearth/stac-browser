@@ -1,5 +1,5 @@
 <template>
-  <div class="widget" v-for="widget of widgets" :key="widget.id">
+  <div class="widget" v-for="widget of visibleWidgets" :key="widget.id">
     <component :is="widget.id" v-bind="widget.props" />
   </div>
 </template>
@@ -22,6 +22,26 @@ export default {
       widgets: [],
     };
   },
+  computed: {
+    visibleWidgets() {
+      return this.widgets.filter(widget => {
+        if (typeof widget.condition !== 'function') {
+          return true;
+        }
+        try {
+          const { state, getters } = this.$store;
+          return Boolean(widget.condition({
+            data: state.data,
+            state,
+            getters
+          }));
+        } catch (error) {
+          console.error(`Condition for widget '${widget.id}' failed:`, error);
+          return false;
+        }
+      });
+    }
+  },
   created() {
     const widgets = widgetConfig[this.id];
     if (!Array.isArray(widgets)) {
@@ -39,6 +59,7 @@ export default {
       this.widgets.push({
         id: widget.id || `Widget${i++}`,
         component,
+        condition: widget.condition,
         props: widget.props || {},
       });
     }

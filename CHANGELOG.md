@@ -9,7 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Widget `Featured`
+- New Widget: `Featured`
+- Allow widgets to be shown conditionally
 - Added `relationTypes.config.js` to allow configuring link relation types that
   - are specifically STAC and should be used to navigate to and display in STAC Browser
   - should be hidden
