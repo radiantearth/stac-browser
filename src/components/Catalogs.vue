@@ -1,8 +1,8 @@
 <template>
   <section class="catalogs mb-4">
     <header>
-      <h2 class="title me-2">{{ title }}</h2>
-      <b-badge v-if="catalogCount !== null" pill variant="secondary" class="me-4">{{ catalogCount }}</b-badge>
+      <h2 class="title me-2">{{ displayTitle }}</h2>
+      <b-badge v-if="!hideCount && catalogCount !== null" pill variant="secondary" class="me-4">{{ catalogCount }}</b-badge>
       <ViewButtons v-if="!hideControls" class="me-2" v-model="view" />
       <SortButtons v-if="!hideControls && isComplete && catalogs.length > 1" v-model="sort.direction" />
     </header>
@@ -39,7 +39,7 @@
     <section class="list">
       <Loading v-if="loading && !loadingMore" fill top />
       <div :class="view === 'list' ? 'card-list' : 'card-grid'">
-        <Catalog v-for="catalog in catalogView" :catalog="catalog" :key="catalog.href">
+        <Catalog v-for="catalog in catalogView" :catalog="catalog" :viewMode="view" :key="catalog.href">
           <template #footer="{data}">
             <slot name="catalogFooter" :data="data" />
           </template>
@@ -91,9 +91,26 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
+    enforceView: {
+      type: String,
+      default: null,
+      validator: value => value === null || ['list', 'cards'].includes(value)
+    },
     hideControls: {
       type: Boolean,
       default: false
+    },
+    hideCount: {
+      type: Boolean,
+      default: false
+    },
+    preserveOrder: {
+      type: Boolean,
+      default: false
+    },
+    title: {
+      type: String,
+      default: null
     },
     loading: {
       type: Boolean,
@@ -162,8 +179,11 @@ export default defineComponent({
       }
       return null;
     },
-    title() {
-      if (this.collectionsOnly) {
+    displayTitle() {
+      if (this.title !== null) {
+        return this.title;
+      }
+      else if (this.collectionsOnly) {
         return this.$t('stacCollection', this.catalogs.length );
       }
       else {
@@ -223,7 +243,7 @@ export default defineComponent({
         });
       }
       // Sort
-      if (!this.hasMore && !this.apiFilters.sortby && this.sort.direction !== 0) {
+      if (!this.preserveOrder && !this.hasMore && !this.apiFilters.sortby && this.sort.direction !== 0) {
         catalogs = sortStac(catalogs, this.sort, this.uiLanguage);
       }
       return catalogs;
@@ -246,13 +266,16 @@ export default defineComponent({
     },
     view: {
       get() {
+        if (this.enforceView) {
+          return this.enforceView;
+        }
         if (this.enforceCards) {
           return 'cards';
         }
         return this.$store.state.cardViewMode;
       },
       async set(cardViewMode) {
-        if (this.enforceCards) {
+        if (this.enforceView || this.enforceCards) {
           return;
         }
         await this.$store.dispatch('config', { cardViewMode });
