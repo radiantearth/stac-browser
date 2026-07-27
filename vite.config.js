@@ -97,9 +97,7 @@ export default defineConfig(async ({ mode }) => {
   const defaultConfig = (await import(pathToFileURL(defaultConfigPath).href)).default ?? {};
   const externalConfig = (await import(pathToFileURL(externalConfigPath).href)).default ?? {};
   const config = Object.assign({}, defaultConfig, externalConfig, env);
-  const runtime = ["true", "1", "yes"].includes(
-    String(rawEnv.SB_RUNTIME || "").toLowerCase()
-  );
+  const runtime = String(rawEnv.SB_RUNTIME || "").toLowerCase() === "true";
   const configFromEnv = runtime
     ? Object.fromEntries(Object.entries(env).filter(([k]) => k !== "pathPrefix"))
     : env;
@@ -151,7 +149,7 @@ export default defineConfig(async ({ mode }) => {
           },
         },
       }),
-      ViteEjsPlugin(config),
+      ViteEjsPlugin({ ...config, RUNTIME: runtime }),
       Components({
         dirs: [],
         globs: [],
