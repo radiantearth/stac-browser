@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Widgets that provide a custom `component` without an `id` render correctly; widget definitions with neither are skipped with an error
 - Use the Bootstrap z-index values to avoid overlay issues with the sticky header
 - Fix logo size calculation, avoiding the site title wrapping into multiple lines
 - Share button correctly shows with rounded borders on the right side

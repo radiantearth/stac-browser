@@ -1,5 +1,5 @@
 <template>
-  <div class="widget" v-for="widget of visibleWidgets" :key="widget.id">
+  <div class="widget" v-for="widget of visibleWidgets" :key="widget.key">
     <component :is="widget.id" v-bind="widget.props" />
   </div>
 </template>
@@ -47,22 +47,26 @@ export default {
     if (!Array.isArray(widgets)) {
       return;
     }
-    let i = 1;
-    for(const widget of widgets) {
+    widgets.forEach((widget, index) => {
       let component = widget.component;
-      if (!widget.component) {
+      if (!component && !widget.id) {
+        console.error(`A widget for the hook '${this.id}' defines neither an 'id' nor a 'component' and is not shown.`);
+        return;
+      }
+      if (!component) {
         component = defineAsyncComponent(
           () => import(`../widgets/${widget.id}.vue`)
         );
       }
-      this.$options.components[widget.id] = component;
+      const id = widget.id || `Widget${index}`;
+      this.$options.components[id] = component;
       this.widgets.push({
-        id: widget.id || `Widget${i++}`,
-        component,
+        id,
+        key: `${id}:${index}`,
         condition: widget.condition,
         props: widget.props || {},
       });
-    }
+    });
   },
 };
 </script>
