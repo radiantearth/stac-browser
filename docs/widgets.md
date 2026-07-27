@@ -11,7 +11,9 @@ content you need - using either the pre-defined widgets or your own Vue componen
 - [Pre-defined Widgets](#pre-defined-widgets)
   - [AlertBox](#alertbox)
   - [CustomText](#customtext)
+  - [Featured](#featured)
 - [Hooks](#hooks)
+  - [StacBrowser.vue](#stacbrowservue)
   - [views/ApiSearch.vue](#viewsapisearchvue)
   - [views/Catalog.vue](#viewscatalogvue)
   - [views/Item.vue](#viewsitemvue)
@@ -91,6 +93,32 @@ Renders a simple text with a heading.
 | ------- | ------ | ------- | ----------- |
 | `title` | String | `''`    | Rendered as an `<h3>` heading. |
 | `text`  | String | `''`    | Rendered as a `<p>` paragraph. |
+
+### Featured
+
+Renders a list of "featured" STAC catalogs or collections.
+A typical placement is the `view-catalog-catalogs-start` hook, which shows the featured entities right above the regular collection list.
+The widget only renders on the landing page (the root catalog).
+
+| Props      | Type   | Default      | Description |
+| ---------- | ------ | ------------ | ----------- |
+| `entities` | Array  | **required** | The entities to feature, shown in the given order. See below for the supported types of entries. |
+| `title`    | String | `null`       | Rendered as the heading of the list. Can be given as plain text or as the key of a phrase from the locales (e.g. defined in the `custom.json` files, see the [localization docs](localization.md#custom-phrases)). If not given, defaults to a localized version of "Featured". |
+| `view`     | String | `'cards'`    | How the entities are shown: `'cards'` or `'list'`. Set to `null` to follow the view mode that the user has chosen for the other lists. |
+
+Each entry in `entities` can be one of the following:
+
+- **A collection ID** (a string without a slash, e.g. `'sentinel-2-l2a'`):
+  Only works for STAC APIs.
+- **A URL** (a string with a slash, absolute or relative to the catalog,
+  e.g. `'https://example.com/api/collections/xyz'` or `'./data/catalog.json'`):
+  Works for both STAC APIs and static catalogs.
+  Entities that fail to load are not shown.
+- **A (partially) complete STAC entity as object**
+  (e.g. `{ id: 'xyz', title: 'My Collection', description: '…', links: […] }`):
+  Works for both STAC APIs and static catalogs. The object must contain a
+  `self` link or (for APIs) an `id`, otherwise the entity is not shown.
+  STAC Browser loads the full version of the entity when needed.
 
 ## Hooks
 

@@ -444,5 +444,8 @@
       "title": "Anzeigen als Kacheln"
     },
     "title": "Anzeigeoptionen"
+  },
+  "widgets": {
+    "featured": "Empfohlen"
   }
 }
