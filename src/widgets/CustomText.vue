@@ -1,13 +1,18 @@
 <template>
   <div class="custom-text">
-    <h3>{{ title }}</h3>
-    <p>{{ text }}</p>
+    <h3 v-if="title">{{ title }}</h3>
+    <Description :description="text" :allowHTML="allowHTML" />
   </div>
 </template>
 
 <script>
+import Description from '../components/Description.vue';
+
 export default {
   name: "CustomText",
+  components: {
+    Description
+  },
   props: {
     title: {
       type: String,
@@ -16,6 +21,10 @@ export default {
     text: {
       type: String,
       default: ''
+    },
+    allowHTML: {
+      type: Boolean,
+      default: false
     }
   }
 };

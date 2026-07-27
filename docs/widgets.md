@@ -81,18 +81,20 @@ Renders a dismissible alert banner.
 | Props         | Type    | Default     | Description |
 | ------------- | ------- | ----------- | ----------- |
 | `title`       | String  | `''`        | Bold heading shown before the text. |
-| `text`        | String  | `''`        | The alert message body. |
+| `text`        | String  | `''`        | The alert message body, CommonMark (Markdown) is supported. |
 | `variant`     | String  | `'warning'` | Color variant: `'warning'`, `'danger'`, `'success'`, `'info'`, etc. |
 | `dismissible` | Boolean | `false`     | Whether the user can close the alert. |
+| `allowHTML`   | Boolean | `false`     | Allows HTML tags in the `text`. |
 
 ### CustomText
 
 Renders a simple text with a heading.
 
-| Props   | Type   | Default | Description |
-| ------- | ------ | ------- | ----------- |
-| `title` | String | `''`    | Rendered as an `<h3>` heading. |
-| `text`  | String | `''`    | Rendered as a `<p>` paragraph. |
+| Props       | Type    | Default | Description |
+| ----------- | ------- | ------- | ----------- |
+| `title`     | String  | `''`    | Rendered as an `<h3>` heading. |
+| `text`      | String  | `''`    | Rendered as the body, CommonMark (Markdown) is supported. |
+| `allowHTML` | Boolean | `false` | Allows HTML tags in the `text`. |
 
 ### Featured
 
