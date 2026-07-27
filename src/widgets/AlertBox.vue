@@ -2,7 +2,7 @@
   <b-alert class="alert-box" :variant="variant" :dismissible="dismissible" show>
     <template v-if="title">
       <strong>{{ title }}</strong>&nbsp;
-      <small><Description inline :description="text" :allowHTML="allowHTML" /></small>
+      <Description inline :description="text" :allowHTML="allowHTML" />
     </template>
     <Description v-else compact :description="text" :allowHTML="allowHTML" />
   </b-alert>
