@@ -166,7 +166,7 @@
     },
     "basemaps": {
       "type": ["object", "null"],
-      "description": "Show your own basemaps instead of the default ones and configure them via runtime/env. This option is here only to allow handling via runtime/env, it's not part of config.js but in basemaps.config.js. See docs/basemaps.md for details."
+      "description": "Show your own basemaps instead of the default ones, e.g. at runtime or via env variables. The default basemaps and code-based customizations live in basemaps.config.js instead of config.js. See docs/basemaps.md for details."
     },
     "transactions": {
       "type": ["string"],

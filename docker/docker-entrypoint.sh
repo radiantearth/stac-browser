@@ -35,13 +35,17 @@ array() {
         # which allows arrays of objects.
         case "$(printf '%s' "$1" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')" in
             \[*\])
+                if ! printf '%s' "$1" | jq -e . >/dev/null 2>&1; then
+                    printf 'Err: Invalid JSON array: %s\n' "$1" >&2
+                    exit 1
+                fi
                 printf '%s' "$1"
                 ;;
             *)
                 case "$2" in
                     string)
-                        # Split on commas and trim each element, like parseArrayEnv() in vite.config.js.
-                        encoded_value="$(jq -cn --arg value "$1" '$value | split(",") | map(gsub("^\\s+|\\s+$";""))')"
+                        # Split on commas, trim each element, and drop empty elements, like parseArrayEnv() in vite.config.js.
+                        encoded_value="$(jq -cn --arg value "$1" '$value | split(",") | map(gsub("^\\s+|\\s+$";"")) | map(select(length > 0))')"
                         printf '%s' "$encoded_value"
                         ;;
                     *)
@@ -87,10 +91,16 @@ export STAC_PREFIX_REDIRECT
 envsubst '$STAC_PATH_PREFIX $STAC_PREFIX_REDIRECT' \
     < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf
 
-# Inject the <base> tag so relative asset URLs resolve against the path prefix (Vite builds with base "./").
+# Point the <base> tag (emitted by SB_RUNTIME builds) at the path prefix so
+# relative asset URLs resolve against it (Vite builds with base "./").
+# The tag's href must be REPLACED (not skipped) when the tag exists — it is
+# baked with the build-time prefix and needs to follow SB_pathPrefix.
+# Updating in place keeps this idempotent across container restarts.
 index_html=/usr/share/nginx/html/index.html
-if [ -f "$index_html" ]; then
-    sed -i "s|<head>|<head><base href=\"${STAC_PATH_PREFIX}\" id=\"stac-browser-base\">|" "$index_html"
+if [ -f "$index_html" ] && grep -q 'id="stac-browser-base"' "$index_html"; then
+    sed -i "s|<base [^>]*id=\"stac-browser-base\"[^>]*>|<base href=\"${STAC_PATH_PREFIX}\" id=\"stac-browser-base\">|" "$index_html"
+elif [ "$STAC_PATH_PREFIX" != "/" ]; then
+    echo "Warn: SB_pathPrefix is set, but index.html contains no stac-browser-base tag (image built with SB_RUNTIME=false?). The path prefix must be set at build time instead." >&2
 fi
 
 config_schema=$(cat /etc/nginx/conf.d/config.schema.json)

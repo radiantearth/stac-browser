@@ -32,7 +32,6 @@
   --bs-link-color: var(--bs-primary);
   --bs-link-color-rgb: var(--bs-primary-rgb);
   --bs-link-hover-color: var(--bs-body-color);
-  --bs-focus-ring-color: rgba(var(--bs-primary-rgb), 0.25);
 
   --bs-primary-bg-subtle: color-mix(in srgb, var(--bs-primary) 20%, black);
   --bs-primary-border-subtle: color-mix(in srgb, var(--bs-primary) 60%, black);
@@ -129,11 +128,11 @@ a:hover {
 }
 
 .accordion {
-  --bs-accordion-btn-focus-box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+  --bs-accordion-btn-focus-box-shadow: 0 0 0 0.25rem var(--bs-focus-ring-color);
 }
 
 .pagination {
-  --bs-pagination-focus-box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+  --bs-pagination-focus-box-shadow: 0 0 0 0.25rem var(--bs-focus-ring-color);
   --bs-pagination-active-color: var(--sb-on-primary);
   --bs-pagination-active-bg: var(--bs-primary);
   --bs-pagination-active-border-color: var(--bs-primary);
@@ -164,7 +163,7 @@ a:hover {
 .form-control:focus,
 .form-select:focus {
   border-color: color-mix(in srgb, var(--bs-primary) 50%, white);
-  box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+  box-shadow: 0 0 0 0.25rem var(--bs-focus-ring-color);
 }
 
 .form-check-input:checked,
@@ -198,19 +197,21 @@ a:hover {
   --sb-subheadings-color: #{$subheadings-color};
 
   // Main/top header of the website. --sb-header defaults to the primary color
-  // so it follows a runtime --bs-primary override; the other colors derive from
-  // it via color-mix(). --sb-header-contrast (the "on-header" text color) is
-  // baked, like --sb-on-primary, as CSS has no runtime color-contrast().
+  // so it follows a runtime --bs-primary override; the other colors derive
+  // from it via the $header-* variables (see variables.scss), which reference
+  // the --sb-header* CSS variables so they stay live at runtime.
+  // --sb-header-contrast (the "on-header" text color) is baked, like
+  // --sb-on-primary, as CSS has no runtime color-contrast().
   --sb-header: var(--bs-primary);
   --sb-header-contrast: #{$header-contrast};
   --sb-header-background: #{$header-background};
-  --sb-header-color: color-mix(in srgb, var(--sb-header) 20%, white);
-  --sb-header-hover-color: var(--sb-header-contrast);
-  --sb-header-button-background: transparent;
-  --sb-header-button-border-color: var(--sb-header-color);
-  --sb-header-button-hover-background: color-mix(in srgb, var(--sb-header-contrast) 15%, transparent);
-  --sb-header-button-active-background: color-mix(in srgb, var(--sb-header-contrast) 25%, transparent);
-  --sb-header-hover-button-border-color: var(--sb-header-hover-color);
+  --sb-header-color: #{$header-color};
+  --sb-header-hover-color: #{$header-hover-color};
+  --sb-header-button-background: #{$header-button-background};
+  --sb-header-button-border-color: #{$header-button-border-color};
+  --sb-header-button-hover-background: #{$header-button-hover-background};
+  --sb-header-button-active-background: #{$header-button-active-background};
+  --sb-header-hover-button-border-color: #{$header-hover-button-border-color};
 }
 
 [data-bs-theme="dark"] {

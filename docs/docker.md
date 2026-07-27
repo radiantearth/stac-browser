@@ -68,7 +68,7 @@ when building the Dockerfile.
 Another build argument is `SB_RUNTIME` (default: `true`).
 When enabled, the built image loads two optional files at startup:
 
-- `runtime-config.js` — lets you set options (like `catalogUrl` and [`pathPrefix`](./options.md#pathprefix)) without rebuilding the image (see [Options](./options.md)).
+- `runtime-config.js` — lets you set options (like `catalogUrl` and `pathPrefix`) without rebuilding the image (see [Options](./options.md)).
 - `runtime-style.css` — lets you drop in a CSS file to adjust the look and feel without rebuilding the image (see [Styling & Theming](./styling.md#runtime-customizations)).
 
 If you set `SB_RUNTIME=false` at build time, the runtime files are not loaded and everything must be configured at build time instead.
@@ -150,7 +150,7 @@ Anything that requires code — custom widgets, actions, function-valued options
 
 The docker image uses a multi stage build.
 The first stage is based on a node image and runs `npm run build` to produce a `/dist` folder with static files (HTML, CSS, and JavaScript).
-The second stage is based on an nginx image that serves the folder with static files. At startup, the entrypoint applies `SB_pathPrefix` to nginx and generates `runtime-config.js`.
+The second stage is based on an nginx image that serves the folder with static files. At startup, the entrypoint applies `SB_pathPrefix` to nginx and to the `<base>` tag in `index.html`, and generates `runtime-config.js`.
 So, essentially, in the end you get an nginx instance that serves static files.
 
 ## Essential parts

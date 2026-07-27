@@ -11,34 +11,11 @@ import { vBToggle } from 'bootstrap-vue-next/directives/BToggle';
 import visible from './directives/visible';
 import WidgetHook from "./plugins/WidgetHook.vue";
 
-// Relative URL so it resolves against the <base id="stac-browser-base"> tag, which carries the path prefix.
-async function loadRuntimeConfig() {
-  await new Promise((resolve) => {
-    const script = document.createElement('script');
-    script.src = 'runtime-config.js';
-    script.onload = resolve;
-    script.onerror = resolve; // file absent — ignore silently
-    document.head.appendChild(script);
-  });
-  if (window.STAC_BROWSER_CONFIG) {
-    Object.assign(CONFIG, window.STAC_BROWSER_CONFIG);
-  }
-}
-
-function injectRuntimeStyle() {
-  const link = document.createElement('link');
-  link.rel = 'stylesheet';
-  link.href = 'runtime-style.css';
-  document.head.appendChild(link);
-}
-
-export default async function init() {
-  if (CONFIG.RUNTIME) {
-    // Inject the stylesheet first (not awaited) so it loads in parallel
-    // and is applied as early as possible to minimize re-styling flashes
-    injectRuntimeStyle();
-    await loadRuntimeConfig();
-  }
+// Note: runtime-config.js and runtime-style.css are loaded by index.html
+// (emitted at build time when SB_RUNTIME is enabled). The deferred script
+// runs before this bundle, so merged-config.js already contains the runtime
+// values when the modules below evaluate.
+export default function init() {
   return loadDefaultMessages().then(() => {
     // Setup router
     const router = createRouter({
@@ -57,17 +34,7 @@ export default async function init() {
     // Setup store
     const store = getStore(CONFIG, router);
 
-    // Pass the config as root props. The prop defaults in StacBrowser.vue
-    // capture primitive config values at module load time, i.e. BEFORE the
-    // runtime config has been merged, and would otherwise overwrite the
-    // runtime values in the store through the immediate prop watchers.
-    const rootProps = {};
-    for (const key in StacBrowser.props) {
-      if (key in CONFIG) {
-        rootProps[key] = CONFIG[key];
-      }
-    }
-    const app = createApp(StacBrowser, rootProps);
+    const app = createApp(StacBrowser);
 
     // Make WidgetHook available globally for convenience
     app.component('WidgetHook', WidgetHook);
