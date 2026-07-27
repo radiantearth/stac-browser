@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Added `relationTypes.config.js` to allow configuring link relation types that
+  - are specifically STAC and should be used to navigate to and display in STAC Browser
+  - should be hidden
+
 ### Changed
 
 - Renamed SCSS variable `$logo-image-height` to `$logo-height` and CSS variable `--sb-logo-max-height` to `--sb-logo-height`

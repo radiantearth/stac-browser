@@ -5,6 +5,8 @@
   - [Translation](#translation)
 - [Hiding fields](#hiding-fields)
   - [Example](#example-1)
+- [Customizing links](#customizing-links)
+  - [Example](#example-2)
 
 The metadata that STAC Browser renders is rendered primarily through the library [`stac-fields`](https://www.npmjs.com/package/@radiantearth/stac-fields).
 It contains a lot of rules for rendering [many existing STAC extensions](https://github.com/stac-utils/stac-fields/blob/main/fields.json) in a human-friendly way.
@@ -99,4 +101,30 @@ const ignoreMetadata = (object, fields, type) => {
   }
   return fields;
 }
+```
+
+## Customizing links
+
+STAC Browser shows the links of a STAC entity in a link list.
+Links that point to other STAC entities open within STAC Browser,
+while all other links open in a new browser tab.
+You can customize this behavior in the file [`relationTypes.config.js`](../relationTypes.config.js)
+based on the relation type (`rel`) of the links.
+
+Two customizations are available:
+
+- `stacNavigation`: A list of relation types that point to STAC entities.
+  Links with these relation types open within STAC Browser instead of opening the raw file in a new tab.
+  Use this if your catalogs use custom relation types to link to other STAC catalogs, collections, or items.
+- `hidden`: A list of relation types that should not appear in the link list at all.
+  Use this to hide links that are not useful for the people browsing your catalog.
+
+### Example
+
+```js
+// Links with the relation type `via` open within STAC Browser
+export const stacNavigation = ['via'];
+// Links with the relation type `service-desc` and `service-doc` are hidden,
+// effectively hiding the OpenAPI document links from the link list on the landing page.
+export const hidden = ['service-desc', 'service-doc'];
 ```
