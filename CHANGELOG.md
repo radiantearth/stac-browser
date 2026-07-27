@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Use the Bootstrap z-index values to avoid overlay issues with the sticky header
 - Fix logo size calculation, avoiding the site title wrapping into multiple lines
+- Share button correctly shows with rounded borders on the right side
 
 ## [5.0.0-rc.2] - 2026-06-23
 
