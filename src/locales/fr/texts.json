@@ -445,7 +445,5 @@
     },
     "title": "Options d'affichage"
   },
-  "widgets": {
-    "featured": ""
-  }
+  "widgets": {}
 }
