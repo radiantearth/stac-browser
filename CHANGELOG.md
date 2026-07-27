@@ -7,9 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Renamed SCSS variable `$logo-image-height` to `$logo-height` and CSS variable `--sb-logo-max-height` to `--sb-logo-height`)
+
 ### Fixed
 
 - Use the Bootstrap z-index values to avoid overlay issues with the sticky header
+- Fix logo size calculation, avoiding the site title wrapping into multiple lines
 
 ## [5.0.0-rc.2] - 2026-06-23
 

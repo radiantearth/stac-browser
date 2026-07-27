@@ -127,7 +127,14 @@ svg {
             gap: var(--sb-header-font-size);
 
             .logo {
-              max-height: var(--sb-logo-max-height);
+              // A definite height (instead of max-height) is required so that
+              // SVG logos without width/height attributes get their width
+              // included in the intrinsic size of the title link,
+              // otherwise the title next to the logo may wrap unnecessarily.
+              // Additionally, ensure we don't upsample images.
+              height: var(--sb-logo-height);
+              width: auto;
+              object-fit: scale-down;
             }
 
             span[role="banner"] {
@@ -827,7 +834,7 @@ svg {
   --sb-header-margin: #{$header-margin};
   --sb-block-gap: #{$block-gap};
   --sb-code-padding: #{$code-padding};
-  --sb-logo-max-height: #{$logo-image-height};
+  --sb-logo-height: #{$logo-height};
   --sb-max-icon-size: #{$max-icon-size};
 
   // Typography
