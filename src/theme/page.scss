@@ -847,11 +847,7 @@ svg {
 
   // Main/top header of the website
   --sb-header: #{$header};
-  --sb-header-background: linear-gradient(to bottom,
-    color-mix(in srgb, var(--sb-header) 85%, #fff),
-    var(--sb-header),
-    color-mix(in srgb, var(--sb-header) 85%, #000)
-  );
+  --sb-header-background: #{$header-background};
   --sb-header-color: #{$header-color};
   --sb-header-hover-color: #{$header-hover-color};
   --sb-header-button-background: #{$header-button-background};

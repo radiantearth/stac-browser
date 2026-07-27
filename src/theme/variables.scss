@@ -95,6 +95,11 @@ $link-hover-color: darken($link-color, 20%);
 
 // Main/top header of the website
 $header: $primary;
+$header-background: linear-gradient(to bottom,
+  color-mix(in srgb, var(--sb-header) 85%, #fff),
+  var(--sb-header),
+  color-mix(in srgb, var(--sb-header) 85%, #000)
+);
 $header-position: sticky; // sticky or static
 $header-font-size: 1.5rem;
 $header-font-weight: 600;
