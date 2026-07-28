@@ -445,5 +445,7 @@
     },
     "title": "Opzioni di visualizzazione"
   },
-  "widgets": {}
+  "widgets": {
+    "featured": "In evidenza"
+  }
 }
