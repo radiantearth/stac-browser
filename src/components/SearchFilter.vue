@@ -275,6 +275,8 @@ export default defineComponent({
       const labels = {
         freeText: () => this.$t('search.freeText'),
         sort: () => this.$t('sort.title'),
+        datetime: () => this.$t('search.temporalExtent'),
+        bbox: () => this.$t('search.spatialExtent'),
         cql2: (f) => f.queryable?.title || f.queryable?.id || f.id,
       };
       return this.droppedFilters
@@ -821,9 +823,8 @@ export default defineComponent({
       this.$emit('input', this.activeParams);
     },
     onReset() {
-      Object.assign(this, getDefaults());   
-      this.resetSort();   
-      this.$store.commit('search/resetShared');      
+      Object.assign(this, getDefaults());
+      this.resetSort();
       if (this.type === 'Collections') {
         this.$store.commit('search/resetCollectionFilters');
       } else {

@@ -81,7 +81,7 @@ import ErrorAlert from '../components/ErrorAlert.vue';
 import { getDisplayTitle, createSTAC } from '../models/stac';
 import { STAC } from 'stac-js';
 import { defineComponent, defineAsyncComponent } from 'vue';
-import { getErrorCode, getErrorMessage } from '../store/utils';
+import { getErrorCode, getErrorMessage, fetchQueryablesForLink } from '../store/utils';
 import { mapGetters, mapState } from "vuex";
 import { BTab, BTabs } from 'bootstrap-vue-next';
 
@@ -184,13 +184,24 @@ export default defineComponent({
         this.updateFreeText(q, true);
       }
     },
-    activeSearch(tab) {
+    async activeSearch(tab, oldTab) {
       // Reset search results when switching tabs
       this.data = null;
       // Update the search type (collections/items) in the URL
       const tabId = Object.entries(this.tabIds).find(([, value]) => value === tab);
       if (tabId) {
         this.$store.commit('updateState', {type: 'searchtype', value: tabId[0]});
+      }
+      // Continuing from collection search into item search carries filters over,
+      // gated on the item-search conformance classes. Only on a real tab change,
+      // not the initial assignment.
+      if (oldTab === this.tabIds.collections && tab === this.tabIds.items && this.$store.getters['search/hasActiveFilters']) {
+        await this.$store.dispatch('search/migrateFiltersToCollection', {
+          collection: this.parent,
+          fetchQueryables: async (stac) => await fetchQueryablesForLink(this.$store, stac?.getQueryablesLink?.()),
+          targetType: 'Global',
+        });
+        this.itemFilters = this.$store.getters['search/itemSearchParams'];
       }
     },
     searchLink: {

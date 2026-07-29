@@ -21,9 +21,9 @@ test.describe('Vuex search module', () => {
 
   test('module initializes with correct default state', async ({ page }) => {
     const state = await getSearchState(page);
-    expect(state.shared.datetime).toBeNull();
-    expect(state.shared.bbox).toBeNull();
-    expect(state.shared.limit).toBeNull();
+    expect(state.itemFilters.datetime).toBeNull();
+    expect(state.itemFilters.bbox).toBeNull();
+    expect(state.itemFilters.limit).toBeNull();
     expect(state.itemFilters.filters).toBeNull();
     expect(state.collectionFilters.filters).toBeNull();
     expect(state.droppedFilters).toEqual([]);
@@ -31,13 +31,18 @@ test.describe('Vuex search module', () => {
     expect(state.getters.hasDroppedFilters).toBe(false);
   });
 
-  test('setShared updates shared state without affecting filters', async ({ page }) => {
-    await commitToStore(page, 'search/setShared', { datetime: '2025-05-01T00:00:00.000Z/2025-05-29T00:00:00.000Z', limit: 10 });
+  test('datetime, bbox and limit are per-bucket, not aliased across search modes', async ({ page }) => {
+    await commitToStore(page, 'search/setCollectionFilters', {
+      datetime: '2025-05-01T00:00:00.000Z/2025-05-29T00:00:00.000Z',
+      limit: 10,
+    });
     const state = await getSearchState(page);
-    expect(state.shared.datetime).toBe('2025-05-01T00:00:00.000Z/2025-05-29T00:00:00.000Z');
-    expect(state.shared.limit).toBe(10);
-    expect(state.itemFilters.q).toEqual([]);
-    expect(state.collectionFilters.q).toEqual([]);
+    expect(state.collectionFilters.datetime).toBe('2025-05-01T00:00:00.000Z/2025-05-29T00:00:00.000Z');
+    expect(state.collectionFilters.limit).toBe(10);
+    // Writing to one bucket must not leak into the other; carry-over happens
+    // only at navigation, gated on the target's conformance.
+    expect(state.itemFilters.datetime).toBeNull();
+    expect(state.itemFilters.limit).toBeNull();
   });
 
   test('itemFilters and collectionFilters are independent', async ({ page }) => {
@@ -49,18 +54,19 @@ test.describe('Vuex search module', () => {
   });
 
   test('resetAll clears all state', async ({ page }) => {
-    await commitToStore(page, 'search/setShared', { datetime: '2025-05-01T00:00:00.000Z/2025-05-29T00:00:00.000Z' });
-    await commitToStore(page, 'search/setItemFilters', { q: 'sentinel' });
+    await commitToStore(page, 'search/setItemFilters', {
+      datetime: '2025-05-01T00:00:00.000Z/2025-05-29T00:00:00.000Z',
+      q: ['sentinel'],
+    });
     await commitToStore(page, 'search/resetAll');
     const state = await getSearchState(page);
-    expect(state.shared.datetime).toBeNull();
+    expect(state.itemFilters.datetime).toBeNull();
     expect(state.itemFilters.q).toEqual([]);
     expect(state.collectionFilters.q).toEqual([]);
   });
 
   test('getters reflect current state correctly', async ({ page }) => {
-    await commitToStore(page, 'search/setShared', { limit: 20 });
-    await commitToStore(page, 'search/setItemFilters', { q: ['sentinel'] });
+    await commitToStore(page, 'search/setItemFilters', { limit: 20, q: ['sentinel'] });
     await commitToStore(page, 'search/setCollectionFilters', { q: ['landsat'] });
     const state = await getSearchState(page);
     expect(state.getters.hasActiveFilters).toBe(true);
@@ -143,13 +149,12 @@ test.describe('Filter reconciliation on collection navigation', () => {
   });
 
   test('q in itemFilters is reconciled, not passed through unreported', async ({ page }) => {
-    await commitToStore(page, 'search/setShared', { limit: 20 });
-    await commitToStore(page, 'search/setItemFilters', { q: ['sentinel'] });
+    await commitToStore(page, 'search/setItemFilters', { limit: 20, q: ['sentinel'] });
 
     await dispatchMigrateFiltersToCollection(page, ['eo:cloud_cover']);
 
     const state = await getSearchState(page);
-    expect(state.shared.limit).toBe(20);
+    expect(state.itemFilters.limit).toBe(20);
     expect(state.itemFilters.q).toEqual([]);
     expect(state.droppedFilters).toContainEqual({ type: 'freeText', terms: ['sentinel'] });
   });

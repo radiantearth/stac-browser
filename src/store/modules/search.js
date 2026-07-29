@@ -2,11 +2,10 @@ import Cql from '../../models/cql2/cql';
 import CqlLogicalOperator, { CqlNot } from '../../models/cql2/operators/logical';
 import { TYPES } from '../../components/ApiCapabilitiesMixin';
 
-const SHARED_FIELDS = ['datetime', 'bbox', 'limit'];
-
 // Fields that may cross search modes, with the capability gating each one.
 // `capability` keys into TYPES[targetType], so the same field is gated by a
 // different conformance class depending on where the user is going.
+// `null` means the field is not capability-dependent and is always carried.
 const CARRY_OVER = {
   q: {
     capability: 'FreeText',
@@ -14,6 +13,9 @@ const CARRY_OVER = {
     describe: (value) => ({ terms: [...value] }),
     empty: () => [],
   },
+  datetime: { capability: 'BasicFilters', dropType: 'datetime' },
+  bbox: { capability: 'BasicFilters', dropType: 'bbox' },
+  limit: { capability: null, dropType: null },
 };
 
 const isSet = (value) => {
@@ -33,13 +35,10 @@ const effective = (state, field) => {
   return isSet(fromCollections) ? fromCollections : state.itemFilters[field];
 };
 
-const defaultShared = () => ({
+const defaultFilterSet = () => ({
   datetime: null,
   bbox: null,
   limit: null,
-});
-
-const defaultFilterSet = () => ({
   q: [],
   ids: [],
   collections: [],
@@ -49,30 +48,16 @@ const defaultFilterSet = () => ({
   filterLogic: { andOr: 'and', negate: false },
 });
 
-const buildSearchParams = (sharedState, specificFilters) => {
-  const rest = { ...specificFilters };
+const buildSearchParams = (filters) => {
+  const rest = { ...filters };
   delete rest.rawFilters;
   delete rest.filterLogic;
-  return { ...sharedState, ...rest };
+  return rest;
 };
-
-function splitShared(patch) {
-  const shared = {};
-  const rest = {};
-  for (const [key, value] of Object.entries(patch)) {
-    if (SHARED_FIELDS.includes(key)) {
-      shared[key] = value;
-    } else {
-      rest[key] = value;
-    }
-  }
-  return { shared, rest };
-}
 
 export default {
   namespaced: true,
   state: () => ({
-    shared: defaultShared(),
     collectionFilters: defaultFilterSet(),
     itemFilters: defaultFilterSet(),
     queryablesCache: {},
@@ -80,40 +65,32 @@ export default {
   }),
 
   getters: {
-    // Full merged filter objects ready to hand to Utils.addFiltersToLink
-    collectionSearchParams: (state) => buildSearchParams(state.shared, state.collectionFilters),
-    itemSearchParams: (state) => buildSearchParams(state.shared, state.itemFilters),
+    // Full filter objects ready to hand to Utils.addFiltersToLink
+    collectionSearchParams: (state) => buildSearchParams(state.collectionFilters),
+    itemSearchParams: (state) => buildSearchParams(state.itemFilters),
     hasActiveFilters: (state) => {
-      const s = state.shared;
       const isActive = (f) => (
+        Boolean(f.datetime) ||
+        Boolean(f.bbox) ||
+        Boolean(f.limit) ||
         (Array.isArray(f.q) && f.q.length > 0) ||
         (Array.isArray(f.ids) && f.ids.length > 0) ||
         (Array.isArray(f.collections) && f.collections.length > 0) ||
         Boolean(f.sortby) ||
         Boolean(f.filters)
       );
-      return Boolean(s.datetime || s.bbox || s.limit) || isActive(state.itemFilters) || isActive(state.collectionFilters);
+      return isActive(state.itemFilters) || isActive(state.collectionFilters);
     },
     hasDroppedFilters: (state) => state.droppedFilters.length > 0,
     cachedQueryables: (state) => (href) => state.queryablesCache[href] || null,
   },
 
   mutations: {
-    setShared(state, patch) {
-      state.shared = { ...state.shared, ...patch };
-    },
     setCollectionFilters(state, patch) {
-      const { shared, rest } = splitShared(patch);
-      state.shared = { ...state.shared, ...shared };
-      state.collectionFilters = { ...state.collectionFilters, ...rest };
+      state.collectionFilters = { ...state.collectionFilters, ...patch };
     },
     setItemFilters(state, patch) {
-      const { shared, rest } = splitShared(patch);
-      state.shared = { ...state.shared, ...shared };
-      state.itemFilters = { ...state.itemFilters, ...rest };
-    },
-    resetShared(state) {
-      state.shared = defaultShared();
+      state.itemFilters = { ...state.itemFilters, ...patch };
     },
     resetCollectionFilters(state) {
       state.collectionFilters = defaultFilterSet();
@@ -122,7 +99,6 @@ export default {
       state.itemFilters = defaultFilterSet();
     },
     resetAll(state) {
-      state.shared = defaultShared();
       state.collectionFilters = defaultFilterSet();
       state.itemFilters = defaultFilterSet();
       state.droppedFilters = [];

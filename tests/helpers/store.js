@@ -7,7 +7,7 @@
  * Waits for the Vuex store to be ready, then commits a mutation.
  *
  * @param {import('@playwright/test').Page} page
- * @param {string} mutation - Fully-namespaced mutation name (e.g. 'search/setShared').
+ * @param {string} mutation - Fully-namespaced mutation name (e.g. 'search/setItemFilters').
  * @param {*} [payload] - Optional mutation payload.
  */
 export async function commitToStore(page, mutation, payload) {
@@ -31,7 +31,6 @@ export async function commitToStore(page, mutation, payload) {
  *
  * @param {import('@playwright/test').Page} page
  * @returns {Promise<{
- *   shared: object,
  *   collectionFilters: object,
  *   itemFilters: object,
  *   droppedFilters: Array,
@@ -56,7 +55,6 @@ export async function getSearchState(page) {
     const s = store?.state?.search;
     if (!s) return null;
     return {
-      shared: { ...s.shared },
       collectionFilters: { ...s.collectionFilters },
       itemFilters: { ...s.itemFilters },
       droppedFilters: [...s.droppedFilters],
@@ -74,7 +72,7 @@ export async function getSearchState(page) {
  * Waits for the Vuex store to be ready, then dispatches an action.
  *
  * @param {import('@playwright/test').Page} page
- * @param {string} action - Fully-namespaced action name (e.g. 'search/resetForCollection').
+ * @param {string} action - Fully-namespaced action name (e.g. 'search/migrateFiltersToCollection').
  * @param {*} [payload] - Optional action payload. Must be JSON-serializable.
  */
 export async function dispatchToStore(page, action, payload) {
