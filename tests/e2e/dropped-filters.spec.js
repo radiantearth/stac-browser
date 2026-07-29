@@ -11,6 +11,7 @@ import API from '../fixtures/instances/api.js';
 import { waitForBrowserReady } from './helpers.js';
 
 const FREE_TEXT_CONFORMANCE = 'https://api.stacspec.org/v1.0.0/collection-search#free-text';
+const SORT_CONFORMANCE = 'https://api.stacspec.org/v1.0.0/collection-search#sort';
 
 // Helper: add a free-text tag to the collection search filter multiselect
 const addFreeTextTerm = async (page, term) => {
@@ -22,6 +23,15 @@ const addFreeTextTerm = async (page, term) => {
   await input.fill(term);
   await input.press('Enter');
   await expect(freeTextGroup.locator('.multiselect__tag').filter({ hasText: term })).toBeVisible();
+};
+
+// Helper: choose a sort field in the sort multiselect
+const selectSortField = async (page, field) => {
+  const sortSelect = page.locator('.sort .multiselect').first();
+  await sortSelect.locator('.multiselect__select').click();
+  const sortInput = sortSelect.locator('input.multiselect__input');
+  await sortInput.fill(field);
+  await sortInput.press('Enter');
 };
 
 // Helper: navigate to the Search page and switch to the Collections tab
@@ -61,6 +71,8 @@ test.describe('Dropped filter banner — collection search to collection navigat
 
     api.root.addConformsTo('https://api.stacspec.org/v1.0.0/collection-search');
     api.root.addConformsTo(FREE_TEXT_CONFORMANCE);
+    // Collection search advertises sort; in-collection item search (Features) does not.
+    api.root.addConformsTo(SORT_CONFORMANCE);
 
     await api.createServer(worker);
     BROWSER_PATH = api.root.getBrowserPath();
@@ -187,10 +199,20 @@ test.describe('Dropped filter banner — collection search to collection navigat
     });
   });
 
-  test('Sort-only drop does not trigger the banner', async ({ page }) => {
-    await test.step('Navigate directly to a collection without any search or free-text', async () => {
-      await page.goto(BROWSER_PATH);
+  test('Sort-only drop is named in the banner', async ({ page }) => {
+    await goToCollectionSearchTab(page, BROWSER_PATH);
+
+    await test.step('Verify sort control is visible (conformance registered correctly)', async () => {
+      await expect(page.locator('.sort').first()).toBeVisible();
+    });
+
+    await test.step('Select a sort field and submit', async () => {
+      await selectSortField(page, 'title');
+      await page.getByRole('button', { name: /submit/i }).click();
       await waitForBrowserReady(page);
+    });
+
+    await test.step('Navigate into a collection', async () => {
       const collectionLink = page.getByText('Sentinel-2 L2A', { exact: false }).first();
       await expect(collectionLink).toBeVisible({ timeout: 10000 });
       await collectionLink.click();
@@ -201,9 +223,10 @@ test.describe('Dropped filter banner — collection search to collection navigat
       await openItemFilterPanel(page);
     });
 
-    await test.step('Verify no banner appears', async () => {
-      await page.waitForTimeout(500);
-      await expect(page.locator('.alert-warning')).toHaveCount(0);
+    await test.step('Banner names the dropped sort', async () => {
+      const banner = page.locator('.alert-warning').first();
+      await expect(banner).toBeVisible({ timeout: 10000 });
+      await expect(banner).toContainText(/sort/i);
     });
   });
 

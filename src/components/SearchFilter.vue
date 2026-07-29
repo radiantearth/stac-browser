@@ -272,14 +272,14 @@ export default defineComponent({
     ...mapGetters(['canSearchCollections', 'getApiChildren', 'supportsConformance']),
     ...mapGetters('search', ['collectionSearchParams', 'itemSearchParams']),
     droppedFilterNames() {
-      const names = [];
-      const ft = this.droppedFilters.find(f => f.type === 'freeText');
-      if (ft) {
-        names.push(this.$t('search.freeText')); 
-      }
-      const cql = this.droppedFilters.filter(f => f.type === 'cql2');
-      cql.forEach(f => names.push(f.queryable?.title || f.queryable?.id || f.id));
-      return names;
+      const labels = {
+        freeText: () => this.$t('search.freeText'),
+        sort: () => this.$t('sort.title'),
+        cql2: (f) => f.queryable?.title || f.queryable?.id || f.id,
+      };
+      return this.droppedFilters
+        .map(f => labels[f.type]?.(f))
+        .filter(Boolean);
     },
     collectionSelectOptions() {
       let taggable = !this.hasAllCollections;
