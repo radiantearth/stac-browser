@@ -142,7 +142,7 @@ test.describe('Filter reconciliation on collection navigation', () => {
     expect(state.getters.hasDroppedFilters).toBe(true);
   });
 
-  test('no rawFilters — basic filters are left untouched', async ({ page }) => {
+  test('q in itemFilters is reconciled, not passed through unreported', async ({ page }) => {
     await commitToStore(page, 'search/setShared', { limit: 20 });
     await commitToStore(page, 'search/setItemFilters', { q: ['sentinel'] });
 
@@ -150,8 +150,8 @@ test.describe('Filter reconciliation on collection navigation', () => {
 
     const state = await getSearchState(page);
     expect(state.shared.limit).toBe(20);
-    expect(state.itemFilters.q).toEqual(['sentinel']);
-    expect(state.droppedFilters).toHaveLength(0);
+    expect(state.itemFilters.q).toEqual([]);
+    expect(state.droppedFilters).toContainEqual({ type: 'freeText', terms: ['sentinel'] });
   });
 
 });

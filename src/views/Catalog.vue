@@ -251,11 +251,12 @@ export default defineComponent({
         if (oldData?.id === newData?.id) {
           return;
         }
-
+        // In-collection item search is Features, not item-search
         await this.$store.dispatch('search/migrateFiltersToCollection', {
           collection: newData,
           fetchQueryables: async (collection) => await fetchQueryablesForLink(this.$store, collection.getQueryablesLink?.()),
-        }); 
+          targetType: 'Items',
+        });
 
         this.filters = this.$store.getters['search/itemSearchParams'];
       }
