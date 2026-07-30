@@ -133,6 +133,48 @@ function getStore(config, router) {
     currentApiCollectionsSearchId: null
   });
 
+  // Users may enter the URL with different URL than reported in
+  // the STAC document (e.g. missing trailing slash).
+  // Per RFC 3986 these are different URLs, which breaks caching
+  // and root detection. If the URL the server reports for this
+  // resource differs from the requested URL redirect the browser.
+  // https://github.com/radiantearth/stac-browser/issues/943
+  async function normalizeCatalogUrl(cx, data, url, show) {
+    // The routes that embed a user-provided URL in the browser path
+    const routePrefixes = { browse: '', search: '/search', validation: '/validation' };
+    const currentRoute = router.currentRoute.value;
+    const routePrefix = routePrefixes[currentRoute?.name];
+    if (typeof routePrefix !== 'string' || !hasText(currentRoute.path) || cx.getters.fromBrowserPath(currentRoute.path) !== url) {
+      return false;
+    }
+    const reported = data.getStacLinkWithRel('self');
+    if (!reported) {
+      return false;
+    }
+    const reportedUrl = URI(reported.getAbsoluteUrl());
+    const requested = URI(url);
+    if (!Utils.samePath(reportedUrl, requested) || reportedUrl.path() === requested.path()) {
+      return false;
+    }
+    const canonical = requested.path(reportedUrl.path()).toString();
+    // A pre-configured catalogUrl with the "wrong" slash must follow,
+    // otherwise root detection and browser paths never match again.
+    if (cx.state.catalogUrl && Utils.samePath(cx.state.catalogUrl, canonical)) {
+      await cx.dispatch('config', {
+        catalogUrl: Utils.setTrailingSlash(cx.state.catalogUrl, reportedUrl.path().endsWith('/'))
+      });
+    }
+    // Reload under the corrected URL, then fix the address bar.
+    // The navigation must be awaited so that subsequent navigation
+    // (e.g. query parameter updates) resolves against the corrected path.
+    await cx.dispatch('load', { url: canonical, show });
+    const newPath = routePrefix + URI(cx.getters.toBrowserPath(canonical)).path();
+    if (currentRoute.path !== newPath) {
+      await router.replace({ path: newPath, query: currentRoute.query, hash: currentRoute.hash });
+    }
+    return true;
+  }
+
   return createStore({
     strict: import.meta.env.NODE_ENV !== 'production',
     modules: {
@@ -596,7 +638,9 @@ function getStore(config, router) {
       },
       updateLoading(state, { url, show }) {
         let data = state.database[url];
-        data.show = show || data.show;
+        if (data instanceof Loading) {
+          data.show = show || data.show;
+        }
       },
       loading(state, { url, loading }) {
         state.database[url] = loading;
@@ -941,6 +985,12 @@ function getStore(config, router) {
               }
             }
 
+            // Users may enter a different URL than reported in the STAC document
+            // (e.g. missing trailing slash) - correct the URL and redirect.
+            if (await normalizeCatalogUrl(cx, data, url, show)) {
+              return;
+            }
+
             // Handle conformance classes
             let conformanceLink = data.getStacLinkWithRel('conformance');
             if (Array.isArray(data.conformsTo) && data.conformsTo.length > 0) {
@@ -993,7 +1043,7 @@ function getStore(config, router) {
               await cx.dispatch('config', { catalogUrl });
             }
           }
-          if (catalogUrl && url !== catalogUrl) {
+          if (catalogUrl && !Utils.equalUrl(url, catalogUrl)) {
             // todo: In principle we could set omitApi: true in many cases here,
             // but until we can reliably load the API data on demand, we fully load it.
             // https://github.com/radiantearth/stac-browser/issues/796
