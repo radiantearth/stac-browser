@@ -8,9 +8,9 @@
             dismissible
             show
             class="mb-3"
-            @dismissed="$store.commit('search/clearDroppedFilters')"
+            @dismissed="$store.commit('search/clearDroppedFilters', type)"
           >
-            {{ $t('search.droppedFilters', { filters: droppedFilterNames.join(', ') }) }}
+            {{ $t('search.droppedFilters', { filters: formattedDroppedFilters }) }}
           </b-alert>
         </template>
         <Loading v-if="!loaded" fill />
@@ -272,16 +272,22 @@ export default defineComponent({
     ...mapGetters(['canSearchCollections', 'getApiChildren', 'supportsConformance']),
     ...mapGetters('search', ['collectionSearchParams', 'itemSearchParams']),
     droppedFilterNames() {
-      const labels = {
-        freeText: () => this.$t('search.freeText'),
-        sort: () => this.$t('sort.title'),
-        datetime: () => this.$t('search.temporalExtent'),
-        bbox: () => this.$t('search.spatialExtent'),
-        cql2: (f) => f.queryable?.title || f.queryable?.id || f.id,
-      };
-      return this.droppedFilters
-        .map(f => labels[f.type]?.(f))
-        .filter(Boolean);
+      const names = [];
+      const scopedDroppedFilters = this.droppedFilters[this.type] || [];
+      
+      const ft = scopedDroppedFilters.find(f => f.type === 'freeText');
+      if (ft) {
+        names.push(this.$t('search.freeText')); 
+      }
+      
+      const cql = scopedDroppedFilters.filter(f => f.type === 'cql2');
+      cql.forEach(f => names.push(f.queryable?.title || f.queryable?.id || f.id));
+      
+      return names;
+    },
+    formattedDroppedFilters() {
+      const formatter = new Intl.ListFormat(this.uiLanguage || 'en', { style: 'long', type: 'conjunction' });
+      return formatter.format(this.droppedFilterNames);
     },
     collectionSelectOptions() {
       let taggable = !this.hasAllCollections;

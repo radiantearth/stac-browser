@@ -669,6 +669,10 @@ function getStore(config, router) {
           state.catalogTitle = config.catalogTitle;
           state.database = {};
           state.apiChildren = {};
+          
+          if (state.search) {
+            state.search.droppedFilters = { Global: [], Collections: [], Items: [] };
+          }
         }
       },
       resetPage(state) {

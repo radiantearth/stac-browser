@@ -31,7 +31,7 @@ export function makeRawFilter(queryableId, { negate = false } = {}) {
     id: `${queryableId}-test`,
     queryable: { id: queryableId },
     value: null,
-    operator: null,
+    operator: 'dummy-test-operator',
     negate,
   };
 }

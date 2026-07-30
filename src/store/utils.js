@@ -154,13 +154,11 @@ export function hasAuthority(pattern, uri) {
 }
 
 export async function fetchQueryablesForLink(store, link) {
-  if (!isObject(link)) {
-    return [];
-  }
+  if (!isObject(link)) {return [];}
+  
   const response = await stacRequest(store, link);
-  if (!isObject(response.data)) {
-    return [];
-  }
+  if (!isObject(response.data)) {return [];}
+  
   let schemas;
   try {
     const { default: refParser } = await import('@apidevtools/json-schema-ref-parser');
@@ -169,9 +167,9 @@ export async function fetchQueryablesForLink(store, link) {
     console.error(e);
     schemas = response.data;
   }
-  if (!isObject(schemas?.properties)) {
-    return [];
-  }
+  
+  if (!isObject(schemas?.properties)) {return [];}
+  
   return Object.entries(schemas.properties)
     .map(([key, schema]) => new Queryable(key, schema));
 }

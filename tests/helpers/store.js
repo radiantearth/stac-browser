@@ -57,7 +57,7 @@ export async function getSearchState(page) {
     return {
       collectionFilters: { ...s.collectionFilters },
       itemFilters: { ...s.itemFilters },
-      droppedFilters: [...s.droppedFilters],
+      droppedFilters: [...(s.droppedFilters.Items || [])],
       getters: {
         hasActiveFilters: store.getters['search/hasActiveFilters'],
         hasDroppedFilters: store.getters['search/hasDroppedFilters'],

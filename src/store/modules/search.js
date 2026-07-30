@@ -60,9 +60,12 @@ export default {
   state: () => ({
     collectionFilters: defaultFilterSet(),
     itemFilters: defaultFilterSet(),
-    queryablesCache: {},
-    droppedFilters: [],
-  }),
+    droppedFilters: {
+      Global: [],
+      Collections: [],
+      Items: []
+    },
+ }),
 
   getters: {
     // Full filter objects ready to hand to Utils.addFiltersToLink
@@ -81,8 +84,7 @@ export default {
       );
       return isActive(state.itemFilters) || isActive(state.collectionFilters);
     },
-    hasDroppedFilters: (state) => state.droppedFilters.length > 0,
-    cachedQueryables: (state) => (href) => state.queryablesCache[href] || null,
+        hasDroppedFilters: state => Object.values(state.droppedFilters).some(arr => arr.length > 0),
   },
 
   mutations: {
@@ -103,14 +105,15 @@ export default {
       state.itemFilters = defaultFilterSet();
       state.droppedFilters = [];
     },
-    cacheQueryables(state, { href, queryables }) {
-      state.queryablesCache = { ...state.queryablesCache, [href]: queryables };
+    setDroppedFilters(state, { type, filters }) {
+      if (state.droppedFilters[type]) {
+        state.droppedFilters[type] = filters;
+      }
     },
-    setDroppedFilters(state, dropped) {
-      state.droppedFilters = dropped;
-    },
-    clearDroppedFilters(state) {
-      state.droppedFilters = [];
+    clearDroppedFilters(state, type) {
+      if (state.droppedFilters[type]) {
+        state.droppedFilters[type] = [];
+      }
     },
     clearDroppedFiltersByType(state, type) {
       state.droppedFilters = state.droppedFilters.filter(f => f.type !== type);
@@ -129,53 +132,48 @@ export default {
      * @param {Function} fetchQueryables - Async fn fetching the collection's queryables
      * @param {String} targetType - 'Items' (OGC API Features) or 'Global' (STAC item search)
      */
-    async migrateFiltersToCollection({ commit, state, rootGetters }, { collection, fetchQueryables, targetType = 'Items' }) {
-      commit('clearDroppedFilters');
+   async migrateFiltersToCollection({ commit, state, rootGetters }, { collection, fetchQueryables, targetType = 'Items' }) {
+      commit('clearDroppedFilters', targetType);
 
       const capabilities = TYPES[targetType] || {};
       const supports = (capability) => {
         const classes = capabilities[capability];
-        if (typeof classes === 'boolean') {
-          return classes;
-        }
-        if (!classes) {
-          return false;
-        }
+        if (typeof classes === 'boolean') return classes;
+        if (!classes) return false;
         return rootGetters.supportsConformance(classes);
       };
 
       const raw = effective(state, 'rawFilters');
       const sortby = effective(state, 'sortby');
-
       const resolved = {};
       const dropped = [];
 
       for (const [field, { capability, dropType, describe, empty }] of Object.entries(CARRY_OVER)) {
         const value = effective(state, field);
-        if (!isSet(value)) {
-          continue;
-        }
+        if (!isSet(value)) continue;
+
         if (capability === null || supports(capability)) {
           resolved[field] = value;
         } else {
           dropped.push({ type: dropType, ...(describe ? describe(value) : { value }) });
-          resolved[field] = empty ? empty() : null;
+          resolved[field] = empty ? empty() : null; 
         }
       }
 
-      // sortby is dropped even where the target advertises sort support: conformance
-      // says the endpoint sorts, not that it sorts by the user's field (item sortables
-      // are `properties.`-prefixed). Validating against target sortables is follow-up.
       if (isSet(sortby)) {
-        dropped.push({ type: 'sort', sortby });
-        resolved.sortby = null;
+        if (supports('Sort')) {
+          resolved.sortby = sortby;
+        } else {
+          dropped.push({ type: 'sort', sortby });
+          resolved.sortby = null;
+        }
       }
 
       const hasCql = Array.isArray(raw) && raw.length > 0;
-
-      if (!hasCql && Object.keys(resolved).length === 0 && dropped.length === 0) {
-        return;
-      }
+      const filterLogic = effective(state, 'filterLogic') || { andOr: 'and', negate: false };
+      const { andOr, negate } = filterLogic;
+      let validCompatible = [];
+      let rebuiltCql = null;
 
       if (hasCql) {
         let queryables = [];
@@ -183,22 +181,25 @@ export default {
           queryables = await fetchQueryables(collection);
         } catch (e) {
           console.error('failed to fetch queryables for reconciliation', e);
-          commit('resetAll');
-          return;
+          queryables = [];
         }
 
-        const supportedIds = new Set(queryables.map(queryable => queryable.id));
-        const compatible = raw.filter(f => supportedIds.has(f.queryable.id));
+        const supportedIds = new Set(queryables.map(q => q.id));
+        validCompatible = raw.filter(f => supportedIds.has(f.queryable.id) && f.operator);
         const cqlDropped = raw.filter(f => !supportedIds.has(f.queryable.id));
+        const invalidCompatible = raw.filter(f => supportedIds.has(f.queryable.id) && !f.operator);
 
         cqlDropped.forEach(f => dropped.push({ type: 'cql2', ...f }));
+        invalidCompatible.forEach(f => dropped.push({ type: 'cql2', ...f }));
 
-        const { andOr, negate } = state.itemFilters.filterLogic;
-
-        let rebuiltCql = null;
-        if (compatible.length > 0 && compatible.every(f => f.operator)) {
-          const args = compatible.map(f => {
-            let filter = new f.operator(f.queryable, f.value);
+        if (validCompatible.length > 0) {
+          const args = validCompatible.map(f => {
+            let filter;
+            if (typeof f.operator === 'function') {
+              filter = new f.operator(f.queryable, f.value);
+            } else {
+              filter = { queryable: f.queryable, value: f.value };
+            }
             return f.negate ? new CqlNot(filter) : filter;
           });
           let logical = CqlLogicalOperator.create(andOr, args);
@@ -207,21 +208,21 @@ export default {
           }
           rebuiltCql = new Cql(logical, null);
         }
+      }
 
-        commit('resetCollectionFilters');
-        commit('setDroppedFilters', dropped);
+      if (hasCql) {
         commit('setItemFilters', {
           ...resolved,
           filters: rebuiltCql,
-          rawFilters: compatible,
+          rawFilters: validCompatible,
           filterLogic: { andOr, negate },
         });
-      } else {
-        commit('resetCollectionFilters');
-        commit('setDroppedFilters', dropped);
-        if (Object.keys(resolved).length > 0) {
-          commit('setItemFilters', resolved);
-        }
+      } else if (Object.keys(resolved).length > 0 || dropped.length > 0) {
+        commit('setItemFilters', resolved);
+      }
+
+      if (dropped.length > 0) {
+        commit('setDroppedFilters', { type: targetType, filters: dropped });
       }
     }
   }

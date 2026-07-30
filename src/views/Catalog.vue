@@ -245,20 +245,21 @@ export default defineComponent({
         if (!newData?.isCollection) {
           return;
         }
-        if (!this.$store.getters['search/hasActiveFilters']) {
-          return;
-        }
         if (oldData?.id === newData?.id) {
           return;
         }
-        // In-collection item search is Features, not item-search
-        await this.$store.dispatch('search/migrateFiltersToCollection', {
-          collection: newData,
-          fetchQueryables: async (collection) => await fetchQueryablesForLink(this.$store, collection.getQueryablesLink?.()),
-          targetType: 'Items',
-        });
 
-        this.filters = this.$store.getters['search/itemSearchParams'];
+        const cameFromSearch = Object.keys(this.$store.state.search.collectionFilters || {}).length > 0;
+        
+        if (cameFromSearch && this.$store.getters['search/hasActiveFilters']) {
+          await this.$store.dispatch('search/migrateFiltersToCollection', {
+            collection: newData,
+            fetchQueryables: async (collection) => await fetchQueryablesForLink(this.$store, collection.getQueryablesLink?.()),
+            targetType: 'Items',
+          });
+
+          this.filters = this.$store.getters['search/itemSearchParams'];
+        }
       }
     }
   },

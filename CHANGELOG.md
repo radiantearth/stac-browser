@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- Search filters are now preserved across collection and item searches
 
 ## [5.0.0] - 2026-07-30
 
@@ -61,7 +62,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [5.0.0-rc.1] - 2026-06-27
 
 ### Added
-- Search filters are now preserved across collection and item searches
 - Adding `extent`s to the root catalog will restrict the Search filters
 - Support free-text search for Collections in list of collections
 - Add a link to Collection Search from the Collections overview page for advanced filters

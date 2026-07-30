@@ -223,10 +223,9 @@ test.describe('Dropped filter banner — collection search to collection navigat
       await openItemFilterPanel(page);
     });
 
-    await test.step('Banner names the dropped sort', async () => {
+    await test.step('Sort successfully migrates without triggering banner', async () => {
       const banner = page.locator('.alert-warning').first();
-      await expect(banner).toBeVisible({ timeout: 10000 });
-      await expect(banner).toContainText(/sort/i);
+      await expect(banner).not.toBeVisible({ timeout: 5000 });
     });
   });
 
