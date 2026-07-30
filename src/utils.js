@@ -21,21 +21,6 @@ export class BrowserError extends Error {
  */
 export default class Utils {
 
-  static isMediaType(type, types, allowEmpty = false) {
-    if (!Array.isArray(types)) {
-      types = [types];
-    }
-    if (allowEmpty && !type) {
-      return true;
-    }
-    else if (typeof type !== 'string') {
-      return false;
-    }
-    else {
-      return types.includes(type.toLowerCase());
-    }
-  }
-
   static shortenTitle(fullStr, strLen, separator = '…') {
     if (fullStr.length <= strLen) {
       return fullStr;
@@ -59,7 +44,7 @@ export default class Utils {
   }
 
   static removeTrailingSlash(str) {
-    return str.replace(/\/$/, '');
+    return str.replace(/\/+$/, '');
   }
 
   static equalUrl(a, b) {
@@ -72,6 +57,50 @@ export default class Utils {
       return uri1.equals(uri2);
     } catch {
       return false;
+    }
+  }
+
+  /**
+   * Checks whether two URLs point to the same resource, ignoring a trailing
+   * slash in the path. Query parameters and fragments are ignored.
+   *
+   * @param {string|URI} a - The first URL
+   * @param {string|URI} b - The second URL
+   * @returns {boolean} `true` if scheme, authority and path (except for a trailing slash) are equal
+   */
+  static samePath(a, b) {
+    if (!a || !b) {
+      return false;
+    }
+    try {
+      const uri1 = URI(a);
+      const uri2 = URI(b);
+      return uri1.scheme().toLowerCase() === uri2.scheme().toLowerCase()
+        && uri1.authority().toLowerCase() === uri2.authority().toLowerCase()
+        && Utils.removeTrailingSlash(uri1.path()) === Utils.removeTrailingSlash(uri2.path());
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Returns the given URL with the trailing slash of the path added or removed.
+   * Scheme, authority, query and fragment are preserved.
+   *
+   * @param {string} url - The URL to change
+   * @param {boolean} trailingSlash - `true` to add a trailing slash, `false` to remove it
+   * @returns {string} The updated URL
+   */
+  static setTrailingSlash(url, trailingSlash) {
+    try {
+      const uri = URI(url);
+      let path = Utils.removeTrailingSlash(uri.path());
+      if (trailingSlash) {
+        path += '/';
+      }
+      return uri.path(path).toString();
+    } catch {
+      return url;
     }
   }
 
@@ -305,19 +334,6 @@ export default class Utils {
     }
     const dir = uri.segmentCoded(-2);
     return dir || auth || href;
-  }
-
-  // Gets the value at path of object.
-  // Drop in replacement for lodash.get
-  static getValueFromObjectUsingPath(object, path) {
-    if (object === null || typeof object !== 'object') {
-      return;
-    }
-    object = object[path[0]];
-    if (typeof object !== 'undefined' && path.length > 1) {
-      return this.getValueFromObjectUsingPath(object, path.slice(1));
-    }
-    return object;
   }
 
   static search(searchterm, target, and = true) {
