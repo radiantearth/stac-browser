@@ -21,25 +21,27 @@
       click focus :boundary-padding="10"
       v-model="popoverLinkVisible"
     >
-      <template #default v-if="stac">
-        <b-row v-if="stacId" class="stac-id">
-          <b-col cols="4">{{ $t('source.id') }}</b-col>
-          <b-col>
-            <code>{{ stacId }}</code>
-            <CopyButton :copyText="stacId" size="sm" variant="primary" class="ms-2" />
-          </b-col>
-        </b-row>
-        <b-row v-if="stacVersion" class="stac-version">
-          <b-col cols="4">{{ $t('source.stacVersion') }}</b-col>
-          <b-col>{{ stacVersion }}</b-col>
-        </b-row>
-        <b-row class="stac-valid">
-          <b-col cols="4">{{ $t('source.valid') }}</b-col>
-          <b-col>
-            <Validation v-if="popoverLinkVisible !== null" :data="stac" />
-          </b-col>
-        </b-row>
-        <hr>
+      <template #default>
+        <template v-if="stac">
+          <b-row v-if="stacId" class="stac-id">
+            <b-col cols="4">{{ $t('source.id') }}</b-col>
+            <b-col>
+              <code>{{ stacId }}</code>
+              <CopyButton :copyText="stacId" size="sm" variant="primary" class="ms-2" />
+            </b-col>
+          </b-row>
+          <b-row v-if="stacVersion" class="stac-version">
+            <b-col cols="4">{{ $t('source.stacVersion') }}</b-col>
+            <b-col>{{ stacVersion }}</b-col>
+          </b-row>
+          <b-row class="stac-valid">
+            <b-col cols="4">{{ $t('source.valid') }}</b-col>
+            <b-col>
+              <Validation v-if="popoverLinkVisible !== null" :data="stac" />
+            </b-col>
+          </b-row>
+          <hr>
+        </template>
         <Url id="stacUrl" :url="stacUrl" :label="$t('source.locatedAt')" />
       </template>
     </b-popover>
