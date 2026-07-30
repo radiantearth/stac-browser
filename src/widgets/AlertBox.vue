@@ -2,15 +2,20 @@
   <b-alert class="alert-box" :variant="variant" :dismissible="dismissible" show>
     <template v-if="title">
       <strong>{{ title }}</strong>&nbsp;
-      <small>{{ text }}</small>
+      <Description inline :description="text" :allowHTML="allowHTML" />
     </template>
-    <template v-else>{{ text }}</template>
+    <Description v-else compact :description="text" :allowHTML="allowHTML" />
   </b-alert>
 </template>
 
 <script>
+import Description from '../components/Description.vue';
+
 export default {
   name: "AlertBox",
+  components: {
+    Description
+  },
   props: {
     title: {
       type: String,
@@ -28,6 +33,10 @@ export default {
       type: Boolean,
       default: false
     },
+    allowHTML: {
+      type: Boolean,
+      default: false
+    },
   },
 };
 </script>
@@ -36,6 +45,6 @@ export default {
 @import "../theme/variables.scss";
 
 .alert-box {
-  margin-bottom: var(--sb-block-gap);
+  margin-bottom: 0;
 }
 </style>

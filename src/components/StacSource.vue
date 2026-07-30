@@ -13,47 +13,47 @@
       >
         <b-icon-share /><span class="button-label">{{ $t('source.share.title') }}</span>
       </b-button>
-
-      <b-popover
-        v-if="stacUrl" id="popover-link" class="popover-large" target="popover-link-btn"
-        placement="bottom" :title="$t('source.title')" teleport-to="#stac-browser" strategy="fixed"
-        click focus :boundary-padding="10"
-        v-model="popoverLinkVisible"
-      >
-        <template #default v-if="stac">
-          <b-row v-if="stacId" class="stac-id">
-            <b-col cols="4">{{ $t('source.id') }}</b-col>
-            <b-col>
-              <code>{{ stacId }}</code>
-              <CopyButton :copyText="stacId" size="sm" variant="primary" class="ms-2" />
-            </b-col>
-          </b-row>
-          <b-row v-if="stacVersion" class="stac-version">
-            <b-col cols="4">{{ $t('source.stacVersion') }}</b-col>
-            <b-col>{{ stacVersion }}</b-col>
-          </b-row>
-          <b-row class="stac-valid">
-            <b-col cols="4">{{ $t('source.valid') }}</b-col>
-            <b-col>
-              <Validation v-if="popoverLinkVisible !== null" :data="stac" />
-            </b-col>
-          </b-row>
-          <hr>
-          <Url id="stacUrl" :url="stacUrl" :label="$t('source.locatedAt')" />
-        </template>
-      </b-popover>
-      <b-popover
-        id="popover-share" class="popover-large" target="popover-share-btn"
-        placement="bottom" :title="$t('source.share.title')" teleport-to="#stac-browser" strategy="fixed"
-        click focus :boundary-padding="10"
-      >
-        <Url id="browserUrl" :url="browserUrl()" :label="$t('source.share.sharePageWithOthers')" :open="false" />
-        <template v-if="enableSocialSharing">
-          <hr>
-          <SocialSharing :text="sharingMessage" :title="title" :url="browserUrl()" />
-        </template>
-      </b-popover>
     </b-button-group>
+
+    <b-popover
+      v-if="stacUrl" id="popover-link" class="popover-large" target="popover-link-btn"
+      placement="bottom" :title="$t('source.title')" teleport-to="#stac-browser" strategy="fixed"
+      click focus :boundary-padding="10"
+      v-model="popoverLinkVisible"
+    >
+      <template #default v-if="stac">
+        <b-row v-if="stacId" class="stac-id">
+          <b-col cols="4">{{ $t('source.id') }}</b-col>
+          <b-col>
+            <code>{{ stacId }}</code>
+            <CopyButton :copyText="stacId" size="sm" variant="primary" class="ms-2" />
+          </b-col>
+        </b-row>
+        <b-row v-if="stacVersion" class="stac-version">
+          <b-col cols="4">{{ $t('source.stacVersion') }}</b-col>
+          <b-col>{{ stacVersion }}</b-col>
+        </b-row>
+        <b-row class="stac-valid">
+          <b-col cols="4">{{ $t('source.valid') }}</b-col>
+          <b-col>
+            <Validation v-if="popoverLinkVisible !== null" :data="stac" />
+          </b-col>
+        </b-row>
+        <hr>
+        <Url id="stacUrl" :url="stacUrl" :label="$t('source.locatedAt')" />
+      </template>
+    </b-popover>
+    <b-popover
+      id="popover-share" class="popover-large" target="popover-share-btn"
+      placement="bottom" :title="$t('source.share.title')" teleport-to="#stac-browser" strategy="fixed"
+      click focus :boundary-padding="10"
+    >
+      <Url id="browserUrl" :url="browserUrl()" :label="$t('source.share.sharePageWithOthers')" :open="false" />
+      <template v-if="enableSocialSharing">
+        <hr>
+        <SocialSharing :text="sharingMessage" :title="title" :url="browserUrl()" />
+      </template>
+    </b-popover>
   </nav>
 </template>
 

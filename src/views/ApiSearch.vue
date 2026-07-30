@@ -339,7 +339,7 @@ export default defineComponent({
     position: fixed;
     bottom: 2rem;
     right: 2rem;
-    z-index: 5000;
+    z-index: $zindex-fixed;
     box-shadow: 0 6px 14px 0 rgba(0, 0, 0, 0.5);
 
     &:hover {

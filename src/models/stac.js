@@ -18,7 +18,7 @@ export function processSTAC(stac, store) {
   return markRaw(stac);
 }
 
-export function createSTAC(data, url = null, store = null) {
+export function createSTAC(data, url = null, store = null, incomplete = false) {
   // Uncomment this line if the old checksum: fields should be converted
   // This is usually not needed so it's not enabled by default to shrink the bundle size
   // Migrate.enableMultihash(require('multihashes'));
@@ -54,6 +54,9 @@ export function createSTAC(data, url = null, store = null) {
     });
   }
   setInternal(obj, 'original', original);
+  if (incomplete) {
+    setInternal(obj, 'incomplete', true);
+  }
 
   // Preprocess STAC objects
   if (store && obj.isItemCollection) {

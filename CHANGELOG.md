@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.0.0] - 2026-07-30
+
+### Added
+
+- New Widget: `Featured`
+- Allow widgets to be shown conditionally
+- Added `relationTypes.config.js` to allow configuring link relation types that
+  - are specifically STAC and should be used to navigate to and display in STAC Browser
+  - should be hidden
+
+### Changed
+
+- Renamed SCSS variable `$logo-image-height` to `$logo-height` and CSS variable `--sb-logo-max-height` to `--sb-logo-height`
+- Added SCSS variable `$header-background` to allow overriding the gradient background of the header via SCSS as well
+
+### Fixed
+
+- URLs that were entered with a "wrong" trailing slash (e.g. `.../v1` although the server reports `.../v1/` as its URL) are corrected based on the self link of the server response and redirected.
+- Widgets that provide a custom `component` without an `id` render correctly; widget definitions with neither are skipped with an error
+- Use the Bootstrap z-index values to avoid overlay issues with the sticky header
+- Fix logo size calculation, avoiding the site title wrapping into multiple lines
+- Share button correctly shows with rounded borders on the right side
+
 ## [5.0.0-rc.2] - 2026-06-23
 
 ### Added
@@ -210,7 +233,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 For releases prior to v4.0.0, please refer to the
 [release notes in the GitHub Releases](https://github.com/radiantearth/stac-browser/releases).
 
-[Unreleased]: https://github.com/radiantearth/stac-browser/compare/v5.0.0-rc.2...HEAD
+[Unreleased]: https://github.com/radiantearth/stac-browser/compare/v5.0.0...HEAD
+[5.0.0]: https://github.com/radiantearth/stac-browser/compare/v5.0.0-rc.2...v5.0.0
 [5.0.0-rc.2]: https://github.com/radiantearth/stac-browser/compare/v5.0.0-rc.1...v5.0.0-rc.2
 [5.0.0-rc.1]: https://github.com/radiantearth/stac-browser/compare/v5.0.0-beta.1...v5.0.0-rc.1
 [5.0.0-beta.1]: https://github.com/radiantearth/stac-browser/compare/v4.0.1...v5.0.0-beta.1
