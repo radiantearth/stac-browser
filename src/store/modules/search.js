@@ -65,7 +65,7 @@ export default {
       Collections: [],
       Items: []
     },
- }),
+  }),
 
   getters: {
     // Full filter objects ready to hand to Utils.addFiltersToLink
@@ -84,7 +84,7 @@ export default {
       );
       return isActive(state.itemFilters) || isActive(state.collectionFilters);
     },
-        hasDroppedFilters: state => Object.values(state.droppedFilters).some(arr => arr.length > 0),
+    hasDroppedFilters: state => Object.values(state.droppedFilters).some(arr => arr.length > 0),
   },
 
   mutations: {
@@ -132,14 +132,14 @@ export default {
      * @param {Function} fetchQueryables - Async fn fetching the collection's queryables
      * @param {String} targetType - 'Items' (OGC API Features) or 'Global' (STAC item search)
      */
-   async migrateFiltersToCollection({ commit, state, rootGetters }, { collection, fetchQueryables, targetType = 'Items' }) {
+    async migrateFiltersToCollection({ commit, state, rootGetters }, { collection, fetchQueryables, targetType = 'Items' }) {
       commit('clearDroppedFilters', targetType);
 
       const capabilities = TYPES[targetType] || {};
       const supports = (capability) => {
         const classes = capabilities[capability];
-        if (typeof classes === 'boolean') return classes;
-        if (!classes) return false;
+        if (typeof classes === 'boolean') {return classes;}
+        if (!classes) {return false;}
         return rootGetters.supportsConformance(classes);
       };
 
@@ -150,7 +150,7 @@ export default {
 
       for (const [field, { capability, dropType, describe, empty }] of Object.entries(CARRY_OVER)) {
         const value = effective(state, field);
-        if (!isSet(value)) continue;
+        if (!isSet(value)) {continue;}
 
         if (capability === null || supports(capability)) {
           resolved[field] = value;
