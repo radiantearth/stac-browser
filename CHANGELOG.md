@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.0.0] - 2026-07-30
+
 ### Added
 
 - New Widget: `Featured`
@@ -231,7 +233,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 For releases prior to v4.0.0, please refer to the
 [release notes in the GitHub Releases](https://github.com/radiantearth/stac-browser/releases).
 
-[Unreleased]: https://github.com/radiantearth/stac-browser/compare/v5.0.0-rc.2...HEAD
+[Unreleased]: https://github.com/radiantearth/stac-browser/compare/v5.0.0...HEAD
+[5.0.0]: https://github.com/radiantearth/stac-browser/compare/v5.0.0-rc.2...v5.0.0
 [5.0.0-rc.2]: https://github.com/radiantearth/stac-browser/compare/v5.0.0-rc.1...v5.0.0-rc.2
 [5.0.0-rc.1]: https://github.com/radiantearth/stac-browser/compare/v5.0.0-beta.1...v5.0.0-rc.1
 [5.0.0-beta.1]: https://github.com/radiantearth/stac-browser/compare/v4.0.1...v5.0.0-beta.1
