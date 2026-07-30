@@ -1,7 +1,7 @@
 <template>
   <div class="header-title">
     <img v-if="logo" :src="logo.getAbsoluteUrl()" :alt="logo.title" :title="logo.title" class="logo">
-    <span role="banner">{{ shortTitle }}</span>
+    <span role="banner" :title="shortTitle">{{ shortTitle }}</span>
   </div>
 </template>
 

@@ -6,7 +6,7 @@
     <ErrorAlert v-if="globalError" dismissible class="global-error" v-bind="globalError" @close="hideError" />
     <Sidebar v-if="sidebar !== null" v-model="sidebar" />
     <!-- Header -->
-    <header ref="header" :class="{ scrolled }">
+    <header ref="header" :class="{ scrolled, 'hide-site-header': hideSite }">
       <b-row class="site">
         <b-col md="12">
           <nav class="actions navigation">
@@ -54,7 +54,7 @@
         <b-col md="12">
           <div class="title">
             <img v-if="icon && !isRoot" :src="icon.getAbsoluteUrl()" :alt="icon.title" :title="icon.title" class="icon">
-            <h1>{{ title }}</h1>
+            <h1 :title="title">{{ title }}</h1>
           </div>
           <nav class="actions navigation">
             <b-button-group>
@@ -172,6 +172,7 @@ export default defineComponent({
       onDataLoaded: null,
       isNavigatingLocale: false,
       scrolled: false,
+      hideSite: false,
       scrollListener: null
     };
   },
@@ -450,12 +451,32 @@ export default defineComponent({
     });
 
     // Add scroll listener to show header shadow only when scrolled (and header is sticky)
+    let lastScrollY = window.scrollY;
     this.scrollListener = () => {
       const header = this.$refs.header;
       const isSticky = header && window.getComputedStyle(header).position === 'sticky';
       const scrolled = Boolean(isSticky) && window.scrollY > 0;
       if (scrolled !== this.scrolled) {
         this.scrolled = scrolled;
+      }
+
+      // Hide the site row when scrolling down, bring it back when scrolling up.
+      // Only takes effect visually on small screens, see page.scss.
+      const y = Math.max(window.scrollY, 0); // clamp for overscroll bounce
+      const delta = y - lastScrollY;
+      lastScrollY = y;
+      const site = isSticky ? header.querySelector('.site') : null;
+      if (!site) {
+        this.hideSite = false;
+        return;
+      }
+      if (delta > 0 && y > site.offsetHeight && !this.hideSite) {
+        // Measure on each hide so the offset follows the current row height
+        header.style.setProperty('--sb-site-height', `${site.offsetHeight}px`);
+        this.hideSite = true;
+      }
+      else if (delta < 0 && this.hideSite) {
+        this.hideSite = false;
       }
     };
   },

@@ -63,6 +63,17 @@ svg {
         border-bottom-color: var(--bs-border-color);
         box-shadow: var(--bs-box-shadow-inset), 0 0.125rem 0.25rem rgba(0, 0, 0, 0.15);
       }
+
+      // On small screens, slide the site row out of view when scrolling down
+      // so that only the page row stays sticky. Scrolling up brings it back.
+      // The .hide-site-header class and --sb-site-height are managed in StacBrowser.vue.
+      @include media-breakpoint-down(md) {
+        transition: box-shadow 0.2s ease-in-out, transform 0.3s ease-in-out;
+
+        &.hide-site-header {
+          transform: translateY(calc(-1 * var(--sb-site-height, 0px)));
+        }
+      }
     }
 
     .btn-header {
@@ -105,6 +116,20 @@ svg {
         text-align: right;
       }
 
+      // On small screens the buttons and the title don't fit on one line,
+      // so move the title to its own full-width row below the buttons.
+      @include media-breakpoint-down(md) {
+        > .col-md-12 {
+          flex-wrap: wrap;
+          justify-content: space-between;
+
+          > .title {
+            order: 1;
+            flex-basis: 100%;
+          }
+        }
+      }
+
       > .col-md-12 {
         > .title {
           display: flex;
@@ -140,6 +165,11 @@ svg {
             span[role="banner"] {
               font-size: var(--sb-header-font-size);
               font-weight: var(--sb-header-font-weight);
+              display: -webkit-box;
+              -webkit-line-clamp: 2;
+              line-clamp: 2;
+              -webkit-box-orient: vertical;
+              overflow: hidden;
             }
           }
         }
@@ -172,8 +202,12 @@ svg {
           h1 {
             color: var(--sb-h1-color);
             font-weight: $h1-font-weight;
-            align-items: center;
             font-size: $h1-font-size;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
           }
           @include media-breakpoint-down(xxl) {
             h1 {
@@ -183,6 +217,11 @@ svg {
           @include media-breakpoint-down(lg) {
             h1 {
               font-size: $h1-font-size - 0.4rem;
+            }
+          }
+          @include media-breakpoint-down(md) {
+            h1 {
+              font-size: $h1-font-size - 0.6rem;
             }
           }
         }
