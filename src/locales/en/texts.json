@@ -161,6 +161,7 @@
   },
   "items": {
     "filter": "Filters",
+    "filterChangesNotApplied": "The filters were changed, but the changes have not been applied yet.",
     "hideFilter": "Hide Filters",
     "noTime": "No time given",
     "noneAvailableForCollection": "No items available for this collection.",
@@ -291,6 +292,7 @@
     "betweenOperatorDescription": "Tests whether a numeric field value lies within the given range. The given range is inclusive.",
     "dateDescription": "All times in Coordinated Universal Time (UTC).",
     "disabledDueToSingleDate": "This filter is disabled because the collection has a single date and time as temporal extent.",
+    "droppedFilters": "The following filters are not supported here and were removed: {filters}.",
     "enterCollections": "Enter one or more Collection IDs...",
     "enterItemIds": "Enter one or more Item IDs...",
     "enterSearchTerms": "Enter one or more search terms...",

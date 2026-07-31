@@ -212,7 +212,15 @@ export default {
         extent = this.stacToOlExtent(this.stac.getBoundingBox());
       }
       if (extent) {
-        this.map.getView().fit(extent, { padding: [50,50,50,50], maxZoom: this.maxZoom });
+        const fit = () => this.map.getView().fit(extent, { padding: [50, 50, 50, 50], maxZoom: this.maxZoom });
+        const size = this.map.getSize();
+        if (size && size[0] > 0 && size[1] > 0) {
+          fit();
+        }
+        else {
+          // Update the map once the size is known, might be zero size if the map is in a hidden tab or so.
+          this.map.once('change:size', fit);
+        }
       }
     },
     addMask(stac) {
@@ -251,8 +259,12 @@ export default {
     fixX(x) {
       // Normalize longitude to -180 to 180 range
       // For antimeridian crossing, westLon can be > eastLon
-      while (x > 180) {x -= 360;}
-      while (x < -180) {x += 360;}
+      while (x > 180) {
+        x -= 360;
+      }
+      while (x < -180) {
+        x += 360;
+      }
       return x;
     },
     fixY(y) {
@@ -385,6 +397,7 @@ export default {
       if (!Array.isArray(extent) || extent.length !== 4) {
         return null;
       }
+    
       // Handles antimeridian-crossing bboxes (westLon > eastLon), shifting
       // eastLon by +360 so OpenLayers gets a valid extent where minX < maxX.
       return toOlExtent(extent, this.map.getView().getProjection());
