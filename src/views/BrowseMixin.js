@@ -4,6 +4,8 @@ import { getErrorCode, getErrorMessage } from '../store/utils';
 import { URI } from 'stac-js/src/utils.js';
 import { mapState, mapGetters } from 'vuex';
 
+const isExternalPath = path => URI(path || '/').is("absolute");
+
 export default {
   components: {
     ErrorAlert,
@@ -25,7 +27,7 @@ export default {
       return getErrorMessage(this.error);
     },
     isExternal() {
-      return URI(this.path).is("absolute");
+      return isExternalPath(this.path);
     }
   },
   watch: {
@@ -41,7 +43,8 @@ export default {
   },
   methods: {
     async browse(path) {
-      if (!this.allowExternalAccess && this.isExternal) {
+      // Check the given path, not the path property (i.e. this.isExternal)
+      if (!this.allowExternalAccess && isExternalPath(path)) {
         return;
       }
 
