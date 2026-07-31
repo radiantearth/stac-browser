@@ -59,6 +59,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Search filters are now preserved for collection and item searches
+- Opening a collection from the collection search results carries the search criteria over into its item filters
+- An indicator on the item filter toggle shows when the filters were changed but not applied yet
+
+### Fixed
+
+- The Search page restores the previous results when returning to it
+
+## [5.0.0] - 2026-07-30
+
+### Added
+
 - New Widget: `Featured`
 - Allow widgets to be shown conditionally
 - Added `relationTypes.config.js` to allow configuring link relation types that
@@ -173,7 +185,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Support for dark mode (defaults to auto-detection based on system settings of the user)
   - Added `enforcedColorMode` config option to enforce a specific color mode (e.g. always show "light" mode)
   - Added a color mode switch in the header (next to the language chooser)
+- Added basic runtime styling options for e.g. use in Docker containers
 - Added more documentation around styling
+- Added `SB_RUNTIME` environment variable to control whether `runtime-config.js` and `runtime-style.css` are included in the built HTML; replaces the previous `DYNAMIC_CONFIG` Docker build argument and `<!--RC RC-->` comment-based mechanism
 
 ### Changed
 

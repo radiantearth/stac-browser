@@ -37,6 +37,15 @@ can be provided as a
 [build argument](https://docs.docker.com/engine/reference/commandline/build#set-build-time-variables---build-arg)
 when building the Dockerfile.
 
+Another build argument is `SB_RUNTIME` (default: `true`).
+When enabled, the built image loads two optional files at startup:
+
+- `runtime-config.js` — lets you set options (like `catalogUrl`) without rebuilding the image (see [Options](./options.md)).
+- `runtime-style.css` — lets you drop in a CSS file to adjust the look and feel without rebuilding the image (see [Styling & Theming](./styling.md#runtime-customizations)).
+
+If you set `SB_RUNTIME=false` at build time, both runtime files are omitted from the built HTML and everything must be configured at build time instead.
+If you don't use runtime config and runtime styles, you can save two server roundtrips by disabling this option, making the initial page load slightly faster.
+
 For example:
 
 ```bash
