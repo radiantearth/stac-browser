@@ -33,9 +33,11 @@ export async function commitToStore(page, mutation, payload) {
  * @returns {Promise<{
  *   collectionFilters: object,
  *   itemFilters: object,
- *   droppedFilters: Array,
+ *   carryFromCollectionSearch: boolean,
+ *   droppedFilters: {Global: Array, Collections: Array, Items: Array},
  *   getters: {
  *     hasActiveFilters: boolean,
+ *     hasCollectionSearchCriteria: boolean,
  *     hasDroppedFilters: boolean,
  *     itemSearchParams: object,
  *     collectionSearchParams: object,
@@ -54,15 +56,39 @@ export async function getSearchState(page) {
       ?.__vue_app__?.config?.globalProperties?.$store;
     const s = store?.state?.search;
     if (!s) return null;
+    // CQL operator classes and Cql instances don't serialize across the page
+    // boundary; replace them with markers that can be asserted on.
+    const sanitizeRow = (row) => {
+      if (!('operator' in row)) {
+        return { ...row };
+      }
+      const { operator, ...rest } = row;
+      return { ...rest, hasOperator: typeof operator === 'function' };
+    };
+    const sanitizeFilterSet = (filterSet) => ({
+      ...filterSet,
+      filters: filterSet.filters ? '<cql>' : null,
+      rawFilters: (filterSet.rawFilters || []).map(sanitizeRow),
+    });
+    const sanitizeParams = (params) => ({
+      ...params,
+      filters: params.filters ? '<cql>' : null,
+    });
     return {
-      collectionFilters: { ...s.collectionFilters },
-      itemFilters: { ...s.itemFilters },
-      droppedFilters: [...(s.droppedFilters.Items || [])],
+      collectionFilters: sanitizeFilterSet(s.collectionFilters),
+      itemFilters: sanitizeFilterSet(s.itemFilters),
+      carryFromCollectionSearch: s.carryFromCollectionSearch,
+      droppedFilters: {
+        Global: (s.droppedFilters.Global || []).map(sanitizeRow),
+        Collections: (s.droppedFilters.Collections || []).map(sanitizeRow),
+        Items: (s.droppedFilters.Items || []).map(sanitizeRow),
+      },
       getters: {
         hasActiveFilters: store.getters['search/hasActiveFilters'],
+        hasCollectionSearchCriteria: store.getters['search/hasCollectionSearchCriteria'],
         hasDroppedFilters: store.getters['search/hasDroppedFilters'],
-        itemSearchParams: { ...store.getters['search/itemSearchParams'] },
-        collectionSearchParams: { ...store.getters['search/collectionSearchParams'] },
+        itemSearchParams: sanitizeParams(store.getters['search/itemSearchParams']),
+        collectionSearchParams: sanitizeParams(store.getters['search/collectionSearchParams']),
       }
     };
   });
@@ -72,19 +98,27 @@ export async function getSearchState(page) {
  * Waits for the Vuex store to be ready, then dispatches an action.
  *
  * @param {import('@playwright/test').Page} page
- * @param {string} action - Fully-namespaced action name (e.g. 'search/migrateFiltersToCollection').
+ * @param {string} action - Fully-namespaced action name (e.g. 'search/carryToItemSearch').
  * @param {*} [payload] - Optional action payload. Must be JSON-serializable.
  */
 export async function dispatchToStore(page, action, payload) {
+  // waitForFunction doesn't await async predicates, so wait for readiness with
+  // a synchronous check first and dispatch via evaluate, which awaits promises.
   await page.waitForFunction(
+    () => {
+      const store = document.querySelector('[data-v-app]')
+        ?.__vue_app__?.config?.globalProperties?.$store;
+      return Boolean(store?.state?.search && store.state.browserReady);
+    },
+    undefined,
+    { timeout: 10000 }
+  );
+  await page.evaluate(
     async ({ action, payload }) => {
       const store = document.querySelector('[data-v-app]')
         ?.__vue_app__?.config?.globalProperties?.$store;
-      if (!store?.state?.search || !store.state.browserReady) return false;
       await store.dispatch(action, payload);
-      return true;
     },
-    { action, payload },
-    { timeout: 10000 }
+    { action, payload }
   );
 }

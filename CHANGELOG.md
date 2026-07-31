@@ -6,7 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+### Added
+
 - Search filters are now preserved across collection and item searches
+
+### Fixed
+
+- The item filter panel opens when filters are carried over from a collection search, instead of applying them silently
+- The item filter panel reacts to programmatic open/close after the page has loaded
 
 ## [5.0.0] - 2026-07-30
 

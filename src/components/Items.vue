@@ -21,7 +21,7 @@
           type="Items"
           :title="$t('items.filter')" :parent="stac"
           :searchLink="itemSearchLink"
-          :value="apiFilters" @input="emitFilter"
+          @input="emitFilter"
         />
       </b-collapse>
     </template>
@@ -163,7 +163,7 @@ export default defineComponent({
   },
   watch: {
     showFilters() {
-      this.filter = this.showFilters;
+      this.filtersOpen = this.showFilters;
     },
     filtersOpen() {
       this.$emit('filtersShown', this.filtersOpen);

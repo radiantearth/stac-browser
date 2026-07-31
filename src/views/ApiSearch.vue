@@ -9,7 +9,7 @@
           <b-tab v-if="collectionSearch" :title="$t('search.tabs.collections')" :id="tabIds.collections">
             <WidgetHook id="view-search-filters-collections-start" />
             <SearchFilter
-              :parent="parent" title="" :value="collectionFilters" type="Collections"
+              :parent="parent" title="" type="Collections"
               @input="setFilters"
             />
             <WidgetHook id="view-search-filters-collections-end" />
@@ -17,7 +17,7 @@
           <b-tab v-if="itemSearch" :title="$t('search.tabs.items')" :id="tabIds.items">
             <WidgetHook id="view-search-filters-items-start" />
             <SearchFilter
-              :parent="parent" title="" :value="itemFilters" type="Global"
+              :parent="parent" title="" type="Global"
               :searchLink="itemSearch"
               @input="setFilters"
             />
@@ -81,7 +81,7 @@ import ErrorAlert from '../components/ErrorAlert.vue';
 import { getDisplayTitle, createSTAC } from '../models/stac';
 import { STAC } from 'stac-js';
 import { defineComponent, defineAsyncComponent } from 'vue';
-import { getErrorCode, getErrorMessage, fetchQueryablesForLink } from '../store/utils';
+import { getErrorCode, getErrorMessage, fetchQueryablesForLink, fetchSortablesForLink } from '../store/utils';
 import { mapGetters, mapState } from "vuex";
 import { BTab, BTabs } from 'bootstrap-vue-next';
 
@@ -192,13 +192,14 @@ export default defineComponent({
       if (tabId) {
         this.$store.commit('updateState', {type: 'searchtype', value: tabId[0]});
       }
-      // Continuing from collection search into item search carries filters over,
-      // gated on the item-search conformance classes. Only on a real tab change,
-      // not the initial assignment.
-      if (oldTab === this.tabIds.collections && tab === this.tabIds.items && this.$store.getters['search/hasActiveFilters']) {
-        await this.$store.dispatch('search/migrateFiltersToCollection', {
+      // Switching from collection search to item search carries the collection
+      // search criteria over, gated on the item-search conformance classes.
+      // Only on a real tab change, not the initial assignment.
+      if (oldTab === this.tabIds.collections && tab === this.tabIds.items && this.$store.getters['search/hasCollectionSearchCriteria']) {
+        await this.$store.dispatch('search/carryToItemSearch', {
           collection: this.parent,
-          fetchQueryables: async (stac) => await fetchQueryablesForLink(this.$store, stac?.getQueryablesLink?.()),
+          fetchQueryables: (stac) => fetchQueryablesForLink(this.$store, stac?.getQueryablesLink?.()),
+          fetchSortables: (stac) => fetchSortablesForLink(this.$store, stac?.getSortablesLink?.()),
           targetType: 'Global',
         });
         this.itemFilters = this.$store.getters['search/itemSearchParams'];
@@ -238,11 +239,15 @@ export default defineComponent({
   methods: {
     updateFreeText(q, force = false) {
       if (Array.isArray(q) && (force || size(q) > 0)) {
-        this.setFilters({ q });
+        // The store is the source of truth for the filter forms; an empty
+        // array explicitly clears the free-text filter.
+        const mutation = this.isCollectionSearch ? 'search/setCollectionFilters' : 'search/setItemFilters';
+        this.$store.commit(mutation, { q });
+        this.setFilters({ ...this.filters, q });
       }
     },
     openItemSearch() {
-      this.itemFilters.collections = Object.keys(this.selectedCollections);
+      this.$store.commit('search/setItemFilters', { collections: Object.keys(this.selectedCollections) });
       this.activeSearch = this.tabIds.items;
       this.selectedCollections = {};
     },

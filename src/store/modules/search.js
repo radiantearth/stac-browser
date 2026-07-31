@@ -1,17 +1,16 @@
 import Cql from '../../models/cql2/cql';
 import CqlLogicalOperator, { CqlNot } from '../../models/cql2/operators/logical';
-import { TYPES } from '../../components/ApiCapabilitiesMixin';
+import { CQL_JSON, CQL_TEXT, TYPES } from '../../components/ApiCapabilitiesMixin';
 
-// Fields that may cross search modes, with the capability gating each one.
-// `capability` keys into TYPES[targetType], so the same field is gated by a
-// different conformance class depending on where the user is going.
-// `null` means the field is not capability-dependent and is always carried.
+// Fields that may be carried over from a collection search into an item search,
+// with the capability gating each one. `capability` keys into TYPES[targetType],
+// so the same field is gated by a different conformance class depending on where
+// the user is going. `null` means the field is always carried.
 const CARRY_OVER = {
   q: {
     capability: 'FreeText',
     dropType: 'freeText',
     describe: (value) => ({ terms: [...value] }),
-    empty: () => [],
   },
   datetime: { capability: 'BasicFilters', dropType: 'datetime' },
   bbox: { capability: 'BasicFilters', dropType: 'bbox' },
@@ -28,14 +27,26 @@ const isSet = (value) => {
   return true;
 };
 
-// Reads a field from whichever bucket the user populated: collection search writes
-// to collectionFilters, both global and in-collection item search write to itemFilters.
-const effective = (state, field) => {
-  const fromCollections = state.collectionFilters[field];
-  return isSet(fromCollections) ? fromCollections : state.itemFilters[field];
-};
+// Whether the user has entered actual search criteria (as opposed to
+// presentational settings such as sort order or page size, which may also be
+// set programmatically through defaults).
+const hasSearchCriteria = (filters) => (
+  Boolean(filters.datetime) ||
+  Boolean(filters.bbox) ||
+  (Array.isArray(filters.q) && filters.q.length > 0) ||
+  (Array.isArray(filters.rawFilters) && filters.rawFilters.length > 0) ||
+  Boolean(filters.filters)
+);
 
-const defaultFilterSet = () => ({
+const isActive = (filters) => (
+  hasSearchCriteria(filters) ||
+  Boolean(filters.limit) ||
+  (Array.isArray(filters.ids) && filters.ids.length > 0) ||
+  (Array.isArray(filters.collections) && filters.collections.length > 0) ||
+  Boolean(filters.sortby)
+);
+
+export const defaultFilterSet = () => ({
   datetime: null,
   bbox: null,
   limit: null,
@@ -48,6 +59,25 @@ const defaultFilterSet = () => ({
   filterLogic: { andOr: 'and', negate: false },
 });
 
+export const freshSearchState = () => ({
+  // Each bucket is owned by its search form and is never rewritten by
+  // navigation: collectionFilters by the collection search, itemFilters by the
+  // item searches (both global and in-collection). Carrying filters from a
+  // collection search into an item search only ever writes the item bucket.
+  collectionFilters: defaultFilterSet(),
+  itemFilters: defaultFilterSet(),
+  // Armed when the user executes a collection search and disarmed as soon as
+  // the user takes over on the item side (submit/reset). While armed,
+  // navigating into a collection re-seeds the item filters from the collection
+  // search, so each collection gets the carry-over based on its own queryables.
+  carryFromCollectionSearch: false,
+  droppedFilters: {
+    Global: [],
+    Collections: [],
+    Items: []
+  },
+});
+
 const buildSearchParams = (filters) => {
   const rest = { ...filters };
   delete rest.rawFilters;
@@ -55,36 +85,29 @@ const buildSearchParams = (filters) => {
   return rest;
 };
 
+// Fields to validate a carried sortby against when the target doesn't
+// advertise sortables. Keep in sync with the fallback in
+// SearchFilter.sortOptions.
+const FALLBACK_ITEM_SORT_FIELDS = [
+  'id',
+  'properties.title',
+  'properties.datetime',
+  'properties.created',
+  'properties.updated',
+];
+
 export default {
   namespaced: true,
-  state: () => ({
-    collectionFilters: defaultFilterSet(),
-    itemFilters: defaultFilterSet(),
-    droppedFilters: {
-      Global: [],
-      Collections: [],
-      Items: []
-    },
-  }),
+  state: freshSearchState,
 
   getters: {
     // Full filter objects ready to hand to Utils.addFiltersToLink
     collectionSearchParams: (state) => buildSearchParams(state.collectionFilters),
     itemSearchParams: (state) => buildSearchParams(state.itemFilters),
-    hasActiveFilters: (state) => {
-      const isActive = (f) => (
-        Boolean(f.datetime) ||
-        Boolean(f.bbox) ||
-        Boolean(f.limit) ||
-        (Array.isArray(f.q) && f.q.length > 0) ||
-        (Array.isArray(f.ids) && f.ids.length > 0) ||
-        (Array.isArray(f.collections) && f.collections.length > 0) ||
-        Boolean(f.sortby) ||
-        Boolean(f.filters)
-      );
-      return isActive(state.itemFilters) || isActive(state.collectionFilters);
-    },
-    hasDroppedFilters: state => Object.values(state.droppedFilters).some(arr => arr.length > 0),
+    hasActiveFilters: (state) => isActive(state.itemFilters) || isActive(state.collectionFilters),
+    hasCollectionSearchCriteria: (state) => hasSearchCriteria(state.collectionFilters),
+    carryPending: (state) => state.carryFromCollectionSearch,
+    hasDroppedFilters: (state) => Object.values(state.droppedFilters).some(arr => arr.length > 0),
   },
 
   mutations: {
@@ -94,136 +117,175 @@ export default {
     setItemFilters(state, patch) {
       state.itemFilters = { ...state.itemFilters, ...patch };
     },
+    // Full replacement, used by the carry-over so that fields without a carried
+    // value return to their defaults instead of keeping stale values.
+    seedItemFilters(state, filterSet) {
+      state.itemFilters = filterSet;
+    },
+    setCarryFromCollectionSearch(state, enabled) {
+      state.carryFromCollectionSearch = Boolean(enabled);
+    },
     resetCollectionFilters(state) {
       state.collectionFilters = defaultFilterSet();
+      state.carryFromCollectionSearch = false;
     },
     resetItemFilters(state) {
       state.itemFilters = defaultFilterSet();
+      state.carryFromCollectionSearch = false;
     },
-    resetAll(state) {
-      state.collectionFilters = defaultFilterSet();
-      state.itemFilters = defaultFilterSet();
-      state.droppedFilters = [];
+    reset(state) {
+      Object.assign(state, freshSearchState());
     },
     setDroppedFilters(state, { type, filters }) {
-      if (state.droppedFilters[type]) {
+      if (type in state.droppedFilters) {
         state.droppedFilters[type] = filters;
       }
     },
     clearDroppedFilters(state, type) {
-      if (state.droppedFilters[type]) {
+      if (type in state.droppedFilters) {
         state.droppedFilters[type] = [];
       }
-    },
-    clearDroppedFiltersByType(state, type) {
-      state.droppedFilters = state.droppedFilters.filter(f => f.type !== type);
     },
   },
 
   actions: {
     /**
-     * Called when the user navigates into a specific search mode.
+     * Carries the collection search criteria over into the item search.
      *
-     * A filter is carried over only if the target mode advertises support for it
-     * per the STAC API conformance classes in TYPES. Anything unsupported is
-     * cleared and recorded in `droppedFilters` so the UI can report it.
+     * Reads only from `collectionFilters` and only writes `itemFilters`, so the
+     * collection search always survives and the carry-over can be repeated for
+     * each collection the user navigates into.
+     *
+     * A filter is carried over only if the target mode advertises support for
+     * it per the STAC API conformance classes in TYPES. Anything unsupported is
+     * recorded in `droppedFilters` so the UI can report it.
+     *
+     * Callers must ensure there are criteria to carry (see the
+     * `hasCollectionSearchCriteria` getter), otherwise the item filters are
+     * needlessly reset to the defaults.
      *
      * @param {Object} collection - The STAC collection being navigated into
      * @param {Function} fetchQueryables - Async fn fetching the collection's queryables
+     * @param {Function} fetchSortables - Async fn fetching the collection's sortable field names
      * @param {String} targetType - 'Items' (OGC API Features) or 'Global' (STAC item search)
      */
-    async migrateFiltersToCollection({ commit, state, rootGetters }, { collection, fetchQueryables, targetType = 'Items' }) {
-      commit('clearDroppedFilters', targetType);
-
+    async carryToItemSearch({ commit, state, rootGetters }, { collection, fetchQueryables, fetchSortables, targetType = 'Items' }) {
+      const source = state.collectionFilters;
       const capabilities = TYPES[targetType] || {};
       const supports = (capability) => {
         const classes = capabilities[capability];
-        if (typeof classes === 'boolean') {return classes;}
-        if (!classes) {return false;}
+        if (typeof classes === 'boolean') {
+          return classes;
+        }
+        if (!classes) {
+          return false;
+        }
         return rootGetters.supportsConformance(classes);
       };
 
-      const raw = effective(state, 'rawFilters');
-      const sortby = effective(state, 'sortby');
-      const resolved = {};
       const dropped = [];
+      // Item-only fields have no counterpart in the collection search and are
+      // kept as they are; everything else is either carried or reset.
+      const seed = Object.assign(defaultFilterSet(), {
+        ids: state.itemFilters.ids,
+        collections: state.itemFilters.collections,
+      });
 
-      for (const [field, { capability, dropType, describe, empty }] of Object.entries(CARRY_OVER)) {
-        const value = effective(state, field);
-        if (!isSet(value)) {continue;}
-
+      for (const [field, { capability, dropType, describe }] of Object.entries(CARRY_OVER)) {
+        const value = source[field];
+        if (!isSet(value)) {
+          continue;
+        }
         if (capability === null || supports(capability)) {
-          resolved[field] = value;
+          seed[field] = value;
         } else {
           dropped.push({ type: dropType, ...(describe ? describe(value) : { value }) });
-          resolved[field] = empty ? empty() : null; 
         }
       }
 
-      if (isSet(sortby)) {
+      // Conformance only tells us that the target sorts at all, not that the
+      // user's field is sortable there, so validate against the target's
+      // sortables. Item properties are usually `properties.`-prefixed while
+      // collection fields are not, so also try the prefixed field name.
+      if (isSet(source.sortby)) {
         if (supports('Sort')) {
-          resolved.sortby = sortby;
-        } else {
-          dropped.push({ type: 'sort', sortby });
-          resolved.sortby = null;
-        }
-      }
-
-      const hasCql = Array.isArray(raw) && raw.length > 0;
-      const filterLogic = effective(state, 'filterLogic') || { andOr: 'and', negate: false };
-      const { andOr, negate } = filterLogic;
-      let validCompatible = [];
-      let rebuiltCql = null;
-
-      if (hasCql) {
-        let queryables = [];
-        try {
-          queryables = await fetchQueryables(collection);
-        } catch (e) {
-          console.error('failed to fetch queryables for reconciliation', e);
-          queryables = [];
-        }
-
-        const supportedIds = new Set(queryables.map(q => q.id));
-        validCompatible = raw.filter(f => supportedIds.has(f.queryable.id) && f.operator);
-        const cqlDropped = raw.filter(f => !supportedIds.has(f.queryable.id));
-        const invalidCompatible = raw.filter(f => supportedIds.has(f.queryable.id) && !f.operator);
-
-        cqlDropped.forEach(f => dropped.push({ type: 'cql2', ...f }));
-        invalidCompatible.forEach(f => dropped.push({ type: 'cql2', ...f }));
-
-        if (validCompatible.length > 0) {
-          const args = validCompatible.map(f => {
-            let filter;
-            if (typeof f.operator === 'function') {
-              filter = new f.operator(f.queryable, f.value);
-            } else {
-              filter = { queryable: f.queryable, value: f.value };
-            }
-            return f.negate ? new CqlNot(filter) : filter;
-          });
-          let logical = CqlLogicalOperator.create(andOr, args);
-          if (negate) {
-            logical = new CqlNot(logical);
+          const direction = source.sortby.startsWith('-') ? '-' : '';
+          const field = direction ? source.sortby.substring(1) : source.sortby;
+          let sortables = null;
+          try {
+            sortables = typeof fetchSortables === 'function' ? await fetchSortables(collection) : null;
+          } catch (error) {
+            console.error('Failed to load sortables', error);
           }
-          rebuiltCql = new Cql(logical, null);
+          if (!Array.isArray(sortables) || sortables.length === 0) {
+            // No sortables advertised; validate against the fields the sort
+            // form offers by default
+            sortables = FALLBACK_ITEM_SORT_FIELDS;
+          }
+          const candidate = [field, `properties.${field}`].find(f => sortables.includes(f));
+          if (candidate) {
+            seed.sortby = direction + candidate;
+          } else {
+            dropped.push({ type: 'sort', sortby: source.sortby });
+          }
+        } else {
+          dropped.push({ type: 'sort', sortby: source.sortby });
         }
       }
 
-      if (hasCql) {
-        commit('setItemFilters', {
-          ...resolved,
-          filters: rebuiltCql,
-          rawFilters: validCompatible,
-          filterLogic: { andOr, negate },
+      if (Array.isArray(source.rawFilters) && source.rawFilters.length > 0) {
+        // Store only plain data for the notification, class instances don't
+        // belong into the state
+        const describeCqlDrop = (f) => ({
+          type: 'cql2',
+          id: f.id,
+          queryable: { id: f.queryable?.id, title: f.queryable?.title },
         });
-      } else if (Object.keys(resolved).length > 0 || dropped.length > 0) {
-        commit('setItemFilters', resolved);
+        const cqlMode = {
+          textMode: rootGetters.supportsConformance(CQL_TEXT),
+          jsonMode: rootGetters.supportsConformance(CQL_JSON),
+        };
+        if (!supports('CqlFilters') || (!cqlMode.textMode && !cqlMode.jsonMode)) {
+          source.rawFilters.forEach(f => dropped.push(describeCqlDrop(f)));
+        }
+        else {
+          let queryables = null;
+          try {
+            queryables = await fetchQueryables(collection);
+          } catch (error) {
+            // Not knowing the queryables doesn't imply the filters are
+            // unsupported, so don't report them as dropped. The CQL filters are
+            // not carried over, but remain part of the collection search.
+            console.error('Failed to load queryables, not carrying over CQL filters', error);
+          }
+          if (Array.isArray(queryables)) {
+            const supportedIds = new Set(queryables.map(queryable => queryable.id));
+            // Rows without an operator class are incomplete and can't be executed
+            const compatible = source.rawFilters.filter(f => supportedIds.has(f.queryable.id) && typeof f.operator === 'function');
+            source.rawFilters
+              .filter(f => !compatible.includes(f))
+              .forEach(f => dropped.push(describeCqlDrop(f)));
+
+            if (compatible.length > 0) {
+              const { andOr = 'and', negate = false } = source.filterLogic || {};
+              const args = compatible.map(f => {
+                const filter = new f.operator(f.queryable, f.value);
+                return f.negate ? new CqlNot(filter) : filter;
+              });
+              let logical = CqlLogicalOperator.create(andOr, args);
+              if (negate) {
+                logical = new CqlNot(logical);
+              }
+              seed.filters = new Cql(logical, cqlMode);
+              seed.rawFilters = compatible;
+              seed.filterLogic = { andOr, negate };
+            }
+          }
+        }
       }
 
-      if (dropped.length > 0) {
-        commit('setDroppedFilters', { type: targetType, filters: dropped });
-      }
+      commit('seedItemFilters', seed);
+      commit('setDroppedFilters', { type: targetType, filters: dropped });
     }
   }
 };

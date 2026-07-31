@@ -86,7 +86,7 @@ import { ItemCollection } from 'stac-js';
 import DeprecationMixin from '../components/DeprecationMixin.js';
 import { BTab, BTabs, BCard} from 'bootstrap-vue-next';
 import { getIgnoredFields } from '../ignored-metadata.js';
-import { fetchQueryablesForLink } from '../store/utils';
+import { fetchQueryablesForLink, fetchSortablesForLink } from '../store/utils';
 
 export default defineComponent({
   name: "Catalog",
@@ -249,16 +249,25 @@ export default defineComponent({
           return;
         }
 
-        const cameFromSearch = Object.keys(this.$store.state.search.collectionFilters || {}).length > 0;
-        
-        if (cameFromSearch && this.$store.getters['search/hasActiveFilters']) {
-          await this.$store.dispatch('search/migrateFiltersToCollection', {
+        // Carry the collection search over into the item filters, but only
+        // while the user is actually coming from an executed collection search
+        // (and has not started an own item search since), so that plain
+        // browsing is not affected by unrelated leftover filters.
+        const carry = this.$store.getters['search/carryPending']
+          && this.$store.getters['search/hasCollectionSearchCriteria'];
+        if (carry) {
+          // In-collection item search is Features, not item-search
+          await this.$store.dispatch('search/carryToItemSearch', {
             collection: newData,
-            fetchQueryables: async (collection) => await fetchQueryablesForLink(this.$store, collection.getQueryablesLink?.()),
+            fetchQueryables: (collection) => fetchQueryablesForLink(this.$store, collection.getQueryablesLink?.()),
+            fetchSortables: (collection) => fetchSortablesForLink(this.$store, collection.getSortablesLink?.()),
             targetType: 'Items',
           });
 
           this.filters = this.$store.getters['search/itemSearchParams'];
+          // Open the filter panel so that the user can see which filters are
+          // applied to the item list instead of filtering it silently
+          this.$store.commit('updateState', {type: 'itemFilterOpen', value: 1});
         }
       }
     }

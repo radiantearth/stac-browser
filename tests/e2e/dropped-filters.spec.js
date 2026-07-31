@@ -44,9 +44,14 @@ const goToCollectionSearchTab = async (page, browserPath) => {
   await waitForBrowserReady(page);
 };
 
-// Helper: open the item filter panel on a collection page (banner lives inside it)
+// Helper: open the item filter panel on a collection page (banner lives inside it).
+// The panel opens automatically when filters were carried over, so only click
+// the toggle while it is still closed.
 const openItemFilterPanel = async (page) => {
-  await page.getByRole('button', { name: /show filters|hide filters/i }).click();
+  const toggle = page.getByRole('button', { name: /show filters/i });
+  if (await toggle.isVisible()) {
+    await toggle.click();
+  }
   await waitForBrowserReady(page);
 };
 
@@ -199,7 +204,7 @@ test.describe('Dropped filter banner — collection search to collection navigat
     });
   });
 
-  test('Sort-only drop is named in the banner', async ({ page }) => {
+  test('Sort-only search does not carry over and shows no banner', async ({ page }) => {
     await goToCollectionSearchTab(page, BROWSER_PATH);
 
     await test.step('Verify sort control is visible (conformance registered correctly)', async () => {
@@ -223,9 +228,42 @@ test.describe('Dropped filter banner — collection search to collection navigat
       await openItemFilterPanel(page);
     });
 
-    await test.step('Sort successfully migrates without triggering banner', async () => {
+    // A sort order alone is no search criterion, so nothing is carried over
+    // into the collection and nothing needs to be reported
+    await test.step('No banner appears for a sort-only search', async () => {
       const banner = page.locator('.alert-warning').first();
       await expect(banner).not.toBeVisible({ timeout: 5000 });
+    });
+  });
+
+  test('Sort is reported alongside dropped search terms', async ({ page }) => {
+    await goToCollectionSearchTab(page, BROWSER_PATH);
+
+    await test.step('Add free-text term, select a sort field and submit', async () => {
+      await addFreeTextTerm(page, 'sentinel');
+      await selectSortField(page, 'title');
+      await page.getByRole('button', { name: /submit/i }).click();
+      await waitForBrowserReady(page);
+    });
+
+    await test.step('Navigate into a collection', async () => {
+      const collectionLink = page.getByText('Sentinel-2 L2A', { exact: false }).first();
+      await expect(collectionLink).toBeVisible({ timeout: 10000 });
+      await collectionLink.click();
+      await waitForBrowserReady(page);
+    });
+
+    await test.step('Open item filter panel', async () => {
+      await openItemFilterPanel(page);
+    });
+
+    // The test API doesn't advertise sort for Features, so the sort must be
+    // named in the banner next to the dropped search terms
+    await test.step('Banner names both the search terms and the sort', async () => {
+      const banner = page.locator('.alert-warning').first();
+      await expect(banner).toBeVisible({ timeout: 10000 });
+      await expect(banner).toContainText(/Search Terms/i);
+      await expect(banner).toContainText(/sort/i);
     });
   });
 
@@ -279,7 +317,7 @@ test.describe('Dropped filter banner — collection search to collection navigat
     });
   });
 
-  test('Navigating to a second collection does not re-show an already dismissed banner', async ({ page }) => {
+  test('Navigating to a second collection re-evaluates the carry-over and shows the banner again', async ({ page }) => {
     await goToCollectionSearchTab(page, BROWSER_PATH);
 
     await test.step('Add free-text, submit, navigate to first collection', async () => {
@@ -304,7 +342,8 @@ test.describe('Dropped filter banner — collection search to collection navigat
     });
 
     await test.step('Navigate back and into a second collection', async () => {
-      await page.goto(BROWSER_PATH);
+      // Navigate in-app (a page.goto would reload and reset the store)
+      await page.getByRole('button', { name: /^browse$/i }).click();
       await waitForBrowserReady(page);
       const secondLink = page.getByText('Landsat 8', { exact: false }).first();
       await expect(secondLink).toBeVisible({ timeout: 10000 });
@@ -316,9 +355,12 @@ test.describe('Dropped filter banner — collection search to collection navigat
       await openItemFilterPanel(page);
     });
 
-    await test.step('Verify banner does not reappear', async () => {
-      await page.waitForTimeout(500);
-      await expect(page.locator('.alert-warning')).toHaveCount(0);
+    // The collection search is still active, so the carry-over runs again for
+    // the second collection and reports what is dropped there
+    await test.step('Verify banner appears for the second collection as well', async () => {
+      const banner = page.locator('.alert-warning').first();
+      await expect(banner).toBeVisible({ timeout: 10000 });
+      await expect(banner).toContainText(/Search Terms/i);
     });
   });
 });

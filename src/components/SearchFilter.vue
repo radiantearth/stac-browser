@@ -177,10 +177,8 @@ import { defineComponent, defineAsyncComponent } from 'vue';
 import { mapGetters, mapState } from "vuex";
 import { BCard, BCardBody, BCardFooter, BCardTitle, BDropdown, BDropdownItem, BModal } from 'bootstrap-vue-next';
 
-import refParser from '@apidevtools/json-schema-ref-parser';
-
 import Utils from '../utils';
-import { hasText, isObject, size } from 'stac-js/src/utils.js';
+import { hasText, isObject } from 'stac-js/src/utils.js';
 
 import ApiCapabilitiesMixin, { TYPES } from './ApiCapabilitiesMixin';
 import DatePickerMixin from './DatePickerMixin';
@@ -190,7 +188,7 @@ import { CollectionCollection, STAC } from 'stac-js';
 import { createSTAC } from '../models/stac';
 import Cql from '../models/cql2/cql';
 import CqlLogicalOperator, { CqlNot } from '../models/cql2/operators/logical';
-import { fetchQueryablesForLink } from '../store/utils';
+import { fetchQueryablesForLink, fetchSchemaProperties } from '../store/utils';
 import { formatKey } from '@radiantearth/stac-fields/helper';
 
 function getDefaults() {
@@ -243,10 +241,6 @@ export default defineComponent({
       type: String,
       required: true
     },
-    value: {
-      type: Object,
-      default: () => ({})
-    },
     searchLink: {
       type: Object,
       default: null
@@ -272,18 +266,17 @@ export default defineComponent({
     ...mapGetters(['canSearchCollections', 'getApiChildren', 'supportsConformance']),
     ...mapGetters('search', ['collectionSearchParams', 'itemSearchParams']),
     droppedFilterNames() {
-      const names = [];
+      const labels = {
+        freeText: () => this.$t('search.freeText'),
+        sort: () => this.$t('sort.title'),
+        datetime: () => this.$t('search.temporalExtent'),
+        bbox: () => this.$t('search.spatialExtent'),
+        cql2: (f) => f.queryable?.title || f.queryable?.id || f.id,
+      };
       const scopedDroppedFilters = this.droppedFilters[this.type] || [];
-      
-      const ft = scopedDroppedFilters.find(f => f.type === 'freeText');
-      if (ft) {
-        names.push(this.$t('search.freeText')); 
-      }
-      
-      const cql = scopedDroppedFilters.filter(f => f.type === 'cql2');
-      cql.forEach(f => names.push(f.queryable?.title || f.queryable?.id || f.id));
-      
-      return names;
+      return scopedDroppedFilters
+        .map(f => labels[f.type]?.(f))
+        .filter(Boolean);
     },
     formattedDroppedFilters() {
       const formatter = new Intl.ListFormat(this.uiLanguage || 'en', { style: 'long', type: 'conjunction' });
@@ -356,11 +349,13 @@ export default defineComponent({
         : this.itemSearchParams;
       return params || {};
     },
-    activeFilterLogic() {
-      const filters = this.type === 'Collections'
+    activeFilterSet() {
+      return this.type === 'Collections'
         ? this.$store.state.search.collectionFilters
         : this.$store.state.search.itemFilters;
-      return filters?.filterLogic || null;
+    },
+    activeFilterLogic() {
+      return this.activeFilterSet?.filterLogic || null;
     },
     canSearchCollectionsFreeText() {
       return this.canSearchCollections && this.supportsConformance(TYPES.Collections.FreeText);
@@ -518,20 +513,6 @@ export default defineComponent({
     apiCollectionsPaginated() {
       this.updateApiCollections();
     },
-    value: {
-      immediate: true,
-      deep: true,
-      handler(newVal) {
-        if (!newVal || size(newVal) === 0) {
-          return;
-        }
-        for (const [key, val] of Object.entries(newVal)) {
-          if (val !== undefined && val !== null && val !== '' && (!Array.isArray(val) || val.length > 0)) {
-            this.commitToVuex(key, val);
-          }
-        }
-      }
-    },
     'activeParams.collections': {
       immediate: true,
       deep: true,
@@ -577,6 +558,21 @@ export default defineComponent({
         this.filtersAndOr = logic.andOr ?? 'and';
         this.filtersNegate = logic.negate ?? false;
       }
+    },
+    'activeFilterSet.rawFilters': {
+      immediate: true,
+      handler(rows) {
+        rows = Array.isArray(rows) ? rows : [];
+        const currentIds = this.filters.map(f => f.id);
+        if (rows.length === currentIds.length && rows.every((row, i) => row.id === currentIds[i])) {
+          return;
+        }
+        // Shallow-copy the rows so that form edits don't mutate the store state
+        this.filters = rows.map(row => ({ ...row }));
+      }
+    },
+    'activeParams.sortby'() {
+      this.syncSortFromStore();
     },
     selectedCollections: {
       deep: 1,
@@ -643,7 +639,11 @@ export default defineComponent({
       );
     }
     Promise.all(promises).finally(() => {
-      this.resetSort();
+      // Show the sort order from the store (e.g. carried over from another
+      // search) if there is one, otherwise apply the configured default
+      if (!this.syncSortFromStore()) {
+        this.resetSort();
+      }
       this.loaded = true;
     });
   },
@@ -742,26 +742,6 @@ export default defineComponent({
         .map(this.collectionToMultiSelect)
         .sort((a,b) => collator.compare(a.text, b.text));
     },
-    async loadSchemas(link) {
-      let response = await this.$store.dispatch('request', { link });
-      if (!isObject(response.data)) {
-        return;
-      }
-
-      let schemas;
-      try {
-        schemas = await refParser.dereference(response.data);
-      } catch (error) {
-        // Use data with $refs included as fallback anyway
-        console.error(error);
-        schemas = response.data;
-      }
-
-      if (isObject(schemas) && isObject(schemas.properties)) {
-        return Object.entries(schemas.properties);
-      }
-      return [];
-    },
     async loadQueryables(link) {
       this.queryables = await fetchQueryablesForLink(this.$store, link);
     },
@@ -770,7 +750,7 @@ export default defineComponent({
         return;
       }
       this.sortables = [];
-      const sortables = await this.loadSchemas(link);
+      const sortables = await fetchSchemaProperties(this.$store, link);
       const collator = new Intl.Collator(this.uiLanguage);
       this.sortables = sortables
         .map(([key, schema]) => ({
@@ -817,14 +797,20 @@ export default defineComponent({
       });
     },
     onSubmit() {
-    
       this.commitToVuex('sortby', this.formatSort());
       this.commitToVuex('filters', this.buildFilter());
-      this.commitToVuex('rawFilters', [...this.filters]);  
+      // Copy the rows so that later form edits don't mutate the store state
+      this.commitToVuex('rawFilters', this.filters.map(f => ({ ...f })));
       this.commitToVuex('filterLogic', {
         andOr: this.filtersAndOr,
         negate: this.filtersNegate,
       });
+      // Executing a collection search enables the carry-over into item
+      // searches; executing an item search means the user has taken over on
+      // the item side and stops it.
+      this.$store.commit('search/setCarryFromCollectionSearch', this.type === 'Collections');
+      // Executing a search retires the notice about the previous carry-over
+      this.$store.commit('search/clearDroppedFilters', this.type);
 
       this.$emit('input', this.activeParams);
     },
@@ -872,6 +858,32 @@ export default defineComponent({
     commitToVuex(field, value) {
       const mutation = this.type === 'Collections' ? 'search/setCollectionFilters' : 'search/setItemFilters';
       this.$store.commit(mutation, { [field]: value });
+    },
+    // Selects the sort field and direction stored for this search (e.g.
+    // carried over from another search) in the form.
+    // Returns whether the stored sort is shown in the form.
+    syncSortFromStore() {
+      if (!this.canSort) {
+        return false;
+      }
+      const sortby = this.activeParams?.sortby;
+      if (!hasText(sortby)) {
+        return false;
+      }
+      if (sortby === this.formatSort()) {
+        return true;
+      }
+      const sort = Utils.parseApiSortParameter(sortby);
+      if (!sort.field) {
+        return false;
+      }
+      const option = this.sortOptions.find(o => o.value === sort.field);
+      if (!option) {
+        return false;
+      }
+      this.sortTerm = option;
+      this.sortOrder = sort.direction;
+      return true;
     },
     resetSort() {
       if (!this.canSort) {
