@@ -407,6 +407,28 @@ The parameter passed into the function is an [Asset object](https://m-mohr.githu
 buildTileUrlTemplate: (asset) => "https://tiles.rdnt.io/tiles/{z}/{x}/{y}@2x?url=" + encodeURIComponent(asset.getAbsoluteUrl()),
 ```
 
+The function can also return `null` to not pass the given asset to the tile server,
+e.g. to filter by media type or protocol based on the given Asset object.
+In this case client-side rendering is used if supported, or no visualization will be provided.
+For async functions (i.e. functions that return a Promise) the "Show on map" button
+may appear with a slight delay, once the Promise has been resolved.
+
+> [!NOTE]  
+> The function is called for every asset that is shown in the user interface, not only for the assets
+> that are actually shown on the map. Avoid heavy work such as network requests in the function,
+> otherwise pages with many assets may render slowly.
+
+**Example**:
+
+```js
+buildTileUrlTemplate: (asset) => {
+  if (!asset.isCOG || !asset.getAbsoluteUrl().startsWith("https://")) {
+    return null;
+  }
+  return "https://tiles.rdnt.io/tiles/{z}/{x}/{y}@2x?url=" + encodeURIComponent(asset.getAbsoluteUrl());
+},
+```
+
 Please note that this option can only be provided through a config file and is not available via CLI/ENV.
 
 ### useTileLayerAsFallback

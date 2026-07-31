@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+## [5.0.0] - 2026-07-31
+
 ### Added
 
 - Search filters are now preserved for collection and item searches
@@ -31,6 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Renamed SCSS variable `$logo-image-height` to `$logo-height` and CSS variable `--sb-logo-max-height` to `--sb-logo-height`
 - Added SCSS variable `$header-background` to allow overriding the gradient background of the header via SCSS as well
+- `buildTileUrlTemplate` can return `null` to not pass an asset to the tile server and use client-side rendering or no rendering at all
 
 ### Fixed
 
@@ -39,6 +44,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Use the Bootstrap z-index values to avoid overlay issues with the sticky header
 - Fix logo size calculation, avoiding the site title wrapping into multiple lines
 - Share button correctly shows with rounded borders on the right side
+- Web-Optimized GeoZarr assets have "Show on Map" button
+- The item filter panel reacts to programmatic open/close after the page has loaded
 
 ## [5.0.0-rc.2] - 2026-06-23
 

@@ -53,14 +53,6 @@ export default {
       }
       return this.asset;
     },
-    tileRendererType() {
-      if (this.buildTileUrlTemplate && !this.useTileLayerAsFallback) {
-        return 'server';
-      }
-      else {
-        return 'client';
-      }
-    },
     fileFormat() {
       if (typeof this.asset.type === "string" && this.asset.type.length > 0) {
         return this.formatMediaType(this.asset.type);

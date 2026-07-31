@@ -1,12 +1,9 @@
 import removeMd from 'remove-markdown';
 import { Link } from 'stac-js';
 import { hasText, isObject, size, URI } from 'stac-js/src/utils.js';
-import { geojsonMediaType, imageMediaTypes } from 'stac-js/src/mediatypes.js';
 import { pagination } from "stac-js/src/relationtypes.js";
 
 export const commonFileNames = ['catalog', 'collection', 'item'];
-
-export const mapMediaTypes = imageMediaTypes.concat([geojsonMediaType]);
 
 export class BrowserError extends Error {
   constructor(message) {
