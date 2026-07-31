@@ -163,7 +163,7 @@ export default defineComponent({
   },
   watch: {
     showFilters() {
-      this.filter = this.showFilters;
+      this.filtersOpen = this.showFilters;
     },
     filtersOpen() {
       this.$emit('filtersShown', this.filtersOpen);
