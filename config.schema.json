@@ -160,7 +160,8 @@
       ]
     },
     "transactions": {
-      "type": ["boolean"]
+      "type": ["string"],
+      "enum": ["auto", "external", "internal", "off"]
     },
     "transactionsRequireLogin": {
       "type": ["boolean"]

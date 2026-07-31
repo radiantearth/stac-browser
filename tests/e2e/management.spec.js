@@ -39,7 +39,7 @@ function createCollectionApi() {
 
 function enablePreflight(page) {
   return configureBrowser(page, {
-    transactions: true,
+    transactions: 'auto',
     transactionsRequireLogin: false,
     transactionsRequirePreflight: true
   });
@@ -152,6 +152,121 @@ test.describe('Management - capability gating', () => {
     await expect(page.getByRole('heading', { name: /add item/i })).toBeVisible();
     await expect(page.locator('.cm-content')).toContainText('"type": "Feature"');
     await expect(page.getByRole('button', { name: /manage/i })).toBeVisible();
+  });
+});
+
+test.describe('Management - external forms', () => {
+  const EDIT_FORM_URL = 'https://editor.example/edit';
+  const CREATE_FORM_URL = 'https://editor.example/create';
+
+  test('an edit-form link replaces the internal Edit action in auto mode', async ({ page, worker }) => {
+    const { api, item } = createItemApi();
+    item.addLink({ href: EDIT_FORM_URL, rel: 'edit-form', title: 'Edit externally' });
+    await api.createServer(worker);
+    await enableTransactions(page);
+
+    await page.goto(item.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    await openManageMenu(page);
+    const external = page.getByRole('menuitem', { name: 'Edit externally' });
+    await expect(external).toBeVisible();
+    await expect(external).toHaveAttribute('href', EDIT_FORM_URL);
+    await expect(external).toHaveAttribute('target', '_blank');
+    await expect(page.getByRole('menuitem', { name: 'Edit', exact: true })).toHaveCount(0);
+    // Delete has no external counterpart and stays available
+    await expect(page.getByRole('menuitem', { name: 'Delete' })).toBeVisible();
+  });
+
+  test('a create-form link replaces the internal Add actions in auto mode', async ({ page, worker }) => {
+    const api = API.minimalApi().addItemTransactionsExtension().addCollectionTransactionsExtension();
+    api.addCollection('collection').setMetadata({ title: 'Test Collection' });
+    api.root.addLink({ href: CREATE_FORM_URL, rel: 'create-form', title: 'Create externally' });
+    await api.createServer(worker);
+    await enableTransactions(page);
+
+    await page.goto(api.root.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    await openManageMenu(page);
+    await expect(page.getByRole('menuitem', { name: 'Create externally' })).toBeVisible();
+    await expect(page.getByRole('menuitem', { name: 'Add Collection' })).toHaveCount(0);
+    await expect(page.getByRole('menuitem', { name: 'Add Item' })).toHaveCount(0);
+  });
+
+  test('external mode shows links without login and hides the internal actions', async ({ page, worker }) => {
+    const { api, item } = createItemApi();
+    item.addLink({ href: EDIT_FORM_URL, rel: 'edit-form', title: 'Edit externally' });
+    await api.createServer(worker);
+    // Login and preflight requirements stay at their defaults (true),
+    // they must not affect external links
+    await configureBrowser(page, { transactions: 'external' });
+
+    await page.goto(item.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    await openManageMenu(page);
+    await expect(page.getByRole('menuitem', { name: 'Edit externally' })).toBeVisible();
+    await expect(page.getByRole('menuitem', { name: 'Edit', exact: true })).toHaveCount(0);
+    await expect(page.getByRole('menuitem', { name: 'Delete' })).toHaveCount(0);
+  });
+
+  test('external mode without form links shows no Manage control', async ({ page, worker }) => {
+    const { api, item } = createItemApi();
+    await api.createServer(worker);
+    await configureBrowser(page, { transactions: 'external' });
+
+    await page.goto(item.getBrowserPath());
+    await waitForBrowserReady(page);
+    await expect(page.getByRole('heading', { name: new RegExp(item.data.id, 'i') })).toBeVisible();
+
+    await expect(page.getByRole('button', { name: /manage/i })).toHaveCount(0);
+  });
+
+  test('internal mode ignores form links', async ({ page, worker }) => {
+    const { api, item } = createItemApi();
+    item.addLink({ href: EDIT_FORM_URL, rel: 'edit-form', title: 'Edit externally' });
+    await api.createServer(worker);
+    await enableTransactions(page, { transactions: 'internal' });
+
+    await page.goto(item.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    await openManageMenu(page);
+    await expect(page.getByRole('menuitem', { name: 'Edit', exact: true })).toBeVisible();
+    await expect(page.getByRole('menuitem', { name: 'Edit externally' })).toHaveCount(0);
+  });
+
+  test('off disables all management capabilities', async ({ page, worker }) => {
+    const { api, item } = createItemApi();
+    item.addLink({ href: EDIT_FORM_URL, rel: 'edit-form', title: 'Edit externally' });
+    await api.createServer(worker);
+    await enableTransactions(page, { transactions: 'off' });
+
+    await page.goto(item.getBrowserPath());
+    await waitForBrowserReady(page);
+    await expect(page.getByRole('heading', { name: new RegExp(item.data.id, 'i') })).toBeVisible();
+
+    await expect(page.getByRole('button', { name: /manage/i })).toHaveCount(0);
+  });
+
+  test('only the first form link with a suitable media type is used', async ({ page, worker }) => {
+    const { api, item } = createItemApi();
+    item.addLink({ href: EDIT_FORM_URL + '.json', rel: 'edit-form', title: 'Machine-readable', type: 'application/json' });
+    item.addLink({ href: EDIT_FORM_URL, rel: 'edit-form', title: 'Edit externally', type: 'text/html' });
+    item.addLink({ href: EDIT_FORM_URL + '/2', rel: 'edit-form', title: 'Second editor' });
+    await api.createServer(worker);
+    await enableTransactions(page);
+
+    await page.goto(item.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    await openManageMenu(page);
+    const external = page.getByRole('menuitem', { name: 'Edit externally' });
+    await expect(external).toBeVisible();
+    await expect(external).toHaveAttribute('href', EDIT_FORM_URL);
+    await expect(page.getByRole('menuitem', { name: 'Machine-readable' })).toHaveCount(0);
+    await expect(page.getByRole('menuitem', { name: 'Second editor' })).toHaveCount(0);
   });
 });
 

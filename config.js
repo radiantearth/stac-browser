@@ -60,7 +60,7 @@ export default {
   socialSharing: ['email', 'bsky', 'mastodon', 'x'],
   preprocessSTAC: null,
   authConfig: null,
-  transactions: true,
+  transactions: 'auto',
   transactionsRequireLogin: true,
   transactionsRequirePreflight: true,
   crs: {},
