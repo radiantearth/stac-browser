@@ -15,13 +15,14 @@
         <b-icon-filter />
         {{ filtersOpen ? $t('items.hideFilter') : $t('items.showFilter') }}
         <b-badge v-if="hasFilters && !filtersOpen" variant="dark">{{ filterCount }}</b-badge>
+        <b-badge v-if="hasUnappliedChanges" variant="warning" :title="$t('items.filterChangesNotApplied')">!</b-badge>
       </b-button>
       <b-collapse id="itemFilter" v-model="filtersOpen">
         <SearchFilter
           type="Items"
           :title="$t('items.filter')" :parent="stac"
           :searchLink="itemSearchLink"
-          :value="apiFilters" @input="emitFilter"
+          @input="emitFilter"
         />
       </b-collapse>
     </template>
@@ -43,7 +44,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 import { BCollapse } from 'bootstrap-vue-next';
 import { defineComponent, defineAsyncComponent } from 'vue';
 
@@ -52,6 +53,7 @@ import { size } from 'stac-js/src/utils.js';
 import Item from './Item.vue';
 import Loading from './Loading.vue';
 import { sortStac } from '../models/stac';
+import { FILTER_FIELDS } from '../store/modules/search';
 
 export default defineComponent({
   name: "Items",
@@ -115,6 +117,24 @@ export default defineComponent({
   },
   computed: {
     ...mapState(['defaultItemSort', 'uiLanguage']),
+    ...mapGetters('search', ['itemSearchParams']),
+    hasUnappliedChanges() {
+      // The badge reflects the filters applied to the shown items (apiFilters);
+      // the form state in the store may have been changed without submitting.
+      const draft = this.itemSearchParams || {};
+      const applied = this.apiFilters || {};
+      // CQL filters are only rebuilt on submit, compare them by reference
+      if ((draft.filters || null) !== (applied.filters || null)) {
+        return true;
+      }
+      const normalize = (value) => {
+        if (value === undefined || value === null || value === '' || (Array.isArray(value) && value.length === 0)) {
+          return null;
+        }
+        return value;
+      };
+      return FILTER_FIELDS.some(key => JSON.stringify(normalize(draft[key])) !== JSON.stringify(normalize(applied[key])));
+    },
     itemCount() {
       if (this.count !== null) {
         return this.count;

@@ -14,6 +14,7 @@ import { addQueryIfNotExists, hasAuthority, isAuthenticationError, Loading, stac
 import { getBest } from 'stac-js/src/locales';
 import { TYPES } from "../components/ApiCapabilitiesMixin";
 import BrowserStorage from "../browser-store.js";
+import search, { freshSearchState } from './modules/search.js';
 
 // type is either 'collections' or 'items', depending on which endpoint the list was loaded from
 function updateApiChildrenState(state, stac, type, list, next = false, prev = false) {
@@ -178,7 +179,8 @@ function getStore(config, router) {
   return createStore({
     strict: import.meta.env.NODE_ENV !== 'production',
     modules: {
-      auth: auth(router)
+      auth: auth(router),
+      search,
     },
     state: Object.assign({}, config, localDefaults(), catalogDefaults(), {
       // Global settings
@@ -667,6 +669,11 @@ function getStore(config, router) {
           state.catalogTitle = config.catalogTitle;
           state.database = {};
           state.apiChildren = {};
+          // Don't leak search filters (incl. CQL built against the previous
+          // API's queryables) into the next catalog
+          if (state.search) {
+            Object.assign(state.search, freshSearchState());
+          }
         }
       },
       resetPage(state) {

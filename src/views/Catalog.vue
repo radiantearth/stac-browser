@@ -86,6 +86,7 @@ import { ItemCollection } from 'stac-js';
 import DeprecationMixin from '../components/DeprecationMixin.js';
 import { BTab, BTabs, BCard } from 'bootstrap-vue-next';
 import { getIgnoredFields } from '../ignored-metadata.js';
+import { fetchQueryablesForLink, fetchSortablesForLink } from '../store/utils';
 
 export default defineComponent({
   name: "Catalog",
@@ -233,12 +234,43 @@ export default defineComponent({
   watch: {
     data: {
       immediate: true,
-      handler(data) {
+      async handler(newData, oldData) {
         try {
-          let schema = createCatalogSchema(data, [this.parentLink, this.rootLink], this.$store);
+          let schema = createCatalogSchema(newData, [this.parentLink, this.rootLink], this.$store);
           addSchemaToDocument(document, schema);
         } catch (error) {
           console.error(error);
+        }
+
+        if (!newData?.isCollection) {
+          return;
+        }
+        if (oldData?.id === newData?.id) {
+          return;
+        }
+
+        // Carry the collection search over into the item filters, but only
+        // when the user explicitly jumped here from the collection search
+        // results (clicking a link there arms the one-shot flag), so that
+        // plain browsing is not affected by unrelated leftover filters.
+        if (!this.$store.state.search.carryOnNextNavigation) {
+          return;
+        }
+        this.$store.commit('search/setCarryOnNextNavigation', false);
+
+        if (this.$store.getters['search/hasCollectionSearchCriteria']) {
+          // In-collection item search is Features, not item-search
+          await this.$store.dispatch('search/carryToItemSearch', {
+            collection: newData,
+            fetchQueryables: (collection) => fetchQueryablesForLink(this.$store, collection.getQueryablesLink?.()),
+            fetchSortables: (collection) => fetchSortablesForLink(this.$store, collection.getSortablesLink?.()),
+            targetType: 'Items',
+          });
+
+          this.filters = this.$store.getters['search/itemSearchParams'];
+          // Open the filter panel so that the user can see which filters are
+          // applied to the item list instead of filtering it silently
+          this.$store.commit('updateState', {type: 'itemFilterOpen', value: 1});
         }
       }
     }

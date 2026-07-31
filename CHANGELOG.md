@@ -13,6 +13,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Search filters are now preserved for collection and item searches
+- Opening a collection from the collection search results carries the search criteria over into its item filters
+- An indicator on the item filter toggle shows when the filters were changed but not applied yet
+
+### Fixed
+
+- The Search page restores the previous results when returning to it
+
+## [5.0.0] - 2026-07-30
+
+### Added
+
 - New Widget: `Featured`
 - Allow widgets to be shown conditionally
 - Added `relationTypes.config.js` to allow configuring link relation types that
@@ -66,7 +78,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [5.0.0-rc.1] - 2026-06-27
 
 ### Added
-
 - Adding `extent`s to the root catalog will restrict the Search filters
 - Support free-text search for Collections in list of collections
 - Add a link to Collection Search from the Collections overview page for advanced filters
