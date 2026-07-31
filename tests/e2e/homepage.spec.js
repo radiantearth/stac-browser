@@ -9,11 +9,10 @@
 import { test, expect } from './fixtures.js';
 import { HOME_PATH, mockStacResource } from './helpers.js';
 import StaticCatalog from '../fixtures/instances/static.js';
-import path from 'path';
 import fs from 'fs';
-const catalogs = JSON.parse(fs.readFileSync(path.resolve(
-  import.meta.dirname, '../fixtures/templates/catalogs.json'
-)));
+const catalogs = JSON.parse(fs.readFileSync(
+  new URL('../fixtures/templates/catalogs.json', import.meta.url), 'utf-8'
+));
 import CONFIG from '../../config.js';
 
 test.describe('STAC Browser Data Source Selection', () => {

@@ -343,7 +343,10 @@ test.describe('Catalog - Children', () => {
 
     await page.getByRole('button', { name: /browse/i }).click();
 
+    // The sidebar is an async component that is loaded on demand by the click
+    // above, so give it extra time for the chunk to load on a busy dev server
     const sidebar = page.locator('#sidebar');
+    await expect(sidebar).toBeVisible({ timeout: 10000 });
     await expect(sidebar.getByText(collection1.getMetadata().title)).toBeVisible();
     // The next page of collections loads automatically once the tree is shown
     await expect(sidebar.getByText(collection2.getMetadata().title)).toBeVisible();

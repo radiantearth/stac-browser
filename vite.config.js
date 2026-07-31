@@ -138,7 +138,9 @@ export default defineConfig(async ({ mode }) => {
         "commonmark",
         "@radiantearth/stac-fields/*",
         "content-type",
+        "json-source-map",
         "stac-node-validator",
+        "stac-node-validator/src/baseValidator.js",
         "@musement/iso-duration"
       ],
     },

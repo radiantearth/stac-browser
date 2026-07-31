@@ -23,6 +23,7 @@
       <JsonEditor
         v-model="jsonContent"
         :read-only="isSaveDisabled"
+        :validator="validateForEditor"
         @request-save="onSaveRequested"
       />
 
@@ -48,6 +49,7 @@ import BrowseMixin from './BrowseMixin.js';
 import JsonEditor from '../components/management/JsonEditor.vue';
 import BrowserStorage from '../browser-store';
 import { getErrorMessage } from '../store/utils';
+import { formatAjvMessage, loadValidationLocale, localizeErrors, schemaTitle, validateStac } from '../validation';
 import { toAbsolute } from 'stac-js/src/http.js';
 import { isObject } from 'stac-js/src/utils.js';
 
@@ -88,12 +90,13 @@ export default defineComponent({
       draftTimer: null,
       showLeaveConfirm: false,
       leaveResolver: null,
+      validationLocale: null,
       // The storage has internal state and is not rendered, keep it out of the reactivity system
       storage: markRaw(new BrowserStorage())
     };
   },
   computed: {
-    ...mapState(['data']),
+    ...mapState(['data', 'uiLanguage']),
     ...mapGetters(['collectionLink', 'parentLink', 'toBrowserPath']),
     ...mapGetters('manager', ['canEdit', 'canAddCollections', 'canAddItems', 'isCheckingPermissions']),
     isCreateCollection() {
@@ -161,6 +164,12 @@ export default defineComponent({
     },
     jsonContent() {
       this.scheduleDraftSave();
+    },
+    uiLanguage: {
+      immediate: true,
+      async handler(locale) {
+        this.validationLocale = await loadValidationLocale(locale);
+      }
     },
     mode: {
       immediate: true,
@@ -288,6 +297,44 @@ export default defineComponent({
         return;
       }
       this.save(body);
+    },
+    // Validates the edited STAC entity and maps the report to editor issues.
+    // Advisory only: schema errors never block saving.
+    async validateForEditor(data) {
+      if (!isObject(data)) {
+        return [];
+      }
+      const report = await validateStac(data);
+      const issues = [];
+      if (Array.isArray(report.messages)) {
+        for (const message of report.messages) {
+          issues.push({ pointer: '', message, severity: 'warning' });
+        }
+      }
+      if (report.skipped) {
+        return issues;
+      }
+      const groups = Object.assign({ core: report.results.core }, report.results.extensions);
+      for (const [schema, errors] of Object.entries(groups)) {
+        if (!Array.isArray(errors) || errors.length === 0) {
+          continue;
+        }
+        const title = schema === 'core' ? null : schemaTitle(schema);
+        for (const error of localizeErrors(errors, this.validationLocale)) {
+          let message = formatAjvMessage(error, this.$t, this.$te) || String(error);
+          if (title) {
+            message = `${title}: ${message}`;
+          }
+          issues.push({
+            pointer: typeof error.instancePath === 'string' ? error.instancePath : '',
+            message,
+            severity: 'error',
+            keyword: error.keyword,
+            params: error.params
+          });
+        }
+      }
+      return issues;
     },
     syncFromStore() {
       if (!this.data || typeof this.data.toJSON !== 'function') {

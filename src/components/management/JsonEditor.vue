@@ -10,8 +10,11 @@ import { defaultKeymap, historyKeymap } from '@codemirror/commands';
 import { searchKeymap, highlightSelectionMatches } from '@codemirror/search';
 import { linter, lintGutter } from '@codemirror/lint';
 import { json } from '@codemirror/lang-json';
+import { parseWithPointers, resolveRange } from './jsonPositions';
 
 const MAX_DIAGNOSTICS = 100;
+// Debounce for the (potentially heavy) validation while typing, in milliseconds
+const VALIDATION_DELAY = 1000;
 
 export default defineComponent({
   name: 'JsonEditor',
@@ -26,6 +29,12 @@ export default defineComponent({
     readOnly: {
       type: Boolean,
       default: false
+    },
+    // Async function that receives the parsed JSON and returns issues:
+    // Array of { pointer, message, severity?, keyword?, params? }
+    validator: {
+      type: Function,
+      default: null
     }
   },
   emits: ['update:modelValue', 'request-save'],
@@ -46,7 +55,10 @@ export default defineComponent({
       };
     },
     editorSettings() {
-      const lintExtension = linter((view) => this.parseDiagnostics(this.jsonLanguageExtension, view));
+      const lintExtension = linter(
+        (view) => this.computeDiagnostics(view),
+        this.validator ? { delay: VALIDATION_DELAY } : {}
+      );
       return {
         basic: true,
         wrap: true,
@@ -63,6 +75,44 @@ export default defineComponent({
     }
   },
   methods: {
+    async computeDiagnostics(view) {
+      const syntaxDiagnostics = this.parseDiagnostics(this.jsonLanguageExtension, view);
+      if (syntaxDiagnostics.length > 0 || !this.validator || this.readOnly) {
+        return syntaxDiagnostics;
+      }
+      return await this.validationDiagnostics(view);
+    },
+    // Validate through the provided validator and map the reported JSON pointers
+    // to text ranges. Stale results for outdated documents are discarded by the
+    // lint plugin itself.
+    async validationDiagnostics(view) {
+      const doc = view.state.doc;
+      let parsed;
+      try {
+        parsed = parseWithPointers(doc.toString());
+      } catch {
+        return []; // Syntax errors are reported by parseDiagnostics
+      }
+      let issues;
+      try {
+        issues = await this.validator(parsed.data);
+      } catch (error) {
+        console.error(error);
+        return [];
+      }
+      if (!Array.isArray(issues)) {
+        return [];
+      }
+      return issues.slice(0, MAX_DIAGNOSTICS).map(issue => {
+        const { from, to } = resolveRange(parsed.pointers, doc, issue);
+        return {
+          from,
+          to,
+          severity: issue.severity || 'error',
+          message: issue.message
+        };
+      });
+    },
     parseDiagnostics(languageSupport, view, { message = 'Syntax error' } = {}) {
       const parser = languageSupport?.language?.parser;
       if (!parser) {

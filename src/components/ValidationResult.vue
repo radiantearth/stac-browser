@@ -24,10 +24,8 @@
 </template>
 
 <script>
-import { isObject, URI } from 'stac-js/src/utils.js';
 import { BCard, BCardHeader } from 'bootstrap-vue-next';
-
-const VERSION_REGEXP = /\/(v?\d+\.\d+[^/]+)(\/|$)/;
+import { formatAjvMessage, localizeErrors, schemaTitle, schemaVersion } from '../validation';
 
 export default {
   name: "ValidationResult",
@@ -62,21 +60,7 @@ export default {
       return this.isCore ? 'span': 'code';
     },
     localizedErrors() {
-      if (typeof this.locale !== 'function') {
-        return this.errors;
-      }
-      // Make a copy of the errors as the ajv-i18n package mutates the error objects
-      const errors = this.errors.map(error => Object.assign({}, error));
-      // Translate error messages
-      this.locale(errors);
-      // ajv-i18n overrides error messages from stac-node-validator that do not originate from ajv.
-      // Reset to the original message in those cases.
-      return errors.map((error, i) => {
-        if (typeof error.keyword === 'undefined') {
-          return this.errors[i];
-        }
-        return error;
-      });
+      return localizeErrors(this.errors, this.locale);
     },
     hasWarnings() {
       return Array.isArray(this.warnings) && this.warnings.length > 0;
@@ -100,51 +84,18 @@ export default {
       if (this.isCore) {
         return this.type;
       }
-      else if (this.id.startsWith('https://stac-extensions.github.io/')) {
-        return URI(this.id)
-          .directory()
-          .replace(VERSION_REGEXP, '/')
-          .replace(/\//g, ' ')
-          .trim();
-      }
-      return this.id
-        .replace(/^\w+:\/\//, '')
-        .replace(/(\.github\.io|raw\.githubusercontent\.com)\/?/, '')
-        .replace(/\/json-schema/, '')
-        .replace(/\/[^/]+\.json$/, '')
-        .replace(VERSION_REGEXP, '');
+      return schemaTitle(this.id);
     },
     version() {
       if (this.isCore) {
         return this.context.version;
       }
-      let v = this.id.match(VERSION_REGEXP);
-      if (v) {
-        return v[1];
-      }
-      return null;
+      return schemaVersion(this.id);
     }
   },
   methods: {
     makeAjvErrorMessage(error) {
-      let message = error.message;
-      if (isObject(error.params) && Object.keys(error.params).length > 0) {
-        let params = Object.entries(error.params)
-          .map(([key, value]) => {
-            let localizedLabel;
-            const labelKey = `source.validationParams.${key}`;
-            if (this.$te(labelKey)) {
-              localizedLabel = this.$t(labelKey);
-            }
-            else {
-              localizedLabel = key.replace(/([^A-Z]+)([A-Z])/g, "$1 $2").toLowerCase();
-            }
-
-            return `${localizedLabel}: ${value}`;
-          })
-          .join(', ');
-        message += ` (${params})`;
-      }
+      const message = formatAjvMessage(error, this.$t, this.$te);
       if (error.instancePath) {
         return `${error.instancePath} ${message}`;
       }

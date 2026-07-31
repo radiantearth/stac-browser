@@ -48,7 +48,7 @@
 <script>
 import { mapState } from 'vuex';
 import { defineComponent } from 'vue';
-import validateSTAC from 'stac-node-validator';
+import { loadValidationLocale, validateStac } from '../validation';
 import BrowseMixin from './BrowseMixin.js';
 import { STAC } from 'stac-js';
 import ValidationResult from '../components/ValidationResult.vue';
@@ -85,16 +85,7 @@ export default defineComponent({
     uiLanguage: {
       immediate: true,
       async handler(locale) {
-        if (!locale) {
-          return;
-        }
-        const i18nFn = (await import(`../locales/${locale}/validation.js`)).default;
-        if (i18nFn instanceof Promise) {
-          this.locale = (await i18nFn).default;
-        }
-        else {
-          this.locale = i18nFn;
-        }
+        this.locale = await loadValidationLocale(locale);
       }
     }
   },
@@ -105,7 +96,7 @@ export default defineComponent({
       if (this.data instanceof STAC) {
         try {
           const stac = this.data._original || this.data.toJSON();
-          this.report = await validateSTAC(stac, {});
+          this.report = await validateStac(stac);
         } catch (error) {
           this.internalError = error;
         } finally {
