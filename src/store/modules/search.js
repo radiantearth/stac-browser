@@ -102,9 +102,9 @@ const buildSearchParams = (filters, shared) => {
   
   // Merge shared fields to ensure URL serialization works correctly,
   // overriding the null defaults in the base filter set.
-  if (shared.bbox) rest.bbox = shared.bbox;
-  if (shared.datetime) rest.datetime = shared.datetime;
-  if (shared.limit) rest.limit = shared.limit;
+  if (shared.bbox) {rest.bbox = shared.bbox;}
+  if (shared.datetime) {rest.datetime = shared.datetime;}
+  if (shared.limit) {rest.limit = shared.limit;}
   
   return rest;
 };
@@ -130,7 +130,7 @@ export default {
     itemSearchParams: (state) => buildSearchParams(state.itemFilters, state.shared),
     hasActiveFilters: (state) => {
       const s = state.shared;
-      const hasShared = !!(s.datetime || s.bbox || s.limit);
+      const hasShared = Boolean(s.datetime || s.bbox || s.limit);
       return hasShared || isActive(state.itemFilters) || isActive(state.collectionFilters);
     },
     hasCollectionSearchCriteria: (state) => hasSearchCriteria(state.collectionFilters),
@@ -147,7 +147,7 @@ export default {
     setItemFilters(state, patch) {
       state.itemFilters = { ...state.itemFilters, ...patch };
     },
-// Full replacement, used by the carry-over so that fields without a carried
+    // Full replacement, used by the carry-over so that fields without a carried
     // value return to their defaults instead of keeping stale values.
     seedItemFilters(state, filterSet) {
       state.itemFilters = filterSet;

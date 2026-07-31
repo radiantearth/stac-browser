@@ -135,8 +135,7 @@ export default defineComponent({
     };
   },
   computed: {
-    ...mapState(['data', 'url', 'apiCatalogPriority', 'apiItems', 'apiItemsLink', 'apiItemsPagination', 'apiItemsNumberMatched', 'nextCollectionsLink', 'stateQueryParameters']),
-    ...mapGetters(['catalogs', 'collectionLink', 'isApiChildrenLoading', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
+    ...mapState(['data', 'apiCatalogPriority', 'apiItemsLink', 'apiItemsPagination', 'apiItemsNumberMatched', 'nextCollectionsLink', 'stateQueryParameters']),    ...mapGetters(['catalogs', 'collectionLink', 'isApiChildrenLoading', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
     droppedFilterCount() {
       // Access the newly scoped droppedFilters for the 'Items' mode
       const itemsDropped = this.$store.state.search.droppedFilters?.Items || [];

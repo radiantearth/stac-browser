@@ -85,7 +85,7 @@ export default defineComponent({
     DeprecationMixin
   ],
   computed: {
-    ...mapState(['data', 'url', 'crossNavigationItems']),
+    ...mapState(['data', 'crossNavigationItems']),
     ...mapGetters(['collectionLink', 'parentLink']),
     ignoredMetadataFields() {
       return getIgnoredFields(this.data);
@@ -106,15 +106,6 @@ export default defineComponent({
       return null;
     }
   },
-  methods: {
-    goToItem(item) {
-      const path = this.$store.getters.toBrowserPath(item.getAbsoluteUrl());
-      this.$router.replace(path);
-    },
-    backToResults() {
-      this.$router.go(-1);
-    }
-  },
   watch: {
     data: {
       immediate: true,
@@ -126,6 +117,15 @@ export default defineComponent({
           console.error(error);
         }
       }
+    }
+  },
+  methods: {
+    goToItem(item) {
+      const path = this.$store.getters.toBrowserPath(item.getAbsoluteUrl());
+      this.$router.replace(path);
+    },
+    backToResults() {
+      this.$router.go(-1);
     }
   }
 });

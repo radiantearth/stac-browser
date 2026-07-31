@@ -796,8 +796,8 @@ function getStore(config, router) {
         }
 
         if (show) {
-          state.apiItems = apiItems;
-          state.crossNavigationItems = apiItems; 
+          state.apiItems = data.features;
+          state.crossNavigationItems = data.features;
         }
 
         // Handle pagination links

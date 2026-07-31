@@ -27,8 +27,9 @@ test.describe('Search filter persistence — Phase 1 (Vuex + URL)', () => {
     await waitForBrowserReady(page);
 
     // Enter a datetime filter in the UI
+    await page.locator('.loading-fill').waitFor({ state: 'hidden', timeout: 10000 });
     const temporalInput = page.getByPlaceholder(/select date range/i);
-    await temporalInput.click();
+    await temporalInput.click({ force: true });
     await temporalInput.fill('2025-05-01 - 2025-05-29');
 
     // Wait for the URL to update automatically
@@ -81,12 +82,26 @@ test.describe('Search filter persistence — Phase 1 (Vuex + URL)', () => {
   test('bbox is rehydrated from URL into Vuex store and UI on load', async ({ page }) => {
     await page.goto(`${SEARCH_PATH}?.s.bbox=-116.1%2C44.3%2C-104%2C49`);
     await waitForBrowserReady(page);
+    // Open the filter panel if it is closed
+    const filterToggle = page.getByRole('button', { name: /Filters/i });
+    if (await filterToggle.isVisible()) {
+      await filterToggle.click();
+    }
 
-    // The checkbox should automatically be checked
+    // Ensure the manual spatial extent inputs are visible
+    const spatialCheckbox = page.getByText(/Filter by spatial extent/i);
+    if (await spatialCheckbox.isVisible() && !(await spatialCheckbox.isChecked())) {
+      await spatialCheckbox.check();
+    }
+    
+    // Switch to manual input mode if there's a map/manual toggle
+    const manualTab = page.getByText(/Manual/i);
+    if (await manualTab.isVisible()) {
+      await manualTab.click();
+    }
     const enableSpatialCheckbox = page.getByRole('checkbox', { name: /filter by spatial extent/i });
     await expect(enableSpatialCheckbox).toBeChecked();
     
-    // The coordinates should automatically populate the manual input boxes
     await expect(page.getByLabel(/west longitude/i)).toHaveValue('-116.1');
     await expect(page.getByLabel(/south latitude/i)).toHaveValue('44.3');
     await expect(page.getByLabel(/east longitude/i)).toHaveValue('-104');

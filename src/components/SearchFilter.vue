@@ -676,6 +676,10 @@ export default defineComponent({
       clearTimeout(this.collectionsLoadingTimer);
       this.collectionsLoadingTimer = null;
     },
+    resetSort() {
+      this.sortTerm = null;
+      this.sortOrder = 1;
+    },
     searchCollections(text) {
       if (!this.canSearchCollectionsFreeText || this.hasAllCollections) {
         return;
@@ -834,7 +838,7 @@ export default defineComponent({
 
       this.$emit('input', this.activeParams, false);
     },
-    async onReset() {
+    onReset() {
       Object.assign(this, getDefaults());
       this.resetSort();
       this.$store.commit('search/resetShared');
@@ -879,7 +883,7 @@ export default defineComponent({
       }
     },
     commitToVuex(field, value) {
-if (['datetime', 'bbox', 'limit'].includes(field)) {
+      if (['datetime', 'bbox', 'limit'].includes(field)) {
         this.$store.commit('search/setShared', { [field]: value });
       } 
       else if (this.type === 'Collections') {
@@ -968,50 +972,50 @@ if (['datetime', 'bbox', 'limit'].includes(field)) {
       this.sortOrder = sort.direction;
       return true;
     }
-    },
-    resetSort() {
-      if (!this.canSort) {
-        return;
+  },
+  resetSort() {
+    if (!this.canSort) {
+      return;
+    }
+    const defaults = this.type === 'Collections' ? this.defaultCollectionSort : this.defaultItemSort;
+    const sort = Utils.parseApiSortParameter(defaults);
+    if (sort.field) {
+      const sortOption = this.sortOptions.find(option => option.value === sort.field);
+      if (sortOption) {
+        this.sortTerm = sortOption;
+        this.sortOrder = sort.direction;
       }
-      const defaults = this.type === 'Collections' ? this.defaultCollectionSort : this.defaultItemSort;
-      const sort = Utils.parseApiSortParameter(defaults);
-      if (sort.field) {
-        const sortOption = this.sortOptions.find(option => option.value === sort.field);
-        if (sortOption) {
-          this.sortTerm = sortOption;
-          this.sortOrder = sort.direction;
+    }
+  },
+  goToGlobalSearch() {
+    const currentPath = this.$route.path;
+
+    const collectionsIndex = currentPath.indexOf('/collections');
+    const rootPath = collectionsIndex > -1 ? currentPath.substring(0, collectionsIndex) : currentPath;
+
+    const queryParams = {};
+    const params = this.activeParams || {};
+    for (const [field, value] of Object.entries(params)) {
+      let urlValue = value;
+      if (Array.isArray(value)) {
+        if (field === 'datetime') {
+          urlValue = value.map(d => d instanceof Date ? d.toISOString() : d).join('/');
+        } else {
+          urlValue = value.join(',');
         }
       }
-    },
-    goToGlobalSearch() {
-      const currentPath = this.$route.path;
-
-      const collectionsIndex = currentPath.indexOf('/collections');
-      const rootPath = collectionsIndex > -1 ? currentPath.substring(0, collectionsIndex) : currentPath;
-
-      const queryParams = {};
-      const params = this.activeParams || {};
-      for (const [field, value] of Object.entries(params)) {
-        let urlValue = value;
-        if (Array.isArray(value)) {
-          if (field === 'datetime') {
-            urlValue = value.map(d => d instanceof Date ? d.toISOString() : d).join('/');
-          } else {
-            urlValue = value.join(',');
-          }
-        }
-        if (urlValue !== '' && urlValue !== null && urlValue !== undefined) {
-          queryParams[`s.${field}`] = urlValue;
-        }
+      if (urlValue !== '' && urlValue !== null && urlValue !== undefined) {
+        queryParams[`s.${field}`] = urlValue;
       }
+    }
 
-      this.$router.push({ 
-        path: `/search${rootPath}`, 
-        query: queryParams 
-      });
-    },
-  }
-});
+    this.$router.push({ 
+      path: `/search${rootPath}`, 
+      query: queryParams 
+    });
+  },
+}
+);
 </script>
 
 <style lang="scss">
