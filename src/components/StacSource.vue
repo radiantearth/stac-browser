@@ -13,8 +13,20 @@
         <b-dropdown-item v-if="canAddItems" :to="browserPaths.addItem">
           <b-icon-file-plus /> {{ $t('manage.addItem') }}
         </b-dropdown-item>
+        <b-dropdown-item
+          v-if="externalCreateLink" :href="externalCreateLink.getAbsoluteUrl()"
+          target="_blank" rel="noopener noreferrer"
+        >
+          <b-icon-file-plus /> {{ externalCreateLink.title || $t('manage.create') }}
+        </b-dropdown-item>
         <b-dropdown-item v-if="canEdit" :to="browserPaths.edit">
           <b-icon-pencil /> {{ $t('manage.edit') }}
+        </b-dropdown-item>
+        <b-dropdown-item
+          v-if="externalEditLink" :href="externalEditLink.getAbsoluteUrl()"
+          target="_blank" rel="noopener noreferrer"
+        >
+          <b-icon-pencil /> {{ externalEditLink.title || $t('manage.edit') }}
         </b-dropdown-item>
         <b-dropdown-item v-if="canDelete" @click="confirmDelete = true">
           <b-icon-trash /> {{ $t('manage.delete') }}
@@ -129,7 +141,7 @@ export default {
   computed: {
     ...mapState(['data', 'socialSharing', 'url']),
     ...mapGetters(['toBrowserPath', 'collectionLink', 'parentLink', 'rootLink']),
-    ...mapGetters('manager', ['browserPaths', 'canEdit', 'canDelete', 'canManage', 'canAddCollections', 'canAddItems']),
+    ...mapGetters('manager', ['browserPaths', 'canEdit', 'canDelete', 'canManage', 'canAddCollections', 'canAddItems', 'externalCreateLink', 'externalEditLink']),
     stacVersion() {
       return this.data?.stac_version;
     },

@@ -23,6 +23,16 @@ function permissionKey(url) {
   }
 }
 
+// The first link of the given rel type (RFC 6861) that leads to a web page,
+// i.e. has no media type or a HTML media type.
+function getExternalFormLink(getters, rootState, rel) {
+  if (!getters.transactionsAllowExternal || !rootState.data?.isSTAC) {
+    return null;
+  }
+  return rootState.data.getLinksWithRels([rel])
+    .find(link => !link.type || link.type === 'text/html') || null;
+}
+
 export default function getStore(config) {
   return {
     namespaced: true,
@@ -30,6 +40,18 @@ export default function getStore(config) {
       permissions: {}
     },
     getters: {
+      transactionsAllowInternal(state, getters, rootState) {
+        return ['auto', 'internal'].includes(rootState.transactions);
+      },
+      transactionsAllowExternal(state, getters, rootState) {
+        return ['auto', 'external'].includes(rootState.transactions);
+      },
+      externalCreateLink(state, getters, rootState) {
+        return getExternalFormLink(getters, rootState, 'create-form');
+      },
+      externalEditLink(state, getters, rootState) {
+        return getExternalFormLink(getters, rootState, 'edit-form');
+      },
       supportsCollectionTransactions(state, getters, rootState, rootGetters) {
         return rootGetters.supportsConformance(
           TRANSACTION_COLLECTION_CONFORMANCE
@@ -67,7 +89,7 @@ export default function getStore(config) {
         return Boolean(url) && state.permissions[permissionKey(url)] instanceof Loading;
       },
       canManageByUrl: (state, getters, rootState, rootGetters) => (url, method) => {
-        if (!url || !rootState.transactions) {
+        if (!url || !getters.transactionsAllowInternal) {
           return false;
         }
         if (rootState.transactionsRequireLogin && !rootGetters['auth/isLoggedIn']) {
@@ -80,9 +102,16 @@ export default function getStore(config) {
         return true;
       },
       canManage(state, getters, rootState, rootGetters) {
-        return getters.canEdit || getters.canDelete || getters.canAddCollections || getters.canAddItems;
+        return Boolean(
+          getters.canEdit || getters.canDelete || getters.canAddCollections || getters.canAddItems
+          || getters.externalCreateLink || getters.externalEditLink
+        );
       },
       canEdit(state, getters, rootState, rootGetters) {
+        // An external editing UI takes precedence over the internal one
+        if (getters.externalEditLink) {
+          return false;
+        }
         if ((rootGetters.isItem && getters.supportsItemTransactions) || (rootGetters.isCollection && getters.supportsCollectionTransactions)) {
           // We only do full replace (i.e. PUT), no partial replace (i.e. PATCH).
           return getters.canManageByUrl(rootState.url, 'put');
@@ -96,6 +125,10 @@ export default function getStore(config) {
         return false;
       },
       canAddCollections(state, getters, rootState, rootGetters) {
+        // An external creation UI takes precedence over the internal one
+        if (getters.externalCreateLink) {
+          return false;
+        }
         if (!rootState.data?.isCatalogLike || !getters.supportsCollectionTransactions) {
           return false;
         }
@@ -107,6 +140,10 @@ export default function getStore(config) {
         return getters.canManageByUrl(url, 'post');
       },
       canAddItems(state, getters, rootState, rootGetters) {
+        // An external creation UI takes precedence over the internal one
+        if (getters.externalCreateLink) {
+          return false;
+        }
         if (!rootState.data?.isCatalogLike || !getters.supportsItemTransactions) {
           return false;
         }
@@ -140,7 +177,7 @@ export default function getStore(config) {
         const url = options.url ? permissionKey(options.url) : null;
         if (
           !url ||
-          !cx.rootState.transactions ||
+          !cx.getters.transactionsAllowInternal ||
           !cx.rootState.transactionsRequirePreflight ||
           // Don't preflight against servers that don't advertise any transaction
           // support - it would just produce pointless OPTIONS requests.

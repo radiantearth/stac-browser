@@ -90,7 +90,7 @@ export async function configureBrowser(page, overrides = {}) {
 */
 export async function enableTransactions(page, overrides = {}) {
   await configureBrowser(page, {
-    transactions: true,
+    transactions: 'auto',
     transactionsRequireLogin: false,
     transactionsRequirePreflight: false,
     ...overrides
