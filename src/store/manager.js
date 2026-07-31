@@ -153,7 +153,9 @@ export default function getStore(config) {
         cx.commit('setPermissions', { url, permissions: new Loading() });
         try {
           options = structuredClone(options);
-          options.url = url;
+          // The permission key has all query parameters removed, but authentication may be
+          // passed via query parameters, so request the URL with the credentials restored.
+          options.url = cx.rootGetters.getRequestUrl(url);
           options.method = 'options';
           options.headers.Accept = '*/*';
           const response = await axios(options);

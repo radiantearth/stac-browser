@@ -383,6 +383,29 @@ test.describe('Management - OPTIONS preflight', () => {
     await expect(page.getByRole('button', { name: /manage/i })).toHaveCount(0);
   });
 
+  test('the OPTIONS request carries configured query parameters', async ({ page, worker }) => {
+    const { api, item } = createItemApi();
+    await api.createServer(worker);
+    await mockOptions(worker, item.getAbsoluteUrl(), ['GET', 'PUT', 'DELETE']);
+    await enablePreflight(page);
+    // Simulates authentication via query parameters, which the permission
+    // check must send although they are stripped from the permission key
+    await configureBrowser(page, { requestQueryParameters: { token: 'test-token' } });
+
+    const optionsRequest = page.waitForRequest(
+      req => req.method() === 'OPTIONS' && req.url().startsWith(item.getAbsoluteUrl())
+    );
+    await page.goto(item.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    const request = await optionsRequest;
+    expect(request.url()).toContain('token=test-token');
+
+    // The permissions are found although they are keyed without the query parameters
+    await openManageMenu(page);
+    await expect(page.getByRole('menuitem', { name: 'Edit' })).toBeVisible();
+  });
+
   test('Add Collection appears only when the Allow header permits POST', async ({ page, worker }) => {
     const { api } = createCollectionApi();
     await api.createServer(worker);
