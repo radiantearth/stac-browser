@@ -629,14 +629,35 @@ Defines whether thumbnails are shown in the lists of assets (`true`) or not (`fa
 
 ## Transactions
 
-These options configure how the management of STAC entities via a STAC API (transaction extensions)
-should work in STAC Browser.
+These options configure how the management of STAC entities should work in STAC Browser.
+There are two ways to manage STAC entities:
+
+- **Internal**: The management user interface built into STAC Browser,
+  which uses the STAC API transaction extensions and is only offered if the API
+  advertises the corresponding conformance classes.
+- **External**: A web-based management user interface provided by the server through links with the
+  relation types `create-form` and `edit-form` (see [RFC 6861](https://www.rfc-editor.org/rfc/rfc6861.html))
+  on the current catalog, collection or item.
+  The first link per relation type that has no media type or a HTML media type (`text/html`) is used.
+  The links are shown in the "Manage" menu, open in a new tab, and use the link `title` as the label.
+  STAC Browser does no permission handling for external links; the target server is expected to handle
+  authentication and permissions itself.
 
 ### transactions
 
-Enables (`true`, default) or disables (`false`) the management capabilities globally in STAC Browser.
+Defines which management capabilities are offered in STAC Browser:
+
+- `auto` (default): Prefer external links per action if present, i.e. a `create-form` link replaces the
+  internal "Add Collection" / "Add Item" actions and an `edit-form` link replaces the internal "Edit" action.
+  Otherwise, fall back to the internal user interface if supported by the API.
+  The internal "Delete" action is offered independently as there's no external counterpart.
+- `external`: Only offer the external links, if present.
+- `internal`: Only offer the internal user interface, if supported by the API.
+- `off`: Disable all management capabilities.
 
 ### transactionsRequireLogin
+
+This option only affects the internal management user interface.
 
 By default (option set to `true`), management capabilities will not be shown to unauthenticated users.
 You can disable this check by setting this option to `false` and allow anyone to make transactional requests.
@@ -645,6 +666,8 @@ Disabling this is usually only reasonable for testing purposes or internal STAC 
 This only works in STAC Browser if the server is also configured this way.
 
 ### transactionsRequirePreflight
+
+This option only affects the internal management user interface.
 
 By default (option set to `true`), STAC Browser will check whether a user has permissions to make transactional requests through an `OPTIONS` HTTP request to the same resource that it checks the permissions for.
 STAC Browser reads the permitted methods from the `Allow` response header.

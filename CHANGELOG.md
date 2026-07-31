@@ -7,19 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [5.0.0] - 2026-07-31
-
 ### Added
 
 - Search filters are now preserved for collection and item searches
 - Opening a collection from the collection search results carries the search criteria over into its item filters
 - An indicator on the item filter toggle shows when the filters were changed but not applied yet
+- Added basic support for the STAC API extensions Transactions (for Items) and Collection Transactions
+  - Adds three new config options: `transactions`, `transactionsRequireLogin` and `transactionsRequirePreflight`
+- Support for external management UIs via `create-form` and `edit-form` links ([RFC 6861](https://www.rfc-editor.org/rfc/rfc6861.html)) in the "Manage" menu
 
 ### Fixed
 
 - The Search page restores the previous results when returning to it
 
-## [5.0.0] - 2026-07-30
+## [5.0.0] - 2026-07-31
 
 ### Added
 
@@ -28,8 +29,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added `relationTypes.config.js` to allow configuring link relation types that
   - are specifically STAC and should be used to navigate to and display in STAC Browser
   - should be hidden
-- Added basic support for the STAC API extensions Transactions (for Items) and Collection Transactions
-  - Adds three new config options: `transactions`, `transactionsRequireLogin` and `transactionsRequirePreflight`
 
 ### Changed
 

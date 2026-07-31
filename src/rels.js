@@ -24,6 +24,8 @@ export const stacBrowserSpecialHandling = [
   'aggregate', // (Irrelevant) Extensions v
   'aggregations',
   'collections-search',
+  'create-form', // Transactions (RFC 6861), shown in the Manage menu v
+  'edit-form',
   'icon', // Other v
   'license',
 ].concat(hierarchical).concat(pagination).concat(queryables).concat(hidden);
