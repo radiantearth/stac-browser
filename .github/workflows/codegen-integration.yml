@@ -2,7 +2,10 @@ name: Integration Tests — Code Generators
 
 on:
   pull_request:
-    branches: [main]
+    branches:
+      - main
+      - v5
+      - v6
     paths:
       - 'src/codegen/**'
       - 'tests/integration/**'
