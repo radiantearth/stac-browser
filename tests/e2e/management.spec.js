@@ -130,7 +130,9 @@ test.describe('Management - capability gating', () => {
 
     // Simulate a slow network for all API responses
     await page.route('**/stac.example/**', async route => {
-      await new Promise(resolve => setTimeout(resolve, 400));
+      await new Promise(resolve => {
+        setTimeout(resolve, 400);
+      });
       await route.fallback();
     });
 
@@ -246,6 +248,109 @@ test.describe('Management - CRUD flows', () => {
     await saveButton.click();
 
     await expect(page.locator('.alert-danger')).toContainText(/do not have the required permissions/i);
+  });
+});
+
+test.describe('Management - drafts and leave guards', () => {
+  const DRAFT_JSON = '{"type": "Feature", "id": "draft-test"}';
+
+  // Replace the editor content; relies on CodeMirror's bracket/quote typeover
+  // so that typing the plain JSON string produces exactly that string.
+  async function replaceEditorContent(page, text) {
+    const editor = page.locator('.cm-content');
+    await editor.click();
+    await page.keyboard.press('ControlOrMeta+a');
+    await page.keyboard.type(text);
+    // Let the debounced draft write (1s) settle
+    await page.waitForTimeout(1500);
+  }
+
+  test('restores a draft after a reload and discards it on request', async ({ page, worker }) => {
+    const { api, item } = createItemApi();
+    await api.createServer(worker);
+    await enableTransactions(page);
+
+    await page.goto('/management/edit' + item.getBrowserPath());
+    await waitForBrowserReady(page);
+    await expect(page.locator('.cm-content')).toContainText(item.data.id);
+
+    await replaceEditorContent(page, DRAFT_JSON);
+
+    // The reload may trigger the browser's beforeunload prompt
+    page.once('dialog', dialog => dialog.accept());
+    await page.reload();
+    await waitForBrowserReady(page);
+
+    // The unsaved changes are restored and announced
+    await expect(page.locator('.cm-content')).toContainText('draft-test');
+    const notice = page.locator('.alert-info');
+    await expect(notice).toContainText(/restored/i);
+
+    // Discarding reverts to the server content and drops the draft
+    await notice.getByRole('button', { name: /discard/i }).click();
+    await expect(page.locator('.cm-content')).toContainText(item.data.id);
+    await expect(page.locator('.alert-info')).toHaveCount(0);
+
+    await page.reload();
+    await waitForBrowserReady(page);
+    await expect(page.locator('.cm-content')).toContainText(item.data.id);
+    await expect(page.locator('.alert-info')).toHaveCount(0);
+  });
+
+  test('a successful save clears the draft', async ({ page, worker }) => {
+    const { api, item } = createItemApi();
+    await api.createServer(worker);
+    await mockTransaction(worker, 'put', item.getAbsoluteUrl(), { status: 200, body: item.build() });
+    await enableTransactions(page);
+
+    await page.goto('/management/edit' + item.getBrowserPath());
+    await waitForBrowserReady(page);
+    await expect(page.locator('.cm-content')).toContainText(item.data.id);
+
+    await replaceEditorContent(page, DRAFT_JSON);
+
+    const putRequest = page.waitForRequest(req => req.method() === 'PUT');
+    await page.getByRole('button', { name: 'Save' }).click();
+    await putRequest;
+
+    page.once('dialog', dialog => dialog.accept());
+    await page.reload();
+    await waitForBrowserReady(page);
+
+    // No draft to restore: the editor shows the server content
+    await expect(page.locator('.cm-content')).toContainText(item.data.id);
+    await expect(page.locator('.alert-info')).toHaveCount(0);
+  });
+
+  test('leaving the page with unsaved changes asks for confirmation', async ({ page, worker }) => {
+    const { api, item } = createItemApi();
+    await api.createServer(worker);
+    await enableTransactions(page);
+
+    // Navigate to the item first so that there is browser history to go back to
+    await page.goto(item.getBrowserPath());
+    await waitForBrowserReady(page);
+    const menu = await openManageMenu(page);
+    await menu.getByRole('menuitem', { name: 'Edit' }).click();
+    await expect(page.getByRole('heading', { name: /^edit/i })).toBeVisible();
+    await expect(page.locator('.cm-content')).toContainText(item.data.id);
+
+    await replaceEditorContent(page, DRAFT_JSON);
+
+    // Declining the confirmation keeps the page and the changes
+    await page.goBack();
+    let modal = page.getByRole('dialog');
+    await expect(modal).toContainText(/unsaved changes/i);
+    await modal.getByRole('button', { name: 'Cancel' }).click();
+    await expect(modal).toBeHidden();
+    await expect(page).toHaveURL(/\/management\/edit/);
+    await expect(page.locator('.cm-content')).toContainText('draft-test');
+
+    // Accepting the confirmation leaves the page
+    await page.goBack();
+    modal = page.getByRole('dialog');
+    await modal.getByRole('button', { name: 'Leave page' }).click();
+    await expect(page).not.toHaveURL(/\/management\//);
   });
 });
 

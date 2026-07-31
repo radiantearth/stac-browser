@@ -401,8 +401,10 @@ export default defineComponent({
     await this.detectLocale();
     await this.parseQuery(this.$route);
 
-    this.$router.afterEach((to, from) => {
-      if (to.path === from.path) {
+    this.$router.afterEach((to, from, failure) => {
+      // Aborted and cancelled navigations don't change the page,
+      // e.g. when a navigation guard rejected the navigation
+      if (failure || to.path === from.path) {
         return;
       }
 

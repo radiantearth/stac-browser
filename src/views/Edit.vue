@@ -15,31 +15,63 @@
       <ErrorAlert v-if="editorError" dismissible :url="editorUrl" :description="editorError" @close="editorError = null" />
       <b-alert v-else-if="showPermissionWarning" variant="warning" show>{{ $t('errors.missingPermissions') }}</b-alert>
 
+      <b-alert v-if="draftRestored" variant="info" show dismissible @close="draftRestored = false">
+        {{ $t('manage.draftRestored') }}
+        <b-button size="sm" variant="primary" class="ms-2" @click="discardDraft">{{ $t('manage.discardDraft') }}</b-button>
+      </b-alert>
+
       <JsonEditor
         v-model="jsonContent"
         :read-only="isSaveDisabled"
         @request-save="onSaveRequested"
       />
+
+      <b-modal :title="$t('manage.unsavedChangesTitle')" v-model="showLeaveConfirm" @hide="resolveLeave(false)">
+        <p>{{ $t('manage.unsavedChangesLeave') }}</p>
+        <template #footer>
+          <b-button variant="danger" @click="resolveLeave(true)">
+            {{ $t('manage.leavePage') }}
+          </b-button>
+          <b-button variant="secondary" @click="resolveLeave(false)">
+            {{ $t('cancel') }}
+          </b-button>
+        </template>
+      </b-modal>
     </section>
   </main>
 </template>
 
 <script>
-import { defineComponent } from 'vue';
+import { defineAsyncComponent, defineComponent, markRaw } from 'vue';
 import { mapGetters, mapState } from 'vuex';
 import BrowseMixin from './BrowseMixin.js';
 import JsonEditor from '../components/management/JsonEditor.vue';
+import BrowserStorage from '../browser-store';
 import { getErrorMessage } from '../store/utils';
 import { toAbsolute } from 'stac-js/src/http.js';
+import { isObject } from 'stac-js/src/utils.js';
+
+const DRAFT_SAVE_DELAY = 1000;
+const DRAFT_TTL = 7 * 24 * 60 * 60 * 1000; // discard drafts after a week
 
 export default defineComponent({
   name: "Edit",
   components: {
+    BModal: defineAsyncComponent(() => import('bootstrap-vue-next').then(m => m.BModal)),
     JsonEditor
   },
   mixins: [
     BrowseMixin,
   ],
+  // Ask for confirmation when leaving the page with unsaved changes.
+  // Mode switches between management routes of the same entity also pass
+  // through here as the routes are separate route records.
+  beforeRouteLeave() {
+    return this.confirmLeave();
+  },
+  beforeRouteUpdate() {
+    return this.confirmLeave();
+  },
   props: {
     mode: {
       type: String,
@@ -51,7 +83,13 @@ export default defineComponent({
       jsonContent: '',
       sourceContent: '',
       saving: false,
-      editorError: null
+      editorError: null,
+      draftRestored: false,
+      draftTimer: null,
+      showLeaveConfirm: false,
+      leaveResolver: null,
+      // The storage has internal state and is not rendered, keep it out of the reactivity system
+      storage: markRaw(new BrowserStorage())
     };
   },
   computed: {
@@ -109,11 +147,20 @@ export default defineComponent({
         return this.$t('manage.addItem');
       }
       return '';
+    },
+    isDirty() {
+      return this.sourceContent.length > 0 && this.jsonContent !== this.sourceContent;
+    },
+    draftKey() {
+      return `draft:${this.mode}:${this.path || '/'}`;
     }
   },
   watch: {
     data() {
       this.initEditor();
+    },
+    jsonContent() {
+      this.scheduleDraftSave();
     },
     mode: {
       immediate: true,
@@ -129,6 +176,13 @@ export default defineComponent({
       }
     }
   },
+  mounted() {
+    window.addEventListener('beforeunload', this.onBeforeUnload);
+  },
+  beforeUnmount() {
+    window.removeEventListener('beforeunload', this.onBeforeUnload);
+    this.flushDraft();
+  },
   methods: {
     initEditor() {
       if (this.mode === 'edit') {
@@ -136,6 +190,81 @@ export default defineComponent({
       }
       else {
         this.resetTemplate();
+      }
+      this.restoreDraft();
+    },
+    scheduleDraftSave() {
+      clearTimeout(this.draftTimer);
+      this.draftTimer = setTimeout(() => this.flushDraft(), DRAFT_SAVE_DELAY);
+    },
+    // Persist the draft so that the edits survive events that destroy the
+    // component state, e.g. the full-page redirect of an OIDC login.
+    flushDraft() {
+      clearTimeout(this.draftTimer);
+      this.draftTimer = null;
+      if (!this.sourceContent) {
+        return; // The editor has not been initialized yet
+      }
+      if (this.isDirty) {
+        this.storage.set(this.draftKey, { content: this.jsonContent, saved: Date.now() });
+      }
+      else {
+        this.storage.remove(this.draftKey);
+      }
+    },
+    removeDraft() {
+      clearTimeout(this.draftTimer);
+      this.draftTimer = null;
+      this.storage.remove(this.draftKey);
+    },
+    restoreDraft() {
+      if (!this.sourceContent) {
+        return;
+      }
+      const draft = this.storage.get(this.draftKey);
+      if (!draft) {
+        return;
+      }
+      if (
+        !isObject(draft) || typeof draft.content !== 'string'
+        || draft.content === this.sourceContent
+        || !(Date.now() - draft.saved <= DRAFT_TTL)
+      ) {
+        this.removeDraft();
+        return;
+      }
+      this.jsonContent = draft.content;
+      this.draftRestored = true;
+    },
+    discardDraft() {
+      this.jsonContent = this.sourceContent;
+      this.removeDraft();
+      this.draftRestored = false;
+    },
+    confirmLeave() {
+      this.flushDraft();
+      if (!this.isDirty || this.saving || this.$store.state.auth.inProgress) {
+        return true;
+      }
+      this.showLeaveConfirm = true;
+      // The navigation waits for the promise, which the modal buttons resolve
+      return new Promise(resolve => {
+        this.leaveResolver = resolve;
+      });
+    },
+    resolveLeave(leave) {
+      this.showLeaveConfirm = false;
+      if (this.leaveResolver) {
+        this.leaveResolver(leave);
+        this.leaveResolver = null;
+      }
+    },
+    onBeforeUnload(event) {
+      this.flushDraft();
+      // Don't block the page unload for an ongoing login (e.g. OIDC redirects
+      // to the identity provider) - the draft preserves the changes instead.
+      if (this.isDirty && !this.saving && !this.$store.state.auth.inProgress) {
+        event.preventDefault();
       }
     },
     parseJson() {
@@ -230,6 +359,13 @@ export default defineComponent({
         body
       };
     },
+    // The changes reached the server: the draft is obsolete and the editor
+    // content is the new baseline (so that the leave guards stay quiet).
+    onSaved() {
+      this.sourceContent = this.jsonContent;
+      this.removeDraft();
+      this.draftRestored = false;
+    },
     async save(body) {
       this.saving = true;
       this.editorError = null;
@@ -238,6 +374,7 @@ export default defineComponent({
           await this.$store.dispatch('request', {
             link: this.createLink('PUT', this.url, body)
           });
+          this.onSaved();
           // Remove the parent from the cache so that its cached list of
           // children reflects the update (e.g. an updated title)
           const parent = this.collectionLink || this.parentLink;
@@ -250,6 +387,7 @@ export default defineComponent({
           const response = await this.$store.dispatch('request', {
             link: this.createLink('POST', this.createUrl, body)
           });
+          this.onSaved();
           // Remove the parent from the cache so that its cached list of
           // children includes the newly created resource
           this.$store.commit('clear', this.url);
