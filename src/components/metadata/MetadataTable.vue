@@ -89,7 +89,7 @@ export default {
       if (typeof spec.default !== 'undefined' && (typeof value === 'undefined' || value === null)) {
         value = spec.default;
       }
-      return this.format(value, key, NaN, item, spec);
+      return this.format(value, key, null, item, spec);
     }
   }
 };

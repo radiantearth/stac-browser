@@ -78,7 +78,7 @@ export default {
     reset() {
       this.$emit('reset');
     },
-    async submit() {
+    submit() {
       this.validate = true;
       this.$emit('submit', `${this.username}:${this.password}`);
     }

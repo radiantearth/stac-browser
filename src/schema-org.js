@@ -1,9 +1,8 @@
-import { isObject, size } from 'stac-js/src/utils.js';
+import { isObject, size, URI } from 'stac-js/src/utils.js';
 import { toAbsolute } from 'stac-js/src/http.js';
 import Utils from './utils';
 import { getDisplayTitle } from './models/stac';
 import { STAC } from 'stac-js';
-import { URI } from 'stac-js/src/utils.js';
 import i18n from './i18n';
 
 function toBrowserUrl(url, store) {
@@ -50,6 +49,22 @@ function makeAssets(data) {
   return [];
 }
 
+function fallbackDescription(data, store) {
+  let stacType, container;
+  if (data instanceof STAC) {
+    stacType = data.isItem ? "Item" : data.type;
+    container = data.collection;
+  }
+  else if (isObject(data) && data.rel === 'item') {
+    stacType = "Item";
+  }
+  if (stacType) {
+    let type = i18n.global.t(`stac${stacType}`, 1);
+    let inX = i18n.global.t('in', { catalog: container || store.catalogTitle });
+    return `SpatioTemporal Asset Catalog (STAC)\n${type} - ${data.id} ${inX}`;
+  }
+}
+
 function makeLinks(links, data, store, type = "DataCatalog") {
   return links.map(link => {
     let name, isBasedOn;
@@ -84,22 +99,6 @@ function makeProvider(providers, role) {
       "url": p.url,
       "email": p.email || p.mail,
     }));
-}
-
-function fallbackDescription(data, store) {
-  let stacType, container;
-  if (data instanceof STAC) {
-    stacType = data.isItem ? "Item" : data.type;
-    container = data.collection;
-  }
-  else if (isObject(data) && data.rel === 'item') {
-    stacType = "Item";
-  }
-  if (stacType) {
-    let type = i18n.global.t(`stac${stacType}`, 1);
-    let inX = i18n.global.t('in', {catalog: container || store.catalogTitle});
-    return `SpatioTemporal Asset Catalog (STAC)\n${type} - ${data.id} ${inX}`;
-  }
 }
 
 function createBaseSchema(data, type, store) {

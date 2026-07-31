@@ -11,8 +11,12 @@ The following ways to set config options are possible:
 - Set **environment variables**, all options need a `SB_` prefix.
   So you could for example set the catalog URL via the environment variable `SB_catalogUrl`.
   Vite loads `.env`, `.env.local`, `.env.[mode]` and `.env.[mode].local` automatically, so `SB_*` variables can be stored there.
+  Options that expect an array or an object must be provided as a JSON string, e.g.
+  `SB_footerLinks='[{"label":"Imprint","url":"https://example.com/imprint"}]'` or
+  `SB_requestHeaders='{"Authorization":"Bearer …"}'`.
+  For convenience, array options that only contain strings may also be given as a comma-separated list, e.g. `SB_supportedLocales=en,de,fr`.
 - Optionally, you can also set options after the build, basically **at "runtime"**.
-  Enable this by removing the `<!--RC` and `RC-->` around the `script` tag that loads the `runtime-config.js` in the [`index.html`](../index.html).
+  Enable this by removing the `<!--RC` and `RC-->` around the tags that load the `runtime-config.js` (and the `<base>` tag) in the [`index.html`](../index.html).
   Then run the build procedure and after completion, you can fill the `dist/runtime-config.js` with any options that you want to customize.
 
 > [!TIP]  
@@ -146,6 +150,12 @@ footerLinks: [
 ]
 ```
 
+As an environment variable, provide the same value as a JSON string:
+
+```bash
+SB_footerLinks='[{"label":"Imprint","url":"https://example.com/imprint"},{"label":"Privacy","url":"https://example.com/privacy"}]'
+```
+
 ### apiCatalogPriority
 
 For STAC APIs there are two potential sources for catalogs and collections:
@@ -193,12 +203,12 @@ Known hosts that require hash mode are Amazon S3 and GitHub Pages.
 
 ### pathPrefix
 
-***build-only option***
-
 If you don't deploy the STAC Browser instance at the root path of your (sub) domain, then you need to set the path prefix
-when building (or running) STAC Browser. Known hosts that require hash mode are Amazon S3 and GitHub Pages.
+when building (or running) STAC Browser.
 
 Either set this option to the respective path (e.g. `/browser/`) in the config file or as environment variable (`SB_pathPrefix`) when running or building.
+
+With `DYNAMIC_CONFIG` (default in the [Docker image](./docker.md)), `pathPrefix` can instead be set at startup via `SB_pathPrefix` / `runtime-config.js`. Outside Docker, also set the `href` of `<base id="stac-browser-base">` in `dist/index.html` to match.
 
 This will build STAC Browser in a way that it can be hosted at `https://example.com/browser` for example.
 Using this parameter for the dev server will make STAC Browser available at `http://localhost:8080/browser`.
@@ -395,6 +405,28 @@ The parameter passed into the function is an [Asset object](https://m-mohr.githu
 
 ```js
 buildTileUrlTemplate: (asset) => "https://tiles.rdnt.io/tiles/{z}/{x}/{y}@2x?url=" + encodeURIComponent(asset.getAbsoluteUrl()),
+```
+
+The function can also return `null` to not pass the given asset to the tile server,
+e.g. to filter by media type or protocol based on the given Asset object.
+In this case client-side rendering is used if supported, or no visualization will be provided.
+For async functions (i.e. functions that return a Promise) the "Show on map" button
+may appear with a slight delay, once the Promise has been resolved.
+
+> [!NOTE]  
+> The function is called for every asset that is shown in the user interface, not only for the assets
+> that are actually shown on the map. Avoid heavy work such as network requests in the function,
+> otherwise pages with many assets may render slowly.
+
+**Example**:
+
+```js
+buildTileUrlTemplate: (asset) => {
+  if (!asset.isCOG || !asset.getAbsoluteUrl().startsWith("https://")) {
+    return null;
+  }
+  return "https://tiles.rdnt.io/tiles/{z}/{x}/{y}@2x?url=" + encodeURIComponent(asset.getAbsoluteUrl());
+},
 ```
 
 Please note that this option can only be provided through a config file and is not available via CLI/ENV.
@@ -642,8 +674,8 @@ Thus, it may make sense to change the root catalog to provide more useful inform
 Of course, ideally you'd want to update the root catalog itself, but until then you can use this.
 
 ```js
-preprocessSTAC: (stac, state) => {
-    if (stac.getBrowserPath() === '/') {
+preprocessSTAC: (stac, state, getters) => {
+    if (getters.toBrowserPath(stac.getAbsoluteUrl()) === '/') {
         stac.title = state.catalogTitle;
         stac.description = 'This is a **much** more useful description for this catalog!';
     }

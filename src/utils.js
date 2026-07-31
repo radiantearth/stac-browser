@@ -1,13 +1,9 @@
-import { URI } from 'stac-js/src/utils.js';
 import removeMd from 'remove-markdown';
 import { Link } from 'stac-js';
-import { hasText, isObject, size } from 'stac-js/src/utils.js';
-import { geojsonMediaType, imageMediaTypes } from 'stac-js/src/mediatypes.js';
+import { hasText, isObject, size, URI } from 'stac-js/src/utils.js';
 import { pagination } from "stac-js/src/relationtypes.js";
 
 export const commonFileNames = ['catalog', 'collection', 'item'];
-
-export const mapMediaTypes = imageMediaTypes.concat([geojsonMediaType]);
 
 export class BrowserError extends Error {
   constructor(message) {
@@ -21,21 +17,6 @@ export class BrowserError extends Error {
  * @class
  */
 export default class Utils {
-
-  static isMediaType(type, types, allowEmpty = false) {
-    if (!Array.isArray(types)) {
-      types = [types];
-    }
-    if (allowEmpty && !type) {
-      return true;
-    }
-    else if (typeof type !== 'string') {
-      return false;
-    }
-    else {
-      return types.includes(type.toLowerCase());
-    }
-  }
 
   static shortenTitle(fullStr, strLen, separator = '…') {
     if (fullStr.length <= strLen) {
@@ -60,7 +41,7 @@ export default class Utils {
   }
 
   static removeTrailingSlash(str) {
-    return str.replace(/\/$/, '');
+    return str.replace(/\/+$/, '');
   }
 
   static equalUrl(a, b) {
@@ -73,6 +54,50 @@ export default class Utils {
       return uri1.equals(uri2);
     } catch {
       return false;
+    }
+  }
+
+  /**
+   * Checks whether two URLs point to the same resource, ignoring a trailing
+   * slash in the path. Query parameters and fragments are ignored.
+   *
+   * @param {string|URI} a - The first URL
+   * @param {string|URI} b - The second URL
+   * @returns {boolean} `true` if scheme, authority and path (except for a trailing slash) are equal
+   */
+  static samePath(a, b) {
+    if (!a || !b) {
+      return false;
+    }
+    try {
+      const uri1 = URI(a);
+      const uri2 = URI(b);
+      return uri1.scheme().toLowerCase() === uri2.scheme().toLowerCase()
+        && uri1.authority().toLowerCase() === uri2.authority().toLowerCase()
+        && Utils.removeTrailingSlash(uri1.path()) === Utils.removeTrailingSlash(uri2.path());
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Returns the given URL with the trailing slash of the path added or removed.
+   * Scheme, authority, query and fragment are preserved.
+   *
+   * @param {string} url - The URL to change
+   * @param {boolean} trailingSlash - `true` to add a trailing slash, `false` to remove it
+   * @returns {string} The updated URL
+   */
+  static setTrailingSlash(url, trailingSlash) {
+    try {
+      const uri = URI(url);
+      let path = Utils.removeTrailingSlash(uri.path());
+      if (trailingSlash) {
+        path += '/';
+      }
+      return uri.path(path).toString();
+    } catch {
+      return url;
     }
   }
 
@@ -93,8 +118,8 @@ export default class Utils {
     if (!el) {
       return;
     }
-    var rect = el.getBoundingClientRect();
-    var isVisible = rect.top < window.innerHeight && rect.bottom >= 0;
+    let rect = el.getBoundingClientRect();
+    let isVisible = rect.top < window.innerHeight && rect.bottom >= 0;
     if (!isVisible) {
       el.scrollIntoView({
         behavior: "smooth",
@@ -155,6 +180,21 @@ export default class Utils {
     
     // Put the object in an array
     return [sortby];
+  }
+
+  static stateQueryParametersToObject(state, query = {}) {
+    for (const [key, value] of Object.entries(state)) {
+      let name = `.${key}`;
+      if (Array.isArray(value)) {
+        if (value.length > 0) {
+          query[name] = value.join(',');
+        }
+      }
+      else if (value !== null) {
+        query[name] = value;
+      }
+    }
+    return query;
   }
 
   // todo: remove when all usage is gone, replace with stac-js method
@@ -291,19 +331,6 @@ export default class Utils {
     }
     const dir = uri.segmentCoded(-2);
     return dir || auth || href;
-  }
-
-  // Gets the value at path of object.
-  // Drop in replacement for lodash.get
-  static getValueFromObjectUsingPath(object, path) {
-    if (object === null || typeof object !== 'object') {
-      return;
-    }
-    object = object[path[0]];
-    if (typeof object !== 'undefined' && path.length > 1) {
-      return this.getValueFromObjectUsingPath(object, path.slice(1));
-    }
-    return object;
   }
 
   static search(searchterm, target, and = true) {

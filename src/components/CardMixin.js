@@ -8,12 +8,19 @@ export default {
     showThumbnail: {
       type: Boolean,
       default: true
+    },
+    // The view mode of the containing list ('list' or 'cards').
+    // If not given, falls back to the global card view mode chosen by the user.
+    viewMode: {
+      type: String,
+      default: null,
+      validator: value => value === null || ['list', 'cards'].includes(value)
     }
   },
   computed: {
     ...mapState(['cardViewMode', 'crossOriginMedia', 'defaultThumbnailSize']),
     isList() {
-      return this.data && !this.data.isItem && this.cardViewMode === 'list';
+      return this.data && !this.data.isItem && (this.viewMode || this.cardViewMode) === 'list';
     },
     hasImage() {
       return this.showThumbnail && this.thumbnail;

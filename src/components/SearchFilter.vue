@@ -2,8 +2,18 @@
   <b-form class="filter mb-4" @submit.stop.prevent="onSubmit" @reset="onReset">
     <b-card no-body :title="title">
       <b-card-body>
+        <template v-if="droppedFilterNames.length > 0">
+          <b-alert
+            variant="warning"
+            dismissible
+            show
+            class="mb-3"
+            @close="$store.commit('search/clearDroppedFilters', type)"
+          >
+            {{ $t('search.droppedFilters', { filters: formattedDroppedFilters }) }}
+          </b-alert>
+        </template>
         <Loading v-if="!loaded" fill />
-
         <b-card-title v-if="title" :title="title" />
 
         <b-form-group v-if="canFilterFreeText" class="filter-freetext" :label="$t('search.freeText')" :label-for="ids.q" :description="$t('search.freeTextDescription')">
@@ -114,9 +124,9 @@
 
         <hr v-if="canFilterExtents || conformances.CollectionIdFilter || conformances.ItemIdFilter || showAdditionalFilters">
 
-        <b-form-group v-if="canSort" class="sort" :label="$t('sort.title')" :label-for="ids.sort" :description="$t('search.notFullySupported')">
+        <b-form-group v-if="canSort" class="sort" :label="$t('sort.title')" :label-for="ids.sortby" :description="$t('search.notFullySupported')">
           <multiselect
-            :id="ids.sort"
+            :id="ids.sortby"
             v-model="sortTerm"
             :options="sortOptions"
             track-by="value"
@@ -170,8 +180,6 @@ import { defineComponent, defineAsyncComponent } from 'vue';
 import { mapGetters, mapState } from "vuex";
 import { BCard, BCardBody, BCardFooter, BCardTitle, BDropdown, BDropdownItem, BModal } from 'bootstrap-vue-next';
 
-import refParser from '@apidevtools/json-schema-ref-parser';
-
 import Utils from '../utils';
 import { hasText, isObject } from 'stac-js/src/utils.js';
 
@@ -180,11 +188,11 @@ import DatePickerMixin from './DatePickerMixin';
 import Loading from './Loading.vue';
 
 import { CollectionCollection, STAC } from 'stac-js'; 
-import { createSTAC, Collection } from '../models/stac';
+import { createSTAC } from '../models/stac';
 import Cql from '../models/cql2/cql';
-import Queryable from '../models/cql2/queryable';
 import CqlLogicalOperator, { CqlNot } from '../models/cql2/operators/logical';
-import { stacRequest } from '../store/utils';
+import { fetchQueryablesForLink, fetchSchemaProperties } from '../store/utils';
+import { FILTER_FIELDS } from '../store/modules/search';
 import { formatKey } from '@radiantearth/stac-fields/helper';
 
 function getDefaults() {
@@ -237,10 +245,6 @@ export default defineComponent({
       type: String,
       required: true
     },
-    value: {
-      type: Object,
-      default: () => ({})
-    },
     searchLink: {
       type: Object,
       default: null
@@ -262,8 +266,26 @@ export default defineComponent({
   },
   computed: {
     ...mapState(['defaultCollectionSort', 'defaultItemSort', 'searchResultsPerPage', 'maxEntriesPerPage', 'uiLanguage']),
-    ...mapGetters(['canSearchCollections', 'supportsConformance']),
+    ...mapState('search', ['droppedFilters']), 
+    ...mapGetters(['canSearchCollections', 'getApiChildren', 'supportsConformance']),
     ...mapGetters('search', ['collectionSearchParams', 'itemSearchParams']),
+    droppedFilterNames() {
+      const labels = {
+        freeText: () => this.$t('search.freeText'),
+        sort: () => this.$t('sort.title'),
+        datetime: () => this.$t('search.temporalExtent'),
+        bbox: () => this.$t('search.spatialExtent'),
+        cql2: (f) => f.queryable?.title || f.queryable?.id || f.id,
+      };
+      const scopedDroppedFilters = this.droppedFilters[this.type] || [];
+      return scopedDroppedFilters
+        .map(f => labels[f.type]?.(f))
+        .filter(Boolean);
+    },
+    formattedDroppedFilters() {
+      const formatter = new Intl.ListFormat(this.uiLanguage || 'en', { style: 'long', type: 'conjunction' });
+      return formatter.format(this.droppedFilterNames);
+    },
     collectionSelectOptions() {
       let taggable = !this.hasAllCollections;
       let isResult = this.collections.length > 0 && !this.hasAllCollections;
@@ -286,7 +308,7 @@ export default defineComponent({
       };
     },
     collectionSearchLink() {
-      return this.parent && this.parent.isCatalogLike && this.parent.getApiCollectionsLink();
+      return this.parent?.isCatalogLike && this.parent.getApiCollectionsLink();
     },
     codeExampleSearchLinks() {
       const toMethodMap = (link) => {
@@ -331,19 +353,20 @@ export default defineComponent({
         : this.itemSearchParams;
       return params || {};
     },
-    activeFilterLogic() {
-      const filters = this.type === 'Collections'
+    activeFilterSet() {
+      return this.type === 'Collections'
         ? this.$store.state.search.collectionFilters
         : this.$store.state.search.itemFilters;
-      return filters?.filterLogic || null;
+    },
+    activeFilterLogic() {
+      return this.activeFilterSet?.filterLogic || null;
     },
     canSearchCollectionsFreeText() {
       return this.canSearchCollections && this.supportsConformance(TYPES.Collections.FreeText);
     },
     ids() {
       let obj = {};
-      ['q', 'datetime', 'bbox', 'collections', 'ids', 'sort', 'limit']
-        .forEach(field => obj[field] = field + formId);
+      FILTER_FIELDS.forEach(field => obj[field] = field + formId);
       return obj;
     },
     stac() {
@@ -429,8 +452,13 @@ export default defineComponent({
       return min instanceof Date && max instanceof Date && min.getTime() === max.getTime();
     },
     searchQ: {
-      get() { return this.activeParams?.q || []; },
-      set(val) { this.commitToVuex('q', val); }
+      get() {
+        const q = this.activeParams?.q;
+        return Array.isArray(q) ? [...q] : [];
+      },
+      set(value) {
+        this.commitToVuex('q', value);
+      }
     },
     searchLimit: {
       get() {
@@ -448,47 +476,58 @@ export default defineComponent({
       }
     },
     searchBBox: {
-      get() { return Array.isArray(this.activeParams?.bbox) ? [...this.activeParams.bbox] : null; },
-      set(val) { this.commitToVuex('bbox', val); }
+      get() {
+        return Array.isArray(this.activeParams?.bbox) ? [...this.activeParams.bbox] : null;
+      },
+      set(val) {
+        this.commitToVuex('bbox', val);
+      }
     },
     searchIds: {
-      get() { return this.activeParams?.ids || []; },
-      set(val) { this.commitToVuex('ids', val); }
+      get() { 
+        const ids = this.activeParams?.ids;
+        return Array.isArray(ids) ? [...ids] : [];
+      },
+      set(value) {
+        this.commitToVuex('ids', value);
+      }
     },
+    apiCollectionsState() {
+      return this.getApiChildren(this.parent);
+    },
+    apiCollectionsFromStore() {
+      const list = this.apiCollectionsState?.list;
+      if (!Array.isArray(list)) {
+        return [];
+      }
+      return list.filter(collection => collection instanceof STAC && collection.isCollection);
+    },
+    apiCollectionsPaginated() {
+      return Boolean(this.apiCollectionsState?.next || this.apiCollectionsState?.prev);
+    }
   },
   watch: {
     parent: {
       immediate: true,
-      handler(newStac, oldStac) {
-        if (newStac instanceof Collection) {
-          newStac.setApiDataListener('searchfilter' + formId, () => this.updateApiCollections());
-        }
-        if (oldStac instanceof Collection) {
-          oldStac.setApiDataListener('searchfilter' + formId);
-        }
+      handler() {
         this.updateApiCollections();
       }
     },
-    value: {
-      immediate: true,
-      deep: true,
-      handler(newVal) {
-        if (!newVal || Object.keys(newVal).length === 0) {return;}
-        for (const [key, val] of Object.entries(newVal)) {
-          if (val !== undefined && val !== null && val !== '') {
-            this.commitToVuex(key, val);
-          }
-        }
-      }
+    apiCollectionsFromStore() {
+      this.updateApiCollections();
+    },
+    apiCollectionsPaginated() {
+      this.updateApiCollections();
     },
     'activeParams.collections': {
       immediate: true,
       deep: true,
       handler(vuexCollections) {
         const activeCollections = vuexCollections || [];
-
+        
         const currentSelectedIds = (this.selectedCollections || []).map(c => c.value);
-        if (JSON.stringify(activeCollections) === JSON.stringify(currentSelectedIds)) {
+        
+        if (activeCollections.length === currentSelectedIds.length && activeCollections.every((val, index) => val === currentSelectedIds[index])) {
           return;
         }
 
@@ -512,7 +551,7 @@ export default defineComponent({
             this.provideBBox = '1';
           });
         }
-        else {
+        else if (!this.loaded) {
           this.provideBBox = false;
         }
       } 
@@ -521,10 +560,26 @@ export default defineComponent({
       immediate: true,
       deep: true,
       handler(logic) {
-        if (!logic) {return;}
+        if (!logic) {
+          return;
+        }
         this.filtersAndOr = logic.andOr ?? 'and';
         this.filtersNegate = logic.negate ?? false;
       }
+    },
+    'activeFilterSet.rawFilters': {
+      immediate: true,
+      handler(rows) {
+        rows = Array.isArray(rows) ? rows : [];
+        const currentIds = this.filters.map(f => f.id);
+        if (rows.length === currentIds.length && rows.every((row, i) => row.id === currentIds[i])) {
+          return;
+        }
+        this.filters = rows.map(row => ({ ...row }));
+      }
+    },
+    'activeParams.sortby'() {
+      this.syncSortFromStore();
     },
     selectedCollections: {
       deep: 1,
@@ -533,6 +588,10 @@ export default defineComponent({
       }
     },  
     provideBBox(shown) {
+      if (!this.loaded) {
+        return;
+      }
+
       if (!shown) {
         this.commitToVuex('bbox', null);
       }
@@ -589,7 +648,11 @@ export default defineComponent({
       );
     }
     Promise.all(promises).finally(() => {
-      this.resetSort();
+      // Show the sort order from the store (e.g. carried over from another
+      // search) if there is one, otherwise apply the configured default
+      if (!this.syncSortFromStore()) {
+        this.resetSort();
+      }
       this.loaded = true;
     });
   },
@@ -626,12 +689,12 @@ export default defineComponent({
       this.collectionsLoadingTimer = setTimeout(async () => {
         try {
           const link = Utils.addFiltersToLink(this.collectionSearchLink, {q: [text]});
-          const response = await stacRequest(this.$store, link);
+          const response = await this.$store.dispatch('request', { link });
           
           // Only set collections if response is valid AND collectionsLoadingTimer has not been reset.
           // If collectionsLoadingTimer has been reset, the result is not relevant anylonger.
           if (this.collectionsLoadingTimer && CollectionCollection.isResponse(response.data)) {
-            const stac = createSTAC(response.data);
+            const stac = createSTAC(response.data, null, this.$store);
             this.collections = this.prepareCollections(stac.getAll());
             if (typeof stac.numberMatched === 'number') {
               this.additionalCollectionCount = stac.numberMatched - this.collections.length;
@@ -656,13 +719,13 @@ export default defineComponent({
         data.collections = this.collections;
       }
       else if (this.type === 'Global' || this.type === 'Collections') {
-        let response = await stacRequest(this.$store, link);
+        let response = await this.$store.dispatch('request', { link });
         
         if (!isObject(response.data)) {
           return {};
         }
 
-        const stac = createSTAC(response.data);
+        const stac = createSTAC(response.data, null, this.$store);
         if (typeof stac.getQueryablesLink === 'function') {
           data.queryableLink = stac.getQueryablesLink();
         }
@@ -681,9 +744,8 @@ export default defineComponent({
       if (!this.parent) {
         return;
       }
-      let apiCollections = this.parent.getChildren('collections');
-      let nextCollectionsLink = this.parent._apiChildren.next;
-      if (!Array.isArray(apiCollections) || nextCollectionsLink || !this.conformances.CollectionIdFilter) {
+      let apiCollections = this.apiCollectionsFromStore;
+      if (!Array.isArray(apiCollections) || this.apiCollectionsPaginated || !this.conformances.CollectionIdFilter) {
         this.collections = [];
         return;
       }
@@ -704,41 +766,15 @@ export default defineComponent({
         .map(this.collectionToMultiSelect)
         .sort((a,b) => collator.compare(a.text, b.text));
     },
-    async loadSchemas(link) {
-      let response = await stacRequest(this.$store, link);
-      if (!isObject(response.data)) {
-        return;
-      }
-
-      let schemas;
-      try {
-        schemas = await refParser.dereference(response.data);
-      } catch (error) {
-        // Use data with $refs included as fallback anyway
-        console.error(error);
-        schemas = response.data;
-      }
-
-      if (isObject(schemas) && isObject(schemas.properties)) {
-        return Object.entries(schemas.properties);
-      }
-      return [];
-    },
     async loadQueryables(link) {
-      if (!isObject(link)) {
-        return;
-      }
-      this.queryables = [];
-      const queryables = await this.loadSchemas(link);
-      this.queryables = queryables
-        .map(([key, schema]) => new Queryable(key, schema));
+      this.queryables = await fetchQueryablesForLink(this.$store, link);
     },
     async loadSortables(link) {
       if (!isObject(link)) {
         return;
       }
       this.sortables = [];
-      const sortables = await this.loadSchemas(link);
+      const sortables = await fetchSchemaProperties(this.$store, link);
       const collator = new Intl.Collator(this.uiLanguage);
       this.sortables = sortables
         .map(([key, schema]) => ({
@@ -786,30 +822,38 @@ export default defineComponent({
     },
     onSubmit() {
       this.commitToVuex('sortby', this.formatSort());
-      this.commitToVuex('filters', this.buildFilter()); 
+      this.commitToVuex('filters', this.buildFilter());
+      // Copy the rows so that later form edits don't mutate the store state
+      this.commitToVuex('rawFilters', this.filters.map(f => ({ ...f })));
       this.commitToVuex('filterLogic', {
         andOr: this.filtersAndOr,
         negate: this.filtersNegate,
       });
+      // Executing a search retires the notice about the previous carry-over
+      this.$store.commit('search/clearDroppedFilters', this.type);
+
       this.$emit('input', this.activeParams, false);
     },
     async onReset() {
-      Object.assign(this, getDefaults());   
-      this.resetSort();   
-      this.$store.commit('search/resetShared');      
+      Object.assign(this, getDefaults());
+      this.resetSort();
+      this.$store.commit('search/resetShared');
       if (this.type === 'Collections') {
         this.$store.commit('search/resetCollectionFilters');
       } else {
         this.$store.commit('search/resetItemFilters');
       }
+      // The notice about the carry-over refers to a state that was just discarded
+      this.$store.commit('search/clearDroppedFilters', this.type);
       this.$emit('input', this.activeParams, true);
     },
     addSearchTerm(term) {
       if (!hasText(term)) {
         return;
       }
-      const currentQ = this.activeParams?.q || [];
-      this.commitToVuex('q', [...currentQ, term]);
+      const currentQ = [...this.searchQ];
+      currentQ.push(term);
+      this.searchQ = currentQ;
     },
     addCollection(collection) {
       if (!this.collectionSelectOptions.taggable) {
@@ -821,8 +865,9 @@ export default defineComponent({
       this.collections.push(opt);
     },
     addId(id) {
-      const currentIds = this.activeParams?.ids || [];
-      this.commitToVuex('ids', [...currentIds, id]);
+      const currentIds = [...this.searchIds];
+      currentIds.push(id);
+      this.searchIds = currentIds;
     },
     formatSort() {
       if (this.canSort && this.sortTerm && this.sortTerm.value && this.sortOrder) {
@@ -834,7 +879,7 @@ export default defineComponent({
       }
     },
     commitToVuex(field, value) {
-      if (['datetime', 'bbox', 'limit'].includes(field)) {
+if (['datetime', 'bbox', 'limit'].includes(field)) {
         this.$store.commit('search/setShared', { [field]: value });
       } 
       else if (this.type === 'Collections') {
@@ -896,6 +941,33 @@ export default defineComponent({
           value: (urlValue === '' || urlValue === null || urlValue === undefined) ? undefined : urlValue 
         });
       }
+    },
+    // Selects the sort field and direction stored for this search (e.g.
+    // carried over from another search) in the form.
+    // Returns whether the stored sort is shown in the form.
+    syncSortFromStore() {
+      if (!this.canSort) {
+        return false;
+      }
+      const sortby = this.activeParams?.sortby;
+      if (!hasText(sortby)) {
+        return false;
+      }
+      if (sortby === this.formatSort()) {
+        return true;
+      }
+      const sort = Utils.parseApiSortParameter(sortby);
+      if (!sort.field) {
+        return false;
+      }
+      const option = this.sortOptions.find(o => o.value === sort.field);
+      if (!option) {
+        return false;
+      }
+      this.sortTerm = option;
+      this.sortOrder = sort.direction;
+      return true;
+    }
     },
     resetSort() {
       if (!this.canSort) {

@@ -65,7 +65,7 @@ test.describe('Validation - button visibility', () => {
 test.describe('Validation - catalog', () => {
   let catalog;
   
-  test.beforeEach(async () => {
+  test.beforeEach(() => {
     catalog = new StaticCatalog({ url: 'https://stac.example/catalog.json' })
       .setMetadata({ title: 'Test Catalog' });
   });

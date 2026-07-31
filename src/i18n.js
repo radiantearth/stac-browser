@@ -11,10 +11,9 @@ const LOCALE_CONFIG = {};
 
 async function loadLocaleConfig() {
   // Load locale config
-  for (let locale of CONFIG.supportedLocales) {
-    // todo: does this work? see console warnings
+  await Promise.all(CONFIG.supportedLocales.map(async (locale) => {
     LOCALE_CONFIG[locale] = await import(`./locales/${locale}/config.json`);
-  }
+  }));
   const messages = {};
   // Add language names all other languages
   for (let locale in LOCALE_CONFIG) {
@@ -70,13 +69,6 @@ const i18n = createI18n({
 
 export default i18n;
 
-export function loadDefaultMessages() {
-  return Promise.all([
-    loadMessages(CONFIG.locale),
-    loadMessages(CONFIG.fallbackLocale)
-  ]);
-}
-
 export async function loadMessages(locale) {
   // Check whether the language has already been loaded
   // Note that a languages key is already present thus check >1 and not >0
@@ -85,6 +77,13 @@ export async function loadMessages(locale) {
   }
   const messages = (await import(`./locales/${locale}/default.js`)).default;
   i18n.global.mergeLocaleMessage(locale, messages);
+}
+
+export function loadDefaultMessages() {
+  return Promise.all([
+    loadMessages(CONFIG.locale),
+    loadMessages(CONFIG.fallbackLocale)
+  ]);
 }
 
 async function executeCustomFunctions(locale) {
@@ -96,7 +95,7 @@ async function executeCustomFunctions(locale) {
     const fn = (await import(`./locales/${locale}/${file}.js`)).default;
     return await fn(locale);
   });
-  return Promise.all(p);
+  return await Promise.all(p);
 }
 
 export function translateFields(value, vars = null) {

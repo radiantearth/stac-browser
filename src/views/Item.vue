@@ -16,7 +16,7 @@
         <WidgetHook id="view-item-primary-start" />
         <section class="mb-4">
           <b-card no-body class="maps-preview">
-            <b-tabs v-model="tab" ref="tabs" card pills vertical end>
+            <b-tabs v-model="tab" card pills vertical end>
               <b-tab :title="$t('map')" :id="tabIds.map" no-body>
                 <MapView :stac="data" :assets="selectedAssets" @changed="dataChanged" @empty="handleEmptyMap" />
               </b-tab>

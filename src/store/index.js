@@ -1,21 +1,97 @@
 import { createStore } from "vuex";
 
-import { URI } from 'stac-js/src/utils.js';
+import { hasText, isObject, size, URI } from 'stac-js/src/utils.js';
 import urijs from 'urijs';
 
 import i18n, { loadMessages, detectDataLanguage, updateExternals } from '../i18n';
 import Utils, { BrowserError } from '../utils';
-import { hasText, isObject } from 'stac-js/src/utils.js';
 import { toAbsolute } from 'stac-js/src/http.js';
 import { addMissingChildren, getDisplayTitle, createSTAC } from '../models/stac';
-import { CatalogLike, STAC } from 'stac-js';
+import { STAC } from 'stac-js';
 
 import auth from './auth.js';
-import { addQueryIfNotExists, hasAuthority, isAuthenticationError, Loading, processSTAC, stacRequest, stacRequestOptions } from './utils';
+import { addQueryIfNotExists, hasAuthority, isAuthenticationError, Loading, stacRequest, stacRequestOptions } from './utils';
 import { getBest } from 'stac-js/src/locales';
 import { TYPES } from "../components/ApiCapabilitiesMixin";
 import BrowserStorage from "../browser-store.js";
-import search from './modules/search.js';
+import search, { freshSearchState } from './modules/search.js';
+
+// type is either 'collections' or 'items', depending on which endpoint the list was loaded from
+function updateApiChildrenState(state, stac, type, list, next = false, prev = false) {
+  if (!stac?.isCatalogLike) {
+    return;
+  }
+  const key = stac.getAbsoluteUrl();
+  state.apiChildren[key] = {
+    type,
+    list: Array.isArray(list) ? list : [],
+    prev: prev || false,
+    next: next || false
+  };
+}
+
+// Returns the Loading object if a page of children is currently
+// being loaded for the given entity, otherwise null.
+function getApiChildrenLoading(state, stac) {
+  if (!stac?.isCatalogLike) {
+    return null;
+  }
+  const children = state.apiChildren[stac.getAbsoluteUrl()];
+  if (children instanceof Loading) {
+    return children;
+  }
+  return children?.loading instanceof Loading ? children.loading : null;
+}
+
+// Combines a list of children received from the API with the children linked to
+// from the STAC entity, depending on the given priority (see apiCatalogPriority).
+// Optionally includes the item links of the entity and pagination links for the API list.
+function combineChildren(stac, apiList, priority, { items = [], prev = false, next = false } = {}) {
+  const showCollections = !priority || priority === 'collections';
+  const showChilds = !priority || priority === 'childs';
+  let children = [];
+  if (showCollections && apiList.length > 0) {
+    children = apiList.slice(0);
+  }
+  if (showChilds) {
+    children = addMissingChildren(children, stac).concat(items);
+  }
+  if (showCollections && prev) {
+    children = [prev].concat(children);
+  }
+  if (showCollections && next) {
+    children.push(next);
+  }
+  return children;
+}
+
+// Fallback for APIs without proper links: If we detect OGC API like paths
+// (i.e. `collections/xyz` or `collections/xyz/items/abc`), go up the number of
+// levels configured for the detected endpoint to guess the URL of a parent entity.
+// Returns the guessed URL as string, or null.
+function guessParentUrlFromApiPath(url, levels) {
+  const uri = URI(url);
+  const path = uri.segment(-2);
+  const count = levels[path];
+  if (!count) {
+    return null;
+  }
+  for (let i = 0; i < count * 2; i++) {
+    uri.segment(-1, "");
+  }
+  return uri.toString();
+}
+
+// Returns the STAC object for the given URL from the cache,
+// otherwise creates it from the given data and adds it to the cache.
+function getOrCreateStac(cx, data, url) {
+  let stac = cx.getters.getStac(url);
+  if (!stac) {
+    stac = createSTAC(data, url, cx);
+    cx.commit('loaded', { url, data: stac });
+  }
+  return stac;
+}
 
 function getStore(config, router) {
   // Local settings (e.g. for currently loaded STAC entity)
@@ -29,7 +105,9 @@ function getStore(config, router) {
 
     localRequestQueryParameters: {},
     stateQueryParameters: {
+      // The currently selected language
       language: null,
+      // Expanded Asset and Item Assets
       asset: [],
       itemdef: [],
       's.q': [],
@@ -39,7 +117,9 @@ function getStore(config, router) {
       's.collections': [],
       's.ids': [],
       's.sortby': null,
-      's.filters': null
+      's.filters': null,
+      searchtype: null,
+      q: []
     },
 
     apiItems: [],
@@ -51,15 +131,57 @@ function getStore(config, router) {
   const catalogDefaults = () => ({
     queue: [],
     privateQueryParameters: {},
-    authActions: [],
     conformsTo: [],
     dataLanguage: null,
 
     apiCollections: [],
     apiItemsLoading: {},
     nextCollectionsLink: null,
-    crossNavigationItems: []
+    crossNavigationItems: [],
+    currentApiCollectionsSearchId: null
   });
+
+  // Users may enter the URL with different URL than reported in
+  // the STAC document (e.g. missing trailing slash).
+  // Per RFC 3986 these are different URLs, which breaks caching
+  // and root detection. If the URL the server reports for this
+  // resource differs from the requested URL redirect the browser.
+  // https://github.com/radiantearth/stac-browser/issues/943
+  async function normalizeCatalogUrl(cx, data, url, show) {
+    // The routes that embed a user-provided URL in the browser path
+    const routePrefixes = { browse: '', search: '/search', validation: '/validation' };
+    const currentRoute = router.currentRoute.value;
+    const routePrefix = routePrefixes[currentRoute?.name];
+    if (typeof routePrefix !== 'string' || !hasText(currentRoute.path) || cx.getters.fromBrowserPath(currentRoute.path) !== url) {
+      return false;
+    }
+    const reported = data.getStacLinkWithRel('self');
+    if (!reported) {
+      return false;
+    }
+    const reportedUrl = URI(reported.getAbsoluteUrl());
+    const requested = URI(url);
+    if (!Utils.samePath(reportedUrl, requested) || reportedUrl.path() === requested.path()) {
+      return false;
+    }
+    const canonical = requested.path(reportedUrl.path()).toString();
+    // A pre-configured catalogUrl with the "wrong" slash must follow,
+    // otherwise root detection and browser paths never match again.
+    if (cx.state.catalogUrl && Utils.samePath(cx.state.catalogUrl, canonical)) {
+      await cx.dispatch('config', {
+        catalogUrl: Utils.setTrailingSlash(cx.state.catalogUrl, reportedUrl.path().endsWith('/'))
+      });
+    }
+    // Reload under the corrected URL, then fix the address bar.
+    // The navigation must be awaited so that subsequent navigation
+    // (e.g. query parameter updates) resolves against the corrected path.
+    await cx.dispatch('load', { url: canonical, show });
+    const newPath = routePrefix + URI(cx.getters.toBrowserPath(canonical)).path();
+    if (currentRoute.path !== newPath) {
+      await router.replace({ path: newPath, query: currentRoute.query, hash: currentRoute.hash });
+    }
+    return true;
+  }
 
   return createStore({
     strict: import.meta.env.NODE_ENV !== 'production',
@@ -70,6 +192,9 @@ function getStore(config, router) {
     state: Object.assign({}, config, localDefaults(), catalogDefaults(), {
       // Global settings
       database: {}, // STAC object, Error object or Loading object or Promise (when loading)
+      // Loading object (when loading the first page) or an object with the props
+      // type, list, prev, next and optionally loading (a Loading object when loading another page)
+      apiChildren: {},
       downloads: {},
       allowSelectCatalog: !config.catalogUrl,
       globalRequestQueryParameters: config.requestQueryParameters,
@@ -119,7 +244,7 @@ function getStore(config, router) {
         else if (typeof data === 'string') {
           id = data;
         }
-        return state.apiItemsLoading[id] || false;
+        return state.apiItemsLoading[id] instanceof Loading;
       },
       error: state => state.database[state.url] instanceof Error ? state.database[state.url] : null,
       getStac: state => (source, returnErrorObject = false) => {
@@ -161,17 +286,9 @@ function getStore(config, router) {
           return Utils.createLink(state.url, 'root', getDisplayTitle(state.data, state.catalogTitle));
         }
         else if (state.url) {
-          // Fallback: If we detect OGC API like paths, try to guess the paths
-          const uri = URI(state.url);
-          const path = uri.segment(-2);
-          if (['collections', 'items'].includes(path)) {
-            uri.segment(-1, "");
-            uri.segment(-1, "");
-            if (path === 'items') {
-              uri.segment(-1, "");
-              uri.segment(-1, "");
-            }
-            return Utils.createLink(uri.toString(), 'root', state.catalogTitle);
+          const rootUrl = guessParentUrlFromApiPath(state.url, { collections: 1, items: 2 });
+          if (rootUrl) {
+            return Utils.createLink(rootUrl, 'root', state.catalogTitle);
           }
         }
         return null;
@@ -184,14 +301,10 @@ function getStore(config, router) {
           }
         }
 
-        // Fallback: If we detect OGC API like paths, try to guess the paths
         if (state.url) {
-          let uri = URI(state.url);
-          let path = uri.segment(-2);
-          if (['collections', 'items'].includes(path)) {
-            uri.segment(-1, "");
-            uri.segment(-1, "");
-            return Utils.createLink(uri.toString(), 'parent');
+          const parentUrl = guessParentUrlFromApiPath(state.url, { collections: 1, items: 1 });
+          if (parentUrl) {
+            return Utils.createLink(parentUrl, 'parent');
           }
         }
 
@@ -199,33 +312,29 @@ function getStore(config, router) {
       },
       collectionLink: state => {
         if (state.data instanceof STAC) {
-          let link = state.data?.getStacLinkWithRel('collection');
+          let link = state.data.getStacLinkWithRel('collection');
           if (link) {
             return link;
           }
         }
 
-        // Fallback: If we detect OGC API like paths, try to guess the paths
         if (state.url) {
-          let uri = URI(state.url);
-          let path = uri.segment(-2);
-          if (path == 'items') {
-            uri.segment(-1, "");
-            uri.segment(-1, "");
-            return Utils.createLink(uri.toString(), 'collection');
+          const collectionUrl = guessParentUrlFromApiPath(state.url, { items: 1 });
+          if (collectionUrl) {
+            return Utils.createLink(collectionUrl, 'collection');
           }
         }
 
         return null;
       },
       supportsConformance: state => classes => {
-        if(!Array.isArray(classes)) {
+        if (!Array.isArray(classes)) {
           return classes;
         }
         let classRegexp = classes
           .map(c => c.replaceAll('*', '[^/]+').replace(/\/?#/, '/?#'))
           .join('|');
-        let regexp = new RegExp('^(' + classRegexp + ')$');
+        let regexp = new RegExp(`^(${classRegexp})$`);
         return Boolean(state.conformsTo.find(uri => uri.match(regexp)));
       },
 
@@ -238,6 +347,22 @@ function getStore(config, router) {
       canSearchCollections: (state, getters) => {
         return getters.supportsConformance(TYPES.Collections.BasicFilters);
       },
+      searchBrowserLink: (state, getters) => {
+        if (!getters.canSearch) {
+          return null;
+        }
+        let searchLink;
+        if (state.data?.isCatalogLike && !state.data.is(getters.root)) {
+          searchLink = state.data.getSearchLink();
+        }
+        if (searchLink) {
+          return `/search${getters.toBrowserPath(state.data)}`;
+        }
+        else if (getters.root && state.allowSelectCatalog) {
+          return `/search${getters.toBrowserPath(getters.root)}`;
+        }
+        return '/search';
+      },
 
       items: state => {
         if (state.apiItems.length > 0) {
@@ -249,21 +374,55 @@ function getStore(config, router) {
         return [];
       },
       catalogs: state => {
-        let hasCollections = Boolean(state.data instanceof CatalogLike && state.data.getApiCollectionsLink() && state.apiCollections.length > 0);
-        let hasChilds = Boolean(state.data instanceof CatalogLike);
-        let showCollections = !state.apiCatalogPriority || state.apiCatalogPriority === 'collections';
-        let showChilds = !state.apiCatalogPriority || state.apiCatalogPriority === 'childs';
-        let catalogs = [];
-        if (hasCollections && showCollections) {
-          catalogs = catalogs.concat(state.apiCollections);
+        if (!state.data?.isCatalogLike) {
+          return [];
         }
-        if (hasChilds && showChilds) {
-          catalogs = addMissingChildren(catalogs, state.data);
+        // Only include API collections if the entity actually exposes a collections endpoint,
+        // otherwise the list may contain stale data from a previously shown entity.
+        const hasCollections = Boolean(state.data.getApiCollectionsLink() && state.apiCollections.length > 0);
+        return combineChildren(state.data, hasCollections ? state.apiCollections : [], state.apiCatalogPriority);
+      },
+      isApiChildrenLoading: state => stac => Boolean(getApiChildrenLoading(state, stac)),
+      getApiChildren: state => stac => {
+        if (!stac?.isCatalogLike) {
+          return null;
         }
-        return catalogs;
+        return state.apiChildren[stac.getAbsoluteUrl()] || {
+          type: null,
+          list: [],
+          prev: false,
+          next: false
+        };
+      },
+      getChildren: (state, getters) => (stac, priority = null) => {
+        let apiChildren = getters.getApiChildren(stac);
+        if (!apiChildren) {
+          return [];
+        }
+        if (apiChildren instanceof Loading) {
+          // The first page of children is still being loaded
+          apiChildren = { list: [], prev: false, next: false };
+        }
+        return combineChildren(stac, apiChildren.list, priority, {
+          items: stac.getLinksWithRels(['item']),
+          prev: apiChildren.prev,
+          next: apiChildren.next
+        });
       },
 
-      toBrowserPath: (state, getters) => url => {
+      toBrowserPath: (state, getters) => ref => {
+        let url = ref;
+        if (isObject(ref)) {
+          if (typeof ref.getAbsoluteUrl === 'function') { // stac-js object
+            url = ref.getAbsoluteUrl();
+          } else if (ref instanceof urijs) { // urijs object
+            url = ref.toString();
+          } else if (hasText(ref.href)) { // plain STAC Link object
+            url = ref.href;
+          } else {
+            throw new Error('Invalid reference provided to toBrowserPath. Must be a stac-js object, URI object or string URL.');
+          }
+        }
         if (!hasText(url)) {
           url = '/';
         }
@@ -281,7 +440,7 @@ function getStore(config, router) {
           let parts = ['/external'];
           let protocol = absolute.protocol();
           if (protocol !== 'https') {
-            parts.push(protocol + ':');
+            parts.push(`${protocol}:`);
           }
           parts.push(absolute.authority());
           parts.push(absolute.path().replace(/^\//, ''));
@@ -293,7 +452,7 @@ function getStore(config, router) {
           return path;
         }
         else {
-          return '/' + relative.toString();
+          return `/${relative.toString()}`;
         }
       },
       fromBrowserPath: (state, getters) => url => {
@@ -386,7 +545,7 @@ function getStore(config, router) {
           languages[state.locale] = 1;
         }
         return Object.entries(languages)
-          .sort((a,b) => {
+          .sort((a, b) => {
             if (a[1] > b[1]) {
               return -1;
             }
@@ -406,10 +565,10 @@ function getStore(config, router) {
       setColorMode(state, mode) {
         state.colorMode = mode;
       },
-      config(state, config) {
+      config(state, options) {
         // This should only be called from the config action
-        for (let key in config) {
-          let value = config[key];
+        for (let key in options) {
+          let value = options[key];
           switch (key) {
             case 'catalogTitle':
               state.catalogTitle = value;
@@ -430,7 +589,7 @@ function getStore(config, router) {
           }
         }
       },
-      languages(state, {uiLanguage, dataLanguage}) {
+      languages(state, { uiLanguage, dataLanguage }) {
         if (typeof uiLanguage !== 'undefined') {
           i18n.global.locale = uiLanguage;
           state.uiLanguage = uiLanguage || null;
@@ -456,21 +615,10 @@ function getStore(config, router) {
           state.requestHeaders[key] = value;
         }
       },
-      requestAuth(state, callback) {
-        if (typeof callback === 'function') {
-          state.doAuth.push(callback);
-        }
-        else {
-          state.doAuth = [];
-        }
-      },
-      setAuthData(state, value) {
-        state.authData = value;
-      },
       state(state, newState) {
         state.stateQueryParameters = newState;
       },
-      updateState(state, {type, value}) {
+      updateState(state, { type, value }) {
         if (value === null || typeof value === 'undefined') {
           delete state.stateQueryParameters[type];
         }
@@ -521,7 +669,7 @@ function getStore(config, router) {
           state.stateQueryParameters[type].splice(idx, 1);
         }
       },
-      startDownload(state, {href, fileStream}) {
+      startDownload(state, { href, fileStream }) {
         state.downloads[href] = fileStream || true;
       },
       finishDownload(state, href) {
@@ -529,7 +677,9 @@ function getStore(config, router) {
       },
       updateLoading(state, { url, show }) {
         let data = state.database[url];
-        data.show = show || data.show;
+        if (data instanceof Loading) {
+          data.show = show || data.show;
+        }
       },
       loading(state, { url, loading }) {
         state.database[url] = loading;
@@ -539,10 +689,11 @@ function getStore(config, router) {
         }
       },
       loaded(state, { url, data }) {
-        state.database[url] = processSTAC(state, data);
+        state.database[url] = data;
       },
       clear(state, url) {
         delete state.database[url];
+        delete state.apiChildren[url];
       },
       resetCatalog(state, clearAll) {
         Object.assign(state, catalogDefaults());
@@ -554,6 +705,12 @@ function getStore(config, router) {
           state.catalogUrl = config.catalogUrl;
           state.catalogTitle = config.catalogTitle;
           state.database = {};
+          state.apiChildren = {};
+          // Don't leak search filters (incl. CQL built against the previous
+          // API's queryables) into the next catalog
+          if (state.search) {
+            Object.assign(state.search, freshSearchState());
+          }
         }
       },
       resetPage(state) {
@@ -601,19 +758,42 @@ function getStore(config, router) {
       setApiItemsLink(state, link) {
         state.apiItemsLink = link;
       },
-      toggleApiItemsLoading(state, collectionId = '') {
-        if (state.apiItemsLoading[collectionId]) {
-          delete state.apiItemsLoading[collectionId];
+      // Assigns the Loading object for the entity to the apiChildren directly
+      // (like in the database), or to the `loading` property if a list of
+      // children is already available. Removes it again if loading is not set.
+      loadingApiChildren(state, { stac, loading = null }) {
+        if (!stac?.isCatalogLike) {
+          return;
+        }
+        const url = stac.getAbsoluteUrl();
+        const children = state.apiChildren[url];
+        if (loading instanceof Loading) {
+          if (isObject(children) && !(children instanceof Loading)) {
+            children.loading = loading;
+          }
+          else {
+            state.apiChildren[url] = loading;
+          }
+        }
+        else if (children instanceof Loading) {
+          delete state.apiChildren[url];
+        }
+        else if (isObject(children)) {
+          delete children.loading;
+        }
+      },
+      loadingApiItems(state, { id = '', loading = null }) {
+        if (loading instanceof Loading) {
+          state.apiItemsLoading[id] = loading;
         }
         else {
-          state.apiItemsLoading[collectionId] = true;
+          delete state.apiItemsLoading[id];
         }
       },
       setApiItems(state, { data, stac, show }) {
         if (!isObject(data) || !Array.isArray(data.features)) {
           return;
         }
-        let apiItems = data.features.map(feature => processSTAC(state, feature));
 
         if (show) {
           state.apiItems = apiItems;
@@ -637,29 +817,40 @@ function getStore(config, router) {
 
         if (stac instanceof STAC) {
           // ToDo: Prev link only required when state.apiItems is not cached(?) -> cache apiItems?
-          stac.setApiData(apiItems, pages.next, pages.prev);
+          updateApiChildrenState(state, stac, 'items', data.features, pages.next, pages.prev);
         }
       },
-      addApiCollections(state, { data, stac, show }) {
+      addApiCollections(state, { data, stac, show, searching = false, append = false }) {
         if (!isObject(data) || !Array.isArray(data.collections)) {
           return;
         }
 
         // todo: Convert to stac-js
-        let collections = data.collections.map(collection => processSTAC(state, collection));
         let nextLink = Utils.getLinkWithRel(data.links, 'next');
         if (show) {
           state.nextCollectionsLink = nextLink;
-          state.apiCollections = state.apiCollections.concat(collections);
+          state.apiCollections = state.apiCollections.concat(data.collections);
         }
-        if (stac instanceof STAC) {
-          stac.setApiData(collections, nextLink);
+        if (stac?.isSTAC && !searching) {
+          // Accumulate the loaded pages so that all consumers (e.g. the tree)
+          // see all collections that have been loaded so far.
+          let list = data.collections;
+          if (append) {
+            const existing = state.apiChildren[stac.getAbsoluteUrl()];
+            if (existing?.type === 'collections') {
+              list = existing.list.concat(list);
+            }
+          }
+          updateApiChildrenState(state, stac, 'collections', list, nextLink);
         }
       },
-      resetApiCollections(state) {
-        state.apiCollections = [];
+      resetApiCollections(state, { list = [], next = null } = {}) {
+        state.apiCollections = list;
         state.apiItemsLoading = {};
-        state.nextCollectionsLink = null;
+        state.nextCollectionsLink = next || null;
+      },
+      setCurrentApiCollectionsSearchId(state, searchId) {
+        state.currentApiCollectionsSearchId = searchId;
       },
       resetApiItems(state, link) {
         state.apiItems = [];
@@ -670,34 +861,37 @@ function getStore(config, router) {
         state.parents = parents;
       },
       showGlobalError(state, error) {
-        if(error) {
+        if (error) {
           console.trace(error);
         }
         state.globalError = error;
       }
     },
     actions: {
-      async config(cx, config) {
+
+      async config(cx, options) {
         const oldConfig = Object.assign({}, cx.state);
-        cx.commit('config', config);
+        cx.commit('config', options);
         // React on config changes
-        for (let key in config) {
+        const promises = [];
+        for (let key in options) {
           let value = cx.state[key];
           if (value === oldConfig[key]) {
             continue;
           }
           switch (key) {
             case 'authConfig':
-              await cx.dispatch('auth/updateMethod', value);
+              promises.push(cx.dispatch('auth/updateMethod', value));
               break;
           }
         }
+        await Promise.all(promises);
       },
-      async switchLocale(cx, {locale, userSelected}) {
+      async switchLocale(cx, { locale, userSelected }) {
         if (locale === cx.state.locale) {
           return;
         }
-        await cx.dispatch('config', {locale});
+        await cx.dispatch('config', { locale });
 
         // Persist the user selected locale in local storage if configured to do so
         if (cx.state.storeLocale && userSelected) {
@@ -719,6 +913,7 @@ function getStore(config, router) {
         cx.commit('languages', { dataLanguage, uiLanguage });
         cx.commit('setQueryParameter', { type: 'state', key: 'language', value: locale });
       },
+      // eslint-disable-next-line require-await
       async switchDataLocale(cx, { locale }) {
         const dataLanguage = detectDataLanguage(cx.state.data, locale, cx.state.uiLanguage);
         cx.commit('languages', { dataLanguage });
@@ -748,6 +943,7 @@ function getStore(config, router) {
             break;
           }
           let url = toAbsolute(parentLink.href, stac.getAbsoluteUrl());
+          // eslint-disable-next-line no-await-in-loop
           await cx.dispatch('load', { url, omitApi: true });
           let parentStac = cx.getters.getStac(url, true);
           if (parentStac instanceof Error) {
@@ -762,25 +958,37 @@ function getStore(config, router) {
         }
         cx.commit('parents', parents);
       },
-      async tryLogin(cx, {url, action}) {
-        cx.commit('clear', url);
-        cx.commit('errored', { url, error: new BrowserError(i18n.global.t('authentication.unauthorized')) });
-        if (action) {
-          cx.commit('auth/addAction', action);
+      // Executes a request for the given STAC link (or URL) and returns the response.
+      // This is the single place that handles authentication errors for requests:
+      // If the request fails with an authentication error, asks the user to log in
+      // and settles with the result of the retried request after the login.
+      // If the user aborts the login or logs out, fails with the original error.
+      async request(cx, args) {
+        const { link, axiosOptions, noRetry } = (isObject(args) && args.link) ? args : { link: args };
+        try {
+          return await stacRequest(cx, link, axiosOptions);
+        } catch (error) {
+          if (noRetry || !cx.state.authConfig || cx.getters['auth/isLoggedIn'] || !isAuthenticationError(error)) {
+            throw error;
+          }
+          return await new Promise((resolve, reject) => {
+            cx.commit('auth/addAction', {
+              run: () => cx.dispatch('request', { link, axiosOptions, noRetry: true }).then(resolve, reject),
+              cancel: () => reject(error)
+            });
+            cx.dispatch('auth/requestLogin').catch(reject);
+          });
         }
-        await cx.dispatch('auth/requestLogin');
       },
       async load(cx, args) {
         let {
           url, // URL to load
           show, // Show the page when loading is finished, otherwise it's likely loaded in the background for completing specific parts of the page
           force, // Force reloading the data, omit the cache
-          noRetry, // Don't retry on authentication errors
           omitApi, // Don't load API collections or API items yet
           isRoot // Is a request for the root catalog initiated by this function, avoiding endless loops in some mis-configured instances (see https://github.com/radiantearth/stac-browser/issues/580)
         } = args;
 
-        const path = cx.getters.toBrowserPath(url);
         url = toAbsolute(url, cx.state.url);
 
         // Make sure we have all authentication details
@@ -801,11 +1009,11 @@ function getStore(config, router) {
         if (!hasData) {
           cx.commit('loading', { url, loading });
           try {
-            const response = await stacRequest(cx, url);
+            const response = await cx.dispatch('request', { link: url });
             if (!isObject(response.data)) {
               throw new BrowserError(i18n.global.t('errors.invalidJsonObject'));
             }
-            data = createSTAC(response.data, url, path);
+            data = createSTAC(response.data, url, cx);
             if (!(data instanceof STAC)) {
               // Might be a request to the /collections or .../items endpoints,
               // which returns an APICollection, not a STAC object.
@@ -817,9 +1025,15 @@ function getStore(config, router) {
               // If we prefer another language abort redirect to the new language
               let localeLink = data.getLocaleLink(cx.state.dataLanguage);
               if (localeLink) {
-                router.replace(cx.getters.toBrowserPath(localeLink.href));
+                router.replace(cx.getters.toBrowserPath(localeLink));
                 return;
               }
+            }
+
+            // Users may enter a different URL than reported in the STAC document
+            // (e.g. missing trailing slash) - correct the URL and redirect.
+            if (await normalizeCatalogUrl(cx, data, url, show)) {
+              return;
             }
 
             // Handle conformance classes
@@ -831,13 +1045,6 @@ function getStore(config, router) {
               await cx.dispatch('loadOgcApiConformance', conformanceLink);
             }
           } catch (error) {
-            if (!noRetry && cx.state.authConfig && isAuthenticationError(error)) {
-              await cx.dispatch('tryLogin', {
-                url,
-                action: () => cx.dispatch('load', Object.assign({noRetry: true, force: true, show: true}, args))
-              });
-              return;
-            }
             console.error(error);
             cx.commit('errored', { url, error });
             return;
@@ -845,12 +1052,12 @@ function getStore(config, router) {
         }
 
         // Load API Collections
-        const apiCollectionLink = data instanceof CatalogLike && data.getApiCollectionsLink();
-        const apiItemLink = data instanceof CatalogLike && data.getApiItemsLink();
+        const apiCollectionLink = data.isCatalogLike && data.getApiCollectionsLink();
+        const apiItemLink = data.isCatalogLike && data.getApiItemsLink();
         if (!omitApi && apiCollectionLink) {
-          let args = { stac: data, show: loading.show };
+          let loadArgs = { stac: data, show: loading.show };
           try {
-            await cx.dispatch('loadNextApiCollections', args);
+            await cx.dispatch('loadNextApiCollections', loadArgs);
           } catch (error) {
             cx.commit('showGlobalError', {
               message: i18n.global.t('errors.loadApiCollectionsFailed'),
@@ -860,9 +1067,9 @@ function getStore(config, router) {
         }
         // Load API Items
         else if (!omitApi && apiItemLink) {
-          let args = { stac: data, show: loading.show };
+          let loadArgs = { stac: data, show: loading.show };
           try {
-            await cx.dispatch('loadApiItems', args);
+            await cx.dispatch('loadApiItems', loadArgs);
           } catch (error) {
             cx.commit('showGlobalError', {
               message: i18n.global.t('errors.loadApiItemsFailed'),
@@ -881,7 +1088,7 @@ function getStore(config, router) {
               await cx.dispatch('config', { catalogUrl });
             }
           }
-          if (catalogUrl && url !== catalogUrl) {
+          if (catalogUrl && !Utils.equalUrl(url, catalogUrl)) {
             // todo: In principle we could set omitApi: true in many cases here,
             // but until we can reliably load the API data on demand, we fully load it.
             // https://github.com/radiantearth/stac-browser/issues/796
@@ -900,10 +1107,9 @@ function getStore(config, router) {
         }
       },
       async loadApiItems(cx, args) {
-        let { link, stac, show, filters, noRetry } = args;
+        let { link, stac, show, filters } = args;
         let collectionId = stac instanceof STAC ? stac.id : '';
-        cx.commit('toggleApiItemsLoading', collectionId);
-
+        cx.commit('loadingApiItems', { id: collectionId, loading: new Loading(show) });
         try {
           let baseUrl = cx.state.url;
           if (stac instanceof STAC) {
@@ -920,7 +1126,7 @@ function getStore(config, router) {
           }
           link = Utils.addFiltersToLink(link, filters, cx.state.itemsPerPage, sort);
 
-          let response = await stacRequest(cx, link);
+          let response = await cx.dispatch('request', { link });
           if (!isObject(response.data) || !Array.isArray(response.data.features)) {
             throw new BrowserError(i18n.global.t('errors.invalidStacItems'));
           }
@@ -964,18 +1170,7 @@ function getStore(config, router) {
                 else {
                   return null;
                 }
-                url = url.toString();
-                let data = cx.getters.getStac(url);
-                if (data) {
-                  return data;
-                }
-                else {
-                  let itemPath = cx.getters.toBrowserPath(url);
-                  data = createSTAC(item, url, itemPath);
-                  data._incomplete = true;
-                  cx.commit('loaded', { data, url });
-                  return data;
-                }
+                return getOrCreateStac(cx, item, url.toString());
               } catch (error) {
                 console.error(error);
                 return null;
@@ -985,47 +1180,96 @@ function getStore(config, router) {
               cx.commit('setApiItemsLink', link);
             }
             cx.commit('setApiItems', { data: response.data, stac, show });
-            cx.commit('toggleApiItemsLoading', collectionId);
             return response;
           }
-        } catch (error) {
-          cx.commit('toggleApiItemsLoading', collectionId);
-          if (!noRetry && cx.state.authConfig && isAuthenticationError(error)) {
-            await cx.dispatch('tryLogin', {
-              url: link.href,
-              action: () => cx.dispatch('loadApiItems', Object.assign({noRetry: true, force: true}, args))
-            });
-            return;
-          }
-          throw error;
+        } finally {
+          cx.commit('loadingApiItems', { id: collectionId });
         }
       },
       async loadNextApiCollections(cx, args) {
-        let { stac, show, noRetry } = args;
+        let { stac, show, q, searching = false, searchRequestId, next = false } = args;
         let link;
-        if (stac) { // First page
-          // If we load from new collections, reset list of collections.
-          // Otherwise we may append to collections from a parent entity.
-          // https://github.com/radiantearth/stac-browser/issues/617
+        let reset = false;
+        const firstPage = Boolean(stac) && !next;
+        if (firstPage) {
           if (show) {
-            cx.commit('resetApiCollections');
+            // Track request IDs for both searching and non-searching reloads
+            // so stale responses can be discarded consistently.
+            if (searchRequestId === undefined) {
+              // Ensure non-search requests also get an ID so stale responses can be discarded.
+              searchRequestId = Date.now();
+            }
+            cx.commit('setCurrentApiCollectionsSearchId', searchRequestId);
+          }
+          if (!searching) {
+            // Reuse the collections that have already been loaded for this entity
+            // instead of fetching (and starting over from) the first page again.
+            const cached = cx.state.apiChildren[stac.getAbsoluteUrl()];
+            if (cached?.type === 'collections') {
+              if (show) {
+                cx.commit('resetApiCollections', cached);
+              }
+              return;
+            }
+            if (show) {
+              // If we load from new collections, reset list of collections.
+              // Otherwise we may append to collections from a parent entity.
+              // https://github.com/radiantearth/stac-browser/issues/617
+              cx.commit('resetApiCollections');
+            }
+          }
+          else if (show) {
+            // When searching, only reset after the request to ensure the previous list remains visible if the request fails.
+            reset = true;
           }
           link = stac.getLinkWithRel('data');
           let sort = null;
           if (cx.getters.supportsConformance(TYPES.Collections.Sort)) {
             sort = cx.state.defaultCollectionSort;
           }
-          link = Utils.addFiltersToLink(link, {}, cx.state.collectionsPerPage, sort);
+          const filters = {};
+          if (cx.getters.supportsConformance(TYPES.Collections.FreeText) && searching && size(q) > 0) {
+            filters.q = q;
+          }
+          link = Utils.addFiltersToLink(link, filters, cx.state.collectionsPerPage, sort);
         }
-        else { // Second page and after
+        else if (next && !searching && stac?.isCatalogLike) {
+          // Load the next page of collections for the given entity (e.g. from the tree)
+          const cached = cx.state.apiChildren[stac.getAbsoluteUrl()];
+          if (cached?.type !== 'collections') {
+            return;
+          }
+          link = cached.next;
+          // Keep the currently shown collection list in sync if it shows the same list
+          show = show || cx.state.nextCollectionsLink === link;
+        }
+        else { // Second page and after for the currently shown collection list
           stac = cx.state.data;
           link = cx.state.nextCollectionsLink;
         }
         if (!link) {
           return;
         }
+        // Assign a Loading object to the apiChildren while loading so that the same
+        // page is not requested multiple times in parallel, e.g. by the tree and the
+        // collection list auto-loading the next page simultaneously.
+        // Requests for search results are not tracked, they don't belong to the children.
+        const track = !searching && stac?.isCatalogLike;
+        if (track) {
+          const pending = getApiChildrenLoading(cx.state, stac);
+          if (pending && (pending.show || !show)) {
+            // The pending request covers everything this request would do
+            return;
+          }
+          cx.commit('loadingApiChildren', { stac, loading: new Loading(show) });
+        }
         try {
-          let response = await stacRequest(cx, link);
+          let response = await cx.dispatch('request', { link });
+          // Check if this response is still relevant (not superseded by a newer search request)
+          if (searchRequestId !== undefined && searchRequestId !== cx.state.currentApiCollectionsSearchId) {
+            // Discard results from stale search requests
+            return;
+          }
           if (!isObject(response.data) || !Array.isArray(response.data.collections)) {
             throw new BrowserError(i18n.global.t('errors.invalidStacCollections'));
           }
@@ -1043,7 +1287,7 @@ function getStore(config, router) {
                 if (baseUrl) {
                   baseUrl = URI(baseUrl);
                   if (!baseUrl.path().endsWith('/')) {
-                    baseUrl.path(baseUrl.path() + '/');
+                    baseUrl.path(`${baseUrl.path()}/`);
                   }
                   url = toAbsolute(`collections/${collection.id}`, baseUrl, false);
                 }
@@ -1051,64 +1295,37 @@ function getStore(config, router) {
               if (!url) {
                 return null; // We can't detect a URL, skip this flawed collection
               }
-              url = url.toString();
-              let data = cx.getters.getStac(url);
-              if (data) {
-                return data;
-              }
-              else {
-                let collectionPath = cx.getters.toBrowserPath(url);
-                data = createSTAC(collection, url, collectionPath);
-                data._incomplete = true;
-                cx.commit('loaded', { data, url });
-                return data;
-              }
+              return getOrCreateStac(cx, collection, url.toString());
+            }).filter(Boolean);
+            if (reset) {
+              cx.commit('resetApiCollections');
+            }
+            cx.commit('addApiCollections', {
+              data: response.data, stac, show, searching, append: !firstPage
             });
-            cx.commit('addApiCollections', { data: response.data, stac, show });
           }
-        } catch (error) {
-          if (!noRetry && cx.state.authConfig && isAuthenticationError(error)) {
-            await cx.dispatch('tryLogin', {
-              url: link.href,
-              action: () => cx.dispatch('loadNextApiCollections', Object.assign({noRetry: true, force: true}, args))
-            });
-            return;
+        } finally {
+          if (track) {
+            cx.commit('loadingApiChildren', { stac });
           }
-          throw error;
         }
       },
       async loadOgcApiConformance(cx, link) {
-        let response = await stacRequest(cx, link);
+        let response = await cx.dispatch('request', { link });
         if (isObject(response.data) && Array.isArray(response.data.conformsTo)) {
           cx.commit('setConformanceClasses', response.data.conformsTo);
         }
       },
-      async retryAfterAuth(cx) {
-        let errorFn = error => cx.commit('showGlobalError', {
-          error,
-          message: i18n.global.t('errors.authFailed')
-        });
-
-        for (let callback of cx.state.doAuth) {
-          try {
-            let p = callback();
-            if (p instanceof Promise) {
-              p.catch(errorFn);
-            }
-          } catch (error) {
-            errorFn(error);
-          }
-        }
-      },
-      async altDownload(cx, link) {
+      async altDownload(cx, args) {
+        const { link, noRetry } = (isObject(args) && args.link) ? args : { link: args };
         const options = stacRequestOptions(cx, link);
         try {
           // Enable the loading indicator
-          cx.commit('startDownload', {href: options.url});
+          cx.commit('startDownload', { href: options.url });
           const StreamSaver = (await import('streamsaver-js')).default;
 
           const uri = URI(window.origin.toString());
-          uri.path(Utils.removeTrailingSlash(cx.state.pathPrefix) + '/mitm.html');
+          uri.path(`${Utils.removeTrailingSlash(cx.state.pathPrefix)}/mitm.html`);
           StreamSaver.mitm = uri.toString();
 
           // Convert from axios to fetch
@@ -1124,8 +1341,14 @@ function getStore(config, router) {
           const res = await fetch(url, axiosOptions);
           // todo: use getErrorMessage / getErrorCode instead?
           if (res.status >= 400) {
+            if ([401, 403].includes(res.status) && !noRetry && cx.state.authConfig && !cx.getters['auth/isLoggedIn']) {
+              // Ask the user to log in and restart the download afterwards
+              cx.commit('auth/addAction', () => cx.dispatch('altDownload', { link, noRetry: true }));
+              await cx.dispatch('auth/requestLogin');
+              return;
+            }
             let msg;
-            switch(res.status) {
+            switch (res.status) {
               case 401:
                 msg = i18n.global.t('errors.unauthorized');
                 break;
@@ -1147,7 +1370,7 @@ function getStore(config, router) {
 
           const filename = Utils.assetFilename(link, res);
           const fileStream = StreamSaver.createWriteStream(filename);
-          cx.commit('startDownload', {href: options.url, fileStream});
+          cx.commit('startDownload', { href: options.url, fileStream });
           await res.body.pipeTo(fileStream);
         } catch (error) {
           if (error instanceof DOMException && error.name === 'AbortError') {

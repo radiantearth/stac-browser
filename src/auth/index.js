@@ -59,7 +59,7 @@ export default class Auth {
   async init() {
   }
 
-  async login() {
+  async login() { // eslint-disable-line require-await
     this.storeSession();
   }
 
@@ -69,13 +69,13 @@ export default class Auth {
     }
   }
 
-  async logout(/*credentials*/) {
+  async logout(/*credentials*/) { // eslint-disable-line require-await
     this.storeSession();
   }
 
   // Tries to resume a user session after e.g. page reload.
   // Returns true if a session could be resumed, false otherwise.
-  async resume() {
+  async resume() { // eslint-disable-line require-await
     return false;
   }
 
@@ -85,7 +85,7 @@ export default class Auth {
     }
   }
 
-  async close() {
+  async close() { // eslint-disable-line require-await
     return;
   }
 

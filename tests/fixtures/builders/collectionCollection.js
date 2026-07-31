@@ -46,13 +46,14 @@ export default class CollectionCollection extends APICollection {
     return this;
   }
   
-  build() {
+  build(searchParams = {}) {
     const data = super.build();
     for(let collection in data.collections){
       if(data.collections[collection] instanceof Collection){
         data.collections[collection] = data.collections[collection].build();
       }
     }
+    this.paginateData('collections', searchParams);
     return data;
   }
 }

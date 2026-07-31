@@ -32,16 +32,14 @@ export default class BrowserStorage {
         this.engine = new NoOp();
       }
     }
+    else if (BrowserStorage.enabled(window.localStorage)) {
+      this.engine = window.localStorage;
+    }
+    else if (navigator.cookieEnabled) {
+      this.engine = new Cookies();
+    }
     else {
-      if (BrowserStorage.enabled(window.localStorage)) {
-        this.engine = window.localStorage;
-      }
-      else if (navigator.cookieEnabled) {
-        this.engine = new Cookies();
-      }
-      else {
-        this.engine = new NoOp();
-      }
+      this.engine = new NoOp();
     }
   }
 

@@ -2,7 +2,7 @@
 
 This is a full-fledged [Spatio-Temporal Asset Catalog (STAC)](https://github.com/radiantearth/stac-spec) browser for STAC APIs and static STAC catalogs.
 
-Version: **5.0.0-dev** (supports all STAC versions between 0.6.0 and 1.1.0)
+Version: **6.0.0-dev** (supports all STAC versions between 0.6.0 and 1.1.0)
 
 This package has also been published to npm as [`@radiantearth/stac-browser`](https://www.npmjs.com/package/@radiantearth/stac-browser).
 
@@ -40,7 +40,7 @@ If you care about STAC Browser and have some funds to support the future of STAC
 
 ## Examples
 
-A demo instance is running at <https://radiantearth.github.io/stac-browser/>.
+A demo instance is running at <https://browser.moregeo.it>.
 
 The catalog section of [STAC Index](https://stacindex.org) is also built on top of STAC Browser (currently v2).
 

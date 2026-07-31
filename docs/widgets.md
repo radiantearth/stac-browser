@@ -8,10 +8,13 @@ content you need - using either the pre-defined widgets or your own Vue componen
   - [Configuration File](#configuration-file)
   - [Using Pre-defined Widgets](#using-pre-defined-widgets)
   - [Using Custom Components](#using-custom-components)
+  - [Conditional Widgets](#conditional-widgets)
 - [Pre-defined Widgets](#pre-defined-widgets)
   - [AlertBox](#alertbox)
   - [CustomText](#customtext)
+  - [Featured](#featured)
 - [Hooks](#hooks)
+  - [StacBrowser.vue](#stacbrowservue)
   - [views/ApiSearch.vue](#viewsapisearchvue)
   - [views/Catalog.vue](#viewscatalogvue)
   - [views/Item.vue](#viewsitemvue)
@@ -68,6 +71,32 @@ Make sure the beginning of the config file includes:
 import { defineAsyncComponent } from 'vue';
 ```
 
+### Conditional Widgets
+
+By default, a widget renders whenever its hook renders. To limit a widget to
+specific situations, add a `condition` function to the widget definition.
+The widget is only shown when the function returns `true`. It receives an
+object with the currently shown STAC entity (`data`) and the Vuex store
+`state` and `getters`.
+
+For example, to show a widget only on the landing page:
+
+```js
+{
+  id: 'AlertBox',
+  condition: ({ data, getters }) => Boolean(data && getters.root && data.is(getters.root)),
+  props: {
+    text: 'Welcome!'
+  }
+}
+```
+
+Or only for collections:
+
+```js
+condition: ({ data }) => Boolean(data?.isCollection)
+```
+
 ## Pre-defined Widgets
 
 All pre-defined widgets are stored in [`src/widgets`](../src/widgets).
@@ -79,18 +108,46 @@ Renders a dismissible alert banner.
 | Props         | Type    | Default     | Description |
 | ------------- | ------- | ----------- | ----------- |
 | `title`       | String  | `''`        | Bold heading shown before the text. |
-| `text`        | String  | `''`        | The alert message body. |
+| `text`        | String  | `''`        | The alert message body, CommonMark (Markdown) is supported. |
 | `variant`     | String  | `'warning'` | Color variant: `'warning'`, `'danger'`, `'success'`, `'info'`, etc. |
 | `dismissible` | Boolean | `false`     | Whether the user can close the alert. |
+| `allowHTML`   | Boolean | `false`     | Allows HTML tags in the `text`. |
 
 ### CustomText
 
 Renders a simple text with a heading.
 
-| Props   | Type   | Default | Description |
-| ------- | ------ | ------- | ----------- |
-| `title` | String | `''`    | Rendered as an `<h3>` heading. |
-| `text`  | String | `''`    | Rendered as a `<p>` paragraph. |
+| Props       | Type    | Default | Description |
+| ----------- | ------- | ------- | ----------- |
+| `title`     | String  | `''`    | Rendered as an `<h3>` heading. |
+| `text`      | String  | `''`    | Rendered as the body, CommonMark (Markdown) is supported. |
+| `allowHTML` | Boolean | `false` | Allows HTML tags in the `text`. |
+
+### Featured
+
+Renders a list of "featured" STAC catalogs or collections.
+A typical placement is the `view-catalog-catalogs-start` hook, which shows the featured entities right above the regular collection list.
+The widget only renders on the landing page (the root catalog).
+
+| Props      | Type   | Default      | Description |
+| ---------- | ------ | ------------ | ----------- |
+| `entities` | Array  | **required** | The entities to feature, shown in the given order. See below for the supported types of entries. |
+| `title`    | String | `null`       | Rendered as the heading of the list. Can be given as plain text or as the key of a phrase from the locales (e.g. defined in the `custom.json` files, see the [localization docs](localization.md#custom-phrases)). If not given, defaults to a localized version of "Featured". |
+| `view`     | String | `'cards'`    | How the entities are shown: `'cards'` or `'list'`. Set to `null` to follow the view mode that the user has chosen for the other lists. |
+
+Each entry in `entities` can be one of the following:
+
+- **A collection ID** (a string without a slash, e.g. `'sentinel-2-l2a'`):
+  Only works for STAC APIs.
+- **A URL** (a string with a slash, absolute or relative to the catalog,
+  e.g. `'https://example.com/api/collections/xyz'` or `'./data/catalog.json'`):
+  Works for both STAC APIs and static catalogs.
+  Entities that fail to load are not shown.
+- **A (partially) complete STAC entity as object**
+  (e.g. `{ id: 'xyz', title: 'My Collection', description: '…', links: […] }`):
+  Works for both STAC APIs and static catalogs. The object must contain a
+  `self` link or (for APIs) an `id`, otherwise the entity is not shown.
+  STAC Browser loads the full version of the entity when needed.
 
 ## Hooks
 

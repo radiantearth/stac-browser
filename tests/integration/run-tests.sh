@@ -12,7 +12,6 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 COMPOSE_FILE="$SCRIPT_DIR/docker-compose.yml"
 GENERATED_DIR="$SCRIPT_DIR/generated"
 

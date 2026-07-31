@@ -34,7 +34,9 @@ export async function mockStacResource(worker, url, mockData, options = {}) {
   await worker.use(
     http.all(url, async () => {
       if (delay > 0) {
-        await new Promise(resolve => setTimeout(resolve, delay));
+        await new Promise(resolve => {
+          setTimeout(resolve, delay);
+        });
       }
       return HttpResponse.json(mockData, { status });
     }),
@@ -97,6 +99,75 @@ export async function waitForMapReady(page) {
 }
 
 /**
+* Read the STAC Browser map state: the OpenLayers view (zoom + center in lon/lat)
+* and the rendered footprint geometry. The OL map isn't exposed to the DOM, so we
+* locate it via the MapView component instance, walking up from the map element
+* through Vue's `__vueParentComponent`. This works in dev builds and in the e2e
+* production build (which enables `__VUE_PROD_DEVTOOLS__` via STAC_BROWSER_E2E);
+* real production builds are unaffected, so no test hook is needed in the
+* application code. Assumes the map uses Web Mercator (EPSG:3857), the STAC
+* Browser default. `lon`/`lat` are `null` when the view has no center yet.
+*
+* @param {import('@playwright/test').Page} page
+* @returns {Promise<{zoom: number, lon: number|null, lat: number|null, footprintType: string|null, footprintPolygons: number}|null>} map state, or null if no map found
+*/
+export function getMapState(page) {
+  return page.evaluate(() => {
+    // Locate the OpenLayers map via the MapView component instance, walking up
+    // from the map element through Vue's `__vueParentComponent`. This is available
+    // in dev builds and in the e2e production build (which sets
+    // __VUE_PROD_DEVTOOLS__ via STAC_BROWSER_E2E); real production builds are
+    // unaffected, so no test hook is needed in the application code.
+    let el = document.querySelector('.map-container .map') || document.querySelector('.map');
+    let map = null;
+    while (el) {
+      const inst = el.__vueParentComponent;
+      let candidate;
+      try {
+        candidate = inst?.proxy?.map ?? inst?.ctx?.map;
+      } catch {
+        candidate = null;
+      }
+      if (candidate && typeof candidate.getView === 'function') {
+        map = candidate;
+        break;
+      }
+      el = el.parentElement;
+    }
+    if (!map) {
+      return null;
+    }
+
+    const view = map.getView();
+    const center = view.getCenter();
+    const zoom = view.getZoom();
+
+    // Rendered footprint: ol-stac splits an antimeridian-crossing footprint into a
+    // MultiPolygon, so report the number of polygons.
+    const bounds = map.getAllLayers().find(l => l.get && l.get('bounds'));
+    const features = (bounds?.getSource?.().getFeatures?.()) ?? [];
+    const geom = features[0]?.getGeometry?.();
+    const footprintType = geom?.getType?.() ?? null;
+    let footprintPolygons = 0;
+    if (footprintType === 'MultiPolygon') {
+      footprintPolygons = geom.getPolygons().length;
+    } else if (footprintType === 'Polygon') {
+      footprintPolygons = 1;
+    }
+
+    let lon = null;
+    let lat = null;
+    if (center) {
+      // Inverse spherical Mercator (EPSG:3857 -> EPSG:4326).
+      const R = 20037508.342789244;
+      lon = (center[0] / R) * 180;
+      lat = (180 / Math.PI) * (2 * Math.atan(Math.exp((center[1] / R) * Math.PI)) - Math.PI / 2);
+    }
+    return { zoom, lon, lat, footprintType, footprintPolygons };
+  });
+}
+
+/**
 * Wait until the bounding-box coordinate inputs have been auto-populated
 * (i.e. all four fields are non-empty).
 * 
@@ -104,10 +175,10 @@ export async function waitForMapReady(page) {
 */
 export async function waitForBboxInputsPopulated(page) {
   const labels = [/west longitude/i, /south latitude/i, /east longitude/i, /north latitude/i];
-  for (const label of labels) {
+  await Promise.all(labels.map(label => {
     const input = page.getByLabel(label);
-    await expect(input).not.toHaveValue('', { timeout: 10000 });
-  }
+    return expect(input).not.toHaveValue('', { timeout: 10000 });
+  }));
 }
 
 /**
@@ -154,7 +225,7 @@ export async function openSourcePanel(page) {
 * @param {import('@playwright/test').Page} page
 * @returns {Promise<string>} clipboard content
 */
-export const readClipboard = async (page) => page.evaluate(() => navigator.clipboard.readText());
+export const readClipboard = (page) => page.evaluate(() => navigator.clipboard.readText());
 
 /**
 * Clear system clipboard.
@@ -162,7 +233,7 @@ export const readClipboard = async (page) => page.evaluate(() => navigator.clipb
 * @param {import('@playwright/test').Page} page
 * @returns {Promise<void>}
 */
-export const clearClipboard = async (page) => page.evaluate(() => navigator.clipboard.writeText(''));
+export const clearClipboard = (page) => page.evaluate(() => navigator.clipboard.writeText(''));
 
 /**
 * Click the "Example Code" button and wait for the modal to appear.
@@ -189,7 +260,7 @@ export const openExampleCodeModal = async (page) => {
 export const copyCodeFromModal = async (page, panel) => {
   await clearClipboard(page);
   await panel.locator('[id="exampleCodeCopyExampleCode"]').click();
-  return expect.poll(async () => readClipboard(page)).not.toEqual('');
+  return expect.poll(() => readClipboard(page)).not.toEqual('');
 };
 
 /**
@@ -203,7 +274,7 @@ export const copyCodeFromModal = async (page, panel) => {
 export const copyDependenciesFromModal = async (page, panel) => {
   await clearClipboard(page);
   await panel.locator('[id="exampleCodeCopyDependencies"]').click();
-  return expect.poll(async () => readClipboard(page)).not.toEqual('');
+  return expect.poll(() => readClipboard(page)).not.toEqual('');
 };
 
 /**
@@ -217,5 +288,5 @@ export const copyDependenciesFromModal = async (page, panel) => {
 export const copyFilenameFromModal = async (page, panel) => {
   await clearClipboard(page);
   await panel.locator('[id="exampleCodeCopyOutputFilename"]').click();
-  return expect.poll(async () => readClipboard(page)).not.toEqual('');
+  return expect.poll(() => readClipboard(page)).not.toEqual('');
 };

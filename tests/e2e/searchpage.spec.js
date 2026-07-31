@@ -23,16 +23,16 @@ const fillBboxInputs = async (page, values) => {
   const eastLonInput = page.getByLabel(/east longitude/i);
   const northLatInput = page.getByLabel(/north latitude/i);
   
-  if (values.westLon != null) {
+  if (values.westLon !== null && values.westLon !== undefined) {
     await westLonInput.fill(values.westLon);
   }
-  if (values.southLat != null) {
+  if (values.southLat !== null && values.southLat !== undefined) {
     await southLatInput.fill(values.southLat);
   }
-  if (values.eastLon != null) {
+  if (values.eastLon !== null && values.eastLon !== undefined) {
     await eastLonInput.fill(values.eastLon);
   }
-  if (values.northLat != null) {
+  if (values.northLat !== null && values.northLat !== undefined) {
     await northLatInput.fill(values.northLat);
   }
 };
@@ -642,12 +642,12 @@ test.describe('STAC Browser Search page', () => {
     });
   });
   test('Catalog search results preserve applied filters when paginating', async ({ page, worker }) => {
-  api = API.minimalApi({}, {
-    defaultLimit: 5,
-    prevLinkEnabled: true,
-    firstLinkEnabled: true,
-    lastLinkEnabled: true
-  });
+    api = API.minimalApi({}, {
+      defaultLimit: 5,
+      prevLinkEnabled: true,
+      firstLinkEnabled: true,
+      lastLinkEnabled: true
+    });
     let collection = api.addCollection('collection').setMetadata({ title: 'Test Collection' });
     api.addManyItems(collection, 13);
     api.addCollectionsExtension().addItemsExtension().addSearchExtension();
@@ -716,14 +716,24 @@ test.describe('STAC Browser Search page', () => {
       }
 
       const firstSearchPromise = page.waitForRequest(req => {
-         if (!(req.resourceType() === 'xhr' || req.resourceType() === 'fetch')) return false;
-         if (!(req.url().includes('/items') || req.url().includes('/search'))) return false;
-         if (req.url().includes('limit=3')) return true;
-         if (req.method() === 'POST' && req.postData()) {
-           try { return JSON.parse(req.postData()).limit === 3; } catch { return false; }
-         }
-         return false;
-       });
+        if (!(req.resourceType() === 'xhr' || req.resourceType() === 'fetch')) {
+          return false;
+        }
+        if (!(req.url().includes('/items') || req.url().includes('/search'))) {
+          return false;
+        }
+        if (req.url().includes('limit=3')) {
+          return true;
+        }
+        if (req.method() === 'POST' && req.postData()) {
+          try {
+            return JSON.parse(req.postData()).limit === 3;
+          } catch {
+            return false;
+          }
+        }
+        return false;
+      });
       
       const limitInput = page.getByLabel(/items per page/i);
       await limitInput.fill('3');
@@ -734,14 +744,24 @@ test.describe('STAC Browser Search page', () => {
 
     await test.step('Click Next page and verify limit filter is preserved', async () => {
       const nextPagePromise = page.waitForRequest(req => {
-         if (!(req.resourceType() === 'xhr' || req.resourceType() === 'fetch')) return false;
-         if (!(req.url().includes('/items') || req.url().includes('/search'))) return false;
-         if (req.url().includes('limit=3')) return true;
-         if (req.method() === 'POST' && req.postData()) {
-           try { return JSON.parse(req.postData()).limit === 3; } catch { return false; }
-         }
-         return false;
-       });
+        if (!(req.resourceType() === 'xhr' || req.resourceType() === 'fetch')) {
+          return false;
+        }
+        if (!(req.url().includes('/items') || req.url().includes('/search'))) {
+          return false;
+        }
+        if (req.url().includes('limit=3')) {
+          return true;
+        }
+        if (req.method() === 'POST' && req.postData()) {
+          try {
+            return JSON.parse(req.postData()).limit === 3;
+          } catch {
+            return false;
+          }
+        }
+        return false;
+      });
       
       const nextButton = page.getByRole('button', { name: /next/i }).first();
       await nextButton.click();
@@ -774,13 +794,21 @@ test.describe('STAC Browser Search page', () => {
       await limitInput.fill('6');
       
       const searchPromise = page.waitForRequest(req => {
-         if (!(req.resourceType() === 'xhr' || req.resourceType() === 'fetch')) return false;
-         if (req.url().includes('limit=6')) return true;
-         if (req.method() === 'POST' && req.url().includes('/search') && req.postData()) {
-           try { return JSON.parse(req.postData()).limit === 6; } catch { return false; }
-         }
-         return false;
-       });
+        if (!(req.resourceType() === 'xhr' || req.resourceType() === 'fetch')) {
+          return false;
+        }
+        if (req.url().includes('limit=6')) {
+          return true;
+        }
+        if (req.method() === 'POST' && req.url().includes('/search') && req.postData()) {
+          try {
+            return JSON.parse(req.postData()).limit === 6;
+          } catch {
+            return false;
+          }
+        }
+        return false;
+      });
       await page.getByRole('button', { name: /submit/i }).click();
       await searchPromise;
     });
@@ -796,6 +824,95 @@ test.describe('STAC Browser Search page', () => {
       
       const resetReq = await resetSearchPromise;
       expect(resetReq.url()).not.toMatch(/[?&]limit=/);
+    });
+  });
+    test('Spatial extent is preserved when switching from Collections tab to Items tab', async ({ page, worker }) => {
+    api = API.minimalApi(
+      {},
+      {
+        defaultLimit: 5,
+        prevLinkEnabled: true,
+        firstLinkEnabled: true,
+        lastLinkEnabled: true
+      }
+    );
+
+    let collection1 = api.addCollection('collection1')
+      .setMetadata({ title: 'Test Collection 1' });
+    let collection2 = api.addCollection('collection2')
+      .setMetadata({ title: 'Test Collection 2' });
+
+    api.addManyItems(collection1, 50);
+    api.addManyItems(collection2, 10);
+    api.addCollectionsExtension()
+      .addItemsExtension()
+      .addSearchExtension();
+
+    api.root.addConformsTo('https://api.stacspec.org/v1.0.0/collection-search');
+
+    await api.createServer(worker);
+
+    await page.goto(api.root.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    await test.step('Navigate to the Search page', async () => {
+      await page.getByRole('button', { name: /^search$/i }).click();
+      await waitForBrowserReady(page);
+    });
+
+    await test.step('Verify both tabs are visible', async () => {
+      await expect(page.getByRole('tab', { name: /search for collections/i })).toBeVisible();
+      await expect(page.getByRole('tab', { name: /search for items/i })).toBeVisible();
+    });
+
+    await test.step('Enable spatial extent and fill in bbox on the Collections tab', async () => {
+      const enableSpatialCheckbox = page.getByRole('checkbox', { name: /filter by spatial extent/i });
+      await enableSpatialCheckbox.check();
+
+      await page.waitForLoadState('networkidle');
+      await waitForMapReady(page);
+
+      await fillBboxInputs(page, {
+        westLon: '-116.1',
+        southLat: '44.3',
+        eastLon: '-104',
+        northLat: '49'
+      });
+
+      await page.getByLabel(/north latitude/i).blur();
+      await waitForBboxInputsPopulated(page);
+
+      await expect(page.getByLabel(/west longitude/i)).toHaveValue('-116.1');
+      await expect(page.getByLabel(/south latitude/i)).toHaveValue('44.3');
+      await expect(page.getByLabel(/east longitude/i)).toHaveValue('-104');
+      await expect(page.getByLabel(/north latitude/i)).toHaveValue('49');
+    });
+
+    await test.step('Switch to the Search for Items tab', async () => {
+      await page.getByRole('tab', { name: /search for items/i }).click();
+      await waitForBrowserReady(page);
+    });
+
+    await test.step('Verify bbox values are preserved on the Items tab', async () => {
+      const enableSpatialCheckbox = page.getByRole('checkbox', { name: /filter by spatial extent/i });
+      await expect(enableSpatialCheckbox).toBeChecked();
+
+      await expect(page.getByLabel(/west longitude/i)).toHaveValue('-116.1');
+      await expect(page.getByLabel(/south latitude/i)).toHaveValue('44.3');
+      await expect(page.getByLabel(/east longitude/i)).toHaveValue('-104');
+      await expect(page.getByLabel(/north latitude/i)).toHaveValue('49');
+    });
+
+    await test.step('Submit from Items tab and verify bbox is in POST body', async () => {
+      const requestPromise = waitForSearchPost(page);
+      await page.getByRole('button', { name: /submit/i }).click();
+
+      const { body } = await requestPromise;
+      expect(body.bbox).toHaveLength(4);
+      expect(body.bbox[0]).toBeCloseTo(-116.1, 2);
+      expect(body.bbox[1]).toBeCloseTo(44.3, 2);
+      expect(body.bbox[2]).toBeCloseTo(-104, 2);
+      expect(body.bbox[3]).toBeCloseTo(49, 2);
     });
   });
 });

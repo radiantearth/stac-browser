@@ -35,10 +35,6 @@ export default {
       type: Object,
       required: true
     },
-    hasAlternatives: {
-      type: Boolean,
-      default: false
-    },
     shown: {
       type: Boolean,
       default: false
@@ -56,14 +52,6 @@ export default {
         return asset;
       }
       return this.asset;
-    },
-    tileRendererType() {
-      if (this.buildTileUrlTemplate && !this.useTileLayerAsFallback) {
-        return 'server';
-      }
-      else {
-        return 'client';
-      }
     },
     fileFormat() {
       if (typeof this.asset.type === "string" && this.asset.type.length > 0) {

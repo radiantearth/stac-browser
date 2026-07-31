@@ -1,10 +1,10 @@
 // Add deprecated CQL conformance classes for stac-fastapi:
 // https://github.com/stac-utils/stac-fastapi/issues/539
-const CQL_TEXT = [
+export const CQL_TEXT = [
   'https://api.stacspec.org/v1.*/item-search#filter:cql-text', // deprecated
   'http://www.opengis.net/spec/cql2/1.*/conf/cql2-text'
 ];
-const CQL_JSON = [
+export const CQL_JSON = [
   'https://api.stacspec.org/v1.*/item-search#filter:cql-json', // deprecated
   'http://www.opengis.net/spec/cql2/1.*/conf/cql2-json'
 ];

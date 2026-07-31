@@ -1,5 +1,5 @@
 <template>
-  <div class="ol-location ol-unselectable ol-control" style="pointer-events: auto;">
+  <div class="ol-location ol-unselectable ol-control">
     <button @click.prevent.stop="request" :title="$t('mapping.location.description')">
       <b-icon-pin-map-fill />
     </button>
@@ -48,6 +48,7 @@ export default {
 
 <style lang="scss" scoped>
 .ol-location {
+  pointer-events: auto;
   z-index: 1;
   left: 0.5em;
   top: calc(3.75em + 6px);

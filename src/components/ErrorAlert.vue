@@ -1,5 +1,5 @@
 <template>
-  <b-alert variant="danger" show @dismissed="$emit('close')" :dismissible="dismissible">
+  <b-alert variant="danger" show @close="$emit('close')" :dismissible="dismissible">
     <p class="message">{{ message || $t('errors.default') }}</p>
     <dl class="error" v-if="error && error.message">
       <dt>{{ $t('errors.labels.cause') }}</dt>

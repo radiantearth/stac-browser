@@ -1,6 +1,9 @@
 <template>
   <section>
-    <b-button v-for="href, service in urls" :key="service" class="service me-1" :class="service" :href="href" target="_blank">
+    <b-button
+      v-for="href, service in urls" :key="service" class="service me-1"
+      :class="service" :href="href" target="_blank" rel="noopener noreferrer"
+    >
       <component :is="`icon-${service}`" /> {{ $t(`source.share.${service}`) }}
     </b-button>
   </section>

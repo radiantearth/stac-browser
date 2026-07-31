@@ -77,10 +77,6 @@ export default defineComponent({
       return defGen?.language;
     }
   },
-  created() {
-    this.loadSelectedMethod();
-    this.loadSelectedTab();
-  },
   watch: {
     selectedTab(value) {
       this.saveSelectedTab(value);
@@ -88,6 +84,10 @@ export default defineComponent({
     selectedMethod(value) {
       this.storage.set(METHOD_STORAGE_KEY, value);
     }
+  },
+  created() {
+    this.loadSelectedMethod();
+    this.loadSelectedTab();
   },
   methods: {
     loadSelectedMethod() {

@@ -75,7 +75,7 @@ export default function getStore(router) {
             await cx.dispatch('executeActions');
           }
           else {
-            cx.commit('resetActions');
+            await cx.dispatch('cancelActions');
           }
         };
 
@@ -104,6 +104,9 @@ export default function getStore(router) {
       },
       async abortLogin(cx) {
         cx.commit('setInProgress', false);
+        // The user actively declined to log in, so don't keep the pending
+        // actions around for a (potentially much later) login.
+        await cx.dispatch('cancelActions');
       },
       async requestLogout(cx) {
         if (!cx.getters.isLoggedIn) {
@@ -121,7 +124,7 @@ export default function getStore(router) {
         }
       },
       // Format the value and add it to query parameters or headers
-      async updateCredentials(cx, value = null) {
+      async updateCredentials(cx, value = null) { // eslint-disable-line require-await
         cx.commit('setCredentials', value);
         const intent = cx.getters.method.updateStore(value);
         if (intent.query) {
@@ -135,15 +138,33 @@ export default function getStore(router) {
           cookie.setItem(intent.cookie.key, intent.cookie.value);
         }
       },
-      async executeActions(cx) {
-        for (let callback of cx.state.actions) {
+      // Actions are either plain functions or objects with a `run` function
+      // and an optional `cancel` function (see cancelActions).
+      async executeActions(cx) { // eslint-disable-line require-await
+        for (let action of cx.state.actions) {
+          const run = typeof action === 'function' ? action : action.run;
           try {
-            const p = callback();
+            const p = run();
             if (p instanceof Promise) {
               p.catch(error => handleAuthError(cx, error));
             }
           } catch (error) {
             handleAuthError(cx, error);
+          }
+        }
+        cx.commit('resetActions');
+      },
+      // Discards the pending actions, e.g. when the user aborts the login or logs out.
+      // Notifies the actions through their `cancel` function so that pending
+      // promises can settle instead of hanging around forever.
+      async cancelActions(cx) { // eslint-disable-line require-await
+        for (let action of cx.state.actions) {
+          if (typeof action.cancel === 'function') {
+            try {
+              action.cancel();
+            } catch (error) {
+              console.error(error);
+            }
           }
         }
         cx.commit('resetActions');

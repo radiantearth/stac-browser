@@ -101,3 +101,13 @@ HTTP mocking is driven by [playwright-msw](https://github.com/valendres/playwrig
 | `copyCodeFromModal(page, panel)` | Copy code snippet from modal panel |
 | `copyDependenciesFromModal(page, panel)` | Copy dependencies from modal panel |
 | `copyFilenameFromModal(page, panel)` | Copy output filename from modal panel |
+
+## Docker Container tests
+
+Docker tests live in `tests/docker/` and verify that the image builds.
+
+Run locally:
+
+```bash
+npm run test:docker
+```

@@ -7,7 +7,7 @@ export default class CopcViewer extends AssetActionPlugin {
   get show() {
     return this.component.isBrowserProtocol && (
       this.asset.type === 'application/vnd.laszip+copc'
-      ||  URI(this.asset.href).filename() == 'ept.json'
+      ||  URI(this.asset.href).filename() === 'ept.json'
     );
   }
 

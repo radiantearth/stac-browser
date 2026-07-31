@@ -6,7 +6,7 @@ import i18n from "../../i18n";
 export default class GeoJsonIo extends AssetActionPlugin {
 
   get show() {
-    return this.component.isBrowserProtocol && geojsonMediaType == this.asset.type;
+    return this.component.isBrowserProtocol && geojsonMediaType === this.asset.type;
   }
 
   get uri() {

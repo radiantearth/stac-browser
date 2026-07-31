@@ -7,9 +7,81 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+## [5.0.0] - 2026-07-31
+
 ### Added
+
 - Added Vuex `search` module to centralize search filter state (`shared`, `collectionFilters`, `itemFilters`)
+- Search filters are now preserved for collection and item searches
+- Opening a collection from the collection search results carries the search criteria over into its item filters
+- An indicator on the item filter toggle shows when the filters were changed but not applied yet
+
+### Fixed
+
+- The Search page restores the previous results when returning to it
+
+## [5.0.0] - 2026-07-30
+
+### Added
+
+- New Widget: `Featured`
+- Allow widgets to be shown conditionally
+- Added `relationTypes.config.js` to allow configuring link relation types that
+  - are specifically STAC and should be used to navigate to and display in STAC Browser
+  - should be hidden
+
+### Changed
+
+- Renamed SCSS variable `$logo-image-height` to `$logo-height` and CSS variable `--sb-logo-max-height` to `--sb-logo-height`
+- Added SCSS variable `$header-background` to allow overriding the gradient background of the header via SCSS as well
+- `buildTileUrlTemplate` can return `null` to not pass an asset to the tile server and use client-side rendering or no rendering at all
+
+### Fixed
+
+- URLs that were entered with a "wrong" trailing slash (e.g. `.../v1` although the server reports `.../v1/` as its URL) are corrected based on the self link of the server response and redirected.
+- Widgets that provide a custom `component` without an `id` render correctly; widget definitions with neither are skipped with an error
+- Use the Bootstrap z-index values to avoid overlay issues with the sticky header
+- Fix logo size calculation, avoiding the site title wrapping into multiple lines
+- Share button correctly shows with rounded borders on the right side
+- Web-Optimized GeoZarr assets have "Show on Map" button
+- The item filter panel reacts to programmatic open/close after the page has loaded
+
+## [5.0.0-rc.2] - 2026-06-23
+
+### Added
+
+- The Browse menu also loads additional Collections on demand
+- Minimal Docker build test and CI workflow.
+- Docker: `pathPrefix` can be set at container startup via `SB_pathPrefix` when `DYNAMIC_CONFIG` is enabled (default)
+
+### Changed
+
+- `getBrowserPath` for STAC Objects is not available any longer, use `toBrowserPath` or other URL comparison mechanisms instead.
+  **Note:** This is commonly used in `preprocessSTAC` config option, ensure to update your `config.js`.
+- Internal rewrite of how API children are maintained
+- Loaded collections are cached and no longer re-fetched when returning to a page
+- Header stays at the top by default and has a different design. You can disable the sticky header in the `variables.scss` by setting `$header-position` to `static`.
+
+### Fixed
+
+- Alternate assets are considered as thumbnail and preview candidates if the original asset can't be shown in a browser
+- Redirect bare `pathPrefix` URLs to their trailing-slash form in the Docker/nginx image (e.g. `/browser` → `/browser/`)
+- Geometries that cross the antimeridian are split into multi-geometries so that footprints render correctly on the map
+- Fix global error handling in certain edge-cases
+- Improve speed of catalog/collection duplicate detection
+- Fix search link detection
+- The configured default collection and item sort is also applied to the Browse menu
+- More requests that fail due to missing authentication are retried after login (incl. searches and downloads)
+- A failed background load no longer switches the page after login
+
+## [5.0.0-rc.1] - 2026-06-27
+
+### Added
 - Adding `extent`s to the root catalog will restrict the Search filters
+- Support free-text search for Collections in list of collections
+- Add a link to Collection Search from the Collections overview page for advanced filters
 - New locales:
   - Swedish
   - Russian
@@ -95,7 +167,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - CLI parameters for npm commands (e.g. `npm run build -- --catalogUrl="https://example.com"`) as they are not supported by Vite. Make sure to check your CI scripts and Docker files.
 - Support for customizing `authConfig` through the root catalog has been removed. Use the STAC Authentication extension instead.
-- Removed the `DYNAMIC_CONFIG` Docker build argument and `<!--RC RC-->` comment-based mechanism to use runtime config options. Use `SB_RUNTIME` instead.
 
 ### Fixed
 
@@ -179,7 +250,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 For releases prior to v4.0.0, please refer to the
 [release notes in the GitHub Releases](https://github.com/radiantearth/stac-browser/releases).
 
-[Unreleased]: https://github.com/radiantearth/stac-browser/compare/v5.0.0-beta.1...HEAD
+[Unreleased]: https://github.com/radiantearth/stac-browser/compare/v5.0.0...HEAD
+[5.0.0]: https://github.com/radiantearth/stac-browser/compare/v5.0.0-rc.2...v5.0.0
+[5.0.0-rc.2]: https://github.com/radiantearth/stac-browser/compare/v5.0.0-rc.1...v5.0.0-rc.2
+[5.0.0-rc.1]: https://github.com/radiantearth/stac-browser/compare/v5.0.0-beta.1...v5.0.0-rc.1
 [5.0.0-beta.1]: https://github.com/radiantearth/stac-browser/compare/v4.0.1...v5.0.0-beta.1
 [4.0.1]: https://github.com/radiantearth/stac-browser/compare/v4.0.0...v4.0.1
 [4.0.0]: https://github.com/radiantearth/stac-browser/compare/v3.3.5...v4.0.0

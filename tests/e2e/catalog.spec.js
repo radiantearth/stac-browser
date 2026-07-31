@@ -131,7 +131,7 @@ test.describe('Catalog - toolBar', () => {
     await copyButton.click();
     
     // Verify the URL was copied to the clipboard
-    await expect.poll(async () => readClipboard(page)).not.toEqual('');
+    await expect.poll(() => readClipboard(page)).not.toEqual('');
     const clipboardText = await readClipboard(page);
     await expect(clipboardText).toContain(catalog.root.getBrowserPath());
   });
@@ -186,7 +186,7 @@ test.describe('Catalog - toolBar', () => {
     await copyButton.click();
     
     // Verify the URL was copied to the clipboard
-    await expect.poll(async () => readClipboard(page)).not.toEqual('');
+    await expect.poll(() => readClipboard(page)).not.toEqual('');
     const clipboardText = await readClipboard(page);
     await expect(clipboardText).toContain(api.root.getBrowserPath());
   });
@@ -307,6 +307,48 @@ test.describe('Catalog - Children', () => {
     await expect(page.locator('.catalogs .card-grid > *')).toHaveCount(0);
   });
   
+  test('API - collection list is restored when returning to the page', async ({ page, worker }) => {
+    const { api } = createAPI();
+    const collection = api.addCollection('my-collection').setMetadata({ title: 'Test Collection' });
+    api.addItem(collection, 'my-item');
+
+    await api.createServer(worker);
+
+    await page.goto(api.root.getBrowserPath());
+    await waitForBrowserReady(page);
+    await expect(page.getByRole('link', { name: new RegExp(collection.getMetadata().title) })).toBeVisible();
+
+    // Visit the search page and return to the catalog page (in-app navigation,
+    // not full page loads), the collections should be restored from the cache
+    await page.getByRole('navigation').getByRole('button', { name: /search/i }).click();
+    await expect(page).toHaveURL(/\/search/);
+    await page.goBack();
+    await waitForBrowserReady(page);
+
+    await expect(page.getByRole('link', { name: new RegExp(collection.getMetadata().title) })).toBeVisible();
+  });
+
+  test('API - tree auto-loads more collection pages', async ({ page, worker }) => {
+    // One collection per page, so that the second collection is only
+    // available after loading the next page of the collections endpoint
+    const api = API.defaultApi({}, { defaultLimit: 1 });
+    const collection1 = api.addCollection('collection-1').setMetadata({ title: 'Test Collection 1' });
+    const collection2 = api.addCollection('collection-2').setMetadata({ title: 'Test Collection 2' });
+
+    await api.createServer(worker);
+
+    // Open a collection page so that only the tree can trigger loading more collection pages
+    await page.goto(collection1.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    await page.getByRole('button', { name: /browse/i }).click();
+
+    const sidebar = page.locator('#sidebar');
+    await expect(sidebar.getByText(collection1.getMetadata().title)).toBeVisible();
+    // The next page of collections loads automatically once the tree is shown
+    await expect(sidebar.getByText(collection2.getMetadata().title)).toBeVisible();
+  });
+
   test('API - navigates into a child collection on click', async ({ page, worker }) => {
     const { api } = createAPI();
     const collection = api.addCollection('my-collection');

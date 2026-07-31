@@ -87,8 +87,8 @@ export default {
       for (let key in stats) {
         if (isObject(this.root[key])) {
           let entry = Object.assign(stats[key], this.root[key]);
-          if (size(entry['versions']) === 1) {
-            entry.version = Object.keys(entry['versions'])[0];
+          if (size(entry.versions) === 1) {
+            entry.version = Object.keys(entry.versions)[0];
             delete entry.versions;
           }
         }

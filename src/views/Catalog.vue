@@ -26,7 +26,7 @@
         </section>
         <section v-if="isCollection || hasThumbnails" class="mb-4">
           <b-card no-body class="maps-preview">
-            <b-tabs v-model="tab" ref="tabs" pills card vertical end>
+            <b-tabs v-model="tab" pills card vertical end>
               <b-tab v-if="isCollection" :id="tabIds.map" :title="$t('map')" no-body>
                 <MapView :stac="data" v-bind="mapData" @changed="dataChanged" @empty="handleEmptyMap" onfocusOnly popover />
               </b-tab>
@@ -45,7 +45,11 @@
       </b-col>
       <b-col class="catalogs-container" v-if="hasCatalogs">
         <WidgetHook id="view-catalog-catalogs-start" />
-        <Catalogs :catalogs="catalogs" :hasMore="hasMore" @load-more="loadMoreCollections" />
+        <Catalogs
+          :apiSearch="hasApiCollections" :catalogs="catalogs" :hasMore="hasMore"
+          @load-more="loadMoreCollections" @search="searchCollections"
+          :loading="Boolean(loadingCollections) || loadingNextCollectionsPage" :loadingMore="loadingCollections === 'more' || loadingNextCollectionsPage"
+        />
         <WidgetHook id="view-catalog-catalogs-end" />
       </b-col>
       <b-col v-if="hasDroppedFilters" cols="12">
@@ -62,7 +66,7 @@
       <b-col class="items-container" v-if="hasItems || hasItemAssets">
         <WidgetHook id="view-catalog-items-start" />
         <Items
-          :stac="data" :items="items" :api="isApi"
+          :stac="data" :items="items" :api="hasApiItems"
           :showFilters="showFilters" :apiFilters="filters"
           :pagination="itemPages" :loading="apiItemsLoading"
           :count="apiItemsNumberMatched"
@@ -87,15 +91,13 @@ import ShowAssetLinkMixin from '../components/ShowAssetLinkMixin';
 import StacFieldsMixin from '../components/StacFieldsMixin';
 import { formatLicense, formatTemporalExtents } from '@radiantearth/stac-fields/formatters';
 import Utils from '../utils';
-import { hasText, isObject } from 'stac-js/src/utils.js';
+import { hasText, isObject, size } from 'stac-js/src/utils.js';
 import { addSchemaToDocument, createCatalogSchema } from '../schema-org';
-import { ItemCollection } from '../models/stac.js';
+import { ItemCollection } from 'stac-js';
 import DeprecationMixin from '../components/DeprecationMixin.js';
 import { BTab, BTabs, BCard, BAlert } from 'bootstrap-vue-next';
 import { getIgnoredFields } from '../ignored-metadata.js';
-import refParser from '@apidevtools/json-schema-ref-parser';
-import { stacRequest } from '../store/utils';
-import Queryable from '../models/cql2/queryable';
+import { fetchQueryablesForLink, fetchSortablesForLink } from '../store/utils';
 
 export default defineComponent({
   name: "Catalog",
@@ -126,15 +128,19 @@ export default defineComponent({
   ],
   data() {
     return {
-      filters: {}
+      filters: {},
+      loadingCollections: null,
+      isSearchingCollections: false,
+      currentSearchRequestId: 0,
     };
   },
   computed: {
-    ...mapState(['data', 'url', 'apiCatalogPriority',  'apiItems', 'apiItemsLink', 'apiItemsPagination', 'apiItemsNumberMatched', 'nextCollectionsLink', 'stateQueryParameters']),
-    ...mapGetters(['catalogs', 'collectionLink', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
-    ...mapGetters('search', ['hasDroppedFilters']),
+    ...mapState(['data', 'url', 'apiCatalogPriority', 'apiItems', 'apiItemsLink', 'apiItemsPagination', 'apiItemsNumberMatched', 'nextCollectionsLink', 'stateQueryParameters']),
+    ...mapGetters(['catalogs', 'collectionLink', 'isApiChildrenLoading', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
     droppedFilterCount() {
-      return this.$store.state.search.droppedFilters.length;
+      // Access the newly scoped droppedFilters for the 'Items' mode
+      const itemsDropped = this.$store.state.search.droppedFilters?.Items || [];
+      return itemsDropped.length;
     },
     ignoredMetadataFields() {
       return getIgnoredFields(this.data, 'CatalogLike');
@@ -146,7 +152,7 @@ export default defineComponent({
       return null;
     },
     showFilters() {
-      return Boolean(this.stateQueryParameters['itemFilterOpen']);
+      return Boolean(this.stateQueryParameters.itemFilterOpen);
     },
     linkPosition() {
       if (this.additionalLinks.length === 0) {
@@ -164,6 +170,10 @@ export default defineComponent({
     },
     hasMore() {
       return this.apiCatalogPriority !== 'childs' && Boolean(this.nextCollectionsLink);
+    },
+    loadingNextCollectionsPage() {
+      // Pages may also be loading through other components, e.g. the tree
+      return this.isApiChildrenLoading(this.data);
     },
     licenses() {
       if (this.data.license) {
@@ -209,14 +219,17 @@ export default defineComponent({
       }
       return pages;
     },
-    isApi() {
+    hasApiItems() {
       return Boolean(this.apiItemsLink);
     },
+    hasApiCollections() {
+      return Boolean(this.data.getApiCollectionsLink()) && this.apiCatalogPriority !== 'childs';
+    },
     hasItems() {
-      return this.items.length > 0 || this.isApi;
+      return this.items.length > 0 || this.hasApiItems;
     },
     hasCatalogs() {
-      return this.catalogs.length > 0;
+      return this.catalogs.length > 0 || this.hasApiCollections || this.isSearchingCollections;
     },
     mapData() {
       const data = {};
@@ -246,32 +259,36 @@ export default defineComponent({
           console.error(error);
         }
 
-        if (!oldData) {return;}
-        if (!newData?.isCollection) {return;}
-        if (!this.$store.getters['search/hasActiveFilters']) {return;}
-        if (oldData?.id === newData?.id) {return;}
+        if (!newData?.isCollection) {
+          return;
+        }
+        if (oldData?.id === newData?.id) {
+          return;
+        }
 
-        await this.$store.dispatch('search/resetForCollection', {
-          collection: newData,
-          fetchQueryables: async (collection) => {
-            const link = collection.getQueryablesLink?.();
-            if (!isObject(link)) {return [];}
-            const response = await stacRequest(this.$store, link);
-            if (!isObject(response.data)) {return [];}
-            let schemas;
-            try {
-              schemas = await refParser.dereference(response.data);
-            } catch (e) {
-              console.error(e);
-              schemas = response.data;
-            }
-            if (!isObject(schemas?.properties)) {return [];}
-            return Object.entries(schemas.properties)
-              .map(([key, schema]) => new Queryable(key, schema));
-          }
-        });
-        
-        this.filters = this.$store.getters['search/itemSearchParams'];
+        // Carry the collection search over into the item filters, but only
+        // when the user explicitly jumped here from the collection search
+        // results (clicking a link there arms the one-shot flag), so that
+        // plain browsing is not affected by unrelated leftover filters.
+        if (!this.$store.state.search.carryOnNextNavigation) {
+          return;
+        }
+        this.$store.commit('search/setCarryOnNextNavigation', false);
+
+        if (this.$store.getters['search/hasCollectionSearchCriteria']) {
+          // In-collection item search is Features, not item-search
+          await this.$store.dispatch('search/carryToItemSearch', {
+            collection: newData,
+            fetchQueryables: (collection) => fetchQueryablesForLink(this.$store, collection.getQueryablesLink?.()),
+            fetchSortables: (collection) => fetchSortablesForLink(this.$store, collection.getSortablesLink?.()),
+            targetType: 'Items',
+          });
+
+          this.filters = this.$store.getters['search/itemSearchParams'];
+          // Open the filter panel so that the user can see which filters are
+          // applied to the item list instead of filtering it silently
+          this.$store.commit('updateState', {type: 'itemFilterOpen', value: 1});
+        }
       }
     }
   },
@@ -279,8 +296,50 @@ export default defineComponent({
     filtersShown(show) {
       this.$store.commit('updateState', {type: 'itemFilterOpen', value: show ? 1 : null});
     },
-    loadMoreCollections() {
-      this.$store.dispatch('loadNextApiCollections', {show: true});
+    async loadMoreCollections() {
+      const requestId = this.currentSearchRequestId;
+      this.loadingCollections = "more";
+      try {
+        const params = {
+          show: true,
+          searching: this.isSearchingCollections
+        };
+        if (this.isSearchingCollections) {
+          params.searchRequestId = requestId;
+        }
+        await this.$store.dispatch('loadNextApiCollections', {
+          ...params
+        });
+      } catch (error) {
+        this.$store.commit('showGlobalError', {
+          error,
+          message: this.$t('errors.loadApiCollectionsFailed')
+        });
+      } finally {
+        if (requestId === this.currentSearchRequestId && this.loadingCollections === 'more') {
+          this.loadingCollections = null;
+        }
+      }
+    },
+    async searchCollections(searchTerms) {
+      this.loadingCollections = "all";
+      this.isSearchingCollections = size(searchTerms) > 0;
+      // Increment request ID to invalidate any in-flight requests from previous searches
+      const requestId = ++this.currentSearchRequestId;
+      try {
+        await this.$store.dispatch('loadNextApiCollections', {
+          stac: this.data, show: true, q: searchTerms, searching: this.isSearchingCollections, searchRequestId: requestId
+        });
+      } catch (error) {
+        this.$store.commit('showGlobalError', {
+          error,
+          message: this.$t('errors.loadApiCollectionsFailed')
+        });
+      } finally {
+        if (requestId === this.currentSearchRequestId && this.loadingCollections === 'all') {
+          this.loadingCollections = null;
+        }
+      }
     },
     async paginateItems(link) {
       try {

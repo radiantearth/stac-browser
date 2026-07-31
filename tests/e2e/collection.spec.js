@@ -40,10 +40,10 @@ test.describe('Collection Metadata', () => {
     await expect(page.getByText(new RegExp(description, 'i'))).toBeVisible();
     
     // Keywords from the collection should be visible
-    for (const kw of collection.getMetadata().keywords) {
+    await Promise.all(collection.getMetadata().keywords.map((kw) => {
       const badge = page.locator('.keywords .keyword', { hasText: new RegExp(kw, 'i') });
-      await expect(badge.first()).toBeVisible();
-    }
+      return expect(badge.first()).toBeVisible();
+    }));
     
     // License should be visible
     await expect(page.getByRole('link', { name: new RegExp(collection.getMetadata().license, 'i') })).toBeVisible();
@@ -72,10 +72,10 @@ test.describe('Collection Metadata', () => {
     await expect(page.getByText(new RegExp(description, 'i'))).toBeVisible();
     
     // Keywords from the collection should be visible
-    for (const kw of collection.getMetadata().keywords) {
+    await Promise.all(collection.getMetadata().keywords.map((kw) => {
       const badge = page.locator('.keywords .keyword', { hasText: new RegExp(kw, 'i') });
-      await expect(badge.first()).toBeVisible();
-    }
+      return expect(badge.first()).toBeVisible();
+    }));
     
     // License should be visible
     await expect(page.getByRole('link', { name: new RegExp(collection.getMetadata().license, 'i') })).toBeVisible();
@@ -175,7 +175,7 @@ test.describe('Collection - toolBar', () => {
     await copyButton.click();
     
     // The URL copied to clipboard should match the collection's URL
-    await expect.poll(async () => readClipboard(page)).not.toEqual('');
+    await expect.poll(() => readClipboard(page)).not.toEqual('');
     const clipboardText = await readClipboard(page);
     expect(clipboardText).toBe(page.url());
   });

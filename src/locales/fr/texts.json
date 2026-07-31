@@ -444,5 +444,8 @@
       "title": "Afficher sous forme de tuiles"
     },
     "title": "Options d'affichage"
+  },
+  "widgets": {
+    "featured": "En vedette"
   }
 }

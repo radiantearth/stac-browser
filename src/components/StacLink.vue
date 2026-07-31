@@ -12,11 +12,10 @@ import { defineComponent } from 'vue';
 import { mapState, mapGetters } from 'vuex';
 import { BButton } from 'bootstrap-vue-next';
 import { stacBrowserNavigatesTo } from "../rels";
-import { isObject, size } from 'stac-js/src/utils.js';
+import { isObject, size, URI } from 'stac-js/src/utils.js';
 import { isStacMediaType } from 'stac-js/src/mediatypes.js';
 import { getDisplayTitle } from '../models/stac';
 import { STAC } from 'stac-js';
-import { URI } from 'stac-js/src/utils.js';
 
 export default defineComponent({
   name: "StacLink",
@@ -134,10 +133,10 @@ export default defineComponent({
       if (this.stac || this.isStacBrowserLink) {
         let href;
         if (this.stac instanceof STAC) {
-          href = this.stac.getBrowserPath();
+          href = this.toBrowserPath(this.stac);
         }
         else {
-          href = this.toBrowserPath(this.link.href);
+          href = this.toBrowserPath(this.link);
         }
         // Normalize to start with a slash for router-link navigation
         if (!href.startsWith('/')) {

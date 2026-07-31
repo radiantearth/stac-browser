@@ -85,17 +85,20 @@ export default defineConfig({
   ],
 
   /* Run your local dev server before starting the tests */
-  webServer: process.env.CI 
+  webServer: process.env.CI
     ? {
-        // In CI: Build and serve the production build
+        // In CI: Build and serve the production build.
+        // STAC_BROWSER_E2E enables __VUE_PROD_DEVTOOLS__ so tests can introspect
+        // the map (see vite.config.js); it does not affect real production builds.
         command: 'npm run build && npx vite preview --port 4173 --strictPort',
-        env: getEnvWithoutSB(),
+        env: { ...getEnvWithoutSB(), STAC_BROWSER_E2E: 'true' },
         url: 'http://localhost:4173',
         reuseExistingServer: false,
         timeout: 120 * 1000,
       }
     : {
         command: 'npm start',
+        env: { ...process.env, STAC_BROWSER_E2E: 'true' },
         url: 'http://localhost:8080',
         reuseExistingServer: true,
         timeout: 120 * 1000,
