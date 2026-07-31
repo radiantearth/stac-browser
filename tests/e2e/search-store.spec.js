@@ -33,7 +33,6 @@ test.describe('Vuex search module', () => {
     expect(state.itemFilters.limit).toBeNull();
     expect(state.itemFilters.filters).toBeNull();
     expect(state.collectionFilters.filters).toBeNull();
-    expect(state.carryFromCollectionSearch).toBe(false);
     expect(state.droppedFilters).toEqual({ Global: [], Collections: [], Items: [] });
     expect(state.getters.hasActiveFilters).toBe(false);
     expect(state.getters.hasCollectionSearchCriteria).toBe(false);
@@ -67,26 +66,12 @@ test.describe('Vuex search module', () => {
       datetime: DATETIME,
       q: ['sentinel'],
     });
-    await commitToStore(page, 'search/setCarryFromCollectionSearch', true);
     await commitToStore(page, 'search/reset');
     const state = await getSearchState(page);
     expect(state.itemFilters.datetime).toBeNull();
     expect(state.itemFilters.q).toEqual([]);
     expect(state.collectionFilters.q).toEqual([]);
-    expect(state.carryFromCollectionSearch).toBe(false);
     expect(state.droppedFilters).toEqual({ Global: [], Collections: [], Items: [] });
-  });
-
-  test('resetting a bucket disarms the carry-over', async ({ page }) => {
-    await commitToStore(page, 'search/setCarryFromCollectionSearch', true);
-    await commitToStore(page, 'search/resetItemFilters');
-    let state = await getSearchState(page);
-    expect(state.carryFromCollectionSearch).toBe(false);
-
-    await commitToStore(page, 'search/setCarryFromCollectionSearch', true);
-    await commitToStore(page, 'search/resetCollectionFilters');
-    state = await getSearchState(page);
-    expect(state.carryFromCollectionSearch).toBe(false);
   });
 
   test('getters reflect current state correctly', async ({ page }) => {
@@ -115,6 +100,8 @@ test.describe('Filter carry-over into item search', () => {
     const collection = api.addCollection('collection1').setMetadata({ title: 'Test Collection 1' });
     api.addManyItems(collection, 5);
     api.addCollectionsExtension().addItemsExtension().addSearchExtension();
+    // CQL encoding for the global item search (Features advertises no CQL here)
+    api.root.addConformsTo('http://www.opengis.net/spec/cql2/1.0/conf/cql2-text');
     await api.createServer(worker);
     await page.goto(api.root.getSearchPath());
   });
@@ -178,17 +165,36 @@ test.describe('Filter carry-over into item search', () => {
       filterLogic: { andOr: 'and', negate: false },
     });
 
-    await dispatchCarryToItemSearch(page, ['eo:cloud_cover']);
+    // The global item search advertises CQL support, so the rows are
+    // reconciled against the queryables
+    await dispatchCarryToItemSearch(page, ['eo:cloud_cover'], { targetType: 'Global' });
 
     const state = await getSearchState(page);
     // s2:mgrs_tile is unsupported; eo:cloud_cover is supported but the row has
     // no operator class (JSON boundary), so it can't be rebuilt either
     expect(state.itemFilters.rawFilters).toHaveLength(0);
     expect(state.itemFilters.filters).toBeNull();
-    const droppedIds = state.droppedFilters.Items.filter(f => f.type === 'cql2').map(f => f.queryable.id);
+    const droppedIds = state.droppedFilters.Global.filter(f => f.type === 'cql2').map(f => f.queryable.id);
     expect(droppedIds).toEqual(expect.arrayContaining(['eo:cloud_cover', 's2:mgrs_tile']));
     // Non-destructive: the collection search keeps the filters
     expect(state.collectionFilters.rawFilters).toHaveLength(2);
+  });
+
+  test('CQL rows are dropped without reconciliation when the target does not support CQL', async ({ page }) => {
+    await commitToStore(page, 'search/setCollectionFilters', {
+      rawFilters: [makeRawFilter('eo:cloud_cover')],
+      filterLogic: { andOr: 'and', negate: false },
+    });
+
+    // The in-collection item search (Features) advertises no CQL conformance
+    // in this test API, so even a supported queryable is dropped
+    await dispatchCarryToItemSearch(page, ['eo:cloud_cover'], { targetType: 'Items' });
+
+    const state = await getSearchState(page);
+    expect(state.itemFilters.rawFilters).toHaveLength(0);
+    expect(state.itemFilters.filters).toBeNull();
+    expect(state.droppedFilters.Items.filter(f => f.type === 'cql2')).toHaveLength(1);
+    expect(state.collectionFilters.rawFilters).toHaveLength(1);
   });
 
   test('a failed queryables fetch neither destroys state nor reports filters as unsupported', async ({ page }) => {
@@ -198,14 +204,14 @@ test.describe('Filter carry-over into item search', () => {
       filterLogic: { andOr: 'and', negate: false },
     });
 
-    await dispatchCarryToItemSearch(page, ['eo:cloud_cover'], { fail: true });
+    await dispatchCarryToItemSearch(page, ['eo:cloud_cover'], { targetType: 'Global', fail: true });
 
     const state = await getSearchState(page);
     // The CQL filters are not carried over, but they are also not classified
     // as unsupported, and the collection search keeps them
     expect(state.itemFilters.rawFilters).toHaveLength(0);
     expect(state.itemFilters.filters).toBeNull();
-    expect(state.droppedFilters.Items.filter(f => f.type === 'cql2')).toHaveLength(0);
+    expect(state.droppedFilters.Global.filter(f => f.type === 'cql2')).toHaveLength(0);
     expect(state.collectionFilters.rawFilters).toHaveLength(1);
   });
 

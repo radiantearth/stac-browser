@@ -9,12 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Search filters are now preserved across collection and item searches
+- Search filters are now preserved for collection and item searches
+- Opening a collection from the collection search results carries the search criteria over into its item filters
+- An indicator on the item filter toggle shows when the filters were changed but not applied yet
 
 ### Fixed
 
-- The item filter panel opens when filters are carried over from a collection search, instead of applying them silently
-- The item filter panel reacts to programmatic open/close after the page has loaded
+- The Search page restores the previous results when returning to it
 
 ## [5.0.0] - 2026-07-30
 

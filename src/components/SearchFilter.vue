@@ -8,7 +8,7 @@
             dismissible
             show
             class="mb-3"
-            @dismissed="$store.commit('search/clearDroppedFilters', type)"
+            @close="$store.commit('search/clearDroppedFilters', type)"
           >
             {{ $t('search.droppedFilters', { filters: formattedDroppedFilters }) }}
           </b-alert>
@@ -124,9 +124,9 @@
 
         <hr v-if="canFilterExtents || conformances.CollectionIdFilter || conformances.ItemIdFilter || showAdditionalFilters">
 
-        <b-form-group v-if="canSort" class="sort" :label="$t('sort.title')" :label-for="ids.sort" :description="$t('search.notFullySupported')">
+        <b-form-group v-if="canSort" class="sort" :label="$t('sort.title')" :label-for="ids.sortby" :description="$t('search.notFullySupported')">
           <multiselect
-            :id="ids.sort"
+            :id="ids.sortby"
             v-model="sortTerm"
             :options="sortOptions"
             track-by="value"
@@ -189,6 +189,7 @@ import { createSTAC } from '../models/stac';
 import Cql from '../models/cql2/cql';
 import CqlLogicalOperator, { CqlNot } from '../models/cql2/operators/logical';
 import { fetchQueryablesForLink, fetchSchemaProperties } from '../store/utils';
+import { FILTER_FIELDS } from '../store/modules/search';
 import { formatKey } from '@radiantearth/stac-fields/helper';
 
 function getDefaults() {
@@ -362,8 +363,7 @@ export default defineComponent({
     },
     ids() {
       let obj = {};
-      ['q', 'datetime', 'bbox', 'collections', 'ids', 'sort', 'limit']
-        .forEach(field => obj[field] = field + formId);
+      FILTER_FIELDS.forEach(field => obj[field] = field + formId);
       return obj;
     },
     stac() {
@@ -805,10 +805,6 @@ export default defineComponent({
         andOr: this.filtersAndOr,
         negate: this.filtersNegate,
       });
-      // Executing a collection search enables the carry-over into item
-      // searches; executing an item search means the user has taken over on
-      // the item side and stops it.
-      this.$store.commit('search/setCarryFromCollectionSearch', this.type === 'Collections');
       // Executing a search retires the notice about the previous carry-over
       this.$store.commit('search/clearDroppedFilters', this.type);
 
@@ -822,13 +818,15 @@ export default defineComponent({
       } else {
         this.$store.commit('search/resetItemFilters');
       }
+      // The notice about the carry-over refers to a state that was just discarded
+      this.$store.commit('search/clearDroppedFilters', this.type);
       this.$emit('input', this.activeParams, true);
     },
     addSearchTerm(term) {
       if (!hasText(term)) {
         return;
       }
-      const currentQ = [...this.searchQ]; 
+      const currentQ = [...this.searchQ];
       currentQ.push(term);
       this.searchQ = currentQ;
     },
@@ -844,7 +842,7 @@ export default defineComponent({
     addId(id) {
       const currentIds = [...this.searchIds];
       currentIds.push(id);
-      this.searchIds = currentIds; 
+      this.searchIds = currentIds;
     },
     formatSort() {
       if (this.canSort && this.sortTerm && this.sortTerm.value && this.sortOrder) {

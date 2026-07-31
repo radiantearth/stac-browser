@@ -33,7 +33,6 @@ export async function commitToStore(page, mutation, payload) {
  * @returns {Promise<{
  *   collectionFilters: object,
  *   itemFilters: object,
- *   carryFromCollectionSearch: boolean,
  *   droppedFilters: {Global: Array, Collections: Array, Items: Array},
  *   getters: {
  *     hasActiveFilters: boolean,
@@ -77,7 +76,6 @@ export async function getSearchState(page) {
     return {
       collectionFilters: sanitizeFilterSet(s.collectionFilters),
       itemFilters: sanitizeFilterSet(s.itemFilters),
-      carryFromCollectionSearch: s.carryFromCollectionSearch,
       droppedFilters: {
         Global: (s.droppedFilters.Global || []).map(sanitizeRow),
         Collections: (s.droppedFilters.Collections || []).map(sanitizeRow),

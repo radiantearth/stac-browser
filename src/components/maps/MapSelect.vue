@@ -218,7 +218,7 @@ export default {
           fit();
         }
         else {
-          // Update the map once the size is known, maybe be zero size if the map is in a hidden tab or so.
+          // Update the map once the size is known, might be zero size if the map is in a hidden tab or so.
           this.map.once('change:size', fit);
         }
       }

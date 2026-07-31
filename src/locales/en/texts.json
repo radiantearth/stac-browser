@@ -161,6 +161,7 @@
   },
   "items": {
     "filter": "Filters",
+    "filterChangesNotApplied": "The filters were changed, but the changes have not been applied yet.",
     "hideFilter": "Hide Filters",
     "noTime": "No time given",
     "noneAvailableForCollection": "No items available for this collection.",

@@ -17,6 +17,16 @@ const CARRY_OVER = {
   limit: { capability: null, dropType: null },
 };
 
+// All filter fields that hold plain values in a filter set; the remaining
+// fields (filters, rawFilters, filterLogic) hold the CQL filters.
+export const FILTER_FIELDS = ['q', 'datetime', 'bbox', 'ids', 'collections', 'sortby', 'limit'];
+
+// The subset of FILTER_FIELDS that expresses actual search criteria, as
+// opposed to presentational settings such as sort order or page size, which
+// may also be set programmatically through defaults. ids and collections only
+// exist for item searches and never carry over from a collection search.
+const CRITERIA_FIELDS = ['q', 'datetime', 'bbox'];
+
 const isSet = (value) => {
   if (value === null || value === undefined) {
     return false;
@@ -27,33 +37,28 @@ const isSet = (value) => {
   return true;
 };
 
-// Whether the user has entered actual search criteria (as opposed to
-// presentational settings such as sort order or page size, which may also be
-// set programmatically through defaults).
+// Whether the user has entered actual search criteria
 const hasSearchCriteria = (filters) => (
-  Boolean(filters.datetime) ||
-  Boolean(filters.bbox) ||
-  (Array.isArray(filters.q) && filters.q.length > 0) ||
-  (Array.isArray(filters.rawFilters) && filters.rawFilters.length > 0) ||
+  CRITERIA_FIELDS.some(field => isSet(filters[field])) ||
+  isSet(filters.rawFilters) ||
   Boolean(filters.filters)
 );
 
 const isActive = (filters) => (
-  hasSearchCriteria(filters) ||
-  Boolean(filters.limit) ||
-  (Array.isArray(filters.ids) && filters.ids.length > 0) ||
-  (Array.isArray(filters.collections) && filters.collections.length > 0) ||
-  Boolean(filters.sortby)
+  FILTER_FIELDS.some(field => isSet(filters[field])) ||
+  isSet(filters.rawFilters) ||
+  Boolean(filters.filters)
 );
 
+// Fields listed in FILTER_FIELDS, plus the CQL filters
 export const defaultFilterSet = () => ({
+  q: [],
   datetime: null,
   bbox: null,
-  limit: null,
-  q: [],
   ids: [],
   collections: [],
   sortby: null,
+  limit: null,
   filters: null,
   rawFilters: [],
   filterLogic: { andOr: 'and', negate: false },
@@ -66,11 +71,16 @@ export const freshSearchState = () => ({
   // collection search into an item search only ever writes the item bucket.
   collectionFilters: defaultFilterSet(),
   itemFilters: defaultFilterSet(),
-  // Armed when the user executes a collection search and disarmed as soon as
-  // the user takes over on the item side (submit/reset). While armed,
-  // navigating into a collection re-seeds the item filters from the collection
-  // search, so each collection gets the carry-over based on its own queryables.
-  carryFromCollectionSearch: false,
+  // The links behind the search results shown last, so that the results can
+  // be restored when the user returns to the Search page
+  resultsLinks: {
+    Collections: null,
+    Global: null
+  },
+  // One-shot flag armed when the user clicks a link in the collection search
+  // results and consumed by the collection page to carry the search criteria
+  // over into its item filters
+  carryOnNextNavigation: false,
   droppedFilters: {
     Global: [],
     Collections: [],
@@ -106,7 +116,6 @@ export default {
     itemSearchParams: (state) => buildSearchParams(state.itemFilters),
     hasActiveFilters: (state) => isActive(state.itemFilters) || isActive(state.collectionFilters),
     hasCollectionSearchCriteria: (state) => hasSearchCriteria(state.collectionFilters),
-    carryPending: (state) => state.carryFromCollectionSearch,
     hasDroppedFilters: (state) => Object.values(state.droppedFilters).some(arr => arr.length > 0),
   },
 
@@ -122,16 +131,21 @@ export default {
     seedItemFilters(state, filterSet) {
       state.itemFilters = filterSet;
     },
-    setCarryFromCollectionSearch(state, enabled) {
-      state.carryFromCollectionSearch = Boolean(enabled);
+    setResultsLink(state, { type, link }) {
+      if (type in state.resultsLinks) {
+        state.resultsLinks[type] = link;
+      }
+    },
+    setCarryOnNextNavigation(state, enabled) {
+      state.carryOnNextNavigation = Boolean(enabled);
     },
     resetCollectionFilters(state) {
       state.collectionFilters = defaultFilterSet();
-      state.carryFromCollectionSearch = false;
+      state.resultsLinks.Collections = null;
     },
     resetItemFilters(state) {
       state.itemFilters = defaultFilterSet();
-      state.carryFromCollectionSearch = false;
+      state.resultsLinks.Global = null;
     },
     reset(state) {
       Object.assign(state, freshSearchState());
@@ -169,7 +183,7 @@ export default {
      * @param {Function} fetchSortables - Async fn fetching the collection's sortable field names
      * @param {String} targetType - 'Items' (OGC API Features) or 'Global' (STAC item search)
      */
-    async carryToItemSearch({ commit, state, rootGetters }, { collection, fetchQueryables, fetchSortables, targetType = 'Items' }) {
+    async carryToItemSearch({ commit, state, rootGetters, rootState }, { collection, fetchQueryables, fetchSortables, targetType = 'Items' }) {
       const source = state.collectionFilters;
       const capabilities = TYPES[targetType] || {};
       const supports = (capability) => {
@@ -207,7 +221,9 @@ export default {
       // user's field is sortable there, so validate against the target's
       // sortables. Item properties are usually `properties.`-prefixed while
       // collection fields are not, so also try the prefixed field name.
-      if (isSet(source.sortby)) {
+      // The configured default sort is applied without user interaction and is
+      // neither worth carrying over nor warning about.
+      if (isSet(source.sortby) && source.sortby !== (rootState.defaultCollectionSort || null)) {
         if (supports('Sort')) {
           const direction = source.sortby.startsWith('-') ? '-' : '';
           const field = direction ? source.sortby.substring(1) : source.sortby;

@@ -41,6 +41,7 @@
             v-if="isCollectionSearch" :catalogs="results" collectionsOnly
             :pagination="pagination" :loading="loading" @paginate="loadResults"
             :count="totalCount" :apiFilters="collectionFilters"
+            @click="armCarryOver"
           >
             <template #catalogFooter="slot">
               <b-button-group v-if="itemSearch || canFilterItems(slot.data)" vertical size="sm">
@@ -204,17 +205,28 @@ export default defineComponent({
         });
         this.itemFilters = this.$store.getters['search/itemSearchParams'];
       }
+      // Restore the previous results for this tab, e.g. when the user returns
+      // to the Search page after visiting a result
+      await this.restoreResults();
     },
     searchLink: {
       immediate: true,
-      handler() {
+      async handler() {
         if (this.searchLink) {
           this.showPage();
+          // The search link only becomes available once the parent is loaded,
+          // which may be after the tab has been activated
+          await this.restoreResults();
         }
       }
     }
   },
   async created() {
+    // Continue with the persisted search filters, e.g. when the user returns
+    // to the Search page after visiting a result
+    this.collectionFilters = this.$store.getters['search/collectionSearchParams'];
+    this.itemFilters = this.$store.getters['search/itemSearchParams'];
+
     let url = this.catalogUrl;
     if (this.loadParent) {
       url = this.fromBrowserPath(this.loadParent);
@@ -237,6 +249,16 @@ export default defineComponent({
     this.updateFreeText(this.stateQueryParameters.q);
   },
   methods: {
+    // Arms the carry-over when the user opens a collection from the search
+    // results, so that its item filters continue the collection search.
+    // Applies to any link in the results, e.g. the collection cards and the
+    // "filter collection" buttons.
+    armCarryOver(event) {
+      const isPlainClick = event.button === 0 && !event.ctrlKey && !event.metaKey && !event.shiftKey;
+      if (isPlainClick && event.target.closest('a')) {
+        this.$store.commit('search/setCarryOnNextNavigation', true);
+      }
+    },
     updateFreeText(q, force = false) {
       if (Array.isArray(q) && (force || size(q) > 0)) {
         // The store is the source of truth for the filter forms; an empty
@@ -287,6 +309,12 @@ export default defineComponent({
           const url = this.link.getAbsoluteUrl();
           const data = createSTAC(response.data, url, this.$store);
           this.data = data;
+          // Remember the shown results so that they can be restored when the
+          // user returns to the Search page
+          this.$store.commit('search/setResultsLink', {
+            type: this.isCollectionSearch ? 'Collections' : 'Global',
+            link
+          });
         }
       } catch (error) {
         this.data = null;
@@ -294,6 +322,18 @@ export default defineComponent({
         this.errorId = getErrorCode(error);
       } finally {
         this.loading = false;
+      }
+    },
+    // Restores the previously shown results, e.g. when the user returns to
+    // the Search page after visiting a result
+    async restoreResults() {
+      if (this.data !== null || this.loading || !this.searchLink) {
+        return;
+      }
+      const type = this.activeSearch === this.tabIds.collections ? 'Collections' : 'Global';
+      const savedLink = this.$store.state.search.resultsLinks[type];
+      if (savedLink) {
+        await this.loadResults(savedLink);
       }
     },
     async setFilters(filters, reset = false) {

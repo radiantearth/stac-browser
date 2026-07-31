@@ -212,7 +212,7 @@ test.describe('Dropped filter banner — collection search to collection navigat
     });
 
     await test.step('Select a sort field and submit', async () => {
-      await selectSortField(page, 'title');
+      await selectSortField(page, 'created');
       await page.getByRole('button', { name: /submit/i }).click();
       await waitForBrowserReady(page);
     });
@@ -241,7 +241,7 @@ test.describe('Dropped filter banner — collection search to collection navigat
 
     await test.step('Add free-text term, select a sort field and submit', async () => {
       await addFreeTextTerm(page, 'sentinel');
-      await selectSortField(page, 'title');
+      await selectSortField(page, 'created');
       await page.getByRole('button', { name: /submit/i }).click();
       await waitForBrowserReady(page);
     });
@@ -317,7 +317,7 @@ test.describe('Dropped filter banner — collection search to collection navigat
     });
   });
 
-  test('Navigating to a second collection re-evaluates the carry-over and shows the banner again', async ({ page }) => {
+  test('Browsing on to another collection does not re-apply the carry-over', async ({ page }) => {
     await goToCollectionSearchTab(page, BROWSER_PATH);
 
     await test.step('Add free-text, submit, navigate to first collection', async () => {
@@ -341,7 +341,7 @@ test.describe('Dropped filter banner — collection search to collection navigat
       await expect(banner).not.toBeVisible({ timeout: 5000 });
     });
 
-    await test.step('Navigate back and into a second collection', async () => {
+    await test.step('Navigate to a second collection via the catalog', async () => {
       // Navigate in-app (a page.goto would reload and reset the store)
       await page.getByRole('button', { name: /^browse$/i }).click();
       await waitForBrowserReady(page);
@@ -355,12 +355,35 @@ test.describe('Dropped filter banner — collection search to collection navigat
       await openItemFilterPanel(page);
     });
 
-    // The collection search is still active, so the carry-over runs again for
-    // the second collection and reports what is dropped there
-    await test.step('Verify banner appears for the second collection as well', async () => {
-      const banner = page.locator('.alert-warning').first();
-      await expect(banner).toBeVisible({ timeout: 10000 });
-      await expect(banner).toContainText(/Search Terms/i);
+    // The carry-over only applies when jumping there from the search results,
+    // browsing the catalog is not affected
+    await test.step('Verify no banner appears for the second collection', async () => {
+      await page.waitForTimeout(500);
+      await expect(page.locator('.alert-warning')).toHaveCount(0);
+    });
+  });
+
+  test('Resetting the item filters clears the banner', async ({ page }) => {
+    await goToCollectionSearchTab(page, BROWSER_PATH);
+
+    await test.step('Add free-text, submit, navigate into a collection', async () => {
+      await addFreeTextTerm(page, 'sentinel');
+      await page.getByRole('button', { name: /submit/i }).click();
+      await waitForBrowserReady(page);
+      const collectionLink = page.getByText('Sentinel-2 L2A', { exact: false }).first();
+      await expect(collectionLink).toBeVisible({ timeout: 10000 });
+      await collectionLink.click();
+      await waitForBrowserReady(page);
+    });
+
+    await test.step('Open item filter panel and verify the banner', async () => {
+      await openItemFilterPanel(page);
+      await expect(page.locator('.alert-warning').first()).toBeVisible({ timeout: 10000 });
+    });
+
+    await test.step('Reset the item filters — the banner disappears', async () => {
+      await page.getByRole('button', { name: /reset/i }).first().click();
+      await expect(page.locator('.alert-warning')).toHaveCount(0);
     });
   });
 });
