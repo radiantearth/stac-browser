@@ -58,6 +58,36 @@ function getRoutes(config) {
   });
 
   routes.push({
+    path: "/management/edit/:pathMatch(.*)*",
+    name: "managementEdit",
+    component: () => import("../views/Edit.vue"),
+    props: route => ({
+      ...getPath(route, config),
+      mode: 'edit'
+    })
+  });
+
+  routes.push({
+    path: "/management/create-item/:pathMatch(.*)*",
+    name: "managementCreateItem",
+    component: () => import("../views/Edit.vue"),
+    props: route => ({
+      ...getPath(route, config),
+      mode: 'create-item'
+    })
+  });
+
+  routes.push({
+    path: "/management/create-collection/:pathMatch(.*)*",
+    name: "managementCreateCollection",
+    component: () => import("../views/Edit.vue"),
+    props: route => ({
+      ...getPath(route, config),
+      mode: 'create-collection'
+    })
+  });
+
+  routes.push({
     path: "/:pathMatch(.*)*",
     name: "browse",
     component: () => import("../views/Browse.vue"),

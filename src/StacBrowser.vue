@@ -69,7 +69,7 @@
               </b-button>
             </b-button-group>
           </nav>
-          <StacSource class="actions" :title="title" :stacUrl="url" :stac="data" />
+          <StacSource class="actions" :title="title" />
         </b-col>
       </b-row>
     </header>
@@ -222,7 +222,7 @@ export default defineComponent({
       return this.isApi ? this.$t('index.api') : this.$t('index.catalog');
     },
     back() {
-      return this.$route.name === 'validation';
+      return this.$route.name === 'validation' || Boolean(this.$route.name?.startsWith('management'));
     },
     selfBrowserLink() {
       return this.toBrowserPath(this.url);
@@ -401,8 +401,10 @@ export default defineComponent({
     await this.detectLocale();
     await this.parseQuery(this.$route);
 
-    this.$router.afterEach((to, from) => {
-      if (to.path === from.path) {
+    this.$router.afterEach((to, from, failure) => {
+      // Aborted and cancelled navigations don't change the page,
+      // e.g. when a navigation guard rejected the navigation
+      if (failure || to.path === from.path) {
         return;
       }
 
