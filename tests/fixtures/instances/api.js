@@ -202,4 +202,16 @@ export default class API extends Instance {
     this.root.addConformsTo("http://www.opengis.net/spec/ogcapi-features-3/1.0/conf/filter");
     return this;
   }
+
+  addItemTransactionsExtension() {
+    this.addItemsExtension();
+    this.root.addConformsTo("https://api.stacspec.org/v1.0.0/ogcapi-features/extensions/transaction");
+    return this;
+  }
+
+  addCollectionTransactionsExtension() {
+    this.addCollectionsExtension();
+    this.root.addConformsTo("https://api.stacspec.org/v1.0.0/collections/extensions/transaction");
+    return this;
+  }
 }

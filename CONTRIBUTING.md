@@ -45,6 +45,8 @@ Tests are located in the `tests/e2e` directory and follow the naming convention 
 
 ## Running Tests
 
+Before running the tests, you have to install a Playwright browser (`npx playwright install`) and Docker.
+
 - `npm test`: Run all tests
 - `npm run test:e2e:ui`: Run UI tests in UI mode (interactive)
 - `npm run test:e2e:headed`: Run UI tests in headed mode (see browser)

@@ -159,6 +159,15 @@
         }
       ]
     },
+    "transactions": {
+      "type": ["boolean"]
+    },
+    "transactionsRequireLogin": {
+      "type": ["boolean"]
+    },
+    "transactionsRequirePreflight": {
+      "type": ["boolean"]
+    },
     "crs": {
       "type": ["object"]
     },
