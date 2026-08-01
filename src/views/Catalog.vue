@@ -47,11 +47,21 @@
       <b-col class="catalogs-container" v-if="hasCatalogs">
         <WidgetHook id="view-catalog-catalogs-start" />
         <Catalogs
+          v-if="mergeCatalogsAndCollections"
           :apiSearch="hasApiCollections" :catalogs="catalogs" :hasMore="hasMore"
           showControls
           @load-more="loadMoreCollections" @search="searchCollections"
           :loading="Boolean(loadingCollections) || loadingNextCollectionsPage" :loadingMore="loadingCollections === 'more' || loadingNextCollectionsPage"
         />
+        <template v-else>
+          <Catalogs v-if="showChildrenSection" :catalogs="childCatalogs" />
+          <Catalogs
+            v-if="showCollectionsSection" collectionsOnly
+            :apiSearch="hasApiCollections" :catalogs="collections" :hasMore="hasMore"
+            @load-more="loadMoreCollections" @search="searchCollections"
+            :loading="Boolean(loadingCollections) || loadingNextCollectionsPage" :loadingMore="loadingCollections === 'more' || loadingNextCollectionsPage"
+          />
+        </template>
         <WidgetHook id="view-catalog-catalogs-end" />
       </b-col>
       <b-col class="items-container" v-if="hasItems || hasItemAssets">
@@ -126,8 +136,8 @@ export default defineComponent({
     };
   },
   computed: {
-    ...mapState(['data', 'apiCatalogPriority', 'apiItemsLink', 'apiItemsPagination', 'apiItemsNumberMatched', 'nextCollectionsLink', 'omitTimeForMidnight', 'stateQueryParameters']),
-    ...mapGetters(['catalogs', 'collectionLink', 'defaultSort', 'isApiChildrenLoading', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
+    ...mapState(['data', 'apiCatalogPriority', 'apiItemsLink', 'apiItemsPagination', 'apiItemsNumberMatched', 'mergeCatalogsAndCollections', 'nextCollectionsLink', 'omitTimeForMidnight', 'stateQueryParameters']),
+    ...mapGetters(['catalogs', 'childCatalogs', 'collections', 'collectionLink', 'defaultSort', 'isApiChildrenLoading', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
     ignoredMetadataFields() {
       return getIgnoredFields(this.data, 'CatalogLike');
     },
@@ -159,7 +169,7 @@ export default defineComponent({
     },
     loadingNextCollectionsPage() {
       // Pages may also be loading through other components, e.g. the tree
-      return this.isApiChildrenLoading(this.data);
+      return this.isApiChildrenLoading(this.data, 'collections');
     },
     licenses() {
       if (this.data.license) {
@@ -215,8 +225,17 @@ export default defineComponent({
     hasItems() {
       return this.items.length > 0 || this.hasApiItems;
     },
+    showChildrenSection() {
+      return this.childCatalogs.length > 0;
+    },
+    showCollectionsSection() {
+      return this.collections.length > 0 || this.hasApiCollections || this.isSearchingCollections;
+    },
     hasCatalogs() {
-      return this.catalogs.length > 0 || this.hasApiCollections || this.isSearchingCollections;
+      if (this.mergeCatalogsAndCollections) {
+        return this.catalogs.length > 0 || this.hasApiCollections || this.isSearchingCollections;
+      }
+      return this.showChildrenSection || this.showCollectionsSection;
     },
     hasWebMapLinks() {
       return getWebMapLinks(this.data).length > 0;

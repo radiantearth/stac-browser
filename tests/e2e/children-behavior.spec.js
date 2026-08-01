@@ -1,14 +1,13 @@
 /**
- * Regression tests for how collections are loaded from the `/collections`
- * endpoint (rel="data") and assembled into the children list of a
- * catalog-like entity: merging with static `rel="child"` links (#103),
- * pagination, URL guessing (#486), caching and list resets across
- * entities (#617), endpoint precedence in the load action, and collection
- * free-text search.
+ * Regression tests for how children of a catalog-like entity are loaded and
+ * displayed, covering the interplay of static `rel="child"` links and the
+ * `/collections` endpoint (rel="data") in many variants.
  *
  * These tests pin down the current behavior before the children/collections
- * handling is refactored for the STAC API - Children extension (#218).
- * The `apiCatalogPriority` option is covered in api-catalog-priority.spec.js.
+ * handling is refactored for the STAC API - Children extension (#218):
+ * merge and de-duplication semantics (#103), `apiCatalogPriority`,
+ * pagination, URL guessing (#486), list resets across entities (#617),
+ * endpoint precedence in the load action, and collection free-text search.
  */
 import { test, expect } from './fixtures.js';
 import { configureBrowser, waitForBrowserReady } from './helpers.js';
@@ -70,6 +69,115 @@ test.describe('Merging static child links and API collections (#103)', () => {
     // infinite scrolling through the paginated collections (#103)
     await expect(page.locator(CARD)).toHaveCount(3);
     await expect(page.locator(CARD).first()).toContainText('Static Catalog');
+  });
+});
+
+test.describe('Separated children and collections display', () => {
+  function createApi() {
+    const api = API.defaultApi();
+    api.addCollection('api-collection').setMetadata({ title: 'API Collection' });
+    const shared = api.addCollection('shared-collection').setMetadata({ title: 'Shared Collection' });
+    api.root.addChildLink(shared);
+    api.addStaticCatalog({ url: 'static-catalog' }).setMetadata({ title: 'Static Catalog' });
+    return { api };
+  }
+
+  test('children and collections are shown as separate sections by default', async ({ page, worker }) => {
+    const { api } = createApi();
+    await api.createServer(worker);
+
+    await page.goto(api.root.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    const sections = page.locator('.catalogs');
+    await expect(sections).toHaveCount(2);
+
+    // The children section lists the static child links,
+    // except for those that are also in the collections list
+    const childrenSection = sections.first();
+    await expect(childrenSection.locator('header .title')).toHaveText(/Catalog/);
+    await expect(childrenSection.locator('.card-grid > *')).toHaveCount(1);
+    await expect(childrenSection.getByRole('link', { name: /Static Catalog/ })).toBeVisible();
+
+    // The collections section lists the collections endpoint results
+    const collectionsSection = sections.last();
+    await expect(collectionsSection.locator('header .title')).toHaveText(/Collections/);
+    await expect(collectionsSection.locator('.card-grid > *')).toHaveCount(2);
+    await expect(collectionsSection.getByRole('link', { name: /API Collection/ })).toBeVisible();
+    await expect(collectionsSection.getByRole('link', { name: /Shared Collection/ })).toBeVisible();
+  });
+
+  test('mergeCatalogsAndCollections shows a single merged list', async ({ page, worker }) => {
+    const { api } = createApi();
+    await api.createServer(worker);
+    await configureBrowser(page, { mergeCatalogsAndCollections: true });
+
+    await page.goto(api.root.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    const sections = page.locator('.catalogs');
+    await expect(sections).toHaveCount(1);
+    await expect(page.locator(CARD)).toHaveCount(3);
+  });
+});
+
+test.describe('apiCatalogPriority', () => {
+  function createApi() {
+    const api = API.defaultApi();
+    api.addCollection('api-collection').setMetadata({ title: 'API Collection' });
+    api.addStaticCatalog({ url: 'static-catalog' }).setMetadata({ title: 'Static Catalog' });
+    return { api };
+  }
+
+  test('null shows both sources', async ({ page, worker }) => {
+    const { api } = createApi();
+    await api.createServer(worker);
+
+    await page.goto(api.root.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    await expect(page.locator(CARD)).toHaveCount(2);
+    await expect(page.getByRole('link', { name: /API Collection/ })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Static Catalog/ })).toBeVisible();
+  });
+
+  test('collections shows only API collections', async ({ page, worker }) => {
+    const { api } = createApi();
+    await api.createServer(worker);
+    await configureBrowser(page, { apiCatalogPriority: 'collections' });
+
+    await page.goto(api.root.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    await expect(page.locator(CARD)).toHaveCount(1);
+    await expect(page.getByRole('link', { name: /API Collection/ })).toBeVisible();
+  });
+
+  test('childs shows only static child links', async ({ page, worker }) => {
+    const { api } = createApi();
+    await api.createServer(worker);
+    await configureBrowser(page, { apiCatalogPriority: 'childs' });
+
+    await page.goto(api.root.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    await expect(page.locator(CARD)).toHaveCount(1);
+    await expect(page.getByRole('link', { name: /Static Catalog/ })).toBeVisible();
+  });
+
+  test('childs hides API collections in the tree', async ({ page, worker }) => {
+    const { api } = createApi();
+    await api.createServer(worker);
+    await configureBrowser(page, { apiCatalogPriority: 'childs' });
+
+    await page.goto(api.root.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    await page.getByRole('button', { name: /browse/i }).click();
+    const sidebar = page.locator('#sidebar');
+    await expect(sidebar).toBeVisible();
+    await expect(sidebar.getByText('Static Catalog')).toBeVisible();
+    await expect(sidebar.getByText('API Collection')).not.toBeVisible();
   });
 });
 
