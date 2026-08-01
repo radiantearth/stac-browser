@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- The children (from the `child` links) and the collections (from the `/collections` endpoint)
+  of an entity are shown as two separate lists by default.
+  The new config option `mergeCatalogsAndCollections` restores the previous merged display.
+
 ### Added
 
 - Search filters are now preserved for collection and item searches

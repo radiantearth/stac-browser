@@ -53,6 +53,9 @@
       "type": ["string", "null"],
       "enum": ["collections", "childs", null]
     },
+    "mergeCatalogsAndCollections": {
+      "type": ["boolean"]
+    },
     "useTileLayerAsFallback": {
       "type": ["boolean"]
     },

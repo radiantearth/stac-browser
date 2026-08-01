@@ -332,6 +332,7 @@ export default defineComponent({
         'defaultItemSort',
         'defaultThumbnailSize',
         'displayGeoTiffByDefault',
+        'mergeCatalogsAndCollections',
         'preferredAssets',
         'showThumbnailsAsAssets'
       ];
