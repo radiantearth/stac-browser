@@ -74,6 +74,7 @@ Function-valued options such as [`preprocessSTAC`](#preprocessstac), [`buildTile
   - [catalogImage](#catalogimage)
   - [footerLinks](#footerlinks)
   - [apiCatalogPriority](#apicatalogpriority)
+  - [mergeCatalogsAndCollections](#mergecatalogsandcollections)
 - [Deployment](#deployment)
   - [historyMode](#historymode)
     - [`history`](#history)
@@ -202,6 +203,18 @@ The following options are available:
 - `null`: Default behavior
 
 This option only applies to catalogs and collections, it never hides items.
+
+See also [mergeCatalogsAndCollections](#mergecatalogsandcollections) for how the two sources are displayed.
+
+### mergeCatalogsAndCollections
+
+By default (value `false`), the children (from the `child` links) and the collections
+(from the `/collections` endpoint) of an entity are shown as two separate lists,
+each with their own pagination. Children that are also contained in the collections
+list are only shown in the collections list.
+
+Set this option to `true` to merge the two sources into a single list
+(the behavior of STAC Browser 3.x), with the children placed before the collections.
 
 ## Deployment
 

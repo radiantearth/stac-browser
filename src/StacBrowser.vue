@@ -369,6 +369,7 @@ export default defineComponent({
         'defaultThumbnailSize',
         'displayGeoTiffByDefault',
         'maxDisplayPixels',
+        'mergeCatalogsAndCollections',
         'preferredAssets',
         'showThumbnailsAsAssets'
       ];
