@@ -77,7 +77,8 @@ export default defineComponent({
   props: {
     mode: {
       type: String,
-      default: 'edit'
+      default: 'edit',
+      validator: value => ['edit', 'create-collection', 'create-item'].includes(value)
     }
   },
   data() {

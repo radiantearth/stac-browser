@@ -138,7 +138,8 @@ export default defineComponent({
     },
     count: {
       type: Number,
-      default: null
+      default: null,
+      validator: value => value === null || value >= 0
     }
   },
   emits: ['loadMore', 'paginate', 'search'],

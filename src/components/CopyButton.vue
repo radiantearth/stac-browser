@@ -29,7 +29,8 @@ export default {
     },
     size: {
       type: String,
-      default: "md"
+      default: "md",
+      validator: value => ['sm', 'md', 'lg'].includes(value)
     },
     buttonProps: {
       type: Object,

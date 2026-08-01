@@ -240,7 +240,8 @@ export default defineComponent({
     },
     type: { // Collections or Global or Items
       type: String,
-      required: true
+      required: true,
+      validator: value => ['Collections', 'Global', 'Items'].includes(value)
     },
     searchLink: {
       type: Object,

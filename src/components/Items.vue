@@ -100,11 +100,13 @@ export default defineComponent({
     },
     chunkSize: {
       type: Number,
-      default: 90
+      default: 90,
+      validator: value => value > 0
     },
     count: {
       type: Number,
-      default: null
+      default: null,
+      validator: value => value === null || value >= 0
     }
   },
   emits: ['filtersShown', 'filterItems', 'paginate'],

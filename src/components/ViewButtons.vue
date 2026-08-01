@@ -16,7 +16,8 @@ export default {
   props: {
     modelValue: {
       type: String,
-      default: 'cards'
+      default: 'cards',
+      validator: value => ['cards', 'list'].includes(value)
     }
   },
   emits: ['update:modelValue'],

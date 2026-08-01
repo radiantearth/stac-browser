@@ -21,7 +21,8 @@ export default {
     },
     size: {
       type: String,
-      default: "sm"
+      default: "sm",
+      validator: value => ['sm', 'md', 'lg'].includes(value)
     }
   },
   data() {

@@ -41,11 +41,13 @@ export default {
     },
     type: {
       type: String,
-      required: true
+      required: true,
+      validator: value => ['versions', 'extensions', 'assets'].includes(value)
     },
     count: {
       type: Number,
-      required: true
+      required: true,
+      validator: value => value >= 0
     },
     options: {
       type: Object,

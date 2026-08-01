@@ -20,7 +20,8 @@ export default defineComponent({
   props: {
     lines: {
       type: Number,
-      default: 3
+      default: 3,
+      validator: value => value > 0
     },
     text: {
       type: String,

@@ -17,7 +17,8 @@ export default {
     },
     placement: { // top or bottom
       type: String,
-      default: "bottom"
+      default: "bottom",
+      validator: value => ['top', 'bottom'].includes(value)
     }
   },
   emits: ['paginate'],

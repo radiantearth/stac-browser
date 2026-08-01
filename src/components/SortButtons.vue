@@ -15,9 +15,10 @@ import { defineComponent } from 'vue';
 export default defineComponent({
   name: "SortButtons",
   props: {
-    modelValue: {
+    modelValue: { // Sort direction: -1 (descending), 0 (none), 1 (ascending)
       type: Number,
-      default: 0
+      default: 0,
+      validator: value => [-1, 0, 1].includes(value)
     },
     enforce: {
       type: Boolean,
