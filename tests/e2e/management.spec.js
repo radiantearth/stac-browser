@@ -11,7 +11,9 @@
 * relax these via `enableTransactions()` (which injects config before boot)
 * unless they specifically exercise the preflight.
 */
+import { readFileSync } from 'node:fs';
 import { test, expect } from './fixtures.js';
+import { http, HttpResponse } from 'msw';
 import {
   enableTransactions,
   configureBrowser,
@@ -21,6 +23,8 @@ import {
   waitForBrowserReady
 } from './helpers.js';
 import API from '../fixtures/instances/api.js';
+
+const itemSchema = JSON.parse(readFileSync(new URL('../fixtures/schemas/item-minimal.json', import.meta.url), 'utf-8'));
 
 function createItemApi() {
   const api = API.minimalApi().addItemTransactionsExtension();
@@ -366,19 +370,19 @@ test.describe('Management - CRUD flows', () => {
   });
 });
 
+// Replace the editor content; relies on CodeMirror's bracket/quote typeover
+// so that typing the plain JSON string produces exactly that string.
+async function replaceEditorContent(page, text) {
+  const editor = page.locator('.cm-content');
+  await editor.click();
+  await page.keyboard.press('ControlOrMeta+a');
+  await page.keyboard.type(text);
+  // Let the debounced draft write (1s) settle
+  await page.waitForTimeout(1500);
+}
+
 test.describe('Management - drafts and leave guards', () => {
   const DRAFT_JSON = '{"type": "Feature", "id": "draft-test"}';
-
-  // Replace the editor content; relies on CodeMirror's bracket/quote typeover
-  // so that typing the plain JSON string produces exactly that string.
-  async function replaceEditorContent(page, text) {
-    const editor = page.locator('.cm-content');
-    await editor.click();
-    await page.keyboard.press('ControlOrMeta+a');
-    await page.keyboard.type(text);
-    // Let the debounced draft write (1s) settle
-    await page.waitForTimeout(1500);
-  }
 
   test('restores a draft after a reload and discards it on request', async ({ page, worker }) => {
     const { api, item } = createItemApi();
@@ -466,6 +470,68 @@ test.describe('Management - drafts and leave guards', () => {
     modal = page.getByRole('dialog');
     await modal.getByRole('button', { name: 'Leave page' }).click();
     await expect(page).not.toHaveURL(/\/management\//);
+  });
+});
+
+test.describe('Management - editor validation', () => {
+  const VALID_ITEM =
+    '{"type": "Feature", "stac_version": "1.1.0", "id": "test", "properties": {"datetime": "2020-01-01T00:00:00Z"}}';
+  const INVALID_ID_ITEM = VALID_ITEM.replace('"test"', '123');
+  const MISSING_ID_ITEM = VALID_ITEM.replace('"id": "test", ', '');
+
+  // Serve self-contained schemas so validation works offline and deterministically
+  async function mockSchemas(worker) {
+    await worker.use(
+      http.get('https://schemas.stacspec.org/*', () => HttpResponse.json(itemSchema)),
+      http.get('https://stac-extensions.github.io/*', () => HttpResponse.json({}))
+    );
+  }
+
+  async function openEditor(page, worker) {
+    const { api, item } = createItemApi();
+    await api.createServer(worker);
+    await mockSchemas(worker);
+    await enableTransactions(page);
+    await page.goto('/management/edit' + item.getBrowserPath());
+    await waitForBrowserReady(page);
+    await expect(page.locator('.cm-content')).toContainText(item.data.id);
+  }
+
+  test('highlights the offending value and clears after fixing it', async ({ page, worker }) => {
+    await openEditor(page, worker);
+    await replaceEditorContent(page, INVALID_ID_ITEM);
+
+    // The debounced validation marks exactly the wrong value
+    const markers = page.locator('.cm-lintRange-error');
+    await expect(markers.first()).toBeVisible({ timeout: 20000 });
+    expect((await markers.allTextContents()).join('')).toContain('123');
+    await expect(page.locator('.cm-lint-marker-error')).toBeVisible();
+
+    // The lint tooltip shows the (localized) ajv message
+    await markers.first().hover();
+    await expect(page.locator('.cm-tooltip-lint')).toContainText(/must be string/i);
+
+    // Fixing the value clears the diagnostics
+    await replaceEditorContent(page, VALID_ITEM);
+    await expect(page.locator('.cm-lintRange-error')).toHaveCount(0, { timeout: 20000 });
+  });
+
+  test('reports a missing required property', async ({ page, worker }) => {
+    await openEditor(page, worker);
+    await replaceEditorContent(page, MISSING_ID_ITEM);
+
+    const markers = page.locator('.cm-lintRange-error');
+    await expect(markers.first()).toBeVisible({ timeout: 20000 });
+    await markers.first().hover();
+    await expect(page.locator('.cm-tooltip-lint')).toContainText(/required property.*id/i);
+  });
+
+  test('broken JSON reports a syntax error without breaking the editor', async ({ page, worker }) => {
+    await openEditor(page, worker);
+    await replaceEditorContent(page, '{"id": }');
+
+    await expect(page.locator('.cm-lintRange-error').first()).toBeVisible({ timeout: 20000 });
+    await expect(page.locator('.cm-content')).toContainText('{"id": }');
   });
 });
 

@@ -9,7 +9,7 @@
 
 <script>
 import { STAC } from 'stac-js';
-import validateSTAC from 'stac-node-validator';
+import { validateStac } from '../validation';
 import { mapGetters } from 'vuex';
 
 export default {
@@ -51,7 +51,7 @@ export default {
       try {
         if (this.data instanceof STAC) {
           const stac = this.data._original || this.data.toJSON();
-          const report = await validateSTAC(stac, {});
+          const report = await validateStac(stac);
           if (report.valid === null) {
             console.warn(report.messages);
           }
