@@ -23,6 +23,7 @@
             </b-row>
           </section>
           <LinkList v-if="linkPosition === 'left'" :title="$t('additionalResources')" :links="additionalLinks" />
+          <StacActions :data="data" />
         </section>
         <section v-if="isCollection || hasThumbnails" class="mb-4">
           <b-card no-body class="maps-preview">
@@ -107,6 +108,7 @@ export default defineComponent({
     MetadataGroups: defineAsyncComponent(() => import('../components/MetadataGroups.vue')),
     Providers: defineAsyncComponent(() => import('../components/Providers.vue')),
     ReadMore,
+    StacActions: defineAsyncComponent(() => import('../components/StacActions.vue')),
     Thumbnails: defineAsyncComponent(() => import('../components/Thumbnails.vue'))
   },
   mixins: [

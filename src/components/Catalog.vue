@@ -18,6 +18,7 @@
     <b-card-footer>
       <slot name="footer" :data="data" />
     </b-card-footer>
+    <StacActions v-if="data" :data="data" footer vertical size="sm" />
   </b-card>
 </template>
 
@@ -28,6 +29,7 @@ import FileFormatsMixin from './FileFormatsMixin';
 import StacFieldsMixin from './StacFieldsMixin';
 import CardMixin from './CardMixin';
 import StacLink from './StacLink.vue';
+import StacActions from './StacActions.vue';
 import { STAC } from 'stac-js';
 import { formatTemporalExtent } from '@radiantearth/stac-fields/formatters';
 import { BCard, BCardBody, BCardFooter, BCardImg, BCardText, BCardTitle } from 'bootstrap-vue-next';
@@ -42,6 +44,7 @@ export default {
     BCardText,
     BCardTitle,
     StacLink,
+    StacActions,
     Keywords: defineAsyncComponent(() => import('./Keywords.vue'))
   },
   mixins: [

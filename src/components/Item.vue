@@ -15,6 +15,7 @@
       <Keywords v-if="showKeywordsInItemCards && keywords.length > 0" :keywords="keywords" variant="primary" />
       <b-card-text><small class="datetime" v-html="displayTime" /></b-card-text>
     </b-card-body>
+    <StacActions v-if="data" :data="data" footer vertical size="sm" />
   </b-card>
 </template>
 
@@ -25,6 +26,7 @@ import { mapState, mapGetters } from 'vuex';
 import FileFormatsMixin from './FileFormatsMixin';
 import CardMixin from './CardMixin';
 import StacLink from './StacLink.vue';
+import StacActions from './StacActions.vue';
 import { STAC } from 'stac-js';
 import { formatTemporalExtent, formatTimestamp } from '@radiantearth/stac-fields/formatters';
 import { BCard, BCardBody, BCardText, BCardTitle, BCardImg } from 'bootstrap-vue-next';
@@ -33,6 +35,7 @@ export default defineComponent({
   name: 'Item',
   components: {
     StacLink,
+    StacActions,
     BCard,
     BCardImg,
     BCardBody,
