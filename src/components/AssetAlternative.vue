@@ -15,7 +15,7 @@ import { formatMediaType } from '@radiantearth/stac-fields/formatters';
 import Description from './Description.vue';
 import HrefActions from './HrefActions.vue';
 import StacFieldsMixin from './StacFieldsMixin';
-import AuthUtils from './auth/utils';
+import { resolveRefs } from '../auth/schemes.js';
 import { isObject, size } from 'stac-js/src/utils.js';
 import { Asset, STACReference } from 'stac-js';
 import { getIgnoredFields } from '../ignored-metadata.js';
@@ -60,7 +60,7 @@ export default {
       return null;
     },
     auth() {
-      return AuthUtils.resolveAuth(this.asset);
+      return resolveRefs(this.asset);
     }
   },
   methods: {

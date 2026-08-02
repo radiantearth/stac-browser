@@ -24,7 +24,13 @@ export function stacRequestOptions(cx, link) {
   }
 
   // Generate URL including query strings
-  const url = cx.getters.getRequestUrl(link.href);
+  let url = cx.getters.getRequestUrl(link.href);
+
+  // Determine the authentication data for this specific link (auth:refs or default scheme)
+  const auth = cx.getters['auth/resolveInjection'](link, url);
+  if (size(auth.query) > 0) {
+    url = cx.getters.getRequestUrl(link.href, null, false, auth.query);
+  }
 
   // Combine headers
   let headers = {
@@ -36,6 +42,7 @@ export function stacRequestOptions(cx, link) {
   if (!cx.getters.isExternalUrl(url)) {
     Object.assign(headers, cx.state.requestHeaders);
   }
+  Object.assign(headers, auth.headers);
   if (isObject(link.headers)) {
     Object.assign(headers, link.headers);
   }

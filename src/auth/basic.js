@@ -22,9 +22,13 @@ export default class BasicAuth extends Auth {
     return i18n.global.t('authentication.button.title');
   }
 
-  async logout(credentials) {
-    await super.logout(credentials);
-    if (this.router.currentRoute.value.name !== 'logout') {
+  async logout(credentials, quiet = false) {
+    await super.logout(credentials, quiet);
+    if (quiet) {
+      // Other schemes are still logged in, stay on the current page
+      await this.confirmLogout();
+    }
+    else if (this.router.currentRoute.value.name !== 'logout') {
       this.router.push('/auth/logout');
     }
     return true;

@@ -18,7 +18,6 @@
 
 <script>
 import Description from '../Description.vue';
-import { mapGetters } from 'vuex';
 import { BCard, BCardBody, BCardFooter } from 'bootstrap-vue-next';
 
 export default {
@@ -47,17 +46,11 @@ export default {
     };
   },
   computed: {
-    ...mapGetters('auth', ['isLoggedIn']),
     promptText() {
       if (this.description) {
         return this.description;
       }
       return this.$t('authConfig.description');
-    }
-  },
-  beforeCreate() {
-    if (this.isLoggedIn) {
-      this.$emit('submit', null);
     }
   },
   created() {

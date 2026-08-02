@@ -30,7 +30,7 @@
       :title="$t('authentication.chooseMethod')" teleport-to="#stac-browser" :boundary-padding="10"
     >
       <b-list-group>
-        <AuthSchemeItem v-for="(method, i) in auth" :key="i" :method="method" @authenticate="startAuth" />
+        <AuthSchemeItem v-for="entry in auth" :key="entry.id" :schemeId="entry.id" :scheme="entry.scheme" @authenticate="startAuth" />
       </b-list-group>
     </b-popover>
   </div>
@@ -46,7 +46,7 @@ import { size, URI } from 'stac-js/src/utils.js';
 import { mapGetters, mapState } from 'vuex';
 import AssetActions from '../../assetActions.config';
 import LinkActions from '../../linkActions.config';
-import AuthUtils from './auth/utils';
+import { isSupported } from '../auth/schemes.js';
 import { Asset } from 'stac-js';
 import { browserProtocols } from 'stac-js/src/http';
 import { imageMediaTypes, geojsonMediaType, wozMediaTypes, zarrMediaTypes } from 'stac-js/src/mediatypes';
@@ -106,7 +106,16 @@ export default {
       return Boolean(this.downloads[this.href]);
     },
     requiresAuth() {
-      return !this.isLoggedIn && this.auth.length > 0;
+      // Authentication is required when none of the schemes that may be used
+      // for this link/asset has credentials yet
+      return this.auth.length > 0 && !this.auth.some(({ id }) => this.isLoggedIn(id));
+    },
+    // The authentication data (headers/query) that requests for this link/asset receive
+    authInjection() {
+      if (typeof this.data.getAbsoluteUrl !== 'function') {
+        return { headers: {}, query: {} };
+      }
+      return this.$store.getters['auth/resolveInjection'](this.data, this.data.getAbsoluteUrl());
     },
     tileRendererType() {
       if (this.tileUrlTemplate && !this.useTileLayerAsFallback) {
@@ -177,7 +186,7 @@ export default {
       else if (typeof this.data.method === 'string' && this.data.method.toUpperCase() !== 'GET') {
         return true;
       }
-      else if (size(this.data.headers) > 0 || size(this.requestHeaders) > 0) {
+      else if (size(this.data.headers) > 0 || size(this.requestHeaders) > 0 || size(this.authInjection.headers) > 0) {
         return true;
       }
       return false;
@@ -208,7 +217,7 @@ export default {
       if (typeof this.data.href !== 'string') {
         return null;
       }
-      return this.getRequestUrl(this.data.getAbsoluteUrl());
+      return this.getRequestUrl(this.data.getAbsoluteUrl(), null, false, this.authInjection.query);
     },
     from() {
       return this.protocolName(this.protocol);
@@ -315,13 +324,14 @@ export default {
         this.startAuth(this.auth[0]);
       }
     },
-    async startAuth(method) {
-      if (AuthUtils.isSupported(method, this.$store.state)) {
-        await this.$store.dispatch('config', { authConfig: method });
-        await this.$store.dispatch('auth/requestLogin');
+    async startAuth({ id, scheme }) {
+      // Prefer the registered scheme, which may be completed by the authConfig option
+      const effective = this.$store.getters['auth/schemes'][id] || scheme;
+      if (isSupported(effective, this.$store.state)) {
+        await this.$store.dispatch('auth/requestLogin', { ids: [id] });
       }
       else {
-        const name = this.$t(`authentication.schemeTypes.${method.type}`, method);
+        const name = this.$t(`authentication.schemeTypes.${effective.type}`, effective);
         const message = this.$t('authentication.unsupportedLong', {method: name});
         this.$store.commit('showGlobalError', {
           error: new Error(message),

@@ -153,9 +153,17 @@
     },
     "authConfig": {
       "type": ["object"],
-      "allOf": [
+      "description": "Either a single Authentication Scheme Object (legacy, applied to all requests) or a map of scheme id => Authentication Scheme Object, aligned with the `auth:schemes` field of the STAC Authentication extension. Scheme objects may additionally contain the STAC Browser specific properties `default`, `formatter`, `description` and `oidcConfig`.",
+      "oneOf": [
         {
-          "$ref": "https://stac-extensions.github.io/authentication/v1.1.0/schema.json"
+          "$comment": "Legacy form: a single Authentication Scheme Object",
+          "required": ["type"]
+        },
+        {
+          "$comment": "Map form: scheme id => Authentication Scheme Object",
+          "additionalProperties": {
+            "type": "object"
+          }
         }
       ]
     },

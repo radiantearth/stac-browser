@@ -15,10 +15,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added basic support for the STAC API extensions Transactions (for Items) and Collection Transactions, including validation
   - Adds three new config options: `transactions`, `transactionsRequireLogin` and `transactionsRequirePreflight`
   - Support for external management UIs via `create-form` and `edit-form` links ([RFC 6861](https://www.rfc-editor.org/rfc/rfc6861.html)) in the "Manage" menu
+- Support for multiple authentication methods with independent credentials at the same time ([#612](https://github.com/radiantearth/stac-browser/issues/612))
+  - The authentication data (header / query parameter / cookie) is determined per request, based on the `auth:refs` of the requested link or asset (STAC Authentication extension)
+  - `authConfig` additionally accepts a map of scheme id => Authentication Scheme Object, aligned with `auth:schemes`; the configured schemes complete or override the schemes announced by a catalog with the same id (e.g. to provide a `client_id` for OpenID Connect); the previous single-object form is still supported
+  - New scheme properties `default` (apply a scheme to all requests without `auth:refs`) and `title` (display name)
+  - Schemes announced by a catalog via `auth:schemes` can be logged in through the header button without configuration
+  - API keys in cookies (`in: cookie`) are supported now
+  - Logging out of one scheme no longer reloads the page while other schemes are still logged in
 
 ### Fixed
 
 - The Search page restores the previous results when returning to it
+- Cookies written by STAC Browser were session cookies as the expiry date was not set correctly
 
 ## [5.0.0] - 2026-07-31
 

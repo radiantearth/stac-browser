@@ -24,7 +24,7 @@ export default defineComponent({
   },
   computed: {
     ...mapState(['globalError']),
-    ...mapGetters('auth', ['method'])
+    ...mapGetters('auth', ['activeMethod'])
   },
   watch: {
     globalError: {
@@ -36,9 +36,13 @@ export default defineComponent({
         }
       }
     },
-    method: {
+    activeMethod: {
       immediate: true,
-      async handler() {
+      async handler(method) {
+        if (!method) {
+          // The method is restored asynchronously at startup (see auth/restore)
+          return;
+        }
         try {
           await this.finalizeLogin();
         } catch (error) {
