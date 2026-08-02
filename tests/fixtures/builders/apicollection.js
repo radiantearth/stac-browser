@@ -59,16 +59,16 @@ export default class APICollection extends STACHypermedia {
     return this;
   }
   
-  paginateData(key, { limit = this.defaultLimit, page = 1 } = {}) {
+  paginateData(key, { limit = this.defaultLimit, page = 1 } = {}, filterFn = null) {
     //key exists in dta and is an array
     if (!(this.data[key] && Array.isArray(this.data[key]))){
       throw new Error(`Cannot paginate data: data[${key}] is not an array`);
     }
-    
+
     // ensure integers
     limit = parseInt(limit);
     page = parseInt(page);
-    
+
     // Preserve full dataset on first call to enable re-pagination
     if (!this._fullData) {
       this._fullData = {};
@@ -76,9 +76,9 @@ export default class APICollection extends STACHypermedia {
     if (!this._fullData[key]) {
       this._fullData[key] = [...this.data[key]];
     }
-    
+
     // using _fullData to preserve the initial list of items. bit hacky...
-    const fullItemList = this._fullData[key];
+    const fullItemList = filterFn ? this._fullData[key].filter(filterFn) : this._fullData[key];
     const totalItems = fullItemList.length;
     const currentIndex = (page - 1) * limit;
     const currentEndIndex = currentIndex + limit;
