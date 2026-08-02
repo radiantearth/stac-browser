@@ -826,7 +826,7 @@ test.describe('STAC Browser Search page', () => {
       expect(resetReq.url()).not.toMatch(/[?&]limit=/);
     });
   });
-    test('Spatial extent is preserved when switching from Collections tab to Items tab', async ({ page, worker }) => {
+  test('Spatial extent is preserved when switching from Collections tab to Items tab', async ({ page, worker }) => {
     api = API.minimalApi(
       {},
       {

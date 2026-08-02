@@ -63,13 +63,13 @@ test.describe('Dropped filter banner — collection search to collection navigat
     api = API.minimalApi({}, { defaultLimit: 10 });
 
     const sentinel = api.addCollection('sentinel-2-l2a')
-        .setMetadata({ title: 'Sentinel-2 L2A' });
+      .setMetadata({ title: 'Sentinel-2 L2A' });
     const landsat = api.addCollection('landsat-8')
-        .setMetadata({ title: 'Landsat 8' });
+      .setMetadata({ title: 'Landsat 8' });
 
     api.addCollectionsExtension()
-    .addItemsExtension()
-    .addSearchExtension();
+      .addItemsExtension()
+      .addSearchExtension();
 
     api.addManyItems(sentinel, 3);
     api.addManyItems(landsat, 3);
@@ -81,7 +81,7 @@ test.describe('Dropped filter banner — collection search to collection navigat
 
     await api.createServer(worker);
     BROWSER_PATH = api.root.getBrowserPath();
- });
+  });
 
   test('Free-text banner appears when navigating from collection search into a collection', async ({ page }) => {
     await test.step('Navigate to collection search tab', async () => {
@@ -166,16 +166,16 @@ test.describe('Dropped filter banner — collection search to collection navigat
     });
 
     await test.step('Verify banner renders above the filter form fields', async () => {
-        const banner = page.locator('.alert-warning').first();
-        const limitGroup = page.locator('.limit').first();
+      const banner = page.locator('.alert-warning').first();
+      const limitGroup = page.locator('.limit').first();
 
-        await expect(banner).toBeVisible({ timeout: 10000 });
-        await expect(limitGroup).toBeVisible();
+      await expect(banner).toBeVisible({ timeout: 10000 });
+      await expect(limitGroup).toBeVisible();
 
-        const bannerBox = await banner.boundingBox();
-        const limitBox = await limitGroup.boundingBox();
-        expect(bannerBox.y).toBeLessThan(limitBox.y);
-        });
+      const bannerBox = await banner.boundingBox();
+      const limitBox = await limitGroup.boundingBox();
+      expect(bannerBox.y).toBeLessThan(limitBox.y);
+    });
   });
 
   test('Free-text banner can be dismissed independently and disappears', async ({ page }) => {
@@ -312,7 +312,9 @@ test.describe('Dropped filter banner — collection search to collection navigat
     });
 
     await test.step('Verify no banner appears', async () => {
-      await page.waitForTimeout(500);
+      // The banner renders in the same pass as the filter form, so once a stable
+      // form field is present its absence is deterministic — no arbitrary wait.
+      await expect(page.locator('.limit').first()).toBeVisible();
       await expect(page.locator('.alert-warning')).toHaveCount(0);
     });
   });
@@ -358,7 +360,9 @@ test.describe('Dropped filter banner — collection search to collection navigat
     // The carry-over only applies when jumping there from the search results,
     // browsing the catalog is not affected
     await test.step('Verify no banner appears for the second collection', async () => {
-      await page.waitForTimeout(500);
+      // The banner renders in the same pass as the filter form, so once a stable
+      // form field is present its absence is deterministic — no arbitrary wait.
+      await expect(page.locator('.limit').first()).toBeVisible();
       await expect(page.locator('.alert-warning')).toHaveCount(0);
     });
   });
