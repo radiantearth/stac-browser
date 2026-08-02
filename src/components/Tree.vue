@@ -157,30 +157,29 @@ export default {
       if (!this.stac?.isCatalogLike) {
         return [];
       }
-      const groups = this.getChildren(this.stac, this.apiCatalogPriority);
+      const { children, collections, items } = this.getChildren(this.stac, this.apiCatalogPriority);
 
       const collectionSort = Utils.parseApiSortParameter(this.defaultCollectionSort);
       const itemSort = Utils.parseApiSortParameter(this.defaultItemSort);
       const sortCatalogs = list => collectionSort.direction === 0 ? list : sortStac(list, collectionSort, this.uiLanguage);
-
-      // Children (from child links) come before the collections (from the
-      // collections endpoint), unless the two lists are merged and sorted as one
-      let catalogs;
-      if (this.mergeCatalogsAndCollections) {
-        catalogs = sortCatalogs(groups.children.concat(groups.collections));
-      }
-      else {
-        catalogs = sortCatalogs(groups.children).concat(sortCatalogs(groups.collections));
-      }
-      const items = itemSort.direction === 0 ? groups.items : sortStac(groups.items, itemSort, this.uiLanguage);
+      const sortedItems = itemSort.direction === 0 ? items : sortStac(items, itemSort, this.uiLanguage);
 
       const childs = [];
-      if (groups.prev) {
-        childs.push(groups.prev);
+      if (this.mergeCatalogsAndCollections) {
+        children.prev && childs.push(children.prev);
+        collections.prev && childs.push(collections.prev);
+        childs.push(...sortCatalogs(children.list.concat(collections.list)), ...sortedItems);
+        children.next && childs.push(children.next);
+        collections.next && childs.push(collections.next);
       }
-      childs.push(...catalogs, ...items);
-      if (groups.next) {
-        childs.push(groups.next);
+      else {
+        // Children before collections, each list paginated on its own
+        children.prev && childs.push(children.prev);
+        childs.push(...sortCatalogs(children.list));
+        children.next && childs.push(children.next);
+        collections.prev && childs.push(collections.prev);
+        childs.push(...sortCatalogs(collections.list), ...sortedItems);
+        collections.next && childs.push(collections.next);
       }
       return childs;
     },
@@ -199,11 +198,15 @@ export default {
     pagination() {
       return ['next', 'prev', 'previous'].includes(this.item.rel);
     },
+    source() {
+      // The source that a pagination link belongs to, see the getChildren getter
+      return this.item.source || 'collections';
+    },
     canLoadMore() {
-      return this.item.rel === 'next' && Boolean(this.getApiChildren(this.parent, 'collections')?.next);
+      return this.item.rel === 'next' && Boolean(this.getApiChildren(this.parent, this.source)?.next);
     },
     loadingMore() {
-      return this.isApiChildrenLoading(this.parent, 'collections');
+      return this.isApiChildrenLoading(this.parent, this.source);
     }
   },
   watch: {
@@ -229,12 +232,18 @@ export default {
       if (!visible || this.loadingMore) {
         return;
       }
+      const children = this.source === 'children';
       try {
-        await this.$store.dispatch('loadNextApiCollections', { stac: this.parent, next: true });
+        if (children) {
+          await this.$store.dispatch('loadApiChildren', { stac: this.parent, next: true });
+        }
+        else {
+          await this.$store.dispatch('loadNextApiCollections', { stac: this.parent, next: true });
+        }
       } catch (error) {
         this.$store.commit('showGlobalError', {
           error,
-          message: this.$t('errors.loadApiCollectionsFailed')
+          message: this.$t(children ? 'errors.loadApiChildrenFailed' : 'errors.loadApiCollectionsFailed')
         });
       }
     },

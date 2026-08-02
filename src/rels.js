@@ -22,6 +22,7 @@ export const stacBrowserSpecialHandling = [
   'data',
   'items',
   'search',
+  'children',
   'aggregate', // (Irrelevant) Extensions v
   'aggregations',
   'collections-search',
