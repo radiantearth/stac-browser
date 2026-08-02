@@ -1,10 +1,9 @@
-import { Catalog, Collection, Item, ItemCollection, CollectionCollection, STAC, STACReference } from 'stac-js';
+import { Catalog, ChildrenCollection, Collection, Item, ItemCollection, CollectionCollection, STAC, STACReference } from 'stac-js';
 import Migrate from '@radiantearth/stac-migrate';
 import Utils from '../utils';
 import { hasText, isObject } from 'stac-js/src/utils.js';
 import { toAbsolute } from 'stac-js/src/http.js';
 import { markRaw } from 'vue';
-import ChildrenCollection from './childrenCollection';
 
 function setInternal(stac, key, value) {
   const internalKey = '_' + key;
@@ -82,10 +81,6 @@ export function createSTAC(data, url = null, store = null, incomplete = false) {
   }
 
   return obj;
-}
-
-export function getApiChildrenLink(stac) {
-  return (stac?.isCatalogLike && stac.getStacLinkWithRel('children')) || null;
 }
 
 // Returns the child links of the entity that are not already contained in the

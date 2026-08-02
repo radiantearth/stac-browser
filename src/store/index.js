@@ -6,9 +6,8 @@ import urijs from 'urijs';
 import i18n, { loadMessages, detectDataLanguage, updateExternals } from '../i18n';
 import Utils, { BrowserError } from '../utils';
 import { toAbsolute } from 'stac-js/src/http.js';
-import { getApiChildrenLink, getMissingChildren, getDisplayTitle, createSTAC } from '../models/stac';
-import ChildrenCollection from '../models/childrenCollection';
-import { STAC } from 'stac-js';
+import { getMissingChildren, getDisplayTitle, createSTAC } from '../models/stac';
+import { ChildrenCollection, STAC } from 'stac-js';
 
 import auth from './auth.js';
 import manager from './manager.js';
@@ -425,7 +424,7 @@ function getStore(config, router) {
         if (!state.data?.isCatalogLike || state.apiCatalogPriority === 'collections') {
           return [];
         }
-        if (getApiChildrenLink(state.data)) {
+        if (state.data.getApiChildrenLink()) {
           const children = getApiChildrenList(getApiChildrenSource(state, state.data, 'children'));
           const collectionUrls = new Set(getters.collections.map(collection => collection.getAbsoluteUrl()));
           return children.filter(child => !collectionUrls.has(child.getAbsoluteUrl()));
@@ -466,7 +465,7 @@ function getStore(config, router) {
           }
         }
         if (showChilds) {
-          if (getApiChildrenLink(stac)) {
+          if (stac.getApiChildrenLink()) {
             // With the Children extension the endpoint is authoritative, static child links are not merged in
             const children = getApiChildrenSource(state, stac, 'children');
             const collectionUrls = new Set(groups.collections.list.map(collection => collection.getAbsoluteUrl()));
@@ -1120,7 +1119,7 @@ function getStore(config, router) {
           cx.dispatch('manager/checkPermissions', stacRequestOptions(cx, url));
         }
 
-        const apiChildrenLink = data.isCatalogLike && getApiChildrenLink(data);
+        const apiChildrenLink = data.isCatalogLike && data.getApiChildrenLink();
         if (!omitApi && apiChildrenLink) {
           try {
             await cx.dispatch('loadApiChildren', { stac: data });
@@ -1289,7 +1288,7 @@ function getStore(config, router) {
           if (loaded) {
             return;
           }
-          link = getApiChildrenLink(stac);
+          link = stac.getApiChildrenLink();
           link = link && Utils.addFiltersToLink(link, {}, cx.state.collectionsPerPage);
         }
         else if (loaded) {
