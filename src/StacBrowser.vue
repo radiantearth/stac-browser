@@ -173,7 +173,8 @@ export default defineComponent({
       isNavigatingLocale: false,
       scrolled: false,
       hideSite: false,
-      scrollListener: null
+      scrollListener: null,
+      headerObserver: null
     };
   },
   computed: {
@@ -388,6 +389,15 @@ export default defineComponent({
       else {
         window.removeEventListener('scroll', oldValue);
       }
+    },
+    browserReady: {
+      immediate: true,
+      handler(ready) {
+        if (ready) {
+          // The header only exists in the DOM once the browser is ready
+          this.$nextTick(() => this.observeHeaderHeight());
+        }
+      }
     }
   },
   async created() {
@@ -484,11 +494,30 @@ export default defineComponent({
   },
   beforeUnmount() {
     this.scrollListener = null;
+    if (this.headerObserver) {
+      this.headerObserver.disconnect();
+      this.headerObserver = null;
+    }
   },
   methods: {
     ...mapActions(['switchLocale', 'switchDataLocale']),
     ...mapMutations('auth', ['addAction']),
     ...mapActions('auth', ['requestLogin', 'requestLogout']),
+    // Expose the (dynamic) header height as a CSS custom property so that
+    // views can size elements relative to the remaining viewport height,
+    // e.g. the independently scrolling panels on the search page.
+    observeHeaderHeight() {
+      if (this.headerObserver || !this.$refs.header || typeof ResizeObserver === 'undefined') {
+        return;
+      }
+      this.headerObserver = new ResizeObserver(() => {
+        const header = this.$refs.header;
+        if (header) {
+          document.documentElement.style.setProperty('--sb-header-height', `${header.offsetHeight}px`);
+        }
+      });
+      this.headerObserver.observe(this.$refs.header);
+    },
     toggleColorMode() {
       this.colorMode = this.colorMode === 'light' ? 'dark' : 'light';
     },

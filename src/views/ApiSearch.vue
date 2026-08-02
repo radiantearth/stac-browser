@@ -394,12 +394,63 @@ export default defineComponent({
 
   .left {
     min-width: 420px;
-    flex-basis: 40%;
+    flex-basis: 35%;
   }
   .right {
     min-width: 250px;
-    flex-basis: 60%;
+    flex-basis: 65%;
     position: relative !important;
+  }
+
+  // Let the filter panel (left) and the results panel (right) scroll
+  // independently: cap each column at the viewport height below the header
+  // and scroll overflowing content inside the column. Only applied on larger
+  // screens; on small screens the columns stack and the page scrolls as usual.
+  @include media-breakpoint-up(md) {
+    .left,
+    .right {
+      // Offset for the sticky header (measured at runtime via --sb-header-height)
+      // plus the gap between header and content.
+      @if $header-position == sticky {
+        --sb-search-panel-top: calc(var(--sb-header-height, 0px) + var(--sb-header-margin, 0px) + var(--sb-block-gap, 1rem));
+      } @else {
+        --sb-search-panel-top: var(--sb-block-gap, 1rem);
+      }
+      position: sticky !important;
+      top: var(--sb-search-panel-top);
+      align-self: flex-start;
+      max-height: calc(100vh - var(--sb-search-panel-top));
+    }
+    .right {
+      overflow-y: auto;
+    }
+    // In the left panel only the card body of the filter form scrolls,
+    // so that the tab navigation and the card footer with the
+    // submit/reset buttons always stay visible. The chain of flex
+    // containers with min-height: 0 passes the height constraint from
+    // the column down to the card body.
+    .left {
+      display: flex;
+      flex-direction: column;
+
+      > .tabs,
+      > .tabs > .tab-content,
+      > .tabs > .tab-content > .tab-pane.active,
+      > .tabs > .tab-content > .tab-pane.active > .filter {
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+      }
+
+      .filter > .card {
+        min-height: 0;
+
+        > .card-body {
+          overflow-y: auto;
+          min-height: 0;
+        }
+      }
+    }
   }
 }
 </style>
