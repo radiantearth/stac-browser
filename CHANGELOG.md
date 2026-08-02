@@ -26,6 +26,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Favorites are stored locally in the browser and can be exported and imported as JSON, CSV, or STAC Catalog
   - Adds a new config option `showFavorites` to disable the functionality
 - Items can be shown in a list view in addition to the card view, with the same view toggle buttons as for catalogs and collections
+- Support for multiple authentication methods with independent credentials at the same time ([#612](https://github.com/radiantearth/stac-browser/issues/612))
+  - The authentication data (header / query parameter / cookie) is determined per request, based on the `auth:refs` of the requested link or asset (STAC Authentication extension)
+  - `authConfig` additionally accepts a map of scheme id => Authentication Scheme Object, aligned with `auth:schemes`; the configured schemes complete or override the schemes announced by a catalog with the same id (e.g. to provide a `client_id` for OpenID Connect); the previous single-object form is still supported
+  - New scheme properties `default` (apply a scheme to all requests without `auth:refs`) and `title` (display name)
+  - Schemes announced by a catalog via `auth:schemes` can be logged in through the header button without configuration
+  - API keys in cookies (`in: cookie`) are supported now
+  - Logging out of one scheme no longer reloads the page while other schemes are still logged in
 - Search Example Code is now also available for curl and Go
 - The map can display more Zarr datasets
 - New config option `getStacLayerOptions` to customize the options of the individual map layers created for STAC assets and links, e.g. to style GeoTIFF/GeoZarr layers
@@ -50,6 +57,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Don't show inline sort and filter options in Collection Search
 - Preserve sort in Collection Search
 - Show error message when search is not actually available although conformance classes are listed
+- Cookies written by STAC Browser were session cookies as the expiry date was not set correctly
 - The `IN` operator for temporal filters shows a list of datepicker inputs instead of a free-text input
 - Timestamps in `IN` filters are serialized as CQL2 temporal literals instead of plain strings
 

@@ -9,7 +9,7 @@ import { toAbsolute } from 'stac-js/src/http.js';
 import { addMissingChildren, getDisplayTitle, createSTAC } from '../models/stac';
 import { STAC } from 'stac-js';
 
-import auth from './auth.js';
+import auth, { resetCatalogAuth } from './auth.js';
 import favorites from './favorites.js';
 import manager from './manager.js';
 import { addQueryIfNotExists, hasAuthority, isAuthenticationError, Loading, stacRequest, stacRequestOptions } from './utils';
@@ -496,10 +496,14 @@ function getStore(config, router) {
         let relativeStr = relative.toString();
         return relativeStr.startsWith('//') || relativeStr.startsWith('../');
       },
-      getRequestUrl: (state, getters) => (url, baseUrl = null, addLocalQueryParams = false) => {
+      getRequestUrl: (state, getters) => (url, baseUrl = null, addLocalQueryParams = false, extraQuery = null) => {
         try {
           let absoluteUrl = toAbsolute(url, baseUrl ? baseUrl : state.url, false);
           if (!getters.isExternalUrl(absoluteUrl)) {
+            // Add additional query parameters, e.g. for authentication (see auth/resolveInjection)
+            if (isObject(extraQuery)) {
+              addQueryIfNotExists(absoluteUrl, extraQuery);
+            }
             // Check whether private params are present and add them if the URL is part of the catalog
             addQueryIfNotExists(absoluteUrl, state.privateQueryParameters);
             // Check if we need to add global request params
@@ -665,6 +669,8 @@ function getStore(config, router) {
       resetCatalog(state, clearAll) {
         Object.assign(state, catalogDefaults());
         Object.assign(state, localDefaults());
+        // Don't leak credentials for catalog-announced auth schemes into the next catalog
+        resetCatalogAuth(state.auth);
         if (!state.supportedLocales.includes(state.locale)) {
           state.locale = config.locale;
         }
@@ -847,7 +853,7 @@ function getStore(config, router) {
           }
           switch (key) {
             case 'authConfig':
-              promises.push(cx.dispatch('auth/updateMethod', value));
+              promises.push(cx.dispatch('auth/configure'));
               break;
           }
         }
@@ -934,7 +940,12 @@ function getStore(config, router) {
         try {
           return await stacRequest(cx, link, checkPermissions, axiosOptions);
         } catch (error) {
-          if (noRetry || !cx.state.authConfig || cx.getters['auth/isLoggedIn'] || !isAuthenticationError(error)) {
+          if (noRetry || !isAuthenticationError(error)) {
+            throw error;
+          }
+          // The schemes that the user could log in with to authorize this request
+          const candidates = cx.getters['auth/candidatesFor'](link);
+          if (candidates.length === 0) {
             throw error;
           }
           return await new Promise((resolve, reject) => {
@@ -942,7 +953,7 @@ function getStore(config, router) {
               run: () => cx.dispatch('request', { link, axiosOptions, checkPermissions, noRetry: true }).then(resolve, reject),
               cancel: () => reject(error)
             });
-            cx.dispatch('auth/requestLogin').catch(reject);
+            cx.dispatch('auth/requestLogin', { ids: candidates }).catch(reject);
           });
         }
       },
@@ -987,6 +998,13 @@ function getStore(config, router) {
               throw new BrowserError(i18n.global.t('errors.apiListRequested'));
             }
             cx.commit('loaded', { url, data });
+
+            // Make the authentication schemes announced by the STAC entity
+            // available for per-request authentication (STAC Authentication extension)
+            const authSchemes = data.getMetadata('auth:schemes');
+            if (isObject(authSchemes)) {
+              await cx.dispatch('auth/registerSchemes', { schemes: authSchemes });
+            }
 
             if (show) {
               // If we prefer another language abort redirect to the new language
@@ -1327,10 +1345,13 @@ function getStore(config, router) {
           const res = await fetch(url, axiosOptions);
           // todo: use getErrorMessage / getErrorCode instead?
           if (res.status >= 400) {
-            if ([401, 403].includes(res.status) && !noRetry && cx.state.authConfig && !cx.getters['auth/isLoggedIn']) {
+            const candidates = [401, 403].includes(res.status) && !noRetry
+              ? cx.getters['auth/candidatesFor'](link)
+              : [];
+            if (candidates.length > 0) {
               // Ask the user to log in and restart the download afterwards
               cx.commit('auth/addAction', () => cx.dispatch('altDownload', { link, noRetry: true }));
-              await cx.dispatch('auth/requestLogin');
+              await cx.dispatch('auth/requestLogin', { ids: candidates });
               return;
             }
             let msg;

@@ -251,33 +251,76 @@ The value for the [`crossorigin` attribute](https://developer.mozilla.org/en-US/
 
 This allows to enable some authentication methods. Currently the supported methods are:
 
-- API Keys (`type: apiKey`) via query parameter or HTTP Header
+- API Keys (`type: apiKey`) via query parameter, HTTP Header or cookie
 - HTTP Basic (`type: http`, `scheme: basic`)
 - OpenID Connect (`type: openIdConnect`)
 
 Authentication is disabled by default (`null`).
 
-The options you can set in the `authConfig` object are defined in the
-[Authentication Scheme Object of the STAC Authentication Extension](https://github.com/stac-extensions/authentication?tab=readme-ov-file#authentication-scheme-object) (limited by the supported methods listed above).
+The option accepts two forms:
+
+1. **A single [Authentication Scheme Object](https://github.com/stac-extensions/authentication?tab=readme-ov-file#authentication-scheme-object)** (limited by the supported methods listed above). The scheme is applied to all requests that don't specify their own authentication schemes via the STAC Authentication Extension (see below).
+2. **A map of scheme id => Authentication Scheme Object**, aligned with the [`auth:schemes` field of the STAC Authentication Extension](https://github.com/stac-extensions/authentication?tab=readme-ov-file#fields). This enables multiple authentication methods with independent credentials at the same time.
 
 **Note:** Before STAC Browser 3.2.0 a different type of object was supported.
 The old way is deprecated, but will be converted to the new object internally.
 Please migrate to the new configuration options now.
 
-In addition the following properties are supported:
+In addition to the fields of the Authentication Scheme Object, the following properties are supported in each scheme:
 
+- `default` (boolean): Only in the map form: the scheme with `default: true` is applied to all requests that don't reference a scheme via `auth:refs` (see below). At most one scheme can be the default. A single Authentication Scheme Object (form 1) is the default scheme automatically.
+- `title` (string|null): Optionally a title for the scheme that is shown to the user, e.g. in the authentication dropdown. Defaults to the name of the authentication method.
 - `formatter` (function|string|null): You can optionally specify a formatter for the query string value or HTTP header value respectively. If the string `"Bearer"` is provided formats as a Bearer token according to RFC 6750. If not given, the token is sent as provided by the user.
 - `description` (string|null): Optionally a description that is shown to the user. This should explain how the credentials can be obtained for example. CommonMark is allowed.
     **Note:** You can leave the description empty in the config file and instead provide a localized string with the key `authConfig` -> `description` in the file for custom phrases (`src/locales/custom.js`).
 
-Authentication is generally affected by the [`allowedDomains`](#alloweddomains) option.
+Authentication is generally affected by the [`allowedDomains`](#alloweddomains) option:
+credentials are never sent to external domains.
+
+#### Interaction with the STAC Authentication Extension
+
+STAC catalogs can announce authentication schemes through the
+[STAC Authentication Extension](https://github.com/stac-extensions/authentication)
+(`auth:schemes`). STAC Browser registers these schemes automatically and determines
+the credentials to send for each request individually, based on the `auth:refs` of
+the requested link or asset. Multiple schemes can be logged in at the same time.
+
+The schemes configured in the map form of `authConfig` are merged with the announced
+schemes **by their scheme id**, with the configuration taking precedence. This way an
+incomplete scheme announced by a catalog can be completed by the deployment, e.g. to
+provide the `client_id` for an OpenID Connect scheme:
+
+```js
+{
+  // Completes the scheme with the id `myOidc` announced by the catalog via auth:schemes
+  myOidc: {
+    oidcConfig: {
+      client_id: 'abc123'
+    }
+  },
+  // An additional scheme that is applied to all requests without auth:refs
+  myKey: {
+    type: 'apiKey',
+    in: 'query',
+    name: 'API_KEY',
+    default: true
+  }
+}
+```
+
+Requests that reference schemes via `auth:refs` never receive the credentials of the
+default scheme; the referenced schemes are treated as alternatives and the first one
+with credentials is used. The `default` flag is only honored from the configuration,
+never from schemes announced by remote catalogs.
 
 #### API Keys
 
-API keys can be configured to be sent via HTTP header or query parameter:
+API keys can be configured to be sent via HTTP header, query parameter or cookie:
 
 - For query parameters you need to set `in: query` with a respective `name` for the query parameter
 - For HTTP headers you need to set `in: header` with a respective `name` for the header field
+- For cookies you need to set `in: cookie` with a respective `name` for the cookie.
+    **Note:** Browsers only send cookies to the domain that set them, so this is usually only useful if STAC Browser is hosted on the same domain as the STAC catalog.
 
 ##### Example 1: HTTP Request Header Value <!-- omit in toc -->
 

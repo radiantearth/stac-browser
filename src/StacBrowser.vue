@@ -33,9 +33,18 @@
           </div>
           <nav class="actions user">
             <b-button-group>
-              <b-button v-if="canAuthenticate" variant="header" @click="logInOut" :title="authTitle">
+              <b-button v-if="canAuthenticate && !showAuthDropdown" variant="header" @click="logInOut" :title="authTitle">
                 <component :is="authIcon" /><span class="button-label">{{ authLabel }}</span>
               </b-button>
+              <b-dropdown v-else-if="canAuthenticate" variant="header" right :title="authTitle">
+                <template #button-content>
+                  <component :is="authIcon" /><span class="button-label">{{ authLabel }}</span>
+                </template>
+                <b-dropdown-item v-for="scheme in authSchemeList" :key="scheme.id" @click="logInOutScheme(scheme)">
+                  <b-icon-unlock v-if="scheme.loggedIn" class="me-1" /><b-icon-lock v-else class="me-1" />
+                  {{ scheme.label }}
+                </b-dropdown-item>
+              </b-dropdown>
               <LanguageChooser
                 v-if="supportedLocalesFromVueX.length > 1"
                 :data="data" :currentLocale="localeFromVueX" :locales="supportedLocalesFromVueX"
@@ -128,7 +137,6 @@ import { API_LANGUAGE_CONFORMANCE, updateExternals } from './i18n';
 import { getBest, prepareSupported } from 'stac-js/src/locales';
 import BrowserStorage from "./browser-store";
 import Authentication from "./components/Authentication.vue";
-import Auth from './auth';
 
 // Pass Config through from props to vuex
 let Props = {};
@@ -153,6 +161,8 @@ export default defineComponent({
   components: {
     AuthImage: defineAsyncComponent(() => import('./components/AuthImage.vue')),
     Authentication,
+    BDropdown: defineAsyncComponent(() => import('bootstrap-vue-next').then(m => m.BDropdown)),
+    BDropdownItem: defineAsyncComponent(() => import('bootstrap-vue-next').then(m => m.BDropdownItem)),
     BIconLock,
     BIconUnlock,
     BPopover: defineAsyncComponent(() => import('bootstrap-vue-next').then(m => m.BPopover)),
@@ -194,8 +204,8 @@ export default defineComponent({
       colorModeFromVueX: 'colorMode'
     }),
     ...mapGetters(['canSearch', 'collectionLink', 'fromBrowserPath', 'isExternalUrl', 'isRoot', 'parentLink', 'root', 'searchBrowserLink', 'supportsConformance', 'title', 'toBrowserPath']),
-    ...mapGetters('auth', { authMethod: 'method' }),
-    ...mapGetters('auth', ['canAuthenticate', 'isLoggedIn', 'showLogin']),
+    ...mapGetters('auth', { authSchemes: 'schemes', isLoggedInScheme: 'isLoggedIn' }),
+    ...mapGetters('auth', ['canAuthenticate', 'isAnyLoggedIn', 'showLogin', 'supportedIds']),
     browserVersion() {
       if (typeof STAC_BROWSER_VERSION !== 'undefined') {
         return STAC_BROWSER_VERSION;
@@ -214,13 +224,32 @@ export default defineComponent({
       return this.$route.name === 'select';
     },
     authIcon() {
-      return this.isLoggedIn ? BIconUnlock : BIconLock;
+      return this.isAnyLoggedIn ? BIconUnlock : BIconLock;
     },
     authTitle() {
-      return this.authMethod.getButtonTitle();
+      return this.$t('authentication.button.title');
     },
     authLabel() {
-      return this.isLoggedIn ? this.authMethod.getLogoutLabel() : this.authMethod.getLoginLabel();
+      if (this.showAuthDropdown) {
+        return this.$t('authentication.title');
+      }
+      return this.isAnyLoggedIn ? this.$t('authentication.button.logout') : this.$t('authentication.button.login');
+    },
+    showAuthDropdown() {
+      return this.supportedIds.length > 1;
+    },
+    // The entries for the authentication dropdown when multiple schemes are available
+    authSchemeList() {
+      return this.supportedIds.map(id => {
+        const scheme = this.authSchemes[id];
+        const method = scheme.title || this.$t(`authentication.schemeTypes.${scheme.type}`, scheme);
+        const loggedIn = this.isLoggedInScheme(id);
+        return {
+          id,
+          loggedIn,
+          label: this.$t(loggedIn ? 'authentication.button.logoutFrom' : 'authentication.button.loginWith', { method })
+        };
+      });
     },
     isApi() {
       // todo: This gives false results for a statically hosted OGC API - Records, which may include conformance classes
@@ -438,10 +467,7 @@ export default defineComponent({
       }
     });
 
-    const authConfig = Auth.restoreLastMethod();
-    if (authConfig) {
-      await this.$store.dispatch('config', { authConfig });
-    }
+    await this.$store.dispatch('auth/restore');
 
     this.$store.commit('browserReady');
   },
@@ -502,18 +528,23 @@ export default defineComponent({
       this.colorMode = this.colorMode === 'light' ? 'dark' : 'light';
     },
     async logInOut() {
-      if (this.url) {
-        this.addAction(() => this.$store.dispatch('load', {
-          url: this.url,
-          show: true,
-          force: true
-        }));
-      }
-      if (this.isLoggedIn) {
-        await this.requestLogout();
+      const id = this.supportedIds[0];
+      await this.logInOutScheme({ id, loggedIn: this.isLoggedInScheme(id) });
+    },
+    async logInOutScheme({ id, loggedIn }) {
+      if (loggedIn) {
+        await this.requestLogout({ id });
       }
       else {
-        await this.requestLogin();
+        if (this.url) {
+          // Reload the current page data after the login
+          this.addAction(() => this.$store.dispatch('load', {
+            url: this.url,
+            show: true,
+            force: true
+          }));
+        }
+        await this.requestLogin({ ids: [id] });
       }
     },
     detectLocale() {
