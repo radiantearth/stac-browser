@@ -47,16 +47,22 @@
         <WidgetHook id="view-catalog-catalogs-start" />
         <Catalogs
           v-if="mergeCatalogsAndCollections"
-          :apiSearch="hasApiCollections" :catalogs="catalogs" :hasMore="hasMore"
+          :apiSearch="hasApiCollections" :catalogs="catalogs" :hasMore="hasMore || hasMoreChildren"
           showControls
-          @load-more="loadMoreCollections" @search="searchCollections"
-          :loading="Boolean(loadingCollections) || loadingNextCollectionsPage" :loadingMore="loadingCollections === 'more' || loadingNextCollectionsPage"
+          @load-more="loadMoreMerged" @search="searchCollections"
+          :loading="Boolean(loadingCollections) || loadingNextCollectionsPage || loadingChildren" :loadingMore="loadingCollections === 'more' || loadingNextCollectionsPage || loadingChildren"
         />
         <template v-else>
-          <Catalogs v-if="showChildrenSection" :catalogs="childCatalogs" />
+          <Catalogs
+            v-if="showChildrenSection" :catalogs="childCatalogs" :hasMore="hasMoreChildren"
+            showControls
+            @load-more="loadMoreChildren"
+            :loading="loadingChildren" :loadingMore="loadingChildren && childCatalogs.length > 0"
+          />
           <Catalogs
             v-if="showCollectionsSection" collectionsOnly
             :apiSearch="hasApiCollections" :catalogs="collections" :hasMore="hasMore"
+            showControls
             @load-more="loadMoreCollections" @search="searchCollections"
             :loading="Boolean(loadingCollections) || loadingNextCollectionsPage" :loadingMore="loadingCollections === 'more' || loadingNextCollectionsPage"
           />
@@ -93,6 +99,7 @@ import { formatLicense, formatTemporalExtents } from '@radiantearth/stac-fields/
 import Utils from '../utils';
 import { hasText, isObject, size } from 'stac-js/src/utils.js';
 import { addSchemaToDocument, createCatalogSchema } from '../schema-org';
+import { getApiChildrenLink } from '../models/stac';
 import { ItemCollection } from 'stac-js';
 import DeprecationMixin from '../components/DeprecationMixin.js';
 import { BTab, BTabs, BCard } from 'bootstrap-vue-next';
@@ -135,7 +142,7 @@ export default defineComponent({
   },
   computed: {
     ...mapState(['data', 'apiCatalogPriority', 'apiItemsLink', 'apiItemsPagination', 'apiItemsNumberMatched', 'mergeCatalogsAndCollections', 'nextCollectionsLink', 'stateQueryParameters']),
-    ...mapGetters(['catalogs', 'childCatalogs', 'collections', 'collectionLink', 'isApiChildrenLoading', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
+    ...mapGetters(['catalogs', 'childCatalogs', 'collections', 'collectionLink', 'getApiChildren', 'isApiChildrenLoading', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
     ignoredMetadataFields() {
       return getIgnoredFields(this.data, 'CatalogLike');
     },
@@ -222,15 +229,24 @@ export default defineComponent({
     hasItems() {
       return this.items.length > 0 || this.hasApiItems;
     },
+    hasApiChildren() {
+      return Boolean(getApiChildrenLink(this.data)) && this.apiCatalogPriority !== 'collections';
+    },
+    hasMoreChildren() {
+      return this.hasApiChildren && Boolean(this.getApiChildren(this.data, 'children')?.next);
+    },
+    loadingChildren() {
+      return this.isApiChildrenLoading(this.data, 'children');
+    },
     showChildrenSection() {
-      return this.childCatalogs.length > 0;
+      return this.childCatalogs.length > 0 || this.hasApiChildren;
     },
     showCollectionsSection() {
       return this.collections.length > 0 || this.hasApiCollections || this.isSearchingCollections;
     },
     hasCatalogs() {
       if (this.mergeCatalogsAndCollections) {
-        return this.catalogs.length > 0 || this.hasApiCollections || this.isSearchingCollections;
+        return this.catalogs.length > 0 || this.hasApiCollections || this.hasApiChildren || this.isSearchingCollections;
       }
       return this.showChildrenSection || this.showCollectionsSection;
     },
@@ -298,6 +314,26 @@ export default defineComponent({
   methods: {
     filtersShown(show) {
       this.$store.commit('updateState', {type: 'itemFilterOpen', value: show ? 1 : null});
+    },
+    async loadMoreChildren() {
+      try {
+        await this.$store.dispatch('loadApiChildren', { stac: this.data, next: true });
+      } catch (error) {
+        this.$store.commit('showGlobalError', {
+          error,
+          message: this.$t('errors.loadApiChildrenFailed')
+        });
+      }
+    },
+    async loadMoreMerged() {
+      const promises = [];
+      if (this.hasMoreChildren) {
+        promises.push(this.loadMoreChildren());
+      }
+      if (this.hasMore) {
+        promises.push(this.loadMoreCollections());
+      }
+      await Promise.all(promises);
     },
     async loadMoreCollections() {
       const requestId = this.currentSearchRequestId;

@@ -1,4 +1,5 @@
 import Instance from './instance.js';
+import ChildrenCollection from '../builders/childrenCollection.js';
 import CollectionCollection from '../builders/collectionCollection.js';
 import Conformance from '../builders/conformance.js';
 import Queryables from '../builders/queryables.js';
@@ -151,6 +152,46 @@ export default class API extends Instance {
     return this;
   }
   
+  // Adds a children endpoint (STAC API - Children extension) to the given
+  // entity, which can occur at any level of the hierarchy (defaults to the root).
+  addChildrenExtension(target = this.root, url = 'children') {
+    this.childrenCollections = this.childrenCollections || {}; // keys = target URLs, values = ChildrenCollection objects
+    const key = target.getAbsoluteUrl();
+    if (this.childrenCollections[key]) {
+      return this;
+    }
+
+    // GET .../children
+    const children = this.createStac({ url, type: ChildrenCollection });
+    this.childrenCollections[key] = children;
+
+    // GET /
+    this.addConformanceEndpoint();
+    this.root.addConformsTo('https://api.stacspec.org/v1.0.0-rc.2/children');
+    target.addLink({ href: children.getAbsoluteUrl(), rel: 'children', type: 'application/json' });
+
+    return this;
+  }
+
+  // Adds a Catalog or Collection to the children endpoint of the given parent
+  addChild(id, { parent = this.root, type = 'catalog', url = null } = {}) {
+    this.addChildrenExtension(parent);
+    url = url || `${type === 'collection' ? 'collections' : 'catalogs'}/${id}`;
+    const child = type === 'collection' ? this.createCollection({ url }) : this.createCatalog({ url });
+    child.setMetadata({ id });
+    child.addParentLink(parent);
+    this.childrenCollections[parent.getAbsoluteUrl()].addNewChild(child);
+    return child;
+  }
+
+  // Adds an already existing entity (e.g. a collection from the collections
+  // endpoint) to the children endpoint of the given parent
+  addExistingChild(child, parent = this.root) {
+    this.addChildrenExtension(parent);
+    this.childrenCollections[parent.getAbsoluteUrl()].addNewChild(child);
+    return child;
+  }
+
   addCollectionsExtension() {
     if (this.endpoints.some(ep => ep instanceof CollectionCollection)) {
       return this;
