@@ -20,7 +20,8 @@ export default class ActionPlugin {
     if (href) {
       return {
         href,
-        target: '_blank'
+        target: '_blank',
+        rel: 'noopener noreferrer',
       };
     }
     return {};
