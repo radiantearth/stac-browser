@@ -1,5 +1,5 @@
 import LinkActionPlugin from "../LinkActionPlugin";
-import URI from 'urijs';
+import { URI } from 'stac-js/src/utils.js';
 import i18n from "../../i18n";
 
 export default class Cesium extends LinkActionPlugin {
@@ -10,7 +10,7 @@ export default class Cesium extends LinkActionPlugin {
 
   get uri() {
     // https://sandcastle.cesium.com/standalone.html vs https://sandcastle.cesium.com/index.html
-    let uri = new URI("https://sandcastle.cesium.com/standalone.html");
+    let uri = URI("https://sandcastle.cesium.com/standalone.html");
     const tileset_url = this.link.href;
     const code_payload = {
       html: `
@@ -37,7 +37,7 @@ export default class Cesium extends LinkActionPlugin {
   }
 
   get text() {
-    return i18n.t('actions.openIn', {service: 'Cesium Sandcastle'});
+    return i18n.global.t('actions.openIn', {service: 'Cesium Sandcastle'});
   }
 
 }

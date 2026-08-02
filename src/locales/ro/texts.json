@@ -41,12 +41,12 @@
     "password": "Parola",
     "required": "Autentificare necesară",
     "schemeTypes": {
-      "http": "HTTP {scheme}",
-      "s3": "S3",
-      "signedUrl": "URL Semnat",
-      "oauth2": "OAuth 2",
       "apiKey": "Cheie API",
-      "openIdConnect": "OpenID Connect"
+      "http": "HTTP {scheme}",
+      "oauth2": "OAuth 2",
+      "openIdConnect": "OpenID Connect",
+      "s3": "S3",
+      "signedUrl": "URL Semnat"
     },
     "title": "Autentificare",
     "unauthorized": "Nu aveți permisiuni să accesați aceste date. Autentificare necesară.",
@@ -70,7 +70,12 @@
     "false": "Nu",
     "true": "Doar"
   },
+  "close": "Închidere",
   "copy": "Copiază",
+  "copyErrors": {
+    "permission": "Nu pot copia. Verificați permisiunile browserului.",
+    "unsupported": "Clipboard-ul nu este disponibil în acest browser."
+  },
   "default": "Implicit",
   "defaultWithValue": "Implicit ({value})",
   "deprecated": "Învechit",
@@ -110,6 +115,11 @@
     "serverError": "Serverul a întâmpinat o problemă. @:errors.contactProvider",
     "title": "Eroare",
     "unauthorized": "Solicitarea necesită informații de autentificare, cum ar fi un token API. Vă rugăm să furnizați acreditările și să încercați din nou"
+  },
+  "exampleCode": {
+    "title": "Cod de exemplu",
+    "storeAs": "Salvează codul ca:",
+    "installDependencies": "Instalează dependințele:"
   },
   "featureExperimental": "Această funcție este încă experimentală și poate da rezultate neașteptate!",
   "features": {
@@ -157,20 +167,34 @@
   "map": "Hartă",
   "mapping": {
     "attribution": {
-      "label": "i",
-      "collapseLabel": "✕"
+      "collapseLabel": "✕",
+      "description": "Atribuții",
+      "label": "i"
     },
-    "bboxSelect": {},
+    "bboxSelect": {
+      "eastLon": "Longitudine estică",
+      "error": {
+        "incomplete": "Coordonate lipsă",
+        "invalidLat": "Trebuie să fie între -90 și 90",
+        "invalidLon": "Trebuie să fie între -180 și 180",
+        "latOrder": "Latitudinea sudică trebuie să fie mai mică decât cea nordică",
+        "lonOrder": "Longitudinea vestică trebuie să fie mai mică decât longitudinea estică"
+      },
+      "northLat": "Latitudine nordică",
+      "southLat": "Latitudine sudică",
+      "westLon": "Longitudine vestică"
+    },
     "close": "Închidere",
     "layers": {
-      "title": "Straturi",
       "base": "Straturi de bază",
-      "unnamed": "Fără nume #{id}",
-      "footprint": "Amprentă la sol"
+      "footprint": "Amprentă la sol",
+      "title": "Straturi",
+      "unnamed": "Fără nume #{id}"
     },
     "location": {
       "description": "Mergi la locație"
     },
+    "nobasemap": "Nici o hartă de bază disponibilă.",
     "nodata": "Nu sunt informații spațiale disponibile în metadate.",
     "zoom": {
       "in": {
@@ -204,6 +228,14 @@
     "previous": "‹ Precedent"
   },
   "poweredBy": "Cu sprijinul {link}",
+  "programming": {
+    "csharp": "C#",
+    "java": "Java",
+    "javascript": "JavaScript",
+    "python": "Python",
+    "r": "R",
+    "rust": "Rust"
+  },
   "protocol": {
     "azure": "Microsoft Azure",
     "file": "Sistem de fișiere (local)",
@@ -234,9 +266,15 @@
   "search": {
     "addCollections": "Apăsați Enter pentru a adăuga o colecție",
     "addFilter": "Adăugați un filtru",
+    "additionalFilters": "Filtre suplimentare",
     "addItemIds": "Apăsați Enter pentru a adăuga un ID de articol",
     "addSearchTerm": "Apăsați enter pentru a adăuga un termen de căutare",
-    "additionalFilters": "Filtre suplimentare",
+    "arrayInput": {
+      "addValue": "Apăsați „enter” pentru a adăuga o valoare",
+      "helpText": "Introduceți valoarea(valorile)"
+    },
+    "arrayContains": "Conține tot",
+    "arrayContainedBy": "Este subset al",
     "dateDescription": "Toate orele sunt timp universal coordonat (UTC).",
     "enterCollections": "Introduceți una sau mai multe colecții...",
     "enterItemIds": "Introduceți unul sau mai multe ID-uri de articol...",
@@ -317,8 +355,8 @@
       "message": "{title} este disponibil la adresa {url}",
       "sharePageWithOthers": "Partajați URL-ul acestei pagini cu alții:",
       "title": "Partajare",
-      "x": "X (Twitter)",
-      "withOthers": "Partajați această pagină"
+      "withOthers": "Partajați această pagină",
+      "x": "X (Twitter)"
     },
     "stacExtension": "Extensie STAC",
     "stacVersion": "Versiune STAC",
@@ -384,5 +422,6 @@
       "title": "Afișare sub formă de cadre"
     },
     "title": "Opțiuni de afișare"
-  }
+  },
+  "widgets": {}
 }

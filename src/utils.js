@@ -1,42 +1,9 @@
-import URI from 'urijs';
 import removeMd from 'remove-markdown';
-import { stacPagination } from "./rels";
-import Link from 'stac-js/src/link.js';
+import { Link } from 'stac-js';
+import { hasText, isObject, size, URI } from 'stac-js/src/utils.js';
+import { pagination } from "stac-js/src/relationtypes.js";
 
 export const commonFileNames = ['catalog', 'collection', 'item'];
-
-export const geojsonMediaType = "application/geo+json";
-
-export const schemaMediaType = "application/schema+json";
-
-export const stacMediaTypes = [
-  'application/json',
-  geojsonMediaType,
-  'text/json'
-];
-
-export const browserImageTypes = [
-  'image/gif',
-  'image/jpg',
-  'image/jpeg',
-  'image/apng',
-  'image/png',
-  'image/webp'
-];
-
-export const cogMediaTypes = [
-  "image/tiff; application=geotiff; profile=cloud-optimized",
-  "image/vnd.stac.geotiff; cloud-optimized=true"
-];
-
-export const geotiffMediaTypes = [
-  "application/geotiff",
-  "image/tiff; application=geotiff",
-  "image/vnd.stac.geotiff",
-].concat(cogMediaTypes);
-
-export const imageMediaTypes = browserImageTypes.concat(geotiffMediaTypes);
-export const mapMediaTypes = imageMediaTypes.concat([geojsonMediaType]);
 
 export class BrowserError extends Error {
   constructor(message) {
@@ -50,68 +17,6 @@ export class BrowserError extends Error {
  * @class
  */
 export default class Utils {
-
-  /**
-   * Checks whether a variable is a real object or not.
-   * 
-   * This is a more strict version of `typeof x === 'object'` as this example would also succeeds for arrays and `null`.
-   * This function only returns `true` for real objects and not for arrays, `null` or any other data types.
-   * 
-   * @param {*} obj - A variable to check.
-   * @returns {boolean} - `true` is the given variable is an object, `false` otherwise.
-   */
-  static isObject(obj) {
-    return (typeof obj === 'object' && obj === Object(obj) && !Array.isArray(obj));
-  }
-
-  /**
-   * Computes the size of an array (number of array elements) or object (number of key-value-pairs).
-   * 
-   * Returns 0 for all other data types.
-   * 
-   * @param {*} obj 
-   * @returns {integer}
-   */
-  static size(obj) {
-    if (typeof obj === 'object' && obj !== null) {
-      if (Array.isArray(obj)) {
-        return obj.length;
-      }
-      else {
-        return Object.keys(obj).length;
-      }
-    }
-    return 0;
-  }
-
-  static isStacMediaType(type, allowEmpty = false) {
-    return Utils.isMediaType(type, stacMediaTypes, allowEmpty);
-  }
-
-  static isMediaType(type, types, allowEmpty = false) {
-    if (!Array.isArray(types)) {
-      types = [types];
-    }
-    if (allowEmpty && !type) {
-      return true;
-    }
-    else if (typeof type !== 'string') {
-      return false;
-    }
-    else {
-      return types.includes(type.toLowerCase());
-    }
-  }
-
-  /**
-   * Checks whether a variable is a string and contains at least one character.
-   * 
-   * @param {*} string - A variable to check.
-   * @returns {boolean} - `true` is the given variable is an string with length > 0, `false` otherwise.
-   */
-  static hasText(string) {
-    return (typeof string === 'string' && string.length > 0);
-  }
 
   static shortenTitle(fullStr, strLen, separator = '…') {
     if (fullStr.length <= strLen) {
@@ -127,38 +32,16 @@ export default class Utils {
            fullStr.substr(fullStr.length - backChars);
   }
 
-  static toAbsolute(href, baseUrl, stringify = true) {
-    return Utils.normalizeUri(href, baseUrl, false, stringify);
-  }
-
-  static normalizeUri(href, baseUrl = null, noParams = false, stringify = true) {
-    // Parse URL and make absolute, if required
-    let uri = URI(href);
-    if (baseUrl && uri.is("relative")) {
-      uri = uri.absoluteTo(baseUrl);
-    }
-    uri.normalize();
-    if (noParams) {
-      uri.query("");
-      uri.fragment("");
-    }
-    return stringify ? uri.toString() : uri;
-  }
-
   static getLinkWithRel(links, rel) {
-    return Array.isArray(links) ? links.find(link => Utils.isObject(link) && Utils.hasText(link.href) && link.rel === rel) : null;
+    return Array.isArray(links) ? links.find(link => isObject(link) && hasText(link.href) && link.rel === rel) : null;
   }
 
   static getLinksWithRels(links, rels) {
-    return Array.isArray(links) ? links.filter(link => Utils.isObject(link) && Utils.hasText(link.href) && rels.includes(link.rel)) : [];
-  }
-
-  static getLinksWithOtherRels(links, rels) {
-    return Array.isArray(links) ? links.filter(link => Utils.isObject(link) && Utils.hasText(link.href) && !rels.includes(link.rel)) : [];
+    return Array.isArray(links) ? links.filter(link => isObject(link) && hasText(link.href) && rels.includes(link.rel)) : [];
   }
 
   static removeTrailingSlash(str) {
-    return str.replace(/\/$/, '');
+    return str.replace(/\/+$/, '');
   }
 
   static equalUrl(a, b) {
@@ -169,13 +52,57 @@ export default class Utils {
       uri1.path(Utils.removeTrailingSlash(uri1.path()));
       uri2.path(Utils.removeTrailingSlash(uri2.path()));
       return uri1.equals(uri2);
-    } catch (error) {
+    } catch {
       return false;
     }
   }
 
+  /**
+   * Checks whether two URLs point to the same resource, ignoring a trailing
+   * slash in the path. Query parameters and fragments are ignored.
+   *
+   * @param {string|URI} a - The first URL
+   * @param {string|URI} b - The second URL
+   * @returns {boolean} `true` if scheme, authority and path (except for a trailing slash) are equal
+   */
+  static samePath(a, b) {
+    if (!a || !b) {
+      return false;
+    }
+    try {
+      const uri1 = URI(a);
+      const uri2 = URI(b);
+      return uri1.scheme().toLowerCase() === uri2.scheme().toLowerCase()
+        && uri1.authority().toLowerCase() === uri2.authority().toLowerCase()
+        && Utils.removeTrailingSlash(uri1.path()) === Utils.removeTrailingSlash(uri2.path());
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Returns the given URL with the trailing slash of the path added or removed.
+   * Scheme, authority, query and fragment are preserved.
+   *
+   * @param {string} url - The URL to change
+   * @param {boolean} trailingSlash - `true` to add a trailing slash, `false` to remove it
+   * @returns {string} The updated URL
+   */
+  static setTrailingSlash(url, trailingSlash) {
+    try {
+      const uri = URI(url);
+      let path = Utils.removeTrailingSlash(uri.path());
+      if (trailingSlash) {
+        path += '/';
+      }
+      return uri.path(path).toString();
+    } catch {
+      return url;
+    }
+  }
+
   static summarizeMd(text, maxLength = null) {
-    if (!Utils.hasText(text)) {
+    if (!hasText(text)) {
       return '';
     }
     // Best-effort approach to remove some CommonMark (Markdown).
@@ -191,8 +118,8 @@ export default class Utils {
     if (!el) {
       return;
     }
-    var rect = el.getBoundingClientRect();
-    var isVisible = rect.top < window.innerHeight && rect.bottom >= 0;
+    let rect = el.getBoundingClientRect();
+    let isVisible = rect.top < window.innerHeight && rect.bottom >= 0;
     if (!isVisible) {
       el.scrollIntoView({
         behavior: "smooth",
@@ -255,10 +182,26 @@ export default class Utils {
     return [sortby];
   }
 
+  static stateQueryParametersToObject(state, query = {}) {
+    for (const [key, value] of Object.entries(state)) {
+      let name = `.${key}`;
+      if (Array.isArray(value)) {
+        if (value.length > 0) {
+          query[name] = value.join(',');
+        }
+      }
+      else if (value !== null) {
+        query[name] = value;
+      }
+    }
+    return query;
+  }
+
+  // todo: remove when all usage is gone, replace with stac-js method
   static getPaginationLinks(data) {
     let pages = {};
-    if (Utils.isObject(data)) {
-      let pageLinks = Utils.getLinksWithRels(data.links, stacPagination);
+    if (isObject(data)) {
+      let pageLinks = Utils.getLinksWithRels(data.links, pagination);
       for (let pageLink of pageLinks) {
         let rel = pageLink.rel === 'previous' ? 'prev' : pageLink.rel;
         pages[rel] = pageLink;
@@ -267,15 +210,15 @@ export default class Utils {
     return pages;
   }
 
-  static addFiltersToLink(link, filters = {}, defaultLimit = null) {
+  static addFiltersToLink(link, filters = {}, defaultLimit = null, defaultSort = null) {
     let isEmpty = value => {
       return (value === null
       || (typeof value === 'number' && !Number.isFinite(value))
       || (typeof value === 'string' && value.length === 0)
-      || (typeof value === 'object' && Utils.size(value) === 0));
+      || (typeof value === 'object' && size(value) === 0));
     };
 
-    if (!Utils.isObject(filters)) {
+    if (!isObject(filters)) {
       filters = {};
     }
     else {
@@ -285,8 +228,11 @@ export default class Utils {
     if (typeof filters.limit !== 'number' && typeof defaultLimit === 'number') {
       filters.limit = defaultLimit;
     }
+    if (typeof filters.sortby !== 'string' && typeof defaultSort === 'string') {
+      filters.sortby = defaultSort;
+    }
 
-    if (Utils.hasText(link.method) && link.method.toUpperCase() === 'POST') {
+    if (hasText(link.method) && link.method.toUpperCase() === 'POST') {
       let body = Object.assign({}, link.body);
 
       for (let key in filters) {
@@ -306,17 +252,21 @@ export default class Utils {
           }
         }
         else if (key === 'filters') {
-          Object.assign(body, value.toJSON());
+          if (typeof value.serialize === 'function') {
+            Object.assign(body, value.serialize(link.method));
+          }
           continue;
         }
 
         body[key] = value;
       }
-      return Object.assign({}, link, { body });
+      const newLink = new Link(link);
+      newLink.body = body;
+      return newLink;
     }
     else { // GET
       // Construct new link with search params
-      let url = URI(link.href);
+      const url = URI(link.href);
 
       for (let key in filters) {
         let value = filters[key];
@@ -335,64 +285,59 @@ export default class Utils {
           value = value.join(',');
         }
         else if (key === 'filters') {
-          let params = value.toText();
-          url.setQuery(params);
+          if (typeof value.serialize === 'function') {
+            let params = value.serialize('GET');
+            // JSON filter objects must be stringified for query params
+            if (typeof params.filter === 'object') {
+              params = { ...params, filter: JSON.stringify(params.filter) };
+            }
+            url.setQuery(params);
+          }
           continue;
         }
 
         url.setQuery(key, value);
       }
 
-      return Object.assign({}, link, { href: url.toString() });
+      const newLink = new Link(link);
+      newLink.href = url.toString();
+      return newLink;
     }
+  }
+
+  static getIcon(data) {
+    if (data?.isSTAC) {
+      const icons = data.getIcons();
+      if (icons.length > 0) {
+        return icons[0];
+      }
+    }
+    return null;
   }
 
   static titleForHref(href, preferFileName = false) {
-    let uri = URI(href);
-    let auth = uri.authority();
-    let file = uri.filename().replace(/^(.{1,})\.\w+$/, '$1');
-    let dir = uri.directory().replace(/^\//, '');
+    const uri = URI(href);
+    const auth = uri.authority();
+    const file = uri.filename().replace(/^(.{1,})\.\w+$/, '$1');
     if (auth && file && !preferFileName) {
-      let path = uri.path().replace(/^\//, '');
+      const path = uri.path().replace(/^\//, '');
       if (auth === 'doi.org' && path.startsWith('10.')) {
         return `DOI ${path}`;
       }
-      else {
-        return `${file} (${auth})`;
-      }
+      return `${file} (${auth})`;
     }
-    else if (file && !commonFileNames.includes(file)) {
+    if (file && !commonFileNames.includes(file)) {
       return file;
     }
-    else if (auth) {
-      return auth;
-    }
-    else if (dir) {
-      return dir;
-    }
-    else {
-      return href;
-    }
-  }
-
-  // Gets the value at path of object.
-  // Drop in replacement for lodash.get
-  static getValueFromObjectUsingPath(object, path) {
-    if (object === null || typeof object !== 'object') {
-      return;
-    }
-    object = object[path[0]];
-    if (typeof object !== 'undefined' && path.length > 1) {
-      return this.getValueFromObjectUsingPath(object, path.slice(1));
-    }
-    return object;
+    const dir = uri.segmentCoded(-2);
+    return dir || auth || href;
   }
 
   static search(searchterm, target, and = true) {
     if (typeof searchterm !== 'string' || searchterm.length === 0) {
       return false;
     }
-    if (Utils.isObject(target)) {
+    if (isObject(target)) {
       target = Object.values(target);
     }
     else if (typeof target === 'string') {
@@ -435,9 +380,9 @@ export default class Utils {
     }
     const source = sources.shift();
 
-    if (Utils.isObject(target) && Utils.isObject(source)) {
+    if (isObject(target) && isObject(source)) {
       for (const key in source) {
-        if (Utils.isObject(source[key])) {
+        if (isObject(source[key])) {
           if (!target[key]) {
             Object.assign(target, { [key]: {} });
           }
@@ -451,15 +396,43 @@ export default class Utils {
     return Utils.mergeDeep(target, ...sources);
   }
 
-  static convertHumanizedSortOrder(value) {
-    switch (value) {
-      case 'asc':
-        return 1;
-      case 'desc':
-        return -1;
-      default:
-        return 0;
+  static parseApiSortParameter(value) {
+    if (typeof value !== 'string') {
+      return { field: null, direction: 0 };
     }
+    if (value.startsWith('-')) {
+      return { field: value.substring(1), direction: -1 };
+    }
+    else {
+      if (value.startsWith('+')) {
+        value = value.substring(1);
+      }
+      return { field: value, direction: 1 };
+    }
+  }
+
+  static assetFilename(asset, response = null) {
+    // Get the preferred filename from the file:local_path property
+    if (asset?.isAsset) {
+      const localPath = asset.getMetadata('file:local_path');
+      if (typeof localPath === 'string') {
+        return URI(localPath).filename();
+      }
+    }
+    // Get the filename from the content-disposition header
+    const contentDisposition = response?.headers.get('content-disposition');
+    if (typeof contentDisposition === 'string') {
+      const parts = contentDisposition.match(/filename=(?:"|)([^"]+)(?:"|)(?:;|$)/);
+      if (parts) {
+        return parts[1];
+      }
+    }
+    // Fallback to the filename from the href
+    if (isObject(asset) && typeof asset.href === 'string') {
+      return URI(asset.href).filename();
+    }
+    // Fallback to a default filename
+    return 'download';
   }
 
 }

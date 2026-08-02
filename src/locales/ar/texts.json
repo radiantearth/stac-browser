@@ -41,12 +41,12 @@
     "password": "كلمة المرور",
     "required": "المصادقة مطلوبة",
     "schemeTypes": {
-      "http": "HTTP {scheme}",
-      "s3": "S3",
-      "signedUrl": "عنوان URL موقّع",
-      "oauth2": "OAuth 2",
       "apiKey": "مفتاح API",
-      "openIdConnect": "OpenID Connect"
+      "http": "HTTP {scheme}",
+      "oauth2": "OAuth 2",
+      "openIdConnect": "OpenID Connect",
+      "s3": "S3",
+      "signedUrl": "عنوان URL موقّع"
     },
     "title": "المصادقة",
     "unauthorized": "ليس لديك إذن للوصول إلى هذه البيانات. يرجى تسجيل الدخول.",
@@ -71,6 +71,7 @@
     "true": "نعم"
   },
   "copy": "نسخ",
+  "copyErrors": {},
   "default": "افتراضي",
   "defaultWithValue": "افتراضي ({value})",
   "deprecated": "مهمل",
@@ -110,6 +111,7 @@
     "serverError": "واجه الخادم مشكلة. @:errors.contactProvider",
     "unauthorized": "يفتقر الطلب إلى بيانات الاعتماد، مثل رمز API. يرجى تقديم بيانات الاعتماد والمحاولة مرة أخرى."
   },
+  "exampleCode": {},
   "featureExperimental": "هذه الميزة لا تزال تجريبية وقد تعطي نتائج غير متوقعة!",
   "features": {},
   "fullscreen": {
@@ -133,6 +135,7 @@
   "in": "في {catalog}",
   "index": {
     "api": "واجهة برمجة التطبيقات",
+    "catalog": "الكتالوج",
     "load": "تحميل",
     "selectStacIndex": "... أو اختر واحدًا من {stacIndex}:",
     "specifyCatalog": "يرجى تحديد كتالوج STAC أو API...",
@@ -151,7 +154,9 @@
   "map": "الخريطة",
   "mapping": {
     "attribution": {},
-    "bboxSelect": {},
+    "bboxSelect": {
+      "error": {}
+    },
     "layers": {},
     "location": {},
     "zoom": {
@@ -180,6 +185,7 @@
     "previous": "‹ السابق"
   },
   "poweredBy": "مشغل بواسطة {link}",
+  "programming": {},
   "protocol": {
     "azure": "مايكروسوفت أزور",
     "file": "نظام الملفات (محلي)",
@@ -210,9 +216,10 @@
   "search": {
     "addCollections": "اضغط على Enter لإضافة مجموعة",
     "addFilter": "إضافة فلتر",
+    "additionalFilters": "فلاتر إضافية",
     "addItemIds": "اضغط على Enter لإضافة معرّف عنصر",
     "addSearchTerm": "اضغط على Enter لإضافة مصطلح بحث",
-    "additionalFilters": "فلاتر إضافية",
+    "arrayInput": {},
     "dateDescription": "جميع الأوقات بتوقيت UTC (التوقيت العالمي المنسق).",
     "enterCollections": "أدخل معرّف مجموعة واحد أو أكثر...",
     "enterItemIds": "أدخل معرّف عنصر واحد أو أكثر...",
@@ -293,8 +300,8 @@
       "message": "{title} متاح على {url}",
       "sharePageWithOthers": "مشاركة رابط هذه الصفحة في أي مكان تريده:",
       "title": "مشاركة",
-      "x": "إكس (تويتر)",
-      "withOthers": "مشاركة هذه الصفحة مع الآخرين"
+      "withOthers": "مشاركة هذه الصفحة مع الآخرين",
+      "x": "إكس (تويتر)"
     },
     "stacExtension": "امتداد STAC",
     "stacVersion": "إصدار STAC",
@@ -360,5 +367,6 @@
       "title": "عرض كمربعات"
     },
     "title": "خيارات العرض"
-  }
+  },
+  "widgets": {}
 }

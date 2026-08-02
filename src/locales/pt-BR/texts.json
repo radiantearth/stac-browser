@@ -41,12 +41,12 @@
     "password": "Senha",
     "required": "Autenticação requerida",
     "schemeTypes": {
-      "http": "HTTP {scheme}",
-      "s3": "S3",
-      "signedUrl": "URL Assinada",
-      "oauth2": "OAuth 2",
       "apiKey": "Chave da API",
-      "openIdConnect": "OpenID Connect"
+      "http": "HTTP {scheme}",
+      "oauth2": "OAuth 2",
+      "openIdConnect": "OpenID Connect",
+      "s3": "S3",
+      "signedUrl": "URL Assinada"
     },
     "title": "Autenticação",
     "unauthorized": "Você não tem permissão para acessar esses dados. Por favor, faça login.",
@@ -70,7 +70,12 @@
     "false": "não",
     "true": "sim"
   },
+  "close": "Fechar",
   "copy": "Cópia",
+  "copyErrors": {
+    "permission": "Não foi possível copiar. Verifique as permissões do navegador.",
+    "unsupported": "A área de transferência não está disponível neste navegador."
+  },
   "default": "Padrão",
   "defaultWithValue": "Valor padrão ({value})",
   "deprecated": "Descontinuado",
@@ -86,6 +91,7 @@
   },
   "description": "Descrição",
   "errors": {
+    "apiListRequested": "A solicitação é inválida. Solicitações diretas para as rotas /collections e .../items não são suportados atualmente.",
     "authFailed": "A solicitação apresentou erro. Os detalhes de autenticação fornecidos podem estar incorretos.",
     "badRequest": "A solicitação é inválida. Isto pode ser devido a parâmetros inválidos, por exemplo, uma solicitação de pesquisa ou pode ser um bug no STAC Browser.",
     "contactProvider": "Entre em contato com o operador do serviço para resolver esse problema.",
@@ -108,10 +114,20 @@
     "noExternalAccess": "Não é permitido acessar catálogos externos!",
     "notFound": "O recurso solicitado não existe. @:errors.contactProvider",
     "serverError": "O servidor encontrou um problema. @:errors.contactProvider",
+    "title": "Erro",
     "unauthorized": "A solicitação não possui credenciais, por exemplo, um token de API. Forneça suas credenciais e tente novamente."
   },
+  "exampleCode": {
+    "title": "Exemplo de código",
+    "storeAs": "Armazenar código como:",
+    "installDependencies": "Instalação de dependências:"
+  },
   "featureExperimental": "Esta funcionalidade ainda é experimental e pode dar resultados inesperados!",
-  "features": {},
+  "features": {
+    "empty": "Nenhuma feição disponível.",
+    "noProperties": "Nenhuma propriedade fornecida.",
+    "title": "Feição | Feições"
+  },
   "fullscreen": {
     "exit": "Sair da tela cheia",
     "exitLabel": "✕",
@@ -135,6 +151,7 @@
   "in": "em {catalog}",
   "index": {
     "api": "API",
+    "catalog": "Catálogo Estático",
     "load": "Carregar",
     "selectStacIndex": "... ou selecione um de {stacIndex}:",
     "specifyCatalog": "Especifique um catálogo STAC ou API...",
@@ -153,21 +170,32 @@
   "map": "Mapa",
   "mapping": {
     "attribution": {
-      "label": "i",
+      "collapseLabel": "✕",
       "description": "Créditos",
-      "collapseLabel": "✕"
+      "label": "i"
     },
     "bboxSelect": {
       "add": "Clique no mapa para adicionar um retângulo envolvente.",
-      "remove": "Clique no retângulo envolvente para removê-lo."
+      "eastLon": "Longitude Leste",
+      "error": {
+        "incomplete": "Coordenada não definida",
+        "invalidLat": "Deve estar entre -90 e 90",
+        "invalidLon": "Deve estar entre -180 e 180",
+        "latOrder": "Latitude Sul deve ser menor que Latitude Norte",
+        "lonOrder": "Latitude Oeste deve ser menor que Latitude Leste"
+      },
+      "northLat": "Latitude Norte",
+      "remove": "Clique no retângulo envolvente para removê-lo.",
+      "southLat": "Latitude Sul",
+      "westLon": "Longitude Oeste"
     },
     "close": "Fechar",
     "fit": "Ajustar à extensão",
     "layers": {
-      "title": "Camadas",
       "base": "Mapas de Fundo",
-      "unnamed": "Sem nome #{id}",
-      "footprint": "Footprint"
+      "footprint": "Footprint",
+      "title": "Camadas",
+      "unnamed": "Sem nome #{id}"
     },
     "location": {
       "description": "Ir para sua localização"
@@ -206,6 +234,14 @@
     "previous": "‹ Anterior"
   },
   "poweredBy": "Distribuído por {link}",
+  "programming": {
+    "csharp": "C#",
+    "java": "Java",
+    "javascript": "JavaScript",
+    "python": "Python",
+    "r": "R",
+    "rust": "Rust"
+  },
   "protocol": {
     "azure": "Microsoft Azure",
     "file": "sistema de arquivos (local)",
@@ -236,9 +272,23 @@
   "search": {
     "addCollections": "Pressione Enter para adicionar uma coleção",
     "addFilter": "Adicionar filtro",
+    "additionalFilters": "Filtros adicionais",
     "addItemIds": "Pressione Enter para adicionar um ID de item",
     "addSearchTerm": "Pressione Enter para adicionar um termo de pesquisa",
-    "additionalFilters": "Filtros adicionais",
+    "arrayInput": {
+      "addValue": "Pressione Enter para adicionar um valor",
+      "helpText": "Digite o(s) valor(es)"
+    },
+    "arrayContains": "Contém todos",
+    "arrayContainsDescription": "O array contém todos os valores especificados",
+    "arrayContainedBy": "É subconjunto de",
+    "arrayContainedByDescription": "Array é um subconjunto dos valores especificados",
+    "arrayEquals": "Corresponde exatamente",
+    "arrayEqualsDescription": "Array corresponde exatamente aos valores especificados (mesmos itens, qualquer ordem)",
+    "arrayOverlaps": "Contém algum",
+    "arrayOverlapsDescription": "Array contém pelo menos um dos valores especificados",
+    "between": "entre",
+    "betweenOperatorDescription": "Testa se o valor de um campo numérico está no intervalo fornecido. O intervalo fornecido é inclusivo.",
     "dateDescription": "Todos os horários em Tempo Universal Coordenado (UTC).",
     "enterCollections": "Insira um ou mais IDs de coleção...",
     "enterItemIds": "Insira um ou mais IDs de item...",
@@ -250,6 +300,8 @@
     "freeTextDescription": "Pesquise pelo menos um dos termos fornecidos em campos como título e descrição.",
     "greaterThan": "maior que",
     "greaterThanEqual": "maior que ou igual a",
+    "in": "incluído em",
+    "inOperatorDescription": "Verifica se o valor do campo corresponde a qualquer um dos valores fornecidos.",
     "itemIds": "IDs dos itens",
     "itemsPerPage": "Itens por página",
     "itemsPerPageDescription": "Número de itens solicitados por página, máx. {maxItems} items.",
@@ -258,19 +310,22 @@
     "likeOperatorDescription": "Você pode usar caracteres curinga. `_` corresponde a um único caractere, `%` corresponde a qualquer número de caracteres. Para pesquisar especificamente um caractere curinga, você precisa adicionar `\\` na frente do caractere.",
     "logical": {
       "and": "Considere todos os filtros (e)",
-      "or": "Considere qualquer filtro (ou)"
+      "or": "Considere qualquer filtro (ou)",
+      "not": "Inverte a condição"
     },
     "matches": "combinações",
     "metaDescription": "Pesquise os dados de {title}.",
     "modifyCriteria": "Por favor, modifique os critérios de pesquisa.",
     "noFurtherItemsFound": "Não há mais itens disponíveis.",
     "noItemsFound": "Nenhum item encontrado para os filtros fornecidos.",
+    "noOperatorsError": "O STAC Browser não oferece suporte a nenhum operador para o filtro {queryable}.",
     "noOptions": "Nenhuma entrada realizada",
     "notEqualTo": "não é igual a",
     "notFullySupported": "Nem todas as opções podem ser suportadas.",
     "notSupported": "A pesquisa de itens não é suportada pela API.",
     "placeholder": "Pesquisar...",
     "selectCollections": "Selecione uma ou várias coleções...",
+    "selectDateRange": "Selecione o intervalo de datas",
     "selectForItemSearch": "Selecione para pesquisa de itens",
     "spatialExtent": "Extensão Espacial",
     "tabs": {
@@ -319,8 +374,8 @@
       "message": "{title} está disponível em {url}",
       "sharePageWithOthers": "Compartilhe a URL desta página onde quiser:",
       "title": "Compartilhar",
-      "x": "X (Twitter)",
-      "withOthers": "Compartilhe esta página com outros"
+      "withOthers": "Compartilhe esta página com outros",
+      "x": "X (Twitter)"
     },
     "stacExtension": "Extensão STAC",
     "stacVersion": "Versão STAC",
@@ -362,6 +417,8 @@
   "stacCollection": "Coleção | Coleções",
   "stacItem": "Item | Items",
   "submit": "Enviar",
+  "switchToDarkMode": "Mudar para o modo escuro",
+  "switchToLightMode": "Mudar para o modo claro",
   "table": {
     "emptyFilteredText": "Não há registros que correspondem à sua solicitação",
     "emptyText": "Não há registros para mostrar",
@@ -386,5 +443,6 @@
       "title": "Mostrar como grade"
     },
     "title": "Opções de exibição"
-  }
+  },
+  "widgets": {}
 }

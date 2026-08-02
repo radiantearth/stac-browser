@@ -118,34 +118,31 @@ Save the file and rebuild / restart STAC Browser.
 
 ## Developer Guide
 
-Implementing actions for assets, items and links follows a very similar pattern.
-The main difference is that each action implements its own interface:
-- assets implement the [`AssetActionPlugin` interface](../src/actions/AssetActionPlugin.js)
-- catalogs, collections and items implement the [`StacActionPlugin` interface](../src/actions/StacActionPlugin.js)
-- links implement the [`LinkActionPlugin` interface](../src/actions/LinkActionPlugin.js)
-Similarly, actions are stored in their own folder:
-- assets are stored in the folder [`src/actions/assets`](../src/actions/assets)
-- catalogs, collections and items are stored in the folder [`src/actions/stac`](../src/actions/stac)
-- links are stored in the folder [`src/actions/links`](../src/actions/links)
+Implementing actions for assets, catalogs/collections/items and links follows a very similar pattern.
+The main difference is that each kind of action implements its own interface:
+
+- assets implement the [`AssetActionPlugin` interface](../src/actions/AssetActionPlugin.js) and are stored in the folder [`src/actions/assets`](../src/actions/assets)
+- catalogs, collections and items implement the [`StacActionPlugin` interface](../src/actions/StacActionPlugin.js) and are stored in the folder [`src/actions/stac`](../src/actions/stac)
+- links implement the [`LinkActionPlugin` interface](../src/actions/LinkActionPlugin.js) and are stored in the folder [`src/actions/links`](../src/actions/links)
 
 All interfaces look as follows:
 
 - `constructor(data: object, component: Vue, id: string)`
-  - `data`: The asset, catalog, collection, item or link object, it is available in the class through `this.asset` (for assets), `this.object` (for items) and `this.link` (for links).
-  - `component`: The parent Asset/Catalog/Collection/Item/Link Vue component (available in the class through `this.component`)
+  - `data`: The asset, catalog, collection, item or link object. It is available in the class through `this.asset` (for assets), `this.object` (for catalogs/collections/items) and `this.link` (for links).
+  - `component`: The parent Asset/StacActions/Link Vue component (available in the class through `this.component`)
   - `id`: Internal ID of the asset, catalog, collection, item or link, not meant to be used.
 - `get btnOptions() : object`
   - This should return an object of button options, see [VueBootstrap b-button](https://bootstrap-vue.org/docs/components/button/#component-reference) for details. Returns `href`, `rel` (only for links) and `target` (set to `_blank`) by default.
 - `get onClick() : function(event: MouseEvent)`
   - Returns a function that accepts a [MouseEvent](https://developer.mozilla.org/de/docs/Web/API/MouseEvent). This is the action to execute in case no `href` is set.
 - `get uri() : string`
-  - Returns the URL to use as `href` for the button/link. This should a valid URL that a browser can navigate to, including the asset or link URL as a query parameter or so.
+  - Returns the URL to use as `href` for the button/link. This should a valid URL that a browser can navigate to, including the asset, object or link URL as a query parameter or so.
 - `get show() : boolean`
-  - Return `true` if the action should be shown for the given asset or link. Return `false` otherwise, default to `false`.
+  - Return `true` if the action should be shown for the given asset, catalog, collection, item or link. Return `false` otherwise, default to `false`.
 - `get text() : string`
-  - Returns the text that is displayed for the button, defaults to "Open". Should be using the [i18n methods](https://kazupon.github.io/vue-i18n/api/#methods) to localize the text.
+  - Returns the text that is displayed for the button, defaults to "Open". Should be using the [i18n methods](https://vue-i18n.intlify.dev/api/general.html) to localize the text.
 - `get icon() : Vue`
-  - Returns a Vue component that should be the icon for the button. Defaults to `BIconBoxArrowUpRight`, see <https://bootstrap-vue.org/docs/icons#icons-1> and search for `arrow-up-right`.
+  - Returns a Vue component that should be the icon for the button. Defaults to the `box-arrow-up-right` icon, see the [Bootstrap Icons list](https://icones.js.org/collection/bi) for other icons that can be imported through `~icons/bi/<name>` (via [unplugin-icons](https://github.com/unplugin/unplugin-icons)).
 
 Each action should at least implement custom behaviour for `uri`, `show` and `text`.
 
@@ -153,10 +150,17 @@ It is recommended to inspect the existing actions to get an impression of what i
 
 Some notes:
 
-- It is recommended to use [urijs](https://www.npmjs.com/package/urijs) for URL manipulations, it comes packages with STAC Browser anyway.
+- It is recommended to use `URI` from stac-js for URL manipulations, it comes packaged with STAC Browser anyway. Example:
+
+  ```js
+  import { URI } from 'stac-js/src/utils.js';
+  const parsed = URI("https://my.example/stac?a=b");
+  ```
+
 - It can be helpful to use the Vue component that is available through `this.component`, for example:
   - `this.component.href` is the absolute asset URL (while `this.asset.href` could be relative or absolute)
   - `this.component.isBrowserProtocol` returns whether it's a http/https URL
   - `this.asset.type` / `this.link.type` contains the media type of the asset/link
+  - `this.object.isItem` / `this.object.isCollection` returns whether the STAC object is an Item or a Collection
 
 To enable a newly implemented action in STAC Browser, please follow the [User Guide](#user-guide).

@@ -1,5 +1,5 @@
 <template>
-  <div class="ol-location ol-unselectable ol-control" style="pointer-events: auto;">
+  <div class="ol-location ol-unselectable ol-control">
     <button @click.prevent.stop="request" :title="$t('mapping.location.description')">
       <b-icon-pin-map-fill />
     </button>
@@ -10,13 +10,9 @@
 import Point from 'ol/geom/Point';
 import ControlMixin from './ControlMixin';
 import { fromLonLat } from 'ol/proj';
-import { BIconPinMapFill } from 'bootstrap-vue';
 
 export default {
   name: 'UserLocationControl',
-  components: {
-    BIconPinMapFill
-  },
   mixins: [
     ControlMixin
   ],
@@ -36,7 +32,10 @@ export default {
             const point = new Point(coords);
             view.fit(point, {maxZoom: this.maxZoom});
           },
-          error => this.$root.$emit('error', error, error.message),
+          error => this.$store.commit('showGlobalError', {
+            error,
+            message: error.message
+          }),
           {
             maximumAge: Infinity
           }
@@ -49,6 +48,7 @@ export default {
 
 <style lang="scss" scoped>
 .ol-location {
+  pointer-events: auto;
   z-index: 1;
   left: 0.5em;
   top: calc(3.75em + 6px);

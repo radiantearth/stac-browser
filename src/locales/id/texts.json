@@ -41,12 +41,12 @@
     "password": "Kata Sandi",
     "required": "Autentikasi diperlukan",
     "schemeTypes": {
-      "http": "HTTP {scheme}",
-      "s3": "S3",
-      "signedUrl": "URL Tertanda",
-      "oauth2": "OAuth 2",
       "apiKey": "Kunci API",
-      "openIdConnect": "OpenID Connect"
+      "http": "HTTP {scheme}",
+      "oauth2": "OAuth 2",
+      "openIdConnect": "OpenID Connect",
+      "s3": "S3",
+      "signedUrl": "URL Tertanda"
     },
     "title": "Autentikasi",
     "unauthorized": "Anda tidak memiliki izin untuk mengakses data ini. Silakan masuk.",
@@ -71,6 +71,7 @@
     "true": "ya"
   },
   "copy": "Salin",
+  "copyErrors": {},
   "default": "Default",
   "defaultWithValue": "Default ({value})",
   "deprecated": "Usang",
@@ -110,6 +111,7 @@
     "serverError": "Server mengalami masalah. @:errors.contactProvider",
     "unauthorized": "Permintaan tidak memiliki kredensial, misalnya token API. Silakan berikan kredensial Anda dan coba lagi."
   },
+  "exampleCode": {},
   "featureExperimental": "Fitur ini masih eksperimental dan mungkin memberikan hasil yang tidak terduga!",
   "features": {},
   "fullscreen": {
@@ -133,6 +135,7 @@
   "in": "dalam {catalog}",
   "index": {
     "api": "API",
+    "catalog": "Katalog",
     "load": "Muat",
     "selectStacIndex": "... atau pilih satu dari {stacIndex}:",
     "specifyCatalog": "Silakan tentukan Katalog atau API STAC...",
@@ -151,7 +154,9 @@
   "map": "Peta",
   "mapping": {
     "attribution": {},
-    "bboxSelect": {},
+    "bboxSelect": {
+      "error": {}
+    },
     "layers": {},
     "location": {},
     "zoom": {
@@ -180,6 +185,7 @@
     "previous": "‹ Sebelumnya"
   },
   "poweredBy": "Didukung oleh {link}",
+  "programming": {},
   "protocol": {
     "azure": "Microsoft Azure",
     "file": "sistem file (lokal)",
@@ -210,9 +216,10 @@
   "search": {
     "addCollections": "Tekan enter untuk menambahkan koleksi",
     "addFilter": "Tambah filter",
+    "additionalFilters": "Filter tambahan",
     "addItemIds": "Tekan enter untuk menambahkan ID Item",
     "addSearchTerm": "Tekan enter untuk menambahkan istilah pencarian",
-    "additionalFilters": "Filter tambahan",
+    "arrayInput": {},
     "dateDescription": "Semua waktu dalam Coordinated Universal Time (UTC).",
     "enterCollections": "Masukkan satu atau lebih ID Koleksi...",
     "enterItemIds": "Masukkan satu atau lebih ID Item...",
@@ -293,8 +300,8 @@
       "message": "{title} tersedia di {url}",
       "sharePageWithOthers": "Bagikan URL halaman ini di mana pun Anda suka:",
       "title": "Bagikan",
-      "x": "X (Twitter)",
-      "withOthers": "Bagikan halaman ini dengan orang lain"
+      "withOthers": "Bagikan halaman ini dengan orang lain",
+      "x": "X (Twitter)"
     },
     "stacExtension": "Ekstensi STAC",
     "stacVersion": "Versi STAC",
@@ -360,5 +367,6 @@
       "title": "Tampilkan sebagai kotak"
     },
     "title": "Opsi Tampilan"
-  }
+  },
+  "widgets": {}
 }

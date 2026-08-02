@@ -1,5 +1,5 @@
 <template>
-  <div class="styled-description" :class="{compact, inline}" v-html="markup(description)" />
+  <div class="styled-description" :class="{compact, inline}" v-html="formatted" />
 </template>
 
 <script>
@@ -25,6 +25,11 @@ export default {
       default: false
     }
   },
+  computed: {
+    formatted: function() {
+      return this.markup(this.description);
+    }
+  },
   methods: {
     markup(text) {
       if (typeof text !== 'string') {
@@ -32,9 +37,9 @@ export default {
       }
 
       // Parse CommonMark
-      var reader = new commonmark.Parser();
-      var writer = new commonmark.HtmlRenderer({safe: !this.allowHTML, smart: true});
-      var parsed = reader.parse(text);
+      let reader = new commonmark.Parser();
+      let writer = new commonmark.HtmlRenderer({safe: !this.allowHTML, smart: true});
+      let parsed = reader.parse(text);
       return writer.render(parsed);
     }
   }
@@ -45,10 +50,10 @@ export default {
 @import '../theme/variables.scss';
 
 #stac-browser .styled-description {
-  line-height: 1.4em;
+  line-height: $line-height-base;
 
   h1, h2, h3, h4, h5, h6 {
-    color: map-get($theme-colors, "secondary");
+    color: $secondary;
     font-weight: 600;
   }
   h1 {
@@ -69,43 +74,21 @@ export default {
   h6 {
     font-size: 1.0rem;
   }
-  pre {
-    background-color: #eee;
-    width: 100%;
-    border: 1px solid #ccc;
-    max-height: 15em;
-    overflow-y: auto;
-  }
-  pre code {
-    background-color: transparent; 
-    display: block;
-    margin: 0.5em;
-  }
-  code {
-    color: maroon;
-    display: inline-block;
-    padding: 0 0.1em;
-  }
 
   &.compact {
     h1, h2, h3, h4, h5, h6 {
-      font-weight: bold;
+      font-weight: 600;
       font-size: 1.1em;
-      margin: 0.5em 0;
+      margin: 0 0 $headings-margin-bottom 0;
     }
     p {
-      margin: 0.5em 0;
-    }
-    p:first-child {
-      margin-top: 0;
+      margin: 0 0 $paragraph-margin-bottom * 0.5 0;
     }
     p:last-child {
       margin-bottom: 0;
     }
     pre {
-      max-height: 7em;
-      width: auto;
-      max-width: 100%;
+      max-height: 8rem;
     }
   }
 

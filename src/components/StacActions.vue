@@ -1,34 +1,28 @@
 <template>
   <!-- add card footer (for items search) -->
   <b-card-footer v-if="footer && hasButtons">
-    <b-button-group class="obj-actions" :vertical="vertical" :size="size">
-      <b-button v-for="action of actions" v-bind="action.btnOptions" :key="action.id" variant="primary" @click="action.onClick">
-        <component v-if="action.icon" :is="action.icon" class="mr-1" />
+    <b-button-group class="stac-actions" :vertical="vertical" :size="size">
+      <b-button v-for="action of actions" :key="action.id" variant="primary" v-bind="action.btnOptions" @click="action.onClick">
+        <component v-if="action.icon" :is="action.icon" class="me-1" />
         {{ action.text }}
       </b-button>
     </b-button-group>
   </b-card-footer>
   <!-- add only button group (for item/collection vue) -->
-  <b-button-group v-else-if="hasButtons" class="obj-actions" :vertical="vertical" :size="size">
-    <b-button v-for="action of actions" v-bind="action.btnOptions" :key="action.id" variant="primary" @click="action.onClick">
-      <component v-if="action.icon" :is="action.icon" class="mr-1" />
+  <b-button-group v-else-if="hasButtons" class="stac-actions" :vertical="vertical" :size="size">
+    <b-button v-for="action of actions" :key="action.id" variant="primary" v-bind="action.btnOptions" @click="action.onClick">
+      <component v-if="action.icon" :is="action.icon" class="me-1" />
       {{ action.text }}
     </b-button>
   </b-button-group>
 </template>
 
-
 <script>
-import { BIconBoxArrowUpRight } from 'bootstrap-vue';
+import { defineComponent } from 'vue';
 import StacActions from '../../stacActions.config';
 
-let i = 0;
-
-export default {
+export default defineComponent({
   name: 'StacActions',
-  components: {
-    BIconBoxArrowUpRight
-  },
   props: {
     data: {
       type: Object,
@@ -47,11 +41,6 @@ export default {
       default: 'md'
     }
   },
-  data() {
-    return {
-      id: i++
-    };
-  },
   computed: {
     actions() {
       return Object.entries(StacActions)
@@ -59,8 +48,8 @@ export default {
         .filter(plugin => plugin.show);
     },
     hasButtons() {
-      return this.actions && this.actions.length > 0;
+      return this.actions.length > 0;
     }
   }
-};
+});
 </script>

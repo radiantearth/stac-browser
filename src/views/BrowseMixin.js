@@ -1,8 +1,10 @@
 import ErrorAlert from '../components/ErrorAlert.vue';
 import Loading from '../components/Loading.vue';
 import { getErrorCode, getErrorMessage } from '../store/utils';
-import URI from 'urijs';
+import { URI } from 'stac-js/src/utils.js';
 import { mapState, mapGetters } from 'vuex';
+
+const isExternalPath = path => URI(path || '/').is("absolute");
 
 export default {
   components: {
@@ -25,7 +27,7 @@ export default {
       return getErrorMessage(this.error);
     },
     isExternal() {
-      return URI(this.path).is("absolute");
+      return isExternalPath(this.path);
     }
   },
   watch: {
@@ -35,13 +37,25 @@ export default {
         if (path === oldPath) {
           return;
         }
-        else if (!this.allowExternalAccess && this.isExternal) {
-          return;
-        }
-
-        let url = this.fromBrowserPath(path || '/');
-        this.$store.dispatch("load", { url, show: true });
+        await this.browse(path);
       }
+    }
+  },
+  methods: {
+    async browse(path) {
+      // Check the given path, not the path property (i.e. this.isExternal)
+      if (!this.allowExternalAccess && isExternalPath(path)) {
+        return;
+      }
+
+      // This has to run after the created() method in StacBrowser.vue.
+      // Thus we have to wait here for the router to be ready so that
+      // we can ensure parseQuery in StacBrowser.vue has been called
+      // and the query parameters for the request are set in the store.
+      // https://github.com/radiantearth/stac-browser/issues/822#issuecomment-4068820575
+      await this.$router.isReady();
+      const url = this.fromBrowserPath(path || '/');
+      await this.$store.dispatch('load', { url, show: true });
     }
   }
 };

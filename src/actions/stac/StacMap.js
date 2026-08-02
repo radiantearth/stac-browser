@@ -1,11 +1,11 @@
 import StacActionPlugin from "../StacActionPlugin";
-import URI from 'urijs';
+import { URI } from 'stac-js/src/utils.js';
 import i18n from "../../i18n";
 
 export default class StacMap extends StacActionPlugin {
 
   get show() {
-    return this.object.isItem();
+    return this.object.isItem;
   }
 
   get uri() {
@@ -13,6 +13,6 @@ export default class StacMap extends StacActionPlugin {
   }
 
   get text() {
-    return i18n.t('actions.openIn', {service: 'stac-map'});
+    return i18n.global.t('actions.openIn', {service: 'stac-map'});
   }
 }

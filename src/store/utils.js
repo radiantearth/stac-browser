@@ -1,6 +1,7 @@
 import axios from "axios";
-import Utils from "../utils";
-import i18n from "../i18n";
+import { hasText, isObject, size } from 'stac-js/src/utils.js';
+import i18n from '../i18n';
+import Queryable from '../models/cql2/queryable';
 
 export class Loading {
 
@@ -18,7 +19,7 @@ export function stacRequestOptions(cx, link) {
     };
   }
   // Return if the link is not an object or doesn't contain an href
-  if (!Utils.isObject(link) || typeof link.href !== 'string') {
+  if (!isObject(link) || typeof link.href !== 'string') {
     return {};
   }
 
@@ -29,13 +30,13 @@ export function stacRequestOptions(cx, link) {
   let headers = {
     'Accept-Language': cx.getters.acceptedLanguages
   };
-  if (Utils.hasText(link.type)) {
+  if (hasText(link.type)) {
     headers.Accept = link.type;
   }
   if (!cx.getters.isExternalUrl(url)) {
     Object.assign(headers, cx.state.requestHeaders);
   }
-  if (Utils.isObject(link.headers)) {
+  if (isObject(link.headers)) {
     Object.assign(headers, link.headers);
   }
 
@@ -49,18 +50,18 @@ export function stacRequestOptions(cx, link) {
   };
 }
 
-export async function stacRequest(cx, link, axiosOptions = {}) {
+export async function stacRequest(cx, link, checkPermissions = false, axiosOptions = {}) {
   // Get options
   const options = stacRequestOptions(cx, link);
   // Execute the request
-  return await axios(Object.assign(options, axiosOptions));
-}
-
-export function processSTAC(state, stac) {
-  if (typeof state.preprocessSTAC === 'function') {
-    stac = state.preprocessSTAC(stac, state);
+  const response = await axios(Object.assign(options, axiosOptions));
+  // Check permissions via OPTIONS if requested
+  if (checkPermissions) {
+    // Don't await this dispatch, we don't want to block the request for permissions check
+    // STAC Browser will react on the permissions check through the reactivity
+    cx.dispatch('manager/checkPermissions', options);
   }
-  return Object.freeze(stac);
+  return response;
 }
 
 export function isAuthenticationError(error) {
@@ -68,9 +69,9 @@ export function isAuthenticationError(error) {
 }
 
 export function getErrorCode(error) {
-  if (error instanceof Error && error.isAxiosError && Utils.isObject(error.response)) {
+  if (error instanceof Error && error.isAxiosError && isObject(error.response)) {
     const res = error.response;
-    if (Utils.isObject(res.data) && res.data.code) {
+    if (isObject(res.data) && res.data.code) {
       return res.data.code;
     }
     else {
@@ -80,37 +81,37 @@ export function getErrorCode(error) {
   return null;
 }
 
-export function getErrorMessage(error) {
+export function getErrorMessage(error, requiresPermissions = false) {
   if (error instanceof Error) {
     if (error.isAxiosError) {
       const res = error.response;
       if (error.response) {
         // Get a error message for HTTP codes where it's clear what the issue is
         if (res.status === 401) {
-          return i18n.t('errors.unauthorized');
+          return i18n.global.t('errors.unauthorized');
         } else if (res.status === 403) {
-          return i18n.t('errors.authFailed');
+          return i18n.global.t(requiresPermissions ? 'errors.missingPermissions' : 'errors.authFailed');
         } else if (res.status === 404) {
-          return i18n.t('errors.notFound');
-        } else if (Utils.isObject(res.data) && Utils.hasText(res.data.description)) {
+          return i18n.global.t('errors.notFound');
+        } else if (isObject(res.data) && hasText(res.data.description)) {
           // Get the error message from the error object as defined for STAC API JSON responses
           return res.data.description;
-        } else if (Utils.hasText(res.data)) {
+        } else if (hasText(res.data)) {
           // Get the error message from the plain text response
           return res.data;
         } else if (res.status >= 500 && res.status < 600) {
           // Return a generic error message for server issues (HTTP 5xx)
-          return i18n.t('errors.serverError');
+          return i18n.global.t('errors.serverError');
         } else if (res.status >= 400 && res.status < 500) {
           // Return a generic error message for issues that originate in the client request (HTTP 4xx)
-          return i18n.t('errors.badRequest');
+          return i18n.global.t('errors.badRequest');
         }
       }
       else if (error.code === 'ERR_NETWORK') {
-        return i18n.t('errors.networkError');
+        return i18n.global.t('errors.networkError');
       }
     }
-    else if (Utils.hasText(error.message)) {
+    else if (hasText(error.message)) {
       return error.message;
     }
   }
@@ -118,7 +119,7 @@ export function getErrorMessage(error) {
 }
 
 export function addQueryIfNotExists(uri, query) {
-  if (Utils.size(query) == 0) {
+  if (size(query) === 0) {
     return uri;
   }
   for (let key in query) {
@@ -157,4 +158,41 @@ export function hasAuthority(pattern, uri) {
     pattern = new RegExp('(^|\\.)' + RegExp.escape(pattern) + '$', 'i');
     return pattern.test(uri.hostname());
   }
+}
+
+// Loads a JSON Schema (queryables, sortables) and returns the entries of its
+// `properties` as [key, schema] pairs, with all $refs resolved.
+export async function fetchSchemaProperties(store, link) {
+  if (!isObject(link)) {
+    return [];
+  }
+  // Go through the request action so that requests are retried after login
+  const response = await store.dispatch('request', { link });
+  if (!isObject(response.data)) {
+    return [];
+  }
+  let schemas;
+  try {
+    const { default: refParser } = await import('@apidevtools/json-schema-ref-parser');
+    schemas = await refParser.dereference(response.data);
+  } catch (error) {
+    // Use data with $refs included as fallback anyway
+    console.error(error);
+    schemas = response.data;
+  }
+  if (!isObject(schemas?.properties)) {
+    return [];
+  }
+  return Object.entries(schemas.properties);
+}
+
+export async function fetchQueryablesForLink(store, link) {
+  const properties = await fetchSchemaProperties(store, link);
+  return properties.map(([key, schema]) => new Queryable(key, schema));
+}
+
+// Loads the sortable field names for a sortables link
+export async function fetchSortablesForLink(store, link) {
+  const properties = await fetchSchemaProperties(store, link);
+  return properties.map(([key]) => key);
 }

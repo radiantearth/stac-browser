@@ -5,49 +5,183 @@ body {
 }
 
 body {
-  margin-top: $header-margin;
+  margin-top: var(--sb-header-margin);
 }
 
-#popover-root-btn {
-  border: 0;
+img,
+svg {
+  // Use center instead of middle to keep the buttons better aligned with the text
+  vertical-align: center;
+}
+
+.btn svg {
+  // Fix an issue where in some cases icons were slightly too large and were only partially shown in buttons
+  height: round(down, 1.2em, 1px);
+  width: round(down, 1.2em, 1px);
+}
+
+.list-group-item.active {
+  // Mark the selected item with Bootstrap's "subtle primary" tokens instead of
+  // a solid primary fill — the same treatment Bootstrap uses for an active
+  // accordion button. This keeps the text and any nested links readable with
+  // the normal colors (no on-primary special-casing) and is tuned for light
+  // and dark mode by Bootstrap.
+  --bs-list-group-active-color: var(--bs-primary-text-emphasis);
+  --bs-list-group-active-bg: var(--bs-primary-bg-subtle);
+  --bs-list-group-active-border-color: var(--bs-primary-border-subtle);
 }
 
 #stac-browser {
   display: flex;
   flex-direction: column;
   max-width: 100%;
-  height: 100%;
+  // Only min-height, not height: a fixed height: 100% would cap this element's
+  // box at the viewport height, which in turn caps the sticky header's
+  // containing block and makes it scroll away past the first viewport. With
+  // min-height the container grows with its content and the header stays pinned.
   min-height: 100%;
-  gap: $block-margin;
+  gap: var(--sb-block-gap);
 
   @include media-breakpoint-only(xxxl) {
     max-width: 75vw;
   }
 
   > header {
+    position: $header-position;
+    margin-inline: calc(var(--bs-gutter-x, 1.5rem) * -0.5);
+    padding-inline: calc(var(--bs-gutter-x, 1.5rem) * 0.5);
+
+    @if $header-position == sticky {
+      top: var(--sb-header-margin);
+      z-index: $zindex-sticky;
+      box-shadow: none;
+      transition: box-shadow 0.2s ease-in-out;
+      background-color: var(--bs-body-bg);
+      border-bottom: 1px solid transparent;
+
+      &.scrolled {
+        border-bottom-color: var(--bs-border-color);
+        box-shadow: var(--bs-box-shadow-inset), 0 0.125rem 0.25rem rgba(0, 0, 0, 0.15);
+      }
+
+      // On small screens, slide the site row out of view when scrolling down
+      // so that only the page row stays sticky. Scrolling up brings it back.
+      // The .hide-site-header class and --sb-site-height are managed in StacBrowser.vue.
+      @include media-breakpoint-down(md) {
+        transition: box-shadow 0.2s ease-in-out, transform 0.3s ease-in-out;
+
+        &.hide-site-header {
+          transform: translateY(calc(-1 * var(--sb-site-height, 0px)));
+        }
+      }
+    }
+
+    .btn-header {
+      @include button-variant(
+        $background: $header-button-background,
+        $border: $header-button-border-color,
+        $color: $header-color,
+        $hover-background: $header-button-hover-background,
+        $hover-border: $header-hover-button-border-color,
+        $hover-color: $header-hover-color,
+        $active-background: $header-button-active-background,
+        $active-border: $header-hover-button-border-color,
+        $active-color: $header-hover-color,
+        $disabled-background: transparent,
+        $disabled-border: transparent,
+        $disabled-color: rgba($header-color, 0.65)
+      );
+      --bs-btn-color: var(--sb-header-color);
+      --bs-btn-bg: var(--sb-header-button-background);
+      --bs-btn-border-color: var(--sb-header-button-border-color);
+      --bs-btn-hover-color: var(--sb-header-hover-color);
+      --bs-btn-hover-bg: var(--sb-header-button-hover-background);
+      --bs-btn-hover-border-color: var(--sb-header-hover-button-border-color);
+      --bs-btn-active-color: var(--sb-header-hover-color);
+      --bs-btn-active-bg: var(--sb-header-button-active-background);
+      --bs-btn-active-border-color: var(--sb-header-hover-button-border-color);
+      --bs-btn-disabled-color: color-mix(in srgb, var(--sb-header-color) 65%, transparent);
+    }
+
     .site {
-      border-bottom: 3px solid map-get($theme-colors, "primary");
+      background: var(--sb-header-background);
+
+      @include media-breakpoint-up(lg) {
+        .actions {
+          min-width: 300px;
+        }
+      }
+
+      .user {
+        text-align: right;
+      }
+
+      // On small screens the buttons and the title don't fit on one line,
+      // so move the title to its own full-width row below the buttons.
+      @include media-breakpoint-down(md) {
+        > .col-md-12 {
+          flex-wrap: wrap;
+          justify-content: space-between;
+
+          > .title {
+            order: 1;
+            flex-basis: 100%;
+          }
+        }
+      }
 
       > .col-md-12 {
         > .title {
-          > span {
-            font-size: 1.5rem;
-            font-weight: 600;
-          }
-        }
+          display: flex;
+          align-items: center;
+          gap: var(--sb-header-font-size);
+          color: var(--sb-header-color);
+          text-shadow: $header-text-shadow;
 
-        .logo {
-          max-height: $logo-image-height;
+          a {
+            color: var(--sb-header-color);
+
+            &:hover {
+              color: var(--sb-header-hover-color);
+            }
+          }
+          
+          .header-title {
+            display: flex;
+            align-items: center;
+            gap: var(--sb-header-font-size);
+
+            .logo {
+              // A definite height (instead of max-height) is required so that
+              // SVG logos without width/height attributes get their width
+              // included in the intrinsic size of the title link,
+              // otherwise the title next to the logo may wrap unnecessarily.
+              // Additionally, ensure we don't upsample images.
+              height: var(--sb-logo-height);
+              width: auto;
+              object-fit: scale-down;
+            }
+
+            span[role="banner"] {
+              font-size: var(--sb-header-font-size);
+              font-weight: var(--sb-header-font-weight);
+              display: -webkit-box;
+              -webkit-line-clamp: 2;
+              line-clamp: 2;
+              -webkit-box-orient: vertical;
+              overflow: hidden;
+            }
+          }
         }
       }
     }
     .site,
     .page {
-      padding: $block-margin 0;
+      padding: var(--sb-block-gap) 0;
 
       > .col-md-12 {
         display: flex;
-        gap: 1rem;
+        gap: var(--sb-block-gap);
         align-items: center;
 
         > .title {
@@ -57,7 +191,7 @@ body {
           margin: 0;
           padding: 0;
           align-items: center;
-          gap: 1rem;
+          gap: var(--sb-block-gap);
 
           h1,
           h2 {
@@ -66,18 +200,28 @@ body {
           }
 
           h1 {
-            font-weight: 700;
-            align-items: center;
-            font-size: 2.2rem;
+            color: var(--sb-h1-color);
+            font-weight: $h1-font-weight;
+            font-size: $h1-font-size;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
           }
-          @include media-breakpoint-down(xl) {
+          @include media-breakpoint-down(xxl) {
             h1 {
-              font-size: 2rem;
+              font-size: $h1-font-size - 0.2rem;
+            }
+          }
+          @include media-breakpoint-down(lg) {
+            h1 {
+              font-size: $h1-font-size - 0.4rem;
             }
           }
           @include media-breakpoint-down(md) {
             h1 {
-              font-size: 1.75rem;
+              font-size: $h1-font-size - 0.6rem;
             }
           }
         }
@@ -95,8 +239,27 @@ body {
     flex: 1;
   }
   > footer {
-    padding-bottom: $block-margin;
+    padding-bottom: var(--sb-block-gap);
     text-align: center;
+
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      list-style: none;
+      padding: 0;
+      margin: 0 0 var(--sb-block-gap) 0;
+      font-size: $font-size-sm;
+
+      li:not(:last-child)::after {
+        content: "|";
+        margin: 0 0.5em;
+      }
+    }
+
+    .poweredby {
+      display: block;
+    }
   }
 
   .popover-large {
@@ -113,45 +276,77 @@ body {
   .map {
     height: 350px;
     background-color: transparent;
-    @include border-radius($border-radius);
+    overflow: hidden;
     position: relative;
     z-index: 0;
   }
 
   h2 {
-    color: map-get($theme-colors, "secondary");
-    font-weight: 600;
+    font-weight: $h2-font-weight;
+    color: var(--sb-subheadings-color);
+  }
+
+  pre {
+    width: fit-content;
+    max-width: 100%;
+    background: var(--bs-body-secondary-bg);
+    color: var(--bs-body-secondary-color);
+    border: var(--bs-border-width) var(--bs-border-style) var(--bs-border-color);
+    border-radius: var(--bs-border-radius);
+    max-height: 20rem;
+    padding: var(--sb-code-padding);
+    overflow: auto;
+  }
+  pre code {
+    font-size: $font-size-sm;
   }
 
   .maps-preview {
     position: static;
 
-    .nav-pills {
-      margin: 0;
-      padding: 0;
+    .tabs {
+      align-items: stretch !important;
 
-      > li {
-        margin: 0 0.5rem;
-        &:only-child {
-          display: none;
-        }
-        &:first-of-type {
-          margin-top: 0.5rem;
-        }
-        &:last-of-type {
-          margin-bottom: 0.5rem;
+      .tab-content {
+        width: 100%;
+        position: relative;
+      }
+
+      .card-header {
+        margin: 0;
+        padding: 0;
+        border-bottom: 0;
+
+        .nav-pills {
+          margin: 0;
+          margin-right: 0 !important;
+          padding: 0;
+
+          > li {
+            margin: 0 0.5rem;
+            &:only-child {
+              display: none;
+            }
+            &:first-of-type {
+              margin-top: 0.5rem;
+            }
+            &:last-of-type {
+              margin-bottom: 0.5rem;
+            }
+
+            > button {
+              width: 100%;
+              text-align: left;
+            }
+          }
         }
       }
     }
   }
 
-  > .popover .items .card-columns.count-1 {
-    column-count: 1;
-  }
-
   .service {
     &.bsky {
-      @include button-variant(#1185fe, #1185fe);
+      @include button-variant(#01A5FF, #01A5FF);
     }
     &.mastodon {
       @include button-variant(#6364ff, #6364ff);
@@ -162,8 +357,8 @@ body {
   }
 
   .icon {
-    max-width: $max-icon-size;
-    max-height: $max-icon-size;
+    max-width: var(--sb-max-icon-size);
+    max-height: var(--sb-max-icon-size);
   }
   h1 > .icon {
     max-width: 1.2em;
@@ -174,7 +369,7 @@ body {
     position: fixed;
     bottom: 0;
     right: 0;
-    z-index: 5000;
+    z-index: $zindex-toast;
     opacity: 0.9;
     max-width: 50vh;
     margin: 1rem;
@@ -183,43 +378,37 @@ body {
   abbr[title],
   abbr[data-original-title] {
     text-decoration: none;
-    border-bottom: 1px dotted $body-color;
+    border-bottom: 1px dotted var(--bs-body-color);
   }
 
   .card {
     background: transparent;
   }
 
-  input:invalid {
-    border-color: map-get($theme-colors, "danger");
-  }
-
   a.list-group-item {
-    color: $link-color;
+    color: var(--bs-link-color);
     text-decoration: $link-decoration;
 
     &:hover {
-      color: $link-hover-color;
+      color: var(--bs-link-hover-color);
       text-decoration: $link-hover-decoration;
     }
+
   }
 
   .btn-group,
   .btn-group-vertical {
     .btn-primary,
     .btn-secondary {
-      border-color: darken(map-get($theme-colors, "primary"), 15%);
+      border-color: color-mix(in srgb, var(--bs-primary) 85%, black);
       &:hover {
-        border-color: darken(map-get($theme-colors, "primary"), 30%);
+        border-color: color-mix(in srgb, var(--bs-primary) 70%, black);
       }
     }
     .btn-secondary {
-      background-color: lighten(
-        desaturate(map-get($theme-colors, "primary"), 50%),
-        20%
-      );
+      background-color: color-mix(in srgb, var(--bs-primary) 30%, white);
       &:hover {
-        background-color: darken(map-get($theme-colors, "primary"), 5%);
+        background-color: color-mix(in srgb, var(--bs-primary) 95%, black);
       }
     }
   }
@@ -243,35 +432,63 @@ body {
   @include media-breakpoint-up(lg) {
     .button-label {
       display: inline-block;
-      margin-left: 0.25rem;
+      margin-left: 0.33rem;
+      margin-right: 0.1rem;
       white-space: nowrap;
     }
   }
 
-  .expandable-card > .card-header {
+  .accordion-item > .accordion-header {
     padding: 0;
     background-color: transparent;
   }
-  .expandable-card > .card-header > .btn,
-  .mimic-expandable-card > .list-group-item {
+  .accordion-item > .accordion-header > .accordion-button,
+  .mimic-accordion > .list-group-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 0.25rem;
     padding: 0.5rem;
-    background-color: rgba(0, 0, 0, 0.03);
+    background-color: rgba($body-color, 0.03);
+    overflow: hidden;
 
-    > .title {
-      text-align: left;
-      flex-grow: 9;
+    &::after {
+      display: none;
     }
+
+    > .start {
+      display: flex;
+      flex: 1 1 auto;
+      gap: 0.25rem;
+      align-items: center;
+      overflow: hidden;
+      min-width: 50%;
+
+      > .title {
+        text-align: left;
+        min-width: 0;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+    }
+
     > .badges {
-      flex-grow: 1;
-      text-align: right;
+      flex: 0 1 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      min-width: 0;
+      overflow: hidden;
 
       .badge {
         margin: 0.125rem;
         text-transform: uppercase;
+        flex: 0 1 auto;
+        min-width: 0;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
       }
     }
   }
@@ -300,55 +517,266 @@ body {
       }
     }
   }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    grid-auto-rows: min-content;
+    // The layout uses margin-bottom instead of row-gap (on .catalog-grid), because
+    // the .card-img-wrapper is supposed to collapse to 0px height when there are no
+    // images in a row. row-gap would prevent that from happening.
+    column-gap: 1rem;
+    padding: 0.5rem 0;
+    grid-auto-flow: dense;
+
+    .catalog-card,
+    .item-card,
+    .feature-card {
+      display: grid;
+      grid-template-rows: subgrid;
+      gap: 0;
+      box-sizing: border-box;
+      overflow: hidden;
+      // See note in .card-grid (below) why margin-bottom is used instead of row-gap
+      margin-bottom: 0.75rem;
+
+      &.queued {
+        min-height: 4rem;
+      }
+    }
+
+    .catalog-card,
+    .item-card {
+      grid-row: span 7;
+
+      .card-body {
+        display: grid;
+        grid-template-rows: subgrid;
+        grid-row: span 4;
+      }
+    }
+
+    .feature-card {
+      grid-row: span 1;
+    }
+  }
+
+  .catalog-card,
+  .item-card,
+  .feature-card {
+    &.deprecated {
+      opacity: 0.5;
+
+      &:hover {
+        opacity: 1;
+      }
+    }
+    
+    .card-img-top,
+    .card-img-end,
+    .card-img-start {
+      width: auto;
+      height: auto;
+      object-fit: scale-down;
+      object-position: center;
+    }
+
+    .card-img-wrapper {
+      background-color: var(--bs-card-cap-bg);
+      display: grid;
+      overflow: hidden;
+
+      img {
+        margin: auto;
+        border-radius: 0;
+
+        &.card-img-top {
+          max-width: 100%;
+          max-height: 250px;
+        }
+      }
+    }
+
+    .card-title {
+      overflow-wrap: anywhere;
+      margin-bottom: 0.25rem;
+    }
+
+    .card-body,
+    .card-footer {
+      position: relative;
+      gap: 0.5rem;
+
+      > p {
+        margin: 0;
+      }
+    }
+    .card-footer {
+      .btn-group-vertical {
+        width: 100%;
+      }
+    }
+    .card-footer:empty {
+      display: none;
+    }
+
+    .badge.deprecated {
+      text-transform: uppercase;
+    }
+
+    .intro {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      overflow-wrap: anywhere;
+      text-align: left;
+      line-height: 1.5em;
+      max-height: 4.5em; /* 3 lines at 1.5em line-height */
+    }
+
+    .datetime {
+      color: $secondary;
+    }
+  }
+
+  .card-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 0.5rem 0;
+
+    .catalog-card {
+      box-sizing: border-box;
+      display: flex;
+      overflow: hidden;
+
+      .card-img-wrapper {
+        width: 33%;
+        position: relative;
+        overflow: hidden;
+
+        &:empty {
+          display: none;
+        }
+
+        .card-img-end {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: scale-down;
+          object-position: center;
+        }
+      }
+
+      .card-body {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        gap: 0.25rem;
+
+        .intro {
+          -webkit-line-clamp: 2;
+          line-clamp: 2;
+          max-height: 3rem;
+        }
+      }
+
+      .card-footer {
+        width: 175px;
+        border-top: 0;
+      }
+    }
+  }
 }
 
-@import "~vue-multiselect/dist/vue-multiselect.min.css";
+@import "vue-multiselect/dist/vue-multiselect.min.css";
 
-// Datepicker related style
-$default-color: map-get($theme-colors, "secondary");
-$primary-color: map-get($theme-colors, "primary");
-
-// Multiselect related style
+// Multiselect related style — uses CSS custom properties so dark mode is automatic.
 #stac-browser {
+  .multiselect__tags {
+    transition: $btn-transition;
+    background: var(--bs-body-bg);
+    border-color: var(--bs-border-color);
+    color: var(--bs-body-color);
+  }
+
   .multiselect__tags:focus-within {
-    border-color: #48cce1;
+    border-color: #{$input-focus-border-color};
     outline: 0;
-    box-shadow: 0 0 0 0.2rem rgba(24, 129, 145, 0.25);
+    box-shadow: var(--bs-box-shadow-inset), 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
   }
 
   .multiselect__select:before {
-    color: #495057;
-    border-color: #495057 transparent transparent;
+    color: var(--bs-body-color);
+    border-color: var(--bs-body-color) transparent transparent;
   }
 
   .multiselect__tags,
   .multiselect__single {
-    border-color: #ccc;
-    padding-left: 0.75rem;
-    font-size: 16px;
-    height: 100%;
+    border-color: var(--bs-border-color);
+    padding-left: $input-padding-x;
+    font-size: $font-size-base;
   }
 
   .multiselect__input,
   .multiselect__single {
+    background: transparent;
+    color: var(--bs-body-color);
     padding: 4px 0 3px 0;
+  }
+
+  // Dropdown list
+  .multiselect__content-wrapper {
+    background: var(--bs-body-bg);
+    border-color: var(--bs-border-color);
+  }
+
+  .multiselect__option {
+    background: var(--bs-body-bg);
+    color: var(--bs-body-color);
+
+    &:after {
+      background: var(--bs-body-bg);
+      color: var(--bs-secondary-color);
+    }
+  }
+
+  .multiselect__tag {
+    margin-top: 3px;
+    margin-bottom: 3px;
   }
 
   .multiselect__tag,
   .multiselect__tag-icon:hover,
   .multiselect__option--highlight,
   .multiselect__option--highlight:after {
-    background-color: map-get($theme-colors, "primary");
+    background-color: var(--bs-primary);
+    color: var(--bs-white);
   }
 
   .multiselect__option--selected.multiselect__option--highlight,
   .multiselect__option--selected.multiselect__option--highlight:after {
-    background-color: map-get($theme-colors, "secondary");
+    background-color: var(--bs-secondary);
+    color: var(--bs-white);
   }
 
   .multiselect__placeholder {
-    color: #999;
-    font-size: 16px;
+    color: var(--bs-secondary-color);
+    font-size: $font-size-base;
+  }
+
+  // Keep placeholder color stable when the field is open/focused
+  .multiselect--active .multiselect__placeholder {
+    color: var(--bs-secondary-color);
+  }
+
+  .multiselect__input::placeholder {
+    color: var(--bs-secondary-color);
+    opacity: 1;
   }
 }
 
@@ -358,20 +786,117 @@ $primary-color: map-get($theme-colors, "primary");
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba($body-color, 0.5);
   margin: auto;
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 9999;
+  z-index: $zindex-modal;
 
   > form {
     min-width: 200px;
     width: 50vw;
     border-radius: $border-radius;
 
+    .b-form-group {
+      margin-bottom: 0.5rem;
+    }
+    .b-form-group:last-of-type {
+      margin-bottom: 0;
+    }
+
     > .card {
-      background-color: #fff;
+      background-color: var(--bs-body-bg);
     }
   }
+}
+
+.btn-light {
+  --bs-btn-border-color: #{shade-color($light, 20%)};
+}
+
+.btn-dark, .badge-dark {
+  --bs-btn-border-color: #{shade-color($dark, 20%)};
+}
+
+[data-bs-theme="dark"] {
+  --bs-light: #{$dark};
+  --bs-light-rgb: #{red($dark)}, #{green($dark)}, #{blue($dark)};
+  --bs-dark: #{$light};
+  --bs-dark-rgb: #{red($light)}, #{green($light)}, #{blue($light)};
+
+  .btn-outline-primary {
+    --bs-btn-color: var(--bs-link-color);
+  }
+
+  .btn-light {
+    --bs-btn-color: #{$white};
+    --bs-btn-bg: #{$dark};
+    --bs-btn-border-color: #{shade-color($dark, 20%)};
+    --bs-btn-hover-color: #{$white};
+    --bs-btn-hover-bg: #{shade-color($dark, 15%)};
+    --bs-btn-hover-border-color: #{shade-color($dark, 20%)};
+    --bs-btn-active-color: #{$white};
+    --bs-btn-active-bg: #{shade-color($dark, 20%)};
+    --bs-btn-active-border-color: #{shade-color($dark, 25%)};
+    --bs-btn-disabled-color: #{$white};
+    --bs-btn-disabled-bg: #{$dark};
+    --bs-btn-disabled-border-color: #{shade-color($dark, 20%)};
+  }
+
+  .btn-dark, .badge-dark {
+    --bs-btn-color: #{$dark};
+    --bs-btn-bg: #{$light};
+    --bs-btn-border-color: #{shade-color($light, 15%)};
+    --bs-btn-hover-color: #{$dark};
+    --bs-btn-hover-bg: #{shade-color($light, 15%)};
+    --bs-btn-hover-border-color: #{shade-color($light, 20%)};
+    --bs-btn-active-color: #{$dark};
+    --bs-btn-active-bg: #{shade-color($light, 20%)};
+    --bs-btn-active-border-color: #{shade-color($light, 25%)};
+    --bs-btn-disabled-color: #{$dark};
+    --bs-btn-disabled-bg: #{$light};
+    --bs-btn-disabled-border-color: #{shade-color($light, 15%)};
+  }
+
+  .text-bg-dark {
+    color: #{$dark} !important;
+  }
+}
+
+// Expose STAC Browser custom vars as CSS custom properties.
+// Non-color parts are baked from Sass (build-time theming);
+// color parts reference var(--bs-primary) so they stay live
+// and can be overridden at runtime in runtime-style.css.
+:root {
+  // Sizing & spacing
+  --sb-header-margin: #{$header-margin};
+  --sb-block-gap: #{$block-gap};
+  --sb-code-padding: #{$code-padding};
+  --sb-logo-height: #{$logo-height};
+  --sb-max-icon-size: #{$max-icon-size};
+
+  // Typography
+  --sb-header-font-size: #{$header-font-size};
+  --sb-header-font-weight: #{$header-font-weight};
+
+  // Colors (light mode; dark mode overrides below)
+  --sb-h1-color: #{$h1-color};
+  --sb-subheadings-color: #{$subheadings-color};
+
+  // Main/top header of the website
+  --sb-header: #{$header};
+  --sb-header-background: #{$header-background};
+  --sb-header-color: #{$header-color};
+  --sb-header-hover-color: #{$header-hover-color};
+  --sb-header-button-background: #{$header-button-background};
+  --sb-header-button-border-color: #{$header-button-border-color};
+  --sb-header-button-hover-background: #{$header-button-hover-background};
+  --sb-header-button-active-background: #{$header-button-active-background};
+  --sb-header-hover-button-border-color: #{$header-hover-button-border-color};
+}
+
+[data-bs-theme="dark"] {
+  --sb-h1-color: #{$h1-color-dark};
+  --sb-subheadings-color: #{$subheadings-color-dark};
 }

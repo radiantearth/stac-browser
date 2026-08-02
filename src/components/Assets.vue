@@ -1,23 +1,25 @@
 <template>
   <section class="assets mb-4">
     <h2 v-if="displayTitle">{{ displayTitle }}</h2>
-    <div class="accordion" role="tablist">
+    <b-accordion>
       <Asset
-        v-for="asset in assets" :asset="asset" :expand="expand" :context="context"
+        v-for="asset in assets" :asset="asset" :expand="expand"
         :definition="definition" :shown="shownKeys.includes(asset.getKey())"
         :key="asset.getKey()" @show="show"
       />
-    </div>
+    </b-accordion>
   </section>
 </template>
 
 <script>
-import Asset from './Asset.vue';
+import { defineAsyncComponent } from 'vue';
+import { BAccordion } from 'bootstrap-vue-next';
 
 export default {
   name: 'Assets',
   components: {
-    Asset
+    Asset: defineAsyncComponent(() => import('./Asset.vue')),
+    BAccordion
   },
   props: {
     assets: {
@@ -28,10 +30,6 @@ export default {
       type: Array,
       default: () => ([])
     },
-    context: {
-      type: Object,
-      default: null
-    },
     definition: {
       type: Boolean,
       default: false
@@ -39,18 +37,23 @@ export default {
     title: {
       type: String,
       default: null
+    },
+    autoExpand: {
+      type: Boolean,
+      default: false
     }
   },
+  emits: ['showAsset'],
   computed: {
     shownKeys() {
       return this.shown
-        .filter(asset => asset.isAsset())
+        .filter(asset => asset.isAsset)
         .map(asset => asset.getKey());
     },
     displayTitle() {
       if (this.title === null) {
         let langKey = this.definition ? 'assets.inItems' : 'stacAssets';
-        return this.$tc(langKey, this.assets.length);
+        return this.$t(langKey, this.assets.length);
       }
       else {
         return this.title;
@@ -60,7 +63,7 @@ export default {
       if (this.definition) {
         return false; // Don't expand assets for Item Asset Definitions
       }
-      else if (this.assets.length === 1 && this.context && this.context.isItem()) {
+      else if (this.assets.length === 1 && this.autoExpand) {
         return true; // Expand asset if it's the only asset available and it is in an Item
       }
       return null; // Let asset decide (e.g. depending on roles)

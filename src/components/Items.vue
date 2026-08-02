@@ -1,35 +1,37 @@
 <template>
   <section class="items mb-4">
     <header>
-      <h2 class="title mr-2">{{ $tc('stacItem', items.length ) }}</h2>
-      <b-badge v-if="itemCount !== null" pill variant="secondary" class="mr-4">{{ itemCount }}</b-badge>
-      <SortButtons v-if="!api && items.length > 1" v-model="sort" />
+      <h2 class="title me-2">{{ $t('stacItem', items.length ) }}</h2>
+      <b-badge v-if="itemCount !== null" pill variant="secondary" class="me-4">{{ itemCount }}</b-badge>
+      <SortButtons v-if="!api && items.length > 1" v-model="sort.direction" />
     </header>
 
     <Pagination
-      v-if="showPagination" ref="topPagination" class="mb-3" :class="{'mr-3': allowFilter}"
+      v-if="showPagination" ref="topPagination" class="mb-3" :class="{'me-3': allowFilter}"
       :pagination="pagination" placement="top" @paginate="paginate"
     />
     <template v-if="allowFilter">
       <b-button v-if="api" class="mb-3" v-b-toggle.itemFilter :variant="hasFilters && !filtersOpen ? 'primary' : 'outline-primary'">
-        <b-icon-search />
+        <b-icon-filter />
         {{ filtersOpen ? $t('items.hideFilter') : $t('items.showFilter') }}
         <b-badge v-if="hasFilters && !filtersOpen" variant="dark">{{ filterCount }}</b-badge>
+        <b-badge v-if="hasUnappliedChanges" variant="warning" :title="$t('items.filterChangesNotApplied')">!</b-badge>
       </b-button>
       <b-collapse id="itemFilter" v-model="filtersOpen">
         <SearchFilter
           type="Items"
           :title="$t('items.filter')" :parent="stac"
-          :value="apiFilters" @input="emitFilter"
+          :searchLink="itemSearchLink"
+          @input="emitFilter"
         />
       </b-collapse>
     </template>
 
     <section class="list">
       <Loading v-if="loading" fill top />
-      <b-card-group v-if="chunkedItems.length > 0" columns>
+      <div v-if="chunkedItems.length > 0" class="card-grid">
         <Item v-for="item in chunkedItems" :item="item" :key="item.href" />
-      </b-card-group>
+      </div>
       <b-alert v-else :variant="hasFilters ? 'warning' : 'info'" show>
         <template v-if="hasFilters">{{ $t('search.noItemsFound') }}</template>
         <template v-else>{{ $t('items.noneAvailableForCollection') }}</template>
@@ -37,29 +39,31 @@
     </section>
 
     <Pagination v-if="showPagination" class="mb-3" :pagination="pagination" @paginate="paginate" />
-    <b-button v-else-if="hasMore" @click="showMore" variant="primary" v-b-visible.300="showMore">{{ $t('showMore') }}</b-button>
+    <b-button v-else-if="hasMore" @click="showMore" variant="primary" v-visible.300="showMore">{{ $t('showMore') }}</b-button>
   </section>
 </template>
 
 <script>
+import { mapGetters, mapState } from 'vuex';
+import { BCollapse } from 'bootstrap-vue-next';
+import { defineComponent, defineAsyncComponent } from 'vue';
+
+import Utils from '../utils';
+import { size } from 'stac-js/src/utils.js';
 import Item from './Item.vue';
 import Loading from './Loading.vue';
-import Pagination from './Pagination.vue';
-import { BCollapse, BIconSearch } from "bootstrap-vue";
-import Utils from '../utils';
-import { getDisplayTitle } from '../models/stac';
-import { mapState } from 'vuex';
+import { sortStac } from '../models/stac';
+import { FILTER_FIELDS } from '../store/modules/search';
 
-export default {
+export default defineComponent({
   name: "Items",
   components: {
-    BCollapse,
-    BIconSearch,
     Item,
-    SearchFilter: () => import('./SearchFilter.vue'),
+    SearchFilter: defineAsyncComponent(() => import('./SearchFilter.vue')),
     Loading,
-    Pagination,
-    SortButtons: () => import('./SortButtons.vue')
+    Pagination: defineAsyncComponent(() => import('./Pagination.vue')),
+    BCollapse,
+    SortButtons: defineAsyncComponent(() => import('./SortButtons.vue'))
   },
   props: {
     items: {
@@ -96,22 +100,43 @@ export default {
     },
     chunkSize: {
       type: Number,
-      default: 90
+      default: 90,
+      validator: value => value > 0
     },
     count: {
       type: Number,
-      default: null
+      default: null,
+      validator: value => value === null || value >= 0
     }
   },
+  emits: ['filtersShown', 'filterItems', 'paginate'],
   data() {
     return {
       shownItems: this.chunkSize,
       filtersOpen: this.showFilters,
-      sort: 0
+      sort: Utils.parseApiSortParameter() // get empty sort object
     };
   },
   computed: {
-    ...mapState(['cardViewSort', 'uiLanguage']),
+    ...mapState(['defaultItemSort', 'uiLanguage']),
+    ...mapGetters('search', ['itemSearchParams']),
+    hasUnappliedChanges() {
+      // The badge reflects the filters applied to the shown items (apiFilters);
+      // the form state in the store may have been changed without submitting.
+      const draft = this.itemSearchParams || {};
+      const applied = this.apiFilters || {};
+      // CQL filters are only rebuilt on submit, compare them by reference
+      if ((draft.filters || null) !== (applied.filters || null)) {
+        return true;
+      }
+      const normalize = (value) => {
+        if (value === undefined || value === null || value === '' || (Array.isArray(value) && value.length === 0)) {
+          return null;
+        }
+        return value;
+      };
+      return FILTER_FIELDS.some(key => JSON.stringify(normalize(draft[key])) !== JSON.stringify(normalize(applied[key])));
+    },
     itemCount() {
       if (this.count !== null) {
         return this.count;
@@ -125,19 +150,15 @@ export default {
       return this.items.length > this.shownItems;
     },
     filterCount() {
-      return Object.values(this.apiFilters).filter(filter => !(filter === null || Utils.size(filter) === 0)).length;
+      return Object.values(this.apiFilters).filter(filter => filter !== null && size(filter) > 0).length;
     },
     hasFilters() {
       return this.filterCount > 0;
     },
     chunkedItems() {
       let items = this.items;
-      if (!this.apiFilters.sortby && this.sort !== 0) {
-        const collator = new Intl.Collator(this.uiLanguage);
-        items = items.slice(0).sort((a,b) => collator.compare(getDisplayTitle(a), getDisplayTitle(b)));
-        if (this.sort === -1) {
-          items = items.reverse();
-        }
+      if (!this.apiFilters.sortby && this.sort.direction !== 0) {
+        items = sortStac(items, this.sort, this.uiLanguage);
       }
       if (!this.api && this.items.length > this.chunkSize) {
         return items.slice(0, this.shownItems);
@@ -153,22 +174,25 @@ export default {
         }
         else if (this.items.length > 0) {
           // Check whether any pagination links are available
-          return Object.values(this.pagination).some(link => !!link);
+          return Object.values(this.pagination).some(link => Boolean(link));
         }
       }
       return false;
+    },
+    itemSearchLink() {
+      return this.stac && typeof this.stac.getApiItemsLink === 'function' ? this.stac.getApiItemsLink() : null;
     }
   },
   watch: {
     showFilters() {
-      this.filter = this.showFilters;
+      this.filtersOpen = this.showFilters;
     },
     filtersOpen() {
       this.$emit('filtersShown', this.filtersOpen);
     }
   },
   created() {
-    this.sort = Utils.convertHumanizedSortOrder(this.cardViewSort);
+    this.sort = Utils.parseApiSortParameter(this.defaultItemSort); // get empty sort object
   },
   mounted() {
     if (this.showFilters) {
@@ -189,5 +213,5 @@ export default {
       this.$emit('paginate', link);
     }
   }
-};
+});
 </script>

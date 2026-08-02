@@ -1,7 +1,11 @@
 <template>
-  <ul class="tree" v-b-visible="load">
+  <ul class="tree" v-visible="load">
     <li>
-      <b-button v-if="pagination" size="sm" variant="light" disabled>
+      <b-button v-if="canLoadMore" size="sm" variant="light" v-visible.300="loadNextPage" @click="loadNextPage()">
+        <b-spinner v-if="loadingMore" small :label="$t('loading')" />
+        <b-icon-three-dots v-else />
+      </b-button>
+      <b-button v-else-if="pagination" size="sm" variant="light" disabled>
         <b-icon-three-dots />
       </b-button>
       <template v-else-if="mayHaveChildren">
@@ -12,9 +16,9 @@
       </template>
       <b-button v-else size="sm" variant="light" :to="to">
         <b-icon-file-earmark-richtext />
-      </b-button>
+      </b-button><!--
       
-      <b-button size="sm" variant="light" :class="{path: onPath || active}" :disabled="!to && !active" :to="to" @click="onClick">
+      --><b-button size="sm" variant="light" :class="{path: onPath || active}" :disabled="!to && !active" :to="to" @click="onClick">
         {{ title }}
       </b-button>
 
@@ -31,7 +35,7 @@
         </ul>
         <template v-else>
           <Tree v-for="(child, i) in shownChilds" :key="i" :item="child" :parent="stac" :path="path" />
-          <b-button class="show-more" v-if="hasMore" variant="light" @click="showMore" v-b-visible.300="showMore">{{ $t('showMore') }}</b-button>
+          <b-button class="show-more" v-if="hasMore" variant="light" @click="showMore" v-visible.300="showMore">{{ $t('showMore') }}</b-button>
         </template>
       </template>
     </li>
@@ -39,20 +43,15 @@
 </template>
 
 <script>
-import { BIconFileEarmarkRichtext, BIconFolderMinus, BIconFolderPlus, BIconThreeDots } from "bootstrap-vue";
 import { mapGetters, mapState } from 'vuex';
+import { isObject } from 'stac-js/src/utils.js';
+import { toAbsolute } from 'stac-js/src/http.js';
 import Utils from '../utils';
-import { getDisplayTitle } from '../models/stac';
-import { STAC, CatalogLike } from 'stac-js';
+import { getDisplayTitle, sortStac } from '../models/stac';
+import { STAC } from 'stac-js';
 
 export default {
   name: 'Tree',
-  components: {
-    BIconFileEarmarkRichtext,
-    BIconFolderMinus,
-    BIconFolderPlus,
-    BIconThreeDots
-  },
   props: {
     item: {
       type: Object,
@@ -71,13 +70,12 @@ export default {
     return {
       expanded: false,
       loading: false,
-      chunk: 1,
-      childs: []
+      chunk: 1
     };
   },
   computed: {
-    ...mapState(['data', 'apiCatalogPriority']),
-    ...mapGetters(['getStac']),
+    ...mapState(['data', 'apiCatalogPriority', 'defaultCollectionSort', 'defaultItemSort', 'uiLanguage']),
+    ...mapGetters(['getApiChildren', 'getChildren', 'getStac', 'isApiChildrenLoading', 'toBrowserPath']),
     onClick() {
       if (!this.to && this.mayHaveChildren) {
         return this.toggle;
@@ -88,7 +86,7 @@ export default {
       if (this.pagination) {
         return null;
       }
-      else if (this.item instanceof STAC) {
+      else if (this.item.isSTAC) {
         let stac = this.getStac(this.item.getAbsoluteUrl());
         if (!this.loading && stac) {
           return stac;
@@ -110,9 +108,9 @@ export default {
           return null;
         }
       }
-      else if (Utils.isObject(this.item) && typeof this.item.href === 'string') {
+      else if (isObject(this.item) && typeof this.item.href === 'string') {
         if (this.parent) {
-          return Utils.toAbsolute(this.item.href, this.parent.getAbsoluteUrl());
+          return toAbsolute(this.item.href, this.parent.getAbsoluteUrl());
         }
         else {
           return this.item.href;
@@ -122,7 +120,7 @@ export default {
     },
     mayHaveChildren() {
       if (this.item instanceof STAC) {
-        return this.item.isCatalogLike();
+        return this.item.isCatalogLike;
       }
       else if (this.link) {
         return this.item.rel !== 'item';
@@ -135,25 +133,61 @@ export default {
       }
       if (this.pagination) {
         if (this.parent && (!this.data || this.parent.getAbsoluteUrl() !== this.data.getAbsoluteUrl())) {
-          return this.parent.getBrowserPath();
+          return this.toBrowserPath(this.parent);
         }
         else {
           return null;
         }
       }
       else if (this.stac instanceof STAC) {
-        return this.stac.getBrowserPath();
+        return this.toBrowserPath(this.stac);
       }
       return null;
     },
     title() {
       if (this.pagination) {
-        return this.$t('tree.moreCollectionPagesAvailable');
+        return this.canLoadMore ? this.$t('catalogs.loadMore') : this.$t('tree.moreCollectionPagesAvailable');
       }
       return getDisplayTitle([this.item, this.stac]);
     },
     hasMore() {
       return this.childs.length > this.shownChilds.length;
+    },
+    childs() {
+      if (this.stac?.isCatalogLike) {
+        const children = this.getChildren(this.stac, this.apiCatalogPriority);
+        if (children.length < 2) {
+          return children;
+        }
+
+        const collectionSort = Utils.parseApiSortParameter(this.defaultCollectionSort);
+        const itemSort = Utils.parseApiSortParameter(this.defaultItemSort);
+
+        const prev = [];
+        const next = [];
+        const items = [];
+        const catalogs = [];
+        for (const child of children) {
+          if (['prev', 'previous'].includes(child?.rel)) {
+            prev.push(child);
+          }
+          else if (child?.rel === 'next') {
+            next.push(child);
+          }
+          else if (child?.rel === 'item' || child?.isItem) {
+            items.push(child);
+          }
+          else {
+            catalogs.push(child);
+          }
+        }
+
+        const sortedCatalogs = collectionSort.direction === 0 ? catalogs : sortStac(catalogs, collectionSort, this.uiLanguage);
+        const sortedItems = itemSort.direction === 0 ? items : sortStac(items, itemSort, this.uiLanguage);
+
+        return prev.concat(sortedCatalogs, sortedItems, next);
+      }
+      return [];
     },
     shownChilds() {
       return this.childs.slice(0, this.chunk * 50);
@@ -169,6 +203,12 @@ export default {
     },
     pagination() {
       return ['next', 'prev', 'previous'].includes(this.item.rel);
+    },
+    canLoadMore() {
+      return this.item.rel === 'next' && this.getApiChildren(this.parent)?.type === 'collections';
+    },
+    loadingMore() {
+      return this.isApiChildrenLoading(this.parent);
     }
   },
   watch: {
@@ -179,18 +219,6 @@ export default {
           this.expanded = true;
         }
       }
-    },
-    stac: {
-      immediate: true,
-      handler(newStac, oldStac) {
-        if (newStac instanceof STAC) {
-          newStac.setApiDataListener('tree', () => this.updateChilds());
-        }
-        if (oldStac instanceof STAC) {
-          oldStac.setApiDataListener('tree');
-        }
-        this.updateChilds();
-      }
     }
   },
   created() {
@@ -199,16 +227,21 @@ export default {
     }
   },
   methods: {
-    updateChilds() {
-      if (this.stac instanceof CatalogLike) {
-        this.childs = this.stac.getChildren(this.apiCatalogPriority);
-      }
-      else {
-        this.childs = [];
-      }
-    },
     showMore() {
       this.chunk++;
+    },
+    async loadNextPage(visible = true) {
+      if (!visible || this.loadingMore) {
+        return;
+      }
+      try {
+        await this.$store.dispatch('loadNextApiCollections', { stac: this.parent, next: true });
+      } catch (error) {
+        this.$store.commit('showGlobalError', {
+          error,
+          message: this.$t('errors.loadApiCollectionsFailed')
+        });
+      }
     },
     load(visible) {
       if (!this.stac && this.link && !this.pagination) {
@@ -220,7 +253,7 @@ export default {
       if (this.expanded && !this.pagination) {
         this.loading = true;
         let url = this.item instanceof STAC ? this.item.getAbsoluteUrl() : this.item.href;
-        await this.$store.dispatch("load", { url });
+        await this.$store.dispatch('load', { url });
         this.loading = false;
       }
     }
@@ -233,6 +266,10 @@ export default {
   list-style-type: none;
   margin: 0;
   padding: 0;
+
+  :deep(.btn.disabled) {
+    filter: none !important;
+  }
 
   > li {
     white-space: nowrap;

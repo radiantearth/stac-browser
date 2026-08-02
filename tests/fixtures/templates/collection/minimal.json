@@ -1,0 +1,16 @@
+{
+  "type": "Collection",
+  "stac_version": "1.1.0",
+  "id": "example-collection",
+  "description": "An example STAC Collection.",
+  "license": "CC-0",
+  "extent": {
+    "spatial": {
+      "bbox": [[-180.0, -90.0, 180.0, 90.0]]
+    },
+    "temporal": {
+      "interval": [["2020-01-01T00:00:00Z", null]]
+    }
+  },
+  "links": []
+}

@@ -1,0 +1,106 @@
+<template>
+  <li class="link">
+    <StacLink :id="popoverId" :data="link" :fallbackTitle="fallbackTitle" class="pe-1" />
+    <b-popover
+      :target="popoverId" placement="auto" teleport-to="#stac-browser" class="link-more"
+      focus hover :boundary-padding="20"
+    >
+      <Description v-if="link.description" :description="link.description" compact />
+      <section class="link-actions">
+        <h3 class="first">{{ $t('additionalActions') }}</h3>
+        <HrefActions vertical :data="link" size="sm" />
+      </section>
+      <MetadataGroups :data="link" type="Link" headerTag="h3" :ignoreFields="ignoredMetadataFields" />
+    </b-popover>
+  </li>
+</template>
+
+<script>
+import { defineAsyncComponent } from 'vue';
+import HrefActions from './HrefActions.vue';
+import StacLink from './StacLink.vue';
+import { getIgnoredFields } from '../ignored-metadata.js';
+
+let linkId = 0;
+
+export default {
+  name: "LinkListEntry",
+  components: {
+    HrefActions,
+    StacLink,
+    BPopover: defineAsyncComponent(() => import('bootstrap-vue-next').then(m => m.BPopover)),
+    Description: defineAsyncComponent(() => import('./Description.vue')),
+    MetadataGroups: defineAsyncComponent(() => import('./MetadataGroups.vue'))
+  },
+  props: {
+    link: {
+      type: Object,
+      required: true
+    },
+    fallbackTitle: {
+      type: Function,
+      required: true
+    }
+  },
+  computed: {
+    ignoredMetadataFields() {
+      return getIgnoredFields(this.link, 'Link');
+    },
+    popoverId() {
+      return "popover-link-" + linkId;
+    }
+  },
+  beforeCreate() {
+    linkId++;
+  }
+};
+</script>
+
+<style lang="scss">
+@import '../theme/variables.scss';
+
+#stac-browser .link-more {
+  width: auto;
+  max-width: 600px;
+
+  .styled-description {
+    margin-bottom: var(--sb-block-gap);
+  }
+
+  h3 {
+    font-size: $font-size-sm;
+    color: $secondary;
+    text-align: center;
+    padding: 0;
+    font-weight: 600;
+    margin: 1rem 0 0.7rem;
+
+    &.first {
+      margin-top: 0;
+    }
+  }
+  
+  .metadata {
+    min-width: 400px;
+
+    h4 {
+      font-size: $font-size-sm;
+      font-weight: normal;
+      margin-top: 0;
+      margin-bottom: 0.5rem;
+    }
+
+    .card-columns {
+      column-count: 1;
+    }
+    .card {
+      border: 0;
+      margin-top: 0;
+      font-size: 0.8rem;
+    }
+    .card-body {
+      padding: 0;
+    }
+  }
+}
+</style>

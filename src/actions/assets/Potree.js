@@ -1,5 +1,5 @@
 import AssetActionPlugin from "../AssetActionPlugin";
-import URI from 'urijs';
+import { URI } from 'stac-js/src/utils.js';
 import i18n from "../../i18n";
 
 const POTREE_SUPPORTED_TYPES = [
@@ -8,21 +8,21 @@ const POTREE_SUPPORTED_TYPES = [
 
 // this.component.filename.endsWith or this.asset.href.includes
 const POTREE_SUPPORTED_FILEEXTS = [
- 'cloud.js', 'metadata.json', 'ept.json'
- // potree v1, potree v2, EPT Entwine Point Tiles
+  'cloud.js', 'metadata.json', 'ept.json'
+  // potree v1, potree v2, EPT Entwine Point Tiles
 ];
   
 export default class Potree extends AssetActionPlugin {
 
   get show() {
-    // todo: this should check for the pointcloud extension or other indications that this asset is actually point cloud related
-    // as the metadata.json matching is rather greedy. Should be possible once stac-js is implemented.
+    // todo: this should check for the pointcloud extension or other indications that this asset
+    // is actually point cloud related as the metadata.json matching is rather greedy.
     return this.component.isBrowserProtocol && (
       POTREE_SUPPORTED_TYPES.includes(this.asset.type)
       || POTREE_SUPPORTED_FILEEXTS.map(
         f => URI(this.asset.href).filename().endsWith(f)
       ).some(e => e)
-  );
+    );
   }
 
   get uri() {
@@ -33,7 +33,7 @@ export default class Potree extends AssetActionPlugin {
     // Alternatives with single potree-supported tileset support and less param parsed
     // https://mpc-copc-viewer.netlify.app?c=rgba&r= Darren Wiens app, which works eg with IGN COPC: 
     // https://potree.org/potree/examples/copc.html?c=rgba&r= Potree copc app
-    let uri = new URI("https://3d.iconem.com/apps/load_potree_project_from_urlparam");
+    let uri = URI("https://3d.iconem.com/apps/load_potree_project_from_urlparam");
     const datasetUrl = this.component.href;
     uri.addQuery('fit', 'true');
     uri.addQuery('c', 'elevation'); // rgba, elevation, intensity etc
@@ -42,7 +42,7 @@ export default class Potree extends AssetActionPlugin {
   }
 
   get text() {
-    return i18n.t('actions.openIn', {service: 'potree.org'});
+    return i18n.global.t('actions.openIn', {service: 'potree.org'});
   }
 
 }

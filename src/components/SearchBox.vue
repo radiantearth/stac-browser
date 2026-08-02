@@ -1,20 +1,16 @@
 <template>
   <div class="vue-component search-box">
-    <span class="icon">🔎</span>
+    <b-icon-search class="icon" />
     <b-form-input type="search" v-model.trim="searchTerm" :placeholder="placeholder || $t('search.placeholder')" />
   </div>
 </template>
 
 <script>
-import { BFormInput } from 'bootstrap-vue';
 
 export default {
   name: 'SearchBox',
-  components: {
-    BFormInput
-  },
   props: {
-    value: {
+    modelValue: {
       type: String,
       default: ''
     },
@@ -23,52 +19,61 @@ export default {
       default: null
     }
   },
+  emits: ['update:modelValue'],
   data() {
     return {
-      searchTerm: this.value
+      searchTerm: this.modelValue
     };
   },
   watch: {
+    modelValue(newValue) {
+      this.searchTerm = newValue;
+    },
     searchTerm(newValue) {
-      if (newValue.length < this.minLength) {
-        newValue = '';
-      }
-      this.$emit('input', newValue);
+      this.$emit('update:modelValue', newValue);
     }
   }
 };
 </script>
 
 <style lang="scss">
+@import '../theme/variables.scss';
+
 #stac-browser .search-box {
   position: relative;
   box-sizing: border-box;
 
   input, .icon {
-    font-size: 1em;
+    font-size: $font-size-base;
     margin: 0;
   }
   input {
-    min-height: 1.5em;
-    padding: 0.25em 0.3em;
-    padding-left: 1.9em;
+    min-height: $input-height;
+    padding: $input-padding-y $input-padding-x;
+    padding-left: calc($input-padding-x * 2 + $font-size-base);
     z-index: 1;
     display: inline-block;
-    border: 1px solid #ccc;
-    box-sizing: content-box;
-    background-color: #fff;
-    width: calc(100% - 1.9em - 0.25em - 2px);
+    border: $input-border-width $border-style $input-border-color;
+    border-radius: $input-border-radius;
+    box-sizing: border-box;
+    background-color: $input-bg;
+    width: 100%;
+    height: 100%;
   }
   .icon {
-    height: 1.5em;
+    height: $font-size-base;
     user-select: none;
-    margin-top: -0.75em;
-    margin-left: 0.3em;
-    width: 1em;
+    margin-left: $input-padding-x;
+    width: $font-size-base;
     z-index: 2;
     position: absolute;
     top: 50%;
     left: 0;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
   }
 }
 </style>

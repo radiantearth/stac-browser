@@ -41,12 +41,12 @@
     "password": "Password",
     "required": "Autenticazione richiesta",
     "schemeTypes": {
-      "http": "HTTP {scheme}",
-      "s3": "S3",
-      "signedUrl": "URL firmato",
-      "oauth2": "OAuth 2",
       "apiKey": "Chiave API",
-      "openIdConnect": "OpenID Connect"
+      "http": "HTTP {scheme}",
+      "oauth2": "OAuth 2",
+      "openIdConnect": "OpenID Connect",
+      "s3": "S3",
+      "signedUrl": "URL firmato"
     },
     "title": "Accesso",
     "unauthorized": "Non hai i permessi per accedere a questi dati. Effettua il login.",
@@ -70,7 +70,12 @@
     "false": "No",
     "true": "Si"
   },
+  "close": "Chiudi",
   "copy": "Copia",
+  "copyErrors": {
+    "permission": "Impossibile copiare. Controllare i permessi del browser.",
+    "unsupported": "Gli appunti non sono disponibili in questo browser."
+  },
   "default": "Predefinito",
   "defaultWithValue": "Predefinito ({value})",
   "deprecated": "Obsoleto",
@@ -86,6 +91,7 @@
   },
   "description": "Descrizione",
   "errors": {
+    "apiListRequested": "La richiesta non è valida. Le richieste dirette agli endpoint /collections e .../items non sono attualmente supportate.",
     "authFailed": "La richiesta ha restituito un errore. I dati di accesso forniti potrebbero essere errati.",
     "badRequest": "La richiesta non è valida. Questo potrebbe essere dovuto a parametri non validi, ad esempio in una richiesta di ricerca, oppure potrebbe essere un bug di STAC Browser.",
     "contactProvider": "Contatta il fornitore del servizio per risolvere il problema.",
@@ -110,6 +116,11 @@
     "serverError": "Il server ha riscontrato un problema. @:errors.contactProvider",
     "title": "Errore",
     "unauthorized": "La richiesta necessita di credenziali, ad esempio un token API. Inserisci i tuoi dati di accesso e riprova."
+  },
+  "exampleCode": {
+    "title": "Codice di esempio",
+    "storeAs": "Memorizza il codice come:",
+    "installDependencies": "Installare le dipendenze:"
   },
   "featureExperimental": "Questa funzione è ancora sperimentale e potrebbe dare risultati inaspettati!",
   "features": {
@@ -159,21 +170,32 @@
   "map": "Mappa",
   "mapping": {
     "attribution": {
-      "label": "i",
+      "collapseLabel": "✕",
       "description": "Crediti",
-      "collapseLabel": "✕"
+      "label": "i"
     },
     "bboxSelect": {
       "add": "Cliccare sulla mappa per aggiungere un box di selezione.",
-      "remove": "Cliccare dentro il box per eliminarlo."
+      "eastLon": "Longitudine est",
+      "error": {
+        "incomplete": "Coordinata mancante",
+        "invalidLat": "Deve essere compreso tra -90 e 90",
+        "invalidLon": "Deve essere compreso tra -180 e 180",
+        "latOrder": "La latitudine sud deve essere inferiore alla latitudine nord",
+        "lonOrder": "La longitudine ovest deve essere inferiore alla longitudine est"
+      },
+      "northLat": "Latitudine nord",
+      "remove": "Cliccare dentro il box per eliminarlo.",
+      "southLat": "Latitudine sud",
+      "westLon": "Longitudine ovest"
     },
     "close": "Chiudi",
     "fit": "Adatta alla estensione",
     "layers": {
-      "title": "Livelli",
       "base": "Livelli di base",
-      "unnamed": "Senza Nome #{id}",
-      "footprint": "Impronta a terra"
+      "footprint": "Impronta a terra",
+      "title": "Livelli",
+      "unnamed": "Senza Nome #{id}"
     },
     "location": {
       "description": "Vai alla tua posizione attuale"
@@ -212,6 +234,14 @@
     "previous": "‹ Precedente"
   },
   "poweredBy": "Offerto da {link}",
+  "programming": {
+    "csharp": "C#",
+    "java": "Java",
+    "javascript": "JavaScript",
+    "python": "Python",
+    "r": "R",
+    "rust": "Rust"
+  },
   "protocol": {
     "azure": "Microsoft Azure",
     "file": "File system (locale)",
@@ -242,10 +272,25 @@
   "search": {
     "addCollections": "Premi invio per aggiungere una Collezione",
     "addFilter": "Aggiungi filtro",
+    "additionalFilters": "Filtri aggiuntivi",
     "addItemIds": "Premi invio per aggiungere l'ID di un Elemento",
     "addSearchTerm": "Premi Invio per aggiungere un termine di ricerca",
-    "additionalFilters": "Filtri aggiuntivi",
+    "arrayInput": {
+      "addValue": "Premi Invio per aggiungere un valore",
+      "helpText": "Inserisci valore/i"
+    },
+    "arrayContains": "Contiene tutti",
+    "arrayContainsDescription": "L'array contiene tutti i valori specificati",
+    "arrayContainedBy": "È sottoinsieme di",
+    "arrayContainedByDescription": "Array è un sottoinsieme dei valori specificati",
+    "arrayEquals": "Corrisponde esattamente",
+    "arrayEqualsDescription": "L'array corrisponde esattamente ai valori specificati (stessi elementi, qualsiasi ordine)",
+    "arrayOverlaps": "Contiene qualsiasi",
+    "arrayOverlapsDescription": "L'array contiene almeno uno dei valori specificati",
+    "between": "tra",
+    "betweenOperatorDescription": "Verifica se un valore di campo numerico si trova all'interno dell'intervallo specificato. L'intervallo dato è inclusivo.",
     "dateDescription": "Data/ora nel sistema UTC (tempo coordinato internazionale).",
+    "disabledDueToSingleDate": "Questo filtro è disabilitato perché la collezione ha una singola data e ora come estensione temporale.",
     "enterCollections": "Inserire una o più Collezioni...",
     "enterItemIds": "Inserire uno o più ID di Elemento...",
     "enterSearchTerms": "Inserisci uno o più termini di ricerca...",
@@ -256,6 +301,8 @@
     "freeTextDescription": "Cerca almeno uno dei termini indicati in campi quali il titolo e la descrizione.",
     "greaterThan": "maggiore di",
     "greaterThanEqual": "maggiore o uguale a",
+    "in": "incluso in",
+    "inOperatorDescription": "Verifica se il valore del campo è uno dei valori specificati.",
     "itemIds": "ID di Elementi",
     "itemsPerPage": "Elementi per pagina",
     "itemsPerPageDescription": "Numero di Elementi richiesti per pagina, massimo {maxItems} Elementi.",
@@ -264,19 +311,22 @@
     "likeOperatorDescription": "Puoi usare i caratteri jolly. `_` corrisponde ad un singolo carattere, `%` corrisponde ad un numero qualsiasi di caratteri. Per cercare un carattere jolly in modo specifico, devi aggiungere `\\` davanti al carattere.",
     "logical": {
       "and": "Abbina tutti i filtri (e)",
-      "or": "Abbina qualcuno dei filtri (o)"
+      "or": "Abbina qualcuno dei filtri (o)",
+      "not": "Nega filtro"
     },
     "matches": "corrisponde a",
     "metaDescription": "Cerca tra i dati offerti da {title}.",
     "modifyCriteria": "Modifica i criteri di ricerca.",
     "noFurtherItemsFound": "Nessun altro elemento disponibile.",
     "noItemsFound": "Nessun Elemento corrispondente ai criteri di ricerca impostati.",
+    "noOperatorsError": "STAC Browser non supporta nessun operatore per il filtro {queryable}.",
     "noOptions": "Nessun valore inserito",
     "notEqualTo": "diverso da",
     "notFullySupported": "Alcune opzioni potrebbero non essere supportate.",
     "notSupported": "La ricerca di Elementi non è supportata dall'API.",
     "placeholder": "Cerca...",
     "selectCollections": "Selezionare una o più Collezioni...",
+    "selectDateRange": "Seleziona l'intervallo di date",
     "selectForItemSearch": "Seleziona per Ricerca Elemento",
     "spatialExtent": "Estensione spaziale",
     "tabs": {
@@ -325,8 +375,8 @@
       "message": "{title} è disponibile all'indirizzo {url}",
       "sharePageWithOthers": "Condividi l'URL di questa pagina dove vuoi:",
       "title": "Condivisione",
-      "x": "X (Twitter)",
-      "withOthers": "Condividi questa pagina con altri"
+      "withOthers": "Condividi questa pagina con altri",
+      "x": "X (Twitter)"
     },
     "stacExtension": "Estensione STAC",
     "stacVersion": "Versione STAC",
@@ -368,6 +418,8 @@
   "stacCollection": "Collezione | Collezioni",
   "stacItem": "Elemento | Elementi",
   "submit": "Invia",
+  "switchToDarkMode": "Passa alla modalità scura",
+  "switchToLightMode": "Passa alla modalità chiara",
   "table": {
     "emptyFilteredText": "Non ci sono record corrispondenti alla tua richiesta",
     "emptyText": "Non ci sono record da mostrare",
@@ -392,5 +444,8 @@
       "title": "Mostra schede"
     },
     "title": "Opzioni di visualizzazione"
+  },
+  "widgets": {
+    "featured": "In evidenza"
   }
 }

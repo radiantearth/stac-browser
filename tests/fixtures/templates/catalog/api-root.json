@@ -1,0 +1,31 @@
+{
+  "type": "Catalog",
+  "stac_version": "1.1.0",
+  "stac_extensions": [],
+  "conformsTo": [
+    "https://api.stacspec.org/v1.0.0/core"
+  ],
+  "id": "example-api",
+  "title": "Example API",
+  "description": "An example STAC API with some **Markdown**.",
+  "links": [
+    {
+      "rel": "service-desc",
+      "type": "application/vnd.oai.openapi+json;version=3.0",
+      "href": "/api",
+      "title": "OpenAPI documentation"
+    },
+    {
+      "rel": "service-doc",
+      "type": "text/html",
+      "href": "/api.html",
+      "title": "Rendered API Documentation"
+    },
+    {
+      "rel": "about",
+      "type": "text/html",
+      "href": "https://stacspec.org",
+      "title": "STAC Specification"
+    }
+  ]
+}

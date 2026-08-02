@@ -20,13 +20,14 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
 import Description from './Description.vue';
 import DeprecationMixin from './DeprecationMixin';
 
 export default {
   name: 'DeprecationNotice',
   components: {
-    StacLink: () => import('./StacLink.vue'),
+    StacLink: defineAsyncComponent(() => import('./StacLink.vue')),
     Description
   },
   mixins: [
@@ -64,14 +65,14 @@ export default {
       }
     },
     type() {
-      if (this.data.isItem()) {
-        return this.$tc('stacItem');
+      if (this.data.isItem) {
+        return this.$t('stacItem', 1);
       }
-      else if (this.data.isCollection()) {
-        return this.$tc(`stacCollection`);
+      else if (this.data.isCollection) {
+        return this.$t(`stacCollection`, 1);
       }
-      else if (this.data.isCatalog()) {
-        return this.$tc(`stacCatalog`);
+      else if (this.data.isCatalog) {
+        return this.$t(`stacCatalog`, 1);
       }
       else {
         return '';

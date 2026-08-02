@@ -1,30 +1,7 @@
+import { hierarchical, pagination, queryables } from "stac-js/src/relationtypes.js";
+import { stacNavigation, hidden } from "../relationTypes.config.js";
+
 // STAC relation types
-
-// STAC hierarchical
-export const stacHierarchy = [
-  'child',
-  'collection',
-  'item',
-  'parent',
-  'root',
-  'self',
-];
-
-// STAC API Pagination
-export const stacPagination = [
-  'first',
-  'last',
-  'next',
-  'prev',
-  'previous',
-];
-
-// Queryables
-export const ogcQueryables = [
-  'queryables', // Old way in STAC (deprecated)
-  'http://www.opengis.net/def/rel/ogc/1.0/queryables', // STAC and OGC APIs
-  'ogc-rel:queryables' // Alternative in OGC APIs
-];
 
 // Rels that STAC Browser can navigate to and display natively (i.e. Collections, Catalogs and Items)
 export const stacBrowserNavigatesTo = [
@@ -36,7 +13,7 @@ export const stacBrowserNavigatesTo = [
   'successor-version',
   'source', // label extension,
   'alternate' // language extension
-].concat(stacHierarchy).concat(stacPagination);
+].concat(hierarchical).concat(pagination).concat(stacNavigation);
 
 // Rels that are handled in a special way and should not be shown in the link list
 export const stacBrowserSpecialHandling = [
@@ -44,9 +21,14 @@ export const stacBrowserSpecialHandling = [
   'data',
   'items',
   'search',
+  'aggregate', // (Irrelevant) Extensions v
+  'aggregations',
+  'collections-search',
+  'create-form', // Transactions (RFC 6861), shown in the Manage menu v
+  'edit-form',
   'icon', // Other v
   'license',
-].concat(stacHierarchy).concat(stacPagination).concat(ogcQueryables);
+].concat(hierarchical).concat(pagination).concat(queryables).concat(hidden);
 
 // OGC APIs
 export const ogcRelPrefix = 'http://www.opengis.net/def/rel/ogc/1.0/';

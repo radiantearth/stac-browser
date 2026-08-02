@@ -1,9 +1,9 @@
 <template>
   <b-card no-body>
     <b-card-header>
-      <component :is="titleComponent" class="name mr-1" :title="id">{{ name }}</component>
-      <b-badge v-if="version" variant="primary ml-1">{{ version }}</b-badge>
-      <b-badge v-if="!isCore" variant="dark ml-1">{{ $t('source.extension') }}</b-badge>
+      <component :is="titleComponent" class="name me-1" :title="id">{{ name }}</component>
+      <b-badge v-if="version" variant="primary ms-1">{{ version }}</b-badge>
+      <b-badge v-if="!isCore" variant="dark ms-1">{{ $t('source.extension') }}</b-badge>
     </b-card-header>
     <b-list-group flush>
       <template v-if="errors.length > 0">
@@ -24,17 +24,14 @@
 </template>
 
 <script>
-import { BListGroup, BListGroupItem } from 'bootstrap-vue';
-import URI from 'urijs';
-import Utils from '../utils';
-
-const VERSION_REGEXP = /\/(v?\d+\.\d+[^/]+)(\/|$)/;
+import { BCard, BCardHeader } from 'bootstrap-vue-next';
+import { formatAjvMessage, localizeErrors, schemaTitle, schemaVersion } from '../validation';
 
 export default {
   name: "ValidationResult",
   components: {
-    BListGroup,
-    BListGroupItem
+    BCard,
+    BCardHeader
   },
   props: {
     id: {
@@ -63,11 +60,7 @@ export default {
       return this.isCore ? 'span': 'code';
     },
     localizedErrors() {
-      if (typeof this.locale !== 'function') {
-        return this.errors;
-      }
-      this.locale(this.errors);
-      return this.errors;
+      return localizeErrors(this.errors, this.locale);
     },
     hasWarnings() {
       return Array.isArray(this.warnings) && this.warnings.length > 0;
@@ -78,11 +71,11 @@ export default {
     type() {
       switch(this.context.type) {
         case "Feature":
-          return this.$tc('stacItem');
+          return this.$t('stacItem', 1);
         case "Catalog":
-          return this.$tc(`stacCatalog`);
+          return this.$t(`stacCatalog`, 1);
         case "Collection":
-          return this.$tc(`stacCollection`);
+          return this.$t(`stacCollection`, 1);
         default:
           return this.context.type;
       }
@@ -91,51 +84,18 @@ export default {
       if (this.isCore) {
         return this.type;
       }
-      else if (this.id.startsWith('https://stac-extensions.github.io/')) {
-        return URI(this.id)
-          .directory()
-          .replace(VERSION_REGEXP, '/')
-          .replace(/\//g, ' ')
-          .trim();
-      }
-      return this.id
-        .replace(/^\w+:\/\//, '')
-        .replace(/(\.github\.io|raw\.githubusercontent\.com)\/?/, '')
-        .replace(/\/json-schema/, '')
-        .replace(/\/[^/]+\.json$/, '')
-        .replace(VERSION_REGEXP, '');
+      return schemaTitle(this.id);
     },
     version() {
       if (this.isCore) {
         return this.context.version;
       }
-      let v = this.id.match(VERSION_REGEXP);
-      if (v) {
-        return v[1];
-      }
-      return null;
+      return schemaVersion(this.id);
     }
   },
   methods: {
     makeAjvErrorMessage(error) {
-      let message = error.message;
-      if (Utils.isObject(error.params) && Object.keys(error.params).length > 0) {
-        let params = Object.entries(error.params)
-          .map(([key, value]) => {
-            let localizedLabel;
-            const labelKey = `source.validationParams.${key}`;
-            if (this.$te(labelKey)) {
-              localizedLabel = this.$t(labelKey);
-            }
-            else {
-              localizedLabel = key.replace(/([^A-Z]+)([A-Z])/g, "$1 $2").toLowerCase();
-            }
-
-            return `${localizedLabel}: ${value}`;
-          })
-          .join(', ');
-        message += ` (${params})`;
-      }
+      const message = formatAjvMessage(error, this.$t, this.$te);
       if (error.instancePath) {
         return `${error.instancePath} ${message}`;
       }

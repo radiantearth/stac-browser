@@ -6,20 +6,52 @@ The following options can be provided in various ways to STAC Browser, either wh
 The following ways to set config options are possible:
 
 - Customize the **[config file](../config.js)** (recommended)
-- Additionally, some options can be [provided through the **root catalog**](../README.md#customize-through-root-catalog) for consistency across multiple deployments (recommended)
-- Append them to the **CLI** command as parameter (see [Get Started](../README.md#get-started) for an example)
+- Load an **external config file** via `SB_CONFIG`
+- Additionally, some options can be [provided through the **root catalog**](../README.md#customization-through-root-catalog) for consistency across multiple deployments
 - Set **environment variables**, all options need a `SB_` prefix.
   So you could for example set the catalog URL via the environment variable `SB_catalogUrl`.
+  Vite loads `.env`, `.env.local`, `.env.[mode]` and `.env.[mode].local` automatically, so `SB_*` variables can be stored there.
+  Options that expect an array or an object must be provided as a JSON string, e.g.
+  `SB_footerLinks='[{"label":"Imprint","url":"https://example.com/imprint"}]'` or
+  `SB_requestHeaders='{"Authorization":"Bearer …"}'`.
+  For convenience, array options that only contain strings may also be given as a comma-separated list, e.g. `SB_supportedLocales=en,de,fr`.
 - Optionally, you can also set options after the build, basically **at "runtime"**.
-  Enable this by removing the `<!--` and `-->` around the `<script defer="defer" src="./config.js"></script>` in the [`public/index.html`](../public/index.html).
-  Then run the build procedure and after completion, you can fill the `dist/config.js` with any options that you want to customize.
+  Enable this by removing the `<!--RC` and `RC-->` around the tags that load the `runtime-config.js` (and the `<base>` tag) in the [`index.html`](../index.html).
+  Then run the build procedure and after completion, you can fill the `dist/runtime-config.js` with any options that you want to customize.
+
+> [!TIP]  
+> To enable the usage of a local configuration file, follow these steps:
+>
+> 1. Create a `.env` file with the following content:
+>
+>    ```bash
+>    SB_CONFIG=config.local.mjs
+>    ```
+>
+> 2. Create a `config.local.mjs` and add options from the `config.js` as needed, for example:
+>
+>    ```js
+>    export default {
+>      catalogUrl: 'https://stac.example.com'
+>    }
+>    ```
+
+The override order for the configuration is:
+
+`config.js` (lowest priority) -> config from `SB_CONFIG` -> `SB_*` env vars -> `runtime-config.js` (highest priority)
+
+> [!CAUTION]  
+> Appending configuration options as CLI parameters to the CLI command (e.g. `npm run build -- --catalogUrl="https://example.com"`) has been removed in  STAC Browser v5.
+> The reason is that such parameters are [not suppored by Vite](https://github.com/vitejs/vite/issues/7065).
 
 ## Table of Contents <!-- omit in toc -->
 
 - [Basic configuration](#basic-configuration)
   - [catalogUrl](#catalogurl)
   - [catalogTitle](#catalogtitle)
+  - [catalogTitleAfterImage](#catalogtitleafterimage)
   - [catalogImage](#catalogimage)
+  - [footerLinks](#footerlinks)
   - [apiCatalogPriority](#apicatalogpriority)
 - [Deployment](#deployment)
   - [historyMode](#historymode)
@@ -45,20 +77,30 @@ The following ways to set config options are possible:
   - [useTileLayerAsFallback](#usetilelayerasfallback)
   - [displayPreview](#displaypreview)
   - [displayOverview](#displayoverview)
+  - [displayOverviewsForChildren](#displayoverviewsforchildren)
   - [displayGeoTiffByDefault](#displaygeotiffbydefault)
   - [crs](#crs)
   - [getMapSourceOptions](#getmapsourceoptions)
 - [User Interface](#user-interface)
+  - [enforcedColorMode](#enforcedcolormode)
+  - [cardViewMode](#cardviewmode)
+  - [showKeywordsInItemCards](#showkeywordsinitemcards)
+  - [showKeywordsInCatalogCards](#showkeywordsincatalogcards)
+  - [defaultThumbnailSize](#defaultthumbnailsize)
+- [Metadata Retrieval](#metadata-retrieval)
   - [searchResultsPerPage](#searchresultsperpage)
   - [itemsPerPage](#itemsperpage)
   - [collectionsPerPage](#collectionsperpage)
   - [maxEntriesPerPage](#maxentriesperpage)
-  - [cardViewMode](#cardviewmode)
-  - [cardViewSort](#cardviewsort)
-  - [showKeywordsInItemCards](#showkeywordsinitemcards)
-  - [showKeywordsInCatalogCards](#showkeywordsincatalogcards)
+  - [defaultCollectionSort](#defaultcollectionsort)
+  - [defaultItemSort](#defaultitemsort)
+- [Assets](#assets)
+  - [preferredAssets](#preferredassets)
   - [showThumbnailsAsAssets](#showthumbnailsasassets)
-  - [defaultThumbnailSize](#defaultthumbnailsize)
+- [Transactions](#transactions)
+  - [transactions](#transactions-1)
+  - [transactionsRequireLogin](#transactionsrequirelogin)
+  - [transactionsRequirePreflight](#transactionsrequirepreflight)
 - [Service Integration](#service-integration)
   - [socialSharing](#socialsharing)
 - [Advanced](#advanced)
@@ -82,10 +124,41 @@ If `catalogUrl` is empty or set to `null` STAC Browser switches to a mode where 
 
 The default title shown if no title can be read from the root STAC catalog.
 
+### catalogTitleAfterImage
+
+A title to use in the header after the `catalogImage`.
+This can be useful in the following cases:
+
+- The image already contains the name and we do not want to show it twice
+- Removing the title in favor of the image - set this value to an empty string then.
+
+Only applies when `catalogImage` is not `null`.
+
 ### catalogImage
 
 URL to an image to use as a logo with the title.
 Should be an image that browsers can display, e.g. PNG, JPEG, WebP, or SVG.
+
+### footerLinks
+
+Array of links to display in the footer above the "Powered by STAC Browser" text. Each link requires a `label` and `url`.
+
+Example:
+
+```js
+footerLinks: [
+  { label: "Imprint", url: "https://example.com/imprint" },
+  { label: "Terms of use", url: "https://example.com/terms" },
+  { label: "Accessibility", url: "https://example.com/accessibility" },
+  { label: "Privacy", url: "https://example.com/privacy" }
+]
+```
+
+As an environment variable, provide the same value as a JSON string:
+
+```bash
+SB_footerLinks='[{"label":"Imprint","url":"https://example.com/imprint"},{"label":"Privacy","url":"https://example.com/privacy"}]'
+```
 
 ### apiCatalogPriority
 
@@ -129,19 +202,17 @@ This also excludes hosting your STAC catalog in the STAC Browser (sub-)folders.
 #### `hash`
 
 If your host/server doesn't support URL rewriting or you experience other related problems, you can enable *hash mode*.
-Either set this option to `hash` in the config file or append `--historyMode=hash` when running or building.
+Either set this option to `hash` in the config file or as environment variable (`SB_historyMode`) when running or building.
 Known hosts that require hash mode are Amazon S3 and GitHub Pages.
 
 ### pathPrefix
 
-***build-only option***
-
 If you don't deploy the STAC Browser instance at the root path of your (sub) domain, then you need to set the path prefix
 when building (or running) STAC Browser.
 
-```bash
-npm run build -- --pathPrefix="/browser/"
-```
+Either set this option to the respective path (e.g. `/browser/`) in the config file or as environment variable (`SB_pathPrefix`) when running or building.
+
+With `DYNAMIC_CONFIG` (default in the [Docker image](./docker.md)), `pathPrefix` can instead be set at startup via `SB_pathPrefix` / `runtime-config.js`. Outside Docker, also set the `href` of `<base id="stac-browser-base">` in `dist/index.html` to match.
 
 This will build STAC Browser in a way that it can be hosted at `https://example.com/browser` for example.
 Using this parameter for the dev server will make STAC Browser available at `http://localhost:8080/browser`.
@@ -251,7 +322,7 @@ HTTP Basic is supported according to [RFC 7617](https://datatracker.ietf.org/doc
 **IMPORTANT: OpenID Connect is only supported if `historyMode` is set to `history`!**
 
 For OpenID Connect some additional options must be provided, which currently follow the
-[oidc-client-ts Configuration options](https://github.com/okta/okta-auth-js?tab=readme-ov-file#configuration-options).
+[oidc-client-ts `UserManagerSettings`](https://authts.github.io/oidc-client-ts/interfaces/UserManagerSettings.html).
 These options (except for `issuer`) must be provided in the property `oidcConfig`.
 The `client_id` option defaults to `stac-browser`.
 
@@ -340,6 +411,28 @@ The parameter passed into the function is an [Asset object](https://m-mohr.githu
 buildTileUrlTemplate: (asset) => "https://tiles.rdnt.io/tiles/{z}/{x}/{y}@2x?url=" + encodeURIComponent(asset.getAbsoluteUrl()),
 ```
 
+The function can also return `null` to not pass the given asset to the tile server,
+e.g. to filter by media type or protocol based on the given Asset object.
+In this case client-side rendering is used if supported, or no visualization will be provided.
+For async functions (i.e. functions that return a Promise) the "Show on map" button
+may appear with a slight delay, once the Promise has been resolved.
+
+> [!NOTE]  
+> The function is called for every asset that is shown in the user interface, not only for the assets
+> that are actually shown on the map. Avoid heavy work such as network requests in the function,
+> otherwise pages with many assets may render slowly.
+
+**Example**:
+
+```js
+buildTileUrlTemplate: (asset) => {
+  if (!asset.isCOG || !asset.getAbsoluteUrl().startsWith("https://")) {
+    return null;
+  }
+  return "https://tiles.rdnt.io/tiles/{z}/{x}/{y}@2x?url=" + encodeURIComponent(asset.getAbsoluteUrl());
+},
+```
+
 Please note that this option can only be provided through a config file and is not available via CLI/ENV.
 
 ### useTileLayerAsFallback
@@ -368,6 +461,13 @@ If both `displayPreview` and `displayOverview` (see below) are enabled, STAC Bro
 ### displayOverview
 
 If set to `true` (default), allows to display COGs and, if `displayGeoTiffByDefault` is enabled, GeoTiffs on the map as default visualization, usually from an asset with role `overview` or `visual`.
+
+### displayOverviewsForChildren
+
+Similar to `displayOverview` (see above), but defaults to `false`.
+Applies only to maps that show multiple STAC entitieies, i.e. lists of items for a Collection or Search.
+Displaying a large number of COGs or Zarrs at the same time on a map, can be slow.
+Thus, this is disabled by default.
 
 ### displayGeoTiffByDefault
 
@@ -418,6 +518,31 @@ getSourceOptions: async (type, options) => {
 
 ## User Interface
 
+### enforcedColorMode
+
+STAC Browser supports light and dark modes since v5.0.0.
+By default, this value is set to `auto`, which detects the user preference based on the system settings.
+This config option allows to enforce a specific color mode, either `light` (default before v5.0.0) or `dark`.
+
+### cardViewMode
+
+The default view mode for lists of catalogs/collections. Either `"list"` or `"cards"` (default).
+
+### showKeywordsInItemCards
+
+Enables keywords in the lists of items if set to `true`. Defaults to `false`.
+
+### showKeywordsInCatalogCards
+
+Enables keywords in the lists of catalogs/collections if set to `true`. Defaults to `false`.
+
+### defaultThumbnailSize
+
+The default size \[Height, Width\] for thumbnails which is reserved in card and list views so that the items don't jump when loading the images.
+This can be overridden per thumbnail by declaring the [`proj:shape`](https://github.com/stac-extensions/projection/#item-properties-or-asset-fields) on the asset or link.
+
+## Metadata Retrieval
+
 ### searchResultsPerPage
 
 The number of items requested and shown per page by default for search results, i.e. global item search and collection search.
@@ -450,37 +575,109 @@ This applies to the following requests:
 
 The maximum number of items per page that a user can request through the `limit` query parameter (`1000` by default).
 
-### cardViewMode
+### defaultCollectionSort
 
-The default view mode for lists of catalogs/collections. Either `"list"` or `"cards"` (default).
+The default sorting for lists of catalogs/collections.
 
-### cardViewSort
+This value must conform to the textual representation of `sortby` in STAC APIs.
 
-The default sorting for lists of catalogs/collections or items. One of:
+So if your property for sorting is "title" you have to use:
 
-- `"asc"`: ascending sort (default)
-- `"desc"`: descending sort
+- `"title"`: ascending sort (default)
+- `"-title"`: descending sort
 - `null`: sorted as in the source
 
-Doesn't apply when API search filters are applied.
-Also doesn't apply when pagination on the server-side is enabled.
+Doesn't apply when the catalog is static and not all information is loaded yet.
 
-### showKeywordsInItemCards
+### defaultItemSort
 
-Enables keywords in the lists of items if set to `true`. Defaults to `false`.
+The default sorting for lists of items.
 
-### showKeywordsInCatalogCards
+This value must conform to the textual representation of `sortby` in STAC APIs.
 
-Enables keywords in the lists of catalogs/collections if set to `true`. Defaults to `false`.
+So if your property for sorting is "datetime" you have to use:
+
+- `"properties.datetime"`: ascending sort
+- `"-properties.datetime"`: descending sort
+
+So if your property for sorting is "id" you have to use:
+
+- `"id"`: ascending sort
+- `"-id"`: descending sort
+
+Alternatively, you can use `null` to keep it sorted as in the source (default).
+
+Doesn't apply when the catalog is static and not all information is loaded yet.
+
+## Assets
+
+### preferredAssets
+
+Allows you to configure how asset alternatives should be displayed by default when a STAC Asset within an Item or Collection has multiple alternatives.
+
+The following options are supported:
+
+- `false`: The main asset is shown first, alternates are displayed as additional tabs.
+- `true` (default): HTTP(S) assets are preferred. If the main asset uses HTTP(S), it's selected by default. Otherwise, the first HTTP(S) alternative is selected.
+- `"assetKeyName"` (string): Specifies the key of the preferred asset to display by default. For example, `"s3"` would pre-select the asset with key `s3` if it exists as an alternative.
+
+This is useful when you want to automatically display a specific asset variant (e.g., the HTTPS version accessible directly through the browser) instead of the main asset.
 
 ### showThumbnailsAsAssets
 
 Defines whether thumbnails are shown in the lists of assets (`true`) or not (`false`, default).
 
-### defaultThumbnailSize
+## Transactions
 
-The default size \[Height, Width\] for thumbnails which is reserved in card and list views so that the items don't jump when loading the images.
-This can be overridden per thumbnail by declaring the [`proj:shape`](https://github.com/stac-extensions/projection/#item-properties-or-asset-fields) on the asset or link.
+These options configure how the management of STAC entities should work in STAC Browser.
+There are two ways to manage STAC entities:
+
+- **Internal**: The management user interface built into STAC Browser,
+  which uses the STAC API transaction extensions and is only offered if the API
+  advertises the corresponding conformance classes.
+- **External**: A web-based management user interface provided by the server through links with the
+  relation types `create-form` and `edit-form` (see [RFC 6861](https://www.rfc-editor.org/rfc/rfc6861.html))
+  on the current catalog, collection or item.
+  The first link per relation type that has no media type or a HTML media type (`text/html`) is used.
+  The links are shown in the "Manage" menu, open in a new tab, and use the link `title` as the label.
+  STAC Browser does no permission handling for external links; the target server is expected to handle
+  authentication and permissions itself.
+
+### transactions
+
+Defines which management capabilities are offered in STAC Browser:
+
+- `auto` (default): Prefer external links per action if present, i.e. a `create-form` link replaces the
+  internal "Add Collection" / "Add Item" actions and an `edit-form` link replaces the internal "Edit" action.
+  Otherwise, fall back to the internal user interface if supported by the API.
+  The internal "Delete" action is offered independently as there's no external counterpart.
+- `external`: Only offer the external links, if present.
+- `internal`: Only offer the internal user interface, if supported by the API.
+- `off`: Disable all management capabilities.
+
+### transactionsRequireLogin
+
+This option only affects the internal management user interface.
+
+By default (option set to `true`), management capabilities will not be shown to unauthenticated users.
+You can disable this check by setting this option to `false` and allow anyone to make transactional requests.
+
+Disabling this is usually only reasonable for testing purposes or internal STAC APIs.
+This only works in STAC Browser if the server is also configured this way.
+
+### transactionsRequirePreflight
+
+This option only affects the internal management user interface.
+
+By default (option set to `true`), STAC Browser will check whether a user has permissions to make transactional requests through an `OPTIONS` HTTP request to the same resource that it checks the permissions for.
+STAC Browser reads the permitted methods from the `Allow` response header.
+See [ogcapi-features issue 1005](https://github.com/opengeospatial/ogcapi-features/issues/1005) for details.
+You can disable this check by setting this option to `false` and allow any authenticated user to make transactional requests.
+
+For APIs served from a different origin, the server must also expose the `Allow` header to the browser via CORS (i.e. send `Access-Control-Expose-Headers: Allow`), otherwise the browser hides it from STAC Browser and no management actions will be offered.
+
+Disabling this is usually only reasonable for testing purposes or internal STAC APIs.
+This only works in STAC Browser if the server is also configured this way.
 
 ## Service Integration
 
@@ -494,7 +691,6 @@ The following services are supported:
 - `bsky` (Bluesky)
 - `mastodon` (Mastodon.social)
 - `x` (X, formerly Twitter)
-
 ## Advanced
 
 ### preprocessSTAC
@@ -534,8 +730,8 @@ Thus, it may make sense to change the root catalog to provide more useful inform
 Of course, ideally you'd want to update the root catalog itself, but until then you can use this.
 
 ```js
-preprocessSTAC: (stac, state) => {
-    if (stac.getBrowserPath() === '/') {
+preprocessSTAC: (stac, state, getters) => {
+    if (getters.toBrowserPath(stac.getAbsoluteUrl()) === '/') {
         stac.title = state.catalogTitle;
         stac.description = 'This is a **much** more useful description for this catalog!';
     }

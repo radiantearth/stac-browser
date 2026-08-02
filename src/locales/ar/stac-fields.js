@@ -9,13 +9,13 @@ export default function run(/*locale*/) {
   I18N.dateFormatter = new Intl.DateTimeFormat("sv-SE", defaults.dateFormatterOptions);
   // We want ISO formatting for the date and time, which is available in e.g. sv-SE
   I18N.dateTimeFormatter = new Intl.DateTimeFormat("sv-SE", {
-		day: 'numeric',
-		month: 'numeric',
-		year: 'numeric',
-		hour: 'numeric',
-		minute: 'numeric',
-		second: 'numeric',
-		timeZone: "UTC",
-		timeZoneName: "short"
-	});
+    day: 'numeric',
+    month: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric',
+    timeZone: "UTC",
+    timeZoneName: "short"
+  });
 }

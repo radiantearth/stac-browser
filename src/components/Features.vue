@@ -1,14 +1,14 @@
 <template>
   <section class="features">
     <header>
-      <h2 class="title mr-2">{{ $tc('features.title', count ) }}</h2>
-      <b-badge pill variant="secondary" class="mr-4">{{ count }}</b-badge>
+      <h2 class="title me-2">{{ $t('features.title', count ) }}</h2>
+      <b-badge pill variant="secondary" class="me-4">{{ count }}</b-badge>
     </header>
     <section class="list">
-      <b-card-group v-if="count > 0" columns>
+      <div v-if="count > 0" class="card-grid">
         <Feature v-for="(feature, i) in features" :key="feature.id || i" :feature="feature" />
-      </b-card-group>
-      <b-alert v-else variant="info" show>
+      </div>
+      <b-alert v-else variant="secondary" show>
         {{ $t('features.empty') }}
       </b-alert>
     </section>

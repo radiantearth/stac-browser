@@ -4,7 +4,7 @@
       <FullscreenButton :element="() => $refs.previews" />
     </div>
     <div class="content">
-      <a v-for="thumbnail in thumbnails" :key="thumbnail.href" :href="thumbnail.getAbsoluteUrl()" target="_blank" download>
+      <a v-for="thumbnail in thumbnails" :key="thumbnail.href" :href="thumbnail.getAbsoluteUrl()" target="_blank" rel="noopener noreferrer" download>
         <img class="thumbnail" :src="thumbnail.getAbsoluteUrl()" :crossorigin="crossOriginMedia">
       </a>
     </div>
@@ -13,11 +13,12 @@
 
 <script>
 import { mapState } from 'vuex';
+import { defineAsyncComponent } from 'vue';
 
 export default {
   name: 'Thumbnails',
   components: {
-    FullscreenButton: () => import('./FullscreenButton.vue')
+    FullscreenButton: defineAsyncComponent(() => import('./FullscreenButton.vue'))
   },
   props: {
     thumbnails: {
@@ -48,7 +49,7 @@ export default {
       border-radius: $border-radius;
 
       &:hover {
-        border-color: map-get($theme-colors, "primary");
+        border-color: $dark;
       }
     }
 
@@ -73,7 +74,7 @@ export default {
       z-index: 1;
 
       .fullscreen-button {
-        margin: 5px;
+        margin: 10px;
       }
     }
 
@@ -81,6 +82,20 @@ export default {
       .thumbnail {
         max-height: none;
         border-radius: 0;
+      }
+    }
+  }
+}
+
+[data-bs-theme="dark"] {
+  #stac-browser {
+    .previews {
+      a {
+        border: 1px solid $body-bg-dark;
+    
+        &:hover {
+          border-color: $light;
+        }
       }
     }
   }

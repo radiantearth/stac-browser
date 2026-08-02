@@ -2,10 +2,10 @@
   <ul>
     <li v-for="l in layers" :key="l.id">
       <div class="d-flex justify-content-between">
-        <b-form-checkbox inline :name="l.id" :checked="l.visible" @input="setVisibility(l, $event)">
+        <b-form-checkbox inline :name="l.id" :model-value="l.visible" @update:model-value="setVisibility(l, $event)">
           <span class="title">{{ l.title }}</span>
         </b-form-checkbox>
-        <b-button variant="light" size="sm" :title="$t('mapping.fit')" @click.prevent.stop="fitToExtent(l)">
+        <b-button variant="primary" size="sm" :title="$t('mapping.fit')" @click.prevent.stop="fitToExtent(l)">
           <b-icon-zoom-in />
         </b-button>
       </div>
@@ -15,17 +15,15 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
 import LayerControlMixin from './LayerControlMixin';
-import { BFormCheckbox, BIconZoomIn } from 'bootstrap-vue';
 import LayerGroup from 'ol/layer/Group';
-import { transformExtent } from 'ol/proj';
+import { toOlExtent } from 'ol-stac/util.js';
 
 export default {
   name: 'LayerControlGroup',
   components: {
-    LayerControlGroup: () => import('./LayerControlGroup.vue'),
-    BFormCheckbox,
-    BIconZoomIn
+    LayerControlGroup: defineAsyncComponent(() => import('./LayerControlGroup.vue')),
   },
   mixins: [
     LayerControlMixin
@@ -102,7 +100,7 @@ export default {
           }
         }
         if (bbox) {
-          extent = transformExtent(bbox, 'EPSG:4326', this.map.getView().getProjection());
+          extent = toOlExtent(bbox, this.map.getView().getProjection());
         }
       }
       if (extent) {

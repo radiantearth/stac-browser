@@ -1,7 +1,8 @@
+import { isObject, size, URI } from 'stac-js/src/utils.js';
+import { toAbsolute } from 'stac-js/src/http.js';
 import Utils from './utils';
 import { getDisplayTitle } from './models/stac';
 import { STAC } from 'stac-js';
-import URI from 'urijs';
 import i18n from './i18n';
 
 function toBrowserUrl(url, store) {
@@ -37,15 +38,31 @@ function formatTemporalCoverage(dates) {
 }
 
 function makeAssets(data) {
-  if (Utils.size(data.assets) > 0) {
+  if (size(data.assets) > 0) {
     return Object.values(data.assets).map(a => ({
       "@type": "DataDownload",
-      contentUrl: Utils.toAbsolute(a.href, data.getAbsoluteUrl()),
+      contentUrl: toAbsolute(a.href, data.getAbsoluteUrl()),
       encodingFormat: a.type,
       name: a.title
     }));
   }
   return [];
+}
+
+function fallbackDescription(data, store) {
+  let stacType, container;
+  if (data instanceof STAC) {
+    stacType = data.isItem ? "Item" : data.type;
+    container = data.collection;
+  }
+  else if (isObject(data) && data.rel === 'item') {
+    stacType = "Item";
+  }
+  if (stacType) {
+    let type = i18n.global.t(`stac${stacType}`, 1);
+    let inX = i18n.global.t('in', { catalog: container || store.catalogTitle });
+    return `SpatioTemporal Asset Catalog (STAC)\n${type} - ${data.id} ${inX}`;
+  }
 }
 
 function makeLinks(links, data, store, type = "DataCatalog") {
@@ -57,7 +74,7 @@ function makeLinks(links, data, store, type = "DataCatalog") {
     }
     else {
       name = link.title;
-      isBasedOn = Utils.toAbsolute(link.href, data.getAbsoluteUrl());
+      isBasedOn = toAbsolute(link.href, data.getAbsoluteUrl());
     }
     let obj = {
       "@type": type,
@@ -74,7 +91,7 @@ function makeLinks(links, data, store, type = "DataCatalog") {
 
 function makeProvider(providers, role) {
   return providers
-    .filter(p => Utils.isObject(p) && Array.isArray(p.roles) && p.roles.includes(role))
+    .filter(p => isObject(p) && Array.isArray(p.roles) && p.roles.includes(role))
     .map(p => ({
       "@type": "Organization",
       "name": p.name,
@@ -82,22 +99,6 @@ function makeProvider(providers, role) {
       "url": p.url,
       "email": p.email || p.mail,
     }));
-}
-
-function fallbackDescription(data, store) {
-  let stacType, container;
-  if (data instanceof STAC) {
-    stacType = data.isItem() ? "Item" : data.type;
-    container = data.collection;
-  }
-  else if (Utils.isObject(data) && data.rel === 'item') {
-    stacType = "Item";
-  }
-  if (stacType) {
-    let type = i18n.tc(`stac${stacType}`);
-    let inX = i18n.t('in', {catalog: container || store.catalogTitle});
-    return `SpatioTemporal Asset Catalog (STAC)\n${type} - ${data.id} ${inX}`;
-  }
 }
 
 function createBaseSchema(data, type, store) {
@@ -118,7 +119,7 @@ function createBaseSchema(data, type, store) {
     license = data.getLinkWithRel('license')?.href;
   }
   if (license) {
-    license = Utils.toAbsolute(license, data.getAbsoluteUrl());
+    license = toAbsolute(license, data.getAbsoluteUrl());
   }
 
   let providers = data.getMetadata('providers');
@@ -126,7 +127,7 @@ function createBaseSchema(data, type, store) {
   let producer; // producer
   let provider; // host
   let creator; // processor
-  if (Utils.size(providers) > 0) {
+  if (size(providers) > 0) {
     copyrightHolder = makeProvider(providers, "licensor");
     producer = makeProvider(providers, "producer");
     provider = makeProvider(providers, "host");
@@ -164,7 +165,7 @@ export function createCatalogSchema(data, parents, store) {
     return null;
   }
   // Remove invalid links
-  parents = parents.filter(link => Utils.isObject(link));
+  parents = parents.filter(link => isObject(link));
   if (parents.length > 1) {
     // Remove duplicates
     parents = parents.filter((link, i) => parents.findIndex(p => p.isBasedOn === link.isBasedOn) !== i);
@@ -172,7 +173,7 @@ export function createCatalogSchema(data, parents, store) {
 
   let schema = createBaseSchema(data, 'DataCatalog', store);
 
-  if (data.isCollection()) {
+  if (data.isCollection) {
     if (data.extent?.temporal?.interval.length > 0) {
       schema.temporalCoverage = formatTemporalCoverage(data.extent.temporal.interval[0]);
     }
@@ -194,7 +195,7 @@ export function createItemSchema(data, parents, store) {
   if (!(data instanceof STAC)) {
     return null;
   }
-  parents = parents.filter(link => Utils.isObject(link));
+  parents = parents.filter(link => isObject(link));
 
   let schema = createBaseSchema(data, 'Dataset', store);
 

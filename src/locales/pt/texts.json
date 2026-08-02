@@ -41,12 +41,12 @@
     "password": "Password",
     "required": "Autenticação necessária",
     "schemeTypes": {
-      "http": "HTTP {scheme}",
-      "s3": "S3",
-      "signedUrl": "URL Assinado",
-      "oauth2": "OAuth 2",
       "apiKey": "Chave da API",
-      "openIdConnect": "OpenID Connect"
+      "http": "HTTP {scheme}",
+      "oauth2": "OAuth 2",
+      "openIdConnect": "OpenID Connect",
+      "s3": "S3",
+      "signedUrl": "URL Assinado"
     },
     "title": "Autenticação",
     "unauthorized": "Não tem autorização para aceder a estes dados. Por favor, faça login.",
@@ -71,6 +71,7 @@
     "true": "sim"
   },
   "copy": "Cópia",
+  "copyErrors": {},
   "default": "Default",
   "defaultWithValue": "Valor default ({value})",
   "deprecated": "Descontinuado",
@@ -110,6 +111,7 @@
     "serverError": "O servidor encontrou um problema. @:errors.contactProvider",
     "unauthorized": "O pedido não possui credenciais, por exemplo um token da API. Forneça as suas credenciais e tente novamente."
   },
+  "exampleCode": {},
   "featureExperimental": "Esta funcionalidade ainda é experimental e pode dar resultados inesperados!",
   "features": {},
   "fullscreen": {
@@ -135,6 +137,7 @@
   "in": "em {catalog}",
   "index": {
     "api": "API",
+    "catalog": "Catálogo",
     "load": "Carregar",
     "selectStacIndex": "... ou selecione um de {stacIndex}:",
     "specifyCatalog": "Por favor especifique um catálogo STAC ou API...",
@@ -153,10 +156,12 @@
   "map": "Mapa",
   "mapping": {
     "attribution": {
-      "label": "i",
-      "collapseLabel": "✕"
+      "collapseLabel": "✕",
+      "label": "i"
     },
-    "bboxSelect": {},
+    "bboxSelect": {
+      "error": {}
+    },
     "close": "Fechar",
     "layers": {},
     "location": {},
@@ -192,6 +197,7 @@
     "previous": "‹ Anterior"
   },
   "poweredBy": "Distribuído por {link}",
+  "programming": {},
   "protocol": {
     "azure": "Microsoft Azure",
     "file": "sistema de ficheiros (local)",
@@ -222,9 +228,10 @@
   "search": {
     "addCollections": "Pressione Enter para adicionar uma coleção",
     "addFilter": "Adicionar filtro",
+    "additionalFilters": "Filtros adicionais",
     "addItemIds": "Pressione Enter para adicionar o ID de um item",
     "addSearchTerm": "Pressione Enter para adicionar um termo de pesquisa",
-    "additionalFilters": "Filtros adicionais",
+    "arrayInput": {},
     "dateDescription": "Todos os horários em UTC.",
     "enterCollections": "Insira um ou mais IDs de coleção...",
     "enterItemIds": "Insira um ou mais IDs de item...",
@@ -305,8 +312,8 @@
       "message": "{title} está disponível em {url}",
       "sharePageWithOthers": "Partilhe o URL desta página onde quiser:",
       "title": "Partilhar",
-      "x": "X (Twitter)",
-      "withOthers": "Partilhe esta página com outros"
+      "withOthers": "Partilhe esta página com outros",
+      "x": "X (Twitter)"
     },
     "stacExtension": "Extensão STAC",
     "stacVersion": "Versão STAC",
@@ -372,5 +379,6 @@
       "title": "Mostrar como grelha"
     },
     "title": "Opções de vista"
-  }
+  },
+  "widgets": {}
 }

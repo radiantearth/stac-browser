@@ -20,23 +20,28 @@
     "noMatches": "No catalogues match the given search criteria."
   },
   "checkbox": {},
+  "copyErrors": {},
   "deprecation": {},
   "errors": {
     "labels": {},
     "noExternalAccess": "Accessing external catalogues is not allowed!"
   },
+  "exampleCode": {},
   "features": {},
   "fullscreen": {},
   "goBack": {},
   "goToCollection": {},
   "goToParent": {},
   "index": {
+    "catalog": "Catalogue",
     "specifyCatalog": "Please specify a STAC Catalogue or API..."
   },
   "items": {},
   "mapping": {
     "attribution": {},
-    "bboxSelect": {},
+    "bboxSelect": {
+      "error": {}
+    },
     "layers": {},
     "location": {},
     "zoom": {
@@ -47,6 +52,7 @@
   "metadata": {},
   "multiselect": {},
   "pagination": {},
+  "programming": {},
   "protocol": {
     "s3": {}
   },
@@ -55,6 +61,7 @@
   },
   "read": {},
   "search": {
+    "arrayInput": {},
     "logical": {},
     "tabs": {}
   },
@@ -79,5 +86,6 @@
   "view": {
     "list": {},
     "tiles": {}
-  }
+  },
+  "widgets": {}
 }

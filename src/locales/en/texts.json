@@ -41,12 +41,12 @@
     "password": "Password",
     "required": "Authentication required",
     "schemeTypes": {
-      "http": "HTTP {scheme}",
-      "s3": "S3",
-      "signedUrl": "Signed URL",
-      "oauth2": "OAuth 2",
       "apiKey": "API key",
-      "openIdConnect": "OpenID Connect"
+      "http": "HTTP {scheme}",
+      "oauth2": "OAuth 2",
+      "openIdConnect": "OpenID Connect",
+      "s3": "S3",
+      "signedUrl": "Signed URL"
     },
     "title": "Authentication",
     "unauthorized": "You don't have permission to access this data. Please log in.",
@@ -70,7 +70,12 @@
     "false": "no",
     "true": "yes"
   },
+  "close": "Close",
   "copy": "Copy",
+  "copyErrors": {
+    "permission": "Unable to copy. Please check browser permissions.",
+    "unsupported": "Clipboard is not available in this browser."
+  },
   "default": "Default",
   "defaultWithValue": "Default ({value})",
   "deprecated": "Deprecated",
@@ -86,6 +91,7 @@
   },
   "description": "Description",
   "errors": {
+    "apiListRequested": "The request is invalid. Direct requests to /collections and .../items endpoints are currently not supported.",
     "authFailed": "The request errored, the provided authentication details may be incorrect.",
     "badRequest": "The request is invalid. This might be due to invalid parameters, e.g. in a search request, or could be a bug in STAC Browser.",
     "contactProvider": "Please contact the service operator to resolve this issue.",
@@ -104,12 +110,18 @@
     "loadApiItemsFailed": "The API Items could not be loaded.",
     "loadFilteredItems": "Sorry, loading a filtered list of Items failed.",
     "loadItems": "Sorry, loading the list of STAC Items failed.",
+    "missingPermissions": "The credentials specified for this request do not have the required permissions.",
     "networkError": "This issue may occur when servers don't allow external access via web browsers (e.g., when CORS headers are not present). @:errors.contactProvider",
     "noExternalAccess": "Accessing external catalogs is not allowed!",
     "notFound": "The requested resource does not exist. @:errors.contactProvider",
     "serverError": "The server encountered an issue. @:errors.contactProvider",
     "title": "Error",
     "unauthorized": "The request lacks credentials, e.g. an API token. Please provide your credentials and try again."
+  },
+  "exampleCode": {
+    "title": "Example Code",
+    "storeAs": "Store code as:",
+    "installDependencies": "Install dependencies:"
   },
   "featureExperimental": "This feature is still experimental and may give unexpected results!",
   "features": {
@@ -150,30 +162,59 @@
   },
   "items": {
     "filter": "Filters",
+    "filterChangesNotApplied": "The filters were changed, but the changes have not been applied yet.",
     "hideFilter": "Hide Filters",
     "noTime": "No time given",
     "noneAvailableForCollection": "No items available for this collection.",
     "showFilter": "Show Filters"
   },
   "loading": "Loading...",
+  "manage": {
+    "addCollection": "Add Collection",
+    "addItem": "Add Item",
+    "confirmDeleteTitle": "Confirm Deletion",
+    "confirmDeleteMessage": "Are you sure you want to delete this STAC resource?",
+    "create": "Create",
+    "delete": "Delete",
+    "discardDraft": "Discard restored changes",
+    "draftRestored": "Unsaved changes from a previous session were restored.",
+    "edit": "Edit",
+    "leavePage": "Leave page",
+    "save": "Save",
+    "noUndo": "This action cannot be undone.",
+    "unsavedChangesLeave": "You have unsaved changes. Do you really want to leave this page?",
+    "unsavedChangesTitle": "Unsaved Changes",
+    "validate": "Validate"
+  },
   "map": "Map",
   "mapping": {
     "attribution": {
-      "label": "i",
+      "collapseLabel": "✕",
       "description": "Attributions",
-      "collapseLabel": "✕"
+      "label": "i"
     },
     "bboxSelect": {
       "add": "Click on the map to add a bounding box.",
-      "remove": "Click inside the bounding box to remove it."
+      "eastLon": "East Longitude",
+      "error": {
+        "incomplete": "Coordinate is missing",
+        "invalidLat": "Must be between -90 and 90",
+        "invalidLon": "Must be between -180 and 180",
+        "latOrder": "South Latitude must be less than North Latitude",
+        "lonOrder": "West Longitude must be less than East Longitude"
+      },
+      "northLat": "North Latitude",
+      "remove": "Click inside the bounding box to remove it.",
+      "southLat": "South Latitude",
+      "westLon": "West Longitude"
     },
     "close": "Close",
     "fit": "Fit to extent",
     "layers": {
-      "title": "Layers",
       "base": "Base Layers",
-      "unnamed": "Unnamed #{id}",
-      "footprint": "Footprint"
+      "footprint": "Footprint",
+      "title": "Layers",
+      "unnamed": "Unnamed #{id}"
     },
     "location": {
       "description": "Go to your location"
@@ -212,6 +253,14 @@
     "previous": "‹ Previous"
   },
   "poweredBy": "Powered by {link}",
+  "programming": {
+    "csharp": "C#",
+    "java": "Java",
+    "javascript": "JavaScript",
+    "python": "Python",
+    "r": "R",
+    "rust": "Rust"
+  },
   "protocol": {
     "azure": "Microsoft Azure",
     "file": "file system (local)",
@@ -242,10 +291,26 @@
   "search": {
     "addCollections": "Press enter to add a collection",
     "addFilter": "Add filter",
+    "additionalFilters": "Additional filters",
     "addItemIds": "Press enter to add an Item ID",
     "addSearchTerm": "Press enter to add a search term",
-    "additionalFilters": "Additional filters",
+    "arrayInput": {
+      "addValue": "Press enter to add a value",
+      "helpText": "Enter value(s)"
+    },
+    "arrayContains": "Contains all",
+    "arrayContainsDescription": "Array contains all of the specified values",
+    "arrayContainedBy": "Is subset of",
+    "arrayContainedByDescription": "Array is a subset of the specified values",
+    "arrayEquals": "Exactly matches",
+    "arrayEqualsDescription": "Array exactly matches the specified values (same items, any order)",
+    "arrayOverlaps": "Contains any",
+    "arrayOverlapsDescription": "Array contains at least one of the specified values",
+    "between": "between",
+    "betweenOperatorDescription": "Tests whether a numeric field value lies within the given range. The given range is inclusive.",
     "dateDescription": "All times in Coordinated Universal Time (UTC).",
+    "disabledDueToSingleDate": "This filter is disabled because the collection has a single date and time as temporal extent.",
+    "droppedFilters": "The following filters are not supported here and were removed: {filters}.",
     "enterCollections": "Enter one or more Collection IDs...",
     "enterItemIds": "Enter one or more Item IDs...",
     "enterSearchTerms": "Enter one or more search terms...",
@@ -256,6 +321,8 @@
     "freeTextDescription": "Search for at least one of the given terms in fields such as the title and the description.",
     "greaterThan": "greater than",
     "greaterThanEqual": "greater than or equal to",
+    "in": "included in",
+    "inOperatorDescription": "Checks whether the field value is any of the given values.",
     "itemIds": "Item IDs",
     "itemsPerPage": "Items per page",
     "itemsPerPageDescription": "Number of items requested per page, max. {maxItems} items.",
@@ -264,19 +331,22 @@
     "likeOperatorDescription": "You can use wildcard characters. `_` matches a single character, `%` matches any number of characters. To search for a wildcard character specifically, you need to add a `\\` in front of the character.",
     "logical": {
       "and": "Match all filters (and)",
-      "or": "Match any filters (or)"
+      "or": "Match any filters (or)",
+      "not": "Negate filter"
     },
     "matches": "matches",
     "metaDescription": "Search through the data offering of {title}.",
     "modifyCriteria": "Please modify the search criteria.",
     "noFurtherItemsFound": "No further items available.",
     "noItemsFound": "No items found for the given filters.",
+    "noOperatorsError": "STAC Browser does not support any operators for the filter {queryable}.",
     "noOptions": "Nothing entered yet",
     "notEqualTo": "not equal to",
     "notFullySupported": "Not all of the options may be supported.",
     "notSupported": "Item Search is not supported by the API.",
     "placeholder": "Search...",
     "selectCollections": "Select one or multiple collections...",
+    "selectDateRange": "Select date range",
     "selectForItemSearch": "Select for Item Search",
     "spatialExtent": "Spatial Extent",
     "tabs": {
@@ -317,6 +387,7 @@
       "switch": "Switch the language"
     },
     "locatedAt": "The STAC metadata file is located at:",
+    "manage": "Manage",
     "share": {
       "bsky": "Bluesky",
       "email": "E-mail",
@@ -325,8 +396,8 @@
       "message": "{title} is available at {url}",
       "sharePageWithOthers": "Share the URL of this page anywhere you like:",
       "title": "Share",
-      "x": "X (Twitter)",
-      "withOthers": "Share this page with others"
+      "withOthers": "Share this page with others",
+      "x": "X (Twitter)"
     },
     "stacExtension": "STAC Extension",
     "stacVersion": "STAC Version",
@@ -368,6 +439,8 @@
   "stacCollection": "Collection | Collections",
   "stacItem": "Item | Items",
   "submit": "Submit",
+  "switchToDarkMode": "Switch to dark mode",
+  "switchToLightMode": "Switch to light mode",
   "table": {
     "emptyFilteredText": "There are no records matching your request",
     "emptyText": "There are no records to show",
@@ -392,5 +465,8 @@
       "title": "Show as tiles"
     },
     "title": "Display Options"
+  },
+  "widgets": {
+    "featured": "Featured"
   }
 }

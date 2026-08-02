@@ -53,6 +53,7 @@
     "true": "はい"
   },
   "copy": "コピー",
+  "copyErrors": {},
   "default": "デフォルト",
   "defaultWithValue": "デフォルト ({value})",
   "deprecated": "非推奨",
@@ -91,6 +92,7 @@
     "serverError": "サーバーに問題が発生しました。@:errors.contactProvider",
     "unauthorized": "リクエストには認証情報がありません（例:APIトークン。）認証情報を入力して再度お試し下さい。"
   },
+  "exampleCode": {},
   "featureExperimental": "この機能はまだ実験的で、予期しない結果をもたらす可能性があります。",
   "features": {},
   "fullscreen": {
@@ -116,6 +118,7 @@
   "in": "{catalog} 内",
   "index": {
     "api": "API",
+    "catalog": "カタログ",
     "load": "読み込み",
     "selectStacIndex": "または {stacIndex} から選択:",
     "specifyCatalog": "STACカタログやSTAC APIのURLを指定:",
@@ -133,7 +136,9 @@
   "map": "マップ",
   "mapping": {
     "attribution": {},
-    "bboxSelect": {},
+    "bboxSelect": {
+      "error": {}
+    },
     "close": "閉じる",
     "layers": {},
     "location": {},
@@ -169,6 +174,7 @@
     "previous": "‹ 前"
   },
   "poweredBy": "提供: {link}",
+  "programming": {},
   "protocol": {
     "azure": "Microsoft Azure",
     "file": "ファイルシステム (ローカル)",
@@ -199,9 +205,10 @@
   "search": {
     "addCollections": "Enterキーを押してコレクションを追加",
     "addFilter": "フィルターを追加",
+    "additionalFilters": "追加のフィルター",
     "addItemIds": "Enterキーを押してアイテムIDを追加",
     "addSearchTerm": "Enter キーを押して検索語句を追加",
-    "additionalFilters": "追加のフィルター",
+    "arrayInput": {},
     "dateDescription": "すべての時刻はUTC (協定世界時) です",
     "enterCollections": "1つ以上のコレクションIDを入力してください...",
     "enterItemIds": "1つ以上のアイテムIDを入力してください...",
@@ -280,8 +287,8 @@
       "message": "{title} はこちらのページで利用できます: {url}",
       "sharePageWithOthers": "このページのURLを共有しましょう:",
       "title": "共有",
-      "x": "X (Twitter)",
-      "withOthers": "このページを共有しましょう"
+      "withOthers": "このページを共有しましょう",
+      "x": "X (Twitter)"
     },
     "statistics": "統計",
     "title": "ソースデータ",
@@ -322,5 +329,6 @@
       "title": "タイル表示"
     },
     "title": "表示オプション"
-  }
+  },
+  "widgets": {}
 }

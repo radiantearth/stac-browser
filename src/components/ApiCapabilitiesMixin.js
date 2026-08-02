@@ -1,15 +1,16 @@
 // Add deprecated CQL conformance classes for stac-fastapi:
 // https://github.com/stac-utils/stac-fastapi/issues/539
-const CQL_TEXT = [
+export const CQL_TEXT = [
   'https://api.stacspec.org/v1.*/item-search#filter:cql-text', // deprecated
   'http://www.opengis.net/spec/cql2/1.*/conf/cql2-text'
 ];
-const CQL_JSON = [
+export const CQL_JSON = [
   'https://api.stacspec.org/v1.*/item-search#filter:cql-json', // deprecated
   'http://www.opengis.net/spec/cql2/1.*/conf/cql2-json'
 ];
 
 const CQL_ADV_COMPARISON = ['http://www.opengis.net/spec/cql2/1.*/conf/advanced-comparison-operators'];
+const CQL_ARRAY_OPERATORS = ['http://www.opengis.net/spec/cql2/1.*/conf/array-functions'];
 
 import { mapGetters } from "vuex";
 
@@ -31,7 +32,7 @@ export const TYPES = {
     FreeText: ['https://api.stacspec.org/v1.*/ogcapi-features#free-text']
   },
   // STAC API - Item Search
-  Global:  {
+  Global: {
     BasicFilters: ['https://api.stacspec.org/v1.*/item-search'],
     CollectionIdFilter: true,
     ItemIdFilter: true,
@@ -86,7 +87,8 @@ export default {
       return {
         textMode,
         jsonMode,
-        advancedComparison: this.supportsConformance(CQL_ADV_COMPARISON)
+        advancedComparison: this.supportsConformance(CQL_ADV_COMPARISON),
+        arrayOperators: this.supportsConformance(CQL_ARRAY_OPERATORS),
       };
     }
   }

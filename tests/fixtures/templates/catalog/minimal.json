@@ -1,0 +1,7 @@
+{
+  "type": "Catalog",
+  "stac_version": "1.1.0",
+  "id": "example-catalog",
+  "description": "An example STAC Catalog.",
+  "links": []
+}

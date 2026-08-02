@@ -1,6 +1,14 @@
-# Docker
+# Docker <!-- omit in toc -->
 
-Note: Docker might not be an ideal way to deploy STAC Browser in production. Consider using a web host, cloud storage, or a CDN. 
+- [Create a custom image](#create-a-custom-image)
+- [Use an existing image](#use-an-existing-image)
+- [How it works](#how-it-works)
+- [Essential parts](#essential-parts)
+- [FAQ](#faq)
+
+> [!NOTE]  
+> Docker might not be the ideal way to deploy STAC Browser in production.
+> Also consider using a web host, cloud storage, or a CDN.
 
 ## Create a custom image
 
@@ -23,7 +31,8 @@ STAC Browser is now available at `http://localhost:8080`
 You can pass further options to STAC Browser to customize it to your needs.
 
 The build-only options
-[`pathPrefix`](docs/options.md#pathprefix) and [`historyMode`](docs/options.md#historymode)
+[`historyMode`](./options.md#historymode)
+and `SB_CONFIG` (for loading an [external config file](./options.md))
 can be provided as a
 [build argument](https://docs.docker.com/engine/reference/commandline/build#set-build-time-variables---build-arg)
 when building the Dockerfile.
@@ -31,27 +40,42 @@ when building the Dockerfile.
 For example:
 
 ```bash
-docker build -t stac-browser:v1 --build-arg pathPrefix="/browser/" --build-arg historyMode=hash .
+docker build -t stac-browser:v1 --build-arg historyMode=hash .
+```
+
+`SB_CONFIG` lets you overlay a custom config module (e.g. for options like
+[`preprocessSTAC`](./options.md#preprocessstac) that can only be set in a config file)
+without modifying the Dockerfile:
+
+```bash
+docker build -t stac-browser:v1 --build-arg SB_CONFIG=./config.custom.mjs .
 ```
 
 All other options, except the ones that are explicitly excluded from CLI/ENV usage,
 can be passed as environment variables when running the container.
 For example, to run the container with a pre-defined
-[`catalogUrl`](docs/options.md#catalogurl) and [`catalogTitle`](docs/options.md#catalogtitle):
+[`catalogUrl`](./options.md#catalogurl) and [`catalogTitle`](./options.md#catalogtitle):
 
 ```bash
 docker run -p 8080:8080 -e SB_catalogUrl="https://earth-search.aws.element84.com/v1/" -e SB_catalogTitle="Earth Search" stac-browser:v1
 ```
 
+[`pathPrefix`](./options.md#pathprefix) can also be set at container startup via `SB_pathPrefix` (when `DYNAMIC_CONFIG` is enabled, the default):
+
+```bash
+docker run -p 8080:8080 -e SB_pathPrefix="/browser/" -e SB_catalogUrl="https://earth-search.aws.element84.com/v1/" stac-browser:v1
+```
+
 If you want to pass all the other arguments to `npm run build` directly, you can modify to the Dockerfile as needed.
 
-STAC browser is now available at `http://localhost:8080/browser`
+STAC Browser is now available at `http://localhost:8080/browser/`.
+Requests to `http://localhost:8080/browser` (no trailing slash) are redirected there.
 
 ## Use an existing image
 
 Since version 3.1.1, you can add an existing image from [Packages](https://github.com/radiantearth/stac-browser/pkgs/container/stac-browser) to your docker-compose.yml:
 
-```
+```yaml
 services:
   stac-browser:
     image: ghcr.io/radiantearth/stac-browser:latest
@@ -64,22 +88,22 @@ services:
 ## How it works
 
 The docker image uses a multi stage build.
-The first stage is based on a node image and runs `npm build` to produce a `/dist` folder with static files (HTML, CSS, and JavaScript).
-The second stage is based on an nginx image that serves the folder with static files and deals with the build-only options such as  `pathPrefix`.
+The first stage is based on a node image and runs `npm run build` to produce a `/dist` folder with static files (HTML, CSS, and JavaScript).
+The second stage is based on an nginx image that serves the folder with static files. At startup, the entrypoint applies `SB_pathPrefix` to nginx and generates `runtime-config.js`.
 So, essentially, in the end you get an nginx instance that serves static files.
 
 ## Essential parts
 
 1. [Dockerfile](../Dockerfile) - contains information on how to build the image.
-2. [docker/default.conf](../docker/default.conf) - nginx configuration template, where `<pathPrefix>` is replaced during build.
-3. [docker/docker-entrypoint.sh](../docker/docker-entrypoint.sh) - a start script to read the passed variables and produce the `config.js` file.
+2. [docker/default.conf](../docker/default.conf) - nginx configuration template; `${STAC_PATH_PREFIX}` is substituted at startup.
+3. [docker/docker-entrypoint.sh](../docker/docker-entrypoint.sh) - a start script to read the passed variables, render the nginx config, and produce the `runtime-config.js` file.
 
 ## FAQ
 
 > Can I use `ghcr.io/radiantearth/stac-browser` image with the `pathPrefix`?
 
-You can not. You need to build your own image because `pathPrefix` is a build-only option.
+Yes — pass `-e SB_pathPrefix="/browser/"` at container startup. See [`pathPrefix`](./options.md#pathprefix).
 
 > How do I specify `buildTileUrlTemplate` via docker env?
 
-You can not. Consider modifying the dockerfile and using a custom `config.js` file
+You can not. Consider modifying the dockerfile and using a custom `config.js` file (or `runtime-config.js` for runtime configuration)

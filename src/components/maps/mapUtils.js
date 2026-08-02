@@ -5,12 +5,14 @@ import Group from 'ol/layer/Group';
 
 const MapUtils = {
 
-  isLayerVisible(layer) {
+  isLayerVisible(map, layer) {
     if (layer instanceof Group) {
-      return layer.getLayers().getArray().some(l => this.isLayerVisible(l));
+      return layer.getLayers().getArray().some(l => this.isLayerVisible(map, l));
     }
     else {
-      return layer.isVisible();
+      // See https://github.com/radiantearth/stac-browser/issues/852
+      const view = map.getView();
+      return layer.isVisible(view.getViewStateAndExtent());
     }
   },
 

@@ -5,7 +5,9 @@
 </template>
 
 <script>
-export default {
+import { defineComponent } from 'vue';
+
+export default defineComponent({
   name: 'Loading',
   props: {
     fill: {
@@ -40,7 +42,7 @@ export default {
       return classes;
     }
   }
-};
+});
 </script>
 
 <style lang="scss" scoped>
@@ -58,7 +60,8 @@ export default {
   }
 
   &.loading-fill {
-    z-index: 2000;
+    // See bootstrap z-index values: https://getbootstrap.com/docs/5.3/layout/z-index/
+    z-index: $zindex-dropdown - 10;
     position: absolute;
     background-color: rgba(255,255,255, 0.75);
     width: 100%;

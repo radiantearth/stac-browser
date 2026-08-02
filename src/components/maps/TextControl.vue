@@ -1,5 +1,5 @@
 <template>
-  <div v-if="texts.length > 0" class="ol-textcontrol ol-unselectable ol-control" @click="toggle" :class="{pointer: texts.length > 1}">{{ current }}</div>
+  <div v-if="texts.length > 0" class="ol-control ol-unselectable ol-textcontrol" @click="toggle" :class="{pointer: texts.length > 1}">{{ current }}</div>
 </template>
 
 <script>
@@ -60,13 +60,15 @@ export default {
   left: calc(2.375em + 6px);
   max-width: calc(100% - 2*(2.375em + 6px));
   box-sizing: border-box;
-  background-color: rgba(255,255,255,0.6);
+  color: var(--ol-foreground-color);
+  background-color: var(--ol-partial-background-color);
   white-space: pre-wrap;
   font-size: 0.9em;
   padding: 0.2em;
   text-align: center;
   z-index: 1;
 }
+
 .pointer {
   cursor: pointer;
 }
