@@ -1,6 +1,6 @@
 {
   "name": "@radiantearth/stac-browser",
-  "version": "5.0.0",
+  "version": "5.1.0-dev",
   "type": "module",
   "description": "A full-fledged UI in Vue for browsing and searching static STAC catalogs and STAC APIs.",
   "main": "src/main.js",
@@ -35,16 +35,16 @@
     "type": "github",
     "url": "https://github.com/sponsors/m-mohr"
   },
-  "author": "Radiant Earth Foundation <hello@radiant.earth>",
+  "author": "moreGeo GmbH <mail@moregeo.it>",
   "contributors": [
     {
-      "name": "Seth Fitzsimmons"
+      "name": "Matthias Mohr"
     },
     {
       "name": "Rob Emanuele"
     },
     {
-      "name": "Matthias Mohr"
+      "name": "Seth Fitzsimmons"
     }
   ],
   "license": "ISC",
