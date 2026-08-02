@@ -12,9 +12,9 @@ certain _OGC API - Records_ and _OGC API - Features_ compliant servers.
 
 > [!IMPORTANT]  
 > Please note that STAC Browser has limited funding for both maintenance, bug fixes and improvements.
-> If you care about STAC Browser and have some funds to support the future of STAC Browser, please contact <mail@moregeo.it>.**
+> If you care about STAC Browser and have some funds to support the future of STAC Browser, please contact <mail@moregeo.it>.
 
-# Table of Contents <!-- omit in toc -->
+## Table of Contents <!-- omit in toc -->
 
 - [Examples](#examples)
 - [Get Started](#get-started)
