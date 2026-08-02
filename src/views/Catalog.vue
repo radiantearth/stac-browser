@@ -101,7 +101,6 @@ import Utils from '../utils';
 import { hasText, isObject, size } from 'stac-js/src/utils.js';
 import { getWebMapLinks } from 'ol-stac/util.js';
 import { addSchemaToDocument, createCatalogSchema } from '../schema-org';
-import { getApiChildrenLink } from '../models/stac';
 import { ItemCollection } from 'stac-js';
 import DeprecationMixin from '../components/DeprecationMixin.js';
 import { BTab, BTabs, BCard } from 'bootstrap-vue-next';
@@ -233,7 +232,7 @@ export default defineComponent({
       return this.items.length > 0 || this.hasApiItems;
     },
     hasApiChildren() {
-      return Boolean(getApiChildrenLink(this.data)) && this.apiCatalogPriority !== 'collections';
+      return Boolean(this.data?.isCatalogLike && this.data.getApiChildrenLink()) && this.apiCatalogPriority !== 'collections';
     },
     hasMoreChildren() {
       return this.hasApiChildren && Boolean(this.getApiChildren(this.data, 'children')?.next);
