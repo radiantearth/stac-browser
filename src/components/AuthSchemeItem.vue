@@ -1,32 +1,36 @@
 <template>
   <b-list-group-item button class="auth-method-item flex-column align-items-start" @click="authenticate">
     <div class="d-flex w-100 justify-content-between align-items-center">
-      <strong class="me-2">{{ $t(`authentication.schemeTypes.${method.type}`, method) }}</strong>
-      <b-badge v-if="!isSupported" variant="danger">{{ $t("authentication.unsupported") }}</b-badge>
+      <strong class="me-2">{{ scheme.title || $t(`authentication.schemeTypes.${scheme.type}`, scheme) }}</strong>
+      <b-badge v-if="!supported" variant="danger">{{ $t("authentication.unsupported") }}</b-badge>
     </div>
   </b-list-group-item>
 </template>
 
 <script>
-import AuthUtils from './auth/utils';
+import { isSupported } from '../auth/schemes.js';
 
 export default {
   name: 'AuthSchemeItem',
   props: {
-    method: {
+    schemeId: {
+      type: String,
+      required: true
+    },
+    scheme: {
       type: Object,
       required: true
     }
   },
   emits: ['authenticate'],
   computed: {
-    isSupported() {
-      return AuthUtils.isSupported(this.method, this.$store.state);
+    supported() {
+      return isSupported(this.scheme, this.$store.state);
     }
   },
   methods: {
     authenticate() {
-      this.$emit('authenticate', this.method);
+      this.$emit('authenticate', { id: this.schemeId, scheme: this.scheme });
     }
   }
 };

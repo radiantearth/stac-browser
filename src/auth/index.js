@@ -15,6 +15,7 @@ export default class Auth {
    * @param {Function} changeListener A change listener with two parameters: loggedIn (boolean) and credentials (string|null)
    */
   constructor(router, options = {}, changeListener = null) {
+    this.id = null; // The scheme id, assigned by the auth store after creation
     this.options = isObject(options) ? options : {};
     this.changeListener = changeListener;
     this.router = router;
@@ -69,7 +70,9 @@ export default class Auth {
     }
   }
 
-  async logout(/*credentials*/) { // eslint-disable-line require-await
+  // Logs out. When quiet is set, other schemes are still logged in and the
+  // logout must not navigate away from the current page.
+  async logout(/*credentials, quiet*/) { // eslint-disable-line require-await
     this.storeSession();
   }
 
@@ -119,7 +122,7 @@ export default class Auth {
   }
 
   persistMethod() {
-    this.browserStorage.set(KEY_METHOD, this.options);
+    this.browserStorage.set(KEY_METHOD, { id: this.id, options: this.options });
   }
 
   updateStore(/*value*/) {

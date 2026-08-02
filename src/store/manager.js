@@ -92,7 +92,7 @@ export default function getStore(config) {
         if (!url || !getters.transactionsAllowInternal) {
           return false;
         }
-        if (rootState.transactionsRequireLogin && !rootGetters['auth/isLoggedIn']) {
+        if (rootState.transactionsRequireLogin && !rootGetters['auth/isAnyLoggedIn']) {
           return false;
         }
         if (rootState.transactionsRequirePreflight) {

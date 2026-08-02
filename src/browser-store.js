@@ -98,7 +98,7 @@ export class Cookies {
     }
     const date = new Date();
     date.setTime(date.getTime() + minutes * 60 * 1000);
-    this.epires = date.toGMTString();
+    return date.toGMTString();
   }
 
   setItem(name, value, minutes = null) {
@@ -121,7 +121,7 @@ export class Cookies {
   }
 
   removeItem(name) {
-    this.set(name, "", -1);
+    this.setItem(name, "", -1);
   }
 
   clear() {

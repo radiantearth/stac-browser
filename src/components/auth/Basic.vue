@@ -24,7 +24,6 @@
 <script>
 import Description from '../Description.vue';
 import { hasText } from 'stac-js/src/utils.js';
-import { mapGetters } from 'vuex';
 import { BCard, BCardBody, BCardFooter } from 'bootstrap-vue-next';
 
 export default {
@@ -55,7 +54,6 @@ export default {
     };
   },
   computed: {
-    ...mapGetters('auth', ['isLoggedIn']),
     promptText() {
       if (this.description) {
         return this.description;
@@ -64,9 +62,6 @@ export default {
     }
   },
   created() {
-    if (this.isLoggedIn) {
-      this.$emit('submit', null);
-    }
     if (hasText(this.credentials) && this.credentials.includes(':')) {
       let parts = this.credentials.split(':', 2);
       this.username = parts[0];

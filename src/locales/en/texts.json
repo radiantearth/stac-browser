@@ -32,7 +32,9 @@
   "authentication": {
     "button": {
       "login": "Log in",
+      "loginWith": "Log in with {method}",
       "logout": "Log out",
+      "logoutFrom": "Log out from {method}",
       "title": "Provide or update your credentials"
     },
     "chooseMethod": "Choose authentication method",
