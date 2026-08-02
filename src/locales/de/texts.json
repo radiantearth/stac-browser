@@ -162,7 +162,6 @@
   },
   "items": {
     "filter": "Filter",
-    "filterChangesNotApplied": "",
     "hideFilter": "Verstecke Filter",
     "noTime": "Keine Zeit angegeben",
     "noneAvailableForCollection": "Für diesen Katalog sind keine Elemente verfügbar.",
@@ -174,7 +173,6 @@
     "addItem": "Element hinzufügen",
     "confirmDeleteTitle": "Löschen bestätigen",
     "confirmDeleteMessage": "Sind Sie sicher, dass Sie diese STAC-Ressource löschen möchten?",
-    "create": "",
     "delete": "Löschen",
     "discardDraft": "Wiederhergestellte Änderungen verwerfen",
     "draftRestored": "Ungespeicherte Änderungen aus einer früheren Sitzung wurden wiederhergestellt.",
@@ -310,7 +308,6 @@
     "betweenOperatorDescription": "Prüft, ob ein numerischer Wert innerhalb des angegebenen Bereichs liegt. Die angegebenen Grenzen werden eingeschlossen.",
     "dateDescription": "Alle Zeiten in koordinierter Weltzeit (UTC).",
     "disabledDueToSingleDate": "Dieser Filter ist deaktiviert, da die Sammlung einen einzelnen Zeitpunkt als zeitliche Ausdehnung hat.",
-    "droppedFilters": "",
     "enterCollections": "Gebe Katalog-Identifikationsnummern ein...",
     "enterItemIds": "Gebe Element-Identifikationsnummern ein...",
     "enterSearchTerms": "Gebe Suchbegriffe ein...",
