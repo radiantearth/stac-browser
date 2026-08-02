@@ -110,7 +110,6 @@
     "loadApiItemsFailed": "Les éléments de l'API n'ont pas pu être chargés.",
     "loadFilteredItems": "Désolé, le chargement d'une liste d'éléments filtrés a échoué.",
     "loadItems": "Désolé, le chargement de la liste des éléments STAC a échoué.",
-    "missingPermissions": "",
     "networkError": "Ce problème peut se produire lorsque les serveurs n'autorisent pas l'accès externe via les navigateurs Web (par exemple, lorsque les en-têtes CORS ne sont pas présents). @:errors.contactProvider",
     "noExternalAccess": "L'accès aux catalogues externes n'est pas autorisé!",
     "notFound": "La ressource demandée n'existe pas. @:errors.contactProvider",
@@ -162,30 +161,13 @@
   },
   "items": {
     "filter": "Filtres",
-    "filterChangesNotApplied": "",
     "hideFilter": "Masquer les filtres",
     "noTime": "Aucun temps sélectionné",
     "noneAvailableForCollection": "Aucun item disponible pour cette collection.",
     "showFilter": "Afficher les filtres"
   },
   "loading": "Chargement...",
-  "manage": {
-    "addCollection": "",
-    "addItem": "",
-    "confirmDeleteTitle": "",
-    "confirmDeleteMessage": "",
-    "create": "",
-    "delete": "",
-    "discardDraft": "",
-    "draftRestored": "",
-    "edit": "",
-    "leavePage": "",
-    "save": "",
-    "noUndo": "",
-    "unsavedChangesLeave": "",
-    "unsavedChangesTitle": "",
-    "validate": ""
-  },
+  "manage": {},
   "map": "Carte",
   "mapping": {
     "attribution": {
@@ -310,7 +292,6 @@
     "betweenOperatorDescription": "Teste si une valeur de champ numérique se situe dans la plage donnée. La plage donnée est inclusive.",
     "dateDescription": "Toutes les heures sont en temps universel coordonné (UTC).",
     "disabledDueToSingleDate": "Ce filtre est désactivé parce que la collection a une date et heure unique comme étendue temporelle.",
-    "droppedFilters": "",
     "enterCollections": "Saisissez une ou plusieurs collections...",
     "enterItemIds": "Saisissez un ou plusieurs identifiants d'éléments...",
     "enterSearchTerms": "Saisissez un ou plusieurs termes de recherche...",
@@ -387,7 +368,6 @@
       "switch": "Changer de langue"
     },
     "locatedAt": "Le fichier de métadonnées STAC se trouve à l'adresse suivante :",
-    "manage": "",
     "share": {
       "bsky": "Bluesky",
       "email": "Courriel",

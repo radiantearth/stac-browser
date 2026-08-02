@@ -110,7 +110,6 @@
     "loadApiItemsFailed": "Los elementos de la API no se pudieron cargar.",
     "loadFilteredItems": "Perdón, la carga de una lista de elementos filtrada falló.",
     "loadItems": "Perdón, falló la carga de la lista de elementos STAC.",
-    "missingPermissions": "",
     "networkError": "Este problema puede ocurrir cuando los servidores no permiten acceso externo desde navegadores web (por ejemplo, cuando no hay encabezados CORS). @:errors.contactProvider",
     "noExternalAccess": "¡El acceso a catálogos externos no está permitido!",
     "notFound": "El recurso solicitado no existe. @:errors.contactProvider",
@@ -162,30 +161,13 @@
   },
   "items": {
     "filter": "Filtros",
-    "filterChangesNotApplied": "",
     "hideFilter": "Ocultar Filtros",
     "noTime": "No se indicó un tiempo",
     "noneAvailableForCollection": "No hay elementos disponibles para esta colección.",
     "showFilter": "Mostrar Filtros"
   },
   "loading": "Cargando...",
-  "manage": {
-    "addCollection": "",
-    "addItem": "",
-    "confirmDeleteTitle": "",
-    "confirmDeleteMessage": "",
-    "create": "",
-    "delete": "",
-    "discardDraft": "",
-    "draftRestored": "",
-    "edit": "",
-    "leavePage": "",
-    "save": "",
-    "noUndo": "",
-    "unsavedChangesLeave": "",
-    "unsavedChangesTitle": "",
-    "validate": ""
-  },
+  "manage": {},
   "map": "Mapa",
   "mapping": {
     "attribution": {
@@ -310,7 +292,6 @@
     "betweenOperatorDescription": "Prueba si el valor de un campo numérico está dentro del rango indicado. El rango es inclusivo.",
     "dateDescription": "Todas las horas en Coordinated Universal Time (UTC).",
     "disabledDueToSingleDate": "El filtro está desactivado porque la colección tiene una única fecha y hora como extensión temporal.",
-    "droppedFilters": "",
     "enterCollections": "Introduzca una o varias colecciones...",
     "enterItemIds": "Introduzca una o varias IDs de Elemento...",
     "enterSearchTerms": "Introduzca uno o más términos de búsqueda...",
@@ -387,7 +368,6 @@
       "switch": "Cambiar el idioma"
     },
     "locatedAt": "El archivo de metadatos STAC se encuentra en:",
-    "manage": "",
     "share": {
       "bsky": "Bluesky",
       "email": "E-mail",
@@ -466,7 +446,5 @@
     },
     "title": "Opciones de visualización"
   },
-  "widgets": {
-    "featured": ""
-  }
+  "widgets": {}
 }
