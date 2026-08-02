@@ -98,6 +98,7 @@
     "default": "The requested page could not be loaded.",
     "forbidden": "The credentials specified for this request are invalid, e.g. an expired or invalid API token. Please provide other credentials and try again.",
     "invalidJsonObject": "The response is not a valid JSON object.",
+    "invalidStacChildren": "The API response is not a valid list of STAC Catalogs and Collections.",
     "invalidStacCollections": "The API response is not a valid list of STAC Collections.",
     "invalidStacItems": "The API response is not a valid list of STAC Items.",
     "labels": {
@@ -106,6 +107,7 @@
       "reason": "Reason:",
       "requestURL": "Request URL:"
     },
+    "loadApiChildrenFailed": "The API Children could not be loaded.",
     "loadApiCollectionsFailed": "The API Collections could not be loaded.",
     "loadApiItemsFailed": "The API Items could not be loaded.",
     "loadFilteredItems": "Sorry, loading a filtered list of Items failed.",

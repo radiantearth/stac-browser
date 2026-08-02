@@ -6,7 +6,8 @@ import urijs from 'urijs';
 import i18n, { loadMessages, detectDataLanguage, updateExternals } from '../i18n';
 import Utils, { BrowserError } from '../utils';
 import { toAbsolute } from 'stac-js/src/http.js';
-import { addMissingChildren, getMissingChildren, getDisplayTitle, createSTAC } from '../models/stac';
+import { getApiChildrenLink, getMissingChildren, getDisplayTitle, createSTAC } from '../models/stac';
+import ChildrenCollection from '../models/childrenCollection';
 import { STAC } from 'stac-js';
 
 import auth from './auth.js';
@@ -18,9 +19,8 @@ import { TYPES } from "../components/ApiCapabilitiesMixin";
 import BrowserStorage from "../browser-store.js";
 import search, { freshSearchState } from './modules/search.js';
 
-// type is 'children', 'collections' or 'items', depending on which endpoint
-// the list was loaded from. Each entity can have lists from multiple endpoints,
-// they are stored as separate keys (sources) per entity URL.
+// An entity can have children from multiple endpoints ('children', 'collections'
+// and 'items'), they are kept as separate keys (sources) per entity URL in apiChildren.
 function updateApiChildrenState(state, stac, type, list, next = false, prev = false) {
   if (!stac?.isCatalogLike) {
     return;
@@ -36,9 +36,8 @@ function updateApiChildrenState(state, stac, type, list, next = false, prev = fa
   });
 }
 
-// Returns the record for the given source (type) of the entity,
-// i.e. a Loading object, an object with the props list, prev, next
-// and optionally loading, or null.
+// Returns the record for the given source of the entity: a Loading object,
+// an object with the props list, prev, next and optionally loading, or null.
 function getApiChildrenSource(state, stac, type) {
   if (!stac?.isCatalogLike) {
     return null;
@@ -47,8 +46,8 @@ function getApiChildrenSource(state, stac, type) {
   return isObject(container) ? (container[type] || null) : null;
 }
 
-// Returns the Loading object if a page of children is currently being loaded
-// for the given entity (and source, if given), otherwise null.
+// Returns the Loading object if a page is currently being loaded for the
+// entity (across all sources, or the given source), otherwise null.
 function getApiChildrenLoading(state, stac, type = null) {
   if (!stac?.isCatalogLike) {
     return null;
@@ -70,8 +69,8 @@ function getApiChildrenLoading(state, stac, type = null) {
   return null;
 }
 
-// Returns the list of a source record, or an empty array if the record
-// is missing or its first page is still being loaded.
+// Returns the list of a source record, or an empty array while its first
+// page is still being loaded (record is a Loading object).
 function getApiChildrenList(record) {
   if (!isObject(record) || record instanceof Loading || !Array.isArray(record.list)) {
     return [];
@@ -107,11 +106,11 @@ function getOrCreateStac(cx, data, url) {
   return stac;
 }
 
-// Resolves the entries of a list loaded from the API (e.g. collections or
-// children) to cached STAC objects. The URL of an entry is taken from its
-// self link. If a guessSegment is given, a `{guessSegment}/{id}` path
-// relative to the catalog is guessed as fallback (see issue #486).
-// Entries without a detectable URL are skipped.
+// Resolves the entries of an API list response (e.g. collections or children)
+// to cached STAC objects, using the entry's self link. If a guessSegment is
+// given, `{guessSegment}/{id}` relative to the catalog is used as a fallback
+// (https://github.com/radiantearth/stac-browser/issues/486). Entries without a
+// detectable URL are skipped.
 // todo: Convert data to stac-js
 function resolveApiList(cx, list, stac, guessSegment = null) {
   return list.map(entry => {
@@ -121,7 +120,6 @@ function resolveApiList(cx, list, stac, guessSegment = null) {
       url = toAbsolute(selfLink.href, cx.state.url || stac.getAbsoluteUrl(), false);
     }
     else if (guessSegment) {
-      // see https://github.com/radiantearth/stac-browser/issues/486
       let baseUrl = cx.state.catalogUrl || stac.getAbsoluteUrl();
       if (baseUrl) {
         baseUrl = URI(baseUrl);
@@ -132,7 +130,7 @@ function resolveApiList(cx, list, stac, guessSegment = null) {
       }
     }
     if (!url) {
-      return null; // We can't detect a URL, skip this flawed entry
+      return null;
     }
     return getOrCreateStac(cx, entry, url.toString());
   }).filter(Boolean);
@@ -413,7 +411,6 @@ function getStore(config, router) {
         }
         return [];
       },
-      // The collections of the shown entity, loaded from the collections endpoint
       collections: state => {
         if (!state.data?.isCatalogLike || state.apiCatalogPriority === 'childs') {
           return [];
@@ -423,39 +420,36 @@ function getStore(config, router) {
         const hasCollections = Boolean(state.data.getApiCollectionsLink() && state.apiCollections.length > 0);
         return hasCollections ? state.apiCollections : [];
       },
-      // The children of the shown entity (from the child links),
-      // without the entries that are also in the collections list.
+      // Child links (or the children endpoint if supported) minus the entries
+      // already in the collections list. With the Children extension the endpoint
+      // is authoritative, so the static child links are not merged in.
       childCatalogs: (state, getters) => {
         if (!state.data?.isCatalogLike || state.apiCatalogPriority === 'collections') {
           return [];
         }
+        if (getApiChildrenLink(state.data)) {
+          const children = getApiChildrenList(getApiChildrenSource(state, state.data, 'children'));
+          const collectionUrls = new Set(getters.collections.map(collection => collection.getAbsoluteUrl()));
+          return children.filter(child => !collectionUrls.has(child.getAbsoluteUrl()));
+        }
         return getMissingChildren(getters.collections, state.data);
       },
-      // The children and collections of the shown entity, merged into a single list
       catalogs: (state, getters) => {
         if (!state.data?.isCatalogLike) {
           return [];
         }
-        let children = [];
-        if (getters.collections.length > 0) {
-          children = getters.collections.slice(0);
-        }
-        if (state.apiCatalogPriority !== 'collections') {
-          children = addMissingChildren(children, state.data);
-        }
-        return children;
+        // place the children first to avoid reaching that late with the paginated collections
+        return getters.childCatalogs.concat(getters.collections);
       },
       isApiChildrenLoading: state => (stac, type = null) => Boolean(getApiChildrenLoading(state, stac, type)),
       getApiChildren: state => (stac, type) => getApiChildrenSource(state, stac, type),
-      // The children of the given entity grouped by source, for the tree.
-      // Includes pagination links for the paginated sources.
       getChildren: state => (stac, priority = null) => {
+        const group = source => ({ list: [], prev: false, next: false, source });
+        const paginationLink = (link, source) => link ? Object.assign({}, link, { source }) : false;
         const groups = {
-          children: [],
-          collections: [],
-          items: [],
-          prev: false,
-          next: false
+          children: group('children'),
+          collections: group('collections'),
+          items: []
         };
         if (!stac?.isCatalogLike) {
           return groups;
@@ -465,17 +459,28 @@ function getStore(config, router) {
         const collections = getApiChildrenSource(state, stac, 'collections');
         const items = getApiChildrenSource(state, stac, 'items');
         if (showCollections) {
-          groups.collections = getApiChildrenList(collections);
-          // Items loaded from the items endpoint are shown in the tree as well
+          groups.collections.list = getApiChildrenList(collections);
           groups.items = getApiChildrenList(items);
           const paginated = isObject(collections) && !(collections instanceof Loading) ? collections : items;
           if (isObject(paginated) && !(paginated instanceof Loading)) {
-            groups.prev = paginated.prev;
-            groups.next = paginated.next;
+            groups.collections.prev = paginationLink(paginated.prev, 'collections');
+            groups.collections.next = paginationLink(paginated.next, 'collections');
           }
         }
         if (showChilds) {
-          groups.children = getMissingChildren(groups.collections, stac);
+          if (getApiChildrenLink(stac)) {
+            // With the Children extension the endpoint is authoritative, static child links are not merged in
+            const children = getApiChildrenSource(state, stac, 'children');
+            const collectionUrls = new Set(groups.collections.list.map(collection => collection.getAbsoluteUrl()));
+            groups.children.list = getApiChildrenList(children).filter(child => !collectionUrls.has(child.getAbsoluteUrl()));
+            if (isObject(children) && !(children instanceof Loading)) {
+              groups.children.prev = paginationLink(children.prev, 'children');
+              groups.children.next = paginationLink(children.next, 'children');
+            }
+          }
+          else {
+            groups.children.list = getMissingChildren(groups.collections.list, stac);
+          }
           groups.items = groups.items.concat(stac.getLinksWithRels(['item']));
         }
         return groups;
@@ -800,10 +805,9 @@ function getStore(config, router) {
       setApiItemsLink(state, link) {
         state.apiItemsLink = link;
       },
-      // Assigns the Loading object for the entity to the given source of the
-      // apiChildren directly (like in the database), or to the `loading`
-      // property if a list is already available for the source.
-      // Removes it again if loading is not set.
+      // Tracks the Loading object for a source of the entity: as the source
+      // record itself, or as its `loading` property once a list is available.
+      // Removes it again when loading is not set.
       loadingApiChildren(state, { stac, type, loading = null }) {
         if (!stac?.isCatalogLike) {
           return;
@@ -865,6 +869,20 @@ function getStore(config, router) {
           // ToDo: Prev link only required when state.apiItems is not cached(?) -> cache apiItems?
           updateApiChildrenState(state, stac, 'items', data.features, pages.next, pages.prev);
         }
+      },
+      addApiChildren(state, { data, stac, append = false }) {
+        if (!isObject(data) || !Array.isArray(data.children)) {
+          return;
+        }
+        const pages = Utils.getPaginationLinks(data);
+        let list = data.children;
+        if (append) {
+          const existing = getApiChildrenSource(state, stac, 'children');
+          if (isObject(existing) && Array.isArray(existing.list)) {
+            list = existing.list.concat(list);
+          }
+        }
+        updateApiChildrenState(state, stac, 'children', list, pages.next);
       },
       addApiCollections(state, { data, stac, show, searching = false, append = false }) {
         if (!isObject(data) || !Array.isArray(data.collections)) {
@@ -1104,6 +1122,18 @@ function getStore(config, router) {
           cx.dispatch('manager/checkPermissions', stacRequestOptions(cx, url));
         }
 
+        const apiChildrenLink = data.isCatalogLike && getApiChildrenLink(data);
+        if (!omitApi && apiChildrenLink) {
+          try {
+            await cx.dispatch('loadApiChildren', { stac: data });
+          } catch (error) {
+            cx.commit('showGlobalError', {
+              message: i18n.global.t('errors.loadApiChildrenFailed'),
+              error
+            });
+          }
+        }
+
         // Load API Collections
         const apiCollectionLink = data.isCatalogLike && data.getApiCollectionsLink();
         const apiItemLink = data.isCatalogLike && data.getApiItemsLink();
@@ -1247,6 +1277,42 @@ function getStore(config, router) {
           }
         } finally {
           cx.commit('loadingApiItems', { id: collectionId });
+        }
+      },
+      async loadApiChildren(cx, args) {
+        const { stac, next = false } = args;
+        if (!stac?.isCatalogLike) {
+          return;
+        }
+        let link;
+        const cached = getApiChildrenSource(cx.state, stac, 'children');
+        const loaded = isObject(cached) && !(cached instanceof Loading);
+        if (!next) {
+          if (loaded) {
+            return;
+          }
+          link = getApiChildrenLink(stac);
+          link = link && Utils.addFiltersToLink(link, {}, cx.state.collectionsPerPage);
+        }
+        else if (loaded) {
+          link = cached.next;
+        }
+        if (!link) {
+          return;
+        }
+        if (getApiChildrenLoading(cx.state, stac, 'children')) {
+          return;
+        }
+        cx.commit('loadingApiChildren', { stac, type: 'children', loading: new Loading(true) });
+        try {
+          const response = await cx.dispatch('request', { link });
+          if (!ChildrenCollection.isResponse(response.data)) {
+            throw new BrowserError(i18n.global.t('errors.invalidStacChildren'));
+          }
+          response.data.children = resolveApiList(cx, response.data.children, stac);
+          cx.commit('addApiChildren', { data: response.data, stac, append: next });
+        } finally {
+          cx.commit('loadingApiChildren', { stac, type: 'children' });
         }
       },
       async loadNextApiCollections(cx, args) {
