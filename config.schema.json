@@ -84,6 +84,12 @@
       "noCLI": true,
       "noEnv": true
     },
+    "getStacLayerOptions": {
+      "type": ["null"],
+      "format": "function",
+      "noCLI": true,
+      "noEnv": true
+    },
     "pathPrefix": {
       "type": ["string"]
     },

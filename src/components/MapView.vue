@@ -200,6 +200,9 @@ export default {
         disableMigration: true,
         childrenOptions: this.childrenOptions
       });
+      if (typeof this.getStacLayerOptions === 'function') {
+        options = this.getStacLayerOptions(options, this.stac) || options;
+      }
       if (this.ignoreDisplayLimit) {
         options.maxDisplayPixels = Infinity;
       }
