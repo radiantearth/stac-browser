@@ -1,6 +1,6 @@
 <template>
   <b-button-group v-if="hasButtons" class="stac-actions" :vertical="vertical" :size="size">
-    <b-button v-for="action of actions" :key="action.id" variant="primary" v-bind="action.btnOptions" @click="action.onClick">
+    <b-button v-for="action of actions" :key="action.id" :variant="variant" v-bind="action.btnOptions" @click="action.onClick">
       <component v-if="action.icon" :is="action.icon" class="me-1" />
       {{ action.text }}
     </b-button>
@@ -17,6 +17,10 @@ export default defineComponent({
     data: {
       type: Object,
       required: true
+    },
+    variant: {
+      type: String,
+      default: 'primary'
     },
     vertical: {
       type: Boolean,

@@ -52,7 +52,7 @@
                 </b-button>
                 <StacLink :button="{variant: 'outline-primary', disabled: !canFilterItems(slot.data)}" :data="slot.data" :title="$t('search.filterCollection')" :state="{itemFilterOpen: 1}" />
               </b-button-group>
-              <StacActions :data="slot.data" vertical size="sm" />
+              <StacActions :data="slot.data" variant="outline-primary" vertical size="sm" />
             </template>
           </Catalogs>
           <Items
