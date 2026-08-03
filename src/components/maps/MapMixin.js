@@ -33,6 +33,7 @@ export default {
         displayGeoTiffByDefault: this.displayGeoTiffByDefault,
         useTileLayerAsFallback: this.useTileLayerAsFallback,
         getSourceOptions: this.getMapSourceOptions,
+        getLayerOptions: this.getStacLayerOptions,
         httpRequestFn: async (url, responseType) => {
           const response = await this.$store.dispatch('request', { link: url, axiosOptions: { responseType } });
           return response.data;
