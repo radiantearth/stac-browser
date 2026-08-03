@@ -23,7 +23,7 @@ register(proj4); // required to support source reprojection
 
 export default {
   computed: {
-    ...mapState(['buildTileUrlTemplate', 'colorMode', 'crossOriginMedia', 'displayGeoTiffByDefault', 'displayPreview', 'displayOverview', 'getMapSourceOptions', 'useTileLayerAsFallback', 'uiLanguage']),
+    ...mapState(['buildTileUrlTemplate', 'colorMode', 'crossOriginMedia', 'displayGeoTiffByDefault', 'displayPreview', 'displayOverview', 'getMapSourceOptions', 'getStacLayerOptions', 'useTileLayerAsFallback', 'uiLanguage']),
     stacLayerOptions() {
       return {
         buildTileUrlTemplate: this.buildTileUrlTemplate,

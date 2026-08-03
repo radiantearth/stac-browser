@@ -162,6 +162,9 @@ export default {
         disableMigration: true,
         childrenOptions: this.childrenOptions
       });
+      if (typeof this.getStacLayerOptions === 'function') {
+        options = this.getStacLayerOptions(options, this.stac) || options;
+      }
       this.stacLayer = new StacLayer(options);
       this.stacLayer.on('error', error => {
         console.warn(error);

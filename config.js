@@ -40,6 +40,7 @@ export default {
   displayOverviewsForChildren: false,
   buildTileUrlTemplate: null,
   getMapSourceOptions: null,
+  getStacLayerOptions: null,
   pathPrefix: "/",
   historyMode: "history",
   cardViewMode: "cards",

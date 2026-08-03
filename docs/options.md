@@ -81,6 +81,7 @@ The override order for the configuration is:
   - [displayGeoTiffByDefault](#displaygeotiffbydefault)
   - [crs](#crs)
   - [getMapSourceOptions](#getmapsourceoptions)
+  - [getStacLayerOptions](#getstaclayeroptions)
 - [User Interface](#user-interface)
   - [enforcedColorMode](#enforcedcolormode)
   - [cardViewMode](#cardviewmode)
@@ -515,6 +516,38 @@ getSourceOptions: async (type, options) => {
   return options;
 }
 ```
+
+### getStacLayerOptions
+
+A function that can customize the [ol-stac `STACLayer` options](https://m-mohr.github.io/ol-stac/en/latest/apidoc/module-ol-stac_layer_STAC-STACLayer.html)
+before the layer is created for a map. It is called with the assembled options and the STAC object
+that is going to be shown on the map, and must (synchronously) return the options to use.
+
+```js
+getStacLayerOptions(options, stac) => options
+```
+
+This allows to customize the map rendering per catalog, collection or item, for example to
+provide a [style](https://openlayers.org/en/latest/apidoc/module-ol_layer_WebGLTile.html#~Style)
+for GeoTIFF or GeoZarr layers (e.g. rescaling single-band data that would otherwise render
+without contrast), or to enforce rendering specific web map links by setting `displayWebMapLink`
+to an array.
+
+For example, the following code would apply a grayscale style to all GeoZarr/GeoTIFF layers
+of a specific collection:
+
+```js
+getStacLayerOptions: (options, stac) => {
+  if (stac.collection === 'my-datacubes') {
+    options.style = {
+      color: ['array', ['/', ['band', 1], 4000], ['/', ['band', 1], 4000], ['/', ['band', 1], 4000], 1]
+    };
+  }
+  return options;
+}
+```
+
+The `data`, `children` and `assets` options are set by STAC Browser and should not be replaced.
 
 ## User Interface
 

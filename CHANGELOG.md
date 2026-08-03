@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added basic support for the STAC API extensions Transactions (for Items) and Collection Transactions, including validation
   - Adds three new config options: `transactions`, `transactionsRequireLogin` and `transactionsRequirePreflight`
   - Support for external management UIs via `create-form` and `edit-form` links ([RFC 6861](https://www.rfc-editor.org/rfc/rfc6861.html)) in the "Manage" menu
+- New config option `getStacLayerOptions` to customize the ol-stac layer options per STAC object, e.g. to style GeoTIFF/GeoZarr layers
 
 ### Fixed
 
