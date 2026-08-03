@@ -52,6 +52,7 @@
                 </b-button>
                 <StacLink :button="{variant: 'outline-primary', disabled: !canFilterItems(slot.data)}" :data="slot.data" :title="$t('search.filterCollection')" :state="{itemFilterOpen: 1}" />
               </b-button-group>
+              <StacActions :data="slot.data" vertical size="sm" />
             </template>
           </Catalogs>
           <Items
@@ -97,6 +98,7 @@ export default defineComponent({
     SearchFilter,
     Items: defineAsyncComponent(() => import('../components/Items.vue')),
     MapView: defineAsyncComponent(() => import('../components/MapView.vue')),
+    StacActions: defineAsyncComponent(() => import('../components/StacActions.vue')),
     StacLink: defineAsyncComponent(() => import('../components/StacLink.vue'))
   },
   props: {

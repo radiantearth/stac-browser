@@ -416,10 +416,6 @@ export default defineComponent({
     }
   }
 
-  .obj-actions + .assets, .obj-actions + .providers, .obj-actions + .metadata {
-    margin-top: 1rem;
-  }
-
   .metadata .card-columns {
     column-count: 1;
 
