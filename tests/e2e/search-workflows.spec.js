@@ -57,7 +57,7 @@ const goToCollectionSearchTab = async (page, browserPath) => {
 
 const navigateIntoCollection = async (page, title) => {
   const link = page.getByText(title, { exact: false }).first();
-  await expect(link).toBeVisible({ timeout: 10000 });
+  await expect(link).toBeVisible();
   await link.click();
   await waitForBrowserReady(page);
 };
@@ -65,7 +65,7 @@ const navigateIntoCollection = async (page, title) => {
 // Add a CQL filter row for the "Identifier" queryable in the visible filter form
 const addIdentifierFilter = async (page) => {
   const addFilter = page.getByRole('button', { name: /add filter/i }).first();
-  await expect(addFilter).toBeVisible({ timeout: 10000 });
+  await expect(addFilter).toBeVisible();
   await addFilter.click();
   await page.getByRole('menuitem', { name: /identifier/i }).first().click();
   await expect(page.locator('.additional-filters .queryable-group').first()).toBeVisible();
@@ -122,7 +122,7 @@ test.describe('Search filter carry-over workflows', () => {
     });
 
     await test.step('Filter panel opens automatically instead of filtering silently', async () => {
-      await expect(page.getByRole('button', { name: /hide filters/i })).toBeVisible({ timeout: 10000 });
+      await expect(page.getByRole('button', { name: /hide filters/i })).toBeVisible();
     });
 
     await test.step('The CQL filter was carried over and rebuilt', async () => {
@@ -137,7 +137,7 @@ test.describe('Search filter carry-over workflows', () => {
     });
 
     await test.step('The carried filter is shown in the item filter form', async () => {
-      await expect(page.locator('.additional-filters .queryable-group').first()).toBeVisible({ timeout: 10000 });
+      await expect(page.locator('.additional-filters .queryable-group').first()).toBeVisible();
     });
 
     await test.step('Submitting the item search keeps the carried filter', async () => {
@@ -196,7 +196,7 @@ test.describe('Search filter carry-over workflows', () => {
 
     await test.step('The filter is dropped and named in the banner', async () => {
       const banner = page.locator('.alert-warning').first();
-      await expect(banner).toBeVisible({ timeout: 10000 });
+      await expect(banner).toBeVisible();
       await expect(banner).toContainText(/identifier/i);
       const state = await getSearchState(page);
       expect(state.itemFilters.rawFilters).toHaveLength(0);
@@ -226,7 +226,7 @@ test.describe('Search filter carry-over workflows', () => {
       await addFreeTextTerm(page, 'sentinel');
       await page.getByRole('button', { name: /submit/i }).click();
       await waitForBrowserReady(page);
-      await expect(page.getByText('Alpha Collection', { exact: false }).first()).toBeVisible({ timeout: 10000 });
+      await expect(page.getByText('Alpha Collection', { exact: false }).first()).toBeVisible();
     });
 
     await test.step('Open a result and go back via the browser history', async () => {
@@ -236,7 +236,7 @@ test.describe('Search filter carry-over workflows', () => {
     });
 
     await test.step('The results are shown again without re-submitting', async () => {
-      await expect(page.getByText('Alpha Collection', { exact: false }).first()).toBeVisible({ timeout: 10000 });
+      await expect(page.getByText('Alpha Collection', { exact: false }).first()).toBeVisible();
       await expect(page.getByText('Beta Collection', { exact: false }).first()).toBeVisible();
       // The search form still shows the criteria
       await expect(page.locator('.filter-freetext .multiselect__tag').filter({ hasText: 'sentinel' }).first()).toBeVisible();
@@ -284,7 +284,7 @@ test.describe('Search filter carry-over workflows', () => {
     });
 
     await test.step('No carry-over: no banner, filter panel stays closed', async () => {
-      await expect(page.getByRole('button', { name: /show filters/i })).toBeVisible({ timeout: 10000 });
+      await expect(page.getByRole('button', { name: /show filters/i })).toBeVisible();
       await expect(page.locator('.alert-warning')).toHaveCount(0);
       const state = await getSearchState(page);
       // The user's item search is untouched
@@ -303,8 +303,8 @@ test.describe('Search filter carry-over workflows', () => {
 
     await test.step('Navigate into a collection — the carry-over runs and reports the drop', async () => {
       await navigateIntoCollection(page, 'Alpha Collection');
-      await expect(page.getByRole('button', { name: /hide filters/i })).toBeVisible({ timeout: 10000 });
-      await expect(page.locator('.alert-warning').first()).toBeVisible({ timeout: 10000 });
+      await expect(page.getByRole('button', { name: /hide filters/i })).toBeVisible();
+      await expect(page.locator('.alert-warning').first()).toBeVisible();
     });
 
     await test.step('Take over: change the limit and execute an own item search', async () => {
@@ -363,7 +363,7 @@ test.describe('Search filter carry-over workflows', () => {
       await page.getByRole('tab', { name: /search for items/i }).click();
       await waitForBrowserReady(page);
       const itemsTab = page.getByRole('tabpanel', { name: /search for items/i });
-      await expect(itemsTab.locator('.filter-freetext .multiselect__tag').filter({ hasText: 'sentinel' })).toBeVisible({ timeout: 10000 });
+      await expect(itemsTab.locator('.filter-freetext .multiselect__tag').filter({ hasText: 'sentinel' })).toBeVisible();
       const state = await getSearchState(page);
       expect(state.itemFilters.q).toEqual(['sentinel']);
     });
@@ -390,7 +390,7 @@ test.describe('Search filter carry-over workflows', () => {
       await page.getByRole('button', { name: /^browse$/i }).click();
       await waitForBrowserReady(page);
       await navigateIntoCollection(page, 'Alpha Collection');
-      await expect(page.getByRole('button', { name: /show filters/i })).toBeVisible({ timeout: 10000 });
+      await expect(page.getByRole('button', { name: /show filters/i })).toBeVisible();
       await expect(page.locator('.alert-warning')).toHaveCount(0);
     });
   });

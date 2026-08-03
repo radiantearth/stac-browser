@@ -140,7 +140,7 @@ test.describe('STAC Browser Data Source Selection', () => {
     
     // Wait for navigation and verify the catalog title appears as h1 heading
     const catalogTitle = page.getByRole('heading', { name: /microsoft planetary computer stac api/i });
-    await expect(catalogTitle).toBeVisible({ timeout: 10000 });
+    await expect(catalogTitle).toBeVisible();
     
     // Verify the page title changed
     await expect(page).toHaveTitle(/microsoft planetary computer stac api/i);
@@ -166,7 +166,7 @@ test.describe('STAC Browser Data Source Selection', () => {
     
     // Wait for navigation and verify the catalog title appears as h1 heading
     const catalogTitle = page.getByRole('heading', { name: new RegExp(expectedTitle, 'i') });
-    await expect(catalogTitle).toBeVisible({ timeout: 10000 });
+    await expect(catalogTitle).toBeVisible();
     
     // Verify the page title changed
     await expect(page).toHaveTitle(new RegExp(expectedTitle, 'i'));

@@ -378,9 +378,8 @@ async function replaceEditorContent(page, text) {
   await editor.click();
   await page.keyboard.press('ControlOrMeta+a');
   await page.keyboard.type(text);
-  // Wait for the debounced draft write (1s) to actually reach localStorage,
-  // rather than guessing at a fixed delay. The draft is stored under a
-  // `draft:<mode>:<path>` key with the typed content JSON-encoded in it.
+  // Wait for the debounced draft write (1s) to reach localStorage, stored under
+  // a `draft:<mode>:<path>` key with the typed content JSON-encoded in it.
   await expect
     .poll(() => page.evaluate(() => {
       const key = Object.keys(window.localStorage).find(k => k.startsWith('draft:'));
@@ -439,6 +438,13 @@ test.describe('Management - drafts and leave guards', () => {
     const putRequest = page.waitForRequest(req => req.method() === 'PUT');
     await page.getByRole('button', { name: 'Save' }).click();
     await putRequest;
+
+    // The draft is cleared by the save-success handler, which runs after the
+    // request is sent. Wait for that side effect before reloading, otherwise the
+    // reload can race it and restore the stale draft.
+    await expect
+      .poll(() => page.evaluate(() => Object.keys(window.localStorage).some(k => k.startsWith('draft:'))))
+      .toBe(false);
 
     page.once('dialog', dialog => dialog.accept());
     await page.reload();

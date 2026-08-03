@@ -354,7 +354,7 @@ test.describe('STAC Collection item search', () => {
     const submitButton = page.getByRole('button', { name: /submit/i });
     await submitButton.click();
     const itemCards = page.locator('.item-card');
-    await expect(itemCards).toHaveCount(5, { timeout: 10000 });
+    await expect(itemCards).toHaveCount(5);
   });
     
   test('item search can be paginated with Next and Previous buttons', async ({ page, worker }) => {
@@ -373,19 +373,19 @@ test.describe('STAC Collection item search', () => {
     const prevButton = page.getByRole('button', { name: /previous/i }).first();
       
     // verify first page shows 5 items, Next enabled, Previous disabled
-    await expect(itemCards).toHaveCount(5, { timeout: 10000 });
+    await expect(itemCards).toHaveCount(5);
     await expect(nextButton).toBeEnabled();
     await expect(prevButton).toBeDisabled();
       
     // click Next and verify second page shows 5 items, Next disabled, Previous enabled
     await nextButton.click();
-    await expect(itemCards).toHaveCount(5, { timeout: 10000 });
+    await expect(itemCards).toHaveCount(5);
     await expect(nextButton).toBeDisabled();
     await expect(prevButton).toBeEnabled();
       
     // click Previous and verify first page is shown again with 5 items, Next enabled, Previous disabled
     await prevButton.click();
-    await expect(itemCards).toHaveCount(5, { timeout: 10000 });
+    await expect(itemCards).toHaveCount(5);
     await expect(nextButton).toBeEnabled();
     await expect(prevButton).toBeDisabled(); 
   });
@@ -408,19 +408,19 @@ test.describe('STAC Collection item search', () => {
     const prevButton = page.getByRole('button', { name: /previous/i }).first();
       
     // verify first page shows 5 items, First disabled, Last enabled
-    await expect(itemCards).toHaveCount(5, { timeout: 10000 });
+    await expect(itemCards).toHaveCount(5);
     await expect(firstButton).toBeDisabled();
     await expect(lastButton).toBeEnabled();
       
     // click Last to jump to the last page and verify it shows 5 items, Next disabled, First enabled
     await lastButton.click();
-    await expect(itemCards).toHaveCount(5, { timeout: 10000 });
+    await expect(itemCards).toHaveCount(5);
     await expect(nextButton).toBeDisabled();
     await expect(firstButton).toBeEnabled();
       
     // click First and verify first page is shown again
     await firstButton.click();
-    await expect(itemCards).toHaveCount(5, { timeout: 10000 });
+    await expect(itemCards).toHaveCount(5);
     await expect(prevButton).toBeDisabled();
   });
 });
