@@ -190,7 +190,7 @@ export default {
       }
     },
     addStacLayer() {
-      let options = Object.assign({}, this.stacLayerOptions, {
+      const options = Object.assign({}, this.stacLayerOptions, {
         // Don't set the URL here, as it is already set in the STAC object and is read-only.
         // url: this.stac.getAbsoluteUrl(),
         data: this.stac,
@@ -200,9 +200,6 @@ export default {
         disableMigration: true,
         childrenOptions: this.childrenOptions
       });
-      if (typeof this.getStacLayerOptions === 'function') {
-        options = this.getStacLayerOptions(options, this.stac) || options;
-      }
       if (this.ignoreDisplayLimit) {
         options.maxDisplayPixels = Infinity;
       }

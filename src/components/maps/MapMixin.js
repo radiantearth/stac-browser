@@ -35,6 +35,7 @@ export default {
         displayGeoTiffByDefault: this.displayGeoTiffByDefault,
         useTileLayerAsFallback: this.useTileLayerAsFallback,
         getSourceOptions: this.getMapSourceOptions,
+        getLayerOptions: this.getStacLayerOptions,
         getRequestHeaders: this.getRequestHeadersForStacLayer,
         // Adds the configured query parameters (incl. query-parameter
         // credentials) to the URLs requested by ol-stac

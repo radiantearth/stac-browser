@@ -560,26 +560,34 @@ getSourceOptions: async (type, options) => {
 
 ### getStacLayerOptions
 
-A function that can customize the [ol-stac `STACLayer` options](https://m-mohr.github.io/ol-stac/en/latest/apidoc/module-ol-stac_layer_STAC-STACLayer.html)
-before the layer is created for a map. It is called with the assembled options and the STAC object
-that is going to be shown on the map, and must (synchronously) return the options to use.
+A function that can customize the options of the individual OpenLayers layers that
+[ol-stac](https://m-mohr.github.io/ol-stac/) creates for the assets and links of a STAC object.
+It is passed through to the [`getLayerOptions` option of the ol-stac `STACLayer`](https://m-mohr.github.io/ol-stac/en/latest/apidoc/module-ol-stac_layer_STAC-STACLayer.html)
+and is called right before each individual layer is created:
 
 ```js
-getStacLayerOptions(options, stac) => options
+getStacLayerOptions(type, options, reference) => options | Promise<options>
 ```
 
-This allows to customize the map rendering per catalog, collection or item, for example to
-provide a [style](https://openlayers.org/en/latest/apidoc/module-ol_layer_WebGLTile.html#~Style)
+- `type` is the [layer type](https://m-mohr.github.io/ol-stac/en/latest/apidoc/module-ol-stac_layer_type-LayerType.html)
+  that is going to be created (compare with `String(type)`, e.g. `'WebGLTile'` for GeoTIFF and GeoZarr layers).
+- `options` are the assembled layer options.
+- `reference` is the STAC Asset or Link the layer is created for.
+
+The function can be asynchronous, e.g. to load a style definition that is referenced in the
+STAC metadata, which only delays the creation of the individual layer.
+
+This allows to customize the map rendering per asset or link, for example to provide a
+[style](https://openlayers.org/en/latest/apidoc/module-ol_layer_WebGLTile.js.html#~Style)
 for GeoTIFF or GeoZarr layers (e.g. rescaling single-band data that would otherwise render
-without contrast), or to enforce rendering specific web map links by setting `displayWebMapLink`
-to an array.
+without contrast).
 
 For example, the following code would apply a grayscale style to all GeoZarr/GeoTIFF layers
 of a specific collection:
 
 ```js
-getStacLayerOptions: (options, stac) => {
-  if (stac.collection === 'my-datacubes') {
+getStacLayerOptions: (type, options, reference) => {
+  if (String(type) === 'WebGLTile' && reference.getContext()?.collection === 'my-datacubes') {
     options.style = {
       color: ['array', ['/', ['band', 1], 4000], ['/', ['band', 1], 4000], ['/', ['band', 1], 4000], 1]
     };
@@ -587,8 +595,6 @@ getStacLayerOptions: (options, stac) => {
   return options;
 }
 ```
-
-The `data`, `children` and `assets` options are set by STAC Browser and should not be replaced.
 
 ## User Interface
 
