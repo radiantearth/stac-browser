@@ -17,7 +17,7 @@
     </b-card-body>
     <b-card-footer>
       <slot name="footer" :data="data">
-        <StacActions v-if="data" :data="data" vertical size="sm" />
+        <StacActions v-if="data && !hideActions" :data="data" variant="outline-primary" vertical size="sm" />
       </slot>
     </b-card-footer>
   </b-card>
@@ -57,6 +57,13 @@ export default {
     catalog: {
       type: Object,
       required: true
+    },
+    // Hides the default StacActions in the footer slot, for embeddings
+    // where showing them would be redundant or confusing (e.g. the parent
+    // collection preview shown alongside an item's own actions).
+    hideActions: {
+      type: Boolean,
+      default: false
     }
   },
   computed: {

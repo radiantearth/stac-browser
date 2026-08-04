@@ -1,6 +1,7 @@
 <template>
   <nav class="share">
     <b-button-group>
+      <StacActions v-if="data" :data="data" variant="outline-primary" size="sm" bare />
       <b-dropdown
         v-if="canManage" size="sm" variant="outline-primary" tabindex="0"
       >
@@ -123,6 +124,7 @@ export default {
     SocialSharing,
     BModal: defineAsyncComponent(() => import('bootstrap-vue-next').then(m => m.BModal)),
     BPopover: defineAsyncComponent(() => import('bootstrap-vue-next').then(m => m.BPopover)),
+    StacActions: defineAsyncComponent(() => import('./StacActions.vue')),
     Validation: defineAsyncComponent(() => import('./Validation.vue'))
   },
   props: {
