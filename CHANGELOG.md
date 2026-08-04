@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Support for the [STAC API - Children extension](https://github.com/stac-api-extensions/children)
 - Search filters are now preserved for collection and item searches
 - Opening a collection from the collection search results carries the search criteria over into its item filters
 - An indicator on the item filter toggle shows when the filters were changed but not applied yet
@@ -22,6 +23,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `multihashes` dependency not required anymore for checksum migration
 - `pl`, `sentinel`, and `xarray` extensions
+
+### Changed
+
+- The children (from the `child` links) and the collections (from the `/collections` endpoint) of an entity are shown as two separate lists by default.
+  The new config option `mergeCatalogsAndCollections` restores the previous merged display.
 
 ### Fixed
 

@@ -46,11 +46,27 @@
       <b-col class="catalogs-container" v-if="hasCatalogs">
         <WidgetHook id="view-catalog-catalogs-start" />
         <Catalogs
-          :apiSearch="hasApiCollections" :catalogs="catalogs" :hasMore="hasMore"
+          v-if="mergeCatalogsAndCollections"
+          :apiSearch="hasApiCollections" :catalogs="catalogs" :hasMore="hasMore || hasMoreChildren"
           showControls
-          @load-more="loadMoreCollections" @search="searchCollections"
-          :loading="Boolean(loadingCollections) || loadingNextCollectionsPage" :loadingMore="loadingCollections === 'more' || loadingNextCollectionsPage"
+          @load-more="loadMoreMerged" @search="searchCollections"
+          :loading="Boolean(loadingCollections) || loadingNextCollectionsPage || loadingChildren" :loadingMore="loadingCollections === 'more' || loadingNextCollectionsPage || loadingChildren"
         />
+        <template v-else>
+          <Catalogs
+            v-if="showChildrenSection" :catalogs="childCatalogs" :hasMore="hasMoreChildren"
+            showControls
+            @load-more="loadMoreChildren"
+            :loading="loadingChildren" :loadingMore="loadingChildren && childCatalogs.length > 0"
+          />
+          <Catalogs
+            v-if="showCollectionsSection" collectionsOnly
+            :apiSearch="hasApiCollections" :catalogs="collections" :hasMore="hasMore"
+            showControls
+            @load-more="loadMoreCollections" @search="searchCollections"
+            :loading="Boolean(loadingCollections) || loadingNextCollectionsPage" :loadingMore="loadingCollections === 'more' || loadingNextCollectionsPage"
+          />
+        </template>
         <WidgetHook id="view-catalog-catalogs-end" />
       </b-col>
       <b-col class="items-container" v-if="hasItems || hasItemAssets">
@@ -124,8 +140,8 @@ export default defineComponent({
     };
   },
   computed: {
-    ...mapState(['data', 'apiCatalogPriority', 'apiItemsLink', 'apiItemsPagination', 'apiItemsNumberMatched', 'nextCollectionsLink', 'stateQueryParameters']),
-    ...mapGetters(['catalogs', 'collectionLink', 'isApiChildrenLoading', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
+    ...mapState(['data', 'apiCatalogPriority', 'apiItemsLink', 'apiItemsPagination', 'apiItemsNumberMatched', 'mergeCatalogsAndCollections', 'nextCollectionsLink', 'stateQueryParameters']),
+    ...mapGetters(['catalogs', 'childCatalogs', 'collections', 'collectionLink', 'getApiChildren', 'isApiChildrenLoading', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
     ignoredMetadataFields() {
       return getIgnoredFields(this.data, 'CatalogLike');
     },
@@ -157,7 +173,7 @@ export default defineComponent({
     },
     loadingNextCollectionsPage() {
       // Pages may also be loading through other components, e.g. the tree
-      return this.isApiChildrenLoading(this.data);
+      return this.isApiChildrenLoading(this.data, 'collections');
     },
     licenses() {
       if (this.data.license) {
@@ -212,8 +228,26 @@ export default defineComponent({
     hasItems() {
       return this.items.length > 0 || this.hasApiItems;
     },
+    hasApiChildren() {
+      return Boolean(this.data?.isCatalogLike && this.data.getApiChildrenLink()) && this.apiCatalogPriority !== 'collections';
+    },
+    hasMoreChildren() {
+      return this.hasApiChildren && Boolean(this.getApiChildren(this.data, 'children')?.next);
+    },
+    loadingChildren() {
+      return this.isApiChildrenLoading(this.data, 'children');
+    },
+    showChildrenSection() {
+      return this.childCatalogs.length > 0 || this.hasApiChildren;
+    },
+    showCollectionsSection() {
+      return this.collections.length > 0 || this.hasApiCollections || this.isSearchingCollections;
+    },
     hasCatalogs() {
-      return this.catalogs.length > 0 || this.hasApiCollections || this.isSearchingCollections;
+      if (this.mergeCatalogsAndCollections) {
+        return this.catalogs.length > 0 || this.hasApiCollections || this.hasApiChildren || this.isSearchingCollections;
+      }
+      return this.showChildrenSection || this.showCollectionsSection;
     },
     mapData() {
       const data = {};
@@ -279,6 +313,26 @@ export default defineComponent({
   methods: {
     filtersShown(show) {
       this.$store.commit('updateState', {type: 'itemFilterOpen', value: show ? 1 : null});
+    },
+    async loadMoreChildren() {
+      try {
+        await this.$store.dispatch('loadApiChildren', { stac: this.data, next: true });
+      } catch (error) {
+        this.$store.commit('showGlobalError', {
+          error,
+          message: this.$t('errors.loadApiChildrenFailed')
+        });
+      }
+    },
+    async loadMoreMerged() {
+      const promises = [];
+      if (this.hasMoreChildren) {
+        promises.push(this.loadMoreChildren());
+      }
+      if (this.hasMore) {
+        promises.push(this.loadMoreCollections());
+      }
+      await Promise.all(promises);
     },
     async loadMoreCollections() {
       const requestId = this.currentSearchRequestId;
