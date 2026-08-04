@@ -53,6 +53,26 @@ test.describe('Collection Metadata', () => {
     await expect(page.getByText(new RegExp(start))).toBeVisible();
   });
 
+  // Regression test for https://github.com/radiantearth/stac-browser/issues/954
+  // An open-ended temporal extent ("{0} until present") dropped its start date in
+  // non-English languages because interpolation values were passed to vue-i18n as
+  // options instead of values, resolving {0} to an empty string.
+  test('Catalog - open-ended temporal extent keeps its start date in non-English languages', async ({ page, worker }) => {
+    const { catalog, collection } = createStaticCatalog();
+    await catalog.createServer(worker);
+
+    await page.goto(`${collection.getBrowserPath()}?.language=de`);
+    await waitForBrowserReady(page);
+
+    // Default collection fixture has an open-ended interval, e.g. ["2020-01-01T00:00:00Z", null].
+    const year = collection.getMetadata().extent.temporal.interval[0][0].slice(0, 4);
+    const temporalValue = page.locator('section.metadata .row', { hasText: 'Zeitliche Ausdehnung' }).locator('.value');
+    // The start date must be present alongside the German "until present" marker,
+    // not just "bis jetzt" on its own.
+    await expect(temporalValue).toContainText(year);
+    await expect(temporalValue).toContainText('bis jetzt');
+  });
+
   test('API - should load and display collection metadata', async ({ page, worker }) => {
     const { api, collection } = createAPI();
     

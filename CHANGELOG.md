@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - The Search page restores the previous results when returning to it
+- Temporal extents were incomplete in non-English languages
 
 ## [5.0.0] - 2026-07-31
 
