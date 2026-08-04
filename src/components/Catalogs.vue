@@ -330,8 +330,10 @@ export default defineComponent({
 
   > .additional-filter-link {
     flex-grow: 0;
-    align-self: center;
     white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }
 </style>
