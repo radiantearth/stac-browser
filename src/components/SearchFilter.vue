@@ -515,9 +515,10 @@ export default defineComponent({
       this.updateApiCollections();
     },
     'activeParams.collections': {
-      immediate: true,
       deep: true,
       handler(vuexCollections) {
+        this.syncVuexToUrl();
+        
         const activeCollections = vuexCollections || [];
         
         const currentSelectedIds = (this.selectedCollections || []).map(c => c.value);
@@ -604,6 +605,14 @@ export default defineComponent({
     formId++;
   },
   created() {
+    const hasUrlFilters = this.rebuildFromUrl();
+    if (hasUrlFilters) {
+      this.$nextTick(() => {
+        this.$emit('input', this.activeParams);
+      });
+    }
+    this.syncVuexToUrl();
+
     let promises = [];
     if (this.stac && this.type !== 'Collections') {
       if (this.cql) {
@@ -649,6 +658,62 @@ export default defineComponent({
     });
   },
   methods: {
+    syncVuexToUrl() {
+      const params = this.activeParams || {};
+      const fieldsToSync = ['q', 'datetime', 'bbox', 'limit', 'collections', 'ids', 'sortby'];
+
+      fieldsToSync.forEach(field => {
+        const value = params[field];
+        let urlValue = value;
+
+        if (value === null || value === undefined || value === '' || (Array.isArray(value) && value.length === 0)) {
+          urlValue = undefined;
+        } else if (Array.isArray(value)) {
+          if (field === 'datetime') {
+            urlValue = value.map(d => d instanceof Date ? d.toISOString() : d).join('/');
+          } else {
+            urlValue = value.join(',');
+          }
+        }
+
+        this.$store.commit('updateState', { 
+          type: `s.${field}`, 
+          value: urlValue 
+        });
+      });
+    },
+
+    rebuildFromUrl() {
+      const sqp = this.$store.state.stateQueryParameters;
+      let foundFiltersInUrl = false;
+      
+      for (const [key, value] of Object.entries(sqp)) {
+        if (key.startsWith('s.') && value !== null && value !== undefined) {
+          const field = key.replace('s.', '');
+          let parsedValue = value;
+          
+          if (typeof value === 'string') {
+            const decodedValue = decodeURIComponent(value);
+            
+            if (['q', 'collections', 'ids'].includes(field)) {
+              parsedValue = decodedValue.split(',');
+            } else if (field === 'bbox') {
+              parsedValue = decodedValue.split(',').map(Number);
+            } else if (field === 'datetime') {
+              parsedValue = decodedValue.includes('/') ? decodedValue.split('/') : decodedValue.split(',');
+            } else if (field === 'limit') {
+              parsedValue = Number.parseInt(decodedValue, 10);
+            }
+          }
+          
+          const mutation = this.type === 'Collections' ? 'search/setCollectionFilters' : 'search/setItemFilters';
+          this.$store.commit(mutation, { [field]: parsedValue });
+          foundFiltersInUrl = true;
+        }
+      }
+      
+      return foundFiltersInUrl;
+    },
     resetSearchCollection() {
       clearTimeout(this.collectionsLoadingTimer);
       this.collectionsLoadingTimer = null;
@@ -857,6 +922,9 @@ export default defineComponent({
     commitToVuex(field, value) {
       const mutation = this.type === 'Collections' ? 'search/setCollectionFilters' : 'search/setItemFilters';
       this.$store.commit(mutation, { [field]: value });
+      this.$nextTick(() => {
+        this.syncVuexToUrl();
+      });
     },
     // Selects the sort field and direction stored for this search (e.g.
     // carried over from another search) in the form.
