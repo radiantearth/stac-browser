@@ -43,7 +43,7 @@
             :count="totalCount" :apiFilters="collectionFilters"
             @click="armCarryOver"
           >
-            <template #catalogFooter="slot">
+            <template #footer="slot">
               <b-button-group v-if="itemSearch || canFilterItems(slot.data)" vertical size="sm">
                 <b-button v-if="itemSearch" variant="outline-primary" :pressed="selectedCollections[slot.data.id]" @click="selectForItemSearch(slot.data)">
                   <b-icon-check-square v-if="selectedCollections[slot.data.id]" />
