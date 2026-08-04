@@ -47,6 +47,7 @@
         <WidgetHook id="view-catalog-catalogs-start" />
         <Catalogs
           :apiSearch="hasApiCollections" :catalogs="catalogs" :hasMore="hasMore"
+          showControls
           @load-more="loadMoreCollections" @search="searchCollections"
           :loading="Boolean(loadingCollections) || loadingNextCollectionsPage" :loadingMore="loadingCollections === 'more' || loadingNextCollectionsPage"
         />

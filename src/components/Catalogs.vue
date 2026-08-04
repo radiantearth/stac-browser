@@ -3,10 +3,10 @@
     <header>
       <h2 class="title me-2">{{ displayTitle }}</h2>
       <b-badge v-if="!hideCount && catalogCount !== null" pill variant="secondary" class="me-4">{{ catalogCount }}</b-badge>
-      <ViewButtons v-if="!hideControls" class="me-2" v-model="view" />
-      <SortButtons v-if="!hideControls && isComplete && catalogs.length > 1" v-model="sort.direction" />
+      <ViewButtons v-if="!enforceView && !enforceCards" class="me-2" v-model="view" />
+      <SortButtons v-if="allowSorting" v-model="sort.direction" />
     </header>
-    <section v-if="!hideControls && ((isComplete && catalogs.length > 1) || canSearchFreeText)" class="catalog-filter mb-2">
+    <section v-if="showControls && ((isComplete && catalogs.length > 1) || canSearchFreeText)" class="catalog-filter mb-2">
       <template v-if="canSearchFreeText">
         <multiselect
           multiple taggable @tag="addSearchTerm"
@@ -96,15 +96,11 @@ export default defineComponent({
       default: null,
       validator: value => value === null || ['list', 'cards'].includes(value)
     },
-    hideControls: {
+    showControls: {
       type: Boolean,
       default: false
     },
     hideCount: {
-      type: Boolean,
-      default: false
-    },
-    preserveOrder: {
       type: Boolean,
       default: false
     },
@@ -197,6 +193,9 @@ export default defineComponent({
       }
       return this.allCatalogs.every(obj => obj.isSTAC);
     },
+    allowSorting() {
+      return this.showControls && this.isComplete && this.catalogs.length > 1;
+    },
     filterPlaceholder() {
       return this.isComplete ? this.$t('catalogs.filterByTitleAndMore') : this.$t('catalogs.filterByTitle');
     },
@@ -243,8 +242,7 @@ export default defineComponent({
           return true;
         });
       }
-      // Sort
-      if (!this.preserveOrder && !this.hasMore && !this.apiFilters.sortby && this.sort.direction !== 0) {
+      if (this.allowSorting && !this.apiFilters.sortby && this.sort.direction !== 0) {
         catalogs = sortStac(catalogs, this.sort, this.uiLanguage);
       }
       return catalogs;

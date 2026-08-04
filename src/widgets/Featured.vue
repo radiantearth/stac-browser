@@ -2,7 +2,7 @@
   <Catalogs
     v-if="resolvedEntities.length > 0" class="featured"
     :catalogs="resolvedEntities" :title="heading" :enforceView="view"
-    hideControls hideCount preserveOrder
+    hideCount
   />
 </template>
 
