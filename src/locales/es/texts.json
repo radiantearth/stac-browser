@@ -110,6 +110,7 @@
     "loadApiItemsFailed": "Los elementos de la API no se pudieron cargar.",
     "loadFilteredItems": "Perdón, la carga de una lista de elementos filtrada falló.",
     "loadItems": "Perdón, falló la carga de la lista de elementos STAC.",
+    "missingPermissions": "Las credenciales especificadas para esta solicitud no tienen los permisos requeridos.",
     "networkError": "Este problema puede ocurrir cuando los servidores no permiten acceso externo desde navegadores web (por ejemplo, cuando no hay encabezados CORS). @:errors.contactProvider",
     "noExternalAccess": "¡El acceso a catálogos externos no está permitido!",
     "notFound": "El recurso solicitado no existe. @:errors.contactProvider",
@@ -161,13 +162,30 @@
   },
   "items": {
     "filter": "Filtros",
+    "filterChangesNotApplied": "Los filtros fueron cambiados, pero los cambios aún no se han aplicado.",
     "hideFilter": "Ocultar Filtros",
     "noTime": "No se indicó un tiempo",
     "noneAvailableForCollection": "No hay elementos disponibles para esta colección.",
     "showFilter": "Mostrar Filtros"
   },
   "loading": "Cargando...",
-  "manage": {},
+  "manage": {
+    "addCollection": "Añadir colección",
+    "addItem": "Añadir elemento",
+    "confirmDeleteTitle": "Confirmar borrado",
+    "confirmDeleteMessage": "¿Estás seguro de que quieres borrar este recurso STAC?",
+    "create": "Crear",
+    "delete": "Borrar",
+    "discardDraft": "Descartar cambios restaurados",
+    "draftRestored": "Los cambios no guardados de una sesión anterior fueron restaurados.",
+    "edit": "Editar",
+    "leavePage": "Salir de la página",
+    "save": "Guardar",
+    "noUndo": "Esta acción no se puede deshacer.",
+    "unsavedChangesLeave": "Tiene cambios sin guardar. ¿Seguro que quiere salir de esta página?",
+    "unsavedChangesTitle": "Cambios sin guardar",
+    "validate": "Validar"
+  },
   "map": "Mapa",
   "mapping": {
     "attribution": {
@@ -292,6 +310,7 @@
     "betweenOperatorDescription": "Prueba si el valor de un campo numérico está dentro del rango indicado. El rango es inclusivo.",
     "dateDescription": "Todas las horas en Coordinated Universal Time (UTC).",
     "disabledDueToSingleDate": "El filtro está desactivado porque la colección tiene una única fecha y hora como extensión temporal.",
+    "droppedFilters": "Los siguientes filtros no están soportados aquí y fueron eliminados: {filters}.",
     "enterCollections": "Introduzca una o varias colecciones...",
     "enterItemIds": "Introduzca una o varias IDs de Elemento...",
     "enterSearchTerms": "Introduzca uno o más términos de búsqueda...",
@@ -368,6 +387,7 @@
       "switch": "Cambiar el idioma"
     },
     "locatedAt": "El archivo de metadatos STAC se encuentra en:",
+    "manage": "Administrar",
     "share": {
       "bsky": "Bluesky",
       "email": "E-mail",
