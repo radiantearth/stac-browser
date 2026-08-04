@@ -152,7 +152,7 @@ export default {
       }
     },
     addStacLayer() {
-      let options = Object.assign({}, this.stacLayerOptions, {
+      const options = Object.assign({}, this.stacLayerOptions, {
         // Don't set the URL here, as it is already set in the STAC object and is read-only.
         // url: this.stac.getAbsoluteUrl(),
         data: this.stac,
