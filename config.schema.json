@@ -88,6 +88,11 @@
       "enum": ["history", "hash"],
       "buildOnly": true
     },
+    "RUNTIME": {
+      "type": ["boolean"],
+      "buildOnly": true,
+      "description": "Whether runtime-config.js and runtime-style.css are loaded. Set via the SB_RUNTIME env var at build time, not part of config.js."
+    },
     "cardViewMode": {
       "type": ["string"],
       "enum": ["list", "cards"]
@@ -158,6 +163,10 @@
           "$ref": "https://stac-extensions.github.io/authentication/v1.1.0/schema.json"
         }
       ]
+    },
+    "basemaps": {
+      "type": ["object", "null"],
+      "description": "Show your own basemaps instead of the default ones, e.g. at runtime or via env variables. The default basemaps and code-based customizations live in basemaps.config.js instead of config.js. See docs/basemaps.md for details."
     },
     "transactions": {
       "type": ["string"],

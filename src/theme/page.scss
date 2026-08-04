@@ -77,20 +77,6 @@ svg {
     }
 
     .btn-header {
-      @include button-variant(
-        $background: $header-button-background,
-        $border: $header-button-border-color,
-        $color: $header-color,
-        $hover-background: $header-button-hover-background,
-        $hover-border: $header-hover-button-border-color,
-        $hover-color: $header-hover-color,
-        $active-background: $header-button-active-background,
-        $active-border: $header-hover-button-border-color,
-        $active-color: $header-hover-color,
-        $disabled-background: transparent,
-        $disabled-border: transparent,
-        $disabled-color: rgba($header-color, 0.65)
-      );
       --bs-btn-color: var(--sb-header-color);
       --bs-btn-bg: var(--sb-header-button-background);
       --bs-btn-border-color: var(--sb-header-button-border-color);
@@ -101,6 +87,9 @@ svg {
       --bs-btn-active-bg: var(--sb-header-button-active-background);
       --bs-btn-active-border-color: var(--sb-header-hover-button-border-color);
       --bs-btn-disabled-color: color-mix(in srgb, var(--sb-header-color) 65%, transparent);
+      --bs-btn-disabled-bg: transparent;
+      --bs-btn-disabled-border-color: transparent;
+      --bs-btn-focus-shadow-rgb: #{to-rgb($header-contrast)};
     }
 
     .site {
@@ -136,7 +125,7 @@ svg {
           align-items: center;
           gap: var(--sb-header-font-size);
           color: var(--sb-header-color);
-          text-shadow: $header-text-shadow;
+          text-shadow: var(--sb-header-text-shadow);
 
           a {
             color: var(--sb-header-color);
@@ -201,8 +190,9 @@ svg {
 
           h1 {
             color: var(--sb-h1-color);
-            font-weight: $h1-font-weight;
-            font-size: $h1-font-size;
+            font-weight: var(--sb-h1-font-weight);
+            font-size: var(--sb-h1-font-size);
+            align-items: center;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             line-clamp: 2;
@@ -211,12 +201,12 @@ svg {
           }
           @include media-breakpoint-down(xxl) {
             h1 {
-              font-size: $h1-font-size - 0.2rem;
+              font-size: calc(var(--sb-h1-font-size) - 0.2rem);
             }
           }
           @include media-breakpoint-down(lg) {
             h1 {
-              font-size: $h1-font-size - 0.4rem;
+              font-size: calc(var(--sb-h1-font-size) - 0.4rem);
             }
           }
           @include media-breakpoint-down(md) {
@@ -637,7 +627,7 @@ svg {
     }
 
     .datetime {
-      color: $secondary;
+      color: var(--bs-secondary);
     }
   }
 
@@ -862,41 +852,4 @@ svg {
   .text-bg-dark {
     color: #{$dark} !important;
   }
-}
-
-// Expose STAC Browser custom vars as CSS custom properties.
-// Non-color parts are baked from Sass (build-time theming);
-// color parts reference var(--bs-primary) so they stay live
-// and can be overridden at runtime in runtime-style.css.
-:root {
-  // Sizing & spacing
-  --sb-header-margin: #{$header-margin};
-  --sb-block-gap: #{$block-gap};
-  --sb-code-padding: #{$code-padding};
-  --sb-logo-height: #{$logo-height};
-  --sb-max-icon-size: #{$max-icon-size};
-
-  // Typography
-  --sb-header-font-size: #{$header-font-size};
-  --sb-header-font-weight: #{$header-font-weight};
-
-  // Colors (light mode; dark mode overrides below)
-  --sb-h1-color: #{$h1-color};
-  --sb-subheadings-color: #{$subheadings-color};
-
-  // Main/top header of the website
-  --sb-header: #{$header};
-  --sb-header-background: #{$header-background};
-  --sb-header-color: #{$header-color};
-  --sb-header-hover-color: #{$header-hover-color};
-  --sb-header-button-background: #{$header-button-background};
-  --sb-header-button-border-color: #{$header-button-border-color};
-  --sb-header-button-hover-background: #{$header-button-hover-background};
-  --sb-header-button-active-background: #{$header-button-active-background};
-  --sb-header-hover-button-border-color: #{$header-hover-button-border-color};
-}
-
-[data-bs-theme="dark"] {
-  --sb-h1-color: #{$h1-color-dark};
-  --sb-subheadings-color: #{$subheadings-color-dark};
 }
