@@ -30,7 +30,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Don't show inline sort and filter options in Collection Search
 - Preserve sort in Collection Search
 
+- Separate scrolling for Search, keeping the main search actions visible at all time regardless of how the scrolling of the search results
+
 ## [5.0.0] - 2026-07-31
+
+### Added
+
+- Search filters are now preserved for collection and item searches
+- Opening a collection from the collection search results carries the search criteria over into its item filters
+- An indicator on the item filter toggle shows when the filters were changed but not applied yet
+
+### Fixed
+
+- The Search page restores the previous results when returning to it
+
+## [5.0.0] - 2026-07-30
 
 ### Added
 

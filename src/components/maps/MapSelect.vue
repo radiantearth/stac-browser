@@ -172,12 +172,27 @@ export default {
               extent[2] - extent[0],
               extent[3] - extent[1]
             ];
-            const mouseExtent = [
+            let mouseExtent = [
               event.coordinate[0] - extentSize[0],
               event.coordinate[1] - extentSize[1],
               event.coordinate[0] + extentSize[0],
               event.coordinate[1] + extentSize[1],
             ];
+            // Clamp the default box to the projection's valid world bounds.
+            // When the map is zoomed far out, extentSize can be large enough
+            // that the box runs past the antimeridian and comes back inverted
+            // (west > east) once normalized to EPSG:4326. Clamping only the
+            // click-generated box leaves intentional antimeridian selections
+            // via drag or manual input untouched (see fixX).
+            const worldExtent = this.map.getView().getProjection().getExtent();
+            if (worldExtent) {
+              mouseExtent = [
+                Math.max(worldExtent[0], mouseExtent[0]),
+                Math.max(worldExtent[1], mouseExtent[1]),
+                Math.min(worldExtent[2], mouseExtent[2]),
+                Math.min(worldExtent[3], mouseExtent[3])
+              ];
+            }
             this.interaction.setExtent(mouseExtent);
             return false;
           }
