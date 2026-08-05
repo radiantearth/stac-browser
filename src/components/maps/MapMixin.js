@@ -34,8 +34,11 @@ export default {
         displayOverview: this.displayOverview,
         displayGeoTiffByDefault: this.displayGeoTiffByDefault,
         useTileLayerAsFallback: this.useTileLayerAsFallback,
-        getSourceOptions: this.getSourceOptionsForStacLayer,
+        getSourceOptions: this.getMapSourceOptions,
         getRequestHeaders: this.getRequestHeadersForStacLayer,
+        // Adds the configured query parameters (incl. query-parameter
+        // credentials) to the URLs requested by ol-stac
+        getRequestUrl: (ref, url) => this.getRequestUrl(url),
         httpRequestFn: async (url, responseType) => {
           const response = await this.$store.dispatch('request', { link: url, axiosOptions: { responseType } });
           return response.data;
@@ -73,26 +76,6 @@ export default {
         return this.$store.state.requestHeaders;
       }
       return null;
-    },
-    // Adds the configured query parameters (incl. query-parameter credentials)
-    // to the source URLs before handing over to the user-provided
-    // getMapSourceOptions function from the config.
-    async getSourceOptionsForStacLayer(type, options, data) {
-      if (typeof options.url === 'string') {
-        options.url = this.getRequestUrl(options.url);
-      }
-      // GeoTIFF sources are defined in a list of sources
-      if (Array.isArray(options.sources)) {
-        for (const source of options.sources) {
-          if (typeof source.url === 'string') {
-            source.url = this.getRequestUrl(source.url);
-          }
-        }
-      }
-      if (typeof this.getMapSourceOptions === 'function') {
-        options = await this.getMapSourceOptions(type, options, data);
-      }
-      return options;
     },
     async createMap(element, onfocusOnly = false) {
       let projection = 'EPSG:3857';

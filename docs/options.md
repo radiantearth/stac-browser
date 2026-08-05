@@ -357,7 +357,7 @@ part of the catalog (see [`allowedDomains`](#alloweddomains)), external URLs nev
   header-based credentials are loaded through an authenticated request and shown via an object URL.
   A failed image request does NOT open the login form; the image falls back to loading without headers.
 - The map: GeoTIFF/COG, GeoZarr and PMTiles requests, preview images, XYZ/TileJSON/WMS/WMTS tiles,
-  WMTS capabilities requests (incl. basemaps), and vector tile basemaps
+  TileJSON manifests, WMTS capabilities requests (incl. basemaps), and vector tile basemaps
   (via a default ol-mapbox-style `transformRequest`, see [Basemaps](basemaps.md)).
 - External viewer actions (e.g. geojson.io, see `assetActions.config.js`) are hidden when the data
   requires header-based credentials, as external services can't receive them. With query-based
@@ -365,8 +365,6 @@ part of the catalog (see [`allowedDomains`](#alloweddomains)), external URLs nev
 
 Known limitations:
 
-- Vector tile basemaps (via ol-mapbox-style) don't receive credentials.
-- The TileJSON manifest request (made internally by OpenLayers) doesn't receive HTTP headers.
 - Header-based credentials for images and tiles require the server to allow the headers in
   CORS preflight requests (the Fetch API is stricter than plain `<img>` elements).
 - Cookie-based authentication works independently of all this via [`crossOriginMedia: 'use-credentials'`](#crossoriginmedia).
@@ -525,10 +523,11 @@ Corresponds to the ol-stac parameter `getSourceOptions`:
 
 > Optional function that can be used to configure the underlying sources. The function can do any additional work and return the completed options or a promise for the same. The function will be called with the current source options and the STAC Asset or Link.
 
-STAC Browser first applies the configured query parameters (incl. query-based credentials from
-[`authConfig`](#authconfig)) to the source URLs and then calls the function provided here, so the
-options already contain the final URLs. Header-based credentials are attached separately through
-the ol-stac option `getRequestHeaders` and don't need to be handled here.
+STAC Browser applies the configured query parameters (incl. query-based credentials from
+[`authConfig`](#authconfig)) to the URLs through the ol-stac option `getRequestUrl`, which runs
+before the function provided here, so the options already contain the final URLs. Header-based
+credentials are attached separately through the ol-stac option `getRequestHeaders`.
+Neither needs to be handled here.
 
 The function that can be provided for getMapSourceOptions has the following signature:
 

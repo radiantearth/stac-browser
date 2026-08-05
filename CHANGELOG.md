@@ -12,8 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Complete authentication support for all supported methods ([#800](https://github.com/radiantearth/stac-browser/issues/800)):
   - Thumbnails, icons and logos are loaded with the configured credentials
     (header-based credentials via authenticated requests and object URLs, as `<img>` can't send HTTP headers)
-  - Map data (GeoTIFF/COG, GeoZarr, preview images, XYZ/TileJSON/WMS/WMTS tiles, PMTiles metadata)
-    is loaded with the configured credentials (via ol-stac's new `getRequestHeaders` option and URL rewriting)
+  - Map data (GeoTIFF/COG, GeoZarr, PMTiles, preview images, XYZ/TileJSON/WMS/WMTS tiles, TileJSON manifests)
+    is loaded with the configured credentials (via ol-stac's new `getRequestHeaders` and `getRequestUrl` options)
   - WMTS capabilities requests (incl. basemaps) are loaded with the configured credentials
   - Vector tile basemaps (ol-mapbox-style) are loaded with the configured credentials through a
     default `transformRequest`; a `transformRequest` defined in `basemaps.config.js` takes precedence

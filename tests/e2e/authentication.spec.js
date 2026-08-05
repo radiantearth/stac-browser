@@ -391,6 +391,42 @@ test.describe('Authenticated map layers', () => {
     expect(requests[0].url).toContain('API_KEY=secret');
   });
 
+  const TILEJSON_URL = 'https://stac.example/manifest.json';
+
+  function addTileJsonLink(item) {
+    item.data.links.push({
+      rel: 'tilejson',
+      href: TILEJSON_URL,
+      type: 'application/json',
+    });
+  }
+
+  test('TileJSON manifest requests on the map carry the auth header', async ({ page, worker }) => {
+    await configureBrowser(page, HEADER_AUTH);
+    const catalog = createStaticCatalog();
+    const item = catalog.addItem({ url: ITEM_URL });
+    addTileJsonLink(item);
+    await catalog.createServer(worker);
+    const requests = await recordRequests(worker, TILEJSON_URL);
+    await loginOnItemPage(page, worker, item, hasHeader('x-api-key', 'secret'));
+
+    await expect.poll(() => requests.length, { timeout: 15000 }).toBeGreaterThan(0);
+    expect(requests[0].apiKey).toBe('secret');
+  });
+
+  test('TileJSON manifest requests on the map carry the private query parameter', async ({ page, worker }) => {
+    await configureBrowser(page, QUERY_AUTH);
+    const catalog = createStaticCatalog();
+    const item = catalog.addItem({ url: ITEM_URL });
+    addTileJsonLink(item);
+    await catalog.createServer(worker);
+    const requests = await recordRequests(worker, TILEJSON_URL);
+    await loginOnItemPage(page, worker, item, hasQuery('API_KEY', 'secret'));
+
+    await expect.poll(() => requests.length, { timeout: 15000 }).toBeGreaterThan(0);
+    expect(requests[0].url).toContain('API_KEY=secret');
+  });
+
   function addGeoZarrAsset(item) {
     item.data.assets.zarr = {
       href: ZARR_URL,
