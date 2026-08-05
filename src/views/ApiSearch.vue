@@ -136,7 +136,7 @@ export default defineComponent({
       return null;
     },
     supportsSearch() {
-      return this.canSearchCollections || this.canSearchItems;
+      return this.collectionSearch || this.itemSearch;
     },
     searchLink() {
       return this.isCollectionSearch ? this.collectionSearch : this.itemSearch;

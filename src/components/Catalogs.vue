@@ -3,7 +3,7 @@
     <header>
       <h2 class="title me-2">{{ displayTitle }}</h2>
       <b-badge v-if="!hideCount && catalogCount !== null" pill variant="secondary" class="me-4">{{ catalogCount }}</b-badge>
-      <ViewButtons v-if="!enforceView && !enforceCards" class="me-2" v-model="view" />
+      <ViewButtons v-if="!enforceView" class="me-2" v-model="view" />
       <SortButtons v-if="allowSorting" v-model="sort.direction" />
     </header>
     <section v-if="showControls && ((isComplete && catalogs.length > 1) || canSearchFreeText)" class="catalog-filter mb-2">
@@ -86,10 +86,6 @@ export default defineComponent({
     collectionsOnly: {
       type: Boolean,
       required: false
-    },
-    enforceCards: {
-      type: Boolean,
-      default: false
     },
     enforceView: {
       type: String,
@@ -180,8 +176,8 @@ export default defineComponent({
       if (this.title !== null) {
         return this.title;
       }
-      let key = (this.collectionsOnly || this.catalogs.every(catalog => catalog.isCollection)) ? 'stacCollection' : 'stacCatalog';
-      return this.$t(key, this.catalogs.length );
+      let key = (this.collectionsOnly || this.allCatalogs.every(catalog => catalog.isCollection)) ? 'stacCollection' : 'stacCatalog';
+      return this.$t(key, this.allCatalogs.length );
     },
     isComplete() {
       if (this.hasMore || this.showPagination) {
@@ -264,13 +260,10 @@ export default defineComponent({
         if (this.enforceView) {
           return this.enforceView;
         }
-        if (this.enforceCards) {
-          return 'cards';
-        }
         return this.$store.state.cardViewMode;
       },
       async set(cardViewMode) {
-        if (this.enforceView || this.enforceCards) {
+        if (this.enforceView) {
           return;
         }
         await this.$store.dispatch('config', { cardViewMode });
