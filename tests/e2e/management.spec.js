@@ -151,8 +151,9 @@ test.describe('Management - capability gating', () => {
     menu = await openManageMenu(page);
     await menu.getByRole('menuitem', { name: 'Add Item' }).click();
 
-    // Let the async loads settle to ensure the page doesn't fall back into a broken state
-    await page.waitForTimeout(2500);
+    // Let the async loads (delayed by the slow-network route) settle so a late
+    // response can't leave the page in a broken state after we assert.
+    await page.waitForLoadState('networkidle');
     await expect(page.getByRole('heading', { name: /add item/i })).toBeVisible();
     await expect(page.locator('.cm-content')).toContainText('"type": "Feature"');
     await expect(page.getByRole('button', { name: /manage/i })).toBeVisible();
@@ -377,8 +378,14 @@ async function replaceEditorContent(page, text) {
   await editor.click();
   await page.keyboard.press('ControlOrMeta+a');
   await page.keyboard.type(text);
-  // Let the debounced draft write (1s) settle
-  await page.waitForTimeout(1500);
+  // Wait for the debounced draft write (1s) to reach localStorage, stored under
+  // a `draft:<mode>:<path>` key with the typed content JSON-encoded in it.
+  await expect
+    .poll(() => page.evaluate(() => {
+      const key = Object.keys(window.localStorage).find(k => k.startsWith('draft:'));
+      return key ? window.localStorage.getItem(key) : null;
+    }))
+    .toContain(JSON.stringify(text));
 }
 
 test.describe('Management - drafts and leave guards', () => {
@@ -431,6 +438,13 @@ test.describe('Management - drafts and leave guards', () => {
     const putRequest = page.waitForRequest(req => req.method() === 'PUT');
     await page.getByRole('button', { name: 'Save' }).click();
     await putRequest;
+
+    // The draft is cleared by the save-success handler, which runs after the
+    // request is sent. Wait for that side effect before reloading, otherwise the
+    // reload can race it and restore the stale draft.
+    await expect
+      .poll(() => page.evaluate(() => Object.keys(window.localStorage).some(k => k.startsWith('draft:'))))
+      .toBe(false);
 
     page.once('dialog', dialog => dialog.accept());
     await page.reload();

@@ -104,7 +104,10 @@ export function translateFields(value, vars = null) {
   }
   let key = `fields.${value}`;
   if (i18n.global.te(key)) {
-    return i18n.global.t(key, null, vars);
+    // Pass interpolation values (e.g. {0}) as the second argument. Passing them
+    // as the third argument makes vue-i18n treat them as options and drops the
+    // placeholders, resulting in incomplete texts (see #954).
+    return vars ? i18n.global.t(key, vars) : i18n.global.t(key);
   }
   return Fields.format(value, vars);
 }

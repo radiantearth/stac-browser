@@ -406,7 +406,7 @@ test.describe('STAC Browser Search page', () => {
       await submitButton.click();
         
       // Wait for item cards to appear
-      await expect(page.locator('.item-card')).toHaveCount(5, { timeout: 10000 });
+      await expect(page.locator('.item-card')).toHaveCount(5);
     });
       
     await test.step('Verify each result item title is displayed', async () => {
@@ -435,7 +435,7 @@ test.describe('STAC Browser Search page', () => {
     });
       
     await test.step('Verify "no items found" message appears', async () => {
-      await expect(page.getByText(/no items found for the given filters/i)).toBeVisible({ timeout: 10000 });
+      await expect(page.getByText(/no items found for the given filters/i)).toBeVisible();
     });
       
     await test.step('Verify no item cards are rendered', async () => {
@@ -466,7 +466,7 @@ test.describe('STAC Browser Search page', () => {
       const submitButton = page.getByRole('button', { name: /submit/i });
       await submitButton.click();
         
-      await expect(page.locator('.item-card')).toHaveCount(9, { timeout: 10000 });
+      await expect(page.locator('.item-card')).toHaveCount(9);
     });
       
     await test.step('Verify items count badge is displayed', async () => {
@@ -529,7 +529,7 @@ test.describe('STAC Browser Search page', () => {
         
     await test.step('Submit search and verify first page shows 5 items', async () => {
       await page.getByRole('button', { name: /submit/i }).click();
-      await expect(itemCards).toHaveCount(5, { timeout: 10000 });
+      await expect(itemCards).toHaveCount(5);
     });
         
     await test.step('Next button is enabled, Previous is disabled on first page', async () => {
@@ -539,7 +539,7 @@ test.describe('STAC Browser Search page', () => {
         
     await test.step('Click Next and verify second page shows 5 items', async () => {
       await nextButton.click();
-      await expect(itemCards).toHaveCount(5, { timeout: 10000 });
+      await expect(itemCards).toHaveCount(5);
     });
         
     await test.step('Both Next and Previous are enabled on middle page', async () => {
@@ -549,7 +549,7 @@ test.describe('STAC Browser Search page', () => {
         
     await test.step('Click Next and verify third page shows 3 items', async () => {
       await nextButton.click();
-      await expect(itemCards).toHaveCount(3, { timeout: 10000 });
+      await expect(itemCards).toHaveCount(3);
     });
         
     await test.step('Previous is enabled, Next is disabled on last page', async () => {
@@ -559,7 +559,7 @@ test.describe('STAC Browser Search page', () => {
         
     await test.step('Click Previous and verify middle page items are restored', async () => {
       await prevButton.click();
-      await expect(itemCards).toHaveCount(5, { timeout: 10000 });
+      await expect(itemCards).toHaveCount(5);
       await expect(nextButton).toBeEnabled();
       await expect(prevButton).toBeEnabled();
     });
@@ -596,7 +596,7 @@ test.describe('STAC Browser Search page', () => {
         
     await test.step('Submit search and verify first page', async () => {
       await page.getByRole('button', { name: /submit/i }).click();
-      await expect(itemCards).toHaveCount(5, { timeout: 10000 });
+      await expect(itemCards).toHaveCount(5);
     });
         
     await test.step('First is disabled, Last is visible on first page', async () => {
@@ -606,7 +606,7 @@ test.describe('STAC Browser Search page', () => {
         
     await test.step('Click Last to jump to the last page', async () => {
       await lastButton.click();
-      await expect(itemCards).toHaveCount(3, { timeout: 10000 });
+      await expect(itemCards).toHaveCount(3);
       await expect(nextButton).toBeDisabled();
       await expect(prevButton).toBeEnabled();
       await expect(firstButton).toBeEnabled();
@@ -614,7 +614,7 @@ test.describe('STAC Browser Search page', () => {
         
     await test.step('Click First to jump back to the first page', async () => {
       await firstButton.click();
-      await expect(itemCards).toHaveCount(5, { timeout: 10000 });
+      await expect(itemCards).toHaveCount(5);
       await expect(nextButton).toBeEnabled();
       await expect(prevButton).toBeDisabled();
       await expect(firstButton).toBeDisabled();
@@ -622,21 +622,21 @@ test.describe('STAC Browser Search page', () => {
         
     await test.step('Navigate to middle page and verify First/Last both enabled', async () => {
       await nextButton.click();
-      await expect(itemCards).toHaveCount(5, { timeout: 10000 });
+      await expect(itemCards).toHaveCount(5);
       await expect(firstButton).toBeEnabled();
       await expect(lastButton).toBeEnabled();
     });
         
     await test.step('Click Last from middle page skips to last page', async () => {
       await lastButton.click();
-      await expect(itemCards).toHaveCount(3, { timeout: 10000 });
+      await expect(itemCards).toHaveCount(3);
       await expect(nextButton).toBeDisabled();
       await expect(firstButton).toBeEnabled();
     });
         
     await test.step('Click First from last page skips to first page', async () => {
       await firstButton.click();
-      await expect(itemCards).toHaveCount(5, { timeout: 10000 });
+      await expect(itemCards).toHaveCount(5);
       await expect(prevButton).toBeDisabled();
       await expect(firstButton).toBeDisabled();
     });
@@ -826,7 +826,7 @@ test.describe('STAC Browser Search page', () => {
       expect(resetReq.url()).not.toMatch(/[?&]limit=/);
     });
   });
-    test('Spatial extent is preserved when switching from Collections tab to Items tab', async ({ page, worker }) => {
+  test('Spatial extent is preserved when switching from Collections tab to Items tab', async ({ page, worker }) => {
     api = API.minimalApi(
       {},
       {

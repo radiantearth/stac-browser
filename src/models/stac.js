@@ -19,10 +19,6 @@ export function processSTAC(stac, store) {
 }
 
 export function createSTAC(data, url = null, store = null, incomplete = false) {
-  // Uncomment this line if the old checksum: fields should be converted
-  // This is usually not needed so it's not enabled by default to shrink the bundle size
-  // Migrate.enableMultihash(require('multihashes'));
-
   // Migrate STAC to latest version
   let original = data._original ?? structuredClone(data);
   data = Migrate.stac(data, false);

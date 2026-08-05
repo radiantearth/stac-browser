@@ -66,7 +66,7 @@ export default class Instance {
     return obj;
   }
   
-  async createServer(worker, options) {
+  async createServer(worker = null, options = {}) {
     options = { reset: true, verbose: false, ...options };
     const handlers = [];
     
@@ -114,16 +114,17 @@ export default class Instance {
         console.log(`failed to add handler for ${endpoint.getAbsoluteUrl()}. Reason:`, e);
       }
     }
-    
-    if (options.reset) {
-      await worker.resetHandlers();
-    }
-    
-    try {
-      await worker.use(...handlers);
-    } catch (e) {
-      options.verbose && console.log(`Endpoints added. Passing handlers to worker`);
-      console.log(`Worker failed to use handlers:`, e);
+
+    options.verbose && console.log(`Endpoints added`);
+    if (worker) {
+      if (options.reset) {
+        await worker.resetHandlers();
+      }
+      try {
+        await worker.use(...handlers);
+      } catch (e) {
+        console.log(`Worker failed to use handlers:`, e);
+      }
     }
   }
 }

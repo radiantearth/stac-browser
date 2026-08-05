@@ -29,7 +29,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/radiantearth/stac-browser.git"
+    "url": "git+https://github.com/radiantearth/stac-browser.git"
   },
   "funding": {
     "type": "github",
@@ -56,8 +56,8 @@
     "@codemirror/search": "^6.7.1",
     "@codemirror/view": "^6.43.5",
     "@musement/iso-duration": "^1.0.0",
-    "@radiantearth/stac-fields": "~1.5.9",
-    "@radiantearth/stac-migrate": "~2.0.2",
+    "@radiantearth/stac-fields": "~1.6.1",
+    "@radiantearth/stac-migrate": "~2.1.0",
     "@turf/mask": "^7.2.0",
     "@vuepic/vue-datepicker": "^12.1.0",
     "@vueuse/core": "^14.2.1",
@@ -74,7 +74,7 @@
     "proj4": "^2.16.1",
     "remove-markdown": "^0.6.2",
     "shiki": "^3.22.0",
-    "stac-js": "^0.5.3",
+    "stac-js": "^0.5.4",
     "stac-node-validator": "2.0.0-rc.3",
     "streamsaver-js": "^2.0.7",
     "urijs": "^1.19.11",

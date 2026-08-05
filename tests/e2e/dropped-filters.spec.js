@@ -48,11 +48,16 @@ const goToCollectionSearchTab = async (page, browserPath) => {
 // The panel opens automatically when filters were carried over, so only click
 // the toggle while it is still closed.
 const openItemFilterPanel = async (page) => {
-  const toggle = page.getByRole('button', { name: /show filters/i });
-  if (await toggle.isVisible()) {
+  // Key off the toggle's real expanded state (kept in aria-expanded by the
+  // collapse) rather than a visibility snapshot, which races the async chunk
+  // load and can skip the click or toggle an already-open panel.
+  const toggle = page.locator('[aria-controls="itemFilter"]');
+  await expect(toggle).toBeVisible();
+  if ((await toggle.getAttribute('aria-expanded')) !== 'true') {
     await toggle.click();
   }
-  await waitForBrowserReady(page);
+  await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+  await expect(page.locator('.limit').first()).toBeVisible();
 };
 
 test.describe('Dropped filter banner — collection search to collection navigation', () => {
@@ -63,13 +68,13 @@ test.describe('Dropped filter banner — collection search to collection navigat
     api = API.minimalApi({}, { defaultLimit: 10 });
 
     const sentinel = api.addCollection('sentinel-2-l2a')
-        .setMetadata({ title: 'Sentinel-2 L2A' });
+      .setMetadata({ title: 'Sentinel-2 L2A' });
     const landsat = api.addCollection('landsat-8')
-        .setMetadata({ title: 'Landsat 8' });
+      .setMetadata({ title: 'Landsat 8' });
 
     api.addCollectionsExtension()
-    .addItemsExtension()
-    .addSearchExtension();
+      .addItemsExtension()
+      .addSearchExtension();
 
     api.addManyItems(sentinel, 3);
     api.addManyItems(landsat, 3);
@@ -81,7 +86,7 @@ test.describe('Dropped filter banner — collection search to collection navigat
 
     await api.createServer(worker);
     BROWSER_PATH = api.root.getBrowserPath();
- });
+  });
 
   test('Free-text banner appears when navigating from collection search into a collection', async ({ page }) => {
     await test.step('Navigate to collection search tab', async () => {
@@ -100,7 +105,7 @@ test.describe('Dropped filter banner — collection search to collection navigat
 
     await test.step('Click into a collection result', async () => {
       const collectionLink = page.getByText('Sentinel-2 L2A', { exact: false }).first();
-      await expect(collectionLink).toBeVisible({ timeout: 10000 });
+      await expect(collectionLink).toBeVisible();
       await collectionLink.click();
       await waitForBrowserReady(page);
     });
@@ -111,7 +116,7 @@ test.describe('Dropped filter banner — collection search to collection navigat
 
     await test.step('Verify free-text banner appears', async () => {
       const banner = page.locator('.alert-warning').first();
-      await expect(banner).toBeVisible({ timeout: 10000 });
+      await expect(banner).toBeVisible();
       await expect(banner).toContainText(/Search Terms/i);
       await expect(banner).toContainText(/removed/i);
     });
@@ -129,7 +134,7 @@ test.describe('Dropped filter banner — collection search to collection navigat
 
     await test.step('Navigate into a collection', async () => {
       const collectionLink = page.getByText('Sentinel-2 L2A', { exact: false }).first();
-      await expect(collectionLink).toBeVisible({ timeout: 10000 });
+      await expect(collectionLink).toBeVisible();
       await collectionLink.click();
       await waitForBrowserReady(page);
     });
@@ -140,7 +145,7 @@ test.describe('Dropped filter banner — collection search to collection navigat
 
     await test.step('Verify banner lists all dropped terms', async () => {
       const banner = page.locator('.alert-warning').first();
-      await expect(banner).toBeVisible({ timeout: 10000 });
+      await expect(banner).toBeVisible();
       await expect(banner).toContainText(/Search Terms/i);
     });
   });
@@ -156,7 +161,7 @@ test.describe('Dropped filter banner — collection search to collection navigat
 
     await test.step('Navigate into a collection', async () => {
       const collectionLink = page.getByText('Sentinel-2 L2A', { exact: false }).first();
-      await expect(collectionLink).toBeVisible({ timeout: 10000 });
+      await expect(collectionLink).toBeVisible();
       await collectionLink.click();
       await waitForBrowserReady(page);
     });
@@ -166,16 +171,16 @@ test.describe('Dropped filter banner — collection search to collection navigat
     });
 
     await test.step('Verify banner renders above the filter form fields', async () => {
-        const banner = page.locator('.alert-warning').first();
-        const limitGroup = page.locator('.limit').first();
+      const banner = page.locator('.alert-warning').first();
+      const limitGroup = page.locator('.limit').first();
 
-        await expect(banner).toBeVisible({ timeout: 10000 });
-        await expect(limitGroup).toBeVisible();
+      await expect(banner).toBeVisible();
+      await expect(limitGroup).toBeVisible();
 
-        const bannerBox = await banner.boundingBox();
-        const limitBox = await limitGroup.boundingBox();
-        expect(bannerBox.y).toBeLessThan(limitBox.y);
-        });
+      const bannerBox = await banner.boundingBox();
+      const limitBox = await limitGroup.boundingBox();
+      expect(bannerBox.y).toBeLessThan(limitBox.y);
+    });
   });
 
   test('Free-text banner can be dismissed independently and disappears', async ({ page }) => {
@@ -186,7 +191,7 @@ test.describe('Dropped filter banner — collection search to collection navigat
       await page.getByRole('button', { name: /submit/i }).click();
       await waitForBrowserReady(page);
       const collectionLink = page.getByText('Sentinel-2 L2A', { exact: false }).first();
-      await expect(collectionLink).toBeVisible({ timeout: 10000 });
+      await expect(collectionLink).toBeVisible();
       await collectionLink.click();
       await waitForBrowserReady(page);
     });
@@ -197,10 +202,10 @@ test.describe('Dropped filter banner — collection search to collection navigat
 
     await test.step('Dismiss the free-text banner', async () => {
       const banner = page.locator('.alert-warning').first();
-      await expect(banner).toBeVisible({ timeout: 10000 });
+      await expect(banner).toBeVisible();
       const dismissButton = banner.locator('button.btn-close').first();
       await dismissButton.click();
-      await expect(banner).not.toBeVisible({ timeout: 5000 });
+      await expect(banner).not.toBeVisible();
     });
   });
 
@@ -219,7 +224,7 @@ test.describe('Dropped filter banner — collection search to collection navigat
 
     await test.step('Navigate into a collection', async () => {
       const collectionLink = page.getByText('Sentinel-2 L2A', { exact: false }).first();
-      await expect(collectionLink).toBeVisible({ timeout: 10000 });
+      await expect(collectionLink).toBeVisible();
       await collectionLink.click();
       await waitForBrowserReady(page);
     });
@@ -232,7 +237,7 @@ test.describe('Dropped filter banner — collection search to collection navigat
     // into the collection and nothing needs to be reported
     await test.step('No banner appears for a sort-only search', async () => {
       const banner = page.locator('.alert-warning').first();
-      await expect(banner).not.toBeVisible({ timeout: 5000 });
+      await expect(banner).not.toBeVisible();
     });
   });
 
@@ -248,7 +253,7 @@ test.describe('Dropped filter banner — collection search to collection navigat
 
     await test.step('Navigate into a collection', async () => {
       const collectionLink = page.getByText('Sentinel-2 L2A', { exact: false }).first();
-      await expect(collectionLink).toBeVisible({ timeout: 10000 });
+      await expect(collectionLink).toBeVisible();
       await collectionLink.click();
       await waitForBrowserReady(page);
     });
@@ -261,7 +266,7 @@ test.describe('Dropped filter banner — collection search to collection navigat
     // named in the banner next to the dropped search terms
     await test.step('Banner names both the search terms and the sort', async () => {
       const banner = page.locator('.alert-warning').first();
-      await expect(banner).toBeVisible({ timeout: 10000 });
+      await expect(banner).toBeVisible();
       await expect(banner).toContainText(/Search Terms/i);
       await expect(banner).toContainText(/sort/i);
     });
@@ -278,7 +283,7 @@ test.describe('Dropped filter banner — collection search to collection navigat
 
     await test.step('Click directly into first collection — oldData is undefined here', async () => {
       const collectionLink = page.getByText('Sentinel-2 L2A', { exact: false }).first();
-      await expect(collectionLink).toBeVisible({ timeout: 10000 });
+      await expect(collectionLink).toBeVisible();
       await collectionLink.click();
       await waitForBrowserReady(page);
     });
@@ -289,7 +294,7 @@ test.describe('Dropped filter banner — collection search to collection navigat
 
     await test.step('Banner appears even though no previous collection was loaded', async () => {
       const banner = page.locator('.alert-warning').first();
-      await expect(banner).toBeVisible({ timeout: 10000 });
+      await expect(banner).toBeVisible();
       await expect(banner).toContainText(/Search Terms/i);
     });
   });
@@ -302,7 +307,7 @@ test.describe('Dropped filter banner — collection search to collection navigat
 
     await test.step('Click into a collection directly', async () => {
       const collectionLink = page.getByText('Sentinel-2 L2A', { exact: false }).first();
-      await expect(collectionLink).toBeVisible({ timeout: 10000 });
+      await expect(collectionLink).toBeVisible();
       await collectionLink.click();
       await waitForBrowserReady(page);
     });
@@ -312,7 +317,6 @@ test.describe('Dropped filter banner — collection search to collection navigat
     });
 
     await test.step('Verify no banner appears', async () => {
-      await page.waitForTimeout(500);
       await expect(page.locator('.alert-warning')).toHaveCount(0);
     });
   });
@@ -325,7 +329,7 @@ test.describe('Dropped filter banner — collection search to collection navigat
       await page.getByRole('button', { name: /submit/i }).click();
       await waitForBrowserReady(page);
       const collectionLink = page.getByText('Sentinel-2 L2A', { exact: false }).first();
-      await expect(collectionLink).toBeVisible({ timeout: 10000 });
+      await expect(collectionLink).toBeVisible();
       await collectionLink.click();
       await waitForBrowserReady(page);
     });
@@ -336,17 +340,18 @@ test.describe('Dropped filter banner — collection search to collection navigat
 
     await test.step('Dismiss the banner', async () => {
       const banner = page.locator('.alert-warning').first();
-      await expect(banner).toBeVisible({ timeout: 10000 });
+      await expect(banner).toBeVisible();
       await banner.locator('button.btn-close').first().click();
-      await expect(banner).not.toBeVisible({ timeout: 5000 });
+      await expect(banner).not.toBeVisible();
     });
 
     await test.step('Navigate to a second collection via the catalog', async () => {
       // Navigate in-app (a page.goto would reload and reset the store)
       await page.getByRole('button', { name: /^browse$/i }).click();
       await waitForBrowserReady(page);
+      // The browse button opens the async-loaded sidebar tree
       const secondLink = page.getByText('Landsat 8', { exact: false }).first();
-      await expect(secondLink).toBeVisible({ timeout: 10000 });
+      await expect(secondLink).toBeVisible();
       await secondLink.click();
       await waitForBrowserReady(page);
     });
@@ -358,7 +363,6 @@ test.describe('Dropped filter banner — collection search to collection navigat
     // The carry-over only applies when jumping there from the search results,
     // browsing the catalog is not affected
     await test.step('Verify no banner appears for the second collection', async () => {
-      await page.waitForTimeout(500);
       await expect(page.locator('.alert-warning')).toHaveCount(0);
     });
   });
@@ -371,14 +375,14 @@ test.describe('Dropped filter banner — collection search to collection navigat
       await page.getByRole('button', { name: /submit/i }).click();
       await waitForBrowserReady(page);
       const collectionLink = page.getByText('Sentinel-2 L2A', { exact: false }).first();
-      await expect(collectionLink).toBeVisible({ timeout: 10000 });
+      await expect(collectionLink).toBeVisible();
       await collectionLink.click();
       await waitForBrowserReady(page);
     });
 
     await test.step('Open item filter panel and verify the banner', async () => {
       await openItemFilterPanel(page);
-      await expect(page.locator('.alert-warning').first()).toBeVisible({ timeout: 10000 });
+      await expect(page.locator('.alert-warning').first()).toBeVisible();
     });
 
     await test.step('Reset the item filters — the banner disappears', async () => {
