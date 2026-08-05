@@ -123,6 +123,26 @@
     "storeAs": "Store code as:",
     "installDependencies": "Install dependencies:"
   },
+  "favorites": {
+    "add": "Add to favorites",
+    "empty": "No favorites have been added yet. To add favorites, use the 'Favorite' button on the page of a catalog, collection, or item.",
+    "export": "Export",
+    "exportDescription": "Export the favorites to a file, e.g. to import them in another browser.",
+    "exportFormats": {
+      "csv": "CSV",
+      "excel": "Excel",
+      "json": "JSON",
+      "stac": "STAC Catalog"
+    },
+    "import": "Import",
+    "importDescription": "Import favorites from a file that was exported before.",
+    "importInvalid": "The selected file does not contain favorites.",
+    "imported": "{count} new favorites were imported.",
+    "label": "Favorite",
+    "localOnly": "Favorites are stored only locally in this web browser. They are not synchronized across devices or browsers.",
+    "remove": "Remove from favorites",
+    "title": "Favorites"
+  },
   "featureExperimental": "This feature is still experimental and may give unexpected results!",
   "features": {
     "empty": "No features available.",

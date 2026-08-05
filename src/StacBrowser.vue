@@ -10,12 +10,15 @@
       <b-row class="site">
         <b-col md="12">
           <nav class="actions navigation">
-            <b-button-group v-if="canSearch || !isServerSelector">
+            <b-button-group v-if="canSearch || !isServerSelector || showFavorites">
               <b-button v-if="!isServerSelector" variant="header" :title="$t('browse')" @click="sidebar = !sidebar">
                 <b-icon-list /><span class="button-label">{{ $t('browse') }}</span>
               </b-button>
               <b-button v-if="canSearch" variant="header" :to="searchBrowserLink" :title="$t('search.title')" :pressed="isSearchPage">
                 <b-icon-search /><span class="button-label">{{ $t('search.title') }}</span>
+              </b-button>
+              <b-button v-if="showFavorites" variant="header" to="/favorites" :title="$t('favorites.title')" :pressed="isFavoritesPage">
+                <b-icon-star /><span class="button-label">{{ $t('favorites.title') }}</span>
               </b-button>
               <b-button v-if="root" variant="header" id="popover-root-btn" tabindex="0">
                 <b-icon-database /><span class="button-label">{{ serviceType }}</span>
@@ -177,7 +180,7 @@ export default defineComponent({
     };
   },
   computed: {
-    ...mapState(['allowSelectCatalog', 'browserReady', 'conformsTo', 'data', 'dataLanguage', 'downloads', 'globalError', 'loading', 'stateQueryParameters', 'url']),
+    ...mapState(['allowSelectCatalog', 'browserReady', 'conformsTo', 'data', 'dataLanguage', 'downloads', 'globalError', 'loading', 'showFavorites', 'stateQueryParameters', 'url']),
     ...mapState({
       footerLinksFromVueX: 'footerLinks',
       localeFromVueX: 'locale',
@@ -201,6 +204,9 @@ export default defineComponent({
     },
     isSearchPage() {
       return this.$route.name === 'search';
+    },
+    isFavoritesPage() {
+      return this.$route.name === 'favorites';
     },
     isServerSelector() {
       return this.$route.name === 'select';
