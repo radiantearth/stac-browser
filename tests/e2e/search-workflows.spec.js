@@ -395,3 +395,53 @@ test.describe('Search filter carry-over workflows', () => {
     });
   });
 });
+
+// The collection search results are the server's answer to a query, so the
+// list must be shown as returned: no client-side re-sorting of the results and
+// no redundant client-side filter bar over them (#955).
+test.describe('Collection search results are server-authoritative (#955)', () => {
+  let api;
+  let BROWSER_PATH;
+
+  test.beforeEach(async ({ worker }) => {
+    api = API.minimalApi({}, { defaultLimit: 10, freeTextSearchEnabled: true });
+
+    // Added in a deliberately non-alphabetical order so the order returned by
+    // the server (Zulu before Alpha) differs from the default title sort, which
+    // would otherwise reorder the results alphabetically.
+    api.addCollection('zulu').setMetadata({ title: 'Zulu Collection' });
+    api.addCollection('alpha').setMetadata({ title: 'Alpha Collection' });
+
+    api.addCollectionsExtension()
+      .addItemsExtension()
+      .addSearchExtension();
+    api.root.addConformsTo('https://api.stacspec.org/v1.0.0/collection-search');
+    api.root.addConformsTo('https://api.stacspec.org/v1.0.0/collection-search#free-text');
+
+    await api.createServer(worker);
+    BROWSER_PATH = api.root.getBrowserPath();
+  });
+
+  test('results preserve the API order and hide the client-side filter bar', async ({ page }) => {
+    await goToCollectionSearchTab(page, BROWSER_PATH);
+
+    await test.step('Execute a collection search', async () => {
+      await page.getByRole('button', { name: /submit/i }).click();
+      await waitForBrowserReady(page);
+    });
+
+    await test.step('The results keep the order returned by the API', async () => {
+      const cards = page.locator('.catalogs .card-grid > *');
+      await expect(cards).toHaveCount(2);
+      await expect(cards.first()).toContainText('Zulu Collection');
+    });
+
+    await test.step('The redundant client-side filter bar is not shown', async () => {
+      await expect(page.locator('.catalogs .catalog-filter')).toHaveCount(0);
+    });
+
+    await test.step('The list/cards view toggle stays available', async () => {
+      await expect(page.locator('.catalogs header').getByRole('button', { name: /list/i })).toBeVisible();
+    });
+  });
+});

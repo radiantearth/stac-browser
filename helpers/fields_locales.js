@@ -4,7 +4,9 @@ import fs from 'fs';
 
 const translatable = ["label", "explain", "unit"];
 const iterable = ["items", "properties"];
-const dest_file = "src/locales/en/fields.json";
+const locales_dir = "src/locales";
+const en_locale = "en";
+const dest_file = `${locales_dir}/${en_locale}/fields.json`;
 
 function ignore(text, path, otherPath) {
   if (path.endsWith(".unit")) {
@@ -60,12 +62,38 @@ function writeToFile(file, locales) {
   fs.writeFileSync(file, json + "\n");
 }
 
+// Remove keys from all non-en language files that are no longer present in the generated set.
+// New keys are not added to other languages; they are only added to the en file (via writeToFile).
+function pruneOtherLocales(validKeys) {
+  const langs = fs.readdirSync(locales_dir, { withFileTypes: true })
+    .filter(entry => entry.isDirectory() && entry.name !== en_locale)
+    .map(entry => entry.name);
+
+  for (const lang of langs) {
+    const file = `${locales_dir}/${lang}/fields.json`;
+    if (!fs.existsSync(file)) {
+      continue;
+    }
+    const data = JSON.parse(fs.readFileSync(file, "utf8"));
+    const removed = Object.keys(data).filter(key => !validKeys.has(key));
+    if (removed.length === 0) {
+      continue;
+    }
+    removed.forEach(key => delete data[key]);
+    const cleaned = {};
+    Object.keys(data).sort().forEach(key => cleaned[key] = data[key]);
+    fs.writeFileSync(file, JSON.stringify(cleaned, null, 2) + "\n");
+    console.log(`Removed ${removed.length} obsolete key(s) from ${file}`);
+  }
+}
+
 function generateLocales() {
   const locales = {};
   HardCodedFields.forEach(text => addText(locales, text, "hardcoded"));
   const types = ["assets", "extensions", "links", "metadata"];
   types.forEach(type => findTexts(locales, Fields[type], type));
   writeToFile(dest_file, locales);
+  pruneOtherLocales(new Set(Object.keys(locales)));
 }
 
 console.log(`Generating fields locale file`);
