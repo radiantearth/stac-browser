@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - The Search page restores the previous results when returning to it
+- The `IN` operator for temporal filters shows a list of datepicker inputs instead of a free-text input
+- Timestamps in `IN` filters are serialized as CQL2 temporal literals instead of plain strings
 
 ## [5.0.0] - 2026-07-31
 

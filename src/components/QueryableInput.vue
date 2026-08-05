@@ -52,6 +52,31 @@
           v-bind="validation"
         />
       </div>
+      <div v-else-if="queryable.isTemporal && operator.SYMBOL === 'in'" class="value dates">
+        <div v-for="(date, index) in listValues" :key="index" class="date-row">
+          <VueDatePicker
+            :model-value="date"
+            @update:model-value="updateTemporalValue(index, $event)"
+            v-bind="datepickerProps"
+            :input-attrs="{ clearable: false }"
+          />
+          <b-button
+            v-if="listValues.length > 1"
+            size="sm" variant="link" class="remove-date"
+            :aria-label="$t('search.removeDate')"
+            @click="removeTemporalValue(index)"
+          >
+            <b-icon-x aria-hidden="true" />
+          </b-button>
+        </div>
+        <b-button
+          size="sm" variant="outline-primary" class="add-date"
+          :disabled="!canAddDate"
+          @click="addTemporalValue"
+        >
+          <b-icon-plus aria-hidden="true" /> {{ $t('search.addDate') }}
+        </b-button>
+      </div>
       <multiselect
         v-else-if="queryable.isArray || operator.SYMBOL === 'in'"
         class="value"
@@ -67,21 +92,11 @@
         <template #noOptions>{{ $t('search.noOptions') }}</template>
       </multiselect>
       <VueDatePicker
-        v-else-if="queryable.isTemporal && (operator.SYMBOL !== 'like' && operator.SYMBOL !== 'in')"
+        v-else-if="queryable.isTemporal && operator.SYMBOL !== 'like'"
         class="value"
         :model-value="value.value"
         @update:model-value="updateValue"
-        :locale="datepickerLang"
-        :week-start="weekStartDay"
-        :formats="{ input: queryable.isDateTime ? dateTimeFormat : dateFormat }"
-        :close-on-scroll="false"
-        :time-config="{ 
-          enableTimePicker: queryable.isDateTime,
-          seconds: queryable.isDateTime,
-          timePickerInline: true 
-        }"
-        :input-attrs="{ clearable: true }"
-        auto-apply
+        v-bind="datepickerProps"
       />
       <b-form-select
         v-else-if="queryable.isSelection"
@@ -131,7 +146,9 @@ import DatePickerMixin from './DatePickerMixin';
 import { isObject } from 'stac-js/src/utils.js';
 import CqlValue from '../models/cql2/value';
 import { CqlNot } from '../models/cql2/operators/logical';
-    
+
+const MAX_IN_OP_VALUES = 5;
+
 export default {
   name: 'QueryableInput',
   components: {
@@ -211,6 +228,27 @@ export default {
       }
       return [];
     },
+    datepickerProps() {
+      return {
+        locale: this.datepickerLang,
+        weekStart: this.weekStartDay,
+        formats: { input: this.queryable.isDateTime ? this.dateTimeFormat : this.dateFormat },
+        closeOnScroll: false,
+        timeConfig: {
+          enableTimePicker: this.queryable.isDateTime,
+          seconds: this.queryable.isDateTime,
+          timePickerInline: true
+        },
+        inputAttrs: { clearable: true },
+        autoApply: true
+      };
+    },
+    listValues() {
+      return this.value?.value || [];
+    },
+    canAddDate() {
+      return this.listValues.length < MAX_IN_OP_VALUES;
+    },
     arrayValues: {
       get() {
         const arr = this.value?.value || [];
@@ -237,13 +275,43 @@ export default {
     },
     updateOperator(op) {
       if (this.operator.valueType !== op.valueType) {
-        this.emitValue(op.getDefaultValue(this.queryable));
+        this.emitValue(this.defaultValueFor(op));
       }
       this.$emit('update:operator', op);
       this.operatorsOpen = false;
     },
+    defaultValueFor(op) {
+      if (this.queryable.isTemporal && op.SYMBOL === 'in') {
+        // Start with one datepicker: an empty IN list has no cql2-text form
+        return CqlValue.create([this.queryable.defaultValue]);
+      }
+      return op.getDefaultValue(this.queryable);
+    },
     updateNegate(negate) {
       this.$emit('update:negate', negate);
+    },
+    addTemporalValue() {
+      if (!this.canAddDate) {
+        return;
+      }
+      this.updateValue([...this.listValues, this.queryable.defaultValue]);
+    },
+    updateTemporalValue(index, date) {
+      if (!(date instanceof Date)) {
+        return;
+      }
+      const dates = this.listValues.slice(0);
+      dates[index] = date;
+      this.updateValue(dates);
+    },
+    removeTemporalValue(index) {
+      // The cql2-text grammar requires at least one value in an IN list
+      if (this.listValues.length < 2) {
+        return;
+      }
+      const dates = this.listValues.slice(0);
+      dates.splice(index, 1);
+      this.updateValue(dates);
     },
     addArrayValue(tag) {
       tag = tag.trim();
@@ -337,7 +405,7 @@ export default {
   gap: 0.5em;
   flex-direction: row;
   flex-wrap: nowrap;
-  align-content: center;
+  align-items: flex-start;
   display: flex;
 
   .title, .value {
@@ -347,6 +415,36 @@ export default {
   .value.between {
     display: flex;
     gap: 0.2em;
+  }
+  .value.dates {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25em;
+
+    .date-row {
+      display: flex;
+      align-items: center;
+      gap: 0.1em;
+
+      .dp__main {
+        flex: 1;
+        min-width: 0;
+      }
+    }
+    // Keep the destructive red for the button that removes the whole filter
+    .remove-date {
+      flex: none;
+      padding: 0 0.2rem;
+      color: var(--bs-secondary-color);
+      text-decoration: none;
+
+      &:hover, &:focus-visible {
+        color: var(--bs-danger);
+      }
+    }
+    .add-date {
+      align-self: flex-start;
+    }
   }
   .op {
     min-width: 4rem;

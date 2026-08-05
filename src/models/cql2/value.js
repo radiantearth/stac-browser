@@ -77,7 +77,10 @@ export class CqlArray extends CqlValue {
   }
 
   toJSON() {
-    return this.value;
+    return this.value.map(elem => {
+      const cql = elem instanceof CqlValue ? elem : CqlValue.create(elem);
+      return cql.toJSON();
+    });
   }
 
   toText() {
