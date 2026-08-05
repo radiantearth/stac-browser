@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Support for external management UIs via `create-form` and `edit-form` links ([RFC 6861](https://www.rfc-editor.org/rfc/rfc6861.html)) in the "Manage" menu
 - AVIF support for thumbnails
 - Improved metadata rendering for Zarr, Archive, Vector and more extensions
+- STAC Actions: A new pluggable interface (`StacActionPlugin`) to add action buttons for catalogs, collections and items, configurable via `stacActions.config.js`. Ships with an optional (disabled by default) `StacMap` action to open items in [stac-map](https://developmentseed.org/stac-map/).
 
 ### Removed
 
