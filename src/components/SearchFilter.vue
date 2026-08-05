@@ -721,7 +721,7 @@ export default defineComponent({
               } else if (field === 'datetime') {
                 const parts = decodedValue.includes('/') ? decodedValue.split('/') : decodedValue.split(',');
                 parsedValue = parts.map(d => {
-                  if (!d || d === '..') return d;
+                  if (!d || d === '..') {return d;}
                   const date = new Date(d);
                   return isNaN(date.getTime()) ? d : date;
                 });
