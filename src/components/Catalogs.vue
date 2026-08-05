@@ -63,6 +63,7 @@ import Loading from './Loading.vue';
 import { STAC } from 'stac-js';
 import ViewButtons from './ViewButtons.vue';
 import Utils from '../utils';
+import ViewMixin from './ViewMixin';
 import { sortStac } from '../models/stac';
 import { TYPES } from './ApiCapabilitiesMixin.js';
 import { hasText, URI } from 'stac-js/src/utils.js';
@@ -78,6 +79,7 @@ export default defineComponent({
     SortButtons: defineAsyncComponent(() => import('./SortButtons.vue')),
     ViewButtons
   },
+  mixins: [ViewMixin],
   props: {
     catalogs: {
       type: Array,
@@ -86,11 +88,6 @@ export default defineComponent({
     collectionsOnly: {
       type: Boolean,
       required: false
-    },
-    enforceView: {
-      type: String,
-      default: null,
-      validator: value => value === null || ['list', 'cards'].includes(value)
     },
     showControls: {
       type: Boolean,
@@ -254,20 +251,6 @@ export default defineComponent({
         }
       }
       return keywords.sort();
-    },
-    view: {
-      get() {
-        if (this.enforceView) {
-          return this.enforceView;
-        }
-        return this.$store.state.cardViewMode;
-      },
-      async set(cardViewMode) {
-        if (this.enforceView) {
-          return;
-        }
-        await this.$store.dispatch('config', { cardViewMode });
-      }
     }
   },
   watch: {
