@@ -15,10 +15,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added basic support for the STAC API extensions Transactions (for Items) and Collection Transactions, including validation
   - Adds three new config options: `transactions`, `transactionsRequireLogin` and `transactionsRequirePreflight`
   - Support for external management UIs via `create-form` and `edit-form` links ([RFC 6861](https://www.rfc-editor.org/rfc/rfc6861.html)) in the "Manage" menu
+- AVIF support for thumbnails
+- Improved metadata rendering for Zarr, Archive, Vector and more extensions
+
+### Removed
+
+- `multihashes` dependency not required anymore for checksum migration
+- `pl`, `sentinel`, and `xarray` extensions
 
 ### Fixed
 
 - The Search page restores the previous results when returning to it
+- Temporal extents were incomplete in non-English languages
+- Don't show inline sort and filter options in Collection Search
+- Preserve sort in Collection Search
 
 ## [5.0.0] - 2026-07-31
 

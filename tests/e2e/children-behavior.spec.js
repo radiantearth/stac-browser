@@ -126,7 +126,7 @@ test.describe('apiCatalogPriority', () => {
 
     await page.getByRole('button', { name: /browse/i }).click();
     const sidebar = page.locator('#sidebar');
-    await expect(sidebar).toBeVisible({ timeout: 10000 });
+    await expect(sidebar).toBeVisible();
     await expect(sidebar.getByText('Static Catalog')).toBeVisible();
     await expect(sidebar.getByText('API Collection')).not.toBeVisible();
   });
