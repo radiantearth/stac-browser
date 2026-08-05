@@ -71,7 +71,6 @@
         </div>
         <b-button
           size="m" variant="outline-primary" class="add-date"
-          :disabled="!canAddDate"
           @click="addTemporalValue"
         >
           <b-icon-node-plus aria-hidden="true" /> {{ $t('search.addDate') }}
@@ -146,8 +145,6 @@ import DatePickerMixin from './DatePickerMixin';
 import { isObject } from 'stac-js/src/utils.js';
 import CqlValue from '../models/cql2/value';
 import { CqlNot } from '../models/cql2/operators/logical';
-
-const MAX_IN_OP_VALUES = 5;
 
 export default {
   name: 'QueryableInput',
@@ -246,9 +243,6 @@ export default {
     listValues() {
       return this.value?.value || [];
     },
-    canAddDate() {
-      return this.listValues.length < MAX_IN_OP_VALUES;
-    },
     arrayValues: {
       get() {
         const arr = this.value?.value || [];
@@ -291,9 +285,6 @@ export default {
       this.$emit('update:negate', negate);
     },
     addTemporalValue() {
-      if (!this.canAddDate) {
-        return;
-      }
       this.updateValue([...this.listValues, this.queryable.defaultValue]);
     },
     updateTemporalValue(index, date) {
