@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Map data (GeoTIFF/COG, GeoZarr, preview images, XYZ/TileJSON/WMS/WMTS tiles, PMTiles metadata)
     is loaded with the configured credentials (via ol-stac's new `getRequestHeaders` option and URL rewriting)
   - WMTS capabilities requests (incl. basemaps) are loaded with the configured credentials
+  - Vector tile basemaps (ol-mapbox-style) are loaded with the configured credentials through a
+    default `transformRequest`; a `transformRequest` defined in `basemaps.config.js` takes precedence
   - External viewer actions are hidden when the data requires header-based credentials that
     external services can't receive
   - See the new "What gets authenticated" section in `docs/options.md` for details and limitations

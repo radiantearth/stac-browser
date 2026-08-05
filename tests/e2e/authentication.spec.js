@@ -303,22 +303,15 @@ test.describe('Authenticated media', () => {
 test.describe('Authenticated map layers', () => {
   const ITEM_URL = 'https://stac.example/item.json';
   const DATA_URL = 'https://stac.example/data.tif';
+  const PMTILES_URL = 'https://stac.example/tiles.pmtiles';
+  const ZARR_URL = 'https://stac.example/store.zarr';
 
-  test('GeoTIFF requests on the map carry the auth header', async ({ page, worker }) => {
-    await configureBrowser(page, {
-      authConfig: { type: 'apiKey', in: 'header', name: 'X-API-Key' },
-      displayGeoTiffByDefault: true,
-    });
-    const catalog = createStaticCatalog();
-    const item = catalog.addItem({ url: ITEM_URL });
-    await catalog.createServer(worker);
-    await requireAuth(worker, ROOT_URL, hasHeader('x-api-key', 'secret'));
-
-    // Record the GeoTIFF requests made by the map (the data is not a valid
-    // GeoTIFF, rendering is expected to fail after the request)
+  // Record the requests the map makes for a URL (the data is not valid,
+  // rendering is expected to fail after the request was made)
+  async function recordRequests(worker, url) {
     const requests = [];
     await worker.use(
-      http.get(DATA_URL, ({ request }) => {
+      http.get(url, ({ request }) => {
         requests.push({
           url: request.url,
           apiKey: request.headers.get('x-api-key'),
@@ -326,38 +319,108 @@ test.describe('Authenticated map layers', () => {
         return new HttpResponse(null, { status: 404 });
       }),
     );
+    return requests;
+  }
 
+  async function loginOnItemPage(page, worker, item, check) {
+    await requireAuth(worker, ROOT_URL, check);
     await page.goto(item.getBrowserPath());
     await expectLoginModal(page);
     await submitApiKey(page, 'secret');
     await waitForBrowserReady(page);
+  }
+
+  const HEADER_AUTH = { authConfig: { type: 'apiKey', in: 'header', name: 'X-API-Key' } };
+  const QUERY_AUTH = { authConfig: { type: 'apiKey', in: 'query', name: 'API_KEY' } };
+
+  test('GeoTIFF requests on the map carry the auth header', async ({ page, worker }) => {
+    await configureBrowser(page, { ...HEADER_AUTH, displayGeoTiffByDefault: true });
+    const catalog = createStaticCatalog();
+    const item = catalog.addItem({ url: ITEM_URL });
+    await catalog.createServer(worker);
+    const requests = await recordRequests(worker, DATA_URL);
+    await loginOnItemPage(page, worker, item, hasHeader('x-api-key', 'secret'));
 
     await expect.poll(() => requests.length, { timeout: 15000 }).toBeGreaterThan(0);
     expect(requests[0].apiKey).toBe('secret');
   });
 
   test('GeoTIFF requests on the map carry the private query parameter', async ({ page, worker }) => {
-    await configureBrowser(page, {
-      authConfig: { type: 'apiKey', in: 'query', name: 'API_KEY' },
-      displayGeoTiffByDefault: true,
-    });
+    await configureBrowser(page, { ...QUERY_AUTH, displayGeoTiffByDefault: true });
     const catalog = createStaticCatalog();
     const item = catalog.addItem({ url: ITEM_URL });
     await catalog.createServer(worker);
-    await requireAuth(worker, ROOT_URL, hasQuery('API_KEY', 'secret'));
+    const requests = await recordRequests(worker, DATA_URL);
+    await loginOnItemPage(page, worker, item, hasQuery('API_KEY', 'secret'));
 
-    const requests = [];
-    await worker.use(
-      http.get(DATA_URL, ({ request }) => {
-        requests.push({ url: request.url });
-        return new HttpResponse(null, { status: 404 });
-      }),
-    );
+    await expect.poll(() => requests.length, { timeout: 15000 }).toBeGreaterThan(0);
+    expect(requests[0].url).toContain('API_KEY=secret');
+  });
 
-    await page.goto(item.getBrowserPath());
-    await expectLoginModal(page);
-    await submitApiKey(page, 'secret');
-    await waitForBrowserReady(page);
+  function addPmtilesLink(item) {
+    item.data.links.push({
+      rel: 'pmtiles',
+      href: PMTILES_URL,
+      type: 'application/vnd.pmtiles',
+    });
+  }
+
+  test('PMTiles requests on the map carry the auth header', async ({ page, worker }) => {
+    await configureBrowser(page, HEADER_AUTH);
+    const catalog = createStaticCatalog();
+    const item = catalog.addItem({ url: ITEM_URL });
+    addPmtilesLink(item);
+    await catalog.createServer(worker);
+    const requests = await recordRequests(worker, PMTILES_URL);
+    await loginOnItemPage(page, worker, item, hasHeader('x-api-key', 'secret'));
+
+    await expect.poll(() => requests.length, { timeout: 15000 }).toBeGreaterThan(0);
+    expect(requests[0].apiKey).toBe('secret');
+  });
+
+  test('PMTiles requests on the map carry the private query parameter', async ({ page, worker }) => {
+    await configureBrowser(page, QUERY_AUTH);
+    const catalog = createStaticCatalog();
+    const item = catalog.addItem({ url: ITEM_URL });
+    addPmtilesLink(item);
+    await catalog.createServer(worker);
+    const requests = await recordRequests(worker, PMTILES_URL);
+    await loginOnItemPage(page, worker, item, hasQuery('API_KEY', 'secret'));
+
+    await expect.poll(() => requests.length, { timeout: 15000 }).toBeGreaterThan(0);
+    expect(requests[0].url).toContain('API_KEY=secret');
+  });
+
+  function addGeoZarrAsset(item) {
+    item.data.assets.zarr = {
+      href: ZARR_URL,
+      type: 'application/vnd.zarr; version=3; profile=multiscales',
+      title: 'Data Cube',
+      roles: ['data'],
+    };
+  }
+
+  test('GeoZarr requests on the map carry the auth header', async ({ page, worker }) => {
+    await configureBrowser(page, HEADER_AUTH);
+    const catalog = createStaticCatalog();
+    const item = catalog.addItem({ url: ITEM_URL });
+    addGeoZarrAsset(item);
+    await catalog.createServer(worker);
+    const requests = await recordRequests(worker, `${ZARR_URL}/zarr.json`);
+    await loginOnItemPage(page, worker, item, hasHeader('x-api-key', 'secret'));
+
+    await expect.poll(() => requests.length, { timeout: 15000 }).toBeGreaterThan(0);
+    expect(requests[0].apiKey).toBe('secret');
+  });
+
+  test('GeoZarr requests on the map carry the private query parameter', async ({ page, worker }) => {
+    await configureBrowser(page, QUERY_AUTH);
+    const catalog = createStaticCatalog();
+    const item = catalog.addItem({ url: ITEM_URL });
+    addGeoZarrAsset(item);
+    await catalog.createServer(worker);
+    const requests = await recordRequests(worker, `${ZARR_URL}/zarr.json`);
+    await loginOnItemPage(page, worker, item, hasQuery('API_KEY', 'secret'));
 
     await expect.poll(() => requests.length, { timeout: 15000 }).toBeGreaterThan(0);
     expect(requests[0].url).toContain('API_KEY=secret');

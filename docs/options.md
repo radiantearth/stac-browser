@@ -356,15 +356,15 @@ part of the catalog (see [`allowedDomains`](#alloweddomains)), external URLs nev
 - Thumbnails, icons and logos: As `<img>` elements can't send HTTP headers, images that require
   header-based credentials are loaded through an authenticated request and shown via an object URL.
   A failed image request does NOT open the login form; the image falls back to loading without headers.
-- The map: GeoTIFF/COG and GeoZarr requests, preview images, XYZ/TileJSON/WMS/WMTS tiles,
-  PMTiles metadata, and WMTS capabilities requests (incl. basemaps).
+- The map: GeoTIFF/COG, GeoZarr and PMTiles requests, preview images, XYZ/TileJSON/WMS/WMTS tiles,
+  WMTS capabilities requests (incl. basemaps), and vector tile basemaps
+  (via a default ol-mapbox-style `transformRequest`, see [Basemaps](basemaps.md)).
 - External viewer actions (e.g. geojson.io, see `assetActions.config.js`) are hidden when the data
   requires header-based credentials, as external services can't receive them. With query-based
   credentials the actions remain available (the credentials are part of the URL that is passed on).
 
 Known limitations:
 
-- PMTiles *tile data* can't be requested with HTTP headers yet.
 - Vector tile basemaps (via ol-mapbox-style) don't receive credentials.
 - The TileJSON manifest request (made internally by OpenLayers) doesn't receive HTTP headers.
 - Header-based credentials for images and tiles require the server to allow the headers in

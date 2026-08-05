@@ -215,6 +215,19 @@ export default {
             layerClassName = 'Group';
             sourceClassName = null;
             const {apply} = await import('ol-mapbox-style');
+            if (typeof options.transformRequest !== 'function') {
+              // Attach the configured credentials to all requests made by
+              // ol-mapbox-style (style, sources, sprites, glyphs, tiles).
+              // A transformRequest defined in the basemap config takes over
+              // instead and must handle credentials itself.
+              options.transformRequest = (url) => {
+                const requestUrl = this.getRequestUrl(url);
+                if (needsAuthenticatedFetch(this.$store, url)) {
+                  return new Request(requestUrl, { headers: this.$store.state.requestHeaders });
+                }
+                return requestUrl;
+              };
+            }
             const callback = options.layerCreated;
             options.layerCreated = async (layer, source, map) => {
               layer = await apply(layer, options.url, options);
