@@ -466,5 +466,7 @@
     },
     "title": "Opciones de visualización"
   },
-  "widgets": {}
+  "widgets": {
+    "featured": ""
+  }
 }
