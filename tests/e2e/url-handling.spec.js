@@ -22,6 +22,7 @@ function createApi() {
   // Advertise free-text collection search so that the free-text field shows up
   api.root.addConformsTo('https://api.stacspec.org/v1.0.0/collection-search');
   api.root.addConformsTo('https://api.stacspec.org/v1.0.0/collection-search#free-text');
+  api.root.addConformsTo('https://api.stacspec.org/v1.0.0/item-search#free-text');
   return { api, collection };
 }
 
@@ -141,4 +142,77 @@ test('corrects a URL entered with a trailing slash if the server reports none', 
 
   await expect(page).toHaveURL(ENTERED_PATH);
   await expect(page.getByRole('heading', { name: /Example API/i })).toBeVisible();
+});
+
+test.describe('Search filter URL serialization', () => {
+
+  test.beforeEach(async ({ page, worker }) => {
+    const { api } = createApi();
+    await api.createServer(worker);
+    await mockStacResource(worker, CANONICAL, api.root.build());
+    
+    await page.goto(`/search${CANONICAL_PATH}`);
+    await waitForBrowserReady(page);
+  });
+
+  test('Filters use scoped prefixes (s.c. for Collections, s.i. for Items)', async ({ page }) => {
+    await page.getByRole('tab', { name: /Items/i }).click();
+
+    const itemSearchGroup = page.locator('.tab-pane.active .filter-freetext');
+    await expect(itemSearchGroup).toBeVisible();
+    const itemSearchMultiselect = itemSearchGroup.locator('.multiselect');
+    await itemSearchMultiselect.locator('.multiselect__tags').click();
+    const itemSearchInput = itemSearchGroup.locator('input.multiselect__input');
+    await expect(itemSearchInput).toBeVisible();
+    await itemSearchInput.fill('water');
+    await itemSearchInput.press('Enter');
+
+    await expect(page).toHaveURL(/s\.i\.q=water/);
+
+    await page.getByRole('tab', { name: /Collections/i }).click();
+    const collectionSearchGroup = page.locator('.tab-pane.active .filter-freetext');
+    await expect(collectionSearchGroup).toBeVisible();
+    const collectionSearchMultiselect = collectionSearchGroup.locator('.multiselect');
+    await collectionSearchMultiselect.locator('.multiselect__tags').click();
+    const collectionSearchInput = collectionSearchGroup.locator('input.multiselect__input');
+    await expect(collectionSearchInput).toBeVisible();
+    await collectionSearchInput.fill('clouds');
+    await collectionSearchInput.press('Enter');
+
+    // Verify the URL uses the collection prefix 's.c.'
+    await expect(page).toHaveURL(/s\.c\.q=clouds/);
+  });
+
+  test('Reset button completely clears filters from the URL', async ({ page }) => {
+    await page.goto(`/search${CANONICAL_PATH}?s.i.q=water&s.i.limit=15`);
+    await waitForBrowserReady(page);
+
+    await page.getByRole('tab', { name: /Items/i }).click();
+    await page.getByRole('button', { name: /reset/i }).click();
+
+    await expect(page).not.toHaveURL(/s\.i\.q/);
+    await expect(page).not.toHaveURL(/s\.i\.limit/);
+  });
+
+  test('Comma-joined fields safely preserve internal commas', async ({ page }) => {
+    await page.goto(`/search${CANONICAL_PATH}?s.i.q=water%2C%20clouds`);
+    await waitForBrowserReady(page);
+
+    await page.getByRole('tab', { name: /Items/i }).click();
+    const searchTag = page.locator('.tab-pane.active .filter-freetext .multiselect__tag').first();
+    await expect(searchTag).toContainText('water, clouds');
+  });
+
+  test('Invalid garbage data in the URL is safely ignored (Validation)', async ({ page }) => {
+    await page.goto(`/search${CANONICAL_PATH}?s.i.bbox=foo,bar,baz,qux&s.i.limit=-50`);
+    await waitForBrowserReady(page);
+
+    await page.getByRole('tab', { name: /Items/i }).click();
+    const limitInput = page.locator('.tab-pane.active .limit input');
+    await expect(limitInput).not.toHaveValue('-50');
+
+    // Verify bbox was ignored
+    const spatialCheckbox = page.getByRole('checkbox', { name: /filter by spatial extent/i });
+    await expect(spatialCheckbox).not.toBeChecked();
+  });
 });

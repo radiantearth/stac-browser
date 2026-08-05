@@ -310,7 +310,8 @@ export default defineComponent({
         }
         let query = {};
         for (const [key, value] of Object.entries(this.$route.query)) {
-          if (!key.startsWith('.')) {
+          const isStateQueryParam = key.startsWith('.') || key === 'searchtype' || key.startsWith('s.c.') || key.startsWith('s.i.');
+          if (!isStateQueryParam) {
             query[key] = value;
           }
         }

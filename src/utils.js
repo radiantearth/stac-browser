@@ -184,7 +184,9 @@ export default class Utils {
 
   static stateQueryParametersToObject(state, query = {}) {
     for (const [key, value] of Object.entries(state)) {
-      let name = `.${key}`;
+      let name = key === 'searchtype'
+        ? key
+        : (key.startsWith('.') || key.includes('.')) ? key : `.${key}`;
       if (Array.isArray(value)) {
         if (value.length > 0) {
           query[name] = value.join(',');

@@ -514,6 +514,13 @@ export default defineComponent({
     apiCollectionsPaginated() {
       this.updateApiCollections();
     },
+    '$route.query': {
+      handler(newQuery, oldQuery) {
+        if (JSON.stringify(newQuery) !== JSON.stringify(oldQuery)) {
+          this.rebuildFromUrl();
+        }
+      }
+    },
     'activeParams.collections': {
       deep: true,
       handler(vuexCollections) {
@@ -661,6 +668,8 @@ export default defineComponent({
     syncVuexToUrl() {
       const params = this.activeParams || {};
       const fieldsToSync = ['q', 'datetime', 'bbox', 'limit', 'collections', 'ids', 'sortby'];
+      
+      const prefix = this.type === 'Collections' ? 's.c.' : 's.i.';
 
       fieldsToSync.forEach(field => {
         const value = params[field];
@@ -671,38 +680,59 @@ export default defineComponent({
         } else if (Array.isArray(value)) {
           if (field === 'datetime') {
             urlValue = value.map(d => d instanceof Date ? d.toISOString() : d).join('/');
+          } else if (['q', 'collections', 'ids'].includes(field)) {
+            urlValue = value.map(encodeURIComponent).join(',');
           } else {
             urlValue = value.join(',');
           }
         }
 
         this.$store.commit('updateState', { 
-          type: `s.${field}`, 
+          type: `${prefix}${field}`, 
           value: urlValue 
         });
       });
     },
 
     rebuildFromUrl() {
-      const sqp = this.$store.state.stateQueryParameters;
+      const query = this.$route.query || {};
       let foundFiltersInUrl = false;
       
-      for (const [key, value] of Object.entries(sqp)) {
-        if (key.startsWith('s.') && value !== null && value !== undefined) {
-          const field = key.replace('s.', '');
+      const prefix = this.type === 'Collections' ? 's.c.' : 's.i.';
+      
+      for (const [key, value] of Object.entries(query)) {
+        if (key.startsWith(prefix) && value !== null && value !== undefined) {
+          const field = key.replace(prefix, '');
           let parsedValue = value;
           
           if (typeof value === 'string') {
-            const decodedValue = decodeURIComponent(value);
-            
             if (['q', 'collections', 'ids'].includes(field)) {
-              parsedValue = decodedValue.split(',');
-            } else if (field === 'bbox') {
-              parsedValue = decodedValue.split(',').map(Number);
-            } else if (field === 'datetime') {
-              parsedValue = decodedValue.includes('/') ? decodedValue.split('/') : decodedValue.split(',');
-            } else if (field === 'limit') {
-              parsedValue = Number.parseInt(decodedValue, 10);
+              parsedValue = value.split(/,(?!\s)/).map(decodeURIComponent);
+            } else {
+              const decodedValue = decodeURIComponent(value);
+              
+              if (field === 'bbox') {
+                const coords = decodedValue.split(',').map(Number);
+                if ((coords.length === 4 || coords.length === 6) && coords.every(n => !Number.isNaN(n))) {
+                  parsedValue = coords;
+                } else {
+                  continue;
+                }
+              } else if (field === 'datetime') {
+                const parts = decodedValue.includes('/') ? decodedValue.split('/') : decodedValue.split(',');
+                parsedValue = parts.map(d => {
+                  if (!d || d === '..') return d;
+                  const date = new Date(d);
+                  return isNaN(date.getTime()) ? d : date;
+                });
+              } else if (field === 'limit') {
+                const limitInt = Number.parseInt(decodedValue, 10);
+                if (!Number.isNaN(limitInt) && limitInt > 0) {
+                  parsedValue = Math.min(limitInt, 10000); 
+                } else {
+                  continue;
+                }
+              }
             }
           }
           
@@ -886,6 +916,9 @@ export default defineComponent({
       }
       // The notice about the carry-over refers to a state that was just discarded
       this.$store.commit('search/clearDroppedFilters', this.type);
+
+      this.syncVuexToUrl();
+
       this.$emit('input', this.activeParams, true);
     },
     addSearchTerm(term) {

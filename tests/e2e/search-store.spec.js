@@ -117,7 +117,7 @@ test.describe('Filter carry-over into item search', () => {
 
     const state = await getSearchState(page);
     // The test API supports basic filters for Features, but no free-text
-    expect(state.itemFilters.datetime).toBe(DATETIME);
+    expect(state.itemFilters.datetime).toEqual(DATETIME.split('/').map(d => new Date(d)));
     expect(state.itemFilters.limit).toBe(10);
     expect(state.itemFilters.q).toEqual([]);
     expect(state.droppedFilters.Items).toContainEqual({ type: 'freeText', terms: ['sentinel'] });
@@ -236,7 +236,7 @@ test.describe('Filter carry-over into item search', () => {
 
     const state = await getSearchState(page);
     // The next collection gets the collection search criteria again
-    expect(state.itemFilters.datetime).toBe(DATETIME);
+    expect(state.itemFilters.datetime).toEqual(DATETIME.split('/').map(d => new Date(d)));
     expect(state.itemFilters.q).toEqual([]);
   });
 });
