@@ -63,7 +63,7 @@ test.describe('STAC Browser code example CQL modal', () => {
     
     await test.step('Add CQL identifier filter for GET search', async () => {
       const cqlGroup = page.getByRole('group', { name: /additional filters/i });
-      await expect(cqlGroup).toBeVisible({ timeout: 10000 });
+      await expect(cqlGroup).toBeVisible();
       await cqlGroup.getByRole('button', { name: /add filter/i }).click();
       await page.getByRole('menuitem', { name: /identifier/i }).click();
       const queryableInput = page.getByRole('textbox', { name: /additional filters/i });

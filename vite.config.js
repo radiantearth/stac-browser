@@ -231,6 +231,15 @@ export default defineConfig(async ({ mode }) => {
         ],
       },
       port: 8080,
+      // During e2e runs, pre-transform the lazily-imported route views and
+      // async components on server start. Otherwise the first in-app navigation
+      // to them (Search view, Sidebar tree, item filter, …) races the cold vite
+      // transform and can take many seconds under parallel worker load, causing
+      // intermittent timeouts. Warmup runs in the background and does not delay
+      // server readiness. Scoped to e2e so normal dev startup is unaffected.
+      warmup: process.env.STAC_BROWSER_E2E === "true"
+        ? { clientFiles: ["./src/**/*.vue"] }
+        : undefined,
     },
   });
 });

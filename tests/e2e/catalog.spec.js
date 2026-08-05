@@ -324,8 +324,8 @@ test.describe('Catalog - Children', () => {
     await expect(page).toHaveURL(/\/search/);
     await page.goBack();
     await waitForBrowserReady(page);
-
-    await expect(page.getByRole('link', { name: new RegExp(collection.getMetadata().title) })).toBeVisible();
+    await expect(page.getByRole('link', { name: new RegExp(collection.getMetadata().title) }))
+      .toBeVisible();
   });
 
   test('API - tree auto-loads more collection pages', async ({ page, worker }) => {
@@ -343,10 +343,9 @@ test.describe('Catalog - Children', () => {
 
     await page.getByRole('button', { name: /browse/i }).click();
 
-    // The sidebar is an async component that is loaded on demand by the click
-    // above, so give it extra time for the chunk to load on a busy dev server
+    // The sidebar is an async component that is loaded on demand by the click above
     const sidebar = page.locator('#sidebar');
-    await expect(sidebar).toBeVisible({ timeout: 10000 });
+    await expect(sidebar).toBeVisible();
     await expect(sidebar.getByText(collection1.getMetadata().title)).toBeVisible();
     // The next page of collections loads automatically once the tree is shown
     await expect(sidebar.getByText(collection2.getMetadata().title)).toBeVisible();

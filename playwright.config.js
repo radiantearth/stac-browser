@@ -1,4 +1,5 @@
 import { defineConfig, devices } from '@playwright/test';
+import os from 'node:os';
 
 function getEnvWithoutSB() {
   const env = {};
@@ -15,18 +16,31 @@ function getEnvWithoutSB() {
  */
 export default defineConfig({
   testDir: './tests/e2e',
-  
+
+  /* Warm up the (dev) server before the workers start, see global-setup.js */
+  globalSetup: './tests/e2e/global-setup.js',
+
   /* Run tests in files in parallel */
   fullyParallel: true,
   
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
-  
-  /* Retry on CI only */
-  retries: process.env.CI ? 2 : 0,
-  
-  /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : undefined,
+
+  retries: 1,
+
+  /* Default assertion timeout. Raised from Playwright's 5s default because the
+     dev server transforms modules on demand and, with many parallel workers,
+     async renders/navigations routinely need longer locally. */
+  expect: { timeout: 10000 },
+
+  /* CI serves a static production build (no on-demand transforms), so it runs
+     single-worker. Locally the dev server transforms modules on demand from a
+     single process, so it — not the CPU count — is the bottleneck: the default
+     (50% of cores) overwhelms it on many-core machines and makes lazy-chunk
+     loads flaky. Use half the cores (like Playwright's default) but cap at 6 so
+     a big machine doesn't swamp the dev server, while smaller/slower CPUs still
+     scale down and aren't oversubscribed. */
+  workers: process.env.CI ? 1 : Math.min(6, Math.max(1, Math.ceil(os.cpus().length / 2))),
   
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [

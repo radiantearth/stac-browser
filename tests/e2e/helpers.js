@@ -174,6 +174,73 @@ export async function openManageMenu(page) {
   return menu;
 }
 
+// ─── Authentication Helpers ──────────────────────────────────────────────────
+
+/**
+* Guard a mocked URL with an authentication check.
+*
+* Registers an MSW handler that returns 401 unless `check(request)` passes.
+* When the check passes, the handler yields (returns undefined) so the regular
+* resource handler (e.g. registered by `instance.createServer`) builds the
+* response. Register this AFTER `createServer` — for the same path, handlers
+* registered later take precedence in playwright-msw.
+*
+* @param {import('playwright-msw').MockServiceWorker} worker
+* @param {string} url – exact URL to guard
+* @param {(request: Request) => boolean} check – returns true when the request is authenticated
+*/
+export async function requireAuth(worker, url, check) {
+  await worker.use(
+    http.get(url, ({ request }) => {
+      if (check(request)) {
+        return undefined; // fall through to the resource handler
+      }
+      return HttpResponse.json(
+        { code: 401, description: 'Unauthorized' },
+        { status: 401 },
+      );
+    }),
+  );
+}
+
+/** Check that a request carries the given header value. */
+export const hasHeader = (name, value) => (request) => request.headers.get(name) === value;
+
+/** Check that a request carries the given query parameter value. */
+export const hasQuery = (name, value) => (request) => new URL(request.url).searchParams.get(name) === value;
+
+/** Check that a request carries HTTP Basic credentials for user:password. */
+export const hasBasicAuth = (user, password) => (request) =>
+  request.headers.get('authorization') === `Basic ${btoa(`${user}:${password}`)}`;
+
+/**
+* Fill and submit the API key / token login form.
+*
+* @param {import('@playwright/test').Page} page
+* @param {string} token
+*/
+export async function submitApiKey(page, token) {
+  const modal = page.locator('#stac-browser-auth-modal');
+  await expect(modal).toBeVisible();
+  await modal.locator('input[type="password"]').fill(token);
+  await modal.getByRole('button', { name: /submit/i }).click();
+}
+
+/**
+* Fill and submit the HTTP Basic login form.
+*
+* @param {import('@playwright/test').Page} page
+* @param {string} user
+* @param {string} password
+*/
+export async function submitBasicAuth(page, user, password) {
+  const modal = page.locator('#stac-browser-auth-modal');
+  await expect(modal).toBeVisible();
+  await modal.locator('#basicUser').fill(user);
+  await modal.locator('#basicPassword').fill(password);
+  await modal.getByRole('button', { name: /submit/i }).click();
+}
+
 // ─── Page interaction Helpers ──────────────────────────────────────────────
 
 /**
