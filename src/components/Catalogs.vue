@@ -180,8 +180,8 @@ export default defineComponent({
       if (this.title !== null) {
         return this.title;
       }
-      let key = (this.collectionsOnly || this.catalogs.every(catalog => catalog.isCollection)) ? 'stacCollection' : 'stacCatalog';
-      return this.$t(key, this.catalogs.length );
+      let key = (this.collectionsOnly || this.allCatalogs.every(catalog => catalog.isCollection)) ? 'stacCollection' : 'stacCatalog';
+      return this.$t(key, this.allCatalogs.length );
     },
     isComplete() {
       if (this.hasMore || this.showPagination) {
