@@ -62,19 +62,19 @@
           />
           <b-button
             v-if="listValues.length > 1"
-            size="sm" variant="link" class="remove-date"
+            size="m" variant="link" class="remove-date"
             :aria-label="$t('search.removeDate')"
             @click="removeTemporalValue(index)"
           >
-            <b-icon-x aria-hidden="true" />
+            <b-icon-node-minus aria-hidden="true" />
           </b-button>
         </div>
         <b-button
-          size="sm" variant="outline-primary" class="add-date"
+          size="m" variant="outline-primary" class="add-date"
           :disabled="!canAddDate"
           @click="addTemporalValue"
         >
-          <b-icon-plus aria-hidden="true" /> {{ $t('search.addDate') }}
+          <b-icon-node-plus aria-hidden="true" /> {{ $t('search.addDate') }}
         </b-button>
       </div>
       <multiselect
@@ -125,8 +125,8 @@
         {{ $t(`checkbox.${value.value}`) }}
       </b-form-checkbox>
 
-      <b-button class="delete" size="sm" variant="danger" @click="$emit('remove-queryable')">
-        <b-icon-x-circle-fill aria-hidden="true" />
+      <b-button class="delete" size="m" variant="danger" @click="$emit('remove-queryable')">
+        <b-icon-trash aria-hidden="true" />
       </b-button>
     </div>
 
