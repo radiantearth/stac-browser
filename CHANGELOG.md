@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Complete authentication support for all supported methods ([#800](https://github.com/radiantearth/stac-browser/issues/800)):
+  - Thumbnails, icons and logos are loaded with the configured credentials
+    (header-based credentials via authenticated requests and object URLs, as `<img>` can't send HTTP headers)
+  - Map data (GeoTIFF/COG, GeoZarr, preview images, XYZ/TileJSON/WMS/WMTS tiles, PMTiles metadata)
+    is loaded with the configured credentials (via ol-stac's new `getRequestHeaders` option and URL rewriting)
+  - WMTS capabilities requests (incl. basemaps) are loaded with the configured credentials
+  - External viewer actions are hidden when the data requires header-based credentials that
+    external services can't receive
+  - See the new "What gets authenticated" section in `docs/options.md` for details and limitations
 - Search filters are now preserved for collection and item searches
 - Opening a collection from the collection search results carries the search criteria over into its item filters
 - An indicator on the item filter toggle shows when the filters were changed but not applied yet

@@ -47,7 +47,6 @@ import { mapGetters, mapState } from 'vuex';
 import AssetActions from '../../assetActions.config';
 import LinkActions from '../../linkActions.config';
 import AuthUtils from './auth/utils';
-import { Asset } from 'stac-js';
 import { browserProtocols } from 'stac-js/src/http';
 import { imageMediaTypes, geojsonMediaType, wozMediaTypes, zarrMediaTypes } from 'stac-js/src/mediatypes';
 
@@ -100,7 +99,7 @@ export default {
   },
   computed: {
     ...mapState(['downloads', 'requestHeaders', 'buildTileUrlTemplate', 'useTileLayerAsFallback']),
-    ...mapGetters(['getRequestUrl']),
+    ...mapGetters(['getRequestUrl', 'isExternalUrl']),
     ...mapGetters('auth', ['isLoggedIn']),
     loading() {
       return Boolean(this.downloads[this.href]);
@@ -116,7 +115,18 @@ export default {
         return 'client';
       }
     },
+    // External services can't receive header-based credentials, so the
+    // external viewer actions won't work for data that requires them.
+    requiresHeaderCredentials() {
+      if (typeof this.data.href !== 'string') {
+        return false;
+      }
+      return size(this.requestHeaders) > 0 && !this.isExternalUrl(this.data.getAbsoluteUrl());
+    },
     actions() {
+      if (this.requiresAuth || this.requiresHeaderCredentials) {
+        return [];
+      }
       return Object.entries(this.isAsset ? AssetActions : LinkActions)
         .map(([id, plugin]) => new plugin(this.data, this, id))
         .filter(plugin => plugin.show);
@@ -303,12 +313,8 @@ export default {
       return '';
     },
     show() {
-      // Clone asset so that we can change the href.
-      // The this.href may include query parameters for authentication due to getRequestUrl.
-      // Unless we make authentication data available to ol-stac in a different way, we have to add it here.
-      const data = new Asset(this.data);
-      data.href = this.href;
-      this.$emit('show', data);
+      // Credentials are attached by the map itself (see MapMixin)
+      this.$emit('show', this.data);
     },
     handleAuthButton() {
       if (this.auth.length === 1) {

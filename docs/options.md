@@ -346,6 +346,31 @@ For a given token `123` this results in the following additional HTTP Header:
 
 You can change the default behaviour to send it as a Bearer token by providing `in`, `name` and `format`.
 
+#### What gets authenticated
+
+The credentials (query parameters or HTTP headers) are attached to all requests for URLs that are
+part of the catalog (see [`allowedDomains`](#alloweddomains)), external URLs never receive credentials:
+
+- STAC documents (catalogs, collections, items, API requests)
+- Downloads
+- Thumbnails, icons and logos: As `<img>` elements can't send HTTP headers, images that require
+  header-based credentials are loaded through an authenticated request and shown via an object URL.
+  A failed image request does NOT open the login form; the image falls back to loading without headers.
+- The map: GeoTIFF/COG and GeoZarr requests, preview images, XYZ/TileJSON/WMS/WMTS tiles,
+  PMTiles metadata, and WMTS capabilities requests (incl. basemaps).
+- External viewer actions (e.g. geojson.io, see `assetActions.config.js`) are hidden when the data
+  requires header-based credentials, as external services can't receive them. With query-based
+  credentials the actions remain available (the credentials are part of the URL that is passed on).
+
+Known limitations:
+
+- PMTiles *tile data* can't be requested with HTTP headers yet.
+- Vector tile basemaps (via ol-mapbox-style) don't receive credentials.
+- The TileJSON manifest request (made internally by OpenLayers) doesn't receive HTTP headers.
+- Header-based credentials for images and tiles require the server to allow the headers in
+  CORS preflight requests (the Fetch API is stricter than plain `<img>` elements).
+- Cookie-based authentication works independently of all this via [`crossOriginMedia: 'use-credentials'`](#crossoriginmedia).
+
 ## Internationalization and Localization
 
 ### locale
@@ -498,7 +523,12 @@ Example for EPSG:2056:
 
 Corresponds to the ol-stac parameter `getSourceOptions`:
 
-> Optional function that can be used to configure the underlying sources. The function can do any additional work and return the completed options or a promise for the same. The function will be called with the current source options and the STAC Asset or Link. This can be useful for adding auth information such as an API token, either via query parameter or HTTP headers. Please be aware that sending HTTP headers may not be supported by all sources.
+> Optional function that can be used to configure the underlying sources. The function can do any additional work and return the completed options or a promise for the same. The function will be called with the current source options and the STAC Asset or Link.
+
+STAC Browser first applies the configured query parameters (incl. query-based credentials from
+[`authConfig`](#authconfig)) to the source URLs and then calls the function provided here, so the
+options already contain the final URLs. Header-based credentials are attached separately through
+the ol-stac option `getRequestHeaders` and don't need to be handled here.
 
 The function that can be provided for getMapSourceOptions has the following signature:
 

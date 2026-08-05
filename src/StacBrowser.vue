@@ -56,7 +56,7 @@
       <b-row class="page" v-if="!loading">
         <b-col md="12">
           <div class="title">
-            <img v-if="icon && !isRoot" :src="icon.getAbsoluteUrl()" :alt="icon.title" :title="icon.title" class="icon">
+            <AuthImage v-if="icon && !isRoot" :src="icon.getAbsoluteUrl()" :alt="icon.title" :title="icon.title" class="icon" />
             <h1 :title="title">{{ title }}</h1>
           </div>
           <nav class="actions navigation">
@@ -151,6 +151,7 @@ for(let key in CONFIG) {
 export default defineComponent({
   name: 'StacBrowser',
   components: {
+    AuthImage: defineAsyncComponent(() => import('./components/AuthImage.vue')),
     Authentication,
     BIconLock,
     BIconUnlock,
