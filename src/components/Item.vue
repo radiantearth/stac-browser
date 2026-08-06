@@ -1,5 +1,5 @@
 <template>
-  <b-card no-body class="item-card" :class="classes" v-visible.400="load">
+  <b-card no-body class="item-card" :class="classes" v-visible.400="load" :img-placement="isList ? 'end' : undefined">
     <div class="card-img-wrapper">
       <b-card-img v-if="hasImage" class="thumbnail" v-bind="thumbnail" lazy />
     </div>

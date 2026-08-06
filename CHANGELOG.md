@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Support for external management UIs via `create-form` and `edit-form` links ([RFC 6861](https://www.rfc-editor.org/rfc/rfc6861.html)) in the "Manage" menu
 - AVIF support for thumbnails
 - Improved metadata rendering for Zarr, Archive, Vector and more extensions
+- Items can be shown in a list view in addition to the card view, with the same view toggle buttons as for catalogs and collections
+  - The `cardViewMode` config option now applies to item lists as well
 
 ### Removed
 

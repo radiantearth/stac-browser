@@ -3,6 +3,7 @@
     <header>
       <h2 class="title me-2">{{ $t('stacItem', items.length ) }}</h2>
       <b-badge v-if="itemCount !== null" pill variant="secondary" class="me-4">{{ itemCount }}</b-badge>
+      <ViewButtons v-if="!enforceView" class="me-2" v-model="view" />
       <SortButtons v-if="!api && items.length > 1" v-model="sort.direction" />
     </header>
 
@@ -29,8 +30,8 @@
 
     <section class="list">
       <Loading v-if="loading" fill top />
-      <div v-if="chunkedItems.length > 0" class="card-grid">
-        <Item v-for="item in chunkedItems" :item="item" :key="item.href" />
+      <div v-if="chunkedItems.length > 0" :class="view === 'list' ? 'card-list' : 'card-grid'">
+        <Item v-for="item in chunkedItems" :item="item" :viewMode="view" :key="item.href" />
       </div>
       <b-alert v-else :variant="hasFilters ? 'warning' : 'info'" show>
         <template v-if="hasFilters">{{ $t('search.noItemsFound') }}</template>
@@ -49,9 +50,11 @@ import { BCollapse } from 'bootstrap-vue-next';
 import { defineComponent, defineAsyncComponent } from 'vue';
 
 import Utils from '../utils';
+import ViewMixin from './ViewMixin';
 import { size } from 'stac-js/src/utils.js';
 import Item from './Item.vue';
 import Loading from './Loading.vue';
+import ViewButtons from './ViewButtons.vue';
 import { sortStac } from '../models/stac';
 import { FILTER_FIELDS } from '../store/modules/search';
 
@@ -63,8 +66,10 @@ export default defineComponent({
     Loading,
     Pagination: defineAsyncComponent(() => import('./Pagination.vue')),
     BCollapse,
-    SortButtons: defineAsyncComponent(() => import('./SortButtons.vue'))
+    SortButtons: defineAsyncComponent(() => import('./SortButtons.vue')),
+    ViewButtons
   },
+  mixins: [ViewMixin],
   props: {
     items: {
       type: Array,

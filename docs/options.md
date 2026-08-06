@@ -526,7 +526,7 @@ This config option allows to enforce a specific color mode, either `light` (defa
 
 ### cardViewMode
 
-The default view mode for lists of catalogs/collections. Either `"list"` or `"cards"` (default).
+The default view mode for lists of catalogs, collections and items. Either `"list"` or `"cards"` (default).
 
 ### showKeywordsInItemCards
 
