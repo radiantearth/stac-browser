@@ -190,10 +190,8 @@ export default class Utils {
       }
       if (Array.isArray(value)) {
         if (value.length > 0) {
-          if (key === 'q') {
+          if (value.length > 0) {
             query[name] = value;
-          } else {
-            query[name] = value.join(',');
           }
         }
       }
