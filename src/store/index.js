@@ -599,7 +599,7 @@ function getStore(config, router) {
           delete state[type][key];
         }
         else {
-          state[type][key] = value;
+          state[type] = Object.assign({}, state[type], { [key]: value });
         }
       },
       setRequestHeader(state, { key, value }) {

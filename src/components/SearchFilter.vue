@@ -514,11 +514,21 @@ export default defineComponent({
     apiCollectionsPaginated() {
       this.updateApiCollections();
     },
-    '$route.query': {
-      handler(newQuery, oldQuery) {
-        if (JSON.stringify(newQuery) !== JSON.stringify(oldQuery)) {
-          this.rebuildFromUrl();
-        }
+    '$route.query'(newQuery, oldQuery) {
+      const getSearchState = (q) => {
+        return Object.keys(q || {})
+          .filter(k => k === 'searchtype' || k.startsWith('s.c.') || k.startsWith('s.i.'))
+          .reduce((obj, k) => {
+            obj[k] = q[k];
+            return obj;
+          }, {});
+      };
+
+      const newSearch = getSearchState(newQuery);
+      const oldSearch = getSearchState(oldQuery);
+
+      if (JSON.stringify(newSearch) !== JSON.stringify(oldSearch)) {
+        this.rebuildFromUrl();
       }
     },
     'activeParams.collections': {
@@ -728,7 +738,7 @@ export default defineComponent({
               } else if (field === 'limit') {
                 const limitInt = Number.parseInt(decodedValue, 10);
                 if (!Number.isNaN(limitInt) && limitInt > 0) {
-                  parsedValue = Math.min(limitInt, 10000); 
+                  parsedValue = Math.min(limitInt, this.maxItems || 10000); 
                 } else {
                   continue;
                 }
