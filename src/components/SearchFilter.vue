@@ -518,6 +518,7 @@ export default defineComponent({
       const getSearchState = (q) => {
         return Object.keys(q || {})
           .filter(k => k === 'searchtype' || k.startsWith('s.c.') || k.startsWith('s.i.'))
+          .sort()
           .reduce((obj, k) => {
             obj[k] = q[k];
             return obj;
@@ -691,7 +692,7 @@ export default defineComponent({
           if (field === 'datetime') {
             urlValue = value.map(d => d instanceof Date ? d.toISOString() : d).join('/');
           } else if (['q', 'collections', 'ids'].includes(field)) {
-            urlValue = value.map(encodeURIComponent).join(',');
+            urlValue = value;
           } else {
             urlValue = value.join(',');
           }
@@ -717,7 +718,7 @@ export default defineComponent({
           
           if (typeof value === 'string') {
             if (['q', 'collections', 'ids'].includes(field)) {
-              parsedValue = value.split(/,(?!\s)/).map(decodeURIComponent);
+              parsedValue = Array.isArray(value) ? value : [value];
             } else {
               const decodedValue = decodeURIComponent(value);
               

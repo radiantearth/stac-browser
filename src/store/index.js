@@ -615,10 +615,12 @@ function getStore(config, router) {
       },
       updateState(state, { type, value }) {
         if (value === null || typeof value === 'undefined') {
-          delete state.stateQueryParameters[type];
+          const newState = Object.assign({}, state.stateQueryParameters);
+          delete newState[type];
+          state.stateQueryParameters = newState;
         }
         else {
-          state.stateQueryParameters[type] = value;
+          state.stateQueryParameters = Object.assign({}, state.stateQueryParameters, { [type]: value });
         }
       },
       openCollapsible(state, { type, uid }) {
