@@ -184,11 +184,10 @@ export default class Utils {
 
   static stateQueryParametersToObject(state, query = {}) {
     for (const [key, value] of Object.entries(state)) {
-      let name = key;
-      if (key !== 'searchtype' && !key.startsWith('.') && !key.includes('.')) {
-        name = `.${key}`;
-      }
+      let name = `.${key}`;
       if (Array.isArray(value)) {
+        // Kept as an array so the router emits one param per entry; joining with
+        // a comma would corrupt values that themselves contain commas.
         if (value.length > 0) {
           query[name] = value;
         }

@@ -113,8 +113,16 @@ function getStore(config, router) {
       itemdef: [],
       // Determine which search tab is active in the API Search view
       searchtype: null,
-      // Used for free-text search
-      q: []
+      // Search filters of the active search, serialized under spec-native names
+      // (the active search is identified by searchtype, so no per-type prefix is
+      // needed). q doubles as the free-text search field.
+      q: [],
+      collections: [],
+      ids: [],
+      datetime: null,
+      bbox: null,
+      limit: null,
+      sortby: null
     },
 
     apiItems: [],
@@ -599,7 +607,7 @@ function getStore(config, router) {
           delete state[type][key];
         }
         else {
-          state[type] = Object.assign({}, state[type], { [key]: value });
+          state[type][key] = value;
         }
       },
       setRequestHeader(state, { key, value }) {
@@ -615,12 +623,10 @@ function getStore(config, router) {
       },
       updateState(state, { type, value }) {
         if (value === null || typeof value === 'undefined') {
-          const newState = Object.assign({}, state.stateQueryParameters);
-          delete newState[type];
-          state.stateQueryParameters = newState;
+          delete state.stateQueryParameters[type];
         }
         else {
-          state.stateQueryParameters = Object.assign({}, state.stateQueryParameters, { [type]: value });
+          state.stateQueryParameters[type] = value;
         }
       },
       openCollapsible(state, { type, uid }) {

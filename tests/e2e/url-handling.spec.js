@@ -155,7 +155,7 @@ test.describe('Search filter URL serialization', () => {
     await waitForBrowserReady(page);
   });
 
-  test('Filters use scoped prefixes (s.c. for Collections, s.i. for Items)', async ({ page }) => {
+  test('Filters serialize under spec-native names, scoped by searchtype', async ({ page }) => {
     await page.getByRole('tab', { name: /Items/i }).click();
 
     const itemSearchGroup = page.locator('.tab-pane.active .filter-freetext');
@@ -169,10 +169,12 @@ test.describe('Search filter URL serialization', () => {
 
     // The URL reflects the executed search, so editing the form alone must not
     // change it; it's only written on submit.
-    await expect(page).not.toHaveURL(/s\.i\.q=water/);
+    await expect(page).not.toHaveURL(/\.q=water/);
     await page.locator('.tab-pane.active').getByRole('button', { name: /submit/i }).click();
 
-    await expect(page).toHaveURL(/s\.i\.q=water/);
+    // Spec-native name, no per-type prefix; searchtype records the active search.
+    await expect(page).toHaveURL(/\.q=water/);
+    await expect(page).toHaveURL(/\.searchtype=items/);
 
     await page.getByRole('tab', { name: /Collections/i }).click();
     const collectionSearchGroup = page.locator('.tab-pane.active .filter-freetext');
@@ -186,23 +188,26 @@ test.describe('Search filter URL serialization', () => {
 
     await page.locator('.tab-pane.active').getByRole('button', { name: /submit/i }).click();
 
-    // Verify the URL uses the collection prefix 's.c.'
-    await expect(page).toHaveURL(/s\.c\.q=clouds/);
+    // The active search owns the shared params; switching and submitting the
+    // collection search replaces the item search's q under the same key.
+    await expect(page).toHaveURL(/\.q=clouds/);
+    await expect(page).toHaveURL(/\.searchtype=collections/);
+    await expect(page).not.toHaveURL(/\.q=water/);
   });
 
   test('Reset button completely clears filters from the URL', async ({ page }) => {
-    await page.goto(`/search${CANONICAL_PATH}?s.i.q=water&s.i.limit=15`);
+    await page.goto(`/search${CANONICAL_PATH}?.q=water&.limit=15&.searchtype=items`);
     await waitForBrowserReady(page);
 
     await page.getByRole('tab', { name: /Items/i }).click();
-    await page.getByRole('button', { name: /reset/i }).click();
+    await page.locator('.tab-pane.active').getByRole('button', { name: /reset/i }).click();
 
-    await expect(page).not.toHaveURL(/s\.i\.q/);
-    await expect(page).not.toHaveURL(/s\.i\.limit/);
+    await expect(page).not.toHaveURL(/\.q=water/);
+    await expect(page).not.toHaveURL(/\.limit=/);
   });
 
   test('Comma-joined fields safely preserve internal commas', async ({ page }) => {
-    await page.goto(`/search${CANONICAL_PATH}?s.i.q=water%2C%20clouds`);
+    await page.goto(`/search${CANONICAL_PATH}?.q=water%2C%20clouds&.searchtype=items`);
     await waitForBrowserReady(page);
 
     await page.getByRole('tab', { name: /Items/i }).click();
@@ -211,7 +216,7 @@ test.describe('Search filter URL serialization', () => {
   });
 
   test('Invalid garbage data in the URL is safely ignored (Validation)', async ({ page }) => {
-    await page.goto(`/search${CANONICAL_PATH}?s.i.bbox=foo,bar,baz,qux&s.i.limit=-50`);
+    await page.goto(`/search${CANONICAL_PATH}?.bbox=foo,bar,baz,qux&.limit=-50&.searchtype=items`);
     await waitForBrowserReady(page);
 
     await page.getByRole('tab', { name: /Items/i }).click();
