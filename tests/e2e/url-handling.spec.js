@@ -206,13 +206,17 @@ test.describe('Search filter URL serialization', () => {
     await expect(page).not.toHaveURL(/\.limit=/);
   });
 
-  test('Comma-joined fields safely preserve internal commas', async ({ page }) => {
-    await page.goto(`/search${CANONICAL_PATH}?.q=water%2C%20clouds&.searchtype=items`);
+  test('Free-text q treats commas as term separators (Basic free-text)', async ({ page }) => {
+    // STAC Basic free-text GET: terms are comma-separated and a space is part of
+    // a term, so `EO,Earth Observation` is two terms, not one.
+    await page.goto(`/search${CANONICAL_PATH}?.q=EO%2CEarth%20Observation&.searchtype=items`);
     await waitForBrowserReady(page);
 
     await page.getByRole('tab', { name: /Items/i }).click();
-    const searchTag = page.locator('.tab-pane.active .filter-freetext .multiselect__tag').first();
-    await expect(searchTag).toContainText('water, clouds');
+    const tags = page.locator('.tab-pane.active .filter-freetext .multiselect__tag');
+    await expect(tags).toHaveCount(2);
+    await expect(tags.nth(0)).toContainText('EO');
+    await expect(tags.nth(1)).toContainText('Earth Observation');
   });
 
   test('Invalid garbage data in the URL is safely ignored (Validation)', async ({ page }) => {

@@ -186,10 +186,8 @@ export default class Utils {
     for (const [key, value] of Object.entries(state)) {
       let name = `.${key}`;
       if (Array.isArray(value)) {
-        // Kept as an array so the router emits one param per entry; joining with
-        // a comma would corrupt values that themselves contain commas.
         if (value.length > 0) {
-          query[name] = value;
+          query[name] = value.join(',');
         }
       }
       else if (value !== null) {

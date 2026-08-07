@@ -523,7 +523,10 @@ export default defineComponent({
       this.updateApiCollections();
     },
     '$route.query'(newQuery, oldQuery) {
-      const searchKeys = ['.searchtype', ...FILTER_FIELDS.map(field => `.${field}`)];
+      // Only re-read when the filter params themselves change (e.g. back/forward).
+      // searchtype is deliberately excluded: a tab switch must not pull the
+      // previous search's still-present params into the newly-active form.
+      const searchKeys = FILTER_FIELDS.map(field => `.${field}`);
       const pick = (q) => searchKeys
         .filter(k => k in (q || {}))
         .sort()
@@ -699,8 +702,8 @@ export default defineComponent({
           if (field === 'datetime') {
             urlValue = value.map(d => d instanceof Date ? d.toISOString() : d).join('/');
           } else if (['q', 'collections', 'ids'].includes(field)) {
-            // Kept as an array so each entry becomes its own URL param, which
-            // preserves values containing commas.
+            // Stored as an array; serialized comma-separated (STAC GET form for
+            // free-text terms and collection/item id lists).
             urlValue = value;
           } else {
             urlValue = value.join(',');
@@ -727,7 +730,9 @@ export default defineComponent({
 
         if (typeof value === 'string') {
           if (['q', 'collections', 'ids'].includes(field)) {
-            parsedValue = [value];
+            // Comma-separated per the STAC GET conventions (Basic free-text
+            // terms; collection/item id lists).
+            parsedValue = value.split(',');
           } else if (field === 'bbox') {
             const coords = decodeURIComponent(value).split(',').map(Number);
             if ((coords.length === 4 || coords.length === 6) && coords.every(n => !Number.isNaN(n))) {
