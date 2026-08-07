@@ -536,7 +536,7 @@ export default defineComponent({
       deep: true,
       handler(vuexCollections) {
         this.syncVuexToUrl();
-        
+
         const activeCollections = vuexCollections || [];
         
         const currentSelectedIds = (this.selectedCollections || []).map(c => c.value);
@@ -679,7 +679,7 @@ export default defineComponent({
     syncVuexToUrl() {
       const params = this.activeParams || {};
       const fieldsToSync = ['q', 'datetime', 'bbox', 'limit', 'collections', 'ids', 'sortby'];
-      
+
       const prefix = this.type === 'Collections' ? 's.c.' : 's.i.';
 
       fieldsToSync.forEach(field => {
@@ -698,9 +698,9 @@ export default defineComponent({
           }
         }
 
-        this.$store.commit('updateState', { 
-          type: `${prefix}${field}`, 
-          value: urlValue 
+        this.$store.commit('updateState', {
+          type: `${prefix}${field}`,
+          value: urlValue
         });
       });
     },
@@ -708,20 +708,20 @@ export default defineComponent({
     rebuildFromUrl() {
       const query = this.$route.query || {};
       let foundFiltersInUrl = false;
-      
+
       const prefix = this.type === 'Collections' ? 's.c.' : 's.i.';
-      
+
       for (const [key, value] of Object.entries(query)) {
         if (key.startsWith(prefix) && value !== null && value !== undefined) {
           const field = key.replace(prefix, '');
           let parsedValue = value;
-          
+
           if (typeof value === 'string') {
             if (['q', 'collections', 'ids'].includes(field)) {
               parsedValue = Array.isArray(value) ? value : [value];
             } else {
               const decodedValue = decodeURIComponent(value);
-              
+
               if (field === 'bbox') {
                 const coords = decodedValue.split(',').map(Number);
                 if ((coords.length === 4 || coords.length === 6) && coords.every(n => !Number.isNaN(n))) {
@@ -739,20 +739,20 @@ export default defineComponent({
               } else if (field === 'limit') {
                 const limitInt = Number.parseInt(decodedValue, 10);
                 if (!Number.isNaN(limitInt) && limitInt > 0) {
-                  parsedValue = Math.min(limitInt, this.maxItems || 10000); 
+                  parsedValue = Math.min(limitInt, this.maxItems || 10000);
                 } else {
                   continue;
                 }
               }
             }
           }
-          
+
           const mutation = this.type === 'Collections' ? 'search/setCollectionFilters' : 'search/setItemFilters';
           this.$store.commit(mutation, { [field]: parsedValue });
           foundFiltersInUrl = true;
         }
       }
-      
+
       return foundFiltersInUrl;
     },
     resetSearchCollection() {

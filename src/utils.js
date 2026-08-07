@@ -190,9 +190,7 @@ export default class Utils {
       }
       if (Array.isArray(value)) {
         if (value.length > 0) {
-          if (value.length > 0) {
-            query[name] = value;
-          }
+          query[name] = value;
         }
       }
       else if (value !== null) {

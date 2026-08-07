@@ -556,7 +556,7 @@ export default defineComponent({
         // Store all state related parameters (start with .)
         else if (key.startsWith('.') || key.startsWith('s.c.') || key.startsWith('s.i.') || key === 'searchtype') {
           let realKey = key.startsWith('.') ? key.substr(1) : key;
-          params.state = isObject(params.state) ? params.state : {};  
+          params.state = isObject(params.state) ? params.state : {};
           if (Array.isArray(this.stateQueryParameters[realKey]) && !Array.isArray(value)) {
             value = value.split(',');
           }
