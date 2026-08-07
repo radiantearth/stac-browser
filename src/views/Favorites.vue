@@ -25,7 +25,7 @@
     </b-alert>
     <b-alert v-if="favorites.length === 0" variant="info" show>{{ $t('favorites.empty') }}</b-alert>
     <b-row v-else-if="visibleFavorites.length > 0">
-      <b-col v-if="catalogs.length > 0" :cols="cols">
+      <b-col v-if="catalogs.length > 0" class="catalogs-container">
         <Catalogs :catalogs="catalogs" enforceView="cards">
           <template #catalogFooter="{source}">
             <b-button size="sm" variant="outline-danger" :title="$t('favorites.remove')" @click="remove(source)">
@@ -34,7 +34,7 @@
           </template>
         </Catalogs>
       </b-col>
-      <b-col v-if="items.length > 0" :cols="cols">
+      <b-col v-if="items.length > 0" class="items-container">
         <Items v-if="items.length > 0" :items="items" enforceView="cards">
           <template #itemFooter="{source}">
             <b-button size="sm" variant="outline-danger" :title="$t('favorites.remove')" @click="remove(source)">
@@ -99,9 +99,6 @@ export default defineComponent({
         .filter(favorite => favorite.type === 'Item')
         .map(favorite => Utils.createLink(favorite.href, 'item', favorite.title));
     },
-    cols() {
-      return this.catalogs.length > 0 && this.items.length > 0 ? 6 : 12;
-    }
   },
   async created() {
     this.$store.commit('showPage', {
@@ -176,3 +173,20 @@ export default defineComponent({
   }
 });
 </script>
+
+<style lang="scss">
+@import 'bootstrap/scss/mixins';
+@import "../theme/variables.scss";
+
+#stac-browser .favorites {
+  // Stack the catalog and item lists on smaller screens
+  @include media-breakpoint-down(lg) {
+    > .row {
+      > .catalogs-container,
+      > .items-container {
+        min-width: 100%;
+      }
+    }
+  }
+}
+</style>

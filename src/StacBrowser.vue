@@ -72,7 +72,7 @@
               </b-button>
             </b-button-group>
           </nav>
-          <StacSource class="actions" :title="title" />
+          <StacSource v-if="!isFavoritesPage" class="actions" :title="title" />
         </b-col>
       </b-row>
     </header>
