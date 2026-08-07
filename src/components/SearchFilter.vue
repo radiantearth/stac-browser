@@ -533,10 +533,9 @@ export default defineComponent({
       }
     },
     'activeParams.collections': {
+      immediate: true,
       deep: true,
       handler(vuexCollections) {
-        this.syncVuexToUrl();
-
         const activeCollections = vuexCollections || [];
         
         const currentSelectedIds = (this.selectedCollections || []).map(c => c.value);
@@ -678,6 +677,8 @@ export default defineComponent({
   methods: {
     syncVuexToUrl() {
       const params = this.activeParams || {};
+      // TODO: also serialize the CQL filters (filters/rawFilters/filterLogic) so
+      // that shared URLs can reproduce advanced filter searches.
       const fieldsToSync = ['q', 'datetime', 'bbox', 'limit', 'collections', 'ids', 'sortby'];
 
       const prefix = this.type === 'Collections' ? 's.c.' : 's.i.';
@@ -915,6 +916,9 @@ export default defineComponent({
       // Executing a search retires the notice about the previous carry-over
       this.$store.commit('search/clearDroppedFilters', this.type);
 
+      // The URL mirrors the executed search, so it's written on submit only.
+      this.syncVuexToUrl();
+
       this.$emit('input', this.activeParams);
     },
     onReset() {
@@ -966,9 +970,6 @@ export default defineComponent({
     commitToVuex(field, value) {
       const mutation = this.type === 'Collections' ? 'search/setCollectionFilters' : 'search/setItemFilters';
       this.$store.commit(mutation, { [field]: value });
-      this.$nextTick(() => {
-        this.syncVuexToUrl();
-      });
     },
     // Selects the sort field and direction stored for this search (e.g.
     // carried over from another search) in the form.

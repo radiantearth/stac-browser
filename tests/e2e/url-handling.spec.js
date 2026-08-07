@@ -167,6 +167,11 @@ test.describe('Search filter URL serialization', () => {
     await itemSearchInput.fill('water');
     await itemSearchInput.press('Enter');
 
+    // The URL reflects the executed search, so editing the form alone must not
+    // change it; it's only written on submit.
+    await expect(page).not.toHaveURL(/s\.i\.q=water/);
+    await page.locator('.tab-pane.active').getByRole('button', { name: /submit/i }).click();
+
     await expect(page).toHaveURL(/s\.i\.q=water/);
 
     await page.getByRole('tab', { name: /Collections/i }).click();
@@ -178,6 +183,8 @@ test.describe('Search filter URL serialization', () => {
     await expect(collectionSearchInput).toBeVisible();
     await collectionSearchInput.fill('clouds');
     await collectionSearchInput.press('Enter');
+
+    await page.locator('.tab-pane.active').getByRole('button', { name: /submit/i }).click();
 
     // Verify the URL uses the collection prefix 's.c.'
     await expect(page).toHaveURL(/s\.c\.q=clouds/);
