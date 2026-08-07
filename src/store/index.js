@@ -113,8 +113,16 @@ function getStore(config, router) {
       itemdef: [],
       // Determine which search tab is active in the API Search view
       searchtype: null,
-      // Used for free-text search
-      q: []
+      // Search filters of the active search, serialized under spec-native names
+      // (the active search is identified by searchtype, so no per-type prefix is
+      // needed). q doubles as the free-text search field.
+      q: [],
+      collections: [],
+      ids: [],
+      datetime: null,
+      bbox: null,
+      limit: null,
+      sortby: null
     },
 
     apiItems: [],
