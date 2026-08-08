@@ -114,12 +114,16 @@ cd /tmp/app && go run search.go
 EOF
       ;;
     curl)
-      # curl only prints the raw response, so assert the result array is present
+      # curl only prints the raw response, so assert the result array is present.
+      # Don't pipe directly into grep, that would discard the curl exit code.
       cat <<'EOF'
 if [ -n "$INSTALL_DEPS" ]; then eval "$INSTALL_DEPS"; fi
-sh /code/default/search.sh | grep -q '"features"'
-sh /code/cql-json/search.sh | grep -q '"features"'
-sh /code/cql-text/search.sh | grep -q '"features"'
+sh /code/default/search.sh > /tmp/default.json
+grep -q '"features"' /tmp/default.json
+sh /code/cql-json/search.sh > /tmp/cql-json.json
+grep -q '"features"' /tmp/cql-json.json
+sh /code/cql-text/search.sh > /tmp/cql-text.json
+grep -q '"features"' /tmp/cql-text.json
 EOF
       ;;
     rust)

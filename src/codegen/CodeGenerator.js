@@ -24,7 +24,10 @@ export default class CodeGenerator {
   }
 
   /**
-   * The syntax highlighter language identifier.
+   * The stable identifier of the generator.
+   * Used as the tab id, the key in the browser storage, the i18n key for the
+   * label (`programming.<language>`) and, unless `highlightLanguage` is
+   * overridden, as the syntax highlighter language identifier.
    * @returns {string}
    */
   get language() {
@@ -32,9 +35,9 @@ export default class CodeGenerator {
   }
 
   /**
-   * The identifier passed to the syntax highlighter.
-   * Override if `language` is not a language known to the highlighter,
-   * e.g. `curl` snippets are highlighted as `bash`.
+   * The syntax highlighter language identifier.
+   * Defaults to `language`, override if that is not a language known to the
+   * highlighter, e.g. `curl` snippets are highlighted as `bash`.
    * @returns {string}
    */
   get highlightLanguage() {
