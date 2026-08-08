@@ -15,6 +15,15 @@ services:
       - ./generated:/code:ro
     network_mode: host
 
+  curl:
+    image: curlimages/curl:latest
+    entrypoint: ["sh"]
+    working_dir: /code
+    command: ["-c", "sh search.sh"]
+    volumes:
+      - ./generated:/code:ro
+    network_mode: host
+
   javascript:
     image: node:22-slim
     working_dir: /code

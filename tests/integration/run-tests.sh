@@ -15,9 +15,9 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 COMPOSE_FILE="$SCRIPT_DIR/docker-compose.yml"
 GENERATED_DIR="$SCRIPT_DIR/generated"
 
-LANGUAGES=(python javascript r csharp java rust)
+LANGUAGES=(python javascript r csharp java rust curl)
 SCENARIOS=(default cql-json cql-text)
-GENERATED_FILES=(Program.cs StacSearch.java search.mjs search.py search.R main.rs)
+GENERATED_FILES=(Program.cs StacSearch.java search.mjs search.py search.R main.rs search.sh)
 TIMEOUT_SECS=300
 
 # Portable timeout: Linux → gtimeout (macOS via brew) → fallback
@@ -98,6 +98,15 @@ cd /tmp && javac -cp '.:*' StacSearch.java && java -cp '.:*' StacSearch
     cd /tmp && javac -cp '.:*' StacSearch.java && java -cp '.:*' StacSearch
     cp /code/cql-text/StacSearch.java /tmp/StacSearch.java
 cd /tmp && javac -cp '.:*' StacSearch.java && java -cp '.:*' StacSearch
+EOF
+      ;;
+    curl)
+      # curl only prints the raw response, so assert the result array is present
+      cat <<'EOF'
+if [ -n "$INSTALL_DEPS" ]; then eval "$INSTALL_DEPS"; fi
+sh /code/default/search.sh | grep -q '"features"'
+sh /code/cql-json/search.sh | grep -q '"features"'
+sh /code/cql-text/search.sh | grep -q '"features"'
 EOF
       ;;
     rust)

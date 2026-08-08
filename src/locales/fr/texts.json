@@ -255,6 +255,7 @@
   "poweredBy": "Propulsé par {link}",
   "programming": {
     "csharp": "C#",
+    "curl": "cURL",
     "java": "Java",
     "javascript": "JavaScript",
     "python": "Python",

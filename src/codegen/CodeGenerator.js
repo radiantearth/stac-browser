@@ -32,6 +32,16 @@ export default class CodeGenerator {
   }
 
   /**
+   * The identifier passed to the syntax highlighter.
+   * Override if `language` is not a language known to the highlighter,
+   * e.g. `curl` snippets are highlighted as `bash`.
+   * @returns {string}
+   */
+  get highlightLanguage() {
+    return this.language;
+  }
+
+  /**
    * The output filename used when generating runnable snippets.
    * @returns {string}
    */

@@ -255,6 +255,7 @@
   "poweredBy": "Generiert von {link}",
   "programming": {
     "csharp": "C#",
+    "curl": "cURL",
     "java": "Java",
     "javascript": "JavaScript",
     "python": "Python",
