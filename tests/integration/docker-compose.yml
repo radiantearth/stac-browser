@@ -15,6 +15,23 @@ services:
       - ./generated:/code:ro
     network_mode: host
 
+  curl:
+    image: curlimages/curl:latest
+    entrypoint: ["sh"]
+    working_dir: /code
+    command: ["-c", "sh search.sh"]
+    volumes:
+      - ./generated:/code:ro
+    network_mode: host
+
+  go:
+    image: golang:1
+    working_dir: /code
+    volumes:
+      - ./generated:/code:ro
+    command: ["sh", "-c", "mkdir -p /tmp/app && cp search.go /tmp/app/ && cd /tmp/app && (go mod init stacsearch || true) && go run search.go"]
+    network_mode: host
+
   javascript:
     image: node:22-slim
     working_dir: /code
