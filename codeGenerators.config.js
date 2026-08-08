@@ -3,6 +3,7 @@ import JavaScriptGenerator from './src/codegen/JavaScriptGenerator.js';
 import RGenerator from './src/codegen/RGenerator.js';
 import CSharpGenerator from './src/codegen/CSharpGenerator.js';
 import CurlGenerator from './src/codegen/CurlGenerator.js';
+import GoGenerator from './src/codegen/GoGenerator.js';
 import JavaGenerator from './src/codegen/JavaGenerator.js';
 import RustGenerator from './src/codegen/RustGenerator.js';
 
@@ -13,6 +14,7 @@ import RustGenerator from './src/codegen/RustGenerator.js';
 export default [
   CSharpGenerator,
   CurlGenerator,
+  GoGenerator,
   JavaGenerator,
   JavaScriptGenerator,
   PythonGenerator,

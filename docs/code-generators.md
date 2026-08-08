@@ -89,7 +89,7 @@ Request preparation (query parameter encoding for GET, body construction for POS
 
 Most languages have **one template file** in `src/codegen/templates/`, using comment-based conditionals to handle GET/POST differences. This replaces the earlier convention of separate `get`/`post`/`item` templates per language.
 
-- Languages that use raw HTTP (JavaScript, C#, Java, curl) use `if IS_POST` conditionals to switch between POST and GET code paths.
+- Languages that use raw HTTP (JavaScript, C#, Java, Go, curl) use `if IS_POST` conditionals to switch between POST and GET code paths.
 - Languages with a dedicated STAC client library (R/rstac, Rust/stac-rs) use **separate template files** for the native client path and the raw HTTP fallback (e.g. `r.r` + `r-http.r`, `rust.rs` + `rust-http.rs`). The generator selects the appropriate template at generation time based on search context (collection search, CQL filters, etc.).
 - Python uses pystac-client in a single template since the library covers all search scenarios.
 

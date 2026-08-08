@@ -232,6 +232,7 @@
   "programming": {
     "csharp": "C#",
     "curl": "cURL",
+    "go": "Go",
     "java": "Java",
     "javascript": "JavaScript",
     "python": "Python",
