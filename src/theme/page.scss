@@ -547,7 +547,12 @@ svg {
 
     .catalog-card,
     .item-card {
-      grid-row: span 7;
+      grid-row: span 6;
+
+      &::after {
+        content: "";
+        grid-row: 6;
+      }
 
       .card-body {
         display: grid;

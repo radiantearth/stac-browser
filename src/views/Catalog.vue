@@ -56,8 +56,8 @@
       <b-col class="items-container" v-if="hasItems || hasItemAssets">
         <WidgetHook id="view-catalog-items-start" />
         <Items
-          :stac="data" :items="items" :api="hasApiItems"
-          :showFilters="showFilters" :apiFilters="filters"
+          :stac="data" :items="items" :api="hasApiItems" allowFilter
+          showControls :showFilters="showFilters" :apiFilters="filters"
           :pagination="itemPages" :loading="apiItemsLoading"
           :count="apiItemsNumberMatched"
           @paginate="paginateItems" @filter-items="filterItems"

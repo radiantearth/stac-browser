@@ -92,6 +92,9 @@
       "type": ["string"],
       "enum": ["list", "cards"]
     },
+    "showFavorites": {
+      "type": ["boolean"]
+    },
     "defaultItemSort": {
       "type": ["string", "null"]
     },

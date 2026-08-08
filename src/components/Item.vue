@@ -15,6 +15,9 @@
       <Keywords v-if="showKeywordsInItemCards && keywords.length > 0" :keywords="keywords" variant="primary" />
       <b-card-text><small class="datetime" v-html="displayTime" /></b-card-text>
     </b-card-body>
+    <b-card-footer v-if="$slots.footer">
+      <slot name="footer" :data="data" :source="item" />
+    </b-card-footer>
   </b-card>
 </template>
 
@@ -27,7 +30,7 @@ import CardMixin from './CardMixin';
 import StacLink from './StacLink.vue';
 import { STAC } from 'stac-js';
 import { formatTemporalExtent, formatTimestamp } from '@radiantearth/stac-fields/formatters';
-import { BCard, BCardBody, BCardText, BCardTitle, BCardImg } from 'bootstrap-vue-next';
+import { BCard, BCardBody, BCardFooter, BCardText, BCardTitle, BCardImg } from 'bootstrap-vue-next';
 
 export default defineComponent({
   name: 'Item',
@@ -36,6 +39,7 @@ export default defineComponent({
     BCard,
     BCardImg,
     BCardBody,
+    BCardFooter,
     BCardText,
     BCardTitle,
     Keywords: defineAsyncComponent(() => import('./Keywords.vue'))

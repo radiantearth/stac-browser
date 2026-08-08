@@ -4,14 +4,14 @@
       <h2 class="title me-2">{{ $t('stacItem', items.length ) }}</h2>
       <b-badge v-if="itemCount !== null" pill variant="secondary" class="me-4">{{ itemCount }}</b-badge>
       <ViewButtons v-if="!enforceView" class="me-2" v-model="view" />
-      <SortButtons v-if="!api && items.length > 1" v-model="sort.direction" />
+      <SortButtons v-if="allowSorting" v-model="sort.direction" />
     </header>
 
     <Pagination
-      v-if="showPagination" ref="topPagination" class="mb-3" :class="{'me-3': allowFilter}"
+      v-if="showPagination" ref="topPagination" class="mb-3" :class="{'me-3': canFilter}"
       :pagination="pagination" placement="top" @paginate="paginate"
     />
-    <template v-if="allowFilter">
+    <template v-if="canFilter">
       <b-button v-if="api" class="mb-3" v-b-toggle.itemFilter :variant="hasFilters && !filtersOpen ? 'primary' : 'outline-primary'">
         <b-icon-filter />
         {{ filtersOpen ? $t('items.hideFilter') : $t('items.showFilter') }}
@@ -31,7 +31,11 @@
     <section class="list">
       <Loading v-if="loading" fill top />
       <div v-if="chunkedItems.length > 0" :class="view === 'list' ? 'card-list' : 'card-grid'">
-        <Item v-for="item in chunkedItems" :item="item" :viewMode="view" :key="item.href" />
+        <Item v-for="item in chunkedItems" :item="item" :viewMode="view" :key="item.href">
+          <template v-if="$slots.itemFooter" #footer="slot">
+            <slot name="itemFooter" v-bind="slot" />
+          </template>
+        </Item>
       </div>
       <b-alert v-else :variant="hasFilters ? 'warning' : 'info'" show>
         <template v-if="hasFilters">{{ $t('search.noItemsFound') }}</template>
@@ -79,17 +83,22 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
+    // The parent STAC entity, only required for filtering (see allowFilter)
     stac: {
       type: Object,
-      required: true
+      default: null
     },
     api: {
       type: Boolean,
       default: false
     },
+    showControls: {
+      type: Boolean,
+      default: false
+    },
     allowFilter: {
       type: Boolean,
-      default: true
+      default: false
     },
     showFilters: {
       type: Boolean,
@@ -142,6 +151,10 @@ export default defineComponent({
       };
       return FILTER_FIELDS.some(key => JSON.stringify(normalize(draft[key])) !== JSON.stringify(normalize(applied[key])));
     },
+    canFilter() {
+      // Filtering requires the parent STAC entity, e.g. for the queryables
+      return this.allowFilter && this.stac !== null;
+    },
     itemCount() {
       if (this.count !== null) {
         return this.count;
@@ -153,6 +166,9 @@ export default defineComponent({
     },
     hasMore() {
       return this.items.length > this.shownItems;
+    },
+    allowSorting() {
+      return this.showControls && !this.api && this.items.length > 1;
     },
     filterCount() {
       return Object.values(this.apiFilters).filter(filter => filter !== null && size(filter) > 0).length;
