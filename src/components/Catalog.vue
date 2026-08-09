@@ -17,7 +17,7 @@
     </b-card-body>
     <b-card-footer>
       <slot name="footer" :data="data" :source="catalog">
-        <StacActions v-if="data && !hideActions" :data="data" variant="outline-primary" vertical size="sm" />
+        <StacActions v-if="data && !hideActions" :data="data" variant="outline-primary" compact size="sm" />
       </slot>
     </b-card-footer>
   </b-card>

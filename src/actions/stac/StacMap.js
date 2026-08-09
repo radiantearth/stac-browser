@@ -1,6 +1,7 @@
 import StacActionPlugin from "../StacActionPlugin";
 import { URI } from 'stac-js/src/utils.js';
 import i18n from "../../i18n";
+import BIconMap from '~icons/bi/map';
 
 export default class StacMap extends StacActionPlugin {
 
@@ -10,6 +11,10 @@ export default class StacMap extends StacActionPlugin {
 
   get uri() {
     return URI('https://developmentseed.org/stac-map/').addQuery('href', this.object.getAbsoluteUrl());
+  }
+
+  get icon() {
+    return BIconMap;
   }
 
   get text() {

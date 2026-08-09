@@ -622,6 +622,11 @@ svg {
       .btn-group-vertical {
         width: 100%;
       }
+      // Stretch the compact action group across the footer so a single action
+      // fills the width like the other buttons instead of a separate small group
+      .stac-actions {
+        display: flex;
+      }
     }
     .card-footer:empty {
       display: none;

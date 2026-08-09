@@ -44,14 +44,14 @@
             @click="armCarryOver"
           >
             <template #footer="slot">
-              <b-button-group v-if="itemSearch || canFilterItems(slot.data) || hasStacActions(slot.data)" vertical size="sm">
+              <b-button-group v-if="itemSearch || canFilterItems(slot.data)" vertical size="sm">
                 <b-button v-if="itemSearch" variant="outline-primary" :pressed="selectedCollections[slot.data.id]" @click="selectForItemSearch(slot.data)">
                   <b-icon-check-square v-if="selectedCollections[slot.data.id]" />
                   <b-icon-square v-else />
                   <span class="ms-2">{{ $t('search.selectForItemSearch') }}</span>
                 </b-button>
                 <StacLink :button="{variant: 'outline-primary', disabled: !canFilterItems(slot.data)}" :data="slot.data" :title="$t('search.filterCollection')" :state="{itemFilterOpen: 1}" />
-                <StacActions :data="slot.data" variant="outline-primary" size="sm" bare />
+                <StacActions :data="slot.data" variant="outline-primary" compact size="sm" />
               </b-button-group>
             </template>
           </Catalogs>
@@ -85,7 +85,6 @@ import { STAC } from 'stac-js';
 import { defineComponent, defineAsyncComponent } from 'vue';
 import { getErrorCode, getErrorMessage, fetchQueryablesForLink, fetchSortablesForLink } from '../store/utils';
 import { mapGetters, mapState } from "vuex";
-import StacActionsConfig from '../../stacActions.config';
 import { BTab, BTabs } from 'bootstrap-vue-next';
 
 export default defineComponent({
@@ -289,9 +288,6 @@ export default defineComponent({
         return Boolean(data.getApiItemsLink());
       }
       return false;
-    },
-    hasStacActions(data) {
-      return Object.values(StacActionsConfig).some(plugin => new plugin(data, this).show);
     },
     async loadResults(link) {
       this.error = null;
