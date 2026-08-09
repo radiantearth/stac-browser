@@ -123,6 +123,26 @@
     "storeAs": "Enregistrer le code en tant que :",
     "installDependencies": "Installer les dépendances :"
   },
+  "favorites": {
+    "add": "",
+    "empty": "",
+    "export": "",
+    "exportDescription": "",
+    "exportFormats": {
+      "csv": "",
+      "excel": "",
+      "json": "",
+      "stac": ""
+    },
+    "import": "",
+    "importDescription": "",
+    "importInvalid": "",
+    "imported": "",
+    "label": "",
+    "localOnly": "",
+    "remove": "",
+    "title": ""
+  },
   "featureExperimental": "Cette fonctionnalité est encore expérimentale et peut donner des résultats inattendus!",
   "features": {
     "empty": "Aucune entité disponible.",
