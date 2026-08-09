@@ -40,8 +40,8 @@
       <Loading v-if="loading && !loadingMore" fill top />
       <div :class="view === 'list' ? 'card-list' : 'card-grid'">
         <Catalog v-for="catalog in catalogView" :catalog="catalog" :viewMode="view" :key="catalog.href">
-          <template #footer="{data}">
-            <slot name="catalogFooter" :data="data" />
+          <template #footer="slot">
+            <slot name="catalogFooter" v-bind="slot" />
           </template>
         </Catalog>
       </div>

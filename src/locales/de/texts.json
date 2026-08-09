@@ -123,6 +123,26 @@
     "storeAs": "Quelltext speichern als:",
     "installDependencies": "Installieren der Abhängigkeiten:"
   },
+  "favorites": {
+    "add": "Zu Favoriten hinzufügen",
+    "empty": "Es wurden noch keine Favoriten hinzugefügt. Favoriten können über den 'Favorit'-Button auf der Seite eines Katalogs, Produkts oder Datensatzes hinzugefügt werden.",
+    "export": "Exportieren",
+    "exportDescription": "Favoriten in eine Datei exportieren, z. B. um sie in einem anderen Browser zu importieren.",
+    "exportFormats": {
+      "csv": "CSV",
+      "excel": "Excel",
+      "json": "JSON",
+      "stac": "STAC-Katalog"
+    },
+    "import": "Importieren",
+    "importDescription": "Favoriten aus einer zuvor exportierten Datei importieren.",
+    "importInvalid": "Die ausgewählte Datei enthält keine Favoriten.",
+    "imported": "{count} neue Favoriten wurden importiert.",
+    "label": "Favorit",
+    "localOnly": "Favoriten werden nur lokal in diesem Webbrowser gespeichert. Sie werden nicht zwischen Geräten oder Browsern synchronisiert.",
+    "remove": "Aus Favoriten entfernen",
+    "title": "Favoriten"
+  },
   "featureExperimental": "Diese Funktion ist noch experimentell und kann unerwartete Ergebnisse verursachen!",
   "features": {
     "empty": "Keine Features verfügbar.",
