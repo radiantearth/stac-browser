@@ -547,7 +547,14 @@ svg {
 
     .catalog-card,
     .item-card {
-      grid-row: span 7;
+      grid-row: span 6;
+
+      // Workaround for a WebKit subgrid bug that clips the last row (the footer);
+      // pinning an empty item to it forces Safari to size it. Remove once fixed.
+      &::after {
+        content: "";
+        grid-row: 6;
+      }
 
       .card-body {
         display: grid;
@@ -647,7 +654,8 @@ svg {
     gap: 1rem;
     padding: 0.5rem 0;
 
-    .catalog-card {
+    .catalog-card,
+    .item-card {
       box-sizing: border-box;
       display: flex;
       overflow: hidden;

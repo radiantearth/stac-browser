@@ -20,7 +20,7 @@ export default {
   computed: {
     ...mapState(['cardViewMode', 'crossOriginMedia', 'defaultThumbnailSize']),
     isList() {
-      return this.data && !this.data.isItem && (this.viewMode || this.cardViewMode) === 'list';
+      return this.data && (this.viewMode || this.cardViewMode) === 'list';
     },
     hasImage() {
       return this.showThumbnail && this.thumbnail;

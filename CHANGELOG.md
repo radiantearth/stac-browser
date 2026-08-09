@@ -18,6 +18,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - AVIF support for thumbnails
 - Improved metadata rendering for Zarr, Archive, Vector and more extensions
 - STAC Actions: A new pluggable interface (`StacActionPlugin`) to add action buttons for catalogs, collections and items, configurable via `stacActions.config.js`. Ships with an optional (disabled by default) `StacMap` action to open items in [stac-map](https://developmentseed.org/stac-map/).
+- Favorites: Catalogs, collections and items can be marked as favorites and revisited on a new Favorites page ([#630](https://github.com/radiantearth/stac-browser/issues/630))
+  - Favorites are stored locally in the browser and can be exported and imported as JSON, CSV, or STAC Catalog
+  - Adds a new config option `showFavorites` to disable the functionality
+- Items can be shown in a list view in addition to the card view, with the same view toggle buttons as for catalogs and collections
+  - The `cardViewMode` config option now applies to item lists as well
 
 ### Removed
 
@@ -30,6 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Temporal extents were incomplete in non-English languages
 - Don't show inline sort and filter options in Collection Search
 - Preserve sort in Collection Search
+- Show error message when search is not actually available although conformance classes are listed
 
 ## [5.0.0] - 2026-07-31
 

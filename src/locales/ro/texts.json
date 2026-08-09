@@ -121,6 +121,9 @@
     "storeAs": "Salvează codul ca:",
     "installDependencies": "Instalează dependințele:"
   },
+  "favorites": {
+    "exportFormats": {}
+  },
   "featureExperimental": "Această funcție este încă experimentală și poate da rezultate neașteptate!",
   "features": {
     "noProperties": "Nu au fost furnizate proprietăți."

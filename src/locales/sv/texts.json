@@ -114,6 +114,9 @@
     "unauthorized": "Begäran saknar inloggningsuppgifter, t.ex. en API-nyckel. Ange dina uppgifter och försök igen."
   },
   "exampleCode": {},
+  "favorites": {
+    "exportFormats": {}
+  },
   "featureExperimental": "Denna funktion är fortfarande experimentell och kan ge oväntade resultat!",
   "features": {
     "empty": "Inga funktioner tillgängliga.",

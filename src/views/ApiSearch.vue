@@ -57,7 +57,7 @@
           </Catalogs>
           <Items
             v-else
-            :stac="parent" :items="results" :api="true" :allowFilter="false"
+            :stac="parent" :items="results" :api="true"
             :pagination="pagination" :loading="loading" @paginate="loadResults"
             :count="totalCount" :apiFilters="itemFilters"
           />
@@ -139,7 +139,7 @@ export default defineComponent({
       return null;
     },
     supportsSearch() {
-      return this.canSearchCollections || this.canSearchItems;
+      return this.collectionSearch || this.itemSearch;
     },
     searchLink() {
       return this.isCollectionSearch ? this.collectionSearch : this.itemSearch;

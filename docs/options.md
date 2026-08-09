@@ -84,6 +84,7 @@ The override order for the configuration is:
 - [User Interface](#user-interface)
   - [enforcedColorMode](#enforcedcolormode)
   - [cardViewMode](#cardviewmode)
+  - [showFavorites](#showfavorites)
   - [showKeywordsInItemCards](#showkeywordsinitemcards)
   - [showKeywordsInCatalogCards](#showkeywordsincatalogcards)
   - [defaultThumbnailSize](#defaultthumbnailsize)
@@ -526,7 +527,17 @@ This config option allows to enforce a specific color mode, either `light` (defa
 
 ### cardViewMode
 
-The default view mode for lists of catalogs/collections. Either `"list"` or `"cards"` (default).
+The default view mode for lists of catalogs, collections and items. Either `"list"` or `"cards"` (default).
+
+### showFavorites
+
+Enables the favorites functionality if set to `true` (default).
+Users can mark catalogs, collections and items as favorites and revisit them
+on a separate page, which is available through a button in the header.
+The favorites are only stored locally in the web browser of the user,
+they are not synchronized across devices or browsers.
+Users can export the favorites to a file and import them elsewhere.
+Set this option to `false` to disable the functionality.
 
 ### showKeywordsInItemCards
 

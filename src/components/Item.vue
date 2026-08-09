@@ -1,5 +1,5 @@
 <template>
-  <b-card no-body class="item-card" :class="classes" v-visible.400="load">
+  <b-card no-body class="item-card" :class="classes" v-visible.400="load" :img-placement="isList ? 'end' : undefined">
     <div class="card-img-wrapper">
       <b-card-img v-if="hasImage" class="thumbnail" v-bind="thumbnail" lazy />
     </div>
@@ -16,7 +16,7 @@
       <b-card-text><small class="datetime" v-html="displayTime" /></b-card-text>
     </b-card-body>
     <b-card-footer>
-      <slot name="footer" :data="data">
+      <slot name="footer" :data="data" :source="item">
         <StacActions v-if="data" :data="data" variant="outline-primary" vertical size="sm" />
       </slot>
     </b-card-footer>

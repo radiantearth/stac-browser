@@ -122,6 +122,9 @@
     "storeAs": "Armazenar código como:",
     "installDependencies": "Instalação de dependências:"
   },
+  "favorites": {
+    "exportFormats": {}
+  },
   "featureExperimental": "Esta funcionalidade ainda é experimental e pode dar resultados inesperados!",
   "features": {
     "empty": "Nenhuma feição disponível.",

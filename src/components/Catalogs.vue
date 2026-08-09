@@ -3,7 +3,7 @@
     <header>
       <h2 class="title me-2">{{ displayTitle }}</h2>
       <b-badge v-if="!hideCount && catalogCount !== null" pill variant="secondary" class="me-4">{{ catalogCount }}</b-badge>
-      <ViewButtons v-if="!enforceView && !enforceCards" class="me-2" v-model="view" />
+      <ViewButtons v-if="!enforceView" class="me-2" v-model="view" />
       <SortButtons v-if="allowSorting" v-model="sort.direction" />
     </header>
     <section v-if="showControls && ((isComplete && catalogs.length > 1) || canSearchFreeText)" class="catalog-filter mb-2">
@@ -40,8 +40,8 @@
       <Loading v-if="loading && !loadingMore" fill top />
       <div :class="view === 'list' ? 'card-list' : 'card-grid'">
         <Catalog v-for="catalog in catalogView" :catalog="catalog" :viewMode="view" :key="catalog.href">
-          <template #footer="{data}">
-            <slot name="footer" :data="data" />
+          <template v-if="$slots.footer" #footer="slot">
+            <slot name="footer" v-bind="slot" />
           </template>
         </Catalog>
       </div>
@@ -63,6 +63,7 @@ import Loading from './Loading.vue';
 import { STAC } from 'stac-js';
 import ViewButtons from './ViewButtons.vue';
 import Utils from '../utils';
+import ViewMixin from './ViewMixin';
 import { sortStac } from '../models/stac';
 import { TYPES } from './ApiCapabilitiesMixin.js';
 import { hasText, URI } from 'stac-js/src/utils.js';
@@ -78,6 +79,7 @@ export default defineComponent({
     SortButtons: defineAsyncComponent(() => import('./SortButtons.vue')),
     ViewButtons
   },
+  mixins: [ViewMixin],
   props: {
     catalogs: {
       type: Array,
@@ -86,15 +88,6 @@ export default defineComponent({
     collectionsOnly: {
       type: Boolean,
       required: false
-    },
-    enforceCards: {
-      type: Boolean,
-      default: false
-    },
-    enforceView: {
-      type: String,
-      default: null,
-      validator: value => value === null || ['list', 'cards'].includes(value)
     },
     showControls: {
       type: Boolean,
@@ -180,8 +173,8 @@ export default defineComponent({
       if (this.title !== null) {
         return this.title;
       }
-      let key = (this.collectionsOnly || this.catalogs.every(catalog => catalog.isCollection)) ? 'stacCollection' : 'stacCatalog';
-      return this.$t(key, this.catalogs.length );
+      let key = (this.collectionsOnly || this.allCatalogs.every(catalog => catalog.isCollection)) ? 'stacCollection' : 'stacCatalog';
+      return this.$t(key, this.allCatalogs.length );
     },
     isComplete() {
       if (this.hasMore || this.showPagination) {
@@ -258,23 +251,6 @@ export default defineComponent({
         }
       }
       return keywords.sort();
-    },
-    view: {
-      get() {
-        if (this.enforceView) {
-          return this.enforceView;
-        }
-        if (this.enforceCards) {
-          return 'cards';
-        }
-        return this.$store.state.cardViewMode;
-      },
-      async set(cardViewMode) {
-        if (this.enforceView || this.enforceCards) {
-          return;
-        }
-        await this.$store.dispatch('config', { cardViewMode });
-      }
     }
   },
   watch: {

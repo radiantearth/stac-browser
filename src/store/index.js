@@ -10,6 +10,7 @@ import { addMissingChildren, getDisplayTitle, createSTAC } from '../models/stac'
 import { STAC } from 'stac-js';
 
 import auth from './auth.js';
+import favorites from './favorites.js';
 import manager from './manager.js';
 import { addQueryIfNotExists, hasAuthority, isAuthenticationError, Loading, stacRequest, stacRequestOptions } from './utils';
 import { getBest } from 'stac-js/src/locales';
@@ -181,6 +182,7 @@ function getStore(config, router) {
     strict: import.meta.env.NODE_ENV !== 'production',
     modules: {
       auth: auth(router),
+      favorites,
       manager: manager(config),
       search,
     },

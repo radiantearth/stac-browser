@@ -57,6 +57,14 @@ function getRoutes(config) {
     props: route => getPath(route, config)
   });
 
+  if (config.showFavorites) {
+    routes.push({
+      path: "/favorites",
+      name: "favorites",
+      component: () => import("../views/Favorites.vue")
+    });
+  }
+
   routes.push({
     path: "/management/edit/:pathMatch(.*)*",
     name: "managementEdit",

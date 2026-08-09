@@ -16,7 +16,7 @@
       <b-card-text v-if="temporalExtent" class="datetime"><small v-html="temporalExtent" /></b-card-text>
     </b-card-body>
     <b-card-footer>
-      <slot name="footer" :data="data">
+      <slot name="footer" :data="data" :source="catalog">
         <StacActions v-if="data && !hideActions" :data="data" variant="outline-primary" vertical size="sm" />
       </slot>
     </b-card-footer>

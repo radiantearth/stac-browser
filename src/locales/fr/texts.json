@@ -123,6 +123,9 @@
     "storeAs": "Enregistrer le code en tant que :",
     "installDependencies": "Installer les dépendances :"
   },
+  "favorites": {
+    "exportFormats": {}
+  },
   "featureExperimental": "Cette fonctionnalité est encore expérimentale et peut donner des résultats inattendus!",
   "features": {
     "empty": "Aucune entité disponible.",
