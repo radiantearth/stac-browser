@@ -122,6 +122,9 @@
     "storeAs": "Сохранить код как:",
     "installDependencies": "Установить зависимости:"
   },
+  "favorites": {
+    "exportFormats": {}
+  },
   "featureExperimental": "Эта функция экспериментальная и может давать неожиданные результаты!",
   "features": {
     "empty": "Объекты отсутствуют.",

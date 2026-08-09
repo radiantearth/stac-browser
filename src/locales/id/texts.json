@@ -112,6 +112,9 @@
     "unauthorized": "Permintaan tidak memiliki kredensial, misalnya token API. Silakan berikan kredensial Anda dan coba lagi."
   },
   "exampleCode": {},
+  "favorites": {
+    "exportFormats": {}
+  },
   "featureExperimental": "Fitur ini masih eksperimental dan mungkin memberikan hasil yang tidak terduga!",
   "features": {},
   "fullscreen": {

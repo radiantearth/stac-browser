@@ -27,6 +27,9 @@
     "noExternalAccess": "Accessing external catalogues is not allowed!"
   },
   "exampleCode": {},
+  "favorites": {
+    "exportFormats": {}
+  },
   "features": {},
   "fullscreen": {},
   "goBack": {},

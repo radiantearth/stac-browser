@@ -112,6 +112,9 @@
     "unauthorized": "يفتقر الطلب إلى بيانات الاعتماد، مثل رمز API. يرجى تقديم بيانات الاعتماد والمحاولة مرة أخرى."
   },
   "exampleCode": {},
+  "favorites": {
+    "exportFormats": {}
+  },
   "featureExperimental": "هذه الميزة لا تزال تجريبية وقد تعطي نتائج غير متوقعة!",
   "features": {},
   "fullscreen": {

@@ -122,6 +122,9 @@
     "storeAs": "Memorizza il codice come:",
     "installDependencies": "Installare le dipendenze:"
   },
+  "favorites": {
+    "exportFormats": {}
+  },
   "featureExperimental": "Questa funzione è ancora sperimentale e potrebbe dare risultati inaspettati!",
   "features": {
     "empty": "Nessuna feature disponibile",

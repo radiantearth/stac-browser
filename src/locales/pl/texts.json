@@ -113,6 +113,9 @@
     "unauthorized": "Żądanie nie zawiera danych uwierzytelniających, np. tokenu API. Podaj dane uwierzytelniające i spróbuj ponownie."
   },
   "exampleCode": {},
+  "favorites": {
+    "exportFormats": {}
+  },
   "featureExperimental": "Ta funkcja jest w fazie testowej i może dawać nieoczekiwane wyniki!",
   "features": {
     "empty": "Brak dostępnych obiektów.",
