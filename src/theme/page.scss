@@ -549,6 +549,8 @@ svg {
     .item-card {
       grid-row: span 6;
 
+      // Workaround for a WebKit subgrid bug that clips the last row (the footer);
+      // pinning an empty item to it forces Safari to size it. Remove once fixed.
       &::after {
         content: "";
         grid-row: 6;
