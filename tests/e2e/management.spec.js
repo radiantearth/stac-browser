@@ -151,12 +151,15 @@ test.describe('Management - capability gating', () => {
     menu = await openManageMenu(page);
     await menu.getByRole('menuitem', { name: 'Add Item' }).click();
 
-    // Let the async loads (delayed by the slow-network route) settle so a late
-    // response can't leave the page in a broken state after we assert.
-    await page.waitForLoadState('networkidle');
+    // Assert on the concrete UI, not `networkidle`: the slow-network route keeps
+    // background loads in flight, so the network may never go idle in time.
     await expect(page.getByRole('heading', { name: /add item/i })).toBeVisible();
     await expect(page.locator('.cm-content')).toContainText('"type": "Feature"');
     await expect(page.getByRole('button', { name: /manage/i })).toBeVisible();
+
+    // A late collection load must not revert the editor to the edited collection.
+    await expect(page.locator('.cm-content')).not.toContainText('"type": "Collection"');
+    await expect(page.locator('.cm-content')).toContainText('"type": "Feature"');
   });
 });
 
