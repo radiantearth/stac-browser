@@ -110,6 +110,7 @@
     "loadApiItemsFailed": "Os itens da API não puderam ser carregados.",
     "loadFilteredItems": "Desculpe, mas não foi possível carregar uma lista filtrada de itens.",
     "loadItems": "Desculpe, mas não foi possível carregar a lista de itens STAC.",
+    "missingPermissions": "",
     "networkError": "Este problema pode ocorrer quando os servidores não permitem acesso externo através de navegadores web (por exemplo, quando os cabeçalhos CORS não estão presentes). @:errors.contactProvider",
     "noExternalAccess": "Não é permitido acessar catálogos externos!",
     "notFound": "O recurso solicitado não existe. @:errors.contactProvider",
@@ -121,6 +122,26 @@
     "title": "Exemplo de código",
     "storeAs": "Armazenar código como:",
     "installDependencies": "Instalação de dependências:"
+  },
+  "favorites": {
+    "add": "",
+    "empty": "",
+    "export": "",
+    "exportDescription": "",
+    "exportFormats": {
+      "csv": "",
+      "excel": "",
+      "json": "",
+      "stac": ""
+    },
+    "import": "",
+    "importDescription": "",
+    "importInvalid": "",
+    "imported": "",
+    "label": "",
+    "localOnly": "",
+    "remove": "",
+    "title": ""
   },
   "featureExperimental": "Esta funcionalidade ainda é experimental e pode dar resultados inesperados!",
   "features": {
@@ -161,13 +182,30 @@
   },
   "items": {
     "filter": "Filtros",
+    "filterChangesNotApplied": "",
     "hideFilter": "Ocultar filtros",
     "noTime": "Nenhuma data informada",
     "noneAvailableForCollection": "Nenhum item disponível para esta coleção.",
     "showFilter": "Mostrar filtros"
   },
   "loading": "Carregando...",
-  "manage": {},
+  "manage": {
+    "addCollection": "",
+    "addItem": "",
+    "confirmDeleteTitle": "",
+    "confirmDeleteMessage": "",
+    "create": "",
+    "delete": "",
+    "discardDraft": "",
+    "draftRestored": "",
+    "edit": "",
+    "leavePage": "",
+    "save": "",
+    "noUndo": "",
+    "unsavedChangesLeave": "",
+    "unsavedChangesTitle": "",
+    "validate": ""
+  },
   "map": "Mapa",
   "mapping": {
     "attribution": {
@@ -291,6 +329,8 @@
     "between": "entre",
     "betweenOperatorDescription": "Testa se o valor de um campo numérico está no intervalo fornecido. O intervalo fornecido é inclusivo.",
     "dateDescription": "Todos os horários em Tempo Universal Coordenado (UTC).",
+    "disabledDueToSingleDate": "",
+    "droppedFilters": "",
     "enterCollections": "Insira um ou mais IDs de coleção...",
     "enterItemIds": "Insira um ou mais IDs de item...",
     "enterSearchTerms": "Insira um ou mais termos de pesquisa...",
@@ -367,6 +407,7 @@
       "switch": "Mudar o idioma"
     },
     "locatedAt": "O arquivo de metadados STAC está localizado em:",
+    "manage": "",
     "share": {
       "bsky": "Bluesky",
       "email": "E-mail",
@@ -445,5 +486,7 @@
     },
     "title": "Opções de exibição"
   },
-  "widgets": {}
+  "widgets": {
+    "featured": ""
+  }
 }
