@@ -124,24 +124,7 @@
     "installDependencies": "Instala las dependencias:"
   },
   "favorites": {
-    "add": "",
-    "empty": "",
-    "export": "",
-    "exportDescription": "",
-    "exportFormats": {
-      "csv": "",
-      "excel": "",
-      "json": "",
-      "stac": ""
-    },
-    "import": "",
-    "importDescription": "",
-    "importInvalid": "",
-    "imported": "",
-    "label": "",
-    "localOnly": "",
-    "remove": "",
-    "title": ""
+    "exportFormats": {}
   },
   "featureExperimental": "¡Esta funcionalidad es experimental y puede producir resultados inesperados!",
   "features": {
@@ -486,7 +469,5 @@
     },
     "title": "Opciones de visualización"
   },
-  "widgets": {
-    "featured": ""
-  }
+  "widgets": {}
 }
