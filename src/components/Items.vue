@@ -32,8 +32,8 @@
       <Loading v-if="loading" fill top />
       <div v-if="chunkedItems.length > 0" :class="view === 'list' ? 'card-list' : 'card-grid'">
         <Item v-for="item in chunkedItems" :item="item" :viewMode="view" :key="item.href">
-          <template v-if="$slots.itemFooter" #footer="slot">
-            <slot name="itemFooter" v-bind="slot" />
+          <template v-if="$slots.footer" #footer="slot">
+            <slot name="footer" v-bind="slot" />
           </template>
         </Item>
       </div>

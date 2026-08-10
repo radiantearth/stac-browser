@@ -154,7 +154,6 @@ test.describe('STAC Browser Search page', () => {
   });
     
   test('Search with spatial extent selection via manual input should have valid POST body', async ({ page }) => {
-    //note: test was flaky due to timing issues. fix was attempted. if problem persists fix this or mark as fixme
     await page.goto(SEARCH_PATH);
       
     await test.step('Enable spatial extent selection and fill in bounding box values', async () => {
@@ -162,8 +161,8 @@ test.describe('STAC Browser Search page', () => {
         
       await enableSpatialCheckbox.check();
         
-      // Wait for network to be idle, map ready, and input fields to ensure UI is ready
-      await page.waitForLoadState('networkidle');
+      // Gate on the map, not `networkidle`: OpenLayers keeps streaming basemap
+      // tiles, so the network may never go idle.
       await waitForMapReady(page);
         
       const westLonInput = page.getByLabel(/west longitude/i);
@@ -869,7 +868,8 @@ test.describe('STAC Browser Search page', () => {
       const enableSpatialCheckbox = page.getByRole('checkbox', { name: /filter by spatial extent/i });
       await enableSpatialCheckbox.check();
 
-      await page.waitForLoadState('networkidle');
+      // Gate on the map, not `networkidle`: OpenLayers keeps streaming basemap
+      // tiles, so the network may never go idle.
       await waitForMapReady(page);
 
       await fillBboxInputs(page, {

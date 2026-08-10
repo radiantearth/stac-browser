@@ -1,12 +1,7 @@
 <template>
   <nav class="share">
     <b-button-group>
-      <b-button
-        v-if="canFavorite" size="sm" variant="outline-primary"
-        :title="favoriteTitle" :pressed="isFavorite" @click="toggleFavorite"
-      >
-        <b-icon-star-fill v-if="isFavorite" /><b-icon-star v-else /><span class="button-label">{{ $t('favorites.label') }}</span>
-      </b-button>
+      <StacActions v-if="data" :data="data" variant="outline-primary" size="sm" bare />
       <b-dropdown
         v-if="canManage" size="sm" variant="outline-primary" tabindex="0"
       >
@@ -113,7 +108,6 @@
 import { mapGetters, mapState } from 'vuex';
 import { defineAsyncComponent } from 'vue';
 import { BDropdown, BDropdownItem } from 'bootstrap-vue-next';
-import { STAC } from 'stac-js';
 
 import Url from './Url.vue';
 import CopyButton from './CopyButton.vue';
@@ -130,6 +124,7 @@ export default {
     SocialSharing,
     BModal: defineAsyncComponent(() => import('bootstrap-vue-next').then(m => m.BModal)),
     BPopover: defineAsyncComponent(() => import('bootstrap-vue-next').then(m => m.BPopover)),
+    StacActions: defineAsyncComponent(() => import('./StacActions.vue')),
     Validation: defineAsyncComponent(() => import('./Validation.vue'))
   },
   props: {
@@ -146,18 +141,9 @@ export default {
     };
   },
   computed: {
-    ...mapState(['data', 'showFavorites', 'socialSharing', 'url']),
+    ...mapState(['data', 'socialSharing', 'url']),
     ...mapGetters(['toBrowserPath', 'collectionLink', 'parentLink', 'rootLink']),
     ...mapGetters('manager', ['browserPaths', 'canEdit', 'canDelete', 'canManage', 'canAddCollections', 'canAddItems', 'externalCreateLink', 'externalEditLink']),
-    canFavorite() {
-      return this.showFavorites && this.$route.name === 'browse' && this.data instanceof STAC;
-    },
-    isFavorite() {
-      return this.$store.getters['favorites/isFavorite'](this.data);
-    },
-    favoriteTitle() {
-      return this.isFavorite ? this.$t('favorites.remove') : this.$t('favorites.add');
-    },
     stacVersion() {
       return this.data?.stac_version;
     },
@@ -175,9 +161,6 @@ export default {
   methods: {
     browserUrl() {
       return window.location.toString();
-    },
-    async toggleFavorite() {
-      await this.$store.dispatch('favorites/toggle', this.data);
     },
     async deleteThis() {
       this.deleting = true;

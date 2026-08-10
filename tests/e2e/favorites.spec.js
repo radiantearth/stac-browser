@@ -21,10 +21,11 @@ function createStaticCatalog() {
   return { catalog, collection, item };
 }
 
-// The favorite toggle button on the page of a catalog, collection or item
-const favoriteToggle = page => page.getByRole('button', { name: 'Favorite', exact: true });
-// The Favorites page button in the header
-const favoritesNav = page => page.locator('header').getByRole('button', { name: 'Favorites' });
+// The favorite toggle action in the header of a catalog, collection or item.
+// Labelled "Favorite"; the add/remove state is in its title attribute.
+const favoriteToggle = page => page.locator('header').getByRole('button', { name: 'Favorite', exact: true });
+// The Favorites page button in the header (exact, so it doesn't match the toggle)
+const favoritesNav = page => page.locator('header').getByRole('button', { name: 'Favorites', exact: true });
 
 // Exports the favorites in the given format and returns the download
 async function exportAs(page, format) {
@@ -39,7 +40,7 @@ async function favoriteAndOpenFavorites(page, collection) {
   await page.goto(collection.getBrowserPath());
   await waitForBrowserReady(page);
   await favoriteToggle(page).click();
-  await expect(favoriteToggle(page)).toHaveAttribute('aria-pressed', 'true');
+  await expect(favoriteToggle(page)).toHaveAttribute('title', 'Remove from favorites');
   await favoritesNav(page).click();
 }
 
@@ -53,15 +54,15 @@ test.describe('Favorites', () => {
     await waitForBrowserReady(page);
     const toggle = favoriteToggle(page);
     await expect(toggle).toBeVisible();
-    await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    await expect(toggle).toHaveAttribute('title', 'Add to favorites');
     await toggle.click();
-    await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+    await expect(toggle).toHaveAttribute('title', 'Remove from favorites');
 
     // Favorite the item
     await page.goto(item.getBrowserPath());
     await waitForBrowserReady(page);
     await favoriteToggle(page).click();
-    await expect(favoriteToggle(page)).toHaveAttribute('aria-pressed', 'true');
+    await expect(favoriteToggle(page)).toHaveAttribute('title', 'Remove from favorites');
 
     // Open the Favorites page from the header
     await favoritesNav(page).click();
@@ -91,9 +92,9 @@ test.describe('Favorites', () => {
     await waitForBrowserReady(page);
     const toggle = favoriteToggle(page);
     await toggle.click();
-    await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+    await expect(toggle).toHaveAttribute('title', 'Remove from favorites');
     await toggle.click();
-    await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    await expect(toggle).toHaveAttribute('title', 'Add to favorites');
 
     await favoritesNav(page).click();
     await expect(page.getByText(/no favorites have been added yet/i)).toBeVisible();
@@ -257,12 +258,12 @@ test.describe('Favorites', () => {
     await page.goto(collection.getBrowserPath());
     await waitForBrowserReady(page);
     await favoriteToggle(page).click();
-    await expect(favoriteToggle(page)).toHaveAttribute('aria-pressed', 'true');
+    await expect(favoriteToggle(page)).toHaveAttribute('title', 'Remove from favorites');
 
     await page.goto(another.getBrowserPath());
     await waitForBrowserReady(page);
     await favoriteToggle(page).click();
-    await expect(favoriteToggle(page)).toHaveAttribute('aria-pressed', 'true');
+    await expect(favoriteToggle(page)).toHaveAttribute('title', 'Remove from favorites');
 
     // Shown in alphabetical order, not in the order they were added
     await favoritesNav(page).click();

@@ -15,9 +15,9 @@ svg {
 }
 
 .btn svg {
-  // Fix an issue where in some cases icons were slightly too large and were only partially shown in buttons
-  height: round(down, 1.2em, 1px);
-  width: round(down, 1.2em, 1px);
+  // Fix an issue where in some cases icons were slightly cut off and were only partially shown in buttons
+  height: round(up, 1.2em, 1px);
+  width: round(up, 1.2em, 1px);
 }
 
 .list-group-item.active {
@@ -621,6 +621,11 @@ svg {
     .card-footer {
       .btn-group-vertical {
         width: 100%;
+      }
+      // Stretch the compact action group across the footer so a single action
+      // fills the width like the other buttons instead of a separate small group
+      .stac-actions {
+        display: flex;
       }
     }
     .card-footer:empty {

@@ -47,4 +47,10 @@ export default class ActionPlugin {
     return i18n.global.t('open');
   }
 
+  // Tooltip for the button, shown especially when rendered compact (icon-only).
+  // Defaults to the button text.
+  get title() {
+    return this.text;
+  }
+
 }

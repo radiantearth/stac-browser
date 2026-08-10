@@ -43,7 +43,7 @@
             :count="totalCount" :apiFilters="collectionFilters"
             @click="armCarryOver"
           >
-            <template #catalogFooter="slot">
+            <template #footer="slot">
               <b-button-group v-if="itemSearch || canFilterItems(slot.data)" vertical size="sm">
                 <b-button v-if="itemSearch" variant="outline-primary" :pressed="selectedCollections[slot.data.id]" @click="selectForItemSearch(slot.data)">
                   <b-icon-check-square v-if="selectedCollections[slot.data.id]" />
@@ -51,6 +51,7 @@
                   <span class="ms-2">{{ $t('search.selectForItemSearch') }}</span>
                 </b-button>
                 <StacLink :button="{variant: 'outline-primary', disabled: !canFilterItems(slot.data)}" :data="slot.data" :title="$t('search.filterCollection')" :state="{itemFilterOpen: 1}" />
+                <StacActions :data="slot.data" variant="outline-primary" compact size="sm" />
               </b-button-group>
             </template>
           </Catalogs>
@@ -97,6 +98,7 @@ export default defineComponent({
     SearchFilter,
     Items: defineAsyncComponent(() => import('../components/Items.vue')),
     MapView: defineAsyncComponent(() => import('../components/MapView.vue')),
+    StacActions: defineAsyncComponent(() => import('../components/StacActions.vue')),
     StacLink: defineAsyncComponent(() => import('../components/StacLink.vue'))
   },
   props: {

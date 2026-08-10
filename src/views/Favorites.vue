@@ -27,7 +27,7 @@
     <b-row v-else-if="visibleFavorites.length > 0">
       <b-col v-if="catalogs.length > 0" class="catalogs-container">
         <Catalogs :catalogs="catalogs" enforceView="cards">
-          <template #catalogFooter="{source}">
+          <template #footer="{source}">
             <b-button size="sm" variant="outline-danger" :title="$t('favorites.remove')" @click="remove(source)">
               <b-icon-star-fill /> {{ $t('favorites.remove') }}
             </b-button>
@@ -36,7 +36,7 @@
       </b-col>
       <b-col v-if="items.length > 0" class="items-container">
         <Items v-if="items.length > 0" :items="items" enforceView="cards">
-          <template #itemFooter="{source}">
+          <template #footer="{source}">
             <b-button size="sm" variant="outline-danger" :title="$t('favorites.remove')" @click="remove(source)">
               <b-icon-star-fill /> {{ $t('favorites.remove') }}
             </b-button>
