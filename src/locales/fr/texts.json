@@ -124,7 +124,24 @@
     "installDependencies": "Installer les dépendances :"
   },
   "favorites": {
-    "exportFormats": {}
+    "add": "Ajouter aux favoris",
+    "empty": "Aucun favori n'a encore été ajouté. Pour ajouter des favoris, utilisez le bouton \"Favoris\" sur la page d'un catalogue, d'une collection ou d'un élément.",
+    "export": "Exporter",
+    "exportDescription": "Exporter les favoris vers un fichier, par exemple pour les importer dans un autre navigateur.",
+    "exportFormats": {
+      "csv": "CSV",
+      "excel": "Excel",
+      "json": "JSON",
+      "stac": "Catalogue STAC"
+    },
+    "import": "Importer",
+    "importDescription": "Importer les favoris depuis un fichier exporté auparavant.",
+    "importInvalid": "Le fichier sélectionné ne contient pas de favoris.",
+    "imported": "{count} nouveaux favoris importés.",
+    "label": "Favori",
+    "localOnly": "Les favoris sont stockés uniquement localement dans ce navigateur Web. Ils ne sont pas synchronisés entre les appareils ou les navigateurs.",
+    "remove": "Supprimer des favoris",
+    "title": "Favoris"
   },
   "featureExperimental": "Cette fonctionnalité est encore expérimentale et peut donner des résultats inattendus!",
   "features": {
