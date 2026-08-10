@@ -15,9 +15,9 @@ svg {
 }
 
 .btn svg {
-  // Fix an issue where in some cases icons were slightly too large and were only partially shown in buttons
-  height: round(down, 1.2em, 1px);
-  width: round(down, 1.2em, 1px);
+  // Fix an issue where in some cases icons were slightly cut off and were only partially shown in buttons
+  height: round(up, 1.2em, 1px);
+  width: round(up, 1.2em, 1px);
 }
 
 .list-group-item.active {
