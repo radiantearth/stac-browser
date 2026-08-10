@@ -124,7 +124,24 @@
     "installDependencies": "Instala las dependencias:"
   },
   "favorites": {
-    "exportFormats": {}
+    "add": "Añadir a favoritos",
+    "empty": "Todavía no se ha añadido ningún favorito. Para añadir favoritos, use el botón de 'Favorito' en la página de un catálogo, colección, o artículo.",
+    "export": "Exportar",
+    "exportDescription": "Exportar los favoritos a un archivo, por ejemplo, para importarlos en otro navegador.",
+    "exportFormats": {
+      "csv": "CSV",
+      "excel": "Excel",
+      "json": "JSON",
+      "stac": "Catálogo STAC"
+    },
+    "import": "Importar",
+    "importDescription": "Importar favoritos desde un archivo previamente exportado.",
+    "importInvalid": "El archivo seleccionado no contiene favoritos.",
+    "imported": "Se importaron {count} nuevos favoritos.",
+    "label": "Favorito",
+    "localOnly": "Los favoritos se almacenan sólo localmente en este navegador web. No se sincronizan entre dispositivos o navegadores.",
+    "remove": "Eliminar de favoritos",
+    "title": "Favoritos"
   },
   "featureExperimental": "¡Esta funcionalidad es experimental y puede producir resultados inesperados!",
   "features": {
@@ -469,5 +486,7 @@
     },
     "title": "Opciones de visualización"
   },
-  "widgets": {}
+  "widgets": {
+    "featured": "Destacados"
+  }
 }
