@@ -64,6 +64,18 @@ export default class CodeGenerator {
     return null;
   }
 
+  /**
+   * Render the request body for embedding in the template.
+   * By default emits a formatted JSON string, embedded verbatim in the
+   * language's string literal. Languages that inject the body as a native
+   * literal instead (e.g. Go composite literals) override this.
+   * @param {Object} body
+   * @returns {string}
+   */
+  renderBody(body) {
+    return JSON.stringify(body, null, this.indent);
+  }
+
   get method() {
     const method = this.searchLink?.method;
     return typeof method === 'string' ? method.toUpperCase() : 'GET';
@@ -149,7 +161,7 @@ export default class CodeGenerator {
     let requestUrl, requestBody;
     if (isPost) {
       requestUrl = this.searchUrl;
-      requestBody = JSON.stringify(preparedLink?.body ?? {}, null, this.indent);
+      requestBody = this.renderBody(preparedLink?.body ?? {});
     }
     else {
       requestUrl = preparedLink?.href ?? this.searchUrl;

@@ -1,12 +1,12 @@
 package main
 
 import (
+/// if IS_POST ///
+	"bytes"
+/// endif ///
 	"encoding/json"
 	"fmt"
 	"net/http"
-/// if IS_POST ///
-	"strings"
-/// endif ///
 )
 
 type searchResponse struct {
@@ -18,8 +18,12 @@ type searchResponse struct {
 func main() {
 	url := "__REQUEST_URL__"
 /// if IS_POST ///
-	body := `__REQUEST_BODY__`
-	resp, err := http.Post(url, "application/json", strings.NewReader(body))
+	payload := __REQUEST_BODY__
+	body, err := json.Marshal(payload)
+	if err != nil {
+		panic(err)
+	}
+	resp, err := http.Post(url, "application/json", bytes.NewReader(body))
 /// else ///
 	resp, err := http.Get(url)
 /// endif ///

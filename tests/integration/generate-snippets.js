@@ -62,6 +62,25 @@ const SCENARIOS = {
       filter: 'eo:cloud_cover <= 10',
       limit: 5,
     }
+  },
+  'default-get': {
+    catalogUrl: DEFAULT_CATALOG_URL,
+    searchMethod: 'GET',
+    filters: {
+      collections: ['sentinel-2-l2a'],
+      bbox: [-122.5, 37.5, -122.0, 38.0],
+      limit: 5,
+    }
+  },
+  'cql-text-get': {
+    catalogUrl: DEFAULT_CATALOG_URL,
+    searchMethod: 'GET',
+    filters: {
+      collections: ['sentinel-2-l2a'],
+      'filter-lang': 'cql2-text',
+      filter: 'eo:cloud_cover <= 10',
+      limit: 5,
+    }
   }
 };
 

@@ -27,4 +27,8 @@ export default class JavaGenerator extends CodeGenerator {
     return '///';
   }
 
+  renderBody(body) {
+    return super.renderBody(body).replaceAll('\\', '\\\\');
+  }
+
 }
