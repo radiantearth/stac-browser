@@ -310,7 +310,6 @@
   "reset": "Restablecer",
   "search": {
     "addCollections": "Presione enter para añadir una colección",
-    "addDate": "",
     "addFilter": "Añadir filtro",
     "additionalFilters": "Filtros adicionales",
     "addItemIds": "Presione enter para añadir el ID de un elemento",
@@ -366,7 +365,6 @@
     "notFullySupported": "Puede que no todas las opciones estén soportadas.",
     "notSupported": "La API no soporta la Búsqueda por Elementos.",
     "placeholder": "Búsqueda...",
-    "removeDate": "",
     "selectCollections": "Seleccione una o varias colecciones...",
     "selectDateRange": "Seleccionar el rango de fechas",
     "selectForItemSearch": "Seleccionar para Búsqueda de Elementos",
