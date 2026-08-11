@@ -9,16 +9,12 @@ on:
         description: 'Deployment environment'
         options:
           - review
-      branch:
-        type: string
-        description: 'Branch to deploy'
-        required: false
 
 jobs:
   build-and-deploy:
     name: Build and Deploy
     runs-on: ubuntu-latest
-    environment: fao-catalog-${{ github.event.inputs.environment }}
+    environment: ${{ github.event.inputs.environment }}
 
     permissions:
       id-token: write
