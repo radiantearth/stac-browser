@@ -310,6 +310,7 @@
   "reset": "Reset",
   "search": {
     "addCollections": "Press enter to add a collection",
+    "addDate": "Add date",
     "addFilter": "Add filter",
     "additionalFilters": "Additional filters",
     "addItemIds": "Press enter to add an Item ID",
@@ -365,6 +366,7 @@
     "notFullySupported": "Not all of the options may be supported.",
     "notSupported": "Item Search is not supported by the API.",
     "placeholder": "Search...",
+    "removeDate": "Remove date",
     "selectCollections": "Select one or multiple collections...",
     "selectDateRange": "Select date range",
     "selectForItemSearch": "Select for Item Search",

@@ -36,6 +36,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Don't show inline sort and filter options in Collection Search
 - Preserve sort in Collection Search
 - Show error message when search is not actually available although conformance classes are listed
+- The `IN` operator for temporal filters shows a list of datepicker inputs instead of a free-text input
+- Timestamps in `IN` filters are serialized as CQL2 temporal literals instead of plain strings
 
 ## [5.0.0] - 2026-07-31
 

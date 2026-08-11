@@ -1,6 +1,10 @@
 <template>
   <div class="queryable-group">
     <div class="queryable-row">
+      <b-button class="delete" size="md" variant="outline-danger" @click="$emit('remove-queryable')">
+        <b-icon-trash aria-hidden="true" />
+      </b-button>
+
       <span class="title">
         {{ queryable.title }}
       </span>
@@ -52,6 +56,30 @@
           v-bind="validation"
         />
       </div>
+      <div v-else-if="queryable.isTemporal && operator.SYMBOL === 'in'" class="value dates">
+        <div v-for="(date, index) in listValues" :key="index" class="date-row">
+          <VueDatePicker
+            :model-value="date"
+            @update:model-value="updateTemporalValue(index, $event)"
+            v-bind="datepickerProps"
+            :input-attrs="{ clearable: false }"
+          />
+          <b-button
+            v-if="listValues.length > 1"
+            size="md" variant="link" class="remove-date"
+            :aria-label="$t('search.removeDate')"
+            @click="removeTemporalValue(index)"
+          >
+            <b-icon-trash aria-hidden="true" />
+          </b-button>
+        </div>
+        <b-button
+          size="sm" variant="outline-primary" class="add-date"
+          @click="addTemporalValue"
+        >
+          <b-icon-plus aria-hidden="true" /> {{ $t('search.addDate') }}
+        </b-button>
+      </div>
       <multiselect
         v-else-if="queryable.isArray || operator.SYMBOL === 'in'"
         class="value"
@@ -67,21 +95,11 @@
         <template #noOptions>{{ $t('search.noOptions') }}</template>
       </multiselect>
       <VueDatePicker
-        v-else-if="queryable.isTemporal && (operator.SYMBOL !== 'like' && operator.SYMBOL !== 'in')"
+        v-else-if="queryable.isTemporal && operator.SYMBOL !== 'like'"
         class="value"
         :model-value="value.value"
         @update:model-value="updateValue"
-        :locale="datepickerLang"
-        :week-start="weekStartDay"
-        :formats="{ input: queryable.isDateTime ? dateTimeFormat : dateFormat }"
-        :close-on-scroll="false"
-        :time-config="{ 
-          enableTimePicker: queryable.isDateTime,
-          seconds: queryable.isDateTime,
-          timePickerInline: true 
-        }"
-        :input-attrs="{ clearable: true }"
-        auto-apply
+        v-bind="datepickerProps"
       />
       <b-form-select
         v-else-if="queryable.isSelection"
@@ -109,10 +127,6 @@
       >
         {{ $t(`checkbox.${value.value}`) }}
       </b-form-checkbox>
-
-      <b-button class="delete" size="sm" variant="danger" @click="$emit('remove-queryable')">
-        <b-icon-x-circle-fill aria-hidden="true" />
-      </b-button>
     </div>
 
     <div v-if="queryable.description || operator.description" class="queryable-help text-body-secondary small">
@@ -131,7 +145,7 @@ import DatePickerMixin from './DatePickerMixin';
 import { isObject } from 'stac-js/src/utils.js';
 import CqlValue from '../models/cql2/value';
 import { CqlNot } from '../models/cql2/operators/logical';
-    
+
 export default {
   name: 'QueryableInput',
   components: {
@@ -211,6 +225,24 @@ export default {
       }
       return [];
     },
+    datepickerProps() {
+      return {
+        locale: this.datepickerLang,
+        weekStart: this.weekStartDay,
+        formats: { input: this.queryable.isDateTime ? this.dateTimeFormat : this.dateFormat },
+        closeOnScroll: false,
+        timeConfig: {
+          enableTimePicker: this.queryable.isDateTime,
+          seconds: this.queryable.isDateTime,
+          timePickerInline: true
+        },
+        inputAttrs: { clearable: true },
+        autoApply: true
+      };
+    },
+    listValues() {
+      return this.value?.value || [];
+    },
     arrayValues: {
       get() {
         const arr = this.value?.value || [];
@@ -237,13 +269,40 @@ export default {
     },
     updateOperator(op) {
       if (this.operator.valueType !== op.valueType) {
-        this.emitValue(op.getDefaultValue(this.queryable));
+        this.emitValue(this.defaultValueFor(op));
       }
       this.$emit('update:operator', op);
       this.operatorsOpen = false;
     },
+    defaultValueFor(op) {
+      if (this.queryable.isTemporal && op.SYMBOL === 'in') {
+        // Start with one datepicker: an empty IN list has no cql2-text form
+        return CqlValue.create([this.queryable.defaultValue]);
+      }
+      return op.getDefaultValue(this.queryable);
+    },
     updateNegate(negate) {
       this.$emit('update:negate', negate);
+    },
+    addTemporalValue() {
+      this.updateValue([...this.listValues, this.queryable.defaultValue]);
+    },
+    updateTemporalValue(index, date) {
+      if (!(date instanceof Date)) {
+        return;
+      }
+      const dates = this.listValues.slice(0);
+      dates[index] = date;
+      this.updateValue(dates);
+    },
+    removeTemporalValue(index) {
+      // The cql2-text grammar requires at least one value in an IN list
+      if (this.listValues.length < 2) {
+        return;
+      }
+      const dates = this.listValues.slice(0);
+      dates.splice(index, 1);
+      this.updateValue(dates);
     },
     addArrayValue(tag) {
       tag = tag.trim();
@@ -337,23 +396,58 @@ export default {
   gap: 0.5em;
   flex-direction: row;
   flex-wrap: nowrap;
-  align-content: center;
+  align-items: center;
   display: flex;
-
-  .title, .value {
-    flex-grow: 4;
+  .title {
+    flex-grow: 3;
+    width: 5rem !important;
+  }
+  .value {
+    flex-grow: 5;
     width: 7rem !important;
   }
   .value.between {
     display: flex;
     gap: 0.2em;
   }
+  .value.dates {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25em;
+    border-left: 2px solid var(--bs-border-color);
+    padding-left: 0.5em;
+
+    .date-row {
+      display: flex;
+      align-items: center;
+      gap: 0.1em;
+
+      .dp__main {
+        flex: 1;
+        min-width: 0;
+      }
+    }
+    // Keep the destructive red for the button that removes the whole filter
+    .remove-date {
+      flex: none;
+      padding: 0 0.2rem;
+      color: var(--bs-text-color);
+
+      &:hover, &:focus-visible {
+        color: var(--bs-danger);
+      }
+    }
+    .add-date {
+      align-self: flex-start;
+    }
+  }
   .op {
     min-width: 4rem;
     width: auto;
   }
   .delete {
-    width: auto;
+    padding: 0.2rem 0.3rem;
+    border: 0;
   }
 }
 
@@ -375,11 +469,11 @@ export default {
 
 .queryable-help {
   display: block;
-  margin: 0.25em 0 1em 0;
+  margin: 0.5em 0 1em 0;
   line-height: 1.1em;
 }
 
 .queryable-group {
-  margin: 0.75em 0;
+  margin: 1rem 0;
 }
 </style>
