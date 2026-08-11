@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - main
+      - fao-main
       - v6
     paths:
       - 'src/codegen/**'

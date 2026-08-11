@@ -4,10 +4,12 @@ on:
   push:
     branches:
       - main
+      - fao-main
       - v6
   pull_request:
     branches:
       - main
+      - fao-main
       - v6
   workflow_dispatch:
 

@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - main
+      - fao-main
 jobs:
   deploy:
     runs-on: ubuntu-latest
