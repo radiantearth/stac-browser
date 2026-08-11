@@ -12,6 +12,7 @@ import {
   hasBasicAuth,
   hasHeader,
   hasQuery,
+  recordRequestHeaders,
   requireAuth,
   submitApiKey,
   submitBasicAuth,
@@ -105,19 +106,26 @@ test.describe('Global authConfig (legacy single scheme)', () => {
     external.setMetadata({ title: 'External Catalog' });
     await catalog.createServer(worker);
     await requireAuth(worker, ROOT_URL, hasHeader('x-api-key', 'secret'));
+    // The catalog card on the root page prefetches the external child in the
+    // background, so its first request can fire at any time after login.
+    // Record all requests on the handler side instead of racing a waiter.
+    const externalRequests = await recordRequestHeaders(worker, 'https://other.example/catalog.json');
 
     await page.goto('/');
     await expectLoginModal(page);
     await submitApiKey(page, 'secret');
     await waitForBrowserReady(page);
 
-    // Navigate to the external child; its request must not carry the credentials
-    const externalRequest = page.waitForRequest(req => req.url().startsWith('https://other.example/catalog.json'));
+    // Navigate to the external child
     await page.getByRole('link', { name: /External Catalog/ }).click();
-    expect((await externalRequest).headers()['x-api-key']).toBeUndefined();
-
     await waitForBrowserReady(page);
     await expect(page.getByRole('heading', { name: /External Catalog/ })).toBeVisible();
+
+    // No request to the external domain may carry the credentials
+    expect(externalRequests.length).toBeGreaterThan(0);
+    for (const headers of externalRequests) {
+      expect(headers['x-api-key']).toBeUndefined();
+    }
   });
 
   test('logout clears the credentials', async ({ page, worker }) => {
