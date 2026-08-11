@@ -398,9 +398,12 @@ export default {
   flex-wrap: nowrap;
   align-items: center;
   display: flex;
-
-  .title, .value {
-    flex-grow: 4;
+  .title {
+    flex-grow: 3;
+    width: 5rem !important;
+  }
+  .value {
+    flex-grow: 5;
     width: 7rem !important;
   }
   .value.between {
