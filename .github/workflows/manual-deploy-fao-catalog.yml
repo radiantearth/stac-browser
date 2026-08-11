@@ -49,15 +49,8 @@ jobs:
           gcloud auth configure-docker ${{ vars.GCP_REGION }}-docker.pkg.dev --quiet
 
       - name: Build Docker image
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NEXT_PUBLIC_URL: ${{ vars.NEXT_PUBLIC_URL }}
-          NEXT_PUBLIC_SERVER_URL: ${{ vars.NEXT_PUBLIC_SERVER_URL }}
         run: |
           docker build \
-            --secret id=NODE_AUTH_TOKEN,env=NODE_AUTH_TOKEN \
-            --build-arg NEXT_PUBLIC_URL=$NEXT_PUBLIC_URL \
-            --build-arg NEXT_PUBLIC_SERVER_URL=$NEXT_PUBLIC_SERVER_URL \
             --build-arg ENVIRONMENT=${{ github.event.inputs.environment }} \
             -f Dockerfile \
             -t ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/fao-catalog/fao-catalog:${{ github.sha }} \
@@ -68,27 +61,12 @@ jobs:
           docker push ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/fao-catalog/fao-catalog:${{ github.sha }}
 
       - name: Deploy to Cloud Run
-        env:
-          PAYLOAD_SECRET: ${{ secrets.PAYLOAD_SECRET }}
-          DATABASE_URL: postgresql://${{ secrets.CLOUD_SQL_DB_USERNAME }}:${{ secrets.CLOUD_SQL_DB_PASSWORD }}@/fao-catalog?host=/cloudsql/${{ vars.CLOUD_SQL_INSTANCE_CONNECTION_NAME }}
-          NEXT_PUBLIC_URL: ${{ vars.NEXT_PUBLIC_URL }}
-          NEXT_PUBLIC_SERVER_URL: ${{ vars.NEXT_PUBLIC_SERVER_URL }}
-          PAYLOAD_PREVIEW_SECRET: ${{ secrets.PAYLOAD_PREVIEW_SECRET }}
-          ADMIN_EMAIL: ${{ vars.ADMIN_EMAIL }}
-          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
         run: |
           gcloud run deploy fao-catalog \
             --service-account "${{ vars.APPLICATION_SERVICE_ACCOUNT }}" \
             --image ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/fao-catalog/fao-catalog:${{ github.sha }} \
             --platform managed \
             --region ${{ vars.GCP_REGION }} \
-            --set-env-vars "PAYLOAD_SECRET=$PAYLOAD_SECRET" \
-            --set-env-vars "DATABASE_URL=$DATABASE_URL" \
-            --set-env-vars "NEXT_PUBLIC_URL=$NEXT_PUBLIC_URL" \
-            --set-env-vars "NEXT_PUBLIC_SERVER_URL=$NEXT_PUBLIC_SERVER_URL" \
-            --set-env-vars "PAYLOAD_PREVIEW_SECRET=$PAYLOAD_PREVIEW_SECRET" \
-            --set-env-vars "ADMIN_EMAIL=$ADMIN_EMAIL" \
-            --set-env-vars "ADMIN_PASSWORD=$ADMIN_PASSWORD" \
             --allow-unauthenticated \
             --add-cloudsql-instances=${{ vars.GCP_PROJECT_ID }}:${{ vars.GCP_REGION }}:${{ vars.CLOUD_SQL_INSTANCE_NAME }} \
             --network=${{ vars.GCP_VPC_NETWORK }} \
