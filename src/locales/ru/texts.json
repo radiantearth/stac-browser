@@ -110,7 +110,6 @@
     "loadApiItemsFailed": "Не удалось загрузить объекты API.",
     "loadFilteredItems": "К сожалению, не удалось загрузить отфильтрованный список объектов.",
     "loadItems": "К сожалению, не удалось загрузить список объектов STAC.",
-    "missingPermissions": "",
     "networkError": "Эта проблема может возникать, если серверы не разрешают внешний доступ через веб-браузеры (например, отсутствуют заголовки CORS). @:errors.contactProvider",
     "noExternalAccess": "Доступ к внешним каталогам запрещен!",
     "notFound": "Запрошенный ресурс не существует. @:errors.contactProvider",
@@ -124,24 +123,7 @@
     "installDependencies": "Установить зависимости:"
   },
   "favorites": {
-    "add": "",
-    "empty": "",
-    "export": "",
-    "exportDescription": "",
-    "exportFormats": {
-      "csv": "",
-      "excel": "",
-      "json": "",
-      "stac": ""
-    },
-    "import": "",
-    "importDescription": "",
-    "importInvalid": "",
-    "imported": "",
-    "label": "",
-    "localOnly": "",
-    "remove": "",
-    "title": ""
+    "exportFormats": {}
   },
   "featureExperimental": "Эта функция экспериментальная и может давать неожиданные результаты!",
   "features": {
@@ -182,30 +164,13 @@
   },
   "items": {
     "filter": "Фильтры",
-    "filterChangesNotApplied": "",
     "hideFilter": "Скрыть фильтры",
     "noTime": "Время не указано",
     "noneAvailableForCollection": "Для этой коллекции нет доступных объектов.",
     "showFilter": "Показать фильтры"
   },
   "loading": "Загрузка...",
-  "manage": {
-    "addCollection": "",
-    "addItem": "",
-    "confirmDeleteTitle": "",
-    "confirmDeleteMessage": "",
-    "create": "",
-    "delete": "",
-    "discardDraft": "",
-    "draftRestored": "",
-    "edit": "",
-    "leavePage": "",
-    "save": "",
-    "noUndo": "",
-    "unsavedChangesLeave": "",
-    "unsavedChangesTitle": "",
-    "validate": ""
-  },
+  "manage": {},
   "map": "Карта",
   "mapping": {
     "attribution": {
@@ -312,7 +277,6 @@
   "reset": "Сбросить",
   "search": {
     "addCollections": "Нажмите Enter, чтобы добавить коллекцию",
-    "addDate": "",
     "addFilter": "Добавить фильтр",
     "additionalFilters": "Дополнительные фильтры",
     "addItemIds": "Нажмите Enter, чтобы добавить ID объекта",
@@ -333,7 +297,6 @@
     "betweenOperatorDescription": "Проверяет, попадает ли числовое значение поля в заданный диапазон. Границы диапазона включаются.",
     "dateDescription": "Время указывается во Всемирном координированном времени (UTC).",
     "disabledDueToSingleDate": "Этот фильтр отключен, так как временной охват коллекции ограничен одной датой и временем.",
-    "droppedFilters": "",
     "enterCollections": "Введите один или несколько ID коллекций...",
     "enterItemIds": "Введите один или несколько ID объектов...",
     "enterSearchTerms": "Введите поисковые запросы...",
@@ -368,7 +331,6 @@
     "notFullySupported": "Некоторые параметры могут не поддерживаться.",
     "notSupported": "Поиск по объектам (Item) не поддерживается этим API.",
     "placeholder": "Поиск...",
-    "removeDate": "",
     "selectCollections": "Выберите одну или несколько коллекций...",
     "selectDateRange": "Выберите временной диапазон",
     "selectForItemSearch": "Выбрать для поиска по объектам",
@@ -411,7 +373,6 @@
       "switch": "Переключить язык"
     },
     "locatedAt": "Файл метаданных STAC находится по адресу:",
-    "manage": "",
     "share": {
       "bsky": "Bluesky",
       "email": "Эл. почта",
@@ -490,7 +451,5 @@
     },
     "title": "Параметры отображения"
   },
-  "widgets": {
-    "featured": ""
-  }
+  "widgets": {}
 }

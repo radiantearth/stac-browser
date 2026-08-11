@@ -70,12 +70,8 @@
     "false": "Nej",
     "true": "Ja"
   },
-  "close": "",
   "copy": "Kopiera",
-  "copyErrors": {
-    "permission": "",
-    "unsupported": ""
-  },
+  "copyErrors": {},
   "default": "Standard",
   "defaultWithValue": "Standard ({value})",
   "deprecated": "Föråldrad",
@@ -110,7 +106,6 @@
     "loadApiItemsFailed": "Objekten från tjänsteleverantören kunde inte laddas.",
     "loadFilteredItems": "Det gick tyvärr inte att ladda den filtrerade listan över objekt.",
     "loadItems": "Det gick tyvärr inte att ladda listan över objekt.",
-    "missingPermissions": "",
     "networkError": "Detta problem kan uppstå om servern inte tillåter extern åtkomst via webbläsare (t.ex. om CORS-rubriker saknas). @:errors.contactProvider",
     "noExternalAccess": "Åtkomst till externa kataloger är inte tillåten!",
     "notFound": "Den begärda sidan finns inte. @:errors.contactProvider",
@@ -118,30 +113,9 @@
     "title": "Fel",
     "unauthorized": "Begäran saknar inloggningsuppgifter, t.ex. en API-nyckel. Ange dina uppgifter och försök igen."
   },
-  "exampleCode": {
-    "title": "",
-    "storeAs": "",
-    "installDependencies": ""
-  },
+  "exampleCode": {},
   "favorites": {
-    "add": "",
-    "empty": "",
-    "export": "",
-    "exportDescription": "",
-    "exportFormats": {
-      "csv": "",
-      "excel": "",
-      "json": "",
-      "stac": ""
-    },
-    "import": "",
-    "importDescription": "",
-    "importInvalid": "",
-    "imported": "",
-    "label": "",
-    "localOnly": "",
-    "remove": "",
-    "title": ""
+    "exportFormats": {}
   },
   "featureExperimental": "Denna funktion är fortfarande experimentell och kan ge oväntade resultat!",
   "features": {
@@ -182,89 +156,31 @@
   },
   "items": {
     "filter": "Filter",
-    "filterChangesNotApplied": "",
     "hideFilter": "Dölj filter",
     "noTime": "Ingen tid angiven",
     "noneAvailableForCollection": "Inga objekt tillgängliga för denna katalog.",
     "showFilter": "Visa filter"
   },
   "loading": "Laddar...",
-  "manage": {
-    "addCollection": "",
-    "addItem": "",
-    "confirmDeleteTitle": "",
-    "confirmDeleteMessage": "",
-    "create": "",
-    "delete": "",
-    "discardDraft": "",
-    "draftRestored": "",
-    "edit": "",
-    "leavePage": "",
-    "save": "",
-    "noUndo": "",
-    "unsavedChangesLeave": "",
-    "unsavedChangesTitle": "",
-    "validate": ""
-  },
+  "manage": {},
   "map": "Karta",
   "mapping": {
-    "attribution": {
-      "collapseLabel": "",
-      "description": "",
-      "label": ""
-    },
+    "attribution": {},
     "bboxSelect": {
-      "add": "",
-      "eastLon": "",
-      "error": {
-        "incomplete": "",
-        "invalidLat": "",
-        "invalidLon": "",
-        "latOrder": "",
-        "lonOrder": ""
-      },
-      "northLat": "",
-      "remove": "",
-      "southLat": "",
-      "westLon": ""
+      "error": {}
     },
-    "close": "",
-    "fit": "",
-    "layers": {
-      "base": "",
-      "footprint": "",
-      "title": "",
-      "unnamed": ""
-    },
-    "location": {
-      "description": ""
-    },
-    "nobasemap": "",
-    "nodata": "",
+    "layers": {},
+    "location": {},
     "zoom": {
-      "in": {
-        "description": "",
-        "label": ""
-      },
-      "out": {
-        "description": "",
-        "label": ""
-      }
+      "in": {},
+      "out": {}
     }
   },
-  "messageForSchemaError": "",
   "metadata": {
     "general": "Allmänt",
     "title": "Metadata"
   },
-  "multiselect": {
-    "andMore": "",
-    "deselectLabel": "",
-    "keywordsPlaceholder": "",
-    "placeholder": "",
-    "selectLabel": "",
-    "selectedLabel": ""
-  },
+  "multiselect": {},
   "open": "Öppna",
   "pagination": {
     "first": "« Första",
@@ -273,26 +189,9 @@
     "previous": "‹ Föregående"
   },
   "poweredBy": "Genererad av {link}",
-  "programming": {
-    "csharp": "",
-    "curl": "",
-    "go": "",
-    "java": "",
-    "javascript": "",
-    "python": "",
-    "r": "",
-    "rust": ""
-  },
+  "programming": {},
   "protocol": {
-    "azure": "",
-    "file": "",
-    "ftp": "",
-    "gcs": "",
-    "oss": "",
-    "s3": {
-      "amazonaws.com": "",
-      "default": ""
-    }
+    "s3": {}
   },
   "providers": {
     "email": "Skicka e-post",
@@ -312,28 +211,13 @@
   "reset": "Återställ",
   "search": {
     "addCollections": "Lägg till med Enter-tangenten",
-    "addDate": "",
     "addFilter": "Lägg till filter",
     "additionalFilters": "Ytterligare filter",
     "addItemIds": "Lägg till objekt-ID med Enter-tangenten",
     "addSearchTerm": "Lägg till sökterm med Enter-tangenten",
-    "arrayInput": {
-      "addValue": "",
-      "helpText": ""
-    },
-    "arrayContains": "",
-    "arrayContainsDescription": "",
-    "arrayContainedBy": "",
-    "arrayContainedByDescription": "",
-    "arrayEquals": "",
-    "arrayEqualsDescription": "",
-    "arrayOverlaps": "",
-    "arrayOverlapsDescription": "",
+    "arrayInput": {},
     "between": "mellan",
-    "betweenOperatorDescription": "",
     "dateDescription": "Alla tider i UTC.",
-    "disabledDueToSingleDate": "",
-    "droppedFilters": "",
     "enterCollections": "Ange katalog-ID...",
     "enterItemIds": "Ange objekt-ID...",
     "enterSearchTerms": "Ange söktermer...",
@@ -341,17 +225,12 @@
     "filterBySpatialExtent": "Filtrera efter geografisk utsträckning",
     "filterCollection": "Filtrera i katalog",
     "freeText": "Söktermer",
-    "freeTextDescription": "",
     "greaterThan": "större än",
     "greaterThanEqual": "större än eller lika med",
-    "in": "",
-    "inOperatorDescription": "",
     "itemIds": "Objekt-ID",
     "itemsPerPage": "Objekt per sida",
-    "itemsPerPageDescription": "",
     "lessThan": "mindre än",
     "lessThanEqual": "mindre än eller lika med",
-    "likeOperatorDescription": "",
     "logical": {
       "and": "Matcha alla filter (och)",
       "or": "Matcha minst ett filter (eller)",
@@ -362,24 +241,18 @@
     "modifyCriteria": "Ändra sökkriterierna.",
     "noFurtherItemsFound": "Inga fler objekt tillgängliga.",
     "noItemsFound": "Inga objekt hittades för de angivna filtren.",
-    "noOperatorsError": "",
-    "noOptions": "",
     "notEqualTo": "är inte lika med",
-    "notFullySupported": "",
     "notSupported": "Sökning stöds inte av tjänsteleverantören.",
     "placeholder": "Sök...",
-    "removeDate": "",
     "selectCollections": "Välj kataloger...",
     "selectDateRange": "Välj datumintervall...",
-    "selectForItemSearch": "",
     "spatialExtent": "Geografisk utsträckning",
     "tabs": {
       "collections": "Sök kataloger",
       "items": "Sök objekt"
     },
     "temporalExtent": "Tidsmässig utsträckning",
-    "title": "Sök",
-    "useInItemSearch": ""
+    "title": "Sök"
   },
   "showMore": "Visa mer...",
   "sidebar": {
@@ -397,82 +270,27 @@
     "title": "Sortering"
   },
   "source": {
-    "conformanceClasses": "",
     "detailsAboutSource": "Detaljer om STAC-datakällan",
-    "extension": "",
     "fileFormat": "Filformat",
     "id": "Identifierare",
     "invalid": "Inte kompatibel",
     "label": "Datakälla",
-    "language": {
-      "label": "",
-      "onlyData": "",
-      "onlyUI": "",
-      "switch": ""
-    },
+    "language": {},
     "locatedAt": "STAC-metadatafilen finns på:",
-    "manage": "",
-    "share": {
-      "bsky": "",
-      "email": "",
-      "label": "",
-      "mastodon": "",
-      "message": "",
-      "sharePageWithOthers": "",
-      "title": "",
-      "withOthers": "",
-      "x": ""
-    },
-    "stacExtension": "",
-    "stacVersion": "",
+    "share": {},
     "statistics": "Statistik",
     "title": "Datakälla",
     "valid": "Kompatibel",
     "validating": "Validerar...",
     "validationNA": "inte tillgänglig",
-    "validationParams": {
-      "additionalProperty": "",
-      "allowedValue": "",
-      "allowedValues": "",
-      "comparison": "",
-      "depsCount": "",
-      "exclusive": "",
-      "failingKeyword": "",
-      "format": "",
-      "i": "",
-      "j": "",
-      "limit": "",
-      "maxContains": "",
-      "minContains": "",
-      "missingProperty": "",
-      "multipleOf": "",
-      "passingSchemas": "",
-      "pattern": "",
-      "property": "",
-      "propertyName": "",
-      "type": ""
-    },
-    "validationReport": {
-      "disclaimer": "",
-      "result": "",
-      "title": ""
-    }
+    "validationParams": {},
+    "validationReport": {}
   },
-  "stacAssets": "",
-  "stacCatalog": "",
-  "stacCollection": "",
-  "stacItem": "",
   "submit": "Skicka",
   "switchToDarkMode": "Byt till mörkt läge",
   "switchToLightMode": "Byt till ljust läge",
   "table": {
-    "emptyFilteredText": "",
-    "emptyText": "",
-    "sort": {
-      "asc": "",
-      "clear": "",
-      "desc": ""
-    }
+    "sort": {}
   },
   "thumbnails": "Miniatyrbilder",
   "tree": {
@@ -490,7 +308,5 @@
     },
     "title": "Visningsalternativ"
   },
-  "widgets": {
-    "featured": ""
-  }
+  "widgets": {}
 }
