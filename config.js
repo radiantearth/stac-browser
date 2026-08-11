@@ -5,7 +5,7 @@ export default {
   catalogImage: null,
   allowExternalAccess: true, // Must be true if catalogUrl is not given
   allowedDomains: [],
-  enforcedColorMode: "auto",
+  enforcedColorMode: "light",
   detectLocaleFromBrowser: true,
   storeLocale: true,
   locale: "en",
