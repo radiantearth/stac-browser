@@ -312,6 +312,7 @@
   "reset": "Zurücksetzen",
   "search": {
     "addCollections": "Hinzufügen mittels Enter-Taste",
+    "addDate": "Datum hinzufügen",
     "addFilter": "Filter hinzufügen",
     "additionalFilters": "Weitere Filter",
     "addItemIds": "Datensatz-Identifikatoren hinzufügen mittels Enter-Taste",
@@ -367,6 +368,7 @@
     "notFullySupported": "Eventuell werden nicht alle Optionen unterstützt.",
     "notSupported": "Suchen wird von dem Diensteanbieter nicht unterstützt.",
     "placeholder": "Suchen...",
+    "removeDate": "Datum entfernen",
     "selectCollections": "Wähle Produkte...",
     "selectDateRange": "Wähle Datumsbereich...",
     "selectForItemSearch": "Markiere für Datensatzsuche",
