@@ -15,9 +15,10 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 COMPOSE_FILE="$SCRIPT_DIR/docker-compose.yml"
 GENERATED_DIR="$SCRIPT_DIR/generated"
 
-LANGUAGES=(python javascript r csharp java rust)
-SCENARIOS=(default cql-json cql-text)
-GENERATED_FILES=(Program.cs StacSearch.java search.mjs search.py search.R main.rs)
+LANGUAGES=(python javascript r csharp java rust curl go)
+SCENARIOS=(default cql-json cql-text default-get cql-text-get)
+SCENARIO_LIST="${SCENARIOS[*]}"
+GENERATED_FILES=(Program.cs StacSearch.java search.mjs search.py search.R main.rs search.sh search.go)
 TIMEOUT_SECS=300
 
 # Portable timeout: Linux → gtimeout (macOS via brew) → fallback
@@ -53,63 +54,62 @@ done
 command_for_language() {
   local lang="$1"
 
+  # Each block runs every scenario in $SCENARIO_LIST (default + CQL + GET
+  # variants). Runtime shell variables ($INSTALL_DEPS, $s) are escaped so only
+  # the scenario list is interpolated here.
   case "$lang" in
     python)
-      cat <<'EOF'
-if [ -n "$INSTALL_DEPS" ]; then eval "$INSTALL_DEPS"; fi
-python /code/default/search.py
-    python /code/cql-json/search.py
-    python /code/cql-text/search.py
+      cat <<EOF
+if [ -n "\$INSTALL_DEPS" ]; then eval "\$INSTALL_DEPS"; fi
+for s in $SCENARIO_LIST; do python /code/\$s/search.py; done
 EOF
       ;;
     javascript)
-      cat <<'EOF'
-if [ -n "$INSTALL_DEPS" ]; then eval "$INSTALL_DEPS"; fi
-node /code/default/search.mjs
-    node /code/cql-json/search.mjs
-    node /code/cql-text/search.mjs
+      cat <<EOF
+if [ -n "\$INSTALL_DEPS" ]; then eval "\$INSTALL_DEPS"; fi
+for s in $SCENARIO_LIST; do node /code/\$s/search.mjs; done
 EOF
       ;;
     r)
-      cat <<'EOF'
-if [ -n "$INSTALL_DEPS" ]; then eval "$INSTALL_DEPS"; fi
-Rscript /code/default/search.R
-    Rscript /code/cql-json/search.R
-    Rscript /code/cql-text/search.R
+      cat <<EOF
+if [ -n "\$INSTALL_DEPS" ]; then eval "\$INSTALL_DEPS"; fi
+for s in $SCENARIO_LIST; do Rscript /code/\$s/search.R; done
 EOF
       ;;
     csharp)
-      cat <<'EOF'
-if [ -n "$INSTALL_DEPS" ]; then eval "$INSTALL_DEPS"; fi
-cp /code/default/Program.cs /app/Program.cs
-cd /app && dotnet run --no-restore
-    cp /code/cql-json/Program.cs /app/Program.cs
-    cd /app && dotnet run --no-restore
-    cp /code/cql-text/Program.cs /app/Program.cs
-cd /app && dotnet run --no-restore
+      cat <<EOF
+if [ -n "\$INSTALL_DEPS" ]; then eval "\$INSTALL_DEPS"; fi
+for s in $SCENARIO_LIST; do cp /code/\$s/Program.cs /app/Program.cs; (cd /app && dotnet run --no-restore); done
 EOF
       ;;
     java)
-      cat <<'EOF'
-cd /tmp && if [ -n "$INSTALL_DEPS" ]; then eval "$INSTALL_DEPS"; fi
-cp /code/default/StacSearch.java /tmp/StacSearch.java
-cd /tmp && javac -cp '.:*' StacSearch.java && java -cp '.:*' StacSearch
-    cp /code/cql-json/StacSearch.java /tmp/StacSearch.java
-    cd /tmp && javac -cp '.:*' StacSearch.java && java -cp '.:*' StacSearch
-    cp /code/cql-text/StacSearch.java /tmp/StacSearch.java
-cd /tmp && javac -cp '.:*' StacSearch.java && java -cp '.:*' StacSearch
+      cat <<EOF
+cd /tmp && if [ -n "\$INSTALL_DEPS" ]; then eval "\$INSTALL_DEPS"; fi
+for s in $SCENARIO_LIST; do cp /code/\$s/StacSearch.java /tmp/StacSearch.java; (cd /tmp && javac -cp '.:*' StacSearch.java && java -cp '.:*' StacSearch); done
+EOF
+      ;;
+    go)
+      cat <<EOF
+if [ -n "\$INSTALL_DEPS" ]; then eval "\$INSTALL_DEPS"; fi
+mkdir -p /tmp/app
+cd /tmp/app && (go mod init stacsearch || true)
+for s in $SCENARIO_LIST; do cp /code/\$s/search.go /tmp/app/search.go; (cd /tmp/app && go run search.go); done
+EOF
+      ;;
+    curl)
+      # curl only prints the raw response, so assert the result array is present.
+      # Don't pipe directly into grep, that would discard the curl exit code.
+      cat <<EOF
+if [ -n "\$INSTALL_DEPS" ]; then eval "\$INSTALL_DEPS"; fi
+for s in $SCENARIO_LIST; do sh /code/\$s/search.sh > /tmp/\$s.json; grep -q '"features"' /tmp/\$s.json; done
 EOF
       ;;
     rust)
-      cat <<'EOF'
-if [ -z "$INSTALL_DEPS" ]; then echo 'INSTALL_DEPS is required for Rust integration tests.' >&2; exit 1; fi
+      cat <<EOF
+if [ -z "\$INSTALL_DEPS" ]; then echo 'INSTALL_DEPS is required for Rust integration tests.' >&2; exit 1; fi
 cp /code/default/main.rs /app/src/main.rs
-    eval "$INSTALL_DEPS"
-cd /app && cargo build --release && ./target/release/stac-search
-    cp /code/cql-json/main.rs /app/src/main.rs
-    cd /app && cargo build --release && ./target/release/stac-search
-    cp /code/cql-text/main.rs /app/src/main.rs
-cd /app && cargo build --release && ./target/release/stac-search
+eval "\$INSTALL_DEPS"
+for s in $SCENARIO_LIST; do cp /code/\$s/main.rs /app/src/main.rs; (cd /app && cargo build --release && ./target/release/stac-search); done
 EOF
       ;;
     *)
@@ -119,7 +119,7 @@ EOF
 }
 
 for lang in "${LANGUAGES[@]}"; do
-  label="$lang [default+cql-json+cql-text]"
+  label="$lang [${SCENARIOS[*]}]"
   echo "── Testing $label ──"
   INSTALL_DEPS="$(node --import "$SCRIPT_DIR/node-loader-register.js" "$SCRIPT_DIR/get-install-dependencies.js" "$lang")"
   LANG_COMMAND="$(command_for_language "$lang")"

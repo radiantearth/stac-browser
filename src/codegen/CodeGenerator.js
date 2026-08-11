@@ -24,11 +24,24 @@ export default class CodeGenerator {
   }
 
   /**
-   * The syntax highlighter language identifier.
+   * The stable identifier of the generator.
+   * Used as the tab id, the key in the browser storage, the i18n key for the
+   * label (`programming.<language>`) and, unless `highlightLanguage` is
+   * overridden, as the syntax highlighter language identifier.
    * @returns {string}
    */
   get language() {
     throw new Error('Subclasses must implement language');
+  }
+
+  /**
+   * The syntax highlighter language identifier.
+   * Defaults to `language`, override if that is not a language known to the
+   * highlighter, e.g. `curl` snippets are highlighted as `bash`.
+   * @returns {string}
+   */
+  get highlightLanguage() {
+    return this.language;
   }
 
   /**
@@ -49,6 +62,18 @@ export default class CodeGenerator {
 
   get installDependencies() {
     return null;
+  }
+
+  /**
+   * Render the request body for embedding in the template.
+   * By default emits a formatted JSON string, embedded verbatim in the
+   * language's string literal. Languages that inject the body as a native
+   * literal instead (e.g. Go composite literals) override this.
+   * @param {Object} body
+   * @returns {string}
+   */
+  renderBody(body) {
+    return JSON.stringify(body, null, this.indent);
   }
 
   get method() {
@@ -136,7 +161,7 @@ export default class CodeGenerator {
     let requestUrl, requestBody;
     if (isPost) {
       requestUrl = this.searchUrl;
-      requestBody = JSON.stringify(preparedLink?.body ?? {}, null, this.indent);
+      requestBody = this.renderBody(preparedLink?.body ?? {});
     }
     else {
       requestUrl = preparedLink?.href ?? this.searchUrl;

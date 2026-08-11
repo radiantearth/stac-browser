@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Adds a new config option `showFavorites` to disable the functionality
 - Items can be shown in a list view in addition to the card view, with the same view toggle buttons as for catalogs and collections
   - The `cardViewMode` config option now applies to item lists as well
+- Search Example Code is now also available for curl and Go
 
 ### Removed
 

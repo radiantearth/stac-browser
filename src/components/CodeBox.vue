@@ -57,7 +57,7 @@ export default defineComponent({
       return this.generator.generate(this.filters);
     },
     language() {
-      return this.generator.language;
+      return this.generator.highlightLanguage;
     },
     file() {
       return this.generator.outputFile;
