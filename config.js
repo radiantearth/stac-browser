@@ -1,5 +1,5 @@
 export default {
-  catalogUrl: null,
+  catalogUrl: "https://data.apps.fao.org/geospatial/search/stac/",
   catalogTitle: null,
   catalogTitleAfterImage: null,
   catalogImage: null,
