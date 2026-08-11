@@ -1,6 +1,10 @@
 <template>
   <div class="queryable-group">
     <div class="queryable-row">
+      <b-button class="delete" size="md" variant="outline-danger" @click="$emit('remove-queryable')">
+        <b-icon-trash aria-hidden="true" />
+      </b-button>
+
       <span class="title">
         {{ queryable.title }}
       </span>
@@ -62,18 +66,18 @@
           />
           <b-button
             v-if="listValues.length > 1"
-            size="m" variant="link" class="remove-date"
+            size="md" variant="link" class="remove-date"
             :aria-label="$t('search.removeDate')"
             @click="removeTemporalValue(index)"
           >
-            <b-icon-node-minus aria-hidden="true" />
+            <b-icon-trash aria-hidden="true" />
           </b-button>
         </div>
         <b-button
-          size="m" variant="outline-primary" class="add-date"
+          size="sm" variant="outline-primary" class="add-date"
           @click="addTemporalValue"
         >
-          <b-icon-node-plus aria-hidden="true" /> {{ $t('search.addDate') }}
+          <b-icon-plus aria-hidden="true" /> {{ $t('search.addDate') }}
         </b-button>
       </div>
       <multiselect
@@ -123,10 +127,6 @@
       >
         {{ $t(`checkbox.${value.value}`) }}
       </b-form-checkbox>
-
-      <b-button class="delete" size="m" variant="danger" @click="$emit('remove-queryable')">
-        <b-icon-trash aria-hidden="true" />
-      </b-button>
     </div>
 
     <div v-if="queryable.description || operator.description" class="queryable-help text-body-secondary small">
@@ -396,7 +396,7 @@ export default {
   gap: 0.5em;
   flex-direction: row;
   flex-wrap: nowrap;
-  align-items: flex-start;
+  align-items: center;
   display: flex;
 
   .title, .value {
@@ -411,6 +411,8 @@ export default {
     display: flex;
     flex-direction: column;
     gap: 0.25em;
+    border-left: 2px solid var(--bs-border-color);
+    padding-left: 0.5em;
 
     .date-row {
       display: flex;
@@ -426,8 +428,7 @@ export default {
     .remove-date {
       flex: none;
       padding: 0 0.2rem;
-      color: var(--bs-secondary-color);
-      text-decoration: none;
+      color: var(--bs-text-color);
 
       &:hover, &:focus-visible {
         color: var(--bs-danger);
@@ -442,7 +443,8 @@ export default {
     width: auto;
   }
   .delete {
-    width: auto;
+    padding: 0.2rem 0.3rem;
+    border: 0;
   }
 }
 
@@ -464,11 +466,11 @@ export default {
 
 .queryable-help {
   display: block;
-  margin: 0.25em 0 1em 0;
+  margin: 0.5em 0 1em 0;
   line-height: 1.1em;
 }
 
 .queryable-group {
-  margin: 0.75em 0;
+  margin: 1rem 0;
 }
 </style>
