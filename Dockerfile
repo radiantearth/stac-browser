@@ -2,9 +2,11 @@ FROM node:lts-alpine AS build-step
 ARG DYNAMIC_CONFIG=true
 ARG historyMode="history"
 ARG SB_CONFIG=""
+ARG SB_footerLinks=""
 ENV DYNAMIC_CONFIG="${DYNAMIC_CONFIG}"
 ENV SB_historyMode="${historyMode}"
 ENV SB_CONFIG="${SB_CONFIG}"
+ENV SB_footerLinks="${SB_footerLinks}"
 
 WORKDIR /app
 COPY package*.json ./

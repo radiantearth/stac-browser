@@ -49,9 +49,12 @@ jobs:
           gcloud auth configure-docker ${{ vars.GCP_REGION }}-docker.pkg.dev --quiet
 
       - name: Build Docker image
+        env:
+          SB_FOOTER_LINKS: '[{"label":"Made with ♥️ by moreGeo","url":"https://moregeo.it"},{"label":"Imprint","url":"https://moregeo.it/imprint"},{"label":"Privacy Policy","url":"https://moregeo.it/privacy"}]'
         run: |
           docker build \
             --build-arg ENVIRONMENT=${{ github.event.inputs.environment }} \
+            --build-arg SB_footerLinks="$SB_FOOTER_LINKS" \
             -f Dockerfile \
             -t ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/fao-catalog/fao-catalog:${{ github.sha }} \
             .
@@ -67,8 +70,4 @@ jobs:
             --image ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/fao-catalog/fao-catalog:${{ github.sha }} \
             --platform managed \
             --region ${{ vars.GCP_REGION }} \
-            --allow-unauthenticated \
-            --add-cloudsql-instances=${{ vars.GCP_PROJECT_ID }}:${{ vars.GCP_REGION }}:${{ vars.CLOUD_SQL_INSTANCE_NAME }} \
-            --network=${{ vars.GCP_VPC_NETWORK }} \
-            --subnet=${{ vars.GCP_VPC_SUBNET }} \
-            --vpc-egress=private-ranges-only
+            --allow-unauthenticated
