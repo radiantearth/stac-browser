@@ -11,6 +11,12 @@ import { size } from 'stac-js/src/utils.js';
  * Object URLs are cached per source URL and reference-counted so that
  * repeated usage (e.g. the same icon in a list of cards) only requests
  * the media once and the object URL is revoked once no user is left.
+ *
+ * The cache key deliberately doesn't include the credentials: for the same
+ * user, the media bytes don't change when a token rotates (e.g. OIDC
+ * renewal), failed requests are never cached, and on logout the consumers
+ * fall back to plain URLs and release their references, which drains the
+ * cache before other credentials can be entered.
  */
 
 const cache = new Map();

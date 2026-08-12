@@ -110,9 +110,12 @@ export default {
     }
   },
   created() {
+    // Not in data() as no reactivity is needed
+    this.disposed = false;
     this.resolve();
   },
   beforeUnmount() {
+    this.disposed = true;
     this.releaseAcquired();
   },
   methods: {
@@ -125,8 +128,9 @@ export default {
       const url = this.src;
       try {
         const blobUrl = await acquire(this.$store, url);
-        if (url !== this.src) {
-          // The src changed while loading
+        if (this.disposed || url !== this.src) {
+          // The component was unmounted or the src changed while loading:
+          // give back the reference taken by acquire()
           release(this.$store, url);
           return;
         }
@@ -134,7 +138,7 @@ export default {
         this.acquiredUrl = url;
         this.blobUrl = blobUrl;
       } catch (error) {
-        if (url !== this.src) {
+        if (this.disposed || url !== this.src) {
           return;
         }
         // Fall back to loading the image directly, which either works
