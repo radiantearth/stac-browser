@@ -68,6 +68,10 @@
     "displayOverviewsForChildren": {
       "type": ["boolean"]
     },
+    "maxDisplayPixels": {
+      "type": ["number", "null"],
+      "minimum": 1
+    },
     "buildTileUrlTemplate": {
       "type": ["null"],
       "format": "function",

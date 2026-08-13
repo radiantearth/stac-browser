@@ -15,6 +15,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added basic support for the STAC API extensions Transactions (for Items) and Collection Transactions, including validation
   - Adds three new config options: `transactions`, `transactionsRequireLogin` and `transactionsRequirePreflight`
   - Support for external management UIs via `create-form` and `edit-form` links ([RFC 6861](https://www.rfc-editor.org/rfc/rfc6861.html)) in the "Manage" menu
+- Completed authentication support for all supported methods, loading the data with the respective credentials:
+  - Thumbnails, icons and logos
+  - Map data
+  - External viewer actions are hidden when the data requires header-based credentials that external services can't receive
 - AVIF support for thumbnails
 - Improved metadata rendering for Zarr, Archive, Vector and more extensions
 - STAC Actions: A new pluggable interface (`StacActionPlugin`) to add action buttons for catalogs, collections and items, configurable via `stacActions.config.js`. Ships with an optional (disabled by default) `StacMap` action to open items in [stac-map](https://developmentseed.org/stac-map/).
@@ -22,8 +26,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Favorites are stored locally in the browser and can be exported and imported as JSON, CSV, or STAC Catalog
   - Adds a new config option `showFavorites` to disable the functionality
 - Items can be shown in a list view in addition to the card view, with the same view toggle buttons as for catalogs and collections
-  - The `cardViewMode` config option now applies to item lists as well
 - Search Example Code is now also available for curl and Go
+- The map can display more Zarr datasets
+
+### Changed
+
+- The `cardViewMode` config option now applies to item lists as well
+- Protection against map visualizations that load so much data that they could slow down or freeze the browser:
+  - Datasets without sufficiently small overviews are not shown on the map automatically
+  - Selecting such an asset through "Show on map" asks for confirmation before displaying it
+  - Adds a new config option `maxDisplayPixels` to adjust the limit, which can also be set through the root catalog
 
 ### Removed
 

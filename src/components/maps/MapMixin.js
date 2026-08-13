@@ -1,6 +1,7 @@
 import { isObject } from 'stac-js/src/utils.js';
 import i18n from '../../i18n';
-import { mapState } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
+import { needsAuthenticatedFetch } from '../../models/authMedia';
 import OlMap from 'ol/Map.js';
 import View from 'ol/View.js';
 import { defaults } from 'ol/interaction/defaults';
@@ -23,9 +24,10 @@ register(proj4); // required to support source reprojection
 
 export default {
   computed: {
-    ...mapState(['buildTileUrlTemplate', 'colorMode', 'crossOriginMedia', 'displayGeoTiffByDefault', 'displayPreview', 'displayOverview', 'getMapSourceOptions', 'useTileLayerAsFallback', 'uiLanguage']),
+    ...mapState(['buildTileUrlTemplate', 'colorMode', 'crossOriginMedia', 'displayGeoTiffByDefault', 'displayPreview', 'displayOverview', 'getMapSourceOptions', 'maxDisplayPixels', 'useTileLayerAsFallback', 'uiLanguage']),
+    ...mapGetters(['getRequestUrl']),
     stacLayerOptions() {
-      return {
+      const options = {
         buildTileUrlTemplate: this.buildTileUrlTemplate,
         crossOriginMedia: this.crossOriginMedia,
         displayPreview: this.displayPreview,
@@ -33,11 +35,20 @@ export default {
         displayGeoTiffByDefault: this.displayGeoTiffByDefault,
         useTileLayerAsFallback: this.useTileLayerAsFallback,
         getSourceOptions: this.getMapSourceOptions,
+        getRequestHeaders: this.getRequestHeadersForStacLayer,
+        // Adds the configured query parameters (incl. query-parameter
+        // credentials) to the URLs requested by ol-stac
+        getRequestUrl: (ref, url) => this.getRequestUrl(url),
         httpRequestFn: async (url, responseType) => {
           const response = await this.$store.dispatch('request', { link: url, axiosOptions: { responseType } });
           return response.data;
         },
       };
+      // null = use the ol-stac default
+      if (typeof this.maxDisplayPixels === 'number') {
+        options.maxDisplayPixels = this.maxDisplayPixels;
+      }
+      return options;
     },
     hasBasemap() {
       return this.basemaps.length > 0;
@@ -63,6 +74,14 @@ export default {
     }
   },
   methods: {
+    // Returns the HTTP headers (e.g. for authentication) that ol-stac attaches
+    // to the requests for the given URL. External URLs get no credentials.
+    getRequestHeadersForStacLayer(ref, url) {
+      if (needsAuthenticatedFetch(this.$store, url)) {
+        return this.$store.state.requestHeaders;
+      }
+      return null;
+    },
     async createMap(element, onfocusOnly = false) {
       let projection = 'EPSG:3857';
       let visibleLayer = 0;
@@ -184,6 +203,19 @@ export default {
             layerClassName = 'Group';
             sourceClassName = null;
             const {apply} = await import('ol-mapbox-style');
+            if (typeof options.transformRequest !== 'function') {
+              // Attach the configured credentials to all requests made by
+              // ol-mapbox-style (style, sources, sprites, glyphs, tiles).
+              // A transformRequest defined in the basemap config takes over
+              // instead and must handle credentials itself.
+              options.transformRequest = (url) => {
+                const requestUrl = this.getRequestUrl(url);
+                if (needsAuthenticatedFetch(this.$store, url)) {
+                  return new Request(requestUrl, { headers: this.$store.state.requestHeaders });
+                }
+                return requestUrl;
+              };
+            }
             const callback = options.layerCreated;
             options.layerCreated = async (layer, source, map) => {
               layer = await apply(layer, options.url, options);
@@ -200,8 +232,9 @@ export default {
               import('ol/format/WMTSCapabilities.js')
             ]);
             try {
-              const response = await fetch(options.url, {method: 'GET'});
-              const capabilities = new WMTSCapabilities().read(await response.text());
+              // Request through the store so that credentials are attached
+              const response = await this.$store.dispatch('request', { link: options.url, axiosOptions: { responseType: 'text' } });
+              const capabilities = new WMTSCapabilities().read(response.data);
               const wmtsOptions = optionsFromCapabilities(capabilities, options);
               Object.assign(options, wmtsOptions);
             } catch (e) {

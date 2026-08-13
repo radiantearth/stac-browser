@@ -220,6 +220,7 @@ You need to provide a field `stac_browser` and then you can set any of the follo
 - `defaultItemSort`
 - `defaultThumbnailSize`
 - `displayGeoTiffByDefault`
+- `maxDisplayPixels`
 - `preferredAssets`
 - `showThumbnailsAsAssets`
 

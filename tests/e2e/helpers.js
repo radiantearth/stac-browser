@@ -230,6 +230,42 @@ export async function recordRequestHeaders(worker, url) {
   return requests;
 }
 
+/**
+* Serve a 1x1 PNG for a URL, optionally guarded by an authentication check,
+* and record all requests to it.
+*
+* Returns the list of recorded requests (`{url, headers}`), which is filled
+* as requests arrive — use `expect.poll` to await it.
+*
+* @param {import('playwright-msw').MockServiceWorker} worker
+* @param {string} url – exact URL to serve the image for
+* @param {(request: Request) => boolean} [check] – when given, requests failing the check get a 401
+* @returns {Promise<Array<{url: string, headers: Object}>>} the recorded requests
+*/
+export async function mockImage(worker, url, check = null) {
+  // A 1x1 transparent PNG
+  const png = Uint8Array.from(
+    atob('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='),
+    c => c.charCodeAt(0),
+  );
+  const requests = [];
+  await worker.use(
+    http.get(url, ({ request }) => {
+      requests.push({
+        url: request.url,
+        headers: Object.fromEntries(request.headers.entries()),
+      });
+      if (check && !check(request)) {
+        return new HttpResponse(null, { status: 401 });
+      }
+      return HttpResponse.arrayBuffer(png.buffer.slice(0), {
+        headers: { 'Content-Type': 'image/png' },
+      });
+    }),
+  );
+  return requests;
+}
+
 /** Check that a request carries the given header value. */
 export const hasHeader = (name, value) => (request) => request.headers.get(name) === value;
 

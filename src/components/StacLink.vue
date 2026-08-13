@@ -1,7 +1,7 @@
 <template>
   <component :is="component" class="stac-link" :id="id" :title="tooltip" v-bind="attributes">
     <slot>
-      <img v-if="icon && !hideIcon" :src="icon.getAbsoluteUrl()" :alt="icon.title" :title="icon.title" class="icon me-2">
+      <AuthImage v-if="icon && !hideIcon" :src="icon.getAbsoluteUrl()" :alt="icon.title" :title="icon.title" class="icon me-2" />
       <span class="title">{{ displayTitle }}</span>
     </slot>
   </component>
@@ -16,9 +16,13 @@ import { isObject, size, URI } from 'stac-js/src/utils.js';
 import { isStacMediaType } from 'stac-js/src/mediatypes.js';
 import { getDisplayTitle } from '../models/stac';
 import { STAC } from 'stac-js';
+import AuthImage from './AuthImage.vue';
 
 export default defineComponent({
   name: "StacLink",
+  components: {
+    AuthImage
+  },
   props: {
     data: {
       type: [Object, Array],

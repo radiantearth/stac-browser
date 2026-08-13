@@ -229,6 +229,11 @@
       "westLon": "Westlicher Längengrad"
     },
     "close": "Schließen",
+    "displayLimit": {
+      "message": "Dieser Datensatz ist sehr groß und die Anzeige kann den Browser verlangsamen oder einfrieren.",
+      "showAnyway": "Trotzdem anzeigen",
+      "title": "Großer Datensatz"
+    },
     "fit": "Ansicht an räumliche Ausdehnung anpassen",
     "layers": {
       "base": "Grundkarten",

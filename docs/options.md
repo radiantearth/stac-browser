@@ -79,6 +79,7 @@ The override order for the configuration is:
   - [displayOverview](#displayoverview)
   - [displayOverviewsForChildren](#displayoverviewsforchildren)
   - [displayGeoTiffByDefault](#displaygeotiffbydefault)
+  - [maxDisplayPixels](#maxdisplaypixels)
   - [crs](#crs)
   - [getMapSourceOptions](#getmapsourceoptions)
 - [User Interface](#user-interface)
@@ -346,6 +347,29 @@ For a given token `123` this results in the following additional HTTP Header:
 
 You can change the default behaviour to send it as a Bearer token by providing `in`, `name` and `format`.
 
+#### What gets authenticated
+
+The credentials (query parameters or HTTP headers) are attached to all requests for URLs that are
+part of the catalog (see [`allowedDomains`](#alloweddomains)), external URLs never receive credentials:
+
+- STAC documents (catalogs, collections, items, API requests)
+- Downloads
+- Thumbnails, icons and logos: As `<img>` elements can't send HTTP headers, images that require
+  header-based credentials are loaded through an authenticated request and shown via an object URL.
+  A failed image request does NOT open the login form; the image falls back to loading without headers.
+- The map: GeoTIFF/COG, GeoZarr and PMTiles requests, preview images, XYZ/TileJSON/WMS/WMTS tiles,
+  TileJSON manifests, WMTS capabilities requests (incl. basemaps), and vector tile basemaps
+  (via a default ol-mapbox-style `transformRequest`, see [Basemaps](basemaps.md)).
+- External viewer actions (e.g. geojson.io, see `assetActions.config.js`) are hidden when the data
+  requires header-based credentials, as external services can't receive them. With query-based
+  credentials the actions remain available (the credentials are part of the URL that is passed on).
+
+Known limitations:
+
+- Header-based credentials for images and tiles require the server to allow the headers in
+  CORS preflight requests (the Fetch API is stricter than plain `<img>` elements).
+- Cookie-based authentication works independently of all this via [`crossOriginMedia: 'use-credentials'`](#crossoriginmedia).
+
 ## Internationalization and Localization
 
 ### locale
@@ -477,6 +501,16 @@ Loading non-cloud-optimized GeoTiffs only works reliably for smaller files (< 1M
 
 Related OpenLayers issue: [openlayers#16961](https://github.com/openlayers/openlayers/issues/16961)
 
+### maxDisplayPixels
+
+Corresponds to the ol-stac parameter `maxDisplayPixels`.
+
+The maximum number of pixels the coarsest resolution level of a GeoTIFF or Zarr asset may have to be displayed on the map, as displaying the full extent of an asset loads every tile of that level. Files without (sufficient) overviews, e.g. GeoTIFFs that are not cloud-optimized or single-resolution Zarr stores, can easily exceed this limit.
+
+Larger assets are not shown on the map automatically. When such an asset is selected through the "Show on map" button, STAC Browser asks for confirmation before displaying it.
+
+If set to `null` (default), the ol-stac default (16 megapixels) applies. Set to a higher number to allow larger assets, or to `Infinity` to display assets of any size without confirmation.
+
 ### crs
 
 An object of coordinate reference systems that the system needs to know.
@@ -498,7 +532,13 @@ Example for EPSG:2056:
 
 Corresponds to the ol-stac parameter `getSourceOptions`:
 
-> Optional function that can be used to configure the underlying sources. The function can do any additional work and return the completed options or a promise for the same. The function will be called with the current source options and the STAC Asset or Link. This can be useful for adding auth information such as an API token, either via query parameter or HTTP headers. Please be aware that sending HTTP headers may not be supported by all sources.
+> Optional function that can be used to configure the underlying sources. The function can do any additional work and return the completed options or a promise for the same. The function will be called with the current source options and the STAC Asset or Link.
+
+STAC Browser applies the configured query parameters (incl. query-based credentials from
+[`authConfig`](#authconfig)) to the URLs through the ol-stac option `getRequestUrl`, which runs
+before the function provided here, so the options already contain the final URLs. Header-based
+credentials are attached separately through the ol-stac option `getRequestHeaders`.
+Neither needs to be handled here.
 
 The function that can be provided for getMapSourceOptions has the following signature:
 

@@ -229,6 +229,11 @@
       "westLon": "West Longitude"
     },
     "close": "Close",
+    "displayLimit": {
+      "message": "This dataset is very large and displaying it may slow down or freeze the browser.",
+      "showAnyway": "Show anyway",
+      "title": "Large dataset"
+    },
     "fit": "Fit to extent",
     "layers": {
       "base": "Base Layers",
