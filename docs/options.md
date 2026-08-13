@@ -82,6 +82,7 @@ The override order for the configuration is:
   - [maxDisplayPixels](#maxdisplaypixels)
   - [crs](#crs)
   - [getMapSourceOptions](#getmapsourceoptions)
+  - [getStacLayerOptions](#getstaclayeroptions)
 - [User Interface](#user-interface)
   - [enforcedColorMode](#enforcedcolormode)
   - [cardViewMode](#cardviewmode)
@@ -552,6 +553,44 @@ For example, the following code would set the `jsonp` option for the OpenLayers 
 getSourceOptions: async (type, options) => {
   if (type.name === 'TileJSON') {
     options.jsonp = true;
+  }
+  return options;
+}
+```
+
+### getStacLayerOptions
+
+A function that can customize the options of the individual OpenLayers layers that
+[ol-stac](https://m-mohr.github.io/ol-stac/) creates for the assets and links of a STAC object.
+It is passed through to the [`getLayerOptions` option of the ol-stac `STACLayer`](https://m-mohr.github.io/ol-stac/en/latest/apidoc/module-ol-stac_layer_STAC-STACLayer.html)
+and is called right before each individual layer is created:
+
+```js
+getStacLayerOptions(type, options, reference) => options | Promise<options>
+```
+
+- `type` is the [layer type](https://m-mohr.github.io/ol-stac/en/latest/apidoc/module-ol-stac_layer_type-LayerType.html)
+  that is going to be created (compare with `String(type)`, e.g. `'WebGLTile'` for GeoTIFF and GeoZarr layers).
+- `options` are the assembled layer options.
+- `reference` is the STAC Asset or Link the layer is created for.
+
+The function can be asynchronous, e.g. to load a style definition that is referenced in the
+STAC metadata, which only delays the creation of the individual layer.
+
+This allows to customize the map rendering per asset or link, for example to provide a
+[style](https://openlayers.org/en/latest/apidoc/module-ol_layer_WebGLTile.js.html#~Style)
+for GeoTIFF or GeoZarr layers (e.g. rescaling single-band data that would otherwise render
+without contrast).
+
+For example, the following code would apply a grayscale style to all GeoZarr/GeoTIFF layers
+of a specific collection:
+
+```js
+getStacLayerOptions: (type, options, reference) => {
+  if (String(type) === 'WebGLTile' && reference.getContext()?.collection === 'my-datacubes') {
+    options.style = {
+      color: ['array', ['/', ['band', 1], 4000], ['/', ['band', 1], 4000], ['/', ['band', 1], 4000], 1]
+    };
   }
   return options;
 }

@@ -28,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Items can be shown in a list view in addition to the card view, with the same view toggle buttons as for catalogs and collections
 - Search Example Code is now also available for curl and Go
 - The map can display more Zarr datasets
+- New config option `getStacLayerOptions` to customize the options of the individual map layers created for STAC assets and links, e.g. to style GeoTIFF/GeoZarr layers
 
 ### Changed
 

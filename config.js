@@ -41,6 +41,7 @@ export default {
   maxDisplayPixels: null,
   buildTileUrlTemplate: null,
   getMapSourceOptions: null,
+  getStacLayerOptions: null,
   pathPrefix: "/",
   historyMode: "history",
   cardViewMode: "cards",

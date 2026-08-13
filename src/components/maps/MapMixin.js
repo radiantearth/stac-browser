@@ -24,7 +24,7 @@ register(proj4); // required to support source reprojection
 
 export default {
   computed: {
-    ...mapState(['buildTileUrlTemplate', 'colorMode', 'crossOriginMedia', 'displayGeoTiffByDefault', 'displayPreview', 'displayOverview', 'getMapSourceOptions', 'maxDisplayPixels', 'useTileLayerAsFallback', 'uiLanguage']),
+    ...mapState(['buildTileUrlTemplate', 'colorMode', 'crossOriginMedia', 'displayGeoTiffByDefault', 'displayPreview', 'displayOverview', 'getMapSourceOptions', 'getStacLayerOptions', 'maxDisplayPixels', 'useTileLayerAsFallback', 'uiLanguage']),
     ...mapGetters(['getRequestUrl']),
     stacLayerOptions() {
       const options = {
@@ -35,6 +35,7 @@ export default {
         displayGeoTiffByDefault: this.displayGeoTiffByDefault,
         useTileLayerAsFallback: this.useTileLayerAsFallback,
         getSourceOptions: this.getMapSourceOptions,
+        getLayerOptions: this.getStacLayerOptions,
         getRequestHeaders: this.getRequestHeadersForStacLayer,
         // Adds the configured query parameters (incl. query-parameter
         // credentials) to the URLs requested by ol-stac
