@@ -24,10 +24,10 @@ register(proj4); // required to support source reprojection
 
 export default {
   computed: {
-    ...mapState(['buildTileUrlTemplate', 'colorMode', 'crossOriginMedia', 'displayGeoTiffByDefault', 'displayPreview', 'displayOverview', 'getMapSourceOptions', 'useTileLayerAsFallback', 'uiLanguage']),
+    ...mapState(['buildTileUrlTemplate', 'colorMode', 'crossOriginMedia', 'displayGeoTiffByDefault', 'displayPreview', 'displayOverview', 'getMapSourceOptions', 'maxDisplayPixels', 'useTileLayerAsFallback', 'uiLanguage']),
     ...mapGetters(['getRequestUrl']),
     stacLayerOptions() {
-      return {
+      const options = {
         buildTileUrlTemplate: this.buildTileUrlTemplate,
         crossOriginMedia: this.crossOriginMedia,
         displayPreview: this.displayPreview,
@@ -44,6 +44,11 @@ export default {
           return response.data;
         },
       };
+      // null = use the ol-stac default
+      if (typeof this.maxDisplayPixels === 'number') {
+        options.maxDisplayPixels = this.maxDisplayPixels;
+      }
+      return options;
     },
     hasBasemap() {
       return this.basemaps.length > 0;

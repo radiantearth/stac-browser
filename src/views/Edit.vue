@@ -27,17 +27,12 @@
         @request-save="onSaveRequested"
       />
 
-      <b-modal :title="$t('manage.unsavedChangesTitle')" v-model="showLeaveConfirm" @hide="resolveLeave(false)">
+      <ConfirmModal
+        v-model="showLeaveConfirm" :title="$t('manage.unsavedChangesTitle')"
+        :confirmLabel="$t('manage.leavePage')" @confirm="resolveLeave(true)" @cancel="resolveLeave(false)"
+      >
         <p>{{ $t('manage.unsavedChangesLeave') }}</p>
-        <template #footer>
-          <b-button variant="danger" @click="resolveLeave(true)">
-            {{ $t('manage.leavePage') }}
-          </b-button>
-          <b-button variant="secondary" @click="resolveLeave(false)">
-            {{ $t('cancel') }}
-          </b-button>
-        </template>
-      </b-modal>
+      </ConfirmModal>
     </section>
   </main>
 </template>
@@ -59,7 +54,7 @@ const DRAFT_TTL = 7 * 24 * 60 * 60 * 1000; // discard drafts after a week
 export default defineComponent({
   name: "Edit",
   components: {
-    BModal: defineAsyncComponent(() => import('bootstrap-vue-next').then(m => m.BModal)),
+    ConfirmModal: defineAsyncComponent(() => import('../components/ConfirmModal.vue')),
     JsonEditor
   },
   mixins: [

@@ -49,6 +49,7 @@ import LinkActions from '../../linkActions.config';
 import AuthUtils from './auth/utils';
 import { browserProtocols } from 'stac-js/src/http';
 import { imageMediaTypes, geojsonMediaType, wozMediaTypes, zarrMediaTypes } from 'stac-js/src/mediatypes';
+import { getGeoZarrSourceOptionsFromAsset } from 'ol-stac/util.js';
 
 const disableDownloadTypes = [...zarrMediaTypes];
 const mapTypes = imageMediaTypes.concat([geojsonMediaType]).concat(wozMediaTypes);
@@ -147,6 +148,16 @@ export default {
       // Otherwise, all images that a browser can read are supported + GeoJSON
       else if (mapTypes.includes(this.data?.type)) {
         return true;
+      }
+      // Other Zarr assets can only be shown if the STAC metadata declares
+      // what to render (a datacube variable or bands)
+      else if (this.isAsset && zarrMediaTypes.includes(this.data?.type)) {
+        try {
+          const options = getGeoZarrSourceOptionsFromAsset(this.data, []);
+          return Boolean(options.variable || (options.bands && options.bands.length > 0));
+        } catch {
+          return false;
+        }
       }
       return false;
     },

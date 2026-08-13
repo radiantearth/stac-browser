@@ -1,0 +1,72 @@
+{
+  "type": "Collection",
+  "stac_version": "1.1.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/datacube/v2.2.0/schema.json"
+  ],
+  "id": "thwaites-ice-velocity",
+  "description": "Antarctic ice velocity subset for Thwaites Glacier (Zarr v2, EPSG:3031).",
+  "license": "other",
+  "extent": {
+    "spatial": {
+      "bbox": [
+        [
+          -130.6,
+          -78.6,
+          -105.9,
+          -71.9
+        ]
+      ]
+    },
+    "temporal": {
+      "interval": [
+        [
+          null,
+          null
+        ]
+      ]
+    }
+  },
+  "cube:dimensions": {
+    "y": {
+      "type": "spatial",
+      "axis": "y",
+      "extent": [
+        -983450,
+        -491950
+      ]
+    },
+    "x": {
+      "type": "spatial",
+      "axis": "x",
+      "extent": [
+        -1720950,
+        -1147450
+      ]
+    }
+  },
+  "cube:variables": {
+    "velocity": {
+      "type": "data",
+      "dimensions": [
+        "y",
+        "x"
+      ]
+    }
+  },
+  "links": [],
+  "assets": {
+    "data": {
+      "href": "https://carbonplan-share.s3.us-west-2.amazonaws.com/zarr-layer-examples/polar-subset.zarr",
+      "type": "application/vnd.zarr; version=2",
+      "roles": [
+        "data"
+      ],
+      "title": "Ice velocity",
+      "statistics": {
+        "minimum": 0,
+        "maximum": 1
+      }
+    }
+  }
+}

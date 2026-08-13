@@ -88,19 +88,13 @@
         <SocialSharing :text="sharingMessage" :title="title" :url="browserUrl()" />
       </template>
     </b-popover>
-    <b-modal :title="$t('manage.confirmDeleteTitle')" v-model="confirmDelete">
+    <ConfirmModal
+      v-model="confirmDelete" :title="$t('manage.confirmDeleteTitle')"
+      :confirmLabel="$t('manage.delete')" :busy="deleting" @confirm="deleteThis"
+    >
       <p>{{ $t('manage.confirmDeleteMessage') }}</p>
       <p>{{ $t('manage.noUndo') }}</p>
-      <template #footer="{ close }">
-        <b-button variant="danger" :disabled="deleting" @click="deleteThis">
-          <b-spinner v-if="deleting" small />
-          {{ $t('manage.delete') }}
-        </b-button>
-        <b-button variant="secondary" @click="close()">
-          {{ $t('cancel') }}
-        </b-button>
-      </template>
-    </b-modal>
+    </ConfirmModal>
   </nav>
 </template>
 
@@ -122,8 +116,8 @@ export default {
     Url,
     CopyButton,
     SocialSharing,
-    BModal: defineAsyncComponent(() => import('bootstrap-vue-next').then(m => m.BModal)),
     BPopover: defineAsyncComponent(() => import('bootstrap-vue-next').then(m => m.BPopover)),
+    ConfirmModal: defineAsyncComponent(() => import('./ConfirmModal.vue')),
     StacActions: defineAsyncComponent(() => import('./StacActions.vue')),
     Validation: defineAsyncComponent(() => import('./Validation.vue'))
   },

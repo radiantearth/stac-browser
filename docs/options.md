@@ -79,6 +79,7 @@ The override order for the configuration is:
   - [displayOverview](#displayoverview)
   - [displayOverviewsForChildren](#displayoverviewsforchildren)
   - [displayGeoTiffByDefault](#displaygeotiffbydefault)
+  - [maxDisplayPixels](#maxdisplaypixels)
   - [crs](#crs)
   - [getMapSourceOptions](#getmapsourceoptions)
 - [User Interface](#user-interface)
@@ -499,6 +500,16 @@ If set to `true`, the map also shows non-cloud-optimized GeoTiff files by defaul
 Loading non-cloud-optimized GeoTiffs only works reliably for smaller files (< 1MB) with a certain structure. It may also work for larger files, but it depends a lot on the underlying client hardware and software.
 
 Related OpenLayers issue: [openlayers#16961](https://github.com/openlayers/openlayers/issues/16961)
+
+### maxDisplayPixels
+
+Corresponds to the ol-stac parameter `maxDisplayPixels`.
+
+The maximum number of pixels the coarsest resolution level of a GeoTIFF or Zarr asset may have to be displayed on the map, as displaying the full extent of an asset loads every tile of that level. Files without (sufficient) overviews, e.g. GeoTIFFs that are not cloud-optimized or single-resolution Zarr stores, can easily exceed this limit.
+
+Larger assets are not shown on the map automatically. When such an asset is selected through the "Show on map" button, STAC Browser asks for confirmation before displaying it.
+
+If set to `null` (default), the ol-stac default (16 megapixels) applies. Set to a higher number to allow larger assets, or to `Infinity` to display assets of any size without confirmation.
 
 ### crs
 

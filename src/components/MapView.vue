@@ -6,6 +6,12 @@
       <TextControl v-if="empty" :map="map" :text="$t('mapping.nodata')" />
       <TextControl v-else-if="!hasBasemap" :map="map" :text="$t('mapping.nobasemap')" />
     </div>
+    <ConfirmModal
+      v-model="showDisplayLimitModal" :title="$t('mapping.displayLimit.title')"
+      :confirmLabel="$t('mapping.displayLimit.showAnyway')" @confirm="showAnyway"
+    >
+      <p>{{ $t('mapping.displayLimit.message') }}</p>
+    </ConfirmModal>
     <div ref="target" class="popover-target" />
     <b-popover
       v-if="popover && selection" show manual placement="auto"
@@ -44,6 +50,7 @@ export default {
   name: 'MapView',
   components: {
     BPopover: defineAsyncComponent(() => import('bootstrap-vue-next').then(m => m.BPopover)),
+    ConfirmModal: defineAsyncComponent(() => import('../components/ConfirmModal.vue')),
     Features: defineAsyncComponent(() => import('../components/Features.vue')),
     Catalogs: defineAsyncComponent(() => import('../components/Catalogs.vue')),
     Items: defineAsyncComponent(() => import('../components/Items.vue')),
@@ -83,6 +90,7 @@ export default {
       empty: false,
       selector: null,
       mapId: `map-${++mapId}`,
+      displayLimitError: null,
     };
   },
   computed: {
@@ -101,6 +109,16 @@ export default {
         displayPreview: showItems,
         displayOverview: showItems && this.displayOverviewsForChildren
       };
+    },
+    showDisplayLimitModal: {
+      get() {
+        return this.displayLimitError !== null;
+      },
+      set(value) {
+        if (!value) {
+          this.displayLimitError = null;
+        }
+      }
     }
   },
   watch: {
@@ -109,6 +127,14 @@ export default {
     },
     async assets() {
       if (!this.stacLayer) {
+        return;
+      }
+      this.displayLimitError = null;
+      if (this.ignoreDisplayLimit) {
+        // Re-enable the display limit for the newly selected assets
+        this.ignoreDisplayLimit = false;
+        this.map.removeLayer(this.stacLayer);
+        this.addStacLayer();
         return;
       }
       await this.stacLayer.setAssets(this.assets);
@@ -134,8 +160,9 @@ export default {
     }
   },
   created() {
-    // This is created here and not in data() to avoid it being reactive
+    // These are created here and not in data() to avoid them being reactive
     this.stacLayer = null;
+    this.ignoreDisplayLimit = false;
   },
   async mounted() {
     await this.showStacLayer();
@@ -144,6 +171,8 @@ export default {
     async showStacLayer() {
       this.map = null;
       this.stacLayer = null;
+      this.displayLimitError = null;
+      this.ignoreDisplayLimit = false;
 
       await this.createMap(this.$refs.map, this.stac, this.onfocusOnly);
 
@@ -162,9 +191,19 @@ export default {
         disableMigration: true,
         childrenOptions: this.childrenOptions
       });
+      if (this.ignoreDisplayLimit) {
+        options.maxDisplayPixels = Infinity;
+      }
       this.stacLayer = new StacLayer(options);
-      this.stacLayer.on('error', error => {
-        console.warn(error);
+      this.stacLayer.on('error', event => {
+        if (event.error?.name === 'DisplayLimitError') {
+          // The asset needs to load more data than ol-stac deems safe;
+          // offer to display it anyway (see showAnyway)
+          this.displayLimitError = event.error;
+        }
+        else {
+          console.warn(event);
+        }
         this.fit();
       });
       this.stacLayer.on('sourceready', this.fit);
@@ -244,6 +283,12 @@ export default {
     },
     resetSelection() {
       this.selection = null;
+    },
+    showAnyway() {
+      this.displayLimitError = null;
+      this.ignoreDisplayLimit = true;
+      this.map.removeLayer(this.stacLayer);
+      this.addStacLayer();
     },
     getShownData() {
       if (!this.stacLayer) {
