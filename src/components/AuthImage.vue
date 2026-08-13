@@ -9,8 +9,8 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
-import { acquire, needsAuthenticatedFetch, release } from '../models/authMedia';
 import { markRaw } from 'vue';
+import { acquire, needsAuthenticatedFetch, release } from '../models/authMedia';
 
 /**
  * An image that is loaded with the configured credentials.
@@ -70,11 +70,10 @@ export default {
       // The URL currently held in the authMedia cache
       acquiredUrl: null,
       failed: false,
-      // Internal state, no reactivity needed
-      disposed: markRaw(false),
-      observer: markRaw(null),
+      disposed: false,
       // Whether a lazy image is close enough to the viewport to be loaded
-      nearViewport: false
+      nearViewport: false,
+      observer: null
     };
   },
   computed: {
@@ -122,24 +121,26 @@ export default {
     if (!this.lazy || this.nearViewport) {
       return;
     }
-    // Native lazy loading only applies to the `<img>` element, but an
-    // authenticated request would fetch the image right away. Defer it
-    // until the image comes close to the viewport instead. While nothing
-    // can be displayed the root element is a placeholder node, so the
-    // surrounding element is observed.
-    const target = this.$el instanceof Element ? this.$el : this.$el.parentElement;
+    // Defer authenticated requests until the image comes close to the
+    // viewport, native lazy loading can't cover them. Observe the closest
+    // ancestor that retains layout: until the image is loaded the root is a
+    // placeholder node and ancestors may be hidden (e.g. `:empty` wrappers).
+    let target = this.$el instanceof Element ? this.$el : this.$el.parentElement;
+    while (target && target.offsetParent === null && target !== document.body) {
+      target = target.parentElement;
+    }
     if (!window.IntersectionObserver || !target) {
       this.nearViewport = true;
       this.resolve();
       return;
     }
-    this.observer = new IntersectionObserver(entries => {
+    this.observer = markRaw(new IntersectionObserver(entries => {
       if (entries.some(entry => entry.isIntersecting)) {
         this.disconnectObserver();
         this.nearViewport = true;
         this.resolve();
       }
-    }, { rootMargin: '200px' });
+    }, { rootMargin: '200px' }));
     this.observer.observe(target);
   },
   beforeUnmount() {
@@ -167,9 +168,9 @@ export default {
       const url = this.src;
       try {
         const blobUrl = await acquire(this.$store, url);
-        if (this.disposed || url !== this.src) {
-          // The component was unmounted or the src changed while loading:
-          // give back the reference taken by acquire()
+        if (this.disposed || url !== this.src || !this.useAuthenticatedFetch) {
+          // Unmounted, src changed or logged out while loading:
+          // give back the reference so that the cache drains on logout
           release(this.$store, url);
           return;
         }
@@ -177,11 +178,10 @@ export default {
         this.acquiredUrl = url;
         this.blobUrl = blobUrl;
       } catch (error) {
-        if (this.disposed || url !== this.src) {
+        if (this.disposed || url !== this.src || !this.useAuthenticatedFetch) {
           return;
         }
-        // A previously shown image (e.g. when the src changed) is no
-        // longer needed
+        // Release a previously shown image (e.g. when the src changed)
         this.releaseAcquired();
         // Fall back to loading the image directly, which either works
         // (e.g. a public image in a partially protected catalog) or
