@@ -143,6 +143,15 @@ export default {
       if (!this.stacLayer) {
         return;
       }
+      this.displayLimitError = null;
+      if (this.ignoreDisplayLimit) {
+        // Re-enable the display limit, it was only confirmed for the
+        // previously selected asset
+        this.ignoreDisplayLimit = false;
+        this.map.removeLayer(this.stacLayer);
+        this.addStacLayer();
+        return;
+      }
       await this.stacLayer.setAssets(null, false);
       await this.stacLayer.setChildren(this.children, this.childrenOptions, false);
       await this.stacLayer.updateLayers();

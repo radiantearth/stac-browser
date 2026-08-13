@@ -10,6 +10,7 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
 import { acquire, needsAuthenticatedFetch, release } from '../models/authMedia';
+import { markRaw } from 'vue';
 
 /**
  * An image that is loaded with the configured credentials.
@@ -68,7 +69,12 @@ export default {
       blobUrl: null,
       // The URL currently held in the authMedia cache
       acquiredUrl: null,
-      failed: false
+      failed: false,
+      // Internal state, no reactivity needed
+      disposed: markRaw(false),
+      observer: markRaw(null),
+      // Whether a lazy image is close enough to the viewport to be loaded
+      nearViewport: false
     };
   },
   computed: {
@@ -110,19 +116,52 @@ export default {
     }
   },
   created() {
-    // Not in data() as no reactivity is needed
-    this.disposed = false;
     this.resolve();
   },
+  mounted() {
+    if (!this.lazy || this.nearViewport) {
+      return;
+    }
+    // Native lazy loading only applies to the `<img>` element, but an
+    // authenticated request would fetch the image right away. Defer it
+    // until the image comes close to the viewport instead. While nothing
+    // can be displayed the root element is a placeholder node, so the
+    // surrounding element is observed.
+    const target = this.$el instanceof Element ? this.$el : this.$el.parentElement;
+    if (!window.IntersectionObserver || !target) {
+      this.nearViewport = true;
+      this.resolve();
+      return;
+    }
+    this.observer = new IntersectionObserver(entries => {
+      if (entries.some(entry => entry.isIntersecting)) {
+        this.disconnectObserver();
+        this.nearViewport = true;
+        this.resolve();
+      }
+    }, { rootMargin: '200px' });
+    this.observer.observe(target);
+  },
   beforeUnmount() {
+    this.disconnectObserver();
     this.disposed = true;
     this.releaseAcquired();
   },
   methods: {
+    disconnectObserver() {
+      if (this.observer) {
+        this.observer.disconnect();
+        this.observer = null;
+      }
+    },
     async resolve() {
       if (!this.useAuthenticatedFetch) {
         this.releaseAcquired();
         this.blobUrl = null;
+        return;
+      }
+      if (this.lazy && !this.nearViewport) {
+        // Deferred until the image comes close to the viewport (see mounted)
         return;
       }
       const url = this.src;
@@ -141,6 +180,9 @@ export default {
         if (this.disposed || url !== this.src) {
           return;
         }
+        // A previously shown image (e.g. when the src changed) is no
+        // longer needed
+        this.releaseAcquired();
         // Fall back to loading the image directly, which either works
         // (e.g. a public image in a partially protected catalog) or
         // reports the failure through the error event of the element.
