@@ -147,9 +147,21 @@ test.describe('STAC Browser Search page', () => {
       await submitButton.click();
         
       const { body } = await requestPromise;
+      // Assert the bbox is geographically valid rather than tying the test to
+      // the map's pixel size / zoom: all four values finite and in range, with
+      // west < east (a click never produces an antimeridian-crossing box) and
+      // south < north.
+      const [west, south, east, north] = body.bbox;
       expect(body.bbox).toHaveLength(4);
-      expect(body.bbox[0]).toBeLessThan(body.bbox[2]);
-      expect(body.bbox[1]).toBeLessThan(body.bbox[3]);
+      for (const v of body.bbox) {
+        expect(Number.isFinite(v)).toBe(true);
+      }
+      expect(west).toBeGreaterThanOrEqual(-180);
+      expect(east).toBeLessThanOrEqual(180);
+      expect(south).toBeGreaterThanOrEqual(-90);
+      expect(north).toBeLessThanOrEqual(90);
+      expect(west).toBeLessThan(east);
+      expect(south).toBeLessThan(north);
     });
   });
     
@@ -195,7 +207,45 @@ test.describe('STAC Browser Search page', () => {
       expect(body.bbox[3]).toBeCloseTo(49, 2);
     });
   });
-    
+
+  test('Search with antimeridian-crossing bbox should preserve west > east in POST body', async ({ page }) => {
+    await page.goto(SEARCH_PATH);
+
+    await test.step('Enter a bounding box that crosses the antimeridian (e.g. New Zealand to Fiji)', async () => {
+      await enableSpatialExtentInputs(page);
+      await page.waitForLoadState('networkidle');
+      await waitForMapReady(page);
+
+      // West positive, east negative: the box wraps across 180°.
+      await fillBboxInputs(page, {
+        westLon: '170',
+        southLat: '-45',
+        eastLon: '-170',
+        northLat: '-10'
+      });
+      await page.getByLabel(/north latitude/i).blur();
+
+      await waitForBboxInputsPopulated(page);
+    });
+
+    await test.step('Submit search and verify the wrapping bbox survives into the POST body', async () => {
+      const requestPromise = waitForSearchPost(page);
+      const submitButton = page.getByRole('button', { name: /submit/i });
+      await submitButton.click();
+
+      const { body } = await requestPromise;
+      // STAC/GeoJSON convention: an antimeridian-crossing bbox has west > east.
+      // It must be preserved verbatim, not normalized/reordered into a huge
+      // box spanning the other way around the globe.
+      expect(body.bbox).toHaveLength(4);
+      expect(body.bbox[0]).toBeCloseTo(170, 2);
+      expect(body.bbox[1]).toBeCloseTo(-45, 2);
+      expect(body.bbox[2]).toBeCloseTo(-170, 2);
+      expect(body.bbox[3]).toBeCloseTo(-10, 2);
+      expect(body.bbox[0]).toBeGreaterThan(body.bbox[2]);
+    });
+  });
+
   test('Manual spatial extent shows incomplete error', async ({ page }) => {
       
     await page.goto(SEARCH_PATH);
