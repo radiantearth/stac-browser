@@ -70,12 +70,8 @@
     "false": "Nie",
     "true": "Tak"
   },
-  "close": "",
   "copy": "Kopiuj",
-  "copyErrors": {
-    "permission": "",
-    "unsupported": ""
-  },
+  "copyErrors": {},
   "default": "Domyślny",
   "defaultWithValue": "Domyślny ({value})",
   "deprecated": "Przestarzały",
@@ -91,7 +87,6 @@
   },
   "description": "Opis",
   "errors": {
-    "apiListRequested": "",
     "authFailed": "Wystąpił błąd żądania - podane dane uwierzytelniające mogą być niepoprawne.",
     "badRequest": "Żądanie jest nieprawidłowe. Może to być spowodowane nieprawidłowymi parametrami, np. w zapytaniu wyszukiwania, lub błędem w STAC Browser.",
     "contactProvider": "Skontaktuj się z administratorem, aby rozwiązaźć ten problem.",
@@ -110,7 +105,6 @@
     "loadApiItemsFailed": "Nie udało się wczytać elementów API.",
     "loadFilteredItems": "Przepraszamy, nie udało się wczytać przelitrowanej listy elementów.",
     "loadItems": "Przepraszamy, nie udało się wczytać listy elementów STAC.",
-    "missingPermissions": "",
     "networkError": "Ten problem może wystąpić, gdy serwer nie zezwala na zewnętrzny dostęp przez przeglądarkę (np. brak nagłówków CORS). @:errors.contactProvider",
     "noExternalAccess": "Dostęp do zewnętrznych katalogów nie jest dozwolny!",
     "notFound": "Żądany zasób nie istnieje. @:errors.contactProvider",
@@ -118,30 +112,9 @@
     "title": "Błąd",
     "unauthorized": "Żądanie nie zawiera danych uwierzytelniających, np. tokenu API. Podaj dane uwierzytelniające i spróbuj ponownie."
   },
-  "exampleCode": {
-    "title": "",
-    "storeAs": "",
-    "installDependencies": ""
-  },
+  "exampleCode": {},
   "favorites": {
-    "add": "",
-    "empty": "",
-    "export": "",
-    "exportDescription": "",
-    "exportFormats": {
-      "csv": "",
-      "excel": "",
-      "json": "",
-      "stac": ""
-    },
-    "import": "",
-    "importDescription": "",
-    "importInvalid": "",
-    "imported": "",
-    "label": "",
-    "localOnly": "",
-    "remove": "",
-    "title": ""
+    "exportFormats": {}
   },
   "featureExperimental": "Ta funkcja jest w fazie testowej i może dawać nieoczekiwane wyniki!",
   "features": {
@@ -182,30 +155,13 @@
   },
   "items": {
     "filter": "Filtry",
-    "filterChangesNotApplied": "",
     "hideFilter": "Ukryj filtry",
     "noTime": "Nie podano czasu",
     "noneAvailableForCollection": "Brak dostępnych elementów dla tej kolekcji.",
     "showFilter": "Pokaż filtry "
   },
   "loading": "Ładowanie...",
-  "manage": {
-    "addCollection": "",
-    "addItem": "",
-    "confirmDeleteTitle": "",
-    "confirmDeleteMessage": "",
-    "create": "",
-    "delete": "",
-    "discardDraft": "",
-    "draftRestored": "",
-    "edit": "",
-    "leavePage": "",
-    "save": "",
-    "noUndo": "",
-    "unsavedChangesLeave": "",
-    "unsavedChangesTitle": "",
-    "validate": ""
-  },
+  "manage": {},
   "map": "Mapa",
   "mapping": {
     "attribution": {
@@ -215,25 +171,11 @@
     },
     "bboxSelect": {
       "add": "Kliknij na mapie, aby dodać ramkę (bbox).",
-      "eastLon": "",
-      "error": {
-        "incomplete": "",
-        "invalidLat": "",
-        "invalidLon": "",
-        "latOrder": "",
-        "lonOrder": ""
-      },
-      "northLat": "",
-      "remove": "Kliknij wewnątrz ramki, aby ją usunąć.",
-      "southLat": "",
-      "westLon": ""
+      "error": {},
+      "remove": "Kliknij wewnątrz ramki, aby ją usunąć."
     },
     "close": "Zamknij",
-    "displayLimit": {
-      "message": "",
-      "showAnyway": "",
-      "title": ""
-    },
+    "displayLimit": {},
     "fit": "Dopasuj do zasięgu",
     "layers": {
       "base": "Warstwy podstawowe",
@@ -278,16 +220,7 @@
     "previous": "‹ Poprzednia"
   },
   "poweredBy": "Wspierane przez {link}",
-  "programming": {
-    "csharp": "",
-    "curl": "",
-    "go": "",
-    "java": "",
-    "javascript": "",
-    "python": "",
-    "r": "",
-    "rust": ""
-  },
+  "programming": {},
   "protocol": {
     "azure": "Microsoft Azure",
     "file": "system plików (lokalny)",
@@ -317,28 +250,12 @@
   "reset": "Resetuj",
   "search": {
     "addCollections": "Naciśnij Enter, aby dodać kolekcję",
-    "addDate": "",
     "addFilter": "Dodaj filtr",
     "additionalFilters": "Dodatkowe filtry",
     "addItemIds": "Naciśnij Enter, aby dodać ID elementu",
     "addSearchTerm": "Naciśnij Enter, aby dodać frazę wyszukiwania",
-    "arrayInput": {
-      "addValue": "",
-      "helpText": ""
-    },
-    "arrayContains": "",
-    "arrayContainsDescription": "",
-    "arrayContainedBy": "",
-    "arrayContainedByDescription": "",
-    "arrayEquals": "",
-    "arrayEqualsDescription": "",
-    "arrayOverlaps": "",
-    "arrayOverlapsDescription": "",
-    "between": "",
-    "betweenOperatorDescription": "",
+    "arrayInput": {},
     "dateDescription": "Wszystkie czasy w Uniwersalnym Czasie Koordynowanym (UTC).",
-    "disabledDueToSingleDate": "",
-    "droppedFilters": "",
     "enterCollections": "Wprowadź jedno lub więcej ID kolekcji...",
     "enterItemIds": "Podaj jedno lub więcej ID elementu...",
     "enterSearchTerms": "Podaj jedną lub więcej fraz wyszukiwania...",
@@ -349,8 +266,6 @@
     "freeTextDescription": "Wyszukaj co najmniej jedną z podanych fraz w polach takich, jak nazwa i opis.",
     "greaterThan": "większy niż",
     "greaterThanEqual": "większy niż lub równy",
-    "in": "",
-    "inOperatorDescription": "",
     "itemIds": "ID elementów",
     "itemsPerPage": "Elementów na stronę",
     "itemsPerPageDescription": "Liczba elementów żądanych na stronę, maks. {maxItems} elementów.",
@@ -359,23 +274,19 @@
     "likeOperatorDescription": "Możesz użyć znaków wieloznacznych. `_` dopasowuj pojedynczy znak, `%` dopasowuje dowolną liczbę znaków. Aby wyszukać znak wieloznaczny, należy dodać `\\` przed znakiem.",
     "logical": {
       "and": "Dopasuj wszystkie wiltry (i)",
-      "or": "Dopasuj dowolny filtr (lub)",
-      "not": ""
+      "or": "Dopasuj dowolny filtr (lub)"
     },
     "matches": "dopasowania",
     "metaDescription": "Przeszukaj ofertę danych {title}.",
     "modifyCriteria": "Dostosuj kryteria wyszukiwania.",
     "noFurtherItemsFound": "Brak dostępnych dalszych elementów.",
     "noItemsFound": "Brak elementów spełniających podane kryteria.",
-    "noOperatorsError": "",
     "noOptions": "Nic nie wpisano",
     "notEqualTo": "nierówny",
     "notFullySupported": "Nie wszystkie opcje mogą być obsługiwane.",
     "notSupported": "Wyszukiwanie elementów nie jest obsługiwane przez API.",
     "placeholder": "Wyszukaj...",
-    "removeDate": "",
     "selectCollections": "Wybierz jedną lub więcej kolekcji...",
-    "selectDateRange": "",
     "selectForItemSearch": "Wybierz do wyszukiwania elementu",
     "spatialExtent": "Zasięg przestrzenny",
     "tabs": {
@@ -416,7 +327,6 @@
       "switch": "Zmień język"
     },
     "locatedAt": "Metadane STAC znajdują się pod adresem:",
-    "manage": "",
     "share": {
       "bsky": "Bluesky",
       "email": "E-mail",
@@ -468,8 +378,6 @@
   "stacCollection": "Kolekcja | Kolekcje",
   "stacItem": "Element | Elementy",
   "submit": "Zatwierdź",
-  "switchToDarkMode": "",
-  "switchToLightMode": "",
   "table": {
     "emptyFilteredText": "Brak rekordów spełniających żądanie",
     "emptyText": "Brak rekordów do wyświetlenia",
@@ -495,7 +403,5 @@
     },
     "title": "Opcje wyświetlania"
   },
-  "widgets": {
-    "featured": ""
-  }
+  "widgets": {}
 }
