@@ -230,8 +230,8 @@
     },
     "close": "Fermer",
     "displayLimit": {
-      "message": "",
-      "showAnyway": "",
+      "message": "Ce jeu de données est très volumineux et l'afficher peut ralentir ou geler le navigateur.",
+      "showAnyway": "Afficher quand même",
       "title": ""
     },
     "fit": "Adapter à l'étendue",
