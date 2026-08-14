@@ -12,7 +12,7 @@
           <nav class="actions navigation">
             <b-button-group v-if="canSearch || !isServerSelector || showFavoritesFromVueX">
               <b-button v-if="!isServerSelector" variant="header" :title="$t('browse')" @click="sidebar = !sidebar">
-                <b-icon-list /><span class="button-label">{{ $t('browse') }}</span>
+                <b-icon-list />
               </b-button>
               <b-button v-if="canSearch" variant="header" :to="searchBrowserLink" :title="$t('search.title')" :pressed="isSearchPage">
                 <b-icon-search /><span class="button-label">{{ $t('search.title') }}</span>

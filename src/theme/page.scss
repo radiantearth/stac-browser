@@ -67,11 +67,14 @@ svg {
       // On small screens, slide the site row out of view when scrolling down
       // so that only the page row stays sticky. Scrolling up brings it back.
       // The .hide-site-header class and --sb-site-height are managed in StacBrowser.vue.
+      // We move the header by animating `top` rather than a `transform`: a transform
+      // on a `position: sticky` element breaks the sticky pin under compositor-driven
+      // scrolling (Firefox on Android, iOS Safari), letting the whole header scroll away.
       @include media-breakpoint-down(md) {
-        transition: box-shadow 0.2s ease-in-out, transform 0.3s ease-in-out;
+        transition: box-shadow 0.2s ease-in-out, top 0.3s ease-in-out;
 
         &.hide-site-header {
-          transform: translateY(calc(-1 * var(--sb-site-height, 0px)));
+          top: calc(var(--sb-header-margin) - var(--sb-site-height, 0px));
         }
       }
     }
@@ -108,7 +111,7 @@ svg {
 
       @include media-breakpoint-up(lg) {
         .actions {
-          min-width: 300px;
+          min-width: 350px;
         }
       }
 
