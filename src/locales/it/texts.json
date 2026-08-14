@@ -194,6 +194,7 @@
       "westLon": "Longitudine ovest"
     },
     "close": "Chiudi",
+    "displayLimit": {},
     "fit": "Adatta alla estensione",
     "layers": {
       "base": "Livelli di base",

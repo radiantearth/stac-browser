@@ -167,6 +167,7 @@
       "error": {}
     },
     "close": "Fechar",
+    "displayLimit": {},
     "layers": {},
     "location": {},
     "zoom": {

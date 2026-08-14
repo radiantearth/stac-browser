@@ -175,6 +175,7 @@
       "remove": "Kliknij wewnątrz ramki, aby ją usunąć."
     },
     "close": "Zamknij",
+    "displayLimit": {},
     "fit": "Dopasuj do zasięgu",
     "layers": {
       "base": "Warstwy podstawowe",

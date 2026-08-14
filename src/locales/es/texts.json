@@ -229,6 +229,7 @@
       "westLon": "Longitud Oeste"
     },
     "close": "Cerrar",
+    "displayLimit": {},
     "fit": "Encajar en la extensión",
     "layers": {
       "base": "Capas base",

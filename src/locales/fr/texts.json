@@ -229,6 +229,11 @@
       "westLon": "Longitude Ouest"
     },
     "close": "Fermer",
+    "displayLimit": {
+      "message": "Ce jeu de données est très volumineux et l'afficher peut ralentir ou geler le navigateur.",
+      "showAnyway": "Afficher quand même",
+      "title": "Jeu de données volumineux"
+    },
     "fit": "Adapter à l'étendue",
     "layers": {
       "base": "Couches de base",
