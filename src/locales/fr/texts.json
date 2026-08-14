@@ -317,6 +317,7 @@
   "reset": "Réinitialiser",
   "search": {
     "addCollections": "Appuyer sur Entrée pour ajouter une Collection",
+    "addDate": "Ajoutez une date",
     "addFilter": "Ajouter un filtre",
     "additionalFilters": "Filtres supplémentaires",
     "addItemIds": "Appuyer sur Entrée pour ajouter un ID Élément",
@@ -372,6 +373,7 @@
     "notFullySupported": "Toutes les options ne sont pas forcément prises en charge",
     "notSupported": "La recherche d'éléments n'est pas pris en charge par l'API.",
     "placeholder": "Rechercher...",
+    "removeDate": "Supprimer la date",
     "selectCollections": "Sélectionnez une ou plusieurs collections...",
     "selectDateRange": "Sélectionner une plage de dates",
     "selectForItemSearch": "Sélectionner pour la recherche d'élément",
