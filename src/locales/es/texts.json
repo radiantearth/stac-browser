@@ -229,7 +229,11 @@
       "westLon": "Longitud Oeste"
     },
     "close": "Cerrar",
-    "displayLimit": {},
+    "displayLimit": {
+      "message": "Este conjunto de datos es muy grande y mostrarlo puede ralentizar o bloquear el navegador.",
+      "showAnyway": "Ver de todas maneras",
+      "title": "Conjunto de datos grande"
+    },
     "fit": "Encajar en la extensión",
     "layers": {
       "base": "Capas base",
