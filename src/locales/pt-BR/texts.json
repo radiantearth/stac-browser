@@ -110,6 +110,7 @@
     "loadApiItemsFailed": "Os itens da API não puderam ser carregados.",
     "loadFilteredItems": "Desculpe, mas não foi possível carregar uma lista filtrada de itens.",
     "loadItems": "Desculpe, mas não foi possível carregar a lista de itens STAC.",
+    "missingPermissions": "As credenciais especificadas para esta requisição não possuem as permissões necessárias.",
     "networkError": "Este problema pode ocorrer quando os servidores não permitem acesso externo através de navegadores web (por exemplo, quando os cabeçalhos CORS não estão presentes). @:errors.contactProvider",
     "noExternalAccess": "Não é permitido acessar catálogos externos!",
     "notFound": "O recurso solicitado não existe. @:errors.contactProvider",
@@ -123,7 +124,24 @@
     "installDependencies": "Instalação de dependências:"
   },
   "favorites": {
-    "exportFormats": {}
+    "add": "Adicionar aos favoritos",
+    "empty": "Nenhum favorito foi adicionado ainda. Para adicionar favoritos, use o botão “Favoritar” na página de um catálogo, coleção ou item.",
+    "export": "Exportar",
+    "exportDescription": "Exporte os favoritos para um arquivo; por exemplo, para importá-los em outro navegador.",
+    "exportFormats": {
+      "csv": "CSV",
+      "excel": "Excel",
+      "json": "JSON",
+      "stac": "Catálogo STAC"
+    },
+    "import": "Importar",
+    "importDescription": "Importar favoritos de um arquivo exportado anteriormente.",
+    "importInvalid": "O arquivo selecionado não contém nenhum favorito.",
+    "imported": "{count} novos favoritos foram importados.",
+    "label": "Favorito",
+    "localOnly": "Os favoritos são armazenados apenas localmente neste navegador. Eles não são sincronizados entre dispositivos ou navegadores.",
+    "remove": "Remover dos favoritos",
+    "title": "Favoritos"
   },
   "featureExperimental": "Esta funcionalidade ainda é experimental e pode dar resultados inesperados!",
   "features": {
@@ -164,13 +182,30 @@
   },
   "items": {
     "filter": "Filtros",
+    "filterChangesNotApplied": "Os filtros foram alterados, mas as alterações ainda não foram aplicadas.",
     "hideFilter": "Ocultar filtros",
     "noTime": "Nenhuma data informada",
     "noneAvailableForCollection": "Nenhum item disponível para esta coleção.",
     "showFilter": "Mostrar filtros"
   },
   "loading": "Carregando...",
-  "manage": {},
+  "manage": {
+    "addCollection": "Adicionar Coleção",
+    "addItem": "Adicionar Item",
+    "confirmDeleteTitle": "Confirmar Exclusão",
+    "confirmDeleteMessage": "Tem certeza que deseja excluir este recurso STAC?",
+    "create": "Criar",
+    "delete": "Excluir",
+    "discardDraft": "Descartar as alterações restauradas",
+    "draftRestored": "Alterações não salvas da sessão anterior foram restauradas.",
+    "edit": "Editar",
+    "leavePage": "Sair da página",
+    "save": "Salvar",
+    "noUndo": "Esta ação não pode ser desfeita.",
+    "unsavedChangesLeave": "Você tem alterações não salvas. Deseja mesmo sair desta página?",
+    "unsavedChangesTitle": "Alterações não salvas",
+    "validate": "Validar"
+  },
   "map": "Mapa",
   "mapping": {
     "attribution": {
@@ -194,7 +229,11 @@
       "westLon": "Longitude Oeste"
     },
     "close": "Fechar",
-    "displayLimit": {},
+    "displayLimit": {
+      "message": "Este conjunto de dados é muito grande e sua exibição pode deixar o navegador lento ou travá-lo.",
+      "showAnyway": "Mostrar mesmo assim",
+      "title": "Conjunto de dados grande"
+    },
     "fit": "Ajustar à extensão",
     "layers": {
       "base": "Mapas de Fundo",
@@ -278,6 +317,7 @@
   "reset": "Redefinir",
   "search": {
     "addCollections": "Pressione Enter para adicionar uma coleção",
+    "addDate": "Adicionar data",
     "addFilter": "Adicionar filtro",
     "additionalFilters": "Filtros adicionais",
     "addItemIds": "Pressione Enter para adicionar um ID de item",
@@ -297,6 +337,8 @@
     "between": "entre",
     "betweenOperatorDescription": "Testa se o valor de um campo numérico está no intervalo fornecido. O intervalo fornecido é inclusivo.",
     "dateDescription": "Todos os horários em Tempo Universal Coordenado (UTC).",
+    "disabledDueToSingleDate": "Este filtro está desabilitado porque a coleção possui uma única data e hora como extensão temporal.",
+    "droppedFilters": "Os seguintes filtros não são suportados aqui e foram removidos: {filters}.",
     "enterCollections": "Insira um ou mais IDs de coleção...",
     "enterItemIds": "Insira um ou mais IDs de item...",
     "enterSearchTerms": "Insira um ou mais termos de pesquisa...",
@@ -331,6 +373,7 @@
     "notFullySupported": "Nem todas as opções podem ser suportadas.",
     "notSupported": "A pesquisa de itens não é suportada pela API.",
     "placeholder": "Pesquisar...",
+    "removeDate": "Remover data",
     "selectCollections": "Selecione uma ou várias coleções...",
     "selectDateRange": "Selecione o intervalo de datas",
     "selectForItemSearch": "Selecione para pesquisa de itens",
@@ -373,6 +416,7 @@
       "switch": "Mudar o idioma"
     },
     "locatedAt": "O arquivo de metadados STAC está localizado em:",
+    "manage": "Gerenciar",
     "share": {
       "bsky": "Bluesky",
       "email": "E-mail",
@@ -451,5 +495,7 @@
     },
     "title": "Opções de exibição"
   },
-  "widgets": {}
+  "widgets": {
+    "featured": "Destaque"
+  }
 }
