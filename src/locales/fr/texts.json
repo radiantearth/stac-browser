@@ -193,7 +193,7 @@
     "addCollection": "Ajouter une Collection",
     "addItem": "Ajouter un Élément",
     "confirmDeleteTitle": "Confirmer la suppression",
-    "confirmDeleteMessage": "Êtes-vous sûr de vouloir supprimer cette ressource STAC?",
+    "confirmDeleteMessage": "Êtes-vous sûr de vouloir supprimer cette ressource STAC ?",
     "create": "Créer",
     "delete": "Supprimer",
     "discardDraft": "Rejeter les modifications restaurées",
