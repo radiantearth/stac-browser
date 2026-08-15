@@ -110,7 +110,7 @@
     "loadApiItemsFailed": "Non è stato possibile caricare gli Elementi dell'API.",
     "loadFilteredItems": "Il caricamento di un elenco filtrato di Elementi non è riuscito.",
     "loadItems": "Il caricamento dell'elenco di Elementi STAC non è riuscito.",
-    "missingPermissions": "",
+    "missingPermissions": "Le credenziali specificate per questa richiesta non hanno i permessi necessari.",
     "networkError": "Questo problema può verificarsi quando i server non consentono l'accesso esterno tramite i browser web (ad esempio, quando non sono presenti le intestazioni CORS). @:errors.contactProvider",
     "noExternalAccess": "L'accesso a cataloghi esterni non è consentito!",
     "notFound": "La risorsa richiesta non esiste. @:errors.contactProvider",
@@ -124,24 +124,24 @@
     "installDependencies": "Installare le dipendenze:"
   },
   "favorites": {
-    "add": "",
-    "empty": "",
-    "export": "",
-    "exportDescription": "",
+    "add": "Aggiungi ai preferiti",
+    "empty": "Nessun preferito è stato ancora aggiunto. Per aggiungere preferiti, usa il pulsante 'Preferiti' nella pagina di un catalogo, una collezione o un elemento.",
+    "export": "Esporta",
+    "exportDescription": "Esporta i preferiti in un file, ad esempio per importarli in un altro browser.",
     "exportFormats": {
       "csv": "CSV",
       "excel": "Excel",
       "json": "JSON",
-      "stac": ""
+      "stac": "Catalogo STAC"
     },
-    "import": "",
-    "importDescription": "",
-    "importInvalid": "",
-    "imported": "",
-    "label": "",
-    "localOnly": "",
-    "remove": "",
-    "title": ""
+    "import": "Importa",
+    "importDescription": "Importa i preferiti da un file precedentemente esportato.",
+    "importInvalid": "Il file selezionato non contiene preferiti.",
+    "imported": "{count} i nuovi preferiti sono stati importati.",
+    "label": "Preferito",
+    "localOnly": "I preferiti sono memorizzati solo localmente in questo browser. Non sono sincronizzati tra dispositivi o browser.",
+    "remove": "Rimuovi dai preferiti",
+    "title": "Preferiti"
   },
   "featureExperimental": "Questa funzione è ancora sperimentale e potrebbe dare risultati inaspettati!",
   "features": {
@@ -182,7 +182,7 @@
   },
   "items": {
     "filter": "Filtri",
-    "filterChangesNotApplied": "",
+    "filterChangesNotApplied": "I filtri sono stati modificati, ma le modifiche non sono ancora state applicate.",
     "hideFilter": "Nascondi filtri",
     "noTime": "Nessuna data/ora indicata",
     "noneAvailableForCollection": "Non ci sono Elementi disponibili per questa Collezione.",
@@ -190,12 +190,12 @@
   },
   "loading": "Carico...",
   "manage": {
-    "addCollection": "",
-    "addItem": "",
-    "confirmDeleteTitle": "",
-    "confirmDeleteMessage": "",
-    "create": "",
-    "delete": "",
+    "addCollection": "Aggiungi collezione",
+    "addItem": "Aggiungi elemento",
+    "confirmDeleteTitle": "Conferma eliminazione",
+    "confirmDeleteMessage": "Sei sicuro/a di voler eliminare questa risorsa STAC?",
+    "create": "Crea",
+    "delete": "Cancella",
     "discardDraft": "",
     "draftRestored": "",
     "edit": "",
@@ -230,9 +230,9 @@
     },
     "close": "Chiudi",
     "displayLimit": {
-      "message": "",
-      "showAnyway": "",
-      "title": ""
+      "message": "Questo set di dati è molto grande. Visualizzarlo potrebbe rallentare o bloccare il browser.",
+      "showAnyway": "Mostra comunque",
+      "title": "Set di dati di grandi dimensioni"
     },
     "fit": "Adatta alla estensione",
     "layers": {
