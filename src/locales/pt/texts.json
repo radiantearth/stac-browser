@@ -119,7 +119,7 @@
     "unauthorized": "O pedido não possui credenciais, por exemplo um token da API. Forneça as suas credenciais e tente novamente."
   },
   "exampleCode": {
-    "title": "",
+    "title": "Código de Exemplo",
     "storeAs": "",
     "installDependencies": ""
   },
@@ -132,7 +132,7 @@
       "csv": "CSV",
       "excel": "Excel",
       "json": "JSON",
-      "stac": ""
+      "stac": "Catálogo STAC"
     },
     "import": "Importar",
     "importDescription": "",
@@ -210,7 +210,7 @@
   "mapping": {
     "attribution": {
       "collapseLabel": "✕",
-      "description": "",
+      "description": "Atribuições",
       "label": "i"
     },
     "bboxSelect": {
@@ -232,14 +232,14 @@
     "displayLimit": {
       "message": "",
       "showAnyway": "Mostrar mesmo assim",
-      "title": ""
+      "title": "Conjunto de dados grande"
     },
-    "fit": "",
+    "fit": "Ajustar à extensão",
     "layers": {
-      "base": "",
+      "base": "Camadas Básicas",
       "footprint": "Footprint",
       "title": "Camadas",
-      "unnamed": ""
+      "unnamed": "Sem nome #{id}"
     },
     "location": {
       "description": ""
@@ -326,13 +326,13 @@
       "addValue": "",
       "helpText": ""
     },
-    "arrayContains": "",
+    "arrayContains": "Contém tudo",
     "arrayContainsDescription": "",
-    "arrayContainedBy": "",
+    "arrayContainedBy": "É subconjunto de",
     "arrayContainedByDescription": "",
     "arrayEquals": "",
     "arrayEqualsDescription": "",
-    "arrayOverlaps": "",
+    "arrayOverlaps": "Contém algum",
     "arrayOverlapsDescription": "",
     "between": "entre",
     "betweenOperatorDescription": "",
@@ -349,7 +349,7 @@
     "freeTextDescription": "Pesquise por pelo menos um dos termos fornecidos em campos como o título e a descrição.",
     "greaterThan": "maior de",
     "greaterThanEqual": "maior de ou igual a",
-    "in": "",
+    "in": "incluído em",
     "inOperatorDescription": "",
     "itemIds": "IDs dos itens",
     "itemsPerPage": "Itens por página",
@@ -360,7 +360,7 @@
     "logical": {
       "and": "Inclua resultados que respeitem todos os filtros (e)",
       "or": "Inclua resultados que respeitem qualquer um dos filtros (ou)",
-      "not": ""
+      "not": "Negar filtro"
     },
     "matches": "resultados",
     "metaDescription": "Pesquise os dados de {title}.",
@@ -373,7 +373,7 @@
     "notFullySupported": "Algumas opções podem não ser suportadas.",
     "notSupported": "A pesquisa de itens não é suportada pela API.",
     "placeholder": "Pesquisar...",
-    "removeDate": "",
+    "removeDate": "Apagar data",
     "selectCollections": "Selecione uma ou várias coleções...",
     "selectDateRange": "",
     "selectForItemSearch": "Selecione para pesquisa de itens",
