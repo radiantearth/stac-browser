@@ -74,7 +74,7 @@
   "copy": "Cópia",
   "copyErrors": {
     "permission": "",
-    "unsupported": ""
+    "unsupported": "A área de transferência não está disponível neste navegador."
   },
   "default": "Default",
   "defaultWithValue": "Valor default ({value})",
@@ -202,7 +202,7 @@
     "leavePage": "Sair da página",
     "save": "Guardar",
     "noUndo": "Esta ação não pode ser desfeita.",
-    "unsavedChangesLeave": "",
+    "unsavedChangesLeave": "Tem alterações não salvas. Deseja mesmo sair desta página?",
     "unsavedChangesTitle": "",
     "validate": "Validar"
   },
@@ -224,7 +224,7 @@
         "lonOrder": ""
       },
       "northLat": "",
-      "remove": "",
+      "remove": "Clique no retângulo envolvente para removê-lo.",
       "southLat": "",
       "westLon": ""
     },
@@ -327,7 +327,7 @@
       "helpText": ""
     },
     "arrayContains": "Contém tudo",
-    "arrayContainsDescription": "",
+    "arrayContainsDescription": "O array contém todos os valores especificados",
     "arrayContainedBy": "É subconjunto de",
     "arrayContainedByDescription": "",
     "arrayEquals": "",
