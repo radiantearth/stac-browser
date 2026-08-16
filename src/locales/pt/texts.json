@@ -72,10 +72,7 @@
   },
   "close": "Fechar",
   "copy": "Cópia",
-  "copyErrors": {
-    "permission": "",
-    "unsupported": ""
-  },
+  "copyErrors": {},
   "default": "Default",
   "defaultWithValue": "Valor default ({value})",
   "deprecated": "Descontinuado",
@@ -91,7 +88,6 @@
   },
   "description": "Descrição",
   "errors": {
-    "apiListRequested": "",
     "authFailed": "O pedido resultou em erro. Os detalhes de autenticação fornecidos podem estar incorretos.",
     "badRequest": "O pedido é inválido. Isto pode ser devido a parâmetros inválidos, por exemplo num pedido de pesquisa, ou pode ser um bug no STAC Browser.",
     "contactProvider": "Por favor contacte o operador do serviço para resolver o problema.",
@@ -110,7 +106,6 @@
     "loadApiItemsFailed": "Os itens da API não puderam ser carregados.",
     "loadFilteredItems": "Desculpe, mas não foi possível carregar uma lista filtrada de itens.",
     "loadItems": "Desculpe, o carregamento da lista de itens STAC falhou.",
-    "missingPermissions": "",
     "networkError": "Este problema pode ocorrer quando os servidores não permitem acesso externo através de navegadores web (por exemplo quando os cabeçalhos CORS não estão presentes). @:errors.contactProvider",
     "noExternalAccess": "Não é permitido aceder a catálogos externos!",
     "notFound": "O recurso pedido não existe. @:errors.contactProvider",
@@ -118,37 +113,19 @@
     "title": "Erro",
     "unauthorized": "O pedido não possui credenciais, por exemplo um token da API. Forneça as suas credenciais e tente novamente."
   },
-  "exampleCode": {
-    "title": "",
-    "storeAs": "",
-    "installDependencies": ""
-  },
+  "exampleCode": {},
   "favorites": {
-    "add": "",
-    "empty": "",
     "export": "Exportar",
-    "exportDescription": "",
     "exportFormats": {
       "csv": "CSV",
       "excel": "Excel",
-      "json": "JSON",
-      "stac": ""
+      "json": "JSON"
     },
     "import": "Importar",
-    "importDescription": "",
-    "importInvalid": "",
-    "imported": "",
-    "label": "Favorita",
-    "localOnly": "",
-    "remove": "",
-    "title": ""
+    "label": "Favorita"
   },
   "featureExperimental": "Esta funcionalidade ainda é experimental e pode dar resultados inesperados!",
-  "features": {
-    "empty": "",
-    "noProperties": "",
-    "title": ""
-  },
+  "features": {},
   "fullscreen": {
     "exit": "Sair do ecrã completo",
     "exitLabel": "✕",
@@ -182,7 +159,6 @@
   },
   "items": {
     "filter": "Filtros",
-    "filterChangesNotApplied": "",
     "hideFilter": "Ocultar filtros",
     "noTime": "Nenhuma data fornecida",
     "noneAvailableForCollection": "Nenhum item disponível para esta coleção.",
@@ -190,62 +166,27 @@
   },
   "loading": "Carregando...",
   "manage": {
-    "addCollection": "",
     "addItem": "Adicionar item",
-    "confirmDeleteTitle": "",
-    "confirmDeleteMessage": "",
     "create": "Criar",
     "delete": "Apagar",
-    "discardDraft": "",
-    "draftRestored": "",
     "edit": "Editar",
-    "leavePage": "",
-    "save": "Guardar",
-    "noUndo": "",
-    "unsavedChangesLeave": "",
-    "unsavedChangesTitle": "",
-    "validate": ""
+    "save": "Guardar"
   },
   "map": "Mapa",
   "mapping": {
     "attribution": {
       "collapseLabel": "✕",
-      "description": "",
       "label": "i"
     },
     "bboxSelect": {
-      "add": "",
-      "eastLon": "",
-      "error": {
-        "incomplete": "",
-        "invalidLat": "",
-        "invalidLon": "",
-        "latOrder": "",
-        "lonOrder": ""
-      },
-      "northLat": "",
-      "remove": "",
-      "southLat": "",
-      "westLon": ""
+      "error": {}
     },
     "close": "Fechar",
-    "displayLimit": {
-      "message": "",
-      "showAnyway": "",
-      "title": ""
-    },
-    "fit": "",
+    "displayLimit": {},
     "layers": {
-      "base": "",
-      "footprint": "",
-      "title": "Camadas",
-      "unnamed": ""
+      "title": "Camadas"
     },
-    "location": {
-      "description": ""
-    },
-    "nobasemap": "",
-    "nodata": "",
+    "location": {},
     "zoom": {
       "in": {
         "description": "Aumentar o zoom",
@@ -283,7 +224,6 @@
     "curl": "cURL",
     "go": "Go",
     "java": "Java",
-    "javascript": "",
     "python": "Python",
     "r": "R",
     "rust": "Rust"
@@ -317,28 +257,13 @@
   "reset": "Redefinir",
   "search": {
     "addCollections": "Pressione Enter para adicionar uma coleção",
-    "addDate": "",
     "addFilter": "Adicionar filtro",
     "additionalFilters": "Filtros adicionais",
     "addItemIds": "Pressione Enter para adicionar o ID de um item",
     "addSearchTerm": "Pressione Enter para adicionar um termo de pesquisa",
-    "arrayInput": {
-      "addValue": "",
-      "helpText": ""
-    },
-    "arrayContains": "",
-    "arrayContainsDescription": "",
-    "arrayContainedBy": "",
-    "arrayContainedByDescription": "",
-    "arrayEquals": "",
-    "arrayEqualsDescription": "",
-    "arrayOverlaps": "",
-    "arrayOverlapsDescription": "",
+    "arrayInput": {},
     "between": "entre",
-    "betweenOperatorDescription": "",
     "dateDescription": "Todos os horários em UTC.",
-    "disabledDueToSingleDate": "",
-    "droppedFilters": "",
     "enterCollections": "Insira um ou mais IDs de coleção...",
     "enterItemIds": "Insira um ou mais IDs de item...",
     "enterSearchTerms": "Insira um ou mais termos de pesquisa...",
@@ -349,8 +274,6 @@
     "freeTextDescription": "Pesquise por pelo menos um dos termos fornecidos em campos como o título e a descrição.",
     "greaterThan": "maior de",
     "greaterThanEqual": "maior de ou igual a",
-    "in": "",
-    "inOperatorDescription": "",
     "itemIds": "IDs dos itens",
     "itemsPerPage": "Itens por página",
     "itemsPerPageDescription": "Número de itens pedidos por página, máx. {maxItems} items.",
@@ -359,23 +282,19 @@
     "likeOperatorDescription": "Pode usar wildcards. `_` corresponde a um único caractere, `%` corresponde a um qualquer número de caracteres. Para pesquisar por um caractere wildcard específico, tem de adicionar `\\` antes do caractere.",
     "logical": {
       "and": "Inclua resultados que respeitem todos os filtros (e)",
-      "or": "Inclua resultados que respeitem qualquer um dos filtros (ou)",
-      "not": ""
+      "or": "Inclua resultados que respeitem qualquer um dos filtros (ou)"
     },
     "matches": "resultados",
     "metaDescription": "Pesquise os dados de {title}.",
     "modifyCriteria": "Por favor, mude os critérios de pesquisa.",
     "noFurtherItemsFound": "Não há mais itens disponíveis.",
     "noItemsFound": "Nenhum item encontrado correspondente aos filtros especificados.",
-    "noOperatorsError": "",
     "noOptions": "Nada introduzido ainda",
     "notEqualTo": "não é igual a",
     "notFullySupported": "Algumas opções podem não ser suportadas.",
     "notSupported": "A pesquisa de itens não é suportada pela API.",
     "placeholder": "Pesquisar...",
-    "removeDate": "",
     "selectCollections": "Selecione uma ou várias coleções...",
-    "selectDateRange": "",
     "selectForItemSearch": "Selecione para pesquisa de itens",
     "spatialExtent": "Extensão Espacial",
     "tabs": {
@@ -468,8 +387,6 @@
   "stacCollection": "Coleção | Coleções",
   "stacItem": "Item | Items",
   "submit": "Submeter",
-  "switchToDarkMode": "",
-  "switchToLightMode": "",
   "table": {
     "emptyFilteredText": "Não há registos que correspondam ao seu pedido",
     "emptyText": "Não há registos a mostrar",
@@ -495,7 +412,5 @@
     },
     "title": "Opções de vista"
   },
-  "widgets": {
-    "featured": ""
-  }
+  "widgets": {}
 }
