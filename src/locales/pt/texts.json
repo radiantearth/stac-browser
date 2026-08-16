@@ -70,6 +70,7 @@
     "false": "não",
     "true": "sim"
   },
+  "close": "Fechar",
   "copy": "Cópia",
   "copyErrors": {},
   "default": "Default",
@@ -109,11 +110,19 @@
     "noExternalAccess": "Não é permitido aceder a catálogos externos!",
     "notFound": "O recurso pedido não existe. @:errors.contactProvider",
     "serverError": "O servidor encontrou um problema. @:errors.contactProvider",
+    "title": "Erro",
     "unauthorized": "O pedido não possui credenciais, por exemplo um token da API. Forneça as suas credenciais e tente novamente."
   },
   "exampleCode": {},
   "favorites": {
-    "exportFormats": {}
+    "export": "Exportar",
+    "exportFormats": {
+      "csv": "CSV",
+      "excel": "Excel",
+      "json": "JSON"
+    },
+    "import": "Importar",
+    "label": "Favorita"
   },
   "featureExperimental": "Esta funcionalidade ainda é experimental e pode dar resultados inesperados!",
   "features": {},
@@ -156,7 +165,13 @@
     "showFilter": "Mostrar filtros"
   },
   "loading": "Carregando...",
-  "manage": {},
+  "manage": {
+    "addItem": "Adicionar item",
+    "create": "Criar",
+    "delete": "Apagar",
+    "edit": "Editar",
+    "save": "Guardar"
+  },
   "map": "Mapa",
   "mapping": {
     "attribution": {
@@ -168,7 +183,9 @@
     },
     "close": "Fechar",
     "displayLimit": {},
-    "layers": {},
+    "layers": {
+      "title": "Camadas"
+    },
     "location": {},
     "zoom": {
       "in": {
@@ -202,7 +219,15 @@
     "previous": "‹ Anterior"
   },
   "poweredBy": "Distribuído por {link}",
-  "programming": {},
+  "programming": {
+    "csharp": "C#",
+    "curl": "cURL",
+    "go": "Go",
+    "java": "Java",
+    "python": "Python",
+    "r": "R",
+    "rust": "Rust"
+  },
   "protocol": {
     "azure": "Microsoft Azure",
     "file": "sistema de ficheiros (local)",
@@ -237,6 +262,7 @@
     "addItemIds": "Pressione Enter para adicionar o ID de um item",
     "addSearchTerm": "Pressione Enter para adicionar um termo de pesquisa",
     "arrayInput": {},
+    "between": "entre",
     "dateDescription": "Todos os horários em UTC.",
     "enterCollections": "Insira um ou mais IDs de coleção...",
     "enterItemIds": "Insira um ou mais IDs de item...",
@@ -309,6 +335,7 @@
       "switch": "Mudar de língua"
     },
     "locatedAt": "O ficheiro de metadados STAC está localizado em:",
+    "manage": "Gerir",
     "share": {
       "bsky": "Bluesky",
       "email": "E-mail",
