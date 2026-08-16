@@ -137,7 +137,7 @@
     "import": "Importar",
     "importDescription": "",
     "importInvalid": "",
-    "imported": "",
+    "imported": "{count} novos favoritos foram importados.",
     "label": "Favorita",
     "localOnly": "",
     "remove": "",
@@ -201,7 +201,7 @@
     "edit": "Editar",
     "leavePage": "Sair da página",
     "save": "Guardar",
-    "noUndo": "",
+    "noUndo": "Esta ação não pode ser desfeita.",
     "unsavedChangesLeave": "",
     "unsavedChangesTitle": "",
     "validate": "Validar"
@@ -214,7 +214,7 @@
       "label": "i"
     },
     "bboxSelect": {
-      "add": "",
+      "add": "Clique no mapa para adicionar um retângulo envolvente.",
       "eastLon": "",
       "error": {
         "incomplete": "",
