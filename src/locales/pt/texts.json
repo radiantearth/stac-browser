@@ -138,7 +138,7 @@
     "importDescription": "",
     "importInvalid": "",
     "imported": "",
-    "label": "",
+    "label": "Favorita",
     "localOnly": "",
     "remove": "",
     "title": ""
@@ -191,7 +191,7 @@
   "loading": "Carregando...",
   "manage": {
     "addCollection": "",
-    "addItem": "",
+    "addItem": "Adicionar item",
     "confirmDeleteTitle": "",
     "confirmDeleteMessage": "",
     "create": "Criar",
@@ -238,7 +238,7 @@
     "layers": {
       "base": "",
       "footprint": "",
-      "title": "",
+      "title": "Camadas",
       "unnamed": ""
     },
     "location": {
@@ -284,7 +284,7 @@
     "go": "Go",
     "java": "Java",
     "javascript": "",
-    "python": "",
+    "python": "Python",
     "r": "R",
     "rust": "Rust"
   },
@@ -334,7 +334,7 @@
     "arrayEqualsDescription": "",
     "arrayOverlaps": "",
     "arrayOverlapsDescription": "",
-    "between": "",
+    "between": "entre",
     "betweenOperatorDescription": "",
     "dateDescription": "Todos os horários em UTC.",
     "disabledDueToSingleDate": "",
@@ -416,7 +416,7 @@
       "switch": "Mudar de língua"
     },
     "locatedAt": "O ficheiro de metadados STAC está localizado em:",
-    "manage": "",
+    "manage": "Gerir",
     "share": {
       "bsky": "Bluesky",
       "email": "E-mail",
