@@ -63,7 +63,7 @@ export default {
       border-radius: $border-radius;
 
       &:hover {
-        border-color: var(--bs-dark);
+        border-color: var(--bs-link-hover-color);
       }
     }
 

@@ -98,9 +98,13 @@ export default defineConfig(async ({ mode }) => {
   const externalConfig = (await import(pathToFileURL(externalConfigPath).href)).default ?? {};
   const config = Object.assign({}, defaultConfig, externalConfig, env);
   const runtime = String(rawEnv.SB_RUNTIME || "").toLowerCase() === "true";
-  const configFromEnv = runtime
-    ? Object.fromEntries(Object.entries(env).filter(([k]) => k !== "pathPrefix"))
-    : env;
+  const excludedFromEnv = new Set(["RUNTIME"]);
+  if (runtime) {
+    excludedFromEnv.add("pathPrefix");
+  }
+  const configFromEnv = Object.fromEntries(
+    Object.entries(env).filter(([k]) => !excludedFromEnv.has(k))
+  );
 
   return ({
     base: runtime ? "./" : config.pathPrefix,

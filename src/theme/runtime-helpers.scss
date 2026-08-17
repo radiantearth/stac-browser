@@ -204,6 +204,7 @@ a:hover {
   // --sb-on-primary, as CSS has no runtime color-contrast().
   --sb-header: var(--bs-primary);
   --sb-header-contrast: #{$header-contrast};
+  --sb-header-contrast-rgb: #{to-rgb($header-contrast)};
   --sb-header-background: #{$header-background};
   --sb-header-color: #{$header-color};
   --sb-header-hover-color: #{$header-hover-color};

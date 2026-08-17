@@ -165,7 +165,7 @@ light mode and in a `[data-bs-theme="dark"]` block for dark mode.
 | `--bs-primary` + `--bs-primary-rgb` | The primary (brand) color, used for buttons, links, active states, focus rings, the page header, etc. |
 | `--sb-on-primary` | Text color used *on* primary-colored backgrounds (buttons, badges, active items). Usually `white` or `black`. |
 | `--sb-header` | Base color of the page header. Defaults to `var(--bs-primary)` so the header follows the primary color; set it explicitly to give the header its own color. The header background, title, and button colors are derived from it via `color-mix()`. |
-| `--sb-header-contrast` | Text/icon color used *on* the header background. Usually `white` or `black`; set it to match the brightness of `--sb-header`. |
+| `--sb-header-contrast` + `--sb-header-contrast-rgb` | Text/icon color used *on* the header background. Usually `white` or `black`; set it to match the brightness of `--sb-header`. The `-rgb` variant (e.g. `255, 255, 255`) is used for the header button focus ring. |
 | `--bs-secondary` + `--bs-secondary-rgb` | The secondary color, used for secondary buttons and badges. |
 | `--sb-on-secondary` | Text color used *on* secondary-colored backgrounds. |
 | `--bs-body-bg` + `--bs-body-bg-rgb` | Page background color. |

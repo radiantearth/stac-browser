@@ -92,7 +92,7 @@ svg {
       --bs-btn-disabled-color: color-mix(in srgb, var(--sb-header-color) 65%, transparent);
       --bs-btn-disabled-bg: transparent;
       --bs-btn-disabled-border-color: transparent;
-      --bs-btn-focus-shadow-rgb: #{to-rgb($header-contrast)};
+      --bs-btn-focus-shadow-rgb: var(--sb-header-contrast-rgb, #{to-rgb($header-contrast)});
     }
 
     .site {
