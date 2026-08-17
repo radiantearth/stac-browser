@@ -73,7 +73,6 @@
   "close": "Fechar",
   "copy": "Cópia",
   "copyErrors": {
-    "permission": "",
     "unsupported": "A área de transferência não está disponível neste navegador."
   },
   "default": "Default",
@@ -119,9 +118,7 @@
     "unauthorized": "O pedido não possui credenciais, por exemplo um token da API. Forneça as suas credenciais e tente novamente."
   },
   "exampleCode": {
-    "title": "Código de Exemplo",
-    "storeAs": "",
-    "installDependencies": ""
+    "title": "Código de Exemplo"
   },
   "favorites": {
     "add": "Adicionar aos favoritos",
@@ -135,20 +132,13 @@
       "stac": "Catálogo STAC"
     },
     "import": "Importar",
-    "importDescription": "",
-    "importInvalid": "",
     "imported": "{count} novos favoritos foram importados.",
     "label": "Favorita",
     "localOnly": "Os favoritos são armazenados apenas localmente neste navegador. Eles não são sincronizados entre dispositivos ou navegadores.",
-    "remove": "",
     "title": "Favoritas"
   },
   "featureExperimental": "Esta funcionalidade ainda é experimental e pode dar resultados inesperados!",
-  "features": {
-    "empty": "",
-    "noProperties": "",
-    "title": ""
-  },
+  "features": {},
   "fullscreen": {
     "exit": "Sair do ecrã completo",
     "exitLabel": "✕",
@@ -190,14 +180,10 @@
   },
   "loading": "Carregando...",
   "manage": {
-    "addCollection": "",
     "addItem": "Adicionar item",
     "confirmDeleteTitle": "Confirme a eliminação",
-    "confirmDeleteMessage": "",
     "create": "Criar",
     "delete": "Apagar",
-    "discardDraft": "",
-    "draftRestored": "",
     "edit": "Editar",
     "leavePage": "Sair da página",
     "save": "Guardar",
@@ -216,13 +202,7 @@
     "bboxSelect": {
       "add": "Clique no mapa para adicionar um retângulo envolvente.",
       "eastLon": "Longitude Oriental",
-      "error": {
-        "incomplete": "",
-        "invalidLat": "",
-        "invalidLon": "",
-        "latOrder": "",
-        "lonOrder": ""
-      },
+      "error": {},
       "northLat": "Latitude ao Norte",
       "remove": "Clique no retângulo envolvente para removê-lo.",
       "southLat": "Latitude Sul",
@@ -241,11 +221,7 @@
       "title": "Camadas",
       "unnamed": "Sem nome #{id}"
     },
-    "location": {
-      "description": ""
-    },
-    "nobasemap": "",
-    "nodata": "",
+    "location": {},
     "zoom": {
       "in": {
         "description": "Aumentar o zoom",
@@ -323,17 +299,13 @@
     "addItemIds": "Pressione Enter para adicionar o ID de um item",
     "addSearchTerm": "Pressione Enter para adicionar um termo de pesquisa",
     "arrayInput": {
-      "addValue": "",
       "helpText": "Digite o(s) valor(es)"
     },
     "arrayContains": "Contém tudo",
     "arrayContainsDescription": "O array contém todos os valores especificados",
     "arrayContainedBy": "É subconjunto de",
-    "arrayContainedByDescription": "",
     "arrayEquals": "Corresponde exatamente",
-    "arrayEqualsDescription": "",
     "arrayOverlaps": "Contém algum",
-    "arrayOverlapsDescription": "",
     "between": "entre",
     "betweenOperatorDescription": "Testa se o valor de um campo numérico está no intervalo fornecido. O intervalo fornecido é inclusivo.",
     "dateDescription": "Todos os horários em UTC.",
@@ -350,7 +322,6 @@
     "greaterThan": "maior de",
     "greaterThanEqual": "maior de ou igual a",
     "in": "incluído em",
-    "inOperatorDescription": "",
     "itemIds": "IDs dos itens",
     "itemsPerPage": "Itens por página",
     "itemsPerPageDescription": "Número de itens pedidos por página, máx. {maxItems} items.",
@@ -469,7 +440,6 @@
   "stacItem": "Item | Items",
   "submit": "Submeter",
   "switchToDarkMode": "Mudar para o modo escuro",
-  "switchToLightMode": "",
   "table": {
     "emptyFilteredText": "Não há registos que correspondam ao seu pedido",
     "emptyText": "Não há registos a mostrar",
