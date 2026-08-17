@@ -42,7 +42,7 @@ The override order for the configuration is:
 
 > [!CAUTION]  
 > Appending configuration options as CLI parameters to the CLI command (e.g. `npm run build -- --catalogUrl="https://example.com"`) has been removed in  STAC Browser v5.
-> The reason is that such parameters are [not suppored by Vite](https://github.com/vitejs/vite/issues/7065).
+> The reason is that such parameters are [not supported by Vite](https://github.com/vitejs/vite/issues/7065).
 
 ## Table of Contents <!-- omit in toc -->
 
@@ -66,6 +66,7 @@ The override order for the configuration is:
     - [API Keys](#api-keys)
     - [HTTP Basic](#http-basic)
     - [OpenID Connect](#openid-connect)
+    - [What gets authenticated](#what-gets-authenticated)
 - [Internationalization and Localization](#internationalization-and-localization)
   - [locale](#locale)
   - [fallbackLocale](#fallbacklocale)
