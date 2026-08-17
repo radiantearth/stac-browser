@@ -72,7 +72,9 @@
   },
   "close": "Fechar",
   "copy": "Cópia",
-  "copyErrors": {},
+  "copyErrors": {
+    "unsupported": "A área de transferência não está disponível neste navegador."
+  },
   "default": "Default",
   "defaultWithValue": "Valor default ({value})",
   "deprecated": "Descontinuado",
@@ -88,6 +90,7 @@
   },
   "description": "Descrição",
   "errors": {
+    "apiListRequested": "A solicitação é inválida. Solicitações diretas para as rotas /collections e .../items não são suportados atualmente.",
     "authFailed": "O pedido resultou em erro. Os detalhes de autenticação fornecidos podem estar incorretos.",
     "badRequest": "O pedido é inválido. Isto pode ser devido a parâmetros inválidos, por exemplo num pedido de pesquisa, ou pode ser um bug no STAC Browser.",
     "contactProvider": "Por favor contacte o operador do serviço para resolver o problema.",
@@ -106,6 +109,7 @@
     "loadApiItemsFailed": "Os itens da API não puderam ser carregados.",
     "loadFilteredItems": "Desculpe, mas não foi possível carregar uma lista filtrada de itens.",
     "loadItems": "Desculpe, o carregamento da lista de itens STAC falhou.",
+    "missingPermissions": "As credenciais especificadas para esta requisição não possuem as permissões necessárias.",
     "networkError": "Este problema pode ocorrer quando os servidores não permitem acesso externo através de navegadores web (por exemplo quando os cabeçalhos CORS não estão presentes). @:errors.contactProvider",
     "noExternalAccess": "Não é permitido aceder a catálogos externos!",
     "notFound": "O recurso pedido não existe. @:errors.contactProvider",
@@ -113,16 +117,25 @@
     "title": "Erro",
     "unauthorized": "O pedido não possui credenciais, por exemplo um token da API. Forneça as suas credenciais e tente novamente."
   },
-  "exampleCode": {},
+  "exampleCode": {
+    "title": "Código de Exemplo"
+  },
   "favorites": {
+    "add": "Adicionar aos favoritos",
+    "empty": "Nenhum favorito foi adicionado ainda. Para adicionar favoritos, use o botão 'Favorito' na página de um catálogo, coleção ou item.",
     "export": "Exportar",
+    "exportDescription": "Exporte os favoritos para um ficheiro; por exemplo, para importá-los em outro navegador.",
     "exportFormats": {
       "csv": "CSV",
       "excel": "Excel",
-      "json": "JSON"
+      "json": "JSON",
+      "stac": "Catálogo STAC"
     },
     "import": "Importar",
-    "label": "Favorita"
+    "imported": "{count} novos favoritos foram importados.",
+    "label": "Favorita",
+    "localOnly": "Os favoritos são armazenados apenas localmente neste navegador. Eles não são sincronizados entre dispositivos ou navegadores.",
+    "title": "Favoritas"
   },
   "featureExperimental": "Esta funcionalidade ainda é experimental e pode dar resultados inesperados!",
   "features": {},
@@ -159,6 +172,7 @@
   },
   "items": {
     "filter": "Filtros",
+    "filterChangesNotApplied": "Os filtros foram alterados, mas as alterações ainda não foram aplicadas.",
     "hideFilter": "Ocultar filtros",
     "noTime": "Nenhuma data fornecida",
     "noneAvailableForCollection": "Nenhum item disponível para esta coleção.",
@@ -167,24 +181,45 @@
   "loading": "Carregando...",
   "manage": {
     "addItem": "Adicionar item",
+    "confirmDeleteTitle": "Confirme a eliminação",
     "create": "Criar",
     "delete": "Apagar",
     "edit": "Editar",
-    "save": "Guardar"
+    "leavePage": "Sair da página",
+    "save": "Guardar",
+    "noUndo": "Esta ação não pode ser desfeita.",
+    "unsavedChangesLeave": "Tem alterações não salvas. Deseja mesmo sair desta página?",
+    "unsavedChangesTitle": "Alterações não guardadas",
+    "validate": "Validar"
   },
   "map": "Mapa",
   "mapping": {
     "attribution": {
       "collapseLabel": "✕",
+      "description": "Atribuições",
       "label": "i"
     },
     "bboxSelect": {
-      "error": {}
+      "add": "Clique no mapa para adicionar um retângulo envolvente.",
+      "eastLon": "Longitude Oriental",
+      "error": {},
+      "northLat": "Latitude ao Norte",
+      "remove": "Clique no retângulo envolvente para removê-lo.",
+      "southLat": "Latitude Sul",
+      "westLon": "Longitude Ocidental"
     },
     "close": "Fechar",
-    "displayLimit": {},
+    "displayLimit": {
+      "message": "Este conjunto de dados é muito grande e a sua exibição pode deixar o navegador lento ou travá-lo.",
+      "showAnyway": "Mostrar mesmo assim",
+      "title": "Conjunto de dados grande"
+    },
+    "fit": "Ajustar à extensão",
     "layers": {
-      "title": "Camadas"
+      "base": "Camadas Básicas",
+      "footprint": "Footprint",
+      "title": "Camadas",
+      "unnamed": "Sem nome #{id}"
     },
     "location": {},
     "zoom": {
@@ -224,6 +259,7 @@
     "curl": "cURL",
     "go": "Go",
     "java": "Java",
+    "javascript": "JavaScript",
     "python": "Python",
     "r": "R",
     "rust": "Rust"
@@ -257,13 +293,24 @@
   "reset": "Redefinir",
   "search": {
     "addCollections": "Pressione Enter para adicionar uma coleção",
+    "addDate": "Adicionar data",
     "addFilter": "Adicionar filtro",
     "additionalFilters": "Filtros adicionais",
     "addItemIds": "Pressione Enter para adicionar o ID de um item",
     "addSearchTerm": "Pressione Enter para adicionar um termo de pesquisa",
-    "arrayInput": {},
+    "arrayInput": {
+      "helpText": "Digite o(s) valor(es)"
+    },
+    "arrayContains": "Contém tudo",
+    "arrayContainsDescription": "O array contém todos os valores especificados",
+    "arrayContainedBy": "É subconjunto de",
+    "arrayEquals": "Corresponde exatamente",
+    "arrayOverlaps": "Contém algum",
     "between": "entre",
+    "betweenOperatorDescription": "Testa se o valor de um campo numérico está no intervalo fornecido. O intervalo fornecido é inclusivo.",
     "dateDescription": "Todos os horários em UTC.",
+    "disabledDueToSingleDate": "Este filtro está desabilitado porque a coleção possui uma única data e hora como extensão temporal.",
+    "droppedFilters": "Os seguintes filtros não são suportados aqui e foram removidos: {filters}.",
     "enterCollections": "Insira um ou mais IDs de coleção...",
     "enterItemIds": "Insira um ou mais IDs de item...",
     "enterSearchTerms": "Insira um ou mais termos de pesquisa...",
@@ -274,6 +321,7 @@
     "freeTextDescription": "Pesquise por pelo menos um dos termos fornecidos em campos como o título e a descrição.",
     "greaterThan": "maior de",
     "greaterThanEqual": "maior de ou igual a",
+    "in": "incluído em",
     "itemIds": "IDs dos itens",
     "itemsPerPage": "Itens por página",
     "itemsPerPageDescription": "Número de itens pedidos por página, máx. {maxItems} items.",
@@ -282,19 +330,23 @@
     "likeOperatorDescription": "Pode usar wildcards. `_` corresponde a um único caractere, `%` corresponde a um qualquer número de caracteres. Para pesquisar por um caractere wildcard específico, tem de adicionar `\\` antes do caractere.",
     "logical": {
       "and": "Inclua resultados que respeitem todos os filtros (e)",
-      "or": "Inclua resultados que respeitem qualquer um dos filtros (ou)"
+      "or": "Inclua resultados que respeitem qualquer um dos filtros (ou)",
+      "not": "Negar filtro"
     },
     "matches": "resultados",
     "metaDescription": "Pesquise os dados de {title}.",
     "modifyCriteria": "Por favor, mude os critérios de pesquisa.",
     "noFurtherItemsFound": "Não há mais itens disponíveis.",
     "noItemsFound": "Nenhum item encontrado correspondente aos filtros especificados.",
+    "noOperatorsError": "O STAC Navegador não oferece suporte a nenhum operador para o filtro {queryable}.",
     "noOptions": "Nada introduzido ainda",
     "notEqualTo": "não é igual a",
     "notFullySupported": "Algumas opções podem não ser suportadas.",
     "notSupported": "A pesquisa de itens não é suportada pela API.",
     "placeholder": "Pesquisar...",
+    "removeDate": "Apagar data",
     "selectCollections": "Selecione uma ou várias coleções...",
+    "selectDateRange": "Selecione o intervalo de datas",
     "selectForItemSearch": "Selecione para pesquisa de itens",
     "spatialExtent": "Extensão Espacial",
     "tabs": {
@@ -387,6 +439,7 @@
   "stacCollection": "Coleção | Coleções",
   "stacItem": "Item | Items",
   "submit": "Submeter",
+  "switchToDarkMode": "Mudar para o modo escuro",
   "table": {
     "emptyFilteredText": "Não há registos que correspondam ao seu pedido",
     "emptyText": "Não há registos a mostrar",
@@ -412,5 +465,7 @@
     },
     "title": "Opções de vista"
   },
-  "widgets": {}
+  "widgets": {
+    "featured": "Destaque"
+  }
 }
