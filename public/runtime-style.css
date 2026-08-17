@@ -62,6 +62,7 @@
   --bs-primary: #d16a94;
   --bs-primary-rgb: 209, 106, 148;
   --sb-on-primary: black;
+  --sb-header-contrast: black;
 
   --bs-body-bg: #212529;
   --bs-body-bg-rgb: 33, 37, 41;

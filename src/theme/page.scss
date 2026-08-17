@@ -92,7 +92,7 @@ svg {
       --bs-btn-disabled-color: color-mix(in srgb, var(--sb-header-color) 65%, transparent);
       --bs-btn-disabled-bg: transparent;
       --bs-btn-disabled-border-color: transparent;
-      --bs-btn-focus-shadow-rgb: var(--sb-header-contrast-rgb, #{to-rgb($header-contrast)});
+      --bs-btn-focus-box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--sb-header-contrast) 50%, transparent);
     }
 
     .site {
@@ -214,7 +214,7 @@ svg {
           }
           @include media-breakpoint-down(md) {
             h1 {
-              font-size: $h1-font-size - 0.6rem;
+              font-size: calc(var(--sb-h1-font-size) - 0.6rem);
             }
           }
         }

@@ -29,7 +29,9 @@
 }
 
 [data-bs-theme="dark"] {
-  --bs-link-color: var(--bs-primary);
+  // Mirror Bootstrap's default dark link (tint-color($primary, 40%)) so the
+  // default primary keeps sufficient contrast on the dark background.
+  --bs-link-color: color-mix(in srgb, var(--bs-primary) 60%, white);
   --bs-link-color-rgb: var(--bs-primary-rgb);
   --bs-link-hover-color: var(--bs-body-color);
 
@@ -50,11 +52,15 @@
   --sb-on-secondary: #{color-contrast($secondary)};
 }
 
-// Bootstrap's reboot colors plain links via rgba(var(--bs-link-color-rgb), ...)
-// and swaps in a *compile-time* hover triplet on :hover. That baked triplet
-// can't follow runtime overrides, so consume the non-rgb hover var instead.
-a:hover {
-  color: var(--bs-link-hover-color);
+// Bootstrap's reboot colors plain links via rgba(var(--bs-link-color-rgb), ...),
+// which can't follow a runtime tint or the compile-time hover triplet. Consume
+// the non-rgb tokens so both the base and hover link colors stay live.
+a {
+  color: var(--bs-link-color);
+
+  &:hover {
+    color: var(--bs-link-hover-color);
+  }
 }
 
 .btn-primary {
@@ -196,15 +202,14 @@ a:hover {
   --sb-h1-color: #{$h1-color};
   --sb-subheadings-color: #{$subheadings-color};
 
-  // Main/top header of the website. --sb-header defaults to the primary color
-  // so it follows a runtime --bs-primary override; the other colors derive
-  // from it via the $header-* variables (see variables.scss), which reference
-  // the --sb-header* CSS variables so they stay live at runtime.
-  // --sb-header-contrast (the "on-header" text color) is baked, like
-  // --sb-on-primary, as CSS has no runtime color-contrast().
-  --sb-header: var(--bs-primary);
+  // Main/top header of the website. --sb-header tracks the primary color so it
+  // follows a runtime --bs-primary override, unless the build set a distinct
+  // $header; the other colors derive from it via the $header-* variables (see
+  // variables.scss), which reference the --sb-header* CSS variables so they stay
+  // live at runtime. --sb-header-contrast (the "on-header" text color) is baked,
+  // like --sb-on-primary, as CSS has no runtime color-contrast().
+  --sb-header: #{if($header == $primary, var(--bs-primary), $header)};
   --sb-header-contrast: #{$header-contrast};
-  --sb-header-contrast-rgb: #{to-rgb($header-contrast)};
   --sb-header-background: #{$header-background};
   --sb-header-color: #{$header-color};
   --sb-header-hover-color: #{$header-hover-color};

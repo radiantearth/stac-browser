@@ -7,19 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [5.1.0-rc.1] - 2026-08-15
-
 ### Added
 
 - New config option `basemaps` to customize the basemaps via JSON without code changes,
   e.g. at runtime through the `SB_basemaps` environment variable of the Docker image or `runtime-config.js`
 - Runtime styling (`runtime-style.css`) can be used to customize the most significant but not all parts of the UI:
-  the secondary color, body background/text colors, link colors, heading colors, and fonts
+  the primary and secondary colors, body background/text colors, link colors, heading colors, and fonts
   can be changed at runtime, and derived shades (hover states, subtle backgrounds, focus rings)
   follow the runtime colors automatically
 - Added `SB_RUNTIME` build-time environment variable to control whether `runtime-config.js` and `runtime-style.css` are loaded by the built HTML
 
-### Changed
+### Removed
+
+- Removed the `DYNAMIC_CONFIG` Docker build argument and `<!--RC RC-->` comment-based mechanism to use runtime config options. Use `SB_RUNTIME` instead.
+
+### Fixed
+
+- Options set at runtime (via `runtime-config.js`) are no longer overwritten with build-time defaults
+  for options with non-null primitive defaults (e.g. `detectLocaleFromBrowser`, `cardViewMode`)
+- Dark-mode basemap variants (e.g. `earth-dark`) are now found when `ssys:targets` uses different casing (e.g. `Earth`)
+- Array-typed options provided via `SB_*` environment variables are handled consistently at build time and in the Docker container:
+  both accept a JSON-encoded array or a comma-separated list of strings; whitespace around the values is trimmed
+  and empty elements are dropped. An empty value results in an empty array.
+- Docker:
+  - The `SB_CONFIG` and `SB_RUNTIME` environment variables no longer leak into the generated `runtime-config.js`
+  - Fixed the environment variable detection in the entrypoint script (`cut` ran before the NUL separators were converted to newlines)
+
+## [5.1.0-rc.1] - 2026-08-15
+
+### Added
 
 - Search filters are now preserved for collection and item searches
 - Opening a collection from the collection search results carries the search criteria over into its item filters
@@ -54,7 +70,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `multihashes` dependency not required anymore for checksum migration
 - `pl`, `sentinel`, and `xarray` extensions
-- Removed the `DYNAMIC_CONFIG` Docker build argument and `<!--RC RC-->` comment-based mechanism to use runtime config options. Use `SB_RUNTIME` instead.
 
 ### Fixed
 
@@ -65,29 +80,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Show error message when search is not actually available although conformance classes are listed
 - The `IN` operator for temporal filters shows a list of datepicker inputs instead of a free-text input
 - Timestamps in `IN` filters are serialized as CQL2 temporal literals instead of plain strings
-- Options set at runtime (via `runtime-config.js`) are no longer overwritten with build-time defaults
-  for options with non-null primitive defaults (e.g. `detectLocaleFromBrowser`, `cardViewMode`)
-- Dark-mode basemap variants (e.g. `earth-dark`) are now found when `ssys:targets` uses different casing (e.g. `Earth`)
-- Array-typed options provided via `SB_*` environment variables are handled consistently at build time and in the Docker container:
-  both accept a JSON-encoded array or a comma-separated list of strings; whitespace around the values is trimmed
-  and empty elements are dropped. An empty value results in an empty array.
-- Docker:
-  - The `SB_CONFIG` and `SB_RUNTIME` environment variables no longer leak into the generated `runtime-config.js`
-  - Fixed the environment variable detection in the entrypoint script (`cut` ran before the NUL separators were converted to newlines)
 
 ## [5.0.0] - 2026-07-31
-
-### Added
-
-- Search filters are now preserved for collection and item searches
-- Opening a collection from the collection search results carries the search criteria over into its item filters
-- An indicator on the item filter toggle shows when the filters were changed but not applied yet
-
-### Fixed
-
-- The Search page restores the previous results when returning to it
-
-## [5.0.0] - 2026-07-30
 
 ### Added
 
@@ -119,7 +113,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - The Browse menu also loads additional Collections on demand
 - Minimal Docker build test and CI workflow.
-- Docker: `pathPrefix` can be set at container startup via `SB_pathPrefix` when `SB_RUNTIME` is enabled (default)
+- Docker: `pathPrefix` can be set at container startup via `SB_pathPrefix` when `DYNAMIC_CONFIG` is enabled (default)
 
 ### Changed
 
