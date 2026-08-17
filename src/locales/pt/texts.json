@@ -110,7 +110,7 @@
     "loadApiItemsFailed": "Os itens da API não puderam ser carregados.",
     "loadFilteredItems": "Desculpe, mas não foi possível carregar uma lista filtrada de itens.",
     "loadItems": "Desculpe, o carregamento da lista de itens STAC falhou.",
-    "missingPermissions": "",
+    "missingPermissions": "As credenciais especificadas para esta requisição não possuem as permissões necessárias.",
     "networkError": "Este problema pode ocorrer quando os servidores não permitem acesso externo através de navegadores web (por exemplo quando os cabeçalhos CORS não estão presentes). @:errors.contactProvider",
     "noExternalAccess": "Não é permitido aceder a catálogos externos!",
     "notFound": "O recurso pedido não existe. @:errors.contactProvider",
@@ -127,7 +127,7 @@
     "add": "Adicionar aos favoritos",
     "empty": "Nenhum favorito foi adicionado ainda. Para adicionar favoritos, use o botão 'Favorito' na página de um catálogo, coleção ou item.",
     "export": "Exportar",
-    "exportDescription": "",
+    "exportDescription": "Exporte os favoritos para um ficheiro; por exemplo, para importá-los em outro navegador.",
     "exportFormats": {
       "csv": "CSV",
       "excel": "Excel",
@@ -182,7 +182,7 @@
   },
   "items": {
     "filter": "Filtros",
-    "filterChangesNotApplied": "",
+    "filterChangesNotApplied": "Os filtros foram alterados, mas as alterações ainda não foram aplicadas.",
     "hideFilter": "Ocultar filtros",
     "noTime": "Nenhuma data fornecida",
     "noneAvailableForCollection": "Nenhum item disponível para esta coleção.",
@@ -230,7 +230,7 @@
     },
     "close": "Fechar",
     "displayLimit": {
-      "message": "",
+      "message": "Este conjunto de dados é muito grande e a sua exibição pode deixar o navegador lento ou travá-lo.",
       "showAnyway": "Mostrar mesmo assim",
       "title": "Conjunto de dados grande"
     },
@@ -338,7 +338,7 @@
     "betweenOperatorDescription": "Testa se o valor de um campo numérico está no intervalo fornecido. O intervalo fornecido é inclusivo.",
     "dateDescription": "Todos os horários em UTC.",
     "disabledDueToSingleDate": "Este filtro está desabilitado porque a coleção possui uma única data e hora como extensão temporal.",
-    "droppedFilters": "",
+    "droppedFilters": "Os seguintes filtros não são suportados aqui e foram removidos: {filters}.",
     "enterCollections": "Insira um ou mais IDs de coleção...",
     "enterItemIds": "Insira um ou mais IDs de item...",
     "enterSearchTerms": "Insira um ou mais termos de pesquisa...",
@@ -367,7 +367,7 @@
     "modifyCriteria": "Por favor, mude os critérios de pesquisa.",
     "noFurtherItemsFound": "Não há mais itens disponíveis.",
     "noItemsFound": "Nenhum item encontrado correspondente aos filtros especificados.",
-    "noOperatorsError": "",
+    "noOperatorsError": "O STAC Navegador não oferece suporte a nenhum operador para o filtro {queryable}.",
     "noOptions": "Nada introduzido ainda",
     "notEqualTo": "não é igual a",
     "notFullySupported": "Algumas opções podem não ser suportadas.",
