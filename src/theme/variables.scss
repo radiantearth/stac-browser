@@ -106,14 +106,14 @@ $header-font-weight: 600;
 $header-text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 
 $header-contrast: color-contrast($header);
-$header-color: tint-color($header, 80%); // Use shade-color if your header has a bright color
-$header-hover-color: $header-contrast;
+$header-color: color-mix(in srgb, var(--sb-header) 20%, white); // Mix with black instead if your header has a bright color
+$header-hover-color: var(--sb-header-contrast);
 
 $header-button-background: transparent;
-$header-button-border-color: $header-color;
-$header-hover-button-border-color: $header-hover-color;
-$header-button-hover-background: rgba($header-contrast, 0.15);
-$header-button-active-background: rgba($header-contrast, 0.25);
+$header-button-border-color: var(--sb-header-color);
+$header-hover-button-border-color: var(--sb-header-hover-color);
+$header-button-hover-background: color-mix(in srgb, var(--sb-header-contrast) 15%, transparent);
+$header-button-active-background: color-mix(in srgb, var(--sb-header-contrast) 25%, transparent);
 
 // ─────────────────────────────────────────────────────────
 // DARK MODE

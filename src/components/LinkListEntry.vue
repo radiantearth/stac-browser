@@ -69,7 +69,7 @@ export default {
 
   h3 {
     font-size: $font-size-sm;
-    color: $secondary;
+    color: var(--bs-secondary);
     text-align: center;
     padding: 0;
     font-weight: 600;
