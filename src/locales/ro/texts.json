@@ -189,6 +189,7 @@
       "westLon": "Longitudine vestică"
     },
     "close": "Închidere",
+    "displayLimit": {},
     "layers": {
       "base": "Straturi de bază",
       "footprint": "Amprentă la sol",
