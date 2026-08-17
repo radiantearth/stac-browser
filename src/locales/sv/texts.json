@@ -70,6 +70,7 @@
     "false": "Nej",
     "true": "Ja"
   },
+  "close": "Stäng",
   "copy": "Kopiera",
   "copyErrors": {},
   "default": "Standard",
@@ -115,7 +116,13 @@
   },
   "exampleCode": {},
   "favorites": {
-    "exportFormats": {}
+    "export": "Exportera",
+    "exportFormats": {
+      "csv": "CSV",
+      "excel": "Excel",
+      "json": "JSON"
+    },
+    "import": "Importera"
   },
   "featureExperimental": "Denna funktion är fortfarande experimentell och kan ge oväntade resultat!",
   "features": {
@@ -162,19 +169,30 @@
     "showFilter": "Visa filter"
   },
   "loading": "Laddar...",
-  "manage": {},
+  "manage": {
+    "edit": "Ändra",
+    "save": "Spara"
+  },
   "map": "Karta",
   "mapping": {
-    "attribution": {},
+    "attribution": {
+      "collapseLabel": "✕",
+      "label": "i"
+    },
     "bboxSelect": {
       "error": {}
     },
+    "close": "Stäng",
     "displayLimit": {},
     "layers": {},
     "location": {},
     "zoom": {
-      "in": {},
-      "out": {}
+      "in": {
+        "label": "+"
+      },
+      "out": {
+        "label": "–"
+      }
     }
   },
   "metadata": {
@@ -190,9 +208,19 @@
     "previous": "‹ Föregående"
   },
   "poweredBy": "Genererad av {link}",
-  "programming": {},
+  "programming": {
+    "csharp": "C#",
+    "curl": "cURL",
+    "go": "Go",
+    "java": "Java",
+    "r": "R",
+    "rust": "Rust"
+  },
   "protocol": {
-    "s3": {}
+    "ftp": "FTP",
+    "s3": {
+      "default": "S3"
+    }
   },
   "providers": {
     "email": "Skicka e-post",
@@ -284,7 +312,11 @@
     "valid": "Kompatibel",
     "validating": "Validerar...",
     "validationNA": "inte tillgänglig",
-    "validationParams": {},
+    "validationParams": {
+      "depsCount": "antal",
+      "limit": "gräns",
+      "type": "typ"
+    },
     "validationReport": {}
   },
   "submit": "Skicka",
