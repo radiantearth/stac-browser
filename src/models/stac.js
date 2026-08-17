@@ -1,4 +1,4 @@
-import { Catalog, Collection, Item, ItemCollection, CollectionCollection, STAC, STACReference } from 'stac-js';
+import { Catalog, ChildrenCollection, Collection, Item, ItemCollection, CollectionCollection, STAC, STACReference } from 'stac-js';
 import Migrate from '@radiantearth/stac-migrate';
 import Utils from '../utils';
 import { hasText, isObject } from 'stac-js/src/utils.js';
@@ -34,6 +34,9 @@ export function createSTAC(data, url = null, store = null, incomplete = false) {
   else if (data.type === 'Collection' || (!data.type && typeof data.extent !== 'undefined' && typeof data.license !== 'undefined')) {
     obj = new Collection(data, url);
   }
+  else if (!data.type && Array.isArray(data.children)) {
+    obj = new ChildrenCollection(data, url);
+  }
   else if (!data.type && Array.isArray(data.collections)) {
     obj = new CollectionCollection(data, url);
   }
@@ -43,7 +46,16 @@ export function createSTAC(data, url = null, store = null, incomplete = false) {
 
   // Set stac-browser internal properties
   if (obj.isApiCollection) {
-    const originals = obj.isCollectionCollection ? original.collections : original.features;
+    let originals;
+    if (obj.isCollectionCollection) {
+      originals = original.collections;
+    }
+    else if (obj.isChildrenCollection) {
+      originals = original.children;
+    }
+    else {
+      originals = original.features;
+    }
     obj.getAll().forEach((child, i) => {
       setInternal(child, 'incomplete', true);
       setInternal(child, 'original', originals[i]);
@@ -61,6 +73,9 @@ export function createSTAC(data, url = null, store = null, incomplete = false) {
   else if (store && obj.isCollectionCollection) {
     obj.collections = obj.collections.map(collection => processSTAC(collection, store));
   }
+  else if (store && obj.isChildrenCollection) {
+    obj.children = obj.children.map(child => processSTAC(child, store));
+  }
   else if (store) {
     obj = processSTAC(obj, store);
   }
@@ -68,16 +83,15 @@ export function createSTAC(data, url = null, store = null, incomplete = false) {
   return obj;
 }
 
-export function addMissingChildren(catalogs, stac) {
+// Returns the child links of the entity that are not already contained in the
+// given list of catalogs/collections (compared by absolute URL).
+// See also https://github.com/radiantearth/stac-browser/issues/103
+export function getMissingChildren(catalogs, stac) {
   const catalogUrls = new Set(catalogs.map(collection => collection.getAbsoluteUrl()));
-  let links = stac.getStacLinksWithRel('child').filter(link => {
-    // Don't add links that are already in collections: https://github.com/radiantearth/stac-browser/issues/103
+  return stac.getStacLinksWithRel('child').filter(link => {
     const absoluteUrl = toAbsolute(link.href, stac.getAbsoluteUrl());
     return !catalogUrls.has(absoluteUrl);
   });
-  // place the children first to avoid conflicts with the paginated collections
-  // where the children are always at the end and can never be reached due to infinite scrolling
-  return links.concat(catalogs);
 }
 
 export function getDisplayTitle(entities, fallbackTitle = "") {

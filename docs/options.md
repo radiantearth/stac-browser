@@ -53,6 +53,7 @@ The override order for the configuration is:
   - [catalogImage](#catalogimage)
   - [footerLinks](#footerlinks)
   - [apiCatalogPriority](#apicatalogpriority)
+  - [mergeCatalogsAndCollections](#mergecatalogsandcollections)
 - [Deployment](#deployment)
   - [historyMode](#historymode)
     - [`history`](#history)
@@ -168,7 +169,9 @@ SB_footerLinks='[{"label":"Imprint","url":"https://example.com/imprint"},{"label
 For STAC APIs there are two potential sources for catalogs and collections:
 
 1. Collections loaded from `/collections` and detected through the `data` link
-2. Childs (i.e. Catalogs and Collections) loaded from various sources and detected through the `child` links
+2. Childs (i.e. Catalogs and Collections) loaded from various sources and detected through
+   the `child` links, or through the `children` link if the API supports the
+   [STAC API - Children extension](https://github.com/stac-api-extensions/children)
 
 By default, STAC Browser loads and shows data from both sources, but tries to eliminate duplicates.
 If you only want to show the data from one of the sources, you can use this option.
@@ -177,6 +180,18 @@ The following options are available:
 - `collections`: Show only collections
 - `childs`: Show only children
 - `null`: Default behavior
+
+See also [mergeCatalogsAndCollections](#mergecatalogsandcollections) for how the two sources are displayed.
+
+### mergeCatalogsAndCollections
+
+By default (value `false`), the children (from the `child` links or the `/children` endpoint)
+and the collections (from the `/collections` endpoint) of an entity are shown as two separate
+lists, each with their own pagination. Children that are also contained in the collections
+list are only shown in the collections list.
+
+Set this option to `true` to merge the two sources into a single list
+(the behavior of STAC Browser 3.x), with the children placed before the collections.
 
 ## Deployment
 
@@ -660,6 +675,7 @@ If set to `null`, the server's default will be used.
 This applies to the following requests:
 
 - `GET /collections` (for collection lists while browsing the API/catalog - see `searchResultsPerPage` for collection search)
+- `GET .../children` (for children lists while browsing an API that supports the STAC API - Children extension)
 
 ### maxEntriesPerPage
 
