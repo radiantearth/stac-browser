@@ -11,16 +11,19 @@
     <meta name="og:description" id="og-description" content="">
     <meta name="og:locale" id="og-locale" content="en">
     <meta name="og:site_name" content="<%- catalogTitle %>">
-    <!--RC
+    <% if (RUNTIME) { %>
     <base href="<%- pathPrefix %>" id="stac-browser-base">
-    <script defer="defer" src="./runtime-config.js"></script>
-    RC-->
+    <script defer src="./runtime-config.js"></script>
+    <% } %>
     <title><%- catalogTitle %></title>
   </head>
   <body>
     <noscript>
       <strong>We're sorry but STAC Browser doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
+    <% if (RUNTIME) { %>
+    <link rel="stylesheet" href="./runtime-style.css">
+    <% } %>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

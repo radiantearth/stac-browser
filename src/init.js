@@ -11,6 +11,10 @@ import { vBToggle } from 'bootstrap-vue-next/directives/BToggle';
 import visible from './directives/visible';
 import WidgetHook from "./plugins/WidgetHook.vue";
 
+// Note: runtime-config.js and runtime-style.css are loaded by index.html
+// (emitted at build time when SB_RUNTIME is enabled). The deferred script
+// runs before this bundle, so merged-config.js already contains the runtime
+// values when the modules below evaluate.
 export default function init() {
   return loadDefaultMessages().then(() => {
     // Setup router

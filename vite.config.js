@@ -97,15 +97,13 @@ export default defineConfig(async ({ mode }) => {
   const defaultConfig = (await import(pathToFileURL(defaultConfigPath).href)).default ?? {};
   const externalConfig = (await import(pathToFileURL(externalConfigPath).href)).default ?? {};
   const config = Object.assign({}, defaultConfig, externalConfig, env);
-  const dynamicConfig = ["true", "1", "yes"].includes(
-    String(rawEnv.DYNAMIC_CONFIG || "").toLowerCase()
+  const runtime = String(rawEnv.SB_RUNTIME || "").toLowerCase() === "true";
+  const configFromEnv = Object.fromEntries(
+    Object.entries(env).filter(([k]) => k !== "RUNTIME")
   );
-  const configFromEnv = dynamicConfig
-    ? Object.fromEntries(Object.entries(env).filter(([k]) => k !== "pathPrefix"))
-    : env;
 
   return ({
-    base: dynamicConfig ? "./" : config.pathPrefix,
+    base: runtime ? "./" : config.pathPrefix,
     build: {
       sourcemap: mode !== "minimal",
       rollupOptions: {
@@ -153,7 +151,7 @@ export default defineConfig(async ({ mode }) => {
           },
         },
       }),
-      ViteEjsPlugin(config),
+      ViteEjsPlugin({ ...config, RUNTIME: runtime }),
       Components({
         dirs: [],
         globs: [],
