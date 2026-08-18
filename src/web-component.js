@@ -16,6 +16,24 @@ const ATTRIBUTE_MAP = {
 // switchLocale). Everything else is init-only and read once on connect.
 const LIVE_KEYS = ['catalogTitle', 'cardViewMode', 'enforcedColorMode'];
 
+// Deep-clone config so each instance owns its mutable values (e.g.
+// requestHeaders, which the store mutates in place on login); otherwise those
+// mutations would leak into the shared module-level defaultConfig and across
+// instances/reconnects. Functions and primitives pass through unchanged.
+function cloneConfig(value) {
+  if (Array.isArray(value)) {
+    return value.map(cloneConfig);
+  }
+  if (value && typeof value === 'object') {
+    const out = {};
+    for (const key of Object.keys(value)) {
+      out[key] = cloneConfig(value[key]);
+    }
+    return out;
+  }
+  return value;
+}
+
 const browserVersion = typeof STAC_BROWSER_VERSION !== 'undefined' ? STAC_BROWSER_VERSION : null;
 
 export class StacBrowserElement extends HTMLElement {
@@ -39,6 +57,7 @@ export class StacBrowserElement extends HTMLElement {
     this._unwatchers = [];
     this._generation = 0;
     this._forwardedProps = new Set();
+    this._ready = null;
     // A `config` set before the element was defined lands as an own property
     // that would shadow the setter after upgrade; re-run it through the setter.
     this._upgradeProperty('config');
@@ -104,14 +123,16 @@ export class StacBrowserElement extends HTMLElement {
     // lets an async init that is superseded by a disconnect or a newer connect
     // bail out instead of mounting into a stale/cleared mount point.
     const generation = ++this._generation;
+    let resolveReady;
+    this._ready = new Promise((resolve) => { resolveReady = resolve; });
 
-    const config = Object.assign(
+    const config = cloneConfig(Object.assign(
       {},
       defaultConfig,
       { historyMode: 'memory' },
       this._attributeConfig(),
       this._configProp
-    );
+    ));
 
     const shadow = this.shadowRoot || this.attachShadow({ mode: 'open' });
     shadow.replaceChildren();
@@ -149,16 +170,27 @@ export class StacBrowserElement extends HTMLElement {
       { immediate: true }
     );
 
-    router.afterEach((to, from, failure) => {
-      if (failure) {
-        return;
-      }
+    let navigated = false;
+    const emitNavigate = (to) => {
+      navigated = true;
       this._emit('navigate', {
         path: to.fullPath,
         url: typeof store.getters.fromBrowserPath === 'function' ? store.getters.fromBrowserPath(to.path) : null,
         title: store.getters.title || null
       });
+    };
+    router.afterEach((to, from, failure) => {
+      if (!failure) {
+        emitNavigate(to);
+      }
     });
+    // The initial navigation can finish before afterEach is installed (cached
+    // route chunks, notably on reconnect); emit it once if it was missed.
+    router.isReady().then(() => {
+      if (!navigated) {
+        emitNavigate(router.currentRoute.value);
+      }
+    }).catch(() => {});
 
     store.subscribe((mutation) => {
       if (mutation.type === 'showGlobalError' && mutation.payload) {
@@ -189,6 +221,7 @@ export class StacBrowserElement extends HTMLElement {
     // Replay options set while init was pending (the setter/attr callback bailed
     // with no instance yet).
     this._applyConfig({ ...this._attributeConfig(), ...this._configProp });
+    resolveReady();
   }
 
   // Styles must live inside the shadow root. The built bundle extracts them next
@@ -280,7 +313,14 @@ export class StacBrowserElement extends HTMLElement {
   }
 
   navigate(path) {
-    return this._instance ? this._instance.router.push(path) : undefined;
+    if (this._instance) {
+      return this._instance.router.push(path);
+    }
+    // Called before init finished (or after disconnect): resolve once ready,
+    // so the call isn't silently lost, and always return a promise.
+    return Promise.resolve(this._ready).then(
+      () => this._instance ? this._instance.router.push(path) : undefined
+    );
   }
 
   _emit(type, detail) {
