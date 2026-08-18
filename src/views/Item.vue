@@ -47,7 +47,6 @@ import Description from '../components/Description.vue';
 import ReadMore from "../components/ReadMore.vue";
 import ShowAssetLinkMixin from '../components/ShowAssetLinkMixin';
 import DeprecationMixin from '../components/DeprecationMixin';
-import { addSchemaToDocument, createItemSchema } from '../schema-org';
 import { getIgnoredFields } from '../ignored-metadata.js';
 
 export default defineComponent({
@@ -75,22 +74,9 @@ export default defineComponent({
   ],
   computed: {
     ...mapState(['data']),
-    ...mapGetters(['collectionLink', 'parentLink']),
+    ...mapGetters(['collectionLink']),
     ignoredMetadataFields() {
       return getIgnoredFields(this.data);
-    }
-  },
-  watch: {
-    data: {
-      immediate: true,
-      handler(data) {
-        try {
-          let schema = createItemSchema(data, [this.collectionLink, this.parentLink], this.$store);
-          addSchemaToDocument(document, schema);
-        } catch (error) {
-          console.error(error);
-        }
-      }
     }
   }
 });

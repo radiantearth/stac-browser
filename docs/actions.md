@@ -11,6 +11,11 @@ For example, you could open COPC files in a dedicated COPC Viewer, which otherwi
   - [Links](#links)
 - [Developer Guide](#developer-guide)
 
+> [!CAUTION]
+> Since v6.0.0, the handling of i18n messages has changed.
+> You should not import the i18n file anymore to load messages.
+> Instead, remove the import and use `this.i18n` instead of the imported `i18n`.
+
 ## User Guide
 
 ### Assets
@@ -140,7 +145,7 @@ All interfaces look as follows:
 - `get show() : boolean`
   - Return `true` if the action should be shown for the given asset, catalog, collection, item or link. Return `false` otherwise, default to `false`.
 - `get text() : string`
-  - Returns the text that is displayed for the button, defaults to "Open". Should be using the [i18n methods](https://vue-i18n.intlify.dev/api/general.html) to localize the text.
+  - Returns the text that is displayed for the button, defaults to "Open". Should be using the [i18n methods](https://vue-i18n.intlify.dev/api/general.html) to localize the text, e.g. `this.i18n.t('my.message')`.
 - `get icon() : Vue`
   - Returns a Vue component that should be the icon for the button. Defaults to the `box-arrow-up-right` icon, see the [Bootstrap Icons list](https://icones.js.org/collection/bi) for other icons that can be imported through `~icons/bi/<name>` (via [unplugin-icons](https://github.com/unplugin/unplugin-icons)).
 

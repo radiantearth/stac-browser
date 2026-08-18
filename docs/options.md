@@ -208,7 +208,7 @@ The following options are available:
 ***build-only option***
 
 This options handles how navigation between two pages is handled in this single-page application.
-There are two options available:
+There are three options available:
 
 #### `history`
 
@@ -230,6 +230,17 @@ This also excludes hosting your STAC catalog in the STAC Browser (sub-)folders.
 If your host/server doesn't support URL rewriting or you experience other related problems, you can enable *hash mode*.
 Either set this option to `hash` in the config file or as environment variable (`SB_historyMode`) when running or building.
 Known hosts that require hash mode are Amazon S3 and GitHub Pages.
+
+#### `memory`
+
+*Memory mode* keeps the navigation history entirely in memory and never reads or writes the browser's URL. This is the
+default when STAC Browser runs as a [web component](./web-component.md), so it does not hijack the address bar of the
+host page it is embedded in.
+
+It is **not recommended for standalone deployments**: because the URL never changes, individual pages can't be
+bookmarked, shared or reloaded, the browser's back/forward buttons don't move between STAC Browser pages, and search
+engines can't crawl beyond the entry page. Use `history` or `hash` for standalone deployments; use `memory` only when
+STAC Browser must not control the page URL.
 
 ### pathPrefix
 

@@ -3,7 +3,7 @@ import { createStore } from "vuex";
 import { hasText, isObject, size, URI } from 'stac-js/src/utils.js';
 import urijs from 'urijs';
 
-import i18n, { loadMessages, detectDataLanguage, updateExternals } from '../i18n';
+import { loadMessages, detectDataLanguage, updateExternals } from '../i18n';
 import Utils, { BrowserError } from '../utils';
 import { toAbsolute } from 'stac-js/src/http.js';
 import { addMissingChildren, getDisplayTitle, createSTAC } from '../models/stac';
@@ -95,7 +95,7 @@ function getOrCreateStac(cx, data, url) {
   return stac;
 }
 
-function getStore(config, router) {
+function getStore(config, router, i18n) {
   // Local settings (e.g. for currently loaded STAC entity)
   const localDefaults = () => ({
     url: '',
@@ -181,7 +181,7 @@ function getStore(config, router) {
   return createStore({
     strict: import.meta.env.NODE_ENV !== 'production',
     modules: {
-      auth: auth(router),
+      auth: auth(router, i18n),
       favorites,
       manager: manager(config),
       search,
@@ -588,7 +588,7 @@ function getStore(config, router) {
       },
       languages(state, { uiLanguage, dataLanguage }) {
         if (typeof uiLanguage !== 'undefined') {
-          i18n.global.locale = uiLanguage;
+          i18n.locale = uiLanguage;
           state.uiLanguage = uiLanguage || null;
         }
         if (typeof dataLanguage !== 'undefined') {
@@ -698,7 +698,7 @@ function getStore(config, router) {
         if (status instanceof Loading && status.show) {
           state.loading = false;
           state.page = () => ({
-            title: i18n.global.t('errors.title')
+            title: i18n.t('errors.title')
           });
         }
         if (!(error instanceof Error)) {
@@ -870,10 +870,10 @@ function getStore(config, router) {
         const dataLanguage = detectDataLanguage(cx.state.data, locale, uiLanguage);
 
         // Load messages
-        await loadMessages(uiLanguage);
+        await loadMessages(i18n, uiLanguage);
 
         // Update dependencies that require the locale to be set (e.g. stac-fields)
-        await updateExternals(uiLanguage, cx.state.fallbackLocale);
+        await updateExternals(i18n, uiLanguage, cx.state.fallbackLocale);
 
         // Update store and URL
         cx.commit('languages', { dataLanguage, uiLanguage });
@@ -978,13 +978,13 @@ function getStore(config, router) {
           try {
             const response = await cx.dispatch('request', { link: url, checkPermissions: isApiRequest });
             if (!isObject(response.data)) {
-              throw new BrowserError(i18n.global.t('errors.invalidJsonObject'));
+              throw new BrowserError(i18n.t('errors.invalidJsonObject'));
             }
             data = createSTAC(response.data, url, cx);
             if (!(data instanceof STAC)) {
               // Might be a request to the /collections or .../items endpoints,
               // which returns an APICollection, not a STAC object.
-              throw new BrowserError(i18n.global.t('errors.apiListRequested'));
+              throw new BrowserError(i18n.t('errors.apiListRequested'));
             }
             cx.commit('loaded', { url, data });
 
@@ -1034,7 +1034,7 @@ function getStore(config, router) {
             await cx.dispatch('loadNextApiCollections', loadArgs);
           } catch (error) {
             cx.commit('showGlobalError', {
-              message: i18n.global.t('errors.loadApiCollectionsFailed'),
+              message: i18n.t('errors.loadApiCollectionsFailed'),
               error
             });
           }
@@ -1046,7 +1046,7 @@ function getStore(config, router) {
             await cx.dispatch('loadApiItems', loadArgs);
           } catch (error) {
             cx.commit('showGlobalError', {
-              message: i18n.global.t('errors.loadApiItemsFailed'),
+              message: i18n.t('errors.loadApiItemsFailed'),
               error
             });
           }
@@ -1112,7 +1112,7 @@ function getStore(config, router) {
 
           let response = await cx.dispatch('request', { link, checkPermissions: true });
           if (!isObject(response.data) || !Array.isArray(response.data.features)) {
-            throw new BrowserError(i18n.global.t('errors.invalidStacItems'));
+            throw new BrowserError(i18n.t('errors.invalidStacItems'));
           }
           else {
             // todo: Convert data to stac-js
@@ -1257,7 +1257,7 @@ function getStore(config, router) {
             return;
           }
           if (!isObject(response.data) || !Array.isArray(response.data.collections)) {
-            throw new BrowserError(i18n.global.t('errors.invalidStacCollections'));
+            throw new BrowserError(i18n.t('errors.invalidStacCollections'));
           }
           else {
             // todo: Convert data to stac-js
@@ -1336,19 +1336,19 @@ function getStore(config, router) {
             let msg;
             switch (res.status) {
               case 401:
-                msg = i18n.global.t('errors.unauthorized');
+                msg = i18n.t('errors.unauthorized');
                 break;
               case 403:
-                msg = i18n.global.t('errors.authFailed');
+                msg = i18n.t('errors.authFailed');
                 break;
               case 404:
-                msg = i18n.global.t('errors.notFound');
+                msg = i18n.t('errors.notFound');
                 break;
               case 500:
-                msg = i18n.global.t('errors.serverError');
+                msg = i18n.t('errors.serverError');
                 break;
               default:
-                msg = i18n.global.t('errors.networkError');
+                msg = i18n.t('errors.networkError');
                 break;
             }
             throw new Error(msg);

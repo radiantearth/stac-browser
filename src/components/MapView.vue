@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import { defineAsyncComponent } from 'vue';
+import { defineAsyncComponent, markRaw } from 'vue';
 import MapMixin from './maps/MapMixin.js';
 import LayerControl from './maps/LayerControl.vue';
 import TextControl from './maps/TextControl.vue';
@@ -60,6 +60,9 @@ export default {
   mixins: [
     MapMixin
   ],
+  inject: {
+    teleportTarget: { default: '#stac-browser' }
+  },
   props: {
     stac: {
       type: Object,
@@ -97,10 +100,10 @@ export default {
     ...mapState(['displayOverviewsForChildren']),
     container() {
       if (this.isFullScreen) {
-        return '#' + this.mapId;
+        return this.$refs.map;
       }
       else {
-        return '#stac-browser';
+        return this.teleportTarget.el;
       }
     },
     childrenOptions() {
@@ -246,7 +249,7 @@ export default {
           if (features.getLength() > 0) {
             const writer = new GeoJSON();
             this.selection = {
-              target: this.$refs.target,
+              target: markRaw(this.$refs.target),
               type: 'features',
               items: features.getArray().map(f => writer.writeFeatureObject(f))
             };
@@ -264,7 +267,7 @@ export default {
             const objects = await getStacObjectsForEvent(event, container, features, 5);
             if (objects.length > 0) {
               this.selection = {
-                target: this.$refs.target,
+                target: markRaw(this.$refs.target),
                 type: this.children.isCollectionCollection ? 'collections': 'items',
                 children: objects
               };

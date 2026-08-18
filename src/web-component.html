@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>STAC Browser Web Component</title>
+    <style>
+      :root { font-family: system-ui, -apple-system, sans-serif; }
+      body { margin: 0; display: flex; flex-direction: column; height: 100vh; }
+
+      /* Host chrome: header, status and sidebar stay put; only <main> scrolls. */
+      header {
+        display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem;
+        padding: 0.6rem 1rem; border-bottom: 1px solid #d0d0d0; background: #f7f7f7;
+        flex: none;
+      }
+      header h1 { margin: 0 0.75rem 0 0; font-size: 1rem; white-space: nowrap; }
+      header input[type="url"] { flex: 1; min-width: 12rem; padding: 0.4rem 0.6rem; font: inherit; }
+      header button { padding: 0.4rem 1rem; font: inherit; cursor: pointer; }
+      #status {
+        flex: none; padding: 0.3rem 1rem; font-size: 0.85rem; color: #555; background: #fafafa;
+        border-bottom: 1px solid #eee; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      }
+
+      .layout { flex: 1; min-height: 0; display: flex; }
+
+      aside {
+        flex: none; width: 16rem; padding: 1rem; overflow-y: auto;
+        border-right: 1px solid #d0d0d0; background: #fafafa;
+      }
+      aside h2 { margin: 0 0 1rem; font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; color: #888; }
+      aside .field { display: flex; flex-direction: column; gap: 0.25rem; margin-bottom: 1rem; font-size: 0.9rem; }
+      aside .field.inline { flex-direction: row; align-items: center; gap: 0.5rem; }
+      aside label { font-weight: 500; }
+      aside input, aside select { font: inherit; padding: 0.3rem 0.4rem; }
+      aside code { font-size: 0.85em; }
+
+      main { flex: 1; min-width: 0; overflow: auto; }
+      main stac-browser { display: block; min-height: 100%; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>STAC Browser</h1>
+      <input id="url" type="url" placeholder="STAC catalog or API URL, e.g. https://example.com/catalog.json" value="https://earth-search.aws.element84.com/v1/">
+      <button id="load">Load</button>
+    </header>
+    <div id="status">Enter a STAC URL and press Load.</div>
+
+    <div class="layout">
+      <aside>
+        <h2>Options</h2>
+        <div class="field inline">
+          <input id="dark" type="checkbox">
+          <label for="dark">Dark mode</label>
+        </div>
+        <div class="field inline">
+          <label for="primary">Primary color</label>
+          <input id="primary" type="color" value="#188191">
+        </div>
+        <div class="field">
+          <label for="cardView">Card layout</label>
+          <select id="cardView">
+            <option value="cards">Cards</option>
+            <option value="list">List</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="title">Catalog title</label>
+          <input id="title" type="text" placeholder="(use the catalog's own)">
+        </div>
+        <div class="field">
+          <label for="isolation">Isolation</label>
+          <select id="isolation">
+            <option value="inline">Inline (overlays span the page)</option>
+            <option value="isolated">Isolated (iframe-like)</option>
+          </select>
+        </div>
+      </aside>
+      <main></main>
+    </div>
+
+    <script type="module" src="./web-component.js"></script>
+    <script type="module">
+      const main = document.querySelector('main');
+      const status = document.getElementById('status');
+      const input = document.getElementById('url');
+      const dark = document.getElementById('dark');
+      const primary = document.getElementById('primary');
+      const cardView = document.getElementById('cardView');
+      const title = document.getElementById('title');
+      const isolation = document.getElementById('isolation');
+
+      // Runtime options applied to a running browser without reloading it.
+      // Config options go through the `config` property; the primary color is a
+      // CSS custom property forwarded into the isolated shadow root.
+      function applyOptions(browser) {
+        browser.config = {
+          enforcedColorMode: dark.checked ? 'dark' : 'light',
+          cardViewMode: cardView.value,
+          catalogTitle: title.value.trim() || null
+        };
+        const hex = primary.value;
+        const rgb = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(', ');
+        browser.style.setProperty('--bs-primary', hex);
+        browser.style.setProperty('--bs-primary-rgb', rgb);
+      }
+
+      function load() {
+        main.replaceChildren();
+        const browser = document.createElement('stac-browser');
+        if (input.value.trim()) {
+          browser.setAttribute('url', input.value.trim());
+        }
+        // Isolation is structural (it sets up the scroll viewport once), so it is
+        // applied at creation. Isolated mode needs a definite height to scroll in.
+        if (isolation.value === 'isolated') {
+          browser.setAttribute('isolation', 'isolated');
+          browser.style.height = '100%';
+        }
+        applyOptions(browser);
+
+        // React to events
+        browser.addEventListener('navigate', (e) => {
+          status.textContent = e.detail.url || e.detail.title || '';
+        });
+        browser.addEventListener('title', (e) => {
+          document.title = e.detail;
+        });
+
+        main.appendChild(browser);
+      }
+
+      // Options change the running browser live, without reloading the catalog.
+      function updateOptions() {
+        const browser = main.querySelector('stac-browser');
+        if (browser) {
+          applyOptions(browser);
+        }
+      }
+
+      input.value = new URLSearchParams(location.search).get('url') ?? input.value;
+      load();
+
+      document.getElementById('load').addEventListener('click', load);
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          load();
+        }
+      });
+      dark.addEventListener('change', updateOptions);
+      primary.addEventListener('input', updateOptions);
+      cardView.addEventListener('change', updateOptions);
+      title.addEventListener('input', updateOptions);
+      isolation.addEventListener('change', load);
+    </script>
+  </body>
+</html>

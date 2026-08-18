@@ -82,7 +82,6 @@ import StacFieldsMixin from '../components/StacFieldsMixin';
 import { formatLicense, formatTemporalExtents } from '@radiantearth/stac-fields/formatters';
 import Utils from '../utils';
 import { hasText, isObject, size } from 'stac-js/src/utils.js';
-import { addSchemaToDocument, createCatalogSchema } from '../schema-org';
 import { ItemCollection } from 'stac-js';
 import DeprecationMixin from '../components/DeprecationMixin.js';
 import { BTab, BTabs, BCard } from 'bootstrap-vue-next';
@@ -125,7 +124,7 @@ export default defineComponent({
   },
   computed: {
     ...mapState(['data', 'apiCatalogPriority', 'apiItemsLink', 'apiItemsPagination', 'apiItemsNumberMatched', 'nextCollectionsLink', 'stateQueryParameters']),
-    ...mapGetters(['catalogs', 'collectionLink', 'isApiChildrenLoading', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
+    ...mapGetters(['catalogs', 'collectionLink', 'isApiChildrenLoading', 'isCollection', 'items', 'getApiItemsLoading']),
     ignoredMetadataFields() {
       return getIgnoredFields(this.data, 'CatalogLike');
     },
@@ -236,13 +235,6 @@ export default defineComponent({
     data: {
       immediate: true,
       async handler(newData, oldData) {
-        try {
-          let schema = createCatalogSchema(newData, [this.parentLink, this.rootLink], this.$store);
-          addSchemaToDocument(document, schema);
-        } catch (error) {
-          console.error(error);
-        }
-
         if (!newData?.isCollection) {
           return;
         }

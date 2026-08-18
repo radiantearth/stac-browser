@@ -1,5 +1,4 @@
 import { isObject } from 'stac-js/src/utils.js';
-import i18n from '../../i18n';
 import { mapGetters, mapState } from 'vuex';
 import { needsAuthenticatedFetch } from '../../models/authMedia';
 import OlMap from 'ol/Map.js';
@@ -10,21 +9,13 @@ import AttributionControl from 'ol/control/Attribution.js';
 import FullScreenControl from 'ol/control/FullScreen.js';
 
 import configureBasemap from '../../../basemaps.config';
-import CONFIG from '../../merged-config';
 import proj4 from 'proj4';
-import {register} from 'ol/proj/proj4.js';
+import { register, isRegistered } from 'ol/proj/proj4.js';
 import { markRaw } from 'vue';
-// Register pre-defined CRS from config in proj4
-if (isObject(CONFIG.crs)) {
-  for (const code in CONFIG.crs) {
-    proj4.defs(code, CONFIG.crs[code]);
-  }
-}
-register(proj4); // required to support source reprojection
 
 export default {
   computed: {
-    ...mapState(['buildTileUrlTemplate', 'colorMode', 'crossOriginMedia', 'displayGeoTiffByDefault', 'displayPreview', 'displayOverview', 'getMapSourceOptions', 'getStacLayerOptions', 'maxDisplayPixels', 'useTileLayerAsFallback', 'uiLanguage']),
+    ...mapState(['buildTileUrlTemplate', 'colorMode', 'crossOriginMedia', 'crs', 'displayGeoTiffByDefault', 'displayPreview', 'displayOverview', 'getMapSourceOptions', 'getStacLayerOptions', 'maxDisplayPixels', 'useTileLayerAsFallback', 'uiLanguage']),
     ...mapGetters(['getRequestUrl']),
     stacLayerOptions() {
       const options = {
@@ -53,6 +44,20 @@ export default {
     },
     hasBasemap() {
       return this.basemaps.length > 0;
+    }
+  },
+  created() {
+    // Install configured CRS definitions even if proj4 was already registered
+    // with OpenLayers (registration is global; another instance or the host may
+    // have registered it without these defs), then (re-)register so OpenLayers
+    // picks them up. register(proj4) is also required for source reprojection.
+    if (isObject(this.crs)) {
+      for (const code in this.crs) {
+        proj4.defs(code, this.crs[code]);
+      }
+    }
+    if (!isRegistered() || isObject(this.crs)) {
+      register(proj4);
     }
   },
   data() {
@@ -166,31 +171,31 @@ export default {
       });
 
       this.zoomControl = new ZoomControl({
-        zoomInLabel: i18n.global.t('mapping.zoom.in.label'),
-        zoomOutLabel: i18n.global.t('mapping.zoom.out.label'),
-        zoomInTipLabel: i18n.global.t('mapping.zoom.in.description'),
-        zoomOutTipLabel: i18n.global.t('mapping.zoom.out.description')
+        zoomInLabel: this.$t('mapping.zoom.in.label'),
+        zoomOutLabel: this.$t('mapping.zoom.out.label'),
+        zoomInTipLabel: this.$t('mapping.zoom.in.description'),
+        zoomOutTipLabel: this.$t('mapping.zoom.out.description')
       });
       this.map.addControl(this.zoomControl);
 
       this.attributionControl = new AttributionControl({
-        tipLabel: i18n.global.t('mapping.attribution.description'),
-        label: i18n.global.t('mapping.attribution.label'),
-        collapseLabel: i18n.global.t('mapping.attribution.collapseLabel'),
+        tipLabel: this.$t('mapping.attribution.description'),
+        label: this.$t('mapping.attribution.label'),
+        collapseLabel: this.$t('mapping.attribution.collapseLabel'),
       });
       this.map.addControl(this.attributionControl);
 
       this.fullScreenControl = new FullScreenControl({
-        label: i18n.global.t('fullscreen.showLabel'),
-        labelActive: i18n.global.t('fullscreen.exitLabel'),
-        tipLabel: i18n.global.t('fullscreen.show'),
+        label: this.$t('fullscreen.showLabel'),
+        labelActive: this.$t('fullscreen.exitLabel'),
+        tipLabel: this.$t('fullscreen.show'),
       });
       this.fullScreenControl.on('enterfullscreen', () => {
-        this.fullScreenControl.button_.title = i18n.global.t('fullscreen.exit');
+        this.fullScreenControl.button_.title = this.$t('fullscreen.exit');
         this.isFullScreen = true;
       });
       this.fullScreenControl.on('leavefullscreen', () => {
-        this.fullScreenControl.button_.title = i18n.global.t('fullscreen.show');
+        this.fullScreenControl.button_.title = this.$t('fullscreen.show');
         this.isFullScreen = false;
       });
       this.map.addControl(this.fullScreenControl);

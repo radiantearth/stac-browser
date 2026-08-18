@@ -5,6 +5,9 @@ import { pagination } from "stac-js/src/relationtypes.js";
 
 export const commonFileNames = ['catalog', 'collection', 'item'];
 
+export const languageConformance = ['https://api.stacspec.org/v1.*/language'];
+export const languageExtension = 'https://stac-extensions.github.io/language/v1.*/schema.json';
+
 export class BrowserError extends Error {
   constructor(message) {
     super(message);
@@ -433,6 +436,26 @@ export default class Utils {
     }
     // Fallback to a default filename
     return 'download';
+  }
+
+  static resolveScrollTarget(el) {
+    let node = el;
+    while (node) {
+      let parent = node.parentElement;
+      if (!parent) {
+        const root = node.getRootNode();
+        parent = root instanceof ShadowRoot ? root.host : null;
+      }
+      if (!parent) {
+        break;
+      }
+      const overflowY = window.getComputedStyle(parent).overflowY;
+      if (overflowY === 'auto' || overflowY === 'scroll' || overflowY === 'overlay') {
+        return parent;
+      }
+      node = parent;
+    }
+    return window;
   }
 
 }

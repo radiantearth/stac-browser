@@ -1,7 +1,7 @@
 <template>
   <b-offcanvas
     initial-animation id="sidebar" :model-value="modelValue" @update:model-value="emit"
-    :title="$t('browse')" teleport-to="#stac-browser" footer-class="offcanvas-footer"
+    :title="$t('browse')" footer-class="offcanvas-footer"
   >
     <template #default>
       <Loading v-if="loading" />
