@@ -194,8 +194,8 @@
     "addItem": "",
     "confirmDeleteTitle": "",
     "confirmDeleteMessage": "",
-    "create": "",
-    "delete": "",
+    "create": "Skapa",
+    "delete": "Radera",
     "discardDraft": "",
     "draftRestored": "",
     "edit": "Ändra",
@@ -238,7 +238,7 @@
     "layers": {
       "base": "",
       "footprint": "Fotavtryck",
-      "title": "",
+      "title": "Lager",
       "unnamed": ""
     },
     "location": {
@@ -284,7 +284,7 @@
     "go": "Go",
     "java": "Java",
     "javascript": "",
-    "python": "",
+    "python": "Python",
     "r": "R",
     "rust": "Rust"
   },
@@ -416,15 +416,15 @@
       "switch": ""
     },
     "locatedAt": "STAC-metadatafilen finns på:",
-    "manage": "",
+    "manage": "Hantera",
     "share": {
       "bsky": "",
-      "email": "",
-      "label": "",
+      "email": "E-Post",
+      "label": "Dela",
       "mastodon": "",
       "message": "",
       "sharePageWithOthers": "",
-      "title": "",
+      "title": "Dela",
       "withOthers": "",
       "x": ""
     },
@@ -443,7 +443,7 @@
       "depsCount": "antal",
       "exclusive": "",
       "failingKeyword": "",
-      "format": "",
+      "format": "format",
       "i": "",
       "j": "",
       "limit": "gräns",
@@ -459,7 +459,7 @@
     },
     "validationReport": {
       "disclaimer": "",
-      "result": "",
+      "result": "Resultat",
       "title": ""
     }
   },
