@@ -248,7 +248,7 @@
     "nodata": "",
     "zoom": {
       "in": {
-        "description": "",
+        "description": "Zooma in",
         "label": "+"
       },
       "out": {
@@ -418,7 +418,7 @@
     "locatedAt": "STAC-metadatafilen finns på:",
     "manage": "Hantera",
     "share": {
-      "bsky": "",
+      "bsky": "Bluesky",
       "email": "E-Post",
       "label": "Dela",
       "mastodon": "",
@@ -452,7 +452,7 @@
       "missingProperty": "",
       "multipleOf": "",
       "passingSchemas": "",
-      "pattern": "",
+      "pattern": "mönster",
       "property": "",
       "propertyName": "",
       "type": "typ"
