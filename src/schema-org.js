@@ -3,7 +3,6 @@ import { toAbsolute } from 'stac-js/src/http.js';
 import Utils from './utils';
 import { getDisplayTitle } from './models/stac';
 import { STAC } from 'stac-js';
-import i18n from './i18n';
 
 function toBrowserUrl(url, store) {
   let path = store.getters.toBrowserPath(url);
@@ -49,7 +48,7 @@ function makeAssets(data) {
   return [];
 }
 
-function fallbackDescription(data, store) {
+function fallbackDescription(data, store, i18n) {
   let stacType, container;
   if (data instanceof STAC) {
     stacType = data.isItem ? "Item" : data.type;
@@ -59,13 +58,13 @@ function fallbackDescription(data, store) {
     stacType = "Item";
   }
   if (stacType) {
-    let type = i18n.global.t(`stac${stacType}`, 1);
-    let inX = i18n.global.t('in', { catalog: container || store.catalogTitle });
+    const type = i18n.t(`stac${stacType}`, 1);
+    const inX = i18n.t('in', { catalog: container || store.catalogTitle });
     return `SpatioTemporal Asset Catalog (STAC)\n${type} - ${data.id} ${inX}`;
   }
 }
 
-function makeLinks(links, data, store, type = "DataCatalog") {
+function makeLinks(links, data, store, i18n, type = "DataCatalog") {
   return links.map(link => {
     let name, isBasedOn;
     if (link instanceof STAC) {
@@ -83,7 +82,7 @@ function makeLinks(links, data, store, type = "DataCatalog") {
       isBasedOn
     };
     if (type === 'Dataset') {
-      obj.description = fallbackDescription(link, store);
+      obj.description = fallbackDescription(link, store, i18n);
     }
     return obj;
   });
@@ -101,7 +100,7 @@ function makeProvider(providers, role) {
     }));
 }
 
-function createBaseSchema(data, type, store) {
+function createBaseSchema(data, type, store, i18n) {
   let name = getDisplayTitle(data);
   let stacUrl = data.getAbsoluteUrl();
   let url = toBrowserUrl(stacUrl, store);
@@ -138,7 +137,7 @@ function createBaseSchema(data, type, store) {
     "@context": "https://schema.org/",
     "@type": type,
     name,
-    description: data.getMetadata("description") || fallbackDescription(data, store),
+    description: data.getMetadata("description") || fallbackDescription(data, store, i18n),
     citation: data.getMetadata("sci:citation"),
     identifier: data.getMetadata("sci:doi") || data.id,
     keywords: data.getMetadata("keywords"),
@@ -160,7 +159,7 @@ function createBaseSchema(data, type, store) {
   };
 }
 
-export function createCatalogSchema(data, parents, store) {
+export function createCatalogSchema(data, parents, store, i18n) {
   if (!(data instanceof STAC)) {
     return null;
   }
@@ -171,7 +170,7 @@ export function createCatalogSchema(data, parents, store) {
     parents = parents.filter((link, i) => parents.findIndex(p => p.isBasedOn === link.isBasedOn) !== i);
   }
 
-  let schema = createBaseSchema(data, 'DataCatalog', store);
+  let schema = createBaseSchema(data, 'DataCatalog', store, i18n);
 
   if (data.isCollection) {
     if (data.extent?.temporal?.interval.length > 0) {
@@ -184,22 +183,22 @@ export function createCatalogSchema(data, parents, store) {
     schema.associatedMedia = makeAssets(data);
   }
 
-  schema.hasPart = makeLinks(store.getters.catalogs, data, store);
-  schema.dataset = makeLinks(store.getters.items, data, store, "Dataset");
-  schema.isPartOf = makeLinks(parents, data, store);
+  schema.hasPart = makeLinks(store.getters.catalogs, data, store, i18n);
+  schema.dataset = makeLinks(store.getters.items, data, store, i18n, "Dataset");
+  schema.isPartOf = makeLinks(parents, data, store, i18n);
 
   return schema;
 }
 
-export function createItemSchema(data, parents, store) {
+export function createItemSchema(data, parents, store, i18n) {
   if (!(data instanceof STAC)) {
     return null;
   }
   parents = parents.filter(link => isObject(link));
 
-  let schema = createBaseSchema(data, 'Dataset', store);
+  let schema = createBaseSchema(data, 'Dataset', store, i18n);
 
-  schema.includedInDataCatalog = makeLinks(parents, data, store);
+  schema.includedInDataCatalog = makeLinks(parents, data, store, i18n);
 
   let start = data.getMetadata('start_datetime');
   let end = data.getMetadata('end_datetime');
@@ -219,6 +218,11 @@ export function createItemSchema(data, parents, store) {
 export function addSchemaToDocument(doc, schema) {
   let id = 'schema-org';
   let element = doc.getElementById(id);
+  if (!schema) {
+    // No structured data for this route: drop the previous route's script.
+    element?.remove();
+    return;
+  }
   if (!element) {
     element = doc.createElement('script');
     element.type = 'application/ld+json';

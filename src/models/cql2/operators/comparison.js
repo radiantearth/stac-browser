@@ -1,4 +1,3 @@
-import i18n from '../../../i18n.js';
 import CqlValue from '../value.js';
 import CqlOperator from './operator';
 
@@ -50,7 +49,7 @@ export class CqlEqual extends CqlComparisonOperator {
   }
 
   static get longLabel() {
-    return i18n.global.t('search.equalTo');
+    return 'search.equalTo';
   }
 
 }
@@ -68,7 +67,7 @@ export class CqlNotEqual extends CqlComparisonOperator {
   }
 
   static get longLabel() {
-    return i18n.global.t('search.notEqualTo');
+    return 'search.notEqualTo';
   }
 
 }
@@ -82,7 +81,7 @@ export class CqlGreaterThan extends CqlComparisonOperator {
   }
 
   static get longLabel() {
-    return i18n.global.t('search.greaterThan');
+    return 'search.greaterThan';
   }
 
 }
@@ -100,7 +99,7 @@ export class CqlGreaterThanEqual extends CqlComparisonOperator {
   }
 
   static get longLabel() {
-    return i18n.global.t('search.greaterThanEqual');
+    return 'search.greaterThanEqual';
   }
 
 }
@@ -114,7 +113,7 @@ export class CqlLessThan extends CqlComparisonOperator {
   }
 
   static get longLabel() {
-    return i18n.global.t('search.lessThan');
+    return 'search.lessThan';
   }
 
 }
@@ -132,7 +131,7 @@ export class CqlLessThanEqual extends CqlComparisonOperator {
   }
 
   static get longLabel() {
-    return i18n.global.t('search.lessThanEqual');
+    return 'search.lessThanEqual';
   }
   
 }
@@ -158,11 +157,11 @@ export class CqlLike extends CqlComparisonOperator {
   }
 
   static get longLabel() {
-    return i18n.global.t('search.matches');
+    return 'search.matches';
   }
 
   static get description() {
-    return i18n.global.t('search.likeOperatorDescription');
+    return 'search.likeOperatorDescription';
   }
 
 }
@@ -180,11 +179,11 @@ export class CqlBetween extends CqlComparisonOperator {
   }
 
   static get longLabel() {
-    return i18n.global.t('search.between');
+    return 'search.between';
   }
 
   static get description() {
-    return i18n.global.t('search.betweenOperatorDescription');
+    return 'search.betweenOperatorDescription';
   }
 
   toText() {

@@ -1,6 +1,5 @@
 import StacActionPlugin from '../StacActionPlugin';
 import { STAC } from 'stac-js';
-import i18n from '../../i18n';
 import BIconStar from '~icons/bi/star';
 import BIconStarFill from '~icons/bi/star-fill';
 
@@ -34,13 +33,13 @@ export default class Favorite extends StacActionPlugin {
   }
 
   get text() {
-    return i18n.global.t('favorites.label');
+    return this.i18n.t('favorites.label');
   }
 
   // The state (add vs. remove) is conveyed by the icon and this tooltip,
   // keeping the button label itself short.
   get title() {
-    return i18n.global.t(this.isFavorite ? 'favorites.remove' : 'favorites.add');
+    return this.i18n.t(this.isFavorite ? 'favorites.remove' : 'favorites.add');
   }
 
   get onClick() {

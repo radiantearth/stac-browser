@@ -1,7 +1,6 @@
 import AssetActionPlugin from "../AssetActionPlugin";
 import { geojsonMediaType } from "stac-js/src/mediatypes.js";
 import { URI } from 'stac-js/src/utils.js';
-import i18n from "../../i18n";
 
 export default class GeoJsonIo extends AssetActionPlugin {
 
@@ -18,7 +17,7 @@ export default class GeoJsonIo extends AssetActionPlugin {
   }
 
   get text() {
-    return i18n.global.t('actions.openIn', {service: 'geojson.io'});
+    return this.i18n.t('actions.openIn', {service: 'geojson.io'});
   }
 
 }

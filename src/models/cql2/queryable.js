@@ -1,5 +1,4 @@
 import { formatKey } from "@radiantearth/stac-fields/helper";
-import i18n from '../../i18n.js';
 import { CqlEqual, CqlGreaterThan, CqlGreaterThanEqual, CqlLessThan, CqlLessThanEqual, CqlNotEqual, CqlBetween, CqlLike } from "./operators/comparison";
 import { CqlIn, CqlArrayOverlaps, CqlArrayContains, CqlArrayEquals, CqlArrayContainedBy } from "./operators/array";
 import { isObject } from "stac-js/src/utils.js";
@@ -19,9 +18,9 @@ export default class Queryable {
 
   get description() {
     if (this.isTemporal) {
-      return i18n.global.t('search.dateDescription');
+      return 'search.dateDescription';
     }
-    return "";
+    return null;
   }
 
   get supported() {

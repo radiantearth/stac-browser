@@ -1,6 +1,5 @@
 import StacActionPlugin from "../StacActionPlugin";
 import { URI } from 'stac-js/src/utils.js';
-import i18n from "../../i18n";
 import BIconMap from '~icons/bi/map';
 
 export default class StacMap extends StacActionPlugin {
@@ -18,6 +17,6 @@ export default class StacMap extends StacActionPlugin {
   }
 
   get text() {
-    return i18n.global.t('actions.openIn', {service: 'stac-map'});
+    return this.i18n.t('actions.openIn', {service: 'stac-map'});
   }
 }

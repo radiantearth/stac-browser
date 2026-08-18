@@ -441,7 +441,7 @@ export default defineComponent({
           await this.$router.push({ name: 'browse', params: { pathMatch } });
         }
       } catch (error) {
-        this.editorError = getErrorMessage(error, true);
+        this.editorError = getErrorMessage(this.$i18n, error, true);
       } finally {
         this.saving = false;
       }
