@@ -283,7 +283,7 @@
     "curl": "cURL",
     "go": "Go",
     "java": "Java",
-    "javascript": "",
+    "javascript": "JavaScript",
     "python": "Python",
     "r": "R",
     "rust": "Rust"
@@ -404,7 +404,7 @@
   "source": {
     "conformanceClasses": "",
     "detailsAboutSource": "Detaljer om STAC-datakällan",
-    "extension": "",
+    "extension": "Filändelse",
     "fileFormat": "Filformat",
     "id": "Identifierare",
     "invalid": "Inte kompatibel",
@@ -426,7 +426,7 @@
       "sharePageWithOthers": "",
       "title": "Dela",
       "withOthers": "",
-      "x": ""
+      "x": "X (Twitter)"
     },
     "stacExtension": "",
     "stacVersion": "",
@@ -439,12 +439,12 @@
       "additionalProperty": "",
       "allowedValue": "",
       "allowedValues": "",
-      "comparison": "",
+      "comparison": "jämförelse",
       "depsCount": "antal",
       "exclusive": "",
       "failingKeyword": "",
       "format": "format",
-      "i": "",
+      "i": "första objekt",
       "j": "",
       "limit": "gräns",
       "maxContains": "",
