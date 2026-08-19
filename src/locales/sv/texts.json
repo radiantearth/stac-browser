@@ -199,7 +199,7 @@
     "discardDraft": "",
     "draftRestored": "",
     "edit": "Ändra",
-    "leavePage": "",
+    "leavePage": "Lämna sidan",
     "save": "Spara",
     "noUndo": "",
     "unsavedChangesLeave": "",
@@ -231,12 +231,12 @@
     "close": "Stäng",
     "displayLimit": {
       "message": "",
-      "showAnyway": "",
+      "showAnyway": "Visa ändå",
       "title": ""
     },
     "fit": "",
     "layers": {
-      "base": "",
+      "base": "Bas lager",
       "footprint": "Fotavtryck",
       "title": "Lager",
       "unnamed": ""
@@ -496,6 +496,6 @@
     "title": "Visningsalternativ"
   },
   "widgets": {
-    "featured": ""
+    "featured": "Utvalda"
   }
 }
