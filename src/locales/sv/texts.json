@@ -191,7 +191,7 @@
   "loading": "Laddar...",
   "manage": {
     "addCollection": "",
-    "addItem": "",
+    "addItem": "Lägg till objekt",
     "confirmDeleteTitle": "",
     "confirmDeleteMessage": "",
     "create": "Skapa",
