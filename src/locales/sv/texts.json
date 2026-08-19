@@ -119,7 +119,7 @@
     "unauthorized": "Begäran saknar inloggningsuppgifter, t.ex. en API-nyckel. Ange dina uppgifter och försök igen."
   },
   "exampleCode": {
-    "title": "",
+    "title": "Exempel Kod",
     "storeAs": "",
     "installDependencies": ""
   },
@@ -132,7 +132,7 @@
       "csv": "CSV",
       "excel": "Excel",
       "json": "JSON",
-      "stac": ""
+      "stac": "STAC Katalog"
     },
     "import": "Importera",
     "importDescription": "",
@@ -210,7 +210,7 @@
   "mapping": {
     "attribution": {
       "collapseLabel": "✕",
-      "description": "",
+      "description": "Erkännanden",
       "label": "i"
     },
     "bboxSelect": {
@@ -232,14 +232,14 @@
     "displayLimit": {
       "message": "",
       "showAnyway": "Visa ändå",
-      "title": ""
+      "title": "Stor datamängd"
     },
-    "fit": "",
+    "fit": "Anpassa till utsträckning",
     "layers": {
       "base": "Bas lager",
       "footprint": "Fotavtryck",
       "title": "Lager",
-      "unnamed": ""
+      "unnamed": "Namnlös #{id}"
     },
     "location": {
       "description": ""
@@ -266,7 +266,7 @@
     "andMore": "",
     "deselectLabel": "",
     "keywordsPlaceholder": "",
-    "placeholder": "",
+    "placeholder": "Välj alternativ",
     "selectLabel": "",
     "selectedLabel": "Markerad"
   },
@@ -292,8 +292,8 @@
     "azure": "",
     "file": "",
     "ftp": "FTP",
-    "gcs": "",
-    "oss": "",
+    "gcs": "Google Cloud",
+    "oss": "Alibaba Cloud",
     "s3": {
       "amazonaws.com": "Amazon S3",
       "default": "S3"
@@ -326,9 +326,9 @@
       "addValue": "",
       "helpText": ""
     },
-    "arrayContains": "",
+    "arrayContains": "Innehåller alla",
     "arrayContainsDescription": "",
-    "arrayContainedBy": "",
+    "arrayContainedBy": "Är undergrupp av",
     "arrayContainedByDescription": "",
     "arrayEquals": "",
     "arrayEqualsDescription": "",
@@ -349,7 +349,7 @@
     "freeTextDescription": "",
     "greaterThan": "större än",
     "greaterThanEqual": "större än eller lika med",
-    "in": "",
+    "in": "inkluderad i",
     "inOperatorDescription": "",
     "itemIds": "Objekt-ID",
     "itemsPerPage": "Objekt per sida",
@@ -373,7 +373,7 @@
     "notFullySupported": "",
     "notSupported": "Sökning stöds inte av tjänsteleverantören.",
     "placeholder": "Sök...",
-    "removeDate": "",
+    "removeDate": "Radera datum",
     "selectCollections": "Välj kataloger...",
     "selectDateRange": "Välj datumintervall...",
     "selectForItemSearch": "",
@@ -429,7 +429,7 @@
       "x": "X (Twitter)"
     },
     "stacExtension": "",
-    "stacVersion": "",
+    "stacVersion": "Version av STAC",
     "statistics": "Statistik",
     "title": "Datakälla",
     "valid": "Kompatibel",
@@ -437,7 +437,7 @@
     "validationNA": "inte tillgänglig",
     "validationParams": {
       "additionalProperty": "",
-      "allowedValue": "",
+      "allowedValue": "tillåtet värde",
       "allowedValues": "",
       "comparison": "jämförelse",
       "depsCount": "antal",
@@ -445,16 +445,16 @@
       "failingKeyword": "",
       "format": "format",
       "i": "första objekt",
-      "j": "",
+      "j": "andra objekt",
       "limit": "gräns",
       "maxContains": "",
       "minContains": "",
       "missingProperty": "",
-      "multipleOf": "",
+      "multipleOf": "multipel av",
       "passingSchemas": "",
       "pattern": "mönster",
       "property": "egenskap",
-      "propertyName": "",
+      "propertyName": "namn på egenskap",
       "type": "typ"
     },
     "validationReport": {
@@ -466,7 +466,7 @@
   "stacAssets": "",
   "stacCatalog": "",
   "stacCollection": "",
-  "stacItem": "",
+  "stacItem": "Artikel | Artiklar",
   "submit": "Skicka",
   "switchToDarkMode": "Byt till mörkt läge",
   "switchToLightMode": "Byt till ljust läge",
