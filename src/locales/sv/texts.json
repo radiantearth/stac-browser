@@ -204,7 +204,7 @@
     "noUndo": "",
     "unsavedChangesLeave": "",
     "unsavedChangesTitle": "",
-    "validate": ""
+    "validate": "Validera"
   },
   "map": "Karta",
   "mapping": {
@@ -252,7 +252,7 @@
         "label": "+"
       },
       "out": {
-        "description": "",
+        "description": "Zooma ut",
         "label": "–"
       }
     }
@@ -268,7 +268,7 @@
     "keywordsPlaceholder": "",
     "placeholder": "",
     "selectLabel": "",
-    "selectedLabel": ""
+    "selectedLabel": "Markerad"
   },
   "open": "Öppna",
   "pagination": {
@@ -317,7 +317,7 @@
   "reset": "Återställ",
   "search": {
     "addCollections": "Lägg till med Enter-tangenten",
-    "addDate": "",
+    "addDate": "Lägg till datum",
     "addFilter": "Lägg till filter",
     "additionalFilters": "Ytterligare filter",
     "addItemIds": "Lägg till objekt-ID med Enter-tangenten",
@@ -453,7 +453,7 @@
       "multipleOf": "",
       "passingSchemas": "",
       "pattern": "mönster",
-      "property": "",
+      "property": "egenskap",
       "propertyName": "",
       "type": "typ"
     },
