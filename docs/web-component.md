@@ -125,6 +125,15 @@ is still initializing are applied once it is ready.
   URL, e.g. `el.navigateToStac('https://example.com/collections/foo')`. URLs
   outside the configured catalog require `allowExternalAccess`. Returns the
   router's navigation promise.
+- `setData(data, url)` — show custom STAC data (a plain object, not a JSON
+  string) as if it had been loaded from `url`: the data is migrated to the
+  latest STAC version, cached under that URL and displayed; relative links
+  resolve against it and clicking them browses on as usual. Calling it again
+  with the same URL updates the view in place, e.g. for an editor live preview:
+
+  ```js
+  el.setData(collectionJson, 'https://example.com/collections/draft');
+  ```
 
 ## Reading the current content
 

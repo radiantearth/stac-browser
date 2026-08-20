@@ -348,6 +348,44 @@ test.describe('<stac-browser> web component', () => {
     expect(events.at(-1).data.title).toBe(catalogTitle);
   });
 
+  test('renders custom data set via setData() and updates it in place', async ({ page, worker }) => {
+    await embed(page, worker);
+    await expect(page.getByRole('heading', { name: new RegExp(catalogTitle, 'i') })).toBeVisible();
+
+    // No server serves this URL: the data must come from the injection alone.
+    const customUrl = 'https://stac.example/wc/live.json';
+    const custom = {
+      type: 'Collection',
+      stac_version: '1.0.0',
+      id: 'live-preview',
+      title: 'Live Preview',
+      description: 'Injected by the host',
+      license: 'CC0-1.0',
+      extent: { spatial: { bbox: [[-10, -10, 10, 10]] }, temporal: { interval: [[null, null]] } },
+      links: []
+    };
+    await page.locator('stac-browser').evaluate(async (el, { custom, customUrl }) => {
+      el.dataset.instance = 'first';
+      await el.setData(custom, customUrl);
+    }, { custom, customUrl });
+    await expect(page.getByRole('heading', { name: /Live Preview/i })).toBeVisible();
+
+    // Setting data for the same URL updates in place, without a reload.
+    await page.locator('stac-browser').evaluate(async (el, { custom, customUrl }) => {
+      await el.setData({ ...custom, title: 'Live Preview (updated)' }, customUrl);
+    }, { custom, customUrl });
+    await expect(page.getByRole('heading', { name: /Live Preview \(updated\)/i })).toBeVisible();
+
+    const state = await page.locator('stac-browser').evaluate((el) => ({
+      sameInstance: el.dataset.instance === 'first',
+      url: el.url,
+      bbox: el.data?.extent?.spatial?.bbox
+    }));
+    expect(state.sameInstance).toBe(true);
+    expect(state.url).toBe(customUrl);
+    expect(state.bbox).toEqual([[-10, -10, 10, 10]]);
+  });
+
   test('exposes a navigateToStac() method that maps a STAC URL to a route', async ({ page, worker }) => {
     await embed(page, worker);
     await expect(page.getByRole('heading', { name: new RegExp(catalogTitle, 'i') })).toBeVisible();
