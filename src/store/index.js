@@ -946,6 +946,18 @@ function getStore(config, router, i18n) {
           });
         }
       },
+      // Shows the given STAC data as if it had been loaded from the given URL:
+      // migrated, cached under the URL, links resolving against it. Used by the
+      // web component's setData; re-injecting an already shown URL refreshes it.
+      // eslint-disable-next-line require-await
+      async injectData(cx, { data, url }) {
+        url = toAbsolute(url, cx.state.url);
+        cx.commit('clear', url);
+        cx.commit('loaded', { url, data: createSTAC(data, url, cx) });
+        if (cx.state.url === url) {
+          cx.commit('showPage', { url });
+        }
+      },
       async load(cx, args) {
         let {
           url, // URL to load

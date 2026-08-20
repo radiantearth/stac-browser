@@ -356,6 +356,19 @@ export class StacBrowserElement extends HTMLElement {
     });
   }
 
+  // Show custom STAC data (a plain object) as if it had been loaded from url:
+  // it is migrated, cached under that url and displayed, with links resolving
+  // against it and browsing continuing as usual. Calling it again with the same
+  // url updates the view in place (e.g. for an editor live preview).
+  setData(data, url) {
+    const copy = structuredClone(data);
+    return this._whenReady(async () => {
+      const { router, store } = this._instance;
+      await store.dispatch('injectData', { data: copy, url });
+      return router.push(store.getters.toBrowserPath(url));
+    });
+  }
+
   _emit(type, detail) {
     this.dispatchEvent(new CustomEvent(type, { bubbles: true, composed: true, detail }));
   }
