@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Configurable via attributes (`url`, `catalog-title`, `locale`, `history-mode`, `isolation`) and a `config` DOM property
   - Emits `navigate`, `title`, `description`, `locale`, `structuredData` and `error` events so the host page can react
     and manage its own document head
-  - Exposes a `navigate(path)` method for programmatic navigation
+  - Exposes `navigate(to)` and `navigateToStac(url)` methods for programmatic navigation by route or STAC URL
   - Themeable from the host by forwarding Bootstrap CSS custom properties (e.g. `--bs-primary`) into the shadow root;
     the site header follows the primary color and can be styled independently via `--sb-header` and `--sb-header-color`
   - `isolation` option: `inline` (default — grows with the host page, overlays span it, and it inherits the host's

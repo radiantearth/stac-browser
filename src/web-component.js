@@ -312,15 +312,28 @@ export class StacBrowserElement extends HTMLElement {
     }
   }
 
-  navigate(path) {
+  // Runs fn once initialization finished, so calls made while the async
+  // connectedCallback is pending aren't lost; always returns a promise.
+  _whenReady(fn) {
     if (this._instance) {
-      return this._instance.router.push(path);
+      return Promise.resolve(fn());
     }
-    // Called before init finished (or after disconnect): resolve once ready,
-    // so the call isn't silently lost, and always return a promise.
-    return Promise.resolve(this._ready).then(
-      () => this._instance ? this._instance.router.push(path) : undefined
-    );
+    return Promise.resolve(this._ready).then(() => this._instance ? fn() : undefined);
+  }
+
+  // Navigate to a route: a browser path ('/search', '/external/…') or a
+  // vue-router location object ({ name, params }).
+  navigate(to) {
+    return this._whenReady(() => this._instance.router.push(to));
+  }
+
+  // Navigate to a STAC catalog, collection or item by its URL. External URLs
+  // require the allowExternalAccess config option.
+  navigateToStac(url) {
+    return this._whenReady(() => {
+      const { router, store } = this._instance;
+      return router.push(store.getters.toBrowserPath(url));
+    });
   }
 
   _emit(type, detail) {

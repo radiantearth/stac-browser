@@ -109,9 +109,17 @@ head or these events — reacts to it.
 
 ## Methods
 
-- `navigate(path)` — navigate the embedded browser programmatically, e.g.
-  `el.navigate('/')` to go back to the root. Returns the router's navigation
-  promise.
+All methods can be called right after creating the element; calls made while it
+is still initializing are applied once it is ready.
+
+- `navigate(to)` — navigate the embedded browser programmatically, e.g.
+  `el.navigate('/')` to go back to the root or `el.navigate('/search')`. Accepts
+  anything the router accepts: a browser path or a location object
+  (`{ name, params }`). Returns the router's navigation promise.
+- `navigateToStac(url)` — navigate to a STAC catalog, collection or item by its
+  URL, e.g. `el.navigateToStac('https://example.com/collections/foo')`. URLs
+  outside the configured catalog require `allowExternalAccess`. Returns the
+  router's navigation promise.
 
 ## Embedded mode
 
