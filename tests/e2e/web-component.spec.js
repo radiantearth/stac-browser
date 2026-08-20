@@ -325,4 +325,16 @@ test.describe('<stac-browser> web component', () => {
     });
     expect(ok).toBe(true);
   });
+
+  test('exposes a navigateToStac() method that maps a STAC URL to a route', async ({ page, worker }) => {
+    await embed(page, worker);
+    await expect(page.getByRole('heading', { name: new RegExp(catalogTitle, 'i') })).toBeVisible();
+
+    // Leave the catalog page, then come back via the STAC URL.
+    await page.evaluate(() => document.querySelector('stac-browser').navigate('/search'));
+    await expect(page.getByRole('heading', { name: new RegExp(catalogTitle, 'i') })).not.toBeVisible();
+
+    await page.evaluate((url) => document.querySelector('stac-browser').navigateToStac(url), catalogUrl);
+    await expect(page.getByRole('heading', { name: new RegExp(catalogTitle, 'i') })).toBeVisible();
+  });
 });
