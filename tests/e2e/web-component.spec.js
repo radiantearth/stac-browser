@@ -31,7 +31,7 @@ test.describe('<stac-browser> web component', () => {
     // The element's events are bubbling and composed, so capture them at the
     // document level (the demo page itself does not expose any test hooks).
     await page.addInitScript(() => {
-      window.__events = { navigate: [], title: [], description: [], locale: [], structuredData: [] };
+      window.__events = { navigate: [], data: [], title: [], description: [], locale: [], structuredData: [] };
       for (const type of Object.keys(window.__events)) {
         document.addEventListener(type, (e) => window.__events[type].push(e.detail));
       }
@@ -324,6 +324,28 @@ test.describe('<stac-browser> web component', () => {
       return true;
     });
     expect(ok).toBe(true);
+  });
+
+  test('exposes the displayed url and data via getters and a data event', async ({ page, worker }) => {
+    await embed(page, worker);
+    await expect(page.getByRole('heading', { name: new RegExp(catalogTitle, 'i') })).toBeVisible();
+
+    const current = await page.locator('stac-browser').evaluate((el) => ({
+      url: el.url,
+      id: el.data?.id,
+      title: el.data?.title,
+      // The copy is detached: mutating it must not affect the browser.
+      mutated: (() => { const d = el.data; d.title = 'hacked'; return el.data.title; })()
+    }));
+    expect(current.url).toBe(catalogUrl);
+    expect(current.title).toBe(catalogTitle);
+    expect(current.mutated).toBe(catalogTitle);
+
+    // The data event delivered the same content to the host.
+    const events = await page.evaluate(() => window.__events.data.filter((e) => e.data));
+    expect(events.length).toBeGreaterThan(0);
+    expect(events.at(-1).url).toBe(catalogUrl);
+    expect(events.at(-1).data.title).toBe(catalogTitle);
   });
 
   test('exposes a navigateToStac() method that maps a STAC URL to a route', async ({ page, worker }) => {

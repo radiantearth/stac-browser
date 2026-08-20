@@ -23,6 +23,7 @@ touch the host page's `document.title` or its unload handling.
 - [Configuration](#configuration)
 - [Events](#events)
 - [Methods](#methods)
+- [Reading the current content](#reading-the-current-content)
 - [Embedded mode](#embedded-mode)
 - [Isolation modes](#isolation-modes)
 - [Styling and isolation](#styling-and-isolation)
@@ -87,11 +88,15 @@ The element emits bubbling, composed `CustomEvent`s so the host page can react:
 | Event            | `detail`                       | When                                         |
 | ---------------- | ------------------------------ | -------------------------------------------- |
 | `navigate`       | `{ path, url, title }`         | On every in-app navigation.                  |
+| `data`           | `{ url, data }`                | The displayed entity changed; `data` is its STAC JSON (see [Reading the current content](#reading-the-current-content)). |
 | `title`          | the document title string      | The page title changed.                      |
 | `description`    | a summary string, or `null`    | The page description changed.                |
 | `locale`         | the UI language code           | The UI language changed.                     |
 | `structuredData` | the schema.org object, or `null` | The structured data (JSON-LD) changed.     |
 | `error`          | the global error payload       | When a global error is shown.                |
+
+Note that `navigate` fires when the route changes, while the entity's data may
+still be loading; `data` fires once it is available.
 
 ```js
 el.addEventListener('navigate', (e) => {
@@ -120,6 +125,26 @@ is still initializing are applied once it is ready.
   URL, e.g. `el.navigateToStac('https://example.com/collections/foo')`. URLs
   outside the configured catalog require `allowExternalAccess`. Returns the
   router's navigation promise.
+
+## Reading the current content
+
+The element exposes what is currently displayed:
+
+- `el.url` — the URL of the displayed STAC resource, or `null`. (The `url`
+  *attribute* is the initially configured catalog and is not updated.)
+- `el.data` — the displayed entity's STAC JSON (migrated to the latest STAC
+  version) as a plain object, or `null` while loading. It is a copy: changing it
+  does not affect the browser.
+
+```js
+el.addEventListener('data', (e) => {
+  console.log(e.detail.url, e.detail.data?.extent?.spatial?.bbox);
+});
+```
+
+The `data` event (see [Events](#events)) pushes the same information whenever
+the displayed entity changes, including when its data finishes loading after a
+`navigate` event.
 
 ## Embedded mode
 
