@@ -66,6 +66,10 @@
             <b-col cols="4">{{ $t('source.stacVersion') }}</b-col>
             <b-col>{{ stacVersion }}</b-col>
           </b-row>
+          <b-row v-if="!allowSelectCatalog" class="stac-external">
+            <b-col cols="4">{{ $t('source.externalData') }}</b-col>
+            <b-col>{{ $t(`checkbox.${isExternalContext}`) }}</b-col>
+          </b-row>
           <b-row class="stac-valid">
             <b-col cols="4">{{ $t('source.valid') }}</b-col>
             <b-col>
@@ -135,8 +139,8 @@ export default {
     };
   },
   computed: {
-    ...mapState(['data', 'socialSharing', 'url']),
-    ...mapGetters(['toBrowserPath', 'collectionLink', 'parentLink', 'rootLink']),
+    ...mapState(['allowSelectCatalog', 'data', 'socialSharing', 'url']),
+    ...mapGetters(['isExternalContext', 'toBrowserPath', 'collectionLink', 'parentLink', 'rootLink']),
     ...mapGetters('manager', ['browserPaths', 'canEdit', 'canDelete', 'canManage', 'canAddCollections', 'canAddItems', 'externalCreateLink', 'externalEditLink']),
     stacVersion() {
       return this.data?.stac_version;
@@ -201,5 +205,9 @@ export default {
     padding-top: 0.1rem;
     padding-bottom: 0.1rem;
     font-size: 0.7rem;
+}
+
+#popover-link .row + .row {
+    margin-top: 0.25rem;
 }
 </style>

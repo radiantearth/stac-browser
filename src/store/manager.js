@@ -54,12 +54,12 @@ export default function getStore(config) {
       },
       supportsCollectionTransactions(state, getters, rootState, rootGetters) {
         return rootGetters.supportsConformance(
-          TRANSACTION_COLLECTION_CONFORMANCE
+          TRANSACTION_COLLECTION_CONFORMANCE, rootState.data
         );
       },
       supportsItemTransactions(state, getters, rootState, rootGetters) {
         return rootGetters.supportsConformance(
-          TRANSACTION_ITEM_CONFORMANCE
+          TRANSACTION_ITEM_CONFORMANCE, rootState.data
         );
       },
       browserPaths(state, getters, rootState, rootGetters) {

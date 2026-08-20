@@ -157,7 +157,8 @@
   },
   "goBack": {
     "description": "Go back to the {type}",
-    "label": "Back"
+    "label": "Back",
+    "refererDescription": "Go back to the last visited page in the catalog"
   },
   "goToCollection": {
     "description": "Go to the associated collection",
@@ -405,6 +406,7 @@
     "conformanceClasses": "Conformance Classes",
     "detailsAboutSource": "Details about the STAC source",
     "extension": "Extension",
+    "externalData": "External data source",
     "fileFormat": "File Format",
     "id": "ID",
     "invalid": "Invalid",

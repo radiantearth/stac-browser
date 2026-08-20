@@ -194,7 +194,7 @@ export default {
         if (!classes) {
           return false;
         }
-        return rootGetters.supportsConformance(classes);
+        return rootGetters.supportsConformance(classes, collection);
       };
 
       const dropped = [];
@@ -258,8 +258,8 @@ export default {
           queryable: { id: f.queryable?.id, title: f.queryable?.title },
         });
         const cqlMode = {
-          textMode: rootGetters.supportsConformance(CQL_TEXT),
-          jsonMode: rootGetters.supportsConformance(CQL_JSON),
+          textMode: rootGetters.supportsConformance(CQL_TEXT, collection),
+          jsonMode: rootGetters.supportsConformance(CQL_JSON, collection),
         };
         if (!supports('CqlFilters') || (!cqlMode.textMode && !cqlMode.jsonMode)) {
           source.rawFilters.forEach(f => dropped.push(describeCqlDrop(f)));
