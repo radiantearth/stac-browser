@@ -18,10 +18,10 @@ export default function manageDocumentHead(store, router, i18n) {
   }, { immediate: true });
 
   store.watch(() => pageDescription(store), (description) => {
-    if (description) {
-      setMeta('meta-description', description);
-      setMeta('og-description', description);
-    }
+    // Clear with '' when a page has no description, so the previous page's
+    // description doesn't stick around.
+    setMeta('meta-description', description || '');
+    setMeta('og-description', description || '');
   }, { immediate: true });
 
   store.watch(() => pageLocale(store), (locale) => {

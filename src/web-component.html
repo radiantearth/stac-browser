@@ -193,13 +193,13 @@
       const jsonError = document.getElementById('jsonError');
       document.getElementById('customData').addEventListener('click', () => jsonDialog.showModal());
       document.getElementById('jsonCancel').addEventListener('click', () => jsonDialog.close());
-      document.getElementById('showJson').addEventListener('click', () => {
+      document.getElementById('showJson').addEventListener('click', async () => {
         const browser = main.querySelector('stac-browser');
         if (!browser) {
           return;
         }
         try {
-          browser.setData(JSON.parse(json.value), document.getElementById('jsonUrl').value);
+          await browser.setData(JSON.parse(json.value), document.getElementById('jsonUrl').value);
           jsonError.hidden = true;
           jsonDialog.close();
         } catch (error) {
