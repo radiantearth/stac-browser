@@ -16,8 +16,8 @@ and defeat the isolation.
 
 The element renders into a **shadow root**, so its styles are isolated from the
 host page and vice versa. It runs STAC Browser in [embedded mode](#embedded-mode):
-it routes in-memory (it never changes the host page's address bar) and does not
-touch the host page's `document.title` or its unload handling.
+it routes in-memory (it never changes the host page's address bar), does not
+touch the host page's `document.title` and never blocks it from navigating away.
 
 - [Building the bundle](#building-the-bundle)
 - [Configuration](#configuration)
@@ -96,7 +96,9 @@ The element emits bubbling, composed `CustomEvent`s so the host page can react:
 | `error`          | the global error payload       | When a global error is shown.                |
 
 Note that `navigate` fires when the route changes, while the entity's data may
-still be loading; `data` fires once it is available.
+still be loading; `data` fires once it is available. Its `url` is the STAC URL
+the path corresponds to; for app pages that don't show a STAC resource (e.g.
+`/search`) it is `null`.
 
 ```js
 el.addEventListener('navigate', (e) => {
@@ -165,8 +167,16 @@ In embedded mode STAC Browser:
 - routes with `historyMode: 'memory'` by default, so the host page's URL is never
   touched (override with the `history-mode` attribute if you want URL syncing);
 - does not set `document.title` (the host page owns the tab title);
-- does not install the `beforeunload` download guard (it must not block the host
-  page from navigating away).
+- never blocks the host page from navigating away: the `beforeunload` download
+  guard is not installed and the editor's unsaved-changes prompt is disabled
+  (drafts still preserve unsaved edits).
+
+Authentication note: OpenID Connect (`openIdConnect`) requires a redirect back to
+a real page URL and is therefore only available with `historyMode: 'history'`. In
+the default `memory` mode it is not offered, since the memory router has no host
+URL for the identity provider to redirect to. HTTP Basic and API-key schemes work
+in all modes. To use OIDC in an embedded browser, set `history-mode="history"` and
+make sure the host serves the browser's `/auth` callback routes.
 
 ## Isolation modes
 
@@ -194,10 +204,16 @@ viewport when the element connects, so switch it by re-creating the element.
 
 ## Styling and isolation
 
-The element renders into a shadow root and injects its stylesheet there, so host
-page styles do not affect STAC Browser and STAC Browser's styles (Bootstrap
-included) do not leak into the host page. Popovers, tooltips, dropdowns, modals
-and the sidebar are teleported inside the shadow root so they stay isolated too.
+The element renders into a shadow root and injects its stylesheet there, so the
+host page's selectors and STAC Browser's styles (Bootstrap included) do not cross
+the boundary in either direction: host rules don't match elements inside, and
+STAC Browser's rules don't leak out. Popovers, tooltips, dropdowns, modals and
+the sidebar are teleported inside the shadow root so they stay isolated too.
+
+Inherited CSS properties are the exception: in the default `inline` mode STAC
+Browser deliberately inherits typography and colors from the host page (see
+below), so those properties do cross the boundary by design. `isolated` mode
+re-applies its own base styles and does not inherit them.
 
 There is no `<body>` inside the shadow root to carry the base page styles
 (background, text color and typography). In [`isolated`](#isolation-modes) mode

@@ -56,13 +56,6 @@ export default {
             this.loading = false;
           }
         }
-
-        if (visible) {
-          document.body.classList.add("sidebar");
-        }
-        else {
-          document.body.classList.remove("sidebar");
-        }
       }
     },
     $route() {

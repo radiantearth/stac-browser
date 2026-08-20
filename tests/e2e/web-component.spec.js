@@ -55,8 +55,14 @@ test.describe('<stac-browser> web component', () => {
   test('routes in memory without touching the host address bar', async ({ page, worker }) => {
     await embed(page, worker);
     await expect(page.getByRole('heading', { name: new RegExp(catalogTitle, 'i') })).toBeVisible();
+    const hostUrl = page.url();
+
+    // Navigate within the component and wait until the new route rendered.
+    await page.evaluate(() => document.querySelector('stac-browser').navigate('/search'));
+    await expect(page.getByRole('heading', { name: new RegExp(catalogTitle, 'i') })).not.toBeVisible();
 
     // The host page URL never changed to a STAC Browser path.
+    expect(page.url()).toBe(hostUrl);
     expect(new URL(page.url()).pathname).toBe(HOST_PATH);
   });
 

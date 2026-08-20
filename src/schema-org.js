@@ -5,6 +5,11 @@ import { getDisplayTitle } from './models/stac';
 import { STAC } from 'stac-js';
 
 function toBrowserUrl(url, store) {
+  // In memory mode (e.g. embedded as a web component) there are no addressable
+  // browser routes under window.location, so return the STAC URL as-is.
+  if (store.state.historyMode === 'memory') {
+    return url;
+  }
   let path = store.getters.toBrowserPath(url);
   let uri = URI(window.location.origin.toString());
   if (store.state.historyMode === 'hash') {

@@ -68,6 +68,17 @@ export class StacBrowserElement extends HTMLElement {
     this._upgradeProperty('config');
   }
 
+  // Deferred that settles once an instance is mounted; created lazily so calls
+  // made before the first connect have something to await.
+  _ensureReady() {
+    if (!this._ready) {
+      let resolve;
+      const promise = new Promise((res) => { resolve = res; });
+      this._ready = { promise, resolve };
+    }
+    return this._ready;
+  }
+
   _upgradeProperty(prop) {
     if (Object.prototype.hasOwnProperty.call(this, prop)) {
       const value = this[prop];
@@ -140,8 +151,7 @@ export class StacBrowserElement extends HTMLElement {
     // lets an async init that is superseded by a disconnect or a newer connect
     // bail out instead of mounting into a stale/cleared mount point.
     const generation = ++this._generation;
-    let resolveReady;
-    this._ready = new Promise((resolve) => { resolveReady = resolve; });
+    const ready = this._ensureReady();
 
     const config = cloneConfig(Object.assign(
       {},
@@ -192,7 +202,9 @@ export class StacBrowserElement extends HTMLElement {
       navigated = true;
       this._emit('navigate', {
         path: to.fullPath,
-        url: typeof store.getters.fromBrowserPath === 'function' ? store.getters.fromBrowserPath(to.path) : null,
+        // Only browse paths encode a STAC URL; mapping app pages (/search,
+        // /favorites, …) would fabricate one under the catalog URL.
+        url: to.name === 'browse' ? store.getters.fromBrowserPath(to.path) : null,
         title: store.getters.title || null
       });
     };
@@ -241,7 +253,7 @@ export class StacBrowserElement extends HTMLElement {
     // Replay options set while init was pending (the setter/attr callback bailed
     // with no instance yet).
     this._applyConfig({ ...this._attributeConfig(), ...this._configProp });
-    resolveReady();
+    ready.resolve();
   }
 
   // Styles must live inside the shadow root. The built bundle extracts them next
@@ -315,6 +327,13 @@ export class StacBrowserElement extends HTMLElement {
       this._instance = null;
     }
     this._mountPoint = null;
+    // Settle a still-pending deferred (disconnected mid-init) so waiting method
+    // calls resolve (to undefined) instead of hanging forever, and drop it so
+    // the next connect starts a fresh one.
+    if (this._ready) {
+      this._ready.resolve();
+      this._ready = null;
+    }
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
@@ -338,7 +357,7 @@ export class StacBrowserElement extends HTMLElement {
     if (this._instance) {
       return Promise.resolve(fn());
     }
-    return Promise.resolve(this._ready).then(() => this._instance ? fn() : undefined);
+    return this._ensureReady().promise.then(() => this._instance ? fn() : undefined);
   }
 
   // Navigate to a route: a browser path ('/search', '/external/…') or a

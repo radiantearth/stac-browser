@@ -952,8 +952,11 @@ function getStore(config, router, i18n) {
       // eslint-disable-next-line require-await
       async injectData(cx, { data, url }) {
         url = toAbsolute(url, cx.state.url);
+        // Convert before clearing: if migration/preprocessing throws, the URL's
+        // existing cache entry stays intact.
+        const stac = createSTAC(data, url, cx);
         cx.commit('clear', url);
-        cx.commit('loaded', { url, data: createSTAC(data, url, cx) });
+        cx.commit('loaded', { url, data: stac });
         if (cx.state.url === url) {
           cx.commit('showPage', { url });
         }
