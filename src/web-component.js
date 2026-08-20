@@ -34,6 +34,11 @@ function cloneConfig(value) {
   return value;
 }
 
+// Plain-object copy of a stac-js entity's migrated JSON, or null.
+function cloneStacData(data) {
+  return data && typeof data.toJSON === 'function' ? structuredClone(data.toJSON()) : null;
+}
+
 const browserVersion = typeof STAC_BROWSER_VERSION !== 'undefined' ? STAC_BROWSER_VERSION : null;
 
 export class StacBrowserElement extends HTMLElement {
@@ -81,6 +86,18 @@ export class StacBrowserElement extends HTMLElement {
 
   get config() {
     return this._configProp;
+  }
+
+  // URL of the currently displayed STAC resource (the `url` attribute is the
+  // initially configured catalog), or null.
+  get url() {
+    return this._instance?.store.state.url || null;
+  }
+
+  // Migrated STAC JSON of the currently displayed entity as a plain object
+  // (a copy, detached from internal state), or null.
+  get data() {
+    return cloneStacData(this._instance?.store.state.data);
   }
 
   // Apply the live subset of a config object to a running instance. locale needs
@@ -205,6 +222,9 @@ export class StacBrowserElement extends HTMLElement {
     watchEmit(() => pageTitle(store, i18n), 'title');
     watchEmit(() => pageDescription(store), 'description');
     watchEmit(() => pageLocale(store), 'locale');
+    this._unwatchers.push(store.watch(() => store.state.data, (data) => {
+      this._emit('data', { url: store.state.url || null, data: cloneStacData(data) });
+    }, { immediate: true }));
     this._unwatchers.push(store.watch(() => store.state.data, () => {
       let schema = null;
       try {
