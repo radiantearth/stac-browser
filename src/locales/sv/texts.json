@@ -263,7 +263,7 @@
     "title": "Metadata"
   },
   "multiselect": {
-    "andMore": "",
+    "andMore": "och {count} mer",
     "deselectLabel": "",
     "keywordsPlaceholder": "",
     "placeholder": "Välj alternativ",
@@ -449,7 +449,7 @@
       "limit": "gräns",
       "maxContains": "",
       "minContains": "",
-      "missingProperty": "",
+      "missingProperty": "saknad egenskap",
       "multipleOf": "multipel av",
       "passingSchemas": "",
       "pattern": "mönster",
@@ -464,7 +464,7 @@
     }
   },
   "stacAssets": "",
-  "stacCatalog": "",
+  "stacCatalog": "Katalog | Kataloger",
   "stacCollection": "",
   "stacItem": "Artikel | Artiklar",
   "submit": "Skicka",
