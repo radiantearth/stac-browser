@@ -386,6 +386,17 @@ test.describe('<stac-browser> web component', () => {
     expect(state.bbox).toEqual([[-10, -10, 10, 10]]);
   });
 
+  test('the demo shows the JSON from its custom-data dialog', async ({ page, worker }) => {
+    await embed(page, worker);
+    await expect(page.getByRole('heading', { name: new RegExp(catalogTitle, 'i') })).toBeVisible();
+
+    await page.locator('#customData').click();
+    await expect(page.locator('#jsonDialog')).toBeVisible();
+    await page.locator('#showJson').click();
+    await expect(page.locator('#jsonDialog')).not.toBeVisible();
+    await expect(page.getByRole('heading', { name: /Live Preview/i })).toBeVisible();
+  });
+
   test('exposes a navigateToStac() method that maps a STAC URL to a route', async ({ page, worker }) => {
     await embed(page, worker);
     await expect(page.getByRole('heading', { name: new RegExp(catalogTitle, 'i') })).toBeVisible();
