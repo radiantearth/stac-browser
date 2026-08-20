@@ -102,9 +102,23 @@ export default defineConfig(async ({ mode }) => {
     Object.entries(env).filter(([k]) => k !== "RUNTIME")
   );
 
+  const isElement = mode === "element";
   return ({
-    base: runtime ? "./" : config.pathPrefix,
-    build: {
+    base: isElement ? "./" : (runtime ? "./" : config.pathPrefix),
+    build: isElement ? {
+      lib: {
+        entry: fileURLToPath(new URL("./src/web-component.js", import.meta.url)),
+        formats: ["es"],
+        fileName: () => "stac-browser.js",
+      },
+      sourcemap: true,
+      // In e2e, the element bundle is built into the same dir as the standalone
+      // app (built first) so `vite preview` can serve both; don't wipe it.
+      emptyOutDir: process.env.STAC_BROWSER_E2E !== "true",
+      rollupOptions: {
+        external: ["fs/promises"],
+      },
+    } : {
       sourcemap: mode !== "minimal",
       rollupOptions: {
         external: ["fs/promises"],

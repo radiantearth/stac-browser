@@ -17,8 +17,8 @@ export default {
     AuthImage
   },
   computed: {
-    ...mapState(['catalogImage', 'catalogTitle', 'catalogTitleAfterImage', 'description', 'loading', 'url', 'uiLanguage']),
-    ...mapGetters(['description', 'root', 'rootLink', 'title']),
+    ...mapState(['catalogImage', 'catalogTitle', 'catalogTitleAfterImage', 'loading', 'url']),
+    ...mapGetters(['root', 'rootLink']),
     logo() {
       if (this.catalogImage) {
         return Utils.createLink(this.catalogImage, 'icon', this.catalogTitle || this.rootLink?.title);
@@ -52,54 +52,6 @@ export default {
         // To change this default title, add "STAC Browser": "Your Title" to the custom.json locale file
         return this.fallbackTitle;
       }
-    },
-    documentTitle() {
-      const titles = new Set();
-      if (this.title) {
-        titles.add(this.title);
-      }
-      if (this.longTitle) {
-        titles.add(this.longTitle);
-      }
-      return Array.from(titles).join(' - ');
-    }
-  },
-  watch: {
-    documentTitle: {
-      immediate: true,
-      handler(documentTitle) {
-        const title = documentTitle || this.fallbackTitle;
-        document.title = title;
-        document.getElementById('og-title').setAttribute("content", title);
-      }
-    },
-    description: {
-      immediate: true,
-      handler(description) {
-        if (!description) {
-          return;
-        }
-        const summary = Utils.summarizeMd(description, 200);
-        document.getElementById('meta-description').setAttribute("content", summary);
-        document.getElementById('og-description').setAttribute("content", summary);
-      }
-    },
-    uiLanguage: {
-      immediate: true,
-      handler(locale) {
-        if (!locale) {
-          return;
-        }
-
-        // Update the HTML lang tag
-        document.documentElement.setAttribute("lang", locale);
-        document.getElementById('og-locale').setAttribute("content", locale);
-      }
-    },
-  },
-  methods: {
-    updateUrl() {
-      document.getElementById('og-url').setAttribute("content", window.location.href);
     }
   }
 };

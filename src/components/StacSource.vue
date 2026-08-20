@@ -35,12 +35,14 @@
       </b-dropdown>
       <b-button
         v-if="url" size="sm" variant="outline-primary" id="popover-link-btn"
+        :ref="el => setTriggerRef('linkTriggerEl', el)"
         :title="$t('source.detailsAboutSource')" tag="a" tabindex="0"
       >
         <b-icon-info-lg /><span class="button-label">{{ $t('source.label') }}</span>
       </b-button>
       <b-button
         size="sm" variant="outline-primary" id="popover-share-btn"
+        :ref="el => setTriggerRef('shareTriggerEl', el)"
         :title="$t('source.share.withOthers')" tag="a" tabindex="0"
       >
         <b-icon-share /><span class="button-label">{{ $t('source.share.title') }}</span>
@@ -48,8 +50,8 @@
     </b-button-group>
 
     <b-popover
-      v-if="url" id="popover-link" class="popover-large" target="popover-link-btn"
-      placement="bottom" :title="$t('source.title')" teleport-to="#stac-browser" strategy="fixed"
+      v-if="url" id="popover-link" class="popover-large" :target="triggerRefs.linkTriggerEl"
+      placement="bottom" :title="$t('source.title')" strategy="fixed"
       click focus :boundary-padding="10"
       v-model="popoverLinkVisible"
     >
@@ -78,8 +80,8 @@
       </template>
     </b-popover>
     <b-popover
-      id="popover-share" class="popover-large" target="popover-share-btn"
-      placement="bottom" :title="$t('source.share.title')" teleport-to="#stac-browser" strategy="fixed"
+      id="popover-share" class="popover-large" :target="triggerRefs.shareTriggerEl"
+      placement="bottom" :title="$t('source.share.title')" strategy="fixed"
       click focus :boundary-padding="10"
     >
       <Url id="browserUrl" :url="browserUrl()" :label="$t('source.share.sharePageWithOthers')" :open="false" />
@@ -106,6 +108,7 @@ import { BDropdown, BDropdownItem } from 'bootstrap-vue-next';
 import Url from './Url.vue';
 import CopyButton from './CopyButton.vue';
 import SocialSharing from './SocialSharing.vue';
+import TriggerRefMixin from './TriggerRefMixin';
 import { getErrorMessage } from '../store/utils.js';
 
 export default {
@@ -121,6 +124,7 @@ export default {
     StacActions: defineAsyncComponent(() => import('./StacActions.vue')),
     Validation: defineAsyncComponent(() => import('./Validation.vue'))
   },
+  mixins: [TriggerRefMixin],
   props: {
     title: {
       type: String,
@@ -177,7 +181,7 @@ export default {
         }
         this.$router.push(path);
       } catch (error) {
-        const message = getErrorMessage(error, true);
+        const message = getErrorMessage(this.$i18n, error, true);
         this.$store.commit('showGlobalError', { error, message });
       } finally {
         this.deleting = false;

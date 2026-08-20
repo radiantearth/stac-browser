@@ -320,7 +320,7 @@ export default defineComponent({
         }
       } catch (error) {
         this.data = null;
-        this.error = getErrorMessage(error);
+        this.error = getErrorMessage(this.$i18n, error);
         this.errorId = getErrorCode(error);
       } finally {
         this.loading = false;

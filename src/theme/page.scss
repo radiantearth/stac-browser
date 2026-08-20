@@ -31,6 +31,44 @@ svg {
   --bs-list-group-active-border-color: var(--bs-primary-border-subtle);
 }
 
+// Custom elements are inline by default; give <stac-browser> a block box so the
+// host can size it (required for isolated mode's scroll viewport). :host only
+// matches inside the shadow root, so this is inert in the standalone bundle.
+:host {
+  display: block;
+}
+
+// Isolated (iframe-like) mode. Inline mode deliberately styles nothing on the
+// root so the component blends into the host page (inheriting its background,
+// text color and typography); everything below applies only when isolated.
+.stac-browser-root[data-isolation="isolated"] {
+  // There is no <body> inside the shadow root, so re-apply Bootstrap's body
+  // reboot: an isolated component styles itself and must not inherit the host
+  // page's background, text color or typography.
+  background-color: var(--bs-body-bg);
+  color: var(--bs-body-color);
+  font-family: $font-family-base;
+  font-size: $font-size-base;
+  font-weight: $font-weight-base;
+  line-height: $line-height-base;
+
+  // Become its own scroll viewport and a containing block (via transform), so
+  // position: fixed overlays resolve against the component's box instead of the
+  // browser viewport and cannot span the host page. The host must give
+  // <stac-browser> a definite height for this to scroll.
+  height: 100%;
+  overflow: auto;
+  transform: translateZ(0);
+
+  // Backdrops are sized in viewport units (100vw/100vh), which ignore the
+  // containing block; pin them to the component box instead.
+  .modal-backdrop,
+  .offcanvas-backdrop {
+    width: 100%;
+    height: 100%;
+  }
+}
+
 #stac-browser {
   display: flex;
   flex-direction: column;
@@ -442,7 +480,7 @@ svg {
     align-items: center;
     gap: 0.25rem;
     padding: 0.5rem;
-    background-color: rgba($body-color, 0.03);
+    background-color: rgba(var(--bs-body-color-rgb), 0.03);
     overflow: hidden;
 
     &::after {
@@ -792,7 +830,7 @@ svg {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba($body-color, 0.5);
+  background-color: rgba(var(--bs-body-color-rgb), 0.5);
   margin: auto;
   display: flex;
   justify-content: center;

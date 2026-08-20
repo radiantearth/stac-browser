@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>STAC Browser Web Component</title>
+    <style>
+      :root { font-family: system-ui, -apple-system, sans-serif; }
+      body { margin: 0; display: flex; flex-direction: column; height: 100vh; }
+
+      /* Host chrome: header, status and sidebar stay put; only <main> scrolls. */
+      header {
+        display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem;
+        padding: 0.6rem 1rem; border-bottom: 1px solid #d0d0d0; background: #f7f7f7;
+        flex: none;
+      }
+      header h1 { margin: 0 0.75rem 0 0; font-size: 1rem; white-space: nowrap; }
+      header input[type="url"] { flex: 1; min-width: 12rem; padding: 0.4rem 0.6rem; font: inherit; }
+      header button { padding: 0.4rem 1rem; font: inherit; cursor: pointer; }
+      #status {
+        flex: none; padding: 0.3rem 1rem; font-size: 0.85rem; color: #555; background: #fafafa;
+        border-bottom: 1px solid #eee; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      }
+
+      .layout { flex: 1; min-height: 0; display: flex; }
+
+      aside {
+        flex: none; width: 16rem; padding: 1rem; overflow-y: auto;
+        border-right: 1px solid #d0d0d0; background: #fafafa;
+      }
+      aside h2, dialog h2 { margin: 0 0 1rem; font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; color: #888; }
+      .field { display: flex; flex-direction: column; gap: 0.25rem; margin-bottom: 1rem; font-size: 0.9rem; }
+      .field.inline { flex-direction: row; align-items: center; gap: 0.5rem; }
+      .field label { font-weight: 500; }
+      .field input, .field select { font: inherit; padding: 0.3rem 0.4rem; }
+      aside code { font-size: 0.85em; }
+
+      dialog {
+        border: 1px solid #d0d0d0; border-radius: 4px; padding: 1rem;
+        width: min(36rem, 90vw);
+      }
+      dialog::backdrop { background: rgba(0, 0, 0, 0.3); }
+      dialog textarea {
+        font: 0.78rem/1.4 ui-monospace, monospace; padding: 0.3rem 0.4rem;
+        width: 100%; box-sizing: border-box; resize: vertical;
+      }
+      dialog .actions { display: flex; gap: 0.5rem; justify-content: flex-end; }
+      dialog .actions button { padding: 0.4rem 1rem; font: inherit; cursor: pointer; }
+      #jsonError { color: #b00020; font-size: 0.85rem; margin: 0 0 0.75rem; }
+
+      main { flex: 1; min-width: 0; overflow: auto; }
+      main stac-browser { display: block; min-height: 100%; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>STAC Browser</h1>
+      <input id="url" type="url" placeholder="STAC catalog or API URL, e.g. https://example.com/catalog.json" value="https://earth-search.aws.element84.com/v1/">
+      <button id="load">Load</button>
+      <button id="customData">Custom JSON</button>
+    </header>
+    <div id="status">Enter a STAC URL and press Load.</div>
+
+    <div class="layout">
+      <aside>
+        <h2>Options</h2>
+        <div class="field inline">
+          <input id="dark" type="checkbox">
+          <label for="dark">Dark mode</label>
+        </div>
+        <div class="field inline">
+          <label for="primary">Primary color</label>
+          <input id="primary" type="color" value="#188191">
+        </div>
+        <div class="field">
+          <label for="cardView">Card layout</label>
+          <select id="cardView">
+            <option value="cards">Cards</option>
+            <option value="list">List</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="title">Catalog title</label>
+          <input id="title" type="text" placeholder="(use the catalog's own)">
+        </div>
+        <div class="field">
+          <label for="isolation">Isolation</label>
+          <select id="isolation">
+            <option value="inline">Inline (overlays span the page)</option>
+            <option value="isolated">Isolated (iframe-like)</option>
+          </select>
+        </div>
+      </aside>
+      <main></main>
+    </div>
+
+    <dialog id="jsonDialog">
+      <h2>Custom data</h2>
+      <div class="field">
+        <label for="json">STAC JSON</label>
+        <textarea id="json" rows="14" spellcheck="false"></textarea>
+      </div>
+      <div class="field">
+        <label for="jsonUrl">Source URL</label>
+        <input id="jsonUrl" type="url" value="https://example.com/live-preview/collection.json">
+      </div>
+      <p id="jsonError" hidden></p>
+      <div class="actions">
+        <button id="jsonCancel">Cancel</button>
+        <button id="showJson">Show</button>
+      </div>
+    </dialog>
+
+    <script type="module" src="./web-component.js"></script>
+    <script type="module">
+      const main = document.querySelector('main');
+      const status = document.getElementById('status');
+      const input = document.getElementById('url');
+      const dark = document.getElementById('dark');
+      const primary = document.getElementById('primary');
+      const cardView = document.getElementById('cardView');
+      const title = document.getElementById('title');
+      const isolation = document.getElementById('isolation');
+
+      // Runtime options applied to a running browser without reloading it.
+      // Config options go through the `config` property; the primary color is a
+      // CSS custom property forwarded into the isolated shadow root.
+      function applyOptions(browser) {
+        browser.config = {
+          enforcedColorMode: dark.checked ? 'dark' : 'light',
+          cardViewMode: cardView.value,
+          catalogTitle: title.value.trim() || null
+        };
+        const hex = primary.value;
+        const rgb = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(', ');
+        browser.style.setProperty('--bs-primary', hex);
+        browser.style.setProperty('--bs-primary-rgb', rgb);
+      }
+
+      function load() {
+        main.replaceChildren();
+        const browser = document.createElement('stac-browser');
+        if (input.value.trim()) {
+          browser.setAttribute('url', input.value.trim());
+        }
+        // Isolation is structural (it sets up the scroll viewport once), so it is
+        // applied at creation. Isolated mode needs a definite height to scroll in.
+        if (isolation.value === 'isolated') {
+          browser.setAttribute('isolation', 'isolated');
+          browser.style.height = '100%';
+        }
+        applyOptions(browser);
+
+        // React to events: log them all to the console, show the current
+        // resource in the status bar, and mirror the title to the tab.
+        for (const type of ['navigate', 'data', 'title', 'description', 'locale', 'structuredData', 'error']) {
+          browser.addEventListener(type, (e) => console.log(`stac-browser ${type}:`, e.detail));
+        }
+        browser.addEventListener('navigate', (e) => {
+          status.textContent = e.detail.url || e.detail.title || '';
+        });
+        browser.addEventListener('title', (e) => {
+          document.title = e.detail;
+        });
+
+        main.appendChild(browser);
+      }
+
+      // Options change the running browser live, without reloading the catalog.
+      function updateOptions() {
+        const browser = main.querySelector('stac-browser');
+        if (browser) {
+          applyOptions(browser);
+        }
+      }
+
+      const json = document.getElementById('json');
+      json.value = JSON.stringify({
+        type: 'Collection',
+        id: 'live-preview',
+        title: 'Live Preview',
+        description: 'Rendered from the JSON in this box, without fetching anything.',
+        license: 'CC0-1.0',
+        extent: {
+          spatial: { bbox: [[-180, -90, 180, 90]] },
+          temporal: { interval: [[null, null]] }
+        },
+        links: []
+      }, null, 2);
+
+      // Show the JSON from the dialog as if it had been loaded from the source URL.
+      const jsonDialog = document.getElementById('jsonDialog');
+      const jsonError = document.getElementById('jsonError');
+      document.getElementById('customData').addEventListener('click', () => jsonDialog.showModal());
+      document.getElementById('jsonCancel').addEventListener('click', () => jsonDialog.close());
+      document.getElementById('showJson').addEventListener('click', async () => {
+        const browser = main.querySelector('stac-browser');
+        if (!browser) {
+          return;
+        }
+        try {
+          await browser.setData(JSON.parse(json.value), document.getElementById('jsonUrl').value);
+          jsonError.hidden = true;
+          jsonDialog.close();
+        } catch (error) {
+          jsonError.textContent = String(error);
+          jsonError.hidden = false;
+        }
+      });
+
+      input.value = new URLSearchParams(location.search).get('url') ?? input.value;
+      load();
+
+      document.getElementById('load').addEventListener('click', load);
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          load();
+        }
+      });
+      dark.addEventListener('change', updateOptions);
+      primary.addEventListener('input', updateOptions);
+      cardView.addEventListener('change', updateOptions);
+      title.addEventListener('input', updateOptions);
+      isolation.addEventListener('change', load);
+    </script>
+  </body>
+</html>

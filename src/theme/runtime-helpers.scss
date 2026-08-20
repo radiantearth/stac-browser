@@ -47,7 +47,10 @@
 // CSS has no runtime equivalent of Bootstrap's color-contrast() yet, so the
 // build-time result is baked as a default and must be overridden manually in
 // runtime-style.css when the runtime color needs a different contrast color.
-:root {
+// :host is included so these tokens also exist inside the web component's shadow
+// root, where :root (the document's <html>) is out of reach.
+:root,
+:host {
   --sb-on-primary: #{color-contrast($primary)};
   --sb-on-secondary: #{color-contrast($secondary)};
 }
@@ -183,7 +186,13 @@ a {
 // Non-color parts are baked from Sass (build-time theming);
 // color parts reference var(--bs-primary) so they stay live
 // and can be overridden at runtime in runtime-style.css.
-:root {
+// :host is included so these apply inside the web component's shadow root too,
+// where :root (the document's <html>) is out of reach. Using :host (the shadow
+// host) rather than #stac-browser (the app container) keeps them inheritable, so
+// a host override forwarded onto the mount point and the dark-mode overrides set
+// on that themed container still win over these defaults.
+:root,
+:host {
   // Sizing & spacing
   --sb-header-margin: #{$header-margin};
   --sb-block-gap: #{$block-gap};

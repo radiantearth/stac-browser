@@ -1,6 +1,6 @@
 <template>
   <Loading v-if="!browserReady" fill />
-  <b-container v-else id="stac-browser">
+  <b-container v-else id="stac-browser" ref="container" :lang="uiLanguage">
     <WidgetHook id="root-start" />
     <Authentication v-if="showLogin" />
     <ErrorAlert v-if="globalError" dismissible class="global-error" v-bind="globalError" @close="hideError" />
@@ -10,26 +10,26 @@
       <b-row class="site">
         <b-col md="12">
           <nav class="actions navigation">
-            <b-button-group v-if="canSearch || !isServerSelector || showFavoritesFromVueX">
+            <b-button-group v-if="canSearch || !isServerSelector || showFavorites">
               <b-button v-if="!isServerSelector" variant="header" :title="$t('browse')" @click="sidebar = !sidebar">
                 <b-icon-list />
               </b-button>
               <b-button v-if="canSearch" variant="header" :to="searchBrowserLink" :title="$t('search.title')" :pressed="isSearchPage">
                 <b-icon-search /><span class="button-label">{{ $t('search.title') }}</span>
               </b-button>
-              <b-button v-if="showFavoritesFromVueX" variant="header" to="/favorites" :title="$t('favorites.title')" :pressed="isFavoritesPage">
+              <b-button v-if="showFavorites" variant="header" to="/favorites" :title="$t('favorites.title')" :pressed="isFavoritesPage">
                 <b-icon-star /><span class="button-label">{{ $t('favorites.title') }}</span>
               </b-button>
-              <b-button v-if="root" variant="header" id="popover-root-btn" tabindex="0">
+              <b-button v-if="root" variant="header" id="popover-root-btn" :ref="el => setTriggerRef('rootTriggerEl', el)" tabindex="0">
                 <b-icon-database /><span class="button-label">{{ serviceType }}</span>
               </b-button>
             </b-button-group>
           </nav>
           <div class="title">
             <StacLink v-if="root" :data="root">
-              <HeaderTitle ref="headerTitle" />
+              <HeaderTitle />
             </StacLink>
-            <HeaderTitle v-else ref="headerTitle" />
+            <HeaderTitle v-else />
           </div>
           <nav class="actions user">
             <b-button-group>
@@ -37,12 +37,12 @@
                 <component :is="authIcon" /><span class="button-label">{{ authLabel }}</span>
               </b-button>
               <LanguageChooser
-                v-if="supportedLocalesFromVueX.length > 1"
-                :data="data" :currentLocale="localeFromVueX" :locales="supportedLocalesFromVueX"
+                v-if="supportedLocales.length > 1"
+                :data="data" :currentLocale="locale" :locales="supportedLocales"
                 @set-locale="locale => switchLocale({locale, userSelected: true})"
               />
               <b-button
-                v-if="!enforcedColorModeFromVueX || enforcedColorModeFromVueX === 'auto'"
+                v-if="!enforcedColorMode || enforcedColorMode === 'auto'"
                 variant="header"
                 @click="toggleColorMode"
               >
@@ -82,8 +82,8 @@
     <!-- Footer -->
     <footer>
       <WidgetHook id="footer-start" />
-      <ul v-if="Array.isArray(footerLinksFromVueX) && footerLinksFromVueX.length > 0" class="footer-links text-body-secondary">
-        <li v-for="link in footerLinksFromVueX" :key="link.url">
+      <ul v-if="Array.isArray(footerLinks) && footerLinks.length > 0" class="footer-links text-body-secondary">
+        <li v-for="link in footerLinks" :key="link.url">
           <a :href="link.url" target="_blank" rel="noopener noreferrer">{{ $te(`footerLinks.${link.label}`) ? $t(`footerLinks.${link.label}`) : link.label }}</a>
         </li>
       </ul>
@@ -94,8 +94,8 @@
       </i18n-t>
     </footer>
     <b-popover
-      v-if="root" id="popover-root" class="popover-large" target="popover-root-btn"
-      placement="bottom" :title="serviceType" teleport-to="#stac-browser"
+      v-if="root" id="popover-root" class="popover-large" :target="triggerRefs.rootTriggerEl"
+      placement="bottom" :title="serviceType"
       click focus :boundary-padding="10" strategy="fixed"
     >
       <RootStats />
@@ -105,11 +105,10 @@
 </template>
 
 <script>
-import { defineComponent, defineAsyncComponent } from 'vue';
+import { defineComponent, defineAsyncComponent, markRaw } from 'vue';
 import { isNavigationFailure, NavigationFailureType } from 'vue-router';
 import { mapMutations, mapActions, mapGetters, mapState } from 'vuex';
 import { useColorMode } from 'bootstrap-vue-next';
-import CONFIG from './merged-config';
 
 // Import icons needed for dynamic component usage
 import BIconLock from '~icons/bi/lock';
@@ -122,31 +121,15 @@ import StacLink from './components/StacLink.vue';
 
 import { STAC } from 'stac-js';
 import { hasText, isObject, size, URI } from 'stac-js/src/utils.js';
-import Utils from './utils';
+import Utils, { languageConformance } from './utils';
 
-import { API_LANGUAGE_CONFORMANCE, updateExternals } from './i18n';
+import { updateExternals } from './i18n';
 import { getBest, prepareSupported } from 'stac-js/src/locales';
 import BrowserStorage from "./browser-store";
 import Authentication from "./components/Authentication.vue";
 import Auth from './auth';
-
-// Pass Config through from props to vuex
-let Props = {};
-let Watchers = {};
-for(let key in CONFIG) {
-  Props[key] = {
-    default: ['object', 'function'].includes(typeof CONFIG[key]) ? () => CONFIG[key] : CONFIG[key]
-  };
-  Watchers[key] = {
-    immediate: true,
-    deep: ['object', 'array'].includes(typeof CONFIG[key]),
-    handler: async function(newValue) {
-      await this.$store.dispatch('config', {
-        [key]: newValue
-      });
-    }
-  };
-}
+import TriggerRefMixin from './components/TriggerRefMixin';
+import StickyHeaderMixin from './components/StickyHeaderMixin';
 
 export default defineComponent({
   name: 'StacBrowser',
@@ -165,45 +148,22 @@ export default defineComponent({
     StacLink,
     StacSource: defineAsyncComponent(() => import('./components/StacSource.vue'))
   },
-  props: {
-    ...Props
-  },
+  mixins: [TriggerRefMixin, StickyHeaderMixin],
+  inject: ['config', 'browserVersion', 'teleportTarget', 'embedded'],
   data() {
     return {
       colorMode: null,
       sidebar: null,
       error: null,
       onDataLoaded: null,
-      isNavigatingLocale: false,
-      scrolled: false,
-      hideSite: false,
-      scrollListener: null
+      isNavigatingLocale: false
     };
   },
   computed: {
-    ...mapState(['allowSelectCatalog', 'browserReady', 'conformsTo', 'data', 'dataLanguage', 'downloads', 'globalError', 'loading', 'stateQueryParameters', 'url']),
-    ...mapState({
-      showFavoritesFromVueX: 'showFavorites',
-      footerLinksFromVueX: 'footerLinks',
-      localeFromVueX: 'locale',
-      fallbackLocaleFromVueX: 'fallbackLocale',
-      detectLocaleFromBrowserFromVueX: 'detectLocaleFromBrowser',
-      supportedLocalesFromVueX: 'supportedLocales',
-      storeLocaleFromVueX: 'storeLocale',
-      enforcedColorModeFromVueX: 'enforcedColorMode',
-      colorModeFromVueX: 'colorMode'
-    }),
+    ...mapState(['allowSelectCatalog', 'browserReady', 'conformsTo', 'data', 'dataLanguage', 'detectLocaleFromBrowser', 'enforcedColorMode', 'fallbackLocale', 'footerLinks', 'globalError', 'historyMode', 'loading', 'locale', 'showFavorites', 'stateQueryParameters', 'storeLocale', 'supportedLocales', 'uiLanguage', 'url']),
     ...mapGetters(['canSearch', 'collectionLink', 'fromBrowserPath', 'isExternalUrl', 'isRoot', 'parentLink', 'root', 'searchBrowserLink', 'supportsConformance', 'title', 'toBrowserPath']),
     ...mapGetters('auth', { authMethod: 'method' }),
     ...mapGetters('auth', ['canAuthenticate', 'isLoggedIn', 'showLogin']),
-    browserVersion() {
-      if (typeof STAC_BROWSER_VERSION !== 'undefined') {
-        return STAC_BROWSER_VERSION;
-      }
-      else {
-        return "";
-      }
-    },
     isSearchPage() {
       return this.$route.name === 'search';
     },
@@ -273,7 +233,6 @@ export default defineComponent({
     }
   },
   watch: {
-    ...Watchers,
     dataLanguage: {
       immediate: true,
       async handler(locale) {
@@ -298,7 +257,7 @@ export default defineComponent({
             }
             this.$store.commit('state', state);
           }
-          else if (this.supportsConformance(API_LANGUAGE_CONFORMANCE)) {
+          else if (this.supportsConformance(languageConformance)) {
             // this.url gets reset with resetCatalog so store the url for use in load
             const url = this.url;
             // Todo: Resetting the catalogs is not ideal. 
@@ -351,7 +310,7 @@ export default defineComponent({
       for(let key of canChange) {
         let value;
         if (doReset) {
-          value = CONFIG[key]; // Original value
+          value = this.config[key]; // Original value
         }
         if (doSet && typeof root.stac_browser[key] !== 'undefined') {
           value = root.stac_browser[key]; // Custom value from root
@@ -372,7 +331,7 @@ export default defineComponent({
         this.onDataLoaded();
       }
     },
-    enforcedColorModeFromVueX: {
+    enforcedColorMode: {
       immediate: true,
       handler(value) {
         if (value && value !== 'auto') {
@@ -380,32 +339,32 @@ export default defineComponent({
         }
       }
     },
-    colorModeFromVueX(value) {
-      if (value && value !== this.colorMode) {
-        this.colorMode = value;
-      }
-    },
     colorMode(value) {
       this.$store.commit('setColorMode', value);
     },
-    scrollListener(newValue, oldValue) {
-      if (newValue) {
-        window.addEventListener('scroll', newValue, { passive: true });
-        // Initialize once, e.g. when the page is loaded already scrolled down.
-        newValue();
-      }
-      else {
-        window.removeEventListener('scroll', oldValue);
+    browserReady(ready) {
+      // The container and header only exist once ready. markRaw: see TriggerRefMixin.
+      if (ready) {
+        this.$nextTick(() => {
+          const container = this.$refs.container?.$el || this.$refs.container;
+          if (container) {
+            this.teleportTarget.el = markRaw(container);
+          }
+          this.setupStickyHeader(this.$refs.header);
+        });
       }
     }
   },
   async created() {
     this.colorMode = useColorMode({
       selector: 'body',
-      initialValue: this.enforcedColorModeFromVueX
+      initialValue: this.enforcedColorMode,
+      // Embedded, the shadow container is themed by the web component; don't
+      // also write data-bs-theme onto the host document.
+      ...(this.embedded && { onChanged: () => {} })
     });
 
-    await updateExternals(this.localeFromVueX, this.fallbackLocaleFromVueX);
+    await updateExternals(this.$i18n, this.locale, this.fallbackLocale);
     await this.$router.isReady();
     await this.detectLocale();
     await this.parseQuery(this.$route);
@@ -432,10 +391,6 @@ export default defineComponent({
 
       this.$store.commit(resetOp);
       this.parseQuery(to);
-
-      if (this.$refs.headerTitle) {
-        this.$refs.headerTitle.updateUrl();
-      }
     });
 
     const authConfig = Auth.restoreLastMethod();
@@ -446,53 +401,10 @@ export default defineComponent({
     this.$store.commit('browserReady');
   },
   mounted() {
-    setInterval(() => this.$store.dispatch('loadBackground', 3), 200);
-
-    // Prevent the user from leaving the page while the download is in progress
-    // As this is not a normal download a user has to stay on the page for the download to complete
-    window.addEventListener('unload', () => {
-      Object.values(this.downloads)
-        .filter(stream => stream && typeof stream.abort === 'function')
-        .forEach(stream => stream.abort());
-    });
-    window.addEventListener('beforeunload', (evt) => {
-      if (size(this.downloads) > 0) {
-        evt.preventDefault();
-      }
-    });
-
-    // Add scroll listener to show header shadow only when scrolled (and header is sticky)
-    let lastScrollY = window.scrollY;
-    this.scrollListener = () => {
-      const header = this.$refs.header;
-      const isSticky = header && window.getComputedStyle(header).position === 'sticky';
-      const scrolled = Boolean(isSticky) && window.scrollY > 0;
-      if (scrolled !== this.scrolled) {
-        this.scrolled = scrolled;
-      }
-
-      // Hide the site row when scrolling down, bring it back when scrolling up.
-      // Only takes effect visually on small screens, see page.scss.
-      const y = Math.max(window.scrollY, 0); // clamp for overscroll bounce
-      const delta = y - lastScrollY;
-      lastScrollY = y;
-      const site = isSticky ? header.querySelector('.site') : null;
-      if (!site) {
-        this.hideSite = false;
-        return;
-      }
-      if (delta > 0 && y > site.offsetHeight && !this.hideSite) {
-        // Measure on each hide so the offset follows the current row height
-        header.style.setProperty('--sb-site-height', `${site.offsetHeight}px`);
-        this.hideSite = true;
-      }
-      else if (delta < 0 && this.hideSite) {
-        this.hideSite = false;
-      }
-    };
+    this.backgroundTimer = setInterval(() => this.$store.dispatch('loadBackground', 3), 200);
   },
   beforeUnmount() {
-    this.scrollListener = null;
+    clearInterval(this.backgroundTimer);
   },
   methods: {
     ...mapActions(['switchLocale', 'switchDataLocale']),
@@ -518,13 +430,13 @@ export default defineComponent({
     },
     detectLocale() {
       let locale;
-      if (this.storeLocaleFromVueX) {
+      if (this.storeLocale) {
         const storage = new BrowserStorage();
         locale = storage.get('locale');
       }
-      if (!locale && this.detectLocaleFromBrowserFromVueX && Array.isArray(navigator.languages)) {
+      if (!locale && this.detectLocaleFromBrowser && Array.isArray(navigator.languages)) {
         // Detect the most suitable locale
-        const supported = prepareSupported(this.supportedLocalesFromVueX);
+        const supported = prepareSupported(this.supportedLocales);
         for(let l of navigator.languages) {
           const best = getBest(supported, l, null);
           if (best) {
@@ -533,7 +445,7 @@ export default defineComponent({
           }
         }
       }
-      if (locale && this.supportedLocalesFromVueX.includes(locale)) {
+      if (locale && this.supportedLocales.includes(locale)) {
         // This may only change the UI language, but does not change the data language if the data is not loaded yet
         this.switchLocale({locale});
         if (!this.data) {
