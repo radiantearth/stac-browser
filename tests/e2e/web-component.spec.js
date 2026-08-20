@@ -108,6 +108,27 @@ test.describe('<stac-browser> web component', () => {
     expect(display).not.toBe('flex');
   });
 
+  test('does not leak component styles into the host page', async ({ page, worker }) => {
+    // Only holds for the built bundle: the dev server injects module CSS into
+    // the host head (and the spec mirrors it into the shadow root).
+    test.skip(!process.env.CI, 'dev-only style injection leaks by design');
+    await embed(page, worker);
+    await expect(page.getByRole('heading', { name: new RegExp(catalogTitle, 'i') })).toBeVisible();
+
+    // A Bootstrap-classed probe in the host must not pick up component styles.
+    const probe = await page.evaluate(() => {
+      const btn = document.createElement('button');
+      btn.className = 'btn btn-primary';
+      document.body.appendChild(btn);
+      const cs = getComputedStyle(btn);
+      const result = { color: cs.color, borderRadius: cs.borderRadius };
+      btn.remove();
+      return result;
+    });
+    expect(probe.color).not.toBe('rgb(255, 255, 255)');
+    expect(probe.borderRadius).toBe('0px');
+  });
+
   test('themes the shadow root live, not the host document, without reloading', async ({ page, worker }) => {
     await embed(page, worker);
     await expect(page.getByRole('heading', { name: new RegExp(catalogTitle, 'i') })).toBeVisible();
