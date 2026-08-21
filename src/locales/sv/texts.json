@@ -72,7 +72,10 @@
   },
   "close": "Stäng",
   "copy": "Kopiera",
-  "copyErrors": {},
+  "copyErrors": {
+    "permission": "",
+    "unsupported": ""
+  },
   "default": "Standard",
   "defaultWithValue": "Standard ({value})",
   "deprecated": "Föråldrad",
@@ -107,6 +110,7 @@
     "loadApiItemsFailed": "Objekten från tjänsteleverantören kunde inte laddas.",
     "loadFilteredItems": "Det gick tyvärr inte att ladda den filtrerade listan över objekt.",
     "loadItems": "Det gick tyvärr inte att ladda listan över objekt.",
+    "missingPermissions": "",
     "networkError": "Detta problem kan uppstå om servern inte tillåter extern åtkomst via webbläsare (t.ex. om CORS-rubriker saknas). @:errors.contactProvider",
     "noExternalAccess": "Åtkomst till externa kataloger är inte tillåten!",
     "notFound": "Den begärda sidan finns inte. @:errors.contactProvider",
@@ -115,10 +119,15 @@
     "unauthorized": "Begäran saknar inloggningsuppgifter, t.ex. en API-nyckel. Ange dina uppgifter och försök igen."
   },
   "exampleCode": {
-    "title": "Exempel Kod"
+    "title": "Exempel Kod",
+    "storeAs": "",
+    "installDependencies": ""
   },
   "favorites": {
+    "add": "",
+    "empty": "",
     "export": "Exportera",
+    "exportDescription": "",
     "exportFormats": {
       "csv": "CSV",
       "excel": "Excel",
@@ -126,7 +135,12 @@
       "stac": "STAC Katalog"
     },
     "import": "Importera",
+    "importDescription": "",
+    "importInvalid": "",
+    "imported": "",
     "label": "Favorit",
+    "localOnly": "",
+    "remove": "",
     "title": "Favoriter"
   },
   "featureExperimental": "Denna funktion är fortfarande experimentell och kan ge oväntade resultat!",
@@ -168,6 +182,7 @@
   },
   "items": {
     "filter": "Filter",
+    "filterChangesNotApplied": "",
     "hideFilter": "Dölj filter",
     "noTime": "Ingen tid angiven",
     "noneAvailableForCollection": "Inga objekt tillgängliga för denna katalog.",
@@ -175,12 +190,20 @@
   },
   "loading": "Laddar...",
   "manage": {
+    "addCollection": "",
     "addItem": "Lägg till objekt",
+    "confirmDeleteTitle": "",
+    "confirmDeleteMessage": "",
     "create": "Skapa",
     "delete": "Radera",
+    "discardDraft": "",
+    "draftRestored": "",
     "edit": "Ändra",
     "leavePage": "Lämna sidan",
     "save": "Spara",
+    "noUndo": "",
+    "unsavedChangesLeave": "",
+    "unsavedChangesTitle": "",
     "validate": "Validera"
   },
   "map": "Karta",
@@ -191,10 +214,23 @@
       "label": "i"
     },
     "bboxSelect": {
-      "error": {}
+      "add": "",
+      "eastLon": "",
+      "error": {
+        "incomplete": "",
+        "invalidLat": "",
+        "invalidLon": "",
+        "latOrder": "",
+        "lonOrder": ""
+      },
+      "northLat": "",
+      "remove": "",
+      "southLat": "",
+      "westLon": ""
     },
     "close": "Stäng",
     "displayLimit": {
+      "message": "",
       "showAnyway": "Visa ändå",
       "title": "Stor datamängd"
     },
@@ -205,7 +241,11 @@
       "title": "Lager",
       "unnamed": "Namnlös #{id}"
     },
-    "location": {},
+    "location": {
+      "description": ""
+    },
+    "nobasemap": "",
+    "nodata": "",
     "zoom": {
       "in": {
         "description": "Zooma in",
@@ -217,13 +257,17 @@
       }
     }
   },
+  "messageForSchemaError": "",
   "metadata": {
     "general": "Allmänt",
     "title": "Metadata"
   },
   "multiselect": {
     "andMore": "och {count} mer",
+    "deselectLabel": "",
+    "keywordsPlaceholder": "",
     "placeholder": "Välj alternativ",
+    "selectLabel": "",
     "selectedLabel": "Markerad"
   },
   "open": "Öppna",
@@ -245,6 +289,8 @@
     "rust": "Rust"
   },
   "protocol": {
+    "azure": "",
+    "file": "",
     "ftp": "FTP",
     "gcs": "Google Cloud",
     "oss": "Alibaba Cloud",
@@ -276,11 +322,23 @@
     "additionalFilters": "Ytterligare filter",
     "addItemIds": "Lägg till objekt-ID med Enter-tangenten",
     "addSearchTerm": "Lägg till sökterm med Enter-tangenten",
-    "arrayInput": {},
+    "arrayInput": {
+      "addValue": "",
+      "helpText": ""
+    },
     "arrayContains": "Innehåller alla",
+    "arrayContainsDescription": "",
     "arrayContainedBy": "Är undergrupp av",
+    "arrayContainedByDescription": "",
+    "arrayEquals": "",
+    "arrayEqualsDescription": "",
+    "arrayOverlaps": "",
+    "arrayOverlapsDescription": "",
     "between": "mellan",
+    "betweenOperatorDescription": "",
     "dateDescription": "Alla tider i UTC.",
+    "disabledDueToSingleDate": "",
+    "droppedFilters": "",
     "enterCollections": "Ange katalog-ID...",
     "enterItemIds": "Ange objekt-ID...",
     "enterSearchTerms": "Ange söktermer...",
@@ -288,13 +346,17 @@
     "filterBySpatialExtent": "Filtrera efter geografisk utsträckning",
     "filterCollection": "Filtrera i katalog",
     "freeText": "Söktermer",
+    "freeTextDescription": "",
     "greaterThan": "större än",
     "greaterThanEqual": "större än eller lika med",
     "in": "inkluderad i",
+    "inOperatorDescription": "",
     "itemIds": "Objekt-ID",
     "itemsPerPage": "Objekt per sida",
+    "itemsPerPageDescription": "",
     "lessThan": "mindre än",
     "lessThanEqual": "mindre än eller lika med",
+    "likeOperatorDescription": "",
     "logical": {
       "and": "Matcha alla filter (och)",
       "or": "Matcha minst ett filter (eller)",
@@ -305,19 +367,24 @@
     "modifyCriteria": "Ändra sökkriterierna.",
     "noFurtherItemsFound": "Inga fler objekt tillgängliga.",
     "noItemsFound": "Inga objekt hittades för de angivna filtren.",
+    "noOperatorsError": "",
+    "noOptions": "",
     "notEqualTo": "är inte lika med",
+    "notFullySupported": "",
     "notSupported": "Sökning stöds inte av tjänsteleverantören.",
     "placeholder": "Sök...",
     "removeDate": "Radera datum",
     "selectCollections": "Välj kataloger...",
     "selectDateRange": "Välj datumintervall...",
+    "selectForItemSearch": "",
     "spatialExtent": "Geografisk utsträckning",
     "tabs": {
       "collections": "Sök kataloger",
       "items": "Sök objekt"
     },
     "temporalExtent": "Tidsmässig utsträckning",
-    "title": "Sök"
+    "title": "Sök",
+    "useInItemSearch": ""
   },
   "showMore": "Visa mer...",
   "sidebar": {
@@ -335,22 +402,33 @@
     "title": "Sortering"
   },
   "source": {
+    "conformanceClasses": "",
     "detailsAboutSource": "Detaljer om STAC-datakällan",
     "extension": "Filändelse",
     "fileFormat": "Filformat",
     "id": "Identifierare",
     "invalid": "Inte kompatibel",
     "label": "Datakälla",
-    "language": {},
+    "language": {
+      "label": "",
+      "onlyData": "",
+      "onlyUI": "",
+      "switch": ""
+    },
     "locatedAt": "STAC-metadatafilen finns på:",
     "manage": "Hantera",
     "share": {
       "bsky": "Bluesky",
       "email": "E-Post",
       "label": "Dela",
+      "mastodon": "",
+      "message": "",
+      "sharePageWithOthers": "",
       "title": "Dela",
+      "withOthers": "",
       "x": "X (Twitter)"
     },
+    "stacExtension": "",
     "stacVersion": "Version av STAC",
     "statistics": "Statistik",
     "title": "Datakälla",
@@ -358,31 +436,48 @@
     "validating": "Validerar...",
     "validationNA": "inte tillgänglig",
     "validationParams": {
+      "additionalProperty": "",
       "allowedValue": "tillåtet värde",
+      "allowedValues": "",
       "comparison": "jämförelse",
       "depsCount": "antal",
+      "exclusive": "",
+      "failingKeyword": "",
       "format": "format",
       "i": "första objekt",
       "j": "andra objekt",
       "limit": "gräns",
+      "maxContains": "",
+      "minContains": "",
       "missingProperty": "saknad egenskap",
       "multipleOf": "multipel av",
+      "passingSchemas": "",
       "pattern": "mönster",
       "property": "egenskap",
       "propertyName": "namn på egenskap",
       "type": "typ"
     },
     "validationReport": {
-      "result": "Resultat"
+      "disclaimer": "",
+      "result": "Resultat",
+      "title": ""
     }
   },
+  "stacAssets": "",
   "stacCatalog": "Katalog | Kataloger",
+  "stacCollection": "",
   "stacItem": "Artikel | Artiklar",
   "submit": "Skicka",
   "switchToDarkMode": "Byt till mörkt läge",
   "switchToLightMode": "Byt till ljust läge",
   "table": {
-    "sort": {}
+    "emptyFilteredText": "",
+    "emptyText": "",
+    "sort": {
+      "asc": "",
+      "clear": "",
+      "desc": ""
+    }
   },
   "thumbnails": "Miniatyrbilder",
   "tree": {
