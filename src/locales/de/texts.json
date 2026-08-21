@@ -157,7 +157,8 @@
   },
   "goBack": {
     "description": "Gehe zurück zu: {type}",
-    "label": "Zurück"
+    "label": "Zurück",
+    "refererDescription": "Gehe zurück zur zuletzt besuchten Seite im Katalog"
   },
   "goToCollection": {
     "description": "Gehe zum dazugehörigen Produkt",
@@ -405,6 +406,7 @@
     "conformanceClasses": "Konformitätsklasse",
     "detailsAboutSource": "Details über die STAC-Datenquelle",
     "extension": "Erweiterung",
+    "externalData": "Externe Datenquelle",
     "fileFormat": "Dateiformat",
     "id": "Identifikator",
     "invalid": "Nicht konform",

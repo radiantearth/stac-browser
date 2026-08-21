@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- A "Back" button on pages with external content returns to the page in the catalog from which the external content was reached
+- The source popover indicates when the shown data is not part of the configured catalog
+
+### Fixed
+
+- The conformance classes of the configured catalog are no longer applied to external content,
+  e.g. sorting and filtering are no longer offered for (and sent to) external APIs that may not support them
+
 ## [5.1.0-rc.1] - 2026-08-15
 
 ### Added
