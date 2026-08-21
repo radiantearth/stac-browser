@@ -152,6 +152,47 @@ test.describe('apiCatalogPriority', () => {
     await expect(sidebar.getByText('item-1')).toBeVisible();
     await expect(sidebar.getByText('No children available.')).not.toBeVisible();
   });
+
+  test('collections does not hide item links in the tree (#990)', async ({ page, worker }) => {
+    const { api } = createApi();
+    const collection = api.addCollection('linked-items').setMetadata({ title: 'Linked Items' });
+    const item = collection.addItem({ url: 'collections/linked-items/items/static-item' });
+    item.setMetadata({ id: 'static-item' });
+    await api.createServer(worker);
+    await configureBrowser(page, { apiCatalogPriority: 'collections' });
+
+    await page.goto(collection.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    await page.getByRole('button', { name: /browse/i }).click();
+    const sidebar = page.locator('#sidebar');
+    await expect(sidebar).toBeVisible();
+
+    // Clicking the active node toggles it open
+    await sidebar.getByRole('button', { name: 'Linked Items' }).click();
+    await expect(sidebar.getByText('static-item')).toBeVisible();
+    await expect(sidebar.getByText('No children available.')).not.toBeVisible();
+  });
+
+  test('items linked and loaded from the API are deduplicated in the tree', async ({ page, worker }) => {
+    const { api } = createApi();
+    const collection = api.addCollection('dedup-collection').setMetadata({ title: 'Dedup Collection' });
+    const item = api.addItem(collection, 'item-1');
+    // The same item is also linked statically
+    collection.addItemLink(item);
+    await api.createServer(worker);
+
+    await page.goto(collection.getBrowserPath());
+    await waitForBrowserReady(page);
+
+    await page.getByRole('button', { name: /browse/i }).click();
+    const sidebar = page.locator('#sidebar');
+    await expect(sidebar).toBeVisible();
+
+    // Clicking the active node toggles it open
+    await sidebar.getByRole('button', { name: 'Dedup Collection' }).click();
+    await expect(sidebar.getByText('item-1')).toHaveCount(1);
+  });
 });
 
 test.describe('Collections pagination on the main page', () => {
