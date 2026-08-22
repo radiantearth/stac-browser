@@ -120,7 +120,7 @@
   },
   "exampleCode": {
     "title": "Exempel Kod",
-    "storeAs": "",
+    "storeAs": "Butikskod som:",
     "installDependencies": ""
   },
   "favorites": {
