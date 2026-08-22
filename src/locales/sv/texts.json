@@ -120,7 +120,7 @@
   },
   "exampleCode": {
     "title": "Exempel Kod",
-    "storeAs": "Butikskod som:",
+    "storeAs": "Spara källkoden som:",
     "installDependencies": ""
   },
   "favorites": {
@@ -190,7 +190,7 @@
   },
   "loading": "Laddar...",
   "manage": {
-    "addCollection": "",
+    "addCollection": "Lägg till samling",
     "addItem": "Lägg till objekt",
     "confirmDeleteTitle": "",
     "confirmDeleteMessage": "",
@@ -203,7 +203,7 @@
     "save": "Spara",
     "noUndo": "",
     "unsavedChangesLeave": "",
-    "unsavedChangesTitle": "",
+    "unsavedChangesTitle": "Osparade ändringar",
     "validate": "Validera"
   },
   "map": "Karta",
@@ -215,7 +215,7 @@
     },
     "bboxSelect": {
       "add": "",
-      "eastLon": "",
+      "eastLon": "Östlig longitud",
       "error": {
         "incomplete": "",
         "invalidLat": "",
@@ -223,10 +223,10 @@
         "latOrder": "",
         "lonOrder": ""
       },
-      "northLat": "",
+      "northLat": "Nordlig latitud",
       "remove": "",
-      "southLat": "",
-      "westLon": ""
+      "southLat": "Sydlig latitud",
+      "westLon": "Västlig Longitud"
     },
     "close": "Stäng",
     "displayLimit": {
@@ -242,7 +242,7 @@
       "unnamed": "Namnlös #{id}"
     },
     "location": {
-      "description": ""
+      "description": "Gå till din plats"
     },
     "nobasemap": "",
     "nodata": "",
@@ -265,7 +265,7 @@
   "multiselect": {
     "andMore": "och {count} mer",
     "deselectLabel": "",
-    "keywordsPlaceholder": "",
+    "keywordsPlaceholder": "Välj nyckelord",
     "placeholder": "Välj alternativ",
     "selectLabel": "",
     "selectedLabel": "Markerad"
@@ -289,8 +289,8 @@
     "rust": "Rust"
   },
   "protocol": {
-    "azure": "",
-    "file": "",
+    "azure": "Microsoft Azure",
+    "file": "filsystem (lokalt)",
     "ftp": "FTP",
     "gcs": "Google Cloud",
     "oss": "Alibaba Cloud",
@@ -324,13 +324,13 @@
     "addSearchTerm": "Lägg till sökterm med Enter-tangenten",
     "arrayInput": {
       "addValue": "",
-      "helpText": ""
+      "helpText": "Ange värde(n)"
     },
     "arrayContains": "Innehåller alla",
     "arrayContainsDescription": "",
     "arrayContainedBy": "Är undergrupp av",
     "arrayContainedByDescription": "",
-    "arrayEquals": "",
+    "arrayEquals": "Exakt matchar",
     "arrayEqualsDescription": "",
     "arrayOverlaps": "Innehåller något",
     "arrayOverlapsDescription": "",
@@ -368,7 +368,7 @@
     "noFurtherItemsFound": "Inga fler objekt tillgängliga.",
     "noItemsFound": "Inga objekt hittades för de angivna filtren.",
     "noOperatorsError": "",
-    "noOptions": "",
+    "noOptions": "Inget har angetts än",
     "notEqualTo": "är inte lika med",
     "notFullySupported": "",
     "notSupported": "Sökning stöds inte av tjänsteleverantören.",
@@ -421,14 +421,14 @@
       "bsky": "Bluesky",
       "email": "E-Post",
       "label": "Dela",
-      "mastodon": "",
+      "mastodon": "Mastodon.social",
       "message": "",
       "sharePageWithOthers": "",
       "title": "Dela",
       "withOthers": "",
       "x": "X (Twitter)"
     },
-    "stacExtension": "",
+    "stacExtension": "STAC-Extension",
     "stacVersion": "Version av STAC",
     "statistics": "Statistik",
     "title": "Datakälla",
@@ -438,11 +438,11 @@
     "validationParams": {
       "additionalProperty": "",
       "allowedValue": "tillåtet värde",
-      "allowedValues": "",
+      "allowedValues": "tillåtna värden",
       "comparison": "jämförelse",
       "depsCount": "antal",
       "exclusive": "",
-      "failingKeyword": "",
+      "failingKeyword": "misslyckade nyckelord",
       "format": "format",
       "i": "första objekt",
       "j": "andra objekt",
@@ -451,7 +451,7 @@
       "minContains": "",
       "missingProperty": "saknad egenskap",
       "multipleOf": "multipel av",
-      "passingSchemas": "",
+      "passingSchemas": "konforma scheman",
       "pattern": "mönster",
       "property": "egenskap",
       "propertyName": "namn på egenskap",
@@ -463,7 +463,7 @@
       "title": ""
     }
   },
-  "stacAssets": "",
+  "stacAssets": "Tillgång | Tillgångar",
   "stacCatalog": "Katalog | Kataloger",
   "stacCollection": "",
   "stacItem": "Artikel | Artiklar",
