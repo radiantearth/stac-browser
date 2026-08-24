@@ -179,6 +179,8 @@ The following options are available:
 - `childs`: Show only children
 - `null`: Default behavior
 
+This option only applies to catalogs and collections, it never hides items.
+
 ## Deployment
 
 ### historyMode

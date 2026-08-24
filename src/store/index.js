@@ -48,20 +48,22 @@ function getApiChildrenLoading(state, stac) {
 // Combines a list of children received from the API with the children linked to
 // from the STAC entity, depending on the given priority (see apiCatalogPriority).
 // Optionally includes the item links of the entity and pagination links for the API list.
-function combineChildren(stac, apiList, priority, { items = [], prev = false, next = false } = {}) {
-  const showCollections = !priority || priority === 'collections';
+// The priority only applies to catalogs and collections, items are always included (#990).
+function combineChildren(stac, apiList, priority, { type = null, items = [], prev = false, next = false } = {}) {
+  const showApiList = type === 'items' || !priority || priority === 'collections';
   const showChilds = !priority || priority === 'childs';
   let children = [];
-  if (showCollections && apiList.length > 0) {
+  if (showApiList && apiList.length > 0) {
     children = apiList.slice(0);
   }
   if (showChilds) {
-    children = addMissingChildren(children, stac).concat(items);
+    children = addMissingChildren(children, stac);
   }
-  if (showCollections && prev) {
+  children = children.concat(items);
+  if (showApiList && prev) {
     children = [prev].concat(children);
   }
-  if (showCollections && next) {
+  if (showApiList && next) {
     children.push(next);
   }
   return children;
@@ -408,10 +410,13 @@ function getStore(config, router) {
         }
         if (apiChildren instanceof Loading) {
           // The first page of children is still being loaded
-          apiChildren = { list: [], prev: false, next: false };
+          apiChildren = { type: null, list: [], prev: false, next: false };
         }
+        // Item links are only used when no items were loaded from the API (as in the items getter)
+        const hasApiItems = apiChildren.type === 'items' && apiChildren.list.length > 0;
         return combineChildren(stac, apiChildren.list, priority, {
-          items: stac.getLinksWithRels(['item']),
+          type: apiChildren.type,
+          items: hasApiItems ? [] : stac.getLinksWithRels(['item']),
           prev: apiChildren.prev,
           next: apiChildren.next
         });

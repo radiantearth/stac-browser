@@ -1,13 +1,14 @@
 /**
- * Regression tests for how children of a catalog-like entity are loaded and
- * displayed, covering the interplay of static `rel="child"` links and the
- * `/collections` endpoint (rel="data") in many variants.
+ * Regression tests for how collections are loaded from the `/collections`
+ * endpoint (rel="data") and assembled into the children list of a
+ * catalog-like entity: merging with static `rel="child"` links (#103),
+ * pagination, URL guessing (#486), caching and list resets across
+ * entities (#617), endpoint precedence in the load action, and collection
+ * free-text search.
  *
  * These tests pin down the current behavior before the children/collections
- * handling is refactored for the STAC API - Children extension (#218):
- * merge and de-duplication semantics (#103), `apiCatalogPriority`,
- * pagination, URL guessing (#486), list resets across entities (#617),
- * endpoint precedence in the load action, and collection free-text search.
+ * handling is refactored for the STAC API - Children extension (#218).
+ * The `apiCatalogPriority` option is covered in api-catalog-priority.spec.js.
  */
 import { test, expect } from './fixtures.js';
 import { configureBrowser, waitForBrowserReady } from './helpers.js';
@@ -69,66 +70,6 @@ test.describe('Merging static child links and API collections (#103)', () => {
     // infinite scrolling through the paginated collections (#103)
     await expect(page.locator(CARD)).toHaveCount(3);
     await expect(page.locator(CARD).first()).toContainText('Static Catalog');
-  });
-});
-
-test.describe('apiCatalogPriority', () => {
-  function createApi() {
-    const api = API.defaultApi();
-    api.addCollection('api-collection').setMetadata({ title: 'API Collection' });
-    api.addStaticCatalog({ url: 'static-catalog' }).setMetadata({ title: 'Static Catalog' });
-    return { api };
-  }
-
-  test('null shows both sources', async ({ page, worker }) => {
-    const { api } = createApi();
-    await api.createServer(worker);
-
-    await page.goto(api.root.getBrowserPath());
-    await waitForBrowserReady(page);
-
-    await expect(page.locator(CARD)).toHaveCount(2);
-    await expect(page.getByRole('link', { name: /API Collection/ })).toBeVisible();
-    await expect(page.getByRole('link', { name: /Static Catalog/ })).toBeVisible();
-  });
-
-  test('collections shows only API collections', async ({ page, worker }) => {
-    const { api } = createApi();
-    await api.createServer(worker);
-    await configureBrowser(page, { apiCatalogPriority: 'collections' });
-
-    await page.goto(api.root.getBrowserPath());
-    await waitForBrowserReady(page);
-
-    await expect(page.locator(CARD)).toHaveCount(1);
-    await expect(page.getByRole('link', { name: /API Collection/ })).toBeVisible();
-  });
-
-  test('childs shows only static child links', async ({ page, worker }) => {
-    const { api } = createApi();
-    await api.createServer(worker);
-    await configureBrowser(page, { apiCatalogPriority: 'childs' });
-
-    await page.goto(api.root.getBrowserPath());
-    await waitForBrowserReady(page);
-
-    await expect(page.locator(CARD)).toHaveCount(1);
-    await expect(page.getByRole('link', { name: /Static Catalog/ })).toBeVisible();
-  });
-
-  test('childs hides API collections in the tree', async ({ page, worker }) => {
-    const { api } = createApi();
-    await api.createServer(worker);
-    await configureBrowser(page, { apiCatalogPriority: 'childs' });
-
-    await page.goto(api.root.getBrowserPath());
-    await waitForBrowserReady(page);
-
-    await page.getByRole('button', { name: /browse/i }).click();
-    const sidebar = page.locator('#sidebar');
-    await expect(sidebar).toBeVisible();
-    await expect(sidebar.getByText('Static Catalog')).toBeVisible();
-    await expect(sidebar.getByText('API Collection')).not.toBeVisible();
   });
 });
 
