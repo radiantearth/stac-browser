@@ -115,7 +115,8 @@
     "unauthorized": "Begäran saknar inloggningsuppgifter, t.ex. en API-nyckel. Ange dina uppgifter och försök igen."
   },
   "exampleCode": {
-    "title": "Exempel Kod"
+    "title": "Exempel Kod",
+    "storeAs": "Spara källkoden som:"
   },
   "favorites": {
     "export": "Exportera",
@@ -175,12 +176,14 @@
   },
   "loading": "Laddar...",
   "manage": {
+    "addCollection": "Lägg till samling",
     "addItem": "Lägg till objekt",
     "create": "Skapa",
     "delete": "Radera",
     "edit": "Ändra",
     "leavePage": "Lämna sidan",
     "save": "Spara",
+    "unsavedChangesTitle": "Osparade ändringar",
     "validate": "Validera"
   },
   "map": "Karta",
@@ -191,7 +194,11 @@
       "label": "i"
     },
     "bboxSelect": {
-      "error": {}
+      "eastLon": "Östlig longitud",
+      "error": {},
+      "northLat": "Nordlig latitud",
+      "southLat": "Sydlig latitud",
+      "westLon": "Västlig Longitud"
     },
     "close": "Stäng",
     "displayLimit": {
@@ -205,7 +212,9 @@
       "title": "Lager",
       "unnamed": "Namnlös #{id}"
     },
-    "location": {},
+    "location": {
+      "description": "Gå till din plats"
+    },
     "zoom": {
       "in": {
         "description": "Zooma in",
@@ -223,6 +232,7 @@
   },
   "multiselect": {
     "andMore": "och {count} mer",
+    "keywordsPlaceholder": "Välj nyckelord",
     "placeholder": "Välj alternativ",
     "selectedLabel": "Markerad"
   },
@@ -245,6 +255,8 @@
     "rust": "Rust"
   },
   "protocol": {
+    "azure": "Microsoft Azure",
+    "file": "filsystem (lokalt)",
     "ftp": "FTP",
     "gcs": "Google Cloud",
     "oss": "Alibaba Cloud",
@@ -276,9 +288,13 @@
     "additionalFilters": "Ytterligare filter",
     "addItemIds": "Lägg till objekt-ID med Enter-tangenten",
     "addSearchTerm": "Lägg till sökterm med Enter-tangenten",
-    "arrayInput": {},
+    "arrayInput": {
+      "helpText": "Ange värde(n)"
+    },
     "arrayContains": "Innehåller alla",
     "arrayContainedBy": "Är undergrupp av",
+    "arrayEquals": "Exakt matchar",
+    "arrayOverlaps": "Innehåller något",
     "between": "mellan",
     "dateDescription": "Alla tider i UTC.",
     "enterCollections": "Ange katalog-ID...",
@@ -305,6 +321,7 @@
     "modifyCriteria": "Ändra sökkriterierna.",
     "noFurtherItemsFound": "Inga fler objekt tillgängliga.",
     "noItemsFound": "Inga objekt hittades för de angivna filtren.",
+    "noOptions": "Inget har angetts än",
     "notEqualTo": "är inte lika med",
     "notSupported": "Sökning stöds inte av tjänsteleverantören.",
     "placeholder": "Sök...",
@@ -348,9 +365,11 @@
       "bsky": "Bluesky",
       "email": "E-Post",
       "label": "Dela",
+      "mastodon": "Mastodon.social",
       "title": "Dela",
       "x": "X (Twitter)"
     },
+    "stacExtension": "STAC-Extension",
     "stacVersion": "Version av STAC",
     "statistics": "Statistik",
     "title": "Datakälla",
@@ -359,14 +378,17 @@
     "validationNA": "inte tillgänglig",
     "validationParams": {
       "allowedValue": "tillåtet värde",
+      "allowedValues": "tillåtna värden",
       "comparison": "jämförelse",
       "depsCount": "antal",
+      "failingKeyword": "misslyckade nyckelord",
       "format": "format",
       "i": "första objekt",
       "j": "andra objekt",
       "limit": "gräns",
       "missingProperty": "saknad egenskap",
       "multipleOf": "multipel av",
+      "passingSchemas": "konforma scheman",
       "pattern": "mönster",
       "property": "egenskap",
       "propertyName": "namn på egenskap",
@@ -376,6 +398,7 @@
       "result": "Resultat"
     }
   },
+  "stacAssets": "Tillgång | Tillgångar",
   "stacCatalog": "Katalog | Kataloger",
   "stacItem": "Artikel | Artiklar",
   "submit": "Skicka",
