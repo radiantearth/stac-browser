@@ -123,6 +123,7 @@
     "storeAs": "Store code as:",
     "installDependencies": "Install dependencies:"
   },
+  "externalInfo": "This {type} is provided by an external data source.",
   "favorites": {
     "add": "Add to favorites",
     "empty": "No favorites have been added yet. To add favorites, use the 'Favorite' button on the page of a catalog, collection, or item.",
@@ -468,6 +469,7 @@
   "stacAssets": "Asset | Assets",
   "stacCatalog": "Catalog | Catalogs",
   "stacCollection": "Collection | Collections",
+  "stacEntity": "resource | resources",
   "stacItem": "Item | Items",
   "submit": "Submit",
   "switchToDarkMode": "Switch to dark mode",
