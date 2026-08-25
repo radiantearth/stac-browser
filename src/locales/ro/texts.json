@@ -91,6 +91,7 @@
   },
   "description": "Descriere",
   "errors": {
+    "apiListRequested": "",
     "authFailed": "Solicitarea a eșuat, credențialele furnizate ar putea fi incorecte.",
     "badRequest": "Solicitarea nu este validă. Acest lucru se poate datora unor parametri de căutare invalizi sau a unei erori în browserul STAC",
     "contactProvider": "Vă rugăm să contactați operatorul serviciului pentru a rezolva această problemă.",
@@ -109,6 +110,7 @@
     "loadApiItemsFailed": "Elementele API nu au putut fi încărcate.",
     "loadFilteredItems": "Ne pare rău, încărcarea unei liste de articole filtrate nu a reușit.",
     "loadItems": "Ne pare rău, nu s-a putut încărca lista de articole STAC.",
+    "missingPermissions": "",
     "networkError": "Această problemă poate apărea atunci când serverele nu permit accesul extern prin browsere web (de exemplu, când anteturile CORS nu sunt prezente). @:errors.contactProvider",
     "noExternalAccess": "Accesul la cataloage externe nu este permis!",
     "notFound": "Resursa solicitată nu există. @:errors.contactProvider",
@@ -121,16 +123,32 @@
     "storeAs": "Salvează codul ca:",
     "installDependencies": "Instalează dependințele:"
   },
+  "externalInfo": "",
   "favorites": {
+    "add": "",
+    "empty": "",
+    "export": "",
+    "exportDescription": "",
     "exportFormats": {
       "csv": "CSV",
       "excel": "Excel",
-      "json": "JSON"
-    }
+      "json": "JSON",
+      "stac": ""
+    },
+    "import": "",
+    "importDescription": "",
+    "importInvalid": "",
+    "imported": "",
+    "label": "",
+    "localOnly": "",
+    "remove": "",
+    "title": ""
   },
   "featureExperimental": "Această funcție este încă experimentală și poate da rezultate neașteptate!",
   "features": {
-    "noProperties": "Nu au fost furnizate proprietăți."
+    "empty": "",
+    "noProperties": "Nu au fost furnizate proprietăți.",
+    "title": ""
   },
   "fullscreen": {
     "exit": "Ieși din modul ecran complet",
@@ -140,7 +158,8 @@
   },
   "goBack": {
     "description": "Reveniți la {type}",
-    "label": "Înapoi"
+    "label": "Înapoi",
+    "refererDescription": ""
   },
   "goToCollection": {
     "description": "Accesați colecția asociată",
@@ -165,6 +184,7 @@
   },
   "items": {
     "filter": "Filtrat",
+    "filterChangesNotApplied": "",
     "hideFilter": "Ascunde filtrele",
     "noTime": "Niciun timp selectat",
     "noneAvailableForCollection": "Nu există articole disponibile pentru această colecție.",
@@ -172,8 +192,21 @@
   },
   "loading": "Încărcare...",
   "manage": {
+    "addCollection": "",
+    "addItem": "",
+    "confirmDeleteTitle": "",
+    "confirmDeleteMessage": "",
+    "create": "",
+    "delete": "",
+    "discardDraft": "",
+    "draftRestored": "",
     "edit": "Editare",
-    "save": "Salvare"
+    "leavePage": "",
+    "save": "Salvare",
+    "noUndo": "",
+    "unsavedChangesLeave": "",
+    "unsavedChangesTitle": "",
+    "validate": ""
   },
   "map": "Hartă",
   "mapping": {
@@ -183,6 +216,7 @@
       "label": "i"
     },
     "bboxSelect": {
+      "add": "",
       "eastLon": "Longitudine estică",
       "error": {
         "incomplete": "Coordonate lipsă",
@@ -192,11 +226,17 @@
         "lonOrder": "Longitudinea vestică trebuie să fie mai mică decât longitudinea estică"
       },
       "northLat": "Latitudine nordică",
+      "remove": "",
       "southLat": "Latitudine sudică",
       "westLon": "Longitudine vestică"
     },
     "close": "Închidere",
-    "displayLimit": {},
+    "displayLimit": {
+      "message": "",
+      "showAnyway": "",
+      "title": ""
+    },
+    "fit": "",
     "layers": {
       "base": "Straturi de bază",
       "footprint": "Amprentă la sol",
@@ -279,6 +319,7 @@
   "reset": "Resetați",
   "search": {
     "addCollections": "Apăsați Enter pentru a adăuga o colecție",
+    "addDate": "",
     "addFilter": "Adăugați un filtru",
     "additionalFilters": "Filtre suplimentare",
     "addItemIds": "Apăsați Enter pentru a adăuga un ID de articol",
@@ -288,8 +329,18 @@
       "helpText": "Introduceți valoarea(valorile)"
     },
     "arrayContains": "Conține tot",
+    "arrayContainsDescription": "",
     "arrayContainedBy": "Este subset al",
+    "arrayContainedByDescription": "",
+    "arrayEquals": "",
+    "arrayEqualsDescription": "",
+    "arrayOverlaps": "",
+    "arrayOverlapsDescription": "",
+    "between": "",
+    "betweenOperatorDescription": "",
     "dateDescription": "Toate orele sunt timp universal coordonat (UTC).",
+    "disabledDueToSingleDate": "",
+    "droppedFilters": "",
     "enterCollections": "Introduceți una sau mai multe colecții...",
     "enterItemIds": "Introduceți unul sau mai multe ID-uri de articol...",
     "enterSearchTerms": "Introduceți unul sau mai mulți termeni de căutare...",
@@ -300,6 +351,8 @@
     "freeTextDescription": "Căutați cel puțin unul dintre termenii specificați în câmpuri precum titlul și descrierea.",
     "greaterThan": "mai mare decât",
     "greaterThanEqual": "mai mare sau egal cu",
+    "in": "",
+    "inOperatorDescription": "",
     "itemIds": "Identificatori de elemente",
     "itemsPerPage": "Elemente per pagină",
     "itemsPerPageDescription": "Număr de elemente solicitate pe pagină, max. {maxItems} elemente",
@@ -308,19 +361,23 @@
     "likeOperatorDescription": "Puteți folosi metacaracterele. `_` se potrivește cu un singur caracter, `%` se potrivește cu orice număr de caractere. Pentru a căuta în mod specific un wildcard, trebuie să adăugați un `\\` în fața caracterului.",
     "logical": {
       "and": "Potrivește toate filtrele (și)",
-      "or": "Potrivește orice filtru (or)"
+      "or": "Potrivește orice filtru (or)",
+      "not": ""
     },
     "matches": "corespunde cu",
     "metaDescription": "Căutați în oferta de date a {title}.",
     "modifyCriteria": "Vă rugăm să modificați criteriile de căutare.",
     "noFurtherItemsFound": "Nici un alt articol disponibil.",
     "noItemsFound": "Nu s-au găsit articole pentru filtrele selectate.",
+    "noOperatorsError": "",
     "noOptions": "Nimic introdus încă",
     "notEqualTo": "diferit de",
     "notFullySupported": "Este posibil să nu fie acceptate toate opțiunile",
     "notSupported": "Căutarea articolelor nu este acceptată de API.",
     "placeholder": "Căutare...",
+    "removeDate": "",
     "selectCollections": "Selectați una sau mai multe colecții...",
+    "selectDateRange": "",
     "selectForItemSearch": "Selectați pentru Căutare Articol",
     "spatialExtent": "Întinderea spațială",
     "tabs": {
@@ -350,6 +407,7 @@
     "conformanceClasses": "Clase de conformitate",
     "detailsAboutSource": "Despre sursa STAC",
     "extension": "Extensie",
+    "externalData": "",
     "fileFormat": "Formatul fișierului",
     "id": "Identificator",
     "invalid": "Invalid",
@@ -361,6 +419,7 @@
       "switch": "Schimbă limba"
     },
     "locatedAt": "Fișierul de metadate STAC poate fi găsit la următoarea adresă:",
+    "manage": "",
     "share": {
       "bsky": "Bluesky",
       "email": "E-Mail",
@@ -410,8 +469,11 @@
   "stacAssets": "Resursă | Resurse",
   "stacCatalog": "Catalog | Cataloage",
   "stacCollection": "Colecție | Colecții",
+  "stacEntity": "",
   "stacItem": "Element | Elemente",
   "submit": "Trimitere",
+  "switchToDarkMode": "",
+  "switchToLightMode": "",
   "table": {
     "emptyFilteredText": "Nu există înregistrări care să corespundă interogării dvs",
     "emptyText": "Nu există înregistrări de afișat",
@@ -437,5 +499,7 @@
     },
     "title": "Opțiuni de afișare"
   },
-  "widgets": {}
+  "widgets": {
+    "featured": ""
+  }
 }
