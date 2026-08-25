@@ -123,6 +123,7 @@
     "storeAs": "Memorizza il codice come:",
     "installDependencies": "Installare le dipendenze:"
   },
+  "externalInfo": "",
   "favorites": {
     "add": "Aggiungi ai preferiti",
     "empty": "Nessun preferito è stato ancora aggiunto. Per aggiungere preferiti, usa il pulsante 'Preferiti' nella pagina di un catalogo, una collezione o un elemento.",
@@ -157,7 +158,8 @@
   },
   "goBack": {
     "description": "Torna a {type}",
-    "label": "Indietro"
+    "label": "Indietro",
+    "refererDescription": ""
   },
   "goToCollection": {
     "description": "Vai alla Collezione associata",
@@ -405,6 +407,7 @@
     "conformanceClasses": "Classi di conformità",
     "detailsAboutSource": "Informazioni sulla fonte STAC",
     "extension": "Estensione",
+    "externalData": "",
     "fileFormat": "Formato file",
     "id": "ID",
     "invalid": "Non valido",
@@ -466,6 +469,7 @@
   "stacAssets": "Risorsa | Risorse",
   "stacCatalog": "Catalogo | Cataloghi",
   "stacCollection": "Collezione | Collezioni",
+  "stacEntity": "",
   "stacItem": "Elemento | Elementi",
   "submit": "Invia",
   "switchToDarkMode": "Passa alla modalità scura",
