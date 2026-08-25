@@ -5,6 +5,10 @@ import { pagination } from "stac-js/src/relationtypes.js";
 
 export const commonFileNames = ['catalog', 'collection', 'item'];
 
+// Browser paths that point to external content, optionally prefixed by a tool route.
+// If you add new routes that may include .../external/... in the path, update this regexp.
+export const externalBrowserPathRE = /^\/((search|validation|management\/[\w-]+)\/)?external\//;
+
 export class BrowserError extends Error {
   constructor(message) {
     super(message);
@@ -30,6 +34,10 @@ export default class Utils {
     return fullStr.substr(0, frontChars) + 
            separator + 
            fullStr.substr(fullStr.length - backChars);
+  }
+
+  static isExternalBrowserPath(path) {
+    return hasText(path) && externalBrowserPathRE.test(path);
   }
 
   static getLinkWithRel(links, rel) {
