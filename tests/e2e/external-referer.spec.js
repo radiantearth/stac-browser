@@ -115,6 +115,11 @@ test.describe('Referer handling and Back button', () => {
     await waitForBrowserReady(page);
     await expect(page.getByRole('heading', { name: /External Collection A/ })).toBeVisible();
     await expect(backButton(page)).toBeHidden();
+
+    await page.goto(`${EXTERNAL_A_PATH}?.referer=${encodeURIComponent('/\\evil.example/')}`);
+    await waitForBrowserReady(page);
+    await expect(page.getByRole('heading', { name: /External Collection A/ })).toBeVisible();
+    await expect(backButton(page)).toBeHidden();
   });
 
   test('does not attach a referer when no catalog is configured', async ({ page, worker }) => {

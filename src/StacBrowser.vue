@@ -248,8 +248,11 @@ export default defineComponent({
     // Set by the router guard in created() when navigating to external content
     refererLink() {
       const referer = this.$route.query['.referer'];
-      // Only accept in-app paths to avoid redirects to arbitrary locations
-      if (!hasText(referer) || !referer.startsWith('/') || referer.startsWith('//')) {
+      if (!hasText(referer) || !referer.startsWith('/')) {
+        return null;
+      }
+      const url = URL.parse(referer, window.location.href);
+      if (!url || url.origin !== window.location.origin) {
         return null;
       }
       if (!this.allowExternalAccessFromVueX && Utils.isExternalBrowserPath(referer)) {
