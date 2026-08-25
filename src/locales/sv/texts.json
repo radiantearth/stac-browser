@@ -259,7 +259,7 @@
       }
     }
   },
-  "messageForSchemaError": "",
+  "messageForSchemaError": "{message}, för schema {schemaPath}",
   "metadata": {
     "general": "Allmänt",
     "title": "Metadata"
