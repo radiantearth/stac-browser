@@ -469,7 +469,7 @@
   "stacAssets": "Risorsa | Risorse",
   "stacCatalog": "Catalogo | Cataloghi",
   "stacCollection": "Collezione | Collezioni",
-  "stacEntity": "",
+  "stacEntity": "risorsa | risorse",
   "stacItem": "Elemento | Elementi",
   "submit": "Invia",
   "switchToDarkMode": "Passa alla modalità scura",
