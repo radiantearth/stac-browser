@@ -413,7 +413,7 @@
     "invalid": "Inte kompatibel",
     "label": "Datakälla",
     "language": {
-      "label": "",
+      "label": "Språk: {currentLanguage}",
       "onlyData": "",
       "onlyUI": "",
       "switch": ""
@@ -463,13 +463,13 @@
     "validationReport": {
       "disclaimer": "",
       "result": "Resultat",
-      "title": ""
+      "title": "Valideringsrapport"
     }
   },
   "stacAssets": "Tillgång | Tillgångar",
   "stacCatalog": "Katalog | Kataloger",
-  "stacCollection": "",
-  "stacEntity": "",
+  "stacCollection": "Samling | Samlingar",
+  "stacEntity": "resurs | resurser",
   "stacItem": "Artikel | Artiklar",
   "submit": "Skicka",
   "switchToDarkMode": "Byt till mörkt läge",
