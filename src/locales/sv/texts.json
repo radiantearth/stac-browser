@@ -226,6 +226,7 @@
       }
     }
   },
+  "messageForSchemaError": "{message}, för schema {schemaPath}",
   "metadata": {
     "general": "Allmänt",
     "title": "Metadata"
@@ -358,7 +359,9 @@
     "id": "Identifierare",
     "invalid": "Inte kompatibel",
     "label": "Datakälla",
-    "language": {},
+    "language": {
+      "label": "Språk: {currentLanguage}"
+    },
     "locatedAt": "STAC-metadatafilen finns på:",
     "manage": "Hantera",
     "share": {
@@ -395,11 +398,14 @@
       "type": "typ"
     },
     "validationReport": {
-      "result": "Resultat"
+      "result": "Resultat",
+      "title": "Valideringsrapport"
     }
   },
   "stacAssets": "Tillgång | Tillgångar",
   "stacCatalog": "Katalog | Kataloger",
+  "stacCollection": "Samling | Samlingar",
+  "stacEntity": "resurs | resurser",
   "stacItem": "Artikel | Artiklar",
   "submit": "Skicka",
   "switchToDarkMode": "Byt till mörkt läge",

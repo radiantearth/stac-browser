@@ -123,6 +123,7 @@
     "storeAs": "Guardar código como:",
     "installDependencies": "Instala las dependencias:"
   },
+  "externalInfo": "Este {type} es proporcionado por una fuente de datos externa.",
   "favorites": {
     "add": "Añadir a favoritos",
     "empty": "Todavía no se ha añadido ningún favorito. Para añadir favoritos, use el botón de 'Favorito' en la página de un catálogo, colección, o artículo.",
@@ -157,7 +158,8 @@
   },
   "goBack": {
     "description": "Volver al {type}",
-    "label": "Volver"
+    "label": "Volver",
+    "refererDescription": "Volver a la última página visitada en el catálogo"
   },
   "goToCollection": {
     "description": "Ir a la colección asociada",
@@ -405,6 +407,7 @@
     "conformanceClasses": "Clases de conformidad",
     "detailsAboutSource": "Detalles sobre la fuente STAC",
     "extension": "Extensión",
+    "externalData": "Fuente de datos externa",
     "fileFormat": "Formato de archivo",
     "id": "ID",
     "invalid": "Ínvalido",
@@ -466,6 +469,7 @@
   "stacAssets": "Recurso | Recursos",
   "stacCatalog": "Catálogo | Catálogos",
   "stacCollection": "Colección | Colecciones",
+  "stacEntity": "recurso | recursos",
   "stacItem": "Elemento | Elementos",
   "submit": "Enviar",
   "switchToDarkMode": "Cambiar a modo oscuro",
