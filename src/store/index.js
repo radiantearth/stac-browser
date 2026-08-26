@@ -989,8 +989,18 @@ function getStore(config, router) {
             cx.commit('loaded', { url, data });
 
             if (show) {
+              // A locale can be selected before the first catalog is loaded.
+              // Resolve the preferred data language against the newly loaded
+              // entity so its localized alternate is followed immediately.
+              const dataLanguage = detectDataLanguage(
+                data,
+                cx.state.locale,
+                cx.state.uiLanguage
+              );
+              cx.commit('languages', { dataLanguage });
+
               // If we prefer another language abort redirect to the new language
-              let localeLink = data.getLocaleLink(cx.state.dataLanguage);
+              let localeLink = data.getLocaleLink(dataLanguage);
               if (localeLink) {
                 router.replace(cx.getters.toBrowserPath(localeLink));
                 return;
