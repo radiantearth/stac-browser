@@ -123,6 +123,7 @@
     "storeAs": "Guardar código como:",
     "installDependencies": "Instalação de dependências:"
   },
+  "externalInfo": "",
   "favorites": {
     "add": "Adicionar aos favoritos",
     "empty": "Nenhum favorito foi adicionado ainda. Para adicionar favoritos, use o botão 'Favorito' na página de um catálogo, coleção ou item.",
@@ -157,7 +158,8 @@
   },
   "goBack": {
     "description": "Voltar para {type}",
-    "label": "Voltar"
+    "label": "Voltar",
+    "refererDescription": ""
   },
   "goToCollection": {
     "description": "Ir para a coleção associada",
