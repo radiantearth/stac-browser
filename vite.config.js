@@ -13,6 +13,7 @@ import { BootstrapVueNextResolver } from "bootstrap-vue-next/resolvers";
 
 import { ViteEjsPlugin } from "vite-plugin-ejs";
 import { visualizer } from "rollup-plugin-visualizer";
+import postcssRTLCSS from "postcss-rtlcss";
 
 import yargs from "yargs";
 
@@ -111,6 +112,12 @@ export default defineConfig(async ({ mode }) => {
       },
     },
     css: {
+      // Bootstrap's RTL support is produced with RTLCSS. Combined mode emits
+      // direction-scoped LTR and RTL declarations from the same source CSS so
+      // the UI can switch direction at runtime without loading a second theme.
+      postcss: {
+        plugins: [postcssRTLCSS()],
+      },
       preprocessorOptions: {
         scss: {
           api: "modern-compiler",
