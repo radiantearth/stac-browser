@@ -158,7 +158,7 @@ export default {
       border: 0;
       margin-top: var(--sb-block-gap);
       margin-bottom: var(--sb-block-gap);
-      text-align: left;
+      text-align: start;
 
       .metadata-rows {
         border-radius: $border-radius;
@@ -182,13 +182,13 @@ export default {
     }
     .label {
       margin: 0;
-      padding-left: 0;
+      padding-inline-start: 0;
       font-weight: 600;
       vertical-align: top;
     }
     .value {
       margin: 0;
-      padding-right: 0;
+      padding-inline-end: 0;
 
       > ul,
       > ol,
@@ -221,11 +221,11 @@ export default {
       }
     }
     ul {
-      padding-left: 1.4em;
+      padding-inline-start: 1.4em;
       margin-bottom: 0;
     }
     ol {
-      padding-left: 2em;
+      padding-inline-start: 2em;
       margin-bottom: 0;
     }
     ul li {
@@ -233,20 +233,20 @@ export default {
     }
     dl {
       margin: 0;
-      margin-left: 1em;
+      margin-inline-start: 1em;
       margin-bottom: 0.5em;
 
       &:only-child {
-        margin-left: 0;
+        margin-inline-start: 0;
         margin-bottom: 0;
       }
       dl:only-child {
-        margin-left: 1em;
+        margin-inline-start: 1em;
       }
     }
     ul > li > dl,
     ol > li > dl {
-      margin-left: 0;
+      margin-inline-start: 0;
     }
     dt {
       display: inline;
