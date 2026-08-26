@@ -3,7 +3,7 @@
     <div v-if="generator.installDependencies" class="meta-row">
       <p class="meta-text">
         {{ $t('exampleCode.installDependencies') }}
-        <code class="meta-code">{{ generator.installDependencies }}</code>
+        <code class="meta-code" dir="ltr">{{ generator.installDependencies }}</code>
       </p>
       <CopyButton
         :copyText="generator.installDependencies"
@@ -14,7 +14,7 @@
     <div class="meta-row">
       <p class="meta-text">
         {{ $t('exampleCode.storeAs') }}
-        <code class="meta-code">{{ file }}</code>
+        <code class="meta-code" dir="ltr">{{ file }}</code>
       </p>
       <CopyButton
         :copyText="file"

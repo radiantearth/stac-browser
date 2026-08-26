@@ -1,5 +1,5 @@
 <template>
-  <div class="code">
+  <div class="code" dir="ltr">
     <div class="actions">
       <b-button
         :title="$t('assets.download.generic')"
@@ -119,7 +119,7 @@ export default defineComponent({
     > * {
       display: inline-block;
       min-width: 100%;
-      padding-right: 3rem;
+      padding-inline-end: 3rem;
       box-sizing: border-box;
     }
   }
@@ -127,7 +127,7 @@ export default defineComponent({
   .actions {
     position: absolute;
     top: var(--sb-code-padding);
-    right: var(--sb-code-padding);
+    inset-inline-end: var(--sb-code-padding);
     display: flex;
     gap: calc(var(--sb-code-padding) / 2);
     flex-direction: column;
