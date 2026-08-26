@@ -1,7 +1,7 @@
 import { createApp } from "vue";
 import { createRouter, createWebHistory, createWebHashHistory } from "vue-router";
 import StacBrowser from "./StacBrowser.vue";
-import i18n, { loadDefaultMessages } from './i18n';
+import i18n, { getLocaleDirection, loadDefaultMessages } from './i18n';
 import CONFIG from './merged-config';
 import getRoutes from "./router";
 import getStore from "./store";
@@ -16,6 +16,11 @@ import WidgetHook from "./plugins/WidgetHook.vue";
 // runs before this bundle, so merged-config.js already contains the runtime
 // values when the modules below evaluate.
 export default function init() {
+  // Direction-scoped styles need a matching document direction before Vue
+  // mounts. HeaderTitle keeps these attributes synchronized after startup.
+  document.documentElement.setAttribute('lang', CONFIG.locale);
+  document.documentElement.setAttribute('dir', getLocaleDirection(CONFIG.locale));
+
   return loadDefaultMessages().then(() => {
     // Setup router
     const router = createRouter({
