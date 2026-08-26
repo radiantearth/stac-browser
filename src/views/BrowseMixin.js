@@ -18,8 +18,8 @@ export default {
     }
   },
   computed: {
-    ...mapState(["allowExternalAccess", "catalogUrl", "loading", "url"]),
-    ...mapGetters(["fromBrowserPath", "error"]),
+    ...mapState(["allowExternalAccess", "catalogUrl", "loading", "locale", "url"]),
+    ...mapGetters(["fromBrowserPath", "error", "isLocalizedCatalogUrl"]),
     errorId() {
       return getErrorCode(this.error);
     },
@@ -43,11 +43,6 @@ export default {
   },
   methods: {
     async browse(path) {
-      // Check the given path, not the path property (i.e. this.isExternal)
-      if (!this.allowExternalAccess && isExternalPath(path)) {
-        return;
-      }
-
       // This has to run after the created() method in StacBrowser.vue.
       // Thus we have to wait here for the router to be ready so that
       // we can ensure parseQuery in StacBrowser.vue has been called
@@ -55,6 +50,19 @@ export default {
       // https://github.com/radiantearth/stac-browser/issues/822#issuecomment-4068820575
       await this.$router.isReady();
       const url = this.fromBrowserPath(path || '/');
+
+      // Locale alternates advertised by the configured catalog remain trusted
+      // even when arbitrary external access is disabled. Establish that root
+      // context before deciding whether an encoded external path is allowed.
+      if (!this.allowExternalAccess && isExternalPath(path)) {
+        if (!this.isLocalizedCatalogUrl(url)) {
+          await this.$store.dispatch('switchCatalogRootLocale', { locale: this.locale });
+        }
+        if (!this.isLocalizedCatalogUrl(url)) {
+          return;
+        }
+      }
+
       await this.$store.dispatch('load', { url, show: true });
     }
   }

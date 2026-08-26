@@ -14,9 +14,9 @@ function catchAllString(route) {
   return Array.isArray(pathMatch) ? pathMatch.join("/") : pathMatch;
 }
 
-function getPath(route, config) {
+function getPath(route) {
   let path = catchAllString(route);
-  if (config.allowExternalAccess && path.startsWith("external/")) {
+  if (path.startsWith("external/")) {
     path = "/" + path;
   }
   return {path};
@@ -65,7 +65,7 @@ function getRoutes(config) {
     path: "/validation/:pathMatch(.*)*",
     name: "validation",
     component: () => import("../views/Validation.vue"),
-    props: route => getPath(route, config)
+    props: route => getPath(route)
   });
 
   if (config.showFavorites) {
@@ -81,7 +81,7 @@ function getRoutes(config) {
     name: "managementEdit",
     component: () => import("../views/Edit.vue"),
     props: route => ({
-      ...getPath(route, config),
+      ...getPath(route),
       mode: 'edit'
     })
   });
@@ -91,7 +91,7 @@ function getRoutes(config) {
     name: "managementCreateItem",
     component: () => import("../views/Edit.vue"),
     props: route => ({
-      ...getPath(route, config),
+      ...getPath(route),
       mode: 'create-item'
     })
   });
@@ -101,7 +101,7 @@ function getRoutes(config) {
     name: "managementCreateCollection",
     component: () => import("../views/Edit.vue"),
     props: route => ({
-      ...getPath(route, config),
+      ...getPath(route),
       mode: 'create-collection'
     })
   });
@@ -110,7 +110,7 @@ function getRoutes(config) {
     path: "/:pathMatch(.*)*",
     name: "browse",
     component: () => import("../views/Browse.vue"),
-    props: route => getPath(route, config)
+    props: route => getPath(route)
   });
 
   return routes;
