@@ -123,7 +123,7 @@
     "storeAs": "Memorizza il codice come:",
     "installDependencies": "Installare le dipendenze:"
   },
-  "externalInfo": "",
+  "externalInfo": "Questo {type} è fornito da una fonte di dati esterna.",
   "favorites": {
     "add": "Aggiungi ai preferiti",
     "empty": "Nessun preferito è stato ancora aggiunto. Per aggiungere preferiti, usa il pulsante 'Preferiti' nella pagina di un catalogo, una collezione o un elemento.",
@@ -159,7 +159,7 @@
   "goBack": {
     "description": "Torna a {type}",
     "label": "Indietro",
-    "refererDescription": ""
+    "refererDescription": "Torna all'ultima pagina visitata nel catalogo"
   },
   "goToCollection": {
     "description": "Vai alla Collezione associata",
@@ -407,7 +407,7 @@
     "conformanceClasses": "Classi di conformità",
     "detailsAboutSource": "Informazioni sulla fonte STAC",
     "extension": "Estensione",
-    "externalData": "",
+    "externalData": "Fonte di dati esterna",
     "fileFormat": "Formato file",
     "id": "ID",
     "invalid": "Non valido",
