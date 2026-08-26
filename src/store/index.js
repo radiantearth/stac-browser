@@ -84,6 +84,22 @@ function guessParentUrlFromApiPath(url, levels) {
   return uri.toString();
 }
 
+function toExternalBrowserPath(absolute) {
+  const parts = ['/external'];
+  const protocol = absolute.protocol();
+  if (protocol !== 'https') {
+    parts.push(`${protocol}:`);
+  }
+  parts.push(absolute.authority());
+  parts.push(absolute.path().replace(/^\//, ''));
+  let path = parts.join('/');
+  const query = absolute.query();
+  if (query) {
+    path += `?${query}`;
+  }
+  return path;
+}
+
 // Returns the STAC object for the given URL from the cache,
 // otherwise creates it from the given data and adds it to the cache.
 function getOrCreateStac(cx, data, url) {
@@ -434,23 +450,18 @@ function getStore(config, router) {
           relative = absolute.relativeTo(state.catalogUrl);
         }
 
+        const relativeStr = relative?.toString();
+        const localizedOutsideBrowserBase = getters.isLocalizedCatalogUrl(absolute) &&
+          (typeof relative === 'undefined' || relativeStr.startsWith('//') || relativeStr.startsWith('../'));
+        if (localizedOutsideBrowserBase) {
+          return toExternalBrowserPath(absolute);
+        }
+
         if (typeof relative === 'undefined' || getters.isExternalUrl(absolute, false)) {
           if (!state.allowExternalAccess) {
             return absolute.toString();
           }
-          let parts = ['/external'];
-          let protocol = absolute.protocol();
-          if (protocol !== 'https') {
-            parts.push(`${protocol}:`);
-          }
-          parts.push(absolute.authority());
-          parts.push(absolute.path().replace(/^\//, ''));
-          let path = parts.join('/');
-          let q = absolute.query();
-          if (q) {
-            path += `?${q}`;
-          }
-          return path;
+          return toExternalBrowserPath(absolute);
         }
         else {
           return `/${relative.toString()}`;
@@ -477,12 +488,29 @@ function getStore(config, router) {
         }
         return getters.getRequestUrl(url, null, true);
       },
-      isExternalUrl: state => (absoluteUrl, whitelist = true) => {
+      isLocalizedCatalogUrl: state => absoluteUrl => {
+        if (!state.catalogRootUrl) {
+          return false;
+        }
+        if (!(absoluteUrl instanceof urijs)) {
+          absoluteUrl = URI(absoluteUrl);
+        }
+        const relative = absoluteUrl.relativeTo(state.catalogRootUrl);
+        if (relative.equals(absoluteUrl)) {
+          return false;
+        }
+        const relativeStr = relative.toString();
+        return !relativeStr.startsWith('//') && !relativeStr.startsWith('../');
+      },
+      isExternalUrl: (state, getters) => (absoluteUrl, whitelist = true) => {
         if (!state.catalogUrl) {
           return false;
         }
         if (!(absoluteUrl instanceof urijs)) {
           absoluteUrl = URI(absoluteUrl);
+        }
+        if (getters.isLocalizedCatalogUrl(absoluteUrl)) {
+          return false;
         }
         if (whitelist && Array.isArray(state.allowedDomains) && state.allowedDomains.some(d => hasAuthority(d, absoluteUrl))) {
           return false;
