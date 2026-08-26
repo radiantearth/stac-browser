@@ -62,7 +62,7 @@
           <nav class="actions navigation">
             <b-button-group>
               <b-button v-if="back" :to="selfBrowserLink" :title="$t('goBack.description', {type})" variant="outline-primary" size="sm">
-                <b-icon-arrow-left /><span class="button-label">{{ $t('goBack.label') }}</span>
+                <b-icon-arrow-left class="directional-icon" /><span class="button-label">{{ $t('goBack.label') }}</span>
               </b-button>
               <b-button v-if="collectionLink" :to="toBrowserPath(collectionLink)" :title="collectionLinkTitle" variant="outline-primary" size="sm">
                 <b-icon-folder-symlink /><span class="button-label">{{ $t('goToCollection.label') }}</span>
@@ -614,4 +614,3 @@ export default defineComponent({
 @import "./theme/runtime-helpers.scss";
 @import "./theme/custom.scss";
 </style>
-

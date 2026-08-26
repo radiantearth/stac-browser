@@ -4,7 +4,7 @@
       <span class="start">
         <span class="chevron" aria-hidden="true">
           <b-icon-chevron-down v-if="expanded" />
-          <b-icon-chevron-right v-else />
+          <b-icon-chevron-right v-else class="directional-icon" />
         </span>
         <span class="title" :title="provider.name">{{ provider.name }}</span>
       </span>
