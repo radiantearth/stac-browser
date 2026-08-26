@@ -143,6 +143,8 @@ function getStore(config, router) {
     queue: [],
     privateQueryParameters: {},
     dataLanguage: null,
+    dataLanguageNavigation: null,
+    dataLanguageNavigationId: 0,
     catalogRootUrl: null,
 
     apiCollections: [],
@@ -656,13 +658,21 @@ function getStore(config, router) {
           }
         }
       },
-      languages(state, { uiLanguage, dataLanguage }) {
+      languages(state, { uiLanguage, dataLanguage, navigateData = false }) {
         if (typeof uiLanguage !== 'undefined') {
           i18n.global.locale = uiLanguage;
           state.uiLanguage = uiLanguage || null;
         }
         if (typeof dataLanguage !== 'undefined') {
-          state.dataLanguage = dataLanguage || null;
+          const resolvedDataLanguage = dataLanguage || null;
+          const changed = state.dataLanguage !== resolvedDataLanguage;
+          state.dataLanguage = resolvedDataLanguage;
+          if (navigateData && changed && resolvedDataLanguage) {
+            state.dataLanguageNavigation = {
+              id: ++state.dataLanguageNavigationId,
+              locale: resolvedDataLanguage
+            };
+          }
         }
       },
       catalogRootUrl(state, url) {
@@ -956,15 +966,19 @@ function getStore(config, router) {
         await updateExternals(uiLanguage, cx.state.fallbackLocale);
 
         // Update store and URL
-        cx.commit('languages', { dataLanguage, uiLanguage });
+        cx.commit('languages', {
+          dataLanguage,
+          uiLanguage,
+          navigateData: cx.state.data instanceof STAC
+        });
         cx.commit('setQueryParameter', { type: 'state', key: 'language', value: locale });
       },
       // eslint-disable-next-line require-await
       async switchDataLocale(cx, { locale }) {
         const dataLanguage = detectDataLanguage(cx.state.data, locale, cx.state.uiLanguage);
-        cx.commit('languages', { dataLanguage });
+        cx.commit('languages', { dataLanguage, navigateData: true });
       },
-      async switchCatalogRootLocale(cx, { locale }) {
+      async switchCatalogRootLocale(cx, { locale, commit = true }) {
         let root = cx.getters.root;
         if (!root && cx.state.catalogUrl) {
           await cx.dispatch('load', { url: cx.state.catalogUrl, isRoot: true });
@@ -979,7 +993,9 @@ function getStore(config, router) {
         if (!cx.getters.getStac(url)) {
           return null;
         }
-        cx.commit('catalogRootUrl', url);
+        if (commit) {
+          cx.commit('catalogRootUrl', url);
+        }
         return url;
       },
       async loadBackground(cx, count) {
