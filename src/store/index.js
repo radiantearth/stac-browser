@@ -770,9 +770,17 @@ function getStore(config, router) {
         }
       },
       loaded(state, { url, data }) {
+        const loading = state.database[url];
+        if (loading instanceof Loading) {
+          loading.finish(data);
+        }
         state.database[url] = data;
       },
       clear(state, url) {
+        const loading = state.database[url];
+        if (loading instanceof Loading) {
+          loading.finish(null);
+        }
         delete state.database[url];
         delete state.apiChildren[url];
         delete state.conformance[url];
@@ -785,6 +793,11 @@ function getStore(config, router) {
           state.locale = config.locale;
         }
         if (clearAll) {
+          for (const data of Object.values(state.database)) {
+            if (data instanceof Loading) {
+              data.finish(null);
+            }
+          }
           state.catalogUrl = config.catalogUrl;
           state.catalogTitle = config.catalogTitle;
           state.database = {};
@@ -821,6 +834,9 @@ function getStore(config, router) {
         }
         if (!(error instanceof Error)) {
           error = new Error(error);
+        }
+        if (status instanceof Loading) {
+          status.finish(error);
         }
         state.database[url] = error;
       },
@@ -1017,7 +1033,7 @@ function getStore(config, router) {
           return null;
         }
         const url = link.getAbsoluteUrl();
-        await cx.dispatch('load', { url, isRoot: true });
+        await cx.dispatch('load', { url, isRoot: true, omitApi: true });
         if (!cx.getters.getStac(url)) {
           return null;
         }
@@ -1101,7 +1117,7 @@ function getStore(config, router) {
 
         // Register before the first await, so that a navigation in the meantime cancels showing the page.
         // Afterwards, check loading.show instead of show.
-        let loading = new Loading(show);
+        let loading = new Loading(show, true);
         if (show) {
           pendingShows.add(loading);
         }
@@ -1117,6 +1133,9 @@ function getStore(config, router) {
         if (data instanceof Loading) {
           pendingShows.delete(loading);
           cx.commit('updateLoading', { url, show: loading.show });
+          if (data.promise) {
+            await data.promise;
+          }
           return;
         }
 
@@ -1159,19 +1178,19 @@ function getStore(config, router) {
         }
 
         let dataLanguage;
-        if (loading.show) {
+        const redirectToDataLocale = async stac => {
           // A locale can be selected before the first catalog is loaded.
           // Resolve it against the entity before showing the page, including
           // when the entity was already available from the cache.
           dataLanguage = detectDataLanguage(
-            data,
+            stac,
             cx.state.locale,
             cx.state.uiLanguage
           );
 
           // Keep catalogUrl stable as the browser-path base. The localized root
           // is loaded separately for the header, breadcrumbs, and root metadata.
-          const localeLink = data.getLocaleLink(dataLanguage);
+          const localeLink = stac.getLocaleLink(dataLanguage);
           if (localeLink) {
             await cx.dispatch('switchCatalogRootLocale', { locale: dataLanguage });
             const browserPath = cx.getters.toBrowserPath(localeLink);
@@ -1186,8 +1205,13 @@ function getStore(config, router) {
             else {
               await router.replace(browserPath);
             }
-            return;
+            return true;
           }
+          return false;
+        };
+
+        if (loading.show && await redirectToDataLocale(data)) {
+          return;
         }
 
         if (loading.show) {
@@ -1224,6 +1248,11 @@ function getStore(config, router) {
           }
         }
 
+        const entityLanguage = data.getMetadata('language');
+        const entityMatchesRequestedLanguage = loading.show &&
+          isObject(entityLanguage) &&
+          getBest([entityLanguage.code], dataLanguage, null);
+
         // Load the root catalog data if not available (e.g. after page refresh or external access)
         if (!cx.getters.root && !isRoot) {
           let catalogUrl = cx.state.catalogUrl;
@@ -1235,10 +1264,11 @@ function getStore(config, router) {
             }
           }
           if (catalogUrl && !Utils.equalUrl(url, catalogUrl)) {
-            // todo: In principle we could set omitApi: true in many cases here,
-            // but until we can reliably load the API data on demand, we fully load it.
-            // https://github.com/radiantearth/stac-browser/issues/796
-            await cx.dispatch('load', { url: catalogUrl, isRoot: true });
+            await cx.dispatch('load', {
+              url: catalogUrl,
+              isRoot: true,
+              omitApi: Boolean(entityMatchesRequestedLanguage)
+            });
           }
         }
 
@@ -1246,12 +1276,7 @@ function getStore(config, router) {
         // to establish the matching root context. Once the configured root is
         // available, select its alternate when the shown entity itself is in
         // the requested language.
-        const entityLanguage = data.getMetadata('language');
-        if (
-          loading.show &&
-          isObject(entityLanguage) &&
-          getBest([entityLanguage.code], dataLanguage, null)
-        ) {
+        if (entityMatchesRequestedLanguage) {
           await cx.dispatch('switchCatalogRootLocale', { locale: dataLanguage });
         }
 
@@ -1268,6 +1293,12 @@ function getStore(config, router) {
         // All tasks finished, show the page if requested
         pendingShows.delete(loading);
         if (loading.show) {
+          // A background request can be promoted to a shown request while any
+          // of the awaited work above is in progress. Re-resolve the locale so
+          // the promoted page cannot bypass its alternate-language redirect.
+          if (await redirectToDataLocale(data)) {
+            return;
+          }
           cx.commit('showPage', { url });
           cx.commit('languages', { dataLanguage });
           // If we don't have a catalogUrl but have a page to show,
