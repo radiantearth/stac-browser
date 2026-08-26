@@ -64,6 +64,7 @@ The following guide helps you to get started:
 - Translate the `.json` files, most importantly `config.json`, `fields.json` and `texts.json`.
   - Please note that you never need to translate any object keys!
   - If you base your language on another existing language (e.g. create `en-IN` based on `en`) you can delete individual files and import existing files from other languages in `default.js`.
+  - UI direction is configured per locale in `config.json` and defaults to `ltr`. For an RTL language, add `"direction": "rtl"`. The shared layout and controls will then follow RTL automatically; no language-specific styles or code are required.
 - Adapt the `datepicker.js`, `duration.js` and `validation.js` files to import the existing definitions from their corresponding external packages, but you could also define the specifics yourself. Ensure the imported files actually exist in the packages.
 - Check that your translation works by running the development server (`npm start`) and navigating to the STAC Browser instance in your browser (usually `http://localhost:8080`).
 - Once completed, please open a pull request and we'll get back to you as soon as possible.

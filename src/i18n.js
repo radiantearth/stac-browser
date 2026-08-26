@@ -69,6 +69,17 @@ const i18n = createI18n({
 
 export default i18n;
 
+/**
+ * Returns the writing direction declared by a supported UI locale.
+ * Locales are left-to-right unless they explicitly opt in to RTL in config.json.
+ *
+ * @param {string} locale The UI locale.
+ * @returns {'ltr'|'rtl'} The locale's writing direction.
+ */
+export function getLocaleDirection(locale) {
+  return LOCALE_CONFIG[locale]?.direction === 'rtl' ? 'rtl' : 'ltr';
+}
+
 export async function loadMessages(locale) {
   // Check whether the language has already been loaded
   // Note that a languages key is already present thus check >1 and not >0
