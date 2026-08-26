@@ -50,7 +50,7 @@ export default {
 .ol-location {
   pointer-events: auto;
   z-index: 1;
-  left: 0.5em;
+  inset-inline-start: 0.5em;
   top: calc(3.75em + 6px);
 }
 </style>
