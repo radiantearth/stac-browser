@@ -1,5 +1,5 @@
 <template>
-  <b-dropdown variant="header" end :title="$t('source.language.switch')">
+  <b-dropdown variant="header" placement="bottom-end" :title="$t('source.language.switch')">
     <template #button-content>
       <b-icon-flag /><span class="button-label">{{ $t('source.language.label', {currentLanguage}) }}</span>
     </template>
