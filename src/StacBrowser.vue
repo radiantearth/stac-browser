@@ -181,7 +181,7 @@ export default defineComponent({
     };
   },
   computed: {
-    ...mapState(['allowSelectCatalog', 'browserReady', 'catalogUrl', 'conformsTo', 'data', 'dataLanguage', 'downloads', 'globalError', 'loading', 'stateQueryParameters', 'url']),
+    ...mapState(['allowSelectCatalog', 'browserReady', 'catalogRootUrl', 'conformsTo', 'data', 'dataLanguage', 'downloads', 'globalError', 'loading', 'stateQueryParameters', 'url']),
     ...mapState({
       showFavoritesFromVueX: 'showFavorites',
       footerLinksFromVueX: 'footerLinks',
@@ -284,26 +284,20 @@ export default defineComponent({
           const link = this.data.getLocaleLink(locale);
           if (link) {
             const state = Object.assign({}, this.stateQueryParameters);
-            const previousCatalogUrl = this.catalogUrl;
-            const localizedRoot = this.root?.getLocaleLink(locale);
-            const localizedCatalogUrl = localizedRoot?.getAbsoluteUrl();
+            const previousCatalogRootUrl = this.catalogRootUrl;
             this.isNavigatingLocale = true;
             try {
-              // Keep the catalog context in the same language as the page. The
-              // header, breadcrumbs, and root metadata all resolve through
-              // catalogUrl, including when switching on a child page.
-              if (localizedCatalogUrl && localizedCatalogUrl !== previousCatalogUrl) {
-                await this.$store.dispatch('config', { catalogUrl: localizedCatalogUrl });
+              await this.$store.dispatch('switchCatalogRootLocale', { locale });
+              const failure = await this.$router.push(this.toBrowserPath(link));
+              if (failure && !isNavigationFailure(failure, NavigationFailureType.duplicated)) {
+                throw failure;
               }
-              await this.$router.push(this.toBrowserPath(link));
             }
             catch (error) {
-              if (!isNavigationFailure(error, NavigationFailureType.duplicated)) {
-                if (this.catalogUrl !== previousCatalogUrl) {
-                  await this.$store.dispatch('config', { catalogUrl: previousCatalogUrl });
-                }
-                throw error;
+              if (this.catalogRootUrl !== previousCatalogRootUrl) {
+                this.$store.commit('catalogRootUrl', previousCatalogRootUrl);
               }
+              throw error;
             }
             finally {
               this.isNavigatingLocale = false;

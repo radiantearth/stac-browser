@@ -129,6 +129,7 @@ function getStore(config, router) {
     privateQueryParameters: {},
     conformsTo: [],
     dataLanguage: null,
+    catalogRootUrl: null,
 
     apiCollections: [],
     apiItemsLoading: {},
@@ -272,8 +273,9 @@ function getStore(config, router) {
       root: (_, getters) => getters.getStac(getters.rootLink),
 
       rootLink: state => {
-        if (state.catalogUrl) {
-          return Utils.createLink(state.catalogUrl, 'root', state.catalogTitle);
+        const activeRootUrl = state.catalogRootUrl || state.catalogUrl;
+        if (activeRootUrl) {
+          return Utils.createLink(activeRootUrl, 'root', state.catalogTitle);
         }
         const link = state.data?.getStacLinkWithRel('root');
         if (link) {
@@ -595,6 +597,9 @@ function getStore(config, router) {
           state.dataLanguage = dataLanguage || null;
         }
       },
+      catalogRootUrl(state, url) {
+        state.catalogRootUrl = hasText(url) ? url : null;
+      },
       setQueryParameter(state, { type, key, value }) {
         type = `${type}QueryParameters`;
         if (typeof value === 'undefined') {
@@ -884,6 +889,24 @@ function getStore(config, router) {
         const dataLanguage = detectDataLanguage(cx.state.data, locale, cx.state.uiLanguage);
         cx.commit('languages', { dataLanguage });
       },
+      async switchCatalogRootLocale(cx, { locale }) {
+        let root = cx.getters.root;
+        if (!root && cx.state.catalogUrl) {
+          await cx.dispatch('load', { url: cx.state.catalogUrl, isRoot: true });
+          root = cx.getters.root;
+        }
+        const link = root?.getLocaleLink(locale);
+        if (!link) {
+          return null;
+        }
+        const url = link.getAbsoluteUrl();
+        await cx.dispatch('load', { url, isRoot: true });
+        if (!cx.getters.getStac(url)) {
+          return null;
+        }
+        cx.commit('catalogRootUrl', url);
+        return url;
+      },
       async loadBackground(cx, count) {
         let urls = cx.state.queue.slice(0, count);
         if (urls.length > 0) {
@@ -988,25 +1011,6 @@ function getStore(config, router) {
             }
             cx.commit('loaded', { url, data });
 
-            if (show) {
-              // A locale can be selected before the first catalog is loaded.
-              // Resolve the preferred data language against the newly loaded
-              // entity so its localized alternate is followed immediately.
-              const dataLanguage = detectDataLanguage(
-                data,
-                cx.state.locale,
-                cx.state.uiLanguage
-              );
-              cx.commit('languages', { dataLanguage });
-
-              // If we prefer another language abort redirect to the new language
-              let localeLink = data.getLocaleLink(dataLanguage);
-              if (localeLink) {
-                router.replace(cx.getters.toBrowserPath(localeLink));
-                return;
-              }
-            }
-
             // Users may enter a different URL than reported in the STAC document
             // (e.g. missing trailing slash) - correct the URL and redirect.
             if (await normalizeCatalogUrl(cx, data, url, show)) {
@@ -1024,6 +1028,38 @@ function getStore(config, router) {
           } catch (error) {
             console.error(error);
             cx.commit('errored', { url, error });
+            return;
+          }
+        }
+
+        let dataLanguage;
+        if (loading.show) {
+          // A locale can be selected before the first catalog is loaded.
+          // Resolve it against the entity before showing the page, including
+          // when the entity was already available from the cache.
+          dataLanguage = detectDataLanguage(
+            data,
+            cx.state.locale,
+            cx.state.uiLanguage
+          );
+
+          // Keep catalogUrl stable as the browser-path base. The localized root
+          // is loaded separately for the header, breadcrumbs, and root metadata.
+          const localeLink = data.getLocaleLink(dataLanguage);
+          if (localeLink) {
+            await cx.dispatch('switchCatalogRootLocale', { locale: dataLanguage });
+            const browserPath = cx.getters.toBrowserPath(localeLink);
+            if (browserPath.startsWith('/')) {
+              const target = URI(browserPath);
+              const query = Utils.stateQueryParametersToObject(
+                cx.state.stateQueryParameters,
+                target.query(true)
+              );
+              await router.replace({ path: target.path(), query });
+            }
+            else {
+              await router.replace(browserPath);
+            }
             return;
           }
         }
@@ -1080,6 +1116,19 @@ function getStore(config, router) {
           }
         }
 
+        // On a reload of an already localized page there is no locale redirect
+        // to establish the matching root context. Once the configured root is
+        // available, select its alternate when the shown entity itself is in
+        // the requested language.
+        const entityLanguage = data.getMetadata('language');
+        if (
+          loading.show &&
+          isObject(entityLanguage) &&
+          getBest([entityLanguage.code], dataLanguage, null)
+        ) {
+          await cx.dispatch('switchCatalogRootLocale', { locale: dataLanguage });
+        }
+
         // Check management permissions for editable resources (items/collections).
         // The list endpoints are preflighted when their listings are loaded, but the
         // detail resources (where edit/delete live) need an explicit check. This runs
@@ -1093,6 +1142,7 @@ function getStore(config, router) {
         // All tasks finished, show the page if requested
         if (loading.show) {
           cx.commit('showPage', { url });
+          cx.commit('languages', { dataLanguage });
           // If we don't have a catalogUrl but have a page to show,
           // we should assume this URL is the root catalog for now.
           if (!cx.state.catalogUrl) {
