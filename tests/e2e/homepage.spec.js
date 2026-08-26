@@ -7,8 +7,9 @@
 * Fixtures: tests/fixtures/catalogs.json (synthetic STAC Index entries)
 */
 import { test, expect } from './fixtures.js';
-import { configureBrowser, HOME_PATH, mockStacResource } from './helpers.js';
+import { configureBrowser, HOME_PATH, mockStacResource, recordRequestHeaders } from './helpers.js';
 import StaticCatalog from '../fixtures/instances/static.js';
+import API from '../fixtures/instances/api.js';
 import fs from 'fs';
 const catalogs = JSON.parse(fs.readFileSync(
   new URL('../fixtures/templates/catalogs.json', import.meta.url), 'utf-8'
@@ -100,6 +101,39 @@ test.describe('STAC Browser Data Source Selection', () => {
     await expect(page.locator('html')).toHaveAttribute('dir', 'ltr');
   });
 
+  test('a stored RTL locale sets direction before the application mounts', async ({ page }) => {
+    await configureBrowser(page, {
+      detectLocaleFromBrowser: false,
+      storeLocale: true,
+      locale: 'en',
+      fallbackLocale: 'en',
+      supportedLocales: ['ar', 'en'],
+    });
+    await page.addInitScript(() => window.localStorage.setItem('locale', 'ar'));
+
+    let releaseMessages;
+    const messagesReleased = new Promise(resolve => {
+      releaseMessages = resolve;
+    });
+    let messagesBlocked;
+    const blockedMessages = new Promise(resolve => {
+      messagesBlocked = resolve;
+    });
+    await page.route('**/src/locales/en/default.js*', async route => {
+      messagesBlocked();
+      await messagesReleased;
+      await route.continue();
+    });
+
+    await page.goto(HOME_PATH, { waitUntil: 'commit' });
+    await blockedMessages;
+    await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
+    await expect(page.locator('#stac-browser')).toHaveCount(0);
+
+    releaseMessages();
+    await expect(page.locator('#stac-browser')).toBeVisible();
+  });
+
   test('a preselected UI language follows the matching catalog alternate', async ({ page, worker }) => {
     const englishUrl = 'https://stac.example/language/catalog.json';
     const arabicUrl = 'https://stac.example/language/ar/catalog.json';
@@ -180,14 +214,15 @@ test.describe('STAC Browser Data Source Selection', () => {
   });
 
   test('a configured catalog keeps stable paths while switching localized roots', async ({ page, worker }) => {
-    const englishUrl = 'https://stac.example/configured/catalog.json';
+    const englishUrl = 'https://stac.example/configured/en/catalog.json';
     const arabicUrl = 'https://stac.example/configured/ar/catalog.json';
-    const englishChildUrl = 'https://stac.example/configured/children/child.json';
+    const englishChildUrl = 'https://stac.example/configured/en/children/child.json';
     const arabicChildUrl = 'https://stac.example/configured/ar/localized/arabic-child.json';
     const languageExtension = 'https://stac-extensions.github.io/language/v1.0.0/schema.json';
 
     await configureBrowser(page, {
       catalogUrl: englishUrl,
+      allowExternalAccess: false,
       detectLocaleFromBrowser: false,
       storeLocale: false,
       locale: 'en',
@@ -231,6 +266,7 @@ test.describe('STAC Browser Data Source Selection', () => {
 
     await englishCatalog.createServer(worker, { reset: false });
     await arabicCatalog.createServer(worker, { reset: false });
+    await mockStacResource(worker, arabicUrl, arabicCatalog.root.build(), { delay: 100 });
 
     await page.goto(`${HOME_PATH}?.language=ar`);
     await expect(page.getByRole('heading', { name: 'كتالوج عربي مضبوط' })).toBeVisible();
@@ -248,6 +284,61 @@ test.describe('STAC Browser Data Source Selection', () => {
     await page.reload();
     await expect(page.getByRole('heading', { name: 'عنصر عربي مضبوط' })).toBeVisible();
     await expect(page.locator('header [role="banner"]')).toHaveText('كتالوج عربي مضبوط');
+
+    await page.locator('header .title .stac-link').click();
+    await expect(page.getByRole('heading', { name: 'كتالوج عربي مضبوط' })).toBeVisible();
+    await expect(page.locator('header [role="banner"]')).toHaveText('كتالوج عربي مضبوط');
+
+    // A user switch must wait for an alternate root already being prefetched.
+    const rootAfterConcurrentSwitch = await page.evaluate(async ({ englishUrl, arabicUrl }) => {
+      const store = document.querySelector('[data-v-app]')
+        ?.__vue_app__?.config?.globalProperties?.$store;
+      store.commit('catalogRootUrl', englishUrl);
+      store.commit('clear', arabicUrl);
+      const backgroundLoad = store.dispatch('load', {
+        url: arabicUrl,
+        isRoot: true,
+        omitApi: true
+      });
+      while (store.state.database[arabicUrl]?.constructor?.name !== 'Loading') {
+        await new Promise(resolve => setTimeout(resolve, 0));
+      }
+      await store.dispatch('switchCatalogRootLocale', { locale: 'ar' });
+      await backgroundLoad;
+      return store.state.catalogRootUrl;
+    }, { englishUrl, arabicUrl });
+    expect(rootAfterConcurrentSwitch).toBe(arabicUrl);
+  });
+
+  test('a language-conformant API does not reload after synchronizing its data language', async ({ page, worker }) => {
+    const apiUrl = 'https://stac.example/language-api/';
+    const api = API.minimalApi({ url: apiUrl });
+    api.root
+      .addConformsTo('https://api.stacspec.org/v1.0.0/language')
+      .setMetadata({
+        language: { code: 'en', name: 'English' },
+        languages: [{ code: 'ar', name: 'العربية', dir: 'rtl' }],
+      });
+    await api.createServer(worker);
+    const requests = await recordRequestHeaders(worker, apiUrl);
+
+    await configureBrowser(page, {
+      catalogUrl: apiUrl,
+      detectLocaleFromBrowser: false,
+      storeLocale: false,
+      locale: 'en',
+      fallbackLocale: 'en',
+      supportedLocales: ['ar', 'en'],
+    });
+
+    await page.goto('/');
+    await expect(page.getByRole('heading', { name: api.root.data.title })).toBeVisible();
+    await expect.poll(() => requests.length).toBe(1);
+
+    await page.getByRole('button', { name: /Language: English/ }).click();
+    await page.locator('.dropdown-menu:visible').getByText(/^العربية$/).click();
+    await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
+    await expect.poll(() => requests.length).toBe(2);
   });
 
   test('should render catalog URL input with proper elements', async ({ page }) => {
