@@ -89,7 +89,7 @@ export default {
     font-weight: 700;
     display: inline-block;
     margin: 0;
-    margin-right: 1em;
+    margin-inline-end: 1em;
   }
   ul {
     margin-top: 0.5em;

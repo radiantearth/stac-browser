@@ -280,13 +280,13 @@ export default {
   }
 
   .tree {
-    margin-left: 1.5em;
+    margin-inline-start: 1.5em;
   }
 
   .show-more {
     width: calc(100% - 1.5em);
     box-sizing: border-box;
-    margin-left: 1.5em;
+    margin-inline-start: 1.5em;
   }
 }
 </style>
