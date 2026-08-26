@@ -7,7 +7,7 @@
 * Fixtures: tests/fixtures/catalogs.json (synthetic STAC Index entries)
 */
 import { test, expect } from './fixtures.js';
-import { HOME_PATH, mockStacResource } from './helpers.js';
+import { configureBrowser, HOME_PATH, mockStacResource } from './helpers.js';
 import StaticCatalog from '../fixtures/instances/static.js';
 import fs from 'fs';
 const catalogs = JSON.parse(fs.readFileSync(
@@ -177,6 +177,77 @@ test.describe('STAC Browser Data Source Selection', () => {
     await expect(page.getByRole('heading', { name: 'English Child' })).toBeVisible();
     await expect(page.locator('header [role="banner"]')).toHaveText('English Catalog');
     await expect(page.locator('html')).toHaveAttribute('dir', 'ltr');
+  });
+
+  test('a configured catalog keeps stable paths while switching localized roots', async ({ page, worker }) => {
+    const englishUrl = 'https://stac.example/configured/catalog.json';
+    const arabicUrl = 'https://stac.example/configured/ar/catalog.json';
+    const englishChildUrl = 'https://stac.example/configured/children/child.json';
+    const arabicChildUrl = 'https://stac.example/configured/ar/localized/arabic-child.json';
+    const languageExtension = 'https://stac-extensions.github.io/language/v1.0.0/schema.json';
+
+    await configureBrowser(page, {
+      catalogUrl: englishUrl,
+      detectLocaleFromBrowser: false,
+      storeLocale: false,
+      locale: 'en',
+      fallbackLocale: 'en',
+      supportedLocales: ['ar', 'en'],
+    });
+
+    const englishCatalog = new StaticCatalog({ url: englishUrl }).setMetadata({
+      title: 'Configured English Catalog',
+      language: { code: 'en', name: 'English' },
+      languages: [{ code: 'ar', name: 'العربية', alternate: 'Arabic', dir: 'rtl' }],
+    });
+    englishCatalog.root
+      .addExtensions([languageExtension])
+      .addLink({ rel: 'alternate', href: arabicUrl, type: 'application/json', hreflang: 'ar' });
+    const englishChild = englishCatalog.addCatalog({ url: englishChildUrl }).setMetadata({
+      title: 'Configured English Child',
+      language: { code: 'en', name: 'English' },
+      languages: [{ code: 'ar', name: 'العربية', alternate: 'Arabic', dir: 'rtl' }],
+    });
+
+    const arabicCatalog = new StaticCatalog({ url: arabicUrl }).setMetadata({
+      title: 'كتالوج عربي مضبوط',
+      language: { code: 'ar', name: 'العربية', dir: 'rtl' },
+      languages: [{ code: 'en', name: 'English' }],
+    });
+    arabicCatalog.root
+      .addExtensions([languageExtension])
+      .addLink({ rel: 'alternate', href: englishUrl, type: 'application/json', hreflang: 'en' });
+    const arabicChild = arabicCatalog.addCatalog({ url: arabicChildUrl }).setMetadata({
+      title: 'عنصر عربي مضبوط',
+      language: { code: 'ar', name: 'العربية', dir: 'rtl' },
+      languages: [{ code: 'en', name: 'English' }],
+    });
+    englishChild
+      .addExtensions([languageExtension])
+      .addLink({ rel: 'alternate', href: arabicChildUrl, type: 'application/json', hreflang: 'ar' });
+    arabicChild
+      .addExtensions([languageExtension])
+      .addLink({ rel: 'alternate', href: englishChildUrl, type: 'application/json', hreflang: 'en' });
+
+    await englishCatalog.createServer(worker, { reset: false });
+    await arabicCatalog.createServer(worker, { reset: false });
+
+    await page.goto(`${HOME_PATH}?.language=ar`);
+    await expect(page.getByRole('heading', { name: 'كتالوج عربي مضبوط' })).toBeVisible();
+    await expect(page.locator('header [role="banner"]')).toHaveText('كتالوج عربي مضبوط');
+    await expect(page).toHaveURL(/\/ar\/catalog\.json\?\.language=ar$/);
+
+    await page.goto('/children/child.json?.language=en');
+    await expect(page.getByRole('heading', { name: 'Configured English Child' })).toBeVisible();
+    await page.getByRole('button', { name: /Language: English/ }).click();
+    await page.locator('.dropdown-menu:visible').getByText(/^العربية$/).click();
+    await expect(page.getByRole('heading', { name: 'عنصر عربي مضبوط' })).toBeVisible();
+    await expect(page.locator('header [role="banner"]')).toHaveText('كتالوج عربي مضبوط');
+    await expect(page).toHaveURL(/\/ar\/localized\/arabic-child\.json\?\.language=ar$/);
+
+    await page.reload();
+    await expect(page.getByRole('heading', { name: 'عنصر عربي مضبوط' })).toBeVisible();
+    await expect(page.locator('header [role="banner"]')).toHaveText('كتالوج عربي مضبوط');
   });
 
   test('should render catalog URL input with proper elements', async ({ page }) => {
