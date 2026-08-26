@@ -786,7 +786,7 @@ svg {
   }
 }
 
-[dir="rtl"] {
+[dir=rtl] {
   #stac-browser {
     // Navigation chevrons convey inline direction rather than a fixed physical
     // direction, so mirror them when the document direction changes.

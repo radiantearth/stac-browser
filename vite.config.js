@@ -116,7 +116,13 @@ export default defineConfig(async ({ mode }) => {
       // direction-scoped LTR and RTL declarations from the same source CSS so
       // the UI can switch direction at runtime without loading a second theme.
       postcss: {
-        plugins: [postcssRTLCSS()],
+        // The imported BootstrapVueNext, Vue Datepicker, and Vue Multiselect
+        // styles use unquoted direction selectors. Matching their syntax lets
+        // RTLCSS recognize and preserve rules that already support RTL.
+        plugins: [postcssRTLCSS({
+          ltrPrefix: '[dir=ltr]',
+          rtlPrefix: '[dir=rtl]',
+        })],
       },
       preprocessorOptions: {
         scss: {
