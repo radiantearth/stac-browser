@@ -175,13 +175,14 @@ export default defineComponent({
       error: null,
       onDataLoaded: null,
       isNavigatingLocale: false,
+      localeNavigationId: 0,
       scrolled: false,
       hideSite: false,
       scrollListener: null
     };
   },
   computed: {
-    ...mapState(['allowSelectCatalog', 'browserReady', 'catalogRootUrl', 'conformsTo', 'data', 'dataLanguage', 'downloads', 'globalError', 'loading', 'stateQueryParameters', 'url']),
+    ...mapState(['allowSelectCatalog', 'browserReady', 'catalogRootUrl', 'conformsTo', 'data', 'dataLanguageNavigation', 'downloads', 'globalError', 'loading', 'stateQueryParameters', 'url']),
     ...mapState({
       showFavoritesFromVueX: 'showFavorites',
       footerLinksFromVueX: 'footerLinks',
@@ -274,12 +275,13 @@ export default defineComponent({
   },
   watch: {
     ...Watchers,
-    dataLanguage: {
-      immediate: true,
-      async handler(locale) {
+    dataLanguageNavigation: {
+      async handler(request) {
+        const locale = request?.locale;
         if (!locale) {
           return;
         }
+        const navigationId = ++this.localeNavigationId;
         if (this.data instanceof STAC) {
           const link = this.data.getLocaleLink(locale);
           if (link) {
@@ -287,22 +289,42 @@ export default defineComponent({
             const previousCatalogRootUrl = this.catalogRootUrl;
             this.isNavigatingLocale = true;
             try {
-              await this.$store.dispatch('switchCatalogRootLocale', { locale });
-              const failure = await this.$router.push(this.toBrowserPath(link));
-              if (failure && !isNavigationFailure(failure, NavigationFailureType.duplicated)) {
-                throw failure;
+              const catalogRootUrl = await this.$store.dispatch('switchCatalogRootLocale', {
+                locale,
+                commit: false
+              });
+              if (navigationId !== this.localeNavigationId) {
+                return;
               }
+              if (catalogRootUrl) {
+                this.$store.commit('catalogRootUrl', catalogRootUrl);
+              }
+              const failure = await this.$router.push(this.toBrowserPath(link));
+              if (navigationId !== this.localeNavigationId) {
+                return;
+              }
+              if (failure && !isNavigationFailure(failure, NavigationFailureType.duplicated)) {
+                if (this.catalogRootUrl !== previousCatalogRootUrl) {
+                  this.$store.commit('catalogRootUrl', previousCatalogRootUrl);
+                }
+                return;
+              }
+              this.$store.commit('state', state);
             }
             catch (error) {
-              if (this.catalogRootUrl !== previousCatalogRootUrl) {
+              if (
+                navigationId === this.localeNavigationId &&
+                this.catalogRootUrl !== previousCatalogRootUrl
+              ) {
                 this.$store.commit('catalogRootUrl', previousCatalogRootUrl);
               }
-              throw error;
+              console.error(error);
             }
             finally {
-              this.isNavigatingLocale = false;
+              if (navigationId === this.localeNavigationId) {
+                this.isNavigatingLocale = false;
+              }
             }
-            this.$store.commit('state', state);
           }
           else if (this.supportsConformance(API_LANGUAGE_CONFORMANCE)) {
             // this.url gets reset with resetCatalog so store the url for use in load
