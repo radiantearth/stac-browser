@@ -96,6 +96,13 @@ config_schema=$(cat /etc/nginx/conf.d/config.schema.json)
 runtime_config_tmp=/usr/share/nginx/html/runtime-config.js.tmp
 runtime_config=/usr/share/nginx/html/runtime-config.js
 
+# Resolve a JSON Schema "type" keyword to a single type name. The keyword may be
+# a string ("array") or an array of strings (["array", "null"]); take the first.
+schema_type() {
+    # $1 = jq path expression pointing at the "type" keyword
+    printf '%s\n' "$config_schema" | jq -r "$1 | if type == \"array\" then .[0] else . end"
+}
+
 # Iterate over environment variables with "SB_" prefix
 env -0 | tr '\0' '\n' | cut -f1 -d= | grep "^SB_" | {
     echo "window.STAC_BROWSER_CONFIG = {"
@@ -106,8 +113,8 @@ env -0 | tr '\0' '\n' | cut -f1 -d= | grep "^SB_" | {
         value="$(printenv "$name")"
 
         # Get the argument type from the schema
-        argtype="$(printf '%s\n' "$config_schema" | jq -r ".properties.$argname.type[0]")"
-        arraytype="$(printf '%s\n' "$config_schema" | jq -r ".properties.$argname.items.type[0]")"
+        argtype="$(schema_type ".properties.\"$argname\".type")"
+        arraytype="$(schema_type ".properties.\"$argname\".items.type")"
 
         # Encode key/value
         printf '  %s: ' "$argname"

@@ -24,11 +24,12 @@ const package_ = JSON.parse(
   readFileSync(new URL("./package.json", import.meta.url), "utf-8")
 );
 
+const isSchemaType = (schema, type) =>
+  Array.isArray(schema.type) ? schema.type.includes(type) : (schema.type === type);
+
 const optionsForType = (type) =>
   Object.entries(configSchema.properties)
-    .filter(
-      ([, schema]) => Array.isArray(schema.type) && schema.type.includes(type)
-    )
+    .filter(([, schema]) => isSchemaType(schema, type))
     .map(([key]) => key);
 
 const defaultConfigPath = fileURLToPath(new URL("./config.js", import.meta.url));
