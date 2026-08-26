@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   can be changed at runtime, and derived shades (hover states, subtle backgrounds, focus rings)
   follow the runtime colors automatically
 - Added `SB_RUNTIME` build-time environment variable to control whether `runtime-config.js` and `runtime-style.css` are loaded by the built HTML
+- Locale-driven right-to-left layout support and complete Arabic translations
 
 ### Removed
 
@@ -32,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Docker:
   - The `SB_CONFIG` and `SB_RUNTIME` environment variables no longer leak into the generated `runtime-config.js`
   - Fixed the environment variable detection in the entrypoint script (`cut` ran before the NUL separators were converted to newlines)
+- Localized catalog metadata updates immediately when switching languages
 
 ## [5.1.0-rc.1] - 2026-08-15
 
