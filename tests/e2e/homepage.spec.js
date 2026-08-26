@@ -74,7 +74,32 @@ test.describe('STAC Browser Data Source Selection', () => {
     const englishOption = dropdownMenu.getByText(/english/i);
     await expect(englishOption).toBeVisible();
   });
-  
+
+  test('Arabic switches the complete interface to RTL and keeps technical input LTR', async ({ page }) => {
+    await page.goto(`${HOME_PATH}?.language=ar`);
+
+    await expect(page.locator('html')).toHaveAttribute('lang', 'ar');
+    await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
+    await expect(page.locator('#stac-browser')).toHaveCSS('direction', 'rtl');
+    await expect(page.getByRole('button', { name: 'تحميل', exact: true })).toBeVisible();
+
+    // URLs remain unambiguous even while the surrounding form follows Arabic direction.
+    const urlInput = page.getByRole('textbox', { name: /كتالوج STAC أو API/i });
+    await expect(urlInput).toHaveAttribute('dir', 'ltr');
+    await expect(urlInput).toHaveCSS('direction', 'ltr');
+
+    // The leading navigation group moves to the right and the user controls to the left.
+    const navigation = await page.locator('header .site .navigation').boundingBox();
+    const userControls = await page.locator('header .site .user').boundingBox();
+    expect(navigation.x).toBeGreaterThan(userControls.x);
+
+    // Direction must be reversible when users switch back to an LTR language.
+    await page.getByRole('button', { name: /اللغة: العربية/ }).click();
+    await page.locator('.dropdown-menu:visible').getByText(/^English$/).click();
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+    await expect(page.locator('html')).toHaveAttribute('dir', 'ltr');
+  });
+
   test('should render catalog URL input with proper elements', async ({ page }) => {
     await page.goto(HOME_PATH);
     
