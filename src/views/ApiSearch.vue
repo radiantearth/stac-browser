@@ -349,6 +349,7 @@ export default defineComponent({
         this.data = null;
       }
       else if (this.searchLink) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         await this.loadResults(this.searchLink);
       }
     },
