@@ -116,6 +116,9 @@
   "optionalDependencies": {
     "ol-mapbox-style": "~13.2.0"
   },
+  "overrides": {
+    "rollup": "4.62.5"
+  },
   "browserslist": [
     "> 1%",
     "last 2 versions",
