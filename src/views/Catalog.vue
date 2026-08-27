@@ -124,7 +124,7 @@ export default defineComponent({
     };
   },
   computed: {
-    ...mapState(['data', 'apiCatalogPriority', 'apiItemsLink', 'apiItemsPagination', 'apiItemsNumberMatched', 'nextCollectionsLink', 'stateQueryParameters']),
+    ...mapState(['data', 'apiCatalogPriority', 'apiItemsLink', 'apiItemsPagination', 'apiItemsNumberMatched', 'nextCollectionsLink', 'omitTimeForMidnight', 'stateQueryParameters']),
     ...mapGetters(['catalogs', 'collectionLink', 'isApiChildrenLoading', 'isCollection', 'items', 'getApiItemsLoading', 'parentLink', 'rootLink']),
     ignoredMetadataFields() {
       return getIgnoredFields(this.data, 'CatalogLike');
@@ -182,7 +182,20 @@ export default defineComponent({
           // Remove union temporal extent in favor of more concrete extents
           extents = extents.slice(1);
         }
-        return this.formatTemporalExtents(extents);
+        const hasNonMidnightExtent = extents
+          .flat()
+          .filter(value => value !== null)
+          .some(value => {
+            const date = new Date(value);
+            return Number.isNaN(date.getTime()) ||
+              date.getUTCHours() !== 0 ||
+              date.getUTCMinutes() !== 0 ||
+              date.getUTCSeconds() !== 0 ||
+              date.getUTCMilliseconds() !== 0;
+          });
+        return this.formatTemporalExtents(extents, null, {
+          shorten: this.omitTimeForMidnight && !hasNonMidnightExtent
+        });
       }
       return null;
     },
