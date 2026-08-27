@@ -55,6 +55,7 @@ Save the file and restart / rebuild STAC Browser.
 
 The following actions are available:
 
+- `FavoriteCard`: Adds a button to the catalog, collection and item cards to add/remove them to/from the favorites. Requires `showFavorites` to be enabled in the config. By default, the button is shown on all pages with cards. To hide it on specific pages, set `showInBrowse` or `showInSearch` to `false` after the import in `stacActions.config.js`, e.g. `FavoriteCard.showInBrowse = false;`.
 - `stac-map`: Allows to open items through stac-map at <https://developmentseed.org/stac-map/>.
 
 All actions for catalogs, collections and items are stored in the folder [`src/actions/stac`](../src/actions/stac) if you want to inspect them.

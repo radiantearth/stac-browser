@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The source popover indicates when the shown data is not part of the configured catalog
 - Widget `ExternalWarning`: Shows an information on the page of a catalog, collection or item that is not part of the configured catalog
 
+### Changed
+
+- Show favorite button in the search cards by default
+
 ### Fixed
 
 - The Docker entrypoint and Vite config now support both forms of the JSON Schema `type` keyword (a string or an array of strings), fixing a `jq` error when setting `SB_footerLinks` via environment variables
