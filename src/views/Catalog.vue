@@ -80,7 +80,7 @@ import ReadMore from "../components/ReadMore.vue";
 import ShowAssetLinkMixin from '../components/ShowAssetLinkMixin';
 import StacFieldsMixin from '../components/StacFieldsMixin';
 import { formatLicense, formatTemporalExtents } from '@radiantearth/stac-fields/formatters';
-import Utils from '../utils';
+import Utils, { getTemporalExtentFormatOptions } from '../utils';
 import { hasText, isObject, size } from 'stac-js/src/utils.js';
 import { addSchemaToDocument, createCatalogSchema } from '../schema-org';
 import { ItemCollection } from 'stac-js';
@@ -182,20 +182,7 @@ export default defineComponent({
           // Remove union temporal extent in favor of more concrete extents
           extents = extents.slice(1);
         }
-        const hasNonMidnightExtent = extents
-          .flat()
-          .filter(value => value !== null)
-          .some(value => {
-            const date = new Date(value);
-            return Number.isNaN(date.getTime()) ||
-              date.getUTCHours() !== 0 ||
-              date.getUTCMinutes() !== 0 ||
-              date.getUTCSeconds() !== 0 ||
-              date.getUTCMilliseconds() !== 0;
-          });
-        return this.formatTemporalExtents(extents, null, {
-          shorten: this.omitTimeForMidnight && !hasNonMidnightExtent
-        });
+        return this.formatTemporalExtents(extents, null, getTemporalExtentFormatOptions(extents, this.omitTimeForMidnight));
       }
       return null;
     },
